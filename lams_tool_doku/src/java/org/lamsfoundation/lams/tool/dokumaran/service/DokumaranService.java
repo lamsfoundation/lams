@@ -1166,7 +1166,8 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	Dokumaran dokumaran = new Dokumaran();
 	dokumaran.setContentId(toolContentID);
 	dokumaran.setTitle(JsonUtil.optString(toolContentJSON, RestTags.TITLE));
-	dokumaran.setInstructions(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
+	dokumaran.setDescription(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
+	dokumaran.setInstructions(JsonUtil.optString(toolContentJSON, "etherpadInstructions"));
 	dokumaran.setCreated(updateDate);
 
 	dokumaran.setTimeLimit(JsonUtil.optInt(toolContentJSON, "timeLimit", 0));
@@ -1180,6 +1181,12 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	dokumaran.setUseSelectLeaderToolOuput(
 		JsonUtil.optBoolean(toolContentJSON, "useSelectLeaderToolOuput", Boolean.FALSE));
 	dokumaran.setAllowMultipleLeaders(JsonUtil.optBoolean(toolContentJSON, "allowMultipleLeaders", Boolean.FALSE));
+	
+	dokumaran.setGalleryWalkEnabled(JsonUtil.optBoolean(toolContentJSON, "galleryWalkEnabled", false));
+	if (dokumaran.isGalleryWalkEnabled()) {
+	    dokumaran.setGalleryWalkReadOnly(JsonUtil.optBoolean(toolContentJSON, "galleryWalkReadOnly", false));
+	    dokumaran.setGalleryWalkInstructions(JsonUtil.optString(toolContentJSON, "galleryWalkInstructions"));
+	}
 
 	dokumaran.setContentInUse(false);
 	dokumaran.setDefineLater(false);

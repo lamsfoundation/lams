@@ -260,13 +260,13 @@
 		onkeydown="doSearch(arguments[0]||event)" />
 		
 	<a href="#nogo" class="btn btn-default btn-sm loffset10" id="advanced-search-button">  
-		<i class="fa fa-lg fa-question-circle" aria-hidden="true" title="Advanced search"></i>
-		Advanced search
+		<i class="fa fa-fw fa-search-plus" aria-hidden="true"></i>
+		<fmt:message key="label.qb.advanced.search"/>
 	</a>
 </div>
 	
 <div id="advanced-search">
-	Collections: &nbsp;
+	<fmt:message key="label.qb.stats.collections"/>: &nbsp;
 	
 	<select id="collections-select" class="selectpicker" multiple>
 		<c:forEach var="collection" items="${userCollections}">

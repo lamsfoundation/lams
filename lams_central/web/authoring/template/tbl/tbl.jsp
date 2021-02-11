@@ -77,27 +77,35 @@
 			initializeWizard(validator);
 		});
 
-		function createApplicationExercise() {
-			var numAppex = $('#numAppEx');
-			var currNum = numAppex.val();
-			var nextNum = +currNum + 1;
-			var newDiv = document.createElement("div");
-			newDiv.id = 'divappex'+nextNum;
-			newDiv.className = 'panel panel-default';
-			var url=getSubmissionURL()+"/createApplicationExercise.do?appexNumber="+nextNum;
-			$('#accordianAppEx').append(newDiv);
+		function createApplicationExercise(type, callingAppexNumber) {
+			var targetNum = null,
+				targetDiv = null;
+			// if user chose a new doku question and current AE is empty, put the new doku AE instead of current AE
+			if (type == 'doku' && callingAppexNumber && $('#divass' + callingAppexNumber).is(':empty')) {
+				targetNum = callingAppexNumber;
+				targetDiv = $('#divappex' + targetNum);
+			} else {
+				// create a new AE
+				var numAppex = $('#numAppEx'),
+					currNum = numAppex.val();
+				targetNum = +currNum + 1;
+				targetDiv = $('<div />').attr('id', 'divappex' + targetNum).addClass('panel panel-default').appendTo('#accordianAppEx');
+			}
+
+			var url = getSubmissionURL() + "/createApplicationExercise.do?appexNumber=" 
+					 + targetNum + "&type=" + type + "&contentFolderID=${contentFolderID}";
+
 			$.ajaxSetup({ cache: true });
-			$(newDiv).load(url, function( response, status, xhr ) {
+			$(targetDiv).load(url, function( response, status, xhr ) {
 				if ( status == "error" ) {
 					console.log( xhr.status + " " + xhr.statusText );
-					newDiv.remove();
-				} else {
-					numAppex.val(nextNum);
-					newDiv.scrollIntoView();
+					targetDiv.remove();
+				} else if (targetNum != callingAppexNumber){
+					$('#numAppEx').val(targetNum);
+					targetDiv[0].scrollIntoView();
 					// close all the others
-					var i;
-					for (i = 1; i <= currNum; i++) {
-						$('#collapseAppex'+i).removeClass('in');
+					for (var i = 1; i < targetNum; i++) {
+						$('#collapseAppex' + i).removeClass('in');
 					}
 				}
 			});
@@ -315,10 +323,12 @@
 	
 			<div class="panel-group" id="accordianAppEx" role="tablist" aria-multiselectable="true"> 
 			<c:set var="appexNumber" scope="page">1</c:set>
-			<%@ include file="appex.jsp" %>
+			<%@ include file="appexAssessment.jsp" %>
 			</div> <!--  end panel group -->
 
-			<a href="#" id="createApplicationExerciseButton" onclick="javascript:createApplicationExercise();" class="btn btn-default"><i class="fa fa-plus"></i> <fmt:message key="authoring.create.application.exercise"/></a>
+			<a href="#" onclick="javascript:createApplicationExercise('assessment')" class="btn btn-default">
+				<i class="fa fa-plus"></i> <fmt:message key="authoring.create.application.exercise"/>
+			</a>
 			
 	    </div>
 

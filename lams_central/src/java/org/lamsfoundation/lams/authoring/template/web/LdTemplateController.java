@@ -129,40 +129,42 @@ public abstract class LdTemplateController {
 
     // icon strings found in the lams_learningdesign_activity table
     protected static final String ASSESSMENT_TOOL_SIGNATURE = "laasse10";
-    protected static final String ASSESSMENT_ICON = "tool/laasse10/images/icon_assessment.swf";
+    protected static final String ASSESSMENT_ICON = "tool/laasse10/images/icon_assessment.svg";
     protected static final String ASSESSMENT_TOOL_OUTPUT_DEFINITION = "learner.total.score";
     protected static final String CHAT_TOOL_SIGNATURE = "lachat11";
-    protected static final String CHAT_ICON = "tool/lachat11/images/icon_chat.swf";
+    protected static final String CHAT_ICON = "tool/lachat11/images/icon_chat.svg";
+    protected static final String DOKU_TOOL_SIGNATURE = "ladoku11";
+    protected static final String DOKU_ICON = "tool/ladoku11/images/icon_dokumaran.svg";
     protected static final String FORUM_TOOL_SIGNATURE = "lafrum11";
-    protected static final String FORUM_ICON = "tool/lafrum11/images/icon_forum.swf";
+    protected static final String FORUM_ICON = "tool/lafrum11/images/icon_forum.svg";
     protected static final String LEADER_TOOL_SIGNATURE = "lalead11";
-    protected static final String LEADER_ICON = "tool/lalead11/images/icon_leaderselection.swf";
+    protected static final String LEADER_ICON = "tool/lalead11/images/icon_leaderselection.svg";
     protected static final String MCQ_TOOL_SIGNATURE = "lamc11";
-    protected static final String MCQ_ICON = "tool/lamc11/images/icon_mcq.swf";
+    protected static final String MCQ_ICON = "tool/lamc11/images/icon_mcq.svg";
     protected static final String MCQ_TOOL_OUTPUT_DEFINITION = "learner.mark";
     protected static final String NOTEBOOK_TOOL_SIGNATURE = "lantbk11";
-    protected static final String NOTEBOOK_ICON = "tool/lantbk11/images/icon_notebook.swf";
+    protected static final String NOTEBOOK_ICON = "tool/lantbk11/images/icon_notebook.svg";
     protected static final String NOTICEBOARD_TOOL_SIGNATURE = "lanb11";
-    protected static final String NOTICEBOARD_ICON = "tool/lanb11/images/icon_htmlnb.swf";
+    protected static final String NOTICEBOARD_ICON = "tool/lanb11/images/icon_htmlnb.svg";
     protected static final String QA_TOOL_SIGNATURE = "laqa11";
-    protected static final String QA_ICON = "tool/laqa11/images/icon_questionanswer.swf";
+    protected static final String QA_ICON = "tool/laqa11/images/icon_questionanswer.svg";
     protected static final String SHARE_RESOURCES_TOOL_SIGNATURE = "larsrc11";
-    protected static final String SHARE_RESOURCES_ICON = "tool/larsrc11/images/icon_rsrc.swf";
+    protected static final String SHARE_RESOURCES_ICON = "tool/larsrc11/images/icon_rsrc.svg";
     protected static final String SCRATCHIE_TOOL_SIGNATURE = "lascrt11";
-    protected static final String SCRATCHIE_ICON = "tool/lascrt11/images/icon_scratchie.swf";
+    protected static final String SCRATCHIE_ICON = "tool/lascrt11/images/icon_scratchie.svg";
     protected static final String SCRATCHIE_TOOL_OUTPUT_DEFINITION = "learner.mark";
     protected static final String SCRIBE_TOOL_SIGNATURE = "lascrb11";
-    protected static final String SCRIBE_ICON = "tool/lascrb11/images/icon_scribe.swf";
+    protected static final String SCRIBE_ICON = "tool/lascrb11/images/icon_scribe.svg";
     protected static final String SUBMIT_TOOL_SIGNATURE = "lasbmt11";
-    protected static final String SUBMIT_ICON = "tool/lasbmt11/images/icon_reportsubmission.swf";
+    protected static final String SUBMIT_ICON = "tool/lasbmt11/images/icon_reportsubmission.svg";
     protected static final String SURVEY_TOOL_SIGNATURE = "lasurv11";
-    protected static final String SURVEY_ICON = "tool/lasurv11/images/icon_survey.swf";
+    protected static final String SURVEY_ICON = "tool/lasurv11/images/icon_survey.svg";
     protected static final String WIKI_TOOL_SIGNATURE = "lawiki10";
-    protected static final String WIKI_ICON = "tool/lawiki10/images/icon_wiki.swf";
+    protected static final String WIKI_ICON = "tool/lawiki10/images/icon_wiki.svg";
     protected static final String MINDMAP_TOOL_SIGNATURE = "lamind10";
-    protected static final String MINDMAP_ICON = "tool/lamind10/images/icon_mindmap.swf";
+    protected static final String MINDMAP_ICON = "tool/lamind10/images/icon_mindmap.svg";
     protected static final String VOTE_TOOL_SIGNATURE = "lavote11";
-    protected static final String VOTE_ICON = "tool/lavote11/images/icon_ranking.swf";
+    protected static final String VOTE_ICON = "tool/lavote11/images/icon_ranking.svg";
     protected static final String PEER_REVIEW_TOOL_SIGNATURE = "laprev11";
     protected static final String PEER_REVIEW_ICON = "tool/laprev11/images/icon_peerreview.svg";
 
@@ -1246,6 +1248,35 @@ public abstract class LdTemplateController {
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.PEER_REVIEW_TOOL_SIGNATURE,
 		LdTemplateController.PEER_REVIEW_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
 		parentActivityType, activityTitle != null ? activityTitle : "Peer Review");
+    }
+
+    /**
+     * Helper method to create a doKumaran tool content.
+     */
+    protected Long createDokumaranToolContent(UserDTO user, String title, String description, String instructions,
+	    boolean selectLeaderToolOutput, boolean galleryWalkEnabled, boolean galleryWalkReadOnly,
+	    String galleryWalkInstructions, String reflectionInstructions) throws IOException {
+
+	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, description,
+		reflectionInstructions, null, null, user);
+	toolContentJSON.put(RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, selectLeaderToolOutput);
+	toolContentJSON.put("etherpadInstructions", instructions);
+	toolContentJSON.put("galleryWalkEnabled", galleryWalkEnabled);
+	toolContentJSON.put("galleryWalkReadOnly", galleryWalkReadOnly);
+	toolContentJSON.put("galleryWalkInstructions", galleryWalkInstructions);
+	return authoringService.createToolContent(user, LdTemplateController.DOKU_TOOL_SIGNATURE, toolContentJSON);
+    }
+
+    /**
+     * Creates a doKumaran activity's JSON details.
+     */
+    protected ObjectNode createDokumaranActivity(AtomicInteger uiid, int order, Integer[] layoutCoords,
+	    Long toolContentID, String contentFolderID, Integer groupingUIID, Integer parentUIID,
+	    Integer parentActivityType, String activityTitle) {
+
+	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.DOKU_TOOL_SIGNATURE,
+		LdTemplateController.DOKU_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
+		parentActivityType, activityTitle != null ? activityTitle : "doKumaran");
     }
 
     /**
