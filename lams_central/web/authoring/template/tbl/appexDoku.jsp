@@ -37,7 +37,7 @@
 		<div class="form-group">
 		    <label for="divappex${param.appexNumber}dokuDescription">
 				<fmt:message key="authoring.label.application.exercise.doku.description" />&nbsp;
-				<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="" data-original-title="<fmt:message key="authoring.label.application.exercise.doku.description.tooltop"/>"></i>
+				<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="" data-original-title="<fmt:message key="authoring.label.application.exercise.doku.description.tooltip"/>"></i>
 			</label>
 		    <lams:CKEditor id="divappex${param.appexNumber}dokuDescription" value="" contentFolderID="${param.contentFolderID}" height="100"/>
 		</div>
@@ -45,7 +45,7 @@
 		<div class="form-group">
 		    <label for="divappex${param.appexNumber}dokuInstructions">
 		    	<fmt:message key="authoring.label.application.exercise.doku.instructions" /> &nbsp;
-				<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="" data-original-title="<fmt:message key="authoring.label.application.exercise.doku.instructions.tooltop"/>"></i>
+				<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="" data-original-title="<fmt:message key="authoring.label.application.exercise.doku.instructions.tooltip"/>"></i>
 		    </label>
 		    <lams:CKEditor id="divappex${param.appexNumber}dokuInstructions" value="" contentFolderID="${param.contentFolderID}" height="100" toolbarSet="DefaultDoku" method="inline"/>
 		</div>
