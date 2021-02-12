@@ -315,24 +315,24 @@
 			<div aria-expanded="false" id="qb-stats" class="panel-body panel-collapse collapse" role="tabpanel" aria-labelledby="heading-qb-stats">
 				<table class="table table-striped table-hover table-condensed">
 					<tr>		
-						<th scope="col">
+						<th scope="col"  class="text-left">
 							#
 						</th>
-						<th scope="col">
+						<th scope="col"  class="text-left">
 							<fmt:message key="label.monitoring.question.summary.question"/>
 						</th>
-						<th scope="col">
+						<th scope="col" class="text-center">
 							<fmt:message key="label.qb.participant.count"/>
 						</th>
-						<th scope="col">
+						<th scope="col" class="text-center">
 							<fmt:message key="label.qb.difficulty.index"/>&nbsp;
 							<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key="label.qb.difficulty.index.tooltip" />"></i>
 						</th>
-						<th scope="col">
+						<th scope="col" class="text-center">
 							<fmt:message key="label.qb.discrimination.index"/>&nbsp;
 							<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key="label.qb.discrimination.index.tooltip" />"></i>
 						</th>
-						<th scope="col">
+						<th scope="col" class="text-center">
 							<fmt:message key="label.qb.point.biserial"/>&nbsp;
 							 <i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key="label.qb.point.biserial.tooltip" />"></i>
 						</th>
@@ -340,25 +340,25 @@
 						
 					<c:forEach var="activityDTO" items="${qbStats}" varStatus="i">
 						<tr>
-							<td>
+							<td class="text-left">
 								${i.index + 1}
 							</td>
-							<td>
+							<td class="text-left">
 								<c:out value="${activityDTO.qbQuestion.name}" escapeXml="false"/>			
 							</td>
-							<td style="text-align: right">
+							<td class="text-center">
 								<c:out value="${activityDTO.participantCount}" />
 							</td>
 							<c:choose>
 								<c:when test="${activityDTO.participantCount < 2}">
-									<td style="text-align: center">-</td>
-									<td style="text-align: center">-</td>
-									<td style="text-align: center">-</td>
+									<td class="text-center">-</td>
+									<td class="text-center">-</td>
+									<td class="text-center">-</td>
 								</c:when>
 								<c:otherwise>
-									<td style="text-align: right"><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.difficultyIndex}" /></td>
-									<td style="text-align: right"><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.discriminationIndex}" /></td>
-									<td style="text-align: right"><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.pointBiserial}" /></td>
+									<td class="text-center"><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.difficultyIndex}" /></td>
+									<td class="text-center"><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.discriminationIndex}" /></td>
+									<td class="text-center"><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.pointBiserial}" /></td>
 								</c:otherwise>
 							</c:choose>
 						</tr>
