@@ -34,8 +34,7 @@ public class LessonDetailsDTO {
 
     private Long lessonID;
     private String lessonName;
-    private String lessonIntro;;
-    private String learningDesignDescription;
+    private String lessonInstructions;
     private Integer lessonStateID;
     private Date createDateTime;
     private String createDateTimeStr;
@@ -73,8 +72,7 @@ public class LessonDetailsDTO {
     public LessonDetailsDTO(Lesson lesson) {
 	this.lessonID = lesson.getLessonId();
 	this.lessonName = lesson.getLessonName();
-	this.lessonIntro = lesson.getLessonDescription();
-	this.learningDesignDescription = lesson.getLearningDesign().getDescription();
+	this.lessonInstructions = lesson.getLearningDesign().getDescription();
 	this.lessonStateID = lesson.getLessonStateId();
 	this.createDateTime = lesson.getCreateDateTime();
 	this.createDateTimeStr = null;
@@ -268,16 +266,12 @@ public class LessonDetailsDTO {
 	this.numberStartedLearners = numberStartedLearners;
     }
 
-    public String getLearningDesignDescription() {
-	return learningDesignDescription;
-    }
-
-    public String getLessonIntro() {
-	return lessonIntro;
-    }
-
     public String getLessonName() {
 	return lessonName;
+    }
+
+    public String getLessonInstructions() {
+	return lessonInstructions;
     }
 
     public Integer getNumberPossibleLearners() {
@@ -325,8 +319,8 @@ public class LessonDetailsDTO {
 	this.lessonName = lessonName;
     }
 
-    public void setLearningDesignDescription(String lessonDescription) {
-	this.learningDesignDescription = lessonDescription;
+    public void setLessonInstructions(String lessonInstructions) {
+	this.lessonInstructions = lessonInstructions;
     }
 
     public void setLessonStateID(Integer lessonStateID) {

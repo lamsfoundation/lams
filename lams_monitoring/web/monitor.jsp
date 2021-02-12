@@ -245,12 +245,6 @@
 			initLearnersTab();
 			initGradebookTab();
 			refreshMonitor();
-			<c:if test="${not empty lesson.learningDesignDescription}">
-				$('#description').readmore({
-					speed: 500,
-					collapsedHeight: 85
-				});
-			</c:if>
 			
 			// remove "loading..." screen
 			$('#loadingOverlay').remove();
@@ -315,10 +309,13 @@
 			<lams:Tab id="2" key="tab.sequence" />
 			<lams:Tab id="3" key="tab.learners" />
 			<lams:Tab id="4" key="tab.gradebook" />
+			<c:if test="${not empty lesson.lessonInstructions}">
+				<lams:Tab id="5" key="tab.instructions" />
+			</c:if>
 		</lams:Tabs>
 		<lams:TabBodyArea>
 			<lams:TabBodys>
-				<lams:TabBody id="1" titleKey="label.basic">
+				<lams:TabBody id="1">
 					<div class="row">
 						<div class="col-xs-12">
 							<button onclick="javascript:startTour();return false;" class="btn btn-sm btn-default pull-right roffset10 tour-button"> 
@@ -342,14 +339,6 @@
 						
 							<!-- Lesson details -->
 							<dl id="lessonDetails" class="dl-horizontal">
-								<c:if test="${not empty lesson.learningDesignDescription}">
-									<dt><fmt:message key="lesson.description"/></dt>
-									<dd id="tabLessonLessonDescription">
-										<div id="description">
-											<c:out value="${lesson.learningDesignDescription}" escapeXml="false"/>
-										</div>
-									</dd>
-								</c:if>
 								<dt><fmt:message key="lesson.state"/>
 								</dt>
 								<dd>
@@ -541,7 +530,7 @@
 					</div>
 				</lams:TabBody>
 				
-				<lams:TabBody id="2" titleKey="label.advanced">
+				<lams:TabBody id="2">
 					<span class="pull-left" style="display:none" id="liveEditWarning"></span>
 					
 					<div id="sequenceTopButtonsContainer" class="topButtonsContainer">
@@ -577,7 +566,7 @@
 					     src="<lams:LAMSURL/>images/pedag_down_arrow.gif" />
 				</lams:TabBody>
 				
-				<lams:TabBody id="3" titleKey="label.conditions">
+				<lams:TabBody id="3">
 					<table id="tabLearnerControlTable">
 						<tr>
 							<td class="learnersHeaderCell">
@@ -633,7 +622,7 @@
 					</div>
 				</lams:TabBody>
 				
-				<lams:TabBody id="4" titleKey="label.gradebook">
+				<lams:TabBody id="4">
 					<div id="gradebookTopButtonsContainer" class="topButtonsContainer pull-right">
 						<button onclick="javascript:startTour();return false;" class="btn btn-sm btn-default pull-right roffset10 tour-button"> 
 						<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="label.tour"/></span></button>
@@ -646,7 +635,25 @@
 					<div id="gradebookDiv"></div>
 					<img id="gradebookLoading" src="<lams:LAMSURL/>images/ajax-loader-big.gif" />
 				</lams:TabBody>
-		    </lams:TabBodys>
+				<c:if test="${not empty lesson.lessonInstructions}">
+					<lams:TabBody id="5">
+						<div class="row">
+							<div class="col-xs-12">
+									<h3>
+										<fmt:message key="tab.instructions.title" />
+									</h3>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-12">
+								<div id="lesson-instructions">
+									<c:out value="${lesson.lessonInstructions}" escapeXml="false" />
+								</div>
+							</div>
+						</div>
+					</lams:TabBody>
+				</c:if>
+			</lams:TabBodys>
 		 </lams:TabBodyArea>
 	 </lams:Page>
 	 
