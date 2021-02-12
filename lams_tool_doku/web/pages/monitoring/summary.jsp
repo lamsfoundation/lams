@@ -89,7 +89,8 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script> 
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>  
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script> 
-<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-editable.js"></script> 
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-editable.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script> 
 <script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/etherpad.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
