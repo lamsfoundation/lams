@@ -47,6 +47,7 @@
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/persistence/api/main/javax.persistence-api-2.2.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/persistence-api"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jboss/logging/commons/logging/main/commons-logging-jboss-logging-1.0.0.Final.jar"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/hibernate/main/hibernate-core-5.3.6.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/hibernate-core"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/websocket/api/main/jboss-websocket-api_1.1_spec-1.1.3.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/websocket"/>
 	<classpathentry kind="output" path="bin"/>
 	<referencedentry kind="lib" path="/lams_build/lib/lams/lams.jar" sourcepath=""/>
 </classpath>

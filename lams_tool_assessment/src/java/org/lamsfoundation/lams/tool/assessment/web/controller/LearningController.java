@@ -204,8 +204,8 @@ public class LearningController {
 		}
 
 		//if the time is up and leader hasn't submitted response - show waitForLeaderFinish page
-		boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(assessment.getUid(),
-			groupLeader.getUserId());
+		boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(assessment.getContentId(),
+			groupLeader.getUserId().intValue());
 		if (isTimeLimitExceeded) {
 		    request.setAttribute(AssessmentConstants.PARAM_WAITING_MESSAGE_KEY,
 			    "label.waiting.for.leader.finish");
@@ -446,8 +446,8 @@ public class LearningController {
 	AssessmentUser leader = session.getGroupLeader();
 
 	//in case of time limit - prevent user from seeing questions page longer than time limit allows
-	boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(session.getAssessment().getUid(),
-		leader.getUserId());
+	boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(session.getAssessment().getContentId(),
+		leader.getUserId().intValue());
 	boolean isLeaderResponseFinalized = service.isLastAttemptFinishedByUser(leader);
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();

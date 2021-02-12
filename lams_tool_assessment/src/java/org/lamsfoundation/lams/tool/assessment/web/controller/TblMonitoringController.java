@@ -35,7 +35,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/tblmonitoring")
@@ -49,21 +51,10 @@ public class TblMonitoringController {
      * Shows ira page in case of Assessment activity
      */
     @RequestMapping("iraAssessment")
-    public String iraAssessment(HttpServletRequest request) {
-	Long toolContentId = WebUtil.readLongParam(request, "toolContentID");
-
-	String[] toolContentIds = new String[] { toolContentId.toString() };
-	String[] activityTitles = new String[] { "" };
-	List<TblAssessmentDTO> assessmentDtos = getAssessmentDtos(toolContentIds, activityTitles);
-	request.setAttribute("assessmentDtos", assessmentDtos);
-
-	boolean attemptedByAnyLearners = assessmentDtos.stream().mapToInt(TblAssessmentDTO::getAttemptedLearnersNumber)
-		.reduce(Integer::max).orElse(0) > 0;
-	request.setAttribute("iraAttemptedByAnyLearners", attemptedByAnyLearners);
-
-	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
-	request.setAttribute("isIraAssessment", true);
-	return "pages/tblmonitoring/assessment";
+    public String iraAssessment(@RequestParam(name = AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentId,
+	    Model model) {
+	model.addAttribute("isIraAssessment", true);
+	return assessment(toolContentId, model);
     }
 
     /**
@@ -172,18 +163,17 @@ public class TblMonitoringController {
     }
 
     /**
-     * Shows aes page
+     * Shows assessment (iRAT or AE) page
      */
-    @RequestMapping("aes")
-    public String aes(HttpServletRequest request) {
-	String[] toolContentIds = request.getParameter("assessmentToolContentIds").split(",");
-	String[] activityTitles = request.getParameter("assessmentActivityTitles").split("\\,");
+    @RequestMapping("assessment")
+    public String assessment(@RequestParam(name = AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentId,
+	    Model model) {
+	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
+	model.addAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
+	model.addAttribute("allowDiscloseAnswers", assessment.isAllowDiscloseAnswers());
 
-	List<TblAssessmentDTO> assessmentDtos = getAssessmentDtos(toolContentIds, activityTitles);
-	request.setAttribute("assessmentDtos", assessmentDtos);
-
-	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID, true);
-	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
+	int attemptedLearnersNumber = assessmentService.getCountUsersByContentId(toolContentId);
+	model.addAttribute("attemptedLearnersNumber", attemptedLearnersNumber);
 
 	return "pages/tblmonitoring/assessment";
     }

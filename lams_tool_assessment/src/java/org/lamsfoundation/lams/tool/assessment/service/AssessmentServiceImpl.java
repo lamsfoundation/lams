@@ -316,8 +316,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public LocalDateTime launchTimeLimit(Long assessmentUid, Long userId) {
-	AssessmentResult lastResult = getLastAssessmentResult(assessmentUid, userId);
+    public LocalDateTime launchTimeLimit(long toolContentId, int userId) {
+	Assessment assessment = getAssessmentByContentId(toolContentId);
+	AssessmentResult lastResult = getLastAssessmentResult(assessment.getUid(), Long.valueOf(userId));
 	LocalDateTime launchedDate = LocalDateTime.now();
 	lastResult.setTimeLimitLaunchedDate(launchedDate);
 	assessmentResultDao.saveObject(lastResult);
@@ -325,9 +326,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public boolean checkTimeLimitExceeded(long assessmentUid, long userId) {
-	Long secondsLeft = LearningWebsocketServer.getSecondsLeft(assessmentUid, userId);
-	return secondsLeft != null && secondsLeft.equals(0);
+    public boolean checkTimeLimitExceeded(long toolContentId, int userId) {
+	Long secondsLeft = LearningWebsocketServer.getSecondsLeft(toolContentId, userId);
+	return secondsLeft != null && secondsLeft.equals(0L);
     }
 
     @Override

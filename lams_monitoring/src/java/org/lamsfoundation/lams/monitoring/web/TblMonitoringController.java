@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -259,6 +260,22 @@ public class TblMonitoringController {
     }
 
     /**
+     * Shows AEs page
+     */
+    @RequestMapping("/aes")
+    public String aes(HttpServletRequest request, Model model) {
+	String[] toolContentIds = request.getParameter("aeToolContentIds").split(",");
+	String[] toolTypes = request.getParameter("aeToolTypes").split(",");
+	String[] activityTitles = request.getParameter("aeActivityTitles").split("\\,");
+
+	model.addAttribute("aeToolContentIds", toolContentIds);
+	model.addAttribute("aeToolTypes", toolTypes);
+	model.addAttribute("aeActivityTitles", activityTitles);
+
+	return "tblmonitor/aes";
+    }
+
+    /**
      * Returns lesson activities sorted by the learning design order.
      */
     private List<Activity> getLessonActivities(Lesson lesson) {
@@ -369,8 +386,9 @@ public class TblMonitoringController {
 
 	boolean scratchiePassed = false;
 	boolean iraPassed = false;
-	String assessmentToolContentIds = "";
-	String assessmentActivityTitles = "";
+	String aeToolContentIds = "";
+	String aeToolTypes = "";
+	String aeActivityTitles = "";
 	for (Activity activity : activities) {
 	    if (activity instanceof ToolActivity) {
 		ToolActivity toolActivity = (ToolActivity) activity;
@@ -397,11 +415,13 @@ public class TblMonitoringController {
 
 		//aes are counted only after Scratchie activity, or for LKC TBL monitoring
 		if ((scratchiePassed || !isScratchieAvailable)
-			&& CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)) {
+			&& (CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)
+				|| CommonConstants.TOOL_SIGNATURE_DOKU.equals(toolSignature))) {
 		    request.setAttribute("isAeAvailable", true);
 		    //prepare assessment details to be passed to Assessment tool
-		    assessmentToolContentIds += toolContentId + ",";
-		    assessmentActivityTitles += toolTitle + "\\,";
+		    aeToolContentIds += toolContentId + ",";
+		    aeToolTypes += CommonConstants.TOOL_SIGNATURE_DOKU.equals(toolSignature) ? "d," : "a,";
+		    aeActivityTitles += toolTitle + "\\,";
 
 		} else if (CommonConstants.TOOL_SIGNATURE_FORUM.equals(toolSignature)) {
 		    request.setAttribute("isForumAvailable", true);
@@ -430,7 +450,8 @@ public class TblMonitoringController {
 	    }
 	}
 
-	request.setAttribute("assessmentToolContentIds", assessmentToolContentIds);
-	request.setAttribute("assessmentActivityTitles", assessmentActivityTitles);
+	request.setAttribute("aeToolContentIds", aeToolContentIds);
+	request.setAttribute("aeToolTypes", aeToolTypes);
+	request.setAttribute("aeActivityTitles", aeActivityTitles);
     }
 }

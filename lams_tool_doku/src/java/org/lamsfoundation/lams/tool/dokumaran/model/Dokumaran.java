@@ -23,9 +23,14 @@
 
 package org.lamsfoundation.lams.tool.dokumaran.model;
 
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -33,6 +38,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.StringUtils;
@@ -76,15 +82,17 @@ public class Dokumaran implements Cloneable {
     @Column(name = "allow_multiple_leaders")
     private boolean allowMultipleLeaders;
 
-    @Column(name = "time_limit")
-    private int timeLimit;
+    @Column(name = "relative_time_limit")
+    private int relativeTimeLimit;
 
-    @Column(name = "time_limit_manual_start")
-    private boolean timeLimitManualStart;
+    @Column(name = "absolute_time_limit")
+    private LocalDateTime absoluteTimeLimit;
 
-    //date when teacher has started time counter (pressed start button)
-    @Column(name = "time_limit_launched_date")
-    private Date timeLimitLaunchedDate;
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "tl_ladoku11_time_limit", joinColumns = @JoinColumn(name = "dokumaran_uid"))
+    @MapKeyColumn(name = "user_id")
+    @Column(name = "adjustment")
+    private Map<Integer, Integer> timeLimitAdjustments = new HashMap<>();
 
     @Column(name = "show_chat")
     private boolean showChat;
@@ -165,6 +173,8 @@ public class Dokumaran implements Cloneable {
 	} catch (CloneNotSupportedException e) {
 	    Dokumaran.log.error("When clone " + Dokumaran.class + " failed");
 	}
+
+	dokumaran.setTimeLimitAdjustments(new HashMap<>(this.getTimeLimitAdjustments()));
 
 	return dokumaran;
     }
@@ -343,35 +353,32 @@ public class Dokumaran implements Cloneable {
     /**
      * @return Returns the time limitation, that students have to complete an attempt.
      */
-    public int getTimeLimit() {
-	return timeLimit;
+    public int getRelativeTimeLimit() {
+	return relativeTimeLimit;
     }
 
     /**
      * @param timeLimit
      *            the time limitation, that students have to complete an attempt.
      */
-    public void setTimeLimit(int timeLimit) {
-	this.timeLimit = timeLimit;
+    public void setRelativeTimeLimit(int timeLimit) {
+	this.relativeTimeLimit = timeLimit;
     }
 
-    public boolean isTimeLimitManualStart() {
-	return timeLimitManualStart;
+    public LocalDateTime getAbsoluteTimeLimit() {
+	return absoluteTimeLimit;
     }
 
-    public void setTimeLimitManualStart(boolean timeLimitManualStart) {
-	this.timeLimitManualStart = timeLimitManualStart;
+    public void setAbsoluteTimeLimit(LocalDateTime absoluteTimeLimit) {
+	this.absoluteTimeLimit = absoluteTimeLimit;
     }
 
-    /**
-     * @return date when teacher has started time counter (pressed start button)
-     */
-    public Date getTimeLimitLaunchedDate() {
-	return timeLimitLaunchedDate;
+    public Map<Integer, Integer> getTimeLimitAdjustments() {
+	return timeLimitAdjustments;
     }
 
-    public void setTimeLimitLaunchedDate(Date timeLimitLaunchedDate) {
-	this.timeLimitLaunchedDate = timeLimitLaunchedDate;
+    public void setTimeLimitAdjustments(Map<Integer, Integer> timeLimitAdjustments) {
+	this.timeLimitAdjustments = timeLimitAdjustments;
     }
 
     public boolean isShowChat() {

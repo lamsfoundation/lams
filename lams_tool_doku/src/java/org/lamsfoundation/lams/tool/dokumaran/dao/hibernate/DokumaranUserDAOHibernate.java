@@ -35,8 +35,6 @@ public class DokumaranUserDAOHibernate extends LAMSBaseDAO implements DokumaranU
 
     private static final String FIND_BY_USER_ID_CONTENT_ID = "from " + DokumaranUser.class.getName()
 	    + " as u where u.userId =? and u.dokumaran.contentId=?";
-    private static final String FIND_BY_USER_ID_CONTENT_ID_VIA_SESSION = "from " + DokumaranUser.class.getName()
-	    + " as u where u.userId =? and u.session.dokumaran.contentId=?";
     private static final String FIND_BY_USER_ID_SESSION_ID = "from " + DokumaranUser.class.getName()
 	    + " as u where u.userId =? and u.session.sessionId=?";
     private static final String FIND_BY_SESSION_ID = "from " + DokumaranUser.class.getName()
@@ -56,15 +54,6 @@ public class DokumaranUserDAOHibernate extends LAMSBaseDAO implements DokumaranU
     @Override
     public DokumaranUser getUserByUserIDAndContentID(Long userId, Long contentId) {
 	List<?> list = this.doFind(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
-	if (list == null || list.size() == 0) {
-	    return null;
-	}
-	return (DokumaranUser) list.get(0);
-    }
-
-    @Override
-    public DokumaranUser getUserByUserIDAndContentIDViaSession(Long userId, Long contentId) {
-	List<?> list = this.doFind(FIND_BY_USER_ID_CONTENT_ID_VIA_SESSION, new Object[] { userId, contentId });
 	if (list == null || list.size() == 0) {
 	    return null;
 	}

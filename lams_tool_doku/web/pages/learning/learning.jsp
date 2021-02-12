@@ -10,7 +10,6 @@
 <c:set var="dokumaran" value="${sessionMap.dokumaran}" />
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 <c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
-<c:set var="isTimeLimitEnabled" value="${hasEditRight && assessment.getTimeLimit() != 0 && !finishedLock}" />
 <c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 	
 <lams:html>
@@ -19,19 +18,20 @@
 	<%@ include file="/common/header.jsp"%>
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 	<style media="screen,projection" type="text/css">
-		#countdown {
+  		.countdown-timeout {
+  			color: #FF3333 !important;
+  		}		
+  		
+  		#countdown {
 			width: 150px; 
 			font-size: 110%; 
 			font-style: italic; 
 			color:#47bc23;
 			text-align: center;
 		}
-		#countdown-label {
-			font-size: 170%; padding-top:5px; padding-bottom:5px; font-style: italic; color:#47bc23;
-		}
 		
 		.lower-to-fit-countdown {
-			margin-top: 70px;
+			margin-top: 55px;
 		}
 	</style>
 
@@ -69,22 +69,7 @@
 				<c:if test="${hasEditRight}">,'userName':'<lams:user property="firstName" />&nbsp;<lams:user property="lastName" />'</c:if>
 			});
 			
-			if (${secondsLeft > 0}) {
-				displayCountdown()
-			}
-			
 			$('[data-toggle="tooltip"]').bootstrapTooltip();
-
-			<%-- Connect to command websocket only if it is learner UI --%>
-			<c:if test="${dokumaran.useSelectLeaderToolOuput and mode == 'learner'}">
-				// command websocket stuff for refreshing
-				// trigger is an unique ID of page and action that command websocket code in Page.tag recognises
-				commandWebsocketHookTrigger = 'doku-leader-change-refresh-${toolSessionID}';
-				// if the trigger is recognised, the following action occurs
-				commandWebsocketHook = function() {
-					location.reload();
-				};
-			</c:if>
 		});
 		
 		if (${!hasEditRight && mode != "teacher" && !finishedLock}) {
@@ -115,33 +100,107 @@
 		function continueReflect(){
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
+
+
 		
-		function displayCountdown() {
+		// TIME LIMIT
+		var dokuWebsocketInitTime = Date.now(),
+			dokuWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
+						+ 'learningWebsocket?toolContentID=' + ${sessionMap.toolContentID}),
+			dokuWebsocketPingTimeout = null,
+			dokuWebsocketPingFunc = null;
+		
+		dokuWebsocket.onclose = function(){
+			// react only on abnormal close
+			if (e.code === 1006 &&
+				Date.now() - dokuWebsocketInitTime > 1000) {
+				location.reload();
+			}
+		};
+		
+		dokuWebsocketPingFunc = function(skipPing){
+			if (dokuWebsocket.readyState == dokuWebsocket.CLOSING 
+					|| dokuWebsocket.readyState == dokuWebsocket.CLOSED){
+				return;
+			}
+			
+			// check and ping every 3 minutes
+			dokuWebsocketPingTimeout = setTimeout(dokuWebsocketPingFunc, 3*60*1000);
+			// initial set up does not send ping
+			if (!skipPing) {
+				dokuWebsocket.send("ping");
+			}
+		};
+		
+		// set up timer for the first time
+		dokuWebsocketPingFunc(true);
+
+		var timeLimitExceeded = ${timeLimitExceeded};
+		// run when the server pushes new reports and vote statistics
+		dokuWebsocket.onmessage = function(e) {
+			// create JSON object
+			var input = JSON.parse(e.data);
+	
+			if (input.clearTimer == true) {
+				// teacher stopped the timer, destroy it
+				$('#countdown').countdown('destroy').remove();
+			} else {
+				// teacher updated the timer
+				var secondsLeft = +input.secondsLeft,
+					counterInitialised = $('#countdown').length > 0;
+					
+				if (counterInitialised) {
+					// just set the new time
+					$('#countdown').countdown('option', 'until', secondsLeft + 'S');
+				} else if (secondsLeft){
+					if (timeLimitExceeded) {
+					    // teacher gave extra time, reload to writable Etherpad
+						location.reload();
+						return;
+					}
+					// initialise the timer
+					displayCountdown(secondsLeft);
+				}
+			}
+			
+			// reset ping timer
+			clearTimeout(dokuWebsocketPingTimeout);
+			dokuWebsocketPingFunc(true);
+		};
+
+		function displayCountdown(secondsLeft){
+			$('#etherpad-panel').addClass('lower-to-fit-countdown');
+			
+			var countdown = '<div id="countdown"></div>';
+			
 			$.blockUI({
-				message: '<div id="countdown"></div>', 
+				message: countdown, 
 				showOverlay: false,
 				focusInput: false,
 				css: { 
-					top: '10px',
+					top: '40px',
 					left: '',
-					right: '1%',
-					width: '150px',
-			        opacity: '.8',
+					right: '0%',
+			        opacity: '1', 
+			        width: '150px',
 			        cursor: 'default',
 			        border: 'none'
 		        }   
 			});
 			
 			$('#countdown').countdown({
-				until: '+${secondsLeft}S',
+				until: '+' + secondsLeft +'S',
 				format: 'hMS',
 				compact: true,
-				description: "<div id='countdown-label'><fmt:message key='label.time.left' /></div>",
+				alwaysExpire : true,
 				onTick: function(periods) {
-					//check for 30 seconds
-					if ((periods[4] == 0) && (periods[5] == 0) && (periods[6] <= 30)) {
-						$('#countdown').css('color', '#FF3333');
-					}					
+					// check for 30 seconds or less and display timer in red
+					var secondsLeft = $.countdown.periodsToSeconds(periods);
+					if (secondsLeft <= 30) {
+						$(this).addClass('countdown-timeout');
+					} else {
+						$(this).removeClass('countdown-timeout');
+					}
 				},
 				onExpiry: function(periods) {
 			        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <fmt:message key="label.time.is.over" /></h1>' }); 
@@ -149,14 +208,13 @@
 			        setTimeout(function() { 
 			        	location.reload();
 			        }, 4000); 
-				}
+				},
+				description: "<div id='countdown-label'><fmt:message key='label.time.left' /></div>"
 			});
 		}
 	</script>
 	
-	<c:if test="${isTimeLimitEnabled or dokumaran.galleryWalkEnabled}">
-		<%@ include file="websocket.jsp"%>		
-	</c:if>
+	<%@ include file="websocket.jsp"%>		
 </lams:head>
 <body class="stripes">
 
@@ -180,8 +238,7 @@
 		
 		<p><c:out value="${dokumaran.description}" escapeXml="false" /></p>
 		
-		<div class='panel panel-default 
-				<c:if test="${isTimeLimitEnabled}">lower-to-fit-countdown</c:if>'>			
+		<div id="etherpad-panel" class='panel panel-default'>			
 			<div id="etherpad-container"></div>
 			<div id="etherpad-containera"></div>
 			<div id="etherpad-containerb"></div>

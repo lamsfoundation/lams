@@ -91,13 +91,15 @@
 				toolContentID = "${iraToolContentId}";
 				url = "<lams:LAMSURL/>tool/laasse10/tblmonitoring/";
 	
-			} else if (method == "aes" || method == "aesStudentChoices") {
-				url = "<lams:LAMSURL/>tool/laasse10/tblmonitoring/";
+			} else if (method == "aes") {
 				options = {
-					assessmentToolContentIds: "${assessmentToolContentIds}",
-					assessmentActivityTitles: "${assessmentActivityTitles}"
+					aeToolContentIds: "${aeToolContentIds}",
+					aeToolTypes: "${aeToolTypes}",
+					aeActivityTitles: "${aeActivityTitles}"
 				};
 
+			} else if (method == "aesStudentChoices") {
+				url = "<lams:LAMSURL/>tool/laasse10/tblmonitoring/";
 			} else if (method == "forum") {
 				options = {
 					activityId: "${forumActivityId}"

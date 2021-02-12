@@ -87,18 +87,15 @@ public interface IAssessmentService extends ICommonToolService {
 
     /**
      * Stores date when user has started activity with time limit.
-     *
-     * @param assessmentUid
-     * @param userId
      */
-    LocalDateTime launchTimeLimit(Long assessmentUid, Long userId);
+    LocalDateTime launchTimeLimit(long toolContentId, int userId);
 
     /**
      * @param assessment
      * @param groupLeader
      * @return whether the time limit is exceeded already
      */
-    boolean checkTimeLimitExceeded(long assessmentUid, long userId);
+    boolean checkTimeLimitExceeded(long assessmentUid, int userId);
 
     /**
      * Get users by given toolSessionID.

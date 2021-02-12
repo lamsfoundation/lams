@@ -5,90 +5,92 @@
 <c:set var="dokumaran" value="${sessionMap.dokumaran}" />
 <%@ page import="org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants"%>
 
-<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
-<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
+<lams:css suffix="jquery.jRating"/>
+<link href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet" type="text/css">
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css"/>
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css" />
 	
 <style media="screen,projection" type="text/css">
-	#countdown {
-		min-width: 150px;
-		width: 100%;
-		font-size: 110%; 
-		font-style: italic; 
-		color:#47bc23; 
-		margin-bottom: 10px;
-		text-align: center;
-		position: static;
-	}
-	#countdown-label {
-		font-size: 170%; padding-top:5px; padding-bottom:5px; font-style: italic; color:#47bc23;
-	}
-	#timelimit-expired {
-		font-size: 145%; padding: 15px;
-	}
-		
-	.jGrowl {
-	  	font-size: 22px;
-	  	font-family: arial, helvetica, sans-serif;
-	  	margin-left: 120px;
-	}
-	.jGrowl-notification {
-		opacity: .6;
-		border-radius: 10px;
-		width: 260px;
-		padding: 10px 20px;
-		margin: 10px 20px;
-	}
-	.jGrowl-message {
-		padding-left: 10px;
-		padding-top: 5px;
+	 		
+	.doku-monitoring-summary .countdown-timeout {
+		color: #FF3333 !important;
 	}
 	
-	.panel {
+	.doku-monitoring-summary #time-limit-table th {
+		vertical-align: middle;
+	}
+	
+	.doku-monitoring-summary #time-limit-table td.centered {
+		text-align: center;
+	}
+
+	.doku-monitoring-summary .panel {
 		overflow: auto;
 	}
-	#control-buttons {
-		padding-bottom: 20px;
+	
+	.doku-monitoring-summary #control-buttons {
+		float: right;
+		margin-bottom: 20px;
 	}
 	
-	#gallery-walk-start {
+	.doku-monitoring-summary #gallery-walk-start {
 		margin-left: 20px;
 	}
 	
-	#gallery-walk-rating-table {
+	.doku-monitoring-summary #gallery-walk-rating-table {
 		width: 60%;
 		margin: 50px auto;
 		border-bottom: 1px solid #ddd;
 	}
 	
-	#gallery-walk-rating-table th {
+	.doku-monitoring-summary #gallery-walk-rating-table th {
 		font-weight: bold;
 		font-style: normal;
 		text-align: center;
 	}
 	
-	#gallery-walk-rating-table td {
+	.doku-monitoring-summary #gallery-walk-rating-table td {
 		text-align: center;
 	}
 	
-	#gallery-walk-rating-table th:first-child, #gallery-walk-rating-table td:first-child {
+	.doku-monitoring-summary #gallery-walk-rating-table th:first-child, .doku-monitoring-summary #gallery-walk-rating-table td:first-child {
 		text-align: right;
 	}
 	
-	.tablesorter tbody > tr > td > div[contenteditable=true]:focus {
+	.doku-monitoring-summary .tablesorter tbody > tr > td > div[contenteditable=true]:focus {
 	  outline: #337ab7 2px solid;
+	}
+	
+	.doku-monitoring-summary #no-session-summary, .doku-monitoring-summary .attendance-row {
+		margin-right: 0;
+	}
+	
+	/* We need to overwrite settings coming from main CSS as in Doku monitoring they look different */
+	
+	.doku-monitoring-summary .ts-pager {
+	    color: black;
+	}
+	
+	.doku-monitoring-summary .ts-pager .btn {
+	    background-color: #eee;
+	}
+	.doku-monitoring-summary .tablesorter tfoot th {
+		background-color: #eee !important;
+	}
+	
+	.doku-monitoring-summary .pagesize {
+	    border: black;
+	    background: white;
 	}
 </style>
 
+<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.jgrowl.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script> 
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>  
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script> 
-<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-editable.js"></script> 
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-editable.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script> 
 <script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/etherpad.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
@@ -102,13 +104,11 @@
 		MIN_RATES = 0,
 		LAMS_URL = '${lams}',
 		COUNT_RATED_ITEMS = true,
-		ALLOW_RERATE = false,
-		
-		isCountdownStarted = ${not empty dokumaran.timeLimitLaunchedDate};
+		ALLOW_RERATE = false;
 	
 	$(document).ready(function(){
 		// show etherpads only on Group expand
-		$('.etherpad-collapse').on('show.bs.collapse', function(){
+		$('#doku-monitoring-summary-${sessionMap.toolContentID} .etherpad-collapse').on('show.bs.collapse', function(){
 			var etherpad = $('.etherpad-container', this);
 			if (!etherpad.hasClass('initialised')) {
 				var id = etherpad.attr('id'),
@@ -117,7 +117,7 @@
 			}
 		});
 		
-		$(".fix-faulty-pad").click(function() {
+		$("#doku-monitoring-summary-${sessionMap.toolContentID} .fix-faulty-pad").click(function() {
 			var toolSessionId = $(this).data("session-id");
 			var button = $(this);
 			
@@ -157,75 +157,8 @@
 	       	});
 		});
 		
-		//display countdown 
-		if (${dokumaran.timeLimit > 0}) {
-			displayCountdown();
-		}
-		
-		$("#start-activity").click(function() {
-			var button = $(this);
-			button.hide();
-			
-	        $.ajax({
-	        	async: true,
-	            url: '<c:url value="/monitoring/launchTimeLimit.do"/>',
-	            data : 'toolContentID=${sessionMap.toolContentID}',
-	            type: 'post',
-	            success: function (response) {
-                	$.jGrowl(
-                    	"<i class='fa fa-lg fa-floppy-o'></i> <fmt:message key='label.started.activity' />",
-                    	{ 
-                    		life: 2000, 
-                    		closeTemplate: ''
-                    	}
-                    );
-                	
-                	//unpause countdown
-                	$('#countdown').countdown('resume');
-                	isCountdownStarted = true;
-	            },
-	            error: function (request, status, error) {
-	            	button.show();
-	                alert(request.responseText);
-	            }
-	       	});
-	        
-	        return false;
-		});
-		
-		$("#add-one-minute").click(function() {
-			var button = $(this);
-			
-	        $.ajax({
-	        	async: true,
-	            url: '<c:url value="/monitoring/addOneMinute.do"/>',
-	            data : 'toolContentID=${sessionMap.toolContentID}',
-	            type: 'post',
-	            success: function (response) {
-	            	var times = $("#countdown").countdown('getTimes');
-	            	var secondsLeft = times[4]*3600 + times[5]*60 + times[6] + 60;
-	            	if (isCountdownStarted) {
-		            	$('#countdown').countdown('option', { until: '+' + secondsLeft + 'S' });
-		            
-		            //fixing countdown bug of not updating it in case if being paused 
-	            	} else {
-	            		$('#countdown').countdown('resume');
-		            	$('#countdown').countdown('option', { until: '+' + secondsLeft + 'S' });
-		            	$('#countdown').countdown('pause');
-	            	}
-	            	
-	            },
-	            error: function (request, status, error) {
-	                alert(request.responseText);
-	            }
-	       	});
-	        
-	        return false;
-		});
-		
-		
 		// marks table for each group
-		var tablesorters = $(".tablesorter");
+		var tablesorters = $("#doku-monitoring-summary-${sessionMap.toolContentID} .tablesorter");
 		// intialise tablesorter tables
 		tablesorters.tablesorter({
 			theme: 'bootstrap',
@@ -347,31 +280,25 @@
 			  }
 			});
 		});
-	});
-	
-	function displayCountdown() {		
-		$('#countdown').countdown({
-			until: '+${sessionMap.secondsLeft}S',
-			format: 'hMS',
-			compact: true,
-			description: "<div id='countdown-label'><fmt:message key='label.time.left' /></div>",
-			onTick: function(periods) {
-				//check for 30 seconds
-				if ((periods[4] == 0) && (periods[5] == 0) && (periods[6] <= 30)) {
-					$('#countdown').css('color', '#FF3333');
-				} else {
-					$('#countdown').css('color', '#47bc23');
-				}					
-			},
-			onExpiry: function(periods) {
-			}
-		});
+
 		
-		//pause countdown in case it hasn't been yet started
-		if (${empty dokumaran.timeLimitLaunchedDate}) {
-			$('#countdown').countdown('pause');
+		// create counter if absolute time limit is set
+		if (absoluteTimeLimit) {
+			updateAbsoluteTimeLimitCounter();
+			
+			// expand time limit panel if absolute time limit is set and not expired
+			if (absoluteTimeLimit > new Date().getTime() / 1000) {
+				$('#time-limit-collapse').collapse('show');
+			}
 		}
-	}
+		initInidividualTimeLimitAutocomplete();
+		
+		
+		<c:if test="${isTbl}">
+			//insert total learners number taken from the parent tblmonitor.jsp
+			$("#doku-monitoring-summary-${sessionMap.toolContentID} .total-learners-number").text(TOTAL_LESSON_LEARNERS_NUMBER);
+		</c:if>
+	});
 	
 	function startGalleryWalk(){
 		if (!confirm('<fmt:message key="monitoring.summary.gallery.walk.start.confirm" />')) {
@@ -384,8 +311,10 @@
 				toolContentID : ${dokumaran.contentId}
 			},
 			'success' : function(){
-				$('#gallery-walk-start, #countdown, #add-one-minute, #start-activity').hide();
-				$('#gallery-walk-finish').removeClass('hidden');
+				$('#doku-monitoring-summary-${sessionMap.toolContentID} #gallery-walk-start, ' +
+				  '#doku-monitoring-summary-${sessionMap.toolContentID} #countdown, ' + 
+				  '#doku-monitoring-summary-${sessionMap.toolContentID} #add-one-minute, #start-activity').hide();
+				$('#doku-monitoring-summary-${sessionMap.toolContentID} #gallery-walk-finish').removeClass('hidden');
 			}
 		});
 	}
@@ -403,7 +332,7 @@
 			'success' : function(){
 				<c:choose>
 					<c:when test="${dokumaran.galleryWalkReadOnly}">
-						$('#gallery-walk-finish').hide();
+						$('#doku-monitoring-summary-${sessionMap.toolContentID} #gallery-walk-finish').hide();
 					</c:when>
 					<c:otherwise>
 						location.reload();
@@ -415,7 +344,7 @@
 
 
 	function showChangeLeaderModal(toolSessionId) {
-		$('#change-leader-modals').empty()
+		$('#doku-monitoring-summary-${sessionMap.toolContentID} #change-leader-modals').empty()
 		.load('<c:url value="/monitoring/displayChangeLeaderForGroupDialogFromActivity.do" />',{
 			toolSessionID : toolSessionId
 		});
@@ -444,46 +373,379 @@
 			alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
 		}
 	}
+
+
+
+	// TIME LIMIT
+		// in minutes since learner entered the activity
+	var relativeTimeLimit = ${dokumaran.relativeTimeLimit},
+		// in seconds since epoch started
+		absoluteTimeLimit = ${empty dokumaran.absoluteTimeLimit ? 'null' : dokumaran.absoluteTimeLimitSeconds};
+	
+	function updateTimeLimit(type, toggle, adjust) {
+		// relavite time limit set
+		if (type == 'relative') {
+			// what is set at the moment on screen, not at server
+			var displayedRelativeTimeLimit = +$('#relative-time-limit-value').text();
+			
+			// start/stop
+			if (toggle !== null) {
+				
+				if (toggle === false) {
+					// stop, i.e. set time limit to 0
+					relativeTimeLimit = 0;
+					updateTimeLimitOnServer();
+					return;
+				}
+				
+				// start, i.e. set backend time limit to whatever is set on screen
+				if (toggle === true && displayedRelativeTimeLimit > 0) {
+					relativeTimeLimit = displayedRelativeTimeLimit;
+					// when teacher enables relative time limit, absolute one gets disabled
+					absoluteTimeLimit = null;
+					updateTimeLimitOnServer();
+				}
+				return;
+			}
+			
+			// no negative time limit is allowed
+			if (displayedRelativeTimeLimit == 0 && adjust < 0) {
+				return;
+			}
+			
+			var adjustedRelativeTimeLimit = displayedRelativeTimeLimit + adjust;
+			// at least one minute is required
+			// if teacher wants to set less, he should disable the limit or click "finish now"
+			if (adjustedRelativeTimeLimit < 1) {
+				adjustedRelativeTimeLimit = 1;
+			}
+			
+			// is time limit already enforced? if so, update the server
+			if (relativeTimeLimit > 0) {
+				relativeTimeLimit = adjustedRelativeTimeLimit;
+				updateTimeLimitOnServer();
+				return;
+			}
+			
+			// if time limit is not enforced yet, just update the screen
+			displayedRelativeTimeLimit = adjustedRelativeTimeLimit;
+			$('#relative-time-limit-value').text(displayedRelativeTimeLimit);
+			$('#relative-time-limit-start').prop('disabled', false);
+			return;
+		}
+		
+		if (type == 'absolute') {
+			// get existing value on counter, if it is set already
+			var counter = $('#absolute-time-limit-counter'),
+				secondsLeft = null;
+			if (counter.length === 1) {
+				var periods = counter.countdown('getTimes');
+				secondsLeft = $.countdown.periodsToSeconds(periods);
+			}
+			
+			if (toggle !== null) {
+				
+				// start/stop
+				if (toggle === false) {
+					absoluteTimeLimit = null;
+					updateAbsoluteTimeLimitCounter();
+					return;
+				} 
+				
+				// turn on the time limit, if there is any value on counter set already
+				if (toggle === true && secondsLeft) {
+					updateAbsoluteTimeLimitCounter(secondsLeft, true);
+					return;
+				}
+				
+				if (toggle === 'stop') {
+					absoluteTimeLimit =  Math.round(new Date().getTime() / 1000);
+					updateAbsoluteTimeLimitCounter();
+				}
+				return;
+			}
+			
+			// counter is not set yet and user clicked negative value
+			if (!secondsLeft && adjust < 0) {
+				return;
+			}
+			
+			// adjust time
+			secondsLeft += adjust * 60;
+			if (secondsLeft < 60) {
+				secondsLeft = 60;
+			}
+
+			// is time limit already enforced, update the server
+			// if time limit is not enforced yet, just update the screen
+			updateAbsoluteTimeLimitCounter(secondsLeft);
+			$('#absolute-time-limit-start').prop('disabled', false);
+			return;
+		}
+		
+		if (type == 'individual') {
+			// this method is called with updateTimeLimit.call() so we can change meaning of "this"
+			// and identify row and userUid
+			var button = $(this),
+				row = button.closest('.individual-time-limit-row'),
+				userId = row.data('userId');
+			
+			// disable individual time adjustment
+			if (toggle === false) {
+				updateIndividualTimeLimitOnServer('user-' + userId);
+				return;
+			}
+			var existingAdjustment = +$('.individual-time-limit-value', row).text(),
+				newAdjustment = existingAdjustment + adjust;
+			
+			updateIndividualTimeLimitOnServer('user-' + userId, newAdjustment);
+			return;
+		}
+	}
+	
+	function updateTimeLimitOnServer() {
+		
+		// absolute time limit has higher priority
+		if (absoluteTimeLimit != null) {
+			relativeTimeLimit = 0;
+		}
+		
+		$.ajax({
+			'url' : '<c:url value="/monitoring/updateTimeLimit.do"/>',
+			'type': 'post',
+			'cache' : 'false',
+			'data': {
+				'toolContentID' : '${sessionMap.toolContentID}',
+				'relativeTimeLimit' : relativeTimeLimit,
+				'absoluteTimeLimit' : absoluteTimeLimit,
+				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
+			},
+			success : function(){
+				// update widgets
+				$('#relative-time-limit-value').text(relativeTimeLimit);
+				
+				if (relativeTimeLimit > 0) {
+					$('#relative-time-limit-disabled').addClass('hidden');
+					$('#relative-time-limit-cancel').removeClass('hidden');
+					$('#relative-time-limit-enabled').removeClass('hidden');
+					$('#relative-time-limit-start').addClass('hidden');
+				} else {
+					$('#relative-time-limit-disabled').removeClass('hidden');
+					$('#relative-time-limit-cancel').addClass('hidden');
+					$('#relative-time-limit-enabled').addClass('hidden');
+					$('#relative-time-limit-start').removeClass('hidden').prop('disabled', true);
+				}
+				
+				if (absoluteTimeLimit === null) {
+					// no absolute time limit? destroy the counter
+					$('#absolute-time-limit-counter').countdown('destroy');
+					$('#absolute-time-limit-value').empty();
+					
+					$('#absolute-time-limit-disabled').removeClass('hidden');
+					$('#absolute-time-limit-cancel').addClass('hidden');
+					$('#absolute-time-limit-enabled').addClass('hidden');
+					$('#absolute-time-limit-start').removeClass('hidden').prop('disabled', true);
+					$('#absolute-time-limit-finish-now').prop('disabled', false);
+				} else {
+					$('#absolute-time-limit-disabled').addClass('hidden');
+					$('#absolute-time-limit-cancel').removeClass('hidden');
+					$('#absolute-time-limit-enabled').removeClass('hidden');
+					$('#absolute-time-limit-start').addClass('hidden');
+					$('#absolute-time-limit-finish-now').prop('disabled', absoluteTimeLimit <= Math.round(new Date().getTime() / 1000));
+				}
+			}
+		});
+	}
+	
+	function updateAbsoluteTimeLimitCounter(secondsLeft, start) {
+		var now = Math.round(new Date().getTime() / 1000),
+			// preset means that counter is set just on screen and the time limit is not enforced for learners
+			preset = start !== true && absoluteTimeLimit == null;
+		
+		if (secondsLeft) {
+			if (!preset) {
+				// time limit is already enforced on server, so update it there now
+				absoluteTimeLimit = now + secondsLeft;
+				updateTimeLimitOnServer();
+			}
+		} else {
+			if (absoluteTimeLimit == null) {
+				// disable the counter
+				updateTimeLimitOnServer();
+				return;
+			}
+			// counter initialisation on page load or "finish now"
+			secondsLeft = absoluteTimeLimit - now;
+			if (secondsLeft <= 0) {
+				// finish now
+				updateTimeLimitOnServer();
+			}
+		}
+		
+		var counter = $('#absolute-time-limit-counter');
+	
+		if (counter.length == 0) {
+			counter = $('<div />').attr('id', 'absolute-time-limit-counter').appendTo('#absolute-time-limit-value')
+				.countdown({
+					until: '+' + secondsLeft +'S',
+					format: 'hMS',
+					compact: true,
+					alwaysExpire : true,
+					onTick: function(periods) {
+						// check for 30 seconds or less and display timer in red
+						var secondsLeft = $.countdown.periodsToSeconds(periods);
+						if (secondsLeft <= 30) {
+							counter.addClass('countdown-timeout');
+						} else {
+							counter.removeClass('countdown-timeout');
+						}				
+					},
+					expiryText : '<span class="countdown-timeout">Expired</span>'
+				});
+		} else {
+			// if counter is paused, we can not adjust time, so resume it for a moment
+			counter.countdown('resume');
+			counter.countdown('option', 'until', secondsLeft + 'S');
+		}
+		
+		if (preset) {
+			counter.countdown('pause');
+			$('#absolute-time-limit-start').removeClass('disabled');
+		} else {
+			counter.countdown('resume');
+		}
+	}
+	
+	function timeLimitFinishNow(){
+		if (confirm('<fmt:message key="label.monitoring.summary.time.limit.finish.now.confirm" />')) {
+			updateTimeLimit('absolute', 'stop');
+		}
+	}
+	
+	
+	function initInidividualTimeLimitAutocomplete(){
+		$('#individual-time-limit-autocomplete').autocomplete({
+			'source' : '<c:url value="/monitoring/getPossibleIndividualTimeLimitUsers.do"/>?toolContentID=${sessionMap.toolContentID}',
+			'delay'  : 700,
+			'minLength' : 3,
+			'select' : function(event, ui){
+				// user ID or group ID, and default 0 adjustment
+				updateIndividualTimeLimitOnServer(ui.item.value, 0);
+
+				// clear search field
+				$(this).val('');
+				return false;
+			},
+			'focus': function() {
+				// Stop the autocomplete of resetting the value to the selected one
+				// It puts LAMS user ID instead of user name
+				event.preventDefault();
+			}
+		});
+		
+		refreshInidividualTimeLimitUsers();
+	}
+	
+	
+	function updateIndividualTimeLimitOnServer(itemId, adjustment) {
+		$.ajax({
+			'url' : '<c:url value="/monitoring/updateIndividualTimeLimit.do"/>',
+			'type': 'post',
+			'cache' : 'false',
+			'data': {
+				'toolContentID' : '${sessionMap.toolContentID}',
+				// itemId can user-<userId> or group-<groupId>
+				'itemId' : itemId,
+				'adjustment' : adjustment,
+				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
+			},
+			success : function(){
+				refreshInidividualTimeLimitUsers();
+			}
+		});
+	}
+
+
+	function refreshInidividualTimeLimitUsers() {
+		var table = $('#time-limit-table');
+		
+		$.ajax({
+			'url' : '<c:url value="/monitoring/getExistingIndividualTimeLimitUsers.do"/>',
+			'dataType' : 'json',
+			'cache' : 'false',
+			'data': {
+				'toolContentID' : '${sessionMap.toolContentID}'
+			},
+			success : function(users) {
+				// remove existing users
+				$('.individual-time-limit-row', table).remove();
+				
+				if (!users) {
+					return;
+				}
+				
+				var template = $('#individual-time-limit-template-row'),
+					now = new Date().getTime();
+				$.each(users, function(){
+					var row = template.clone()
+									  .attr('id', 'individual-time-limit-row-' + this.userId)
+									  .data('userId', this.userId)
+									  .addClass('individual-time-limit-row')
+									  .appendTo(table);
+					$('.individual-time-limit-user-name', row).text(this.name);
+					$('.individual-time-limit-value', row).text(this.adjustment);
+					
+					row.removeClass('hidden');
+				});
+			}
+		});
+	}
+
+	// END OF TIME LIMIT
 </script>
 <script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 
-<div class="panel">
-	<h4>
-	    <c:out value="${dokumaran.title}" escapeXml="true"/>
-	</h4>
-	
-	<c:out value="${dokumaran.description}" escapeXml="false"/>
-	
-	
-	<c:if test="${empty summaryList}">
-		<lams:Alert type="info" id="no-session-summary" close="false">
-			 <fmt:message key="message.monitoring.summary.no.session" />
-		</lams:Alert>
-	</c:if>
-	
-	<!--For release marks feature-->
-	<i class="fa fa-spinner" style="display:none" id="message-area-busy"></i>
-	<div id="message-area"></div>
-
-	<c:if test="${dokumaran.timeLimit > 0 or dokumaran.galleryWalkEnabled}">
-		<div class="pull-right" id="control-buttons">
-	
-			<c:if test="${dokumaran.timeLimit > 0 and not dokumaran.galleryWalkStarted}">
-				<div id="countdown"></div>
-			
-				<c:if test="${empty dokumaran.timeLimitLaunchedDate and dokumaran.timeLimitManualStart}">
-					<a href="#nogo" class="btn btn-default" id="start-activity">
-						<fmt:message key="label.start.activity" />
-					</a>		
-				</c:if>
+<!-- Extra container div to isolate content from multiple Application Excercise tabs in TBL monitoring -->
+<div id="doku-monitoring-summary-${sessionMap.toolContentID}" class="doku-monitoring-summary">
+	<div class="panel">
+		<c:choose>
+			<c:when test="${isTbl}">
+				<div class="row attendance-row">
+					<div class="col-xs-6 col-sm-4">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title">
+									<i class="fa fa-users" style="color:gray" ></i> 
+									<fmt:message key="label.attendance"/>: <span>${attemptedLearnersNumber}</span>/<span class="total-learners-number"></span> 
+								</h4> 
+							</div>
+						</div>
+					</div>
+				</div>
+			</c:when>
+			<c:otherwise>
+				<h4>
+				    <c:out value="${dokumaran.title}" escapeXml="true"/>
+				</h4>
 				
-				<a href="#nogo" class="btn btn-default" id="add-one-minute">
-					<fmt:message key="label.plus.one.minute" />
-				</a>	
-			</c:if>
-			
-			<c:if test="${dokumaran.galleryWalkEnabled}">
+				<c:out value="${dokumaran.description}" escapeXml="false"/>
+			</c:otherwise>
+		</c:choose>
+	
+	
+		<c:if test="${empty summaryList}">
+			<lams:Alert type="info" id="no-session-summary" close="false">
+				 <fmt:message key="message.monitoring.summary.no.session" />
+			</lams:Alert>
+		</c:if>
+		
+		<!--For release marks feature-->
+		<i class="fa fa-spinner" style="display:none" id="message-area-busy"></i>
+		<div id="message-area"></div>
+	
+		<c:if test="${not empty summaryList and dokumaran.galleryWalkEnabled}">
+			<div id="control-buttons">
 				<button id="gallery-walk-start" type="button"
 				        class="btn btn-default 
 				        	   ${not dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'hidden'}"
@@ -496,136 +758,140 @@
 				        onClick="javascript:finishGalleryWalk()">
 					<fmt:message key="monitoring.summary.gallery.walk.finish" /> 
 				</button>
-			</c:if>
-		</div>
-		
-		<br>
+			</div>
+			
+			<br>
+		</c:if>
+	</div>
+
+	<c:if test="${dokumaran.galleryWalkFinished and not dokumaran.galleryWalkReadOnly}">
+		<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk.ratings.header" /></h4>
+		<table id="gallery-walk-rating-table" class="table table-hover table-condensed">
+		  <thead class="thead-light">
+		    <tr>
+		      <th scope="col"><fmt:message key="monitoring.label.group" /></th>
+		      <th scope="col"><fmt:message key="label.rating" /></th>
+		    </tr>
+		  </thead>
+		  <tbody>
+			<c:forEach var="groupSummary" items="${summaryList}">
+				<tr>
+					<td>${groupSummary.sessionName}</td>
+					<td>
+						<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" 
+									 isItemAuthoredByUser="true"
+									 hideCriteriaTitle="true" />
+					</td>
+				</tr>
+			</c:forEach>
+		  </tbody>
+		</table>
 	</c:if>
-</div>
-
-<c:if test="${dokumaran.galleryWalkFinished and not dokumaran.galleryWalkReadOnly}">
-	<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk.ratings.header" /></h4>
-	<table id="gallery-walk-rating-table" class="table table-hover table-condensed">
-	  <thead class="thead-light">
-	    <tr>
-	      <th scope="col"><fmt:message key="monitoring.label.group" /></th>
-	      <th scope="col"><fmt:message key="label.rating" /></th>
-	    </tr>
-	  </thead>
-	  <tbody>
-		<c:forEach var="groupSummary" items="${summaryList}">
-			<tr>
-				<td>${groupSummary.sessionName}</td>
-				<td>
-					<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" 
-								 isItemAuthoredByUser="true"
-								 hideCriteriaTitle="true" />
-				</td>
-			</tr>
-		</c:forEach>
-	  </tbody>
-	</table>
-</c:if>
-
-<c:if test="${sessionMap.isGroupedActivity}">
-	<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
-</c:if>
-
-<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
-	<c:choose>
-		<c:when test="${sessionMap.isGroupedActivity}">		
-		    <div class="panel panel-default" >
-	        <div class="panel-heading" id="heading${groupSummary.sessionId}">
-	        	<span class="panel-title collapsable-icon-left">
-	        		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${groupSummary.sessionId}" 
-							aria-expanded="false" aria-controls="collapse${groupSummary.sessionId}" >
-						<fmt:message key="monitoring.label.group" />&nbsp;${groupSummary.sessionName}
-					</a>
-				</span>
-				<c:if test="${dokumaran.useSelectLeaderToolOuput and groupSummary.numberOfLearners > 0 and not groupSummary.sessionFinished}">
-					<button type="button" class="btn btn-default btn-xs pull-right"
+	
+	<c:if test="${sessionMap.isGroupedActivity}">
+		<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
+	</c:if>
+	
+	<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
+		<c:choose>
+			<c:when test="${sessionMap.isGroupedActivity}">		
+			    <div class="panel panel-default" >
+		        <div class="panel-heading" id="heading${groupSummary.sessionId}">
+		        	<span class="panel-title collapsable-icon-left">
+		        		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${groupSummary.sessionId}" 
+								aria-expanded="false" aria-controls="collapse${groupSummary.sessionId}" >
+							<fmt:message key="monitoring.label.group" />&nbsp;${groupSummary.sessionName}
+						</a>
+					</span>
+					<c:if test="${dokumaran.useSelectLeaderToolOuput and groupSummary.numberOfLearners > 0 and not groupSummary.sessionFinished}">
+						<button type="button" class="btn btn-default btn-xs pull-right"
+								onClick="javascript:showChangeLeaderModal(${groupSummary.sessionId})">
+							<fmt:message key='label.monitoring.change.leader'/>
+						</button>
+					</c:if>
+		        </div>
+		        
+		        <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse etherpad-collapse" 
+		        	 role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
+			</c:when>
+			<c:when test="${dokumaran.useSelectLeaderToolOuput and groupSummary.numberOfLearners > 0 and not groupSummary.sessionFinished}">
+				<div style="text-align: right">
+					<button type="button" class="btn btn-default" style="margin-bottom: 10px"
 							onClick="javascript:showChangeLeaderModal(${groupSummary.sessionId})">
 						<fmt:message key='label.monitoring.change.leader'/>
 					</button>
-				</c:if>
-	        </div>
-	        
-	        <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse etherpad-collapse" 
-	        	 role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
-		</c:when>
-		<c:when test="${dokumaran.useSelectLeaderToolOuput and groupSummary.numberOfLearners > 0 and not groupSummary.sessionFinished}">
-			<div style="text-align: right">
-				<button type="button" class="btn btn-default" style="margin-bottom: 10px"
-						onClick="javascript:showChangeLeaderModal(${groupSummary.sessionId})">
-					<fmt:message key='label.monitoring.change.leader'/>
-				</button>
-			</div>
-		</c:when>
-	</c:choose>
-	
-	<c:choose>
-		<c:when test="${groupSummary.sessionFaulty}">
+				</div>
+			</c:when>
+		</c:choose>
 		
-			<div class="faulty-pad-container">
-				<fmt:message key="label.cant.display.faulty.pad" />
+		<c:choose>
+			<c:when test="${groupSummary.sessionFaulty}">
+			
+				<div class="faulty-pad-container">
+					<fmt:message key="label.cant.display.faulty.pad" />
+					
+					<a href="#nogo" class="btn btn-default btn-xs fix-faulty-pad" data-session-id="${groupSummary.sessionId}">
+						<fmt:message key="label.recreate.faulty.pad" />
+					</a>
+				</div>
+										
+			</c:when>
+			<c:otherwise>
+				<c:if test="${dokumaran.galleryWalkStarted and not dokumaran.galleryWalkReadOnly}">
+					<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" isItemAuthoredByUser="true" />
+				</c:if>
 				
-				<a href="#nogo" class="btn btn-default btn-xs fix-faulty-pad" data-session-id="${groupSummary.sessionId}">
-					<fmt:message key="label.recreate.faulty.pad" />
-				</a>
-			</div>
-									
-		</c:when>
-		<c:otherwise>
-			<c:if test="${dokumaran.galleryWalkStarted and not dokumaran.galleryWalkReadOnly}">
-				<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" isItemAuthoredByUser="true" />
-			</c:if>
-			
-			<div class="btn-group btn-group-xs pull-right">
-				<c:url  var="exportHtmlUrl" value="${etherpadServerUrl}/p/${groupSummary.padId}/export/html"/>
-				<a href="#nogo" onclick="window.location = '${exportHtmlUrl}';" class="btn btn-default btn-sm " 
-						title="<fmt:message key="label.export.pad.html" />">
-					<i class="fa fa-lg fa-file-text-o"></i>
-					<fmt:message key="label.export.pad.html" />
-				</a>
-			</div>	
-			
-			<lams:Etherpad groupId="${groupSummary.sessionId}" padId="${groupSummary.padId}"
-						   showControls="true" showChat="${dokumaran.showChat}" showOnDemand="${sessionMap.isGroupedActivity}"
-						   heightAutoGrow="true" height="600" />	
-		</c:otherwise>
-	</c:choose>
+				<div class="btn-group btn-group-xs pull-right">
+					<c:url  var="exportHtmlUrl" value="${etherpadServerUrl}/p/${groupSummary.padId}/export/html"/>
+					<a href="#nogo" onclick="window.location = '${exportHtmlUrl}';" class="btn btn-default btn-sm " 
+							title="<fmt:message key="label.export.pad.html" />">
+						<i class="fa fa-lg fa-file-text-o"></i>
+						<fmt:message key="label.export.pad.html" />
+					</a>
+				</div>	
+				
+				<lams:Etherpad groupId="${groupSummary.sessionId}" padId="${groupSummary.padId}"
+							   showControls="true" showChat="${dokumaran.showChat}" showOnDemand="${sessionMap.isGroupedActivity}"
+							   heightAutoGrow="true" height="600" />	
+			</c:otherwise>
+		</c:choose>
+		
 	
-
-	<!-- Editable marks section -->
-	<div class="voffset10">	
-		<h4>
-		   <fmt:message key="label.monitoring.learner.marks.header"/>
-		</h4>
-		<lams:TSTable numColumns="3" dataId='toolSessionId="${groupSummary.sessionId}"'>
-			<th><fmt:message key="label.monitoring.learner.marks.first.name"/></th>
-			<th><fmt:message key="label.monitoring.learner.marks.last.name"/></th>
-			<th><fmt:message key="label.monitoring.learner.marks.mark"/>&nbsp;
-				<small><fmt:message key="label.monitoring.learner.marks.mark.tip"/></small>
-			</th>
-		</lams:TSTable>
-	</div>
+		<!-- Editable marks section -->
+		<div class="voffset10">	
+			<h4>
+			   <fmt:message key="label.monitoring.learner.marks.header"/>
+			</h4>
+			<lams:TSTable numColumns="3" dataId='toolSessionId="${groupSummary.sessionId}"'>
+				<th><fmt:message key="label.monitoring.learner.marks.first.name"/></th>
+				<th><fmt:message key="label.monitoring.learner.marks.last.name"/></th>
+				<th><fmt:message key="label.monitoring.learner.marks.mark"/>&nbsp;
+					<small><fmt:message key="label.monitoring.learner.marks.mark.tip"/></small>
+				</th>
+			</lams:TSTable>
+		</div>
+		
+		<c:if test="${sessionMap.isGroupedActivity}">
+			</div> <!-- end collapse area  -->
+			</div> <!-- end collapse panel  -->
+		</c:if>
+		${ !sessionMap.isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
+		
+	</c:forEach>
 	
 	<c:if test="${sessionMap.isGroupedActivity}">
-		</div> <!-- end collapse area  -->
-		</div> <!-- end collapse panel  -->
+		</div> <!--  end accordianSessions --> 
 	</c:if>
-	${ !sessionMap.isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
+		
+	<c:if test="${sessionMap.dokumaran.reflectOnActivity}">
+		<%@ include file="reflections.jsp"%>
+	</c:if>
 	
-</c:forEach>
-
-<c:if test="${sessionMap.isGroupedActivity}">
-	</div> <!--  end accordianSessions --> 
-</c:if>
+	<c:if test="${not isTbl}">
+		<%@ include file="advanceoptions.jsp"%>
+	</c:if>
 	
-<c:if test="${sessionMap.dokumaran.reflectOnActivity}">
-	<%@ include file="reflections.jsp"%>
-</c:if>
-
-<%@ include file="advanceoptions.jsp"%>
-
-<div id="change-leader-modals"></div>
+	<%@ include file="timeLimit.jsp"%>
+	
+	<div id="change-leader-modals"></div>
+</div>

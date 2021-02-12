@@ -291,7 +291,6 @@ function makeSortable(element) {
 
 
 function showMonitorLessonDialog(lessonID) {
-
 	var id = "dialogMonitorLesson" + lessonID,
 		dialog = showDialog(id, {
 			'data' : {
@@ -299,8 +298,8 @@ function showMonitorLessonDialog(lessonID) {
 				'lessonID' : lessonID
 			},
 			'autoOpen' : false,
-			'height': Math.max(380, Math.min(800, $(window).height() - 30)),
-			'width' : Math.max(380, Math.min(1024, $(window).width() - 60)),
+			'height': Math.max(380, Math.min(monitor_height, $(window).height() - 30)),
+			'width' : Math.max(380, Math.min(monitor_width, $(window).width() - 60)),
 			'title' : LABELS.MONITORING_TITLE,
 			'open' : function() {
 				// load contents after opening the dialog

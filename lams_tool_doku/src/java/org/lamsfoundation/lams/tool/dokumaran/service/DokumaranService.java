@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.dokumaran.service;
 
 import java.io.IOException;
 import java.security.InvalidParameterException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -45,9 +46,13 @@ import org.lamsfoundation.lams.etherpad.EtherpadException;
 import org.lamsfoundation.lams.etherpad.service.IEtherpadService;
 import org.lamsfoundation.lams.etherpad.util.EtherpadUtil;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -73,6 +78,7 @@ import org.lamsfoundation.lams.tool.dokumaran.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
+import org.lamsfoundation.lams.tool.dokumaran.web.controller.LearningWebsocketServer;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -111,6 +117,8 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     private IUserManagementService userManagementService;
 
     private ILearnerService learnerService;
+
+    private ILessonService lessonService;
 
     private IRatingService ratingService;
 
@@ -304,64 +312,32 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
 	Dokumaran dokumaran = session.getDokumaran();
 	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
-	jsonCommand.put("hookTrigger", "doku-leader-change-refresh-" + toolSessionId);
+	jsonCommand.put("hookTrigger", "doku-refresh-" + dokumaran.getContentId());
 	learnerService.createCommandForLearners(dokumaran.getContentId(), userIds, jsonCommand.toString());
     }
 
     @Override
-    public void launchTimeLimit(Long toolContentId) throws IOException {
-	Dokumaran dokumaran = getDokumaranByContentId(toolContentId);
-	dokumaran.setTimeLimitLaunchedDate(new Date());
-	dokumaranDao.saveObject(dokumaran);
+    public LocalDateTime launchTimeLimit(long toolContentId, int userId) {
+	DokumaranUser user = getUserByIDAndContent(Long.valueOf(userId), toolContentId);
+	if (user != null) {
+	    LocalDateTime launchedDate = LocalDateTime.now();
+	    user.setTimeLimitLaunchedDate(launchedDate);
+	    dokumaranUserDao.saveObject(user);
+	    return launchedDate;
+	}
+	return null;
     }
 
     @Override
-    public void addOneMinute(Long toolContentId) throws IOException {
-	Dokumaran dokumaran = getDokumaranByContentId(toolContentId);
-
-	int timeLimit = dokumaran.getTimeLimit();
-	if (timeLimit == 0) {
-	    return;
-	}
-
-	int newTimeLimit;
-	if (checkTimeLimitExceeded(dokumaran)) {
-	    dokumaran.setTimeLimitLaunchedDate(new Date());
-	    newTimeLimit = 1;//d
-	} else {
-	    newTimeLimit = timeLimit + 1;
-	}
-	dokumaran.setTimeLimit(newTimeLimit);
-	dokumaranDao.saveObject(dokumaran);
+    public boolean checkTimeLimitExceeded(Dokumaran dokumaran, int userId) {
+	Long secondsLeft = LearningWebsocketServer.getSecondsLeft(dokumaran.getContentId(), userId);
+	return secondsLeft != null && secondsLeft.equals(0L);
     }
 
     @Override
-    public long getSecondsLeft(Dokumaran dokumaran) {
-
-	long secondsLeft = 0;
-	if (dokumaran.getTimeLimit() != 0) {
-	    // if teacher has started the time limit already - calculate remaining time, and full time otherwise
-	    secondsLeft = dokumaran.getTimeLimitLaunchedDate() == null ? dokumaran.getTimeLimit() * 60
-		    : dokumaran.getTimeLimit() * 60
-			    - (System.currentTimeMillis() - dokumaran.getTimeLimitLaunchedDate().getTime()) / 1000;
-	    // change negative to 0
-	    secondsLeft = Math.max(0, secondsLeft);
-	}
-
-	return secondsLeft;
-    }
-
-    @Override
-    public boolean checkTimeLimitExceeded(Dokumaran dokumaran) {
-	int timeLimit = dokumaran.getTimeLimit();
-	if (timeLimit == 0) {
-	    return false;
-	}
-
-	// check if the time limit is exceeded
-	Date timeLimitLaunchedDate = dokumaran.getTimeLimitLaunchedDate();
-	return (timeLimitLaunchedDate != null)
-		&& timeLimitLaunchedDate.getTime() + timeLimit * 60000 < System.currentTimeMillis();
+    public List<User> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString) {
+	Lesson lesson = lessonService.getLessonByToolContentId(toolContentId);
+	return lessonService.getLessonLearners(lesson.getLessonId(), searchString, null, null, true);
     }
 
     @Override
@@ -372,9 +348,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     @Override
     public DokumaranUser getUserByLoginAndContent(String login, long contentId) {
 	List<User> user = dokumaranUserDao.findByProperty(User.class, "login", login);
-	return user.isEmpty() ? null
-		: dokumaranUserDao.getUserByUserIDAndContentIDViaSession(user.get(0).getUserId().longValue(),
-			contentId);
+	return user.isEmpty() ? null : getUserByIDAndContent(user.get(0).getUserId().longValue(), contentId);
     }
 
     @Override
@@ -566,6 +540,13 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	return (DokumaranUser) dokumaranUserDao.getObject(DokumaranUser.class, uid);
     }
 
+    @Override
+    public Grouping getGrouping(long toolContentId) {
+	ToolActivity toolActivity = (ToolActivity) userManagementService
+		.findByProperty(ToolActivity.class, "toolContentId", toolContentId).get(0);
+	return toolActivity.getApplyGrouping() ? toolActivity.getGrouping() : null;
+    }
+
     private List<RatingCriteria> createGalleryWalkRatingCriterion(long toolContentId) {
 	List<RatingCriteria> criteria = ratingService.getCriteriasByToolContentId(toolContentId);
 
@@ -638,7 +619,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
     private void sendGalleryWalkRefreshRequest(Dokumaran dokumaran) {
 	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
-	jsonCommand.put("hookTrigger", "gallery-walk-refresh-" + dokumaran.getContentId());
+	jsonCommand.put("hookTrigger", "doku-refresh-" + dokumaran.getContentId());
 	// get all learners in this doku
 	Set<Integer> userIds = dokumaranSessionDao.getByContentId(dokumaran.getContentId()).stream()
 		.flatMap(session -> dokumaranUserDao.getBySessionID(session.getSessionId()).stream())
@@ -1130,6 +1111,10 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	this.learnerService = learnerService;
     }
 
+    public void setLessonService(ILessonService lessonService) {
+	this.lessonService = lessonService;
+    }
+
     public void setRatingService(IRatingService ratingService) {
 	this.ratingService = ratingService;
     }
@@ -1170,7 +1155,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	dokumaran.setInstructions(JsonUtil.optString(toolContentJSON, "etherpadInstructions"));
 	dokumaran.setCreated(updateDate);
 
-	dokumaran.setTimeLimit(JsonUtil.optInt(toolContentJSON, "timeLimit", 0));
+	dokumaran.setRelativeTimeLimit(JsonUtil.optInt(toolContentJSON, "timeLimit", 0));
 	dokumaran.setShowChat(JsonUtil.optBoolean(toolContentJSON, "showChat", Boolean.FALSE));
 	dokumaran.setShowLineNumbers(JsonUtil.optBoolean(toolContentJSON, "showLineNumbers", Boolean.FALSE));
 	dokumaran.setSharedPadId(JsonUtil.optString(toolContentJSON, "sharedPadId"));
@@ -1181,7 +1166,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	dokumaran.setUseSelectLeaderToolOuput(
 		JsonUtil.optBoolean(toolContentJSON, "useSelectLeaderToolOuput", Boolean.FALSE));
 	dokumaran.setAllowMultipleLeaders(JsonUtil.optBoolean(toolContentJSON, "allowMultipleLeaders", Boolean.FALSE));
-	
+
 	dokumaran.setGalleryWalkEnabled(JsonUtil.optBoolean(toolContentJSON, "galleryWalkEnabled", false));
 	if (dokumaran.isGalleryWalkEnabled()) {
 	    dokumaran.setGalleryWalkReadOnly(JsonUtil.optBoolean(toolContentJSON, "galleryWalkReadOnly", false));

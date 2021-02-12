@@ -147,15 +147,6 @@ public class LearningController {
 	    request.setAttribute(DokumaranConstants.ATTR_DOKUMARAN, dokumaran);
 	    return "pages/learning/waitforleader";
 	}
-	if (dokumaran.getTimeLimit() > 0 && dokumaran.getTimeLimitLaunchedDate() == null) {
-	    if (dokumaran.isTimeLimitManualStart() && (mode == null || !mode.isAuthor())) {
-		// time limit is set but hasn't yet launched by a teac1her - show waitForTimeLimitLaunch page
-		return "pages/learning/waitForTimeLimitLaunch";
-	    }
-	    // there is no manual start, so the first learner that enters starts the timer
-	    dokumaran.setTimeLimitLaunchedDate(new Date());
-	    dokumaranService.saveOrUpdate(dokumaran);
-	}
 
 	boolean isUserLeader = (user != null) && dokumaranService.isUserLeader(leaders, user.getUserId());
 	boolean hasEditRight = !dokumaran.isUseSelectLeaderToolOuput()
@@ -245,11 +236,7 @@ public class LearningController {
 	dokumaranService.saveOrUpdate(dokumaran);
 
 	//time limit
-	boolean isTimeLimitEnabled = hasEditRight && !finishedLock && dokumaran.getTimeLimit() != 0;
-	long secondsLeft = isTimeLimitEnabled ? dokumaranService.getSecondsLeft(dokumaran) : 0;
-	request.setAttribute(DokumaranConstants.ATTR_SECONDS_LEFT, secondsLeft);
-
-	boolean isTimeLimitExceeded = dokumaranService.checkTimeLimitExceeded(dokumaran);
+	boolean isTimeLimitExceeded = dokumaranService.checkTimeLimitExceeded(dokumaran, user.getUserId().intValue());
 	request.setAttribute("timeLimitExceeded", isTimeLimitExceeded);
 
 	String padId = session.getPadId();

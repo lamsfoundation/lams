@@ -40,16 +40,9 @@
 <lams:SimplePanel titleKey="label.resource.options">
 
 	<div class="form-inline">
-		<label for="timeLimit">
+		<label for="relativeTimeLimit">
 			<fmt:message key="label.time.limit" />&nbsp;
-			<form:input path="dokumaran.timeLimit" type="number" min="0" size="3" id="timeLimit" cssClass="form-control input-sm"/>
-		</label>
-	</div>
-	
-	<div id="timeLimitManualStartDiv" class="checkbox">
-		<label for="timeLimitManualStart">
-			<form:checkbox path="dokumaran.timeLimitManualStart" id="timeLimitManualStart"/>
-			<fmt:message key="label.time.limit.manual.start" />
+			<form:input path="dokumaran.relativeTimeLimit" type="number" min="0" size="3" id="relativeTimeLimit" cssClass="form-control input-sm"/>
 		</label>
 	</div>
 	
