@@ -42,9 +42,10 @@
 	<div class="form-inline">
 		<label for="relativeTimeLimit">
 			<fmt:message key="label.time.limit" />&nbsp;
-			<form:input path="dokumaran.relativeTimeLimit" type="number" min="0" size="3" id="relativeTimeLimit" cssClass="form-control input-sm"/>
+            <i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="" data-original-title="<fmt:message key="label.time.limit.tooltip"/>"></i>
 		</label>
-	</div>
+        <form:input path="dokumaran.relativeTimeLimit" type="number" min="0" size="2" id="relativeTimeLimit" cssClass="form-control input-sm"/>        
+    </div>
 	
 	<div class="checkbox">
 		<label for="showChat">

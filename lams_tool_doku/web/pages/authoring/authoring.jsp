@@ -8,7 +8,7 @@
 	<%@ include file="/common/tabbedheader.jsp"%>
 	
 	<style>
-		#timeLimit {
+		#relativeTimeLimit {
 			width: 70px;
 		}
 		
