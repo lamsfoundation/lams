@@ -64,10 +64,11 @@
 					}
 				);
 				
-			}       
+			}
+            // avoid name clash between bootstrap and jQuery UI
+            $.fn.bootstrapTooltip = $.fn.tooltip.noConflict();            
 		</script>	  
 
-	    </script>		 
 	</lams:head>
 	<body class="stripes" onLoad="init()">
 
