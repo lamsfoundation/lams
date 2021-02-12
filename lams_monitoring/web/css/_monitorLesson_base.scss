@@ -361,6 +361,7 @@ div#completedLearnersContainer span {
 }
 
 /********** LEARNERS TAB STYLES **********/
+
 #tabLearnerControlTable td {
 	padding: 0px;
 	text-align: center;
@@ -411,6 +412,12 @@ div#tabLearnersContainer {
 
 td.progressBarLabel {
 	line-height: 1 !important;
+}
+
+/********** INSTRUCTIONS TAB STYLES **********/
+
+#lesson-instructions {
+	padding-bottom: 20px;
 }
 
 /********** BOOTSTRAP ADDITIONS **********/

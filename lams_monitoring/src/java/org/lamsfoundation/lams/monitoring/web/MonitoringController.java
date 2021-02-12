@@ -1117,8 +1117,7 @@ public class MonitoringController {
 	responseJSON.put("lessonStateID", lesson.getLessonStateId());
 
 	responseJSON.put("lessonName", HtmlUtils.htmlEscape(lesson.getLessonName()));
-	responseJSON.put("lessonIntro", lesson.getLessonDescription());
-	responseJSON.put("learningDesignDescription", learningDesign.getDescription());
+	responseJSON.put("lessonInstructions", learningDesign.getDescription());
 
 	Date startOrScheduleDate = lesson.getStartDateTime() == null ? lesson.getScheduleStartDate()
 		: lesson.getStartDateTime();
