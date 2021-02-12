@@ -45,18 +45,6 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="field-name" >
-                                <fmt:message key="label.average.mark" />:
-                            </td>
-                            <td class="text-right">
-                                <c:out value="${leaderDto.avgMark}" />
-                            </td>
-                        </tr>
-                    </table>    
-                </div>
-                <div class="col-md-6" style="padding: 0px 20px 0px 20px;">
-					<table class="table table-striped table-hover table-condensed">
-                        <tr>
                             <td class="field-name">
                                 <fmt:message key="label.lowest.mark"/>
                             </td>
@@ -65,11 +53,39 @@
                             </td>
                         </tr>
                         <tr>
+                            <td class="field-name" >
+                                <fmt:message key="label.median.mark" />:
+                            </td>
+                            <td class="text-right">
+                                -
+                            </td>
+                        </tr>
+                    </table>    
+                </div>
+                <div class="col-md-6" style="padding: 0px 20px 0px 20px;">
+					<table class="table table-striped table-hover table-condensed">
+                        <tr>
+                            <td class="field-name" >
+                                <fmt:message key="label.average.mark" />:
+                            </td>
+                            <td class="text-right">
+                                <c:out value="${leaderDto.avgMark}" />
+                            </td>
+                        </tr>
+                        <tr>
                             <td class="field-name">
                                 <fmt:message key="label.highest.mark"/>
                             </td>
                             <td class="text-right">
                                 <c:out value="${leaderDto.maxMark}" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="field-name" >
+                                <fmt:message key="label.modes.mark" />:
+                            </td>
+                            <td class="text-right">
+                                -
                             </td>
                         </tr>
                     </table>
