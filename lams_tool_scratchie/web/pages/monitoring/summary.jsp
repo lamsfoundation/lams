@@ -217,7 +217,7 @@
     		var icon = '';
     		
     		if (rowObject.isLeader == 'true') {
-    			icon = '&nbsp;<i title="leader" class="text-primary fa fa-star"></i>';
+    			icon = '&nbsp;<i title="<fmt:message key="label.monitoring.team.leader"/>" class="text-primary fa fa-star"></i>';
     		} else if (rowObject.reachedActivity == 'true') {
     			icon = '&nbsp;<i class="text-primary fa fa-check"></i>';
     		}
@@ -229,7 +229,7 @@
     				name = name.replace('</a>', icon + '</a>');
     			}
     		}
-        
+    		
     		return name;
     	}
         

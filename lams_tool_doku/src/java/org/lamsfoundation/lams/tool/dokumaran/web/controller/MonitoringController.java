@@ -204,38 +204,44 @@ public class MonitoringController {
 	List<DokumaranUser> users = dokumaranService.getUsersBySession(toolSessionId).stream()
 		.sorted(Comparator.comparing(sorting <= 1 ? DokumaranUser::getFirstName : DokumaranUser::getLastName))
 		.collect(Collectors.toList());
-	// reverse if sorting is descending
-	if (sorting == LEARNER_MARKS_SORTING_FIRST_NAME_DESC || sorting == LEARNER_MARKS_SORTING_LAST_NAME_DESC) {
-	    Collections.reverse(users);
-	}
 
-	// paging
-	int endIndex = (page + 1) * size;
-	users = users.subList(page * size, users.size() > endIndex ? endIndex : users.size());
-
-	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	ObjectNode responsedata = JsonNodeFactory.instance.objectNode();
-	responsedata.put("total_rows", users.size());
+	if (!users.isEmpty()) {
+	    // reverse if sorting is descending
+	    if (sorting == LEARNER_MARKS_SORTING_FIRST_NAME_DESC || sorting == LEARNER_MARKS_SORTING_LAST_NAME_DESC) {
+		Collections.reverse(users);
+	    }
 
-	ToolSession toolSession = toolService.getToolSessionById(toolSessionId);
-	Map<Integer, Double> gradebookUserActivities = gradebookService
-		.getGradebookUserActivities(toolSession.getToolActivity().getActivityId()).stream()
-		.filter(g -> g.getMark() != null)
-		.collect(Collectors.toMap(g -> g.getLearner().getUserId(), GradebookUserActivity::getMark));
+	    // paging
+	    int endIndex = (page + 1) * size;
+	    users = users.subList(page * size, users.size() > endIndex ? endIndex : users.size());
 
-	for (DokumaranUser user : users) {
-	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
+	    ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 
-	    responseRow.put("userId", user.getUserId());
-	    responseRow.put("firstName", user.getFirstName());
-	    responseRow.put("lastName", user.getLastName());
-	    Double mark = gradebookUserActivities.get(user.getUserId().intValue());
-	    responseRow.put("mark", mark == null ? "" : String.valueOf(mark));
+	    responsedata.put("total_rows", users.size());
 
-	    rows.add(responseRow);
+	    ToolSession toolSession = toolService.getToolSessionById(toolSessionId);
+	    Map<Integer, Double> gradebookUserActivities = gradebookService
+		    .getGradebookUserActivities(toolSession.getToolActivity().getActivityId()).stream()
+		    .filter(g -> g.getMark() != null)
+		    .collect(Collectors.toMap(g -> g.getLearner().getUserId(), GradebookUserActivity::getMark));
+
+	    DokumaranUser leader = users.get(0).getSession().getGroupLeader();
+	    for (DokumaranUser user : users) {
+		ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
+
+		responseRow.put("userId", user.getUserId());
+		responseRow.put("firstName", user.getFirstName());
+		responseRow.put("lastName", user.getLastName());
+		Double mark = gradebookUserActivities.get(user.getUserId().intValue());
+		responseRow.put("mark", mark == null ? "" : String.valueOf(mark));
+		responseRow.put("isLeader", leader != null && leader.getUid().equals(user.getUid()));
+
+		rows.add(responseRow);
+	    }
+	    responsedata.set("rows", rows);
 	}
 
-	responsedata.set("rows", rows);
 	response.setContentType("application/json;charset=utf-8");
 	return responsedata.toString();
     }
