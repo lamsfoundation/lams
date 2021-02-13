@@ -50,7 +50,8 @@
 	<div class="checkbox">
 		<label for="showChat">
 			<form:checkbox path="dokumaran.showChat" id="showChat"/>
-			<fmt:message key="label.show.chat" />
+			<fmt:message key="label.show.chat" />&nbsp;
+            <i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="" data-original-title="<fmt:message key="label.show.chat.tooltip  "/>"></i>
 		</label>
 	</div>
 	

@@ -253,14 +253,10 @@
 							
 							rows += '<tr userId="' + userData['userId'] + '">';
 
-							rows += '<td>';
-							rows += 	userData['firstName'];
+							rows += '<td width="80%">';
+							rows += 	userData['firstName'] + ' ' +userData['lastName'];
 							rows += '</td>';
-							
-							rows += '<td>';
-							rows += 	userData['lastName'];
-							rows += '</td>';
-							
+														
 							rows += '<td>';
 							rows += 	userData['mark'];
 							rows += '</td>';
@@ -862,9 +858,8 @@
 			<h4>
 			   <fmt:message key="label.monitoring.learner.marks.header"/>
 			</h4>
-			<lams:TSTable numColumns="3" dataId='toolSessionId="${groupSummary.sessionId}"'>
-				<th><fmt:message key="label.monitoring.learner.marks.first.name"/></th>
-				<th><fmt:message key="label.monitoring.learner.marks.last.name"/></th>
+			<lams:TSTable numColumns="2" dataId='toolSessionId="${groupSummary.sessionId}"'>
+				<th><fmt:message key="label.monitoring.learner.marks.name"/></th>
 				<th><fmt:message key="label.monitoring.learner.marks.mark"/>&nbsp;
 					<small><fmt:message key="label.monitoring.learner.marks.mark.tip"/></small>
 				</th>
