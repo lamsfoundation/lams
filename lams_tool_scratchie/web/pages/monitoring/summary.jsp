@@ -142,7 +142,7 @@
 				guiStyle: "bootstrap",
 				iconSet: 'fontAwesome',
 			   	colNames:['#',
-						"<fmt:message key='label.monitoring.summary.user.name' />",
+						"<fmt:message key='label.team' />",
 					    "<fmt:message key='label.burning.questions' />",
 						"<fmt:message key='label.count' />"
 				],
@@ -421,9 +421,9 @@
 		      		</span>
 		        </div>
 		
-		        <div id="collapseBurning" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingBurning">
+		        <div id="collapseBurning" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingBurning" style="padding: 10px;">
 					<c:forEach var="burningQuestionItemDto" items="${sessionMap.burningQuestionItemDtos}" varStatus="i">
-						<div class="voffset5"><strong>
+						<div class="voffset10"><strong>
 							<c:if test="${not i.last}">
 								${i.count})&nbsp;
 								
