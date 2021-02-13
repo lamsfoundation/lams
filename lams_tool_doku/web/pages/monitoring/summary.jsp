@@ -166,14 +166,14 @@
 		    sortInitialOrder: 'asc',
 		    sortList: [[0]],
 		    widgets: [ "uitheme", "resizable", "editable" ],
-		    headers: { 0: { sorter: true}, 1: { sorter: true}, 2: { sorter: false}  }, 
+		    headers: { 0: { sorter: true}, 1: { sorter: true}  }, 
 		    sortList : [[0,1]],
 		    showProcessing: false,
 		    widgetOptions: {
 		    	resizable: true,
 		    	
 		    	// only marks is editable
-		        editable_columns       : [2],
+		        editable_columns       : [1],
 		        editable_enterToAccept : true,          // press enter to accept content, or click outside if false
 		        editable_autoAccept    : false,          // accepts any changes made to the table cell automatically
 		        editable_autoResort    : false,         // auto resort after the content has changed.
@@ -248,13 +248,18 @@
 			    		var rows = [],
 			            json = {};
 
+			    		
 			    		for (i = 0; i < data.rows.length; i++){
-							var userData = data.rows[i];
+							var userData = data.rows[i],
+								isLeader = userData['isLeader'];
 							
-							rows += '<tr userId="' + userData['userId'] + '">';
+							rows += '<tr userId="' + userData['userId'] + '" ' + (isLeader ? 'class="info"' : '') + '>';
 
-							rows += '<td width="80%">';
+							rows += '<td style="width: 80%">';
 							rows += 	userData['firstName'] + ' ' +userData['lastName'];
+							if (isLeader) {
+								rows += '&nbsp;<i title="<fmt:message key="label.monitoring.team.leader"/>" class="text-primary fa fa-star"></i>';
+							}
 							rows += '</td>';
 														
 							rows += '<td>';
