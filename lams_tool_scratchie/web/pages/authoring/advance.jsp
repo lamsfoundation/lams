@@ -48,120 +48,143 @@
 </script>
 
 <lams:SimplePanel titleKey="label.scratchie.options">
-	<c:if test="${sessionMap.isEnabledExtraPointOption}">
-		<div class="checkbox">
-			<label for="extraPoint">
-				<form:checkbox path="scratchie.extraPoint" id="extraPoint"/>
-				<fmt:message key="label.authoring.advanced.give.extra.point" />
-			</label>
-		</div>
-	</c:if>
+    
+    <div class="row">
+        <div class="col-sm-6">
+
+            <c:if test="${sessionMap.isEnabledExtraPointOption}">
+                <div class="checkbox">
+                    <label for="extraPoint">
+                        <form:checkbox path="scratchie.extraPoint" id="extraPoint"/>
+                        <fmt:message key="label.authoring.advanced.give.extra.point" />
+                    </label>
+                </div>
+            </c:if>
+
+            <div class="checkbox">
+                <label for="burning-questions-enabled">
+                    <form:checkbox path="scratchie.burningQuestionsEnabled" id="burning-questions-enabled"/>
+                    <fmt:message key="label.authoring.advanced.burning.questions" />
+                </label>
+            </div>
+
+            <c:if test="${sessionMap.isQuestionEtherpadEnabled}">
+                <div class="checkbox">
+                    <label for="question-etherpad-enabled">
+                        <form:checkbox path="scratchie.questionEtherpadEnabled" id="question-etherpad-enabled"/>
+                        <fmt:message key="label.authoring.advanced.question.etherpad" />
+                    </label>
+                </div>
+            </c:if>
+
+            <div class="checkbox">
+                <label for="shuffle-items">
+                    <form:checkbox path="scratchie.shuffleItems" id="shuffle-items"/>
+                    <fmt:message key="label.authoring.advanced.shuffle.items" />
+                </label>
+            </div>
+            
+            
+        </div>
+        <div class="col-sm-6">
+            
+            <div class="checkbox">
+                <label for="reveal-on-double-click">
+                    <form:checkbox path="scratchie.revealOnDoubleClick" id="reveal-on-double-click"/>
+                    <fmt:message key="label.authoring.advanced.reveal.double.click" />
+                </label>
+                <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="right" title="" data-original-title="<fmt:message key="label.authoring.advanced.reveal.double.click.tooltip" />"></i>
+            </div>
+
+            <div class="checkbox">
+                <label for="show-scratchies-in-results">
+                    <form:checkbox path="scratchie.showScrachiesInResults" styleId="show-scratchies-in-results"/>
+                    <fmt:message key="label.authoring.advanced.show.scratchies.in.results" />
+                </label>
+            </div>
+
+            <div class="form-inline">
+                <label for="time-limit">
+                    <fmt:message key="label.time.limit" />&nbsp;
+                    <i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="" data-original-title="<fmt:message key="label.time.limit.tooltip"/>"></i>
+                </label>
+                <form:input path="scratchie.timeLimit" size="3" id="time-limit" cssClass="form-control input-sm"/>
+
+            </div>            
+            
+        </div>
+    </div>
 	
-	<div class="checkbox">
-		<label for="burning-questions-enabled">
-			<form:checkbox path="scratchie.burningQuestionsEnabled" id="burning-questions-enabled"/>
-			<fmt:message key="label.authoring.advanced.burning.questions" />
-		</label>
-	</div>
-	
-	<c:if test="${sessionMap.isQuestionEtherpadEnabled}">
-		<div class="checkbox">
-			<label for="question-etherpad-enabled">
-				<form:checkbox path="scratchie.questionEtherpadEnabled" id="question-etherpad-enabled"/>
-				<fmt:message key="label.authoring.advanced.question.etherpad" />
-			</label>
-		</div>
-	</c:if>
-	
-	<div class="checkbox">
-		<label for="shuffle-items">
-			<form:checkbox path="scratchie.shuffleItems" id="shuffle-items"/>
-			<fmt:message key="label.authoring.advanced.shuffle.items" />
-		</label>
-	</div>
-	
-	<div class="checkbox">
-		<label for="reveal-on-double-click">
-			<form:checkbox path="scratchie.revealOnDoubleClick" id="reveal-on-double-click"/>
-			<fmt:message key="label.authoring.advanced.reveal.double.click" />
-		</label>
-		<i class="fa fa-question-circle" data-toggle="tooltip" data-placement="right" title="" data-original-title="<fmt:message key="label.authoring.advanced.reveal.double.click.tooltip" />"></i>
-	</div>
-	
-	<div class="checkbox">
-		<label for="show-scratchies-in-results">
-			<form:checkbox path="scratchie.showScrachiesInResults" styleId="show-scratchies-in-results"/>
-			<fmt:message key="label.authoring.advanced.show.scratchies.in.results" />
-		</label>
-	</div>
-	
-	<div class="form-inline">
-		<label for="time-limit">
-			<fmt:message key="label.time.limit" />&nbsp;
-			<form:input path="scratchie.timeLimit" size="3" id="time-limit" cssClass="form-control input-sm"/>
-		</label>
-	</div>
-	
-	<div class="checkbox">
-		<c:if test="${activitiesProvidingConfidenceLevels == null}">
-			<div class="alert-warning" style="margin-bottom: 5px;">
-				<fmt:message key="label.save.learning.design" />
-			</div>
-		</c:if>
-		
-		<c:choose>
-			<c:when test="${fn:length(activitiesProvidingConfidenceLevels) == 0}">
-				<fmt:message key="label.no.confidence.levels.activities" />
-			</c:when>
-				
-			<c:otherwise>
-				<label for="display-confidence-levels-activities">
-					<input type="checkbox" id="display-confidence-levels-activities"
-							<c:if test="${authoringForm.scratchie.confidenceLevelsActivityUiid != null}">checked="true"</c:if>
-					/>
-				
-					<fmt:message key="label.show.confidence.level" />&nbsp;
-					<form:select path="scratchie.confidenceLevelsActivityUiid" cssClass="form-control input-sm" id="confidence-levels-activity">
-						<c:forEach var="confidenceProvidingActivity" items="${activitiesProvidingConfidenceLevels}">
-							<form:option value="${confidenceProvidingActivity.activityUIID}">${confidenceProvidingActivity.title}</form:option>
-						</c:forEach>
-					</form:select>
-				</label>
-				
-				<div class="checkbox loffset20">
-					<label for="confidence-levels-anonymous">
-						<form:checkbox path="scratchie.confidenceLevelsAnonymous" id="confidence-levels-anonymous"/>
-						<fmt:message key="label.anonymous.confidence.level" />
-					</label>
-				</div>
-			</c:otherwise>
-		</c:choose>
-	</div>
-	
-	<div class="checkbox">
-		<c:choose>
-			<c:when test="${fn:length(activitiesProvidingVsaAnswers) == 0}">
-				<fmt:message key="label.no.activities.provide.vsa.answers" />
-			</c:when>
-				
-			<c:otherwise>
-				<label for="display-activities-providing-vsa-answers">
-					<input type="checkbox" id="display-activities-providing-vsa-answers"
-							<c:if test="${authoringForm.scratchie.activityUiidProvidingVsaAnswers != null}">checked="true"</c:if>
-					/>
-				
-					<fmt:message key="label.show.vsa.answers" />&nbsp;
-					<form:select path="scratchie.activityUiidProvidingVsaAnswers" cssClass="form-control input-sm" id="activity-providing-vsa-answers">
-						<c:forEach var="activityProvidingVsaAnswers" items="${activitiesProvidingVsaAnswers}">
-							<form:option value="${activityProvidingVsaAnswers.activityUIID}">${activityProvidingVsaAnswers.title}</form:option>
-						</c:forEach>
-					</form:select>
-				</label>
-			</c:otherwise>
-		</c:choose>
-	</div>
+    <hr>
+    
+    <a role="button" data-toggle="collapse" href="#dataExchange" aria-expanded="false" aria-controls="dataExchange"><fmt:message key="label.authoring.advanced.data.import"/></a>&nbsp; <i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="" data-original-title="<fmt:message key='label.authoring.advanced.data.import.tooltip'/>"></i>
+    
+
+
+        <div class="collapse  <c:if test="${fn:length(activitiesProvidingConfidenceLevels) > 0}">in</c:if>" id="dataExchange" style="padding: 0px 10px 0px 10px;">
+            
+            <c:if test="${fn:length(activitiesProvidingConfidenceLevels) == 0}">
+                <div class="panel-body" style="font-style: italic"><fmt:message key="label.save.learning.design" /></div>
+            </c:if>
+
+
+            <c:if test="${fn:length(activitiesProvidingConfidenceLevels) > 0}">
+                <div class="checkbox" style="">
+                    <label for="display-confidence-levels-activities">
+                        <input type="checkbox" id="display-confidence-levels-activities"
+                                <c:if test="${authoringForm.scratchie.confidenceLevelsActivityUiid != null}">checked="true"</c:if>
+                        />
+
+                        <fmt:message key="label.show.confidence.level" />&nbsp;
+                        <form:select path="scratchie.confidenceLevelsActivityUiid" cssClass="form-control input-sm" id="confidence-levels-activity">
+                            <c:forEach var="confidenceProvidingActivity" items="${activitiesProvidingConfidenceLevels}">
+                                <form:option value="${confidenceProvidingActivity.activityUIID}">${confidenceProvidingActivity.title}</form:option>
+                            </c:forEach>
+                        </form:select>
+                    </label>
+
+                    <div class="checkbox loffset20">
+                        <label for="confidence-levels-anonymous">
+                            <form:checkbox path="scratchie.confidenceLevelsAnonymous" id="confidence-levels-anonymous"/>
+                            <fmt:message key="label.anonymous.confidence.level" />
+                        </label>
+                    </div>
+                </div>
+            </c:if>
+    
+            <c:if test="${fn:length(activitiesProvidingVsaAnswers) > 0}">
+
+                <div class="checkbox">
+                    <c:choose>
+                        <c:when test="${fn:length(activitiesProvidingVsaAnswers) == 0}">
+                            <fmt:message key="label.no.activities.provide.vsa.answers" />
+                        </c:when>
+
+                        <c:otherwise>
+                            <label for="display-activities-providing-vsa-answers">
+                                <input type="checkbox" id="display-activities-providing-vsa-answers"
+                                        <c:if test="${authoringForm.scratchie.activityUiidProvidingVsaAnswers != null}">checked="true"</c:if>
+                                />
+
+                                <fmt:message key="label.show.vsa.answers" />&nbsp;
+                                <form:select path="scratchie.activityUiidProvidingVsaAnswers" cssClass="form-control input-sm" id="activity-providing-vsa-answers">
+                                    <c:forEach var="activityProvidingVsaAnswers" items="${activitiesProvidingVsaAnswers}">
+                                        <form:option value="${activityProvidingVsaAnswers.activityUIID}">${activityProvidingVsaAnswers.title}</form:option>
+                                    </c:forEach>
+                                </form:select>
+                            </label>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+            </c:if>
+        </div>
+
+    
 </lams:SimplePanel>
 
+
+   
+    
 <c:set var="adTitle"><fmt:message key="label.change.marking.allocation" /></c:set>
 <lams:AdvancedAccordian title="${adTitle}">
 	<div class="panel-body ">
