@@ -35,7 +35,7 @@ CKEDITOR.config.toolbar_DefaultLearnerInline = [
   	['Bold','Italic','Underline', '-','Subscript','Superscript'],
   	['NumberedList','BulletedList','-','Outdent','Indent'],
   	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-  	['Jlatexmath'],
+  	['Jlatexmath','-','Link'],
   	['TextColor','BGColor'],
   	['Image','Table','HorizontalRule','Emojione'],
   	['Format','Font','FontSize']
