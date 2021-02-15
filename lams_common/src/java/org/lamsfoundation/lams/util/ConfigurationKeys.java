@@ -275,6 +275,8 @@ public class ConfigurationKeys {
     public static String PASSWORD_POLICY_NUMERICS = "PasswordPolicyNumerics";
 
     public static String PASSWORD_POLICY_SYMBOLS = "PasswordPolicySymbols";
+    
+    public static String PASSWORD_EXPIRATION_MONTHS = "PasswordExpirationMonths";
 
     // LDEV-4049 Option for not displaying stacktraces in config settings
     public static String ERROR_STACK_TRACE = "ErrorStackTrace";

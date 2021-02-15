@@ -28,6 +28,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -296,7 +297,7 @@ public class UserManagementService implements IUserManagementService {
 
     @Override
     public Organisation getRootOrganisation() {
-	return (Organisation) baseDAO
+	return baseDAO
 		.findByProperty(Organisation.class, "organisationType.organisationTypeId", OrganisationType.ROOT_TYPE)
 		.get(0);
     }
@@ -398,11 +399,11 @@ public class UserManagementService implements IUserManagementService {
 	List results = baseDAO.findByProperty(User.class, "login", login);
 	return results.isEmpty() ? null : (User) results.get(0);
     }
-    
+
     @Override
     public User getUserById(Integer userId) {
 	return (User) findById(User.class, userId);
-    }   
+    }
 
     @Override
     public void updatePassword(String login, String password) {
@@ -412,6 +413,7 @@ public class UserManagementService implements IUserManagementService {
 	    user.setSalt(salt);
 	    user.setPassword(HashUtil.sha256(password, salt));
 	    user.setModifiedDate(new Date());
+	    user.setPasswordChangeDate(LocalDateTime.now());
 	    baseDAO.update(user);
 	} catch (Exception e) {
 	    log.debug(e);
@@ -1113,7 +1115,7 @@ public class UserManagementService implements IUserManagementService {
 
 	for (int userId = minUserId; userId <= maxUserId; userId++) {
 	    try {
-		User user = (User) baseDAO.find(User.class, userId);
+		User user = baseDAO.find(User.class, userId);
 		if (user == null) {
 		    if (log.isDebugEnabled()) {
 			log.debug("User " + userId + " not found when batch uploading portraits, skipping");

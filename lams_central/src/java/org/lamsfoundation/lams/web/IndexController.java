@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.web;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,32 +90,43 @@ public class IndexController {
 	// taken based on that parameter; immediatelly, the value in DB is updated
 	HttpSession ss = SessionManager.getSession();
 	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	User user = userManagementService.getUserByLogin(userDTO.getLogin());
 	if (userDTO.isFirstLogin()) {
 	    request.setAttribute("firstLogin", true);
-	    User user = userManagementService.getUserByLogin(userDTO.getLogin());
 	    user.setFirstLogin(false);
 	    userManagementService.saveUser(user);
 	    userDTO.setFirstLogin(false);
 	}
 
-	// check if user is flagged as needing to change their password
-	User loggedInUser = userManagementService.getUserByLogin(request.getRemoteUser());
-	if (loggedInUser.getChangePassword() != null && loggedInUser.getChangePassword()) {
+	if (user.getPasswordChangeDate() == null) {
+	    user.setPasswordChangeDate(LocalDateTime.now());
+	    userManagementService.save(user);
+	} else {
+	    int expirationPeriod = Configuration.getAsInt(ConfigurationKeys.PASSWORD_EXPIRATION_MONTHS);
+	    if (expirationPeriod > 0) {
+		LocalDateTime expirationDate = user.getPasswordChangeDate().plusMonths(expirationPeriod);
+		if (LocalDateTime.now().isAfter(expirationDate)) {
+		    user.setChangePassword(true);
+		    userManagementService.save(user);
+		    return "forward:/password.do?passwordExpired=true";
+		}
+	    }
+	}
+
+	if (user.getChangePassword() != null && user.getChangePassword()) {
 	    return "forward:/password.do";
 	}
 
 	// check if user needs to get his shared two-factor authorization secret
-	if (loggedInUser.isTwoFactorAuthenticationEnabled()
-		&& loggedInUser.getTwoFactorAuthenticationSecret() == null) {
+	if (user.isTwoFactorAuthenticationEnabled() && user.getTwoFactorAuthenticationSecret() == null) {
 	    return "forward:/twoFactorAuthentication.do";
 	}
 
 	// check if user needs to get his shared two-factor authorization secret
-	if (policyService.isPolicyConsentRequiredForUser(loggedInUser.getUserId())) {
+	if (policyService.isPolicyConsentRequiredForUser(user.getUserId())) {
 	    return "forward:/policyConsents.do";
 	}
 
-	User user = userManagementService.getUserByLogin(userDTO.getLogin());
 	request.setAttribute("portraitUuid", user.getPortraitUuid());
 
 	String redirectParam = WebUtil.readStrParam(request, "redirect", true);

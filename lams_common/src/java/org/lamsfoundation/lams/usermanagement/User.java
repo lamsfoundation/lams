@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -184,6 +185,9 @@ public class User implements Serializable, Comparable<User> {
 
     @Column(name = "portrait_uuid")
     private UUID portraitUuid;
+
+    @Column(name = "password_change_date")
+    private LocalDateTime passwordChangeDate;
 
     @Column(name = "change_password")
     private Boolean changePassword;
@@ -597,6 +601,14 @@ public class User implements Serializable, Comparable<User> {
 
     public void setPortraitUuid(UUID portraitUuid) {
 	this.portraitUuid = portraitUuid;
+    }
+
+    public LocalDateTime getPasswordChangeDate() {
+	return passwordChangeDate;
+    }
+
+    public void setPasswordChangeDate(LocalDateTime passwordChangeDate) {
+	this.passwordChangeDate = passwordChangeDate;
     }
 
     public Boolean getChangePassword() {

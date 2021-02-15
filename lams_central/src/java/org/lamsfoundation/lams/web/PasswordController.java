@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class PasswordController {
 
     @RequestMapping("/password")
-    public String execute(@ModelAttribute("PasswordChangeActionForm") PasswordChangeActionForm passwordChangeForm, HttpServletRequest request)
+    public String execute(@ModelAttribute("passwordChangeActionForm") PasswordChangeActionForm passwordChangeForm, HttpServletRequest request)
 	    throws Exception {
 
 	passwordChangeForm.setLogin(request.getRemoteUser());

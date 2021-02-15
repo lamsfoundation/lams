@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.admin.web.controller;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -320,6 +321,7 @@ public class UserSaveController {
 	    String passwordHash = HashUtil.sha256(password, salt);
 	    user.setSalt(salt);
 	    user.setPassword(passwordHash);
+	    user.setPasswordChangeDate(LocalDateTime.now());
 	    userManagementService.logPasswordChanged(user, sysadmin);
 	    userManagementService.saveUser(user);
 	    return "forward:/user/edit.do";

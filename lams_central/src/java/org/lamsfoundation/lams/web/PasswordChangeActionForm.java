@@ -37,8 +37,6 @@ import org.apache.commons.lang.StringUtils;
  */
 public class PasswordChangeActionForm {
 
-    public static final String formName = "PasswordChangeActionForm"; // must match name in @struts:action section above
-
     private String redirectURL;
 
     private String oldPassword;
@@ -48,6 +46,8 @@ public class PasswordChangeActionForm {
     private String passwordConfirm;
 
     private String login;
+
+    private boolean passwordExpired;
 
     public PasswordChangeActionForm() {
     }
@@ -132,6 +132,14 @@ public class PasswordChangeActionForm {
 	this.redirectURL = redirectURL;
     }
 
+    public boolean isPasswordExpired() {
+	return passwordExpired;
+    }
+
+    public void setPasswordExpired(boolean passwordExpired) {
+	this.passwordExpired = passwordExpired;
+    }
+
     /**
      * Reset all properties to their default values.
      *
@@ -146,5 +154,4 @@ public class PasswordChangeActionForm {
 	setPassword(null);
 	setPasswordConfirm(null);
     }
-
 }
