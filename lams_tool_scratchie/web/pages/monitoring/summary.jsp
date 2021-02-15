@@ -32,6 +32,10 @@
 	    -webkit-border-radius:0;
 	    -khtml-border-radius:0;
 	}
+	
+	#collapseBurning .panel {
+		margin-bottom: 20px;
+	}
 </style>
 
 <script type="text/javascript">
@@ -422,18 +426,7 @@
 		        </div>
 		
 		        <div id="collapseBurning" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingBurning" style="padding: 10px;">
-					<c:forEach var="burningQuestionItemDto" items="${sessionMap.burningQuestionItemDtos}" varStatus="i">
-						<div class="voffset10"><strong>
-							<c:if test="${not i.last}">
-								${i.count})&nbsp;
-								
-							</c:if>
-							<c:if test="${not sessionMap.hideTitles}">
-								<c:out value="${burningQuestionItemDto.scratchieItem.qbQuestion.name}" />
-							</c:if>
-						</strong></div>
-						<table id="burningQuestions${burningQuestionItemDto.scratchieItem.uid}" class="scroll" cellpadding="0" cellspacing="0"></table>
-					</c:forEach>
+					<%@ include file="parts/burningQuestions.jsp"%>
 				</div>
 			</div>
 		</div>
