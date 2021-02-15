@@ -10,8 +10,6 @@
 	<lams:head>
 	
 	<lams:css/>
-	<lams:css webapp="monitoring" suffix="tblmonitor"/>
-	
 	<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 	<link type="text/css" href="${lams}css/thickbox.css" rel="stylesheet"  media="screen">
 	<link href="${lams}css/jquery-ui.timepicker.css" rel="stylesheet" type="text/css" >

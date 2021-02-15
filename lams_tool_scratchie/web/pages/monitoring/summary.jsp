@@ -36,6 +36,22 @@
 	#collapseBurning .panel {
 		margin-bottom: 20px;
 	}
+	
+	#collapseBurning .panel-heading a:after {
+	  font-family: FontAwesome;
+	  content: "\f139";
+	  float: right;
+	  color: grey;
+	}
+	
+	#collapseBurning .panel-heading a.collapsed:after {
+	  content: "\f13a";
+	 }
+	
+	#collapseBurning .burning-question-title {
+	  cursor: pointer;
+	}
+	
 </style>
 
 <script type="text/javascript">
