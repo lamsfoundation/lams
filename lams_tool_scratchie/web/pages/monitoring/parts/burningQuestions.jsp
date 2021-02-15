@@ -42,22 +42,30 @@
 			link.remove();
 			$('#options-' + itemUid).show();
 		});
+
+		//use jqeury toggle instead of bootstrap collapse 
+		$(".burning-question-title").on('click', function () {
+			var div =  $("#collapse-" + $(this).data("itemuid"));
+			div.toggleClass("in");
+			$(this).toggleClass("collapsed");
+		});
 	});
 </script>
 
 <!-- Header -->
 <div class="row no-gutter">
 	<div class="col-xs-12">
-        <button type="button" id="toggle-burning-questions-button" class="btn btn-sm btn-default pull-right voffset20" data-expanded="false">
+        <button type="button" id="toggle-burning-questions-button" class="btn btn-sm btn-default pull-right ${isTbl ? 'voffset20' : ''}" data-expanded="false">
            	<i class="fa fa-plus-circle"></i> 
            	<span class="hidden-xs">
            		<fmt:message key='label.expand.all' />
            	</span>
         </button>
-            
-		<h3>
-			<fmt:message key="label.burning.questions"/>
-		</h3>
+        <c:if test="${isTbl}">
+			<h3>
+				<fmt:message key="label.burning.questions"/>
+			</h3>
+		</c:if>
 	</div>
 </div>
 <!-- End header -->              

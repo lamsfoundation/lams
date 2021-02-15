@@ -24,6 +24,8 @@
 package org.lamsfoundation.lams.tool.scratchie.web.controller;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,6 +48,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
+import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.LeaderResultsDTO;
@@ -58,6 +61,7 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.AlphanumComparator;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -137,7 +141,8 @@ public class MonitoringController {
 	if (scratchie.isBurningQuestionsEnabled()) {
 	    List<BurningQuestionItemDTO> burningQuestionItemDtos = scratchieService.getBurningQuestionDtos(scratchie,
 		    null, true, true);
-	    sessionMap.put(ScratchieConstants.ATTR_BURNING_QUESTION_ITEM_DTOS, burningQuestionItemDtos);
+	    MonitoringController.setUpBurningQuestions(burningQuestionItemDtos);
+	    request.setAttribute(ScratchieConstants.ATTR_BURNING_QUESTION_ITEM_DTOS, burningQuestionItemDtos);
 	}
 
 	// Create reflectList if reflection is enabled.
@@ -325,5 +330,29 @@ public class MonitoringController {
 	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+    }
+
+    static void setUpBurningQuestions(List<BurningQuestionItemDTO> burningQuestionItemDtos) {
+	//unescape previously escaped session names
+	for (BurningQuestionItemDTO burningQuestionItemDto : burningQuestionItemDtos) {
+	    List<BurningQuestionDTO> burningQuestionDtos = burningQuestionItemDto.getBurningQuestionDtos();
+
+	    for (BurningQuestionDTO burningQuestionDto : burningQuestionItemDto.getBurningQuestionDtos()) {
+
+		String escapedBurningQuestion = StringEscapeUtils
+			.unescapeJavaScript(burningQuestionDto.getEscapedBurningQuestion());
+		burningQuestionDto.setEscapedBurningQuestion(escapedBurningQuestion);
+
+		String sessionName = StringEscapeUtils.unescapeJavaScript(burningQuestionDto.getSessionName());
+		burningQuestionDto.setSessionName(sessionName);
+	    }
+
+	    Collections.sort(burningQuestionDtos, new Comparator<BurningQuestionDTO>() {
+		@Override
+		public int compare(BurningQuestionDTO o1, BurningQuestionDTO o2) {
+		    return new AlphanumComparator().compare(o1.getSessionName(), o2.getSessionName());
+		}
+	    });
+	}
     }
 }
