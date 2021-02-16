@@ -30,10 +30,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TimeZone;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -44,6 +47,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
@@ -54,6 +58,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.SortNatural;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -191,6 +196,16 @@ public class User implements Serializable, Comparable<User> {
 
     @Column(name = "change_password")
     private Boolean changePassword;
+
+    /**
+     * Contains a list of recently used passwords in form: password change date -> "old_hash=old_salt"
+     */
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "lams_user_password_history", joinColumns = @JoinColumn(name = "user_id"))
+    @MapKeyColumn(name = "change_date")
+    @Column(name = "password")
+    @SortNatural
+    private SortedMap<LocalDateTime, String> passwordHistory = new TreeMap<>();
 
     @Column(name = "first_login")
     private Boolean firstLogin;
@@ -617,6 +632,14 @@ public class User implements Serializable, Comparable<User> {
 
     public void setChangePassword(Boolean changePassword) {
 	this.changePassword = changePassword;
+    }
+
+    public SortedMap<LocalDateTime, String> getPasswordHistory() {
+	return passwordHistory;
+    }
+
+    public void setPasswordHistory(SortedMap<LocalDateTime, String> passwordHistory) {
+	this.passwordHistory = passwordHistory;
     }
 
     public String getTimeZone() {

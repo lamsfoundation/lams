@@ -22,6 +22,7 @@
 
 package org.lamsfoundation.lams.util;
 
+import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -140,6 +141,26 @@ public class ValidationUtil {
     }
 
     /**
+     * Checks if password has not been used in recent history.
+     */
+    public static boolean isPasswordNotInHistory(String newPassword, Collection<String> hashesAndSalts) {
+	int historyLimit = Configuration.getAsInt(ConfigurationKeys.PASSWORD_HISTORY_LIMIT);
+	if (historyLimit <= 0) {
+	    return true;
+	}
+	for (String hashAndSalt : hashesAndSalts) {
+	    String[] hashAndSaltSplit = hashAndSalt.split("=");
+	    String oldHash = hashAndSaltSplit[0];
+	    String oldSalt = hashAndSaltSplit[1];
+	    String newHash = HashUtil.sha256(newPassword, oldSalt);
+	    if (oldHash.equals(newHash)) {
+		return false;
+	    }
+	}
+	return true;
+    }
+
+    /**
      * Checks whether supplied email address is valid. It validates email only if USER_VALIDATION_REQUIRED_EMAIL LAMS
      * configuration is ON.
      */
@@ -219,14 +240,15 @@ public class ValidationUtil {
 	}
 
 	int wordCount = 0;
-	if ( text.length() >  0) {
+	if (text.length() > 0) {
 	    String cleanedString = text.replaceAll("[\'\";:,\\.\\?\\-!]+", "").trim();
 	    wordCount = cleanedString.split("\\S+").length;//.match(/\S+/g) || []) ;
 	    // special case - if only one word and no spaces then the split array is empty.
-	    if ( wordCount == 0 && cleanedString.length() > 0)
+	    if (wordCount == 0 && cleanedString.length() > 0) {
 		wordCount = 1;
+	    }
 	}
-    	
+
 	// check min words limit is reached
 	return (wordCount >= minWordsLimit);
     }

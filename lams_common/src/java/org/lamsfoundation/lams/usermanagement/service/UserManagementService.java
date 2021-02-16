@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.stream.Collectors;
@@ -101,6 +102,8 @@ public class UserManagementService implements IUserManagementService {
     private Logger log = Logger.getLogger(UserManagementService.class);
 
     private static final String SEQUENCES_FOLDER_NAME_KEY = "runsequences.folder.name";
+
+    private static final int PASSWORD_HISTORY_DEFAULT_LIMIT = 50;
 
     private IBaseDAO baseDAO;
 
@@ -407,16 +410,27 @@ public class UserManagementService implements IUserManagementService {
 
     @Override
     public void updatePassword(User user, String password) {
-	try {
-	    String salt = HashUtil.salt();
-	    user.setSalt(salt);
-	    user.setPassword(HashUtil.sha256(password, salt));
-	    user.setModifiedDate(new Date());
-	    user.setPasswordChangeDate(LocalDateTime.now());
-	    baseDAO.update(user);
-	} catch (Exception e) {
-	    log.debug(e);
+	String salt = HashUtil.salt();
+	user.setSalt(salt);
+	String hash = HashUtil.sha256(password, salt);
+	user.setPassword(hash);
+	user.setModifiedDate(new Date());
+	LocalDateTime date = LocalDateTime.now();
+	user.setPasswordChangeDate(date);
+
+	// add new password to history
+	SortedMap<LocalDateTime, String> history = user.getPasswordHistory();
+	history.put(date, hash + "=" + salt);
+
+	// clear old password, about the limit
+	int historyLimit = Configuration.getAsInt(ConfigurationKeys.PASSWORD_HISTORY_LIMIT);
+	// if no limit is set then set some high limit to keep the table tidy
+	historyLimit = historyLimit <= 0 ? PASSWORD_HISTORY_DEFAULT_LIMIT : historyLimit;
+	while (historyLimit < history.size()) {
+	    history.remove(history.firstKey());
 	}
+
+	baseDAO.update(user);
     }
 
     @Override

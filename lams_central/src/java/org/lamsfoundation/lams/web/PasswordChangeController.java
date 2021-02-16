@@ -107,6 +107,10 @@ public class PasswordChangeController {
 		    errorMap.add("password", messageService.getMessage("label.password.restrictions"));
 		    PasswordChangeController.log.debug("Password must follow the restrictions");
 		}
+		if (!ValidationUtil.isPasswordNotInHistory(password, user.getPasswordHistory().values())) {
+		    errorMap.add("password", messageService.getMessage("error.password.history"));
+		    PasswordChangeController.log.debug("Password has been recently used");
+		}
 
 		if (errorMap.isEmpty()) {
 		    userManagementService.updatePassword(user, password);
@@ -122,7 +126,8 @@ public class PasswordChangeController {
 
 	} catch (Exception e) {
 	    PasswordChangeController.log.error("Exception occured ", e);
-	    errorMap.add("GLOBAL", messageService.getMessage(e.getMessage()));
+	    errorMap.add("GLOBAL",
+		    "Error while chaging password" + (e.getMessage() == null ? "" : ": " + e.getMessage()));
 	}
 
 	// -- Report any errors

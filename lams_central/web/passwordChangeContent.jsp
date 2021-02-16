@@ -9,6 +9,7 @@
 <c:set var="mustHaveLowercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_LOWERCASE)%></c:set>
 <c:set var="mustHaveNumerics"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_NUMERICS)%></c:set>
 <c:set var="mustHaveSymbols"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_SYMBOLS)%></c:set>
+<c:set var="passwordHistoryLimit"><%=Configuration.get(ConfigurationKeys.PASSWORD_HISTORY_LIMIT)%></c:set>
 <c:set var="lams"><lams:LAMSURL/></c:set>
 	
 <lams:html>
@@ -136,7 +137,14 @@
 									</c:if>	
 									<c:if test="${mustHaveSymbols}">
 										<li><span class="fa fa-check"></span> <fmt:message key='label.password.must.symbol'/></li>
-									</c:if>	
+									</c:if>
+									<c:if test="${passwordHistoryLimit > 0}">
+										<li><span class="fa fa-check"></span>
+											<fmt:message key='label.password.history'>
+												<fmt:param value="${passwordHistoryLimit}" />
+											</fmt:message>
+										</li>
+									</c:if>
 								</ul>
 							</lams:Alert> 
 						</div>
