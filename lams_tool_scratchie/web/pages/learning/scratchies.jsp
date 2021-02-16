@@ -29,7 +29,7 @@
 	</c:if>
 
 	<c:choose>
-	<c:when test="${item.qbQuestion.type == 1}">
+	<c:when test="${item.qbQuestion.type == 1 or item.qbQuestion.type == 8}">
 		<table class="table table-hover scratches">
 			<c:forEach var="optionDto" items="${item.optionDtos}" varStatus="status">
 				<tr id="tr${optionDto.qbOptionUid}">

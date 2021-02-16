@@ -64,7 +64,7 @@
 				<td style="width:1%; vertical-align: top">
 					<span class='alert-info btn-xs question-type-alert'>
 						<c:choose>
-							<c:when test="${item.qbQuestion.type == 1}">
+							<c:when test="${item.qbQuestion.type == 1 or item.qbQuestion.type == 8}">
 								<fmt:message key="label.type.multiple.choice" />
 							</c:when>
 							<c:when test="${item.qbQuestion.type == 3}">

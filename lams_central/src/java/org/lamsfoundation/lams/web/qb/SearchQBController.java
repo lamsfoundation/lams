@@ -105,8 +105,9 @@ public class SearchQBController {
 	    questionTypesAvailable.append(QbQuestion.TYPE_MULTIPLE_CHOICE);
 	    questionTypesAvailable.append(",");
 	    questionTypesAvailable.append(QbQuestion.TYPE_VERY_SHORT_ANSWERS);
+	    questionTypesAvailable.append(",");
+	    questionTypesAvailable.append(QbQuestion.TYPE_MARK_HEDGING);
 
-	    //CommonConstants.TOOL_SIGNATURE_SURVEY
 	} else if ("lasurv11".equals(toolSignature)) {
 	    questionTypesAvailable.append(QbQuestion.TYPE_MULTIPLE_CHOICE);
 	    questionTypesAvailable.append(",");

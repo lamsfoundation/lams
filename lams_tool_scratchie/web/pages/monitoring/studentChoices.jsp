@@ -134,7 +134,7 @@
 				</th>
 				<c:forEach var="item" items="${items}">
 					<td class="text-center">
-						<c:if test="${item.qbQuestion.type == 1}">
+						<c:if test="${item.qbQuestion.type == 1 or item.qbQuestion.type == 8}">
 							${item.correctAnswerLetter}
 						</c:if>
 					</td>
@@ -187,7 +187,7 @@
 										<c:if test="${optionDto.answer != ''}">
 											<span class="user-response <c:if test="${optionDto.correct}">successful-response</c:if> <c:if test="${!optionDto.correct}">wrong-response</c:if>">
 												<c:choose>
-													<c:when test="${itemDto.type == 1}">
+													<c:when test="${itemDto.type == 1 or itemDto.type == 8}">
 														<c:out value="${optionDto.answer}" escapeXml="false"/>
 													</c:when>
 													<c:when test="${optionDto.correct}"><i class="fa fa-check"></i></c:when>
@@ -245,7 +245,7 @@
 								<c:set var="cssClass"><c:if test='${qbOption.correct}'>bg-success</c:if></c:set>
 									<tr>
 										<c:choose>
-											<c:when test="${item.qbQuestion.type == 1}">
+											<c:when test="${item.qbQuestion.type == 1 or item.qbQuestion.type == 8}">
 												<td width="5px" class="${cssClass}">
 													${ALPHABET[j.index]}.
 												</td>

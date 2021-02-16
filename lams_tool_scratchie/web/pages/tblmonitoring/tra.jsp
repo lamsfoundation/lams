@@ -97,7 +97,7 @@
 							<c:set var="cssClass"><c:if test='${qbOption.correct}'>bg-success</c:if></c:set>
 							<tr>
 								<c:choose>
-									<c:when test="${item.qbQuestion.type == 1}">
+									<c:when test="${item.qbQuestion.type == 1 or item.qbQuestion.type == 8}">
 										<td width="5px" class="${cssClass}">
 											${ALPHABET[j.index]}.
 										</td>
