@@ -222,32 +222,32 @@ public class UserSaveController {
 		    BeanUtils.copyProperties(user, userForm);
 		    user.setSalt(salt);
 		    user.setPassword(passwordHash);
+		    user.setPasswordChangeDate(LocalDateTime.now());
 		    log.debug("creating user... new login: " + user.getLogin());
-		    if (errorMap.isEmpty()) {
-			user.setDisabledFlag(false);
-			user.setCreateDate(new Date());
-			user.setAuthenticationMethod((AuthenticationMethod) userManagementService
-				.findByProperty(AuthenticationMethod.class, "authenticationMethodName", "LAMS-Database")
-				.get(0));
-			user.setUserId(null);
-			user.setLocale(locale);
 
-			Theme theme = null;
-			if (userForm.getUserTheme() != null) {
-			    theme = (Theme) userManagementService.findById(Theme.class, userForm.getUserTheme());
-			}
-			if (theme == null) {
-			    theme = userManagementService.getDefaultTheme();
-			}
-			user.setTheme(theme);
+		    user.setDisabledFlag(false);
+		    user.setCreateDate(new Date());
+		    user.setAuthenticationMethod((AuthenticationMethod) userManagementService
+			    .findByProperty(AuthenticationMethod.class, "authenticationMethodName", "LAMS-Database")
+			    .get(0));
+		    user.setUserId(null);
+		    user.setLocale(locale);
 
-			userManagementService.saveUser(user);
-
-			// make 'create user' audit log entry
-			userManagementService.logUserCreated(user, sysadmin);
-
-			log.debug("user: " + user.toString());
+		    Theme theme = null;
+		    if (userForm.getUserTheme() != null) {
+			theme = (Theme) userManagementService.findById(Theme.class, userForm.getUserTheme());
 		    }
+		    if (theme == null) {
+			theme = userManagementService.getDefaultTheme();
+		    }
+		    user.setTheme(theme);
+
+		    userManagementService.saveUser(user);
+
+		    // make 'create user' audit log entry
+		    userManagementService.logUserCreated(user, sysadmin);
+
+		    log.debug("user: " + user.toString());
 		}
 	    }
 	}
@@ -296,7 +296,7 @@ public class UserSaveController {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Only Sysadmin has edit permisions");
 	    return null;
 	}
-	
+
 	User sysadmin = (User) userManagementService.findById(User.class, loggeduserId);
 
 	String password = WebUtil.readStrParam(request, "password");
@@ -317,13 +317,8 @@ public class UserSaveController {
 
 	if (errorMap.isEmpty()) {
 	    User user = (User) userManagementService.findById(User.class, userId);
-	    String salt = HashUtil.salt();
-	    String passwordHash = HashUtil.sha256(password, salt);
-	    user.setSalt(salt);
-	    user.setPassword(passwordHash);
-	    user.setPasswordChangeDate(LocalDateTime.now());
+	    userManagementService.updatePassword(user, password);
 	    userManagementService.logPasswordChanged(user, sysadmin);
-	    userManagementService.saveUser(user);
 	    return "forward:/user/edit.do";
 	}
 	request.setAttribute("errorMap", errorMap);

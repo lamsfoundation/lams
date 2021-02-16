@@ -406,9 +406,8 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @Override
-    public void updatePassword(String login, String password) {
+    public void updatePassword(User user, String password) {
 	try {
-	    User user = getUserByLogin(login);
 	    String salt = HashUtil.salt();
 	    user.setSalt(salt);
 	    user.setPassword(HashUtil.sha256(password, salt));

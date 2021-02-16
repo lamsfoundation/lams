@@ -2,6 +2,7 @@ package org.lamsfoundation.lams.web.controller;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.time.LocalDateTime;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
@@ -91,6 +92,7 @@ public class SignupController {
 		String salt = HashUtil.salt();
 		user.setSalt(salt);
 		user.setPassword(HashUtil.sha256(signupForm.getPassword(), salt));
+		user.setPasswordChangeDate(LocalDateTime.now());
 		if (emailVerify) {
 		    user.setEmailVerified(false);
 		    user.setDisabledFlag(true);

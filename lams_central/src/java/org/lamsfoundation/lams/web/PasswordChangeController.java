@@ -23,8 +23,6 @@
 
 package org.lamsfoundation.lams.web;
 
-import java.time.LocalDateTime;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -111,12 +109,7 @@ public class PasswordChangeController {
 		}
 
 		if (errorMap.isEmpty()) {
-		    String salt = HashUtil.salt();
-		    user.setSalt(salt);
-		    user.setPassword(HashUtil.sha256(password, salt));
-		    user.setChangePassword(false);
-		    user.setPasswordChangeDate(LocalDateTime.now());
-		    userManagementService.saveUser(user);
+		    userManagementService.updatePassword(user, password);
 
 		    // make 'password changed' audit log entry
 		    String[] args = new String[1];

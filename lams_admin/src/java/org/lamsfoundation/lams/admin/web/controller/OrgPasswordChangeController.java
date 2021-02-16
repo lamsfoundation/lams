@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.admin.web.controller;
 
 import java.io.IOException;
 import java.security.InvalidParameterException;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -50,7 +49,6 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
@@ -281,14 +279,11 @@ public class OrgPasswordChangeController {
 	    }
 
 	    // change password
-	    String salt = HashUtil.salt();
-	    user.setSalt(salt);
-	    user.setPassword(HashUtil.sha256(password, salt));
-	    user.setPasswordChangeDate(LocalDateTime.now());
 	    if (force) {
 		user.setChangePassword(true);
 	    }
-	    userManagementService.saveUser(user);
+	    userManagementService.updatePassword(user, password);
+
 	    log.info("Changed password for user ID " + user.getUserId());
 	    userManagementService.logPasswordChanged(user, currentUser);
 	    changedUserIDs.add(user.getUserId());
