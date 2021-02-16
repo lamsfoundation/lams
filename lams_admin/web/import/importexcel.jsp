@@ -178,6 +178,12 @@
 								<li><span class="fa fa-check"></span> <fmt:message
 										key='label.password.must.symbol' /></li>
 							</c:if>
+							<li><span class="fa fa-check"></span>
+								<fmt:message key='label.password.user.details' />
+							</li>
+							<li><span class="fa fa-check"></span>
+								<fmt:message key='label.password.common' />
+							</li>
 						</ul>
 					</lams:Alert>
 				</div>

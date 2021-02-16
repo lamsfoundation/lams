@@ -28,6 +28,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -39,6 +40,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.stream.Collectors;
@@ -100,6 +102,8 @@ public class UserManagementService implements IUserManagementService {
     private Logger log = Logger.getLogger(UserManagementService.class);
 
     private static final String SEQUENCES_FOLDER_NAME_KEY = "runsequences.folder.name";
+
+    private static final int PASSWORD_HISTORY_DEFAULT_LIMIT = 50;
 
     private IBaseDAO baseDAO;
 
@@ -296,7 +300,7 @@ public class UserManagementService implements IUserManagementService {
 
     @Override
     public Organisation getRootOrganisation() {
-	return (Organisation) baseDAO
+	return baseDAO
 		.findByProperty(Organisation.class, "organisationType.organisationTypeId", OrganisationType.ROOT_TYPE)
 		.get(0);
     }
@@ -398,24 +402,35 @@ public class UserManagementService implements IUserManagementService {
 	List results = baseDAO.findByProperty(User.class, "login", login);
 	return results.isEmpty() ? null : (User) results.get(0);
     }
-    
+
     @Override
     public User getUserById(Integer userId) {
 	return (User) findById(User.class, userId);
-    }   
+    }
 
     @Override
-    public void updatePassword(String login, String password) {
-	try {
-	    User user = getUserByLogin(login);
-	    String salt = HashUtil.salt();
-	    user.setSalt(salt);
-	    user.setPassword(HashUtil.sha256(password, salt));
-	    user.setModifiedDate(new Date());
-	    baseDAO.update(user);
-	} catch (Exception e) {
-	    log.debug(e);
+    public void updatePassword(User user, String password) {
+	String salt = HashUtil.salt();
+	user.setSalt(salt);
+	String hash = HashUtil.sha256(password, salt);
+	user.setPassword(hash);
+	user.setModifiedDate(new Date());
+	LocalDateTime date = LocalDateTime.now();
+	user.setPasswordChangeDate(date);
+
+	// add new password to history
+	SortedMap<LocalDateTime, String> history = user.getPasswordHistory();
+	history.put(date, hash + "=" + salt);
+
+	// clear old password, about the limit
+	int historyLimit = Configuration.getAsInt(ConfigurationKeys.PASSWORD_HISTORY_LIMIT);
+	// if no limit is set then set some high limit to keep the table tidy
+	historyLimit = historyLimit <= 0 ? PASSWORD_HISTORY_DEFAULT_LIMIT : historyLimit;
+	while (historyLimit < history.size()) {
+	    history.remove(history.firstKey());
 	}
+
+	baseDAO.update(user);
     }
 
     @Override
@@ -1113,7 +1128,7 @@ public class UserManagementService implements IUserManagementService {
 
 	for (int userId = minUserId; userId <= maxUserId; userId++) {
 	    try {
-		User user = (User) baseDAO.find(User.class, userId);
+		User user = baseDAO.find(User.class, userId);
 		if (user == null) {
 		    if (log.isDebugEnabled()) {
 			log.debug("User " + userId + " not found when batch uploading portraits, skipping");

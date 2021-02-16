@@ -49,7 +49,6 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
@@ -247,6 +246,9 @@ public class OrgPasswordChangeController {
 	UserDTO currentUserDTO = getUserDTO();
 	User currentUser = (User) userManagementService.findById(User.class, currentUserDTO.getUserID());
 	for (User user : users) {
+	    if (!ValidationUtil.isPasswordNotUserDetails(password, user)) {
+		throw new InvalidParameterException("Password is the same as user details");
+	    }
 	    // either we work with white list or black list
 	    if (includedUsers == null) {
 		boolean excluded = false;
@@ -280,13 +282,11 @@ public class OrgPasswordChangeController {
 	    }
 
 	    // change password
-	    String salt = HashUtil.salt();
-	    user.setSalt(salt);
-	    user.setPassword(HashUtil.sha256(password, salt));
 	    if (force) {
 		user.setChangePassword(true);
 	    }
-	    userManagementService.saveUser(user);
+	    userManagementService.updatePassword(user, password);
+
 	    log.info("Changed password for user ID " + user.getUserId());
 	    userManagementService.logPasswordChanged(user, currentUser);
 	    changedUserIDs.add(user.getUserId());

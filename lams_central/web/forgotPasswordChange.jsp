@@ -104,6 +104,7 @@
 					<strong><fmt:message key='label.password.must.contain' />:</strong>
 					<c:out value="${mustHaveUppercase}" />
 					<ul class="list-unstyled" style="line-height: 1.2">
+
 						<li><span class="fa fa-check"></span> <fmt:message
 								key='label.password.min.length'>
 								<fmt:param value='${minNumChars}' />
@@ -124,6 +125,12 @@
 							<li><span class="fa fa-check"></span> <fmt:message
 									key='label.password.must.symbol' /></li>
 						</c:if>
+						<li><span class="fa fa-check"></span>
+							<fmt:message key='label.password.user.details' />
+						</li>
+						<li><span class="fa fa-check"></span>
+							<fmt:message key='label.password.common' />
+						</li>
 					</ul>
 				</lams:Alert>
 			</div>

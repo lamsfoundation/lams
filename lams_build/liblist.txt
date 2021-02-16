@@ -56,6 +56,8 @@ mysql             mysql-connector-java-8.0.11.jar		8.0.11				   GPL							 Oracl
 
 odmg              odmg-3.0.jar                          3.0                                                                                   
 
+passpol			  passpol-0.7.1-SNAPSHOT.jar			0.7.1				   Apache License 2.0			 Codahale						  For checking for weak or compromised password. Recompiled manually with Java 11.
+
 quartz			  quartz-2.2.3.jar						2.2.3			   	   Apache License 2.0			 Terracotta						  For running scheduled jobs
 
 spring            spring-core-4.3.12.RELEASE.jar		4.3.12				   Apache License 2.0			 Pivotal						  programming and configuration model for modern Java-based enterprise applications

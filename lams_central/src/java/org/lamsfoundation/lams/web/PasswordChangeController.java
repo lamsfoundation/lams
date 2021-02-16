@@ -70,68 +70,65 @@ public class PasswordChangeController {
      *
      */
     @RequestMapping(path = "/passwordChanged", method = RequestMethod.POST)
-    public String execute(@ModelAttribute("PasswordChangeActionForm") PasswordChangeActionForm passwordChangeForm,
+    public String execute(@ModelAttribute("passwordChangeActionForm") PasswordChangeActionForm passwordChangeForm,
 	    HttpServletRequest request) throws Exception {
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
-	if (errorMap.isEmpty()) {
-	    try {
+	try {
+	    String loggedInUser = request.getRemoteUser();
+	    String login = passwordChangeForm.getLogin();
+	    String oldPassword = passwordChangeForm.getOldPassword();
+	    String password = passwordChangeForm.getPassword();
+	    String passwordConfirm = passwordChangeForm.getPasswordConfirm();
 
-		String loggedInUser = request.getRemoteUser();
-		String login = passwordChangeForm.getLogin();
-		String oldPassword = passwordChangeForm.getOldPassword();
-		String password = passwordChangeForm.getPassword();
-		String passwordConfirm = passwordChangeForm.getPasswordConfirm();
+	    if ((loggedInUser == null) || !loggedInUser.equals(login)) {
+		errorMap.add("GLOBAL", messageService.getMessage("error.authorisation"));
 
-		if ((loggedInUser == null) || !loggedInUser.equals(login)) {
-		    errorMap.add("GLOBAL", messageService.getMessage("error.authorisation"));
-		    
-		} else {
-		    User user = userManagementService.getUserByLogin(login);
-		    String passwordHash = user.getPassword().length() == HashUtil.SHA1_HEX_LENGTH
-			    ? HashUtil.sha1(oldPassword)
-			    : HashUtil.sha256(oldPassword, user.getSalt());
+	    } else {
+		User user = userManagementService.getUserByLogin(login);
+		String passwordHash = user.getPassword().length() == HashUtil.SHA1_HEX_LENGTH
+			? HashUtil.sha1(oldPassword)
+			: HashUtil.sha256(oldPassword, user.getSalt());
 
-		    if (!user.getPassword().equals(passwordHash)) {
-			errorMap.add("oldPassword", messageService.getMessage("error.oldpassword.mismatch"));
-			PasswordChangeController.log.debug("old pass wrong");
-		    }
-		    if (!password.equals(passwordConfirm)) {
-			errorMap.add("password", messageService.getMessage("error.newpassword.mismatch"));
-			PasswordChangeController.log.debug("new pass wrong");
-		    }
-		    if ((password == null) || (password.length() == 0)) {
-			errorMap.add("password", messageService.getMessage("error.password.empty"));
-			PasswordChangeController.log.debug("new password cannot be empty");
-		    }
-		    if (!ValidationUtil.isPasswordValueValid(password, passwordConfirm)) {
-			errorMap.add("password", messageService.getMessage("label.password.restrictions"));
-			PasswordChangeController.log.debug("Password must follow the restrictions");
-		    }
-
-		    if (errorMap.isEmpty()) {
-			String salt = HashUtil.salt();
-			user.setSalt(salt);
-			user.setPassword(HashUtil.sha256(password, salt));
-			user.setChangePassword(false);
-			userManagementService.saveUser(user);
-
-			// make 'password changed' audit log entry
-			String[] args = new String[1];
-			args[0] = user.getLogin() + " (" + user.getUserId() + ")";
-			String message = messageService.getMessage("audit.user.password.change", args);
-			logEventService.logEvent(LogEvent.TYPE_PASSWORD_CHANGE, user.getUserId(), user.getUserId(), null, null,
-				message);
-		    }
+		if (!user.getPassword().equals(passwordHash)) {
+		    errorMap.add("oldPassword", messageService.getMessage("error.oldpassword.mismatch"));
+		    PasswordChangeController.log.debug("old pass wrong");
+		}
+		if (!password.equals(passwordConfirm)) {
+		    errorMap.add("password", messageService.getMessage("error.newpassword.mismatch"));
+		    PasswordChangeController.log.debug("new pass wrong");
+		}
+		if ((password == null) || (password.length() == 0)) {
+		    errorMap.add("password", messageService.getMessage("error.password.empty"));
+		    PasswordChangeController.log.debug("new password cannot be empty");
+		}
+		if (!ValidationUtil.isPasswordValueValid(password, passwordConfirm, user)) {
+		    errorMap.add("password", messageService.getMessage("label.password.restrictions"));
+		    PasswordChangeController.log.debug("Password must follow the restrictions");
+		}
+		if (!ValidationUtil.isPasswordNotInHistory(password, user.getPasswordHistory().values())) {
+		    errorMap.add("password", messageService.getMessage("error.password.history"));
+		    PasswordChangeController.log.debug("Password has been recently used");
 		}
 
-	    } catch (Exception e) {
-		PasswordChangeController.log.error("Exception occured ", e);
-		errorMap.add("GLOBAL", messageService.getMessage(e.getMessage()));
+		if (errorMap.isEmpty()) {
+		    userManagementService.updatePassword(user, password);
+
+		    // make 'password changed' audit log entry
+		    String[] args = new String[1];
+		    args[0] = user.getLogin() + " (" + user.getUserId() + ")";
+		    String message = messageService.getMessage("audit.user.password.change", args);
+		    logEventService.logEvent(LogEvent.TYPE_PASSWORD_CHANGE, user.getUserId(), user.getUserId(), null,
+			    null, message);
+		}
 	    }
 
-	} // end if no errors
+	} catch (Exception e) {
+	    PasswordChangeController.log.error("Exception occured ", e);
+	    errorMap.add("GLOBAL",
+		    "Error while chaging password" + (e.getMessage() == null ? "" : ": " + e.getMessage()));
+	}
 
 	// -- Report any errors
 	if (!errorMap.isEmpty()) {

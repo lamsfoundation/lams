@@ -265,17 +265,10 @@ public interface IUserManagementService {
      * @return the User
      */
     User getUserByLogin(String login);
-    
+
     User getUserById(Integer userId);
 
-    /**
-     * @param login
-     *            user's login
-     * @param password
-     *            new password
-     * @return void
-     */
-    void updatePassword(String login, String password);
+    void updatePassword(User user, String password);
 
     /**
      * @param userId

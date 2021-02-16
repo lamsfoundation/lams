@@ -9,6 +9,7 @@
 <c:set var="mustHaveLowercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_LOWERCASE)%></c:set>
 <c:set var="mustHaveNumerics"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_NUMERICS)%></c:set>
 <c:set var="mustHaveSymbols"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_SYMBOLS)%></c:set>
+<c:set var="passwordHistoryLimit"><%=Configuration.get(ConfigurationKeys.PASSWORD_HISTORY_LIMIT)%></c:set>
 <c:set var="lams"><lams:LAMSURL/></c:set>
 	
 <lams:html>
@@ -86,18 +87,27 @@
 </lams:head>
 
 <body>
-<form:form modelAttribute="PasswordChangeActionForm" id="change-password" method="post" action="/lams/passwordChanged.do">
+<form:form modelAttribute="passwordChangeActionForm" id="change-password" method="post" action="/lams/passwordChanged.do">
 	<input type="hidden" name="redirectURL" value="${param.redirectURL}" />
 	<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 
 	<div style="clear: both"></div>
 	<div class="container">
+		<c:if test="${passwordChangeActionForm.passwordExpired}">
+			<div class="row voffset20">
+				<div class="col-xs-4 col-xs-offset-4 alert alert-warning" role="alert">
+				  	<fmt:message key="label.password.expired" />
+				</div>
+			</div>
+		</c:if>
+		
 		<div class="row vertical-center-row">
 			<div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
 				<div class="panel voffset20">
 					<lams:errors/>
 					<div class="panel-body">
-						<form:hidden name="<%=PasswordChangeActionForm.formName%>" path="login" />
+						<form:hidden path="passwordExpired" />
+						<form:hidden path="login" />
 						
 						<div class="form-group">
 							<label for="oldPassword"><fmt:message key="label.password.old.password" />:</label>
@@ -127,7 +137,20 @@
 									</c:if>	
 									<c:if test="${mustHaveSymbols}">
 										<li><span class="fa fa-check"></span> <fmt:message key='label.password.must.symbol'/></li>
-									</c:if>	
+									</c:if>
+									<li><span class="fa fa-check"></span>
+										<fmt:message key='label.password.user.details' />
+									</li>
+									<li><span class="fa fa-check"></span>
+										<fmt:message key='label.password.common' />
+									</li>
+									<c:if test="${passwordHistoryLimit > 0}">
+										<li><span class="fa fa-check"></span>
+											<fmt:message key='label.password.history'>
+												<fmt:param value="${passwordHistoryLimit}" />
+											</fmt:message>
+										</li>
+									</c:if>
 								</ul>
 							</lams:Alert> 
 						</div>
@@ -145,10 +168,12 @@
 						</div>
 							
 						<div class="form-group" align="right">
-							<button type="button" id="cancelButton" class="btn btn-sm btn-default voffset5" onclick="history.go(-1);">
-								<fmt:message key="button.cancel"/>
-							</button>
-							&nbsp;&nbsp;
+							<c:if test="${not passwordChangeActionForm.passwordExpired}">
+								<button type="button" id="cancelButton" class="btn btn-sm btn-default voffset5" onclick="history.go(-1);">
+									<fmt:message key="button.cancel"/>
+								</button>
+								&nbsp;&nbsp;
+							</c:if>
 							<button id="saveButton" type="submit" class="btn btn-sm btn-primary voffset5">
 								<fmt:message key="button.save" />
 							</button>

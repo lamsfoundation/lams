@@ -52,7 +52,6 @@ import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
@@ -493,10 +492,6 @@ public class ImportService implements IImportService {
 	    hasError = true;
 	    return null;
 	}
-	String salt = HashUtil.salt();
-	password = HashUtil.sha256(password, salt);
-	user.setSalt(salt);
-	user.setPassword(password);
 
 	user.setTitle(parseStringCell(row.getCell(ImportService.TITLE)));
 
@@ -574,6 +569,15 @@ public class ImportService implements IImportService {
 	    user.setLocale(locale);
 	}
 
+	if (!ValidationUtil.isPasswordNotUserDetails(password, user)) {
+	    rowResult.add(messageService.getMessage("label.password.restrictions"));
+	    hasError = true;
+	}
+
+	if (hasError) {
+	    return null;
+	}
+
 	user.setAddressLine1(parseStringCell(row.getCell(ImportService.ADDRESS1)));
 	user.setAddressLine2(parseStringCell(row.getCell(ImportService.ADDRESS2)));
 	user.setAddressLine3(parseStringCell(row.getCell(ImportService.ADDRESS3)));
@@ -591,7 +595,9 @@ public class ImportService implements IImportService {
 	user.setTimeZone(timezoneService.getServerTimezone().getTimezoneId());
 	user.setFirstLogin(true);
 
-	return (hasError ? null : user);
+	service.updatePassword(user, password);
+
+	return user;
     }
 
     /*
