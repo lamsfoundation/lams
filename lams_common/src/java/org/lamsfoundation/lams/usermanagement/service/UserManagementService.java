@@ -430,6 +430,8 @@ public class UserManagementService implements IUserManagementService {
 	    history.remove(history.firstKey());
 	}
 
+	user.setChangePassword(false);
+
 	baseDAO.update(user);
     }
 
