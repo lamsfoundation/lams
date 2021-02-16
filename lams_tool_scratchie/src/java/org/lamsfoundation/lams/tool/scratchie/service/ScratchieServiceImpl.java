@@ -768,7 +768,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		    item.getUid());
 
 	    for (OptionDTO optionDto : item.getOptionDtos()) {
-		if (QbQuestion.TYPE_MULTIPLE_CHOICE == qbQuestion.getType()) {
+		if (QbQuestion.TYPE_MULTIPLE_CHOICE == qbQuestion.getType()
+			|| QbQuestion.TYPE_MARK_HEDGING == qbQuestion.getType()) {
 		    int attemptNumber;
 		    ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getLog(optionDto.getQbOptionUid(),
 			    item.getUid(), sessionId);
@@ -824,7 +825,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 		// find according log if it exists
 		boolean isScratched = false;
-		if (QbQuestion.TYPE_MULTIPLE_CHOICE == item.getQbQuestion().getType()) {
+		if (QbQuestion.TYPE_MULTIPLE_CHOICE == item.getQbQuestion().getType()
+			|| QbQuestion.TYPE_MARK_HEDGING == item.getQbQuestion().getType()) {
 		    for (ScratchieAnswerVisitLog userLog : userLogs) {
 			if (userLog.getQbToolQuestion().getUid().equals(item.getUid())
 				&& userLog.getQbOption().getUid().equals(optionDto.getQbOptionUid())) {
@@ -967,7 +969,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     private static boolean isItemUnraveled(ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs) {
 	boolean isItemUnraveled = false;
 
-	if (QbQuestion.TYPE_MULTIPLE_CHOICE == item.getQbQuestion().getType()) {
+	if (QbQuestion.TYPE_MULTIPLE_CHOICE == item.getQbQuestion().getType()
+		|| QbQuestion.TYPE_MARK_HEDGING == item.getQbQuestion().getType()) {
 	    for (QbOption option : item.getQbQuestion().getQbOptions()) {
 
 		ScratchieAnswerVisitLog log = null;
@@ -1065,7 +1068,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     public List<GroupSummary> getGroupSummariesByItem(Long contentId, Long itemUid) {
 	List<GroupSummary> groupSummaryList = new ArrayList<>();
 	ScratchieItem item = scratchieItemDao.getByUid(itemUid);
-	boolean isMcqItem = item.getQbQuestion().getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
+	boolean isMcqItem = item.getQbQuestion().getType() == QbQuestion.TYPE_MULTIPLE_CHOICE
+		|| item.getQbQuestion().getType() == QbQuestion.TYPE_MARK_HEDGING;
 	List<QbOption> options = item.getQbQuestion().getQbOptions();
 
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(contentId);
@@ -1305,7 +1309,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
      */
     public static void fillCorrectAnswerLetters(Collection<ScratchieItem> items) {
 	for (ScratchieItem item : items) {
-	    boolean isMcqItem = item.getQbQuestion().getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
+	    boolean isMcqItem = item.getQbQuestion().getType() == QbQuestion.TYPE_MULTIPLE_CHOICE
+		    || item.getQbQuestion().getType() == QbQuestion.TYPE_MARK_HEDGING;
 
 	    // find out the correct answer's sequential letter - A,B,C...
 	    String correctAnswerLetter = "";
@@ -1583,7 +1588,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	for (ScratchieItem item : items) {
 	    List<GroupSummary> itemSummary = getGroupSummariesByItem(contentId, item.getUid());
-	    boolean isMcqItem = item.getQbQuestion().getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
+	    boolean isMcqItem = item.getQbQuestion().getType() == QbQuestion.TYPE_MULTIPLE_CHOICE
+		    || item.getQbQuestion().getType() == QbQuestion.TYPE_MARK_HEDGING;
 
 	    row = researchAndAnalysisSheet.initRow();
 	    row.addCell(getMessage("label.question.semicolon", new Object[] { item.getQbQuestion().getName() }), true);
@@ -1698,7 +1704,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		row.addCell(getMessage("label.team.leader") + session.getSessionName());
 
 		for (ScratchieItem item : items) {
-		    boolean isMcqItem = item.getQbQuestion().getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
+		    boolean isMcqItem = item.getQbQuestion().getType() == QbQuestion.TYPE_MULTIPLE_CHOICE
+			    || item.getQbQuestion().getType() == QbQuestion.TYPE_MARK_HEDGING;
 
 		    //build list of all logs left for this item and this session
 		    List<ScratchieAnswerVisitLog> logsBySessionAndItem = new ArrayList<>();
@@ -1787,7 +1794,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    for (ScratchieUser user : users) {
 		int questionCount = 1;
 		for (ScratchieItemDTO itemDto : summary.getItemDtos()) {
-		    boolean isMcqItem = itemDto.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
+		    boolean isMcqItem = itemDto.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE || itemDto.getType() == QbQuestion.TYPE_MARK_HEDGING;
 
 		    row = spssAnalysisSheet.initRow();
 		    // learner name
@@ -2043,7 +2050,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		boolean isUnraveledOnFirstAttempt = false;
 		String optionsSequence = "";
 		QbQuestion qbQuestion = item.getQbQuestion();
-		boolean isMcqItem = qbQuestion.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
+		boolean isMcqItem = qbQuestion.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE
+			|| qbQuestion.getType() == QbQuestion.TYPE_MARK_HEDGING;
 
 		// if there is no group leader don't calculate numbers - there aren't any
 		if (groupLeader != null) {

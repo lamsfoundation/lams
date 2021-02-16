@@ -85,7 +85,8 @@ public class ScratchieItem extends QbToolQuestion implements Serializable, Clone
 	if (optionDtos == null) {
 	    optionDtos = new LinkedList<>();
 
-	    if (QbQuestion.TYPE_MULTIPLE_CHOICE == this.qbQuestion.getType()) {
+	    if (QbQuestion.TYPE_MULTIPLE_CHOICE == this.qbQuestion.getType()
+		    || QbQuestion.TYPE_MARK_HEDGING == this.qbQuestion.getType()) {
 		for (QbOption qbOption : qbQuestion.getQbOptions()) {
 		    OptionDTO optionDTO = new OptionDTO(qbOption);
 		    optionDtos.add(optionDTO);

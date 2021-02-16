@@ -170,9 +170,9 @@ public class LearningWebsocketServer {
 			    }
 			}
 
-			boolean isMCQItem = QbQuestion.TYPE_MULTIPLE_CHOICE == item.getQbQuestion().getType();
-			String optionUidOrAnswer = isMCQItem
-				? optionDto.getQbOptionUid().toString()
+			boolean isMCQItem = QbQuestion.TYPE_MULTIPLE_CHOICE == item.getQbQuestion().getType()
+				|| QbQuestion.TYPE_MARK_HEDGING == item.getQbQuestion().getType();
+			String optionUidOrAnswer = isMCQItem ? optionDto.getQbOptionUid().toString()
 				: optionDto.getAnswer();
 			Boolean isCorrectStoredAnswer = optionDto.isCorrect();
 

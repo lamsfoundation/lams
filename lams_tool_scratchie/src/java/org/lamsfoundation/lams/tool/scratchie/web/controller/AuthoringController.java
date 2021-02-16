@@ -370,7 +370,8 @@ public class AuthoringController {
 	    form.setItemIndex(String.valueOf(itemIdx));
 	}
 	form.setQuestionType(qbQuestion.getType());
-	boolean isMcqQuestionType = qbQuestion.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
+	boolean isMcqQuestionType = qbQuestion.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE
+		|| qbQuestion.getType() == QbQuestion.TYPE_MARK_HEDGING;
 	if (!isMcqQuestionType) {
 	    form.setFeedback(qbQuestion.getFeedback());
 	    form.setCaseSensitive(qbQuestion.isCaseSensitive());
@@ -519,7 +520,8 @@ public class AuthoringController {
 	qbQuestion.setDescription(form.getDescription().strip());
 	qbQuestion.setContentFolderId(form.getContentFolderID());
 
-	boolean isMcqQuestionType = qbQuestion.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
+	boolean isMcqQuestionType = qbQuestion.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE
+		|| qbQuestion.getType() == QbQuestion.TYPE_MARK_HEDGING;
 	//handle VSA question type
 	if (!isMcqQuestionType) {
 	    qbQuestion.setFeedback(form.getFeedback());

@@ -114,7 +114,7 @@
 	}
 	
     function importQTI(type){
-    	window.open('<lams:LAMSURL/>questions/questionFile.jsp?limitType=mc&collectionChoice=true&importType='+type,
+    	window.open('<lams:LAMSURL/>questions/questionFile.jsp?limitType=mc,mh,fb&collectionChoice=true&importType='+type,
     			    'QuestionFile','width=500,height=370,scrollbars=yes');
     }
   	
