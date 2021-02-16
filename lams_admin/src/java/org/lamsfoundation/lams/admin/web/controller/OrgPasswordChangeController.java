@@ -246,6 +246,9 @@ public class OrgPasswordChangeController {
 	UserDTO currentUserDTO = getUserDTO();
 	User currentUser = (User) userManagementService.findById(User.class, currentUserDTO.getUserID());
 	for (User user : users) {
+	    if (!ValidationUtil.isPasswordNotUserDetails(password, user)) {
+		throw new InvalidParameterException("Password is the same as user details");
+	    }
 	    // either we work with white list or black list
 	    if (includedUsers == null) {
 		boolean excluded = false;

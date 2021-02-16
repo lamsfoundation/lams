@@ -138,6 +138,9 @@
 									<c:if test="${mustHaveSymbols}">
 										<li><span class="fa fa-check"></span> <fmt:message key='label.password.must.symbol'/></li>
 									</c:if>
+									<li><span class="fa fa-check"></span>
+										<fmt:message key='label.password.user.details' />
+									</li>
 									<c:if test="${passwordHistoryLimit > 0}">
 										<li><span class="fa fa-check"></span>
 											<fmt:message key='label.password.history'>

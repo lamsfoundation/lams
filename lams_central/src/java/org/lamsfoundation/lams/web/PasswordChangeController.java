@@ -103,7 +103,7 @@ public class PasswordChangeController {
 		    errorMap.add("password", messageService.getMessage("error.password.empty"));
 		    PasswordChangeController.log.debug("new password cannot be empty");
 		}
-		if (!ValidationUtil.isPasswordValueValid(password, passwordConfirm)) {
+		if (!ValidationUtil.isPasswordValueValid(password, passwordConfirm, user)) {
 		    errorMap.add("password", messageService.getMessage("label.password.restrictions"));
 		    PasswordChangeController.log.debug("Password must follow the restrictions");
 		}

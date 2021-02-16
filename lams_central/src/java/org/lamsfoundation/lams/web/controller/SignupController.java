@@ -2,7 +2,6 @@ package org.lamsfoundation.lams.web.controller;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.time.LocalDateTime;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
@@ -37,14 +36,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/signup")
 public class SignupController {
     private static Logger log = Logger.getLogger(SignupController.class);
-    
+
     @Autowired
     private ISignupService signupService;
     @Autowired
     @Qualifier("centralMessageService")
     private MessageService messageService;
     @Autowired
-    private ITimezoneService timezoneService ;
+    private ITimezoneService timezoneService;
 
     @RequestMapping("init")
     public String execute(@ModelAttribute("SignupForm") SignupForm signupForm, HttpServletRequest request,
@@ -58,9 +57,9 @@ public class SignupController {
 	    request.setAttribute("messageKey", "no.such.signup.page.exist");
 	    return "msgContent";
 	}
-	
+
 	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(true));
-	
+
 	request.setAttribute("signupOrganisation", signupOrganisation);
 	return "signup/signup";
     }
@@ -89,14 +88,18 @@ public class SignupController {
 		user.setEmail(signupForm.getEmail());
 		user.setCountry(signupForm.getCountry());
 		user.setTimeZone(timezoneService.getServerTimezone().getTimezoneId());
-		String salt = HashUtil.salt();
-		user.setSalt(salt);
-		user.setPassword(HashUtil.sha256(signupForm.getPassword(), salt));
-		user.setPasswordChangeDate(LocalDateTime.now());
+
+		if (!ValidationUtil.isPasswordNotUserDetails(signupForm.getPassword(), user)) {
+		    errorMap.add("password", messageService.getMessage("label.password.restrictions"));
+		    request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(true));
+		    request.setAttribute("errorMap", errorMap);
+		    return "signup/signup";
+		}
+
 		if (emailVerify) {
 		    user.setEmailVerified(false);
 		    user.setDisabledFlag(true);
-		    signupService.signupUser(user, signupForm.getContext());
+		    signupService.signupUser(user, signupForm.getPassword(), signupForm.getContext());
 		    try {
 			sendVerificationEmail(user);
 		    } catch (Exception e) {
@@ -107,7 +110,7 @@ public class SignupController {
 		    return "/signup/emailVerifyResult";
 		} else {
 		    user.setDisabledFlag(false);
-		    signupService.signupUser(user, signupForm.getContext());
+		    signupService.signupUser(user, signupForm.getPassword(), signupForm.getContext());
 		    try {
 			sendWelcomeEmail(user);
 		    } catch (Exception e) {

@@ -23,7 +23,6 @@
 
 package org.lamsfoundation.lams.admin.web.controller;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -44,7 +43,6 @@ import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -212,17 +210,16 @@ public class UserSaveController {
 		    errorMap.add("password", messageService.getMessage("error.newpassword.mismatch"));
 		}
 		if (!ValidationUtil.isPasswordValueValid(password, password2)) {
-		    errorMap.add("password", messageService.getMessage("error.newpassword.mismatch"));
+		    errorMap.add("password", messageService.getMessage("label.password.restrictions"));
 		}
 
 		if (errorMap.isEmpty()) {
 		    user = new User();
-		    String salt = HashUtil.salt();
-		    String passwordHash = HashUtil.sha256(userForm.getPassword(), salt);
 		    BeanUtils.copyProperties(user, userForm);
-		    user.setSalt(salt);
-		    user.setPassword(passwordHash);
-		    user.setPasswordChangeDate(LocalDateTime.now());
+		    if (!ValidationUtil.isPasswordNotUserDetails(password, user)) {
+			errorMap.add("password", messageService.getMessage("label.password.restrictions"));
+		    }
+
 		    log.debug("creating user... new login: " + user.getLogin());
 
 		    user.setDisabledFlag(false);
@@ -243,6 +240,7 @@ public class UserSaveController {
 		    user.setTheme(theme);
 
 		    userManagementService.saveUser(user);
+		    userManagementService.updatePassword(user, password);
 
 		    // make 'create user' audit log entry
 		    userManagementService.logUserCreated(user, sysadmin);
@@ -311,12 +309,14 @@ public class UserSaveController {
 	if (!StringUtils.equals(password, password2)) {
 	    errorMap.add("password", messageService.getMessage("error.newpassword.mismatch"));
 	}
-	if (!ValidationUtil.isPasswordValueValid(password, password2)) {
+
+	User user = (User) userManagementService.findById(User.class, userId);
+	if (!ValidationUtil.isPasswordValueValid(password, password2, user)) {
 	    errorMap.add("password", messageService.getMessage("label.password.restrictions"));
 	}
 
 	if (errorMap.isEmpty()) {
-	    User user = (User) userManagementService.findById(User.class, userId);
+
 	    userManagementService.updatePassword(user, password);
 	    userManagementService.logPasswordChanged(user, sysadmin);
 	    return "forward:/user/edit.do";

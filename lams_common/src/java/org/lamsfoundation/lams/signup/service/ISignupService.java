@@ -30,7 +30,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 
 public interface ISignupService {
 
-    void signupUser(User user, String context);
+    void signupUser(User user, String password, String context);
 
     SignupOrganisation getSignupOrganisation(String context);
 

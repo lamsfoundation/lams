@@ -27,6 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * Utility methods for String validation.
@@ -83,6 +84,10 @@ public class ValidationUtil {
     }
 
     public static boolean isPasswordValueValid(String password, String password2) {
+	return ValidationUtil.isPasswordValueValid(password, password2, null);
+    }
+
+    public static boolean isPasswordValueValid(String password, String password2, User user) {
 
 	if (password == null || password2 == null || !password.equals(password2)) {
 	    return false;
@@ -135,6 +140,32 @@ public class ValidationUtil {
 		return false;
 	    }
 
+	}
+
+	return ValidationUtil.isPasswordNotUserDetails(password, user);
+    }
+
+    /**
+     * Checks if password is not the same as user ID, login, email or names.
+     */
+    public static boolean isPasswordNotUserDetails(String password, User user) {
+	if (user == null || StringUtils.isBlank(password)) {
+	    return true;
+	}
+	if (user.getUserId() != null && password.equals(user.getUserId().toString())) {
+	    return false;
+	}
+	if (StringUtils.isNotBlank(user.getLogin()) && password.equalsIgnoreCase(user.getLogin().trim())) {
+	    return false;
+	}
+	if (StringUtils.isNotBlank(user.getEmail()) && password.equalsIgnoreCase(user.getEmail().trim())) {
+	    return false;
+	}
+	if (StringUtils.isNotBlank(user.getFirstName()) && password.equalsIgnoreCase(user.getFirstName().trim())) {
+	    return false;
+	}
+	if (StringUtils.isNotBlank(user.getLastName()) && password.equalsIgnoreCase(user.getLastName().trim())) {
+	    return false;
 	}
 
 	return true;

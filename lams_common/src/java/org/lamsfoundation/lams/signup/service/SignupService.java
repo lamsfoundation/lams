@@ -33,13 +33,15 @@ public class SignupService implements ISignupService {
     private ILessonService lessonService;
 
     @Override
-    public void signupUser(User user, String context) {
+    public void signupUser(User user, String password, String context) {
 	// save User
 	user.setTheme(userManagementService.getDefaultTheme());
 	user.setAuthenticationMethod(getAuthenticationMethod(AuthenticationMethod.DB));
 	user.setLocale(getDefaultLocale());
 	user.setCreateDate(new Date());
 	userManagementService.saveUser(user);
+
+	userManagementService.updatePassword(user, password);
 
 	// add to org
 	SignupOrganisation signup = signupDAO.getSignupOrganisation(context);

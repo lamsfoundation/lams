@@ -493,8 +493,6 @@ public class ImportService implements IImportService {
 	    return null;
 	}
 
-	service.updatePassword(user, password);
-
 	user.setTitle(parseStringCell(row.getCell(ImportService.TITLE)));
 
 	String firstName = parseStringCell(row.getCell(ImportService.FIRST_NAME));
@@ -571,6 +569,15 @@ public class ImportService implements IImportService {
 	    user.setLocale(locale);
 	}
 
+	if (!ValidationUtil.isPasswordNotUserDetails(password, user)) {
+	    rowResult.add(messageService.getMessage("label.password.restrictions"));
+	    hasError = true;
+	}
+
+	if (hasError) {
+	    return null;
+	}
+
 	user.setAddressLine1(parseStringCell(row.getCell(ImportService.ADDRESS1)));
 	user.setAddressLine2(parseStringCell(row.getCell(ImportService.ADDRESS2)));
 	user.setAddressLine3(parseStringCell(row.getCell(ImportService.ADDRESS3)));
@@ -588,7 +595,9 @@ public class ImportService implements IImportService {
 	user.setTimeZone(timezoneService.getServerTimezone().getTimezoneId());
 	user.setFirstLogin(true);
 
-	return (hasError ? null : user);
+	service.updatePassword(user, password);
+
+	return user;
     }
 
     /*
