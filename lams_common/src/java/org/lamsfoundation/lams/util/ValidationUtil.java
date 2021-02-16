@@ -27,12 +27,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.User;
+
+import com.codahale.passpol.BreachDatabase;
+import com.codahale.passpol.PasswordPolicy;
+import com.codahale.passpol.Status;
 
 /**
  * Utility methods for String validation.
  */
 public class ValidationUtil {
+
+    private static Logger log = Logger.getLogger(ValidationUtil.class);
 
     private final static Pattern REGEX_USER_NAME = Pattern.compile("^[^<>^!#&()/\\|\"?,:{}= ~`*%$]*$");
 
@@ -142,7 +149,12 @@ public class ValidationUtil {
 
 	}
 
-	return ValidationUtil.isPasswordNotUserDetails(password, user);
+	boolean isPasswordNotUserDetails = ValidationUtil.isPasswordNotUserDetails(password, user);
+	if (!isPasswordNotUserDetails) {
+	    return false;
+	}
+
+	return ValidationUtil.isPasswordNotBreached(password);
     }
 
     /**
@@ -187,6 +199,26 @@ public class ValidationUtil {
 	    if (oldHash.equals(newHash)) {
 		return false;
 	    }
+	}
+	return true;
+    }
+
+    public static boolean isPasswordNotBreached(String password) {
+	try {
+	    // check for a static list of 100k known weak passwords
+	    PasswordPolicy commonPasswordPolicy = new PasswordPolicy(BreachDatabase.top100K(), 0, Integer.MAX_VALUE);
+	    if (Status.OK != commonPasswordPolicy.check(password)) {
+		return false;
+	    }
+
+	    // check online DB
+	    PasswordPolicy pwnedPolicy = new PasswordPolicy(BreachDatabase.haveIBeenPwned(), 0, Integer.MAX_VALUE);
+	    if (Status.OK != pwnedPolicy.check(password)) {
+		return false;
+	    }
+
+	} catch (Exception e) {
+	    log.error("Error while checking password for breach", e);
 	}
 	return true;
     }

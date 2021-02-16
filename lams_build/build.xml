@@ -425,6 +425,14 @@
 		<copy tofile="${server.home}/modules/system/layers/base/org/apache/batik/main/module.xml"
 			file="lib/batik/batik.module.xml" overwrite="true" verbose="true" />
 
+		<copy todir="${server.home}/modules/system/layers/base/com/codahale/passpol/main/" overwrite="true" verbose="true">
+			<fileset dir="lib/passpol">
+				<include name="passpol-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/com/codahale/passpol/main/module.xml"
+			file="lib/passpol/passpol.module.xml" overwrite="true" verbose="true" />
+
 		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/compress/main" overwrite="true" verbose="true">
 			<fileset dir="lib/apache-poi">
 				<include name="commons-compress-*.jar" />
