@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -547,6 +548,7 @@ public class AuthoringController {
 		updatedQuestion.clearID();
 		updatedQuestion.setVersion(qbService.getMaxQuestionVersion(qbQuestion.getQuestionId()) + 1);
 		updatedQuestion.setCreateDate(new Date());
+		updatedQuestion.setUuid(UUID.randomUUID());
 	    }
 		break;
 	    case IQbService.QUESTION_MODIFIED_ID_BUMP: {
@@ -556,6 +558,7 @@ public class AuthoringController {
 		updatedQuestion.setQuestionId(qbService.generateNextQuestionId());
 		updatedQuestion.setVersion(1);
 		updatedQuestion.setCreateDate(new Date());
+		updatedQuestion.setUuid(UUID.randomUUID());
 	    }
 		break;
 	    case IQbService.QUESTION_MODIFIED_NONE: {
