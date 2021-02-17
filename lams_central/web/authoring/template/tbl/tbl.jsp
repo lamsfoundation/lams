@@ -172,8 +172,8 @@
 						// this action returns ID of the created QB question
 						// which is put into itemArea div
 						returnUrl: "<lams:LAMSURL/>qb/edit/returnQuestionUid.do",
-						// limit question to multiple choice (ira) or essay and multiple choice (ae)
-						toolSignature: appexNumber ? "lasurv11" : "lamc11"
+						// limit question to multiple choice and mark hedging (ira) or essay and multiple choice (ae)
+						toolSignature: appexNumber ? "lasurv11" : "tblIrat"
 					}, function(){
 						 container.scrollIntoView(true);
 					}
@@ -284,11 +284,11 @@
 						</li>
                         <li role="separator" class="divider"></li>
 						<li class="dropdown-header"><fmt:message key="authoring.tbl.import.questions.from"/></li>
-						<li><a style="margin-left: 1em;" href="javascript:void(0)" id="importWordButton" onClick="javascript:importQTI('mcq', 'mc', 'word')">
+						<li><a style="margin-left: 1em;" href="javascript:void(0)" id="importWordButton" onClick="javascript:importQTI('mcq', 'mc,mh', 'word')">
 								<i class="fa fa-file-word-o text-primary"></i> <fmt:message key="label.qb.collection.word"/>...
                             </a>
                         </li>	
-						<li><a style="margin-left: 1em;" href="javascript:void(0)" onClick="javascript:importQTI('mcq', 'mc', 'qti')" id="importQTIButton">
+						<li><a style="margin-left: 1em;" href="javascript:void(0)" onClick="javascript:importQTI('mcq', 'mc,mh', 'qti')" id="importQTIButton">
 								<i class="fa fa-file-code-o text-primary"></i> <fmt:message key="label.qb.collection.qti"/>...
                             </a>
                         </li>

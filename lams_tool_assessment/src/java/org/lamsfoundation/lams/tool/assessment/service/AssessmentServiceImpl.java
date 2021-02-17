@@ -3707,7 +3707,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	    for (JsonNode questionJSONData : questions) {
 		AssessmentQuestion question = new AssessmentQuestion();
-		Integer type = JsonUtil.optInt(questionJSONData, "type");
+		Integer type = JsonUtil.optInt(questionJSONData, "type", QbQuestion.TYPE_MULTIPLE_CHOICE);
+		int mark = JsonUtil.optInt(questionJSONData, "defaultGrade", 1);
 		question.setToolContentId(toolContentID);
 		question.setDisplayOrder(JsonUtil.optInt(questionJSONData, RestTags.DISPLAY_ORDER));
 		question.setAnswerRequired(JsonUtil.optBoolean(questionJSONData, "answerRequired", Boolean.FALSE));
@@ -3721,6 +3722,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    oldQbQuestion = qbService.getQuestionByUUID(UUID.fromString(uuid));
 		}
 		boolean isModification = oldQbQuestion != null;
+		// if user imported MCQ or mark hedging question and then changed its type in checkbox
+		// then it must be a new question
+		if (isModification && !oldQbQuestion.getType().equals(type)) {
+		    isModification = false;
+		}
 
 		// are we modifying an existing question or creating a new one
 		if (isModification) {
@@ -3740,7 +3746,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			JsonUtil.optBoolean(questionJSONData, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
 		qbQuestion.setCaseSensitive(JsonUtil.optBoolean(questionJSONData, "caseSensitive", Boolean.FALSE));
 		qbQuestion.setCorrectAnswer(JsonUtil.optBoolean(questionJSONData, "correctAnswer", Boolean.FALSE));
-		qbQuestion.setMaxMark(JsonUtil.optInt(questionJSONData, "defaultGrade", 1));
 		qbQuestion.setFeedback(JsonUtil.optString(questionJSONData, "feedback"));
 		qbQuestion.setFeedbackOnCorrect(JsonUtil.optString(questionJSONData, "feedbackOnCorrect"));
 		qbQuestion.setFeedbackOnIncorrect(JsonUtil.optString(questionJSONData, "feedbackOnIncorrect"));
@@ -3755,6 +3760,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		qbQuestion.setPenaltyFactor(JsonUtil.optDouble(questionJSONData, "penaltyFactor", 0.0).floatValue());
 
 		if (!isModification) {
+		    // default question is set only for new question
+		    // for existing question only reference is updated
+		    qbQuestion.setMaxMark(mark);
+
 		    // UUID normally gets generated in the DB, but we need it immediately,
 		    // so we generate it programmatically.
 		    // Re-reading the QbQuestion we just saved does not help as it is read from Hibernate cache,
@@ -3894,7 +3903,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    // collection
 	    for (JsonNode referenceJSONData : references) {
 		QuestionReference reference = new QuestionReference();
-		reference.setMaxMark(JsonUtil.optInt(referenceJSONData, "maxMark", 1));
 		reference.setSequenceId(JsonUtil.optInt(referenceJSONData, RestTags.DISPLAY_ORDER));
 		AssessmentQuestion matchingQuestion = matchQuestion(newQuestionSet,
 			JsonUtil.optInt(referenceJSONData, "questionDisplayOrder"));
@@ -3903,6 +3911,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			    + referenceJSONData.get("questionDisplayOrder") + ". Data:" + toolContentJSON);
 		}
 		reference.setQuestion(matchingQuestion);
+		// either take the parameter or get default question grade
+		Integer referenceMark = JsonUtil.optInt(referenceJSONData, "maxMark");
+		reference.setMaxMark(
+			referenceMark == null ? matchingQuestion.getQbQuestion().getMaxMark() : referenceMark);
 		reference.setRandomQuestion(JsonUtil.optBoolean(referenceJSONData, "randomQuestion", Boolean.FALSE));
 		newReferenceSet.add(reference);
 	    }
@@ -3926,9 +3938,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
     // TODO Implement REST support for all types and then remove checkType method
     void checkType(Integer type) throws IOException {
-	if ((type != QbQuestion.TYPE_ESSAY) && (type != QbQuestion.TYPE_MULTIPLE_CHOICE)) {
+	if ((type != QbQuestion.TYPE_ESSAY) && (type != QbQuestion.TYPE_MULTIPLE_CHOICE) && (type != QbQuestion.TYPE_MARK_HEDGING)) {
 	    throw new IOException(
-		    "Assessment Tool does not support REST Authoring for anything but Essay Type and Multiple Choice. Found type "
+		    "Assessment Tool does not support REST Authoring for anything but Essay, Multiple Choice and Mark Hedging types. Found type "
 			    + type);
 	}
     }

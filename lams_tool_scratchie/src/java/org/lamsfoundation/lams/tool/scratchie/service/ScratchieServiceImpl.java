@@ -1794,7 +1794,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    for (ScratchieUser user : users) {
 		int questionCount = 1;
 		for (ScratchieItemDTO itemDto : summary.getItemDtos()) {
-		    boolean isMcqItem = itemDto.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE || itemDto.getType() == QbQuestion.TYPE_MARK_HEDGING;
+		    boolean isMcqItem = itemDto.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE
+			    || itemDto.getType() == QbQuestion.TYPE_MARK_HEDGING;
 
 		    row = spssAnalysisSheet.initRow();
 		    // learner name
@@ -2755,6 +2756,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    ObjectNode questionData = (ObjectNode) questions.get(i);
 
 	    ScratchieItem item = new ScratchieItem();
+	    int type = JsonUtil.optInt(questionData, "type", QbQuestion.TYPE_MULTIPLE_CHOICE);
 	    item.setDisplayOrder(JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER));
 	    item.setAnswerRequired(JsonUtil.optBoolean(questionData, "answerRequired", Boolean.FALSE));
 	    item.setToolContentId(scratchie.getContentId());
@@ -2765,6 +2767,9 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    // try to match the question to an existing QB question in DB
 	    if (StringUtils.isNotBlank(uuid)) {
 		qbQuestion = qbService.getQuestionByUUID(UUID.fromString(uuid));
+	    }
+	    if (qbQuestion != null && !qbQuestion.getType().equals(type)) {
+		qbQuestion = null;
 	    }
 
 	    Long collectionUid = JsonUtil.optLong(questionData, RestTags.COLLECTION_UID);

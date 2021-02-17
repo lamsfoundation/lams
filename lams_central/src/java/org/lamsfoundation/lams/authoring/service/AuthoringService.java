@@ -1652,7 +1652,8 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 		Integer questionDisplayOrder = question.get(RestTags.DISPLAY_ORDER).asInt();
 		Integer defaultGrade = JsonUtil.optInt(question, "defaultGrade", 1);
 		references.add(JsonNodeFactory.instance.objectNode().put(RestTags.DISPLAY_ORDER, questionDisplayOrder)
-			.put("questionDisplayOrder", questionDisplayOrder).put("defaultGrade", defaultGrade));
+			// default grade is name maxMark for reference
+			.put("questionDisplayOrder", questionDisplayOrder).put("maxMark", defaultGrade));
 	    }
 	    toolContentJSON.set("references", references);
 	}
