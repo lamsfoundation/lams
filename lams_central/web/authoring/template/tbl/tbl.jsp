@@ -128,7 +128,7 @@
 						if ( status == "error" ) {
 							console.log( xhr.status + " " + xhr.statusText );
 						} else {
-							$('#divquestions').append(response);
+							$('#divquestions').append(response).find('.collapse').collapse('hide');
 							$('#divq'+nextNum)[0].scrollIntoView();
 						}
 					}
@@ -149,7 +149,7 @@
 						if ( status == "error" ) {
 							console.log( xhr.status + " " + xhr.statusText );
 						} else {
-							$('#'+containingDivName).append(response);
+							$('#'+containingDivName).append(response).find('.collapse').collapse('hide');
 							$('#'+containingDivName+'divassess'+nextNum)[0].scrollIntoView();
 						}
 					}
