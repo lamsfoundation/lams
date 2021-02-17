@@ -36,6 +36,8 @@ import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -47,6 +49,7 @@ import org.lamsfoundation.lams.authoring.template.Assessment;
 import org.lamsfoundation.lams.authoring.template.PeerReviewCriteria;
 import org.lamsfoundation.lams.authoring.template.TemplateData;
 import org.lamsfoundation.lams.authoring.template.TextUtil;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.AuthoringJsonTags;
@@ -75,6 +78,7 @@ public class TBLTemplateController extends LdTemplateController {
     private static Logger log = Logger.getLogger(TBLTemplateController.class);
     private static String templateCode = "TBL";
     private static final DateFormat LESSON_SCHEDULING_DATETIME_FORMAT = new SimpleDateFormat("MM/dd/yy HH:mm");
+    private static final Pattern IRAT_QUESTION_DISPLAY_ORDER_PATTERN = Pattern.compile("question(\\d+)");
 
     /**
      * Sets up the CKEditor stuff
@@ -448,40 +452,41 @@ public class TBLTemplateController extends LdTemplateController {
 	    while (parameterNames.hasMoreElements()) {
 		String name = (String) parameterNames.nextElement();
 		if (useIRATRA && name.startsWith("question")) {
+		    Matcher questionDisplayOrderMather = IRAT_QUESTION_DISPLAY_ORDER_PATTERN.matcher(name);
+		    questionDisplayOrderMather.find();
+		    int questionDisplayOrder = Integer.parseInt(questionDisplayOrderMather.group(1));
+		    ObjectNode question = testQuestions.get(questionDisplayOrder);
+		    if (question == null) {
+			// init iRAT question
+			boolean isMarkHedging = WebUtil.readBooleanParam(request,
+				"question" + questionDisplayOrder + "markHedging", false);
+			String title = getTrimmedString(request, "question" + questionDisplayOrder + "title", false);
+			String text = getTrimmedString(request, "question" + questionDisplayOrder, true);
+			String[] learningOutcomes = request
+				.getParameterValues("question" + questionDisplayOrder + "learningOutcome");
+			Long collectionUid = WebUtil.readLongParam(request,
+				"question" + questionDisplayOrder + "collection", true);
+			String uuid = getTrimmedString(request, "question" + questionDisplayOrder + "uuid", false);
+			Integer mark = WebUtil.readIntParam(request, "question" + questionDisplayOrder + "mark", true);
+			question = processTestQuestion(
+				isMarkHedging ? QbQuestion.TYPE_MARK_HEDGING : QbQuestion.TYPE_MULTIPLE_CHOICE, text,
+				title, questionDisplayOrder, mark, uuid, learningOutcomes, collectionUid);
+		    }
+
 		    int correctIndex = name.indexOf("correct");
 		    if (correctIndex > 0) { // question1correct
-			Integer questionDisplayOrder = Integer.valueOf(name.substring(questionOffset, correctIndex));
 			Integer correctValue = WebUtil.readIntParam(request, name);
 			correctAnswers.put(questionDisplayOrder, correctValue);
-		    } else {
-			int optionIndex = name.indexOf("option");
-			if (optionIndex > 0) {
-			    Integer questionDisplayOrder = Integer.valueOf(name.substring(questionOffset, optionIndex));
-			    Integer optionDisplayOrder = Integer.valueOf(name.substring(optionIndex + 6));
-			    processTestQuestion(name, null, null, questionDisplayOrder, null, optionDisplayOrder,
-				    getTrimmedString(request, name, true), null, null);
-			} else {
-			    int titleIndex = name.indexOf("title");
-			    if (titleIndex > 0) { // question1title
-				Integer questionDisplayOrder = Integer
-					.valueOf(name.substring(questionOffset, titleIndex));
-				// get all learning outcomes straight away instead of iterating over them
-				String[] learningOutcomes = request
-					.getParameterValues("question" + questionDisplayOrder + "learningOutcome");
-				Long collectionUid = WebUtil.readLongParam(request,
-					"question" + questionDisplayOrder + "collection", true);
-				processTestQuestion(name, null, getTrimmedString(request, name, false),
-					questionDisplayOrder, null, null, null, learningOutcomes, collectionUid);
-			    } else if (name.indexOf("uuid") < 0 && name.indexOf("learningOutcome") < 0
-				    && name.indexOf("collection") < 0) {
-				Integer questionDisplayOrder = Integer.valueOf(name.substring(questionOffset));
-				processTestQuestion(name, getTrimmedString(request, name, true), null,
-					questionDisplayOrder,
-					getTrimmedString(request, "question" + questionDisplayOrder + "uuid", false),
-					null, null, null, null);
-			    }
-			}
+			continue;
 		    }
+
+		    int optionIndex = name.indexOf("option");
+		    if (optionIndex > 0) {
+			Integer optionDisplayOrder = Integer.valueOf(name.substring(optionIndex + 6));
+			String optionText = getTrimmedString(request, name, true);
+			processTestOption(question, optionDisplayOrder, optionText);
+		    }
+
 		} else if (usePeerReview && name.startsWith("peerreview")) {
 		    processInputPeerReviewRequestField(name, request);
 		}
@@ -620,7 +625,7 @@ public class TBLTemplateController extends LdTemplateController {
 			assessment.setDefaultGrade(mark);
 		    }
 
-		    if (assessment.getType() == Assessment.ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE) {
+		    if (assessment.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE) {
 			assessment.setMultipleAnswersAllowed(
 				WebUtil.readBooleanParam(request, assessmentPrefix + "multiAllowed", false));
 			String optionPrefix = new StringBuilder("divass").append(appexNumber).append("assmcq").append(i)
@@ -683,17 +688,28 @@ public class TBLTemplateController extends LdTemplateController {
 	    return criteria;
 	}
 
-	void processTestQuestion(String name, String questionText, String questionTitle, Integer questionDisplayOrder,
-		String questionUuid, Integer optionDisplayOrder, String optionText, String[] learningOutcomes,
+	void processTestOption(ObjectNode question, Integer optionDisplayOrder, String optionText) {
+	    if (optionDisplayOrder != null && optionText != null) {
+		ObjectNode newOption = JsonNodeFactory.instance.objectNode();
+		newOption.put(RestTags.DISPLAY_ORDER, optionDisplayOrder);
+		newOption.put(RestTags.CORRECT, false);
+		newOption.put(RestTags.ANSWER_TEXT, optionText);
+		((ArrayNode) question.get(RestTags.ANSWERS)).add(newOption);
+	    }
+	}
+
+	ObjectNode processTestQuestion(int questionType, String questionText, String questionTitle,
+		Integer questionDisplayOrder, Integer mark, String questionUuid, String[] learningOutcomes,
 		Long collectionUid) {
 
-	    ObjectNode question = testQuestions.get(questionDisplayOrder);
-	    if (question == null) {
-		question = JsonNodeFactory.instance.objectNode();
-		question.put("type", Assessment.ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE);
-		question.set(RestTags.ANSWERS, JsonNodeFactory.instance.arrayNode());
-		question.put(RestTags.DISPLAY_ORDER, questionDisplayOrder);
-		testQuestions.put(questionDisplayOrder, question);
+	    ObjectNode question = JsonNodeFactory.instance.objectNode();
+	    question.put("type", questionType);
+	    question.set(RestTags.ANSWERS, JsonNodeFactory.instance.arrayNode());
+	    question.put(RestTags.DISPLAY_ORDER, questionDisplayOrder);
+	    testQuestions.put(questionDisplayOrder, question);
+
+	    if (questionTitle != null) {
+		question.put(RestTags.QUESTION_TITLE, questionTitle);
 	    }
 
 	    if (questionText != null) {
@@ -704,20 +720,12 @@ public class TBLTemplateController extends LdTemplateController {
 		}
 	    }
 
-	    if (questionTitle != null) {
-		question.put(RestTags.QUESTION_TITLE, questionTitle);
+	    if (mark != null) {
+		question.put("defaultGrade", mark);
 	    }
 
 	    if (questionUuid != null) {
 		question.put(RestTags.QUESTION_UUID, questionUuid);
-	    }
-
-	    if (optionDisplayOrder != null && optionText != null) {
-		ObjectNode newOption = JsonNodeFactory.instance.objectNode();
-		newOption.put(RestTags.DISPLAY_ORDER, optionDisplayOrder);
-		newOption.put(RestTags.CORRECT, false);
-		newOption.put(RestTags.ANSWER_TEXT, optionText);
-		((ArrayNode) question.get(RestTags.ANSWERS)).add(newOption);
 	    }
 
 	    if (learningOutcomes != null && learningOutcomes.length > 0) {
@@ -733,6 +741,8 @@ public class TBLTemplateController extends LdTemplateController {
 	    if (collectionUid != null) {
 		question.put(RestTags.COLLECTION_UID, collectionUid);
 	    }
+
+	    return question;
 	}
 
 	void updateCorrectAnswers(TreeMap<Integer, Integer> correctAnswers) {

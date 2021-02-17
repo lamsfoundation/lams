@@ -311,6 +311,7 @@ public class McService
 		    qbQuestion = qbQuestionClone;
 		    qbQuestion.setVersion(qbService.getMaxQuestionVersion(qbQuestion.getQuestionId()) + 1);
 		    qbQuestion.setCreateDate(new Date());
+		    qbQuestion.setUuid(UUID.randomUUID());
 		    break;
 		case IQbService.QUESTION_MODIFIED_ID_BUMP:
 		    // new questionDescription gets created
@@ -318,6 +319,7 @@ public class McService
 		    qbQuestion.setVersion(1);
 		    qbQuestion.setQuestionId(qbService.generateNextQuestionId());
 		    qbQuestion.setCreateDate(new Date());
+		    qbQuestion.setUuid(UUID.randomUUID());
 		    break;
 	    }
 

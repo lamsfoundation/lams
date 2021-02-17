@@ -1359,7 +1359,7 @@ public abstract class LdTemplateController {
 	model.addAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, qbQuestion.getContentFolderId());
 	model.addAttribute("question", question);
 
-	if (question.getType() == Assessment.ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE) {
+	if (question.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE) {
 	    Set<AssessMCAnswer> answers = question.getAnswers();
 	    for (QbOption qbOption : qbQuestion.getQbOptions()) {
 		AssessMCAnswer answer = new AssessMCAnswer(qbOption.getDisplayOrder(), qbOption.getName(),
@@ -1380,10 +1380,11 @@ public abstract class LdTemplateController {
 	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 
 	Assessment question = new Assessment();
-	question.setType(Assessment.ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE);
+	question.setType(qbQuestion.getType());
 	question.setTitle(qbQuestion.getName());
 	question.setText(qbQuestion.getDescription());
 	question.setUuid(qbQuestion.getUuid().toString());
+	question.setDefaultGrade(qbQuestion.getMaxMark());
 
 	Set<AssessMCAnswer> answers = question.getAnswers();
 	for (QbOption qbOption : qbQuestion.getQbOptions()) {
@@ -1418,7 +1419,7 @@ public abstract class LdTemplateController {
 	    assessment.setUuid(question.getQbUUID());
 
 	    if (isMultipleChoice) {
-		assessment.setType(Assessment.ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE);
+		assessment.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
 		assessment.setMultipleAnswersAllowed(false);
 		String correctAnswer = null;
 
@@ -1458,7 +1459,7 @@ public abstract class LdTemplateController {
 		}
 
 	    } else if (isMultipleResponse) {
-		assessment.setType(Assessment.ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE);
+		assessment.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
 		assessment.setMultipleAnswersAllowed(true);
 
 		if (question.getAnswers() != null) {
@@ -1489,7 +1490,7 @@ public abstract class LdTemplateController {
 		    }
 		}
 	    } else {
-		assessment.setType(Assessment.ASSESSMENT_QUESTION_TYPE_ESSAY);
+		assessment.setType(QbQuestion.TYPE_ESSAY);
 	    }
 
 	    assessment.setDefaultGrade(defaultGrade);

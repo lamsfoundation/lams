@@ -133,7 +133,14 @@ public class SearchQBController {
 	    //CommonConstants.TOOL_SIGNATURE_QA
 	} else if ("laqa11".equals(toolSignature)) {
 	    questionTypeDefault = QbQuestion.TYPE_ESSAY;
+	} else if ("tblIrat".equals(toolSignature)) {
+	    // this is a special tool "signature" which allows mcq and mark hedging
+	    // used by iRAT page in TBL template
+	    questionTypesAvailable.append(QbQuestion.TYPE_MULTIPLE_CHOICE);
+	    questionTypesAvailable.append(",");
+	    questionTypesAvailable.append(QbQuestion.TYPE_MARK_HEDGING);
 	}
+	
 	request.setAttribute("questionType", questionTypeDefault);
 	request.setAttribute("questionTypesAvailable", questionTypesAvailable.toString());
 	//let jsp know it's Scratchie, so we can disable VSA questions not compatible with TBL

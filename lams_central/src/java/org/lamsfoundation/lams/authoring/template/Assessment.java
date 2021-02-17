@@ -31,6 +31,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.util.JsonUtil;
 
@@ -41,17 +42,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /** Simple assessment object used for parsing survey data before conversion to JSON */
 public class Assessment {
 
-    // assessment type - copied from ResourceConstants
-    // question type;
-    public static final short ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE = 1;
-//    public static final short ASSESSMENT_QUESTION_TYPE_MATCHING_PAIRS = 2;
-//    public static final short ASSESSMENT_QUESTION_TYPE_SHORT_ANSWER = 3;
-//    public static final short ASSESSMENT_QUESTION_TYPE_NUMERICAL = 4;
-//    public static final short ASSESSMENT_QUESTION_TYPE_TRUE_FALSE = 5;
-    public static final short ASSESSMENT_QUESTION_TYPE_ESSAY = 6;
-//    public static final short ASSESSMENT_QUESTION_TYPE_ORDERING = 7;
-
-    short type = 6;
+    int type = 6;
     String title = null;
     String text = null;
     Boolean required = false;
@@ -62,9 +53,9 @@ public class Assessment {
     List<String> learningOutcomes;
     Long collectionUid;
 
-    public void setType(short type) {
+    public void setType(int type) {
 	this.type = type;
-	if (type == 1 && this.answers == null) {
+	if ((type == QbQuestion.TYPE_MULTIPLE_CHOICE || type == QbQuestion.TYPE_MARK_HEDGING) && this.answers == null) {
 	    // JSP template pages expect this list to be in correct order
 	    this.answers = new TreeSet<>(Comparator.comparingInt(AssessMCAnswer::getSequenceId));
 	}
@@ -72,13 +63,13 @@ public class Assessment {
 
     public void setType(String type) {
 	if (type != null && type.equalsIgnoreCase("mcq")) {
-	    setType(ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE);
+	    setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
 	} else {
-	    setType(ASSESSMENT_QUESTION_TYPE_ESSAY);
+	    setType(QbQuestion.TYPE_ESSAY);
 	}
     }
 
-    public short getType() {
+    public int getType() {
 	return type;
     }
 
@@ -158,8 +149,8 @@ public class Assessment {
 	json.put(RestTags.DISPLAY_ORDER, displayOrder);
 	json.put("answerRequired", required);
 	json.put("defaultGrade", defaultGrade);
-	if (type == ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE) {
-	    json.put("type", ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE);
+	if (type == QbQuestion.TYPE_MULTIPLE_CHOICE || type == QbQuestion.TYPE_MARK_HEDGING) {
+	    json.put("type", type);
 	    ArrayNode answersJSON = JsonNodeFactory.instance.arrayNode();
 	    for (AssessMCAnswer answer : answers) {
 		answersJSON.add(answer.getAsObjectNode());
@@ -169,7 +160,7 @@ public class Assessment {
 	    json.put("multipleAnswersAllowed", multipleAnswersAllowed);
 	    json.put("incorrectAnswerNullifiesMark", multipleAnswersAllowed);
 	} else {
-	    json.put("type", ASSESSMENT_QUESTION_TYPE_ESSAY);
+	    json.put("type", QbQuestion.TYPE_ESSAY);
 	}
 	if (learningOutcomes != null && !learningOutcomes.isEmpty()) {
 	    json.set(RestTags.LEARNING_OUTCOMES, JsonUtil.readArray(learningOutcomes));
@@ -183,7 +174,7 @@ public class Assessment {
     public boolean validate(List<String> errorMessages, ResourceBundle appBundle, MessageFormat formatter,
 	    Integer applicationExerciseNumber, String applicationExerciseTitle, Integer questionNumber) {
 	boolean errorsExist = false;
-	if (type == ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE) {
+	if (type == QbQuestion.TYPE_MULTIPLE_CHOICE) {
 	    if (answers.size() == 0) {
 		errorMessages.add(TextUtil.getText(appBundle, formatter,
 			"authoring.error.application.exercise.must.have.answer.num",

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -203,6 +204,7 @@ public class EditQbQuestionController {
 		qbQuestion.clearID();
 		qbQuestion.setVersion(qbService.getMaxQuestionVersion(qbQuestion.getQuestionId()) + 1);
 		qbQuestion.setCreateDate(new Date());
+		qbQuestion.setUuid(UUID.randomUUID());
 	    }
 		break;
 	    case IQbService.QUESTION_MODIFIED_ID_BUMP: {
@@ -211,6 +213,7 @@ public class EditQbQuestionController {
 		qbQuestion.clearID();
 		qbQuestion.setVersion(1);
 		qbQuestion.setCreateDate(new Date());
+		qbQuestion.setUuid(UUID.randomUUID());
 		// no need to bump question ID as the new question already has a new ID generated in initNewQuestion()
 	    }
 		break;
