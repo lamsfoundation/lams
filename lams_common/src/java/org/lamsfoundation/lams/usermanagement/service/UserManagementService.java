@@ -433,6 +433,8 @@ public class UserManagementService implements IUserManagementService {
 	user.setChangePassword(false);
 
 	baseDAO.update(user);
+
+	logPasswordChanged(user, user);
     }
 
     @Override

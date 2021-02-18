@@ -104,9 +104,6 @@
 						<lams:Alert type="info" id="passwordConditions" close="false">
 							<fmt:message key='label.password.must.contain' />:
 				<ul class="list-unstyled" style="line-height: 1.2">
-								<li><span class="fa fa-check"></span>
-									<fmt:message key='label.password.user.details' />
-								</li>
 								<li><span class="fa fa-check"></span> <fmt:message
 										key='label.password.min.length'>
 										<fmt:param value='${minNumChars}' />

@@ -281,14 +281,14 @@ public class OrgPasswordChangeController {
 		}
 	    }
 
+	    userManagementService.updatePassword(user, password);
 	    // change password
 	    if (force) {
 		user.setChangePassword(true);
+		userManagementService.save(user);
 	    }
-	    userManagementService.updatePassword(user, password);
 
 	    log.info("Changed password for user ID " + user.getUserId());
-	    userManagementService.logPasswordChanged(user, currentUser);
 	    changedUserIDs.add(user.getUserId());
 	}
 	return changedUserIDs;

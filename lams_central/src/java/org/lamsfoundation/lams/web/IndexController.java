@@ -98,10 +98,7 @@ public class IndexController {
 	    userDTO.setFirstLogin(false);
 	}
 
-	if (user.getPasswordChangeDate() == null) {
-	    user.setPasswordChangeDate(LocalDateTime.now());
-	    userManagementService.save(user);
-	} else {
+	if (user.getPasswordChangeDate() != null) {
 	    int expirationPeriod = Configuration.getAsInt(ConfigurationKeys.PASSWORD_EXPIRATION_MONTHS);
 	    if (expirationPeriod > 0) {
 		LocalDateTime expirationDate = user.getPasswordChangeDate().plusMonths(expirationPeriod);

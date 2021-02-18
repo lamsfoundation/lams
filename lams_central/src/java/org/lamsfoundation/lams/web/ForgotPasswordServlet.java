@@ -245,7 +245,7 @@ public class ForgotPasswordServlet extends HttpServlet {
 	    if (now < cutoffTime) {
 		User user = (User) userManagementService.findById(User.class, fp.getUserId());
 		userManagementService.updatePassword(user, newPassword);
-		userManagementService.logPasswordChanged(user, user);
+
 		languageKey = ForgotPasswordServlet.SUCCESS_CHANGE_PASS;
 
 	    } else {

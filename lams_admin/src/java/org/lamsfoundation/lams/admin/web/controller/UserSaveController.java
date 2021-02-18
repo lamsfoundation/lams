@@ -295,8 +295,6 @@ public class UserSaveController {
 	    return null;
 	}
 
-	User sysadmin = (User) userManagementService.findById(User.class, loggeduserId);
-
 	String password = WebUtil.readStrParam(request, "password");
 	String password2 = WebUtil.readStrParam(request, "password2");
 
@@ -318,7 +316,6 @@ public class UserSaveController {
 	if (errorMap.isEmpty()) {
 
 	    userManagementService.updatePassword(user, password);
-	    userManagementService.logPasswordChanged(user, sysadmin);
 	    return "forward:/user/edit.do";
 	}
 	request.setAttribute("errorMap", errorMap);
