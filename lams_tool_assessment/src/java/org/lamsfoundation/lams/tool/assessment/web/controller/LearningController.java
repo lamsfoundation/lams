@@ -898,13 +898,6 @@ public class LearningController {
 		}
 	    }
 
-	    // store confidence level entered by the learner
-	    if (assessment.isEnableConfidenceLevels()) {
-		int confidenceLevel = WebUtil.readIntParam(request,
-			AssessmentConstants.ATTR_CONFIDENCE_LEVEL_PREFIX + i);
-		questionDto.setConfidenceLevel(confidenceLevel);
-	    }
-
 	    // store justification entered by the learner
 	    if (assessment.isAllowAnswerJustification()) {
 		String justification = WebUtil.readStrParam(request,

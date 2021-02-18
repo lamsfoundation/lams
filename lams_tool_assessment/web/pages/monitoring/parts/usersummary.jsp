@@ -55,7 +55,7 @@
 	  						'questionResultUid',
 	  						"<fmt:message key="label.monitoring.user.summary.time" />",
 	  						"<fmt:message key="label.monitoring.user.summary.response" />",
-	  						<c:if test="${assessment.enableConfidenceLevels}">
+	  						<c:if test="${assessment.enableConfidenceLevels and question.type != 8}">
 	  							"<fmt:message key="label.confidence" />",
 	  						</c:if>
 	  						"<fmt:message key="label.monitoring.user.summary.grade" />"
@@ -65,7 +65,7 @@
 	  				   		{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
 	  				   		{name:'time', index:'time', width:150, sorttype:'date', datefmt:'Y-m-d'},
 	  				   		{name:'response', index:'response', width:341, sortable:false},
-	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
+	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels and question.type != 8}">
 			  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align', formatter: gradientNumberFormatter},
 			  			  	</c:if>
 	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' }		

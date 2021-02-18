@@ -83,7 +83,7 @@
 	  				   	    'maxMark',
 	  		  				"<fmt:message key="label.monitoring.summary.user.name" />",
 	  		  			    "<fmt:message key="label.monitoring.user.summary.grade" />",
-		  			   		<c:if test="${assessment.enableConfidenceLevels}">
+		  			   		<c:if test="${assessment.enableConfidenceLevels and questionDto.type != 8}">
 		  			   			"<fmt:message key="label.confidence" />",
 		  			  		</c:if>
 			  			   	<c:if test="${questionDto.groupsAnswersDisclosed}">
@@ -101,7 +101,7 @@
 				    			return definePortraitPopover(rowObject[rowObject.length - 1], rowObject[rowObject.length - 2], rowObject[2]);
 							}},
 							{name:'grade', index:'grade', width:30, sorttype:"float", search:false, editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' },
-	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
+	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels and questionDto.type != 8}">
 			  			   		{name:'confidence', index:'confidence', width: 80, search:false, classes: 'vertical-align', formatter: gradientNumberFormatter},
 			  			  	</c:if>
 				  			<c:if test="${questionDto.groupsAnswersDisclosed}">

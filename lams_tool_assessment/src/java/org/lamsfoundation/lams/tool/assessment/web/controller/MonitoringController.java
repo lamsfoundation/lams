@@ -600,7 +600,8 @@ public class MonitoringController {
 		userData.add(questionResult.getMark());
 		// show confidence levels if this feature is turned ON
 		if (assessment.isEnableConfidenceLevels()) {
-		    userData.add(questionResult.getConfidenceLevel());
+		    userData.add(questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_MARK_HEDGING) ? -1
+			    : questionResult.getConfidenceLevel());
 		}
 
 		// show average rating

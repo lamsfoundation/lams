@@ -20,7 +20,7 @@
  	   	   		title:"${fn:escapeXml(title)}",
  	   	   		response:responseStr,
  	   	   		<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
- 	   	   			confidence:"${questionResult.confidenceLevel}",
+ 	   	   			confidence:"${question.type == 8 ? -1 : questionResult.confidenceLevel}",
  	   	   		</c:if>
  	   	   		grade:"<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>"
  	   	   	});

@@ -87,7 +87,7 @@
 					</c:when>						
 				</c:choose>
 				
-				<c:if test="${assessment.enableConfidenceLevels}">
+				<c:if test="${assessment.enableConfidenceLevels and question.type != 8}">
 					<%@ include file="confidencelevel.jsp"%>
 				</c:if>
 			</div>

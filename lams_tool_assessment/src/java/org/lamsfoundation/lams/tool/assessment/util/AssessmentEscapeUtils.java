@@ -261,7 +261,8 @@ public class AssessmentEscapeUtils {
 	    case QbQuestion.TYPE_MATCHING_PAIRS:
 		return AssessmentEscapeUtils.getOptionResponse(questionResult, QbQuestion.TYPE_MATCHING_PAIRS, false);
 	    case QbQuestion.TYPE_MULTIPLE_CHOICE:
-		return AssessmentEscapeUtils.getOptionResponse(questionResult, QbQuestion.TYPE_MULTIPLE_CHOICE,
+	    case QbQuestion.TYPE_MARK_HEDGING:
+		return AssessmentEscapeUtils.getOptionResponse(questionResult, questionResult.getQbQuestion().getType(),
 			useLettersForMcq);
 	    case QbQuestion.TYPE_NUMERICAL:
 		return new AssessmentExcelCell(questionResult.getAnswer(), false);
@@ -273,8 +274,6 @@ public class AssessmentEscapeUtils {
 		boolean isCorrect = questionResult.getQbQuestion().getCorrectAnswer() == questionResult
 			.getAnswerBoolean();
 		return new AssessmentExcelCell(questionResult.getAnswerBoolean(), isCorrect);
-	    case QbQuestion.TYPE_MARK_HEDGING:
-		//taken care beforehand
 	}
 	return null;
     }
@@ -297,15 +296,19 @@ public class AssessmentEscapeUtils {
 	List<QbOption> options = questionResult.getQbQuestion().getQbOptions();
 	Set<AssessmentOptionAnswer> optionAnswers = questionResult.getOptionAnswers();
 	if (optionAnswers != null) {
-	    if (type == QbQuestion.TYPE_MULTIPLE_CHOICE) {
-		highlightCell = true;
+	    if (type == QbQuestion.TYPE_MULTIPLE_CHOICE || type == QbQuestion.TYPE_MARK_HEDGING) {
+		highlightCell = type == QbQuestion.TYPE_MULTIPLE_CHOICE;
 		int letter = 'A';
 		for (QbOption option : options) {
 		    for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
 			if (option.getUid().equals(optionAnswer.getOptionUid())) {
-			    if (optionAnswer.getAnswerBoolean()) {
+			    if (optionAnswer.getAnswerBoolean() || type == QbQuestion.TYPE_MARK_HEDGING) {
 				// either we display full answers or just letters of chosen options
-				sb.append((useLettersForMcq ? String.valueOf((char) letter) : option.getName()) + ", ");
+				sb.append(useLettersForMcq ? String.valueOf((char) letter) : option.getName());
+				if (type == QbQuestion.TYPE_MARK_HEDGING) {
+				    sb.append('=').append(optionAnswer.getAnswerInt());
+				}
+				sb.append(',');
 				trimLastComma = true;
 
 				// if any answer is wrong, we do not highlight correct answer
@@ -353,8 +356,6 @@ public class AssessmentEscapeUtils {
 
 		}
 
-	    } else if (type == QbQuestion.TYPE_MARK_HEDGING) {
-		//taken care beforehand
 	    }
 
 	}

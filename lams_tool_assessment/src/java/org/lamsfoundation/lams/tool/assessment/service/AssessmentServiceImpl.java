@@ -1955,177 +1955,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    }
 	}
 
-	/*
-	 * ------------------------------------------------------------------
-	 * // -------------- Third tab: User Summary ---------------------------
-	 *
-	 * ExcelSheet userSummarySheet = new ExcelSheet(getMessage("label.export.summary.by.user"));
-	 * sheets.add(userSummarySheet);
-	 *
-	 * // Create the question summary
-	 * ExcelRow userSummaryTitle = userSummarySheet.initRow();
-	 * userSummaryTitle.addCell(getMessage("label.export.user.summary"), true);
-	 *
-	 * ExcelRow summaryRowTitle = userSummarySheet.initRow();
-	 * summaryRowTitle.addCell("#", true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	 * summaryRowTitle.addCell(getMessage("label.monitoring.question.summary.question"), true,
-	 * ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	 * summaryRowTitle.addCell(getMessage("label.authoring.basic.list.header.type"), true,
-	 * ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	 * summaryRowTitle.addCell(getMessage("label.authoring.basic.penalty.factor"), true,
-	 * ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	 * summaryRowTitle.addCell(getMessage("label.monitoring.question.summary.default.mark"), true,
-	 * ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	 * summaryRowTitle.addCell(getMessage("label.monitoring.question.summary.average.mark"), true,
-	 * ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	 *
-	 * Float totalGradesPossible = 0F;
-	 * Float totalAverage = 0F;
-	 * int questionIndex = 1;
-	 * if (assessment.getQuestionReferences() != null) {
-	 * Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
-	 * questionReferences.addAll(assessment.getQuestionReferences());
-	 *
-	 * int randomQuestionsCount = 1;
-	 * for (QuestionReference questionReference : questionReferences) {
-	 *
-	 * String title;
-	 * String questionType;
-	 * Float penaltyFactor;
-	 * Float averageMark = null;
-	 * if (questionReference.isRandomQuestion()) {
-	 *
-	 * title = getMessage("label.authoring.basic.type.random.question") + randomQuestionsCount++;
-	 * questionType = getMessage("label.authoring.basic.type.random.question");
-	 * penaltyFactor = null;
-	 * averageMark = null;
-	 * } else {
-	 *
-	 * AssessmentQuestion question = questionReference.getQuestion();
-	 * title = question.getQbQuestion().getName();
-	 * questionType = AssessmentServiceImpl.getQuestionTypeLanguageLabel(question.getType());
-	 * penaltyFactor = question.getQbQuestion().getPenaltyFactor();
-	 *
-	 * QuestionSummary questionSummary = questionSummaries.get(question.getUid());
-	 * if (questionSummary != null) {
-	 * averageMark = questionSummary.getAverageMark();
-	 * totalAverage += questionSummary.getAverageMark();
-	 * }
-	 * }
-	 *
-	 * int maxGrade = questionReference.getMaxMark();
-	 * totalGradesPossible += maxGrade;
-	 *
-	 * ExcelRow questCellRow = userSummarySheet.initRow();
-	 * questCellRow.addCell(questionIndex++);
-	 * questCellRow.addCell(title);
-	 * questCellRow.addCell(questionType);
-	 * questCellRow.addCell(penaltyFactor);
-	 * questCellRow.addCell(maxGrade);
-	 * questCellRow.addCell(averageMark);
-	 * }
-	 *
-	 * if (totalGradesPossible.floatValue() > 0) {
-	 * ExcelRow totalCellRow = userSummarySheet.initRow();
-	 * totalCellRow.addEmptyCells(2);
-	 * totalCellRow.addCell(getMessage("label.monitoring.summary.total"), true);
-	 * totalCellRow.addCell(totalGradesPossible);
-	 * totalCellRow.addCell(totalAverage);
-	 * }
-	 * userSummarySheet.addEmptyRow();
-	 * }
-	 *
-	 * if (sessionDtos != null) {
-	 * List<AssessmentResult> assessmentResults = assessmentResultDao
-	 * .getLastFinishedAssessmentResults(assessment.getContentId());
-	 * Map<Long, AssessmentResult> userUidToResultMap = new HashMap<>();
-	 * for (AssessmentResult assessmentResult : assessmentResults) {
-	 * userUidToResultMap.put(assessmentResult.getUser().getUid(), assessmentResult);
-	 * }
-	 *
-	 * for (SessionDTO sessionDTO : sessionDtos) {
-	 * userSummarySheet.addEmptyRow();
-	 *
-	 * ExcelRow sessionTitle = userSummarySheet.initRow();
-	 * sessionTitle.addCell(sessionDTO.getSessionName(), true);
-	 *
-	 * AssessmentSession assessmentSession = getSessionBySessionId(sessionDTO.getSessionId());
-	 * Set<AssessmentUser> assessmentUsers = assessmentSession.getAssessmentUsers();
-	 * if (assessmentUsers != null) {
-	 * for (AssessmentUser assessmentUser : assessmentUsers) {
-	 * ExcelRow userTitleRow = userSummarySheet.initRow();
-	 * userTitleRow.addCell(getMessage("label.export.user.id"), true);
-	 * userTitleRow.addCell(getMessage("label.monitoring.user.summary.full.name"), true);
-	 * userTitleRow.addCell(getMessage("label.export.date.attempted"), true);
-	 * userTitleRow.addCell(getMessage("label.monitoring.question.summary.question"), true);
-	 * userTitleRow.addCell(getMessage("label.authoring.basic.option.answer"), true);
-	 * if (assessment.isEnableConfidenceLevels()) {
-	 * userTitleRow.addCell(getMessage("label.confidence"), true);
-	 * }
-	 * userTitleRow.addCell(getMessage("label.export.mark"), true);
-	 *
-	 * if (assessment.isAllowAnswerJustification()) {
-	 * userTitleRow.addCell(getMessage("label.answer.justification"), true);
-	 * }
-	 *
-	 * AssessmentResult assessmentResult = userUidToResultMap.get(assessmentUser.getUid());
-	 * if (assessmentResult != null) {
-	 * Set<AssessmentQuestionResult> questionResults = assessmentResult.getQuestionResults();
-	 * if (questionResults != null) {
-	 * for (AssessmentQuestionResult questionResult : questionResults) {
-	 * ExcelRow userResultRow = userSummarySheet.initRow();
-	 * userResultRow.addCell(assessmentUser.getLoginName());
-	 * userResultRow.addCell(assessmentUser.getFullName());
-	 * userResultRow.addCell(assessmentResult.getStartDate());
-	 * userResultRow.addCell(questionResult.getQbQuestion().getName());
-	 *
-	 * AssessmentEscapeUtils.addResponseCellForExcelExport(questionResult,
-	 * userResultRow, false);
-	 *
-	 * if (assessment.isEnableConfidenceLevels()) {
-	 * String confidenceLevel = null;
-	 *
-	 * switch (assessment.getConfidenceLevelsType()) {
-	 * case 2:
-	 * confidenceLevel = new String[] { getMessage("label.not.confident"),
-	 * getMessage("label.confident"),
-	 * getMessage("label.very.confident") }[questionResult
-	 * .getConfidenceLevel() / 5];
-	 * break;
-	 * case 3:
-	 * confidenceLevel = new String[] { getMessage("label.not.sure"),
-	 * getMessage("label.sure"),
-	 * getMessage("label.very.sure") }[questionResult
-	 * .getConfidenceLevel() / 5];
-	 * break;
-	 * default:
-	 * confidenceLevel = questionResult.getConfidenceLevel() * 10 + "%";
-	 * }
-	 *
-	 * userResultRow.addCell(confidenceLevel);
-	 * }
-	 *
-	 * userResultRow.addCell(questionResult.getMark());
-	 *
-	 * if (assessment.isAllowAnswerJustification()) {
-	 * userResultRow.addCell(AssessmentEscapeUtils
-	 * .escapeStringForExcelExport(questionResult.getJustification()));
-	 * }
-	 * }
-	 * }
-	 *
-	 * ExcelRow userTotalRow = userSummarySheet.initRow();
-	 * userTotalRow.addEmptyCells(assessment.isEnableConfidenceLevels() ? 5 : 4);
-	 * userTotalRow.addCell(getMessage("label.monitoring.summary.total"), true);
-	 * userTotalRow.addCell(assessmentResult.getGrade());
-	 * userSummarySheet.addEmptyRow();
-	 * }
-	 * }
-	 * }
-	 * }
-	 * }
-	 */
-
 	// ------------------------------------------------------------------
 	// -------------- Third tab: Learner summary ---------------------------
 
@@ -2175,7 +2004,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		if (addAnsweredDateColumn) {
 		    columnShift++;
 		}
-		if (assessment.isEnableConfidenceLevels()) {
+		if (assessment.isEnableConfidenceLevels() && QbQuestion.TYPE_MARK_HEDGING != question.getType()) {
 		    columnShift++;
 		}
 		questionTitlesRow.addEmptyCells(columnShift);
@@ -2203,7 +2032,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		if (addAnsweredDateColumn) {
 		    userSummaryUserHeadersRow.addCell(getMessage("monitor.summary.after.date"));
 		}
-		if (assessment.isEnableConfidenceLevels()) {
+		if (assessment.isEnableConfidenceLevels() && QbQuestion.TYPE_MARK_HEDGING != question.getType()) {
 		    userSummaryUserHeadersRow.addCell(getMessage("label.confidence"));
 		}
 	    }
@@ -2274,7 +2103,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			}
 
 			// confidence level
-			if (assessment.isEnableConfidenceLevels()) {
+			if (assessment.isEnableConfidenceLevels()
+				&& QbQuestion.TYPE_MARK_HEDGING != question.getType()) {
 			    String confidenceLevel = null;
 
 			    switch (assessment.getConfidenceLevelsType()) {
@@ -3938,7 +3768,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
     // TODO Implement REST support for all types and then remove checkType method
     void checkType(Integer type) throws IOException {
-	if ((type != QbQuestion.TYPE_ESSAY) && (type != QbQuestion.TYPE_MULTIPLE_CHOICE) && (type != QbQuestion.TYPE_MARK_HEDGING)) {
+	if ((type != QbQuestion.TYPE_ESSAY) && (type != QbQuestion.TYPE_MULTIPLE_CHOICE)
+		&& (type != QbQuestion.TYPE_MARK_HEDGING)) {
 	    throw new IOException(
 		    "Assessment Tool does not support REST Authoring for anything but Essay, Multiple Choice and Mark Hedging types. Found type "
 			    + type);

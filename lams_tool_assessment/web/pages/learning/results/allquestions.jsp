@@ -167,7 +167,7 @@
 			<c:if test="${not empty toolSessionID}">			
 				<%@ include file="historyresponses.jsp"%>
 				
-				<c:if test="${assessment.enableConfidenceLevels}">
+				<c:if test="${assessment.enableConfidenceLevels and question.type != 8}">
 					<%@ include file="confidencelevel.jsp"%>
 				</c:if>
 				
