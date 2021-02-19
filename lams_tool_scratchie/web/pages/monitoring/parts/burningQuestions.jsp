@@ -76,43 +76,29 @@
 
 	<c:forEach var="burningQuestionItemDto" items="${burningQuestionItemDtos}" varStatus="i">
 		<c:set var="burningQsCount" value="${fn:length(burningQuestionItemDto.burningQuestionDtos)}"/>
-		<c:set var="item" value="${burningQuestionItemDto.scratchieItem}"/>
-		
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h4 class="panel-title panel-collapse">
-					
-					<!-- Don't display number prior to general burning question -->
-					<c:set var="itemTitle">
-						<c:choose>
-							<c:when test="${empty burningQuestionItemDto.scratchieItem.uid}">
-								<c:out value="${item.qbQuestion.name}" escapeXml="false"/>
-							</c:when>
-							<c:otherwise>
-								Q${i.index+1}) 
-								<c:if test="${not hideTitles}">
+		<c:if test="${burningQsCount > 0}">
+			<c:set var="item" value="${burningQuestionItemDto.scratchieItem}"/>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title panel-collapse">
+						<a data-toggle="collapse" data-itemuid="${item.uid}" class="collapsed burning-question-title">
+							<!-- Don't display number prior to general burning question -->
+							<c:choose>
+								<c:when test="${empty burningQuestionItemDto.scratchieItem.uid}">
 									<c:out value="${item.qbQuestion.name}" escapeXml="false"/>
-								</c:if> 
-							</c:otherwise>
-						</c:choose>
-					</c:set>
-				
-					<c:choose>
-						<c:when test="${empty burningQuestionItemDto.scratchieItem.uid and burningQsCount == 0}">
-							${itemTitle} 
-						</c:when>
-						<c:otherwise>
-							<a data-toggle="collapse" data-itemuid="${item.uid}" class="collapsed burning-question-title">
-								${itemTitle}
-							</a>
-							
-							<span class="badge pull-right" style="margin-right: 4px">${burningQsCount}</span>
-						</c:otherwise>
-					</c:choose> 
-				</h4>
-			</div>
-		
-			<c:if test="${not empty burningQuestionItemDto.scratchieItem.uid or burningQsCount > 0}">
+								</c:when>
+								<c:otherwise>
+									Q${i.index+1}) 
+									<c:if test="${not hideTitles}">
+										<c:out value="${item.qbQuestion.name}" escapeXml="false"/>
+									</c:if> 
+								</c:otherwise>
+							</c:choose>
+						</a>
+					</h4>
+				</div>
+			
 				<div id="collapse-${item.uid}" class="panel-collapse collapse">
 				<div class="panel-body">
 				
@@ -163,9 +149,9 @@
 					</div>
 				</div>
 				</div>
-			</c:if>
-			
-		</div>
+				
+			</div>
+		</c:if>
 	</c:forEach>    
   
 </div>
