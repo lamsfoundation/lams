@@ -101,7 +101,7 @@ public class TblMonitorController {
 		}
 
 		Double percentage = (items.size() == 0) ? 0 : (double) numberOfFirstChoiceEvents * 100 / items.size();
-		summary.setTotalPercentage(percentage.toString());
+		summary.setTotalPercentage(percentage);
 	    }
 
 	    request.setAttribute("groupSummaries", groupSummaries);

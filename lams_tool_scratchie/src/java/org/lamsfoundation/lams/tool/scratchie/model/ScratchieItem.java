@@ -67,6 +67,10 @@ public class ScratchieItem extends QbToolQuestion implements Serializable, Clone
     private int mark;
     @Transient
     private String correctAnswerLetter;
+    @Transient
+    private int correctOnFirstAttemptCount;
+    @Transient
+    private double correctOnFirstAttemptPercent;
 
     @Override
     public Object clone() {
@@ -130,5 +134,21 @@ public class ScratchieItem extends QbToolQuestion implements Serializable, Clone
 
     public void setCorrectAnswerLetter(String correctAnswerLetters) {
 	this.correctAnswerLetter = correctAnswerLetters;
+    }
+
+    public int getCorrectOnFirstAttemptCount() {
+	return correctOnFirstAttemptCount;
+    }
+
+    public void setCorrectOnFirstAttemptCount(int correctOnFirstAttemptCount) {
+	this.correctOnFirstAttemptCount = correctOnFirstAttemptCount;
+    }
+
+    public double getCorrectOnFirstAttemptPercent() {
+	return correctOnFirstAttemptPercent;
+    }
+
+    public void setCorrectOnFirstAttemptPercent(double correctOnFirstAttemptPercent) {
+	this.correctOnFirstAttemptPercent = correctOnFirstAttemptPercent;
     }
 }

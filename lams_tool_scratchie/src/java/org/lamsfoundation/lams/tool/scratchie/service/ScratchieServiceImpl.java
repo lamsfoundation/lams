@@ -1955,6 +1955,9 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	List<ScratchieItem> itemList = new LinkedList<>(items);
 	model.put("items", itemList);
 
+	Map<Long, ScratchieItem> itemToCorrectOnFirstAttemptMap = itemList.stream()
+		.collect(Collectors.toMap(ScratchieItem::getUid, Function.identity()));
+
 	//correct answers row
 	ScratchieServiceImpl.fillCorrectAnswerLetters(itemList);
 
@@ -1995,6 +1998,9 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    for (ScratchieItemDTO itemDto : summary.getItemDtos()) {
 		if (itemDto.isUnraveledOnFirstAttempt()) {
 		    numberOfFirstChoiceEvents++;
+
+		    ScratchieItem item = itemToCorrectOnFirstAttemptMap.get(itemDto.getUid());
+		    item.setCorrectOnFirstAttemptCount(item.getCorrectOnFirstAttemptCount() + 1);
 		}
 	    }
 	    summary.setMark(numberOfFirstChoiceEvents);
@@ -2002,11 +2008,16 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    // round the percentage cell
 	    String totalPercentage = String.valueOf(
 		    Math.round((items.size() == 0) ? 0 : (double) numberOfFirstChoiceEvents * 100 / items.size()));
-	    summary.setTotalPercentage(totalPercentage);
+	    summary.setTotalPercentage(Double.valueOf(totalPercentage));
 
 	}
-
 	model.put("sessionDtos", groupSummaries);
+
+	for (ScratchieItem item : itemList) {
+	    item.setCorrectOnFirstAttemptPercent(
+		    groupSummaries.isEmpty() ? 0 : item.getCorrectOnFirstAttemptCount() * 100 / groupSummaries.size());
+	}
+
 	return model;
     }
 

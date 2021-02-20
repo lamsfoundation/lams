@@ -115,13 +115,15 @@
 						</a>
 					</th>
 				</c:forEach>
-				<th class="text-center">
-					<fmt:message key="label.total"/>
-				</th>
-				<th class="text-center">
-					<fmt:message key="label.total"/> %
-				</th>
 				
+				<c:if test="${not empty sessionDtos}">
+					<th class="text-center">
+						<fmt:message key="label.total"/>
+					</th>
+					<th class="text-center">
+						<fmt:message key="label.total"/> %
+					</th>
+				</c:if>
 			</tr>
 		</thead>
 		<tbody>
@@ -140,11 +142,13 @@
 					</td>
 				</c:forEach>
 				
-				<td class="text-center"></td>
-				<td class="text-center"></td>
+				<c:if test="${not empty sessionDtos}">
+					<td class="text-center"></td>
+					<td class="text-center"></td>
+				</c:if>
 			</tr>
 			
-			<c:if test="${not showStudentChoicesTableOnly or sessionMap.isGroupedActivity}">
+			<c:if test="${not empty sessionDtos and (not showStudentChoicesTableOnly or sessionMap.isGroupedActivity)}">
 				<tr>
 					<th colspan="0" style="font-weight: bold;">
 						<fmt:message key="label.teams.notuppercase"/>
@@ -200,18 +204,64 @@
 								</td>
 							</c:forEach>
 							
-							<td class="text-center">
+							<c:set var="highlightClass">
+								<c:choose>
+									<c:when test="${sessionDto.totalPercentage > 95}">bg-success</c:when>
+									<c:when test="${sessionDto.totalPercentage < 40}">bg-danger</c:when>
+									<c:when test="${sessionDto.totalPercentage < 75}">bg-warning</c:when>
+								</c:choose>
+							</c:set>
+							
+							<td class="text-center ${highlightClass}">
 								${sessionDto.mark}
 							</td>
 							
-							<td class="text-center">
+							<td class="text-center ${highlightClass}">
 								<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${sessionDto.totalPercentage}" /> %
 							</td>
 						</c:otherwise>
 					</c:choose>
-					
 				</tr>
-			</c:forEach>                                               
+			</c:forEach>      
+			
+			<c:if test="${not empty sessionDtos}">
+				<tr>
+					<th><fmt:message key="label.total"/></th>
+					<c:forEach var="item" items="${items}">
+						<c:set var="highlightClass">
+							<c:choose>
+								<c:when test="${item.correctOnFirstAttemptPercent > 95}">bg-success</c:when>
+								<c:when test="${item.correctOnFirstAttemptPercent < 40}">bg-danger</c:when>
+								<c:when test="${item.correctOnFirstAttemptPercent < 75}">bg-warning</c:when>
+							</c:choose>
+						</c:set>
+						
+						<td class="text-center ${highlightClass}">
+							${item.correctOnFirstAttemptCount}
+						</td>
+					</c:forEach>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<th><fmt:message key="label.total"/> %</th>
+					<c:forEach var="item" items="${items}">
+						<c:set var="highlightClass">
+							<c:choose>
+								<c:when test="${item.correctOnFirstAttemptPercent > 95}">bg-success</c:when>
+								<c:when test="${item.correctOnFirstAttemptPercent < 40}">bg-danger</c:when>
+								<c:when test="${item.correctOnFirstAttemptPercent < 75}">bg-warning</c:when>
+							</c:choose>
+						</c:set>
+						
+						<td class="text-center ${highlightClass}">
+							<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${item.correctOnFirstAttemptPercent}" /> %
+						</td>
+					</c:forEach>
+					<td></td>
+					<td></td>
+				</tr>                         
+			</c:if>                     
 		</tbody>
 	</table>
 	</div>
