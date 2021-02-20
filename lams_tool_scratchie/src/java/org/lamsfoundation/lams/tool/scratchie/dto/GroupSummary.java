@@ -33,7 +33,7 @@ public class GroupSummary {
     private String sessionName;
     private int mark;
     private int totalAttempts;
-    private String totalPercentage;
+    private Double totalPercentage;
     private Long leaderUid;
     private boolean scratchingFinished;
 
@@ -95,11 +95,11 @@ public class GroupSummary {
 	this.totalAttempts = totalAttempts;
     }
 
-    public String getTotalPercentage() {
+    public Double getTotalPercentage() {
 	return totalPercentage;
     }
 
-    public void setTotalPercentage(String totalPercentage) {
+    public void setTotalPercentage(Double totalPercentage) {
 	this.totalPercentage = totalPercentage;
     }
 
