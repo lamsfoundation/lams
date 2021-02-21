@@ -1,8 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <% pageContext.setAttribute("newLineChar", "\r\n"); %>
 
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/common.js"></script>
-
 <style>
 	/* show horizontal scroller for iPads */
 	body {
@@ -48,6 +46,13 @@
 	span.wrong-response {
 	  background-color: #d9534f; }
 </style>
+
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/common.js"></script>
+<script>
+	$(document).ready(function(){
+		 $('[data-toggle="tooltip"]').tooltip();
+	});
+</script>
 
 <c:if test="${not showStudentChoicesTableOnly}">
 	<script>
@@ -102,7 +107,7 @@
 <div class="col-xs-12 col-md-12 col-lg-12">
 <div class="panel">
 <div class="panel-body">
-<div class="table-responsive">
+<div id="questions-data-container" class="table-responsive">
 	<table id="questions-data" class="table table-striped table-bordered table-hover table-condensed">
 		<thead>
 			<tr role="row">
@@ -118,7 +123,9 @@
 				
 				<c:if test="${not empty sessionDtos}">
 					<th class="text-center">
-						<fmt:message key="label.total"/> &nbsp<i class="fa fa-question-circle text-primary" data-toggle="tooltip" data-placement="top"  title="<fmt:message key="label.total.1st.attempt.by.team"/>"></i>
+						<fmt:message key="label.total"/>&nbsp;
+						<i class="fa fa-question-circle text-primary" data-toggle="tooltip" data-placement="top" data-container="body" 
+						   title="<fmt:message key="label.total.1st.attempt.by.team"/>"></i>
 					</th>
 					<th class="text-center">
 						<fmt:message key="label.total"/> %
@@ -226,7 +233,10 @@
 			
 			<c:if test="${not empty sessionDtos}">
 				<tr>
-					<th><fmt:message key="label.total"/>&nbsp<i class="fa fa-question-circle text-primary" data-toggle="tooltip" data-placement="top"  title="<fmt:message key="label.total.1st.attempt.by.question"/>"></i></th>
+					<th><fmt:message key="label.total"/>&nbsp;
+					<i class="fa fa-question-circle text-primary" data-toggle="tooltip" data-placement="top" data-container="body" 
+					   title="<fmt:message key="label.total.1st.attempt.by.question"/>"></i></th>
+					   
 					<c:forEach var="item" items="${items}">
 						<c:set var="highlightClass">
 							<c:choose>

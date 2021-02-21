@@ -51,16 +51,12 @@
 	#collapseBurning .burning-question-title {
 	  cursor: pointer;
 	}
-	
 </style>
 
 <script type="text/javascript">
-
-$(function () {
-  $('[data-toggle="tooltip"]').tooltip()
-})
-
 	$(document).ready(function(){
+		 $('[data-toggle="tooltip"]').bootstrapTooltip();
+		 
 		var oldValue = 0;
 		
 		<c:forEach var="summary" items="${summaryList}" varStatus="status">
