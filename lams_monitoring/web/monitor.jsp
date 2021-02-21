@@ -900,6 +900,6 @@
 		</div>
 	</div>
 	
-	<div class="tooltip" id="tooltip"></div>
+	<div class="progress-bar-tooltip" id="progress-bar-tooltip"></div>
 </body>
 </lams:html>

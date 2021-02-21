@@ -386,14 +386,14 @@ var ActivityUtils = {
 				var tooltipText = '<b>' + activity.name + '</b><br />'
 						+ activity.statusTooltip;
 				// move to proper place and show
-				$('#tooltip').stop(true, true).css("left", x + 10).css("top", y + 20).css("opacity",1)
+				$('#progress-bar-tooltip').stop(true, true).css("left", x + 10).css("top", y + 20).css("opacity",1)
 						.html(tooltipText).delay(700).fadeIn();
 			},
 
 			mouseout = function() {
 				// remove glow
 				ActivityUtils.removeGlow(activity);
-				$('#tooltip').stop(true, true).fadeOut();
+				$('#progress-bar-tooltip').stop(true, true).fadeOut();
 			},
 
 			isSupportActivity = activity instanceof SupportActivity,

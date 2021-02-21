@@ -357,12 +357,15 @@
 								<i class="pull-right fa fa-map"></i>
 							</a>
 							<div id="progressBarDiv" class="progressBarContainer"></div>
+							
 						</li>
 					</ul>
 				</div>
 			</div>
 		</nav>
-
+		
+		<div class="progress-bar-tooltip" id="progress-bar-tooltip"></div>
+		
 	</c:if> <%--  end of sidebar stuff - only used if in learner screen --%>
 
 		<div id="navcontent" class="content">
