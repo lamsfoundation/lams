@@ -118,7 +118,7 @@
 				
 				<c:if test="${not empty sessionDtos}">
 					<th class="text-center">
-						<fmt:message key="label.total"/>
+						<fmt:message key="label.total"/> &nbsp<i class="fa fa-question-circle text-primary" data-toggle="tooltip" data-placement="top"  title="<fmt:message key="label.total.1st.attempt.by.team"/>"></i>
 					</th>
 					<th class="text-center">
 						<fmt:message key="label.total"/> %
@@ -226,7 +226,7 @@
 			
 			<c:if test="${not empty sessionDtos}">
 				<tr>
-					<th><fmt:message key="label.total"/></th>
+					<th><fmt:message key="label.total"/>&nbsp<i class="fa fa-question-circle text-primary" data-toggle="tooltip" data-placement="top"  title="<fmt:message key="label.total.1st.attempt.by.question"/>"></i></th>
 					<c:forEach var="item" items="${items}">
 						<c:set var="highlightClass">
 							<c:choose>

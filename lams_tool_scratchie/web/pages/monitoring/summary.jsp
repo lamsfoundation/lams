@@ -55,6 +55,11 @@
 </style>
 
 <script type="text/javascript">
+
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+
 	$(document).ready(function(){
 		var oldValue = 0;
 		
