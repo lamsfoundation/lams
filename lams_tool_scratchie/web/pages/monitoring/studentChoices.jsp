@@ -232,6 +232,8 @@
 			</c:forEach>      
 			
 			<c:if test="${not empty sessionDtos}">
+				<c:set var="totalSum" value="0" />
+				<c:set var="totalPercentSum" value="0" />
 				<tr>
 					<th><fmt:message key="label.total"/>&nbsp;
 					<i class="fa fa-question-circle text-primary" data-toggle="tooltip" data-placement="top" data-container="body" 
@@ -249,9 +251,24 @@
 						<td class="text-center ${highlightClass}">
 							${item.correctOnFirstAttemptCount}
 						</td>
+						<c:set var="totalSum" value="${totalSum + item.correctOnFirstAttemptCount}" />
+						<c:set var="totalPercentSum" value="${totalPercentSum + item.correctOnFirstAttemptPercent}" />
 					</c:forEach>
-					<td></td>
-					<td></td>
+					
+					<c:set var="totalPercentAverage" value="${totalPercentSum / fn:length(items)}" />
+					<c:set var="totalAverageHighlightClass">
+						<c:choose>
+							<c:when test="${totalPercentAverage > 95}">bg-success</c:when>
+							<c:when test="${totalPercentAverage < 40}">bg-danger</c:when>
+							<c:when test="${totalPercentAverage < 75}">bg-warning</c:when>
+						</c:choose>
+					</c:set>
+					<td class="text-center ${totalAverageHighlightClass}">
+						<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${totalSum / fn:length(items)}" />&nbsp;
+						<i class="fa fa-question-circle text-primary" data-toggle="tooltip" data-placement="top" data-container="body" 
+						    title="<fmt:message key="label.total.1st.attempt.average"/>"></i>
+					</td>
+					<td class="text-center">-</td>
 				</tr>
 				<tr>
 					<th><fmt:message key="label.total"/> %</th>
@@ -268,8 +285,12 @@
 							<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${item.correctOnFirstAttemptPercent}" /> %
 						</td>
 					</c:forEach>
-					<td></td>
-					<td></td>
+					<td class="text-center">-</td>
+					<td class="text-center ${totalAverageHighlightClass}">					
+						<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${totalPercentAverage}" />&nbsp;%&nbsp;
+						<i class="fa fa-question-circle text-primary" data-toggle="tooltip" data-placement="top" data-container="body" 
+						    title="<fmt:message key="label.total.1st.attempt.average"/>"></i>
+					</td>
 				</tr>                         
 			</c:if>                     
 		</tbody>
