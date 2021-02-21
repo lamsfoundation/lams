@@ -720,6 +720,10 @@ nav.sidebar p.no-portrait{
 	padding-right: 35px;
 }
 
+#bs-sidebar-navbar-collapse-1 .lessonName {
+	word-break: break-word;
+}
+
 /* .....NavBar: Fully showing nav bar..... */
 
 @media (min-width: 1330px) {
