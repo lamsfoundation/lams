@@ -817,6 +817,7 @@ div.growlUI h1,div.growlUI h2 {
 
 // Tooltips used for learner progress and gradebook (large version)
 .progress-bar-tooltip {
+	display: none;
 	position: absolute;
 	border: $border-thin-default;
 	background-color: $gray-light-mid;
