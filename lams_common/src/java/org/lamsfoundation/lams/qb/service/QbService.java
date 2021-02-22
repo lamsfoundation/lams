@@ -235,7 +235,6 @@ public class QbService implements IQbService {
 
 	QbStatsActivityDTO activityDTO = new QbStatsActivityDTO();
 	activityDTO.setActivity(activity);
-	activityDTO.setParticipantCount(participantCount);
 
 	String monitorUrl = "/lams/" + lamsCoreToolService.getToolMonitoringURL(lessonId, activity)
 		+ "&contentFolderID=" + learningDesign.getContentFolderID();
@@ -245,6 +244,12 @@ public class QbService implements IQbService {
 	if (participantCount >= Configuration.getAsInt(ConfigurationKeys.QB_STATS_MIN_PARTICIPANTS)) {
 	    // mapping of user ID -> option UID
 	    Map<Integer, Long> activityAnswers = qbDAO.getAnswersForActivity(activity.getActivityId(), qbQuestionUid);
+	    // take only learners who finished (not only submitted) this activity
+	    userLessonGrades = userLessonGrades.stream().filter(g -> activityAnswers.containsKey(g.getLearner().getUserId()))
+		    .collect(Collectors.toList());
+	    participantCount = userLessonGrades.size();
+	    activityDTO.setParticipantCount(participantCount);
+
 	    // see who answered correctly
 	    Set<Integer> correctUserIds = new HashSet<>();
 	    for (Entry<Integer, Long> answer : activityAnswers.entrySet()) {

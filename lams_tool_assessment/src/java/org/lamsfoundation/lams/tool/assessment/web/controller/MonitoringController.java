@@ -448,14 +448,14 @@ public class MonitoringController {
 
 	    if (groupLeader != null) {
 
-		float assessmentResult = service.getLastTotalScoreByUser(assessment.getUid(), groupLeader.getUserId());
+		Float assessmentResult = service.getLastTotalScoreByUser(assessment.getUid(), groupLeader.getUserId());
 		String portraitId = service.getPortraitId(groupLeader.getUserId());
 
 		AssessmentUserDTO userDto = new AssessmentUserDTO();
 		userDto.setUserId(groupLeader.getUserId());
 		userDto.setFirstName(groupLeader.getFirstName());
 		userDto.setLastName(groupLeader.getLastName());
-		userDto.setGrade(assessmentResult);
+		userDto.setGrade(assessmentResult == null ? 0 : assessmentResult);
 		userDto.setPortraitId(portraitId);
 		userDtos.add(userDto);
 		countSessionUsers = 1;
@@ -783,20 +783,15 @@ public class MonitoringController {
     public void exportSummary(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	String fileName = null;
-
 	Long contentId = null;
-	List<GradeStatsDTO> sessionDtos;
 	if (sessionMapID != null) {
 	    SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		    .getAttribute(sessionMapID);
 	    request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    contentId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
-	    sessionDtos = (List<GradeStatsDTO>) sessionMap.get("sessionDtos");
-
 	} else {
 	    contentId = WebUtil.readLongParam(request, "toolContentID");
 	    fileName = WebUtil.readStrParam(request, "fileName");
-	    sessionDtos = service.getSessionDtos(contentId, true);
 	}
 
 	Assessment assessment = service.getAssessmentByContentId(contentId);
@@ -804,7 +799,7 @@ public class MonitoringController {
 	    return;
 	}
 
-	List<ExcelSheet> sheets = service.exportSummary(assessment, sessionDtos);
+	List<ExcelSheet> sheets = service.exportSummary(assessment, contentId);
 
 	// Setting the filename if it wasn't passed in the request
 	if (fileName == null) {

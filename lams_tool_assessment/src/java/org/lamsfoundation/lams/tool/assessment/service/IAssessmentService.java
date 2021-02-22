@@ -450,12 +450,8 @@ public interface IAssessmentService extends ICommonToolService {
 
     /**
      * Prepares data for Summary excel export
-     *
-     * @param assessment
-     * @param sessionDtos
-     * @return
      */
-    List<ExcelSheet> exportSummary(Assessment assessment, List<GradeStatsDTO> sessionDtos);
+    List<ExcelSheet> exportSummary(Assessment assessment, long toolContentId);
 
     /**
      * Gets the basic statistics for the grades for the Leaders when an Assessment is done using

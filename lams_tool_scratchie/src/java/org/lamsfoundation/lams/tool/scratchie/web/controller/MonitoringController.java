@@ -262,7 +262,7 @@ public class MonitoringController {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 
 	Scratchie scratchie = (Scratchie) sessionMap.get(ScratchieConstants.ATTR_SCRATCHIE);
-	List<Number> results = null;
+	List<Integer> results = null;
 
 	if (scratchie != null) {
 	    results = scratchieService.getMarksArray(scratchie.getContentId());
@@ -272,7 +272,7 @@ public class MonitoringController {
 	if (results != null) {
 	    responseJSON.set("data", JsonUtil.readArray(results));
 	} else {
-	    responseJSON.set("data", JsonUtil.readArray(new Float[0]));
+	    responseJSON.set("data", JsonUtil.readArray(new Integer[0]));
 	}
 
 	res.setContentType("application/json;charset=utf-8");

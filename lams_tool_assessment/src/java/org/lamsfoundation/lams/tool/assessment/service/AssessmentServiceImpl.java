@@ -1648,83 +1648,117 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public List<ExcelSheet> exportSummary(Assessment assessment, List<GradeStatsDTO> sessionDtos) {
+    public List<ExcelSheet> exportSummary(Assessment assessment, long toolContentId) {
 	List<ExcelSheet> sheets = new LinkedList<>();
 
 	// -------------- First tab: Summary ----------------------------------------------------
 	ExcelSheet summarySheet = new ExcelSheet(getMessage("label.export.summary"));
 	sheets.add(summarySheet);
 
-	if (sessionDtos != null) {
-	    for (GradeStatsDTO sessionDTO : sessionDtos) {
-		Long sessionId = sessionDTO.getSessionId();
+	GradeStatsDTO overallDTO = getStatsDtoForActivity(toolContentId);
+
+	summarySheet.addEmptyRow();
+	ExcelRow overallSummaryRow = summarySheet.initRow();
+	overallSummaryRow.addCell(getMessage("label.export.overall.summary"), true);
+	summarySheet.addEmptyRow();
+
+	overallSummaryRow = summarySheet.initRow();
+	overallSummaryRow.addCell(getMessage("label.number.learners"), true);
+	overallSummaryRow.addCell(overallDTO.getCount());
+
+	overallSummaryRow = summarySheet.initRow();
+	overallSummaryRow.addCell(getMessage("label.lowest.mark"), true);
+	overallSummaryRow.addCell(overallDTO.getMin() == null ? 0 : overallDTO.getMin());
+
+	overallSummaryRow = summarySheet.initRow();
+	overallSummaryRow.addCell(getMessage("label.highest.mark"), true);
+	overallSummaryRow.addCell(overallDTO.getMax() == null ? 0 : overallDTO.getMax());
+
+	overallSummaryRow = summarySheet.initRow();
+	overallSummaryRow.addCell(getMessage("label.average.mark") + ":", true);
+	overallSummaryRow.addCell(overallDTO.getAverage() == null ? 0 : overallDTO.getAverage());
+
+	overallSummaryRow = summarySheet.initRow();
+	overallSummaryRow.addCell(getMessage("label.median.mark"), true);
+	overallSummaryRow.addCell(overallDTO.getMedian() == null ? 0 : overallDTO.getMedian());
+
+	overallSummaryRow = summarySheet.initRow();
+	overallSummaryRow.addCell(getMessage("label.modes.mark"), true);
+	overallSummaryRow.addCell(overallDTO.getModesString());
+	summarySheet.addEmptyRow();
+	summarySheet.addEmptyRow();
+
+	List<GradeStatsDTO> sessionDtos = getSessionDtos(toolContentId, true);
+	for (GradeStatsDTO sessionDTO : sessionDtos) {
+	    Long sessionId = sessionDTO.getSessionId();
+
+	    summarySheet.addEmptyRow();
+
+	    ExcelRow sessionTitleRow = summarySheet.initRow();
+	    sessionTitleRow.addCell(sessionDTO.getSessionName(), true);
+
+	    List<AssessmentUserDTO> userDtos = new ArrayList<>();
+	    // in case of UseSelectLeaderToolOuput - display only one user
+	    if (assessment.isUseSelectLeaderToolOuput()) {
+
+		AssessmentSession session = getSessionBySessionId(sessionId);
+		AssessmentUser groupLeader = session.getGroupLeader();
+
+		if (groupLeader != null) {
+
+		    Float assessmentResult = getLastTotalScoreByUser(assessment.getUid(), groupLeader.getUserId());
+
+		    AssessmentUserDTO userDto = new AssessmentUserDTO();
+		    userDto.setLogin(groupLeader.getLoginName());
+		    userDto.setFirstName(groupLeader.getFirstName());
+		    userDto.setLastName(groupLeader.getLastName());
+		    userDto.setGrade(assessmentResult == null ? 0 : assessmentResult);
+		    userDto.setResultSubmitted(assessmentResult != null);
+		    userDtos.add(userDto);
+		}
 
 		summarySheet.addEmptyRow();
+		ExcelRow minMaxRow = summarySheet.initRow();
+		minMaxRow.addCell(getMessage("label.number.learners"), true);
+		minMaxRow.addCell(userDtos.size());
 
-		ExcelRow sessionTitleRow = summarySheet.initRow();
-		sessionTitleRow.addCell(sessionDTO.getSessionName(), true);
+	    } else {
+		int countSessionUsers = getCountUsersBySession(sessionId, null);
 
-		List<AssessmentUserDTO> userDtos = new ArrayList<>();
-		// in case of UseSelectLeaderToolOuput - display only one user
-		if (assessment.isUseSelectLeaderToolOuput()) {
+		// Get the user list from the db
+		userDtos = getPagedUsersBySession(sessionId, 0, countSessionUsers, "userName", "ASC", "");
 
-		    AssessmentSession session = getSessionBySessionId(sessionId);
-		    AssessmentUser groupLeader = session.getGroupLeader();
-
-		    if (groupLeader != null) {
-
-			float assessmentResult = getLastTotalScoreByUser(assessment.getUid(), groupLeader.getUserId());
-
-			AssessmentUserDTO userDto = new AssessmentUserDTO();
-			userDto.setFirstName(groupLeader.getFirstName());
-			userDto.setLastName(groupLeader.getLastName());
-			userDto.setGrade(assessmentResult);
-			userDtos.add(userDto);
-		    }
-
-		} else {
-		    int countSessionUsers = getCountUsersBySession(sessionId, null);
-
-		    // Get the user list from the db
-		    userDtos = getPagedUsersBySession(sessionId, 0, countSessionUsers, "userName", "ASC", "");
-		}
-
-		float minGrade = -9999999;
-		float maxGrade = 0;
-		for (AssessmentUserDTO userDto : userDtos) {
-		    float grade = userDto.getGrade();
-		    if (grade < minGrade || minGrade == -9999999) {
-			minGrade = grade;
-		    }
-		    if (grade > maxGrade) {
-			maxGrade = grade;
-		    }
-		}
-		if (minGrade == -9999999) {
-		    minGrade = 0;
-		}
+		float minGrade = sessionDTO.getMin() == null ? 0 : sessionDTO.getMin();
+		float maxGrade = sessionDTO.getMax() == null ? 0 : sessionDTO.getMax();
 
 		LinkedHashMap<String, Integer> markSummary = getMarksSummaryForSession(userDtos, minGrade, maxGrade,
 			10);
-		// work out total marks so we can do percentages. need as float for the correct divisions
-		int totalNumEntries = 0;
-		for (Map.Entry<String, Integer> entry : markSummary.entrySet()) {
-		    totalNumEntries += entry.getValue();
-		}
 
 		// Mark Summary Min, Max + Grouped Percentages
 		summarySheet.addEmptyRow();
 		ExcelRow minMaxRow = summarySheet.initRow();
 		minMaxRow.addCell(getMessage("label.number.learners"), true);
-		minMaxRow.addCell(totalNumEntries);
+		minMaxRow.addCell(sessionDTO.getCount());
 
 		minMaxRow = summarySheet.initRow();
 		minMaxRow.addCell(getMessage("label.lowest.mark"), true);
-		minMaxRow.addCell((double) minGrade);
+		minMaxRow.addCell(minGrade);
 
 		minMaxRow = summarySheet.initRow();
 		minMaxRow.addCell(getMessage("label.highest.mark"), true);
-		minMaxRow.addCell((double) maxGrade);
+		minMaxRow.addCell(maxGrade);
+
+		minMaxRow = summarySheet.initRow();
+		minMaxRow.addCell(getMessage("label.average.mark") + ":", true);
+		minMaxRow.addCell(sessionDTO.getAverage() == null ? 0 : sessionDTO.getAverage());
+
+		minMaxRow = summarySheet.initRow();
+		minMaxRow.addCell(getMessage("label.median.mark"), true);
+		minMaxRow.addCell(sessionDTO.getMedian() == null ? 0 : sessionDTO.getMedian());
+
+		minMaxRow = summarySheet.initRow();
+		minMaxRow.addCell(getMessage("label.modes.mark"), true);
+		minMaxRow.addCell(sessionDTO.getModesString());
 		summarySheet.addEmptyRow();
 
 		ExcelRow binSummaryRow = summarySheet.initRow();
@@ -1732,31 +1766,31 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 		binSummaryRow.addCell(getMessage("label.number.learners"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 		binSummaryRow.addCell(getMessage("label.percentage"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		float totalNumEntriesAsFloat = totalNumEntries;
+		float totalNumEntriesAsFloat = sessionDTO.getCount();
 		for (Map.Entry<String, Integer> entry : markSummary.entrySet()) {
 		    binSummaryRow = summarySheet.initRow();
 		    binSummaryRow.addCell(entry.getKey());
 		    binSummaryRow.addCell(entry.getValue());
 		    binSummaryRow.addCell(Math.round(entry.getValue() / totalNumEntriesAsFloat * 100));
 		}
-		summarySheet.addEmptyRow();
-		summarySheet.addEmptyRow();
-
-		ExcelRow summaryTitleRow = summarySheet.initRow();
-		summaryTitleRow.addCell(getMessage("label.export.user.id"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		summaryTitleRow.addCell(getMessage("label.monitoring.summary.user.name"), true,
-			ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		summaryTitleRow.addCell(getMessage("label.monitoring.summary.total"), true,
-			ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-
-		for (AssessmentUserDTO userDto : userDtos) {
-		    ExcelRow userResultRow = summarySheet.initRow();
-		    userResultRow.addCell(userDto.getLogin());
-		    userResultRow.addCell(userDto.getFirstName() + " " + userDto.getLastName());
-		    userResultRow.addCell(userDto.getGrade());
-		}
-		summarySheet.addEmptyRow();
 	    }
+
+	    summarySheet.addEmptyRow();
+	    summarySheet.addEmptyRow();
+
+	    ExcelRow summaryTitleRow = summarySheet.initRow();
+	    summaryTitleRow.addCell(getMessage("label.export.user.id"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	    summaryTitleRow.addCell(getMessage("label.monitoring.summary.user.name"), true,
+		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	    summaryTitleRow.addCell(getMessage("label.monitoring.summary.total"), true,
+		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	    for (AssessmentUserDTO userDto : userDtos) {
+		ExcelRow userResultRow = summarySheet.initRow();
+		userResultRow.addCell(userDto.getLogin());
+		userResultRow.addCell(userDto.getFirstName() + " " + userDto.getLastName());
+		userResultRow.addCell(userDto.isResultSubmitted() ? userDto.getGrade() : "-");
+	    }
+	    summarySheet.addEmptyRow();
 	}
 
 	// ------------------------------------------------------------------
@@ -1913,11 +1947,23 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 				userResultRow.addCell(seconds);
 				timeTakenCount++;
 				timeTakenTotal += seconds;
+			    } else {
+				userResultRow.addEmptyCell();
 			    }
+			} else {
+			    userResultRow.addEmptyCell();
 			}
 
 			//mark
-			userResultRow.addCell(questionResult.getMark());
+			//calculating markCount & markTotal
+			if (questionResult.getMark() != null && questionResult.getFinishDate() != null) {
+			    userResultRow.addCell(questionResult.getMark());
+
+			    markCount++;
+			    markTotal += questionResult.getMark();
+			} else {
+			    userResultRow.addEmptyCell();
+			}
 
 			if (assessment.isAllowAnswerJustification()) {
 			    userResultRow.addCell(AssessmentEscapeUtils
@@ -1926,11 +1972,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 			questionSummaryTabTemp.add(userResultRow);
 
-			//calculating markCount & markTotal
-			if (questionResult.getMark() != null) {
-			    markCount++;
-			    markTotal += questionResult.getMark();
-			}
 		    }
 		}
 
@@ -2696,6 +2737,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	}
 
 	for (AssessmentUserDTO userDto : userDtos) {
+	    // skip learners who have not submitted answers
+	    if (!userDto.isResultSubmitted()) {
+		continue;
+	    }
 	    float grade = userDto.getGrade();
 	    int bucketStart = intMinGrade;
 	    int bucketStop = bucketStart + bucketSize;
