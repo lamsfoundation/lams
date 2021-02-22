@@ -1734,17 +1734,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		LinkedHashMap<String, Integer> markSummary = getMarksSummaryForSession(userDtos, minGrade, maxGrade,
 			10);
 
-		// work out total marks so we can do percentages. need as float for the correct divisions
-		int totalNumEntries = 0;
-		for (Map.Entry<String, Integer> entry : markSummary.entrySet()) {
-		    totalNumEntries += entry.getValue();
-		}
-
 		// Mark Summary Min, Max + Grouped Percentages
 		summarySheet.addEmptyRow();
 		ExcelRow minMaxRow = summarySheet.initRow();
 		minMaxRow.addCell(getMessage("label.number.learners"), true);
-		minMaxRow.addCell(totalNumEntries);
+		minMaxRow.addCell(sessionDTO.getCount());
 
 		minMaxRow = summarySheet.initRow();
 		minMaxRow.addCell(getMessage("label.lowest.mark"), true);
@@ -1772,7 +1766,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 		binSummaryRow.addCell(getMessage("label.number.learners"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 		binSummaryRow.addCell(getMessage("label.percentage"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		float totalNumEntriesAsFloat = totalNumEntries;
+		float totalNumEntriesAsFloat = sessionDTO.getCount();
 		for (Map.Entry<String, Integer> entry : markSummary.entrySet()) {
 		    binSummaryRow = summarySheet.initRow();
 		    binSummaryRow.addCell(entry.getKey());
@@ -1794,7 +1788,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		ExcelRow userResultRow = summarySheet.initRow();
 		userResultRow.addCell(userDto.getLogin());
 		userResultRow.addCell(userDto.getFirstName() + " " + userDto.getLastName());
-		userResultRow.addCell(userDto.getGrade());
+		userResultRow.addCell(userDto.isResultSubmitted() ? userDto.getGrade() : "-");
 	    }
 	    summarySheet.addEmptyRow();
 	}
@@ -1953,11 +1947,23 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 				userResultRow.addCell(seconds);
 				timeTakenCount++;
 				timeTakenTotal += seconds;
+			    } else {
+				userResultRow.addEmptyCell();
 			    }
+			} else {
+			    userResultRow.addEmptyCell();
 			}
 
 			//mark
-			userResultRow.addCell(questionResult.getMark());
+			//calculating markCount & markTotal
+			if (questionResult.getMark() != null && questionResult.getFinishDate() != null) {
+			    userResultRow.addCell(questionResult.getMark());
+
+			    markCount++;
+			    markTotal += questionResult.getMark();
+			} else {
+			    userResultRow.addEmptyCell();
+			}
 
 			if (assessment.isAllowAnswerJustification()) {
 			    userResultRow.addCell(AssessmentEscapeUtils
@@ -1966,11 +1972,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 			questionSummaryTabTemp.add(userResultRow);
 
-			//calculating markCount & markTotal
-			if (questionResult.getMark() != null) {
-			    markCount++;
-			    markTotal += questionResult.getMark();
-			}
 		    }
 		}
 
@@ -2736,6 +2737,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	}
 
 	for (AssessmentUserDTO userDto : userDtos) {
+	    // skip learners who have not submitted answers
+	    if (!userDto.isResultSubmitted()) {
+		continue;
+	    }
 	    float grade = userDto.getGrade();
 	    int bucketStart = intMinGrade;
 	    int bucketStop = bucketStart + bucketSize;
