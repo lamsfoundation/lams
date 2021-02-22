@@ -7,7 +7,7 @@ public class QbStatsActivityDTO {
     private ToolActivity activity;
     private QbQuestion qbQuestion;
     private String monitorURL;
-    private Integer participantCount;
+    private int participantCount;
     private Double difficultyIndex;
     private Double discriminationIndex;
     private Double pointBiserial;
@@ -36,12 +36,12 @@ public class QbStatsActivityDTO {
 	this.monitorURL = monitorURL;
     }
 
-    public Integer getParticipantCount() {
+    public int getParticipantCount() {
 	return participantCount;
     }
 
-    public void setParticipantCount(Integer testParticipantCount) {
-	this.participantCount = testParticipantCount;
+    public void setParticipantCount(int participantCount) {
+	this.participantCount = participantCount;
     }
 
     public Double getDifficultyIndex() {

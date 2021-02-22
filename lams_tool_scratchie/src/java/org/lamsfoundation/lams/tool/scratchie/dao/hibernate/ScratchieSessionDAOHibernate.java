@@ -52,6 +52,7 @@ public class ScratchieSessionDAOHibernate extends LAMSBaseDAO implements Scratch
     private static final String LOAD_MARKS = "SELECT mark FROM tl_lascrt11_session session "
 	    + " JOIN tl_lascrt11_scratchie scratchie ON session.scratchie_uid = scratchie.uid "
 	    + " WHERE session.scratching_finished = 1 AND scratchie.content_id = :toolContentId";
+    
     private static final String FIND_MARK_STATS = "SELECT MIN(mark) min_grade, AVG(mark) avg_grade, MAX(mark) max_grade, COUNT(mark) num_complete "
 	    + " FROM tl_lascrt11_session session "
 	    + " JOIN tl_lascrt11_scratchie scratchie ON session.scratchie_uid = scratchie.uid "
