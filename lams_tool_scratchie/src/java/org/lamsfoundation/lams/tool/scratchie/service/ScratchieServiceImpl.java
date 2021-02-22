@@ -1994,8 +1994,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    summary.setMark(numberOfFirstChoiceEvents);
 
 	    // round the percentage cell
-	    String totalPercentage = String.valueOf(
-		    Math.round((items.size() == 0) ? 0 : (double) numberOfFirstChoiceEvents * 100 / items.size()));
+	    String totalPercentage = String
+		    .valueOf((items.size() == 0) ? 0 : (double) numberOfFirstChoiceEvents * 100 / items.size());
 	    summary.setTotalPercentage(Double.valueOf(totalPercentage));
 
 	}
@@ -2003,7 +2003,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	for (ScratchieItem item : itemList) {
 	    item.setCorrectOnFirstAttemptPercent(
-		    groupSummaries.isEmpty() ? 0 : item.getCorrectOnFirstAttemptCount() * 100 / groupSummaries.size());
+		    groupSummaries.isEmpty() ? 0 : (double) item.getCorrectOnFirstAttemptCount() * 100 / groupSummaries.size());
 	}
 
 	return model;
