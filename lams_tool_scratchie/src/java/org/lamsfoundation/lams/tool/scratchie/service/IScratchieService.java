@@ -447,10 +447,10 @@ public interface IScratchieService extends ICommonToolService {
     int getMaxPossibleScore(Scratchie scratchie);
 
     /** Get the raw marks for display in a graph in monitoring */
-    List<Number> getMarksArray(Long contentId);
+    List<Integer> getMarksArray(Long contentId);
 
     /** Get the statistics such as average, max, min for the marks. Used in monitoring */
-    LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId);
+    LeaderResultsDTO getLeaderResultsDTOForLeaders(Long toolContentId);
 
     Map<String, Object> prepareStudentChoicesData(Scratchie scratchie);
 

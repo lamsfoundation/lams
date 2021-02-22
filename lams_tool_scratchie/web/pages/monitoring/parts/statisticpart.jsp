@@ -41,7 +41,7 @@
                                 <fmt:message key="label.number.groups.finished" />:
                             </td>
                             <td class="text-right">
-                                <c:out value="${leaderDto.numberGroupsLeaderFinished}" />
+                                <c:out value="${leaderDto.count}" />
                             </td>
                         </tr>
                         <tr>
@@ -49,15 +49,15 @@
                                 <fmt:message key="label.lowest.mark"/>
                             </td>
                             <td class="text-right">
-                                <c:out value="${leaderDto.minMark}" />
+                                <c:out value="${leaderDto.minString}" />
                             </td>
                         </tr>
                         <tr>
                             <td class="field-name" >
-                                <fmt:message key="label.median.mark" />:
+                                <fmt:message key="label.median.mark" />
                             </td>
                             <td class="text-right">
-                                -
+                               <c:out value="${leaderDto.medianString}" />
                             </td>
                         </tr>
                     </table>    
@@ -66,10 +66,10 @@
 					<table class="table table-striped table-hover table-condensed">
                         <tr>
                             <td class="field-name" >
-                                <fmt:message key="label.average.mark" />:
+                                <fmt:message key="label.average.mark" />
                             </td>
                             <td class="text-right">
-                                <c:out value="${leaderDto.avgMark}" />
+                                <c:out value="${leaderDto.averageString}" />
                             </td>
                         </tr>
                         <tr>
@@ -77,15 +77,15 @@
                                 <fmt:message key="label.highest.mark"/>
                             </td>
                             <td class="text-right">
-                                <c:out value="${leaderDto.maxMark}" />
+                                <c:out value="${leaderDto.maxString}" />
                             </td>
                         </tr>
                         <tr>
                             <td class="field-name" >
-                                <fmt:message key="label.modes.mark" />:
+                                <fmt:message key="label.modes.mark" />
                             </td>
                             <td class="text-right">
-                                -
+                                <c:out value="${leaderDto.modesString}" />
                             </td>
                         </tr>
                     </table>

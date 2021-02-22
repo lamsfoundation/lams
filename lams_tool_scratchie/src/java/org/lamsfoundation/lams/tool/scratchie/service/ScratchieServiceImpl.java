@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -113,7 +112,6 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.excel.ExcelRow;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 
@@ -1923,26 +1921,16 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     }
 
     @Override
-    public List<Number> getMarksArray(Long toolContentId) {
+    public List<Integer> getMarksArray(Long toolContentId) {
 	return scratchieSessionDao.getRawLeaderMarksByToolContentId(toolContentId);
     }
 
     @Override
-    public LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId) {
-	LeaderResultsDTO newDto = new LeaderResultsDTO(contentId);
-	Object[] markStats = scratchieSessionDao.getStatsMarksForLeaders(contentId);
-	if (markStats != null) {
-	    newDto.setMinMark(
-		    markStats[0] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[0], (Locale) null, 2)
-			    : "0.00");
-	    newDto.setAvgMark(
-		    markStats[1] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[1], (Locale) null, 2)
-			    : "0.00");
-	    newDto.setMaxMark(
-		    markStats[2] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[2], (Locale) null, 2)
-			    : "0.00");
-	    newDto.setNumberGroupsLeaderFinished((Integer) markStats[3]);
-	}
+    public LeaderResultsDTO getLeaderResultsDTOForLeaders(Long toolContentId) {
+
+	List<Integer> marks = scratchieSessionDao.getRawLeaderMarksByToolContentId(toolContentId);
+	LeaderResultsDTO newDto = new LeaderResultsDTO(toolContentId, marks);
+
 	return newDto;
     }
 

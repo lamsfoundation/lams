@@ -30,8 +30,6 @@ import java.util.TreeSet;
 
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
-import org.hibernate.type.FloatType;
-import org.hibernate.type.IntegerType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieSessionDAO;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
@@ -50,11 +48,6 @@ public class ScratchieSessionDAOHibernate extends LAMSBaseDAO implements Scratch
 	    + " as p where p.scratchie.contentId=? order by p.sessionName asc";
 
     private static final String LOAD_MARKS = "SELECT mark FROM tl_lascrt11_session session "
-	    + " JOIN tl_lascrt11_scratchie scratchie ON session.scratchie_uid = scratchie.uid "
-	    + " WHERE session.scratching_finished = 1 AND scratchie.content_id = :toolContentId";
-    
-    private static final String FIND_MARK_STATS = "SELECT MIN(mark) min_grade, AVG(mark) avg_grade, MAX(mark) max_grade, COUNT(mark) num_complete "
-	    + " FROM tl_lascrt11_session session "
 	    + " JOIN tl_lascrt11_scratchie scratchie ON session.scratchie_uid = scratchie.uid "
 	    + " WHERE session.scratching_finished = 1 AND scratchie.content_id = :toolContentId";
 
@@ -91,25 +84,10 @@ public class ScratchieSessionDAOHibernate extends LAMSBaseDAO implements Scratch
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Number> getRawLeaderMarksByToolContentId(Long toolContentId) {
-	NativeQuery<?> query = getSession().createNativeQuery(LOAD_MARKS);
+    public List<Integer> getRawLeaderMarksByToolContentId(Long toolContentId) {
+	NativeQuery<Integer> query = getSession().createNativeQuery(LOAD_MARKS);
 	query.setParameter("toolContentId", toolContentId);
-	return (List<Number>) query.list();
-    }
-
-    @Override
-    public Object[] getStatsMarksForLeaders(Long toolContentId) {
-	NativeQuery<?> query = getSession().createNativeQuery(FIND_MARK_STATS)
-		.addScalar("min_grade", FloatType.INSTANCE).addScalar("avg_grade", FloatType.INSTANCE)
-		.addScalar("max_grade", FloatType.INSTANCE).addScalar("num_complete", IntegerType.INSTANCE);
-	query.setParameter("toolContentId", toolContentId);
-	@SuppressWarnings("unchecked")
-	List<Object[]> list = (List<Object[]>) query.list();
-	if ((list == null) || (list.size() == 0)) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
+	return query.list();
     }
 
     @Override
