@@ -1405,8 +1405,38 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	ExcelSheet reportByTeamSheet = new ExcelSheet(getMessage("label.report.by.team.tra"));
 	sheets.add(reportByTeamSheet);
 
-	row = reportByTeamSheet.initRow();
-	row.addCell(getMessage("label.quick.analysis"), true);
+	LeaderResultsDTO overallDTO = getLeaderResultsDTOForLeaders(contentId);
+
+	ExcelRow overallSummaryRow = reportByTeamSheet.initRow();
+	overallSummaryRow.addCell(getMessage("label.export.overall.summary"), true);
+	reportByTeamSheet.addEmptyRow();
+
+	overallSummaryRow = reportByTeamSheet.initRow();
+	overallSummaryRow.addCell(getMessage("label.number.groups.finished"), true);
+	overallSummaryRow.addCell(overallDTO.getCount());
+
+	overallSummaryRow = reportByTeamSheet.initRow();
+	overallSummaryRow.addCell(getMessage("label.lowest.mark"), true);
+	overallSummaryRow.addCell(overallDTO.getMin() == null ? 0 : overallDTO.getMin());
+
+	overallSummaryRow = reportByTeamSheet.initRow();
+	overallSummaryRow.addCell(getMessage("label.highest.mark"), true);
+	overallSummaryRow.addCell(overallDTO.getMax() == null ? 0 : overallDTO.getMax());
+
+	overallSummaryRow = reportByTeamSheet.initRow();
+	overallSummaryRow.addCell(getMessage("label.average.mark") + ":", true);
+	overallSummaryRow.addCell(overallDTO.getAverage() == null ? 0 : overallDTO.getAverage());
+
+	overallSummaryRow = reportByTeamSheet.initRow();
+	overallSummaryRow.addCell(getMessage("label.median.mark"), true);
+	overallSummaryRow.addCell(overallDTO.getMedian() == null ? 0 : overallDTO.getMedian());
+
+	overallSummaryRow = reportByTeamSheet.initRow();
+	overallSummaryRow.addCell(getMessage("label.modes.mark"), true);
+	overallSummaryRow.addCell(overallDTO.getModesString());
+	reportByTeamSheet.addEmptyRow();
+	reportByTeamSheet.addEmptyRow();
+	reportByTeamSheet.addEmptyRow();
 
 	row = reportByTeamSheet.initRow();
 	row.addEmptyCell();
@@ -2002,8 +2032,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	model.put("sessionDtos", groupSummaries);
 
 	for (ScratchieItem item : itemList) {
-	    item.setCorrectOnFirstAttemptPercent(
-		    groupSummaries.isEmpty() ? 0 : (double) item.getCorrectOnFirstAttemptCount() * 100 / groupSummaries.size());
+	    item.setCorrectOnFirstAttemptPercent(groupSummaries.isEmpty() ? 0
+		    : (double) item.getCorrectOnFirstAttemptCount() * 100 / groupSummaries.size());
 	}
 
 	return model;
