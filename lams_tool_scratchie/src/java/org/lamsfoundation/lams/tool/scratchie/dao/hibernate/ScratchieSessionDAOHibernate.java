@@ -49,7 +49,7 @@ public class ScratchieSessionDAOHibernate extends LAMSBaseDAO implements Scratch
 
     private static final String LOAD_MARKS = "SELECT mark FROM tl_lascrt11_session session "
 	    + " JOIN tl_lascrt11_scratchie scratchie ON session.scratchie_uid = scratchie.uid "
-	    + " WHERE session.scratching_finished = 1 AND scratchie.content_id = :toolContentId";
+	    + " WHERE scratchie.content_id = :toolContentId";
 
     @SuppressWarnings("rawtypes")
     @Override
