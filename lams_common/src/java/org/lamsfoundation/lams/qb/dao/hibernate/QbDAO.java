@@ -49,7 +49,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    + "WHERE tq.qb_question_uid = :qbQuestionUid GROUP BY opt HAVING opt IS NOT NULL";
 
     private static final String FIND_ANSWERS_BY_ACTIVITY = "SELECT COALESCE(mcu.que_usr_id, su.user_id, au.user_id) AS user_id, "
-	    + "COALESCE(a.qb_option_uid, aa.question_option_uid) AS opt "
+	    + "IF(su.user_id IS NULL, COALESCE(a.qb_option_uid, aa.question_option_uid), IF(COUNT(a.qb_option_uid) > 1, -1, a.qb_option_uid)) AS opt "
 	    + "FROM lams_learning_activity AS act JOIN lams_qb_tool_question AS tq USING (tool_content_id) "
 	    + "JOIN lams_qb_tool_answer AS a USING (tool_question_uid) "
 	    + "LEFT JOIN tl_lamc11_usr_attempt AS mca ON a.answer_uid = mca.uid "
@@ -61,7 +61,8 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    + "LEFT JOIN tl_laasse10_question_result AS aq ON a.answer_uid = aq.uid "
 	    + "LEFT JOIN tl_laasse10_assessment_result AS ar ON aq.result_uid = ar.uid AND ar.finish_date IS NOT NULL AND ar.latest = 1 "
 	    + "LEFT JOIN tl_laasse10_user AS au ON ar.user_uid = au.uid AND au.session_finished = 1 "
-	    + "WHERE act.activity_id = :activityId AND tq.qb_question_uid = :qbQuestionUid HAVING opt IS NOT NULL AND user_id IS NOT NULL";
+	    + "WHERE act.activity_id = :activityId AND tq.qb_question_uid = :qbQuestionUid GROUP BY user_id "
+	    + "HAVING opt IS NOT NULL AND user_id IS NOT NULL";
 
     private static final String FIND_BURNING_QUESTIONS = "SELECT b.question, COUNT(bl.uid) FROM ScratchieBurningQuestion b LEFT OUTER JOIN "
 	    + "BurningQuestionLike AS bl ON bl.burningQuestion = b WHERE b.scratchieItem.qbQuestion.uid = :qbQuestionUid "
