@@ -54,11 +54,6 @@
 	</error-page>
 
 	<jsp-config>
-		<jsp-property-group>
-			<url-pattern>*.jsp</url-pattern>
-			<page-encoding>UTF-8</page-encoding>
-			<default-content-type>text/html; charset=UTF-8</default-content-type>
-  		</jsp-property-group>
   		
 		<!-- ======================================================== -->
 		<!-- JSTL 1.2 Tag Library -->
@@ -86,6 +81,12 @@
 			<taglib-uri>tags-lams</taglib-uri>
 			<taglib-location>/WEB-INF/tlds/lams/lams.tld</taglib-location>
 		</taglib>
+		
+		<jsp-property-group>
+			<url-pattern>*.jsp</url-pattern>
+			<page-encoding>UTF-8</page-encoding>
+			<default-content-type>text/html; charset=UTF-8</default-content-type>
+  		</jsp-property-group>
 
 	</jsp-config>
 
