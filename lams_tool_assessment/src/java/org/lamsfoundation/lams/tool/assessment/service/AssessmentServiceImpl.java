@@ -3191,67 +3191,57 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
 		QbQuestion qbQuestion = questionResult.getQbQuestion();
 
-		List<String> answers = new LinkedList<>();
-		List<Long> optionUids = new LinkedList<>();
-
 		if (qbQuestion.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE) {
 
 		    for (QbOption option : qbQuestion.getQbOptions()) {
 			for (AssessmentOptionAnswer optionAnswer : questionResult.getOptionAnswers()) {
 			    if (optionAnswer.getAnswerBoolean()
 				    && (optionAnswer.getOptionUid().equals(option.getUid()))) {
-				optionUids.add(option.getUid());
+				ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
+
+				confidenceLevelDto.setUserId(user.getUserId().intValue());
+				String userName = StringUtils.isBlank(user.getFirstName())
+					&& StringUtils.isBlank(user.getLastName()) ? user.getLoginName()
+						: user.getFirstName() + " " + user.getLastName();
+				confidenceLevelDto.setUserName(userName);
+				confidenceLevelDto
+					.setPortraitUuid(portraitUuid == null ? null : portraitUuid.toString());
+				confidenceLevelDto.setQbQuestionUid(qbQuestion.getUid());
+
+				confidenceLevelDto.setLevel(questionResult.getConfidenceLevel());
+				confidenceLevelDto.setType(assessment.getConfidenceLevelsType());
+				confidenceLevelDto.setQbOptionUid(optionAnswer.getOptionUid());
+
+				confidenceLevelDtos.add(confidenceLevelDto);
 			    }
 			}
 		    }
-
-		} else if (qbQuestion.getType() == QbQuestion.TYPE_MATCHING_PAIRS) {
-
-		} else if (qbQuestion.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS) {
-		    answers.add(questionResult.getAnswer());
-
-		} else if (qbQuestion.getType() == QbQuestion.TYPE_NUMERICAL) {
-		    answers.add(questionResult.getAnswer());
-
-		} else if (qbQuestion.getType() == QbQuestion.TYPE_TRUE_FALSE) {
-		    if (questionResult.getAnswer() != null) {
-			answers.add("" + questionResult.getAnswerBoolean());
-		    }
-
-		} else if (qbQuestion.getType() == QbQuestion.TYPE_ESSAY) {
-		    answers.add(questionResult.getAnswer());
-
-		} else if (qbQuestion.getType() == QbQuestion.TYPE_ORDERING) {
-
 		} else if (qbQuestion.getType() == QbQuestion.TYPE_MARK_HEDGING) {
+		    for (AssessmentOptionAnswer optionAnswer : questionResult.getOptionAnswers()) {
+			if (optionAnswer.getAnswerInt() > 0) {
+			    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
 
+			    confidenceLevelDto.setUserId(user.getUserId().intValue());
+			    String userName = StringUtils.isBlank(user.getFirstName())
+				    && StringUtils.isBlank(user.getLastName()) ? user.getLoginName()
+					    : user.getFirstName() + " " + user.getLastName();
+			    confidenceLevelDto.setUserName(userName);
+			    confidenceLevelDto.setPortraitUuid(portraitUuid == null ? null : portraitUuid.toString());
+			    confidenceLevelDto.setQbQuestionUid(qbQuestion.getUid());
+
+			    // each option which got a mark gets a confidence level
+			    // it is projected to 1 - 10 points. For example answer with 3 marks out of 5 marks gets level 6.
+			    int level = Float.valueOf(optionAnswer.getAnswerInt() / questionResult.getMaxMark() * 10)
+				    .intValue();
+			    confidenceLevelDto.setLevel(level);
+			    confidenceLevelDto.setType(ConfidenceLevelDTO.CONFIDENCE_LEVELS_TYPE_0_TO_100);
+			    confidenceLevelDto.setQbOptionUid(optionAnswer.getOptionUid());
+
+			    confidenceLevelDtos.add(confidenceLevelDto);
+			}
+		    }
 		}
 
-		for (Long optionUid : optionUids) {
-		    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
-		    confidenceLevelDto.setUserId(user.getUserId().intValue());
-		    String userName = StringUtils.isBlank(user.getFirstName())
-			    && StringUtils.isBlank(user.getLastName()) ? user.getLoginName()
-				    : user.getFirstName() + " " + user.getLastName();
-		    confidenceLevelDto.setUserName(userName);
-		    confidenceLevelDto.setPortraitUuid(portraitUuid == null ? null : portraitUuid.toString());
-		    confidenceLevelDto.setLevel(questionResult.getConfidenceLevel());
-		    confidenceLevelDto.setType(assessment.getConfidenceLevelsType());
-		    confidenceLevelDto.setQbQuestionUid(qbQuestion.getUid());
-		    confidenceLevelDto.setQbOptionUid(optionUid);
-
-		    confidenceLevelDtos.add(confidenceLevelDto);
-		}
-		for (String answer : answers) {
-//		    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
-//		    confidenceLevelDto.setUserId(userId.intValue());
-//		    confidenceLevelDto.setPortraitUuid(portraitUuid);
-//		    confidenceLevelDto.setLevel(questionResult.getConfidenceLevel());
-//		    confidenceLevelDto.setQbQuestionUid(qbQuestion.getUid());
-//		    confidenceLevelDto.setQbOptionUid(optionUid);
-//
-//		    confidenceLevelDtos.add(confidenceLevelDto);
-		}
 	    }
 
 	}
