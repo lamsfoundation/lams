@@ -432,7 +432,7 @@ public class UserManagementService implements IUserManagementService {
 
 	user.setChangePassword(false);
 
-	baseDAO.update(user);
+	baseDAO.insertOrUpdate(user);
 
 	logPasswordChanged(user, user);
     }
