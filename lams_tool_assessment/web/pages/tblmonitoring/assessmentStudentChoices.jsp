@@ -3,8 +3,7 @@
 <style>
 	.question-title {
 		white-space: nowrap;
-    	overflow: scroll;
-    	max-width: 30ch;
+    	overflow: auto;
 	} 
 	
 	#completion-charts-container > div {
