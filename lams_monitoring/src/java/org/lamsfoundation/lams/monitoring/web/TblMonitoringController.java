@@ -140,61 +140,116 @@ public class TblMonitoringController {
 	Set<Group> groups = grouping == null ? null : grouping.getGroups();
 
 	Set<TblGroupDTO> groupDtos = new TreeSet<>();
-	if (groups != null) {
-	    for (Group group : groups) {
-		TblGroupDTO groupDto = new TblGroupDTO(group);
-		groupDtos.add(groupDto);
+	for (Group group : groups) {
+	    TblGroupDTO groupDto = new TblGroupDTO(group);
+	    groupDtos.add(groupDto);
 
-		if (group.getUsers() != null) {
-		    for (User user : group.getUsers()) {
-			TblUserDTO userDto = new TblUserDTO(user.getUserDTO());
-			groupDto.getUserList().add(userDto);
+	    if (group.getUsers() != null) {
+		for (User user : group.getUsers()) {
+		    TblUserDTO userDto = new TblUserDTO(user.getUserDTO());
+		    groupDto.getUserList().add(userDto);
 
-			//set up all user leaders
-			if (leaderUserIds.contains(user.getUserId().longValue())) {
-			    userDto.setGroupLeader(true);
-			    groupDto.setGroupLeader(userDto);
-			}
-
-			if (isIraAvailable) {
-			    // find according iraGradebookUserActivity
-			    for (GradebookUserActivity iraGradebookUserActivity : iraGradebookUserActivities) {
-				if (iraGradebookUserActivity.getLearner().getUserId().equals(user.getUserId())) {
-				    userDto.setIraScore(iraGradebookUserActivity.getMark());
-
-				    break;
-				}
-			    }
-
-			    Integer correctAnswerCount = commonAssessmentService.countCorrectAnswers(iraToolContentId,
-				    user.getUserId());
-			    if (correctAnswerCount != null) {
-				userDto.setIraCorrectAnswerCount(correctAnswerCount);
-			    }
-			}
+		    //set up all user leaders
+		    if (leaderUserIds.contains(user.getUserId().longValue())) {
+			userDto.setGroupLeader(true);
+			groupDto.setGroupLeader(userDto);
 		    }
 
-		    if (isTraAvailable && groupDto.getGroupLeader() != null) {
-			//find according traGradebookUserActivity
-			for (GradebookUserActivity traGradebookUserActivity : traGradebookUserActivities) {
-			    if (traGradebookUserActivity.getLearner().getUserId()
-				    .equals(groupDto.getGroupLeader().getUserID())) {
-				groupDto.setTraScore(traGradebookUserActivity.getMark());
+		    if (isIraAvailable) {
+			// find according iraGradebookUserActivity
+			for (GradebookUserActivity iraGradebookUserActivity : iraGradebookUserActivities) {
+			    if (iraGradebookUserActivity.getLearner().getUserId().equals(user.getUserId())) {
+				userDto.setIraScore(iraGradebookUserActivity.getMark());
 
 				break;
 			    }
 			}
 
-			Integer correctAnswerCount = commonScratchieService.countCorrectAnswers(traToolContentId,
-				groupDto.getGroupLeader().getUserID());
+			Integer correctAnswerCount = commonAssessmentService.countCorrectAnswers(iraToolContentId,
+				user.getUserId());
 			if (correctAnswerCount != null) {
-			    groupDto.setTraCorrectAnswerCount(correctAnswerCount);
+			    userDto.setIraCorrectAnswerCount(correctAnswerCount);
 			}
+		    }
+		}
+
+		if (isTraAvailable && groupDto.getGroupLeader() != null) {
+		    //find according traGradebookUserActivity
+		    for (GradebookUserActivity traGradebookUserActivity : traGradebookUserActivities) {
+			if (traGradebookUserActivity.getLearner().getUserId()
+				.equals(groupDto.getGroupLeader().getUserID())) {
+			    groupDto.setTraScore(traGradebookUserActivity.getMark());
+
+			    break;
+			}
+		    }
+
+		    Integer correctAnswerCount = commonScratchieService.countCorrectAnswers(traToolContentId,
+			    groupDto.getGroupLeader().getUserID());
+		    if (correctAnswerCount != null) {
+			groupDto.setTraCorrectAnswerCount(correctAnswerCount);
 		    }
 		}
 	    }
 	}
 	request.setAttribute("groupDtos", groupDtos);
+
+	double highestIraScoreAverage = 0;
+	double lowestIraScoreAverage = Double.MAX_VALUE;
+	double highestTraScore = 0;
+	double lowestTraScore = Double.MAX_VALUE;
+
+	int iraGroupsCount = 0;
+	int traGroupsCount = 0;
+	int iraCorrectAnswerCountAverageSum = 0;
+	int traCorrectAnswerSum = 0;
+	double iraAverageScoreSum = 0;
+	double traScoreSum = 0;
+
+	for (TblGroupDTO group : groupDtos) {
+	    Double iraScoreAverage = group.getIraScoreAverage();
+	    Double traScore = group.getTraScore();
+
+	    if (iraScoreAverage != null) {
+		iraAverageScoreSum += iraScoreAverage;
+		iraCorrectAnswerCountAverageSum += group.getIraCorrectAnswerCountAverage();
+		iraGroupsCount++;
+
+		if (iraScoreAverage > highestIraScoreAverage) {
+		    highestIraScoreAverage = iraScoreAverage;
+		} else if (iraScoreAverage < lowestIraScoreAverage) {
+		    lowestIraScoreAverage = iraScoreAverage;
+		}
+	    }
+
+	    if (traScore != null) {
+		traScoreSum += traScore;
+		traCorrectAnswerSum += group.getTraCorrectAnswerCount();
+		traGroupsCount++;
+
+		if (traScore > highestTraScore) {
+		    highestTraScore = traScore;
+		} else if (traScore < lowestTraScore) {
+		    lowestTraScore = traScore;
+		}
+	    }
+	}
+
+	if (iraGroupsCount > 1) {
+	    request.setAttribute("highestIraScoreAverage", highestIraScoreAverage);
+	    request.setAttribute("lowestIraScoreAverage", highestIraScoreAverage <= 0 ? 0 : lowestIraScoreAverage);
+
+	    request.setAttribute("averageIraScoreAverage", iraAverageScoreSum / iraGroupsCount);
+	    request.setAttribute("averageIraCorrectAnswerCountAverage",
+		    iraCorrectAnswerCountAverageSum / iraGroupsCount);
+	}
+	if (traGroupsCount > 1) {
+	    request.setAttribute("highestTraScore", highestTraScore);
+	    request.setAttribute("lowestTraScore", highestTraScore <= 0 ? 0 : lowestTraScore);
+
+	    request.setAttribute("averageTraScore", traScoreSum / traGroupsCount);
+	    request.setAttribute("averageTraCorrectAnswerCount", traCorrectAnswerSum / traGroupsCount);
+	}
 
 	return "tblmonitor/teams";
     }

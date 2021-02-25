@@ -2,6 +2,7 @@ package org.lamsfoundation.lams.monitoring.dto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalDouble;
 
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.util.AlphanumComparator;
@@ -96,14 +97,16 @@ public class TblGroupDTO implements Comparable {
 	this.traCorrectAnswerCount = traCorrectAnswerCount;
     }
 
-    public double getIraScoreAverage() {
-	return userList.stream().filter(u -> u.getIraScore() != null).mapToDouble(TblUserDTO::getIraScore).average()
-		.orElse(0);
+    public Double getIraScoreAverage() {
+	OptionalDouble result = userList.stream().filter(u -> u.getIraScore() != null)
+		.mapToDouble(TblUserDTO::getIraScore).average();
+	return result.isPresent() ? result.getAsDouble() : null;
     }
 
-    public double getIraCorrectAnswerCountAverage() {
-	return userList.stream().filter(u -> u.getIraScore() != null).mapToDouble(TblUserDTO::getIraCorrectAnswerCount)
-		.average().orElse(0);
+    public Double getIraCorrectAnswerCountAverage() {
+	OptionalDouble result = userList.stream().filter(u -> u.getIraScore() != null)
+		.mapToDouble(TblUserDTO::getIraCorrectAnswerCount).average();
+	return result.isPresent() ? result.getAsDouble() : null;
     }
 
     public double getIraHighestScore() {

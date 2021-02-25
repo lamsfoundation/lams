@@ -176,12 +176,175 @@
 <div class="row no-gutter">
 <div class="col-xs-12 col-md-12 col-lg-12">
 
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h4 class="panel-title panel-collapse">
+				<a data-toggle="collapse" data-groupid="0" class="collapsed group-title">
+					<fmt:message key="label.summary"/>
+				</a>
+			</h4>
+		</div>
+
+		<div id="collapse-0" class="panel-collapse collapse in">
+			<div class="panel-body">
+				
+				
+					<div class="table-responsive">
+						<table class="table table-striped table-hover table-condensed">
+							<thead>
+								<tr>
+									<th>
+										<fmt:message key="label.teams"/>
+									</th>
+									
+									<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
+										<th class="text-center">
+											<fmt:message key="label.ira.mark.average"/>
+										</th>
+										
+										<th class="text-center">
+											<fmt:message key="label.ira.correct.count.average"/>
+										</th>
+										
+										<th></th>
+									</c:if>
+									
+									<c:if test="${isScratchieAvailable}">
+										<th class="text-center" style="${isIraAssessmentAvailable || isIraMcqAvailable ? 'border-left: 1px solid #ddd !important' : ''}">
+											<fmt:message key="label.tra.mark"/>
+										</th>
+										
+										<th class="text-center">
+											<fmt:message key="label.tra.correct.count"/>
+										</th>
+										
+										<th></th>
+									</c:if>
+								</tr>
+							</thead>
+	
+							<tbody>
+								<c:forEach var="groupDto" items="${groupDtos}">
+								
+									<tr>
+										<td>
+											<c:out value="${groupDto.groupName}" />
+										</td>
+										
+										<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
+											<td class="text-center">
+												<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${groupDto.iraScoreAverage}" />
+											</td>
+											
+											<td class="text-center">
+												<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${groupDto.iraCorrectAnswerCountAverage}" />
+											</td>
+											
+											<td class="text-center">
+												<c:choose>
+													<c:when test="${not empty highestIraScoreAverage && groupDto.iraScoreAverage >= highestIraScoreAverage}">
+														<span class="label label-success"><fmt:message key="label.highest"/></span>
+													</c:when>
+													<c:when test="${not empty lowestIraScoreAverage && groupDto.iraScoreAverage <= lowestIraScoreAverage}">
+														<span class="label label-danger"><fmt:message key="label.lowest"/></span>
+													</c:when>
+												</c:choose>		
+											</td>
+										</c:if>
+										
+										<c:if test="${isScratchieAvailable}">
+											<td class="text-center" style="${isIraAssessmentAvailable || isIraMcqAvailable ? 'border-left: 1px solid #ddd !important' : ''}">
+												${groupDto.traScore}
+											</td>
+											
+											<td class="text-center">
+												${groupDto.traCorrectAnswerCount}
+											</td>
+											
+											<td class="text-center">
+												<c:choose>
+													<c:when test="${not empty highestTraScore && groupDto.traScore >= highestTraScore}">
+														<span class="label label-success"><fmt:message key="label.highest"/></span>
+													</c:when>
+													<c:when test="${not empty lowestTraScore && groupDto.traScore <= lowestTraScore}">
+														<span class="label label-danger"><fmt:message key="label.lowest"/></span>
+													</c:when>
+												</c:choose>		
+											</td>
+										</c:if>
+									</tr>
+								</c:forEach>
+								
+								<c:if test="${not empty averageIraScoreAverage or not empty averageTraScore}">
+									<tr>
+										<th><fmt:message key="label.average"/></th>
+										
+										<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
+											<td class="text-center">
+												<c:choose>
+													<c:when test="${empty averageIraScoreAverage}">
+														-
+													</c:when>
+													<c:otherwise>
+														<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${averageIraScoreAverage}" />
+													</c:otherwise>
+												</c:choose>
+											</td>
+											
+											<td class="text-center">
+												<c:choose>
+													<c:when test="${empty averageIraCorrectAnswerCountAverage}">
+														-
+													</c:when>
+													<c:otherwise>
+														<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${averageIraCorrectAnswerCountAverage}" />
+													</c:otherwise>
+												</c:choose>
+											</td>
+											
+											<td></td>
+										</c:if>
+										
+										<c:if test="${isScratchieAvailable}">
+											<td class="text-center" style="${isIraAssessmentAvailable || isIraMcqAvailable ? 'border-left: 1px solid #ddd !important' : ''}">
+												<c:choose>
+													<c:when test="${empty averageTraScore}">
+														-
+													</c:when>
+													<c:otherwise>
+														<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${averageTraScore}" />
+													</c:otherwise>
+												</c:choose>
+											</td>
+											
+											<td class="text-center">
+												<c:choose>
+													<c:when test="${empty averageTraCorrectAnswerCount}">
+														-
+													</c:when>
+													<c:otherwise>
+														<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${averageTraCorrectAnswerCount}" />
+													</c:otherwise>
+												</c:choose>
+											</td>
+											
+											<td></td>
+										</c:if>
+									</tr>
+								</c:if>
+							</tbody>
+						</table>
+					</div>
+			</div>
+		</div>
+	</div>
+
 	<c:forEach var="groupDto" items="${groupDtos}">
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h4 class="panel-title panel-collapse">
 					<a data-toggle="collapse" data-groupid="${groupDto.groupID}" class="collapsed group-title" id="group-name-${groupDto.groupID}">
-						${groupDto.groupName}
+						<c:out value="${groupDto.groupName}" />
 					</a>
 				</h4>
 			</div>
@@ -275,7 +438,7 @@
 														</a>
 													</c:when>
 													<c:otherwise>
-														0
+														-
 													</c:otherwise>
 												</c:choose>
 											</td>
@@ -290,7 +453,7 @@
 														</a>													
 													</c:when>
 													<c:otherwise>
-														0
+														-
 													</c:otherwise>
 												</c:choose>
 											</td>
@@ -310,18 +473,20 @@
 										</tr>
 									</c:forEach>
 									
-									<tr>
-										<th><fmt:message key="label.average"/></th>
-										<td class="text-center">
-											<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${groupDto.iraScoreAverage}" />
-										</td>
-										
-										<td class="text-center">
-											<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${groupDto.iraCorrectAnswerCountAverage}" />
-										</td>
-										
-										<td></td>
-									</tr>
+									<c:if test="${fn:length(groupDto.userList) > 1}">
+										<tr>
+											<th><fmt:message key="label.average"/></th>
+											<td class="text-center">
+												<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${groupDto.iraScoreAverage}" />
+											</td>
+											
+											<td class="text-center">
+												<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${groupDto.iraCorrectAnswerCountAverage}" />
+											</td>
+											
+											<td></td>
+										</tr>
+									</c:if>
 								</tbody>
 							</table>
 						</div>

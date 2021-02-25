@@ -3332,7 +3332,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	if (user == null) {
 	    return null;
 	}
-	AssessmentResult assessmentResult = getLastAssessmentResult(assessment.getUid(), user.getUid());
+	AssessmentResult assessmentResult = getLastAssessmentResult(assessment.getUid(), Integer.valueOf(userId).longValue());
 	if (assessmentResult == null) {
 	    return 0;
 	}
