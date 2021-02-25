@@ -62,6 +62,8 @@ public class ValidationUtil {
     private final static Pattern REGEX_PASSWORD_CHARATERS_ALLOWED = Pattern
 	    .compile("^[A-Za-z0-9\\d`~!@#$%^&*\\(\\)_\\-+={}\\[\\]\\\\|:\\;\\\"\\'\\<\\>,.?\\/]*$");
 
+    private static BreachDatabase TOP_100K_PASSWORDS_DB = null;
+
     /**
      * Checks whether supplied username is valid. Username can only contain alphanumeric characters and no spaces.
      */
@@ -205,8 +207,12 @@ public class ValidationUtil {
 
     public static boolean isPasswordNotBreached(String password) {
 	try {
+	    // load file with passwords only once
+	    if (TOP_100K_PASSWORDS_DB == null) {
+		TOP_100K_PASSWORDS_DB = BreachDatabase.top100K();
+	    }
 	    // check for a static list of 100k known weak passwords
-	    PasswordPolicy commonPasswordPolicy = new PasswordPolicy(BreachDatabase.top100K(), 0, Integer.MAX_VALUE);
+	    PasswordPolicy commonPasswordPolicy = new PasswordPolicy(TOP_100K_PASSWORDS_DB, 0, Integer.MAX_VALUE);
 	    if (Status.OK != commonPasswordPolicy.check(password)) {
 		return false;
 	    }
