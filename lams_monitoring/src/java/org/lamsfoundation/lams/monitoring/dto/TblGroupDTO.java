@@ -21,10 +21,7 @@ public class TblGroupDTO implements Comparable {
     /**
      * Get the DTO for this group. Does not include the GroupBranchActivities as they will be in a separate array for
      * Flash.
-     *
-     * @param group
      */
-    @SuppressWarnings("unchecked")
     public TblGroupDTO(Group group) {
 	groupID = group.getGroupId();
 	groupName = group.getGroupName();
@@ -97,5 +94,15 @@ public class TblGroupDTO implements Comparable {
 
     public void setTraCorrectAnswerCount(int traCorrectAnswerCount) {
 	this.traCorrectAnswerCount = traCorrectAnswerCount;
+    }
+
+    public double getIraScoreAverage() {
+	return userList.stream().filter(u -> u.getIraScore() != null).mapToDouble(TblUserDTO::getIraScore).average()
+		.orElse(0);
+    }
+
+    public double getIraCorrectAnswerCountAverage() {
+	return userList.stream().filter(u -> u.getIraScore() != null).mapToDouble(TblUserDTO::getIraCorrectAnswerCount)
+		.average().orElse(0);
     }
 }

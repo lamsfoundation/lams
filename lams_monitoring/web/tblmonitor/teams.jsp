@@ -291,6 +291,16 @@
 											</td>
 										</tr>
 									</c:forEach>
+									
+									<tr>
+										<th><fmt:message key="label.average"/></th>
+										<td class="text-center">
+											<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${groupDto.iraScoreAverage}" />
+										</td>
+										<td class="text-center">
+											<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${groupDto.iraCorrectAnswerCountAverage}" />
+										</td>
+									</tr>
 								</tbody>
 							</table>
 						</div>
