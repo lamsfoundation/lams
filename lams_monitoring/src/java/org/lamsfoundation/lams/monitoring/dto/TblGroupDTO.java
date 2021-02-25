@@ -105,4 +105,14 @@ public class TblGroupDTO implements Comparable {
 	return userList.stream().filter(u -> u.getIraScore() != null).mapToDouble(TblUserDTO::getIraCorrectAnswerCount)
 		.average().orElse(0);
     }
+
+    public double getIraHighestScore() {
+	return userList.stream().filter(u -> u.getIraScore() != null).mapToDouble(TblUserDTO::getIraScore).max()
+		.orElse(0);
+    }
+
+    public double getIraLowestScore() {
+	return userList.stream().filter(u -> u.getIraScore() != null).mapToDouble(TblUserDTO::getIraScore).min()
+		.orElse(0);
+    }
 }

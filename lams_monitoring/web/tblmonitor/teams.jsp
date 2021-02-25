@@ -239,14 +239,19 @@
 										<th class="text-center">
 											<fmt:message key="label.ira.mark"/>
 										</th>
-									
+										
 										<th class="text-center">
 											<fmt:message key="label.ira.correct.count"/>
 										</th>
+										
+										<th></th>
 									</tr>
 								</thead>
 		
 								<tbody>
+									<c:set var="highestScore" value="${groupDto.iraHighestScore}" />
+									<c:set var="lowestScore" value="${groupDto.iraLowestScore}" />
+									
 									<c:forEach var="userDto" items="${groupDto.userList}">
 									
 										<tr>
@@ -267,7 +272,7 @@
 																data-user-id="${userDto.userID}"
 																data-ira-score="${userDto.iraScore}">
 															${userDto.iraScore}
-														</a>													
+														</a>
 													</c:when>
 													<c:otherwise>
 														0
@@ -289,6 +294,19 @@
 													</c:otherwise>
 												</c:choose>
 											</td>
+											
+											<td class="col-md-1 text-center">
+												<c:if test="${fn:length(groupDto.userList) > 1}">
+													<c:choose>
+														<c:when test="${highestScore > 0 && userDto.iraScore >= highestScore}">
+															<span class="label label-success"><fmt:message key="label.highest"/></span>
+														</c:when>
+														<c:when test="${lowestScore > 0 && userDto.iraScore <= lowestScore}">
+															<span class="label label-danger"><fmt:message key="label.lowest"/></span>
+														</c:when>
+													</c:choose>		
+												</c:if>
+											</td>
 										</tr>
 									</c:forEach>
 									
@@ -297,9 +315,12 @@
 										<td class="text-center">
 											<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${groupDto.iraScoreAverage}" />
 										</td>
+										
 										<td class="text-center">
 											<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${groupDto.iraCorrectAnswerCountAverage}" />
 										</td>
+										
+										<td></td>
 									</tr>
 								</tbody>
 							</table>
