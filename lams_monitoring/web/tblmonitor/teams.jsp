@@ -188,44 +188,78 @@
 	
 			<div id="collapse-${groupDto.groupID}" class="panel-collapse collapse in">
 				<div class="panel-body">
-	
-					<div class="table-responsive">
-						<table class="table table-striped table-hover table-condensed">
-							<thead>
-								<tr>
-									<th>
-										<fmt:message key="label.student"/>
-									</th>
-									
-									<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
-										<th class="text-center">
-											<fmt:message key="label.ira"/>
-										</th>
-									</c:if>
-									
-									<c:if test="${isScratchieAvailable}">
-										<th class="text-center">
-											<fmt:message key="label.tra"/>
-										</th>
-									</c:if>               
-								</tr>
-							</thead>
-	
-							<tbody>
-								<c:forEach var="userDto" items="${groupDto.userList}">
-								
+					<c:if test="${isScratchieAvailable}">
+															
+						<h4><fmt:message key="label.tra.mark"/>:
+							<c:choose>
+								<c:when test="${empty groupDto.traScore}">
+									-
+								</c:when>
+								<c:when test="${empty groupDto.groupLeader}">
+									${groupDto.traScore}
+								</c:when>
+								<c:otherwise>
+									<a data-toggle="modal" href="#tra-modal"
+									   data-user-id="${groupDto.groupLeader.userID}"
+									   data-tra-score="${groupDto.traScore}">
+										${groupDto.traScore}
+									</a>
+								</c:otherwise>
+							</c:choose>
+						</h4>
+						
+						<h4><fmt:message key="label.tra.correct.count"/>:
+							<c:choose>
+								<c:when test="${empty groupDto.traScore}">
+									-
+								</c:when>
+								<c:when test="${empty groupDto.groupLeader}">
+									${groupDto.traScore}
+								</c:when>
+								<c:otherwise>
+									<a data-toggle="modal" href="#tra-modal"
+									   data-user-id="${groupDto.groupLeader.userID}"
+									   data-tra-score="${groupDto.traScore}">
+										${groupDto.traCorrectAnswerCount}
+									</a>
+								</c:otherwise>
+							</c:choose>
+						</h4>
+					</c:if>
+					
+					<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
+						<div class="table-responsive">
+							<table class="table table-striped table-hover table-condensed">
+								<thead>
 									<tr>
-										<td class="col-md-7">
-											<span id="user-name-${userDto.userID}" class="belong-to-group-${groupDto.groupID} new-popover <c:if test="${userDto.groupLeader}">font-weight-bold</c:if>" 
-													data-portrait="${userDto.portraitUuid}" data-fullname="${userDto.lastName},&nbsp;${userDto.firstName}">
-												${userDto.lastName},&nbsp;${userDto.firstName} 
-											</span>
-											<c:if test="${userDto.groupLeader}">
-												<abbr title="Leader" class="fa fa-user-plus" style="color:darkorange"></abbr>
-											</c:if>
-										</td>
+										<th>
+											<fmt:message key="label.student"/>
+										</th>
 										
-										<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
+										<th class="text-center">
+											<fmt:message key="label.ira.mark"/>
+										</th>
+									
+										<th class="text-center">
+											<fmt:message key="label.ira.correct.count"/>
+										</th>
+									</tr>
+								</thead>
+		
+								<tbody>
+									<c:forEach var="userDto" items="${groupDto.userList}">
+									
+										<tr>
+											<td class="col-md-7">
+												<span id="user-name-${userDto.userID}" class="belong-to-group-${groupDto.groupID} new-popover <c:if test="${userDto.groupLeader}">font-weight-bold</c:if>" 
+														data-portrait="${userDto.portraitUuid}" data-fullname="${userDto.lastName},&nbsp;${userDto.firstName}">
+													${userDto.lastName},&nbsp;${userDto.firstName} 
+												</span>
+												<c:if test="${userDto.groupLeader}">
+													<abbr title="Leader" class="fa fa-user-plus" style="color:darkorange"></abbr>
+												</c:if>
+											</td>
+											
 											<td class="col-md-2 text-center">
 												<c:choose>
 													<c:when test="${userDto.iraScore != null}">
@@ -240,24 +274,28 @@
 													</c:otherwise>
 												</c:choose>
 											</td>
-										</c:if>
 										
-										<c:if test="${isScratchieAvailable}">
 											<td class="col-md-2 text-center">
-												<a data-toggle="modal" href="#tra-modal"
-														data-user-id="${userDto.userID}"
-														data-tra-score="${groupDto.traScore}">
-													${groupDto.traScore}
-												</a>
+												<c:choose>
+													<c:when test="${userDto.iraScore != null}">
+														<a data-toggle="modal" href="#ira-modal"
+																data-user-id="${userDto.userID}"
+																data-ira-score="${userDto.iraScore}">
+															${userDto.iraCorrectAnswerCount}
+														</a>													
+													</c:when>
+													<c:otherwise>
+														0
+													</c:otherwise>
+												</c:choose>
 											</td>
-										</c:if>
-									</tr>
-									
-								</c:forEach>
-							</tbody>
-						</table>
-					</div>
-	
+										</tr>
+									</c:forEach>
+								</tbody>
+							</table>
+						</div>
+					</c:if>	
+					
 					<!-- Change leader and Compare buttons -->
 					<div class="row">
 						<div class="col-xs-12 col-md-12 col-lg-12">

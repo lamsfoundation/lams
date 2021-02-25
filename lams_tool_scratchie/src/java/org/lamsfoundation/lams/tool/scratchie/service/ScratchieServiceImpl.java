@@ -592,6 +592,43 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	}
     }
 
+    /**
+     * Counts how many questions were answered correctly on first attempt by the given user, regardless of mark given.
+     */
+    @Override
+    public Integer countCorrectAnswers(long toolContentId, int userId) {
+	Scratchie scratchie = getScratchieByContentId(toolContentId);
+	ScratchieUser user = getUserByUserIDAndContentID((long) userId, toolContentId);
+	if (user == null) {
+	    return null;
+	}
+	List<ScratchieAnswerVisitLog> logs = scratchieAnswerVisitDao.getLogsBySession(user.getSession().getSessionId());
+	if (logs.isEmpty()) {
+	    return 0;
+	}
+
+	int count = 0;
+
+	for (ScratchieItem item : scratchie.getScratchieItems()) {
+	    //create a list of attempts user done for the current item
+	    List<ScratchieAnswerVisitLog> visitLogs = new ArrayList<>();
+	    for (ScratchieAnswerVisitLog log : logs) {
+		if (log.getQbToolQuestion().getUid().equals(item.getUid())) {
+		    visitLogs.add(log);
+		}
+	    }
+
+	    int numberOfAttempts = visitLogs.size();
+	    boolean isUnraveledOnFirstAttempt = (numberOfAttempts == 1)
+		    && ScratchieServiceImpl.isItemUnraveled(item, logs);
+	    if (isUnraveledOnFirstAttempt) {
+		count++;
+	    }
+	}
+
+	return count;
+    }
+
     @Override
     public List<ScratchieBurningQuestion> getBurningQuestionsBySession(Long sessionId) {
 	return scratchieBurningQuestionDao.getBurningQuestionsBySession(sessionId);
@@ -1032,7 +1069,6 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    // get lowest mark by default
 	    int mark = Integer.parseInt(presetMarks[presetMarks.length - 1]);
 	    // add mark only if an item was unravelled
-	    // add mark only if an item was unraveled
 	    if (ScratchieServiceImpl.isItemUnraveled(item, userLogs)) {
 		int itemAttempts = ScratchieServiceImpl.getNumberAttemptsForItem(userLogs, item);
 		String markStr = (itemAttempts <= presetMarks.length) ? presetMarks[itemAttempts - 1]

@@ -16,6 +16,7 @@ public class TblGroupDTO implements Comparable {
     private TblUserDTO groupLeader;
 
     private Double traScore;
+    private int traCorrectAnswerCount;
 
     /**
      * Get the DTO for this group. Does not include the GroupBranchActivities as they will be in a separate array for
@@ -28,7 +29,7 @@ public class TblGroupDTO implements Comparable {
 	groupID = group.getGroupId();
 	groupName = group.getGroupName();
 	orderID = group.getOrderId();
-	userList = new ArrayList<TblUserDTO>();
+	userList = new ArrayList<>();
     }
 
     @Override
@@ -88,5 +89,13 @@ public class TblGroupDTO implements Comparable {
 
     public Double getTraScore() {
 	return traScore;
+    }
+
+    public int getTraCorrectAnswerCount() {
+	return traCorrectAnswerCount;
+    }
+
+    public void setTraCorrectAnswerCount(int traCorrectAnswerCount) {
+	this.traCorrectAnswerCount = traCorrectAnswerCount;
     }
 }

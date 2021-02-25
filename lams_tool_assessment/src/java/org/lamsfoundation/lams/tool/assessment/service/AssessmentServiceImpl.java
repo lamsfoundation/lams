@@ -3321,6 +3321,45 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	return uid_answerToVsaAnswerDtoMap.values();
     }
 
+    /**
+     * Counts how many questions were answered correctly by the given user, regardless of the mark given.
+     * Currently it only works for MCQ and mark hedging questions.
+     */
+    @Override
+    public Integer countCorrectAnswers(long toolContentId, int userId) {
+	Assessment assessment = getAssessmentByContentId(toolContentId);
+	AssessmentUser user = getUserByIdAndContent((long) userId, toolContentId);
+	if (user == null) {
+	    return null;
+	}
+	AssessmentResult assessmentResult = getLastAssessmentResult(assessment.getUid(), user.getUid());
+	if (assessmentResult == null) {
+	    return 0;
+	}
+
+	int count = 0;
+	for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
+	    QbToolQuestion qbToolQuestion = questionResult.getQbToolQuestion();
+	    QbQuestion qbQuestion = qbToolQuestion.getQbQuestion();
+	    if (qbQuestion.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE
+		    || qbQuestion.getType() == QbQuestion.TYPE_MARK_HEDGING) {
+		
+		QuestionDTO questionDTO = new QuestionDTO(qbToolQuestion);
+		loadupQuestionResultIntoQuestionDto(questionDTO, questionResult);
+		
+		calculateAnswerMark(assessment.getUid(), user.getUid(), questionResult, questionDTO);
+		if (questionResult.getMark() > 0) {
+		    count++;
+		}
+	    }
+	    // We are just doing some calculations. Do not allow Hiberante to automatically store any changes to the entity.
+	    releaseFromCache(questionResult);
+	}
+	releaseFromCache(assessmentResult);
+
+	return count;
+    }
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	Long userId = user.getUserId().longValue();

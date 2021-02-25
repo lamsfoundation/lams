@@ -34,12 +34,15 @@ import org.lamsfoundation.lams.monitoring.dto.TblGroupDTO;
 import org.lamsfoundation.lams.monitoring.dto.TblUserDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.tool.ToolSession;
+import org.lamsfoundation.lams.tool.service.ICommonAssessmentService;
+import org.lamsfoundation.lams.tool.service.ICommonScratchieService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -64,6 +67,12 @@ public class TblMonitoringController {
     private IActivityDAO activityDAO;
     @Autowired
     private IGradebookService gradebookService;
+    @Autowired
+    @Qualifier("laasseAssessmentService")
+    private ICommonAssessmentService commonAssessmentService;
+    @Autowired
+    @Qualifier("scratchieService")
+    private ICommonScratchieService commonScratchieService;
 
     /**
      * Displays addStudent page.
@@ -90,11 +99,9 @@ public class TblMonitoringController {
 
 	List<Activity> lessonActivities = getLessonActivities(lesson);
 	setupAvailableActivityTypes(request, lessonActivities);
-	boolean isScratchieAvailable = (request.getAttribute("isScratchieAvailable") != null)
+	boolean isTraAvailable = (request.getAttribute("isScratchieAvailable") != null)
 		&& ((Boolean) request.getAttribute("isScratchieAvailable"));
-	boolean isIraMcqAvailable = (request.getAttribute("isIraMcqAvailable") != null)
-		&& ((Boolean) request.getAttribute("isIraMcqAvailable"));
-	boolean isIraAssessmentAvailable = (request.getAttribute("isIraAssessmentAvailable") != null)
+	boolean isIraAvailable = (request.getAttribute("isIraAssessmentAvailable") != null)
 		&& ((Boolean) request.getAttribute("isIraAssessmentAvailable"));
 	Long iraToolActivityId = request.getAttribute("iraToolActivityId") == null ? null
 		: (Long) request.getAttribute("iraToolActivityId");
@@ -102,14 +109,20 @@ public class TblMonitoringController {
 		: (Long) request.getAttribute("traToolActivityId");
 	Long leaderselectionToolActivityId = request.getAttribute("leaderselectionToolActivityId") == null ? null
 		: (Long) request.getAttribute("leaderselectionToolActivityId");
+	Long iraToolContentId = isIraAvailable
+		? activityDAO.find(ToolActivity.class, iraToolActivityId).getToolContentId()
+		: null;
+	Long traToolContentId = isTraAvailable
+		? activityDAO.find(ToolActivity.class, traToolActivityId).getToolContentId()
+		: null;
 
 	//get all mcq and assessment scores
 	List<GradebookUserActivity> iraGradebookUserActivities = new LinkedList<>();
 	List<GradebookUserActivity> traGradebookUserActivities = new LinkedList<>();
-	if (isIraMcqAvailable || isIraAssessmentAvailable) {
+	if (isIraAvailable) {
 	    iraGradebookUserActivities = gradebookService.getGradebookUserActivities(iraToolActivityId);
 	}
-	if (isScratchieAvailable) {
+	if (isTraAvailable) {
 	    traGradebookUserActivities = gradebookService.getGradebookUserActivities(traToolActivityId);
 	}
 
@@ -138,30 +151,44 @@ public class TblMonitoringController {
 			groupDto.getUserList().add(userDto);
 
 			//set up all user leaders
-			if (leaderUserIds.contains(new Long(user.getUserId()))) {
+			if (leaderUserIds.contains(user.getUserId().longValue())) {
 			    userDto.setGroupLeader(true);
 			    groupDto.setGroupLeader(userDto);
 			}
 
-			if (isIraMcqAvailable || isIraAssessmentAvailable) {
-			    //find according iraGradebookUserActivity
+			if (isIraAvailable) {
+			    // find according iraGradebookUserActivity
 			    for (GradebookUserActivity iraGradebookUserActivity : iraGradebookUserActivities) {
 				if (iraGradebookUserActivity.getLearner().getUserId().equals(user.getUserId())) {
 				    userDto.setIraScore(iraGradebookUserActivity.getMark());
+
 				    break;
 				}
+			    }
+
+			    Integer correctAnswerCount = commonAssessmentService.countCorrectAnswers(iraToolContentId,
+				    user.getUserId());
+			    if (correctAnswerCount != null) {
+				userDto.setIraCorrectAnswerCount(correctAnswerCount);
+			    }
+			}
+		    }
+
+		    if (isTraAvailable && groupDto.getGroupLeader() != null) {
+			//find according traGradebookUserActivity
+			for (GradebookUserActivity traGradebookUserActivity : traGradebookUserActivities) {
+			    if (traGradebookUserActivity.getLearner().getUserId()
+				    .equals(groupDto.getGroupLeader().getUserID())) {
+				groupDto.setTraScore(traGradebookUserActivity.getMark());
+
+				break;
 			    }
 			}
 
-			if (isScratchieAvailable) {
-			    //find according traGradebookUserActivity
-			    for (GradebookUserActivity traGradebookUserActivity : traGradebookUserActivities) {
-				if (traGradebookUserActivity.getLearner().getUserId().equals(user.getUserId())) {
-				    //we set traScore multiple times, but it's doesn't matter
-				    groupDto.setTraScore(traGradebookUserActivity.getMark());
-				    break;
-				}
-			    }
+			Integer correctAnswerCount = commonScratchieService.countCorrectAnswers(traToolContentId,
+				groupDto.getGroupLeader().getUserID());
+			if (correctAnswerCount != null) {
+			    groupDto.setTraCorrectAnswerCount(correctAnswerCount);
 			}
 		    }
 		}

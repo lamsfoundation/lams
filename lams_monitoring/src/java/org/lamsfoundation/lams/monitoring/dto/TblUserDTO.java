@@ -6,6 +6,7 @@ public class TblUserDTO extends UserDTO {
 
     private boolean groupLeader;
     private Double iraScore;
+    private int iraCorrectAnswerCount;
 
     public TblUserDTO(UserDTO userDto) {
 	super(userDto.getUserID(), userDto.getFirstName(), userDto.getLastName(), userDto.getLocaleCountry(),
@@ -29,4 +30,11 @@ public class TblUserDTO extends UserDTO {
 	return iraScore;
     }
 
+    public int getIraCorrectAnswerCount() {
+	return iraCorrectAnswerCount;
+    }
+
+    public void setIraCorrectAnswerCount(int iraCorrectAnswerCount) {
+	this.iraCorrectAnswerCount = iraCorrectAnswerCount;
+    }
 }
