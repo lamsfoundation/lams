@@ -299,13 +299,15 @@
 					<!-- Change leader and Compare buttons -->
 					<div class="row">
 						<div class="col-xs-12 col-md-12 col-lg-12">
-							<c:if test="${(isIraAssessmentAvailable || isIraMcqAvailable) && isScratchieAvailable}">
+							<c:if test="${(isIraAssessmentAvailable || isIraMcqAvailable) && isScratchieAvailable && not empty groupDto.userList && not empty groupDto.traScore}">
 								<button href="#" data-toggle="modal" data-target="#comparison-modal" type="button" class="btn btn-sm btn-default pull-right"
 										data-ira-scores="
 										<c:forEach var="userDto" items="${groupDto.userList}">
-											${userDto.iraScore},
+											<c:if test="${userDto.iraScore != null}">
+												${userDto.iraCorrectAnswerCount},
+											</c:if>
 										</c:forEach>" 
-										data-tra-scores="${groupDto.traScore}" 
+										data-tra-scores="${groupDto.traCorrectAnswerCount}" 
 										data-group-id="${groupDto.groupID}"
 										data-user-names="">
 									<i class="fa fa-bar-chart"></i> 
