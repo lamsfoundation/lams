@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -103,6 +105,7 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
+import org.lamsfoundation.lams.tool.scratchie.web.controller.LearningWebsocketServer;
 import org.lamsfoundation.lams.tool.service.ICommonScratchieService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.service.IQbToolService;
@@ -351,17 +354,33 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     }
 
     @Override
-    public void launchTimeLimit(Long sessionId) {
-	ScratchieSession session = getScratchieSessionBySessionId(sessionId);
-	int timeLimit = session.getScratchie().getTimeLimit();
-	if (timeLimit == 0) {
-	    return;
+    public boolean checkTimeLimitExceeded(long toolContentId, int userId) {
+	Long secondsLeft = LearningWebsocketServer.getSecondsLeft(toolContentId, userId);
+	return secondsLeft != null && secondsLeft.equals(0L);
+    }
+
+    @Override
+    public LocalDateTime launchTimeLimit(long toolContentId, int userId) {
+	ScratchieUser user = getUserByUserIDAndContentID(Integer.valueOf(userId).longValue(), toolContentId);
+	if (user == null) {
+	    return null;
 	}
 
-	//store timeLimitLaunchedDate into DB
-	Date timeLimitLaunchedDate = new Date();
-	session.setTimeLimitLaunchedDate(timeLimitLaunchedDate);
-	scratchieSessionDao.saveObject(session);
+	ScratchieSession session = user.getSession();
+	Date launchDate = session.getTimeLimitLaunchedDate();
+	if (launchDate == null) {
+	    if (!session.isUserGroupLeader(user.getUid())) {
+		// only leader launches time limit
+		return null;
+	    }
+
+	    //store timeLimitLaunchedDate into DB
+	    launchDate = new Date();
+	    session.setTimeLimitLaunchedDate(launchDate);
+	    scratchieSessionDao.saveObject(session);
+	}
+
+	return launchDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
     @Override

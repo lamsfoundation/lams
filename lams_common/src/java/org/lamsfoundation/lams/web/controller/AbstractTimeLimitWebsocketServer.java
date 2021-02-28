@@ -286,17 +286,20 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
     public void unregisterUser(Session websocket, CloseReason reason) {
 	Long toolContentID = Long
 		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_CONTENT_ID).get(0));
-	websockets.get(toolContentID).remove(websocket);
+	Set<Session> sessionWebsockets = websockets.get(toolContentID);
+	if (sessionWebsockets != null) {
+	    websockets.get(toolContentID).remove(websocket);
 
-	if (log.isDebugEnabled()) {
-	    // If there was something wrong with the connection, put it into logs.
-	    log.debug("User " + websocket.getUserPrincipal().getName() + " left activity with tool content ID: "
-		    + toolContentID
-		    + (!(reason.getCloseCode().equals(CloseCodes.GOING_AWAY)
-			    || reason.getCloseCode().equals(CloseCodes.NORMAL_CLOSURE))
-				    ? ". Abnormal close. Code: " + reason.getCloseCode() + ". Reason: "
-					    + reason.getReasonPhrase()
-				    : ""));
+	    if (log.isDebugEnabled()) {
+		// If there was something wrong with the connection, put it into logs.
+		log.debug("User " + websocket.getUserPrincipal().getName() + " left activity with tool content ID: "
+			+ toolContentID
+			+ (!(reason.getCloseCode().equals(CloseCodes.GOING_AWAY)
+				|| reason.getCloseCode().equals(CloseCodes.NORMAL_CLOSURE))
+					? ". Abnormal close. Code: " + reason.getCloseCode() + ". Reason: "
+						+ reason.getReasonPhrase()
+					: ""));
+	    }
 	}
     }
 
