@@ -2817,7 +2817,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	scratchie.setInstructions(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
 
 	scratchie.setBurningQuestionsEnabled(JsonUtil.optBoolean(toolContentJSON, "burningQuestionsEnabled", true));
-	scratchie.setTimeLimit(JsonUtil.optInt(toolContentJSON, "timeLimit", 0));
+	scratchie.setRelativeTimeLimit(JsonUtil.optInt(toolContentJSON, "timeLimit", 0));
 	scratchie.setExtraPoint(JsonUtil.optBoolean(toolContentJSON, "extraPoint", false));
 	scratchie.setReflectOnActivity(
 		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));

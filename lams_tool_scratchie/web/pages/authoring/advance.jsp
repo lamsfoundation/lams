@@ -102,16 +102,14 @@
                     <fmt:message key="label.authoring.advanced.show.scratchies.in.results" />
                 </label>
             </div>
-
-            <div class="form-inline">
-                <label for="time-limit">
-                    <fmt:message key="label.time.limit" />&nbsp;
-                    <i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="" data-original-title="<fmt:message key="label.time.limit.tooltip"/>"></i>
-                </label>
-                <form:input path="scratchie.timeLimit" size="3" id="time-limit" cssClass="form-control input-sm"/>
-
-            </div>            
             
+            <div class="form-inline">
+				<label for="relativeTimeLimit">
+					<fmt:message key="label.time.limit" />&nbsp;
+					<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="" data-original-title="<fmt:message key="label.time.limit.tooltip"/>"></i>
+				</label>
+				<form:input path="scratchie.relativeTimeLimit" type="number" min="0" max="999" size="3" id="relativeTimeLimit" cssClass="form-control input-sm"/>
+			</div>
         </div>
     </div>
 	

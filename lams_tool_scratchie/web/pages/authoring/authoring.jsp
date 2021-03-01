@@ -70,11 +70,21 @@
         
         // avoid name clash between bootstrap and jQuery UI
         $.fn.bootstrapTooltip = $.fn.tooltip.noConflict();
+
+        function validateForm(){
+			var timeLimit = $('#relativeTimeLimit').val();
+			if (!timeLimit || timeLimit < 1) {
+				$('#relativeTimeLimit').val(0);
+			}
+
+			return true;
+        }
     </script>
  
 </lams:head>
 <body class="stripes" onLoad="init()">
-	<form:form action="/lams/tool/lascrt11/authoring/update.do" modelAttribute="authoringForm" method="post" id="authoringForm" >
+	<form:form action="/lams/tool/lascrt11/authoring/update.do" modelAttribute="authoringForm" method="post" id="authoringForm"
+			   onSubmit="javascript:return validateForm()">
 		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 		<form:hidden path="scratchie.contentId" />
 		<form:hidden path="sessionMapID" />

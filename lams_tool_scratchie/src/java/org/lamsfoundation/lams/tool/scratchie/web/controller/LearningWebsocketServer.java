@@ -107,10 +107,12 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
 	TimeCache existingTimeSettings = new TimeCache();
 
 	existingTimeSettings.absoluteTimeLimit = null;
-	existingTimeSettings.relativeTimeLimit = scratchie.getTimeLimit() * 60;
+	existingTimeSettings.relativeTimeLimit = scratchie.getRelativeTimeLimit() * 60;
 	existingTimeSettings.timeLimitAdjustment = new HashMap<>();
 
 	Map<Long, LocalDateTime> sessionLaunchDates = new HashMap<>();
+	Map<Long, Integer> sessionTimeLimitAdjustments = new HashMap<>();
+
 	for (Integer userId : userIds) {
 	    ScratchieUser user = scratchieService.getUserByUserIDAndContentID(userId.longValue(), toolContentId);
 	    if (user == null) {
@@ -119,20 +121,27 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
 
 	    ScratchieSession session = user.getSession();
 	    LocalDateTime sessionLaunchDate = null;
+	    Integer timeLimitAdjustment = null;
 
 	    if (sessionLaunchDates.containsKey(session.getUid())) {
 		sessionLaunchDate = sessionLaunchDates.get(session.getUid());
+		timeLimitAdjustment = sessionTimeLimitAdjustments.get(session.getUid());
 	    } else {
 		Date launchDate = session.getTimeLimitLaunchedDate();
 		if (launchDate != null) {
 		    sessionLaunchDate = launchDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-		}
+		    timeLimitAdjustment = session.getTimeLimitAdjustment();
 
-		sessionLaunchDates.put(session.getUid(), sessionLaunchDate);
+		    sessionLaunchDates.put(session.getUid(), sessionLaunchDate);
+		    sessionTimeLimitAdjustments.put(session.getUid(), timeLimitAdjustment);
+		}
 	    }
 
 	    if (sessionLaunchDate != null) {
 		existingTimeSettings.timeLimitLaunchedDate.put(userId, sessionLaunchDate);
+		if (timeLimitAdjustment != null) {
+		    existingTimeSettings.timeLimitAdjustment.put(userId, timeLimitAdjustment);
+		}
 	    }
 	}
 

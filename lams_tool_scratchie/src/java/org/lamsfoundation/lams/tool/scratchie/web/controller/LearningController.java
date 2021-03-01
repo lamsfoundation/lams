@@ -251,7 +251,7 @@ public class LearningController {
 	}
 
 	// check time limits
-	if (scratchie.getTimeLimit() != 0 && !mode.isTeacher()) {
+	if (scratchie.getRelativeTimeLimit() != 0 && !mode.isTeacher()) {
 
 	    // show waitForLeaderLaunchTimeLimit page if the leader hasn't started activity
 	    if (!isUserLeader && toolSession.getTimeLimitLaunchedDate() == null) {
