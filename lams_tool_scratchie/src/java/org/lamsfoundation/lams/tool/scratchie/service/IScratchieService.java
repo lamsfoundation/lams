@@ -127,14 +127,6 @@ public interface IScratchieService extends ICommonToolService {
 
     boolean checkTimeLimitExceeded(long toolContentId, int userId);
 
-    /**
-     * Checks if non-leaders should still wait for leader to submit notebook.
-     *
-     * @param toolSession
-     * @return
-     */
-    boolean isWaitingForLeaderToSubmitNotebook(ScratchieSession toolSession);
-
     List<ScratchieBurningQuestion> getBurningQuestionsBySession(Long sessionId);
 
     /**

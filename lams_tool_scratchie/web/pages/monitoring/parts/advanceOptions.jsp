@@ -57,16 +57,6 @@
 	
 	<tr>
 		<td>
-			<fmt:message key="label.time.limit" />
-		</td>
-			
-		<td>
-			<c:out value="${sessionMap.scratchie.timeLimit}" escapeXml="true"/>
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
 			<fmt:message key="monitor.summary.td.addNotebook" />
 		</td>
 		

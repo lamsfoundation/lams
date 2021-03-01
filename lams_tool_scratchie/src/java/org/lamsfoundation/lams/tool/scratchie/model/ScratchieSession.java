@@ -72,7 +72,7 @@ public class ScratchieSession {
     private Date timeLimitLaunchedDate;
 
     @Column(name = "time_limit_adjustment")
-    private int timeLimitAdjustment;
+    private Integer timeLimitAdjustment;
 
     // finish or not
     @Column
@@ -116,11 +116,11 @@ public class ScratchieSession {
 	this.timeLimitLaunchedDate = timeLimitLaunchedDate;
     }
 
-    public int getTimeLimitAdjustment() {
+    public Integer getTimeLimitAdjustment() {
 	return timeLimitAdjustment;
     }
 
-    public void setTimeLimitAdjustment(int relativeTimeLimitAdjustment) {
+    public void setTimeLimitAdjustment(Integer relativeTimeLimitAdjustment) {
 	this.timeLimitAdjustment = relativeTimeLimitAdjustment;
     }
 

@@ -251,7 +251,7 @@ public class LearningController {
 	}
 
 	// check time limits
-	if (scratchie.getRelativeTimeLimit() != 0 && !mode.isTeacher()) {
+	if ((scratchie.getRelativeTimeLimit() != 0 || scratchie.getAbsoluteTimeLimit() != null) && !mode.isTeacher()) {
 
 	    // show waitForLeaderLaunchTimeLimit page if the leader hasn't started activity
 	    if (!isUserLeader && toolSession.getTimeLimitLaunchedDate() == null) {
@@ -282,12 +282,6 @@ public class LearningController {
 		// go through whole method again, with new settings
 		return "forward:start.do";
 
-	    } else if (isScratchingFinished) {
-		// teacher gave extra time
-		toolSession.setScratchingFinished(false);
-		scratchieService.saveOrUpdateScratchieSession(toolSession);
-		// go through whole method again, with new settings
-		return "forward:start.do";
 	    }
 	}
 

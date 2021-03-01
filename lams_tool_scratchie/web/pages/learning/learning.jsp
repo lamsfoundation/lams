@@ -27,19 +27,7 @@
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/circle.css" />
 	<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>includes/css/scratchie-learning.css" />
-	<style>
-		.countdown-timeout {
-  			color: #FF3333 !important;
-  		}		
-  		
-  		#countdown {
-			width: 150px; 
-			font-size: 110%; 
-			font-style: italic; 
-			color:#47bc23;
-			text-align: center;
-		}
-	</style>
+	
 	<!-- ********************  javascript ********************** -->
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
@@ -384,11 +372,11 @@
 					location.reload();
 					return;
 				}
-				
+			
 				if (input.clearTimer == true) {
 					// teacher stopped the timer, destroy it
 					$('#countdown').countdown('destroy').remove();
-				} else if (input.secondsLeft){
+				} else if (typeof input.secondsLeft != 'undefined'){
 					// teacher updated the timer
 					var secondsLeft = +input.secondsLeft,
 						counterInitialised = $('#countdown').length > 0;
@@ -396,12 +384,7 @@
 					if (counterInitialised) {
 						// just set the new time
 						$('#countdown').countdown('option', 'until', secondsLeft + 'S');
-					} else if (secondsLeft){
-						if (${isScratchingFinished}) {
-						    // teacher gave extra time, reload to enable scratching again
-							location.reload();
-							return;
-						}
+					} else {
 						// initialise the timer
 						displayCountdown(secondsLeft);
 					}

@@ -24,6 +24,9 @@
 package org.lamsfoundation.lams.tool.scratchie.web.controller;
 
 import java.io.IOException;
+import java.security.InvalidParameterException;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -57,6 +60,7 @@ import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
@@ -84,6 +88,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -303,6 +308,78 @@ public class MonitoringController {
 	    request.setAttribute("qbStats", qbStats);
 	}
 	return "pages/monitoring/parts/statisticpart";
+    }
+
+    @RequestMapping(path = "/updateTimeLimit", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void updateTimeLimit(@RequestParam(name = AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentId,
+	    @RequestParam int relativeTimeLimit, @RequestParam(required = false) Long absoluteTimeLimit) {
+	if (relativeTimeLimit < 0) {
+	    throw new InvalidParameterException(
+		    "Relative time limit must not be negative and it is " + relativeTimeLimit);
+	}
+	if (absoluteTimeLimit != null && relativeTimeLimit != 0) {
+	    throw new InvalidParameterException(
+		    "Relative time limit must not be provided when absolute time limit is set");
+	}
+
+	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
+	scratchie.setRelativeTimeLimit(relativeTimeLimit);
+	// set time limit as seconds from start of epoch, using current server time zone
+	scratchie.setAbsoluteTimeLimit(absoluteTimeLimit == null ? null
+		: LocalDateTime.ofEpochSecond(absoluteTimeLimit, 0, OffsetDateTime.now().getOffset()));
+	scratchieService.saveOrUpdateScratchie(scratchie);
+    }
+
+    @RequestMapping(path = "/getPossibleIndividualTimeLimitUsers", method = RequestMethod.GET)
+    @ResponseBody
+    public String getPossibleIndividualTimeLimitUsers(
+	    @RequestParam(name = AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentId,
+	    @RequestParam(name = "term") String searchString) {
+
+	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
+	String groupLabel = scratchieService.getMessage("monitoring.label.group") + " \"";
+	for (ScratchieSession session : scratchieService.getSessionsByContentId(toolContentId)) {
+	    if (session.getSessionName().toLowerCase().contains(searchString.toLowerCase())) {
+		ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
+		groupJSON.put("label", groupLabel + session.getSessionName() + "\"");
+		groupJSON.put("value", "group-" + session.getSessionId());
+		responseJSON.add(groupJSON);
+	    }
+	}
+	return responseJSON.toString();
+    }
+
+    @RequestMapping(path = "/getExistingIndividualTimeLimitUsers", method = RequestMethod.GET)
+    @ResponseBody
+    public String getExistingIndividualTimeLimitUsers(
+	    @RequestParam(name = AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentId) {
+
+	String groupLabel = scratchieService.getMessage("monitoring.label.group") + " \"";
+	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
+	for (ScratchieSession session : scratchieService.getSessionsByContentId(toolContentId)) {
+	    if (session.getTimeLimitAdjustment() == null) {
+		continue;
+	    }
+	    ObjectNode userJSON = JsonNodeFactory.instance.objectNode();
+	    userJSON.put("sessionId", session.getSessionId());
+	    userJSON.put("adjustment", session.getTimeLimitAdjustment());
+	    userJSON.put("name", groupLabel + session.getSessionName() + "\"");
+
+	    responseJSON.add(userJSON);
+	}
+	return responseJSON.toString();
+    }
+
+    @RequestMapping(path = "/updateIndividualTimeLimit", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void updateIndividualTimeLimit(@RequestParam String itemId,
+	    @RequestParam(required = false) Integer adjustment) {
+
+	String[] itemIdParts = itemId.split("-");
+	ScratchieSession session = scratchieService.getScratchieSessionBySessionId(Long.valueOf(itemIdParts[1]));
+	session.setTimeLimitAdjustment(adjustment);
+	scratchieService.saveOrUpdateScratchieSession(session);
     }
 
     @RequestMapping(path = "/displayChangeLeaderForGroupDialogFromActivity")

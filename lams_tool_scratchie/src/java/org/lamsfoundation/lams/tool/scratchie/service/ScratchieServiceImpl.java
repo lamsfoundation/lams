@@ -384,24 +384,6 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     }
 
     @Override
-    public boolean isWaitingForLeaderToSubmitNotebook(ScratchieSession toolSession) {
-	Long toolSessionId = toolSession.getSessionId();
-	Scratchie scratchie = toolSession.getScratchie();
-	ScratchieUser groupLeader = toolSession.getGroupLeader();
-
-	boolean isReflectOnActivity = scratchie.isReflectOnActivity();
-	// get notebook entry
-	NotebookEntry notebookEntry = null;
-	if (isReflectOnActivity && (groupLeader != null)) {
-	    notebookEntry = getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ScratchieConstants.TOOL_SIGNATURE, groupLeader.getUserId().intValue());
-	}
-
-	// return whether it's waiting for the leader to submit notebook
-	return isReflectOnActivity && (notebookEntry == null);
-    }
-
-    @Override
     public void changeUserMark(Long userId, Long sessionId, Integer newMark) {
 	if (newMark == null) {
 	    return;

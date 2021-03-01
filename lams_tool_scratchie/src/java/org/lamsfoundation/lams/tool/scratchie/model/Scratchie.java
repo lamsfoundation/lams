@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.scratchie.model;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
@@ -390,6 +391,10 @@ public class Scratchie implements Cloneable {
 
     public void setAbsoluteTimeLimit(LocalDateTime absoluteTimeLimit) {
 	this.absoluteTimeLimit = absoluteTimeLimit;
+    }
+
+    public Long getAbsoluteTimeLimitSeconds() {
+	return absoluteTimeLimit == null ? null : absoluteTimeLimit.atZone(ZoneId.systemDefault()).toEpochSecond();
     }
 
     public boolean isRevealOnDoubleClick() {

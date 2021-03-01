@@ -601,7 +601,7 @@
 							counter.removeClass('countdown-timeout');
 						}				
 					},
-					expiryText : '<span class="countdown-timeout">Expired</span>'
+					expiryText : '<span class="countdown-timeout"><fmt:message key="label.monitoring.summary.time.limit.expired" /></span>'
 				});
 		} else {
 			// if counter is paused, we can not adjust time, so resume it for a moment

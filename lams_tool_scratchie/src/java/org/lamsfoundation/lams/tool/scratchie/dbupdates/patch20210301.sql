@@ -9,7 +9,7 @@ ALTER TABLE tl_lascrt11_scratchie CHANGE COLUMN time_limit relative_time_limit S
 
 ALTER TABLE tl_lascrt11_scratchie ADD COLUMN absolute_time_limit DATETIME AFTER relative_time_limit;
 
-ALTER TABLE tl_lascrt11_session ADD COLUMN time_limit_adjustment SMALLINT NOT NULL DEFAULT 0 AFTER time_limit_launched_date;
+ALTER TABLE tl_lascrt11_session ADD COLUMN time_limit_adjustment SMALLINT AFTER time_limit_launched_date;
 
 -- Put all sql statements above here
 
