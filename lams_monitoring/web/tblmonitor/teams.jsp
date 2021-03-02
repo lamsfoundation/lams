@@ -17,7 +17,7 @@
 </style>
 
 <!-- ChartJS-->
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chartjs.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chart.bundle.min.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
 <script>
 	$(document).ready(function(){
@@ -59,31 +59,35 @@
 			
 			var canvas = $(this).find('.modal-body canvas');
 			$(this).find('.modal-title').html(title);
+
 			var ctx = canvas[0].getContext('2d');
 
-			//draw chart
-			chart = new Chart(ctx).Bar({
-				responsive: true,
-				labels: userNames,
-				datasets: [
-				{
-	                label: "iRA",
-	                fillColor: "rgba(26,179,148,0.5)",
-	                strokeColor: "rgba(26,179,148,0.8)",
-	                highlightFill: "rgba(26,179,148,0.75)",
-	                highlightStroke: "rgba(26,179,148,1)",
-	                data: iraScores
+			chart = new Chart(ctx, {
+				type : 'bar',
+				data : {
+					datasets : [ {
+						label: "iRA",
+						data : iraScores,
+						backgroundColor : 'rgba(255, 195, 55, 1)'
+										  
+					},
+					{
+						label: "tRA",
+						data : traScores,
+						backgroundColor : 'rgba(5, 204, 214, 1)'
+										  
+					}],
+					labels : userNames
 				},
-				{
-	                label: "tRA",
-	                fillColor: "rgba(176,176,176,0.5)",
-	                strokeColor: "rgba(176,176,176,0.8)",
-	                highlightFill: "rgba(176,176,176,0.75)",
-	                highlightStroke: "rgba(176,176,176,1)",              
-	                data: traScores
-				}]
-			}, {});
-
+				options : {
+					legend : {
+						display : false
+					},
+					animation : {
+						duration : 1000
+					}
+				}
+			});
 		//on hiding chart modal window
 		}).on('hidden.bs.modal', function (event) {
 			var canvas = $(this).find('.modal-body canvas');
@@ -204,7 +208,7 @@
 						<table class="table table-striped table-hover table-condensed">
 							<thead>
 								<tr>
-									<th>
+									<th style="width: 30%">
 										<fmt:message key="label.teams"/>
 									</th>
 									
@@ -393,7 +397,7 @@
 							<table class="table table-striped table-hover table-condensed">
 								<thead>
 									<tr>
-										<th>
+										<th style="width: 30%">
 											<fmt:message key="label.student"/>
 										</th>
 										
