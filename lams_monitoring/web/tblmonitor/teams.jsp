@@ -212,6 +212,8 @@
 				}
 			);
 		});
+
+		$('[data-toggle="tooltip"]').tooltip();
 	});
 
 	function showChangeLeaderModal(groupID) {
@@ -304,10 +306,10 @@
 														<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${groupDto.iraCorrectAnswerCountAverage}" />
 														<c:choose>
 															<c:when test="${not empty highestIraCorrectAnswerCountAverage && groupDto.iraCorrectAnswerCountAverage >= highestIraCorrectAnswerCountAverage}">
-																&nbsp;<i class="fa fa-arrow-circle-up" title="<fmt:message key="label.highest"/>"></i>
+																&nbsp;<i class="fa fa-arrow-circle-up" data-toggle="tooltip" title="<fmt:message key="label.highest"/>"></i>
 															</c:when>
 															<c:when test="${not empty lowestIraCorrectAnswerCountAverage && groupDto.iraCorrectAnswerCountAverage <= lowestIraCorrectAnswerCountAverage}">
-																&nbsp;<i class="fa fa-arrow-circle-down" title="<fmt:message key="label.lowest"/>"></i>
+																&nbsp;<i class="fa fa-arrow-circle-down" data-toggle="tooltip" title="<fmt:message key="label.lowest"/>"></i>
 															</c:when>
 														</c:choose>		
 													</c:otherwise>
@@ -324,13 +326,12 @@
 													</c:when>
 													<c:otherwise>
 														${groupDto.traCorrectAnswerCount}
-														
 														<c:choose>
 															<c:when test="${not empty highestTraCorrectAnswerCount && groupDto.traCorrectAnswerCount >= highestTraCorrectAnswerCount}">
-																&nbsp;<i class="fa fa-arrow-circle-up" title="<fmt:message key="label.highest"/>"></i>
+																&nbsp;<i class="fa fa-arrow-circle-up" data-toggle="tooltip" title="<fmt:message key="label.highest"/>"></i>
 															</c:when>
 															<c:when test="${not empty lowestTraCorrectAnswerCount && groupDto.traCorrectAnswerCount <= lowestTraCorrectAnswerCount}">
-																&nbsp;<i class="fa fa-arrow-circle-down" title="<fmt:message key="label.lowest"/>"></i>
+																&nbsp;<i class="fa fa-arrow-circle-down" data-toggle="tooltip" title="<fmt:message key="label.lowest"/>"></i>
 															</c:when>
 														</c:choose>		
 													</c:otherwise>
@@ -348,10 +349,10 @@
 															
 															<c:choose>					 
 																<c:when test="${not empty highestCorrectAnswerCountDelta && groupDto.correctAnswerCountPercentDelta >= highestCorrectAnswerCountDelta}">
-																	&nbsp;<i class="fa fa-arrow-circle-up" title="<fmt:message key="label.highest"/>"></i>
+																	&nbsp;<i class="fa fa-arrow-circle-up" data-toggle="tooltip" title="<fmt:message key="label.highest"/>"></i>
 																</c:when>
 																<c:when test="${not empty lowestCorrectAnswerCountDelta && groupDto.correctAnswerCountPercentDelta <= lowestCorrectAnswerCountDelta}">
-																	&nbsp;<i class="fa fa-arrow-circle-down" title="<fmt:message key="label.lowest"/>"></i>
+																	&nbsp;<i class="fa fa-arrow-circle-down" data-toggle="tooltip" title="<fmt:message key="label.lowest"/>"></i>
 																</c:when>
 															</c:choose>	
 														</c:otherwise>
@@ -502,10 +503,10 @@
 														<c:if test="${fn:length(groupDto.userList) > 1}">
 															<c:choose>
 																<c:when test="${not empty iraHighestCorrectAnswerCount && userDto.iraCorrectAnswerCount >= iraHighestCorrectAnswerCount}">
-																	&nbsp;<i class="fa fa-arrow-circle-up" title="<fmt:message key="label.highest"/>"></i>
+																	&nbsp;<i class="fa fa-arrow-circle-up" data-toggle="tooltip" title="<fmt:message key="label.highest"/>"></i>
 																</c:when>
 																<c:when test="${not empty iraLowestCorrectAnswerCount && userDto.iraCorrectAnswerCount <= iraLowestCorrectAnswerCount}">
-																	&nbsp;<i class="fa fa-arrow-circle-down" title="<fmt:message key="label.lowest"/>"></i>
+																	&nbsp;<i class="fa fa-arrow-circle-down" data-toggle="tooltip" title="<fmt:message key="label.lowest"/>"></i>
 																</c:when>
 															</c:choose>		
 														</c:if>
@@ -527,10 +528,10 @@
 															<c:if test="${fn:length(groupDto.userList) > 1}">
 																<c:choose>
 																	<c:when test="${not empty highestCorrectAnswerCountPercentDelta && userDto.correctAnswerCountPercentDelta >= highestCorrectAnswerCountPercentDelta}">
-																		&nbsp;<i class="fa fa-arrow-circle-up" title="<fmt:message key="label.highest"/>"></i>
+																		&nbsp;<i class="fa fa-arrow-circle-up" data-toggle="tooltip" title="<fmt:message key="label.highest"/>"></i>
 																	</c:when>
 																	<c:when test="${not empty lowestCorrectAnswerCountPercentDelta && userDto.correctAnswerCountPercentDelta <= lowestCorrectAnswerCountPercentDelta}">
-																		&nbsp;<i class="fa fa-arrow-circle-down" title="<fmt:message key="label.lowest"/>"></i>
+																		&nbsp;<i class="fa fa-arrow-circle-down" data-toggle="tooltip" title="<fmt:message key="label.lowest"/>"></i>
 																	</c:when>
 																</c:choose>		
 															</c:if>

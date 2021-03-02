@@ -192,12 +192,13 @@ public class TblMonitoringController {
 	for (TblGroupDTO group : groupDtos) {
 	    Double iraCorrectAnswerCountAverage = group.getIraCorrectAnswerCountAverage();
 	    if (iraCorrectAnswerCountAverage != null) {
-		iraCorrectAnswerCountAverageSum += group.getIraCorrectAnswerCountAverage();
+		iraCorrectAnswerCountAverageSum += iraCorrectAnswerCountAverage;
 		iraGroupsCount++;
 
 		if (iraCorrectAnswerCountAverage > highestIraCorrectAnswerCountAverage) {
 		    highestIraCorrectAnswerCountAverage = iraCorrectAnswerCountAverage;
-		} else if (iraCorrectAnswerCountAverage < lowestIraCorrectAnswerCountAverage) {
+		}
+		if (iraCorrectAnswerCountAverage < lowestIraCorrectAnswerCountAverage) {
 		    lowestIraCorrectAnswerCountAverage = iraCorrectAnswerCountAverage;
 		}
 	    }
@@ -205,13 +206,14 @@ public class TblMonitoringController {
 	    Integer traCorrectAnswerCount = group.getTraCorrectAnswerCount();
 
 	    if (traCorrectAnswerCount != null) {
-		traCorrectAnswerSum += group.getTraCorrectAnswerCount();
+		traCorrectAnswerSum += traCorrectAnswerCount;
 		traGroupsCount++;
 
 		if (traCorrectAnswerCount > highestTraCorrectAnswerCount) {
-		    highestTraCorrectAnswerCount = traCorrectAnswerSum;
-		} else if (traCorrectAnswerSum < lowestTraCorrectAnswerCount) {
-		    lowestTraCorrectAnswerCount = traCorrectAnswerSum;
+		    highestTraCorrectAnswerCount = traCorrectAnswerCount;
+		}
+		if (traCorrectAnswerSum < lowestTraCorrectAnswerCount) {
+		    lowestTraCorrectAnswerCount = traCorrectAnswerCount;
 		}
 
 		if (iraCorrectAnswerCountAverage != null) {
@@ -228,7 +230,8 @@ public class TblMonitoringController {
 
 		    if (correctAnswerCountPercentDelta > highestСorrectAnswerCountDelta) {
 			highestСorrectAnswerCountDelta = correctAnswerCountPercentDelta;
-		    } else if (correctAnswerCountPercentDelta < lowestСorrectAnswerCountDelta) {
+		    }
+		    if (correctAnswerCountPercentDelta < lowestСorrectAnswerCountDelta) {
 			lowestСorrectAnswerCountDelta = correctAnswerCountPercentDelta;
 		    }
 		}
