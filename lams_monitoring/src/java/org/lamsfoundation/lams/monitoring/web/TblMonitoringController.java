@@ -2,7 +2,6 @@ package org.lamsfoundation.lams.monitoring.web;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -10,7 +9,6 @@ import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
@@ -116,16 +114,6 @@ public class TblMonitoringController {
 		? activityDAO.find(ToolActivity.class, traToolActivityId).getToolContentId()
 		: null;
 
-	//get all mcq and assessment scores
-	List<GradebookUserActivity> iraGradebookUserActivities = new LinkedList<>();
-	List<GradebookUserActivity> traGradebookUserActivities = new LinkedList<>();
-	if (isIraAvailable) {
-	    iraGradebookUserActivities = gradebookService.getGradebookUserActivities(iraToolActivityId);
-	}
-	if (isTraAvailable) {
-	    traGradebookUserActivities = gradebookService.getGradebookUserActivities(traToolActivityId);
-	}
-
 	Set<Long> leaderUserIds = null;
 	if (leaderselectionToolActivityId != null) {
 	    leaderUserIds = lamsToolService.getLeaderUserId(leaderselectionToolActivityId);
@@ -144,111 +132,115 @@ public class TblMonitoringController {
 	    TblGroupDTO groupDto = new TblGroupDTO(group);
 	    groupDtos.add(groupDto);
 
-	    if (group.getUsers() != null) {
-		for (User user : group.getUsers()) {
-		    TblUserDTO userDto = new TblUserDTO(user.getUserDTO());
-		    groupDto.getUserList().add(userDto);
+	    if (group.getUsers() == null) {
+		continue;
+	    }
 
-		    //set up all user leaders
-		    if (leaderUserIds.contains(user.getUserId().longValue())) {
-			userDto.setGroupLeader(true);
-			groupDto.setGroupLeader(userDto);
-		    }
+	    for (User user : group.getUsers()) {
+		TblUserDTO userDto = new TblUserDTO(user.getUserDTO());
+		groupDto.getUserList().add(userDto);
 
-		    if (isIraAvailable) {
-			// find according iraGradebookUserActivity
-			for (GradebookUserActivity iraGradebookUserActivity : iraGradebookUserActivities) {
-			    if (iraGradebookUserActivity.getLearner().getUserId().equals(user.getUserId())) {
-				userDto.setIraScore(iraGradebookUserActivity.getMark());
-
-				break;
-			    }
-			}
-
-			Integer correctAnswerCount = commonAssessmentService.countCorrectAnswers(iraToolContentId,
-				user.getUserId());
-			if (correctAnswerCount != null) {
-			    userDto.setIraCorrectAnswerCount(correctAnswerCount);
-			}
-		    }
+		//set up all user leaders
+		if (leaderUserIds.contains(user.getUserId().longValue())) {
+		    userDto.setGroupLeader(true);
+		    groupDto.setGroupLeader(userDto);
 		}
 
-		if (isTraAvailable && groupDto.getGroupLeader() != null) {
-		    //find according traGradebookUserActivity
-		    for (GradebookUserActivity traGradebookUserActivity : traGradebookUserActivities) {
-			if (traGradebookUserActivity.getLearner().getUserId()
-				.equals(groupDto.getGroupLeader().getUserID())) {
-			    groupDto.setTraScore(traGradebookUserActivity.getMark());
+		Integer correctAnswerCount = commonAssessmentService.countCorrectAnswers(iraToolContentId,
+			user.getUserId());
+		if (correctAnswerCount != null) {
+		    userDto.setIraCorrectAnswerCount(correctAnswerCount);
+		}
+	    }
 
-			    break;
-			}
-		    }
+	    if (isTraAvailable && groupDto.getGroupLeader() != null) {
+		Integer correctAnswerCount = commonScratchieService.countCorrectAnswers(traToolContentId,
+			groupDto.getGroupLeader().getUserID());
+		if (correctAnswerCount != null) {
+		    groupDto.setTraCorrectAnswerCount(correctAnswerCount);
 
-		    Integer correctAnswerCount = commonScratchieService.countCorrectAnswers(traToolContentId,
-			    groupDto.getGroupLeader().getUserID());
-		    if (correctAnswerCount != null) {
-			groupDto.setTraCorrectAnswerCount(correctAnswerCount);
+		    for (TblUserDTO userDto : groupDto.getUserList()) {
+			userDto.setTraCorrectAnswerCount(correctAnswerCount);
 		    }
 		}
 	    }
 	}
+
 	request.setAttribute("groupDtos", groupDtos);
 
-	double highestIraScoreAverage = 0;
-	double lowestIraScoreAverage = Double.MAX_VALUE;
-	double highestTraScore = 0;
-	double lowestTraScore = Double.MAX_VALUE;
+	double highestIraCorrectAnswerCountAverage = 0;
+	double lowestIraCorrectAnswerCountAverage = Double.MAX_VALUE;
+	int highestTraCorrectAnswerCount = 0;
+	int lowestTraCorrectAnswerCount = Integer.MAX_VALUE;
+	long highestСorrectAnswerCountDelta = Long.MIN_VALUE;
+	long lowestСorrectAnswerCountDelta = Long.MAX_VALUE;
 
 	int iraGroupsCount = 0;
 	int traGroupsCount = 0;
-	int iraCorrectAnswerCountAverageSum = 0;
+	int deltaCount = 0;
+	double iraCorrectAnswerCountAverageSum = 0;
 	int traCorrectAnswerSum = 0;
-	double iraAverageScoreSum = 0;
-	double traScoreSum = 0;
+	int deltaSum = 0;
 
 	for (TblGroupDTO group : groupDtos) {
-	    Double iraScoreAverage = group.getIraScoreAverage();
-	    Double traScore = group.getTraScore();
-
-	    if (iraScoreAverage != null) {
-		iraAverageScoreSum += iraScoreAverage;
+	    Double iraCorrectAnswerCountAverage = group.getIraCorrectAnswerCountAverage();
+	    if (iraCorrectAnswerCountAverage != null) {
 		iraCorrectAnswerCountAverageSum += group.getIraCorrectAnswerCountAverage();
 		iraGroupsCount++;
 
-		if (iraScoreAverage > highestIraScoreAverage) {
-		    highestIraScoreAverage = iraScoreAverage;
-		} else if (iraScoreAverage < lowestIraScoreAverage) {
-		    lowestIraScoreAverage = iraScoreAverage;
+		if (iraCorrectAnswerCountAverage > highestIraCorrectAnswerCountAverage) {
+		    highestIraCorrectAnswerCountAverage = iraCorrectAnswerCountAverage;
+		} else if (iraCorrectAnswerCountAverage < lowestIraCorrectAnswerCountAverage) {
+		    lowestIraCorrectAnswerCountAverage = iraCorrectAnswerCountAverage;
 		}
 	    }
 
-	    if (traScore != null) {
-		traScoreSum += traScore;
+	    Integer traCorrectAnswerCount = group.getTraCorrectAnswerCount();
+
+	    if (traCorrectAnswerCount != null) {
 		traCorrectAnswerSum += group.getTraCorrectAnswerCount();
 		traGroupsCount++;
 
-		if (traScore > highestTraScore) {
-		    highestTraScore = traScore;
-		} else if (traScore < lowestTraScore) {
-		    lowestTraScore = traScore;
+		if (traCorrectAnswerCount > highestTraCorrectAnswerCount) {
+		    highestTraCorrectAnswerCount = traCorrectAnswerSum;
+		} else if (traCorrectAnswerSum < lowestTraCorrectAnswerCount) {
+		    lowestTraCorrectAnswerCount = traCorrectAnswerSum;
+		}
+
+		if (iraCorrectAnswerCountAverage != null) {
+		    long correctAnswerCountPercentDelta = Math
+			    .round((traCorrectAnswerCount - iraCorrectAnswerCountAverage) * 100
+				    / iraCorrectAnswerCountAverage);
+		    group.setCorrectAnswerCountPercentDelta(correctAnswerCountPercentDelta);
+		    deltaSum += correctAnswerCountPercentDelta;
+		    deltaCount++;
+
+		    if (correctAnswerCountPercentDelta > highestСorrectAnswerCountDelta) {
+			highestСorrectAnswerCountDelta = correctAnswerCountPercentDelta;
+		    } else if (correctAnswerCountPercentDelta < lowestСorrectAnswerCountDelta) {
+			lowestСorrectAnswerCountDelta = correctAnswerCountPercentDelta;
+		    }
 		}
 	    }
+
 	}
 
 	if (iraGroupsCount > 1) {
-	    request.setAttribute("highestIraScoreAverage", highestIraScoreAverage);
-	    request.setAttribute("lowestIraScoreAverage", highestIraScoreAverage <= 0 ? 0 : lowestIraScoreAverage);
-
-	    request.setAttribute("averageIraScoreAverage", iraAverageScoreSum / iraGroupsCount);
+	    request.setAttribute("highestIraCorrectAnswerCountAverage", highestIraCorrectAnswerCountAverage);
+	    request.setAttribute("lowestIraCorrectAnswerCountAverage", lowestIraCorrectAnswerCountAverage);
 	    request.setAttribute("averageIraCorrectAnswerCountAverage",
 		    iraCorrectAnswerCountAverageSum / iraGroupsCount);
 	}
 	if (traGroupsCount > 1) {
-	    request.setAttribute("highestTraScore", highestTraScore);
-	    request.setAttribute("lowestTraScore", highestTraScore <= 0 ? 0 : lowestTraScore);
+	    request.setAttribute("highestTraCorrectAnswerCount", highestTraCorrectAnswerCount);
+	    request.setAttribute("lowestTraCorrectAnswerCount", lowestTraCorrectAnswerCount);
+	    request.setAttribute("averageTraCorrectAnswerCount", (double) traCorrectAnswerSum / traGroupsCount);
+	}
 
-	    request.setAttribute("averageTraScore", traScoreSum / traGroupsCount);
-	    request.setAttribute("averageTraCorrectAnswerCount", traCorrectAnswerSum / traGroupsCount);
+	if (deltaCount > 1) {
+	    request.setAttribute("highestCorrectAnswerCountDelta", highestСorrectAnswerCountDelta);
+	    request.setAttribute("lowestCorrectAnswerCountDelta", lowestСorrectAnswerCountDelta);
+	    request.setAttribute("averageCorrectAnswerCountDelta", (double) deltaSum / deltaCount);
 	}
 
 	return "tblmonitor/teams";

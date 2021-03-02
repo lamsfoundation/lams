@@ -96,8 +96,8 @@
 			$('#ira-user-name-label').html(userName);
 
 			//populate user score
-			var userScore = link.data('ira-score');
-			$('#ira-user-score').html(userScore);
+			var userScore = link.data('ira-correct-answer-count');
+			$('#ira-correct-answer-count').html(userScore);
 
 			//load modal dialog content using Ajax
 			var url = "${isIraMcqAvailable}" == "true" ? "<lams:LAMSURL/>tool/lamc11/tblmonitoring/getModalDialogForTeamsTab.do" : "<lams:LAMSURL/>tool/laasse10/tblmonitoring/getModalDialogForTeamsTab.do";
@@ -126,8 +126,8 @@
 			$('#tra-user-name-label').html(userName);
 
 			//populate user score
-			var userScore = link.data('tra-score');
-			$('#tra-user-score').html(userScore);
+			var userScore = link.data('tra-correct-answer-count');
+			$('#tra-correct-answer-count').html(userScore);
 
 			//load modal dialog content using Ajax
 			$('#tra-modal .modal-body').load(
@@ -199,10 +199,6 @@
 									
 									<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
 										<th class="text-center">
-											<fmt:message key="label.ira.mark.average"/>
-										</th>
-										
-										<th class="text-center">
 											<fmt:message key="label.ira.correct.count.average"/>
 										</th>
 										
@@ -210,15 +206,19 @@
 									</c:if>
 									
 									<c:if test="${isScratchieAvailable}">
-										<th class="text-center" style="${isIraAssessmentAvailable || isIraMcqAvailable ? 'border-left: 1px solid #ddd !important' : ''}">
-											<fmt:message key="label.tra.mark"/>
-										</th>
-										
 										<th class="text-center">
 											<fmt:message key="label.tra.correct.count"/>
 										</th>
 										
 										<th></th>
+										
+										<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
+											<th class="text-center">
+												<fmt:message key="label.ira.tra.delta"/>
+											</th>
+											
+											<th></th>
+										</c:if>
 									</c:if>
 								</tr>
 							</thead>
@@ -233,19 +233,22 @@
 										
 										<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
 											<td class="text-center">
-												<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${groupDto.iraScoreAverage}" />
-											</td>
-											
-											<td class="text-center">
-												<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${groupDto.iraCorrectAnswerCountAverage}" />
+												<c:choose>
+													<c:when test="${empty groupDto.iraCorrectAnswerCountAverage}">
+														-
+													</c:when>
+													<c:otherwise>
+														<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${groupDto.iraCorrectAnswerCountAverage}" />
+													</c:otherwise>
+												</c:choose>
 											</td>
 											
 											<td class="text-center">
 												<c:choose>
-													<c:when test="${not empty highestIraScoreAverage && groupDto.iraScoreAverage >= highestIraScoreAverage}">
+													<c:when test="${not empty highestIraCorrectAnswerCountAverage && groupDto.iraCorrectAnswerCountAverage >= highestIraCorrectAnswerCountAverage}">
 														<span class="label label-success"><fmt:message key="label.highest"/></span>
 													</c:when>
-													<c:when test="${not empty lowestIraScoreAverage && groupDto.iraScoreAverage <= lowestIraScoreAverage}">
+													<c:when test="${not empty lowestIraCorrectAnswerCountAverage && groupDto.iraCorrectAnswerCountAverage <= lowestIraCorrectAnswerCountAverage}">
 														<span class="label label-danger"><fmt:message key="label.lowest"/></span>
 													</c:when>
 												</c:choose>		
@@ -253,44 +256,62 @@
 										</c:if>
 										
 										<c:if test="${isScratchieAvailable}">
-											<td class="text-center" style="${isIraAssessmentAvailable || isIraMcqAvailable ? 'border-left: 1px solid #ddd !important' : ''}">
-												${groupDto.traScore}
-											</td>
-											
-											<td class="text-center">
-												${groupDto.traCorrectAnswerCount}
-											</td>
 											
 											<td class="text-center">
 												<c:choose>
-													<c:when test="${not empty highestTraScore && groupDto.traScore >= highestTraScore}">
-														<span class="label label-success"><fmt:message key="label.highest"/></span>
-													</c:when>
-													<c:when test="${not empty lowestTraScore && groupDto.traScore <= lowestTraScore}">
-														<span class="label label-danger"><fmt:message key="label.lowest"/></span>
-													</c:when>
-												</c:choose>		
-											</td>
-										</c:if>
-									</tr>
-								</c:forEach>
-								
-								<c:if test="${not empty averageIraScoreAverage or not empty averageTraScore}">
-									<tr>
-										<th><fmt:message key="label.average"/></th>
-										
-										<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
-											<td class="text-center">
-												<c:choose>
-													<c:when test="${empty averageIraScoreAverage}">
+													<c:when test="${empty groupDto.traCorrectAnswerCount}">
 														-
 													</c:when>
 													<c:otherwise>
-														<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${averageIraScoreAverage}" />
+														${groupDto.traCorrectAnswerCount}
 													</c:otherwise>
 												</c:choose>
 											</td>
 											
+											<td class="text-center">
+												<c:choose>
+													<c:when test="${not empty highestTraCorrectAnswerCount && groupDto.traCorrectAnswerCount >= highestTraCorrectAnswerCount}">
+														<span class="label label-success"><fmt:message key="label.highest"/></span>
+													</c:when>
+													<c:when test="${not empty lowestTraCorrectAnswerCount && groupDto.traCorrectAnswerCount <= lowestTraCorrectAnswerCount}">
+														<span class="label label-danger"><fmt:message key="label.lowest"/></span>
+													</c:when>
+												</c:choose>		
+											</td>
+											
+											<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
+												<td class="text-center">
+													<c:choose>
+														<c:when test="${empty groupDto.correctAnswerCountPercentDelta}">
+															-
+														</c:when>
+														<c:otherwise>
+															${groupDto.correctAnswerCountPercentDelta}%
+														</c:otherwise>
+													</c:choose>
+												</td>
+												
+																	
+												<td class="text-center">
+													<c:choose>					 
+														<c:when test="${not empty highestCorrectAnswerCountDelta && groupDto.correctAnswerCountPercentDelta >= highestCorrectAnswerCountDelta}">
+															<span class="label label-success"><fmt:message key="label.highest"/></span>
+														</c:when>
+														<c:when test="${not empty lowestCorrectAnswerCountDelta && groupDto.correctAnswerCountPercentDelta <= lowestCorrectAnswerCountDelta}">
+															<span class="label label-danger"><fmt:message key="label.lowest"/></span>
+														</c:when>
+													</c:choose>		
+												</td>
+											</c:if>
+										</c:if>
+									</tr>
+								</c:forEach>
+								
+								<c:if test="${not empty averageIraCorrectAnswerCountAverage or not empty averageTraCorrectAnswerCount}">
+									<tr>
+										<th><fmt:message key="label.average"/></th>
+										
+										<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
 											<td class="text-center">
 												<c:choose>
 													<c:when test="${empty averageIraCorrectAnswerCountAverage}">
@@ -306,17 +327,6 @@
 										</c:if>
 										
 										<c:if test="${isScratchieAvailable}">
-											<td class="text-center" style="${isIraAssessmentAvailable || isIraMcqAvailable ? 'border-left: 1px solid #ddd !important' : ''}">
-												<c:choose>
-													<c:when test="${empty averageTraScore}">
-														-
-													</c:when>
-													<c:otherwise>
-														<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${averageTraScore}" />
-													</c:otherwise>
-												</c:choose>
-											</td>
-											
 											<td class="text-center">
 												<c:choose>
 													<c:when test="${empty averageTraCorrectAnswerCount}">
@@ -329,6 +339,21 @@
 											</td>
 											
 											<td></td>
+											
+											<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
+												<td class="text-center">
+													<c:choose>
+														<c:when test="${empty averageCorrectAnswerCountDelta}">
+															-
+														</c:when>
+														<c:otherwise>
+															<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${averageCorrectAnswerCountDelta}" />%
+														</c:otherwise>
+													</c:choose>
+												</td>
+												
+												<td></td>
+											</c:if>
 										</c:if>
 									</tr>
 								</c:if>
@@ -352,28 +377,10 @@
 			<div id="collapse-${groupDto.groupID}" class="panel-collapse collapse in">
 				<div class="panel-body">
 					<c:if test="${isScratchieAvailable}">
-															
-						<h4><fmt:message key="label.tra.mark"/>:
-							<c:choose>
-								<c:when test="${empty groupDto.traScore}">
-									-
-								</c:when>
-								<c:when test="${empty groupDto.groupLeader}">
-									${groupDto.traScore}
-								</c:when>
-								<c:otherwise>
-									<a data-toggle="modal" href="#tra-modal"
-									   data-user-id="${groupDto.groupLeader.userID}"
-									   data-tra-score="${groupDto.traScore}">
-										${groupDto.traScore}
-									</a>
-								</c:otherwise>
-							</c:choose>
-						</h4>
 						
 						<h4><fmt:message key="label.tra.correct.count"/>:
 							<c:choose>
-								<c:when test="${empty groupDto.traScore}">
+								<c:when test="${empty groupDto.traCorrectAnswerCount}">
 									-
 								</c:when>
 								<c:when test="${empty groupDto.groupLeader}">
@@ -382,7 +389,7 @@
 								<c:otherwise>
 									<a data-toggle="modal" href="#tra-modal"
 									   data-user-id="${groupDto.groupLeader.userID}"
-									   data-tra-score="${groupDto.traScore}">
+									   data-tra-correct-answer-count="${groupDto.traCorrectAnswerCount}">
 										${groupDto.traCorrectAnswerCount}
 									</a>
 								</c:otherwise>
@@ -400,25 +407,32 @@
 										</th>
 										
 										<th class="text-center">
-											<fmt:message key="label.ira.mark"/>
-										</th>
-										
-										<th class="text-center">
 											<fmt:message key="label.ira.correct.count"/>
 										</th>
 										
 										<th></th>
+										
+										<c:if test="${isScratchieAvailable}">
+																					
+											<th class="text-center">
+												<fmt:message key="label.ira.tra.delta"/>
+											</th>
+											
+											<th></th>
+										</c:if>
 									</tr>
 								</thead>
 		
 								<tbody>
-									<c:set var="highestScore" value="${groupDto.iraHighestScore}" />
-									<c:set var="lowestScore" value="${groupDto.iraLowestScore}" />
+									<c:set var="iraHighestCorrectAnswerCount" value="${groupDto.iraHighestCorrectAnswerCount}" />
+									<c:set var="iraLowestCorrectAnswerCount" value="${groupDto.iraLowestCorrectAnswerCount}" />
+									<c:set var="highestCorrectAnswerCountPercentDelta" value="${groupDto.highestCorrectAnswerCountPercentDelta}" />
+									<c:set var="lowestCorrectAnswerCountPercentDelta" value="${groupDto.lowestCorrectAnswerCountPercentDelta}" />
 									
 									<c:forEach var="userDto" items="${groupDto.userList}">
 									
 										<tr>
-											<td class="col-md-7">
+											<td class="">
 												<span id="user-name-${userDto.userID}" class="belong-to-group-${groupDto.groupID} new-popover <c:if test="${userDto.groupLeader}">font-weight-bold</c:if>" 
 														data-portrait="${userDto.portraitUuid}" data-fullname="${userDto.lastName},&nbsp;${userDto.firstName}">
 													${userDto.lastName},&nbsp;${userDto.firstName} 
@@ -428,60 +442,75 @@
 												</c:if>
 											</td>
 											
-											<td class="col-md-2 text-center">
+											<td class="text-center">
 												<c:choose>
-													<c:when test="${userDto.iraScore != null}">
-														<a data-toggle="modal" href="#ira-modal"
-																data-user-id="${userDto.userID}"
-																data-ira-score="${userDto.iraScore}">
-															${userDto.iraScore}
-														</a>
+													<c:when test="${empty userDto.iraCorrectAnswerCount}">
+														-													
 													</c:when>
 													<c:otherwise>
-														-
-													</c:otherwise>
-												</c:choose>
-											</td>
-										
-											<td class="col-md-2 text-center">
-												<c:choose>
-													<c:when test="${userDto.iraScore != null}">
 														<a data-toggle="modal" href="#ira-modal"
 																data-user-id="${userDto.userID}"
-																data-ira-score="${userDto.iraScore}">
+																data-ira-correct-answer-count="${userDto.iraCorrectAnswerCount}">
 															${userDto.iraCorrectAnswerCount}
-														</a>													
-													</c:when>
-													<c:otherwise>
-														-
+														</a>
 													</c:otherwise>
 												</c:choose>
 											</td>
 											
-											<td class="col-md-1 text-center">
+											<td class="text-center">
 												<c:if test="${fn:length(groupDto.userList) > 1}">
 													<c:choose>
-														<c:when test="${highestScore > 0 && userDto.iraScore >= highestScore}">
+														<c:when test="${not empty iraHighestCorrectAnswerCount && userDto.iraCorrectAnswerCount >= iraHighestCorrectAnswerCount}">
 															<span class="label label-success"><fmt:message key="label.highest"/></span>
 														</c:when>
-														<c:when test="${lowestScore > 0 && userDto.iraScore <= lowestScore}">
+														<c:when test="${not empty iraLowestCorrectAnswerCount && userDto.iraCorrectAnswerCount <= iraLowestCorrectAnswerCount}">
 															<span class="label label-danger"><fmt:message key="label.lowest"/></span>
 														</c:when>
 													</c:choose>		
 												</c:if>
 											</td>
+											
+											<c:if test="${isScratchieAvailable}">
+																						
+												<td class="text-center">
+													<c:choose>
+														<c:when test="${empty userDto.correctAnswerCountPercentDelta}">
+															-													
+														</c:when>
+														<c:otherwise>
+															${userDto.correctAnswerCountPercentDelta}%
+														</c:otherwise>
+													</c:choose>
+												</td>
+												
+												<td>
+													<c:if test="${fn:length(groupDto.userList) > 1}">
+														<c:choose>
+															<c:when test="${not empty highestCorrectAnswerCountPercentDelta && userDto.correctAnswerCountPercentDelta >= highestCorrectAnswerCountPercentDelta}">
+																<span class="label label-success"><fmt:message key="label.highest"/></span>
+															</c:when>
+															<c:when test="${not empty lowestCorrectAnswerCountPercentDelta && userDto.correctAnswerCountPercentDelta <= lowestCorrectAnswerCountPercentDelta}">
+																<span class="label label-danger"><fmt:message key="label.lowest"/></span>
+															</c:when>
+														</c:choose>		
+													</c:if>
+												</td>
+											</c:if>
 										</tr>
 									</c:forEach>
 									
 									<c:if test="${fn:length(groupDto.userList) > 1}">
 										<tr>
 											<th><fmt:message key="label.average"/></th>
-											<td class="text-center">
-												<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${groupDto.iraScoreAverage}" />
-											</td>
 											
 											<td class="text-center">
 												<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${groupDto.iraCorrectAnswerCountAverage}" />
+											</td>
+											
+											<td></td>
+											
+											<td class="text-center">
+												<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${groupDto.correctAnswerCountPercentDeltaAverage}" />%
 											</td>
 											
 											<td></td>
@@ -495,11 +524,11 @@
 					<!-- Change leader and Compare buttons -->
 					<div class="row">
 						<div class="col-xs-12 col-md-12 col-lg-12">
-							<c:if test="${(isIraAssessmentAvailable || isIraMcqAvailable) && isScratchieAvailable && not empty groupDto.userList && not empty groupDto.traScore}">
+							<c:if test="${(isIraAssessmentAvailable || isIraMcqAvailable) && isScratchieAvailable && not empty groupDto.userList && not empty groupDto.traCorrectAnswerCount}">
 								<button href="#" data-toggle="modal" data-target="#comparison-modal" type="button" class="btn btn-sm btn-default pull-right"
 										data-ira-scores="
 										<c:forEach var="userDto" items="${groupDto.userList}">
-											<c:if test="${userDto.iraScore != null}">
+											<c:if test="${userDto.iraCorrectAnswerCount != null}">
 												${userDto.iraCorrectAnswerCount},
 											</c:if>
 										</c:forEach>" 
@@ -564,7 +593,7 @@
 		<h4 class="modal-title">
 			<fmt:message key="label.ira.responses.for"/>: <span id="ira-user-name-label"></span> 
 		</h4>
-		<fmt:message key="label.score"/>: <span id="ira-user-score"></span>
+		<fmt:message key="label.ira.correct.count"/>: <span id="ira-correct-answer-count"></span>
 	</div>
           
 	<!-- Begin -->
@@ -593,7 +622,7 @@
 		<h4 class="modal-title">
 			<fmt:message key="label.tra.responses.for"/>: <span id="tra-user-name-label"></span> 
 		</h4>
-		<fmt:message key="label.score"/>: <span id="tra-user-score"></span>
+		<fmt:message key="label.tra.correct.count"/>: <span id="tra-correct-answer-count"></span>
 	</div>
           
 	<!-- Begin -->
