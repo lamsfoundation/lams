@@ -172,17 +172,20 @@
 
 <!-- Header -->
 <div class="row no-gutter">
-	<div class="col-xs-12 col-md-12 col-lg-8">
-		<h3>
+	<div class="col-xs-2"></div>
+	<div class="col-xs-8">
+		<h3 style="text-align: center;">
 			<fmt:message key="label.students.teams"/>
 		</h3>
 	</div>
+	<div class="col-xs-2"></div>
 </div>
 <!-- End header -->              
 
 <!-- Tables -->
 <div class="row no-gutter">
-<div class="col-xs-12 col-md-12 col-lg-12">
+<div class="col-xs-2"></div>
+<div class="col-xs-8">
 
 	<div class="panel panel-default">
 		<div class="panel-heading">
@@ -534,6 +537,7 @@
 	</c:forEach>     
 
 </div>
+<div class="col-xs-2"></div>
 </div>
 
 <!-- modal chart -->
