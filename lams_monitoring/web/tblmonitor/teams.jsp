@@ -6,6 +6,14 @@
 	.group-title {
 	   	cursor: pointer;
 	}
+	
+	.fa-arrow-circle-down {
+		color: #d9534f;
+	}
+	
+	.fa-arrow-circle-up {
+		color: #5cb85c;
+	}
 </style>
 
 <!-- ChartJS-->
@@ -201,8 +209,6 @@
 										<th class="text-center">
 											<fmt:message key="label.ira.correct.count.average"/>
 										</th>
-										
-										<th></th>
 									</c:if>
 									
 									<c:if test="${isScratchieAvailable}">
@@ -210,14 +216,10 @@
 											<fmt:message key="label.tra.correct.count"/>
 										</th>
 										
-										<th></th>
-										
 										<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
 											<th class="text-center">
 												<fmt:message key="label.ira.tra.delta"/>
 											</th>
-											
-											<th></th>
 										</c:if>
 									</c:if>
 								</tr>
@@ -239,19 +241,16 @@
 													</c:when>
 													<c:otherwise>
 														<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${groupDto.iraCorrectAnswerCountAverage}" />
+														<c:choose>
+															<c:when test="${not empty highestIraCorrectAnswerCountAverage && groupDto.iraCorrectAnswerCountAverage >= highestIraCorrectAnswerCountAverage}">
+																&nbsp;<i class="fa fa-arrow-circle-up" title="<fmt:message key="label.highest"/>"></i>
+															</c:when>
+															<c:when test="${not empty lowestIraCorrectAnswerCountAverage && groupDto.iraCorrectAnswerCountAverage <= lowestIraCorrectAnswerCountAverage}">
+																&nbsp;<i class="fa fa-arrow-circle-down" title="<fmt:message key="label.lowest"/>"></i>
+															</c:when>
+														</c:choose>		
 													</c:otherwise>
 												</c:choose>
-											</td>
-											
-											<td class="text-center">
-												<c:choose>
-													<c:when test="${not empty highestIraCorrectAnswerCountAverage && groupDto.iraCorrectAnswerCountAverage >= highestIraCorrectAnswerCountAverage}">
-														<span class="label label-success"><fmt:message key="label.highest"/></span>
-													</c:when>
-													<c:when test="${not empty lowestIraCorrectAnswerCountAverage && groupDto.iraCorrectAnswerCountAverage <= lowestIraCorrectAnswerCountAverage}">
-														<span class="label label-danger"><fmt:message key="label.lowest"/></span>
-													</c:when>
-												</c:choose>		
 											</td>
 										</c:if>
 										
@@ -264,19 +263,17 @@
 													</c:when>
 													<c:otherwise>
 														${groupDto.traCorrectAnswerCount}
+														
+														<c:choose>
+															<c:when test="${not empty highestTraCorrectAnswerCount && groupDto.traCorrectAnswerCount >= highestTraCorrectAnswerCount}">
+																&nbsp;<i class="fa fa-arrow-circle-up" title="<fmt:message key="label.highest"/>"></i>
+															</c:when>
+															<c:when test="${not empty lowestTraCorrectAnswerCount && groupDto.traCorrectAnswerCount <= lowestTraCorrectAnswerCount}">
+																&nbsp;<i class="fa fa-arrow-circle-down" title="<fmt:message key="label.lowest"/>"></i>
+															</c:when>
+														</c:choose>		
 													</c:otherwise>
 												</c:choose>
-											</td>
-											
-											<td class="text-center">
-												<c:choose>
-													<c:when test="${not empty highestTraCorrectAnswerCount && groupDto.traCorrectAnswerCount >= highestTraCorrectAnswerCount}">
-														<span class="label label-success"><fmt:message key="label.highest"/></span>
-													</c:when>
-													<c:when test="${not empty lowestTraCorrectAnswerCount && groupDto.traCorrectAnswerCount <= lowestTraCorrectAnswerCount}">
-														<span class="label label-danger"><fmt:message key="label.lowest"/></span>
-													</c:when>
-												</c:choose>		
 											</td>
 											
 											<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
@@ -287,20 +284,17 @@
 														</c:when>
 														<c:otherwise>
 															${groupDto.correctAnswerCountPercentDelta}%
+															
+															<c:choose>					 
+																<c:when test="${not empty highestCorrectAnswerCountDelta && groupDto.correctAnswerCountPercentDelta >= highestCorrectAnswerCountDelta}">
+																	&nbsp;<i class="fa fa-arrow-circle-up" title="<fmt:message key="label.highest"/>"></i>
+																</c:when>
+																<c:when test="${not empty lowestCorrectAnswerCountDelta && groupDto.correctAnswerCountPercentDelta <= lowestCorrectAnswerCountDelta}">
+																	&nbsp;<i class="fa fa-arrow-circle-down" title="<fmt:message key="label.lowest"/>"></i>
+																</c:when>
+															</c:choose>	
 														</c:otherwise>
 													</c:choose>
-												</td>
-												
-																	
-												<td class="text-center">
-													<c:choose>					 
-														<c:when test="${not empty highestCorrectAnswerCountDelta && groupDto.correctAnswerCountPercentDelta >= highestCorrectAnswerCountDelta}">
-															<span class="label label-success"><fmt:message key="label.highest"/></span>
-														</c:when>
-														<c:when test="${not empty lowestCorrectAnswerCountDelta && groupDto.correctAnswerCountPercentDelta <= lowestCorrectAnswerCountDelta}">
-															<span class="label label-danger"><fmt:message key="label.lowest"/></span>
-														</c:when>
-													</c:choose>		
 												</td>
 											</c:if>
 										</c:if>
@@ -322,8 +316,6 @@
 													</c:otherwise>
 												</c:choose>
 											</td>
-											
-											<td></td>
 										</c:if>
 										
 										<c:if test="${isScratchieAvailable}">
@@ -338,8 +330,6 @@
 												</c:choose>
 											</td>
 											
-											<td></td>
-											
 											<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
 												<td class="text-center">
 													<c:choose>
@@ -351,8 +341,6 @@
 														</c:otherwise>
 													</c:choose>
 												</td>
-												
-												<td></td>
 											</c:if>
 										</c:if>
 									</tr>
@@ -410,15 +398,11 @@
 											<fmt:message key="label.ira.correct.count"/>
 										</th>
 										
-										<th></th>
-										
 										<c:if test="${isScratchieAvailable}">
 																					
 											<th class="text-center">
 												<fmt:message key="label.ira.tra.delta"/>
 											</th>
-											
-											<th></th>
 										</c:if>
 									</tr>
 								</thead>
@@ -453,22 +437,21 @@
 																data-ira-correct-answer-count="${userDto.iraCorrectAnswerCount}">
 															${userDto.iraCorrectAnswerCount}
 														</a>
+														
+														<c:if test="${fn:length(groupDto.userList) > 1}">
+															<c:choose>
+																<c:when test="${not empty iraHighestCorrectAnswerCount && userDto.iraCorrectAnswerCount >= iraHighestCorrectAnswerCount}">
+																	&nbsp;<i class="fa fa-arrow-circle-up" title="<fmt:message key="label.highest"/>"></i>
+																</c:when>
+																<c:when test="${not empty iraLowestCorrectAnswerCount && userDto.iraCorrectAnswerCount <= iraLowestCorrectAnswerCount}">
+																	&nbsp;<i class="fa fa-arrow-circle-down" title="<fmt:message key="label.lowest"/>"></i>
+																</c:when>
+															</c:choose>		
+														</c:if>
 													</c:otherwise>
 												</c:choose>
 											</td>
 											
-											<td class="text-center">
-												<c:if test="${fn:length(groupDto.userList) > 1}">
-													<c:choose>
-														<c:when test="${not empty iraHighestCorrectAnswerCount && userDto.iraCorrectAnswerCount >= iraHighestCorrectAnswerCount}">
-															<span class="label label-success"><fmt:message key="label.highest"/></span>
-														</c:when>
-														<c:when test="${not empty iraLowestCorrectAnswerCount && userDto.iraCorrectAnswerCount <= iraLowestCorrectAnswerCount}">
-															<span class="label label-danger"><fmt:message key="label.lowest"/></span>
-														</c:when>
-													</c:choose>		
-												</c:if>
-											</td>
 											
 											<c:if test="${isScratchieAvailable}">
 																						
@@ -479,21 +462,19 @@
 														</c:when>
 														<c:otherwise>
 															${userDto.correctAnswerCountPercentDelta}%
+															
+															<c:if test="${fn:length(groupDto.userList) > 1}">
+																<c:choose>
+																	<c:when test="${not empty highestCorrectAnswerCountPercentDelta && userDto.correctAnswerCountPercentDelta >= highestCorrectAnswerCountPercentDelta}">
+																		&nbsp;<i class="fa fa-arrow-circle-up" title="<fmt:message key="label.highest"/>"></i>
+																	</c:when>
+																	<c:when test="${not empty lowestCorrectAnswerCountPercentDelta && userDto.correctAnswerCountPercentDelta <= lowestCorrectAnswerCountPercentDelta}">
+																		&nbsp;<i class="fa fa-arrow-circle-down" title="<fmt:message key="label.lowest"/>"></i>
+																	</c:when>
+																</c:choose>		
+															</c:if>
 														</c:otherwise>
 													</c:choose>
-												</td>
-												
-												<td>
-													<c:if test="${fn:length(groupDto.userList) > 1}">
-														<c:choose>
-															<c:when test="${not empty highestCorrectAnswerCountPercentDelta && userDto.correctAnswerCountPercentDelta >= highestCorrectAnswerCountPercentDelta}">
-																<span class="label label-success"><fmt:message key="label.highest"/></span>
-															</c:when>
-															<c:when test="${not empty lowestCorrectAnswerCountPercentDelta && userDto.correctAnswerCountPercentDelta <= lowestCorrectAnswerCountPercentDelta}">
-																<span class="label label-danger"><fmt:message key="label.lowest"/></span>
-															</c:when>
-														</c:choose>		
-													</c:if>
 												</td>
 											</c:if>
 										</tr>
@@ -507,13 +488,9 @@
 												<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${groupDto.iraCorrectAnswerCountAverage}" />
 											</td>
 											
-											<td></td>
-											
 											<td class="text-center">
 												<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${groupDto.correctAnswerCountPercentDeltaAverage}" />%
 											</td>
-											
-											<td></td>
 										</tr>
 									</c:if>
 								</tbody>
