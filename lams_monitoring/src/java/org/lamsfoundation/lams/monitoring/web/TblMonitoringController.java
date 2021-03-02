@@ -45,6 +45,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+
 /**
  * Displays TBL monitor.
  *
@@ -182,6 +185,10 @@ public class TblMonitoringController {
 	int traCorrectAnswerSum = 0;
 	int deltaSum = 0;
 
+	ArrayNode chartIraDataset = JsonNodeFactory.instance.arrayNode();
+	ArrayNode chartTraDataset = JsonNodeFactory.instance.arrayNode();
+	ArrayNode chartNamesDataset = JsonNodeFactory.instance.arrayNode();
+
 	for (TblGroupDTO group : groupDtos) {
 	    Double iraCorrectAnswerCountAverage = group.getIraCorrectAnswerCountAverage();
 	    if (iraCorrectAnswerCountAverage != null) {
@@ -208,6 +215,10 @@ public class TblMonitoringController {
 		}
 
 		if (iraCorrectAnswerCountAverage != null) {
+		    chartIraDataset.add(iraCorrectAnswerCountAverage);
+		    chartTraDataset.add(traCorrectAnswerCount);
+		    chartNamesDataset.add(group.getGroupName());
+
 		    long correctAnswerCountPercentDelta = Math
 			    .round((traCorrectAnswerCount - iraCorrectAnswerCountAverage) * 100
 				    / iraCorrectAnswerCountAverage);
@@ -241,6 +252,12 @@ public class TblMonitoringController {
 	    request.setAttribute("highestCorrectAnswerCountDelta", highestСorrectAnswerCountDelta);
 	    request.setAttribute("lowestCorrectAnswerCountDelta", lowestСorrectAnswerCountDelta);
 	    request.setAttribute("averageCorrectAnswerCountDelta", (double) deltaSum / deltaCount);
+	}
+
+	if (iraGroupsCount > 0 && traGroupsCount > 0) {
+	    request.setAttribute("chartIraDataset", chartIraDataset.toString());
+	    request.setAttribute("chartTraDataset", chartTraDataset.toString());
+	    request.setAttribute("chartNamesDataset", chartNamesDataset.toString());
 	}
 
 	return "tblmonitor/teams";

@@ -30,6 +30,55 @@
 			$(this).toggleClass("collapsed");
 		});
 
+		<c:if test="${not empty chartNamesDataset}">
+			// summary chart
+			var summaryChartIraDataset = JSON.parse('${chartIraDataset}'),
+				summaryChartTraDataset = JSON.parse('${chartTraDataset}'),
+				summaryChartNamesDataset = JSON.parse('${chartNamesDataset}'),
+				ctx = $('#summary-chart')[0].getContext('2d'),
+				summaryChart = new Chart(ctx, {
+					type : 'bar',
+					data : {
+						datasets : [ {
+							label: "iRAT",
+							data : summaryChartIraDataset,
+							backgroundColor : 'rgba(255, 195, 55, 1)'
+											  
+						},
+						{
+							label: "tRAT",
+							data : summaryChartTraDataset,
+							backgroundColor : 'rgba(5, 204, 214, 1)'
+											  
+						}],
+						labels : summaryChartNamesDataset
+					},
+					options : {
+						legend : {
+							display : false
+						},
+						animation : {
+							duration : 0
+						},
+						scales : {
+							yAxes : [
+								{
+								    ticks : {
+										beginAtZero   : true
+									},
+									scaleLabel : {
+										display : true,
+										labelString : "<fmt:message key='label.ira.tra.correct.count'/>",
+										fontSize : 15
+									}
+								}
+							]
+						}
+					}
+				});
+		</c:if>
+		
+
 		//Comparison button modal window
 		var chart;
 		$('#comparison-modal').on('shown.bs.modal', function (event) {
@@ -50,7 +99,7 @@
 			//titles
 			var groupId = link.data('group-id');
 			var groupName = $("#group-name-" + groupId).html();
-			var title = groupName + ": iRA vs tRA comparison";
+			var title = groupName + ": <fmt:message key='label.ira.tra.correct.count'/>";
 
 			var userNames = [];
 			$(".belong-to-group-" + groupId).each(function() { 
@@ -66,13 +115,13 @@
 				type : 'bar',
 				data : {
 					datasets : [ {
-						label: "iRA",
+						label: "iRAT",
 						data : iraScores,
 						backgroundColor : 'rgba(255, 195, 55, 1)'
 										  
 					},
 					{
-						label: "tRA",
+						label: "tRAT",
 						data : traScores,
 						backgroundColor : 'rgba(5, 204, 214, 1)'
 										  
@@ -85,6 +134,15 @@
 					},
 					animation : {
 						duration : 1000
+					},
+					scales : {
+						yAxes : [
+							{
+							    ticks : {
+									beginAtZero   : true
+								}
+							}
+						]
 					}
 				}
 			});
@@ -174,24 +232,20 @@
 	}
 </script>            
 
-<!-- Header -->
-<div class="row no-gutter">
-	<div class="col-xs-2"></div>
-	<div class="col-xs-8">
-		<h3 style="text-align: center;">
-			<fmt:message key="label.students.teams"/>
-		</h3>
-	</div>
-	<div class="col-xs-2"></div>
-</div>
-<!-- End header -->              
+
 
 <!-- Tables -->
 <div class="row no-gutter">
 <div class="col-xs-2"></div>
 <div class="col-xs-8">
 
-	<div class="panel panel-default">
+	<h3 style="text-align: center;">
+		<fmt:message key="label.students.teams"/>
+	</h3>
+	
+	<canvas id="summary-chart" class="voffset20"></canvas>
+
+	<div class="panel panel-default voffset20">
 		<div class="panel-heading">
 			<h4 class="panel-title panel-collapse">
 				<a data-toggle="collapse" data-groupid="0" class="collapsed group-title">
@@ -397,7 +451,7 @@
 							<table class="table table-striped table-hover table-condensed">
 								<thead>
 									<tr>
-										<th style="width: 30%">
+										<th>
 											<fmt:message key="label.student"/>
 										</th>
 										
