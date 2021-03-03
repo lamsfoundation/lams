@@ -440,24 +440,23 @@
 			<div id="collapse-${groupDto.groupID}" class="panel-collapse collapse in">
 				<div class="panel-body">
 					<c:if test="${isScratchieAvailable}">
-						
-						<h4><fmt:message key="label.tra.correct.count"/>:
-							<c:choose>
-								<c:when test="${empty groupDto.traCorrectAnswerCount}">
-									-
-								</c:when>
-								<c:when test="${empty groupDto.groupLeader}">
-									${groupDto.traScore}
-								</c:when>
-								<c:otherwise>
-									<a data-toggle="modal" href="#tra-modal"
-									   data-user-id="${groupDto.groupLeader.userID}"
-									   data-tra-correct-answer-count="${groupDto.traCorrectAnswerCount}">
+						<c:choose>
+							<c:when test="${empty groupDto.traCorrectAnswerCount}">
+								-
+							</c:when>
+							<c:when test="${empty groupDto.groupLeader}">
+								<h4><fmt:message key="label.tra.correct.count"/>: ${groupDto.traCorrectAnswerCount}</h4>
+							</c:when>
+							<c:otherwise>
+								<a data-toggle="modal" href="#tra-modal"
+								   data-user-id="${groupDto.groupLeader.userID}"
+								   data-tra-correct-answer-count="${groupDto.traCorrectAnswerCount}">
+								   <h4><fmt:message key="label.tra.correct.count"/>:
 										${groupDto.traCorrectAnswerCount}
-									</a>
-								</c:otherwise>
-							</c:choose>
-						</h4>
+								   </h4>
+								</a>
+							</c:otherwise>
+						</c:choose>
 					</c:if>
 					
 					<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
@@ -492,10 +491,14 @@
 									
 										<tr>
 											<td class="">
-												<span id="user-name-${userDto.userID}" class="belong-to-group-${groupDto.groupID} new-popover <c:if test="${userDto.groupLeader}">font-weight-bold</c:if>" 
-														data-portrait="${userDto.portraitUuid}" data-fullname="${userDto.lastName},&nbsp;${userDto.firstName}">
-													${userDto.lastName},&nbsp;${userDto.firstName} 
-												</span>
+												<a data-toggle="modal" href="#ira-modal"
+												   data-user-id="${userDto.userID}"
+												   data-ira-correct-answer-count="${userDto.iraCorrectAnswerCount}">
+													<span id="user-name-${userDto.userID}" class="belong-to-group-${groupDto.groupID} new-popover <c:if test="${userDto.groupLeader}">font-weight-bold</c:if>" 
+															data-portrait="${userDto.portraitUuid}" data-fullname="${userDto.lastName},&nbsp;${userDto.firstName}">
+														${userDto.lastName},&nbsp;${userDto.firstName} 
+													</span>
+												</a>
 												<c:if test="${userDto.groupLeader}">
 													<abbr title="Leader" class="fa fa-user-plus" style="color:darkorange"></abbr>
 												</c:if>
