@@ -2,6 +2,7 @@ package org.lamsfoundation.lams.monitoring.dto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalDouble;
 
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.util.AlphanumComparator;
@@ -15,20 +16,18 @@ public class TblGroupDTO implements Comparable {
 
     private TblUserDTO groupLeader;
 
-    private Double traScore;
+    private Integer traCorrectAnswerCount;
+    private Long correctAnswerCountPercentDelta;
 
     /**
      * Get the DTO for this group. Does not include the GroupBranchActivities as they will be in a separate array for
      * Flash.
-     *
-     * @param group
      */
-    @SuppressWarnings("unchecked")
     public TblGroupDTO(Group group) {
 	groupID = group.getGroupId();
 	groupName = group.getGroupName();
 	orderID = group.getOrderId();
-	userList = new ArrayList<TblUserDTO>();
+	userList = new ArrayList<>();
     }
 
     @Override
@@ -82,11 +81,55 @@ public class TblGroupDTO implements Comparable {
 	this.groupLeader = groupLeader;
     }
 
-    public void setTraScore(Double traScore) {
-	this.traScore = traScore;
+    public Integer getTraCorrectAnswerCount() {
+	return traCorrectAnswerCount;
     }
 
-    public Double getTraScore() {
-	return traScore;
+    public void setTraCorrectAnswerCount(Integer traCorrectAnswerCount) {
+	this.traCorrectAnswerCount = traCorrectAnswerCount;
+    }
+
+    public Long getCorrectAnswerCountPercentDelta() {
+	return correctAnswerCountPercentDelta;
+    }
+
+    public void setCorrectAnswerCountPercentDelta(Long correctAnswerCountPercentDelta) {
+	this.correctAnswerCountPercentDelta = correctAnswerCountPercentDelta;
+    }
+
+    public Double getIraCorrectAnswerCountAverage() {
+	OptionalDouble result = userList.stream().filter(u -> u.getIraCorrectAnswerCount() != null)
+		.mapToDouble(TblUserDTO::getIraCorrectAnswerCount).average();
+	return result.isPresent() ? result.getAsDouble() : null;
+    }
+
+    public Double getIraHighestCorrectAnswerCount() {
+	OptionalDouble result = userList.stream().filter(u -> u.getIraCorrectAnswerCount() != null)
+		.mapToDouble(TblUserDTO::getIraCorrectAnswerCount).max();
+	return result.isPresent() ? result.getAsDouble() : null;
+    }
+
+    public Double getIraLowestCorrectAnswerCount() {
+	OptionalDouble result = userList.stream().filter(u -> u.getIraCorrectAnswerCount() != null)
+		.mapToDouble(TblUserDTO::getIraCorrectAnswerCount).min();
+	return result.isPresent() ? result.getAsDouble() : null;
+    }
+
+    public Integer getCorrectAnswerCountPercentDeltaAverage() {
+	OptionalDouble result = userList.stream().filter(u -> u.getCorrectAnswerCountPercentDelta() != null)
+		.mapToDouble(TblUserDTO::getCorrectAnswerCountPercentDelta).average();
+	return result.isPresent() ? Double.valueOf(result.getAsDouble()).intValue() : null;
+    }
+
+    public Double getHighestCorrectAnswerCountPercentDelta() {
+	OptionalDouble result = userList.stream().filter(u -> u.getCorrectAnswerCountPercentDelta() != null)
+		.mapToDouble(TblUserDTO::getCorrectAnswerCountPercentDelta).max();
+	return result.isPresent() ? result.getAsDouble() : null;
+    }
+
+    public Double getLowestCorrectAnswerCountPercentDelta() {
+	OptionalDouble result = userList.stream().filter(u -> u.getCorrectAnswerCountPercentDelta() != null)
+		.mapToDouble(TblUserDTO::getCorrectAnswerCountPercentDelta).min();
+	return result.isPresent() ? result.getAsDouble() : null;
     }
 }

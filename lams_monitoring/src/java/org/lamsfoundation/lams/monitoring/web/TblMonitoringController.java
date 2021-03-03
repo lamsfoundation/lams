@@ -2,7 +2,6 @@ package org.lamsfoundation.lams.monitoring.web;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -10,7 +9,6 @@ import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
@@ -34,15 +32,21 @@ import org.lamsfoundation.lams.monitoring.dto.TblGroupDTO;
 import org.lamsfoundation.lams.monitoring.dto.TblUserDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.tool.ToolSession;
+import org.lamsfoundation.lams.tool.service.ICommonAssessmentService;
+import org.lamsfoundation.lams.tool.service.ICommonScratchieService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 /**
  * Displays TBL monitor.
@@ -64,6 +68,12 @@ public class TblMonitoringController {
     private IActivityDAO activityDAO;
     @Autowired
     private IGradebookService gradebookService;
+    @Autowired
+    @Qualifier("laasseAssessmentService")
+    private ICommonAssessmentService commonAssessmentService;
+    @Autowired
+    @Qualifier("scratchieService")
+    private ICommonScratchieService commonScratchieService;
 
     /**
      * Displays addStudent page.
@@ -90,11 +100,9 @@ public class TblMonitoringController {
 
 	List<Activity> lessonActivities = getLessonActivities(lesson);
 	setupAvailableActivityTypes(request, lessonActivities);
-	boolean isScratchieAvailable = (request.getAttribute("isScratchieAvailable") != null)
+	boolean isTraAvailable = (request.getAttribute("isScratchieAvailable") != null)
 		&& ((Boolean) request.getAttribute("isScratchieAvailable"));
-	boolean isIraMcqAvailable = (request.getAttribute("isIraMcqAvailable") != null)
-		&& ((Boolean) request.getAttribute("isIraMcqAvailable"));
-	boolean isIraAssessmentAvailable = (request.getAttribute("isIraAssessmentAvailable") != null)
+	boolean isIraAvailable = (request.getAttribute("isIraAssessmentAvailable") != null)
 		&& ((Boolean) request.getAttribute("isIraAssessmentAvailable"));
 	Long iraToolActivityId = request.getAttribute("iraToolActivityId") == null ? null
 		: (Long) request.getAttribute("iraToolActivityId");
@@ -102,16 +110,12 @@ public class TblMonitoringController {
 		: (Long) request.getAttribute("traToolActivityId");
 	Long leaderselectionToolActivityId = request.getAttribute("leaderselectionToolActivityId") == null ? null
 		: (Long) request.getAttribute("leaderselectionToolActivityId");
-
-	//get all mcq and assessment scores
-	List<GradebookUserActivity> iraGradebookUserActivities = new LinkedList<>();
-	List<GradebookUserActivity> traGradebookUserActivities = new LinkedList<>();
-	if (isIraMcqAvailable || isIraAssessmentAvailable) {
-	    iraGradebookUserActivities = gradebookService.getGradebookUserActivities(iraToolActivityId);
-	}
-	if (isScratchieAvailable) {
-	    traGradebookUserActivities = gradebookService.getGradebookUserActivities(traToolActivityId);
-	}
+	Long iraToolContentId = isIraAvailable
+		? activityDAO.find(ToolActivity.class, iraToolActivityId).getToolContentId()
+		: null;
+	Long traToolContentId = isTraAvailable
+		? activityDAO.find(ToolActivity.class, traToolActivityId).getToolContentId()
+		: null;
 
 	Set<Long> leaderUserIds = null;
 	if (leaderselectionToolActivityId != null) {
@@ -127,47 +131,137 @@ public class TblMonitoringController {
 	Set<Group> groups = grouping == null ? null : grouping.getGroups();
 
 	Set<TblGroupDTO> groupDtos = new TreeSet<>();
-	if (groups != null) {
-	    for (Group group : groups) {
-		TblGroupDTO groupDto = new TblGroupDTO(group);
-		groupDtos.add(groupDto);
+	for (Group group : groups) {
+	    TblGroupDTO groupDto = new TblGroupDTO(group);
+	    groupDtos.add(groupDto);
 
-		if (group.getUsers() != null) {
-		    for (User user : group.getUsers()) {
-			TblUserDTO userDto = new TblUserDTO(user.getUserDTO());
-			groupDto.getUserList().add(userDto);
+	    if (group.getUsers() == null) {
+		continue;
+	    }
 
-			//set up all user leaders
-			if (leaderUserIds.contains(new Long(user.getUserId()))) {
-			    userDto.setGroupLeader(true);
-			    groupDto.setGroupLeader(userDto);
-			}
+	    for (User user : group.getUsers()) {
+		TblUserDTO userDto = new TblUserDTO(user.getUserDTO());
+		groupDto.getUserList().add(userDto);
 
-			if (isIraMcqAvailable || isIraAssessmentAvailable) {
-			    //find according iraGradebookUserActivity
-			    for (GradebookUserActivity iraGradebookUserActivity : iraGradebookUserActivities) {
-				if (iraGradebookUserActivity.getLearner().getUserId().equals(user.getUserId())) {
-				    userDto.setIraScore(iraGradebookUserActivity.getMark());
-				    break;
-				}
-			    }
-			}
+		//set up all user leaders
+		if (leaderUserIds.contains(user.getUserId().longValue())) {
+		    userDto.setGroupLeader(true);
+		    groupDto.setGroupLeader(userDto);
+		}
 
-			if (isScratchieAvailable) {
-			    //find according traGradebookUserActivity
-			    for (GradebookUserActivity traGradebookUserActivity : traGradebookUserActivities) {
-				if (traGradebookUserActivity.getLearner().getUserId().equals(user.getUserId())) {
-				    //we set traScore multiple times, but it's doesn't matter
-				    groupDto.setTraScore(traGradebookUserActivity.getMark());
-				    break;
-				}
-			    }
-			}
+		Integer correctAnswerCount = commonAssessmentService.countCorrectAnswers(iraToolContentId,
+			user.getUserId());
+		if (correctAnswerCount != null) {
+		    userDto.setIraCorrectAnswerCount(correctAnswerCount);
+		}
+	    }
+
+	    if (isTraAvailable && groupDto.getGroupLeader() != null) {
+		Integer correctAnswerCount = commonScratchieService.countCorrectAnswers(traToolContentId,
+			groupDto.getGroupLeader().getUserID());
+		if (correctAnswerCount != null) {
+		    groupDto.setTraCorrectAnswerCount(correctAnswerCount);
+
+		    for (TblUserDTO userDto : groupDto.getUserList()) {
+			userDto.setTraCorrectAnswerCount(correctAnswerCount);
 		    }
 		}
 	    }
 	}
+
 	request.setAttribute("groupDtos", groupDtos);
+
+	double highestIraCorrectAnswerCountAverage = 0;
+	double lowestIraCorrectAnswerCountAverage = Double.MAX_VALUE;
+	int highestTraCorrectAnswerCount = 0;
+	int lowestTraCorrectAnswerCount = Integer.MAX_VALUE;
+	long highestСorrectAnswerCountDelta = Long.MIN_VALUE;
+	long lowestСorrectAnswerCountDelta = Long.MAX_VALUE;
+
+	int iraGroupsCount = 0;
+	int traGroupsCount = 0;
+	int deltaCount = 0;
+	double iraCorrectAnswerCountAverageSum = 0;
+	int traCorrectAnswerSum = 0;
+	int deltaSum = 0;
+
+	ArrayNode chartIraDataset = JsonNodeFactory.instance.arrayNode();
+	ArrayNode chartTraDataset = JsonNodeFactory.instance.arrayNode();
+	ArrayNode chartNamesDataset = JsonNodeFactory.instance.arrayNode();
+
+	for (TblGroupDTO group : groupDtos) {
+	    Double iraCorrectAnswerCountAverage = group.getIraCorrectAnswerCountAverage();
+	    if (iraCorrectAnswerCountAverage != null) {
+		iraCorrectAnswerCountAverageSum += iraCorrectAnswerCountAverage;
+		iraGroupsCount++;
+
+		if (iraCorrectAnswerCountAverage > highestIraCorrectAnswerCountAverage) {
+		    highestIraCorrectAnswerCountAverage = iraCorrectAnswerCountAverage;
+		}
+		if (iraCorrectAnswerCountAverage < lowestIraCorrectAnswerCountAverage) {
+		    lowestIraCorrectAnswerCountAverage = iraCorrectAnswerCountAverage;
+		}
+	    }
+
+	    Integer traCorrectAnswerCount = group.getTraCorrectAnswerCount();
+
+	    if (traCorrectAnswerCount != null) {
+		traCorrectAnswerSum += traCorrectAnswerCount;
+		traGroupsCount++;
+
+		if (traCorrectAnswerCount > highestTraCorrectAnswerCount) {
+		    highestTraCorrectAnswerCount = traCorrectAnswerCount;
+		}
+		if (traCorrectAnswerSum < lowestTraCorrectAnswerCount) {
+		    lowestTraCorrectAnswerCount = traCorrectAnswerCount;
+		}
+
+		if (iraCorrectAnswerCountAverage != null) {
+		    chartIraDataset.add(iraCorrectAnswerCountAverage);
+		    chartTraDataset.add(traCorrectAnswerCount);
+		    chartNamesDataset.add(group.getGroupName());
+
+		    long correctAnswerCountPercentDelta = Math
+			    .round((traCorrectAnswerCount - iraCorrectAnswerCountAverage) * 100
+				    / iraCorrectAnswerCountAverage);
+		    group.setCorrectAnswerCountPercentDelta(correctAnswerCountPercentDelta);
+		    deltaSum += correctAnswerCountPercentDelta;
+		    deltaCount++;
+
+		    if (correctAnswerCountPercentDelta > highestСorrectAnswerCountDelta) {
+			highestСorrectAnswerCountDelta = correctAnswerCountPercentDelta;
+		    }
+		    if (correctAnswerCountPercentDelta < lowestСorrectAnswerCountDelta) {
+			lowestСorrectAnswerCountDelta = correctAnswerCountPercentDelta;
+		    }
+		}
+	    }
+
+	}
+
+	if (iraGroupsCount > 1) {
+	    request.setAttribute("highestIraCorrectAnswerCountAverage", highestIraCorrectAnswerCountAverage);
+	    request.setAttribute("lowestIraCorrectAnswerCountAverage", lowestIraCorrectAnswerCountAverage);
+	    request.setAttribute("averageIraCorrectAnswerCountAverage",
+		    iraCorrectAnswerCountAverageSum / iraGroupsCount);
+	}
+	if (traGroupsCount > 1) {
+	    request.setAttribute("highestTraCorrectAnswerCount", highestTraCorrectAnswerCount);
+	    request.setAttribute("lowestTraCorrectAnswerCount", lowestTraCorrectAnswerCount);
+	    request.setAttribute("averageTraCorrectAnswerCount", (double) traCorrectAnswerSum / traGroupsCount);
+	}
+
+	if (deltaCount > 1) {
+	    request.setAttribute("highestCorrectAnswerCountDelta", highestСorrectAnswerCountDelta);
+	    request.setAttribute("lowestCorrectAnswerCountDelta", lowestСorrectAnswerCountDelta);
+	    request.setAttribute("averageCorrectAnswerCountDelta", (double) deltaSum / deltaCount);
+	}
+
+	if (iraGroupsCount > 0 && traGroupsCount > 0) {
+	    request.setAttribute("chartIraDataset", chartIraDataset.toString());
+	    request.setAttribute("chartTraDataset", chartTraDataset.toString());
+	    request.setAttribute("chartNamesDataset", chartNamesDataset.toString());
+	}
 
 	return "tblmonitor/teams";
     }
