@@ -293,7 +293,7 @@
 								
 									<tr>
 										<td>
-											<c:out value="${groupDto.groupName}" />
+											<a href="#teams-panel-${groupDto.groupID}"><c:out value="${groupDto.groupName}" /></a>
 										</td>
 										
 										<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
@@ -415,7 +415,7 @@
 	</div>
 
 	<c:forEach var="groupDto" items="${groupDtos}">
-		<div class="panel panel-default">
+		<div class="panel panel-default" id="teams-panel-${groupDto.groupID}">
 			<div class="panel-heading">
 				<h4 class="panel-title panel-collapse">
 					<a data-toggle="collapse" data-groupid="${groupDto.groupID}" class="collapsed group-title" id="group-name-${groupDto.groupID}">
