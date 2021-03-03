@@ -44,13 +44,13 @@
 					type : 'bar',
 					data : {
 						datasets : [ {
-							label: "iRAT",
+							label: "<fmt:message key='label.ira' />",
 							data : summaryChartIraDataset,
 							backgroundColor : 'rgba(255, 195, 55, 1)'
 											  
 						},
 						{
-							label: "tRAT",
+							label: "<fmt:message key='label.tra' />",
 							data : summaryChartTraDataset,
 							backgroundColor : 'rgba(5, 204, 214, 1)'
 											  
@@ -255,7 +255,7 @@
 		<div class="panel-heading">
 			<h4 class="panel-title panel-collapse">
 				<a data-toggle="collapse" data-groupid="0" class="collapsed group-title">
-					<fmt:message key="label.summary"/>
+					<fmt:message key="label.ira.tra.summary"/>
 				</a>
 			</h4>
 		</div>
@@ -310,10 +310,10 @@
 														<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${groupDto.iraCorrectAnswerCountAverage}" />
 														<c:choose>
 															<c:when test="${not empty highestIraCorrectAnswerCountAverage && groupDto.iraCorrectAnswerCountAverage >= highestIraCorrectAnswerCountAverage}">
-																&nbsp;<i class="fa fa-arrow-circle-up" data-toggle="tooltip" title="<fmt:message key="label.highest"/>"></i>
+																&nbsp;<i class="fa fa-arrow-circle-up" data-toggle="tooltip" title="<fmt:message key="label.ira.tra.highest"/>"></i>
 															</c:when>
 															<c:when test="${not empty lowestIraCorrectAnswerCountAverage && groupDto.iraCorrectAnswerCountAverage <= lowestIraCorrectAnswerCountAverage}">
-																&nbsp;<i class="fa fa-arrow-circle-down" data-toggle="tooltip" title="<fmt:message key="label.lowest"/>"></i>
+																&nbsp;<i class="fa fa-arrow-circle-down" data-toggle="tooltip" title="<fmt:message key="label.ira.tra.lowest"/>"></i>
 															</c:when>
 															<c:otherwise>
 																&nbsp;<i class="fa fa-arrow-circle-left"></i>
@@ -335,10 +335,10 @@
 														${groupDto.traCorrectAnswerCount}
 														<c:choose>
 															<c:when test="${not empty highestTraCorrectAnswerCount && groupDto.traCorrectAnswerCount >= highestTraCorrectAnswerCount}">
-																&nbsp;<i class="fa fa-arrow-circle-up" data-toggle="tooltip" title="<fmt:message key="label.highest"/>"></i>
+																&nbsp;<i class="fa fa-arrow-circle-up" data-toggle="tooltip" title="<fmt:message key="label.ira.tra.highest"/>"></i>
 															</c:when>
 															<c:when test="${not empty lowestTraCorrectAnswerCount && groupDto.traCorrectAnswerCount <= lowestTraCorrectAnswerCount}">
-																&nbsp;<i class="fa fa-arrow-circle-down" data-toggle="tooltip" title="<fmt:message key="label.lowest"/>"></i>
+																&nbsp;<i class="fa fa-arrow-circle-down" data-toggle="tooltip" title="<fmt:message key="label.ira.tra.lowest"/>"></i>
 															</c:when>
 															<c:otherwise>
 																&nbsp;<i class="fa fa-arrow-circle-left"></i>
@@ -359,10 +359,10 @@
 															
 															<c:choose>					 
 																<c:when test="${not empty highestCorrectAnswerCountDelta && groupDto.correctAnswerCountPercentDelta >= highestCorrectAnswerCountDelta}">
-																	&nbsp;<i class="fa fa-arrow-circle-up" data-toggle="tooltip" title="<fmt:message key="label.highest"/>"></i>
+																	&nbsp;<i class="fa fa-arrow-circle-up" data-toggle="tooltip" title="<fmt:message key="label.ira.tra.highest"/>"></i>
 																</c:when>
 																<c:when test="${not empty lowestCorrectAnswerCountDelta && groupDto.correctAnswerCountPercentDelta <= lowestCorrectAnswerCountDelta}">
-																	&nbsp;<i class="fa fa-arrow-circle-down" data-toggle="tooltip" title="<fmt:message key="label.lowest"/>"></i>
+																	&nbsp;<i class="fa fa-arrow-circle-down" data-toggle="tooltip" title="<fmt:message key="label.ira.tra.lowest"/>"></i>
 																</c:when>
 																<c:otherwise>
 																	&nbsp;<i class="fa fa-arrow-circle-left"></i>
@@ -378,7 +378,7 @@
 								
 								<c:if test="${not empty averageIraCorrectAnswerCountAverage or not empty averageTraCorrectAnswerCount}">
 									<tr>
-										<th><fmt:message key="label.average"/></th>
+										<th><fmt:message key="label.ira.tra.average"/></th>
 										
 										<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
 											<td class="text-center">
@@ -519,10 +519,10 @@
 														<c:if test="${fn:length(groupDto.userList) > 1}">
 															<c:choose>
 																<c:when test="${not empty iraHighestCorrectAnswerCount && userDto.iraCorrectAnswerCount >= iraHighestCorrectAnswerCount}">
-																	&nbsp;<i class="fa fa-arrow-circle-up" data-toggle="tooltip" title="<fmt:message key="label.highest"/>"></i>
+																	&nbsp;<i class="fa fa-arrow-circle-up" data-toggle="tooltip" title="<fmt:message key="label.ira.tra.highest"/>"></i>
 																</c:when>
 																<c:when test="${not empty iraLowestCorrectAnswerCount && userDto.iraCorrectAnswerCount <= iraLowestCorrectAnswerCount}">
-																	&nbsp;<i class="fa fa-arrow-circle-down" data-toggle="tooltip" title="<fmt:message key="label.lowest"/>"></i>
+																	&nbsp;<i class="fa fa-arrow-circle-down" data-toggle="tooltip" title="<fmt:message key="label.ira.tra.lowest"/>"></i>
 																</c:when>
 																<c:otherwise>
 																	&nbsp;<i class="fa fa-arrow-circle-left"></i>
@@ -547,10 +547,10 @@
 															<c:if test="${fn:length(groupDto.userList) > 1}">
 																<c:choose>
 																	<c:when test="${not empty highestCorrectAnswerCountPercentDelta && userDto.correctAnswerCountPercentDelta >= highestCorrectAnswerCountPercentDelta}">
-																		&nbsp;<i class="fa fa-arrow-circle-up" data-toggle="tooltip" title="<fmt:message key="label.highest"/>"></i>
+																		&nbsp;<i class="fa fa-arrow-circle-up" data-toggle="tooltip" title="<fmt:message key="label.ira.tra.highest"/>"></i>
 																	</c:when>
 																	<c:when test="${not empty lowestCorrectAnswerCountPercentDelta && userDto.correctAnswerCountPercentDelta <= lowestCorrectAnswerCountPercentDelta}">
-																		&nbsp;<i class="fa fa-arrow-circle-down" data-toggle="tooltip" title="<fmt:message key="label.lowest"/>"></i>
+																		&nbsp;<i class="fa fa-arrow-circle-down" data-toggle="tooltip" title="<fmt:message key="label.ira.tra.lowest"/>"></i>
 																	</c:when>
 																	<c:otherwise>
 																		&nbsp;<i class="fa fa-arrow-circle-left"></i>
@@ -566,7 +566,7 @@
 									
 									<c:if test="${fn:length(groupDto.userList) > 1}">
 										<tr>
-											<th><fmt:message key="label.average"/></th>
+											<th><fmt:message key="label.ira.tra.average"/></th>
 											
 											<td class="text-center">
 												<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${groupDto.iraCorrectAnswerCountAverage}" />
