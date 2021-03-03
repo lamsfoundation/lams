@@ -14,6 +14,10 @@
 	.fa-arrow-circle-up {
 		color: #5cb85c;
 	}
+	
+	.fa-arrow-circle-left {
+		visibility: hidden;
+	}
 </style>
 
 <!-- ChartJS-->
@@ -311,6 +315,9 @@
 															<c:when test="${not empty lowestIraCorrectAnswerCountAverage && groupDto.iraCorrectAnswerCountAverage <= lowestIraCorrectAnswerCountAverage}">
 																&nbsp;<i class="fa fa-arrow-circle-down" data-toggle="tooltip" title="<fmt:message key="label.lowest"/>"></i>
 															</c:when>
+															<c:otherwise>
+																&nbsp;<i class="fa fa-arrow-circle-left"></i>
+															</c:otherwise>
 														</c:choose>		
 													</c:otherwise>
 												</c:choose>
@@ -333,6 +340,9 @@
 															<c:when test="${not empty lowestTraCorrectAnswerCount && groupDto.traCorrectAnswerCount <= lowestTraCorrectAnswerCount}">
 																&nbsp;<i class="fa fa-arrow-circle-down" data-toggle="tooltip" title="<fmt:message key="label.lowest"/>"></i>
 															</c:when>
+															<c:otherwise>
+																&nbsp;<i class="fa fa-arrow-circle-left"></i>
+															</c:otherwise>
 														</c:choose>		
 													</c:otherwise>
 												</c:choose>
@@ -354,6 +364,9 @@
 																<c:when test="${not empty lowestCorrectAnswerCountDelta && groupDto.correctAnswerCountPercentDelta <= lowestCorrectAnswerCountDelta}">
 																	&nbsp;<i class="fa fa-arrow-circle-down" data-toggle="tooltip" title="<fmt:message key="label.lowest"/>"></i>
 																</c:when>
+																<c:otherwise>
+																	&nbsp;<i class="fa fa-arrow-circle-left"></i>
+																</c:otherwise>
 															</c:choose>	
 														</c:otherwise>
 													</c:choose>
@@ -508,6 +521,9 @@
 																<c:when test="${not empty iraLowestCorrectAnswerCount && userDto.iraCorrectAnswerCount <= iraLowestCorrectAnswerCount}">
 																	&nbsp;<i class="fa fa-arrow-circle-down" data-toggle="tooltip" title="<fmt:message key="label.lowest"/>"></i>
 																</c:when>
+																<c:otherwise>
+																	&nbsp;<i class="fa fa-arrow-circle-left"></i>
+																</c:otherwise>
 															</c:choose>		
 														</c:if>
 													</c:otherwise>
@@ -533,6 +549,9 @@
 																	<c:when test="${not empty lowestCorrectAnswerCountPercentDelta && userDto.correctAnswerCountPercentDelta <= lowestCorrectAnswerCountPercentDelta}">
 																		&nbsp;<i class="fa fa-arrow-circle-down" data-toggle="tooltip" title="<fmt:message key="label.lowest"/>"></i>
 																	</c:when>
+																	<c:otherwise>
+																		&nbsp;<i class="fa fa-arrow-circle-left"></i>
+																	</c:otherwise>
 																</c:choose>		
 															</c:if>
 														</c:otherwise>
