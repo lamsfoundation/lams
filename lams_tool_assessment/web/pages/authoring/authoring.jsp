@@ -37,7 +37,7 @@
 			}
 
 			var timeLimit = $('#relativeTimeLimit').val();
-			if (!timeLimit) {
+			if (!timeLimit || timeLimit < 0) {
 				$('#relativeTimeLimit').val(0);
 			}
 

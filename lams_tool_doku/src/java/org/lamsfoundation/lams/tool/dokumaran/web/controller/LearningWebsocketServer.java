@@ -26,7 +26,7 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
 
     private static final Logger log = Logger.getLogger(LearningWebsocketServer.class);
 
-    private static IDokumaranService dokumaranService;
+    private IDokumaranService dokumaranService;
 
     public LearningWebsocketServer() {
 	if (dokumaranService == null) {
@@ -38,7 +38,7 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
 
     @Override
     protected Logger getLog() {
-	return log;
+	return LearningWebsocketServer.log;
     }
 
     /**

@@ -51,6 +51,19 @@
 	#collapseBurning .burning-question-title {
 	  cursor: pointer;
 	}
+	
+		 		
+	.countdown-timeout {
+		color: #FF3333 !important;
+	}
+	
+	#time-limit-table th {
+		vertical-align: middle;
+	}
+	
+	#time-limit-table td.centered {
+		text-align: center;
+	}
 </style>
 
 <script type="text/javascript">
@@ -300,6 +313,17 @@
             $.extend(grid[0].p.postData,{filters:JSON.stringify(f)});
             grid.trigger("reloadGrid",[{page:1,current:true}]);
 	    });
+
+   		// create counter if absolute time limit is set
+   		if (absoluteTimeLimit) {
+   			updateAbsoluteTimeLimitCounter();
+   			
+   			// expand time limit panel if absolute time limit is set and not expired
+   			if (absoluteTimeLimit > new Date().getTime() / 1000) {
+   				$('#time-limit-collapse').collapse('show');
+   			}
+   		}
+   		initInidividualTimeLimitAutocomplete();
 	});
 	
 	function exportExcel(){
@@ -350,6 +374,334 @@
 		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
 		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
 	};
+
+
+
+	// TIME LIMIT
+	
+	// in minutes since learner entered the activity
+	var relativeTimeLimit = ${scratchie.relativeTimeLimit},
+		// in seconds since epoch started
+		absoluteTimeLimit = ${empty scratchie.absoluteTimeLimit ? 'null' : scratchie.absoluteTimeLimitSeconds};
+	
+	function updateTimeLimit(type, toggle, adjust) {
+		// relavite time limit set
+		if (type == 'relative') {
+			// what is set at the moment on screen, not at server
+			var displayedRelativeTimeLimit = +$('#relative-time-limit-value').text();
+			
+			// start/stop
+			if (toggle !== null) {
+				
+				if (toggle === false) {
+					// stop, i.e. set time limit to 0
+					relativeTimeLimit = 0;
+					updateTimeLimitOnServer();
+					return;
+				}
+				
+				// start, i.e. set backend time limit to whatever is set on screen
+				if (toggle === true && displayedRelativeTimeLimit > 0) {
+					relativeTimeLimit = displayedRelativeTimeLimit;
+					// when teacher enables relative time limit, absolute one gets disabled
+					absoluteTimeLimit = null;
+					updateTimeLimitOnServer();
+				}
+				return;
+			}
+			
+			// no negative time limit is allowed
+			if (displayedRelativeTimeLimit == 0 && adjust < 0) {
+				return;
+			}
+			
+			var adjustedRelativeTimeLimit = displayedRelativeTimeLimit + adjust;
+			// at least one minute is required
+			// if teacher wants to set less, he should disable the limit or click "finish now"
+			if (adjustedRelativeTimeLimit < 1) {
+				adjustedRelativeTimeLimit = 1;
+			}
+			
+			// is time limit already enforced? if so, update the server
+			if (relativeTimeLimit > 0) {
+				relativeTimeLimit = adjustedRelativeTimeLimit;
+				updateTimeLimitOnServer();
+				return;
+			}
+			
+			// if time limit is not enforced yet, just update the screen
+			displayedRelativeTimeLimit = adjustedRelativeTimeLimit;
+			$('#relative-time-limit-value').text(displayedRelativeTimeLimit);
+			$('#relative-time-limit-start').prop('disabled', false);
+			return;
+		}
+		
+		if (type == 'absolute') {
+			// get existing value on counter, if it is set already
+			var counter = $('#absolute-time-limit-counter'),
+				secondsLeft = null;
+			if (counter.length === 1) {
+				var periods = counter.countdown('getTimes');
+				secondsLeft = $.countdown.periodsToSeconds(periods);
+			}
+			
+			if (toggle !== null) {
+				
+				// start/stop
+				if (toggle === false) {
+					absoluteTimeLimit = null;
+					updateAbsoluteTimeLimitCounter();
+					return;
+				} 
+				
+				// turn on the time limit, if there is any value on counter set already
+				if (toggle === true && secondsLeft) {
+					updateAbsoluteTimeLimitCounter(secondsLeft, true);
+					return;
+				}
+				
+				if (toggle === 'stop') {
+					absoluteTimeLimit =  Math.round(new Date().getTime() / 1000);
+					updateAbsoluteTimeLimitCounter();
+				}
+				return;
+			}
+			
+			// counter is not set yet and user clicked negative value
+			if (!secondsLeft && adjust < 0) {
+				return;
+			}
+			
+			// adjust time
+			secondsLeft += adjust * 60;
+			if (secondsLeft < 60) {
+				secondsLeft = 60;
+			}
+
+			// is time limit already enforced, update the server
+			// if time limit is not enforced yet, just update the screen
+			updateAbsoluteTimeLimitCounter(secondsLeft);
+			$('#absolute-time-limit-start').prop('disabled', false);
+			return;
+		}
+		
+		if (type == 'individual') {
+			// this method is called with updateTimeLimit.call() so we can change meaning of "this"
+			// and identify row and userUid
+			var button = $(this),
+				row = button.closest('.individual-time-limit-row'),
+				sessionId = row.data('sessionId');
+			
+			// disable individual time adjustment
+			if (toggle === false) {
+				updateIndividualTimeLimitOnServer('group-' + sessionId);
+				return;
+			}
+			var existingAdjustment = +$('.individual-time-limit-value', row).text(),
+				newAdjustment = existingAdjustment + adjust;
+			
+			updateIndividualTimeLimitOnServer('group-' + sessionId, newAdjustment);
+			return;
+		}
+	}
+	
+	function updateTimeLimitOnServer() {
+		
+		// absolute time limit has higher priority
+		if (absoluteTimeLimit != null) {
+			relativeTimeLimit = 0;
+		}
+		
+		$.ajax({
+			'url' : '<c:url value="/monitoring/updateTimeLimit.do"/>',
+			'type': 'post',
+			'cache' : 'false',
+			'data': {
+				'toolContentID' : '${scratchie.contentId}',
+				'relativeTimeLimit' : relativeTimeLimit,
+				'absoluteTimeLimit' : absoluteTimeLimit,
+				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
+			},
+			success : function(){
+				// update widgets
+				$('#relative-time-limit-value').text(relativeTimeLimit);
+				
+				if (relativeTimeLimit > 0) {
+					$('#relative-time-limit-disabled').addClass('hidden');
+					$('#relative-time-limit-cancel').removeClass('hidden');
+					$('#relative-time-limit-enabled').removeClass('hidden');
+					$('#relative-time-limit-start').addClass('hidden');
+				} else {
+					$('#relative-time-limit-disabled').removeClass('hidden');
+					$('#relative-time-limit-cancel').addClass('hidden');
+					$('#relative-time-limit-enabled').addClass('hidden');
+					$('#relative-time-limit-start').removeClass('hidden').prop('disabled', true);
+				}
+				
+				if (absoluteTimeLimit === null) {
+					// no absolute time limit? destroy the counter
+					$('#absolute-time-limit-counter').countdown('destroy');
+					$('#absolute-time-limit-value').empty();
+					
+					$('#absolute-time-limit-disabled').removeClass('hidden');
+					$('#absolute-time-limit-cancel').addClass('hidden');
+					$('#absolute-time-limit-enabled').addClass('hidden');
+					$('#absolute-time-limit-start').removeClass('hidden').prop('disabled', true);
+					$('#absolute-time-limit-finish-now').prop('disabled', false);
+				} else {
+					$('#absolute-time-limit-disabled').addClass('hidden');
+					$('#absolute-time-limit-cancel').removeClass('hidden');
+					$('#absolute-time-limit-enabled').removeClass('hidden');
+					$('#absolute-time-limit-start').addClass('hidden');
+					$('#absolute-time-limit-finish-now').prop('disabled', absoluteTimeLimit <= Math.round(new Date().getTime() / 1000));
+				}
+			}
+		});
+	}
+	
+	function updateAbsoluteTimeLimitCounter(secondsLeft, start) {
+		var now = Math.round(new Date().getTime() / 1000),
+			// preset means that counter is set just on screen and the time limit is not enforced for learners
+			preset = start !== true && absoluteTimeLimit == null;
+		
+		if (secondsLeft) {
+			if (!preset) {
+				// time limit is already enforced on server, so update it there now
+				absoluteTimeLimit = now + secondsLeft;
+				updateTimeLimitOnServer();
+			}
+		} else {
+			if (absoluteTimeLimit == null) {
+				// disable the counter
+				updateTimeLimitOnServer();
+				return;
+			}
+			// counter initialisation on page load or "finish now"
+			secondsLeft = absoluteTimeLimit - now;
+			if (secondsLeft <= 0) {
+				// finish now
+				updateTimeLimitOnServer();
+			}
+		}
+		
+		var counter = $('#absolute-time-limit-counter');
+	
+		if (counter.length == 0) {
+			counter = $('<div />').attr('id', 'absolute-time-limit-counter').appendTo('#absolute-time-limit-value')
+				.countdown({
+					until: '+' + secondsLeft +'S',
+					format: 'hMS',
+					compact: true,
+					alwaysExpire : true,
+					onTick: function(periods) {
+						// check for 30 seconds or less and display timer in red
+						var secondsLeft = $.countdown.periodsToSeconds(periods);
+						if (secondsLeft <= 30) {
+							counter.addClass('countdown-timeout');
+						} else {
+							counter.removeClass('countdown-timeout');
+						}				
+					},
+					expiryText : '<span class="countdown-timeout"><fmt:message key="label.monitoring.summary.time.limit.expired" /></span>'
+				});
+		} else {
+			// if counter is paused, we can not adjust time, so resume it for a moment
+			counter.countdown('resume');
+			counter.countdown('option', 'until', secondsLeft + 'S');
+		}
+		
+		if (preset) {
+			counter.countdown('pause');
+			$('#absolute-time-limit-start').removeClass('disabled');
+		} else {
+			counter.countdown('resume');
+		}
+	}
+	
+	function timeLimitFinishNow(){
+		if (confirm('<fmt:message key="label.monitoring.summary.time.limit.finish.now.confirm" />')) {
+			updateTimeLimit('absolute', 'stop');
+		}
+	}
+	
+	
+	function initInidividualTimeLimitAutocomplete(){
+		$('#individual-time-limit-autocomplete').autocomplete({
+			'source' : '<c:url value="/monitoring/getPossibleIndividualTimeLimitUsers.do"/>?toolContentID=${scratchie.contentId}',
+			'delay'  : 700,
+			'minLength' : 3,
+			'select' : function(event, ui){
+				// user ID or group ID, and default 0 adjustment
+				updateIndividualTimeLimitOnServer(ui.item.value, 0);
+
+				// clear search field
+				$(this).val('');
+				return false;
+			},
+			'focus': function() {
+				// Stop the autocomplete of resetting the value to the selected one
+				// It puts LAMS user ID instead of user name
+				event.preventDefault();
+			}
+		});
+		
+		refreshInidividualTimeLimitUsers();
+	}
+	
+	
+	function updateIndividualTimeLimitOnServer(itemId, adjustment) {
+		$.ajax({
+			'url' : '<c:url value="/monitoring/updateIndividualTimeLimit.do"/>',
+			'type': 'post',
+			'cache' : 'false',
+			'data': {
+				'itemId' : itemId,
+				'adjustment' : adjustment,
+				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
+			},
+			success : function(){
+				refreshInidividualTimeLimitUsers();
+			}
+		});
+	}
+
+
+	function refreshInidividualTimeLimitUsers() {
+		var table = $('#time-limit-table');
+		
+		$.ajax({
+			'url' : '<c:url value="/monitoring/getExistingIndividualTimeLimitUsers.do"/>',
+			'dataType' : 'json',
+			'cache' : 'false',
+			'data': {
+				'toolContentID' : '${scratchie.contentId}'
+			},
+			success : function(users) {
+				// remove existing users
+				$('.individual-time-limit-row', table).remove();
+				
+				if (!users) {
+					return;
+				}
+				
+				var template = $('#individual-time-limit-template-row'),
+					now = new Date().getTime();
+				$.each(users, function(){
+					var row = template.clone()
+									  .attr('id', 'individual-time-limit-row-' + this.sessionId)
+									  .data('sessionId', this.sessionId)
+									  .addClass('individual-time-limit-row')
+									  .appendTo(table);
+					$('.individual-time-limit-user-name', row).text(this.name);
+					$('.individual-time-limit-value', row).text(this.adjustment);
+					
+					row.removeClass('hidden');
+				});
+			}
+		});
+	}
+
+	// END OF TIME LIMIT
 
 </script>
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
@@ -476,6 +828,8 @@
 	</c:if>
 	
 <%@ include file="parts/advanceOptions.jsp"%>
+
+<%@ include file="parts/timeLimit.jsp"%>
 
 <%@ include file="parts/dateRestriction.jsp"%>
 

@@ -21,6 +21,8 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
