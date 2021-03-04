@@ -491,14 +491,21 @@
 									
 										<tr>
 											<td class="">
-												<a data-toggle="modal" href="#ira-modal"
-												   data-user-id="${userDto.userID}"
-												   data-ira-correct-answer-count="${userDto.iraCorrectAnswerCount}">
-													<span id="user-name-${userDto.userID}" class="belong-to-group-${groupDto.groupID} new-popover <c:if test="${userDto.groupLeader}">font-weight-bold</c:if>" 
-															data-portrait="${userDto.portraitUuid}" data-fullname="${userDto.lastName},&nbsp;${userDto.firstName}">
-														${userDto.lastName},&nbsp;${userDto.firstName} 
-													</span>
-												</a>
+												<c:choose>
+													<c:when test="${empty userDto.iraCorrectAnswerCount}">
+														<c:out value="${userDto.lastName}" />,&nbsp;<c:out value="${userDto.firstName}" />
+													</c:when>
+													<c:otherwise>
+														<a data-toggle="modal" href="#ira-modal"
+														   data-user-id="${userDto.userID}"
+														   data-ira-correct-answer-count="${userDto.iraCorrectAnswerCount}">
+															<span id="user-name-${userDto.userID}" class="belong-to-group-${groupDto.groupID} new-popover <c:if test="${userDto.groupLeader}">font-weight-bold</c:if>" 
+																	data-portrait="${userDto.portraitUuid}" data-fullname="${userDto.lastName},&nbsp;${userDto.firstName}">
+																<c:out value="${userDto.lastName}" />,&nbsp;<c:out value="${userDto.firstName}" />
+															</span>
+														</a>
+													</c:otherwise>
+												</c:choose>
 												<c:if test="${userDto.groupLeader}">
 													<abbr title="Leader" class="fa fa-user-plus" style="color:darkorange"></abbr>
 												</c:if>
