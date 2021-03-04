@@ -253,10 +253,7 @@ public interface IResourceService extends ICommonToolService {
      */
     ResourceUser getUser(Long uid);
 
-    void notifyTeachersOnAssigmentSumbit(Long sessionId, ResourceUser resourceUser);
-
-    void notifyTeachersOnFileUpload(Long toolContentId, Long toolSessionId, String sessionMapId, String userName,
-	    Long itemUid, String fileName);
+    void notifyTeachersOnAssigmentSumbit(long itemUid);
 
     void evict(Object object);
 

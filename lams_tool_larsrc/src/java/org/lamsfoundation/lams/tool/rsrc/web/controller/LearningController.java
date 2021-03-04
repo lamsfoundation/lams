@@ -424,19 +424,13 @@ public class LearningController {
 	resourceItemList.add(item);
 
 	// URL or file upload
-	request.setAttribute(ResourceConstants.ATTR_ADD_RESOURCE_TYPE, new Short(type));
+	request.setAttribute(ResourceConstants.ATTR_ADD_RESOURCE_TYPE, type);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode);
 
 	Resource resource = resSession.getResource();
 	if (resource.isNotifyTeachersOnAssigmentSumbit()) {
-	    resourceService.notifyTeachersOnAssigmentSumbit(sessionId, resourceUser);
+	    resourceService.notifyTeachersOnAssigmentSumbit(item.getUid());
 	}
-
-//	if (resource.isNotifyTeachersOnFileUpload() && (type == ResourceConstants.RESOURCE_TYPE_FILE)) {
-//	    resourceService.notifyTeachersOnFileUpload(resource.getContentId(), sessionId, sessionMapID,
-//		    resourceUser.getFirstName() + " " + resourceUser.getLastName(), item.getUid(),
-//		    resourceItemForm.getFile().getOriginalFilename());
-//	}
 
 	return "pages/learning/success";
     }
@@ -645,7 +639,7 @@ public class LearningController {
 		    errorMap.add("GLOBAL", "No file uploaded");
 		}
 	    } else {
-		 errorMap.add("GLOBAL", "No file uploaded");
+		errorMap.add("GLOBAL", "No file uploaded");
 	    }
 //	    if ((resourceItemForm.getFile() != null)
 //		    && FileUtil.isExecutableFile(resourceItemForm.getFile().getOriginalFilename())) {

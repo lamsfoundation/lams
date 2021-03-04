@@ -547,27 +547,32 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     @Override
-    public void notifyTeachersOnAssigmentSumbit(Long sessionId, ResourceUser resourceUser) {
+    public void notifyTeachersOnAssigmentSumbit(long itemUid) {
+	ResourceItem item = getResourceItemByUid(itemUid);
+	ResourceUser resourceUser = item.getCreateBy();
+	ResourceSession session = resourceUser.getSession();
+	Resource resource = session.getResource();
+
 	String userName = resourceUser.getLastName() + " " + resourceUser.getFirstName();
 	String message = getLocalisedMessage("event.assigment.submit.body", new Object[] { userName });
+	
+	if (item.getType() == ResourceConstants.RESOURCE_TYPE_FILE) {
+		String eventName = new StringBuilder("resources_file_upload_").append(toolContentId).append("_")
+			.append(System.currentTimeMillis()).toString();
+		String url = new StringBuilder("<a href='").append(WebUtil.getBaseServerURL())
+			.append("/lams/tool/larsrc11/reviewItem.do?").append(ResourceConstants.ATTR_SESSION_MAP_ID).append("=")
+			.append(sessionMapId).append("&").append(AttributeNames.ATTR_MODE).append("=")
+			.append(ToolAccessMode.TEACHER.toString()).append("&").append(ResourceConstants.ATTR_TOOL_SESSION_ID)
+			.append("=").append(toolSessionId).append("&").append(ResourceConstants.ATTR_RESOURCE_ITEM_UID)
+			.append("=").append(itemUid).append("'>")
+			.append(getLocalisedMessage("event.file.upload", new Object[] { userName, fileName })).append("</a>")
+			.toString();
+		eventNotificationService.createLessonEvent(IEventNotificationService.LESSON_MONITORS_SCOPE, eventName,
+			toolContentId, null, url, true, IEventNotificationService.DELIVERY_METHOD_NOTIFICATION);
+	}
+	
 	eventNotificationService.notifyLessonMonitors(sessionId, message, false);
-    }
 
-    @Override
-    public void notifyTeachersOnFileUpload(Long toolContentId, Long toolSessionId, String sessionMapId, String userName,
-	    Long itemUid, String fileName) {
-	String eventName = new StringBuilder("resources_file_upload_").append(toolContentId).append("_")
-		.append(System.currentTimeMillis()).toString();
-	String url = new StringBuilder("<a href='").append(WebUtil.getBaseServerURL())
-		.append("/lams/tool/larsrc11/reviewItem.do?").append(ResourceConstants.ATTR_SESSION_MAP_ID).append("=")
-		.append(sessionMapId).append("&").append(AttributeNames.ATTR_MODE).append("=")
-		.append(ToolAccessMode.TEACHER.toString()).append("&").append(ResourceConstants.ATTR_TOOL_SESSION_ID)
-		.append("=").append(toolSessionId).append("&").append(ResourceConstants.ATTR_RESOURCE_ITEM_UID)
-		.append("=").append(itemUid).append("'>")
-		.append(getLocalisedMessage("event.file.upload", new Object[] { userName, fileName })).append("</a>")
-		.toString();
-	eventNotificationService.createLessonEvent(IEventNotificationService.LESSON_MONITORS_SCOPE, eventName,
-		toolContentId, null, url, true, IEventNotificationService.DELIVERY_METHOD_NOTIFICATION);
     }
 
     // *****************************************************************************

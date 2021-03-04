@@ -55,13 +55,6 @@
 	</label>
 	</div>
 	
-	<div class="checkbox">
-	<label for="notifyTeachersOnFileUpload">
-	<form:checkbox path="resource.notifyTeachersOnFileUpload" id="notifyTeachersOnFileUpload"/>
-	<fmt:message key="label.authoring.advanced.notify.onfileupload" />
-	</label>
-	</div>
-	
 </lams:SimplePanel>
 
 <lams:OutcomeAuthor toolContentId="${authoringForm.resource.contentId}" />
