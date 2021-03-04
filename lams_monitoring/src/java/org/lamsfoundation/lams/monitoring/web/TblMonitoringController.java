@@ -221,8 +221,9 @@ public class TblMonitoringController {
 		    chartTraDataset.add(traCorrectAnswerCount);
 		    chartNamesDataset.add(group.getGroupName());
 
-		    long correctAnswerCountPercentDelta = Math
-			    .round((traCorrectAnswerCount - iraCorrectAnswerCountAverage) * 100
+		    long correctAnswerCountPercentDelta = iraCorrectAnswerCountAverage.equals(0d)
+			    ? traCorrectAnswerCount * 100
+			    : Math.round((traCorrectAnswerCount - iraCorrectAnswerCountAverage) * 100
 				    / iraCorrectAnswerCountAverage);
 		    group.setCorrectAnswerCountPercentDelta(correctAnswerCountPercentDelta);
 		    deltaSum += correctAnswerCountPercentDelta;

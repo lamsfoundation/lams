@@ -35,7 +35,10 @@ public class TblUserDTO extends UserDTO {
     }
 
     public Integer getCorrectAnswerCountPercentDelta() {
-	return iraCorrectAnswerCount == null || traCorrectAnswerCount == null ? null
+	if (iraCorrectAnswerCount == null || traCorrectAnswerCount == null) {
+	    return null;
+	}
+	return iraCorrectAnswerCount.equals(0) ? traCorrectAnswerCount * 100
 		: (traCorrectAnswerCount - iraCorrectAnswerCount) * 100 / iraCorrectAnswerCount;
     }
 
