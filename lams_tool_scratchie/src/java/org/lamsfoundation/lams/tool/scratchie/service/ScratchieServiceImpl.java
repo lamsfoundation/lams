@@ -2590,6 +2590,13 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 		if ((session.getGroupLeader() != null) && session.getGroupLeader().getUid().equals(user.getUid())) {
 		    session.setGroupLeader(null);
+		    session.setScratchingFinished(false);
+		    session.setSessionEndDate(null);
+		    session.setTimeLimitLaunchedDate(null);
+		    scratchieSessionDao.update(session);
+
+		    scratchieAnswerVisitDao.deleteByProperty(ScratchieAnswerVisitLog.class, "sessionId",
+			    session.getSessionId());
 		}
 
 		scratchieUserDao.removeObject(ScratchieUser.class, user.getUid());
