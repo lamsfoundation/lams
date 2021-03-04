@@ -144,7 +144,7 @@
 			if (input.clearTimer == true) {
 				// teacher stopped the timer, destroy it
 				$('#countdown').countdown('destroy').remove();
-			} else {
+			} else if (typeof input.secondsLeft != 'undefined'){
 				// teacher updated the timer
 				var secondsLeft = +input.secondsLeft,
 					counterInitialised = $('#countdown').length > 0;
@@ -152,12 +152,11 @@
 				if (counterInitialised) {
 					// just set the new time
 					$('#countdown').countdown('option', 'until', secondsLeft + 'S');
-				} else if (secondsLeft){
-					if (timeLimitExceeded) {
-					    // teacher gave extra time, reload to writable Etherpad
-						location.reload();
-						return;
-					}
+				} else if (timeLimitExceeded && secondsLeft > 0){
+				    // teacher gave extra time, reload to writable Etherpad
+					location.reload();
+					return;
+				} else {
 					// initialise the timer
 					displayCountdown(secondsLeft);
 				}

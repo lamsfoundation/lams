@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.dokumaran.model;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -371,6 +372,10 @@ public class Dokumaran implements Cloneable {
 
     public void setAbsoluteTimeLimit(LocalDateTime absoluteTimeLimit) {
 	this.absoluteTimeLimit = absoluteTimeLimit;
+    }
+
+    public Long getAbsoluteTimeLimitSeconds() {
+	return absoluteTimeLimit == null ? null : absoluteTimeLimit.atZone(ZoneId.systemDefault()).toEpochSecond();
     }
 
     public Map<Integer, Integer> getTimeLimitAdjustments() {
