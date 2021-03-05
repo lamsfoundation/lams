@@ -547,27 +547,41 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     @Override
-    public void notifyTeachersOnAssigmentSumbit(Long sessionId, ResourceUser resourceUser) {
-	String userName = resourceUser.getLastName() + " " + resourceUser.getFirstName();
-	String message = getLocalisedMessage("event.assigment.submit.body", new Object[] { userName });
-	eventNotificationService.notifyLessonMonitors(sessionId, message, false);
-    }
+    public void notifyTeachersOnAssigmentSumbit(long itemUid) {
+	ResourceItem item = getResourceItemByUid(itemUid);
+	ResourceUser resourceUser = item.getCreateBy();
+	ResourceSession session = resourceUser.getSession();
 
-    @Override
-    public void notifyTeachersOnFileUpload(Long toolContentId, Long toolSessionId, String sessionMapId, String userName,
-	    Long itemUid, String fileName) {
-	String eventName = new StringBuilder("resources_file_upload_").append(toolContentId).append("_")
-		.append(System.currentTimeMillis()).toString();
-	String url = new StringBuilder("<a href='").append(WebUtil.getBaseServerURL())
-		.append("/lams/tool/larsrc11/reviewItem.do?").append(ResourceConstants.ATTR_SESSION_MAP_ID).append("=")
-		.append(sessionMapId).append("&").append(AttributeNames.ATTR_MODE).append("=")
-		.append(ToolAccessMode.TEACHER.toString()).append("&").append(ResourceConstants.ATTR_TOOL_SESSION_ID)
-		.append("=").append(toolSessionId).append("&").append(ResourceConstants.ATTR_RESOURCE_ITEM_UID)
-		.append("=").append(itemUid).append("'>")
-		.append(getLocalisedMessage("event.file.upload", new Object[] { userName, fileName })).append("</a>")
-		.toString();
-	eventNotificationService.createLessonEvent(IEventNotificationService.LESSON_MONITORS_SCOPE, eventName,
-		toolContentId, null, url, true, IEventNotificationService.DELIVERY_METHOD_NOTIFICATION);
+	String userName = new StringBuilder()
+		.append(StringUtils.isBlank(resourceUser.getFirstName()) ? "" : resourceUser.getFirstName() + " ")
+		.append(StringUtils.isBlank(resourceUser.getLastName()) ? "" : resourceUser.getLastName() + " ")
+		.append("(").append(resourceUser.getLoginName()).append(")").toString();
+	String resourceType = getLocalisedMessage(
+		item.getType() == ResourceConstants.RESOURCE_TYPE_URL ? "label.authoring.basic.resource.url"
+			: "label.authoring.basic.resource.file",
+		new Object[] {});
+
+	String url = null;
+	StringBuilder link = new StringBuilder("<a href='");
+
+	if (item.getType() == ResourceConstants.RESOURCE_TYPE_URL) {
+	    url = item.getUrl();
+	} else {
+	    url = new StringBuilder(WebUtil.getBaseServerURL()).append("/lams/tool/larsrc11/reviewItem.do?")
+		    .append(AttributeNames.ATTR_MODE).append("=").append(ToolAccessMode.TEACHER.toString()).append("&")
+		    .append(ResourceConstants.ATTR_TOOL_SESSION_ID).append("=").append(session.getSessionId())
+		    .append("&").append(ResourceConstants.ATTR_RESOURCE_ITEM_UID).append("=").append(itemUid)
+		    .toString();
+	}
+
+	link.append(url).append("'>").append(url).append("</a>");
+
+	String subject = getLocalisedMessage("event.assigment.submit.subject", new Object[] {});
+	String message = getLocalisedMessage("event.assigment.submit.body",
+		new Object[] { userName, resourceType, link.toString() });
+
+	eventNotificationService.notifyLessonMonitors(session.getSessionId(), subject, message, true);
+
     }
 
     // *****************************************************************************
@@ -1222,8 +1236,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	resource.setMiniViewResourceNumber(JsonUtil.optInt(toolContentJSON, "minViewResourceNumber", 0));
 	resource.setNotifyTeachersOnAssigmentSumbit(
 		JsonUtil.optBoolean(toolContentJSON, "notifyTeachersOnAssigmentSubmit", Boolean.FALSE));
-	resource.setNotifyTeachersOnAssigmentSumbit(
-		JsonUtil.optBoolean(toolContentJSON, "notifyTeachersOnFileUpload", Boolean.FALSE));
 	resource.setReflectOnActivity(
 		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	resource.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));

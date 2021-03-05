@@ -101,9 +101,6 @@ public class Resource implements Cloneable, Serializable {
     @Column(name = "assigment_submit_notify")
     private boolean notifyTeachersOnAssigmentSumbit;
 
-    @Column(name = "file_upload_notify")
-    private boolean notifyTeachersOnFileUpload;
-
     @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;
 
@@ -436,14 +433,6 @@ public class Resource implements Cloneable, Serializable {
 	this.notifyTeachersOnAssigmentSumbit = notifyTeachersOnAssigmentSumbit;
     }
 
-    public boolean isNotifyTeachersOnFileUpload() {
-	return notifyTeachersOnFileUpload;
-    }
-
-    public void setNotifyTeachersOnFileUpload(boolean notifyTeachersOnFileUpload) {
-	this.notifyTeachersOnFileUpload = notifyTeachersOnFileUpload;
-    }
-
     public Set<LearnerItemRatingCriteria> getRatingCriterias() {
 	return ratingCriterias;
     }
@@ -451,5 +440,4 @@ public class Resource implements Cloneable, Serializable {
     public void setRatingCriterias(Set<LearnerItemRatingCriteria> ratingCriterias) {
 	this.ratingCriterias = ratingCriterias;
     }
-
 }
