@@ -62,14 +62,21 @@ public class ViewItemController {
     /**
      * Display main frame to display instrcution and item content.
      */
+    @SuppressWarnings("unchecked")
     @RequestMapping("/reviewItem")
     private String reviewItem(HttpServletRequest request) {
+
+	SessionMap<String, Object> sessionMap = null;
+	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID, true);
+	if (sessionMapID == null) {
+	    sessionMap = new SessionMap<>();
+	    sessionMapID = sessionMap.getSessionID();
+	    request.getSession().setAttribute(sessionMapID, sessionMap);
+	} else {
+	    sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	}
+	
 	String mode = request.getParameter(AttributeNames.ATTR_MODE);
-
-	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-
 	ResourceItem item = getResourceItem(request, sessionMap, mode);
 
 	String idStr = request.getParameter(ResourceConstants.ATTR_TOOL_SESSION_ID);
@@ -184,7 +191,7 @@ public class ViewItemController {
     // *************************************************************************************
     // Private methods
     // *************************************************************************************
-    
+
     /**
      * Return resource item according to ToolAccessMode.
      *

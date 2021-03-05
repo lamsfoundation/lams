@@ -155,7 +155,5 @@ public class ResourceConstants {
 
     public static final String ATTR_USER_UID = "userUid";
 
-    public static final String EVENT_NAME_NOTIFY_TEACHERS_ON_ASSIGMENT_SUBMIT = "notify_teachers_on_assigment_submit";
-
     public static final String SHARED_ITEMS_DEFINITION_NAME = "shared.items.output.definition.rsrc";
 }
