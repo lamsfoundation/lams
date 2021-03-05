@@ -129,7 +129,7 @@ public class ImsQtiController {
 	    qbQuestion.setQuestionId(questionId);
 	    qbQuestion.setVersion(1);
 
-	    int questionMark = 1;
+	    Integer questionMark = question.getScore();
 	    boolean isMultipleChoice = Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType());
 	    boolean isMarkHedgingType = Question.QUESTION_TYPE_MARK_HEDGING.equals(question.getType());
 	    boolean isVsaType = Question.QUESTION_TYPE_FILL_IN_BLANK.contentEquals(question.getType());
@@ -175,8 +175,10 @@ public class ImsQtiController {
 			option.setQbQuestion(qbQuestion);
 
 			if ((answer.getScore() != null) && (answer.getScore() > 0) && (correctAnswer == null)) {
-			    // whatever the correct answer holds, it becomes the question score
-			    questionMark = Double.valueOf(Math.ceil(answer.getScore())).intValue();
+			    if (questionMark == null) {
+				// whatever the correct answer holds, it becomes the question score
+				questionMark = Double.valueOf(Math.ceil(answer.getScore())).intValue();
+			    }
 			    // 100% goes to the correct answer
 			    option.setMaxMark(1);
 			    correctAnswer = answerText;
@@ -209,7 +211,9 @@ public class ImsQtiController {
 			    totalScore += answer.getScore();
 			}
 		    }
-		    questionMark = Double.valueOf(Math.round(totalScore)).intValue();
+		    if (questionMark == null) {
+			questionMark = Double.valueOf(Math.round(totalScore)).intValue();
+		    }
 
 		    TreeSet<QbOption> optionList = new TreeSet<>();
 		    int orderId = 1;
@@ -244,7 +248,9 @@ public class ImsQtiController {
 		    for (Answer answer : question.getAnswers()) {
 			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
 			    qbQuestion.setCorrectAnswer(Boolean.parseBoolean(answer.getText()));
-			    questionMark = Double.valueOf(Math.ceil(answer.getScore())).intValue();
+			    if (questionMark == null) {
+				questionMark = Double.valueOf(Math.ceil(answer.getScore())).intValue();
+			    }
 			}
 			if (!StringUtils.isBlank(answer.getFeedback())) {
 			    // set feedback for true/false answers
@@ -268,7 +274,9 @@ public class ImsQtiController {
 			    totalScore += answer.getScore();
 			}
 		    }
-		    questionMark = Double.valueOf(Math.round(totalScore)).intValue();
+		    if (questionMark == null) {
+			questionMark = Double.valueOf(Math.round(totalScore)).intValue();
+		    }
 
 		    TreeSet<QbOption> optionList = new TreeSet<>();
 		    int orderId = 1;
@@ -303,7 +311,7 @@ public class ImsQtiController {
 		continue;
 	    }
 
-	    qbQuestion.setMaxMark(questionMark);
+	    qbQuestion.setMaxMark(questionMark == null ? 1 : questionMark);
 	    userManagementService.save(qbQuestion);
 
 	    if (question.getLearningOutcomes() != null && !question.getLearningOutcomes().isEmpty()) {

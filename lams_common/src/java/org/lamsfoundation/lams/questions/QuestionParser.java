@@ -395,6 +395,10 @@ public class QuestionParser {
 		if (!StringUtils.isBlank(questionText)) {
 		    question.setText(questionText);
 		}
+		String questionScore = request.getParameter("question" + questionIndex + "score");
+		if (!StringUtils.isBlank(questionScore)) {
+		    question.setScore(Integer.valueOf(questionScore));
+		}
 		String questionFeedback = request.getParameter("question" + questionIndex + "feedback");
 		// can be blank
 		if (!StringUtils.isBlank(questionFeedback)) {

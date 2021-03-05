@@ -80,7 +80,7 @@
                     <li class="dropdown-header"><fmt:message key="authoring.tbl.import.questions.from"/></li>
                     <li>
                     	<a style="margin-left: 1em;" href="javascript:void(0)" id="divass${appexNumber}CQTI"
-                    	   onClick="javascript:importQTI('appex${appexNumber}', 'mc,mr,es', 'word')">
+                    	   onClick="javascript:importQTI('appex${appexNumber}', 'mc,mr,mh,es', 'word')">
                     		<i class="fa fa-file-word-o fa-fw text-primary"></i> <fmt:message key="label.qb.collection.word"/>...
                     	</a>
                     </li>

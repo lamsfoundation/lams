@@ -56,6 +56,7 @@ public class Question {
     private Map<Integer, Integer> matchMap;
     private List<String> learningOutcomes;
     private String resourcesFolderPath;
+    private Integer score;
 
     // UUID in QTI question label is LAMS custom idea
     public String getQbUUID() {
@@ -141,6 +142,14 @@ public class Question {
 
     public void setResourcesFolderPath(String resourcesFolderPath) {
 	this.resourcesFolderPath = resourcesFolderPath;
+    }
+
+    public Integer getScore() {
+        return score;
+    }
+
+    public void setScore(Integer mark) {
+        this.score = mark;
     }
 
     @Override

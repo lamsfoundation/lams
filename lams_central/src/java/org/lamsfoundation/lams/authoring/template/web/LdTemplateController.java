@@ -1410,16 +1410,17 @@ public abstract class LdTemplateController {
 	    assessments.add(assessment);
 
 	    boolean isMultipleChoice = Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType());
+	    boolean isMarkHedging = Question.QUESTION_TYPE_MARK_HEDGING.equals(question.getType());
 	    boolean isMultipleResponse = Question.QUESTION_TYPE_MULTIPLE_RESPONSE.equals(question.getType());
-	    int defaultGrade = 1;
+	    Integer defaultGrade = question.getScore();
 
 	    assessment.setText(QuestionParser.processHTMLField(question.getText(), false, contentFolderID,
 		    question.getResourcesFolderPath()));
 	    assessment.setTitle(question.getTitle());
 	    assessment.setUuid(question.getQbUUID());
 
-	    if (isMultipleChoice) {
-		assessment.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
+	    if (isMultipleChoice || isMarkHedging) {
+		assessment.setType(isMultipleChoice ? QbQuestion.TYPE_MULTIPLE_CHOICE : QbQuestion.TYPE_MARK_HEDGING);
 		assessment.setMultipleAnswersAllowed(false);
 		String correctAnswer = null;
 
@@ -1438,8 +1439,10 @@ public abstract class LdTemplateController {
 
 			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
 			    if (correctAnswer == null) {
-				// whatever the correct answer holds, it becomes the question score
-				defaultGrade = Double.valueOf(Math.ceil(answer.getScore())).intValue();
+				if (defaultGrade == null) {
+				    // if grade not explicitly set, whatever the correct answer holds, it becomes the question score
+				    defaultGrade = Double.valueOf(Math.ceil(answer.getScore())).intValue();
+				}
 				// 100% goes to the correct answer
 				newAnswer.setGrade(1F);
 				correctAnswer = answerText;
@@ -1470,7 +1473,10 @@ public abstract class LdTemplateController {
 			    totalScore += answer.getScore();
 			}
 		    }
-		    defaultGrade = Double.valueOf(Math.round(totalScore)).intValue();
+		    if (defaultGrade == null) {
+			// if grade not explicitly set, user total score as grade
+			defaultGrade = Double.valueOf(Math.round(totalScore)).intValue();
+		    }
 
 		    int displayOrder = 1;
 		    for (Answer answer : question.getAnswers()) {
@@ -1493,7 +1499,7 @@ public abstract class LdTemplateController {
 		assessment.setType(QbQuestion.TYPE_ESSAY);
 	    }
 
-	    assessment.setDefaultGrade(defaultGrade);
+	    assessment.setDefaultGrade(defaultGrade == null ? 1 : defaultGrade);
 
 	    assessment.setLearningOutcomes(question.getLearningOutcomes());
 	}

@@ -65,6 +65,8 @@ public class QuestionWordParser {
     private final static String ANSWER_TAG = "answer:";
     private final static String CORRECT_TAG = "correct:";
     private final static String INCORRECT_TAG = "incorrect:";
+    private final static String MARK_TAG = "mark:";
+    private final static String MARK_HEDGING_TAG = "markhedging:";
     private final static String FEEDBACK_TAG = "feedback:";
     private final static String LEARNING_OUTCOME_TAG = "lo:";
     private static final String CUSTOM_IMAGE_TAG_REGEX = "\\[IMAGE: .*?]";
@@ -144,6 +146,8 @@ public class QuestionWordParser {
 
 	    String title = null;
 	    String description = null;
+	    String mark = null;
+	    boolean isMarkHedging = false;
 	    String feedback = null;
 	    List<Answer> answers = new ArrayList<>();
 	    Answer correctVsaAnswer = null;
@@ -244,6 +248,24 @@ public class QuestionWordParser {
 		    continue;
 		}
 
+		if (text.startsWith(MARK_TAG)) {
+		    optionsStarted = true;
+		    feedbackStarted = false;
+
+		    mark = WebUtil.removeHTMLtags(text).replaceAll("(?i)" + MARK_TAG + "\\s*", "").strip();
+		    continue;
+		}
+
+		if (text.startsWith(MARK_HEDGING_TAG)) {
+		    optionsStarted = true;
+		    feedbackStarted = false;
+
+		    String markHedging = WebUtil.removeHTMLtags(text).replaceAll("(?i)" + MARK_HEDGING_TAG + "\\s*", "")
+			    .strip();
+		    isMarkHedging = Boolean.valueOf(markHedging);
+		    continue;
+		}
+
 		if (text.startsWith(FEEDBACK_TAG)) {
 		    optionsStarted = true;
 		    feedbackStarted = true;
@@ -291,7 +313,25 @@ public class QuestionWordParser {
 
 	    if (answerTagFound && (correctVsaAnswer != null || incorrectVsaAnswer != null)) {
 		log.error(
-			"ANSWER tag found, but also CORRECT and/or INCORRECT tag found. Can not categorise the question as MCQ or VSA.");
+			"ANSWER tag found, but also CORRECT and/or INCORRECT tag found. Can not categorise the question as MCQ or VSA: "
+				+ title);
+		continue;
+	    }
+
+	    if (isMarkHedging && (correctVsaAnswer != null || incorrectVsaAnswer != null)) {
+		log.error(
+			"MarkHedging tag found, but also CORRECT and/or INCORRECT tag found. Can not categorise the question as mark hedging or VSA. "
+				+ title);
+		continue;
+	    }
+
+	    if (isMarkHedging && answers.isEmpty()) {
+		log.error("MarkHedging tag found, but  no answers were found in question: " + title);
+		continue;
+	    }
+
+	    if (isMarkHedging && isMultipleResponse) {
+		log.error("MarkHedging question must only have one correct answer in question: " + title);
 		continue;
 	    }
 
@@ -309,12 +349,25 @@ public class QuestionWordParser {
 		    continue;
 		}
 	    } else {
-		if (!QuestionParser
-			.isQuestionTypeAcceptable(isMultipleResponse ? Question.QUESTION_TYPE_MULTIPLE_RESPONSE
-				: Question.QUESTION_TYPE_MULTIPLE_CHOICE, limitType, question)) {
+		String type = Question.QUESTION_TYPE_MULTIPLE_CHOICE;
+		if (isMultipleResponse) {
+		    type = Question.QUESTION_TYPE_MULTIPLE_RESPONSE;
+		} else if (isMarkHedging) {
+		    type = Question.QUESTION_TYPE_MARK_HEDGING;
+		}
+		if (!QuestionParser.isQuestionTypeAcceptable(type, limitType, question)) {
 		    continue;
 		}
 		question.setAnswers(answers);
+	    }
+
+	    if (mark != null) {
+		try {
+		    question.setScore(Integer.valueOf(mark));
+		} catch (Exception e) {
+		    log.error("Malformed mark, it must be an integer number: " + mark);
+		    continue;
+		}
 	    }
 
 	    question.setResourcesFolderPath(TEMP_IMAGE_FOLDER);
