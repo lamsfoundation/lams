@@ -65,6 +65,7 @@ public class QuestionWordParser {
     private final static String ANSWER_TAG = "answer:";
     private final static String CORRECT_TAG = "correct:";
     private final static String INCORRECT_TAG = "incorrect:";
+    private final static String MARK_TAG = "mark:";
     private final static String FEEDBACK_TAG = "feedback:";
     private final static String LEARNING_OUTCOME_TAG = "lo:";
     private static final String CUSTOM_IMAGE_TAG_REGEX = "\\[IMAGE: .*?]";
@@ -144,6 +145,7 @@ public class QuestionWordParser {
 
 	    String title = null;
 	    String description = null;
+	    String mark = null;
 	    String feedback = null;
 	    List<Answer> answers = new ArrayList<>();
 	    Answer correctVsaAnswer = null;
@@ -244,6 +246,14 @@ public class QuestionWordParser {
 		    continue;
 		}
 
+		if (text.startsWith(MARK_TAG)) {
+		    optionsStarted = true;
+		    feedbackStarted = false;
+
+		    mark = WebUtil.removeHTMLtags(text).replaceAll("(?i)" + MARK_TAG + "\\s*", "").strip();
+		    continue;
+		}
+
 		if (text.startsWith(FEEDBACK_TAG)) {
 		    optionsStarted = true;
 		    feedbackStarted = true;
@@ -315,6 +325,15 @@ public class QuestionWordParser {
 		    continue;
 		}
 		question.setAnswers(answers);
+	    }
+
+	    if (mark != null) {
+		try {
+		    question.setScore(Integer.valueOf(mark));
+		} catch (Exception e) {
+		    log.error("Malformed mark, it must be an integer number: " + mark);
+		    continue;
+		}
 	    }
 
 	    question.setResourcesFolderPath(TEMP_IMAGE_FOLDER);
