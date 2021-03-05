@@ -1410,6 +1410,7 @@ public abstract class LdTemplateController {
 	    assessments.add(assessment);
 
 	    boolean isMultipleChoice = Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType());
+	    boolean isMarkHedging = Question.QUESTION_TYPE_MARK_HEDGING.equals(question.getType());
 	    boolean isMultipleResponse = Question.QUESTION_TYPE_MULTIPLE_RESPONSE.equals(question.getType());
 	    Integer defaultGrade = question.getScore();
 
@@ -1418,8 +1419,8 @@ public abstract class LdTemplateController {
 	    assessment.setTitle(question.getTitle());
 	    assessment.setUuid(question.getQbUUID());
 
-	    if (isMultipleChoice) {
-		assessment.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
+	    if (isMultipleChoice || isMarkHedging) {
+		assessment.setType(isMultipleChoice ? QbQuestion.TYPE_MULTIPLE_CHOICE : QbQuestion.TYPE_MARK_HEDGING);
 		assessment.setMultipleAnswersAllowed(false);
 		String correctAnswer = null;
 
