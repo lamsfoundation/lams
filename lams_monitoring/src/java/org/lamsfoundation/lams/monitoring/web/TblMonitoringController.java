@@ -9,7 +9,6 @@ import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
@@ -66,8 +65,6 @@ public class TblMonitoringController {
     private ILamsToolService lamsToolService;
     @Autowired
     private IActivityDAO activityDAO;
-    @Autowired
-    private IGradebookService gradebookService;
     @Autowired
     @Qualifier("laasseAssessmentService")
     private ICommonAssessmentService commonAssessmentService;
@@ -212,7 +209,7 @@ public class TblMonitoringController {
 		if (traCorrectAnswerCount > highestTraCorrectAnswerCount) {
 		    highestTraCorrectAnswerCount = traCorrectAnswerCount;
 		}
-		if (traCorrectAnswerSum < lowestTraCorrectAnswerCount) {
+		if (traCorrectAnswerCount < lowestTraCorrectAnswerCount) {
 		    lowestTraCorrectAnswerCount = traCorrectAnswerCount;
 		}
 
