@@ -40,6 +40,23 @@
 	
 	<tr>
 		<td>
+			<fmt:message key="label.authoring.advanced.question.etherpad" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${sessionMap.scratchie.questionEtherpadEnabled}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
 			<fmt:message key="label.authoring.advanced.shuffle.items" />
 		</td>
 		
@@ -52,6 +69,50 @@
 					<fmt:message key="label.off" />
 				</c:otherwise>
 			</c:choose>
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.advanced.reveal.double.click" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${sessionMap.scratchie.revealOnDoubleClick}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+		
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.advanced.show.scratchies.in.results" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${sessionMap.scratchie.showScrachiesInResults}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="admin.preset.marks" />
+		</td>
+		
+		<td>
+			<c:out value="${sessionMap.scratchie.presetMarks}" />
 		</td>
 	</tr>
 	
