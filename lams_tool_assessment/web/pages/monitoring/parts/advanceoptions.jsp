@@ -23,7 +23,7 @@
 		
 		<tr>
 			<td>
-				<fmt:message key="label.authoring.advance.time.limit" />
+				<fmt:message key="label.authoring.advance.questions.per.page" />
 			</td>
 			
 			<td>
@@ -135,6 +135,23 @@
 		
 		<tr>
 			<td>
+				<fmt:message key="label.authoring.advance.disclose.answers" />
+			</td>
+			
+			<td>
+				<c:choose>
+					<c:when test="${assessment.allowDiscloseAnswers}">
+						<fmt:message key="label.on" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.off" />
+					</c:otherwise>
+				</c:choose>	
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
 				<fmt:message key="label.authoring.advance.allow.students.right.answers" />
 			</td>
 			
@@ -189,6 +206,38 @@
 			<td>
 				<c:choose>
 					<c:when test="${assessment.allowHistoryResponses}">
+						<fmt:message key="label.on" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.off" />
+					</c:otherwise>
+				</c:choose>	
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<fmt:message key="label.authoring.advance.answer.justification" />
+			</td>
+			
+			<td>
+				<c:choose>
+					<c:when test="${assessment.allowAnswerJustification}">
+						<fmt:message key="label.on" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.off" />
+					</c:otherwise>
+				</c:choose>	
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<fmt:message key="label.enable.confidence.levels" />
+			</td>
+			
+			<td>
+				<c:choose>
+					<c:when test="${assessment.enableConfidenceLevels}">
 						<fmt:message key="label.on" />
 					</c:when>
 					<c:otherwise>
