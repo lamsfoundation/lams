@@ -44,9 +44,9 @@
 			
 		<lams:TabBodyArea>
 			<lams:TabBodys>
-				<lams:TabBody id="1" titleKey="titleHeading.summary" page="m_Summary.jsp" /> 
-				<lams:TabBody id="2" titleKey="titleHeading.editActivity" page="m_EditActivity.jsp" />
-				<lams:TabBody id="3" titleKey="titleHeading.statistics" page="m_Statistics.jsp" />
+				<lams:TabBody id="1" page="m_Summary.jsp" /> 
+				<lams:TabBody id="2" page="m_EditActivity.jsp" />
+				<lams:TabBody id="3" page="m_Statistics.jsp" />
 			</lams:TabBodys>
 		</lams:TabBodyArea>
 				

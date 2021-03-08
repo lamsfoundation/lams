@@ -89,9 +89,9 @@
 
 <lams:TabBodyArea>
 	<lams:TabBodys>
-	 	<lams:TabBody id="1" titleKey="label.learning.heading.add" page="addRecord.jsp?displayedRecordNumber=${displayedRecordNumber}" />
- 		<lams:TabBody id="2" titleKey="label.learning.heading.list" page="listRecords.jsp?includeMode=learning" />
-	 	<lams:TabBody id="3" titleKey="label.learning.heading.summary" page="questionSummaries.jsp" />
+	 	<lams:TabBody id="1" page="addRecord.jsp?displayedRecordNumber=${displayedRecordNumber}" />
+ 		<lams:TabBody id="2" page="listRecords.jsp?includeMode=learning" />
+	 	<lams:TabBody id="3" page="questionSummaries.jsp" />
 	 </lams:TabBodys>
 
 <c:if test="${mode != 'teacher'}">

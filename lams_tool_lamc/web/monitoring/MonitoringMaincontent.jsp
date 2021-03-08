@@ -69,9 +69,9 @@
 	
 	<lams:TabBodyArea>
 		<lams:TabBodys>
-			<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp"/>
-			<lams:TabBody id="2" titleKey="label.editActivity" page="Edit.jsp" />
-			<lams:TabBody id="3" titleKey="label.stats" page="Stats.jsp" />
+			<lams:TabBody id="1" page="SummaryContent.jsp"/>
+			<lams:TabBody id="2" page="Edit.jsp" />
+			<lams:TabBody id="3" page="Stats.jsp" />
 		</lams:TabBodys>
 	</lams:TabBodyArea>
 	

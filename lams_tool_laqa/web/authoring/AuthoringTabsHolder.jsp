@@ -66,9 +66,9 @@
 			<lams:errors/>
 					
 			<lams:TabBodys>
-				<lams:TabBody id="1" titleKey="label.basic" page="BasicContent.jsp"/>
-				<lams:TabBody id="2" titleKey="label.advanced" page="AdvancedContent.jsp" />
-				<lams:TabBody id="3" titleKey="label.conditions" page="conditions.jsp" />
+				<lams:TabBody id="1" page="BasicContent.jsp"/>
+				<lams:TabBody id="2" page="AdvancedContent.jsp" />
+				<lams:TabBody id="3" page="conditions.jsp" />
 		    </lams:TabBodys>
 		    
 			<lams:AuthoringButton formID="authoringForm"

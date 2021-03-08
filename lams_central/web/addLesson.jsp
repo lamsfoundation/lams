@@ -68,7 +68,7 @@
 		</lams:Tabs>
 		<lams:TabBodyArea>
 			<lams:TabBodys>
-				<lams:TabBody id="1" titleKey="label.basic">
+				<lams:TabBody id="1">
 					<div id="tabLessonTitle" class="tabTitle bg-warning"><fmt:message key="label.tab.lesson.title" /></div>
 					<table class="tabTable">
 						<tr>
@@ -100,7 +100,7 @@
 					</table>
 				</lams:TabBody>
 				
-				<lams:TabBody id="2" titleKey="label.tab.class">
+				<lams:TabBody id="2">
 					<!-- Class panel -->
 					<div id="tabClassTitle" class="tabTitle bg-warning"><fmt:message key="label.tab.class.title" /></div>
 					<table id="classTable" class="tabTable">
@@ -156,7 +156,7 @@
 					</table>
 				</lams:TabBody>
 				
-				<lams:TabBody id="3" titleKey="label.tab.advanced">
+				<lams:TabBody id="3">
 					<!-- Advanced Panel -->
 					<input id="organisation-id" name="organisationID" value="${param.organisationID}" type="hidden" />
 					<input id="ldIdField" name="learningDesignID" type="hidden" />
@@ -290,7 +290,7 @@
 					</c:if>
 				</lams:TabBody>
 				
-				<lams:TabBody id="4" titleKey="label.tab.conditions">
+				<lams:TabBody id="4">
 					<!-- Conditions Panel -->
 					<div class="lead"><fmt:message key="label.tab.conditions.dependencies" /></div>
 					<div class="options">

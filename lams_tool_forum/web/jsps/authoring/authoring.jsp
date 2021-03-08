@@ -73,9 +73,9 @@
 				   
 				    <!--  Set up tabs  -->
 				     <lams:TabBodys>
-						<lams:TabBody id="1" titleKey="authoring.tab.basic" page="basic.jsp" />
-						<lams:TabBody id="2" titleKey="authoring.tab.advanced" page="advance.jsp" />
-						<lams:TabBody id="3" titleKey="authoring.tab.conditions" page="conditions.jsp" />
+						<lams:TabBody id="1" page="basic.jsp" />
+						<lams:TabBody id="2" page="advance.jsp" />
+						<lams:TabBody id="3" page="conditions.jsp" />
 				    </lams:TabBodys>
 				
 					<!-- Button Row -->

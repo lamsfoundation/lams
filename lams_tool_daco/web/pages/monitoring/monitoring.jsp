@@ -33,9 +33,9 @@
 
   		<lams:TabBodyArea>
 			<lams:TabBodys>			
-					<lams:TabBody id="1" titleKey="label.common.summary" page="summary.jsp"/>
-					<lams:TabBody id="2" titleKey="tab.monitoring.edit.activity" page="editactivity.jsp"/>	
-					<lams:TabBody id="3" titleKey="tab.monitoring.statistics" page="statistics.jsp"/>
+					<lams:TabBody id="1" page="summary.jsp"/>
+					<lams:TabBody id="2" page="editactivity.jsp"/>	
+					<lams:TabBody id="3" page="statistics.jsp"/>
 			</lams:TabBodys> 
 		</lams:TabBodyArea> 
 
