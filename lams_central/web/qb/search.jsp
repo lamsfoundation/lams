@@ -112,48 +112,7 @@
 	<%@ include file="/jqGrid.i18n.jsp"%>
 
 	$(document).ready(function(){
-			
-		$("#questions-grid").jqGrid({
-		   	multiselect: false,
-			datatype: "json",
-			url: "<c:url value="/searchQB/getPagedQuestions.do"/>",
-			postData: { 
-				questionTypes: "" + $("#types-select").val(), 
-	        },
-			height: '100%',
-			autowidth: true,
-			shrinkToFit: true,
-		    pager: 'questions-grid-pager',
-		    rowList:[10,20,30,40,50,100],
-		    rowNum:10,
-		    guiStyle: "bootstrap",
-			iconSet: 'fontAwesome',
-		   	colNames:[
-			   	'questionUid',
-				'<fmt:message key="label.qb.collection.grid.title"/>',
-				'questionDescription'
-			],
-		   	colModel:[
-		   		{name:'questionUid', index:'questionUid', width:0, hidden: true},
-		   		{name:'questionName', index:'questionName', width:570, search: true, searchoptions: { clearSearch: false }, formatter:questionNameFormatter},
-		   		{name:'questionDescription', index:'questionDescription', width:0, hidden: true}
-		   	],
-			onSelectRow: function(rowid, e) {
-			    //load up question details area
-		   		var questionUid = jQuery("#questions-grid").getCell(rowid, 'questionUid');
-		   		loadQuestionDetailsArea(questionUid);
-			},
-	  	  	gridComplete: gridSearchHighlight,
-		    loadError: function(xhr,textStatus,errorThrown) {
-		    	$("#questions-grid").clearGridData();
-		    	$("#question-detail-area").hide().html("");
-
-		    	//display warning message
-		    	$(this).jqGrid("displayErrorMessage", "<fmt:message key="error.loaderror"/>");
-		    }
-		})
-		.navGrid("#questions-grid-pager", {edit:false,add:false,del:false,search:false});	
-
+		
         //jqgrid autowidth
         $(window).bind('resize', function() {
             resizeJqgrid($(".ui-jqgrid-btable:visible"));
@@ -239,6 +198,48 @@
     	//workaround for $('#types-select-select').selectpicker('selectAll'); throwing exception 
     	$("#types-select option").prop("selected", "selected");
     	$('#types-select').selectpicker('refresh');
+
+    	$("#questions-grid").jqGrid({
+		   	multiselect: false,
+			datatype: "json",
+			url: "<c:url value="/searchQB/getPagedQuestions.do"/>",
+			postData: { 
+				questionTypes: "" + $("#types-select").val(), 
+	        },
+			height: '100%',
+			autowidth: true,
+			shrinkToFit: true,
+		    pager: 'questions-grid-pager',
+		    rowList:[10,20,30,40,50,100],
+		    rowNum:10,
+		    guiStyle: "bootstrap",
+			iconSet: 'fontAwesome',
+		   	colNames:[
+			   	'questionUid',
+				'<fmt:message key="label.qb.collection.grid.title"/>',
+				'questionDescription'
+			],
+		   	colModel:[
+		   		{name:'questionUid', index:'questionUid', width:0, hidden: true},
+		   		{name:'questionName', index:'questionName', width:570, search: true, searchoptions: { clearSearch: false }, formatter:questionNameFormatter},
+		   		{name:'questionDescription', index:'questionDescription', width:0, hidden: true}
+		   	],
+			onSelectRow: function(rowid, e) {
+			    //load up question details area
+		   		var questionUid = jQuery("#questions-grid").getCell(rowid, 'questionUid');
+		   		loadQuestionDetailsArea(questionUid);
+			},
+	  	  	gridComplete: gridSearchHighlight,
+		    loadError: function(xhr,textStatus,errorThrown) {
+		    	$("#questions-grid").clearGridData();
+		    	$("#question-detail-area").hide().html("");
+
+		    	//display warning message
+		    	$(this).jqGrid("displayErrorMessage", "<fmt:message key="error.loaderror"/>");
+		    }
+		})
+		.navGrid("#questions-grid-pager", {edit:false,add:false,del:false,search:false});	
+    	
 	});
 
 	//load up question details area
