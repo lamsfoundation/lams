@@ -41,13 +41,17 @@ public class ContentDTO {
 
     String reflectInstructions;
 
+    boolean startInMonitor;
+
+    Integer duration;
+
     Long currentTab;
 
     boolean contentInUse;
 
     boolean isGroupedActivity; // set manually in MonitoringAction
 
-    Set<SessionDTO> sessionDTOs = new TreeSet<SessionDTO>();
+    Set<SessionDTO> sessionDTOs = new TreeSet<>();
 
     /* Constructors */
     public ContentDTO() {
@@ -60,6 +64,8 @@ public class ContentDTO {
 	this.contentInUse = zoom.isContentInUse();
 	this.reflectInstructions = zoom.getReflectInstructions();
 	this.reflectOnActivity = zoom.isReflectOnActivity();
+	this.startInMonitor = zoom.isStartInMonitor();
+	this.duration = zoom.getDuration();
 	for (ZoomSession session : zoom.getZoomSessions()) {
 	    sessionDTOs.add(new SessionDTO(session));
 	}
@@ -89,6 +95,22 @@ public class ContentDTO {
 
     public void setReflectInstructions(String reflectInstructions) {
 	this.reflectInstructions = reflectInstructions;
+    }
+
+    public boolean isStartInMonitor() {
+	return startInMonitor;
+    }
+
+    public void setStartInMonitor(boolean startInMonitor) {
+	this.startInMonitor = startInMonitor;
+    }
+
+    public Integer getDuration() {
+	return duration;
+    }
+
+    public void setDuration(Integer duration) {
+	this.duration = duration;
     }
 
     public String getTitle() {
