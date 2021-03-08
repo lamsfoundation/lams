@@ -354,7 +354,8 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
     @SuppressWarnings("unchecked")
     @Override
     public Map<User, Boolean> getUsersWithLessonParticipation(final Long lessonId, final String role,
-	    String searchPhrase, final Integer limit, final Integer offset, boolean orderAscending) {
+	    String searchPhrase, final Integer limit, final Integer offset, boolean orderByLastName,
+	    boolean orderAscending) {
 	String queryTextBase = LessonDAO.LOAD_USERS_WITH_LESSON_PARTICIPATION;
 	// whether to exclude staff group or make it the only group that counts
 	queryTextBase = queryTextBase.replace("<IS_STAFF>", role.equals(Role.MONITOR) ? "=" : "<>");
@@ -372,12 +373,18 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 	    queryTextBuilder.delete(queryTextBuilder.length() - 4, queryTextBuilder.length());
 	}
 	String order = orderAscending ? "ASC" : "DESC";
-	queryTextBuilder.append(" ORDER BY users.first_name ").append(order).append(", users.last_name ").append(order)
-		.append(", users.login ").append(order);
+	if (orderByLastName) {
+	    queryTextBuilder.append(" ORDER BY users.last_name ").append(order).append(", users.first_name ")
+		    .append(order);
+	} else {
+	    queryTextBuilder.append(" ORDER BY users.first_name ").append(order).append(", users.last_name ")
+		    .append(order);
+	}
+	queryTextBuilder.append(", users.login ").append(order);
 
 	Query<Object[]> query = getSession().createSQLQuery(queryTextBuilder.toString()).addEntity(User.class)
-		.addScalar("participant").setLong("lessonId", lessonId)
-		.setInteger("roleId", role.equals(Role.MONITOR) ? Role.ROLE_MONITOR : Role.ROLE_LEARNER);
+		.addScalar("participant").setParameter("lessonId", lessonId)
+		.setParameter("roleId", role.equals(Role.MONITOR) ? Role.ROLE_MONITOR : Role.ROLE_LEARNER);
 	if (limit != null) {
 	    query.setMaxResults(limit);
 	}

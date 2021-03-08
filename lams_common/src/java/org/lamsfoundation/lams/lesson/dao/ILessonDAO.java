@@ -125,7 +125,7 @@ public interface ILessonDAO extends IBaseDAO {
      * given lesson.
      */
     Map<User, Boolean> getUsersWithLessonParticipation(Long lessonId, String role, String searchPhrase, Integer limit,
-	    Integer offset, boolean orderAscending);
+	    Integer offset, boolean orderByLastName, boolean orderAscending);
 
     /**
      * Get all the preview lessons more with the creation date before the given date.
@@ -142,11 +142,11 @@ public interface ILessonDAO extends IBaseDAO {
     Lesson getLessonForActivity(long activityId);
 
     /**
-     * Get the lesson and activity ids that apply to the tool activity associated with this tool content id. 
+     * Get the lesson and activity ids that apply to the tool activity associated with this tool content id.
      * Returns an array of two longs.
      */
     Long[] getLessonActivityIdsForToolContentId(long toolContentId);
-    
+
     /**
      * Gets all non-removed lessons for a user in an org; set userRole parameter to learner if you want lessons where
      * user is in the learner list, or to monitor if in the staff list.
@@ -208,10 +208,11 @@ public interface ILessonDAO extends IBaseDAO {
      * Finds IDs of preview lessons.
      */
     List<Long> getPreviewLessons(Integer limit);
-    
+
     /**
-     * Finds IDs of all lessons in an organisation. When calling MonitoringService.removeLessonPermanently() you cannot load the Lessons
+     * Finds IDs of all lessons in an organisation. When calling MonitoringService.removeLessonPermanently() you cannot
+     * load the Lessons
      * or a Hibernate error occurs. So we need a way to get the ids withouth calling Organisation.getLessons()
      */
-    List<Long> getOrganisationLessons(Integer organisationId) ;
+    List<Long> getOrganisationLessons(Integer organisationId);
 }
