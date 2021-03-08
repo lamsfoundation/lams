@@ -70,9 +70,9 @@
 
 	<lams:TabBodyArea>
 		<lams:TabBodys>
-			<lams:TabBody id="1" titleKey="label.monitoring.heading.userlist.desc" page="parts/summary.jsp" />
-			<lams:TabBody id="2" titleKey="label.monitoring.heading.edit.activity.desc" page="parts/activity.jsp" />
-			<lams:TabBody id="3" titleKey="label.monitoring.heading.stats.desc" page="parts/statisticpart.jsp" />
+			<lams:TabBody id="1" page="parts/summary.jsp" />
+			<lams:TabBody id="2" page="parts/activity.jsp" />
+			<lams:TabBody id="3" page="parts/statisticpart.jsp" />
 		</lams:TabBodys>
 	</lams:TabBodyArea>
 		

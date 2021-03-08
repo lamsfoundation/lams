@@ -79,8 +79,8 @@
 		 		
 				<!--  Set up tabs  -->
 		 		<lams:TabBodys>
-   					<lams:TabBody id="1" titleKey="label.authoring.heading.basic" page="basic.jsp" />
- 					<lams:TabBody id="2" titleKey="label.authoring.heading.advanced" page="advance.jsp" />
+   					<lams:TabBody id="1" page="basic.jsp" />
+ 					<lams:TabBody id="2" page="advance.jsp" />
   				</lams:TabBodys>
 		
 				<!-- Button Row -->

@@ -128,8 +128,8 @@
               
                 <!--  Set up tabs  -->
                  <lams:TabBodys>
-    				<lams:TabBody id="1" titleKey="label.basic" page="BasicContent.jsp"/>
-					<lams:TabBody id="2" titleKey="label.advanced" page="AdvancedContent.jsp" />
+    				<lams:TabBody id="1" page="BasicContent.jsp"/>
+					<lams:TabBody id="2" page="AdvancedContent.jsp" />
                 </lams:TabBodys>
   	
   				<lams:AuthoringButton formID="voteAuthoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lavote11" 

@@ -28,9 +28,9 @@
 	   
 	    <!--  Set up tabs  -->
 	     <lams:TabBodys>
-			<lams:TabBody id="1" titleKey="button.basic" page="basic.jsp" />
-			<lams:TabBody id="2" titleKey="button.advanced" page="advanced.jsp" />
-			<lams:TabBody id="3" titleKey="button.conditions" page="conditions.jsp" />
+			<lams:TabBody id="1" page="basic.jsp" />
+			<lams:TabBody id="2" page="advanced.jsp" />
+			<lams:TabBody id="3" page="conditions.jsp" />
 	    </lams:TabBodys>
 
 

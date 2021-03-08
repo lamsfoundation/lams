@@ -41,7 +41,7 @@
 					 <lams:errors/>
 					<%-- Page tabs --%>
 		            <lams:TabBodys>
-						<lams:TabBody id="1" titleKey="button.basic" page="basic.jsp" />
+						<lams:TabBody id="1" page="basic.jsp" />
 	           		</lams:TabBodys>
 					<lams:AuthoringButton formID="authoringForm"
 						clearSessionActionUrl="/clearsession.do" toolSignature="lalead11"
