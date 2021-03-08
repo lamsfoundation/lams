@@ -352,9 +352,21 @@ public class LearningController implements SbmtConstants {
 	String fileDescription = learnerForm.getDescription();
 	// reset fields and display a new form for next new file upload
 	learnerForm.setDescription("");
+
+	SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
+	SubmitFilesContent content = submitFilesService.getSessionById(sessionID).getContent();
 	try {
 	    for (File file : files) {
 		submitFilesService.uploadFileToSession(sessionID, file, fileDescription, userID);
+
+		if (content.isNotifyTeachersOnFileSubmit()) {
+		    String message = submitFilesService.getLocalisedMessage("event.file.submit.body",
+			    new Object[] { learner.getFullName(), file.getName(), fileDescription });
+
+		    submitFilesService.getEventNotificationService().notifyLessonMonitors(sessionID,
+			    submitFilesService.getLocalisedMessage("event.file.submit.subject", new Object[] {}),
+			    message, true);
+		}
 	    }
 	} catch (SubmitFilesException e) {
 	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
@@ -365,16 +377,6 @@ public class LearningController implements SbmtConstants {
 	    return "learner/sbmtlearner";
 	} finally {
 	    FileUtil.deleteTmpFileUploadDir(learnerForm.getTmpFileUploadId());
-	}
-
-	SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
-
-	SubmitFilesContent content = submitFilesService.getSessionById(sessionID).getContent();
-	if (content.isNotifyTeachersOnFileSubmit()) {
-
-	    String message = submitFilesService.getLocalisedMessage("event.file.submit.body",
-		    new Object[] { learner.getFullName() });
-	    submitFilesService.getEventNotificationService().notifyLessonMonitors(sessionID, message, false);
 	}
 
 	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMapID);
