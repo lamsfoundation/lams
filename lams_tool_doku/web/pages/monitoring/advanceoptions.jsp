@@ -88,6 +88,45 @@
 			</c:choose>	
 		</td>
 	</tr>
+		
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.advance.gallery.walk.enabled" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${sessionMap.dokumaran.galleryWalkEnabled}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+		
+	<c:choose>
+		<c:when test="${sessionMap.dokumaran.galleryWalkEnabled}">
+			<tr>
+				<td>
+					<fmt:message key="label.authoring.advance.gallery.walk.read.only" />
+				</td>
+				
+				<td>
+					<c:choose>
+						<c:when test="${sessionMap.dokumaran.galleryWalkReadOnly}">
+							<fmt:message key="label.on" />
+						</c:when>
+						<c:otherwise>
+							<fmt:message key="label.off" />
+						</c:otherwise>
+					</c:choose>	
+				</td>
+			</tr>
+		</c:when>
+	</c:choose>
+	
 	<tr>
 		<td>
 			<fmt:message key="monitor.summary.td.addNotebook" />
