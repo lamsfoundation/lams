@@ -714,7 +714,7 @@ public class MonitoringController {
 
 	// find organisation users and whether they participate in the current lesson
 	Map<User, Boolean> users = lessonService.getUsersWithLessonParticipation(lessonId, role, searchPhrase,
-		MonitoringController.USER_PAGE_SIZE, (pageNumber - 1) * MonitoringController.USER_PAGE_SIZE,
+		MonitoringController.USER_PAGE_SIZE, (pageNumber - 1) * MonitoringController.USER_PAGE_SIZE, true,
 		orderAscending);
 
 	// if the result is less then page size, then no need for full check of user count
@@ -1401,7 +1401,7 @@ public class MonitoringController {
 	if (isOrganisationSearch) {
 	    // search for Learners in the organisation
 	    Map<User, Boolean> result = lessonService.getUsersWithLessonParticipation(lessonId, Role.LEARNER,
-		    searchPhrase, MonitoringController.USER_PAGE_SIZE, null, true);
+		    searchPhrase, MonitoringController.USER_PAGE_SIZE, null, false, true);
 	    users = result.keySet();
 	} else {
 	    // search for Learners in the lesson

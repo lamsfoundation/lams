@@ -78,7 +78,7 @@ public interface ILessonService {
      * given lesson.
      */
     Map<User, Boolean> getUsersWithLessonParticipation(Long lessonId, String role, String searchPhrase, Integer limit,
-	    Integer offset, boolean orderAscending);
+	    Integer offset, boolean orderByLastName, boolean orderAscending);
 
     /**
      * Get the count of all the learners who are a part of the lesson class.
