@@ -83,10 +83,6 @@
 			responseStr +='</div>';
 			responseStr +='<br>';
 		</c:forEach>
-							
-	<c:if test="${question.hedgingJustificationEnabled}">
-		responseStr +="${questionResult.answerEscaped}";
-	</c:if>
 	</c:when>						
 	
 </c:choose>

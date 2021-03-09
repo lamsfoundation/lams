@@ -138,10 +138,6 @@
 											</div>
 											<br>
 										</c:forEach>
-															
-										<c:if test="${question.hedgingJustificationEnabled}">
-											${questionResult.answer}
-										</c:if>
 									</c:when>
 								</c:choose>
 							</td>

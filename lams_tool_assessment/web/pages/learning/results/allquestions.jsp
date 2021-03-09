@@ -134,27 +134,35 @@
 		<div class="panel-body" id="question-area-${status.index}">
 			<c:choose>
 				<c:when test="${question.type == 1}">
+					<c:set var="justificationEligible" value="true" />	
 					<%@ include file="multiplechoice.jsp"%>
 				</c:when>
 				<c:when test="${question.type == 2}">
+					<c:set var="justificationEligible" value="true" />	
 					<%@ include file="matchingpairs.jsp"%>
 				</c:when>
 				<c:when test="${question.type == 3}">
+					<c:set var="justificationEligible" value="false" />	
 					<%@ include file="vsa.jsp"%>
 				</c:when>
 				<c:when test="${question.type == 4}">
+					<c:set var="justificationEligible" value="true" />	
 					<%@ include file="numerical.jsp"%>
 				</c:when>
 				<c:when test="${question.type == 5}">
+					<c:set var="justificationEligible" value="true" />	
 					<%@ include file="truefalse.jsp"%>
 				</c:when>
 				<c:when test="${question.type == 6}">
+					<c:set var="justificationEligible" value="false" />	
 					<%@ include file="essay.jsp"%>
 				</c:when>
 				<c:when test="${question.type == 7}">
+					<c:set var="justificationEligible" value="true" />	
 					<%@ include file="ordering.jsp"%>
 				</c:when>
 				<c:when test="${question.type == 8}">
+					<c:set var="justificationEligible" value="true" />	
 					<c:set var="questionIndex" value="${status.index}"/>
 					<%@ include file="markhedging.jsp"%>
 				</c:when>			
@@ -170,15 +178,61 @@
 				<c:if test="${assessment.enableConfidenceLevels and question.type != 8}">
 					<%@ include file="confidencelevel.jsp"%>
 				</c:if>
-				
-				<c:if test="${assessment.allowAnswerJustification and not empty question.justification}">
-					<div class="question-type">
-						<fmt:message key="label.answer.justification" />
-					</div>
-					<p>
-						<c:out value="${question.justificationHtml}" escapeXml="false" />
-					</p>
-				</c:if>
+			</c:if>
+			
+			<c:if test="${justificationEligible and 
+							 (assessment.allowAnswerJustification or (question.type == 8 and question.hedgingJustificationEnabled))}">
+				<c:choose>
+					<c:when test="${assessment.allowDiscloseAnswers and question.groupsAnswersDisclosed and fn:length(sessions) > 1}">
+						<%-- Display a table with other groups' justifications --%>
+						<div class="question-type voffset20">
+							<fmt:message key="label.answer.justification" />
+						</div>
+						
+						<table class="table table-responsive table-striped table-bordered table-condensed">
+							<c:forEach var="session" items="${sessions}" varStatus="status">
+								<c:set var="sessionResults" value="" />
+								
+								<%-- Get the needed piece of information from a complicated questionSummaries structure --%>
+								<c:set var="questionSummary" value="${questionSummaries[question.uid]}" />
+								<c:set var="sessionResults" 
+									value="${questionSummary.questionResultsPerSession[status.index]}" />
+								<c:set var="sessionResults" value="${sessionResults[fn:length(sessionResults)-1]}" />
+
+								<c:if test="${not empty sessionResults.uid and not empty sessionResults.justification}">
+									<tr role="row">
+										<td width="30%">
+											<c:if test="${not empty session.groupLeader}">
+												<lams:Portrait userId="${session.groupLeader.userId}"/>&nbsp;
+											</c:if>
+											<c:choose>
+												<c:when test="${not empty toolSessionID and toolSessionID == session.sessionId}">
+													<b><fmt:message key="label.your.team"/></b>
+												</c:when>
+												<c:otherwise>
+													<%-- Sessions are named after groups --%>
+													<c:out value="${session.sessionName}" escapeXml="true"/> 
+												</c:otherwise>
+											</c:choose>
+										</td>
+										<td>
+											<c:out value="${sessionResults.justificationEscaped}" escapeXml="false" />
+										</td>
+									</tr>
+								</c:if>
+							</c:forEach>
+						</table>
+					</c:when>
+					<c:when test="${not empty toolSessionID and not empty question.justification}">
+						<%-- Display only own justification --%>
+						<div class="question-type voffset20">
+							<fmt:message key="label.answer.justification" />
+						</div>
+						<p>
+							<c:out value="${question.justificationHtml}" escapeXml="false" />
+						</p>
+					</c:when>
+				</c:choose>
 			</c:if>
 		</div>
 					

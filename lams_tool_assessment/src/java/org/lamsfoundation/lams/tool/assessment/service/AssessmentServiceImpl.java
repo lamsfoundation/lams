@@ -731,7 +731,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	}
 
 	// store justification entered by the learner
-	if (assessment.isAllowAnswerJustification()) {
+	if (assessment.isAllowAnswerJustification() || (questionDto.getType().equals(QbQuestion.TYPE_MARK_HEDGING)
+		&& questionDto.isHedgingJustificationEnabled())) {
 	    questionResult.setJustification(questionDto.getJustification());
 	}
 
@@ -1808,6 +1809,17 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	if (assessment.getQuestions() != null) {
 	    Set<AssessmentQuestion> questions = assessment.getQuestions();
 
+	    boolean allowAnswerJustification = assessment.isAllowAnswerJustification();
+	    if (!allowAnswerJustification) {
+		for (AssessmentQuestion question : questions) {
+		    if (question.getType().equals(QbQuestion.TYPE_MARK_HEDGING)
+			    && question.getQbQuestion().isHedgingJustificationEnabled()) {
+			allowAnswerJustification = true;
+			break;
+		    }
+		}
+	    }
+
 	    // question row title
 	    ExcelRow questionTitleRow = new ExcelRow();
 	    questionTitleRow.addCell(getMessage("label.monitoring.question.summary.question"), true,
@@ -1829,7 +1841,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	    questionTitleRow.addCell(getMessage("label.export.time.taken"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	    questionTitleRow.addCell(getMessage("label.export.mark"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	    if (assessment.isAllowAnswerJustification()) {
+	    if (allowAnswerJustification) {
 		questionTitleRow.addCell(getMessage("label.answer.justification"), true,
 			ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	    }
@@ -1965,7 +1977,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			    userResultRow.addEmptyCell();
 			}
 
-			if (assessment.isAllowAnswerJustification()) {
+			if (allowAnswerJustification) {
 			    userResultRow.addCell(AssessmentEscapeUtils
 				    .escapeStringForExcelExport(questionResult.getJustification()));
 			}
@@ -3332,7 +3344,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	if (user == null) {
 	    return null;
 	}
-	AssessmentResult assessmentResult = getLastAssessmentResult(assessment.getUid(), Integer.valueOf(userId).longValue());
+	AssessmentResult assessmentResult = getLastAssessmentResult(assessment.getUid(),
+		Integer.valueOf(userId).longValue());
 	if (assessmentResult == null) {
 	    return 0;
 	}
@@ -3343,10 +3356,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    QbQuestion qbQuestion = qbToolQuestion.getQbQuestion();
 	    if (qbQuestion.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE
 		    || qbQuestion.getType() == QbQuestion.TYPE_MARK_HEDGING) {
-		
+
 		QuestionDTO questionDTO = new QuestionDTO(qbToolQuestion);
 		loadupQuestionResultIntoQuestionDto(questionDTO, questionResult);
-		
+
 		calculateAnswerMark(assessment.getUid(), user.getUid(), questionResult, questionDTO);
 		if (questionResult.getMark() > 0) {
 		    count++;

@@ -908,7 +908,8 @@ public class LearningController {
 	    }
 
 	    // store justification entered by the learner
-	    if (assessment.isAllowAnswerJustification()) {
+	    if (assessment.isAllowAnswerJustification() || (questionDto.getType().equals(QbQuestion.TYPE_MARK_HEDGING)
+		    && questionDto.isHedgingJustificationEnabled())) {
 		String justification = WebUtil.readStrParam(request,
 			AssessmentConstants.ATTR_ANSWER_JUSTIFICATION_PREFIX + i, true);
 		questionDto.setJustification(justification);
@@ -974,11 +975,6 @@ public class LearningController {
 			    sumMarkHedging += optionDto.getAnswerInt();
 			}
 			isAnswered = sumMarkHedging == questionDto.getMaxMark();
-
-			//verify justification of hedging is provided if it was enabled
-			if (questionDto.isHedgingJustificationEnabled()) {
-			    isAnswered &= StringUtils.isNotBlank(questionDto.getAnswer());
-			}
 		    }
 
 		    // check all questions were answered
