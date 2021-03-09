@@ -95,7 +95,8 @@
 		</div>
 		
 		<%--Display jsutification for each question --%>
-		<c:if test="${assessment.allowAnswerJustification && justificationEligible && (!isLeadershipEnabled or isUserLeader)}">
+		<c:if test="${(assessment.allowAnswerJustification || (question.type == 8 && question.hedgingJustificationEnabled)) 
+					&& justificationEligible && (!isLeadershipEnabled or isUserLeader)}">
 			<div class="form-group answer-justification-container">
 				<a data-toggle="collapse" data-target="#answer-justification-${question.uid}" role="button" class="collapsed">
 					<span class="if-collapsed"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i></span>

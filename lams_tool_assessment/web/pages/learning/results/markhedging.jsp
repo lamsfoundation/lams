@@ -51,14 +51,6 @@
 			</tr>
 		</c:forEach>
 	</table>
-		
-	<c:if test="${not empty toolSessionID and question.hedgingJustificationEnabled}">
-		<lams:textarea id="justification-question${questionIndex}" name="question${questionIndex}" class="mark-hedging-select margin-top-minus-10"
-						disabled="disabled" rows="4" cols="60">
-			<c:out value="${question.answer}" />
-		</lams:textarea>
-	</c:if>
-	
 </div>
 
 <c:if test="${assessment.allowQuestionFeedback}">
