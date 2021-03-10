@@ -27,6 +27,9 @@
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/bootstrap-slider.css" />
+	<c:if test="${not empty codeStyles}">
+		<link rel="stylesheet" type="text/css" href="${lams}css/codemirror.css" />
+	</c:if>
 	<style>
 		.slider.slider-horizontal {
 			margin-left: 40px;
@@ -52,7 +55,32 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jgrowl.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-slider.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/Sortable.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/Sortable.js"></script>
+	
+	<c:if test="${not empty codeStyles}">
+		<script type="text/javascript" src="${lams}includes/javascript/codemirror.js"></script>
+		<script type="text/javascript">
+			// this line separator for consistency with regular essay questions
+			CodeMirror.defaults.lineSeparator = '<BR>';
+			CodeMirror.defaults.lineNumbers = true;
+			CodeMirror.defaults.readOnly = ${!hasEditRight};
+		</script>
+	</c:if>
+	<%-- codeStyles is a set, so each code style will be listed only once --%>
+	<c:forEach items="${codeStyles}" var="codeStyle">
+		<c:choose>
+			<c:when test="${codeStyle == 1}">
+				<script type="text/javascript" src="${lams}includes/javascript/codemirror_mode_clike.js"></script>
+			</c:when>
+			<c:when test="${codeStyle == 2}">
+				<script type="text/javascript" src="${lams}includes/javascript/codemirror_mode_javascript.js"></script>
+			</c:when>
+			<c:when test="${codeStyle == 3}">
+				<script type="text/javascript" src="${lams}includes/javascript/codemirror_mode_python.js"></script>
+			</c:when>
+		</c:choose>
+	</c:forEach>
+	
 	<script type="text/javascript">
 		$(document).ready(function(){
 			//if isLeadershipEnabled - enable/disable submit buttons for hedging marks type of questions
@@ -268,7 +296,12 @@
 		<c:if test="${hasEditRight && (mode != 'teacher')}">
 		
 			function learnerAutosave(){
-
+				if (typeof CodeMirror != 'undefined') {
+					$('.CodeMirror').each(function(){
+						this.CodeMirror.save();
+					});
+				}
+				
 				//copy value from CKEditor (only available in essay type of questions) to textarea before ajax submit
 				$("textarea[id^='question']").each(function()  {
 					var ckeditorData = CKEDITOR.instances[this.name].getData();
@@ -318,6 +351,12 @@
 		}
 		
 		function submitAll(isTimelimitExpired){
+			if (typeof CodeMirror != 'undefined') {
+				$('.CodeMirror').each(function(){
+					this.CodeMirror.save();
+				});
+			}
+						
 			//only if time limit is not expired
 			if (!isTimelimitExpired) {
 				if (!validateAnswers()) {

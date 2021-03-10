@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -384,12 +385,19 @@ public class LearningController {
 	LinkedHashSet<QuestionDTO> questionsForOnePage = new LinkedHashSet<>();
 	pagedQuestionDtos.add(questionsForOnePage);
 	int count = 0;
+
+	// lists all code styles used in this assessment
+	Set<Integer> codeStyles = new HashSet<>();
 	for (QuestionDTO questionDto : questionDtos) {
 	    questionsForOnePage.add(questionDto);
 	    count++;
 	    if ((questionsForOnePage.size() == maxQuestionsPerPage) && (count != questionDtos.size())) {
 		questionsForOnePage = new LinkedHashSet<>();
 		pagedQuestionDtos.add(questionsForOnePage);
+	    }
+
+	    if (questionDto.getCodeStyle() != null) {
+		codeStyles.add(questionDto.getCodeStyle());
 	    }
 	}
 
@@ -428,6 +436,10 @@ public class LearningController {
 			.sorted(Comparator.comparing(u -> u.getFirstName() + u.getLastName()))
 			.collect(Collectors.toList());
 		request.setAttribute(AssessmentConstants.ATTR_ALL_GROUP_USERS, allGroupUsers);
+	    }
+
+	    if (!codeStyles.isEmpty()) {
+		request.setAttribute(AssessmentConstants.ATTR_CODE_STYLES, codeStyles);
 	    }
 
 	    return "pages/learning/learning";
