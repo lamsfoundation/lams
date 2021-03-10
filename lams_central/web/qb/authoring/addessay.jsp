@@ -103,6 +103,24 @@
 	    			minimumWordsSpinner.spinner( "disable" );
 	    		}
 	        });
+
+	        $('#codeStyle').change(function(){
+		        let codeStyle = $(this).val();
+
+		        // if code style is selected, there are no restrictions on number of words and no usage of CKEditor
+		        if (codeStyle > 0) {
+		        	$("#min-words-limit-checkbox, #max-words-limit-checkbox, #allow-rich-editor").prop({
+			        	'checked' : false,
+			        	'disabled': true
+			        });
+		        	maximumWordsSpinner.spinner('disable');
+		        	minimumWordsSpinner.spinner('disable');
+			    } else {
+		        	$("#min-words-limit-checkbox, #max-words-limit-checkbox, #allow-rich-editor").prop({
+			        	'disabled': false
+			        });
+				}
+		    }).change();
 		});
 		
 		
@@ -181,7 +199,22 @@
 						    </div>
 						</div>
 					</c:if>
-
+					
+					<div class="form-group row form-inline">
+					    <label for="codeStyle" class="col-sm-3">
+					    	<fmt:message key="label.code.style" />
+					    </label>
+					    
+					    <div class="col-sm-9">
+					    	<form:select path="codeStyle" cssClass="form-control">
+					    		<form:option value="0"><fmt:message key="label.code.style.none" /></form:option>
+					    		<form:option value="1">Java</form:option>
+					    		<form:option value="2">JavaScript</form:option>
+					    		<form:option value="3">Python</form:option>
+					    	</form:select>
+					    </div>
+					</div>
+					
 					<div>
 						<label class="switch">
 							<form:checkbox path="allowRichEditor" id="allow-rich-editor"/>
@@ -191,6 +224,7 @@
 							<fmt:message key="label.authoring.basic.allow.learners.rich.editor" />
 						</label>
 					</div>
+
 					
 					<div class="form-group row form-inline" style="display: flex; align-items: center;">
 					    <label for="max-words-limit-checkbox" class="col-sm-3">

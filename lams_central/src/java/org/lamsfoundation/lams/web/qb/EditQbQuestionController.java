@@ -143,6 +143,7 @@ public class EditQbQuestionController {
 	form.setAllowRichEditor(qbQuestion.isAllowRichEditor());
 	form.setMaxWordsLimit(qbQuestion.getMaxWordsLimit());
 	form.setMinWordsLimit(qbQuestion.getMinWordsLimit());
+	form.setCodeStyle(qbQuestion.getCodeStyle());
 	form.setHedgingJustificationEnabled(qbQuestion.isHedgingJustificationEnabled());
 	//TODO check autocomplete is saved and then maybe remove other property copying
 	BeanUtils.copyProperties(form, qbQuestion);
@@ -320,6 +321,8 @@ public class EditQbQuestionController {
 	    qbQuestion.setAllowRichEditor(form.isAllowRichEditor());
 	    qbQuestion.setMaxWordsLimit(form.getMaxWordsLimit());
 	    qbQuestion.setMinWordsLimit(form.getMinWordsLimit());
+	    qbQuestion.setCodeStyle(
+		    form.getCodeStyle() == null || form.getCodeStyle().equals(0) ? null : form.getCodeStyle());
 
 	} else if (type == QbQuestion.TYPE_ORDERING) {
 	    qbQuestion.setPenaltyFactor(Float.parseFloat(form.getPenaltyFactor()));

@@ -47,6 +47,11 @@ public class QbQuestion implements Serializable, Cloneable {
     public static final int TYPE_ORDERING = 7;
     public static final int TYPE_MARK_HEDGING = 8;
 
+    // code styles
+    public static final int CODE_STYLE_JAVA = 1;
+    public static final int CODE_STYLE_JAVASCRIPT = 2;
+    public static final int CODE_STYLE_PYTHON = 3;
+
     // primary key
     // another candidate is questionId + version, but single uid can be searched faster
     @Id
@@ -130,6 +135,10 @@ public class QbQuestion implements Serializable, Cloneable {
     // only for essay type of question
     @Column(name = "min_words_limit")
     private int minWordsLimit;
+
+    // only for essay type of question
+    @Column(name = "code_style")
+    private Integer codeStyle;
 
     /** ---- only for hedging type of question ---- */
     @Column(name = "hedging_justification_enabled")
@@ -473,6 +482,14 @@ public class QbQuestion implements Serializable, Cloneable {
      */
     public void setMinWordsLimit(int minWordsLimit) {
 	this.minWordsLimit = minWordsLimit;
+    }
+
+    public Integer getCodeStyle() {
+	return codeStyle;
+    }
+
+    public void setCodeStyle(Integer codeStyle) {
+	this.codeStyle = codeStyle;
     }
 
     public boolean isHedgingJustificationEnabled() {
