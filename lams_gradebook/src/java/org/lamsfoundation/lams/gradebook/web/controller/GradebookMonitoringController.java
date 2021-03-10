@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -100,7 +101,9 @@ public class GradebookMonitoringController {
     @Autowired
     private IEventNotificationService eventNotificationService;
 
-    private static final DateFormat RELEASE_MARKS_SCHEDULE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    private static final DateFormat RELEASE_MARKS_SCHEDULE_OUTPUT_DATE_FORMAT = new SimpleDateFormat(
+	    DateUtil.PRETTY_FORMAT);
+    private static final DateFormat RELEASE_MARKS_SCHEDULE_INPUT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     @RequestMapping("")
     public String unspecified(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -281,7 +284,7 @@ public class GradebookMonitoringController {
 		Date scheduleDate = (Date) scheduleData.get("userTimeZoneScheduleDate");
 		if (scheduleDate != null) {
 		    model.addAttribute("releaseMarksScheduleDate",
-			    RELEASE_MARKS_SCHEDULE_DATE_FORMAT.format(scheduleDate));
+			    RELEASE_MARKS_SCHEDULE_OUTPUT_DATE_FORMAT.format(scheduleDate));
 		    model.addAttribute("releaseMarksSendEmails", scheduleData.get("sendEmails"));
 		}
 	    }
@@ -335,7 +338,7 @@ public class GradebookMonitoringController {
 	try {
 	    Date scheduleDate = null;
 	    if (StringUtils.isNotBlank(scheduleDateString)) {
-		scheduleDate = RELEASE_MARKS_SCHEDULE_DATE_FORMAT.parse(scheduleDateString);
+		scheduleDate = RELEASE_MARKS_SCHEDULE_INPUT_DATE_FORMAT.parse(scheduleDateString);
 
 		// set seconds and miliseconds to 0
 		Calendar calendarDate = Calendar.getInstance();
