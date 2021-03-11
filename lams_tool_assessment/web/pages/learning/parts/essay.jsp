@@ -58,19 +58,9 @@
 		$(document).ready(function() {
 			var codeArea = $('#essay-question${status.index}'),
 				codeMirror = CodeMirror.fromTextArea(codeArea[0], {
-					'mode' : 
-						<c:choose>
-							<c:when test="${question.codeStyle == 1}">
-								'text/x-java'
-							</c:when>
-							<c:when test="${question.codeStyle == 2}">
-								'text/javascript'
-							</c:when>
-							<c:when test="${question.codeStyle == 3}">
-								'text/x-python'
-							</c:when>
-						</c:choose>
+					'mode' : '${question.codeStyleMime}'
 				}),
+				// on the back end we keep essay answer lines <BR>-separated, but CodeMirror uses \n
 				content = codeMirror.getValue().replaceAll('<BR>', '\n');
 			codeMirror.setValue(content);
 		});

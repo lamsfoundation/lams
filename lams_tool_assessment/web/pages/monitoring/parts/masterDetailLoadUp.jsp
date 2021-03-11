@@ -28,6 +28,10 @@
  	 	    // set maxGrade attribute to cell DOM element
  	 	    table.setCell(${i.index + 1}, "grade", "", null, {"maxGrade" :  "${questionResult.maxMark}"});
 		</c:forEach>
+
+		if (typeof CodeMirror != 'undefined') {
+			CodeMirror.colorize($('.code-style'));
+		}
 	};
 	masterDetailLoadUp();
 </script>

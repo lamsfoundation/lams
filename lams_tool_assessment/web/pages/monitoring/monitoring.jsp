@@ -14,7 +14,10 @@
 		<link href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet" type="text/css" >
  		<lams:css suffix="chart"/>
  		<link href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet" type="text/css">
- 		
+ 		<c:if test="${not empty codeStyles}">
+			<link rel="stylesheet" type="text/css" href="${lams}css/codemirror.css" />
+		</c:if>
+	
  		<style>
 	 		.ui-jqdialog.ui-jqgrid-bootstrap .ui-jqdialog-titlebar, .ui-jqgrid.ui-jqgrid-bootstrap .ui-jqgrid-caption {
 				background-color: #f5f5f5;
@@ -35,6 +38,11 @@
 	  		#completion-charts-container > div {
 	  			padding: 5rem 2rem;
 	  		}
+	  		
+	  		pre {
+				background-color: initial;
+				border: none;
+			}
  		</style>
  		
 		<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
@@ -101,8 +109,26 @@
  		<script type="text/javascript" src="${lams}includes/javascript/download.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/portrait.js" ></script>
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
-
  		
+		<c:if test="${not empty codeStyles}">
+			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/runmode-standalone.js"></script>
+			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/colorize.js"></script>
+		</c:if>
+		<%-- codeStyles is a set, so each code style will be listed only once --%>
+		<c:forEach items="${codeStyles}" var="codeStyle">
+			<c:choose>
+				<c:when test="${codeStyle == 1}">
+					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/clike.js"></script>
+				</c:when>
+				<c:when test="${codeStyle == 2}">
+					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/javascript.js"></script>
+				</c:when>
+				<c:when test="${codeStyle == 3}">
+					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/python.js"></script>
+				</c:when>
+			</c:choose>
+		</c:forEach>
+		
 		<script>        
 		    function doSelectTab(tabId) {
 		    	if ( tabId == 3 )

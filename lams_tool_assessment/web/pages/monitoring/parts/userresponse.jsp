@@ -37,7 +37,7 @@
 	<c:when test="${question.type == 3}">
 		responseStr +="${fn:escapeXml(questionResult.answerEscaped)}";
 	</c:when>
-						
+	
 	<c:when test="${question.type == 4}">
 		responseStr +="${questionResult.answerEscaped}";
 	</c:when>
@@ -48,10 +48,14 @@
 		</c:if>
 	</c:when>
 						
-	<c:when test="${question.type == 6}">
+	<c:when test="${question.type == 6 and empty question.codeStyle}">
 		responseStr +="${questionResult.answerEscaped}";
 	</c:when>
-						
+	
+	<c:when test="${question.type == 6}">
+		responseStr +="<pre class='code-style' data-lang='${question.codeStyleMime}'>${questionResult.answerEscaped}</pre>";
+	</c:when>	
+	
 	<c:when test="${question.type == 7}">
 		<c:forEach var="j" begin="0" end="${fn:length(questionResult.optionAnswers) - 1}" step="1">
 			<c:forEach var="optionAnswer" items="${questionResult.optionAnswers}">

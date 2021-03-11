@@ -10,6 +10,10 @@
 		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
+		<c:if test="${not empty codeStyles}">
+			<link rel="stylesheet" type="text/css" href="${lams}css/codemirror.css" />
+		</c:if>
+	
 		<style>
 			.question-etherpad {
 				padding: 0;
@@ -18,6 +22,11 @@
 			[data-toggle="collapse"].collapsed .if-not-collapsed, [data-toggle="collapse"]:not(.collapsed) .if-collapsed {
 	  			display: none;
 	  		}
+	  		
+	  		pre {
+				background-color: initial;
+				border: none;
+			}
 		</style>
 		
 		<script>
@@ -34,6 +43,26 @@
 		</script>
 		<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
+	 	
+	 	<c:if test="${not empty codeStyles}">
+			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/runmode-standalone.js"></script>
+			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/colorize.js"></script>
+		</c:if>
+		<%-- codeStyles is a set, so each code style will be listed only once --%>
+		<c:forEach items="${codeStyles}" var="codeStyle">
+			<c:choose>
+				<c:when test="${codeStyle == 1}">
+					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/clike.js"></script>
+				</c:when>
+				<c:when test="${codeStyle == 2}">
+					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/javascript.js"></script>
+				</c:when>
+				<c:when test="${codeStyle == 3}">
+					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/python.js"></script>
+				</c:when>
+			</c:choose>
+		</c:forEach>
+		
   	    <script>
 	    	var isEdited = false;
   	    	var previousCellValue = "";  	    	
@@ -151,6 +180,10 @@
 						etherpadInitMethods[groupId]();
 					}
 				});
+
+				if (typeof CodeMirror != 'undefined') {
+					CodeMirror.colorize($('.code-style'));
+				}
 	  		});  	    	
 
     		function refreshSummaryPage()  { 

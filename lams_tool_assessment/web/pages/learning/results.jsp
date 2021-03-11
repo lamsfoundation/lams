@@ -9,9 +9,11 @@
 	<lams:css suffix="jquery.jRating"/>
 	<c:if test="${not empty codeStyles}">
 		<link rel="stylesheet" type="text/css" href="${lams}css/codemirror.css" />
+		<link rel="stylesheet" type="text/css" href="${lams}css/codemirror_simplescrollbars.css" />
 		<style>
 			pre {
 				background-color: initial;
+				border: none;
 			}
 		</style>
 	</c:if>
