@@ -58,7 +58,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/Sortable.js"></script>
 	
 	<c:if test="${not empty codeStyles}">
-		<script type="text/javascript" src="${lams}includes/javascript/codemirror.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/codemirror/codemirror.js"></script>
 		<script type="text/javascript">
 			CodeMirror.defaults.lineNumbers = true;
 			CodeMirror.defaults.readOnly = ${!hasEditRight};
@@ -68,13 +68,13 @@
 	<c:forEach items="${codeStyles}" var="codeStyle">
 		<c:choose>
 			<c:when test="${codeStyle == 1}">
-				<script type="text/javascript" src="${lams}includes/javascript/codemirror_mode_clike.js"></script>
+				<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/clike.js"></script>
 			</c:when>
 			<c:when test="${codeStyle == 2}">
-				<script type="text/javascript" src="${lams}includes/javascript/codemirror_mode_javascript.js"></script>
+				<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/javascript.js"></script>
 			</c:when>
 			<c:when test="${codeStyle == 3}">
-				<script type="text/javascript" src="${lams}includes/javascript/codemirror_mode_python.js"></script>
+				<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/python.js"></script>
 			</c:when>
 		</c:choose>
 	</c:forEach>
