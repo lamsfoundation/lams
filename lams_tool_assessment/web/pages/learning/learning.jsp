@@ -29,6 +29,7 @@
 	<link rel="stylesheet" type="text/css" href="${lams}css/bootstrap-slider.css" />
 	<c:if test="${not empty codeStyles}">
 		<link rel="stylesheet" type="text/css" href="${lams}css/codemirror.css" />
+		<link rel="stylesheet" type="text/css" href="${lams}css/codemirror_simplescrollbars.css" />
 	</c:if>
 	<style>
 		.slider.slider-horizontal {
@@ -59,9 +60,22 @@
 	
 	<c:if test="${not empty codeStyles}">
 		<script type="text/javascript" src="${lams}includes/javascript/codemirror/codemirror.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/scroll/simplescrollbars.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/selection/active-line.js"></script>
+		<c:if test="${hasEditRight}">
+			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/comment/continuecomment.js"></script>
+			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/edit/closebrackets.js"></script>
+			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/edit/matchbrackets.js"></script>
+		</c:if>
+
 		<script type="text/javascript">
-			CodeMirror.defaults.lineNumbers = true;
 			CodeMirror.defaults.readOnly = ${!hasEditRight};
+			CodeMirror.defaults.lineNumbers = true;
+			CodeMirror.defaults.continueComments = true;
+			CodeMirror.defaults.autoCloseBrackets = true; 
+			CodeMirror.defaults.matchBrackets = true;
+			CodeMirror.defaults.scrollbarStyle = 'simple';
+			CodeMirror.defaults.styleActiveLine = true;
 		</script>
 	</c:if>
 	<%-- codeStyles is a set, so each code style will be listed only once --%>
