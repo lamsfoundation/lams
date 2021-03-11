@@ -412,6 +412,10 @@ public class LearningController {
 	sessionMap.put(AssessmentConstants.CONFIG_KEY_HIDE_TITLES,
 		Boolean.valueOf(service.getConfigValue(AssessmentConstants.CONFIG_KEY_HIDE_TITLES)));
 
+	if (!codeStyles.isEmpty()) {
+	    request.setAttribute(AssessmentConstants.ATTR_CODE_STYLES, codeStyles);
+	}
+
 	if (showResults) {
 
 	    // display results page
@@ -436,10 +440,6 @@ public class LearningController {
 			.sorted(Comparator.comparing(u -> u.getFirstName() + u.getLastName()))
 			.collect(Collectors.toList());
 		request.setAttribute(AssessmentConstants.ATTR_ALL_GROUP_USERS, allGroupUsers);
-	    }
-
-	    if (!codeStyles.isEmpty()) {
-		request.setAttribute(AssessmentConstants.ATTR_CODE_STYLES, codeStyles);
 	    }
 
 	    return "pages/learning/learning";
@@ -883,7 +883,7 @@ public class LearningController {
 		    // text coming from CodeMirror uses \n as separator
 		    answer = answer.replaceAll("\n", "<BR>");
 		}
-		
+
 		questionDto.setAnswer(answer);
 
 	    } else if (questionType == QbQuestion.TYPE_ORDERING) {

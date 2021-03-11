@@ -6,10 +6,23 @@
 	</div>
 	
 	<div class="table-responsive">
-		<table class="table table-hover table-condensed">
+		<table class="table table-condensed ${empty question.codeStyle ? 'table-hover' : ''}">
 			<tr>
 				<td>
-					${question.answer}
+					<c:choose>
+						<c:when test="${empty question.codeStyle}">
+							${question.answer}
+						</c:when>
+						<c:when test="${question.codeStyle == 1}">
+							<pre class="code-style" data-lang="text/x-java">${question.answer}</pre>
+						</c:when>
+						<c:when test="${question.codeStyle == 2}">
+							<pre class="code-style" data-lang="text/javascript">${question.answer}</pre>
+						</c:when>
+						<c:when test="${question.codeStyle == 3}">
+							<pre class="code-style" data-lang="text/x-python">${question.answer}</pre>
+						</c:when>
+					</c:choose>
 				</td>
 			</tr>
 		</table>
