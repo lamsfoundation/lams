@@ -60,8 +60,6 @@
 	<c:if test="${not empty codeStyles}">
 		<script type="text/javascript" src="${lams}includes/javascript/codemirror.js"></script>
 		<script type="text/javascript">
-			// this line separator for consistency with regular essay questions
-			CodeMirror.defaults.lineSeparator = '<BR>';
 			CodeMirror.defaults.lineNumbers = true;
 			CodeMirror.defaults.readOnly = ${!hasEditRight};
 		</script>

@@ -70,7 +70,9 @@
 								'text/x-python'
 							</c:when>
 						</c:choose>
-				});
+				}),
+				content = codeMirror.getValue().replaceAll('<BR>', '\n');
+			codeMirror.setValue(content);
 		});
 	</script>
 </c:if>

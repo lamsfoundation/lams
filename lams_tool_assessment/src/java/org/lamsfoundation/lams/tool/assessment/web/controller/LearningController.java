@@ -877,7 +877,13 @@ public class LearningController {
 
 	    } else if (questionType == QbQuestion.TYPE_ESSAY) {
 		String answer = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
-		answer = answer.replaceAll("[\n\r\f]", "");
+		if (questionDto.getCodeStyle() == null) {
+		    answer = answer.replaceAll("[\n\r\f]", "");
+		} else {
+		    // text coming from CodeMirror uses \n as separator
+		    answer = answer.replaceAll("\n", "<BR>");
+		}
+		
 		questionDto.setAnswer(answer);
 
 	    } else if (questionType == QbQuestion.TYPE_ORDERING) {
