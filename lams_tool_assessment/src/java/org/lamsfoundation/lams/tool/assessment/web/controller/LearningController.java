@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -384,12 +385,19 @@ public class LearningController {
 	LinkedHashSet<QuestionDTO> questionsForOnePage = new LinkedHashSet<>();
 	pagedQuestionDtos.add(questionsForOnePage);
 	int count = 0;
+
+	// lists all code styles used in this assessment
+	Set<Integer> codeStyles = new HashSet<>();
 	for (QuestionDTO questionDto : questionDtos) {
 	    questionsForOnePage.add(questionDto);
 	    count++;
 	    if ((questionsForOnePage.size() == maxQuestionsPerPage) && (count != questionDtos.size())) {
 		questionsForOnePage = new LinkedHashSet<>();
 		pagedQuestionDtos.add(questionsForOnePage);
+	    }
+
+	    if (questionDto.getCodeStyle() != null) {
+		codeStyles.add(questionDto.getCodeStyle());
 	    }
 	}
 
@@ -403,6 +411,10 @@ public class LearningController {
 
 	sessionMap.put(AssessmentConstants.CONFIG_KEY_HIDE_TITLES,
 		Boolean.valueOf(service.getConfigValue(AssessmentConstants.CONFIG_KEY_HIDE_TITLES)));
+
+	if (!codeStyles.isEmpty()) {
+	    request.setAttribute(AssessmentConstants.ATTR_CODE_STYLES, codeStyles);
+	}
 
 	if (showResults) {
 
@@ -865,7 +877,13 @@ public class LearningController {
 
 	    } else if (questionType == QbQuestion.TYPE_ESSAY) {
 		String answer = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
-		answer = answer.replaceAll("[\n\r\f]", "");
+		if (questionDto.getCodeStyle() == null) {
+		    answer = answer.replaceAll("[\n\r\f]", "");
+		} else {
+		    // text coming from CodeMirror uses \n as separator
+		    answer = answer.replaceAll("\n", "<BR>");
+		}
+
 		questionDto.setAnswer(answer);
 
 	    } else if (questionType == QbQuestion.TYPE_ORDERING) {

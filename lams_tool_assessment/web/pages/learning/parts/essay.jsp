@@ -52,6 +52,21 @@
 </script>
 </c:if>
 
+<c:if test="${not empty question.codeStyle}">
+	<script type="text/javascript">
+		// initialise syntax highlighter depending on programming language
+		$(document).ready(function() {
+			var codeArea = $('#essay-question${status.index}'),
+				codeMirror = CodeMirror.fromTextArea(codeArea[0], {
+					'mode' : '${question.codeStyleMime}'
+				}),
+				// on the back end we keep essay answer lines <BR>-separated, but CodeMirror uses \n
+				content = codeMirror.getValue().replaceAll('<BR>', '\n');
+			codeMirror.setValue(content);
+		});
+	</script>
+</c:if>
+
 <div class="question-type">
 	<fmt:message key="label.learning.short.answer.answer" />
 </div>
@@ -95,6 +110,9 @@
 				<c:choose>
 					<c:when test="${question.allowRichEditor && hasEditRight}">
 						<lams:CKEditor id="question${status.index}" value="${question.answer}" contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner" height="174px"></lams:CKEditor>
+					</c:when>
+					<c:when test="${not empty question.codeStyle}">
+						<textarea id="essay-question${status.index}" name="question${status.index}">${question.answer}</textarea>
 					</c:when>
 					<c:otherwise>
 						<lams:textarea id="essay-question${status.index}" name="question${status.index}" class="form-control" disabled="${!hasEditRight}" rows="8">${question.answer}</lams:textarea>

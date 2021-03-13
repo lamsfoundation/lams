@@ -60,6 +60,8 @@ public class QuestionDTO implements Comparable<QuestionDTO> {
 
     private int minWordsLimit;
 
+    private Integer codeStyle;
+
     private boolean hedgingJustificationEnabled;
 
     private boolean autocompleteEnabled;
@@ -141,6 +143,7 @@ public class QuestionDTO implements Comparable<QuestionDTO> {
 	this.units = qbQuestion.getUnits();
 	this.maxWordsLimit = qbQuestion.getMaxWordsLimit();
 	this.minWordsLimit = qbQuestion.getMinWordsLimit();
+	this.codeStyle = qbQuestion.getCodeStyle();
 	this.hedgingJustificationEnabled = qbQuestion.isHedgingJustificationEnabled();
 	this.autocompleteEnabled = qbQuestion.isAutocompleteEnabled();
 
@@ -329,6 +332,18 @@ public class QuestionDTO implements Comparable<QuestionDTO> {
 
     public void setMinWordsLimit(int minWordsLimit) {
 	this.minWordsLimit = minWordsLimit;
+    }
+
+    public Integer getCodeStyle() {
+	return codeStyle;
+    }
+
+    public void setCodeStyle(Integer codeStyle) {
+	this.codeStyle = codeStyle;
+    }
+
+    public String getCodeStyleMime() {
+	return QbQuestion.getCodeStyleMime(codeStyle);
     }
 
     public boolean isHedgingJustificationEnabled() {

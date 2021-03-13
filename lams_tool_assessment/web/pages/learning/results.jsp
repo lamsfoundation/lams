@@ -7,6 +7,16 @@
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
 	<lams:css suffix="jquery.jRating"/>
+	<c:if test="${not empty codeStyles}">
+		<link rel="stylesheet" type="text/css" href="${lams}css/codemirror.css" />
+		<link rel="stylesheet" type="text/css" href="${lams}css/codemirror_simplescrollbars.css" />
+		<style>
+			pre {
+				background-color: initial;
+				border: none;
+			}
+		</style>
+	</c:if>
 	
 	<%-- param has higher level for request attribute --%>
 	<c:if test="${not empty param.sessionMapID}">
@@ -23,6 +33,34 @@
 	<c:set var="isUserLeader" value="${sessionMap.isUserLeader}"/>
 	<c:set var="isLeadershipEnabled" value="${assessment.useSelectLeaderToolOuput}"/>
 		
+	<c:if test="${not empty codeStyles}">
+		<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/runmode-standalone.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/colorize.js"></script>
+	</c:if>
+	<%-- codeStyles is a set, so each code style will be listed only once --%>
+	<c:forEach items="${codeStyles}" var="codeStyle">
+		<c:choose>
+			<c:when test="${codeStyle == 1}">
+				<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/python.js"></script>
+			</c:when>
+			<c:when test="${codeStyle == 2}">
+				<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/javascript.js"></script>
+			</c:when>
+			<c:when test="${codeStyle >= 3}">
+				<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/clike.js"></script>
+			</c:when>
+		</c:choose>
+	</c:forEach>
+	
+	<c:if test="${not empty codeStyles}">
+		<script type="text/javascript">
+			// initialise syntax highlighter depending on programming language in data-lang attribute
+			$(document).ready(function() {
+				CodeMirror.colorize($('.code-style'));
+			});
+		</script>
+	</c:if>
+	
 	<script type="text/javascript">
 		function disableButtons() {
 			$('.btn').prop('disabled',true);

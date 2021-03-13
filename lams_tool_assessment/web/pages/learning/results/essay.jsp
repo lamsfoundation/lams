@@ -6,10 +6,17 @@
 	</div>
 	
 	<div class="table-responsive">
-		<table class="table table-hover table-condensed">
+		<table class="table table-condensed ${empty question.codeStyle ? 'table-hover' : ''}">
 			<tr>
 				<td>
-					${question.answer}
+					<c:choose>
+						<c:when test="${empty question.codeStyle}">
+							${question.answer}
+						</c:when>
+						<c:otherwise>
+							<pre class="code-style" data-lang="${question.codeStyleMime}">${question.answer}</pre>
+						</c:otherwise>
+					</c:choose>
 				</td>
 			</tr>
 		</table>
@@ -77,7 +84,14 @@
 					<%-- Do not show your own answer --%> 
 					<c:if test="${toolSessionID != session.sessionId}">
 							<td>
-								<c:out value="${answer}" escapeXml="false" /> 
+								<c:choose>
+									<c:when test="${empty question.codeStyle}">
+										<c:out value="${answer}" escapeXml="false" /> 
+									</c:when>
+									<c:otherwise>
+										<pre class="code-style" data-lang="${question.codeStyleMime}">${answer}</pre>
+									</c:otherwise>
+								</c:choose>
 							</td>
 						</tr>
 					</c:if>

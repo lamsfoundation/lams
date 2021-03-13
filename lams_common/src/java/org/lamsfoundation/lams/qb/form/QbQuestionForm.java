@@ -60,6 +60,7 @@ public class QbQuestionForm {
     private boolean allowRichEditor;
     private int maxWordsLimit;
     private int minWordsLimit;
+    private Integer codeStyle;
     private boolean hedgingJustificationEnabled;
     private boolean autocompleteEnabled;
     private boolean authoringRestricted;
@@ -245,6 +246,14 @@ public class QbQuestionForm {
 
     public void setMinWordsLimit(int minWordsLimit) {
 	this.minWordsLimit = minWordsLimit;
+    }
+
+    public Integer getCodeStyle() {
+	return codeStyle;
+    }
+
+    public void setCodeStyle(Integer codeStyle) {
+	this.codeStyle = codeStyle;
     }
 
     public boolean isPrefixAnswersWithLetters() {

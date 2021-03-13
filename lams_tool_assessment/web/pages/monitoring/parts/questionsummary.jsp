@@ -14,6 +14,9 @@
 		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
+		<c:if test="${not empty questionDto.codeStyle}">
+			<link rel="stylesheet" type="text/css" href="${lams}css/codemirror.css" />
+		</c:if>
 		<style>
 			.sortable-on {
 				background: lightgoldenrodyellow;
@@ -25,6 +28,10 @@
 			}
 			.list-group-item {
 				cursor: pointer;
+			}
+	  		pre {
+				background-color: initial;
+				border: none;
 			}
 		</style>
 		
@@ -58,7 +65,24 @@
 	 	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/Sortable.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script> 	
+
+		<c:if test="${not empty questionDto.codeStyle}">
+			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/runmode-standalone.js"></script>
+			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/colorize.js"></script>
+			<c:choose>
+				<c:when test="${questionDto.codeStyle == 1}">
+					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/python.js"></script>
+				</c:when>
+				<c:when test="${questionDto.codeStyle == 2}">
+					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/javascript.js"></script>
+				</c:when>
+				<c:when test="${questionDto.codeStyle >= 3}">
+					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/clike.js"></script>
+				</c:when>
+			</c:choose>
+		</c:if>
+		
   	    <script>
   	    	var isEdited = false;
   	    	var previousCellValue = "";
@@ -107,7 +131,7 @@
 				  			<c:if test="${questionDto.groupsAnswersDisclosed}">
 				  				{name:'rating', index:'rating', width:120, align:"center", sortable:false, search:false},
 		  			  		</c:if>
-			  			   	{name:'response', index:'response', width:400, sortable:false, search:false},
+			  			   	{name:'response', index:'response', width:400, sortable:false, search:false, formatter: responseFormatter},
 			  				{name:'userId', index:'userId', width:0, hidden: true},
 		  				   	{name:'portraitId', index:'portraitId', width:0, hidden: true}
 	  				   	],
@@ -148,6 +172,10 @@
   						loadComplete: function () {
   							initializeJRating();
   					   	 	initializePortraitPopover('<lams:LAMSURL/>');
+
+	  						if (typeof CodeMirror != 'undefined') {
+	  							CodeMirror.colorize($('.code-style'));
+	  						}
   					    },
   					    subGrid: true,
   						subGridOptions: {
@@ -275,6 +303,11 @@
         		} else {
         			self.parent.tb_remove();
         		}
+    		}
+
+    		function responseFormatter (cellvalue) {
+        		var codeStyle = ${empty questionDto.codeStyle ? 'null' : questionDto.codeStyle};
+        		return codeStyle ? "<pre class='code-style' data-lang='${questionDto.codeStyleMime}'>" + cellvalue + "</pre>" : cellvalue;
     		}
   		</script>
 	</lams:head>

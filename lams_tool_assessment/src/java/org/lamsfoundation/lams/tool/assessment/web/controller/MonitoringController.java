@@ -72,6 +72,7 @@ import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
+import org.lamsfoundation.lams.tool.assessment.dto.UserSummaryItem;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
@@ -206,6 +207,7 @@ public class MonitoringController {
 	// display student choices only if all questions are multiple choice
 	boolean displayStudentChoices = true;
 	int maxOptionsInQuestion = 0;
+
 	for (AssessmentQuestion question : assessment.getQuestions()) {
 	    if (question.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE) {
 		int optionsInQuestion = question.getQbQuestion().getQbOptions().size();
@@ -238,6 +240,14 @@ public class MonitoringController {
 		}
 	    }
 	    request.setAttribute("questions", questionDtos);
+	}
+
+	// lists all code styles used in this assessment
+	Set<Integer> codeStyles = questionList.stream().filter(q -> q.getQbQuestion().getCodeStyle() != null)
+		.collect(Collectors.mapping(q -> q.getQbQuestion().getCodeStyle(), Collectors.toSet()));
+
+	if (!codeStyles.isEmpty()) {
+	    request.setAttribute(AssessmentConstants.ATTR_CODE_STYLES, codeStyles);
 	}
 
 	return "pages/monitoring/monitoring";
@@ -354,6 +364,15 @@ public class MonitoringController {
 		&& StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
 	request.setAttribute(AssessmentConstants.ATTR_IS_QUESTION_ETHERPAD_ENABLED, questionEtherpadEnabled);
 	request.setAttribute(AssessmentConstants.ATTR_TOOL_SESSION_ID, sessionId);
+
+	// lists all code styles used in this assessment
+	Set<Integer> codeStyles = userSummary.getUserSummaryItems().stream().map(UserSummaryItem::getQuestionDto)
+		.filter(q -> q.getCodeStyle() != null)
+		.collect(Collectors.mapping(q -> q.getCodeStyle(), Collectors.toSet()));
+
+	if (!codeStyles.isEmpty()) {
+	    request.setAttribute(AssessmentConstants.ATTR_CODE_STYLES, codeStyles);
+	}
 
 	return "pages/monitoring/parts/usersummary";
     }

@@ -47,6 +47,17 @@ public class QbQuestion implements Serializable, Cloneable {
     public static final int TYPE_ORDERING = 7;
     public static final int TYPE_MARK_HEDGING = 8;
 
+    // code styles
+    public static final int CODE_STYLE_PYTHON = 1;
+    public static final int CODE_STYLE_JAVASCRIPT = 2;
+    public static final int CODE_STYLE_JAVA = 3;
+    public static final int CODE_STYLE_SCALA = 4;
+    public static final int CODE_STYLE_KOTLIN = 5;
+    public static final int CODE_STYLE_C = 6;
+    public static final int CODE_STYLE_OBJECTIVE_C = 7;
+    public static final int CODE_STYLE_CPP = 8;
+    public static final int CODE_STYLE_CSHARP = 9;
+
     // primary key
     // another candidate is questionId + version, but single uid can be searched faster
     @Id
@@ -130,6 +141,10 @@ public class QbQuestion implements Serializable, Cloneable {
     // only for essay type of question
     @Column(name = "min_words_limit")
     private int minWordsLimit;
+
+    // only for essay type of question
+    @Column(name = "code_style")
+    private Integer codeStyle;
 
     /** ---- only for hedging type of question ---- */
     @Column(name = "hedging_justification_enabled")
@@ -473,6 +488,42 @@ public class QbQuestion implements Serializable, Cloneable {
      */
     public void setMinWordsLimit(int minWordsLimit) {
 	this.minWordsLimit = minWordsLimit;
+    }
+
+    public Integer getCodeStyle() {
+	return codeStyle;
+    }
+
+    public void setCodeStyle(Integer codeStyle) {
+	this.codeStyle = codeStyle;
+    }
+
+    public static String getCodeStyleMime(Integer codeStyle) {
+	switch (codeStyle) {
+	    case CODE_STYLE_PYTHON:
+		return "text/x-python";
+	    case CODE_STYLE_JAVASCRIPT:
+		return "text/javascript";
+	    case CODE_STYLE_JAVA:
+		return "text/x-java";
+	    case CODE_STYLE_SCALA:
+		return "text/x-scala";
+	    case CODE_STYLE_KOTLIN:
+		return "text/x-kotlin";
+	    case CODE_STYLE_C:
+		return "text/x-csrc";
+	    case CODE_STYLE_OBJECTIVE_C:
+		return "text/x-objectivec";
+	    case CODE_STYLE_CPP:
+		return "text/x-c++src";
+	    case CODE_STYLE_CSHARP:
+		return "text/x-csharp";
+	}
+	return null;
+    }
+
+    public String getCodeStyleMime() {
+	return QbQuestion.getCodeStyleMime(codeStyle);
     }
 
     public boolean isHedgingJustificationEnabled() {
