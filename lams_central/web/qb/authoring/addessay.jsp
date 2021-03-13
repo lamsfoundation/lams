@@ -208,9 +208,15 @@
 					    <div class="col-sm-9">
 					    	<form:select path="codeStyle" cssClass="form-control">
 					    		<form:option value="0"><fmt:message key="label.code.style.none" /></form:option>
-					    		<form:option value="1">Java</form:option>
+					    		<form:option value="1">Python</form:option>
 					    		<form:option value="2">JavaScript</form:option>
-					    		<form:option value="3">Python</form:option>
+					    		<form:option value="3">Java</form:option>
+					    		<form:option value="4">Scala</form:option>
+					    		<form:option value="5">Kotlin</form:option>
+					    		<form:option value="6">C</form:option>
+					    		<form:option value="7">Objective C</form:option>
+					    		<form:option value="8">C++</form:option>
+					    		<form:option value="9">C#</form:option>
 					    	</form:select>
 					    </div>
 					</div>

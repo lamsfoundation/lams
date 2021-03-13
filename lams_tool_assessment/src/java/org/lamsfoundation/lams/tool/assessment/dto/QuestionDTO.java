@@ -343,15 +343,7 @@ public class QuestionDTO implements Comparable<QuestionDTO> {
     }
 
     public String getCodeStyleMime() {
-	switch (codeStyle) {
-	    case 1:
-		return "text/x-java";
-	    case 2:
-		return "text/javascript";
-	    case 3:
-		return "text/x-python";
-	}
-	return null;
+	return QbQuestion.getCodeStyleMime(codeStyle);
     }
 
     public boolean isHedgingJustificationEnabled() {

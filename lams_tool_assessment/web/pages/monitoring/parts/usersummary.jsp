@@ -52,13 +52,13 @@
 		<c:forEach items="${codeStyles}" var="codeStyle">
 			<c:choose>
 				<c:when test="${codeStyle == 1}">
-					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/clike.js"></script>
+					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/python.js"></script>
 				</c:when>
 				<c:when test="${codeStyle == 2}">
 					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/javascript.js"></script>
 				</c:when>
-				<c:when test="${codeStyle == 3}">
-					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/python.js"></script>
+				<c:when test="${codeStyle >= 3}">
+					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/clike.js"></script>
 				</c:when>
 			</c:choose>
 		</c:forEach>

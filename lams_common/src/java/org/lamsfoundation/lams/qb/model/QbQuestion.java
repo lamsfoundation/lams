@@ -48,9 +48,15 @@ public class QbQuestion implements Serializable, Cloneable {
     public static final int TYPE_MARK_HEDGING = 8;
 
     // code styles
-    public static final int CODE_STYLE_JAVA = 1;
+    public static final int CODE_STYLE_PYTHON = 1;
     public static final int CODE_STYLE_JAVASCRIPT = 2;
-    public static final int CODE_STYLE_PYTHON = 3;
+    public static final int CODE_STYLE_JAVA = 3;
+    public static final int CODE_STYLE_SCALA = 4;
+    public static final int CODE_STYLE_KOTLIN = 5;
+    public static final int CODE_STYLE_C = 6;
+    public static final int CODE_STYLE_OBJECTIVE_C = 7;
+    public static final int CODE_STYLE_CPP = 8;
+    public static final int CODE_STYLE_CSHARP = 9;
 
     // primary key
     // another candidate is questionId + version, but single uid can be searched faster
@@ -492,16 +498,32 @@ public class QbQuestion implements Serializable, Cloneable {
 	this.codeStyle = codeStyle;
     }
 
-    public String getCodeStyleMime() {
+    public static String getCodeStyleMime(Integer codeStyle) {
 	switch (codeStyle) {
-	    case 1:
-		return "text/x-java";
-	    case 2:
-		return "text/javascript";
-	    case 3:
+	    case CODE_STYLE_PYTHON:
 		return "text/x-python";
+	    case CODE_STYLE_JAVASCRIPT:
+		return "text/javascript";
+	    case CODE_STYLE_JAVA:
+		return "text/x-java";
+	    case CODE_STYLE_SCALA:
+		return "text/x-scala";
+	    case CODE_STYLE_KOTLIN:
+		return "text/x-kotlin";
+	    case CODE_STYLE_C:
+		return "text/x-csrc";
+	    case CODE_STYLE_OBJECTIVE_C:
+		return "text/x-objectivec";
+	    case CODE_STYLE_CPP:
+		return "text/x-c++src";
+	    case CODE_STYLE_CSHARP:
+		return "text/x-csharp";
 	}
 	return null;
+    }
+
+    public String getCodeStyleMime() {
+	return QbQuestion.getCodeStyleMime(codeStyle);
     }
 
     public boolean isHedgingJustificationEnabled() {

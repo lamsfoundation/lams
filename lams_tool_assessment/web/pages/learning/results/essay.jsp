@@ -88,15 +88,9 @@
 									<c:when test="${empty question.codeStyle}">
 										<c:out value="${answer}" escapeXml="false" /> 
 									</c:when>
-									<c:when test="${question.codeStyle == 1}">
-										<pre class="code-style" data-lang="text/x-java">${answer}</pre>
-									</c:when>
-									<c:when test="${question.codeStyle == 2}">
-										<pre class="code-style" data-lang="text/javascript">${answer}</pre>
-									</c:when>
-									<c:when test="${question.codeStyle == 3}">
-										<pre class="code-style" data-lang="text/x-python">${answer}</pre>
-									</c:when>
+									<c:otherwise>
+										<pre class="code-style" data-lang="${question.codeStyleMime}">${answer}</pre>
+									</c:otherwise>
 								</c:choose>
 							</td>
 						</tr>

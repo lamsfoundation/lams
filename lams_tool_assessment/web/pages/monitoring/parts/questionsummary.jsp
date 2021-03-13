@@ -72,13 +72,13 @@
 			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/colorize.js"></script>
 			<c:choose>
 				<c:when test="${questionDto.codeStyle == 1}">
-					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/clike.js"></script>
+					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/python.js"></script>
 				</c:when>
 				<c:when test="${questionDto.codeStyle == 2}">
 					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/javascript.js"></script>
 				</c:when>
-				<c:when test="${questionDto.codeStyle == 3}">
-					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/python.js"></script>
+				<c:when test="${questionDto.codeStyle >= 3}">
+					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/clike.js"></script>
 				</c:when>
 			</c:choose>
 		</c:if>
