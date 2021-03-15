@@ -17,7 +17,9 @@
 			LAMS_URL = '<lams:LAMSURL/>',
 			TAB_REFRESH_INTERVAL = 20 * 1000, // refresh tab every 20 seconds
 			lastTabMethod = null, // these variables are needed for tab refresh
-			lastTabToolContentID = null;
+			lastTabToolContentID = null,
+			tlbMonitorHorizontalScrollElement = null; // keeps ID of element which can be scrolled right,
+												      // so we can re-scroll it after refresh
 	
 		$(document).ready(function(){
 			<!-- Menu Toggle Script -->
@@ -58,13 +60,16 @@
 			}, TAB_REFRESH_INTERVAL);
 		});
 
+
+		
 		function loadTab(method, toolContentID, autoRefresh) {
 			if (!method && !toolContentID) {
 				// tab was refreshed, get stored parameters
 				method = lastTabMethod;
 
-				if (autoRefresh && (method == 'burningQuestions' || method == 'aes' || method == 'aesStudentChoices' || method == 'sequence' || $('.modal').hasClass('in'))){
-					// do not auto refresh Burning Questions nor AES tabs
+				if (autoRefresh && (method == 'burningQuestions' || method == 'aes' || method == 'aesStudentChoices' || method == 'sequence' || 
+									method == 'gates' || method == 'iraAssessment'  || $('.modal').hasClass('in'))){
+					// do not auto refresh pages with mostly static content
 					// or if a modal dialog is open
 					return;
 				}	
@@ -78,6 +83,10 @@
 			
 			var url = "<lams:LAMSURL/>monitoring/tblmonitor/"
 			var options = {};
+			// check if tab declared an element scrollable
+			// if so, store where it was scrolled to
+			var horizontalScroll = tlbMonitorHorizontalScrollElement == null ? null : $(tlbMonitorHorizontalScrollElement).scrollLeft();
+			tlbMonitorHorizontalScrollElement = null;
 			
 			if (method == "tra" || method == "traStudentChoices" || method == "burningQuestions") {
 				toolContentID = "${traToolContentId}";
@@ -111,15 +120,23 @@
 			}
 
 			// Merge additional options into existing options object, convert method to url call
-			url = url+method+".do";
+			url = url + method + ".do";
 			$.extend( options, {
 				lessonID: ${lesson.lessonId},
 				toolContentID: toolContentID
 			});
 
+			
 			$("#tblmonitor-tab-content").load(
 				url,
-				options
+				options,
+				function(){
+					if (horizontalScroll == null || horizontalScroll == 0 || tlbMonitorHorizontalScrollElement == null) {
+						return;
+					}
+					// re-scroll to the same position horizontally
+					$(tlbMonitorHorizontalScrollElement).scrollLeft(horizontalScroll);
+				}
 			);
 		}
 

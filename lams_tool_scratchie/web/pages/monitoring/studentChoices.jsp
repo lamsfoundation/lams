@@ -56,6 +56,9 @@
 
 <c:if test="${not showStudentChoicesTableOnly}">
 	<script>
+		// tell TBL monitor that this element is scrollable horizontally
+		tlbMonitorHorizontalScrollElement = '#questions-data-container';
+		
 		function exportExcel(){
 			//dynamically create a form and submit it
 			var exportExcelUrl = "<lams:LAMSURL/>tool/lascrt11/tblmonitoring/exportExcel.do?toolContentID=${toolContentID}&reqID=" + (new Date()).getTime();
