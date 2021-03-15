@@ -58,13 +58,16 @@
 			}, TAB_REFRESH_INTERVAL);
 		});
 
+
+		
 		function loadTab(method, toolContentID, autoRefresh) {
 			if (!method && !toolContentID) {
 				// tab was refreshed, get stored parameters
 				method = lastTabMethod;
 
-				if (autoRefresh && (method == 'burningQuestions' || method == 'aes' || method == 'aesStudentChoices' || method == 'sequence' || $('.modal').hasClass('in'))){
-					// do not auto refresh Burning Questions nor AES tabs
+				if (autoRefresh && (method == 'burningQuestions' || method == 'aes' || method == 'aesStudentChoices' || method == 'sequence' || 
+									method == 'gates' || method == 'iraAssessment'  || $('.modal').hasClass('in'))){
+					// do not auto refresh pages with mostly static content
 					// or if a modal dialog is open
 					return;
 				}	
@@ -111,12 +114,13 @@
 			}
 
 			// Merge additional options into existing options object, convert method to url call
-			url = url+method+".do";
+			url = url + method + ".do";
 			$.extend( options, {
 				lessonID: ${lesson.lessonId},
 				toolContentID: toolContentID
 			});
 
+			
 			$("#tblmonitor-tab-content").load(
 				url,
 				options
