@@ -80,6 +80,11 @@
 				lastTabMethod = method;
 				lastTabToolContentID = toolContentID;
 			}
+
+			if (!method) {
+				// we should not have this situation!
+				return;
+			}
 			
 			var url = "<lams:LAMSURL/>monitoring/tblmonitor/"
 			var options = {};
