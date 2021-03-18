@@ -10,8 +10,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
@@ -302,7 +300,7 @@ public class LearningWebsocketServer {
      * When user leaves the activity.
      */
     @OnClose
-    public void unregisterUser(Session session, CloseReason reason) {
+    public void unregisterUser(Session session) {
 	Long toolSessionId = Long
 		.valueOf(session.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
 	Set<Websocket> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
@@ -317,12 +315,7 @@ public class LearningWebsocketServer {
 
 	if (LearningWebsocketServer.log.isDebugEnabled()) {
 	    LearningWebsocketServer.log.debug(
-		    "User " + session.getUserPrincipal().getName() + " left Chat with toolSessionId: " + toolSessionId
-			    + (!(reason.getCloseCode().equals(CloseCodes.GOING_AWAY)
-				    || reason.getCloseCode().equals(CloseCodes.NORMAL_CLOSURE))
-					    ? ". Abnormal close. Code: " + reason.getCloseCode() + ". Reason: "
-						    + reason.getReasonPhrase()
-					    : ""));
+		    "User " + session.getUserPrincipal().getName() + " left Chat with toolSessionId: " + toolSessionId);
 	}
     }
 

@@ -8,8 +8,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.OnClose;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
@@ -66,7 +64,7 @@ public class LearningWebsocketServer {
 			LeaderselectionUser leader = LearningWebsocketServer.getLeaderService()
 				.getSessionBySessionId(toolSessionId).getGroupLeader();
 			Long existingLeaderUid = leaders.get(toolSessionId);
-			
+
 			// check if a leader has been selected or it has changed
 			if ((existingLeaderUid == null && leader != null) || (existingLeaderUid != null
 				&& (leader == null || !leader.getUid().equals(existingLeaderUid)))) {
@@ -135,7 +133,7 @@ public class LearningWebsocketServer {
      * When user leaves the activity.
      */
     @OnClose
-    public void unregisterUser(Session websocket, CloseReason reason) {
+    public void unregisterUser(Session websocket) {
 	Long toolSessionId = Long
 		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
 	websockets.get(toolSessionId).remove(websocket);
@@ -143,12 +141,7 @@ public class LearningWebsocketServer {
 	if (log.isDebugEnabled()) {
 	    // If there was something wrong with the connection, put it into logs.
 	    log.debug("User " + websocket.getUserPrincipal().getName() + " left Leader Selection with Tool Session ID: "
-		    + toolSessionId
-		    + (!(reason.getCloseCode().equals(CloseCodes.GOING_AWAY)
-			    || reason.getCloseCode().equals(CloseCodes.NORMAL_CLOSURE))
-				    ? ". Abnormal close. Code: " + reason.getCloseCode() + ". Reason: "
-					    + reason.getReasonPhrase()
-				    : ""));
+		    + toolSessionId);
 	}
     }
 

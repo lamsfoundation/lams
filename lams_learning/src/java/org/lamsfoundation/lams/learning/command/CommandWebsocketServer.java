@@ -142,7 +142,7 @@ public class CommandWebsocketServer {
      * Removes Learner websocket from the collection.
      */
     @OnClose
-    public void unregisterUser(Session session, CloseReason reason) {
+    public void unregisterUser(Session session) {
 	String login = session.getUserPrincipal().getName();
 	if (login == null) {
 	    return;
