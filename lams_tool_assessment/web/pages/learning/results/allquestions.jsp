@@ -73,8 +73,13 @@
 			commandWebsocketHookTrigger = 'assessment-results-refresh-${assessment.contentId}';
 			// if the trigger is recognised, the following action occurs
 			commandWebsocketHook = function() {
-				location.reload();
-			};
+					debugger;
+					// delay reload by a period to prevent flood of reloads from students
+					setTimeout(function(){
+						debugger;
+						location.reload();
+					}, Math.round(8000 * Math.random()));
+				};
 		</c:if>
 	});
 </script>
