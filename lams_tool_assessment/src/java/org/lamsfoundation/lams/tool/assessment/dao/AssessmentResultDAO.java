@@ -34,12 +34,14 @@ public interface AssessmentResultDAO extends DAO {
     List<AssessmentResult> getAssessmentResults(Long assessmentUid, Long userId);
 
     List<AssessmentResult> getAssessmentResultsByQbQuestion(Long qbQuestionUid);
-    
+
     List<AssessmentResult> getAssessmentResultsByQbQuestionAndAnswer(Long qbQuestionUid, String answer);
 
     List<AssessmentResult> getAssessmentResultsBySession(Long sessionId, Long userId);
 
     List<AssessmentResult> getFinishedAssessmentResultsByUser(Long sessionId, Long userId);
+
+    List<AssessmentResult> getLastAssessmentResults(Long assessmentUid);
 
     AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId);
 

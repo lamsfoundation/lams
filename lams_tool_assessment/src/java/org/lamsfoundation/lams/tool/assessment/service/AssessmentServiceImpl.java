@@ -893,19 +893,19 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    mark = -maxMark;
 	}
 
-	// calculate penalty
-	if (mark > 0) {
+	// calculate penalty if needed
+	float penalty = 0;
+	if (mark > 0 && questionDto.getPenaltyFactor() != 0) {
 	    // calculate number of wrong answers
 	    int numberWrongAnswers = assessmentQuestionResultDao.getNumberWrongAnswersDoneBefore(assessmentUid, userId,
 		    questionDto.getUid());
 
 	    // calculate penalty itself
-	    float penalty = questionDto.getPenaltyFactor() * numberWrongAnswers;
+	    penalty = questionDto.getPenaltyFactor() * numberWrongAnswers;
 	    mark -= penalty;
 	    if (penalty > maxMark) {
 		penalty = maxMark;
 	    }
-	    questionResult.setPenalty(penalty);
 
 	    // don't let penalty make mark less than 0
 	    if (mark < 0) {
@@ -913,6 +913,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    }
 	}
 
+	questionResult.setPenalty(penalty);
 	questionResult.setMark(mark);
 	questionResult.setMaxMark(maxMark);
     }
@@ -3346,11 +3347,30 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	}
 	AssessmentResult assessmentResult = getLastAssessmentResult(assessment.getUid(),
 		Integer.valueOf(userId).longValue());
+	return countCorrectAnswers(assessment.getUid(), user.getUid(), assessmentResult);
+    }
+
+    @Override
+    public Map<Integer, Integer> countCorrectAnswers(long toolContentId) {
+	Map<Integer, Integer> counts = new HashMap<>();
+	Assessment assessment = getAssessmentByContentId(toolContentId);
+	long assessmentUid = assessment.getUid();
+	long start = System.currentTimeMillis();
+	Collection<AssessmentResult> assessmentResults = assessmentResultDao.getLastAssessmentResults(assessmentUid);
+	for (AssessmentResult assessmentResult : assessmentResults) {
+	    AssessmentUser user = assessmentResult.getUser();
+	    int count = countCorrectAnswers(assessmentUid, user.getUid(), assessmentResult);
+	    counts.put(user.getUserId().intValue(), count);
+	}
+	return counts;
+    }
+
+    private int countCorrectAnswers(long assessmentUid, long userUid, AssessmentResult assessmentResult) {
 	if (assessmentResult == null) {
 	    return 0;
 	}
-
 	int count = 0;
+
 	for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
 	    QbToolQuestion qbToolQuestion = questionResult.getQbToolQuestion();
 	    QbQuestion qbQuestion = qbToolQuestion.getQbQuestion();
@@ -3358,9 +3378,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    || qbQuestion.getType() == QbQuestion.TYPE_MARK_HEDGING) {
 
 		QuestionDTO questionDTO = new QuestionDTO(qbToolQuestion);
+
 		loadupQuestionResultIntoQuestionDto(questionDTO, questionResult);
 
-		calculateAnswerMark(assessment.getUid(), user.getUid(), questionResult, questionDTO);
+		calculateAnswerMark(assessmentUid, userUid, questionResult, questionDTO);
 		if (questionResult.getMark() > 0) {
 		    count++;
 		}

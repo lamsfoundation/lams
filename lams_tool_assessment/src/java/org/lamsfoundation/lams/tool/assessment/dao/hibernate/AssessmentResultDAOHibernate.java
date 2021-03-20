@@ -44,6 +44,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements AssessmentResultDAO {
 
+    private static final String FIND_LAST_BY_ASSESSMENT = "FROM " + AssessmentResult.class.getName()
+	    + " AS r WHERE r.assessment.uid=:assessmentUid AND r.latest=1";
+
     private static final String FIND_LAST_BY_ASSESSMENT_AND_USER = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId =:userId AND r.assessment.uid=:assessmentUid AND r.latest=1";
 
@@ -176,6 +179,13 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     @Override
     public List<AssessmentResult> getAssessmentResultsBySession(Long sessionId, Long userId) {
 	return doFind(FIND_BY_SESSION_AND_USER, new Object[] { userId, sessionId });
+    }
+
+    @Override
+    public List<AssessmentResult> getLastAssessmentResults(Long assessmentUid) {
+	Query<AssessmentResult> q = getSession().createQuery(FIND_LAST_BY_ASSESSMENT, AssessmentResult.class);
+	q.setParameter("assessmentUid", assessmentUid);
+	return q.getResultList();
     }
 
     @Override

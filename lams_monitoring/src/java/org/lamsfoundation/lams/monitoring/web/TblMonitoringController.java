@@ -3,6 +3,7 @@ package org.lamsfoundation.lams.monitoring.web;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -127,6 +128,9 @@ public class TblMonitoringController {
 	Grouping grouping = groupingActivity == null ? null : groupingActivity.getCreateGrouping();
 	Set<Group> groups = grouping == null ? null : grouping.getGroups();
 
+	Map<Integer, Integer> iraCorrectAnswerCountByUser = commonAssessmentService
+		.countCorrectAnswers(iraToolContentId);
+
 	Set<TblGroupDTO> groupDtos = new TreeSet<>();
 	for (Group group : groups) {
 	    TblGroupDTO groupDto = new TblGroupDTO(group);
@@ -146,8 +150,7 @@ public class TblMonitoringController {
 		    groupDto.setGroupLeader(userDto);
 		}
 
-		Integer correctAnswerCount = commonAssessmentService.countCorrectAnswers(iraToolContentId,
-			user.getUserId());
+		Integer correctAnswerCount = iraCorrectAnswerCountByUser.get(userDto.getUserID());
 		if (correctAnswerCount != null) {
 		    userDto.setIraCorrectAnswerCount(correctAnswerCount);
 		}
@@ -165,7 +168,6 @@ public class TblMonitoringController {
 		}
 	    }
 	}
-
 	request.setAttribute("groupDtos", groupDtos);
 
 	double highestIraCorrectAnswerCountAverage = 0;
