@@ -46,24 +46,29 @@ import org.lamsfoundation.lams.util.Nullable;
 /**
  * Base class for all RatingCriterias. If you add another subclass, you must update
  * RatingCriteriaDAO.getRatingCriteriaByRatingCriteriaId() and add a ACTIVITY_TYPE constant.
- * 
+ *
  * Criteria Styles:
- * 
- *   Comment: This supports the old style Peer Review comments, with every reviewer leaving one comment for each item/user 
- *   being reviewed for a set of (star) criteria.
- *   Not support in the in Peer Review once it supports Ranking, Hedging, etc but kept for compatibility with existing data. 
- *   Could be included in new style Peer Review with user interface changes. 
- *   
- *   Star: The original style of comment, with up to 5 stars being used. For every star criteria, each reviewer leaves 
- *   one star rating (in lams_rating) for each item/user and possibly one comment (in lams_rating_comment) for each item/user.
- *   
- *   Ranking: Ordering of the top 1, top 2, top 3, top 4, top 5 or all items/users. For every ranking criteria, each reviewer leaves 
- *   one ranking (in lams_rating) for  [ 1/2/3/4/5/all ] items/users and no comments.
- *   
- *   Hedging: Allocating out marks across items/users. For every hedging criteria, each reviewer leaves 
- *   one ranking (in lams_rating) for 1 or more items/users and 0 or 1 justification comment overall (in lams_rating_comment).
- *   That is, for Hedging a reviewer makes one justification comment, whereas in Star the reviewer makes one comment for each user/item being reviewed.
- *   
+ *
+ * Comment: This supports the old style Peer Review comments, with every reviewer leaving one comment for each item/user
+ * being reviewed for a set of (star) criteria.
+ * Not support in the in Peer Review once it supports Ranking, Hedging, etc but kept for compatibility with existing
+ * data.
+ * Could be included in new style Peer Review with user interface changes.
+ *
+ * Star: The original style of comment, with up to 5 stars being used. For every star criteria, each reviewer leaves
+ * one star rating (in lams_rating) for each item/user and possibly one comment (in lams_rating_comment) for each
+ * item/user.
+ *
+ * Ranking: Ordering of the top 1, top 2, top 3, top 4, top 5 or all items/users. For every ranking criteria, each
+ * reviewer leaves
+ * one ranking (in lams_rating) for [ 1/2/3/4/5/all ] items/users and no comments.
+ *
+ * Hedging: Allocating out marks across items/users. For every hedging criteria, each reviewer leaves
+ * one ranking (in lams_rating) for 1 or more items/users and 0 or 1 justification comment overall (in
+ * lams_rating_comment).
+ * That is, for Hedging a reviewer makes one justification comment, whereas in Star the reviewer makes one comment for
+ * each user/item being reviewed.
+ *
  */
 
 @Entity
@@ -99,23 +104,30 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
     public static final String I18N_DESCRIPTION = "rating.criteria.description";
     public static final String I18N_HELP_TEXT = "rating.criteria.helptext";
 
-    /** What style to use for doing the rating? Stored in Int member
-     * If Style = RATING_STYLE_COMMENT then the entry is for a comment criteria, with the data in RatingComment. 
-     * If Style = RATING_STYLE_STAR then maxRating is 5, which lines up with the number of stars and comments are allowed. 
+    /**
+     * What style to use for doing the rating? Stored in Int member
+     * If Style = RATING_STYLE_COMMENT then the entry is for a comment criteria, with the data in RatingComment.
+     * If Style = RATING_STYLE_STAR then maxRating is 5, which lines up with the number of stars and comments are
+     * allowed.
      * If Style = RATING_STYLE_RANKING then maxRating will be 1 through 5 or -1 for rank all.
-     * If Style = RATING_STYLE_HEDGING then maxRating contains the sum total mark to which the hedged ratings should add up. 
-     * The comments table is also used to store the rating justification for hedging. */
+     * If Style = RATING_STYLE_HEDGING then maxRating contains the sum total mark to which the hedged ratings should add
+     * up.
+     * If Style = RATING_STYLE_RUBRICS then maxRating is the same as number of columns, starting with 1
+     * The comments table is also used to store the rating justification for hedging.
+     */
     public static final int RATING_STYLE_COMMENT = 0;
     public static final int RATING_STYLE_STAR = 1;
     public static final int RATING_STYLE_RANKING = 2;
     public static final int RATING_STYLE_HEDGING = 3;
+    public static final int RATING_STYLE_RUBRICS = 4;
 
     // The star rating can never be higher than RATING_STYLE_STAR_DEFAULT_MAX - it is capped in RatingService.rateItem, RatingService.rateItems
-    public static final int RATING_STYLE_STAR_DEFAULT_MAX = 5; 
-    public static final float RATING_STYLE_STAR_DEFAULT_MAX_AS_FLOAT = 5f; 
+    public static final int RATING_STYLE_STAR_DEFAULT_MAX = 5;
+    public static final float RATING_STYLE_STAR_DEFAULT_MAX_AS_FLOAT = 5f;
     public static final int RATING_STYLE_RANKING_DEFAULT_MAX = 5;
+    public static final int RATING_STYLE_RUBRICS_DEFAULT_MAX = 5;
     public static final int RATING_RANK_ALL = -1;
-    
+
     // ---------------------------------------------------------------------
     // Instance variables
     // ---------------------------------------------------------------------
@@ -139,6 +151,9 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
     @Column(name = "rating_criteria_type_id", insertable = false, updatable = false)
     private Integer ratingCriteriaTypeId;
 
+    @Column(name = "rating_criteia_group_id")
+    private Integer ratingCriteriaGroupId; // ID shared between all criteria in the same group, for example all rows in the same rubrics criteria
+
     @Column(name = "comments_enabled")
     private boolean commentsEnabled; // comments for RATING_STYLE_COMMENT, RATING_STYLE_STAR justification for RATING_STYLE_HEDGING
 
@@ -147,17 +162,16 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
 
     @Column(name = "rating_style")
     private Integer ratingStyle; // see comments above for RATING_STYLE
-    
+
     @Column(name = "max_rating")
     private Integer maxRating; // see comments above for RATING_STYLE
-    
+
     @Column(name = "minimum_rates")
     private Integer minimumRates; // Minimum number of people for whom one user may rate this criteria. Used for RATING_STYLE_STAR.
 
     @Column(name = "maximum_rates")
     private Integer maximumRates; // Minimum number of people for whom one user may rate this criteria. Used for RATING_STYLE_STAR.
 
-    
     // ---------------------------------------------------------------------
     // Object constructors
     // ---------------------------------------------------------------------
@@ -168,7 +182,8 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
 
     /** full constructor */
     public RatingCriteria(Long ratingCriteriaId, String title, Integer orderId, Date createDateTime,
-	    Integer ratingCriteriaTypeId, Integer ratingStyle, Integer maxRating, Integer minimumRates, Integer maximumRates) {
+	    Integer ratingCriteriaTypeId, Integer ratingStyle, Integer maxRating, Integer minimumRates,
+	    Integer maximumRates) {
 	this.ratingCriteriaId = ratingCriteriaId;
 	this.title = title;
 	this.orderId = orderId;
@@ -309,11 +324,12 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
 	    case RatingCriteria.RATING_STYLE_HEDGING:
 	    case RatingCriteria.RATING_STYLE_COMMENT:
 		return 0;
-	    default:
-		return null;
+	    case RatingCriteria.RATING_STYLE_RUBRICS:
+		return RATING_STYLE_RUBRICS_DEFAULT_MAX;
 	}
+	return null;
     }
-    
+
     // ---------------------------------------------------------------------
     // RatingCriteria Type checking methods
     // ---------------------------------------------------------------------
@@ -374,40 +390,47 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
 	return getRatingStyle().intValue() == RatingCriteria.RATING_STYLE_HEDGING;
     }
 
+    /**
+     * Is it Rubrics?
+     */
+    public boolean isRubricsStyleRating() {
+	return getRatingStyle().intValue() == RatingCriteria.RATING_STYLE_RUBRICS;
+    }
+
     // ---------------------------------------------------------------------
     // Data Transfer object creation methods
     // ---------------------------------------------------------------------
 
     public Integer getRatingStyle() {
-        return ratingStyle;
+	return ratingStyle;
     }
 
     public void setRatingStyle(Integer ratingStyle) {
-        this.ratingStyle = ratingStyle;
+	this.ratingStyle = ratingStyle;
     }
 
     public Integer getMaxRating() {
-        return maxRating;
+	return maxRating;
     }
 
     public void setMaxRating(Integer maxRating) {
-        this.maxRating = maxRating;
+	this.maxRating = maxRating;
     }
 
     public Integer getMinimumRates() {
-        return minimumRates;
+	return minimumRates;
     }
 
     public void setMinimumRates(Integer minimumRates) {
-        this.minimumRates = minimumRates;
+	this.minimumRates = minimumRates;
     }
 
     public Integer getMaximumRates() {
-        return maximumRates;
+	return maximumRates;
     }
 
     public void setMaximumRates(Integer maximumRates) {
-        this.maximumRates = maximumRates;
+	this.maximumRates = maximumRates;
     }
 
     @Override

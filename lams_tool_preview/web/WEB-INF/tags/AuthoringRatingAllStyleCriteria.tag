@@ -104,11 +104,15 @@
 <c:if test="${empty styleComment}">
 	<c:set var="styleComment" value="label.rating.style.comment" scope="request"/>
 </c:if>
-
+<c:if test="${empty styleRubrics}">
+	<c:set var="styleRubrics" value="label.rating.style.rubrics" scope="request"/>
+</c:if>
 
 <script type="text/javascript">
 	var minimumWordsSpinnerArray  = new Array();
 	var maxOrderId;
+	var newGroupId = -1; // groups existing in DB have ID > 0; new, unsaved ones have ID < 0
+	var groupTable = null;
 	
 	$(document).ready(function() { 
 	
@@ -120,7 +124,7 @@
 			</c:if>
 			<c:set var="escapedTitle"><c:out value="${criteria.title}" escapeXml="true"/></c:set>
  			addRow('${criteria.orderId}', '${criteria.ratingStyle}', '${escapedTitle}', '${criteria.maxRating}', 
- 					${criteria.commentsEnabled}, '${criteria.commentsMinWordsLimit}', '${criteria.minimumRates}', '${criteria.maximumRates}' );
+ 					${criteria.commentsEnabled}, '${criteria.commentsMinWordsLimit}', '${criteria.minimumRates}', '${criteria.maximumRates}', '${criteria.ratingCriteriaGroupId}' );
 		</c:forEach>
 		maxOrderId = ${maxOrderId};
 		if ( maxOrderId == 0 ) {
@@ -133,11 +137,10 @@
 			var currentRow = $(this).closest('tr');
 			var currentCriteriaTd = $( ".criteria-info", currentRow);
 			var currentOrderId = $( "input[name^='criteriaOrderId']", currentCriteriaTd);
-			//var textEl1 = $( "input[id^='criteria-title-']", currentRow);
+
 			var prevRow = currentRow.prev();
 			var prevCriteriaTd = $( ".criteria-info", prevRow);
 			var prevOrderId = $( "input[name^='criteriaOrderId']", prevCriteriaTd);
-			//var textEl2 = $( "input[id^='criteria-title-']", currentRow);
 			
 			//swap orderIds
 			var temp = currentOrderId.val();
@@ -257,12 +260,14 @@
 	     });
 	}
 	
-	function addRow(orderId, style, title, maxRating, justifyOrComment, commentMinWordsLimit, minimumRates, maximumRates) {
+	function addRow(orderId, style, title, maxRating, justifyOrComment, commentMinWordsLimit, minimumRates, maximumRates, groupId) {
 		var row = jQuery('<tr/>');
-		var inputField = '<div class="form-inline"><input type="text" class="form-control" name="criteriaTitle' + orderId + '" value="'+title+'">'
+		var inputField = '<input type="text" class="form-control" name="criteriaTitle' + orderId + '" value="'+title+'">'
 		  + '<input type="hidden" name="ratingStyle' + orderId + '" value="' + style + '">' 
 		  + '<input type="hidden" name="criteriaOrderId' + orderId + '" value="' + orderId + '">';
+		  + '<input type="hidden" name="groupId' + orderId + '" value="' + groupId + '">';
 
+	   
 		if ( style == 0 ) {
 			var ratingLimitsStr = '';
 			if ( '${hasRatingLimits}' == 'true' ) {
@@ -276,7 +281,7 @@
 			row.append(jQuery('<td/>', {
 				'class': 'criteria-info',
 			    html: '<div class="voffset5"><fmt:message key="${styleComment}" />:&nbsp;</div>'+inputField+ratingLimitsStr
-			})); 
+			})).appendTo('#criterias-table-body');	
 	
 		} else if ( style == 1 ) {
 			var ratingLimitsStr = '';
@@ -291,7 +296,7 @@
 			row.append(jQuery('<td/>', {
 				'class': 'criteria-info',
 			    html: '<div class="voffset5"><fmt:message key="${styleStar}" />:&nbsp;</div>'+inputField+ratingLimitsStr
-			})); 
+			})).appendTo('#criterias-table-body');	
 	
 		} else if ( style == 2 ) { 
 			var rankingStr = '<div class="voffset5"><label for="maxRating' + orderId + '"><fmt:message key="${rankLabel}"/></label>&nbsp;'
@@ -308,9 +313,32 @@
 				 + '<div class="voffset5"><label for="maxRating'+ orderId + '"><fmt:message key="${hedgeRankLabel}"/>&nbsp;</label>'
 			     + '<input type="text" name="maxRating' + orderId + '" id="maxRating' + orderId + '" value="'+maxRating+'" size="4">&nbsp;'
 				 + generateSpinner(orderId, justifyOrComment, '<fmt:message key="${justifyLabel}"/>', '<fmt:message key="${minNumberWordsLabel}"><fmt:param> </fmt:param></fmt:message>', commentMinWordsLimit)
-			}));
+			})).appendTo('#criterias-table-body');	
 			
-		} 
+		}  else if (style == 4) {
+			if (!groupId) {
+				groupId = newGroupId;
+				newGroupId--;
+			}
+			if (groupTable == null || groupTable.attr('groupId') != groupId) {
+				lastGroupTable = $("<table table-striped table-condensed />").attr('groupId', groupId);
+				row.appendTo('#criterias-table-body').append(lastGroupTable);
+				row = $('<tr />').appendTo(lastGroupTable);
+				for (var i = 0; i <= 7; i++) {
+					$('<th/>').text(i <= 5 && i > 0 ? i : '').appendTo(row);
+				}
+
+				row = $('<tr/>');
+			}
+
+			row.appendTo(lastGroupTable);
+			$('<td />').css('min-width', '100px').append('Row title:<br>' + inputField).appendTo(row);
+			for (var i = 0; i < 5; i++) {
+				var cell = $('<td/>').appendTo(row);
+				$('<textarea />').attr('name', 'cellDescription' + orderId + 'column' + i).appendTo(cell);
+			}
+			
+		}
 	
 		row.append(jQuery('<td/>', {
 			width: '40px',
@@ -320,7 +348,7 @@
 		})).append(jQuery('<td/>', {
 			width: '20px',
 			html: '<i class="fa fa-times" title="<fmt:message key="${deleteLabel}"/>"></i>'
-		})).appendTo('#criterias-table-body');	
+		}));
 		
 		// cannot activate the spinners until after the fields have been created by the appendTo above.
 		if ( style == 0 ) {
@@ -398,11 +426,13 @@
 				<label><fmt:message key="${headerLabel}" /></label>
 			</div>
 	
-			<table class="table table-striped table-condensed" id="criterias-table">	
-			<tbody id="criterias-table-body">
-				<!--  populated by javascript -->
-			</tbody>
-			</table>
+			<div class="form-inline">
+				<table class="table table-striped table-condensed" id="criterias-table">	
+					<tbody id="criterias-table-body">
+						<!--  populated by javascript -->
+					</tbody>
+				</table>
+			</div>
 		</div>
 
 		<div class="form-group voffset20">
@@ -411,6 +441,7 @@
 				<option value="2"><fmt:message key="${styleRanking}" /></option>
 				<option value="3"><fmt:message key="${styleHedging}" /></option>
 				<option value="0"><fmt:message key="${styleComment}" /></option>
+				<option value="4"><fmt:message key="${styleRubrics}" /></option>
 			</select>
 
 			<a href="#nogo" class="btn btn-default btn-sm loffset10" id="add-criteria">
