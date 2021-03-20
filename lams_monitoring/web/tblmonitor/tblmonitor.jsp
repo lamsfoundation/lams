@@ -15,7 +15,8 @@
 	<script>
 		var TOTAL_LESSON_LEARNERS_NUMBER = ${totalLearnersNumber},
 			LAMS_URL = '<lams:LAMSURL/>',
-			TAB_REFRESH_INTERVAL = 20 * 1000, // refresh tab every 20 seconds
+			TAB_REFRESH_INTERVAL = 20 * 1000, // refresh tab every 20 seconds,
+			refreshIntervalReference = null, // stores reference to interval so it can be cancelled
 			lastTabMethod = null, // these variables are needed for tab refresh
 			lastTabToolContentID = null,
 			tlbMonitorHorizontalScrollElement = null; // keeps ID of element which can be scrolled right,
@@ -54,14 +55,20 @@
 		       	});
 			}
 			
-			// refresh automatically every X seconds
-			window.setInterval(function(){
-				refresh(true);
-			}, TAB_REFRESH_INTERVAL);
+			restartRefreshInterval();
 		});
 
+		function restartRefreshInterval() {
+			if (refreshIntervalReference) {
+				window.clearInterval(refreshIntervalReference);
+			}
+			
+			// refresh automatically every X seconds
+			refreshIntervalReference = window.setInterval(function(){
+				refresh(true);
+			}, TAB_REFRESH_INTERVAL);
+		}
 
-		
 		function loadTab(method, toolContentID, autoRefresh) {
 			if (!method && !toolContentID) {
 				// tab was refreshed, get stored parameters
@@ -85,6 +92,9 @@
 				// we should not have this situation!
 				return;
 			}
+
+			// no need to refresh soon if we are loading new tab anyway
+			restartRefreshInterval();
 			
 			var url = "<lams:LAMSURL/>monitoring/tblmonitor/"
 			var options = {};
