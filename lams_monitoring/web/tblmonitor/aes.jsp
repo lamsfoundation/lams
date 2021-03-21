@@ -22,7 +22,7 @@
 		});
 	});
 	
-	function loadAePane(targetToolContentId){
+	function loadAePane(targetToolContentId, contentType){
 		$('#aes-tab .tab-pane').each(function(){
 			var aePane = $(this),
 				toolContentId = aePane.data('toolContentId'),
@@ -30,10 +30,19 @@
 				nav = $('#aes-tab .nav-tabs a[data-tool-content-id="' + toolContentId + '"]').closest('li');
 	
 			if (toolContentId == targetToolContentId) {
+				var url = null;
+				if (toolType == 'd') {
+					url =  "<lams:LAMSURL/>tool/ladoku11/monitoring/ae.do?toolContentID="  + toolContentId;
+				} else if (contentType == 'studentChoices' || (!contentType && aePane.data('contentType') == 'studentChoices')){
+					// contentType is an extra setting saying which content from the given tool type to display
+					url =  "<lams:LAMSURL/>tool/laasse10/tblmonitoring/aesStudentChoices.do?toolContentID="  + toolContentId;
+					aePane.data('contentType', 'studentChoices');
+				} else {
+					url = "<lams:LAMSURL/>tool/laasse10/tblmonitoring/assessment.do?toolContentID="  + toolContentId;
+					aePane.data('contentType', 'default');
+				}
 				// load AE tab content for the given tool content ID
-				aePane.load(toolType == "d" ? 
-						 "<lams:LAMSURL/>tool/ladoku11/monitoring/ae.do?toolContentID="  + toolContentId
-						: "<lams:LAMSURL/>tool/laasse10/tblmonitoring/assessment.do?toolContentID="  + toolContentId);
+				aePane.load(url);
 					
 				aePane.addClass('active');
 				nav.addClass('active');

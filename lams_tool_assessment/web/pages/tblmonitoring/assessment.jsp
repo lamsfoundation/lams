@@ -104,6 +104,15 @@
 	function disabledAndCheckButton(button){
 		button.attr('disabled', true).html('<i class="fa fa-check text-success">&nbsp;</i>' + button.text());
 	}
+
+	function showStudentChoices() {
+		// these methods come from tblmonitor.jsp and aes.jsp in lams_monitoring
+		if (${not empty isIraAssessment and isIraAssessment}) {
+			loadTab('iraAssessmentStudentChoices', ${toolContentID});
+			return;
+		}
+		loadAePane(${toolContentID}, 'studentChoices');
+	}
 </script>
 
 <%-- For AEs tab the panes are defined in TBL monitor, for IRA we need to define it here --%>
@@ -132,7 +141,7 @@
 		</div>
 		<div class="col-xs-6 col-sm-8">
 			<div class="btn btn-sm btn-default pull-right"
-				 onclick="javascript:loadTab('${isIraAssessment ? 'iraAssessmentStudentChoices' : 'aesStudentChoices'}', ${toolContentID})">
+				 onclick="javascript:showStudentChoices()">
 				<i class="fa fa-file"></i>
 				<fmt:message key="label.show.students.choices"/>
 			</div>   

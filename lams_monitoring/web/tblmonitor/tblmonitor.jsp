@@ -74,7 +74,7 @@
 				// tab was refreshed, get stored parameters
 				method = lastTabMethod;
 
-				if (autoRefresh && (method == 'burningQuestions' || method == 'aes' || method == 'aesStudentChoices' || method == 'sequence' || 
+				if (autoRefresh && (method == 'burningQuestions' || method == 'aes' || method == 'sequence' || 
 									method == 'gates' || method == 'iraAssessment'  || $('.modal').hasClass('in'))){
 					// do not auto refresh pages with mostly static content
 					// or if a modal dialog is open
@@ -122,8 +122,6 @@
 					aeActivityTitles: "${aeActivityTitles}"
 				};
 
-			} else if (method == "aesStudentChoices") {
-				url = "<lams:LAMSURL/>tool/laasse10/tblmonitoring/";
 			} else if (method == "forum") {
 				options = {
 					activityId: "${forumActivityId}"

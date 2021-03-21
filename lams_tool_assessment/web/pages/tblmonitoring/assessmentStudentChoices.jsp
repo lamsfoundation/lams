@@ -57,36 +57,22 @@
 	};
 </script>
 
-<!-- Header -->
-<div class="row no-gutter">
-	<div class="col-xs-12 col-md-12 col-lg-8">
-		<h3>
-			<fmt:message key="label.ae.questions.marks"/>
-		</h3>
-	</div>
-</div>
-<!-- End header -->
 
 <!-- Notifications -->
-<div class="row">
-	<div class="col-md-6 col-lg-4 ">
-	</div>
-	
-	<div class="col-xs-12 col-md-6 col-lg-4 col-lg-offset-2">
-		<a href="#nogo" type="button" class="btn btn-sm btn-default buttons_column"
-				onclick="javascript:loadTab('aes', ${toolContentID}); return false;">
-			<i class="fa fa-undo"></i>
-			<fmt:message key="label.hide.students.choices"/>
-		</a>
-		<a href="#nogo" onclick="javascript:printTable(); return false;" type="button" class="btn btn-sm btn-default buttons_column">
-			<i class="fa fa-print"></i>
-			<fmt:message key="label.print"/>
-		</a>
-		<a href="#nogo" onclick="javascript:exportExcel(); return false;" type="button" class="btn btn-sm btn-default buttons_column">
-			<i class="fa fa-file"></i>
-			<fmt:message key="label.excel.export"/>
-		</a>
-	</div>
+<div class="pull-right">
+	<a href="#nogo" type="button" class="btn btn-sm btn-default buttons_column"
+			onclick="javascript:loadAePane(${toolContentID}, 'default'); return false;">
+		<i class="fa fa-undo"></i>
+		<fmt:message key="label.hide.students.choices"/>
+	</a>
+	<a href="#nogo" onclick="javascript:printTable(); return false;" type="button" class="btn btn-sm btn-default buttons_column">
+		<i class="fa fa-print"></i>
+		<fmt:message key="label.print"/>
+	</a>
+	<a href="#nogo" onclick="javascript:exportExcel(); return false;" type="button" class="btn btn-sm btn-default buttons_column">
+		<i class="fa fa-file"></i>
+		<fmt:message key="label.excel.export"/>
+	</a>
 </div>
 <br>
 <!-- End notifications -->
