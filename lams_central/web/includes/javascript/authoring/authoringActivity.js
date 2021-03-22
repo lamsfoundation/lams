@@ -1421,6 +1421,7 @@ ActivityLib = {
 				'width' :  Math.max(380, Math.min(1024, $(window).width() - 60)),
 				'draggable' : true,
 				'resizable' : true,
+				'startMaximized' : true,
 				'title' : activity.title + ' ' + LABELS.ACTIVITY_DIALOG_TITLE_SUFFIX,
 				'beforeClose' : function(event){
 					// ask the user if he really wants to exit before saving his work

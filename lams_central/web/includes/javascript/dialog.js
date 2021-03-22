@@ -61,6 +61,7 @@ function showDialog(id, initParams, extraButtons, recreate) {
 		'modal'    : false,
 		'draggable' : true,
 		'resizable' : extraButtons == true,
+		'startMaximized' : false,
 		'beforeClose' : function(){
 			$('iframe', this).attr('src', null);
 		},
@@ -193,12 +194,11 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	}
 	
 	if (extraButtons) {
-		$('.dialogMaximise', dialog).click(function(){
+		var maximizeButton = $('.dialogMaximise', dialog).click(function(){
 			var icon = $('i', this),
 				wasMaxed = icon.hasClass('fa-clone'),
 				internalDialog = $('.modal-dialog', dialog),
-				internalContent = $('.modal-content', dialog),
-				positionTarget = initParams.modal ? internalDialog : dialog;
+				internalContent = $('.modal-content', dialog);
 			icon.toggleClass('fa-plus').toggleClass('fa-clone');
 			if (wasMaxed) {
 				// restore dialog
@@ -254,6 +254,10 @@ function showDialog(id, initParams, extraButtons, recreate) {
 			
 			internalContent.trigger('resizestop');
 		});
+		
+		if (initParams.startMaximized) {
+			maximizeButton.click();
+		}
 		
 	    $('.dialogMinimise', dialog).click(function() {
 	        if (dialog.hasClass('dialogMin')) {
