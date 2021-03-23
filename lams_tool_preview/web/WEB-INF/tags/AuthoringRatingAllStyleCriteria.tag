@@ -104,15 +104,53 @@
 <c:if test="${empty styleComment}">
 	<c:set var="styleComment" value="label.rating.style.comment" scope="request"/>
 </c:if>
-<c:if test="${empty styleRubrics}">
-	<c:set var="styleRubrics" value="label.rating.style.rubrics" scope="request"/>
-</c:if>
+
+<style>
+	#criterias-table-body .rubrics-table {
+		width: 100%;
+	}
+	
+	#criterias-table-body .rubrics-table .rubrics-columns-part td {
+		padding: 0 3px 20px 3px;
+		text-align: right;
+	}
+	
+	#criterias-table-body .rubrics-table .rubrics-rows-part th {
+		border-top: 1px solid #ddd;
+		padding-top: 10px;
+	}
+	
+	#criterias-table-body .rubrics-table .rubrics-row td {
+		padding: 10px 3px 0 3px;
+	}
+	
+	#criterias-table-body .rubrics-table .rubrics-row-title {
+		border-right: 1px solid #ddd;
+	}
+	
+	#criterias-table-body .rubrics-table th {
+		text-align: center;
+	}
+	
+	#criterias-table-body .rubrics-table textarea {
+		width: 100%;
+		resize: vertical;
+	}
+	
+	#criterias-table-body .rubrics-table .rubrics-delete-column-button {
+		margin-right: 4px;
+		display: block;
+	}
+</style>
 
 <script type="text/javascript">
 	var minimumWordsSpinnerArray  = new Array();
 	var maxOrderId;
+	var criteriaArrows = '<div class="arrow-up" title="<fmt:message key="${upLabel}"/>" />' + 
+	 					 '<div class="arrow-down" title="<fmt:message key="${downLabel}"/>" />';
+	  
 	var newGroupId = -1; // groups existing in DB have ID > 0; new, unsaved ones have ID < 0
-	var groupTable = null;
+	const MAX_RUBRICS_COLUMNS = 5;
 	
 	$(document).ready(function() { 
 	
@@ -133,54 +171,61 @@
 		reactivateArrows();
 	
 		//upCriteria
-		 $( "body" ).on( "click", ".fa-long-arrow-up", function() {
+		 $( "body" ).on( "click", ".arrow-up", function() {
 			var currentRow = $(this).closest('tr');
-			var currentCriteriaTd = $( ".criteria-info", currentRow);
-			var currentOrderId = $( "input[name^='criteriaOrderId']", currentCriteriaTd);
+			var currentOrderId = $( "input[name^='criteriaOrderId']", currentRow);
 
 			var prevRow = currentRow.prev();
-			var prevCriteriaTd = $( ".criteria-info", prevRow);
-			var prevOrderId = $( "input[name^='criteriaOrderId']", prevCriteriaTd);
-			
-			//swap orderIds
-			var temp = currentOrderId.val();
-			currentOrderId.val(prevOrderId.val());
-			prevOrderId.val(temp);
+			var prevOrderId = $( "input[name^='criteriaOrderId']", prevRow);
+
+			currentOrderId.each(function(){
+				var val = +$(this).val();
+				$(this).val(val - prevOrderId.length);
+			});		
+			prevOrderId.each(function(){
+				var val = +$(this).val();
+				$(this).val(val + currentOrderId.length);
+			});		
 			
 			//swap elements
-			currentCriteriaTd.detach().prependTo(prevRow);
-			prevCriteriaTd.detach().prependTo(currentRow);
+			currentRow.insertBefore(prevRow);
 			
 			reactivateArrows();
 		 } );
 		 
 		//downCriteria
-		 $( "body" ).on( "click", ".fa-long-arrow-down", function() {
-			var currentRow = $(this).closest('tr');
-			var currentCriteriaTd = $( ".criteria-info", currentRow);
-			var currentOrderId = $( "input[name^='criteriaOrderId']", currentCriteriaTd);
-			//var textEl1 = $( "input[id^='criteria-title-']", currentRow);
-			var nextRow = currentRow.next();
-			var nextCriteriaTd = $( ".criteria-info", nextRow);
-			var nextOrderId = $( "input[name^='criteriaOrderId']", nextCriteriaTd);
-			//var textEl2 = $( "input[id^='criteria-title-']", currentRow);
-			
-			//swap orderIds
-			var temp = currentOrderId.val();
-			currentOrderId.val(nextOrderId.val());
-			nextOrderId.val(temp);
-			
-			//swap elements
-			currentCriteriaTd.detach().prependTo(nextRow);
-			nextCriteriaTd.detach().prependTo(currentRow);
-			
-			reactivateArrows();
+		 $( "body" ).on( "click", ".arrow-down", function() {
+				var currentRow = $(this).closest('tr');
+				var currentOrderId = $( "input[name^='criteriaOrderId']", currentRow);
+
+				var nextRow = currentRow.next();
+				var nextOrderId = $( "input[name^='criteriaOrderId']", nextRow);
+
+				currentOrderId.each(function(){
+					var val = +$(this).val();
+					$(this).val(val + nextOrderId.length);
+				});		
+				nextOrderId.each(function(){
+					var val = +$(this).val();
+					$(this).val(val + currentOrderId.length);
+				});		
+				
+				//swap elements
+				currentRow.insertAfter(nextRow);
+				
+				reactivateArrows();
 		 });
 		 
 		 //deleteCriteria
-		 $( "body" ).on( "click", ".fa-times", function() {
+		 $( "body" ).on( "click", ".delete-criteria", function() {
 			var currentRow = $(this).closest('tr');
+			var rubricsTable = currentRow.closest('.rubrics-table');
+			
 			currentRow.remove();
+			if (rubricsTable.length > 0 && $('*[name^="criteriaTitle"]', rubricsTable).length == 0) {
+				rubricsTable.closest('tr').remove();
+			}
+			
 			reactivateArrows();
 		});
 	
@@ -262,12 +307,10 @@
 	
 	function addRow(orderId, style, title, maxRating, justifyOrComment, commentMinWordsLimit, minimumRates, maximumRates, groupId) {
 		var row = jQuery('<tr/>');
-		var inputField = '<input type="text" class="form-control" name="criteriaTitle' + orderId + '" value="'+title+'">'
-		  + '<input type="hidden" name="ratingStyle' + orderId + '" value="' + style + '">' 
-		  + '<input type="hidden" name="criteriaOrderId' + orderId + '" value="' + orderId + '">';
-		  + '<input type="hidden" name="groupId' + orderId + '" value="' + groupId + '">';
-
-	   
+		var inputField = '<input type="text" class="form-control" name="criteriaTitle' + orderId + '" value="'+title+'">';
+		var hiddenInputs = '<input type="hidden" name="ratingStyle' + orderId + '" value="' + style + '">' 
+		  				 + '<input type="hidden" name="criteriaOrderId' + orderId + '" value="' + orderId + '">';
+			 
 		if ( style == 0 ) {
 			var ratingLimitsStr = '';
 			if ( '${hasRatingLimits}' == 'true' ) {
@@ -280,9 +323,11 @@
 			}
 			row.append(jQuery('<td/>', {
 				'class': 'criteria-info',
-			    html: '<div class="voffset5"><fmt:message key="${styleComment}" />:&nbsp;</div>'+inputField+ratingLimitsStr
+			    html: '<div class="voffset5"><fmt:message key="${styleComment}" />:&nbsp;</div>'+ inputField + hiddenInputs + ratingLimitsStr
 			})).appendTo('#criterias-table-body');	
-	
+			
+			activateSpinner(orderId, true);
+			
 		} else if ( style == 1 ) {
 			var ratingLimitsStr = '';
 			if ( '${hasRatingLimits}' == 'true' ) {
@@ -295,72 +340,222 @@
 			}
 			row.append(jQuery('<td/>', {
 				'class': 'criteria-info',
-			    html: '<div class="voffset5"><fmt:message key="${styleStar}" />:&nbsp;</div>'+inputField+ratingLimitsStr
-			})).appendTo('#criterias-table-body');	
-	
+			    html: '<div class="voffset5"><fmt:message key="${styleStar}" />:&nbsp;</div>'+inputField + hiddenInputs + ratingLimitsStr
+			})).appendTo('#criterias-table-body');
+				
+			activateSpinner(orderId, justifyOrComment);
+			
 		} else if ( style == 2 ) { 
 			var rankingStr = '<div class="voffset5"><label for="maxRating' + orderId + '"><fmt:message key="${rankLabel}"/></label>&nbsp;'
 			  + generateSelect('maxRating' + orderId, null, null, orderId, maxRating);
 			row.append(jQuery('<td/>', {
 				'class': 'criteria-info',
-			    html: '<div class="voffset5"><fmt:message key="${styleRanking}" />:&nbsp;</div>'+ inputField + rankingStr 
-			}));
+			    html: '<div class="voffset5"><fmt:message key="${styleRanking}" />:&nbsp;</div>'+ inputField + hiddenInputs + rankingStr 
+			})).appendTo('#criterias-table-body');
 	
 		} else if ( style == 3) {
 			row.append(jQuery('<td/>', {
 				'class': 'criteria-info',
-			    html: '<div class="voffset5"><fmt:message key="${styleHedging}" />:&nbsp;</div>' +inputField
+			    html: '<div class="voffset5"><fmt:message key="${styleHedging}" />:&nbsp;</div>' + inputField + hiddenInputs
 				 + '<div class="voffset5"><label for="maxRating'+ orderId + '"><fmt:message key="${hedgeRankLabel}"/>&nbsp;</label>'
 			     + '<input type="text" name="maxRating' + orderId + '" id="maxRating' + orderId + '" value="'+maxRating+'" size="4">&nbsp;'
 				 + generateSpinner(orderId, justifyOrComment, '<fmt:message key="${justifyLabel}"/>', '<fmt:message key="${minNumberWordsLabel}"><fmt:param> </fmt:param></fmt:message>', commentMinWordsLimit)
 			})).appendTo('#criterias-table-body');	
 			
+			activateSpinner(orderId, justifyOrComment);
+			$("#maxRating" + orderId).spinner({ min: 1 });
+			
 		}  else if (style == 4) {
 			if (!groupId) {
+				// get a new group ID
 				groupId = newGroupId;
 				newGroupId--;
 			}
-			if (groupTable == null || groupTable.attr('groupId') != groupId) {
-				lastGroupTable = $("<table table-striped table-condensed />").attr('groupId', groupId);
-				row.appendTo('#criterias-table-body').append(lastGroupTable);
-				row = $('<tr />').appendTo(lastGroupTable);
-				for (var i = 0; i <= 7; i++) {
-					$('<th/>').text(i <= 5 && i > 0 ? i : '').appendTo(row);
-				}
 
-				row = $('<tr/>');
+			var rubricsTable = $('.rubrics-table[groupId="' + groupId + '"]');
+
+			if (rubricsTable.length == 0 || rubricsTable.attr('groupId') != groupId) {
+				// this is the first row of a rubrics table, so need to create the table and buttons etc.
+				rubricsTable = addRubricsTable(groupId);
 			}
 
-			row.appendTo(lastGroupTable);
-			$('<td />').css('min-width', '100px').append('Row title:<br>' + inputField).appendTo(row);
-			for (var i = 0; i < 5; i++) {
+			// input field for rubrics is a textarea, not regular text input
+			inputField = '<textarea class="form-control" name="criteriaTitle' + orderId + '" value="' + title + '"></textarea>';
+			// this criterion is grouped, so we need to store which group it belongs to
+			hiddenInputs += '<input type="hidden" name="groupId' + orderId + '" value="' + groupId + '">';
+
+			// each rubrics row is a separate criterion
+			row.addClass('rubrics-row').appendTo(rubricsTable);
+			$('<td />').addClass('rubrics-row-title').append(inputField + hiddenInputs).appendTo(row);
+
+			// build row structure: row header, value for each column and cell with buttons
+			var rubricsColumns = $('.rubrics-column', rubricsTable).length;
+			for (var i = 1; i <= rubricsColumns; i++) {
 				var cell = $('<td/>').appendTo(row);
-				$('<textarea />').attr('name', 'cellDescription' + orderId + 'column' + i).appendTo(cell);
+				$('<textarea />').addClass('form-control rubrics-cell').attr('name', 'rubrics' + orderId + 'cell' + i).appendTo(cell);
 			}
-			
+			row.append('<td />');
 		}
-	
-		row.append(jQuery('<td/>', {
-			width: '40px',
-			html: '<div class="arrow-up fa fa-long-arrow-up fa-pull-left" title="<fmt:message key="${upLabel}"/>" />' + 
-		    		'<div class="voffset10"><div class="arrow-down fa fa-long-arrow-down fa-pull-right" title="<fmt:message key="${downLabel}"/>" />'
-		    		
-		})).append(jQuery('<td/>', {
+
+		if (style != 4) {
+			// for rubrics there are just arrows to move whole group, not for each row
+			row.append(jQuery('<td/>', {
+				width: '40px',
+				html: criteriaArrows
+			}));
+		}
+
+		// it deletes either whole criterion or a rubrics row (which is also a criterion)
+		row.append($('<td/>', {
 			width: '20px',
-			html: '<i class="fa fa-times" title="<fmt:message key="${deleteLabel}"/>"></i>'
+			html: '<i class="fa fa-times delete-criteria" title="<fmt:message key="${deleteLabel}"/>"></i>'
 		}));
-		
-		// cannot activate the spinners until after the fields have been created by the appendTo above.
-		if ( style == 0 ) {
-			activateSpinner(orderId, true);
-		} else if ( style == 1) {
-			activateSpinner(orderId, justifyOrComment);
-		} else if ( style == 3 ) {
-			activateSpinner(orderId, justifyOrComment);
-			$("#maxRating" + orderId).spinner({ min: 1 });
-		}
 	}
-	 
+
+
+	function addRubricsTable(groupId) {
+		var row = $('<tr />'),
+			rubricsColumns = MAX_RUBRICS_COLUMNS;
+
+		row.appendTo('#criterias-table-body');
+
+		// this cell holds whole rubrics table
+		var cell = $('<td />', {
+			'class': 'criteria-info',
+			// arrows to move whole rubrics table
+		    html: '<div class="voffset5"><fmt:message key="label.rating.style.rubrics" />:<div class="pull-right">' + criteriaArrows + '</div></div>'
+		}).attr('colspan', '3').appendTo(row);
+
+		var rubricsTable = $("<table />").addClass('table-striped table-condensed rubrics-table').attr('groupId', groupId).appendTo(cell),
+			addColumnButton = $('<button />').attr('type', 'button').addClass('btn btn-default pull-right voffset20 rubrics-add-column-button')
+										   	 .text('<fmt:message key="label.rating.rubrics.column.add" />').click(function(){
+						var columns = $('.rubrics-columns-part .rubrics-column', rubricsTable);
+						// no more than X columns allowed
+						if (columns.length >= MAX_RUBRICS_COLUMNS) {
+							return;
+						}
+
+						// always add to the end
+						var lastColumn = columns.last(),
+							columnOrderId = +lastColumn.attr('name').split('column')[1],
+							cell = $('<td />').insertAfter(lastColumn.parent());
+
+						// add delete button
+						$('<i />').addClass('fa fa-times rubrics-delete-column-button')
+								  .attr('title', '<fmt:message key="${deleteLabel}"/>').appendTo(cell).click(function(){
+							deleteRubricsColumn($(this));
+						});
+
+						// add column header input
+						$('<textarea />').addClass('form-control rubrics-column')
+										 .attr('name', 'rubrics' + groupId + 'column' + (columnOrderId + 1)).appendTo(cell);
+
+						// go through each row and add a new column at the end
+						$('textarea[name$="cell' + columnOrderId + '"]', rubricsTable).each(function() {
+							var orderId = $(this).attr('name').split('cell')[0].replace('rubrics', ''),
+								cell = $('<td/>');
+							$('<textarea />').addClass('form-control rubrics-cell')
+											 .attr('name', 'rubrics' + orderId + 'cell' + (columnOrderId + 1)).appendTo(cell);
+							cell.insertAfter($(this).closest('td'));
+						});
+
+						// if delete column buttons were hidden, now show them
+						$('.rubrics-delete-column-button', rubricsTable).show();
+
+						// do not allow more than X columns
+						if (columns.length == MAX_RUBRICS_COLUMNS - 1) {
+							$('.rubrics-add-column-button', rubricsTable.parent()).hide();
+						}
+					}).appendTo(cell);
+
+		if (rubricsColumns >=  MAX_RUBRICS_COLUMNS) {
+			addColumnButton.hide();
+		}
+		
+		$('<button />').attr('type', 'button').addClass('btn btn-default pull-right voffset20 roffset10')
+					   .text('<fmt:message key="label.rating.rubrics.row.add" />').click(function(){
+			// this will add a row to the existing rubrics table with the given group ID
+			maxOrderId++;
+			$("#criteria-max-order-id").val(maxOrderId);
+			addRow(maxOrderId, 4, '', '', false, 1, 0, 0, groupId);
+			reactivateArrows();
+		}).appendTo(cell);
+
+		// start adding content to rubrics table
+		row = $('<tr />').appendTo(rubricsTable);
+		// empty first cell, for row headers below
+		row.append('<th />');
+
+		$('<th />').attr('colspan', rubricsColumns)
+				   .text('<fmt:message key="label.rating.rubrics.column.headers" />')
+				   .appendTo(row);
+		// empty cell for action buttons
+		$('<th />').attr('colspan', 2).appendTo(row);
+
+		// add column headers
+		row = $('<tr />').addClass('rubrics-columns-part').appendTo(rubricsTable);
+		// empty first cell, for row headers below
+		row.append('<td />');
+		
+		for (var i = 1; i <= rubricsColumns; i++) {
+			cell = $('<td />').appendTo(row);
+			$('<i />').addClass('fa fa-times rubrics-delete-column-button')
+					  .attr('title', '<fmt:message key="${deleteLabel}"/>').appendTo(cell).click(function(){
+				deleteRubricsColumn($(this));
+			});
+			
+			$('<textarea />').addClass('form-control rubrics-column').text(i)
+							 .attr('name', 'rubrics' + groupId + 'column' + i).appendTo(cell);
+		}
+		// empty cell for action buttons
+		$('<td />').attr('colspan', 2).appendTo(row);
+
+		// description of the rows part
+		row = $('<tr />').addClass('rubrics-rows-part').appendTo(rubricsTable);
+		$('<th />').addClass('rubrics-row-title').text('<fmt:message key="label.rating.rubrics.row.headers" />').appendTo(row);
+		$('<th />').attr('colspan', rubricsColumns)
+				   .text('<fmt:message key="label.rating.rubrics.column.content" />')
+				   .appendTo(row);
+		$('<td />').attr('colspan', 2).appendTo(row);
+
+		return rubricsTable;
+	}
+
+	function deleteRubricsColumn(button) {
+		var rubricsTable = button.closest('.rubrics-table'),
+			// extract this column's order ID
+			columnOrderId = +button.siblings('.rubrics-column').attr('name').split('column')[1];
+
+		// delete the column header
+		button.closest('td').remove();
+
+		// shift order IDs of column headers to the right
+		$('.rubrics-column', rubricsTable).each(function(){
+			var name = $(this).attr('name').split('column'),
+				orderId = +name[1];
+			if (orderId > columnOrderId) {
+				$(this).attr('name', name[0] + 'column' + (orderId - 1));
+			}
+		});
+
+		// go through each row, delete column description and shift order IDs of columns to the right
+		$('.rubrics-cell[name$="cell' + columnOrderId + '"]', rubricsTable).parent('td').remove();
+		$('.rubrics-cell', rubricsTable).each(function(){
+			var name = $(this).attr('name').split('cell'),
+				orderId = +name[1];
+			if (orderId > columnOrderId) {
+				$(this).attr('name', name[0] + 'cell' + (orderId - 1));
+			}
+		});
+
+		// must not remove last column
+		var columns = $('.rubrics-columns-part .rubrics-column', rubricsTable);
+		if (columns.length == 1) {
+			$('.rubrics-delete-column-button', rubricsTable).hide();
+		}
+		$('.rubrics-add-column-button', rubricsTable.parent()).show();
+	}
+
 	function reactivateArrows() {
 		$('#criterias-table-body tr').each(function() {
 	
@@ -441,7 +636,7 @@
 				<option value="2"><fmt:message key="${styleRanking}" /></option>
 				<option value="3"><fmt:message key="${styleHedging}" /></option>
 				<option value="0"><fmt:message key="${styleComment}" /></option>
-				<option value="4"><fmt:message key="${styleRubrics}" /></option>
+				<option value="4"><fmt:message key="label.rating.style.rubrics" /></option>
 			</select>
 
 			<a href="#nogo" class="btn btn-default btn-sm loffset10" id="add-criteria">

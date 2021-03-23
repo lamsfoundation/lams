@@ -1422,7 +1422,7 @@ ActivityLib = {
 				'draggable' : true,
 				'resizable' : true,
 				// only Peer Review pop up starts maximized as it contains wide rubrics ratings
-				'startMaximized' : activity.authorURL.contains('laprev11'),
+				'startMaximized' : activity.authorURL.includes('laprev11'),
 				'title' : activity.title + ' ' + LABELS.ACTIVITY_DIALOG_TITLE_SUFFIX,
 				'beforeClose' : function(event){
 					// ask the user if he really wants to exit before saving his work
