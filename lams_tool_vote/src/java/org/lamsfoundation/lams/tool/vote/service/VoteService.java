@@ -158,10 +158,14 @@ public class VoteService
 	// up previous scratches done
 	if (leader == null) {
 	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getQueUsrId().intValue());
-	    // set leader only if current user is the leader
+	    // set leader only if the leader entered the activity
 	    if (user.getQueUsrId().equals(leaderUserId)) {
+		// is it me?
 		leader = user;
-
+	    } else {
+		leader = getVoteUserBySession(leaderUserId, session.getUid());
+	    }
+	    if (leader != null) {
 		// set group leader
 		session.setGroupLeader(leader);
 		voteSessionDAO.updateVoteSession(session);

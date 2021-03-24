@@ -146,10 +146,14 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	if (leader == null) {
 
 	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getQueUsrId().intValue());
-	    // set leader only if current user is the leader
+	    // set leader only if the leader entered the activity
 	    if (user.getQueUsrId().equals(leaderUserId)) {
+		// is it me?
 		leader = user;
-
+	    } else {
+		leader = getUserByIdAndSession(leaderUserId, toolSessionId);
+	    }
+	    if (leader != null) {
 		// set group leader
 		qaSession.setGroupLeader(leader);
 		this.updateSession(qaSession);

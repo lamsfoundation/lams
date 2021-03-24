@@ -168,10 +168,14 @@ public class McService
 	if (leader == null) {
 
 	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getQueUsrId().intValue());
-	    // set leader only if current user is the leader
+	    // set leader only if the leader entered the activity
 	    if (user.getQueUsrId().equals(leaderUserId)) {
+		// is it me?
 		leader = user;
-
+	    } else {
+		leader = getMcUserBySession(leaderUserId, mcSession.getUid());
+	    }
+	    if (leader != null) {
 		// set group leader
 		mcSession.setGroupLeader(leader);
 		mcSessionDAO.updateMcSession(mcSession);

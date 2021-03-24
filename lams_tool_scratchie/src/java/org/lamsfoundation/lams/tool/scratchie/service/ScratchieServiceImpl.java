@@ -341,10 +341,14 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	// up previous scratches done
 	if (leader == null) {
 	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getUserId().intValue());
-	    // set leader only if current user is the leader
+	    // set leader only if the leader entered the activity
 	    if (user.getUserId().equals(leaderUserId)) {
+		// is it me?
 		leader = user;
-
+	    } else {
+		leader = getUserByIDAndSession(leaderUserId, toolSessionId);
+	    }
+	    if (leader != null) {
 		// set group leader
 		scratchieSession.setGroupLeader(leader);
 		saveOrUpdateScratchieSession(scratchieSession);

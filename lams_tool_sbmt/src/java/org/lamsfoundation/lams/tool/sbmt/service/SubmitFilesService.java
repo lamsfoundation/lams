@@ -1374,10 +1374,17 @@ public class SubmitFilesService
 	// up previous scratches done
 	if (leader == null) {
 	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getUserID().intValue());
-	    // set leader only if current user is the leader
+	    // set leader only if the leader entered the activity
+	    if (leaderUserId == null) {
+		return null;
+	    }
 	    if (user.getUserID().equals(leaderUserId.intValue())) {
+		// is it me?
 		leader = user;
-
+	    } else {
+		leader = getSessionUser(toolSessionId, leaderUserId.intValue());
+	    }
+	    if (leader != null) {
 		// set group leader
 		submitFileSession.setGroupLeader(leader);
 		submitFilesSessionDAO.insertOrUpdate(submitFileSession);
