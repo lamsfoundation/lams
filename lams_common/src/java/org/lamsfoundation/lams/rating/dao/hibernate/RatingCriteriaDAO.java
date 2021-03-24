@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.rating.model.AuthoredItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.LessonRatingCriteria;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
+import org.lamsfoundation.lams.rating.model.RatingRubricsColumn;
 import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 
@@ -44,6 +45,12 @@ public class RatingCriteriaDAO extends LAMSBaseDAO implements IRatingCriteriaDAO
     private static final String GET_COMMENTS_MIN_WORDS_LIMIT_FOR_TOOL_CONTENT_ID = "SELECT r.commentsMinWordsLimit FROM "
 	    + RatingCriteria.class.getName() + " AS r WHERE r.toolContentId=? AND r.ratingStyle = 0";
 
+    private static final String GET_MAX_RATING_CRITERIA_GROUP_ID = "SELECT MAX(ratingCriteriaGroupId) FROM "
+	    + RatingCriteria.class.getName();
+
+    private static final String GET_RUBRICS_COLUMN_HEADERS = "SELECT name FROM " + RatingRubricsColumn.class.getName()
+	    + " AS c WHERE ratingCriteriaGroupId = :groupId AND ratingCriteriaId IS NULL ORDER BY orderId";
+
     @Override
     public void saveOrUpdate(RatingCriteria criteria) {
 	getSession().saveOrUpdate(criteria);
@@ -57,7 +64,7 @@ public class RatingCriteriaDAO extends LAMSBaseDAO implements IRatingCriteriaDAO
 
     @Override
     public List<RatingCriteria> getByToolContentId(Long toolContentId) {
-	return (List<RatingCriteria>) (doFind(FIND_BY_TOOL_CONTENT_ID, new Object[] { toolContentId }));
+	return (doFind(FIND_BY_TOOL_CONTENT_ID, new Object[] { toolContentId }));
     }
 
     @Override
@@ -66,7 +73,7 @@ public class RatingCriteriaDAO extends LAMSBaseDAO implements IRatingCriteriaDAO
 	    return null;
 	}
 
-	RatingCriteria criteria = (RatingCriteria) super.find(RatingCriteria.class, ratingCriteriaId);
+	RatingCriteria criteria = super.find(RatingCriteria.class, ratingCriteriaId);
 
 	/**
 	 * we must return the real activity, not a Hibernate proxy. So relook it up. This should be quick as it should
@@ -104,6 +111,17 @@ public class RatingCriteriaDAO extends LAMSBaseDAO implements IRatingCriteriaDAO
     public boolean isCommentsEnabledForToolContent(Long toolContentId) {
 	List list = super.find(IS_COMMENTS_ENABLED_FOR_TOOL_CONTENT_ID, new Object[] { toolContentId });
 	return ((Number) list.get(0)).intValue() == 1;
+    }
+
+    @Override
+    public int getNextRatingCriteriaGroupId() {
+	Number result = (Number) find(GET_MAX_RATING_CRITERIA_GROUP_ID).get(0);
+	return result == null ? 1 : result.intValue() + 1;
+    }
+
+    public List<String> getRubricsColumnHeaders(int groupId) {
+	return getSession().createQuery(GET_RUBRICS_COLUMN_HEADERS, String.class).setParameter("groupId", groupId)
+		.getResultList();
     }
 
     @Override

@@ -20,14 +20,14 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.rating.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 
-public interface IRatingCriteriaDAO {
+public interface IRatingCriteriaDAO extends IBaseDAO {
 
     void saveOrUpdate(RatingCriteria criteria);
 
@@ -55,4 +55,7 @@ public interface IRatingCriteriaDAO {
      */
     int getCommentsMinWordsLimitForToolContent(Long toolContentId);
 
+    int getNextRatingCriteriaGroupId();
+
+    List<String> getRubricsColumnHeaders(int groupId);
 }

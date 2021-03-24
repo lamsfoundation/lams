@@ -164,7 +164,8 @@
 			</c:if>
 			<c:set var="escapedTitle"><c:out value="${criteria.title}" escapeXml="true"/></c:set>
  			addRow('${criteria.orderId}', '${criteria.ratingStyle}', '${escapedTitle}', '${criteria.maxRating}', 
- 					${criteria.commentsEnabled}, '${criteria.commentsMinWordsLimit}', '${criteria.minimumRates}', '${criteria.maximumRates}', '${criteria.ratingCriteriaGroupId}' );
+ 					${criteria.commentsEnabled}, '${criteria.commentsMinWordsLimit}', '${criteria.minimumRates}', '${criteria.maximumRates}', 
+ 					'${criteria.ratingCriteriaGroupId}', '${criteria.rubricsColumnsJSON}', '${criteria.rubricsColumnHeadersJSON}');
 		</c:forEach>
 		maxOrderId = ${maxOrderId};
 		if ( maxOrderId == 0 ) {
@@ -307,7 +308,8 @@
 	     });
 	}
 	
-	function addRow(orderId, style, title, maxRating, justifyOrComment, commentMinWordsLimit, minimumRates, maximumRates, groupId) {
+	function addRow(orderId, style, title, maxRating, justifyOrComment, commentMinWordsLimit, minimumRates, maximumRates,
+					groupId, rubricsColumnsString, rubricsColumnHeadersString) {
 		var row = jQuery('<tr/>');
 		var inputField = '<input type="text" class="form-control" name="criteriaTitle' + orderId + '" value="'+title+'">';
 		var hiddenInputs = '<input type="hidden" name="ratingStyle' + orderId + '" value="' + style + '">' 
@@ -378,11 +380,11 @@
 
 			if (rubricsTable.length == 0 || rubricsTable.attr('groupId') != groupId) {
 				// this is the first row of a rubrics table, so need to create the table and buttons etc.
-				rubricsTable = addRubricsTable(groupId);
+				rubricsTable = addRubricsTable(groupId, rubricsColumnHeadersString ? JSON.parse(rubricsColumnHeadersString) : []);
 			}
 
 			// input field for rubrics is a textarea, not regular text input
-			inputField = '<textarea class="form-control" name="criteriaTitle' + orderId + '" value="' + title + '"></textarea>';
+			inputField = '<textarea class="form-control" name="criteriaTitle' + orderId + '">' + title + '</textarea>';
 			// this criterion is grouped, so we need to store which group it belongs to
 			hiddenInputs += '<input type="hidden" name="groupId' + orderId + '" value="' + groupId + '">';
 
@@ -391,10 +393,13 @@
 			$('<td />').addClass('rubrics-row-title').append(inputField + hiddenInputs).appendTo(row);
 
 			// build row structure: row header, value for each column and cell with buttons
-			var rubricsColumns = $('.rubrics-column', rubricsTable).length;
-			for (var i = 1; i <= rubricsColumns; i++) {
+			var rubricsColumns = rubricsColumnsString ? JSON.parse(rubricsColumnsString) : [];
+			var rubricsColumnsLength = $('.rubrics-column', rubricsTable).length;
+			for (var i = 0; i < rubricsColumnsLength; i++) {
 				var cell = $('<td/>').appendTo(row);
-				$('<textarea />').addClass('form-control rubrics-cell').attr('name', 'rubrics' + orderId + 'cell' + i).appendTo(cell);
+				$('<textarea />').addClass('form-control rubrics-cell')
+				.text(i < rubricsColumns.length ? rubricsColumns[i] : '')
+				.attr('name', 'rubrics' + orderId + 'cell' + (i + 1)).appendTo(cell)
 			}
 			row.append('<td />');
 		}
@@ -415,9 +420,10 @@
 	}
 
 
-	function addRubricsTable(groupId) {
+	function addRubricsTable(groupId, headers) {
 		var row = $('<tr />'),
-			rubricsColumns = MAX_RUBRICS_COLUMNS;
+			// if data is present, use it, but only if it is within bounds
+			rubricsColumnsLength = headers.length > 0 && headers.length < MAX_RUBRICS_COLUMNS ? headers.length : MAX_RUBRICS_COLUMNS;
 
 		row.appendTo('#criterias-table-body');
 
@@ -475,7 +481,8 @@
 						}
 					}).appendTo(cell);
 
-		if (rubricsColumns >=  MAX_RUBRICS_COLUMNS) {
+		// initial hide of the button, if all columns are present
+		if (rubricsColumnsLength >=  MAX_RUBRICS_COLUMNS) {
 			addColumnButton.hide();
 		}
 		
@@ -493,7 +500,7 @@
 		// empty first cell, for row headers below
 		row.append('<th />');
 
-		$('<th />').attr('colspan', rubricsColumns)
+		$('<th />').attr('colspan', rubricsColumnsLength)
 				   .text('<fmt:message key="label.rating.rubrics.column.headers" />')
 				   .appendTo(row);
 		// empty cell for action buttons
@@ -504,15 +511,15 @@
 		// empty first cell, for row headers below
 		row.append('<td />');
 		
-		for (var i = 1; i <= rubricsColumns; i++) {
+		for (var i = 0; i < rubricsColumnsLength; i++) {
 			cell = $('<td />').appendTo(row);
 			$('<i />').addClass('fa fa-times rubrics-delete-column-button')
 					  .attr('title', '<fmt:message key="${deleteLabel}"/>').appendTo(cell).click(function(){
 				deleteRubricsColumn($(this));
 			});
 			
-			$('<textarea />').addClass('form-control rubrics-column').text(i)
-							 .attr('name', 'rubrics' + groupId + 'column' + i).appendTo(cell);
+			$('<textarea />').addClass('form-control rubrics-column').text(i < headers.length ? headers[i] : i + 1)
+							 .attr('name', 'rubrics' + groupId + 'column' + (i + 1)).appendTo(cell);
 		}
 		// empty cell for action buttons
 		$('<td />').attr('colspan', 2).appendTo(row);
@@ -520,7 +527,7 @@
 		// description of the rows part
 		row = $('<tr />').addClass('rubrics-rows-part').appendTo(rubricsTable);
 		$('<th />').addClass('rubrics-row-title').text('<fmt:message key="label.rating.rubrics.row.headers" />').appendTo(row);
-		$('<th />').attr('colspan', rubricsColumns)
+		$('<th />').attr('colspan', rubricsColumnsLength)
 				   .text('<fmt:message key="label.rating.rubrics.column.content" />')
 				   .appendTo(row);
 		$('<td />').attr('colspan', 2).appendTo(row);

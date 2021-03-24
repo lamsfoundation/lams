@@ -226,4 +226,7 @@ public interface IRatingService {
 
     List<RatingCommentDTO> getCommentsByCriteriaAndItem(Long ratingCriteriaId, Long toolSessionId, Long itemId);
 
+    List<String> getRubricsColumnHeaders(int groupId);
+
+    int getNextRatingCriteriaGroupId();
 }

@@ -25,7 +25,11 @@ package org.lamsfoundation.lams.rating.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
@@ -35,13 +39,20 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.Nullable;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * Base class for all RatingCriterias. If you add another subclass, you must update
@@ -151,8 +162,26 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
     @Column(name = "rating_criteria_type_id", insertable = false, updatable = false)
     private Integer ratingCriteriaTypeId;
 
-    @Column(name = "rating_criteia_group_id")
+    @Column(name = "rating_criteria_group_id")
     private Integer ratingCriteriaGroupId; // ID shared between all criteria in the same group, for example all rows in the same rubrics criteria
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "rating_criteria_id")
+    @OrderBy("order_id")
+    private List<RatingRubricsColumn> rubricsColumns = new LinkedList<>();
+
+    /**
+     * This could not be a collection fetched with Hibernate.
+     *
+     * "@Formula" did not work as it always used a non-existing RatingCriteria_rubricsColumnHeaders in the query.
+     * Regular one-to-many with rating_criteria_group_id as join column resulted in shared collection
+     * exception.
+     * Also Hibernate ignores insertable=false, so the list is always managed and yields results when orderId
+     * is missing.
+     * So this collection is populated by DAO when needed.
+     */
+    @Transient
+    private List<String> rubricsColumnHeaders = new LinkedList<>();
 
     @Column(name = "comments_enabled")
     private boolean commentsEnabled; // comments for RATING_STYLE_COMMENT, RATING_STYLE_STAR justification for RATING_STYLE_HEDGING
@@ -270,6 +299,40 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
 
     public void setRatingCriteriaTypeId(Integer ratingCriteriaTypeId) {
 	this.ratingCriteriaTypeId = ratingCriteriaTypeId;
+    }
+
+    public Integer getRatingCriteriaGroupId() {
+	return ratingCriteriaGroupId;
+    }
+
+    public void setRatingCriteriaGroupId(Integer ratingCriteriaGroupId) {
+	this.ratingCriteriaGroupId = ratingCriteriaGroupId;
+    }
+
+    public List<String> getRubricsColumnHeaders() {
+	return rubricsColumnHeaders;
+    }
+
+    public void setRubricsColumnHeaders(List<String> rubricsColumnHeaders) {
+	this.rubricsColumnHeaders = rubricsColumnHeaders;
+    }
+
+    public String getRubricsColumnHeadersJSON() throws JsonProcessingException {
+	return getRubricsColumnHeaders() == null ? null : JsonUtil.toString(getRubricsColumnHeaders());
+    }
+
+    public List<RatingRubricsColumn> getRubricsColumns() {
+	return rubricsColumns;
+    }
+
+    public void setRubricsColumns(List<RatingRubricsColumn> rubricsColumns) {
+	this.rubricsColumns = rubricsColumns;
+    }
+
+    public String getRubricsColumnsJSON() throws JsonProcessingException {
+	return getRubricsColumns() == null ? null
+		: JsonUtil.toString(getRubricsColumns().stream()
+			.collect(Collectors.mapping(RatingRubricsColumn::getName, Collectors.toList())));
     }
 
     public boolean isCommentsEnabled() {
@@ -439,6 +502,10 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
 	try {
 	    criteria = (RatingCriteria) super.clone();
 	    criteria.setRatingCriteriaId(null);
+	    criteria.setRubricsColumns(new LinkedList<>());
+	    for (RatingRubricsColumn column : getRubricsColumns()) {
+		criteria.getRubricsColumns().add(column.clone());
+	    }
 	} catch (CloneNotSupportedException e) {
 	    RatingCriteria.log.error("When clone " + RatingCriteria.class + " failed");
 	}

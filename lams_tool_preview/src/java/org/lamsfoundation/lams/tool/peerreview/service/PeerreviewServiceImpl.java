@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -40,6 +41,7 @@ import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Hibernate;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
@@ -53,6 +55,7 @@ import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
+import org.lamsfoundation.lams.rating.model.RatingRubricsColumn;
 import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
@@ -465,6 +468,7 @@ public class PeerreviewServiceImpl
 	return getLocalisedMessage("event.sent.results.subject", new Object[] { peerreview.getTitle() });
     }
 
+    @Override
     public Map<Long, LearnerData> getLearnerData(Long toolContentId, Long sessionId) {
 	PeerreviewSession session = peerreviewSessionDao.getSessionBySessionId(sessionId);
 	Peerreview peerreview = getPeerreviewByContentId(toolContentId);
@@ -591,6 +595,8 @@ public class PeerreviewServiceImpl
 	}
 	toolContentObj.setCreatedBy(null);
 
+	fillRubricsColumnHeaders(toolContentObj.getRatingCriterias());
+
 	// set PeerreviewToolContentHandler as null to avoid copy file node in repository again.
 	toolContentObj = Peerreview.newInstance(toolContentObj, toolContentId);
 	try {
@@ -619,9 +625,29 @@ public class PeerreviewServiceImpl
 
 	    // reset it to new toolContentId
 	    toolContentObj.setContentId(toolContentId);
+	    Map<Integer, Integer> groupIdMap = new HashMap<>();
 	    if (toolContentObj.getRatingCriterias() != null) {
 		for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
 		    criteria.setToolContentId(toolContentId);
+
+		    if (criteria.getRatingStyle().equals(RatingCriteria.RATING_STYLE_RUBRICS)) {
+			int existingGroupId = criteria.getRatingCriteriaGroupId();
+			Integer newGroupId = groupIdMap.get(existingGroupId);
+			if (newGroupId == null) {
+			    newGroupId = ratingService.getNextRatingCriteriaGroupId();
+			    groupIdMap.put(existingGroupId, newUserUid);
+
+			    for (int columnIndex = 0; columnIndex < criteria.getRubricsColumnHeaders()
+				    .size(); columnIndex++) {
+				RatingRubricsColumn columnHeader = new RatingRubricsColumn(columnIndex + 1,
+					criteria.getRubricsColumnHeaders().get(columnIndex));
+				columnHeader.setRatingCriteriaGroupId(newGroupId);
+				peerreviewDao.insert(columnHeader);
+			    }
+			}
+
+			criteria.setRatingCriteriaGroupId(newGroupId);
+		    }
 		}
 	    }
 
@@ -794,7 +820,25 @@ public class PeerreviewServiceImpl
 
     @Override
     public List<RatingCriteria> getRatingCriterias(Long toolContentId) {
-	return ratingService.getCriteriasByToolContentId(toolContentId);
+	List<RatingCriteria> result = ratingService.getCriteriasByToolContentId(toolContentId);
+	fillRubricsColumnHeaders(result);
+	for (RatingCriteria ratingCriteria : result) {
+	    Hibernate.initialize(ratingCriteria.getRubricsColumns());
+	}
+	return result;
+    }
+
+    private void fillRubricsColumnHeaders(Collection<? extends RatingCriteria> ratingCriterias) {
+	for (RatingCriteria ratingCriteria : ratingCriterias) {
+	    fillRubricsColumnHeaders(ratingCriteria);
+	}
+    }
+
+    private void fillRubricsColumnHeaders(RatingCriteria ratingCriteria) {
+	if (ratingCriteria.getRatingStyle().equals(RatingCriteria.RATING_STYLE_RUBRICS)) {
+	    ratingCriteria.setRubricsColumnHeaders(
+		    ratingService.getRubricsColumnHeaders(ratingCriteria.getRatingCriteriaGroupId()));
+	}
     }
 
     @Override

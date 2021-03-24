@@ -50,6 +50,7 @@ import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingComment;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
+import org.lamsfoundation.lams.rating.model.RatingRubricsColumn;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
@@ -285,7 +286,7 @@ public class RatingService implements IRatingService {
 		    String userRatingStr = userRating == null ? "" : numberFormat.format(userRating.getRating());
 		    criteriaDto.setUserRating(userRatingStr);
 		}
-		
+
 		// check if there is any data returned from DB regarding this item and criteria
 		Object[] itemStatistics = null;
 		for (Object[] itemStatisticsIter : itemsStatistics) {
@@ -480,6 +481,7 @@ public class RatingService implements IRatingService {
 //	}
 
 	int criteriaMaxOrderId = WebUtil.readIntParam(request, "criteriaMaxOrderId");
+	Map<Integer, Integer> groupIdMap = new HashMap<>();
 	// i is equal to an old orderId
 	for (int i = 1; i <= criteriaMaxOrderId; i++) {
 
@@ -489,6 +491,8 @@ public class RatingService implements IRatingService {
 	    if (ratingStyle == null) {
 		ratingStyle = RatingCriteria.RATING_STYLE_STAR;
 	    }
+
+	    Integer groupId = WebUtil.readIntParam(request, "groupId" + i, true);
 
 	    Integer maxRating = WebUtil.readIntParam(request, "maxRating" + i, true);
 	    if (maxRating == null) {
@@ -524,6 +528,7 @@ public class RatingService implements IRatingService {
 
 		ratingCriteria.setOrderId(newCriteriaOrderId);
 		ratingCriteria.setTitle(criteriaTitle);
+
 		ratingCriteria.setRatingStyle(ratingStyle);
 		ratingCriteria.setMaxRating(maxRating);
 		ratingCriteria.setCommentsEnabled(commentsEnabled);
@@ -538,7 +543,52 @@ public class RatingService implements IRatingService {
 		ratingCriteria.setMaximumRates(maxRatings);
 
 		ratingCriteriaDAO.saveOrUpdate(ratingCriteria);
-		// !!updatedCriterias.add(ratingCriteria);
+
+		if (ratingStyle.equals(RatingCriteria.RATING_STYLE_RUBRICS)) {
+		    if (groupId == null) {
+			log.error("No group ID found for rubrics rating criterion with order ID " + newCriteriaOrderId);
+			continue;
+		    }
+
+		    Integer newGroupId = groupIdMap.get(groupId);
+
+		    if (newGroupId == null) {
+			if (groupId < 1) {
+			    newGroupId = getNextRatingCriteriaGroupId();
+			} else {
+			    newGroupId = groupId;
+			    ratingCriteriaDAO.deleteByProperty(RatingRubricsColumn.class, "ratingCriteriaGroupId",
+				    groupId);
+			}
+
+			for (int columnIndex = 1; columnIndex <= RatingCriteria.RATING_STYLE_RUBRICS_DEFAULT_MAX; columnIndex++) {
+			    String columnHeaderString = WebUtil.readStrParam(request,
+				    "rubrics" + groupId + "column" + columnIndex, true);
+			    if (columnHeaderString != null) {
+				RatingRubricsColumn columnHeader = new RatingRubricsColumn(columnIndex,
+					columnHeaderString);
+				columnHeader.setRatingCriteriaGroupId(newGroupId);
+				columnHeader.setName(columnHeaderString);
+				ratingCriteriaDAO.insert(columnHeader);
+			    }
+			}
+
+			groupIdMap.put(groupId, newGroupId);
+		    }
+
+		    ratingCriteria.setRatingCriteriaGroupId(newGroupId);
+
+		    ratingCriteria.getRubricsColumns().clear();
+		    for (int columnIndex = 1; columnIndex <= RatingCriteria.RATING_STYLE_RUBRICS_DEFAULT_MAX; columnIndex++) {
+			String columnString = WebUtil.readStrParam(request,
+				"rubrics" + newCriteriaOrderId + "cell" + columnIndex, true);
+			if (columnString != null) {
+			    RatingRubricsColumn column = new RatingRubricsColumn(columnIndex, columnString);
+			    column.setName(columnString);
+			    ratingCriteria.getRubricsColumns().add(column);
+			}
+		    }
+		}
 
 		// delete
 	    } else if (ratingCriteria != null) {
@@ -782,6 +832,16 @@ public class RatingService implements IRatingService {
     @Override
     public String getRatingSelectJoinSQL(Integer ratingStyle, boolean getByUser) {
 	return ratingDAO.getRatingSelectJoinSQL(ratingStyle, getByUser);
+    }
+
+    @Override
+    public List<String> getRubricsColumnHeaders(int groupId) {
+	return ratingCriteriaDAO.getRubricsColumnHeaders(groupId);
+    }
+
+    @Override
+    public int getNextRatingCriteriaGroupId() {
+	return ratingCriteriaDAO.getNextRatingCriteriaGroupId();
     }
 
     @Override
