@@ -229,8 +229,13 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
 		}
 
 		LocalDateTime launchedDate = timeCache.timeLimitLaunchedDate.get(userId);
-		// user (re)entered the activity, so update him with time limit
-		if (launchedDate == null || !launchedDate.equals(existingLaunchDate)) {
+		if (existingLaunchDate == null) {
+		    if (launchedDate != null) {
+			updateUser = true;
+			timeCache.timeLimitLaunchedDate.remove(userId);
+		    }
+		} else if (launchedDate == null || !launchedDate.equals(existingLaunchDate)) {
+		    // user (re)entered the activity, so update him with time limit
 		    updateUser = true;
 		    timeCache.timeLimitLaunchedDate.put(userId, existingLaunchDate);
 		}
