@@ -113,6 +113,7 @@
 	#criterias-table-body .rubrics-table .rubrics-columns-part td {
 		padding: 0 3px 20px 3px;
 		text-align: right;
+		vertical-align: top;
 	}
 	
 	#criterias-table-body .rubrics-table .rubrics-rows-part th {
@@ -122,6 +123,7 @@
 	
 	#criterias-table-body .rubrics-table .rubrics-row td {
 		padding: 10px 3px 0 3px;
+		vertical-align: top;
 	}
 	
 	#criterias-table-body .rubrics-table .rubrics-row-title {
@@ -426,7 +428,12 @@
 		    html: '<div class="voffset5"><fmt:message key="label.rating.style.rubrics" />:<div class="pull-right">' + criteriaArrows + '</div></div>'
 		}).attr('colspan', '3').appendTo(row);
 
-		var rubricsTable = $("<table />").addClass('table-striped table-condensed rubrics-table').attr('groupId', groupId).appendTo(cell),
+		var rubricsTable = $("<table />").addClass('table-striped table-condensed rubrics-table').attr('groupId', groupId).appendTo(cell)
+										 .on('mouseup', 'textarea', function(){
+				// there is no "resize" event for textarea, so we use mouseup to keep all boxes in the row the same height
+				var height = $(this).height();
+				$(this).closest('tr').find('textarea').height(height);
+			}),
 			addColumnButton = $('<button />').attr('type', 'button').addClass('btn btn-default pull-right voffset20 rubrics-add-column-button')
 										   	 .text('<fmt:message key="label.rating.rubrics.column.add" />').click(function(){
 						var columns = $('.rubrics-columns-part .rubrics-column', rubricsTable);
@@ -555,6 +562,7 @@
 		}
 		$('.rubrics-add-column-button', rubricsTable.parent()).show();
 	}
+	
 
 	function reactivateArrows() {
 		$('#criterias-table-body tr').each(function() {
