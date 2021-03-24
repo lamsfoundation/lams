@@ -38,7 +38,8 @@
 			    	async: false,
 			        url: '<c:url value="/learning/becomeLeader.do?toolSessionID=${toolSessionID}"/>',
 			        type: 'post',
-			        success: function (json) {
+			        dataType : 'text',
+			        success: function () {
 			          	location.reload();
 			        }
 			   	});
