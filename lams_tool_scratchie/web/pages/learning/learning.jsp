@@ -421,8 +421,6 @@
 			window.setInterval(learnerAutosave,	autosaveInterval);
 			
 			function learnerAutosave(){
-				if (isWaitingForConfirmation) return;
-				
 				//ajax form submit
 				$('#burning-questions').ajaxSubmit({
 					url: "<lams:WebAppURL/>learning/autosaveBurningQuestions.do?sessionMapID=${sessionMapID}&date=" + new Date().getTime(),
