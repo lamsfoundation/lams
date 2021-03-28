@@ -335,6 +335,10 @@
 					<c:when test="${dokumaran.galleryWalkReadOnly}">
 						$('#doku-monitoring-summary-${sessionMap.toolContentID} #gallery-walk-finish').hide();
 					</c:when>
+					<c:when test="${isTbl}">
+						// reload current tab with Doku summary
+						loadTab(null, null, false);
+					</c:when>
 					<c:otherwise>
 						location.reload();
 					</c:otherwise>
