@@ -228,6 +228,8 @@ public interface IPeerreviewService extends ToolRatingManager, ICommonToolServic
 
     List<RatingCriteria> getCriteriasByToolContentId(Long toolContentId);
 
+    void fillRubricsColumnHeaders(RatingCriteria ratingCriteria);
+
     /** Save the ratings for ranking and hedging. */
     int rateItems(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Map<Long, Float> newRatings);
 

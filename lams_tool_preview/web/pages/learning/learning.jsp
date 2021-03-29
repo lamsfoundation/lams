@@ -14,6 +14,7 @@
 <c:set var="isStar" value="<%=RatingCriteria.RATING_STYLE_STAR%>"/>
 <c:set var="isRanking" value="<%=RatingCriteria.RATING_STYLE_RANKING%>"/>
 <c:set var="isHedging" value="<%=RatingCriteria.RATING_STYLE_HEDGING%>"/>
+<c:set var="isRubrics" value="<%=RatingCriteria.RATING_STYLE_RUBRICS%>"/>
 
 <c:choose>
 	<c:when test="${peerreview.showRatingsLeftForUser || peerreview.reflectOnActivity}">
@@ -69,12 +70,6 @@
 			hideButtons();
 			document.location.href='<c:url value="/learning/nextPrev.do?sessionMapID=${sessionMapID}&criteriaId=${criteriaRatings.ratingCriteria.ratingCriteriaId}&next='+next+'"/>';
 		}
-/*
-		function onRatingErrorCallback() {
-			alert('<fmt:message key="error.max.ratings.per.user"/>');
-			refresh();
-		}
- */
      </script>
 </lams:head>
 <body class="stripes">
@@ -100,17 +95,18 @@
 				<p><fmt:message key="label.step"><fmt:param>${stepNumber}</fmt:param><fmt:param>${numCriteria}</fmt:param></fmt:message></p>
 		 	</c:if> 
 		</div>
-			
 		<div class="panel">
-			<h4><c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/></h4>
 		<c:choose>
 		<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isComment}">
+			<h4><c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/></h4>
 			<%@ include file="comment.jsp" %>
 		</c:when>
 		<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isStar}">
+			<h4><c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/></h4>
 			<%@ include file="star.jsp" %>
 		</c:when>
 		<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isRanking}">
+			<h4><c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/></h4>
 			<c:choose>
 			<c:when test="${rateAllUsers > 0}">
 			<%@ include file="rankall.jsp" %>
@@ -121,7 +117,11 @@
 			</c:choose>		
 		</c:when>
 		<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isHedging}">
+			<h4><c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/></h4>
 			<%@ include file="hedging.jsp" %>
+		</c:when>
+		<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isRubrics}">
+			<%@ include file="rubrics.jsp" %>
 		</c:when>
 		</c:choose>		
 		</div>

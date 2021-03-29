@@ -527,7 +527,7 @@ public class RatingService implements IRatingService {
 		}
 
 		ratingCriteria.setOrderId(newCriteriaOrderId);
-		ratingCriteria.setTitle(criteriaTitle);
+		ratingCriteria.setTitle(criteriaTitle.strip().replaceAll("\r\n", "<BR/>"));
 
 		ratingCriteria.setRatingStyle(ratingStyle);
 		ratingCriteria.setMaxRating(maxRating);
@@ -568,7 +568,7 @@ public class RatingService implements IRatingService {
 				RatingRubricsColumn columnHeader = new RatingRubricsColumn(columnIndex,
 					columnHeaderString);
 				columnHeader.setRatingCriteriaGroupId(newGroupId);
-				columnHeader.setName(columnHeaderString);
+				columnHeader.setName(columnHeaderString.strip().replaceAll("\r\n", "<BR/>"));
 				ratingCriteriaDAO.insert(columnHeader);
 			    }
 			}
@@ -580,11 +580,10 @@ public class RatingService implements IRatingService {
 
 		    ratingCriteria.getRubricsColumns().clear();
 		    for (int columnIndex = 1; columnIndex <= RatingCriteria.RATING_STYLE_RUBRICS_DEFAULT_MAX; columnIndex++) {
-			String columnString = WebUtil.readStrParam(request,
-				"rubrics" + newCriteriaOrderId + "cell" + columnIndex, true);
+			String columnString = WebUtil.readStrParam(request, "rubrics" + i + "cell" + columnIndex, true);
 			if (columnString != null) {
 			    RatingRubricsColumn column = new RatingRubricsColumn(columnIndex, columnString);
-			    column.setName(columnString);
+			    column.setName(columnString.strip().replaceAll("\r\n", "<BR/>"));
 			    ratingCriteria.getRubricsColumns().add(column);
 			}
 		    }

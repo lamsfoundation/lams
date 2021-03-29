@@ -163,7 +163,7 @@
 				<c:set var="maxOrderId" value="${criteria.orderId}"/>
 			</c:if>
 			<c:set var="escapedTitle"><c:out value="${criteria.title}" escapeXml="true"/></c:set>
- 			addRow('${criteria.orderId}', '${criteria.ratingStyle}', '${escapedTitle}', '${criteria.maxRating}', 
+ 			addRow('${criteria.orderId}', '${criteria.ratingStyle}', '${escapedTitle}'.replaceAll('&lt;BR/&gt;', '\r\n'), '${criteria.maxRating}', 
  					${criteria.commentsEnabled}, '${criteria.commentsMinWordsLimit}', '${criteria.minimumRates}', '${criteria.maximumRates}', 
  					'${criteria.ratingCriteriaGroupId}', '${criteria.rubricsColumnsJSON}', '${criteria.rubricsColumnHeadersJSON}');
 		</c:forEach>
@@ -398,7 +398,7 @@
 			for (var i = 0; i < rubricsColumnsLength; i++) {
 				var cell = $('<td/>').appendTo(row);
 				$('<textarea />').addClass('form-control rubrics-cell')
-				.text(i < rubricsColumns.length ? rubricsColumns[i] : '')
+				.text(i < rubricsColumns.length ? rubricsColumns[i].replaceAll('<BR/>', '\r\n') : '')
 				.attr('name', 'rubrics' + orderId + 'cell' + (i + 1)).appendTo(cell)
 			}
 			row.append('<td />');
@@ -518,7 +518,7 @@
 				deleteRubricsColumn($(this));
 			});
 			
-			$('<textarea />').addClass('form-control rubrics-column').text(i < headers.length ? headers[i] : i + 1)
+			$('<textarea />').addClass('form-control rubrics-column').text(i < headers.length ? headers[i].replaceAll('<BR/>', '\r\n') : i + 1)
 							 .attr('name', 'rubrics' + groupId + 'column' + (i + 1)).appendTo(cell);
 		}
 		// empty cell for action buttons
@@ -651,7 +651,7 @@
 				<option value="2"><fmt:message key="${styleRanking}" /></option>
 				<option value="3"><fmt:message key="${styleHedging}" /></option>
 				<option value="0"><fmt:message key="${styleComment}" /></option>
-				<c:if test="${formContentPrefix eq 'peerreview'}">
+				<c:if test="${formContentPrefix eq 'peerreview.'}">
 					<option value="4"><fmt:message key="label.rating.style.rubrics" /></option>
 				</c:if>
 			</select>

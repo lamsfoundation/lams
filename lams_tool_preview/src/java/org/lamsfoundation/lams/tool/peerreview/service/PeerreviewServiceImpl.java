@@ -834,7 +834,8 @@ public class PeerreviewServiceImpl
 	}
     }
 
-    private void fillRubricsColumnHeaders(RatingCriteria ratingCriteria) {
+    @Override
+    public void fillRubricsColumnHeaders(RatingCriteria ratingCriteria) {
 	if (ratingCriteria.getRatingStyle().equals(RatingCriteria.RATING_STYLE_RUBRICS)) {
 	    ratingCriteria.setRubricsColumnHeaders(
 		    ratingService.getRubricsColumnHeaders(ratingCriteria.getRatingCriteriaGroupId()));
