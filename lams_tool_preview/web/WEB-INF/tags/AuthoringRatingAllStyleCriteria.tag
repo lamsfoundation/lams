@@ -651,7 +651,9 @@
 				<option value="2"><fmt:message key="${styleRanking}" /></option>
 				<option value="3"><fmt:message key="${styleHedging}" /></option>
 				<option value="0"><fmt:message key="${styleComment}" /></option>
-				<option value="4"><fmt:message key="label.rating.style.rubrics" /></option>
+				<c:if test="${formContentPrefix eq 'peerreview'}">
+					<option value="4"><fmt:message key="label.rating.style.rubrics" /></option>
+				</c:if>
 			</select>
 
 			<a href="#nogo" class="btn btn-default btn-sm loffset10" id="add-criteria">
