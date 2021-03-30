@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.peerreview.web.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +34,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -398,7 +400,15 @@ public class LearningController {
 		? new ArrayList<>(ratingCriterias.size())
 		: null;
 
+	Set<Integer> processedCriteriaGroups = new HashSet<>();
 	for (RatingCriteria criteria : ratingCriterias) {
+	    if (criteria.getRatingCriteriaGroupId() != null) {
+		if (processedCriteriaGroups.contains(criteria.getRatingCriteriaGroupId())) {
+		    continue;
+		}
+		processedCriteriaGroups.add(criteria.getRatingCriteriaGroupId());
+	    }
+
 	    boolean showAllUsers = peerreview.isSelfReview() || criteria.isRankingStyleRating()
 		    || criteria.isHedgeStyleRating() || (mode != null && mode.isTeacher());
 
@@ -407,15 +417,29 @@ public class LearningController {
 		    : PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC;
 
 	    if (allUsersDtos != null) {
-		allUsersDtos.add(service.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(), sessionId,
-			criteria, user.getUserId(), false, sorting, null, showAllUsers, true));
+		Function<RatingCriteria, StyledCriteriaRatingDTO> dtoBuilder = c -> service
+			.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(), sessionId, c,
+				user.getUserId(), false, sorting, null, showAllUsers, true);
+
+		// for rubrics there is a single dto (first row) with list of all rows (including first) filled
+		StyledCriteriaRatingDTO dto = criteria.isRubricsStyleRating()
+			? fillCriteriaGroup(criteria, ratingCriterias, dtoBuilder)
+			: dtoBuilder.apply(criteria);
+		allUsersDtos.add(dto);
 	    }
 
 	    if (currentUserDtos != null) {
-		currentUserDtos.add(service.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(), sessionId,
-			criteria, user.getUserId(), false, sorting, null, showAllUsers, false));
-	    }
+		Function<RatingCriteria, StyledCriteriaRatingDTO> dtoBuilder = c -> service
+			.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(), sessionId, c,
+				user.getUserId(), false, sorting, null,
+				showAllUsers && !criteria.isRubricsStyleRating(), false);
 
+		// for rubrics there is a single dto (first row) with list of all rows (including first) filled
+		StyledCriteriaRatingDTO dto = criteria.isRubricsStyleRating()
+			? fillCriteriaGroup(criteria, ratingCriterias, dtoBuilder)
+			: dtoBuilder.apply(criteria);
+		currentUserDtos.add(dto);
+	    }
 	}
 
 	if (allUsersDtos != null) {
@@ -534,22 +558,10 @@ public class LearningController {
 
 	if (criteria.isRubricsStyleRating()) {
 	    List<RatingCriteria> criterias = service.getRatingCriterias(peerreview.getContentId());
-
-	    Integer groupId = criteria.getRatingCriteriaGroupId();
-	    List<StyledCriteriaRatingDTO> criteriaGroup = new LinkedList<>();
-	    for (RatingCriteria criteriaInGroup : criterias) {
-		if (!groupId.equals(criteriaInGroup.getRatingCriteriaGroupId())) {
-		    continue;
-		}
-		StyledCriteriaRatingDTO dto = service.getUsersRatingsCommentsByCriteriaIdDTO(toolContentId,
-			toolSessionId, criteriaInGroup, userId, false, PeerreviewConstants.SORT_BY_USERNAME_ASC, null,
-			peerreview.isSelfReview(), true);
-		criteriaGroup.add(dto);
-	    }
-	    
-	    criteriaDto = criteriaGroup.get(0);
-	    criteriaDto.setCriteriaGroup(criteriaGroup);
-
+	    criteriaDto = fillCriteriaGroup(criteria, criterias,
+		    entryCriteria -> service.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(),
+			    toolSessionId, entryCriteria, userId, false, PeerreviewConstants.SORT_BY_USERNAME_ASC, null,
+			    peerreview.isSelfReview(), true));
 	} else {
 	    criteriaDto = service.getUsersRatingsCommentsByCriteriaIdDTO(toolContentId, toolSessionId, criteria, userId,
 		    (criteria.isCommentRating() || criteria.isStarStyleRating()),
@@ -918,4 +930,25 @@ public class LearningController {
 	return finish(request, session);
     }
 
+    private StyledCriteriaRatingDTO fillCriteriaGroup(RatingCriteria targetCriteria,
+	    Collection<RatingCriteria> allCriteria, Function<RatingCriteria, StyledCriteriaRatingDTO> dtoProducer) {
+	Integer groupId = targetCriteria.getRatingCriteriaGroupId();
+	StyledCriteriaRatingDTO result = null;
+	List<StyledCriteriaRatingDTO> criteriaGroup = new LinkedList<>();
+	for (RatingCriteria criteriaInGroup : allCriteria) {
+	    if (!groupId.equals(criteriaInGroup.getRatingCriteriaGroupId())) {
+		continue;
+	    }
+
+	    StyledCriteriaRatingDTO dto = dtoProducer.apply(criteriaInGroup);
+	    if (criteriaInGroup.getRatingCriteriaId().equals(targetCriteria.getRatingCriteriaId())) {
+		criteriaGroup.add(0, dto);
+		result = dto;
+		result.setCriteriaGroup(criteriaGroup);
+	    } else {
+		criteriaGroup.add(dto);
+	    }
+	}
+	return result;
+    }
 }

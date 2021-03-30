@@ -33,10 +33,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -53,6 +55,7 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
+import org.lamsfoundation.lams.rating.dto.StyledRatingDTO;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.model.RatingRubricsColumn;
@@ -353,6 +356,27 @@ public class PeerreviewServiceImpl
 
 	if (skipRatings) {
 	    return ratingService.convertToStyledDTO(criteria, currentUserId, getAllUsers, null);
+	}
+
+	if (criteria.isRubricsStyleRating() && !getByUser) {
+	    // for rubrics we need every answer, not just aggregation
+	    StyledCriteriaRatingDTO dto = new StyledCriteriaRatingDTO();
+	    dto.setRatingCriteria(criteria);
+	    List<StyledRatingDTO> ratingDtos = ratingService
+		    .getRatingsByCriteriasAndItems(Set.of(criteria.getRatingCriteriaId()), Set.of(currentUserId))
+		    .stream()
+		    .filter(rating -> getAllUsers || !rating.getLearner().getUserId().equals(currentUserId.intValue()))
+		    .collect(Collectors.mapping(rating -> {
+			StyledRatingDTO ratingDto = new StyledRatingDTO(currentUserId);
+			if (rating.getRating() != null) {
+			    ratingDto.setUserRating(String.valueOf(rating.getRating().intValue()));
+			}
+			ratingDto.setItemDescription(rating.getLearner().getFullName());
+			return ratingDto;
+		    }, Collectors.toList()));
+
+	    dto.setRatingDtos(ratingDtos);
+	    return dto;
 	}
 
 	List<Object[]> rawData = peerreviewUserDao.getRatingsComments(toolContentId, toolSessionId, criteria,

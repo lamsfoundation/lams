@@ -137,5 +137,5 @@ public interface IRatingDAO {
     /**
      * Get all the raw ratings for a combination of criteria and item ids. Used by Peer Review to do SPA analysis.
      */
-    List getRatingsByCriteriasAndItems(Collection<Long> ratingCriteriaIds, Collection<Long> itemIds);
+    List<Rating> getRatingsByCriteriasAndItems(Collection<Long> ratingCriteriaIds, Collection<Long> itemIds);
 }

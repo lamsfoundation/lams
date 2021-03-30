@@ -852,7 +852,7 @@ public class RatingService implements IRatingService {
      * Get all the raw ratings for a combination of criteria and item ids. Used by Peer Review to do SPA analysis.
      */
     @Override
-    public List getRatingsByCriteriasAndItems(Collection<Long> ratingCriteriaIds, Collection<Long> itemIds) {
+    public List<Rating> getRatingsByCriteriasAndItems(Collection<Long> ratingCriteriaIds, Collection<Long> itemIds) {
 	return ratingDAO.getRatingsByCriteriasAndItems(ratingCriteriaIds, itemIds);
     }
 
