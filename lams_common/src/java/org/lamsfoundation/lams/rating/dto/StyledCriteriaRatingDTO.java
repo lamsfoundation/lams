@@ -37,12 +37,15 @@ public class StyledCriteriaRatingDTO {
 
      //common properties
     private RatingCriteria ratingCriteria;
-
+    
     // all the ratings done by the current user, for a set of items ids.
     private List<StyledRatingDTO> ratingDtos;
 
     private String justificationComment;
     private Integer countRatedItems;
+    
+    // ratings which are in the same group
+    private List<StyledCriteriaRatingDTO> criteriaGroup;
     
     public StyledCriteriaRatingDTO() {
     }
@@ -79,6 +82,11 @@ public class StyledCriteriaRatingDTO {
         this.countRatedItems = countRatedItems;
     }
 
+    public List<StyledCriteriaRatingDTO> getCriteriaGroup() {
+        return criteriaGroup;
+    }
 
-
+    public void setCriteriaGroup(List<StyledCriteriaRatingDTO> criteriaGroup) {
+        this.criteriaGroup = criteriaGroup;
+    }
 }

@@ -536,7 +536,7 @@ public class LearningController {
 	    List<RatingCriteria> criterias = service.getRatingCriterias(peerreview.getContentId());
 
 	    Integer groupId = criteria.getRatingCriteriaGroupId();
-	    List<StyledCriteriaRatingDTO> dtos = new LinkedList<>();
+	    List<StyledCriteriaRatingDTO> criteriaGroup = new LinkedList<>();
 	    for (RatingCriteria criteriaInGroup : criterias) {
 		if (!groupId.equals(criteriaInGroup.getRatingCriteriaGroupId())) {
 		    continue;
@@ -544,12 +544,12 @@ public class LearningController {
 		StyledCriteriaRatingDTO dto = service.getUsersRatingsCommentsByCriteriaIdDTO(toolContentId,
 			toolSessionId, criteriaInGroup, userId, false, PeerreviewConstants.SORT_BY_USERNAME_ASC, null,
 			peerreview.isSelfReview(), true);
-		if (criteriaDto == null) {
-		    criteriaDto = dto;
-		}
-		dtos.add(dto);
+		criteriaGroup.add(dto);
 	    }
-	    request.setAttribute("criteriaGroup", dtos);
+	    
+	    criteriaDto = criteriaGroup.get(0);
+	    criteriaDto.setCriteriaGroup(criteriaGroup);
+
 	} else {
 	    criteriaDto = service.getUsersRatingsCommentsByCriteriaIdDTO(toolContentId, toolSessionId, criteria, userId,
 		    (criteria.isCommentRating() || criteria.isStarStyleRating()),

@@ -55,8 +55,7 @@
 
 <div id="rubrics-user-panels" class="panel-group" role="tablist" aria-multiselectable="true">
 	<%-- It is sufficient to take user names and columns from the first row/criterion --%>
-	<c:set var="exampleCriteria" value="${criteriaGroup[0]}" />
-	<c:set var="exampleRatings" value="${exampleCriteria.ratingDtos}" />
+	<c:set var="exampleRatings" value="${criteriaRatings.ratingDtos}" />
 
 	<c:forEach var="ratingDto" items="${exampleRatings}" varStatus="learnerOrderId">
 			
@@ -75,14 +74,14 @@
 					<table class="table table-hover table-bordered rubrics-table">
 						<tr>
 							<%-- Each answer column has the same length, all remaining space is take by the question column --%>
-							<th class="col-xs-${12 - fn:length(exampleCriteria.ratingCriteria.rubricsColumnHeaders) * 2}"></th>
-							<c:forEach var="columnHeader" items="${exampleCriteria.ratingCriteria.rubricsColumnHeaders}">
+							<th class="col-xs-${12 - fn:length(criteriaRatings.ratingCriteria.rubricsColumnHeaders) * 2}"></th>
+							<c:forEach var="columnHeader" items="${criteriaRatings.ratingCriteria.rubricsColumnHeaders}">
 								<th class="col-xs-2">
 									<c:out value="${columnHeader}" escapeXml="false"/>
 								</th>
 							</c:forEach>
 						</tr>
-						<c:forEach var="criteriaDto" items="${criteriaGroup}">
+						<c:forEach var="criteriaDto" items="${criteriaRatings.criteriaGroup}">
 							<c:set var="criteria" value="${criteriaDto.ratingCriteria}" />
 							<tr>
 								<td>
