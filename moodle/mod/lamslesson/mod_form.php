@@ -107,10 +107,10 @@ class mod_lamslesson_mod_form extends moodleform_mod {
     	$authorpreviewbutton .= html_writer::start_tag('div', array('id' => 'buttons', 'style' => 'float:right'));
         
         // Preview button
-        $authorpreviewbutton .= html_writer::link('#nogo', $openpreviewlabel, array('onclick' => js_writer::function_call('openPreview', array('1' => $previewurl, '2' => 'preview', '3' => 1280, '4' => 720)), 'id' => 'previewbutton', 'style' => 'visibility:hidden;', 'class' => 'btn btn-primary'));
+        $authorpreviewbutton .= html_writer::link('#nogo', $openpreviewlabel, array('onclick' => js_writer::function_call('openPreview', array('1' => $previewurl, '2' => 'preview', '3' => 1280, '4' => 720)), 'id' => 'previewbutton', 'style' => 'visibility:hidden;margin: 1em;', 'class' => 'btn btn-primary'));
 
         //Authoring button
-        $authorpreviewbutton .= html_writer::link('#nogo', $openauthorlabel, array('onclick' => js_writer::function_call('PopupCenter', array('1' => $authorurl, '2' => 'author', '3' => 1280, '4' => 720)), 'class' => 'btn btn-primary', 'id' => 'authorbutton'));
+        $authorpreviewbutton .= html_writer::link('#nogo', $openauthorlabel, array('onclick' => js_writer::function_call('PopupCenter', array('1' => $authorurl, '2' => 'author', '3' => 1280, '4' => 720)), 'class' => 'btn btn-primary', 'style' => 'margin: 1em;','id' => 'authorbutton'));
 
         $authorpreviewbutton .= html_writer::end_tag('div');
 	}
@@ -151,7 +151,7 @@ class mod_lamslesson_mod_form extends moodleform_mod {
         $this->add_action_buttons();
     }
 	
-    function validation($data) {
+    function validation($data, $files) {
       $errors = array();
       // a sequence needs to be selected                                                                                   
       if (empty($data['sequence_id']) || $data['sequence_id'] <= 0) {
