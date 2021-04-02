@@ -40,7 +40,8 @@ require_login($course);
 
 // Check permissions and capabilities:
 
-$context = get_context_instance(CONTEXT_COURSE, $course->id);
+// $context = get_context_instance(CONTEXT_COURSE, $course->id);
+$context = context_course::instance($course->id);
 
 $canmanage = has_capability('mod/lamslesson:manage', $context);
 if ($canmanage) {

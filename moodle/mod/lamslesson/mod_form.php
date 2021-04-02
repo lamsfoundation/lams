@@ -63,15 +63,18 @@ class mod_lamslesson_mod_form extends moodleform_mod {
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->addHelpButton('name', 'lamslessonname', 'lamslesson');
 
-    /// Adding the standard "intro" and "introformat" fields
-        $this->add_intro_editor();
+    // Adding the standard "intro" and "introformat" fields
+        $this->standard_intro_elements();
 
 //-------------------------------------------------------------------------------
     /// Adding the rest of lamslesson settings, spreeading all them into this fieldset
     /// or adding more fieldsets ('header' elements) if needed for better logic
 
     // Set needed vars
-	$context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
+		//$context = get_context_instance(CONTEXT_COURSE, $COURSE->id); 
+		// using context_course now instead
+	$context = context_course::instance($COURSE->id);
+		
 	$canmanage = has_capability('mod/lamslesson:manage', $context);
 
     //-- Open Author & Preview URL buttons
