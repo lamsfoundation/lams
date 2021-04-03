@@ -25,12 +25,9 @@ package org.lamsfoundation.lams.tool.peerreview.web.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,6 +49,7 @@ import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.tool.peerreview.service.IPeerreviewService;
 import org.lamsfoundation.lams.tool.peerreview.service.PeerreviewApplicationException;
+import org.lamsfoundation.lams.tool.peerreview.service.PeerreviewServiceImpl;
 import org.lamsfoundation.lams.tool.peerreview.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -277,18 +275,7 @@ public class LearningController {
 	    criterias = service.getCriteriasByToolContentId(peerreview.getContentId());
 
 	    // for criteria groups, like rubrics, count only first criterion
-	    Set<Integer> processedCriteriaGroups = new HashSet<>();
-	    Iterator<RatingCriteria> criteriaIter = criterias.iterator();
-	    while (criteriaIter.hasNext()) {
-		RatingCriteria criterion = criteriaIter.next();
-		if (criterion.getRatingCriteriaGroupId() != null) {
-		    if (processedCriteriaGroups.contains(criterion.getRatingCriteriaGroupId())) {
-			criteriaIter.remove();
-		    } else {
-			processedCriteriaGroups.add(criterion.getRatingCriteriaGroupId());
-		    }
-		}
-	    }
+	    PeerreviewServiceImpl.removeGroupedCriteria(criterias);
 
 	    if (criterias.size() > 0) {
 		if (currentCriteria == null) {
@@ -423,7 +410,7 @@ public class LearningController {
 
 		// for rubrics there is a single dto (first row) with list of all rows (including first) filled
 		StyledCriteriaRatingDTO dto = criteria.isRubricsStyleRating()
-			? fillCriteriaGroup(criteria, ratingCriterias, dtoBuilder)
+			? PeerreviewServiceImpl.fillCriteriaGroup(criteria, ratingCriterias, dtoBuilder)
 			: dtoBuilder.apply(criteria);
 		allUsersDtos.add(dto);
 	    }
@@ -436,7 +423,7 @@ public class LearningController {
 
 		// for rubrics there is a single dto (first row) with list of all rows (including first) filled
 		StyledCriteriaRatingDTO dto = criteria.isRubricsStyleRating()
-			? fillCriteriaGroup(criteria, ratingCriterias, dtoBuilder)
+			? PeerreviewServiceImpl.fillCriteriaGroup(criteria, ratingCriterias, dtoBuilder)
 			: dtoBuilder.apply(criteria);
 		currentUserDtos.add(dto);
 	    }
@@ -558,7 +545,7 @@ public class LearningController {
 
 	if (criteria.isRubricsStyleRating()) {
 	    List<RatingCriteria> criterias = service.getRatingCriterias(peerreview.getContentId());
-	    criteriaDto = fillCriteriaGroup(criteria, criterias,
+	    criteriaDto = PeerreviewServiceImpl.fillCriteriaGroup(criteria, criterias,
 		    entryCriteria -> service.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(),
 			    toolSessionId, entryCriteria, userId, false, PeerreviewConstants.SORT_BY_USERNAME_ASC, null,
 			    peerreview.isSelfReview(), true));
@@ -928,27 +915,5 @@ public class LearningController {
 	}
 
 	return finish(request, session);
-    }
-
-    private StyledCriteriaRatingDTO fillCriteriaGroup(RatingCriteria targetCriteria,
-	    Collection<RatingCriteria> allCriteria, Function<RatingCriteria, StyledCriteriaRatingDTO> dtoProducer) {
-	Integer groupId = targetCriteria.getRatingCriteriaGroupId();
-	StyledCriteriaRatingDTO result = null;
-	List<StyledCriteriaRatingDTO> criteriaGroup = new LinkedList<>();
-	for (RatingCriteria criteriaInGroup : allCriteria) {
-	    if (!groupId.equals(criteriaInGroup.getRatingCriteriaGroupId())) {
-		continue;
-	    }
-
-	    StyledCriteriaRatingDTO dto = dtoProducer.apply(criteriaInGroup);
-	    if (criteriaInGroup.getRatingCriteriaId().equals(targetCriteria.getRatingCriteriaId())) {
-		criteriaGroup.add(0, dto);
-		result = dto;
-		result.setCriteriaGroup(criteriaGroup);
-	    } else {
-		criteriaGroup.add(dto);
-	    }
-	}
-	return result;
     }
 }

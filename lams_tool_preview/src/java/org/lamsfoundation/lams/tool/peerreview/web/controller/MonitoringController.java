@@ -27,7 +27,10 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 
 import javax.servlet.ServletException;
@@ -43,6 +46,7 @@ import org.lamsfoundation.lams.tool.peerreview.dto.EmailPreviewDTO;
 import org.lamsfoundation.lams.tool.peerreview.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.service.IPeerreviewService;
+import org.lamsfoundation.lams.tool.peerreview.service.PeerreviewServiceImpl;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
@@ -106,6 +110,9 @@ public class MonitoringController {
 	sessionMap.put(PeerreviewConstants.ATTR_IS_GROUPED_ACTIVITY, service.isGroupedActivity(contentId));
 
 	List<RatingCriteria> criterias = service.getRatingCriterias(contentId);
+
+	PeerreviewServiceImpl.removeGroupedCriteria(criterias);
+	
 	request.setAttribute(PeerreviewConstants.ATTR_CRITERIAS, criterias);
 	return MONITORING_PATH;
     }

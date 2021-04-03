@@ -29,7 +29,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -38,6 +40,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -567,6 +570,43 @@ public class PeerreviewServiceImpl
 	return retValue;
     }
 
+    public static StyledCriteriaRatingDTO fillCriteriaGroup(RatingCriteria targetCriteria,
+	    Collection<RatingCriteria> allCriteria, Function<RatingCriteria, StyledCriteriaRatingDTO> dtoProducer) {
+	Integer groupId = targetCriteria.getRatingCriteriaGroupId();
+	StyledCriteriaRatingDTO result = null;
+	List<StyledCriteriaRatingDTO> criteriaGroup = new LinkedList<>();
+	for (RatingCriteria criteriaInGroup : allCriteria) {
+	    if (!groupId.equals(criteriaInGroup.getRatingCriteriaGroupId())) {
+		continue;
+	    }
+
+	    StyledCriteriaRatingDTO dto = dtoProducer.apply(criteriaInGroup);
+	    if (criteriaInGroup.getRatingCriteriaId().equals(targetCriteria.getRatingCriteriaId())) {
+		criteriaGroup.add(0, dto);
+		result = dto;
+		result.setCriteriaGroup(criteriaGroup);
+	    } else {
+		criteriaGroup.add(dto);
+	    }
+	}
+	return result;
+    }
+
+    public static void removeGroupedCriteria(Collection<RatingCriteria> criteria) {
+	Set<Integer> processedCriteriaGroups = new HashSet<>();
+	Iterator<RatingCriteria> criteriaIter = criteria.iterator();
+	while (criteriaIter.hasNext()) {
+	    RatingCriteria criterion = criteriaIter.next();
+	    if (criterion.getRatingCriteriaGroupId() != null) {
+		if (processedCriteriaGroups.contains(criterion.getRatingCriteriaGroupId())) {
+		    criteriaIter.remove();
+		} else {
+		    processedCriteriaGroups.add(criterion.getRatingCriteriaGroupId());
+		}
+	    }
+	}
+    }
+    
     // *****************************************************************************
     // private methods
     // *****************************************************************************

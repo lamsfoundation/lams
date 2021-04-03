@@ -108,6 +108,7 @@
         <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
 	</c:if>
 	
+	<c:set var="rubricsCriteriaCounter" value="1" />
 	<c:choose>
 		<c:when test="${not empty criterias && fn:length(criterias) eq 1}">
 			<c:forEach var="criteria" items="${criterias}">
@@ -122,7 +123,20 @@
 			<c:forEach var="criteria" items="${criterias}">
 				<c:set var='url'><c:url value="/monitoring/criteria.do"/>?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&criteriaId=${criteria.ratingCriteriaId}</c:set>
 				<button onclick="javascript:launchPopup('${url}');return false;" class="btn btn-default btn-disable-on-submit voffset5 loffset5">
-					<fmt:message key="label.monitoring.view"><fmt:param><c:out value="${criteria.title}" escapeXml="true"/></fmt:param></fmt:message></button>
+					<fmt:message key="label.monitoring.view">
+						<fmt:param>
+							<c:choose>
+								<c:when test="${criteria.rubricsStyleRating}">
+									<fmt:message key="label.rating.style.rubrics" />&nbsp;${rubricsCriteriaCounter}
+									<c:set var="rubricsCriteriaCounter" value="${rubricsCriteriaCounter + 1}" />
+								</c:when>
+								<c:otherwise>
+									<c:out value="${criteria.title}" escapeXml="true"/>
+								</c:otherwise>
+							</c:choose>
+						</fmt:param>
+					</fmt:message>
+				</button>
 			</c:forEach>
 		</c:otherwise>
 	</c:choose>
