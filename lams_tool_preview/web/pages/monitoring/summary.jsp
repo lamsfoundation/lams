@@ -110,14 +110,20 @@
 	
 	<c:set var="rubricsCriteriaCounter" value="1" />
 	<c:choose>
-		<c:when test="${not empty criterias && fn:length(criterias) eq 1}">
-			<c:forEach var="criteria" items="${criterias}">
-			<h4><c:out value="${criteria.title}" escapeXml="true"/></h4>
+		<c:when test="${fn:length(criterias) eq 1}">
+			<c:set var="criteria" value="${criterias[0]}" scope="request"/>
 			<c:set var="toolSessionId" value="${groupSummary.sessionId}" scope="request"/>
 			<c:set var="criteria" value="${criteria}" scope="request"/>
 			<c:set var="sessionMap" value="${sessionMap}" scope="request"/>
-			<jsp:include page="criteriapart.jsp"/>
-			</c:forEach>
+			<c:choose>
+				<c:when test="${criteria.rubricsStyleRating}">
+					<%@ include file="rubricspart.jsp" %>
+				</c:when>
+				<c:otherwise>
+					<h4><c:out value="${criteria.title}" escapeXml="true"/></h4>
+					<%@ include file="criteriapart.jsp" %>
+				</c:otherwise>
+			</c:choose>
 		</c:when>
 		<c:otherwise>
 			<c:forEach var="criteria" items="${criterias}">

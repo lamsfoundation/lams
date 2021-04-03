@@ -60,6 +60,7 @@ import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
 import org.lamsfoundation.lams.rating.dto.StyledRatingDTO;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
+import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.model.RatingRubricsColumn;
 import org.lamsfoundation.lams.rating.service.IRatingService;
@@ -176,6 +177,11 @@ public class PeerreviewServiceImpl
     @Override
     public PeerreviewUser getUserByIDAndSession(Long userId, Long sessionId) {
 	return peerreviewUserDao.getUserByUserIDAndSessionID(userId, sessionId);
+    }
+
+    @Override
+    public List<PeerreviewUser> getUsersBySession(Long sessionId) {
+	return peerreviewUserDao.getBySessionID(sessionId);
     }
 
     @Override
@@ -362,24 +368,11 @@ public class PeerreviewServiceImpl
 	}
 
 	if (criteria.isRubricsStyleRating() && !getByUser) {
-	    // for rubrics we need every answer, not just aggregation
-	    StyledCriteriaRatingDTO dto = new StyledCriteriaRatingDTO();
-	    dto.setRatingCriteria(criteria);
-	    List<StyledRatingDTO> ratingDtos = ratingService
-		    .getRatingsByCriteriasAndItems(Set.of(criteria.getRatingCriteriaId()), Set.of(currentUserId))
-		    .stream()
-		    .filter(rating -> getAllUsers || !rating.getLearner().getUserId().equals(currentUserId.intValue()))
-		    .collect(Collectors.mapping(rating -> {
-			StyledRatingDTO ratingDto = new StyledRatingDTO(currentUserId);
-			if (rating.getRating() != null) {
-			    ratingDto.setUserRating(String.valueOf(rating.getRating().intValue()));
-			}
-			ratingDto.setItemDescription(rating.getLearner().getFullName());
-			return ratingDto;
-		    }, Collectors.toList()));
+	    Collection<Rating> ratings = ratingService
+		    .getRatingsByCriteriasAndItems(Set.of(criteria.getRatingCriteriaId()), Set.of(currentUserId));
 
-	    dto.setRatingDtos(ratingDtos);
-	    return dto;
+	    return PeerreviewServiceImpl.getRubricsCriteriaDTO(criteria, currentUserId.intValue(), getAllUsers,
+		    ratings);
 	}
 
 	List<Object[]> rawData = peerreviewUserDao.getRatingsComments(toolContentId, toolSessionId, criteria,
@@ -606,7 +599,29 @@ public class PeerreviewServiceImpl
 	    }
 	}
     }
-    
+
+    public static StyledCriteriaRatingDTO getRubricsCriteriaDTO(RatingCriteria criteria, Integer currentUserId,
+	    boolean includeCurrentUser, Collection<Rating> ratings) {
+	StyledCriteriaRatingDTO dto = new StyledCriteriaRatingDTO();
+	dto.setRatingCriteria(criteria);
+	List<StyledRatingDTO> ratingDtos = ratings.stream()
+		.filter(rating -> rating.getRatingCriteria().getRatingCriteriaId()
+			.equals(criteria.getRatingCriteriaId()) && rating.getItemId().equals(currentUserId.longValue())
+			&& (includeCurrentUser || !rating.getLearner().getUserId().equals(currentUserId)))
+		.collect(Collectors.mapping(rating -> {
+		    StyledRatingDTO ratingDto = new StyledRatingDTO(currentUserId.longValue());
+		    if (rating.getRating() != null) {
+			ratingDto.setUserRating(String.valueOf(rating.getRating().intValue()));
+		    }
+		    ratingDto.setItemDescription(rating.getLearner().getFullName());
+		    ratingDto.setItemDescription2(rating.getLearner().getUserId().toString());
+		    return ratingDto;
+		}, Collectors.toList()));
+
+	dto.setRatingDtos(ratingDtos);
+	return dto;
+    }
+
     // *****************************************************************************
     // private methods
     // *****************************************************************************

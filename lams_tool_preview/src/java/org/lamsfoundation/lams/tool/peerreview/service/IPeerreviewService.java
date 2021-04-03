@@ -91,6 +91,8 @@ public interface IPeerreviewService extends ToolRatingManager, ICommonToolServic
      */
     PeerreviewUser getUserByIDAndSession(Long long1, Long sessionId);
 
+    List<PeerreviewUser> getUsersBySession(Long sessionId);
+
     /**
      * Save or update peerreview into database.
      *

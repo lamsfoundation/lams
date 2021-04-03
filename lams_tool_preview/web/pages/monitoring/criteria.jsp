@@ -35,8 +35,6 @@
 		WARN_COMMENTS_IS_BLANK_LABEL = '',
 		WARN_MIN_NUMBER_WORDS_LABEL = '';
 	</script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
@@ -45,8 +43,16 @@
 </lams:head>
 
 <body class="stripes">
-	<lams:Page type="monitor" title="${criteria.title}">
-		<%@ include file="criteriapart.jsp" %>
+	<lams:Page type="monitor" title="${criteria.rubricsStyleRating ? '' : title}">
+		<c:choose>
+			<c:when test="${criteria.rubricsStyleRating}">
+				<%@ include file="rubricspart.jsp" %>
+			</c:when>
+			<c:otherwise>
+				<%@ include file="criteriapart.jsp" %>
+			</c:otherwise>
+		</c:choose>
+		
 		
  		<span onclick="window.close()" class="btn btn-default voffset20 pull-right">
  			<fmt:message key="label.close"/>
