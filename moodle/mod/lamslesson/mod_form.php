@@ -89,6 +89,7 @@ class mod_lamslesson_mod_form extends moodleform_mod {
 	  $popupoptions = LAMSLESSON_POPUP_OPTIONS;
 	  $openauthorlabel = get_string('openauthor', 'lamslesson');
 	  $openpreviewlabel = get_string('previewthislesson', 'lamslesson');
+	  $refreshlabel = get_string('refresh', 'lamslesson');
 
     	  // display user's lams workspace
     	  $lds = lamslesson_get_sequences_rest($USER->username, $USER->firstname, $USER->lastname, $USER->email, $COURSE->id, $COURSE->fullname, $COURSE->timecreated, $USER->country, $USER->lang) ;
@@ -112,6 +113,9 @@ class mod_lamslesson_mod_form extends moodleform_mod {
         //Authoring button
         $authorpreviewbutton .= html_writer::link('#nogo', $openauthorlabel, array('onclick' => js_writer::function_call('PopupCenter', array('1' => $authorurl, '2' => 'author', '3' => 1280, '4' => 720)), 'class' => 'btn btn-primary', 'style' => 'margin: 1em;','id' => 'authorbutton'));
 
+        //Refresh button
+	$authorpreviewbutton .= html_writer::link('#nogo', $refreshlabel, array('onclick' => js_writer::function_call('location.reload'), 'class' => 'btn btn-primary', 'style' => 'margin: 1em;','id' => 'authorbutton'));
+
         $authorpreviewbutton .= html_writer::end_tag('div');
 	}
 
@@ -134,8 +138,10 @@ class mod_lamslesson_mod_form extends moodleform_mod {
 		$mform->setExpanded('selectsequence', true);
 
         $mform->addElement('static', 'sequencemessage', '', $html);
-    	$mform->addElement('checkbox', 'displaydesign', get_string('displaydesign', 'lamslesson'));
-    	$mform->addElement('checkbox', 'allowlearnerrestart', get_string('allowlearnerrestart', 'lamslesson'));
+	$mform->addElement('checkbox', 'displaydesign', get_string('displaydesign', 'lamslesson'));
+	$mform->addHelpButton('displaydesign', 'displaydesign', 'lamslesson');
+	$mform->addElement('checkbox', 'allowlearnerrestart', get_string('allowlearnerrestart', 'lamslesson'));
+	$mform->addHelpButton('allowlearnerrestart', 'allowlearnerrestart', 'lamslesson');
 
 		//-------------------------------------------------------------------------------
 		$this->standard_grading_coursemodule_elements();
