@@ -80,7 +80,7 @@
 				  onBeforeFileAdded: function(currentFile, files) {
 					  var name = currentFile.data.name || currentFile.name,
 					  	  extensionIndex = name.lastIndexOf('.'),
-					  	  valid = extensionIndex < 0 || !EXE_FILE_TYPES.includes(name.substring(extensionIndex).trim());
+					  	  valid = extensionIndex < 0 || !EXE_FILE_TYPES.includes(name.substring(extensionIndex).trim().toLowerCase());
 					  if (!valid) {
 						  uppy.info(EXE_FILE_ERROR, 'error', 10000);
 					  }

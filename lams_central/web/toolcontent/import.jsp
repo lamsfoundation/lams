@@ -60,17 +60,7 @@
 							  // its format is: upload_<userId>_<timestamp>
 							  'tmpFileUploadId' : tmpFileUploadId,
 							  'largeFilesAllowed' : false
-						  },
-						  onBeforeFileAdded: function(currentFile, files) {
-							  var name = currentFile.data.name,
-							  	  extensionIndex = name.lastIndexOf('.'),
-							  	  valid = allowedFileTypes.includes(name.substring(extensionIndex).trim());
-							  if (!valid) {
-								  uppy.info('<fmt:message key="error.ld.zip.file" />', 'error', 10000);
-							  }
-							  
-							  return valid;
-					    }
+						  }
 					  };
 				  
 				  switch(language) {

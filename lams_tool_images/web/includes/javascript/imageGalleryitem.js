@@ -79,17 +79,7 @@ function initFileUpload(tmpFileUploadId, singleFileUpload, language) {
 			  // for server-side file type validation; consistent with CKEditor parameter
 			  'Type' : 'Image',
 			  'largeFilesAllowed' : true
-		  },
-		  onBeforeFileAdded: function(currentFile, files) {
-			  var name = currentFile.data.name || currentFile.name,
-			  	  extensionIndex = name.lastIndexOf('.'),
-			  	  valid = UPLOAD_ALLOWED_EXTENSIONS.includes(name.substring(extensionIndex).trim());
-			  if (!valid) {
-				  uppy.info(LABEL_NOT_ALLOWED_FORMAT, 'error', 10000);
-			  }
-			  
-			  return valid;
-	    }
+		  }
 	  };
 	  
 	  switch(language) {
