@@ -138,7 +138,7 @@ if ($canmanage) {
     $popupmonitoraction = new popup_action('click', $monitorurl, 'monitorlesson', array('height' => 720, 'width' => 1280));
 
   echo '<div class="centerlink">';
-  echo $OUTPUT->action_link('#', get_string('openmonitor', 'lamslesson'), $popupmonitoraction, array('class' => 'btn btn-default'), new pix_icon('i/dashboard',''));
+  echo $OUTPUT->action_link('#', get_string('openmonitor', 'lamslesson'), $popupmonitoraction, array('class' => 'btn btn-primary'), new pix_icon('i/dashboard',''));
   echo '</div>';
 }
 
