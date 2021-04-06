@@ -86,3 +86,4 @@ $string["activities"] = "activities";
 $string["ymmv"] = "Total activities depend on your learning path.";
 $string["yourmarkis"] = "Your final mark/grade is:";
 $string["outofmark"] = "out of";
+$string["lamslesson:addinstance"] = "Add LAMS lessons";

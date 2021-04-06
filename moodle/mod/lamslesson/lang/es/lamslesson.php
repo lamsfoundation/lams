@@ -84,3 +84,4 @@ $string["activities"] = "actividades";
 $string["ymmv"] = "Las actividades totales dependen de su ruta de aprendizaje.";
 $string["yourmarkis"] = "Su puntaje final es:";
 $string["outofmark"] = "de";
+$string["lamslesson:addinstance"] = "Agregar lecciones LAMS";
