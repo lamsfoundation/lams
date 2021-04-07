@@ -768,7 +768,7 @@ function lamslesson_get_course_userids($lamslessonid, $context=NULL) {
 
 		$listofcontexts = '('.$sitecontext->id.')'; // must be site
 	}
-	$sql = "SELECT u.id
+	$sql = "SELECT DISTINCT u.id
 		FROM {user} u INNER JOIN {role_assignments} r ON u.id=r.userid
 		WHERE r.contextid IN $listofcontexts OR r.contextid=$context->id
 		AND u.deleted=0 AND u.username!='guest'";
