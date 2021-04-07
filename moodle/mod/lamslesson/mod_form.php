@@ -138,9 +138,9 @@ class mod_lamslesson_mod_form extends moodleform_mod {
 		$mform->setExpanded('selectsequence', true);
 
         $mform->addElement('static', 'sequencemessage', '', $html);
-	$mform->addElement('checkbox', 'displaydesign', get_string('displaydesign', 'lamslesson'));
+	$mform->addElement('advcheckbox', 'displaydesign', get_string('displaydesign', 'lamslesson'),'',array(0,1));
 	$mform->addHelpButton('displaydesign', 'displaydesign', 'lamslesson');
-	$mform->addElement('checkbox', 'allowlearnerrestart', get_string('allowlearnerrestart', 'lamslesson'));
+	$mform->addElement('advcheckbox', 'allowlearnerrestart', get_string('allowlearnerrestart', 'lamslesson'),'', array(0,1));
 	$mform->addHelpButton('allowlearnerrestart', 'allowlearnerrestart', 'lamslesson');
 
 		//-------------------------------------------------------------------------------
