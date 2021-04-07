@@ -1256,7 +1256,11 @@ function updateSequenceTab() {
 						openPopUp(LAMS_URL + activity.url, "MonitorActivity", popupHeight, popupWidth, true, true);
 					});
 				}
-			});	
+			});
+			
+			// remove any existing popovers
+			$('.popover[role="tooltip"]').remove();
+			
 			initializePortraitPopover(LAMS_URL, 'large', 'left');
 
 			// update the cache global values so that the contributions & the Live Edit buttons will update
