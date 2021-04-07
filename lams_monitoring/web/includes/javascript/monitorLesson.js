@@ -1257,7 +1257,7 @@ function updateSequenceTab() {
 					});
 				}
 			});	
-			initializePortraitPopover(LAMS_URL, 'large', 'top');
+			initializePortraitPopover(LAMS_URL, 'large', 'left');
 
 			// update the cache global values so that the contributions & the Live Edit buttons will update
 			lockedForEdit = response.lockedForEdit;
