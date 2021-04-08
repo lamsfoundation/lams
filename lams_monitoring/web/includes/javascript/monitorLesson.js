@@ -1683,7 +1683,14 @@ function addActivityIconsHandlers(activity) {
 		$('*[id^="act' + activity.id + 'attention"]', sequenceCanvas).click(function(event){
 			event.stopPropagation();
 			// switch to first tab where attention prompts are listed
-			doSelectTab(1); 
+			if ($('#tblmonitor-tab-content').length == 0) {
+				// wer are in regular monitor, so switch to first tab to perform tasks
+				doSelectTab(1);
+			} else {
+				// we are in TBL mode, so switch back to regular monitor to perform tasks
+				switchToRegularMonitor(true);
+			}
+			 
 		});
 	}
 }
