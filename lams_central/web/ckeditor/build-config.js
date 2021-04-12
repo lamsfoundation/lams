@@ -1,6 +1,6 @@
 ﻿/**
- * @license Copyright (c) 2003-2018, CKSource - Frederico Knabben. All rights reserved.
- * For licensing, see LICENSE.md or http://ckeditor.com/license
+ * @license Copyright (c) 2003-2021, CKSource - Frederico Knabben. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/license
  */
 
 /**
@@ -10,13 +10,13 @@
  * If you would like to build CKEditor online again
  * (for example to upgrade), visit one the following links:
  *
- * (1) http://ckeditor.com/builder
+ * (1) https://ckeditor.com/cke4/builder
  *     Visit online builder to build CKEditor from scratch.
  *
- * (2) http://ckeditor.com/builder/da259b618b74b16675ea8a4121ec1564
+ * (2) https://ckeditor.com/cke4/builder/27b9535ddbd5cae170263cef61dee5e5
  *     Visit online builder to build CKEditor, starting with the same setup as before.
  *
- * (3) http://ckeditor.com/builder/download/da259b618b74b16675ea8a4121ec1564
+ * (3) https://ckeditor.com/cke4/builder/download/27b9535ddbd5cae170263cef61dee5e5
  *     Straight download link to the latest version of CKEditor (Optimized) with the same setup as before.
  *
  * NOTE:
@@ -38,6 +38,8 @@ var CKBUILDER_CONFIG = {
 		'.jshintignore',
 		'.jshintrc',
 		'.mailmap',
+		'.npm',
+		'.nvmrc',
 		'.travis.yml',
 		'bender-err.log',
 		'bender-out.log',
@@ -47,6 +49,7 @@ var CKBUILDER_CONFIG = {
 		'gruntfile.js',
 		'less',
 		'node_modules',
+		'package-lock.json',
 		'package.json',
 		'tests'
 	],
@@ -105,34 +108,19 @@ var CKBUILDER_CONFIG = {
 		'wysiwygarea' : 1
 	},
 	languages : {
-		'ar' : 1,
-		'bg' : 1,
-		'ca' : 1,
-		'cs' : 1,
-		'cy' : 1,
-		'da' : 1,
 		'de' : 1,
 		'el' : 1,
 		'en' : 1,
 		'en-au' : 1,
 		'es' : 1,
 		'fr' : 1,
-		'hu' : 1,
-		'id' : 1,
 		'it' : 1,
-		'ja' : 1,
-		'ko' : 1,
-		'ms' : 1,
-		'nl' : 1,
 		'no' : 1,
 		'pl' : 1,
 		'pt-br' : 1,
 		'ru' : 1,
-		'sl' : 1,
 		'sv' : 1,
-		'th' : 1,
 		'tr' : 1,
-		'vi' : 1,
 		'zh' : 1,
 		'zh-cn' : 1
 	}

@@ -1,64 +1,95 @@
 CKEditor 4
 ==========
 
-Copyright (c) 2003-2018, CKSource - Frederico Knabben. All rights reserved.
-http://ckeditor.com - See LICENSE.md for license information.
+Copyright (c) 2003-2021, CKSource - Frederico Knabben. All rights reserved.
+https://ckeditor.com - See LICENSE.md for license information.
+
+CKEditor 4 is a text editor to be used inside web pages. It's not a replacement
+for desktop text editors like Word or OpenOffice, but a component to be used as
+part of web applications and websites.
+
+## Documentation
+
+The full editor documentation is available online at the following address:
+https://ckeditor.com/docs/
 
 ## Installation
 
-1. Go to https://ckeditor.com/cke4/builder. Select Full. Upload /lams_central/web/ckeditor/build-config.js
+Installing CKEditor is an easy task. Just follow these simple steps:
 
-2. Download CKEditor
+ 1. **Download** the latest version from the CKEditor website:
+    https://ckeditor.com.  
+    You should have already completed this step, but be
+    sure you have the very latest version.
+    
+ 2. **Extract** (decompress) the downloaded file into the root of your website.
+ 
+ 3. Copy plugins developed by LAMS from the old instance of CKEditor
+/ckeditor/filemanager  
+/ckeditor/plugins/jlatexmath  
+/ckeditor/plugins/bootsnippets  
+/ckeditor/plugins/bootpanel  
+/ckeditor/plugins/confighelper  
+/ckeditor/plugins/wavepanel  
+ 4. Apply all customizations listed below in LAMS Customizations
+ 
+**Note:** CKEditor is by default installed in the `ckeditor` folder. You can
+place the files in whichever you want though.
 
-3. Copy plugins developed by LAMS from the old instance of CKEditor
-/ckeditor/plugins/jlatexmath
-/ckeditor/plugins/bootstrapTabs
-/ckeditor/plugins/bootsnippets
+## Checking Your Installation
 
-4. Apply all customizations listed below in ## LAMS Customizations
+The editor comes with a few sample pages that can be used to verify that
+installation proceeded properly. Take a look at the `samples` directory.
 
+To test your installation, just call the following page at your website:
 
+	http://<your site>/<CKEditor installation path>/samples/index.html
+
+For example:
+
+	http://www.example.com/ckeditor/samples/index.html
+	
 ## LAMS Customizations
 
-1. In order to make Preview feature available in inline mode, Preview plugin needed to be tweaked. To achieve it the next command
+- (NOT REQUIRED ANYMORE AS OF CKEDITOR 4.16.0) In order to make Preview feature available in inline mode, Preview plugin needed to be tweaked. To achieve it the next command
 "a.elementMode!=CKEDITOR.ELEMENT_MODE_INLINE&&(" .. ")" was removed from the ckeditor.js; precisely from that line:
-CKEDITOR.plugins.add("preview",{init:function(a){a.elementMode!=CKEDITOR.ELEMENT_MODE_INLINE&&(h=this.path,a.addCommand
+CKEDITOR.plugins.add("preview",{init:function(a){a.elementMode!=CKEDITOR.ELEMENT_MODE_INLINE&&(h=this.path,a.addCommand  
+(As in [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=3f3b286c8daddd86677d64fcd08366c33fbfd927](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=3f3b286c8daddd86677d64fcd08366c33fbfd927))  
 
-(As in https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=3f3b286c8daddd86677d64fcd08366c33fbfd927)
-
-2. Emojione button.
+- Emojione button.  
 When adding Emojione plugin as integrated one, its icon gets incorporated into icons.png incorrectly (the size of the icon is much bigger than 16 px) that's why it doesn't get displayed at all. 
 So we need to tweak editor.css and replace CSS rule for .cke_button__emojione_icon with the following:
 .cke_button__emojione_icon {background: url(../../plugins/emojione/icons/emojione.png?t=dee79e2) no-repeat 0 0 !important; background-size: 100% !important;}
-Also do not delete /ckeditor/plugins/emojione/icons/emojione.png
+Also do not delete /ckeditor/plugins/emojione/icons/emojione.png  
+(As in [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=781f0147a8670550edaf7a482d85a4504f93e564](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=781f0147a8670550edaf7a482d85a4504f93e564))
 
-(As in https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=781f0147a8670550edaf7a482d85a4504f93e564)
-
-3. Preview should show text on a white background
+- Preview should show text on a white background  
 Don't add class to the resulted preview body. It can be achieved by
 removing the following line from the ckeditor.js:
 ,d.getAttribute("class")&&(b+='class\x3d"'+d.getAttribute("class")+'" ')
+(As in [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=f8ccd872d79996df2a3d0e8485e2c95ccbef044b](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=f8ccd872d79996df2a3d0e8485e2c95ccbef044b))  
+For CKEditor 4.16.0 the code to remove is  
+b.getAttribute("class")&&(c=c.replace("\x3e",' class\x3d"'+b.getAttribute("class")+'"\x3e'));
+  
+- bootstrapTabs plugin.
+The "element.getAscendant"'s function that was specified on Double click and contextMenu listener methods were replaced with the following "return !( element instanceof CKEDITOR.dom.document ) && element.hasClass('bootstrap-tabs') ;". As otherwise it always false positively determined there is a tabs element in CKEditor canvas (due to LAMS header containing a tab).  
+Modify plugins/bootstrapTabs/plugin.js  
+or optimised ckeditor.js
 
-(As in https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=f8ccd872d79996df2a3d0e8485e2c95ccbef044b)
-
-4. bootstrapTabs plugin. The "element.getAscendant"'s function that was specified on Double click and contextMenu listener methods were replaced with the following "return !( element instanceof CKEDITOR.dom.document ) && element.hasClass('bootstrap-tabs') ;". As otherwise it always false positively determined there is a tabs element in CKEditor canvas (due to LAMS header containing a tab).
-
-Modify ckeditor.js.
-	* replace 
+```
+	replace 
 	return!(a instanceof CKEDITOR.dom.document)&&(a.hasClass("nav-tabs")||a.hasClass("tab-content"))
 	with the following
 	return!(a instanceof CKEDITOR.dom.document)&&a.hasClass("bootstrap-tabs")
+```
 
-	* replace 
-	return!(a instanceof CKEDITOR.dom.document)&&("a"==a.name&&"tab"==a.attributes.role||a.hasClass("nav-tabs")||a.hasClass("tab-content"))
-	with the following
-	return!(a instanceof CKEDITOR.dom.document)&&a.hasClass("bootstrap-tabs")
-
-(Similar to https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=2fbab8924ec9cef2ab6ed231386042fc8ab17fe4)
-
-5. Modify html5audio plugin.
+(Similar to [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=2fbab8924ec9cef2ab6ed231386042fc8ab17fe4](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=2fbab8924ec9cef2ab6ed231386042fc8ab17fe4))  
+  
+- Modify html5audio plugin.  
+(NOT USED IN ANY TOOLBAR SO IGNORED FOR CKEDITOR UPGRADE TO 4.16.0)  
 Add support for double click event. Also add padding around widget to increate area where user can double click and right click when trying to open html5audio dialog.
 
+```
 	*after
 	this.element.getChild(0).setAttribute("controlslist","nodownload"))
 	insert
@@ -68,7 +99,8 @@ Add support for double click event. Also add padding around widget to increate a
 	if ( elementCssPadding < 10) {
 		this.element.setStyle( 'padding', '10px' );
 	}
-	
+```
+```
 	*after 
 	CKEDITOR.dialog.add("html5audio",this.path+"dialogs/html5audio.js")
 	insert
@@ -85,24 +117,44 @@ Add support for double click event. Also add padding around widget to increate a
 			evt.data.dialog = 'html5audio';
 		} 
 	});
+```
 
-(Similar to https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=091a2b538d13f42a153dc5d0137ea6caffbd983b)
+(Similar to [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=091a2b538d13f42a153dc5d0137ea6caffbd983b](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=091a2b538d13f42a153dc5d0137ea6caffbd983b))
 
-6. Open JLatexmath dialog when clicking on its image
+- Open JLatexmath dialog when clicking on its image  
+In ckeditor.js
 After
 !a.attributes["data-cke-realelement"]
 Add
 &&!a.attributes["data-jlatexmath"]
 
-(Similar to https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=423d88c3f279da62c8802e3f9df86654a659fcb3)
+(Similar to [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=423d88c3f279da62c8802e3f9df86654a659fcb3](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=423d88c3f279da62c8802e3f9df86654a659fcb3))
 
-7. Including bootstrap tables CSS styles.
+- Maximise JLatexmath content after load  
+The JLatexmath iframe in dialog is not maximised in height on first load.
+Subsequent loads put correct height but first load is confusing, the iframe is very short.
+We need to add onLoad function as the last parameter when adding the iframe and manually set its height.
+Modify /plugins/jlatexmath/plugin.js and add the last argument (function) to the following code
 
-Replace /lams_central/web/ckeditor/plugins/table/dialogs/table.js entirely with the following file https://code.lamsfoundation.org/fisheye/browse/~raw,r=2b9f93362e5be1cb3a8718e7f8f26bda31bd4a60/lams-github/lams_central/web/ckeditor/plugins/table/dialogs/table.js
+```
+CKEDITOR.dialog.addIframe(
+	'Jlatexmath',
+	editor.lang.jlatexmath.DlgJlatexmathTitle,
+	pluginPath + 'jlatexmath.jsp',
+	950,
+	530,
+	function() {
+		$('#' + this.domId).height(530);
+	}
+);
+```
 
-(as in https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=2b9f93362e5be1cb3a8718e7f8f26bda31bd4a60)
+- Including bootstrap tables CSS styles.  
+(Maybe it is not required anymore as of CKEditor 4.16.0. We will see if clients require this functionality):  
+Replace /lams_central/web/ckeditor/plugins/table/dialogs/table.js entirely with the following file [https://code.lamsfoundation.org/fisheye/browse/~raw,r=2b9f93362e5be1cb3a8718e7f8f26bda31bd4a60/lams-github/lams_central/web/ckeditor/plugins/table/dialogs/table.js](https://code.lamsfoundation.org/fisheye/browse/~raw,r=2b9f93362e5be1cb3a8718e7f8f26bda31bd4a60/lams-github/lams_central/web/ckeditor/plugins/table/dialogs/table.js)  
+(as in [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=2b9f93362e5be1cb3a8718e7f8f26bda31bd4a60](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=2b9f93362e5be1cb3a8718e7f8f26bda31bd4a60))
 
-8. image2 plugin. Add 'classes' field to its dialog.
+- image2 plugin. Add 'classes' field to its dialog.
 
 	* Edit /lams_central/web/ckeditor/plugins/image2/dialogs/image2.js
 	Before
@@ -151,16 +203,13 @@ Replace /lams_central/web/ckeditor/plugins/table/dialogs/table.js entirely with 
 	With the following
 	\x3cimg class\x3d"img-responsive" alt\x3d"" src\x3d
 	
-(As in https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=62a52d851ecb5878433ca8ecd5ef422375619f47)
+(As in [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=62a52d851ecb5878433ca8ecd5ef422375619f47](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=62a52d851ecb5878433ca8ecd5ef422375619f47))
 
 
-9. Add jqeury.js and bootstrap.min.js scripts to preview page
+- Add jquery.js and bootstrap.min.js scripts to preview page
 After
-"\x3c/title\x3e"+CKEDITOR.tools.buildStyleHtml(a.config.contentsCss)+
+"\x3c/title\x3e"+CKEDITOR.tools.buildStyleHtml(d.contentsCss)+
 Insert the following:
 "<script type='text/javascript' src='/lams/includes/javascript/jquery.js'></script><script type='text/javascript' src='/lams/includes/javascript/bootstrap.min.js'></script>"+
 
-(As in https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=cc93c9f975e956a0f5e70032c0dbc1beb106e2fb)
-
-10. CKEditor's Upload image dialog doesn't work correctly (LDEV-4557)
-...
+(As in [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=cc93c9f975e956a0f5e70032c0dbc1beb106e2fb](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=cc93c9f975e956a0f5e70032c0dbc1beb106e2fb))

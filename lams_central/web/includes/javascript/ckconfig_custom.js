@@ -121,7 +121,6 @@ CKEDITOR.config.toolbar_LessonDescriptionInline = [
 
 
 CKEDITOR.config.contentsCss = CKEDITOR.basePath + '../css/defaultHTML_learner.css';
-//CKEDITOR.config.skin = 'office2013' ;
 CKEDITOR.config.disableNativeSpellChecker = false;
 CKEDITOR.config.browserContextMenuOnCtrl = true;
 CKEDITOR.config.bootsnippets = 'bootsnippets-text, bootsnippets-image, bootsnippets-multimedia, bootsnippets-advanced-layout';
@@ -129,18 +128,19 @@ CKEDITOR.config.bootsnippets_icons = CKEDITOR.basePath + '/plugins/bootsnippets/
 CKEDITOR.config.bootsnippets_labels = 'Text Snippets, Image Snippets, Multimedia Snippets, Advanced Layout Snippets';
 CKEDITOR.config.bootsnippets_files = [CKEDITOR.basePath + '../www/public/ckeditor-templates/bootsnippets.js'];
 CKEDITOR.config.format_tags	= 'div;h1;h2;h3;h4;h5;h6;pre;address;p' ;
-CKEDITOR.config.enterMode = 'div';
 CKEDITOR.plugins.addExternal('wikilink', CKEDITOR.basePath + '../tool/lawiki10/wikilink/', 'plugin.js');
-CKEDITOR.config.extraPlugins = 'wikilink,jlatexmath,image2,html5audio,confighelper,bootstrapTabs,bootpanel,bootsnippets,wavepanel';
+// html5audio and bootstrapTabs are available but not used anymore; they probably need fixes as in CKEditor README doc
+CKEDITOR.config.extraPlugins = 'wikilink,jlatexmath,image2,confighelper,bootpanel,bootsnippets,wavepanel';
 CKEDITOR.config.enterMode = CKEDITOR.ENTER_DIV; 
 CKEDITOR.config.removePlugins = 'elementspath,about,specialchar';
 CKEDITOR.config.allowedContent = true;
 CKEDITOR.config.toolbarCanCollapse = true;
-CKEDITOR.config.embed_provider = '//ckeditor.iframe.ly/api/oembed?url={url}&callback={callback}';//default URL for 'embed' plugin
+CKEDITOR.config.embed_provider = '//ckeditor.iframe.ly/api/oembed?url={url}&callback={callback}'; //default URL for 'embed' plugin
 CKEDITOR.config.filebrowserUploadMethod	 = 'form';
 //allow empty i and span tags (for font awesome)
 CKEDITOR.dtd.$removeEmpty['i'] = false;
 CKEDITOR.dtd.$removeEmpty['span'] = false;
+
 
 // ---- Additional scripts -----
 
