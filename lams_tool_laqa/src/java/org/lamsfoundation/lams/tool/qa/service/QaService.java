@@ -1187,21 +1187,23 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	user.setLearnerFinished(true);
 	updateUser(user);
 
-	//if this is a leader finishes, complete all non-leaders as well, also copy leader results to them
+	//if this is a leader finished, complete all non-leaders as well, also copy leader results to them
 	QaSession session = user.getQaSession();
-	QaQueUsr groupLeader = checkLeaderSelectToolForSessionLeader(user, toolSessionID);
-	if (isUserGroupLeader(userID, toolSessionID)) {
-	    session.getQaQueUsers().forEach(sessionUser -> {
-		//finish users
-		sessionUser.setResponseFinalized(true);
-		sessionUser.setLearnerFinished(true);
-		updateUser(user);
+	if (session.getQaContent().isUseSelectLeaderToolOuput()) {
+	    QaQueUsr groupLeader = checkLeaderSelectToolForSessionLeader(user, toolSessionID);
+	    if (isUserGroupLeader(userID, toolSessionID)) {
+		session.getQaQueUsers().forEach(sessionUser -> {
+		    //finish users
+		    sessionUser.setResponseFinalized(true);
+		    sessionUser.setLearnerFinished(true);
+		    updateUser(user);
 
-		//copy answers from leader to non-leaders
-		copyAnswersFromLeader(sessionUser, groupLeader);
-	    });
+		    //copy answers from leader to non-leaders
+		    copyAnswersFromLeader(sessionUser, groupLeader);
+		});
+	    }
 	}
-
+	
 	//return nextActivityUrl
 	return leaveToolSession(toolSessionID, userID);
     }
