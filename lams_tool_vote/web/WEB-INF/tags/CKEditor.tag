@@ -1,4 +1,4 @@
-<%@ taglib uri="tags-core" prefix="c"%>
+\<%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-function" prefix="fn" %>
 
@@ -84,7 +84,7 @@
 				classes                       : classes,
 				language                      : language,
 				defaultLangugage              : "en",
-				toolbarStartupExpanded        : ${displayExpanded},
+				toolbarStartupExpanded        : displayExpanded,
 				filebrowserBrowseUrl          : "${ckEditorBasePath}filemanager/browser/default/browser.html?Type=File&Connector=connectors/jsp/connector&CurrentFolder=/" + contentFolderID + "/",
 				filebrowserUploadUrl          : "${ckEditorBasePath}filemanager/upload/simpleuploader?Type=File&CurrentFolder=/" + contentFolderID + "/",
 				filebrowserImageBrowseUrl     : "${ckEditorBasePath}filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector&CurrentFolder=/" + contentFolderID + "/",
