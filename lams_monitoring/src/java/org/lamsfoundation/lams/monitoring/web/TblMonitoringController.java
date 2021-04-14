@@ -3,6 +3,7 @@ package org.lamsfoundation.lams.monitoring.web;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -37,6 +38,7 @@ import org.lamsfoundation.lams.tool.service.ICommonScratchieService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.CommonConstants;
+import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -216,7 +218,8 @@ public class TblMonitoringController {
 		}
 
 		if (iraCorrectAnswerCountAverage != null) {
-		    chartIraDataset.add(iraCorrectAnswerCountAverage);
+		    chartIraDataset
+			    .add(NumberUtil.formatLocalisedNumber(iraCorrectAnswerCountAverage, (Locale) null, 2));
 		    chartTraDataset.add(traCorrectAnswerCount);
 		    chartNamesDataset.add(group.getGroupName());
 
