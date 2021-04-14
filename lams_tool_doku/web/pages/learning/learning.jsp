@@ -152,10 +152,12 @@
 				if (counterInitialised) {
 					// just set the new time
 					$('#countdown').countdown('option', 'until', secondsLeft + 'S');
-				} else if (timeLimitExceeded && secondsLeft > 0){
-				    // teacher gave extra time, reload to writable Etherpad
-					location.reload();
-					return;
+				} else if (timeLimitExceeded){
+					if (secondsLeft > 0) {
+					    // teacher gave extra time, reload to writable Etherpad
+						location.reload();
+						return;
+					}
 				} else {
 					// initialise the timer
 					displayCountdown(secondsLeft);
