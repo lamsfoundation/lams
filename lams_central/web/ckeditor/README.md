@@ -84,6 +84,14 @@ or optimised ckeditor.js
 ```
 
 (Similar to [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=2fbab8924ec9cef2ab6ed231386042fc8ab17fe4](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=2fbab8924ec9cef2ab6ed231386042fc8ab17fe4))  
+It also seems that CKEditor optimiser breaks brackets, so pay attention to what is in the non-optimised plugin.js and reproduce the same logical operators (with modifications) in the optimised ckeditor.js  
+So it should be
+
+```
+return!(a instanceof CKEDITOR.dom.document)&&(("a"==a.name&&"tab"==a.attributes.role)||a.hasClass("bootstrap-tabs"))
+instea of
+return!(a instanceof CKEDITOR.dom.document)&&("a"==a.name&&"tab"==a.attributes.role||a.hasClass("bootstrap-tabs"))
+```
   
 - Modify html5audio plugin.  
 (NOT USED IN ANY TOOLBAR SO IGNORED FOR CKEDITOR UPGRADE TO 4.16.0)  
@@ -150,9 +158,84 @@ CKEDITOR.dialog.addIframe(
 ```
 
 - Including bootstrap tables CSS styles.  
-(Maybe it is not required anymore as of CKEditor 4.16.0. We will see if clients require this functionality):  
 Replace /lams_central/web/ckeditor/plugins/table/dialogs/table.js entirely with the following file [https://code.lamsfoundation.org/fisheye/browse/~raw,r=2b9f93362e5be1cb3a8718e7f8f26bda31bd4a60/lams-github/lams_central/web/ckeditor/plugins/table/dialogs/table.js](https://code.lamsfoundation.org/fisheye/browse/~raw,r=2b9f93362e5be1cb3a8718e7f8f26bda31bd4a60/lams-github/lams_central/web/ckeditor/plugins/table/dialogs/table.js)  
 (as in [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=2b9f93362e5be1cb3a8718e7f8f26bda31bd4a60](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=2b9f93362e5be1cb3a8718e7f8f26bda31bd4a60))
+For 4.16.0 upgrade following code has been added
+
+```
+* after
+if (!table.getAttribute('style'))
+	table.removeAttribute('style');
+		
+* added		
+						
+var bootstrapClass = 'table';
+bootstrapClass += this.getValueOf('bootstrapCssTab', 'stripedRows') ? ' table-striped' : '';
+bootstrapClass += this.getValueOf('bootstrapCssTab', 'bordered') ? ' table-bordered' : '';
+bootstrapClass += this.getValueOf('bootstrapCssTab', 'hover') ? ' table-hover' : '';
+bootstrapClass += this.getValueOf('bootstrapCssTab', 'condensed') ? ' table-condensed' : '';
+table.$.className = bootstrapClass;
+
+* then in "contents" table after "info" added
+{
+	id: 'bootstrapCssTab',
+	label: 'Bootstrap CSS',
+	elements: [
+		{
+			type: 'hbox',
+			widths: ['50%', '50%'],
+			children: [
+				{
+					id: 'stripedRows',
+					label: 'Striped Rows',
+					type: 'checkbox',
+					value: 'table-striped',
+					setup: function(a) {
+						var tableClasses = (a.getAttribute('class')).split(' ');
+						this.setValue(mj_in_array('table-striped', tableClasses));
+					}
+				},
+				{
+					id: 'bordered',
+					label: 'Bordered',
+					type: 'checkbox',
+					value: 'table-bordered',
+					setup: function(a) {
+						var tableClasses = (a.getAttribute('class')).split(' ');
+						this.setValue(mj_in_array('table-bordered', tableClasses));
+					}
+				}
+			]
+		},
+		{
+			type: 'hbox',
+			widths: ['50%', '50%'],
+			children: [
+				{
+					id: 'hover',
+					label: 'Hover',
+					type: 'checkbox',
+					value: 'table-hover',
+					setup: function(a) {
+						var tableClasses = (a.getAttribute('class')).split(' ');
+						this.setValue(mj_in_array('table-hover', tableClasses));
+					}
+				},
+				{
+					id: 'condensed',
+					label: 'Condensed',
+					type: 'checkbox',
+					value: 'table-condensed',
+					setup: function(a) {
+						var tableClasses = (a.getAttribute('class')).split(' ');
+						this.setValue(mj_in_array('table-condensed', tableClasses));
+					}
+				}
+			]
+		}
+	]
+},
+```
 
 - image2 plugin. Add 'classes' field to its dialog.
 

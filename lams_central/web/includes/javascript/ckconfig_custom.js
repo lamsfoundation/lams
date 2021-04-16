@@ -129,8 +129,8 @@ CKEDITOR.config.bootsnippets_labels = 'Text Snippets, Image Snippets, Multimedia
 CKEDITOR.config.bootsnippets_files = [CKEDITOR.basePath + '../www/public/ckeditor-templates/bootsnippets.js'];
 CKEDITOR.config.format_tags	= 'div;h1;h2;h3;h4;h5;h6;pre;address;p' ;
 CKEDITOR.plugins.addExternal('wikilink', CKEDITOR.basePath + '../tool/lawiki10/wikilink/', 'plugin.js');
-// html5audio and bootstrapTabs are available but not used anymore; they probably need fixes as in CKEditor README doc
-CKEDITOR.config.extraPlugins = 'wikilink,jlatexmath,image2,confighelper,bootpanel,bootsnippets,wavepanel';
+// html5audio is available but not used anymore; it probably needs fixes as in CKEditor README doc
+CKEDITOR.config.extraPlugins = 'wikilink,jlatexmath,image2,confighelper,bootstrapTabs,bootpanel,bootsnippets,wavepanel';
 CKEDITOR.config.enterMode = CKEDITOR.ENTER_DIV; 
 CKEDITOR.config.removePlugins = 'elementspath,about,specialchar';
 CKEDITOR.config.allowedContent = true;
