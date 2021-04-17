@@ -67,7 +67,6 @@ var CKBUILDER_CONFIG = {
 		'div' : 1,
 		'elementspath' : 1,
 		'embed' : 1,
-		'emojione' : 1,
 		'enterkey' : 1,
 		'entities' : 1,
 		'filebrowser' : 1,
