@@ -3,12 +3,12 @@
 
 CKEDITOR.config.toolbar_Default = [
 	['Source','-','Maximize','Preview','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath','-'], 
-	['Embed','Image','Link','Iframe','Table','HorizontalRule','Emojione','Format','Font','FontSize']
+	['Image','Link','Iframe','Table','HorizontalRule','Emojione','Format','Font','FontSize']
 ];
 
 CKEDITOR.config.toolbar_DefaultInline = [
 	['Sourcedialog','Preview','-','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath','-'], 
-    ['Embed','Image','Link','Iframe','Table','HorizontalRule','Emojione','-','bootsnippets-text','bootsnippets-image','bootsnippets-multimedia','bootsnippets-advanced-layout','Format','Font','FontSize']
+    ['Image','Link','Iframe','Table','HorizontalRule','-','bootsnippets-text','bootsnippets-image','bootsnippets-multimedia','bootsnippets-advanced-layout','Format','Font','FontSize']
 ];
 
 CKEDITOR.config.toolbar_DefaultDokuInline = [
@@ -26,7 +26,7 @@ CKEDITOR.config.toolbar_DefaultLearner = [
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
 	['Jlatexmath'],
 	['TextColor','BGColor'],
-	['Image','Table','HorizontalRule','Emojione'],
+	['Image','Table','HorizontalRule'],
 	['Format','Font','FontSize']
 ];
 
@@ -37,7 +37,7 @@ CKEDITOR.config.toolbar_DefaultLearnerInline = [
   	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
   	['Jlatexmath','-','Link'],
   	['TextColor','BGColor'],
-  	['Image','Table','HorizontalRule','Emojione'],
+  	['Image','Table','HorizontalRule'],
   	['Format','Font','FontSize']
   ];
 
@@ -49,7 +49,7 @@ CKEDITOR.config.toolbar_DefaultMonitor = [
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
 	['Jlatexmath'],
 	['TextColor','BGColor'],
-	['Table','HorizontalRule','Emojione'],
+	['Table','HorizontalRule'],
 	['Format','Font','FontSize']
 ];
 
@@ -60,7 +60,7 @@ CKEDITOR.config.toolbar_DefaultMonitorInline = [
   	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
   	['Jlatexmath'],
   	['TextColor','BGColor'],
-  	['Table','HorizontalRule','Emojione'],
+  	['Table','HorizontalRule'],
   	['Format','Font','FontSize']
 ];
 
@@ -73,7 +73,7 @@ CKEDITOR.config.toolbar_CustomWiki = [
 	['wikilink','Link','Image'],
 	['Jlatexmath'],
 	['TextColor','BGColor'],
-	['Table','HorizontalRule','Emojione'],
+	['Table','HorizontalRule'],
 	['Format','Font','FontSize']
 ];
 
@@ -86,19 +86,19 @@ CKEDITOR.config.toolbar_CustomWikiInline = [
   	['wikilink','Link','Image'],
   	['Jlatexmath'],
   	['TextColor','BGColor'],
-  	['Table','HorizontalRule','Emojione'],
+  	['Table','HorizontalRule'],
   	['Format','Font','FontSize']
 ];
 
 
 CKEDITOR.config.toolbar_CustomPedplanner = [
 	['Source','-','Maximize','Preview','Bold','Italic','Underline', '-','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath'], 
-	['Image','Link','Iframe','Table','Emojione','Font','FontSize']
+	['Image','Link','Iframe','Table','Font','FontSize']
 ];
 
 CKEDITOR.config.toolbar_CustomPedplannerInline = [
 	['Sourcedialog','-','Bold','Italic','Underline', '-','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath'], 
-	['Image','Link','Iframe','Table','Emojione','Font','FontSize']
+	['Image','Link','Iframe','Table','Font','FontSize']
 ];
 
 CKEDITOR.config.toolbar_LessonDescription = [
@@ -106,7 +106,7 @@ CKEDITOR.config.toolbar_LessonDescription = [
 	['NumberedList','BulletedList','-','Outdent','Indent'],
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
 	['TextColor','BGColor'],
-	['Table','HorizontalRule','Emojione'],
+	['Table','HorizontalRule'],
 	['Format','Font','FontSize']
 ];
 
@@ -115,7 +115,7 @@ CKEDITOR.config.toolbar_LessonDescriptionInline = [
  	['NumberedList','BulletedList','-','Outdent','Indent'],
  	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
  	['TextColor','BGColor'],
- 	['Table','HorizontalRule','Emojione'],
+ 	['Table','HorizontalRule'],
  	['Format','Font','FontSize']
  ];
 
