@@ -56,13 +56,6 @@ For example:
 CKEDITOR.plugins.add("preview",{init:function(a){a.elementMode!=CKEDITOR.ELEMENT_MODE_INLINE&&(h=this.path,a.addCommand  
 (As in [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=3f3b286c8daddd86677d64fcd08366c33fbfd927](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=3f3b286c8daddd86677d64fcd08366c33fbfd927))  
 
-- Emojione button.  
-When adding Emojione plugin as integrated one, its icon gets incorporated into icons.png incorrectly (the size of the icon is much bigger than 16 px) that's why it doesn't get displayed at all. 
-So we need to tweak editor.css and replace CSS rule for .cke_button__emojione_icon with the following:
-.cke_button__emojione_icon {background: url(../../plugins/emojione/icons/emojione.png?t=dee79e2) no-repeat 0 0 !important; background-size: 100% !important;}
-Also do not delete /ckeditor/plugins/emojione/icons/emojione.png  
-(As in [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=781f0147a8670550edaf7a482d85a4504f93e564](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=781f0147a8670550edaf7a482d85a4504f93e564))
-
 - Preview should show text on a white background  
 Don't add class to the resulted preview body. It can be achieved by
 removing the following line from the ckeditor.js:
