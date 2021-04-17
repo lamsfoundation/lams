@@ -140,7 +140,8 @@ CKEDITOR.config.filebrowserUploadMethod	 = 'form';
 //allow empty i and span tags (for font awesome)
 CKEDITOR.dtd.$removeEmpty['i'] = false;
 CKEDITOR.dtd.$removeEmpty['span'] = false;
-
+// with autoinline enabled there is sometimes a situation when CKEditor double initialises editors created from textarea
+CKEDITOR.disableAutoInline = true;
 
 // ---- Additional scripts -----
 
