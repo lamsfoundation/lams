@@ -373,3 +373,7 @@
 	</div>
 </c:forEach>
 <!-- End question detail modal -->
+
+<c:if test="${isTbl}">
+	<%@ include file="parts/timeLimit.jsp"%>
+</c:if>

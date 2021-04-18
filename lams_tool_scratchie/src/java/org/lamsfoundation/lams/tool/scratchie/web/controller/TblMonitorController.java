@@ -122,6 +122,9 @@ public class TblMonitorController {
 	model.addAllAttributes(modelAttributes);
 
 	model.addAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
+	model.addAttribute("scratchie", scratchie);
+	model.addAttribute("isTbl", true);
+
 	return "pages/monitoring/studentChoices";
     }
 
