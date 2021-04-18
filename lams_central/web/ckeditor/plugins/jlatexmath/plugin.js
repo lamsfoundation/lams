@@ -32,7 +32,10 @@ CKEDITOR.plugins.add('jlatexmath', {
 	            	editor.lang.jlatexmath.DlgJlatexmathTitle,
 	                pluginPath + 'jlatexmath.jsp',
 	                950,
-	                530
+	                530,
+					function() {
+						$('#' + this.domId).height(530);
+					}
 	             );
 	             
 	 			editor.on( 

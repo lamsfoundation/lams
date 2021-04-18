@@ -3,12 +3,12 @@
 
 CKEDITOR.config.toolbar_Default = [
 	['Source','-','Maximize','Preview','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath','-'], 
-	['Embed','Image','Link','Iframe','Table','HorizontalRule','Emojione','Format','Font','FontSize']
+	['Image','Link','Iframe','Table','HorizontalRule','Emojione','Format','Font','FontSize']
 ];
 
 CKEDITOR.config.toolbar_DefaultInline = [
 	['Sourcedialog','Preview','-','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath','-'], 
-    ['Embed','Image','Link','Iframe','Table','HorizontalRule','Emojione','-','bootsnippets-text','bootsnippets-image','bootsnippets-multimedia','bootsnippets-advanced-layout','Format','Font','FontSize']
+    ['Image','Link','Iframe','Table','HorizontalRule','-','bootsnippets-text','bootsnippets-image','bootsnippets-multimedia','bootsnippets-advanced-layout','Format','Font','FontSize']
 ];
 
 CKEDITOR.config.toolbar_DefaultDokuInline = [
@@ -26,7 +26,7 @@ CKEDITOR.config.toolbar_DefaultLearner = [
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
 	['Jlatexmath'],
 	['TextColor','BGColor'],
-	['Image','Table','HorizontalRule','Emojione'],
+	['Image','Table','HorizontalRule'],
 	['Format','Font','FontSize']
 ];
 
@@ -37,7 +37,7 @@ CKEDITOR.config.toolbar_DefaultLearnerInline = [
   	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
   	['Jlatexmath','-','Link'],
   	['TextColor','BGColor'],
-  	['Image','Table','HorizontalRule','Emojione'],
+  	['Image','Table','HorizontalRule'],
   	['Format','Font','FontSize']
   ];
 
@@ -49,7 +49,7 @@ CKEDITOR.config.toolbar_DefaultMonitor = [
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
 	['Jlatexmath'],
 	['TextColor','BGColor'],
-	['Table','HorizontalRule','Emojione'],
+	['Table','HorizontalRule'],
 	['Format','Font','FontSize']
 ];
 
@@ -60,7 +60,7 @@ CKEDITOR.config.toolbar_DefaultMonitorInline = [
   	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
   	['Jlatexmath'],
   	['TextColor','BGColor'],
-  	['Table','HorizontalRule','Emojione'],
+  	['Table','HorizontalRule'],
   	['Format','Font','FontSize']
 ];
 
@@ -73,7 +73,7 @@ CKEDITOR.config.toolbar_CustomWiki = [
 	['wikilink','Link','Image'],
 	['Jlatexmath'],
 	['TextColor','BGColor'],
-	['Table','HorizontalRule','Emojione'],
+	['Table','HorizontalRule'],
 	['Format','Font','FontSize']
 ];
 
@@ -86,19 +86,19 @@ CKEDITOR.config.toolbar_CustomWikiInline = [
   	['wikilink','Link','Image'],
   	['Jlatexmath'],
   	['TextColor','BGColor'],
-  	['Table','HorizontalRule','Emojione'],
+  	['Table','HorizontalRule'],
   	['Format','Font','FontSize']
 ];
 
 
 CKEDITOR.config.toolbar_CustomPedplanner = [
 	['Source','-','Maximize','Preview','Bold','Italic','Underline', '-','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath'], 
-	['Image','Link','Iframe','Table','Emojione','Font','FontSize']
+	['Image','Link','Iframe','Table','Font','FontSize']
 ];
 
 CKEDITOR.config.toolbar_CustomPedplannerInline = [
 	['Sourcedialog','-','Bold','Italic','Underline', '-','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath'], 
-	['Image','Link','Iframe','Table','Emojione','Font','FontSize']
+	['Image','Link','Iframe','Table','Font','FontSize']
 ];
 
 CKEDITOR.config.toolbar_LessonDescription = [
@@ -106,7 +106,7 @@ CKEDITOR.config.toolbar_LessonDescription = [
 	['NumberedList','BulletedList','-','Outdent','Indent'],
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
 	['TextColor','BGColor'],
-	['Table','HorizontalRule','Emojione'],
+	['Table','HorizontalRule'],
 	['Format','Font','FontSize']
 ];
 
@@ -115,13 +115,12 @@ CKEDITOR.config.toolbar_LessonDescriptionInline = [
  	['NumberedList','BulletedList','-','Outdent','Indent'],
  	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
  	['TextColor','BGColor'],
- 	['Table','HorizontalRule','Emojione'],
+ 	['Table','HorizontalRule'],
  	['Format','Font','FontSize']
  ];
 
 
 CKEDITOR.config.contentsCss = CKEDITOR.basePath + '../css/defaultHTML_learner.css';
-//CKEDITOR.config.skin = 'office2013' ;
 CKEDITOR.config.disableNativeSpellChecker = false;
 CKEDITOR.config.browserContextMenuOnCtrl = true;
 CKEDITOR.config.bootsnippets = 'bootsnippets-text, bootsnippets-image, bootsnippets-multimedia, bootsnippets-advanced-layout';
@@ -129,18 +128,20 @@ CKEDITOR.config.bootsnippets_icons = CKEDITOR.basePath + '/plugins/bootsnippets/
 CKEDITOR.config.bootsnippets_labels = 'Text Snippets, Image Snippets, Multimedia Snippets, Advanced Layout Snippets';
 CKEDITOR.config.bootsnippets_files = [CKEDITOR.basePath + '../www/public/ckeditor-templates/bootsnippets.js'];
 CKEDITOR.config.format_tags	= 'div;h1;h2;h3;h4;h5;h6;pre;address;p' ;
-CKEDITOR.config.enterMode = 'div';
 CKEDITOR.plugins.addExternal('wikilink', CKEDITOR.basePath + '../tool/lawiki10/wikilink/', 'plugin.js');
-CKEDITOR.config.extraPlugins = 'wikilink,jlatexmath,image2,html5audio,confighelper,bootstrapTabs,bootpanel,bootsnippets,wavepanel';
+// html5audio is available but not used anymore; it probably needs fixes as in CKEditor README doc
+CKEDITOR.config.extraPlugins = 'wikilink,jlatexmath,image2,confighelper,bootstrapTabs,bootpanel,bootsnippets,wavepanel';
 CKEDITOR.config.enterMode = CKEDITOR.ENTER_DIV; 
 CKEDITOR.config.removePlugins = 'elementspath,about,specialchar';
 CKEDITOR.config.allowedContent = true;
 CKEDITOR.config.toolbarCanCollapse = true;
-CKEDITOR.config.embed_provider = '//ckeditor.iframe.ly/api/oembed?url={url}&callback={callback}';//default URL for 'embed' plugin
+CKEDITOR.config.embed_provider = '//ckeditor.iframe.ly/api/oembed?url={url}&callback={callback}'; //default URL for 'embed' plugin
 CKEDITOR.config.filebrowserUploadMethod	 = 'form';
 //allow empty i and span tags (for font awesome)
 CKEDITOR.dtd.$removeEmpty['i'] = false;
 CKEDITOR.dtd.$removeEmpty['span'] = false;
+// with autoinline enabled there is sometimes a situation when CKEditor double initialises editors created from textarea
+CKEDITOR.disableAutoInline = true;
 
 // ---- Additional scripts -----
 
