@@ -22,18 +22,6 @@
 	 		.ui-jqdialog.ui-jqgrid-bootstrap .ui-jqdialog-titlebar, .ui-jqgrid.ui-jqgrid-bootstrap .ui-jqgrid-caption {
 				background-color: #f5f5f5;
 	 		}
-	 		
-	 		.countdown-timeout {
-	  			color: #FF3333 !important;
-	  		}
-	  		
-	  		#time-limit-table th {
-	  			vertical-align: middle;
-	  		}
-	  		
-	  		#time-limit-table td.centered {
-	  			text-align: center;
-	  		}
 	  		
 	  		#completion-charts-container > div {
 	  			padding: 5rem 2rem;

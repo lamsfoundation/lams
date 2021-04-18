@@ -93,6 +93,11 @@
 				return;
 			}
 
+			// if there is a timer running, destroy it before loading a new page
+			var counter = $('#absolute-time-limit-counter');
+			if (counter.length > 0) {
+				counter.countdown('destroy');
+			}
 			// no need to refresh soon if we are loading new tab anyway
 			restartRefreshInterval();
 			
