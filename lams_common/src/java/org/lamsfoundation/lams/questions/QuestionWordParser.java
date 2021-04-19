@@ -171,7 +171,7 @@ public class QuestionWordParser {
 		}
 
 		// check if answers section started
-		if (!feedbackStarted && isTypeParagraph && text.matches("^[a-z]\\).*")) {
+		if (!feedbackStarted && !answerTagFound && isTypeParagraph && text.matches("^[a-z]\\).*")) {
 		    optionsStarted = true;
 
 		    //process a-z) answers
