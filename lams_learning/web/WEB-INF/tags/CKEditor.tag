@@ -1,4 +1,4 @@
-\<%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-function" prefix="fn" %>
 
