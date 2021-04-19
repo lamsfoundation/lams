@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.service.ICommonAssessmentService;
 import org.lamsfoundation.lams.tool.service.ICommonScratchieService;
+import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.CommonConstants;
@@ -66,6 +67,8 @@ public class TblMonitoringController {
     private IMonitoringFullService monitoringService;
     @Autowired
     private ILamsToolService lamsToolService;
+    @Autowired
+    private ILamsCoreToolService lamsCoreToolService;
     @Autowired
     private IActivityDAO activityDAO;
     @Autowired
@@ -127,6 +130,10 @@ public class TblMonitoringController {
 	}
 
 	GroupingActivity groupingActivity = getGroupingActivity(lesson);
+
+	String groupsSetupUrl = lamsCoreToolService.getToolContributionURL(lessonId, groupingActivity);
+	request.setAttribute("groupsSetupUrl", groupsSetupUrl);
+
 	Grouping grouping = groupingActivity == null ? null : groupingActivity.getCreateGrouping();
 	Set<Group> groups = grouping == null ? null : grouping.getGroups();
 

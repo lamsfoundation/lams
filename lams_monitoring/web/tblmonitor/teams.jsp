@@ -244,13 +244,14 @@
 <div class="row no-gutter">
 <div class="col-xs-2"></div>
 <div class="col-xs-8">
-
 	<h3 style="text-align: center;">
 		<fmt:message key="label.students.teams"/>
 	</h3>
 	
-	<canvas id="summary-chart" class="voffset20"></canvas>
-
+	<c:if test="${not empty chartNamesDataset}">
+		<canvas id="summary-chart" class="voffset20"></canvas>
+	</c:if>
+	
 	<div class="panel panel-default voffset20">
 		<div class="panel-heading">
 			<h4 class="panel-title panel-collapse">
@@ -625,7 +626,14 @@
 	</c:forEach>     
 
 </div>
-<div class="col-xs-2"></div>
+<div class="col-xs-2">
+	<c:if test="${not empty groupsSetupUrl}">
+		<button onClick="javascript:openPopUp('<lams:LAMSURL/>${groupsSetupUrl}','GroupsSetup', 800, 1280, true)" type="button"
+			    class="btn btn-default voffset20">
+			<fmt:message key="label.teams.setup"/>
+		</button>
+	</c:if>
+</div>
 </div>
 
 <!-- modal chart -->
