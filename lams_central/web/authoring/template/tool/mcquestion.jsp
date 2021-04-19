@@ -34,12 +34,14 @@
 				   name="question${questionNumber}mark" id="question${questionNumber}mark"  class="form-control form-control-inline voffset5"/>
 			
 			<span class="pull-right">
-				<div class="checkbox"><label for="question${questionNumber}markHedging">
-					<input name="question${questionNumber}markHedging" id="question${questionNumber}markHedging" type="checkbox" value="true" ${question.type == 8 ? "checked=" : "" }/> 
-						<fmt:message key="authoring.tbl.mark.hedging" />&nbsp; 
-						<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="top" 
-						   title="<fmt:message key='authoring.tbl.mark.hedging.tooltip'/>"></i>
-						</label></div>
+				<div class="form-group voffset10">
+					<label for="question${questionNumber}markHedging">
+						<input name="question${questionNumber}markHedging" id="question${questionNumber}markHedging" type="checkbox" value="true" ${question.type == 8 ? "checked=" : "" }/> 
+						<fmt:message key="authoring.tbl.mark.hedging" />
+					</label>
+					<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="top" 
+					   title="<fmt:message key='authoring.tbl.mark.hedging.tooltip'/>"></i>
+				</div>
 			</span>
 		</div>
 		
