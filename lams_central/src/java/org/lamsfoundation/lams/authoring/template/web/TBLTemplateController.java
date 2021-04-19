@@ -811,20 +811,18 @@ public class TBLTemplateController extends LdTemplateController {
 
 	private void validateApplicationExercises() {
 	    if (applicationExercises.size() == 0) {
-		addValidationErrorMessage("authoring.error.application.exercise.num", new Integer[] { 1 },
-			applicationExerciseErrors);
-	    } else {
-		for (Map.Entry<Integer, AppExData> appExEntry : applicationExercises.entrySet()) {
-		    AppExData appEx = appExEntry.getValue();
-		    if (StringUtils.isBlank(appEx.dokuDescription) && StringUtils.isBlank(appEx.dokuInstructions)
-			    && (appEx.assessments == null)) {
-			addValidationErrorMessage("authoring.error.application.exercise.num",
-				new String[] { "\"" + appEx.title + "\"" }, applicationExerciseErrors);
-		    } else if (appEx.assessments != null) {
-			for (Map.Entry<Integer, Assessment> assessmentEntry : appEx.assessments.entrySet()) {
-			    assessmentEntry.getValue().validate(applicationExerciseErrors, appBundle, formatter,
-				    appExEntry.getKey(), "\"" + appEx.title + "\"", assessmentEntry.getKey());
-			}
+		return;
+	    }
+	    for (Map.Entry<Integer, AppExData> appExEntry : applicationExercises.entrySet()) {
+		AppExData appEx = appExEntry.getValue();
+		if (StringUtils.isBlank(appEx.dokuDescription) && StringUtils.isBlank(appEx.dokuInstructions)
+			&& (appEx.assessments == null)) {
+		    addValidationErrorMessage("authoring.error.application.exercise.num",
+			    new String[] { "\"" + appEx.title + "\"" }, applicationExerciseErrors);
+		} else if (appEx.assessments != null) {
+		    for (Map.Entry<Integer, Assessment> assessmentEntry : appEx.assessments.entrySet()) {
+			assessmentEntry.getValue().validate(applicationExerciseErrors, appBundle, formatter,
+				appExEntry.getKey(), "\"" + appEx.title + "\"", assessmentEntry.getKey());
 		    }
 		}
 	    }
