@@ -3647,6 +3647,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	    QbCollection collection = null;
 	    Set<String> collectionUUIDs = null;
+	    Long privateCollectionUUID = null;
 
 	    for (JsonNode questionJSONData : questions) {
 		AssessmentQuestion question = new AssessmentQuestion();
@@ -3759,18 +3760,24 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		}
 
 		Long collectionUid = JsonUtil.optLong(questionJSONData, RestTags.COLLECTION_UID);
-		boolean addToCollection = collectionUid != null;
-		if (addToCollection) {
-		    // check if it is the same collection - there is a good chance it is
-		    if (collection == null || collectionUid != collection.getUid()) {
-			collection = qbService.getCollection(collectionUid);
-			if (collection == null) {
-			    addToCollection = false;
-			} else {
-			    collectionUUIDs = qbService.getCollectionQuestions(collection.getUid()).stream()
-				    .filter(q -> q.getUuid() != null)
-				    .collect(Collectors.mapping(q -> q.getUuid().toString(), Collectors.toSet()));
-			}
+		if (collectionUid == null) {
+		    // if no collection UUID was specified, questions end up in user's private collection
+		    if (privateCollectionUUID == null) {
+			privateCollectionUUID = qbService.getUserPrivateCollection(userID).getUid();
+		    }
+		    collectionUid = privateCollectionUUID;
+		}
+
+		boolean addToCollection = true;
+		// check if it is the same collection - there is a good chance it is
+		if (collection == null || collectionUid != collection.getUid()) {
+		    collection = qbService.getCollection(collectionUid);
+		    if (collection == null) {
+			addToCollection = false;
+		    } else {
+			collectionUUIDs = qbService.getCollectionQuestions(collection.getUid()).stream()
+				.filter(q -> q.getUuid() != null)
+				.collect(Collectors.mapping(q -> q.getUuid().toString(), Collectors.toSet()));
 		    }
 		}
 
@@ -3830,7 +3837,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		checkType(question.getType());
 		newQuestionSet.add(question);
 
-		// all questions need to end up in user's private collection
 		if (addToCollection) {
 		    qbService.addQuestionToCollection(collectionUid, qbQuestion.getQuestionId(), false);
 		    collectionUUIDs.add(uuid);

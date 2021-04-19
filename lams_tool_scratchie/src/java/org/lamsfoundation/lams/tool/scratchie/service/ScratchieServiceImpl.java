@@ -2826,6 +2826,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	QbCollection collection = null;
 	Set<String> collectionUUIDs = null;
+	Long privateCollectionUUID = null;
 
 	ArrayNode questions = JsonUtil.optArray(toolContentJSON, RestTags.QUESTIONS);
 	for (int i = 0; i < questions.size(); i++) {
@@ -2850,19 +2851,24 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    }
 
 	    Long collectionUid = JsonUtil.optLong(questionData, RestTags.COLLECTION_UID);
-	    boolean addToCollection = collectionUid != null;
-
-	    if (addToCollection) {
-		// check if it is the same collection - there is a good chance it is
-		if (collection == null || collectionUid != collection.getUid()) {
-		    collection = qbService.getCollection(collectionUid);
-		    if (collection == null) {
-			addToCollection = false;
-		    } else {
-			collectionUUIDs = qbService.getCollectionQuestions(collection.getUid()).stream()
-				.filter(q -> q.getUuid() != null)
-				.collect(Collectors.mapping(q -> q.getUuid().toString(), Collectors.toSet()));
-		    }
+	    if (collectionUid == null) {
+		// if no collection UUID was specified, questions end up in user's private collection
+		if (privateCollectionUUID == null) {
+		    privateCollectionUUID = qbService.getUserPrivateCollection(userID).getUid();
+		}
+		collectionUid = privateCollectionUUID;
+	    }
+	    
+	    boolean addToCollection = true;
+	    // check if it is the same collection - there is a good chance it is
+	    if (collection == null || collectionUid != collection.getUid()) {
+		collection = qbService.getCollection(collectionUid);
+		if (collection == null) {
+		    addToCollection = false;
+		} else {
+		    collectionUUIDs = qbService.getCollectionQuestions(collection.getUid()).stream()
+			    .filter(q -> q.getUuid() != null)
+			    .collect(Collectors.mapping(q -> q.getUuid().toString(), Collectors.toSet()));
 		}
 	    }
 
