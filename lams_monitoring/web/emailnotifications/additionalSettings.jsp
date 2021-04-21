@@ -19,7 +19,7 @@
 			
 		<div class="form-group">
 			<label for="datePicker"><fmt:message key="email.notifications.by.this.date" /></label>
-			<input type="text" class="form-control" name="datePicker" id="datePicker" value="" autocomplete="off" />
+			<input type="text" class="form-control" name="datePicker" id="datePicker" value="" autocomplete="nope" />
 		</div>
 	</div>
 </div>	

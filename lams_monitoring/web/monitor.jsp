@@ -353,7 +353,7 @@
 												<div class="form-group" id="lessonStartApply">
 													<label for="scheduleDatetimeField" class="col-sm-1"><fmt:message key="lesson.start"/></label>
 													<div class="col-sm-8">
-													<input class="lessonManageField input-sm" id="scheduleDatetimeField" type="text"/>
+													<input class="lessonManageField input-sm" id="scheduleDatetimeField" type="text" autocomplete="nope" />
 													<a id="scheduleLessonButton" class="btn btn-xs btn-default lessonManageField" href="#"
 														   onClick="javascript:scheduleLesson()"
 														   title='<fmt:message key="button.schedule.tooltip"/>'>
@@ -877,7 +877,7 @@
 				<div class="col-xs-6">
 					<div class="form-group">
 						<label for="emaildatePicker"><fmt:message key="progress.email.select.date"/></label>
-						<input type="text" class="form-control" name="emaildatePicker" id="emaildatePicker" value="" autocomplete="off" />
+						<input type="text" class="form-control" name="emaildatePicker" id="emaildatePicker" value="" autocomplete="nope" />
 					</div>
 				</div>
 			</div>

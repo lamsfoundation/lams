@@ -262,11 +262,11 @@
 						</div>
 						<div id="scheduleStartTime" class="form-group">
 							<label for="schedulingDatetimeField"><fmt:message key="label.start"/></label>
-							<input id="schedulingDatetimeField" name="schedulingDatetime" type="text" />
+							<input id="schedulingDatetimeField" name="schedulingDatetime" type="text" autocomplete="nope" />
 						</div>
 						<div id="scheduleEndTime" class="form-group">
 							<label for="schedulingEndDatetimeField"><fmt:message key="label.end"/></label>
-							<input id="schedulingEndDatetimeField" name="schedulingEndDatetime" type="text" />
+							<input id="schedulingEndDatetimeField" name="schedulingEndDatetime" type="text" autocomplete="nope" />
 						</div>
 					</div>
 					
