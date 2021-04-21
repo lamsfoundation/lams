@@ -2858,7 +2858,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		}
 		collectionUid = privateCollectionUUID;
 	    }
-	    
+
 	    boolean addToCollection = true;
 	    // check if it is the same collection - there is a good chance it is
 	    if (collection == null || collectionUid != collection.getUid()) {
@@ -2867,7 +2867,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		    addToCollection = false;
 		} else {
 		    collectionUUIDs = qbService.getCollectionQuestions(collection.getUid()).stream()
-			    .filter(q -> q.getUuid() != null)
+			    .peek(q -> qbService.releaseFromCache(q)).filter(q -> q.getUuid() != null)
 			    .collect(Collectors.mapping(q -> q.getUuid().toString(), Collectors.toSet()));
 		}
 	    }

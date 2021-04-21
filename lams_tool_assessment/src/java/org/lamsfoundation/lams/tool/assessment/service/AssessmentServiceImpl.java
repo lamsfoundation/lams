@@ -3675,7 +3675,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		// are we modifying an existing question or creating a new one
 		if (isModification) {
 		    qbQuestion = oldQbQuestion.clone();
-		    qbService.releaseFromCache(oldQbQuestion);
+		    assessmentDao.releaseFromCache(oldQbQuestion);
 		} else {
 		    qbQuestion = new QbQuestion();
 		    qbQuestion.setQuestionId(qbService.generateNextQuestionId());
@@ -3776,7 +3776,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			addToCollection = false;
 		    } else {
 			collectionUUIDs = qbService.getCollectionQuestions(collection.getUid()).stream()
-				.filter(q -> q.getUuid() != null)
+				.peek(q -> qbService.releaseFromCache(q)).filter(q -> q.getUuid() != null)
 				.collect(Collectors.mapping(q -> q.getUuid().toString(), Collectors.toSet()));
 		    }
 		}
