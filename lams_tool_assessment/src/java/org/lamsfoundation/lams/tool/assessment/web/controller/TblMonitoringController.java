@@ -95,14 +95,17 @@ public class TblMonitoringController {
 	request.setAttribute("maxOptionsInQuestion", maxOptionsInQuestion);
 
 	int totalNumberOfUsers = assessmentService.getCountUsersByContentId(toolContentId);
-	for (QuestionDTO questionDto : questionDtos) {
+	if (totalNumberOfUsers > 0) {
+	    for (QuestionDTO questionDto : questionDtos) {
 
-	    // build candidate dtos
-	    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-		int optionAttemptCount = assessmentService.countAttemptsPerOption(toolContentId, optionDto.getUid());
+		// build candidate dtos
+		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+		    int optionAttemptCount = assessmentService.countAttemptsPerOption(toolContentId,
+			    optionDto.getUid());
 
-		float percentage = (float) (optionAttemptCount * 100) / totalNumberOfUsers;
-		optionDto.setPercentage(percentage);
+		    float percentage = (float) (optionAttemptCount * 100) / totalNumberOfUsers;
+		    optionDto.setPercentage(percentage);
+		}
 	    }
 	}
 	request.setAttribute("questions", questionDtos);
@@ -111,7 +114,7 @@ public class TblMonitoringController {
 	request.setAttribute("groupsInAnsweredQuestionsChart", assessment.isUseSelectLeaderToolOuput());
 	request.setAttribute("assessment", assessment);
 	request.setAttribute("isTbl", true);
-	
+
 	return "pages/tblmonitoring/iraAssessmentStudentChoices";
     }
 
@@ -254,7 +257,7 @@ public class TblMonitoringController {
 	request.setAttribute("groupsInAnsweredQuestionsChart", assessment.isUseSelectLeaderToolOuput());
 	request.setAttribute("assessment", assessment);
 	request.setAttribute("isTbl", true);
-	
+
 	return "pages/tblmonitoring/assessmentStudentChoices";
     }
 
