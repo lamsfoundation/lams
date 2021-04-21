@@ -126,7 +126,7 @@
 								rows += '<div class="col-xs-12 col-sm-11 ">';										
 								rows +=		'<textarea name="comment-textarea-'+itemId+'" rows="4" id="comment-textarea-'+ itemId + '" class="form-control"';
 								<c:if test="${minRates ne 0 || maxRates ne 0}">
-									rows += ' onblur="return updatedComment(this);"';
+									rows += ' onkeyup="return updatedComment(this);"';
 									if ( maxReached && commentPostedByUser == '' ) {
 										rows += ' style="display:none"';
 									}
