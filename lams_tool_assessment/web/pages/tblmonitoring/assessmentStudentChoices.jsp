@@ -124,8 +124,8 @@
 				<td><b>Correct answer</b></td>
 				<c:forEach var="tblQuestionDto" items="${questionDtos}" varStatus="i">
 					<td class="text-center">
-						${fn:replace(tblQuestionDto.correctAnswer, newLineChar, ', ')}
-					</td>
+						<c:out value="${tblQuestionDto.correctAnswer}" escapeXml="false" />
+ 					</td>
 				</c:forEach>
 			</tr>
 			
