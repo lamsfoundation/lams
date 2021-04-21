@@ -288,4 +288,14 @@ After
 Insert the following:
 "<script type='text/javascript' src='/lams/includes/javascript/jquery.js'></script><script type='text/javascript' src='/lams/includes/javascript/bootstrap.min.js'></script>"+
 
-(As in [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=cc93c9f975e956a0f5e70032c0dbc1beb106e2fb](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=cc93c9f975e956a0f5e70032c0dbc1beb106e2fb))
+(As in [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=cc93c9f975e956a0f5e70032c0dbc1beb106e2fb](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=cc93c9f975e956a0f5e70032c0dbc1beb106e2fb))  
+
+- Do not set default tooltip to CKEditor instances  
+By default, CKEditor adds a "title" attribute to its instances, which results in annoying tooltip shown.  
+We remove it, but may have to review it when working on accessibility.  
+Remove from ckeditor.js
+
+```
+a.changeAttr("aria-label",c);c&&a.changeAttr("title",c)
+```
+(As in [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=4f3c21320d4784bc94f86b946f1fd304ce442b01](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=4f3c21320d4784bc94f86b946f1fd304ce442b01))
