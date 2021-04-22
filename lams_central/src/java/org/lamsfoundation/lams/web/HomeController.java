@@ -244,9 +244,11 @@ public class HomeController {
 	    return "errorContent";
 	}
 
+	boolean forceRegularMonitor = WebUtil.readBooleanParam(req, "forceRegularMonitor", false);
 	// security check will be done there
 	String url = Configuration.get(ConfigurationKeys.SERVER_URL)
-		+ "monitoring/monitoring/monitorLesson.do?lessonID=" + lessonId;
+		+ "monitoring/monitoring/monitorLesson.do?lessonID=" + lessonId + "&forceRegularMonitor="
+		+ forceRegularMonitor;
 	res.sendRedirect(url);
 	return null;
     }
