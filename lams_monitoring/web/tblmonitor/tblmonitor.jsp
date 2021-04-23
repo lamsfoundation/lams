@@ -209,12 +209,6 @@
 				<div class="logo">
 				</div>
 			</div>
-				
-			<div class="offcanvas-header">
-				<span class="courses-title ">
-					${lesson.lessonName}
-				</span>
-			</div>
 
 			<table class="tablesorter">
 				<tr>
@@ -327,10 +321,13 @@
 
 			<!-- Top bar -->
 			<div class="top-nav">
-				<div class="col-xs-5 col-md-3 col-lg-3">
+				<div class="col-xs-9 col-md-7 col-lg-7" id="menu-left-controls">
 					<a href="#">
 						<i class="fa fa-bars fa-lg" id="menu-toggle-bars"></i>
 					</a>
+					<span class="courses-title">
+						<c:out value="${lesson.lessonName}" escapeXml="true" />
+					</span>
 				</div>
 						
 				<div>
