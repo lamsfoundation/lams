@@ -71,11 +71,14 @@ table.tablesorter {
 	text-decoration: none;
 }
 
+#page-content-wrapper #menu-left-controls {
+	padding-top: 25px;
+}
+
 .courses-title {
-    padding-left: 0;
-    word-break: break-all;
     line-height: 10px;
     font-size: 19px;
+	vertical-align: middle;
 }
 
 .offcanvas-header {
