@@ -180,7 +180,7 @@ function initWhiteboard() {
                         at: accessToken,
                     }).done(function (originalData) {
 						// make sure all images are in the background, otherwise they obscure learners' drawings
-						originalData.forEach((drawItem) => {drawItem.draw = 1});
+						originalData.forEach((drawItem) => {drawItem.draw = 0});
 						console.log(originalData);
 						console.log(data);
                         whiteboard.loadData(originalData);
