@@ -171,19 +171,16 @@ function initWhiteboard() {
         // request whiteboard from server
         $.get(subdir + "/api/loadwhiteboard", { wid: whiteboardId, at: accessToken }).done(
             function (data) {
-				// modified for LAMS, allow cloning whiteboard even when it is not empty
-				// also force original data to be drawn first
-                if (copyfromwid) {
-                    //Copy from witheboard if current is empty and get parameter is given
+				// modified for LAMS, force original data to be drawn and saved first
+                if (copyfromwid && data.length == 0) {
+                    // Copy from witheboard if current is empty and get parameter is given
                     $.get(subdir + "/api/loadwhiteboard", {
                         wid: copyfromwid,
                         at: accessToken,
                     }).done(function (originalData) {
-						// make sure all images are in the background, otherwise they obscure learners' drawings
-						originalData.forEach((drawItem) => {drawItem.draw = 0});
 						console.log(originalData);
 						console.log(data);
-                        whiteboard.loadData(originalData);
+						whiteboard.loadJsonData(originalData);
 						whiteboard.loadData(data);
                     });
                 } else {
