@@ -365,15 +365,17 @@ public class MonitoringController {
 	request.setAttribute(AssessmentConstants.ATTR_IS_QUESTION_ETHERPAD_ENABLED, questionEtherpadEnabled);
 	request.setAttribute(AssessmentConstants.ATTR_TOOL_SESSION_ID, sessionId);
 
-	// lists all code styles used in this assessment
-	Set<Integer> codeStyles = userSummary.getUserSummaryItems().stream().map(UserSummaryItem::getQuestionDto)
-		.filter(q -> q.getCodeStyle() != null)
-		.collect(Collectors.mapping(q -> q.getCodeStyle(), Collectors.toSet()));
+	if (userSummary.getUserSummaryItems() != null) {
+	    // lists all code styles used in this assessment
+	    Set<Integer> codeStyles = userSummary.getUserSummaryItems().stream().map(UserSummaryItem::getQuestionDto)
+		    .filter(q -> q.getCodeStyle() != null)
+		    .collect(Collectors.mapping(q -> q.getCodeStyle(), Collectors.toSet()));
 
-	if (!codeStyles.isEmpty()) {
-	    request.setAttribute(AssessmentConstants.ATTR_CODE_STYLES, codeStyles);
+	    if (!codeStyles.isEmpty()) {
+		request.setAttribute(AssessmentConstants.ATTR_CODE_STYLES, codeStyles);
+	    }
 	}
-
+	
 	return "pages/monitoring/parts/usersummary";
     }
 
