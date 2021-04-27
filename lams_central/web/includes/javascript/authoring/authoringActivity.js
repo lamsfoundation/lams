@@ -77,6 +77,7 @@ ActivityCategories = {
 		'Survey' : 6,
 		'Share taskList' : 4,
 		'Voting' : 6,
+		'Whiteboard' : 2,
 		'Wiki' : 2,
 		'Kaltura' : 2,
 		'Zoom' : 2,

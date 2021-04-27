@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<bean id="whiteboardMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource">
+			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename"><value>org.lamsfoundation.lams.tool.whiteboard.ApplicationResources</value></property>
+				<property name="defaultEncoding" value="UTF-8" />
+			</bean>
+		</property>										
+	</bean>
+	
+    <!-- core beans -->
+    <bean id="whiteboardDao" class="org.lamsfoundation.lams.tool.whiteboard.dao.hibernate.WhiteboardDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+   <bean id="whiteboardUserDao" class="org.lamsfoundation.lams.tool.whiteboard.dao.hibernate.WhiteboardUserDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+   <bean id="whiteboardSessionDao" class="org.lamsfoundation.lams.tool.whiteboard.dao.hibernate.WhiteboardSessionDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="whiteboardOutputFactory" class="org.lamsfoundation.lams.tool.whiteboard.service.WhiteboardOutputFactory">  
+    	<property name="toolMessageService"><ref bean="whiteboardMessageService"/></property>  
+	</bean> 
+
+    <!-- Managers -->
+	<bean id="whiteboardToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>whiteboardworkspace</value></property>
+		<property name="repositoryUser"><value>whiteboard</value></property>
+		<property name="repositoryId"><value>lams-whiteboard</value></property>
+	</bean>
+    <bean id="whiteboardManagerTarget" class="org.lamsfoundation.lams.tool.whiteboard.service.WhiteboardService">
+        <property name="whiteboardDao">
+            <ref bean="whiteboardDao"/>
+        </property>
+        <property name="whiteboardUserDao">
+            <ref bean="whiteboardUserDao"/>
+        </property>
+        <property name="whiteboardSessionDao">
+            <ref bean="whiteboardSessionDao"/>
+        </property>
+        <property name="whiteboardToolContentHandler">
+            <ref bean="whiteboardToolContentHandler"/>
+        </property>
+   		<property name="toolService">
+   			<ref bean="lamsToolService"/>
+   		</property>
+   		<property name="userManagementService">
+   			<ref bean="userManagementService"/>
+   		</property>
+   		<property name="learnerService">
+   			<ref bean="learnerService"/>
+   		</property>
+   		<property name="lessonService">
+   			<ref bean="lessonService"/>
+   		</property>
+   		<property name="ratingService">
+   			<ref bean="ratingService"/>
+   		</property>
+   		<property name="exportContentService">
+   			<ref bean="exportToolContentService"/>
+   		</property>
+   		<property name="messageService"><ref bean="whiteboardMessageService"/></property>
+		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
+		<property name="whiteboardOutputFactory"><ref bean="whiteboardOutputFactory"/></property>
+    </bean>
+
+    <bean id="whiteboardService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+        <property name="target">
+            <ref bean="whiteboardManagerTarget"/>
+        </property>
+        <property name="proxyTargetClass">
+            <value>false</value>
+        </property>
+        <property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop> 
+            </props>
+        </property>
+    </bean>
+</beans>

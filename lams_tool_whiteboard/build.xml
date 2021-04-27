@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="LAMS Tool Whiteboard" basedir=".">
+
+	<import file="../lams_build/build_tools_base.xml"/>
+	
+	<target name="_build-war" depends="_compile-java, _copy-websocket, build_base._build-war" />
+	
+	<!-- Add the websocket class to WEB-INF/classes.
+		 This can not be a target in build_base because the way Ant reads properties and dependecies
+		 would make it too complex or make it repeat some tasks.
+		 
+		 The file servers only as an advice for WF to set up the websocket server.
+		 The actual implementation is taken from the JAR.
+		 Not having it in WAR will make WF ignore its annotations,
+		 not having it in JAR will cause a ClassLoader error.
+	-->
+	<target name="_copy-websocket">
+		<echo>${ant.project.name}: Copying additional Java classes to WAR</echo>
+		<copy todir="${basedir}/build/war/WEB-INF/classes"
+			  file="${basedir}/build/classes/java/org/lamsfoundation/lams/tool/whiteboard/web/controller/LearningWebsocketServer.class"
+			  verbose="true"
+		/>
+	</target>
+
+</project>

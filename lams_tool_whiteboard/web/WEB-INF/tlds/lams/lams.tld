@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee web-jsptaglibrary_2_0.xsd"
+    version="2.0">
+
+   <tlib-version>1.0</tlib-version>
+   <short-name>lams</short-name>
+
+   <display-name>LAMSTags</display-name>
+   <description><![CDATA[LAMS custom tags]]></description>
+
+   <listener>
+      <listener-class>org.lamsfoundation.lams.web.SessionListener</listener-class>
+   </listener>
+
+   <tag>
+
+      <description>Output the basic URL for the current webapp. e.g. http://server/lams/tool/nb11/</description>
+      <display-name>Base URL for the current web app</display-name>
+      <icon>    
+      </icon>
+      <name>WebAppURL</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.WebAppURLTag</tag-class>
+      <body-content>empty</body-content>
+
+   </tag>
+   <tag>
+
+      <description>Help tag</description>
+      <display-name>Help tag</display-name>
+      <icon>    
+      </icon>
+      <name>help</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.HelpTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Help tag</description>
+         <name>module</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Help tag</description>
+         <name>toolSignature</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Help tag</description>
+         <name>page</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Help tag</description>
+         <name>style</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Get the configuration value for the specified key</description>
+      <display-name>Configuration value</display-name>
+      <icon>    
+      </icon>
+      <name>Configuration</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.ConfigurationTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Get the configuration value for the specified key</description>
+         <name>key</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Output the Server URL as defined in the lams.xml configuration file.</description>
+      <display-name>LAMS URL</display-name>
+      <icon>    
+      </icon>
+      <name>LAMSURL</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.LAMSURLTag</tag-class>
+      <body-content>empty</body-content>
+
+   </tag>
+   <tag>
+
+      <description>Render html tag with direction and language</description>
+      <display-name>Render html tag with direction and language</display-name>
+      <icon>    
+      </icon>
+      <name>html</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.HtmlTag</tag-class>
+      <body-content>JSP</body-content>
+
+      <attribute>
+         <description>Render html tag with direction and language</description>
+         <name>xhtml</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Converts text from \n or \r\n to &lt;BR&gt; before rendering</description>
+      <display-name>Converts text from \n or \r\n to &lt;BR&gt; before rendering</display-name>
+      <icon>    
+      </icon>
+      <name>out</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.MultiLinesOutputTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Converts text from \n or \r\n to &lt;BR&gt; before rendering</description>
+         <name>value</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Converts text from \n or \r\n to &lt;BR&gt; before rendering</description>
+         <name>escapeHtml</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Converts role name into form usable as message resources key</description>
+      <display-name>Converts role name into form usable as message resources key</display-name>
+      <icon>    
+      </icon>
+      <name>role</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.RoleTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Converts role name into form usable as message resources key</description>
+         <name>role</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Output stylesheet based on the user preferences.</description>
+      <display-name>User's chosen stylesheet</display-name>
+      <icon>    
+      </icon>
+      <name>css</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.CssTag</tag-class>
+      <body-content>empty</body-content>
+  	  <attribute>
+ 	      <description>Override the name to use a different suffix than "learner"</description>
+	      <name>suffix</name>
+ 	      <required>false</required>
+ 	      <rtexprvalue>true</rtexprvalue>
+ 	  </attribute>
+ 	  <attribute>
+ 	      <description>Include this webapp in the path</description>
+	      <name>webapp</name>
+ 	      <required>false</required>
+ 	      <rtexprvalue>true</rtexprvalue>
+ 	  </attribute>
+   </tag>
+   <tag>
+
+      <description>Output details from the shared session UserDTO object</description>
+      <display-name>user details</display-name>
+      <icon>    
+      </icon>
+      <name>user</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.UserTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Output details from the shared session UserDTO object</description>
+         <name>property</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+
+	
+	<tag>
+      <description>Small portrait of a user</description>
+      <display-name>User Portrait</display-name>
+      <icon></icon>
+      <name>Portrait</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.PortraitTag</tag-class>
+      <body-content>JSP</body-content>
+      <attribute>
+         <name>userId</name>
+         <required>true</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+         <name>size</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+         <name>round</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+         <description>If true shows the portrait as a round dot. Defaults to true.</description>
+      </attribute>
+      <attribute>
+         <name>hover</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+         <description>If true then display as a hover box. Uses the body of the tag as the link text.</description>
+      </attribute>
+   </tag>
+	
+	<tag-file>
+       <name>Tab</name>
+       <path>/WEB-INF/tags/Tab.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>Tabs</name>
+       <path>/WEB-INF/tags/Tabs.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>TabBody</name>
+       <path>/WEB-INF/tags/TabBody.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>TabBodys</name>
+       <path>/WEB-INF/tags/TabBodys.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>TabBodyArea</name>
+       <path>/WEB-INF/tags/TabBodyArea.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>CKEditor</name>
+       <path>/WEB-INF/tags/CKEditor.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>AuthoringButton</name>
+       <path>/WEB-INF/tags/AuthoringButton.tag</path>
+   	</tag-file>   
+   	<tag-file>
+       <name>AuthoringRatingCriteria</name>
+       <path>/WEB-INF/tags/AuthoringRatingCriteria.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>AuthoringRatingAllStyleCriteria</name>
+       <path>/WEB-INF/tags/AuthoringRatingAllStyleCriteria.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>Rating</name>
+       <path>/WEB-INF/tags/Rating.tag</path>
+   	</tag-file>    		
+   	<tag-file>
+       <name>StyledRating</name>
+       <path>/WEB-INF/tags/StyledRating.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>headItems</name>
+       <path>/WEB-INF/tags/headItems.tag</path>
+   	</tag-file>
+   	<tag-file>
+	    <name>Date</name>
+		<path>/WEB-INF/tags/Date.tag</path>
+   	</tag-file>  
+   	<tag-file>
+	    <name>DefineLater</name>
+		<path>/WEB-INF/tags/DefineLater.tag</path>
+   	</tag-file>  
+   	<tag-file>
+	    <name>Alert</name>
+		<path>/WEB-INF/tags/Alert.tag</path>
+   	</tag-file>  
+   	<tag-file>
+	    <name>Page</name>
+		<path>/WEB-INF/tags/Page.tag</path>
+   	</tag-file>
+   	<tag-file>
+	    <name>TSTable</name>
+		<path>/WEB-INF/tags/TSTable.tag</path>
+   	</tag-file>    
+  	<tag-file>
+	    <name>Arrow</name>
+		<path>/WEB-INF/tags/Arrow.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>AdvancedAccordian</name>
+       <path>/WEB-INF/tags/AdvancedAccordian.tag</path>
+   	</tag-file>  
+   	<tag-file>
+   		<name>RestrictedUsageAccordian</name>
+   		<path>/WEB-INF/tags/RestrictedUsageAccordian.tag</path>
+   	</tag-file>
+  	<tag-file>
+	    <name>SimplePanel</name>
+		<path>/WEB-INF/tags/SimplePanel.tag</path>
+   	</tag-file>
+   	<tag-file>
+	    <name>ImgButtonWrapper</name>
+		<path>/WEB-INF/tags/ImgButtonWrapper.tag</path>
+   	</tag-file>
+   	<tag-file>
+	    <name>TextSearch</name>
+		<path>/WEB-INF/tags/TextSearch.tag</path>
+   	</tag-file>  
+   	<tag-file>
+	    <name>LeaderDisplay</name>
+		<path>/WEB-INF/tags/LeaderDisplay.tag</path>
+   	</tag-file> 
+   	<tag-file>
+       <name>OutcomeAuthor</name>
+       <path>/WEB-INF/tags/OutcomeAuthor.tag</path>
+   	</tag-file>  
+   	<tag-file>
+       <name>Etherpad</name>
+       <path>/WEB-INF/tags/Etherpad.tag</path>
+   	</tag-file> 
+	<tag-file>
+	    <name>errors</name>
+		<path>/WEB-INF/tags/Errors.tag</path>
+   	</tag-file>  
+   	<tag>
+    <name>textarea</name>
+    <tag-class>org.lamsfoundation.lams.web.tag.LAMSMultiLinesTextareaTag</tag-class>
+    <body-content>JSP</body-content>
+    <dynamic-attributes>true</dynamic-attributes>
+    <description>
+    	Render text exactly same as  original input, which even won't escape the input HTML tag.
+    </description>    
+    <attribute>
+        <description>
+        </description>
+        <name>name</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+        <description>
+        </description>
+        <name>id</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+        <description>
+        </description>
+        <name>onchange</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+        <description>
+        </description>
+        <name>disabled</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+	<tag-file>
+		<name>head</name>
+	    <path>/WEB-INF/tags/Head.tag</path>
+	</tag-file>
+   	<tag-file>
+       <name>Comments</name>
+       <path>/WEB-INF/tags/Comments.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>CommentsAuthor</name>
+       <path>/WEB-INF/tags/CommentsAuthor.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>FileUpload</name>
+       <path>/WEB-INF/tags/FileUpload.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>WaitingSpinner</name>
+       <path>/WEB-INF/tags/WaitingSpinner.tag</path>
+   	</tag-file>
+
+</taglib>

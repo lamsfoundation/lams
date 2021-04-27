@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+	<!-- Autopatch service -->
+	<bean id="autopatchService" init-method="patch" class="org.lamsfoundation.lams.dbupdates.AutoPatchServiceSynchronizer">
+		<property name="systemName" value="lawhiteboard11"/> 
+		<property name="databaseType" value="mysql"/> 
+		<property name="patchPath" value="org/lamsfoundation/lams/tool/whiteboard/dbupdates" /> 
+		<property name="dataSource" ref="dataSource"/> 
+	</bean>
+</beans>
