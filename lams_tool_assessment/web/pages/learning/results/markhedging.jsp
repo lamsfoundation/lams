@@ -75,7 +75,7 @@
 	</div>
 </c:if>
 
-<c:if test="${not empty toolSessionID}">
+<c:if test="${not empty toolSessionID and assessment.allowRightAnswersAfterQuestion}">
 	<div class="question-feedback" style="padding-bottom: 10px;">
 		<fmt:message key="label.learning.marks" >
 			<fmt:param><fmt:formatNumber value="${question.mark}" maxFractionDigits="3"/></fmt:param>
