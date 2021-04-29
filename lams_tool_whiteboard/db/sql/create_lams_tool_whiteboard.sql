@@ -76,7 +76,7 @@ INSERT INTO `tl_lawhiteboard11_whiteboard` (`uid`, `create_date`, `update_date`,
   (1,NULL,NULL,NULL,'Whiteboard','0','Instructions',0,0,${default_content_id},0,0);
   
 INSERT INTO tl_lawhiteboard11_configuration (config_key, config_value) VALUES
-('ServerURL', '<LAMS_SERVER_URL>:9003');
+('ServerURL', '[LAMS_SERVER_URL]:9003');
   
   
 SET FOREIGN_KEY_CHECKS=1;
