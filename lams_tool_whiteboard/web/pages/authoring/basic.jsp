@@ -15,3 +15,7 @@
     </label>
     <lams:CKEditor id="whiteboard.instructions" value="${authoringForm.whiteboard.instructions}" contentFolderID="${authoringForm.contentFolderID}" />
 </div>
+
+<iframe id="whiteboard-frame"
+        src="http://localhost:9003?accesstoken=123&whiteboardid=${authoringForm.whiteboard.contentId}&username=${authoringForm.authorName}">
+</iframe>

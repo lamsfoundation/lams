@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.whiteboard.web.controller;
 
+import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -40,6 +41,7 @@ import org.lamsfoundation.lams.tool.whiteboard.service.IWhiteboardService;
 import org.lamsfoundation.lams.tool.whiteboard.web.form.WhiteboardForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -110,12 +112,25 @@ public class AuthoringController {
 
 	try {
 	    whiteboard = whiteboardService.getWhiteboardByContentId(contentId);
+
 	    // if Whiteboard does not exist, try to use default content instead.
 	    if (whiteboard == null) {
 		whiteboard = whiteboardService.getDefaultContent(contentId);
 	    }
 
 	    authoringForm.setWhiteboard(whiteboard);
+
+	    String authorName = null;
+	    if (whiteboard.getCreatedBy() == null) {
+		HttpSession ss = SessionManager.getSession();
+		// get back login user DTO
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		authorName = user.getFirstName() + " " + user.getLastName();
+	    } else {
+		authorName = whiteboard.getCreatedBy().getFirstName() + " " + whiteboard.getCreatedBy().getLastName();
+	    }
+
+	    authoringForm.setAuthorName(URLEncoder.encode(authorName, FileUtil.ENCODING_UTF_8));
 	} catch (Exception e) {
 	    AuthoringController.log.error(e);
 	    throw new ServletException(e);

@@ -40,6 +40,7 @@ public class WhiteboardForm {
     private String mode;
 
     private Whiteboard whiteboard;
+    private String authorName;
 
     public WhiteboardForm() {
 	whiteboard = new Whiteboard();
@@ -97,5 +98,13 @@ public class WhiteboardForm {
 
     public void setMode(String mode) {
 	this.mode = mode;
+    }
+
+    public String getAuthorName() {
+        return authorName;
+    }
+
+    public void setAuthorName(String authorName) {
+        this.authorName = authorName;
     }
 }

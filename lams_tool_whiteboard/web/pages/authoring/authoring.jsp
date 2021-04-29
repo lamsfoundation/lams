@@ -12,8 +12,11 @@
 			width: 70px;
 		}
 		
-		#timeLimitManualStartDiv {
-			margin: 0 0 25px 0;
+		#whiteboard-frame {
+			width: 100%;
+			height: 700px;
+			margin-bottom: 20px;
+			border: 1px solid #c1c1c1;
 		}
 	</style>
 	<script type="text/javascript">
@@ -78,12 +81,6 @@
 			</lams:TabBodys>
 				
 			<!-- Button Row -->
-			<%--  Default value 
-				cancelButtonLabelKey="label.authoring.cancel.button"
-				saveButtonLabelKey="label.authoring.save.button"
-				cancelConfirmMsgKey="authoring.msg.cancel.save"
-				accessMode="author"
-			--%>
 			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
 				toolSignature="<%=WhiteboardConstants.TOOL_SIGNATURE%>" toolContentID="${authoringForm.whiteboard.contentId}" 
 				 customiseSessionID="${authoringForm.sessionMapID}" accessMode="${mode}" defineLater="${mode=='teacher'}"
