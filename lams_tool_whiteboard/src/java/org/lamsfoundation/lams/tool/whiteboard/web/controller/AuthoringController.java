@@ -32,12 +32,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.whiteboard.WhiteboardConstants;
 import org.lamsfoundation.lams.tool.whiteboard.model.Whiteboard;
+import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardConfigItem;
 import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardUser;
 import org.lamsfoundation.lams.tool.whiteboard.service.IWhiteboardService;
+import org.lamsfoundation.lams.tool.whiteboard.service.WhiteboardApplicationException;
 import org.lamsfoundation.lams.tool.whiteboard.web.form.WhiteboardForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
@@ -139,16 +142,19 @@ public class AuthoringController {
 	sessionMap.put(WhiteboardConstants.ATTR_RESOURCE_FORM, authoringForm);
 	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
 		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
+
 	return "pages/authoring/start";
     }
 
     /**
      * Display same entire authoring page content from HttpSession variable.
+     *
+     * @throws WhiteboardApplicationException
      */
 
     @RequestMapping("/init")
     private String initPage(@ModelAttribute("authoringForm") WhiteboardForm authoringForm, HttpServletRequest request)
-	    throws ServletException {
+	    throws ServletException, WhiteboardApplicationException {
 	String sessionMapID = WebUtil.readStrParam(request, WhiteboardConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -163,6 +169,31 @@ public class AuthoringController {
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 	authoringForm.setMode(mode.toString());
+
+	WhiteboardConfigItem whiteboardServerUrlConfigItem = whiteboardService
+		.getConfigItem(WhiteboardConfigItem.KEY_SERVER_URL);
+	if (whiteboardServerUrlConfigItem == null
+		|| StringUtils.isBlank(whiteboardServerUrlConfigItem.getConfigValue())) {
+	    throw new WhiteboardApplicationException(
+		    "Whiteboard server URL is not configured on sysadmin tool management page");
+	}
+	String whiteboardServerUrl = whiteboardServerUrlConfigItem.getConfigValue();
+	if (whiteboardServerUrl.contains(WhiteboardConfigItem.SERVER_URL_PLACEHOLDER)) {
+	    String lamsServerUrl = WebUtil.getBaseServerURL();
+	    if (lamsServerUrl.contains(":")) {
+		lamsServerUrl = lamsServerUrl.substring(0, lamsServerUrl.lastIndexOf(':'));
+	    }
+	    whiteboardServerUrl = whiteboardServerUrl.replace(WhiteboardConfigItem.SERVER_URL_PLACEHOLDER,
+		    lamsServerUrl);
+	}
+	request.setAttribute("whiteboardServerUrl", whiteboardServerUrl);
+
+	WhiteboardConfigItem whiteboardAccessTokenConfigItem = whiteboardService
+		.getConfigItem(WhiteboardConfigItem.KEY_ACCESS_TOKEN);
+	if (whiteboardAccessTokenConfigItem != null
+		&& StringUtils.isNotBlank(whiteboardAccessTokenConfigItem.getConfigValue())) {
+	    request.setAttribute("whiteboardAccessToken", whiteboardAccessTokenConfigItem.getConfigValue());
+	}
 
 	return "pages/authoring/authoring";
     }

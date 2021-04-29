@@ -32,6 +32,7 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.tool.whiteboard.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.whiteboard.model.Whiteboard;
+import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardConfigItem;
 import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardSession;
 import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardUser;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -125,4 +126,8 @@ public interface IWhiteboardService extends ICommonToolService {
     void changeLeaderForGroup(long toolSessionId, long leaderUserId);
 
     Grouping getGrouping(long toolContentId);
+
+    WhiteboardConfigItem getConfigItem(String key);
+
+    void saveOrUpdateScratchieConfigItem(WhiteboardConfigItem item);
 }

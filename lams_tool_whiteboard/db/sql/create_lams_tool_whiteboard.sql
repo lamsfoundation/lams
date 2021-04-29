@@ -55,6 +55,13 @@ CREATE TABLE tl_lawhiteboard11_time_limit (
 	CONSTRAINT FK_tl_lawhiteboard11_time_limit_2 FOREIGN KEY (user_id)
 		REFERENCES lams_user (user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+CREATE TABLE tl_lawhiteboard11_configuration (
+  uid TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  config_key varchar(30) NOT NULL,
+  config_value varchar(255),
+  PRIMARY KEY (uid),
+  UNIQUE KEY UQ_tl_lawhiteboard11_configuration_config_key (config_key)
+) ENGINE=InnoDB;
 
 ALTER TABLE tl_lawhiteboard11_whiteboard ADD CONSTRAINT FK_tl_lawhiteboard11_whiteboard_1 FOREIGN KEY (create_by) REFERENCES tl_lawhiteboard11_user (uid)  ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE tl_lawhiteboard11_session ADD CONSTRAINT FK_tl_lawhiteboard11_session_2 FOREIGN KEY (whiteboard_uid) REFERENCES tl_lawhiteboard11_whiteboard (uid) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -67,5 +74,9 @@ ALTER TABLE tl_lawhiteboard11_session ADD CONSTRAINT tl_lawhiteboard11_session_2
 INSERT INTO `tl_lawhiteboard11_whiteboard` (`uid`, `create_date`, `update_date`, `create_by`, `title`, `lock_on_finished`,
  `instructions`, `content_in_use`, `define_later`, `content_id`, `use_select_leader_tool_ouput`, `reflect_on_activity`) VALUES
   (1,NULL,NULL,NULL,'Whiteboard','0','Instructions',0,0,${default_content_id},0,0);
+  
+INSERT INTO tl_lawhiteboard11_configuration (config_key, config_value) VALUES
+('ServerURL', '<LAMS_SERVER_URL>:9003');
+  
   
 SET FOREIGN_KEY_CHECKS=1;

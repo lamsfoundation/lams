@@ -30,6 +30,11 @@
             <ref bean="coreSessionFactory"/>
         </property>
     </bean>
+    <bean id="whiteboardConfigItemDao" class="org.lamsfoundation.lams.tool.whiteboard.dao.hibernate.WhiteboardConfigItemDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
     <bean id="whiteboardOutputFactory" class="org.lamsfoundation.lams.tool.whiteboard.service.WhiteboardOutputFactory">  
     	<property name="toolMessageService"><ref bean="whiteboardMessageService"/></property>  
 	</bean> 
@@ -50,6 +55,9 @@
         </property>
         <property name="whiteboardSessionDao">
             <ref bean="whiteboardSessionDao"/>
+        </property>
+        <property name="whiteboardConfigItemDao">
+            <ref bean="whiteboardConfigItemDao"/>
         </property>
         <property name="whiteboardToolContentHandler">
             <ref bean="whiteboardToolContentHandler"/>

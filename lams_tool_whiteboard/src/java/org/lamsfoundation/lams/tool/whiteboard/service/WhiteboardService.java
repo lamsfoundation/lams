@@ -61,11 +61,13 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.whiteboard.WhiteboardConstants;
+import org.lamsfoundation.lams.tool.whiteboard.dao.WhiteboardConfigItemDAO;
 import org.lamsfoundation.lams.tool.whiteboard.dao.WhiteboardDAO;
 import org.lamsfoundation.lams.tool.whiteboard.dao.WhiteboardSessionDAO;
 import org.lamsfoundation.lams.tool.whiteboard.dao.WhiteboardUserDAO;
 import org.lamsfoundation.lams.tool.whiteboard.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.whiteboard.model.Whiteboard;
+import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardConfigItem;
 import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardSession;
 import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardUser;
 import org.lamsfoundation.lams.tool.whiteboard.web.controller.LearningWebsocketServer;
@@ -85,6 +87,8 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
     private WhiteboardUserDAO whiteboardUserDao;
 
     private WhiteboardSessionDAO whiteboardSessionDao;
+
+    private WhiteboardConfigItemDAO whiteboardConfigItemDao;
 
     private IToolContentHandler whiteboardToolContentHandler;
 
@@ -425,6 +429,16 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	learnerService.createCommandForLearners(whiteboard.getContentId(), userIds, jsonCommand.toString());
     }
 
+    @Override
+    public WhiteboardConfigItem getConfigItem(String key) {
+	return whiteboardConfigItemDao.getConfigItemByKey(key);
+    }
+
+    @Override
+    public void saveOrUpdateScratchieConfigItem(WhiteboardConfigItem item) {
+	whiteboardConfigItemDao.saveOrUpdate(item);
+    }
+
     // *****************************************************************************
     // private methods
     // *****************************************************************************
@@ -763,6 +777,10 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 
     public void setWhiteboardSessionDao(WhiteboardSessionDAO whiteboardSessionDao) {
 	this.whiteboardSessionDao = whiteboardSessionDao;
+    }
+
+    public void setWhiteboardConfigItemDao(WhiteboardConfigItemDAO whiteboardConfigItemDao) {
+	this.whiteboardConfigItemDao = whiteboardConfigItemDao;
     }
 
     public void setWhiteboardToolContentHandler(IToolContentHandler whiteboardToolContentHandler) {

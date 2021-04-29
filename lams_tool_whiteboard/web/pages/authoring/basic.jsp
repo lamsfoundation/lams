@@ -17,5 +17,5 @@
 </div>
 
 <iframe id="whiteboard-frame"
-        src="http://localhost:9003?accesstoken=123&whiteboardid=${authoringForm.whiteboard.contentId}&username=${authoringForm.authorName}">
+        src='${whiteboardServerUrl}?whiteboardid=${authoringForm.whiteboard.contentId}&username=${authoringForm.authorName}${empty whiteboardAccessToken ? "" : "&accesstoken=" + whiteboardAccessToken}'>
 </iframe>
