@@ -129,5 +129,5 @@ public interface IWhiteboardService extends ICommonToolService {
 
     WhiteboardConfigItem getConfigItem(String key);
 
-    void saveOrUpdateScratchieConfigItem(WhiteboardConfigItem item);
+    void saveOrUpdateWhiteboardConfigItem(WhiteboardConfigItem item);
 }

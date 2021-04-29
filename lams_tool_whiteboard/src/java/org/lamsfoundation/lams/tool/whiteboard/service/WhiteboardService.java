@@ -435,7 +435,7 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
     }
 
     @Override
-    public void saveOrUpdateScratchieConfigItem(WhiteboardConfigItem item) {
+    public void saveOrUpdateWhiteboardConfigItem(WhiteboardConfigItem item) {
 	whiteboardConfigItemDao.saveOrUpdate(item);
     }
 

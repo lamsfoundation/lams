@@ -37,7 +37,7 @@ public class WhiteboardConfigItem implements java.io.Serializable {
     public static final String KEY_SERVER_URL = "ServerURL";
     public static final String KEY_ACCESS_TOKEN = "AccessToken";
     
-    public static final String SERVER_URL_PLACEHOLDER = "<LAMS_SERVER_URL>";
+    public static final String SERVER_URL_PLACEHOLDER = "[LAMS_SERVER_URL]";
 
     @Id
     @Column(name = "uid")
