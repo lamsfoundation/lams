@@ -36,7 +36,6 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.whiteboard.WhiteboardConstants;
 import org.lamsfoundation.lams.tool.whiteboard.model.Whiteboard;
-import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardConfigItem;
 import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardUser;
 import org.lamsfoundation.lams.tool.whiteboard.service.IWhiteboardService;
 import org.lamsfoundation.lams.tool.whiteboard.service.WhiteboardApplicationException;
@@ -166,11 +165,14 @@ public class AuthoringController {
 	String whiteboardServerUrl = whiteboardService.getWhiteboardServerUrl();
 	request.setAttribute("whiteboardServerUrl", whiteboardServerUrl);
 
-	WhiteboardConfigItem whiteboardAccessTokenConfigItem = whiteboardService
-		.getConfigItem(WhiteboardConfigItem.KEY_ACCESS_TOKEN);
-	if (whiteboardAccessTokenConfigItem != null
-		&& StringUtils.isNotBlank(whiteboardAccessTokenConfigItem.getConfigValue())) {
-	    request.setAttribute("whiteboardAccessToken", whiteboardAccessTokenConfigItem.getConfigValue());
+	String wid = authoringForm.getWhiteboard().getContentId().toString();
+	String whiteboardAccessTokenHash = whiteboardService.getWhiteboardAccessTokenHash(wid, null);
+	request.setAttribute("whiteboardAccessToken", whiteboardAccessTokenHash);
+
+	if (StringUtils.isNotBlank(authoringForm.getWhiteboard().getSourceWid())) {
+	    String whiteboardCopyAccessTokenHash = whiteboardService.getWhiteboardAccessTokenHash(wid,
+		    authoringForm.getWhiteboard().getSourceWid());
+	    request.setAttribute("whiteboardCopyAccessToken", whiteboardCopyAccessTokenHash);
 	}
 
 	return "pages/authoring/authoring";
@@ -207,16 +209,16 @@ public class AuthoringController {
 	    // get back UID
 	    whiteboardPO.setUid(uid);
 
-	    // if whiteboard canvas was copied from another Learning Design,
-	    // not it becomes the source, i.e. does not copy from anything anymore
-	    whiteboardPO.setSourceWid(null);
-
 	    // if it's a teacher - change define later status
 	    if (mode.isTeacher()) {
 		whiteboardPO.setDefineLater(false);
 	    }
 	    whiteboardPO.setUpdated(new Timestamp(new Date().getTime()));
 	}
+
+	// if whiteboard canvas was copied from another Learning Design,
+	// not it becomes the source, i.e. does not copy from anything anymore
+	whiteboardPO.setSourceWid(null);
 
 	// *******************************Handle user*******************
 	// try to get form system session

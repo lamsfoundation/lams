@@ -134,8 +134,6 @@ public class Whiteboard implements Cloneable {
 	Whiteboard toContent = new Whiteboard();
 	toContent = (Whiteboard) defaultContent.clone();
 	toContent.setContentId(contentId);
-	// copy whiteboard canvas on next open
-	toContent.setSourceWid(defaultContent.getContentId().toString());
 
 	return toContent;
     }

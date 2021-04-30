@@ -464,6 +464,22 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	return whiteboardServerUrl;
     }
 
+    @Override
+    public String getWhiteboardAccessTokenHash(String wid, String sourceWid) {
+	if (StringUtils.isBlank(wid)) {
+	    return null;
+	}
+	WhiteboardConfigItem whiteboardAccessTokenConfigItem = getConfigItem(WhiteboardConfigItem.KEY_ACCESS_TOKEN);
+	if (whiteboardAccessTokenConfigItem == null
+		|| StringUtils.isBlank(whiteboardAccessTokenConfigItem.getConfigValue())) {
+	    return null;
+	}
+	// sourceWid is present when we want to copy content from other canvas
+	String plainText = (StringUtils.isBlank(sourceWid) ? "" : sourceWid) + wid
+		+ whiteboardAccessTokenConfigItem.getConfigValue();
+	return String.valueOf(plainText.hashCode());
+    }
+
     public static String getWhiteboardAuthorName(UserDTO user) throws UnsupportedEncodingException {
 	if (user == null) {
 	    return null;
@@ -610,6 +626,8 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	}
 
 	Whiteboard toContent = Whiteboard.newInstance(whiteboard, toContentId);
+	// copy whiteboard canvas on next open
+	toContent.setSourceWid(whiteboard.getContentId().toString());
 	whiteboardDao.insert(toContent);
 
 	if (toContent.isGalleryWalkEnabled() && !toContent.isGalleryWalkReadOnly()) {

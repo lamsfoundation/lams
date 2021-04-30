@@ -37,6 +37,7 @@ if (urlParams.get("whiteboardid") !== whiteboardId) {
 const myUsername = urlParams.get("username") || "unknown" + (Math.random() + "").substring(2, 6);
 const accessToken = urlParams.get("accesstoken") || "";
 const copyfromwid = urlParams.get("copyfromwid") || "";
+const copyaccesstoken = urlParams.get("copyaccesstoken") || "";
 
 // Custom Html Title
 const title = urlParams.get("title");
@@ -176,7 +177,10 @@ function initWhiteboard() {
                     // Copy from witheboard if current is empty and get parameter is given
                     $.get(subdir + "/api/loadwhiteboard", {
                         wid: copyfromwid,
-                        at: accessToken,
+						// needed for checking hash
+						targetWid: whiteboardId,
+						// this is not the main access token, but a special one just for this operation
+                        at: copyaccesstoken,
                     }).done(function (originalData) {
 						console.log(originalData);
 						console.log(data);

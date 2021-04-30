@@ -132,4 +132,6 @@ public interface IWhiteboardService extends ICommonToolService {
     void saveOrUpdateWhiteboardConfigItem(WhiteboardConfigItem item);
 
     String getWhiteboardServerUrl() throws WhiteboardApplicationException;
+
+    String getWhiteboardAccessTokenHash(String wid, String sourceWid);
 }

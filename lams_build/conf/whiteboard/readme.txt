@@ -12,3 +12,5 @@ Current version is 1.6 with all changes up to date 2021-04-23
        There is also some processing of source data - all images are put in background, so target canvas' drawings go on top.
 
    3.2 In server.js we set up default port to 9003 instead of 8080, so it does not collide with WildFly development mode.
+   
+   3.3 In server-backend.js we introduce hashing of wid + accesstoken to improve security

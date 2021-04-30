@@ -216,7 +216,7 @@
 		
 
 		<iframe id="whiteboard-frame"
-		        src='${whiteboardServerUrl}?whiteboardid=${whiteboard.contentId}_${toolSessionID}&username=${whiteboardAuthorName}${empty whiteboardAccessToken ? "" : "&accesstoken=".concat(whiteboardAccessToken)}${empty whiteboard.sourceWid ? "" : "&copyfromwid=".concat(whiteboard.sourceWid)}'>
+		        src='${whiteboardServerUrl}?whiteboardid=${whiteboard.contentId}-${toolSessionID}&username=${whiteboardAuthorName}${empty whiteboardAccessToken ? "" : "&accesstoken=".concat(whiteboardAccessToken)}${empty whiteboard.sourceWid ? "" : "&copyfromwid=".concat(whiteboard.sourceWid).concat("&copyaccesstoken=").concat(whiteboardCopyAccessToken)}'>
 		</iframe>
 
 		<!-- Reflection -->
