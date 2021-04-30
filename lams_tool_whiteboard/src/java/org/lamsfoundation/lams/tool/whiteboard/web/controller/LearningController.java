@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.whiteboard.web.controller;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -44,6 +45,7 @@ import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardSession;
 import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardUser;
 import org.lamsfoundation.lams.tool.whiteboard.service.IWhiteboardService;
 import org.lamsfoundation.lams.tool.whiteboard.service.WhiteboardApplicationException;
+import org.lamsfoundation.lams.tool.whiteboard.service.WhiteboardService;
 import org.lamsfoundation.lams.tool.whiteboard.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -74,10 +76,12 @@ public class LearningController {
      *
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
      *
+     * @throws UnsupportedEncodingException
+     *
      */
     @RequestMapping("/start")
     private String start(HttpServletRequest request, HttpServletResponse response)
-	    throws WhiteboardApplicationException {
+	    throws WhiteboardApplicationException, UnsupportedEncodingException {
 
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
@@ -94,13 +98,12 @@ public class LearningController {
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 	// get back login user DTO
 	HttpSession ss = SessionManager.getSession();
-	UserDTO currentUserDto = null;
+	UserDTO currentUserDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	if ((mode != null) && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
 	    // whiteboardUser may be null if the user was force completed.
 	    user = getSpecifiedUser(toolSessionId, WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
 	} else {
-	    currentUserDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    user = whiteboardService.getUserByIDAndSession(currentUserDto.getUserID().longValue(), toolSessionId);
 	    if (user == null) {
 		user = new WhiteboardUser(currentUserDto, session);
@@ -208,6 +211,12 @@ public class LearningController {
 	//time limit
 	boolean isTimeLimitExceeded = whiteboardService.checkTimeLimitExceeded(whiteboard, user.getUserId().intValue());
 	request.setAttribute("timeLimitExceeded", isTimeLimitExceeded);
+
+	String whiteboardServerUrl = whiteboardService.getWhiteboardServerUrl();
+	request.setAttribute("whiteboardServerUrl", whiteboardServerUrl);
+
+	String authorName = WhiteboardService.getWhiteboardAuthorName(currentUserDto);
+	request.setAttribute("whiteboardAuthorName", authorName);
 
 	return "pages/learning/learning";
     }

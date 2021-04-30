@@ -24,6 +24,8 @@
 package org.lamsfoundation.lams.tool.whiteboard.service;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.security.InvalidParameterException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -34,6 +36,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -74,7 +77,9 @@ import org.lamsfoundation.lams.tool.whiteboard.web.controller.LearningWebsocketS
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.WebUtil;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -437,6 +442,44 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
     @Override
     public void saveOrUpdateWhiteboardConfigItem(WhiteboardConfigItem item) {
 	whiteboardConfigItemDao.saveOrUpdate(item);
+    }
+
+    @Override
+    public String getWhiteboardServerUrl() throws WhiteboardApplicationException {
+	WhiteboardConfigItem whiteboardServerUrlConfigItem = getConfigItem(WhiteboardConfigItem.KEY_SERVER_URL);
+	if (whiteboardServerUrlConfigItem == null
+		|| StringUtils.isBlank(whiteboardServerUrlConfigItem.getConfigValue())) {
+	    throw new WhiteboardApplicationException(
+		    "Whiteboard server URL is not configured on sysadmin tool management page");
+	}
+	String whiteboardServerUrl = whiteboardServerUrlConfigItem.getConfigValue();
+	if (whiteboardServerUrl.contains(WhiteboardConfigItem.SERVER_URL_PLACEHOLDER)) {
+	    String lamsServerUrl = WebUtil.getBaseServerURL();
+	    if (lamsServerUrl.contains(":")) {
+		lamsServerUrl = lamsServerUrl.substring(0, lamsServerUrl.lastIndexOf(':'));
+	    }
+	    whiteboardServerUrl = whiteboardServerUrl.replace(WhiteboardConfigItem.SERVER_URL_PLACEHOLDER,
+		    lamsServerUrl);
+	}
+	return whiteboardServerUrl;
+    }
+
+    public static String getWhiteboardAuthorName(UserDTO user) throws UnsupportedEncodingException {
+	if (user == null) {
+	    return null;
+	}
+	StringBuilder authorName = new StringBuilder();
+	if (StringUtils.isNotBlank(user.getFirstName())) {
+	    authorName.append(user.getFirstName());
+	}
+	if (StringUtils.isNotBlank(user.getLastName())) {
+	    if (authorName.length() > 0) {
+		authorName.append(" ");
+	    }
+	    authorName.append(user.getLastName());
+	}
+	return URLEncoder.encode(authorName.length() == 0 ? user.getLogin() : authorName.toString(),
+		FileUtil.ENCODING_UTF_8);
     }
 
     // *****************************************************************************

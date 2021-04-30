@@ -23,7 +23,6 @@
 
 package org.lamsfoundation.lams.tool.whiteboard.web.controller;
 
-import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -41,10 +40,10 @@ import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardConfigItem;
 import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardUser;
 import org.lamsfoundation.lams.tool.whiteboard.service.IWhiteboardService;
 import org.lamsfoundation.lams.tool.whiteboard.service.WhiteboardApplicationException;
+import org.lamsfoundation.lams.tool.whiteboard.service.WhiteboardService;
 import org.lamsfoundation.lams.tool.whiteboard.web.form.WhiteboardForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
-import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -123,17 +122,11 @@ public class AuthoringController {
 
 	    authoringForm.setWhiteboard(whiteboard);
 
-	    String authorName = null;
-	    if (whiteboard.getCreatedBy() == null) {
-		HttpSession ss = SessionManager.getSession();
-		// get back login user DTO
-		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		authorName = user.getFirstName() + " " + user.getLastName();
-	    } else {
-		authorName = whiteboard.getCreatedBy().getFirstName() + " " + whiteboard.getCreatedBy().getLastName();
-	    }
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    String authorName = WhiteboardService.getWhiteboardAuthorName(user);
+	    authoringForm.setAuthorName(authorName);
 
-	    authoringForm.setAuthorName(URLEncoder.encode(authorName, FileUtil.ENCODING_UTF_8));
 	} catch (Exception e) {
 	    AuthoringController.log.error(e);
 	    throw new ServletException(e);
@@ -170,22 +163,7 @@ public class AuthoringController {
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 	authoringForm.setMode(mode.toString());
 
-	WhiteboardConfigItem whiteboardServerUrlConfigItem = whiteboardService
-		.getConfigItem(WhiteboardConfigItem.KEY_SERVER_URL);
-	if (whiteboardServerUrlConfigItem == null
-		|| StringUtils.isBlank(whiteboardServerUrlConfigItem.getConfigValue())) {
-	    throw new WhiteboardApplicationException(
-		    "Whiteboard server URL is not configured on sysadmin tool management page");
-	}
-	String whiteboardServerUrl = whiteboardServerUrlConfigItem.getConfigValue();
-	if (whiteboardServerUrl.contains(WhiteboardConfigItem.SERVER_URL_PLACEHOLDER)) {
-	    String lamsServerUrl = WebUtil.getBaseServerURL();
-	    if (lamsServerUrl.contains(":")) {
-		lamsServerUrl = lamsServerUrl.substring(0, lamsServerUrl.lastIndexOf(':'));
-	    }
-	    whiteboardServerUrl = whiteboardServerUrl.replace(WhiteboardConfigItem.SERVER_URL_PLACEHOLDER,
-		    lamsServerUrl);
-	}
+	String whiteboardServerUrl = whiteboardService.getWhiteboardServerUrl();
 	request.setAttribute("whiteboardServerUrl", whiteboardServerUrl);
 
 	WhiteboardConfigItem whiteboardAccessTokenConfigItem = whiteboardService
@@ -228,6 +206,10 @@ public class AuthoringController {
 	    whiteboard = null;
 	    // get back UID
 	    whiteboardPO.setUid(uid);
+
+	    // if whiteboard canvas was copied from another Learning Design,
+	    // not it becomes the source, i.e. does not copy from anything anymore
+	    whiteboardPO.setSourceWid(null);
 
 	    // if it's a teacher - change define later status
 	    if (mode.isTeacher()) {

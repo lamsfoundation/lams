@@ -29,9 +29,12 @@
 			color:#47bc23;
 			text-align: center;
 		}
-		
-		.lower-to-fit-countdown {
-			margin-top: 55px;
+				
+		#whiteboard-frame {
+			width: 100%;
+			height: 700px;
+			margin-bottom: 20px;
+			border: 1px solid #c1c1c1;
 		}
 	</style>
 
@@ -209,13 +212,12 @@
 
 		<lams:errors/>
 		
-		<p><c:out value="${whiteboard.description}" escapeXml="false" /></p>
+		<p><c:out value="${whiteboard.instructions}" escapeXml="false" /></p>
 		
-		<div id="whiteboard-panel" class='panel panel-default'>			
-			<div id="whiteboard-container"></div>
-			<div id="whiteboard-containera"></div>
-			<div id="whiteboard-containerb"></div>
-		</div>
+
+		<iframe id="whiteboard-frame"
+		        src='${whiteboardServerUrl}?whiteboardid=${whiteboard.contentId}_${toolSessionID}&username=${whiteboardAuthorName}${empty whiteboardAccessToken ? "" : "&accesstoken=".concat(whiteboardAccessToken)}${empty whiteboard.sourceWid ? "" : "&copyfromwid=".concat(whiteboard.sourceWid)}'>
+		</iframe>
 
 		<!-- Reflection -->
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">

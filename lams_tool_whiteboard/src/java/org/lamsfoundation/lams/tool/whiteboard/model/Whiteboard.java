@@ -60,6 +60,9 @@ public class Whiteboard implements Cloneable {
     @Column(name = "content_id")
     private Long contentId;
 
+    @Column(name = "source_wid")
+    private String sourceWid;
+
     @Column
     private String title;
 
@@ -131,6 +134,8 @@ public class Whiteboard implements Cloneable {
 	Whiteboard toContent = new Whiteboard();
 	toContent = (Whiteboard) defaultContent.clone();
 	toContent.setContentId(contentId);
+	// copy whiteboard canvas on next open
+	toContent.setSourceWid(defaultContent.getContentId().toString());
 
 	return toContent;
     }
@@ -225,6 +230,14 @@ public class Whiteboard implements Cloneable {
 
     public void setUid(Long uid) {
 	this.uid = uid;
+    }
+
+    public String getSourceWid() {
+	return sourceWid;
+    }
+
+    public void setSourceWid(String sourceWid) {
+	this.sourceWid = sourceWid;
     }
 
     /**
