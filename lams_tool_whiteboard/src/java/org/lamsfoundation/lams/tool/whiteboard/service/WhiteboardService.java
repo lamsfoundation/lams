@@ -24,8 +24,12 @@
 package org.lamsfoundation.lams.tool.whiteboard.service;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.security.InvalidParameterException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,6 +40,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
@@ -78,6 +83,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 
@@ -478,6 +484,41 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	String plainText = (StringUtils.isBlank(sourceWid) ? "" : sourceWid) + wid
 		+ whiteboardAccessTokenConfigItem.getConfigValue();
 	return String.valueOf(plainText.hashCode());
+    }
+
+    @Override
+    public String getWhiteboardReadOnlyWid(String wid) throws WhiteboardApplicationException {
+	if (StringUtils.isBlank(wid)) {
+	    return null;
+	}
+	// using Whiteboard API from https://cloud13.de/testwhiteboard/apidoc/index.html
+	String whiteboardServerUrl = getWhiteboardServerUrl();
+	StringBuilder url = new StringBuilder().append(whiteboardServerUrl).append("/api/getReadOnlyWid?wid=").append(wid);
+	String whiteboardAccessToken = getWhiteboardAccessTokenHash(wid, null);
+	if (whiteboardAccessToken != null) {
+	    url.append("&at=").append(whiteboardAccessToken);
+	}
+
+	try {
+	    HttpURLConnection connection = HttpUrlConnectionUtil.getConnection(url.toString());
+	    connection.connect();
+	    int code = connection.getResponseCode();
+	    if (code != 200) {
+		throw new IOException(
+			"When getting Whiteboard read-only ID for wid " + wid + " server responded with code " + code);
+	    }
+
+	    InputStream responseStream = connection.getInputStream();
+	    if (responseStream != null) {
+		StringWriter writer = new StringWriter();
+		IOUtils.copy(responseStream, writer, Charset.defaultCharset());
+		return writer.toString();
+	    }
+	} catch (IOException e) {
+	    throw new WhiteboardApplicationException("Could not get Whiteboard read-only ID for wid: " + wid, e);
+	}
+
+	return null;
     }
 
     public static String getWhiteboardAuthorName(UserDTO user) throws UnsupportedEncodingException {

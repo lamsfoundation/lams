@@ -219,7 +219,13 @@ public class LearningController {
 	String whiteboardAuthorName = WhiteboardService.getWhiteboardAuthorName(currentUserDto);
 	request.setAttribute("whiteboardAuthorName", whiteboardAuthorName);
 
+	// This is just a convention used for Whiteboard canvases in lessons.
+	// Authored canvases are recognised by their corresponding tool content ID without session ID part.
 	String wid = whiteboard.getContentId() + "-" + toolSessionId;
+	if (!hasEditRight) {
+	    wid = whiteboardService.getWhiteboardReadOnlyWid(wid);
+	}
+	request.setAttribute("wid", wid);
 	String whiteboardAccessTokenHash = whiteboardService.getWhiteboardAccessTokenHash(wid, null);
 	request.setAttribute("whiteboardAccessToken", whiteboardAccessTokenHash);
 

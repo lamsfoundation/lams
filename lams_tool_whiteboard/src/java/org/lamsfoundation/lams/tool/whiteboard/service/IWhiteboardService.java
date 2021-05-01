@@ -134,4 +134,6 @@ public interface IWhiteboardService extends ICommonToolService {
     String getWhiteboardServerUrl() throws WhiteboardApplicationException;
 
     String getWhiteboardAccessTokenHash(String wid, String sourceWid);
+
+    String getWhiteboardReadOnlyWid(String wid) throws WhiteboardApplicationException;
 }
