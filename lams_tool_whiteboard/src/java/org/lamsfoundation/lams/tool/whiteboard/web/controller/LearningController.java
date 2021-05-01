@@ -246,10 +246,12 @@ public class LearningController {
 
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	// boolean isLeaderResponseFinalized = whiteboardService.isLeaderResponseFinalized(toolSessionId);
+	WhiteboardSession session = whiteboardService.getWhiteboardSessionBySessionId(toolSessionId);
+	boolean isLeaderResponseFinalized = session != null && session.getGroupLeader() != null
+		&& session.getGroupLeader().isSessionFinished();
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	// responseJSON.put(WhiteboardConstants.ATTR_IS_LEADER_RESPONSE_FINALIZED, isLeaderResponseFinalized);
+	responseJSON.put(WhiteboardConstants.ATTR_IS_LEADER_RESPONSE_FINALIZED, isLeaderResponseFinalized);
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(responseJSON);
 	return responseJSON.toString();
@@ -257,12 +259,6 @@ public class LearningController {
 
     /**
      * Finish learning session.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/finish")
     private String finish(HttpServletRequest request) {
@@ -281,7 +277,7 @@ public class LearningController {
 	try {
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    Long userID = new Long(user.getUserID().longValue());
+	    Long userID = user.getUserID().longValue();
 
 	    nextActivityUrl = whiteboardService.finishToolSession(sessionId, userID);
 	    request.setAttribute(WhiteboardConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);

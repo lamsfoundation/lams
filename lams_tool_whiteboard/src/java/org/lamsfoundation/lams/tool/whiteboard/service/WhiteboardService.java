@@ -493,7 +493,8 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	}
 	// using Whiteboard API from https://cloud13.de/testwhiteboard/apidoc/index.html
 	String whiteboardServerUrl = getWhiteboardServerUrl();
-	StringBuilder url = new StringBuilder().append(whiteboardServerUrl).append("/api/getReadOnlyWid?wid=").append(wid);
+	StringBuilder url = new StringBuilder().append(whiteboardServerUrl).append("/api/getReadOnlyWid?wid=")
+		.append(wid);
 	String whiteboardAccessToken = getWhiteboardAccessTokenHash(wid, null);
 	if (whiteboardAccessToken != null) {
 	    url.append("&at=").append(whiteboardAccessToken);
@@ -726,7 +727,6 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (WhiteboardService.log.isDebugEnabled()) {
 	    WhiteboardService.log
@@ -764,14 +764,6 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	Whiteboard whiteboard = whiteboardDao.getByContentId(toolContentId);
 	session.setWhiteboard(whiteboard);
 	whiteboardSessionDao.insert(session);
-
-	//create pad in a try-catch block so it doesn't affect session creation operation
-//	try {
-//	    createPad(whiteboard, session);
-//	} catch (Exception e) {
-//	    log.warn(e.getMessage(), e);
-//	}
-
     }
 
     @Override
