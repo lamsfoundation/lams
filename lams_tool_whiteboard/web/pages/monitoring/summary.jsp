@@ -82,6 +82,13 @@
 	    border: black;
 	    background: white;
 	}
+	
+					
+	.whiteboard-monitoring-summary .whiteboard-frame {
+		width: 100%;
+		height: 700px;
+		border: 1px solid #c1c1c1;
+	}
 </style>
 
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
@@ -106,13 +113,12 @@
 		ALLOW_RERATE = false;
 	
 	$(document).ready(function(){
-		// show etherpads only on Group expand
-		$('#whiteboard-monitoring-summary-${sessionMap.toolContentID} .etherpad-collapse').on('show.bs.collapse', function(){
-			var etherpad = $('.etherpad-container', this);
-			if (!etherpad.hasClass('initialised')) {
-				var id = etherpad.attr('id'),
-					groupId = id.substring('etherpad-container-'.length);
-				etherpadInitMethods[groupId]();
+		// show Whiteboards only on Group expand
+		$('#whiteboard-monitoring-summary-${sessionMap.toolContentID} .whiteboard-collapse').on('show.bs.collapse', function(){
+			var whiteboard = $('.whiteboard-frame', this);
+			if (whiteboard.data('src')) {
+				whiteboard.attr('src', whiteboard.data('src'));
+				whiteboard.data('src', null);
 			}
 		});
 		
@@ -732,8 +738,6 @@
 				<h4>
 				    <c:out value="${whiteboard.title}" escapeXml="true"/>
 				</h4>
-				
-				<c:out value="${whiteboard.description}" escapeXml="false"/>
 			</c:otherwise>
 		</c:choose>
 	
@@ -815,7 +819,7 @@
 					</c:if>
 		        </div>
 		        
-		        <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse etherpad-collapse" 
+		        <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse whiteboard-collapse" 
 		        	 role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
 			</c:when>
 			<c:when test="${whiteboard.useSelectLeaderToolOuput and groupSummary.numberOfLearners > 0 and not groupSummary.sessionFinished}">
@@ -828,38 +832,11 @@
 			</c:when>
 		</c:choose>
 		
-		<c:choose>
-			<c:when test="${groupSummary.sessionFaulty}">
-			
-				<div class="faulty-pad-container">
-					<fmt:message key="label.cant.display.faulty.pad" />
-					
-					<a href="#nogo" class="btn btn-default btn-xs fix-faulty-pad" data-session-id="${groupSummary.sessionId}">
-						<fmt:message key="label.recreate.faulty.pad" />
-					</a>
-				</div>
-										
-			</c:when>
-			<c:otherwise>
-				<c:if test="${whiteboard.galleryWalkStarted and not whiteboard.galleryWalkReadOnly}">
-					<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" isItemAuthoredByUser="true" />
-				</c:if>
-				
-				<div class="btn-group btn-group-xs pull-right">
-					<c:url  var="exportHtmlUrl" value="${etherpadServerUrl}/p/${groupSummary.padId}/export/html"/>
-					<a href="#nogo" onclick="window.location = '${exportHtmlUrl}';" class="btn btn-default btn-sm " 
-							title="<fmt:message key="label.export.pad.html" />">
-						<i class="fa fa-lg fa-file-text-o"></i>
-						<fmt:message key="label.export.pad.html" />
-					</a>
-				</div>	
-				
-				<lams:Etherpad groupId="${groupSummary.sessionId}" padId="${groupSummary.padId}"
-							   showControls="true" showChat="${whiteboard.showChat}" showOnDemand="${sessionMap.isGroupedActivity}"
-							   heightAutoGrow="true" height="600" />	
-			</c:otherwise>
-		</c:choose>
-		
+		<%-- If there is no grouping, data is loaded immediately.
+		     If there is grouping, data is loaded on panel expand. --%>
+		<iframe class="whiteboard-frame"
+				${sessionMap.isGroupedActivity ? "data-" : ""}src='${whiteboardServerUrl}?whiteboardid=${groupSummary.wid}&username=${whiteboardAuthorName}${empty groupSummary.accessToken ? "" : "&accesstoken=".concat(groupSummary.accessToken)}${empty whiteboard.sourceWid ? "" : "&copyfromwid=".concat(whiteboard.sourceWid).concat("&copyaccesstoken=").concat(groupSummary.copyAccessToken)}'>
+		</iframe>		
 	
 		<!-- Editable marks section -->
 		<div class="voffset10">	

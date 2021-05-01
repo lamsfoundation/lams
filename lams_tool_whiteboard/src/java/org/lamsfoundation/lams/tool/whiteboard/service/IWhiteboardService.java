@@ -31,6 +31,7 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.tool.whiteboard.dto.ReflectDTO;
+import org.lamsfoundation.lams.tool.whiteboard.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.whiteboard.model.Whiteboard;
 import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardConfigItem;
 import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardSession;
@@ -114,6 +115,8 @@ public interface IWhiteboardService extends ICommonToolService {
      */
     List<ReflectDTO> getReflectList(Long contentId);
 
+    List<SessionDTO> getSummary(Long contentId, Long ratingUserId);
+
     /**
      * Get user by UID
      */
@@ -136,4 +139,5 @@ public interface IWhiteboardService extends ICommonToolService {
     String getWhiteboardAccessTokenHash(String wid, String sourceWid);
 
     String getWhiteboardReadOnlyWid(String wid) throws WhiteboardApplicationException;
+
 }

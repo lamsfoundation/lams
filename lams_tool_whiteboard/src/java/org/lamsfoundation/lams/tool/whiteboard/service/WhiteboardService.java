@@ -36,8 +36,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -56,6 +58,7 @@ import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
@@ -74,6 +77,7 @@ import org.lamsfoundation.lams.tool.whiteboard.dao.WhiteboardDAO;
 import org.lamsfoundation.lams.tool.whiteboard.dao.WhiteboardSessionDAO;
 import org.lamsfoundation.lams.tool.whiteboard.dao.WhiteboardUserDAO;
 import org.lamsfoundation.lams.tool.whiteboard.dto.ReflectDTO;
+import org.lamsfoundation.lams.tool.whiteboard.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.whiteboard.model.Whiteboard;
 import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardConfigItem;
 import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardSession;
@@ -277,6 +281,64 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
     @Override
     public WhiteboardSession getWhiteboardSessionBySessionId(Long sessionId) {
 	return whiteboardSessionDao.getSessionBySessionId(sessionId);
+    }
+
+    @Override
+    public List<SessionDTO> getSummary(Long contentId, Long ratingUserId) {
+	List<WhiteboardSession> sessionList = whiteboardSessionDao.getByContentId(contentId);
+	Whiteboard whiteboard = whiteboardDao.getByContentId(contentId);
+
+	Map<Long, ItemRatingDTO> itemRatingDtoMap = null;
+	if (whiteboard.isGalleryWalkStarted()) {
+	    if (!whiteboard.isGalleryWalkReadOnly()) {
+		// it should have been created on lesson create,
+		// but in case Live Edit added Gallery Walk, we need to add it now, but just once
+		try {
+		    createGalleryWalkRatingCriterion(whiteboard.getContentId());
+		} catch (Exception e) {
+		    log.warn("Ignoring error while processing Whiteboard Gallery Walk criteria for tool content ID "
+			    + whiteboard.getContentId());
+		}
+	    }
+
+	    // Item IDs are WhiteboardSession session IDs, i.e. a single Whiteboard
+	    Set<Long> itemIds = sessionList.stream()
+		    .collect(Collectors.mapping(WhiteboardSession::getSessionId, Collectors.toSet()));
+
+	    List<ItemRatingDTO> itemRatingDtos = ratingService.getRatingCriteriaDtos(contentId, null, itemIds, false,
+		    ratingUserId);
+	    // Mapping of Item ID -> DTO
+	    itemRatingDtoMap = itemRatingDtos.stream()
+		    .collect(Collectors.toMap(ItemRatingDTO::getItemId, Function.identity()));
+	}
+
+	List<SessionDTO> groupList = new ArrayList<>();
+	for (WhiteboardSession session : sessionList) {
+	    // one new group for one session.
+	    SessionDTO group = new SessionDTO();
+	    group.setSessionId(session.getSessionId());
+	    group.setSessionName(session.getSessionName());
+	    group.setNumberOfLearners(getUsersBySession(session.getSessionId()).size());
+	    group.setSessionFinished(WhiteboardConstants.COMPLETED == session.getStatus());
+
+	    group.setWid(whiteboard.getContentId() + "-" + session.getSessionId());
+	    group.setAccessToken(getWhiteboardAccessTokenHash(group.getWid(), null));
+
+	    if (StringUtils.isNotBlank(whiteboard.getSourceWid())) {
+		String whiteboardCopyAccessToken = getWhiteboardAccessTokenHash(group.getWid(),
+			whiteboard.getSourceWid());
+		// since each wid is different for a different session, copy access token is also different
+		group.setCopyAccessToken(whiteboardCopyAccessToken);
+	    }
+
+	    if (itemRatingDtoMap != null) {
+		group.setItemRatingDto(itemRatingDtoMap.get(session.getSessionId()));
+	    }
+
+	    groupList.add(group);
+	}
+
+	return groupList;
     }
 
     @Override

@@ -4,7 +4,7 @@
 
 <lams:html>
 	<lams:head>
-		<%@ include file="/common/tabbedheader.jsp" %>
+		<%@ include file="/common/header.jsp" %>
 		
 		<style type="text/css">
 			.panel-collapse > .btn-group.btn-group-xs {

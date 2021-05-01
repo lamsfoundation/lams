@@ -28,9 +28,11 @@ public class SessionDTO {
 
     private Long sessionId;
     private String sessionName;
+
     private String wid;
-    private String readOnlyWid;
-    private boolean sessionFaulty;
+    private String accessToken;
+    private String copyAccessToken;
+
     private ItemRatingDTO itemRatingDto;
     private int numberOfLearners;
     private boolean sessionFinished;
@@ -59,20 +61,20 @@ public class SessionDTO {
 	this.wid = padId;
     }
 
-    public String getReadOnlyWid() {
-	return readOnlyWid;
+    public String getAccessToken() {
+	return accessToken;
     }
 
-    public void setReadOnlyWid(String readOnlyPadId) {
-	this.readOnlyWid = readOnlyPadId;
+    public void setAccessToken(String accessToken) {
+	this.accessToken = accessToken;
     }
 
-    public boolean isSessionFaulty() {
-	return sessionFaulty;
+    public String getCopyAccessToken() {
+	return copyAccessToken;
     }
 
-    public void setSessionFaulty(boolean sessionFaulty) {
-	this.sessionFaulty = sessionFaulty;
+    public void setCopyAccessToken(String copyAccessToken) {
+	this.copyAccessToken = copyAccessToken;
     }
 
     public ItemRatingDTO getItemRatingDto() {
@@ -84,18 +86,18 @@ public class SessionDTO {
     }
 
     public int getNumberOfLearners() {
-        return numberOfLearners;
+	return numberOfLearners;
     }
 
     public void setNumberOfLearners(int numberOfLearners) {
-        this.numberOfLearners = numberOfLearners;
+	this.numberOfLearners = numberOfLearners;
     }
 
     public boolean isSessionFinished() {
-        return sessionFinished;
+	return sessionFinished;
     }
 
     public void setSessionFinished(boolean sesssionFinished) {
-        this.sessionFinished = sesssionFinished;
+	this.sessionFinished = sesssionFinished;
     }
 }

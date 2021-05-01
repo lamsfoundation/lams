@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.whiteboard.web.controller;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidParameterException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -51,9 +52,13 @@ import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.tool.whiteboard.WhiteboardConstants;
+import org.lamsfoundation.lams.tool.whiteboard.dto.ReflectDTO;
+import org.lamsfoundation.lams.tool.whiteboard.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.whiteboard.model.Whiteboard;
 import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardUser;
 import org.lamsfoundation.lams.tool.whiteboard.service.IWhiteboardService;
+import org.lamsfoundation.lams.tool.whiteboard.service.WhiteboardApplicationException;
+import org.lamsfoundation.lams.tool.whiteboard.service.WhiteboardService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -63,6 +68,7 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -111,65 +117,50 @@ public class MonitoringController {
     @Qualifier("whiteboardMessageService")
     private MessageService messageService;
 
-    /*
-     * @RequestMapping("/summary")
-     * private String summary(HttpServletRequest request, HttpServletResponse response) throws EtherpadException {
-     * // initial Session Map
-     * SessionMap<String, Object> sessionMap = new SessionMap<>();
-     * request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-     * request.setAttribute(WhiteboardConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-     * // save contentFolderID into session
-     * sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,
-     * WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID, true));
-     * 
-     * Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-     * List<SessionDTO> groupList = whiteboardService.getSummary(contentId, null);
-     * boolean hasFaultySession = false;
-     * int attemptedLearnersNumber = 0;
-     * for (SessionDTO group : groupList) {
-     * hasFaultySession |= group.isSessionFaulty();
-     * attemptedLearnersNumber += group.getNumberOfLearners();
-     * }
-     * 
-     * Whiteboard whiteboard = whiteboardService.getWhiteboardByContentId(contentId);
-     * 
-     * // Create reflectList if reflection is enabled.
-     * if (whiteboard.isReflectOnActivity()) {
-     * List<ReflectDTO> relectList = whiteboardService.getReflectList(contentId);
-     * sessionMap.put(WhiteboardConstants.ATTR_REFLECT_LIST, relectList);
-     * }
-     * 
-     * // cache into sessionMap
-     * sessionMap.put(WhiteboardConstants.ATTR_SUMMARY_LIST, groupList);
-     * sessionMap.put(WhiteboardConstants.ATTR_HAS_FAULTY_SESSION, hasFaultySession);
-     * sessionMap.put(WhiteboardConstants.PAGE_EDITABLE, whiteboard.isContentInUse());
-     * sessionMap.put(WhiteboardConstants.ATTR_WHITEBOARD, whiteboard);
-     * sessionMap.put(WhiteboardConstants.ATTR_TOOL_CONTENT_ID, contentId);
-     * sessionMap.put(WhiteboardConstants.ATTR_IS_GROUPED_ACTIVITY, whiteboardService.isGroupedActivity(contentId));
-     * request.setAttribute("attemptedLearnersNumber", attemptedLearnersNumber);
-     * 
-     * // get the API key from the config table and add it to the session
-     * String etherpadServerUrl = Configuration.get(ConfigurationKeys.ETHERPAD_SERVER_URL);
-     * String etherpadApiKey = Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY);
-     * if (StringUtils.isBlank(etherpadServerUrl) || StringUtils.isBlank(etherpadApiKey)) {
-     * return "pages/learning/notconfigured";
-     * }
-     * request.setAttribute(WhiteboardConstants.KEY_ETHERPAD_SERVER_URL, etherpadServerUrl);
-     * 
-     * HttpSession ss = SessionManager.getSession();
-     * // get back login user DTO
-     * UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-     * 
-     * //no need to store cookie if there are no sessions created yet
-     * if (!groupList.isEmpty()) {
-     * // add new sessionID cookie in order to access pad
-     * Cookie etherpadSessionCookie = whiteboardService.createEtherpadCookieForMonitor(user, contentId);
-     * response.addCookie(etherpadSessionCookie);
-     * }
-     * 
-     * return "pages/monitoring/monitoring";
-     * }
-     */
+    @RequestMapping("/summary")
+    private String summary(HttpServletRequest request, HttpServletResponse response)
+	    throws WhiteboardApplicationException, UnsupportedEncodingException {
+	// initial Session Map
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
+	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	request.setAttribute(WhiteboardConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	// save contentFolderID into session
+	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,
+		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID, true));
+
+	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	List<SessionDTO> groupList = whiteboardService.getSummary(contentId, null);
+	int attemptedLearnersNumber = 0;
+	for (SessionDTO group : groupList) {
+	    attemptedLearnersNumber += group.getNumberOfLearners();
+	}
+
+	Whiteboard whiteboard = whiteboardService.getWhiteboardByContentId(contentId);
+
+	// Create reflectList if reflection is enabled.
+	if (whiteboard.isReflectOnActivity()) {
+	    List<ReflectDTO> relectList = whiteboardService.getReflectList(contentId);
+	    sessionMap.put(WhiteboardConstants.ATTR_REFLECT_LIST, relectList);
+	}
+
+	// cache into sessionMap
+	sessionMap.put(WhiteboardConstants.ATTR_SUMMARY_LIST, groupList);
+	sessionMap.put(WhiteboardConstants.PAGE_EDITABLE, whiteboard.isContentInUse());
+	sessionMap.put(WhiteboardConstants.ATTR_WHITEBOARD, whiteboard);
+	sessionMap.put(WhiteboardConstants.ATTR_TOOL_CONTENT_ID, contentId);
+	sessionMap.put(WhiteboardConstants.ATTR_IS_GROUPED_ACTIVITY, whiteboardService.isGroupedActivity(contentId));
+	request.setAttribute("attemptedLearnersNumber", attemptedLearnersNumber);
+
+	String whiteboardServerUrl = whiteboardService.getWhiteboardServerUrl();
+	request.setAttribute("whiteboardServerUrl", whiteboardServerUrl);
+
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	String authorName = WhiteboardService.getWhiteboardAuthorName(user);
+	request.setAttribute("whiteboardAuthorName", authorName);
+
+	return "pages/monitoring/monitoring";
+    }
 
     @RequestMapping("/getLearnerMarks")
     @ResponseBody
