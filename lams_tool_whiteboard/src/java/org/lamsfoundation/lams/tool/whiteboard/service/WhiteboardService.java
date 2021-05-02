@@ -284,7 +284,7 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
     }
 
     @Override
-    public List<SessionDTO> getSummary(Long contentId, Long ratingUserId) {
+    public List<SessionDTO> getSummary(Long contentId, Long ratingUserId) throws WhiteboardApplicationException {
 	List<WhiteboardSession> sessionList = whiteboardSessionDao.getByContentId(contentId);
 	Whiteboard whiteboard = whiteboardDao.getByContentId(contentId);
 
@@ -321,12 +321,15 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	    group.setNumberOfLearners(getUsersBySession(session.getSessionId()).size());
 	    group.setSessionFinished(WhiteboardConstants.COMPLETED == session.getStatus());
 
-	    group.setWid(whiteboard.getContentId() + "-" + session.getSessionId());
-	    group.setAccessToken(getWhiteboardAccessTokenHash(group.getWid(), null));
+	    String wid = whiteboard.getContentId() + "-" + session.getSessionId();
+	    if (ratingUserId != null) {
+		wid = getWhiteboardReadOnlyWid(wid);
+	    }
+	    group.setWid(wid);
+	    group.setAccessToken(getWhiteboardAccessTokenHash(wid, null));
 
 	    if (StringUtils.isNotBlank(whiteboard.getSourceWid())) {
-		String whiteboardCopyAccessToken = getWhiteboardAccessTokenHash(group.getWid(),
-			whiteboard.getSourceWid());
+		String whiteboardCopyAccessToken = getWhiteboardAccessTokenHash(wid, whiteboard.getSourceWid());
 		// since each wid is different for a different session, copy access token is also different
 		group.setCopyAccessToken(whiteboardCopyAccessToken);
 	    }

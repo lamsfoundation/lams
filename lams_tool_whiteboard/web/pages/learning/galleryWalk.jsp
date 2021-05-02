@@ -39,6 +39,12 @@
 		#gallery-walk-preview-info {
 			margin-bottom: 20px;
 		}
+							
+		.whiteboard-frame {
+			width: 100%;
+			height: 700px;
+			border: 1px solid #c1c1c1;
+		}
 	</style>
 
 	<script type="text/javascript">
@@ -59,6 +65,15 @@
 		
 	    $(document).ready(function(){
 			$('[data-toggle="tooltip"]').bootstrapTooltip();
+			
+			// show Whiteboards only on Group expand
+			$('.whiteboard-collapse').on('show.bs.collapse', function(){
+				var whiteboard = $('.whiteboard-frame', this);
+				if (whiteboard.data('src')) {
+					whiteboard.attr('src', whiteboard.data('src'));
+					whiteboard.data('src', null);
+				}
+			});
 		});
 		
 		function finishSession(){
@@ -82,7 +97,7 @@
 
 	<lams:errors/>
 	
-	<p><c:out value="${whiteboard.description}" escapeXml="false" /></p>
+	<p><c:out value="${whiteboard.instructions}" escapeXml="false" /></p>
 	
 	<c:if test="${not empty whiteboard.galleryWalkInstructions}">
 		<hr>
@@ -153,9 +168,9 @@
 								     isItemAuthoredByUser="${whiteboard.galleryWalkFinished or not hasEditRight or mode == 'teacher'}" />
 		       	    </c:if>
 		 
-<%-- 					<lams:Etherpad groupId="${groupSummary.sessionId}" padId="${groupSummary.readOnlyPadId}" --%>
-<%-- 								   showControls="${not whiteboard.galleryWalkFinished and not whiteboard.galleryWalkReadOnly and hasEditRight}" --%>
-<%-- 								   showOnDemand="true" height="600" />	 --%>
+					<iframe class="whiteboard-frame"
+							data-src='${whiteboardServerUrl}?whiteboardid=${groupSummary.wid}&username=${whiteboardAuthorName}${empty groupSummary.accessToken ? "" : "&accesstoken=".concat(groupSummary.accessToken)}${empty whiteboard.sourceWid ? "" : "&copyfromwid=".concat(whiteboard.sourceWid).concat("&copyaccesstoken=").concat(groupSummary.copyAccessToken)}'>
+					</iframe>	
 				</div>
 			</div>
 		</c:forEach>

@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.whiteboard.WhiteboardConstants;
+import org.lamsfoundation.lams.tool.whiteboard.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.whiteboard.model.Whiteboard;
 import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardSession;
 import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardUser;
@@ -55,6 +56,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.hibernate5.HibernateOptimisticLockingFailureException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -134,8 +136,7 @@ public class LearningController {
 	}
 
 	boolean isUserLeader = user != null && leader != null && user.getUid().equals(leader.getUid());
-	boolean hasEditRight = !whiteboard.isUseSelectLeaderToolOuput()
-		|| whiteboard.isUseSelectLeaderToolOuput() && isUserLeader;
+	boolean hasEditRight = !whiteboard.isUseSelectLeaderToolOuput() || isUserLeader;
 	sessionMap.put(WhiteboardConstants.ATTR_HAS_EDIT_RIGHT, hasEditRight);
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	sessionMap.put(WhiteboardConstants.ATTR_REFLECTION_ON, whiteboard.isReflectOnActivity());
@@ -171,23 +172,22 @@ public class LearningController {
 		}
 	    }
 	}
+	String whiteboardServerUrl = whiteboardService.getWhiteboardServerUrl();
+	request.setAttribute("whiteboardServerUrl", whiteboardServerUrl);
+
+	String whiteboardAuthorName = WhiteboardService.getWhiteboardAuthorName(currentUserDto);
+	request.setAttribute("whiteboardAuthorName", whiteboardAuthorName);
 
 	if (whiteboard.isGalleryWalkStarted()) {
-//	    List<SessionDTO> groupList = null;
-//	    try {
-//		groupList = whiteboardService.getSummary(whiteboard.getContentId(), user.getUserId());
-//	    } catch (HibernateOptimisticLockingFailureException e) {
-//		log.warn("Ignoring error caused probably by creating Gallery Walk criteria", e);
-//		// simply run the transaction again
-//		groupList = whiteboardService.getSummary(whiteboard.getContentId(), user.getUserId());
-//	    }
-//	    request.setAttribute(WhiteboardConstants.ATTR_SUMMARY_LIST, groupList);
-//
-//	    if (currentUserDto == null) {
-//		currentUserDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-//	    }
-//	    Cookie cookie = whiteboardService.createEtherpadCookieForMonitor(currentUserDto, whiteboard.getContentId());
-//	    response.addCookie(cookie);
+	    List<SessionDTO> groupList = null;
+	    try {
+		groupList = whiteboardService.getSummary(whiteboard.getContentId(), user.getUserId());
+	    } catch (HibernateOptimisticLockingFailureException e) {
+		log.warn("Ignoring error caused probably by creating Gallery Walk criteria", e);
+		// simply run the transaction again
+		groupList = whiteboardService.getSummary(whiteboard.getContentId(), user.getUserId());
+	    }
+	    request.setAttribute(WhiteboardConstants.ATTR_SUMMARY_LIST, groupList);
 	    return "pages/learning/galleryWalk";
 	}
 
@@ -213,16 +213,13 @@ public class LearningController {
 	boolean isTimeLimitExceeded = whiteboardService.checkTimeLimitExceeded(whiteboard, user.getUserId().intValue());
 	request.setAttribute("timeLimitExceeded", isTimeLimitExceeded);
 
-	String whiteboardServerUrl = whiteboardService.getWhiteboardServerUrl();
-	request.setAttribute("whiteboardServerUrl", whiteboardServerUrl);
-
-	String whiteboardAuthorName = WhiteboardService.getWhiteboardAuthorName(currentUserDto);
-	request.setAttribute("whiteboardAuthorName", whiteboardAuthorName);
+	//in case of non-leader or finished lock or isTimeLimitExceeded - show Whiteboard in readonly mode
+	boolean readOnly = !hasEditRight || finishedLock || isTimeLimitExceeded;
 
 	// This is just a convention used for Whiteboard canvases in lessons.
 	// Authored canvases are recognised by their corresponding tool content ID without session ID part.
 	String wid = whiteboard.getContentId() + "-" + toolSessionId;
-	if (!hasEditRight) {
+	if (readOnly) {
 	    wid = whiteboardService.getWhiteboardReadOnlyWid(wid);
 	}
 	request.setAttribute("wid", wid);

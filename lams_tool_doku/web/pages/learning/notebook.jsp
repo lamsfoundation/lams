@@ -37,7 +37,7 @@
 			</p>
 
 			<form:textarea cols="60" rows="8" path="entryText"
-				cssClass="text-area" />
+				cssClass="text-area form-control" />
 
 			<div class="space-bottom-top align-right">
 				<a href="#nogo" class="btn btn-primary voffset5 pull-right na" id="finishButton" onclick="submitForm('finish')">

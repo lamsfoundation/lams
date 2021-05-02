@@ -115,7 +115,7 @@ public interface IWhiteboardService extends ICommonToolService {
      */
     List<ReflectDTO> getReflectList(Long contentId);
 
-    List<SessionDTO> getSummary(Long contentId, Long ratingUserId);
+    List<SessionDTO> getSummary(Long contentId, Long ratingUserId) throws WhiteboardApplicationException;
 
     /**
      * Get user by UID

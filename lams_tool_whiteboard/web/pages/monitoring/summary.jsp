@@ -82,7 +82,6 @@
 	    border: black;
 	    background: white;
 	}
-	
 					
 	.whiteboard-monitoring-summary .whiteboard-frame {
 		width: 100%;
