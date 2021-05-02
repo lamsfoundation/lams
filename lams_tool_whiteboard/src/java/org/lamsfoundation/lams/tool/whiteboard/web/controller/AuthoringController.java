@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.whiteboard.WhiteboardConstants;
@@ -169,12 +168,6 @@ public class AuthoringController {
 	String whiteboardAccessTokenHash = whiteboardService.getWhiteboardAccessTokenHash(wid, null);
 	request.setAttribute("whiteboardAccessToken", whiteboardAccessTokenHash);
 
-	if (StringUtils.isNotBlank(authoringForm.getWhiteboard().getSourceWid())) {
-	    String whiteboardCopyAccessTokenHash = whiteboardService.getWhiteboardAccessTokenHash(wid,
-		    authoringForm.getWhiteboard().getSourceWid());
-	    request.setAttribute("whiteboardCopyAccessToken", whiteboardCopyAccessTokenHash);
-	}
-
 	return "pages/authoring/authoring";
     }
 
@@ -215,11 +208,6 @@ public class AuthoringController {
 	    }
 	    whiteboardPO.setUpdated(new Timestamp(new Date().getTime()));
 	}
-
-	// if whiteboard canvas was copied from another Learning Design,
-	// not it becomes the source, i.e. does not copy from anything anymore
-	whiteboardPO.setSourceWid(null);
-
 	// *******************************Handle user*******************
 	// try to get form system session
 	HttpSession ss = SessionManager.getSession();

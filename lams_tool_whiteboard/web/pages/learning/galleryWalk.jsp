@@ -169,7 +169,7 @@
 		       	    </c:if>
 		 
 					<iframe class="whiteboard-frame"
-							data-src='${whiteboardServerUrl}?whiteboardid=${groupSummary.wid}&username=${whiteboardAuthorName}${empty groupSummary.accessToken ? "" : "&accesstoken=".concat(groupSummary.accessToken)}${empty whiteboard.sourceWid ? "" : "&copyfromwid=".concat(whiteboard.sourceWid).concat("&copyaccesstoken=").concat(groupSummary.copyAccessToken)}'>
+							data-src='${whiteboardServerUrl}?whiteboardid=${groupSummary.wid}&username=${whiteboardAuthorName}${empty groupSummary.accessToken ? "" : "&accesstoken=".concat(groupSummary.accessToken)}&copyfromwid=${whiteboard.contentId}${empty whiteboardCopyAccessToken ? "" : "&copyaccesstoken=".concat(groupSummary.copyAccessToken)}'>
 					</iframe>	
 				</div>
 			</div>

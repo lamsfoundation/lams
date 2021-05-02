@@ -35,7 +35,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -226,11 +225,9 @@ public class LearningController {
 	String whiteboardAccessTokenHash = whiteboardService.getWhiteboardAccessTokenHash(wid, null);
 	request.setAttribute("whiteboardAccessToken", whiteboardAccessTokenHash);
 
-	if (StringUtils.isNotBlank(whiteboard.getSourceWid())) {
-	    String whiteboardCopyAccessTokenHash = whiteboardService.getWhiteboardAccessTokenHash(wid,
-		    whiteboard.getSourceWid());
-	    request.setAttribute("whiteboardCopyAccessToken", whiteboardCopyAccessTokenHash);
-	}
+	String whiteboardCopyAccessTokenHash = whiteboardService.getWhiteboardAccessTokenHash(wid,
+		whiteboard.getContentId().toString());
+	request.setAttribute("whiteboardCopyAccessToken", whiteboardCopyAccessTokenHash);
 
 	return "pages/learning/learning";
     }

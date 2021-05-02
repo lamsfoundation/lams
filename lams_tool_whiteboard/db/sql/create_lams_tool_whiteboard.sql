@@ -5,7 +5,6 @@ DROP TABLE IF EXISTS tl_lawhiteboard11_user;
 CREATE TABLE tl_lawhiteboard11_whiteboard (
    uid bigint not null auto_increment,
    content_id bigint unique,
-   source_wid varchar(64),
    create_date datetime,
    update_date datetime,
    create_by bigint,

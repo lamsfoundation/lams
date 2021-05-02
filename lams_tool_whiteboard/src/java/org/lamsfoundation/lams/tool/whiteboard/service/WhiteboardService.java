@@ -328,11 +328,9 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	    group.setWid(wid);
 	    group.setAccessToken(getWhiteboardAccessTokenHash(wid, null));
 
-	    if (StringUtils.isNotBlank(whiteboard.getSourceWid())) {
-		String whiteboardCopyAccessToken = getWhiteboardAccessTokenHash(wid, whiteboard.getSourceWid());
-		// since each wid is different for a different session, copy access token is also different
-		group.setCopyAccessToken(whiteboardCopyAccessToken);
-	    }
+	    String whiteboardCopyAccessToken = getWhiteboardAccessTokenHash(wid, whiteboard.getContentId().toString());
+	    // since each wid is different for a different session, copy access token is also different
+	    group.setCopyAccessToken(whiteboardCopyAccessToken);
 
 	    if (itemRatingDtoMap != null) {
 		group.setItemRatingDto(itemRatingDtoMap.get(session.getSessionId()));
@@ -587,6 +585,33 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	return null;
     }
 
+    private void copyWhiteboardContent(String sourceWid, String targetWid) throws WhiteboardApplicationException {
+	if (StringUtils.isBlank(sourceWid) || StringUtils.isBlank(targetWid)) {
+	    return;
+	}
+	// using Whiteboard API from https://cloud13.de/testwhiteboard/apidoc/index.html
+	String whiteboardServerUrl = getWhiteboardServerUrl();
+	StringBuilder url = new StringBuilder().append(whiteboardServerUrl).append("/api/copywhiteboard?sourceWid=")
+		.append(sourceWid).append("&targetWid=").append(targetWid);
+	String whiteboardAccessToken = getWhiteboardAccessTokenHash(sourceWid, null);
+	if (whiteboardAccessToken != null) {
+	    url.append("&at=").append(whiteboardAccessToken);
+	}
+
+	try {
+	    HttpURLConnection connection = HttpUrlConnectionUtil.getConnection(url.toString());
+	    connection.connect();
+	    int code = connection.getResponseCode();
+	    if (code != 200) {
+		throw new IOException("When copying Whiteboard from ID " + sourceWid + " to ID " + targetWid
+			+ " server responded with code " + code);
+	    }
+	} catch (IOException e) {
+	    throw new WhiteboardApplicationException(
+		    "Could not copy Whiteboard from ID " + sourceWid + " to ID " + targetWid, e);
+	}
+    }
+
     public static String getWhiteboardAuthorName(UserDTO user) throws UnsupportedEncodingException {
 	if (user == null) {
 	    return null;
@@ -733,8 +758,12 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	}
 
 	Whiteboard toContent = Whiteboard.newInstance(whiteboard, toContentId);
-	// copy whiteboard canvas on next open
-	toContent.setSourceWid(whiteboard.getContentId().toString());
+	// copy whiteboard canvas
+	try {
+	    copyWhiteboardContent(whiteboard.getContentId().toString(), toContentId.toString());
+	} catch (WhiteboardApplicationException e) {
+	    throw new ToolException("Error while copying tool content", e);
+	}
 	whiteboardDao.insert(toContent);
 
 	if (toContent.isGalleryWalkEnabled() && !toContent.isGalleryWalkReadOnly()) {

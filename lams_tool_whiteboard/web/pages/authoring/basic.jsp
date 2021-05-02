@@ -17,5 +17,5 @@
 </div>
 
 <iframe id="whiteboard-frame"
-        src='${whiteboardServerUrl}?whiteboardid=${authoringForm.whiteboard.contentId}&username=${authoringForm.authorName}${empty whiteboardAccessToken ? "" : "&accesstoken=".concat(whiteboardAccessToken)}${empty authoringForm.whiteboard.sourceWid ? "" : "&copyfromwid=".concat(authoringForm.whiteboard.sourceWid).concat("&copyaccesstoken=").concat(whiteboardCopyAccessToken)}'>
+        src='${whiteboardServerUrl}?whiteboardid=${authoringForm.whiteboard.contentId}&username=${authoringForm.authorName}${empty whiteboardAccessToken ? "" : "&accesstoken=".concat(whiteboardAccessToken)}'>
 </iframe>

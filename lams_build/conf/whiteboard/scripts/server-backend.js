@@ -78,6 +78,22 @@ function startBackendServer(port) {
         }
     });
 
+	// added by LAMS
+    app.get("/api/copywhiteboard", function (req, res) {
+        const sourceWid = req["query"]["sourceWid"];
+        const at = req["query"]["at"]; //accesstoken
+		const targetWid = req["query"]["targetWid"];
+
+        if (accessToken === "" || hashAccessToken(sourceWid) == at) {
+            s_whiteboard.copyStoredData(sourceWid, targetWid);
+            res.end();
+        } else {
+            res.status(401); //Unauthorized
+            res.end();
+        }
+    });
+
+
     /**
      * @api {get} /api/getReadOnlyWid Get the readOnlyWhiteboardId
      * @apiDescription This returns the readOnlyWhiteboardId for a given WhiteboardId
