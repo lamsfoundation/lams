@@ -136,5 +136,14 @@ module.exports = {
 			return;
 		}
 		savedBoards[targetWid] = sourceData.slice();
+		this.saveToDB();
+	},
+	saveData: function(wid, data) {
+		const existingData = this.loadStoredData(wid);
+		if (existingData.lenght > 0 || !data) {
+			return;
+		}
+		savedBoards[wid] = JSON.parse(data);
+		this.saveToDB();
 	}
 };

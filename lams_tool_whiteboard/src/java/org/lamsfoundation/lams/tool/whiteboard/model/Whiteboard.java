@@ -41,6 +41,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -123,6 +124,10 @@ public class Whiteboard implements Cloneable {
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "create_by")
     private WhiteboardUser createdBy;
+
+    // used only for export and import of LD
+    @Transient
+    private String exportContent;
 
     // **********************************************************
     // Function method for Whiteboard
@@ -389,5 +394,13 @@ public class Whiteboard implements Cloneable {
 
     public void setGalleryWalkInstructions(String galleryWalkInstructions) {
 	this.galleryWalkInstructions = galleryWalkInstructions;
+    }
+
+    public String getExportContent() {
+	return exportContent;
+    }
+
+    public void setExportContent(String exportContent) {
+	this.exportContent = exportContent;
     }
 }

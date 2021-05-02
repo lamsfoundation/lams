@@ -14,6 +14,7 @@ Current version is 1.6 with all changes up to date 2021-04-23
    3.2 In server.js we set up default port to 9003 instead of 8080, so it does not collide with WildFly development mode.
    
    3.3 In server-backend.js we introduce hashing of wid + accesstoken to improve security.
-   	   Also an API method is added to copy Whiteboard canvas on tool content copy.
+   	   Also an API method is added to upload Whiteboard canvas content after tool content import
+   	   and a method to copy Whiteboard canvas on tool content copy.
    	      
-   3.4 In s_whiteboard.js we introduce methods for copying canvas contents.
+   3.4 In s_whiteboard.js we introduce methods for copying and saving canvas contents.

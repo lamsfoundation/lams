@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.whiteboard.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -589,7 +590,7 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	if (StringUtils.isBlank(sourceWid) || StringUtils.isBlank(targetWid)) {
 	    return;
 	}
-	// using Whiteboard API from https://cloud13.de/testwhiteboard/apidoc/index.html
+	// using own method added to Whiteboard API
 	String whiteboardServerUrl = getWhiteboardServerUrl();
 	StringBuilder url = new StringBuilder().append(whiteboardServerUrl).append("/api/copywhiteboard?sourceWid=")
 		.append(sourceWid).append("&targetWid=").append(targetWid);
@@ -610,6 +611,78 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	    throw new WhiteboardApplicationException(
 		    "Could not copy Whiteboard from ID " + sourceWid + " to ID " + targetWid, e);
 	}
+    }
+
+    private void uploadWhiteboardContent(String wid, String content) throws WhiteboardApplicationException {
+	if (StringUtils.isBlank(wid) || StringUtils.isBlank(content)) {
+	    return;
+	}
+	// using own method added to Whiteboard API
+	String whiteboardServerUrl = getWhiteboardServerUrl();
+	StringBuilder url = new StringBuilder().append(whiteboardServerUrl).append("/api/uploadwhiteboard");
+
+	StringBuilder parameters = new StringBuilder("wid=").append(wid);
+	String whiteboardAccessToken = getWhiteboardAccessTokenHash(wid, null);
+	if (whiteboardAccessToken != null) {
+	    parameters.append("&at=").append(whiteboardAccessToken);
+	}
+	parameters.append("&content=").append(content);
+
+	try {
+	    HttpURLConnection connection = HttpUrlConnectionUtil.getConnection(url.toString());
+	    connection.setRequestMethod("POST");
+	    connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+	    connection.setRequestProperty("charset", "utf-8");
+	    connection.setDoOutput(true);
+
+	    OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+	    writer.write(parameters.toString());
+	    writer.close();
+
+	    connection.connect();
+	    int code = connection.getResponseCode();
+	    if (code != 200) {
+		throw new IOException(
+			"When uploading Whiteboard content to ID " + wid + " server responded with code " + code);
+	    }
+	} catch (IOException e) {
+	    throw new WhiteboardApplicationException("Could not upload Whiteboard content to ID " + wid, e);
+	}
+    }
+
+    private String getWhiteboardContent(String wid) throws WhiteboardApplicationException {
+	if (StringUtils.isBlank(wid)) {
+	    return null;
+	}
+	// using Whiteboard API from https://cloud13.de/testwhiteboard/apidoc/index.html
+	String whiteboardServerUrl = getWhiteboardServerUrl();
+	StringBuilder url = new StringBuilder().append(whiteboardServerUrl).append("/api/loadwhiteboard?wid=")
+		.append(wid);
+	String whiteboardAccessToken = getWhiteboardAccessTokenHash(wid, null);
+	if (whiteboardAccessToken != null) {
+	    url.append("&at=").append(whiteboardAccessToken);
+	}
+
+	try {
+	    HttpURLConnection connection = HttpUrlConnectionUtil.getConnection(url.toString());
+	    connection.connect();
+	    int code = connection.getResponseCode();
+	    if (code != 200) {
+		throw new IOException(
+			"When getting Whiteboard content with ID " + wid + ", server responded with code " + code);
+	    }
+
+	    InputStream responseStream = connection.getInputStream();
+	    if (responseStream != null) {
+		StringWriter writer = new StringWriter();
+		IOUtils.copy(responseStream, writer, Charset.defaultCharset());
+		return writer.toString();
+	    }
+	} catch (IOException e) {
+	    throw new WhiteboardApplicationException("Could not get Whiteboard content with ID " + wid, e);
+	}
+
+	return null;
     }
 
     public static String getWhiteboardAuthorName(UserDTO user) throws UnsupportedEncodingException {
@@ -685,9 +758,10 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	// set tool content handler as null to avoid copy file node in repository again.
 	toolContentObj = Whiteboard.newInstance(toolContentObj, toolContentId);
 	try {
+	    toolContentObj.setExportContent(getWhiteboardContent(toolContentId.toString()));
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, whiteboardToolContentHandler,
 		    rootPath);
-	} catch (ExportToolContentException e) {
+	} catch (ExportToolContentException | WhiteboardApplicationException e) {
 	    throw new ToolException(e);
 	}
     }
@@ -719,8 +793,12 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	    }
 	    toolContentObj.setCreatedBy(user);
 
+	    if (StringUtils.isNotBlank(toolContentObj.getExportContent())) {
+		uploadWhiteboardContent(toolContentId.toString(), toolContentObj.getExportContent());
+	    }
+
 	    whiteboardDao.insertOrUpdate(toolContentObj);
-	} catch (ImportToolContentException e) {
+	} catch (ImportToolContentException | WhiteboardApplicationException e) {
 	    throw new ToolException(e);
 	}
     }

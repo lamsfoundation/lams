@@ -93,6 +93,33 @@ function startBackendServer(port) {
         }
     });
 
+	// added by LAMS
+    app.post("/api/uploadwhiteboard", function (req, res) {
+        var form = new formidable.IncomingForm(); //Receive form
+        var formData = {
+            fields: {},
+        };
+
+        form.on("field", function (name, value) {
+            formData["fields"][name] = value;
+        });
+
+        form.on("error", function (err) {
+            console.log("File upload Error!");
+        });
+
+        form.on("end", function () {
+            if (accessToken === "" || hashAccessToken(formData["fields"]["wid"]) == formData["fields"]["at"]) {
+                s_whiteboard.saveData(formData["fields"]["wid"], formData["fields"]["content"]);
+				res.end();
+            } else {
+                res.status(401); //Unauthorized
+                res.end();
+            }
+            //End file upload
+        });
+        form.parse(req);
+    });
 
     /**
      * @api {get} /api/getReadOnlyWid Get the readOnlyWhiteboardId
