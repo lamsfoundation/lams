@@ -16,6 +16,8 @@
     <lams:CKEditor id="whiteboard.instructions" value="${authoringForm.whiteboard.instructions}" contentFolderID="${authoringForm.contentFolderID}" />
 </div>
 
-<iframe id="whiteboard-frame"
-        src='${whiteboardServerUrl}?whiteboardid=${authoringForm.whiteboard.contentId}&username=${authoringForm.authorName}${empty whiteboardAccessToken ? "" : "&accesstoken=".concat(whiteboardAccessToken)}'>
-</iframe>
+<c:if test="${not empty whiteboardServerUrl}">
+	<iframe id="whiteboard-frame"
+	        src='${whiteboardServerUrl}?whiteboardid=${authoringForm.whiteboard.contentId}&username=${authoringForm.authorName}${empty whiteboardAccessToken ? "" : "&accesstoken=".concat(whiteboardAccessToken)}'>
+	</iframe>
+</c:if>
