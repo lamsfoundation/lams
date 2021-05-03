@@ -160,7 +160,7 @@
 					</a>
 				</span>
 		       </div>
-		       <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse etherpad-collapse" 
+		       <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse whiteboard-collapse" 
 		       	    role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
 					<%-- Do not show rating to own group before Gallery Walk is finished --%>
 		       	    <c:if test="${not whiteboard.galleryWalkReadOnly and (whiteboard.galleryWalkFinished or mode == 'teacher' or toolSessionID != groupSummary.sessionId)}">
