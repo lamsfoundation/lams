@@ -200,5 +200,7 @@ public interface ILearnerService {
 
     void createCommandForLearners(Long toolContentId, Collection<Integer> userIds, String jsonCommand);
 
+    void createCommandForLessonLearners(Long toolContentId, String jsonCommand);
+
     boolean isLearnerStartedLessonByContentId(int userId, long toolContentId);
 }

@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
@@ -17,6 +16,7 @@ import javax.websocket.server.ServerEndpoint;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.command.model.Command;
+import org.lamsfoundation.lams.learning.discussion.service.IDiscussionSentimentService;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
@@ -34,6 +34,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class CommandWebsocketServer {
 
     private static ILearnerFullService learnerService;
+
+    private static IDiscussionSentimentService discussionSentimentService;
 
     /**
      * A singleton which updates Learners with messages and commands.
@@ -136,6 +138,8 @@ public class CommandWebsocketServer {
 
 	String login = websocket.getUserPrincipal().getName();
 	sessionWebsockets.put(login, websocket);
+
+	discussionSentimentService.restartDiscussionForLearner(lessonId, login);
     }
 
     /**

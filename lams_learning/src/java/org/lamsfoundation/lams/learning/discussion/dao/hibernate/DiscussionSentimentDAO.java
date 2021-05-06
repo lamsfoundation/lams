@@ -32,4 +32,18 @@ public class DiscussionSentimentDAO extends LAMSBaseDAO implements IDiscussionSe
 	return votes.stream().filter(v -> v.getUserId() != null).collect(
 		Collectors.groupingBy(DiscussionSentimentVote::getSelectedOption, TreeMap::new, Collectors.counting()));
     }
+
+    @Override
+    public DiscussionSentimentVote getDiscussionVote(long lessonId, long toolContentId, Long burningQuestionUid,
+	    int userId) {
+	Map<String, Object> properties = new HashMap<>();
+	properties.put("lessonId", lessonId);
+	properties.put("toolContentId", toolContentId);
+	if (burningQuestionUid != null) {
+	    properties.put("burningQuestionUid", burningQuestionUid);
+	}
+	properties.put("userId", userId);
+	List<DiscussionSentimentVote> votes = findByProperties(DiscussionSentimentVote.class, properties);
+	return votes.isEmpty() ? null : votes.get(0);
+    }
 }

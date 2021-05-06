@@ -13,7 +13,8 @@ CREATE TABLE lams_discussion_sentiment (
 	user_id BIGINT,
 	selected_option TINYINT UNSIGNED,
 	PRIMARY KEY (uid),
-	INDEX IDX_lams_discussion_sentiment_burning_question_uid (burning_question_uid),
+	INDEX IDX_lams_discussion_sentiment_1 (burning_question_uid),
+	UNIQUE INDEX UQ_lams_discussion_sentiment_2 (lesson_id, tool_content_id, burning_question_id, user_id),
 	CONSTRAINT FK_lams_discussion_sentiment_1 FOREIGN KEY (lesson_id) REFERENCES lams_lesson (lesson_id)
 		ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT FK_lams_discussion_sentiment_2 FOREIGN KEY (tool_content_id) REFERENCES lams_tool_content (tool_content_id)
