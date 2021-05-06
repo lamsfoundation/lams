@@ -2,6 +2,7 @@ package org.lamsfoundation.lams.web.controller;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Map;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
@@ -58,8 +59,6 @@ public class SignupController {
 	    return "msgContent";
 	}
 
-	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(true));
-
 	request.setAttribute("signupOrganisation", signupOrganisation);
 	return "signup/signup";
     }
@@ -70,7 +69,6 @@ public class SignupController {
 	    // validation
 	    MultiValueMap<String, String> errorMap = validateSignup(signupForm);
 	    if (!errorMap.isEmpty()) {
-		request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(true));
 		request.setAttribute("errorMap", errorMap);
 		return "signup/signup";
 	    } else {
@@ -91,7 +89,6 @@ public class SignupController {
 
 		if (!ValidationUtil.isPasswordNotUserDetails(signupForm.getPassword(), user)) {
 		    errorMap.add("password", messageService.getMessage("label.password.restrictions"));
-		    request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(true));
 		    request.setAttribute("errorMap", errorMap);
 		    return "signup/signup";
 		}
@@ -126,6 +123,11 @@ public class SignupController {
 	}
 
 	return "/";
+    }
+
+    @ModelAttribute("countryCodes")
+    public Map<String, String> getCountryCodes() {
+	return LanguageUtil.getCountryCodes(true);
     }
 
     private void sendWelcomeEmail(User user) throws AddressException, MessagingException, UnsupportedEncodingException {
@@ -173,6 +175,7 @@ public class SignupController {
 	    MultiValueMap<String, String> errorMap = validateSignin(signupForm);
 	    if (!errorMap.isEmpty()) {
 		request.setAttribute("errorMap", errorMap);
+		request.setAttribute("selectedTab", "login");
 		return "signup/signup";
 	    } else {
 		String login = signupForm.getUsernameTab2();
