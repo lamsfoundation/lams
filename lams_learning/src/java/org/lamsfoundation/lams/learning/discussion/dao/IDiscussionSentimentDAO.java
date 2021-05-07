@@ -9,7 +9,7 @@ public interface IDiscussionSentimentDAO extends IBaseDAO {
 
     DiscussionSentimentVote getActiveDiscussion(long lessonId);
 
-    Map<Integer, Long> getDiscussionAggregatedVotes(long lessonId, long toolContentId, Long burningQuestionUid);
+    Map<Integer, Long> getDiscussionAggregatedVotes(long toolQuestionUid, Long burningQuestionUid);
 
-    DiscussionSentimentVote getDiscussionVote(long lessonId, long toolContentId, Long burningQuestionUid, int userId);
+    DiscussionSentimentVote getDiscussionVote(long toolQuestionUid, Long burningQuestionUid, int userId);
 }

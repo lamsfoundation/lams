@@ -1443,6 +1443,7 @@ public class LearnerService implements ILearnerFullService {
 	}
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public void createCommandForLessonLearners(Long toolContentId, String jsonCommand) {
 	// find lesson for given tool content ID

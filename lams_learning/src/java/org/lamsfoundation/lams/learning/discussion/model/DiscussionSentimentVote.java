@@ -18,8 +18,8 @@ public class DiscussionSentimentVote {
     @Column(name = "lesson_id")
     private Long lessonId;
 
-    @Column(name = "tool_content_id")
-    private Long toolContentId;
+    @Column(name = "tool_question_uid")
+    private Long toolQuestionUid;
 
     @Column(name = "burning_question_uid")
     private Long burningQuestionUid;
@@ -33,9 +33,10 @@ public class DiscussionSentimentVote {
     public DiscussionSentimentVote() {
     }
 
-    public DiscussionSentimentVote(Long lessonId, Long toolContentId) {
+    public DiscussionSentimentVote(Long lessonId, Long toolQuestionUid, Long burningQuestionUid) {
 	this.lessonId = lessonId;
-	this.toolContentId = toolContentId;
+	this.toolQuestionUid = toolQuestionUid;
+	this.burningQuestionUid = burningQuestionUid;
     }
 
     public Long getUid() {
@@ -54,12 +55,12 @@ public class DiscussionSentimentVote {
 	this.lessonId = lessonId;
     }
 
-    public Long getToolContentId() {
-	return toolContentId;
+    public Long getToolQuestionUid() {
+	return toolQuestionUid;
     }
 
-    public void setToolContentId(Long toolContentId) {
-	this.toolContentId = toolContentId;
+    public void setToolQuestionUid(Long toolQuestionUid) {
+	this.toolQuestionUid = toolQuestionUid;
     }
 
     public Long getBurningQuestionUid() {

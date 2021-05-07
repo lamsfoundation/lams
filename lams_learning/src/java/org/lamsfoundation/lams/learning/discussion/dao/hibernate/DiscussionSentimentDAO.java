@@ -21,10 +21,9 @@ public class DiscussionSentimentDAO extends LAMSBaseDAO implements IDiscussionSe
     }
 
     @Override
-    public Map<Integer, Long> getDiscussionAggregatedVotes(long lessonId, long toolContentId, Long burningQuestionUid) {
+    public Map<Integer, Long> getDiscussionAggregatedVotes(long toolQuestionUid, Long burningQuestionUid) {
 	Map<String, Object> properties = new HashMap<>();
-	properties.put("lessonId", lessonId);
-	properties.put("toolContentId", toolContentId);
+	properties.put("toolQuestionUid", toolQuestionUid);
 	if (burningQuestionUid != null) {
 	    properties.put("burningQuestionUid", burningQuestionUid);
 	}
@@ -34,11 +33,9 @@ public class DiscussionSentimentDAO extends LAMSBaseDAO implements IDiscussionSe
     }
 
     @Override
-    public DiscussionSentimentVote getDiscussionVote(long lessonId, long toolContentId, Long burningQuestionUid,
-	    int userId) {
+    public DiscussionSentimentVote getDiscussionVote(long toolQuestionUid, Long burningQuestionUid, int userId) {
 	Map<String, Object> properties = new HashMap<>();
-	properties.put("lessonId", lessonId);
-	properties.put("toolContentId", toolContentId);
+	properties.put("toolQuestionUid", toolQuestionUid);
 	if (burningQuestionUid != null) {
 	    properties.put("burningQuestionUid", burningQuestionUid);
 	}

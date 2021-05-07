@@ -4,14 +4,15 @@ import java.util.Map;
 
 public interface IDiscussionSentimentService {
 
-    void startDiscussion(long lessonId, long toolContentId, Long burningQuestionUid);
+    void startDiscussionForMonitor(long toolQuestionUid, Long burningQuestionUid);
 
-    void stopDiscussion(long lessonId);
+    void stopDiscussionForMonitor(long toolQuestionUid);
 
-    void restartDiscussionForLearner(long lessonId, String login);
+    void startDiscussionForLearner(long lessonId, String login);
 
-    void addDiscussionVoteForLearner(long lessonId, int userId, int selectedOption);
+    boolean addDiscussionVoteForLearner(long lessonId, int userId, int selectedOption);
 
-    Map<Integer, Long> getDiscussionAggregatedVotes(long lessonId, long toolContentId, Long burningQuestionUid);
+    Integer getDiscussionVoteSelectedOption(long lessonId, int userId);
 
+    Map<Integer, Long> getDiscussionAggregatedVotes(long lessonId, long toolQuestionUid, Long burningQuestionUid);
 }
