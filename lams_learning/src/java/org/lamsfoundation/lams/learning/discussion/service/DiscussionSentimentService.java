@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.learning.discussion.service;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.lamsfoundation.lams.learning.discussion.dao.IDiscussionSentimentDAO;
@@ -22,7 +23,7 @@ public class DiscussionSentimentService implements IDiscussionSentimentService {
     private static long ACTIVE_DISCUSSION_TOKEN_REFRESH_PERIOD = 5 * 1000;
 
     @Override
-    public void startDiscussionForMonitor(long toolQuestionUid, Long burningQuestionUid) {
+    public long startDiscussionForMonitor(long toolQuestionUid, Long burningQuestionUid) {
 	long toolContentId = getToolContentId(toolQuestionUid);
 	long lessonId = getLessonIdByToolContentId(toolContentId);
 	// stop current discussion, if any
@@ -42,6 +43,8 @@ public class DiscussionSentimentService implements IDiscussionSentimentService {
 	jsonCommand.put("discussion", "startLearner");
 
 	learnerService.createCommandForLessonLearners(toolContentId, jsonCommand.toString());
+
+	return lessonId;
     }
 
     @Override
@@ -121,8 +124,21 @@ public class DiscussionSentimentService implements IDiscussionSentimentService {
     }
 
     @Override
-    public Map<Integer, Long> getDiscussionAggregatedVotes(long lessonId, long toolContentId, Long burningQuestionUid) {
-	return discussionSentimentDAO.getDiscussionAggregatedVotes(toolContentId, burningQuestionUid);
+    public Set<DiscussionSentimentVote> getDiscussions(long toolContentId) {
+	long lessonId = getLessonIdByToolContentId(toolContentId);
+	return discussionSentimentDAO.getDiscussions(lessonId);
+    }
+
+    @Override
+    public Map<Integer, Long> getDiscussionAggregatedVotes(long toolQuestionUid, Long burningQuestionUid) {
+	return discussionSentimentDAO.getDiscussionAggregatedVotes(toolQuestionUid, burningQuestionUid);
+    }
+
+    @Override
+    public DiscussionSentimentVote getActiveDiscussionByQuestion(long toolQuestionUid) {
+	long toolContentId = getToolContentId(toolQuestionUid);
+	long lessonId = getLessonIdByToolContentId(toolContentId);
+	return getCachedActiveDiscussion(lessonId);
     }
 
     private DiscussionSentimentVote getCachedActiveDiscussion(long lessonId) {
@@ -162,6 +178,12 @@ public class DiscussionSentimentService implements IDiscussionSentimentService {
 	cachedActiveDiscussionTokens.remove(lessonId);
 
 	return currentActiveDiscussionToken;
+    }
+
+    @Override
+    public long getLessonIdByQuestion(long toolQuestionUid) {
+	long toolContentId = getToolContentId(toolQuestionUid);
+	return getLessonIdByToolContentId(toolContentId);
     }
 
     private long getToolContentId(long toolQuestionUid) {

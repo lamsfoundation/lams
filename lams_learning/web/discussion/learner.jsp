@@ -11,8 +11,8 @@
 	  width: 40px;
 	}	
 	
-	/* Underlining the link in title does not look nice*/
 	#discussion-sentiment-widget .panel-title a {
+		/* Underlining the link in title does not look nice*/
 		text-decoration: none !important;
 	}
 	
@@ -22,6 +22,7 @@
 	}
 	
 	#discussion-sentiment-widget th {
+		/* Table headers feels better this way */
 		text-align: center;
 		font-weight: bold;
 		font-style: normal;
@@ -37,6 +38,19 @@
 	// This method is called when monitor stops discussion via stopLearner.jsp and on server error
 	function stopDiscussionSentimentLearnerWidget(){
 		$('#discussion-sentiment-widget-content').data('remove', true).collapse('hide');
+	}
+
+	function selectDiscussionSentimentOption(selectedOption) {
+		// clear other cells
+		var widget = $('#discussion-sentiment-widget');
+		$('td', widget).removeClass('selected warning success');
+
+		if (!selectedOption) {
+			return;
+		}
+		// highlight the successfuly selected cell
+		var selectedCell = $('#discussion-sentiment-widget-option-cell-' + selectedOption, widget).addClass('selected');
+		selectedCell.addClass(selectedCell.hasClass('discussion-sentiment-widget-option-stay') ? 'warning' : 'success');
 	}
 
 	$(document).ready(function(){
@@ -94,10 +108,7 @@
 						stopDiscussionSentimentLearnerWidget();
 					}
 					if (response == 'voted') {
-						// highlight the successfuly selected cell
-						$('#discussion-sentiment-widget td').removeClass('selected warning success');
-						selectedCell.addClass('selected')
-									.addClass(selectedCell.hasClass('discussion-sentiment-widget-option-stay') ? 'warning' : 'success');
+						selectDiscussionSentimentOption(selectedOption);
 					}
 				},
 				error    : function(){
@@ -105,6 +116,8 @@
 				}
 			});
 		});
+
+		selectDiscussionSentimentOption('${param.selectedOption}');
 	});
 </script>
 
@@ -133,14 +146,14 @@
 	       	 </tr>
 	       	 <c:forEach begin="1" end="4" var="optionNumber">
 		       	 <tr>
-		       	 	<td class="discussion-sentiment-widget-option-stay ${optionNumber eq param.selectedOption ? 'selected warning' : ''}"
+		       	 	<td id="discussion-sentiment-widget-option-cell-${optionNumber}" class="discussion-sentiment-widget-option-stay"
 		       	 		data-option-number="${optionNumber}">
 		       	 		<fmt:message key="label.discussion.stay.option.${optionNumber}" />
 		       	 	</td>
 		       	 	<%-- Stay options start from 1, Move options start from 11 --%>
-		       	 	<td class="discussion-sentiment-widget-option-move ${(10 + optionNumber) eq param.selectedOption ? 'selected success' : ''}"
+		       	 	<td id="discussion-sentiment-widget-option-cell-${10 + optionNumber}" class="discussion-sentiment-widget-option-move"
 		       	 		data-option-number="${10 + optionNumber}">
-		       	 		<fmt:message key="label.discussion.move.option.1${optionNumber}" />
+		       	 		<fmt:message key="label.discussion.move.option.${10 + optionNumber}" />
 		       	 	</td>
 		       	 </tr>
 	       	 </c:forEach>

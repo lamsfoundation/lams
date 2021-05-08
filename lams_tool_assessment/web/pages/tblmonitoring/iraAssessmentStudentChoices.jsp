@@ -10,7 +10,6 @@
 <script src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 <script src="<lams:LAMSURL/>includes/javascript/jquery.plugin.js"></script>
 <script src="<lams:LAMSURL/>includes/javascript/jquery.countdown.js"></script>
-<script src="<lams:LAMSURL/>includes/javascript/chart.bundle.min.js"></script>
 <script src="<lams:WebAppURL />includes/javascript/chart.js"></script>
 
 <script>	

@@ -6,7 +6,7 @@
 		$('<div />').attr('id', 'discussion-sentiment-widget').appendTo('body')
 			.load("<lams:LAMSURL />learning/discussion/learner.jsp?lessonId=${param.lessonId}&selectedOption=${selectedOption}");
 	} else {
-		// the widget already exists and monitor changed the topic, so clear out the selected option
-		$('#discussion-sentiment-widget td').removeClass('selected warning success');
+		// the widget already exists and monitor changed the topic, so clear out the selected option and optionally set a new one
+		selectDiscussionSentimentOption('${selectedOption}');
 	}
 </script>

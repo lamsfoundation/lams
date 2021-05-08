@@ -1,10 +1,13 @@
 package org.lamsfoundation.lams.learning.discussion.service;
 
 import java.util.Map;
+import java.util.Set;
+
+import org.lamsfoundation.lams.learning.discussion.model.DiscussionSentimentVote;
 
 public interface IDiscussionSentimentService {
 
-    void startDiscussionForMonitor(long toolQuestionUid, Long burningQuestionUid);
+    long startDiscussionForMonitor(long toolQuestionUid, Long burningQuestionUid);
 
     void stopDiscussionForMonitor(long toolQuestionUid);
 
@@ -14,5 +17,11 @@ public interface IDiscussionSentimentService {
 
     Integer getDiscussionVoteSelectedOption(long lessonId, int userId);
 
-    Map<Integer, Long> getDiscussionAggregatedVotes(long lessonId, long toolQuestionUid, Long burningQuestionUid);
+    Map<Integer, Long> getDiscussionAggregatedVotes(long toolQuestionUid, Long burningQuestionUid);
+
+    DiscussionSentimentVote getActiveDiscussionByQuestion(long toolQuestionUid);
+
+    Set<DiscussionSentimentVote> getDiscussions(long toolContentId);
+
+    long getLessonIdByQuestion(long toolQuestionUid);
 }

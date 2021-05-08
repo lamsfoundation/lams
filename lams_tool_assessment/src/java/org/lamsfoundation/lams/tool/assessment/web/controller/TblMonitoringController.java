@@ -10,6 +10,7 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
@@ -46,6 +47,9 @@ public class TblMonitoringController {
     @Autowired
     @Qualifier("laasseAssessmentService")
     private IAssessmentService assessmentService;
+
+    @Autowired
+    private ILearnerService learnerService;
 
     /**
      * Shows ira page in case of Assessment activity

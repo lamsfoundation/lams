@@ -1,12 +1,17 @@
 package org.lamsfoundation.lams.learning.discussion.controller;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.lamsfoundation.lams.learning.discussion.model.DiscussionSentimentVote;
 import org.lamsfoundation.lams.learning.discussion.service.IDiscussionSentimentService;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +24,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 @Controller
 @RequestMapping("/discussionSentiment")
 public class DiscussionSentimentController {
     @Autowired
     private IDiscussionSentimentService discussionSentimentService;
+
+    @Autowired
+    private ILessonService lessonService;
 
     /**
      * Called via Page.tag.
@@ -85,17 +97,74 @@ public class DiscussionSentimentController {
 	return ResponseEntity.ok(discussionActive ? "voted" : "stop");
     }
 
-    @RequestMapping(path = "/startMonitor", method = RequestMethod.POST)
+    /**
+     * Sends discussion IDs (question UID, burning question UID)
+     * where there is any data (active discussion, inactive discussion where someone voted).
+     * It is used to reinitialised discussion widgets on monitoring screen.
+     */
+    @RequestMapping("/checkMonitor")
     @ResponseBody
-    public void startMonitorWidget(@RequestParam long toolQuestionUid,
-	    @RequestParam(required = false) Long burningQuestionUid) {
-	discussionSentimentService.startDiscussionForMonitor(toolQuestionUid, burningQuestionUid);
+    public ResponseEntity<String> checkMonitorWidget(@RequestParam long toolContentId) {
+	Set<DiscussionSentimentVote> tokens = discussionSentimentService.getDiscussions(toolContentId);
+
+	ArrayNode result = JsonNodeFactory.instance.arrayNode();
+	for (DiscussionSentimentVote token : tokens) {
+	    ObjectNode tokenJSON = JsonNodeFactory.instance.objectNode();
+	    tokenJSON.put("toolQuestionUid", token.getToolQuestionUid());
+	    tokenJSON.put("burningQuestionUid", token.getBurningQuestionUid());
+	    result.add(tokenJSON);
+	}
+
+	return ResponseEntity.ok(result.toString());
+    }
+
+    /**
+     * Fetches details to build a monitor widget.
+     * If markAsActive is true, the monitor clicked "Start Discussion" or "Restart" button.
+     * If markAsActive is false, this is monitor widget reinitialising after page load.
+     */
+    @RequestMapping("/startMonitor")
+    public String startMonitorWidget(@RequestParam long toolQuestionUid,
+	    @RequestParam(required = false) Long burningQuestionUid, @RequestParam boolean markAsActive, Model model) {
+	Long lessonId = null;
+	if (markAsActive) {
+	    lessonId = discussionSentimentService.startDiscussionForMonitor(toolQuestionUid, burningQuestionUid);
+	} else {
+	    lessonId = discussionSentimentService.getLessonIdByQuestion(toolQuestionUid);
+	}
+
+	int learnerCount = lessonService.getCountLessonLearners(lessonId, null);
+	model.addAttribute("learnerCount", learnerCount);
+	return "/discussion/monitor";
     }
 
     @RequestMapping(path = "/stopMonitor", method = RequestMethod.POST)
     @ResponseBody
     public void stopMonitorWidget(@RequestParam long toolQuestionUid) {
 	discussionSentimentService.stopDiscussionForMonitor(toolQuestionUid);
+    }
+
+    /**
+     * Periodic refresh of discussion chart.
+     */
+    @RequestMapping("/getMonitorData")
+    @ResponseBody
+    public ResponseEntity<String> getMonitorData(@RequestParam long toolQuestionUid,
+	    @RequestParam(required = false) Long burningQuestionUid) throws IOException {
+	Map<Integer, Long> votes = discussionSentimentService.getDiscussionAggregatedVotes(toolQuestionUid,
+		burningQuestionUid);
+
+	DiscussionSentimentVote activeDiscussionToken = discussionSentimentService
+		.getActiveDiscussionByQuestion(toolQuestionUid);
+	ObjectNode response = JsonNodeFactory.instance.objectNode();
+	// check if this discussion is active, so the widget knows if periodic refresh should keep running
+	response.put("isActive",
+		activeDiscussionToken != null && activeDiscussionToken.getToolQuestionUid().equals(toolQuestionUid)
+			&& (activeDiscussionToken.getBurningQuestionUid() == null ? burningQuestionUid == null
+				: activeDiscussionToken.getBurningQuestionUid().equals(burningQuestionUid)));
+	response.set("votes", JsonUtil.readObject(votes));
+
+	return ResponseEntity.ok(response.toString());
     }
 
     private static UserDTO getCurrentUserDto() {
