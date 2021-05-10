@@ -18,6 +18,6 @@
 
 <c:if test="${not empty whiteboardServerUrl}">
 	<iframe id="whiteboard-frame"
-	        src='${whiteboardServerUrl}?whiteboardid=${authoringForm.whiteboard.contentId}&username=${authoringForm.authorName}${empty whiteboardAccessToken ? "" : "&accesstoken=".concat(whiteboardAccessToken)}'>
+	        src='${whiteboardServerUrl}/?whiteboardid=${authoringForm.whiteboard.contentId}&username=${authoringForm.authorName}${empty whiteboardAccessToken ? "" : "&accesstoken=".concat(whiteboardAccessToken)}'>
 	</iframe>
 </c:if>

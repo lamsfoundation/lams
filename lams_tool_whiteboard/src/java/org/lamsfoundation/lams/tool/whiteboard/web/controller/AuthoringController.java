@@ -143,6 +143,7 @@ public class AuthoringController {
      * @throws WhiteboardApplicationException
      */
 
+    @SuppressWarnings("unchecked")
     @RequestMapping("/init")
     private String initPage(@ModelAttribute("authoringForm") WhiteboardForm authoringForm, HttpServletRequest request)
 	    throws ServletException, WhiteboardApplicationException {
