@@ -35,11 +35,11 @@
 	}
 	
 	.discussion-sentiment-table-stay-header-row td {
-		background-color: #fcf8e3;
+		background-color: rgba(255, 195, 55, 1);
 	}
 	
 	.discussion-sentiment-table-move-header-row td {
-		background-color: #dff0d8;
+		background-color: rgba(5, 204, 214, 1);
 	}
 	
 	.discussion-sentiment-table-option-row td:first-child {
@@ -163,8 +163,9 @@
 							},
 							datasets : [ {
 								data : chartData,
-								backgroundColor : [ '#fcf8e3',
-													'#dff0d8'
+								backgroundColor : [ 'rgba(255, 195, 55, 1)',
+													'rgba(5, 204, 214, 1)'
+													
 												  ],
 								borderWidth : 0,
 							} ],
