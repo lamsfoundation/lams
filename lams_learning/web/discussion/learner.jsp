@@ -59,6 +59,7 @@
 				.on('hidden.bs.collapse', function () {
 					// leave just the discussion icon
 					$('#discussion-sentiment-widget-title', discussionSentimentWidget).hide();
+					$('.panel-heading', discussionSentimentWidget).removeClass('collapsable-icon-left');
 					
 					discussionSentimentWidget.animate({
 						width: '40px'
@@ -81,6 +82,7 @@
 						width: '300px'
 					}, function(){
 						$('#discussion-sentiment-widget-title', discussionSentimentWidget).show();
+						$('.panel-heading', discussionSentimentWidget).addClass('collapsable-icon-left');
 						content.css('visibility', 'visible');
 					});
 				});
