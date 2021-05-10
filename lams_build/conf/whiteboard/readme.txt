@@ -18,3 +18,5 @@ Current version is 1.6 with all changes up to date 2021-04-23
    	   and a method to copy Whiteboard canvas on tool content copy.
    	      
    3.4 In s_whiteboard.js we introduce methods for copying and saving canvas contents.
+   
+   3.5 In index.html we hide some buttons
