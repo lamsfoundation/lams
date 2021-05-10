@@ -56,7 +56,7 @@ public class AdminController {
 		.getConfigItem(WhiteboardConfigItem.KEY_ACCESS_TOKEN);
 	if (whiteboardAccessTokenConfigItem != null
 		&& StringUtils.isNotBlank(whiteboardAccessTokenConfigItem.getConfigValue())) {
-	    whiteboardAdminForm.setWhiteboardServerUrl(whiteboardAccessTokenConfigItem.getConfigValue());
+	    whiteboardAdminForm.setWhiteboardAccessToken(whiteboardAccessTokenConfigItem.getConfigValue());
 	}
 
 	return "pages/admin/config";
