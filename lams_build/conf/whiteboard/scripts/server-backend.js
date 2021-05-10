@@ -63,13 +63,28 @@ function startBackendServer(port) {
         const wid = req["query"]["wid"];
         const at = req["query"]["at"]; //accesstoken
 		const targetWid = req["query"]["targetWid"];
+		const embedImages = req["query"]["embedImages"];
 
 		// if targetWid is present, hash generation is based on combined wids
         if (accessToken === "" || hashAccessToken(wid + (targetWid || "")) == at) {
             const widForData = ReadOnlyBackendService.isReadOnly(wid)
                 ? ReadOnlyBackendService.getIdFromReadOnlyId(wid)
                 : wid;
-            const ret = s_whiteboard.loadStoredData(widForData);
+            let ret = s_whiteboard.loadStoredData(widForData);
+
+			if (embedImages) {
+				// exporting LAMS content: save image data directly in JSON
+				ret = ret.slice();
+				ret.forEach(function(entry){
+					if (entry.t !== "addImgBG" || !entry.url.startsWith("/uploads/")) {
+						return true;
+					}
+					const filePath = "./public" + entry.url;
+					const contents = fs.readFileSync(filePath, {encoding: 'base64'});
+					entry.imageData = contents;
+				});
+			}
+
             res.send(ret);
             res.end();
         } else {
@@ -110,7 +125,7 @@ function startBackendServer(port) {
 
         form.on("end", function () {
             if (accessToken === "" || hashAccessToken(formData["fields"]["wid"]) == formData["fields"]["at"]) {
-                s_whiteboard.saveData(formData["fields"]["wid"], formData["fields"]["content"]);
+                s_whiteboard.saveData(formData["fields"]["wid"], formData["fields"]["content"], true);
 				res.end();
             } else {
                 res.status(401); //Unauthorized

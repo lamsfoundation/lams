@@ -159,12 +159,41 @@ module.exports = {
 		savedBoards[targetWid] = sourceData.slice();
 		this.saveToDB(targetWid);
 	},
-	saveData: function(wid, data) {
+	saveData: function(wid, data, processEmbeddedImages) {
 		const existingData = this.loadStoredData(wid);
 		if (existingData.length > 0 || !data) {
 			return;
 		}
-		savedBoards[wid] = JSON.parse(data);
+		let savedBoard = JSON.parse(data);
+		
+		// importing LAMS content which has base64 images embedded
+		if (processEmbeddedImages) {
+			savedBoard.forEach(function(entry) {
+				// check if it is an embedded image or one with absolute URL
+				if (entry.t !== "addImgBG" || !entry.url.startsWith("/uploads/") || !entry.imageData) {
+					return true;
+				}
+				
+				// if the file already exists on the servrer, do nothing
+				const filePath = "./public" + entry.url;
+				if (fs.existsSync(filePath)) {
+					return true;
+				}
+				
+				// create a dir for the given output path
+				fs.mkdirSync(filePath.substring(0, filePath.lastIndexOf("/")), {
+					// this option also mutes an error if path exists
+					recursive : true
+				});
+
+				// write out data to file
+				fs.writeFileSync(filePath, entry.imageData, "base64");
+				
+				// clean up
+				delete entry.imageData;		
+			});
+		}
+		savedBoards[wid] = savedBoard;
 		this.saveToDB(wid);
 	}
 };

@@ -627,9 +627,10 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	if (whiteboardAccessToken != null) {
 	    parameters.append("&at=").append(whiteboardAccessToken);
 	}
-	parameters.append("&content=").append(content);
 
 	try {
+	    parameters.append("&content=").append(URLEncoder.encode(content, FileUtil.ENCODING_UTF_8));
+
 	    HttpURLConnection connection = HttpUrlConnectionUtil.getConnection(url.toString());
 	    connection.setRequestMethod("POST");
 	    connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -657,8 +658,8 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	}
 	// using Whiteboard API from https://cloud13.de/testwhiteboard/apidoc/index.html
 	String whiteboardServerUrl = getWhiteboardServerUrl();
-	StringBuilder url = new StringBuilder().append(whiteboardServerUrl).append("/api/loadwhiteboard?wid=")
-		.append(wid);
+	StringBuilder url = new StringBuilder().append(whiteboardServerUrl)
+		.append("/api/loadwhiteboard?embedImages=true&wid=").append(wid);
 	String whiteboardAccessToken = getWhiteboardAccessTokenHash(wid, null);
 	if (whiteboardAccessToken != null) {
 	    url.append("&at=").append(whiteboardAccessToken);
@@ -796,6 +797,8 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 
 	    if (StringUtils.isNotBlank(toolContentObj.getExportContent())) {
 		uploadWhiteboardContent(toolContentId.toString(), toolContentObj.getExportContent());
+		// clean up
+		toolContentObj.setExportContent(null);
 	    }
 
 	    whiteboardDao.insertOrUpdate(toolContentObj);
