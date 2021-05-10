@@ -36,6 +36,15 @@
 			text-align: right;
 		}
 		
+		.gallery-walk-rating-comment-container {
+			width: 60%;
+			margin: auto;
+		}
+		
+		.gallery-walk-rating-comment-container textarea {
+			margin-bottom: 20px;
+		}
+		
 		#gallery-walk-preview-info {
 			margin-bottom: 20px;
 		}
@@ -57,6 +66,9 @@
 			MIN_RATES = 0,
 			LAMS_URL = '${lams}',
 			COUNT_RATED_ITEMS = true,
+			COMMENTS_MIN_WORDS_LIMIT = 0,
+			COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
+			WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="warning.comment.blank"/>',
 			ALLOW_RERATE = true,
 			SESSION_ID = ${toolSessionID};
 			
@@ -164,8 +176,10 @@
 		       	    role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
 					<%-- Do not show rating to own group before Gallery Walk is finished --%>
 		       	    <c:if test="${not whiteboard.galleryWalkReadOnly and (whiteboard.galleryWalkFinished or mode == 'teacher' or toolSessionID != groupSummary.sessionId)}">
-		       	    	<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}"
-								     isItemAuthoredByUser="${whiteboard.galleryWalkFinished or not hasEditRight or mode == 'teacher'}" />
+		       	    	<div class="gallery-walk-rating-comment-container">
+		       	    		<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}"
+									     isItemAuthoredByUser="${whiteboard.galleryWalkFinished or not hasEditRight or mode == 'teacher'}" />
+						 </div>
 		       	    </c:if>
 		 
 					<iframe class="whiteboard-frame"

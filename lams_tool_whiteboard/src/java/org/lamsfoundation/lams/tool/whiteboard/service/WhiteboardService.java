@@ -306,7 +306,7 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	    Set<Long> itemIds = sessionList.stream()
 		    .collect(Collectors.mapping(WhiteboardSession::getSessionId, Collectors.toSet()));
 
-	    List<ItemRatingDTO> itemRatingDtos = ratingService.getRatingCriteriaDtos(contentId, null, itemIds, false,
+	    List<ItemRatingDTO> itemRatingDtos = ratingService.getRatingCriteriaDtos(contentId, null, itemIds, true,
 		    ratingUserId);
 	    // Mapping of Item ID -> DTO
 	    itemRatingDtoMap = itemRatingDtos.stream()
@@ -452,6 +452,7 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	    criterion.setTitle(messageService.getMessage("label.pad.rating.title"));
 	    criterion.setOrderId(1);
 	    criterion.setRatingStyle(RatingCriteria.RATING_STYLE_STAR);
+	    criterion.setCommentsEnabled(true);
 	    criterion.setToolContentId(toolContentId);
 
 	    whiteboardDao.insert(criterion);
