@@ -65,18 +65,20 @@
 		return false;
 	}
 
-	function startDiscussionSentiment(toolQuestionUid, markAsActive) {
-		$('#discussion-sentiment-chart-panel-container-' + toolQuestionUid).load(
-			'${lams}learning/discussionSentiment/startMonitor.do',
-			{
-				toolQuestionUid : toolQuestionUid,
-				markAsActive    : markAsActive
-			},
-			function(){
-				$('#discussion-sentiment-start-button-' + toolQuestionUid).remove();
-			}
-		)
-	}
+	<c:if test="${param.embedded and empty toolSessionID}">
+		function startDiscussionSentiment(toolQuestionUid, markAsActive) {
+			$('#discussion-sentiment-chart-panel-container-' + toolQuestionUid).load(
+				'${lams}learning/discussionSentiment/startMonitor.do',
+				{
+					toolQuestionUid : toolQuestionUid,
+					markAsActive    : markAsActive
+				},
+				function(){
+					$('#discussion-sentiment-start-button-' + toolQuestionUid).remove();
+				}
+			)
+		}
+	</c:if>
 	
 	$(document).ready(function() {
 		$("time.timeago").timeago();
@@ -277,7 +279,9 @@
 				</c:choose>
 			</c:if>
 			
-			<div id="discussion-sentiment-chart-panel-container-${question.uid}"></div>
+			<c:if test="${param.embedded and empty toolSessionID}">
+				<div id="discussion-sentiment-chart-panel-container-${question.uid}"></div>
+			</c:if>
 		</div>
 					
 	</div>
