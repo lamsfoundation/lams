@@ -28,6 +28,17 @@
 		margin-left: 40px;
 	}
 	
+	.discussion-sentiment-start-button {
+		margin-top: -2px;
+		margin-right: 5px;
+	}
+	
+	@media (min-width: 0px) and (max-width: 767px){
+		.discussion-sentiment-start-button {
+			padding: 1px 5px;
+		}
+	}
+	
 	.discussion-sentiment-start-button .fa-comments {
 		color: black !important;
 	}
