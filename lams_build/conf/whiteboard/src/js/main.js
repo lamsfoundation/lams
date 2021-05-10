@@ -633,6 +633,7 @@ function initWhiteboard() {
                         reader.readAsDataURL(blob);
                         reader.onloadend = function () {
                             const base64data = reader.result;
+
                             uploadImgAndAddToWhiteboard(base64data);
                         };
                     } else if (isPDFFileName(filename)) {
@@ -822,6 +823,7 @@ function initWhiteboard() {
         false
     );
 
+
     function uploadImgAndAddToWhiteboard(base64data) {
         const date = +new Date();
         $.ajax({
@@ -836,9 +838,8 @@ function initWhiteboard() {
             success: function (msg) {
                 const { correspondingReadOnlyWid } = ConfigService;
                 const filename = `${correspondingReadOnlyWid}_${date}.png`;
-                const rootUrl = document.URL.substr(0, document.URL.lastIndexOf("/"));
                 whiteboard.addImgToCanvasByUrl(
-                    `${rootUrl}/uploads/${correspondingReadOnlyWid}/${filename}`
+                    `/uploads/${correspondingReadOnlyWid}/${filename}`
                 ); //Add image to canvas
                 console.log("Image uploaded!");
             },
