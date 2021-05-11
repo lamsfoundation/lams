@@ -20,3 +20,7 @@ Current version is 1.6 with all changes up to date 2021-04-23
    3.4 In s_whiteboard.js we introduce methods for copying and saving canvas contents.
    
    3.5 In index.html we hide some buttons
+   
+   3.6 In config.default.yml, config-schema.json, ConfigService.js and whiteboard.js we introduce imageURL config property.
+   	   In vanilla Whiteboard all images are prefixed with current server URL. If we move Whiteboard or export & import data, it will not work.
+   	   Now images have relative URL prefixed with whatever is in imageURL. 
