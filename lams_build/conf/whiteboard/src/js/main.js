@@ -789,17 +789,14 @@ function initWhiteboard() {
         // fix bug cursor not showing up
         whiteboard.refreshCursorAppearance();
 
-        if (process.env.NODE_ENV === "production") {
-            if (ConfigService.readOnlyOnWhiteboardLoad) ReadOnlyService.activateReadOnlyMode();
-            else ReadOnlyService.deactivateReadOnlyMode();
+		// LAMS addition - these settings were set only for production mode
+		// but since LAMS is always running in development mode, we always use them
+        if (ConfigService.readOnlyOnWhiteboardLoad) ReadOnlyService.activateReadOnlyMode();
+        else ReadOnlyService.deactivateReadOnlyMode();
 
-            if (ConfigService.displayInfoOnWhiteboardLoad) InfoService.displayInfo();
-            else InfoService.hideInfo();
-        } else {
-            // in dev
-            ReadOnlyService.deactivateReadOnlyMode();
-            InfoService.displayInfo();
-        }
+        if (ConfigService.displayInfoOnWhiteboardLoad) InfoService.displayInfo();
+        else InfoService.hideInfo();
+
 
         // In any case, if we are on read-only whiteboard we activate read-only mode
         if (ConfigService.isReadOnly) ReadOnlyService.activateReadOnlyMode();
