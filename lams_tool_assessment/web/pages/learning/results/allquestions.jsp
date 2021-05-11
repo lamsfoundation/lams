@@ -77,7 +77,9 @@
 	}
 
 	<c:if test="${param.embedded and empty toolSessionID and assessment.allowDiscussionSentiment}">
-		function startDiscussionSentiment(toolQuestionUid, markAsActive) {
+		function startDiscussionSentiment(toolQuestionUid, burningQuestionUid, markAsActive) {
+			// burningQuestionUid is not used in Assessment, but must be added for function signature consistency
+			
 			$('#discussion-sentiment-chart-panel-container-' + toolQuestionUid).load(
 				'${lams}learning/discussionSentiment/startMonitor.do',
 				{
@@ -111,18 +113,20 @@
 				};
 		</c:if>
 
-		$.ajax({
-			url : '${lams}learning/discussionSentiment/checkMonitor.do',
-			data : {
-				toolContentId : ${assessment.contentId}
-			},
-			dataType : 'json',
-			success : function(result){
-				result.forEach(function(discussion){
-					startDiscussionSentiment(discussion.toolQuestionUid, false);
-				});
-			}
-		});
+		<c:if test="${param.embedded and empty toolSessionID and assessment.allowDiscussionSentiment}">
+			$.ajax({
+				url : '${lams}learning/discussionSentiment/checkMonitor.do',
+				data : {
+					toolContentId : ${assessment.contentId}
+				},
+				dataType : 'json',
+				success : function(result){
+					result.forEach(function(discussion){
+						startDiscussionSentiment(discussion.toolQuestionUid, null, false);
+					});
+				}
+			});
+		</c:if>
 	});
 </script>
 <script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
@@ -158,7 +162,7 @@
 				<c:if test="${assessment.allowDiscussionSentiment}">
 					<div id="discussion-sentiment-start-button-${question.uid}"
 					     class="btn btn-xs btn-default pull-right discussion-sentiment-start-button"
-					     onClick="javascript:startDiscussionSentiment(${question.uid}, true)">
+					     onClick="javascript:startDiscussionSentiment(${question.uid}, null, true)">
 						<i class="fa fa-comments"></i><fmt:message key="label.monitoring.discussion.start"/>
 					</div>
 				</c:if>

@@ -1,4 +1,5 @@
 <%@include file="/common/taglibs.jsp"%>
+<c:set var="idSuffix" value='${param.toolQuestionUid}${empty param.burningQuestionUid ? "" : "-".concat(param.burningQuestionUid)}' />
 
 <style>
 	.discussion-sentiment-chart-panel .panel-title .fa-comments {
@@ -49,53 +50,56 @@
 </style>
 
 <script>
-	function stopDiscussionSentiment(toolQuestionUid) {
+	function stopDiscussionSentiment(toolQuestionUid, burningQuestionUid) {
 		// stop discussion on server and reflect it on widget
 		$.ajax({
 			url : '<lams:LAMSURL />learning/discussionSentiment/stopMonitor.do',
 			data : {
-				toolQuestionUid : toolQuestionUid
+				toolQuestionUid : toolQuestionUid,
+				burningQuestionUid : burningQuestionUid
 			},
 			type : 'post',
 			success : function(){
-				 onStopDiscussionSentiment(toolQuestionUid);
+				 onStopDiscussionSentiment(toolQuestionUid, burningQuestionUid);
 			}
 		});
 	}
 
-	function onStopDiscussionSentiment(toolQuestionUid) {
+	function onStopDiscussionSentiment(toolQuestionUid, burningQuestionUid) {
 		// stop auto refresh for this widget and make it look like disabled
-		 var widget = $('#discussion-sentiment-chart-panel-content-' + toolQuestionUid)
+		 var widget = $('#discussion-sentiment-chart-panel-content-' + toolQuestionUid + (burningQuestionUid ? '-' + burningQuestionUid : ''))
 		 		.data('stop', true)
 				.closest('.discussion-sentiment-chart-panel').addClass('disabled');
 		$('.discussion-sentiment-stop-button', widget).remove();	
 		$('.discussion-sentiment-start-button', widget).show();	
 	}
 
-	function getDiscussionSentimentMonitorData(toolQuestionUid) {
+	function getDiscussionSentimentMonitorData(toolQuestionUid, burningQuestionUid) {
 		$.ajax({
 			url : '<lams:LAMSURL />learning/discussionSentiment/getMonitorData.do',
 			data : {
-				toolQuestionUid : toolQuestionUid
+				toolQuestionUid : toolQuestionUid,
+				burningQuestionUid : burningQuestionUid
 			},
 			dataType : 'json',
 			success : function(response) {
 				if (!response.isActive) {
 					 // probably another teacher stopped this discussion
-					 onStopDiscussionSentiment(toolQuestionUid);
+					 onStopDiscussionSentiment(toolQuestionUid, burningQuestionUid);
 				}
 
 				// process raw data in response, which is "option" -> "number of votes"
 				var data = response.votes, 
 					stayVotes  = 0,
-					moveVotes  = 0;
+					moveVotes  = 0,
+					idSuffix = toolQuestionUid + (burningQuestionUid ? '-' + burningQuestionUid : '');
 				for (var optionNumber = 1; optionNumber <= 4; optionNumber++) {
 					var votes = data[optionNumber];
 					if (votes) {
 						stayVotes += votes;
 					}
 				}
-				$('#discussion-sentiment-table-stay-header-votes-' + toolQuestionUid).text(stayVotes);
+				$('#discussion-sentiment-table-stay-header-votes-' + idSuffix).text(stayVotes);
 
 				for (var optionNumber = 11; optionNumber <= 14; optionNumber++) {
 					var votes = data[optionNumber];
@@ -103,14 +107,14 @@
 						moveVotes += votes;
 					}
 				}
-				$('#discussion-sentiment-table-move-header-votes-' + toolQuestionUid).text(moveVotes);
+				$('#discussion-sentiment-table-move-header-votes-' + idSuffix).text(moveVotes);
 				
 				var totalVotes = stayVotes + moveVotes;
-				$('#discussion-sentiment-votes-' + toolQuestionUid).text(totalVotes);
+				$('#discussion-sentiment-votes-' + idSuffix).text(totalVotes);
 				var stayPercent = totalVotes === 0 ? 0 : Math.round(stayVotes / totalVotes * 100);
-				$('#discussion-sentiment-table-stay-header-value-' + toolQuestionUid).text(stayPercent + '%');
+				$('#discussion-sentiment-table-stay-header-value-' + idSuffix).text(stayPercent + '%');
 				var movePercent = totalVotes === 0 ? 0 : Math.round(moveVotes / totalVotes * 100);
-				$('#discussion-sentiment-table-move-header-value-' + toolQuestionUid).text(movePercent + '%');
+				$('#discussion-sentiment-table-move-header-value-' + idSuffix).text(movePercent + '%');
 
 				for (var optionNumber = 1; optionNumber <= 14; optionNumber++) {
 					if (optionNumber > 4 && optionNumber < 11) {
@@ -119,7 +123,7 @@
 					}
 					
 					var votes = data[optionNumber],
-						optionRow = $('#discussion-sentiment-table-option-row-' + toolQuestionUid + '-' + optionNumber);
+						optionRow = $('#discussion-sentiment-table-option-row-' + idSuffix + '-' + optionNumber);
 					if (votes && totalVotes > 0) {
 						optionRow.css('display', 'table-row')
 								 .find('.discussion-sentiment-table-option-value')
@@ -130,7 +134,7 @@
 					}
 				}
 
-				var chartCell = $('#discussion-sentiment-chart-cell-' + toolQuestionUid);
+				var chartCell = $('#discussion-sentiment-chart-cell-' + idSuffix);
 				if (totalVotes === 0) {
 					// no votes, no chart
 					chartCell.empty();
@@ -206,13 +210,15 @@
 	
 	$(document).ready(function(){
 		var toolQuestionUid = ${param.toolQuestionUid},
+			burningQuestionUid = '${param.burningQuestionUid}',
+			idSuffix = toolQuestionUid + (burningQuestionUid ? '-' + burningQuestionUid : ''),
 			// how often to refresh the chart
 			dataRefreshInterval = 5 * 1000;
-		getDiscussionSentimentMonitorData(toolQuestionUid);
+		getDiscussionSentimentMonitorData(toolQuestionUid, burningQuestionUid);
 		
 	
 		var dataRefresh = window.setInterval(function(){
-			var panelContent = $('#discussion-sentiment-chart-panel-content-' + toolQuestionUid),
+			var panelContent = $('#discussion-sentiment-chart-panel-content-' + idSuffix),
 				// If in TBL monitor the tab with the chart got refreshed, then old interval is still ticking.
 				// We need to clear it so only the new interval does it job.
 				existingDataRefresh = panelContent.data('dataRefresh');
@@ -220,50 +226,51 @@
 				window.clearInterval(dataRefresh);
 				return;
 			}
-			getDiscussionSentimentMonitorData(toolQuestionUid);
+			getDiscussionSentimentMonitorData(toolQuestionUid, burningQuestionUid);
 		}, dataRefreshInterval);
 	
-		$('#discussion-sentiment-chart-panel-content-' + toolQuestionUid).data('dataRefresh', dataRefresh);
+		$('#discussion-sentiment-chart-panel-content-' + idSuffix).data('dataRefresh', dataRefresh);
 	});
 </script>
 
+
 <div class="panel panel-default discussion-sentiment-chart-panel">
 	<div class="panel-heading"
-		 id="discussion-sentiment-chart-panel-heading-${param.toolQuestionUid}">
+		 id="discussion-sentiment-chart-panel-heading-${idSuffix}">
        	<div class="panel-title">
 	    	<i class="fa fa-comments"></i>
 	    	<fmt:message key="label.discussion.header" />
-	       	(<span id="discussion-sentiment-votes-${param.toolQuestionUid}"></span>
+	       	(<span id="discussion-sentiment-votes-${idSuffix}"></span>
 	       	 <fmt:message key="label.discussion.votes.of.students">
 	       		<fmt:param value="${learnerCount}" />
 	       	 </fmt:message>
 	       	)
      	</div>
-     	<div class="btn btn-default discussion-sentiment-start-button" onClick="javascript:startDiscussionSentiment(${param.toolQuestionUid}, true)">
+     	<div class="btn btn-default discussion-sentiment-start-button" onClick="javascript:startDiscussionSentiment(${param.toolQuestionUid}, '${param.burningQuestionUid}', true)">
 			<fmt:message key="label.discussion.restart"/>
 		</div>
-  		<div class="btn btn-default discussion-sentiment-stop-button" onClick="javascript:stopDiscussionSentiment(${param.toolQuestionUid})">
+  		<div class="btn btn-default discussion-sentiment-stop-button" onClick="javascript:stopDiscussionSentiment(${param.toolQuestionUid}, '${param.burningQuestionUid}')">
 			<fmt:message key="label.discussion.stop"/>
 		</div>
     </div>
 
-    <div id="discussion-sentiment-chart-panel-content-${param.toolQuestionUid}" class="panel-body container-fluid" role="tabpanel"
-       	 aria-labelledby="discussion-sentiment-chart-panel-heading-${param.toolQuestionUid}">
+    <div id="discussion-sentiment-chart-panel-content-${idSuffix}" class="panel-body container-fluid" role="tabpanel"
+       	 aria-labelledby="discussion-sentiment-chart-panel-heading-${idSuffix}">
 		<div class="row">
-			<div class="col-xs-12 col-sm-6" id="discussion-sentiment-chart-cell-${param.toolQuestionUid}">
+			<div class="col-xs-12 col-sm-6" id="discussion-sentiment-chart-cell-${idSuffix}">
 			</div>
 			<div class="col-xs-12 col-sm-6">
 				<table class="table">
 			       	 <tr class="discussion-sentiment-table-header-row discussion-sentiment-table-stay-header-row">
 			       	 	<td>
 			       	 		<fmt:message key="label.discussion.stay.header" />
-			       	 		(<span id="discussion-sentiment-table-stay-header-votes-${param.toolQuestionUid}"></span>&nbsp;<fmt:message key="label.discussion.votes" />)
+			       	 		(<span id="discussion-sentiment-table-stay-header-votes-${idSuffix}"></span>&nbsp;<fmt:message key="label.discussion.votes" />)
 			       	 	</td>
-			       	 	<td id="discussion-sentiment-table-stay-header-value-${param.toolQuestionUid}">
+			       	 	<td id="discussion-sentiment-table-stay-header-value-${idSuffix}">
 			       	 	</td>
 			       	 </tr>
 			       	 <c:forEach begin="1" end="4" var="optionNumber">
-				       	 <tr id="discussion-sentiment-table-option-row-${param.toolQuestionUid}-${optionNumber}" class="discussion-sentiment-table-option-row">
+				       	 <tr id="discussion-sentiment-table-option-row-${idSuffix}-${optionNumber}" class="discussion-sentiment-table-option-row">
 				       	 	<td>
 				       	 		<fmt:message key="label.discussion.stay.option.${optionNumber}" />
 				       	 	</td>
@@ -275,13 +282,13 @@
 			       	 <tr class="discussion-sentiment-table-header-row discussion-sentiment-table-move-header-row">
 			       	 	<td>
 			       	 		<fmt:message key="label.discussion.move.header" />
-			       	 		(<span id="discussion-sentiment-table-move-header-votes-${param.toolQuestionUid}"></span>&nbsp;<fmt:message key="label.discussion.votes" />)
+			       	 		(<span id="discussion-sentiment-table-move-header-votes-${idSuffix}"></span>&nbsp;<fmt:message key="label.discussion.votes" />)
 			       	 	</td>
-			       	 	<td id="discussion-sentiment-table-move-header-value-${param.toolQuestionUid}">
+			       	 	<td id="discussion-sentiment-table-move-header-value-${idSuffix}">
 			       	 	</td>
 			       	 </tr>
 			       	 <c:forEach begin="11" end="14" var="optionNumber">
-				       	 <tr id="discussion-sentiment-table-option-row-${param.toolQuestionUid}-${optionNumber}" class="discussion-sentiment-table-option-row">
+				       	 <tr id="discussion-sentiment-table-option-row-${idSuffix}-${optionNumber}" class="discussion-sentiment-table-option-row">
 				       	 	<td>
 				       	 		<fmt:message key="label.discussion.move.option.${optionNumber}" />
 				       	 	</td>

@@ -93,13 +93,13 @@ public class DiscussionSentimentService implements IDiscussionSentimentService {
 		userId);
 	if (learnerVote != null) {
 	    discussionSentimentDAO.delete(learnerVote);
+	    discussionSentimentDAO.flush();
 	}
 
 	// add the vote
 	// it is different to discussion token as it contains user ID
 	learnerVote = new DiscussionSentimentVote(lessonId, cachedActiveDiscussionToken.getToolQuestionUid(),
 		cachedActiveDiscussionToken.getBurningQuestionUid());
-	learnerVote.setBurningQuestionUid(cachedActiveDiscussionToken.getBurningQuestionUid());
 	learnerVote.setUserId(userId);
 	learnerVote.setSelectedOption(selectedOption);
 

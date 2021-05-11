@@ -193,6 +193,8 @@ public class TblMonitorController {
 	}
 
 	request.setAttribute("isTbl", true);
+	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, scratchie.getContentId());
+	request.setAttribute("discussionSentimentEnabled", scratchie.isDiscussionSentimentEnabled());
 
 	return "pages/monitoring/parts/burningQuestions";
     }

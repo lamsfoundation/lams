@@ -16,7 +16,7 @@ public class DiscussionSentimentDAO extends LAMSBaseDAO implements IDiscussionSe
     private static final String FIND_ACTIVE_DISCUSSION = "FROM " + DiscussionSentimentVote.class.getName()
 	    + " WHERE lessonId = :lessonId AND userId IS NULL";
 
-    private static final String FIND_ALL_LESSON_DISCUSSIONS = "SELECT toolQuestionUid FROM "
+    private static final String FIND_ALL_LESSON_DISCUSSIONS = "SELECT toolQuestionUid, burningQuestionUid FROM "
 	    + DiscussionSentimentVote.class.getName() + " WHERE lessonId = :lessonId GROUP BY toolQuestionUid";
 
     @Override
@@ -28,12 +28,13 @@ public class DiscussionSentimentDAO extends LAMSBaseDAO implements IDiscussionSe
     @Override
     @SuppressWarnings("unchecked")
     public Set<DiscussionSentimentVote> getDiscussions(long lessonId) {
-	List<Long> queryResult = getSession().createQuery(FIND_ALL_LESSON_DISCUSSIONS)
+	List<Object[]> queryResult = getSession().createQuery(FIND_ALL_LESSON_DISCUSSIONS)
 		.setParameter("lessonId", lessonId).getResultList();
 	Set<DiscussionSentimentVote> result = new HashSet<>();
 
-	for (Long toolQuestionUid : queryResult) {
-	    DiscussionSentimentVote token = new DiscussionSentimentVote(lessonId, toolQuestionUid, null);
+	for (Object[] discussionDetails : queryResult) {
+	    DiscussionSentimentVote token = new DiscussionSentimentVote(lessonId, (Long) discussionDetails[0],
+		    (Long) discussionDetails[1]);
 	    result.add(token);
 	}
 	return result;
