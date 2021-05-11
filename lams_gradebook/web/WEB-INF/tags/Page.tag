@@ -217,22 +217,41 @@
 						} else {
 							alert(command.message);
 						}
-						
 					}
+					
 					// if learner's currently displayed page has hookTrigger same as in the JSON
 					// then a function also defined on that page will run
 					if (command.hookTrigger && command.hookTrigger == commandWebsocketHookTrigger 
 										    && typeof commandWebsocketHook === 'function') {
 					    commandWebsocketHook(command.hookParams);
 					}
+
 					if (command.redirectURL) {
 						window.location.href = command.redirectURL;
+					}
+
+					if (command.discussion) {
+						var discussionCommand = $('#discussion-sentiment-command');
+						if (discussionCommand.length === 0) {
+							discussionCommand = $('<div />').attr('id', 'discussion-sentiment-command').appendTo('body');
+						}
+						discussionCommand.load(LEARNING_URL + "discussionSentiment/" + command.discussion + ".do", {
+							lessonId : lessonId
+						});
 					}
 
 					// reset ping timer
 					clearTimeout(commandWebsocketPingTimeout);
 					commandWebsocketPingFunc(true);
 				};
+
+				// check if there is a running discussion; if so, a websocket command will come to display the widget
+				$.ajax({
+					url : LEARNING_URL + "discussionSentiment/checkLearner.do",
+					data: {
+						lessonId : lessonId
+					}
+				});
 			}
 			
 			$(document).ready(function() {
