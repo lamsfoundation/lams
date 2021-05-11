@@ -37,20 +37,52 @@
 <script>
 	// This method is called when monitor stops discussion via stopLearner.jsp and on server error
 	function stopDiscussionSentimentLearnerWidget(){
-		$('#discussion-sentiment-widget-content').data('remove', true).collapse('hide');
+		var discussionSentimentContent = $('#discussion-sentiment-widget-content');
+		if (discussionSentimentContent.hasClass('in')){
+			// if the widget is expanded, collapse it and then remove it
+			discussionSentimentContent.data('remove', true).collapse('hide');
+		} else {
+			// if the widget is collapsed, remove it straight away
+			$('#discussion-sentiment-command, #discussion-sentiment-widget').remove();
+		}
 	}
 
-	function selectDiscussionSentimentOption(selectedOption) {
+	function selectDiscussionSentimentOption(selectedOption, autoExpand, autoCollapse) {
 		// clear other cells
-		var widget = $('#discussion-sentiment-widget');
-		$('td', widget).removeClass('selected warning success');
+		var discussionSentimentContent = $('#discussion-sentiment-widget-content'),
+			isExpanded = discussionSentimentContent.hasClass('in');
+		$('td', discussionSentimentContent).removeClass('selected warning success');
 
 		if (!selectedOption) {
+			if (autoExpand && !isExpanded) {
+				// when a teacher starts a fresh discussion and learner has not answered yet,
+				// prompt the learner for an answer by expanding the widget
+				window.setTimeout(function(){
+					discussionSentimentContent.collapse('show');
+				}, 1000);
+			}
 			return;
 		}
+		
 		// highlight the successfuly selected cell
-		var selectedCell = $('#discussion-sentiment-widget-option-cell-' + selectedOption, widget).addClass('selected');
+		var selectedCell = $('#discussion-sentiment-widget-option-cell-' + selectedOption, discussionSentimentContent).addClass('selected');
 		selectedCell.addClass(selectedCell.hasClass('discussion-sentiment-widget-option-stay') ? 'warning' : 'success');
+		
+		if (!autoCollapse) {
+			return;
+		}
+		if (isExpanded) {
+			// when learner clicks on an answer, collapse the widget after few seconds
+			var collapseTimeout = discussionSentimentContent.data('collapseTimeout');
+			if (collapseTimeout) {
+				// the learner quickly changed his mind, so count timer from the last click, not the first one
+				window.clearTimeout(collapseTimeout);
+			}
+			collapseTimeout = window.setTimeout(function(){
+				discussionSentimentContent.data('collapseTimeout', null).collapse('hide');
+			}, 3 * 1000);
+			discussionSentimentContent.data('collapseTimeout', collapseTimeout);
+		}
 	}
 
 	$(document).ready(function(){
@@ -87,11 +119,6 @@
 					});
 				});
 
-		// the widget is collapsed at the beginning, then we expand it
-		window.setTimeout(function(){
-			discussionSentimentContent.collapse('show');
-		}, 1000);
-
 		// cells are clickable
 		$('#discussion-sentiment-widget-content td', discussionSentimentWidget).click(function(){
 			var selectedCell = $(this),
@@ -110,7 +137,7 @@
 						stopDiscussionSentimentLearnerWidget();
 					}
 					if (response == 'voted') {
-						selectDiscussionSentimentOption(selectedOption);
+						selectDiscussionSentimentOption(selectedOption, false, true);
 					}
 				},
 				error    : function(){
@@ -119,7 +146,7 @@
 			});
 		});
 
-		selectDiscussionSentimentOption('${param.selectedOption}');
+		selectDiscussionSentimentOption('${param.selectedOption}', true, false);
 	});
 </script>
 

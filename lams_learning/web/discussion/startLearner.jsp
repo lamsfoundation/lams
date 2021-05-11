@@ -7,6 +7,6 @@
 			.load("<lams:LAMSURL />learning/discussion/learner.jsp?lessonId=${param.lessonId}&selectedOption=${selectedOption}");
 	} else {
 		// the widget already exists and monitor changed the topic, so clear out the selected option and optionally set a new one
-		selectDiscussionSentimentOption('${selectedOption}');
+		selectDiscussionSentimentOption('${selectedOption}', true, false);
 	}
 </script>
