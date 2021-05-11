@@ -1630,7 +1630,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
     public Long createTblAssessmentToolContent(UserDTO user, String title, String instructions,
 	    String reflectionInstructions, boolean selectLeaderToolOutput, boolean enableNumbering,
 	    boolean enableConfidenceLevels, boolean allowDiscloseAnswers, boolean allowAnswerJustification,
-	    ArrayNode questions) throws IOException {
+	    boolean allowDiscussionSentiment, ArrayNode questions) throws IOException {
 
 	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, instructions,
 		reflectionInstructions, null, null, user);
@@ -1640,6 +1640,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	toolContentJSON.put("displaySummary", Boolean.TRUE);
 	toolContentJSON.put("allowDiscloseAnswers", allowDiscloseAnswers);
 	toolContentJSON.put("allowAnswerJustification", allowAnswerJustification);
+	toolContentJSON.put("allowDiscussionSentiment", allowDiscussionSentiment);
 
 	if (questions != null) {
 	    toolContentJSON.set(RestTags.QUESTIONS, questions);
