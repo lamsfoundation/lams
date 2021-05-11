@@ -148,6 +148,6 @@ public interface IAuthoringFullService extends IAuthoringService {
 
     Long createTblAssessmentToolContent(UserDTO user, String title, String instructions, String reflectionInstructions,
 	    boolean selectLeaderToolOutput, boolean enableNumbering, boolean enableConfidenceLevels,
-	    boolean allowDiscloseAnswers, boolean allowAnswerJustification, boolean allowDiscussionSentiment,
+	    boolean allowDiscloseAnswers, boolean allowAnswerJustification, boolean enableDiscussionSentiment,
 	    ArrayNode questions) throws IOException;
 }

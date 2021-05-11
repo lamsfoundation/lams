@@ -195,7 +195,7 @@ public class TBLTemplateController extends LdTemplateController {
 		    ? JsonUtil.optInt(iraActivityJSON, AuthoringJsonTags.ACTIVITY_UIID)
 		    : null;
 	    Long tRAToolContentId = createScratchieToolContent(userDTO, activityTitle,
-		    data.getText("boilerplate.tra.instructions"), false, confidenceLevelsActivityUIID,
+		    data.getText("boilerplate.tra.instructions"), false, true, confidenceLevelsActivityUIID,
 		    testQuestionsArray);
 	    activities.add(createScratchieActivity(maxUIID, order++, currentActivityPosition, tRAToolContentId,
 		    data.contentFolderID, groupingUIID, null, null, activityTitle));

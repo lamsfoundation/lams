@@ -1058,8 +1058,8 @@ public abstract class LdTemplateController {
      * full details of questions). Other fields are optional.
      */
     protected Long createScratchieToolContent(UserDTO user, String title, String instructions,
-	    boolean useSelectLeaderToolOuput, Integer confidenceLevelsActivityUiid, ArrayNode questions)
-	    throws IOException {
+	    boolean useSelectLeaderToolOuput, boolean enableDiscussionSentiment, Integer confidenceLevelsActivityUiid,
+	    ArrayNode questions) throws IOException {
 
 	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, instructions, null, null, null,
 		null);
@@ -1067,6 +1067,8 @@ public abstract class LdTemplateController {
 	if (confidenceLevelsActivityUiid != null) {
 	    toolContentJSON.put(RestTags.CONFIDENCE_LEVELS_ACTIVITY_UIID, confidenceLevelsActivityUiid);
 	}
+
+	toolContentJSON.put(RestTags.ENABLE_DISCUSSION_SENTIMENT, enableDiscussionSentiment);
 
 	for (int i = 0; i < questions.size(); i++) {
 	    ObjectNode question = (ObjectNode) questions.get(i);
