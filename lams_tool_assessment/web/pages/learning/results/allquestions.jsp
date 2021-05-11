@@ -76,7 +76,7 @@
 		return false;
 	}
 
-	<c:if test="${param.embedded and empty toolSessionID}">
+	<c:if test="${param.embedded and empty toolSessionID and assessment.allowDiscussionSentiment}">
 		function startDiscussionSentiment(toolQuestionUid, markAsActive) {
 			$('#discussion-sentiment-chart-panel-container-' + toolQuestionUid).load(
 				'${lams}learning/discussionSentiment/startMonitor.do',
@@ -155,11 +155,13 @@
 					</div>
 				</c:if>
 				
-				<div id="discussion-sentiment-start-button-${question.uid}"
-				     class="btn btn-xs btn-default pull-right discussion-sentiment-start-button"
-				     onClick="javascript:startDiscussionSentiment(${question.uid}, true)">
-					<i class="fa fa-comments"></i><fmt:message key="label.monitoring.discussion.start"/>
-				</div>
+				<c:if test="${assessment.allowDiscussionSentiment}">
+					<div id="discussion-sentiment-start-button-${question.uid}"
+					     class="btn btn-xs btn-default pull-right discussion-sentiment-start-button"
+					     onClick="javascript:startDiscussionSentiment(${question.uid}, true)">
+						<i class="fa fa-comments"></i><fmt:message key="label.monitoring.discussion.start"/>
+					</div>
+				</c:if>
 			</c:if>
 			
 			<h3 class="panel-title" style="margin-bottom: 10px;font-size: initial;">
@@ -290,7 +292,7 @@
 				</c:choose>
 			</c:if>
 			
-			<c:if test="${param.embedded and empty toolSessionID}">
+			<c:if test="${param.embedded and empty toolSessionID and assessment.allowDiscussionSentiment}">
 				<div id="discussion-sentiment-chart-panel-container-${question.uid}"></div>
 			</c:if>
 		</div>

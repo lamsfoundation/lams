@@ -242,6 +242,13 @@
 </div>
 
 <div class="checkbox">
+	<label for="allowDiscussionSentiment">
+		<form:checkbox path="assessment.allowDiscussionSentiment" id="allowDiscussionSentiment"/>
+		<fmt:message key="label.authoring.advance.discussion" />
+	</label>
+</div>
+
+<div class="checkbox">
 	<label for="enable-confidence-levels">
 		<form:checkbox path="assessment.enableConfidenceLevels" id="enable-confidence-levels"/>
 		<fmt:message key="label.enable.confidence.levels" />
