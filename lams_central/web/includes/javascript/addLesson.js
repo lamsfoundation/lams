@@ -735,7 +735,7 @@ function updateSplitLearnersFields(){
 		var maxLearnerCount = $('#selected-learners div.draggableItem').length,
 			learnerCount = $('#splitLearnersCountField').val(),
 			instances = Math.ceil(maxLearnerCount/learnerCount);
-		learnerCount = Math.ceil(maxLearnerCount/instances);
+		learnerCount = instances ? Math.ceil(maxLearnerCount/instances) : learnerCount;
 		var description = SPLIT_LEARNERS_DESCRIPTION.replace('[0]', instances).replace('[1]', learnerCount);
 		$('#splitLearnersDescription').html(description);
 	}
