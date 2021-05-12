@@ -56,10 +56,6 @@
     border-radius: 0 0 6px 6px;
 }
 
-#refresh-button {
-	margin-right: 15px;
-}
-
 /* Sidebar Styles */
 
 table.tablesorter {
@@ -156,10 +152,21 @@ table.tablesorter {
     background: none;
 }
 
+.top-nav {
+	padding: 0 10px 0 15px;
+	display: flex;
+    justify-content: space-between;
+}
+
 .top-nav div {
     padding-top: 13px;
 }
 
+.top-nav #menu-right-controls {
+	min-width: 100px;
+}
+	
+	
 @media(min-width:768px) {
     #wrapper {
         padding-left: 154px;
@@ -180,7 +187,11 @@ table.tablesorter {
     #wrapper.toggled #page-content-wrapper {
         margin-right: 0;
     }
-   
+
+    .top-nav #menu-right-controls {
+	    min-width: 400px;
+	}
+	
    .top-nav div {
 	    padding-top: 20px;
 	}

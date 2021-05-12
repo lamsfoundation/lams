@@ -315,13 +315,13 @@
 	        </div>
 	    </nav>
 		<!-- /Offcanvas Bar -->
-    
-    		<!-- Page Content -->
+		
+    	<!-- Page Content -->
 		<div id="page-content-wrapper">
 
 			<!-- Top bar -->
 			<div class="top-nav">
-				<div class="col-xs-9 col-md-7 col-lg-7" id="menu-left-controls">
+				<div id="menu-left-controls">
 					<a href="#">
 						<i class="fa fa-bars fa-lg" id="menu-toggle-bars"></i>
 					</a>
@@ -330,18 +330,16 @@
 					</span>
 				</div>
 						
-				<div>
-					<button id="regular-monitor-button" type="button" class="btn btn-sm btn-default pull-right" onclick="return switchToRegularMonitor();" style="margin-right: 10px;">
-						<i class="fa fa-heartbeat" title="<fmt:message key="label.monitor" />"></i><span class="hidden-xs">  <fmt:message key="label.switch.to.regular.monitor" /></span>
-					</button>
-					
-					<button id="refresh-button" type="button" class="btn btn-sm btn-default pull-right" onclick="Javascript: refresh(); return false;" style="margin-right: 10px;">
+				<div id="menu-right-controls">
+					<button id="timer-button" type="button" class="btn btn-sm btn-default"  onclick="javascript:openPopUp('<lams:LAMSURL/>monitoring/timer.jsp', '<fmt:message key="label.countdown.timer"/>', 648, 1152, true);return false;">
+							<i class="fa fa-hourglass-half"></i><span class="hidden-xs"> <fmt:message key="label.countdown.timer"/></span>
+					</button>	
+					<button id="refresh-button" type="button" class="btn btn-sm btn-default" onclick="Javascript: refresh(); return false;">
 						<i class="fa fa-refresh"></i><span class="hidden-xs">  <fmt:message key="button.refresh"/></span>
 					</button>
-					
-					<button id="timer-button" type="button" class="btn btn-sm btn-default pull-right"  onclick="javascript:openPopUp('<lams:LAMSURL/>monitoring/timer.jsp', '<fmt:message key="label.countdown.timer"/>', 648, 1152, true);return false;" style="margin-right: 10px;">
-							<i class="fa fa-hourglass-half"></i><span class="hidden-xs"> <fmt:message key="label.countdown.timer"/></span>
-					</button>		
+					<button id="regular-monitor-button" type="button" class="btn btn-sm btn-default" onclick="return switchToRegularMonitor();">
+						<i class="fa fa-heartbeat" title="<fmt:message key="label.monitor" />"></i><span class="hidden-xs">  <fmt:message key="label.switch.to.regular.monitor" /></span>
+					</button>
 				</div>
 			</div>
 			<!-- End top bar -->
