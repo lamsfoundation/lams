@@ -1,8 +1,15 @@
 <%@ include file="/taglibs.jsp"%>
 <style>
+
+	#tbl-teams-tab-title {
+		text-align: center;
+		margin: 23px 0 0 100px;
+	}
+	
 	.font-weight-bold {
 		font-weight: bold;
 	}
+	
 	.group-title {
 	   	cursor: pointer;
 	}
@@ -244,7 +251,15 @@
 <div class="row no-gutter">
 <div class="col-xs-2"></div>
 <div class="col-xs-8">
-	<h3 style="text-align: center;">
+
+	<c:if test="${not empty groupsSetupUrl}">
+		<div onClick="javascript:openPopUp('<lams:LAMSURL/>${groupsSetupUrl}','GroupsSetup', 800, 1280, true)" type="button"
+			    class="btn btn-default pull-right voffset20">
+			<fmt:message key="label.teams.setup"/>
+		</div>
+	</c:if>
+	
+	<h3 id="tbl-teams-tab-title">
 		<fmt:message key="label.students.teams"/>
 	</h3>
 	
@@ -626,14 +641,7 @@
 	</c:forEach>     
 
 </div>
-<div class="col-xs-2">
-	<c:if test="${not empty groupsSetupUrl}">
-		<button onClick="javascript:openPopUp('<lams:LAMSURL/>${groupsSetupUrl}','GroupsSetup', 800, 1280, true)" type="button"
-			    class="btn btn-default voffset20">
-			<fmt:message key="label.teams.setup"/>
-		</button>
-	</c:if>
-</div>
+<div class="col-xs-2"></div>
 </div>
 
 <!-- modal chart -->
