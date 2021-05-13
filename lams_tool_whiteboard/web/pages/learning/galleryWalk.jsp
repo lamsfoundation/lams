@@ -153,42 +153,39 @@
 	</c:if>
 	
 
-	<div id="whiteboard-group-panels" class="panel-group" role="tablist" aria-multiselectable="true"> 
-		<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
-		
-		    <div class="panel panel-default whiteboard-group-panel">
-		       <div class="panel-heading" role="tab" id="heading${groupSummary.sessionId}">
-		       	<span class="panel-title collapsable-icon-left">
-		       		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${groupSummary.sessionId}" 
-							aria-expanded="false" aria-controls="collapse${groupSummary.sessionId}" data-parent="#whiteboard-group-panels">
-						<c:choose>
-							<c:when test="${toolSessionID == groupSummary.sessionId}">
-								<b><c:out value="${groupSummary.sessionName}" />&nbsp;<fmt:message key="label.gallery.walk.your.group" /></b>
-							</c:when>
-							<c:otherwise>
-								<c:out value="${groupSummary.sessionName}" />
-							</c:otherwise>
-						</c:choose>
-					</a>
-				</span>
-		       </div>
-		       <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse whiteboard-collapse" 
-		       	    role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
-					<%-- Do not show rating to own group before Gallery Walk is finished --%>
-		       	    <c:if test="${not whiteboard.galleryWalkReadOnly and (whiteboard.galleryWalkFinished or mode == 'teacher' or toolSessionID != groupSummary.sessionId)}">
-		       	    	<div class="gallery-walk-rating-comment-container">
-		       	    		<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}"
-									     isItemAuthoredByUser="${whiteboard.galleryWalkFinished or not hasEditRight or mode == 'teacher'}" />
-						 </div>
-		       	    </c:if>
-		 
-					<iframe class="whiteboard-frame"
-							data-src='${whiteboardServerUrl}/?whiteboardid=${groupSummary.wid}&username=${whiteboardAuthorName}${empty groupSummary.accessToken ? "" : "&accesstoken=".concat(groupSummary.accessToken)}&copyfromwid=${whiteboard.contentId}${empty whiteboardCopyAccessToken ? "" : "&copyaccesstoken=".concat(groupSummary.copyAccessToken)}'>
-					</iframe>	
-				</div>
+	<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
+	    <div class="panel panel-default">
+	       <div class="panel-heading" role="tab" id="heading${groupSummary.sessionId}">
+	       	<span class="panel-title collapsable-icon-left">
+	       		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${groupSummary.sessionId}" 
+						aria-expanded="false" aria-controls="collapse${groupSummary.sessionId}">
+					<c:choose>
+						<c:when test="${toolSessionID == groupSummary.sessionId}">
+							<b><c:out value="${groupSummary.sessionName}" />&nbsp;<fmt:message key="label.gallery.walk.your.group" /></b>
+						</c:when>
+						<c:otherwise>
+							<c:out value="${groupSummary.sessionName}" />
+						</c:otherwise>
+					</c:choose>
+				</a>
+			</span>
+	       </div>
+	       <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse whiteboard-collapse" 
+	       	    role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
+				<%-- Do not show rating to own group before Gallery Walk is finished --%>
+	       	    <c:if test="${not whiteboard.galleryWalkReadOnly and (whiteboard.galleryWalkFinished or mode == 'teacher' or toolSessionID != groupSummary.sessionId)}">
+	       	    	<div class="gallery-walk-rating-comment-container">
+	       	    		<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}"
+								     isItemAuthoredByUser="${whiteboard.galleryWalkFinished or not hasEditRight or mode == 'teacher'}" />
+					 </div>
+	       	    </c:if>
+	 
+				<iframe class="whiteboard-frame"
+						data-src='${whiteboardServerUrl}/?whiteboardid=${groupSummary.wid}&username=${whiteboardAuthorName}${empty groupSummary.accessToken ? "" : "&accesstoken=".concat(groupSummary.accessToken)}&copyfromwid=${whiteboard.contentId}${empty whiteboardCopyAccessToken ? "" : "&copyaccesstoken=".concat(groupSummary.copyAccessToken)}'>
+				</iframe>	
 			</div>
-		</c:forEach>
-	</div>
+		</div>
+	</c:forEach>
 	
 	<c:if test="${mode != 'teacher'}">
 		<div>
