@@ -36,17 +36,42 @@
 			margin-bottom: 20px;
 			border: 1px solid #c1c1c1;
 		}
+		
+		.launch-fullscreen {
+			margin-bottom: 5px;
+		}
+		
+		.exit-fullscreen {
+			display: none;
+			margin-bottom: 5px;
+		}
+		
+		#fullPageContentDiv:fullscreen {
+			padding: 20px 0 70px 0;
+		}
+		
+		#fullPageContentDiv:fullscreen #flexDiv {
+			margin: 0 2%;
+		}
+		
+		#fullPageContentDiv:fullscreen #flexDiv, #fullPageContentDiv:fullscreen #mainDiv, #fullPageContentDiv:fullscreen #whiteboard-frame {
+			height: 100%;
+			width: 100%;
+		}
 	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/fullscreen.js"></script>
 	<script type="text/javascript">
 	    // avoid name clash between bootstrap and jQuery UI
 	    $.fn.bootstrapTooltip = $.fn.tooltip.noConflict();
 	    
 		$(document).ready(function(){
 			$('[data-toggle="tooltip"]').bootstrapTooltip();
+
+			setupFullScreenEvents();
 		});
 		
 		if (${!hasEditRight && mode != "teacher" && !finishedLock}) {
@@ -214,10 +239,23 @@
 		
 		<p><c:out value="${whiteboard.instructions}" escapeXml="false" /></p>
 		
-
-		<iframe id="whiteboard-frame"
-		        src='${whiteboardServerUrl}/?whiteboardid=${wid}&username=${whiteboardAuthorName}${empty whiteboardAccessToken ? "" : "&accesstoken=".concat(whiteboardAccessToken)}&copyfromwid=${whiteboard.contentId}${empty whiteboardCopyAccessToken ? "" : "&copyaccesstoken=".concat(whiteboardCopyAccessToken)}'>
-		</iframe>
+		<div id="fullPageContentDiv">
+			<div id="flexDiv">
+				<a href="#" class="btn btn-default fixed-button-width pull-right launch-fullscreen" onclick="javascript:launchIntoFullscreen()"
+				   title="<fmt:message key='label.fullscreen.open' />">
+					<i class="fa fa-arrows-alt" aria-hidden="true"></i>
+				</a> 
+		       	<a href="#" class="btn btn-default fixed-button-width pull-right exit-fullscreen" onclick="javascript:exitFullscreen()"
+				   title="<fmt:message key='label.fullscreen.close' />">
+		       		<i class="fa fa-compress" aria-hidden="true"></i>
+		       	</a>
+		       	<div id="mainDiv">
+					<iframe id="whiteboard-frame"
+					        src='${whiteboardServerUrl}/?whiteboardid=${wid}&username=${whiteboardAuthorName}${empty whiteboardAccessToken ? "" : "&accesstoken=".concat(whiteboardAccessToken)}&copyfromwid=${whiteboard.contentId}${empty whiteboardCopyAccessToken ? "" : "&copyaccesstoken=".concat(whiteboardCopyAccessToken)}'>
+					</iframe>
+				</div>
+			</div>
+		</div>
 
 		<!-- Reflection -->
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">

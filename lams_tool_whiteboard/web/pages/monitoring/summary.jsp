@@ -88,6 +88,28 @@
 		height: 700px;
 		border: 1px solid #c1c1c1;
 	}
+	
+	.launch-fullscreen {
+		margin-bottom: 5px;
+	}
+	
+	.exit-fullscreen {
+		display: none;
+		margin-bottom: 5px;
+	}
+	
+	#fullPageContentDiv:fullscreen {
+		padding: 20px 0 70px 0;
+	}
+	
+	#fullPageContentDiv:fullscreen #flexDiv {
+		margin: 0 2%;
+	}
+	
+	#fullPageContentDiv:fullscreen #flexDiv, #fullPageContentDiv:fullscreen #mainDiv, #fullPageContentDiv:fullscreen .whiteboard-frame {
+		height: 100%;
+		width: 100%;
+	}
 </style>
 
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
