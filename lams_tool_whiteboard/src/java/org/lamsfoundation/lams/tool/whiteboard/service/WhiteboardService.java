@@ -608,6 +608,9 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 		throw new IOException("When copying Whiteboard from ID " + sourceWid + " to ID " + targetWid
 			+ " server responded with code " + code);
 	    }
+	    if (log.isDebugEnabled()) {
+		log.debug("Copied Whiteboard from ID " + sourceWid + " to ID " + targetWid);
+	    }
 	} catch (IOException e) {
 	    throw new WhiteboardApplicationException(
 		    "Could not copy Whiteboard from ID " + sourceWid + " to ID " + targetWid, e);
@@ -646,6 +649,10 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	    if (code != 200) {
 		throw new IOException(
 			"When uploading Whiteboard content to ID " + wid + " server responded with code " + code);
+	    }
+
+	    if (log.isDebugEnabled()) {
+		log.debug("Uploaded Whiteboard content to ID " + wid);
 	    }
 	} catch (IOException e) {
 	    throw new WhiteboardApplicationException("Could not upload Whiteboard content to ID " + wid, e);
