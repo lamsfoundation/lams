@@ -2,7 +2,9 @@ Whiteboard is required for Whiteboard tool
 
 1. Get code from 
 https://github.com/cracker0dks/whiteboard
-Current version is 1.6 with all changes up to date 2021-04-23
+Current version is 1.6 with all changes up to date 2021-05-19
+It requires Node.js version 16 as version 14 has a problem with image loading
+https://stackoverflow.com/questions/63610932/express-static-network-requests-stuck-on-pending
 
 2. Follow installation instructions from the GitHub page
 
@@ -20,8 +22,7 @@ Current version is 1.6 with all changes up to date 2021-04-23
    3.4 In s_whiteboard.js we introduce methods for copying and saving canvas contents.
    
    3.5 In index.html we hide some buttons
-   
-   3.6 In index.html and index.js we hide Whiteboard contents until everything loads, otherwise the UI looks messed up at first.
+       In index.html and index.js we hide Whiteboard contents until everything loads, otherwise the UI looks messed up at first.
    
    3.7 In config.default.yml, config-schema.json, ConfigService.js and whiteboard.js we introduce imageURL config property.
    	   In vanilla Whiteboard all images are prefixed with current server URL. If we move Whiteboard or export & import data, it will not work.
