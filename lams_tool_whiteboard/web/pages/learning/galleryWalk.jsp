@@ -54,8 +54,38 @@
 			height: 700px;
 			border: 1px solid #c1c1c1;
 		}
+		
+		.full-screen-launch-button {
+			margin-bottom: 5px;
+			margin-top: 5px;
+		}
+		
+		.full-screen-exit-button {
+			display: none;
+			margin-bottom: 5px;
+		}
+	
+		.full-screen-content-div {
+			clear: both;
+		}
+		
+		.full-screen-content-div:fullscreen {
+			padding: 20px 0 70px 0;
+		}
+		
+		.full-screen-content-div:fullscreen .full-screen-flex-div {
+			margin: 0 2%;
+		}
+		
+		.full-screen-content-div:fullscreen .full-screen-flex-div,
+		.full-screen-content-div:fullscreen .full-screen-main-div,
+		.full-screen-content-div:fullscreen .whiteboard-frame {
+			height: 100%;
+			width: 100%;
+		}
 	</style>
 
+	<script type="text/javascript" src="${lams}includes/javascript/fullscreen.js"></script>
 	<script type="text/javascript">
 			//var for jquery.jRating.js
 		var pathToImageFolder = "${lams}images/css/",
@@ -86,6 +116,8 @@
 					whiteboard.data('src', null);
 				}
 			});
+			
+			setupFullScreenEvents();
 		});
 		
 		function finishSession(){
@@ -180,9 +212,24 @@
 					 </div>
 	       	    </c:if>
 	 
-				<iframe class="whiteboard-frame"
-						data-src='${whiteboardServerUrl}/?whiteboardid=${groupSummary.wid}&username=${whiteboardAuthorName}${empty groupSummary.accessToken ? "" : "&accesstoken=".concat(groupSummary.accessToken)}&copyfromwid=${whiteboard.contentId}${empty whiteboardCopyAccessToken ? "" : "&copyaccesstoken=".concat(groupSummary.copyAccessToken)}'>
-				</iframe>	
+			 	<div class="full-screen-content-div">
+					<div class="full-screen-flex-div">
+						<a href="#" class="btn btn-default fixed-button-width pull-right full-screen-launch-button" onclick="javascript:launchIntoFullscreen(this)"
+						   title="<fmt:message key='label.fullscreen.open' />">
+							<i class="fa fa-arrows-alt" aria-hidden="true"></i>
+						</a> 
+				       	<a href="#" class="btn btn-default fixed-button-width pull-right full-screen-exit-button" onclick="javascript:exitFullscreen()"
+						   title="<fmt:message key='label.fullscreen.close' />">
+				       		<i class="fa fa-compress" aria-hidden="true"></i>
+				       	</a>
+				       	<div class="full-screen-main-div">
+							<iframe class="whiteboard-frame"
+									data-src='${whiteboardServerUrl}/?whiteboardid=${groupSummary.wid}&username=${whiteboardAuthorName}${empty groupSummary.accessToken ? "" : "&accesstoken=".concat(groupSummary.accessToken)}&copyfromwid=${whiteboard.contentId}${empty whiteboardCopyAccessToken ? "" : "&copyaccesstoken=".concat(groupSummary.copyAccessToken)}'>
+							</iframe>		
+						</div>
+					</div>
+				</div>
+
 			</div>
 		</div>
 	</c:forEach>
