@@ -5,16 +5,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.lamsfoundation.lams.learning.command.model.Command;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
-import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.learningdesign.dto.GateActivityDTO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -23,7 +19,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * Contains methods intended for internal usage by lams_learning.
- * 
+ *
  * @author Andrey Balan
  */
 public interface ILearnerFullService extends ILearnerService {
@@ -60,7 +56,7 @@ public interface ILearnerFullService extends ILearnerService {
      * @return LearnerProgress
      */
     LearnerProgress chooseActivity(Integer learnerId, Long lessonId, Activity activity, Boolean clearCompletedFlag);
-    
+
     /**
      * "Complete" an activity from the web layer's perspective. Used for CompleteActivityAction and the Gate and
      * Grouping actions. Calls the completeActivity(Integer, Activity, Long) to actually complete the activity and
@@ -128,8 +124,8 @@ public interface ILearnerFullService extends ILearnerService {
      *            the learner who wants to go through the gate.
      * @param forceGate
      *            if forceGate==true and the lesson is a preview lesson then the gate is opened straight away.
-     * @param key 
-     * 		  additional information provided by user to open gate, for example password
+     * @param key
+     *            additional information provided by user to open gate, for example password
      * @return Updated gate details
      */
     GateActivityDTO knockGate(Long gateActivityId, User knocker, boolean forceGate, Object key);

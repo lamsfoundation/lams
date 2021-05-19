@@ -12,6 +12,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chart.bundle.min.js"></script>
 	<script>
 		var TOTAL_LESSON_LEARNERS_NUMBER = ${totalLearnersNumber},
 			LAMS_URL = '<lams:LAMSURL/>',

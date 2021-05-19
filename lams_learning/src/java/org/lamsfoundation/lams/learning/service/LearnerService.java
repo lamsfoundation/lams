@@ -1444,6 +1444,19 @@ public class LearnerService implements ILearnerFullService {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public void createCommandForLessonLearners(Long toolContentId, String jsonCommand) {
+	// find lesson for given tool content ID
+	Long lessonId = lessonService.getLessonByToolContentId(toolContentId).getLessonId();
+
+	Collection<User> learners = lessonService.getActiveLessonLearners(lessonId);
+	for (User learner : learners) {
+	    Command command = new Command(lessonId, learner.getLogin(), jsonCommand);
+	    commandDAO.insert(command);
+	}
+    }
+
+    @Override
     public List<Command> getCommandsForLesson(Long lessonId, Date laterThan) {
 	return commandDAO.getNewCommands(lessonId, laterThan);
     }

@@ -163,7 +163,7 @@ public class TBLTemplateController extends LdTemplateController {
 
 	    Long iRAToolContentId = authoringService.createTblAssessmentToolContent(userDTO, activityTitle,
 		    data.getText("boilerplate.ira.instructions"), null, false, true, data.confidenceLevelEnable, false,
-		    false, testQuestionsArray);
+		    false, false, testQuestionsArray);
 	    ObjectNode iraActivityJSON = createAssessmentActivity(maxUIID, order++, currentActivityPosition,
 		    iRAToolContentId, data.contentFolderID, groupingUIID, null, null, activityTitle);
 	    activities.add(iraActivityJSON);
@@ -195,7 +195,7 @@ public class TBLTemplateController extends LdTemplateController {
 		    ? JsonUtil.optInt(iraActivityJSON, AuthoringJsonTags.ACTIVITY_UIID)
 		    : null;
 	    Long tRAToolContentId = createScratchieToolContent(userDTO, activityTitle,
-		    data.getText("boilerplate.tra.instructions"), false, confidenceLevelsActivityUIID,
+		    data.getText("boilerplate.tra.instructions"), false, true, confidenceLevelsActivityUIID,
 		    testQuestionsArray);
 	    activities.add(createScratchieActivity(maxUIID, order++, currentActivityPosition, tRAToolContentId,
 		    data.contentFolderID, groupingUIID, null, null, activityTitle));
@@ -248,7 +248,7 @@ public class TBLTemplateController extends LdTemplateController {
 
 		    Long aetoolContentId = authoringService.createTblAssessmentToolContent(userDTO,
 			    applicationExerciseTitle, data.getText("boilerplate.ae.instructions"), null, true, false,
-			    false, true, true, questionsJSONArray);
+			    false, true, true, true, questionsJSONArray);
 		    activities.add(createAssessmentActivity(maxUIID, order++, currentActivityPosition, aetoolContentId,
 			    data.contentFolderID, groupingUIID, null, null, applicationExerciseTitle));
 		}

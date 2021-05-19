@@ -96,6 +96,9 @@ public class Scratchie implements Cloneable {
     @Column(name = "burning_questions_enabled")
     private boolean burningQuestionsEnabled;
 
+    @Column(name = "discussion_sentiment_enabled")
+    private boolean discussionSentimentEnabled;
+
     @Column(name = "question_etherpad_enabled")
     private boolean questionEtherpadEnabled;
 
@@ -352,6 +355,14 @@ public class Scratchie implements Cloneable {
 
     public void setBurningQuestionsEnabled(boolean burningQuestionsEnabled) {
 	this.burningQuestionsEnabled = burningQuestionsEnabled;
+    }
+
+    public boolean isDiscussionSentimentEnabled() {
+	return discussionSentimentEnabled;
+    }
+
+    public void setDiscussionSentimentEnabled(boolean discussionSentimentEnabled) {
+	this.discussionSentimentEnabled = discussionSentimentEnabled;
     }
 
     public boolean isQuestionEtherpadEnabled() {

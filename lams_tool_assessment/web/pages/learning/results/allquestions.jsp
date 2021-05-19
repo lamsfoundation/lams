@@ -23,8 +23,24 @@
 	tr.selected-by-groups span {
 		font-weight: bold;
 	}
+	
 	.slider.slider-horizontal {
 		margin-left: 40px;
+	}
+	
+	.discussion-sentiment-start-button {
+		margin-top: -2px;
+		margin-right: 5px;
+	}
+	
+	@media (min-width: 0px) and (max-width: 767px){
+		.discussion-sentiment-start-button {
+			padding: 1px 5px;
+		}
+	}
+	
+	.discussion-sentiment-start-button .fa-comments {
+		color: black !important;
 	}
 </style>
 	
@@ -59,6 +75,23 @@
 		location.reload();
 		return false;
 	}
+
+	<c:if test="${param.embedded and empty toolSessionID and assessment.allowDiscussionSentiment}">
+		function startDiscussionSentiment(toolQuestionUid, burningQuestionUid, markAsActive) {
+			// burningQuestionUid is not used in Assessment, but must be added for function signature consistency
+			
+			$('#discussion-sentiment-chart-panel-container-' + toolQuestionUid).load(
+				'${lams}learning/discussionSentiment/startMonitor.do',
+				{
+					toolQuestionUid : toolQuestionUid,
+					markAsActive    : markAsActive
+				},
+				function(){
+					$('#discussion-sentiment-start-button-' + toolQuestionUid).remove();
+				}
+			)
+		}
+	</c:if>
 	
 	$(document).ready(function() {
 		$("time.timeago").timeago();
@@ -73,13 +106,26 @@
 			commandWebsocketHookTrigger = 'assessment-results-refresh-${assessment.contentId}';
 			// if the trigger is recognised, the following action occurs
 			commandWebsocketHook = function() {
-					debugger;
 					// delay reload by a period to prevent flood of reloads from students
 					setTimeout(function(){
-						debugger;
 						location.reload();
 					}, Math.round(8000 * Math.random()));
 				};
+		</c:if>
+
+		<c:if test="${param.embedded and empty toolSessionID and assessment.allowDiscussionSentiment}">
+			$.ajax({
+				url : '${lams}learning/discussionSentiment/checkMonitor.do',
+				data : {
+					toolContentId : ${assessment.contentId}
+				},
+				dataType : 'json',
+				success : function(result){
+					result.forEach(function(discussion){
+						startDiscussionSentiment(discussion.toolQuestionUid, null, false);
+					});
+				}
+			});
 		</c:if>
 	});
 </script>
@@ -90,26 +136,36 @@
 							
 	<div class="panel panel-default">
 		<div class="panel-heading">			
-			<c:if test="${param.embedded and empty toolSessionID and assessment.allowDiscloseAnswers}">
-				<div class="btn-group-xs pull-right disclose-button-group" questionUid="${question.uid}">
-					<%-- Allow disclosing correct answers only for multiple choice questions --%>
-					<c:if test="${question.type == 1}">
-						<div class="btn btn-default disclose-correct-button"
-							<c:if test="${question.correctAnswersDisclosed}">
+			<c:if test="${param.embedded and empty toolSessionID}">
+				<c:if test="${assessment.allowDiscloseAnswers}">
+					<div class="btn-group-xs pull-right disclose-button-group" questionUid="${question.uid}">
+						<%-- Allow disclosing correct answers only for multiple choice questions --%>
+						<c:if test="${question.type == 1}">
+							<div class="btn btn-default disclose-correct-button"
+								<c:if test="${question.correctAnswersDisclosed}">
+									disabled="disabled"><i class="fa fa-check text-success">&nbsp;</i
+								</c:if>
+								>
+								<fmt:message key="label.disclose.correct.answers"/>
+							</div>
+						</c:if>
+						<div class="btn btn-default disclose-groups-button"
+							<c:if test="${question.groupsAnswersDisclosed}">
 								disabled="disabled"><i class="fa fa-check text-success">&nbsp;</i
 							</c:if>
 							>
-							<fmt:message key="label.disclose.correct.answers"/>
+							<fmt:message key="label.disclose.groups.answers"/>
 						</div>
-					</c:if>
-					<div class="btn btn-default disclose-groups-button"
-						<c:if test="${question.groupsAnswersDisclosed}">
-							disabled="disabled"><i class="fa fa-check text-success">&nbsp;</i
-						</c:if>
-						>
-						<fmt:message key="label.disclose.groups.answers"/>
 					</div>
-				</div>
+				</c:if>
+				
+				<c:if test="${assessment.allowDiscussionSentiment}">
+					<div id="discussion-sentiment-start-button-${question.uid}"
+					     class="btn btn-xs btn-default pull-right discussion-sentiment-start-button"
+					     onClick="javascript:startDiscussionSentiment(${question.uid}, null, true)">
+						<i class="fa fa-comments"></i><fmt:message key="label.monitoring.discussion.start"/>
+					</div>
+				</c:if>
 			</c:if>
 			
 			<h3 class="panel-title" style="margin-bottom: 10px;font-size: initial;">
@@ -238,6 +294,10 @@
 						</p>
 					</c:when>
 				</c:choose>
+			</c:if>
+			
+			<c:if test="${param.embedded and empty toolSessionID and assessment.allowDiscussionSentiment}">
+				<div id="discussion-sentiment-chart-panel-container-${question.uid}"></div>
 			</c:if>
 		</div>
 					

@@ -1,4 +1,20 @@
 <%@ include file="/common/taglibs.jsp"%>
+
+<style>
+
+	.discussion-sentiment-start-button-cell {
+		width: 50px;
+		text-align: right;
+	}	
+	
+	.discussion-sentiment-start-button .fa-comments {
+		color: black !important;
+	}
+	
+	.discussion-sentiment-chart-row {
+		display: none;
+	}
+</style>
 <script>
 	$(document).ready(function(){
 		//handler for expand/collapse all button
@@ -49,7 +65,42 @@
 			div.toggleClass("in");
 			$(this).toggleClass("collapsed");
 		});
+		
+		<c:if test="${isTbl and discussionSentimentEnabled}">
+			$.ajax({
+				url : '<lams:LAMSURL />learning/discussionSentiment/checkMonitor.do',
+				data : {
+					toolContentId : ${toolContentID}
+				},
+				dataType : 'json',
+				success : function(result){
+					result.forEach(function(discussion){
+						startDiscussionSentiment(discussion.toolQuestionUid, discussion.burningQuestionUid, false);
+					});
+				}
+			});
+		</c:if>
 	});
+
+
+	<c:if test="${isTbl and discussionSentimentEnabled}">
+		function startDiscussionSentiment(toolQuestionUid, burningQuestionUid, markAsActive) {
+			var idSuffix = toolQuestionUid + '-' + burningQuestionUid,
+				chartRow = $('#discussion-sentiment-chart-row-' + idSuffix).css('display', 'table-row');
+			
+			$('#discussion-sentiment-chart-panel-container-' + idSuffix, chartRow).load(
+				'<lams:LAMSURL />learning/discussionSentiment/startMonitor.do',
+				{
+					toolQuestionUid    : toolQuestionUid,
+					burningQuestionUid : burningQuestionUid,
+					markAsActive       : markAsActive
+				},
+				function(){
+					$('#discussion-sentiment-start-button-' + idSuffix).closest('td').remove();
+				}
+			)
+		}
+	</c:if>
 </script>
 
 <!-- Header -->
@@ -78,6 +129,13 @@
 		<c:set var="burningQsCount" value="${fn:length(burningQuestionItemDto.burningQuestionDtos)}"/>
 		<c:if test="${burningQsCount > 0}">
 			<c:set var="item" value="${burningQuestionItemDto.scratchieItem}"/>
+			<%-- toolQuestionUid, i.e. item UID, is required for discussion token.
+				 It is missing for general burning questions as they are not bound to any question.
+				 In this case we use first question's UID, as burning question UID will uniquely identify the discussion anyway
+			 --%>
+			<c:set var="generalBurningQuestionDiscussionItemUid"
+				   value="${empty generalBurningQuestionDiscussionItemUid and not empty item.uid ? item.uid : generalBurningQuestionDiscussionItemUid}" />
+			<c:set var="discussionItemUid" value="${empty item.uid ? generalBurningQuestionDiscussionItemUid : item.uid}" />
 
 			<div class="panel panel-default">
 				<div class="panel-heading">
@@ -85,7 +143,7 @@
 						<a data-toggle="collapse" data-itemuid="${item.uid}" class="collapsed burning-question-title">
 							<!-- Don't display number prior to general burning question -->
 							<c:choose>
-								<c:when test="${empty burningQuestionItemDto.scratchieItem.uid}">
+								<c:when test="${empty item.uid}">
 									<c:out value="${item.qbQuestion.name}" escapeXml="false"/>
 								</c:when>
 								<c:otherwise>
@@ -142,7 +200,24 @@
 										<td class="text-nowrap">
 											<span class="badge">${burningQuestionDto.likeCount}</span> &nbsp; <i class="fa fa-thumbs-o-up" style="color:darkblue"></i>
 										</td>
+										<c:if test="${isTbl and discussionSentimentEnabled and not empty discussionItemUid}">
+											<td class="discussion-sentiment-start-button-cell">
+												<div id="discussion-sentiment-start-button-${discussionItemUid}-${burningQuestionDto.burningQuestion.uid}"
+												     class="btn btn-xs btn-default discussion-sentiment-start-button"
+												     onClick="javascript:startDiscussionSentiment(${discussionItemUid}, ${burningQuestionDto.burningQuestion.uid}, true)">
+													<i class="fa fa-comments"></i><fmt:message key="label.monitoring.discussion.start"/>
+												</div>
+											</td>
+										</c:if>
 									</tr>
+									<c:if test="${isTbl and discussionSentimentEnabled and not empty discussionItemUid}">
+										<tr id="discussion-sentiment-chart-row-${discussionItemUid}-${burningQuestionDto.burningQuestion.uid}"
+										    class="discussion-sentiment-chart-row">
+											<td colspan="3">
+												<div id="discussion-sentiment-chart-panel-container-${discussionItemUid}-${burningQuestionDto.burningQuestion.uid}"></div>
+											</td>
+										</tr>
+									</c:if>
 								</c:forEach>
 							</tbody>
 						</table>

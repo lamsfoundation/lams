@@ -3622,6 +3622,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		JsonUtil.optBoolean(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
 	assessment.setAllowAnswerJustification(
 		JsonUtil.optBoolean(toolContentJSON, "allowAnswerJustification", Boolean.FALSE));
+	assessment.setAllowDiscussionSentiment(
+		JsonUtil.optBoolean(toolContentJSON, RestTags.ENABLE_DISCUSSION_SENTIMENT, Boolean.FALSE));
 
 	// submission deadline set in monitoring
 

@@ -43,7 +43,20 @@
 				$("#preset-marks").prop('disabled','disabled');
 			</c:otherwise>
 		</c:choose>
-		
+
+		var discussionSentimentCheckbox = $('#discussion-sentiment-enabled'),
+			burningQuestionsCheckbox = $('#burning-questions-enabled').click(function(){
+				var disabled = !$(this).is(':checked');
+				if (disabled) {
+					discussionSentimentCheckbox.slideUp();
+				} else {
+					discussionSentimentCheckbox.slideDown();
+				}
+		});
+
+		if (!burningQuestionsCheckbox.is(':checked')) {
+			discussionSentimentCheckbox.prop('checked', false).hide();
+		}
 	});
 </script>
 
@@ -65,6 +78,13 @@
                 <label for="burning-questions-enabled">
                     <form:checkbox path="scratchie.burningQuestionsEnabled" id="burning-questions-enabled"/>
                     <fmt:message key="label.authoring.advanced.burning.questions" />
+                </label>
+            </div>
+
+			<div class="checkbox loffset20">
+                <label for="discussion-sentiment-enabled">
+                    <form:checkbox path="scratchie.discussionSentimentEnabled" id="discussion-sentiment-enabled"/>
+                    <fmt:message key="label.authoring.advanced.discussion" />
                 </label>
             </div>
 

@@ -9,6 +9,7 @@
    						   http://www.springframework.org/schema/context/spring-context-4.3.xsd">
 	<!-- Spring MVC -->
 	<context:component-scan base-package="org.lamsfoundation.lams.learning.kumalive" />
+	<context:component-scan base-package="org.lamsfoundation.lams.learning.discussion.controller" />
 	<context:component-scan base-package="org.lamsfoundation.lams.learning.web.controller" />
 	
 	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">

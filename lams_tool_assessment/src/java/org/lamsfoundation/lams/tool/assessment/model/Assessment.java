@@ -142,6 +142,9 @@ public class Assessment implements Cloneable {
     @Column(name = "allow_answer_justification")
     private boolean allowAnswerJustification;
 
+    @Column(name = "allow_discussion_sentiment")
+    private boolean allowDiscussionSentiment;
+
     @Column(name = "display_summary")
     private boolean displaySummary;
 
@@ -612,6 +615,14 @@ public class Assessment implements Cloneable {
 
     public void setAllowAnswerJustification(boolean allowAnswerJustification) {
 	this.allowAnswerJustification = allowAnswerJustification;
+    }
+
+    public boolean isAllowDiscussionSentiment() {
+	return allowDiscussionSentiment;
+    }
+
+    public void setAllowDiscussionSentiment(boolean allowDiscussionSentiment) {
+	this.allowDiscussionSentiment = allowDiscussionSentiment;
     }
 
     public boolean isDisplaySummary() {
