@@ -19,24 +19,26 @@
 			border: 1px solid #c1c1c1;
 		}
 		
-		.launch-fullscreen {
+		.full-screen-launch-button {
 			margin-bottom: 5px;
 		}
 		
-		.exit-fullscreen {
+		.full-screen-exit-button {
 			display: none;
 			margin-bottom: 5px;
 		}
 		
-		#fullPageContentDiv:fullscreen {
+		.full-screen-content-div:fullscreen {
 			padding: 20px 0 70px 0;
 		}
 		
-		#fullPageContentDiv:fullscreen #flexDiv {
+		.full-screen-content-div:fullscreen .full-screen-flex-div {
 			margin: 0 2%;
 		}
 		
-		#fullPageContentDiv:fullscreen #flexDiv, #fullPageContentDiv:fullscreen #mainDiv, #fullPageContentDiv:fullscreen #whiteboard-frame {
+		.full-screen-content-div:fullscreen .full-screen-flex-div,
+		.full-screen-content-div:fullscreen .full-screen-main-div,
+		.full-screen-content-div:fullscreen #whiteboard-frame {
 			height: 100%;
 			width: 100%;
 		}

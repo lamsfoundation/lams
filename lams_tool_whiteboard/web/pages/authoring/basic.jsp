@@ -16,17 +16,17 @@
     <lams:CKEditor id="whiteboard.instructions" value="${authoringForm.whiteboard.instructions}" contentFolderID="${authoringForm.contentFolderID}" />
 </div>
 <c:if test="${not empty whiteboardServerUrl}">
-	<div id="fullPageContentDiv">
-		<div id="flexDiv">
-			<a href="#" class="btn btn-default fixed-button-width pull-right launch-fullscreen" onclick="javascript:launchIntoFullscreen()"
+	<div class="full-screen-content-div">
+		<div class="full-screen-flex-div">
+			<a href="#" class="btn btn-default fixed-button-width pull-right full-screen-launch-button" onclick="javascript:launchIntoFullscreen(this)"
 			   title="<fmt:message key='label.fullscreen.open' />">
 				<i class="fa fa-arrows-alt" aria-hidden="true"></i>
 			</a> 
-	       	<a href="#" class="btn btn-default fixed-button-width pull-right exit-fullscreen" onclick="javascript:exitFullscreen()"
+	       	<a href="#" class="btn btn-default fixed-button-width pull-right full-screen-exit-button" onclick="javascript:exitFullscreen()"
 			   title="<fmt:message key='label.fullscreen.close' />">
 	       		<i class="fa fa-compress" aria-hidden="true"></i>
 	       	</a>
-	       	<div id="mainDiv">
+	       	<div class="full-screen-main-div">
 				<iframe id="whiteboard-frame"
 				          src='${whiteboardServerUrl}/?whiteboardid=${authoringForm.whiteboard.contentId}&username=${authoringForm.authorName}${empty whiteboardAccessToken ? "" : "&accesstoken=".concat(whiteboardAccessToken)}'>
 				</iframe>
