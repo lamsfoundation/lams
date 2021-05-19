@@ -14,12 +14,6 @@
 				background-color: #f5f5f5; 
 				padding: 5px;
 			}
-			.faulty-pad-container {
-				margin: 5px 10px;
-			}
-			.faulty-pad-container a{
-				margin-left: 10px;
-			}
 		</style>
 		
 		<script>

@@ -89,24 +89,27 @@
 		border: 1px solid #c1c1c1;
 	}
 	
-	.launch-fullscreen {
+	.full-screen-launch-button {
 		margin-bottom: 5px;
+		margin-top: 5px;
 	}
 	
-	.exit-fullscreen {
+	.full-screen-exit-button {
 		display: none;
 		margin-bottom: 5px;
 	}
-	
-	#fullPageContentDiv:fullscreen {
+
+	.full-screen-content-div:fullscreen {
 		padding: 20px 0 70px 0;
 	}
 	
-	#fullPageContentDiv:fullscreen #flexDiv {
+	.full-screen-content-div:fullscreen .full-screen-flex-div {
 		margin: 0 2%;
 	}
 	
-	#fullPageContentDiv:fullscreen #flexDiv, #fullPageContentDiv:fullscreen #mainDiv, #fullPageContentDiv:fullscreen .whiteboard-frame {
+	.full-screen-content-div:fullscreen .full-screen-flex-div,
+	.full-screen-content-div:fullscreen .full-screen-main-div,
+	.full-screen-content-div:fullscreen .whiteboard-frame {
 		height: 100%;
 		width: 100%;
 	}
@@ -120,6 +123,7 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-editable.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script> 
 <script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/fullscreen.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript">
 	//var for jquery.jRating.js
@@ -325,6 +329,8 @@
 			//insert total learners number taken from the parent tblmonitor.jsp
 			$("#whiteboard-monitoring-summary-${sessionMap.toolContentID} .total-learners-number").text(TOTAL_LESSON_LEARNERS_NUMBER);
 		</c:if>
+
+		setupFullScreenEvents();
 	});
 	
 	function startGalleryWalk(){
@@ -853,12 +859,26 @@
 			</c:when>
 		</c:choose>
 		
-		<%-- If there is no grouping, data is loaded immediately.
-		     If there is grouping, data is loaded on panel expand. --%>
-		<iframe class="whiteboard-frame"
-				${sessionMap.isGroupedActivity ? "data-" : ""}src='${whiteboardServerUrl}/?whiteboardid=${groupSummary.wid}&username=${whiteboardAuthorName}${empty groupSummary.accessToken ? "" : "&accesstoken=".concat(groupSummary.accessToken)}&copyfromwid=${whiteboard.contentId}${empty whiteboardCopyAccessToken ? "" : "&copyaccesstoken=".concat(groupSummary.copyAccessToken)}'>
-		</iframe>		
-	
+		<div class="full-screen-content-div">
+			<div class="full-screen-flex-div">
+				<a href="#" class="btn btn-default fixed-button-width pull-right full-screen-launch-button" onclick="javascript:launchIntoFullscreen(this)"
+				   title="<fmt:message key='label.fullscreen.open' />">
+					<i class="fa fa-arrows-alt" aria-hidden="true"></i>
+				</a> 
+		       	<a href="#" class="btn btn-default fixed-button-width pull-right full-screen-exit-button" onclick="javascript:exitFullscreen()"
+				   title="<fmt:message key='label.fullscreen.close' />">
+		       		<i class="fa fa-compress" aria-hidden="true"></i>
+		       	</a>
+		       	<div class="full-screen-main-div">
+					<%-- If there is no grouping, data is loaded immediately.
+					     If there is grouping, data is loaded on panel expand. --%>
+					<iframe class="whiteboard-frame"
+							${sessionMap.isGroupedActivity ? "data-" : ""}src='${whiteboardServerUrl}/?whiteboardid=${groupSummary.wid}&username=${whiteboardAuthorName}${empty groupSummary.accessToken ? "" : "&accesstoken=".concat(groupSummary.accessToken)}&copyfromwid=${whiteboard.contentId}${empty whiteboardCopyAccessToken ? "" : "&copyaccesstoken=".concat(groupSummary.copyAccessToken)}'>
+					</iframe>		
+				</div>
+			</div>
+		</div>
+
 		<!-- Editable marks section -->
 		<div class="voffset10">	
 			<h4>

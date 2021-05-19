@@ -46,7 +46,6 @@
 			margin-bottom: 5px;
 		}
 
-		
 		.full-screen-content-div:fullscreen {
 			padding: 20px 0 70px 0;
 		}
