@@ -86,6 +86,7 @@
                     <form:checkbox path="scratchie.discussionSentimentEnabled" id="discussion-sentiment-enabled"/>
                     <fmt:message key="label.authoring.advanced.discussion" />
                 </label>
+				<i class="fa fa-question-circle" data-toggle="tooltip" data-placement="right" title="" data-original-title="<fmt:message key="label.authoring.advanced.discussion.tooltip" />"></i>
             </div>
 
             <c:if test="${sessionMap.isQuestionEtherpadEnabled}">

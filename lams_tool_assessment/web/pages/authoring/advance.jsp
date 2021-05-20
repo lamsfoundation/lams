@@ -246,6 +246,7 @@
 		<form:checkbox path="assessment.allowDiscussionSentiment" id="allowDiscussionSentiment"/>
 		<fmt:message key="label.authoring.advance.discussion" />
 	</label>
+	<i class="fa fa-question-circle" data-toggle="tooltip" data-placement="right" title="" data-original-title="<fmt:message key="label.authoring.advance.discussion.tooltip" />"></i>
 </div>
 
 <div class="checkbox">
