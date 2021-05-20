@@ -73,6 +73,9 @@
 		$(document).ready(function(){
 			$('[data-toggle="tooltip"]').bootstrapTooltip();
 
+			// Use container-fluid just for this tool
+			$('.panel-learner-page').closest('.container').removeClass('container').addClass('container-fluid');
+			
 			setupFullScreenEvents();
 		});
 		
