@@ -118,14 +118,13 @@ const whiteboard = {
         this.oldGCO = this.ctx.globalCompositeOperation;
 
         window.addEventListener("resize", function () {
-            // Handel resize
+            // Handle resize
+            const dbCp = JSON.parse(JSON.stringify(_this.drawBuffer)); // Copy the buffer
             _this.canvas.width = $(window).width();
             _this.canvas.height = $(window).height(); // Set new canvas height
             _this.drawBuffer = [];
-
-			// Modified by LAMS
-			// Do not load canvas content again as it appears on top of the existing content
-			// For some reason clearning canvas does not work
+			_this.textContainer.empty();
+            _this.loadData(dbCp); // draw old content in
         });
 
         $(_this.mouseOverlay).on("mousedown touchstart", function (e) {
