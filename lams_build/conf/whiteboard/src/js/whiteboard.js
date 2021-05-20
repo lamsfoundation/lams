@@ -119,11 +119,13 @@ const whiteboard = {
 
         window.addEventListener("resize", function () {
             // Handel resize
-            const dbCp = JSON.parse(JSON.stringify(_this.drawBuffer)); // Copy the buffer
             _this.canvas.width = $(window).width();
             _this.canvas.height = $(window).height(); // Set new canvas height
             _this.drawBuffer = [];
-            _this.loadData(dbCp); // draw old content in
+
+			// Modified by LAMS
+			// Do not load canvas content again as it appears on top of the existing content
+			// For some reason clearning canvas does not work
         });
 
         $(_this.mouseOverlay).on("mousedown touchstart", function (e) {
