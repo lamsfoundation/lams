@@ -6,12 +6,12 @@ var savedBoards = {};
 var savedUndos = {};
 var saveDelay = {};
 
-if (config.backend.enableFileDatabase){
-	// make sure that folder with saved boards exists
-	fs.mkdirSync("savedBoards", {
-		// this option also mutes an error if path exists
-		recursive : true
-	});
+if (config.backend.enableFileDatabase) {
+    // make sure that folder with saved boards exists
+    fs.mkdirSync("savedBoards", {
+        // this option also mutes an error if path exists
+        recursive: true
+    });
 }
 
 module.exports = {
@@ -23,18 +23,18 @@ module.exports = {
             //Clear the whiteboard
             delete savedBoards[wid];
             delete savedUndos[wid];
-			// delete the corresponding file too
-			fs.unlink("savedBoards/" + wid + ".json", function(err) {
-				if (err) {
-					return console.log(err);
-				}
-			});
+            // delete the corresponding file too
+            fs.unlink("savedBoards/" + wid + ".json", function (err) {
+                if (err) {
+                    return console.log(err);
+                }
+            });
         } else if (tool === "undo") {
             //Undo an action
             if (!savedUndos[wid]) {
                 savedUndos[wid] = [];
             }
-			let savedBoard = this.loadStoredData(wid);
+            let savedBoard = this.loadStoredData(wid);
             if (savedBoard) {
                 for (var i = savedBoards[wid].length - 1; i >= 0; i--) {
                     if (savedBoards[wid][i]["username"] == username) {
@@ -59,7 +59,7 @@ module.exports = {
             if (!savedUndos[wid]) {
                 savedUndos[wid] = [];
             }
-			let savedBoard = this.loadStoredData(wid);
+            let savedBoard = this.loadStoredData(wid);
             for (var i = savedUndos[wid].length - 1; i >= 0; i--) {
                 if (savedUndos[wid][i]["username"] == username) {
                     var drawId = savedUndos[wid][i]["drawId"];
@@ -93,7 +93,7 @@ module.exports = {
                 "setTextboxFontColor",
             ].includes(tool)
         ) {
-			let savedBoard = this.loadStoredData(wid);
+            let savedBoard = this.loadStoredData(wid);
             //Save all this actions
             delete content["wid"]; //Delete id from content so we don't store it twice
             if (tool === "setTextboxText") {
@@ -109,61 +109,65 @@ module.exports = {
             }
             savedBoard.push(content);
         }
-		this.saveToDB(wid);
+        this.saveToDB(wid);
     },
-	saveToDB : function(wid){
+    saveToDB: function (wid) {
         if (config.backend.enableFileDatabase) {
             //Save whiteboard to file
             if (!saveDelay[wid]) {
                 saveDelay[wid] = true;
                 setTimeout(function () {
                     saveDelay[wid] = false;
-					if (savedBoards[wid]) {
-	                    fs.writeFile("savedBoards/" + wid + ".json", JSON.stringify(savedBoards[wid]), (err) => {
-	                        if (err) {
-								return console.log(err);
-	                        }
-	                    });
-					}
+                    if (savedBoards[wid]) {
+                        fs.writeFile(
+                            "savedBoards/" + wid + ".json",
+                            JSON.stringify(savedBoards[wid]),
+                            (err) => {
+                                if (err) {
+                                    return console.log(err);
+                                }
+                            }
+                        );
+                    }
                 }, 1000 * 10); //Save after 10 sec
             }
         }
-	},
-	// Load saved whiteboard
-    loadStoredData: function (wid) {
-		if (wid in savedBoards) {
-			 return savedBoards[wid];
-		}
-        
-	   savedBoards[wid] = [];
-
-	   // try to load from DB
-       if (config.backend.enableFileDatabase) {
-		    //read saved board from file
-			var filePath = "savedBoards/" + wid + ".json";
-			if (fs.existsSync(filePath)) {
-			    var data = fs.readFileSync(filePath);
-				if (data) {
-			    	savedBoards[wid] = JSON.parse(data);
-				}
-			}
-		}
-		
-		return savedBoards[wid];
     },
-	copyStoredData : function(sourceWid, targetWid) {
-		const sourceData = this.loadStoredData(sourceWid);
-		if (sourceData.length === 0 || this.loadStoredData(targetWid).lenght > 0) {
-			return;
-		}
-		savedBoards[targetWid] = sourceData.slice();
-		this.saveToDB(targetWid);
-	},
+    // Load saved whiteboard
+    loadStoredData: function (wid) {
+        if (wid in savedBoards) {
+            return savedBoards[wid];
+        }
+
+        savedBoards[wid] = [];
+
+        // try to load from DB
+        if (config.backend.enableFileDatabase) {
+            //read saved board from file
+            var filePath = "savedBoards/" + wid + ".json";
+            if (fs.existsSync(filePath)) {
+                var data = fs.readFileSync(filePath);
+                if (data) {
+                    savedBoards[wid] = JSON.parse(data);
+                }
+            }
+        }
+
+        return savedBoards[wid];
+    },
+    copyStoredData: function (sourceWid, targetWid) {
+        const sourceData = this.loadStoredData(sourceWid);
+        if (sourceData.length === 0 || this.loadStoredData(targetWid).lenght > 0) {
+            return;
+        }
+        savedBoards[targetWid] = sourceData.slice();
+        this.saveToDB(targetWid);
+    },
 	saveData: function(wid, data, processEmbeddedImages) {
-		const existingData = this.loadStoredData(wid);
-		if (existingData.length > 0 || !data) {
-			return;
-		}
+        const existingData = this.loadStoredData(wid);
+        if (existingData.length > 0 || !data) {
+            return;
+        }
 		let savedBoard = JSON.parse(data);
 		
 		// importing LAMS content which has base64 images embedded
@@ -194,6 +198,6 @@ module.exports = {
 			});
 		}
 		savedBoards[wid] = savedBoard;
-		this.saveToDB(wid);
-	}
+        this.saveToDB(wid);
+    }
 };

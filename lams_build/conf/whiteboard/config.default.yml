@@ -34,7 +34,7 @@ frontend:
   # LAMS addition - URL prefix for uploaded images, without the trailing slash, for example
   # imageURL: "http://localhost:9003"
   # if it is blank, images will use relative path, for example "/uploads/<image_path>.png"
-  imageURL : ""
+  imageURL: ""
 
   # draw the background grid to images on download ? (If True, even PNGs are also not transparent anymore) -- boolean
   drawBackgroundGrid: false

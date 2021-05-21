@@ -1,5 +1,5 @@
 import keymage from "keymage";
-import io from "socket.io-client";
+import { io } from "socket.io-client";
 import whiteboard from "./whiteboard";
 import keybinds from "./keybinds";
 import Picker from "vanilla-picker";
@@ -174,7 +174,7 @@ function initWhiteboard() {
             function (data) {
 				// modified for LAMS, force original data to be drawn and saved first
                 if (copyfromwid && data.length == 0) {
-                    // Copy from witheboard if current is empty and get parameter is given
+                    //Copy from witheboard if current is empty and get parameter is given
                     $.get(subdir + "/api/loadwhiteboard", {
                         wid: copyfromwid,
 						// needed for checking hash
@@ -182,16 +182,13 @@ function initWhiteboard() {
 						// this is not the main access token, but a special one just for this operation
                         at: copyaccesstoken,
                     }).done(function (originalData) {
-						console.log(originalData);
-						console.log(data);
 						whiteboard.loadJsonData(originalData);
-						whiteboard.loadData(data);
+                        whiteboard.loadData(data);
                     });
                 } else {
 					console.log(data);
 					whiteboard.loadData(data);
-				}
-				
+                }
             }
         );
 
@@ -633,7 +630,6 @@ function initWhiteboard() {
                         reader.readAsDataURL(blob);
                         reader.onloadend = function () {
                             const base64data = reader.result;
-
                             uploadImgAndAddToWhiteboard(base64data);
                         };
                     } else if (isPDFFileName(filename)) {
@@ -803,6 +799,8 @@ function initWhiteboard() {
 
         // In any case, if we are on read-only whiteboard we activate read-only mode
         if (ConfigService.isReadOnly) ReadOnlyService.activateReadOnlyMode();
+
+        $("body").show();
     });
 
     //Prevent site from changing tab on drag&drop
@@ -822,7 +820,6 @@ function initWhiteboard() {
         },
         false
     );
-
 
     function uploadImgAndAddToWhiteboard(base64data) {
         const date = +new Date();

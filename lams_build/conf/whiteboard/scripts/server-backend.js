@@ -19,6 +19,7 @@ function startBackendServer(port) {
     var s_whiteboard = require("./s_whiteboard.js");
 
     var app = express();
+
     var server = require("http").Server(app);
     server.listen(port);
     var io = require("socket.io")(server, { path: "/ws-api" });
@@ -408,9 +409,8 @@ function startBackendServer(port) {
                 socket.emit("whiteboardConfig", {
                     common: config.frontend,
                     whiteboardSpecific: {
-                        correspondingReadOnlyWid: ReadOnlyBackendService.getReadOnlyId(
-                            whiteboardId
-                        ),
+                        correspondingReadOnlyWid:
+                            ReadOnlyBackendService.getReadOnlyId(whiteboardId),
                         isReadOnly: ReadOnlyBackendService.isReadOnly(whiteboardId),
                     },
                 });
