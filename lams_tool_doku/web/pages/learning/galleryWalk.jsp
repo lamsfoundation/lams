@@ -4,7 +4,7 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="mode" value="${sessionMap.mode}" />
 <c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
-<c:set var="whiteboard" value="${sessionMap.whiteboard}" />
+<c:set var="dokumaran" value="${sessionMap.dokumaran}" />
 <c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
 <c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 	
@@ -39,14 +39,9 @@
 		#gallery-walk-preview-info {
 			margin-bottom: 20px;
 		}
-							
-		.whiteboard-frame {
-			width: 100%;
-			height: 700px;
-			border: 1px solid #c1c1c1;
-		}
 	</style>
 
+	<script type="text/javascript" src="${lams}includes/javascript/etherpad.js"></script>
 	<script type="text/javascript">
 			//var for jquery.jRating.js
 		var pathToImageFolder = "${lams}images/css/",
@@ -64,16 +59,17 @@
 	    $.fn.bootstrapTooltip = $.fn.tooltip.noConflict();
 		
 	    $(document).ready(function(){
-			$('[data-toggle="tooltip"]').bootstrapTooltip();
-			
-			// show Whiteboards only on Group expand
-			$('.whiteboard-collapse').on('show.bs.collapse', function(){
-				var whiteboard = $('.whiteboard-frame', this);
-				if (whiteboard.data('src')) {
-					whiteboard.attr('src', whiteboard.data('src'));
-					whiteboard.data('src', null);
+			// show etherpads only on Group expand
+			$('.etherpad-collapse').on('show.bs.collapse', function(){
+				var etherpad = $('.etherpad-container', this);
+				if (!etherpad.hasClass('initialised')) {
+					var id = etherpad.attr('id'),
+						groupId = id.substring('etherpad-container-'.length);
+					etherpadInitMethods[groupId]();
 				}
 			});
+			
+			$('[data-toggle="tooltip"]').bootstrapTooltip();
 		});
 		
 		function finishSession(){
@@ -93,18 +89,18 @@
 </lams:head>
 <body class="stripes">
 
-<lams:Page type="learner" title="${whiteboard.title}" style="">
+<lams:Page type="learner" title="${dokumaran.title}" style="">
 
 	<lams:errors/>
 	
-	<p><c:out value="${whiteboard.instructions}" escapeXml="false" /></p>
+	<p><c:out value="${dokumaran.description}" escapeXml="false" /></p>
 	
-	<c:if test="${not empty whiteboard.galleryWalkInstructions}">
+	<c:if test="${not empty dokumaran.galleryWalkInstructions}">
 		<hr>
-		<p><c:out value="${whiteboard.galleryWalkInstructions}" escapeXml="false" /></p>
+		<p><c:out value="${dokumaran.galleryWalkInstructions}" escapeXml="false" /></p>
 	</c:if>
 		
-	<c:if test="${whiteboard.galleryWalkFinished and not whiteboard.galleryWalkReadOnly}">
+	<c:if test="${dokumaran.galleryWalkFinished and not dokumaran.galleryWalkReadOnly}">
 		<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk.ratings.header" /></h4>
 		<table id="gallery-walk-rating-table" class="table table-hover table-condensed">
 		  <thead class="thead-light">
@@ -141,14 +137,14 @@
 	</c:if>
 	
 
-	<div id="whiteboard-group-panels" class="panel-group" role="tablist" aria-multiselectable="true"> 
+	<div id="doku-group-panels" class="panel-group" role="tablist" aria-multiselectable="true"> 
 		<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
 		
-		    <div class="panel panel-default whiteboard-group-panel">
+		    <div class="panel panel-default doku-group-panel">
 		       <div class="panel-heading" role="tab" id="heading${groupSummary.sessionId}">
 		       	<span class="panel-title collapsable-icon-left">
 		       		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${groupSummary.sessionId}" 
-							aria-expanded="false" aria-controls="collapse${groupSummary.sessionId}" data-parent="#whiteboard-group-panels">
+							aria-expanded="false" aria-controls="collapse${groupSummary.sessionId}" data-parent="#doku-group-panels">
 						<c:choose>
 							<c:when test="${toolSessionID == groupSummary.sessionId}">
 								<b><c:out value="${groupSummary.sessionName}" />&nbsp;<fmt:message key="label.gallery.walk.your.group" /></b>
@@ -160,17 +156,17 @@
 					</a>
 				</span>
 		       </div>
-		       <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse whiteboard-collapse" 
+		       <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse etherpad-collapse" 
 		       	    role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
 					<%-- Do not show rating to own group before Gallery Walk is finished --%>
-		       	    <c:if test="${not whiteboard.galleryWalkReadOnly and (whiteboard.galleryWalkFinished or mode == 'teacher' or toolSessionID != groupSummary.sessionId)}">
+		       	    <c:if test="${not dokumaran.galleryWalkReadOnly and (dokumaran.galleryWalkFinished or mode == 'teacher' or toolSessionID != groupSummary.sessionId)}">
 		       	    	<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}"
-								     isItemAuthoredByUser="${whiteboard.galleryWalkFinished or not hasEditRight or mode == 'teacher'}" />
+								     isItemAuthoredByUser="${dokumaran.galleryWalkFinished or not hasEditRight or mode == 'teacher'}" />
 		       	    </c:if>
 		 
-					<iframe class="whiteboard-frame"
-							data-src='${whiteboardServerUrl}?whiteboardid=${groupSummary.wid}&username=${whiteboardAuthorName}${empty groupSummary.accessToken ? "" : "&accesstoken=".concat(groupSummary.accessToken)}${empty whiteboard.sourceWid ? "" : "&copyfromwid=".concat(whiteboard.sourceWid).concat("&copyaccesstoken=").concat(groupSummary.copyAccessToken)}'>
-					</iframe>	
+					<lams:Etherpad groupId="${groupSummary.sessionId}" padId="${groupSummary.readOnlyPadId}"
+								   showControls="${not dokumaran.galleryWalkFinished and not dokumaran.galleryWalkReadOnly and hasEditRight}"
+								   showOnDemand="true" height="600" />	
 				</div>
 			</div>
 		</c:forEach>
@@ -179,7 +175,7 @@
 	<c:if test="${mode != 'teacher'}">
 		<div>
 			<c:choose>
-				<c:when test="${not whiteboard.galleryWalkFinished}">
+				<c:when test="${not dokumaran.galleryWalkFinished}">
 					<button data-toggle="tooltip" 
 							class="btn btn-default voffset5 pull-right ${mode == 'author' ? '' : 'disabled'}"
 							<c:choose>
