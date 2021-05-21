@@ -54,7 +54,11 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
 	existingTimeSettings.timeLimitAdjustment = whiteboard.getTimeLimitAdjustments();
 
 	for (Integer userId : userIds) {
-	    WhiteboardUser user = whiteboardService.getUserByIDAndContent(userId.longValue(), toolContentId);
+	    WhiteboardUser user = whiteboardService.getLearnerByIDAndContent(userId.longValue(), toolContentId);
+	    if (whiteboard.isUseSelectLeaderToolOuput()) {
+		// if team leader is enabled, show consistent timer for all group members
+		user = user.getSession().getGroupLeader();
+	    }
 	    if (user != null && user.getTimeLimitLaunchedDate() != null) {
 		existingTimeSettings.timeLimitLaunchedDate.put(userId, user.getTimeLimitLaunchedDate());
 	    }

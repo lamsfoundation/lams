@@ -28,9 +28,11 @@ import java.util.List;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardUser;
 
-public interface WhiteboardUserDAO extends IBaseDAO{
+public interface WhiteboardUserDAO extends IBaseDAO {
 
     WhiteboardUser getUserByUserIDAndSessionID(Long userID, Long sessionId);
+
+    WhiteboardUser getLearnerByUserIDAndContent(Long userId, Long contentId);
 
     WhiteboardUser getUserByUserIDAndContentID(Long userId, Long contentId);
 

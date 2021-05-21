@@ -66,6 +66,11 @@ public interface IWhiteboardService extends ICommonToolService {
 
     List<User> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString);
 
+    /**
+     * Get learner by given user ID and tool content ID, i.e. user who has a session assigned.
+     */
+    WhiteboardUser getLearnerByIDAndContent(Long userId, Long contentId);
+
     WhiteboardUser getUserByIDAndContent(Long userID, Long contentId);
 
     WhiteboardUser getUserByLoginAndContent(String login, long contentId);

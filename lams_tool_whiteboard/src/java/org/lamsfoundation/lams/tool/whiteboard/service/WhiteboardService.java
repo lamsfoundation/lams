@@ -224,10 +224,17 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
     public LocalDateTime launchTimeLimit(long toolContentId, int userId) {
 	WhiteboardUser user = getUserByIDAndContent(Long.valueOf(userId), toolContentId);
 	if (user != null) {
+	    WhiteboardSession session = user.getSession();
+	    Whiteboard whiteboard = session.getWhiteboard();
+
 	    LocalDateTime launchedDate = LocalDateTime.now();
 	    user.setTimeLimitLaunchedDate(launchedDate);
 	    whiteboardUserDao.update(user);
-	    return launchedDate;
+	    // if the user is not a leader, store his launch date, but return null so the leader's launch date is in use
+	    if (!whiteboard.isUseSelectLeaderToolOuput() || (session.getGroupLeader() != null
+		    && session.getGroupLeader().getUserId().equals(Long.valueOf(userId)))) {
+		return launchedDate;
+	    }
 	}
 	return null;
     }
@@ -242,6 +249,11 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
     public List<User> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString) {
 	Lesson lesson = lessonService.getLessonByToolContentId(toolContentId);
 	return lessonService.getLessonLearners(lesson.getLessonId(), searchString, null, null, true);
+    }
+
+    @Override
+    public WhiteboardUser getLearnerByIDAndContent(Long userId, Long contentId) {
+	return whiteboardUserDao.getLearnerByUserIDAndContent(userId, contentId);
     }
 
     @Override

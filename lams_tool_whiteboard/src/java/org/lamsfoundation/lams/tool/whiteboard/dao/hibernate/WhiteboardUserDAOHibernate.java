@@ -35,6 +35,8 @@ public class WhiteboardUserDAOHibernate extends LAMSBaseDAO implements Whiteboar
 
     private static final String FIND_BY_USER_ID_CONTENT_ID = "from " + WhiteboardUser.class.getName()
 	    + " as u where u.userId =? and u.whiteboard.contentId=?";
+    private static final String FIND_LEARNER_BY_USER_ID_CONTENT_ID = FIND_BY_USER_ID_CONTENT_ID
+	    + " AND u.session IS NOT NULL";
     private static final String FIND_BY_USER_ID_SESSION_ID = "from " + WhiteboardUser.class.getName()
 	    + " as u where u.userId =? and u.session.sessionId=?";
     private static final String FIND_BY_SESSION_ID = "from " + WhiteboardUser.class.getName()
@@ -43,6 +45,15 @@ public class WhiteboardUserDAOHibernate extends LAMSBaseDAO implements Whiteboar
     @Override
     public WhiteboardUser getUserByUserIDAndSessionID(Long userId, Long toolSessionId) {
 	List<?> list = this.doFind(FIND_BY_USER_ID_SESSION_ID, new Object[] { userId, toolSessionId });
+	if (list == null || list.size() == 0) {
+	    return null;
+	}
+	return (WhiteboardUser) list.get(0);
+    }
+
+    @Override
+    public WhiteboardUser getLearnerByUserIDAndContent(Long userId, Long contentId) {
+	List<?> list = this.doFind(FIND_LEARNER_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
