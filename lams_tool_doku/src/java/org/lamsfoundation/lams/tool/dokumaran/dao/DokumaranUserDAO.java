@@ -31,6 +31,8 @@ public interface DokumaranUserDAO extends DAO {
 
     DokumaranUser getUserByUserIDAndSessionID(Long userID, Long sessionId);
 
+    DokumaranUser getLearnerByUserIDAndContentID(Long userId, Long contentId);
+
     DokumaranUser getUserByUserIDAndContentID(Long userId, Long contentId);
 
     List<DokumaranUser> getBySessionID(Long sessionId);

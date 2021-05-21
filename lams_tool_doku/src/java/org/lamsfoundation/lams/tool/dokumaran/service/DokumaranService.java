@@ -322,12 +322,22 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
     @Override
     public LocalDateTime launchTimeLimit(long toolContentId, int userId) {
-	DokumaranUser user = getUserByIDAndContent(Long.valueOf(userId), toolContentId);
+	DokumaranUser user = getLearnerByIDAndContent(Long.valueOf(userId), toolContentId);
 	if (user != null) {
-	    LocalDateTime launchedDate = LocalDateTime.now();
-	    user.setTimeLimitLaunchedDate(launchedDate);
-	    dokumaranUserDao.saveObject(user);
-	    return launchedDate;
+	    DokumaranSession session = user.getSession();
+	    Dokumaran dokumaran = session.getDokumaran();
+
+	    if (user.getTimeLimitLaunchedDate() == null) {
+		LocalDateTime launchedDate = LocalDateTime.now();
+		user.setTimeLimitLaunchedDate(launchedDate);
+		dokumaranUserDao.saveObject(user);
+
+		// if the user is not a leader, store his launch date, but return null so the leader's launch date is in use
+		if (!dokumaran.isUseSelectLeaderToolOuput() || (session.getGroupLeader() != null
+			&& session.getGroupLeader().getUserId().equals(Long.valueOf(userId)))) {
+		    return launchedDate;
+		}
+	    }
 	}
 	return null;
     }
@@ -345,14 +355,13 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     }
 
     @Override
-    public DokumaranUser getUserByIDAndContent(Long userId, Long contentId) {
-	return dokumaranUserDao.getUserByUserIDAndContentID(userId, contentId);
+    public DokumaranUser getLearnerByIDAndContent(Long userId, Long contentId) {
+	return dokumaranUserDao.getLearnerByUserIDAndContentID(userId, contentId);
     }
 
     @Override
-    public DokumaranUser getUserByLoginAndContent(String login, long contentId) {
-	List<User> user = dokumaranUserDao.findByProperty(User.class, "login", login);
-	return user.isEmpty() ? null : getUserByIDAndContent(user.get(0).getUserId().longValue(), contentId);
+    public DokumaranUser getUserByIDAndContent(Long userId, Long contentId) {
+	return dokumaranUserDao.getUserByUserIDAndContentID(userId, contentId);
     }
 
     @Override

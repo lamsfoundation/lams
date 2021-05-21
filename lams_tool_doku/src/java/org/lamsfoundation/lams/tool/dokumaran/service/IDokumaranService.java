@@ -131,14 +131,17 @@ public interface IDokumaranService extends ICommonToolService {
 
     // ********** for user methods *************
     /**
+     * Get learner by given user ID and tool content ID, i.e. user who has a session assigned.
+     */
+    DokumaranUser getLearnerByIDAndContent(Long userId, Long contentId);
+
+    /**
      * Get user by given userID and toolContentID.
      *
      * @param long1
      * @return
      */
     DokumaranUser getUserByIDAndContent(Long userID, Long contentId);
-
-    DokumaranUser getUserByLoginAndContent(String login, long contentId);
 
     /**
      * Get user by sessionID and UserID
@@ -231,6 +234,6 @@ public interface IDokumaranService extends ICommonToolService {
     void finishGalleryWalk(long toolContentId) throws IOException;
 
     void changeLeaderForGroup(long toolSessionId, long leaderUserId);
-    
+
     Grouping getGrouping(long toolContentId);
 }

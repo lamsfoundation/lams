@@ -54,7 +54,13 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
 	existingTimeSettings.timeLimitAdjustment = dokumaran.getTimeLimitAdjustments();
 
 	for (Integer userId : userIds) {
-	    DokumaranUser user = dokumaranService.getUserByIDAndContent(userId.longValue(), toolContentId);
+
+	    DokumaranUser user = dokumaranService.getLearnerByIDAndContent(userId.longValue(), toolContentId);
+	    if (dokumaran.isUseSelectLeaderToolOuput()) {
+		// if team leader is enabled, show consistent timer for all group members
+		user = user.getSession().getGroupLeader();
+	    }
+
 	    if (user != null && user.getTimeLimitLaunchedDate() != null) {
 		existingTimeSettings.timeLimitLaunchedDate.put(userId, user.getTimeLimitLaunchedDate());
 	    }
