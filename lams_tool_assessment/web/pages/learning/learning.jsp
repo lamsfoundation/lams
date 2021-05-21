@@ -137,9 +137,9 @@
 						}			            
 			        });
 			    });
-				
-				initAssessmentTimeLimitWebsocket();
 			}
+
+			initAssessmentTimeLimitWebsocket();
 
 			//autocomplete for VSA
 			$('.ui-autocomplete-input').each(function(){
@@ -292,13 +292,15 @@
 						$(this).removeClass('countdown-timeout');
 					}
 				},
-				onExpiry: function(periods) {
-			        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <fmt:message key="label.learning.blockui.time.is.over" /></h1>' }); 
-			        
-			        setTimeout(function() { 
-			        	submitAll(true);
-			        }, 4000); 
-				},
+				<c:if test="${hasEditRight && (mode != 'teacher')}">
+					onExpiry: function(periods) {
+				        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <fmt:message key="label.learning.blockui.time.is.over" /></h1>' }); 
+				        
+				        setTimeout(function() { 
+				        	submitAll(true);
+				        }, 4000); 
+					},
+				</c:if>
 				description: "<div id='countdown-label'><fmt:message key='label.learning.countdown.time.left' /></div>"
 			});
 		}

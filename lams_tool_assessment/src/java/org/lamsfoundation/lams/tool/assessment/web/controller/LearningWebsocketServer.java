@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.web.controller.AbstractTimeLimitWebsocketServer;
 import org.lamsfoundation.lams.web.controller.AbstractTimeLimitWebsocketServer.EndpointConfigurator;
@@ -54,8 +55,18 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
 	existingTimeSettings.timeLimitAdjustment = assessment.getTimeLimitAdjustments();
 
 	for (Integer userId : userIds) {
-	    AssessmentResult result = assessmentService.getLastAssessmentResult(assessment.getUid(),
-		    userId.longValue());
+	    AssessmentResult result = null;
+	    if (assessment.isUseSelectLeaderToolOuput()) {
+		AssessmentUser user = assessmentService.getUserByIdAndContent(userId.longValue(), toolContentId);
+		AssessmentUser leader = user.getSession().getGroupLeader();
+		if (leader != null) {
+		    // if team leader is enabled, show consistent timer for all group members
+		    result = assessmentService.getLastAssessmentResult(assessment.getUid(), leader.getUserId());
+		}
+	    } else {
+		result = assessmentService.getLastAssessmentResult(assessment.getUid(), userId.longValue());
+	    }
+
 	    if (result != null && result.getTimeLimitLaunchedDate() != null) {
 		existingTimeSettings.timeLimitLaunchedDate.put(userId, result.getTimeLimitLaunchedDate());
 	    }

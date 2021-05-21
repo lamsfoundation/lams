@@ -324,6 +324,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     public LocalDateTime launchTimeLimit(long toolContentId, int userId) {
 	Assessment assessment = getAssessmentByContentId(toolContentId);
 	AssessmentResult lastResult = getLastAssessmentResult(assessment.getUid(), Long.valueOf(userId));
+	if (lastResult == null) {
+	    return null;
+	}
 	LocalDateTime launchedDate = LocalDateTime.now();
 	lastResult.setTimeLimitLaunchedDate(launchedDate);
 	assessmentResultDao.saveObject(lastResult);
