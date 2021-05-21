@@ -630,7 +630,7 @@ public class TBLTemplateController extends LdTemplateController {
 				WebUtil.readBooleanParam(request, assessmentPrefix + "multiAllowed", false));
 			String optionPrefix = new StringBuilder("divass").append(appexNumber).append("assmcq").append(i)
 				.append("option").toString();
-			for (int o = 1, order = 0; o <= MAX_OPTION_COUNT; o++) {
+			for (int o = 1, order = 1; o <= MAX_OPTION_COUNT; o++) {
 			    String answer = getTrimmedString(request, optionPrefix + o, true);
 			    if (answer != null) {
 				String grade = request.getParameter(optionPrefix + o + "grade");
