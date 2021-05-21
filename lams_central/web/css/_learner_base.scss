@@ -1183,72 +1183,25 @@ $portrait-size-image-xl: 400px;
     margin-left: 0px; 
 }
 
-// Full screen sizing - expects the div to be fullscreened to be called fullPageContentDiv, which contains a flexDiv and a mainDiv
+// Full screen sizing - expects the div to be fullscreened to have class full-screen-content-div, which contains a full-screen-flex-div and a full-screen-main-div
 // You may need to tweak complicated structures within the div (e.g. see Mindmap's height control)
-@mixin fullPageContentDivDefn() {
-	width: 100%;
+
+.full-screen-content-div:fullscreen {
+  	width: 100%;
 	height: 100vh;
 	background-color: $body-bg;
 	display: flex;
 	align-items: center;
 }
 
-@mixin flexDivDefn() {
+.full-screen-content-div:fullscreen .full-screen-flex-div {
     margin-left: 5%;
     margin-right: 5%;
     display: block;
 }
 
-@mixin mainDivDefn() {
+.full-screen-content-div:fullscreen .full-screen-main-div {
 	width: 90vw;
-}
-
-#fullPageContentDiv:-webkit-full-screen {
-  @include fullPageContentDivDefn;
-}
-
-#fullPageContentDiv:-webkit-full-screen #flexDiv {
-  @include flexDivDefn;
-}
-
-#fullPageContentDiv:-webkit-full-screen #mainDiv {
-  @include mainDivDefn;
-}
-
-#fullPageContentDiv:-moz-full-screen {
-  @include fullPageContentDivDefn;
-}
-
-#fullPageContentDiv:-moz-full-screen  #flexDiv {
-  @include flexDivDefn;
-}
-
-#fullPageContentDiv:-moz-full-screen #mainDiv {
-  @include mainDivDefn;
-}
-
-#fullPageContentDiv:-ms-fullscreen {
-  @include fullPageContentDivDefn;
-}
-
-#fullPageContentDiv:-ms-fullscreen  #flexDiv {
-  @include flexDivDefn;
-}
-
-#fullPageContentDiv:-ms-full-screen #mainDiv {
-  @include mainDivDefn;
-}
-
-#fullPageContentDiv:fullscreen {
-  @include fullPageContentDivDefn;
-}
-
-#fullPageContentDiv:fullscreen #flexDiv {
-  @include flexDivDefn;
-}
-
-#fullPageContentDiv:fullscreen #mainDiv {
-  @include mainDivDefn;
 }
     
 /* jqGrid text wrapping */

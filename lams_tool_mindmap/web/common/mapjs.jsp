@@ -416,9 +416,9 @@
 	
 </script>	
 
-	<div id="fullPageContentDiv">
-	<div id="flexDiv">
-	<div id="mainDiv">
+	<div class="full-screen-content-div">
+	<div class="full-screen-flex-div">
+	<div class="full-screen-main-div">
 	
 	<c:if test="${contentEditable and (mode == 'learner' || mode == 'author')}">
 		<div>
@@ -432,8 +432,8 @@
 	
 		<!-- Color picker & expand buttons must be outside the next div or it can't float on top of the mindmap. The float is done in javascript. -->
 		<div style="display:inline" role="group">
-        <a href="#" class="btn btn-default btn-sm launch-fullscreen pull-right loffset5" id="expand" onclick="javascript:launchIntoFullscreen()"><i class="fa fa-arrows-alt" aria-hidden="true"></i></a> 
-        <a href="#" class="btn btn-default btn-sm exit-fullscreen pull-right loffset5" id="shrink" onclick="javascript:exitFullscreen()" style="display: none;"><i class="fa fa-compress" aria-hidden="true"></i></a> 
+        <a href="#" class="btn btn-default btn-sm full-screen-launch-button pull-right loffset5" id="expand" onclick="javascript:launchIntoFullscreen(this)"><i class="fa fa-arrows-alt" aria-hidden="true"></i></a> 
+        <a href="#" class="btn btn-default btn-sm full-screen-exit-button pull-right loffset5" id="shrink" onclick="javascript:exitFullscreen()" style="display: none;"><i class="fa fa-compress" aria-hidden="true"></i></a> 
 		<input type="text" id="background-color" class='updateStyle form-control input-sm' data-mm-target-property='background' size="7" width="180px">
 		</div>
 		 

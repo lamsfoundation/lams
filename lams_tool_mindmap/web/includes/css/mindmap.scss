@@ -12,17 +12,8 @@
 	border: $border-thin-solid;
 }	
 
-#fullPageContentDiv:-webkit-full-screen #mindmap-container {
- 	height: calc(100vh - 150px);
-}
-#fullPageContentDiv:-moz-full-screen  #mindmap-container {
- 	height: calc(100vh - 150px);
-}
-#fullPageContentDiv:-ms-fullscreen  #mindmap-container {
- 	height: calc(100vh - 150px);
-}
-#fullPageContentDiv:fullscreen #mindmap-container {
- 	height: calc(100vh - 150px);
+.full-screen-content-div:fullscreen #mindmap-container {
+  height: calc(100vh - 150px);
 }
 
 // Override the default mapjs styles

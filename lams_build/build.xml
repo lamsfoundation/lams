@@ -91,6 +91,7 @@
 			<ant antfile="../lams_tool_doku/build.xml"          target="_clean-dirs" inheritAll="false" />
 			<ant antfile="../lams_tool_zoom/build.xml"          target="_clean-dirs" inheritAll="false" />
 			<ant antfile="../lams_tool_preview/build.xml"       target="_clean-dirs" inheritAll="false" />
+			<ant antfile="../lams_tool_whiteboard/build.xml"    target="_clean-dirs" inheritAll="false" />
 		-->
 	</target>
 	
@@ -124,6 +125,7 @@
 		<ant antfile="../lams_tool_survey/build.xml"        target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_task/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_vote/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_whiteboard/build.xml"    target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_wiki/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_zoom/build.xml"          target="copy-tags" inheritAll="false"/>
 		
@@ -287,6 +289,7 @@
 			<ant antfile="../lams_tool_gmap/build.xml"          target="deploy-tool" inheritAll="false" />
 			
 			<ant antfile="../lams_tool_doku/build.xml"          target="deploy-tool" inheritAll="false" />
+			<ant antfile="../lams_tool_whiteboard/build.xml"    target="deploy-tool" inheritAll="false" />
 			<ant antfile="../lams_tool_zoom/build.xml"          target="deploy-tool" inheritAll="false" />
 		-->
 	</target>
@@ -773,6 +776,7 @@
 		<ant antfile="../lams_tool_doku/build.xml"          target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_zoom/build.xml"          target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_preview/build.xml"       target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_whiteboard/build.xml"    target="deploy-tool" inheritAll="false" />
 	</target>
 	
 	
