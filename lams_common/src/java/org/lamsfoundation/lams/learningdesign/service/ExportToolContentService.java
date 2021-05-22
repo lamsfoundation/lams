@@ -519,7 +519,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    }
 
 	    // zip file name with full path
-	    targetZipFileName = ldDto.getTitle() + ExportToolContentService.EXPORT_TOOLCONTNET_ZIP_SUFFIX;
+	    targetZipFileName = FileUtil.stripInvalidChars(ldDto.getTitle())
+		    + ExportToolContentService.EXPORT_TOOLCONTNET_ZIP_SUFFIX;
 
 	    log.debug("Create export content target zip file. File name is " + targetZipFileName);
 	    // create zip file and return zip full file name
@@ -1271,7 +1272,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    if (removedActMap.containsKey(actDto.getActivityID())) {
 		continue;
 	    }
-	    
+
 	    Activity act = getActivity(actDto, groupingMapper, toolMapper, defaultActivityToParentActivityMapping);
 	    // so far, the activitiy ID is still old one, so setup the
 	    // mapping relation between old ID and new activity.
