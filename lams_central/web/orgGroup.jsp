@@ -147,7 +147,7 @@
 			<div class="userContainerTitle">
 				<fmt:message key="label.course.groups.unassigned" />
 				<span class="sortUsersButton"
-				      title="<fmt:message key='label.course.groups.sort.tooltip' />">?</span>
+				      title="<fmt:message key='label.course.groups.sort.tooltip' />">&#9650;</span>
 			</div>
 			<div class="userContainer"></div>
 		</td>
@@ -173,7 +173,7 @@
 			</c:if>
 		/>
 		<span class="sortUsersButton"
-		      title="<fmt:message key='label.course.groups.sort.tooltip' />">?</span>
+		      title="<fmt:message key='label.course.groups.sort.tooltip' />">&#9650;</span>
 	</div>
 	<div class="userContainer"></div>
 </div>
