@@ -229,6 +229,10 @@ ActivityDefs = {
 		this.groupingType = groupingType || 'random';
 		this.groupDivide = groupDivide || 'groups';
 		this.groupCount = +groupCount || layout.conf.defaultGroupingGroupCount;
+		if (groups && groups.length > this.groupCount) {
+			// when opening a run sequence, groups created in monitoring can be more numerous then the original setting
+			this.groupCount = groups.length;
+		}
 		this.learnerCount = +learnerCount || layout.conf.defaultGroupingLearnerCount;
 		this.equalSizes = equalSizes || false;
 		this.viewLearners = viewLearners || false;
