@@ -1170,15 +1170,21 @@ public class LearningController implements QaAppConstants {
 	List<ItemRatingDTO> itemRatingDtos = null;
 	if (isAllowRateAnswers && !responses.isEmpty()) {
 	    //create itemIds list
+
+	    List<QaUsrResp> responsesForRatings = responses;
+	    if (isOnlyLeadersIncluded && userId.equals(-1L)) {
+		responsesForRatings = qaService.getResponsesForTablesorter(qaContentId, qaSessionId, questionUid, 0L,
+			isOnlyLeadersIncluded, page, size, sorting, searchString);
+	    }
 	    List<Long> itemIds = new LinkedList<>();
-	    for (QaUsrResp response : responses) {
+	    for (QaUsrResp response : responsesForRatings) {
 		itemIds.add(response.getUid());
 	    }
 
 	    //all comments required only for monitoring
 	    boolean isCommentsByOtherUsersRequired = isMonitoring;
-	    itemRatingDtos = qaService.getRatingCriteriaDtos(qaContentId, qaSessionId, itemIds,
-		    isCommentsByOtherUsersRequired, userId);
+	    itemRatingDtos = qaService.getRatingCriteriaDtos(qaContentId, isOnlyLeadersIncluded ? null : qaSessionId,
+		    itemIds, isCommentsByOtherUsersRequired, userId);
 
 	    // store how many items are rated
 	    int countRatedQuestions = qaService.getCountItemsRatedByUser(qaContentId, userId.intValue());
@@ -1208,6 +1214,7 @@ public class LearningController implements QaAppConstants {
 	    responseRow.put("responseUid", response.getUid().toString());
 	    responseRow.put("answer", response.getAnswer());
 	    responseRow.put("userName", StringEscapeUtils.escapeCsv(user.getFullname()));
+	    responseRow.put("sessionName", StringEscapeUtils.escapeCsv(user.getQaSession().getSession_name()));
 	    responseRow.put("visible", new Boolean(response.isVisible()).toString());
 	    responseRow.put("userID", user.getQueUsrId());
 	    responseRow.put("portraitId", response.getPortraitId());

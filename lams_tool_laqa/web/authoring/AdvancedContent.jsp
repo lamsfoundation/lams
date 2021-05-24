@@ -4,20 +4,6 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		
-		$("#useSelectLeaderToolOuput").click(function() {
-			if (document.forms.authoringForm["qa.useSelectLeaderToolOuput"].checked) {
-				//uncheck checkboxes
-				document.forms.authoringForm["qa.showOtherAnswers"].checked = false;
-				//disable checkboxes
-				document.forms.authoringForm["qa.showOtherAnswers"].disabled = true;
-				
-				$("#show-other-answers-options").hide('slow');
-			} else {
-				//enable checkboxes
-				document.forms.authoringForm["qa.showOtherAnswers"].disabled = false;
-			}	
-		});
-		
 		$("#showOtherAnswers").click(function() {
 			$("#show-other-answers-options").toggle('slow');
 			if ($(this).is(':checked')) {
@@ -91,7 +77,7 @@
 
 	<div class="checkbox">
 		<label for="showOtherAnswers">
-			<form:checkbox path="qa.showOtherAnswers" id="showOtherAnswers" disabled="${authoringForm.qa.useSelectLeaderToolOuput}"/>
+			<form:checkbox path="qa.showOtherAnswers" id="showOtherAnswers" />
 			<fmt:message key="label.learner.answer" />
 		</label>
 	</div>
