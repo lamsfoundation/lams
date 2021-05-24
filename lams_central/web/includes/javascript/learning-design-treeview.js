@@ -86,7 +86,7 @@ var ldTreeview = {
 						$.each(response.learningDesigns, function(){
 							var canModify = canSave && this.canModify;
 							result.push({'label'            : this.name,
-										 'text'             : this.name + (this.readOnly || !canModify ? ' <i class="fa fa-lock"></i>' : ''),
+										 'text'             : this.name + (this.readOnly ? ' <i class="fa fa-lock"></i>' : ''),
 							  	         'learningDesignId' : this.learningDesignId,
 							  	         'canHaveReadOnly'	: canHaveReadOnly,
 							  	         'canModify'		: canModify,

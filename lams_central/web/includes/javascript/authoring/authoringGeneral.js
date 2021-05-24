@@ -508,8 +508,8 @@ GeneralInitLib = {
     			return;
     		}
     		var isFolder = !ldNode.learningDesignId,
-    			title = prompt(LABELS.RENAME_TITLE_PROMPT + ' ' + (isFolder ? LABELS.FOLDER : LABELS.SEQUENCE)
-						+ ' "' + ldNode.label + '"');
+    			title = prompt(LABELS.RENAME_TITLE_PROMPT + ' ' +
+						(isFolder ? LABELS.FOLDER + ' "' + ldNode.text + '"' : LABELS.SEQUENCE + ' "' + ldNode.label + '"'));
 			
 			// skip if no name or the same name was provided
 			if (!title || ldNode.label == title) {
@@ -969,6 +969,7 @@ GeneralInitLib = {
 				if (canSetReadOnly && !isOpenDialog) {
 					// detect which folders/sequences are marked as read-only
 					// and which ones are immutable
+
 					if (!node.nodes) {
 						$('#ldStoreDialogReadOnlyCheckbox', layout.ldStoreDialog)
 							.prop('disabled', !node.canModify || !node.canHaveReadOnly)
@@ -980,7 +981,7 @@ GeneralInitLib = {
 					}
 				} else {
 					// is this is normal user or open dialog, only show/hide read-only label
-					if (node.nodes ? !node.canSave : node.readOnly || !node.canModify){
+					if (node.nodes ? !node.canSave : node.readOnly){
 						$('#ldStoreDialogReadOnlySpan', layout.ldStoreDialog).show();
 					} else {
 						$('#ldStoreDialogReadOnlySpan', layout.ldStoreDialog).hide();

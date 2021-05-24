@@ -339,61 +339,6 @@ var MenuLib = {
 		return result;
 	},
 	
-	
-	/**
-	 * Loads subfolders and LDs from the server.
-	 */
-	getFolderContents : function(folderID, canSave, canHaveReadOnly) {
-		var result = null;
-			
-		$.ajax({
-			url : LAMS_URL + 'home/getFolderContents.do',
-			data : {
-				'folderID' : folderID,
-				'allowInvalidDesigns' : true
-			},
-			cache : false,
-			async: false,
-			dataType : 'json',
-			success : function(response) {
-				result = [];
-				// parse the response; extract folders and LDs
-				if (response.folders) {
-					$.each(response.folders, function(index){
-						// folderID == -2 is courses folder
-						var canSave = this.folderID > 0 && !this.isRunSequencesFolder;
-						result.push({'type'				   : 'html',
-									 'html'                : (this.isRunSequencesFolder ? LABELS.RUN_SEQUENCES_FOLDER : this.name)
-																+ (canSave ? '' : ' <i class="fa fa-lock"></i>'),
-								  	 'folderID'		       : this.folderID,
-								  	 'isRunSequenceFolder' : this.isRunSequencesFolder,
-								  	 // either take parent's setting or take 2nd (courses) and 3rd (public) folder 
-								  	 'canHaveReadOnly'	   : folderID ? canHaveReadOnly : index > 0,
-								  	 'canSave'		       : canSave,
-						  	         'canModify'	       : this.canModify && !this.isRunSequenceFolder
-									});
-					});
-				}
-				if (response.learningDesigns) {
-					$.each(response.learningDesigns, function(){
-						var canModify = canSave && this.canModify;
-						result.push({'type'				: 'html',
-									 'label'			: this.name,
-									 'html'             : this.name + (this.readOnly || !canModify ? ' <i class="fa fa-lock"></i>' : ''),
-						  	         'isLeaf'           : true,
-						  	         'learningDesignId' : this.learningDesignId,
-						  	         'canHaveReadOnly'	: canHaveReadOnly,
-						  	         'canModify'		: canModify,
-						  	         'readOnly'			: this.readOnly
-							        });
-					});
-				}
-			}
-		});
-		
-		return result;
-	},
-	
 	/**
 	 * Opens a pop up for importing LD. Loads the imported LD to canvas.
 	 */
