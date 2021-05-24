@@ -5,13 +5,24 @@
        	<div class="col-xs-12x col-md-6x form-groupx rowx form-inlinex btn-group-md voffset5">
        		<%-- Hide if we edit it on QB collections page or if we edit in a tool but the question is not in users' collections  --%>
        		<span <c:if test="${empty assessmentQuestionForm.sessionMapID or empty assessmentQuestionForm.userCollections}">style="visibility: hidden;"</c:if>>
-	       		Collection
+	       		<fmt:message key="label.qb.collection" />&nbsp;
 	        		
 				<select class="btn btn-md btn-default" id="collection-uid-select">
 					<c:forEach var="collection" items="${assessmentQuestionForm.userCollections}">
 						<option value="${collection.uid}"
 							<c:if test="${collection.uid == assessmentQuestionForm.oldCollectionUid}">selected="selected"</c:if>>
-							<c:out value="${collection.name}" />
+				        		<c:choose>
+									<c:when test="${empty collection.userId and not collection.personal}">
+										<fmt:message key="label.qb.collection.public.name" />
+									</c:when>
+									<c:otherwise>
+										<c:out value="${collection.name}" />
+									</c:otherwise>
+								</c:choose>
+								
+								<c:if test="${collection.personal}">
+									(<fmt:message key="label.qb.collection.private" />)
+								</c:if>
 						</option>
 					</c:forEach>
 				</select>
