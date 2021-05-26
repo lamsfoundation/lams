@@ -150,6 +150,8 @@
 				url,
 				options,
 				function(){
+					$('[data-toggle="tooltip"]').bootstrapTooltip();
+					
 					if (horizontalScroll == null || horizontalScroll == 0 || tlbMonitorHorizontalScrollElement == null) {
 						return;
 					}

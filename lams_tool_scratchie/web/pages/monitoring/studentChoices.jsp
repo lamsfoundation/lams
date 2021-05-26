@@ -48,11 +48,6 @@
 </style>
 
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/common.js"></script>
-<script>
-	$(document).ready(function(){
-		 $('[data-toggle="tooltip"]').tooltip();
-	});
-</script>
 
 <c:if test="${not showStudentChoicesTableOnly}">
 	<script>
