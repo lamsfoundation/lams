@@ -49,6 +49,7 @@
 		
 		.rate-answers-area {
 			 min-height: 120px;
+			 margin-bottom: 20px;
 		}
 	</style>
 
@@ -111,7 +112,7 @@
 				      // {sortList:col} adds the sortList to the url into a "col" array, and {filterList:fcol} adds
 				      // the filterList to the url into an "fcol" array.
 				      // So a sortList = [[2,0],[3,0]] becomes "&col[2]=0&col[3]=0" in the url
-					ajaxUrl : "<c:url value='getResponses.do'/>?page={page}&size={size}&{sortList:column}&isAllowRateAnswers=${qaContent.allowRateAnswers}&isAllowRichEditor=${qaContent.allowRichEditor}&qaContentId=${qaContent.qaContentId}&qaSessionId=" + $("#toolSessionID").val() + "&questionUid=" + $(this).attr('data-question-uid') + "&userId=" + $("#userID").val() + "&reqID=" + (new Date()).getTime(),
+					ajaxUrl : "<c:url value='getResponses.do'/>?page={page}&size={size}&{sortList:column}&isAllowRateAnswers=${qaContent.allowRateAnswers}&isAllowRichEditor=${qaContent.allowRichEditor}&isOnlyLeadersIncluded=${qaContent.useSelectLeaderToolOuput}&qaContentId=${qaContent.qaContentId}&qaSessionId=" + $("#toolSessionID").val() + "&questionUid=" + $(this).attr('data-question-uid') + "&userId=" + $("#userID").val() + "&reqID=" + (new Date()).getTime(),
 					ajaxProcessing: function (data) {
 				    	if (data && data.hasOwnProperty('rows')) {
 				    		var rows = [],
@@ -127,7 +128,8 @@
 								rows += '<td style="vertical-align:top;">';
 								
 								if (${generalLearnerFlowDTO.userNameVisible}) {
-									rows += definePortraitMiniHeader(userData["portraitId"], userData["userID"], '${lams}', userData["userName"], 
+									rows += definePortraitMiniHeader(userData["portraitId"], userData["userID"], '${lams}',
+																	 ${qaContent.useSelectLeaderToolOuput} ? userData["sessionName"] : userData["userName"], 
 											'<time class="timeago" title="' + userData["attemptTime"] + '" datetime="' + userData["timeAgo"] + '"></time>', 
 											false, "sbox-heading bg-warning")
 								}
