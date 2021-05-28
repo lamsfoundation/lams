@@ -123,7 +123,7 @@ var MenuLib = {
 	addGate : function() {
 		HandlerLib.resetCanvasMode();
 		
-		canvas.css('cursor', 'url("' + layout.toolMetadata.gate.iconPath + '"), move').click(function(event){
+		canvas.css('cursor', 'url("' + ActivityIcons.gateClosed + '"), move').click(function(event){
 			// pageX and pageY tell event coordinates relative to the whole page
 			// we need relative to canvas
 			var translatedEvent = GeneralLib.translateEventOnCanvas(event),

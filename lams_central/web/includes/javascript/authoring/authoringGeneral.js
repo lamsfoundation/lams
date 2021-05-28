@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿/**
+﻿﻿﻿﻿﻿﻿﻿﻿﻿/**
  * This file contains main methods for Authoring.
  */
 
@@ -34,9 +34,6 @@ var paper = null,
 		'dialogs' : [],
 		// icons for special activities
 		'toolMetadata': {
-			'gate'     : {
-				'iconPath' : '../images/stop.gif'
-			},
 			'grouping' : {
 				'iconPath' : '../images/grouping.png'
 			}
@@ -80,7 +77,9 @@ var paper = null,
 		'snapToGrid' : {
 			// snapping grid step when dragging an activity
 			'step' : 40,
+			// distance from canvas border so activities are not on edge
 			'padding' : 20,
+			// shift final position by this number so activites are aligned to dots, not between them
 			'offset' : 10
 		},
 		

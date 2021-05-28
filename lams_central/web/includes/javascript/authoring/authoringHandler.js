@@ -160,7 +160,8 @@ var HandlerLib = {
 	 * Moves dragged elements on the canvas.
 	 */
 	dragItemsMoveHandler : function(object, event, startX, startY) {
-		var dx = GeneralLib.snapToGrid(event.pageX - startX, true),
+		var isOnlyIcon = object instanceof ActivityDefs.GateActivity,
+		    dx = GeneralLib.snapToGrid(event.pageX - startX, true),
 			dy = GeneralLib.snapToGrid(event.pageY - startY, true);
 
 		object.items.transform('t' + dx + ' ' + dy);
