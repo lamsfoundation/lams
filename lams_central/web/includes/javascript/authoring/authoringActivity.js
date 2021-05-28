@@ -502,11 +502,11 @@ ActivityDraw = {
 	 */
 	grouping : function(x, y) {
 		if (x == undefined || y == undefined) {
-			// just redraw the activity
+			// if no new coordinates are given, just redraw the activity
 			x = this.items.getBBox().x;
 			y = this.items.getBBox().y;
 		}
-
+		
 		if (this.items) {
 			this.items.remove();
 		}
@@ -515,23 +515,29 @@ ActivityDraw = {
 		y = GeneralLib.snapToGrid(y);
 		
 		// create activity SVG elements
-		var shape = paper.path(Snap.format('M {x} {y} h 125 v 50 h -125 z',
-										   {
-											'x' : x,
-											'y' : y
-										   })
-							  )
-						 .attr({
-							    'stroke' : layout.colors.groupingBorder,
-							    'stroke-width' : '0.5',
-								'fill' : layout.colors.grouping
-							 }),
-			icon = paper.image(ActivityIcons.grouping, x + 47, y - 3, 32, 45),
-			label = paper.text(x + 62, y + 42, ActivityLib.shortenActivityTitle(this.title))
-						 .attr(layout.defaultTextAttributes);
+		var curve = layout.activity.borderCurve,
+			width = layout.activity.width,
+			height = layout.activity.height,			
+			shapePath = ' M ' + (x + curve) + ' ' + y + ' h ' + (width - 2 * curve) + ' q ' + curve + ' 0 ' + curve + ' ' + curve +
+						' v ' + (height - 2 * curve) + ' q 0 ' + curve + ' ' + -curve + ' ' + curve + 
+						' h ' + (-width + 2 * curve) + ' q ' + -curve + ' 0 ' + -curve + ' ' + -curve +
+						' v ' + (-height + 2 * curve) + ' q 0 ' + -curve + ' ' + curve + ' ' + -curve,
+			shape = paper.path(shapePath)
+						 .addClass('svg-tool-activity-background'),
+			shapeBorder = paper.path(shapePath)
+							 .addClass('svg-tool-activity-border' + (this.requireGrouping ? '-require-grouping' : '')),
+			// check for icon in the library
+			icon = paper.image(ActivityIcons.grouping, x + 20, y + 3, 30, 30),
+			label = paper.text(x + 55, y + 25, ActivityLib.shortenActivityTitle(this.title))
+			 			 .attr(layout.defaultTextAttributes)
+			 			 .attr({
+			 				 'id'   : 'toolActivityTitle',
+			 				 'fill' : layout.colors.activityText,
+			 				 'text-anchor' : 'start'
+			 			 });
 		
-		this.items = paper.g(shape, icon, label);
-							// uiid is needed in Monitoring
+		this.items = paper.g(shape, shapeBorder, label, icon);
+		
 		if (this.readOnly && !isReadOnlyMode) {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}
