@@ -150,7 +150,7 @@ var MenuLib = {
 			layout.isGroupingStarted = true;
 			HandlerLib.resetCanvasMode();
 			
-			canvas.css('cursor', 'url("' + layout.toolMetadata.grouping.iconPath + '"), move')
+			canvas.css('cursor', 'url("' + ActivityIcons.grouping + '"), move')
 				.click(function(event){
 					layout.isGroupingStarted = false;
 					// pageX and pageY tell event coordinates relative to the whole page

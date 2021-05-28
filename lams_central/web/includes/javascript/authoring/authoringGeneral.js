@@ -32,11 +32,8 @@ var paper = null,
 		'addBranchingStart' : null,
 		// list of all dialogs, so they can be easily closed all at once 
 		'dialogs' : [],
-		// icons for special activities
+		// for storing icons and other activity metadata
 		'toolMetadata': {
-			'grouping' : {
-				'iconPath' : '../images/grouping.png'
-			}
 		},
 		
 		// graphics constants
