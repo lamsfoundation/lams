@@ -687,7 +687,7 @@ ActivityDraw = {
 			// check for icon in the library
 			imageData = ActivityIcons[this.learningLibraryID],
 			icon = imageData ? paper.image(imageData, x + 20, y + 3, 30, 30) : null,
-			label = paper.text(x + 55, y + 25, ActivityLib.shortenActivityTitle(this.title))
+			label = paper.text(x + 55, y + 23, ActivityLib.shortenActivityTitle(this.title))
 			 			 .attr(layout.defaultTextAttributes)
 			 			 .attr({
 			 				 'id'   : 'toolActivityTitle',
