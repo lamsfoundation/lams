@@ -478,7 +478,9 @@ div.template {
 	padding: 8px 0px 5px 5px;
 }
 
-.media #toolDisplayName {
+.tooltemplate .media img {
+	width: 30px;
+	height: 30px;
 }
 
 td#canvasContainerCell {
