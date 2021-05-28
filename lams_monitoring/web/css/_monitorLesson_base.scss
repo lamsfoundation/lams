@@ -316,6 +316,10 @@ div#sequenceCanvas svg {
 	overflow: hidden;
 }
 
+div#sequenceCanvas svg g.gate image {
+	display: none;
+}
+
 img#sequenceCanvasLoading {
 	padding: 5px 0 0 100px;
 	display: none;

@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -1248,6 +1249,10 @@ public class MonitoringController {
 	    activityJSON.put("uiid", activity.getActivityUIID());
 	    activityJSON.put("title", activity.getTitle());
 	    activityJSON.put("type", activity.getActivityTypeId());
+
+	    if (activity.isGateActivity()) {
+		activityJSON.put("gateOpen", ((GateActivity) activity).getGateOpen());
+	    }
 
 	    Activity parentActivity = activity.getParentActivity();
 	    if (activity.isBranchingActivity()) {
