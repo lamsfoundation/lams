@@ -688,9 +688,9 @@ ActivityDraw = {
 			shapeBorder = paper.path(shapePath)
 							 .addClass('svg-tool-activity-border' + (this.requireGrouping ? '-require-grouping' : '')),
 			// check for icon in the library
-			imageData = null, // ActivityIcons[this.learningLibraryID],
-			icon = imageData ? paper.image(imageData, x + 5, y + 3, 20, 20) : null,
-			label = paper.text(x + 30, y + 18, ActivityLib.shortenActivityTitle(this.title))
+			imageData = ActivityIcons[this.learningLibraryID],
+			icon = imageData ? paper.image(imageData, x + 20, y + 3, 30, 30) : null,
+			label = paper.text(x + 55, y + 25, ActivityLib.shortenActivityTitle(this.title))
 			 			 .attr(layout.defaultTextAttributes)
 			 			 .attr({
 			 				 'id'   : 'toolActivityTitle',
@@ -1815,8 +1815,8 @@ ActivityLib = {
 	 * Reduce length of activity's title so it fits in its SVG shape.
 	 */
 	shortenActivityTitle : function(title) {
-		if (title.length > 18) {
-			title = title.substring(0, 17) + '...';
+		if (title.length > 23) {
+			title = title.substring(0, 22) + '...';
 		}
 		return title;
 	},
