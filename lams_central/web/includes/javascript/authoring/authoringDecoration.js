@@ -102,13 +102,14 @@ var DecorationDefs = {
 					strokeWidth = 0.5;
 				
 				// the rectangle
-				this.items.shape = paper.path(Snap.format('M {x} {y} h {width} v {height} h -{width} z',
-														  {
-														   'x'     : x,
-														   'y'     : y,
-														   'width' : x2 - x,
-														   'height'    : y2 - y
-														  }))
+				var curve = layout.activity.borderCurve,
+					width = x2 - x,
+					height = y2 - y,
+					shapePath = ' M ' + (x + curve) + ' ' + y + ' h ' + (width - 2 * curve) + ' q ' + curve + ' 0 ' + curve + ' ' + curve +
+						' v ' + (height - 2 * curve) + ' q 0 ' + curve + ' ' + -curve + ' ' + curve + 
+						' h ' + (-width + 2 * curve) + ' q ' + -curve + ' 0 ' + -curve + ' ' + -curve +
+						' v ' + (-height + 2 * curve) + ' q 0 ' + -curve + ' ' + curve + ' ' + -curve;
+				this.items.shape = paper.path(shapePath)
 						 			    .attr({
 						 			    	'stroke' : borderColor,
 										    'stroke-width' : strokeWidth,
@@ -210,7 +211,7 @@ var DecorationDefs = {
 				var box = this.items.shape.getBBox();
 				
 				if (!isReadOnlyMode){
-					this.items.fitButton = paper.circle(box.x2 - 10, box.y + 10, 5)
+					this.items.fitButton = paper.circle(box.x2 - 7, box.y + 7, 5)
 										 .attr({
 											'stroke'  : null,
 											'fill'    : 'blue',
@@ -227,13 +228,11 @@ var DecorationDefs = {
 										 });
 					this.items.append(this.items.fitButton);
 					
-					this.items.resizeButton = paper.path(Snap.format('M {x} {y} v {side} h -{side} z',
-																	 {
-																 	  'x' : box.x2,
-																 	  'y' : box.y2 - 15,
-																 	  'side' : 15
-																	 })
-														)
+					var curve = layout.activity.borderCurve,
+						side = 10;
+					
+					this.items.resizeButton = paper.path(' M ' + box.x2 + ' ' + (box.y2 - side - curve) + ' v ' + side +
+														 ' q 0 ' + curve + ' ' + (-curve) + ' ' + curve + ' h ' + (-side) + ' z')
 												   .attr({
 													 'stroke' : null,
 													 'fill'   : 'blue',
