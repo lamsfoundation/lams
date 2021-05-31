@@ -196,7 +196,7 @@ GeneralInitLib = {
 			// assign icons' data uris to their learning library IDs instead of labels
 			ActivityIcons[learningLibraryID] = ActivityIcons[learningLibraryTitle];
 			delete ActivityIcons[learningLibraryTitle];
-			$('<img />').attr('src', ActivityIcons[learningLibraryID]).appendTo(".img-"+learningLibraryID);
+			
 			// register tool properties so they are later easily accessible
 			layout.toolMetadata[learningLibraryID] = {
 				'iconPath'				    : $(this).attr('iconPath'),
@@ -205,7 +205,6 @@ GeneralInitLib = {
 				'activityCategoryID' 	    : activityCategoryID,
 				'parallelChildActivityDefs' : parallelChildActivityDefs
 			};
-			
 		});
 		
 		if (!isReadOnlyMode){

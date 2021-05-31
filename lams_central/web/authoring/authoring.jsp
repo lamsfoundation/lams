@@ -461,7 +461,9 @@
 							 </c:if>
 							 >
 							<div class="media">
-  								<div class="media-left img-${tool.learningLibraryId}"></div>
+  								<div class="media-left img-${tool.learningLibraryId}">
+  									<img src="<lams:LAMSURL/>${tool.iconPath}" />
+  								</div>
   								<div class="media-body media-middle" id="toolDisplayName">
 									<c:out value="${tool.toolDisplayName}" />
 								</div>
