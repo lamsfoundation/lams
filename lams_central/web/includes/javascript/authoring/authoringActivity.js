@@ -654,9 +654,7 @@ ActivityDraw = {
 						 .addClass('svg-tool-activity-background'),
 			shapeBorder = paper.path(shapePath)
 							 .addClass('svg-tool-activity-border' + (this.requireGrouping ? '-require-grouping' : '')),
-			// check for icon in the library
-			imageData = ActivityIcons[this.learningLibraryID],
-			icon = imageData ? paper.image(imageData, x + 20, y + 3, 30, 30) : null,
+			learningLibraryID = this.learningLibraryID,
 			label = paper.text(x + 55, y + 23, ActivityLib.shortenActivityTitle(this.title))
 			 			 .attr(layout.defaultTextAttributes)
 			 			 .attr({
@@ -667,12 +665,37 @@ ActivityDraw = {
 		
 		bannerPath += ' h ' + bannerWidth + ' v ' + height + ' z';
 		var banner = paper.path(bannerPath)
-						  .addClass('svg-tool-activity-category-' + layout.toolMetadata[this.learningLibraryID].activityCategoryID);
+						  .addClass('svg-tool-activity-category-' + layout.toolMetadata[learningLibraryID].activityCategoryID);
 		this.items = paper.g(shape, banner, shapeBorder, label);
 		
-		if (icon) {
+		// check for icon SVG cache in the library
+		var iconData = layout.toolMetadata[learningLibraryID].iconData;
+		if (!iconData) {
+			// if SVG is not cached, get it synchronously
+			$.ajax({
+				url : LAMS_URL + layout.toolMetadata[learningLibraryID].iconPath,
+				async : false,
+				dataType : 'text',
+				success : function(response) {
+					iconData = response;
+					layout.toolMetadata[learningLibraryID].iconData = iconData;
+				}
+			});		
+		}
+		
+		if (iconData) {
+			// build a SVG fragment and position it
+			var fragment = Snap.parse(iconData),
+				icon = Snap(fragment.node);
+			icon.select('svg').attr({
+				'x'     : x + 20,
+				'y'     : y + 3,
+				'width' : '30px',
+				'height': '30px'
+			});
 			this.items.add(icon);
 		}
+		
 		if (this.readOnly && !isReadOnlyMode) {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}
