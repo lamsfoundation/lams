@@ -94,8 +94,14 @@ function initializePortraitPopover(LAMS_URL, size, placement) {
 			console.log("Warning: portrait dataset missing. Unable to display portrait. "+element.id);
 			return;
 		}
+		
+		var fullName = element.dataset.fullname;
+		if (fullName) {
+			// apostrophe is the only character from monitorLesson.js#escapeHtml() which is allowed in user name 
+			fullName = fullName.replace('&#039;', "'");
+		}
 		if ( element.dataset.portrait ) {
-			var url =  LAMS_URL + '/download?preferDownload=false&uuid='+element.dataset.portrait+_getSizeVersion(size);
+			var url =  LAMS_URL + '/download?preferDownload=false&uuid='+element.dataset.portrait+_getSizeVersion(size)
 			// uses custom template to set the size of the portrait area
 			var template = '<div class="popover" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content popover-content-with-portrait"></div></div>'
 			$(element).popover({
@@ -103,14 +109,14 @@ function initializePortraitPopover(LAMS_URL, size, placement) {
 				content: '<img src="'+url+'"/>',  
 				html: true,
 		        trigger: 'hover focus',
-		        title: element.dataset.fullname,
+		        title: fullName,
 		        delay: { "show": 400, "hide": 100 },
 		        container: 'body',  // ensures popovers are not clipped within jqgrid tables
-		        	placement: placement
+		        placement: placement
 			});
 		} else {
 			$(element).popover({
-				content: element.dataset.fullname,  
+				content: fullName,
 				html: false,
 		        trigger: 'hover focus',
 		        delay: { "show": 400, "hide": 100 },
