@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
+<svg class="dokumaran"
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -9,8 +9,8 @@
    xml:space="preserve"
    style="enable-background:new 0 0 512 512;"
    viewBox="0 0 512 512"
-   y="0px"
-   x="0px"
+   
+   
    version="1.1"><metadata
    id="metadata462"><rdf:RDF><cc:Work
        rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
@@ -148,7 +148,7 @@
      style="fill:none;stroke:#111342;stroke-width:14.7191;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10"
      d="m 54.103592,418.88633 v -25.84536 c 0,-9.96632 8.178377,-18.04591 18.266544,-18.04591 h 7.887289 l 16.404014,14.47832 16.768141,-14.47832 h 5.06986 c 10.08817,0 18.26655,8.07959 18.26655,18.04591 v 27.5867"
      id="path450" /><g
-     id="Layer_1"
+     
      transform="matrix(1.0741235,0,0,1.0611495,-28.71756,-29.438272)">
 </g></g>
 </svg>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
+<svg class="imageGallery"
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -8,9 +8,9 @@
    xml:space="preserve"
    style="enable-background:new 0 0 512 512;"
    viewBox="0 0 512 512"
-   y="0px"
-   x="0px"
-   id="Layer_1"
+   
+   
+   
    version="1.1"><metadata
    id="metadata247"><rdf:RDF><cc:Work
        rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
@@ -28,9 +28,9 @@
 <style
    id="style218"
    type="text/css">
-	.st0{opacity:0.6;fill:#B783B9;}
-	.st1{fill:#B783B9;}
-	.st2{fill:none;stroke:#111342;stroke-width:13.85;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	svg.imageGallery .st0{opacity:0.6;fill:#B783B9;}
+	svg.imageGallery .st1{fill:#B783B9;}
+	svg.imageGallery .st2{fill:none;stroke:#111342;stroke-width:13.85;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
 </style>
 <g
    transform="matrix(1.1337227,0,0,1.1337227,-0.13372265,-32.713801)"

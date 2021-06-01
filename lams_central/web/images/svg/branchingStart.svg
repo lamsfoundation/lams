@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
+<svg class="branchingStart"
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -8,9 +8,9 @@
    xml:space="preserve"
    style="enable-background:new 0 0 512 512;"
    viewBox="0 0 512 512"
-   y="0px"
-   x="0px"
-   id="Layer_1"
+   
+   
+   
    version="1.1"><metadata
    id="metadata856"><rdf:RDF><cc:Work
        rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
@@ -27,9 +27,9 @@
 <style
    id="style833"
    type="text/css">
-	.st0{opacity:0.6;fill:#87CB9D;}
-	.st1{fill:#87CB9D;}
-	.st2{fill:none;stroke:#111342;stroke-width:15.1508;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	svg.branchingStart .st0{opacity:0.6;fill:#87CB9D;}
+	svg.branchingStart .st1{fill:#87CB9D;}
+	svg.branchingStart .st2{fill:none;stroke:#111342;stroke-width:15.1508;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
 </style>
 <g
    transform="matrix(1.0702362,0,0,1.0702362,-0.44311562,-24.776274)"

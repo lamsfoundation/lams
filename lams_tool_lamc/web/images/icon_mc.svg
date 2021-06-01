@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
+<svg class="mc"
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
    version="1.1"
-   id="Layer_1"
-   x="0px"
-   y="0px"
+   
+   
+   
    viewBox="0 0 512 512"
    style="enable-background:new 0 0 512 512;"
    xml:space="preserve"><metadata
@@ -46,10 +46,10 @@
 <style
    type="text/css"
    id="style10">
-	.st0{opacity:0.6;fill:#FBA919;}
-	.st1{fill:#FBA919;}
-	.st2{fill:none;stroke:#111342;stroke-width:14.5329;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
-	.st3{fill:#FBA919;stroke:#111342;stroke-width:16.1561;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	svg.mc .st0{opacity:0.6;fill:#FBA919;}
+	svg.mc .st1{fill:#FBA919;}
+	svg.mc .st2{fill:none;stroke:#111342;stroke-width:14.5329;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	svg.mc .st3{fill:#FBA919;stroke:#111342;stroke-width:16.1561;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
 </style>
 <circle
    style="stroke-width:1.30489"

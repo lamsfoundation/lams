@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
+<svg class="gateClosed"
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
    version="1.1"
-   id="Layer_1"
-   x="0px"
-   y="0px"
+   
+   
+   
    viewBox="0 0 512 512"
    style="enable-background:new 0 0 512 512;"
    xml:space="preserve"><metadata
@@ -23,11 +23,11 @@
 <style
    type="text/css"
    id="style1150">
-	.st0{fill:#FBA919;stroke:#111342;stroke-width:14.3597;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
-	.st1{display:none;}
+	svg.gateClosed .st0{fill:#FBA919;stroke:#111342;stroke-width:14.3597;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	svg.gateClosed .st1{display:none;}
 	
-		.st2{display:inline;fill:#FFFFFF;stroke:#111342;stroke-width:14.3597;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
-	.st3{fill:#FFFFFF;stroke:#111342;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+		svg.gateClosed .st2{display:inline;fill:#FFFFFF;stroke:#111342;stroke-width:14.3597;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	svg.gateClosed .st3{fill:#FFFFFF;stroke:#111342;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
 </style>
 <circle
    id="circle1152"

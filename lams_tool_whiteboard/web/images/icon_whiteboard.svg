@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
+<svg class="whiteboard"
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -9,9 +9,9 @@
    width="512"
    xml:space="preserve"
    viewBox="0 0 512 512"
-   y="0px"
-   x="0px"
-   id="Layer_1"
+   
+   
+   
    version="1.1"><metadata
    id="metadata872"><rdf:RDF><cc:Work
        rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
