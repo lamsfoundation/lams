@@ -490,17 +490,13 @@ ActivityDraw = {
 							 .addClass('svg-tool-activity-border' + (this.requireGrouping ? '-require-grouping' : '')),
 			// check for icon in the library
 			icon = ActivityLib.getActivityIcon('grouping'),
-			label = paper.text(x + 55, y + 25, ActivityLib.shortenActivityTitle(this.title))
-			 			 .attr(layout.defaultTextAttributes)
-			 			 .attr({
-			 				 'fill' : layout.colors.activityText,
-			 				 'text-anchor' : 'start'
-			 			 });
+			label = ActivityLib.wrapActivityTitle(this.title, x, y);
+			
 		icon.select('svg').attr({
 			'x'     : x + 20,
-			'y'     : y + 3,
-			'width' : '30px',
-			'height': '30px'
+			'y'     : y + 15,
+			'width' : '50px',
+			'height': '50px'
 		});
 		
 		this.items = paper.g(shape, shapeBorder, label, icon);
@@ -1806,17 +1802,6 @@ ActivityLib = {
 		transition.items.remove();
 		GeneralLib.setModified(true);
 	},
-	
-	/**
-	 * Reduce length of activity's title so it fits in its SVG shape.
-	 */
-	shortenActivityTitle : function(title) {
-		if (title.length > 23) {
-			title = title.substring(0, 22) + '...';
-		}
-		return title;
-	},
-	
 	
 	/**
 	 * Crawles through branches setting their lengths and finding the longest one.
