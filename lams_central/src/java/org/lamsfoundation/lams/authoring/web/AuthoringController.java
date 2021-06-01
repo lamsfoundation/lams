@@ -352,7 +352,9 @@ public class AuthoringController {
 	    Organisation organisation = monitoringService.getOrganisation(organisationID);
 
 	    List<User> staffList = new LinkedList<>();
-	    staffList.add(user);
+	    Vector<User> staffVector = userManagementService.getUsersFromOrganisationByRole(organisationID,
+		    Role.MONITOR, true);
+	    staffList.addAll(staffVector);
 
 	    // add organisation's learners as lesson participants
 	    List<User> learnerList = new LinkedList<>();

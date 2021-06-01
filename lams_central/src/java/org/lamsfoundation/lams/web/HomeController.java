@@ -285,12 +285,8 @@ public class HomeController {
 	    userJSON.put("lastName", user.getLastName());
 	    userJSON.put("login", user.getLogin());
 
-	    if (userDTO.getUserID().equals(user.getUserId())) {
-		// creator is always selected
-		users.withArray("selectedMonitors").add(userJSON);
-	    } else {
-		users.withArray("unselectedMonitors").add(userJSON);
-	    }
+	    // all monitors are added by default
+	    users.withArray("selectedMonitors").add(userJSON);
 	}
 	req.setAttribute("users", users.toString());
 
