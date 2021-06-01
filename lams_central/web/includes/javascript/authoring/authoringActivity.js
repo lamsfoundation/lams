@@ -500,11 +500,17 @@ ActivityDraw = {
 		});
 		
 		this.items = paper.g(shape, shapeBorder, label, icon);
+		this.items.attr({
+			'uiid'   : this.uiid,
+			'data-x' : x,
+			'data-y' : y,
+			'data-width' : width,
+			'data-height': height
+		});
+		
 		if (this.readOnly && !isReadOnlyMode) {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}
-		// uiid is needed in Monitoring
-		this.items.attr('uiid', this.uiid);
 		this.items.shape = shape;
 		
 		ActivityLib.activityHandlersInit(this);
@@ -677,7 +683,13 @@ ActivityDraw = {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}
 		// uiid is needed in Monitoring
-		this.items.attr('uiid', this.uiid);
+		this.items.attr({
+			'uiid'   : this.uiid,
+			'data-x' : x,
+			'data-y' : y,
+			'data-width' : width,
+			'data-height': height
+		});
         this.items.addClass('toolActivity');
 		this.items.shape = shape;
 		
@@ -1804,6 +1816,17 @@ ActivityLib = {
 	},
 	
 	/**
+	 * Reduce length of activity's title so it fits in its SVG shape.
+	 */
+	shortenActivityTitle : function(title) {
+		if (title.length > 23) {
+			title = title.substring(0, 22) + '...';
+		}
+		return title;
+	},
+	
+	
+	/**
 	 * Crawles through branches setting their lengths and finding the longest one.
 	 */
 	updateBranchesLength : function(branchingActivity) {
@@ -1838,18 +1861,22 @@ ActivityLib = {
 	
 	wrapActivityTitle : function(title, x, y) {
 		if (title.length < 15) {
-			return paper.text(x + 135, y + 45, title)
+			var label = paper.text(x + 135, y + 45, title)
 			 			 .attr(layout.activityTitleTextAttributes)
 			 			 .attr({
 			 				 'text-anchor' : 'middle'
 			 			 });
+			label.addClass('activityTitleLabel');
+			return label;
 		}
 		
 		const firstLine = paper.text(x + 75, y + 35, title.substring(0, 13))
 			 			 .attr(layout.activityTitleTextAttributes),
 			secondLine = paper.text(x + 75, y + 55, title.length > 24 ? title.substring(13, 24) + '...'  : title.substring(13, title.length))
-				 			 .attr(layout.activityTitleTextAttributes);
-				
-		return paper.g(firstLine, secondLine);
+				 			 .attr(layout.activityTitleTextAttributes),
+			labelGroup = paper.g(firstLine, secondLine);
+		
+		labelGroup.addClass('activityTitleLabel');
+		return labelGroup;
 	}
 }; 

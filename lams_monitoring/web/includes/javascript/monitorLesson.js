@@ -1225,7 +1225,6 @@ function updateSequenceTab() {
 						activityGroup.find('image').attr('xlink:href', gateClosedIcon).show();
 					}
 				}
-				
 				// are there any learners in this or any activity?
 				learnerCount += activity.learnerCount;
 				if (response.contributeActivities) {
@@ -1543,12 +1542,41 @@ function addActivityIcons(activity) {
 	}
 	
 	// add group of users icon
-	var appendTarget = $('svg', sequenceCanvas)[0],
+	var appendTarget = $('svg.learningDesignSvg', sequenceCanvas)[0],
+		isTool = activity.type == 1,
+		isGrouping = activity.type == 2,
 		// branching and gates require extra adjustments
 		isBranching =  [10,11,12,13].indexOf(activity.type) > -1,
 		isGate = [3,4,5,14].indexOf(activity.type) > -1;
 	
 	if (activity.learnerCount > 0){
+		
+		if (isTool || isGrouping) {
+			// if learners reached the activity, make room for their icons: make activity icon and label smaller and move to top
+			var activityGroup = $('g[id="' + activity.id + '"]', appendTarget);
+			// 
+			$('svg', activityGroup).attr({
+				'x'     : coord.x + 20,
+				'y'     : coord.y + 3,
+				'width' : '30px',
+				'height': '30px'
+			});
+			
+			$('.activityTitleLabel', activityGroup).remove();
+			$('<text>').text(activity.title.length < 20 ? activity.title : activity.title.substring(0, 20) + '...')
+					   .attr({
+							'x' : coord.x + 55,
+							'y' : coord.y + 20
+						})
+						.css({
+							'text-anchor' : 'start',
+							'font-size'   : '12px',
+							'font-family' : 'sans-serif'
+						})
+						.addClass('activityTitleLabel')
+						.appendTo(activityGroup);
+		}
+		
 		var	groupTitle = activity.learnerCount + ' ' + LABELS.LEARNER_GROUP_COUNT + ' ' + LABELS.LEARNER_GROUP_SHOW,
 			element = appendXMLElement('image', {
 			'id'         : 'act' + activity.id + 'learnerGroup',
@@ -1821,17 +1849,14 @@ function getActivityCoordinates(activity){
 	if (group.length == 0) {
 		return;
 	}
-	var path = $('path', group).attr('d'),
-	// extract width and height from path M<x>,<y>h<width>v<height>... or M <x> <y> h <width> v <height>...
-		match = /M\s?(\d+)\s?,?\s?(\d+)\s?h\s?(\d+)\s?v\s?(\d+)/.exec(path);
-	if (match) {
-		return {
-			'x'    : +match[1],
-			'y'    : +match[2] + 1,
-			'x2'   : +match[1] + +match[3],
-			'y2'   : +match[2] + +match[4]
-		}
+	
+	return {
+		'x'    : +group.data('x'),
+		'y'    : +group.data('y'),
+		'x2'   : +group.data('x') + +group.data('width'),
+		'y2'   : +group.data('y') + +group.data('height')
 	}
+	
 }
 
 
