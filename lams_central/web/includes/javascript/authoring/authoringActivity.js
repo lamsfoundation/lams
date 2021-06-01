@@ -3,17 +3,6 @@
  */
 
 /**
- * Stores different Activity types structures.
- */
-var ActivityIcons = {
-		'grouping' : 'data:image/png;base64,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',
-		'gateClosed' : 'data:image/png;base64,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',
-		'branchingStart' : 'data:image/png;base64,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',
-		'branchingEnd' : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAFHklEQVRIS71Wa2wUVRQ+d2Z2dmffu21otQX6iAWk0BaRhxVIpKmJCYoKvsBfBhMS5RFTfAQMKoZENMSYSPylGIyJiSgC/lEiDW6BpmkKpYUqrBu6JV1gd2a7s/O8M2PudhaXTWGpabnJJJt77p7vPL9zEAAwAGDaH9yvgwqAyG/rvgG7XNUbFSV5EkCOAwB1vzxHwfCqUcvE6bQQWQgAGgAQz0nop/Ugf2DJaQqxYdNShsfSPW12zvPgxIBpCT8KhFqjktj/oour/wDAMjJjfWuKXKXtCEypASgQWnE1mxl4CePUGX9w6WnTVK/omI8YhnQFqzciAJCxDZnS/KNgeOWwONb/Msb8nx7/omMM5aw0sHiJot31iHIEdZ3/QxIHdgJACgCI98ZUJJ8Ajwip7se93rq3aSawNC2cbvlPsW+Ox1fb4XCE28WxvlcxFjonAU4iRL68ofmU5QoX+YLLzoGlxynKWZfmuxYDgGQXGM4XFstWPOPxNX6XSfc+iTFPwl/K87vJczIUKnvCsJCZEm72PAwg3ijqZWIxYTaNZWesdXvnfSWkOusAQLGNmqjt7FrwzaWcs990MO75LgfiwFKikhT7TNfTPcRw5PM1HlTV2D5NEy/cxROWgHt8jQcR0B4xc27dHah2HJR+4Lny8NwDs8sTJ8XMzaNDCeNvMIIrysKzOsTM5d2qOnzgXimTvCMhYgKh1j6Mk8ezmUtv2bVA7omcgGIAf/2sqkcu/Lgthlpq0tdVlabPj+Dend/yHScGuEy4fOn5MaH/+bxC0qOl2CrP5eFAcPlvloV5Rb64VdPEgduqnGr88otNzOY3no1jlXcyDGUB7UJgAYI1u+ILjg9UN4f81dsLPb6XLrk1SJxczRY3V/OOYUr/GIYcpSlnuaRc3e9kZ7579iNh1bxZoqmrFEVTADpGmPMgx+VhuW9Bh7TWyS2JTBY4TyKc29uwk3VUvoDNdL+B5SjFOMNqNv41563f2/1hqnVOVdbUdYqibATTAotlLbR8R/bpnpGmffncEG9LhdoGdc0Olj16AutijzhG8iyP3BYquunQoa3Ghg2rR3GWdzIsM65WNxC4vbq85mP3N8f6KpsLPb4bJeYN9AXDKwdU+ernshz7xAYk7UYOKTIdoGxx40MLz/7+3l9mxQzNtCSa3FuIM6wMzyjLdjcwg7GhjcjnX/SrLMX2YJzqKiCO4nzn2snnbzlimUpCFC++DgDkTi+aXuPGUzXbWhpq9+9eNwpL6rJAgQV9w27Y89ODEBm8tsfUhnahUNlq8meNT0YWACjRol4minKeuFzVr7m42vcF/lS9bRWhwokmls1aFW2InbmlqpxtohBQI0k8aCjxAwDXfs4RSCD02KChpyMMW/aUkOptARCvA4DD9iaH4XJVb+I8DZ9mM92tNtGUmlSFcs7uc0LF5ORkZAO5IaQ6GzhPww4nW7Fe4E/NBwCVWMUwoWWcu66Dot1z5Wzvek3L9k9iPcrltqBoCSCpldzQIMAJSexpI0q9/qYfGCaweHwsclXkgaomDivS5b32WlRqOEzEBfkCvi0tBDgppLqbAWQpEGzt0vTkUUMXzliWHNX1dG+BplLhvRcCuvWGzOO4JPa2c56mI1i7eSybHdpepIG0y50KaVJghY/JzhVDiOWwljgsioOb7cLKL3kkPFO6a+XBUbi83dKU0e9F8fwrdh9PuXcTJp5sF5qW+KVAOC0eFoNPdkj875xOBDwtxVPKwn8BbCc3nMHhPAgAAAAASUVORK5CYII=',
-		'bin' : 'data:image/png;base64,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',
-}, 
-
-/**
  * For colouring. See LDEV-5058
  *  CATEGORY_SYSTEM = 1;
     CATEGORY_COLLABORATION = 2;
@@ -360,8 +349,14 @@ ActivityDraw = {
 		// create activity SVG elements
 		var shape = paper.circle(x, y, 20)
 						 .addClass('svg-branching svg-branching-' + (this.isStart ? 'start' : 'end')),
-			icon = paper.image(this.isStart ? ActivityIcons.branchingStart : ActivityIcons.branchingEnd, x - 15, y - 15, 30, 30);
-
+			icon = ActivityLib.getActivityIcon(this.isStart ? 'branchingStart' : 'branchingEnd');
+		icon.select('svg').attr({
+			'x'     : x - 15,
+			'y'     : y - 15,
+			'width' : '30px',
+			'height': '30px'
+		});
+	
 		this.items = paper.g(shape, icon);
 		if (this.readOnly && !isReadOnlyMode) {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
@@ -444,7 +439,13 @@ ActivityDraw = {
 		y = GeneralLib.snapToGrid(y) - layout.snapToGrid.offset * 2;
 		
 		// create activity SVG elements
-		var shape = paper.image(ActivityIcons.gateClosed, x, y, 40, 40);
+		var shape = ActivityLib.getActivityIcon('gateClosed');
+		shape.select('svg').attr({
+			'x'     : x,
+			'y'     : y,
+			'width' : '40px',
+			'height': '40px'
+		});
 
 		this.items = paper.g(shape);
 		if (this.readOnly && !isReadOnlyMode) {
@@ -488,7 +489,7 @@ ActivityDraw = {
 			shapeBorder = paper.path(shapePath)
 							 .addClass('svg-tool-activity-border' + (this.requireGrouping ? '-require-grouping' : '')),
 			// check for icon in the library
-			icon = paper.image(ActivityIcons.grouping, x + 20, y + 3, 30, 30),
+			icon = ActivityLib.getActivityIcon('grouping'),
 			label = paper.text(x + 55, y + 25, ActivityLib.shortenActivityTitle(this.title))
 			 			 .attr(layout.defaultTextAttributes)
 			 			 .attr({
@@ -496,9 +497,14 @@ ActivityDraw = {
 			 				 'fill' : layout.colors.activityText,
 			 				 'text-anchor' : 'start'
 			 			 });
+		icon.select('svg').attr({
+			'x'     : x + 20,
+			'y'     : y + 3,
+			'width' : '30px',
+			'height': '30px'
+		});
 		
 		this.items = paper.g(shape, shapeBorder, label, icon);
-		
 		if (this.readOnly && !isReadOnlyMode) {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}
@@ -654,46 +660,28 @@ ActivityDraw = {
 						 .addClass('svg-tool-activity-background'),
 			shapeBorder = paper.path(shapePath)
 							 .addClass('svg-tool-activity-border' + (this.requireGrouping ? '-require-grouping' : '')),
-			learningLibraryID = this.learningLibraryID,
 			label = paper.text(x + 55, y + 23, ActivityLib.shortenActivityTitle(this.title))
 			 			 .attr(layout.defaultTextAttributes)
 			 			 .attr({
 			 				 'id'   : 'toolActivityTitle',
 			 				 'fill' : layout.colors.activityText,
 			 				 'text-anchor' : 'start'
-			 			 });
+			 			 }),
+			icon = ActivityLib.getActivityIcon(this.learningLibraryID);
 		
 		bannerPath += ' h ' + bannerWidth + ' v ' + height + ' z';
 		var banner = paper.path(bannerPath)
-						  .addClass('svg-tool-activity-category-' + layout.toolMetadata[learningLibraryID].activityCategoryID);
+						  .addClass('svg-tool-activity-category-' + layout.toolMetadata[this.learningLibraryID].activityCategoryID);
 		this.items = paper.g(shape, banner, shapeBorder, label);
 		
-		// check for icon SVG cache in the library
-		var iconData = layout.toolMetadata[learningLibraryID].iconData;
-		if (!iconData) {
-			// if SVG is not cached, get it synchronously
-			$.ajax({
-				url : LAMS_URL + layout.toolMetadata[learningLibraryID].iconPath,
-				async : false,
-				dataType : 'text',
-				success : function(response) {
-					iconData = response;
-					layout.toolMetadata[learningLibraryID].iconData = iconData;
-				}
-			});		
-		}
-		
-		if (iconData) {
-			// build a SVG fragment and position it
-			var fragment = Snap.parse(iconData),
-				icon = Snap(fragment.node);
+		if (icon) {
 			icon.select('svg').attr({
 				'x'     : x + 20,
 				'y'     : y + 3,
 				'width' : '30px',
 				'height': '30px'
 			});
-			this.items.add(icon);
+			this.items.add(icon);	
 		}
 		
 		if (this.readOnly && !isReadOnlyMode) {
@@ -1237,7 +1225,13 @@ ActivityLib = {
 		GeneralLib.setModified(true);
 		return transition;
 	},
-	
+		
+	adjustTransitionPoint : function(bottomLimit, topLimit, target) {
+		// find a good point inside the grid, then make sure it is within bounds
+		return Math.max(bottomLimit + layout.transition.adjustStep, Math.min(topLimit - layout.transition.adjustStep,
+				Math.floor(target / layout.transition.adjustStep) * layout.transition.adjustStep + layout.snapToGrid.offset));
+	},
+
 	/**
 	 * It is run from authoringConfirm.jsp
 	 * It closes the dialog with activity authoring 
@@ -1361,13 +1355,6 @@ ActivityLib = {
 		return nestedBranching;
 	},
 	
-	adjustTransitionPoint : function(bottomLimit, topLimit, target) {
-		// find a good point inside the grid, then make sure it is within bounds
-		return Math.max(bottomLimit + layout.transition.adjustStep, Math.min(topLimit - layout.transition.adjustStep,
-				Math.floor(target / layout.transition.adjustStep) * layout.transition.adjustStep + layout.snapToGrid.offset));
-	},
-
-	
 	/**
 	 * Calculates start, middle and end points of a line between two activities. 
 	 */
@@ -1437,6 +1424,32 @@ ActivityLib = {
 		}
 		
 		return points;
+	},
+	
+	getActivityIcon(activityName) {
+		// check for icon SVG cache in the library
+		var iconData = layout.toolMetadata[activityName].iconData;
+		if (!iconData) {
+			if (!layout.toolMetadata[activityName].iconPath) {
+				return;
+			}
+			// if SVG is not cached, get it synchronously
+			$.ajax({
+				url : LAMS_URL + layout.toolMetadata[activityName].iconPath,
+				async : false,
+				dataType : 'text',
+				success : function(response) {
+					iconData = response;
+					layout.toolMetadata[activityName].iconData = iconData;
+				}
+			});		
+		}
+		
+		if (iconData) {
+			// build a SVG fragment
+			var fragment = Snap.parse(iconData);
+			return Snap(fragment.node);
+		}
 	},
 	
 	
