@@ -271,7 +271,7 @@ var MenuLib = {
 	/**
 	 * Creates a SVG image out of current SVG contents.
 	 */
-	exportSVG : function(download){
+	exportSVG : function(){
 		ActivityLib.removeSelectEffect();
 		
 		var crop = MenuLib.getCanvasCrop();
@@ -288,6 +288,7 @@ var MenuLib = {
 		svg.setAttribute('preserveAspectRatio', 'xMinYMin slice');
 		svg.setAttribute('width', width);
 		svg.setAttribute('height', height);
+		$(svg).addClass('learningDesignSvg');
 		
 		// reset any cursor=pointer styles
 		$('*[style*="cursor"]', svg).css('cursor', 'default');
