@@ -113,7 +113,6 @@ var paper = null,
 		
 		'colors' : {
 			'activityBorder'	  : 'black',
-			'activityText' 		  : 'black',
 			// default region colour
 			'annotation'		  : '#CCFF99',
 			// region colours to choose from
@@ -141,6 +140,13 @@ var paper = null,
 			'text-anchor' : 'middle',
 			'font-size'   : 12,
 			'font-family' : 'sans-serif'
+		},
+		
+		'activityTitleTextAttributes' : {
+			'text-anchor' : 'start',
+			'font-size'   : 14,
+			'font-family' : 'sans-serif',
+			'fill'        : 'black'
 		}
 },
 

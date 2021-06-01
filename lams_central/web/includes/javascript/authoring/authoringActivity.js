@@ -493,7 +493,6 @@ ActivityDraw = {
 			label = paper.text(x + 55, y + 25, ActivityLib.shortenActivityTitle(this.title))
 			 			 .attr(layout.defaultTextAttributes)
 			 			 .attr({
-			 				 'id'   : 'toolActivityTitle',
 			 				 'fill' : layout.colors.activityText,
 			 				 'text-anchor' : 'start'
 			 			 });
@@ -660,13 +659,7 @@ ActivityDraw = {
 						 .addClass('svg-tool-activity-background'),
 			shapeBorder = paper.path(shapePath)
 							 .addClass('svg-tool-activity-border' + (this.requireGrouping ? '-require-grouping' : '')),
-			label = paper.text(x + 55, y + 23, ActivityLib.shortenActivityTitle(this.title))
-			 			 .attr(layout.defaultTextAttributes)
-			 			 .attr({
-			 				 'id'   : 'toolActivityTitle',
-			 				 'fill' : layout.colors.activityText,
-			 				 'text-anchor' : 'start'
-			 			 }),
+			label = ActivityLib.wrapActivityTitle(this.title, x, y),
 			icon = ActivityLib.getActivityIcon(this.learningLibraryID);
 		
 		bannerPath += ' h ' + bannerWidth + ' v ' + height + ' z';
@@ -677,9 +670,9 @@ ActivityDraw = {
 		if (icon) {
 			icon.select('svg').attr({
 				'x'     : x + 20,
-				'y'     : y + 3,
-				'width' : '30px',
-				'height': '30px'
+				'y'     : y + 15,
+				'width' : '50px',
+				'height': '50px'
 			});
 			this.items.add(icon);	
 		}
@@ -689,7 +682,7 @@ ActivityDraw = {
 		}
 		// uiid is needed in Monitoring
 		this.items.attr('uiid', this.uiid);
-        this.items.attr('id' , 'toolActivity');
+        this.items.addClass('toolActivity');
 		this.items.shape = shape;
 		
 		if (this.grouping) {
@@ -1856,5 +1849,22 @@ ActivityLib = {
 		});
 		
 		branchingActivity.longestBranchLength = longestBranchLength;
+	},
+	
+	wrapActivityTitle : function(title, x, y) {
+		if (title.length < 15) {
+			return paper.text(x + 135, y + 45, title)
+			 			 .attr(layout.activityTitleTextAttributes)
+			 			 .attr({
+			 				 'text-anchor' : 'middle'
+			 			 });
+		}
+		
+		const firstLine = paper.text(x + 75, y + 35, title.substring(0, 13))
+			 			 .attr(layout.activityTitleTextAttributes),
+			secondLine = paper.text(x + 75, y + 55, title.length > 24 ? title.substring(13, 24) + '...'  : title.substring(13, title.length))
+				 			 .attr(layout.activityTitleTextAttributes);
+				
+		return paper.g(firstLine, secondLine);
 	}
-};
+}; 
