@@ -39,9 +39,9 @@ public class SignupService implements ISignupService {
 	user.setAuthenticationMethod(getAuthenticationMethod(AuthenticationMethod.DB));
 	user.setLocale(getDefaultLocale());
 	user.setCreateDate(new Date());
-	
+
 	userManagementService.updatePassword(user, password);
-	
+
 	// add to org
 	SignupOrganisation signup = signupDAO.getSignupOrganisation(context);
 
@@ -79,31 +79,30 @@ public class SignupService implements ISignupService {
     public void signinUser(String login, String context) {
 	User user = userManagementService.getUserByLogin(login);
 
-	// add to org
 	SignupOrganisation signup = signupDAO.getSignupOrganisation(context);
 
-	ArrayList<String> rolesList = new ArrayList<>();
-	rolesList.add(Role.ROLE_LEARNER.toString());
-	if (signup.getAddAsStaff()) {
-	    rolesList.add(Role.ROLE_MONITOR.toString());
-	    rolesList.add(Role.ROLE_AUTHOR.toString());
-	} else if (signup.getAddWithAuthor()) {
-	    rolesList.add(Role.ROLE_AUTHOR.toString());
-	} else if (signup.getAddWithMonitor()) {
-	    rolesList.add(Role.ROLE_MONITOR.toString());
-	}
-
-	userManagementService.setRolesForUserOrganisation(user, signup.getOrganisation().getOrganisationId(),
-		rolesList);
-
 	if (signup.getAddToLessons()) {
+	    // if user is learner and logging in users get added to lessons, he is also added as a learner to all lessons
+	    boolean addAsLearner = userManagementService.hasRoleInOrganisation(user, Role.ROLE_LEARNER,
+		    signup.getOrganisation());
+
+	    // if user is monitor and logging in users get added to lessons, he is also added as a monitor to all lessons
+	    boolean addAsStaff = userManagementService.hasRoleInOrganisation(user, Role.ROLE_MONITOR,
+		    signup.getOrganisation());
+
+	    if (!addAsLearner && !addAsStaff) {
+		return;
+	    }
+
 	    // add to lessons
 	    Set lessonSet = signup.getOrganisation().getLessons();
 	    Iterator lessonIterator = lessonSet.iterator();
 	    while (lessonIterator.hasNext()) {
 		Lesson lesson = (Lesson) lessonIterator.next();
-		lessonService.addLearner(lesson.getLessonId(), user.getUserId());
-		if (signup.getAddAsStaff()) {
+		if (addAsLearner) {
+		    lessonService.addLearner(lesson.getLessonId(), user.getUserId());
+		}
+		if (addAsStaff) {
 		    lessonService.addStaffMember(lesson.getLessonId(), user.getUserId());
 		}
 	    }
