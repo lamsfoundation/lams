@@ -22,7 +22,7 @@ var originalSequenceCanvas = null,
 	learnerProgressCurrentPageNumber = 1,
 
 //auto refresh all tabs every 30 seconds
-	autoRefreshInterval = 30 * 1000,
+	autoRefreshInterval = 99990 * 1000,
 	autoRefreshIntervalObject = null,
 // when user is doing something, do not auto refresh
 	autoRefreshBlocked = false,
@@ -1542,7 +1542,7 @@ function addActivityIcons(activity) {
 	}
 	
 	// add group of users icon
-	var appendTarget = $('svg.learningDesignSvg', sequenceCanvas)[0],
+	var learningDesignSvg = $('svg.learningDesignSvg', sequenceCanvas),
 		isTool = activity.type == 1,
 		isGrouping = activity.type == 2,
 		// branching and gates require extra adjustments
@@ -1553,7 +1553,7 @@ function addActivityIcons(activity) {
 		
 		if (isTool || isGrouping) {
 			// if learners reached the activity, make room for their icons: make activity icon and label smaller and move to top
-			var activityGroup = $('g[id="' + activity.id + '"]', appendTarget);
+			var activityGroup = $('g[id="' + activity.id + '"]', learningDesignSvg);
 			// 
 			$('svg', activityGroup).attr({
 				'x'     : coord.x + 20,
@@ -1575,8 +1575,49 @@ function addActivityIcons(activity) {
 						})
 						.addClass('activityTitleLabel')
 						.appendTo(activityGroup);
+						
+			var learningDesignSvgViewbox = learningDesignSvg.attr('viewBox').split(' '),
+				learningDesignSvgInternalLeftOffset = +learningDesignSvgViewbox[0],
+				learningDesignSvgInternalTopOffset = +learningDesignSvgViewbox[1],
+				learningDesignSvgExternalOffset = learningDesignSvg.offset(),
+				activityLeftOffset = learningDesignSvgExternalOffset.left + coord.x - learningDesignSvgInternalLeftOffset,
+				activityTopOffset  = learningDesignSvgExternalOffset.top + coord.y - learningDesignSvgInternalTopOffset;
+			activity.learners = [...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners]
+			$.each(activity.learners, function(learnerIndex, learner){
+				if (learnerIndex >= 7 && activity.learners.length > 8) {
+					return false;					
+				}
+				$(definePortrait(learner.portraitId, learner.id, STYLE_SMALL, true, LAMS_URL))
+					  .css({
+						'left'     : activityLeftOffset + (learnerIndex * (activity.learners.length < 5 ? 45 : 20)) + 20 + 'px',
+						'top'      : activityTopOffset  + 40 + 'px',
+						'z-index'  : 100 + learnerIndex
+					  })
+					  .addClass('popover-link new-popover learner-icon')
+					  .attr({
+						'data-id'       : 'popover-' + learner.id,
+						'data-toggle'   : 'popover',
+						'data-portrait' : learner.portraitId,
+						'data-fullname' : getLearnerDisplayName(learner)
+					  })
+					  .appendTo(sequenceCanvas);
+			});
+			
+			if (activity.learners.length > 8) {
+				$('<div />')
+					  .css({
+						'left'     : activityLeftOffset + 160 + 'px',
+						'top'      : activityTopOffset  + 40 + 'px'
+					  })
+					  .addClass('more-learner-icon')
+					  .text('+' + (activity.learners.length - 7))
+					  .appendTo(sequenceCanvas);
+			}
 		}
 		
+
+		
+		/*
 		var	groupTitle = activity.learnerCount + ' ' + LABELS.LEARNER_GROUP_COUNT + ' ' + LABELS.LEARNER_GROUP_SHOW,
 			element = appendXMLElement('image', {
 			'id'         : 'act' + activity.id + 'learnerGroup',
@@ -1631,6 +1672,7 @@ function addActivityIcons(activity) {
 				});
 			}
 		}
+		*/
 	}
 	
 	if (activity.requiresAttention) {
@@ -1642,7 +1684,7 @@ function addActivityIcons(activity) {
 			'width'      : 16,
 			'xlink:href' : LAMS_URL + 'images/icons/exclamation.png',
 			'style'		 : 'cursor : pointer'
-		}, null, appendTarget);
+		}, null, learningDesignSvg[0]);
 		appendXMLElement('title', null, LABELS.CONTRIBUTE_ATTENTION, element);
 	}
 }
@@ -2093,6 +2135,8 @@ function resizeSequenceCanvas(width, height){
 			'padding-left' : canvasPaddingLeft + 'px',
 			'height'  : canvasHeight - 70 + 'px'
 		});
+
+	updateSequenceTab();
 }
 
 //********** LEARNERS TAB FUNCTIONS **********

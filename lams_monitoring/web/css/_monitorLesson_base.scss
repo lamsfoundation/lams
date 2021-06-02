@@ -311,12 +311,29 @@ div#sequenceCanvas {
 	overflow: auto;
 }
 
-div#sequenceCanvas svg {
+div#sequenceCanvas div.learner-icon {
+	position : absolute;
+	border-radius : 20px;
+	background-color : #FFFFFF;
+}
+  
+div#sequenceCanvas div.more-learner-icon {
+	position : absolute;
+	border-radius : 20px;
+	background-color : #e7e7e7;
+	width    : 35px;
+	height   : 35px;
+	line-height : 35px;
+	font-size  : 16px;
+	z-index : 108;
+}
+
+div#sequenceCanvas svg.learningDesignSvg {
 	display: block;
 	overflow: hidden;
 }
 
-div#sequenceCanvas svg g.gate image {
+div#sequenceCanvas svg.learningDesignSvg g.gate image {
 	display: none;
 }
 

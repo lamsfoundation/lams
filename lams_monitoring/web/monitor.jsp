@@ -272,6 +272,8 @@
 					sequenceInfoDialog.modal("show");
 					sequenceTabShowInfo = false; // only show it once
                 }
+
+				updateSequenceTab();
                 
 			} else {
 				sequenceInfoDialog.modal("hide");
