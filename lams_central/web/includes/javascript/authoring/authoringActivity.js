@@ -364,7 +364,13 @@ ActivityDraw = {
 		}
 		if (this.isStart) {
 			// uiid is needed in Monitoring
-			this.items.attr('uiid', this.branchingActivity.uiid);
+			this.items.attr({
+				'uiid'   : this.branchingActivity.uiid,
+				'data-x' : x,
+				'data-y' : y,
+				'data-width' : 30,
+				'data-height': 30
+			});
 		}
 		this.items.shape = shape;
 		
@@ -455,7 +461,13 @@ ActivityDraw = {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}
 		// uiid is needed in Monitoring
-		this.items.attr('uiid', this.uiid);
+		this.items.attr({
+			'uiid'   : this.uiid,
+			'data-x' : x,
+			'data-y' : y,
+			'data-width' : 40,
+			'data-height': 40
+		});
 		this.items.shape = shape;
 		
 		ActivityLib.activityHandlersInit(this);
@@ -539,6 +551,9 @@ ActivityDraw = {
 			this.childActivities = childActivities;
 		}
 		
+		var width = null,
+			height = null;
+			
 		if (this.childActivities && this.childActivities.length > 0) {
 			// draw one by one, vertically
 			var activityY = y + layout.conf.containerActivityPadding + 10,
@@ -559,14 +574,16 @@ ActivityDraw = {
 			// area containing all drawn child activities
 			box = allElements.getBBox();
 			
-			this.drawContainer(x, y,
-							  box.x2 + layout.conf.containerActivityPadding,
-							  box.y2 + layout.conf.containerActivityPadding,
+			width = box.x2 + layout.conf.containerActivityPadding - x;
+			height = box.y2 + layout.conf.containerActivityPadding - y;
+			
+			this.drawContainer(x, y, x + width, y + height,
 							  layout.colors.optionalActivity, layout.colors.optionalActivityBorder, 0.5);
 		} else {
-			this.drawContainer(x, y,
-							   x + layout.conf.containerActivityEmptyWidth,
-							   y + layout.conf.containerActivityEmptyHeight,
+			width  = layout.conf.containerActivityEmptyWidth;
+			height = layout.conf.containerActivityEmptyHeight;
+	
+			this.drawContainer(x, y, x + width, y + height,
 							   layout.colors.optionalActivity, layout.colors.optionalActivityBorder, 0.5);
 		}
 		
@@ -577,6 +594,13 @@ ActivityDraw = {
 		
 		this.items.data('parentObject', this);
 		this.items.addClass('svg-activity-optional');
+		this.items.attr({
+			'uiid'   : this.uiid,
+			'data-x' : x,
+			'data-y' : y,
+			'data-width' : width,
+			'data-height': height
+		});
 	},
 	
 	
@@ -594,7 +618,10 @@ ActivityDraw = {
 		
 		x = GeneralLib.snapToGrid(x);
 		y = GeneralLib.snapToGrid(y);
-		
+				
+		var width = null,
+			height = null;
+			
 		if (this.childActivities && this.childActivities.length > 0) {
 			// draw one by one, vertically
 			var activityY = y + layout.conf.containerActivityPadding + 10,
@@ -610,14 +637,16 @@ ActivityDraw = {
 			// area containing all drawn child activities
 			var box = allElements.getBBox();
 			
-			this.drawContainer(x, y,
-							  box.x2 + layout.conf.containerActivityPadding,
-							  box.y2 + layout.conf.containerActivityPadding,
+			width = box.x2 + layout.conf.containerActivityPadding - x;
+			height = box.y2 + layout.conf.containerActivityPadding - y;
+			
+			this.drawContainer(x, y, x + width, y + height,
 							  layout.colors.optionalActivity, layout.colors.optionalActivityBorder, 0.5);
 		} else {
-			this.drawContainer(x, y,
-							   x + layout.conf.containerActivityEmptyWidth,
-							   y + layout.conf.containerActivityEmptyHeight,
+			width  = layout.conf.containerActivityEmptyWidth;
+			height = layout.conf.containerActivityEmptyHeight;
+			
+			this.drawContainer(x, y, x + width, y + height,
 							   layout.colors.optionalActivity, layout.colors.optionalActivityBorder, 0.5);
 		}
 		
@@ -632,6 +661,13 @@ ActivityDraw = {
 		
 		this.items.data('parentObject', this);
 		this.items.addClass('svg-activity-parallel');
+		this.items.attr({
+			'uiid'   : this.uiid,
+			'data-x' : x,
+			'data-y' : y,
+			'data-width' : width,
+			'data-height': height
+		});
 	},
 	
 	

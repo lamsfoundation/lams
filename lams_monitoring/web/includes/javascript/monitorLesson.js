@@ -1195,6 +1195,9 @@ function updateSequenceTab() {
 			$.each(response.activities, function(index, activity){
 				var activityGroup = $('g[id="' + activity.id + '"]', sequenceCanvas),
 					isGate = [3,4,5,14].indexOf(activity.type) > -1;
+					
+				learnerCount += activity.learnerCount;
+				
 				if (isGate) {
 					var gateClosedIcon = activityGroup.find('.gateClosed');
 					
@@ -1237,6 +1240,9 @@ function updateSequenceTab() {
 				// put learner and attention icons on each activity shape
 				addActivityIcons(activity);
 			});
+			
+			// modyfing SVG in DOM does not render changes, so we need to reload it
+			sequenceCanvas.html(sequenceCanvas.html());
 			
 			if (sequenceSearchedLearner != null && !response.searchedLearnerFound) {
 				// the learner has not started the lesson yet, display an info box
@@ -1539,14 +1545,26 @@ function addActivityIcons(activity) {
 		isGrouping = activity.type == 2,
 		// branching and gates require extra adjustments
 		isBranching =  [10,11,12,13].indexOf(activity.type) > -1,
-		isGate = [3,4,5,14].indexOf(activity.type) > -1;
-	
-	if (activity.learnerCount > 0){
+		isGate = [3,4,5,14].indexOf(activity.type) > -1,
+		isContainer = [6,7].indexOf(activity.type) > -1;
 		
+			
+	if (activity.learnerCount > 0){
+		if (activity.learners) {
+			activity.learners = [...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners]
+			activity.learnerCount = activity.learners.length;
+	    }
+
+		var learningDesignSvgViewbox = learningDesignSvg.attr('viewBox').split(' '),
+			learningDesignSvgInternalLeftOffset = +learningDesignSvgViewbox[0],
+			learningDesignSvgInternalTopOffset = +learningDesignSvgViewbox[1],
+			learningDesignSvgExternalOffset = learningDesignSvg.offset(),
+			activityLeftOffset = learningDesignSvgExternalOffset.left + coord.x - learningDesignSvgInternalLeftOffset + sequenceCanvas.scrollLeft(),
+			activityTopOffset  = learningDesignSvgExternalOffset.top  + coord.y - learningDesignSvgInternalTopOffset + sequenceCanvas.scrollTop();
+
 		if (isTool || isGrouping) {
 			// if learners reached the activity, make room for their icons: make activity icon and label smaller and move to top
 			var activityGroup = $('g[id="' + activity.id + '"]', learningDesignSvg);
-			// 
 			$('svg', activityGroup).attr({
 				'x'     : coord.x + 20,
 				'y'     : coord.y + 3,
@@ -1567,22 +1585,15 @@ function addActivityIcons(activity) {
 						})
 						.addClass('activityTitleLabel')
 						.appendTo(activityGroup);
-						
-			var learningDesignSvgViewbox = learningDesignSvg.attr('viewBox').split(' '),
-				learningDesignSvgInternalLeftOffset = +learningDesignSvgViewbox[0],
-				learningDesignSvgInternalTopOffset = +learningDesignSvgViewbox[1],
-				learningDesignSvgExternalOffset = learningDesignSvg.offset(),
-				activityLeftOffset = learningDesignSvgExternalOffset.left + coord.x - learningDesignSvgInternalLeftOffset,
-				activityTopOffset  = learningDesignSvgExternalOffset.top + coord.y - learningDesignSvgInternalTopOffset;
-			activity.learners = [...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners]
+
 			$.each(activity.learners, function(learnerIndex, learner){
-				if (learnerIndex >= 7 && activity.learners.length > 8) {
+				if (learnerIndex >= 7 && activity.learnerCount > 8) {
 					return false;					
 				}
 				$(definePortrait(learner.portraitId, learner.id, STYLE_SMALL, true, LAMS_URL))
 					  .css({
-						'left'     : activityLeftOffset + (learnerIndex * (activity.learners.length < 5 ? 45 : 20)) + 20 + 'px',
-						'top'      : activityTopOffset  + 40 + 'px',
+ 						'left'     : activityLeftOffset + (learnerIndex * (activity.learnerCount < 5 ? 45 : 20)) - 2 + 'px',
+						'top'      : activityTopOffset  - 60 + 'px',
 						'z-index'  : 100 + learnerIndex
 					  })
 					  .addClass('popover-link new-popover learner-icon')
@@ -1595,18 +1606,46 @@ function addActivityIcons(activity) {
 					  .appendTo(sequenceCanvas);
 			});
 			
-			if (activity.learners.length > 8) {
+			if (activity.learnerCount > 8) {
 				$('<div />')
 					  .css({
-						'left'     : activityLeftOffset + 160 + 'px',
-						'top'      : activityTopOffset  + 40 + 'px'
+						'left'     : activityLeftOffset + 138 + 'px',
+						'top'      : activityTopOffset  - 60  + 'px'
 					  })
 					  .addClass('more-learner-icon')
-					  .text('+' + (activity.learners.length - 7))
+					  .text('+' + (activity.learnerCount - 7))
 					  .appendTo(sequenceCanvas);
 			}
+			
+		} else if (isGate) {
+			$('<div />')
+				  .css({
+					'left'     : activityLeftOffset + 'px',
+					'top'      : activityTopOffset  - 80  + 'px'
+				  })
+				  .addClass('more-learner-icon')
+				  .text(activity.learnerCount)
+				  .appendTo(sequenceCanvas);
+		} else if (isBranching) {
+			$('<div />')
+				  .css({
+					'left'     : activityLeftOffset - 20  + 'px',
+					'top'      : activityTopOffset  - 100  + 'px'
+				  })
+				  .addClass('more-learner-icon')
+				  .text(activity.learnerCount)
+				  .appendTo(sequenceCanvas);
+		} else if (isContainer) {
+			$('<div />')
+				  .css({
+					'left'     : activityLeftOffset + coord.width - 50 + 'px',
+					'top'      : activityTopOffset  - 98  + 'px'
+				  })
+				  .addClass('more-learner-icon')
+				  .text(activity.learnerCount)
+				  .appendTo(sequenceCanvas);
 		}
-		
+	
 
 		
 		/*
@@ -1668,6 +1707,7 @@ function addActivityIcons(activity) {
 	}
 	
 	if (activity.requiresAttention) {
+		/*
 		var element = appendXMLElement('image', {
 			'id'         : 'act' + activity.id + 'attention',
 			'x'          : isBranching ? coord.x + 14 : coord.x2 - 19,
@@ -1678,6 +1718,7 @@ function addActivityIcons(activity) {
 			'style'		 : 'cursor : pointer'
 		}, null, learningDesignSvg[0]);
 		appendXMLElement('title', null, LABELS.CONTRIBUTE_ATTENTION, element);
+		*/
 	}
 }
 
@@ -1861,34 +1902,18 @@ function getActivityCoordinates(activity){
 		activity.y = 0;
 	}
 	
-	// special processing for gates
-	if ([3,4,5,14].indexOf(activity.type) > -1) {
-		return {
-			'x'  : activity.x,
-			'y'  : activity.y - 18,
-			'x2' : activity.x + 39,
-			'y2' : activity.y + 40
-		}
-	}
-	
-	// special processing for branching and optional sequences
-	if ([10,11,12,13].indexOf(activity.type) > -1) {
-		return {
-			'x'  : activity.x,
-			'y'  : activity.y
-		}
-	}
-	
 	var group = $('g[id="' + activity.id + '"]', sequenceCanvas);
 	if (group.length == 0) {
 		return;
 	}
 	
 	return {
-		'x'    : +group.data('x'),
-		'y'    : +group.data('y'),
-		'x2'   : +group.data('x') + +group.data('width'),
-		'y2'   : +group.data('y') + +group.data('height')
+		'x'     : +group.data('x'),
+		'y'     : +group.data('y'),
+		'x2'    : +group.data('x') + +group.data('width'),
+		'y2'    : +group.data('y') + +group.data('height'),
+		'width' : +group.data('width'),
+		'height': +group.data('height'),
 	}
 	
 }
@@ -2735,25 +2760,6 @@ function togglePagingCells(parent, pageNumber, maxPageNumber) {
 	} else {
 		$('td.pageCell', parent).css('visibility', 'visible').text(pageNumber + ' / ' + maxPageNumber);
 	}
-}
-
-
-/**
- * Makes a XML element with given attributes.
- * jQuery does not work well with SVG in Chrome, so all this manipulation need to be done manually. 
- */
-function appendXMLElement(tagName, attributesObject, content, target) {
-	var elementText = '<' + tagName + (content ? '>' + content + '</' + tagName + '>'
-											   : ' />');
-	var element = $.parseXML(elementText).firstChild;
-	if (attributesObject) {
-		for (attrKey in attributesObject) {
-			element.setAttribute(attrKey, attributesObject[attrKey]);
-		}
-	}
-
-	target.appendChild(element);
-	return element;
 }
 
 /**
