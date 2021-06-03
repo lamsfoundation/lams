@@ -1608,6 +1608,7 @@ function addActivityIcons(activity) {
 					  })
 					  .addClass('popover-link new-popover learner-icon')
 					  .attr({
+						'id'            : 'act' + activity.id + 'learner' + learner.id,
 						'data-id'       : 'popover-' + learner.id,
 						'data-toggle'   : 'popover',
 						'data-portrait' : learner.portraitId,
@@ -1705,7 +1706,7 @@ function addActivityIconsHandlers(activity) {
 	
 	if (activity.learners){
 		$.each(activity.learners, function(learnerIndex, learner){
-			var learnerIcon = $('image[id="act' + activity.id + 'learner' + learner.id + '"]', sequenceCanvas)
+			let learnerIcon = $('div#act' + activity.id + 'learner' + learner.id, sequenceCanvas)
 							  .css('cursor', 'pointer')
 							  // drag learners to force complete activities
 							  .draggable({
@@ -1715,7 +1716,7 @@ function addActivityIconsHandlers(activity) {
 							    'scroll'      : false,
 							    'cursorAt'	  : {'left' : 10, 'top' : 15},
 							    'helper' : function(){
-							    	return $('<img />').attr('src', LAMS_URL + 'images/icons/user.png');
+							    	return learnerIcon.clone();
 							    },
 								'start' : function(){
 									 autoRefreshBlocked = true;
