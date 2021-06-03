@@ -8,6 +8,7 @@ var originalSequenceCanvas = null,
 	sequenceInfoTimeout = 8000,
 // which learner was selected in the search box
 	sequenceSearchedLearner = null,
+	sequencePreviousLearnerData = null,
 // container for learners' progress bars metadata
 	bars = null,
 // placeholder for single learner's progress bar and title
@@ -1546,23 +1547,32 @@ function addActivityIcons(activity) {
 		// branching and gates require extra adjustments
 		isBranching =  [10,11,12,13].indexOf(activity.type) > -1,
 		isGate = [3,4,5,14].indexOf(activity.type) > -1,
-		isContainer = [6,7].indexOf(activity.type) > -1;
+		isContainer = [6,7].indexOf(activity.type) > -1,
+		requiresAttentionIcon = activity.requiresAttention ? 
+				$('<image />')
+					.attr({
+						'id'    : 'act' + activity.id + 'attention',
+						'src'   : LAMS_URL + 'images/icons/exclamation.png',
+						'title' : LABELS.CONTRIBUTE_ATTENTION
+					})
+					.addClass('activity-requires-attention')
+					.appendTo(sequenceCanvas)
+				: null,
 		
-			
-	if (activity.learnerCount > 0){
-		if (activity.learners) {
-			activity.learners = [...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners]
-			activity.learnerCount = activity.learners.length;
-	    }
-
-		var learningDesignSvgViewbox = learningDesignSvg.attr('viewBox').split(' '),
-			learningDesignSvgInternalLeftOffset = +learningDesignSvgViewbox[0],
-			learningDesignSvgInternalTopOffset = +learningDesignSvgViewbox[1],
-			learningDesignSvgExternalOffset = learningDesignSvg.offset(),
-			activityLeftOffset = learningDesignSvgExternalOffset.left + coord.x - learningDesignSvgInternalLeftOffset + sequenceCanvas.scrollLeft(),
-			activityTopOffset  = learningDesignSvgExternalOffset.top  + coord.y - learningDesignSvgInternalTopOffset + sequenceCanvas.scrollTop();
-
-		if (isTool || isGrouping) {
+		learningDesignSvgViewbox = learningDesignSvg.attr('viewBox').split(' '),
+		learningDesignSvgInternalLeftOffset = +learningDesignSvgViewbox[0],
+		learningDesignSvgInternalTopOffset = +learningDesignSvgViewbox[1],
+		learningDesignSvgExternalOffset = learningDesignSvg.offset(),
+		activityLeftOffset = learningDesignSvgExternalOffset.left + coord.x - learningDesignSvgInternalLeftOffset + sequenceCanvas.scrollLeft(),
+		activityTopOffset  = learningDesignSvgExternalOffset.top  + coord.y - learningDesignSvgInternalTopOffset + sequenceCanvas.scrollTop();
+		
+	//	if (activity.learners) {
+	//		activity.learners = [...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners]
+	//		activity.learnerCount = activity.learners.length;
+	//    }
+	
+	if (isTool || isGrouping) {
+		if (activity.learnerCount > 0) {
 			// if learners reached the activity, make room for their icons: make activity icon and label smaller and move to top
 			var activityGroup = $('g[id="' + activity.id + '"]', learningDesignSvg);
 			$('svg', activityGroup).attr({
@@ -1585,14 +1595,14 @@ function addActivityIcons(activity) {
 						})
 						.addClass('activityTitleLabel')
 						.appendTo(activityGroup);
-
+	
 			$.each(activity.learners, function(learnerIndex, learner){
 				if (learnerIndex >= 7 && activity.learnerCount > 8) {
 					return false;					
 				}
 				$(definePortrait(learner.portraitId, learner.id, STYLE_SMALL, true, LAMS_URL))
 					  .css({
- 						'left'     : activityLeftOffset + (learnerIndex * (activity.learnerCount < 5 ? 45 : 20)) - 2 + 'px',
+						'left'     : activityLeftOffset + (learnerIndex * (activity.learnerCount < 5 ? 45 : 20)) - 2 + 'px',
 						'top'      : activityTopOffset  - 60 + 'px',
 						'z-index'  : 100 + learnerIndex
 					  })
@@ -1616,8 +1626,16 @@ function addActivityIcons(activity) {
 					  .text('+' + (activity.learnerCount - 7))
 					  .appendTo(sequenceCanvas);
 			}
-			
-		} else if (isGate) {
+		}
+		
+		if (requiresAttentionIcon) {
+			requiresAttentionIcon.css({
+				'left'     :  activityLeftOffset    + 160 + 'px',
+				'top'      : activityTopOffset  - 95  + 'px'
+			});
+		}
+	} else if (isGate) {
+		if (activity.learnerCount > 0) {
 			$('<div />')
 				  .css({
 					'left'     : activityLeftOffset + 'px',
@@ -1626,7 +1644,16 @@ function addActivityIcons(activity) {
 				  .addClass('more-learner-icon')
 				  .text(activity.learnerCount)
 				  .appendTo(sequenceCanvas);
-		} else if (isBranching) {
+		}
+		
+		if (requiresAttentionIcon) {
+			requiresAttentionIcon.css({
+				'left'     :  activityLeftOffset + 5 + 'px',
+				'top'      : activityTopOffset  - 100  + 'px'
+			});
+		}
+	} else if (isBranching) {
+		if (activity.learnerCount > 0) {
 			$('<div />')
 				  .css({
 					'left'     : activityLeftOffset - 20  + 'px',
@@ -1635,7 +1662,16 @@ function addActivityIcons(activity) {
 				  .addClass('more-learner-icon')
 				  .text(activity.learnerCount)
 				  .appendTo(sequenceCanvas);
-		} else if (isContainer) {
+		}		
+		
+		if (requiresAttentionIcon) {
+			requiresAttentionIcon.css({
+				'left'     :  activityLeftOffset - 13 + 'px',
+				'top'      : activityTopOffset  - 124  + 'px'
+			});
+		}
+	} else if (isContainer) {
+		if (activity.learnerCount > 0) {
 			$('<div />')
 				  .css({
 					'left'     : activityLeftOffset + coord.width - 50 + 'px',
@@ -1645,80 +1681,13 @@ function addActivityIcons(activity) {
 				  .text(activity.learnerCount)
 				  .appendTo(sequenceCanvas);
 		}
-	
-
 		
-		/*
-		var	groupTitle = activity.learnerCount + ' ' + LABELS.LEARNER_GROUP_COUNT + ' ' + LABELS.LEARNER_GROUP_SHOW,
-			element = appendXMLElement('image', {
-			'id'         : 'act' + activity.id + 'learnerGroup',
-			'x'          : isBranching ? coord.x + 2  : (isGate ? coord.x + 10 : coord.x2 - 18),
-			'y'          : isBranching ? coord.y - 12 : coord.y + 1,
-			'height'     : 16,
-			'width'      : 16,
-			'xlink:href' : LAMS_URL + 'images/icons/group.png',
-			'style'		 : 'cursor : pointer'
-		}, null, appendTarget);
-		appendXMLElement('title', null, groupTitle, element);
-		// add a small number telling how many learners are in the group
-		element = appendXMLElement('text', {
-			'id'         : 'act' + activity.id + 'learnerGroupText',
-			'x'          : isBranching ? coord.x + 9  : (isGate ? coord.x + 17 : coord.x2 - 9),
-			'y'          : isBranching ? coord.y + 12 : coord.y + 25,
-			'text-anchor': 'middle',
-			'font-family': 'Verdana',
-			'font-size'  : 8,
-			'style'		 : 'cursor : pointer'
-		}, activity.learnerCount, appendTarget);
-		appendXMLElement('title', null, groupTitle, element);
-	
-		if (activity.learners) {
-			// draw single icons for the first few learners;
-			// don't do it for gate and optional activities
-			if ([3,4,5,7,13,14].indexOf(activity.type) == -1) {
-				$.each(activity.learners, function(learnerIndex, learner){
-					var learnerDisplayName = getLearnerDisplayName(learner);
-						activityLearnerId = 'act' + activity.id + 'learner' + learner.id,
-						elementAttributes = {
-									'id'		 : activityLearnerId,
-									'x'          : coord.x + learnerIndex*15 + 1,
-									// a bit lower for Optional Activity
-									'y'          : coord.y,
-									'height'     : 16,
-									'width'      : 16,
-									'xlink:href' : LAMS_URL + 'images/icons/' 
-													   + (learner.id == sequenceSearchedLearner ? 'user_red.png'
-													      : (learner.leader ? 'user_online.png' : 'user.png')),
-									'style'		 : 'cursor : pointer',
-									'class'		 : 'popover-link new-popover',
-									'data-toggle': 'popover',
-									'data-id'	 : 'popover-'+activityLearnerId,
-									'data-fullname': learnerDisplayName},
-						element;
-
-					if ( learner.portraitId ) {
-						elementAttributes['data-portrait'] = learner.portraitId;
-					} 
-					element = appendXMLElement('image', elementAttributes, null, appendTarget);
-				});
-			}
+		if (requiresAttentionIcon) {
+			requiresAttentionIcon.css({
+				'left'     : activityLeftOffset - 20 + 'px',
+				'top'      : activityTopOffset  - 80  + 'px'
+			});
 		}
-		*/
-	}
-	
-	if (activity.requiresAttention) {
-		/*
-		var element = appendXMLElement('image', {
-			'id'         : 'act' + activity.id + 'attention',
-			'x'          : isBranching ? coord.x + 14 : coord.x2 - 19,
-			'y'          : isBranching ? coord.y + 6  : coord.y2 - 19,
-			'height'     : 16,
-			'width'      : 16,
-			'xlink:href' : LAMS_URL + 'images/icons/exclamation.png',
-			'style'		 : 'cursor : pointer'
-		}, null, learningDesignSvg[0]);
-		appendXMLElement('title', null, LABELS.CONTRIBUTE_ATTENTION, element);
-		*/
 	}
 }
 

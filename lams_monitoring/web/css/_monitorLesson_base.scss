@@ -328,6 +328,11 @@ div#sequenceCanvas div.more-learner-icon {
 	font-size  : 16px;
 	z-index : 108;
 }
+  
+div#sequenceCanvas .activity-requires-attention {
+	position: absolute;
+	cursor  : pointer;
+}
 
 div#sequenceCanvas svg.learningDesignSvg {
 	display: block;
