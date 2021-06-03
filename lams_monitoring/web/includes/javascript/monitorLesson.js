@@ -1151,14 +1151,11 @@ function updateSequenceTab() {
 		return;
 	}
 	sequenceRefreshInProgress = true;
-	// SVG modifications are made only the first time this method is called
-	var sequenceCanvasFirstFetch = false;
-	
+
 	if (originalSequenceCanvas) {
 		// put bottom layer, LD SVG
 		sequenceCanvas.html(originalSequenceCanvas);
 	} else {
-		sequenceCanvasFirstFetch = true;
 		var exit = loadLearningDesignSVG();
 		if (exit) {
 			// when SVG gets re-created, this update method will be run again
@@ -1186,35 +1183,15 @@ function updateSequenceTab() {
 			'searchedLearnerId' : sequenceSearchedLearner
 		},		
 		success : function(response) {
-			if (sequenceCanvasFirstFetch) {
-				// activities have uiids but no ids, set it here
-				$.each(response.activities, function(activityIndex, activity){
-					$('g[uiid="' + activity.uiid + '"]', sequenceCanvas).attr('id', activity.id);
-				});
-				
-				// add some metadata to activities
-				$.each(response.activities, function(activityIndex, activity){
-					var activityGroup = $('g[id="' + activity.id + '"]', sequenceCanvas),
-						isGate = [3,4,5,14].indexOf(activity.type) > -1,
-						isOptional = activity.type == 7,
-						isFloating = activity.type == 15;
-					if (isGate) {
-						activityGroup.addClass('gate');
-					} else if (isOptional) {
-						activityGroup.addClass('optional');
-					} else if (isFloating) {
-						activityGroup.addClass('floating');
-					}
-				});
-				
-				originalSequenceCanvas = sequenceCanvas.html();
-			}
-			
+			// activities have uiids but no ids, set it here
+			$.each(response.activities, function(){
+				$('g[uiid="' + this.uiid + '"]', sequenceCanvas).attr('id', this.id);
+			});
+
 			// remove the loading animation
 			$('img#sequenceCanvasLoading', sequenceTopButtonsContainer).remove();
 
-			var learnerCount = 0,
-				reloadSVG = false;
+			var learnerCount = 0;
 			$.each(response.activities, function(index, activity){
 				var activityGroup = $('g[id="' + activity.id + '"]', sequenceCanvas),
 					isGate = [3,4,5,14].indexOf(activity.type) > -1;
@@ -1248,26 +1225,18 @@ function updateSequenceTab() {
 					}
 				}
 				
-				// are there any learners in this or any activity?
-				learnerCount += activity.learnerCount;
 				if (response.contributeActivities) {
 					$.each(response.contributeActivities, function(){
 						if (activity.id == this.activityID) {
 							 activity.requiresAttention = true;
-							 reloadSVG = true;
 							 return false;
 						}
 					});
 				}
+				
 				// put learner and attention icons on each activity shape
 				addActivityIcons(activity);
 			});
-			
-			reloadSVG |= learnerCount > 0;
-			if (reloadSVG) {
-				// IMPORTANT! Reload SVG, otherwise added icons will not get displayed
-				sequenceCanvas.html(sequenceCanvas.html());
-			}
 			
 			if (sequenceSearchedLearner != null && !response.searchedLearnerFound) {
 				// the learner has not started the lesson yet, display an info box
@@ -1296,7 +1265,7 @@ function updateSequenceTab() {
 			// remove any existing popovers
 			$('.popover[role="tooltip"]').remove();
 			
-			initializePortraitPopover(LAMS_URL, 'large', 'left');
+			initializePortraitPopover(LAMS_URL, 'large', 'right');
 
 			// update the cache global values so that the contributions & the Live Edit buttons will update
 			lockedForEdit = response.lockedForEdit;

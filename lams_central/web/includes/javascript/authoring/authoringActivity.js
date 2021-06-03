@@ -358,6 +358,7 @@ ActivityDraw = {
 		});
 	
 		this.items = paper.g(shape, icon);
+		this.items.addClass('svg-activity-branching');
 		if (this.readOnly && !isReadOnlyMode) {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}
@@ -419,6 +420,7 @@ ActivityDraw = {
 		}
 		
 		this.items.data('parentObject', this);
+		this.items.addClass('svg-activity-floating');
 	},
 	
 	
@@ -448,6 +450,7 @@ ActivityDraw = {
 		});
 
 		this.items = paper.g(shape);
+		this.items.addClass('svg-activity-gate');
 		if (this.readOnly && !isReadOnlyMode) {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}
@@ -508,6 +511,7 @@ ActivityDraw = {
 			'data-height': height
 		});
 		
+		this.items.addClass('svg-activity-grouping');
 		if (this.readOnly && !isReadOnlyMode) {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}
@@ -572,6 +576,7 @@ ActivityDraw = {
 		}
 		
 		this.items.data('parentObject', this);
+		this.items.addClass('svg-activity-optional');
 	},
 	
 	
@@ -626,6 +631,7 @@ ActivityDraw = {
 		}
 		
 		this.items.data('parentObject', this);
+		this.items.addClass('svg-activity-parallel');
 	},
 	
 	
@@ -690,7 +696,7 @@ ActivityDraw = {
 			'data-width' : width,
 			'data-height': height
 		});
-        this.items.addClass('toolActivity');
+        this.items.addClass('svg-activity-tool');
 		this.items.shape = shape;
 		
 		if (this.grouping) {
