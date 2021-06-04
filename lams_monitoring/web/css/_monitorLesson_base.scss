@@ -318,8 +318,19 @@ div#sequenceCanvas div.learner-icon, #completedLearnersContainer div.learner-ico
 	background-color : #FFFFFF;
 }
 
-#completedLearnersContainer div.learner-icon {
-	margin-right: 10px;
+div#sequenceCanvas div.learner-icon.learner-searched {
+	border: red 3px solid;
+	border-radius: 25px;
+	z-index: 109 !important;	
+}
+
+div#sequenceCanvas div.portrait-generic-sm.learner-icon.learner-searched {
+	border: none;	
+}
+
+div#sequenceCanvas div.portrait-generic-sm.learner-icon.learner-searched::before {
+	border: red 3px solid;
+	border-radius: 25px;
 }
   
 div#sequenceCanvas div.more-learner-icon, #completedLearnersContainer div.more-learner-icon {
@@ -333,7 +344,7 @@ div#sequenceCanvas div.more-learner-icon, #completedLearnersContainer div.more-l
 	background-color : #e7e7e7;
 	text-align: center;
 }
-  
+
 div#sequenceCanvas .activity-requires-attention {
 	position: absolute;
 	cursor  : pointer;

@@ -1897,31 +1897,20 @@ function highlightSearchedLearner(icon) {
 	// show the "clear" button
 	$('#sequenceSearchPhraseClear').css('visibility', 'visible');
 	
+	// border and z-index are manipulated via CSS
+	icon.addClass('learner-searched');
 	
-	var highlighter = $('#sequenceSearchedLearnerHighlighter'),
-		isVisible = highlighter.is(':visible');
+	toggleInterval = setInterval(function(){
+		icon.toggle();
+	}, 500);
 	
-	highlighter.show().offset({
-			'top'  : icon.offset().top - 25,
-			'left' : icon.offset().left - 4
-		});
-	
-	// blink only after the search, not after subsequent refreshes
-	if (!isVisible) {
-		toggleInterval = setInterval(function(){
-			highlighter.toggle();
-		}, 500);
-		
-		setTimeout(function(){
-			clearInterval(toggleInterval);
-			//if the search box was cleared during blinking, act accordingly
-			if (sequenceSearchedLearner) {
-				highlighter.show();
-			} else {
-				highlighter.hide();
-			}
-		}, 3000);
-	}
+	setTimeout(function(){
+		clearInterval(toggleInterval);
+		//if the search box was cleared during blinking, act accordingly
+		if (!sequenceSearchedLearner) {
+			icon.removeClass('learner-searched');
+		}
+	}, 3000);
 }
 
 
