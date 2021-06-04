@@ -8,7 +8,6 @@ var originalSequenceCanvas = null,
 	sequenceInfoTimeout = 8000,
 // which learner was selected in the search box
 	sequenceSearchedLearner = null,
-	sequencePreviousLearnerData = null,
 // container for learners' progress bars metadata
 	bars = null,
 // placeholder for single learner's progress bar and title
@@ -1566,10 +1565,10 @@ function addActivityIcons(activity) {
 		activityLeftOffset = learningDesignSvgExternalOffset.left + coord.x - learningDesignSvgInternalLeftOffset + sequenceCanvas.scrollLeft(),
 		activityTopOffset  = learningDesignSvgExternalOffset.top  + coord.y - learningDesignSvgInternalTopOffset + sequenceCanvas.scrollTop();
 		
-	//	if (activity.learners) {
-	//		activity.learners = [...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners]
-	//		activity.learnerCount = activity.learners.length;
-	//    }
+		if (activity.learners) {
+			activity.learners = [...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners]
+			activity.learnerCount = activity.learners.length;
+	    }
 	
 	if (isTool || isGrouping) {
 		if (activity.learnerCount > 0) {
@@ -1619,6 +1618,7 @@ function addActivityIcons(activity) {
 			
 			if (activity.learnerCount > 8) {
 				$('<div />')
+					  .attr('id', 'act' + activity.id + 'learnerGroup')
 					  .css({
 						'left'     : activityLeftOffset + 138 + 'px',
 						'top'      : activityTopOffset  - 60  + 'px'
@@ -1751,7 +1751,7 @@ function addActivityIconsHandlers(activity) {
 	}
 		
 	if (activity.learnerCount > 0){
-		var learnerGroup = $('*[id^="act' + activity.id + 'learnerGroup"]', sequenceCanvas);
+		var learnerGroup = $('#act' + activity.id + 'learnerGroup', sequenceCanvas);
 		dblTap(learnerGroup, function(event){
 			 // double click on learner group icon to see list of learners
 			event.stopPropagation();
@@ -1766,7 +1766,7 @@ function addActivityIconsHandlers(activity) {
 	}
 	
 	if (activity.requiresAttention){
-		$('*[id^="act' + activity.id + 'attention"]', sequenceCanvas).click(function(event){
+		$('#act' + activity.id + 'attention', sequenceCanvas).click(function(event){
 			event.stopPropagation();
 			// switch to first tab where attention prompts are listed
 			if ($('#tblmonitor-tab-content').length == 0) {
