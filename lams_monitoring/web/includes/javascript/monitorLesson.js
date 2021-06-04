@@ -22,7 +22,7 @@ var originalSequenceCanvas = null,
 	learnerProgressCurrentPageNumber = 1,
 
 //auto refresh all tabs every 30 seconds
-	autoRefreshInterval = 99990 * 1000,
+	autoRefreshInterval = 30 * 1000,
 	autoRefreshIntervalObject = null,
 // when user is doing something, do not auto refresh
 	autoRefreshBlocked = false,
@@ -1539,6 +1539,13 @@ function addActivityIcons(activity) {
 		return;
 	}
 	
+	/*
+	if (activity.learners) {
+		activity.learners = [...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners]
+		activity.learnerCount = activity.learners.length;
+    }
+    */
+
 	// add group of users icon
 	var learningDesignSvg = $('svg.learningDesignSvg', sequenceCanvas),
 		isTool = activity.type == 1,
@@ -1557,7 +1564,18 @@ function addActivityIcons(activity) {
 					.addClass('activity-requires-attention')
 					.appendTo(sequenceCanvas)
 				: null,
-		
+		allLearnersIcon = activity.learnerCount > 0 ?
+						$('<div />')
+
+							.css({
+								'position' : 'absolute'
+							})
+							.addClass('more-learner-icon')
+							.append($('<a />').attr({
+								role : 'button',
+								tabindex : 0
+							}))
+							: null,
 		learningDesignSvgViewbox = learningDesignSvg.attr('viewBox').split(' '),
 		learningDesignSvgInternalLeftOffset = +learningDesignSvgViewbox[0],
 		learningDesignSvgInternalTopOffset = +learningDesignSvgViewbox[1],
@@ -1565,12 +1583,7 @@ function addActivityIcons(activity) {
 		activityLeftOffset = learningDesignSvgExternalOffset.left + coord.x - learningDesignSvgInternalLeftOffset + sequenceCanvas.scrollLeft(),
 		activityTopOffset  = learningDesignSvgExternalOffset.top  + coord.y - learningDesignSvgInternalTopOffset + sequenceCanvas.scrollTop();
 		
-		/*
-		if (activity.learners) {
-			activity.learners = [...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners]
-			activity.learnerCount = activity.learners.length;
-	    }
-	*/
+
 	if (isTool || isGrouping) {
 		if (activity.learnerCount > 0) {
 			// if learners reached the activity, make room for their icons: make activity icon and label smaller and move to top
@@ -1619,37 +1632,35 @@ function addActivityIcons(activity) {
 			});
 			
 			if (activity.learnerCount > 8) {
-				$('<div />')
+				allLearnersIcon
 					  .attr('id', 'act' + activity.id + 'learnerGroup')
 					  .css({
-						'position' : 'absolute',
 						'left'     : activityLeftOffset + 138 + 'px',
 						'top'      : activityTopOffset  - 60  + 'px',
 						'z-index'  : 108
 					  })
-					  .addClass('more-learner-icon')
-					  .text('+' + (activity.learnerCount - 7))
-					  .appendTo(sequenceCanvas);
+					  .appendTo(sequenceCanvas)
+					  .children('a').text('+' + (activity.learnerCount - 7));
+			
+			allLearnersIcon.popover('show');
 			}
 		}
 		
 		if (requiresAttentionIcon) {
 			requiresAttentionIcon.css({
-				'left'     :  activityLeftOffset    + 160 + 'px',
+				'left'     : activityLeftOffset    + 160 + 'px',
 				'top'      : activityTopOffset  - 95  + 'px'
 			});
 		}
 	} else if (isGate) {
 		if (activity.learnerCount > 0) {
-			$('<div />')
+			allLearnersIcon
 				  .css({
-					'position' : 'absolute',
 					'left'     : activityLeftOffset + 'px',
 					'top'      : activityTopOffset  - 80  + 'px'
 				  })
-				  .addClass('more-learner-icon')
-				  .text(activity.learnerCount)
-				  .appendTo(sequenceCanvas);
+				  .appendTo(sequenceCanvas)
+		 		  .children('a').text(activity.learnerCount);
 		}
 		
 		if (requiresAttentionIcon) {
@@ -1660,34 +1671,30 @@ function addActivityIcons(activity) {
 		}
 	} else if (isBranching) {
 		if (activity.learnerCount > 0) {
-			$('<div />')
+			allLearnersIcon
 				  .css({
-					'position' : 'absolute',
 					'left'     : activityLeftOffset - 20  + 'px',
 					'top'      : activityTopOffset  - 100  + 'px'
 				  })
-				  .addClass('more-learner-icon')
-				  .text(activity.learnerCount)
-				  .appendTo(sequenceCanvas);
+				  .appendTo(sequenceCanvas)
+				  .children('a').text(activity.learnerCount);
 		}		
 		
 		if (requiresAttentionIcon) {
 			requiresAttentionIcon.css({
-				'left'     :  activityLeftOffset - 13 + 'px',
+				'left'     : activityLeftOffset - 13 + 'px',
 				'top'      : activityTopOffset  - 124  + 'px'
 			});
 		}
 	} else if (isContainer) {
 		if (activity.learnerCount > 0) {
-			$('<div />')
+			allLearnersIcon
 				  .css({
-					'position' : 'absolute',
 					'left'     : activityLeftOffset + coord.width - 50 + 'px',
 					'top'      : activityTopOffset  - 98  + 'px'
 				  })
-				  .addClass('more-learner-icon')
-				  .text(activity.learnerCount)
-				  .appendTo(sequenceCanvas);
+				  .appendTo(sequenceCanvas)
+				  .children('a').text(activity.learnerCount);
 		}
 		
 		if (requiresAttentionIcon) {
@@ -1758,7 +1765,30 @@ function addActivityIconsHandlers(activity) {
 	}
 		
 	if (activity.learnerCount > 0){
-		var learnerGroup = $('#act' + activity.id + 'learnerGroup', sequenceCanvas);
+		var learnerGroup = $('#act' + activity.id + 'learnerGroup', sequenceCanvas)
+							.popover({
+								content: function(){
+									var learnerPopoverContainer = $('<div />');
+									
+									$.each(activity.learners, function(learnerIndex, learner){
+										$('<div />').addClass('more-learner-popover-icon')
+										   .append(definePortrait(learner.portraitId, learner.id, STYLE_SMALL, true, LAMS_URL))
+										   .append($('<p />').text(getLearnerDisplayName(learner)))
+										   .appendTo(learnerPopoverContainer);
+									});
+									
+									return learnerPopoverContainer.html();
+								},
+								template : '<div class="popover more-learner-popover" role="tooltip"><div class="arrow"></div>' + 
+										   '<h3 class="popover-title"></h3><div class="popover-content"></div></div>',
+								sanitize : false,
+								html: true,
+						        trigger: 'focus hover',
+						        delay: { "show": 400, "hide": 100 },
+						        container: 'body', // ensures popovers are not clipped within jqgrid tables
+						        placement: 'auto right'
+							});
+							
 		dblTap(learnerGroup, function(event){
 			 // double click on learner group icon to see list of learners
 			event.stopPropagation();
