@@ -1565,11 +1565,12 @@ function addActivityIcons(activity) {
 		activityLeftOffset = learningDesignSvgExternalOffset.left + coord.x - learningDesignSvgInternalLeftOffset + sequenceCanvas.scrollLeft(),
 		activityTopOffset  = learningDesignSvgExternalOffset.top  + coord.y - learningDesignSvgInternalTopOffset + sequenceCanvas.scrollTop();
 		
+		/*
 		if (activity.learners) {
 			activity.learners = [...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners]
 			activity.learnerCount = activity.learners.length;
 	    }
-	
+	*/
 	if (isTool || isGrouping) {
 		if (activity.learnerCount > 0) {
 			// if learners reached the activity, make room for their icons: make activity icon and label smaller and move to top
@@ -1601,11 +1602,12 @@ function addActivityIcons(activity) {
 				}
 				$(definePortrait(learner.portraitId, learner.id, STYLE_SMALL, true, LAMS_URL))
 					  .css({
+						'position' : 'absolute',
 						'left'     : activityLeftOffset + (learnerIndex * (activity.learnerCount < 5 ? 45 : 20)) - 2 + 'px',
 						'top'      : activityTopOffset  - 60 + 'px',
 						'z-index'  : 100 + learnerIndex
 					  })
-					  .addClass('popover-link new-popover learner-icon')
+					  .addClass('new-popover learner-icon')
 					  .attr({
 						'id'            : 'act' + activity.id + 'learner' + learner.id,
 						'data-id'       : 'popover-' + learner.id,
@@ -1620,8 +1622,10 @@ function addActivityIcons(activity) {
 				$('<div />')
 					  .attr('id', 'act' + activity.id + 'learnerGroup')
 					  .css({
+						'position' : 'absolute',
 						'left'     : activityLeftOffset + 138 + 'px',
-						'top'      : activityTopOffset  - 60  + 'px'
+						'top'      : activityTopOffset  - 60  + 'px',
+						'z-index'  : 108
 					  })
 					  .addClass('more-learner-icon')
 					  .text('+' + (activity.learnerCount - 7))
@@ -1639,6 +1643,7 @@ function addActivityIcons(activity) {
 		if (activity.learnerCount > 0) {
 			$('<div />')
 				  .css({
+					'position' : 'absolute',
 					'left'     : activityLeftOffset + 'px',
 					'top'      : activityTopOffset  - 80  + 'px'
 				  })
@@ -1657,6 +1662,7 @@ function addActivityIcons(activity) {
 		if (activity.learnerCount > 0) {
 			$('<div />')
 				  .css({
+					'position' : 'absolute',
 					'left'     : activityLeftOffset - 20  + 'px',
 					'top'      : activityTopOffset  - 100  + 'px'
 				  })
@@ -1675,6 +1681,7 @@ function addActivityIcons(activity) {
 		if (activity.learnerCount > 0) {
 			$('<div />')
 				  .css({
+					'position' : 'absolute',
 					'left'     : activityLeftOffset + coord.width - 50 + 'px',
 					'top'      : activityTopOffset  - 98  + 'px'
 				  })
@@ -1796,18 +1803,15 @@ function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 	if (learners) {
 		// create learner icons, along with handlers
 		$.each(learners, function(learnerIndex, learner){
-			// make an icon for each learner			
-			var activityLearnerId = 'completedlearner'+learner.id;
-			var icon = $('<img />').attr({
-				'id'	   : activityLearnerId,
-				'src' : LAMS_URL + 'images/icons/' 
-				   		+ (learner.id == sequenceSearchedLearner ? 'user_red.png' : 'user.png'),
-				'style'		 : 'cursor : pointer',
-				'class'		 : 'popover-link new-popover',
-				'data-toggle': 'popover',
-				'data-id'	 : 'popover-'+activityLearnerId,
-				'data-fullname': getLearnerDisplayName(learner)
-				})
+			let icon = $(definePortrait(learner.portraitId, learner.id, STYLE_SMALL, true, LAMS_URL))
+				  .addClass('new-popover learner-icon')
+				  .attr({
+					'id'            : 'learner-complete-' + learner.id,
+					'data-id'       : 'popover-' + learner.id,
+					'data-toggle'   : 'popover',
+					'data-portrait' : learner.portraitId,
+					'data-fullname' : getLearnerDisplayName(learner)
+				  })
 				// drag learners to force complete activities
 				  .draggable({
 					'appendTo'    : '#t2',
@@ -1815,9 +1819,9 @@ function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 				    'distance'    : 20,
 				    'scroll'      : false,
 				    'cursorAt'	  : {'left' : 10, 'top' : 15},
-					'helper'      : function(event){
+					'helper'      : function(){
 						// copy of the icon for dragging
-						return $('<img />').attr('src', LAMS_URL + 'images/icons/user.png');
+						return icon.clone();
 					},
 					'start' : function(){
 						autoRefreshBlocked = true;
@@ -1832,21 +1836,18 @@ function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 					}
 				})
 				.appendTo(iconsContainer);
-			if ( learner.portraitId ) {
-				icon.attr('data-portrait', learner.portraitId);
-			} 
 			
 			if (learner.id == sequenceSearchedLearner){
 				highlightSearchedLearner(icon);
 			}
 		});
 		
-		// show a group icon
-		var groupIcon = $('<img />').attr({
-			'src' : LAMS_URL + 'images/icons/group.png',
-			'title'      : LABELS.LEARNER_GROUP_SHOW
-		}).css('cursor', 'pointer').appendTo(iconsContainer);
 		
+		var groupIcon = $('<div />')
+		  .addClass('more-learner-icon')
+		  .text(learnerCount)
+		  .appendTo(iconsContainer);
+
 		dblTap(groupIcon, function(){
 			var ajaxProperties = {
 					url : LAMS_URL + 'monitoring/monitoring/getCurrentLearners.do',

@@ -311,23 +311,27 @@ div#sequenceCanvas {
 	height: 100%;
 	overflow: auto;
 }
-
-div#sequenceCanvas div.learner-icon {
-	position : absolute;
+  
+div#sequenceCanvas div.learner-icon, #completedLearnersContainer div.learner-icon {
+	display: inline-block;
 	border-radius : 20px;
 	background-color : #FFFFFF;
 }
+
+#completedLearnersContainer div.learner-icon {
+	margin-right: 10px;
+}
   
-div#sequenceCanvas div.more-learner-icon {
-	position : absolute;
-	border-radius : 20px;
-	cursor: pointer;
-	background-color : #e7e7e7;
+div#sequenceCanvas div.more-learner-icon, #completedLearnersContainer div.more-learner-icon {
+	display: inline-block;
 	width    : 35px;
 	height   : 35px;
 	line-height : 35px;
 	font-size  : 16px;
-	z-index : 108;
+	border-radius : 20px;
+	cursor: pointer;
+	background-color : #e7e7e7;
+	text-align: center;
 }
   
 div#sequenceCanvas .activity-requires-attention {
