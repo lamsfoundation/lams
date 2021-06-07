@@ -1165,7 +1165,7 @@ function updateSequenceTab() {
 	}
 	
 	// clear all completed learner icons except the door
-	$('#completedLearnersContainer :not(img#completedLearnersDoorIcon)').remove();
+	$('#completedLearnersContainer :not(img#completedLessonLearnersIcon)').remove();
 	
 	var sequenceTopButtonsContainer = $('#sequenceTopButtonsContainer');
 	if ($('img#sequenceCanvasLoading', sequenceTopButtonsContainer).length == 0){
@@ -1558,7 +1558,7 @@ function addActivityIcons(activity) {
 				$('<image />')
 					.attr({
 						'id'    : 'act' + activity.id + 'attention',
-						'src'   : LAMS_URL + 'images/icons/exclamation.png',
+						'src'   : LAMS_URL + 'images/exclamation.svg',
 						'title' : LABELS.CONTRIBUTE_ATTENTION
 					})
 					.addClass('activity-requires-attention')
@@ -1793,11 +1793,6 @@ function addActivityIconsHandlers(activity) {
  */
 function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 	var iconsContainer = $('#completedLearnersContainer');
-	// show (current/total) label
-	$('<span />').attr({
-						'title' : LABELS.LEARNER_FINISHED_COUNT.replace('[0]', learnerCount).replace('[1]', learnerTotalCount)
-			   }).text('(' + learnerCount + '/' + learnerTotalCount + ')')
-	  .appendTo(iconsContainer);
 	
 	if (learners) {
 		// create learner icons, along with handlers

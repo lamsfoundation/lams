@@ -352,6 +352,13 @@ div#sequenceCanvas div.more-learner-icon, #completedLearnersContainer div.more-l
 div#sequenceCanvas .activity-requires-attention {
 	position: absolute;
 	cursor  : pointer;
+	width: 16px;
+  	height: 16px;
+}
+  
+#completedLearnersContainer #completedLessonLearnersIcon {
+	width: 35px;
+	height: 35px;
 }
 
 div#sequenceCanvas svg.learningDesignSvg {

@@ -78,8 +78,6 @@
 				SAVE_BUTTON : '<c:out value="${SAVE_BUTTON_VAR}" />',
 				<fmt:message key="button.cancel" var="CANCEL_BUTTON_VAR"/>
 				CANCEL_BUTTON : '<c:out value="${CANCEL_BUTTON_VAR}" />',
-				<fmt:message key="learner.finished.count" var="LEARNER_FINISHED_COUNT_VAR"/>
-				LEARNER_FINISHED_COUNT : '<c:out value="${LEARNER_FINISHED_COUNT_VAR}" />',
 				<fmt:message key="learner.finished.dialog.title" var="LEARNER_FINISHED_DIALOG_TITLE_VAR"/>
 				LEARNER_FINISHED_DIALOG_TITLE : '<c:out value="${LEARNER_FINISHED_DIALOG_TITLE_VAR}" />',
 				<fmt:message key="lesson.enable.presence.alert" var="LESSON_PRESENCE_ENABLE_ALERT_VAR"/>
@@ -567,7 +565,7 @@
 						</div>
 						<div id="sequenceCanvas"></div>
 						<div id="completedLearnersContainer" title="<fmt:message key='force.complete.end.lesson.tooltip' />">
-							<img id="completedLearnersDoorIcon" src="<lams:LAMSURL/>images/icons/door_open.png" />
+							<img id="completedLessonLearnersIcon" src="<lams:LAMSURL/>images/completed.svg" />
 						</div>
 						<img id="sequenceCanvasLoading"
 						     src="<lams:LAMSURL/>images/ajax-loader-big.gif" />
