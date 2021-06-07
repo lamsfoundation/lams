@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
 // copy of lesson SVG so it does no need to be fetched every time
 var originalSequenceCanvas = null,
 // DIV container for lesson SVG
@@ -1758,18 +1758,17 @@ function addActivityIconsHandlers(activity) {
 	}
 		
 	if (activity.learnerCount > 0){
-		var learnerGroup = $('#act' + activity.id + 'learnerGroup', sequenceCanvas);				
-		dblTap(learnerGroup, function(event){
-			 // double click on learner group icon to see list of learners
-			event.stopPropagation();
-			var ajaxProperties = {
-					url : LAMS_URL + 'monitoring/monitoring/getCurrentLearners.do',
-					data : {
-						'activityID' : activity.id
-					}
-				};
-			showLearnerGroupDialog(ajaxProperties, activity.title, false, true, usersViewable, false);
-		});
+		$('#act' + activity.id + 'learnerGroup', sequenceCanvas)
+		   .click(function(event){
+				 // double click on learner group icon to see list of learners
+				var ajaxProperties = {
+						url : LAMS_URL + 'monitoring/monitoring/getCurrentLearners.do',
+						data : {
+							'activityID' : activity.id
+						}
+					};
+				showLearnerGroupDialog(ajaxProperties, activity.title, false, true, usersViewable, false);
+			});
 	}
 	
 	if (activity.requiresAttention){
@@ -1843,12 +1842,11 @@ function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 		});
 		
 		
-		var groupIcon = $('<div />')
-		  .addClass('more-learner-icon')
-		  .text(learnerCount)
-		  .appendTo(iconsContainer);
-
-		dblTap(groupIcon, function(){
+	$('<div />')
+	  .addClass('more-learner-icon')
+	  .text(learnerCount)
+	  .appendTo(iconsContainer)
+      .click(function(){
 			var ajaxProperties = {
 					url : LAMS_URL + 'monitoring/monitoring/getCurrentLearners.do',
 					data : {
