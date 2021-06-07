@@ -13,6 +13,8 @@
 .svg-tool-activity-background {
 	stroke: none;
 	fill: white;
+	-webkit-filter: drop-shadow( 2px 2px 2px rgba(0, 0, 0, .3));
+  	filter: drop-shadow( 2px 2px 2px rgba(0, 0, 0, .3));
 }
 
 .svg-tool-activity-category-1 {
