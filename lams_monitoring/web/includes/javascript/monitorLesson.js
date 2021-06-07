@@ -1566,15 +1566,10 @@ function addActivityIcons(activity) {
 				: null,
 		allLearnersIcon = activity.learnerCount > 0 ?
 						$('<div />')
-
 							.css({
 								'position' : 'absolute'
 							})
 							.addClass('more-learner-icon')
-							.append($('<a />').attr({
-								role : 'button',
-								tabindex : 0
-							}))
 							: null,
 		learningDesignSvgViewbox = learningDesignSvg.attr('viewBox').split(' '),
 		learningDesignSvgInternalLeftOffset = +learningDesignSvgViewbox[0],
@@ -1639,10 +1634,8 @@ function addActivityIcons(activity) {
 						'top'      : activityTopOffset  - 60  + 'px',
 						'z-index'  : 108
 					  })
-					  .appendTo(sequenceCanvas)
-					  .children('a').text('+' + (activity.learnerCount - 7));
-			
-			allLearnersIcon.popover('show');
+					  .text('+' + (activity.learnerCount - 7))
+					  .appendTo(sequenceCanvas);
 			}
 		}
 		
@@ -1659,8 +1652,8 @@ function addActivityIcons(activity) {
 					'left'     : activityLeftOffset + 'px',
 					'top'      : activityTopOffset  - 80  + 'px'
 				  })
-				  .appendTo(sequenceCanvas)
-		 		  .children('a').text(activity.learnerCount);
+				  .text(activity.learnerCount)
+				  .appendTo(sequenceCanvas);
 		}
 		
 		if (requiresAttentionIcon) {
@@ -1676,8 +1669,8 @@ function addActivityIcons(activity) {
 					'left'     : activityLeftOffset - 20  + 'px',
 					'top'      : activityTopOffset  - 100  + 'px'
 				  })
-				  .appendTo(sequenceCanvas)
-				  .children('a').text(activity.learnerCount);
+				  .text(activity.learnerCount)
+				  .appendTo(sequenceCanvas);
 		}		
 		
 		if (requiresAttentionIcon) {
@@ -1693,8 +1686,8 @@ function addActivityIcons(activity) {
 					'left'     : activityLeftOffset + coord.width - 50 + 'px',
 					'top'      : activityTopOffset  - 98  + 'px'
 				  })
-				  .appendTo(sequenceCanvas)
-				  .children('a').text(activity.learnerCount);
+				  .text(activity.learnerCount)
+				  .appendTo(sequenceCanvas);
 		}
 		
 		if (requiresAttentionIcon) {
@@ -1765,30 +1758,7 @@ function addActivityIconsHandlers(activity) {
 	}
 		
 	if (activity.learnerCount > 0){
-		var learnerGroup = $('#act' + activity.id + 'learnerGroup', sequenceCanvas)
-							.popover({
-								content: function(){
-									var learnerPopoverContainer = $('<div />');
-									
-									$.each(activity.learners, function(learnerIndex, learner){
-										$('<div />').addClass('more-learner-popover-icon')
-										   .append(definePortrait(learner.portraitId, learner.id, STYLE_SMALL, true, LAMS_URL))
-										   .append($('<p />').text(getLearnerDisplayName(learner)))
-										   .appendTo(learnerPopoverContainer);
-									});
-									
-									return learnerPopoverContainer.html();
-								},
-								template : '<div class="popover more-learner-popover" role="tooltip"><div class="arrow"></div>' + 
-										   '<h3 class="popover-title"></h3><div class="popover-content"></div></div>',
-								sanitize : false,
-								html: true,
-						        trigger: 'focus hover',
-						        delay: { "show": 400, "hide": 100 },
-						        container: 'body', // ensures popovers are not clipped within jqgrid tables
-						        placement: 'auto right'
-							});
-							
+		var learnerGroup = $('#act' + activity.id + 'learnerGroup', sequenceCanvas);				
 		dblTap(learnerGroup, function(event){
 			 // double click on learner group icon to see list of learners
 			event.stopPropagation();

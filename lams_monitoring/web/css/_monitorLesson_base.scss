@@ -309,7 +309,8 @@ div#sequenceCanvas {
   text-align: center;
   width: 100%;
   height: 100%;
-  overflow: auto; }
+		  overflow: auto;
+}
   
 div#sequenceCanvas div.learner-icon, #completedLearnersContainer div.learner-icon {
 	display: inline-block;
@@ -346,28 +347,6 @@ div#sequenceCanvas div.more-learner-icon, #completedLearnersContainer div.more-l
 	cursor: pointer;
 	background-color : #e7e7e7;
 	text-align: center;
-}
-
-div#sequenceCanvas div.more-learner-icon > a, #completedLearnersContainer div.more-learner-icon > a {
-	color: black;
-	text-decoration: none;
-	outline: none;
-}
-
-div.more-learner-popover {
-	max-width: 460px;
-	max-height: 500px;
-	overflow: auto;
-}
-
-div.more-learner-popover div.more-learner-popover-icon {
-	display : inline-block;
-	text-align : center;
-	margin-right: 5px;
-}
-
-div.more-learner-popover div.more-learner-popover-icon > p {
-	font-size : 10px;
 }
 
 div#sequenceCanvas .activity-requires-attention {
