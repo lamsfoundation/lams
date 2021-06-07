@@ -1904,21 +1904,15 @@ ActivityLib = {
 	wrapActivityTitle : function(title, x, y) {
 		if (title.length < 15) {
 			var label = paper.text(x + 135, y + 45, title)
-			 			 .attr(layout.activityTitleTextAttributes)
-			 			 .attr({
-			 				 'text-anchor' : 'middle'
-			 			 });
-			label.addClass('activityTitleLabel');
+			label.addClass('svg-tool-activity-title-label svg-tool-activity-title-label-middle');
 			return label;
 		}
 		
 		const firstLine = paper.text(x + 75, y + 35, title.substring(0, 13))
-			 			 .attr(layout.activityTitleTextAttributes),
 			secondLine = paper.text(x + 75, y + 55, title.length > 24 ? title.substring(13, 24) + '...'  : title.substring(13, title.length))
-				 			 .attr(layout.activityTitleTextAttributes),
 			labelGroup = paper.g(firstLine, secondLine);
 		
-		labelGroup.addClass('activityTitleLabel');
+		labelGroup.addClass('svg-tool-activity-title-label');
 		return labelGroup;
 	}
 }; 

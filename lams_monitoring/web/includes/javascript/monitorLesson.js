@@ -1619,18 +1619,13 @@ function addActivityIcons(activity) {
 				'height': '30px'
 			});
 			
-			$('.activityTitleLabel', activityGroup).remove();
+			$('.svg-tool-activity-title-label', activityGroup).remove();
 			$('<text>').text(activity.title.length < 20 ? activity.title : activity.title.substring(0, 20) + '...')
 					   .attr({
 							'x' : coord.x + 55,
 							'y' : coord.y + 20
 						})
-						.css({
-							'text-anchor' : 'start',
-							'font-size'   : '12px',
-							'font-family' : 'sans-serif'
-						})
-						.addClass('activityTitleLabel')
+						.addClass('svg-tool-activity-title-label svg-tool-activity-title-label-small')
 						.appendTo(activityGroup);
 	
 			$.each(activity.learners, function(learnerIndex, learner){

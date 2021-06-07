@@ -45,6 +45,19 @@
 	fill: #e9f9c0;
 }
 
+.svg-tool-activity-title-label {
+	font-size   : 14px;
+	font-family : sans-serif;
+}
+
+.svg-tool-activity-title-label.svg-tool-activity-title-label-middle {
+	text-anchor : middle;
+}
+
+.svg-tool-activity-title-label.svg-tool-activity-title-label-small {
+	font-size   : 12px;
+}
+
 .svg-branching {
 	stroke-width: 3;
 	fill: white;

@@ -140,13 +140,6 @@ var paper = null,
 			'text-anchor' : 'middle',
 			'font-size'   : 12,
 			'font-family' : 'sans-serif'
-		},
-		
-		'activityTitleTextAttributes' : {
-			'text-anchor' : 'start',
-			'font-size'   : 14,
-			'font-family' : 'sans-serif',
-			'fill'        : 'black'
 		}
 },
 
