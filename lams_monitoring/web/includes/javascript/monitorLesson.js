@@ -1043,6 +1043,35 @@ function initSequenceTab(){
 	$("#sequenceSearchPhrase").autocomplete( {
 		'source' : LAMS_URL + "monitoring/monitoring/autocomplete.do?scope=lesson&lessonID=" + lessonId,
 		'delay'  : 700,
+		'response' : function(event, ui) {
+			$.each(ui.content, function(){
+				// only add portrait if user has got one
+				let valueParts = this.value.split('_');
+				if (valueParts.length > 1) {
+					this.value = valueParts[0];
+					// portrait div will be added as text, then in open() function below we fix it
+					this.label += definePortrait(valueParts[1], this.value, STYLE_SMALL, true, LAMS_URL);
+				}
+			});
+		},
+		'open'   : function(event, ui) {
+			$('.ui-menu-item-wrapper', $(this).autocomplete( "widget" )).each(function(){
+				let menuItem = $(this);
+				// portrait, if exists, was added as text; now we make it proper html
+				menuItem.html(menuItem.text());
+				let portrait = menuItem.children('div');
+				if (portrait.length == 0) {
+					// no portrait, nothing to do
+					return;
+				}
+				// rearrange item contents
+				portrait.detach();
+				let label = $('<p />').text(menuItem.text());
+				// this extra class makes it a flex box
+				menuItem.empty().addClass('autocomplete-menu-item-with-portrait');
+				menuItem.append(label).append(portrait);
+			});
+		},
 		'select' : function(event, ui){
 			// put the learner first name, last name and login into the box
 			$(this).val(ui.item.label);
@@ -2117,8 +2146,8 @@ function resizeSequenceCanvas(width, height){
 function initLearnersTab() {
 	// search for users with the term the Monitor entered
 	$("#learnersSearchPhrase").autocomplete( {
-		'source' : LAMS_URL + "monitoring/monitoring/autocomplete.do?scope=lesson&lessonID=" + lessonId,
-		'delay'  : 700,
+		'source'   : LAMS_URL + "monitoring/monitoring/autocomplete.do?scope=lesson&lessonID=" + lessonId,
+		'delay'    : 700,
 		'select' : function(event, ui){
 		    // learner's ID in ui.item.value is not used here
 			$(this).val(ui.item.label);

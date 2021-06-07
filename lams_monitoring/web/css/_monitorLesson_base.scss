@@ -392,6 +392,15 @@ img#sequenceCanvasLoading {
 	visibility: hidden;
 }
 
+.ui-menu-item-wrapper.autocomplete-menu-item-with-portrait {
+	display: flex;
+	justify-content: space-between;
+}
+
+.ui-menu-item-wrapper.autocomplete-menu-item-with-portrait > p {
+	padding-top : 10px;
+}
+
 img#sequenceSearchedLearnerHighlighter {
 	position: absolute;
 	display: none;

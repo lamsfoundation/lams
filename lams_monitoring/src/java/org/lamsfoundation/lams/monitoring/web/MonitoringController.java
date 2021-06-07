@@ -1418,7 +1418,8 @@ public class MonitoringController {
 	for (User user : users) {
 	    ObjectNode userJSON = JsonNodeFactory.instance.objectNode();
 	    userJSON.put("label", user.getFirstName() + " " + user.getLastName() + " " + user.getLogin());
-	    userJSON.put("value", user.getUserId());
+	    userJSON.put("value",
+		    user.getUserId() + (user.getPortraitUuid() == null ? "" : "_" + user.getPortraitUuid().toString()));
 
 	    responseJSON.add(userJSON);
 	}
