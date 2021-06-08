@@ -60,9 +60,16 @@
 	font-size   : 12px;
 }
 
+.svg-activity-gate {
+	-webkit-filter: drop-shadow( 2px 2px 2px rgba(0, 0, 0, .3));
+  	filter: drop-shadow( 2px 2px 2px rgba(0, 0, 0, .3));
+}
+
 .svg-branching {
 	stroke-width: 3;
 	fill: white;
+	-webkit-filter: drop-shadow( 2px 2px 2px rgba(0, 0, 0, .3));
+  	filter: drop-shadow( 2px 2px 2px rgba(0, 0, 0, .3));
 }
 
 .svg-branching-start {
