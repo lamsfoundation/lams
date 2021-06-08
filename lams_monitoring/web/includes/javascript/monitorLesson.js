@@ -1665,8 +1665,8 @@ function addActivityIcons(activity) {
 		
 		if (requiresAttentionIcon) {
 			requiresAttentionIcon.css({
-				'left'     : activityLeftOffset    + 160 + 'px',
-				'top'      : activityTopOffset  - 95  + 'px'
+				'left'     : activityLeftOffset    + 157 + 'px',
+				'top'      : activityTopOffset  - 93  + 'px'
 			});
 		}
 	} else if (isGate) {
