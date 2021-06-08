@@ -309,58 +309,65 @@ div#sequenceCanvas {
   text-align: center;
   width: 100%;
   height: 100%;
-		  overflow: auto;
+  overflow: auto;
 }
   
-div#sequenceCanvas div.learner-icon, #completedLearnersContainer div.learner-icon {
-	display: inline-block;
-	border-radius : 20px;
-	background-color : #FFFFFF;
+div#sequenceCanvas div.learner-icon-container {
+	position: relative;
+}
+  
+div#sequenceCanvas div.learner-icon-container div.learner-icon, #completedLearnersContainer div.learner-icon {
+  border-radius: 20px;
+  background-color: #FFFFFF;
+}
+
+div#sequenceCanvas div.learner-icon-container div.learner-icon, div#sequenceCanvas div.learner-icon-container div.more-learner-icon {
+	position: absolute;
 }
 
 #completedLearnersContainer div.learner-icon {
-	margin-right: 5px;	
+  display: inline-block;
+  margin-right: 5px;
+}
+
+div#sequenceCanvas div.more-learner-icon, #completedLearnersContainer div.more-learner-icon {
+  display: inline-block;
+  width: 35px;
+  height: 35px;
+  line-height: 35px;
+  font-size: 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  background-color: #e7e7e7;
+  text-align: center;
 }
 
 div#sequenceCanvas div.learner-icon.learner-searched {
-	border: red 3px solid;
-	border-radius: 25px;
-	z-index: 109 !important;	
+  border: red 3px solid;
+  border-radius: 25px;
+  z-index: 109 !important;
 }
 
 div#sequenceCanvas div.portrait-generic-sm.learner-icon.learner-searched {
-	border: none;	
+  border: none;
 }
 
 div#sequenceCanvas div.portrait-generic-sm.learner-icon.learner-searched::before {
-	border: red 3px solid;
-	border-radius: 25px;
-}
-  
-div#sequenceCanvas div.more-learner-icon, #completedLearnersContainer div.more-learner-icon {
-	display: inline-block;
-	width    : 35px;
-	height   : 35px;
-	line-height : 35px;
-	font-size  : 16px;
-	border-radius : 20px;
-	cursor: pointer;
-	background-color : #e7e7e7;
-	text-align: center;
+  border: red 3px solid;
+  border-radius: 25px;
 }
 
 div#sequenceCanvas .activity-requires-attention {
-	position: absolute;
-	cursor  : pointer;
-	width: 16px;
-  	height: 16px;
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
 }
   
 #completedLearnersContainer #completedLessonLearnersIcon {
-	width: 35px;
-	height: 35px;
+  width: 35px;
+  height: 35px;
 }
-
+  
 div#sequenceCanvas svg.learningDesignSvg {
 	display: block;
 	overflow: hidden;

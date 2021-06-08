@@ -1568,12 +1568,13 @@ function addActivityIcons(activity) {
 		return;
 	}
 	
-	
+	/*
+	activity.requiresAttention = true;
 	if (activity.learners) {
-		activity.learners = [...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners]
+		activity.learners = [...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners]
 		activity.learnerCount = activity.learners.length;
     }
-    
+    */
 
 	// add group of users icon
 	var learningDesignSvg = $('svg.learningDesignSvg', sequenceCanvas),
@@ -1583,36 +1584,26 @@ function addActivityIcons(activity) {
 		isBranching =  [10,11,12,13].indexOf(activity.type) > -1,
 		isGate = [3,4,5,14].indexOf(activity.type) > -1,
 		isContainer = [6,7].indexOf(activity.type) > -1,
+		activityGroup = $('g[id="' + activity.id + '"]', learningDesignSvg),
 		requiresAttentionIcon = activity.requiresAttention ? 
-				$('<image />')
+				$('<img />')
 					.attr({
 						'id'    : 'act' + activity.id + 'attention',
 						'src'   : LAMS_URL + 'images/exclamation.svg',
 						'title' : LABELS.CONTRIBUTE_ATTENTION
 					})
 					.addClass('activity-requires-attention')
-					.appendTo(sequenceCanvas)
 				: null,
 		allLearnersIcon = activity.learnerCount > 0 ?
-						$('<div />')
-							.css({
-								'position' : 'absolute'
-							})
-							.attr('id', 'act' + activity.id + 'learnerGroup')
-							.addClass('more-learner-icon')
-							: null,
-		learningDesignSvgViewbox = learningDesignSvg.attr('viewBox').split(' '),
-		learningDesignSvgInternalLeftOffset = +learningDesignSvgViewbox[0],
-		learningDesignSvgInternalTopOffset = +learningDesignSvgViewbox[1],
-		learningDesignSvgExternalOffset = learningDesignSvg.offset(),
-		activityLeftOffset = learningDesignSvgExternalOffset.left + coord.x - learningDesignSvgInternalLeftOffset + sequenceCanvas.scrollLeft(),
-		activityTopOffset  = learningDesignSvgExternalOffset.top  + coord.y - learningDesignSvgInternalTopOffset + sequenceCanvas.scrollTop();
+				$('<div />')
+					.attr('id', 'act' + activity.id + 'learnerGroup')
+					.addClass('more-learner-icon')
+				: null;
 		
 
 	if (isTool || isGrouping) {
 		if (activity.learnerCount > 0) {
 			// if learners reached the activity, make room for their icons: make activity icon and label smaller and move to top
-			var activityGroup = $('g[id="' + activity.id + '"]', learningDesignSvg);
 			$('svg', activityGroup).attr({
 				'x'     : coord.x + 20,
 				'y'     : coord.y + 3,
@@ -1628,16 +1619,22 @@ function addActivityIcons(activity) {
 						})
 						.addClass('svg-activity-title-label svg-activity-title-label-small')
 						.appendTo(activityGroup);
-	
+						
+			var learnersContainer = $('<div />').addClass('learner-icon-container');
+			$('<foreignObject />').append(learnersContainer).appendTo(activityGroup).attr({
+				'x' : coord.x + 20,
+				'y' : coord.y + 40,
+				'width'  : 184,
+				'height' : 40
+			});
+			
 			$.each(activity.learners, function(learnerIndex, learner){
 				if (learnerIndex >= 5 && activity.learnerCount > 6) {
 					return false;					
 				}
 				$(definePortrait(learner.portraitId, learner.id, STYLE_SMALL, true, LAMS_URL))
 					  .css({
-						'position' : 'absolute',
-						'left'     : activityLeftOffset + (learnerIndex * (activity.learnerCount < 5 ? 45 : 27)) - 2 + 'px',
-						'top'      : activityTopOffset  - 60 + 'px',
+						'left'     : learnerIndex * (activity.learnerCount < 5 ? 46 : 28)  + 'px',
 						'z-index'  : 100 + learnerIndex
 					  })
 					  .addClass('new-popover learner-icon')
@@ -1648,76 +1645,83 @@ function addActivityIcons(activity) {
 						'data-portrait' : learner.portraitId,
 						'data-fullname' : getLearnerDisplayName(learner)
 					  })
-					  .appendTo(sequenceCanvas);
+					  .appendTo(learnersContainer);
 			});
 			
 			if (activity.learnerCount > 6) {
 				allLearnersIcon
 					  .css({
-						'left'     : activityLeftOffset + 135 + 'px',
-						'top'      : activityTopOffset  - 60  + 'px',
+						'left'     : '140px',
 						'z-index'  : 108
 					  })
 					  .text('+' + (activity.learnerCount - 5))
-					  .appendTo(sequenceCanvas);
+					  .appendTo(learnersContainer);
 			}
 		}
 		
 		if (requiresAttentionIcon) {
-			requiresAttentionIcon.css({
-				'left'     : activityLeftOffset    + 157 + 'px',
-				'top'      : activityTopOffset  - 93  + 'px'
+			$('<foreignObject />').append(requiresAttentionIcon).appendTo(activityGroup).attr({
+				'x' : coord.x + 180,
+				'y' : coord.y - 1,
+				'width'  : 20,
+				'height' : 20
 			});
 		}
 	} else if (isGate) {
 		if (activity.learnerCount > 0) {
-			allLearnersIcon
-				  .css({
-					'left'     : activityLeftOffset + 'px',
-					'top'      : activityTopOffset  - 80  + 'px'
-				  })
-				  .text(activity.learnerCount)
-				  .appendTo(sequenceCanvas);
+			$('<foreignObject />').append(allLearnersIcon).appendTo(activityGroup).attr({
+				'x' : coord.x + 20,
+				'y' : coord.y + 20,
+				'width' : 40,
+				'height' : 40
+			});
+			allLearnersIcon.text(activity.learnerCount);
 		}
 		
 		if (requiresAttentionIcon) {
-			requiresAttentionIcon.css({
-				'left'     :  activityLeftOffset + 5 + 'px',
-				'top'      : activityTopOffset  - 100  + 'px'
+			$('<foreignObject />').append(requiresAttentionIcon).appendTo(activityGroup).attr({
+				'x' : coord.x + 25,
+				'y' : coord.y -  5,
+				'width'  : 20,
+				'height' : 20
 			});
 		}
 	} else if (isBranching) {
 		if (activity.learnerCount > 0) {
-			allLearnersIcon
-				  .css({
-					'left'     : activityLeftOffset - 20  + 'px',
-					'top'      : activityTopOffset  - 100  + 'px'
-				  })
-				  .text(activity.learnerCount)
-				  .appendTo(sequenceCanvas);
+			$('<foreignObject />').append(allLearnersIcon).appendTo(activityGroup).attr({
+				'x' : coord.x,
+				'y' : coord.y,
+				'width' : 40,
+				'height' : 40
+			});
+			allLearnersIcon.text(activity.learnerCount);
 		}		
 		
 		if (requiresAttentionIcon) {
-			requiresAttentionIcon.css({
-				'left'     : activityLeftOffset - 13 + 'px',
-				'top'      : activityTopOffset  - 124  + 'px'
+			$('<foreignObject />').append(requiresAttentionIcon).appendTo(activityGroup).attr({
+				'x' : coord.x + 8,
+				'y' : coord.y - 28,
+				'width'  : 20,
+				'height' : 20
 			});
 		}
 	} else if (isContainer) {
 		if (activity.learnerCount > 0) {
-			allLearnersIcon
-				  .css({
-					'left'     : activityLeftOffset + coord.width - 50 + 'px',
-					'top'      : activityTopOffset  - 98  + 'px'
-				  })
-				  .text(activity.learnerCount)
-				  .appendTo(sequenceCanvas);
+			$('<foreignObject />').append(allLearnersIcon).appendTo(activityGroup).attr({
+				'x' : coord.x + coord.width - 20,
+				'y' : coord.y - 17,
+				'width' : 40,
+				'height' : 40
+			});
+			allLearnersIcon.text(activity.learnerCount);
 		}
 		
 		if (requiresAttentionIcon) {
-			requiresAttentionIcon.css({
-				'left'     : activityLeftOffset - 20 + 'px',
-				'top'      : activityTopOffset  - 80  + 'px'
+			$('<foreignObject />').append(requiresAttentionIcon).appendTo(activityGroup).attr({
+				'x' : coord.x,
+				'y' : coord.y + 15,
+				'width'  : 20,
+				'height' : 20
 			});
 		}
 	}
