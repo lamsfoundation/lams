@@ -54,8 +54,14 @@
 	font-family : sans-serif;
 }
 
-.svg-tool-activity-title-label.svg-tool-activity-title-label-middle {
-	text-anchor : middle;
+.svg-tool-activity-title-box {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	word-wrap: break-word;
+	padding-right: 2px;
+	text-align: center;
 }
 
 .svg-tool-activity-title-label.svg-tool-activity-title-label-small {

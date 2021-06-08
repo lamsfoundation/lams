@@ -1619,7 +1619,7 @@ function addActivityIcons(activity) {
 				'height': '30px'
 			});
 			
-			$('.svg-tool-activity-title-label', activityGroup).remove();
+			$('.svg-tool-activity-title-label', activityGroup).parent('foreignObject').remove();
 			$('<text>').text(activity.title.length < 20 ? activity.title : activity.title.substring(0, 20) + '...')
 					   .attr({
 							'x' : coord.x + 55,

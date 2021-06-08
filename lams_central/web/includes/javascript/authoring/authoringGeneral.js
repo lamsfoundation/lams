@@ -782,7 +782,10 @@ GeneralInitLib = {
 		        }, 500);
 				
 			},
-			'close' : null,
+			'close' : function(){
+				// CSS loaded from an old LD SVG can interfere with current authoring layout
+				$('#ldScreenshotAuthor', this).empty();
+			},
 			'data' : {
 				'prepareForOpen' : function(dialogTitle, learningDesignTitle, shownElementIDs, highlightFolder){
 					$('#ldStoreDialogNameContainer input', layout.ldStoreDialog).val(learningDesignTitle);

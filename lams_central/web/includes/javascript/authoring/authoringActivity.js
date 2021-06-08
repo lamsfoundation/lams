@@ -505,7 +505,7 @@ ActivityDraw = {
 							   .addClass('svg-tool-activity-border'),
 			// check for icon in the library
 			icon = ActivityLib.getActivityIcon('grouping'),
-			label = ActivityLib.wrapActivityTitle(this.title, x, y);
+			label = ActivityLib.getActivityTitle(this.title, x, y);
 			
 		icon.select('svg').attr({
 			'x'     : x + 20,
@@ -703,7 +703,7 @@ ActivityDraw = {
 						 .addClass('svg-tool-activity-background ' + (this.grouping ? '' : 'svg-shadow')),
 			shapeBorder = paper.path(shapePath)
 							 .addClass('svg-tool-activity-border' + (this.requireGrouping ? '-require-grouping' : '')),
-			label = ActivityLib.wrapActivityTitle(this.title, x, y),
+			label = ActivityLib.getActivityTitle(this.title, x, y),
 			icon = ActivityLib.getActivityIcon(this.learningLibraryID);
 		
 		bannerPath += ' h ' + bannerWidth + ' v ' + height + ' z';
@@ -1857,16 +1857,6 @@ ActivityLib = {
 		GeneralLib.setModified(true);
 	},
 	
-	/**
-	 * Reduce length of activity's title so it fits in its SVG shape.
-	 */
-	shortenActivityTitle : function(title) {
-		if (title.length > 23) {
-			title = title.substring(0, 22) + '...';
-		}
-		return title;
-	},
-	
 	
 	/**
 	 * Crawles through branches setting their lengths and finding the longest one.
@@ -1901,18 +1891,18 @@ ActivityLib = {
 		branchingActivity.longestBranchLength = longestBranchLength;
 	},
 	
-	wrapActivityTitle : function(title, x, y) {
-		if (title.length < 15) {
-			var label = paper.text(x + 135, y + 45, title)
-			label.addClass('svg-tool-activity-title-label svg-tool-activity-title-label-middle');
-			return label;
+	getActivityTitle : function(title, x, y) {
+		
+		if (title.length > 35) {
+			title = title.substring(0, 35) + '...';
 		}
-		
-		const firstLine = paper.text(x + 75, y + 35, title.substring(0, 13))
-			secondLine = paper.text(x + 75, y + 55, title.length > 24 ? title.substring(13, 24) + '...'  : title.substring(13, title.length))
-			labelGroup = paper.g(firstLine, secondLine);
-		
-		labelGroup.addClass('svg-tool-activity-title-label');
-		return labelGroup;
+		var label = $('<div />').addClass('svg-tool-activity-title-label svg-tool-activity-title-box').text(title),
+			wrapper = $('<foreignObject />').append(label).attr({
+				'x'     : x + 75,
+				'y'     : y,
+				'width' : layout.activity.width - 75,
+				'height': layout.activity.height
+			});
+		return Snap.parse(wrapper[0].outerHTML);
 	}
 }; 
