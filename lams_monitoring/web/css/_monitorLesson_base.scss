@@ -305,11 +305,11 @@ td.contributeEntryCell a {
 
 /********** SEQUENCE TAB STYLES **********/
 div#sequenceCanvas {
-  position: relative;
-  text-align: center;
   width: 100%;
-  height: 100%;
   overflow: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
   
 div#sequenceCanvas div.learner-icon-container {
@@ -320,7 +320,7 @@ div#sequenceCanvas div.learner-icon-container div.learner-icon, #completedLearne
   border-radius: 20px;
   background-color: #FFFFFF;
 }
-
+  
 div#sequenceCanvas div.learner-icon-container div.learner-icon, div#sequenceCanvas div.learner-icon-container div.more-learner-icon {
 	position: absolute;
 }
@@ -357,6 +357,7 @@ div#sequenceCanvas div.portrait-generic-sm.learner-icon.learner-searched::before
   border-radius: 25px;
 }
 
+
 div#sequenceCanvas .activity-requires-attention {
   cursor: pointer;
   width: 16px;
@@ -368,6 +369,7 @@ div#sequenceCanvas .activity-requires-attention {
   height: 35px;
 }
   
+
 div#sequenceCanvas svg.learningDesignSvg {
 	display: block;
 	overflow: hidden;
