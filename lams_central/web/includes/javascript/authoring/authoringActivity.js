@@ -358,7 +358,7 @@ ActivityDraw = {
 		});
 	
 		this.items = paper.g(shape, icon);
-		this.items.addClass('svg-activity-branching');
+		this.items.addClass('svg-activity svg-activity-branching');
 		if (this.readOnly && !isReadOnlyMode) {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}
@@ -426,7 +426,7 @@ ActivityDraw = {
 		}
 		
 		this.items.data('parentObject', this);
-		this.items.addClass('svg-activity-floating svg-shadow');
+		this.items.addClass('svg-activity svg-activity-floating svg-shadow');
 	},
 	
 	
@@ -456,7 +456,7 @@ ActivityDraw = {
 		});
 
 		this.items = paper.g(shape);
-		this.items.addClass('svg-activity-gate svg-shadow');
+		this.items.addClass('svg-activity svg-activity-gate svg-shadow');
 		if (this.readOnly && !isReadOnlyMode) {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}
@@ -523,7 +523,7 @@ ActivityDraw = {
 			'data-height': height
 		});
 		
-		this.items.addClass('svg-activity-grouping');
+		this.items.addClass('svg-activity svg-activity-grouping');
 		if (this.readOnly && !isReadOnlyMode) {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}
@@ -593,7 +593,7 @@ ActivityDraw = {
 		}
 		
 		this.items.data('parentObject', this);
-		this.items.addClass('svg-activity-optional svg-shadow');
+		this.items.addClass('svg-activity svg-activity-optional svg-shadow');
 		this.items.attr({
 			'uiid'   : this.uiid,
 			'data-x' : x,
@@ -660,7 +660,7 @@ ActivityDraw = {
 		}
 		
 		this.items.data('parentObject', this);
-		this.items.addClass('svg-activity-parallel svg-shadow');
+		this.items.addClass('svg-activity svg-activity-parallel svg-shadow');
 		this.items.attr({
 			'uiid'   : this.uiid,
 			'data-x' : x,
@@ -732,7 +732,7 @@ ActivityDraw = {
 			'data-width' : width,
 			'data-height': height
 		});
-        this.items.addClass('svg-activity-tool');
+        this.items.addClass('svg-activity svg-activity-tool');
 		this.items.shape = shape;
 		
 		if (this.grouping) {
@@ -1896,7 +1896,7 @@ ActivityLib = {
 		if (title.length > 35) {
 			title = title.substring(0, 35) + '...';
 		}
-		var label = $('<div />').addClass('svg-tool-activity-title-label svg-tool-activity-title-box').text(title),
+		var label = $('<div />').addClass('svg-activity-title-label svg-tool-activity-title-box').text(title),
 			wrapper = $('<foreignObject />').append(label).attr({
 				'x'     : x + 75,
 				'y'     : y,

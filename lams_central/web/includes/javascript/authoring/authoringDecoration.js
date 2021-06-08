@@ -84,8 +84,7 @@ var DecorationDefs = {
 				this.items.attr('uiid', this.uiid);
 				if (this.title) {
 					var label = paper.text(x + 7, y + 14, this.title)
-									 .attr(layout.defaultTextAttributes)
-					 				 .attr('text-anchor', 'start');
+									 .addClass('svg-activity-title-label svg-activity-title-label-small');
 					if (!isReadOnlyMode){
 						label.attr('cursor', 'pointer');
 					}

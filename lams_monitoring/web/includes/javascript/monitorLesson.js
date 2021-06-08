@@ -1406,7 +1406,7 @@ function forceComplete(currentActivityId, learners, x, y) {
 		// otherwise it is a list of selected learners IDs
 		moveAll = learners === true;
 	// check all activities and "users who finished lesson" bar
-	$('g[id]:not([id*="_to_"])', sequenceCanvas).add('#completedLearnersContainer').each(function(){
+	$('g.svg-activity', sequenceCanvas).add('#completedLearnersContainer').each(function(){
 		// find which activity learner was dropped on
 		var act = $(this),
 			coord = {
@@ -1432,13 +1432,13 @@ function forceComplete(currentActivityId, learners, x, y) {
 	});
 	
 	$.each(foundActivities, function(){
-		if (this.attr('class') == 'floating') {
+		if (this.hasClass('svg-activity-floating')) {
 			// no force complete to support activities
 			targetActivity = null;
 			return false;
 		}
 		// the enveloping OptionalActivity has priority
-		if (targetActivity == null || this.attr('class') == 'optional') {
+		if (targetActivity == null || this.hasClass('svg-activity-optional')) {
 			targetActivity = this;
 		}
 	});
@@ -1466,7 +1466,7 @@ function forceComplete(currentActivityId, learners, x, y) {
 	} else {
 		var targetActivityId = +targetActivity.attr('id');
 		if (currentActivityId != targetActivityId) {
-			var targetActivityName = targetActivity.attr('class') == 'gate' ? "Gate" : targetActivity.children('text').text(),
+			var targetActivityName = targetActivity.hasClass('svg-activity-gate') ? "Gate" : targetActivity.find('.svg-activity-title-label').text(),
 				moveBackwards = currentActivityId == null;
 			
 			// check if target activity is before current activity
@@ -1598,6 +1598,7 @@ function addActivityIcons(activity) {
 							.css({
 								'position' : 'absolute'
 							})
+							.attr('id', 'act' + activity.id + 'learnerGroup')
 							.addClass('more-learner-icon')
 							: null,
 		learningDesignSvgViewbox = learningDesignSvg.attr('viewBox').split(' '),
@@ -1619,13 +1620,13 @@ function addActivityIcons(activity) {
 				'height': '30px'
 			});
 			
-			$('.svg-tool-activity-title-label', activityGroup).parent('foreignObject').remove();
+			$('.svg-activity-title-label', activityGroup).parent('foreignObject').remove();
 			$('<text>').text(activity.title.length < 20 ? activity.title : activity.title.substring(0, 20) + '...')
 					   .attr({
 							'x' : coord.x + 55,
 							'y' : coord.y + 20
 						})
-						.addClass('svg-tool-activity-title-label svg-tool-activity-title-label-small')
+						.addClass('svg-activity-title-label svg-activity-title-label-small')
 						.appendTo(activityGroup);
 	
 			$.each(activity.learners, function(learnerIndex, learner){
@@ -1652,7 +1653,6 @@ function addActivityIcons(activity) {
 			
 			if (activity.learnerCount > 8) {
 				allLearnersIcon
-					  .attr('id', 'act' + activity.id + 'learnerGroup')
 					  .css({
 						'left'     : activityLeftOffset + 138 + 'px',
 						'top'      : activityTopOffset  - 60  + 'px',
