@@ -426,7 +426,7 @@ ActivityDraw = {
 		}
 		
 		this.items.data('parentObject', this);
-		this.items.addClass('svg-activity-floating');
+		this.items.addClass('svg-activity-floating svg-shadow');
 	},
 	
 	
@@ -593,7 +593,7 @@ ActivityDraw = {
 		}
 		
 		this.items.data('parentObject', this);
-		this.items.addClass('svg-activity-optional');
+		this.items.addClass('svg-activity-optional svg-shadow');
 		this.items.attr({
 			'uiid'   : this.uiid,
 			'data-x' : x,
@@ -660,7 +660,7 @@ ActivityDraw = {
 		}
 		
 		this.items.data('parentObject', this);
-		this.items.addClass('svg-activity-parallel');
+		this.items.addClass('svg-activity-parallel svg-shadow');
 		this.items.attr({
 			'uiid'   : this.uiid,
 			'data-x' : x,
