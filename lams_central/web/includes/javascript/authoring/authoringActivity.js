@@ -348,7 +348,7 @@ ActivityDraw = {
 
 		// create activity SVG elements
 		var shape = paper.circle(x, y, 20)
-						 .addClass('svg-branching svg-branching-' + (this.isStart ? 'start' : 'end')),
+						 .addClass('svg-branching svg-shadow svg-branching-' + (this.isStart ? 'start' : 'end')),
 			icon = ActivityLib.getActivityIcon(this.isStart ? 'branchingStart' : 'branchingEnd');
 		icon.select('svg').attr({
 			'x'     : x - 15,
@@ -456,7 +456,7 @@ ActivityDraw = {
 		});
 
 		this.items = paper.g(shape);
-		this.items.addClass('svg-activity-gate');
+		this.items.addClass('svg-activity-gate svg-shadow');
 		if (this.readOnly && !isReadOnlyMode) {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}
@@ -500,9 +500,9 @@ ActivityDraw = {
 						' h ' + (-width + 2 * curve) + ' q ' + -curve + ' 0 ' + -curve + ' ' + -curve +
 						' v ' + (-height + 2 * curve) + ' q 0 ' + -curve + ' ' + curve + ' ' + -curve,
 			shape = paper.path(shapePath)
-						 .addClass('svg-tool-activity-background'),
+						 .addClass('svg-tool-activity-background svg-shadow'),
 			shapeBorder = paper.path(shapePath)
-							 .addClass('svg-tool-activity-border' + (this.requireGrouping ? '-require-grouping' : '')),
+							   .addClass('svg-tool-activity-border'),
 			// check for icon in the library
 			icon = ActivityLib.getActivityIcon('grouping'),
 			label = ActivityLib.wrapActivityTitle(this.title, x, y);
@@ -700,7 +700,7 @@ ActivityDraw = {
 			shapePath = bannerPath + ' h ' + (width - 2 * curve) + ' q ' + curve + ' 0 ' + curve + ' ' + curve +
 						' v ' + (height - 2 * curve) + ' q 0 ' + curve + ' ' + -curve + ' ' + curve + ' z',
 			shape = paper.path(shapePath)
-						 .addClass('svg-tool-activity-background'),
+						 .addClass('svg-tool-activity-background ' + (this.grouping ? '' : 'svg-shadow')),
 			shapeBorder = paper.path(shapePath)
 							 .addClass('svg-tool-activity-border' + (this.requireGrouping ? '-require-grouping' : '')),
 			label = ActivityLib.wrapActivityTitle(this.title, x, y),
@@ -961,7 +961,7 @@ ActivityLib = {
 						activityBox.width,
 						activityBox.height,
 						5, 5)
-				   .addClass('svg-tool-activity-border');
+				   .addClass('svg-tool-activity-border svg-tool-activity-border-grouped svg-shadow');
 			
 			activity.items.prepend(activity.items.groupingEffect);
 			

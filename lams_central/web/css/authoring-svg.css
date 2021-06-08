@@ -10,11 +10,13 @@
 	stroke-width: 3;
 }
 
+.svg-tool-activity-border-grouped {
+	fill: white;
+}
+
 .svg-tool-activity-background {
 	stroke: none;
 	fill: white;
-	-webkit-filter: drop-shadow( 2px 2px 2px rgba(0, 0, 0, .3));
-  	filter: drop-shadow( 2px 2px 2px rgba(0, 0, 0, .3));
 }
 
 .svg-tool-activity-category-1 {
@@ -60,16 +62,10 @@
 	font-size   : 12px;
 }
 
-.svg-activity-gate {
-	-webkit-filter: drop-shadow( 2px 2px 2px rgba(0, 0, 0, .3));
-  	filter: drop-shadow( 2px 2px 2px rgba(0, 0, 0, .3));
-}
 
 .svg-branching {
 	stroke-width: 3;
 	fill: white;
-	-webkit-filter: drop-shadow( 2px 2px 2px rgba(0, 0, 0, .3));
-  	filter: drop-shadow( 2px 2px 2px rgba(0, 0, 0, .3));
 }
 
 .svg-branching-start {
@@ -99,4 +95,9 @@
 	stroke-width: 2;
 	stroke: rgb(119, 126, 157);
 	stroke-dasharray: 5, 3;
+}
+
+.svg-shadow {
+	-webkit-filter: drop-shadow( 2px 2px 2px rgba(0, 0, 0, .3));
+  	filter: drop-shadow( 2px 2px 2px rgba(0, 0, 0, .3));
 }
