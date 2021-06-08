@@ -271,8 +271,8 @@
 					sequenceTabShowInfo = false; // only show it once
                 }
 
-				updateSequenceTab();
-                
+
+				window.parent.resizeSequenceCanvas();
 			} else {
 				sequenceInfoDialog.modal("hide");
             }

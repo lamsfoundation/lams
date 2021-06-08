@@ -1355,8 +1355,7 @@ function loadLearningDesignSVG() {
 		},
 		success : function(response) {
 			originalSequenceCanvas = response;
-			sequenceCanvas = $('#sequenceCanvas').removeAttr('style')
-						  						 .html(originalSequenceCanvas);
+			sequenceCanvas = $('#sequenceCanvas').html(originalSequenceCanvas);
 		},
 		error : function(error) {
 			exit = true;
@@ -2118,23 +2117,13 @@ function openLiveEdit(){
 /**
  * Adjusts sequence canvas (SVG) based on space available in the dialog.
  */
-function resizeSequenceCanvas(width, height){
-	// can the calculation it be done nicer?
-	var canvasHeight = height - $('.navbar').height() - $('#sequenceTopButtonsContainer').height()
-	  				   - Math.min(20, $('#completedLearnersContainer').height()),
-		canvasWidth = width,
-		svg = $('svg', sequenceCanvas),
-		// center a small SVG inside large DIV
-		canvasPaddingTop = Math.max(0, canvasHeight/2 - svg.attr('height')/2 - 50),
-		canvasPaddingLeft =  Math.max(0, canvasWidth/2 - svg.attr('width')/2 - 40);
-		
-		sequenceCanvas.css({
-			'padding-top'  : canvasPaddingTop + 'px',
-			'padding-left' : canvasPaddingLeft + 'px',
-			'height'  : canvasHeight - 70 + 'px'
-		});
-
-	updateSequenceTab();
+function resizeSequenceCanvas(height){
+	var svg = $('svg.learningDesignSvg', sequenceCanvas),
+		svgHeight = +svg.attr('height') + 10,
+		appliedHeight = Math.max(svgHeight, height - 140);
+	sequenceCanvas.css({
+		'height'  : appliedHeight + 'px'
+	});
 }
 
 //********** LEARNERS TAB FUNCTIONS **********
