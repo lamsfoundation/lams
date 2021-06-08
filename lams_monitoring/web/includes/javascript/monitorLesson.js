@@ -1568,12 +1568,12 @@ function addActivityIcons(activity) {
 		return;
 	}
 	
-	/*
+	
 	if (activity.learners) {
-		activity.learners = [...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners]
+		activity.learners = [...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners]
 		activity.learnerCount = activity.learners.length;
     }
-    */
+    
 
 	// add group of users icon
 	var learningDesignSvg = $('svg.learningDesignSvg', sequenceCanvas),
@@ -1630,13 +1630,13 @@ function addActivityIcons(activity) {
 						.appendTo(activityGroup);
 	
 			$.each(activity.learners, function(learnerIndex, learner){
-				if (learnerIndex >= 7 && activity.learnerCount > 8) {
+				if (learnerIndex >= 5 && activity.learnerCount > 6) {
 					return false;					
 				}
 				$(definePortrait(learner.portraitId, learner.id, STYLE_SMALL, true, LAMS_URL))
 					  .css({
 						'position' : 'absolute',
-						'left'     : activityLeftOffset + (learnerIndex * (activity.learnerCount < 5 ? 45 : 20)) - 2 + 'px',
+						'left'     : activityLeftOffset + (learnerIndex * (activity.learnerCount < 5 ? 45 : 27)) - 2 + 'px',
 						'top'      : activityTopOffset  - 60 + 'px',
 						'z-index'  : 100 + learnerIndex
 					  })
@@ -1651,14 +1651,14 @@ function addActivityIcons(activity) {
 					  .appendTo(sequenceCanvas);
 			});
 			
-			if (activity.learnerCount > 8) {
+			if (activity.learnerCount > 6) {
 				allLearnersIcon
 					  .css({
-						'left'     : activityLeftOffset + 138 + 'px',
+						'left'     : activityLeftOffset + 135 + 'px',
 						'top'      : activityTopOffset  - 60  + 'px',
 						'z-index'  : 108
 					  })
-					  .text('+' + (activity.learnerCount - 7))
+					  .text('+' + (activity.learnerCount - 5))
 					  .appendTo(sequenceCanvas);
 			}
 		}
