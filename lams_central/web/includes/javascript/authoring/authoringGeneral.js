@@ -128,8 +128,6 @@ var paper = null,
 			'gateText'     		  : 'white',
 			'grouping'		      : '#caddfb',
 			'groupingBorder'	  : '#00007f',
-			'optionalActivity'    : '#caddfb',
-			'optionalActivityBorder'    : '#00007f',
 			// dashed border around a selected activity 
 			'selectEffect'        : 'black',
 			// highlight TBL activities which should be grouped

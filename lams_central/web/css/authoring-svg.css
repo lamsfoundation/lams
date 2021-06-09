@@ -85,6 +85,16 @@
 	stroke: blue;
 }
 
+.svg-annotation-container {
+	stroke: #b6b6b6;
+}
+
+.svg-activity-optional .svg-annotation-container,
+.svg-activity-parallel .svg-annotation-container,
+.svg-activity-floating .svg-annotation-container {
+	fill : #f0f8ff;
+}
+
 .svg-transition {
 	stroke-width: 1;
 	stroke: rgb(119, 126, 157);

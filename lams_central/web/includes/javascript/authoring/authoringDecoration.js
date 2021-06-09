@@ -61,7 +61,7 @@ var DecorationDefs = {
 	methods : {
 		container : {
 			
-			draw : function(x, y, x2, y2, color, borderColor, strokeWidth){
+			draw : function(x, y, x2, y2, color){
 				// check for new coordinates or just take them from the existing shape
 				var box = this.items   ? this.items.shape.getBBox() : null,
 					x = x != undefined ? x : box.x,
@@ -69,7 +69,7 @@ var DecorationDefs = {
 					// take into account minimal size of rectangle
 					x2 = x2 ? Math.max(x2, x + layout.conf.regionEmptyWidth) : x + box.width,
 					y2 = y2 ? Math.max(y2, y + layout.conf.regionEmptyHeight) : y + box.height,
-					color =  color ? color : this.items.shape.attr('fill');
+					color =  !color && this.items ? this.items.shape.attr('fill') : color;
 	
 				if (box) {
 					this.items.remove();
@@ -95,11 +95,6 @@ var DecorationDefs = {
 					x2 = Math.max(x2, label.getBBox().x2 + 5);
 				}
 				
-				if ( ! borderColor )
-					borderColor = layout.colors.activityBorder;
-				if ( ! strokeWidth )
-					strokeWidth = 0.5;
-				
 				// the rectangle
 				var curve = layout.activity.borderCurve,
 					width = x2 - x,
@@ -108,15 +103,14 @@ var DecorationDefs = {
 						' v ' + (height - 2 * curve) + ' q 0 ' + curve + ' ' + -curve + ' ' + curve + 
 						' h ' + (-width + 2 * curve) + ' q ' + -curve + ' 0 ' + -curve + ' ' + -curve +
 						' v ' + (-height + 2 * curve) + ' q 0 ' + -curve + ' ' + curve + ' ' + -curve;
-				this.items.shape = paper.path(shapePath)
-						 			    .attr({
-						 			    	'stroke' : borderColor,
-										    'stroke-width' : strokeWidth,
-						 			    	'fill'   : color
-						 			    });
+				this.items.shape = paper.path(shapePath);
+				this.items.shape.addClass('svg-annotation-container');
 				this.items.prepend(this.items.shape);
 				GeneralLib.toBack(this.items);
 				
+				if (color) {
+					this.items.shape.attr('fill', color);
+				}
 				if (isReadOnlyMode){
 					if (activitiesOnlySelectable) {
 						this.items.attr('cursor', 'pointer')
@@ -206,6 +200,7 @@ var DecorationDefs = {
 		region : {
 			draw : function(x, y, x2, y2, color){
 				this.drawContainer(x, y, x2, y2, color);
+				this.items.addClass('svg-annotation-region');
 				
 				var box = this.items.shape.getBBox();
 				
