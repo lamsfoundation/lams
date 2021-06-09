@@ -331,7 +331,7 @@ function resizeSequenceCanvas(){
 			win = iframe.contentWindow || iframe.contentDocument;
 		if (win.resizeSequenceCanvas) {
 			var body = $(this).find('.modal-body');
-			win.resizeSequenceCanvas(body.height());
+			win.resizeSequenceCanvas(body.width(), body.height());
 		}
 	});
 }

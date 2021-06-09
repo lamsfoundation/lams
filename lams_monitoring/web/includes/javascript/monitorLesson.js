@@ -4,6 +4,8 @@ var originalSequenceCanvas = null,
 // DIV container for lesson SVG
 // it gets accessed so many times it's worth to cache it here
 	sequenceCanvas = $('#sequenceCanvas'),
+// switch between SVG original size and fit-to-sreen (enlarge/shrink)
+	learningDesignSvgFitScreen = false,
 // info box show timeout
 	sequenceInfoTimeout = 8000,
 // which learner was selected in the search box
@@ -1148,6 +1150,8 @@ function initSequenceTab(){
 	}).find('.modal-header').remove();
 	
 	$('#sequenceInfoDialog .modal-body').empty().append($('#sequenceInfoDialogContents').show());
+	
+	canvasFitScreen(learningDesignSvgFitScreen, true);
 }
 
 function showIntroductionDialog(lessonId) {
@@ -1180,6 +1184,8 @@ function updateSequenceTab() {
 		return;
 	}
 	sequenceRefreshInProgress = true;
+	
+	sequenceCanvas.css('visibility', 'hidden');
 
 	if (originalSequenceCanvas) {
 		// put bottom layer, LD SVG
@@ -1272,6 +1278,11 @@ function updateSequenceTab() {
 			
 			// modyfing SVG in DOM does not render changes, so we need to reload it
 			sequenceCanvas.html(sequenceCanvas.html());
+			// SVG needs resizing after reload
+			window.parent.resizeSequenceCanvas();
+			
+			// only now show SVG so there is no "jump" when resizing
+			sequenceCanvas.css('visibility', 'visible');
 			
 			if (sequenceSearchedLearner != null && !response.searchedLearnerFound) {
 				// the learner has not started the lesson yet, display an info box
@@ -2117,13 +2128,45 @@ function openLiveEdit(){
 /**
  * Adjusts sequence canvas (SVG) based on space available in the dialog.
  */
-function resizeSequenceCanvas(height){
+function resizeSequenceCanvas(width, height){
 	var svg = $('svg.learningDesignSvg', sequenceCanvas),
-		svgHeight = +svg.attr('height') + 10,
-		appliedHeight = Math.max(svgHeight, height - 140);
+		viewBoxParts = svg.attr('viewBox').split(' '),
+		svgHeight = +viewBoxParts[3],
+		sequenceCanvasHeight = learningDesignSvgFitScreen ? height - 140 : Math.max(svgHeight + 10, height - 140);
+	
+	// By default sequenceCanvas div is as high as SVG, but for SVG vertical centering
+	// we want it to be as large as available space (iframe height minus toolbars)
+	// or if SVG is higher, then as high as SVG
 	sequenceCanvas.css({
-		'height'  : appliedHeight + 'px'
+		'height'  : sequenceCanvasHeight + 'px'
 	});
+	
+	// if we want SVG to fit screen, then we make it as wide & high as sequenceCanvas div
+	// but no more than extra 30% because small SVGs look weird if they are too large
+	if (learningDesignSvgFitScreen) {
+		var svgWidth = +viewBoxParts[2],
+			sequenceCanvasWidth = sequenceCanvas.width();
+		svg.attr({
+			'preserveAspectRatio' : 'xMidYMid meet',
+			'width' : Math.min(svgWidth * 1.3, sequenceCanvasWidth - 10),
+			'height': Math.min(svgHeight * 1.3, sequenceCanvasHeight - 10)
+		})
+	}
+}
+
+function canvasFitScreen(fitScreen, skipResize) {
+	learningDesignSvgFitScreen = fitScreen;
+	if (!skipResize) {
+		updateSequenceTab();
+	}
+	
+	if (fitScreen) {
+		$('#canvasFitScreenButton').hide();
+		$('#canvasOriginalSizeButton').show();
+	} else {
+		$('#canvasFitScreenButton').show();
+		$('#canvasOriginalSizeButton').hide();
+	}
 }
 
 //********** LEARNERS TAB FUNCTIONS **********

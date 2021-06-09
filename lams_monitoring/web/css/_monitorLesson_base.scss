@@ -306,7 +306,6 @@ td.contributeEntryCell a {
 /********** SEQUENCE TAB STYLES **********/
 div#sequenceCanvas {
   width: 100%;
-  overflow: auto;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -372,7 +371,7 @@ div#sequenceCanvas .activity-requires-attention {
 
 div#sequenceCanvas svg.learningDesignSvg {
 	display: block;
-	overflow: hidden;
+	overflow: visible;
 }
 
 div#sequenceCanvas svg.learningDesignSvg g.gate svg {
