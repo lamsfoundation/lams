@@ -8,8 +8,7 @@
 var HandlerLib = {
 	// taken from http://jsfiddle.net/LQuyr/8/
 	touchHandler : function(event) {
-	    var self = this,
-	    	touches = event.changedTouches,
+	    var touches = event.changedTouches,
 	        first = touches[0],
 	        type = "";
 
@@ -33,13 +32,11 @@ var HandlerLib = {
 
 	    first.target.dispatchEvent(simulatedEvent);
 
-	    var scrollables = [],
-	    	clickedInScrollArea = false,
+	    var scrollables = [];
 	    	// check if any of the parents has is-scollable class
-	    	parentEls = $(event.target).parents().map(function() {
+	    $(event.target).parents().map(function() {
 	        try {
 	            if ($(this).hasClass('scrollable')) {
-	                clickedInScrollArea = true;
 	                // get vertical direction of touch event
 	                var direction = (window.startY < first.clientY) ? 'down' : 'up';
 	                // calculate stuff... :o)
@@ -177,11 +174,12 @@ var HandlerLib = {
 		// highlight rubbish bin if dragged elements are over it
 		if (HandlerLib.isElemenentBinned(event)) {
 			if (!layout.bin.glowEffect) {
+				let binSvg = layout.bin.select('svg');
 				layout.bin.glowEffect = paper.path(Snap.format('M {x} {y} h {side} v {side} h -{side} z',
 												   {
-													'x'     : layout.bin.attr('x'),
-													'y'     : layout.bin.attr('y'),
-													'side'  : layout.bin.attr('width')
+													'x'     : binSvg.attr('x'),
+													'y'     : binSvg.attr('y'),
+													'side'  : binSvg.attr('width')
 												   }))
 								   			.attr({
 												   'stroke'           : layout.colors.binSelect,
@@ -189,6 +187,7 @@ var HandlerLib = {
 												   'stroke-dasharray' : '5,3',
 												   'fill' : 'none'
 												  });
+				layout.bin.append(layout.bin.glowEffect);
 			}
 		} else if (layout.bin.glowEffect){
 			layout.bin.glowEffect.remove();

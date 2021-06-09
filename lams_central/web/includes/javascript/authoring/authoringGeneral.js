@@ -49,7 +49,7 @@ var paper = null,
 				'iconPath'   : 'images/svg/branchingEnd.svg'
 			},
 			'bin' : {
-				'iconData'   : 'data:image/png;base64,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',
+				'iconPath'   : 'images/svg/authoringBin.svg'
 			}, 
 		},
 		
@@ -2949,9 +2949,14 @@ GeneralLib = {
 			}
 			
 			// draw rubbish bin on canvas
-			layout.bin = paper.image(layout.toolMetadata.bin.iconData, width - 55, height - 55, 48, 48);
-			// so it can be found when SVG code gets cloned
-			$(layout.bin.node).attr('id', 'rubbishBin');
+			layout.bin = paper.g(ActivityLib.getActivityIcon('bin'));
+			layout.bin.attr('id', 'rubbishBin');
+			layout.bin.select('svg').attr({
+				'x' : width - 65,
+				'y' : height - 65,
+				'width' : 48,
+				'height': 48
+			});
 			
 			HandlerLib.resetCanvasMode(true);
 		}
