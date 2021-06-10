@@ -599,8 +599,8 @@ public class MonitoringController {
 	String activityDescription = null;
 	if (activityId != null) {
 	    Activity activity = monitoringService.getActivityById(activityId);
-	    activityDescription = new StringBuffer(activity.getTitle()).append(" (").append(activityId).append(")")
-		    .toString();
+	    activityDescription = new StringBuffer(activity.getTitle() == null ? "" : activity.getTitle()).append(" (")
+		    .append(activityId).append(")").toString();
 	}
 
 	List<User> learners = null;
