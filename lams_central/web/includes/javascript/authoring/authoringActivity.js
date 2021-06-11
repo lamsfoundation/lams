@@ -752,7 +752,8 @@ ActivityDraw = {
 		}
 		this.items = paper.g();
 		
-		var isBranching = this.fromActivity instanceof ActivityDefs.BranchingEdgeActivity || this.toActivity instanceof ActivityDefs.BranchingEdgeActivity,
+		var isBranching = (this.fromActivity instanceof ActivityDefs.BranchingEdgeActivity && this.fromActivity.isStart) || 
+					      (this.toActivity instanceof ActivityDefs.BranchingEdgeActivity   && !this.toActivity.isStart),
 			points = ActivityLib.findTransitionPoints(this.fromActivity, this.toActivity),
 			curve = layout.transition.curve,
 			straightLineThreshold = 2 * curve + 2;

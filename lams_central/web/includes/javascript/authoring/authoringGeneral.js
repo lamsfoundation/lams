@@ -55,10 +55,10 @@ var paper = null,
 		
 		// graphics constants
 		'conf' : {
-			'arrangeHorizontalSpace'           : 200,
-			'arrangeVerticalSpace'             : 100,
-			'arrangeHorizontalPadding'         : 35,
-			'arrangeVerticalPadding'           : 50,
+			'arrangeHorizontalSpace'           : 240,
+			'arrangeVerticalSpace'             : 120,
+			'arrangeHorizontalPadding'         : 40,
+			'arrangeVerticalPadding'           : 40,
 			
 			'dragStartThreshold'               : 300,
 			
@@ -92,7 +92,7 @@ var paper = null,
 			// snapping grid step when dragging an activity
 			'step' : 40,
 			// distance from canvas border so activities are not on edge
-			'padding' : 20,
+			'padding' : 40,
 			// shift final position by this number so activites are aligned to dots, not between them
 			'offset' : 10
 		},
@@ -1258,6 +1258,8 @@ GeneralLib = {
 			return;
 		}
 		
+		
+		// warn that annotation labels and regions will not be arranged
 		if (!append && (layout.regions.length > 0 || layout.labels.length > 0)
 			&& !isReadOnlyMode && !confirm(LABELS.ARRANGE_CONFIRM)) {
 			return;
@@ -1273,7 +1275,7 @@ GeneralLib = {
 		
 		var row = 0;
 		if (append) {
-			// find the lowest existing activity and append the new activities beneath
+			// find the lowest (highest Y) existing activity and append the new activities beneath
 			$.each(layout.activities, function(){
 				row = Math.max(row,
 						Math.ceil((this.items.getBBox().y2 - layout.conf.arrangeVerticalPadding)
@@ -1287,9 +1289,7 @@ GeneralLib = {
 			forceRowY = null,
 			paperWidth = paper.attr('width'),
 			// check how many columns current paper can hold
-			maxColumns = Math.floor(((paperWidth < 300 && paperMinWidth ? paperMinWidth : paperWidth) 
-									    - layout.conf.arrangeHorizontalPadding)
-					                 / layout.conf.arrangeHorizontalSpace),
+			maxColumns = Math.floor((paperWidth - layout.conf.arrangeHorizontalPadding) / layout.conf.arrangeHorizontalSpace),
 			// the initial max length of subsequences is limited by paper space
 			subsequenceMaxLength = maxColumns,
 	        // a shallow copy of activities array without inner activities
@@ -1304,7 +1304,7 @@ GeneralLib = {
 		});
 		
 		// branches will not be broken into few rows; if they are long, paper will be resized
-		// find the longes branch to find the new paper size
+		// find the longes branch and use it for a new paper size
 		$.each(activities, function(){
 			if (this instanceof ActivityDefs.BranchingEdgeActivity && this.isStart) {
 				// add start and end edges to the longest branch length in the branching
@@ -1336,6 +1336,7 @@ GeneralLib = {
 				$.each(activitiesCopy, function(){
 					if (this.transitions.to.length > 0) {
 						activity = this;
+						// crawl back using "to" transition all the way to the beggining of sequence
 						while (activity.transitions.to.length > 0) {
 							// check if previous activity was not drawn already
 							// it can happen for branching edges
@@ -1389,11 +1390,11 @@ GeneralLib = {
 						complex.branchingRow = row + Math.floor(branchingActivity.branches.length / 2);
 						// edge points go to middle of rows with branches
 						var startX = layout.conf.arrangeHorizontalPadding +
-									 column * layout.conf.arrangeHorizontalSpace + 54,
+									 column * layout.conf.arrangeHorizontalSpace + 80,
 							edgeY = layout.conf.arrangeVerticalPadding +
-									complex.branchingRow * layout.conf.arrangeVerticalSpace + 17,
+									complex.branchingRow * layout.conf.arrangeVerticalSpace + 50,
 							endX = layout.conf.arrangeHorizontalPadding +
-								   end.column * layout.conf.arrangeHorizontalSpace + 54;
+								   end.column * layout.conf.arrangeHorizontalSpace + 80;
 						
 						activitiesCopy.splice(activitiesCopy.indexOf(start), 1);
 						activitiesCopy.splice(activitiesCopy.indexOf(end), 1);
@@ -1434,10 +1435,8 @@ GeneralLib = {
 					
 					if (activity instanceof ActivityDefs.GateActivity) {
 						// adjust placement for gate activity, so it's in the middle of its cell
-						x += 57;
-						y += 10;
-					} else if (activity instanceof ActivityDefs.OptionalActivity){
-						x -= 20;
+						x += 70;
+						y += 30;
 					}
 					
 					activity.draw(x, y);
@@ -1460,7 +1459,7 @@ GeneralLib = {
 					row++;
 					// if an Optional Activity forced next activities to be drawn lower than usual
 					if (forceRowY) {
-						while (forceRowY > layout.conf.arrangeVerticalPadding + 10 + row * layout.conf.arrangeVerticalSpace) {
+						while (forceRowY > layout.conf.arrangeVerticalPadding + row * layout.conf.arrangeVerticalSpace) {
 							row++;
 						}
 						forceRowY = null;
@@ -1526,8 +1525,14 @@ GeneralLib = {
 				row++;
 				column = 0;
 			}
+			// if last activity was optional activity, we may need to go lower with rows
+			if (forceRowY) {
+				while (forceRowY > layout.conf.arrangeVerticalPadding + row * layout.conf.arrangeVerticalSpace) {
+					row++;
+				}
+			}
 			var x = layout.conf.arrangeHorizontalPadding,
-				y = layout.conf.arrangeVerticalPadding - 30 + row * layout.conf.arrangeVerticalSpace;
+				y = layout.conf.arrangeVerticalPadding + row * layout.conf.arrangeVerticalSpace;
 			
 			layout.floatingActivity.draw(x, y);
 		}
