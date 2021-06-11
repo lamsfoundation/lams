@@ -290,10 +290,10 @@ public abstract class LdTemplateController {
 	return transitions;
     }
 
-    protected static final int rowHeightSpace = 100;
-    protected static final int activityWidthSpace = 185;
-    protected static final int gateHeightOffset = 5;
-    protected static final int gateWidthOffset = 50;
+    protected static final int rowHeightSpace = 120;
+    protected static final int activityWidthSpace = 240;
+    protected static final int gateHeightOffset = 30;
+    protected static final int gateWidthOffset = 70;
 
     /**
      * Calculate where to draw an activity. Aim for 4 activities per line. Returns Integer[x,y]
