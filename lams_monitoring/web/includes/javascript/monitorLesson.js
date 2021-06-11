@@ -1578,16 +1578,8 @@ function addActivityIcons(activity) {
 		return;
 	}
 	
-	/*
-	activity.requiresAttention = true;
-	if (activity.learners) {
-		activity.learners = [...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners,...activity.learners]
-		activity.learnerCount = activity.learners.length;
-    }
-    */
-
 	// add group of users icon
-	var learningDesignSvg = $('svg.learningDesignSvg', sequenceCanvas),
+	var learningDesignSvg = $('svg.svg-learning-design', sequenceCanvas),
 		isTool = activity.type == 1,
 		isGrouping = activity.type == 2,
 		// branching and gates require extra adjustments
@@ -2133,7 +2125,7 @@ function openLiveEdit(){
  * Adjusts sequence canvas (SVG) based on space available in the dialog.
  */
 function resizeSequenceCanvas(width, height){
-	var svg = $('svg.learningDesignSvg', sequenceCanvas),
+	var svg = $('svg.svg-learning-design', sequenceCanvas),
 		viewBoxParts = svg.attr('viewBox').split(' '),
 		svgHeight = +viewBoxParts[3],
 		sequenceCanvasHeight = learningDesignSvgFitScreen ? height - 140 : Math.max(svgHeight + 10, height - 140);

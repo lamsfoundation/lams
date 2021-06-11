@@ -36,7 +36,7 @@ var DecorationDefs = {
 			this.loadPropertiesDialogContent = PropertyDefs.labelProperties;
 		}
 		
-		this.draw(x, y, color || layout.colors.activityText, size || layout.conf.labelDefaultSize);
+		this.draw(x, y, color || 'black', size || layout.conf.labelDefaultSize);
 	},
 	
 	

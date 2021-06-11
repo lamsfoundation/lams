@@ -343,6 +343,7 @@ ActivityDraw = {
 			this.items.remove();
 		}
 		
+		// make the icon more centred
 		x = GeneralLib.snapToGrid(x) + layout.snapToGrid.offset * 2;
 		y = GeneralLib.snapToGrid(y);
 
@@ -363,7 +364,7 @@ ActivityDraw = {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}
 		if (this.isStart) {
-			// uiid is needed in Monitoring
+			// these are needed in monitoring
 			this.items.attr({
 				'uiid'   : this.branchingActivity.uiid,
 				'data-x' : x,
@@ -416,13 +417,11 @@ ActivityDraw = {
 			
 			this.drawContainer(x, y,
 							   box.x2 + layout.conf.containerActivityPadding,
-							   box.y2 + layout.conf.containerActivityPadding,
-							   layout.colors.optionalActivity, layout.colors.optionalActivityBorder, 0.5);
+							   box.y2 + layout.conf.containerActivityPadding);
 		} else {
 			this.drawContainer(x, y,
 							   x + layout.conf.containerActivityEmptyWidth,
-							   y + layout.conf.containerActivityEmptyHeight,
-							   layout.colors.optionalActivity, layout.colors.optionalActivityBorder, 0.5);
+							   y + layout.conf.containerActivityEmptyHeight);
 		}
 		
 		this.items.data('parentObject', this);
@@ -444,6 +443,7 @@ ActivityDraw = {
 		}
 		
 		x = GeneralLib.snapToGrid(x);
+		// make the icon more centred
 		y = GeneralLib.snapToGrid(y) - layout.snapToGrid.offset * 2;
 		
 		// create activity SVG elements
@@ -460,7 +460,7 @@ ActivityDraw = {
 		if (this.readOnly && !isReadOnlyMode) {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}
-		// uiid is needed in Monitoring
+		// these are needed in monitoring
 		this.items.attr({
 			'uiid'   : this.uiid,
 			'data-x' : x,
@@ -594,6 +594,7 @@ ActivityDraw = {
 		
 		this.items.data('parentObject', this);
 		this.items.addClass('svg-activity svg-activity-optional svg-shadow');
+		// these are needed in monitoring
 		this.items.attr({
 			'uiid'   : this.uiid,
 			'data-x' : x,
@@ -661,6 +662,7 @@ ActivityDraw = {
 		
 		this.items.data('parentObject', this);
 		this.items.addClass('svg-activity svg-activity-parallel svg-shadow');
+		// these are needed in monitoring
 		this.items.attr({
 			'uiid'   : this.uiid,
 			'data-x' : x,
@@ -696,6 +698,8 @@ ActivityDraw = {
 			height = layout.activity.height,
 			bannerPath = 'M ' + (x + curve) + ' ' + (y + height) + ' q ' + -curve + ' 0 ' + -curve + ' ' + -curve + 
 						 ' v ' + (-height + 2 * curve) + ' q 0 ' + -curve + ' ' + curve + ' ' + -curve,
+			// by default the wide banner is displayed,
+			// but when there are learners in monitoring, the narrow one is shown instead
 			bannerWidePath = bannerPath + ' h ' + layout.activity.bannerWideWidth + ' v ' + height + ' z',
 			bannerNarrowPath = bannerPath + ' h ' + layout.activity.bannerNarrowWidth + ' v ' + height + ' z',
 			bannerWide = paper.path(bannerWidePath)
@@ -727,7 +731,7 @@ ActivityDraw = {
 		if (this.readOnly && !isReadOnlyMode) {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}
-		// uiid is needed in Monitoring
+		// these are needed in monitoring
 		this.items.attr({
 			'uiid'   : this.uiid,
 			'data-x' : x,
@@ -1770,7 +1774,7 @@ ActivityLib = {
 				// different effects for different types of objects
 				if (object instanceof DecorationDefs.Region) {
 					object.items.shape.attr({
-	 			    	'stroke' : layout.colors.activityBorder,
+	 			    	'stroke' : 'black',
 						'stroke-dasharray' : null
 					});
 					object.items.fitButton.attr('display','none');

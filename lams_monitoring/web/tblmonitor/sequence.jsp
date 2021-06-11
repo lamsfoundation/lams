@@ -199,7 +199,7 @@
 
 		// assigne svg 'auto' width and height 
 		if (sequenceCanvas) {
-			var svg = $('svg.learningDesignSvg','#sequenceCanvas');
+			var svg = $('svg.svg-learning-design','#sequenceCanvas');
 			if ( svg ) {
 				var svgWidth = svg.attr('width'),
 					svgHeight = svg.attr('height');

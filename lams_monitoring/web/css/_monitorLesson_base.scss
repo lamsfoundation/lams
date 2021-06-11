@@ -369,12 +369,12 @@ div#sequenceCanvas .activity-requires-attention {
 }
   
 
-div#sequenceCanvas svg.learningDesignSvg {
+div#sequenceCanvas svg.svg-learning-design {
 	display: block;
 	overflow: visible;
 }
 
-div#sequenceCanvas svg.learningDesignSvg g.gate svg {
+div#sequenceCanvas svg.svg-learning-design g.gate svg {
 	display: none;
 }
 

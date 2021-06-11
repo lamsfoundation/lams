@@ -288,7 +288,7 @@ var MenuLib = {
 		svg.setAttribute('preserveAspectRatio', 'xMinYMin slice');
 		svg.setAttribute('width', width);
 		svg.setAttribute('height', height);
-		$(svg).addClass('learningDesignSvg');
+		$(svg).addClass('svg-learning-design');
 		
 		// reset any cursor=pointer styles
 		$('*[style*="cursor"]', svg).css('cursor', 'default');

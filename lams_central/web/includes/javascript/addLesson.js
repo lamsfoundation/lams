@@ -454,8 +454,8 @@ function loadLearningDesignSVG(ldId) {
 			$('#ldScreenshotAuthor').html(response);
 			$('#ldScreenshotAuthor').css('display', 'block').css('width', 'auto').css('height', 'auto');
 
-			originalThumbnailWidth = $('svg.learningDesignSvg','#ldScreenshotAuthor').attr('width');
-			originalThumbnailHeight = $('svg.learningDesignSvg','#ldScreenshotAuthor').attr('height');
+			originalThumbnailWidth = $('svg.svg-learning-design','#ldScreenshotAuthor').attr('width');
+			originalThumbnailHeight = $('svg.svg-learning-design','#ldScreenshotAuthor').attr('height');
 
 			// resize if needed
 			var resized = resizeSequenceThumbnail();
@@ -504,7 +504,7 @@ function loadLearningDesignSVG(ldId) {
 function resizeSequenceThumbnail(reset) {
 
 	var returnValue = false;
-	var svg = $('svg.learningDesignSvg','#ldScreenshotAuthor');
+	var svg = $('svg.svg-learning-design','#ldScreenshotAuthor');
 	if ( svg ) {
 		if ( reset ) {
 			svg.attr('width',originalThumbnailWidth);

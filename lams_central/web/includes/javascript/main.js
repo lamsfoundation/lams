@@ -330,6 +330,7 @@ function resizeSequenceCanvas(){
 		var iframe = $('iframe', this)[0], 
 			win = iframe.contentWindow || iframe.contentDocument;
 		if (win.resizeSequenceCanvas) {
+			// find out the size of content area in the monitoring modal
 			var body = $(this).find('.modal-body');
 			win.resizeSequenceCanvas(body.width(), body.height());
 		}

@@ -113,7 +113,6 @@ var paper = null,
 		},
 		
 		'colors' : {
-			'activityBorder'	  : 'black',
 			// default region colour
 			'annotation'		  : '#CCFF99',
 			// region colours to choose from
@@ -123,12 +122,6 @@ var paper = null,
 
 			// when mouse hovers over rubbish bin
 			'binSelect' 		  : 'red',
-			
-			'gate'         		  : 'red',
-            'gateBorder'          : '#801515',
-			'gateText'     		  : 'white',
-			'grouping'		      : '#caddfb',
-			'groupingBorder'	  : '#00007f',
 			// dashed border around a selected activity 
 			'selectEffect'        : 'black',
 			// highlight TBL activities which should be grouped
