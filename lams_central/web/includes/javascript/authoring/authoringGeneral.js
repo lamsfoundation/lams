@@ -2577,16 +2577,12 @@ GeneralLib = {
 		
 		$.each(layoutActivityDefs, function(){
 			var activity = this,
-				activityBox = activity.items ? activity.items.shape.getBBox() : null,
+				activityBox = activity.items ? activity.items.getBBox() : null,
 				x = activityBox ? parseInt(activityBox.x) : null,
 				y = activityBox ? parseInt(activityBox.y) : null,
 				activityTypeID = null,
-				activityCategoryID = activity instanceof ActivityDefs.ToolActivity ?
-						   			 layout.toolMetadata[activity.learningLibraryID].activityCategoryID : 
-						             activity instanceof ActivityDefs.ParallelActivity ? 5 : 1,
 				iconPath = null,
 				isGrouped = activity.grouping ? true : false,
-				parentActivityID = activity.parentActivity ? activity.parentActivity.id : null,
 				gateActivityCompletionBased = false,
 				activityTransitions = activity instanceof ActivityDefs.BranchingActivity ?
 						activity.end.transitions : activity.transitions;
