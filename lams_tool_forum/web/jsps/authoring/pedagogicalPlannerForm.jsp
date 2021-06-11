@@ -100,7 +100,7 @@
 						</lams:CKEditor>
 					</td>
 					<td>
-						<img class="clearEntry" src="<lams:LAMSURL/>images/icons/cross.png"
+						<img class="clearEntry" src="<lams:LAMSURL/>images/cross.png"
 							title="<fmt:message key="msg.planner.clear.entry" />"
 							onclick="javascript:clearEntry(${topicIndex-1})" />
 					</td>

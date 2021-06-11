@@ -67,7 +67,7 @@
 						<form:input id="item${itemIndex-1}" cssClass="item" size="100" path="taskListItem[${itemIndex-1}]"/>
 					</td>
 					<td>
-						<img class="clearEntry" src="<lams:LAMSURL/>images/icons/cross.png"
+						<img class="clearEntry" src="<lams:LAMSURL/>images/cross.png"
 							title="<fmt:message key="msg.planner.clear.entry" />"
 							onclick="javascript:clearEntry(${itemIndex-1})" />
 						</td>
