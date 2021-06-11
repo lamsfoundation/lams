@@ -101,7 +101,8 @@ var paper = null,
 			'width'					   : 200,
 			'height'				   : 80,
 			'borderCurve'			   : 5,
-			'bannerWidth'			   : 10
+			'bannerNarrowWidth'		   : 10,
+			'bannerWideWidth'		   : 60
 		},
 		
 		'transition' : {

@@ -694,9 +694,14 @@ ActivityDraw = {
 		var curve = layout.activity.borderCurve,
 			width = layout.activity.width,
 			height = layout.activity.height,
-			bannerWidth = layout.activity.bannerWidth,
 			bannerPath = 'M ' + (x + curve) + ' ' + (y + height) + ' q ' + -curve + ' 0 ' + -curve + ' ' + -curve + 
 						 ' v ' + (-height + 2 * curve) + ' q 0 ' + -curve + ' ' + curve + ' ' + -curve,
+			bannerWidePath = bannerPath + ' h ' + layout.activity.bannerWideWidth + ' v ' + height + ' z',
+			bannerNarrowPath = bannerPath + ' h ' + layout.activity.bannerNarrowWidth + ' v ' + height + ' z',
+			bannerWide = paper.path(bannerWidePath)
+						  .addClass('svg-tool-banner-wide svg-tool-activity-category-' + layout.toolMetadata[this.learningLibraryID].activityCategoryID),
+			bannerNarrow = paper.path(bannerNarrowPath)
+						  .addClass('svg-tool-banner-narrow svg-tool-activity-category-' + layout.toolMetadata[this.learningLibraryID].activityCategoryID),
 			shapePath = bannerPath + ' h ' + (width - 2 * curve) + ' q ' + curve + ' 0 ' + curve + ' ' + curve +
 						' v ' + (height - 2 * curve) + ' q 0 ' + curve + ' ' + -curve + ' ' + curve + ' z',
 			shape = paper.path(shapePath)
@@ -705,18 +710,16 @@ ActivityDraw = {
 							 .addClass('svg-tool-activity-border' + (this.requireGrouping ? '-require-grouping' : '')),
 			label = ActivityLib.getActivityTitle(this.title, x, y),
 			icon = ActivityLib.getActivityIcon(this.learningLibraryID);
-		
-		bannerPath += ' h ' + bannerWidth + ' v ' + height + ' z';
-		var banner = paper.path(bannerPath)
-						  .addClass('svg-tool-activity-category-' + layout.toolMetadata[this.learningLibraryID].activityCategoryID);
-		this.items = paper.g(shape, banner, shapeBorder, label);
+				
+		$(bannerNarrow.node).hide();
+		this.items = paper.g(shape, bannerWide, bannerNarrow, shapeBorder, label);
 		
 		if (icon) {
 			icon.select('svg').attr({
-				'x'     : x + 20,
-				'y'     : y + 15,
-				'width' : '50px',
-				'height': '50px'
+				'x'     : x + 15,
+				'y'     : y + 20,
+				'width' : '40px',
+				'height': '40px'
 			});
 			this.items.add(icon);	
 		}

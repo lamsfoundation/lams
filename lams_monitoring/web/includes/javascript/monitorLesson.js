@@ -1621,6 +1621,10 @@ function addActivityIcons(activity) {
 				'height': '30px'
 			});
 			
+			// switch from wide banner to narrow one
+			$('.svg-tool-banner-narrow', activityGroup).show();
+			$('.svg-tool-banner-wide', activityGroup).hide();
+			
 			$('.svg-activity-title-label', activityGroup).parent('foreignObject').remove();
 			$('<text>').text(activity.title.length < 20 ? activity.title : activity.title.substring(0, 20) + '...')
 					   .attr({
