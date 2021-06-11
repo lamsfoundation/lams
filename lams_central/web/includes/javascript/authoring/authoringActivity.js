@@ -1420,8 +1420,7 @@ ActivityLib = {
 		if (direction === 'vertical') {
 			if (fromActivityBox.cy < toActivityBox.cy) {
 				points = {
-						'startX'    : ActivityLib.adjustTransitionPoint(fromActivityBox.x, fromActivityBox.x2, toActivityBox.x + toActivityBox.width / 2)
-										- (fromActivity.items.groupingEffect ? 0.5 * layout.conf.groupingEffectPadding : 0),
+						'startX'    : ActivityLib.adjustTransitionPoint(fromActivityBox.x, fromActivityBox.x2, toActivityBox.x + toActivityBox.width / 2),
 						'startY'    : fromActivityBox.y2 + layout.transition.dotRadius,
 						'endY'      : toActivityBox.y,
 						'direction' : 'down',
@@ -1443,8 +1442,7 @@ ActivityLib = {
 			if (fromActivityBox.cx < toActivityBox.cx) {
 				points = {
 						'startX'    : fromActivityBox.x2 + layout.transition.dotRadius,
-						'startY'    : ActivityLib.adjustTransitionPoint(fromActivityBox.y, fromActivityBox.y2, toActivityBox.y + toActivityBox.height / 2)
-										- (fromActivity.items.groupingEffect ? 0.5 * layout.conf.groupingEffectPadding : 0),
+						'startY'    : ActivityLib.adjustTransitionPoint(fromActivityBox.y, fromActivityBox.y2, toActivityBox.y + toActivityBox.height / 2),
 						'endX'      : toActivityBox.x,
 						'direction' : 'right',
 						'arrowAngle': 90
