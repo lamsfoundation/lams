@@ -1759,8 +1759,8 @@ function addActivityIconsHandlers(activity) {
 							  .css('cursor', 'pointer')
 							  // drag learners to force complete activities
 							  .draggable({
-								'appendTo'    : '#t2',
-								'containment' : '#t2',
+								'appendTo'    : '.svg-learner-draggable-area',
+								'containment' : '.svg-learner-draggable-area',
 							    'distance'    : 20,
 							    'scroll'      : false,
 							    'cursorAt'	  : {'left' : 10, 'top' : 15},
@@ -1850,8 +1850,8 @@ function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 				  })
 				// drag learners to force complete activities
 				  .draggable({
-					'appendTo'    : '#t2',
-					'containment' : '#t2',
+					'appendTo'    : '.svg-learner-draggable-area',
+					'containment' : '.svg-learner-draggable-area',
 				    'distance'    : 20,
 				    'scroll'      : false,
 				    'cursorAt'	  : {'left' : 10, 'top' : 15},
