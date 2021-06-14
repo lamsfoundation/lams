@@ -1,4 +1,5 @@
 /bin/
 /build/
 /.sass-cache/
+/web/includes/css/*.css
 .DS_Store
