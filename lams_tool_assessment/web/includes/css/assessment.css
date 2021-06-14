@@ -1,0 +1,110 @@
+.innerforms {
+  border: 0px;
+  font-size: small;
+  font-style: normal;
+  width: 100%; }
+
+img.validationWarning, div.errors img.icon, div.messages img.icon {
+  border: 0;
+  width: 14px;
+  height: 13px;
+  vertical-align: top; }
+
+div.growlUI h1, div.growlUI h2 {
+  color: white;
+  margin: 5px 5px 5px 0px;
+  text-align: center;
+  font-size: 18px; }
+
+.question-numbers {
+  padding-right: 15px;
+  float: left;
+  font-weight: bold; }
+
+.asterisk {
+  float: left;
+  padding-right: 5px; }
+
+.ordering-option {
+  vertical-align: middle !important; }
+
+.question-type {
+  padding-bottom: 7px;
+  font-style: italic; }
+
+.question-table {
+  width: 98%; }
+
+.has-radio-button {
+  padding: 5px 0px 2px 15px;
+  width: 5px; }
+
+.has-radio-button-prefix {
+  padding: 5px 0px 5px 5px !important;
+  width: 45px; }
+
+.has-radio-button-prefix-answer {
+  padding-left: 0px !important; }
+
+.complete-item-gif {
+  padding: 5px 0px 2px 15px;
+  width: 7px; }
+
+.complete-item-gif img {
+  border: 1px; }
+
+#pager {
+  text-align: center;
+  font-size: 110%; }
+
+#pager a {
+  margin-left: 10px; }
+
+#warning-answers-required, #warning-words-limit, #warning-mark-hedging-wrong-total {
+  display: none; }
+
+.reg-info {
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-bottom: 10px;
+  width: 80%; }
+
+.button-disabled {
+  opacity: .2; }
+
+table.table-row-spacing {
+  width: 100%;
+  border-spacing: 4px;
+  border-collapse: separate; }
+
+.comments {
+  font-size: small;
+  font-style: italic;
+  margin-top: -8px; }
+
+.margin-top-minus-10 {
+  margin-top: -10px; }
+
+/*----------countdown growl----------------*/
+.jGrowl {
+  font-size: 22px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin-left: 120px; }
+
+.jGrowl-notification {
+  opacity: .6;
+  border-radius: 10px;
+  width: 260px;
+  padding: 10px 20px;
+  margin: 10px 20px; }
+
+.jGrowl-message {
+  padding-left: 10px;
+  padding-top: 5px; }
+
+/*----------SORTABLE----------------*/
+.sortable-chosen {
+  background-color: #fff; }
+
+.sortable-placeholder {
+  background-color: rgba(241, 241, 241, 0.7); }

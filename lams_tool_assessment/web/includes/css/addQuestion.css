@@ -1,0 +1,39 @@
+/*     brand Colors              */
+.carousel.carousel-full-nagivation .left {
+  cursor: url("../../img/arrow-left.png"), url("../../img/arrow-left.cur"), default !important; }
+.carousel.carousel-full-nagivation .right {
+  cursor: url("../../img/arrow-right.png"), url("../../img/arrow-right.cur"), default !important; }
+
+.card .card-header-primary, .card.bg-primary, .card.card-rotate.bg-primary .front, .card.card-rotate.bg-primary .back {
+  background: linear-gradient(60deg, #2979ff, #2962ff); }
+
+div.error {
+  display: none; }
+
+em {
+  font-weight: bold;
+  padding-right: 1em;
+  vertical-align: top; }
+
+#content {
+  width: 91%;
+  margin-bottom: 10px; }
+
+table.alternative-color td {
+  padding-left: 0; }
+
+.short-input-text {
+  width: 10%; }
+
+#max-words-limit-checkbox, #min-words-limit-checkbox {
+  vertical-align: sub; }
+
+.fake-validation-input {
+  visibility: hidden;
+  height: 0;
+  width: 0;
+  float: right !important; }
+
+/* overwriting bootstrap value. */
+.panel {
+  margin-bottom: 0 !important; }
