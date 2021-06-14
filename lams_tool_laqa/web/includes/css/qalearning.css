@@ -1,0 +1,24 @@
+.rating-stars-div {
+  margin-top: 8px; }
+
+.user-answer {
+  padding: 0 2px; }
+
+.tablesorter-blue {
+  margin-bottom: 5px; }
+
+.pager {
+  padding-bottom: 20px; }
+
+.extra-controls-inner:after {
+  margin-top: -10px; }
+
+textarea {
+  margin: 10px 0px;
+  width: 88%; }
+
+.add-comment {
+  margin-top: 60px; }
+
+.hiddenEntryInMonitoring {
+  font-style: italic; }
