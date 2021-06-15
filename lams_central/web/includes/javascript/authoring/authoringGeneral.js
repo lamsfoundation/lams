@@ -2886,11 +2886,11 @@ GeneralLib = {
 		$('.templateContainer').height(windowHeight - 80);
 		$('#canvas').height(windowHeight - 75)
 		// width of window minus templates on the left; minimum is toolbar width so it does not collapse
-					.width(Math.max($('#toolbar').width() - 180, $(window).width() - 190));
+		// .width(Math.max($('#toolbar').width() - 200, $(window).width() - $('#templateContainerCell').width()));
 		
 		if (!width || !height) {
-			var width = 0,
-				height = 0;
+			width = 0;
+			height = 0;
 			$.each(layout.activities, function(){
 				// find new dimensions of paper
 				var activityBox = this.items.shape.getBBox();

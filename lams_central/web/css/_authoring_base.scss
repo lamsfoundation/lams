@@ -456,13 +456,13 @@ td#templateContainerCell {
   vertical-align: top;
 }
 
-td#templateContainerCell #template-container-cell-dummy-placeholder {
-  height: 22px;
+td#templateContainerCell #template-container-collapse {
+	padding-left: 5px;
 }
 
-td#templateContainerCell div.templateContainer {
-  display: none;
-  overflow: auto;
+td#templateContainerCell #template-container-collapse i.fa {
+	font-size: 20px;
+	cursor: pointer;
 }
 
 td#templateContainerCell div.template {

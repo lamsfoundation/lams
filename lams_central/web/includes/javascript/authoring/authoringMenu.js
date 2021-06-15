@@ -222,6 +222,18 @@ var MenuLib = {
 		}
 	},
 	
+	/**
+	 * Hide / show activity toolbar on the left
+	 */
+	toggleTemplateContainer : function(){
+		var templateContainerCell = $('#templateContainerCell');
+		templateContainerCell.animate({
+			'width': templateContainerCell.width() > 0 ? 0 : 200
+		}, function(){
+			templateContainerCell.find('#template-container-collapse i.fa').toggleClass('fa-arrow-circle-o-left fa-arrow-circle-o-right');
+			GeneralLib.resizePaper();
+		});
+	},
 	
 	/**
 	 * Mark an activity as ready for pasting.
