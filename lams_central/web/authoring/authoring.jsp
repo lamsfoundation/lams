@@ -287,7 +287,6 @@
 			activitiesOnlySelectable = false,
 			initContentFolderID = '${contentFolderID}',
 			initLearningDesignID = '${param.learningDesignID}',
-			learningLibraryGroups = ${learningLibraryGroups},
 			initAccess = ${access},
 			csrfTokenName = '<csrf:tokenname/>',
 			csrfTokenValue = '<csrf:tokenvalue/>';
@@ -435,9 +434,7 @@
 	<table id="authoringTable">
 		<tr>
 			<td id="templateContainerCell">
-				<select>
-					<option><fmt:message key="authoring.fla.tool.groups.all" /></option>
-				</select>
+				<div id="template-container-cell-dummy-placeholder"></div>
 				<div class="templateContainer scrollable">
 					<c:forEach var="tool" items="${tools}">
 						<div class="tooltemplate">
@@ -479,7 +476,7 @@
 						 onClick="javascript:MenuLib.toggleDescriptionDiv()">
 						<span id="ldDescriptionFieldTitle"><fmt:message key="authoring.fla.page.ld.title" /></span>
 						<span id="ldDescriptionFieldModified"></span>
-						<span id="ldDescriptionHideTip">▼</span>
+						<span id="ldDescriptionHideTip">?</span>
 					</div>
 					<div id="ldDescriptionDetails">
 						<div class="ldDescriptionLabel"><label for="ldDescriptionFieldDescription"><fmt:message key="authoring.fla.page.ld.description" /></label><p class="text-muted"><i class="text-primary fa fa-info-circle" aria-hidden="true"></i> <fmt:message key="authoring.fla.page.ld.description.placeholder" /></p></div>

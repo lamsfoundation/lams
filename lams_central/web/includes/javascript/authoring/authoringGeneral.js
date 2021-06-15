@@ -215,46 +215,7 @@ GeneralInitLib = {
 			// store the initial window height now as on iPad the iframe grows when templates are show,
 			// reporting incorrect window height to the first resizePaper() run
 			layout.initWindowHeight = $(window).height();
-			// create list of learning libraries for each group
-			var templateContainerCell = $('#templateContainerCell'),
-				learningLibraryGroupSelect = $('select', templateContainerCell),
-				allGroup = $('option', learningLibraryGroupSelect),
-				allTemplates = $('#templateContainerCell .templateContainer').show();
-		
-			learningLibraryGroupSelect.change(function(){
-				$('.templateContainer').hide();
-				// show DIV with the selected learning libraries group
-				$('option:selected', this).data('templates').show();
-			});
-			allGroup.data('templates', allTemplates);
-			
-			$.each(learningLibraryGroups, function(){
-				var learningLibraries = this.learningLibraries;
-				if (!learningLibraries) {
-					return true;
-				}
-				
-				var templates = allTemplates.clone().appendTo(templateContainerCell);
-				// cloned everything, now remove ones that are not in the list
-				$('.template', templates).each(function(){
-					var learningLibraryId = $(this).attr('learningLibraryId'),
-						found = false;
-					$.each(learningLibraries, function(){
-						if (learningLibraryId == this) {
-							found = true;
-							return false;
-						}
-					});
-					
-					if (!found) {
-						$(this).remove();
-					}
-				});
-				
-				$('<option />').text(this.name)
-							   .data('templates', templates)
-							   .appendTo(learningLibraryGroupSelect);
-			});
+			$('#templateContainerCell .templateContainer').show();
 			
 			$('.template').each(function(){
 				// allow dragging a template to canvas

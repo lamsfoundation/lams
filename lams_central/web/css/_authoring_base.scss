@@ -451,9 +451,9 @@ td#templateContainerCell {
 	vertical-align: top;
 }
 
-td#templateContainerCell select {
-	width: 100%;
-	margin-bottom: 3px;
+
+td#templateContainerCell #template-container-cell-dummy-placeholder {
+  height: 22px;
 }
 
 div.templateContainer {

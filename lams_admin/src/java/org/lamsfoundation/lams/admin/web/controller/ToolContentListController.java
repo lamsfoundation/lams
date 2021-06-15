@@ -22,13 +22,11 @@
 
 package org.lamsfoundation.lams.admin.web.controller;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,8 +34,6 @@ import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
-import org.lamsfoundation.lams.learningdesign.LearningLibrary;
-import org.lamsfoundation.lams.learningdesign.LearningLibraryGroup;
 import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LibraryActivityDTO;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
@@ -45,7 +41,6 @@ import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -55,11 +50,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author jliew
@@ -101,11 +91,6 @@ public class ToolContentListController {
 	    } else {
 		return "error";
 	    }
-	} else if (StringUtils.equals(param, "openLearningLibraryGroups")) {
-	    return openLearningLibraryGroups(request);
-	} else if (StringUtils.equals(param, "saveLearningLibraryGroups")) {
-	    saveLearningLibraryGroups(request);
-	    return null;
 	}
 
 	// get learning library dtos and their validity
@@ -206,73 +191,6 @@ public class ToolContentListController {
 	Long learningLibraryId = WebUtil.readLongParam(request, "libraryID", false);
 	ILearningDesignService ldService = learningDesignService;
 	ldService.setValid(learningLibraryId, true);
-	return "forward:/toolcontentlist/start.do";
-    }
-
-    /**
-     * Loads groups and libraries and displays the management dialog.
-     */
-    @RequestMapping(path = "/openLearningLibraryGroups")
-    public String openLearningLibraryGroups(HttpServletRequest request) throws IOException {
-	// build full list of available learning libraries
-	List<LearningLibraryDTO> learningLibraries = learningDesignService
-		.getAllLearningLibraryDetails(getUserLanguage());
-	ArrayNode learningLibrariesJSON = JsonNodeFactory.instance.arrayNode();
-	for (LearningLibraryDTO learningLibrary : learningLibraries) {
-	    ObjectNode learningLibraryJSON = JsonNodeFactory.instance.objectNode();
-	    learningLibraryJSON.put("learningLibraryId", learningLibrary.getLearningLibraryID());
-	    learningLibraryJSON.put("title", learningLibrary.getTitle());
-	    learningLibrariesJSON.add(learningLibraryJSON);
-	}
-	request.setAttribute("learningLibraries", learningLibrariesJSON.toString());
-
-	// build list of existing groups
-	List<LearningLibraryGroup> groups = learningDesignService.getLearningLibraryGroups();
-	ArrayNode groupsJSON = JsonNodeFactory.instance.arrayNode();
-	for (LearningLibraryGroup group : groups) {
-	    ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
-	    groupJSON.put("groupId", group.getGroupId());
-	    groupJSON.put("name", group.getName());
-	    for (LearningLibrary learningLibrary : group.getLearningLibraries()) {
-		ObjectNode learningLibraryJSON = JsonNodeFactory.instance.objectNode();
-		learningLibraryJSON.put("learningLibraryId", learningLibrary.getLearningLibraryId());
-		learningLibraryJSON.put("title", learningLibrary.getTitle());
-		groupJSON.withArray("learningLibraries").add(learningLibraryJSON);
-	    }
-	    groupsJSON.add(groupJSON);
-	}
-	request.setAttribute("groups", groupsJSON.toString());
-
-	return "toolcontent/learningLibraryGroup";
-    }
-
-    @RequestMapping(path = "/saveLearningLibraryGroups", method = RequestMethod.POST)
-    private String saveLearningLibraryGroups(HttpServletRequest request) throws IOException {
-	// extract groups from JSON and persist them
-
-	ArrayNode groupsJSON = JsonUtil.readArray(request.getParameter("groups"));
-	List<LearningLibraryGroup> groups = new ArrayList<>(groupsJSON.size());
-	for (JsonNode groupJSON : groupsJSON) {
-	    LearningLibraryGroup group = new LearningLibraryGroup();
-	    groups.add(group);
-	    
-	    Long groupId = JsonUtil.optLong(groupJSON, "groupId");
-	    if (groupId != null) {
-		group.setGroupId(groupId);
-	    }
-	    group.setName(JsonUtil.optString(groupJSON, "name"));
-
-	    group.setLearningLibraries(new HashSet<LearningLibrary>());
-	    ArrayNode learningLibrariesJSON = (ArrayNode) groupJSON.get("learningLibraries");
-	    for (JsonNode learningLibraryJSON : learningLibrariesJSON) {
-		long learningLibraryId = learningLibraryJSON.asLong();
-		LearningLibrary learningLibrary = learningDesignService.getLearningLibrary(learningLibraryId);
-		group.getLearningLibraries().add(learningLibrary);
-	    }
-	}
-
-	learningDesignService.saveLearningLibraryGroups(groups);
-	
 	return "forward:/toolcontentlist/start.do";
     }
 }
