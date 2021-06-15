@@ -1289,8 +1289,10 @@ GeneralLib = {
 	        // a shallow copy of activities array without inner activities
 			activitiesCopy = [],
 			// just to speed up processing when there are only activities with no transitions left
-			onlyDetachedLeft = false;
-	
+			onlyDetachedLeft = false,
+			// TBL sequences get arranged differently
+			isTBL = GeneralLib.checkTBLGrouping() !== null;
+			
 		$.each(activities, function(){
 			if (!this.parentActivity || !(this.parentActivity instanceof DecorationDefs.Container)){
 				activitiesCopy.push(this);
@@ -1448,7 +1450,13 @@ GeneralLib = {
 				}
 				
 				// find the next row and column
-				column = (column + 1) % maxColumns;
+				if (isTBL && activity instanceof ActivityDefs.GateActivity) {
+					// in TBL sequences break after each gate
+					column = 0;
+				} else {
+					column = (column + 1) % maxColumns;
+				}
+				
 				if (column == 0) {
 					row++;
 					// if an Optional Activity forced next activities to be drawn lower than usual
@@ -1668,7 +1676,7 @@ GeneralLib = {
 				this.draw();
 			}
 		});
-		return activitiesToGroup.length === 0 ? null : activitiesToGroup;
+		return activitiesToGroup;
 	},
 	
 	/**
@@ -3025,7 +3033,7 @@ GeneralLib = {
 					
 					if (layout.liveEdit) {
 						var missingGroupingOnActivities = GeneralLib.checkTBLGrouping();
-						if (missingGroupingOnActivities) {
+						if (missingGroupingOnActivities && missingGroupingOnActivities.length > 0) {
 							var info = LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING;
 							$.each(missingGroupingOnActivities, function(){
 									info += '<br /> * ' + this.title; 
@@ -3097,7 +3105,7 @@ GeneralLib = {
 					
 					if (!layout.ld.invalid) {
 						var missingGroupingOnActivities = GeneralLib.checkTBLGrouping();
-						if (missingGroupingOnActivities) {
+						if (missingGroupingOnActivities && missingGroupingOnActivities.length > 0) {
 							var info = LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING;
 							$.each(missingGroupingOnActivities, function(){
 								info += '<br /> * ' + this.title; 
