@@ -479,7 +479,7 @@ td#templateContainerCell div.template:hover{
 td#templateContainerCell div.template .media {
   margin-top: 0px;
   padding: 12px 5px 5px 5px; 
-  font-size: larger;
+  font-size: 16px; 
 }
 
 td#templateContainerCell div.template .media img {
@@ -488,32 +488,35 @@ td#templateContainerCell div.template .media img {
 }
 
 td#templateContainerCell .panel-heading {
-	cursor: pointer;
+  cursor: pointer;
+  background-color: white;
+  font-size: 16px;
 }
 
 td#templateContainerCell #collapse-heading-tool-category-1 {
-	background-color: #caddfb;
+  border-bottom: 5px solid #caddfb;
 }
 
 td#templateContainerCell #collapse-heading-tool-category-2 {
-	background-color: #ffffbb;
+ border-bottom: 10px solid #ffffbb;
 }
 
 td#templateContainerCell #collapse-heading-tool-category-3 {
-	background-color: rgba(45, 188, 233, 0.25);
+  border-bottom: 10px solid rgba(45, 188, 233, 0.25);
 }
 
 td#templateContainerCell #collapse-heading-tool-category-4 {
-	background-color: rgba(255, 114, 172, 0.25);
+  border-bottom: 10px solid rgba(255, 114, 172, 0.25);
 }
 
 td#templateContainerCell #collapse-heading-tool-category-5 {
-	background-color: #f0f8ff;
+  border-bottom: 10px solid #f0f8ff;
 }
 
 td#templateContainerCell #collapse-heading-tool-category-6 {
-	background-color: rgba(26, 217, 178, 0.25);
+  border-bottom: 10px solid rgba(26, 217, 178, 0.25);
 }
+
 
 td#canvasContainerCell {
 	vertical-align: top;
