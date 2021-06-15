@@ -1283,7 +1283,10 @@ GeneralLib = {
 			forceRowY = null,
 			paperWidth = paper.attr('width'),
 			// check how many columns current paper can hold
-			maxColumns = Math.floor((paperWidth - layout.conf.arrangeHorizontalPadding) / layout.conf.arrangeHorizontalSpace),
+			// paperMinWidth is used for SVG auto regenerate
+			maxColumns = Math.floor(((paperWidth < 300 && paperMinWidth ? paperMinWidth : paperWidth) 
+									    - layout.conf.arrangeHorizontalPadding)
+					                 / layout.conf.arrangeHorizontalSpace),
 			// the initial max length of subsequences is limited by paper space
 			subsequenceMaxLength = maxColumns,
 	        // a shallow copy of activities array without inner activities
