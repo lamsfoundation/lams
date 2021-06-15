@@ -1823,7 +1823,8 @@ GeneralLib = {
 					$('#ldDescriptionLicenseText').text(ld.licenseText || null);
 				}
 				
-				var arrangeNeeded = false,
+				// always arrange activities when SVG gets recreated
+				var arrangeNeeded = isReadOnlyMode,
 					// if system gate is found, it is Live Edit
 					systemGate = null,
 					// should we allow the author to enter activity authoring

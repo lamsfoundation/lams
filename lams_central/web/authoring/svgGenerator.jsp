@@ -53,7 +53,7 @@
 </lams:head>
 
 <body>
-	<div style="display: none">
+	<div id="templateContainerCell" style="display: none">
 		<c:forEach var="tool" items="${tools}">
 			<div
 				 toolId="${tool.toolId}"
