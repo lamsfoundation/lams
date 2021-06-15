@@ -435,9 +435,26 @@
 		<tr>
 			<td id="templateContainerCell">
 				<div id="template-container-cell-dummy-placeholder"></div>
-				<div class="templateContainer scrollable">
+				<div id="template-container-panel-group" class="templateContainer scrollable panel-group" role="tablist" aria-multiselectable="true">
+				
+					<c:forTokens items="3,2,4,6,5" delims="," var="toolCategoryId">
+						 <div class="panel panel-default">
+						 	  <div class="panel-heading" role="tab" id="collapse-heading-tool-category-${toolCategoryId}"
+						 	  		data-toggle="collapse" href="#collapse-tool-category-${toolCategoryId}" 
+									aria-expanded="false" aria-controls="collapse-tool-category-${toolCategoryId}"
+									data-parent="#template-container-panel-group">
+						 	  		<span class="panel-title">
+										<fmt:message key="authoring.fla.tool.category.${toolCategoryId}" />
+						 	  		</span>
+						 	  </div>
+						 </div>
+						 
+						   <div id="collapse-tool-category-${toolCategoryId}" class="panel-collapse collapse" 
+					       	    role="tabpanel" aria-labelledby="collapse-heading-tool-category-${toolCategoryId}">
+					       </div>
+					</c:forTokens>
+						
 					<c:forEach var="tool" items="${tools}">
-						<div class="tooltemplate">
 						<div
                              name="tool${tool.toolDisplayName}"
 							 toolId="${tool.toolId}"
@@ -465,7 +482,6 @@
 									<c:out value="${tool.toolDisplayName}" />
 								</div>
 							</div>
-						</div>
 						</div>
 					</c:forEach>
 				</div>

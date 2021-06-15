@@ -179,8 +179,10 @@ GeneralInitLib = {
 	 * Draw boxes with Tool Activity templates in the panel on the left.
 	 */
 	initTemplates : function(){
+		var templateContainerCell = $('#templateContainerCell');
+		
 		// store some template data in JS structures
-		$('.template').each(function(){
+		$('.template', templateContainerCell).each(function(){
 			var learningLibraryID = +$(this).attr('learningLibraryId'),
 				learningLibraryTitle = $(this).attr('learningLibraryTitle'),
 				activityCategoryID = ActivityCategories[learningLibraryTitle],
@@ -215,9 +217,13 @@ GeneralInitLib = {
 			// store the initial window height now as on iPad the iframe grows when templates are show,
 			// reporting incorrect window height to the first resizePaper() run
 			layout.initWindowHeight = $(window).height();
-			$('#templateContainerCell .templateContainer').show();
 			
-			$('.template').each(function(){
+			$('.template', templateContainerCell).each(function(){
+				var learningLibraryID = +$(this).attr('learningLibraryId'),
+					activityCategoryID = layout.toolMetadata[learningLibraryID].activityCategoryID;
+					
+				$('#collapse-tool-category-' + activityCategoryID, templateContainerCell).append(this);
+				
 				// allow dragging a template to canvas
 				$(this).draggable({
 					'containment' : '#authoringTable',
@@ -225,19 +231,13 @@ GeneralInitLib = {
 				    'distance'    : 20,
 				    'scroll'      : false,
 				    'scope'       : 'template',
-				    'helper'      : function(event){
+				    'helper'      : function(){
 				    	// build a simple helper
-						return $(this).clone().css({
-							'width'   : '150px',
-							'border'  : 'thin black solid',
-							'z-index' : 1,
-							'cursor'  : 'move'
-						});
+						return $(this).clone().addClass('template-drag-helper');
 					}
 				});
 			});
 
-			
 			// allow dropping templates to canvas
 			canvas.droppable({
 				   'tolerance'   : 'touch',
@@ -282,6 +282,8 @@ GeneralInitLib = {
 						ActivityLib.dropActivity(activity, eventX, eventY);
 				   }
 			});
+			
+			$('.templateContainer', templateContainerCell).show();
 		}
 	},
 

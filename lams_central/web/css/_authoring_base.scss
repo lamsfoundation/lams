@@ -141,9 +141,6 @@ input.groupName {
 	width: 95%;
 }
 
-div#infoDialog .modal-content {
-}
-
 div#infoDialog .modal-header {
 	padding-top: 5px;
 	padding-bottom: 5px;
@@ -445,42 +442,77 @@ table#authoringTable {
 	table-layout: fixed;
 	width: 100%;
 }
-
-td#templateContainerCell {
-	width: 175px;
-	vertical-align: top;
+  
+table#authoringTable .template-drag-helper{
+	width : 200px;
+	height: 70px;
+	border: thin black solid !important;
+	z-index : 1;
+	cursor  : move;
 }
 
+td#templateContainerCell {
+  width: 200px;
+  vertical-align: top;
+}
 
 td#templateContainerCell #template-container-cell-dummy-placeholder {
   height: 22px;
 }
 
-div.templateContainer {
-	display: none;
-	overflow: auto;
-	border: $border-thin-default;
-	border-radius: 3px;
+td#templateContainerCell div.templateContainer {
+  display: none;
+  overflow: auto;
 }
 
-div.template {
-	min-height: 45px;
-	border-bottom: $border-thin-default;
+td#templateContainerCell div.template {
+  min-height: 65px;
+  border-bottom: thin solid #cecdcd;
+  cursor: pointer;
+}
+  
+  
+td#templateContainerCell div.template:hover{
+	background-color: #eeeeee; 
+}
+
+td#templateContainerCell div.template .media {
+  margin-top: 0px;
+  padding: 12px 5px 5px 5px; 
+  font-size: larger;
+}
+
+td#templateContainerCell div.template .media img {
+  width: 50px;
+  height: 40px;
+}
+
+td#templateContainerCell .panel-heading {
 	cursor: pointer;
 }
 
-.tooltemplate :hover {
-	background-color:$gray-lighter;
+td#templateContainerCell #collapse-heading-tool-category-1 {
+	background-color: #caddfb;
 }
 
-.tooltemplate .media {
-	margin-top: 0px;
-	padding: 8px 0px 5px 5px;
+td#templateContainerCell #collapse-heading-tool-category-2 {
+	background-color: #ffffbb;
 }
 
-.tooltemplate .media img {
-	width: 30px;
-	height: 30px;
+td#templateContainerCell #collapse-heading-tool-category-3 {
+	background-color: rgba(45, 188, 233, 0.25);
+}
+
+td#templateContainerCell #collapse-heading-tool-category-4 {
+	background-color: rgb(255, 114, 172, 0.25);
+}
+
+td#templateContainerCell #collapse-heading-tool-category-5 {
+	background-color: #f0f8ff;
+}
+
+td#templateContainerCell #collapse-heading-tool-category-6 {
+	background-color: rgba(26, 217, 178, 0.25);
 }
 
 td#canvasContainerCell {
