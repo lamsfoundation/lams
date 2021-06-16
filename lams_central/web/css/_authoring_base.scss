@@ -466,7 +466,11 @@ td#templateContainerCell #template-container-collapse i.fa {
 	font-size: 20px;
 	cursor: pointer;
 }
- 
+   
+td#templateContainerCell #template-categories-collapse-button {
+	margin-left: 155px;
+}
+
 td#templateContainerCell #template-container-panel-group {
 	overflow-x: hidden;
 	overflow-y: auto;

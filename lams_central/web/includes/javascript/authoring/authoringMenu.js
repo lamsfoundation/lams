@@ -223,19 +223,6 @@ var MenuLib = {
 	},
 	
 	/**
-	 * Hide / show activity toolbar on the left
-	 */
-	toggleTemplateContainer : function(){
-		var templateContainerCell = $('#templateContainerCell');
-		templateContainerCell.animate({
-			'width': templateContainerCell.width() > 0 ? 0 : 200
-		}, function(){
-			templateContainerCell.find('#template-container-collapse i.fa').toggleClass('fa-arrow-circle-o-left fa-arrow-circle-o-right');
-			GeneralLib.resizePaper();
-		});
-	},
-	
-	/**
 	 * Mark an activity as ready for pasting.
 	 */
 	copyActivity : function(){
@@ -592,7 +579,6 @@ var MenuLib = {
 		layout.ldStoreDialog.modal('show');
 	},
 	
-	
 	/**
 	 * Expands/collapses description field.
 	 */
@@ -603,6 +589,37 @@ var MenuLib = {
 		});
 	},
 	
+	/**
+	 * Hide / show contents of all ativity categories in the toolbar on the left
+	 */
+	toggleExpandTemplateCategories : function(){
+		var collapseCategoriesButton = $('#template-container-collapse #template-categories-collapse-button'),
+			isExpanded = collapseCategoriesButton.hasClass('fa-arrow-circle-o-up');
+		$('#template-container-panel-group .collapse').collapse(isExpanded ? 'hide' : 'show');
+		collapseCategoriesButton.toggleClass('fa-arrow-circle-o-down fa-arrow-circle-o-up');
+	},
+	
+	/**
+	 * Hide / show activity toolbar on the left
+	 */
+	toggleTemplateContainer : function(){
+		var templateContainerCell = $('#templateContainerCell'),
+			isExpanded = templateContainerCell.width();
+
+		if (isExpanded) {
+			$('#template-container-collapse #template-categories-collapse-button', templateContainerCell).hide();
+		}
+
+		templateContainerCell.animate({
+			'width': isExpanded > 0 ? 0 : 200
+		}, function(){
+			$('#template-container-collapse #template-container-collapse-button', templateContainerCell).toggleClass('fa-arrow-circle-o-left fa-arrow-circle-o-right');
+			if (!isExpanded) {
+				$('#template-container-collapse #template-categories-collapse-button', templateContainerCell).show();
+			}
+			GeneralLib.resizePaper();
+		});
+	},
 	
 	/**
 	 * Opens a pop up for template window that generates a learning design
