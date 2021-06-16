@@ -460,6 +460,7 @@ td#templateContainerCell {
 
 td#templateContainerCell #template-container-collapse {
 	padding-left: 5px;
+	border-bottom: thin solid #cecdcd;
 }
 
 td#templateContainerCell #template-container-collapse i.fa {
@@ -476,9 +477,14 @@ td#templateContainerCell #template-container-panel-group {
 	overflow-y: auto;
 }
 
+td#templateContainerCell #template-container-panel-group .panel {
+	border-top: none;
+}
+
 td#templateContainerCell div.template {
   min-height: 65px;
   border-bottom: thin solid #cecdcd;
+  border-right: thin solid #cecdcd;
   cursor: pointer; }
 
 td#templateContainerCell div.template .media {
