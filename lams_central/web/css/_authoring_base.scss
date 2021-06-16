@@ -443,12 +443,14 @@ table#authoringTable {
 	width: 100%;
 }
   
-table#authoringTable .template-drag-helper{
-	width : 200px;
-	height: 70px;
-	border: thin black solid !important;
-	z-index : 1;
-	cursor  : move;
+
+table#authoringTable .template-drag-helper {
+  width: 200px;
+  height: 70px;
+  border: thin black solid !important;
+  background-color: white !important;
+  z-index: 1;
+  cursor: move; 
 }
 
 td#templateContainerCell {
@@ -464,59 +466,68 @@ td#templateContainerCell #template-container-collapse i.fa {
 	font-size: 20px;
 	cursor: pointer;
 }
+ 
+td#templateContainerCell #template-container-panel-group {
+	overflow-x: hidden;
+	overflow-y: auto;
+}
 
 td#templateContainerCell div.template {
   min-height: 65px;
   border-bottom: thin solid #cecdcd;
-  cursor: pointer;
-}
-  
-  
-td#templateContainerCell div.template:hover{
-	background-color: #eeeeee; 
-}
+  cursor: pointer; }
 
 td#templateContainerCell div.template .media {
   margin-top: 0px;
-  padding: 12px 5px 5px 5px; 
-  font-size: 16px; 
-}
+  padding: 12px 5px 5px 5px;
+  font-size: 16px; }
 
 td#templateContainerCell div.template .media img {
   width: 50px;
-  height: 40px;
-}
+  height: 40px; }
 
 td#templateContainerCell .panel-heading {
   cursor: pointer;
   background-color: white;
   font-size: 16px;
-}
+  padding-bottom: 4px; }
 
 td#templateContainerCell #collapse-heading-tool-category-1 {
-  border-bottom: 5px solid #caddfb;
-}
-
+  border-bottom: 10px solid #caddfb; }
+  
+td#templateContainerCell #collapse-heading-tool-category-1 div.template:hover {
+  background-color: #caddfb; }
+  
 td#templateContainerCell #collapse-heading-tool-category-2 {
- border-bottom: 10px solid #ffffbb;
-}
+  border-bottom: 10px solid #ffffbb; }
 
+td#templateContainerCell #collapse-tool-category-2 div.template:hover {
+  background-color: #ffffbb; }
+  
 td#templateContainerCell #collapse-heading-tool-category-3 {
-  border-bottom: 10px solid rgba(45, 188, 233, 0.25);
-}
+  border-bottom: 10px solid rgba(45, 188, 233, 0.25); }
 
+td#templateContainerCell #collapse-tool-category-3 div.template:hover {
+  background-color: rgba(45, 188, 233, 0.25); }
+  
 td#templateContainerCell #collapse-heading-tool-category-4 {
-  border-bottom: 10px solid rgba(255, 114, 172, 0.25);
-}
+  border-bottom: 10px solid rgba(255, 114, 172, 0.25); }
 
+td#templateContainerCell #collapse-tool-category-4 div.template:hover {
+  background-color: rgba(255, 114, 172, 0.25); }
+  
 td#templateContainerCell #collapse-heading-tool-category-5 {
-  border-bottom: 10px solid #f0f8ff;
-}
+  border-bottom: 10px solid #f0f8ff; }
 
+td#templateContainerCell #collapse-tool-category-5 div.template:hover {
+  background-color: #f0f8ff; }
+  
 td#templateContainerCell #collapse-heading-tool-category-6 {
-  border-bottom: 10px solid rgba(26, 217, 178, 0.25);
-}
+  border-bottom: 10px solid rgba(26, 217, 178, 0.25); }
 
+td#templateContainerCell #collapse-tool-category-6 div.template:hover {
+  background-color: rgba(26, 217, 178, 0.25); }
+  
 
 td#canvasContainerCell {
 	vertical-align: top;

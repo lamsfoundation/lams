@@ -252,7 +252,7 @@ GeneralInitLib = {
 							activityCategoryID = layout.toolMetadata[learningLibraryID].activityCategoryID,
 					    	x = draggable.offset.left  + canvas.scrollLeft() - canvas.offset().left,
 					    	y = draggable.offset.top   + canvas.scrollTop()  - canvas.offset().top,
-					    	label = $('#toolDisplayName', draggable.draggable).text().trim(),
+					    	label = $('.tool-display-name', draggable.draggable).text().trim(),
 					    	activity = null,
 					    	translatedEvent = GeneralLib.translateEventOnCanvas(event),
 							eventX = translatedEvent[0],
@@ -264,7 +264,7 @@ GeneralInitLib = {
 					    	layout.toolMetadata[learningLibraryID].parallelChildActivityDefs.each(function(){
 					    		var childLearningLibraryID = +$(this).attr('learningLibraryId'),
 					    			childToolID = +$(this).attr('toolId'),
-					    			toolLabel = $('#toolDisplayName', this).text().trim(),
+					    			toolLabel = $('.tool-display-name', this).text().trim(),
 					    			childActivity = new ActivityDefs.ToolActivity(null, null, null,
 					    					childToolID, childLearningLibraryID, null, x, y, toolLabel);
 					    	
