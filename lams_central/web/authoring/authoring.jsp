@@ -499,7 +499,7 @@
 						 onClick="javascript:MenuLib.toggleDescriptionDiv()">
 						<span id="ldDescriptionFieldTitle"><fmt:message key="authoring.fla.page.ld.title" /></span>
 						<span id="ldDescriptionFieldModified"></span>
-						<span id="ldDescriptionHideTip">?</span>
+						<span id="ldDescriptionHideTip">&#9660;</span>
 					</div>
 					<div id="ldDescriptionDetails">
 						<div class="ldDescriptionLabel"><label for="ldDescriptionFieldDescription"><fmt:message key="authoring.fla.page.ld.description" /></label><p class="text-muted"><i class="text-primary fa fa-info-circle" aria-hidden="true"></i> <fmt:message key="authoring.fla.page.ld.description.placeholder" /></p></div>
