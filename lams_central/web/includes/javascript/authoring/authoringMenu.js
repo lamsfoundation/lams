@@ -583,8 +583,8 @@ var MenuLib = {
 	 * Expands/collapses description field.
 	 */
 	toggleDescriptionDiv: function() {
+		$('#ldDescriptionHideTip').toggleClass('fa-chevron-circle-down fa-chevron-circle-up')
 		$('#ldDescriptionDetails').slideToggle(function(){
-			$('#ldDescriptionHideTip').text($(this).is(':visible') ? '▲' : '▼');
 			$('.templateContainer').height($('#ldDescriptionDiv').height() + $('#canvas').height() - 10);
 		});
 	},
@@ -607,7 +607,7 @@ var MenuLib = {
 			isExpanded = templateContainerCell.width();
 
 		if (isExpanded) {
-			$('#template-container-collapse #template-categories-collapse-button', templateContainerCell).hide();
+			$('#template-container-collapse #template-categories-collapse-button', templateContainerCell).css('visibility', 'hidden');
 		}
 
 		templateContainerCell.animate({
@@ -615,7 +615,7 @@ var MenuLib = {
 		}, function(){
 			$('#template-container-collapse #template-container-collapse-button', templateContainerCell).toggleClass('fa-chevron-circle-left fa-chevron-circle-right');
 			if (!isExpanded) {
-				$('#template-container-collapse #template-categories-collapse-button', templateContainerCell).show();
+				$('#template-container-collapse #template-categories-collapse-button', templateContainerCell).css('visibility', '');
 			}
 			GeneralLib.resizePaper();
 		});

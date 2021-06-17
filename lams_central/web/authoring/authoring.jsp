@@ -299,7 +299,10 @@
 	</div>
 	
 	<div id="toolbar" class="buttons btn-group-sm">
-	
+		<button id="activitiesToolbarButton" class="btn btn-primary" onClick="javascript:MenuLib.toggleTemplateContainer()">
+			Activities
+		</button>
+		
 		<div class="btn-group btn-group-sm">
 			<button id="newButton" class="btn btn-default desktopButton" onClick="javascript:GeneralLib.newLearningDesign(false)">
 				<i class="fa fa-plus"></i> 
@@ -365,7 +368,7 @@
 			<i class="fa fa-long-arrow-right"></i> 
 			<span><fmt:message key="authoring.fla.page.menu.transition" /></span>
 		</button>
-
+		<!-- 
 		<div class="btn-group btn-group-sm desktopButton" role="group">
 		  <button class="btn btn-default dropdown-toggle" type="button" id="optionalButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 		  	<i class="fa fa-check-square-o"></i>
@@ -394,7 +397,8 @@
 			<i class="fa fa-group"></i> 
 			<span><fmt:message key="authoring.fla.page.menu.group" /></span>
 		</button>
-		
+		 -->
+		 
 		<div class="btn-group btn-group-sm desktopButton" role="group">
 		  <button class="btn btn-default dropdown-toggle" type="button" id="annotateButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 		  	<i class="fa fa-font"></i>
@@ -406,16 +410,16 @@
 		    <li id="annotateRegionButton" onClick="javascript:MenuLib.addAnnotationRegion()"><a href="#"><fmt:message key="authoring.fla.page.menu.annotate.region" /></a></li>
 		  </ul>
 		</div>
+			
+		<button id="arrangeButton" class="btn btn-default desktopButton" onClick="javascript:GeneralLib.arrangeActivities()">
+			<i class="fa fa-th"></i> 
+			<span><fmt:message key="authoring.fla.page.menu.arrange" /></span>
+		</button>
 		
 		<button id="weightButton" class="btn btn-default desktopButton" onClick="javascript:MenuLib.openWeights()">
 			<i class="fa fa-balance-scale"></i> 
 			<span><fmt:message key="authoring.fla.weights.menu" /></span>
 		</button>	
-		
-		<button id="arrangeButton" class="btn btn-default desktopButton" onClick="javascript:GeneralLib.arrangeActivities()">
-			<i class="fa fa-th"></i> 
-			<span><fmt:message key="authoring.fla.page.menu.arrange" /></span>
-		</button>
 		
 		<button id="questionBankButton" class="btn btn-default desktopButton" onClick="javascript:MenuLib.openQuestionBank()">
 			<i class="fa fa-bank"></i> 
@@ -435,9 +439,6 @@
 		<tr>
 			<td id="templateContainerCell">
 				<div id="template-container-collapse">
-					<i id="template-container-collapse-button" class="fa fa-chevron-circle-left" 
-					   title="<fmt:message key='authoring.fla.tool.bar.expand' />"	
-					   onClick="javascript:MenuLib.toggleTemplateContainer()"></i>
 					<i id="template-categories-collapse-button" class="fa fa-chevron-circle-down"
 					   title="<fmt:message key='authoring.fla.tool.category.expand' />"	
 					   onClick="javascript:MenuLib.toggleExpandTemplateCategories()"></i>
@@ -481,12 +482,14 @@
 							 	style="display: none"
 							 </c:if>
 							 >
-							<div class="media">
-  								<div class="media-left img-${tool.learningLibraryId}">
-  									<img src="<lams:LAMSURL/>${tool.iconPath}" />
-  								</div>
-  								<div class="media-body media-middle tool-display-name">
-									<c:out value="${tool.toolDisplayName}" />
+							 <div>
+								<div class="media">
+	  								<div class="media-left img-${tool.learningLibraryId}">
+	  									<img src="<lams:LAMSURL/>${tool.iconPath}" />
+	  								</div>
+	  								<div class="media-body media-middle tool-display-name">
+										<c:out value="${tool.toolDisplayName}" />
+									</div>
 								</div>
 							</div>
 						</div>
@@ -495,11 +498,11 @@
 			</td>
 			<td id="canvasContainerCell">
 				<div id="ldDescriptionDiv">
-					<div id="ldDescriptionTitleContainer" title='<fmt:message key="authoring.fla.page.ld.title.desc" /> '
-						 onClick="javascript:MenuLib.toggleDescriptionDiv()">
+					<div id="ldDescriptionTitleContainer">
 						<span id="ldDescriptionFieldTitle"><fmt:message key="authoring.fla.page.ld.title" /></span>
 						<span id="ldDescriptionFieldModified"></span>
-						<span id="ldDescriptionHideTip">&#9660;</span>
+						<i id="ldDescriptionHideTip" class="fa fa-chevron-circle-down" title='<fmt:message key="authoring.fla.page.ld.title.desc" /> '
+						   onClick="javascript:MenuLib.toggleDescriptionDiv()"></i>
 					</div>
 					<div id="ldDescriptionDetails">
 						<div class="ldDescriptionLabel"><label for="ldDescriptionFieldDescription"><fmt:message key="authoring.fla.page.ld.description" /></label><p class="text-muted"><i class="text-primary fa fa-info-circle" aria-hidden="true"></i> <fmt:message key="authoring.fla.page.ld.description.placeholder" /></p></div>
