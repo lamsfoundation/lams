@@ -460,13 +460,13 @@ td#templateContainerCell {
 }
 
 td#templateContainerCell #template-container-collapse {
-	padding-left: 5px;
-	border-bottom: thin solid #cecdcd;
+  padding: 1px 0 1px 5px;
+  border-bottom: thin solid #cecdcd;
 }
 
 td#templateContainerCell #template-container-collapse i.fa {
-	font-size: 20px;
-	cursor: pointer;
+  color: #6f6e6e;
+  cursor: pointer;
 }
    
 td#templateContainerCell #template-categories-collapse-button {

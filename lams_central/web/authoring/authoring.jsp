@@ -435,8 +435,12 @@
 		<tr>
 			<td id="templateContainerCell">
 				<div id="template-container-collapse">
-					<i id="template-container-collapse-button" class="fa fa-arrow-circle-o-left" onClick="javascript:MenuLib.toggleTemplateContainer()"></i>
-					<i id="template-categories-collapse-button" class="fa fa-arrow-circle-o-down" onClick="javascript:MenuLib.toggleExpandTemplateCategories()"></i>
+					<i id="template-container-collapse-button" class="fa fa-chevron-circle-left" 
+					   title="<fmt:message key='authoring.fla.tool.bar.expand' />"	
+					   onClick="javascript:MenuLib.toggleTemplateContainer()"></i>
+					<i id="template-categories-collapse-button" class="fa fa-chevron-circle-down"
+					   title="<fmt:message key='authoring.fla.tool.category.expand' />"	
+					   onClick="javascript:MenuLib.toggleExpandTemplateCategories()"></i>
 				</div>
 				<div id="template-container-panel-group" class="templateContainer scrollable panel-group" role="tablist" aria-multiselectable="true">
 				

@@ -594,9 +594,9 @@ var MenuLib = {
 	 */
 	toggleExpandTemplateCategories : function(){
 		var collapseCategoriesButton = $('#template-container-collapse #template-categories-collapse-button'),
-			isExpanded = collapseCategoriesButton.hasClass('fa-arrow-circle-o-up');
+			isExpanded = collapseCategoriesButton.hasClass('fa-chevron-circle-up');
 		$('#template-container-panel-group .collapse').collapse(isExpanded ? 'hide' : 'show');
-		collapseCategoriesButton.toggleClass('fa-arrow-circle-o-down fa-arrow-circle-o-up');
+		collapseCategoriesButton.toggleClass('fa-chevron-circle-down fa-chevron-circle-up');
 	},
 	
 	/**
@@ -613,7 +613,7 @@ var MenuLib = {
 		templateContainerCell.animate({
 			'width': isExpanded > 0 ? 0 : 200
 		}, function(){
-			$('#template-container-collapse #template-container-collapse-button', templateContainerCell).toggleClass('fa-arrow-circle-o-left fa-arrow-circle-o-right');
+			$('#template-container-collapse #template-container-collapse-button', templateContainerCell).toggleClass('fa-chevron-circle-left fa-chevron-circle-right');
 			if (!isExpanded) {
 				$('#template-container-collapse #template-categories-collapse-button', templateContainerCell).show();
 			}
