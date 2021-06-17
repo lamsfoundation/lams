@@ -476,6 +476,7 @@ td#templateContainerCell #template-categories-collapse-button {
 td#templateContainerCell #template-container-panel-group {
 	overflow-x: hidden;
 	overflow-y: auto;
+	background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2720%27%20height%3D%2720%27%3E%0D%0A%20%20%3Crect%20width%3D%2720%27%20height%3D%2720%27%20fill%3D%27%23fefefe%27%2F%3E%0D%0A%3Crect%20x%3D%2710%27%20y%3D%2710%27%20width%3D%271.5%27%20height%3D%271.5%27%20fill%3D%27%23b6b6b6%27%2F%3E%0D%0A%3C%2Fsvg%3E");
 }
 
 td#templateContainerCell #template-container-panel-group .panel {
@@ -484,9 +485,11 @@ td#templateContainerCell #template-container-panel-group .panel {
 
 td#templateContainerCell div.template {
   min-height: 65px;
+  background-color: white;
   border-bottom: thin solid #cecdcd;
   border-right: thin solid #cecdcd;
-  cursor: pointer; }
+  cursor: pointer;
+}
 
 td#templateContainerCell div.template .media {
   margin-top: 0px;
