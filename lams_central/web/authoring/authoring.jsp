@@ -299,9 +299,8 @@
 	</div>
 	
 	<div id="toolbar" class="buttons btn-group-sm">
-		<button id="activitiesToolbarButton" class="btn btn-primary" onClick="javascript:MenuLib.toggleTemplateContainer()">
-			Activities
-		</button>
+		<i id="activitiesToolbarButton" onClick="javascript:MenuLib.toggleTemplateContainer()" class="fa fa-bars"
+		   title="<fmt:message key='authoring.fla.tool.bar.expand' />"></i>
 		
 		<div class="btn-group btn-group-sm">
 			<button id="newButton" class="btn btn-default desktopButton" onClick="javascript:GeneralLib.newLearningDesign(false)">
@@ -432,7 +431,7 @@
 			<span><fmt:message key="authoring.fla.page.menu.preview" /></span>
 		</button>
 
-		<a id="helpButton" class="btn btn-xs btn-default pull-right" target="_blank" href="<%=Configuration.get(ConfigurationKeys.HELP_URL)%>/authoring"><i class="fa fa-question-circle text-primary"></i></a>
+		<a id="helpButton" class="btn btn-xs btn-default" target="_blank" href="<%=Configuration.get(ConfigurationKeys.HELP_URL)%>/authoring"><i class="fa fa-question-circle text-primary"></i></a>
 	</div>
 	
 	<table id="authoringTable">

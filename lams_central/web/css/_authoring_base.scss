@@ -437,7 +437,8 @@ div#weightsDialogContents input {
 div#toolbar {
   text-align: center;
   padding-top: 15px;
-  padding-bottom: 15px; }
+  padding-bottom: 15px;
+  position: relative; }
 
 div#toolbar button {
   box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
@@ -456,7 +457,12 @@ div#toolbar > button, div#toolbar > a, div#toolbar .btn-group button.dropdown-to
   border-bottom-right-radius: 45px; }
 
 div#toolbar #activitiesToolbarButton {
-	margin-right: 30px;
+  position: absolute;
+  left: 20px;
+  font-size: 25px;
+  top: 18px;
+  background-color: white;
+  cursor: pointer;
 }
 
 div#toolbar ul.dropdown-menu {
