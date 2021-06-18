@@ -438,7 +438,6 @@ div#toolbar {
   text-align: center;
   padding-top: 15px;
   padding-bottom: 15px;
-  position: relative;
   }
 
 div#toolbar button {
@@ -457,10 +456,9 @@ div#toolbar > button, div#toolbar > a, div#toolbar .btn-group button.dropdown-to
   border-bottom-right-radius: 45px; }
 
 div#toolbar #activitiesToolbarButton {
-  position: absolute;
-  left: 20px;
+  float: left;
+  margin: 4px 20px 0 20px;
   font-size: 25px;
-  top: 18px;
   background-color: white;
   cursor: pointer;
 }
