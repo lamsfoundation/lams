@@ -2883,8 +2883,8 @@ GeneralLib = {
 		// next runs use the regular window height
 		layout.initWindowHeight = null;
 		// height of window minus toolbar, padding...
-		$('.templateContainer').height(windowHeight - 80);
-		$('#canvas').height(windowHeight - 75)
+		$('.templateContainer').height(windowHeight - 105);
+		$('#canvas').height(windowHeight - 85);
 		// width of window minus templates on the left; minimum is toolbar width so it does not collapse
 		// .width(Math.max($('#toolbar').width() - 200, $(window).width() - $('#templateContainerCell').width()));
 		
