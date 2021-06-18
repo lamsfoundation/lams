@@ -325,7 +325,7 @@
 				<span class="caret"></span>
 				<span class="sr-only">Toggle Dropdown</span>
 			</button>
-			<ul class="dropdown-menu desktopButton">
+			<ul class="dropdown-menu dropdown-menu-right desktopButton">
 				<li id="importSequenceButton" onClick="javascript:MenuLib.importLearningDesign()"><a href="#"><fmt:message key="authoring.fla.page.menu.import" /></a></li>
 				<li id="importPartSequenceButton" onClick="javascript:MenuLib.importPartLearningDesign()"><a href="#"><fmt:message key="authoring.fla.page.menu.import.part" /></a></li>
 			</ul>
@@ -341,7 +341,7 @@
 				<span class="caret"></span>
 				<span class="sr-only">Toggle Dropdown</span>
 			</button>
-			<ul class="dropdown-menu desktopButton">
+			<ul class="dropdown-menu dropdown-menu-right desktopButton">
 				<li id="saveAsButton" onClick="javascript:MenuLib.saveLearningDesign(true)"><a href="#"><fmt:message key="authoring.fla.page.menu.saveas" /></a></li>
 				<li id="exportLamsButton" onClick="javascript:MenuLib.exportLearningDesign(1)"><a href="#"><fmt:message key="authoring.fla.page.menu.export.lams" /></a></li>
 			</ul>
@@ -404,7 +404,7 @@
 		    <span><fmt:message key="authoring.fla.page.menu.annotate" /></span>
 		    <span class="caret"></span>
 		  </button>
-		  <ul class="dropdown-menu" aria-labelledby="annotateButton">
+		  <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="annotateButton">
 		    <li id="annotateLabelButton" onClick="javascript:MenuLib.addAnnotationLabel()"><a href="#"><fmt:message key="authoring.fla.page.menu.annotate.label" /></a></li>
 		    <li id="annotateRegionButton" onClick="javascript:MenuLib.addAnnotationRegion()"><a href="#"><fmt:message key="authoring.fla.page.menu.annotate.region" /></a></li>
 		  </ul>
