@@ -435,11 +435,9 @@ div#weightsDialogContents input {
 
 /**** Main authoring styles ****/
 div#toolbar {
-  display: flex;
-  justify-content: center;
+  text-align: center;
   padding-top: 15px;
-  padding-bottom: 15px;
-}
+  padding-bottom: 15px; }
 
 div#toolbar button {
   box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
