@@ -465,6 +465,11 @@ div#toolbar #activitiesToolbarButton {
   cursor: pointer;
 }
 
+div#toolbar #helpButton {
+	float: right;
+	margin-right: 10px;
+}
+
 div#toolbar ul.dropdown-menu {
 	background-color: transparent;
 	border: none;
