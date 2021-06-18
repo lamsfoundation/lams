@@ -448,17 +448,17 @@
 						<div class="panel panel-default">
 					 	  <div class="panel-heading" role="tab" id="collapse-heading-tool-category-${toolCategoryId}"
 					 	  		data-toggle="collapse" href="#collapse-tool-category-${toolCategoryId}" 
-								aria-expanded="false" aria-controls="collapse-tool-category-${toolCategoryId}"
-								data-parent="#template-container-panel-group">
+								aria-expanded="false" aria-controls="collapse-tool-category-${toolCategoryId}">
 					 	  		<span class="panel-title">
 									<fmt:message key="authoring.fla.tool.category.${toolCategoryId}" />
 					 	  		</span>
+					 	  		<div class="collapse-heading-bottom-border"></div>
 					 	  </div>
-					  	</div>
 						 
-					    <div id="collapse-tool-category-${toolCategoryId}" class="panel-collapse collapse" 
-				       	    role="tabpanel" aria-labelledby="collapse-heading-tool-category-${toolCategoryId}">
-				        </div>
+						  <div id="collapse-tool-category-${toolCategoryId}" class="panel-collapse collapse" 
+					       	   role="tabpanel" aria-labelledby="collapse-heading-tool-category-${toolCategoryId}">
+					      </div>
+					   </div>
 					</c:forTokens>
 						
 					<c:forEach var="tool" items="${tools}">

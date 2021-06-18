@@ -608,15 +608,21 @@ var MenuLib = {
 
 		if (isExpanded) {
 			$('#template-container-collapse #template-categories-collapse-button', templateContainerCell).css('visibility', 'hidden');
+		} else {
+			templateContainerCell.show();
 		}
 
 		templateContainerCell.animate({
 			'width': isExpanded > 0 ? 0 : 200
 		}, function(){
 			$('#template-container-collapse #template-container-collapse-button', templateContainerCell).toggleClass('fa-chevron-circle-left fa-chevron-circle-right');
-			if (!isExpanded) {
+			if (isExpanded) {
+				templateContainerCell.hide();
+			} else {
 				$('#template-container-collapse #template-categories-collapse-button', templateContainerCell).css('visibility', '');
+				
 			}
+			
 			GeneralLib.resizePaper();
 		});
 	},

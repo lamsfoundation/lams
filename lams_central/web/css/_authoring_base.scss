@@ -438,15 +438,15 @@ div#toolbar {
   text-align: center;
   padding-top: 15px;
   padding-bottom: 15px;
-  position: relative; }
+  position: relative;
+  }
 
 div#toolbar button {
   box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
-  outline: none;  
-}
+  outline: none; }
+
 div#toolbar > button, div#toolbar .btn-group {
-  margin-right: 5px;
-}
+  margin-right: 5px; }
 
 div#toolbar > button, div#toolbar > a, div#toolbar .btn-group button:first-child {
   border-top-left-radius: 45px;
@@ -471,21 +471,19 @@ div#toolbar #helpButton {
 }
 
 div#toolbar ul.dropdown-menu {
-	background-color: transparent;
-	border: none;
-	box-shadow: none;
-}
+  background-color: transparent;
+  border: none;
+  box-shadow: none; }
 
 div#toolbar ul.dropdown-menu li {
-	background-color: white;
-	border: thin solid #ccc;
-	border-radius: 45px;
-	margin-bottom: 10px;
-	outline: none;
-}
+  background-color: white;
+  border: thin solid #ccc;
+  border-radius: 45px;
+  margin-bottom: 10px;
+  outline: none; }
+
 div#toolbar ul.dropdown-menu li > a {
-	border-radius: 45px;	
-}
+  border-radius: 45px; }
 
 #cancelLiveEditButton {
   display: none; }
@@ -494,106 +492,117 @@ table#authoringTable {
   table-layout: fixed;
   width: 100%; }
 
-table#authoringTable .template-drag-helper {
-  width: 200px;
-  height: 70px;
-  border: thin black solid !important;
-  background-color: white !important;
-  z-index: 1;
-  cursor: move; }
-
 td#templateContainerCell {
-  width: 200px;
+  width: 210px;
   vertical-align: top;
-  user-select: none; }
+  user-select: none;
+}
 
 td#templateContainerCell #template-container-collapse {
-  padding: 1px 0 1px 5px;
- }
+  padding: 1px 0 1px 5px; }
 
 td#templateContainerCell #template-container-collapse i.fa {
   color: #6f6e6e;
   cursor: pointer; }
 
 td#templateContainerCell #template-categories-collapse-button {
-	margin-left: 182px;
-	visibility: hidden;
-}
+  margin-left: 171px;
+  visibility: hidden; }
 
 td#templateContainerCell:hover #template-categories-collapse-button {
-	visibility: visible;
-}
+  visibility: visible; }
 
 td#templateContainerCell #template-container-panel-group {
   overflow-x: hidden;
-  overflow-y: auto; }
+  overflow-y: auto;
+  padding-right: 10px;
+}
+  
+td#templateContainerCell #template-container-panel-group::-webkit-scrollbar {
+  width: 10px;
+}
+
+td#templateContainerCell #template-container-panel-group::-webkit-scrollbar-thumb {
+  background: #e6e6e6;
+}
+
+td#templateContainerCell #template-container-panel-group::-webkit-scrollbar-thumb:hover {
+  background: #cecdcd;
+}
+
+td#templateContainerCell #template-container-panel-group > .panel {
+  background-color: transparent;
+  border: none;
+  border-top-right-radius: 30px;
+  border-bottom-right-radius: 30px;
+  box-shadow: none;
+}
+
+td#templateContainerCell #template-container-panel-group > .panel:not(:first-child) {
+  margin-top: 10px; }
   
 td#templateContainerCell #template-container-panel-group .panel-heading {
   cursor: pointer;
   background-color: white;
   font-size: 16px;
-  padding-bottom: 4px;
-  border-radius: 30px;
+  padding: 7px 10px 0 0;
+  border: thin solid #cecdcd;
+  border-left: none;
+  border-top-right-radius: 30px;
+  border-bottom-right-radius: 30px;
+ }
+
+td#templateContainerCell #template-container-panel-group .panel-title {
+	padding-left: 10px;
 }
 
-td#templateContainerCell #template-container-panel-group > .panel {
-  border: none;
-  background-color: transparent;
-  box-shadow: none;
-}
-  
-td#templateContainerCell #template-container-panel-group > .panel:not(:first-child) {
-	margin-top: 10px;
+td#templateContainerCell #template-container-panel-group .collapse-heading-bottom-border {
+	height: 5px;
+	border-radius: 15px;
 }
 
-td#templateContainerCell #collapse-heading-tool-category-1 {
-  border: 5px solid #caddfb; }
 
+td#templateContainerCell #template-container-panel-group .panel-collapse {
+	background-color: transparent;	
+}
+
+td#templateContainerCell #collapse-heading-tool-category-1 .collapse-heading-bottom-border,
 td#templateContainerCell #collapse-heading-tool-category-1 div.template:hover > div {
   background-color: #caddfb; }
 
-td#templateContainerCell #collapse-heading-tool-category-2 {
-  border: 5px solid #ffffbb; }
-
+td#templateContainerCell #collapse-heading-tool-category-2 .collapse-heading-bottom-border,
 td#templateContainerCell #collapse-tool-category-2 div.template:hover > div {
   background-color: #ffffbb; }
 
-td#templateContainerCell #collapse-heading-tool-category-3 {
-  border: 5px solid rgba(45, 188, 233, 0.25); }
-
+td#templateContainerCell #collapse-heading-tool-category-3 .collapse-heading-bottom-border,
 td#templateContainerCell #collapse-tool-category-3 div.template:hover > div {
   background-color: rgba(45, 188, 233, 0.25); }
 
-td#templateContainerCell #collapse-heading-tool-category-4 {
-  border: 5px solid rgba(255, 114, 172, 0.25); }
-
+td#templateContainerCell #collapse-heading-tool-category-4 .collapse-heading-bottom-border,
 td#templateContainerCell #collapse-tool-category-4 div.template:hover > div {
   background-color: rgba(255, 114, 172, 0.25); }
 
-td#templateContainerCell #collapse-heading-tool-category-5 {
-  border: 5px solid #f0f8ff; }
-
+td#templateContainerCell #collapse-heading-tool-category-5 .collapse-heading-bottom-border,
 td#templateContainerCell #collapse-tool-category-5 div.template:hover > div {
   background-color: #f0f8ff; }
 
-td#templateContainerCell #collapse-heading-tool-category-6 {
-  border: 5px solid rgba(26, 217, 178, 0.25); }
-
+td#templateContainerCell #collapse-heading-tool-category-6 .collapse-heading-bottom-border,
 td#templateContainerCell #collapse-tool-category-6 div.template:hover > div {
   background-color: rgba(26, 217, 178, 0.25); }
-  
+
 td#templateContainerCell div.template > div {
-	height: 100%;
-	border-radius: 15px;
-	border: thin solid #cecdcd;
+  height: 100%;
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 15px;
+  border: thin solid #cecdcd;
+  border-left: none;
 }
 
 td#templateContainerCell div.template {
   height: 65px;
-  margin-top: 10px;
+  margin-top: 5px;
   cursor: pointer;
-  background-color: white;	
-}
+  background-color: white; }
 
 td#templateContainerCell div.template .media {
   margin-top: 0px;
@@ -604,6 +613,20 @@ td#templateContainerCell div.template .media img {
   width: 50px;
   height: 40px; }
   
+table#authoringTable .template-drag-helper {
+  width: 200px;
+  height: 80px !important;
+  z-index: 1;
+  cursor: move;
+  border-radius: 15px;
+}
+
+table#authoringTable .template-drag-helper > div {
+  padding-top: 5px;
+  border: thin solid #cecdcd !important;
+  border-radius: 15px;
+}
+
 td#canvasContainerCell {
 	vertical-align: top;
 }
