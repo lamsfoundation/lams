@@ -303,9 +303,10 @@
 		   title="<fmt:message key='authoring.fla.tool.bar.expand' />"></i>
 		
 		<div class="btn-group btn-group-sm">
-			<button id="newButton" class="btn btn-default desktopButton" onClick="javascript:GeneralLib.newLearningDesign(false)">
+			<button id="newButton" class="btn btn-default desktopButton" onClick="javascript:GeneralLib.newLearningDesign(false)"
+			    	title="<fmt:message key="authoring.fla.page.menu.new" />">
 				<i class="fa fa-plus"></i> 
-				<span><fmt:message key="authoring.fla.page.menu.new" /></span>
+				<span class="hidden-sm hidden-xs"><fmt:message key="authoring.fla.page.menu.new" /></span>
 			</button>
 			<button id="newDropButton" type="button" class="btn btn-default desktopButton dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				<span class="caret"></span>
@@ -317,9 +318,10 @@
 		</div>
 		
 		<div class="btn-group btn-group-sm">
-			<button id="openButton" type="button" class="btn btn-default" onClick="javascript:MenuLib.openLearningDesign()">
+			<button id="openButton" type="button" class="btn btn-default" onClick="javascript:MenuLib.openLearningDesign()"
+			    	title="<fmt:message key="authoring.fla.page.menu.open" />">
 				<i class="fa fa-folder-open-o"></i>
-				<span><fmt:message key="authoring.fla.page.menu.open" /></span>
+				<span class="hidden-sm hidden-xs"><fmt:message key="authoring.fla.page.menu.open" /></span>
 			</button>
 			<button id="openDropButton" type="button" class="btn btn-default desktopButton dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				<span class="caret"></span>
@@ -333,9 +335,10 @@
 
 		<div class="btn-group btn-group-sm">
 			<button id="saveButton" type="button" class="btn btn-default" onClick="javascript:MenuLib.saveLearningDesign()"
-					data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='authoring.fla.page.menu.save' /></span>">
+					data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='authoring.fla.page.menu.save' /></span>"
+			    	title="<fmt:message key="authoring.fla.page.menu.save" />">
 				<i class="fa fa-save"></i>
-				<span><fmt:message key="authoring.fla.page.menu.save" /></span>
+				<span class="hidden-sm hidden-xs"><fmt:message key="authoring.fla.page.menu.save" /></span>
 			</button>
 			<button id="saveDropButton" type="button" class="btn btn-default desktopButton dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				<span class="caret"></span>
@@ -348,24 +351,28 @@
 		</div>
 		
 		<button id="cancelLiveEditButton" class="btn btn-default" onClick="javascript:GeneralLib.cancelLiveEdit()"
-				data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='authoring.fla.cancel.button' /></span>">
+				data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='authoring.fla.cancel.button' /></span>"
+			    title="<fmt:message key="authoring.fla.cancel.button" />">
 			<i class="fa fa-ban"></i> 
-			<span><fmt:message key="authoring.fla.cancel.button" /></span>
+			<span class="hidden-sm hidden-xs"><fmt:message key="authoring.fla.cancel.button" /></span>
 		</button>
 		<div class="btn-group btn-group-sm desktopButton" role="group">
-		<button id="copyButton" class="btn btn-default" onClick="javascript:MenuLib.copyActivity()">
+		<button id="copyButton" class="btn btn-default" onClick="javascript:MenuLib.copyActivity()"
+			    title="<fmt:message key="authoring.fla.page.menu.copy" />">
 			<i class="fa fa-copy"></i> 
-			<span><fmt:message key="authoring.fla.page.menu.copy" /></span>
+			<span class="hidden-sm hidden-xs"><fmt:message key="authoring.fla.page.menu.copy" /></span>
 		</button>
-		<button id="pasteButton" class="btn btn-default" onClick="javascript:MenuLib.pasteActivity()">
+		<button id="pasteButton" class="btn btn-default" onClick="javascript:MenuLib.pasteActivity()"
+			    title="<fmt:message key="authoring.fla.page.menu.paste" />">
 			<i class="fa fa-paste"></i> 
-			<span><fmt:message key="authoring.fla.page.menu.paste" /></span>
+			<span class="hidden-sm hidden-xs"><fmt:message key="authoring.fla.page.menu.paste" /></span>
 		</button>
 		</div>	
 		
-		<button id="transitionButton" class="btn btn-default" onClick="javascript:MenuLib.addTransition()">
+		<button id="transitionButton" class="btn btn-default" onClick="javascript:MenuLib.addTransition()"
+			    title="<fmt:message key="authoring.fla.page.menu.transition" />">
 			<i class="fa fa-long-arrow-right"></i> 
-			<span><fmt:message key="authoring.fla.page.menu.transition" /></span>
+			<span class="hidden-sm hidden-xs"><fmt:message key="authoring.fla.page.menu.transition" /></span>
 		</button>
 		<!-- 
 		<div class="btn-group btn-group-sm desktopButton" role="group">
@@ -399,9 +406,10 @@
 		 -->
 		 
 		<div class="btn-group btn-group-sm desktopButton" role="group">
-		  <button class="btn btn-default dropdown-toggle" type="button" id="annotateButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+		  <button class="btn btn-default dropdown-toggle" type="button" id="annotateButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"
+		  		  title="<fmt:message key="authoring.fla.page.menu.annotate" />">
 		  	<i class="fa fa-font"></i>
-		    <span><fmt:message key="authoring.fla.page.menu.annotate" /></span>
+		    <span class="hidden-sm hidden-xs"><fmt:message key="authoring.fla.page.menu.annotate" /></span>
 		    <span class="caret"></span>
 		  </button>
 		  <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="annotateButton">
@@ -410,25 +418,29 @@
 		  </ul>
 		</div>
 			
-		<button id="arrangeButton" class="btn btn-default desktopButton" onClick="javascript:GeneralLib.arrangeActivities()">
+		<button id="arrangeButton" class="btn btn-default desktopButton" onClick="javascript:GeneralLib.arrangeActivities()"
+			    title="<fmt:message key="authoring.fla.page.menu.arrange" />">
 			<i class="fa fa-th"></i> 
-			<span><fmt:message key="authoring.fla.page.menu.arrange" /></span>
+			<span class="hidden-sm hidden-xs"><fmt:message key="authoring.fla.page.menu.arrange" /></span>
 		</button>
 		
-		<button id="weightButton" class="btn btn-default desktopButton" onClick="javascript:MenuLib.openWeights()">
+		<button id="weightButton" class="btn btn-default desktopButton" onClick="javascript:MenuLib.openWeights()"
+			    title="<fmt:message key="authoring.fla.weights.menu" />">
 			<i class="fa fa-balance-scale"></i> 
-			<span><fmt:message key="authoring.fla.weights.menu" /></span>
+			<span class="hidden-sm hidden-xs"><fmt:message key="authoring.fla.weights.menu" /></span>
 		</button>	
 		
-		<button id="questionBankButton" class="btn btn-default desktopButton" onClick="javascript:MenuLib.openQuestionBank()">
+		<button id="questionBankButton" class="btn btn-default desktopButton" onClick="javascript:MenuLib.openQuestionBank()"
+			    title="<fmt:message key="label.question.bank" />">
 			<i class="fa fa-bank"></i> 
-			<span><fmt:message key="label.question.bank" /></span>
+			<span class="hidden-sm hidden-xs"><fmt:message key="label.question.bank" /></span>
 		</button>
 		
 		<button id="previewButton" class="btn btn-default" onClick="javascript:MenuLib.openPreview()"
-				data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key="authoring.fla.page.menu.preview" /></span>">
+				data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key="authoring.fla.page.menu.preview" /></span>"
+			    title="<fmt:message key="authoring.fla.page.menu.preview" />">
 			<i class="fa fa-search-plus"></i> 
-			<span><fmt:message key="authoring.fla.page.menu.preview" /></span>
+			<span class="hidden-sm hidden-xs"><fmt:message key="authoring.fla.page.menu.preview" /></span>
 		</button>
 
 		<a id="helpButton" class="btn btn-xs btn-default" target="_blank" href="<%=Configuration.get(ConfigurationKeys.HELP_URL)%>/authoring"><i class="fa fa-question-circle text-primary"></i></a>
