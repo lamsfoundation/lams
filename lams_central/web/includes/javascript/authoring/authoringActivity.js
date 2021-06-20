@@ -45,7 +45,8 @@ ActivityCategories = {
 		'Chat and Scribe' : 5,
 		'Forum and Scribe' : 5,
 		
-		'grouping' : 1
+		'grouping' : 1,
+		'gate'     : 1
 },
 
 ActivityDefs = {
@@ -449,7 +450,7 @@ ActivityDraw = {
 		y = GeneralLib.snapToGrid(y) - layout.snapToGrid.offset * 2;
 		
 		// create activity SVG elements
-		var shape = ActivityLib.getActivityIcon('gateClosed');
+		var shape = ActivityLib.getActivityIcon('gate');
 		shape.select('svg').attr({
 			'x'     : x,
 			'y'     : y,

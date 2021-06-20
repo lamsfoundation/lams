@@ -34,10 +34,6 @@ var paper = null,
 		'dialogs' : [],
 		// for storing icons and other activity metadata
 		'toolMetadata': {
-			'gateClosed'     : {
-				'iconPath'   : 'images/svg/gateClosed.svg',
-				'cursorPath' : 'images/gateClosed.png'
-			},
 			'branchingStart' : {
 				'iconPath'   : 'images/svg/branchingStart.svg'
 			},
@@ -215,7 +211,7 @@ GeneralInitLib = {
 			layout.initWindowHeight = $(window).height();
 			
 			$('.template', templateContainerCell).each(function(){
-				var learningLibraryID = $(this).attr('learningLibraryId'),
+				let learningLibraryID = $(this).attr('learningLibraryId'),
 					activityCategoryID = layout.toolMetadata[learningLibraryID].activityCategoryID;
 					
 				$('#collapse-tool-category-' + activityCategoryID, templateContainerCell).append(this);
@@ -228,9 +224,20 @@ GeneralInitLib = {
 				    'scroll'      : false,
 				    'scope'       : 'template',
 				    'helper'      : function(){
+						let helper = null;
 				    	// build a simple helper
-						return $(this).clone().addClass('template-drag-helper');
-					}
+						if (learningLibraryID == 'gate'){
+							helper = $('img', this).clone();
+						} else {
+							helper =  $(this).clone();
+						}
+
+						return helper.addClass('template-drag-helper');
+					},
+					'cursorAt'   : isNaN(+learningLibraryID) ? {
+						'right' : 20,
+						'bottom': 45
+					} : false
 				});
 			});
 
@@ -256,6 +263,8 @@ GeneralInitLib = {
 						if (activityCategoryID === 1) {
 							if (learningLibraryID == 'grouping'){
 								activity = new ActivityDefs.GroupingActivity(null, null, x, y)
+							} else if (learningLibraryID == 'gate'){
+								activity = new ActivityDefs.GateActivity(null, null, x - 10, y + 20);
 							}
 						} else if (activityCategoryID === 5) {
 					    	// construct child activities out of previously referenced HTML templates

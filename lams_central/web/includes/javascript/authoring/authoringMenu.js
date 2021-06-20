@@ -118,27 +118,6 @@ var MenuLib = {
 	
 
 	/**
-	 * Creates a new gate activity.
-	 */
-	addGate : function() {
-		HandlerLib.resetCanvasMode();
-		
-		canvas.css('cursor', 'url("' + LAMS_URL + layout.toolMetadata.gateClosed.cursorPath + '"), move').click(function(event){
-			// pageX and pageY tell event coordinates relative to the whole page
-			// we need relative to canvas
-			var translatedEvent = GeneralLib.translateEventOnCanvas(event),
-				x = translatedEvent[0],
-				y = translatedEvent[1] + 2;
-			
-			layout.activities.push(new ActivityDefs.GateActivity(null, null, x, y));
-			
-			GeneralLib.setModified(true);
-			HandlerLib.resetCanvasMode(true);
-		});
-	},
-	
-	
-	/**
 	 * Creates a new optional activity.
 	 */
 	addOptionalActivity : function() {

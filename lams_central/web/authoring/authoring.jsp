@@ -394,7 +394,6 @@
 		    <span class="caret"></span>
 		  </button>
 		  <ul class="dropdown-menu" aria-labelledby="flowButton">
-		    <li id="gateButton" onClick="javascript:MenuLib.addGate()"><a href="#"><fmt:message key="authoring.fla.page.menu.flow.gate" /></a></li>
 		    <li id="branchingButton" onClick="javascript:MenuLib.addBranching()"><a href="#"><fmt:message key="authoring.fla.page.menu.flow.branch" /></a></li>
 		  </ul>
 		</div>
@@ -513,6 +512,24 @@
   								</div>
   								<div class="media-body media-middle tool-display-name">
 									<fmt:message key="authoring.fla.page.menu.group" />
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div
+						 learningLibraryId="gate"
+						 learningLibraryTitle="gate"
+						 iconPath="images/svg/gateClosed.svg"
+						 class="template"
+						 >
+						 <div>
+							<div class="media">
+  								<div class="media-left">
+  									<img src="<lams:LAMSURL/>images/svg/gateClosed.svg" />
+  								</div>
+  								<div class="media-body media-middle tool-display-name">
+									<fmt:message key="authoring.fla.page.menu.flow.gate" />
 								</div>
 							</div>
 						</div>
