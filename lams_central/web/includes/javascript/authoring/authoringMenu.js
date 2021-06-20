@@ -139,36 +139,6 @@ var MenuLib = {
 	
 	
 	/**
-	 * Creates a new grouping activity.
-	 */
-	addGrouping : function() {
-		if (layout.isGroupingStarted) {
-			layout.isGroupingStarted = false;
-			HandlerLib.resetCanvasMode(true);
-			$('#groupButton').blur();
-		} else {
-			layout.isGroupingStarted = true;
-			HandlerLib.resetCanvasMode();
-			
-			canvas.css('cursor', 'url("' + LAMS_URL + layout.toolMetadata.grouping.cursorPath + '"), move')
-				.click(function(event){
-					layout.isGroupingStarted = false;
-					// pageX and pageY tell event coordinates relative to the whole page
-					// we need relative to canvas
-					var translatedEvent = GeneralLib.translateEventOnCanvas(event),
-						x = translatedEvent[0] - 47,
-						y = translatedEvent[1] -  2;
-		
-					layout.activities.push(new ActivityDefs.GroupingActivity(null, null, x, y));
-					
-					GeneralLib.setModified(true);
-					HandlerLib.resetCanvasMode(true);
-				});
-		}
-	},
-	
-
-	/**
 	 * Creates a new optional activity.
 	 */
 	addOptionalActivity : function() {

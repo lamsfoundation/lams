@@ -398,11 +398,6 @@
 		    <li id="branchingButton" onClick="javascript:MenuLib.addBranching()"><a href="#"><fmt:message key="authoring.fla.page.menu.flow.branch" /></a></li>
 		  </ul>
 		</div>
-		
-		<button id="groupButton" class="btn btn-default" onClick="javascript:MenuLib.addGrouping()">
-			<i class="fa fa-group"></i> 
-			<span><fmt:message key="authoring.fla.page.menu.group" /></span>
-		</button>
 		 -->
 		 
 		<div class="btn-group btn-group-sm desktopButton" role="group">
@@ -456,7 +451,7 @@
 				</div>
 				<div id="template-container-panel-group" class="templateContainer scrollable panel-group" role="tablist" aria-multiselectable="true">
 				
-					<c:forTokens items="3,2,4,6,5" delims="," var="toolCategoryId">
+					<c:forTokens items="1,3,2,4,6,5" delims="," var="toolCategoryId">
 						<div class="panel panel-default">
 					 	  <div class="panel-heading" role="tab" id="collapse-heading-tool-category-${toolCategoryId}"
 					 	  		data-toggle="collapse" href="#collapse-tool-category-${toolCategoryId}" 
@@ -475,7 +470,6 @@
 						
 					<c:forEach var="tool" items="${tools}">
 						<div
-                             name="tool${tool.toolDisplayName}"
 							 toolId="${tool.toolId}"
 							 learningLibraryId="${tool.learningLibraryId}"
 							 learningLibraryTitle="${tool.learningLibraryTitle}"
@@ -495,7 +489,7 @@
 							 >
 							 <div>
 								<div class="media">
-	  								<div class="media-left img-${tool.learningLibraryId}">
+	  								<div class="media-left">
 	  									<img src="<lams:LAMSURL/>${tool.iconPath}" />
 	  								</div>
 	  								<div class="media-body media-middle tool-display-name">
@@ -505,6 +499,24 @@
 							</div>
 						</div>
 					</c:forEach>
+					
+					<div
+						 learningLibraryId="grouping"
+						 learningLibraryTitle="grouping"
+						 iconPath="images/svg/grouping.svg"
+						 class="template"
+						 >
+						 <div>
+							<div class="media">
+  								<div class="media-left">
+  									<img src="<lams:LAMSURL/>images/svg/grouping.svg" />
+  								</div>
+  								<div class="media-body media-middle tool-display-name">
+									<fmt:message key="authoring.fla.page.menu.group" />
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</td>
 			<td id="canvasContainerCell">

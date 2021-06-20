@@ -43,7 +43,9 @@ ActivityCategories = {
 		'Zoom' : 2,
 		'Resources and Forum' : 5,
 		'Chat and Scribe' : 5,
-		'Forum and Scribe' : 5
+		'Forum and Scribe' : 5,
+		
+		'grouping' : 1
 },
 
 ActivityDefs = {

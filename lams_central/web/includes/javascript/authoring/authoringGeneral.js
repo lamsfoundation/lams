@@ -34,10 +34,6 @@ var paper = null,
 		'dialogs' : [],
 		// for storing icons and other activity metadata
 		'toolMetadata': {
-			'grouping'       : {
-				'iconPath'   : 'images/svg/grouping.svg',
-				'cursorPath' : 'images/grouping.png'
-			},
 			'gateClosed'     : {
 				'iconPath'   : 'images/svg/gateClosed.svg',
 				'cursorPath' : 'images/gateClosed.png'
@@ -183,7 +179,7 @@ GeneralInitLib = {
 		
 		// store some template data in JS structures
 		$('.template', templateContainerCell).each(function(){
-			var learningLibraryID = +$(this).attr('learningLibraryId'),
+			var learningLibraryID = $(this).attr('learningLibraryId'),
 				learningLibraryTitle = $(this).attr('learningLibraryTitle'),
 				activityCategoryID = ActivityCategories[learningLibraryTitle],
 				parallelChildActivityDefs = null;
@@ -219,7 +215,7 @@ GeneralInitLib = {
 			layout.initWindowHeight = $(window).height();
 			
 			$('.template', templateContainerCell).each(function(){
-				var learningLibraryID = +$(this).attr('learningLibraryId'),
+				var learningLibraryID = $(this).attr('learningLibraryId'),
 					activityCategoryID = layout.toolMetadata[learningLibraryID].activityCategoryID;
 					
 				$('#collapse-tool-category-' + activityCategoryID, templateContainerCell).append(this);
@@ -247,7 +243,7 @@ GeneralInitLib = {
 						$(draggable.helper).remove();
 						
 						// calculate the position and create an instance of the tool activity
-					    var learningLibraryID = +draggable.draggable.attr('learningLibraryId'),
+					    var learningLibraryID = draggable.draggable.attr('learningLibraryId'),
 					    	toolID = +draggable.draggable.attr('toolId'),
 							activityCategoryID = layout.toolMetadata[learningLibraryID].activityCategoryID,
 					    	x = draggable.offset.left  + canvas.scrollLeft() - canvas.offset().left,
@@ -257,8 +253,11 @@ GeneralInitLib = {
 					    	translatedEvent = GeneralLib.translateEventOnCanvas(event),
 							eventX = translatedEvent[0],
 							eventY = translatedEvent[1];
-
-					    if (activityCategoryID == 5) {
+						if (activityCategoryID === 1) {
+							if (learningLibraryID == 'grouping'){
+								activity = new ActivityDefs.GroupingActivity(null, null, x, y)
+							}
+						} else if (activityCategoryID === 5) {
 					    	// construct child activities out of previously referenced HTML templates
 					    	var childActivities = [];
 					    	layout.toolMetadata[learningLibraryID].parallelChildActivityDefs.each(function(){
