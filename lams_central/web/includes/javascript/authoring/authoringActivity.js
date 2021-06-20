@@ -347,7 +347,7 @@ ActivityDraw = {
 		}
 		
 		// make the icon more centred
-		x = GeneralLib.snapToGrid(x) + layout.snapToGrid.offset * 2;
+		x = GeneralLib.snapToGrid(x) + 20;
 		y = GeneralLib.snapToGrid(y);
 
 		// create activity SVG elements
@@ -447,7 +447,7 @@ ActivityDraw = {
 		
 		x = GeneralLib.snapToGrid(x);
 		// make the icon more centred
-		y = GeneralLib.snapToGrid(y) - layout.snapToGrid.offset * 2;
+		y = GeneralLib.snapToGrid(y) - 20;
 		
 		// create activity SVG elements
 		var shape = ActivityLib.getActivityIcon('gate');
@@ -1283,7 +1283,7 @@ ActivityLib = {
 	adjustTransitionPoint : function(bottomLimit, topLimit, target) {
 		// find a good point inside the grid, then make sure it is within bounds
 		return Math.max(bottomLimit + layout.transition.adjustStep, Math.min(topLimit - layout.transition.adjustStep,
-				Math.floor(target / layout.transition.adjustStep) * layout.transition.adjustStep + layout.snapToGrid.offset));
+				Math.floor(target / layout.transition.adjustStep) * layout.transition.adjustStep));
 	},
 
 	/**

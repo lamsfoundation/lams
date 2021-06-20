@@ -84,9 +84,7 @@ var paper = null,
 			// snapping grid step when dragging an activity
 			'step' : 40,
 			// distance from canvas border so activities are not on edge
-			'padding' : 40,
-			// shift final position by this number so activites are aligned to dots, not between them
-			'offset' : 10
+			'padding' : 40
 		},
 		
 		'activity' : {
@@ -264,7 +262,7 @@ GeneralInitLib = {
 							if (learningLibraryID == 'grouping'){
 								activity = new ActivityDefs.GroupingActivity(null, null, x, y)
 							} else if (learningLibraryID == 'gate'){
-								activity = new ActivityDefs.GateActivity(null, null, x - 10, y + 20);
+								activity = new ActivityDefs.GateActivity(null, null, x, y + 30);
 							}
 						} else if (activityCategoryID === 5) {
 					    	// construct child activities out of previously referenced HTML templates
@@ -3391,6 +3389,6 @@ GeneralLib = {
 	 
 	 snapToGrid : function(input, skipPadding) {
 		 var snapped = Snap.snapTo(layout.snapToGrid.step, input, layout.snapToGrid.step / 2);
-		 return skipPadding ? snapped : (Math.max(snapped, layout.snapToGrid.padding) + layout.snapToGrid.offset);
+		 return skipPadding ? snapped : Math.max(snapped, layout.snapToGrid.padding);
 	 }
 };
