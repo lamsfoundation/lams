@@ -42,7 +42,7 @@ import org.lamsfoundation.lams.themes.service.IThemeService;
 import org.lamsfoundation.lams.timezone.Timezone;
 import org.lamsfoundation.lams.timezone.dto.TimezoneDTO;
 import org.lamsfoundation.lams.timezone.service.ITimezoneService;
-import org.lamsfoundation.lams.timezone.util.TimezoneDTOComparator;
+import org.lamsfoundation.lams.timezone.util.TimezoneIDComparator;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
@@ -199,7 +199,7 @@ public class UserController {
 
 	// Get all available time zones
 	List<Timezone> availableTimeZones = timezoneService.getDefaultTimezones();
-	TreeSet<TimezoneDTO> timezoneDtos = new TreeSet<>(new TimezoneDTOComparator());
+	TreeSet<TimezoneDTO> timezoneDtos = new TreeSet<>(new TimezoneIDComparator());
 	for (Timezone availableTimeZone : availableTimeZones) {
 	    String timezoneId = availableTimeZone.getTimezoneId();
 	    TimezoneDTO timezoneDto = new TimezoneDTO();
