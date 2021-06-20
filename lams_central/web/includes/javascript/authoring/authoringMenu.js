@@ -85,38 +85,6 @@ var MenuLib = {
 		});
 	},
 	
-
-	/**
-	 * Creates a new floating activity.
-	 */
-	addFloatingActivity : function() {
-		if (layout.floatingActivity) {
-			// there can be only one
-			return;
-		}
-		HandlerLib.resetCanvasMode();
-		
-		layout.infoDialog.data('show')(LABELS.SUPPORT_ACTIVITY_PLACE_PROMPT, true);
-	
-		canvas.css('cursor', 'pointer').click(function(event){
-			layout.infoDialog.modal('hide');
-			var translatedEvent = GeneralLib.translateEventOnCanvas(event),
-				x = translatedEvent[0],
-				y = translatedEvent[1];
-			
-			GeneralLib.setModified(true);
-			HandlerLib.resetCanvasMode(true);
-
-			// do not add it to layout.activities as it behaves differently
-			new ActivityDefs.FloatingActivity(null, null, x, y);
-			
-			// there can be only one, so disable the button
-			$('#floatingActivityButton').attr('disabled', 'disabled')
-									 	.css('opacity', 0.2);
-		});
-	},
-	
-
 	/**
 	 * Creates a new optional activity.
 	 */

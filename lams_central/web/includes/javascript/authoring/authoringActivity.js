@@ -46,7 +46,8 @@ ActivityCategories = {
 		'Forum and Scribe' : 5,
 		
 		'grouping' : 1,
-		'gate'     : 1
+		'gate'     : 1,
+		'floating' : 1
 },
 
 ActivityDefs = {
@@ -1711,8 +1712,7 @@ ActivityLib = {
 		if (activity instanceof ActivityDefs.FloatingActivity) {
 			layout.floatingActivity = null;
 			// re-enable the button, as the only possible Floating Activity is gone now
-			$('#floatingActivityButton').attr('disabled', null)
-									 	.css('opacity', 1);
+			$('.template[learningLibraryId="floating"]').slideDown();
 		} else {
 			// remove the transitions
 			// need to use slice() to copy the array as it gets modified in removeTransition()

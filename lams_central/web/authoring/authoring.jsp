@@ -187,8 +187,6 @@
 				ANNOTATION_LABEL_PLACE_PROMPT : decoderDiv.html('<c:out value="${ANNOTATION_LABEL_PLACE_PROMPT_VAR}" />').text(),
 				<fmt:message key="authoring.fla.optional.activity.place.prompt" var="OPTIONAL_ACTIVITY_PLACE_PROMPT_VAR"/>
 				OPTIONAL_ACTIVITY_PLACE_PROMPT : decoderDiv.html('<c:out value="${OPTIONAL_ACTIVITY_PLACE_PROMPT_VAR}" />').text(),
-				<fmt:message key="authoring.fla.support.activity.place.prompt" var="SUPPORT_ACTIVITY_PLACE_PROMPT_VAR"/>
-				SUPPORT_ACTIVITY_PLACE_PROMPT : decoderDiv.html('<c:out value="${SUPPORT_ACTIVITY_PLACE_PROMPT_VAR}" />').text(),
 				<fmt:message key="authoring.fla.transition.place.prompt" var="TRANSITION_PLACE_PROMPT_VAR"/>
 				TRANSITION_PLACE_PROMPT : decoderDiv.html('<c:out value="${TRANSITION_PLACE_PROMPT_VAR}" />').text(),
 				<fmt:message key="authoring.fla.paste.error" var="PASTE_ERROR_VAR"/>
@@ -383,7 +381,6 @@
 		  </button>
 		  <ul class="dropdown-menu" aria-labelledby="optionalButton">
 		    <li id="optionalActivityButton" onClick="javascript:MenuLib.addOptionalActivity()"><a href="#"><fmt:message key="authoring.fla.page.menu.optional.activity" /></a></li>
-		    <li id="floatingActivityButton" onClick="javascript:MenuLib.addFloatingActivity()"><a href="#"><fmt:message key="authoring.fla.page.menu.optional.support" /></a></li>
 		  </ul>
 		</div>
 
@@ -534,6 +531,25 @@
 							</div>
 						</div>
 					</div>
+					
+					<div
+						 learningLibraryId="floating"
+						 learningLibraryTitle="floating"
+						 iconPath="images/svg/icon_floating.svg"
+						 class="template"
+						 >
+						 <div>
+							<div class="media">
+  								<div class="media-left">
+  									<img src="<lams:LAMSURL/>images/svg/floating.svg" />
+  								</div>
+  								<div class="media-body media-middle tool-display-name">
+									<fmt:message key="authoring.fla.page.menu.optional.support" />
+								</div>
+							</div>
+						</div>
+					</div>
+					
 				</div>
 			</td>
 			<td id="canvasContainerCell">

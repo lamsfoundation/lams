@@ -210,6 +210,7 @@ GeneralInitLib = {
 			
 			$('.template', templateContainerCell).each(function(){
 				let learningLibraryID = $(this).attr('learningLibraryId'),
+					isFlowActivity = isNaN(+learningLibraryID),
 					activityCategoryID = layout.toolMetadata[learningLibraryID].activityCategoryID;
 					
 				$('#collapse-tool-category-' + activityCategoryID, templateContainerCell).append(this);
@@ -224,7 +225,7 @@ GeneralInitLib = {
 				    'helper'      : function(){
 						let helper = null;
 				    	// build a simple helper
-						if (learningLibraryID == 'gate'){
+						if (isFlowActivity){
 							helper = $('img', this).clone();
 						} else {
 							helper =  $(this).clone();
@@ -232,7 +233,7 @@ GeneralInitLib = {
 
 						return helper.addClass('template-drag-helper');
 					},
-					'cursorAt'   : isNaN(+learningLibraryID) ? {
+					'cursorAt'   : isFlowActivity ? {
 						'right' : 20,
 						'bottom': 45
 					} : false
@@ -263,6 +264,11 @@ GeneralInitLib = {
 								activity = new ActivityDefs.GroupingActivity(null, null, x, y)
 							} else if (learningLibraryID == 'gate'){
 								activity = new ActivityDefs.GateActivity(null, null, x, y + 30);
+							} else if (learningLibraryID == 'floating') {
+								activity = new ActivityDefs.FloatingActivity(null, null, x, y);
+								
+								// there can be only one floating activity on canvas
+								$('.template[learningLibraryId="floating"]').slideUp();
 							}
 						} else if (activityCategoryID === 5) {
 					    	// construct child activities out of previously referenced HTML templates
