@@ -34,15 +34,12 @@ var paper = null,
 		'dialogs' : [],
 		// for storing icons and other activity metadata
 		'toolMetadata': {
-			'branchingStart' : {
-				'iconPath'   : 'images/svg/branchingStart.svg'
-			},
 			'branchingEnd'   : {
 				'iconPath'   : 'images/svg/branchingEnd.svg'
 			},
 			'bin' : {
 				'iconPath'   : 'images/svg/authoringBin.svg'
-			}, 
+			}
 		},
 		
 		// graphics constants
@@ -263,8 +260,10 @@ GeneralInitLib = {
 							if (learningLibraryID == 'grouping'){
 								activity = new ActivityDefs.GroupingActivity(null, null, x, y)
 							} else if (learningLibraryID == 'gate'){
-								activity = new ActivityDefs.GateActivity(null, null, x, y + 30);
-							}  else if (learningLibraryID == 'optional'){
+								activity = new ActivityDefs.GateActivity(null, null, x, y + 40);
+							} else if (learningLibraryID == 'branching') {
+								activity = new ActivityDefs.BranchingEdgeActivity(null, null, x, y, null, false, null, null);
+							} else if (learningLibraryID == 'optional'){
 								activity = new ActivityDefs.OptionalActivity(null, null, x, y);
 							} else if (learningLibraryID == 'floating') {
 								activity = new ActivityDefs.FloatingActivity(null, null, x, y);
@@ -294,6 +293,11 @@ GeneralInitLib = {
 						layout.activities.push(activity);
 						HandlerLib.dropObject(activity);
 						ActivityLib.dropActivity(activity, eventX, eventY);
+						
+						if (activity instanceof ActivityDefs.BranchingEdgeActivity) {
+							let branchingEnd = new ActivityDefs.BranchingEdgeActivity(null, null, GeneralLib.snapToGrid(x + 120), y, null, false, null, activity.branchingActivity);
+							layout.activities.push(branchingEnd);
+						}
 				   }
 			});
 			
@@ -1368,7 +1372,7 @@ GeneralLib = {
 						var startX = layout.conf.arrangeHorizontalPadding +
 									 column * layout.conf.arrangeHorizontalSpace + 80,
 							edgeY = layout.conf.arrangeVerticalPadding +
-									complex.branchingRow * layout.conf.arrangeVerticalSpace + 50,
+									complex.branchingRow * layout.conf.arrangeVerticalSpace + 20,
 							endX = layout.conf.arrangeHorizontalPadding +
 								   end.column * layout.conf.arrangeHorizontalSpace + 80;
 						

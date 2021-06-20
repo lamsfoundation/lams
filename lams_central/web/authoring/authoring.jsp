@@ -177,10 +177,6 @@
 				ARRANGE_CONFIRM : decoderDiv.html('<c:out value="${ARRANGE_CONFIRM_VAR}" />').text(),
 				<fmt:message key="authoring.fla.clear.canvas.confirm" var="CLEAR_CANVAS_CONFIRM_VAR"/>
 				CLEAR_CANVAS_CONFIRM : decoderDiv.html('<c:out value="${CLEAR_CANVAS_CONFIRM_VAR}" />').text(),
-				<fmt:message key="authoring.fla.branching.start.place.prompt" var="BRANCHING_START_PLACE_PROMPT_VAR"/>
-				BRANCHING_START_PLACE_PROMPT : decoderDiv.html('<c:out value="${BRANCHING_START_PLACE_PROMPT_VAR}" />').text(),
-				<fmt:message key="authoring.fla.branching.end.place.prompt" var="BRANCHING_END_PLACE_PROMPT_VAR"/>
-				BRANCHING_END_PLACE_PROMPT : decoderDiv.html('<c:out value="${BRANCHING_END_PLACE_PROMPT_VAR}" />').text(),
 				<fmt:message key="authoring.fla.annotation.region.place.prompt" var="ANNOTATION_REGION_PLACE_PROMPT_VAR"/>
 				ANNOTATION_REGION_PLACE_PROMPT : decoderDiv.html('<c:out value="${ANNOTATION_REGION_PLACE_PROMPT_VAR}" />').text(),
 				<fmt:message key="authoring.fla.annotation.label.place.prompt" var="ANNOTATION_LABEL_PLACE_PROMPT_VAR"/>
@@ -370,19 +366,6 @@
 			<i class="fa fa-long-arrow-right"></i> 
 			<span class="hidden-sm hidden-xs"><fmt:message key="authoring.fla.page.menu.transition" /></span>
 		</button>
-		<!-- 
-
-		<div class="btn-group btn-group-sm desktopButton" role="group">
-		  <button class="btn btn-default dropdown-toggle" type="button" id="flowButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-		  	<i class="fa fa-map-o"></i>
-		    <span><fmt:message key="authoring.fla.page.menu.flow" /></span>
-		    <span class="caret"></span>
-		  </button>
-		  <ul class="dropdown-menu" aria-labelledby="flowButton">
-		    <li id="branchingButton" onClick="javascript:MenuLib.addBranching()"><a href="#"><fmt:message key="authoring.fla.page.menu.flow.branch" /></a></li>
-		  </ul>
-		</div>
-		 -->
 		 
 		<div class="btn-group btn-group-sm desktopButton" role="group">
 		  <button class="btn btn-default dropdown-toggle" type="button" id="annotateButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"
@@ -515,6 +498,24 @@
   								</div>
   								<div class="media-body media-middle tool-display-name">
 									<fmt:message key="authoring.fla.page.menu.flow.gate" />
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div
+						 learningLibraryId="branching"
+						 learningLibraryTitle="branching"
+						 iconPath="images/svg/branchingStart.svg"
+						 class="template"
+						 >
+						 <div>
+							<div class="media">
+  								<div class="media-left">
+  									<img src="<lams:LAMSURL/>images/svg/branchingStart.svg" />
+  								</div>
+  								<div class="media-body media-middle tool-display-name">
+									<fmt:message key="authoring.fla.page.menu.flow.branch" />
 								</div>
 							</div>
 						</div>

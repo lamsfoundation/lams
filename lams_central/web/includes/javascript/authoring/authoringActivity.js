@@ -47,6 +47,7 @@ ActivityCategories = {
 		
 		'grouping' : 1,
 		'gate'     : 1,
+		'branching': 1,
 		'optional' : 1,
 		'floating' : 1
 },
@@ -349,16 +350,16 @@ ActivityDraw = {
 		}
 		
 		// make the icon more centred
-		x = GeneralLib.snapToGrid(x) + 20;
-		y = GeneralLib.snapToGrid(y);
+		x = GeneralLib.snapToGrid(x - 40) + 40;
+		y = GeneralLib.snapToGrid(y - 20) + 20;
 
 		// create activity SVG elements
-		var shape = paper.circle(x, y, 20)
+		var shape = paper.circle(x + 20, y + 20, 20)
 						 .addClass('svg-branching svg-shadow svg-branching-' + (this.isStart ? 'start' : 'end')),
-			icon = ActivityLib.getActivityIcon(this.isStart ? 'branchingStart' : 'branchingEnd');
+			icon = ActivityLib.getActivityIcon(this.isStart ? 'branching' : 'branchingEnd');
 		icon.select('svg').attr({
-			'x'     : x - 15,
-			'y'     : y - 15,
+			'x'     : x + 5,
+			'y'     : y + 5,
 			'width' : '30px',
 			'height': '30px'
 		});
@@ -374,8 +375,8 @@ ActivityDraw = {
 				'uiid'   : this.branchingActivity.uiid,
 				'data-x' : x,
 				'data-y' : y,
-				'data-width' : 30,
-				'data-height': 30
+				'data-width' : 40,
+				'data-height': 40
 			});
 		}
 		this.items.shape = shape;

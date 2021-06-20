@@ -47,45 +47,6 @@ var MenuLib = {
 	
 	
 	/**
-	 * Run when branching is selected from menu. Allows placing branching and converge points on canvas.
-	 */
-	addBranching : function(){
-		HandlerLib.resetCanvasMode();
-		
-		layout.infoDialog.data('show')(LABELS.BRANCHING_START_PLACE_PROMPT, true);
-		
-		layout.addBranchingStart = true;
-		
-		var branchingActivity = null;
-		canvas.css('cursor', 'pointer').click(function(event){
-			// pageX and pageY tell event coordinates relative to the whole page
-			// we need relative to canvas
-			var translatedEvent = GeneralLib.translateEventOnCanvas(event),
-				x = translatedEvent[0] - 6,
-				y = translatedEvent[1] - 8;
-			
-			// if it is start point, branchingActivity is null and constructor acts accordingly
-			var branchingEdge = new ActivityDefs.BranchingEdgeActivity(null, null, x, y, null, false, null, branchingActivity);
-			layout.activities.push(branchingEdge);
-			
-			if (branchingActivity) {
-				// converge point was just place, end of function
-				layout.addBranchingStart = null;
-				HandlerLib.resetCanvasMode(true);
-				
-				layout.infoDialog.modal('hide');
-				
-				GeneralLib.setModified(true);
-			} else {
-				// extract main branchingActivity structure from created start point
-				branchingActivity = branchingEdge.branchingActivity;
-				layout.addBranchingStart = branchingEdge;
-				layout.infoDialog.data('show')(LABELS.BRANCHING_END_PLACE_PROMPT, true);
-			}
-		});
-	},
-
-	/**
 	 * Creates a new transition.
 	 */
 	addTransition : function() {
