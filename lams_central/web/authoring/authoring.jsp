@@ -185,8 +185,6 @@
 				ANNOTATION_REGION_PLACE_PROMPT : decoderDiv.html('<c:out value="${ANNOTATION_REGION_PLACE_PROMPT_VAR}" />').text(),
 				<fmt:message key="authoring.fla.annotation.label.place.prompt" var="ANNOTATION_LABEL_PLACE_PROMPT_VAR"/>
 				ANNOTATION_LABEL_PLACE_PROMPT : decoderDiv.html('<c:out value="${ANNOTATION_LABEL_PLACE_PROMPT_VAR}" />').text(),
-				<fmt:message key="authoring.fla.optional.activity.place.prompt" var="OPTIONAL_ACTIVITY_PLACE_PROMPT_VAR"/>
-				OPTIONAL_ACTIVITY_PLACE_PROMPT : decoderDiv.html('<c:out value="${OPTIONAL_ACTIVITY_PLACE_PROMPT_VAR}" />').text(),
 				<fmt:message key="authoring.fla.transition.place.prompt" var="TRANSITION_PLACE_PROMPT_VAR"/>
 				TRANSITION_PLACE_PROMPT : decoderDiv.html('<c:out value="${TRANSITION_PLACE_PROMPT_VAR}" />').text(),
 				<fmt:message key="authoring.fla.paste.error" var="PASTE_ERROR_VAR"/>
@@ -373,16 +371,6 @@
 			<span class="hidden-sm hidden-xs"><fmt:message key="authoring.fla.page.menu.transition" /></span>
 		</button>
 		<!-- 
-		<div class="btn-group btn-group-sm desktopButton" role="group">
-		  <button class="btn btn-default dropdown-toggle" type="button" id="optionalButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-		  	<i class="fa fa-check-square-o"></i>
-		    <span><fmt:message key="authoring.fla.page.menu.optional" /></span>
-		    <span class="caret"></span>
-		  </button>
-		  <ul class="dropdown-menu" aria-labelledby="optionalButton">
-		    <li id="optionalActivityButton" onClick="javascript:MenuLib.addOptionalActivity()"><a href="#"><fmt:message key="authoring.fla.page.menu.optional.activity" /></a></li>
-		  </ul>
-		</div>
 
 		<div class="btn-group btn-group-sm desktopButton" role="group">
 		  <button class="btn btn-default dropdown-toggle" type="button" id="flowButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -533,9 +521,27 @@
 					</div>
 					
 					<div
+						 learningLibraryId="optional"
+						 learningLibraryTitle="optional"
+						 iconPath="images/svg/optional.svg"
+						 class="template"
+						 >
+						 <div>
+							<div class="media">
+  								<div class="media-left">
+  									<img src="<lams:LAMSURL/>images/svg/optional.svg" />
+  								</div>
+  								<div class="media-body media-middle tool-display-name">
+									<fmt:message key="authoring.fla.page.menu.optional" />
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div
 						 learningLibraryId="floating"
 						 learningLibraryTitle="floating"
-						 iconPath="images/svg/icon_floating.svg"
+						 iconPath="images/svg/floating.svg"
 						 class="template"
 						 >
 						 <div>

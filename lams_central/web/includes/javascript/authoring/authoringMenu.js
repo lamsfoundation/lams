@@ -84,28 +84,6 @@ var MenuLib = {
 			}
 		});
 	},
-	
-	/**
-	 * Creates a new optional activity.
-	 */
-	addOptionalActivity : function() {
-			HandlerLib.resetCanvasMode();
-			
-			layout.infoDialog.data('show')(LABELS.OPTIONAL_ACTIVITY_PLACE_PROMPT, true);
-		
-			canvas.css('cursor', 'pointer').click(function(event){
-				layout.infoDialog.modal('hide');
-				var translatedEvent = GeneralLib.translateEventOnCanvas(event),
-					x = translatedEvent[0],
-					y = translatedEvent[1];
-				
-				GeneralLib.setModified(true);
-				HandlerLib.resetCanvasMode(true);
-	
-				layout.activities.push(new ActivityDefs.OptionalActivity(null, null, x, y));
-			});
-	},
-	
 
 	/**
 	 * Creates a new transition.

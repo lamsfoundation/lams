@@ -264,6 +264,8 @@ GeneralInitLib = {
 								activity = new ActivityDefs.GroupingActivity(null, null, x, y)
 							} else if (learningLibraryID == 'gate'){
 								activity = new ActivityDefs.GateActivity(null, null, x, y + 30);
+							}  else if (learningLibraryID == 'optional'){
+								activity = new ActivityDefs.OptionalActivity(null, null, x, y);
 							} else if (learningLibraryID == 'floating') {
 								activity = new ActivityDefs.FloatingActivity(null, null, x, y);
 								

@@ -47,6 +47,7 @@ ActivityCategories = {
 		
 		'grouping' : 1,
 		'gate'     : 1,
+		'optional' : 1,
 		'floating' : 1
 },
 
