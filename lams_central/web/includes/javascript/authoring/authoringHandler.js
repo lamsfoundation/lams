@@ -745,9 +745,6 @@ HandlerTransitionLib = {
 		if (targetElement) {
 			endActivity = ActivityLib.getParentObject(targetElement);
 		}
-		if (endActivity == null) {
-			endActivity = ActivityLib.getParentObject(targetElement.parent());
-		}
 
 		if (endActivity && activity != endActivity) {
 			ActivityLib.addTransition(activity, endActivity);

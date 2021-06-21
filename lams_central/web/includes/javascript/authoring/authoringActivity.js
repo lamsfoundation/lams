@@ -1510,13 +1510,18 @@ ActivityLib = {
 	 * Finds activity/region this shape is bound with.
 	 */
 	getParentObject : function(item) {
-		var parentObject = item.data('parentObject');
-		if (!parentObject) {
-			var parentNode = item.parent();
-			if (parentNode.type == 'g') {
-				parentObject = parentNode.data('parentObject');
+		var parentObject = null;
+		
+		while (!parentObject) {
+			parentObject = item.data('parentObject');
+			if (!parentObject) {
+				item = item.parent();
+				if (!item || item.attr('id') == 'canvas') {
+					break;
+				}
 			}
 		}
+		
 		return parentObject;
 	},
 	
