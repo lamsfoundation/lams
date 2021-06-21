@@ -1445,8 +1445,7 @@ ActivityLib = {
 						'direction' : 'up',
 						'arrowAngle': 0
 					};
-				points.endX = ActivityLib.adjustTransitionPoint(toActivityBox.x, toActivityBox.x2, points.startX) 
-								- (toActivity.items.groupingEffect ? 0.5 * layout.conf.groupingEffectPadding : 0);
+				points.endX = ActivityLib.adjustTransitionPoint(toActivityBox.x, toActivityBox.x2, points.startX);
 			}
 		} else {
 			if (fromActivityBox.cx < toActivityBox.cx) {
@@ -1467,8 +1466,7 @@ ActivityLib = {
 						'direction' : 'left',
 						'arrowAngle': 270
 					};
-				points.endY = ActivityLib.adjustTransitionPoint(toActivityBox.y, toActivityBox.y2, points.startY) 
-								- (toActivity.items.groupingEffect ? 0.5 * layout.conf.groupingEffectPadding : 0);
+				points.endY = ActivityLib.adjustTransitionPoint(toActivityBox.y, toActivityBox.y2, points.startY);
 			}
 		}
 		
