@@ -54,22 +54,8 @@
 
 <body>
 	<div id="templateContainerCell" style="display: none">
-		<c:forEach var="tool" items="${tools}">
-			<div
-				 toolId="${tool.toolId}"
-				 learningLibraryId="${tool.learningLibraryId}"
-				 learningLibraryTitle="${tool.learningLibraryTitle}"
-				 supportsOutputs="${tool.supportsOutputs}"
-				 iconPath="${tool.iconPath}"
-				 childToolIds="
-				 <c:forEach var='childId' items='${tool.childToolIds}'>
-				 	${childId},
-				 </c:forEach>
-				 "
-				 class="template">
-				<div><c:out value="${tool.toolDisplayName}" /></div>
-			</div>
-		</c:forEach>
+		<%-- Shared with svgGenerator.jsp --%>
+		<%@ include file="authoringTemplatePart.jsp"%> 
 	</div>
 
 	<div id="canvas"></div>
