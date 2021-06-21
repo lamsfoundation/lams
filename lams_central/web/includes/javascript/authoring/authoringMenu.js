@@ -460,7 +460,8 @@ var MenuLib = {
 	 */
 	toggleTemplateContainer : function(){
 		var templateContainerCell = $('#templateContainerCell'),
-			isExpanded = templateContainerCell.width();
+			isExpanded = templateContainerCell.width(),
+			rubbishBin = $('#rubbishBin', canvas).hide();
 
 		if (isExpanded) {
 			$('#template-container-collapse #template-categories-collapse-button', templateContainerCell).css('visibility', 'hidden');
@@ -480,6 +481,7 @@ var MenuLib = {
 			}
 			
 			GeneralLib.resizePaper();
+			rubbishBin.show();
 		});
 	},
 	
