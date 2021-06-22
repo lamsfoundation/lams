@@ -13,4 +13,4 @@
 	<c:set scope="request" var="importUrlPrefix"><lams:WebAppURL /></c:set>
 </c:if>
 
-<script src="${importUrlPrefix}${src}?v=<%=Configuration.get(ConfigurationKeys.VERSION).hashCode()%>"></script>
+<script src="${importUrlPrefix}${src}?v=<%=Math.abs(Configuration.get(ConfigurationKeys.VERSION).hashCode())%>"></script>
