@@ -124,7 +124,11 @@ public class EmailAnalysisBuilder {
 	htmlText.append("<p>&nbsp;</p>\n");
 	generateSelfPeerTable(htmlText, learnerData);
 	htmlText.append("<p>&nbsp;</p>\n");
-	generateSAPASPAExplanation(htmlText, learnerData.getSPAFactor(), learnerData.getSAPAFactor());
+
+	if (peerreview.isSelfReview()) {
+	    generateSAPASPAExplanation(htmlText, learnerData.getSPAFactor(), learnerData.getSAPAFactor());
+	    htmlText.append("<p>&nbsp;</p>\n");
+	}
 
 	htmlText.append("<p>").append(getLocalisedMessage("email.send.automatically")).append("</p>\n");
 	htmlText.append("</body>\n");
@@ -369,46 +373,66 @@ public class EmailAnalysisBuilder {
     private void generateSelfPeerTable(StringBuilder htmlText, LearnerData learnerData) {
 	boolean spaDone = false;
 	boolean evenRow = false;
+	boolean isSelfReview = peerreview.isSelfReview();
+
+	// SPA factor can come in different places, so it is better to put its cell definition here
 	String spaFactor = roundTo2PlacesAsString(learnerData.getSPAFactor());
-	String sapaFactor = roundTo2PlacesAsString(learnerData.getSAPAFactor());
+	StringBuilder spaFactorCellContents = new StringBuilder().append("<td>&nbsp;</td><td style=\"width:20%;")
+		.append(zebraOddRow).append("\"><span style=\"").append(bold).append("\">")
+		.append(getLocalisedMessage("email.SPA.factor")).append("</span></td><td style=\"width:20%;")
+		.append(zebraOddRow).append("\"><span style=\"").append(bold).append("\">").append(spaFactor)
+		.append("</span></td>");
 	htmlText.append("<table style=\"border-collapse:collapse;").append(width100pc).append("\">");
 	for (RatingCriteria criteria : criteriaForCriteriaTable) {
 	    SingleCriteriaData criteriaData = learnerData.criteriaDataMap.get(criteria.getRatingCriteriaId());
 	    if (criteriaData != null) {
-		String selfRating = roundTo2PlacesAsString(criteriaData.selfRating);
-		String peerRatingExcSelf = roundTo2PlacesAsString(criteriaData.peerRatingExcSelf);
-		htmlText.append("<tr><td rowspan=\"3\" style=\"width:25%;").append(evenRow ? zebraEvenRow : zebraOddRow)
-			.append("\"><span style=\"").append(bold).append("\">").append(criteria.getTitle())
-			.append("</span></td><td style=\"width:20%;").append(evenRow ? zebraEvenRow : zebraOddRow)
-			.append("\"><span style=\"").append(bold).append("\">").append(selfRatingString)
-			.append("</span></td><td style=\"").append(evenRow ? zebraEvenRow : zebraOddRow).append("\">")
-			.append(selfRating).append("</td>");
-		if (!spaDone) {
-		    htmlText.append("<td>&nbsp;</td><td style=\"width:20%;")
-			    .append(evenRow ? zebraEvenRow : zebraOddRow).append("\"><span style=\"").append(bold)
-			    .append("\">").append(getLocalisedMessage("email.SPA.factor"))
-			    .append("</span></td><td style=\"width:20%;").append(evenRow ? zebraEvenRow : zebraOddRow)
-			    .append("\"><span style=\"").append(bold).append("\">").append(spaFactor)
-			    .append("</span></td>");
-		}
-		htmlText.append("</tr>\n<tr><td style=\"").append(evenRow ? zebraEvenRow : zebraOddRow)
-			.append("\"><span style=\"").append(bold).append("\">").append(peerRatingString)
-			.append("</span></td><td style=\"").append(evenRow ? zebraEvenRow : zebraOddRow).append("\">")
-			.append(peerRatingExcSelf).append("</td>");
-		if (!spaDone) {
-		    htmlText.append("<td>&nbsp;</td><td style=\"width:20%;")
-			    .append(evenRow ? zebraEvenRow : zebraOddRow).append("\"><span style=\"").append(bold)
-			    .append("\">").append(getLocalisedMessage("email.SAPA.factor"))
+
+		htmlText.append("<tr><td rowspan=\"").append(isSelfReview ? 3 : 1).append("\" style=\"width:25%;")
+			.append(evenRow ? zebraEvenRow : zebraOddRow).append("\"><span style=\"").append(bold)
+			.append("\">").append(criteria.getTitle()).append("</span></td>");
+
+		if (isSelfReview) {
+		    String selfRating = roundTo2PlacesAsString(criteriaData.selfRating);
+		    htmlText.append("<td style=\"width:20%;").append(evenRow ? zebraEvenRow : zebraOddRow)
+			    .append("\"><span style=\"").append(bold).append("\">").append(selfRatingString)
 			    .append("</span></td><td style=\"").append(evenRow ? zebraEvenRow : zebraOddRow)
-			    .append("\"><span style=\"").append(bold).append("\">").append(sapaFactor)
-			    .append("</span></td>");
+			    .append("\">").append(selfRating).append("</td>");
+		    if (!spaDone) {
+			htmlText.append(spaFactorCellContents);
+		    }
+		    htmlText.append("</tr>\n<tr>");
+		}
+
+		String peerRatingExcSelf = roundTo2PlacesAsString(criteriaData.peerRatingExcSelf);
+		htmlText.append("<td style=\"").append(evenRow ? zebraEvenRow : zebraOddRow).append("\"><span style=\"")
+			.append(bold).append("\">").append(peerRatingString).append("</span></td><td style=\"")
+			.append(evenRow ? zebraEvenRow : zebraOddRow).append("\">").append(peerRatingExcSelf)
+			.append("</td>");
+		if (!spaDone) {
+		    if (isSelfReview) {
+			String sapaFactor = roundTo2PlacesAsString(learnerData.getSAPAFactor());
+			htmlText.append("<td>&nbsp;</td><td style=\"width:20%;").append(zebraOddRow)
+				.append("\"><span style=\"").append(bold).append("\">")
+				.append(getLocalisedMessage("email.SAPA.factor")).append("</span></td><td style=\"")
+				.append(zebraOddRow).append("\"><span style=\"").append(bold).append("\">")
+				.append(sapaFactor).append("</span></td>");
+		    } else {
+			htmlText.append(spaFactorCellContents);
+		    }
 		    spaDone = true;
 		}
-		htmlText.append("</tr>\n<tr><td style=\"width:20%;").append(evenRow ? zebraEvenRow : zebraOddRow)
-			.append("\"><span style=\"").append(bold).append("\">").append("Self & Peers' Rating")
-			.append("</span></td><td style=\"").append(evenRow ? zebraEvenRow : zebraOddRow).append("\">")
-			.append(roundTo2PlacesAsString(criteriaData.peerRatingIncSelf)).append("</td>");
+
 		htmlText.append("</tr>\n");
+
+		if (isSelfReview) {
+		    htmlText.append("<tr><td style=\"width:20%;").append(evenRow ? zebraEvenRow : zebraOddRow)
+			    .append("\"><span style=\"").append(bold).append("\">").append("Self & Peers' Rating")
+			    .append("</span></td><td style=\"").append(evenRow ? zebraEvenRow : zebraOddRow)
+			    .append("\">").append(roundTo2PlacesAsString(criteriaData.peerRatingIncSelf))
+			    .append("</td>");
+		    htmlText.append("</tr>\n");
+		}
+
 		evenRow = !evenRow;
 	    } else {
 		log.warn("Unable to report on criteria " + criteria
@@ -525,10 +549,12 @@ public class EmailAnalysisBuilder {
 	}
 	int colWidth = 100 / numCol;
 
-	StringBuilder tempBuffer = new StringBuilder("<table style=\"").append(tableBorderedStyle).append(width100pc)
-		.append("\">").append("<tr style=\"").append(tableBorderedStyle).append("\"><td style=\"")
-		.append(tableBorderedStyle).append(headerBackgroundStyle).append("\"><span style=\"").append(bold)
-		.append("\">").append(getLocalisedMessage("label.learner")).append("</span></td>");
+	StringBuilder tempBuffer = new StringBuilder("<span>")
+		.append(getLocalisedMessage("email.crtieria.table.explanation")).append("</span>");
+	tempBuffer.append("<table style=\"").append(tableBorderedStyle).append(width100pc).append("\">")
+		.append("<tr style=\"").append(tableBorderedStyle).append("\"><td style=\"").append(tableBorderedStyle)
+		.append(headerBackgroundStyle).append("\"><span style=\"").append(bold).append("\">")
+		.append(getLocalisedMessage("label.learner")).append("</span></td>");
 
 	for (RatingCriteria criteria : criterias) {
 	    if (!criteria.isCommentRating()) {
