@@ -123,13 +123,13 @@ public class EmailAnalysisBuilder {
 	generateFeedbackComments(htmlText, learnerData);
 	htmlText.append("<p>&nbsp;</p>\n");
 	generateSelfPeerTable(htmlText, learnerData);
-	 htmlText.append("<p>&nbsp;</p>\n");
-	 
+	htmlText.append("<p>&nbsp;</p>\n");
+
 	if (peerreview.isSelfReview()) {
 	    generateSAPASPAExplanation(htmlText, learnerData.getSPAFactor(), learnerData.getSAPAFactor());
 	    htmlText.append("<p>&nbsp;</p>\n");
 	}
-	
+
 	htmlText.append("<p>").append(getLocalisedMessage("email.send.automatically")).append("</p>\n");
 	htmlText.append("</body>\n");
 	return htmlText.toString();
@@ -549,10 +549,12 @@ public class EmailAnalysisBuilder {
 	}
 	int colWidth = 100 / numCol;
 
-	StringBuilder tempBuffer = new StringBuilder("<table style=\"").append(tableBorderedStyle).append(width100pc)
-		.append("\">").append("<tr style=\"").append(tableBorderedStyle).append("\"><td style=\"")
-		.append(tableBorderedStyle).append(headerBackgroundStyle).append("\"><span style=\"").append(bold)
-		.append("\">").append(getLocalisedMessage("label.learner")).append("</span></td>");
+	StringBuilder tempBuffer = new StringBuilder("<span>")
+		.append(getLocalisedMessage("email.crtieria.table.explanation")).append("</span>");
+	tempBuffer.append("<table style=\"").append(tableBorderedStyle).append(width100pc).append("\">")
+		.append("<tr style=\"").append(tableBorderedStyle).append("\"><td style=\"").append(tableBorderedStyle)
+		.append(headerBackgroundStyle).append("\"><span style=\"").append(bold).append("\">")
+		.append(getLocalisedMessage("label.learner")).append("</span></td>");
 
 	for (RatingCriteria criteria : criterias) {
 	    if (!criteria.isCommentRating()) {
