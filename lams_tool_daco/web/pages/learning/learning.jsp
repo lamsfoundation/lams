@@ -56,7 +56,7 @@
 		var LABEL_NOT_ALLOWED_FORMAT = '<c:out value="${LABEL_NOT_ALLOWED_FORMAT_VAR}" />';	
 
     </script>
-    <script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/dacoLearning.js"></script>
+    <lams:JSImport src="includes/javascript/dacoLearning.js" relative="true" />
 </lams:head>
 
 

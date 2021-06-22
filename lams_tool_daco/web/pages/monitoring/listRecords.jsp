@@ -19,7 +19,7 @@
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/prototype.js"></script>					
 		<%@ include file="/common/header.jsp"%>
 
-		<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/dacoMonitoring.js"></script>
+		<lams:JSImport src="includes/javascript/dacoMonitoring.js" relative="true" />
 		<script type="text/javascript">
 			function checkCheckbox(checkboxName){
 				var checkbox = document.getElementById(checkboxName);

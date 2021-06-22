@@ -32,7 +32,7 @@
 			});
 
 		</script>
-		<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/rsrcresourceitem.js"></script>
+		<lams:JSImport src="includes/javascript/rsrcresourceitem.js" relative="true" />
 	</lams:head>
 	<body>
 

@@ -17,13 +17,13 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/learning-design-treeview.js" ></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>	
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringGeneral.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringActivity.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringDecoration.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringProperty.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringHandler.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringMenu.js"></script>
+	<lams:JSImport src="includes/javascript/dialog.js" />	
+	<lams:JSImport src="includes/javascript/authoring/authoringGeneral.js" />
+	<lams:JSImport src="includes/javascript/authoring/authoringActivity.js" />
+	<lams:JSImport src="includes/javascript/authoring/authoringDecoration.js" />
+	<lams:JSImport src="includes/javascript/authoring/authoringProperty.js" />
+	<lams:JSImport src="includes/javascript/authoring/authoringHandler.js" />
+	<lams:JSImport src="includes/javascript/authoring/authoringMenu.js" />
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>',
 			LD_THUMBNAIL_URL_BASE = LAMS_URL + 'home/getLearningDesignThumbnail.do?ldId=',

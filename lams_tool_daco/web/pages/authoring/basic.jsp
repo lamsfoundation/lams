@@ -2,7 +2,7 @@
 <c:url var="showMessageURL" value='/authoring/newQuestion.do'>
 	<c:param name="sessionMapID" value="${authoringForm.sessionMapID}" />
 </c:url>
-	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/dacoAuthoring.js"></script>
+	<lams:JSImport src="includes/javascript/dacoAuthoring.js" relative="true" />
 
 <script type="text/javascript">
 	//Showes the add/edit question area

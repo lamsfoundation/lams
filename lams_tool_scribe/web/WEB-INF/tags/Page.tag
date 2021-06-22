@@ -59,7 +59,7 @@
 			// Adding bootstrap.js if it hasn't been loaded already
 			(typeof($.fn.modal) != 'undefined') || document.write('<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"><\/script>');
 		</script>
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
+		<lams:JSImport src="includes/javascript/dialog.js" />
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
 		

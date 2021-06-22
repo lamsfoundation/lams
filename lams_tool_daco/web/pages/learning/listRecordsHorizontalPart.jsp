@@ -30,7 +30,7 @@
 		var removeRecordUrl = "<lams:WebAppURL/>learning/removeRecord.do";
 		var recordListLength = "${fn:length(recordList)}";
 	</script>
-	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/dacoLearning.js"></script>
+	<lams:JSImport src="includes/javascript/dacoLearning.js" relative="true" />
 </lams:head>
 <body class="tabpart">
 	

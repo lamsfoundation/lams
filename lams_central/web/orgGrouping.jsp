@@ -15,7 +15,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/orgGrouping.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/dialog.js"></script>
+	<lams:JSImport src="includes/javascript/dialog.js" />
 	<script type="text/javascript">
 		var groupingActivityId = '${param.activityID}',
 			lessonMode = ${lessonMode},

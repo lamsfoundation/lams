@@ -25,14 +25,14 @@
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/readmore.min.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/d3.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/chart.js"></script>
-<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/monitorLesson.js"></script>
+<lams:JSImport src="includes/javascript/monitorLesson.js" relative="true" />
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 <script>
 
 </script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.tabcontroller.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap-tourist.min.js"></script> 
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
+<lams:JSImport src="includes/javascript/dialog.js" />
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
 <script>
 	//avoid name clash between bootstrap and jQuery UI

@@ -4,7 +4,7 @@
   		var removeInstructionUrl = "<c:url value='/authoring/removeInstruction.do'/>";
      		var addInstructionUrl = "<c:url value='/authoring/newInstruction.do'/>";
 </script>
-<script type="text/javascript" src="<lams:WebAppURL/>/includes/javascript/surveyitem.js"></script>
+<lams:JSImport src="includes/javascript/surveyitem.js" relative="true" />
 
 	<div class="panel panel-default add-file">
 		<div class="panel-heading panel-title">

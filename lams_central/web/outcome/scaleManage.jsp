@@ -12,7 +12,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/outcome.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.cookie.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
+	<lams:JSImport src="includes/javascript/dialog.js" />
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>',
 			

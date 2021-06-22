@@ -91,7 +91,7 @@
    		<script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/chart.bundle.min.js"></script>
- 		<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/chart.js"></script>
+ 		<lams:JSImport src="includes/javascript/chart.js" relative="true" />
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/download.js"></script>

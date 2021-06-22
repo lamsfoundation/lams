@@ -14,7 +14,7 @@
 <script src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 <script src="<lams:LAMSURL/>includes/javascript/jquery.plugin.js"></script>
 <script src="<lams:LAMSURL/>includes/javascript/jquery.countdown.js"></script>
-<script src="<lams:WebAppURL />includes/javascript/chart.js"></script>
+<lams:JSImport src="includes/javascript/chart.js" relative="true" />
 	
 <script>
 	var WEB_APP_URL = '<lams:WebAppURL />',

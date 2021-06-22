@@ -66,7 +66,7 @@
 			var UPLOAD_ALLOWED_EXTENSIONS = JSON.parse("[" + "${ALLOWED_EXTENSIONS_IMAGE}".replace(/\.\w+/g, '"$&"') + "]");
 			var LABEL_ITEM_BLANK = '<fmt:message key="error.resource.item.file.blank"/>';
 		</script>
-		<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/imageGalleryitem.js"></script>
+		<lams:JSImport src="includes/javascript/imageGalleryitem.js" relative="true" />
 		
 		<script type="text/javascript" src="${lams}includes/javascript/uppy/uppy.min.js"></script>
 		<c:choose>
@@ -81,7 +81,7 @@
 			</c:when>
 		</c:choose>
 	
-		<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/uploadImageLearning.js"></script>
+		<lams:JSImport src="includes/javascript/uploadImageLearning.js" relative="true" />
     	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>

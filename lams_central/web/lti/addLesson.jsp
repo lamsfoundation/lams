@@ -38,7 +38,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap-treeview.js" ></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/learning-design-treeview.js" ></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.dialogextend.js"></script>	
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
+	<lams:JSImport src="includes/javascript/dialog.js" />
 	<script type="text/javascript">
     	var isSelected = false;
 		var tree;
