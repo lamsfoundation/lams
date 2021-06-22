@@ -20,7 +20,7 @@
 		var MODE = "${MODE}", TOOL_SESSION_ID = '${param.toolSessionID}', APP_URL = '<lams:WebAppURL />', LEARNING_ACTION = "<c:url value='learning/learning.do'/>", LAMS_URL = '<lams:LAMSURL/>';
 		</script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
-		<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/learning.js"></script>
+		<lams:JSImport src="includes/javascript/learning.js" relative="true" />
 			
 		
 	</lams:head>

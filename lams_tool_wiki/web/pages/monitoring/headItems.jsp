@@ -12,7 +12,7 @@
 <script type="text/javascript" src="${tool}includes/javascript/monitoring.js">
 </script>
 
-<script type="text/javascript" src="<lams:WebAppURL />/includes/javascript/wikiCommon.js"></script>
+<lams:JSImport src="includes/javascript/wikiCommon.js" relative="true" />
 
 <script type="text/javascript">
 	$(document).ready(function() {$("time.timeago").timeago();});

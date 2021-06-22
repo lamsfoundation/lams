@@ -24,7 +24,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script> 	
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.dialogextend.js"></script>	
-	<script type="text/javascript" src="${lams}includes/javascript/dialog.js"></script>
+	<lams:JSImport src="includes/javascript/dialog.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-tourist.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.ui.touch-punch.js"></script>

@@ -5,7 +5,7 @@
 <script type="text/javascript"> 
 	var pathToImageFolder = "<lams:WebAppURL/>includes/images/"; 
 </script>
-<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/lytebox.js" ></script>
+<lams:JSImport src="includes/javascript/lytebox.js" relative="true" />
 <script lang="javascript">
 
 	function hideMessage(){

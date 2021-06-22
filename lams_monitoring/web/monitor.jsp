@@ -221,7 +221,7 @@
 			};
 	</script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
-	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/monitorLesson.js"></script>
+	<lams:JSImport src="includes/javascript/monitorLesson.js" relative="true" />
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.timepicker.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
@@ -231,7 +231,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.tabcontroller.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap-tourist.min.js"></script> 
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
+	<lams:JSImport src="includes/javascript/dialog.js" />
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable.js"></script>
 	<script type="text/javascript">

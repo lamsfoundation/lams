@@ -5,7 +5,7 @@
 <lams:html>
 	<lams:head>
 		<lams:headItems/>
-		<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/authoring.js"></script>
+		<lams:JSImport src="includes/javascript/authoring.js" relative="true" />
 	</lams:head>
 	<body class="stripes">
 		<form:form action="/lams/tool/lantbk11/authoring/updateContent.do" modelAttribute="authoringForm" id="authoringForm" method="post">

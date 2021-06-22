@@ -13,7 +13,7 @@
 		</title>
 		<link href="${tool}includes/css/chat.css" rel="stylesheet" type="text/css">
 		<lams:headItems />
-		<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/authoring.js"></script>
+		<lams:JSImport src="includes/javascript/authoring.js" relative="true" />
 	</lams:head>
 	
 	<body class="stripes" onload="init();">

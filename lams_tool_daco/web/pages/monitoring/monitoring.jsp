@@ -16,7 +16,7 @@
 			var gStatisticsUrl = "${statisticsUrl}"; // used by the tab functions
 			var gRefreshUrl = "${refreshSummaryUrl}"; // used by the tab functions
 		</script>
-		<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/dacoMonitoring.js"></script> 
+		<lams:JSImport src="includes/javascript/dacoMonitoring.js" relative="true" /> 
 		
 		<title><fmt:message key="title.monitoring" /></title>
 

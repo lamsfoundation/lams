@@ -409,5 +409,8 @@
        <name>WaitingSpinner</name>
        <path>/WEB-INF/tags/WaitingSpinner.tag</path>
    	</tag-file>
-
+   	<tag-file>
+       <name>JSImport</name>
+       <path>/WEB-INF/tags/JSImport.tag</path>
+   	</tag-file>
 </taglib>

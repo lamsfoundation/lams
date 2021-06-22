@@ -35,7 +35,7 @@
 							 tag  : "groupchat"
 							};
 	</script>
-	<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/presence.js"></script>
+	<lams:JSImport src="includes/javascript/presence.js" relative="true" />
 	<script type="text/javascript">
 		$(document).ready(function() {
 			resizeChat();

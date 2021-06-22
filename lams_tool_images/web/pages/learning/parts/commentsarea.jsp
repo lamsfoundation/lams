@@ -33,7 +33,7 @@
 	</script>
 	<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
 </c:if>
-<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/uploadImageLearning.js"></script>
+<lams:JSImport src="includes/javascript/uploadImageLearning.js" relative="true" />
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 <script type="text/javascript">
 	$(document).ready(function(){
