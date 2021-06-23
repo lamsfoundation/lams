@@ -714,7 +714,7 @@ public class PeerreviewServiceImpl
 			Integer newGroupId = groupIdMap.get(existingGroupId);
 			if (newGroupId == null) {
 			    newGroupId = ratingService.getNextRatingCriteriaGroupId();
-			    groupIdMap.put(existingGroupId, newUserUid);
+			    groupIdMap.put(existingGroupId, newGroupId);
 
 			    for (int columnIndex = 0; columnIndex < criteria.getRubricsColumnHeaders()
 				    .size(); columnIndex++) {
