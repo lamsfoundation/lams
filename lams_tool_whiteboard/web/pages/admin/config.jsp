@@ -51,7 +51,14 @@
 							<form:input path="whiteboardAccessToken" size="50" maxlength="255" cssClass="form-control form-control-inline" />
 						</td>
 					</tr>
-					
+					<tr>
+						<td>
+							<label for="whiteboardIdPrefix"><fmt:message key="admin.id.prefix" /></label>
+						</td>
+						<td>
+							<form:input path="whiteboardIdPrefix" size="50" maxlength="255" cssClass="form-control form-control-inline" />
+						</td>
+					</tr>
 				</table>
 				<button class="btn btn-primary  pull-right"><fmt:message key="label.save" /></button>
 			</form:form>

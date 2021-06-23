@@ -166,8 +166,10 @@ public class AuthoringController {
 	request.setAttribute("whiteboardServerUrl", whiteboardServerUrl);
 
 	String wid = authoringForm.getWhiteboard().getContentId().toString();
+	wid = whiteboardService.getWhiteboardPrefixedId(wid);
 	String whiteboardAccessTokenHash = whiteboardService.getWhiteboardAccessTokenHash(wid, null);
 	request.setAttribute("whiteboardAccessToken", whiteboardAccessTokenHash);
+	request.setAttribute("wid", wid);
 
 	return "pages/authoring/authoring";
     }

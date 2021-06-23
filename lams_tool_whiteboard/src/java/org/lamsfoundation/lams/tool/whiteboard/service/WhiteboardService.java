@@ -335,6 +335,7 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	    group.setSessionFinished(WhiteboardConstants.COMPLETED == session.getStatus());
 
 	    String wid = whiteboard.getContentId() + "-" + session.getSessionId();
+	    wid = getWhiteboardPrefixedId(wid);
 	    if (ratingUserId != null) {
 		wid = getWhiteboardReadOnlyWid(wid);
 	    }
@@ -599,10 +600,18 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	return null;
     }
 
+    @Override
+    public String getWhiteboardPrefixedId(String wid) {
+	String prefix = getConfigItem(WhiteboardConfigItem.KEY_ID_PREFIX).getConfigValue();
+	return StringUtils.isBlank(prefix) ? wid : prefix + wid;
+    }
+
     private void copyWhiteboardContent(String sourceWid, String targetWid) throws WhiteboardApplicationException {
 	if (StringUtils.isBlank(sourceWid) || StringUtils.isBlank(targetWid)) {
 	    return;
 	}
+	sourceWid = getWhiteboardPrefixedId(sourceWid);
+	targetWid = getWhiteboardPrefixedId(targetWid);
 	// using own method added to Whiteboard API
 	String whiteboardServerUrl = getWhiteboardServerUrl();
 	StringBuilder url = new StringBuilder().append(whiteboardServerUrl).append("/api/copywhiteboard?sourceWid=")
@@ -633,6 +642,8 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	if (StringUtils.isBlank(wid) || StringUtils.isBlank(content)) {
 	    return;
 	}
+
+	wid = getWhiteboardPrefixedId(wid);
 	// using own method added to Whiteboard API
 	String whiteboardServerUrl = getWhiteboardServerUrl();
 	StringBuilder url = new StringBuilder().append(whiteboardServerUrl).append("/api/uploadwhiteboard");
@@ -675,6 +686,8 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	if (StringUtils.isBlank(wid)) {
 	    return null;
 	}
+
+	wid = getWhiteboardPrefixedId(wid);
 	// using Whiteboard API from https://cloud13.de/testwhiteboard/apidoc/index.html
 	String whiteboardServerUrl = getWhiteboardServerUrl();
 	StringBuilder url = new StringBuilder().append(whiteboardServerUrl)

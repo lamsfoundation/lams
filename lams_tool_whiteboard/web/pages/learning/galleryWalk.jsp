@@ -224,7 +224,7 @@
 				       	</a>
 				       	<div class="full-screen-main-div">
 							<iframe class="whiteboard-frame"
-									data-src='${whiteboardServerUrl}/?whiteboardid=${groupSummary.wid}&username=${whiteboardAuthorName}${empty groupSummary.accessToken ? "" : "&accesstoken=".concat(groupSummary.accessToken)}&copyfromwid=${whiteboard.contentId}${empty whiteboardCopyAccessToken ? "" : "&copyaccesstoken=".concat(groupSummary.copyAccessToken)}'>
+									data-src='${whiteboardServerUrl}/?whiteboardid=${groupSummary.wid}&username=${whiteboardAuthorName}${empty groupSummary.accessToken ? "" : "&accesstoken=".concat(groupSummary.accessToken)}&copyfromwid=${sourceWid}${empty whiteboardCopyAccessToken ? "" : "&copyaccesstoken=".concat(groupSummary.copyAccessToken)}'>
 							</iframe>		
 						</div>
 					</div>
