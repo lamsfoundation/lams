@@ -177,6 +177,9 @@ public class LearningController {
 	String whiteboardAuthorName = WhiteboardService.getWhiteboardAuthorName(currentUserDto);
 	request.setAttribute("whiteboardAuthorName", whiteboardAuthorName);
 
+	String sourceWid = whiteboardService.getWhiteboardPrefixedId(whiteboard.getContentId().toString());
+	request.setAttribute("sourceWid", sourceWid);
+
 	if (whiteboard.isGalleryWalkStarted()) {
 	    List<SessionDTO> groupList = null;
 	    try {
@@ -216,8 +219,8 @@ public class LearningController {
 	boolean readOnly = !hasEditRight || finishedLock || isTimeLimitExceeded;
 
 	// This is just a convention used for Whiteboard canvases in lessons.
-	// Authored canvases are recognised by their corresponding tool content ID without session ID part.
-	String wid = whiteboard.getContentId() + "-" + toolSessionId;
+	// Authored canvases are recognised by their corresponding (optionally prefixed) tool content ID without session ID part.
+	String wid = sourceWid + "-" + toolSessionId;
 	if (readOnly) {
 	    wid = whiteboardService.getWhiteboardReadOnlyWid(wid);
 	}
@@ -225,8 +228,7 @@ public class LearningController {
 	String whiteboardAccessTokenHash = whiteboardService.getWhiteboardAccessTokenHash(wid, null);
 	request.setAttribute("whiteboardAccessToken", whiteboardAccessTokenHash);
 
-	String whiteboardCopyAccessTokenHash = whiteboardService.getWhiteboardAccessTokenHash(wid,
-		whiteboard.getContentId().toString());
+	String whiteboardCopyAccessTokenHash = whiteboardService.getWhiteboardAccessTokenHash(wid, sourceWid);
 	request.setAttribute("whiteboardCopyAccessToken", whiteboardCopyAccessTokenHash);
 
 	return "pages/learning/learning";

@@ -154,6 +154,9 @@ public class MonitoringController {
 	String whiteboardServerUrl = whiteboardService.getWhiteboardServerUrl();
 	request.setAttribute("whiteboardServerUrl", whiteboardServerUrl);
 
+	String sourceWid = whiteboardService.getWhiteboardPrefixedId(whiteboard.getContentId().toString());
+	request.setAttribute("sourceWid", sourceWid);
+
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	String authorName = WhiteboardService.getWhiteboardAuthorName(user);

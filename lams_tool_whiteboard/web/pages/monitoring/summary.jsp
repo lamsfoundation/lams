@@ -873,7 +873,7 @@
 					<%-- If there is no grouping, data is loaded immediately.
 					     If there is grouping, data is loaded on panel expand. --%>
 					<iframe class="whiteboard-frame"
-							${sessionMap.isGroupedActivity ? "data-" : ""}src='${whiteboardServerUrl}/?whiteboardid=${groupSummary.wid}&username=${whiteboardAuthorName}${empty groupSummary.accessToken ? "" : "&accesstoken=".concat(groupSummary.accessToken)}&copyfromwid=${whiteboard.contentId}${empty whiteboardCopyAccessToken ? "" : "&copyaccesstoken=".concat(groupSummary.copyAccessToken)}'>
+							${sessionMap.isGroupedActivity ? "data-" : ""}src='${whiteboardServerUrl}/?whiteboardid=${groupSummary.wid}&username=${whiteboardAuthorName}${empty groupSummary.accessToken ? "" : "&accesstoken=".concat(groupSummary.accessToken)}&copyfromwid=${sourceWid}${empty whiteboardCopyAccessToken ? "" : "&copyaccesstoken=".concat(groupSummary.copyAccessToken)}'>
 					</iframe>		
 				</div>
 			</div>

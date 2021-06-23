@@ -59,6 +59,12 @@ public class AdminController {
 	    whiteboardAdminForm.setWhiteboardAccessToken(whiteboardAccessTokenConfigItem.getConfigValue());
 	}
 
+	WhiteboardConfigItem whiteboardIdPrefixConfigItem = whiteboardService
+		.getConfigItem(WhiteboardConfigItem.KEY_ID_PREFIX);
+	if (whiteboardIdPrefixConfigItem != null
+		&& StringUtils.isNotBlank(whiteboardIdPrefixConfigItem.getConfigValue())) {
+	    whiteboardAdminForm.setWhiteboardIdPrefix(whiteboardIdPrefixConfigItem.getConfigValue());
+	}
 	return "pages/admin/config";
     }
 
@@ -87,6 +93,17 @@ public class AdminController {
 		.setConfigValue(StringUtils.isBlank(whiteboardAdminForm.getWhiteboardAccessToken()) ? null
 			: whiteboardAdminForm.getWhiteboardAccessToken().strip());
 	whiteboardService.saveOrUpdateWhiteboardConfigItem(whiteboardAccessTokenConfigItem);
+
+	WhiteboardConfigItem whiteboardIdPrefixConfigItem = whiteboardService
+		.getConfigItem(WhiteboardConfigItem.KEY_ID_PREFIX);
+	if (whiteboardIdPrefixConfigItem == null) {
+	    whiteboardIdPrefixConfigItem = new WhiteboardConfigItem();
+	    whiteboardIdPrefixConfigItem.setConfigKey(WhiteboardConfigItem.KEY_ID_PREFIX);
+	}
+	whiteboardIdPrefixConfigItem
+		.setConfigValue(StringUtils.isBlank(whiteboardAdminForm.getWhiteboardIdPrefix()) ? null
+			: whiteboardAdminForm.getWhiteboardIdPrefix().strip());
+	whiteboardService.saveOrUpdateWhiteboardConfigItem(whiteboardIdPrefixConfigItem);
 
 	request.setAttribute("savedSuccess", true);
 	return "pages/admin/config";

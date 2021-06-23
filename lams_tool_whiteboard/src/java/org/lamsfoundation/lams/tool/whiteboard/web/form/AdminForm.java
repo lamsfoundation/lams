@@ -26,6 +26,7 @@ public class AdminForm {
 
     private String whiteboardServerUrl;
     private String whiteboardAccessToken;
+    private String whiteboardIdPrefix;
 
     public String getWhiteboardServerUrl() {
 	return whiteboardServerUrl;
@@ -41,5 +42,13 @@ public class AdminForm {
 
     public void setWhiteboardAccessToken(String whiteboardAccessToken) {
 	this.whiteboardAccessToken = whiteboardAccessToken;
+    }
+
+    public String getWhiteboardIdPrefix() {
+        return whiteboardIdPrefix;
+    }
+
+    public void setWhiteboardIdPrefix(String whiteboardIdPrefix) {
+        this.whiteboardIdPrefix = whiteboardIdPrefix;
     }
 }

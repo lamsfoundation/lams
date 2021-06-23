@@ -28,7 +28,7 @@
 	       	</a>
 	       	<div class="full-screen-main-div">
 				<iframe id="whiteboard-frame"
-				          src='${whiteboardServerUrl}/?whiteboardid=${authoringForm.whiteboard.contentId}&username=${authoringForm.authorName}${empty whiteboardAccessToken ? "" : "&accesstoken=".concat(whiteboardAccessToken)}'>
+				          src='${whiteboardServerUrl}/?whiteboardid=${wid}&username=${authoringForm.authorName}${empty whiteboardAccessToken ? "" : "&accesstoken=".concat(whiteboardAccessToken)}'>
 				</iframe>
 			</div>
 		</div>
