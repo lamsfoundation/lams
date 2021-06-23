@@ -1,6 +1,7 @@
 <%-- JS import directive that changes with each LAMS server version so the file does not get cached --%>
 <%@ tag body-content="scriptless"%>
 <%@ taglib uri="tags-core" prefix="c" %>
+<%@ taglib uri="tags-lams" prefix="lams"%>
 
 <%@ attribute name="src" required="true" rtexprvalue="true" %>
 <%@ attribute name="relative" required="false" rtexprvalue="true"%>
