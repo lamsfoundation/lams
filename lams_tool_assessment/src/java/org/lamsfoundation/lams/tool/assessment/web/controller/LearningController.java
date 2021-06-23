@@ -699,15 +699,19 @@ public class LearningController {
 
     /**
      * auto saves responses
+     *
+     * @throws IOException
      */
     @RequestMapping("/autoSaveAnswers")
     @ResponseStatus(HttpStatus.OK)
-    public void autoSaveAnswers(HttpServletRequest request)
-	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    @ResponseBody
+    public String autoSaveAnswers(HttpServletRequest request, HttpServletResponse response)
+	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, IOException {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	if (sessionMap == null) {
 	    log.warn("No sessionMap found in session for user: " + request.getRemoteUser());
-	    return;
+	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No session found for the user");
+	    return null;
 	}
 	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
 
@@ -715,6 +719,8 @@ public class LearningController {
 	storeUserAnswersIntoSessionMap(request, pageNumber);
 	//store results from sessionMap into DB
 	storeUserAnswersIntoDatabase(sessionMap, true);
+
+	return "ok";
     }
 
     @RequestMapping("/vsaAutocomplete")
