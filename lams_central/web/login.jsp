@@ -45,7 +45,7 @@
 				
 				function isBrowserCompatible() {
 					return Modernizr.atobbtoa && Modernizr.checked && Modernizr.cookies && Modernizr.nthchild && Modernizr.opacity &&
-						   Modernizr.svg && Modernizr.todataurlpng && Modernizr.websockets && Modernizr.xhrresponsetypetext;
+						   Modernizr.svg && Modernizr.todataurlpng && Modernizr.websockets && Modernizr.xhrresponsetypetext && Modernizr.svgforeignobject;
 					// Modernizr.datauri - should be included, it's a async test though
 					// Modernizr.time - should be included, fails in Chrome for an unknown reason (reported)
 					// Modernizr.xhrresponsetypejson - should be included, fails in IE 11 for an unknown reason (reported)

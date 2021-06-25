@@ -5,6 +5,8 @@
 <lams:head>
 	<title><fmt:message key="authoring.fla.page.svg.generator.title" /></title>
 	
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/authoring-svg.css" type="text/css" media="screen" />
+	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringGeneral.js"></script>
@@ -51,23 +53,9 @@
 </lams:head>
 
 <body>
-	<div style="display: none">
-		<c:forEach var="tool" items="${tools}">
-			<div
-				 toolId="${tool.toolId}"
-				 learningLibraryId="${tool.learningLibraryId}"
-				 learningLibraryTitle="${tool.learningLibraryTitle}"
-				 supportsOutputs="${tool.supportsOutputs}"
-				 iconPath="${tool.iconPath}"
-				 childToolIds="
-				 <c:forEach var='childId' items='${tool.childToolIds}'>
-				 	${childId},
-				 </c:forEach>
-				 "
-				 class="template">
-				<div><c:out value="${tool.toolDisplayName}" /></div>
-			</div>
-		</c:forEach>
+	<div id="templateContainerCell" style="display: none">
+		<%-- Shared with svgGenerator.jsp --%>
+		<%@ include file="authoringTemplatePart.jsp"%> 
 	</div>
 
 	<div id="canvas"></div>

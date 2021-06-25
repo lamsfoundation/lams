@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -598,8 +599,8 @@ public class MonitoringController {
 	String activityDescription = null;
 	if (activityId != null) {
 	    Activity activity = monitoringService.getActivityById(activityId);
-	    activityDescription = new StringBuffer(activity.getTitle()).append(" (").append(activityId).append(")")
-		    .toString();
+	    activityDescription = new StringBuffer(activity.getTitle() == null ? "" : activity.getTitle()).append(" (")
+		    .append(activityId).append(")").toString();
 	}
 
 	List<User> learners = null;
@@ -1249,6 +1250,10 @@ public class MonitoringController {
 	    activityJSON.put("title", activity.getTitle());
 	    activityJSON.put("type", activity.getActivityTypeId());
 
+	    if (activity.isGateActivity()) {
+		activityJSON.put("gateOpen", ((GateActivity) activity).getGateOpen());
+	    }
+
 	    Activity parentActivity = activity.getParentActivity();
 	    if (activity.isBranchingActivity()) {
 		BranchingActivity ba = (BranchingActivity) monitoringService.getActivityById(activity.getActivityId());
@@ -1413,7 +1418,8 @@ public class MonitoringController {
 	for (User user : users) {
 	    ObjectNode userJSON = JsonNodeFactory.instance.objectNode();
 	    userJSON.put("label", user.getFirstName() + " " + user.getLastName() + " " + user.getLogin());
-	    userJSON.put("value", user.getUserId());
+	    userJSON.put("value",
+		    user.getUserId() + (user.getPortraitUuid() == null ? "" : "_" + user.getPortraitUuid().toString()));
 
 	    responseJSON.add(userJSON);
 	}

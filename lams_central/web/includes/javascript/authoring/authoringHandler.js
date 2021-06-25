@@ -8,8 +8,7 @@
 var HandlerLib = {
 	// taken from http://jsfiddle.net/LQuyr/8/
 	touchHandler : function(event) {
-	    var self = this,
-	    	touches = event.changedTouches,
+	    var touches = event.changedTouches,
 	        first = touches[0],
 	        type = "";
 
@@ -33,13 +32,11 @@ var HandlerLib = {
 
 	    first.target.dispatchEvent(simulatedEvent);
 
-	    var scrollables = [],
-	    	clickedInScrollArea = false,
+	    var scrollables = [];
 	    	// check if any of the parents has is-scollable class
-	    	parentEls = $(event.target).parents().map(function() {
+	    $(event.target).parents().map(function() {
 	        try {
 	            if ($(this).hasClass('scrollable')) {
-	                clickedInScrollArea = true;
 	                // get vertical direction of touch event
 	                var direction = (window.startY < first.clientY) ? 'down' : 'up';
 	                // calculate stuff... :o)
@@ -78,14 +75,15 @@ var HandlerLib = {
 	/**
 	 * Start dragging an activity or a transition.
 	 */
-	dragItemsStartHandler : function(items, draggedElement, mouseupHandler, event, startX, startY) {
+	dragItemsStartHandler : function(object, draggedElement, mouseupHandler, event, startX, startY) {
 		if (layout.drawMode || (event.originalEvent ?
 				event.originalEvent.defaultPrevented : event.defaultPrevented)){
 			return;
 		}
 		
 		// if user clicks or drags very shortly, do not take it into account 
-		var dragCancel = function(){
+		var items = object.items,
+			dragCancel = function(){
 			canvas.off('mouseup');
 			// if there is already a function waiting to be started, clear it
 			if (items.dragStarter) {
@@ -126,7 +124,7 @@ var HandlerLib = {
 			}
 			
 			canvas.mousemove(function(event) {
-				 HandlerLib.dragItemsMoveHandler(items, event, startX, startY);
+				 HandlerLib.dragItemsMoveHandler(object, event, startX, startY);
 			});
 			
 			var mouseup = function(mouseupEvent){
@@ -144,7 +142,7 @@ var HandlerLib = {
 			};
 			
 			/* The event is passed from items to canvas, so it is OK to assign it only to canvas.
-			   Ufortunately, this does not apply to the icon.
+			   Unfortunately, this does not apply to the icon.
 			   Also, if mousedown was on items and mouseup on canvas (very quick move),
 			   items will not accept mouseup until click.
 			*/
@@ -158,24 +156,43 @@ var HandlerLib = {
 	/**
 	 * Moves dragged elements on the canvas.
 	 */
-	dragItemsMoveHandler : function(items, event, startX, startY) {
-		var dx = event.pageX - startX,
-			dy = event.pageY - startY;
+	dragItemsMoveHandler : function(object, event, startX, startY) {
+		// detect if activity is close to an edge of viewport and scroll automatically
+		if (event.pageX - canvas.scrollLeft() > canvas.width() - layout.activity.width / 2) {
+			canvas.scrollLeft(event.pageX - canvas.width() + layout.activity.width / 2);
+		} else if (event.pageX - canvas.scrollLeft() < layout.activity.width * 1.5) {
+			canvas.scrollLeft(event.pageX - layout.activity.width * 1.5);
+		}
 		
-		items.transform('t' + dx + ' ' + dy);
+		if (event.pageY - canvas.scrollTop() > canvas.height() - layout.activity.height * 2) {
+			canvas.scrollTop(event.pageY - canvas.height() + layout.activity.height * 2);
+		} else if (event.pageY - canvas.scrollTop() < layout.activity.height) {
+			canvas.scrollTop(event.pageY - layout.activity.height);
+		}
 		
-//		if (items.groupingEffect) {
-//			GeneralLib.toBack(items.groupingEffect);
-//		}
+		var dx = GeneralLib.snapToGrid(event.pageX + canvas.scrollLeft() - startX, true),
+			dy = GeneralLib.snapToGrid(event.pageY + canvas.scrollTop()  - startY, true);
+
+		object.items.transform('t' + dx + ' ' + dy);
+		
+		if (object.transitions) {
+			$.each(object.transitions.from, function(){
+				this.draw();
+			});
+			$.each(object.transitions.to, function(){
+				this.draw();
+			});
+		}
 		
 		// highlight rubbish bin if dragged elements are over it
 		if (HandlerLib.isElemenentBinned(event)) {
 			if (!layout.bin.glowEffect) {
+				let binSvg = layout.bin.select('svg');
 				layout.bin.glowEffect = paper.path(Snap.format('M {x} {y} h {side} v {side} h -{side} z',
 												   {
-													'x'     : layout.bin.attr('x'),
-													'y'     : layout.bin.attr('y'),
-													'side'  : layout.bin.attr('width')
+													'x'     : binSvg.attr('x'),
+													'y'     : binSvg.attr('y'),
+													'side'  : binSvg.attr('width')
 												   }))
 								   			.attr({
 												   'stroke'           : layout.colors.binSelect,
@@ -183,6 +200,7 @@ var HandlerLib = {
 												   'stroke-dasharray' : '5,3',
 												   'fill' : 'none'
 												  });
+				layout.bin.append(layout.bin.glowEffect);
 			}
 		} else if (layout.bin.glowEffect){
 			layout.bin.glowEffect.remove();
@@ -204,7 +222,7 @@ var HandlerLib = {
 			object.draw();
 		} else {
 			// finialise the drop
-			var box = object.items.shape.getBBox(),
+			var box = object.items.getBBox(),
 				originalCoordinates = {
 					x : box.x,
 					// adjust this coordinate for annotation labels
@@ -275,17 +293,6 @@ var HandlerLib = {
 		      .off('mouseup')
 		      .off('mousemove');
 		
-		// if the user started adding a branching and did not finish it
-		if (layout.addBranchingStart){
-			layout.infoDialog.modal('hide');
-			
-			if (layout.addBranchingStart instanceof ActivityDefs.BranchingEdgeActivity) {
-				layout.activities.splice(layout.activities.indexOf(layout.addBranchingStart), 1);
-				layout.addBranchingStart.items.remove();
-			}
-			layout.addBranchingStart = null;
-		}
-
 		if (init) {
 			 // if clicked anywhere, activity selection is gone
 			canvas.click(HandlerLib.canvasClickHandler)
@@ -387,8 +394,10 @@ HandlerActivityLib = {
 					}
 				}
 			}
+
+			var transitions = activity.transitions.from.concat(activity.transitions.to);
 			// start dragging the activity
-			HandlerLib.dragItemsStartHandler(activity.items, this, mouseupHandler, event, x, y);
+			HandlerLib.dragItemsStartHandler(activity, this, mouseupHandler, event, x + canvas.scrollLeft(), y + canvas.scrollTop(), transitions);
 		}
 	},
 	
@@ -401,8 +410,8 @@ HandlerActivityLib = {
 			startItems = branchingActivity.start.items,
 			endItems = branchingActivity.end.items;
 		if (!startItems.isDragged && !endItems.isDragged) {
-			startItems.shape.attr('fill', layout.colors.branchingEdgeMatch);
-			endItems.shape.attr('fill', layout.colors.branchingEdgeMatch);
+			startItems.shape.addClass('svg-branching-match');
+			endItems.shape.addClass('svg-branching-match');
 		}
 	},
 	
@@ -416,8 +425,8 @@ HandlerActivityLib = {
 			endItems = branchingActivity.end.items;
 		
 		if (!startItems.isDragged && !endItems.isDragged) {
-			startItems.shape.attr('fill', layout.colors.branchingEdgeStart);
-			endItems.shape.attr('fill', layout.colors.branchingEdgeEnd);
+			startItems.shape.removeClass('svg-branching-match');
+			endItems.shape.removeClass('svg-branching-match');
 		}
 	}
 },
@@ -478,7 +487,7 @@ HandlerDecorationLib = {
 			}
 		}
 			
-		HandlerLib.dragItemsStartHandler(container.items, this, mouseupHandler, event, x, y);
+		HandlerLib.dragItemsStartHandler(container, this, mouseupHandler, event, x + canvas.scrollLeft(), y + canvas.scrollTop());
 	},
 		
 	/**
@@ -580,7 +589,7 @@ HandlerDecorationLib = {
 			}
 		}
 			
-		HandlerLib.dragItemsStartHandler(label.items, this, mouseupHandler, event, x, y);
+		HandlerLib.dragItemsStartHandler(label, this, mouseupHandler, event, x + canvas.scrollLeft(), y + canvas.scrollTop());
 	},
 	
 	
@@ -713,11 +722,7 @@ HandlerTransitionLib = {
 															 'endX'   : endX,
 															 'endY'   : endY
 															}))
-										  .attr({
-											  	 'stroke' : layout.colors.transition,
-									        	 'stroke-width' : 2,
-												 'stroke-dasharray' : '5,3'
-											    })
+										  .addClass('svg-transition-draw')
 									);
 	},
 	
@@ -735,7 +740,6 @@ HandlerTransitionLib = {
 			activity.tempTransition.remove();
 			activity.tempTransition = null;
 		}
-		
 		var endActivity = null,
 			targetElement = Snap.getElementByPoint(event.pageX, event.pageY);
 		if (targetElement) {
@@ -772,6 +776,6 @@ HandlerTransitionLib = {
 			}
 		}
 			
-		HandlerLib.dragItemsStartHandler(transition.items, this, mouseupHandler, event, x, y);
+		HandlerLib.dragItemsStartHandler(transition, this, mouseupHandler, event, x + canvas.scrollLeft(), y + canvas.scrollTop());
 	}
 };

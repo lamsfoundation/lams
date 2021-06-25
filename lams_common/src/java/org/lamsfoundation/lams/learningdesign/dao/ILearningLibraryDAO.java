@@ -27,7 +27,6 @@ import java.util.List;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
-import org.lamsfoundation.lams.learningdesign.LearningLibraryGroup;
 
 /**
  * @author Manpreet Minhas
@@ -45,6 +44,4 @@ public interface ILearningLibraryDAO extends IBaseDAO {
      * Get all learning libraries whatever the library is valid or invalid.
      */
     public List<LearningLibrary> getAllLearningLibraries(boolean valid);
-
-    public List<LearningLibraryGroup> getLearningLibraryGroups();
 }

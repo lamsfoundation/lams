@@ -47,150 +47,6 @@ var MenuLib = {
 	
 	
 	/**
-	 * Run when branching is selected from menu. Allows placing branching and converge points on canvas.
-	 */
-	addBranching : function(){
-		HandlerLib.resetCanvasMode();
-		
-		layout.infoDialog.data('show')(LABELS.BRANCHING_START_PLACE_PROMPT, true);
-		
-		layout.addBranchingStart = true;
-		
-		var branchingActivity = null;
-		canvas.css('cursor', 'pointer').click(function(event){
-			// pageX and pageY tell event coordinates relative to the whole page
-			// we need relative to canvas
-			var translatedEvent = GeneralLib.translateEventOnCanvas(event),
-				x = translatedEvent[0] - 6,
-				y = translatedEvent[1] - 8;
-			
-			// if it is start point, branchingActivity is null and constructor acts accordingly
-			var branchingEdge = new ActivityDefs.BranchingEdgeActivity(null, null, x, y, null, false, null, branchingActivity);
-			layout.activities.push(branchingEdge);
-			
-			if (branchingActivity) {
-				// converge point was just place, end of function
-				layout.addBranchingStart = null;
-				HandlerLib.resetCanvasMode(true);
-				
-				layout.infoDialog.modal('hide');
-				
-				GeneralLib.setModified(true);
-			} else {
-				// extract main branchingActivity structure from created start point
-				branchingActivity = branchingEdge.branchingActivity;
-				layout.addBranchingStart = branchingEdge;
-				layout.infoDialog.data('show')(LABELS.BRANCHING_END_PLACE_PROMPT, true);
-			}
-		});
-	},
-	
-
-	/**
-	 * Creates a new floating activity.
-	 */
-	addFloatingActivity : function() {
-		if (layout.floatingActivity) {
-			// there can be only one
-			return;
-		}
-		HandlerLib.resetCanvasMode();
-		
-		layout.infoDialog.data('show')(LABELS.SUPPORT_ACTIVITY_PLACE_PROMPT, true);
-	
-		canvas.css('cursor', 'pointer').click(function(event){
-			layout.infoDialog.modal('hide');
-			var translatedEvent = GeneralLib.translateEventOnCanvas(event),
-				x = translatedEvent[0],
-				y = translatedEvent[1];
-			
-			GeneralLib.setModified(true);
-			HandlerLib.resetCanvasMode(true);
-
-			// do not add it to layout.activities as it behaves differently
-			new ActivityDefs.FloatingActivity(null, null, x, y);
-			
-			// there can be only one, so disable the button
-			$('#floatingActivityButton').attr('disabled', 'disabled')
-									 	.css('opacity', 0.2);
-		});
-	},
-	
-
-	/**
-	 * Creates a new gate activity.
-	 */
-	addGate : function() {
-		HandlerLib.resetCanvasMode();
-		
-		canvas.css('cursor', 'url("' + layout.toolMetadata.gate.iconPath + '"), move').click(function(event){
-			// pageX and pageY tell event coordinates relative to the whole page
-			// we need relative to canvas
-			var translatedEvent = GeneralLib.translateEventOnCanvas(event),
-				x = translatedEvent[0],
-				y = translatedEvent[1] + 2;
-			
-			layout.activities.push(new ActivityDefs.GateActivity(null, null, x, y));
-			
-			GeneralLib.setModified(true);
-			HandlerLib.resetCanvasMode(true);
-		});
-	},
-	
-	
-	/**
-	 * Creates a new grouping activity.
-	 */
-	addGrouping : function() {
-		if (layout.isGroupingStarted) {
-			layout.isGroupingStarted = false;
-			HandlerLib.resetCanvasMode(true);
-			$('#groupButton').blur();
-		} else {
-			layout.isGroupingStarted = true;
-			HandlerLib.resetCanvasMode();
-			
-			canvas.css('cursor', 'url("' + layout.toolMetadata.grouping.iconPath + '"), move')
-				.click(function(event){
-					layout.isGroupingStarted = false;
-					// pageX and pageY tell event coordinates relative to the whole page
-					// we need relative to canvas
-					var translatedEvent = GeneralLib.translateEventOnCanvas(event),
-						x = translatedEvent[0] - 47,
-						y = translatedEvent[1] -  2;
-		
-					layout.activities.push(new ActivityDefs.GroupingActivity(null, null, x, y));
-					
-					GeneralLib.setModified(true);
-					HandlerLib.resetCanvasMode(true);
-				});
-		}
-	},
-	
-
-	/**
-	 * Creates a new optional activity.
-	 */
-	addOptionalActivity : function() {
-			HandlerLib.resetCanvasMode();
-			
-			layout.infoDialog.data('show')(LABELS.OPTIONAL_ACTIVITY_PLACE_PROMPT, true);
-		
-			canvas.css('cursor', 'pointer').click(function(event){
-				layout.infoDialog.modal('hide');
-				var translatedEvent = GeneralLib.translateEventOnCanvas(event),
-					x = translatedEvent[0],
-					y = translatedEvent[1];
-				
-				GeneralLib.setModified(true);
-				HandlerLib.resetCanvasMode(true);
-	
-				layout.activities.push(new ActivityDefs.OptionalActivity(null, null, x, y));
-			});
-	},
-	
-
-	/**
 	 * Creates a new transition.
 	 */
 	addTransition : function() {
@@ -221,7 +77,6 @@ var MenuLib = {
 			});
 		}
 	},
-	
 	
 	/**
 	 * Mark an activity as ready for pasting.
@@ -271,7 +126,7 @@ var MenuLib = {
 	/**
 	 * Creates a SVG image out of current SVG contents.
 	 */
-	exportSVG : function(download){
+	exportSVG : function(){
 		ActivityLib.removeSelectEffect();
 		
 		var crop = MenuLib.getCanvasCrop();
@@ -288,9 +143,23 @@ var MenuLib = {
 		svg.setAttribute('preserveAspectRatio', 'xMinYMin slice');
 		svg.setAttribute('width', width);
 		svg.setAttribute('height', height);
+		$(svg).addClass('svg-learning-design');
 		
 		// reset any cursor=pointer styles
 		$('*[style*="cursor"]', svg).css('cursor', 'default');
+		
+		// append SVG CSS straight into SVG file
+		$.ajax({
+			'url'     : LAMS_URL + 'css/authoring-svg.css',
+			'dataType': 'text',
+			'async'   : false,
+			'success' : function(css) {
+				let styleElement = document.createElement("style"),
+					styleContent = document.createTextNode(css);
+				styleElement.appendChild(styleContent);
+				svg.appendChild(styleElement);
+			}
+		});
 		
 		return crop.canvasClone.html();
 	},
@@ -566,17 +435,55 @@ var MenuLib = {
 		layout.ldStoreDialog.modal('show');
 	},
 	
-	
 	/**
 	 * Expands/collapses description field.
 	 */
 	toggleDescriptionDiv: function() {
+		$('#ldDescriptionHideTip').toggleClass('fa-chevron-circle-down fa-chevron-circle-up')
 		$('#ldDescriptionDetails').slideToggle(function(){
-			$('#ldDescriptionHideTip').text($(this).is(':visible') ? '▲' : '▼');
 			$('.templateContainer').height($('#ldDescriptionDiv').height() + $('#canvas').height() - 10);
 		});
 	},
 	
+	/**
+	 * Hide / show contents of all ativity categories in the toolbar on the left
+	 */
+	toggleExpandTemplateCategories : function(){
+		var collapseCategoriesButton = $('#template-container-collapse #template-categories-collapse-button'),
+			isExpanded = collapseCategoriesButton.hasClass('fa-chevron-circle-up');
+		$('#template-container-panel-group .collapse').collapse(isExpanded ? 'hide' : 'show');
+		collapseCategoriesButton.toggleClass('fa-chevron-circle-down fa-chevron-circle-up');
+	},
+	
+	/**
+	 * Hide / show activity toolbar on the left
+	 */
+	toggleTemplateContainer : function(){
+		var templateContainerCell = $('#templateContainerCell'),
+			isExpanded = templateContainerCell.width(),
+			rubbishBin = $('#rubbishBin', canvas).hide();
+
+		if (isExpanded) {
+			$('#template-container-collapse #template-categories-collapse-button', templateContainerCell).css('visibility', 'hidden');
+		} else {
+			templateContainerCell.show();
+		}
+
+		templateContainerCell.animate({
+			'width': isExpanded > 0 ? 0 : 200
+		}, function(){
+			$('#template-container-collapse #template-container-collapse-button', templateContainerCell).toggleClass('fa-chevron-circle-left fa-chevron-circle-right');
+			if (isExpanded) {
+				templateContainerCell.hide();
+			} else {
+				$('#template-container-collapse #template-categories-collapse-button', templateContainerCell).css('visibility', '');
+				
+			}
+			
+			GeneralLib.resizePaper();
+			rubbishBin.show();
+		});
+	},
 	
 	/**
 	 * Opens a pop up for template window that generates a learning design

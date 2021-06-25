@@ -199,7 +199,7 @@
 
 		// assigne svg 'auto' width and height 
 		if (sequenceCanvas) {
-			var svg = $('svg','#sequenceCanvas');
+			var svg = $('svg.svg-learning-design','#sequenceCanvas');
 			if ( svg ) {
 				var svgWidth = svg.attr('width'),
 					svgHeight = svg.attr('height');
@@ -252,10 +252,10 @@
 	<div class="col-xs-12">
 	<div class="panel panel-success">
 	
-	<div id="tabSequence">
+	<div class="svg-learner-draggable-area" id="tabSequence">
 		<div id="sequenceCanvas"></div>
 		<div id="completedLearnersContainer" title="<fmt:message key='force.complete.end.lesson.tooltip' />">
-			<img id="completedLearnersDoorIcon" src="<lams:LAMSURL/>images/icons/door_open.png" />
+			<img id="completedLessonLearnersIcon" src="<lams:LAMSURL/>images/completed.svg" />
 		</div>
 		<img id="sequenceCanvasLoading"
 		     src="<lams:LAMSURL/>images/ajax-loader-big.gif" />

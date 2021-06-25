@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,7 +40,6 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
-import org.lamsfoundation.lams.learningdesign.LearningLibraryGroup;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
@@ -182,40 +180,6 @@ public class LearningDesignService implements ILearningDesignService {
     @Override
     public LearningLibrary getLearningLibrary(Long learningLibraryId) {
 	return learningDesignDAO.find(LearningLibrary.class, learningLibraryId);
-    }
-
-    @Override
-    public List<LearningLibraryGroup> getLearningLibraryGroups() {
-	return learningLibraryDAO.getLearningLibraryGroups();
-    }
-
-    @Override
-    public void saveLearningLibraryGroups(Collection<LearningLibraryGroup> groups) {
-	// find out which groups do not exist anymore and get rid of them
-	Collection<LearningLibraryGroup> existingGroups = learningLibraryDAO.getLearningLibraryGroups();
-	Collection<LearningLibraryGroup> removeGroups = new HashSet<>(existingGroups);
-	removeGroups.removeAll(groups);
-	existingGroups.removeAll(removeGroups);
-	learningLibraryDAO.deleteAll(removeGroups);
-
-	// find out which groups are new and which ones need to be updated
-	for (LearningLibraryGroup group : groups) {
-	    boolean found = false;
-	    for (LearningLibraryGroup existingGroup : existingGroups) {
-		if (existingGroup.equals(group)) {
-		    existingGroup.setName(group.getName());
-		    existingGroup.setLearningLibraries(group.getLearningLibraries());
-		    learningLibraryDAO.update(existingGroup);
-
-		    found = true;
-		    break;
-		}
-	    }
-
-	    if (!found) {
-		learningDesignDAO.insert(group);
-	    }
-	}
     }
 
     @SuppressWarnings("unchecked")

@@ -88,6 +88,8 @@ function initializePortraitPopover(LAMS_URL, size, placement) {
 	
 	if ( ! placement )
 		placement = 'right';
+		
+	placement = 'auto ' + placement;
 	
 	$('.new-popover').each(function( index, element ) {
 		if ( ! element.dataset ) {

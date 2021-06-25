@@ -51,8 +51,6 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningDesignAccess;
-import org.lamsfoundation.lams.learningdesign.LearningLibrary;
-import org.lamsfoundation.lams.learningdesign.LearningLibraryGroup;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
@@ -88,7 +86,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -134,18 +131,6 @@ public class AuthoringController {
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, FileUtil.generateUniqueContentFolderID());
 
 	request.setAttribute("tools", learningDesignService.getToolDTOs(true, true, request.getRemoteUser()));
-	// build list of existing learning library groups
-	List<LearningLibraryGroup> groups = learningDesignService.getLearningLibraryGroups();
-	ArrayNode groupsJSON = JsonNodeFactory.instance.arrayNode();
-	for (LearningLibraryGroup group : groups) {
-	    ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
-	    groupJSON.put("name", group.getName());
-	    for (LearningLibrary learningLibrary : group.getLearningLibraries()) {
-		groupJSON.withArray("learningLibraries").add(learningLibrary.getLearningLibraryId());
-	    }
-	    groupsJSON.add(groupJSON);
-	}
-	request.setAttribute("learningLibraryGroups", groupsJSON.toString());
 
 	List<LearningDesignAccess> accessList = authoringService.updateLearningDesignAccessByUser(getUserId());
 	request.setAttribute("access", JsonUtil.toString(accessList));

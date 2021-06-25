@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿/**
+﻿﻿﻿﻿﻿﻿﻿﻿﻿/**
  * This file contains main methods for Authoring.
  */
 
@@ -32,22 +32,22 @@ var paper = null,
 		'addBranchingStart' : null,
 		// list of all dialogs, so they can be easily closed all at once 
 		'dialogs' : [],
-		// icons for special activities
+		// for storing icons and other activity metadata
 		'toolMetadata': {
-			'gate'     : {
-				'iconPath' : '../images/stop.gif'
+			'branchingEnd'   : {
+				'iconPath'   : 'images/svg/branchingEnd.svg'
 			},
-			'grouping' : {
-				'iconPath' : '../images/grouping.png'
+			'bin' : {
+				'iconPath'   : 'images/svg/authoringBin.svg'
 			}
 		},
 		
-		// graphics contants
+		// graphics constants
 		'conf' : {
-			'arrangeHorizontalSpace'           : 200,
-			'arrangeVerticalSpace'             : 100,
-			'arrangeHorizontalPadding'         : 35,
-			'arrangeVerticalPadding'           : 50,
+			'arrangeHorizontalSpace'           : 240,
+			'arrangeVerticalSpace'             : 120,
+			'arrangeHorizontalPadding'         : 40,
+			'arrangeVerticalPadding'           : 40,
 			
 			'dragStartThreshold'               : 300,
 			
@@ -74,24 +74,32 @@ var paper = null,
 			'supportsDownloadAttribute'		   : typeof $('<a/>')[0].download != 'undefined',
 			
 			// will be initialised when paper gets created
-			'readOnlyFilter'				   : null
+			'readOnlyFilter'				   : null,
+		},
+		
+		'snapToGrid' : {
+			// snapping grid step when dragging an activity
+			'step' : 40,
+			// distance from canvas border so activities are not on edge
+			'padding' : 40
+		},
+		
+		'activity' : {
+			'width'					   : 200,
+			'height'				   : 80,
+			'borderCurve'			   : 5,
+			'bannerNarrowWidth'		   : 10,
+			'bannerWideWidth'		   : 60
+		},
+		
+		'transition' : {
+			'adjustStep' : 20,
+			'curve' : 15,
+			'dotRadius' : 3,
+			'arrowLength' : 5
 		},
 		
 		'colors' : {
-			'activityBorder'	  : 'black',
-			
-			/*
-			 * Colours depend on activity category.
-			 *  CATEGORY_SYSTEM = 1;
-			    CATEGORY_COLLABORATION = 2;
-			    CATEGORY_ASSESSMENT = 3;
-			    CATEGORY_CONTENT = 4;
-			    CATEGORY_SPLIT = 5;
-			    CATEGORY_RESPONSE = 6;
-			 */
-			'toolActivityBorder'      : ['','#00007f','#ff8300','#625F67','#ffa500','#00007f','#7aa712'],
-			'activity'     		  : ['','#caddfb','#ffffbb','#ece9f7','#fdf1d3','#caddfb','#e9f9c0'],
-			'activityText' 		  : 'black',
 			// default region colour
 			'annotation'		  : '#CCFF99',
 			// region colours to choose from
@@ -101,29 +109,15 @@ var paper = null,
 
 			// when mouse hovers over rubbish bin
 			'binSelect' 		  : 'red',
-			
-			'branchingEdgeStart'  : 'green',
-			'branchingEdgeEnd'    : 'red',
-			// highlight branching edges on mouse hover
-			'branchingEdgeMatch'  : 'blue',
-			'gate'         		  : 'red',
-            'gateBorder'          : '#801515',
-			'gateText'     		  : 'white',
-			'grouping'		      : '#caddfb',
-			'groupingBorder'	  : '#00007f',
-			'optionalActivity'    : '#caddfb',
-			'optionalActivityBorder'    : '#00007f',
 			// dashed border around a selected activity 
 			'selectEffect'        : 'black',
-			'transition'   		  : 'rgb(119,126,157)',
 			// highlight TBL activities which should be grouped
-			'activityRequireGrouping' : 'red',
 			'activityReadOnly'	  : 'red'
 		},
 	
 		'defaultTextAttributes' : {
 			'text-anchor' : 'middle',
-			'font-size'   : 10,
+			'font-size'   : 12,
 			'font-family' : 'sans-serif'
 		}
 },
@@ -172,9 +166,11 @@ GeneralInitLib = {
 	 * Draw boxes with Tool Activity templates in the panel on the left.
 	 */
 	initTemplates : function(){
+		var templateContainerCell = $('#templateContainerCell');
+		
 		// store some template data in JS structures
-		$('.template').each(function(){
-			var learningLibraryID = +$(this).attr('learningLibraryId'),
+		$('.template', templateContainerCell).each(function(){
+			var learningLibraryID = $(this).attr('learningLibraryId'),
 				learningLibraryTitle = $(this).attr('learningLibraryTitle'),
 				activityCategoryID = ActivityCategories[learningLibraryTitle],
 				parallelChildActivityDefs = null;
@@ -194,10 +190,6 @@ GeneralInitLib = {
 				});
 			}
 			
-			// assign icons' data uris to their learning library IDs instead of labels
-			ActivityIcons[learningLibraryID] = ActivityIcons[learningLibraryTitle];
-			delete ActivityIcons[learningLibraryTitle];
-			$('<img />').attr('src', ActivityIcons[learningLibraryID]).appendTo(".img-"+learningLibraryID);
 			// register tool properties so they are later easily accessible
 			layout.toolMetadata[learningLibraryID] = {
 				'iconPath'				    : $(this).attr('iconPath'),
@@ -206,55 +198,20 @@ GeneralInitLib = {
 				'activityCategoryID' 	    : activityCategoryID,
 				'parallelChildActivityDefs' : parallelChildActivityDefs
 			};
-			
 		});
 		
 		if (!isReadOnlyMode){
 			// store the initial window height now as on iPad the iframe grows when templates are show,
 			// reporting incorrect window height to the first resizePaper() run
 			layout.initWindowHeight = $(window).height();
-			// create list of learning libraries for each group
-			var templateContainerCell = $('#templateContainerCell'),
-				learningLibraryGroupSelect = $('select', templateContainerCell),
-				allGroup = $('option', learningLibraryGroupSelect),
-				allTemplates = $('#templateContainerCell .templateContainer').show();
-		
-			learningLibraryGroupSelect.change(function(){
-				$('.templateContainer').hide();
-				// show DIV with the selected learning libraries group
-				$('option:selected', this).data('templates').show();
-			});
-			allGroup.data('templates', allTemplates);
 			
-			$.each(learningLibraryGroups, function(){
-				var learningLibraries = this.learningLibraries;
-				if (!learningLibraries) {
-					return true;
-				}
-				
-				var templates = allTemplates.clone().appendTo(templateContainerCell);
-				// cloned everything, now remove ones that are not in the list
-				$('.template', templates).each(function(){
-					var learningLibraryId = $(this).attr('learningLibraryId'),
-						found = false;
-					$.each(learningLibraries, function(){
-						if (learningLibraryId == this) {
-							found = true;
-							return false;
-						}
-					});
+			$('.template', templateContainerCell).each(function(){
+				let learningLibraryID = $(this).attr('learningLibraryId'),
+					isFlowActivity = isNaN(+learningLibraryID),
+					activityCategoryID = layout.toolMetadata[learningLibraryID].activityCategoryID;
 					
-					if (!found) {
-						$(this).remove();
-					}
-				});
+				$('#collapse-tool-category-' + activityCategoryID, templateContainerCell).append(this);
 				
-				$('<option />').text(this.name)
-							   .data('templates', templates)
-							   .appendTo(learningLibraryGroupSelect);
-			});
-			
-			$('.template').each(function(){
 				// allow dragging a template to canvas
 				$(this).draggable({
 					'containment' : '#authoringTable',
@@ -262,19 +219,24 @@ GeneralInitLib = {
 				    'distance'    : 20,
 				    'scroll'      : false,
 				    'scope'       : 'template',
-				    'helper'      : function(event){
+				    'helper'      : function(){
+						let helper = null;
 				    	// build a simple helper
-						return $(this).clone().css({
-							'width'   : '150px',
-							'border'  : 'thin black solid',
-							'z-index' : 1,
-							'cursor'  : 'move'
-						});
-					}
+						if (isFlowActivity){
+							helper = $('img', this).clone();
+						} else {
+							helper =  $(this).clone();
+						}
+
+						return helper.addClass('template-drag-helper');
+					},
+					'cursorAt'   : isFlowActivity ? {
+						'right' : 20,
+						'bottom': 45
+					} : false
 				});
 			});
 
-			
 			// allow dropping templates to canvas
 			canvas.droppable({
 				   'tolerance'   : 'touch',
@@ -284,24 +246,38 @@ GeneralInitLib = {
 						$(draggable.helper).remove();
 						
 						// calculate the position and create an instance of the tool activity
-					    var learningLibraryID = +draggable.draggable.attr('learningLibraryId'),
+					    var learningLibraryID = draggable.draggable.attr('learningLibraryId'),
 					    	toolID = +draggable.draggable.attr('toolId'),
 							activityCategoryID = layout.toolMetadata[learningLibraryID].activityCategoryID,
 					    	x = draggable.offset.left  + canvas.scrollLeft() - canvas.offset().left,
 					    	y = draggable.offset.top   + canvas.scrollTop()  - canvas.offset().top,
-					    	label = $('#toolDisplayName', draggable.draggable).text().trim(),
+					    	label = $('.tool-display-name', draggable.draggable).text().trim(),
 					    	activity = null,
 					    	translatedEvent = GeneralLib.translateEventOnCanvas(event),
 							eventX = translatedEvent[0],
 							eventY = translatedEvent[1];
-
-					    if (activityCategoryID == 5) {
+						if (activityCategoryID === 1) {
+							if (learningLibraryID == 'grouping'){
+								activity = new ActivityDefs.GroupingActivity(null, null, x, y)
+							} else if (learningLibraryID == 'gate'){
+								activity = new ActivityDefs.GateActivity(null, null, x, y + 40);
+							} else if (learningLibraryID == 'branching') {
+								activity = new ActivityDefs.BranchingEdgeActivity(null, null, x, y, null, false, null, null);
+							} else if (learningLibraryID == 'optional'){
+								activity = new ActivityDefs.OptionalActivity(null, null, x, y);
+							} else if (learningLibraryID == 'floating') {
+								activity = new ActivityDefs.FloatingActivity(null, null, x, y);
+								
+								// there can be only one floating activity on canvas
+								$('.template[learningLibraryId="floating"]').slideUp();
+							}
+						} else if (activityCategoryID === 5) {
 					    	// construct child activities out of previously referenced HTML templates
 					    	var childActivities = [];
 					    	layout.toolMetadata[learningLibraryID].parallelChildActivityDefs.each(function(){
 					    		var childLearningLibraryID = +$(this).attr('learningLibraryId'),
 					    			childToolID = +$(this).attr('toolId'),
-					    			toolLabel = $('#toolDisplayName', this).text().trim(),
+					    			toolLabel = $('.tool-display-name', this).text().trim(),
 					    			childActivity = new ActivityDefs.ToolActivity(null, null, null,
 					    					childToolID, childLearningLibraryID, null, x, y, toolLabel);
 					    	
@@ -317,8 +293,15 @@ GeneralInitLib = {
 						layout.activities.push(activity);
 						HandlerLib.dropObject(activity);
 						ActivityLib.dropActivity(activity, eventX, eventY);
+						
+						if (activity instanceof ActivityDefs.BranchingEdgeActivity) {
+							let branchingEnd = new ActivityDefs.BranchingEdgeActivity(null, null, GeneralLib.snapToGrid(x + 120), y, null, false, null, activity.branchingActivity);
+							layout.activities.push(branchingEnd);
+						}
 				   }
 			});
+			
+			$('.templateContainer', templateContainerCell).show();
 		}
 	},
 
@@ -772,7 +755,10 @@ GeneralInitLib = {
 		        }, 500);
 				
 			},
-			'close' : null,
+			'close' : function(){
+				// CSS loaded from an old LD SVG can interfere with current authoring layout
+				$('#ldScreenshotAuthor', this).empty();
+			},
 			'data' : {
 				'prepareForOpen' : function(dialogTitle, learningDesignTitle, shownElementIDs, highlightFolder){
 					$('#ldStoreDialogNameContainer input', layout.ldStoreDialog).val(learningDesignTitle);
@@ -1247,6 +1233,8 @@ GeneralLib = {
 			return;
 		}
 		
+		
+		// warn that annotation labels and regions will not be arranged
 		if (!append && (layout.regions.length > 0 || layout.labels.length > 0)
 			&& !isReadOnlyMode && !confirm(LABELS.ARRANGE_CONFIRM)) {
 			return;
@@ -1262,7 +1250,7 @@ GeneralLib = {
 		
 		var row = 0;
 		if (append) {
-			// find the lowest existing activity and append the new activities beneath
+			// find the lowest (highest Y) existing activity and append the new activities beneath
 			$.each(layout.activities, function(){
 				row = Math.max(row,
 						Math.ceil((this.items.getBBox().y2 - layout.conf.arrangeVerticalPadding)
@@ -1276,6 +1264,7 @@ GeneralLib = {
 			forceRowY = null,
 			paperWidth = paper.attr('width'),
 			// check how many columns current paper can hold
+			// paperMinWidth is used for SVG auto regenerate
 			maxColumns = Math.floor(((paperWidth < 300 && paperMinWidth ? paperMinWidth : paperWidth) 
 									    - layout.conf.arrangeHorizontalPadding)
 					                 / layout.conf.arrangeHorizontalSpace),
@@ -1284,8 +1273,10 @@ GeneralLib = {
 	        // a shallow copy of activities array without inner activities
 			activitiesCopy = [],
 			// just to speed up processing when there are only activities with no transitions left
-			onlyDetachedLeft = false;
-	
+			onlyDetachedLeft = false,
+			// TBL sequences get arranged differently
+			isTBL = GeneralLib.checkTBLGrouping() !== null;
+			
 		$.each(activities, function(){
 			if (!this.parentActivity || !(this.parentActivity instanceof DecorationDefs.Container)){
 				activitiesCopy.push(this);
@@ -1293,7 +1284,7 @@ GeneralLib = {
 		});
 		
 		// branches will not be broken into few rows; if they are long, paper will be resized
-		// find the longes branch to find the new paper size
+		// find the longes branch and use it for a new paper size
 		$.each(activities, function(){
 			if (this instanceof ActivityDefs.BranchingEdgeActivity && this.isStart) {
 				// add start and end edges to the longest branch length in the branching
@@ -1325,6 +1316,7 @@ GeneralLib = {
 				$.each(activitiesCopy, function(){
 					if (this.transitions.to.length > 0) {
 						activity = this;
+						// crawl back using "to" transition all the way to the beggining of sequence
 						while (activity.transitions.to.length > 0) {
 							// check if previous activity was not drawn already
 							// it can happen for branching edges
@@ -1378,11 +1370,11 @@ GeneralLib = {
 						complex.branchingRow = row + Math.floor(branchingActivity.branches.length / 2);
 						// edge points go to middle of rows with branches
 						var startX = layout.conf.arrangeHorizontalPadding +
-									 column * layout.conf.arrangeHorizontalSpace + 54,
+									 column * layout.conf.arrangeHorizontalSpace + 80,
 							edgeY = layout.conf.arrangeVerticalPadding +
-									complex.branchingRow * layout.conf.arrangeVerticalSpace + 17,
+									complex.branchingRow * layout.conf.arrangeVerticalSpace + 20,
 							endX = layout.conf.arrangeHorizontalPadding +
-								   end.column * layout.conf.arrangeHorizontalSpace + 54;
+								   end.column * layout.conf.arrangeHorizontalSpace + 80;
 						
 						activitiesCopy.splice(activitiesCopy.indexOf(start), 1);
 						activitiesCopy.splice(activitiesCopy.indexOf(end), 1);
@@ -1423,10 +1415,8 @@ GeneralLib = {
 					
 					if (activity instanceof ActivityDefs.GateActivity) {
 						// adjust placement for gate activity, so it's in the middle of its cell
-						x += 57;
-						y += 10;
-					} else if (activity instanceof ActivityDefs.OptionalActivity){
-						x -= 20;
+						x += 70;
+						y += 30;
 					}
 					
 					activity.draw(x, y);
@@ -1436,7 +1426,7 @@ GeneralLib = {
 					// learn where a tall Optional Activity has its end
 					// and later start drawing activities lower than in the next row
 					if (activity instanceof DecorationDefs.Container && activity.childActivities.length > 1) {
-						var activityEndY = activity.items.shape.getBBox().y2;
+						var activityEndY = activity.items.getBBox().y2;
 						if (!forceRowY || activityEndY > forceRowY) {
 							forceRowY = activityEndY;
 						}
@@ -1444,12 +1434,18 @@ GeneralLib = {
 				}
 				
 				// find the next row and column
-				column = (column + 1) % maxColumns;
+				if (isTBL && activity instanceof ActivityDefs.GateActivity) {
+					// in TBL sequences break after each gate
+					column = 0;
+				} else {
+					column = (column + 1) % maxColumns;
+				}
+				
 				if (column == 0) {
 					row++;
 					// if an Optional Activity forced next activities to be drawn lower than usual
 					if (forceRowY) {
-						while (forceRowY > layout.conf.arrangeVerticalPadding + 10 + row * layout.conf.arrangeVerticalSpace) {
+						while (forceRowY > layout.conf.arrangeVerticalPadding + row * layout.conf.arrangeVerticalSpace) {
 							row++;
 						}
 						forceRowY = null;
@@ -1515,8 +1511,14 @@ GeneralLib = {
 				row++;
 				column = 0;
 			}
+			// if last activity was optional activity, we may need to go lower with rows
+			if (forceRowY) {
+				while (forceRowY > layout.conf.arrangeVerticalPadding + row * layout.conf.arrangeVerticalSpace) {
+					row++;
+				}
+			}
 			var x = layout.conf.arrangeHorizontalPadding,
-				y = layout.conf.arrangeVerticalPadding - 30 + row * layout.conf.arrangeVerticalSpace;
+				y = layout.conf.arrangeVerticalPadding + row * layout.conf.arrangeVerticalSpace;
 			
 			layout.floatingActivity.draw(x, y);
 		}
@@ -1658,7 +1660,7 @@ GeneralLib = {
 				this.draw();
 			}
 		});
-		return activitiesToGroup.length === 0 ? null : activitiesToGroup;
+		return activitiesToGroup;
 	},
 	
 	/**
@@ -1802,7 +1804,8 @@ GeneralLib = {
 					$('#ldDescriptionLicenseText').text(ld.licenseText || null);
 				}
 				
-				var arrangeNeeded = false,
+				// always arrange activities when SVG gets recreated
+				var arrangeNeeded = isReadOnlyMode,
 					// if system gate is found, it is Live Edit
 					systemGate = null,
 					// should we allow the author to enter activity authoring
@@ -2560,16 +2563,12 @@ GeneralLib = {
 		
 		$.each(layoutActivityDefs, function(){
 			var activity = this,
-				activityBox = activity.items ? activity.items.shape.getBBox() : null,
+				activityBox = activity.items ? activity.items.getBBox() : null,
 				x = activityBox ? parseInt(activityBox.x) : null,
 				y = activityBox ? parseInt(activityBox.y) : null,
 				activityTypeID = null,
-				activityCategoryID = activity instanceof ActivityDefs.ToolActivity ?
-						   			 layout.toolMetadata[activity.learningLibraryID].activityCategoryID : 
-						             activity instanceof ActivityDefs.ParallelActivity ? 5 : 1,
 				iconPath = null,
 				isGrouped = activity.grouping ? true : false,
-				parentActivityID = activity.parentActivity ? activity.parentActivity.id : null,
 				gateActivityCompletionBased = false,
 				activityTransitions = activity instanceof ActivityDefs.BranchingActivity ?
 						activity.end.transitions : activity.transitions;
@@ -2902,14 +2901,14 @@ GeneralLib = {
 		// next runs use the regular window height
 		layout.initWindowHeight = null;
 		// height of window minus toolbar, padding...
-		$('.templateContainer').height(windowHeight - 80);
-		$('#canvas').height(windowHeight - 75)
+		$('.templateContainer').height(windowHeight - 105);
+		$('#canvas').height(windowHeight - 85);
 		// width of window minus templates on the left; minimum is toolbar width so it does not collapse
-					.width(Math.max($('#toolbar').width() - 180, $(window).width() - 190));
+		// .width(Math.max($('#toolbar').width() - 200, $(window).width() - $('#templateContainerCell').width()));
 		
 		if (!width || !height) {
-			var width = 0,
-				height = 0;
+			width = 0;
+			height = 0;
 			$.each(layout.activities, function(){
 				// find new dimensions of paper
 				var activityBox = this.items.shape.getBBox();
@@ -2938,9 +2937,14 @@ GeneralLib = {
 			}
 			
 			// draw rubbish bin on canvas
-			layout.bin = paper.image(ActivityIcons.bin, width - 55, height - 55, 48, 48);
-			// so it can be found when SVG code gets cloned
-			$(layout.bin.node).attr('id', 'rubbishBin');
+			layout.bin = paper.g(ActivityLib.getActivityIcon('bin'));
+			layout.bin.attr('id', 'rubbishBin');
+			layout.bin.select('svg').attr({
+				'x' : width - 65,
+				'y' : height - 65,
+				'width' : 48,
+				'height': 48
+			});
 			
 			HandlerLib.resetCanvasMode(true);
 		}
@@ -3014,7 +3018,7 @@ GeneralLib = {
 					
 					if (layout.liveEdit) {
 						var missingGroupingOnActivities = GeneralLib.checkTBLGrouping();
-						if (missingGroupingOnActivities) {
+						if (missingGroupingOnActivities && missingGroupingOnActivities.length > 0) {
 							var info = LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING;
 							$.each(missingGroupingOnActivities, function(){
 									info += '<br /> * ' + this.title; 
@@ -3086,7 +3090,7 @@ GeneralLib = {
 					
 					if (!layout.ld.invalid) {
 						var missingGroupingOnActivities = GeneralLib.checkTBLGrouping();
-						if (missingGroupingOnActivities) {
+						if (missingGroupingOnActivities && missingGroupingOnActivities.length > 0) {
 							var info = LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING;
 							$.each(missingGroupingOnActivities, function(){
 								info += '<br /> * ' + this.title; 
@@ -3393,5 +3397,10 @@ GeneralLib = {
 	 */
 	 validateName : function(name) {
 		 return name && GeneralLib.nameValidator.test(name);
+	 },
+	 
+	 snapToGrid : function(input, skipPadding) {
+		 var snapped = Snap.snapTo(layout.snapToGrid.step, input, layout.snapToGrid.step / 2);
+		 return skipPadding ? snapped : Math.max(snapped, layout.snapToGrid.padding);
 	 }
 };

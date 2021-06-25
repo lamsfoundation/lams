@@ -36,7 +36,7 @@ var DecorationDefs = {
 			this.loadPropertiesDialogContent = PropertyDefs.labelProperties;
 		}
 		
-		this.draw(x, y, color || layout.colors.activityText, size || layout.conf.labelDefaultSize);
+		this.draw(x, y, color || 'black', size || layout.conf.labelDefaultSize);
 	},
 	
 	
@@ -61,7 +61,7 @@ var DecorationDefs = {
 	methods : {
 		container : {
 			
-			draw : function(x, y, x2, y2, color, borderColor, strokeWidth){
+			draw : function(x, y, x2, y2, color){
 				// check for new coordinates or just take them from the existing shape
 				var box = this.items   ? this.items.shape.getBBox() : null,
 					x = x != undefined ? x : box.x,
@@ -69,7 +69,7 @@ var DecorationDefs = {
 					// take into account minimal size of rectangle
 					x2 = x2 ? Math.max(x2, x + layout.conf.regionEmptyWidth) : x + box.width,
 					y2 = y2 ? Math.max(y2, y + layout.conf.regionEmptyHeight) : y + box.height,
-					color =  color ? color : this.items.shape.attr('fill');
+					color =  !color && this.items ? this.items.shape.attr('fill') : color;
 	
 				if (box) {
 					this.items.remove();
@@ -84,8 +84,7 @@ var DecorationDefs = {
 				this.items.attr('uiid', this.uiid);
 				if (this.title) {
 					var label = paper.text(x + 7, y + 14, this.title)
-									 .attr(layout.defaultTextAttributes)
-					 				 .attr('text-anchor', 'start');
+									 .addClass('svg-activity-title-label svg-activity-title-label-small');
 					if (!isReadOnlyMode){
 						label.attr('cursor', 'pointer');
 					}
@@ -96,27 +95,22 @@ var DecorationDefs = {
 					x2 = Math.max(x2, label.getBBox().x2 + 5);
 				}
 				
-				if ( ! borderColor )
-					borderColor = layout.colors.activityBorder;
-				if ( ! strokeWidth )
-					strokeWidth = 0.5;
-				
 				// the rectangle
-				this.items.shape = paper.path(Snap.format('M {x} {y} h {width} v {height} h -{width} z',
-														  {
-														   'x'     : x,
-														   'y'     : y,
-														   'width' : x2 - x,
-														   'height'    : y2 - y
-														  }))
-						 			    .attr({
-						 			    	'stroke' : borderColor,
-										    'stroke-width' : strokeWidth,
-						 			    	'fill'   : color
-						 			    });
+				var curve = layout.activity.borderCurve,
+					width = x2 - x,
+					height = y2 - y,
+					shapePath = ' M ' + (x + curve) + ' ' + y + ' h ' + (width - 2 * curve) + ' q ' + curve + ' 0 ' + curve + ' ' + curve +
+						' v ' + (height - 2 * curve) + ' q 0 ' + curve + ' ' + -curve + ' ' + curve + 
+						' h ' + (-width + 2 * curve) + ' q ' + -curve + ' 0 ' + -curve + ' ' + -curve +
+						' v ' + (-height + 2 * curve) + ' q 0 ' + -curve + ' ' + curve + ' ' + -curve;
+				this.items.shape = paper.path(shapePath);
+				this.items.shape.addClass('svg-annotation-container');
 				this.items.prepend(this.items.shape);
 				GeneralLib.toBack(this.items);
 				
+				if (color) {
+					this.items.shape.attr('fill', color);
+				}
 				if (isReadOnlyMode){
 					if (activitiesOnlySelectable) {
 						this.items.attr('cursor', 'pointer')
@@ -206,11 +200,12 @@ var DecorationDefs = {
 		region : {
 			draw : function(x, y, x2, y2, color){
 				this.drawContainer(x, y, x2, y2, color);
+				this.items.addClass('svg-annotation-region');
 				
 				var box = this.items.shape.getBBox();
 				
 				if (!isReadOnlyMode){
-					this.items.fitButton = paper.circle(box.x2 - 10, box.y + 10, 5)
+					this.items.fitButton = paper.circle(box.x2 - 7, box.y + 7, 5)
 										 .attr({
 											'stroke'  : null,
 											'fill'    : 'blue',
@@ -227,13 +222,11 @@ var DecorationDefs = {
 										 });
 					this.items.append(this.items.fitButton);
 					
-					this.items.resizeButton = paper.path(Snap.format('M {x} {y} v {side} h -{side} z',
-																	 {
-																 	  'x' : box.x2,
-																 	  'y' : box.y2 - 15,
-																 	  'side' : 15
-																	 })
-														)
+					var curve = layout.activity.borderCurve,
+						side = 10;
+					
+					this.items.resizeButton = paper.path(' M ' + box.x2 + ' ' + (box.y2 - side - curve) + ' v ' + side +
+														 ' q 0 ' + curve + ' ' + (-curve) + ' ' + curve + ' h ' + (-side) + ' z')
 												   .attr({
 													 'stroke' : null,
 													 'fill'   : 'blue',

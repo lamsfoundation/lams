@@ -78,8 +78,6 @@
 				SAVE_BUTTON : '<c:out value="${SAVE_BUTTON_VAR}" />',
 				<fmt:message key="button.cancel" var="CANCEL_BUTTON_VAR"/>
 				CANCEL_BUTTON : '<c:out value="${CANCEL_BUTTON_VAR}" />',
-				<fmt:message key="learner.finished.count" var="LEARNER_FINISHED_COUNT_VAR"/>
-				LEARNER_FINISHED_COUNT : '<c:out value="${LEARNER_FINISHED_COUNT_VAR}" />',
 				<fmt:message key="learner.finished.dialog.title" var="LEARNER_FINISHED_DIALOG_TITLE_VAR"/>
 				LEARNER_FINISHED_DIALOG_TITLE : '<c:out value="${LEARNER_FINISHED_DIALOG_TITLE_VAR}" />',
 				<fmt:message key="lesson.enable.presence.alert" var="LESSON_PRESENCE_ENABLE_ALERT_VAR"/>
@@ -272,7 +270,9 @@
 					sequenceInfoDialog.modal("show");
 					sequenceTabShowInfo = false; // only show it once
                 }
-                
+
+
+				window.parent.resizeSequenceCanvas();
 			} else {
 				sequenceInfoDialog.modal("hide");
             }
@@ -538,39 +538,49 @@
 					</lams:TabBody>
 					
 					<lams:TabBody id="2">
-						<span class="pull-left" style="display:none" id="liveEditWarning"></span>
-						
-						<div id="sequenceTopButtonsContainer" class="topButtonsContainer">
-							<button onclick="javascript:startTour();return false;" class="btn btn-sm btn-default pull-right roffset10 tour-button"> 
-							<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="label.tour"/></span></button>
-	
-							<a id="refreshButton" class="btn btn-sm btn-default" title="<fmt:message key='button.refresh.tooltip'/>"
-							   href="#" onClick="javascript:refreshMonitor('sequence')">
-								<i class="fa fa-refresh"></i> <span class="hidden-xs"><fmt:message key="button.refresh"/></span>
-							</a>
-							<a id="liveEditButton" class="btn btn-sm btn-default style="display:none" title="<fmt:message key='button.live.edit.tooltip'/>"
-						       href="#" onClick="javascript:openLiveEdit()">
-								<i class="fa fa-pencil"></i> <span class="hidden-xs"><fmt:message key='button.live.edit'/></span>
-							</a>
-							<span id="sequenceSearchPhraseClear"
-								 class="fa fa-xs fa-times-circle"
-								 onClick="javascript:sequenceClearSearchPhrase(true)"
-								 title="<fmt:message key='learners.search.phrase.clear.tooltip' />" 
-							></span>
-							<input id="sequenceSearchPhrase"
-								   title="<fmt:message key='search.learner.textbox' />" />
-							<span id="sequenceSearchPhraseIcon"
-								  class="ui-icon ui-icon-search"
-								  title="<fmt:message key='search.learner.textbox' />"></span>
+						<div class="svg-learner-draggable-area">
+							<span class="pull-left" style="display:none" id="liveEditWarning"></span>
+							
+							<div id="sequenceTopButtonsContainer" class="topButtonsContainer">
+								<button onclick="javascript:startTour();return false;" class="btn btn-sm btn-default pull-right roffset10 tour-button"> 
+								<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="label.tour"/></span></button>
+		
+								<a id="refreshButton" class="btn btn-sm btn-default" title="<fmt:message key='button.refresh.tooltip'/>"
+								   href="#" onClick="javascript:refreshMonitor('sequence')">
+									<i class="fa fa-refresh"></i> <span class="hidden-xs"><fmt:message key="button.refresh"/></span>
+								</a>
+								<a id="liveEditButton" class="btn btn-sm btn-default style="display:none" title="<fmt:message key='button.live.edit.tooltip'/>"
+							       href="#" onClick="javascript:openLiveEdit()">
+									<i class="fa fa-pencil"></i> <span class="hidden-xs"><fmt:message key='button.live.edit'/></span>
+								</a>
+								<a id="canvasFitScreenButton" class="btn btn-sm btn-default title="<fmt:message key='button.canvas.fit.screen.tooltip'/>"
+							       href="#" onClick="javascript:canvasFitScreen(true)">
+									<i class="fa fa-arrows-alt"></i> <span class="hidden-xs"><fmt:message key='button.canvas.fit.screen'/></span>
+								</a>
+								<a id="canvasOriginalSizeButton" class="btn btn-sm btn-default title="<fmt:message key='button.canvas.original.size.tooltip'/>"
+							       href="#" onClick="javascript:canvasFitScreen(false)">
+									<i class="fa fa-arrow-circle-o-up"></i> <span class="hidden-xs"><fmt:message key='button.canvas.original.size'/></span>
+								</a>
+								<span id="sequenceSearchPhraseClear"
+									 class="fa fa-xs fa-times-circle"
+									 onClick="javascript:sequenceClearSearchPhrase(true)"
+									 title="<fmt:message key='learners.search.phrase.clear.tooltip' />" 
+								></span>
+								<input id="sequenceSearchPhrase"
+									   title="<fmt:message key='search.learner.textbox' />" />
+								<span id="sequenceSearchPhraseIcon"
+									  class="ui-icon ui-icon-search"
+									  title="<fmt:message key='search.learner.textbox' />"></span>
+							</div>
+							<div id="sequenceCanvas"></div>
+							<div id="completedLearnersContainer" title="<fmt:message key='force.complete.end.lesson.tooltip' />">
+								<img id="completedLessonLearnersIcon" src="<lams:LAMSURL/>images/completed.svg" />
+							</div>
+							<img id="sequenceCanvasLoading"
+							     src="<lams:LAMSURL/>images/ajax-loader-big.gif" />
+							<img id="sequenceSearchedLearnerHighlighter"
+							     src="<lams:LAMSURL/>images/pedag_down_arrow.gif" />
 						</div>
-						<div id="sequenceCanvas"></div>
-						<div id="completedLearnersContainer" title="<fmt:message key='force.complete.end.lesson.tooltip' />">
-							<img id="completedLearnersDoorIcon" src="<lams:LAMSURL/>images/icons/door_open.png" />
-						</div>
-						<img id="sequenceCanvasLoading"
-						     src="<lams:LAMSURL/>images/ajax-loader-big.gif" />
-						<img id="sequenceSearchedLearnerHighlighter"
-						     src="<lams:LAMSURL/>images/pedag_down_arrow.gif" />
 					</lams:TabBody>
 					
 					<lams:TabBody id="3">

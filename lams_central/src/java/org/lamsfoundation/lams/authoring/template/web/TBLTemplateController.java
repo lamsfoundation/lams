@@ -118,7 +118,7 @@ public class TBLTemplateController extends LdTemplateController {
 	ArrayNode activities = JsonNodeFactory.instance.arrayNode();
 	ArrayNode groupings = JsonNodeFactory.instance.arrayNode();
 
-	Integer[] firstActivityInRowPosition = new Integer[] { 20, 125 }; // the very first activity, all other locations can be calculated from here if needed!
+	Integer[] firstActivityInRowPosition = new Integer[] { 40, 40 }; // the very first activity, all other locations can be calculated from here if needed!
 	String activityTitle = null;
 	Integer[] currentActivityPosition = null;
 	Integer groupingUIID = null;

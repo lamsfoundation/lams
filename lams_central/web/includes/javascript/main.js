@@ -292,7 +292,7 @@ function makeSortable(element) {
 
 function showMonitorLessonDialog(lessonID) {
 	var id = "dialogMonitorLesson" + lessonID,
-		dialog = showDialog(id, {
+	    dialog = showDialog(id, {
 			'data' : {
 				'isMonitorDialog' : true,
 				'lessonID' : lessonID
@@ -308,15 +308,15 @@ function showMonitorLessonDialog(lessonID) {
 					+ $(this).data('lessonID'),
 					'id' : 'monitorModal'});
 			},
-
-		}, true, true);
 	
+		}, true, true);
+		
+
+		
 	// if it was just created
 	if (dialog) {
 		// tell the dialog contents that it was resized
 		$('.modal-content', dialog).on('resizestop', resizeSequenceCanvas);
-		// initial resize
-		$('iframe', dialog).on('load', resizeSequenceCanvas);
 		
 		dialog.modal('show');
 	}
@@ -326,10 +326,12 @@ function showMonitorLessonDialog(lessonID) {
  * Adjust the position of LD SVG in Monitoring.
  */
 function resizeSequenceCanvas(){
-	$('div[id^="dialogMonitorLesson"] iframe').each(function(){
-		var win = this.contentWindow || this.contentDocument;
+	$('div[id^="dialogMonitorLesson"]').each(function(){
+		var iframe = $('iframe', this)[0], 
+			win = iframe.contentWindow || iframe.contentDocument;
 		if (win.resizeSequenceCanvas) {
-			var body = $(this).closest('.modal-body');
+			// find out the size of content area in the monitoring modal
+			var body = $(this).find('.modal-body');
 			win.resizeSequenceCanvas(body.width(), body.height());
 		}
 	});

@@ -305,15 +305,84 @@ td.contributeEntryCell a {
 
 /********** SEQUENCE TAB STYLES **********/
 div#sequenceCanvas {
-	text-align: center;
-	width: 100%;
-	height: 100%;
-	overflow: auto;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;  
+}
+  
+div#sequenceCanvas div.learner-icon-container {
+	position: relative;
+}
+  
+div#sequenceCanvas div.learner-icon-container div.learner-icon, #completedLearnersContainer div.learner-icon {
+  border-radius: 20px;
+  background-color: #FFFFFF;
+}
+  
+div#sequenceCanvas div.learner-icon-container div.learner-icon, div#sequenceCanvas div.learner-icon-container div.more-learner-icon {
+	position: absolute;
 }
 
-div#sequenceCanvas svg {
+#completedLearnersContainer div.learner-icon {
+  display: inline-block;
+  margin-right: 5px;
+}
+
+div#sequenceCanvas div.more-learner-icon, #completedLearnersContainer div.more-learner-icon {
+  display: inline-block;
+  width: 35px;
+  height: 35px;
+  line-height: 35px;
+  font-size: 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  background-color: #e7e7e7;
+  text-align: center;
+}
+
+div#sequenceCanvas div.learner-icon.learner-searched {
+  border: red 3px solid;
+  border-radius: 25px;
+  z-index: 109 !important;
+}
+
+div#sequenceCanvas div.portrait-generic-sm.learner-icon.learner-searched {
+  border: none;
+}
+
+div#sequenceCanvas div.portrait-generic-sm.learner-icon.learner-searched::before {
+  border: red 3px solid;
+  border-radius: 25px;
+}
+
+
+div#sequenceCanvas .activity-requires-attention {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+}
+  
+#completedLearnersContainer #completedLessonLearnersIcon {
+  width: 35px;
+  height: 35px;
+}
+  
+
+div#sequenceCanvas svg.svg-learning-design {
 	display: block;
-	overflow: hidden;
+	overflow: visible;
+}
+
+div#sequenceCanvas svg.svg-learning-design g.gate svg {
+	display: none;
 }
 
 img#sequenceCanvasLoading {
@@ -336,6 +405,15 @@ img#sequenceCanvasLoading {
 	cursor: pointer;
 	margin: 9px 25px 5px 0;
 	visibility: hidden;
+}
+
+.ui-menu-item-wrapper.autocomplete-menu-item-with-portrait {
+	display: flex;
+	justify-content: space-between;
+}
+
+.ui-menu-item-wrapper.autocomplete-menu-item-with-portrait > p {
+	padding-top : 10px;
 }
 
 img#sequenceSearchedLearnerHighlighter {
