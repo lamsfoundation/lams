@@ -197,6 +197,19 @@ public class QbCollectionController {
 	qbService.removeQuestionFromCollectionByQuestionId(collectionUid, qbQuestionId, true);
     }
 
+    @RequestMapping(path = "/removeCollectionQuestions", method = RequestMethod.POST)
+    @ResponseBody
+    public String removeCollectionQuestionS(@RequestParam long collectionUid,
+	    @RequestParam("qbQuestionIds[]") int[] qbQuestionIds) {
+	boolean allQuestionsRemoved = true;
+	for (int qbQuestionId : qbQuestionIds) {
+	    allQuestionsRemoved &= qbService.removeQuestionFromCollectionByQuestionId(collectionUid, qbQuestionId,
+		    true);
+	}
+	// if some questions could not be removed because they are in sequences, we need to let the user know
+	return allQuestionsRemoved ? "ok" : "fail";
+    }
+
     @RequestMapping(path = "/addCollectionQuestion", method = RequestMethod.POST)
     @ResponseBody
     public void addCollectionQuestion(@RequestParam long targetCollectionUid, @RequestParam boolean copy,
