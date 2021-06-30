@@ -26,7 +26,7 @@
 	<%-- Combined tab and navigation bar used in authoring and monitoring --%>
 		<div class="row no-gutter no-margin">
 		<div class="col-xs-12">
-		<div class="container-fluid" id="content">
+		<div class="container-fluid" id="content" style="max-width: 1400px">
 			<jsp:doBody />
 		</div>
 		</div>
