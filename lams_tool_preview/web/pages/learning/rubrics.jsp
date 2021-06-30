@@ -19,6 +19,10 @@
 	.rubrics-table td:not(:first-child) {
 		cursor: pointer;
 	}
+	
+	.expand-all-button {
+		margin-bottom: 10px;
+	}
 </style>
 
 <script>
@@ -51,8 +55,14 @@
  			}
     	});
 	}
-</script>
 
+	function expandAllRubricsUserPanels(){
+		$('.collapse').collapse('show');
+	}
+</script>
+<button class="btn btn-default expand-all-button" onClick="javascript:expandAllRubricsUserPanels()">
+	<fmt:message key="label.rating.rubrics.expand.all" />
+</button>
 <div id="rubrics-user-panels" class="panel-group" role="tablist" aria-multiselectable="true">
 	<%-- It is sufficient to take user names and columns from the first row/criterion --%>
 	<c:set var="exampleRatings" value="${criteriaRatings.ratingDtos}" />
