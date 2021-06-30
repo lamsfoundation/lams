@@ -250,9 +250,9 @@ When true, hides the names and groups the comments.  -->
 				<tr>
 					<%-- Each answer column has the same length, all remaining space is taken by the question column --%>
 					<th class="col-xs-${12 - fn:length(criteriaRatings.ratingCriteria.rubricsColumnHeaders) * 2}"></th>
-					<c:forEach var="columnHeader" items="${criteriaRatings.ratingCriteria.rubricsColumnHeaders}">
+					<c:forEach var="columnHeader" items="${criteriaRatings.ratingCriteria.rubricsColumnHeaders}" varStatus="columnStatus">
 						<th class="col-xs-2">
-							<c:out value="${columnHeader}" escapeXml="false"/>
+							(${columnStatus.count})&nbsp;<c:out value="${columnHeader}" escapeXml="false"/>
 						</th>
 					</c:forEach>
 				</tr>
@@ -350,9 +350,9 @@ When true, hides the names and groups the comments.  -->
 								<tr>
 									<%-- Each answer column has the same length, all remaining space is take by the question column --%>
 									<th class="col-xs-${12 - fn:length(criteriaRatings.ratingCriteria.rubricsColumnHeaders) * 2}"></th>
-									<c:forEach var="columnHeader" items="${criteriaRatings.ratingCriteria.rubricsColumnHeaders}">
+									<c:forEach var="columnHeader" items="${criteriaRatings.ratingCriteria.rubricsColumnHeaders}" varStatus="columnStatus">
 										<th class="col-xs-2">
-											<c:out value="${columnHeader}" escapeXml="false"/>
+											(${columnStatus.count})&nbsp;<c:out value="${columnHeader}" escapeXml="false"/>
 										</th>
 									</c:forEach>
 								</tr>
