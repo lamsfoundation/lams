@@ -506,6 +506,9 @@ public class PeerreviewServiceImpl
 
     @Override
     public int emailReportToUser(Long toolContentId, Long sessionId, Long userId, String email) {
+	if (log.isDebugEnabled()) {
+	    log.debug("Sending email with results to learner " + userId + " for session ID " + sessionId);
+	}
 	PeerreviewUser user = peerreviewUserDao.getUserByUserIDAndSessionID(userId, sessionId);
 	if (user != null) {
 	    eventNotificationService.sendMessage(null, userId.intValue(),
@@ -521,6 +524,10 @@ public class PeerreviewServiceImpl
 
     @Override
     public int emailReportToSessionUsers(Long toolContentId, Long sessionId) {
+	if (log.isDebugEnabled()) {
+	    log.debug("Sending email with results to all learners for session ID " + sessionId);
+	}
+
 	PeerreviewSession session = peerreviewSessionDao.getSessionBySessionId(sessionId);
 	Peerreview peerreview = getPeerreviewByContentId(toolContentId);
 	Map<Long, String> emails = new EmailAnalysisBuilder(peerreview, session, ratingService, peerreviewSessionDao,
