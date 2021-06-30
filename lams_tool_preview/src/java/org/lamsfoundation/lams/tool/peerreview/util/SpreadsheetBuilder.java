@@ -79,16 +79,28 @@ public class SpreadsheetBuilder {
 	titleRow.addCell(service.getLocalisedMessage("label.learner", null), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	Map<Long, Integer> criteriaIndexMap = new HashMap<>();
 	int countNonCommentCriteria = 0;
-	Integer ratingCriteriaGroupId = null;
-	
+	Integer previousRatingCriteriaGroupId = null;
+
 	for (RatingCriteria criteria : criterias) {
 	    if (!criteria.isCommentRating()) {
-		titleRow.addCell(criteria.getTitle(), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		// for each rubrics we separate its rows with a left border
+		Integer ratingCriteriaGroupId = criteria.getRatingCriteriaGroupId();
+		int[] borders = null;
+		if (ratingCriteriaGroupId == null ? previousRatingCriteriaGroupId != null
+			: !ratingCriteriaGroupId.equals(previousRatingCriteriaGroupId)) {
+		    borders = new int[] { ExcelCell.BORDER_STYLE_BOTTOM_THIN, ExcelCell.BORDER_STYLE_LEFT_THIN };
+		} else {
+		    borders = new int[] { ExcelCell.BORDER_STYLE_BOTTOM_THIN };
+		}
+		previousRatingCriteriaGroupId = ratingCriteriaGroupId;
+		titleRow.addCell(criteria.getTitle(), true, borders);
+
 		criteriaIndexMap.put(criteria.getRatingCriteriaId(), countNonCommentCriteria);
 		countNonCommentCriteria++;
 	    }
 	}
-	titleRow.addCell(service.getLocalisedMessage("label.average", null), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	titleRow.addCell(service.getLocalisedMessage("label.average", null), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN,
+		ExcelCell.BORDER_STYLE_LEFT_THIN);
 	if (peerreview.isSelfReview()) {
 	    titleRow.addCell(service.getLocalisedMessage("label.sa", null), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	}
@@ -175,11 +187,11 @@ public class SpreadsheetBuilder {
 	avgRow.addCell(finalGroupAverage, true);
 
 	// the map is: itemId (who was rated) -> userId (who rated) -> rating from all categories
-	Map<Long, Map<Long, Set<Rating>>> ratings = ((List<Rating>) ratingService
-		.getRatingsByCriteriasAndItems(criteriaIndexMap.keySet(), userNames.keySet())).stream()
-			.filter(rating -> rating.getRating() != null)
-			.collect(Collectors.groupingBy(Rating::getItemId, Collectors.groupingBy(
-				rating -> rating.getLearner().getUserId().longValue(), Collectors.toSet())));
+	Map<Long, Map<Long, Set<Rating>>> ratings = ratingService
+		.getRatingsByCriteriasAndItems(criteriaIndexMap.keySet(), userNames.keySet()).stream()
+		.filter(rating -> rating.getRating() != null)
+		.collect(Collectors.groupingBy(Rating::getItemId, Collectors
+			.groupingBy(rating -> rating.getLearner().getUserId().longValue(), Collectors.toSet())));
 
 	// Combine rated rows with rows with users not yet rated, to make up complete list, and write out to rowList.
 	for (PeerreviewUser user : users) {
