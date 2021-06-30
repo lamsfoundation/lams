@@ -79,7 +79,8 @@ public class SpreadsheetBuilder {
 	titleRow.addCell(service.getLocalisedMessage("label.learner", null), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	Map<Long, Integer> criteriaIndexMap = new HashMap<>();
 	int countNonCommentCriteria = 0;
-
+	Integer ratingCriteriaGroupId = null;
+	
 	for (RatingCriteria criteria : criterias) {
 	    if (!criteria.isCommentRating()) {
 		titleRow.addCell(criteria.getTitle(), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
