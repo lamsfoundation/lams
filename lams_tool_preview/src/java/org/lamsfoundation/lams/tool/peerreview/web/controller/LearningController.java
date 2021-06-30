@@ -418,8 +418,7 @@ public class LearningController {
 	    if (currentUserDtos != null) {
 		Function<RatingCriteria, StyledCriteriaRatingDTO> dtoBuilder = c -> service
 			.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(), sessionId, c,
-				user.getUserId(), false, sorting, null,
-				showAllUsers && !criteria.isRubricsStyleRating(), false);
+				user.getUserId(), false, sorting, null, showAllUsers, false);
 
 		// for rubrics there is a single dto (first row) with list of all rows (including first) filled
 		StyledCriteriaRatingDTO dto = criteria.isRubricsStyleRating()
