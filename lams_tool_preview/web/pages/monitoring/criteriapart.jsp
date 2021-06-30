@@ -127,74 +127,8 @@
             });
         };
         setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
-        
 	});
-
-	function closeResultsForLearner() {
-		$("#emailPreviewArea").html("");
-		$("#emailPreviewArea").hide();
-		return false;
-	}
-
-	function clearMessage() {
-		$("#messageArea2").html("");
-		return false;
-	}
-
-	// Prview the email to be sent to the learner
-	function previewResultsForLearner(sessionId, userId) {
-		$(".btn-disable-on-submit").prop("disabled", true);
-		var url = "<c:url value="/monitoring/previewResultsToUser.do"/>";
-		clearMessage();
-		$("#messageArea2_Busy").show();
-		$("#emailPreviewArea").load(
-			url,
-			{
-				sessionMapID: "${sessionMapID}",
-				toolContentID: ${sessionMap.toolContentID},
-				toolSessionId: sessionId, 
-				userID: userId,
-				reqID: (new Date()).getTime()
-			},
-			function() {
-				$("#messageArea2_Busy").hide();
-				$("#emailPreviewArea").show();
-				$(".btn-disable-on-submit").prop("disabled", false);
-			}
-		);
-		return false;
-	}
-
-	// Send the previewed email to the learner
-	function sendResultsForLearner(sessionId, userId, dateTimeStamp) {
-		$(".btn-disable-on-submit").prop("disabled", true);
-		var url = "<c:url value="/monitoring/sendPreviewedResultsToUser.do"/>";
-		clearMessage();
-		$("#messageArea2_Busy").show();
-		$("#messageArea2").load(
-			url,
-			{
-				sessionMapID: "${sessionMapID}",
-				toolContentID: ${sessionMap.toolContentID},
-				toolSessionId: sessionId, 
-				dateTimeStamp: dateTimeStamp,
-				userID: userId,
-				reqID: (new Date()).getTime()
-			},
-			function() {
-				$("#messageArea2_Busy").hide();
-				closeResultsForLearner();
-				$(".btn-disable-on-submit").prop("disabled", false);
-			}
-		);
-		return false;
-	}
-
 </script>
-
-<!--For send results feature-->
-<i class="fa fa-spinner" style="display:none" id="messageArea2_Busy"></i>
-<div class="voffset5" id="messageArea2"></div>
 
 <p>
 	<c:choose>
@@ -221,5 +155,3 @@
 
 <table id="group${toolSessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
 <div id="pager${toolSessionId}"></div> 
-
-<div class="voffset10" id="emailPreviewArea" style="display:none" ></div>

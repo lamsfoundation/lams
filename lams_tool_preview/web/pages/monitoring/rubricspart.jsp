@@ -46,6 +46,10 @@
 									&nbsp;<c:out value="${learnerData.key.lastName}" escapeXml="true"/>
 								</a>
 							</span>
+							<button class="btn btn-default pull-right email-button btn-disable-on-submit"
+									onClick="javascript:previewResultsForLearner(${session.key.sessionId}, ${learnerData.key.userId})">
+								<fmt:message key="button.preview.results" />
+							</button>
 					       </div>
 				       
 				       	<div id="rubrics-user-collapse-${learnerData.key.uid}" class="panel-collapse collapse" 
