@@ -23,14 +23,14 @@
 		
 	//vars for rating.js
 	var MAX_RATES = 0,
-	MIN_RATES = 0,
-	COMMENTS_MIN_WORDS_LIMIT = 0,
-	MAX_RATINGS_FOR_ITEM = 0,
-	LAMS_URL = '',
-	COUNT_RATED_ITEMS = 0,
-	COMMENT_TEXTAREA_TIP_LABEL = '',
-	WARN_COMMENTS_IS_BLANK_LABEL = '',
-	WARN_MIN_NUMBER_WORDS_LABEL = '';
+		MIN_RATES = 0,
+		COMMENTS_MIN_WORDS_LIMIT = 0,
+		MAX_RATINGS_FOR_ITEM = 0,
+		LAMS_URL = '',
+		COUNT_RATED_ITEMS = 0,
+		COMMENT_TEXTAREA_TIP_LABEL = '',
+		WARN_COMMENTS_IS_BLANK_LABEL = '',
+		WARN_MIN_NUMBER_WORDS_LABEL = '';
 </script>
 <script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 
@@ -117,6 +117,7 @@
 			<c:set var="sessionMap" value="${sessionMap}" scope="request"/>
 			<c:choose>
 				<c:when test="${criteria.rubricsStyleRating}">
+					<c:set var="rubricsLearnerData" value="${rubricsData[toolSessionId]}" scope="request"/>
 					<%@ include file="rubricspart.jsp" %>
 				</c:when>
 				<c:otherwise>

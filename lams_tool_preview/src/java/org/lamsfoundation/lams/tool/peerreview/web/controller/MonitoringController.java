@@ -29,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -123,7 +124,7 @@ public class MonitoringController {
 	PeerreviewServiceImpl.removeGroupedCriteria(criterias);
 
 	if (criterias.size() == 1 && criterias.get(0).isRubricsStyleRating()) {
-	    Map<GroupSummary, Map<PeerreviewUser, StyledCriteriaRatingDTO>> rubricsData = getRubricsData(sessionMap,
+	    Map<Long, Map<PeerreviewUser, StyledCriteriaRatingDTO>> rubricsData = getRubricsData(sessionMap,
 		    criterias.get(0), criterias);
 	    request.setAttribute("rubricsData", rubricsData);
 	}
@@ -151,9 +152,9 @@ public class MonitoringController {
 	    Long toolContentId = (Long) sessionMap.get(PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
 
 	    List<RatingCriteria> criterias = service.getRatingCriterias(toolContentId);
-	    Map<GroupSummary, Map<PeerreviewUser, StyledCriteriaRatingDTO>> rubricsData = getRubricsData(sessionMap,
+	    Map<PeerreviewUser, StyledCriteriaRatingDTO> rubricsLearnerData = getRubricsLearnerData(toolSessionId,
 		    criteria, criterias);
-	    request.setAttribute("rubricsData", rubricsData);
+	    request.setAttribute("rubricsLearnerData", rubricsLearnerData);
 	}
 
 	request.setAttribute("criteria", criteria);
@@ -694,9 +695,25 @@ public class MonitoringController {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<GroupSummary, Map<PeerreviewUser, StyledCriteriaRatingDTO>> getRubricsData(
+    private Map<Long, Map<PeerreviewUser, StyledCriteriaRatingDTO>> getRubricsData(
 	    SessionMap<String, Object> sessionMap, RatingCriteria criteria, Collection<RatingCriteria> criterias) {
 	List<GroupSummary> sessionList = (List<GroupSummary>) sessionMap.get(PeerreviewConstants.ATTR_SUMMARY_LIST);
+
+	Map<Long, Map<PeerreviewUser, StyledCriteriaRatingDTO>> rubricsData = new HashMap<>();
+	for (GroupSummary session : sessionList) {
+	    Long toolSessionId = session.getSessionId();
+	    Map<PeerreviewUser, StyledCriteriaRatingDTO> learnerData = getRubricsLearnerData(toolSessionId, criteria,
+		    criterias);
+	    rubricsData.put(toolSessionId, learnerData);
+	}
+
+	return rubricsData;
+    }
+
+    private Map<PeerreviewUser, StyledCriteriaRatingDTO> getRubricsLearnerData(Long toolSessionId,
+	    RatingCriteria criteria, Collection<RatingCriteria> criterias) {
+	Map<PeerreviewUser, StyledCriteriaRatingDTO> learnerData = new TreeMap<>(
+		Comparator.comparing(PeerreviewUser::getFirstName).thenComparing(PeerreviewUser::getLastName));
 
 	criterias = criterias.stream()
 		.filter(c -> criteria.getRatingCriteriaGroupId().equals(c.getRatingCriteriaGroupId()))
@@ -704,25 +721,17 @@ public class MonitoringController {
 	Collection<Long> criteriaIds = criterias.stream()
 		.collect(Collectors.mapping(RatingCriteria::getRatingCriteriaId, Collectors.toSet()));
 
-	Map<GroupSummary, Map<PeerreviewUser, StyledCriteriaRatingDTO>> rubricsData = new TreeMap<>(
-		Comparator.comparing(GroupSummary::getSessionName));
-	for (GroupSummary session : sessionList) {
-	    Map<PeerreviewUser, StyledCriteriaRatingDTO> learnerData = new TreeMap<>(
-		    Comparator.comparing(PeerreviewUser::getFirstName).thenComparing(PeerreviewUser::getLastName));
-	    rubricsData.put(session, learnerData);
+	Collection<PeerreviewUser> learners = service.getUsersBySession(toolSessionId);
+	List<Rating> ratings = ratingService.getRatingsByCriteriasAndItems(criteriaIds,
+		learners.stream().collect(Collectors.mapping(PeerreviewUser::getUserId, Collectors.toSet())));
 
-	    Collection<PeerreviewUser> learners = service.getUsersBySession(session.getSessionId());
-	    List<Rating> ratings = ratingService.getRatingsByCriteriasAndItems(criteriaIds,
-		    learners.stream().collect(Collectors.mapping(PeerreviewUser::getUserId, Collectors.toSet())));
-
-	    for (PeerreviewUser learner : learners) {
-		Function<RatingCriteria, StyledCriteriaRatingDTO> dtoBuilder = c -> PeerreviewServiceImpl
-			.getRubricsCriteriaDTO(c, learner.getUserId().intValue(), true, ratings);
-		StyledCriteriaRatingDTO dto = PeerreviewServiceImpl.fillCriteriaGroup(criteria, criterias, dtoBuilder);
-		learnerData.put(learner, dto);
-	    }
+	for (PeerreviewUser learner : learners) {
+	    Function<RatingCriteria, StyledCriteriaRatingDTO> dtoBuilder = c -> PeerreviewServiceImpl
+		    .getRubricsCriteriaDTO(c, learner.getUserId().intValue(), true, ratings);
+	    StyledCriteriaRatingDTO dto = PeerreviewServiceImpl.fillCriteriaGroup(criteria, criterias, dtoBuilder);
+	    learnerData.put(learner, dto);
 	}
 
-	return rubricsData;
+	return learnerData;
     }
 }
