@@ -249,12 +249,13 @@ When true, hides the names and groups the comments.  -->
 			<table class="table table-bordered rubrics-table">
 				<tr>
 					<%-- Each answer column has the same length, all remaining space is taken by the question column --%>
-					<th class="col-xs-${12 - fn:length(criteriaRatings.ratingCriteria.rubricsColumnHeaders) * 2}"></th>
+					<th class="col-xs-${11 - fn:length(criteriaRatings.ratingCriteria.rubricsColumnHeaders) * 2}"></th>
 					<c:forEach var="columnHeader" items="${criteriaRatings.ratingCriteria.rubricsColumnHeaders}" varStatus="columnStatus">
 						<th class="col-xs-2">
 							(${columnStatus.count})&nbsp;<c:out value="${columnHeader}" escapeXml="false"/>
 						</th>
 					</c:forEach>
+					<th class="col-xs-1 text-center"><fmt:message key="label.average" /></th>
 				</tr>
 				<c:forEach var="criteriaDto" items="${criteriaRatings.criteriaGroup}">
 					<c:set var="criteria" value="${criteriaDto.ratingCriteria}" />
@@ -263,13 +264,19 @@ When true, hides the names and groups the comments.  -->
 						<td rowspan="2">
 							<c:out value="${criteria.title}" escapeXml="false" />
 						</td>
+						
+						<%-- These variables are for counting average rating for the given row --%>
+						<c:set var="rowRateCount" value="0" />
+						<c:set var="rowRateValue" value="0" />
 						<c:forEach var="column" items="${criteria.rubricsColumns}" varStatus="columnOrderId">
 							
 							<%-- Check if any other learner rated this learner for this column --%>
 							<c:set var="rateCount" value="0" />
 							<c:forEach var="ratingDto" items="${criteriaDto.ratingDtos}">
-								<c:set var="rateCount" value="${rateCount + (ratingDto.userRating eq columnOrderId.count? 1 : 0)}" />
+								<c:set var="rateCount" value="${rateCount + (ratingDto.userRating eq columnOrderId.count ? 1 : 0)}" />
 							</c:forEach>
+							<c:set var="rowRateCount" value="${rowRateCount + rateCount}" />
+							<c:set var="rowRateValue" value="${rowRateValue + rateCount * columnOrderId.count}" />
 							
 							<td class="rubrics-description-cell
 								<c:if test="${rateCount > 0}">
@@ -280,6 +287,18 @@ When true, hides the names and groups the comments.  -->
 								<c:out value="${column.name}" escapeXml="false" />
 							</td>
 						</c:forEach>
+						
+						<%-- Cell with average rating --%>
+						<td rowspan="2" class="text-center">
+							<c:choose>
+								<c:when test="${rowRateCount eq 0}">
+									-
+								</c:when>
+								<c:otherwise>
+									<fmt:formatNumber value="${rowRateValue / rowRateCount}" type="number" maxFractionDigits="2" />
+								</c:otherwise>
+							</c:choose>
+						</td>
 					</tr>
 					<tr>
 						<c:forEach var="column" items="${criteria.rubricsColumns}" varStatus="columnOrderId">
