@@ -4,6 +4,7 @@
 <c:set var="leaderDto" value="${sessionMap.leaderDto}"/>
 <c:set var="activityDto" value="${sessionMap.activityDto}"/>
 
+<script src="<lams:LAMSURL />includes/javascript/doc-popover.js"></script>
 <script type="text/javascript">
 	$(document).ready(function(){
 		$('[data-toggle="tooltip"]').bootstrapTooltip();
@@ -308,7 +309,15 @@
 			    	<a class="collapsed" role="button" data-toggle="collapse" href="#qb-stats" aria-expanded="true" aria-controls="qb-stats">
 		          		<fmt:message key="label.qb.stats" />
 		          	</a>
-					<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key="label.qb.stats.tooltip" />"></i>
+					<i class="fa fa-question-circle" aria-hidden="true" data-toggle="doc-popover"></i>
+					<span class="doc-popover-content hidden">
+						<span class="doc-popover-title">
+							<fmt:message key="label.qb.stats" />
+						</span>
+						<span class="doc-popover-body">
+							<fmt:message key="label.qb.stats.tooltip" />
+						</span>
+					</span>
 	      		</span>
 	        </div>
 	
@@ -326,15 +335,23 @@
 						</th>
 						<th scope="col" class="text-center">
 							<fmt:message key="label.qb.difficulty.index"/>&nbsp;
-							<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key="label.qb.difficulty.index.tooltip" />"></i>
+							<i class="fa fa-question-circle" aria-hidden="true" data-toggle="doc-popover" data-placement="right"></i>
+							<span class="doc-popover-content hidden">
+								<span class="doc-popover-body">
+									<fmt:message key="label.qb.difficulty.index.tooltip" />
+									<a href="/lams/" target="_blank">Here is a link</a>
+								</span>
+							</span>
 						</th>
 						<th scope="col" class="text-center">
 							<fmt:message key="label.qb.discrimination.index"/>&nbsp;
-							<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key="label.qb.discrimination.index.tooltip" />"></i>
+							<i id="discrimination-index-popover" class="fa fa-question-circle" aria-hidden="true" data-toggle="doc-popover" data-placement="right"/></i>
 						</th>
 						<th scope="col" class="text-center">
 							<fmt:message key="label.qb.point.biserial"/>&nbsp;
-							<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key="label.qb.point.biserial.tooltip" />"></i>
+							<i class="fa fa-question-circle" aria-hidden="true" data-toggle="doc-popover" data-placement="top"
+							   data-title="<fmt:message key="label.qb.point.biserial"/>"
+							   data-content="<fmt:message key="label.qb.point.biserial.tooltip" />"></i>
 						</th>
 					</tr>
 						
@@ -376,5 +393,15 @@
 
 </c:otherwise>
 </c:choose>
+
+<span id="discrimination-index-popover-content" class="doc-popover-content hidden">
+	<span class="doc-popover-title">
+		<fmt:message key="label.qb.discrimination.index"/>
+	</span>
+	<span class="doc-popover-body">
+		<fmt:message key="label.qb.discrimination.index.tooltip" />
+		<a href="/lams/" target="_blank">Here is a link</a>
+	</span>
+</span>
 
 <%@ include file="parts/toolOutput.jsp"%>
