@@ -1,6 +1,7 @@
 $(document).ready(function() {
 	$('[data-toggle="doc-popover"]').popover({
 		'html'  : true,
+		'container' : 'body',
 		'title' : function(){
 			// first try to get the title straight from element attributes
 			let popover = $(this),

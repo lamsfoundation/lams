@@ -316,6 +316,7 @@
 						</span>
 						<span class="doc-popover-body">
 							<fmt:message key="label.qb.stats.tooltip" />
+							<a href="/lams/" target="_blank">Here is a link</a>
 						</span>
 					</span>
 	      		</span>
