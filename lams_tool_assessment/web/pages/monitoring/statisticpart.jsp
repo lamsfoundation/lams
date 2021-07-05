@@ -334,7 +334,7 @@
 						</th>
 						<th scope="col" class="text-center">
 							<fmt:message key="label.qb.point.biserial"/>&nbsp;
-							 <i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key="label.qb.point.biserial.tooltip" />"></i>
+							<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key="label.qb.point.biserial.tooltip" />"></i>
 						</th>
 					</tr>
 						
