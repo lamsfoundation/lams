@@ -59,4 +59,30 @@ $(document).ready(function() {
 			return contentBody.length === 0 ? "" : contentBody.html();
 		}
 	});
+	
+
+	// Dismiss popover on a click outside an open popover
+	// Taken from https://stackoverflow.com/a/33953365
+	$(document).on('click', function (e) {
+	    var $popover,
+	        $target = $(e.target);
+	
+	    //do nothing if there was a click on popover content
+	    if ($target.hasClass('popover') || $target.closest('.popover').length) {
+	        return;
+	    }
+	
+	    $('[data-toggle="doc-popover"]').each(function () {
+	        $popover = $(this);
+	
+	        if (!$popover.is(e.target) &&
+	            $popover.has(e.target).length === 0 &&
+	            $('.popover').has(e.target).length === 0) {
+	            $popover.popover('hide');
+	        } else {
+	            //fixes issue described above
+	            $popover.popover('toggle');
+	        }
+	    });
+	});
 });
