@@ -309,14 +309,14 @@
 			    	<a class="collapsed" role="button" data-toggle="collapse" href="#qb-stats" aria-expanded="true" aria-controls="qb-stats">
 		          		<fmt:message key="label.qb.stats" />
 		          	</a>
-					<i class="fa fa-question-circle" aria-hidden="true" data-toggle="doc-popover"></i>
+					<a class="fa fa-question-circle" data-toggle="doc-popover"></a>
 					<span class="doc-popover-content hidden">
 						<span class="doc-popover-title">
 							<fmt:message key="label.qb.stats" />
 						</span>
 						<span class="doc-popover-body">
 							<fmt:message key="label.qb.stats.tooltip" />
-							<a href="/lams/" target="_blank">Here is a link</a>
+							<a href="/lams/" tabindex="0" target="_blank">Here is a link</a>
 						</span>
 					</span>
 	      		</span>
@@ -336,21 +336,21 @@
 						</th>
 						<th scope="col" class="text-center">
 							<fmt:message key="label.qb.difficulty.index"/>&nbsp;
-							<i class="fa fa-question-circle" aria-hidden="true" data-toggle="doc-popover" data-placement="right"></i>
+							<i class="fa fa-question-circle" data-toggle="doc-popover" data-placement="right"></i>
 							<span class="doc-popover-content hidden">
 								<span class="doc-popover-body">
 									<fmt:message key="label.qb.difficulty.index.tooltip" />
-									<a href="/lams/" target="_blank">Here is a link</a>
+									<a href="/lams/" tabindex="0" target="_blank">Here is a link</a>
 								</span>
 							</span>
 						</th>
 						<th scope="col" class="text-center">
 							<fmt:message key="label.qb.discrimination.index"/>&nbsp;
-							<i id="discrimination-index-popover" class="fa fa-question-circle" aria-hidden="true" data-toggle="doc-popover" data-placement="right"/></i>
+							<i id="discrimination-index-popover" class="fa fa-question-circle" data-toggle="doc-popover" data-placement="right"/></i>
 						</th>
 						<th scope="col" class="text-center">
 							<fmt:message key="label.qb.point.biserial"/>&nbsp;
-							<i class="fa fa-question-circle" aria-hidden="true" data-toggle="doc-popover" data-placement="top"
+							<i class="fa fa-question-circle" data-toggle="doc-popover" data-placement="top"
 							   data-title="<fmt:message key="label.qb.point.biserial"/>"
 							   data-content="<fmt:message key="label.qb.point.biserial.tooltip" />"></i>
 						</th>
@@ -401,7 +401,7 @@
 	</span>
 	<span class="doc-popover-body">
 		<fmt:message key="label.qb.discrimination.index.tooltip" />
-		<a href="/lams/" target="_blank">Here is a link</a>
+		<a href="/lams/" tabindex="0" target="_blank">Here is a link</a>
 	</span>
 </span>
 
