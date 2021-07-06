@@ -51,6 +51,8 @@
 			function() {
 				messageAreaBusy.hide();
 				emailPreviewArea.show();
+				// scroll to preview area
+				$('html, body').animate({scrollTop: emailPreviewArea.offset().top}, 1000);
 				buttons.prop("disabled", false);
 			}
 		);
