@@ -199,5 +199,206 @@ When true, hides the names and groups the comments.  -->
 	</c:if>
 </c:when> 
 
+<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == 4}">
 
+	<%-- Some styles for the table and results --%>
+	<style>	
+		.rubrics-user-panel .collapsable-icon-left a {
+			text-decoration: none;
+		}
+		
+		.rubrics-user-panel .collapsable-icon-left a:after {
+			margin-top: 6px;
+		}
+		
+		.rubrics-table tr:first-child {
+			background-color: initial !important;
+		}
+		
+		.rubrics-table th {
+			font-style: normal;
+			font-weight: bold;
+		}
+		
+		.rubrics-table .rubrics-rating-cell {
+			border-top: none;
+			
+		}
+		.rubrics-table .rubrics-rating-cell .rubrics-rating-count {
+			text-align: right;
+		}
+		
+		.rubrics-table .rubrics-rating-cell .rubrics-rating-count > .badge {
+			color: gray;
+			background-color: white;
+			font-size: large;
+		}
+		
+		.rubrics-table .rubrics-rating-cell .rubrics-rating-learner {
+			margin-top: 10px;
+		}
+		
+		.rubrics-table .rubrics-description-cell {
+			border-bottom: none;
+		}
+	</style>
+	
+	<c:choose>
+		<c:when test="${currentUserDisplay}">
+			
+			<table class="table table-bordered rubrics-table">
+				<tr>
+					<%-- Each answer column has the same length, all remaining space is taken by the question column --%>
+					<th class="col-xs-${11 - fn:length(criteriaRatings.ratingCriteria.rubricsColumnHeaders) * 2}"></th>
+					<c:forEach var="columnHeader" items="${criteriaRatings.ratingCriteria.rubricsColumnHeaders}" varStatus="columnStatus">
+						<th class="col-xs-2">
+							(${columnStatus.count})&nbsp;<c:out value="${columnHeader}" escapeXml="false"/>
+						</th>
+					</c:forEach>
+					<th class="col-xs-1 text-center"><fmt:message key="label.average" /></th>
+				</tr>
+				<c:forEach var="criteriaDto" items="${criteriaRatings.criteriaGroup}">
+					<c:set var="criteria" value="${criteriaDto.ratingCriteria}" />
+					
+					<tr>
+						<td rowspan="2">
+							<c:out value="${criteria.title}" escapeXml="false" />
+						</td>
+						
+						<%-- These variables are for counting average rating for the given row --%>
+						<c:set var="rowRateCount" value="0" />
+						<c:set var="rowRateValue" value="0" />
+						<c:forEach var="column" items="${criteria.rubricsColumns}" varStatus="columnOrderId">
+							
+							<%-- Check if any other learner rated this learner for this column --%>
+							<c:set var="rateCount" value="0" />
+							<c:forEach var="ratingDto" items="${criteriaDto.ratingDtos}">
+								<c:set var="rateCount" value="${rateCount + (ratingDto.userRating eq columnOrderId.count ? 1 : 0)}" />
+							</c:forEach>
+							<c:set var="rowRateCount" value="${rowRateCount + rateCount}" />
+							<c:set var="rowRateValue" value="${rowRateValue + rateCount * columnOrderId.count}" />
+							
+							<td class="rubrics-description-cell
+								<c:if test="${rateCount > 0}">
+									bg-success
+								</c:if>
+								"
+							>
+								<c:out value="${column.name}" escapeXml="false" />
+							</td>
+						</c:forEach>
+						
+						<%-- Cell with average rating --%>
+						<td rowspan="2" class="text-center">
+							<c:choose>
+								<c:when test="${rowRateCount eq 0}">
+									-
+								</c:when>
+								<c:otherwise>
+									<fmt:formatNumber value="${rowRateValue / rowRateCount}" type="number" maxFractionDigits="2" />
+								</c:otherwise>
+							</c:choose>
+						</td>
+					</tr>
+					<tr>
+						<c:forEach var="column" items="${criteria.rubricsColumns}" varStatus="columnOrderId">
+							<%-- Calculate again because we need the same cell background colour --%>
+							<c:set var="rateCount" value="0" />
+							<c:forEach var="ratingDto" items="${criteriaDto.ratingDtos}">
+								<c:set var="rateCount" value="${rateCount + (ratingDto.userRating eq columnOrderId.count? 1 : 0)}" />
+							</c:forEach>
+							
+							<td class="rubrics-rating-cell
+								<%-- Columns are ordered from 1 to 5, so rate value is also the order ID of the column --%>
+								<c:if test="${rateCount > 0}">
+									bg-success
+								</c:if>
+								"
+							>
+							
+								<c:if test="${rateCount > 0}">
+									<%-- learners see just how many rates they got from other learners --%>
+									<div class="rubrics-rating-count">
+										<span class="badge">x&nbsp;${rateCount}</span>
+									</div>
+									
+									<%-- teachers see also who gave the rating --%>
+									<c:if test="${showJustification}">
+										<c:forEach var="ratingDto" items="${criteriaDto.ratingDtos}">
+											<c:if test="${ratingDto.userRating eq columnOrderId.count}">
+												<div class="rubrics-rating-learner">
+													<lams:Portrait userId="${ratingDto.itemDescription2}" hover="false" />
+													&nbsp;<c:out value="${ratingDto.itemDescription}" escapeXml="true"/>
+												</div>
+											</c:if>
+										</c:forEach>
+									</c:if>
+								</c:if>
+							</td>
+						</c:forEach>
+					</tr>
+				</c:forEach>
+			</table>
+		</c:when>
+		
+		<c:otherwise>
+		
+			<c:set var="criteriaGroupId" value="${criteriaRatings.ratingCriteria.ratingCriteriaGroupId}" />
+			
+			<div id="rubrics-user-panels-${criteriaGroupId}" class="panel-group" role="tablist" aria-multiselectable="true">
+			<%-- It is sufficient to take user names and columns from the first row/criterion --%>
+			<c:set var="exampleRatings" value="${criteriaRatings.ratingDtos}" />
+		
+				<c:forEach var="ratingDto" items="${exampleRatings}" varStatus="learnerOrderId">
+					
+					<div class="panel panel-default rubrics-user-panel">
+				       <div class="panel-heading" role="tab" id="rubrics-heading-${criteriaGroupId}-${ratingDto.itemId}">
+				       	<span class="panel-title collapsable-icon-left">
+				       		<a class="collapsed" role="button" data-toggle="collapse" href="#rubrics-collapse-${criteriaGroupId}-${ratingDto.itemId}" 
+									aria-expanded="false" aria-controls="rubrics-collapse-${criteriaGroupId}-${ratingDto.itemId}"
+									data-parent="#rubrics-users-panels-${criteriaGroupId}">
+								<lams:Portrait userId="${ratingDto.itemId}" hover="false" />
+								&nbsp;<c:out value="${ratingDto.itemDescription}" escapeXml="true"/>
+							</a>
+						</span>
+				       </div>
+			       
+			       <div id="rubrics-collapse-${criteriaGroupId}-${ratingDto.itemId}" class="panel-collapse collapse" 
+			       	    role="tabpanel" aria-labelledby="rubrics-heading-${criteriaGroupId}-${ratingDto.itemId}">
+							<table class="table table-bordered rubrics-table">
+								<tr>
+									<%-- Each answer column has the same length, all remaining space is take by the question column --%>
+									<th class="col-xs-${12 - fn:length(criteriaRatings.ratingCriteria.rubricsColumnHeaders) * 2}"></th>
+									<c:forEach var="columnHeader" items="${criteriaRatings.ratingCriteria.rubricsColumnHeaders}" varStatus="columnStatus">
+										<th class="col-xs-2">
+											(${columnStatus.count})&nbsp;<c:out value="${columnHeader}" escapeXml="false"/>
+										</th>
+									</c:forEach>
+								</tr>
+								<c:forEach var="criteriaDto" items="${criteriaRatings.criteriaGroup}">
+									<c:set var="criteria" value="${criteriaDto.ratingCriteria}" />
+									<tr>
+										<td>
+											<c:out value="${criteria.title}" escapeXml="false" />
+										</td>
+										<c:forEach var="column" items="${criteria.rubricsColumns}" varStatus="columnOrderId">
+											<td
+												<%-- Columns are ordered from 1 to 5, so rate value is also the order ID of the column --%>
+												<c:if test="${criteriaDto.ratingDtos[learnerOrderId.index].userRating eq columnOrderId.count}">
+													class="bg-success"
+												</c:if>
+											>
+												<c:out value="${column.name}" escapeXml="false" />	
+											</td>
+										</c:forEach>
+										</tr>
+								</c:forEach>
+							</table>
+						</div>
+					</div>
+				</c:forEach>
+			</div>
+		</c:otherwise>
+	</c:choose>
+</c:when>
 </c:choose>

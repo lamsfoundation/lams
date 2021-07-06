@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.tool.peerreview.util.EmailAnalysisBuilder.LearnerData;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
+import org.lamsfoundation.lams.web.util.SessionMap;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
@@ -90,6 +91,8 @@ public interface IPeerreviewService extends ToolRatingManager, ICommonToolServic
      * @return
      */
     PeerreviewUser getUserByIDAndSession(Long long1, Long sessionId);
+
+    List<PeerreviewUser> getUsersBySession(Long sessionId);
 
     /**
      * Save or update peerreview into database.
@@ -228,6 +231,8 @@ public interface IPeerreviewService extends ToolRatingManager, ICommonToolServic
 
     List<RatingCriteria> getCriteriasByToolContentId(Long toolContentId);
 
+    void fillRubricsColumnHeaders(RatingCriteria ratingCriteria);
+
     /** Save the ratings for ranking and hedging. */
     int rateItems(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Map<Long, Float> newRatings);
 
@@ -322,5 +327,11 @@ public interface IPeerreviewService extends ToolRatingManager, ICommonToolServic
     int getCountItemsRatedByUserByCriteria(final Long criteriaId, final Integer userId);
 
     /** For this user, there has be int[0] ratings out of a possible int[1] ratings */
-    public int[] getNumberPossibleRatings(Long toolContentId, Long toolSessionId, Long userId);
+    int[] getNumberPossibleRatings(Long toolContentId, Long toolSessionId, Long userId);
+
+    Map<Long, Map<PeerreviewUser, StyledCriteriaRatingDTO>> getRubricsData(SessionMap<String, Object> sessionMap,
+	    RatingCriteria criteria, Collection<RatingCriteria> criterias);
+
+    Map<PeerreviewUser, StyledCriteriaRatingDTO> getRubricsLearnerData(Long toolSessionId, RatingCriteria criteria,
+	    Collection<RatingCriteria> criterias);
 }

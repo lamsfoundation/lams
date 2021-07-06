@@ -1,14 +1,19 @@
 package org.lamsfoundation.lams.tool.peerreview.web.controller;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
 import org.lamsfoundation.lams.tool.peerreview.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
+import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.tool.peerreview.service.IPeerreviewService;
+import org.lamsfoundation.lams.tool.peerreview.service.PeerreviewServiceImpl;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -31,7 +36,7 @@ public class TblMonitoringController {
     @RequestMapping("/peerreview")
     public String peerreview(HttpServletRequest request) {
 	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
@@ -47,11 +52,20 @@ public class TblMonitoringController {
 	sessionMap.put(PeerreviewConstants.ATTR_TOOL_CONTENT_ID, contentId);
 	sessionMap.put(PeerreviewConstants.ATTR_IS_GROUPED_ACTIVITY, peerreviewService.isGroupedActivity(contentId));
 	sessionMap.put("tblMonitoring", true);
-	
+
 	List<RatingCriteria> criterias = peerreviewService.getRatingCriterias(contentId);
-	request.setAttribute(PeerreviewConstants.ATTR_CRITERIAS, criterias);
-	
+	List<RatingCriteria> flattenedCriterias = new ArrayList<>(criterias);
+	PeerreviewServiceImpl.removeGroupedCriteria(flattenedCriterias);
+
+	if (flattenedCriterias.size() == 1 && flattenedCriterias.get(0).isRubricsStyleRating()) {
+	    Map<Long, Map<PeerreviewUser, StyledCriteriaRatingDTO>> rubricsData = peerreviewService
+		    .getRubricsData(sessionMap, flattenedCriterias.get(0), criterias);
+	    request.setAttribute("rubricsData", rubricsData);
+	}
+
+	request.setAttribute(PeerreviewConstants.ATTR_CRITERIAS, flattenedCriterias);
+
 	return "/pages/monitoring/summary";
     }
-    
+
 }

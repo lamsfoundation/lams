@@ -38,7 +38,6 @@
 		WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="warning.comment.blank"/>',
 		WARN_MIN_NUMBER_WORDS_LABEL = "<fmt:message key="warning.minimum.number.words"><fmt:param value="${criteriaRatings.ratingCriteria.commentsMinWordsLimit}"/></fmt:message>";
 	</script>
-	<script src="${lams}includes/javascript/jquery.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
@@ -103,9 +102,11 @@
 		<c:if test="${not empty allCriteriaRatings}">
 		<c:forEach var="criteriaRatings" items="${allCriteriaRatings}" varStatus="status">
 			<div class="panel panel-default">
-			<div class="panel-heading panel-title">
-				<c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/>
-			</div>
+			<c:if test="${not criteriaRatings.ratingCriteria.rubricsStyleRating}">
+				<div class="panel-heading panel-title">
+					<c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/>
+				</div>
+			</c:if>
 			<div class="panel-body">
 			<lams:StyledRating criteriaRatings="${criteriaRatings}" showJustification="true" alwaysShowAverage="false" currentUserDisplay="false" />
 			</div>
@@ -127,7 +128,9 @@
 			</lams:Alert>
 		
 			<c:forEach var="criteriaRatings" items="${userRatings}" varStatus="status">
-				<h4><c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/></h4>
+				<c:if test="${not criteriaRatings.ratingCriteria.rubricsStyleRating}">
+					<h4><c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/></h4>
+				</c:if>
 		 		<lams:StyledRating criteriaRatings="${criteriaRatings}" showJustification="false" alwaysShowAverage="true" currentUserDisplay="true"/>
 			</c:forEach>
 		</div>

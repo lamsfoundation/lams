@@ -26,8 +26,10 @@ package org.lamsfoundation.lams.tool.peerreview.web.controller;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import javax.servlet.ServletException;
@@ -37,12 +39,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
+import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
 import org.lamsfoundation.lams.tool.peerreview.dto.EmailPreviewDTO;
 import org.lamsfoundation.lams.tool.peerreview.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
+import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.tool.peerreview.service.IPeerreviewService;
+import org.lamsfoundation.lams.tool.peerreview.service.PeerreviewServiceImpl;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
@@ -83,6 +89,9 @@ public class MonitoringController {
     @Qualifier("peerreviewService")
     private IPeerreviewService service;
 
+    @Autowired
+    private IRatingService ratingService;
+
     @RequestMapping("/summary")
     public String summary(HttpServletRequest request, HttpServletResponse response) {
 	// initial Session Map
@@ -106,7 +115,16 @@ public class MonitoringController {
 	sessionMap.put(PeerreviewConstants.ATTR_IS_GROUPED_ACTIVITY, service.isGroupedActivity(contentId));
 
 	List<RatingCriteria> criterias = service.getRatingCriterias(contentId);
-	request.setAttribute(PeerreviewConstants.ATTR_CRITERIAS, criterias);
+	List<RatingCriteria> flattenedCriterias = new ArrayList<>(criterias);
+	PeerreviewServiceImpl.removeGroupedCriteria(flattenedCriterias);
+
+	if (flattenedCriterias.size() == 1 && flattenedCriterias.get(0).isRubricsStyleRating()) {
+	    Map<Long, Map<PeerreviewUser, StyledCriteriaRatingDTO>> rubricsData = service.getRubricsData(sessionMap,
+		    flattenedCriterias.get(0), criterias);
+	    request.setAttribute("rubricsData", rubricsData);
+	}
+
+	request.setAttribute(PeerreviewConstants.ATTR_CRITERIAS, flattenedCriterias);
 	return MONITORING_PATH;
     }
 
@@ -124,6 +142,15 @@ public class MonitoringController {
 
 	Long criteriaId = WebUtil.readLongParam(request, "criteriaId");
 	RatingCriteria criteria = service.getCriteriaByCriteriaId(criteriaId);
+
+	if (criteria.isRubricsStyleRating()) {
+	    Long toolContentId = (Long) sessionMap.get(PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
+
+	    List<RatingCriteria> criterias = service.getRatingCriterias(toolContentId);
+	    Map<PeerreviewUser, StyledCriteriaRatingDTO> rubricsLearnerData = service
+		    .getRubricsLearnerData(toolSessionId, criteria, criterias);
+	    request.setAttribute("rubricsLearnerData", rubricsLearnerData);
+	}
 
 	request.setAttribute("criteria", criteria);
 	request.setAttribute("toolSessionId", toolSessionId);
@@ -661,5 +688,4 @@ public class MonitoringController {
 	service.setUserHidden(toolContentId, userUid, isHidden);
 	return "";
     }
-
 }

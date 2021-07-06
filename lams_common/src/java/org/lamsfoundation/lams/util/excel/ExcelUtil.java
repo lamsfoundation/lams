@@ -66,21 +66,13 @@ public class ExcelUtil {
     private static short percentageFormat;
 
     private static CellStyle defaultStyle;
-    private static CellStyle boldStyle;
 
     private static CellStyle greenColor;
     private static CellStyle blueColor;
     private static CellStyle redColor;
     private static CellStyle yellowColor;
 
-    private static CellStyle borderStyleLeftThin;
-    private static CellStyle borderStyleLeftThick;
-    private static CellStyle borderStyleRightThick;
-    private static CellStyle borderStyleLeftThinBoldFont;
-    private static CellStyle borderStyleLeftThickBoldFont;
-    private static CellStyle borderStyleRightThickBoldFont;
-    private static CellStyle borderStyleBottomThin;
-    private static CellStyle borderStyleBottomThinBoldFont;
+    private static Font boldFont;
 
     public final static String DEFAULT_FONT_NAME = "Calibri-Regular";
 
@@ -157,12 +149,10 @@ public class ExcelUtil {
 	defaultStyle = workbook.createCellStyle();
 	defaultStyle.setFont(defaultFont);
 
-	//create bold style
-	boldStyle = workbook.createCellStyle();
-	Font boldFont = workbook.createFont();
+	//create bold font
+	boldFont = workbook.createFont();
 	boldFont.setBold(true);
 	boldFont.setFontName(DEFAULT_FONT_NAME);
-	boldStyle.setFont(boldFont);
 
 	//create color style
 	blueColor = workbook.createCellStyle();
@@ -191,32 +181,6 @@ public class ExcelUtil {
 	dateFormat = (short) 14;// built-in 0xe format - "m/d/yy"
 	timeFormat = (short) 19;// built-in 0x13 format - "h:mm:ss AM/PM"
 	percentageFormat = workbook.createDataFormat().getFormat(FORMAT_PERCENTAGE);
-
-	//create border style
-	borderStyleLeftThin = workbook.createCellStyle();
-	borderStyleLeftThin.setBorderLeft(BorderStyle.THIN);
-	borderStyleLeftThin.setFont(defaultFont);
-	borderStyleLeftThick = workbook.createCellStyle();
-	borderStyleLeftThick.setBorderLeft(BorderStyle.THICK);
-	borderStyleLeftThick.setFont(defaultFont);
-	borderStyleRightThick = workbook.createCellStyle();
-	borderStyleRightThick.setBorderRight(BorderStyle.THICK);
-	borderStyleRightThick.setFont(defaultFont);
-	borderStyleLeftThinBoldFont = workbook.createCellStyle();
-	borderStyleLeftThinBoldFont.setBorderLeft(BorderStyle.THIN);
-	borderStyleLeftThinBoldFont.setFont(boldFont);
-	borderStyleLeftThickBoldFont = workbook.createCellStyle();
-	borderStyleLeftThickBoldFont.setBorderLeft(BorderStyle.THICK);
-	borderStyleLeftThickBoldFont.setFont(boldFont);
-	borderStyleRightThickBoldFont = workbook.createCellStyle();
-	borderStyleRightThickBoldFont.setBorderRight(BorderStyle.THICK);
-	borderStyleRightThickBoldFont.setFont(boldFont);
-	borderStyleBottomThin = workbook.createCellStyle();
-	borderStyleBottomThin.setBorderBottom(BorderStyle.THIN);
-	borderStyleBottomThin.setFont(defaultFont);
-	borderStyleBottomThinBoldFont = workbook.createCellStyle();
-	borderStyleBottomThinBoldFont.setBorderBottom(BorderStyle.THIN);
-	borderStyleBottomThinBoldFont.setFont(boldFont);
     }
 
     private static void createSheet(Workbook workbook, ExcelSheet excelSheet, String dateHeader,
@@ -239,7 +203,7 @@ public class ExcelUtil {
 	if (isTitleToBePrinted) {
 	    ExcelRow excelRow = new ExcelRow();
 	    excelRow.addCell(excelSheet.getSheetName(), true);
-	    ExcelUtil.createRow(excelRow, 0, sheet);
+	    ExcelUtil.createRow(workbook, excelRow, 0, sheet);
 	}
 
 	// Print current date, if needed
@@ -247,7 +211,7 @@ public class ExcelUtil {
 	    ExcelRow excelRow = new ExcelRow();
 	    excelRow.addCell(dateHeader);
 	    excelRow.addCell(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(new Date()));
-	    ExcelUtil.createRow(excelRow, 1, sheet);
+	    ExcelUtil.createRow(workbook, excelRow, 1, sheet);
 	}
 
 	int maxCellsNumber = 0;
@@ -258,7 +222,7 @@ public class ExcelUtil {
 
 	    // in case there is a sheet title or dateHeader available start from 4th row
 	    int rowIndexOffset = !isTitleToBePrinted && StringUtils.isBlank(dateHeader) ? 0 : 4;
-	    ExcelUtil.createRow(excelRow, rowIndex + rowIndexOffset, sheet);
+	    ExcelUtil.createRow(workbook, excelRow, rowIndex + rowIndexOffset, sheet);
 
 	    //calculate max column size
 	    int cellsNumber = excelRow.getCells().size();
@@ -278,7 +242,7 @@ public class ExcelUtil {
 	}
     }
 
-    private static void createRow(ExcelRow excelRow, int rowIndex, Sheet sheet) {
+    private static void createRow(Workbook workbook, ExcelRow excelRow, int rowIndex, Sheet sheet) {
 	Row row = sheet.createRow(rowIndex);
 
 	int columnIndex = 0;
@@ -316,62 +280,54 @@ public class ExcelUtil {
 	    }
 
 	    //figure out cell's style
-	    CellStyle cellStyle = defaultStyle;
-	    if (excelCell.isBold() || excelRow.isBold()) {
-		cellStyle = boldStyle;
-	    }
+	    CellStyle sourceCellStyle = defaultStyle;
+
 	    if (excelCell.getColor() != null) {
 		switch (excelCell.getColor()) {
 		    case BLUE:
-			cellStyle = blueColor;
+			sourceCellStyle = blueColor;
 			break;
 		    case GREEN:
-			cellStyle = greenColor;
+			sourceCellStyle = greenColor;
 			break;
 		    case RED:
-			cellStyle = redColor;
+			sourceCellStyle = redColor;
 			break;
 		    case YELLOW:
-			cellStyle = yellowColor;
+			sourceCellStyle = yellowColor;
 			break;
 		    default:
 			break;
 		}
 	    }
-	    if (excelCell.getBorderStyle() != 0) {
-		switch (excelCell.getBorderStyle()) {
-		    case ExcelCell.BORDER_STYLE_LEFT_THIN:
-			if (excelCell.isBold()) {
-			    cellStyle = borderStyleLeftThinBoldFont;
-			} else {
-			    cellStyle = borderStyleLeftThin;
-			}
-			break;
-		    case ExcelCell.BORDER_STYLE_LEFT_THICK:
-			if (excelCell.isBold()) {
-			    cellStyle = borderStyleLeftThickBoldFont;
-			} else {
-			    cellStyle = borderStyleLeftThick;
-			}
-			break;
-		    case ExcelCell.BORDER_STYLE_RIGHT_THICK:
-			if (excelCell.isBold()) {
-			    cellStyle = borderStyleRightThickBoldFont;
-			} else {
-			    cellStyle = borderStyleRightThick;
-			}
-			break;
-		    case ExcelCell.BORDER_STYLE_BOTTOM_THIN:
-			if (excelCell.isBold()) {
-			    cellStyle = borderStyleBottomThinBoldFont;
-			} else {
-			    cellStyle = borderStyleBottomThin;
-			}
-			break;
-		    default:
-			break;
+
+	    // create a clone that can be modified
+	    CellStyle cellStyle = workbook.createCellStyle();
+	    cellStyle.cloneStyleFrom(sourceCellStyle);
+
+	    if (excelCell.isBold() || excelRow.isBold()) {
+		cellStyle.setFont(boldFont);
+	    }
+
+	    if (excelCell.getBorderStyle() != null) {
+		for (int borderStyle : excelCell.getBorderStyle()) {
+		    switch (borderStyle) {
+			case ExcelCell.BORDER_STYLE_LEFT_THIN:
+			    cellStyle.setBorderLeft(BorderStyle.THIN);
+			    break;
+			case ExcelCell.BORDER_STYLE_LEFT_THICK:
+			    cellStyle.setBorderLeft(BorderStyle.THICK);
+			    break;
+			case ExcelCell.BORDER_STYLE_RIGHT_THICK:
+			    cellStyle.setBorderRight(BorderStyle.THICK);
+			    break;
+			case ExcelCell.BORDER_STYLE_BOTTOM_THIN:
+			    cellStyle.setBorderBottom(BorderStyle.THIN);
+			    break;
+		    }
 		}
 	    }
+
 	    cell.setCellStyle(cellStyle);
 
 	    //set data format

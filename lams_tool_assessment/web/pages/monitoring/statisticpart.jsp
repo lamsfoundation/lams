@@ -334,7 +334,7 @@
 						</th>
 						<th scope="col" class="text-center">
 							<fmt:message key="label.qb.point.biserial"/>&nbsp;
-							 <i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key="label.qb.point.biserial.tooltip" />"></i>
+							<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key="label.qb.point.biserial.tooltip" />"></i>
 						</th>
 					</tr>
 						
@@ -356,9 +356,15 @@
 									<td class="text-center">-</td>
 								</c:when>
 								<c:otherwise>
-									<td class="text-center"><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.difficultyIndex}" /></td>
-									<td class="text-center"><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.discriminationIndex}" /></td>
-									<td class="text-center"><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.pointBiserial}" /></td>
+									<td class="text-center ${activityDTO.difficultyIndex < 0.3 or activityDTO.difficultyIndex > 0.7 ? 'bg-danger' : 'bg-success'}">
+										<fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.difficultyIndex}" />
+									</td>
+									<td class="text-center ${activityDTO.discriminationIndex < -0.2 ? 'bg-danger' : (activityDTO.discriminationIndex < 0.2 ? 'bg-warning' : 'bg-success')}">
+										<fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.discriminationIndex}" />
+									</td>
+									<td class="text-center ${activityDTO.pointBiserial < -0.2 ? 'bg-danger' : (activityDTO.pointBiserial< 0.2 ? 'bg-warning' : 'bg-success')}">
+										<fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.pointBiserial}" />
+									</td>
 								</c:otherwise>
 							</c:choose>
 						</tr>
