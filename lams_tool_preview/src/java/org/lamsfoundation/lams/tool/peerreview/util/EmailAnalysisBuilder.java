@@ -307,10 +307,9 @@ public class EmailAnalysisBuilder {
 	}
 	HashMap<Long, HashMap<Long, SummingData>> tally = new HashMap<>();
 	if (criteriaIds.size() > 0) {
-	    List<Object> rawRatingsForSession = ratingService.getRatingsByCriteriasAndItems(criteriaIds,
+	    List<Rating> rawRatingsForSession = ratingService.getRatingsByCriteriasAndItems(criteriaIds,
 		    learnerDataMap.keySet());
-	    for (Object obj : rawRatingsForSession) {
-		Rating rating = (Rating) obj;
+	    for (Rating rating : rawRatingsForSession) {
 		SummingData sd = null;
 		Long itemId = rating.getItemId();
 		HashMap<Long, SummingData> itemMap = tally.get(itemId);

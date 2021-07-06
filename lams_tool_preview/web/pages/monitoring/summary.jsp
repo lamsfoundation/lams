@@ -23,14 +23,14 @@
 		
 	//vars for rating.js
 	var MAX_RATES = 0,
-	MIN_RATES = 0,
-	COMMENTS_MIN_WORDS_LIMIT = 0,
-	MAX_RATINGS_FOR_ITEM = 0,
-	LAMS_URL = '',
-	COUNT_RATED_ITEMS = 0,
-	COMMENT_TEXTAREA_TIP_LABEL = '',
-	WARN_COMMENTS_IS_BLANK_LABEL = '',
-	WARN_MIN_NUMBER_WORDS_LABEL = '';
+		MIN_RATES = 0,
+		COMMENTS_MIN_WORDS_LIMIT = 0,
+		MAX_RATINGS_FOR_ITEM = 0,
+		LAMS_URL = '',
+		COUNT_RATED_ITEMS = 0,
+		COMMENT_TEXTAREA_TIP_LABEL = '',
+		WARN_COMMENTS_IS_BLANK_LABEL = '',
+		WARN_MIN_NUMBER_WORDS_LABEL = '';
 </script>
 <script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 
@@ -48,11 +48,15 @@
 		if (!confirm('<fmt:message key="confirm.notify.user.of.results" />')) {
 			return;
 		}
-		var url = "<c:url value="/monitoring/sendResultsToSessionUsers.do"/>";
-		$("#messageArea").html("");
-		$("#messageArea_Busy").show();
-		$(".btn-disable-on-submit").prop("disabled", true);
-		$("#messageArea").load(
+		let buttons = getResultsElement(sessionId, ".btn-disable-on-submit"),
+			messageArea = getResultsElement(sessionId, ".messageArea2"),
+			messageAreaBusy = getResultsElement(sessionId, ".messageArea2_Busy"),
+			url = "<c:url value="/monitoring/sendResultsToSessionUsers.do"/>";
+		
+		messageArea.html("");
+		messageAreaBusy.show();
+		buttons.prop("disabled", true);
+		messageArea.load(
 			url,
 			{
 				sessionMapID: "${sessionMapID}",
@@ -61,8 +65,8 @@
 				reqID: (new Date()).getTime()
 			},
 			function() {
-				$("#messageArea_Busy").hide();
-				$(".btn-disable-on-submit").prop("disabled", false);
+				messageAreaBusy.hide();
+				buttons.prop("disabled", false);
 			}
 		);
 		return false;
@@ -108,21 +112,42 @@
         <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
 	</c:if>
 	
+	<c:set var="rubricsCriteriaCounter" value="1" />
 	<c:choose>
-		<c:when test="${not empty criterias && fn:length(criterias) eq 1}">
-			<c:forEach var="criteria" items="${criterias}">
-			<h4><c:out value="${criteria.title}" escapeXml="true"/></h4>
+		<c:when test="${fn:length(criterias) eq 1}">
+			<c:set var="criteria" value="${criterias[0]}" scope="request"/>
 			<c:set var="toolSessionId" value="${groupSummary.sessionId}" scope="request"/>
 			<c:set var="criteria" value="${criteria}" scope="request"/>
 			<c:set var="sessionMap" value="${sessionMap}" scope="request"/>
-			<jsp:include page="criteriapart.jsp"/>
-			</c:forEach>
+			<c:choose>
+				<c:when test="${criteria.rubricsStyleRating}">
+					<c:set var="rubricsLearnerData" value="${rubricsData[toolSessionId]}" scope="request"/>
+					<%@ include file="rubricspart.jsp" %>
+				</c:when>
+				<c:otherwise>
+					<h4><c:out value="${criteria.title}" escapeXml="true"/></h4>
+					<%@ include file="criteriapart.jsp" %>
+				</c:otherwise>
+			</c:choose>
 		</c:when>
 		<c:otherwise>
 			<c:forEach var="criteria" items="${criterias}">
 				<c:set var='url'><c:url value="/monitoring/criteria.do"/>?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&criteriaId=${criteria.ratingCriteriaId}</c:set>
 				<button onclick="javascript:launchPopup('${url}');return false;" class="btn btn-default btn-disable-on-submit voffset5 loffset5">
-					<fmt:message key="label.monitoring.view"><fmt:param><c:out value="${criteria.title}" escapeXml="true"/></fmt:param></fmt:message></button>
+					<fmt:message key="label.monitoring.view">
+						<fmt:param>
+							<c:choose>
+								<c:when test="${criteria.rubricsStyleRating}">
+									<fmt:message key="label.rating.style.rubrics" />&nbsp;${rubricsCriteriaCounter}
+									<c:set var="rubricsCriteriaCounter" value="${rubricsCriteriaCounter + 1}" />
+								</c:when>
+								<c:otherwise>
+									<c:out value="${criteria.title}" escapeXml="true"/>
+								</c:otherwise>
+							</c:choose>
+						</fmt:param>
+					</fmt:message>
+				</button>
 			</c:forEach>
 		</c:otherwise>
 	</c:choose>

@@ -115,7 +115,7 @@ public class AuthoringController {
 	peerreviewForm.setContentFolderID(contentFolderID);
 
 	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	session.setAttribute(sessionMap.getSessionID(), sessionMap);
 	peerreviewForm.setSessionMapID(sessionMap.getSessionID());
 

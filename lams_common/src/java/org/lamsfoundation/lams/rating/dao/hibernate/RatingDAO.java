@@ -395,8 +395,8 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
      * Get all the raw ratings for a combination of criteria and item ids. Used by Peer Review to do SPA analysis.
      */
     @Override
-    public List getRatingsByCriteriasAndItems(Collection<Long> ratingCriteriaIds, Collection<Long> itemIds) {
-	return getSession().createQuery(FIND_RATINGS_BY_ITEM_CRITERIA)
+    public List<Rating> getRatingsByCriteriasAndItems(Collection<Long> ratingCriteriaIds, Collection<Long> itemIds) {
+	return getSession().createQuery(FIND_RATINGS_BY_ITEM_CRITERIA, Rating.class)
 		.setParameterList("ratingCriteriaIds", ratingCriteriaIds).setParameterList("itemIds", itemIds).list();
     }
 
