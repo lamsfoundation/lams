@@ -27,16 +27,10 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.TreeMap;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -46,7 +40,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
-import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
@@ -126,7 +119,7 @@ public class MonitoringController {
 	PeerreviewServiceImpl.removeGroupedCriteria(flattenedCriterias);
 
 	if (flattenedCriterias.size() == 1 && flattenedCriterias.get(0).isRubricsStyleRating()) {
-	    Map<Long, Map<PeerreviewUser, StyledCriteriaRatingDTO>> rubricsData = getRubricsData(sessionMap,
+	    Map<Long, Map<PeerreviewUser, StyledCriteriaRatingDTO>> rubricsData = service.getRubricsData(sessionMap,
 		    flattenedCriterias.get(0), criterias);
 	    request.setAttribute("rubricsData", rubricsData);
 	}
@@ -154,8 +147,8 @@ public class MonitoringController {
 	    Long toolContentId = (Long) sessionMap.get(PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
 
 	    List<RatingCriteria> criterias = service.getRatingCriterias(toolContentId);
-	    Map<PeerreviewUser, StyledCriteriaRatingDTO> rubricsLearnerData = getRubricsLearnerData(toolSessionId,
-		    criteria, criterias);
+	    Map<PeerreviewUser, StyledCriteriaRatingDTO> rubricsLearnerData = service
+		    .getRubricsLearnerData(toolSessionId, criteria, criterias);
 	    request.setAttribute("rubricsLearnerData", rubricsLearnerData);
 	}
 
@@ -694,46 +687,5 @@ public class MonitoringController {
 
 	service.setUserHidden(toolContentId, userUid, isHidden);
 	return "";
-    }
-
-    @SuppressWarnings("unchecked")
-    private Map<Long, Map<PeerreviewUser, StyledCriteriaRatingDTO>> getRubricsData(
-	    SessionMap<String, Object> sessionMap, RatingCriteria criteria, Collection<RatingCriteria> criterias) {
-	List<GroupSummary> sessionList = (List<GroupSummary>) sessionMap.get(PeerreviewConstants.ATTR_SUMMARY_LIST);
-
-	Map<Long, Map<PeerreviewUser, StyledCriteriaRatingDTO>> rubricsData = new HashMap<>();
-	for (GroupSummary session : sessionList) {
-	    Long toolSessionId = session.getSessionId();
-	    Map<PeerreviewUser, StyledCriteriaRatingDTO> learnerData = getRubricsLearnerData(toolSessionId, criteria,
-		    criterias);
-	    rubricsData.put(toolSessionId, learnerData);
-	}
-
-	return rubricsData;
-    }
-
-    private Map<PeerreviewUser, StyledCriteriaRatingDTO> getRubricsLearnerData(Long toolSessionId,
-	    RatingCriteria criteria, Collection<RatingCriteria> criterias) {
-	Map<PeerreviewUser, StyledCriteriaRatingDTO> learnerData = new TreeMap<>(
-		Comparator.comparing(PeerreviewUser::getFirstName).thenComparing(PeerreviewUser::getLastName));
-
-	criterias = criterias.stream()
-		.filter(c -> criteria.getRatingCriteriaGroupId().equals(c.getRatingCriteriaGroupId()))
-		.collect(Collectors.toList());
-	Collection<Long> criteriaIds = criterias.stream()
-		.collect(Collectors.mapping(RatingCriteria::getRatingCriteriaId, Collectors.toSet()));
-
-	Collection<PeerreviewUser> learners = service.getUsersBySession(toolSessionId);
-	List<Rating> ratings = ratingService.getRatingsByCriteriasAndItems(criteriaIds,
-		learners.stream().collect(Collectors.mapping(PeerreviewUser::getUserId, Collectors.toSet())));
-
-	for (PeerreviewUser learner : learners) {
-	    Function<RatingCriteria, StyledCriteriaRatingDTO> dtoBuilder = c -> PeerreviewServiceImpl
-		    .getRubricsCriteriaDTO(c, learner.getUserId().intValue(), true, ratings);
-	    StyledCriteriaRatingDTO dto = PeerreviewServiceImpl.fillCriteriaGroup(criteria, criterias, dtoBuilder);
-	    learnerData.put(learner, dto);
-	}
-
-	return learnerData;
     }
 }

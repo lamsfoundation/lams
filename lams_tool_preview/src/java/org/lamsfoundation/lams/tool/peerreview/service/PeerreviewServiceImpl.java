@@ -27,6 +27,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -93,6 +94,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
+import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -568,6 +570,49 @@ public class PeerreviewServiceImpl
 	Peerreview peerreview = peerreviewDao.getByContentId(toolContentId);
 	retValue[1] = peerreview.isSelfReview() ? numUsersInSession : numUsersInSession - 1;
 	return retValue;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Map<Long, Map<PeerreviewUser, StyledCriteriaRatingDTO>> getRubricsData(SessionMap<String, Object> sessionMap,
+	    RatingCriteria criteria, Collection<RatingCriteria> criterias) {
+	List<GroupSummary> sessionList = (List<GroupSummary>) sessionMap.get(PeerreviewConstants.ATTR_SUMMARY_LIST);
+
+	Map<Long, Map<PeerreviewUser, StyledCriteriaRatingDTO>> rubricsData = new HashMap<>();
+	for (GroupSummary session : sessionList) {
+	    Long toolSessionId = session.getSessionId();
+	    Map<PeerreviewUser, StyledCriteriaRatingDTO> learnerData = getRubricsLearnerData(toolSessionId, criteria,
+		    criterias);
+	    rubricsData.put(toolSessionId, learnerData);
+	}
+
+	return rubricsData;
+    }
+
+    @Override
+    public Map<PeerreviewUser, StyledCriteriaRatingDTO> getRubricsLearnerData(Long toolSessionId,
+	    RatingCriteria criteria, Collection<RatingCriteria> criterias) {
+	Map<PeerreviewUser, StyledCriteriaRatingDTO> learnerData = new TreeMap<>(
+		Comparator.comparing(PeerreviewUser::getFirstName).thenComparing(PeerreviewUser::getLastName));
+
+	criterias = criterias.stream()
+		.filter(c -> criteria.getRatingCriteriaGroupId().equals(c.getRatingCriteriaGroupId()))
+		.collect(Collectors.toList());
+	Collection<Long> criteriaIds = criterias.stream()
+		.collect(Collectors.mapping(RatingCriteria::getRatingCriteriaId, Collectors.toSet()));
+
+	Collection<PeerreviewUser> learners = getUsersBySession(toolSessionId);
+	List<Rating> ratings = ratingService.getRatingsByCriteriasAndItems(criteriaIds,
+		learners.stream().collect(Collectors.mapping(PeerreviewUser::getUserId, Collectors.toSet())));
+
+	for (PeerreviewUser learner : learners) {
+	    Function<RatingCriteria, StyledCriteriaRatingDTO> dtoBuilder = c -> PeerreviewServiceImpl
+		    .getRubricsCriteriaDTO(c, learner.getUserId().intValue(), true, ratings);
+	    StyledCriteriaRatingDTO dto = PeerreviewServiceImpl.fillCriteriaGroup(criteria, criterias, dtoBuilder);
+	    learnerData.put(learner, dto);
+	}
+
+	return learnerData;
     }
 
     public static StyledCriteriaRatingDTO fillCriteriaGroup(RatingCriteria targetCriteria,
