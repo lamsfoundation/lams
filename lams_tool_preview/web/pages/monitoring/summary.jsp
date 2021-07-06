@@ -48,11 +48,15 @@
 		if (!confirm('<fmt:message key="confirm.notify.user.of.results" />')) {
 			return;
 		}
-		var url = "<c:url value="/monitoring/sendResultsToSessionUsers.do"/>";
-		$("#messageArea").html("");
-		$("#messageArea_Busy").show();
-		$(".btn-disable-on-submit").prop("disabled", true);
-		$("#messageArea").load(
+		let buttons = getResultsElement(sessionId, ".btn-disable-on-submit"),
+			messageArea = getResultsElement(sessionId, ".messageArea2"),
+			messageAreaBusy = getResultsElement(sessionId, ".messageArea2_Busy"),
+			url = "<c:url value="/monitoring/sendResultsToSessionUsers.do"/>";
+		
+		messageArea.html("");
+		messageAreaBusy.show();
+		buttons.prop("disabled", true);
+		messageArea.load(
 			url,
 			{
 				sessionMapID: "${sessionMapID}",
@@ -61,8 +65,8 @@
 				reqID: (new Date()).getTime()
 			},
 			function() {
-				$("#messageArea_Busy").hide();
-				$(".btn-disable-on-submit").prop("disabled", false);
+				messageAreaBusy.hide();
+				buttons.prop("disabled", false);
 			}
 		);
 		return false;

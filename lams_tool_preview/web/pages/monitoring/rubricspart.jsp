@@ -8,24 +8,38 @@
 </style>
 
 <script>
-	function closeResultsForLearner() {
-		$("#emailPreviewArea").html("");
-		$("#emailPreviewArea").hide();
+
+	function getResultsElement(sessionId, selector) {
+		let element = null;
+		if (sessionId) {
+			// if Peer Review is grouped, try to find the element within own group
+			element = $('#collapse' + sessionId + ' ' + selector);
+		}
+		if (!element || element.length == 0) {
+			element = $(selector);
+		}
+		return element;
+	}
+	
+	function closeResultsForLearner(sessionId) {
+		let emailPreviewArea = getResultsElement(sessionId, '.emailPreviewArea');
+		emailPreviewArea .html("").hide();
 		return false;
 	}
 	
-	function clearMessage() {
-		$("#messageArea2").html("");
-		return false;
-	}
-	
-	// Prview the email to be sent to the learner
+	// Preview the email to be sent to the learner
 	function previewResultsForLearner(sessionId, userId) {
-		$(".btn-disable-on-submit").prop("disabled", true);
-		var url = "<c:url value="/monitoring/previewResultsToUser.do"/>";
-		clearMessage();
-		$("#messageArea2_Busy").show();
-		$("#emailPreviewArea").load(
+		let buttons = getResultsElement(sessionId, ".btn-disable-on-submit"),
+			messageArea = getResultsElement(sessionId, ".messageArea2"),
+			messageAreaBusy = getResultsElement(sessionId, ".messageArea2_Busy"),
+			emailPreviewArea = getResultsElement(sessionId, '.emailPreviewArea'),
+			url = "<c:url value="/monitoring/previewResultsToUser.do"/>";
+			
+		buttons.prop("disabled", true);
+		messageArea.html("");
+		messageAreaBusy.show();
+		
+		emailPreviewArea.load(
 			url,
 			{
 				sessionMapID: "${sessionMapID}",
@@ -35,9 +49,9 @@
 				reqID: (new Date()).getTime()
 			},
 			function() {
-				$("#messageArea2_Busy").hide();
-				$("#emailPreviewArea").show();
-				$(".btn-disable-on-submit").prop("disabled", false);
+				messageAreaBusy.hide();
+				emailPreviewArea.show();
+				buttons.prop("disabled", false);
 			}
 		);
 		return false;
@@ -45,11 +59,16 @@
 	
 	// Send the previewed email to the learner
 	function sendResultsForLearner(sessionId, userId, dateTimeStamp) {
-		$(".btn-disable-on-submit").prop("disabled", true);
-		var url = "<c:url value="/monitoring/sendPreviewedResultsToUser.do"/>";
-		clearMessage();
-		$("#messageArea2_Busy").show();
-		$("#messageArea2").load(
+		let buttons = getResultsElement(sessionId, ".btn-disable-on-submit"),
+			messageArea = getResultsElement(sessionId, ".messageArea2"),
+			messageAreaBusy = getResultsElement(sessionId, ".messageArea2_Busy"),
+			url = "<c:url value="/monitoring/sendPreviewedResultsToUser.do"/>";
+		
+		buttons.prop("disabled", true);
+		messageArea.html("");
+		messageAreaBusy.show();
+		
+		messageArea.load(
 			url,
 			{
 				sessionMapID: "${sessionMapID}",
@@ -60,9 +79,9 @@
 				reqID: (new Date()).getTime()
 			},
 			function() {
-				$("#messageArea2_Busy").hide();
-				closeResultsForLearner();
-				$(".btn-disable-on-submit").prop("disabled", false);
+				messageAreaBusy.hide();
+				closeResultsForLearner(sessionId);
+				buttons.prop("disabled", false);
 			}
 		);
 		return false;
@@ -70,8 +89,8 @@
 </script>
 
 <!--For send results feature-->
-<i class="fa fa-spinner" style="display:none" id="messageArea2_Busy"></i>
-<div class="voffset5" id="messageArea2"></div>
+<i class="fa fa-spinner messageArea2_Busy" style="display:none"></i>
+<div class="voffset5 messageArea2"></div>
 
 	     
 <c:forEach var="learnerData" items="${rubricsLearnerData}">
@@ -88,7 +107,7 @@
 		</a>
 	</span>
 	<button class="btn btn-default pull-right email-button btn-disable-on-submit"
-			onClick="javascript:previewResultsForLearner(${toolSessionId}, ${learnerData.key.userId})">
+			onClick="javascript:previewResultsForLearner(${toolSessionId}, ${learnerData.key.userId}, this)">
 		<fmt:message key="button.preview.results" />
 	</button>
       </div>
@@ -101,4 +120,4 @@
 </div>
 </c:forEach>
 
-<div class="voffset10" id="emailPreviewArea" style="display:none" ></div>
+<div class="voffset10 emailPreviewArea" style="display:none" ></div>
