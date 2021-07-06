@@ -14,9 +14,10 @@ $(document).ready(function() {
 		    }
 		})
 		.popover({
-			'html'  : true,
-			'container' : 'body',
+			'html'      : true,
 			'trigger'   : 'click',
+			// without this option the close button in popover title does not show up
+			'sanitize'  : false,
 			'title' : function(){
 				// first try to get the title straight from element attributes
 				let popover = $(this),
@@ -45,7 +46,14 @@ $(document).ready(function() {
 				}
 				// if content found then try to extract title from it, if any
 				title = content.children('.doc-popover-title');
-				return title.length === 0 ? "" : title.html();
+				title = title.length === 0 ? "" : title.html();
+				if (title) {
+					// put title text on the left and a close button on the right
+					title = '<div style="display: flex; justify-content: space-between;"><span>' + title + 
+							'</span><a role="button" class="close" aria-label="Close" tabindex="0" style="height: 100%"><span aria-hidden="true">&times;</span></a>';
+				}
+				
+				return title;
 			},
 			'content' : function(){
 				// first try to get content straight from element attributes
@@ -74,6 +82,14 @@ $(document).ready(function() {
 				return contentBody.length === 0 ? "" : contentBody.html();
 			}
 		});
+		
+	// when a close button is clicked, close the popover
+	$(document).on('keypress click', '.popover .popover-title .close', function(e){
+		if (e.type == "click" || e.keyCode === 32 || e.keyCode == 13) {
+			var popoverId = $(this).closest('.popover').attr('id');
+			$('[data-original-title], [data-toggle="doc-popover"][aria-describedby="' + popoverId + '"]').popover('hide');
+	    }
+	});
 
 	// Dismiss popover on a click outside an open popover
 	// Taken from https://stackoverflow.com/a/33953365
