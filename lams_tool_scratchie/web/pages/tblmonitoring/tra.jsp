@@ -8,35 +8,46 @@
 </style>
 
 <!-- ChartJS. Colour used is brand-primary for purple skin. -->
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chartjs.js"></script>
 <script>
 	$(document).ready(function(){
-		var barData = {
-			labels: [<c:forEach var="groupSummary" items="${groupSummaries}">"${groupSummary.sessionName}",</c:forEach>],
-			datasets: [{
-				label: "My First dataset",
-				fillColor: "#85237d",
-				strokeColor: "#85237d",
-				highlightFill: "#85237d",
-				highlightStroke: "#85237d",
-				data: [<c:forEach var="groupSummary" items="${groupSummaries}">${groupSummary.totalPercentage},</c:forEach>]
-			}]
-		};
-
-		var barOptions = {
-			scaleBeginAtZero: true,
-			scaleShowGridLines: true,
-			scaleGridLineColor: "rgba(0,0,0,.05)",
-			scaleGridLineWidth: 1,
-			barShowStroke: true,
-			barStrokeWidth: 2,
-			barValueSpacing: 5,
-			barDatasetSpacing: 1,
-	<%--	responsive: true,  When responsive the font becomes too small on larger screen --%>
-		};
-
-		var ctx = document.getElementById("barChart").getContext("2d");
-		var myNewChart = new Chart(ctx).Bar(barData, barOptions);
+		var ctx = document.getElementById("barChart").getContext("2d"),
+			myNewChart = new Chart(ctx, {
+				type : 'bar',
+				data : {
+					datasets : [ {
+						data : [<c:forEach var="groupSummary" items="${groupSummaries}">${groupSummary.totalPercentage},</c:forEach>],
+						backgroundColor : "#85237d",
+						borderColor     :  "#85237d",
+						hoverBackgroundColor : "#85237d",
+						hoverBorderColor: "#85237d"
+					} ],
+					labels :  [<c:forEach var="groupSummary" items="${groupSummaries}">"${groupSummary.sessionName}",</c:forEach>],
+				},
+				options : {
+					legend : {
+						display : false
+					},
+					scales : {
+						xAxes : [
+							{
+								 ticks : {
+									fontSize : 30
+								}
+							}
+						],
+						yAxes : [
+							{
+							    ticks : {
+									beginAtZero   : true,
+									maxTicksLimit : 6,
+									suggestedMax  : 100,
+									fontSize : 25
+								}
+							}
+						]
+					}
+				}
+			});
 
 		//insert total learners number taken from the parent tblmonitor.jsp
 		$("#total-learners-number").html(TOTAL_LESSON_LEARNERS_NUMBER);
