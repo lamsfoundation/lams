@@ -1803,9 +1803,9 @@ GeneralLib = {
 					$('#ldDescriptionLicenseSelect').val(ld.licenseID || 0).change();
 					$('#ldDescriptionLicenseText').text(ld.licenseText || null);
 				}
-				
-				// always arrange activities when SVG gets recreated
-				var arrangeNeeded = isReadOnlyMode,
+
+				// always arrange activities when SVG gets recreated or it is old authoring version
+				var arrangeNeeded = isReadOnlyMode || +response.ld.version < 4.5,
 					// if system gate is found, it is Live Edit
 					systemGate = null,
 					// should we allow the author to enter activity authoring
