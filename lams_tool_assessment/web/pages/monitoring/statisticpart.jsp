@@ -308,7 +308,12 @@
 			    	<a class="collapsed" role="button" data-toggle="collapse" href="#qb-stats" aria-expanded="true" aria-controls="qb-stats">
 		          		<fmt:message key="label.qb.stats" />
 		          	</a>
-					<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key="label.qb.stats.tooltip" />"></i>
+		          	
+		          	<lams:Popover titleKey="label.qb.stats">
+		          		<fmt:message key="label.qb.stats.tooltip" />
+						<a href="/lams/" tabindex="0" target="_blank">Here is a link</a>
+		          	</lams:Popover>
+
 	      		</span>
 	        </div>
 	
@@ -326,15 +331,37 @@
 						</th>
 						<th scope="col" class="text-center">
 							<fmt:message key="label.qb.difficulty.index"/>&nbsp;
-							<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key="label.qb.difficulty.index.tooltip" />"></i>
+							
+							<lams:Popover data-placement="bottom">
+				          		<fmt:message key="label.qb.difficulty.index.tooltip" />
+								<a href="/lams/" tabindex="0" target="_blank">Here is a link</a>
+				          	</lams:Popover>
+							
 						</th>
 						<th scope="col" class="text-center">
 							<fmt:message key="label.qb.discrimination.index"/>&nbsp;
-							<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key="label.qb.discrimination.index.tooltip" />"></i>
+							
+							<a id="discrimination-index-popover" class="lams-popover" data-placement="top"/></a>
+							<span id="discrimination-index-popover-content" class="lams-popover-content hidden">
+								<span class="lams-popover-title">
+									<fmt:message key="label.qb.discrimination.index"/>
+								</span>
+								<span class="lams-popover-body">
+									<fmt:message key="label.qb.discrimination.index.tooltip" />
+									<a href="/lams/" tabindex="0" target="_blank">Here is a link</a>
+								</span>
+							</span>
+														
+							
 						</th>
 						<th scope="col" class="text-center">
 							<fmt:message key="label.qb.point.biserial"/>&nbsp;
-							<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key="label.qb.point.biserial.tooltip" />"></i>
+							
+							<lams:Popover titleKey="label.qb.difficulty.index" data-placement="left">
+								<fmt:message key="label.qb.difficulty.index.tooltip" />
+								<a href="/lams/" tabindex="0" target="_blank">Here is a link</a>
+				          	</lams:Popover>
+	
 						</th>
 					</tr>
 						

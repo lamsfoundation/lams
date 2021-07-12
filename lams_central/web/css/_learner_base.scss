@@ -356,7 +356,7 @@ td.arrows{
   border: $border-thin-default-light
 }
 /* Icons to show panel is collapsed */
-.collapsable-icon-right a:after {
+.collapsable-icon-right a[data-toggle="collapse"]:after {
     font-family: FontAwesome;
     content:"\f078";
     float: right;
@@ -366,7 +366,7 @@ td.arrows{
 .collapsable-icon-right a.collapsed:after {
     content:"\f054";
 }
-.collapsable-icon-left a:after {
+.collapsable-icon-left a[data-toggle="collapse"]:after {
     font-family: FontAwesome;
     content:"\f078";
     float: left;
