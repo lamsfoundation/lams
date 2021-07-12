@@ -99,6 +99,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
 	newScheduleGateActivity.setGateEndTimeOffset(this.getGateEndTimeOffset());
 	newScheduleGateActivity.setGateStartTimeOffset(this.getGateStartTimeOffset());
 	newScheduleGateActivity.setGateActivityCompletionBased(this.getGateActivityCompletionBased());
+	newScheduleGateActivity.setGateStopAtPrecedingActivity(this.isGateStopAtPrecedingActivity());
 	return newScheduleGateActivity;
     }
 

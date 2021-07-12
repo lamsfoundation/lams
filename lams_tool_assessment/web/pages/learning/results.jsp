@@ -62,13 +62,42 @@
 	</c:if>
 	
 	<script type="text/javascript">
+		 $.fn.bootstrapTooltip = $.fn.tooltip.noConflict();
+		 
+		$(document).ready(function() {
+			$('#finishButton').bootstrapTooltip({
+				'trigger' : 'manual',
+				'title' : function(){
+					return $(this).data('gateClosedTooltip');
+				}
+			});
+		});
+	
 		function disableButtons() {
 			$('.btn').prop('disabled',true);
 		}
 		
 		function finishSession(){
 			disableButtons();
-			document.location.href ='<c:url value="/learning/finish.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}';
+			
+			$.ajax({
+				'url' : '<lams:LAMSURL />learning/learner/isNextGateActivityOpen.do?userId=${sessionMap.user.userId}&toolSessionId=${toolSessionID}',
+				'cache' : false,
+				'dataType' : 'text',
+				'success'  : function(response) {
+					if (response == 'true') {
+						document.location.href ='<c:url value="/learning/finish.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}';
+						return;
+					}
+
+					let finishButton = $('#finishButton').bootstrapTooltip('show');
+					setTimeout(function(){
+						finishButton.bootstrapTooltip('hide');
+						$('.btn').prop('disabled', false);
+					}, 5000);
+				}
+			});
+			
 			return false;
 		}
 		
@@ -189,9 +218,11 @@
 						</c:when>
 						
 						<c:otherwise>
-							<button name="FinishButton"
+							<button id="finishButton"
+							        name="FinishButton"
 									onClick="return finishSession()"
-									class="btn btn-primary voffset10 pull-right na">
+									class="btn btn-primary voffset10 pull-right na"
+									data-gate-closed-tooltip="<fmt:message key="label.learning.gate.closed" />">
 								<span class="nextActivity">
 									<c:choose>
 										<c:when test="${sessionMap.isLastActivity}">

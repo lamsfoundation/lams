@@ -520,7 +520,6 @@ public class LearnerService implements ILearnerFullService {
 	} catch (ProgressException e) {
 	    throw new LearnerServiceException(e.getMessage());
 	}
-
     }
 
     @Override
@@ -888,6 +887,46 @@ public class LearnerService implements ILearnerFullService {
 	// the database.
 	activityDAO.update(gate);
 	return new GateActivityDTO(gate, expectedLearnerCount, waitingLearnerCount, gateOpen);
+    }
+
+    @Override
+    public boolean isNextGateActivityOpenByToolSessionId(int learnerId, long toolSessionId) {
+	ToolSession toolSession = lamsCoreToolService.getToolSessionById(toolSessionId);
+	return isNextGateActivityOpenByLessonId(learnerId, toolSession.getLesson().getLessonId());
+    }
+
+    @Override
+    public boolean isNextGateActivityOpenByLessonId(int learnerId, long lessonId) {
+	LearnerProgress learnerProgress = getProgress(learnerId, lessonId);
+	return isNextGateActivityOpen(learnerId, learnerProgress.getCurrentActivity());
+    }
+
+    private boolean isNextGateActivityOpen(int learnerId, Activity currentActivity) {
+	Activity nextActivity = null;
+	Transition transition = currentActivity.getTransitionFrom();
+	if (transition != null) {
+	    nextActivity = transition.getToActivity();
+	} else if (currentActivity.getParentActivity() != null) {
+	    currentActivity = currentActivity.getParentActivity();
+	    transition = currentActivity.getTransitionFrom();
+	    if (transition != null) {
+		nextActivity = transition.getToActivity();
+	    }
+	}
+
+	if (nextActivity == null || !nextActivity.isGateActivity()) {
+	    return true;
+	}
+
+	GateActivity gateActivity = (GateActivity) activityDAO.getActivityByActivityId(nextActivity.getActivityId(),
+		GateActivity.class);
+	if (!gateActivity.isGateStopAtPrecedingActivity()) {
+	    return true;
+	}
+
+	User learner = userManagementService.getUserById(learnerId);
+	GateActivityDTO gateDto = knockGate(gateActivity, learner, false, null);
+	return gateDto.getAllowToPass();
     }
 
     /**

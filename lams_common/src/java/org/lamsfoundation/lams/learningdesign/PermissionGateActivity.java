@@ -84,6 +84,7 @@ public class PermissionGateActivity extends GateActivity implements Serializable
 	copyToNewActivity(newPermissionGateActivity, uiidOffset);
 	newPermissionGateActivity.setGateOpen(false);
 	newPermissionGateActivity.setGateActivityLevelId(this.getGateActivityLevelId());
+	newPermissionGateActivity.setGateStopAtPrecedingActivity(this.isGateStopAtPrecedingActivity());
 	return newPermissionGateActivity;
 
     }

@@ -65,6 +65,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -447,5 +448,21 @@ public class LearnerController {
 	response.setContentType("application/json;charset=utf-8");
 
 	return responseJSON.toString();
+    }
+
+    @RequestMapping("/isNextGateActivityOpen")
+    @ResponseBody
+    public String isNextGateActivityOpen(@RequestParam int userId, @RequestParam(required = false) Long toolSessionId,
+	    @RequestParam(required = false) Long lessonId) {
+	Boolean isOpen = true;
+	if (toolSessionId != null) {
+	    isOpen = learnerService.isNextGateActivityOpenByToolSessionId(userId, toolSessionId);
+	} else if (lessonId != null) {
+	    isOpen = learnerService.isNextGateActivityOpenByLessonId(userId, lessonId);
+	} else {
+	    throw new IllegalArgumentException("Either tool session ID or lesson ID has to be provided");
+	}
+
+	return isOpen.toString();
     }
 }
