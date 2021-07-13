@@ -61,55 +61,14 @@
 		</script>
 	</c:if>
 	
+	<script type="text/javascript" src="${lams}learning/includes/javascript/gate-check.js"></script>
 	<script type="text/javascript">
-		 $.fn.bootstrapTooltip = $.fn.tooltip.noConflict();
+		 checkNextGateActivity('finishButton', ${sessionMap.user.userId}, '${toolSessionID}', '', function(){
+			 document.location.href ='<c:url value="/learning/finish.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}';
+		 });
 		 
-		$(document).ready(function() {
-			$('#finishButton').bootstrapTooltip({
-				'trigger' : 'manual'
-			});
-		});
-	
 		function disableButtons() {
 			$('.btn').prop('disabled',true);
-		}
-		
-		function finishSession(){
-			disableButtons();
-			
-			$.ajax({
-				'url' : '<lams:LAMSURL />learning/learner/isNextGateActivityOpen.do?userId=${sessionMap.user.userId}&toolSessionId=${toolSessionID}',
-				'cache' : false,
-				'dataType' : 'json',
-				'success'  : function(response) {
-					if (response.status == 'open') {
-						document.location.href ='<c:url value="/learning/finish.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}';
-						return;
-					}
-					
-					if (response.status == 'closed') {
-						let timeoutFunction = null;
-						if (response.message) {
-							let finishButton = $('#finishButton').attr({
-								'title' : response.message,
-								'data-original-title' : response.message
-							}).bootstrapTooltip('show');
-							timeoutFunction = function(){
-								finishButton.bootstrapTooltip('hide');
-								$('.btn').prop('disabled', false);
-							};
-						} else {
-							timeoutFunction = function(){
-								$('.btn').prop('disabled', false);
-							};
-						}
-
-						setTimeout(timeoutFunction, 5000);
-					}
-				}
-			});
-			
-			return false;
 		}
 		
 		function continueReflect(){
@@ -231,7 +190,6 @@
 						<c:otherwise>
 							<button id="finishButton"
 							        name="FinishButton"
-									onClick="return finishSession()"
 									class="btn btn-primary voffset10 pull-right na">
 								<span class="nextActivity">
 									<c:choose>
