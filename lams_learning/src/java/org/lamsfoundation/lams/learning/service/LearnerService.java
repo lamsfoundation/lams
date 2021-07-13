@@ -898,8 +898,12 @@ public class LearnerService implements ILearnerFullService {
     @Override
     public GateActivityDTO isNextGateActivityOpenByLessonId(int learnerId, long lessonId) {
 	LearnerProgress learnerProgress = getProgress(learnerId, lessonId);
+	if (learnerProgress.getLesson().getLearningDesign().getCopyTypeID() == LearningDesign.COPY_TYPE_PREVIEW) {
+	    // teacher can rush through preview lessons ignoring gates
+	    return null;
+	}
+	
 	Activity currentActivity = learnerProgress.getCurrentActivity();
-
 	Activity nextActivity = null;
 	Transition transition = currentActivity.getTransitionFrom();
 	if (transition != null) {
