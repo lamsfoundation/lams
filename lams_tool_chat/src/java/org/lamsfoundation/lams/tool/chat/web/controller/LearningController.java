@@ -60,7 +60,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/learning")
 public class LearningController {
-    
+
     @Autowired
     private IChatService chatService;
     @Autowired
@@ -179,6 +179,7 @@ public class LearningController {
 	Long toolSessionId = chatUser.getChatSession().getSessionId();
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, chatService.isLastActivity(toolSessionId));
+	request.setAttribute("userId", chatUser.getUserId());
 
 	return "pages/learning/notebook";
     }
@@ -215,8 +216,7 @@ public class LearningController {
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	// attempt to retrieve user using userId and toolSessionId
-	ChatUser chatUser = chatService.getUserByUserIdAndSessionId(user.getUserID().longValue(),
-		toolSessionId);
+	ChatUser chatUser = chatService.getUserByUserIdAndSessionId(user.getUserID().longValue(), toolSessionId);
 
 	if (chatUser == null) {
 	    ChatSession chatSession = chatService.getSessionBySessionId(toolSessionId);
