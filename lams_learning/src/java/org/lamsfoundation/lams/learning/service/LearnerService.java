@@ -890,18 +890,16 @@ public class LearnerService implements ILearnerFullService {
     }
 
     @Override
-    public boolean isNextGateActivityOpenByToolSessionId(int learnerId, long toolSessionId) {
+    public GateActivityDTO isNextGateActivityOpenByToolSessionId(int learnerId, long toolSessionId) {
 	ToolSession toolSession = lamsCoreToolService.getToolSessionById(toolSessionId);
 	return isNextGateActivityOpenByLessonId(learnerId, toolSession.getLesson().getLessonId());
     }
 
     @Override
-    public boolean isNextGateActivityOpenByLessonId(int learnerId, long lessonId) {
+    public GateActivityDTO isNextGateActivityOpenByLessonId(int learnerId, long lessonId) {
 	LearnerProgress learnerProgress = getProgress(learnerId, lessonId);
-	return isNextGateActivityOpen(learnerId, learnerProgress.getCurrentActivity());
-    }
+	Activity currentActivity = learnerProgress.getCurrentActivity();
 
-    private boolean isNextGateActivityOpen(int learnerId, Activity currentActivity) {
 	Activity nextActivity = null;
 	Transition transition = currentActivity.getTransitionFrom();
 	if (transition != null) {
@@ -915,18 +913,18 @@ public class LearnerService implements ILearnerFullService {
 	}
 
 	if (nextActivity == null || !nextActivity.isGateActivity()) {
-	    return true;
+	    return null;
 	}
 
 	GateActivity gateActivity = (GateActivity) activityDAO.getActivityByActivityId(nextActivity.getActivityId(),
 		GateActivity.class);
-	if (!gateActivity.isGateStopAtPrecedingActivity()) {
-	    return true;
+	if (!gateActivity.getGateStopAtPrecedingActivity()) {
+	    return null;
 	}
 
 	User learner = userManagementService.getUserById(learnerId);
 	GateActivityDTO gateDto = knockGate(gateActivity, learner, false, null);
-	return gateDto.getAllowToPass();
+	return gateDto.getAllowToPass() ? null : gateDto;
     }
 
     /**

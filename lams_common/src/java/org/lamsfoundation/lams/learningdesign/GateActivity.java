@@ -191,7 +191,7 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
 	this.allowedToPassLearners = allowedToPassLearners;
     }
 
-    public boolean isGateStopAtPrecedingActivity() {
+    public boolean getGateStopAtPrecedingActivity() {
 	return gateStopAtPrecedingActivity;
     }
 

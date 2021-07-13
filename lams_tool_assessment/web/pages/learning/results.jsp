@@ -66,10 +66,7 @@
 		 
 		$(document).ready(function() {
 			$('#finishButton').bootstrapTooltip({
-				'trigger' : 'manual',
-				'title' : function(){
-					return $(this).data('gateClosedTooltip');
-				}
+				'trigger' : 'manual'
 			});
 		});
 	
@@ -83,18 +80,32 @@
 			$.ajax({
 				'url' : '<lams:LAMSURL />learning/learner/isNextGateActivityOpen.do?userId=${sessionMap.user.userId}&toolSessionId=${toolSessionID}',
 				'cache' : false,
-				'dataType' : 'text',
+				'dataType' : 'json',
 				'success'  : function(response) {
-					if (response == 'true') {
+					if (response.status == 'open') {
 						document.location.href ='<c:url value="/learning/finish.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}';
 						return;
 					}
+					
+					if (response.status == 'closed') {
+						let timeoutFunction = null;
+						if (response.message) {
+							let finishButton = $('#finishButton').attr({
+								'title' : response.message,
+								'data-original-title' : response.message
+							}).bootstrapTooltip('show');
+							timeoutFunction = function(){
+								finishButton.bootstrapTooltip('hide');
+								$('.btn').prop('disabled', false);
+							};
+						} else {
+							timeoutFunction = function(){
+								$('.btn').prop('disabled', false);
+							};
+						}
 
-					let finishButton = $('#finishButton').bootstrapTooltip('show');
-					setTimeout(function(){
-						finishButton.bootstrapTooltip('hide');
-						$('.btn').prop('disabled', false);
-					}, 5000);
+						setTimeout(timeoutFunction, 5000);
+					}
 				}
 			});
 			
@@ -221,8 +232,7 @@
 							<button id="finishButton"
 							        name="FinishButton"
 									onClick="return finishSession()"
-									class="btn btn-primary voffset10 pull-right na"
-									data-gate-closed-tooltip="<fmt:message key="label.learning.gate.closed" />">
+									class="btn btn-primary voffset10 pull-right na">
 								<span class="nextActivity">
 									<c:choose>
 										<c:when test="${sessionMap.isLastActivity}">

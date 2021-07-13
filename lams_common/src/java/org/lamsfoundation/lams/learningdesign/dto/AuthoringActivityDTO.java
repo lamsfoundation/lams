@@ -453,7 +453,7 @@ public class AuthoringActivityDTO extends BaseDTO {
 	GateActivity gateActivity = (GateActivity) activity;
 	gateActivityLevelID = gateActivity.getGateActivityLevelId();
 	gateOpen = gateActivity.getGateOpen();
-	gateStopAtPrecedingActivity = gateActivity.isGateStopAtPrecedingActivity();
+	gateStopAtPrecedingActivity = gateActivity.getGateStopAtPrecedingActivity();
 	adminURL = gateActivity.getSystemTool().getAdminUrl();
     }
 

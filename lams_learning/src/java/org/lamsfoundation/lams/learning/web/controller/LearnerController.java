@@ -24,11 +24,15 @@
 package org.lamsfoundation.lams.learning.web.controller;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -42,7 +46,10 @@ import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
+import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
+import org.lamsfoundation.lams.learningdesign.dto.GateActivityDTO;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgressArchive;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -57,6 +64,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -453,16 +461,52 @@ public class LearnerController {
     @RequestMapping("/isNextGateActivityOpen")
     @ResponseBody
     public String isNextGateActivityOpen(@RequestParam int userId, @RequestParam(required = false) Long toolSessionId,
-	    @RequestParam(required = false) Long lessonId) {
-	Boolean isOpen = true;
+	    @RequestParam(required = false) Long lessonId, Locale locale) {
+	GateActivityDTO gateDto = null;
+
 	if (toolSessionId != null) {
-	    isOpen = learnerService.isNextGateActivityOpenByToolSessionId(userId, toolSessionId);
+	    gateDto = learnerService.isNextGateActivityOpenByToolSessionId(userId, toolSessionId);
 	} else if (lessonId != null) {
-	    isOpen = learnerService.isNextGateActivityOpenByLessonId(userId, lessonId);
+	    gateDto = learnerService.isNextGateActivityOpenByLessonId(userId, lessonId);
 	} else {
 	    throw new IllegalArgumentException("Either tool session ID or lesson ID has to be provided");
 	}
 
-	return isOpen.toString();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	if (gateDto == null) {
+	    responseJSON.put("status", "open");
+	} else {
+	    responseJSON.put("status", "closed");
+
+	    String message = null;
+	    GateActivity gate = gateDto.getGate();
+	    if (gate.isScheduleGate()) {
+		ScheduleGateActivity scheduleGate = (ScheduleGateActivity) gate;
+		if (!Boolean.TRUE.equals(scheduleGate.getGateActivityCompletionBased())) {
+		    Lesson lesson = gate.getLearningDesign().getLessons().iterator().next();
+		    User user = userManagementService.getUserById(userId);
+		    TimeZone userTimeZone = TimeZone.getTimeZone(user.getTimeZone());
+
+		    Calendar openTime = new GregorianCalendar(userTimeZone);
+		    Date lessonStartTime = DateUtil.convertToTimeZoneFromDefault(userTimeZone,
+			    lesson.getStartDateTime());
+		    openTime.setTime(lessonStartTime);
+		    openTime.add(Calendar.MINUTE, scheduleGate.getGateStartTimeOffset().intValue());
+		    String openDateString = DateUtil.convertToStringForJSON(openTime.getTime(), locale);
+		    message = messageService.getMessage("label.gate.closed.preceding.activity.schedule",
+			    new Object[] { openDateString });
+		}
+	    } else if (gate.isConditionGate()) {
+		message = messageService.getMessage("label.gate.closed.preceding.activity.condition");
+	    }
+
+	    if (message == null) {
+		message = messageService.getMessage("label.gate.closed.preceding.activity");
+	    }
+
+	    responseJSON.put("message", message);
+	}
+
+	return responseJSON.toString();
     }
 }
