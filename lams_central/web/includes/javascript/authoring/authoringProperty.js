@@ -222,8 +222,25 @@ var PropertyDefs = {
 					activity.offsetDay = +$('.propertiesContentFieldOffsetDay', content).val();
 					activity.offsetHour = +$('.propertiesContentFieldOffsetHour', content).val();
 					activity.offsetMinute = +$('.propertiesContentFieldOffsetMinute', content).val();
+					
+					// both of these options must not be on at the same time
+					// stop-at-preceding-activity may prevent preceding activity from completion,
+					// meaning that timer-from-previous-activity-completion will never start
 					activity.gateActivityCompletionBased = $('.propertiesContentFieldActivityCompletionBased', content).is(':checked');
-					activity.gateStopAtPrecedingActivity = $('.propertiesContentFieldStopAtPrecedingActivity', content).is(':checked');
+					if (activity.gateActivityCompletionBased) {
+						activity.gateStopAtPrecedingActivity = false;
+						$('.propertiesContentFieldStopAtPrecedingActivity', content).prop('disabled', true).prop('checked', false);
+					} else {
+						activity.gateStopAtPrecedingActivity = $('.propertiesContentFieldStopAtPrecedingActivity', content).is(':checked');
+						$('.propertiesContentFieldStopAtPrecedingActivity', content).prop('disabled', false);
+					}
+					
+					if (activity.gateStopAtPrecedingActivity) {
+						activity.gateActivityCompletionBased = false;
+						$('.propertiesContentFieldActivityCompletionBased', content).prop('disabled', true).prop('checked', false);
+					} else {
+						$('.propertiesContentFieldActivityCompletionBased', content).prop('disabled', false);
+					}
 				}
 				
 				if (activity.gateType == 'password') {
