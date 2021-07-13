@@ -905,10 +905,19 @@ public class LearnerService implements ILearnerFullService {
 	if (transition != null) {
 	    nextActivity = transition.getToActivity();
 	} else if (currentActivity.getParentActivity() != null) {
+	    // check parent activity like Optional activities
 	    currentActivity = currentActivity.getParentActivity();
 	    transition = currentActivity.getTransitionFrom();
 	    if (transition != null) {
 		nextActivity = transition.getToActivity();
+	    } else if (currentActivity.getParentActivity() != null) {
+		// if it is branching, then it is activity -> sequence activity -> branching activity
+		// and the branching activity is what we need to check
+		currentActivity = currentActivity.getParentActivity();
+		transition = currentActivity.getTransitionFrom();
+		if (transition != null) {
+		    nextActivity = transition.getToActivity();
+		}
 	    }
 	}
 
