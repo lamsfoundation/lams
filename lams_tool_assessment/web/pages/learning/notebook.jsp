@@ -9,7 +9,12 @@
 	</title>
 	<%@ include file="/common/header.jsp"%>
 	
+	<script type="text/javascript" src="${lams}learning/includes/javascript/gate-check.js"></script>
 	<script type="text/javascript">
+		 checkNextGateActivity('finishButton', '${sessionMap.toolSessionID}', '', function(){
+			$('#reflectionForm').submit();
+		 });
+	 
 		function disableFinishButton() {
 			document.getElementById("finishButton").disabled = true;
 		}
