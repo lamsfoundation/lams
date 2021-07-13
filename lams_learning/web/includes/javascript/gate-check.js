@@ -17,8 +17,13 @@ function checkNextGateActivity(finishButtonId, userId, toolSessionId, lessonId, 
 				'trigger' : 'manual'
 			})
 			.click(function(event){
+				if (finishButton.prop('disabled') == true) {
+					// if the button is already disabled, do not run a check
+					return;
+				}
+				
 				// disable the button
-				finishButton.prop('disabled', true);
+				finishButton.prop('disabled', true).attr('disabled', true);
 				
 				// check if there is a gate after this activity
 				// if so, check if learner can pass
@@ -29,7 +34,7 @@ function checkNextGateActivity(finishButtonId, userId, toolSessionId, lessonId, 
 					'success'  : function(response) {
 						if (response.status == 'open') {
 							// learner can pass
-							finishButton.prop('disabled', false);
+							finishButton.prop('disabled', false).attr('disabled', false);
 							submitFunction();
 							return;
 						}
@@ -47,11 +52,11 @@ function checkNextGateActivity(finishButtonId, userId, toolSessionId, lessonId, 
 								}).bootstrapTooltip('show');
 								
 								timeoutFunction = function(){
-									finishButton.bootstrapTooltip('hide').prop('disabled', false);
+									finishButton.bootstrapTooltip('hide').prop('disabled', false).attr('disabled', false);
 								};
 							} else {
 								timeoutFunction = function(){
-									finishButton.prop('disabled', false);
+									finishButton.prop('disabled', false).attr('disabled', false);
 								};
 							}
 	
