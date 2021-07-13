@@ -22,7 +22,7 @@
 	<body class="stripes">
 			
 			<script type="text/javascript">
-				checkNextGateActivity('finishButton', ${userId}, '${toolSessionID}', '', function(){
+				checkNextGateActivity('finishButton', '${toolSessionID}', '', function(){
 					 submitForm('finishActivity');
 				});
 			

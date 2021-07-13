@@ -460,10 +460,16 @@ public class LearnerController {
 
     @RequestMapping("/isNextGateActivityOpen")
     @ResponseBody
-    public String isNextGateActivityOpen(@RequestParam int userId, @RequestParam(required = false) Long toolSessionId,
-	    @RequestParam(required = false) Long lessonId, Locale locale) {
-	GateActivityDTO gateDto = null;
+    public String isNextGateActivityOpen(@RequestParam(required = false) Long toolSessionId,
+	    @RequestParam(required = false) Long lessonId, HttpSession session, Locale locale) {
 
+	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
+	if (userDto == null) {
+	    throw new IllegalArgumentException("No user is logged in");
+	}
+
+	Integer userId = userDto.getUserID();
+	GateActivityDTO gateDto = null;
 	if (toolSessionId != null) {
 	    gateDto = learnerService.isNextGateActivityOpenByToolSessionId(userId, toolSessionId);
 	} else if (lessonId != null) {

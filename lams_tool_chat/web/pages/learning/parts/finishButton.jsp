@@ -30,7 +30,7 @@
 
 <script type="text/javascript" src="${lams}learning/includes/javascript/gate-check.js"></script>
 <script type="text/javascript">
-	checkNextGateActivity('finishButton', ${chatUserDTO.userID}, '${param.toolSessionID}', '', function(){
+	checkNextGateActivity('finishButton', '${param.toolSessionID}', '', function(){
 		 submitForm('finishActivity');
 	});
 	

@@ -179,7 +179,6 @@ public class LearningController {
 	Long toolSessionId = chatUser.getChatSession().getSessionId();
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, chatService.isLastActivity(toolSessionId));
-	request.setAttribute("userId", chatUser.getUserId());
 
 	return "pages/learning/notebook";
     }
