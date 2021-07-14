@@ -6,6 +6,7 @@
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}learning/includes/javascript/gate-check.js"></script>
 
 	<c:if test="${not empty param.sessionMapID}">
 		<c:set var="sessionMapID" value="${param.sessionMapID}" />
@@ -14,8 +15,10 @@
 	<c:set var="mode" value="${sessionMap.mode}" />
 	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 	<c:set var="commonCartridge" value="${sessionMap.commonCartridge}" />
-
+	
 	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${toolSessionID}', '', finishSession);
+		
 		function checkNew() {
 		    var reqIDVar = new Date();
 			document.location.href = "<c:url value="/learning/start.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&reqID="+reqIDVar.getTime();
@@ -28,9 +31,7 @@
 		}
 		
 		function finishSession() {
-			document.getElementById("finishButton").disabled = true;
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
-			return false;
 		}
 		
 		function continueReflect() {
@@ -127,7 +128,7 @@
 						</button>
 					</c:when>
 					<c:otherwise>
-						<a href="#nogo" name="FinishButton" id="finishButton" onclick="return finishSession()" class="btn btn-primary">
+						<a href="#nogo" name="FinishButton" id="finishButton" class="btn btn-primary">
 							<span class="na">
 								<c:choose>
 				 					<c:when test="${sessionMap.isLastActivity}">
