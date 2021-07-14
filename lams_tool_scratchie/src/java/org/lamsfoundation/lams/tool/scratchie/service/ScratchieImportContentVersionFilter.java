@@ -99,7 +99,7 @@ public class ScratchieImportContentVersionFilter extends ToolContentVersionFilte
 	this.removeField(ScratchieItem.class, "userMark");
 	this.removeField(ScratchieItem.class, "userAttempts");
     }
-    
+
     /**
      * Migration to Question Bank
      */
@@ -182,6 +182,20 @@ public class ScratchieImportContentVersionFilter extends ToolContentVersionFilte
 		scratchieQuestion.removeChild(scratchieOptions.item(0).getParentNode());
 		XMLUtil.removeElement(scratchieQuestion, "isCreateByAuthor");
 	    }
+	});
+    }
+
+    /**
+     * Change Scratchie items collection type
+     */
+    public void up20190809To20210714(String toolFilePath) throws IOException {
+	transformXML(toolFilePath, toolRoot -> {
+	    NodeList scratchieItems = toolRoot.getElementsByTagName("scratchieItems");
+	    if (scratchieItems.getLength() == 0) {
+		return;
+	    }
+
+	    ((Element) scratchieItems.item(0)).setAttribute("class", "sorted-set");
 	});
     }
 }
