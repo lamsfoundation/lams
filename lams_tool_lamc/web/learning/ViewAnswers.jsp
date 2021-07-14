@@ -30,9 +30,13 @@
 		}
 	</style>	
 
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-slider.js"></script>
+	<script type="text/javascript" src="${lams}learning/includes/javascript/gate-check.js"></script>
 	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${mcLearningForm.toolSessionID}', '', submitForm);
+		
 		$(document).ready(function() {
 			//initialize bootstrap-sliders if "Enable confidence level" option is ON
 			$('.bootstrap-slider').bootstrapSlider();
@@ -45,7 +49,7 @@
 			}
 		}
 
-		function submitForm(methodName) {
+		function submitForm() {
 			var f = document.getElementById('mcLearningForm');
 			f.submit();
 		}
@@ -321,8 +325,7 @@
 						<c:if test="${(mcGeneralLearnerFlowDTO.reflection != 'true') || !hasEditRight}">
 							<form:hidden path="learnerFinished" value="Finished" />
 
-							<a href="#nogo" class="btn btn-primary pull-right na" id="finishButton"
-									onclick="submitForm('finish'); return false;">
+							<a href="#nogo" class="btn btn-primary pull-right na" id="finishButton">
 								<c:choose>
 									<c:when test="${isLastActivity}">
 										<fmt:message key="label.submit" />
