@@ -80,11 +80,16 @@
 	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/portrait.js" type="text/javascript" ></script>
-
+	<script src="${lams}learning/includes/javascript/gate-check.js" type="text/javascript"></script>
+	
 	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${toolSessionID}', '', function(){
+			submitMethod('endLearning');
+		});
+		
 		var AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
-		YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
-		IS_DISABLED =  ${sessionMap.isDisabled};
+			YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
+			IS_DISABLED =  ${sessionMap.isDisabled};
 		
 		$(document).ready(function(){
 			
@@ -277,7 +282,6 @@
 			}
 		}
 		function submitMethod(actionMethod) {
-			$('.btn').prop('disabled', true);
 			document.forms.qaLearningForm.action=actionMethod+".do"; 
 			document.forms.qaLearningForm.submit();
 		}
@@ -502,8 +506,7 @@
 						</c:when>
 	
 						<c:when test="${(generalLearnerFlowDTO.reflection != 'true') || !hasEditRight || generalLearnerFlowDTO.isLearnerFinished}">
-							<button type="button" id="finishButton"
-									onclick="javascript:submitMethod('endLearning'); return false;" class="btn btn-primary pull-right na">
+							<button type="button" id="finishButton" class="btn btn-primary pull-right na">
 								<c:choose>
 									<c:when test="${sessionMap.isLastActivity}">
 										<fmt:message key="button.submit" />

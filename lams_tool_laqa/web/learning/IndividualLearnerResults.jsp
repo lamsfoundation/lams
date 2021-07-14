@@ -8,8 +8,14 @@
 	<title><fmt:message key="activity.title" /></title>
 
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />learning/includes/javascript/gate-check.js"></script>
+	
+	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${qaLearningForm.toolSessionID}', '', function(){
+			submitMethod('storeAllResults');
+		});
 
-	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) {
 			$('.btn').prop('disabled', true);
 			document.forms.qaLearningForm.action = actionMethod+".do";
@@ -129,8 +135,7 @@
 			<c:if test="${!generalLearnerFlowDTO.showOtherAnswers}">
 				<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
 					<div class="space-bottom-top align-right">
-						<button type="button" id="finishButton" 
-							onclick="javascript:submitMethod('storeAllResults');return false" class="btn btn-primary pull-right na">
+						<button type="button" id="finishButton" class="btn btn-primary pull-right na">
 							<c:choose>
 								<c:when test="${sessionMap.isLastActivity}">
 									<fmt:message key="button.submit" />
