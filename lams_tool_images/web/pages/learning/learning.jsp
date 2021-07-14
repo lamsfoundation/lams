@@ -69,7 +69,10 @@
     <script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
  	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
  	<lams:JSImport src="includes/javascript/fotorama.js" relative="true" />
+ 	<script type="text/javascript" src="${lams}learning/includes/javascript/gate-check.js"></script>
+		
 	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${toolSessionID}', '', finishSession);
 	
 		$(document).ready(function(){ 
 			$('.fotorama')
@@ -125,11 +128,11 @@
 			document.location.href = "<c:url value="/learning/start.do"/>?mode=${mode}&toolSessionID=${toolSessionID}";
  		    return false;
 		}
+		
 		function finishSession(){
-			$('#finishButton').attr('disabled', true);
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
-			return false;
 		}
+		
 		function continueReflect() {
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
@@ -275,7 +278,7 @@
 						</button>
 					</c:when>
 					<c:otherwise>
-						<a href="#nogo" name="FinishButton" id="finishButton"	onclick="return finishSession()" class="btn btn-primary pull-right" >
+						<a href="#nogo" name="FinishButton" id="finishButton" class="btn btn-primary pull-right" >
 							<span class="na">
 								<c:choose>
 				 					<c:when test="${sessionMap.isLastActivity}">
