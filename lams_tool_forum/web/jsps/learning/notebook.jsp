@@ -7,7 +7,9 @@
 <c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="tool"><lams:WebAppURL /></c:set>
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request" />
-
+<c:set var="sessionMapID" value="${param.sessionMapID}" />
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+		
 <lams:html>
 	<lams:head>
 		<title><fmt:message key="activity.title" /></title>
@@ -31,7 +33,8 @@
 		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>		
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jscroll.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
-		
+		<script type="text/javascript" src="${lams}learning/includes/javascript/gate-check.js"></script>
+	
 		<script type="text/javascript">
 			var removeItemAttachmentUrl = "<lams:WebAppURL />learning/deleteAttachment.do";
 			var warning = '<fmt:message key="warn.minimum.number.characters" />';
@@ -39,25 +42,22 @@
 			var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.attachment.executable"/>';	
 			var EXE_FILE_TYPES = '${EXE_FILE_TYPES}';
 			var UPLOAD_FILE_MAX_SIZE = '${UPLOAD_FILE_MAX_SIZE}';
+
+			checkNextGateActivity('finishButton', '${sessionMap.toolSessionID}', '', submitForm);
+
+			function disableFinishButton() {
+				document.getElementById("finishButton").disabled = true;
+			}
+			function submitForm(){
+		    	var f = document.getElementById('reflectionForm');
+				f.submit();
+		    }
 		</script>
 		<script type="text/javascript" src="${tool}includes/javascript/learner.js"></script>	
 		
 	</lams:head>
 	
 	<body class="stripes">
-		<c:set var="sessionMapID" value="${param.sessionMapID}" />
-		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-		
-		<script type="text/javascript">
-			function disableFinishButton() {
-				document.getElementById("finishButton").disabled = true;
-			}
-			function submitForm(methodName){
-		        	var f = document.getElementById('reflectionForm');
-			        f.submit();
-		        }
-		</script>
-		
 		<form:form action="submitReflection.do" method="post"
 			onsubmit="disableFinishButton();" modelAttribute="reflectionForm" id="reflectionForm">
 			<form:hidden path="userID" />
@@ -74,7 +74,7 @@
 				<textarea id="focused" rows="5" name="entryText" class="form-control">${reflectionForm.entryText}</textarea>
 		
 				<div class="space-bottom-top align-right">
-					<a  href="#nogo" class="btn btn-primary voffset5 pull-right na" id="finishButton" onclick="submitForm('finish')">
+					<a  href="#nogo" class="btn btn-primary voffset5 pull-right na" id="finishButton">
 						<span class="nextActivity">
 							<c:choose>
 			 					<c:when test="${sessionMap.isLastActivity}">
