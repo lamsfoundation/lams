@@ -1,16 +1,21 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+<script type="text/javascript" src="${lams}learning/includes/javascript/gate-check.js"></script>
 <script type="text/javascript">
+	checkNextGateActivity('finishButton', '${scribeSessionDTO.sessionID}', '', submitForm);
+
 	function disableFinishButton() {
 		var finishButton = document.getElementById("finishButton");
 		if (finishButton != null) {
 			finishButton.disabled = true;
 		}
 	}
-         function submitForm(methodName){
-                var f = document.getElementById('learningForm');
-                f.submit();
-        }
+	
+    function submitForm(){
+           var f = document.getElementById('learningForm');
+           f.submit();
+    }
 </script>
 
 <div class="voffset10">
@@ -26,7 +31,7 @@
 
 			</c:when>
 			<c:otherwise>
-				<a href="#nogo" class="btn btn-primary pull-right na" id="finishButton" onclick="submitForm('finish')">
+				<a href="#nogo" class="btn btn-primary pull-right na" id="finishButton">
 					<span class="nextActivity">
 						<c:choose>
 		 					<c:when test="${isLastActivity}">
