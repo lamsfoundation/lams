@@ -1,13 +1,19 @@
 <%@ include file="/common/taglibs.jsp"%>
-
-<script type="text/javascript">
-	function disableFinishButton() {
-		var finishButton = document.getElementById("finishButton");
-		if (finishButton != null) {
-			finishButton.disabled = true;
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}learning/includes/javascript/gate-check.js"></script>
+	
+	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${learningForm.toolSessionID}', '', function(){
+			$('#finishForm').submit();
+		});
+		
+		function disableFinishButton() {
+			var finishButton = document.getElementById("finishButton");
+			if (finishButton != null) {
+				finishButton.disabled = true;
+			}
 		}
-	}
-</script>
+	</script>
 
 <c:set var="notebookEntry" scope="request">
 	<fmt:message key="label.notebookEntry" />
@@ -46,7 +52,7 @@
 </form:form>
 
 <form:form action="${!userDTO.finishedActivity and contentDTO.reflectOnActivity ? 'openNotebook.do' : 'finishActivity.do'}"
-		   method="post" onsubmit="disableFinishButton();" modelAttribute="learningForm">
+		   method="post" onsubmit="disableFinishButton();" modelAttribute="learningForm" id="finishForm">
 	<form:hidden path="toolSessionID" />
 	<div class="pull-right voffset10">
 		<c:choose>
@@ -54,7 +60,7 @@
 				<button type="submit" class="btn btn-primary"><fmt:message key="button.continue" /></button>
 			</c:when>
 			<c:otherwise>
-				<button type="submit" class="btn btn-primary na" id="finishButton">
+				<button type="button" class="btn btn-primary na" id="finishButton">
 					<c:choose>
 						<c:when test="${isLastActivity}">
 							<fmt:message key="button.submit" />
