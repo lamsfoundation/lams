@@ -39,8 +39,11 @@
 			<script type="text/javascript" src="${lams}includes/javascript/uppy/el_GR.min.js"></script>
 		</c:when>
 	</c:choose>
+	
+	<script type="text/javascript" src="${lams}learning/includes/javascript/gate-check.js"></script>
+	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${toolSessionID}', '', finishSession);
 		
-	<script type="text/javascript">			
 		var LAMS_URL = '${lams}',
 	 		UPLOAD_FILE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>',
 			// convert Java syntax to JSON
@@ -389,7 +392,7 @@
 					</c:when>
 
 					<c:otherwise>
-						<button type="submit" id="finishButton" onclick="return finishSession()"
+						<button type="submit" id="finishButton"
 							class="btn btn-primary btn-disable-on-submit voffset10 pull-right na">
 							<span class="nextActivity"> <c:choose>
 									<c:when test="${sessionMap.isLastActivity}">
