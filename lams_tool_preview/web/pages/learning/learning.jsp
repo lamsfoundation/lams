@@ -10,6 +10,7 @@
 <c:set var="toolSessionId" value="${sessionMap.toolSessionId}" />
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 <c:set var="userId" value="${sessionMap.user.userId }"/>
+<c:set var="displayFinalFinishButton" value="${not peerreview.showRatingsLeftForUser and not peerreview.reflectOnActivity and stepNumber >= numCriteria}" />
 <c:set var="isComment" value="<%=RatingCriteria.RATING_STYLE_COMMENT%>"/>
 <c:set var="isStar" value="<%=RatingCriteria.RATING_STYLE_STAR%>"/>
 <c:set var="isRanking" value="<%=RatingCriteria.RATING_STYLE_RANKING%>"/>
@@ -35,9 +36,13 @@
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script src="${lams}includes/javascript/jquery.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/bootstrap.min.js" type="text/javascript"></script>
+	<script src="${lams}learning/includes/javascript/gate-check.js" type="text/javascript"></script>
 	
 	<script type="text/javascript">
-
+		<c:if test="${displayFinalFinishButton}">
+			checkNextGateActivity('finishButton', '${toolSessionId}', '', finishSession);
+		</c:if>
+		
 		function hideButtons() {
 			$("#buttonNextPrevDiv").css("visibility", "hidden");
 		}	
@@ -46,9 +51,7 @@
 		}	
 
  		function finishSession(){
- 			hideButtons();
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionId=${toolSessionId}"/>';
-			return false;
 		}
 
 		function showResults(){
@@ -73,7 +76,6 @@
      </script>
 </lams:head>
 <body class="stripes">
-
 	<lams:Page type="learner" title="${peerreview.title}">
 
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
@@ -146,6 +148,9 @@
 			<span id="prevButton" class="btn btn-default" onclick="javascript:${method}(false);"><fmt:message key="label.previous"/></span>
 		</c:if>
 		<c:choose>
+			<c:when test="${displayFinalFinishButton}">
+				<span id="finishButton" class="btn btn-primary">${finishButtonLabel}</span>
+			</c:when>
 			<c:when test="${stepNumber == numCriteria}">
 				<span id="finishButton" class="btn btn-primary" onclick="javascript:${method}(true);">${finishButtonLabel}</span>
 			</c:when>

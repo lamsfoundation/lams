@@ -44,7 +44,9 @@
 	<script src="${lams}includes/javascript/jquery.tablesorter-pager.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/common.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script>	
+	<script src="${lams}learning/includes/javascript/gate-check.js" type="text/javascript"></script>
 	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${toolSessionId}', '', finishSession);
 	
 		$(document).ready(function(){
 			$(".tablesorter").tablesorter({
@@ -66,9 +68,7 @@
 		 });
 	
 		function finishSession(){
-			document.getElementById("finishButton").disabled = true;
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionId=${toolSessionId}"/>';
-			return false;
 		}
 		
 		function continueReflect(){
@@ -153,12 +153,12 @@
 		<div>
 			<c:choose>			
 				<c:when test="${sessionMap.reflectOn and empty sessionMap.reflectEntry}">
-					<a href="#nogo" id="finishButton" onclick="return continueReflect()" class="btn btn-default voffset5 pull-right">
+					<a href="#nogo" id="continueButton" onclick="return continueReflect()" class="btn btn-default voffset5 pull-right">
 						<fmt:message key="label.continue" />
 					</a>
 				</c:when>
 				<c:otherwise>
-					<a href="#nogo" id="finishButton" onclick="return finishSession()" class="btn btn-primary voffset5 pull-right na">
+					<a href="#nogo" id="finishButton" class="btn btn-primary voffset5 pull-right na">
 						<fmt:message key="label.finished" />
 					</a>
 				</c:otherwise>
