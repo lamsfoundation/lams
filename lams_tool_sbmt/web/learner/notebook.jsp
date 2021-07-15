@@ -1,11 +1,20 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 
+<c:set var="sessionMapID" value="${param.sessionMapID}" />
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+	
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
+	
+	<script type="text/javascript" src="${lams}learning/includes/javascript/gate-check.js"></script>
 	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${sessionMap.toolSessionID}', '', function(){
+			$('#refForm').submit();
+		});
+		
 		function disableFinishButton() {
 			document.getElementById("finishButton").disabled = true;
 		}
@@ -13,9 +22,6 @@
 </lams:head>
 
 <body class="stripes">
-
-	<c:set var="sessionMapID" value="${param.sessionMapID}" />
-	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 	<lams:Page type="learner" title="${sessionMap.title}" formID="refForm">
 
@@ -32,7 +38,7 @@
 				<form:textarea path="entryText" cssClass="form-control" id="focused" rows="5"></form:textarea>
 
 
-				<button class="btn btn-primary voffset10 pull-right na" id="finishButton" type="submit">
+				<button class="btn btn-primary voffset10 pull-right na" id="finishButton" type="button">
 
 					<c:choose>
 						<c:when test="${isLastActivity}">
