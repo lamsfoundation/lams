@@ -33,7 +33,7 @@
 		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>		
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jscroll.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
-		<script type="text/javascript" src="${lams}learning/includes/javascript/gate-check.js"></script>
+		<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	
 		<script type="text/javascript">
 			var removeItemAttachmentUrl = "<lams:WebAppURL />learning/deleteAttachment.do";

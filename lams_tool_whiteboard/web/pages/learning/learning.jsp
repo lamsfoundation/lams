@@ -66,7 +66,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/fullscreen.js"></script>
-	<script type="text/javascript" src="${lams}learning/includes/javascript/gate-check.js"></script>
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	
 	<script type="text/javascript">
 		checkNextGateActivity('finish-button', '${toolSessionID}', '', finishSession);

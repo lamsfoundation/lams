@@ -28,7 +28,7 @@
 	</c:if>
 </form>
 
-<script type="text/javascript" src="${lams}learning/includes/javascript/gate-check.js"></script>
+<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 <script type="text/javascript">
 	checkNextGateActivity('finishButton', '${param.toolSessionID}', '', function(){
 		 submitForm('finishActivity');

@@ -6,7 +6,7 @@
 	<title><fmt:message key="activity.title" /></title>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>learning/includes/javascript/gate-check.js"></script>
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	<script type="text/javascript">
 		checkNextGateActivity('finishButton', '${qaLearningForm.toolSessionID}', '', function(){
 			$('#qaLearningForm').submit();

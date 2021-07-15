@@ -80,7 +80,7 @@
 	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/portrait.js" type="text/javascript" ></script>
-	<script src="${lams}learning/includes/javascript/gate-check.js" type="text/javascript"></script>
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	
 	<script type="text/javascript">
 		checkNextGateActivity('finishButton', '${toolSessionID}', '', function(){

@@ -11,7 +11,7 @@
 	<title><fmt:message key="activity.title"/></title>
 	<script src="${lams}includes/javascript/jquery.js"></script>
 	<script src="${lams}includes/javascript/bootstrap.min.js" type="text/javascript"></script>
-	<script src="${lams}learning/includes/javascript/gate-check.js"></script>
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	<script type="text/javascript">
 		checkNextGateActivity('finishButton', '${nbLearnerForm.toolSessionID}', '', function(){
 			submitForm('finish');

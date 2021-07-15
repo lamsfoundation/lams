@@ -26,7 +26,7 @@
 		<script src="${tool}includes/javascript/mapjs/main.js"></script>
 		<script src="${tool}includes/javascript/mapjs/underscore-min.js"></script>
 		
-		<script type="text/javascript" src="${lams}learning/includes/javascript/gate-check.js"></script>
+		<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 		<script type="text/javascript">
 			checkNextGateActivity('finishButton', '${learningForm.toolSessionID}', '', submitForm);
 		

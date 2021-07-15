@@ -42,7 +42,7 @@
 	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/etherpad.js"></script>
-	<script type="text/javascript" src="${lams}learning/includes/javascript/gate-check.js"></script>
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	<script type="text/javascript">
 			//var for jquery.jRating.js
 		var pathToImageFolder = "${lams}images/css/",

@@ -20,7 +20,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>learning/includes/javascript/gate-check.js"></script>
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	
 	<script type="text/javascript">
 		checkNextGateActivity('finishButton', '${voteLearningForm.toolSessionID}', '', function() {

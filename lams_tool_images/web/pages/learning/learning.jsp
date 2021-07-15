@@ -69,7 +69,7 @@
     <script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
  	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
  	<lams:JSImport src="includes/javascript/fotorama.js" relative="true" />
- 	<script type="text/javascript" src="${lams}learning/includes/javascript/gate-check.js"></script>
+ 	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 		
 	<script type="text/javascript">
 		checkNextGateActivity('finishButton', '${toolSessionID}', '', finishSession);

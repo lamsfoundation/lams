@@ -36,7 +36,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script src="${lams}includes/javascript/jquery.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/bootstrap.min.js" type="text/javascript"></script>
-	<script src="${lams}learning/includes/javascript/gate-check.js" type="text/javascript"></script>
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	
 	<script type="text/javascript">
 		<c:if test="${displayFinalFinishButton}">

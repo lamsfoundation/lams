@@ -59,7 +59,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 	</c:if>
 	
-	<script type="text/javascript" src="${lams}learning/includes/javascript/gate-check.js"></script>
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	<script type="text/javascript">
 		checkNextGateActivity('finishButton', '${toolSessionID}', '', finishSession);
 	

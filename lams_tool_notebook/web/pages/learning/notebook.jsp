@@ -4,7 +4,7 @@
 <lams:html>
 	<lams:head>
 		<lams:headItems/>
-		<script src="<lams:LAMSURL/>learning/includes/javascript/gate-check.js"></script>
+		<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 		<script type="text/javascript">
 			checkNextGateActivity('finishButton', '${messageForm.toolSessionID}', '', function(){
 				submitForm('finish');
