@@ -40,9 +40,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<script type="text/javascript" src="${lams}learning/includes/javascript/gate-check.js"></script>
+	
 	<script type="text/javascript">
-		function submitForm(methodName) {
+		checkNextGateActivity('finishButton', '', ${activityID}, submitForm);
+		
+		function submitForm() {
 			var f = document.getElementById('messageForm');
 			f.submit();
 		}
@@ -99,7 +104,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<div class="row no-gutter">
 					<div class="col-xs-12">
 						<div id="right-buttons" class="pull-right voffset10">
-							<a href="javascript:;" class="btn btn btn-primary na" id="finishButton" onclick="submitForm('finish')">
+							<a href="javascript:;" class="btn btn btn-primary na" id="finishButton">
 								<span class="nextActivity"> 
 									<c:choose>
 										<c:when test="${activityPosition.last}">
