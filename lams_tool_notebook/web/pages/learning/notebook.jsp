@@ -4,76 +4,80 @@
 <lams:html>
 	<lams:head>
 		<lams:headItems/>
+		<script src="<lams:LAMSURL/>learning/includes/javascript/gate-check.js"></script>
+		<script type="text/javascript">
+			checkNextGateActivity('finishButton', '${messageForm.toolSessionID}', '', function(){
+				submitForm('finish');
+			});
+
+			var mode = "${mode}";
+			var forceResponse = "${notebookDTO.forceResponse}";
+
+			function disableFinishButton() {
+				document.getElementById("finishButton").style.visibility = 'hidden';
+			}
+
+			function textAreaReady() {
+				<c:if test="${contentEditable}">
+					<c:choose>
+					<c:when test="${notebookDTO.allowRichEditor}">
+						CKEDITOR.instances["entryText"].focus();
+					</c:when>		
+					<c:otherwise>
+						document.forms.messageForm.focusedInput.focus();
+					</c:otherwise>
+					</c:choose>
+				</c:if>
+				document.getElementById("finishButton").style.visibility = 'visible';
+			}
+			
+			function submitForm(methodName) {
+				disableFinishButton();
+				<c:choose>
+				<c:when test="${notebookDTO.allowRichEditor}">
+			      	CKEDITOR.instances["entryText"].updateElement(); // update textarea
+			      	var editorcontent = document.getElementById("entryText").value.replace(/<[^>]*>/gi, ''); // strip tags
+			      	var isEmpty = editorcontent.length === 0;
+
+					if (forceResponse =="true" && isEmpty ) {
+
+						retValue = confirm("<fmt:message>message.learner.blank.alertforceResponse</fmt:message>");
+						textAreaReady();
+						return retValue;
+						
+					} else if  (forceResponse =="false" && isEmpty && mode == "learner") {
+			
+						if (!confirm("<fmt:message>message.learner.blank.input</fmt:message>")) {
+							// otherwise, focus on the text area
+							textAreaReady();
+							return false;
+						}
+					}
+				</c:when>		
+				<c:otherwise>
+					if (forceResponse =="true" && document.forms.messageForm.focusedInput.value == "") {
+
+						retValue = confirm("<fmt:message>message.learner.blank.alertforceResponse</fmt:message>");
+						textAreaReady();
+						return retValue;
+						
+					} else if  (forceResponse =="false" && document.forms.messageForm.focusedInput.value == "" && mode == "learner") {
+			
+						if (!confirm("<fmt:message>message.learner.blank.input</fmt:message>")) {
+							// otherwise, focus on the text area
+							textAreaReady();
+							return false;
+						}
+					}
+				</c:otherwise>		
+				</c:choose>
+				
+				var f = document.getElementById('messageForm');
+				f.submit();
+			}
+		</script>
 	</lams:head>
 	<body class="stripes">
-		<script type="text/javascript">
-	var mode = "${mode}";
-	var forceResponse = "${notebookDTO.forceResponse}";
-
-	function disableFinishButton() {
-		document.getElementById("finishButton").style.visibility = 'hidden';
-	}
-
-	function textAreaReady() {
-		<c:if test="${contentEditable}">
-			<c:choose>
-			<c:when test="${notebookDTO.allowRichEditor}">
-				CKEDITOR.instances["entryText"].focus();
-			</c:when>		
-			<c:otherwise>
-				document.forms.messageForm.focusedInput.focus();
-			</c:otherwise>
-			</c:choose>
-		</c:if>
-		document.getElementById("finishButton").style.visibility = 'visible';
-	}
-	
-	function submitForm(methodName) {
-		disableFinishButton();
-		<c:choose>
-		<c:when test="${notebookDTO.allowRichEditor}">
-	      	CKEDITOR.instances["entryText"].updateElement(); // update textarea
-	      	var editorcontent = document.getElementById("entryText").value.replace(/<[^>]*>/gi, ''); // strip tags
-	      	var isEmpty = editorcontent.length === 0;
-
-			if (forceResponse =="true" && isEmpty ) {
-
-				retValue = confirm("<fmt:message>message.learner.blank.alertforceResponse</fmt:message>");
-				textAreaReady();
-				return retValue;
-				
-			} else if  (forceResponse =="false" && isEmpty && mode == "learner") {
-	
-				if (!confirm("<fmt:message>message.learner.blank.input</fmt:message>")) {
-					// otherwise, focus on the text area
-					textAreaReady();
-					return false;
-				}
-			}
-		</c:when>		
-		<c:otherwise>
-			if (forceResponse =="true" && document.forms.messageForm.focusedInput.value == "") {
-
-				retValue = confirm("<fmt:message>message.learner.blank.alertforceResponse</fmt:message>");
-				textAreaReady();
-				return retValue;
-				
-			} else if  (forceResponse =="false" && document.forms.messageForm.focusedInput.value == "" && mode == "learner") {
-	
-				if (!confirm("<fmt:message>message.learner.blank.input</fmt:message>")) {
-					// otherwise, focus on the text area
-					textAreaReady();
-					return false;
-				}
-			}
-		</c:otherwise>		
-		</c:choose>
-		
-		var f = document.getElementById('messageForm');
-		f.submit();
-	}
-	
-</script>
 
 <form:form action="learning/finishActivity.do" method="post" modelAttribute="messageForm" id="messageForm">
 	<form:hidden path="toolSessionID" />
@@ -153,8 +157,7 @@
 
 			<c:if test="${mode != 'teacher'}">
 				<div class="right-buttons voffset5">
-					<button href="#nogo" class="btn btn-primary pull-right na" id="finishButton" type="button"
-						onclick="submitForm('finish')">
+					<button href="#nogo" class="btn btn-primary pull-right na" id="finishButton" type="button">
 						<c:choose>
 							<c:when test="${isLastActivity}">
 								<fmt:message key="button.submit" />
