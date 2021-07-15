@@ -25,7 +25,11 @@
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+		<script type="text/javascript" src="${lams}learning/includes/javascript/gate-check.js"></script>
+		
 		<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${toolSessionID}', '', finishActivity);
+		
 			$(document).ready(function(){
 				$("#leaderSelectionDialog").modal({
 					show: ${isSelectLeaderActive},
@@ -46,7 +50,6 @@
 			}
 		
 		    function finishActivity(){
-		    	document.getElementById("finishButton").disabled = true;
 				location.href = '<c:url value="/learning/finishActivity.do?toolSessionID=${toolSessionID}"/>';
 		    }
 		
@@ -144,7 +147,7 @@
 				</button>
 				
 				<c:if test="${!isSelectLeaderActive}">
-					<a href="#nogo" class="btn btn-primary pull-right na" id="finishButton" onclick="finishActivity()">
+					<a href="#nogo" class="btn btn-primary pull-right na" id="finishButton">
 						<span class="nextActivity"> <c:choose>
 								<c:when test="${isLastActivity}">
 									<fmt:message key="button.submit" />
