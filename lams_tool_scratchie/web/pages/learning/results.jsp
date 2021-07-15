@@ -66,7 +66,10 @@
 	</style>
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>learning/includes/javascript/gate-check.js"></script>
 	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${toolSessionID}', '', finishSession);
+		
 		function likeEntry(scratchieItemUid, rowid, burningQuestionUid) {
 			
 			var jqGrid = $("#burningQuestions" + scratchieItemUid);
@@ -335,9 +338,7 @@
 		})
 	
 		function finishSession() {
-			document.getElementById("finishButton").disabled = true;
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}"/>';
-			return false;
 		}
 		function continueReflect() {
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
@@ -459,7 +460,7 @@
 		<!-- Display finish buttons -->
 		<c:if test="${mode != 'teacher'}">
 			<div class="voffset10 pull-right">
-				<a href="#nogo" name="finishButton" id="finishButton" onclick="return finishSession()"
+				<a href="#nogo" name="finishButton" id="finishButton"
 					class="btn btn-primary na">
 					<c:choose>
 						<c:when test="${sessionMap.isLastActivity}">

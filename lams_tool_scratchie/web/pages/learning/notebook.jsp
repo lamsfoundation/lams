@@ -2,12 +2,18 @@
 <!DOCTYPE html>
 
 
+<c:set var="sessionMapID" value="${param.sessionMapID}" />
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+	
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
-
+	<script type="text/javascript" src="${lams}learning/includes/javascript/gate-check.js"></script>
+	
 	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${sessionMap.toolSessionID}', '', submitForm);
+		
 		function disableFinishButton() {
 			document.getElementById("finishButton").disabled = true;
 		}
@@ -18,9 +24,6 @@
 	</script>
 </lams:head>
 <body class="stripes">
-
-	<c:set var="sessionMapID" value="${param.sessionMapID}" />
-	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 	<form:form action="/lams/tool/lascrt11/learning/submitReflection.do" modelAttribute="reflectionForm" method="post" onsubmit="disableFinishButton();" id="reflectionForm">
 		<form:hidden path="userID" />
@@ -37,7 +40,7 @@
 			<form:textarea rows="8" path="entryText" id="focused" cssClass="form-control" />
 
 			<div class="voffset10 pull-right">
-				<button name="finishButton" id="finishButton" onclick="submitForm()"
+				<button name="finishButton" id="finishButton"
 					class="btn btn-sm btn-default">
 					<fmt:message key="label.submit" />
 				</buttun>
