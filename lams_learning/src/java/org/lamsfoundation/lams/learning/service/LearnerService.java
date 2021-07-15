@@ -907,7 +907,9 @@ public class LearnerService implements ILearnerFullService {
 	}
 
 	Activity parentActivity = currentActivity.getParentActivity();
-	if (parentActivity != null && parentActivity.isOptionsActivity()) {
+	Activity grandParentActivity = parentActivity == null ? null : parentActivity.getParentActivity();
+	if (parentActivity != null && (parentActivity.isOptionsActivity()
+		|| (grandParentActivity != null && grandParentActivity.isOptionsWithSequencesActivity()))) {
 	    // it is the optional activity which controls gate flow, not the nested tool
 	    return null;
 	}
@@ -916,20 +918,12 @@ public class LearnerService implements ILearnerFullService {
 	Transition transition = currentActivity.getTransitionFrom();
 	if (transition != null) {
 	    nextActivity = transition.getToActivity();
-	} else if (currentActivity.getParentActivity() != null) {
-	    // check parent activity like Optional activities
-	    currentActivity = currentActivity.getParentActivity();
-	    transition = currentActivity.getTransitionFrom();
+	} else if (grandParentActivity != null) {
+	    // if it is branching, then it is activity -> sequence activity -> branching activity
+	    // and the branching activity is what we need to check
+	    transition = grandParentActivity.getTransitionFrom();
 	    if (transition != null) {
 		nextActivity = transition.getToActivity();
-	    } else if (currentActivity.getParentActivity() != null) {
-		// if it is branching, then it is activity -> sequence activity -> branching activity
-		// and the branching activity is what we need to check
-		currentActivity = currentActivity.getParentActivity();
-		transition = currentActivity.getTransitionFrom();
-		if (transition != null) {
-		    nextActivity = transition.getToActivity();
-		}
 	    }
 	}
 
