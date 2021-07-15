@@ -1,4 +1,4 @@
-function checkNextGateActivity(finishButtonId, toolSessionId, lessonId, submitFunction){
+function checkNextGateActivity(finishButtonId, toolSessionId, activityId, submitFunction){
 	// we need bootstrap tooltip, not jQuery UI one
 	// if it has not been isolated yet, try to do it now
 	if (typeof $.fn.bootstrapTooltip != 'function') {
@@ -28,7 +28,7 @@ function checkNextGateActivity(finishButtonId, toolSessionId, lessonId, submitFu
 				// check if there is a gate after this activity
 				// if so, check if learner can pass
 				$.ajax({
-					'url' : '/lams/learning/learner/isNextGateActivityOpen.do?toolSessionId=' + toolSessionId + '&lessonId=' + lessonId,
+					'url' : '/lams/learning/learner/isNextGateActivityOpen.do?toolSessionId=' + toolSessionId + '&activityId=' + activityId,
 					'cache' : false,
 					'dataType' : 'json',
 					'success'  : function(response) {

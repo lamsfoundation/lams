@@ -461,7 +461,7 @@ public class LearnerController {
     @RequestMapping("/isNextGateActivityOpen")
     @ResponseBody
     public String isNextGateActivityOpen(@RequestParam(required = false) Long toolSessionId,
-	    @RequestParam(required = false) Long lessonId, HttpSession session, Locale locale) {
+	    @RequestParam(required = false) Long activityId, HttpSession session, Locale locale) {
 
 	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
 	if (userDto == null) {
@@ -472,10 +472,10 @@ public class LearnerController {
 	GateActivityDTO gateDto = null;
 	if (toolSessionId != null) {
 	    gateDto = learnerService.isNextGateActivityOpenByToolSessionId(userId, toolSessionId);
-	} else if (lessonId != null) {
-	    gateDto = learnerService.isNextGateActivityOpenByLessonId(userId, lessonId);
+	} else if (activityId != null) {
+	    gateDto = learnerService.isNextGateActivityOpenByActivityId(userId, activityId);
 	} else {
-	    throw new IllegalArgumentException("Either tool session ID or lesson ID has to be provided");
+	    throw new IllegalArgumentException("Either tool session ID or activity ID has to be provided");
 	}
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();

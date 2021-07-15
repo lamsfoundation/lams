@@ -186,7 +186,7 @@ public interface ILearnerService {
 
     GateActivityDTO isNextGateActivityOpenByToolSessionId(int learnerId, long toolSessionId);
 
-    GateActivityDTO isNextGateActivityOpenByLessonId(int learnerId, long lessonId);
+    GateActivityDTO isNextGateActivityOpenByActivityId(int learnerId, long lessonId);
 
     Set<Group> getGroupsForGate(GateActivity gate);
 
