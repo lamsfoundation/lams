@@ -784,6 +784,10 @@
 	<div id="propertiesContentGate" class="dialogContents">
 		<table>
 			<tr>
+				<!-- Empty row with 4 cells so table structure is the same for all gate types -->
+				<td></td><td></td><td></td><td></td>
+			</tr>
+			<tr>
 				<td>
 					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
