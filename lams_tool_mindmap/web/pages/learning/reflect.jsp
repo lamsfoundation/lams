@@ -15,12 +15,15 @@
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-		
+		<lams:JSImport src="learning/includes/javascript/gate-check.js" />
+	
 		<script type="text/javascript">
+			checkNextGateActivity('finishButton', '${learningForm.toolSessionID}', '', submitForm);
+		
 			function disableFinishButton() {
 				document.getElementById("finishButton").disabled = true;
 			}
-			function submitForm(methodName){
+			function submitForm(){
 		 		var f = document.getElementById('learningForm');
 				f.submit();
 		 	}
@@ -53,7 +56,7 @@
 				</c:otherwise>
 			</c:choose>
 			
-			<a  href="#nogo" class="btn btn-primary voffset5 pull-right" id="finishButton" onclick="submitForm('finish')">
+			<button type="button" class="btn btn-primary voffset5 pull-right" id="finishButton">
 				<span class="na">
 					<c:choose>
 						<c:when test="${isLastActivity}">
@@ -64,7 +67,7 @@
 						</c:otherwise>
 					</c:choose>
 				</span>
-			</a>
+			</button>
 	
 		</form:form>
 	</lams:Page>

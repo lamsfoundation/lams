@@ -176,6 +176,8 @@ public class AuthoringActivityDTO extends BaseDTO {
 
     private Boolean gateActivityCompletionBased;
 
+    private boolean gateStopAtPrecedingActivity;
+
     private String gatePassword;
 
     private Boolean applyGrouping;
@@ -451,6 +453,7 @@ public class AuthoringActivityDTO extends BaseDTO {
 	GateActivity gateActivity = (GateActivity) activity;
 	gateActivityLevelID = gateActivity.getGateActivityLevelId();
 	gateOpen = gateActivity.getGateOpen();
+	gateStopAtPrecedingActivity = gateActivity.getGateStopAtPrecedingActivity();
 	adminURL = gateActivity.getSystemTool().getAdminUrl();
     }
 
@@ -576,6 +579,14 @@ public class AuthoringActivityDTO extends BaseDTO {
 
     public void setGateActivityCompletionBased(Boolean gateActivityCompletionBased) {
 	this.gateActivityCompletionBased = gateActivityCompletionBased;
+    }
+
+    public boolean isGateStopAtPrecedingActivity() {
+	return gateStopAtPrecedingActivity;
+    }
+
+    public void setGateStopAtPrecedingActivity(boolean gateStopAtPrecedingActivity) {
+	this.gateStopAtPrecedingActivity = gateStopAtPrecedingActivity;
     }
 
     public String getGatePassword() {

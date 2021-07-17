@@ -21,18 +21,23 @@
 		<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-	
-	</lams:head>
-	<body class="stripes">
+		<lams:JSImport src="learning/includes/javascript/gate-check.js" />
+		
 		<script type="text/javascript">
+			checkNextGateActivity('finishButton', '${toolSessionID}', '', submitForm);
+			
 			function disableFinishButton() {
 				document.getElementById("finishButton").disabled = true;
 			}
-		         function submitForm(methodName){
-		                var f = document.getElementById('learningForm');
-		                f.submit();
-		        }
-		</script>
+			
+	         function submitForm(){
+	                var f = document.getElementById('learningForm');
+	                f.submit();
+	        }
+	</script>
+	</lams:head>
+	<body class="stripes">
+	
 		
 		<lams:Page type="learner" title="${scribeDTO.title}">
 		
@@ -47,7 +52,7 @@
 					cssClass="form-control"></form:textarea>
 		
 				
-					<a href="#nogo" class="btn btn-primary voffset10 pull-right na" id="finishButton" onclick="submitForm('finish')">
+					<a href="#nogo" class="btn btn-primary voffset10 pull-right na" id="finishButton">
 						<span class="nextActivity">
 							<c:choose>
 			 					<c:when test="${isLastActivity}">

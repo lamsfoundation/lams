@@ -1,17 +1,24 @@
 <%@ include file="/common/taglibs.jsp"%>
-  <script type="text/javascript">
-    function disableFinishButton() {
-      var finishButton = document.getElementById("finishButton");
-      if (finishButton != null) {
-        finishButton.disabled = true;
-      }
-    }
 
-    function continueOrFinish(action) {
-      document.getElementById("learningForm").action = action + ".do";
-      document.getElementById("learningForm").submit();
-    }
-  </script>
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
+	
+	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${learningForm.toolSessionID}', '', function(){
+			continueOrFinish('finishActivity');
+		});
+		
+	    function disableFinishButton() {
+	      var finishButton = document.getElementById("finishButton");
+	      if (finishButton != null) {
+	        finishButton.disabled = true;
+	      }
+	    }
+	
+	    function continueOrFinish(action) {
+	      document.getElementById("learningForm").action = action + ".do";
+	      document.getElementById("learningForm").submit();
+	    }
+	</script>
 
   <c:if test="${userDTO.finishedActivity and wikiDTO.reflectOnActivity}">
     <form:form action="openNotebook.do" method="get" id="learningForm" modelAttribute="learningForm">
@@ -55,8 +62,7 @@
         <c:otherwise>
 
           <div class="pull-right voffset5">
-            <a href="#nogo" class="btn btn-primary na" id="finishButton"
-                       onclick="javascript:continueOrFinish('finishActivity'); return false">
+            <a href="#nogo" class="btn btn-primary na" id="finishButton">
               <c:choose>
                 <c:when test="${isLastActivity}">
                   <fmt:message key="button.submit" />

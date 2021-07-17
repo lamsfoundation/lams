@@ -180,13 +180,16 @@ ActivityDefs = {
 	/**
 	 * Constructor for a Gate Activity.
 	 */
-	GateActivity : function(id, uiid, x, y, title, description, readOnly, gateType, startTimeOffset, gateActivityCompletionBased, password) {
+	GateActivity : function(id, uiid, x, y, title, description, readOnly, gateType, startTimeOffset,
+						    gateActivityCompletionBased, gateStopAtPrecedingActivity, password) {
 		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.title = title;
 		this.description = description;
 		this.readOnly = readOnly;
 		this.gateType = gateType || 'permission';
+		this.gateStopAtPrecedingActivity = gateStopAtPrecedingActivity;
+		
 		if (gateType == 'schedule') {
 			var day = 24*60;
 			this.offsetDay = Math.floor(startTimeOffset/day);
@@ -199,6 +202,7 @@ ActivityDefs = {
 		if (gateType == 'password') {
 			this.password = password;
 		}
+		
 		// mapping between tool output and gate states ("branches"), if applicable
 		this.conditionsToBranches = [];
 		this.transitions = {

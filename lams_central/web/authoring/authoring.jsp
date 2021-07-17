@@ -476,7 +476,7 @@
 						 onClick="javascript:MenuLib.toggleDescriptionDiv()">
 						<span id="ldDescriptionFieldTitle"><fmt:message key="authoring.fla.page.ld.title" /></span>
 						<span id="ldDescriptionFieldModified"></span>
-						<span id="ldDescriptionHideTip">▼</span>
+						<span id="ldDescriptionHideTip">?</span>
 					</div>
 					<div id="ldDescriptionDetails">
 						<div class="ldDescriptionLabel"><label for="ldDescriptionFieldDescription"><fmt:message key="authoring.fla.page.ld.description" /></label><p class="text-muted"><i class="text-primary fa fa-info-circle" aria-hidden="true"></i> <fmt:message key="authoring.fla.page.ld.description.placeholder" /></p></div>
@@ -784,6 +784,10 @@
 	<div id="propertiesContentGate" class="dialogContents">
 		<table>
 			<tr>
+				<!-- Empty row with 4 cells so table structure is the same for all gate types -->
+				<td></td><td></td><td></td><td></td>
+			</tr>
+			<tr>
 				<td>
 					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
@@ -813,7 +817,7 @@
 					 </select>
 				</td>
 			</tr>
-			<tr>
+			<tr class="propertiesContentRowGateTypeBased">
 				<td>
 					<fmt:message key="authoring.fla.page.prop.input" />
 				</td>
@@ -821,7 +825,7 @@
 					  <select class="propertiesContentFieldInput"></select>
 				</td>
 			</tr>
-			<tr class="propertiesContentRowGateSchedule">
+			<tr class="propertiesContentRowGateTypeBased propertiesContentRowGateSchedule">
 				<td>
 					<fmt:message key="authoring.fla.page.prop.gate.delay" />
 				</td>
@@ -838,7 +842,7 @@
 					<fmt:message key="authoring.fla.page.prop.minutes" />
 				</td>
 			</tr>
-			<tr class="propertiesContentRowGateSchedule">
+			<tr class="propertiesContentRowGateTypeBased propertiesContentRowGateSchedule">
 				<td colspan="3">
 					<fmt:message key="authoring.fla.page.prop.gate.activity.finish.based" />
 				</td>
@@ -846,7 +850,15 @@
 					 <input class="propertiesContentFieldActivityCompletionBased" type="checkbox">
 				</td>
 			</tr>
-			<tr class="propertiesContentRowGatePassword">
+			<tr class="propertiesContentRowGateTypeBased propertiesContentRowGateSchedule propertiesContentRowConditions propertiesContentRowPermission">
+				<td colspan="3">
+					<fmt:message key="authoring.fla.page.prop.gate.stop.at.preceding" />
+				</td>
+				<td>
+					 <input class="propertiesContentFieldStopAtPrecedingActivity" type="checkbox">
+				</td>
+			</tr>
+			<tr class="propertiesContentRowGateTypeBased propertiesContentRowGatePassword">
 				<td>
 					<fmt:message key="authoring.fla.page.prop.password" />
 				</td>
@@ -854,12 +866,12 @@
 					 <input class="propertiesContentFieldPassword" type="text" maxlength="32">
 				</td>
 			</tr>
-			<tr class="propertiesContentRowConditions">
+			<tr class="propertiesContentRowGateTypeBased propertiesContentRowConditions">
 				<td colspan="4">
 					<div class="btn btn-default propertiesContentFieldCreateConditions"><fmt:message key="authoring.fla.page.prop.conditions.create" /></div>
 				</td>
 			</tr>
-			<tr class="propertiesContentRowConditions">
+			<tr class="propertiesContentRowGateTypeBased propertiesContentRowConditions">
 				<td colspan="4">
 					<button class="btn btn-default propertiesContentFieldMatchConditions"><fmt:message key="authoring.fla.page.prop.gate.conditions.map" /></button>
 				</td>

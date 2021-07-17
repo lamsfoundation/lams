@@ -26,9 +26,8 @@
 	<c:set var="userID"><lams:user property="userID"/></c:set>
 	<c:set var="delConfirmMsgKey" value="del.confirmation" scope="request"/>
 
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.validate.js"></script>
-	
+
 	<c:set var="language"><lams:user property="localeLanguage"/></c:set>
 	<script type="text/javascript" src="${lams}includes/javascript/uppy/uppy.min.js"></script>
 	<c:choose>
@@ -54,13 +53,16 @@
 			YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
 			ALLOW_RERATE = true,
 			SESSION_ID = ${toolSessionID}; 
-
+			
 	</script>
 	<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 	</c:if>
-			
+	
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${toolSessionID}', '', finishSession);
+	
 		$(document).ready(function(){
  			<c:if test="${sessionMap.rateItems}">
 			initializeJRating();
@@ -137,9 +139,7 @@
 			launchPopup(myUrl,"LearnerView");
 		}
 		function finishSession(){
-			$('.btn-disable-on-submit').prop('disabled', true);
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
-			return false;
 		}
 		function continueReflect(){
 			$('.btn-disable-on-submit').prop('disabled', true);
@@ -335,8 +335,7 @@
 						</button>
 					</c:when>
 					<c:otherwise>
-						<button type="submit" id="finishButton"
-							onclick="return finishSession()" class="btn btn-primary btn-disable-on-submit voffset5 pull-right na">
+						<button type="submit" id="finishButton" class="btn btn-primary btn-disable-on-submit voffset5 pull-right na">
 							<span class="nextActivity">
 								<c:choose>
 				 					<c:when test="${sessionMap.isLastActivity}">

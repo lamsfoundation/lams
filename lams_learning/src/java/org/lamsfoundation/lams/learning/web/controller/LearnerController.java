@@ -24,11 +24,15 @@
 package org.lamsfoundation.lams.learning.web.controller;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -42,7 +46,10 @@ import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
+import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
+import org.lamsfoundation.lams.learningdesign.dto.GateActivityDTO;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgressArchive;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -57,6 +64,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -65,6 +73,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -445,6 +454,64 @@ public class LearnerController {
 	responseJSON.put(AttributeNames.PARAM_PRESENCE_IM_ENABLED, lesson.getLearnerImAvailable());
 
 	response.setContentType("application/json;charset=utf-8");
+
+	return responseJSON.toString();
+    }
+
+    @RequestMapping("/isNextGateActivityOpen")
+    @ResponseBody
+    public String isNextGateActivityOpen(@RequestParam(required = false) Long toolSessionId,
+	    @RequestParam(required = false) Long activityId, HttpSession session, Locale locale) {
+
+	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
+	if (userDto == null) {
+	    throw new IllegalArgumentException("No user is logged in");
+	}
+
+	Integer userId = userDto.getUserID();
+	GateActivityDTO gateDto = null;
+	if (toolSessionId != null) {
+	    gateDto = learnerService.isNextGateActivityOpenByToolSessionId(userId, toolSessionId);
+	} else if (activityId != null) {
+	    gateDto = learnerService.isNextGateActivityOpenByActivityId(userId, activityId);
+	} else {
+	    throw new IllegalArgumentException("Either tool session ID or activity ID has to be provided");
+	}
+
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	if (gateDto == null) {
+	    responseJSON.put("status", "open");
+	} else {
+	    responseJSON.put("status", "closed");
+
+	    String message = null;
+	    GateActivity gate = gateDto.getGate();
+	    if (gate.isScheduleGate()) {
+		ScheduleGateActivity scheduleGate = (ScheduleGateActivity) gate;
+		if (!Boolean.TRUE.equals(scheduleGate.getGateActivityCompletionBased())) {
+		    Lesson lesson = gate.getLearningDesign().getLessons().iterator().next();
+		    User user = userManagementService.getUserById(userId);
+		    TimeZone userTimeZone = TimeZone.getTimeZone(user.getTimeZone());
+
+		    Calendar openTime = new GregorianCalendar(userTimeZone);
+		    Date lessonStartTime = DateUtil.convertToTimeZoneFromDefault(userTimeZone,
+			    lesson.getStartDateTime());
+		    openTime.setTime(lessonStartTime);
+		    openTime.add(Calendar.MINUTE, scheduleGate.getGateStartTimeOffset().intValue());
+		    String openDateString = DateUtil.convertToStringForJSON(openTime.getTime(), locale);
+		    message = messageService.getMessage("label.gate.closed.preceding.activity.schedule",
+			    new Object[] { openDateString });
+		}
+	    } else if (gate.isConditionGate()) {
+		message = messageService.getMessage("label.gate.closed.preceding.activity.condition");
+	    }
+
+	    if (message == null) {
+		message = messageService.getMessage("label.gate.closed.preceding.activity");
+	    }
+
+	    responseJSON.put("message", message);
+	}
 
 	return responseJSON.toString();
     }

@@ -2,22 +2,27 @@
 <!DOCTYPE html>
         
 
+<c:set var="sessionMapID" value="${param.sessionMapID}" />
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" />
 	</title>
 	<%@ include file="/common/header.jsp"%>
 	
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${sessionMap.toolSessionID}', '', function(){
+			$('#reflectionForm').submit();
+		});
+		
 		function disableFinishButton() {
 			document.getElementById("finishButton").disabled = true;
 		}
 	</script>
 </lams:head>
 <body class="stripes">
-
-	<c:set var="sessionMapID" value="${param.sessionMapID}" />
-	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 	<lams:Page type="learner" title="${sessionMap.title}">
 	

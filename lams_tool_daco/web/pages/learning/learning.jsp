@@ -12,7 +12,8 @@
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
-	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>		
+	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>	
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />	
 	
 	<c:if test="${not empty param.sessionMapID}">
 		<c:set var="sessionMapID" value="${param.sessionMapID}" />
@@ -38,6 +39,10 @@
 	</c:choose>
 	
 	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${toolSessionID}', '', function(){
+			finishSession();
+		});
+	
 	 	var currentTab = ${learningCurrentTab};
 	 	var changeViewUrl = "<c:url value='/learning/changeView.do' />";
 	 	var finishUrl = '<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&displayedRecordNumber=${displayedRecordNumber}"/>';
@@ -102,7 +107,7 @@
 				</button>
 			</c:when>
 			<c:otherwise>
-				<button type="submit" name="FinishButton" id="finishButton" onclick="javascript:finishSession()" class="btn btn-primary btn-disable-on-submit voffset5 pull-right na">
+				<button type="submit" name="FinishButton" id="finishButton" class="btn btn-primary btn-disable-on-submit voffset5 pull-right na">
 					<c:choose>
 		 					<c:when test="${sessionMap.isLastActivity}">
 		 						<fmt:message key="label.learning.submit" />

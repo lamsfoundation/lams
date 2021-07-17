@@ -61,15 +61,14 @@
 		</script>
 	</c:if>
 	
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	<script type="text/javascript">
+		 checkNextGateActivity('finishButton', '${toolSessionID}', '', function(){
+			 document.location.href ='<c:url value="/learning/finish.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}';
+		 });
+		 
 		function disableButtons() {
 			$('.btn').prop('disabled',true);
-		}
-		
-		function finishSession(){
-			disableButtons();
-			document.location.href ='<c:url value="/learning/finish.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}';
-			return false;
 		}
 		
 		function continueReflect(){
@@ -189,8 +188,8 @@
 						</c:when>
 						
 						<c:otherwise>
-							<button name="FinishButton"
-									onClick="return finishSession()"
+							<button id="finishButton"
+							        name="FinishButton"
 									class="btn btn-primary voffset10 pull-right na">
 								<span class="nextActivity">
 									<c:choose>

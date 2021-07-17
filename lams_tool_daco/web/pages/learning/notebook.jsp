@@ -14,11 +14,14 @@
 </lams:head>
 <body class="stripes">
 
+<lams:JSImport src="learning/includes/javascript/gate-check.js" />	
 <script type="text/javascript">
-         function submitForm(methodName){
-                var f = document.getElementById('messageForm');
-                f.submit();
-        }
+	checkNextGateActivity('finishButton', '${sessionMap.toolSessionID}', '', submitForm);
+	
+    function submitForm(){
+           var f = document.getElementById('messageForm');
+           f.submit();
+   }
 </script>
 
 	<lams:Page type="learner" title="${daco.title}">
@@ -37,7 +40,7 @@
 			<form:textarea id="focused" rows="5" path="entryText" cssClass="form-control"></form:textarea>
 
 			<div class="space-bottom-top align-right">
-				<button type="submit" class="btn btn-primary voffset5 pull-right na" id="finishButton" onclick="submitForm('finish')">
+				<button type="submit" class="btn btn-primary voffset5 pull-right na" id="finishButton">
 					<span class="nextActivity">
 						<c:choose>
 		 					<c:when test="${sessionMap.isLastActivity}">

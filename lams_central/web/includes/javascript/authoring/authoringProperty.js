@@ -215,37 +215,57 @@ var PropertyDefs = {
 				
 				activity.gateType = $('.propertiesContentFieldGateType', content).val();
 				
+				$('.propertiesContentRowGateTypeBased', content).hide();
 				if (activity.gateType == 'schedule') {
 					// show inputs for setting delay before the gate is closed
 					$(".propertiesContentRowGateSchedule", content).show();
 					activity.offsetDay = +$('.propertiesContentFieldOffsetDay', content).val();
 					activity.offsetHour = +$('.propertiesContentFieldOffsetHour', content).val();
 					activity.offsetMinute = +$('.propertiesContentFieldOffsetMinute', content).val();
+					
+					// both of these options must not be on at the same time
+					// stop-at-preceding-activity may prevent preceding activity from completion,
+					// meaning that timer-from-previous-activity-completion will never start
 					activity.gateActivityCompletionBased = $('.propertiesContentFieldActivityCompletionBased', content).is(':checked');
-				} else {
-					$(".propertiesContentRowGateSchedule", content).hide();
+					if (activity.gateActivityCompletionBased) {
+						activity.gateStopAtPrecedingActivity = false;
+						$('.propertiesContentFieldStopAtPrecedingActivity', content).prop('disabled', true).prop('checked', false);
+					} else {
+						activity.gateStopAtPrecedingActivity = $('.propertiesContentFieldStopAtPrecedingActivity', content).is(':checked');
+						$('.propertiesContentFieldStopAtPrecedingActivity', content).prop('disabled', false);
+					}
+					
+					if (activity.gateStopAtPrecedingActivity) {
+						activity.gateActivityCompletionBased = false;
+						$('.propertiesContentFieldActivityCompletionBased', content).prop('disabled', true).prop('checked', false);
+					} else {
+						$('.propertiesContentFieldActivityCompletionBased', content).prop('disabled', false);
+					}
 				}
 				
 				if (activity.gateType == 'password') {
 					$(".propertiesContentRowGatePassword", content).show();
 					activity.password = $('.propertiesContentFieldPassword', content).val();
-				} else {
-					$(".propertiesContentRowGatePassword", content).hide();
 				}
 				
 				// Gate can be input-based
-				var inputRow = $('.propertiesContentFieldInput', content).closest('tr'),
-					inputDefinitionRows = $('.propertiesContentRowConditions', content);
 				if (activity.gateType == 'condition') {
+					var inputRow = $('.propertiesContentFieldInput', content).closest('tr'),
+						inputDefinitionRows = $('.propertiesContentRowConditions', content);
+						
+					activity.gateStopAtPrecedingActivity = $('.propertiesContentFieldStopAtPrecedingActivity', content).is(':checked');
+					
 					activity.input = inputRow.show().find('option:selected').data('input');
 					if (activity.input) {
 						inputDefinitionRows.show();
 					} else {
-						inputDefinitionRows.hide();
+						$('.propertiesContentFieldStopAtPrecedingActivity', content).closest('tr').show();
 					}
-				} else {
-					inputRow.hide();
-					inputDefinitionRows.hide();
+				}			
+					
+				if (activity.gateType == 'permission') {
+					$(".propertiesContentRowPermission", content).show();
+					activity.gateStopAtPrecedingActivity = $('.propertiesContentFieldStopAtPrecedingActivity', content).is(':checked');
 				}
 				
 				if (redrawNeeded) {
@@ -277,8 +297,11 @@ var PropertyDefs = {
 			  .on('input', changeFunction);
 			
 			$('.propertiesContentFieldActivityCompletionBased', content)
-				.attr('checked', activity.gateActivityCompletionBased? 'checked' : null);
+				.attr('checked', activity.gateActivityCompletionBased ? 'checked' : null);
 			
+			$('.propertiesContentFieldStopAtPrecedingActivity', content)
+				.attr('checked', activity.gateStopAtPrecedingActivity ? 'checked' : null);
+				
 			$('.propertiesContentFieldPassword', content)
 			  .val(activity.password);
 			

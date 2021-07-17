@@ -184,6 +184,10 @@ public interface ILearnerService {
      */
     GateActivityDTO knockGate(GateActivity gateActivity, User knocker, boolean forceGate, Object key);
 
+    GateActivityDTO isNextGateActivityOpenByToolSessionId(int learnerId, long toolSessionId);
+
+    GateActivityDTO isNextGateActivityOpenByActivityId(int learnerId, long lessonId);
+
     Set<Group> getGroupsForGate(GateActivity gate);
 
     /**

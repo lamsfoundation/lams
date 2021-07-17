@@ -6,12 +6,14 @@
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
-
+	
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
+	
 	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${sessionMap.toolSessionID}', '', finishSession);
+		
 		function finishSession(){
-			disableButtons();
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}"/>';
-			return false;
 		}
 		
 		function showOtherUsersAnswers(){
@@ -203,7 +205,7 @@
 					</c:when>
 
 					<c:otherwise>
-						<button type="submit" id="finishButton" onclick="return finishSession()"
+						<button type="submit" id="finishButton"
 							class="btn btn-sm btn-primary pull-right na">
 							<c:choose>
 								<c:when test="${sessionMap.isLastActivity}">

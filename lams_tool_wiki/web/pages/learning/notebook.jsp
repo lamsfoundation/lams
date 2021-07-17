@@ -20,19 +20,22 @@
 		<script type="text/javascript" src="${tool}includes/javascript/wikiCommon.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-	</lams:head>
-
-	<body class="stripes">
+		<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 		
 		<script type="text/javascript">
+			checkNextGateActivity('finishButton', '${learningForm.toolSessionID}', '', submitForm);
+			
 			function disableFinishButton() {
 				document.getElementById("finishButton").disabled = true;
 			}
-			function submitForm(methodName) {
+			function submitForm() {
 				var f = document.getElementById('learningForm');
 				f.submit();
 			}
 		</script>
+	</lams:head>
+
+	<body class="stripes">
 		
 		<lams:Page type="learner" title="${wikiDTO.title}">
 			<form:form action="submitReflection.do" method="post" onsubmit="disableFinishButton();" id="learningForm" modelAttribute="learningForm">
@@ -45,8 +48,7 @@
 				<div class="form-group">
 					<textarea id="focused" rows="4" name="entryText" class="form-control">${learningForm.entryText}</textarea>
 		
-					<a href="#nogo" class="btn btn-primary voffset5 pull-right na" id="finishButton"
-						onclick="submitForm('finish');return false">
+					<a href="#nogo" class="btn btn-primary voffset5 pull-right na" id="finishButton">
 						<c:choose>
 							<c:when test="${isLastActivity}">
 								<fmt:message key="button.submit" />

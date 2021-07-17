@@ -66,10 +66,11 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/fullscreen.js"></script>
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
+	
 	<script type="text/javascript">
-	    // avoid name clash between bootstrap and jQuery UI
-	    $.fn.bootstrapTooltip = $.fn.tooltip.noConflict();
-	    
+		checkNextGateActivity('finish-button', '${toolSessionID}', '', finishSession);
+		
 		$(document).ready(function(){
 			$('[data-toggle="tooltip"]').bootstrapTooltip();
 
@@ -92,16 +93,14 @@
 	            type: 'post',
 	            success: function (json) {
 	            	if (json.isLeaderResponseFinalized) {
-	            		$("#finish-button").show();
+	            		$("#finish-button, #continue-button").show();
 	            	}
 	            }
 	       	});
 		}
 	
 		function finishSession(){
-			document.getElementById("finish-button").disabled = true;
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
-			return false;
 		}
 		
 		function continueReflect(){
@@ -318,7 +317,7 @@
 						</button>
 					</c:when>
 					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-						<button name="FinishButton" id="finish-button"
+						<button name="FinishButton" id="continue-button"
 								onclick="return continueReflect()" class="btn btn-default voffset5 pull-right">
 							<fmt:message key="label.continue" />
 						</button>
@@ -328,7 +327,7 @@
 					</c:when>
 					<c:otherwise>
 						<a href="#nogo" name="FinishButton" id="finish-button"
-								onclick="return finishSession()" class="btn btn-primary voffset5 pull-right na">
+								 class="btn btn-primary voffset5 pull-right na">
 							<span class="nextActivity">
 								<c:choose>
 				 					<c:when test="${sessionMap.isLastActivity}">

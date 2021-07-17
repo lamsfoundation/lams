@@ -62,6 +62,7 @@ public class ConditionGateActivity extends GateActivity implements Serializable 
 	copyToNewActivity(newConditionGateActivity, uiidOffset);
 	newConditionGateActivity.setGateOpen(false);
 	newConditionGateActivity.setGateActivityLevelId(this.getGateActivityLevelId());
+	newConditionGateActivity.setGateStopAtPrecedingActivity(this.getGateStopAtPrecedingActivity());
 
 	if ((this.getBranchActivityEntries() != null) && (this.getBranchActivityEntries().size() > 0)) {
 	    Iterator<BranchActivityEntry> iter = this.getBranchActivityEntries().iterator();

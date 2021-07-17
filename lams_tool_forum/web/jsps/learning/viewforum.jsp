@@ -7,6 +7,19 @@
 <c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="tool"><lams:WebAppURL /></c:set>
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request" />
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"	scope="request" />
+<c:set var="newtopic">
+	<lams:WebAppURL />learning/newTopic.do?sessionMapID=${sessionMapID}
+</c:set>
+<c:set var="continue">
+	<lams:WebAppURL />learning/newReflection.do?sessionMapID=${sessionMapID}
+</c:set>
+<c:set var="finish">
+	<lams:WebAppURL />learning/finish.do?sessionMapID=${sessionMapID}
+</c:set>
+<c:set var="refresh">
+	<lams:WebAppURL />learning/viewForum.do?mode=${sessionMap.mode}&toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}&hideReflection=${sessionMap.hideReflection}
+</c:set>
 
 <lams:html>
 	<lams:head>
@@ -31,6 +44,7 @@
 		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>		
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jscroll.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
+		<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 		
 		<script type="text/javascript">
 			var removeItemAttachmentUrl = "<lams:WebAppURL />learning/deleteAttachment.do";
@@ -39,32 +53,18 @@
 			var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.attachment.executable"/>';	
 			var EXE_FILE_TYPES = '${EXE_FILE_TYPES}';
 			var UPLOAD_FILE_MAX_SIZE = '${UPLOAD_FILE_MAX_SIZE}';
+
+			checkNextGateActivity('finishButton', '${sessionMap.toolSessionID}', '', submitFinish);
+
+			function submitFinish() {
+				location.href = '${finish}';
+			}
 		</script>
 		<script type="text/javascript" src="${tool}includes/javascript/learner.js"></script>	
 		
 	</lams:head>
 	
 	<body class="stripes">
-		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"	scope="request" />
-		<c:set var="newtopic">
-			<lams:WebAppURL />learning/newTopic.do?sessionMapID=${sessionMapID}
-		</c:set>
-		<c:set var="continue">
-			<lams:WebAppURL />learning/newReflection.do?sessionMapID=${sessionMapID}
-		</c:set>
-		<c:set var="finish">
-			<lams:WebAppURL />learning/finish.do?sessionMapID=${sessionMapID}
-		</c:set>
-		<c:set var="refresh">
-			<lams:WebAppURL />learning/viewForum.do?mode=${sessionMap.mode}&toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}&hideReflection=${sessionMap.hideReflection}
-		</c:set>
-		
-		<script type="text/javascript">
-			function submitFinish() {
-				document.getElementById("finishButton").disabled = true;
-				location.href = '${finish}';
-			}		
-		</script>
 
 		<lams:Page type="learner" title="${sessionMap.title}">
 		
@@ -204,7 +204,7 @@
 					</c:when>
 		
 					<c:otherwise>
-						<a href="#nogo" name="finish" id="finishButton" onclick="submitFinish();" class="btn btn-primary voffset5 pull-right na">
+						<a href="#nogo" name="finish" id="finishButton" class="btn btn-primary voffset5 pull-right na">
 							<span class="nextActivity">
 								<c:choose>
 				 					<c:when test="${sessionMap.isLastActivity}">

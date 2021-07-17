@@ -60,7 +60,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/learning")
 public class LearningController {
-    
+
     @Autowired
     private IChatService chatService;
     @Autowired
@@ -215,8 +215,7 @@ public class LearningController {
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	// attempt to retrieve user using userId and toolSessionId
-	ChatUser chatUser = chatService.getUserByUserIdAndSessionId(user.getUserID().longValue(),
-		toolSessionId);
+	ChatUser chatUser = chatService.getUserByUserIdAndSessionId(user.getUserID().longValue(), toolSessionId);
 
 	if (chatUser == null) {
 	    ChatSession chatSession = chatService.getSessionBySessionId(toolSessionId);

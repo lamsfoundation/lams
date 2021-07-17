@@ -28,7 +28,12 @@
 	</c:if>
 </form>
 
+<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 <script type="text/javascript">
+	checkNextGateActivity('finishButton', '${param.toolSessionID}', '', function(){
+		 submitForm('finishActivity');
+	});
+	
 	function disableFinishButton() {
 		var finishButton = document.getElementById("finishButton");
 		if (finishButton != null) {
@@ -56,7 +61,7 @@
 			<form:form action="finishActivity.do" method="post"
 			onsubmit="disableFinishButton();"  modelAttribute="learningForm" id="learningForm">
 			<form:hidden path="chatUserUID" value="${chatUserDTO.uid}" />
-			<a href="#nogo" type="button" class="btn btn-primary pull-right voffset10 na btn-autoresize" id="finishButton"  onclick="submitForm('finishActivity')">
+			<a href="#nogo" type="button" class="btn btn-primary pull-right voffset10 na btn-autoresize" id="finishButton">
 						 <span class="nextActivity">
 							 <c:choose>
 							 	<c:when test="${isLastActivity}">
