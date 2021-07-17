@@ -42,6 +42,7 @@
 	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/etherpad.js"></script>
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	<script type="text/javascript">
 			//var for jquery.jRating.js
 		var pathToImageFolder = "${lams}images/css/",
@@ -55,8 +56,7 @@
 			ALLOW_RERATE = true,
 			SESSION_ID = ${toolSessionID};
 			
-	    // avoid name clash between bootstrap and jQuery UI
-	    $.fn.bootstrapTooltip = $.fn.tooltip.noConflict();
+		checkNextGateActivity('finish-button', '${toolSessionID}', '', finishSession);
 		
 	    $(document).ready(function(){
 			// show etherpads only on Group expand
@@ -73,9 +73,7 @@
 		});
 		
 		function finishSession(){
-			document.getElementById("finish-button").disabled = true;
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
-			return false;
 		}
 		
 		function continueReflect(){
@@ -198,8 +196,7 @@
 					</button>
 				</c:when>
 				<c:otherwise>
-					<a href="#nogo" name="FinishButton" id="finish-button"
-							onclick="return finishSession()" class="btn btn-primary voffset5 pull-right na">
+					<a href="#nogo" name="FinishButton" id="finish-button" class="btn btn-primary voffset5 pull-right na">
 						<span class="nextActivity">
 							<c:choose>
 			 					<c:when test="${sessionMap.isLastActivity}">

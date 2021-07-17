@@ -21,24 +21,26 @@
 		<link rel="stylesheet" type="text/css" href="${tool}includes/css/mindmap.css"></link>
 		
 		<script src="${lams}includes/javascript/jquery.minicolors.min.js"></script>
-<script src="${lams}includes/javascript/fullscreen.js"></script>
+		<script src="${lams}includes/javascript/fullscreen.js"></script>
 		<script src="${tool}includes/javascript/jquery.timer.js"></script>
 		<script src="${tool}includes/javascript/mapjs/main.js"></script>
 		<script src="${tool}includes/javascript/mapjs/underscore-min.js"></script>
 		
+		<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 		<script type="text/javascript">
+			checkNextGateActivity('finishButton', '${learningForm.toolSessionID}', '', submitForm);
 		
 			var mode = "${mode}";		// learner, teacher, ...
 			
 			function disableButtons() {
-				$("#finishButton").attr("disabled", true);
+				$("#finishButton, #continueButton").attr("disabled", true);
 				// show the waiting area during the upload
 				$("#spinnerArea_Busy").show();
 			}
 		
 			function enableButtons() {
 				$("#spinnerArea_Busy").hide();
-				$("#finishButton").removeAttr("disabled");
+				$("#finishButton, #continueButton").removeAttr("disabled");
 			}
 		
 			function submitForm() {
@@ -105,13 +107,13 @@
 						<c:otherwise>
 							<c:choose>
 								<c:when test="${reflectOnActivity}">
-									<a href="javascript:submitForm();" class="btn btn-primary" id="finishButton">
+									<a href="javascript:submitForm();" class="btn btn-primary" id="continueButton">
 										   <span class="nextActivity"><fmt:message key="button.continue"/></span>
 									</a>
 								</c:when>
 				
 								<c:otherwise>
-									<a href="javascript:submitForm();" class="btn btn-primary" id="finishButton">
+									<button type="button" class="btn btn-primary" id="finishButton">
 										<span class="na">
 											<c:choose>
 							 					<c:when test="${isLastActivity}">
@@ -122,7 +124,7 @@
 							 					</c:otherwise>
 							 				</c:choose>
 									 	</span>
-									</a>
+									</button>
 								</c:otherwise>
 							</c:choose>
 						</c:otherwise>

@@ -150,10 +150,10 @@ public class TBLTemplateController extends LdTemplateController {
 	    activityTitle = data.getText("boilerplate.before.ira.gate");
 	    if (data.useScheduledGates && data.iraStartOffset != null) {
 		activities.add(createScheduledGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition),
-			activityTitle, null, data.iraStartOffset));
+			activityTitle, null, data.iraStartOffset, true));
 	    } else {
 		activities.add(createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition),
-			activityTitle, activityTitle));
+			activityTitle, activityTitle, true));
 	    }
 
 	    // iRA Test - Assessment
@@ -182,10 +182,10 @@ public class TBLTemplateController extends LdTemplateController {
 	    activityTitle = data.getText("boilerplate.before.tra.gate");
 	    if (data.useScheduledGates && data.traStartOffset != null) {
 		activities.add(createScheduledGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition),
-			activityTitle, null, data.traStartOffset));
+			activityTitle, null, data.traStartOffset, true));
 	    } else {
 		activities.add(createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition),
-			activityTitle, activityTitle));
+			activityTitle, activityTitle, true));
 	    }
 
 	    // tRA Test
@@ -218,11 +218,12 @@ public class TBLTemplateController extends LdTemplateController {
 		String gateTitleBeforeAppEx = data.getText("boilerplate.before.app.ex",
 			new String[] { applicationExercise.title });
 		if (data.useScheduledGates && data.aeStartOffset != null) {
-		    activities.add(createScheduledGateActivity(maxUIID, order++,
-			    calcGateOffset(currentActivityPosition), gateTitleBeforeAppEx, null, data.aeStartOffset));
+		    activities
+			    .add(createScheduledGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition),
+				    gateTitleBeforeAppEx, null, data.aeStartOffset, true));
 		} else {
 		    activities.add(createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition),
-			    gateTitleBeforeAppEx, gateTitleBeforeAppEx));
+			    gateTitleBeforeAppEx, gateTitleBeforeAppEx, true));
 		}
 
 		// Application Exercise
@@ -263,7 +264,7 @@ public class TBLTemplateController extends LdTemplateController {
 			String gateTitle = data.getText("boilerplate.before.app.ex.noticeboard",
 				new String[] { noticeboardCountAsString });
 			activities.add(createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition),
-				gateTitle, gateTitle));
+				gateTitle, gateTitle, true));
 		    }
 		    currentActivityPosition = calcPositionNextRight(currentActivityPosition);
 		    String notebookTitle = data.getText("boilerplate.grouped.ae.noticeboard.num",
@@ -293,7 +294,7 @@ public class TBLTemplateController extends LdTemplateController {
 		// Stop!
 		String gateTitle = data.getText("boilerplate.before.peer.review");
 		activities.add(createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition), gateTitle,
-			gateTitle));
+			gateTitle, true));
 
 		currentActivityPosition = calcPositionNextRight(currentActivityPosition);
 		String peerReviewTitle = data.getText("boilerplate.peerreview");
@@ -307,7 +308,8 @@ public class TBLTemplateController extends LdTemplateController {
 
 	if (data.useReflection) {
 	    // Stop!
-	    activities.add(createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition), null, null));
+	    activities.add(
+		    createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition), null, null, true));
 
 	    // Individual Reflection
 	    currentActivityPosition = calcPositionNextRight(currentActivityPosition);

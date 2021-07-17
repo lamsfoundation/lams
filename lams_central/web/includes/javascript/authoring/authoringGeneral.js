@@ -796,7 +796,6 @@ GeneralInitLib = {
 					// activities in the another LD have different clousures, so they can not be imported directly
 					// they need to be recreated from a scratch with current LD being their context
 					var frameWindow = $('#ldStoreDialogImportPartFrame', layout.ldStoreDialog)[0].contentWindow,
-		     			frameActivities = frameWindow.layout.activities,
 		     			frameActivityDefs = frameWindow.ActivityDefs,
 		     			// the local activity
 		     			addActivity = null;
@@ -825,7 +824,8 @@ GeneralInitLib = {
 					} else if (activity instanceof frameActivityDefs.GateActivity) {
 						addActivity = new ActivityDefs.GateActivity(
 								null, activity.uiid, 0, 0, activity.title, activity.description, false, activity.gateType,
-								activity.startTimeoffset, activity.gateActivityCompletionBased
+								activity.startTimeoffset, activity.gateActivityCompletionBased, activity.gateStopAtPrecedingActivity,
+								activity.password
 								);
 					} else if (activity instanceof frameActivityDefs.GroupingActivity) {
 						addActivity = new ActivityDefs.GroupingActivity(
@@ -1925,6 +1925,7 @@ GeneralLib = {
 								gateType,
 								activityData.gateStartTimeOffset,
 								activityData.gateActivityCompletionBased,
+								activityData.gateStopAtPrecedingActivity,
 								activityData.gatePassword);
 							
 							if (gateType == 'system'){
@@ -2570,6 +2571,7 @@ GeneralLib = {
 				iconPath = null,
 				isGrouped = activity.grouping ? true : false,
 				gateActivityCompletionBased = false,
+				gateStopAtPrecedingActivity = false,
 				activityTransitions = activity instanceof ActivityDefs.BranchingActivity ?
 						activity.end.transitions : activity.transitions;
 			
@@ -2619,21 +2621,26 @@ GeneralLib = {
 				});
 				
 			} else if (activity instanceof  ActivityDefs.GateActivity){
+				let previousActivityExists = activityTransitions && activityTransitions.to && activityTransitions.to.length > 0;
+				
 				switch(activity.gateType) {
 					case 'sync'       : activityTypeID = 3; break;
 					case 'schedule'   : 
 						activityTypeID = 4; 
-						gateActivityCompletionBased = activity.gateActivityCompletionBased
-							//check the previous activity is available as well
-							&& (activityTransitions && activityTransitions.to && activityTransitions.to.length > 0);
+						gateActivityCompletionBased = activity.gateActivityCompletionBased && previousActivityExists;
+						gateStopAtPrecedingActivity = activity.gateStopAtPrecedingActivity && previousActivityExists;
 						break;
 						
-					case 'permission' : activityTypeID = 5; break;
+					case 'permission' : 
+						activityTypeID = 5;
+						gateStopAtPrecedingActivity = activity.gateStopAtPrecedingActivity && previousActivityExists;
+						break;
 					case 'password'   : activityTypeID = 16; break;
 					case 'system' 	  : activityTypeID = 9; systemGate = activity; break;
 					case 'condition'  :
 						activityTypeID = 14;
-							
+						gateStopAtPrecedingActivity = activity.gateStopAtPrecedingActivity && previousActivityExists;
+								
 						if (activity.input) {
 							$.each(activity.conditionsToBranches, function(index){
 								if (!this.branch) {
@@ -2760,6 +2767,7 @@ GeneralLib = {
 				'gateStartTimeOffset'	 : activity.gateType == 'schedule' ?
 											activity.offsetDay*24*60 + activity.offsetHour*60 + activity.offsetMinute : null,
 				'gateActivityCompletionBased' : gateActivityCompletionBased,
+				'gateStopAtPrecedingActivity' : gateStopAtPrecedingActivity,
 				'gatePassword'			 : activity.gateType == 'password' ? activity.password : null,
 				'gateActivityLevelID'    : activity instanceof ActivityDefs.GateActivity ? 1 : null,
 				'minOptions'			 : activity.minOptions || null,

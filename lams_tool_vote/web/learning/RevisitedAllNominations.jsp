@@ -17,10 +17,16 @@
 
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
-
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
+	
 	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${voteLearningForm.toolSessionID}', '', function() {
+			submitMethod('learnerFinished');
+		});
+
 		function submitMethod(actionMethod) {
 			$('.btn').prop('disabled', true);
 			document.forms.voteLearningForm.action = actionMethod + '.do';
@@ -106,8 +112,7 @@
 			</c:if>
 
 
-			<button type="submit" id="finishButton"
-				onclick="javascript:submitMethod('learnerFinished');"
+			<button type="button" id="finishButton"
 				class="btn btn-primary voffset10 pull-right na">
 				<c:choose>
 						<c:when test="${isLastActivity}">

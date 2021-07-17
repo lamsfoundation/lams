@@ -1209,11 +1209,11 @@ public class ObjectExtractor implements IObjectExtractor {
 	if (activity instanceof SynchGateActivity) {
 	    buildSynchGateActivity((SynchGateActivity) activity);
 	} else if (activity instanceof PermissionGateActivity) {
-	    buildPermissionGateActivity((PermissionGateActivity) activity);
+	    buildPermissionGateActivity((PermissionGateActivity) activity, activityDetails);
 	} else if (activity instanceof SystemGateActivity) {
 	    buildSystemGateActivity((SystemGateActivity) activity);
 	} else if (activity instanceof ConditionGateActivity) {
-	    buildConditionGateActivity((ConditionGateActivity) activity);
+	    buildConditionGateActivity((ConditionGateActivity) activity, activityDetails);
 	} else if (activity instanceof ScheduleGateActivity) {
 	    buildScheduleGateActivity((ScheduleGateActivity) activity, activityDetails);
 	} else {
@@ -1227,7 +1227,9 @@ public class ObjectExtractor implements IObjectExtractor {
 	activity.setSystemTool(getSystemTool(SystemTool.SYNC_GATE));
     }
 
-    private void buildPermissionGateActivity(PermissionGateActivity activity) {
+    private void buildPermissionGateActivity(PermissionGateActivity activity, ObjectNode activityDetails) {
+	activity.setGateStopAtPrecedingActivity(JsonUtil.optBoolean(activityDetails,
+		AuthoringJsonTags.GATE_STOP_AT_PRECEDING_ACTIVITY, false));
 	activity.setSystemTool(getSystemTool(SystemTool.PERMISSION_GATE));
     }
 
@@ -1246,6 +1248,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	Boolean isGateActivityCompletionBased = JsonUtil.optBoolean(activityDetails,
 		AuthoringJsonTags.GATE_ACTIVITY_COMPLETION_BASED);
 	activity.setGateActivityCompletionBased(isGateActivityCompletionBased);
+	activity.setGateStopAtPrecedingActivity(JsonUtil.optBoolean(activityDetails,
+		AuthoringJsonTags.GATE_STOP_AT_PRECEDING_ACTIVITY, false));
 	activity.setSystemTool(getSystemTool(SystemTool.SCHEDULE_GATE));
     }
 
@@ -1667,7 +1671,9 @@ public class ObjectExtractor implements IObjectExtractor {
 		JsonUtil.optBoolean(groupingDetails, AuthoringJsonTags.VIEW_STUDENTS_BEFORE_SELECTION));
     }
 
-    private void buildConditionGateActivity(ConditionGateActivity activity) {
+    private void buildConditionGateActivity(ConditionGateActivity activity, ObjectNode activityDetails) {
+	activity.setGateStopAtPrecedingActivity(JsonUtil.optBoolean(activityDetails,
+		AuthoringJsonTags.GATE_STOP_AT_PRECEDING_ACTIVITY, false));
 	activity.setSystemTool(getSystemTool(SystemTool.CONDITION_GATE));
     }
 }

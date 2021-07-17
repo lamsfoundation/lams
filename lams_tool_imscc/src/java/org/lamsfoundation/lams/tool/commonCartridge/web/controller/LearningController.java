@@ -155,7 +155,7 @@ public class LearningController {
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	// reflection information
-	sessionMap.put(CommonCartridgeConstants.ATTR_REFLECTION_ON, commonCartridge.isReflectOnActivity());
+	sessionMap.put(CommonCartridgeConstants.ATTR_REFLECTION_ON, commonCartridge.getReflectOnActivity());
 	sessionMap.put(CommonCartridgeConstants.ATTR_REFLECTION_INSTRUCTION, commonCartridge.getReflectInstructions());
 	sessionMap.put(CommonCartridgeConstants.ATTR_REFLECTION_ENTRY, entryText);
 	sessionMap.put(CommonCartridgeConstants.ATTR_RUN_AUTO, new Boolean(runAuto));

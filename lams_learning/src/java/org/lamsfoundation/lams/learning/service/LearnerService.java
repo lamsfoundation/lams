@@ -520,7 +520,6 @@ public class LearnerService implements ILearnerFullService {
 	} catch (ProgressException e) {
 	    throw new LearnerServiceException(e.getMessage());
 	}
-
     }
 
     @Override
@@ -888,6 +887,58 @@ public class LearnerService implements ILearnerFullService {
 	// the database.
 	activityDAO.update(gate);
 	return new GateActivityDTO(gate, expectedLearnerCount, waitingLearnerCount, gateOpen);
+    }
+
+    @Override
+    public GateActivityDTO isNextGateActivityOpenByToolSessionId(int learnerId, long toolSessionId) {
+	ToolSession toolSession = lamsCoreToolService.getToolSessionById(toolSessionId);
+	return isNextGateActivityOpenByActivityId(learnerId, toolSession.getToolActivity().getActivityId());
+    }
+
+    @Override
+    public GateActivityDTO isNextGateActivityOpenByActivityId(int learnerId, long currentActivityId) {
+	Activity currentActivity = activityDAO.getActivityByActivityId(currentActivityId, Activity.class);
+
+	LearnerProgress learnerProgress = getProgress(learnerId,
+		currentActivity.getLearningDesign().getLessons().iterator().next().getLessonId());
+	if (learnerProgress.getLesson().getLearningDesign().getCopyTypeID() == LearningDesign.COPY_TYPE_PREVIEW) {
+	    // teacher can rush through preview lessons ignoring gates
+	    return null;
+	}
+
+	Activity parentActivity = currentActivity.getParentActivity();
+	if (parentActivity != null && parentActivity.isOptionsActivity()) {
+	    // it is the optional activity which controls gate flow, not the nested tool
+	    return null;
+	}
+
+	Activity nextActivity = null;
+	Transition transition = currentActivity.getTransitionFrom();
+	Activity grandParentActivity = parentActivity == null ? null : parentActivity.getParentActivity();
+	if (transition != null) {
+	    nextActivity = transition.getToActivity();
+	} else if (grandParentActivity != null && !grandParentActivity.isOptionsWithSequencesActivity()) {
+	    // if it is branching, then it is activity -> sequence activity -> branching activity
+	    // and the branching activity is what we need to check
+	    transition = grandParentActivity.getTransitionFrom();
+	    if (transition != null) {
+		nextActivity = transition.getToActivity();
+	    }
+	}
+
+	if (nextActivity == null || !nextActivity.isGateActivity()) {
+	    return null;
+	}
+
+	GateActivity gateActivity = (GateActivity) activityDAO.getActivityByActivityId(nextActivity.getActivityId(),
+		GateActivity.class);
+	if (!gateActivity.getGateStopAtPrecedingActivity()) {
+	    return null;
+	}
+
+	User learner = userManagementService.getUserById(learnerId);
+	GateActivityDTO gateDto = knockGate(gateActivity, learner, false, null);
+	return gateDto.getAllowToPass() ? null : gateDto;
     }
 
     /**

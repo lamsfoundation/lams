@@ -5,6 +5,13 @@
 	<lams:css />
 	<title><fmt:message key="activity.title" /></title>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
+	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${mcLearningForm.toolSessionID}', '', function(){
+			document.forms.mcLearningForm.submit();
+		});
+	</script>
 </lams:head>
 
 <body class="stripes">
@@ -29,8 +36,7 @@
 				</textarea>
 
 
-				<a href="#" name="submitReflection" class="btn btn-primary pull-right voffset10 na"
-					onclick="javascript:document.forms.mcLearningForm.submit();return false">
+				<a href="#" name="submitReflection" id="finishButton" class="btn btn-primary pull-right voffset10 na">
 					<fmt:message key="button.endLearning" />
 				</a>
 

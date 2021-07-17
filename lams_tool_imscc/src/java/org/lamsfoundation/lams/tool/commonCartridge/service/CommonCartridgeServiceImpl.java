@@ -347,7 +347,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	List<CommonCartridgeSession> sessionList = commonCartridgeSessionDao.getByContentId(contentId);
 	for (CommonCartridgeSession session : sessionList) {
 	    Long sessionId = session.getSessionId();
-	    boolean hasRefection = session.getCommonCartridge().isReflectOnActivity();
+	    boolean hasRefection = session.getCommonCartridge().getReflectOnActivity();
 	    Set<ReflectDTO> list = new TreeSet<>(new ReflectDTOComparator());
 	    // get all users in this session
 	    List<CommonCartridgeUser> users = commonCartridgeUserDao.getBySessionID(sessionId);

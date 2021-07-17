@@ -15,12 +15,13 @@
 		<fmt:message key="label.learning.title" />
 	</title>
 	<%@ include file="/common/header.jsp"%>
-	
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
+		
 	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${toolSessionID}', '', finishSession);
+		
 		function finishSession(){
-			document.getElementById("finishButton").disabled = true;
         	saveUserSpreadsheet("finishSession");
-			return false;
 		}
 		
 		function continueReflect(){
@@ -180,7 +181,7 @@
 						</button>
 					</c:when>
 					<c:otherwise>
-						<a href="#nogo" class="btn btn-primary pull-right na" id="finishButton" onclick="return finishSession()">
+						<a href="#nogo" class="btn btn-primary pull-right na" id="finishButton">
 							<c:choose>
 			 					<c:when test="${sessionMap.isLastActivity}">
 			 						<fmt:message key="label.submit" />
