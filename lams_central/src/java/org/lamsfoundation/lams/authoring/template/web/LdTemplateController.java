@@ -403,7 +403,7 @@ public abstract class LdTemplateController {
 
     /* ************************************** Non-Tool Activity methods ******************************************** */
     protected ObjectNode createGateActivity(AtomicInteger uiid, int order, Integer[] layoutCoords, String activityTitle,
-	    String activityDescription) {
+	    String activityDescription, boolean gateStopAtPrecedingActivity) {
 
 	ObjectNode activityJSON = JsonNodeFactory.instance.objectNode();
 	Integer[] pos = layoutCoords;
@@ -425,14 +425,16 @@ public abstract class LdTemplateController {
 	}
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TYPE_ID, Activity.PERMISSION_GATE_ACTIVITY_TYPE);
 	activityJSON.put(AuthoringJsonTags.GATE_ACTIVITY_LEVEL_ID, GateActivity.LEARNER_GATE_LEVEL);
+	activityJSON.put(AuthoringJsonTags.GATE_STOP_AT_PRECEDING_ACTIVITY, gateStopAtPrecedingActivity);
 
 	return activityJSON;
     }
 
     protected ObjectNode createScheduledGateActivity(AtomicInteger uiid, int order, Integer[] layoutCoords,
-	    String activityTitle, String activityDescription, Long startOffset) {
+	    String activityTitle, String activityDescription, Long startOffset, boolean gateStopAtPrecedingActivity) {
 
-	ObjectNode activityJSON = createGateActivity(uiid, order, layoutCoords, activityTitle, activityDescription);
+	ObjectNode activityJSON = createGateActivity(uiid, order, layoutCoords, activityTitle, activityDescription,
+		gateStopAtPrecedingActivity);
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TYPE_ID, Activity.SCHEDULE_GATE_ACTIVITY_TYPE);
 	activityJSON.put(AuthoringJsonTags.GATE_START_OFFSET, startOffset);
 
