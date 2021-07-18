@@ -94,6 +94,8 @@ public class AssessmentQuestionResult extends QbToolAnswer {
     private String answerEscaped;
     @Transient
     private QuestionDTO questionDto;
+    @Transient
+    private boolean answerModified;
 
     public QbQuestion getQbQuestion() {
 	return qbToolQuestion.getQbQuestion();
@@ -223,5 +225,13 @@ public class AssessmentQuestionResult extends QbToolAnswer {
 
     public void setQuestionDto(QuestionDTO questionDto) {
 	this.questionDto = questionDto;
+    }
+
+    public boolean isAnswerModified() {
+	return answerModified;
+    }
+
+    public void setAnswerModified(boolean answerModified) {
+	this.answerModified = answerModified;
     }
 }
