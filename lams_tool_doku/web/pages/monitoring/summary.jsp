@@ -784,7 +784,7 @@
 				</button>
 								
 				<button id="learner-reedit" type="button"
-				        class="btn btn-default ${dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'hidden'}"
+				        class="btn btn-default ${dokumaran.galleryWalkStarted or dokumaran.galleryWalkFinished ? '' : 'hidden'}"
 				        onClick="javascript:learnerReedit()">
 					<fmt:message key="monitoring.summary.learner.reedit" /> 
 				</button>

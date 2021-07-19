@@ -812,7 +812,7 @@
 				</button>
 				
 				<button id="learner-reedit" type="button"
-				        class="btn btn-default ${whiteboard.galleryWalkStarted and not whiteboard.galleryWalkFinished ? '' : 'hidden'}"
+				        class="btn btn-default ${whiteboard.galleryWalkStarted or whiteboard.galleryWalkFinished ? '' : 'hidden'}"
 				        onClick="javascript:learnerReedit()">
 					<fmt:message key="monitoring.summary.learner.reedit" /> 
 				</button>

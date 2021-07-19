@@ -516,6 +516,7 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 			    + toolContentId);
 	}
 	whiteboard.setGalleryWalkStarted(false);
+	whiteboard.setGalleryWalkFinished(false);
 	whiteboardDao.update(whiteboard);
 
 	sendGalleryWalkRefreshRequest(whiteboard);

@@ -639,6 +639,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 			    + toolContentId);
 	}
 	dokumaran.setGalleryWalkStarted(false);
+	dokumaran.setGalleryWalkFinished(false);
 	dokumaranDao.saveObject(dokumaran);
 
 	sendGalleryWalkRefreshRequest(dokumaran);
