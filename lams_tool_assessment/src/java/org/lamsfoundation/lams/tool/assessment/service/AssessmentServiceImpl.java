@@ -684,23 +684,24 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	result.setMaximumGrade(maximumGrade);
 	result.setGrade(grade);
 
-	if (isAutosave) {
-	    if (isAnswerModified && assessment.isUseSelectLeaderToolOuput()) {
-		AssessmentSession session = getSessionBySessionId(result.getSessionId());
-		Long leaderUid = session.getGroupLeader() == null ? null : session.getGroupLeader().getUid();
-		Set<Integer> userIds = session.getAssessmentUsers().stream().filter(u -> !u.getUid().equals(leaderUid))
-			.collect(Collectors.mapping(assessmentUser -> assessmentUser.getUserId().intValue(),
-				Collectors.toSet()));
-
-		ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
-		jsonCommand.put("hookTrigger", "assessment-leader-triggered-refresh-" + result.getSessionId());
-		learnerService.createCommandForLearners(assessment.getContentId(), userIds, jsonCommand.toString());
-	    }
-	} else {
+	if (!isAutosave) {
 	    result.setFinishDate(new Timestamp(new Date().getTime()));
 	}
 
 	assessmentResultDao.update(result);
+
+	// refresh non-leaders when leader changed his answers or submitted them
+	if (assessment.isUseSelectLeaderToolOuput() && (!isAutosave || isAnswerModified)) {
+	    AssessmentSession session = getSessionBySessionId(result.getSessionId());
+	    Long leaderUid = session.getGroupLeader() == null ? null : session.getGroupLeader().getUid();
+	    Set<Integer> userIds = session.getAssessmentUsers().stream().filter(u -> !u.getUid().equals(leaderUid))
+		    .collect(Collectors.mapping(assessmentUser -> assessmentUser.getUserId().intValue(),
+			    Collectors.toSet()));
+
+	    ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
+	    jsonCommand.put("hookTrigger", "assessment-leader-triggered-refresh-" + result.getSessionId());
+	    learnerService.createCommandForLearners(assessment.getContentId(), userIds, jsonCommand.toString());
+	}
 
 	return true;
     }
