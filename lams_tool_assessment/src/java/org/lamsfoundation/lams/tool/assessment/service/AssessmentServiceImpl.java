@@ -964,8 +964,20 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
     @Override
     public void loadupLastAttempt(Long assessmentUid, Long userId, List<Set<QuestionDTO>> pagedQuestionDtos) {
+	Assessment assessment = assessmentDao.getByUid(assessmentUid);
+
+	// for non-leaders the result of the leader should be used instead
+	Long targetUserId = userId;
+	AssessmentUser user = getUserByIdAndContent(userId, assessment.getContentId());
+	if (assessment.isUseSelectLeaderToolOuput()) {
+	    AssessmentSession session = user.getSession();
+	    if (session.getGroupLeader() != null && !session.getGroupLeader().getUserId().equals(targetUserId)) {
+		targetUserId = session.getGroupLeader().getUserId();
+	    }
+	}
+
 	//get the latest result (it can be unfinished one)
-	AssessmentResult lastResult = getLastAssessmentResult(assessmentUid, userId);
+	AssessmentResult lastResult = getLastAssessmentResult(assessmentUid, targetUserId);
 	//if there is no results yet - no action required
 	if (lastResult == null) {
 	    return;
@@ -974,7 +986,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	//get the latest finished result (required for mark hedging type of questions only)
 	AssessmentResult lastFinishedResult = null;
 	if (lastResult.getFinishDate() == null) {
-	    lastFinishedResult = getLastFinishedAssessmentResult(assessmentUid, userId);
+	    lastFinishedResult = getLastFinishedAssessmentResult(assessmentUid, targetUserId);
 	}
 
 	for (Set<QuestionDTO> questionsForOnePage : pagedQuestionDtos) {
