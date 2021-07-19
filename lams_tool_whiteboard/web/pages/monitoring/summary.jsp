@@ -344,10 +344,10 @@
 				toolContentID : ${whiteboard.contentId}
 			},
 			'success' : function(){
-				$('#whiteboard-monitoring-summary-${sessionMap.toolContentID} #gallery-walk-start, ' +
-				  '#whiteboard-monitoring-summary-${sessionMap.toolContentID} #countdown, ' + 
-				  '#whiteboard-monitoring-summary-${sessionMap.toolContentID} #add-one-minute, #start-activity').hide();
-				$('#whiteboard-monitoring-summary-${sessionMap.toolContentID} #gallery-walk-finish').removeClass('hidden');
+				let summaryPane = $('#whiteboard-monitoring-summary-${sessionMap.toolContentID}');
+				
+				$('#gallery-walk-start', summaryPane).hide();
+				$('#gallery-walk-finish, #learner-reedit', summaryPane).removeClass('hidden');
 			}
 		});
 	}
@@ -379,7 +379,30 @@
 		});
 	}
 
-
+	function learnerReedit(){
+		if (!confirm('<fmt:message key="monitoring.summary.learner.reedit.confirm" />')) {
+			return;
+		}
+		
+		$.ajax({
+			'url' : '<c:url value="/monitoring/learnerReedit.do"/>',
+			'data': {
+				toolContentID : ${whiteboard.contentId}
+			},
+			'success' : function(){
+				<c:choose>
+					<c:when test="${isTbl}">
+						// reload current tab with Doku summary
+						loadTab(null, null, false);
+					</c:when>
+					<c:otherwise>
+						location.reload();
+					</c:otherwise>
+				</c:choose>
+			}
+		});
+	}
+	
 	function showChangeLeaderModal(toolSessionId) {
 		$('#whiteboard-monitoring-summary-${sessionMap.toolContentID} #change-leader-modals').empty()
 		.load('<c:url value="/monitoring/displayChangeLeaderForGroupDialogFromActivity.do" />',{
@@ -786,6 +809,12 @@
 				        	   ${not whiteboard.galleryWalkStarted and not whiteboard.galleryWalkFinished ? '' : 'hidden'}"
 				        onClick="javascript:startGalleryWalk()">
 					<fmt:message key="monitoring.summary.gallery.walk.start" /> 
+				</button>
+				
+				<button id="learner-reedit" type="button"
+				        class="btn btn-default ${whiteboard.galleryWalkStarted and not whiteboard.galleryWalkFinished ? '' : 'hidden'}"
+				        onClick="javascript:learnerReedit()">
+					<fmt:message key="monitoring.summary.learner.reedit" /> 
 				</button>
 				
 				<button id="gallery-walk-finish" type="button"

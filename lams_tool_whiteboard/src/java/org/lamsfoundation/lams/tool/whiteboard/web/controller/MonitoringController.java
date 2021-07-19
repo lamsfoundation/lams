@@ -279,6 +279,13 @@ public class MonitoringController {
 	whiteboardService.finishGalleryWalk(toolContentId);
     }
 
+    @RequestMapping("/learnerReedit")
+    private void learnerReedit(HttpServletRequest request) throws IOException {
+	Long toolContentId = WebUtil.readLongParam(request, WhiteboardConstants.ATTR_TOOL_CONTENT_ID, false);
+
+	whiteboardService.learnerReedit(toolContentId);
+    }
+
     @RequestMapping(path = "/updateTimeLimit", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public void updateTimeLimit(@RequestParam(name = AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentId,

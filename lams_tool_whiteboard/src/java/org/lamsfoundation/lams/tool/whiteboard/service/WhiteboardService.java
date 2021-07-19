@@ -507,6 +507,20 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	sendGalleryWalkRefreshRequest(whiteboard);
     }
 
+    @Override
+    public void learnerReedit(long toolContentId) throws IOException {
+	Whiteboard whiteboard = getWhiteboardByContentId(toolContentId);
+	if (!whiteboard.isGalleryWalkEnabled()) {
+	    throw new IllegalArgumentException(
+		    "Can not allow learners to reedit activity as Gallery Walk is not enabled for Wwith tool content ID "
+			    + toolContentId);
+	}
+	whiteboard.setGalleryWalkStarted(false);
+	whiteboardDao.update(whiteboard);
+
+	sendGalleryWalkRefreshRequest(whiteboard);
+    }
+
     private void sendGalleryWalkRefreshRequest(Whiteboard whiteboard) {
 	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
 	jsonCommand.put("hookTrigger", "whiteboard-refresh-" + whiteboard.getContentId());
