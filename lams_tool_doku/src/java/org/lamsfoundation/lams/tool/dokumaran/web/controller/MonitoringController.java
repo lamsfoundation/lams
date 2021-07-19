@@ -314,6 +314,13 @@ public class MonitoringController {
 	dokumaranService.finishGalleryWalk(toolContentId);
     }
 
+    @RequestMapping("/learnerReedit")
+    private void learnerReedit(HttpServletRequest request) throws IOException {
+	Long toolContentId = WebUtil.readLongParam(request, DokumaranConstants.ATTR_TOOL_CONTENT_ID, false);
+
+	dokumaranService.learnerReedit(toolContentId);
+    }
+
     @RequestMapping("/ae")
     private String tblApplicationExcercise(HttpServletRequest request, HttpServletResponse response)
 	    throws EtherpadException {
