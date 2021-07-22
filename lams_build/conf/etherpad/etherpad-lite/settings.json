@@ -572,6 +572,7 @@
      //*LAMS* commented out the following two lines
      //["importexport", "timeslider", "savedrevision"],
      //["settings", "embed"],
+      ["importexport"],
       ["settings"],
       ["timeslider"],
       ["showusers"]
