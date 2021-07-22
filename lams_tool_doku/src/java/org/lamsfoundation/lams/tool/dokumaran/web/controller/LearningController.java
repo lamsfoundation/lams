@@ -31,7 +31,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -209,8 +208,7 @@ public class LearningController {
 	    if (currentUserDto == null) {
 		currentUserDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    }
-	    Cookie cookie = dokumaranService.createEtherpadCookieForMonitor(currentUserDto, dokumaran.getContentId());
-	    response.addCookie(cookie);
+	    dokumaranService.createEtherpadCookieForMonitor(currentUserDto, dokumaran.getContentId(), response);
 	    return "pages/learning/galleryWalk";
 	}
 
@@ -253,8 +251,7 @@ public class LearningController {
 
 	//add new sessionID cookie in order to access pad
 	if (user != null) {
-	    Cookie etherpadSessionCookie = dokumaranService.createEtherpadCookieForLearner(user, session);
-	    response.addCookie(etherpadSessionCookie);
+	    dokumaranService.createEtherpadCookieForLearner(user, session, response);
 	}
 
 	return "pages/learning/learning";
