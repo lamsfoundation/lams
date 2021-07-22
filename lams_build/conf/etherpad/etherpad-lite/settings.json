@@ -653,4 +653,18 @@
 
   /* Disable Admin UI tests */
   "enableAdminUITests": false
+  
+  /*
+    LAMS: uncomment and configure after ep_image_plugin was installed
+    
+	,"ep_image_upload":{
+	    "storage":{
+	      "type": "local",
+	      "baseFolder": "<PATH TO LAMS.EAR>/lams-www.war/public/etherpad-images/",
+	      "baseURL": "<LAMS SERVER ULR>/lams/www/public/etherpad-images/"
+	    },
+	    "fileTypes": ["jpeg", "jpg", "bmp", "gif","png"],
+	    "maxFileSize": 5000000
+	  }
+  */
 }
