@@ -19,7 +19,9 @@ Etherpad is required for Dokumaran tool and for Etherpad tag
 	authornames:		Adds author names to span titles (shows on hover) 0.2.0
 	author_neat2:		Neat author display 2.0.1
 	comments_page:		Adds comments on sidebar and link it to the text 0.1.63
-	ep_image_upload:    Add images to etherpad 1.0.51
+	export_authors:		Etherpad plugin to add author information to the html export 0.1.1
+	headings2:			Adds heading support 0.2.30
+	image_upload:    	Add images to etherpad 1.0.51
 						After installing set up ep_image_upload section at the botton of settings.json
 						
 						If this plugin installs correctly but does not display in Etherpad,
@@ -31,8 +33,17 @@ Etherpad is required for Dokumaran tool and for Etherpad tag
 					      "integrity": "sha512-zQvEJO4vPVh/GSBGg/8sus+VcF7R6nO1ZjQPkC+Ks1zPbplZU3R7vng56uCpxReJ/ABK8CKm4Zliq0fp8++uiw=="
 					    },
 					    
-	export_authors:		Etherpad plugin to add author information to the html export 0.1.1
-	headings2:			Adds heading support 0.2.30
+	previewimages       Preview image when pasting a link to an image 0.0.13
+	
+						If this plugin installs correctly but does not display in Etherpad,
+						manually add following section to package-lock.json after all other plugins (for example after ep_stats section)
+						
+						"ep_previewimages": {
+					      "version": "0.0.13",
+					      "resolved": "https://registry.npmjs.org/ep_previewimages/-/ep_previewimages-0.0.13.tgz",
+					      "integrity": "sha512-UYAe9dpBXpqRVRDHFHUJ0qH2BGcbCdp/e4A2lNbuxEpel7fXXmlnwwZAco3W8iGmxOy0wTDVeOh01CzdWFLc/A=="
+					    },
+					    
 	resize:				Notifies about pad size 0.0.15
 	stats:				See pad Stats 0.0.11
 
