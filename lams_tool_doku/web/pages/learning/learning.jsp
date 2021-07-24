@@ -42,7 +42,6 @@
 	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	<script type="text/javascript">
 		checkNextGateActivity('finish-button', '${toolSessionID}', '', finishSession);
-	    
 		$(document).ready(function(){
 			// Resize Etherpad iframe when its content grows.
 			// It does not support shrinking, only growing.
@@ -53,7 +52,7 @@
 		        	var src = msg.data.location.substring(0, msg.data.location.indexOf('?')),
 		        		iframe = $('iframe[src^="' + src + '"]'),
 		            	// height should be no less than 200 px
-		            	height = Math.max(200, msg.data.height + (${hasEditRight and not timeLimitExceeded} ? 0 : 30));
+		            	height = Math.max(200, msg.data.height + (${hasEditRight and not timeLimitExceeded} ? 10 : 29));
 		           	iframe.height(height);
 		        }
 		    });
