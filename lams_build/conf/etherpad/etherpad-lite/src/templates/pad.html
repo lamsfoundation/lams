@@ -180,6 +180,7 @@
       <!------------------------->
 
       <div id="import_export" class="popup"><div class="popup-content">
+      	  <!-- 
           <h1 data-l10n-id="pad.importExport.import_export"></h1>
           <div class="acl-write">
               <% e.begin_block("importColumn"); %>
@@ -201,6 +202,7 @@
               </form>
               <% e.end_block(); %>
           </div>
+           -->
           <div id="exportColumn">
               <h2 data-l10n-id="pad.importExport.export"></h2>
               <% e.begin_block("exportColumn"); %>
@@ -208,13 +210,14 @@
               <a id="exportetherpada" target="_blank" class="exportlink">
                 <span class="exporttype buttonicon buttonicon-file-powerpoint" id="exportetherpad" data-l10n-id="pad.importExport.exportetherpad"></span>
               </a>
-              <a id="exporthtmla" target="_blank" class="exportlink">
-                <span class="exporttype buttonicon buttonicon-file-code" id="exporthtml" data-l10n-id="pad.importExport.exporthtml"></span>
-              </a>
+
               <a id="exportplaina" target="_blank" class="exportlink">
                 <span class="exporttype buttonicon buttonicon-file" id="exportplain" data-l10n-id="pad.importExport.exportplain"></span>
               </a>
 			  -->
+			  <a id="exporthtmla" target="_blank" class="exportlink">
+                <span class="exporttype buttonicon buttonicon-file-code" id="exporthtml" data-l10n-id="pad.importExport.exporthtml"></span>
+              </a>
               <a id="exportworda" target="_blank" class="exportlink">
                 <span class="exporttype buttonicon buttonicon-file-word" id="exportword" data-l10n-id="pad.importExport.exportword"></span>
               </a>
@@ -384,7 +387,7 @@
             <div id="titlebar">
               <h1 id ="titlelabel" data-l10n-id="pad.chat"></h1>
               <a id="titlecross" class="hide-reduce-btn" onClick="chat.hide();return false;">-&nbsp;</a>
-              <a id="titlesticky" class="stick-to-screen-btn" onClick="chat.stickToScreen(true);return false;" data-l10n-id="pad.chat.stick.title">█&nbsp;&nbsp;</a>
+              <a id="titlesticky" class="stick-to-screen-btn" onClick="chat.stickToScreen(true);return false;" data-l10n-id="pad.chat.stick.title">?&nbsp;&nbsp;</a>
             </div>
             <div id="chattext" class="thin-scrollbar" aria-live="polite" aria-relevant="additions removals text" role="log" aria-atomic="false">
                 <div alt="loading.." id="chatloadmessagesball" class="chatloadmessages loadingAnimation" align="top"></div>
