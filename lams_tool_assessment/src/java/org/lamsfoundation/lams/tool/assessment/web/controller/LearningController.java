@@ -447,28 +447,6 @@ public class LearningController {
     }
 
     /**
-     * Checks Leader Progress
-     */
-    @RequestMapping("/checkLeaderProgress")
-    @ResponseBody
-    public String checkLeaderProgress(HttpServletRequest request, HttpServletResponse response) throws IOException {
-	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	AssessmentSession session = service.getSessionBySessionId(toolSessionId);
-	AssessmentUser leader = session.getGroupLeader();
-
-	//in case of time limit - prevent user from seeing questions page longer than time limit allows
-	boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(session.getAssessment().getContentId(),
-		leader.getUserId().intValue());
-	boolean isLeaderResponseFinalized = service.isLastAttemptFinishedByUser(leader);
-
-	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	responseJSON.put("isPageRefreshRequested", isLeaderResponseFinalized || isTimeLimitExceeded);
-	response.setContentType("application/json;charset=utf-8");
-	return responseJSON.toString();
-    }
-
-    /**
      * Shows next page. It's available only to leaders as non-leaders see all questions on one page.
      */
     @RequestMapping("/nextPage")
