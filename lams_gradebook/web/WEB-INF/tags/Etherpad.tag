@@ -45,7 +45,6 @@
 		if (!showOnDemand) {
 			lamsEtherpadTagInitialiseDelay = delayBeforeInitialise + 1500;
 		}
-		
 		<c:if test="${heightAutoGrow eq 'true'}">
 			// Resize Etherpad iframe when its content grows.
 			// It does not support shrinking, only growing.
@@ -56,7 +55,7 @@
 		        	var src = msg.data.location.substring(0, msg.data.location.indexOf('?')),
 		        		iframe = $('iframe[src^="' + src + '"]'),
 		            	// height should be no less than 200 px
-		            	height = Math.max(200, msg.data.height - (${showControls} ? 0 : 64));
+		            	height = Math.max(200, msg.data.height + (${showControls} ? 10 : 29));
 		           	iframe.height(height);
 		        }
 		    });

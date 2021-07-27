@@ -10,7 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.etherpad.EtherpadException;
@@ -85,7 +85,7 @@ public class EtherpadService implements IEtherpadService {
      * Constructs cookie to be stored at a clientside browser.
      */
     @Override
-    public Cookie createCookie(String etherpadSessionIds) throws EtherpadException {
+    public void createCookie(String etherpadSessionIds, HttpServletResponse response) throws EtherpadException {
 	String etherpadServerUrl = Configuration.get(ConfigurationKeys.ETHERPAD_SERVER_URL);
 	URI uri;
 	try {
@@ -100,26 +100,25 @@ public class EtherpadService implements IEtherpadService {
 	Matcher m = p.matcher(uri.getHost());
 	String topLevelDomain = m.matches() ? "." + m.group(1) : uri.getHost();
 
-	Cookie etherpadSessionCookie = new Cookie("sessionID", etherpadSessionIds);
-	if (!topLevelDomain.equals("localhost")) {
-	    etherpadSessionCookie.setDomain(topLevelDomain);
-	}
-	// A negative value means that the cookie is not stored persistently and will be deleted when the Web browser
-	// exits. A zero value causes the cookie to be deleted.
-	etherpadSessionCookie.setMaxAge(-1);
-	etherpadSessionCookie.setPath("/");
+	// cookie needs to be constructed manually so we can set SameSite=None
+	StringBuilder cookieHeaderValue = new StringBuilder("sessionID=\"").append(etherpadSessionIds)
+		.append("\"; Version 1; Path=/; Discard; Secure; SameSite=None;");
 
-	return etherpadSessionCookie;
+	if (!topLevelDomain.equals("localhost")) {
+	    cookieHeaderValue.append("Domain=").append(topLevelDomain);
+	}
+
+	response.setHeader("Set-Cookie", cookieHeaderValue.toString());
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public Cookie createCookie(String authorId, String etherpadGroupId, boolean includeAllGroups)
-	    throws EtherpadException {
+    public void createCookie(String authorId, String etherpadGroupId, boolean includeAllGroups,
+	    HttpServletResponse response) throws EtherpadException {
 	// search for already existing user's session at Etherpad server
 	Map<String, Object> etherpadSessions = getClient().listSessionsOfAuthor(authorId);
 	String etherpadSessionId = getExistingSessionID(authorId, etherpadGroupId, etherpadSessions, includeAllGroups);
-	return createCookie(etherpadSessionId);
+	createCookie(etherpadSessionId, response);
     }
 
     /**

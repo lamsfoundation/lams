@@ -39,7 +39,6 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -170,8 +169,7 @@ public class MonitoringController {
 	//no need to store cookie if there are no sessions created yet
 	if (!groupList.isEmpty()) {
 	    // add new sessionID cookie in order to access pad
-	    Cookie etherpadSessionCookie = dokumaranService.createEtherpadCookieForMonitor(user, contentId);
-	    response.addCookie(etherpadSessionCookie);
+	    dokumaranService.createEtherpadCookieForMonitor(user, contentId, response);
 	}
 
 	return "pages/monitoring/monitoring";

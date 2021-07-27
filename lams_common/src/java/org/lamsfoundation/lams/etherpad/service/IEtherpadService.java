@@ -2,7 +2,7 @@ package org.lamsfoundation.lams.etherpad.service;
 
 import java.util.Map;
 
-import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 
 import org.lamsfoundation.lams.etherpad.EtherpadException;
 
@@ -36,12 +36,13 @@ public interface IEtherpadService {
     /**
      * Constructs cookie to be stored at a client side browser.
      */
-    Cookie createCookie(String etherpadSessionIds) throws EtherpadException;
+    void createCookie(String etherpadSessionIds, HttpServletResponse response) throws EtherpadException;
 
     /**
      * Constructs cookie to be stored at a client side browser.
      */
-    Cookie createCookie(String authorId, String etherpadGroupId, boolean includeAllGroup) throws EtherpadException;
+    void createCookie(String authorId, String etherpadGroupId, boolean includeAllGroup, HttpServletResponse response)
+	    throws EtherpadException;
 
     /**
      * Returns valid Etherpad session. Returns existing one if finds such one and creates the new one otherwise

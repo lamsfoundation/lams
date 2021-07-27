@@ -36,7 +36,7 @@ import java.util.SortedMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -947,8 +947,8 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
     @SuppressWarnings("unchecked")
     @Override
-    public Cookie createEtherpadCookieForLearner(DokumaranUser user, DokumaranSession session)
-	    throws DokumaranApplicationException, EtherpadException {
+    public void createEtherpadCookieForLearner(DokumaranUser user, DokumaranSession session,
+	    HttpServletResponse response) throws DokumaranApplicationException, EtherpadException {
 	String groupId = session.getEtherpadGroupId();
 
 	//don't allow sessions that has had problems with pad initializations. they could be fixed in monitoring by a teacher
@@ -966,19 +966,20 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	// search for already existing user's session at Etherpad server
 	Map etherpadSessions = client.listSessionsOfAuthor(authorId);
 	String etherpadSessionId = etherpadService.getExistingSessionID(authorId, groupId, etherpadSessions);
-	return etherpadService.createCookie(etherpadSessionId);
+	etherpadService.createCookie(etherpadSessionId, response);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public Cookie createEtherpadCookieForMonitor(UserDTO user, Long contentId) throws EtherpadException {
+    public void createEtherpadCookieForMonitor(UserDTO user, Long contentId, HttpServletResponse response)
+	    throws EtherpadException {
 
 	String authorId = etherpadService.createAuthor(user.getUserID(),
 		user.getFirstName() + " " + user.getLastName());
 
 	List<DokumaranSession> sessionList = dokumaranSessionDao.getByContentId(contentId);
 	if (sessionList.isEmpty()) {
-	    return null;
+	    return;
 	}
 
 	// in case sharedPadId is present - all sessions will share the same padId - and thus show only one pad
@@ -1003,7 +1004,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    etherpadSessionIds += StringUtils.isEmpty(etherpadSessionIds) ? etherpadSessionId : "," + etherpadSessionId;
 	}
 
-	return etherpadService.createCookie(etherpadSessionIds);
+	etherpadService.createCookie(etherpadSessionIds, response);
     }
 
     @Override
