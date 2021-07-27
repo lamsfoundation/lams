@@ -60,10 +60,12 @@ Etherpad is required for Dokumaran tool and for Etherpad tag
 
 4) Copy contents of folder /lams_buil/conf/etherpad/etherpad-lite/ over to /${etherpad-lite-server-folder}/
 	It customises Etherpad and the plugins
+
+5) Install Tidy HTML and set path to it in "tidyHtml" setting in settings.json
 	
-5) Install LibreOffice and set path to it in "soffice" setting in settings.json
+6) Install LibreOffice and set path to it in "soffice" setting in settings.json
 	
-6) To run Etherpad in iframes SSL is required. On localhost for development follow this guide
+7) To run Etherpad in iframes SSL is required. On localhost for development follow this guide
    https://github.com/ether/etherpad-lite/wiki/Providing-encrypted-web-access-to-Etherpad-Lite-using-SSL-certificates
    Then set up "ssl" secion in settings.json.
    Then set up Etherpad in sysadmin panel to use HTTPS, for example https://localhost:9001
