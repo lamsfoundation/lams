@@ -114,8 +114,11 @@
 					<c:when test="${not empty question.codeStyle}">
 						<textarea id="essay-question${status.index}" name="question${status.index}">${question.answer}</textarea>
 					</c:when>
+					<c:when test="${not hasEditRight}">
+						${question.answer}
+					</c:when>
 					<c:otherwise>
-						<lams:textarea id="essay-question${status.index}" name="question${status.index}" class="form-control" disabled="${!hasEditRight}" rows="8">${question.answer}</lams:textarea>
+						<lams:textarea id="essay-question${status.index}" name="question${status.index}" class="form-control" rows="8">${question.answer}</lams:textarea>
 					</c:otherwise>
 				</c:choose>
 			</td>
