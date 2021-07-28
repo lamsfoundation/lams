@@ -347,7 +347,7 @@
 				let summaryPane = $('#whiteboard-monitoring-summary-${sessionMap.toolContentID}');
 				
 				$('#gallery-walk-start', summaryPane).hide();
-				$('#gallery-walk-finish, #learner-reedit', summaryPane).removeClass('hidden');
+				$('#gallery-walk-finish, #gallery-walk-learner-edit', summaryPane).removeClass('hidden');
 			}
 		});
 	}
@@ -379,13 +379,13 @@
 		});
 	}
 
-	function learnerReedit(){
-		if (!confirm('<fmt:message key="monitoring.summary.learner.reedit.confirm" />')) {
+	function enableGalleryWalkLearnerEdit(){
+		if (!confirm('<fmt:message key="monitoring.summary.gallery.walk.learner.edit.confirm" />')) {
 			return;
 		}
 		
 		$.ajax({
-			'url' : '<c:url value="/monitoring/learnerReedit.do"/>',
+			'url' : '<c:url value="/monitoring/enableGalleryWalkLearnerEdit.do"/>',
 			'data': {
 				toolContentID : ${whiteboard.contentId}
 			},
@@ -811,10 +811,10 @@
 					<fmt:message key="monitoring.summary.gallery.walk.start" /> 
 				</button>
 				
-				<button id="learner-reedit" type="button"
-				        class="btn btn-default ${whiteboard.galleryWalkStarted or whiteboard.galleryWalkFinished ? '' : 'hidden'}"
-				        onClick="javascript:learnerReedit()">
-					<fmt:message key="monitoring.summary.learner.reedit" /> 
+				<button id="gallery-walk-learner-edit" type="button"
+				        class="btn btn-default ${not whiteboard.galleryWalkEditEnabled and (whiteboard.galleryWalkStarted or whiteboard.galleryWalkFinished) ? '' : 'hidden'}"
+				        onClick="javascript:enableGalleryWalkLearnerEdit()">
+					<fmt:message key="monitoring.summary.gallery.walk.learner.edit" /> 
 				</button>
 				
 				<button id="gallery-walk-finish" type="button"

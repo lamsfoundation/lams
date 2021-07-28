@@ -110,6 +110,9 @@ public class Whiteboard implements Cloneable {
     @Column(name = "gallery_walk_finished")
     private boolean galleryWalkFinished;
 
+    @Column(name = "gallery_walk_edit_enabled")
+    private boolean galleryWalkEditEnabled;
+
     @Column(name = "gallery_walk_instructions")
     private String galleryWalkInstructions;
 
@@ -386,6 +389,14 @@ public class Whiteboard implements Cloneable {
 
     public void setGalleryWalkFinished(boolean galleryWalkFinished) {
 	this.galleryWalkFinished = galleryWalkFinished;
+    }
+
+    public boolean isGalleryWalkEditEnabled() {
+	return galleryWalkEditEnabled;
+    }
+
+    public void setGalleryWalkEditEnabled(boolean galleryWalkEditEnabled) {
+	this.galleryWalkEditEnabled = galleryWalkEditEnabled;
     }
 
     public String getGalleryWalkInstructions() {

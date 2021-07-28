@@ -326,6 +326,9 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	}
 
 	List<SessionDTO> groupList = new ArrayList<>();
+	Long userSessionId = ratingUserId == null || !whiteboard.isGalleryWalkStarted()
+		|| !whiteboard.isGalleryWalkEditEnabled() ? null
+			: getUserByIDAndContent(ratingUserId, contentId).getSession().getSessionId();
 	for (WhiteboardSession session : sessionList) {
 	    // one new group for one session.
 	    SessionDTO group = new SessionDTO();
@@ -336,7 +339,11 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 
 	    String wid = whiteboard.getContentId() + "-" + session.getSessionId();
 	    wid = getWhiteboardPrefixedId(wid);
-	    if (ratingUserId != null) {
+	    
+	    // show read only pad if it is a learner and no reedit was enabled
+	    if (ratingUserId != null && (userSessionId == null || !session.getSessionId().equals(userSessionId)
+		    || (whiteboard.isUseSelectLeaderToolOuput() && (session.getGroupLeader() == null
+			    || !session.getGroupLeader().getUserId().equals(ratingUserId))))) {
 		wid = getWhiteboardReadOnlyWid(wid);
 	    }
 	    group.setWid(wid);
@@ -508,15 +515,14 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
     }
 
     @Override
-    public void learnerReedit(long toolContentId) throws IOException {
+    public void enableGalleryWalkLearnerEdit(long toolContentId) throws IOException {
 	Whiteboard whiteboard = getWhiteboardByContentId(toolContentId);
 	if (!whiteboard.isGalleryWalkEnabled()) {
 	    throw new IllegalArgumentException(
-		    "Can not allow learners to reedit activity as Gallery Walk is not enabled for Wwith tool content ID "
+		    "Can not allow learners to reedit activity as Gallery Walk is not enabled for Whiteboard with tool content ID "
 			    + toolContentId);
 	}
-	whiteboard.setGalleryWalkStarted(false);
-	whiteboard.setGalleryWalkFinished(false);
+	whiteboard.setGalleryWalkEditEnabled(true);
 	whiteboardDao.update(whiteboard);
 
 	sendGalleryWalkRefreshRequest(whiteboard);
