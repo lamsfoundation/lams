@@ -36,8 +36,10 @@
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
 <script>
 	//avoid name clash between bootstrap and jQuery UI
-	$.fn.bootstrapTooltip = $.fn.tooltip.noConflict();    
-
+	if (typeof $.fn.bootstrapTooltip == 'undefined') {
+		$.fn.bootstrapTooltip = $.fn.tooltip.noConflict();    
+	}
+	
 	var lessonId = ${lesson.lessonId},
 		userId = '<lams:user property="userID"/>',
 		ldId = ${lesson.learningDesign.learningDesignId},

@@ -2,7 +2,6 @@ package org.lamsfoundation.lams.web;
 
 import java.util.Map;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -59,8 +58,7 @@ public class EtherpadController {
 	String authorId = etherpadService.createAuthor(user.getUserID(), userName);
 
 	// create cookie with ALL valid user session IDs so there can be multiple pads on a single page
-	Cookie cookie = etherpadService.createCookie(authorId, etherpadGroupId, true);
-	response.addCookie(cookie);
+	etherpadService.createCookie(authorId, etherpadGroupId, true, response);
 
 	return (String) padData.get("padId");
     }

@@ -38,6 +38,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -646,10 +647,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    return false;
 	}
 
+	boolean isAnswerModified = false;
 	// store all answers (in all pages)
 	for (Set<QuestionDTO> questionsForOnePage : pagedQuestions) {
 	    for (QuestionDTO questionDto : questionsForOnePage) {
-		storeUserAnswer(result, questionDto);
+		AssessmentQuestionResult questionResult = storeUserAnswer(result, questionDto);
+		isAnswerModified |= questionResult.isAnswerModified();
 	    }
 	}
 
@@ -680,10 +683,25 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	result.setMaximumGrade(maximumGrade);
 	result.setGrade(grade);
+
 	if (!isAutosave) {
 	    result.setFinishDate(new Timestamp(new Date().getTime()));
 	}
+
 	assessmentResultDao.update(result);
+
+	// refresh non-leaders when leader changed his answers or submitted them
+	if (assessment.isUseSelectLeaderToolOuput() && (!isAutosave || isAnswerModified)) {
+	    AssessmentSession session = getSessionBySessionId(result.getSessionId());
+	    Long leaderUid = session.getGroupLeader() == null ? null : session.getGroupLeader().getUid();
+	    Set<Integer> userIds = session.getAssessmentUsers().stream().filter(u -> !u.getUid().equals(leaderUid))
+		    .collect(Collectors.mapping(assessmentUser -> assessmentUser.getUserId().intValue(),
+			    Collectors.toSet()));
+
+	    ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
+	    jsonCommand.put("hookTrigger", "assessment-leader-triggered-refresh-" + result.getSessionId());
+	    learnerService.createCommandForLearners(assessment.getContentId(), userIds, jsonCommand.toString());
+	}
 
 	return true;
     }
@@ -700,15 +718,24 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	for (AssessmentQuestionResult questionResultIter : assessmentResult.getQuestionResults()) {
 	    if (questionDto.getUid().equals(questionResultIter.getQbToolQuestion().getUid())) {
 		questionResult = questionResultIter;
+		break;
 	    }
 	}
+
+	boolean isAnswerModified = false;
 
 	//if teacher modified question in monitor - update questionDto now
 	if (assessment.isContentModifiedInMonitor(assessmentResult.getStartDate())) {
 	    AssessmentQuestion modifiedQuestion = assessmentQuestionDao.getByUid(questionDto.getUid());
 	    QuestionDTO updatedQuestionDto = modifiedQuestion.getQuestionDTO();
 	    PropertyUtils.copyProperties(questionDto, updatedQuestionDto);
+
+	    isAnswerModified = true;
 	}
+
+	isAnswerModified |= !Objects.equals(questionResult.getAnswerBoolean(), questionDto.getAnswerBoolean())
+		|| !Objects.equals(questionResult.getAnswerFloat(), questionDto.getAnswerFloat())
+		|| !Objects.equals(questionResult.getAnswer(), questionDto.getAnswer());
 
 	// store question answer values
 	questionResult.setAnswerBoolean(questionDto.getAnswerBoolean());
@@ -722,28 +749,38 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    for (AssessmentOptionAnswer optionAnswerIter : questionResult.getOptionAnswers()) {
 		if (optionDto.getUid().equals(optionAnswerIter.getOptionUid())) {
 		    optionAnswer = optionAnswerIter;
+		    break;
 		}
 	    }
 
 	    // store option answer values
+	    isAnswerModified |= !Objects.equals(optionAnswer.getAnswerBoolean(), optionDto.getAnswerBoolean());
+
 	    optionAnswer.setAnswerBoolean(optionDto.getAnswerBoolean());
-	    optionAnswer.setAnswerInt(optionDto.getAnswerInt());
 	    if (questionDto.getType() == QbQuestion.TYPE_ORDERING) {
+		isAnswerModified |= !Objects.equals(optionAnswer.getAnswerInt(), optionDto.getDisplayOrder());
 		optionAnswer.setAnswerInt(optionDto.getDisplayOrder());
+	    } else {
+		isAnswerModified |= !Objects.equals(optionAnswer.getAnswerInt(), optionDto.getAnswerInt());
+		optionAnswer.setAnswerInt(optionDto.getAnswerInt());
 	    }
 	}
 
 	// store confidence levels entered by the learner
 	if (assessment.isEnableConfidenceLevels()) {
+	    isAnswerModified |= !Objects.equals(questionResult.getConfidenceLevel(), questionDto.getConfidenceLevel());
 	    questionResult.setConfidenceLevel(questionDto.getConfidenceLevel());
 	}
 
 	// store justification entered by the learner
 	if (assessment.isAllowAnswerJustification() || (questionDto.getType().equals(QbQuestion.TYPE_MARK_HEDGING)
 		&& questionDto.isHedgingJustificationEnabled())) {
+	    isAnswerModified |= !Objects.equals(questionResult.getJustification(), questionDto.getJustification());
 	    questionResult.setJustification(questionDto.getJustification());
 	}
 
+	questionResult.setAnswerModified(isAnswerModified);
+	;
 	return questionResult;
     }
 
@@ -928,8 +965,20 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
     @Override
     public void loadupLastAttempt(Long assessmentUid, Long userId, List<Set<QuestionDTO>> pagedQuestionDtos) {
+	Assessment assessment = assessmentDao.getByUid(assessmentUid);
+
+	// for non-leaders the result of the leader should be used instead
+	Long targetUserId = userId;
+	AssessmentUser user = getUserByIdAndContent(userId, assessment.getContentId());
+	if (assessment.isUseSelectLeaderToolOuput()) {
+	    AssessmentSession session = user.getSession();
+	    if (session.getGroupLeader() != null && !session.getGroupLeader().getUserId().equals(targetUserId)) {
+		targetUserId = session.getGroupLeader().getUserId();
+	    }
+	}
+
 	//get the latest result (it can be unfinished one)
-	AssessmentResult lastResult = getLastAssessmentResult(assessmentUid, userId);
+	AssessmentResult lastResult = getLastAssessmentResult(assessmentUid, targetUserId);
 	//if there is no results yet - no action required
 	if (lastResult == null) {
 	    return;
@@ -938,7 +987,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	//get the latest finished result (required for mark hedging type of questions only)
 	AssessmentResult lastFinishedResult = null;
 	if (lastResult.getFinishDate() == null) {
-	    lastFinishedResult = getLastFinishedAssessmentResult(assessmentUid, userId);
+	    lastFinishedResult = getLastFinishedAssessmentResult(assessmentUid, targetUserId);
 	}
 
 	for (Set<QuestionDTO> questionsForOnePage : pagedQuestionDtos) {
@@ -4024,7 +4073,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		Collectors.mapping(assessmentUser -> assessmentUser.getUserId().intValue(), Collectors.toSet()));
 
 	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
-	jsonCommand.put("hookTrigger", "assessment-leader-change-refresh-" + toolSessionId);
+	jsonCommand.put("hookTrigger", "assessment-leader-triggered-refresh-" + toolSessionId);
 	learnerService.createCommandForLearners(assessment.getContentId(), userIds, jsonCommand.toString());
     }
 }

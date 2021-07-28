@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 
 import org.lamsfoundation.lams.etherpad.EtherpadException;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -119,10 +120,11 @@ public interface IDokumaranService extends ICommonToolService {
 
     List<User> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString);
 
-    Cookie createEtherpadCookieForLearner(DokumaranUser user, DokumaranSession session)
+    void createEtherpadCookieForLearner(DokumaranUser user, DokumaranSession session, HttpServletResponse response)
 	    throws DokumaranApplicationException, EtherpadException;
 
-    Cookie createEtherpadCookieForMonitor(UserDTO user, Long contentId) throws EtherpadException;
+    void createEtherpadCookieForMonitor(UserDTO user, Long contentId, HttpServletResponse response)
+	    throws EtherpadException;
 
     /**
      * Creates pad on Etherpad server side.

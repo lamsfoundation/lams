@@ -14,6 +14,10 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chart.bundle.min.js"></script>
 	<script>
+		if (typeof $.fn.bootstrapTooltip == 'undefined') {
+			$.fn.bootstrapTooltip = $.fn.tooltip.noConflict();    
+		}
+	
 		var TOTAL_LESSON_LEARNERS_NUMBER = ${totalLearnersNumber},
 			LAMS_URL = '<lams:LAMSURL/>',
 			TAB_REFRESH_INTERVAL = 20 * 1000, // refresh tab every 20 seconds,
