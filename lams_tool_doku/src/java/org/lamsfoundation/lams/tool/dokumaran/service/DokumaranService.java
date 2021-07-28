@@ -631,15 +631,14 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     }
 
     @Override
-    public void learnerReedit(long toolContentId) throws IOException {
+    public void enableGalleryWalkLearnerEdit(long toolContentId) throws IOException {
 	Dokumaran dokumaran = getDokumaranByContentId(toolContentId);
 	if (!dokumaran.isGalleryWalkEnabled()) {
 	    throw new IllegalArgumentException(
 		    "Can not allow learners to reedit activity as Gallery Walk is not enabled for Dokumaran with tool content ID "
 			    + toolContentId);
 	}
-	dokumaran.setGalleryWalkStarted(false);
-	dokumaran.setGalleryWalkFinished(false);
+	dokumaran.setGalleryWalkEditEnabled(true);
 	dokumaranDao.saveObject(dokumaran);
 
 	sendGalleryWalkRefreshRequest(dokumaran);
