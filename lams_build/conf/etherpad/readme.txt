@@ -21,16 +21,9 @@ Etherpad is required for Dokumaran tool and for Etherpad tag
 	comments_page:		Adds comments on sidebar and link it to the text 0.1.63
 	export_authors:		Etherpad plugin to add author information to the html export 0.1.1
 	headings2:			Adds heading support 0.2.30
-	ice_tables:			Add tables to etherpad 0.0.3
-	
-						If this plugin installs correctly but does not display in Etherpad,
-						manually add following section to package-lock.json after all other plugins (for example after ep_stats section)
-						
-						"ep_ice_tables": {
-					      "version": "0.0.3",
-					      "resolved": "https://registry.npmjs.org/ep_ice_tables/-/ep_ice_tables-0.0.3.tgz",
-					      "integrity": "sha512-vOoY42DZq7EvpbLdiknQ+1GjQoK9iQIOp2XdUXhPBgPyBzBj3TSQTfzxwge5iQUbXY9hvvOwoh7U+jXm4u/xbQ=="
-					    },
+	// ice_tables:		Add tables to etherpad 0.0.3
+						This plugin has been abandoned and is not production ready.
+						If a new version appears, customisations from "incompatible-plugins" directory can be used
 					    
 	image_upload:    	Add images to etherpad 1.0.51
 						After installing set up ep_image_upload section at the botton of settings.json
