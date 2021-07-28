@@ -312,10 +312,10 @@
 				toolContentID : ${dokumaran.contentId}
 			},
 			'success' : function(){
-				$('#doku-monitoring-summary-${sessionMap.toolContentID} #gallery-walk-start, ' +
-				  '#doku-monitoring-summary-${sessionMap.toolContentID} #countdown, ' + 
-				  '#doku-monitoring-summary-${sessionMap.toolContentID} #add-one-minute, #start-activity').hide();
-				$('#doku-monitoring-summary-${sessionMap.toolContentID} #gallery-walk-finish').removeClass('hidden');
+				let summaryPane = $('#doku-monitoring-summary-${sessionMap.toolContentID}');
+				
+				$('#gallery-walk-start', summaryPane).hide();
+				$('#gallery-walk-finish, #gallery-walk-learner-edit', summaryPane).removeClass('hidden');
 			}
 		});
 	}
@@ -335,6 +335,31 @@
 					<c:when test="${dokumaran.galleryWalkReadOnly}">
 						$('#doku-monitoring-summary-${sessionMap.toolContentID} #gallery-walk-finish').hide();
 					</c:when>
+					<c:when test="${isTbl}">
+						// reload current tab with Doku summary
+						loadTab(null, null, false);
+					</c:when>
+					<c:otherwise>
+						location.reload();
+					</c:otherwise>
+				</c:choose>
+			}
+		});
+	}
+
+	
+	function enableGalleryWalkLearnerEdit(){
+		if (!confirm('<fmt:message key="monitoring.summary.gallery.walk.learner.edit.confirm" />')) {
+			return;
+		}
+		
+		$.ajax({
+			'url' : '<c:url value="/monitoring/enableGalleryWalkLearnerEdit.do"/>',
+			'data': {
+				toolContentID : ${dokumaran.contentId}
+			},
+			'success' : function(){
+				<c:choose>
 					<c:when test="${isTbl}">
 						// reload current tab with Doku summary
 						loadTab(null, null, false);
@@ -756,6 +781,12 @@
 				        	   ${not dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'hidden'}"
 				        onClick="javascript:startGalleryWalk()">
 					<fmt:message key="monitoring.summary.gallery.walk.start" /> 
+				</button>
+								
+				<button id="gallery-walk-learner-edit" type="button"
+				        class="btn btn-default ${not dokumaran.galleryWalkEditEnabled and (dokumaran.galleryWalkStarted or dokumaran.galleryWalkFinished) ? '' : 'hidden'}"
+				        onClick="javascript:enableGalleryWalkLearnerEdit()">
+					<fmt:message key="monitoring.summary.gallery.walk.learner.edit" /> 
 				</button>
 				
 				<button id="gallery-walk-finish" type="button"
