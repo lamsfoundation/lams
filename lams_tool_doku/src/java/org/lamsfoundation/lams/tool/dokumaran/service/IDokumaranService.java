@@ -233,6 +233,8 @@ public interface IDokumaranService extends ICommonToolService {
 
     void finishGalleryWalk(long toolContentId) throws IOException;
 
+    void enableGalleryWalkLearnerEdit(long toolContentId) throws IOException;
+
     void changeLeaderForGroup(long toolSessionId, long leaderUserId);
 
     Grouping getGrouping(long toolContentId);

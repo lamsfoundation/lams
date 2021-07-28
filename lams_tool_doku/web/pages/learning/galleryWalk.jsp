@@ -162,8 +162,9 @@
 								     isItemAuthoredByUser="${dokumaran.galleryWalkFinished or not hasEditRight or mode == 'teacher'}" />
 		       	    </c:if>
 		 
-					<lams:Etherpad groupId="${groupSummary.sessionId}" padId="${groupSummary.readOnlyPadId}"
-								   showControls="${not dokumaran.galleryWalkFinished and not dokumaran.galleryWalkReadOnly and hasEditRight}"
+					<lams:Etherpad groupId="${groupSummary.sessionId}"
+								   padId="${hasEditRight and dokumaran.galleryWalkEditEnabled and toolSessionID == groupSummary.sessionId ? groupSummary.padId : groupSummary.readOnlyPadId}"
+								   showControls="${hasEditRight and ((dokumaran.galleryWalkEditEnabled and toolSessionID == groupSummary.sessionId) or (not dokumaran.galleryWalkFinished and not dokumaran.galleryWalkReadOnly))}"
 								   showOnDemand="true" height="600" />	
 				</div>
 			</div>

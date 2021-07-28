@@ -314,6 +314,13 @@ public class MonitoringController {
 	dokumaranService.finishGalleryWalk(toolContentId);
     }
 
+    @RequestMapping("/enableGalleryWalkLearnerEdit")
+    private void enableGalleryWalkLearnerEdit(HttpServletRequest request) throws IOException {
+	Long toolContentId = WebUtil.readLongParam(request, DokumaranConstants.ATTR_TOOL_CONTENT_ID, false);
+
+	dokumaranService.enableGalleryWalkLearnerEdit(toolContentId);
+    }
+
     @RequestMapping("/ae")
     private String tblApplicationExcercise(HttpServletRequest request, HttpServletResponse response)
 	    throws EtherpadException {
