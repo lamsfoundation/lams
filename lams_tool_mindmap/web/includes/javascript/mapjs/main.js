@@ -19381,6 +19381,13 @@ jQuery.fn.editNode = function (shouldSelectAll) {
 					cancelEditing();
 				}
 				e.stopPropagation();
+			// check if it s a printable character
+			} else if (String.fromCharCode(e.keyCode).match(/(\w|\s)/g)){
+				const content = textBox.innerText();
+				// LAMS Modification - LDEV-4656 Restrict to 100 chars
+				if (content && content.length >= 100) {
+					return false;
+				}
 			}
 		},
 		attachListeners = function () {
