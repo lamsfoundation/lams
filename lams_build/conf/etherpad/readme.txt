@@ -19,7 +19,6 @@ Etherpad is required for Dokumaran tool and for Etherpad tag
 	authornames:		Adds author names to span titles (shows on hover) 0.2.0
 	author_neat2:		Neat author display 2.0.1
 	comments_page:		Adds comments on sidebar and link it to the text 0.1.63
-	export_authors:		Etherpad plugin to add author information to the html export 0.1.1
 	headings2:			Adds heading support 0.2.30
 	// ice_tables:		Add tables to etherpad 0.0.3
 						This plugin has been abandoned and is not production ready.
