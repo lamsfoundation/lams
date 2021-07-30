@@ -26,7 +26,7 @@
     </properties>
 
     <resources>
-        <resource-root path="commons-compress-1.18.jar"/>
+        <resource-root path="commons-compress-1.21.jar"/>
     </resources>
 
     <dependencies>

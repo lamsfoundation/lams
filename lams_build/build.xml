@@ -412,6 +412,15 @@
 		<copy tofile="${server.home}/modules/system/layers/base/org/apache/xmlbeans/main/module.xml"
 			  file="lib/apache-poi/xmlbeans.module.xml" overwrite="true" verbose="true" />
 		
+		<copy todir="${server.home}/modules/system/layers/base/com/zaxxer/sparsebits/main" overwrite="true" verbose="true">
+			<fileset dir="lib/apache-poi">
+				<include name="SparseBitSet-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/com/zaxxer/sparsebits/main/module.xml"
+			  file="lib/apache-poi/sparse-bit-set.module.xml" overwrite="true" verbose="true" />
+		
+		
 		<copy todir="${server.home}/modules/system/layers/base/org/apache/tika/main" overwrite="true" verbose="true">
 			<fileset dir="lib/apache-tika">
 				<include name="tika-*.jar" />
@@ -522,6 +531,16 @@
 		<copy tofile="${server.home}/modules/system/layers/base/net/fckeditor/main/module.xml"
 			  file="lib/fckeditor/fckeditor.module.xml" overwrite="true" verbose="true" />
 		
+		
+		
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/codec/main" overwrite="true" verbose="true">
+					<fileset dir="lib/jakarta-commons">
+						<include name="commons-codec-*.jar" />
+					</fileset>
+				</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/codec/main/module.xml"
+			  file="lib/jakarta-commons/codec.module.xml" overwrite="true" verbose="true" />
+				
 		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/collections4/main" overwrite="true" verbose="true">
 			<fileset dir="lib/jakarta-commons">
 				<include name="commons-collections4-*.jar" />
