@@ -251,9 +251,31 @@ public class ExcelUtil {
 		continue;
 	    }
 
-	    Cell cell = row.createCell(columnIndex++);
-	    Object excelCellValue = excelCell.getCellValue();
+	    //figure out cell's style
+	    CellStyle sourceCellStyle = defaultStyle;
 
+	    if (excelCell.getColor() != null) {
+		switch (excelCell.getColor()) {
+		    case BLUE:
+			sourceCellStyle = blueColor;
+			break;
+		    case GREEN:
+			sourceCellStyle = greenColor;
+			break;
+		    case RED:
+			sourceCellStyle = redColor;
+			break;
+		    case YELLOW:
+			sourceCellStyle = yellowColor;
+			break;
+		    default:
+			break;
+		}
+	    }
+
+	    Cell cell = CellUtil.createCell(row, columnIndex++, null, sourceCellStyle);
+
+	    Object excelCellValue = excelCell.getCellValue();
 	    //cast excelCell's value
 	    if (excelCellValue != null) {
 		if (excelCell.getDataFormat() == ExcelCell.CELL_FORMAT_TIME && excelCellValue instanceof Date) {
@@ -279,56 +301,28 @@ public class ExcelUtil {
 		}
 	    }
 
-	    //figure out cell's style
-	    CellStyle sourceCellStyle = defaultStyle;
-
-	    if (excelCell.getColor() != null) {
-		switch (excelCell.getColor()) {
-		    case BLUE:
-			sourceCellStyle = blueColor;
-			break;
-		    case GREEN:
-			sourceCellStyle = greenColor;
-			break;
-		    case RED:
-			sourceCellStyle = redColor;
-			break;
-		    case YELLOW:
-			sourceCellStyle = yellowColor;
-			break;
-		    default:
-			break;
-		}
-	    }
-
-	    // create a clone that can be modified
-	    CellStyle cellStyle = workbook.createCellStyle();
-	    cellStyle.cloneStyleFrom(sourceCellStyle);
-
 	    if (excelCell.isBold() || excelRow.isBold()) {
-		cellStyle.setFont(boldFont);
+		CellUtil.setFont(cell, boldFont);
 	    }
 
 	    if (excelCell.getBorderStyle() != null) {
 		for (int borderStyle : excelCell.getBorderStyle()) {
 		    switch (borderStyle) {
 			case ExcelCell.BORDER_STYLE_LEFT_THIN:
-			    cellStyle.setBorderLeft(BorderStyle.THIN);
+			    CellUtil.setCellStyleProperty(cell, CellUtil.BORDER_LEFT, BorderStyle.THIN);
 			    break;
 			case ExcelCell.BORDER_STYLE_LEFT_THICK:
-			    cellStyle.setBorderLeft(BorderStyle.THICK);
-			    break;
-			case ExcelCell.BORDER_STYLE_RIGHT_THICK:
-			    cellStyle.setBorderRight(BorderStyle.THICK);
+			    CellUtil.setCellStyleProperty(cell, CellUtil.BORDER_LEFT, BorderStyle.THICK);
 			    break;
 			case ExcelCell.BORDER_STYLE_BOTTOM_THIN:
-			    cellStyle.setBorderBottom(BorderStyle.THIN);
+			    CellUtil.setCellStyleProperty(cell, CellUtil.BORDER_RIGHT, BorderStyle.THIN);
+			    break;
+			case ExcelCell.BORDER_STYLE_RIGHT_THICK:
+			    CellUtil.setCellStyleProperty(cell, CellUtil.BORDER_RIGHT, BorderStyle.THICK);
 			    break;
 		    }
 		}
 	    }
-
-	    cell.setCellStyle(cellStyle);
 
 	    //set data format
 	    if (excelCellValue != null
