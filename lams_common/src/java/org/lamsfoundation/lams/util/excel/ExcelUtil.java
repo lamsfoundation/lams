@@ -25,7 +25,9 @@ package org.lamsfoundation.lams.util.excel;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpSession;
@@ -46,7 +48,6 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.util.LocaleUtil;
-import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -75,6 +76,7 @@ public class ExcelUtil {
     private static Font boldFont;
 
     public final static String DEFAULT_FONT_NAME = "Calibri-Regular";
+    public final static float DEFAULT_CHARACTER_WIDTH = 1.14388f;
 
     private final static int MAX_CELL_TEXT_LENGTH = 32767;
 
@@ -193,17 +195,14 @@ public class ExcelUtil {
 	}
 
 	Sheet sheet = workbook.createSheet(sheetName);
-	//make sure columns are tracked prior to auto-sizing them
-	if (workbook instanceof SXSSFWorkbook) {
-	    ((SXSSFSheet) sheet).trackAllColumnsForAutoSizing();
-	}
+	Map<Integer, Integer> columnWidths = new HashMap<>();
 
 	// Print title if requested
 	boolean isTitleToBePrinted = displaySheetTitle && StringUtils.isNotBlank(excelSheet.getSheetName());
 	if (isTitleToBePrinted) {
 	    ExcelRow excelRow = new ExcelRow();
 	    excelRow.addCell(excelSheet.getSheetName(), true);
-	    ExcelUtil.createRow(workbook, excelRow, 0, sheet);
+	    ExcelUtil.createRow(workbook, excelRow, 0, sheet, columnWidths);
 	}
 
 	// Print current date, if needed
@@ -211,7 +210,7 @@ public class ExcelUtil {
 	    ExcelRow excelRow = new ExcelRow();
 	    excelRow.addCell(dateHeader);
 	    excelRow.addCell(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(new Date()));
-	    ExcelUtil.createRow(workbook, excelRow, 1, sheet);
+	    ExcelUtil.createRow(workbook, excelRow, 1, sheet, columnWidths);
 	}
 
 	int maxCellsNumber = 0;
@@ -222,7 +221,7 @@ public class ExcelUtil {
 
 	    // in case there is a sheet title or dateHeader available start from 4th row
 	    int rowIndexOffset = !isTitleToBePrinted && StringUtils.isBlank(dateHeader) ? 0 : 4;
-	    ExcelUtil.createRow(workbook, excelRow, rowIndex + rowIndexOffset, sheet);
+	    ExcelUtil.createRow(workbook, excelRow, rowIndex + rowIndexOffset, sheet, columnWidths);
 
 	    //calculate max column size
 	    int cellsNumber = excelRow.getCells().size();
@@ -236,13 +235,14 @@ public class ExcelUtil {
 	    sheet.addMergedRegion(mergedCells);
 	}
 
-	//autoSizeColumns
-	for (int i = 0; i < maxCellsNumber; i++) {
-	    sheet.autoSizeColumn(i);
+	for (int columnIndex : columnWidths.keySet()) {
+	    // one unit is 1/256 of character width, plus some characters for padding
+	    sheet.setColumnWidth(columnIndex, (columnWidths.get(columnIndex) + 4) * 256);
 	}
     }
 
-    private static void createRow(Workbook workbook, ExcelRow excelRow, int rowIndex, Sheet sheet) {
+    private static void createRow(Workbook workbook, ExcelRow excelRow, int rowIndex, Sheet sheet,
+	    Map<Integer, Integer> columnWidths) {
 	Row row = sheet.createRow(rowIndex);
 
 	int columnIndex = 0;
@@ -273,31 +273,39 @@ public class ExcelUtil {
 		}
 	    }
 
-	    Cell cell = CellUtil.createCell(row, columnIndex++, null, sourceCellStyle);
+	    Cell cell = CellUtil.createCell(row, columnIndex, null, sourceCellStyle);
 
 	    Object excelCellValue = excelCell.getCellValue();
+	    int cellValueLength = 0;
 	    //cast excelCell's value
 	    if (excelCellValue != null) {
 		if (excelCell.getDataFormat() == ExcelCell.CELL_FORMAT_TIME && excelCellValue instanceof Date) {
 		    cell.setCellValue((Date) excelCellValue);
+		    cellValueLength = ((Date) excelCellValue).toString().length();
 
 		} else if (excelCellValue instanceof Date) {
 		    cell.setCellValue(FileUtil.EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT.format(excelCellValue));
+		    cellValueLength = cell.getStringCellValue().length();
 
 		} else if (excelCellValue instanceof java.lang.Float) {
 		    cell.setCellValue((Float) excelCellValue);
+		    cellValueLength = String.valueOf(cell.getNumericCellValue()).length();
 
 		} else if (excelCellValue instanceof java.lang.Double) {
 		    cell.setCellValue((Double) excelCellValue);
+		    cellValueLength = String.valueOf(cell.getNumericCellValue()).length();
 
 		} else if (excelCellValue instanceof java.lang.Long) {
 		    cell.setCellValue(((Long) excelCellValue).doubleValue());
+		    cellValueLength = String.valueOf(cell.getNumericCellValue()).length();
 
 		} else if (excelCellValue instanceof java.lang.Integer) {
 		    cell.setCellValue(((Integer) excelCellValue).doubleValue());
+		    cellValueLength = String.valueOf(cell.getNumericCellValue()).length();
 
 		} else {
 		    cell.setCellValue(ExcelUtil.ensureCorrectCellLength(excelCellValue.toString()));
+		    cellValueLength = cell.getStringCellValue().length();
 		}
 	    }
 
@@ -362,11 +370,20 @@ public class ExcelUtil {
 			break;
 		}
 	    }
+
+	    
+	    // Store maximum number of characters in each column.
+	    // XLXS format processing is done chunk by chunk and it is append only, so this information needs to be stored on the fly.
+	    Integer existingColumnWidth = columnWidths.get(columnIndex);
+	    if (existingColumnWidth == null || existingColumnWidth < cellValueLength) {
+		columnWidths.put(columnIndex, cellValueLength);
+	    }
+
+	    columnIndex++;
 	}
     }
 
     public static String ensureCorrectCellLength(String cellText) {
 	return cellText.length() > MAX_CELL_TEXT_LENGTH ? cellText.substring(0, MAX_CELL_TEXT_LENGTH) : cellText;
     }
-
 }
