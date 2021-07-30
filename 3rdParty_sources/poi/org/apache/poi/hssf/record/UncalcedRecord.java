@@ -17,23 +17,28 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title: Uncalced Record
- * <P>
- * If this record occurs in the Worksheet Substream, it indicates that the formulas have not 
+ * If this record occurs in the Worksheet Substream, it indicates that the formulas have not
  * been recalculated before the document was saved.
- * 
- * @author Olivier Leprince
  */
-public final class UncalcedRecord extends StandardRecord  {
-	public final static short sid = 0x005E;
+public final class UncalcedRecord extends StandardRecord {
+	public static final short sid = 0x005E;
 
     private short _reserved;
 
 	public UncalcedRecord() {
         _reserved = 0;
+	}
+
+	public UncalcedRecord(UncalcedRecord other) {
+		super(other);
+		_reserved = other._reserved;
 	}
 
 	public short getSid() {
@@ -42,14 +47,6 @@ public final class UncalcedRecord extends StandardRecord  {
 
 	public UncalcedRecord(RecordInputStream in) {
 		_reserved = in.readShort(); // unused
-	}
-
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("[UNCALCED]\n");
-        buffer.append("    _reserved: ").append(_reserved).append('\n');
-		buffer.append("[/UNCALCED]\n");
-		return buffer.toString();
 	}
 
 	public void serialize(LittleEndianOutput out) {
@@ -62,5 +59,20 @@ public final class UncalcedRecord extends StandardRecord  {
 
 	public static int getStaticRecordSize() {
 		return 6;
+	}
+
+	@Override
+	public UncalcedRecord copy() {
+		return new UncalcedRecord(this);
+	}
+
+	@Override
+	public HSSFRecordTypes getGenericRecordType() {
+		return HSSFRecordTypes.UNCALCED;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties("reserved", () -> _reserved);
 	}
 }

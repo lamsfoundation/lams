@@ -18,51 +18,36 @@
 package org.apache.poi.hssf.record.aggregates;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
+import org.apache.poi.common.Duplicatable;
 import org.apache.poi.hssf.model.RecordStream;
 import org.apache.poi.hssf.record.ColumnInfoRecord;
 
-/**
- * @author Glen Stampoultzis
- */
-public final class ColumnInfoRecordsAggregate extends RecordAggregate implements Cloneable {
+public final class ColumnInfoRecordsAggregate extends RecordAggregate implements Duplicatable {
 	/**
 	 * List of {@link ColumnInfoRecord}s assumed to be in order
 	 */
-	private final List<ColumnInfoRecord> records;
-
-
-	private static final class CIRComparator implements Comparator<ColumnInfoRecord> {
-		public static final Comparator<ColumnInfoRecord> instance = new CIRComparator();
-		private CIRComparator() {
-			// enforce singleton
-		}
-		public int compare(ColumnInfoRecord a, ColumnInfoRecord b) {
-			return compareColInfos(a, b);
-		}
-		public static int compareColInfos(ColumnInfoRecord a, ColumnInfoRecord b) {
-			return a.getFirstColumn()-b.getFirstColumn();
-		}
-	}
+	private final List<ColumnInfoRecord> records = new ArrayList<>();
 
 	/**
 	 * Creates an empty aggregate
 	 */
-	public ColumnInfoRecordsAggregate() {
-		records = new ArrayList<ColumnInfoRecord>();
+	public ColumnInfoRecordsAggregate() {}
+
+	public ColumnInfoRecordsAggregate(ColumnInfoRecordsAggregate other) {
+		other.records.stream().map(ColumnInfoRecord::copy).forEach(records::add);
 	}
+
 	public ColumnInfoRecordsAggregate(RecordStream rs) {
 		this();
 
 		boolean isInOrder = true;
 		ColumnInfoRecord cirPrev = null;
-		while(rs.peekNextClass() == ColumnInfoRecord.class) {
+		while (rs.peekNextClass() == ColumnInfoRecord.class) {
 			ColumnInfoRecord cir = (ColumnInfoRecord) rs.getNext();
 			records.add(cir);
-			if (cirPrev != null && CIRComparator.compareColInfos(cirPrev, cir) > 0) {
+			if (cirPrev != null && compareColInfos(cirPrev, cir) > 0) {
 				isInOrder = false;
 			}
 			cirPrev = cir;
@@ -71,17 +56,13 @@ public final class ColumnInfoRecordsAggregate extends RecordAggregate implements
 			throw new RuntimeException("No column info records found");
 		}
 		if (!isInOrder) {
-			Collections.sort(records, CIRComparator.instance);
+			records.sort(ColumnInfoRecordsAggregate::compareColInfos);
 		}
 	}
 
 	@Override
-	public ColumnInfoRecordsAggregate clone() {
-		ColumnInfoRecordsAggregate rec = new ColumnInfoRecordsAggregate();
-		for (ColumnInfoRecord ci : records) {
-			rec.records.add(ci.clone());
-		}
-		return rec;
+	public ColumnInfoRecordsAggregate copy() {
+		return new ColumnInfoRecordsAggregate(this);
 	}
 
 	/**
@@ -89,7 +70,7 @@ public final class ColumnInfoRecordsAggregate extends RecordAggregate implements
 	 */
 	public void insertColumn(ColumnInfoRecord col) {
 		records.add(col);
-		Collections.sort(records, CIRComparator.instance);
+		records.sort(ColumnInfoRecordsAggregate::compareColInfos);
 	}
 
 	/**
@@ -110,10 +91,9 @@ public final class ColumnInfoRecordsAggregate extends RecordAggregate implements
 			return;
 		}
 		ColumnInfoRecord cirPrev = null;
-		for(int i=0; i<nItems; i++) {
-			ColumnInfoRecord cir = records.get(i);
+		for (ColumnInfoRecord cir : records) {
 			rv.visitRecord(cir);
-			if (cirPrev != null && CIRComparator.compareColInfos(cirPrev, cir) > 0) {
+			if (cirPrev != null && compareColInfos(cirPrev, cir) > 0) {
 				// Excel probably wouldn't mind, but there is much logic in this class
 				// that assumes the column info records are kept in order
 				throw new RuntimeException("Column info records are out of order");
@@ -292,15 +272,14 @@ public final class ColumnInfoRecordsAggregate extends RecordAggregate implements
 	}
 
 	private static ColumnInfoRecord copyColInfo(ColumnInfoRecord ci) {
-		return ci.clone();
+		return ci.copy();
 	}
 
 
 	public void setColumn(int targetColumnIx, Short xfIndex, Integer width,
 					Integer level, Boolean hidden, Boolean collapsed) {
 		ColumnInfoRecord ci = null;
-		int k  = 0;
-
+		int k;
 		for (k = 0; k < records.size(); k++) {
 			ColumnInfoRecord tci = records.get(k);
 			if (tci.containsColumn(targetColumnIx)) {
@@ -363,12 +342,11 @@ public final class ColumnInfoRecordsAggregate extends RecordAggregate implements
 			attemptMergeColInfoRecords(k);
 		} else {
 			//split to 3 records
-			ColumnInfoRecord ciStart = ci;
-			ColumnInfoRecord ciMid = copyColInfo(ci);
+            ColumnInfoRecord ciMid = copyColInfo(ci);
 			ColumnInfoRecord ciEnd = copyColInfo(ci);
 			int lastcolumn = ci.getLastColumn();
 
-			ciStart.setLastColumn(targetColumnIx - 1);
+			ci.setLastColumn(targetColumnIx - 1);
 
 			ciMid.setFirstColumn(targetColumnIx);
 			ciMid.setLastColumn(targetColumnIx);
@@ -493,6 +471,7 @@ public final class ColumnInfoRecordsAggregate extends RecordAggregate implements
 			setColumn(i, null, null, Integer.valueOf(level), null, null);
 		}
 	}
+
 	/**
 	 * Finds the <tt>ColumnInfoRecord</tt> which contains the specified columnIndex
 	 * @param columnIndex index of the column (not the index of the ColumnInfoRecord)
@@ -508,6 +487,7 @@ public final class ColumnInfoRecordsAggregate extends RecordAggregate implements
 		}
 		return null;
 	}
+
 	public int getMaxOutlineLevel() {
 		int result = 0;
 		int count=records.size();
@@ -517,6 +497,7 @@ public final class ColumnInfoRecordsAggregate extends RecordAggregate implements
 		}
 		return result;
 	}
+
 	public int getOutlineLevel(int columnIndex) {
 	    ColumnInfoRecord ci = findColumnInfo(columnIndex);
 	    if (ci != null) {
@@ -524,5 +505,39 @@ public final class ColumnInfoRecordsAggregate extends RecordAggregate implements
 	    } else {
 	        return 0;
 	    }
+	}
+
+	public int getMinColumnIndex() {
+		if(records.isEmpty()) {
+			return 0;
+		}
+
+		int minIndex = Integer.MAX_VALUE;
+		int nInfos = records.size();
+		for(int i=0; i< nInfos; i++) {
+			ColumnInfoRecord ci = getColInfo(i);
+			minIndex = Math.min(minIndex, ci.getFirstColumn());
+		}
+
+		return minIndex;
+	}
+
+	public int getMaxColumnIndex() {
+		if(records.isEmpty()) {
+			return 0;
+		}
+
+		int maxIndex = 0;
+		int nInfos = records.size();
+		for(int i=0; i< nInfos; i++) {
+			ColumnInfoRecord ci = getColInfo(i);
+			maxIndex = Math.max(maxIndex, ci.getLastColumn());
+		}
+
+		return maxIndex;
+	}
+
+	private static int compareColInfos(ColumnInfoRecord a, ColumnInfoRecord b) {
+		return a.getFirstColumn()-b.getFirstColumn();
 	}
 }

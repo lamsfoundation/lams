@@ -14,8 +14,11 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-        
+
 package org.apache.poi.hssf.record;
+
+import java.util.Map;
+import java.util.function.Supplier;
 
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
@@ -23,24 +26,25 @@ import org.apache.poi.util.RecordFormatException;
 
 /**
  * ftEnd (0x0000)<p>
- * 
+ *
  * The end data record is used to denote the end of the subrecords.
  */
-public final class EndSubRecord extends SubRecord implements Cloneable {
+public final class EndSubRecord extends SubRecord {
     // Note - zero sid is somewhat unusual (compared to plain Records)
-    public final static short sid = 0x0000;
+    public static final short sid = 0x0000;
     private static final int ENCODED_SIZE = 0;
 
-    public EndSubRecord()
-    {
-
-    }
+    public EndSubRecord() {}
 
     /**
      * @param in unused (since this record has no data)
      * @param size must be 0
      */
     public EndSubRecord(LittleEndianInput in, int size) {
+        this(in, size, -1);
+    }
+
+    EndSubRecord(LittleEndianInput in, int size, int cmoOt) {
         if ((size & 0xFF) != ENCODED_SIZE) { // mask out random crap in upper byte
             throw new RecordFormatException("Unexpected size (" + size + ")");
         }
@@ -49,16 +53,6 @@ public final class EndSubRecord extends SubRecord implements Cloneable {
     @Override
     public boolean isTerminating(){
         return true;
-    }
-
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[ftEnd]\n");
-
-        buffer.append("[/ftEnd]\n");
-        return buffer.toString();
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -76,9 +70,17 @@ public final class EndSubRecord extends SubRecord implements Cloneable {
     }
 
     @Override
-    public EndSubRecord clone() {
-        EndSubRecord rec = new EndSubRecord();
-    
-        return rec;
+    public EndSubRecord copy() {
+        return new EndSubRecord();
+    }
+
+    @Override
+    public SubRecordTypes getGenericRecordType() {
+        return SubRecordTypes.END;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return null;
     }
 }

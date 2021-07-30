@@ -20,27 +20,32 @@ package org.apache.poi.ss.util;
 import static org.apache.poi.util.StringUtil.endsWithIgnoreCase;
 
 import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.poi.common.usermodel.GenericRecord;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.formula.SheetNameFormatter;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.util.GenericRecordUtil;
 
 /**
  * <p>Common conversion functions between Excel style A1, C27 style
  *  cell references, and POI usermodel style row=0, column=0
  *  style references. Handles sheet-based and sheet-free references
  *  as well, eg "Sheet1!A1" and "$B$72"</p>
- *  
+ *
  *  <p>Use <tt>CellReference</tt> when the concept of
  * relative/absolute does apply (such as a cell reference in a formula).
  * Use {@link CellAddress} when you want to refer to the location of a cell in a sheet
- * when the concept of relative/absolute does not apply (such as the anchor location 
+ * when the concept of relative/absolute does not apply (such as the anchor location
  * of a cell comment).
  * <tt>CellReference</tt>s have a concept of "sheet", while <tt>CellAddress</tt>es do not.</p>
  */
-public class CellReference {
+public class CellReference implements GenericRecord {
     /**
      * Used to classify identifiers found in formulas as cell references or not.
      */
@@ -132,7 +137,7 @@ public class CellReference {
         if (rowRef.length() == 0) {
             _rowIndex = -1;
         } else {
-            // throws NumberFormatException if rowRef is not convertable to an int
+            // throws NumberFormatException if rowRef is not convertible to an int
             _rowIndex = Integer.parseInt(rowRef)-1; // -1 to convert 1-based to zero-based
         }
     }
@@ -145,7 +150,7 @@ public class CellReference {
     }
 
     public CellReference(Cell cell) {
-        this(cell.getRowIndex(), cell.getColumnIndex(), false, false);
+        this(cell.getSheet().getSheetName(), cell.getRowIndex(), cell.getColumnIndex(), false, false);
     }
 
     public CellReference(int pRow, int pCol, boolean pAbsRow, boolean pAbsCol) {
@@ -336,10 +341,10 @@ public class CellReference {
             if(colStr.toUpperCase(Locale.ROOT).compareTo(lastCol) > 0) {
                 return false;
             }
-        } else {
+        } /*else {
             // apparent column name has less chars than max
             // no need to check range
-        }
+        }*/
         return true;
     }
 
@@ -350,8 +355,11 @@ public class CellReference {
      * @throws NumberFormatException if rowStr is not parseable as an integer
      */
     public static boolean isRowWithinRange(String rowStr, SpreadsheetVersion ssVersion) {
-        final int rowNum = Integer.parseInt(rowStr) - 1;
-        return isRowWithinRange(rowNum, ssVersion);
+        final long rowNum = Long.parseLong(rowStr) - 1;
+        if(rowNum > Integer.MAX_VALUE) {
+            return false;
+        }
+        return isRowWithinRange(Math.toIntExact(rowNum), ssVersion);
     }
 
     /**
@@ -367,7 +375,7 @@ public class CellReference {
     private static final class CellRefParts {
         final String sheetName;
         final String rowRef;
-        final String colRef; 
+        final String colRef;
 
         private CellRefParts(String sheetName, String rowRef, String colRef) {
             this.sheetName = sheetName;
@@ -378,7 +386,7 @@ public class CellReference {
 
     /**
      * Separates the sheet name, row, and columns from a cell reference string.
-     * 
+     *
      * @param reference is a string that identifies a cell within the sheet or workbook
      * reference may not refer to a cell in an external workbook
      * reference may be absolute or relative.
@@ -397,8 +405,7 @@ public class CellReference {
         String col = matcher.group(1);
         String row = matcher.group(2);
 
-        CellRefParts cellRefParts = new CellRefParts(sheetName, row, col);
-        return cellRefParts;
+        return new CellRefParts(sheetName, row, col);
     }
 
     private static String parseSheetName(String reference, int indexOfSheetNameDelimiter) {
@@ -427,7 +434,7 @@ public class CellReference {
         //   AreaReference.separateAreaRefs()
         //   SheetNameFormatter.format() (inverse)
 
-        StringBuffer sb = new StringBuffer(indexOfSheetNameDelimiter);
+        StringBuilder sb = new StringBuilder(indexOfSheetNameDelimiter);
 
         for(int i=1; i<lastQuotePos; i++) { // Note boundaries - skip outer quotes
             char ch = reference.charAt(i);
@@ -485,8 +492,28 @@ public class CellReference {
      * @return the text representation of this cell reference as it would appear in a formula.
      */
     public String formatAsString() {
-        StringBuffer sb = new StringBuffer(32);
-        if(_sheetName != null) {
+        return formatAsString(true);
+    }
+
+    /**
+     * Returns a text representation of this cell reference and allows to control
+     * if the sheetname is included in the reference.
+     *
+     * <p>
+     *  Example return values:
+     *	<table border="0" cellpadding="1" cellspacing="0" summary="Example return values">
+     *	  <tr><th align='left'>Result</th><th align='left'>Comment</th></tr>
+     *	  <tr><td>A1</td><td>Cell reference without sheet</td></tr>
+     *	  <tr><td>Sheet1!A1</td><td>Standard sheet name</td></tr>
+     *	  <tr><td>'O''Brien''s Sales'!A1'&nbsp;</td><td>Sheet name with special characters</td></tr>
+     *	</table>
+     * @param   includeSheetName If true and there is a sheet name set for this cell reference,
+     *                           the reference is prefixed with the sheet name and '!'
+     * @return the text representation of this cell reference as it would appear in a formula.
+     */
+    public String formatAsString(boolean includeSheetName) {
+        StringBuilder sb = new StringBuilder(32);
+        if(includeSheetName && _sheetName != null) {
             SheetNameFormatter.appendFormat(sb, _sheetName);
             sb.append(SHEET_NAME_DELIMITER);
         }
@@ -496,11 +523,7 @@ public class CellReference {
 
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer(64);
-        sb.append(getClass().getName()).append(" [");
-        sb.append(formatAsString());
-        sb.append("]");
-        return sb.toString();
+        return getClass().getName() + " [" + formatAsString() + "]";
     }
 
     /**
@@ -524,7 +547,7 @@ public class CellReference {
      * Appends cell reference with '$' markers for absolute values as required.
      * Sheet name is not included.
      */
-    /* package */ void appendCellReference(StringBuffer sb) {
+    /* package */ void appendCellReference(StringBuilder sb) {
         if (_colIndex != -1) {
             if(_isColAbs) {
                 sb.append(ABSOLUTE_REFERENCE_MARKER);
@@ -566,12 +589,18 @@ public class CellReference {
 
     @Override
     public int hashCode() {
-        int result = 17;
-        result = 31 * result + _rowIndex;
-        result = 31 * result + _colIndex;
-        result = 31 * result + (_isRowAbs ? 1 : 0);
-        result = 31 * result + (_isColAbs ? 1 : 0);
-        result = 31 * result + (_sheetName == null ? 0 : _sheetName.hashCode());
-        return result;
+        return Objects.hash(_rowIndex,_colIndex,_isRowAbs,_isColAbs,_sheetName);
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "sheetName", this::getSheetName,
+            "rowIndex", this::getRow,
+            "colIndex", this::getCol,
+            "rowAbs", this::isRowAbsolute,
+            "colAbs", this::isColAbsolute,
+            "formatAsString", this::formatAsString
+        );
     }
 }

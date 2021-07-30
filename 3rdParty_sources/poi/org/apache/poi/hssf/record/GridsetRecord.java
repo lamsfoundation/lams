@@ -15,35 +15,31 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-        
-
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        Gridset Record.<P>
- * Description:  flag denoting whether the user specified that gridlines are used when
- *               printing.<P>
- * REFERENCE:  PG 320 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)<P>
- *
- * @author Andrew C. Oliver (acoliver at apache dot org)
- * @author  Glen Stampoultzis (glens at apache.org)
- * @author Jason Height (jheight at chariot dot net dot au)
+ * Flag denoting whether the user specified that gridlines are used when printing.
  *
  * @version 2.0-pre
  */
+public final class GridsetRecord extends StandardRecord {
+    public static final short sid = 0x82;
+    private short field_1_gridset_flag;
 
-public final class GridsetRecord extends StandardRecord implements Cloneable {
-    public final static short sid = 0x82;
-    public short              field_1_gridset_flag;
+    public GridsetRecord() {}
 
-    public GridsetRecord()
-    {
+    public GridsetRecord(GridsetRecord other) {
+        super(other);
+        field_1_gridset_flag = other.field_1_gridset_flag;
     }
 
-    public GridsetRecord(RecordInputStream in)
-    {
+    public GridsetRecord(RecordInputStream in) {
         field_1_gridset_flag = in.readShort();
     }
 
@@ -52,15 +48,10 @@ public final class GridsetRecord extends StandardRecord implements Cloneable {
      *
      * @param gridset - <b>true</b> if no gridlines are print, <b>false</b> if gridlines are not print.
      */
-
-    public void setGridset(boolean gridset)
-    {
-        if (gridset == true)
-        {
+    public void setGridset(boolean gridset) {
+        if (gridset) {
             field_1_gridset_flag = 1;
-        }
-        else
-        {
+        } else {
             field_1_gridset_flag = 0;
         }
     }
@@ -70,21 +61,9 @@ public final class GridsetRecord extends StandardRecord implements Cloneable {
      *
      * @return gridset - true if gridlines are NOT printed, false if they are.
      */
-
     public boolean getGridset()
     {
         return (field_1_gridset_flag == 1);
-    }
-
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[GRIDSET]\n");
-        buffer.append("    .gridset        = ").append(getGridset())
-            .append("\n");
-        buffer.append("[/GRIDSET]\n");
-        return buffer.toString();
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -101,9 +80,17 @@ public final class GridsetRecord extends StandardRecord implements Cloneable {
     }
 
     @Override
-    public GridsetRecord clone() {
-      GridsetRecord rec = new GridsetRecord();
-      rec.field_1_gridset_flag = field_1_gridset_flag;
-      return rec;
+    public GridsetRecord copy() {
+        return new GridsetRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.GRIDSET;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties("gridset", this::getGridset);
     }
 }

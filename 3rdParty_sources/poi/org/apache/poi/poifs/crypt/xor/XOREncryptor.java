@@ -21,28 +21,32 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
-import java.util.BitSet;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.zaxxer.sparsebits.SparseBitSet;
+import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.poifs.crypt.ChunkedCipherOutputStream;
 import org.apache.poi.poifs.crypt.CryptoFunctions;
 import org.apache.poi.poifs.crypt.Encryptor;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.util.LittleEndian;
 
-public class XOREncryptor extends Encryptor implements Cloneable {
-    protected XOREncryptor() {
+public class XOREncryptor extends Encryptor {
+    protected XOREncryptor() {}
+
+    protected XOREncryptor(XOREncryptor other) {
+        super(other);
     }
 
     @Override
     public void confirmPassword(String password) {
         int keyComp      = CryptoFunctions.createXorKey1(password);
         int verifierComp = CryptoFunctions.createXorVerifier1(password);
-        byte xorArray[]  = CryptoFunctions.createXorArray1(password);
-        
-        byte shortBuf[] = new byte[2];
+        byte[] xorArray = CryptoFunctions.createXorArray1(password);
+
+        byte[] shortBuf = new byte[2];
         XOREncryptionVerifier ver = (XOREncryptionVerifier)getEncryptionInfo().getVerifier();
         LittleEndian.putUShort(shortBuf, 0, keyComp);
         ver.setEncryptedKey(shortBuf);
@@ -52,9 +56,9 @@ public class XOREncryptor extends Encryptor implements Cloneable {
     }
 
     @Override
-    public void confirmPassword(String password, byte keySpec[],
-            byte keySalt[], byte verifier[], byte verifierSalt[],
-            byte integritySalt[]) {
+    public void confirmPassword(String password, byte[] keySpec,
+                                byte[] keySalt, byte[] verifier, byte[] verifierSalt,
+                                byte[] integritySalt) {
         confirmPassword(password);
     }
 
@@ -79,17 +83,14 @@ public class XOREncryptor extends Encryptor implements Cloneable {
         // chunkSize is irrelevant
     }
 
-    protected void createEncryptionInfoEntry(DirectoryNode dir) throws IOException {
-    }
-
     @Override
-    public XOREncryptor clone() throws CloneNotSupportedException {
-        return (XOREncryptor)super.clone();
+    public XOREncryptor copy() {
+        return new XOREncryptor(this);
     }
 
     private class XORCipherOutputStream extends ChunkedCipherOutputStream {
-        private int recordStart = 0;
-        private int recordEnd = 0;
+        private int recordStart;
+        private int recordEnd;
 
         public XORCipherOutputStream(OutputStream stream, int initialPos) throws IOException, GeneralSecurityException {
             super(stream, -1);
@@ -110,9 +111,8 @@ public class XOREncryptor extends Encryptor implements Cloneable {
         }
 
         @Override
-        protected void createEncryptionInfoEntry(DirectoryNode dir, File tmpFile)
-        throws IOException, GeneralSecurityException {
-            XOREncryptor.this.createEncryptionInfoEntry(dir);
+        protected void createEncryptionInfoEntry(DirectoryNode dir, File tmpFile) {
+            throw new EncryptedDocumentException("createEncryptionInfoEntry not supported");
         }
 
         @Override
@@ -139,10 +139,10 @@ public class XOREncryptor extends Encryptor implements Cloneable {
 
             final int start = Math.max(posInChunk-(recordEnd-recordStart), 0);
 
-            final BitSet plainBytes = getPlainByteFlags();
-            final byte xorArray[] = getEncryptionInfo().getEncryptor().getSecretKey().getEncoded();
-            final byte chunk[] = getChunk();
-            final byte plain[] = (plainBytes.isEmpty()) ? null : chunk.clone();
+            final SparseBitSet plainBytes = getPlainByteFlags();
+            final byte[] xorArray = getEncryptionInfo().getEncryptor().getSecretKey().getEncoded();
+            final byte[] chunk = getChunk();
+            final byte[] plain = (plainBytes.isEmpty()) ? null : chunk.clone();
 
             /*
              * From: http://social.msdn.microsoft.com/Forums/en-US/3dadbed3-0e68-4f11-8b43-3a2328d9ebd5
@@ -164,8 +164,12 @@ public class XOREncryptor extends Encryptor implements Cloneable {
                 chunk[i] = value;
             }
 
-            for (int i = plainBytes.nextSetBit(start); i >= 0 && i < posInChunk; i = plainBytes.nextSetBit(i+1)) {
-                chunk[i] = plain[i];
+            if (plain != null) {
+                int i = plainBytes.nextSetBit(start);
+                while (i >= 0 && i < posInChunk) {
+                    chunk[i] = plain[i];
+                    i = plainBytes.nextSetBit(i + 1);
+                }
             }
 
             return posInChunk;

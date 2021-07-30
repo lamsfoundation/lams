@@ -17,60 +17,32 @@
 
 package org.apache.poi.hpsf;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Supplier;
 
-import org.apache.poi.util.HexDump;
+import org.apache.poi.common.Duplicatable;
+import org.apache.poi.common.usermodel.GenericRecord;
+import org.apache.poi.util.GenericRecordUtil;
+import org.apache.poi.util.LittleEndianInput;
+import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * Represents a class ID (16 bytes). Unlike other little-endian
  * type the {@link ClassID} is not just 16 bytes stored in the wrong
  * order. Instead, it is a double word (4 bytes) followed by two
  * words (2 bytes each) followed by 8 bytes.<p>
- *  
- * The ClassID (or CLSID) is a UUID - see RFC 4122 
+ *
+ * The ClassID (or CLSID) is a UUID - see RFC 4122
  */
-public class ClassID {
-    public static final ClassID OLE10_PACKAGE  = new ClassID("{0003000C-0000-0000-C000-000000000046}");
-    public static final ClassID PPT_SHOW       = new ClassID("{64818D10-4F9B-11CF-86EA-00AA00B929E8}");
-    public static final ClassID XLS_WORKBOOK   = new ClassID("{00020841-0000-0000-C000-000000000046}");
-    public static final ClassID TXT_ONLY       = new ClassID("{5e941d80-bf96-11cd-b579-08002b30bfeb}");
+public class ClassID implements Duplicatable, GenericRecord {
 
-    // Excel V3
-    public static final ClassID EXCEL_V3       = new ClassID("{00030000-0000-0000-C000-000000000046}");
-    public static final ClassID EXCEL_V3_CHART = new ClassID("{00030001-0000-0000-C000-000000000046}");
-    public static final ClassID EXCEL_V3_MACRO = new ClassID("{00030002-0000-0000-C000-000000000046}");
-    // Excel V5
-    public static final ClassID EXCEL95        = new ClassID("{00020810-0000-0000-C000-000000000046}");
-    public static final ClassID EXCEL95_CHART  = new ClassID("{00020811-0000-0000-C000-000000000046}");
-    // Excel V8
-    public static final ClassID EXCEL97        = new ClassID("{00020820-0000-0000-C000-000000000046}");
-    public static final ClassID EXCEL97_CHART  = new ClassID("{00020821-0000-0000-C000-000000000046}");
-    // Excel V11
-    public static final ClassID EXCEL2003      = new ClassID("{00020812-0000-0000-C000-000000000046}");
-    // Excel V12
-    public static final ClassID EXCEL2007      = new ClassID("{00020830-0000-0000-C000-000000000046}");
-    public static final ClassID EXCEL2007_MACRO= new ClassID("{00020832-0000-0000-C000-000000000046}");
-    public static final ClassID EXCEL2007_XLSB = new ClassID("{00020833-0000-0000-C000-000000000046}");
-    // Excel V14
-    public static final ClassID EXCEL2010      = new ClassID("{00024500-0000-0000-C000-000000000046}");
-    public static final ClassID EXCEL2010_CHART= new ClassID("{00024505-0014-0000-C000-000000000046}");
-    public static final ClassID EXCEL2010_ODS  = new ClassID("{EABCECDB-CC1C-4A6F-B4E3-7F888A5ADFC8}");
-    
-    public static final ClassID WORD97         = new ClassID("{00020906-0000-0000-C000-000000000046}");
-    public static final ClassID WORD95         = new ClassID("{00020900-0000-0000-C000-000000000046}");
-    public static final ClassID WORD2007       = new ClassID("{F4754C9B-64F5-4B40-8AF4-679732AC0607}");
-    public static final ClassID WORD2007_MACRO = new ClassID("{18A06B6B-2F3F-4E2B-A611-52BE631B2D22}");
-    
-    public static final ClassID POWERPOINT97   = new ClassID("{64818D10-4F9B-11CF-86EA-00AA00B929E8}");
-    public static final ClassID POWERPOINT95   = new ClassID("{EA7BAE70-FB3B-11CD-A903-00AA00510EA3}");
-    public static final ClassID POWERPOINT2007 = new ClassID("{CF4F55F4-8F87-4D47-80BB-5808164BB3F8}");
-    public static final ClassID POWERPOINT2007_MACRO = new ClassID("{DC020317-E6E2-4A62-B9FA-B3EFE16626F4}");
-    
-    public static final ClassID EQUATION30     = new ClassID("{0002CE02-0000-0000-C000-000000000046}");
-	
     /** The number of bytes occupied by this object in the byte stream. */
     public static final int LENGTH = 16;
-	
+
     /**
      * The bytes making out the class ID in correct order, i.e. big-endian.
      */
@@ -94,11 +66,18 @@ public class ClassID {
         Arrays.fill(bytes, (byte)0);
     }
 
+    /**
+     * Clones the given ClassID
+     */
+    public ClassID(ClassID other) {
+        System.arraycopy(other.bytes, 0, bytes, 0, bytes.length);
+    }
+
 
     /**
-     * Creates a {@link ClassID} from a human-readable representation of the Class ID in standard 
+     * Creates a {@link ClassID} from a human-readable representation of the Class ID in standard
      * format {@code "{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}"}.
-     * 
+     *
      * @param externalForm representation of the Class ID represented by this object.
      */
     public ClassID(String externalForm) {
@@ -107,7 +86,16 @@ public class ClassID {
         	bytes[i/2] = (byte)Integer.parseInt(clsStr.substring(i, i+2), 16);
         }
     }
-    
+
+    /**
+     * Reads the ClassID from the input
+     * @param lei the input (stream)
+     */
+    public ClassID(LittleEndianInput lei) {
+        byte[] buf = bytes.clone();
+        lei.readFully(buf);
+        read(buf, 0);
+    }
 
     /**
      * @return The number of bytes occupied by this object in the byte stream.
@@ -148,6 +136,7 @@ public class ClassID {
      * @param offset The offset within the {@code src} byte array
      * @return A byte array containing the class ID.
      */
+    @SuppressWarnings("PointlessArithmeticExpression")
     public byte[] read(final byte[] src, final int offset) {
         /* Read double word. */
         bytes[0] = src[3 + offset];
@@ -179,6 +168,7 @@ public class ClassID {
      * @exception ArrayStoreException if there is not enough room for the class
      * ID 16 bytes in the byte array after the {@code offset} position.
      */
+    @SuppressWarnings("PointlessArithmeticExpression")
     public void write(final byte[] dst, final int offset)
     throws ArrayStoreException {
         /* Check array size: */
@@ -187,7 +177,7 @@ public class ClassID {
                 ("Destination byte[] must have room for at least 16 bytes, " +
                  "but has a length of only " + dst.length + ".");
         }
-        
+
         /* Write double word. */
         dst[0 + offset] = bytes[3];
         dst[1 + offset] = bytes[2];
@@ -206,7 +196,16 @@ public class ClassID {
         System.arraycopy(bytes, 8, dst, 8 + offset, 8);
     }
 
-
+    /**
+     * Write the class ID to a LittleEndianOutput (stream)
+     *
+     * @param leo the output
+     */
+    public void write(LittleEndianOutput leo) {
+        byte[] buf = bytes.clone();
+        write(buf, 0);
+        leo.write(buf);
+    }
 
     /**
      * Checks whether this {@code ClassID} is equal to another object.
@@ -258,22 +257,46 @@ public class ClassID {
     }
 
     /**
-     * Returns a human-readable representation of the Class ID in standard 
+     * Returns a human-readable representation of the Class ID in standard
      * format {@code "{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}"}.
-     * 
+     *
      * @return String representation of the Class ID represented by this object.
      */
     @Override
     public String toString() {
-        StringBuilder sbClassId = new StringBuilder(38);
-        sbClassId.append('{');
-        for (int i = 0; i < LENGTH; i++) {
-            sbClassId.append(HexDump.toHex(bytes[i]));
-            if (i == 3 || i == 5 || i == 7 || i == 9) {
-                sbClassId.append('-');
-            }
-        }
-        sbClassId.append('}');
-        return sbClassId.toString();
+        return "{" + toUUIDString() + "}";
+    }
+
+    /**
+     * Returns a human-readable representation of the Class ID in UUID
+     * format {@code "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"}.
+     *
+     * @return UUID String representation of the Class ID represented by this object.
+     */
+    public String toUUIDString() {
+        return toUUID().toString().toUpperCase(Locale.ROOT);
+    }
+
+    /**
+     * Converts the ClassID to an UUID
+     * @return the ClassID as UUID
+     *
+     * @since POI 5.0.0
+     */
+    public UUID toUUID() {
+        final long mostSigBits = ByteBuffer.wrap(bytes, 0, 8).getLong();
+        final long leastSigBits = ByteBuffer.wrap(bytes, 8, 8).getLong();
+        return new UUID(mostSigBits, leastSigBits);
+    }
+
+
+    @Override
+    public ClassID copy() {
+        return new ClassID(this);
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties("uuid", this::toString);
     }
 }

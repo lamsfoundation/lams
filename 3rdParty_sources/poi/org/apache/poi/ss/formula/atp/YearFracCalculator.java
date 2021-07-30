@@ -22,14 +22,16 @@ import java.util.Calendar;
 import org.apache.poi.ss.formula.eval.ErrorEval;
 import org.apache.poi.ss.formula.eval.EvaluationException;
 import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.util.Internal;
 import org.apache.poi.util.LocaleUtil;
 
 
 /**
  * Internal calculation methods for Excel 'Analysis ToolPak' function YEARFRAC()<br>
- *  
+ *
  * Algorithm inspired by www.dwheeler.com/yearfrac
  */
+@Internal
 final class YearFracCalculator {
 	private static final int MS_PER_HOUR = 60 * 60 * 1000;
 	private static final int MS_PER_DAY = 24 * MS_PER_HOUR;
@@ -61,7 +63,7 @@ final class YearFracCalculator {
 		int startDateVal = (int) Math.floor(pStartDateVal);
 		int endDateVal = (int) Math.floor(pEndDateVal);
 		if (startDateVal == endDateVal) {
-			// when dates are equal, result is zero 
+			// when dates are equal, result is zero
 			return 0;
 		}
 		// swap start and end if out of order
@@ -86,13 +88,13 @@ final class YearFracCalculator {
 	 * @param startDateVal assumed to be less than or equal to endDateVal
 	 * @param endDateVal assumed to be greater than or equal to startDateVal
 	 */
-	public static double basis0(int startDateVal, int endDateVal) {
+	private static double basis0(int startDateVal, int endDateVal) {
 		SimpleDate startDate = createDate(startDateVal);
 		SimpleDate endDate = createDate(endDateVal);
 		int date1day = startDate.day;
 		int date2day = endDate.day;
 
-		// basis zero has funny adjustments to the day-of-month fields when at end-of-month 
+		// basis zero has funny adjustments to the day-of-month fields when at end-of-month
 		if (date1day == LONG_MONTH_LEN && date2day == LONG_MONTH_LEN) {
 			date1day = SHORT_MONTH_LEN;
 			date2day = SHORT_MONTH_LEN;
@@ -116,12 +118,14 @@ final class YearFracCalculator {
 	 * @param startDateVal assumed to be less than or equal to endDateVal
 	 * @param endDateVal assumed to be greater than or equal to startDateVal
 	 */
-	public static double basis1(int startDateVal, int endDateVal) {
+	private static double basis1(int startDateVal, int endDateVal) {
+		assert(startDateVal <= endDateVal);
 		SimpleDate startDate = createDate(startDateVal);
 		SimpleDate endDate = createDate(endDateVal);
 		double yearLength;
 		if (isGreaterThanOneYear(startDate, endDate)) {
 			yearLength = averageYearLength(startDate.year, endDate.year);
+			assert(yearLength > 0);
 		} else if (shouldCountFeb29(startDate, endDate)) {
 			yearLength = DAYS_PER_LEAP_YEAR;
 		} else {
@@ -134,28 +138,28 @@ final class YearFracCalculator {
 	 * @param startDateVal assumed to be less than or equal to endDateVal
 	 * @param endDateVal assumed to be greater than or equal to startDateVal
 	 */
-	public static double basis2(int startDateVal, int endDateVal) {
+	private static double basis2(int startDateVal, int endDateVal) {
 		return (endDateVal - startDateVal) / 360.0;
 	}
 	/**
 	 * @param startDateVal assumed to be less than or equal to endDateVal
 	 * @param endDateVal assumed to be greater than or equal to startDateVal
 	 */
-	public static double basis3(double startDateVal, double endDateVal) {
+	private static double basis3(double startDateVal, double endDateVal) {
 		return (endDateVal - startDateVal) / 365.0;
 	}
 	/**
 	 * @param startDateVal assumed to be less than or equal to endDateVal
 	 * @param endDateVal assumed to be greater than or equal to startDateVal
 	 */
-	public static double basis4(int startDateVal, int endDateVal) {
+	private static double basis4(int startDateVal, int endDateVal) {
 		SimpleDate startDate = createDate(startDateVal);
 		SimpleDate endDate = createDate(endDateVal);
 		int date1day = startDate.day;
 		int date2day = endDate.day;
 
 
-		// basis four has funny adjustments to the day-of-month fields when at end-of-month 
+		// basis four has funny adjustments to the day-of-month fields when at end-of-month
 		if (date1day == LONG_MONTH_LEN) {
 			date1day = SHORT_MONTH_LEN;
 		}
@@ -169,10 +173,10 @@ final class YearFracCalculator {
 
 	private static double calculateAdjusted(SimpleDate startDate, SimpleDate endDate, int date1day,
 			int date2day) {
-		double dayCount 
-			= (endDate.year - startDate.year) * 360
-			+ (endDate.month - startDate.month) * SHORT_MONTH_LEN
-			+ (date2day - date1day) * 1;
+		double dayCount
+			= (endDate.year - startDate.year) * 360.0
+			+ (endDate.month - startDate.month) * (double)SHORT_MONTH_LEN
+			+ (date2day - date1day) * 1.0;
 		return dayCount / 360;
 	}
 
@@ -223,7 +227,7 @@ final class YearFracCalculator {
 			}
 			return false;
 		}
-		
+
 		if (isLeapYear(end.year)) {
 			switch (end.month) {
 				case SimpleDate.JANUARY:
@@ -245,14 +249,14 @@ final class YearFracCalculator {
 	private static int dateDiff(long startDateMS, long endDateMS) {
 		long msDiff = endDateMS - startDateMS;
 
-		// some extra checks to make sure we don't hide some other bug with the rounding 
+		// some extra checks to make sure we don't hide some other bug with the rounding
 		int remainderHours = (int) ((msDiff % MS_PER_DAY) / MS_PER_HOUR);
 		switch (remainderHours) {
 			case 0:  // normal case
 				break;
 			case 1:  // transition from normal time to daylight savings adjusted
 			case 23: // transition from daylight savings adjusted to normal time
-				// Unexpected since we are using UTC_TIME_ZONE 
+				// Unexpected since we are using UTC_TIME_ZONE
 			default:
 				throw new RuntimeException("Unexpected date diff between " + startDateMS + " and " + endDateMS);
 
@@ -261,14 +265,12 @@ final class YearFracCalculator {
 	}
 
 	private static double averageYearLength(int startYear, int endYear) {
+		assert(startYear <= endYear);
 		int dayCount = 0;
 		for (int i=startYear; i<=endYear; i++) {
-			dayCount += DAYS_PER_NORMAL_YEAR;
-			if (isLeapYear(i)) {
-				dayCount++;
-			}
+			dayCount += isLeapYear(i) ? DAYS_PER_LEAP_YEAR : DAYS_PER_NORMAL_YEAR;
 		}
-		double numberOfYears = endYear-startYear+1;
+		double numberOfYears = endYear-startYear+1.;
 		return dayCount / numberOfYears;
 	}
 
@@ -282,13 +284,11 @@ final class YearFracCalculator {
 			return true;
 		}
 		// all other centuries are *not* leap years
-		if (i % 100 == 0) {
-			return false;
-		}
-		return true;
+		return i % 100 != 0;
 	}
 
 	private static boolean isGreaterThanOneYear(SimpleDate start, SimpleDate end) {
+		assert(start.year <= end.year);
 		if (start.year == end.year) {
 			return false;
 		}
@@ -307,7 +307,7 @@ final class YearFracCalculator {
 	}
 
 	private static SimpleDate createDate(int dayCount) {
-	    /** use UTC time-zone to avoid daylight savings issues */
+	    /* use UTC time-zone to avoid daylight savings issues */
 		Calendar cal = LocaleUtil.getLocaleCalendar(LocaleUtil.TIMEZONE_UTC);
 		DateUtil.setCalendar(cal, dayCount, 0, false, false);
 		return new SimpleDate(cal);
@@ -324,7 +324,7 @@ final class YearFracCalculator {
 		/** day of month */
 		public final int day;
 		/** milliseconds since 1970 */
-		public long tsMilliseconds;
+		public final long tsMilliseconds;
 
 		public SimpleDate(Calendar cal) {
 			year = cal.get(Calendar.YEAR);

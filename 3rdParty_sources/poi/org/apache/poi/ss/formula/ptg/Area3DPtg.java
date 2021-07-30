@@ -17,22 +17,24 @@
 
 package org.apache.poi.ss.formula.ptg;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.formula.ExternSheetReferenceToken;
 import org.apache.poi.ss.formula.FormulaRenderingWorkbook;
 import org.apache.poi.ss.formula.WorkbookDependentFormula;
 import org.apache.poi.ss.util.AreaReference;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * <p>Title:        Area 3D Ptg - 3D reference (Sheet + Area)</p>
- * <p>Description:  Defined an area in Extern Sheet. </p>
- * <p>REFERENCE:  </p>
- * 
- * <p>This is HSSF only, as it matches the HSSF file format way of
- *  referring to the sheet by an extern index. The XSSF equivalent
- *  is {@link Area3DPxg}
+ * Area 3D Ptg - 3D reference (Sheet + Area)<p>
+ * Defined an area in Extern Sheet.<p>
+ *
+ * This is HSSF only, as it matches the HSSF file format way of referring to the sheet by an extern index.
+ * The XSSF equivalent is {@link Area3DPxg}
  */
 public final class Area3DPtg extends AreaPtgBase implements WorkbookDependentFormula, ExternSheetReferenceToken {
 	public final static byte sid = 0x3b;
@@ -44,6 +46,11 @@ public final class Area3DPtg extends AreaPtgBase implements WorkbookDependentFor
 	public Area3DPtg(String arearef, int externIdx) {
 		super(new AreaReference(arearef, SpreadsheetVersion.EXCEL97));
 		setExternSheetIndex(externIdx);
+	}
+
+	public Area3DPtg(Area3DPtg other)  {
+		super(other);
+		field_1_index_extern_sheet = other.field_1_index_extern_sheet;
 	}
 
 	public Area3DPtg(LittleEndianInput in)  {
@@ -64,22 +71,15 @@ public final class Area3DPtg extends AreaPtgBase implements WorkbookDependentFor
 	}
 
 	@Override
-	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append(getClass().getName());
-		sb.append(" [");
-		sb.append("sheetIx=").append(getExternSheetIndex());
-		sb.append(" ! ");
-		sb.append(formatReferenceAsString());
-		sb.append("]");
-		return sb.toString();
-	}
-
-	@Override
 	public void write(LittleEndianOutput out) {
 		out.writeByte(sid + getPtgClass());
 		out.writeShort(field_1_index_extern_sheet);
 		writeCoordinates(out);
+	}
+
+	@Override
+	public byte getSid() {
+		return sid;
 	}
 
 	@Override
@@ -104,8 +104,22 @@ public final class Area3DPtg extends AreaPtgBase implements WorkbookDependentFor
 	public String toFormulaString(FormulaRenderingWorkbook book) {
 		return ExternSheetNameResolver.prependSheetName(book, field_1_index_extern_sheet, formatReferenceAsString());
 	}
+
 	@Override
 	public String toFormulaString() {
 		throw new RuntimeException("3D references need a workbook to determine formula text");
+	}
+
+	@Override
+	public Area3DPtg copy() {
+		return new Area3DPtg(this);
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"base", super::getGenericProperties,
+			"externSheetIndex", this::getExternSheetIndex
+		);
 	}
 }

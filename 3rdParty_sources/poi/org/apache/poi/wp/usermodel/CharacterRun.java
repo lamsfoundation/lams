@@ -48,7 +48,9 @@ public interface CharacterRun {
     void setImprinted(boolean imprint);
 
     int getFontSize();
+    Double getFontSizeAsDouble();
     void setFontSize(int halfPoints);
+    void setFontSize(double halfPoints);
 
     int getCharacterSpacing();
     void setCharacterSpacing(int twips);

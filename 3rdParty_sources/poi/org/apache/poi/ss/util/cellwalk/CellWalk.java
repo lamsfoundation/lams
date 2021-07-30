@@ -5,9 +5,9 @@
    The ASF licenses this file to You under the Apache License, Version 2.0
    (the "License"); you may not use this file except in compliance with
    the License.  You may obtain a copy of the License at
-   
+
    http://www.apache.org/licenses/LICENSE-2.0
-   
+
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,6 +17,11 @@
 
 package org.apache.poi.ss.util.cellwalk;
 
+import static org.apache.commons.math3.util.ArithmeticUtils.addAndCheck;
+import static org.apache.commons.math3.util.ArithmeticUtils.mulAndCheck;
+import static org.apache.commons.math3.util.ArithmeticUtils.subAndCheck;
+
+import org.apache.commons.math3.util.ArithmeticUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -25,13 +30,11 @@ import org.apache.poi.ss.util.CellRangeAddress;
 
 /**
  * Traverse cell range.
- *
- * @author Roman Kashitsyn
  */
 public class CellWalk {
 
-    private Sheet sheet;
-    private CellRangeAddress range;
+    private final Sheet sheet;
+    private final CellRangeAddress range;
     private boolean traverseEmptyCells;
 
 
@@ -73,8 +76,8 @@ public class CellWalk {
         int lastColumn = range.getLastColumn();
         final int width = lastColumn - firstColumn + 1;
         SimpleCellWalkContext ctx = new SimpleCellWalkContext();
-        Row currentRow = null;
-        Cell currentCell = null;
+        Row currentRow;
+        Cell currentCell;
 
         for (ctx.rowNumber = firstRow; ctx.rowNumber <= lastRow; ++ctx.rowNumber) {
             currentRow = sheet.getRow(ctx.rowNumber);
@@ -91,9 +94,9 @@ public class CellWalk {
                     continue;
                 }
 
-                ctx.ordinalNumber =
-                        (ctx.rowNumber - firstRow) * width +
-                                (ctx.colNumber - firstColumn + 1);
+                long rowSize = mulAndCheck(subAndCheck(ctx.rowNumber, firstRow), (long)width);
+
+                ctx.ordinalNumber = addAndCheck(rowSize, (ctx.colNumber - firstColumn + 1));
 
                 handler.onCell(currentCell, ctx);
             }
@@ -101,27 +104,28 @@ public class CellWalk {
     }
 
     private boolean isEmpty(Cell cell) {
-        return (cell.getCellTypeEnum() == CellType.BLANK);
+        return (cell.getCellType() == CellType.BLANK);
     }
 
     /**
      * Inner class to hold walk context.
-     *
-     * @author Roman Kashitsyn
      */
     private static class SimpleCellWalkContext implements CellWalkContext {
-        public long ordinalNumber = 0;
-        public int rowNumber = 0;
-        public int colNumber = 0;
+        private long ordinalNumber;
+        private int rowNumber;
+        private int colNumber;
 
+        @Override
         public long getOrdinalNumber() {
             return ordinalNumber;
         }
 
+        @Override
         public int getRowNumber() {
             return rowNumber;
         }
 
+        @Override
         public int getColumnNumber() {
             return colNumber;
         }

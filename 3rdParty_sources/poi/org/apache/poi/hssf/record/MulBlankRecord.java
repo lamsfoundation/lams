@@ -17,18 +17,19 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        Multiple Blank cell record(0x00BE)<p>
- * Description:  Represents a  set of columns in a row with no value but with styling.<p>
+ * Represents a set of columns in a row with no value but with styling.
  *
- * REFERENCE:  PG 329 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)
- * 
  * @see BlankRecord
  */
 public final class MulBlankRecord extends StandardRecord {
-	public final static short sid = 0x00BE;
+	public static final short sid = 0x00BE;
 
 	private final int _row;
 	private final int _firstCol;
@@ -55,7 +56,7 @@ public final class MulBlankRecord extends StandardRecord {
 	public int getFirstColumn() {
 		return _firstCol;
 	}
-	
+
 	/**
 	 * @return ending column (last cell this holds in the row). Zero based
 	 */
@@ -99,21 +100,6 @@ public final class MulBlankRecord extends StandardRecord {
 		return retval;
 	}
 
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
-
-		buffer.append("[MULBLANK]\n");
-		buffer.append("row  = ").append(Integer.toHexString(getRow())).append("\n");
-		buffer.append("firstcol  = ").append(Integer.toHexString(getFirstColumn())).append("\n");
-		buffer.append(" lastcol  = ").append(Integer.toHexString(_lastCol)).append("\n");
-		for (int k = 0; k < getNumColumns(); k++) {
-			buffer.append("xf").append(k).append("		= ").append(
-					Integer.toHexString(getXFAt(k))).append("\n");
-		}
-		buffer.append("[/MULBLANK]\n");
-		return buffer.toString();
-	}
-
 	public short getSid() {
 		return sid;
 	}
@@ -121,9 +107,8 @@ public final class MulBlankRecord extends StandardRecord {
 	public void serialize(LittleEndianOutput out) {
 		out.writeShort(_row);
 		out.writeShort(_firstCol);
-		int nItems = _xfs.length;
-		for (int i = 0; i < nItems; i++) {
-			out.writeShort(_xfs[i]);
+		for (short xf : _xfs) {
+			out.writeShort(xf);
 		}
 		out.writeShort(_lastCol);
 	}
@@ -134,8 +119,23 @@ public final class MulBlankRecord extends StandardRecord {
 	}
 
 	@Override
-	public MulBlankRecord clone() {
+	public MulBlankRecord copy() {
 		// immutable - so OK to return this
 		return this;
+	}
+
+	@Override
+	public HSSFRecordTypes getGenericRecordType() {
+		return HSSFRecordTypes.MUL_BLANK;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"row", this::getRow,
+			"firstColumn", this::getFirstColumn,
+			"lastColumn", this::getLastColumn,
+			"xf", () -> _xfs
+		);
 	}
 }

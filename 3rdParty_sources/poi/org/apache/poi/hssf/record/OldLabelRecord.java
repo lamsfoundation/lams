@@ -17,21 +17,28 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.HexDump;
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
 import org.apache.poi.util.RecordFormatException;
 
 /**
- * Biff2 - Biff 4 Label Record (0x0004 / 0x0204) - read only support for 
+ * Biff2 - Biff 4 Label Record (0x0004 / 0x0204) - read only support for
  *  strings stored directly in the cell, from the older file formats that
  *  didn't use {@link LabelSSTRecord}
  */
 public final class OldLabelRecord extends OldCellRecord {
-    private final static POILogger logger = POILogFactory.getLogger(OldLabelRecord.class);
+    private static final POILogger logger = POILogFactory.getLogger(OldLabelRecord.class);
+    //arbitrarily set, may need to increase
+    private static final int MAX_RECORD_LENGTH = 100_000;
 
-    public final static short biff2_sid = 0x0004;
-    public final static short biff345_sid = 0x0204;
+    public static final short biff2_sid = 0x0004;
+    public static final short biff345_sid = 0x0204;
 
     private short          field_4_string_len;
     private final byte[]         field_5_bytes;
@@ -51,13 +58,13 @@ public final class OldLabelRecord extends OldCellRecord {
         }
 
         // Can only decode properly later when you know the codepage
-        field_5_bytes = new byte[field_4_string_len];
+        field_5_bytes = IOUtils.safelyAllocate(field_4_string_len, MAX_RECORD_LENGTH);
         in.read(field_5_bytes, 0, field_4_string_len);
 
         if (in.remaining() > 0) {
             logger.log(POILogger.INFO,
-                    "LabelRecord data remains: " + in.remaining() +
-                    " : " + HexDump.toHex(in.readRemainder())
+                    "LabelRecord data remains: ", in.remaining(),
+                    " : ", HexDump.toHex(in.readRemainder())
                     );
         }
     }
@@ -65,7 +72,7 @@ public final class OldLabelRecord extends OldCellRecord {
     public void setCodePage(CodepageRecord codepage) {
         this.codepage = codepage;
     }
-    
+
     /**
      * get the number of characters this string contains
      * @return number of characters
@@ -77,7 +84,7 @@ public final class OldLabelRecord extends OldCellRecord {
 
     /**
      * Get the String of the cell
-     * 
+     *
      * @return the String of the cell
      */
     public String getValue()
@@ -87,7 +94,7 @@ public final class OldLabelRecord extends OldCellRecord {
 
     /**
      * Not supported
-     * 
+     *
      * @param offset not supported
      * @param data not supported
      * @return not supported
@@ -95,19 +102,22 @@ public final class OldLabelRecord extends OldCellRecord {
     public int serialize(int offset, byte [] data) {
         throw new RecordFormatException("Old Label Records are supported READ ONLY");
     }
-    
+
     public int getRecordSize() {
         throw new RecordFormatException("Old Label Records are supported READ ONLY");
     }
 
     @Override
-    protected void appendValueText(StringBuilder sb) {
-        sb.append("    .string_len= ").append(HexDump.shortToHex(field_4_string_len)).append("\n");
-        sb.append("    .value       = ").append(getValue()).append("\n");
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.LABEL;
     }
 
     @Override
-    protected String getRecordName() {
-        return "OLD LABEL";
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "base", super::getGenericProperties,
+            "stringLength", this::getStringLength,
+            "value", this::getValue
+        );
     }
 }

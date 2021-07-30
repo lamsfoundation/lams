@@ -20,6 +20,8 @@ package org.apache.poi.hssf.usermodel;
 import org.apache.poi.ss.formula.EvaluationCell;
 import org.apache.poi.ss.formula.EvaluationSheet;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.util.CellRangeAddress;
+
 /**
  * HSSF wrapper for a cell under evaluation
  */
@@ -49,25 +51,12 @@ final class HSSFEvaluationCell implements EvaluationCell {
 	public boolean getBooleanCellValue() {
 		return _cell.getBooleanCellValue();
 	}
-	   /**
-	 * Will return {@link CellType} in a future version of POI.
-	 * For forwards compatibility, do not hard-code cell type literals in your code.
-	 *
-	 * @return cell type
-	 * @deprecated 3.15. Will return a {@link CellType} enum in the future.
-	 */
-	@Override
-	public int getCellType() {
-		return _cell.getCellType();
-	}
 	/**
-	 * @since POI 3.15 beta 3
-	 * @deprecated POI 3.15 beta 3.
-	 * Will be deleted when we make the CellType enum transition. See bug 59791.
+	 * @return cell type
 	 */
 	@Override
-	public CellType getCellTypeEnum() {
-		return _cell.getCellTypeEnum();
+	public CellType getCellType() {
+		return _cell.getCellType();
 	}
 	@Override
 	public int getColumnIndex() {
@@ -93,24 +82,21 @@ final class HSSFEvaluationCell implements EvaluationCell {
 	public String getStringCellValue() {
 		return _cell.getRichStringCellValue().getString();
 	}
+	
+	@Override
+	public CellRangeAddress getArrayFormulaRange() {
+		return _cell.getArrayFormulaRange();
+	}
+	
+	@Override
+	public boolean isPartOfArrayFormulaGroup() {
+		return _cell.isPartOfArrayFormulaGroup();
+	}
+	
 	/**
-	 * Will return {@link CellType} in a future version of POI.
-	 * For forwards compatibility, do not hard-code cell type literals in your code.
-	 *
+	 * @since POI 4.0
 	 * @return cell type of cached formula result
-	 * @deprecated 3.15. Will return a {@link CellType} enum in the future.
 	 */
 	@Override
-	public int getCachedFormulaResultType() {
-		return _cell.getCachedFormulaResultType();
-	}
-	/**
-	 * @since POI 3.15 beta 3
-	 * @deprecated POI 3.15 beta 3.
-	 * Will be deleted when we make the CellType enum transition. See bug 59791.
-	 */
-	@Override
-	public CellType getCachedFormulaResultTypeEnum() {
-		return _cell.getCachedFormulaResultTypeEnum();
-	}
+	public CellType getCachedFormulaResultType() { return _cell.getCachedFormulaResultType(); }
 }

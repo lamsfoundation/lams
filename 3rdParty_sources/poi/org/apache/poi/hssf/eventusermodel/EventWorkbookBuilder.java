@@ -17,6 +17,7 @@
 package org.apache.poi.hssf.eventusermodel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.poi.hssf.model.HSSFFormulaParser;
@@ -65,13 +66,11 @@ public class EventWorkbookBuilder {
 	 */
 	public static InternalWorkbook createStubWorkbook(ExternSheetRecord[] externs,
 			BoundSheetRecord[] bounds, SSTRecord sst) {
-		List<Record> wbRecords = new ArrayList<Record>();
+		List<org.apache.poi.hssf.record.Record> wbRecords = new ArrayList<>();
 
 		// Core Workbook records go first
 		if(bounds != null) {
-			for (BoundSheetRecord bound : bounds) {
-				wbRecords.add(bound);
-			}
+			Collections.addAll(wbRecords, bounds);
 		}
 		if(sst != null) {
 			wbRecords.add(sst);
@@ -82,9 +81,7 @@ public class EventWorkbookBuilder {
 		if(externs != null) {
 			wbRecords.add(SupBookRecord.createInternalReferences(
 					(short)externs.length));
-			for (ExternSheetRecord extern : externs) {
-				wbRecords.add(extern);
-			}
+			Collections.addAll(wbRecords, externs);
 		}
 
 		// Finally we need an EoF record
@@ -114,9 +111,9 @@ public class EventWorkbookBuilder {
 	 */
 	public static class SheetRecordCollectingListener implements HSSFListener {
 		private final HSSFListener childListener;
-		private final List<BoundSheetRecord> boundSheetRecords = new ArrayList<BoundSheetRecord>();
-		private final List<ExternSheetRecord> externSheetRecords = new ArrayList<ExternSheetRecord>();
-		private SSTRecord sstRecord = null;
+		private final List<BoundSheetRecord> boundSheetRecords = new ArrayList<>();
+		private final List<ExternSheetRecord> externSheetRecords = new ArrayList<>();
+		private SSTRecord sstRecord;
 
 		public SheetRecordCollectingListener(HSSFListener childListener) {
 			this.childListener = childListener;
@@ -125,12 +122,12 @@ public class EventWorkbookBuilder {
 
 		public BoundSheetRecord[] getBoundSheetRecords() {
 			return boundSheetRecords.toArray(
-					new BoundSheetRecord[boundSheetRecords.size()]
+					new BoundSheetRecord[0]
 			);
 		}
 		public ExternSheetRecord[] getExternSheetRecords() {
 			return externSheetRecords.toArray(
-					new ExternSheetRecord[externSheetRecords.size()]
+					new ExternSheetRecord[0]
 			);
 		}
 		public SSTRecord getSSTRecord() {
@@ -160,7 +157,7 @@ public class EventWorkbookBuilder {
 		 *  pass it on to our child listener
 		 */
 		@Override
-        public void processRecord(Record record) {
+        public void processRecord(org.apache.poi.hssf.record.Record record) {
 			// Handle it ourselves
 			processRecordInternally(record);
 
@@ -174,7 +171,7 @@ public class EventWorkbookBuilder {
 		 *  
 		 * @param record the record to be processed
 		 */
-		public void processRecordInternally(Record record) {
+		public void processRecordInternally(org.apache.poi.hssf.record.Record record) {
 			if(record instanceof BoundSheetRecord) {
 				boundSheetRecords.add((BoundSheetRecord)record);
 			}

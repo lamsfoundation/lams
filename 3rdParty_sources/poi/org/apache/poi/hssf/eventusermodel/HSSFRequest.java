@@ -38,7 +38,7 @@ public class HSSFRequest {
 
 	/** Creates a new instance of HSSFRequest */
 	public HSSFRequest() {
-		_records = new HashMap<Short, List<HSSFListener>>(50); // most folks won't listen for too many of these
+		_records = new HashMap<>(50); // most folks won't listen for too many of these
 	}
 
 	/**
@@ -55,12 +55,9 @@ public class HSSFRequest {
 	 *        for example req.addListener(myListener, BOFRecord.sid)
 	 */
 	public void addListener(HSSFListener lsnr, short sid) {
-		List<HSSFListener> list = _records.get(Short.valueOf(sid));
+		List<HSSFListener> list = _records.computeIfAbsent(Short.valueOf(sid), k -> new ArrayList<>(1));
 
-		if (list == null) {
-			list = new ArrayList<HSSFListener>(1); // probably most people will use one listener
-			_records.put(Short.valueOf(sid), list);
-		}
+		// probably most people will use one listener
 		list.add(lsnr);
 	}
 
@@ -91,7 +88,7 @@ public class HSSFRequest {
 	 * @return numeric user-specified result code. If zero continue processing.
 	 * @throws HSSFUserException User exception condition
 	 */
-	protected short processRecord(Record rec) throws HSSFUserException {
+	protected short processRecord(org.apache.poi.hssf.record.Record rec) throws HSSFUserException {
 		List<HSSFListener> listeners = _records.get(Short.valueOf(rec.getSid()));
 		short userCode = 0;
 

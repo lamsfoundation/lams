@@ -15,35 +15,35 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-        
+
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        RefMode Record<P>
- * Description:  Describes which reference mode to use<P>
- * REFERENCE:  PG 376 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)<P>
- * @author Andrew C. Oliver (acoliver at apache dot org)
- * @author Jason Height (jheight at chariot dot net dot au)
+ * Describes which reference mode to use
+ *
  * @version 2.0-pre
  */
 
-public final class RefModeRecord
-    extends StandardRecord
-{
-    public final static short sid           = 0xf;
-    public final static short USE_A1_MODE   = 1;
-    public final static short USE_R1C1_MODE = 0;
+public final class RefModeRecord extends StandardRecord {
+    public static final short sid           = 0xf;
+    public static final short USE_A1_MODE   = 1;
+    public static final short USE_R1C1_MODE = 0;
     private short             field_1_mode;
 
-    public RefModeRecord()
-    {
+    public RefModeRecord() {}
+
+    public RefModeRecord(RefModeRecord other) {
+        field_1_mode = other.field_1_mode;
     }
 
-    public RefModeRecord(RecordInputStream in)
-    {
+    public RefModeRecord(RecordInputStream in) {
         field_1_mode = in.readShort();
     }
 
@@ -72,17 +72,6 @@ public final class RefModeRecord
         return field_1_mode;
     }
 
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[REFMODE]\n");
-        buffer.append("    .mode           = ")
-            .append(Integer.toHexString(getMode())).append("\n");
-        buffer.append("[/REFMODE]\n");
-        return buffer.toString();
-    }
-
     public void serialize(LittleEndianOutput out) {
         out.writeShort(getMode());
     }
@@ -96,9 +85,18 @@ public final class RefModeRecord
         return sid;
     }
 
-    public Object clone() {
-      RefModeRecord rec = new RefModeRecord();
-      rec.field_1_mode = field_1_mode;
-      return rec;
+    @Override
+    public RefModeRecord copy() {
+        return new RefModeRecord();
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.REF_MODE;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties("mode", this::getMode);
     }
 }

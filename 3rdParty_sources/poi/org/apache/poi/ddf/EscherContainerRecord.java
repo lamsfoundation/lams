@@ -22,12 +22,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.HexDump;
 import org.apache.poi.util.LittleEndian;
 import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
-import org.apache.poi.util.Removal;
 
 /**
  * Escher container records store other escher records as children.
@@ -36,12 +38,12 @@ import org.apache.poi.util.Removal;
  * used to represent many different types of records.
  */
 public final class EscherContainerRecord extends EscherRecord implements Iterable<EscherRecord> {
-    public static final short DGG_CONTAINER    = (short)0xF000;
-    public static final short BSTORE_CONTAINER = (short)0xF001;
-    public static final short DG_CONTAINER     = (short)0xF002;
-    public static final short SPGR_CONTAINER   = (short)0xF003;
-    public static final short SP_CONTAINER     = (short)0xF004;
-    public static final short SOLVER_CONTAINER = (short)0xF005;
+    public static final short DGG_CONTAINER    = EscherRecordTypes.DGG_CONTAINER.typeID;
+    public static final short BSTORE_CONTAINER = EscherRecordTypes.BSTORE_CONTAINER.typeID;
+    public static final short DG_CONTAINER     = EscherRecordTypes.DG_CONTAINER.typeID;
+    public static final short SPGR_CONTAINER   = EscherRecordTypes.SPGR_CONTAINER.typeID;
+    public static final short SP_CONTAINER     = EscherRecordTypes.SP_CONTAINER.typeID;
+    public static final short SOLVER_CONTAINER = EscherRecordTypes.SOLVER_CONTAINER.typeID;
 
     private static final POILogger log = POILogFactory.getLogger(EscherContainerRecord.class);
 
@@ -69,7 +71,15 @@ public final class EscherContainerRecord extends EscherRecord implements Iterabl
      */
     private int _remainingLength;
 
-    private final List<EscherRecord> _childRecords = new ArrayList<EscherRecord>();
+    private final List<EscherRecord> _childRecords = new ArrayList<>();
+
+    public EscherContainerRecord() {}
+
+    public EscherContainerRecord(EscherContainerRecord other) {
+        super(other);
+        _remainingLength = other._remainingLength;
+        other._childRecords.stream().map(EscherRecord::copy).forEach(_childRecords::add);
+    }
 
     @Override
     public int fillFields(byte[] data, int pOffset, EscherRecordFactory recordFactory) {
@@ -132,13 +142,9 @@ public final class EscherContainerRecord extends EscherRecord implements Iterabl
      * @return true, if any child has the given recordId
      */
     public boolean hasChildOfType(short recordId) {
-        for (EscherRecord r : this) {
-            if(r.getRecordId() == recordId) {
-                return true;
-            }
-        }
-        return false;
+        return _childRecords.stream().anyMatch(r -> r.getRecordId() == recordId);
     }
+
     @Override
     public EscherRecord getChild( int index ) {
         return _childRecords.get(index);
@@ -149,18 +155,7 @@ public final class EscherContainerRecord extends EscherRecord implements Iterabl
      */
     @Override
     public List<EscherRecord> getChildRecords() {
-        return new ArrayList<EscherRecord>(_childRecords);
-    }
-
-    /**
-     * @return an iterator over the child records
-     * @deprecated POI 3.16 beta 1. use iterator() or loop over the container record instead,
-     *     e.g. "for (EscherRecord r : container) ..."
-     */
-    @Removal(version="3.18")
-    @Deprecated
-    public Iterator<EscherRecord> getChildIterator() {
-        return iterator();
+        return new ArrayList<>(_childRecords);
     }
 
     /**
@@ -170,6 +165,7 @@ public final class EscherContainerRecord extends EscherRecord implements Iterabl
     public Iterator<EscherRecord> iterator() {
         return Collections.unmodifiableList(_childRecords).iterator();
     }
+
 
     /**
      * replaces the internal child list with the contents of the supplied <tt>childRecords</tt>
@@ -202,7 +198,7 @@ public final class EscherContainerRecord extends EscherRecord implements Iterabl
      * @return EscherContainer children
      */
     public List<EscherContainerRecord> getChildContainers() {
-        List<EscherContainerRecord> containers = new ArrayList<EscherContainerRecord>();
+        List<EscherContainerRecord> containers = new ArrayList<>();
         for (EscherRecord r : this) {
             if(r instanceof EscherContainerRecord) {
                 containers.add((EscherContainerRecord) r);
@@ -213,22 +209,9 @@ public final class EscherContainerRecord extends EscherRecord implements Iterabl
 
     @Override
     public String getRecordName() {
-        switch (getRecordId()) {
-            case DGG_CONTAINER:
-                return "DggContainer";
-            case BSTORE_CONTAINER:
-                return "BStoreContainer";
-            case DG_CONTAINER:
-                return "DgContainer";
-            case SPGR_CONTAINER:
-                return "SpgrContainer";
-            case SP_CONTAINER:
-                return "SpContainer";
-            case SOLVER_CONTAINER:
-                return "SolverContainer";
-            default:
-                return "Container 0x" + HexDump.toHex(getRecordId());
-        }
+        final short id = getRecordId();
+        EscherRecordTypes t = EscherRecordTypes.forTypeID(id);
+        return (t != EscherRecordTypes.UNKNOWN) ? t.recordName : "Container 0x" + HexDump.toHex(id);
     }
 
     @Override
@@ -295,19 +278,20 @@ public final class EscherContainerRecord extends EscherRecord implements Iterabl
     }
 
     @Override
-    protected Object[][] getAttributeMap() {
-        List<Object> chList = new ArrayList<Object>(_childRecords.size()*2+2);
-        chList.add("children");
-        chList.add(_childRecords.size());
-        int count = 0;
-        for ( EscherRecord record : this ) {
-            chList.add("Child "+count);
-            chList.add(record);
-            count++;
-        }
-        return new Object[][] {
-        	{ "isContainer", isContainerRecord() },
-            chList.toArray()
-        };
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "base", super::getGenericProperties,
+            "isContainer", this::isContainerRecord
+        );
+    }
+
+    @Override
+    public Enum getGenericRecordType() {
+        return EscherRecordTypes.forTypeID(getRecordId());
+    }
+
+    @Override
+    public EscherContainerRecord copy() {
+        return new EscherContainerRecord(this);
     }
 }

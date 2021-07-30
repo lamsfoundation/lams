@@ -25,59 +25,34 @@ package org.apache.poi.ss.usermodel;
  */
 public interface BorderFormatting {
 
-    /**
-     * @deprecated POI 3.15. Use {@link #getBorderBottomEnum()}.
-     * This method will return an BorderStyle enum in the future.
-     */
-    short getBorderBottom();
-    /** @since POI 3.15 */
-    BorderStyle getBorderBottomEnum();
+    /** @since POI 4.0.0 */
+    BorderStyle getBorderBottom();
 
-    /**
-     * @deprecated POI 3.15. Use {@link #getBorderDiagonalEnum()}.
-     * This method will return an BorderStyle enum in the future.
-     */
-    short getBorderDiagonal();
-    /** @since POI 3.15 */
-    BorderStyle getBorderDiagonalEnum();
+    /** @since POI 4.0.0 */
+    BorderStyle getBorderDiagonal();
 
-    /**
-     * @deprecated POI 3.15. Use {@link #getBorderLeftEnum()}.
-     * This method will return an BorderStyle enum in the future.
-     */
-    short getBorderLeft();
-    /** @since POI 3.15 */
-    BorderStyle getBorderLeftEnum();
+    /** @since POI 4.0.0 */
+    BorderStyle getBorderLeft();
 
-    /**
-     * @deprecated POI 3.15. Use {@link #getBorderRightEnum()}.
-     * This method will return an BorderStyle enum in the future.
-     */
-    short getBorderRight();
-    /** @since POI 3.15 */
-    BorderStyle getBorderRightEnum();
+    /** @since POI 4.0.0 */
+    BorderStyle getBorderRight();
 
-    /**
-     * @deprecated POI 3.15. Use {@link #getBorderTopEnum()}.
-     * This method will return an BorderStyle enum in the future.
-     */
-    short getBorderTop();
-    /** @since POI 3.15 */
-    BorderStyle getBorderTopEnum();
+    /** @since POI 4.0.0 */
+    BorderStyle getBorderTop();
 
     /**
      * Only valid for range borders, such as table styles
-     * @since 3.17 beta 1
+     * @since 4.0.0
      * @return border style
      */
-    BorderStyle getBorderVerticalEnum();
+    BorderStyle getBorderVertical();
     /**
      * Only valid for range borders, such as table styles
-     * @since 3.17 beta 1
+     * @since 4.0.0
      * @return border style
      */
-    BorderStyle getBorderHorizontalEnum();
-    
+    BorderStyle getBorderHorizontal();
+
     short getBottomBorderColor();
     Color getBottomBorderColorColor();
 
@@ -122,75 +97,35 @@ public interface BorderFormatting {
     /**
      * Set bottom border.
      *
-     * @param border  MUST be a BORDER_* constant
-     * @deprecated 3.15 beta 2. Use {@link BorderFormatting#setBorderBottom(BorderStyle)}
-     */
-    void setBorderBottom(short border);
-
-    /**
-     * Set bottom border.
-     *
-     * @param border
+     * @param border The style of border to set.
      */
     void setBorderBottom(BorderStyle border);
     
     /**
      * Set diagonal border.
      *
-     * @param border  MUST be a BORDER_* constant
-     * @deprecated 3.15 beta 2. Use {@link BorderFormatting#setBorderDiagonal(BorderStyle)}
-     */
-    void setBorderDiagonal(short border);
-    
-    /**
-     * Set diagonal border.
-     *
-     * @param border
+     * @param border The style of border to set.
      */
     void setBorderDiagonal(BorderStyle border);
 
     /**
      * Set left border.
      *
-     * @param border  MUST be a BORDER_* constant
-     * @deprecated 3.15 beta 2. Use {@link BorderFormatting#setBorderLeft(BorderStyle)}
-     */
-    void setBorderLeft(short border);
-    
-    /**
-     * Set left border.
-     *
-     * @param border
+     * @param border The style of border to set.
      */
     void setBorderLeft(BorderStyle border);
 
     /**
      * Set right border.
      *
-     * @param border  MUST be a BORDER_* constant
-     * @deprecated 3.15 beta 2. Use {@link BorderFormatting#setBorderRight(BorderStyle)}
-     */
-    void setBorderRight(short border);
-    
-    /**
-     * Set right border.
-     *
-     * @param border
+     * @param border The style of border to set.
      */
     void setBorderRight(BorderStyle border);
 
     /**
      * Set top border.
      *
-     * @param border  MUST be a BORDER_* constant
-     * @deprecated 3.15 beta 2. Use {@link BorderFormatting#setBorderTop(BorderStyle)}
-     */
-    void setBorderTop(short border);
-    
-    /**
-     * Set top border.
-     *
-     * @param border
+     * @param border The style of border to set.
      */
     void setBorderTop(BorderStyle border);
     
@@ -198,7 +133,7 @@ public interface BorderFormatting {
      * Set range internal horizontal borders.
      *
      * @since 3.17 beta 1
-     * @param border
+     * @param border The style of border to set.
      */
     void setBorderHorizontal(BorderStyle border);
     
@@ -206,7 +141,7 @@ public interface BorderFormatting {
      * Set range internal vertical borders.
      *
      * @since 3.17 beta 1
-     * @param border
+     * @param border The style of border to set.
      */
     void setBorderVertical(BorderStyle border);
 

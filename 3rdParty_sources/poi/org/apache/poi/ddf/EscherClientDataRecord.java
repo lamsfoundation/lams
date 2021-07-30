@@ -18,26 +18,41 @@
 
 package org.apache.poi.ddf;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.LittleEndian;
 
 /**
  * The EscherClientDataRecord is used to store client specific data about the position of a
  * shape within a container.
  */
-public class EscherClientDataRecord
-    extends EscherRecord
-{
-    public static final short RECORD_ID = (short) 0xF011;
-    public static final String RECORD_DESCRIPTION = "MsofbtClientData";
+public class EscherClientDataRecord extends EscherRecord {
+
+    public static final short RECORD_ID = EscherRecordTypes.CLIENT_DATA.typeID;
+
+    //arbitrarily selected; may need to increase
+    private static final int MAX_RECORD_LENGTH = 100_000;
+    private static final byte[] EMPTY = {};
 
     private byte[] remainingData;
+
+    public EscherClientDataRecord() {}
+
+    public EscherClientDataRecord(EscherClientDataRecord other) {
+        super(other);
+        remainingData = (other.remainingData == null) ? null : other.remainingData.clone();
+    }
 
     @Override
     public int fillFields(byte[] data, int offset, EscherRecordFactory recordFactory) {
         int bytesRemaining = readHeader( data, offset );
         int pos            = offset + 8;
-        remainingData  =  new byte[bytesRemaining];
-        System.arraycopy( data, pos, remainingData, 0, bytesRemaining );
+
+        remainingData = (bytesRemaining == 0) ? EMPTY : IOUtils.safelyClone(data, pos, bytesRemaining, MAX_RECORD_LENGTH);
+
         return 8 + bytesRemaining;
     }
 
@@ -46,7 +61,7 @@ public class EscherClientDataRecord
         listener.beforeRecordSerialize( offset, getRecordId(), this );
 
         if (remainingData == null) {
-            remainingData = new byte[0];
+            remainingData = EMPTY;
         }
         LittleEndian.putShort( data, offset, getOptions() );
         LittleEndian.putShort( data, offset + 2, getRecordId() );
@@ -71,12 +86,12 @@ public class EscherClientDataRecord
 
     @Override
     public String getRecordName() {
-        return "ClientData";
+        return EscherRecordTypes.CLIENT_DATA.recordName;
     }
 
     /**
      * Any data recording this record.
-     * 
+     *
      * @return the remaining bytes
      */
     public byte[] getRemainingData()
@@ -86,7 +101,7 @@ public class EscherClientDataRecord
 
     /**
      * Any data recording this record.
-     * 
+     *
      * @param remainingData the remaining bytes
      */
     public void setRemainingData( byte[] remainingData ) {
@@ -96,9 +111,20 @@ public class EscherClientDataRecord
     }
 
     @Override
-    protected Object[][] getAttributeMap() {
-        return new Object[][] {
-            { "Extra Data", getRemainingData() }
-        };
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "base", super::getGenericProperties,
+            "remainingData", this::getRemainingData
+        );
+    }
+
+    @Override
+    public Enum getGenericRecordType() {
+        return EscherRecordTypes.CLIENT_DATA;
+    }
+
+    @Override
+    public EscherClientDataRecord copy() {
+        return new EscherClientDataRecord(this);
     }
 }

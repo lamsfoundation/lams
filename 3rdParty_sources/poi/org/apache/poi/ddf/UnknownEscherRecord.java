@@ -19,30 +19,41 @@ package org.apache.poi.ddf;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.HexDump;
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.LittleEndian;
 
 /**
  * This record is used whenever a escher record is encountered that
  * we do not explicitly support.
  */
-public final class UnknownEscherRecord extends EscherRecord implements Cloneable {
+public final class UnknownEscherRecord extends EscherRecord {
+
+    //arbitrarily selected; may need to increase
+    private static final int MAX_RECORD_LENGTH = 100_000_000;
+
     private static final byte[] NO_BYTES = new byte[0];
 
     /** The data for this record not including the the 8 byte header */
     private byte[] thedata = NO_BYTES;
-    private List<EscherRecord> _childRecords;
+    private final List<EscherRecord> _childRecords = new ArrayList<>();
 
-    public UnknownEscherRecord() {
-        _childRecords = new ArrayList<EscherRecord>();
+    public UnknownEscherRecord() {}
+
+    public UnknownEscherRecord(UnknownEscherRecord other) {
+        super(other);
+        other._childRecords.stream().map(EscherRecord::copy).forEach(_childRecords::add);
     }
 
     @Override
     public int fillFields(byte[] data, int offset, EscherRecordFactory recordFactory) {
         int bytesRemaining = readHeader( data, offset );
 		/*
-		 * Have a check between available bytes and bytesRemaining, 
+		 * Have a check between available bytes and bytesRemaining,
 		 * take the available length if the bytesRemaining out of range.
 		 */
 		int available = data.length - (offset + 8);
@@ -69,9 +80,9 @@ public final class UnknownEscherRecord extends EscherRecord implements Cloneable
         if (bytesRemaining < 0) {
             bytesRemaining = 0;
         }
-        
-        thedata = new byte[bytesRemaining];
-        System.arraycopy( data, offset + 8, thedata, 0, bytesRemaining );
+
+        thedata = IOUtils.safelyClone(data, offset + 8, bytesRemaining, MAX_RECORD_LENGTH);
+
         return bytesRemaining + 8;
     }
 
@@ -115,16 +126,11 @@ public final class UnknownEscherRecord extends EscherRecord implements Cloneable
 
     @Override
     public void setChildRecords(List<EscherRecord> childRecords) {
-        _childRecords = childRecords;
-    }
-
-    @Override
-    public UnknownEscherRecord clone() {
-        UnknownEscherRecord uer = new UnknownEscherRecord();
-        uer.thedata = this.thedata.clone();
-        uer.setOptions(this.getOptions());
-        uer.setRecordId(this.getRecordId());
-        return uer;
+        if (childRecords == _childRecords) {
+            return;
+        }
+        _childRecords.clear();
+        _childRecords.addAll(childRecords);
     }
 
     @Override
@@ -137,20 +143,20 @@ public final class UnknownEscherRecord extends EscherRecord implements Cloneable
     }
 
     @Override
-    protected Object[][] getAttributeMap() {
-        int numCh = getChildRecords().size();
-        List<Object> chLst = new ArrayList<Object>(numCh*2+2);
-        chLst.add("children");
-        chLst.add(numCh);
-        for (EscherRecord er : _childRecords) {
-            chLst.add(er.getRecordName());
-            chLst.add(er);
-        }
-        
-        return new Object[][] {
-            { "isContainer", isContainerRecord() },
-            chLst.toArray(),
-            { "Extra Data", thedata }
-        };
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "base", super::getGenericProperties,
+            "data", this::getData
+        );
+    }
+
+    @Override
+    public Enum getGenericRecordType() {
+        return EscherRecordTypes.UNKNOWN;
+    }
+
+    @Override
+    public UnknownEscherRecord copy() {
+        return new UnknownEscherRecord(this);
     }
 }

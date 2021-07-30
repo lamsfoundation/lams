@@ -25,7 +25,7 @@ import java.awt.Graphics2D;
  */
 public interface Sheet<
     S extends Shape<S,P>,
-    P extends TextParagraph<S,P,?>
+    P extends TextParagraph<S,P,? extends TextRun>
 > extends ShapeContainer<S,P> {
 	SlideShow<S,P> getSlideShow();
 
@@ -46,4 +46,16 @@ public interface Sheet<
 	 * @param graphics
 	 */
 	void draw(Graphics2D graphics);
+
+	/**
+	 * Get the placeholder details for the given placeholder type. Not all placeholders are also shapes -
+	 * this is especially true for old HSLF slideshows, which notes have header/footers elements which
+	 * aren't shapes.
+	 *
+	 * @param placeholder the placeholder type
+	 * @return the placeholder details or {@code null}, if the placeholder isn't contained in the sheet
+	 *
+	 * @since POI 4.0.0
+	 */
+	PlaceholderDetails getPlaceholderDetails(Placeholder placeholder);
 }

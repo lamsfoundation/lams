@@ -16,85 +16,129 @@
 ==================================================================== */
 package org.apache.poi.sl.usermodel;
 
+import static org.apache.poi.extractor.ExtractorFactory.OOXML_PACKAGE;
+import static org.apache.poi.poifs.crypt.Decryptor.DEFAULT_POIFS_ENTRY;
+
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ServiceLoader;
 
+import org.apache.poi.EmptyFileException;
 import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.OldFileFormatException;
-import org.apache.poi.hssf.record.crypto.Biff8EncryptionKey;
 import org.apache.poi.poifs.crypt.Decryptor;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
-import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
 import org.apache.poi.poifs.filesystem.FileMagic;
-import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
-import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
-import org.apache.poi.util.IOUtils;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
-public class SlideShowFactory {
+public final class SlideShowFactory {
+
+    private static class Singleton {
+        private static final SlideShowFactory INSTANCE = new SlideShowFactory();
+    }
+
+    private interface ProviderMethod {
+        SlideShow<?,?> create(SlideShowProvider<?,?> prov) throws IOException;
+    }
+
+    private final List<SlideShowProvider<?,?>> provider = new ArrayList<>();
+
+    private SlideShowFactory() {
+        ClassLoader cl = SlideShowFactory.class.getClassLoader();
+        ServiceLoader.load(SlideShowProvider.class, cl).forEach(provider::add);
+    }
+
     /**
-     * Creates a SlideShow from the given NPOIFSFileSystem.
+     * Create a new empty SlideShow, either XSLF or HSLF depending
+     * on the parameter
      *
-     * @param fs The {@link NPOIFSFileSystem} to read the document from
+     * @param XSLF If an XSLFSlideShow or a HSLFSlideShow should be created
+     *
+     * @return The created SlideShow
+     *
+     * @throws IOException if an error occurs while creating the objects
+     */
+    public static SlideShow<?,?> create(boolean XSLF) throws IOException {
+        return wp(XSLF ? FileMagic.OOXML : FileMagic.OLE2, SlideShowProvider::create);
+    }
+
+    /**
+     * Creates a HSLFSlideShow from the given POIFSFileSystem<p>
+     *
+     * Note that in order to properly release resources the
+     * SlideShow should be closed after use.
+     *
+     * @param fs The {@link POIFSFileSystem} to read the document from
      *
      * @return The created SlideShow
      *
      * @throws IOException if an error occurs while reading the data
      */
-    public static SlideShow<?,?> create(NPOIFSFileSystem fs) throws IOException {
+    public static SlideShow<?,?> create(POIFSFileSystem fs) throws IOException {
         return create(fs, null);
     }
 
     /**
-     * Creates a SlideShow from the given NPOIFSFileSystem, which may
+     * Creates a SlideShow from the given POIFSFileSystem, which may
+     *  be password protected
+     *
+     *  @param fs The {@link POIFSFileSystem} to read the document from
+     *  @param password The password that should be used or null if no password is necessary.
+     *
+     *  @return The created SlideShow
+     *
+     *  @throws IOException if an error occurs while reading the data
+     */
+    private static SlideShow<?,?> create(final POIFSFileSystem fs, String password) throws IOException {
+        return create(fs.getRoot(), password);
+    }
+
+
+    /**
+     * Creates a SlideShow from the given DirectoryNode.
+     *
+     * @param root The {@link DirectoryNode} to start reading the document from
+     *
+     * @return The created SlideShow
+     *
+     * @throws IOException if an error occurs while reading the data
+     */
+    public static SlideShow<?,?> create(final DirectoryNode root) throws IOException {
+        return create(root, null);
+    }
+
+
+    /**
+     * Creates a SlideShow from the given DirectoryNode, which may
      * be password protected
      *
-     * @param fs The {@link NPOIFSFileSystem} to read the document from
+     * @param root The {@link DirectoryNode} to start reading the document from
      * @param password The password that should be used or null if no password is necessary.
      *
      * @return The created SlideShow
      *
      * @throws IOException if an error occurs while reading the data
      */
-    public static SlideShow<?,?> create(final NPOIFSFileSystem fs, String password) throws IOException {
-        DirectoryNode root = fs.getRoot();
-
+    public static SlideShow<?,?> create(final DirectoryNode root, String password) throws IOException {
         // Encrypted OOXML files go inside OLE2 containers, is this one?
-        if (root.hasEntry(Decryptor.DEFAULT_POIFS_ENTRY)) {
-            InputStream stream = null;
-            try {
-                stream = DocumentFactoryHelper.getDecryptedStream(fs, password);
-
-                return createXSLFSlideShow(stream);
-            } finally {
-                IOUtils.closeQuietly(stream);
-            }
-        }
-
-        // If we get here, it isn't an encrypted PPTX file
-        // So, treat it as a regular HSLF PPT one
-        boolean passwordSet = false;
-        if (password != null) {
-            Biff8EncryptionKey.setCurrentUserPassword(password);
-            passwordSet = true;
-        }
-        try {
-            return createHSLFSlideShow(fs);
-        } finally {
-            if (passwordSet) {
-                Biff8EncryptionKey.setCurrentUserPassword(null);
-            }
+        if (root.hasEntry(Decryptor.DEFAULT_POIFS_ENTRY) || root.hasEntry(OOXML_PACKAGE)) {
+            return wp(FileMagic.OOXML, w -> w.create(root, password));
+        } else {
+            return wp(FileMagic.OLE2, w ->  w.create(root, password));
         }
     }
 
     /**
-     * Creates the appropriate HSLFSlideShow / XMLSlideShow from
+     * Creates the appropriate HSLFSlideShow / XSLFSlideShow from
      *  the given InputStream.
      *
-     * <p>Note that using an {@link InputStream} has a higher memory footprint
+     * <p>Your input stream MUST either support mark/reset, or
+     *  be wrapped as a {@link BufferedInputStream}!
+     *  Note that using an {@link InputStream} has a higher memory footprint
      *  than using a {@link File}.</p>
      *
      * <p>Note that in order to properly release resources the
@@ -107,17 +151,19 @@ public class SlideShowFactory {
      *  @return The created SlideShow
      *
      *  @throws IOException if an error occurs while reading the data
-     *  @throws EncryptedDocumentException If the SlideShow given is password protected
+     *  @throws EncryptedDocumentException If the SlideShow<?,?> given is password protected
      */
     public static SlideShow<?,?> create(InputStream inp) throws IOException, EncryptedDocumentException {
         return create(inp, null);
     }
 
     /**
-     * Creates the appropriate HSLFSlideShow / XMLSlideShow from
+     * Creates the appropriate HSLFSlideShow / XSLFSlideShow from
      *  the given InputStream, which may be password protected.
-     *  
-     * <p>Note that using an {@link InputStream} has a higher memory footprint
+     *
+     * <p>Your input stream MUST either support mark/reset, or
+     *  be wrapped as a {@link BufferedInputStream}!
+     *  Note that using an {@link InputStream} has a higher memory footprint
      *  than using a {@link File}.</p>
      *
      * <p>Note that in order to properly release resources the
@@ -135,21 +181,31 @@ public class SlideShowFactory {
      */
     public static SlideShow<?,?> create(InputStream inp, String password) throws IOException, EncryptedDocumentException {
         InputStream is = FileMagic.prepareToCheckMagic(inp);
-        FileMagic fm = FileMagic.valueOf(is);
-        
-        switch (fm) {
-        case OLE2:
-            NPOIFSFileSystem fs = new NPOIFSFileSystem(is);
-            return create(fs, password);
-        case OOXML:
-            return createXSLFSlideShow(is);
-        default:
-            throw new IllegalArgumentException("Your InputStream was neither an OLE2 stream, nor an OOXML stream");
+        byte[] emptyFileCheck = new byte[1];
+        is.mark(emptyFileCheck.length);
+        if (is.read(emptyFileCheck) < emptyFileCheck.length) {
+            throw new EmptyFileException();
         }
+        is.reset();
+
+        final FileMagic fm = FileMagic.valueOf(is);
+        if (FileMagic.OOXML == fm) {
+            return wp(fm, w -> w.create(is));
+        }
+
+        if (FileMagic.OLE2 != fm) {
+            throw new IOException("Can't open SlideShow - unsupported file type: "+fm);
+        }
+
+        POIFSFileSystem poifs = new POIFSFileSystem(is);
+        DirectoryNode root = poifs.getRoot();
+        boolean isOOXML = root.hasEntry(DEFAULT_POIFS_ENTRY) || root.hasEntry(OOXML_PACKAGE);
+
+        return wp(isOOXML ? FileMagic.OOXML : fm, w -> w.create(poifs.getRoot(), password));
     }
 
     /**
-     * Creates the appropriate HSLFSlideShow / XMLSlideShow from
+     * Creates the appropriate HSLFSlideShow / XSLFSlideShow from
      *  the given File, which must exist and be readable.
      * <p>Note that in order to properly release resources the
      *  SlideShow should be closed after use.
@@ -166,7 +222,7 @@ public class SlideShowFactory {
     }
 
     /**
-     * Creates the appropriate HSLFSlideShow / XMLSlideShow from
+     * Creates the appropriate HSLFSlideShow / XSLFSlideShow from
      *  the given File, which must exist and be readable, and
      *  may be password protected
      * <p>Note that in order to properly release resources the
@@ -185,7 +241,7 @@ public class SlideShowFactory {
     }
 
     /**
-     * Creates the appropriate HSLFSlideShow / XMLSlideShow from
+     * Creates the appropriate HSLFSlideShow / XSLFSlideShow from
      *  the given File, which must exist and be readable, and
      *  may be password protected
      * <p>Note that in order to properly release resources the
@@ -206,56 +262,43 @@ public class SlideShowFactory {
             throw new FileNotFoundException(file.toString());
         }
 
-        NPOIFSFileSystem fs = null;
-        try {
-            fs = new NPOIFSFileSystem(file, readOnly);
-            return create(fs, password);
-        } catch(OfficeXmlFileException e) {
-            IOUtils.closeQuietly(fs);
-            return createXSLFSlideShow(file, readOnly);
-        } catch(RuntimeException e) {
-            IOUtils.closeQuietly(fs);
-            throw e;
+        if (file.length() == 0) {
+            throw new EmptyFileException(file);
         }
-    }
-    
-    protected static SlideShow<?,?> createHSLFSlideShow(Object... args) throws IOException, EncryptedDocumentException {
-        return createSlideShow("org.apache.poi.hslf.usermodel.HSLFSlideShowFactory", args);
-    }
-    
-    protected static SlideShow<?,?> createXSLFSlideShow(Object... args) throws IOException, EncryptedDocumentException {
-        return createSlideShow("org.apache.poi.xslf.usermodel.XSLFSlideShowFactory", args);
-    }
-    
-    protected static SlideShow<?,?> createSlideShow(String factoryClass, Object args[]) throws IOException, EncryptedDocumentException {
-        try {
-            Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(factoryClass);
-            Class<?> argsClz[] = new Class<?>[args.length];
-            int i=0;
-            for (Object o : args) {
-                Class<?> c = o.getClass();
-                if (Boolean.class.isAssignableFrom(c)) {
-                    c = boolean.class;
-                } else if (InputStream.class.isAssignableFrom(c)) {
-                    c = InputStream.class;
-                }
-                argsClz[i++] = c;
+
+        FileMagic fm = FileMagic.valueOf(file);
+        if (fm == FileMagic.OOXML) {
+            return wp(fm, w -> w.create(file, password, readOnly));
+        } else if (fm == FileMagic.OLE2) {
+            final boolean ooxmlEnc;
+            try (POIFSFileSystem fs = new POIFSFileSystem(file, true)) {
+                DirectoryNode root = fs.getRoot();
+                ooxmlEnc = root.hasEntry(Decryptor.DEFAULT_POIFS_ENTRY) || root.hasEntry(OOXML_PACKAGE);
             }
-            Method m = clazz.getMethod("createSlideShow", argsClz);
-            return (SlideShow<?,?>)m.invoke(null, args);
-        } catch (InvocationTargetException e) {
-            Throwable t = e.getCause();
-            if (t instanceof IOException) {
-                throw (IOException)t;
-            } else if (t instanceof EncryptedDocumentException) {
-                throw (EncryptedDocumentException)t;
-            } else if (t instanceof OldFileFormatException) {
-                throw (OldFileFormatException)t;
-            } else {
-                throw new IOException(t);
-            }
-        } catch (Exception e) {
-            throw new IOException(e);
+            return wp(ooxmlEnc ? FileMagic.OOXML : fm, w -> w.create(file, password, readOnly));
         }
+
+        return null;
+    }
+
+
+
+    private static SlideShow<?,?> wp(FileMagic fm, SlideShowFactory.ProviderMethod fun) throws IOException {
+
+        for (SlideShowProvider<?,?> prov : SlideShowFactory.Singleton.INSTANCE.provider) {
+            if (prov.accepts(fm)) {
+                return fun.create(prov);
+            }
+        }
+        throw new IOException("Your InputStream was neither an OLE2 stream, nor an OOXML stream " +
+                                      "or you haven't provide the poi-ooxml*.jar in the classpath/modulepath - FileMagic: "+fm);
+    }
+
+    public static void addProvider(SlideShowProvider<?,?> provider){
+        Singleton.INSTANCE.provider.add(provider);
+    }
+
+    public static void removeProvider(Class<? extends SlideShowProvider<?,?>> provider){
+        Singleton.INSTANCE.provider.removeIf(p -> p.getClass().isAssignableFrom(provider));
     }
 }

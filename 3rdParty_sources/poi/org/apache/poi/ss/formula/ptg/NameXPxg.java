@@ -17,13 +17,17 @@
 
 package org.apache.poi.ss.formula.ptg;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.ss.formula.SheetNameFormatter;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * A Name, be that a Named Range or a Function / User Defined
  *  Function, addressed in the HSSF External Sheet style.
- *  
+ *
  * <p>This is XSSF only, as it stores the sheet / book references
  *  in String form. The HSSF equivalent using indexes is {@link NameXPtg}</p>
  */
@@ -37,28 +41,19 @@ public final class NameXPxg extends OperandPtg implements Pxg {
         this.sheetName = sheetName;
         this.nameName = nameName;
     }
+
+    public NameXPxg(NameXPxg other) {
+        super(other);
+        externalWorkbookNumber = other.externalWorkbookNumber;
+        sheetName = other.sheetName;
+        nameName = other.nameName;
+    }
+
     public NameXPxg(String sheetName, String nameName) {
         this(-1, sheetName, nameName);
     }
     public NameXPxg(String nameName) {
         this(-1, null, nameName);
-    }
-
-    public String toString(){
-        StringBuffer sb = new StringBuffer();
-        sb.append(getClass().getName());
-        sb.append(" [");
-        if (externalWorkbookNumber >= 0) {
-            sb.append(" [");
-            sb.append("workbook=").append(getExternalWorkbookNumber());
-            sb.append("] ");
-        }
-        sb.append("sheet=").append(getSheetName());
-        sb.append(" ! ");
-        sb.append("name=");
-        sb.append(nameName);
-        sb.append("]");
-        return sb.toString();
     }
 
     public int getExternalWorkbookNumber() {
@@ -70,13 +65,13 @@ public final class NameXPxg extends OperandPtg implements Pxg {
     public String getNameName() {
         return nameName;
     }
-    
+
     public void setSheetName(String sheetName) {
         this.sheetName = sheetName;
     }
 
     public String toFormulaString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder(64);
         boolean needsExclamation = false;
         if (externalWorkbookNumber >= 0) {
             sb.append('[');
@@ -94,9 +89,14 @@ public final class NameXPxg extends OperandPtg implements Pxg {
         sb.append(nameName);
         return sb.toString();
     }
-    
+
     public byte getDefaultOperandClass() {
         return Ptg.CLASS_VALUE;
+    }
+
+    @Override
+    public byte getSid() {
+        return -1;
     }
 
     public int getSize() {
@@ -104,5 +104,19 @@ public final class NameXPxg extends OperandPtg implements Pxg {
     }
     public void write(LittleEndianOutput out) {
         throw new IllegalStateException("XSSF-only Ptg, should not be serialised");
+    }
+
+    @Override
+    public NameXPxg copy() {
+        return new NameXPxg(this);
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "externalWorkbookNumber", this::getExternalWorkbookNumber,
+            "sheetName", this::getSheetName,
+            "nameName", this::getNameName
+        );
     }
 }

@@ -17,14 +17,11 @@
 
 package org.apache.poi.ss.formula.ptg;
 
-import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.util.LittleEndianInput;
-import org.apache.poi.util.Removal;
 
 /**
  * Specifies a rectangular area of cells A1:A4 for instance.
- * @author Jason Height (jheight at chariot dot net dot au)
  */
 public final class AreaPtg extends Area2DPtgBase {
 	public final static short sid  = 0x25;
@@ -32,26 +29,26 @@ public final class AreaPtg extends Area2DPtgBase {
 	public AreaPtg(int firstRow, int lastRow, int firstColumn, int lastColumn, boolean firstRowRelative, boolean lastRowRelative, boolean firstColRelative, boolean lastColRelative) {
 		super(firstRow, lastRow, firstColumn, lastColumn, firstRowRelative, lastRowRelative, firstColRelative, lastColRelative);
 	}
-	
+
+	public AreaPtg(AreaPtg other)  {
+		super(other);
+	}
+
 	public AreaPtg(LittleEndianInput in)  {
 		super(in);
 	}
 
-	/**
-     * @deprecated use {@link #AreaPtg(AreaReference)} instead
-	 */
-	@Deprecated()
-	@Removal(version="3.19")
-    public AreaPtg(String arearef) {
-        this(new AreaReference(arearef, SpreadsheetVersion.EXCEL97));
-    }
-	
     public AreaPtg(AreaReference arearef) {
         super(arearef);
     }
-    
+
 	@Override
-	protected byte getSid() {
+	public byte getSid() {
 		return sid;
+	}
+
+	@Override
+	public AreaPtg copy() {
+		return new AreaPtg(this);
 	}
 }

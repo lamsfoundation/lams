@@ -17,25 +17,32 @@
 
 package org.apache.poi.hssf.record.pivottable;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * SXIDSTM - Stream ID (0x00D5)<br>
- * 
- * @author Patrick Cheng
+ * SXIDSTM - Stream ID (0x00D5)
  */
 public final class StreamIDRecord extends StandardRecord {
 	public static final short sid = 0x00D5;
 
 	private int idstm;
-	
+
+	public StreamIDRecord(StreamIDRecord other) {
+		super(other);
+		idstm = other.idstm;
+	}
+
 	public StreamIDRecord(RecordInputStream in) {
 		idstm = in.readShort();
 	}
-	
+
 	@Override
 	protected void serialize(LittleEndianOutput out) {
 		out.writeShort(idstm);
@@ -52,13 +59,17 @@ public final class StreamIDRecord extends StandardRecord {
 	}
 
 	@Override
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
+	public StreamIDRecord copy() {
+		return new StreamIDRecord(this);
+	}
 
-		buffer.append("[SXIDSTM]\n");
-		buffer.append("    .idstm      =").append(HexDump.shortToHex(idstm)).append('\n');
+	@Override
+	public HSSFRecordTypes getGenericRecordType() {
+		return HSSFRecordTypes.STREAM_ID;
+	}
 
-		buffer.append("[/SXIDSTM]\n");
-		return buffer.toString();
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties("idstm", () -> idstm);
 	}
 }

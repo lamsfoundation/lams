@@ -17,17 +17,29 @@
 
 package org.apache.poi.ddf;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndian;
 
 public class EscherBitmapBlip extends EscherBlipRecord {
-    public static final short RECORD_ID_JPEG = (short) 0xF018 + 5;
-    public static final short RECORD_ID_PNG = (short) 0xF018 + 6;
-    public static final short RECORD_ID_DIB = (short) 0xF018 + 7;
+    public static final short RECORD_ID_JPEG = EscherRecordTypes.BLIP_JPEG.typeID;
+    public static final short RECORD_ID_PNG = EscherRecordTypes.BLIP_PNG.typeID;
+    public static final short RECORD_ID_DIB = EscherRecordTypes.BLIP_DIB.typeID;
 
     private static final int HEADER_SIZE = 8;
 
     private final byte[] field_1_UID = new byte[16];
     private byte field_2_marker = (byte) 0xFF;
+
+    public EscherBitmapBlip() {}
+
+    public EscherBitmapBlip(EscherBitmapBlip other) {
+        super(other);
+        System.arraycopy(other.field_1_UID, 0, field_1_UID, 0, field_1_UID.length);
+        field_2_marker = other.field_2_marker;
+    }
 
     @Override
     public int fillFields(byte[] data, int offset, EscherRecordFactory recordFactory) {
@@ -53,7 +65,7 @@ public class EscherBitmapBlip extends EscherBlipRecord {
 
         System.arraycopy( field_1_UID, 0, data, pos, 16 );
         data[pos + 16] = field_2_marker;
-        byte pd[] = getPicturedata();
+        byte[] pd = getPicturedata();
         System.arraycopy( pd, 0, data, pos + 17, pd.length );
 
         listener.afterRecordSerialize(offset + getRecordSize(), getRecordId(), getRecordSize(), this);
@@ -62,7 +74,7 @@ public class EscherBitmapBlip extends EscherBlipRecord {
 
     @Override
     public int getRecordSize() {
-        return 8 + 16 + 1 + getPicturedata().length;
+        return 8 + 16 + 1 + (getPicturedata() == null ? 0 : getPicturedata().length);
     }
 
     /**
@@ -109,10 +121,16 @@ public class EscherBitmapBlip extends EscherBlipRecord {
     }
 
     @Override
-    protected Object[][] getAttributeMap() {
-        return new Object[][] {
-            { "Marker", field_2_marker },
-            { "Extra Data", getPicturedata() }
-        };
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "base", super::getGenericProperties,
+            "uid", this::getUID,
+            "marker", this::getMarker
+        );
+    }
+
+    @Override
+    public EscherBitmapBlip copy() {
+        return new EscherBitmapBlip(this);
     }
 }

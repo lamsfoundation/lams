@@ -17,19 +17,24 @@
 
 package org.apache.poi.hssf.record.common;
 
+import static org.apache.poi.util.GenericRecordUtil.getBitsAsString;
+
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.hssf.record.FeatRecord;
-//import org.apache.poi.hssf.record.Feat11Record;
-//import org.apache.poi.hssf.record.Feat12Record;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.util.BitField;
 import org.apache.poi.util.BitFieldFactory;
+import org.apache.poi.util.GenericRecordJsonWriter;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * Title: FeatFormulaErr2 (Formula Evaluation Shared Feature) common record part
  * <P>
- * This record part specifies Formula Evaluation & Error Ignoring data 
- *  for a sheet, stored as part of a Shared Feature. It can be found in 
+ * This record part specifies Formula Evaluation & Error Ignoring data
+ *  for a sheet, stored as part of a Shared Feature. It can be found in
  *  records such as {@link FeatRecord}.
  * For the full meanings of the flags, see pages 669 and 670
  *  of the Excel binary file format documentation and/or
@@ -44,32 +49,34 @@ public final class FeatFormulaErr2 implements SharedFeature {
 	private static final BitField CHECK_DATETIME_FORMATS =      BitFieldFactory.getInstance(0x20);
 	private static final BitField CHECK_UNPROTECTED_FORMULAS =  BitFieldFactory.getInstance(0x40);
 	private static final BitField PERFORM_DATA_VALIDATION =     BitFieldFactory.getInstance(0x80);
-	
+
 	/**
 	 * What errors we should ignore
 	 */
 	private int errorCheck;
-	
-	
+
+
 	public FeatFormulaErr2() {}
+
+	public FeatFormulaErr2(FeatFormulaErr2 other) {
+		errorCheck = other.errorCheck;
+	}
 
 	public FeatFormulaErr2(RecordInputStream in) {
 		errorCheck = in.readInt();
 	}
 
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"errorCheck", getBitsAsString(this::_getRawErrorCheckValue,
+			new BitField[]{CHECK_CALCULATION_ERRORS, CHECK_EMPTY_CELL_REF, CHECK_NUMBERS_AS_TEXT, CHECK_INCONSISTENT_RANGES, CHECK_INCONSISTENT_FORMULAS, CHECK_DATETIME_FORMATS, CHECK_UNPROTECTED_FORMULAS, PERFORM_DATA_VALIDATION},
+			new String[]{"CHECK_CALCULATION_ERRORS", "CHECK_EMPTY_CELL_REF", "CHECK_NUMBERS_AS_TEXT", "CHECK_INCONSISTENT_RANGES", "CHECK_INCONSISTENT_FORMULAS", "CHECK_DATETIME_FORMATS", "CHECK_UNPROTECTED_FORMULAS", "PERFORM_DATA_VALIDATION"})
+		);
+	}
+
 	public String toString() {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append(" [FEATURE FORMULA ERRORS]\n");
-		buffer.append("  checkCalculationErrors    = "); 
-		buffer.append("  checkEmptyCellRef         = "); 
-		buffer.append("  checkNumbersAsText        = "); 
-		buffer.append("  checkInconsistentRanges   = "); 
-		buffer.append("  checkInconsistentFormulas = "); 
-		buffer.append("  checkDateTimeFormats      = "); 
-		buffer.append("  checkUnprotectedFormulas  = "); 
-		buffer.append("  performDataValidation     = "); 
-		buffer.append(" [/FEATURE FORMULA ERRORS]\n");
-		return buffer.toString();
+		return GenericRecordJsonWriter.marshal(this);
 	}
 
 	public void serialize(LittleEndianOutput out) {
@@ -79,7 +86,7 @@ public final class FeatFormulaErr2 implements SharedFeature {
 	public int getDataSize() {
 		return 4;
 	}
-	
+
 	public int _getRawErrorCheckValue() {
 		return errorCheck;
 	}
@@ -138,5 +145,10 @@ public final class FeatFormulaErr2 implements SharedFeature {
 	}
 	public void setPerformDataValidation(boolean performDataValidation) {
 	    errorCheck = PERFORM_DATA_VALIDATION.setBoolean(errorCheck, performDataValidation);
+	}
+
+	@Override
+	public FeatFormulaErr2 copy() {
+		return new FeatFormulaErr2(this);
 	}
 }

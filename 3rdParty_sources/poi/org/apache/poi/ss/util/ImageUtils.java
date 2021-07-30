@@ -24,6 +24,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -42,13 +44,13 @@ import org.apache.poi.util.Units;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-/**
- * @author Yegor Kozlov
- */
-public class ImageUtils {
+public final class ImageUtils {
     private static final POILogger logger = POILogFactory.getLogger(ImageUtils.class);
 
-    public static final int PIXEL_DPI = 96;
+    private static final int WIDTH_UNITS = 1024;
+    private static final int HEIGHT_UNITS = 256;
+
+    private ImageUtils() {}
 
     /**
      * Return the dimension of this image
@@ -59,7 +61,7 @@ public class ImageUtils {
      *
      * @return image dimension in pixels
      */
-    public static Dimension getImageDimension(InputStream is, int type){
+    public static Dimension getImageDimension(InputStream is, int type) {
         Dimension size = new Dimension();
 
         switch (type){
@@ -70,28 +72,29 @@ public class ImageUtils {
             case Workbook.PICTURE_TYPE_DIB:
                 try {
                     //read the image using javax.imageio.*
-                    ImageInputStream iis = ImageIO.createImageInputStream( is );
-                    try {
+                    try (ImageInputStream iis = ImageIO.createImageInputStream(is)) {
                         Iterator<ImageReader> i = ImageIO.getImageReaders( iis );
-                        ImageReader r = i.next();
-                        try {
-                            r.setInput( iis );
-                            BufferedImage img = r.read(0);
-        
-                            int[] dpi = getResolution(r);
-        
-                            //if DPI is zero then assume standard 96 DPI
-                            //since cannot divide by zero
-                            if (dpi[0] == 0) dpi[0] = PIXEL_DPI;
-                            if (dpi[1] == 0) dpi[1] = PIXEL_DPI;
-        
-                            size.width = img.getWidth()*PIXEL_DPI/dpi[0];
-                            size.height = img.getHeight()*PIXEL_DPI/dpi[1];
-                        } finally {
-                            r.dispose();
+                        if (i.hasNext()) {
+                            ImageReader r = i.next();
+                            try {
+                                r.setInput( iis );
+                                BufferedImage img = r.read(0);
+
+                                int[] dpi = getResolution(r);
+
+                                //if DPI is zero then assume standard 96 DPI
+                                //since cannot divide by zero
+                                if (dpi[0] == 0) dpi[0] = Units.PIXEL_DPI;
+                                if (dpi[1] == 0) dpi[1] = Units.PIXEL_DPI;
+
+                                size.width = img.getWidth()*Units.PIXEL_DPI/dpi[0];
+                                size.height = img.getHeight()*Units.PIXEL_DPI/dpi[1];
+                            } finally {
+                                r.dispose();
+                            }
+                        } else {
+                            logger.log(POILogger.WARN, "ImageIO found no images");
                         }
-                    } finally {
-                        iis.close();
                     }
 
                 } catch (IOException e) {
@@ -111,7 +114,7 @@ public class ImageUtils {
      * Return the the "effective" dpi calculated as <code>25.4/HorizontalPixelSize</code>
      * and <code>25.4/VerticalPixelSize</code>.  Where 25.4 is the number of mm in inch.
      *
-     * @return array of two elements: <code>{horisontalPdi, verticalDpi}</code>.
+     * @return array of two elements: <code>{horizontalDpi, verticalDpi}</code>.
      * {96, 96} is the default.
      */
     public static int[] getResolution(ImageReader r) throws IOException {
@@ -121,10 +124,14 @@ public class ImageUtils {
         NodeList lst;
         Element node = (Element)r.getImageMetadata(0).getAsTree("javax_imageio_1.0");
         lst = node.getElementsByTagName("HorizontalPixelSize");
-        if(lst != null && lst.getLength() == 1) hdpi = (int)(mm2inch/Float.parseFloat(((Element)lst.item(0)).getAttribute("value")));
+        if(lst != null && lst.getLength() == 1) {
+            hdpi = (int)(mm2inch/Float.parseFloat(((Element)lst.item(0)).getAttribute("value")));
+        }
 
         lst = node.getElementsByTagName("VerticalPixelSize");
-        if(lst != null && lst.getLength() == 1) vdpi = (int)(mm2inch/Float.parseFloat(((Element)lst.item(0)).getAttribute("value")));
+        if(lst != null && lst.getLength() == 1) {
+            vdpi = (int)(mm2inch/Float.parseFloat(((Element)lst.item(0)).getAttribute("value")));
+        }
 
         return new int[]{hdpi, vdpi};
     }
@@ -141,81 +148,32 @@ public class ImageUtils {
         boolean isHSSF = (anchor instanceof HSSFClientAnchor);
         PictureData data = picture.getPictureData();
         Sheet sheet = picture.getSheet();
-        
+
         // in pixel
-        Dimension imgSize = getImageDimension(new ByteArrayInputStream(data.getData()), data.getPictureType());
+        final Dimension imgSize = (scaleX == Double.MAX_VALUE || scaleY == Double.MAX_VALUE)
+            ? getImageDimension(new ByteArrayInputStream(data.getData()), data.getPictureType())
+            : new Dimension();
+
         // in emus
-        Dimension anchorSize = ImageUtils.getDimensionFromAnchor(picture);
+        final Dimension anchorSize = (scaleX != Double.MAX_VALUE || scaleY != Double.MAX_VALUE)
+            ? ImageUtils.getDimensionFromAnchor(picture)
+            : new Dimension();
+
         final double scaledWidth = (scaleX == Double.MAX_VALUE)
             ? imgSize.getWidth() : anchorSize.getWidth()/EMU_PER_PIXEL * scaleX;
         final double scaledHeight = (scaleY == Double.MAX_VALUE)
             ? imgSize.getHeight() : anchorSize.getHeight()/EMU_PER_PIXEL * scaleY;
 
-        double w = 0;
-        int col2 = anchor.getCol1();
-        int dx2 = 0;
+        scaleCell(scaledWidth, anchor.getCol1(), anchor.getDx1(), anchor::setCol2, anchor::setDx2,
+             isHSSF ? WIDTH_UNITS : 0, sheet::getColumnWidthInPixels);
 
-        //space in the leftmost cell
-        w = sheet.getColumnWidthInPixels(col2++);
-        if (isHSSF) {
-            w *= 1d - anchor.getDx1()/1024d;
-        } else {
-            w -= anchor.getDx1()/(double)EMU_PER_PIXEL;
-        }
-        
-        while(w < scaledWidth){
-            w += sheet.getColumnWidthInPixels(col2++);
-        }
-        
-        if(w > scaledWidth) {
-            //calculate dx2, offset in the rightmost cell
-            double cw = sheet.getColumnWidthInPixels(--col2);
-            double delta = w - scaledWidth;
-            if (isHSSF) {
-                dx2 = (int)((cw-delta)/cw*1024);
-            } else {
-                dx2 = (int)((cw-delta)*EMU_PER_PIXEL);
-            }
-            if (dx2 < 0) dx2 = 0;
-        }
-        anchor.setCol2(col2);
-        anchor.setDx2(dx2);
+        scaleCell(scaledHeight, anchor.getRow1(), anchor.getDy1(), anchor::setRow2, anchor::setDy2,
+                  isHSSF ? HEIGHT_UNITS : 0, (row) -> getRowHeightInPixels(sheet, row));
 
-        double h = 0;
-        int row2 = anchor.getRow1();
-        int dy2 = 0;
-        
-        h = getRowHeightInPixels(sheet,row2++);
-        if (isHSSF) {
-            h *= 1 - anchor.getDy1()/256d;
-        } else {
-            h -= anchor.getDy1()/(double)EMU_PER_PIXEL;
-        }
-
-        while(h < scaledHeight){
-            h += getRowHeightInPixels(sheet,row2++);
-        }
-        
-        if(h > scaledHeight) {
-            double ch = getRowHeightInPixels(sheet,--row2);
-            double delta = h - scaledHeight;
-            if (isHSSF) {
-                dy2 = (int)((ch-delta)/ch*256);
-            } else {
-                dy2 = (int)((ch-delta)*EMU_PER_PIXEL);
-            }
-            if (dy2 < 0) dy2 = 0;
-        }
-
-        anchor.setRow2(row2);
-        anchor.setDy2(dy2);
-
-        Dimension dim = new Dimension(
+        return new Dimension(
             (int)Math.round(scaledWidth*EMU_PER_PIXEL),
             (int)Math.round(scaledHeight*EMU_PER_PIXEL)
         );
-        
-        return dim;
     }
 
     /**
@@ -229,57 +187,100 @@ public class ImageUtils {
         boolean isHSSF = (anchor instanceof HSSFClientAnchor);
         Sheet sheet = picture.getSheet();
 
-        double w = 0;
-        int col2 = anchor.getCol1();
-
-        //space in the leftmost cell
-        w = sheet.getColumnWidthInPixels(col2++);
-        if (isHSSF) {
-            w *= 1 - anchor.getDx1()/1024d;
-        } else {
-            w -= anchor.getDx1()/(double)EMU_PER_PIXEL;
-        }
-        
-        while(col2 < anchor.getCol2()){
-            w += sheet.getColumnWidthInPixels(col2++);
-        }
-        
-        if (isHSSF) {
-            w += sheet.getColumnWidthInPixels(col2) * anchor.getDx2()/1024d;
-        } else {
-            w += anchor.getDx2()/(double)EMU_PER_PIXEL;
+        // default to image size (in pixel), if the anchor is only specified for Col1/Row1
+        Dimension imgSize = null;
+        if (anchor.getCol2() < anchor.getCol1() || anchor.getRow2() < anchor.getRow1()) {
+            PictureData data = picture.getPictureData();
+            imgSize = getImageDimension(new ByteArrayInputStream(data.getData()), data.getPictureType());
         }
 
-        double h = 0;
-        int row2 = anchor.getRow1();
-        
-        h = getRowHeightInPixels(sheet,row2++);
-        if (isHSSF) {
-            h *= 1 - anchor.getDy1()/256d;
-        } else {
-            h -= anchor.getDy1()/(double)EMU_PER_PIXEL;
-        }
+        int w = getDimFromCell(imgSize == null ? 0 : imgSize.getWidth(), anchor.getCol1(), anchor.getDx1(), anchor.getCol2(), anchor.getDx2(),
+            isHSSF ? WIDTH_UNITS : 0, sheet::getColumnWidthInPixels);
 
-        while(row2 < anchor.getRow2()){
-            h += getRowHeightInPixels(sheet,row2++);
-        }
-        
-        if (isHSSF) {
-            h += getRowHeightInPixels(sheet,row2) * anchor.getDy2()/256;
-        } else {
-            h += anchor.getDy2()/(double)EMU_PER_PIXEL;
-        }
+        int h = getDimFromCell(imgSize == null ? 0 : imgSize.getHeight(), anchor.getRow1(), anchor.getDy1(), anchor.getRow2(), anchor.getDy2(),
+                               isHSSF ? HEIGHT_UNITS : 0, (row) -> getRowHeightInPixels(sheet, row));
 
-        w *= EMU_PER_PIXEL;
-        h *= EMU_PER_PIXEL;
-        
-        return new Dimension((int)Math.rint(w), (int)Math.rint(h));
+        return new Dimension(w, h);
     }
-    
-    
+
+
     public static double getRowHeightInPixels(Sheet sheet, int rowNum) {
         Row r = sheet.getRow(rowNum);
         double points = (r == null) ? sheet.getDefaultRowHeightInPoints() : r.getHeightInPoints();
         return Units.toEMU(points)/(double)EMU_PER_PIXEL;
+    }
+
+    private static void scaleCell(final double targetSize,
+                                  final int startCell,
+                                  final int startD,
+                                  Consumer<Integer> endCell,
+                                  Consumer<Integer> endD,
+                                  final int hssfUnits,
+                                  Function<Integer,Number> nextSize) {
+        if (targetSize < 0) {
+            throw new IllegalArgumentException("target size < 0");
+        }
+
+        int cellIdx = startCell;
+        double dim, delta;
+        for (double totalDim = 0, remDim;; cellIdx++, totalDim += remDim) {
+            dim = nextSize.apply(cellIdx).doubleValue();
+            remDim = dim;
+            if (cellIdx == startCell) {
+                if (hssfUnits > 0) {
+                    remDim *= 1 - startD/(double)hssfUnits;
+                } else {
+                    remDim -= startD/(double)EMU_PER_PIXEL;
+                }
+            }
+            delta = targetSize - totalDim;
+            if (delta < remDim) {
+                break;
+            }
+        }
+
+        double endDval;
+        if (hssfUnits > 0) {
+            endDval = delta/dim * (double)hssfUnits;
+        } else {
+            endDval = delta * EMU_PER_PIXEL;
+        }
+        if (cellIdx == startCell) {
+            endDval += startD;
+        }
+
+        endCell.accept(cellIdx);
+        endD.accept((int)Math.rint(endDval));
+    }
+
+    private static int getDimFromCell(double imgSize, int startCell, int startD, int endCell, int endD, int hssfUnits,
+         Function<Integer,Number> nextSize) {
+        double targetSize;
+        if (endCell < startCell) {
+            targetSize = imgSize * EMU_PER_PIXEL;
+        } else {
+            targetSize = 0;
+            for (int cellIdx = startCell; cellIdx<=endCell; cellIdx++) {
+                final double dim = nextSize.apply(cellIdx).doubleValue() * EMU_PER_PIXEL;
+                double leadSpace = 0;
+                if (cellIdx == startCell) {
+                    //space in the leftmost cell
+                    leadSpace = (hssfUnits > 0)
+                        ? dim * startD/(double)hssfUnits
+                        : startD;
+                }
+
+                double trailSpace = 0;
+                if (cellIdx == endCell) {
+                    // space after the rightmost cell
+                    trailSpace = (hssfUnits > 0)
+                        ? dim * (hssfUnits-endD)/(double)hssfUnits
+                        : dim - endD;
+                }
+                targetSize += dim - leadSpace - trailSpace;
+            }
+        }
+
+        return (int)Math.rint(targetSize);
     }
 }

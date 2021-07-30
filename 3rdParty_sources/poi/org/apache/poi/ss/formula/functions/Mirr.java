@@ -18,6 +18,8 @@
 
 package org.apache.poi.ss.formula.functions;
 
+import java.util.Arrays;
+
 import org.apache.poi.ss.formula.eval.ErrorEval;
 import org.apache.poi.ss.formula.eval.EvaluationException;
 
@@ -60,8 +62,7 @@ public class Mirr extends MultiOperandNumericFunction {
         double financeRate = values[values.length-1];
         double reinvestRate = values[values.length-2];
 
-        double[] mirrValues = new double[values.length - 2];
-        System.arraycopy(values, 0, mirrValues, 0, mirrValues.length);
+        double[] mirrValues = Arrays.copyOf(values, values.length - 2);
 
         boolean mirrValuesAreAllNegatives = true;
         for (double mirrValue : mirrValues) {
@@ -84,7 +85,7 @@ public class Mirr extends MultiOperandNumericFunction {
 
     private static double mirr(double[] in, double financeRate, double reinvestRate) {
         double value = 0;
-        int numOfYears = in.length - 1;
+        double numOfYears = in.length - 1.;
         double pv = 0;
         double fv = 0;
 

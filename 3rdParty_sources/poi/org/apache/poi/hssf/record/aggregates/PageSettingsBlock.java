@@ -40,7 +40,7 @@ public final class PageSettingsBlock extends RecordAggregate {
      */
     private static final class PLSAggregate extends RecordAggregate {
         private static final ContinueRecord[] EMPTY_CONTINUE_RECORD_ARRAY = { };
-        private final Record _pls;
+        private final org.apache.poi.hssf.record.Record _pls;
         /**
          * holds any continue records found after the PLS record.<br>
          * This would not be required if PLS was properly interpreted.
@@ -52,7 +52,7 @@ public final class PageSettingsBlock extends RecordAggregate {
         public PLSAggregate(RecordStream rs) {
             _pls = rs.getNext();
             if (rs.peekNextSid()==ContinueRecord.sid) {
-                List<ContinueRecord> temp = new ArrayList<ContinueRecord>();
+                List<ContinueRecord> temp = new ArrayList<>();
                 while (rs.peekNextSid()==ContinueRecord.sid) {
                     temp.add((ContinueRecord)rs.getNext());
                 }
@@ -86,18 +86,18 @@ public final class PageSettingsBlock extends RecordAggregate {
     private BottomMarginRecord _bottomMargin;
     private final List<PLSAggregate> _plsRecords;
     private PrintSetupRecord _printSetup;
-    private Record _bitmap;
+    private org.apache.poi.hssf.record.Record _bitmap;
     private HeaderFooterRecord _headerFooter;
     /**
      * HeaderFooterRecord records belonging to preceding CustomViewSettingsRecordAggregates.
      * The indicator of such records is a non-zero GUID,
      *  see {@link  org.apache.poi.hssf.record.HeaderFooterRecord#getGuid()}
      */
-    private final List<HeaderFooterRecord> _sviewHeaderFooters = new ArrayList<HeaderFooterRecord>();
-    private Record _printSize;
+    private final List<HeaderFooterRecord> _sviewHeaderFooters = new ArrayList<>();
+    private org.apache.poi.hssf.record.Record _printSize;
 
     public PageSettingsBlock(RecordStream rs) {
-        _plsRecords = new ArrayList<PLSAggregate>();
+        _plsRecords = new ArrayList<>();
         while(true) {
             if (!readARecord(rs)) {
                 break;
@@ -109,7 +109,7 @@ public final class PageSettingsBlock extends RecordAggregate {
      * Creates a PageSettingsBlock with default settings
      */
     public PageSettingsBlock() {
-        _plsRecords = new ArrayList<PLSAggregate>();
+        _plsRecords = new ArrayList<>();
         _rowBreaksRecord = new HorizontalPageBreakRecord();
         _columnBreaksRecord = new VerticalPageBreakRecord();
         _header = new HeaderRecord("");
@@ -121,7 +121,7 @@ public final class PageSettingsBlock extends RecordAggregate {
 
     /**
      * @param sid the record sid
-     * 
+     *
      * @return <code>true</code> if the specified Record sid is one belonging to the
      * 'Page Settings Block'.
      */
@@ -220,7 +220,7 @@ public final class PageSettingsBlock extends RecordAggregate {
         return true;
     }
 
-    private void checkNotPresent(Record rec) {
+    private void checkNotPresent(org.apache.poi.hssf.record.Record rec) {
         if (rec != null) {
             throw new org.apache.poi.util.RecordFormatException("Duplicate PageSettingsBlock record (sid=0x"
                     + Integer.toHexString(rec.getSid()) + ")");
@@ -296,7 +296,7 @@ public final class PageSettingsBlock extends RecordAggregate {
         visitIfPresent(_headerFooter, rv);
         visitIfPresent(_bitmap, rv);
     }
-    private static void visitIfPresent(Record r, RecordVisitor rv) {
+    private static void visitIfPresent(org.apache.poi.hssf.record.Record r, RecordVisitor rv) {
         if (r != null) {
             rv.visitRecord(r);
         }
@@ -482,11 +482,11 @@ public final class PageSettingsBlock extends RecordAggregate {
     private static void shiftBreaks(PageBreakRecord breaks, int start, int stop, int count) {
 
         Iterator<PageBreakRecord.Break> iterator = breaks.getBreaksIterator();
-        List<PageBreakRecord.Break> shiftedBreak = new ArrayList<PageBreakRecord.Break>();
+        List<PageBreakRecord.Break> shiftedBreak = new ArrayList<>();
         while(iterator.hasNext())
         {
             PageBreakRecord.Break breakItem = iterator.next();
-            int breakLocation = breakItem.main;
+            int breakLocation = breakItem.getMain();
             boolean inStart = (breakLocation >= start);
             boolean inEnd = (breakLocation <= stop);
             if(inStart && inEnd) {
@@ -497,8 +497,8 @@ public final class PageSettingsBlock extends RecordAggregate {
         iterator = shiftedBreak.iterator();
         while (iterator.hasNext()) {
             PageBreakRecord.Break breakItem = iterator.next();
-            breaks.removeBreak(breakItem.main);
-            breaks.addBreak((short)(breakItem.main+count), breakItem.subFrom, breakItem.subTo);
+            breaks.removeBreak(breakItem.getMain());
+            breaks.addBreak((short)(breakItem.getMain()+count), breakItem.getSubFrom(), breakItem.getSubTo());
         }
     }
 
@@ -526,9 +526,9 @@ public final class PageSettingsBlock extends RecordAggregate {
 
     /**
      * Queries if the specified row has a page break
-     * 
+     *
      * @param row the row to check for
-     * 
+     *
      * @return true if the specified row has a page break
      */
     public boolean isRowBroken(int row) {
@@ -538,7 +538,7 @@ public final class PageSettingsBlock extends RecordAggregate {
 
     /**
      * Queries if the specified column has a page break
-     * 
+     *
      * @param column the column to check for
      *
      * @return <code>true</code> if the specified column has a page break
@@ -606,7 +606,7 @@ public final class PageSettingsBlock extends RecordAggregate {
     /**
      * HEADERFOOTER is new in 2007.  Some apps seem to have scattered this record long after
      * the {@link PageSettingsBlock} where it belongs.
-     * 
+     *
      * @param rec the HeaderFooterRecord to set
      */
     public void addLateHeaderFooter(HeaderFooterRecord rec) {
@@ -623,10 +623,10 @@ public final class PageSettingsBlock extends RecordAggregate {
      * This method reads PageSettingsBlock records from the supplied RecordStream until the first
      * non-PageSettingsBlock record is encountered.  As each record is read, it is incorporated
      * into this PageSettingsBlock.<p>
-     * 
+     *
      * The latest Excel version seems to write the PageSettingsBlock uninterrupted. However there
      * are several examples (that Excel reads OK) where these records are not written together:
-     * 
+     *
      * <ul>
      * <li><b>HEADER_FOOTER(0x089C) after WINDOW2</b> - This record is new in 2007.  Some apps
      * seem to have scattered this record long after the PageSettingsBlock where it belongs
@@ -635,7 +635,7 @@ public final class PageSettingsBlock extends RecordAggregate {
      * This happens in the test sample file "NoGutsRecords.xls" and "WORKBOOK_in_capitals.xls"</li>
      * <li><b>Margins after DIMENSION</b> - All of PSB should be before DIMENSION. (Bug-47199)</li>
      * </ul>
-     * 
+     *
      * These were probably written by other applications (or earlier versions of Excel). It was
      * decided to not write specific code for detecting each of these cases.  POI now tolerates
      * PageSettingsBlock records scattered all over the sheet record stream, and in any order, but
@@ -646,7 +646,7 @@ public final class PageSettingsBlock extends RecordAggregate {
      * were when they were originally read.
      *
      * @param rs the RecordStream to read from
-     * 
+     *
      * @throws  org.apache.poi.util.RecordFormatException if any PSB record encountered has the same type (sid) as
      * a record that is already part of this PageSettingsBlock
      */
@@ -672,9 +672,9 @@ public final class PageSettingsBlock extends RecordAggregate {
     public void positionRecords(List<RecordBase> sheetRecords) {
         // Take a copy to loop over, so we can update the real one
         //  without concurrency issues
-        List<HeaderFooterRecord> hfRecordsToIterate = new ArrayList<HeaderFooterRecord>(_sviewHeaderFooters);
+        List<HeaderFooterRecord> hfRecordsToIterate = new ArrayList<>(_sviewHeaderFooters);
 
-        final Map<String, HeaderFooterRecord> hfGuidMap = new HashMap<String, HeaderFooterRecord>();
+        final Map<String, HeaderFooterRecord> hfGuidMap = new HashMap<>();
 
         for(final HeaderFooterRecord hf : hfRecordsToIterate) {
             hfGuidMap.put(HexDump.toHex(hf.getGuid()), hf);
@@ -685,17 +685,14 @@ public final class PageSettingsBlock extends RecordAggregate {
         for (RecordBase rb : sheetRecords) {
             if (rb instanceof CustomViewSettingsRecordAggregate) {
                 final CustomViewSettingsRecordAggregate cv = (CustomViewSettingsRecordAggregate) rb;
-                cv.visitContainedRecords(new RecordVisitor() {
-                    @Override
-                    public void visitRecord(Record r) {
-                        if (r.getSid() == UserSViewBegin.sid) {
-                            String guid = HexDump.toHex(((UserSViewBegin) r).getGuid());
-                            HeaderFooterRecord hf = hfGuidMap.get(guid);
+                cv.visitContainedRecords(r -> {
+                    if (r.getSid() == UserSViewBegin.sid) {
+                        String guid = HexDump.toHex(((UserSViewBegin) r).getGuid());
+                        HeaderFooterRecord hf = hfGuidMap.get(guid);
 
-                            if (hf != null) {
-                                cv.append(hf);
-                                _sviewHeaderFooters.remove(hf);
-                            }
+                        if (hf != null) {
+                            cv.append(hf);
+                            _sviewHeaderFooters.remove(hf);
                         }
                     }
                 });

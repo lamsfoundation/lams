@@ -18,7 +18,6 @@
 package org.apache.poi.ss.usermodel;
 
 import org.apache.poi.ss.formula.eval.ErrorEval;
-import org.apache.poi.util.Removal;
 
 /**
  * Mimics the 'data view' of a cell. This allows formula evaluator
@@ -27,7 +26,7 @@ import org.apache.poi.util.Removal;
  */
 public final class CellValue {
 	public static final CellValue TRUE = new CellValue(CellType.BOOLEAN, 0.0, true,  null, 0);
-	public static final CellValue FALSE= new CellValue(CellType.BOOLEAN, 0.0, false, null, 0);
+	public static final CellValue FALSE = new CellValue(CellType.BOOLEAN, 0.0, false, null, 0);
 
 	private final CellType _cellType;
 	private final double _numberValue;
@@ -83,31 +82,13 @@ public final class CellValue {
 		return _textValue;
 	}
 
-    /**
-     * Return the cell type.
-     *
-     * @return the cell type
-     * @since POI 3.15
-     * Will be renamed to <code>getCellTypeEnum()</code> when we make the CellType enum transition in POI 4.0. See bug 59791.
-     */
-    @Removal(version="4.2")
-    public CellType getCellTypeEnum() {
-        return _cellType;
-    }
-
 	/**
 	 * Return the cell type.
 	 *
-	 * Will return {@link CellType} in version 4.0 of POI.
-	 * For forwards compatibility, do not hard-code cell type literals in your code.
-	 *
 	 * @return the cell type
-	 *
-	 * @deprecated POI 3.15. Use {@link #getCellTypeEnum()} instead.
 	 */
-	@Deprecated
-	public int getCellType() {
-		return _cellType.getCode();
+	public CellType getCellType() {
+		return _cellType;
 	}
 
 	/**
@@ -118,11 +99,9 @@ public final class CellValue {
 	}
 
 	public String toString() {
-		StringBuffer sb = new StringBuffer(64);
-		sb.append(getClass().getName()).append(" [");
-		sb.append(formatAsString());
-		sb.append("]");
-		return sb.toString();
+		return getClass().getName() + " [" +
+				formatAsString() +
+				"]";
 	}
 
 	public String formatAsString() {

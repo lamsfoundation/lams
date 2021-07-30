@@ -17,9 +17,11 @@
 
 package org.apache.poi.hssf.record;
 
-import java.util.Locale;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Supplier;
 
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
@@ -27,13 +29,17 @@ import org.apache.poi.util.LittleEndianOutput;
  * This record also marks the start of custom view records, which save custom view settings.
  * Records between {@link UserSViewBegin} and {@link UserSViewEnd} contain settings for the custom view,
  * not settings for the sheet itself.
- *
- * @author Yegor Kozlov
  */
 public final class UserSViewBegin extends StandardRecord {
 
-    public final static short sid = 0x01AA;
-	private byte[] _rawData;
+    public static final short sid = 0x01AA;
+
+    private byte[] _rawData;
+
+    public UserSViewBegin(UserSViewBegin other) {
+        super(other);
+        _rawData = (other._rawData == null) ? null : other._rawData.clone();
+    }
 
     public UserSViewBegin(byte[] data) {
         _rawData = data;
@@ -68,24 +74,24 @@ public final class UserSViewBegin extends StandardRecord {
      * @return Globally unique identifier for the custom view
      */
     public byte[] getGuid(){
-        byte[] guid = new byte[16];
-        System.arraycopy(_rawData, 0, guid, 0, guid.length);
-        return guid;
+        return Arrays.copyOf(_rawData, 16);
     }
 
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-
-        sb.append("[").append("USERSVIEWBEGIN").append("] (0x");
-        sb.append(Integer.toHexString(sid).toUpperCase(Locale.ROOT) + ")\n");
-        sb.append("  rawData=").append(HexDump.toHex(_rawData)).append("\n");
-        sb.append("[/").append("USERSVIEWBEGIN").append("]\n");
-        return sb.toString();
+    @Override
+    public UserSViewBegin copy() {
+        return new UserSViewBegin(this);
     }
 
-    //HACK: do a "cheat" clone, see Record.java for more information
-    public Object clone() {
-        return cloneViaReserialise();
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.USER_SVIEW_BEGIN;
     }
- 
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "guid", this::getGuid,
+            "rawData", () -> _rawData
+        );
+    }
 }

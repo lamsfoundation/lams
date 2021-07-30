@@ -24,57 +24,33 @@ import javax.xml.stream.XMLOutputFactory;
 
 /**
  * Provides handy methods for working with StAX parsers and readers
+ *
+ * @deprecated use {@link XMLHelper}
  */
+@Deprecated
+@Removal(version = "6.0.0")
 public final class StaxHelper {
-    private static final POILogger logger = POILogFactory.getLogger(StaxHelper.class);
-
-    private StaxHelper() {}
+    private StaxHelper() {
+    }
 
     /**
      * Creates a new StAX XMLInputFactory, with sensible defaults
      */
     public static XMLInputFactory newXMLInputFactory() {
-        XMLInputFactory factory = XMLInputFactory.newFactory();
-        trySetProperty(factory, XMLInputFactory.IS_NAMESPACE_AWARE, true);
-        trySetProperty(factory, XMLInputFactory.IS_VALIDATING, false);
-        trySetProperty(factory, XMLInputFactory.SUPPORT_DTD, false);
-        trySetProperty(factory, XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
-        return factory;
+        return XMLHelper.newXMLInputFactory();
     }
 
     /**
      * Creates a new StAX XMLOutputFactory, with sensible defaults
      */
     public static XMLOutputFactory newXMLOutputFactory() {
-        XMLOutputFactory factory = XMLOutputFactory.newFactory();
-        trySetProperty(factory, XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
-        return factory;
+        return XMLHelper.newXMLOutputFactory();
     }
 
     /**
      * Creates a new StAX XMLEventFactory, with sensible defaults
      */
     public static XMLEventFactory newXMLEventFactory() {
-        return XMLEventFactory.newFactory();
-    }
-            
-    private static void trySetProperty(XMLInputFactory factory, String feature, boolean flag) {
-        try {
-            factory.setProperty(feature, flag);
-        } catch (Exception e) {
-            logger.log(POILogger.WARN, "StAX Property unsupported", feature, e);
-        } catch (AbstractMethodError ame) {
-            logger.log(POILogger.WARN, "Cannot set StAX property because outdated StAX parser in classpath", feature, ame);
-        }
-    }
-
-    private static void trySetProperty(XMLOutputFactory factory, String feature, boolean flag) {
-        try {
-            factory.setProperty(feature, flag);
-        } catch (Exception e) {
-            logger.log(POILogger.WARN, "StAX Property unsupported", feature, e);
-        } catch (AbstractMethodError ame) {
-            logger.log(POILogger.WARN, "Cannot set StAX property because outdated StAX parser in classpath", feature, ame);
-        }
+        return XMLHelper.newXMLEventFactory();
     }
 }

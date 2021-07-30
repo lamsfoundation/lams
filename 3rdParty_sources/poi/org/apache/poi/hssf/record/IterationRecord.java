@@ -17,32 +17,36 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.util.BitField;
 import org.apache.poi.util.BitFieldFactory;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        Iteration Record (0x0011)<p>
- * Description:  Tells whether to iterate over formula calculations or not
- *               (if a formula is dependent upon another formula's result)
- *               (odd feature for something that can only have 32 elements in
- *                a formula!)<p>
- * REFERENCE:  PG 325 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)
+ * Tells whether to iterate over formula calculations or not.
+ * If a formula is dependent upon another formula's result.
+ * (odd feature for something that can only have 32 elements in a formula!)
  */
-public final class IterationRecord extends StandardRecord implements Cloneable {
-    public final static short sid = 0x0011;
+public final class IterationRecord extends StandardRecord {
+    public static final short sid = 0x0011;
 
     private static final BitField iterationOn = BitFieldFactory.getInstance(0x0001);
 
     private int _flags;
 
+    public IterationRecord(IterationRecord other) {
+        super(other);
+        _flags = other._flags;
+    }
+
     public IterationRecord(boolean iterateOn) {
         _flags = iterationOn.setBoolean(0, iterateOn);
     }
 
-    public IterationRecord(RecordInputStream in)
-    {
+    public IterationRecord(RecordInputStream in) {
         _flags = in.readShort();
     }
 
@@ -63,15 +67,6 @@ public final class IterationRecord extends StandardRecord implements Cloneable {
         return iterationOn.isSet(_flags);
     }
 
-    public String toString() {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[ITERATION]\n");
-        buffer.append("    .flags      = ").append(HexDump.shortToHex(_flags)).append("\n");
-        buffer.append("[/ITERATION]\n");
-        return buffer.toString();
-    }
-
     public void serialize(LittleEndianOutput out) {
         out.writeShort(_flags);
     }
@@ -85,7 +80,20 @@ public final class IterationRecord extends StandardRecord implements Cloneable {
     }
 
     @Override
-    public IterationRecord clone() {
-        return new IterationRecord(getIteration());
+    public IterationRecord copy() {
+        return new IterationRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.ITERATION;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "flags", () -> _flags,
+            "iteration", this::getIteration
+        );
     }
 }

@@ -24,13 +24,17 @@ import org.apache.poi.ss.util.CellRangeAddress;
  * Used to describe a {@link CFRuleRecord}.
  * @see CFHeader12Record
  */
-public final class CFHeaderRecord extends CFHeaderBase implements Cloneable {
+public final class CFHeaderRecord extends CFHeaderBase {
     public static final short sid = 0x01B0;
 
-    /** Creates new CFHeaderRecord */
     public CFHeaderRecord() {
         createEmpty();
     }
+
+    public CFHeaderRecord(CFHeaderRecord other) {
+        super(other);
+    }
+
     public CFHeaderRecord(CellRangeAddress[] regions, int nRules) {
         super(regions, nRules);
     }
@@ -48,9 +52,12 @@ public final class CFHeaderRecord extends CFHeaderBase implements Cloneable {
     }
 
     @Override
-    public CFHeaderRecord clone() {
-        CFHeaderRecord result = new CFHeaderRecord();
-        super.copyTo(result);
-        return result;
+    public CFHeaderRecord copy() {
+        return new CFHeaderRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.CF_HEADER;
     }
 }

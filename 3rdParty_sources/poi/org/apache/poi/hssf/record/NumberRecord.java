@@ -17,22 +17,26 @@
 
 package org.apache.poi.hssf.record;
 
-import org.apache.poi.ss.util.NumberToTextConverter;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * NUMBER (0x0203) Contains a numeric cell value. <P>
- * REFERENCE:  PG 334 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)<P>
- * @author Andrew C. Oliver (acoliver at apache dot org)
- * @author Jason Height (jheight at chariot dot net dot au)
+ * NUMBER (0x0203) Contains a numeric cell value.
  */
-public final class NumberRecord extends CellRecord implements Cloneable {
+public final class NumberRecord extends CellRecord {
     public static final short sid = 0x0203;
+
     private double field_4_value;
 
     /** Creates new NumberRecord */
-    public NumberRecord() {
-    	// fields uninitialised
+    public NumberRecord() {}
+
+    public NumberRecord(NumberRecord other) {
+        super(other);
+        field_4_value = other.field_4_value;
     }
 
     /**
@@ -63,12 +67,7 @@ public final class NumberRecord extends CellRecord implements Cloneable {
 
     @Override
     protected String getRecordName() {
-    	return "NUMBER";
-    }
-
-    @Override
-    protected void appendValueText(StringBuilder sb) {
-    	sb.append("  .value= ").append(NumberToTextConverter.toText(field_4_value));
+        return "NUMBER";
     }
 
     @Override
@@ -78,7 +77,7 @@ public final class NumberRecord extends CellRecord implements Cloneable {
 
     @Override
     protected int getValueDataSize() {
-    	return 8;
+        return 8;
     }
 
     @Override
@@ -87,10 +86,20 @@ public final class NumberRecord extends CellRecord implements Cloneable {
     }
 
     @Override
-    public NumberRecord clone() {
-      NumberRecord rec = new NumberRecord();
-      copyBaseFields(rec);
-      rec.field_4_value = field_4_value;
-      return rec;
+    public NumberRecord copy() {
+        return new NumberRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.NUMBER;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+           "base", super::getGenericProperties,
+           "value", this::getValue
+        );
     }
 }

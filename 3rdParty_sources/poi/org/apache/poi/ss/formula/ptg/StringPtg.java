@@ -17,6 +17,10 @@
 
 package org.apache.poi.ss.formula.ptg;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 import org.apache.poi.util.StringUtil;
@@ -24,10 +28,6 @@ import org.apache.poi.util.StringUtil;
 /**
  * String Stores a String value in a formula value stored in the format
  * &lt;length 2 bytes&gt;char[]
- * 
- * @author Werner Froidevaux
- * @author Jason Height (jheight at chariot dot net dot au)
- * @author Bernard Chesnoy
  */
 public final class StringPtg extends ScalarConstantPtg {
      public final static byte sid = 0x17;
@@ -56,7 +56,7 @@ public final class StringPtg extends ScalarConstantPtg {
      * Create a StringPtg from a string representation of the number Number
      * format is not checked, it is expected to be validated in the parser that
      * calls this method.
-     * 
+     *
      * @param value :
      *            String representation of a floating point number
      */
@@ -84,6 +84,11 @@ public final class StringPtg extends ScalarConstantPtg {
         }
     }
 
+    @Override
+    public byte getSid() {
+        return sid;
+    }
+
     public int getSize() {
     	return 3 +  field_3_string.length() * (_is16bitUnicode ? 2 : 1);
     }
@@ -91,7 +96,7 @@ public final class StringPtg extends ScalarConstantPtg {
     public String toFormulaString() {
         String value = field_3_string;
         int len = value.length();
-        StringBuffer sb = new StringBuffer(len + 4);
+        StringBuilder sb = new StringBuilder(len + 4);
         sb.append(FORMULA_DELIMITER);
 
         for (int i = 0; i < len; i++) {
@@ -104,5 +109,15 @@ public final class StringPtg extends ScalarConstantPtg {
 
         sb.append(FORMULA_DELIMITER);
         return sb.toString();
+    }
+
+    @Override
+    public StringPtg copy() {
+        return this;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties("value", this::getValue);
     }
 }

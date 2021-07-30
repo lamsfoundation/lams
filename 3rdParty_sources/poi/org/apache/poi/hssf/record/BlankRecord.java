@@ -17,30 +17,36 @@
 
 package org.apache.poi.hssf.record;
 
-import org.apache.poi.util.HexDump;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        Blank cell record (0x0201) <P>
- * Description:  Represents a column in a row with no value but with styling.<P>
- * REFERENCE:  PG 287 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)<P>
- * @author Andrew C. Oliver (acoliver at apache dot org)
- * @author Jason Height (jheight at chariot dot net dot au)
+ * Represents a column in a row with no value but with styling.
+ *
  * @version 2.0-pre
  */
-public final class BlankRecord extends StandardRecord implements CellValueRecordInterface, Cloneable {
-    public final static short sid = 0x0201;
-    private int             field_1_row;
-    private short             field_2_col;
-    private short             field_3_xf;
+public final class BlankRecord extends StandardRecord implements CellValueRecordInterface {
+    public static final short sid = 0x0201;
+
+    private int field_1_row;
+    private short field_2_col;
+    private short field_3_xf;
 
     /** Creates a new instance of BlankRecord */
-    public BlankRecord()
-    {
+    public BlankRecord() {}
+
+    public BlankRecord(BlankRecord other) {
+        super(other);
+        field_1_row = other.field_1_row;
+        field_2_col = other.field_2_col;
+        field_3_xf  = other.field_3_xf;
     }
 
-    public BlankRecord(RecordInputStream in)
-    {
+
+    public BlankRecord(RecordInputStream in) {
         field_1_row = in.readUShort();
         field_2_col = in.readShort();
         field_3_xf  = in.readShort();
@@ -115,18 +121,6 @@ public final class BlankRecord extends StandardRecord implements CellValueRecord
         return sid;
     }
 
-    public String toString()
-    {
-        StringBuffer sb = new StringBuffer();
-
-        sb.append("[BLANK]\n");
-        sb.append("    row= ").append(HexDump.shortToHex(getRow())).append("\n");
-        sb.append("    col= ").append(HexDump.shortToHex(getColumn())).append("\n");
-        sb.append("    xf = ").append(HexDump.shortToHex(getXFIndex())).append("\n");
-        sb.append("[/BLANK]\n");
-        return sb.toString();
-    }
-
     public void serialize(LittleEndianOutput out) {
         out.writeShort(getRow());
         out.writeShort(getColumn());
@@ -138,11 +132,21 @@ public final class BlankRecord extends StandardRecord implements CellValueRecord
     }
 
     @Override
-    public BlankRecord clone() {
-      BlankRecord rec = new BlankRecord();
-      rec.field_1_row = field_1_row;
-      rec.field_2_col = field_2_col;
-      rec.field_3_xf = field_3_xf;
-      return rec;
+    public BlankRecord copy() {
+        return new BlankRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.BLANK;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "row", this::getRow,
+            "col", this::getColumn,
+            "xfIndex", this::getXFIndex
+        );
     }
 }

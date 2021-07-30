@@ -17,6 +17,10 @@
 
 package org.apache.poi.ss.formula.ptg;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 
@@ -37,6 +41,7 @@ import org.apache.poi.util.LittleEndianOutput;
 public final class TblPtg extends ControlPtg {
     private final static int  SIZE = 5;
     public final static short sid  = 0x02;
+
     /** The row number of the upper left corner */
     private final int field_1_first_row;
     /** The column number of the upper left corner */
@@ -51,6 +56,11 @@ public final class TblPtg extends ControlPtg {
         out.writeByte(sid + getPtgClass());
         out.writeShort(field_1_first_row);
         out.writeShort(field_2_first_col);
+    }
+
+    @Override
+    public byte getSid() {
+        return sid;
     }
 
     public int getSize() {
@@ -71,10 +81,17 @@ public final class TblPtg extends ControlPtg {
         throw new RuntimeException("Table and Arrays are not yet supported");
     }
 
-    public String toString() {
-        StringBuffer buffer = new StringBuffer("[Data Table - Parent cell is an interior cell in a data table]\n");
-        buffer.append("top left row = ").append(getRow()).append("\n");
-        buffer.append("top left col = ").append(getColumn()).append("\n");
-        return buffer.toString();
+    @Override
+    public TblPtg copy() {
+        // immutable
+        return this;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "row", this::getRow,
+            "column", this::getColumn
+        );
     }
 }

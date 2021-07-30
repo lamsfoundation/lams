@@ -29,7 +29,7 @@ public class FontDetails
 {
     private String _fontName;
     private int _height;
-    private final Map<Character, Integer> charWidths = new HashMap<Character, Integer>();
+    private final Map<Character, Integer> charWidths = new HashMap<>();
 
     /**
      * Construct the font details with the given name and height.
@@ -151,12 +151,12 @@ public class FontDetails
         int listSize = tok.countTokens();
         if(max != -1 && listSize > max)
             listSize = max;
-        String list[] = new String[listSize];
+        String[] list = new String[listSize];
         for(int i = 0; tok.hasMoreTokens(); i++)
         {
             if(max != -1 && i == listSize - 1)
             {
-                StringBuffer buf = new StringBuffer((text.length() * (listSize - i)) / listSize);
+                StringBuilder buf = new StringBuilder((text.length() * (listSize - i)) / listSize);
                 while(tok.hasMoreTokens())
                 {
                     buf.append(tok.nextToken());

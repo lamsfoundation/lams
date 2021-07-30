@@ -41,7 +41,11 @@ import org.apache.poi.util.ShortField;
  * The block containing the archive header
  */
 public final class HeaderBlock implements HeaderBlockConstants {
-    private static final byte _default_value = ( byte ) 0xFF;
+
+	//arbitrarily selected; may need to increase
+	private static final int MAX_RECORD_LENGTH = 100_000;
+
+	private static final byte _default_value = ( byte ) 0xFF;
 
     /**
 	 * What big block size the file uses. Most files
@@ -104,7 +108,7 @@ public final class HeaderBlock implements HeaderBlockConstants {
 		// Fetch the rest of the block if needed
 		if(bigBlockSize.getBigBlockSize() != 512) {
 		   int rest = bigBlockSize.getBigBlockSize() - 512;
-		   byte[] tmp = new byte[rest];
+		   byte[] tmp = IOUtils.safelyAllocate(rest, MAX_RECORD_LENGTH);
 		   IOUtils.readFully(stream, tmp);
 		}
 	}
@@ -132,6 +136,9 @@ public final class HeaderBlock implements HeaderBlockConstants {
 	   case MSWRITE:
            throw new NotOLE2FileException("The supplied data appears to be in the old MS Write format. "
                + "Apache POI doesn't currently support this format");
+	   case WORD2:
+		   throw new NotOLE2FileException("The supplied data appears to be an old Word version 2 file. "
+			   + "Apache POI doesn't currently support this format");
        case BIFF2:
        case BIFF3:
        case BIFF4:
@@ -207,12 +214,12 @@ public final class HeaderBlock implements HeaderBlockConstants {
       byte[] data = new byte[512];
       int bsCount = IOUtils.readFully(stream, data);
       if(bsCount != 512) {
-         throw alertShortRead(bsCount, 512);
+         throw alertShortRead(bsCount);
       }
       return data;
 	}
 
-	private static IOException alertShortRead(int pRead, int expectedReadSize) {
+	private static IOException alertShortRead(int pRead) {
 		int read;
 		if (pRead < 0) {
 			//Can't have -1 bytes read in the error message!
@@ -223,8 +230,7 @@ public final class HeaderBlock implements HeaderBlockConstants {
 		String type = " byte" + (read == 1 ? (""): ("s"));
 
 		return new IOException("Unable to read entire header; "
-				+ read + type + " read; expected "
-				+ expectedReadSize + " bytes");
+				+ read + type + " read; expected 512 bytes");
 	}
 
 	/**
@@ -365,7 +371,7 @@ public final class HeaderBlock implements HeaderBlockConstants {
     * @exception IOException on problems writing to the specified
     *            stream
     */
-   void writeData(final OutputStream stream) throws IOException {
+   public void writeData(final OutputStream stream) throws IOException {
       // Update the counts and start positions 
       new IntegerField(_bat_count_offset,      _bat_count, _data);
       new IntegerField(_property_start_offset, _property_start, _data);

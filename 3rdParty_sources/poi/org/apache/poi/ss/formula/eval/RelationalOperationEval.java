@@ -17,6 +17,7 @@
 
 package org.apache.poi.ss.formula.eval;
 
+import org.apache.poi.ss.formula.functions.ArrayFunction;
 import org.apache.poi.ss.formula.functions.Fixed2ArgFunction;
 import org.apache.poi.ss.formula.functions.Function;
 import org.apache.poi.ss.util.NumberComparer;
@@ -26,7 +27,7 @@ import org.apache.poi.ss.util.NumberComparer;
  *
  * @author Amol S. Deshmukh &lt; amolweb at ya hoo dot com &gt;
  */
-public abstract class RelationalOperationEval extends Fixed2ArgFunction {
+public abstract class RelationalOperationEval extends Fixed2ArgFunction implements ArrayFunction {
 
 	/**
 	 * Converts a standard compare result (-1, 0, 1) to <code>true</code> or <code>false</code>
@@ -40,22 +41,23 @@ public abstract class RelationalOperationEval extends Fixed2ArgFunction {
 	 * for the relational operators Evals.
 	 *
 	 * <pre>
-	 * Bool.TRUE > any number.
-	 * Bool > any string. ALWAYS
-	 * Bool.TRUE > Bool.FALSE
+	 * Bool.TRUE &gt; any number.
+	 * Bool &gt; any string. ALWAYS
+	 * Bool.TRUE &gt; Bool.FALSE
 	 * Bool.FALSE == Blank
 	 *
 	 * Strings are never converted to numbers or booleans
-	 * String > any number. ALWAYS
-	 * Non-empty String > Blank
+	 * String &gt; any number. ALWAYS
+	 * Non-empty String &gt; Blank
 	 * Empty String == Blank
 	 * String are sorted dictionary wise
 	 *
-	 * Blank > Negative numbers
+	 * Blank &gt; Negative numbers
 	 * Blank == 0
 	 * Blank < Positive numbers
 	 * </pre>
 	 */
+
 	public ValueEval evaluate(int srcRowIndex, int srcColumnIndex, ValueEval arg0, ValueEval arg1) {
 
 		ValueEval vA;
@@ -71,12 +73,24 @@ public abstract class RelationalOperationEval extends Fixed2ArgFunction {
 		return BoolEval.valueOf(result);
 	}
 
+	@Override
+	public ValueEval evaluateArray(ValueEval[] args, int srcRowIndex, int srcColumnIndex) {
+		ValueEval arg0 = args[0];
+		ValueEval arg1 = args[1];
+		return evaluateTwoArrayArgs(arg0, arg1, srcRowIndex, srcColumnIndex, (vA, vB) -> {
+			int cmpResult = doCompare(vA, vB);
+			boolean result = convertComparisonResult(cmpResult);
+			return BoolEval.valueOf(result);
+		});
+
+	}
+
 	private static int doCompare(ValueEval va, ValueEval vb) {
-		// special cases when one operand is blank
-		if (va == BlankEval.instance) {
+		// special cases when one operand is blank or missing
+		if (va == BlankEval.instance || va instanceof MissingArgEval) {
 			return compareBlank(vb);
 		}
-		if (vb == BlankEval.instance) {
+		if (vb == BlankEval.instance || vb instanceof MissingArgEval) {
 			return -compareBlank(va);
 		}
 
@@ -117,7 +131,7 @@ public abstract class RelationalOperationEval extends Fixed2ArgFunction {
 	}
 
 	private static int compareBlank(ValueEval v) {
-		if (v == BlankEval.instance) {
+		if (v == BlankEval.instance || v instanceof MissingArgEval) {
 			return 0;
 		}
 		if (v instanceof BoolEval) {

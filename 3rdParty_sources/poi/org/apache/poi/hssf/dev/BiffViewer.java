@@ -42,7 +42,7 @@ import org.apache.poi.hssf.record.pivottable.ViewDefinitionRecord;
 import org.apache.poi.hssf.record.pivottable.ViewFieldsRecord;
 import org.apache.poi.hssf.record.pivottable.ViewSourceRecord;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.util.HexDump;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.LittleEndian;
@@ -71,20 +71,17 @@ public final class BiffViewer {
      * @param recListener the record listener to notify about read records
      * @param dumpInterpretedRecords if {@code true}, the read records will be written to the PrintWriter
      *
-     * @return an array of Records created from the InputStream
      * @exception  org.apache.poi.util.RecordFormatException  on error processing the InputStream
      */
-    public static Record[] createRecords(InputStream is, PrintWriter ps, BiffRecordListener recListener, boolean dumpInterpretedRecords)
+    private static void createRecords(InputStream is, PrintWriter ps, BiffRecordListener recListener, boolean dumpInterpretedRecords)
             throws org.apache.poi.util.RecordFormatException {
-        List<Record> temp = new ArrayList<Record>();
-
         RecordInputStream recStream = new RecordInputStream(is);
         while (true) {
             boolean hasNext;
             try {
                 hasNext = recStream.hasNextRecord();
             } catch (LeftoverDataException e) {
-                logger.log(POILogger.ERROR, "Discarding " + recStream.remaining() + " bytes and continuing", e);
+                logger.log(POILogger.ERROR, "Discarding ", recStream.remaining(), " bytes and continuing", e);
                 recStream.readRemainder();
                 hasNext = recStream.hasNextRecord();
             }
@@ -95,13 +92,12 @@ public final class BiffViewer {
             if (recStream.getSid() == 0) {
                 continue;
             }
-            Record record;
+            org.apache.poi.hssf.record.Record record;
             if (dumpInterpretedRecords) {
                 record = createRecord (recStream);
                 if (record.getSid() == ContinueRecord.sid) {
                     continue;
                 }
-                temp.add(record);
 
                 for (String header : recListener.getRecentHeaders()) {
                     ps.println(header);
@@ -112,9 +108,6 @@ public final class BiffViewer {
             }
             ps.println();
         }
-        Record[] result = new Record[temp.size()];
-        temp.toArray(result);
-        return result;
     }
 
 
@@ -123,7 +116,7 @@ public final class BiffViewer {
      *  up non-debug operations.
      *
      */
-    private static Record createRecord(RecordInputStream in) {
+    private static org.apache.poi.hssf.record.Record createRecord(RecordInputStream in) {
         switch (in.getSid()) {
             case AreaFormatRecord.sid:        return new AreaFormatRecord(in);
             case AreaRecord.sid:              return new AreaRecord(in);
@@ -147,7 +140,7 @@ public final class BiffViewer {
             case CFHeader12Record.sid:        return new CFHeader12Record(in);
             case CFRuleRecord.sid:            return new CFRuleRecord(in);
             case CFRule12Record.sid:          return new CFRule12Record(in);
-            // TODO Add CF Ex, and remove from UnknownRecord 
+            // TODO Add CF Ex, and remove from UnknownRecord
             case CalcCountRecord.sid:         return new CalcCountRecord(in);
             case CalcModeRecord.sid:          return new CalcModeRecord(in);
             case CategorySeriesAxisRecord.sid:return new CategorySeriesAxisRecord(in);
@@ -244,7 +237,7 @@ public final class BiffViewer {
             case SeriesListRecord.sid:        return new SeriesListRecord(in);
             case SeriesRecord.sid:            return new SeriesRecord(in);
             case SeriesTextRecord.sid:        return new SeriesTextRecord(in);
-            case SeriesToChartGroupRecord.sid:return new SeriesToChartGroupRecord(in);
+            case SeriesChartGroupIndexRecord.sid:return new SeriesChartGroupIndexRecord(in);
             case SharedFormulaRecord.sid:     return new SharedFormulaRecord(in);
             case SheetPropertiesRecord.sid:   return new SheetPropertiesRecord(in);
             case StringRecord.sid:            return new StringRecord(in);
@@ -349,19 +342,19 @@ public final class BiffViewer {
             }
             return new CommandArgs(biffhex, noint, out, rawhex, noheader, file);
         }
-        public boolean shouldDumpBiffHex() {
+        boolean shouldDumpBiffHex() {
             return _biffhex;
         }
-        public boolean shouldDumpRecordInterpretations() {
+        boolean shouldDumpRecordInterpretations() {
             return !_noint;
         }
-        public boolean shouldOutputToFile() {
+        boolean shouldOutputToFile() {
             return _out;
         }
-        public boolean shouldOutputRawHexOnly() {
+        boolean shouldOutputRawHexOnly() {
             return _rawhex;
         }
-        public boolean suppressHeader() {
+        boolean suppressHeader() {
             return _noHeader;
         }
         public File getFile() {
@@ -369,7 +362,7 @@ public final class BiffViewer {
         }
     }
     private static final class CommandParseException extends Exception {
-        public CommandParseException(String msg) {
+        CommandParseException(String msg) {
             super(msg);
         }
     }
@@ -391,8 +384,8 @@ public final class BiffViewer {
 	 * <tr><td>--escher</td><td>turn on deserialization of escher records (default is off)</td></tr>
 	 * <tr><td>--noheader</td><td>do not print record header (default is on)</td></tr>
 	 * </table>
-	 * 
-	 * @param args the command line arguments 
+	 *
+	 * @param args the command line arguments
 	 *
 	 * @throws IOException if the file doesn't exist or contained errors
 	 * @throws CommandParseException if the command line contained errors
@@ -401,45 +394,40 @@ public final class BiffViewer {
 		// args = new String[] { "--out", "", };
 		CommandArgs cmdArgs = CommandArgs.parse(args);
 
-		PrintWriter pw;
-		if (cmdArgs.shouldOutputToFile()) {
-			OutputStream os = new FileOutputStream(cmdArgs.getFile().getAbsolutePath() + ".out");
-			pw = new PrintWriter(new OutputStreamWriter(os, StringUtil.UTF8));
-		} else {
-		    // Use the system default encoding when sending to System Out
-			pw = new PrintWriter(new OutputStreamWriter(System.out, Charset.defaultCharset()));
-		}
-
-		NPOIFSFileSystem fs = null;
-		InputStream is = null;
-        try {
-            fs = new NPOIFSFileSystem(cmdArgs.getFile(), true);
-            is = getPOIFSInputStream(fs);
-
+        try (POIFSFileSystem fs = new POIFSFileSystem(cmdArgs.getFile(), true);
+             InputStream is = getPOIFSInputStream(fs);
+             PrintWriter pw = getOutputStream(cmdArgs.shouldOutputToFile() ? cmdArgs.getFile().getAbsolutePath() : null)
+         ) {
             if (cmdArgs.shouldOutputRawHexOnly()) {
                 byte[] data = IOUtils.toByteArray(is);
                 HexDump.dump(data, 0, System.out, 0);
             } else {
                 boolean dumpInterpretedRecords = cmdArgs.shouldDumpRecordInterpretations();
                 boolean dumpHex = cmdArgs.shouldDumpBiffHex();
-                boolean zeroAlignHexDump = dumpInterpretedRecords;  // TODO - fix non-zeroAlign
-                runBiffViewer(pw, is, dumpInterpretedRecords, dumpHex, zeroAlignHexDump,
+                runBiffViewer(pw, is, dumpInterpretedRecords, dumpHex, dumpInterpretedRecords,
                         cmdArgs.suppressHeader());
             }
-        } finally {
-            IOUtils.closeQuietly(is);
-            IOUtils.closeQuietly(fs);
-            IOUtils.closeQuietly(pw);
         }
 	}
 
-	protected static InputStream getPOIFSInputStream(NPOIFSFileSystem fs)
-			throws IOException, FileNotFoundException {
+	static PrintWriter getOutputStream(String outputPath) throws FileNotFoundException {
+        // Use the system default encoding when sending to System Out
+        OutputStream os = System.out;
+        Charset cs = Charset.defaultCharset();
+        if (outputPath != null) {
+            cs = StringUtil.UTF8;
+            os = new FileOutputStream(outputPath + ".out");
+        }
+        return new PrintWriter(new OutputStreamWriter(os, cs));
+    }
+
+
+	static InputStream getPOIFSInputStream(POIFSFileSystem fs) throws IOException {
 		String workbookName = HSSFWorkbook.getWorkbookDirEntryName(fs.getRoot());
 		return fs.createDocumentInputStream(workbookName);
 	}
 
-	protected static void runBiffViewer(PrintWriter pw, InputStream is,
+	static void runBiffViewer(PrintWriter pw, InputStream is,
 			boolean dumpInterpretedRecords, boolean dumpHex, boolean zeroAlignHexDump,
 			boolean suppressHeader) {
 		BiffRecordListener recListener = new BiffRecordListener(dumpHex ? pw : null, zeroAlignHexDump, suppressHeader);
@@ -452,11 +440,11 @@ public final class BiffViewer {
 		private List<String> _headers;
 		private final boolean _zeroAlignEachRecord;
 		private final boolean _noHeader;
-		public BiffRecordListener(Writer hexDumpWriter, boolean zeroAlignEachRecord, boolean noHeader) {
+		private BiffRecordListener(Writer hexDumpWriter, boolean zeroAlignEachRecord, boolean noHeader) {
 			_hexDumpWriter = hexDumpWriter;
 			_zeroAlignEachRecord = zeroAlignEachRecord;
 			_noHeader = noHeader;
-			_headers = new ArrayList<String>();
+			_headers = new ArrayList<>();
 		}
 
 		@Override
@@ -478,18 +466,16 @@ public final class BiffViewer {
 				}
 			}
 		}
-		public List<String> getRecentHeaders() {
+		private List<String> getRecentHeaders() {
 		    List<String> result = _headers;
-		    _headers = new ArrayList<String>();
+		    _headers = new ArrayList<>();
 		    return result;
 		}
 		private static String formatRecordDetails(int globalOffset, int sid, int size, int recordCounter) {
-			StringBuilder sb = new StringBuilder(64);
-			sb.append("Offset=").append(HexDump.intToHex(globalOffset)).append("(").append(globalOffset).append(")");
-			sb.append(" recno=").append(recordCounter);
-			sb.append(  " sid=").append(HexDump.shortToHex(sid));
-			sb.append( " size=").append(HexDump.shortToHex(size)).append("(").append(size).append(")");
-			return sb.toString();
+            return "Offset=" + HexDump.intToHex(globalOffset) + "(" + globalOffset + ")" +
+                    " recno=" + recordCounter +
+                    " sid=" + HexDump.shortToHex(sid) +
+                    " size=" + HexDump.shortToHex(size) + "(" + size + ")";
 		}
 	}
 
@@ -513,7 +499,7 @@ public final class BiffViewer {
 		private int _currentSize;
 		private boolean _innerHasReachedEOF;
 
-		public BiffDumpingStream(InputStream is, IBiffRecordListener listener) {
+		private BiffDumpingStream(InputStream is, IBiffRecordListener listener) {
 			_is = new DataInputStream(is);
 			_listener = listener;
 			_data = new byte[RecordInputStream.MAX_RECORD_DATA_SIZE + 4];
@@ -539,20 +525,16 @@ public final class BiffViewer {
 		}
 		@Override
 		public int read(byte[] b, int off, int len) throws IOException {
+            if (b == null || off < 0 || len < 0  || b.length < off+len) {
+                throw new IllegalArgumentException();
+            }
 			if (_currentPos >= _currentSize) {
 				fillNextBuffer();
 			}
 			if (_currentPos >= _currentSize) {
 				return -1;
 			}
-			int availSize = _currentSize - _currentPos;
-			int result;
-			if (len > availSize) {
-				System.err.println("Unexpected request to read past end of current biff record");
-				result = availSize;
-			} else {
-				result = len;
-			}
+			final int result = Math.min(len, _currentSize - _currentPos);
 			System.arraycopy(_data, _currentPos, b, off, result);
 			_currentPos += result;
 			_overallStreamPos += result;
@@ -604,7 +586,7 @@ public final class BiffViewer {
 	 * @param globalOffset (somewhat arbitrary) used to calculate the addresses printed at the
 	 * start of each line
 	 */
-	static void hexDumpAligned(Writer w, byte[] data, int dumpLen, int globalOffset,
+	private static void hexDumpAligned(Writer w, byte[] data, int dumpLen, int globalOffset,
 			boolean zeroAlignEachRecord) {
 		int baseDataOffset = 0;
 
@@ -692,7 +674,7 @@ public final class BiffViewer {
 			}
 
 			idx = arraycopy(NEW_LINE_CHARS, buf, idx);
-			
+
 			w.write(buf, 0, idx);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -706,7 +688,7 @@ public final class BiffViewer {
 	    }
 	    return idx;
 	}
-	
+
 	private static char getPrintableChar(byte b) {
 		char ib = (char) (b & 0x00FF);
 		if (ib < 32 || ib > 126) {
@@ -715,7 +697,7 @@ public final class BiffViewer {
 		return ib;
 	}
 
-	private static void writeHex(char buf[], int startInBuf, int value, int nDigits) throws IOException {
+	private static void writeHex(char[] buf, int startInBuf, int value, int nDigits) {
 		int acc = value;
 		for(int i=nDigits-1; i>=0; i--) {
 			int digit = acc & 0x0F;

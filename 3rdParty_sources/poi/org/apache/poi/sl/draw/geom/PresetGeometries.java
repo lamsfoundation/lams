@@ -19,105 +19,88 @@
 
 package org.apache.poi.sl.draw.geom;
 
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeMap;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.EventFilter;
-import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
+import javax.xml.transform.stream.StreamSource;
 
-import org.apache.poi.sl.draw.binding.CTCustomGeometry2D;
 import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
-import org.apache.poi.util.StaxHelper;
+import org.apache.poi.util.XMLHelper;
 
-/**
- * 
- */
-public class PresetGeometries extends LinkedHashMap<String, CustomGeometry> {
+public final class PresetGeometries {
     private final static POILogger LOG = POILogFactory.getLogger(PresetGeometries.class);
-    protected final static String BINDING_PACKAGE = "org.apache.poi.sl.draw.binding";
-    
-    protected static PresetGeometries _inst;
 
-    protected PresetGeometries(){}
+    private final Map<String, CustomGeometry> map = new TreeMap<>();
 
-    @SuppressWarnings("unused")
-    public void init(InputStream is) throws XMLStreamException, JAXBException {
-        // StAX:
-        EventFilter startElementFilter = new EventFilter() {
-            @Override
-            public boolean accept(XMLEvent event) {
-                return event.isStartElement();
-            }
-        };
-        
-        XMLInputFactory staxFactory = StaxHelper.newXMLInputFactory();
-        XMLEventReader staxReader = staxFactory.createXMLEventReader(is);
-        XMLEventReader staxFiltRd = staxFactory.createFilteredReader(staxReader, startElementFilter);
-        // ignore StartElement:
-        /* XMLEvent evDoc = */ staxFiltRd.nextEvent();
-        // JAXB:
-        JAXBContext jaxbContext = JAXBContext.newInstance(BINDING_PACKAGE);
-        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-
-        long cntElem = 0;
-        while (staxFiltRd.peek() != null) {
-            StartElement evRoot = (StartElement)staxFiltRd.peek();
-            String name = evRoot.getName().getLocalPart();
-            JAXBElement<CTCustomGeometry2D> el = unmarshaller.unmarshal(staxReader, CTCustomGeometry2D.class);
-            CTCustomGeometry2D cus = el.getValue();
-            cntElem++;
-            
-            if(containsKey(name)) {
-                LOG.log(POILogger.WARN, "Duplicate definition of " + name);
-            }
-            put(name, new CustomGeometry(cus));
-        }       
+    private static class SingletonHelper{
+        private static final PresetGeometries INSTANCE = new PresetGeometries();
     }
-    
+
+    public static PresetGeometries getInstance(){
+        return SingletonHelper.INSTANCE;
+    }
+
+    private PresetGeometries() {
+        // use a local object first to not assign a partly constructed object in case of failure
+        try {
+            try (InputStream is = PresetGeometries.class.getResourceAsStream("presetShapeDefinitions.xml")) {
+                XMLInputFactory staxFactory = XMLHelper.newXMLInputFactory();
+                XMLStreamReader sr = staxFactory.createXMLStreamReader(new StreamSource(is));
+                try {
+                    PresetParser p = new PresetParser(PresetParser.Mode.FILE);
+                    p.parse(sr);
+                    p.getGeom().forEach(map::put);
+                } finally {
+                    sr.close();
+                }
+            }
+        } catch (IOException | XMLStreamException e){
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Convert a single CustomGeometry object, i.e. from xmlbeans
      */
     public static CustomGeometry convertCustomGeometry(XMLStreamReader staxReader) {
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(BINDING_PACKAGE);
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            JAXBElement<CTCustomGeometry2D> el = unmarshaller.unmarshal(staxReader, CTCustomGeometry2D.class);
-            return new CustomGeometry(el.getValue());
-        } catch (JAXBException e) {
+            PresetParser p = new PresetParser(PresetParser.Mode.SHAPE);
+            p.parse(staxReader);
+            return p.getGeom().values().stream().findFirst().orElse(null);
+        } catch (XMLStreamException e) {
             LOG.log(POILogger.ERROR, "Unable to parse single custom geometry", e);
             return null;
         }
     }
 
-    public static synchronized PresetGeometries getInstance(){
-        if(_inst == null) {
-            // use a local object first to not assign a partly constructed object
-            // in case of failure
-            PresetGeometries lInst = new PresetGeometries();
-            try {
-                InputStream is = PresetGeometries.class.
-                    getResourceAsStream("presetShapeDefinitions.xml");
-                try {
-                    lInst.init(is);
-                } finally {
-                    is.close();
-                }
-            } catch (Exception e){
-                throw new RuntimeException(e);
-            }
-            _inst = lInst;
-        }
+    public CustomGeometry get(String name) {
+        return name == null ? null : map.get(name);
+    }
 
-        return _inst;
+    public Set<String> keySet() {
+        return map.keySet();
+    }
+
+    public int size() {
+        return map.size();
+    }
+
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    @Override
+    public boolean equals(Object o) {
+        return (this == o);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(map);
     }
 }

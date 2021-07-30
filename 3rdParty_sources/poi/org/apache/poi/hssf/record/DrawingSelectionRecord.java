@@ -17,7 +17,11 @@
 
 package org.apache.poi.hssf.record;
 
-import org.apache.poi.util.HexDump;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.common.usermodel.GenericRecord;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 
@@ -26,14 +30,14 @@ import org.apache.poi.util.LittleEndianOutput;
  * Reference:
  * [MS-OGRAPH].pdf sec 2.4.69
  */
-public final class DrawingSelectionRecord extends StandardRecord implements Cloneable {
+public final class DrawingSelectionRecord extends StandardRecord {
 	public static final short sid = 0x00ED;
 
 	/**
 	 * From [MS-ODRAW].pdf sec 2.2.1<p>
 	 * TODO - make EscherRecordHeader {@link LittleEndianInput} aware and refactor with this
 	 */
-	private static final class OfficeArtRecordHeader {
+	private static final class OfficeArtRecordHeader implements GenericRecord {
 		public static final int ENCODED_SIZE = 8;
 		/**
 		 * lower 4 bits is 'version' usually 0x01 or 0x0F (for containers)
@@ -56,12 +60,13 @@ public final class DrawingSelectionRecord extends StandardRecord implements Clon
 			out.writeInt(_length);
 		}
 
-		public String debugFormatAsString() {
-			StringBuffer sb = new StringBuffer(32);
-			sb.append("ver+inst=").append(HexDump.shortToHex(_verAndInstance));
-			sb.append(" type=").append(HexDump.shortToHex(_type));
-			sb.append(" len=").append(HexDump.intToHex(_length));
-			return sb.toString();
+		@Override
+		public Map<String, Supplier<?>> getGenericProperties() {
+			return GenericRecordUtil.getGenericProperties(
+				"verAndInstance", () -> _verAndInstance,
+				"type", () -> _type,
+				"length", () -> _length
+			);
 		}
 	}
 
@@ -93,7 +98,7 @@ public final class DrawingSelectionRecord extends StandardRecord implements Clon
 	}
 
 	protected int getDataSize() {
-		return OfficeArtRecordHeader.ENCODED_SIZE 
+		return OfficeArtRecordHeader.ENCODED_SIZE
 			+ 12 // 3 int fields
 			+ _shapeIds.length * 4;
 	}
@@ -103,35 +108,30 @@ public final class DrawingSelectionRecord extends StandardRecord implements Clon
 		out.writeInt(_cpsp);
 		out.writeInt(_dgslk);
 		out.writeInt(_spidFocus);
-		for (int i = 0; i < _shapeIds.length; i++) {
-			out.writeInt(_shapeIds[i]);
+		for (int shapeId : _shapeIds) {
+			out.writeInt(shapeId);
 		}
 	}
 
 	@Override
-	public DrawingSelectionRecord clone() {
+	public DrawingSelectionRecord copy() {
 		// currently immutable
 		return this;
 	}
 
-	public String toString() {
-		StringBuffer sb = new StringBuffer();
+	@Override
+	public HSSFRecordTypes getGenericRecordType() {
+		return HSSFRecordTypes.DRAWING_SELECTION;
+	}
 
-		sb.append("[MSODRAWINGSELECTION]\n");
-		sb.append("    .rh       =(").append(_header.debugFormatAsString()).append(")\n");
-		sb.append("    .cpsp     =").append(HexDump.intToHex(_cpsp)).append('\n');
-		sb.append("    .dgslk    =").append(HexDump.intToHex(_dgslk)).append('\n');
-		sb.append("    .spidFocus=").append(HexDump.intToHex(_spidFocus)).append('\n');
-		sb.append("    .shapeIds =(");
-		for (int i = 0; i < _shapeIds.length; i++) {
-			if (i > 0) {
-				sb.append(", ");
-			}
-			sb.append(HexDump.intToHex(_shapeIds[i]));
-		}
-		sb.append(")\n");
-
-		sb.append("[/MSODRAWINGSELECTION]\n");
-		return sb.toString();
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"rh", () -> _header,
+			"cpsp", () -> _cpsp,
+			"dgslk", () -> _dgslk,
+			"spidFocus", () -> _spidFocus,
+			"shapeIds", () -> _shapeIds
+		);
 	}
 }

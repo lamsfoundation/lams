@@ -23,21 +23,61 @@ import java.io.ByteArrayInputStream;
  * Adapts a plain byte array to {@link LittleEndianInput}
  */
 public class LittleEndianByteArrayInputStream extends ByteArrayInputStream implements LittleEndianInput {
-	public LittleEndianByteArrayInputStream(byte[] buf, int startOffset, int maxReadLen) { // NOSONAR
-	    super(buf, startOffset, maxReadLen);
+	/**
+	 * Creates <code>LittleEndianByteArrayInputStream</code>
+	 * that uses <code>buf</code> as its
+	 * buffer array. The initial value of <code>pos</code>
+	 * is <code>offset</code> and the initial value
+	 * of <code>count</code> is the minimum of <code>offset+length</code>
+	 * and <code>buf.length</code>.
+	 * The buffer array is not copied. The buffer's mark is
+	 * set to the specified offset.
+	 *
+	 * @param   buf      the input buffer.
+	 * @param   offset   the offset in the buffer of the first byte to read.
+	 * @param   length   the maximum number of bytes to read from the buffer.
+	 */
+	public LittleEndianByteArrayInputStream(byte[] buf, int offset, int length) { // NOSONAR
+	    super(buf, offset, length);
 	}
-	
-	public LittleEndianByteArrayInputStream(byte[] buf, int startOffset) {
-	    this(buf, startOffset, buf.length - startOffset);
+
+	/**
+	 * Creates <code>LittleEndianByteArrayInputStream</code>
+	 * that uses <code>buf</code> as its
+	 * buffer array. The initial value of <code>pos</code>
+	 * is <code>offset</code> and the initial value
+	 * of <code>count</code> is the minimum of <code>offset+buf.length</code>
+	 * and <code>buf.length</code>.
+	 * The buffer array is not copied. The buffer's mark is
+	 * set to the specified offset.
+	 *
+	 * @param   buf      the input buffer.
+	 * @param   offset   the offset in the buffer of the first byte to read.
+	 */
+	public LittleEndianByteArrayInputStream(byte[] buf, int offset) {
+	    this(buf, offset, buf.length - offset);
 	}
-	
+
+	/**
+	 * Creates a <code>LittleEndianByteArrayInputStream</code>
+	 * so that it uses <code>buf</code> as its
+	 * buffer array.
+	 * The buffer array is not copied.
+	 * The initial value of <code>pos</code>
+	 * is <code>0</code> and the initial value
+	 * of <code>count</code> is the length of
+	 * <code>buf</code>.
+	 *
+	 * @param   buf   the input buffer.
+	 */
 	public LittleEndianByteArrayInputStream(byte[] buf) {
-	    this(buf, 0);
+	    super(buf);
 	}
 
 	protected void checkPosition(int i) {
 		if (i > count - pos) {
-			throw new RuntimeException("Buffer overrun");
+			throw new RuntimeException("Buffer overrun, having " + count + " bytes in the stream and position is at " + pos +
+					", but trying to increment position by " + i);
 		}
 	}
 
@@ -51,8 +91,8 @@ public class LittleEndianByteArrayInputStream extends ByteArrayInputStream imple
 	   }
 	   this.pos = pos;
 	}
-	
-	
+
+
 	@Override
     public byte readByte() {
 		checkPosition(1);
@@ -100,14 +140,14 @@ public class LittleEndianByteArrayInputStream extends ByteArrayInputStream imple
 	}
 
 	public long readUInt() {
-	    return readInt() & 0x00FFFFFFFFL; 
+	    return readInt() & 0x00FFFFFFFFL;
     }
 
     @Override
     public double readDouble() {
         return Double.longBitsToDouble(readLong());
     }
-	
+
 	@Override
     public void readFully(byte[] buffer, int off, int len) {
 		checkPosition(len);
@@ -124,4 +164,12 @@ public class LittleEndianByteArrayInputStream extends ByteArrayInputStream imple
     public void readPlain(byte[] buf, int off, int len) {
         readFully(buf, off, len);
     }
+
+	/**
+	 * Change the limit of the ByteArrayInputStream
+	 * @param size the new limit - is truncated to length of internal buffer
+	 */
+	public void limit(int size) {
+		count = Math.min(size, buf.length);
+	}
 }

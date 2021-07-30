@@ -17,40 +17,33 @@
 
 package org.apache.poi.hssf.record.chart;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * The begin record defines the start of a block of records for a (grpahing
+ * The begin record defines the start of a block of records for a (graphing
  * data object. This record is matched with a corresponding EndRecord.
  *
  * @see EndRecord
- *
- * @author Glen Stampoultzis (glens at apache.org)
  */
-public final class BeginRecord extends StandardRecord implements Cloneable {
+public final class BeginRecord extends StandardRecord {
     public static final short sid = 0x1033;
 
-    public BeginRecord()
-    {
+    public BeginRecord() {}
+
+    public BeginRecord(BeginRecord other) {
+        super(other);
     }
 
     /**
      * @param in unused (since this record has no data)
      */
-    public BeginRecord(RecordInputStream in)
-    {
-    }
-
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[BEGIN]\n");
-        buffer.append("[/BEGIN]\n");
-        return buffer.toString();
-    }
+    public BeginRecord(RecordInputStream in) {}
 
     public void serialize(LittleEndianOutput out) {
     }
@@ -63,11 +56,19 @@ public final class BeginRecord extends StandardRecord implements Cloneable {
     {
         return sid;
     }
-    
+
     @Override
-    public BeginRecord clone() {
-       BeginRecord br = new BeginRecord();
-       // No data so nothing to copy
-       return br;
+    public BeginRecord copy() {
+        return new BeginRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.BEGIN;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return null;
     }
 }

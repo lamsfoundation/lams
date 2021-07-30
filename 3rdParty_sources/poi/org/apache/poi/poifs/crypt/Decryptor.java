@@ -19,28 +19,38 @@ package org.apache.poi.poifs.crypt;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
+import java.util.Map;
+import java.util.function.Supplier;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.common.usermodel.GenericRecord;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
-import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
-import org.apache.poi.poifs.filesystem.OPOIFSFileSystem;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.util.GenericRecordUtil;
 
-public abstract class Decryptor implements Cloneable {
+public abstract class Decryptor implements GenericRecord {
+    @SuppressWarnings({"squid:S2068"})
     public static final String DEFAULT_PASSWORD="VelvetSweatshop";
     public static final String DEFAULT_POIFS_ENTRY="EncryptedPackage";
-    
+
     protected EncryptionInfo encryptionInfo;
     private SecretKey secretKey;
     private byte[] verifier, integrityHmacKey, integrityHmacValue;
 
-    protected Decryptor() {
+    protected Decryptor() {}
+
+    protected Decryptor(Decryptor other) {
+        encryptionInfo = other.encryptionInfo;
+        // secretKey is immutable
+        secretKey = other.secretKey;
+        verifier = (other.verifier == null) ? null : other.verifier.clone();
+        integrityHmacKey = (other.integrityHmacKey == null) ? null : other.integrityHmacKey.clone();
+        integrityHmacValue = (other.integrityHmacValue == null) ? null : other.integrityHmacValue.clone();
     }
-    
+
     /**
      * Return a stream with decrypted data.
      * <p>
@@ -57,7 +67,7 @@ public abstract class Decryptor implements Cloneable {
 
     /**
      * Wraps a stream for decryption<p>
-     * 
+     *
      * As we are handling streams and don't know the total length beforehand,
      * it's the callers duty to care for the length of the entries.
      *
@@ -87,13 +97,13 @@ public abstract class Decryptor implements Cloneable {
      * @param cipher may be null, otherwise the given instance is reset to the new block index
      * @param block the block index, e.g. the persist/slide id (hslf)
      * @return a new cipher object, if cipher was null, otherwise the reinitialized cipher
-     * @throws GeneralSecurityException
+     * @throws GeneralSecurityException if the cipher can't be initialized
      */
     public Cipher initCipherForBlock(Cipher cipher, int block)
     throws GeneralSecurityException {
         throw new EncryptedDocumentException("this decryptor doesn't support initCipherForBlock");
     }
-    
+
     public abstract boolean verifyPassword(String password)
         throws GeneralSecurityException;
 
@@ -122,18 +132,10 @@ public abstract class Decryptor implements Cloneable {
         return d;
     }
 
-    public InputStream getDataStream(NPOIFSFileSystem fs) throws IOException, GeneralSecurityException {
-        return getDataStream(fs.getRoot());
-    }
-
-    public InputStream getDataStream(OPOIFSFileSystem fs) throws IOException, GeneralSecurityException {
-        return getDataStream(fs.getRoot());
-    }
-
     public InputStream getDataStream(POIFSFileSystem fs) throws IOException, GeneralSecurityException {
         return getDataStream(fs.getRoot());
     }
-    
+
     // for tests
     public byte[] getVerifier() {
         return verifier;
@@ -142,11 +144,12 @@ public abstract class Decryptor implements Cloneable {
     public SecretKey getSecretKey() {
         return secretKey;
     }
-    
+
     public byte[] getIntegrityHmacKey() {
         return integrityHmacKey;
     }
 
+    @SuppressWarnings("unused")
     public byte[] getIntegrityHmacValue() {
         return integrityHmacValue;
     }
@@ -167,14 +170,15 @@ public abstract class Decryptor implements Cloneable {
         this.integrityHmacValue = (integrityHmacValue == null) ? null : integrityHmacValue.clone();
     }
 
+    @SuppressWarnings("unused")
     protected int getBlockSizeInBytes() {
         return encryptionInfo.getHeader().getBlockSize();
     }
-    
+
     protected int getKeySizeInBytes() {
         return encryptionInfo.getHeader().getKeySize()/8;
     }
-    
+
     public EncryptionInfo getEncryptionInfo() {
         return encryptionInfo;
     }
@@ -183,14 +187,15 @@ public abstract class Decryptor implements Cloneable {
         this.encryptionInfo = encryptionInfo;
     }
 
+    public abstract Decryptor copy();
+
     @Override
-    public Decryptor clone() throws CloneNotSupportedException {
-        Decryptor other = (Decryptor)super.clone();
-        other.integrityHmacKey = integrityHmacKey.clone();
-        other.integrityHmacValue = integrityHmacValue.clone();
-        other.verifier = verifier.clone();
-        other.secretKey = new SecretKeySpec(secretKey.getEncoded(), secretKey.getAlgorithm());
-        // encryptionInfo is set from outside
-        return other;
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "secretKey", secretKey == null ? () -> null : secretKey::getEncoded,
+            "verifier", this::getVerifier,
+            "integrityHmacKey", this::getIntegrityHmacKey,
+            "integrityHmacValue", this::getIntegrityHmacValue
+        );
     }
 }

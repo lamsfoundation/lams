@@ -17,9 +17,14 @@
 
 package org.apache.poi.hssf.record.chart;
 
+import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 
@@ -40,6 +45,11 @@ public final class ChartFRTInfoRecord extends StandardRecord {
 		private int rtFirst;
 		private int rtLast;
 
+		public CFRTID(CFRTID other) {
+			rtFirst = other.rtFirst;
+			rtLast = other.rtLast;
+		}
+
 		public CFRTID(LittleEndianInput in) {
 			rtFirst = in.readShort();
 			rtLast = in.readShort();
@@ -48,6 +58,17 @@ public final class ChartFRTInfoRecord extends StandardRecord {
 		public void serialize(LittleEndianOutput out) {
 			out.writeShort(rtFirst);
 			out.writeShort(rtLast);
+		}
+	}
+
+	public ChartFRTInfoRecord(ChartFRTInfoRecord other) {
+		super(other);
+		rt = other.rt;
+		grbitFrt = other.grbitFrt;
+		verOriginator = other.verOriginator;
+		verWriter = other.verWriter;
+		if (other.rgCFRTID != null) {
+			rgCFRTID = Stream.of(other.rgCFRTID).map(CFRTID::new).toArray(CFRTID[]::new);
 		}
 	}
 
@@ -81,25 +102,31 @@ public final class ChartFRTInfoRecord extends StandardRecord {
 		out.writeShort(grbitFrt);
 		out.writeByte(verOriginator);
 		out.writeByte(verWriter);
-		int nCFRTIDs = rgCFRTID.length;
-		out.writeShort(nCFRTIDs);
+		out.writeShort(rgCFRTID.length);
 
-		for (int i = 0; i < nCFRTIDs; i++) {
-			rgCFRTID[i].serialize(out);
+		for (CFRTID cfrtid : rgCFRTID) {
+			cfrtid.serialize(out);
 		}
 	}
 
 	@Override
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
+	public ChartFRTInfoRecord copy() {
+		return new ChartFRTInfoRecord(this);
+	}
 
-		buffer.append("[CHARTFRTINFO]\n");
-		buffer.append("    .rt           =").append(HexDump.shortToHex(rt)).append('\n');
-		buffer.append("    .grbitFrt     =").append(HexDump.shortToHex(grbitFrt)).append('\n');
-		buffer.append("    .verOriginator=").append(HexDump.byteToHex(verOriginator)).append('\n');
-		buffer.append("    .verWriter    =").append(HexDump.byteToHex(verOriginator)).append('\n');
-		buffer.append("    .nCFRTIDs     =").append(HexDump.shortToHex(rgCFRTID.length)).append('\n');
-		buffer.append("[/CHARTFRTINFO]\n");
-		return buffer.toString();
+	@Override
+	public HSSFRecordTypes getGenericRecordType() {
+		return HSSFRecordTypes.CHART_FRT_INFO;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"rt", () -> rt,
+			"grbitFrt", () -> grbitFrt,
+			"verOriginator", () -> verOriginator,
+			"verWriter", () -> verWriter,
+			"rgCFRTIDs", () -> rgCFRTID
+		);
 	}
 }

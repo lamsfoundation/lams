@@ -17,27 +17,28 @@
 
 package org.apache.poi.hssf.record;
 
-import org.apache.poi.ss.formula.ptg.*;
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.hssf.util.CellRangeAddress8Bit;
-import org.apache.poi.ss.formula.Formula;
 import org.apache.poi.ss.SpreadsheetVersion;
+import org.apache.poi.ss.formula.Formula;
 import org.apache.poi.ss.formula.SharedFormula;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.ss.formula.ptg.Ptg;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        SHAREDFMLA (0x04BC) SharedFormulaRecord
- * Description:  Primarily used as an excel optimization so that multiple similar formulas
- *               are not written out too many times.  We should recognize this record and
- *               serialize as is since this is used when reading templates.
+ * Primarily used as an excel optimization so that multiple similar formulas are not
+ * written out too many times.  We should recognize this record and serialize as is
+ * since this is used when reading templates.
  * <p>
  * Note: the documentation says that the SID is BC where biffviewer reports 4BC.  The hex dump shows
  * that the two byte sid representation to be 'BC 04' that is consistent with the other high byte
  * record types.
- * @author Danny Mui at apache dot org
  */
 public final class SharedFormulaRecord extends SharedValueRecordBase {
-    public final static short   sid = 0x04BC;
+    public static final short sid = 0x04BC;
 
     private int field_5_reserved;
     private Formula field_7_parsed_expr;
@@ -46,6 +47,13 @@ public final class SharedFormulaRecord extends SharedValueRecordBase {
     public SharedFormulaRecord() {
         this(new CellRangeAddress8Bit(0,0,0,0));
     }
+
+    public SharedFormulaRecord(SharedFormulaRecord other) {
+        super(other);
+        field_5_reserved = other.field_5_reserved;
+        field_7_parsed_expr = (other.field_7_parsed_expr == null) ? null : other.field_7_parsed_expr.copy();
+    }
+
     private SharedFormulaRecord(CellRangeAddress8Bit range) {
         super(range);
         field_7_parsed_expr = Formula.create(Ptg.EMPTY_PTG_ARRAY);
@@ -71,34 +79,15 @@ public final class SharedFormulaRecord extends SharedValueRecordBase {
         return 2 + field_7_parsed_expr.getEncodedSize();
     }
 
-    /**
-     * print a sort of string representation ([SHARED FORMULA RECORD] id = x [/SHARED FORMULA RECORD])
-     */
-
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[SHARED FORMULA (").append(HexDump.intToHex(sid)).append("]\n");
-        buffer.append("    .range      = ").append(getRange()).append("\n");
-        buffer.append("    .reserved    = ").append(HexDump.shortToHex(field_5_reserved)).append("\n");
-
-        Ptg[] ptgs = field_7_parsed_expr.getTokens();
-        for (int k = 0; k < ptgs.length; k++ ) {
-           buffer.append("Formula[").append(k).append("]");
-           Ptg ptg = ptgs[k];
-           buffer.append(ptg).append(ptg.getRVAType()).append("\n");
-        }
-
-        buffer.append("[/SHARED FORMULA]\n");
-        return buffer.toString();
-    }
-
     public short getSid() {
         return sid;
     }
 
     /**
+     * Convert formula into an array of {@link Ptg} tokens.
+     *
+     * @param formula The record to break into tokens, cannot be null
+     *
      * @return the equivalent {@link Ptg} array that the formula would have, were it not shared.
      */
     public Ptg[] getFormulaTokens(FormulaRecord formula) {
@@ -113,13 +102,25 @@ public final class SharedFormulaRecord extends SharedValueRecordBase {
         return sf.convertSharedFormulas(field_7_parsed_expr.getTokens(), formulaRow, formulaColumn);
     }
 
-    public Object clone() {
-        SharedFormulaRecord result = new SharedFormulaRecord(getRange());
-        result.field_5_reserved = field_5_reserved;
-        result.field_7_parsed_expr = field_7_parsed_expr.copy();
-        return result;
+    @Override
+    public SharedFormulaRecord copy() {
+        return new SharedFormulaRecord(this);
     }
 	public boolean isFormulaSame(SharedFormulaRecord other) {
 		return field_7_parsed_expr.isSame(other.field_7_parsed_expr);
 	}
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.SHARED_FORMULA;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "range", this::getRange,
+            "reserved", () -> field_5_reserved,
+            "formula", () -> field_7_parsed_expr
+        );
+    }
 }

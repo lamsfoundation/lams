@@ -127,8 +127,7 @@ public final class EscherGraphics2d extends Graphics2D {
 
     public Graphics create()
     {
-        EscherGraphics2d g2d = new EscherGraphics2d(_escherGraphics);
-        return g2d;
+        return new EscherGraphics2d(_escherGraphics);
     }
 
     public void dispose()
@@ -244,13 +243,13 @@ public final class EscherGraphics2d extends Graphics2D {
 //        draw(new java.awt.geom.Ellipse2D.Float(x, y, width, height));
     }
 
-    public void drawPolygon(int xPoints[], int yPoints[],
-				     int nPoints)
+    public void drawPolygon(int[] xPoints, int[] yPoints,
+                            int nPoints)
     {
         getEscherGraphics().drawPolygon(xPoints, yPoints, nPoints);
     }
 
-    public void drawPolyline(int xPoints[], int yPoints[], int nPoints)
+    public void drawPolyline(int[] xPoints, int[] yPoints, int nPoints)
     {
         if(nPoints > 0)
         {
@@ -344,7 +343,7 @@ public final class EscherGraphics2d extends Graphics2D {
      * @param nPoints the total number of points in the polygon.
      * @see   java.awt.Graphics#drawPolygon(int[], int[], int)
      */
-    public void fillPolygon(int xPoints[], int yPoints[], int nPoints)
+    public void fillPolygon(int[] xPoints, int[] yPoints, int nPoints)
     {
         _escherGraphics.fillPolygon(xPoints, yPoints, nPoints);
     }
@@ -380,7 +379,8 @@ public final class EscherGraphics2d extends Graphics2D {
     public Rectangle getClipBounds()
     {
         if(getDeviceclip() != null) {
-            return getClip().getBounds();
+            final Shape clip = getClip();
+            return clip != null ? clip.getBounds() : null;
         }
         return null;
     }

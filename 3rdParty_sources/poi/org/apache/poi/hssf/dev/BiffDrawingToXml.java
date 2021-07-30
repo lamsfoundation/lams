@@ -57,7 +57,7 @@ public class BiffDrawingToXml {
     }
 
     private static List<Integer> getIndexesByName(String[] params, HSSFWorkbook workbook) {
-        List<Integer> list = new ArrayList<Integer>();
+        List<Integer> list = new ArrayList<>();
         int pos = getAttributeIndex(SHEET_NAME_PARAM, params);
         if (-1 != pos) {
             if (pos >= params.length) {
@@ -74,7 +74,7 @@ public class BiffDrawingToXml {
     }
 
     private static List<Integer> getIndexesByIdArray(String[] params) {
-        List<Integer> list = new ArrayList<Integer>();
+        List<Integer> list = new ArrayList<>();
         int pos = getAttributeIndex(SHEET_INDEXES_PARAM, params);
         if (-1 != pos) {
             if (pos >= params.length) {
@@ -90,7 +90,7 @@ public class BiffDrawingToXml {
     }
 
     private static List<Integer> getSheetsIndexes(String[] params, HSSFWorkbook workbook) {
-        List<Integer> list = new ArrayList<Integer>();
+        List<Integer> list = new ArrayList<>();
         list.addAll(getIndexesByIdArray(params));
         list.addAll(getIndexesByName(params, workbook));
         if (0 == list.size()) {
@@ -123,42 +123,40 @@ public class BiffDrawingToXml {
             return;
         }
         String input = getInputFileName(params);
-        FileInputStream inp = new FileInputStream(input);
         String output = getOutputFileName(input);
-        FileOutputStream outputStream = new FileOutputStream(output);
-        writeToFile(outputStream, inp, isExcludeWorkbookRecords(params), params);
-        inp.close();
-        outputStream.close();
+        try (FileInputStream inp = new FileInputStream(input);
+            FileOutputStream outputStream = new FileOutputStream(output)) {
+            writeToFile(outputStream, inp, isExcludeWorkbookRecords(params), params);
+        }
     }
 
     public static void writeToFile(OutputStream fos, InputStream xlsWorkbook, boolean excludeWorkbookRecords, String[] params) throws IOException {
-        HSSFWorkbook workbook = new HSSFWorkbook(xlsWorkbook);
-        InternalWorkbook internalWorkbook = workbook.getInternalWorkbook();
-        DrawingGroupRecord r = (DrawingGroupRecord) internalWorkbook.findFirstRecordBySid(DrawingGroupRecord.sid);
+        try (HSSFWorkbook workbook = new HSSFWorkbook(xlsWorkbook)) {
+            InternalWorkbook internalWorkbook = workbook.getInternalWorkbook();
+            DrawingGroupRecord r = (DrawingGroupRecord) internalWorkbook.findFirstRecordBySid(DrawingGroupRecord.sid);
 
-        StringBuilder builder = new StringBuilder();
-        builder.append("<workbook>\n");
-        String tab = "\t";
-        if (!excludeWorkbookRecords && r != null) {
-            r.decode();
-            List<EscherRecord> escherRecords = r.getEscherRecords();
-            for (EscherRecord record : escherRecords) {
-                builder.append(record.toXml(tab));
+            StringBuilder builder = new StringBuilder();
+            builder.append("<workbook>\n");
+            String tab = "\t";
+            if (!excludeWorkbookRecords && r != null) {
+                r.decode();
+                List<EscherRecord> escherRecords = r.getEscherRecords();
+                for (EscherRecord record : escherRecords) {
+                    builder.append(record.toXml(tab));
+                }
             }
-        }
-        List<Integer> sheets = getSheetsIndexes(params, workbook);
-        for (Integer i : sheets) {
-            HSSFPatriarch p = workbook.getSheetAt(i).getDrawingPatriarch();
-            if(p != null ) {
-                builder.append(tab).append("<sheet").append(i).append(">\n");
-                builder.append(p.getBoundAggregate().toXml(tab + "\t"));
-                builder.append(tab).append("</sheet").append(i).append(">\n");
+            List<Integer> sheets = getSheetsIndexes(params, workbook);
+            for (Integer i : sheets) {
+                HSSFPatriarch p = workbook.getSheetAt(i).getDrawingPatriarch();
+                if (p != null) {
+                    builder.append(tab).append("<sheet").append(i).append(">\n");
+                    builder.append(p.getBoundAggregate().toXml(tab + "\t"));
+                    builder.append(tab).append("</sheet").append(i).append(">\n");
+                }
             }
+            builder.append("</workbook>\n");
+            fos.write(builder.toString().getBytes(StringUtil.UTF8));
         }
-        builder.append("</workbook>\n");
-        fos.write(builder.toString().getBytes(StringUtil.UTF8));
-        fos.close();
-        workbook.close();
     }
 
 }

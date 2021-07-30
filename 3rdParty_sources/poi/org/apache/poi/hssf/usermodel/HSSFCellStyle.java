@@ -19,7 +19,9 @@
 package org.apache.poi.hssf.usermodel;
 
 import java.util.List;
+import java.util.Objects;
 
+import org.apache.poi.common.Duplicatable;
 import org.apache.poi.hssf.model.InternalWorkbook;
 import org.apache.poi.hssf.record.ExtendedFormatRecord;
 import org.apache.poi.hssf.record.FontRecord;
@@ -33,6 +35,7 @@ import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.util.Removal;
 
 /**
  * High level representation of the style of a cell in a sheet of a workbook.
@@ -41,7 +44,7 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
  * @see org.apache.poi.hssf.usermodel.HSSFWorkbook#getCellStyleAt(int)
  * @see org.apache.poi.hssf.usermodel.HSSFCell#setCellStyle(HSSFCellStyle)
  */
-public final class HSSFCellStyle implements CellStyle {
+public final class HSSFCellStyle implements CellStyle, Duplicatable {
     private final ExtendedFormatRecord _format;
     private final short                _index;
     private final InternalWorkbook     _workbook;
@@ -58,6 +61,13 @@ public final class HSSFCellStyle implements CellStyle {
         _index = index;
         _format     = rec;
     }
+
+    protected HSSFCellStyle(HSSFCellStyle other) {
+        _workbook = other._workbook;
+        _index = other._index;
+        _format = other._format;
+    }
+
 
     /**
      * get the index within the HSSFWorkbook (sequence within the collection of ExtnededFormat objects)
@@ -108,16 +118,11 @@ public final class HSSFCellStyle implements CellStyle {
     }
 
     // we keep the cached data in ThreadLocal members in order to
-    // avoid multi-threading issues when different workbooks are accessed in 
+    // avoid multi-threading issues when different workbooks are accessed in
     // multiple threads at the same time
-    private static final ThreadLocal<Short> lastDateFormat = new ThreadLocal<Short>() {
-        @Override
-        protected Short initialValue() {
-            return Short.MIN_VALUE;
-        }
-    };
-    private static final ThreadLocal<List<FormatRecord>> lastFormats = new ThreadLocal<List<FormatRecord>>();
-    private static final ThreadLocal<String> getDataFormatStringCache = new ThreadLocal<String>();
+    private static final ThreadLocal<Short> lastDateFormat = ThreadLocal.withInitial(() -> Short.MIN_VALUE);
+    private static final ThreadLocal<List<FormatRecord>> lastFormats = new ThreadLocal<>();
+    private static final ThreadLocal<String> getDataFormatStringCache = new ThreadLocal<>();
 
     /**
      * Get the contents of the format string, by looking up
@@ -169,7 +174,7 @@ public final class HSSFCellStyle implements CellStyle {
      * set the font for this style
      * @param font  a font object created or retrieved from the HSSFWorkbook object
      * @see org.apache.poi.hssf.usermodel.HSSFWorkbook#createFont()
-     * @see org.apache.poi.hssf.usermodel.HSSFWorkbook#getFontAt(short)
+     * @see org.apache.poi.hssf.usermodel.HSSFWorkbook#getFontAt(int)
      */
     @Override
     public void setFont(Font font) {
@@ -177,16 +182,31 @@ public final class HSSFCellStyle implements CellStyle {
     }
     public void setFont(HSSFFont font) {
         _format.setIndentNotParentFont(true);
-        short fontindex = font.getIndex();
+        short fontindex = (short) font.getIndex();
         _format.setFontIndex(fontindex);
     }
 
     /**
      * gets the index of the font for this style
-     * @see org.apache.poi.hssf.usermodel.HSSFWorkbook#getFontAt(short)
+     * @see org.apache.poi.hssf.usermodel.HSSFWorkbook#getFontAt(int)
+     * @since 5.0.0 (used to return a short value)
      */
     @Override
-    public short getFontIndex()
+    public int getFontIndex()
+    {
+        return _format.getFontIndex();
+    }
+
+    /**
+     * gets the index of the font for this style
+     * @see org.apache.poi.hssf.usermodel.HSSFWorkbook#getFontAt(int)
+     * @deprecated use {@link #getFontIndex()} instead
+     * @since 4.0.0
+     */
+    @Deprecated
+    @Removal(version = "6.0.0")
+    @Override
+    public int getFontIndexAsInt()
     {
         return _format.getFontIndex();
     }
@@ -195,7 +215,7 @@ public final class HSSFCellStyle implements CellStyle {
      * gets the font for this style
      * @param parentWorkbook The HSSFWorkbook that this style belongs to
      * @see org.apache.poi.hssf.usermodel.HSSFCellStyle#getFontIndex()
-     * @see org.apache.poi.hssf.usermodel.HSSFWorkbook#getFontAt(short)
+     * @see org.apache.poi.hssf.usermodel.HSSFWorkbook#getFontAt(int)
      */
     public HSSFFont getFont(org.apache.poi.ss.usermodel.Workbook parentWorkbook) {
         return ((HSSFWorkbook) parentWorkbook).getFontAt(getFontIndex());
@@ -252,7 +272,7 @@ public final class HSSFCellStyle implements CellStyle {
     public void setQuotePrefixed(boolean quotePrefix) {
         _format.set123Prefix(quotePrefix);
     }
-    
+
     /**
      * Is "Quote Prefix" or "123 Prefix" enabled for the cell?
      */
@@ -260,7 +280,7 @@ public final class HSSFCellStyle implements CellStyle {
     public boolean getQuotePrefixed() {
         return _format.get123Prefix();
     }
-    
+
     /**
      * set the type of horizontal alignment for the cell
      * @param align - the type of alignment
@@ -272,23 +292,8 @@ public final class HSSFCellStyle implements CellStyle {
         _format.setAlignment(align.getCode());
     }
 
-    /**
-     * get the type of horizontal alignment for the cell
-     * @return align - the type of alignment
-     * @deprecated POI 3.15 beta 3. Use {@link #getAlignmentEnum()} instead.
-     */
-    @Deprecated
     @Override
-    public short getAlignment()
-    {
-        return _format.getAlignment();
-    }
-    /**
-     * get the type of horizontal alignment for the cell
-     * @return align - the type of alignment
-     */
-    @Override
-    public HorizontalAlignment getAlignmentEnum()
+    public HorizontalAlignment getAlignment()
     {
         return HorizontalAlignment.forInt(_format.getAlignment());
     }
@@ -324,33 +329,16 @@ public final class HSSFCellStyle implements CellStyle {
         _format.setVerticalAlignment(align.getCode());
     }
 
-    /**
-     * get the type of vertical alignment for the cell
-     * @return align the type of alignment
-     * @see VerticalAlignment
-     * @deprecated POI 3.15 beta 3. Use {@link #getVerticalAlignmentEnum()} instead.
-     */
-    @Deprecated
     @Override
-    public short getVerticalAlignment()
-    {
-        return _format.getVerticalAlignment();
+    public VerticalAlignment getVerticalAlignment() {
+        return VerticalAlignment.forInt(_format.getVerticalAlignment());
     }
-   /**
-    * get the type of vertical alignment for the cell
-    * @return align the type of alignment
-    */
-   @Override
-   public VerticalAlignment getVerticalAlignmentEnum()
-   {
-       return VerticalAlignment.forInt(_format.getVerticalAlignment());
-   }
 
     /**
      * set the degree of rotation for the text in the cell
      *
-     * Note: HSSF uses values from -90 to 90 degrees, whereas XSSF 
-     * uses values from 0 to 180 degrees. The implementations of this method will map between these two value-ranges 
+     * Note: HSSF uses values from -90 to 90 degrees, whereas XSSF
+     * uses values from 0 to 180 degrees. The implementations of this method will map between these two value-ranges
      * accordingly, however the corresponding getter is returning values in the range mandated by the current type
      * of Excel file-format that this CellStyle is applied to.
      *
@@ -361,7 +349,7 @@ public final class HSSFCellStyle implements CellStyle {
     {
       if (rotation == 0xff) {
           // Special cases for vertically aligned text
-      } 
+      }
       else if ((rotation < 0)&&(rotation >= -90)) {
         //Take care of the funny 4th quadrant issue
         //The 4th quadrant (-1 to -90) is stored as (91 to 180)
@@ -416,7 +404,7 @@ public final class HSSFCellStyle implements CellStyle {
     {
         return _format.getIndent();
     }
-    
+
     /**
      * set the type of border to use for the left border of the cell
      * @param border type
@@ -429,28 +417,12 @@ public final class HSSFCellStyle implements CellStyle {
         _format.setBorderLeft(border.getCode());
     }
 
-    /**
-     * get the type of border to use for the left border of the cell
-     * @return border type
-     * @deprecated POI 3.15. Will return a BorderStyle enum in the future. Use {@link #getBorderLeftEnum()}.
-     */
-    @Deprecated
     @Override
-    public short getBorderLeft()
-    {
-        return _format.getBorderLeft();
-    }
-    /**
-     * get the type of border to use for the left border of the cell
-     * @return border type
-     * @since POI 3.15
-     */
-    @Override
-    public BorderStyle getBorderLeftEnum()
+    public BorderStyle getBorderLeft()
     {
         return BorderStyle.valueOf(_format.getBorderLeft());
     }
-    
+
     /**
      * set the type of border to use for the right border of the cell
      * @param border type
@@ -463,28 +435,12 @@ public final class HSSFCellStyle implements CellStyle {
         _format.setBorderRight(border.getCode());
     }
 
-    /**
-     * get the type of border to use for the right border of the cell
-     * @return border type
-     * @deprecated POI 3.15. Will return a BorderStyle enum in the future. Use {@link #getBorderRightEnum()}.
-     */
-    @Deprecated
     @Override
-    public short getBorderRight()
-    {
-        return _format.getBorderRight();
-    }
-    /**
-     * get the type of border to use for the right border of the cell
-     * @return border type
-     * @since POI 3.15
-     */
-    @Override
-    public BorderStyle getBorderRightEnum()
+    public BorderStyle getBorderRight()
     {
         return BorderStyle.valueOf(_format.getBorderRight());
     }
-    
+
     /**
      * set the type of border to use for the top border of the cell
      * @param border type
@@ -497,28 +453,12 @@ public final class HSSFCellStyle implements CellStyle {
         _format.setBorderTop(border.getCode());
     }
 
-    /**
-     * get the type of border to use for the top border of the cell
-     * @return border type
-     * @deprecated POI 3.15. Will return a BorderStyle enum in the future. Use {@link #getBorderTopEnum()}.
-     */
-    @Deprecated
     @Override
-    public short getBorderTop()
-    {
-        return _format.getBorderTop();
-    }
-    /**
-     * get the type of border to use for the top border of the cell
-     * @return border type
-     * @since 3.15
-     */
-    @Override
-    public BorderStyle getBorderTopEnum()
+    public BorderStyle getBorderTop()
     {
         return BorderStyle.valueOf(_format.getBorderTop());
     }
-    
+
     /**
      * set the type of border to use for the bottom border of the cell
      * @param border type
@@ -531,24 +471,8 @@ public final class HSSFCellStyle implements CellStyle {
         _format.setBorderBottom(border.getCode());
     }
 
-    /**
-     * get the type of border to use for the bottom border of the cell
-     * @return border type
-     * @deprecated POI 3.15. Will return a BorderStyle enum in the future. Use {@link #getBorderBottomEnum()}.
-     */
-    @Deprecated
     @Override
-    public short getBorderBottom()
-    {
-        return _format.getBorderBottom();
-    }
-    /**
-     * get the type of border to use for the bottom border of the cell
-     * @return border type
-     * @since 3.15
-     */
-    @Override
-    public BorderStyle getBorderBottomEnum()
+    public BorderStyle getBorderBottom()
     {
         return BorderStyle.valueOf(_format.getBorderBottom());
     }
@@ -636,7 +560,7 @@ public final class HSSFCellStyle implements CellStyle {
     {
         return _format.getBottomBorderPaletteIdx();
     }
-    
+
     /**
      * setting to one fills the cell with the foreground color... No idea about
      * other values
@@ -649,24 +573,8 @@ public final class HSSFCellStyle implements CellStyle {
         _format.setAdtlFillPattern(fp.getCode());
     }
 
-    /**
-     * get the fill pattern
-     * @return fill pattern
-     * @deprecated POI 3.15 beta 3. This method will return {@link FillPatternType} in the future. Use {@link #setFillPattern(FillPatternType)} instead. 
-     */
-    @Deprecated
     @Override
-    public short getFillPattern()
-    {
-        return getFillPatternEnum().getCode();
-    }
-    
-    /**
-     * get the fill pattern
-     * @return fill pattern
-     */
-    @Override
-    public FillPatternType getFillPatternEnum()
+    public FillPatternType getFillPattern()
     {
         return FillPatternType.forInt(_format.getAdtlFillPattern());
     }
@@ -748,7 +656,7 @@ public final class HSSFCellStyle implements CellStyle {
         }
         return result;
     }
-    
+
     @Override
     public HSSFColor getFillBackgroundColorColor() {
        HSSFPalette pallette = new HSSFPalette(
@@ -843,7 +751,7 @@ public final class HSSFCellStyle implements CellStyle {
     public boolean getShrinkToFit() {
         return _format.getShrinkToFit();
     }
-    
+
     /**
      * Get the reading order, for RTL/LTR ordering of
      *  the text.
@@ -866,7 +774,7 @@ public final class HSSFCellStyle implements CellStyle {
     public void setReadingOrder(short order) {
         _format.setReadingOrder(order);
     }
-    
+
     /**
      * Verifies that this style belongs to the supplied Workbook.
      * Will throw an exception if it belongs to a different one.
@@ -910,9 +818,9 @@ public final class HSSFCellStyle implements CellStyle {
         if(_workbook != source._workbook) {
 
             lastDateFormat.set(Short.MIN_VALUE);
-            lastFormats.set(null);
-            getDataFormatStringCache.set(null);
-           
+            lastFormats.remove();
+            getDataFormatStringCache.remove();
+
             // Then we need to clone the format string,
             //  and update the format record for this
             short fmt = (short)_workbook.createFormat(source.getDataFormatString() );
@@ -937,11 +845,7 @@ public final class HSSFCellStyle implements CellStyle {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((_format == null) ? 0 : _format.hashCode());
-        result = prime * result + _index;
-        return result;
+        return Objects.hash(_format, _index);
     }
 
     @Override
@@ -968,5 +872,9 @@ public final class HSSFCellStyle implements CellStyle {
         }
         return false;
     }
-    
+
+    @Override
+    public HSSFCellStyle copy() {
+        return new HSSFCellStyle(this);
+    }
 }

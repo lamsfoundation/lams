@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.extractor.POITextExtractor;
 import org.apache.poi.hssf.OldExcelFormatException;
 import org.apache.poi.hssf.record.BOFRecord;
 import org.apache.poi.hssf.record.CodepageRecord;
@@ -42,24 +43,28 @@ import org.apache.poi.hssf.record.RKRecord;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.DocumentNode;
-import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
+import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.poifs.filesystem.NotOLE2FileException;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.util.IOUtils;
 
 /**
  * A text extractor for old Excel files, which are too old for
- *  HSSFWorkbook to handle. This includes Excel 95, and very old 
+ *  HSSFWorkbook to handle. This includes Excel 95, and very old
  *  (pre-OLE2) Excel files, such as Excel 4 files.
  * <p>
- * Returns much (but not all) of the textual content of the file, 
+ * Returns much (but not all) of the textual content of the file,
  *  suitable for indexing by something like Apache Lucene, or used
  *  by Apache Tika, but not really intended for display to the user.
  * </p>
  */
-public class OldExcelExtractor implements Closeable {
+public class OldExcelExtractor implements POITextExtractor {
 
     private final static int FILE_PASS_RECORD_SID = 0x2f;
+    //arbitrarily selected; may need to increase
+    private static final int MAX_RECORD_LENGTH = 100_000;
+
 
     private RecordInputStream ris;
 
@@ -74,22 +79,14 @@ public class OldExcelExtractor implements Closeable {
     }
 
     public OldExcelExtractor(File f) throws IOException {
-        NPOIFSFileSystem poifs = null;
+        POIFSFileSystem poifs = null;
         try {
-            poifs = new NPOIFSFileSystem(f);
+            poifs = new POIFSFileSystem(f);
             open(poifs);
             toClose = poifs;
             return;
-        } catch (OldExcelFormatException e) {
+        } catch (OldExcelFormatException | NotOLE2FileException e) {
             // will be handled by workaround below
-        } catch (NotOLE2FileException e) {
-            // will be handled by workaround below
-        } catch (IOException e) {
-            // ensure streams are closed correctly
-            throw e;
-        } catch (RuntimeException e) {
-            // ensure streams are closed correctly
-            throw e;
         } finally {
             if (toClose == null) {
                 IOUtils.closeQuietly(poifs);
@@ -100,38 +97,43 @@ public class OldExcelExtractor implements Closeable {
         FileInputStream biffStream = new FileInputStream(f); // NOSONAR
         try {
             open(biffStream);
-        } catch (IOException e)  {
+        } catch (IOException | RuntimeException e)  {
             // ensure that the stream is properly closed here if an Exception
             // is thrown while opening
             biffStream.close();
-            throw e;
-        } catch (RuntimeException e)  {
-            // ensure that the stream is properly closed here if an Exception
-            // is thrown while opening
-            biffStream.close();
+
+            toClose.close();
+
             throw e;
         }
     }
 
-    public OldExcelExtractor(NPOIFSFileSystem fs) throws IOException {
+    public OldExcelExtractor(POIFSFileSystem fs) throws IOException {
+        toClose = fs;
+
         open(fs);
     }
 
     public OldExcelExtractor(DirectoryNode directory) throws IOException {
+        toClose = directory.getFileSystem();
+
         open(directory);
     }
 
     private void open(InputStream biffStream) throws IOException {
-        BufferedInputStream bis = (biffStream instanceof BufferedInputStream) 
+        BufferedInputStream bis = (biffStream instanceof BufferedInputStream)
             ? (BufferedInputStream)biffStream
             : new BufferedInputStream(biffStream, 8);
 
-        if (NPOIFSFileSystem.hasPOIFSHeader(bis)) {
-            NPOIFSFileSystem poifs = new NPOIFSFileSystem(bis);
+        if (FileMagic.valueOf(bis) == FileMagic.OLE2) {
+            POIFSFileSystem poifs = new POIFSFileSystem(bis);
             try {
                 open(poifs);
+                toClose = poifs; // Fixed by GR, we should not close it here
             } finally {
-                poifs.close();
+                if (toClose == null) {
+                    poifs.close();
+                }
             }
         } else {
             ris = new RecordInputStream(bis);
@@ -140,7 +142,7 @@ public class OldExcelExtractor implements Closeable {
         }
     }
 
-    private void open(NPOIFSFileSystem fs) throws IOException {
+    private void open(POIFSFileSystem fs) throws IOException {
         open(fs.getRoot());
     }
 
@@ -148,7 +150,7 @@ public class OldExcelExtractor implements Closeable {
         DocumentNode book;
         try {
             book = (DocumentNode)directory.getEntry(OLD_WORKBOOK_DIR_ENTRY_NAME);
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException | IllegalArgumentException e) {
             // some files have "Workbook" instead
             book = (DocumentNode)directory.getEntry(WORKBOOK_DIR_ENTRY_NAMES[0]);
         }
@@ -156,7 +158,7 @@ public class OldExcelExtractor implements Closeable {
         if (book == null) {
             throw new IOException("No Excel 5/95 Book stream found");
         }
-        
+
         ris = new RecordInputStream(directory.createDocumentInputStream(book));
         prepare();
     }
@@ -171,13 +173,13 @@ public class OldExcelExtractor implements Closeable {
         System.out.println(extractor.getText());
         extractor.close();
     }
-    
+
     private void prepare() {
         if (! ris.hasNextRecord()) {
             throw new IllegalArgumentException("File contains no records!");
-        } 
+        }
         ris.nextRecord();
-        
+
         // Work out what version we're dealing with
         int bofSid = ris.getSid();
         switch (bofSid) {
@@ -194,9 +196,9 @@ public class OldExcelExtractor implements Closeable {
                 biffVersion = 5;
                 break;
             default:
-                throw new IllegalArgumentException("File does not begin with a BOF, found sid of " + bofSid); 
+                throw new IllegalArgumentException("File does not begin with a BOF, found sid of " + bofSid);
         }
-        
+
         // Get the type
         BOFRecord bof = new BOFRecord(ris);
         fileType = bof.getType();
@@ -204,18 +206,18 @@ public class OldExcelExtractor implements Closeable {
 
     /**
      * The Biff version, largely corresponding to the Excel version
-     * 
+     *
      * @return the Biff version
      */
     public int getBiffVersion() {
         return biffVersion;
     }
-    
+
     /**
      * The kind of the file, one of {@link BOFRecord#TYPE_WORKSHEET},
      *  {@link BOFRecord#TYPE_CHART}, {@link BOFRecord#TYPE_EXCEL_4_MACRO}
      *  or {@link BOFRecord#TYPE_WORKSPACE_FILE}
-     * 
+     *
      * @return the file type
      */
     public int getFileType() {
@@ -225,12 +227,12 @@ public class OldExcelExtractor implements Closeable {
     /**
      * Retrieves the text contents of the file, as best we can
      *  for these old file formats
-     * 
+     *
      * @return the text contents of the file
      */
     public String getText() {
-        StringBuffer text = new StringBuffer();
-        
+        StringBuilder text = new StringBuilder();
+
         // To track formats and encodings
         CodepageRecord codepage = null;
         // TODO track the XFs and Format Strings
@@ -251,7 +253,7 @@ public class OldExcelExtractor implements Closeable {
                     text.append(shr.getSheetname());
                     text.append('\n');
                     break;
-            
+
                 case OldLabelRecord.biff2_sid:
                 case OldLabelRecord.biff345_sid:
                     OldLabelRecord lr = new OldLabelRecord(ris);
@@ -266,7 +268,7 @@ public class OldExcelExtractor implements Closeable {
                     text.append(sr.getString());
                     text.append('\n');
                     break;
-                    
+
                 case NumberRecord.sid:
                     NumberRecord nr = new NumberRecord(ris);
                     handleNumericCell(text, nr.getValue());
@@ -277,12 +279,12 @@ public class OldExcelExtractor implements Closeable {
                     // Biff 2 and 5+ share the same SID, due to a bug...
                     if (biffVersion == 5) {
                         FormulaRecord fr = new FormulaRecord(ris);
-                        if (fr.getCachedResultType() == CellType.NUMERIC.getCode()) {
+                        if (fr.getCachedResultTypeEnum() == CellType.NUMERIC) {
                             handleNumericCell(text, fr.getValue());
                         }
                     } else {
                         OldFormulaRecord fr = new OldFormulaRecord(ris);
-                        if (fr.getCachedResultType() == CellType.NUMERIC.getCode()) {
+                        if (fr.getCachedResultTypeEnum() == CellType.NUMERIC) {
                             handleNumericCell(text, fr.getValue());
                         }
                     }
@@ -291,34 +293,49 @@ public class OldExcelExtractor implements Closeable {
                     RKRecord rr = new RKRecord(ris);
                     handleNumericCell(text, rr.getRKNumber());
                     break;
-                    
+
                 case CodepageRecord.sid:
                     codepage = new CodepageRecord(ris);
                     break;
-                    
+
                 default:
-                    ris.readFully(new byte[ris.remaining()]);
+                    ris.readFully(IOUtils.safelyAllocate(ris.remaining(), MAX_RECORD_LENGTH));
             }
         }
 
-        close();
         ris = null;
 
         return text.toString();
     }
 
-    @Override
-    public void close() {
-        // some cases require this close here
-        if(toClose != null) {
-            IOUtils.closeQuietly(toClose);
-            toClose = null;
-        }
-    }
-
-    protected void handleNumericCell(StringBuffer text, double value) {
+    protected void handleNumericCell(StringBuilder text, double value) {
         // TODO Need to fetch / use format strings
         text.append(value);
         text.append('\n');
+    }
+
+    @Override
+    public POITextExtractor getMetadataTextExtractor() {
+        return null;
+    }
+
+    @Override
+    public void setCloseFilesystem(boolean doCloseFilesystem) {
+
+    }
+
+    @Override
+    public boolean isCloseFilesystem() {
+        return toClose != null;
+    }
+
+    @Override
+    public Closeable getFilesystem() {
+        return toClose;
+    }
+
+    @Override
+    public Object getDocument() {
+        return ris;
     }
 }

@@ -17,20 +17,24 @@
 
 package org.apache.poi.hssf.record;
 
-import org.apache.poi.util.HexDump;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        Label SST Record<P>
- * Description:  Refers to a string in the shared string table and is a column value.<P>
- * REFERENCE:  PG 325 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)
+ * Refers to a string in the shared string table and is a column value.
  */
-public final class LabelSSTRecord extends CellRecord implements Cloneable {
-    public final static short sid = 0xfd;
+public final class LabelSSTRecord extends CellRecord {
+    public static final short sid = 0xfd;
     private int field_4_sst_index;
 
-    public LabelSSTRecord() {
-    	// fields uninitialised
+    public LabelSSTRecord() {}
+
+    public LabelSSTRecord(LabelSSTRecord other) {
+        super(other);
+        field_4_sst_index = other.field_4_sst_index;
     }
 
     public LabelSSTRecord(RecordInputStream in) {
@@ -58,17 +62,12 @@ public final class LabelSSTRecord extends CellRecord implements Cloneable {
     public int getSSTIndex() {
         return field_4_sst_index;
     }
-    
+
     @Override
     protected String getRecordName() {
     	return "LABELSST";
     }
 
-    @Override
-    protected void appendValueText(StringBuilder sb) {
-		sb.append("  .sstIndex = ");
-    	sb.append(HexDump.shortToHex(getSSTIndex()));
-    }
     @Override
     protected void serializeValue(LittleEndianOutput out) {
         out.writeInt(getSSTIndex());
@@ -85,10 +84,20 @@ public final class LabelSSTRecord extends CellRecord implements Cloneable {
     }
 
     @Override
-    public LabelSSTRecord clone() {
-      LabelSSTRecord rec = new LabelSSTRecord();
-      copyBaseFields(rec);
-      rec.field_4_sst_index = field_4_sst_index;
-      return rec;
+    public LabelSSTRecord copy() {
+        return new LabelSSTRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.LABEL_SST;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "base", super::getGenericProperties,
+            "sstIndex", this::getSSTIndex
+        );
     }
 }

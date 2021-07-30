@@ -17,47 +17,36 @@
 
 package org.apache.poi.hssf.record.chart;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * The axis line format record defines the axis type details.<p>
- * 
- * @author Glen Stampoultzis (glens at apache.org)
+ * The axis line format record defines the axis type details.
  */
-public final class AxisLineFormatRecord extends StandardRecord implements Cloneable {
-    public final static short      sid                             = 0x1021;
-    private  short      field_1_axisType;
-    public final static short       AXIS_TYPE_AXIS_LINE            = 0;
-    public final static short       AXIS_TYPE_MAJOR_GRID_LINE      = 1;
-    public final static short       AXIS_TYPE_MINOR_GRID_LINE      = 2;
-    public final static short       AXIS_TYPE_WALLS_OR_FLOOR       = 3;
+public final class AxisLineFormatRecord extends StandardRecord {
+    public static final short sid                       = 0x1021;
+    public static final short AXIS_TYPE_AXIS_LINE       = 0;
+    public static final short AXIS_TYPE_MAJOR_GRID_LINE = 1;
+    public static final short AXIS_TYPE_MINOR_GRID_LINE = 2;
+    public static final short AXIS_TYPE_WALLS_OR_FLOOR  = 3;
 
+    private short field_1_axisType;
 
-    public AxisLineFormatRecord()
-    {
+    public AxisLineFormatRecord() {}
 
+    public AxisLineFormatRecord(AxisLineFormatRecord other) {
+        super(other);
+        field_1_axisType = other.field_1_axisType;
     }
 
-    public AxisLineFormatRecord(RecordInputStream in)
-    {
-        field_1_axisType               = in.readShort();
-    }
-
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[AXISLINEFORMAT]\n");
-        buffer.append("    .axisType             = ")
-            .append("0x").append(HexDump.toHex(  getAxisType ()))
-            .append(" (").append( getAxisType() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-
-        buffer.append("[/AXISLINEFORMAT]\n");
-        return buffer.toString();
+    public AxisLineFormatRecord(RecordInputStream in) {
+        field_1_axisType = in.readShort();
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -73,21 +62,10 @@ public final class AxisLineFormatRecord extends StandardRecord implements Clonea
         return sid;
     }
 
-    @Override
-    public AxisLineFormatRecord clone() {
-        AxisLineFormatRecord rec = new AxisLineFormatRecord();
-    
-        rec.field_1_axisType = field_1_axisType;
-        return rec;
-    }
-
-
-
-
     /**
      * Get the axis type field for the AxisLineFormat record.
      *
-     * @return  One of 
+     * @return  One of
      *        AXIS_TYPE_AXIS_LINE
      *        AXIS_TYPE_MAJOR_GRID_LINE
      *        AXIS_TYPE_MINOR_GRID_LINE
@@ -102,7 +80,7 @@ public final class AxisLineFormatRecord extends StandardRecord implements Clonea
      * Set the axis type field for the AxisLineFormat record.
      *
      * @param field_1_axisType
-     *        One of 
+     *        One of
      *        AXIS_TYPE_AXIS_LINE
      *        AXIS_TYPE_MAJOR_GRID_LINE
      *        AXIS_TYPE_MINOR_GRID_LINE
@@ -111,5 +89,22 @@ public final class AxisLineFormatRecord extends StandardRecord implements Clonea
     public void setAxisType(short field_1_axisType)
     {
         this.field_1_axisType = field_1_axisType;
+    }
+
+    @Override
+    public AxisLineFormatRecord copy() {
+        return new AxisLineFormatRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.AXIS_LINE_FORMAT;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "axisType", this::getAxisType
+        );
     }
 }

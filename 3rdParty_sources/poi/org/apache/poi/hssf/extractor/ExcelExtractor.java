@@ -24,7 +24,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Locale;
 
-import org.apache.poi.POIOLE2TextExtractor;
+import org.apache.poi.extractor.POIOLE2TextExtractor;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFComment;
@@ -50,26 +50,28 @@ import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
  * To turn an excel file into a CSV or similar, then see
  *  the XLS2CSVmra example
  * </p>
- * 
+ *
  * @see <a href="http://svn.apache.org/repos/asf/poi/trunk/src/examples/src/org/apache/poi/hssf/eventusermodel/examples/XLS2CSVmra.java">XLS2CSVmra</a>
  */
-public class ExcelExtractor extends POIOLE2TextExtractor implements org.apache.poi.ss.extractor.ExcelExtractor {
+public class ExcelExtractor implements POIOLE2TextExtractor, org.apache.poi.ss.extractor.ExcelExtractor {
 	private final HSSFWorkbook _wb;
 	private final HSSFDataFormatter _formatter;
+	private boolean doCloseFilesystem = true;
 	private boolean _includeSheetNames = true;
 	private boolean _shouldEvaluateFormulas = true;
-	private boolean _includeCellComments = false;
-	private boolean _includeBlankCells = false;
+	private boolean _includeCellComments;
+	private boolean _includeBlankCells;
 	private boolean _includeHeadersFooters = true;
 
 	public ExcelExtractor(HSSFWorkbook wb) {
-		super(wb);
 		_wb = wb;
 		_formatter = new HSSFDataFormatter();
 	}
+
 	public ExcelExtractor(POIFSFileSystem fs) throws IOException {
 		this(fs.getRoot());
 	}
+
 	public ExcelExtractor(DirectoryNode dir) throws IOException {
 		this(new HSSFWorkbook(dir, true));
 	}
@@ -201,9 +203,9 @@ public class ExcelExtractor extends POIOLE2TextExtractor implements org.apache.p
 
 	/**
 	 * Command line extractor.
-	 * 
+	 *
 	 * @param args the command line parameters
-	 * 
+	 *
 	 * @throws IOException if the file can't be read or contains errors
 	 */
 	public static void main(String[] args) throws IOException {
@@ -223,24 +225,17 @@ public class ExcelExtractor extends POIOLE2TextExtractor implements org.apache.p
 			return;
 		}
 
-		InputStream is;
-		if(cmdArgs.getInputFile() == null) {
-			is = System.in;
-		} else {
-			is = new FileInputStream(cmdArgs.getInputFile());
+		try (InputStream is = cmdArgs.getInputFile() == null ? System.in : new FileInputStream(cmdArgs.getInputFile());
+			 HSSFWorkbook wb = new HSSFWorkbook(is);
+			 ExcelExtractor extractor = new ExcelExtractor(wb)
+		) {
+			extractor.setIncludeSheetNames(cmdArgs.shouldShowSheetNames());
+			extractor.setFormulasNotResults(!cmdArgs.shouldEvaluateFormulas());
+			extractor.setIncludeCellComments(cmdArgs.shouldShowCellComments());
+			extractor.setIncludeBlankCells(cmdArgs.shouldShowBlankCells());
+			extractor.setIncludeHeadersFooters(cmdArgs.shouldIncludeHeadersFooters());
+			System.out.println(extractor.getText());
 		}
-		HSSFWorkbook wb = new HSSFWorkbook(is);
-		is.close();
-
-		ExcelExtractor extractor = new ExcelExtractor(wb);
-		extractor.setIncludeSheetNames(cmdArgs.shouldShowSheetNames());
-		extractor.setFormulasNotResults(!cmdArgs.shouldEvaluateFormulas());
-		extractor.setIncludeCellComments(cmdArgs.shouldShowCellComments());
-		extractor.setIncludeBlankCells(cmdArgs.shouldShowBlankCells());
-		extractor.setIncludeHeadersFooters(cmdArgs.shouldIncludeHeadersFooters());
-		System.out.println(extractor.getText());
-		extractor.close();
-		wb.close();
 	}
 
 	@Override
@@ -262,7 +257,7 @@ public class ExcelExtractor extends POIOLE2TextExtractor implements org.apache.p
 	 * Should blank cells be output? Default is to only
 	 *  output cells that are present in the file and are
 	 *  non-blank.
-	 * 
+	 *
 	 * @param includeBlankCells {@code true} if blank cells should be included
 	 */
 	public void setIncludeBlankCells(boolean includeBlankCells) {
@@ -276,7 +271,7 @@ public class ExcelExtractor extends POIOLE2TextExtractor implements org.apache.p
 
 	@Override
     public String getText() {
-		StringBuffer text = new StringBuffer();
+		StringBuilder text = new StringBuilder();
 
 		// We don't care about the difference between
 		//  null (missing) and blank cells
@@ -321,7 +316,7 @@ public class ExcelExtractor extends POIOLE2TextExtractor implements org.apache.p
 						// Only output if requested
 						outputContents = _includeBlankCells;
 					} else {
-						switch(cell.getCellTypeEnum()) {
+						switch(cell.getCellType()) {
 							case STRING:
 								text.append(cell.getRichStringCellValue().getString());
 								break;
@@ -338,7 +333,7 @@ public class ExcelExtractor extends POIOLE2TextExtractor implements org.apache.p
 								if(!_shouldEvaluateFormulas) {
 									text.append(cell.getCellFormula());
 								} else {
-									switch(cell.getCachedFormulaResultTypeEnum()) {
+									switch(cell.getCachedFormulaResultType()) {
 										case STRING:
 											HSSFRichTextString str = cell.getRichStringCellValue();
 											if(str != null && str.length() > 0) {
@@ -359,13 +354,13 @@ public class ExcelExtractor extends POIOLE2TextExtractor implements org.apache.p
 											text.append(ErrorEval.getText(cell.getErrorCellValue()));
 											break;
 										default:
-											throw new IllegalStateException("Unexpected cell cached formula result type: " + cell.getCachedFormulaResultTypeEnum());
+											throw new IllegalStateException("Unexpected cell cached formula result type: " + cell.getCachedFormulaResultType());
 
 									}
 								}
 								break;
 							default:
-								throw new RuntimeException("Unexpected cell type (" + cell.getCellTypeEnum() + ")");
+								throw new RuntimeException("Unexpected cell type (" + cell.getCellType() + ")");
 						}
 
 						// Output the comment, if requested and exists
@@ -374,7 +369,7 @@ public class ExcelExtractor extends POIOLE2TextExtractor implements org.apache.p
 							// Replace any newlines with spaces, otherwise it
 							//  breaks the output
 							String commentText = comment.getString().getString().replace('\n', ' ');
-							text.append(" Comment by "+comment.getAuthor()+": "+commentText);
+							text.append(" Comment by ").append(comment.getAuthor()).append(": ").append(commentText);
 						}
 					}
 
@@ -398,7 +393,7 @@ public class ExcelExtractor extends POIOLE2TextExtractor implements org.apache.p
 	}
 
 	public static String _extractHeaderFooter(HeaderFooter hf) {
-		StringBuffer text = new StringBuffer();
+		StringBuilder text = new StringBuilder();
 
 		if(hf.getLeft() != null) {
 			text.append(hf.getLeft());
@@ -417,5 +412,25 @@ public class ExcelExtractor extends POIOLE2TextExtractor implements org.apache.p
 			text.append("\n");
 
 		return text.toString();
+	}
+
+	@Override
+	public HSSFWorkbook getDocument() {
+		return _wb;
+	}
+
+	@Override
+	public void setCloseFilesystem(boolean doCloseFilesystem) {
+		this.doCloseFilesystem = doCloseFilesystem;
+	}
+
+	@Override
+	public boolean isCloseFilesystem() {
+		return doCloseFilesystem;
+	}
+
+	@Override
+	public HSSFWorkbook getFilesystem() {
+		return _wb;
 	}
 }

@@ -17,29 +17,28 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * Record for the left margin.
  */
-public final class LeftMarginRecord extends StandardRecord implements Margin, Cloneable {
-    public final static short sid = 0x0026;
+public final class LeftMarginRecord extends StandardRecord implements Margin {
+    public static final short sid = 0x0026;
     private double field_1_margin;
 
-    public LeftMarginRecord()    {    }
+    public LeftMarginRecord() {}
 
-    public LeftMarginRecord(RecordInputStream in)
-    {
-        field_1_margin = in.readDouble();
+    public LeftMarginRecord(LeftMarginRecord other) {
+        super(other);
+        field_1_margin = other.field_1_margin;
     }
 
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append( "[LeftMargin]\n" );
-        buffer.append( "    .margin               = " ).append( " (" ).append( getMargin() ).append( " )\n" );
-        buffer.append( "[/LeftMargin]\n" );
-        return buffer.toString();
+    public LeftMarginRecord(RecordInputStream in) {
+        field_1_margin = in.readDouble();
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -70,9 +69,17 @@ public final class LeftMarginRecord extends StandardRecord implements Margin, Cl
     }
 
     @Override
-    public LeftMarginRecord clone() {
-        LeftMarginRecord rec = new LeftMarginRecord();
-        rec.field_1_margin = this.field_1_margin;
-        return rec;
+    public LeftMarginRecord copy() {
+        return new LeftMarginRecord(this);
     }
-} 
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.LEFT_MARGIN;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties("margin", this::getMargin);
+    }
+}

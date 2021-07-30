@@ -1,4 +1,3 @@
-
 /* ====================================================================
    Licensed to the Apache Software Foundation (ASF) under one or more
    contributor license agreements.  See the NOTICE file distributed with
@@ -15,30 +14,27 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-        
-
 package org.apache.poi.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * A logger class that strives to make it as easy as possible for
- * developers to write log calls, while simultaneously making those
- * calls as cheap as possible by performing lazy evaluation of the log
- * message.<p>
+ * An implementation of the {@link POILogger} using the
+ * Apache Commons Logging framework. Which itself can be configured to
+ * send log to various different log frameworks and even allows to create
+ * a small wrapper for custom log frameworks.
  */
-public class CommonsLogger extends POILogger
+public class CommonsLogger implements POILogger
 {
     private static final LogFactory   _creator = LogFactory.getFactory();
-    private Log             log   = null;
+    private Log log;
 
     @Override
-    public void initialize(final String cat)
-    {
+    public void initialize(final String cat) {
         this.log = _creator.getInstance(cat);
-    }   
-     
+    }
+
     /**
      * Log a message
      *
@@ -46,54 +42,43 @@ public class CommonsLogger extends POILogger
      * @param obj1 The object to log.
      */
     @Override
-    protected void _log(final int level, final Object obj1)
-    {
+    public void _log(final int level, final Object obj1) {
         // FIXME: What happens if level is in between two levels (an even number)?
         // Should this be `if (level >= FATAL) ...`?
-        if(level==FATAL)
-        {
-          if(log.isFatalEnabled())
-          {
-            log.fatal(obj1);
-          }
-        }
-        else if(level==ERROR)
-        {
-          if(log.isErrorEnabled())
-          {
-            log.error(obj1);
-          }
-        }
-        else if(level==WARN)
-        {
-          if(log.isWarnEnabled())
-          {
-            log.warn(obj1);
-          }
-        }
-        else if(level==INFO)
-        {
-          if(log.isInfoEnabled())
-          {
-            log.info(obj1);
-          }
-        }
-        else if(level==DEBUG)
-        {
-          if(log.isDebugEnabled())
-          {
-            log.debug(obj1);
-          }
-        }
-        else
-        {
-          if(log.isTraceEnabled())
-          {
-            log.trace(obj1);
-          }
+        switch (level) {
+            case FATAL:
+                if (log.isFatalEnabled()) {
+                    log.fatal(obj1);
+                }
+                break;
+            case ERROR:
+                if (log.isErrorEnabled()) {
+                    log.error(obj1);
+                }
+                break;
+            case WARN:
+                if (log.isWarnEnabled()) {
+                    log.warn(obj1);
+                }
+                break;
+            case INFO:
+                if (log.isInfoEnabled()) {
+                    log.info(obj1);
+                }
+                break;
+            case DEBUG:
+                if (log.isDebugEnabled()) {
+                    log.debug(obj1);
+                }
+                break;
+            default:
+                if (log.isTraceEnabled()) {
+                    log.trace(obj1);
+                }
+                break;
         }
     }
-    
+
     /**
      * Log a message
      *
@@ -102,72 +87,65 @@ public class CommonsLogger extends POILogger
      * @param exception An exception to be logged
      */
     @Override
-    protected void _log(final int level, final Object obj1,
-                    final Throwable exception) 
-    {
+    public void _log(final int level, final Object obj1, final Throwable exception) {
         // FIXME: What happens if level is in between two levels (an even number)?
         // Should this be `if (level >= FATAL) ...`?
-        if(level==FATAL)
-        {
-          if(log.isFatalEnabled())
-          {
-            if(obj1 != null)
-               log.fatal(obj1, exception);
-            else
-               log.fatal(exception);
-          }
+        switch (level) {
+            case FATAL:
+                if (log.isFatalEnabled()) {
+                    if (obj1 != null) {
+                        log.fatal(obj1, exception);
+                    } else {
+                        log.fatal(exception);
+                    }
+                }
+                break;
+            case ERROR:
+                if (log.isErrorEnabled()) {
+                    if (obj1 != null) {
+                        log.error(obj1, exception);
+                    } else {
+                        log.error(exception);
+                    }
+                }
+                break;
+            case WARN:
+                if (log.isWarnEnabled()) {
+                    if (obj1 != null) {
+                        log.warn(obj1, exception);
+                    } else {
+                        log.warn(exception);
+                    }
+                }
+                break;
+            case INFO:
+                if (log.isInfoEnabled()) {
+                    if (obj1 != null) {
+                        log.info(obj1, exception);
+                    } else {
+                        log.info(exception);
+                    }
+                }
+                break;
+            case DEBUG:
+                if (log.isDebugEnabled()) {
+                    if (obj1 != null) {
+                        log.debug(obj1, exception);
+                    } else {
+                        log.debug(exception);
+                    }
+                }
+                break;
+            default:
+                if (log.isTraceEnabled()) {
+                    if (obj1 != null) {
+                        log.trace(obj1, exception);
+                    } else {
+                        log.trace(exception);
+                    }
+                }
+                break;
         }
-        else if(level==ERROR)
-        {
-          if(log.isErrorEnabled())
-          {
-            if(obj1 != null)
-               log.error(obj1, exception);
-            else
-               log.error(exception);
-          }
-        }
-        else if(level==WARN)
-        {
-          if(log.isWarnEnabled())
-          {
-            if(obj1 != null)
-               log.warn(obj1, exception);
-            else
-               log.warn(exception);
-          }
-        }
-        else if(level==INFO)
-        {
-          if(log.isInfoEnabled())
-          {
-        	if(obj1 != null)
-               log.info(obj1, exception);
-        	else
-        	   log.info(exception);
-          }
-        }
-        else if(level==DEBUG)
-        {
-          if(log.isDebugEnabled())
-          {
-        	if(obj1 != null)
-               log.debug(obj1, exception);
-        	else
-        	   log.debug(exception);
-          }
-        }
-        else
-        {
-          if(log.isTraceEnabled())
-          {
-        	if(obj1 != null)
-               log.trace(obj1, exception);
-        	else
-        	   log.trace(exception);
-          }
-        }
-
     }
 
     /**
@@ -180,46 +158,20 @@ public class CommonsLogger extends POILogger
     {
         // FIXME: What happens if level is in between two levels (an even number)?
         // Should this be `if (level >= FATAL) ...`?
-        if(level==FATAL)
-        {
-          if(log.isFatalEnabled())
-          {
-            return true;
-          }
+        switch (level) {
+            case FATAL:
+                return log.isFatalEnabled();
+            case ERROR:
+                return log.isErrorEnabled();
+            case WARN:
+                return log.isWarnEnabled();
+            case INFO:
+                return log.isInfoEnabled();
+            case DEBUG:
+                return log.isDebugEnabled();
+            default:
+                return false;
         }
-        else if(level==ERROR)
-        {
-          if(log.isErrorEnabled())
-          {
-            return true;
-          }
-        }
-        else if(level==WARN)
-        {
-          if(log.isWarnEnabled())
-          {
-            return true;
-          }
-        }
-        else if(level==INFO)
-        {
-          if(log.isInfoEnabled())
-          {
-            return true;
-          }
-        }
-        else if(level==DEBUG)
-        {
-          if(log.isDebugEnabled())
-          {
-            return true;
-          }
-        }
-
-        return false;
-
     }
-
- 
-}   // end package scope class POILogger
+}
 

@@ -49,13 +49,13 @@ import org.apache.poi.util.LittleEndian;
 import org.apache.poi.util.LittleEndianInputStream;
 import org.apache.poi.util.StringUtil;
 
-public class CryptoAPIDecryptor extends Decryptor implements Cloneable {
+public class CryptoAPIDecryptor extends Decryptor {
 
     private long length = -1L;
     private int chunkSize = -1;
 
     static class StreamDescriptorEntry {
-        static BitField flagStream = BitFieldFactory.getInstance(1);
+        static final BitField flagStream = BitFieldFactory.getInstance(1);
 
         int streamOffset;
         int streamSize;
@@ -65,7 +65,12 @@ public class CryptoAPIDecryptor extends Decryptor implements Cloneable {
         String streamName;
     }
 
-    protected CryptoAPIDecryptor() {
+    protected CryptoAPIDecryptor() {}
+
+    protected CryptoAPIDecryptor(CryptoAPIDecryptor other) {
+        super(other);
+        length = other.length;
+        chunkSize = other.chunkSize;
     }
 
     @Override
@@ -74,15 +79,15 @@ public class CryptoAPIDecryptor extends Decryptor implements Cloneable {
         SecretKey skey = generateSecretKey(password, ver);
         try {
             Cipher cipher = initCipherForBlock(null, 0, getEncryptionInfo(), skey, Cipher.DECRYPT_MODE);
-            byte encryptedVerifier[] = ver.getEncryptedVerifier();
-            byte verifier[] = new byte[encryptedVerifier.length];
+            byte[] encryptedVerifier = ver.getEncryptedVerifier();
+            byte[] verifier = new byte[encryptedVerifier.length];
             cipher.update(encryptedVerifier, 0, encryptedVerifier.length, verifier);
             setVerifier(verifier);
-            byte encryptedVerifierHash[] = ver.getEncryptedVerifierHash();
-            byte verifierHash[] = cipher.doFinal(encryptedVerifierHash);
+            byte[] encryptedVerifierHash = ver.getEncryptedVerifierHash();
+            byte[] verifierHash = cipher.doFinal(encryptedVerifierHash);
             HashAlgorithm hashAlgo = ver.getHashAlgorithm();
             MessageDigest hashAlg = CryptoFunctions.getMessageDigest(hashAlgo);
-            byte calcVerifierHash[] = hashAlg.digest(verifier);
+            byte[] calcVerifierHash = hashAlg.digest(verifier);
             if (Arrays.equals(calcVerifierHash, verifierHash)) {
                 setSecretKey(skey);
                 return true;
@@ -106,11 +111,11 @@ public class CryptoAPIDecryptor extends Decryptor implements Cloneable {
     throws GeneralSecurityException {
         EncryptionVerifier ver = encryptionInfo.getVerifier();
         HashAlgorithm hashAlgo = ver.getHashAlgorithm();
-        byte blockKey[] = new byte[4];
+        byte[] blockKey = new byte[4];
         LittleEndian.putUInt(blockKey, 0, block);
         MessageDigest hashAlg = CryptoFunctions.getMessageDigest(hashAlgo);
         hashAlg.update(skey.getEncoded());
-        byte encKey[] = hashAlg.digest(blockKey);
+        byte[] encKey = hashAlg.digest(blockKey);
         EncryptionHeader header = encryptionInfo.getHeader();
         int keyBits = header.getKeySize();
         encKey = CryptoFunctions.getBlock0(encKey, keyBits / 8);
@@ -133,9 +138,8 @@ public class CryptoAPIDecryptor extends Decryptor implements Cloneable {
         HashAlgorithm hashAlgo = ver.getHashAlgorithm();
         MessageDigest hashAlg = CryptoFunctions.getMessageDigest(hashAlgo);
         hashAlg.update(ver.getSalt());
-        byte hash[] = hashAlg.digest(StringUtil.getToUnicodeLE(password));
-        SecretKey skey = new SecretKeySpec(hash, ver.getCipherAlgorithm().jceId);
-        return skey;
+        byte[] hash = hashAlg.digest(StringUtil.getToUnicodeLE(password));
+        return new SecretKeySpec(hash, ver.getCipherAlgorithm().jceId);
     }
 
     @Override
@@ -154,13 +158,13 @@ public class CryptoAPIDecryptor extends Decryptor implements Cloneable {
      * Decrypt the Document-/SummaryInformation and other optionally streams.
      * Opposed to other crypto modes, cryptoapi is record based and can't be used
      * to stream-decrypt a whole file.<p>
-     * 
+     *
      * Summary entries are only encrypted within cryptoapi encrypted files.
      * Binary RC4 encrypted files use non-encrypted/default property sets
-     * 
+     *
      * @param root root directory node of the OLE file containing the encrypted properties
      * @param encryptedStream name of the encrypted stream -
-     *      "encryption" for HSSF/HWPF, "encryptedStream" (or encryptedSummary?) for HSLF 
+     *      "encryption" for HSSF/HWPF, "encryptedStream" (or encryptedSummary?) for HSLF
      *
      * @see <a href="http://msdn.microsoft.com/en-us/library/dd943321(v=office.12).aspx">2.3.5.4 RC4 CryptoAPI Encrypted Summary Stream</a>
      */
@@ -171,10 +175,11 @@ public class CryptoAPIDecryptor extends Decryptor implements Cloneable {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         IOUtils.copy(dis, bos);
         dis.close();
-        CryptoAPIDocumentInputStream sbis = new CryptoAPIDocumentInputStream(this, bos.toByteArray());
-        LittleEndianInputStream leis = new LittleEndianInputStream(sbis);
         POIFSFileSystem fsOut = null;
-        try {
+        try (
+            CryptoAPIDocumentInputStream sbis = new CryptoAPIDocumentInputStream(this, bos.toByteArray());
+            LittleEndianInputStream leis = new LittleEndianInputStream(sbis)
+        ) {
             int streamDescriptorArrayOffset = (int) leis.readUInt();
             /* int streamDescriptorArraySize = (int) */ leis.readUInt();
             long skipN = streamDescriptorArrayOffset - 8L;
@@ -183,7 +188,7 @@ public class CryptoAPIDecryptor extends Decryptor implements Cloneable {
             }
             sbis.setBlock(0);
             int encryptedStreamDescriptorCount = (int) leis.readUInt();
-            StreamDescriptorEntry entries[] = new StreamDescriptorEntry[encryptedStreamDescriptorCount];
+            StreamDescriptorEntry[] entries = new StreamDescriptorEntry[encryptedStreamDescriptorCount];
             for (int i = 0; i < encryptedStreamDescriptorCount; i++) {
                 StreamDescriptorEntry entry = new StreamDescriptorEntry();
                 entries[i] = entry;
@@ -203,9 +208,9 @@ public class CryptoAPIDecryptor extends Decryptor implements Cloneable {
             for (StreamDescriptorEntry entry : entries) {
                 sbis.seek(entry.streamOffset);
                 sbis.setBlock(entry.block);
-                InputStream is = new BoundedInputStream(sbis, entry.streamSize);
-                fsOut.createDocument(is, entry.streamName);
-                is.close();
+                try (InputStream is = new BoundedInputStream(sbis, entry.streamSize)) {
+                    fsOut.createDocument(is, entry.streamName);
+                }
             }
         } catch (Exception e) {
             IOUtils.closeQuietly(fsOut);
@@ -216,9 +221,6 @@ public class CryptoAPIDecryptor extends Decryptor implements Cloneable {
             } else {
                 throw new IOException("summary entries can't be read", e);
             }
-        } finally {
-            IOUtils.closeQuietly(leis);
-            IOUtils.closeQuietly(sbis);
         }
         return fsOut;
     }
@@ -240,8 +242,8 @@ public class CryptoAPIDecryptor extends Decryptor implements Cloneable {
     }
 
     @Override
-    public CryptoAPIDecryptor clone() throws CloneNotSupportedException {
-        return (CryptoAPIDecryptor)super.clone();
+    public CryptoAPIDecryptor copy() {
+        return new CryptoAPIDecryptor(this);
     }
 
     private class CryptoAPICipherInputStream extends ChunkedCipherInputStream {

@@ -17,27 +17,26 @@
 
 package org.apache.poi.ss.formula.ptg;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.util.BitField;
 import org.apache.poi.util.BitFieldFactory;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * Specifies a rectangular area of cells A1:A4 for instance.
- * @author  andy
- * @author Jason Height (jheight at chariot dot net dot au)
  */
 public abstract class AreaPtgBase extends OperandPtg implements AreaI {
-    /**
-     * TODO - (May-2008) fix subclasses of AreaPtg 'AreaN~' which are used in shared formulas.
-     * see similar comment in ReferencePtg
-     */
-    protected final RuntimeException notImplemented() {
-        return new RuntimeException("Coding Error: This method should never be called. This ptg should be converted");
-    }
+
+    private final static BitField rowRelative = BitFieldFactory.getInstance(0x8000);
+    private final static BitField colRelative = BitFieldFactory.getInstance(0x4000);
+    private final static BitField columnMask  = BitFieldFactory.getInstance(0x3FFF);
 
     /** zero based, unsigned 16 bit */
     private int field_1_first_row;
@@ -48,12 +47,14 @@ public abstract class AreaPtgBase extends OperandPtg implements AreaI {
     /** zero based, unsigned 8 bit */
     private int field_4_last_column; //BitFields: (last row relative, last col relative, last column number)
 
-    private final static BitField rowRelative = BitFieldFactory.getInstance(0x8000);
-    private final static BitField colRelative = BitFieldFactory.getInstance(0x4000);
-    private final static BitField columnMask  = BitFieldFactory.getInstance(0x3FFF);
+    protected AreaPtgBase() {}
 
-    protected AreaPtgBase() {
-        // do nothing
+    protected AreaPtgBase(AreaPtgBase other) {
+        super(other);
+        field_1_first_row = other.field_1_first_row;
+        field_2_last_row = other.field_2_last_row;
+        field_3_first_column = other.field_3_first_column;
+        field_4_last_column = other.field_4_last_column;
     }
 
     protected AreaPtgBase(AreaReference ar) {
@@ -96,11 +97,11 @@ public abstract class AreaPtgBase extends OperandPtg implements AreaI {
             setLastColRelative(firstColRelative);
         }
     }
-    
+
     /**
      * Sort the first and last row and columns in-place to the preferred (top left:bottom right) order
      * Note: Sort only occurs when an instance is constructed or when this method is called.
-     * 
+     *
      * <p>For example, <code>$E5:B$10</code> becomes <code>B5:$E$10</code></p>
      */
     public void sortTopLeftToBottomRight() {
@@ -298,5 +299,20 @@ public abstract class AreaPtgBase extends OperandPtg implements AreaI {
 
     public byte getDefaultOperandClass() {
         return Ptg.CLASS_REF;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "firstRow", this::getFirstRow,
+            "firstRowRelative", this::isFirstRowRelative,
+            "firstColumn", this::getFirstColumn,
+            "firstColRelative", this::isFirstColRelative,
+            "lastRow", this::getLastRow,
+            "lastRowRelative", this::isLastRowRelative,
+            "lastColumn", this::getLastColumn,
+            "lastColRelative", this::isLastColRelative,
+            "formatReference", this::formatReferenceAsString
+        );
     }
 }

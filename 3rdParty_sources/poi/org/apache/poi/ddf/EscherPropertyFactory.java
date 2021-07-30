@@ -19,6 +19,7 @@ package org.apache.poi.ddf;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 
 import org.apache.poi.util.LittleEndian;
 
@@ -26,6 +27,7 @@ import org.apache.poi.util.LittleEndian;
  * Generates a property given a reference into the byte array storing that property.
  */
 public final class EscherPropertyFactory {
+
     /**
      * Create new properties from a byte array.
      *
@@ -35,62 +37,57 @@ public final class EscherPropertyFactory {
      * @return                  The new properties
      */
     public List<EscherProperty> createProperties(byte[] data, int offset, short numProperties) {
-        List<EscherProperty> results = new ArrayList<EscherProperty>();
+        List<EscherProperty> results = new ArrayList<>();
 
         int pos = offset;
 
         for (int i = 0; i < numProperties; i++) {
-            short propId;
-            int propData;
-            propId = LittleEndian.getShort( data, pos );
-            propData = LittleEndian.getInt( data, pos + 2 );
-            short propNumber = (short) ( propId & (short) 0x3FFF );
-            boolean isComplex = ( propId & (short) 0x8000 ) != 0;
-            // boolean isBlipId = ( propId & (short) 0x4000 ) != 0;
+            final short propId = LittleEndian.getShort( data, pos );
+            final int propData = LittleEndian.getInt( data, pos + 2 );
+            final boolean isComplex = ( propId & EscherProperty.IS_COMPLEX ) != 0;
 
-            byte propertyType = EscherProperties.getPropertyType(propNumber);
-            EscherProperty ep;
-            switch (propertyType) {
-                case EscherPropertyMetaData.TYPE_BOOLEAN:
-                    ep = new EscherBoolProperty( propId, propData );
+            EscherPropertyTypes propertyType = EscherPropertyTypes.forPropertyID(propId);
+
+            final BiFunction<Short,Integer,EscherProperty> con;
+            switch (propertyType.holder) {
+                case BOOLEAN:
+                    con = EscherBoolProperty::new;
                     break;
-                case EscherPropertyMetaData.TYPE_RGB:
-                    ep = new EscherRGBProperty( propId, propData );
+                case RGB:
+                    con = EscherRGBProperty::new;
                     break;
-                case EscherPropertyMetaData.TYPE_SHAPEPATH:
-                    ep = new EscherShapePathProperty( propId, propData );
+                case SHAPE_PATH:
+                    con = EscherShapePathProperty::new;
                     break;
                 default:
-                    if ( !isComplex ) {
-                        ep = new EscherSimpleProperty( propId, propData );
-                    } else if ( propertyType == EscherPropertyMetaData.TYPE_ARRAY) {
-                        ep = new EscherArrayProperty( propId, new byte[propData]);
+                    if ( isComplex ) {
+                        con = (propertyType.holder == EscherPropertyTypesHolder.ARRAY)
+                            ? EscherArrayProperty::new
+                            : EscherComplexProperty::new;
                     } else {
-                        ep = new EscherComplexProperty( propId, new byte[propData]);
+                        con = EscherSimpleProperty::new;
                     }
                     break;
             }
-            results.add( ep );
+
+            results.add( con.apply(propId,propData) );
             pos += 6;
         }
 
         // Get complex data
         for (EscherProperty p : results) {
-            if (p instanceof EscherComplexProperty) {
-                if (p instanceof EscherArrayProperty) {
-                    pos += ((EscherArrayProperty)p).setArrayData(data, pos);
-                } else {
-                    byte[] complexData = ((EscherComplexProperty)p).getComplexData();
-
-                    int leftover = data.length - pos;
-                    if (leftover < complexData.length) {
-                        throw new IllegalStateException("Could not read complex escher property, length was " + complexData.length + ", but had only " +
-                                leftover + " bytes left");
-                    }
-
-                    System.arraycopy(data, pos, complexData, 0, complexData.length);
-                    pos += complexData.length;
+            if (p instanceof EscherArrayProperty) {
+                EscherArrayProperty eap = (EscherArrayProperty)p;
+                pos += eap.setArrayData(data, pos);
+            } else if (p instanceof EscherComplexProperty) {
+                EscherComplexProperty ecp = (EscherComplexProperty)p;
+                int cdLen = ecp.getComplexData().length;
+                int leftover = data.length - pos;
+                if (leftover < cdLen) {
+                    throw new IllegalStateException("Could not read complex escher property, length was " +
+                        cdLen + ", but had only " + leftover + " bytes left");
                 }
+                pos += ecp.setComplexData(data, pos);
             }
         }
         return results;

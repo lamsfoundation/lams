@@ -17,6 +17,7 @@
 
 package org.apache.poi.hssf.record.cf;
 
+import org.apache.poi.common.Duplicatable;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 
@@ -24,7 +25,7 @@ import org.apache.poi.util.LittleEndianOutput;
  * Icon / Multi-State specific Threshold / value (CFVO),
  *  for changes in Conditional Formatting
  */
-public final class IconMultiStateThreshold extends Threshold implements Cloneable {
+public final class IconMultiStateThreshold extends Threshold implements Duplicatable {
     /**
      * Cell values that are equal to the threshold value do not pass the threshold
      */
@@ -33,15 +34,18 @@ public final class IconMultiStateThreshold extends Threshold implements Cloneabl
      * Cell values that are equal to the threshold value pass the threshold.
      */
     public static final byte EQUALS_INCLUDE = 1;
-    
+
     private byte equals;
 
     public IconMultiStateThreshold() {
-        super();
         equals = EQUALS_INCLUDE;
     }
 
-    /** Creates new Ico Multi-State Threshold */
+    public IconMultiStateThreshold(IconMultiStateThreshold other) {
+        super(other);
+        equals = other.equals;
+    }
+
     public IconMultiStateThreshold(LittleEndianInput in) {
         super(in);
         equals = in.readByte();
@@ -61,11 +65,8 @@ public final class IconMultiStateThreshold extends Threshold implements Cloneabl
     }
 
     @Override
-    public IconMultiStateThreshold clone() {
-      IconMultiStateThreshold rec = new IconMultiStateThreshold();
-      super.copyTo(rec);
-      rec.equals = equals;
-      return rec;
+    public IconMultiStateThreshold copy() {
+        return new IconMultiStateThreshold(this);
     }
 
     public void serialize(LittleEndianOutput out) {

@@ -1,4 +1,3 @@
-
 /* ====================================================================
    Licensed to the Apache Software Foundation (ASF) under one or more
    contributor license agreements.  See the NOTICE file distributed with
@@ -19,36 +18,39 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        Default Row Height Record
- * Description:  Row height for rows with undefined or not explicitly defined
- *               heights.
- * REFERENCE:  PG 301 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)<P>
- * @author Andrew C. Oliver (acoliver at apache dot org)
- * @author Jason Height (jheight at chariot dot net dot au)
+ * Row height for rows with undefined or not explicitly defined heights.
+ *
  * @version 2.0-pre
  */
 
-public final class DefaultRowHeightRecord extends StandardRecord implements Cloneable {
-    public final static short sid = 0x225;
-    private short             field_1_option_flags;
-    private short             field_2_row_height;
+public final class DefaultRowHeightRecord extends StandardRecord {
+    public static final short sid = 0x225;
 
-    /**
-     * The default row height for empty rows is 255 twips (255 / 20 == 12.75 points)
-     */
+    /** The default row height for empty rows is 255 twips (255 / 20 == 12.75 points) */
     public static final short DEFAULT_ROW_HEIGHT = 0xFF;
 
-    public DefaultRowHeightRecord()
-    {
+    private short field_1_option_flags;
+    private short field_2_row_height;
+
+    public DefaultRowHeightRecord() {
         field_1_option_flags = 0x0000;
         field_2_row_height = DEFAULT_ROW_HEIGHT;
     }
 
-    public DefaultRowHeightRecord(RecordInputStream in)
-    {
+    public DefaultRowHeightRecord(DefaultRowHeightRecord other) {
+        super(other);
+        field_1_option_flags = other.field_1_option_flags;
+        field_2_row_height = other.field_2_row_height;
+    }
+
+    public DefaultRowHeightRecord(RecordInputStream in) {
         field_1_option_flags = in.readShort();
         field_2_row_height   = in.readShort();
     }
@@ -93,19 +95,6 @@ public final class DefaultRowHeightRecord extends StandardRecord implements Clon
         return field_2_row_height;
     }
 
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[DEFAULTROWHEIGHT]\n");
-        buffer.append("    .optionflags    = ")
-            .append(Integer.toHexString(getOptionFlags())).append("\n");
-        buffer.append("    .rowheight      = ")
-            .append(Integer.toHexString(getRowHeight())).append("\n");
-        buffer.append("[/DEFAULTROWHEIGHT]\n");
-        return buffer.toString();
-    }
-
     public void serialize(LittleEndianOutput out) {
         out.writeShort(getOptionFlags());
         out.writeShort(getRowHeight());
@@ -121,10 +110,20 @@ public final class DefaultRowHeightRecord extends StandardRecord implements Clon
     }
 
     @Override
-    public DefaultRowHeightRecord clone() {
-      DefaultRowHeightRecord rec = new DefaultRowHeightRecord();
-      rec.field_1_option_flags = field_1_option_flags;
-      rec.field_2_row_height = field_2_row_height;
-      return rec;
+    public DefaultRowHeightRecord copy() {
+        return new DefaultRowHeightRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.DEFAULT_ROW_HEIGHT;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "optionFlags", this::getOptionFlags,
+            "rowHeight", this::getRowHeight
+        );
     }
 }

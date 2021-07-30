@@ -17,26 +17,30 @@
 
 package org.apache.poi.hssf.record;
 
-import org.apache.poi.util.HexDump;
-import org.apache.poi.util.LittleEndianOutput;
-
 import java.util.Arrays;
-import java.util.Locale;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
+import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * The HEADERFOOTER record stores information added in Office Excel 2007 for headers/footers.
- *
- * @author Yegor Kozlov
  */
-public final class HeaderFooterRecord extends StandardRecord implements Cloneable {
-
+public final class HeaderFooterRecord extends StandardRecord {
+    public static final short sid = 0x089C;
+    @SuppressWarnings("MismatchedReadAndWriteOfArray")
     private static final byte[] BLANK_GUID = new byte[16];
 
-    public final static short sid = 0x089C;
 	private byte[] _rawData;
 
     public HeaderFooterRecord(byte[] data) {
         _rawData = data;
+    }
+
+    public HeaderFooterRecord(HeaderFooterRecord other) {
+        super(other);
+        _rawData = (other._rawData == null) ? null : other._rawData.clone();
     }
 
 	/**
@@ -58,7 +62,7 @@ public final class HeaderFooterRecord extends StandardRecord implements Cloneabl
 	protected int getDataSize() {
 		return _rawData.length;
 	}
-    
+
     public short getSid()
     {
         return sid;
@@ -73,33 +77,28 @@ public final class HeaderFooterRecord extends StandardRecord implements Cloneabl
      * @return the sheet view?s GUID
      */
     public byte[] getGuid(){
-        byte[] guid = new byte[16];
-        System.arraycopy(_rawData, 12, guid, 0, guid.length);
-        return guid;
+        return Arrays.copyOfRange(_rawData, 12, 12+16);
     }
 
     /**
-     * @return whether this record belongs to the current sheet 
+     * @return whether this record belongs to the current sheet
      */
     public boolean isCurrentSheet(){
         return Arrays.equals(getGuid(), BLANK_GUID);
     }
 
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-
-        sb.append("[").append("HEADERFOOTER").append("] (0x");
-        sb.append(Integer.toHexString(sid).toUpperCase(Locale.ROOT) + ")\n");
-        sb.append("  rawData=").append(HexDump.toHex(_rawData)).append("\n");
-        sb.append("[/").append("HEADERFOOTER").append("]\n");
-        return sb.toString();
+    @Override
+    public HeaderFooterRecord copy() {
+        return new HeaderFooterRecord(this);
     }
 
     @Override
-    public HeaderFooterRecord clone() {
-        //HACK: do a "cheat" clone, see Record.java for more information
-        return (HeaderFooterRecord)cloneViaReserialise();
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.HEADER_FOOTER;
     }
-    
- 
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties("rawData", () -> _rawData);
+    }
 }

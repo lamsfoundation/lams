@@ -19,7 +19,10 @@ package org.apache.poi.hssf.record.aggregates;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
+import org.apache.poi.common.usermodel.GenericRecord;
 import org.apache.poi.hssf.model.RecordStream;
 import org.apache.poi.hssf.record.CFHeader12Record;
 import org.apache.poi.hssf.record.CFHeaderBase;
@@ -29,23 +32,24 @@ import org.apache.poi.hssf.record.CFRuleBase;
 import org.apache.poi.hssf.record.CFRuleRecord;
 import org.apache.poi.hssf.record.Record;
 import org.apache.poi.ss.formula.FormulaShifter;
-import org.apache.poi.ss.formula.ptg.AreaErrPtg;
-import org.apache.poi.ss.formula.ptg.AreaPtg;
 import org.apache.poi.ss.formula.ptg.Ptg;
+import org.apache.poi.ss.usermodel.helpers.BaseRowColShifter;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.util.GenericRecordJsonWriter;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
 import org.apache.poi.util.RecordFormatException;
 
 /**
- * <p>CFRecordsAggregate - aggregates Conditional Formatting records CFHeaderRecord 
+ * <p>CFRecordsAggregate - aggregates Conditional Formatting records CFHeaderRecord
  * and number of up CFRuleRecord records together to simplify access to them.</p>
  * <p>Note that Excel versions before 2007 can only cope with a maximum of 3
  *  Conditional Formatting rules per sheet. Excel 2007 or newer can cope with
  *  unlimited numbers, as can Apache OpenOffice. This is an Excel limitation,
  *  not a file format one.</p>
  */
-public final class CFRecordsAggregate extends RecordAggregate {
+public final class CFRecordsAggregate extends RecordAggregate implements GenericRecord {
     /** Excel 97-2003 allows up to 3 conditional formating rules */
     private static final int MAX_97_2003_CONDTIONAL_FORMAT_RULES = 3;
     private static final POILogger logger = POILogFactory.getLogger(CFRecordsAggregate.class);
@@ -53,7 +57,12 @@ public final class CFRecordsAggregate extends RecordAggregate {
     private final CFHeaderBase header;
 
     /** List of CFRuleRecord objects */
-    private final List<CFRuleBase> rules;
+    private final List<CFRuleBase> rules = new ArrayList<>();
+
+    public CFRecordsAggregate(CFRecordsAggregate other) {
+        header = other.header.copy();
+        other.rules.stream().map(t -> t.copy()).forEach(rules::add);
+    }
 
     private CFRecordsAggregate(CFHeaderBase pHeader, CFRuleBase[] pRules) {
         if(pHeader == null) {
@@ -64,7 +73,7 @@ public final class CFRecordsAggregate extends RecordAggregate {
         }
         if(pRules.length > MAX_97_2003_CONDTIONAL_FORMAT_RULES) {
             logger.log(POILogger.WARN, "Excel versions before 2007 require that "
-                    + "No more than " + MAX_97_2003_CONDTIONAL_FORMAT_RULES 
+                    + "No more than " + MAX_97_2003_CONDTIONAL_FORMAT_RULES
                     + " rules may be specified, " + pRules.length + " were found,"
                     + " this file will cause problems with old Excel versions");
         }
@@ -72,7 +81,6 @@ public final class CFRecordsAggregate extends RecordAggregate {
             throw new RecordFormatException("Mismatch number of rules");
         }
         header = pHeader;
-        rules = new ArrayList<CFRuleBase>(pRules.length);
         for (CFRuleBase pRule : pRules) {
             checkRuleType(pRule);
             rules.add(pRule);
@@ -106,7 +114,7 @@ public final class CFRecordsAggregate extends RecordAggregate {
         Record rec = rs.getNext();
         if (rec.getSid() != CFHeaderRecord.sid &&
             rec.getSid() != CFHeader12Record.sid) {
-            throw new IllegalStateException("next record sid was " + rec.getSid() 
+            throw new IllegalStateException("next record sid was " + rec.getSid()
                     + " instead of " + CFHeaderRecord.sid + " or " +
                     CFHeader12Record.sid + " as expected");
         }
@@ -124,13 +132,11 @@ public final class CFRecordsAggregate extends RecordAggregate {
 
     /**
      * Create a deep clone of the record
+     *
+     * @return A new object with the same values as this record
      */
     public CFRecordsAggregate cloneCFAggregate() {
-        CFRuleBase[] newRecs = new CFRuleBase[rules.size()];
-        for (int i = 0; i < newRecs.length; i++) {
-            newRecs[i] = getRule(i).clone();
-        }
-        return new CFRecordsAggregate(header.clone(), newRecs);
+        return new CFRecordsAggregate(this);
     }
 
     /**
@@ -142,7 +148,7 @@ public final class CFRecordsAggregate extends RecordAggregate {
 
     private void checkRuleIndex(int idx) {
         if(idx < 0 || idx >= rules.size()) {
-            throw new IllegalArgumentException("Bad rule record index (" + idx 
+            throw new IllegalArgumentException("Bad rule record index (" + idx
                     + ") nRules=" + rules.size());
         }
     }
@@ -175,8 +181,8 @@ public final class CFRecordsAggregate extends RecordAggregate {
             throw new IllegalArgumentException("r must not be null");
         }
         if(rules.size() >= MAX_97_2003_CONDTIONAL_FORMAT_RULES) {
-            logger.log(POILogger.WARN, "Excel versions before 2007 cannot cope with" 
-                    + " any more than " + MAX_97_2003_CONDTIONAL_FORMAT_RULES 
+            logger.log(POILogger.WARN, "Excel versions before 2007 cannot cope with"
+                    + " any more than " + MAX_97_2003_CONDTIONAL_FORMAT_RULES
                     + " - this file will cause problems with old Excel versions");
         }
         checkRuleType(r);
@@ -187,25 +193,19 @@ public final class CFRecordsAggregate extends RecordAggregate {
         return rules.size();
     }
 
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "header", this::getHeader,
+            "rules", () -> rules
+        );
+    }
+
     /**
      * String representation of CFRecordsAggregate
      */
     public String toString() {
-        StringBuilder buffer = new StringBuilder();
-        String type = "CF";
-        if (header instanceof CFHeader12Record) {
-            type = "CF12";
-        }
-
-        buffer.append("[").append(type).append("]\n");
-        if( header != null ) {
-            buffer.append(header);
-        }
-        for (CFRuleBase cfRule : rules) {
-            buffer.append(cfRule);
-        }
-        buffer.append("[/").append(type).append("]\n");
-        return buffer.toString();
+        return GenericRecordJsonWriter.marshal(this);
     }
 
     public void visitContainedRecords(RecordVisitor rv) {
@@ -216,14 +216,17 @@ public final class CFRecordsAggregate extends RecordAggregate {
     }
 
     /**
+     * @param shifter The {@link FormulaShifter} to use
+     * @param currentExternSheetIx The index for extern sheets
+     *
      * @return <code>false</code> if this whole {@link CFHeaderRecord} / {@link CFRuleRecord}s should be deleted
      */
     public boolean updateFormulasAfterCellShift(FormulaShifter shifter, int currentExternSheetIx) {
         CellRangeAddress[] cellRanges = header.getCellRanges();
         boolean changed = false;
-        List<CellRangeAddress> temp = new ArrayList<CellRangeAddress>();
+        List<CellRangeAddress> temp = new ArrayList<>();
         for (CellRangeAddress craOld : cellRanges) {
-            CellRangeAddress craNew = shiftRange(shifter, craOld, currentExternSheetIx);
+            CellRangeAddress craNew = BaseRowColShifter.shiftRange(shifter, craOld, currentExternSheetIx);
             if (craNew == null) {
                 changed = true;
                 continue;
@@ -263,24 +266,5 @@ public final class CFRecordsAggregate extends RecordAggregate {
             }
         }
         return true;
-    }
-
-    private static CellRangeAddress shiftRange(FormulaShifter shifter, CellRangeAddress cra, int currentExternSheetIx) {
-        // FormulaShifter works well in terms of Ptgs - so convert CellRangeAddress to AreaPtg (and back) here
-        AreaPtg aptg = new AreaPtg(cra.getFirstRow(), cra.getLastRow(), cra.getFirstColumn(), cra.getLastColumn(), false, false, false, false);
-        Ptg[] ptgs = { aptg, };
-
-        if (!shifter.adjustFormula(ptgs, currentExternSheetIx)) {
-            return cra;
-        }
-        Ptg ptg0 = ptgs[0];
-        if (ptg0 instanceof AreaPtg) {
-            AreaPtg bptg = (AreaPtg) ptg0;
-            return new CellRangeAddress(bptg.getFirstRow(), bptg.getLastRow(), bptg.getFirstColumn(), bptg.getLastColumn());
-        }
-        if (ptg0 instanceof AreaErrPtg) {
-            return null;
-        }
-        throw new IllegalStateException("Unexpected shifted ptg class (" + ptg0.getClass().getName() + ")");
     }
 }
