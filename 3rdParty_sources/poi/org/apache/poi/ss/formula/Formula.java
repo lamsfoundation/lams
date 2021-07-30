@@ -18,11 +18,16 @@
 package org.apache.poi.ss.formula;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Supplier;
 
+import org.apache.poi.common.usermodel.GenericRecord;
 import org.apache.poi.ss.formula.ptg.ExpPtg;
 import org.apache.poi.ss.formula.ptg.Ptg;
 import org.apache.poi.ss.formula.ptg.TblPtg;
 import org.apache.poi.ss.util.CellReference;
+import org.apache.poi.util.GenericRecordUtil;
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.LittleEndian;
 import org.apache.poi.util.LittleEndianByteArrayInputStream;
 import org.apache.poi.util.LittleEndianInput;
@@ -30,10 +35,11 @@ import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * Encapsulates an encoded formula token array.
- *
- * @author Josh Micich
  */
-public class Formula {
+public class Formula implements GenericRecord {
+
+	//Arbitrarily set.  May need to increase.
+	private static final int MAX_ENCODED_LEN = 100000;
 
 	private static final Formula EMPTY = new Formula(new byte[0], 0);
 
@@ -41,22 +47,23 @@ public class Formula {
 	private final byte[] _byteEncoding;
 	private final int _encodedTokenLen;
 
+	public Formula(Formula other) {
+		_byteEncoding = (other._byteEncoding == null) ? null : other._byteEncoding.clone();
+		_encodedTokenLen = other._encodedTokenLen;
+	}
+
 	private Formula(byte[] byteEncoding, int encodedTokenLen) {
 		_byteEncoding = byteEncoding.clone();
 		_encodedTokenLen = encodedTokenLen;
-//		if (false) { // set to true to eagerly check Ptg decoding
-//			LittleEndianByteArrayInputStream in = new LittleEndianByteArrayInputStream(byteEncoding);
-//			Ptg.readTokens(encodedTokenLen, in);
-//			int nUnusedBytes = _byteEncoding.length - in.getReadIndex();
-//			if (nUnusedBytes > 0) {
-//				// TODO - this seems to occur when IntersectionPtg is present
-//				// This example file "IntersectionPtg.xls"
-//				// used by test: TestIntersectionPtg.testReading()
-//				// has 10 bytes unused at the end of the formula
-//				// 10 extra bytes are just 0x01 and 0x00
-//				System.out.println(nUnusedBytes + " unused bytes at end of formula");
-//			}
-//		}
+
+		// TODO - this seems to occur when IntersectionPtg is present
+		// This example file "IntersectionPtg.xls"
+		// used by test: TestIntersectionPtg.testReading()
+		// has 10 bytes unused at the end of the formula
+		// 10 extra bytes are just 0x01 and 0x00
+		// LittleEndianByteArrayInputStream in = new LittleEndianByteArrayInputStream(byteEncoding);
+		// Ptg.readTokens(encodedTokenLen, in);
+		// int nUnusedBytes = _byteEncoding.length - in.getReadIndex();
 	}
 	/**
 	 * Convenience method for {@link #read(int, LittleEndianInput, int)}
@@ -72,7 +79,7 @@ public class Formula {
 	 * @return A new formula object as read from the stream.  Possibly empty, never <code>null</code>.
 	 */
 	public static Formula read(int encodedTokenLen, LittleEndianInput in, int totalEncodedLen) {
-		byte[] byteEncoding = new byte[totalEncodedLen];
+		byte[] byteEncoding = IOUtils.safelyAllocate(totalEncodedLen, MAX_ENCODED_LEN);
 		in.readFully(byteEncoding);
 		return new Formula(byteEncoding, encodedTokenLen);
 	}
@@ -191,5 +198,13 @@ public class Formula {
 	}
 	public boolean isSame(Formula other) {
 		return Arrays.equals(_byteEncoding, other._byteEncoding);
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"tokens", this::getTokens,
+			"expReference", this::getExpReference
+		);
 	}
 }

@@ -17,6 +17,10 @@
 
 package org.apache.poi.hssf.record.chart;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
 import org.apache.poi.util.LittleEndianOutput;
@@ -26,31 +30,17 @@ import org.apache.poi.util.LittleEndianOutput;
  * data object. This record is matched with a corresponding BeginRecord.
  *
  * @see BeginRecord
- *
- * @author Glen Stampoultzis (glens at apache.org)
  */
 
-public final class EndRecord extends StandardRecord implements Cloneable {
+public final class EndRecord extends StandardRecord {
     public static final short sid = 0x1034;
 
-    public EndRecord()
-    {
-    }
+    public EndRecord() {}
 
     /**
      * @param in unused (since this record has no data)
      */
-    public EndRecord(RecordInputStream in)
-    {
-    }
-
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[END]\n");
-        buffer.append("[/END]\n");
-        return buffer.toString();
+    public EndRecord(RecordInputStream in) {
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -64,11 +54,20 @@ public final class EndRecord extends StandardRecord implements Cloneable {
     {
         return sid;
     }
-    
+
     @Override
-    public EndRecord clone() {
-       EndRecord er = new EndRecord();
-       // No data so nothing to copy
-       return er;
+    public EndRecord copy() {
+        // No data so nothing to copy
+       return new EndRecord();
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.END;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return null;
     }
 }

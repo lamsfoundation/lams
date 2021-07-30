@@ -17,19 +17,32 @@
 
 package org.apache.poi.ss.formula.ptg;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.util.BitField;
 import org.apache.poi.util.BitFieldFactory;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * ReferencePtgBase - handles references (such as A1, A2, IA4)
- *
- * @author Andrew C. Oliver (acoliver@apache.org)
- * @author Jason Height (jheight at chariot dot net dot au)
  */
 public abstract class RefPtgBase extends OperandPtg {
+
+	/**
+	 * YK: subclasses of RefPtgBase are used by the FormulaParser and FormulaEvaluator accross HSSF and XSSF.
+	 * The bit mask should accommodate the maximum number of avaiable columns, i.e. 0x3FFF.
+	 *
+	 * @see org.apache.poi.ss.SpreadsheetVersion
+	 */
+	private static final BitField column = BitFieldFactory.getInstance(0x3FFF);
+
+	private static final BitField rowRelative = BitFieldFactory.getInstance(0x8000);
+	private static final BitField colRelative = BitFieldFactory.getInstance(0x4000);
+
 
 	/** The row index - zero based unsigned 16 bit value */
 	private int field_1_row;
@@ -38,19 +51,13 @@ public abstract class RefPtgBase extends OperandPtg {
 	 * 16 - isRowRelative - bit 15 - isColumnRelative
 	 */
 	private int field_2_col;
-	private static final BitField rowRelative = BitFieldFactory.getInstance(0x8000);
-	private static final BitField colRelative = BitFieldFactory.getInstance(0x4000);
 
-    /**
-     * YK: subclasses of RefPtgBase are used by the FormulaParser and FormulaEvaluator accross HSSF and XSSF.
-     * The bit mask should accomodate the maximum number of avaiable columns, i.e. 0x3FFF.
-     *
-     * @see org.apache.poi.ss.SpreadsheetVersion
-     */
-    private static final BitField column = BitFieldFactory.getInstance(0x3FFF);
+	protected RefPtgBase() {}
 
-	protected RefPtgBase() {
-		// Required for clone methods
+	protected RefPtgBase(RefPtgBase other) {
+		super(other);
+		field_1_row = other.field_1_row;
+		field_2_col = other.field_2_col;
 	}
 
 	protected RefPtgBase(CellReference c) {
@@ -105,7 +112,7 @@ public abstract class RefPtgBase extends OperandPtg {
 		return column.getValue(field_2_col);
 	}
 
-	protected final String formatReferenceAsString() {
+	protected String formatReferenceAsString() {
 		// Only make cell references as needed. Memory is an issue
 		CellReference cr = new CellReference(getRow(), getColumn(), !isRowRelative(), !isColRelative());
 		return cr.formatAsString();
@@ -114,5 +121,16 @@ public abstract class RefPtgBase extends OperandPtg {
 	@Override
     public final byte getDefaultOperandClass() {
 		return Ptg.CLASS_REF;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"row", this::getRow,
+			"rowRelative", this::isRowRelative,
+			"column", this::getColumn,
+			"colRelative", this::isColRelative,
+			"formatReference", this::formatReferenceAsString
+		);
 	}
 }

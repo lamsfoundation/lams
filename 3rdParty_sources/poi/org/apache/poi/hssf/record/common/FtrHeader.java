@@ -17,8 +17,15 @@
 
 package org.apache.poi.hssf.record.common;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.common.Duplicatable;
+import org.apache.poi.common.usermodel.GenericRecord;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.util.GenericRecordJsonWriter;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
@@ -26,9 +33,9 @@ import org.apache.poi.util.LittleEndianOutput;
  * <P>
  * This record part specifies a header for a Ftr (Future)
  *  style record, which includes extra attributes above and
- *  beyond those of a traditional record. 
+ *  beyond those of a traditional record.
  */
-public final class FtrHeader implements Cloneable {
+public final class FtrHeader implements Duplicatable, GenericRecord {
     /** This MUST match the type on the containing record */
     private short recordType;
     /** This is a FrtFlags */
@@ -40,6 +47,12 @@ public final class FtrHeader implements Cloneable {
         associatedRange = new CellRangeAddress(0, 0, 0, 0);
     }
 
+    public FtrHeader(FtrHeader other) {
+        recordType = other.recordType;
+        grbitFrt = other.grbitFrt;
+        associatedRange = other.associatedRange.copy();
+    }
+
     public FtrHeader(RecordInputStream in) {
         recordType = in.readShort();
         grbitFrt   = in.readShort();
@@ -48,12 +61,7 @@ public final class FtrHeader implements Cloneable {
     }
 
     public String toString() {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append(" [FUTURE HEADER]\n");
-        buffer.append("   Type " + recordType);
-        buffer.append("   Flags " + grbitFrt);
-        buffer.append(" [/FUTURE HEADER]\n");
-        return buffer.toString();
+        return GenericRecordJsonWriter.marshal(this);
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -87,11 +95,16 @@ public final class FtrHeader implements Cloneable {
         this.associatedRange = associatedRange;
     }
 
-    public Object clone() {
-        FtrHeader result = new FtrHeader();
-        result.recordType = recordType;
-        result.grbitFrt = grbitFrt;
-        result.associatedRange = associatedRange.copy();
-        return result;
+    public FtrHeader copy() {
+        return new FtrHeader(this);
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "recordType", this::getRecordType,
+            "grbitFrt", this::getGrbitFrt,
+            "associatedRange", this::getAssociatedRange
+        );
     }
 }

@@ -17,20 +17,21 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.util.BitField;
 import org.apache.poi.util.BitFieldFactory;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title: Protect Record (0x0012)<p>
- * Description:  defines whether a sheet or workbook is protected (HSSF DOES NOT SUPPORT ENCRYPTION)<p>
+ * Defines whether a sheet or workbook is protected (HSSF DOES NOT SUPPORT ENCRYPTION)<p>
  * HSSF now supports the simple "protected" sheets (where they are not encrypted and open office et al
  * ignore the password record entirely).
- * REFERENCE:  PG 373 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)
  */
 public final class ProtectRecord extends StandardRecord {
-    public final static short sid = 0x0012;
+    public static final short sid = 0x0012;
 
     private static final BitField protectFlag = BitFieldFactory.getInstance(0x0001);
 
@@ -38,6 +39,11 @@ public final class ProtectRecord extends StandardRecord {
 
     private ProtectRecord(int options) {
         _options = options;
+    }
+
+    private ProtectRecord(ProtectRecord other) {
+        super(other);
+        _options = other._options;
     }
 
     public ProtectRecord(boolean isProtected) {
@@ -65,15 +71,6 @@ public final class ProtectRecord extends StandardRecord {
         return protectFlag.isSet(_options);
     }
 
-    public String toString() {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[PROTECT]\n");
-        buffer.append("    .options = ").append(HexDump.shortToHex(_options)).append("\n");
-        buffer.append("[/PROTECT]\n");
-        return buffer.toString();
-    }
-
     public void serialize(LittleEndianOutput out) {
         out.writeShort(_options);
     }
@@ -86,7 +83,21 @@ public final class ProtectRecord extends StandardRecord {
         return sid;
     }
 
-    public Object clone() {
-        return new ProtectRecord(_options);
+    @Override
+    public ProtectRecord copy() {
+        return new ProtectRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.PROTECT;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "options", () -> _options,
+            "protect", this::getProtect
+        );
     }
 }

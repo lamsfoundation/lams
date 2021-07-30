@@ -17,16 +17,17 @@
 
 package org.apache.poi.ss.formula.ptg;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.ss.util.NumberToTextConverter;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * Number Stores a floating point value in a formula value stored in a 8 byte
  * field using IEEE notation
- * 
- * @author Avik Sengupta
- * @author Jason Height (jheight at chariot dot net dot au)
  */
 public final class NumberPtg extends ScalarConstantPtg {
 	public final static int SIZE = 9;
@@ -41,7 +42,7 @@ public final class NumberPtg extends ScalarConstantPtg {
 	 * Create a NumberPtg from a string representation of the number Number
 	 * format is not checked, it is expected to be validated in the parser that
 	 * calls this method.
-	 * 
+	 *
 	 * @param value String representation of a floating point number
 	 */
 	public NumberPtg(String value) {
@@ -61,11 +62,26 @@ public final class NumberPtg extends ScalarConstantPtg {
 		out.writeDouble(getValue());
 	}
 
+	@Override
+	public byte getSid() {
+		return sid;
+	}
+
 	public int getSize() {
 		return SIZE;
 	}
 
 	public String toFormulaString() {
 		return NumberToTextConverter.toText(field_1_value);
+	}
+
+	@Override
+	public NumberPtg copy() {
+		return this;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties("value", this::getValue);
 	}
 }

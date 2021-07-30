@@ -17,17 +17,20 @@
 
 package org.apache.poi.ss.formula.ptg;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.ss.formula.FormulaRenderingWorkbook;
 import org.apache.poi.ss.formula.WorkbookDependentFormula;
 import org.apache.poi.ss.usermodel.FormulaError;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        Deleted Area 3D Ptg - 3D referecnce (Sheet + Area)<P>
- * Description:  Defined a area in Extern Sheet. <P>
- * REFERENCE:  <P>
- * @author Patrick Luby
+ * Deleted Area 3D Ptg - 3D referecnce (Sheet + Area)<p>
+ * Defined a area in Extern Sheet.
+ *
  * @version 1.0-pre
  */
 public final class DeletedArea3DPtg extends OperandPtg implements WorkbookDependentFormula {
@@ -41,7 +44,7 @@ public final class DeletedArea3DPtg extends OperandPtg implements WorkbookDepend
 		unused1 = 0;
 		unused2 = 0;
 	}
-	
+
 	public DeletedArea3DPtg(LittleEndianInput in)  {
 		field_1_index_extern_sheet = in.readUShort();
 		unused1 = in.readInt();
@@ -56,13 +59,39 @@ public final class DeletedArea3DPtg extends OperandPtg implements WorkbookDepend
 	public byte getDefaultOperandClass() {
 		return Ptg.CLASS_REF;
 	}
+
+	@Override
+	public byte getSid() {
+		return sid;
+	}
+
 	public int getSize() {
 		return 11;
 	}
+
+	public int getExternSheetIndex() {
+		return field_1_index_extern_sheet;
+	}
+
 	public void write(LittleEndianOutput out) {
 		out.writeByte(sid + getPtgClass());
 		out.writeShort(field_1_index_extern_sheet);
 		out.writeInt(unused1);
 		out.writeInt(unused2);
+	}
+
+	@Override
+	public DeletedArea3DPtg copy() {
+		// immutable
+		return this;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"externSheetIndex", this::getExternSheetIndex,
+			"unused1", () -> unused1,
+			"unused2", () -> unused2
+		);
 	}
 }

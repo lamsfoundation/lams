@@ -17,46 +17,45 @@
 
 package org.apache.poi.hssf.record;
 
-import org.apache.poi.util.HexDump;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title: Beginning Of File (0x0809)<P>
- * Description: Somewhat of a misnomer, its used for the beginning of a set of
- *              records that have a particular purpose or subject.
- *              Used in sheets and workbooks.<P>
- * REFERENCE:  PG 289 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)<P>
- * @author Andrew C. Oliver
- * @author Jason Height (jheight at chariot dot net dot au)
+ * Somewhat of a misnomer, its used for the beginning of a set of records that
+ * have a particular purpose or subject. Used in sheets and workbooks.
  */
-public final class BOFRecord extends StandardRecord implements Cloneable {
+public final class BOFRecord extends StandardRecord {
     /**
      * for BIFF8 files the BOF is 0x809. For earlier versions see
-     *  {@link #biff2_sid} {@link #biff3_sid} {@link #biff4_sid} 
+     *  {@link #biff2_sid} {@link #biff3_sid} {@link #biff4_sid}
      *  {@link #biff5_sid}
      */
-    public final static short sid = 0x809;
+    public static final short sid = 0x809;
     // SIDs from earlier BIFF versions
-    public final static short biff2_sid = 0x009;
-    public final static short biff3_sid = 0x209;
-    public final static short biff4_sid = 0x409;
-    public final static short biff5_sid = 0x809;
+    public static final short biff2_sid = 0x009;
+    public static final short biff3_sid = 0x209;
+    public static final short biff4_sid = 0x409;
+    public static final short biff5_sid = 0x809;
 
     /** suggested default (0x0600 - BIFF8) */
-    public final static int VERSION             = 0x0600;
+    public static final int VERSION             = 0x0600;
     /** suggested default 0x10d3 */
-    public final static int BUILD               = 0x10d3;
+    public static final int BUILD               = 0x10d3;
     /** suggested default  0x07CC (1996) */
-    public final static int BUILD_YEAR          = 0x07CC;   // 1996
+    public static final int BUILD_YEAR          = 0x07CC;   // 1996
     /** suggested default for a normal sheet (0x41) */
-    public final static int HISTORY_MASK        = 0x41;
+    public static final int HISTORY_MASK        = 0x41;
 
-    public final static int TYPE_WORKBOOK       = 0x05;
-    public final static int TYPE_VB_MODULE      = 0x06;
-    public final static int TYPE_WORKSHEET      = 0x10;
-    public final static int TYPE_CHART          = 0x20;
-    public final static int TYPE_EXCEL_4_MACRO  = 0x40;
-    public final static int TYPE_WORKSPACE_FILE = 0x100;
+    public static final int TYPE_WORKBOOK       = 0x05;
+    public static final int TYPE_VB_MODULE      = 0x06;
+    public static final int TYPE_WORKSHEET      = 0x10;
+    public static final int TYPE_CHART          = 0x20;
+    public static final int TYPE_EXCEL_4_MACRO  = 0x40;
+    public static final int TYPE_WORKSPACE_FILE = 0x100;
 
     private int field_1_version;
     private int field_2_type;
@@ -68,9 +67,18 @@ public final class BOFRecord extends StandardRecord implements Cloneable {
     /**
      * Constructs an empty BOFRecord with no fields set.
      */
-    public BOFRecord() {
+    public BOFRecord() {}
+
+    public BOFRecord(BOFRecord other) {
+        super(other);
+        field_1_version = other.field_1_version;
+        field_2_type = other.field_2_type;
+        field_3_build = other.field_3_build;
+        field_4_year = other.field_4_year;
+        field_5_history = other.field_5_history;
+        field_6_rversion = other.field_6_rversion;
     }
-    
+
     private BOFRecord(int type) {
         field_1_version = VERSION;
         field_2_type = type;
@@ -79,7 +87,7 @@ public final class BOFRecord extends StandardRecord implements Cloneable {
         field_5_history = 0x01;
         field_6_rversion = VERSION;
     }
-    
+
     public static BOFRecord createSheetBOF() {
         return new BOFRecord(TYPE_WORKSHEET);
     }
@@ -224,21 +232,6 @@ public final class BOFRecord extends StandardRecord implements Cloneable {
         return field_6_rversion;
     }
 
-    public String toString() {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[BOF RECORD]\n");
-        buffer.append("    .version  = ").append(HexDump.shortToHex(getVersion())).append("\n");
-        buffer.append("    .type     = ").append(HexDump.shortToHex(getType()));
-        buffer.append(" (").append(getTypeName()).append(")").append("\n");
-        buffer.append("    .build    = ").append(HexDump.shortToHex(getBuild())).append("\n");
-        buffer.append("    .buildyear= ").append(getBuildYear()).append("\n");
-        buffer.append("    .history  = ").append(HexDump.intToHex(getHistoryBitMask())).append("\n");
-        buffer.append("    .reqver   = ").append(HexDump.intToHex(getRequiredVersion())).append("\n");
-        buffer.append("[/BOF RECORD]\n");
-        return buffer.toString();
-    }
-
     private String getTypeName() {
         switch(field_2_type) {
             case TYPE_CHART: return "chart";
@@ -269,14 +262,25 @@ public final class BOFRecord extends StandardRecord implements Cloneable {
     }
 
     @Override
-    public BOFRecord clone() {
-      BOFRecord rec = new BOFRecord();
-      rec.field_1_version = field_1_version;
-      rec.field_2_type = field_2_type;
-      rec.field_3_build = field_3_build;
-      rec.field_4_year = field_4_year;
-      rec.field_5_history = field_5_history;
-      rec.field_6_rversion = field_6_rversion;
-      return rec;
+    public BOFRecord copy() {
+        return new BOFRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.BOF;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        final Map<String,Supplier<?>> m = new LinkedHashMap<>();
+        m.put("version", this::getVersion);
+        m.put("type", this::getType);
+        m.put("typeName", this::getTypeName);
+        m.put("build", this::getBuild);
+        m.put("buildYear", this::getBuildYear);
+        m.put("history", this::getHistoryBitMask);
+        m.put("requiredVersion", this::getRequiredVersion);
+        return Collections.unmodifiableMap(m);
     }
 }

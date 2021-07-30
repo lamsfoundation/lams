@@ -146,8 +146,8 @@ public interface TextParagraph<
      * The amount of vertical white space before the paragraph
      * This may be specified in two different ways, percentage spacing and font point spacing:
      * <p>
-     * If spaceBefore >= 0, then space is a percentage of normal line height.
-     * If spaceBefore < 0, the absolute value in points
+     * If spaceBefore &gt;= 0, then space is a percentage of normal line height.
+     * If spaceBefore &lt; 0, the absolute value in points
      * </p>
      *
      * @return the vertical white space before the paragraph, or null if unset
@@ -158,8 +158,8 @@ public interface TextParagraph<
      * Set the amount of vertical white space that will be present before the paragraph.
      * This space is specified in either percentage or points:
      * <p>
-     * If spaceBefore >= 0, then space is a percentage of normal line height.
-     * If spaceBefore < 0, the absolute value of linespacing is the spacing in points
+     * If spaceBefore &gt;= 0, then space is a percentage of normal line height.
+     * If spaceBefore &lt; 0, the absolute value of linespacing is the spacing in points
      * </p>
      * Examples:
      * <pre><code>
@@ -179,8 +179,8 @@ public interface TextParagraph<
      * The amount of vertical white space after the paragraph
      * This may be specified in two different ways, percentage spacing and font point spacing:
      * <p>
-     * If spaceBefore >= 0, then space is a percentage of normal line height.
-     * If spaceBefore < 0, the absolute value of linespacing is the spacing in points
+     * If spaceBefore &gt;= 0, then space is a percentage of normal line height.
+     * If spaceBefore &lt; 0, the absolute value of linespacing is the spacing in points
      * </p>
      *
      * @return the vertical white space after the paragraph or null, if unset
@@ -191,8 +191,8 @@ public interface TextParagraph<
      * Set the amount of vertical white space that will be present after the paragraph.
      * This space is specified in either percentage or points:
      * <p>
-     * If spaceAfter >= 0, then space is a percentage of normal line height.
-     * If spaceAfter < 0, the absolute value of linespacing is the spacing in points
+     * If spaceAfter &gt;= 0, then space is a percentage of normal line height.
+     * If spaceAfter &lt; 0, the absolute value of linespacing is the spacing in points
      * </p>
      * Examples:
      * <pre><code>
@@ -283,8 +283,8 @@ public interface TextParagraph<
      * This element specifies the vertical line spacing that is to be used within a paragraph.
      * This may be specified in two different ways, percentage spacing and font point spacing:
      * <p>
-     * If linespacing >= 0, then linespacing is a percentage of normal line height
-     * If linespacing < 0, the absolute value of linespacing is the spacing in points
+     * If linespacing &gt;= 0, then linespacing is a percentage of normal line height
+     * If linespacing &lt; 0, the absolute value of linespacing is the spacing in points
      * </p>
      * Examples:
      * <pre><code>
@@ -374,4 +374,34 @@ public interface TextParagraph<
      * @since POI 3.15-beta2
      */
     boolean isHeaderOrFooter();
+    
+    
+    /**
+     * Get the {@link TabStop TabStops} - the list can't be and it's entries shouldn't be modified.
+     * Opposed to other properties, this method is not cascading to the master sheet,
+     * if the property is not defined on the normal slide level, i.e. the tabstops on
+     * different levels aren't merged.
+     *
+     * @return the tabstop collection or {@code null} if no tabstops are defined
+     * 
+     * @since POI 4.0.0
+     */
+    List<? extends TabStop> getTabStops();
+
+    /**
+     * Set the {@link TabStop} collection
+     *
+     * @param tabStops the {@link TabStop} collection
+     * 
+     * @since POI 4.0.0
+     */
+    void addTabStops(double positionInPoints, TabStop.TabStopType tabStopType);
+
+    /**
+     * Removes the tabstops of this paragraphs.
+     * This doesn't affect inherited tabstops, e.g. inherited by the slide master
+     * 
+     * @since POI 4.0.0
+     */
+    void clearTabStops();
 }

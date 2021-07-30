@@ -38,25 +38,25 @@ import org.apache.poi.ss.util.PaneInformation;
 public interface Sheet extends Iterable<Row> {
 
     /* Constants for margins */
-    public static final short LeftMargin = 0;
+    short LeftMargin = 0;
 
-    public static final short RightMargin = 1;
+    short RightMargin = 1;
 
-    public static final short TopMargin = 2;
+    short TopMargin = 2;
 
-    public static final short BottomMargin = 3;
+    short BottomMargin = 3;
 
-    public static final short HeaderMargin = 4;
+    short HeaderMargin = 4;
 
-    public static final short FooterMargin = 5;
+    short FooterMargin = 5;
 
-    public static final byte PANE_LOWER_RIGHT = (byte) 0;
+    byte PANE_LOWER_RIGHT = (byte) 0;
 
-    public static final byte PANE_UPPER_RIGHT = (byte) 1;
+    byte PANE_UPPER_RIGHT = (byte) 1;
 
-    public static final byte PANE_LOWER_LEFT = (byte) 2;
+    byte PANE_LOWER_LEFT = (byte) 2;
 
-    public static final byte PANE_UPPER_LEFT = (byte) 3;
+    byte PANE_UPPER_LEFT = (byte) 3;
 
     /**
      * Create a new row within the sheet and return the high level representation
@@ -79,7 +79,7 @@ public interface Sheet extends Iterable<Row> {
      * defined you get a null.  This is to say row 4 represents the fifth row on a sheet.
      *
      * @param rownum  row to get (0-based)
-     * @return Row representing the rownumber or null if its not defined on the sheet
+     * @return Row representing the row-number or null if its not defined on the sheet
      */
     Row getRow(int rownum);
 
@@ -91,16 +91,27 @@ public interface Sheet extends Iterable<Row> {
     int getPhysicalNumberOfRows();
 
     /**
-     * Gets the first row on the sheet
+     * Gets the first row on the sheet.
+     *
+     * Note: rows which had content before and were set to empty later might
+     * still be counted as rows by Excel and Apache POI, so the result of this
+     * method will include such rows and thus the returned value might be lower
+     * than expected!
      *
      * @return the number of the first logical row on the sheet (0-based)
+     *      or -1 if no row exists
      */
     int getFirstRowNum();
 
     /**
      * Gets the last row on the sheet
      *
-     * @return last row contained n this sheet (0-based)
+     * Note: rows which had content before and were set to empty later might
+     * still be counted as rows by Excel and Apache POI, so the result of this
+     * method will include such rows and thus the returned value might be higher
+     * than expected!
+     *
+     * @return last row contained on this sheet (0-based) or -1 if no row exists
      */
     int getLastRowNum();
 
@@ -108,7 +119,7 @@ public interface Sheet extends Iterable<Row> {
      * Get the visibility state for a given column
      *
      * @param columnIndex - the column to get (0-based)
-     * @param hidden - the visiblity state of the column
+     * @param hidden - the visibility state of the column
      */
     void setColumnHidden(int columnIndex, boolean hidden);
 
@@ -125,14 +136,14 @@ public interface Sheet extends Iterable<Row> {
      *
      * @param value true for right to left, false otherwise.
      */
-    public void setRightToLeft(boolean value);
+    void setRightToLeft(boolean value);
 
     /**
      * Whether the text is displayed in right-to-left mode in the window
      *
      * @return whether the text is displayed in right-to-left mode in the window
      */
-    public boolean isRightToLeft();
+    boolean isRightToLeft();
 
     /**
      * Set the width (in units of 1/256th of a character width)<p>
@@ -144,22 +155,22 @@ public interface Sheet extends Iterable<Row> {
      * Character width is defined as the maximum digit width
      * of the numbers <code>0, 1, 2, ... 9</code> as rendered
      * using the default font (first font in the workbook).<p>
-     * 
+     *
      * Unless you are using a very special font, the default character is '0' (zero),
      * this is true for Arial (default font font in HSSF) and Calibri (default font in XSSF)<p>
      *
      * Please note, that the width set by this method includes 4 pixels of margin padding (two on each side),
      * plus 1 pixel padding for the gridlines (Section 3.3.1.12 of the OOXML spec).
      * This results is a slightly less value of visible characters than passed to this method (approx. 1/2 of a character).<p>
-     * 
+     *
      * To compute the actual number of visible characters,
      * Excel uses the following formula (Section 3.3.1.12 of the OOXML spec):<p>
-     * 
+     *
      * <code>
      *     width = Truncate([{Number of Visible Characters} *
      *      {Maximum Digit Width} + {5 pixel padding}]/{Maximum Digit Width}*256)/256
      * </code>
-     * 
+     *
      * Using the Calibri font as an example, the maximum digit width of 11 point font size is 7 pixels (at 96 dpi).
      * If you set a column width to be eight characters wide, e.g. <code>setColumnWidth(columnIndex, 8*256)</code>,
      * then the actual value of visible characters (the value shown in Excel) is derived from the following equation:
@@ -191,19 +202,19 @@ public interface Sheet extends Iterable<Row> {
 
     /**
      * get the width in pixel
-     * 
+     *
      * <p>
      * Please note, that this method works correctly only for workbooks
      * with the default font size (Arial 10pt for .xls and Calibri 11pt for .xlsx).
-     * If the default font is changed the column width can be streched
+     * If the default font is changed the column width can be stretched
      * </p>
      *
      * @param columnIndex - the column to set (0-based)
      * @return width in pixels
      */
     float getColumnWidthInPixels(int columnIndex);
-    
-    
+
+
     /**
      * Set the default column width for the sheet (if the columns do not define their own width)
      * in characters
@@ -227,7 +238,7 @@ public interface Sheet extends Iterable<Row> {
      * @return  default row height measured in twips (1/20 of  a point)
      */
     short getDefaultRowHeight();
-    
+
     /**
      * Get the default row height for the sheet (if the rows do not define their own height) in
      * points.
@@ -256,9 +267,9 @@ public interface Sheet extends Iterable<Row> {
      *  (0 based) column, or null if no style has been
      *  set for that column
      */
-    public CellStyle getColumnStyle(int column);
+    CellStyle getColumnStyle(int column);
 
-    /**
+    /*
      * Sets the CellStyle that applies to the given
      *  (0 based) column.
      */
@@ -327,7 +338,7 @@ public interface Sheet extends Iterable<Row> {
      * @param index of the region to unmerge
      */
     void removeMergedRegion(int index);
-    
+
     /**
      * Removes a number of merged regions of cells (hence letting them free)
      *
@@ -347,14 +358,14 @@ public interface Sheet extends Iterable<Row> {
      *
      * @return the merged region at the specified index
      */
-    public CellRangeAddress getMergedRegion(int index);
+    CellRangeAddress getMergedRegion(int index);
 
     /**
      * Returns the list of merged regions.
      *
      * @return the list of merged regions
      */
-    public List<CellRangeAddress> getMergedRegions();
+    List<CellRangeAddress> getMergedRegions();
 
     /**
      *  Returns an iterator of the physical rows
@@ -374,7 +385,7 @@ public interface Sheet extends Iterable<Row> {
      *  evaluation in POI is not possible.
      *  </p>
      *
-     *  To force recalcuation of formulas in the entire workbook
+     *  To force recalculation of formulas in the entire workbook
      *  use {@link Workbook#setForceFormulaRecalculation(boolean)} instead.
      *
      * @param value true if the application will perform a full recalculation of
@@ -386,10 +397,15 @@ public interface Sheet extends Iterable<Row> {
 
     /**
      * Whether Excel will be asked to recalculate all formulas in this sheet when the
-     *  workbook is opened.  
+     *  workbook is opened.
+     *
+     * Note: This just returns if the sheet has the recalculate flag set and
+     * will still return false even if recalculation is enabled on workbook-level.
+     *
+     * @return true if the Sheet has the recalculate-flag set.
      */
     boolean getForceFormulaRecalculation();
-    
+
     /**
      * Flag indicating whether the sheet displays Automatic Page Breaks.
      *
@@ -527,7 +543,7 @@ public interface Sheet extends Iterable<Row> {
      * @see #setDisplayGridlines(boolean) to display gridlines on screen
      */
     void setPrintGridlines(boolean show);
-    
+
     /**
      * Gets the flag indicating whether this sheet prints the
      * row and column headings when printing.
@@ -553,16 +569,16 @@ public interface Sheet extends Iterable<Row> {
 
     /**
      * Gets the user model for the default document header.<p>
-     * 
+     *
      * Note that XSSF offers more kinds of document headers than HSSF does
-     * 
+     *
      * @return the document header. Never <code>null</code>
      */
     Header getHeader();
 
     /**
      * Gets the user model for the default document footer.<p>
-     * 
+     *
      * Note that XSSF offers more kinds of document footers than HSSF does.
      *
      * @return the document footer. Never <code>null</code>
@@ -571,7 +587,7 @@ public interface Sheet extends Iterable<Row> {
 
     /**
      * Sets a flag indicating whether this sheet is selected.<p>
-     * 
+     *
      * Note: multiple sheets can be selected, but only one sheet can be active at one time.
      *
      * @param value <code>true</code> if this sheet is selected
@@ -601,20 +617,20 @@ public interface Sheet extends Iterable<Row> {
      * @return true =&gt; protection enabled; false =&gt; protection disabled
      */
     boolean getProtect();
-    
+
     /**
      * Sets the protection enabled as well as the password
      * @param password to set for protection. Pass <code>null</code> to remove protection
      */
-    public void protectSheet(String password);
-    
+    void protectSheet(String password);
+
     /**
      * Answer whether scenario protection is enabled or disabled
      *
      * @return true =&gt; protection enabled; false =&gt; protection disabled
      */
     boolean getScenarioProtect();
-    
+
     /**
      * Window zoom magnification for current view representing percent values.
      * Valid values range from 10 to 400. Horizontal &amp; Vertical scale together.
@@ -632,7 +648,7 @@ public interface Sheet extends Iterable<Row> {
      * @param scale window zoom magnification
      * @throws IllegalArgumentException if scale is invalid
      */
-    public void setZoom(int scale);
+    void setZoom(int scale);
 
     /**
      * The top row in the visible view when the sheet is
@@ -654,10 +670,10 @@ public interface Sheet extends Iterable<Row> {
      * Sets desktop window pane display area, when the
      * file is first opened in a viewer.
      *
-     * @param toprow the top row to show in desktop window pane
-     * @param leftcol the left column to show in desktop window pane
+     * @param topRow the top row to show in desktop window pane
+     * @param leftCol the left column to show in desktop window pane
      */
-    void showInPane(int toprow, int leftcol);
+    void showInPane(int topRow, int leftCol);
 
     /**
      * Shifts rows between startRow and endRow n number of rows.
@@ -694,11 +710,22 @@ public interface Sheet extends Iterable<Row> {
     void shiftRows(int startRow, int endRow, int n, boolean copyRowHeight, boolean resetOriginalRowHeight);
 
     /**
+     * Shifts columns between startColumn and endColumn, n number of columns.
+     * If you use a negative number, it will shift columns left.
+     * Code ensures that columns don't wrap around
+     *
+     * @param startColumn the column to start shifting
+     * @param endColumn the column to end shifting
+     * @param n the number of columns to shift
+     */
+    void shiftColumns(int startColumn, int endColumn, int n);
+
+    /**
      * Creates a split (freezepane). Any existing freezepane or split pane is overwritten.
      * <p>
      *     If both colSplit and rowSplit are zero then the existing freeze pane is removed
      * </p>
-     * @param colSplit      Horizonatal position of split.
+     * @param colSplit      Horizontal position of split.
      * @param rowSplit      Vertical position of split.
      * @param leftmostColumn   Left column visible in right pane.
      * @param topRow        Top row visible in bottom pane
@@ -710,14 +737,14 @@ public interface Sheet extends Iterable<Row> {
      * <p>
      *     If both colSplit and rowSplit are zero then the existing freeze pane is removed
      * </p>
-     * @param colSplit      Horizonatal position of split.
+     * @param colSplit      Horizontal position of split.
      * @param rowSplit      Vertical position of split.
      */
     void createFreezePane(int colSplit, int rowSplit);
 
     /**
      * Creates a split pane. Any existing freezepane or split pane is overwritten.
-     * @param xSplitPos      Horizonatal position of split (in 1/20th of a point).
+     * @param xSplitPos      Horizontal position of split (in 1/20th of a point).
      * @param ySplitPos      Vertical position of split (in 1/20th of a point).
      * @param topRow        Top row visible in bottom pane
      * @param leftmostColumn   Left column visible in right pane.
@@ -783,7 +810,7 @@ public interface Sheet extends Iterable<Row> {
      * Breaks occur above the specified row and left of the specified column inclusive.
      *
      * For example, <code>sheet.setColumnBreak(2);</code> breaks the sheet into two parts
-     * with columns A,B,C in the first and D,E,... in the second. Simuilar, <code>sheet.setRowBreak(2);</code>
+     * with columns A,B,C in the first and D,E,... in the second. Similar, <code>sheet.setRowBreak(2);</code>
      * breaks the sheet into two parts with first three rows (rownum=1...3) in the first part
      * and rows starting with rownum=4 in the second.
      *
@@ -800,7 +827,7 @@ public interface Sheet extends Iterable<Row> {
 
     /**
      * Removes the page break at the indicated row
-     * @param row
+     * @param row The 0-based index of the row.
      */
     void removeRowBreak(int row);
 
@@ -821,7 +848,7 @@ public interface Sheet extends Iterable<Row> {
      * Breaks occur above the specified row and left of the specified column inclusive.
      *
      * For example, <code>sheet.setColumnBreak(2);</code> breaks the sheet into two parts
-     * with columns A,B,C in the first and D,E,... in the second. Simuilar, <code>sheet.setRowBreak(2);</code>
+     * with columns A,B,C in the first and D,E,... in the second. Similar, <code>sheet.setRowBreak(2);</code>
      * breaks the sheet into two parts with first three rows (rownum=1...3) in the first part
      * and rows starting with rownum=4 in the second.
      *
@@ -838,7 +865,7 @@ public interface Sheet extends Iterable<Row> {
 
     /**
      * Removes a page break at the indicated column
-     * @param column
+     * @param column The 0-based index of the column.
      */
     void removeColumnBreak(int column);
 
@@ -927,7 +954,7 @@ public interface Sheet extends Iterable<Row> {
      * @param useMergedCells whether to use the contents of merged cells when calculating the width of the column
      */
     void autoSizeColumn(int column, boolean useMergedCells);
-    
+
     /**
      * Returns cell comment for the specified location
      *
@@ -944,17 +971,17 @@ public interface Sheet extends Iterable<Row> {
 
     /**
      * Return the sheet's existing drawing, or null if there isn't yet one.
-     * 
+     *
      * Use {@link #createDrawingPatriarch()} to get or create
      *
      * @return a SpreadsheetML drawing
      */
     Drawing<?> getDrawingPatriarch();
-    
+
     /**
-     * Creates the top-level drawing patriarch. 
+     * Creates the top-level drawing patriarch.
      * <p>This may then be used to add graphics or charts.</p>
-     * <p>Note that this will normally have the effect of removing 
+     * <p>Note that this will normally have the effect of removing
      *  any existing drawings on this sheet.</p>
      *
      * @return  The new drawing patriarch.
@@ -985,7 +1012,10 @@ public interface Sheet extends Iterable<Row> {
 
     /**
      * Sets array formula to specified region for result.
-     *
+     * <p>
+     * Note if there are shared formulas this will invalidate any
+     * {@link FormulaEvaluator} instances based on this workbook
+     *</p>
      * @param formula text representation of the formula
      * @param range Region of array formula for result.
      * @return the {@link CellRange} of cells affected by this change
@@ -999,24 +1029,24 @@ public interface Sheet extends Iterable<Row> {
      * @return the {@link CellRange} of cells affected by this change
      */
     CellRange<? extends Cell> removeArrayFormula(Cell cell);
-    
-    public DataValidationHelper getDataValidationHelper();
+
+    DataValidationHelper getDataValidationHelper();
 
     /**
      * Returns the list of DataValidation in the sheet.
      * @return list of DataValidation in the sheet
      */
-    public List<? extends DataValidation> getDataValidations();
+    List<? extends DataValidation> getDataValidations();
 
     /**
      * Creates a data validation object
      * @param dataValidation The Data validation object settings
      */
-    public void addValidationData(DataValidation dataValidation);
+    void addValidationData(DataValidation dataValidation);
 
     /**
      * Enable filtering for a range of cells
-     * 
+     *
      * @param range the range of cells to filter
      */
     AutoFilter setAutoFilter(CellRangeAddress range);
@@ -1030,111 +1060,111 @@ public interface Sheet extends Iterable<Row> {
 
 
     /**
-     * Gets the repeating rows used when printing the sheet, as found in 
+     * Gets the repeating rows used when printing the sheet, as found in
      * File-&gt;PageSetup-&gt;Sheet.<p>
-     * 
+     *
      * Repeating rows cover a range of contiguous rows, e.g.:
      * <pre>
      * Sheet1!$1:$1
      * Sheet2!$5:$8
      * </pre>
-     * The {@link CellRangeAddress} returned contains a column part which spans 
-     * all columns, and a row part which specifies the contiguous range of 
+     * The {@link CellRangeAddress} returned contains a column part which spans
+     * all columns, and a row part which specifies the contiguous range of
      * repeating rows.<p>
-     * 
+     *
      * If the Sheet does not have any repeating rows defined, null is returned.
-     * 
-     * @return an {@link CellRangeAddress} containing the repeating rows for the 
+     *
+     * @return an {@link CellRangeAddress} containing the repeating rows for the
      *         Sheet, or null.
      */
     CellRangeAddress getRepeatingRows();
 
 
     /**
-     * Gets the repeating columns used when printing the sheet, as found in 
+     * Gets the repeating columns used when printing the sheet, as found in
      * File-&gt;PageSetup-&gt;Sheet.<p>
-     * 
+     *
      * Repeating columns cover a range of contiguous columns, e.g.:
      * <pre>
      * Sheet1!$A:$A
      * Sheet2!$C:$F
      * </pre>
-     * The {@link CellRangeAddress} returned contains a row part which spans all 
-     * rows, and a column part which specifies the contiguous range of 
+     * The {@link CellRangeAddress} returned contains a row part which spans all
+     * rows, and a column part which specifies the contiguous range of
      * repeating columns.<p>
-     * 
-     * If the Sheet does not have any repeating columns defined, null is 
+     *
+     * If the Sheet does not have any repeating columns defined, null is
      * returned.
-     * 
-     * @return an {@link CellRangeAddress} containing the repeating columns for 
+     *
+     * @return an {@link CellRangeAddress} containing the repeating columns for
      *         the Sheet, or null.
      */
     CellRangeAddress getRepeatingColumns();
 
 
     /**
-     * Sets the repeating rows used when printing the sheet, as found in 
+     * Sets the repeating rows used when printing the sheet, as found in
      * File-&gt;PageSetup-&gt;Sheet.<p>
-     * 
+     *
      * Repeating rows cover a range of contiguous rows, e.g.:
      * <pre>
      * Sheet1!$1:$1
      * Sheet2!$5:$8</pre>
-     * The parameter {@link CellRangeAddress} should specify a column part 
-     * which spans all columns, and a row part which specifies the contiguous 
+     * The parameter {@link CellRangeAddress} should specify a column part
+     * which spans all columns, and a row part which specifies the contiguous
      * range of repeating rows, e.g.:
      * <pre>
      * sheet.setRepeatingRows(CellRangeAddress.valueOf("2:3"));</pre>
-     * A null parameter value indicates that repeating rows should be removed 
+     * A null parameter value indicates that repeating rows should be removed
      * from the Sheet:
      * <pre>
      * sheet.setRepeatingRows(null);</pre>
-     * 
-     * @param rowRangeRef a {@link CellRangeAddress} containing the repeating 
+     *
+     * @param rowRangeRef a {@link CellRangeAddress} containing the repeating
      *        rows for the Sheet, or null.
      */
     void setRepeatingRows(CellRangeAddress rowRangeRef);
 
 
     /**
-     * Sets the repeating columns used when printing the sheet, as found in 
+     * Sets the repeating columns used when printing the sheet, as found in
      * File-&gt;PageSetup-&gt;Sheet.<p>
-     * 
+     *
      * Repeating columns cover a range of contiguous columns, e.g.:
      * <pre>
      * Sheet1!$A:$A
      * Sheet2!$C:$F</pre>
-     * The parameter {@link CellRangeAddress} should specify a row part 
-     * which spans all rows, and a column part which specifies the contiguous 
+     * The parameter {@link CellRangeAddress} should specify a row part
+     * which spans all rows, and a column part which specifies the contiguous
      * range of repeating columns, e.g.:
      * <pre>
      * sheet.setRepeatingColumns(CellRangeAddress.valueOf("B:C"));</pre>
-     * A null parameter value indicates that repeating columns should be removed 
+     * A null parameter value indicates that repeating columns should be removed
      * from the Sheet:
      * <pre>
      * sheet.setRepeatingColumns(null);</pre>
-     * 
-     * @param columnRangeRef a {@link CellRangeAddress} containing the repeating 
+     *
+     * @param columnRangeRef a {@link CellRangeAddress} containing the repeating
      *        columns for the Sheet, or null.
      */
     void setRepeatingColumns(CellRangeAddress columnRangeRef);
-    
+
     /**
      * Returns the column outline level. Increased as you
      *  put it into more groups (outlines), reduced as
      *  you take it out of them.
      */
     int getColumnOutlineLevel(int columnIndex);
-    
+
     /**
      * Get a Hyperlink in this sheet anchored at row, column
      *
-     * @param row
-     * @param column
+     * @param row The 0-based index of the row to look at.
+     * @param column The 0-based index of the column to look at.
      * @return hyperlink if there is a hyperlink anchored at row, column; otherwise returns null
      */
-    public Hyperlink getHyperlink(int row, int column);
-    
+    Hyperlink getHyperlink(int row, int column);
+
     /**
      * Get a Hyperlink in this sheet located in a cell specified by {code addr}
      *
@@ -1142,14 +1172,14 @@ public interface Sheet extends Iterable<Row> {
      * @return hyperlink if there is a hyperlink anchored at {@code addr}; otherwise returns {@code null}
      * @since POI 3.15 beta 3
      */
-    public Hyperlink getHyperlink(CellAddress addr);
-    
+    Hyperlink getHyperlink(CellAddress addr);
+
     /**
      * Get a list of Hyperlinks in this sheet
      *
      * @return Hyperlinks for the sheet
      */
-    public List<? extends Hyperlink> getHyperlinkList();
+    List<? extends Hyperlink> getHyperlinkList();
 
     /**
      * Return location of the active cell, e.g. <code>A1</code>.
@@ -1157,7 +1187,7 @@ public interface Sheet extends Iterable<Row> {
      * @return the location of the active cell.
      * @since 3.14beta1
      */
-    public CellAddress getActiveCell();
+    CellAddress getActiveCell();
 
     /**
       * Sets location of the active cell
@@ -1165,5 +1195,5 @@ public interface Sheet extends Iterable<Row> {
       * @param address the location of the active cell, e.g. <code>A1</code>.
       * @since 3.14beta1
       */
-    public void setActiveCell(CellAddress address);
+    void setActiveCell(CellAddress address);
 }

@@ -27,6 +27,7 @@ import org.apache.poi.ss.formula.eval.StringEval;
 import org.apache.poi.ss.formula.eval.ValueEval;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.util.CellRangeAddress;
 
 /**
  * Represents a cell being used for forked evaluation that has had a value set different from the
@@ -88,7 +89,7 @@ final class ForkedEvaluationCell implements EvaluationCell {
 	}
 	public void copyValue(Cell destCell) {
 		switch (_cellType) {
-			case BLANK:   destCell.setCellType(CellType.BLANK);          return;
+			case BLANK:   destCell.setBlank();                           return;
 			case NUMERIC: destCell.setCellValue(_numberValue);           return;
 			case BOOLEAN: destCell.setCellValue(_booleanValue);          return;
 			case STRING:  destCell.setCellValue(_stringValue);           return;
@@ -102,24 +103,9 @@ final class ForkedEvaluationCell implements EvaluationCell {
 			throw new RuntimeException("Wrong data type (" + _cellType + ")");
 		}
 	}
-	/**
-	 * Will return {@link CellType} in a future version of POI.
-	 * For forwards compatibility, do not hard-code cell type literals in your code.
-	 *
-	 * @return cell type
-	 * @deprecated 3.15. Will return a {@link CellType} enum in the future.
-	 */
+
 	@Override
-	public int getCellType() {
-		return _cellType.getCode();
-	}
-	/**
-	 * @since POI 3.15 beta 3
-	 * @deprecated POI 3.15 beta 3.
-	 * Will be deleted when we make the CellType enum transition. See bug 59791.
-	 */
-	@Override
-	public CellType getCellTypeEnum() {
+	public CellType getCellType() {
 		return _cellType;
 	}
 	@Override
@@ -154,25 +140,21 @@ final class ForkedEvaluationCell implements EvaluationCell {
 	public int getColumnIndex() {
 		return _masterCell.getColumnIndex();
 	}
+	
+	@Override
+	public CellRangeAddress getArrayFormulaRange() {
+		return _masterCell.getArrayFormulaRange();
+	}
+	
+	@Override
+	public boolean isPartOfArrayFormulaGroup() {
+		return _masterCell.isPartOfArrayFormulaGroup();
+	}
 	/**
-	 * Will return {@link CellType} in a future version of POI.
-	 * For forwards compatibility, do not hard-code cell type literals in your code.
-	 *
 	 * @return cell type of cached formula result
-	 * @deprecated 3.15. Will return a {@link CellType} enum in the future.
 	 */
 	@Override
-	public int getCachedFormulaResultType() {
+	public CellType getCachedFormulaResultType() {
 		return _masterCell.getCachedFormulaResultType();
 	}
-	/**
-	 * @since POI 3.15 beta 3
-	 * @deprecated POI 3.15 beta 3.
-	 * Will be deleted when we make the CellType enum transition. See bug 59791.
-	 */
-	@Override
-	public CellType getCachedFormulaResultTypeEnum() {
-		return _masterCell.getCachedFormulaResultTypeEnum();
-	}
-
 }

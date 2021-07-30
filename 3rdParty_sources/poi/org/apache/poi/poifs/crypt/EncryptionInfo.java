@@ -21,33 +21,31 @@ import static org.apache.poi.poifs.crypt.EncryptionMode.binaryRC4;
 import static org.apache.poi.poifs.crypt.EncryptionMode.cryptoAPI;
 import static org.apache.poi.poifs.crypt.EncryptionMode.standard;
 import static org.apache.poi.poifs.crypt.EncryptionMode.xor;
+import static org.apache.poi.util.GenericRecordUtil.getBitsAsString;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Supplier;
 
 import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.common.usermodel.GenericRecord;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
-import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
-import org.apache.poi.poifs.filesystem.OPOIFSFileSystem;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.util.BitField;
 import org.apache.poi.util.BitFieldFactory;
 import org.apache.poi.util.LittleEndianInput;
 
 /**
- * This class may require {@code poi-ooxml} to be on the classpath to load
- * some {@link EncryptionMode}s.
- * @see #getBuilder(EncryptionMode)
+ * Wrapper for the EncryptionInfo node of encrypted documents
  */
-public class EncryptionInfo implements Cloneable {
-    private final EncryptionMode encryptionMode;
-    private final int versionMajor;
-    private final int versionMinor;
-    private final int encryptionFlags;
-    
-    private EncryptionHeader header;
-    private EncryptionVerifier verifier;
-    private Decryptor decryptor;
-    private Encryptor encryptor;
+public class EncryptionInfo implements GenericRecord {
+
+    /**
+     * Document entry name for encryption info xml descriptor
+     */
+    public static final String ENCRYPTION_INFO_ENTRY = "EncryptionInfo";
 
     /**
      * A flag that specifies whether CryptoAPI RC4 or ECMA-376 encryption
@@ -59,47 +57,52 @@ public class EncryptionInfo implements Cloneable {
      * A value that MUST be 0 if document properties are encrypted.
      * The encryption of document properties is specified in section 2.3.5.4.
      */
+    @SuppressWarnings("WeakerAccess")
     public static final BitField flagDocProps = BitFieldFactory.getInstance(0x08);
-    
+
     /**
      * A value that MUST be 1 if extensible encryption is used. If this value is 1,
      * the value of every other field in this structure MUST be 0.
      */
+    @SuppressWarnings("WeakerAccess")
     public static final BitField flagExternal = BitFieldFactory.getInstance(0x10);
-    
+
     /**
      * A value that MUST be 1 if the protected content is an ECMA-376 document
      * ECMA-376. If the fAES bit is 1, the fCryptoAPI bit MUST also be 1.
      */
     public static final BitField flagAES = BitFieldFactory.getInstance(0x20);
-    
-    
+
+    private static final int[] FLAGS_MASKS = {
+        0x04, 0x08, 0x10, 0x20
+    };
+
+    private static final String[] FLAGS_NAMES = {
+        "CRYPTO_API", "DOC_PROPS", "EXTERNAL", "AES"
+    };
+
+    private final EncryptionMode encryptionMode;
+    private final int versionMajor;
+    private final int versionMinor;
+    private final int encryptionFlags;
+
+    private EncryptionHeader header;
+    private EncryptionVerifier verifier;
+    private Decryptor decryptor;
+    private Encryptor encryptor;
+
     /**
      * Opens for decryption
      */
     public EncryptionInfo(POIFSFileSystem fs) throws IOException {
        this(fs.getRoot());
     }
-    
-    /**
-     * Opens for decryption
-     */
-    public EncryptionInfo(OPOIFSFileSystem fs) throws IOException {
-       this(fs.getRoot());
-    }
-    
-    /**
-     * Opens for decryption
-     */
-    public EncryptionInfo(NPOIFSFileSystem fs) throws IOException {
-       this(fs.getRoot());
-    }
-    
+
     /**
      * Opens for decryption
      */
     public EncryptionInfo(DirectoryNode dir) throws IOException {
-        this(dir.createDocumentInputStream("EncryptionInfo"), null);
+        this(dir.createDocumentInputStream(ENCRYPTION_INFO_ENTRY), null);
     }
 
     public EncryptionInfo(LittleEndianInput dis, EncryptionMode preferredEncryptionMode) throws IOException {
@@ -111,25 +114,16 @@ public class EncryptionInfo implements Cloneable {
             versionMinor = dis.readUShort();
         }
 
-        if (   versionMajor == xor.versionMajor
-            && versionMinor == xor.versionMinor) {
+        if (versionMajor == xor.versionMajor && versionMinor == xor.versionMinor) {
             encryptionMode = xor;
             encryptionFlags = -1;
-        } else if (   versionMajor == binaryRC4.versionMajor
-            && versionMinor == binaryRC4.versionMinor) {
+        } else if (versionMajor == binaryRC4.versionMajor && versionMinor == binaryRC4.versionMinor) {
             encryptionMode = binaryRC4;
             encryptionFlags = -1;
-        } else if (
-               2 <= versionMajor && versionMajor <= 4
-            && versionMinor == 2) {
+        } else if (2 <= versionMajor && versionMajor <= 4 && versionMinor == 2) {
             encryptionFlags = dis.readInt();
-            encryptionMode = (
-                preferredEncryptionMode == cryptoAPI
-                || !flagAES.isSet(encryptionFlags))
-                ? cryptoAPI : standard;
-        } else if (
-               versionMajor == agile.versionMajor
-            && versionMinor == agile.versionMinor){
+            encryptionMode = (preferredEncryptionMode == cryptoAPI || !flagAES.isSet(encryptionFlags)) ? cryptoAPI : standard;
+        } else if (versionMajor == agile.versionMajor && versionMinor == agile.versionMinor){
             encryptionMode = agile;
             encryptionFlags = dis.readInt();
         } else {
@@ -142,7 +136,7 @@ public class EncryptionInfo implements Cloneable {
                 " / fDocProps: "+flagDocProps.isSet(encryptionFlags)+
                 " / fAES: "+flagAES.isSet(encryptionFlags));
         }
-        
+
         EncryptionInfoBuilder eib;
         try {
             eib = getBuilder(encryptionMode);
@@ -152,7 +146,7 @@ public class EncryptionInfo implements Cloneable {
 
         eib.initialize(this, dis);
     }
-    
+
     /**
      * Prepares for encryption, using the given Encryption Mode, and
      *  all other parameters as default.
@@ -161,18 +155,18 @@ public class EncryptionInfo implements Cloneable {
     public EncryptionInfo(EncryptionMode encryptionMode) {
         this(encryptionMode, null, null, -1, -1, null);
     }
-    
+
     /**
      * Constructs an EncryptionInfo from scratch
      *
      * @param encryptionMode see {@link EncryptionMode} for values, {@link EncryptionMode#cryptoAPI} is for
      *   internal use only, as it's record based
-     * @param cipherAlgorithm
-     * @param hashAlgorithm
-     * @param keyBits
-     * @param blockSize
-     * @param chainingMode
-     * 
+     * @param cipherAlgorithm the cipher algorithm
+     * @param hashAlgorithm the hash algorithm
+     * @param keyBits the bit count of the key
+     * @param blockSize the size of a cipher block
+     * @param chainingMode the chaining mode
+     *
      * @throws EncryptedDocumentException if the given parameters mismatch, e.g. only certain combinations
      *   of keyBits, blockSize are allowed for a given {@link CipherAlgorithm}
      */
@@ -184,7 +178,7 @@ public class EncryptionInfo implements Cloneable {
           , int blockSize
           , ChainingMode chainingMode
       ) {
-        this.encryptionMode = encryptionMode; 
+        this.encryptionMode = encryptionMode;
         versionMajor = encryptionMode.versionMajor;
         versionMinor = encryptionMode.versionMinor;
         encryptionFlags = encryptionMode.encryptionFlags;
@@ -195,34 +189,38 @@ public class EncryptionInfo implements Cloneable {
         } catch (Exception e) {
             throw new EncryptedDocumentException(e);
         }
-        
+
         eib.initialize(this, cipherAlgorithm, hashAlgorithm, keyBits, blockSize, chainingMode);
     }
 
+    public EncryptionInfo(EncryptionInfo other) {
+        encryptionMode = other.encryptionMode;
+        versionMajor = other.versionMajor;
+        versionMinor = other.versionMinor;
+        encryptionFlags = other.encryptionFlags;
+
+        header = (other.header == null) ? null : other.header.copy();
+        verifier = (other.verifier == null) ? null : other.verifier.copy();
+        if (other.decryptor != null) {
+            decryptor = other.decryptor.copy();
+            decryptor.setEncryptionInfo(this);
+        }
+        if (other.encryptor != null) {
+            encryptor = other.encryptor.copy();
+            encryptor.setEncryptionInfo(this);
+        }
+    }
+
     /**
-     * This method loads the builder class with reflection, which may generate
-     * a {@code ClassNotFoundException} if the class is not on the classpath.
-     * For example, {@link org.apache.poi.poifs.crypt.agile.AgileEncryptionInfoBuilder}
-     * is contained in the {@code poi-ooxml} package since the class makes use of some OOXML
-     * classes rather than using the {@code poi} package and plain XML DOM calls.
-     * As such, you may need to include {@code poi-ooxml} and {@code poi-ooxml-schemas} to load
-     * some encryption mode builders. See bug #60021 for more information.
-     * https://bz.apache.org/bugzilla/show_bug.cgi?id=60021
+     * Create the builder instance
      *
      * @param encryptionMode the encryption mode
      * @return an encryption info builder
-     * @throws ClassNotFoundException
-     * @throws IllegalAccessException
-     * @throws InstantiationException
      */
-    protected static EncryptionInfoBuilder getBuilder(EncryptionMode encryptionMode)
-    throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        EncryptionInfoBuilder eib;
-        eib = (EncryptionInfoBuilder)cl.loadClass(encryptionMode.builder).newInstance();
-        return eib;
+    private static EncryptionInfoBuilder getBuilder(EncryptionMode encryptionMode) {
+        return encryptionMode.builder.get();
     }
-    
+
     public int getVersionMajor() {
         return versionMajor;
     }
@@ -242,7 +240,7 @@ public class EncryptionInfo implements Cloneable {
     public EncryptionVerifier getVerifier() {
         return verifier;
     }
-    
+
     public Decryptor getDecryptor() {
         return decryptor;
     }
@@ -270,7 +268,7 @@ public class EncryptionInfo implements Cloneable {
     public EncryptionMode getEncryptionMode() {
         return encryptionMode;
     }
-    
+
     /**
      * @return true, if Document Summary / Summary are encrypted and stored in the {@code EncryptedStream} stream,
      * otherwise the Summaries aren't encrypted and located in their usual streams
@@ -278,16 +276,22 @@ public class EncryptionInfo implements Cloneable {
     public boolean isDocPropsEncrypted() {
         return !flagDocProps.isSet(getEncryptionFlags());
     }
-    
+
+    public EncryptionInfo copy()  {
+        return new EncryptionInfo(this);
+    }
+
     @Override
-    public EncryptionInfo clone() throws CloneNotSupportedException {
-        EncryptionInfo other = (EncryptionInfo)super.clone();
-        other.header = header.clone();
-        other.verifier = verifier.clone();
-        other.decryptor = decryptor.clone();
-        other.decryptor.setEncryptionInfo(other);
-        other.encryptor = encryptor.clone();
-        other.encryptor.setEncryptionInfo(other);
-        return other;
+    public Map<String, Supplier<?>> getGenericProperties() {
+        final Map<String,Supplier<?>> m = new LinkedHashMap<>();
+        m.put("encryptionMode", this::getEncryptionMode);
+        m.put("versionMajor", this::getVersionMajor);
+        m.put("versionMinor", this::getVersionMinor);
+        m.put("encryptionFlags", getBitsAsString(this::getEncryptionFlags, FLAGS_MASKS, FLAGS_NAMES));
+        m.put("header", this::getHeader);
+        m.put("verifier", this::getVerifier);
+        m.put("decryptor", this::getDecryptor);
+        m.put("encryptor", this::getEncryptor);
+        return Collections.unmodifiableMap(m);
     }
 }

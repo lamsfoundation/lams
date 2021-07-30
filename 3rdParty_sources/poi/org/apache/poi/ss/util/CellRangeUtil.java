@@ -18,6 +18,7 @@
 package org.apache.poi.ss.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -118,6 +119,7 @@ public final class CellRangeUtil {
                     }
                     somethingGotMerged = true;
                     // overwrite range1 with first result
+                    range1 = mergeResult[0];
                     cellRangeList.set(i, mergeResult[0]);
                     // remove range2
                     cellRangeList.remove(j--);
@@ -171,10 +173,8 @@ public final class CellRangeUtil {
         return result;
     }
     private static List<CellRangeAddress> toList(CellRangeAddress[] temp) {
-        List<CellRangeAddress> result = new ArrayList<CellRangeAddress>(temp.length);
-        for (CellRangeAddress range : temp) {
-            result.add(range);
-        }
+        List<CellRangeAddress> result = new ArrayList<>(temp.length);
+        Collections.addAll(result, temp);
         return result;
     }
 

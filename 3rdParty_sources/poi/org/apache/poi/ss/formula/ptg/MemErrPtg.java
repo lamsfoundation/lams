@@ -17,20 +17,24 @@
 
 package org.apache.poi.ss.formula.ptg;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 
-/**
- * 
- * @author andy
- * @author Jason Height (jheight at chariot dot net dot au)
- * @author Daniel Noll (daniel at nuix dot com dot au)
- */
 public final class MemErrPtg extends OperandPtg {
 	public final static short sid = 0x27;
 	private final static int SIZE = 7;
 	private int field_1_reserved;
 	private short field_2_subex_len;
+
+	public MemErrPtg(MemErrPtg other) {
+		super(other);
+		field_1_reserved = other.field_1_reserved;
+		field_2_subex_len = other.field_2_subex_len;
+	}
 
 	public MemErrPtg(LittleEndianInput in)  {
 		field_1_reserved = in.readInt();
@@ -43,6 +47,11 @@ public final class MemErrPtg extends OperandPtg {
 		out.writeShort(field_2_subex_len);
 	}
 
+	@Override
+	public byte getSid() {
+		return sid;
+	}
+
 	public int getSize() {
 		return SIZE;
 	}
@@ -53,5 +62,19 @@ public final class MemErrPtg extends OperandPtg {
 
 	public byte getDefaultOperandClass() {
 		return Ptg.CLASS_VALUE;
+	}
+
+	public int getLenRefSubexpression() {
+		return field_2_subex_len;
+	}
+
+	@Override
+	public MemErrPtg copy() {
+		return new MemErrPtg(this);
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties("lenRefSubexpression", this::getLenRefSubexpression);
 	}
 }

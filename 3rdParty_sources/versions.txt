@@ -13,7 +13,7 @@ Apache HttpClient 4.5.2
 
 Apache HttpCore 4.4.4
 
-Apache POI 3.17
+Apache POI 4.1.2
 
 Commons Digester 2.1
 

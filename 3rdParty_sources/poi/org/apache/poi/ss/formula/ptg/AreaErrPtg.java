@@ -17,14 +17,16 @@
 
 package org.apache.poi.ss.formula.ptg;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.ss.usermodel.FormulaError;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * AreaErr - handles deleted cell area references.
- *
- * @author Daniel Noll (daniel at nuix dot com dot au)
  */
 public final class AreaErrPtg extends OperandPtg {
 	public final static byte sid = 0x2B;
@@ -56,8 +58,26 @@ public final class AreaErrPtg extends OperandPtg {
 		return Ptg.CLASS_REF;
 	}
 
+	@Override
+	public byte getSid() {
+		return sid;
+	}
+
 	public int getSize() {
 		return 9;
 	}
-}
 
+	@Override
+	public AreaErrPtg copy() {
+		// immutable
+		return this;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"unused1", () -> unused1,
+			"unused2", () -> unused2
+		);
+	}
+}

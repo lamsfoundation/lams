@@ -15,35 +15,37 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-        
+
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        Hide Object Record<P>
- * Description:  flag defines whether to hide placeholders and object<P>
- * REFERENCE:  PG 321 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)<P>
- * @author Andrew C. Oliver (acoliver at apache dot org)
+ * Flag defines whether to hide placeholders and object
+ *
  * @version 2.0-pre
  */
+public final class HideObjRecord extends StandardRecord {
+    public static final short sid               = 0x8d;
+    public static final short HIDE_ALL          = 2;
+    public static final short SHOW_PLACEHOLDERS = 1;
+    public static final short SHOW_ALL          = 0;
 
-public final class HideObjRecord
-    extends StandardRecord
-{
-    public final static short sid               = 0x8d;
-    public final static short HIDE_ALL          = 2;
-    public final static short SHOW_PLACEHOLDERS = 1;
-    public final static short SHOW_ALL          = 0;
-    private short             field_1_hide_obj;
+    private short field_1_hide_obj;
 
-    public HideObjRecord()
-    {
+    public HideObjRecord() {}
+
+    public HideObjRecord(HideObjRecord other) {
+        super(other);
+        field_1_hide_obj = other.field_1_hide_obj;
     }
 
-    public HideObjRecord(RecordInputStream in)
-    {
+    public HideObjRecord(RecordInputStream in) {
         field_1_hide_obj = in.readShort();
     }
 
@@ -75,17 +77,6 @@ public final class HideObjRecord
         return field_1_hide_obj;
     }
 
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[HIDEOBJ]\n");
-        buffer.append("    .hideobj         = ")
-            .append(Integer.toHexString(getHideObj())).append("\n");
-        buffer.append("[/HIDEOBJ]\n");
-        return buffer.toString();
-    }
-
     public void serialize(LittleEndianOutput out) {
         out.writeShort(getHideObj());
     }
@@ -97,5 +88,20 @@ public final class HideObjRecord
     public short getSid()
     {
         return sid;
+    }
+
+    @Override
+    public HideObjRecord copy() {
+        return new HideObjRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.HIDE_OBJ;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties("hideObj", this::getHideObj);
     }
 }

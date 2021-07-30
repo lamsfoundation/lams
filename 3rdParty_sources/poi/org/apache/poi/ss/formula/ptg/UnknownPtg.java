@@ -16,14 +16,13 @@
 ==================================================================== */
 package org.apache.poi.ss.formula.ptg;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.util.LittleEndianOutput;
 
-/**
- * @author andy
- * @author Jason Height (jheight at chariot dot net dot au)
- */
 public class UnknownPtg extends Ptg {
-    private short size = 1;
+    private final short size = 1;
     private final int _sid;
 
     public UnknownPtg(int sid) {
@@ -37,6 +36,11 @@ public class UnknownPtg extends Ptg {
         out.writeByte(_sid);
     }
 
+    @Override
+    public byte getSid() {
+        return (byte)_sid;
+    }
+
     public int getSize() {
         return size;
     }
@@ -46,5 +50,15 @@ public class UnknownPtg extends Ptg {
     }
     public byte getDefaultOperandClass() {
         return Ptg.CLASS_VALUE;
+    }
+
+    @Override
+    public UnknownPtg copy() {
+        return this;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return null;
     }
 }

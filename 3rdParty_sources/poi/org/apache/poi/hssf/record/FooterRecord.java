@@ -18,28 +18,21 @@
 package org.apache.poi.hssf.record;
 
 /**
- * Title:        Footer Record (0x0015)<p>
- * Description:  Specifies the footer for a sheet<p>
- * REFERENCE:  PG 317 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)
+ * Specifies the footer for a sheet
  */
-public final class FooterRecord extends HeaderFooterBase implements Cloneable {
-	public final static short sid = 0x0015;
+public final class FooterRecord extends HeaderFooterBase {
+	public static final short sid = 0x0015;
 
 	public FooterRecord(String text) {
 		super(text);
 	}
 
-	public FooterRecord(RecordInputStream in) {
-		super(in);
+	public FooterRecord(FooterRecord other) {
+		super(other);
 	}
 
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
-
-		buffer.append("[FOOTER]\n");
-		buffer.append("    .footer = ").append(getText()).append("\n");
-		buffer.append("[/FOOTER]\n");
-		return buffer.toString();
+	public FooterRecord(RecordInputStream in) {
+		super(in);
 	}
 
 	public short getSid() {
@@ -47,7 +40,12 @@ public final class FooterRecord extends HeaderFooterBase implements Cloneable {
 	}
 
 	@Override
-	public FooterRecord clone() {
-		return new FooterRecord(getText());
+	public FooterRecord copy() {
+		return new FooterRecord(this);
+	}
+
+	@Override
+	public HSSFRecordTypes getGenericRecordType() {
+		return HSSFRecordTypes.FOOTER;
 	}
 }

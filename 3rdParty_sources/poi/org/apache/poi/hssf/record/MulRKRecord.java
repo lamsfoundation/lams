@@ -17,24 +17,25 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.common.usermodel.GenericRecord;
 import org.apache.poi.hssf.util.RKUtil;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 import org.apache.poi.util.RecordFormatException;
 
 /**
- * MULRK (0x00BD)<p>
- * 
  * Used to store multiple RK numbers on a row.  1 MulRk = Multiple Cell values.
- * HSSF just converts this into multiple NUMBER records.  READ-ONLY SUPPORT!<P>
- * REFERENCE:  PG 330 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)
- * 
+ * HSSF just converts this into multiple NUMBER records.  READ-ONLY SUPPORT!
+ *
  * @since 2.0-pre
  */
 public final class MulRKRecord extends StandardRecord {
-	public final static short sid = 0x00BD;
+	public static final short sid = 0x00BD;
 
-	private final int	 field_1_row;
+	private final int	  field_1_row;
 	private final short   field_2_first_col;
 	private final RkRec[] field_3_rks;
 	private final short   field_4_last_col;
@@ -69,9 +70,9 @@ public final class MulRKRecord extends StandardRecord {
 
 	/**
 	 * returns the xf index for column (coffset = column - field_2_first_col)
-	 * 
+	 *
      * @param coffset the coffset = column - field_2_first_col
-     * 
+     *
 	 * @return the XF index for the column
 	 */
 	public short getXFAt(int coffset) {
@@ -80,9 +81,9 @@ public final class MulRKRecord extends StandardRecord {
 
 	/**
 	 * returns the rk number for column (coffset = column - field_2_first_col)
-	 * 
+	 *
 	 * @param coffset the coffset = column - field_2_first_col
-	 * 
+	 *
 	 * @return the value (decoded into a double)
 	 */
 	public double getRKNumberAt(int coffset) {
@@ -97,24 +98,6 @@ public final class MulRKRecord extends StandardRecord {
 		field_2_first_col = in.readShort();
 		field_3_rks = RkRec.parseRKs(in);
 		field_4_last_col = in.readShort();
-	}
-
-
-	@Override
-    public String toString() {
-		StringBuffer buffer = new StringBuffer();
-
-		buffer.append("[MULRK]\n");
-		buffer.append("	.row	 = ").append(HexDump.shortToHex(getRow())).append("\n");
-		buffer.append("	.firstcol= ").append(HexDump.shortToHex(getFirstColumn())).append("\n");
-		buffer.append("	.lastcol = ").append(HexDump.shortToHex(getLastColumn())).append("\n");
-
-		for (int k = 0; k < getNumColumns(); k++) {
-			buffer.append("	xf[").append(k).append("] = ").append(HexDump.shortToHex(getXFAt(k))).append("\n");
-			buffer.append("	rk[").append(k).append("] = ").append(getRKNumberAt(k)).append("\n");
-		}
-		buffer.append("[/MULRK]\n");
-		return buffer.toString();
 	}
 
 	@Override
@@ -132,7 +115,7 @@ public final class MulRKRecord extends StandardRecord {
 		throw new RecordFormatException( "Sorry, you can't serialize MulRK in this release");
 	}
 
-	private static final class RkRec {
+	private static final class RkRec implements GenericRecord {
 		public static final int ENCODED_SIZE = 6;
 		public final short xf;
 		public final int   rk;
@@ -150,5 +133,34 @@ public final class MulRKRecord extends StandardRecord {
 			}
 			return retval;
 		}
+
+		@Override
+		public Map<String, Supplier<?>> getGenericProperties() {
+			return GenericRecordUtil.getGenericProperties(
+				"xf", () -> xf,
+				"rk", () -> rk
+			);
+		}
+	}
+
+	@Override
+	public MulRKRecord copy() {
+		// immutable - so OK to return this
+		return this;
+	}
+
+	@Override
+	public HSSFRecordTypes getGenericRecordType() {
+		return HSSFRecordTypes.MUL_RK;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"row", this::getRow,
+			"firstColumn", this::getFirstColumn,
+			"lastColumn", this::getLastColumn,
+			"rk", () -> field_3_rks
+		);
 	}
 }

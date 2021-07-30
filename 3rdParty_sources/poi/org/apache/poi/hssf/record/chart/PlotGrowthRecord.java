@@ -17,48 +17,34 @@
 
 package org.apache.poi.hssf.record.chart;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * The plot growth record specifies the scaling factors used when a font is scaled.
  */
 public final class PlotGrowthRecord extends StandardRecord {
-    public final static short      sid                             = 0x1064;
-    private  int        field_1_horizontalScale;
-    private  int        field_2_verticalScale;
+    public static final short sid = 0x1064;
+    private int field_1_horizontalScale;
+    private int field_2_verticalScale;
 
 
-    public PlotGrowthRecord()
-    {
+    public PlotGrowthRecord() {}
 
+    public PlotGrowthRecord(PlotGrowthRecord other) {
+        field_1_horizontalScale = other.field_1_horizontalScale;
+        field_2_verticalScale = other.field_2_verticalScale;
     }
 
-    public PlotGrowthRecord(RecordInputStream in)
-    {
-        field_1_horizontalScale        = in.readInt();
-        field_2_verticalScale          = in.readInt();
-
-    }
-
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[PLOTGROWTH]\n");
-        buffer.append("    .horizontalScale      = ")
-            .append("0x").append(HexDump.toHex(  getHorizontalScale ()))
-            .append(" (").append( getHorizontalScale() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-        buffer.append("    .verticalScale        = ")
-            .append("0x").append(HexDump.toHex(  getVerticalScale ()))
-            .append(" (").append( getVerticalScale() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-
-        buffer.append("[/PLOTGROWTH]\n");
-        return buffer.toString();
+    public PlotGrowthRecord(RecordInputStream in) {
+        field_1_horizontalScale = in.readInt();
+        field_2_verticalScale = in.readInt();
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -75,16 +61,9 @@ public final class PlotGrowthRecord extends StandardRecord {
         return sid;
     }
 
-    public Object clone() {
-        PlotGrowthRecord rec = new PlotGrowthRecord();
-    
-        rec.field_1_horizontalScale = field_1_horizontalScale;
-        rec.field_2_verticalScale = field_2_verticalScale;
-        return rec;
+    public PlotGrowthRecord copy() {
+        return new PlotGrowthRecord(this);
     }
-
-
-
 
     /**
      * Get the horizontalScale field for the PlotGrowth record.
@@ -116,5 +95,19 @@ public final class PlotGrowthRecord extends StandardRecord {
     public void setVerticalScale(int field_2_verticalScale)
     {
         this.field_2_verticalScale = field_2_verticalScale;
+    }
+
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.PLOT_GROWTH;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "horizontalScale", this::getHorizontalScale,
+            "verticalScale", this::getVerticalScale
+        );
     }
 }

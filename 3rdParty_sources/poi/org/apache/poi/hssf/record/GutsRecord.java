@@ -15,34 +15,44 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-        
+
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        Guts Record <P>
- * Description:  Row/column gutter sizes <P>
- * REFERENCE:  PG 320 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)<P>
- * @author Andrew C. Oliver (acoliver at apache dot org)
- * @author Jason Height (jheight at chariot dot net dot au)
+ * Row/column gutter sizes
+ *
  * @version 2.0-pre
  */
 
-public final class GutsRecord extends StandardRecord implements Cloneable {
-    public final static short sid = 0x80;
-    private short             field_1_left_row_gutter;   // size of the row gutter to the left of the rows
-    private short             field_2_top_col_gutter;    // size of the column gutter above the columns
-    private short             field_3_row_level_max;     // maximum outline level for row gutters
-    private short             field_4_col_level_max;     // maximum outline level for column gutters
+public final class GutsRecord extends StandardRecord {
+    public static final short sid = 0x80;
+    /** size of the row gutter to the left of the rows */
+    private short field_1_left_row_gutter;
+    /** size of the column gutter above the columns */
+    private short field_2_top_col_gutter;
+    /** maximum outline level for row gutters */
+    private short field_3_row_level_max;
+    /** maximum outline level for column gutters */
+    private short field_4_col_level_max;
 
-    public GutsRecord()
-    {
+    public GutsRecord() {}
+
+    public GutsRecord(GutsRecord other) {
+        super(other);
+        field_1_left_row_gutter = other.field_1_left_row_gutter;
+        field_2_top_col_gutter  = other.field_2_top_col_gutter;
+        field_3_row_level_max   = other.field_3_row_level_max;
+        field_4_col_level_max   = other.field_4_col_level_max;
     }
 
-    public GutsRecord(RecordInputStream in)
-    {
+    public GutsRecord(RecordInputStream in) {
         field_1_left_row_gutter = in.readShort();
         field_2_top_col_gutter  = in.readShort();
         field_3_row_level_max   = in.readShort();
@@ -137,23 +147,6 @@ public final class GutsRecord extends StandardRecord implements Cloneable {
         return field_4_col_level_max;
     }
 
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[GUTS]\n");
-        buffer.append("    .leftgutter     = ")
-            .append(Integer.toHexString(getLeftRowGutter())).append("\n");
-        buffer.append("    .topgutter      = ")
-            .append(Integer.toHexString(getTopColGutter())).append("\n");
-        buffer.append("    .rowlevelmax    = ")
-            .append(Integer.toHexString(getRowLevelMax())).append("\n");
-        buffer.append("    .collevelmax    = ")
-            .append(Integer.toHexString(getColLevelMax())).append("\n");
-        buffer.append("[/GUTS]\n");
-        return buffer.toString();
-    }
-
     public void serialize(LittleEndianOutput out) {
         out.writeShort(getLeftRowGutter());
         out.writeShort(getTopColGutter());
@@ -171,12 +164,22 @@ public final class GutsRecord extends StandardRecord implements Cloneable {
     }
 
     @Override
-    public GutsRecord clone() {
-      GutsRecord rec = new GutsRecord();
-      rec.field_1_left_row_gutter = field_1_left_row_gutter;
-      rec.field_2_top_col_gutter = field_2_top_col_gutter;
-      rec.field_3_row_level_max = field_3_row_level_max;
-      rec.field_4_col_level_max = field_4_col_level_max;
-      return rec;
+    public GutsRecord copy() {
+      return new GutsRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.GUTS;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "leftGutter", this::getLeftRowGutter,
+            "topGutter", this::getTopColGutter,
+            "rowLevelMax", this::getRowLevelMax,
+            "colLevelMax", this::getColLevelMax
+        );
     }
 }

@@ -42,7 +42,7 @@ public class BoundedInputStream extends InputStream {
     private final long max;
 
     /** the number of bytes already returned */
-    private long pos = 0;
+    private long pos;
 
     /** the marked position */
     private long mark = -1;
@@ -131,13 +131,13 @@ public class BoundedInputStream extends InputStream {
     /**
      * Invokes the delegate's <code>skip(long)</code> method.
      * @param n the number of bytes to skip
-     * @return the actual number of bytes skipped
+     * @return the actual number of bytes skipped; might be fewer than requested
      * @throws IOException if an I/O error occurs
      */
     @Override
     public long skip(long n) throws IOException {
         long toSkip = max>=0 ? Math.min(n, max-pos) : n;
-        long skippedBytes = in.skip(toSkip);
+        long skippedBytes = IOUtils.skipFully(in, toSkip);
         pos+=skippedBytes;
         return skippedBytes;
     }

@@ -34,11 +34,11 @@ import org.apache.poi.util.StringUtil;
  * @since 3.15-beta2
  */
 public class VBAMacroExtractor {
-    public static void main(String args[]) throws IOException {
+    public static void main(String[] args) throws IOException {
         if (args.length == 0) {
             System.err.println("Use:");
             System.err.println("   VBAMacroExtractor <office.doc> [output]");
-            System.err.println("");
+            System.err.println();
             System.err.println("If an output directory is given, macros are written there");
             System.err.println("Otherwise they are output to the screen");
             System.exit(1);
@@ -78,10 +78,11 @@ public class VBAMacroExtractor {
         } else {
             System.err.println("STDOUT");
         }
-        
-        VBAMacroReader reader = new VBAMacroReader(input);
-        Map<String,String> macros = reader.readMacros();
-        reader.close();
+
+        final Map<String,String> macros;
+        try (VBAMacroReader reader = new VBAMacroReader(input)) {
+            macros = reader.readMacros();
+        }
         
         final String divider = "---------------------------------------";
         for (Entry<String, String> entry : macros.entrySet()) {
@@ -90,15 +91,14 @@ public class VBAMacroExtractor {
             if (outputDir == null) {
                 System.out.println(divider);
                 System.out.println(moduleName);
-                System.out.println("");
+                System.out.println();
                 System.out.println(moduleCode);
             } else {
                 File out = new File(outputDir, moduleName + extension);
-                FileOutputStream fout = new FileOutputStream(out);
-                OutputStreamWriter fwriter = new OutputStreamWriter(fout, StringUtil.UTF8);
-                fwriter.write(moduleCode);
-                fwriter.close();
-                fout.close();
+                try (FileOutputStream fout = new FileOutputStream(out);
+                    OutputStreamWriter fwriter = new OutputStreamWriter(fout, StringUtil.UTF8)) {
+                    fwriter.write(moduleCode);
+                }
                 System.out.println("Extracted " + out);
             }
         }

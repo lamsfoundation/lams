@@ -17,41 +17,31 @@
 
 package org.apache.poi.hssf.record.chart;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * links a series to its position in the series list.
  */
 public final class SeriesIndexRecord extends StandardRecord {
-    public final static short      sid                             = 0x1065;
-    private  short      field_1_index;
+    public static final short sid = 0x1065;
+    private short field_1_index;
 
+    public SeriesIndexRecord() {}
 
-    public SeriesIndexRecord()
-    {
-
+    public SeriesIndexRecord(SeriesIndexRecord other) {
+        super(other);
+        field_1_index = other.field_1_index;
     }
 
-    public SeriesIndexRecord(RecordInputStream in)
-    {
-        field_1_index                  = in.readShort();
-    }
-
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[SINDEX]\n");
-        buffer.append("    .index                = ")
-            .append("0x").append(HexDump.toHex(  getIndex ()))
-            .append(" (").append( getIndex() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-
-        buffer.append("[/SINDEX]\n");
-        return buffer.toString();
+    public SeriesIndexRecord(RecordInputStream in) {
+        field_1_index = in.readShort();
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -67,15 +57,10 @@ public final class SeriesIndexRecord extends StandardRecord {
         return sid;
     }
 
-    public Object clone() {
-        SeriesIndexRecord rec = new SeriesIndexRecord();
-    
-        rec.field_1_index = field_1_index;
-        return rec;
+    @Override
+    public SeriesIndexRecord copy() {
+        return new SeriesIndexRecord(this);
     }
-
-
-
 
     /**
      * Get the index field for the SeriesIndex record.
@@ -91,5 +76,15 @@ public final class SeriesIndexRecord extends StandardRecord {
     public void setIndex(short field_1_index)
     {
         this.field_1_index = field_1_index;
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.SERIES_INDEX;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties("index", this::getIndex);
     }
 }

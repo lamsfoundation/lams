@@ -17,24 +17,32 @@
 package org.apache.poi.ddf;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndian;
 
 /**
  * Common abstract class for {@link EscherOptRecord} and
  * {@link EscherTertiaryOptRecord}
  */
-public abstract class AbstractEscherOptRecord extends EscherRecord
-{
-    private List<EscherProperty> properties = new ArrayList<EscherProperty>();
+public abstract class AbstractEscherOptRecord extends EscherRecord {
+    private final List<EscherProperty> properties = new ArrayList<>();
+
+    protected AbstractEscherOptRecord() {}
+
+    protected AbstractEscherOptRecord(AbstractEscherOptRecord other) {
+        super(other);
+        properties.addAll(other.properties);
+    }
+
 
     /**
      * Add a property to this record.
-     * 
+     *
      * @param prop the escher property to add
      */
     public void addEscherProperty( EscherProperty prop )
@@ -51,13 +59,14 @@ public abstract class AbstractEscherOptRecord extends EscherRecord
         int pos = offset + 8;
 
         EscherPropertyFactory f = new EscherPropertyFactory();
-        properties = f.createProperties( data, pos, propertiesCount );
+        properties.clear();
+        properties.addAll( f.createProperties( data, pos, propertiesCount ) );
         return bytesRemaining + 8;
     }
 
     /**
      * The list of properties stored by this record.
-     * 
+     *
      * @return the list of properties
      */
     public List<EscherProperty> getEscherProperties()
@@ -67,7 +76,7 @@ public abstract class AbstractEscherOptRecord extends EscherRecord
 
     /**
      * The list of properties stored by this record.
-     * 
+     *
      * @param index the ordinal index of the property
      * @return the escher property
      */
@@ -76,7 +85,7 @@ public abstract class AbstractEscherOptRecord extends EscherRecord
         return properties.get( index );
     }
 
-    
+
     private int getPropertiesSize()
     {
         int totalSize = 0;
@@ -94,18 +103,13 @@ public abstract class AbstractEscherOptRecord extends EscherRecord
         return 8 + getPropertiesSize();
     }
 
-    public <T extends EscherProperty> T lookup( int propId )
-    {
-        for ( EscherProperty prop : properties )
-        {
-            if ( prop.getPropertyNumber() == propId )
-            {
-                @SuppressWarnings( "unchecked" )
-                final T result = (T) prop;
-                return result;
-            }
-        }
-        return null;
+    public <T extends EscherProperty> T lookup( EscherPropertyTypes propType ) {
+        return lookup(propType.propNumber);
+    }
+
+    @SuppressWarnings( "unchecked" )
+    public <T extends EscherProperty> T lookup( int propId ) {
+        return (T)properties.stream().filter(p -> p.getPropertyNumber() == propId).findFirst().orElse(null);
     }
 
     @Override
@@ -133,61 +137,31 @@ public abstract class AbstractEscherOptRecord extends EscherRecord
     /**
      * Records should be sorted by property number before being stored.
      */
-    public void sortProperties()
-    {
-        Collections.sort( properties, new Comparator<EscherProperty>()
-        {
-            @Override
-            public int compare( EscherProperty p1, EscherProperty p2 )
-            {
-                short s1 = p1.getPropertyNumber();
-                short s2 = p2.getPropertyNumber();
-                return s1 < s2 ? -1 : s1 == s2 ? 0 : 1;
-            }
-        } );
+    public void sortProperties() {
+        properties.sort(Comparator.comparingInt(EscherProperty::getPropertyNumber));
     }
 
     /**
-     * Set an escher property. If a property with given propId already
-     exists it is replaced.
+     * Set an escher property. If a property with given propId already exists it is replaced.
      *
      * @param value the property to set.
      */
     public void setEscherProperty(EscherProperty value){
-        for ( Iterator<EscherProperty> iterator =
-                      properties.iterator(); iterator.hasNext(); ) {
-            EscherProperty prop = iterator.next();
-            if (prop.getId() == value.getId()){
-                iterator.remove();
-            }
-        }
+        properties.removeIf(prop -> prop.getId() == value.getId());
         properties.add( value );
         sortProperties();
     }
 
-    public void removeEscherProperty(int num){
-        for ( Iterator<EscherProperty> iterator = getEscherProperties().iterator(); iterator.hasNext(); ) {
-            EscherProperty prop = iterator.next();
-            if (prop.getPropertyNumber() == num){
-                iterator.remove();
-            }
-        }
+    public void removeEscherProperty(EscherPropertyTypes type){
+        properties.removeIf(prop -> prop.getPropertyNumber() == type.propNumber);
     }
 
     @Override
-    protected Object[][] getAttributeMap() {
-        List<Object> attrList = new ArrayList<Object>(properties.size()*2+2);
-        attrList.add("properties");
-        attrList.add(properties.size());
-        for ( EscherProperty property : properties ) {
-            attrList.add(property.getName());
-            attrList.add(property);
-        }
-        
-        return new Object[][]{
-            { "isContainer", isContainerRecord() },
-            { "numchildren", getChildRecords().size() },
-            attrList.toArray()
-        };
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "base", super::getGenericProperties,
+            "isContainer", this::isContainerRecord,
+            "properties", this::getEscherProperties
+        );
     }
 }

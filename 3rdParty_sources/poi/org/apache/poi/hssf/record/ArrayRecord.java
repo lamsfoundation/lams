@@ -17,10 +17,13 @@
 
 package org.apache.poi.hssf.record;
 
-import org.apache.poi.ss.formula.ptg.Ptg;
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.hssf.util.CellRangeAddress8Bit;
 import org.apache.poi.ss.formula.Formula;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.ss.formula.ptg.Ptg;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
@@ -28,7 +31,7 @@ import org.apache.poi.util.LittleEndianOutput;
  *
  * Treated in a similar way to SharedFormulaRecord
  */
-public final class ArrayRecord extends SharedValueRecordBase implements Cloneable {
+public final class ArrayRecord extends SharedValueRecordBase {
 
 	public final static short sid = 0x0221;
 	private static final int OPT_ALWAYS_RECALCULATE = 0x0001;
@@ -37,6 +40,13 @@ public final class ArrayRecord extends SharedValueRecordBase implements Cloneabl
 	private int _options;
 	private int _field3notUsed;
 	private Formula _formula;
+
+	public ArrayRecord(ArrayRecord other) {
+		super(other);
+		_options = other._options;
+		_field3notUsed = other._field3notUsed;
+		_formula = (other._formula == null) ? null : other._formula.copy();
+	}
 
 	public ArrayRecord(RecordInputStream in) {
 		super(in);
@@ -78,30 +88,23 @@ public final class ArrayRecord extends SharedValueRecordBase implements Cloneabl
 		return sid;
 	}
 
-	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append(getClass().getName()).append(" [ARRAY]\n");
-		sb.append(" range=").append(getRange()).append("\n");
-		sb.append(" options=").append(HexDump.shortToHex(_options)).append("\n");
-		sb.append(" notUsed=").append(HexDump.intToHex(_field3notUsed)).append("\n");
-		sb.append(" formula:").append("\n");
-		Ptg[] ptgs = _formula.getTokens();
-		for (int i = 0; i < ptgs.length; i++) {
-			Ptg ptg = ptgs[i];
-			sb.append(ptg).append(ptg.getRVAType()).append("\n");
-		}
-		sb.append("]");
-		return sb.toString();
-	}	
-    
 	@Override
-    public ArrayRecord clone() {
-        ArrayRecord rec = new ArrayRecord(_formula.copy(), getRange());
-
-        // they both seem unused, but clone them nevertheless to have an exact copy
-        rec._options = _options;
-        rec._field3notUsed = _field3notUsed;
-
-        return rec;
+    public ArrayRecord copy() {
+        return new ArrayRecord(this);
     }
+
+	@Override
+	public HSSFRecordTypes getGenericRecordType() {
+		return HSSFRecordTypes.ARRAY;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"range", this::getRange,
+			"options", () -> _options,
+			"notUsed", () -> _field3notUsed,
+			"formula", () -> _formula
+		);
+	}
 }

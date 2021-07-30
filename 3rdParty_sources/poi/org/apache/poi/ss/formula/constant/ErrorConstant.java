@@ -66,12 +66,12 @@ public class ErrorConstant {
     			default:    break;
     		}
 	    }
-		logger.log( POILogger.WARN, "Warning - unexpected error code (" + errorCode + ")");
+		logger.log( POILogger.WARN, "Warning - unexpected error code (", errorCode, ")");
 		return new ErrorConstant(errorCode);
 	}
 
 	public String toString() {
-		StringBuffer sb = new StringBuffer(64);
+		StringBuilder sb = new StringBuilder(64);
 		sb.append(getClass().getName()).append(" [");
 		sb.append(getText());
 		sb.append("]");

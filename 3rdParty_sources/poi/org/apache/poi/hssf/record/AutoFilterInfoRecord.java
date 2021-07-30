@@ -19,28 +19,32 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * The AutoFilterInfo record specifies the number of columns that have AutoFilter enabled
  * and indicates the beginning of the collection of AutoFilter records.
- *
- * @author Yegor Kozlov
  */
 
-public final class AutoFilterInfoRecord extends StandardRecord implements Cloneable {
-    public final static short sid = 0x9D;
+public final class AutoFilterInfoRecord extends StandardRecord {
+    public static final short sid = 0x9D;
     /**
      * Number of AutoFilter drop-down arrows on the sheet
      */
-    private short             _cEntries;   // = 0;
+    private short _cEntries;
 
-    public AutoFilterInfoRecord()
-    {
+    public AutoFilterInfoRecord() {}
+
+    public AutoFilterInfoRecord(AutoFilterInfoRecord other) {
+        super(other);
+        _cEntries = other._cEntries;
     }
 
-    public AutoFilterInfoRecord(RecordInputStream in)
-    {
+    public AutoFilterInfoRecord(RecordInputStream in) {
         _cEntries = in.readShort();
     }
 
@@ -66,17 +70,6 @@ public final class AutoFilterInfoRecord extends StandardRecord implements Clonea
         return _cEntries;
     }
 
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[AUTOFILTERINFO]\n");
-        buffer.append("    .numEntries          = ")
-            .append(_cEntries).append("\n");
-        buffer.append("[/AUTOFILTERINFO]\n");
-        return buffer.toString();
-    }
-
     public void serialize(LittleEndianOutput out) {
         out.writeShort(_cEntries);
     }
@@ -91,9 +84,19 @@ public final class AutoFilterInfoRecord extends StandardRecord implements Clonea
     }
 
     @Override
-    public AutoFilterInfoRecord clone()
-    {
-    	return (AutoFilterInfoRecord)cloneViaReserialise();
+    public AutoFilterInfoRecord copy() {
+        return new AutoFilterInfoRecord(this);
     }
-    
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.AUTO_FILTER_INFO;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "numEntries", this::getNumEntries
+        );
+    }
 }

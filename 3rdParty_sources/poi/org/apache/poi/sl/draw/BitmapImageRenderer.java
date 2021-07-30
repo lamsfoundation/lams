@@ -17,17 +17,18 @@
 
 package org.apache.poi.sl.draw;
 
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Dimension2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
@@ -39,6 +40,8 @@ import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.MemoryCacheImageInputStream;
 
+import org.apache.poi.sl.usermodel.PictureData.PictureType;
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
 
@@ -46,9 +49,22 @@ import org.apache.poi.util.POILogger;
  * For now this class renders only images supported by the javax.imageio.ImageIO framework.
  **/
 public class BitmapImageRenderer implements ImageRenderer {
-    private final static POILogger LOG = POILogFactory.getLogger(ImageRenderer.class);
+    private final static POILogger LOG = POILogFactory.getLogger(BitmapImageRenderer.class);
 
     protected BufferedImage img;
+
+    @Override
+    public boolean canRender(String contentType) {
+        PictureType[] pts = {
+            PictureType.JPEG, PictureType.PNG, PictureType.BMP, PictureType.GIF
+        };
+        for (PictureType pt : pts) {
+            if (pt.contentType.equalsIgnoreCase(contentType)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     @Override
     public void loadImage(InputStream data, String contentType) throws IOException {
@@ -56,10 +72,10 @@ public class BitmapImageRenderer implements ImageRenderer {
     }
 
     @Override
-    public void loadImage(byte data[], String contentType) throws IOException {
+    public void loadImage(byte[] data, String contentType) throws IOException {
         img = readImage(new ByteArrayInputStream(data), contentType);
     }
-    
+
     /**
      * Read the image data via ImageIO and optionally try to workaround metadata errors.
      * The resulting image is of image type {@link BufferedImage#TYPE_INT_ARGB}
@@ -69,20 +85,24 @@ public class BitmapImageRenderer implements ImageRenderer {
      * @return the bufferedImage or null, if there was no image reader for this content type
      * @throws IOException thrown if there was an error while processing the image
      */
-    private static BufferedImage readImage(InputStream data, String contentType) throws IOException {
+    private static BufferedImage readImage(final InputStream data, final String contentType) throws IOException {
         IOException lastException = null;
         BufferedImage img = null;
-        if (data.markSupported()) {
-            data.mark(data.available());
+
+        final ByteArrayInputStream bis;
+        if (data instanceof ByteArrayInputStream) {
+            bis = (ByteArrayInputStream)data;
+        } else {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(0x3FFFF);
+            IOUtils.copy(data, bos);
+            bis = new ByteArrayInputStream(bos.toByteArray());
         }
-        
+
+
         // currently don't use FileCacheImageInputStream,
         // because of the risk of filling the file handles (see #59166)
-        ImageInputStream iis = new MemoryCacheImageInputStream(data);
+        ImageInputStream iis = new MemoryCacheImageInputStream(bis);
         try {
-            iis = new MemoryCacheImageInputStream(data);
-            iis.mark();
-            
             Iterator<ImageReader> iter = ImageIO.getImageReaders(iis);
             while (img==null && iter.hasNext()) {
                 ImageReader reader = iter.next();
@@ -90,24 +110,14 @@ public class BitmapImageRenderer implements ImageRenderer {
                 // 0:default mode, 1:fallback mode
                 for (int mode=0; img==null && mode<3; mode++) {
                     lastException = null;
-                    try {
-                        iis.reset();
-                    } catch (IOException e) {
-                        if (data.markSupported()) {
-                            data.reset();
-                            data.mark(data.available());
-                            iis.close();
-                            iis = new MemoryCacheImageInputStream(data);
-                        } else {
-                            // can't restore the input stream, so we need to stop processing here
-                            lastException = e;
-                            break;
-                        }
+                    if (mode > 0) {
+                        bis.reset();
+                        iis.close();
+                        iis = new MemoryCacheImageInputStream(bis);
                     }
-                    iis.mark();
 
                     try {
-                    
+
                         switch (mode) {
                             case 0:
                                 reader.setInput(iis, false, true);
@@ -136,7 +146,7 @@ public class BitmapImageRenderer implements ImageRenderer {
                                 reader.setInput(iis, false, true);
                                 int height = reader.getHeight(0);
                                 int width = reader.getWidth(0);
-                                
+
                                 Iterator<ImageTypeSpecifier> imageTypes = reader.getImageTypes(0);
                                 if (imageTypes.hasNext()) {
                                     ImageTypeSpecifier imageTypeSpecifier = imageTypes.next();
@@ -162,11 +172,11 @@ public class BitmapImageRenderer implements ImageRenderer {
                                             img = argbImg;
                                         }
                                     }
-                                }                                
+                                }
                                 break;
                             }
                         }
-                    
+
                     } catch (IOException e) {
                         if (mode < 2) {
                             lastException = e;
@@ -182,7 +192,7 @@ public class BitmapImageRenderer implements ImageRenderer {
         } finally {
             iis.close();
         }
-        
+
         // If you don't have an image at the end of all readers
         if (img == null) {
             if (lastException != null) {
@@ -202,7 +212,7 @@ public class BitmapImageRenderer implements ImageRenderer {
             g.dispose();
             return argbImg;
         }
-        
+
         return img;
     }
 
@@ -219,20 +229,26 @@ public class BitmapImageRenderer implements ImageRenderer {
         }
         return 0;
     }
-    
-    
+
+
     @Override
     public BufferedImage getImage() {
         return img;
     }
 
     @Override
-    public BufferedImage getImage(Dimension dim) {
+    public BufferedImage getImage(Dimension2D dim) {
+        if (img == null) {
+            return img;
+        }
         double w_old = img.getWidth();
         double h_old = img.getHeight();
-        BufferedImage scaled = new BufferedImage((int)w_old, (int)h_old, BufferedImage.TYPE_INT_ARGB);
         double w_new = dim.getWidth();
         double h_new = dim.getHeight();
+        if (w_old == w_new && h_old == h_new) {
+            return img;
+        }
+        BufferedImage scaled = new BufferedImage((int)w_new, (int)h_new, BufferedImage.TYPE_INT_ARGB);
         AffineTransform at = new AffineTransform();
         at.scale(w_new/w_old, h_new/h_old);
         AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
@@ -241,24 +257,30 @@ public class BitmapImageRenderer implements ImageRenderer {
     }
 
     @Override
-    public Dimension getDimension() {
+    public Rectangle2D getBounds() {
         return (img == null)
-            ? new Dimension(0,0)
-            : new Dimension(img.getWidth(),img.getHeight());
+            ? new Rectangle2D.Double()
+            : new Rectangle2D.Double(0, 0, img.getWidth(), img.getHeight());
     }
 
     @Override
     public void setAlpha(double alpha) {
-        if (img == null) return;
+        img = setAlpha(img, alpha);
+    }
 
-        Dimension dim = getDimension();
-        BufferedImage newImg = new BufferedImage((int)dim.getWidth(), (int)dim.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = newImg.createGraphics();
-        RescaleOp op = new RescaleOp(new float[]{1.0f, 1.0f, 1.0f, (float)alpha}, new float[]{0,0,0,0}, null);
-        g.drawImage(img, op, 0, 0);
-        g.dispose();
+    public static BufferedImage setAlpha(BufferedImage image, double alpha) {
+        if (image == null) {
+            return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        }
 
-        img = newImg;
+        if (alpha == 0) {
+            return image;
+        }
+
+        float[] scalefactors = {1, 1, 1, (float)alpha};
+        float[] offsets = {0,0,0,0};
+        RescaleOp op = new RescaleOp(scalefactors, offsets, null);
+        return op.filter(image, null);
     }
 
 
@@ -296,10 +318,17 @@ public class BitmapImageRenderer implements ImageRenderer {
         AffineTransform at = new AffineTransform(sx, 0, 0, sy, tx, ty) ;
 
         Shape clipOld = graphics.getClip();
-        if (isClipped) graphics.clip(anchor.getBounds2D());
+        if (isClipped) {
+            graphics.clip(anchor.getBounds2D());
+        }
         graphics.drawRenderedImage(img, at);
         graphics.setClip(clipOld);
 
         return true;
+    }
+
+    @Override
+    public Rectangle2D getNativeBounds() {
+        return new Rectangle2D.Double(0, 0, img.getWidth(), img.getHeight());
     }
 }

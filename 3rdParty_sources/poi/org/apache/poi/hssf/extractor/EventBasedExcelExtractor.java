@@ -17,12 +17,13 @@
 
 package org.apache.poi.hssf.extractor;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.poi.POIDocument;
-import org.apache.poi.POIOLE2TextExtractor;
+import org.apache.poi.extractor.POIOLE2TextExtractor;
 import org.apache.poi.hpsf.DocumentSummaryInformation;
 import org.apache.poi.hpsf.SummaryInformation;
 import org.apache.poi.hssf.eventusermodel.FormatTrackingHSSFListener;
@@ -37,10 +38,9 @@ import org.apache.poi.hssf.record.LabelRecord;
 import org.apache.poi.hssf.record.LabelSSTRecord;
 import org.apache.poi.hssf.record.NoteRecord;
 import org.apache.poi.hssf.record.NumberRecord;
-import org.apache.poi.hssf.record.Record;
 import org.apache.poi.hssf.record.SSTRecord;
 import org.apache.poi.hssf.record.StringRecord;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.DirectoryEntry;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
@@ -57,29 +57,31 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
  * To turn an excel file into a CSV or similar, then see
  *  the XLS2CSVmra example
  * </p>
- * 
+ *
  * @see <a href="http://svn.apache.org/repos/asf/poi/trunk/src/examples/src/org/apache/poi/hssf/eventusermodel/examples/XLS2CSVmra.java">XLS2CSVmra</a>
  */
-public class EventBasedExcelExtractor extends POIOLE2TextExtractor implements org.apache.poi.ss.extractor.ExcelExtractor {
-    private DirectoryNode _dir;
+public class EventBasedExcelExtractor implements POIOLE2TextExtractor, org.apache.poi.ss.extractor.ExcelExtractor {
+    private final POIFSFileSystem poifs;
+    private final DirectoryNode _dir;
+    private boolean doCloseFilesystem = true;
     boolean _includeSheetNames = true;
-    boolean _formulasNotResults = false;
+    boolean _formulasNotResults;
 
-    public EventBasedExcelExtractor( DirectoryNode dir )
-    {
-        super( (POIDocument)null );
+    public EventBasedExcelExtractor(DirectoryNode dir) {
+        poifs = null;
         _dir = dir;
     }
 
    public EventBasedExcelExtractor(POIFSFileSystem fs) {
-      this(fs.getRoot());
-      super.setFilesystem(fs);
+        poifs = fs;
+        _dir = fs.getRoot();
    }
 
    /**
     * Would return the document information metadata for the document,
     *  if we supported it
     */
+   @Override
    public DocumentSummaryInformation getDocSummaryInformation() {
        throw new IllegalStateException("Metadata extraction not supported in streaming mode, please use ExcelExtractor");
    }
@@ -87,6 +89,7 @@ public class EventBasedExcelExtractor extends POIOLE2TextExtractor implements or
     * Would return the summary information metadata for the document,
     *  if we supported it
     */
+   @Override
    public SummaryInformation getSummaryInformation() {
        throw new IllegalStateException("Metadata extraction not supported in streaming mode, please use ExcelExtractor");
    }
@@ -128,7 +131,7 @@ public class EventBasedExcelExtractor extends POIOLE2TextExtractor implements or
     * Retreives the text contents of the file
     */
    public String getText() {
-       String text = null;
+       String text;
        try {
            TextListener tl = triggerExtraction();
 
@@ -163,17 +166,17 @@ public class EventBasedExcelExtractor extends POIOLE2TextExtractor implements or
        private SSTRecord sstRecord;
 
        private final List<String> sheetNames;
-       final StringBuffer _text = new StringBuffer();
+       final StringBuilder _text = new StringBuilder();
        private int sheetNum = -1;
        private int rowNum;
 
-       private boolean outputNextStringValue = false;
+       private boolean outputNextStringValue;
        private int nextRow = -1;
 
        public TextListener() {
-           sheetNames = new ArrayList<String>();
+           sheetNames = new ArrayList<>();
        }
-       public void processRecord(Record record) {
+       public void processRecord(org.apache.poi.hssf.record.Record record) {
            String thisText = null;
            int thisRow = -1;
 
@@ -203,7 +206,7 @@ public class EventBasedExcelExtractor extends POIOLE2TextExtractor implements or
                thisRow = frec.getRow();
 
                if(_formulasNotResults) {
-                   thisText = HSSFFormulaParser.toFormulaString((HSSFWorkbook)null, frec.getParsedExpression());
+                   thisText = HSSFFormulaParser.toFormulaString(null, frec.getParsedExpression());
                } else {
                    if(frec.hasCachedResultString()) {
                        // Formula result is a string
@@ -263,4 +266,45 @@ public class EventBasedExcelExtractor extends POIOLE2TextExtractor implements or
            }
        }
    }
+
+    @Override
+    public void setCloseFilesystem(boolean doCloseFilesystem) {
+        this.doCloseFilesystem = doCloseFilesystem;
+    }
+
+    @Override
+    public boolean isCloseFilesystem() {
+        return doCloseFilesystem;
+    }
+
+    @Override
+    public Closeable getFilesystem() {
+        return poifs;
+    }
+
+    @Override
+    public POIDocument getDocument() {
+        return null;
+    }
+
+    @Override
+    public DirectoryEntry getRoot() {
+        return _dir;
+    }
+
+    @Override
+    public void close() throws IOException {
+        // first perform the default close
+        POIOLE2TextExtractor.super.close();
+
+        // also ensure that an underlying DirectoryNode
+        // is closed properly to avoid leaking file-handles
+        DirectoryEntry root = getRoot();
+        if (root instanceof DirectoryNode) {
+            Closeable fs = ((DirectoryNode) root).getFileSystem();
+            if (isCloseFilesystem() && fs != null) {
+                fs.close();
+            }
+        }
+    }
 }

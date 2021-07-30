@@ -20,8 +20,15 @@
  */
 package org.apache.poi.hssf.record.chart;
 
+import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import org.apache.poi.common.usermodel.GenericRecord;
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
@@ -30,14 +37,19 @@ import org.apache.poi.util.LittleEndianOutput;
  */
 public class ChartTitleFormatRecord extends StandardRecord {
 	public static final short sid = 0x1050;
-	
-	private CTFormat[] _formats;
-	
-	private static final class CTFormat {
+
+	private final CTFormat[] _formats;
+
+	private static final class CTFormat implements GenericRecord {
 		public static final int ENCODED_SIZE=4;
 		private int _offset;
 		private int _fontIndex;
-		
+
+		public CTFormat(CTFormat other) {
+			_offset = other._offset;
+			_fontIndex = other._fontIndex;
+		}
+
 		public CTFormat(RecordInputStream in) {
 			_offset = in.readShort();
 			_fontIndex = in.readShort();
@@ -57,8 +69,20 @@ public class ChartTitleFormatRecord extends StandardRecord {
 			out.writeShort(_offset);
 			out.writeShort(_fontIndex);
 		}
+
+		@Override
+		public Map<String, Supplier<?>> getGenericProperties() {
+			return GenericRecordUtil.getGenericProperties(
+				"offset", this::getOffset,
+				"fontIndex", this::getFontIndex
+			);
+		}
 	}
 
+	public ChartTitleFormatRecord(ChartTitleFormatRecord other) {
+		super(other);
+		_formats = Stream.of(other._formats).map(CTFormat::new).toArray(CTFormat[]::new);
+	}
 
 	public ChartTitleFormatRecord(RecordInputStream in) {
 		int nRecs = in.readUShort();
@@ -71,23 +95,23 @@ public class ChartTitleFormatRecord extends StandardRecord {
 
 	public void serialize(LittleEndianOutput out) {
         out.writeShort(_formats.length);
-        for(int i=0; i<_formats.length; i++){
-            _formats[i].serialize(out);
-        }
+		for (CTFormat format : _formats) {
+			format.serialize(out);
+		}
     }
 
     protected int getDataSize() {
         return 2 + CTFormat.ENCODED_SIZE * _formats.length;
     }
-    
+
 	public short getSid() {
 		return sid;
 	}
-	
+
 	public int getFormatCount() {
 		return _formats.length;
 	}
-	
+
 	public void modifyFormatRun(short oldPos, short newLen) {
 		int shift = 0;
 		for(int i=0; i < _formats.length; i++) {
@@ -97,22 +121,22 @@ public class ChartTitleFormatRecord extends StandardRecord {
 			} else if (oldPos == ctf.getOffset() && i < _formats.length - 1){
 				CTFormat nextCTF = _formats[i + 1];
 				shift = newLen - (nextCTF.getOffset() - ctf.getOffset());
-			} 
+			}
 		}
 	}
-	
-	public String toString() {
-        StringBuffer buffer = new StringBuffer();
 
-        buffer.append("[CHARTTITLEFORMAT]\n");
-        buffer.append("    .format_runs       = ").append(_formats.length).append("\n");
-        for(int i=0; i<_formats.length; i++) {
-            CTFormat ctf = _formats[i];
-        	buffer.append("       .char_offset= ").append(ctf.getOffset());
-        	buffer.append(",.fontidx= ").append(ctf.getFontIndex());
-            buffer.append("\n");
-        }
-        buffer.append("[/CHARTTITLEFORMAT]\n");
-        return buffer.toString();
-    }
+	@Override
+	public ChartTitleFormatRecord copy() {
+		return new ChartTitleFormatRecord(this);
+	}
+
+	@Override
+	public HSSFRecordTypes getGenericRecordType() {
+		return HSSFRecordTypes.CHART_TITLE_FORMAT;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties("formats", () -> _formats);
+	}
 }

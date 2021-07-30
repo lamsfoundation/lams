@@ -21,17 +21,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.ShortBufferException;
 
 import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.Internal;
 import org.apache.poi.util.LittleEndianInputStream;
 
 @Internal
 public abstract class ChunkedCipherInputStream extends LittleEndianInputStream {
+
+    //arbitrarily selected; may need to increase
+    private static final int MAX_RECORD_LENGTH = 100_000;
+
     private final int chunkSize;
     private final int chunkBits;
 
@@ -41,7 +43,7 @@ public abstract class ChunkedCipherInputStream extends LittleEndianInputStream {
 
     private int lastIndex;
     private long pos;
-    private boolean chunkIsValid = false;
+    private boolean chunkIsValid;
 
     public ChunkedCipherInputStream(InputStream stream, long size, int chunkSize)
     throws GeneralSecurityException {
@@ -55,8 +57,8 @@ public abstract class ChunkedCipherInputStream extends LittleEndianInputStream {
         this.pos = initialPos;
         this.chunkSize = chunkSize;
         int cs = chunkSize == -1 ? 4096 : chunkSize;
-        this.chunk = new byte[cs];
-        this.plain = new byte[cs];
+        this.chunk = IOUtils.safelyAllocate(cs, MAX_RECORD_LENGTH);
+        this.plain = IOUtils.safelyAllocate(cs, MAX_RECORD_LENGTH);
         this.chunkBits = Integer.bitCount(chunk.length-1);
         this.lastIndex = (int)(pos >> chunkBits);
         this.cipher = initCipherForBlock(null, lastIndex);
@@ -77,8 +79,7 @@ public abstract class ChunkedCipherInputStream extends LittleEndianInputStream {
     @Override
     public int read() throws IOException {
         byte[] b = { 0 };
-        // FIXME: compare against -1 or 1? (bug 59893)
-        return (read(b) == 1) ? -1 : b[0];
+        return (read(b) == 1) ? (b[0] & 0xFF) : -1;
     }
 
     // do not implement! -> recursion
@@ -92,7 +93,7 @@ public abstract class ChunkedCipherInputStream extends LittleEndianInputStream {
     private int read(byte[] b, int off, int len, boolean readPlain) throws IOException {
         int total = 0;
 
-        if (available() <= 0) {
+        if (remainingBytes() <= 0) {
             return -1;
         }
 
@@ -107,7 +108,7 @@ public abstract class ChunkedCipherInputStream extends LittleEndianInputStream {
                 }
             }
             int count = (int)(chunk.length - (pos & chunkMask));
-            int avail = available();
+            int avail = remainingBytes();
             if (avail == 0) {
                 return total;
             }
@@ -128,7 +129,7 @@ public abstract class ChunkedCipherInputStream extends LittleEndianInputStream {
     }
 
     @Override
-    public long skip(final long n) throws IOException {
+    public long skip(final long n) {
         long start = pos;
         long skip = Math.min(remainingBytes(), n);
 
@@ -164,7 +165,7 @@ public abstract class ChunkedCipherInputStream extends LittleEndianInputStream {
     }
 
     @Override
-    public synchronized void reset() throws IOException {
+    public synchronized void reset() {
         throw new UnsupportedOperationException();
     }
 
@@ -188,7 +189,7 @@ public abstract class ChunkedCipherInputStream extends LittleEndianInputStream {
         }
 
         final int todo = (int)Math.min(size, chunk.length);
-        int readBytes = 0, totalBytes = 0;
+        int readBytes, totalBytes = 0;
         do {
             readBytes = super.read(plain, totalBytes, todo-totalBytes);
             totalBytes += Math.max(0, readBytes);
@@ -206,10 +207,6 @@ public abstract class ChunkedCipherInputStream extends LittleEndianInputStream {
     /**
      * Helper function for overriding the cipher invocation, i.e. XOR doesn't use a cipher
      * and uses it's own implementation
-     *
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws ShortBufferException
      */
     protected int invokeCipher(int totalBytes, boolean doFinal) throws GeneralSecurityException {
         if (doFinal) {
@@ -222,10 +219,10 @@ public abstract class ChunkedCipherInputStream extends LittleEndianInputStream {
     /**
      * Used when BIFF header fields (sid, size) are being read. The internal
      * {@link Cipher} instance must step even when unencrypted bytes are read
-     * 
+     *
      */
     @Override
-    public void readPlain(byte b[], int off, int len) {
+    public void readPlain(byte[] b, int off, int len) {
         if (len <= 0) {
             return;
         }
@@ -236,7 +233,7 @@ public abstract class ChunkedCipherInputStream extends LittleEndianInputStream {
                 readBytes = read(b, off, len, true);
                 total += Math.max(0, readBytes);
             } while (readBytes > -1 && total < len);
-    
+
             if (total < len) {
                 throw new EOFException("buffer underrun");
             }

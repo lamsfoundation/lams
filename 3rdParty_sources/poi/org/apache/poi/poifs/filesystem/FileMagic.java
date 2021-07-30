@@ -17,12 +17,12 @@
 
 package org.apache.poi.poifs.filesystem;
 
-import static org.apache.poi.poifs.common.POIFSConstants.OOXML_FILE_HEADER;
-import static org.apache.poi.poifs.common.POIFSConstants.RAW_XML_FILE_HEADER;
-
 import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import org.apache.poi.poifs.storage.HeaderBlockConstants;
 import org.apache.poi.util.IOUtils;
@@ -36,30 +36,30 @@ import org.apache.poi.util.LocaleUtil;
 public enum FileMagic {
     /** OLE2 / BIFF8+ stream used for Office 97 and higher documents */
     OLE2(HeaderBlockConstants._signature),
-    /** OOXML / ZIP stream */
-    OOXML(OOXML_FILE_HEADER),
-    /** XML file */
-    XML(RAW_XML_FILE_HEADER),
+    /** OOXML / ZIP stream - The first 4 bytes of an OOXML file, used in detection */
+    OOXML(0x50, 0x4b, 0x03, 0x04),
+    /** XML file - The first 5 bytes of a raw XML file, used in detection */
+    XML(0x3c, 0x3f, 0x78, 0x6d, 0x6c),
     /** BIFF2 raw stream - for Excel 2 */
-    BIFF2(new byte[]{
+    BIFF2(
         0x09, 0x00, // sid=0x0009
         0x04, 0x00, // size=0x0004
         0x00, 0x00, // unused
-        0x70, 0x00  // 0x70 = multiple values
-    }),
+        '?', 0x00  // '?' = multiple values
+    ),
     /** BIFF3 raw stream - for Excel 3 */
-    BIFF3(new byte[]{
+    BIFF3(
         0x09, 0x02, // sid=0x0209
         0x06, 0x00, // size=0x0006
         0x00, 0x00, // unused
-        0x70, 0x00  // 0x70 = multiple values
-    }),
+        '?', 0x00  // '?' = multiple values
+    ),
     /** BIFF4 raw stream - for Excel 4 */
     BIFF4(new byte[]{
         0x09, 0x04, // sid=0x0409
         0x06, 0x00, // size=0x0006
         0x00, 0x00, // unused
-        0x70, 0x00  // 0x70 = multiple values
+        '?', 0x00  // '? = multiple values
     },new byte[]{
         0x09, 0x04, // sid=0x0409
         0x06, 0x00, // size=0x0006
@@ -74,44 +74,118 @@ public enum FileMagic {
     RTF("{\\rtf"),
     /** PDF document */
     PDF("%PDF"),
+    /** Some different HTML documents */
+    HTML("<!DOCTYP",
+         "<html","\n\r<html","\r\n<html","\r<html","\n<html",
+         "<HTML","\r\n<HTML","\n\r<HTML","\r<HTML","\n<HTML"),
+    WORD2(0xdb, 0xa5, 0x2d, 0x00),
+    /** JPEG image */
+    JPEG(
+        new byte[]{ (byte)0xFF, (byte)0xD8, (byte)0xFF, (byte)0xDB },
+        new byte[]{ (byte)0xFF, (byte)0xD8, (byte)0xFF, (byte)0xE0, '?', '?', 'J', 'F', 'I', 'F', 0x00, 0x01 },
+        new byte[]{ (byte)0xFF, (byte)0xD8, (byte)0xFF, (byte)0xEE },
+        new byte[]{ (byte)0xFF, (byte)0xD8, (byte)0xFF, (byte)0xE1, '?', '?', 'E', 'x', 'i', 'f', 0x00, 0x00 }),
+    /** GIF image */
+    GIF("GIF87a","GIF89a"),
+    /** PNG Image */
+    PNG(0x89, 'P', 'N', 'G', 0x0D, 0x0A, 0x1A, 0x0A),
+    /** TIFF Image */
+    TIFF("II*\u0000", "MM\u0000*" ),
+    /** WMF image with a placeable header */
+    WMF(0xD7, 0xCD, 0xC6, 0x9A),
+    /** EMF image */
+    EMF(1, 0, 0, 0,
+        '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?',
+        '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?',
+        ' ', 'E', 'M', 'F'),
+    /** BMP image */
+    BMP('B','M'),
     // keep UNKNOWN always as last enum!
     /** UNKNOWN magic */
     UNKNOWN(new byte[0]);
-    
+
+    // update this if a longer pattern is added
+    final static int MAX_PATTERN_LENGTH = 44;
+
     final byte[][] magic;
-    
+
     FileMagic(long magic) {
         this.magic = new byte[1][8];
         LittleEndian.putLong(this.magic[0], 0, magic);
     }
-    
+
+    FileMagic(int... magic) {
+        byte[] one = new byte[magic.length];
+        for (int i=0; i<magic.length; i++) {
+            one[i] = (byte)(magic[i] & 0xFF);
+        }
+        this.magic = new byte[][]{ one };
+    }
+
     FileMagic(byte[]... magic) {
         this.magic = magic;
     }
-    
-    FileMagic(String magic) {
-        this(magic.getBytes(LocaleUtil.CHARSET_1252));
+
+    FileMagic(String... magic) {
+        this.magic = new byte[magic.length][];
+        int i=0;
+        for (String s : magic) {
+            this.magic[i++] = s.getBytes(LocaleUtil.CHARSET_1252);
+        }
     }
 
     public static FileMagic valueOf(byte[] magic) {
         for (FileMagic fm : values()) {
-            int i=0;
-            boolean found = true;
             for (byte[] ma : fm.magic) {
-                for (byte m : ma) {
-                    byte d = magic[i++];
-                    if (!(d == m || (m == 0x70 && (d == 0x10 || d == 0x20 || d == 0x40)))) {
-                        found = false;
-                        break;
-                    }
+                // don't try to match if the given byte-array is too short
+                // for this pattern anyway
+                if(magic.length < ma.length) {
+                    continue;
                 }
-                if (found) {
+
+                if (findMagic(ma, magic)) {
                     return fm;
                 }
             }
         }
         return UNKNOWN;
     }
+
+    private static boolean findMagic(byte[] expected, byte[] actual) {
+        int i=0;
+        for (byte expectedByte : expected) {
+            if (actual[i++] != expectedByte && expectedByte != '?') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    /**
+     * Get the file magic of the supplied {@link File}<p>
+     *
+     * Even if this method returns {@link FileMagic#UNKNOWN} it could potentially mean,
+     *  that the ZIP stream has leading junk bytes
+     *
+     * @param inp a file to be identified
+     */
+    public static FileMagic valueOf(final File inp) throws IOException {
+        try (FileInputStream fis = new FileInputStream(inp)) {
+            // read as many bytes as possible, up to the required number of bytes
+            byte[] data = new byte[MAX_PATTERN_LENGTH];
+            int read = IOUtils.readFully(fis, data, 0, MAX_PATTERN_LENGTH);
+            if(read == -1) {
+                return FileMagic.UNKNOWN;
+            }
+
+            // only use the bytes that could be read
+            data = Arrays.copyOf(data, read);
+
+            return FileMagic.valueOf(data);
+        }
+    }
+
 
     /**
      * Get the file magic of the supplied InputStream (which MUST
@@ -131,15 +205,15 @@ public enum FileMagic {
             throw new IOException("getFileMagic() only operates on streams which support mark(int)");
         }
 
-        // Grab the first 8 bytes
-        byte[] data = IOUtils.peekFirst8Bytes(inp);
+        // Grab the first bytes of this stream
+        byte[] data = IOUtils.peekFirstNBytes(inp, MAX_PATTERN_LENGTH);
 
         return FileMagic.valueOf(data);
     }
 
 
     /**
-     * Checks if an {@link InputStream} can be reseted (i.e. used for checking the header magic) and wraps it if not
+     * Checks if an {@link InputStream} can be reset (i.e. used for checking the header magic) and wraps it if not
      *
      * @param stream stream to be checked for wrapping
      * @return a mark enabled stream

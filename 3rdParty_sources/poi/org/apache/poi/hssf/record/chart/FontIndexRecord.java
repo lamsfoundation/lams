@@ -17,43 +17,29 @@
 
 package org.apache.poi.hssf.record.chart;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
-/**
- * The font index record indexes into the font table for the text record.<p>
- * 
- * @author Glen Stampoultzis (glens at apache.org)
- */
-public final class FontIndexRecord extends StandardRecord implements Cloneable {
-    public final static short sid = 0x1026;
-    private  short      field_1_fontIndex;
+/** The font index record indexes into the font table for the text record. */
+public final class FontIndexRecord extends StandardRecord {
+    public static final short sid = 0x1026;
+    private short field_1_fontIndex;
 
+    public FontIndexRecord() {}
 
-    public FontIndexRecord()
-    {
-
+    public FontIndexRecord(FontIndexRecord other) {
+        super(other);
+        field_1_fontIndex = other.field_1_fontIndex;
     }
 
-    public FontIndexRecord(RecordInputStream in)
-    {
-        field_1_fontIndex              = in.readShort();
-    }
-
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[FONTX]\n");
-        buffer.append("    .fontIndex            = ")
-            .append("0x").append(HexDump.toHex(  getFontIndex ()))
-            .append(" (").append( getFontIndex() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-
-        buffer.append("[/FONTX]\n");
-        return buffer.toString();
+    public FontIndexRecord(RecordInputStream in) {
+        field_1_fontIndex = in.readShort();
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -70,14 +56,9 @@ public final class FontIndexRecord extends StandardRecord implements Cloneable {
     }
 
     @Override
-    public FontIndexRecord clone() {
-        FontIndexRecord rec = new FontIndexRecord();
-    
-        rec.field_1_fontIndex = field_1_fontIndex;
-        return rec;
+    public FontIndexRecord copy() {
+        return new FontIndexRecord(this);
     }
-
-
 
 
     /**
@@ -94,5 +75,15 @@ public final class FontIndexRecord extends StandardRecord implements Cloneable {
     public void setFontIndex(short field_1_fontIndex)
     {
         this.field_1_fontIndex = field_1_fontIndex;
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.FONT_INDEX;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties("fontIdex", this::getFontIndex);
     }
 }

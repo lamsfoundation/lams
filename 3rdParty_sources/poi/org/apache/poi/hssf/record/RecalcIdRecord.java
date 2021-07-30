@@ -17,22 +17,23 @@
 
 package org.apache.poi.hssf.record;
 
-import org.apache.poi.util.HexDump;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title: Recalc Id Record (0x01C1)<p>
- * Description:  This record contains an ID that marks when a worksheet was last
- *               recalculated. It's an optimization Excel uses to determine if it
- *               needs to  recalculate the spreadsheet when it's opened. So far, only
- *               the two engine ids {@code 0x80 0x38 0x01 0x00}
- *               and {@code 0x60 0x69 0x01 0x00} have been seen.
- *               A value of {@code 0x00} will cause Excel to recalculate
- *               all formulas on the next load.<p>
- * REFERENCE:  http://chicago.sourceforge.net/devel/docs/excel/biff8.html
+ * This record contains an ID that marks when a worksheet was last recalculated.
+ * It's an optimization Excel uses to determine if it needs to  recalculate the spreadsheet
+ * when it's opened. So far, only the two engine ids {@code 0x80 0x38 0x01 0x00} and
+ * {@code 0x60 0x69 0x01 0x00} have been seen. A value of {@code 0x00} will cause Excel
+ * to recalculate all formulas on the next load.
+ *
+ * @see <a href="http://chicago.sourceforge.net/devel/docs/excel/biff8.html">Chicago biff8 docs</a>
  */
 public final class RecalcIdRecord extends StandardRecord {
-    public final static short sid = 0x01C1;
+    public static final short sid = 0x01C1;
     private final int _reserved0;
 
     /**
@@ -47,6 +48,11 @@ public final class RecalcIdRecord extends StandardRecord {
     public RecalcIdRecord() {
         _reserved0 = 0;
         _engineId = 0;
+    }
+
+    public RecalcIdRecord(RecalcIdRecord other) {
+        _reserved0 = other._reserved0;
+        _engineId = other._engineId;
     }
 
     public RecalcIdRecord(RecordInputStream in) {
@@ -67,16 +73,6 @@ public final class RecalcIdRecord extends StandardRecord {
         return _engineId;
     }
 
-    public String toString() {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[RECALCID]\n");
-        buffer.append("    .reserved = ").append(HexDump.shortToHex(_reserved0)).append("\n");
-        buffer.append("    .engineId = ").append(HexDump.intToHex(_engineId)).append("\n");
-        buffer.append("[/RECALCID]\n");
-        return buffer.toString();
-    }
-
     public void serialize(LittleEndianOutput out) {
         out.writeShort(sid); // always write 'rt' field as 0x01C1
         out.writeShort(_reserved0);
@@ -89,5 +85,23 @@ public final class RecalcIdRecord extends StandardRecord {
 
     public short getSid() {
         return sid;
+    }
+
+    @Override
+    public RecalcIdRecord copy() {
+        return new RecalcIdRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.RECALC_ID;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "reserved0", () -> _reserved0,
+            "engineId", this::getEngineId
+        );
     }
 }

@@ -23,31 +23,31 @@ import java.util.List;
 import org.apache.poi.hssf.record.Record;
 
 public final class WorkbookRecordList {
-    private List<Record> records = new ArrayList<Record>();
+    private List<org.apache.poi.hssf.record.Record> records = new ArrayList<>();
 
     /** holds the position of the protect record */
-	private int protpos	       = 0;
+	private int protpos;
     /** holds the position of the last bound sheet */
-	private int bspos	       = 0;
+	private int bspos;
     /** holds the position of the tabid record */
-	private int tabpos	       = 0;
+	private int tabpos;
     /** hold the position of the last font record */
-	private int fontpos	       = 0;
+	private int fontpos;
     /** hold the position of the last extended font record */
-	private int xfpos	       = 0;
+	private int xfpos;
     /** holds the position of the backup record */
-	private int backuppos      = 0;
+	private int backuppos;
     /** holds the position of last name record */
-	private int namepos	       = 0;
+	private int namepos;
 	/** holds the position of sup book */
-	private int supbookpos     = 0;
+	private int supbookpos;
 	/** holds the position of the extern sheet */
-	private int externsheetPos = 0;
+	private int externsheetPos;
 	/** hold the position of the palette, if applicable */
 	private int palettepos     = -1;
 
 
-	public void setRecords(List<Record> records) {
+	public void setRecords(List<org.apache.poi.hssf.record.Record> records) {
 	    this.records = records;
 	}
 
@@ -64,7 +64,7 @@ public final class WorkbookRecordList {
 		updateRecordPos(pos, true);
 	}
 
-	public List<Record> getRecords() {
+	public List<org.apache.poi.hssf.record.Record> getRecords() {
 		return records;
 	}
 
@@ -76,7 +76,7 @@ public final class WorkbookRecordList {
 	public void remove( Object record ) {
 	   // can't use List.indexOf here because it checks the records for equality and not identity
 	   int i = 0;
-	   for (Record r : records) {
+	   for (org.apache.poi.hssf.record.Record r : records) {
 	       if (r == record) {
 	           remove(i);
 	           break;

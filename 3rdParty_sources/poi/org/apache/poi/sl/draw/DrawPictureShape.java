@@ -20,75 +20,103 @@ package org.apache.poi.sl.draw;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.Paint;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
+import java.util.ServiceLoader;
+import java.util.function.Supplier;
+import java.util.stream.StreamSupport;
 
+import org.apache.poi.common.usermodel.PictureType;
+import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.sl.usermodel.PictureData;
-import org.apache.poi.sl.usermodel.PictureData.PictureType;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
 import org.apache.poi.sl.usermodel.PictureShape;
 import org.apache.poi.sl.usermodel.RectAlign;
+import org.apache.poi.util.POILogFactory;
+import org.apache.poi.util.POILogger;
 
 
 public class DrawPictureShape extends DrawSimpleShape {
     private static final POILogger LOG = POILogFactory.getLogger(DrawPictureShape.class);
-    private static final String WMF_IMAGE_RENDERER = "org.apache.poi.hwmf.draw.HwmfSLImageRenderer";
-    
+
     public DrawPictureShape(PictureShape<?,?> shape) {
         super(shape);
     }
-    
+
     @Override
     public void drawContent(Graphics2D graphics) {
-        PictureData data = getShape().getPictureData();
-        if(data == null) return;
+        PictureShape<?,?> ps = getShape();
 
-        Rectangle2D anchor = getAnchor(graphics, getShape());
-        Insets insets = getShape().getClipping();
+        Rectangle2D anchor = getAnchor(graphics, ps);
+        Insets insets = ps.getClipping();
 
-        try {
-            ImageRenderer renderer = getImageRenderer(graphics, data.getContentType());
-            renderer.loadImage(data.getData(), data.getContentType());
-            renderer.drawImage(graphics, anchor, insets);
-        } catch (IOException e) {
-            LOG.log(POILogger.ERROR, "image can't be loaded/rendered.", e);
+        PictureData[] pics = { ps.getAlternativePictureData(), ps.getPictureData() };
+        for (PictureData data : pics) {
+            if (data == null) {
+                continue;
+            }
+
+            try {
+                byte[] dataBytes = data.getData();
+
+                PictureType type = PictureType.valueOf(FileMagic.valueOf(dataBytes));
+                String ct = (type == PictureType.UNKNOWN) ? data.getContentType() : type.getContentType();
+
+                ImageRenderer renderer = getImageRenderer(graphics, ct);
+                if (renderer.canRender(ct)) {
+                    renderer.loadImage(dataBytes, ct);
+                    renderer.drawImage(graphics, anchor, insets);
+                    return;
+                }
+            } catch (IOException e) {
+                LOG.log(POILogger.ERROR, "image can't be loaded/rendered.", e);
+            }
         }
-    }    
+    }
 
     /**
      * Returns an ImageRenderer for the PictureData
      *
-     * @param graphics
+     * @param graphics the graphics context
      * @return the image renderer
      */
     public static ImageRenderer getImageRenderer(Graphics2D graphics, String contentType) {
-        ImageRenderer renderer = (ImageRenderer)graphics.getRenderingHint(Drawable.IMAGE_RENDERER);
-        if (renderer != null) {
+        final ImageRenderer renderer = (graphics != null) ? (ImageRenderer)graphics.getRenderingHint(Drawable.IMAGE_RENDERER) : null;
+        if (renderer != null && renderer.canRender(contentType)) {
             return renderer;
         }
-        
-        if (PictureType.WMF.contentType.equals(contentType)) {
-            try {
-                @SuppressWarnings("unchecked")
-                Class<? extends ImageRenderer> irc = (Class<? extends ImageRenderer>)
-                    Thread.currentThread().getContextClassLoader().loadClass(WMF_IMAGE_RENDERER);
-                return irc.newInstance();
-            } catch (Exception e) {
-                // WMF image renderer is not on the classpath, continuing with BitmapRenderer
-                // although this doesn't make much sense ...
-                LOG.log(POILogger.ERROR, "WMF image renderer is not on the classpath - include poi-scratchpad jar!", e);
-            }
+
+        final BitmapImageRenderer fallback = new BitmapImageRenderer();
+        if (fallback.canRender(contentType)) {
+            return fallback;
         }
-        
-        return new BitmapImageRenderer();
+
+        // the fallback is the BitmapImageRenderer, at least it gracefully handles invalid images
+        final Supplier<ImageRenderer> getFallback = () -> {
+            LOG.log(POILogger.WARN, "No suitable image renderer found for content-type '",
+                contentType, "' - include poi-scratchpad (for wmf/emf) or poi-ooxml (for svg) jars!");
+            return fallback;
+        };
+
+        ClassLoader cl = DrawPictureShape.class.getClassLoader();
+        return StreamSupport
+            .stream(ServiceLoader.load(ImageRenderer.class, cl).spliterator(), false)
+            .filter(ir -> ir.canRender(contentType))
+            .findFirst()
+            .orElseGet(getFallback)
+        ;
     }
-    
+
+    @Override
+    protected Paint getFillPaint(Graphics2D graphics) {
+        return null;
+    }
+
     @Override
     protected PictureShape<?,?> getShape() {
         return (PictureShape<?,?>)shape;
     }
-    
+
     /**
      * Resize this picture to the default size.
      *

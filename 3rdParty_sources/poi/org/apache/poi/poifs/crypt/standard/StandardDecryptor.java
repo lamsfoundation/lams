@@ -43,10 +43,14 @@ import org.apache.poi.util.LittleEndian;
 
 /**
  */
-public class StandardDecryptor extends Decryptor implements Cloneable {
+public class StandardDecryptor extends Decryptor {
     private long _length = -1;
 
-    protected StandardDecryptor() {
+    protected StandardDecryptor() {}
+
+    protected StandardDecryptor(StandardDecryptor other) {
+        super(other);
+        _length = other._length;
     }
 
     @Override
@@ -56,19 +60,19 @@ public class StandardDecryptor extends Decryptor implements Cloneable {
         Cipher cipher = getCipher(skey);
 
         try {
-            byte encryptedVerifier[] = ver.getEncryptedVerifier();
-            byte verifier[] = cipher.doFinal(encryptedVerifier);
+            byte[] encryptedVerifier = ver.getEncryptedVerifier();
+            byte[] verifier = cipher.doFinal(encryptedVerifier);
             setVerifier(verifier);
             MessageDigest sha1 = CryptoFunctions.getMessageDigest(ver.getHashAlgorithm());
             byte[] calcVerifierHash = sha1.digest(verifier);
-            byte encryptedVerifierHash[] = ver.getEncryptedVerifierHash();
-            byte decryptedVerifierHash[] = cipher.doFinal(encryptedVerifierHash);
+            byte[] encryptedVerifierHash = ver.getEncryptedVerifierHash();
+            byte[] decryptedVerifierHash = cipher.doFinal(encryptedVerifierHash);
 
             // see 2.3.4.9 Password Verification (Standard Encryption)
             // ... The number of bytes used by the encrypted Verifier hash MUST be 32 ...
             // TODO: check and trim/pad the hashes to 32
             byte[] verifierHash = Arrays.copyOf(decryptedVerifierHash, calcVerifierHash.length);
-    
+
             if (Arrays.equals(calcVerifierHash, verifierHash)) {
                 setSecretKey(skey);
                 return true;
@@ -79,30 +83,29 @@ public class StandardDecryptor extends Decryptor implements Cloneable {
             throw new EncryptedDocumentException(e);
         }
     }
-    
+
     protected static SecretKey generateSecretKey(String password, EncryptionVerifier ver, int keySize) {
         HashAlgorithm hashAlgo = ver.getHashAlgorithm();
 
-        byte pwHash[] = hashPassword(password, hashAlgo, ver.getSalt(), ver.getSpinCount());
+        byte[] pwHash = hashPassword(password, hashAlgo, ver.getSalt(), ver.getSpinCount());
 
         byte[] blockKey = new byte[4];
         LittleEndian.putInt(blockKey, 0, 0);
 
         byte[] finalHash = CryptoFunctions.generateKey(pwHash, hashAlgo, blockKey, hashAlgo.hashSize);
-        byte x1[] = fillAndXor(finalHash, (byte) 0x36);
-        byte x2[] = fillAndXor(finalHash, (byte) 0x5c);
+        byte[] x1 = fillAndXor(finalHash, (byte) 0x36);
+        byte[] x2 = fillAndXor(finalHash, (byte) 0x5c);
 
         byte[] x3 = new byte[x1.length + x2.length];
         System.arraycopy(x1, 0, x3, 0, x1.length);
         System.arraycopy(x2, 0, x3, x1.length, x2.length);
-        
+
         byte[] key = Arrays.copyOf(x3, keySize);
 
-        SecretKey skey = new SecretKeySpec(key, ver.getCipherAlgorithm().jceId);
-        return skey;
+        return new SecretKeySpec(key, ver.getCipherAlgorithm().jceId);
     }
 
-    protected static byte[] fillAndXor(byte hash[], byte fillByte) {
+    protected static byte[] fillAndXor(byte[] hash, byte fillByte) {
         byte[] buff = new byte[64];
         Arrays.fill(buff, fillByte);
 
@@ -122,7 +125,7 @@ public class StandardDecryptor extends Decryptor implements Cloneable {
     }
 
     @Override
-    @SuppressWarnings("resource")
+    @SuppressWarnings({"resource", "squid:S2095"})
     public InputStream getDataStream(DirectoryNode dir) throws IOException {
         DocumentInputStream dis = dir.createDocumentInputStream(DEFAULT_POIFS_ENTRY);
 
@@ -132,12 +135,12 @@ public class StandardDecryptor extends Decryptor implements Cloneable {
             verifyPassword(null);
         }
         // limit wrong calculated ole entries - (bug #57080)
-        // standard encryption always uses aes encoding, so blockSize is always 16 
+        // standard encryption always uses aes encoding, so blockSize is always 16
         // http://stackoverflow.com/questions/3283787/size-of-data-after-aes-encryption
         int blockSize = getEncryptionInfo().getHeader().getCipherAlgorithm().blockSize;
         long cipherLen = (_length/blockSize + 1) * blockSize;
         Cipher cipher = getCipher(getSecretKey());
-        
+
         InputStream boundedDis = new BoundedInputStream(dis, cipherLen);
         return new BoundedInputStream(new CipherInputStream(boundedDis, cipher), _length);
     }
@@ -154,7 +157,7 @@ public class StandardDecryptor extends Decryptor implements Cloneable {
     }
 
     @Override
-    public StandardDecryptor clone() throws CloneNotSupportedException {
-        return (StandardDecryptor)super.clone();
+    public StandardDecryptor copy() {
+        return new StandardDecryptor(this);
     }
 }

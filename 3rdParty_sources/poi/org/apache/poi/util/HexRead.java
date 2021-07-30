@@ -36,11 +36,8 @@ public class HexRead {
      */
     public static byte[] readData( String filename ) throws IOException {
         File file = new File( filename );
-        InputStream stream = new FileInputStream( file );
-        try {
-            return readData( stream, -1 );
-        } finally {
-            stream.close();
+        try (InputStream stream = new FileInputStream(file)) {
+            return readData(stream, -1);
         }
     }
 
@@ -55,7 +52,7 @@ public class HexRead {
      */
     public static byte[] readData(InputStream stream, String section ) throws IOException {
         try {
-            StringBuffer sectionText = new StringBuffer();
+            StringBuilder sectionText = new StringBuilder();
             boolean inSection = false;
             int c = stream.read();
             while ( c != -1 ) {
@@ -66,12 +63,12 @@ public class HexRead {
                     case '\n':
                     case '\r':
                         inSection = false;
-                        sectionText = new StringBuffer();
+                        sectionText = new StringBuilder();
                         break;
                     case ']':
                         inSection = false;
                         if ( sectionText.toString().equals( section ) ) return readData( stream, '[' );
-                        sectionText = new StringBuffer();
+                        sectionText = new StringBuilder();
                         break;
                     default:
                         if ( inSection ) sectionText.append( (char) c );
@@ -95,7 +92,7 @@ public class HexRead {
     {
         int characterCount = 0;
         byte b = (byte) 0;
-        List<Byte> bytes = new ArrayList<Byte>();
+        List<Byte> bytes = new ArrayList<>();
         final char a = 'a' - 10;
         final char A = 'A' - 10;
         while ( true ) {
@@ -125,7 +122,7 @@ public class HexRead {
                 }
             }
         }
-        Byte[] polished = bytes.toArray(new Byte[bytes.size()]);
+        Byte[] polished = bytes.toArray(new Byte[0]);
         byte[] rval = new byte[polished.length];
         for ( int j = 0; j < polished.length; j++ ) {
             rval[j] = polished[j].byteValue();

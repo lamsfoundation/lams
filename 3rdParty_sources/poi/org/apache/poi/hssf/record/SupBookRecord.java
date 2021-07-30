@@ -17,41 +17,66 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
 import org.apache.poi.util.StringUtil;
 
 /**
- * Title:        Sup Book - EXTERNALBOOK (0x01AE)<p>
- * Description:  A External Workbook Description (Supplemental Book)
- *               Its only a dummy record for making new ExternSheet Record<p>
- * REFERENCE:  5.38
+ * A External Workbook Description (Supplemental Book).
+ * Its only a dummy record for making new ExternSheet Record
  */
 public final class SupBookRecord extends StandardRecord {
 
-    private final static POILogger logger = POILogFactory.getLogger(SupBookRecord.class);
-	
-    public final static short sid = 0x01AE;
+    private static final POILogger logger = POILogFactory.getLogger(SupBookRecord.class);
+
+    public static final short sid = 0x01AE;
 
     private static final short SMALL_RECORD_SIZE = 4;
     private static final short TAG_INTERNAL_REFERENCES = 0x0401;
     private static final short TAG_ADD_IN_FUNCTIONS = 0x3A01;
 
+    static final char CH_VOLUME = 1;
+    static final char CH_SAME_VOLUME = 2;
+    static final char CH_DOWN_DIR = 3;
+    static final char CH_UP_DIR = 4;
+    static final char CH_LONG_VOLUME = 5;
+    static final char CH_STARTUP_DIR = 6;
+    static final char CH_ALT_STARTUP_DIR = 7;
+    static final char CH_LIB_DIR = 8;
+    static final String PATH_SEPERATOR = System.getProperty("file.separator");
+
     private short field_1_number_of_sheets;
     private String field_2_encoded_url;
-    private String[] field_3_sheet_names;
-    private boolean _isAddInFunctions;
+    private final String[] field_3_sheet_names;
+    private final boolean _isAddInFunctions;
 
-    protected static final char CH_VOLUME = 1;
-    protected static final char CH_SAME_VOLUME = 2;
-    protected static final char CH_DOWN_DIR = 3;
-    protected static final char CH_UP_DIR = 4;
-    protected static final char CH_LONG_VOLUME = 5;
-    protected static final char CH_STARTUP_DIR = 6;
-    protected static final char CH_ALT_STARTUP_DIR = 7;
-    protected static final char CH_LIB_DIR = 8;
-    protected static final String PATH_SEPERATOR = System.getProperty("file.separator");
+    public SupBookRecord(SupBookRecord other) {
+        super(other);
+        field_1_number_of_sheets = other.field_1_number_of_sheets;
+        field_2_encoded_url = other.field_2_encoded_url;
+        field_3_sheet_names = other.field_3_sheet_names;
+        _isAddInFunctions = other._isAddInFunctions;
+    }
+
+    private SupBookRecord(boolean isAddInFuncs, short numberOfSheets) {
+        // else not 'External References'
+        field_1_number_of_sheets = numberOfSheets;
+        field_2_encoded_url = null;
+        field_3_sheet_names = null;
+        _isAddInFunctions = isAddInFuncs;
+    }
+
+    public SupBookRecord(String url, String[] sheetNames) {
+        field_1_number_of_sheets = (short) sheetNames.length;
+        field_2_encoded_url = url;
+        field_3_sheet_names = sheetNames;
+        _isAddInFunctions = false;
+    }
 
     public static SupBookRecord createInternalReferences(short numberOfSheets) {
         return new SupBookRecord(false, numberOfSheets);
@@ -61,19 +86,6 @@ public final class SupBookRecord extends StandardRecord {
     }
     public static SupBookRecord createExternalReferences(String url, String[] sheetNames) {
         return new SupBookRecord(url, sheetNames);
-    }
-    private SupBookRecord(boolean isAddInFuncs, short numberOfSheets) {
-        // else not 'External References'
-        field_1_number_of_sheets = numberOfSheets;
-        field_2_encoded_url = null;
-        field_3_sheet_names = null;
-        _isAddInFunctions = isAddInFuncs;
-    }
-    public SupBookRecord(String url, String[] sheetNames) {
-        field_1_number_of_sheets = (short) sheetNames.length;
-        field_2_encoded_url = url;
-        field_3_sheet_names = sheetNames;
-        _isAddInFunctions = false;
     }
 
     public boolean isExternalReferences() {
@@ -129,27 +141,6 @@ public final class SupBookRecord extends StandardRecord {
         }
      }
 
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("[SUPBOOK ");
-
-        if(isExternalReferences()) {
-            sb.append("External References]\n");
-            sb.append(" .url     = ").append(field_2_encoded_url).append("\n");
-            sb.append(" .nSheets = ").append(field_1_number_of_sheets).append("\n");
-            for (String sheetname : field_3_sheet_names) {
-                sb.append("    .name = ").append(sheetname).append("\n");
-            }
-            sb.append("[/SUPBOOK");
-        } else if(_isAddInFunctions) {
-            sb.append("Add-In Functions");
-        } else {
-            sb.append("Internal References");
-            sb.append(" nSheets=").append(field_1_number_of_sheets);
-        }
-        sb.append("]");
-        return sb.toString();
-    }
     protected int getDataSize() {
         if(!isExternalReferences()) {
             return SMALL_RECORD_SIZE;
@@ -158,8 +149,8 @@ public final class SupBookRecord extends StandardRecord {
 
         sum += StringUtil.getEncodedSize(field_2_encoded_url);
 
-        for(int i=0; i<field_3_sheet_names.length; i++) {
-            sum += StringUtil.getEncodedSize(field_3_sheet_names[i]);
+        for (String field_3_sheet_name : field_3_sheet_names) {
+            sum += StringUtil.getEncodedSize(field_3_sheet_name);
         }
         return sum;
     }
@@ -170,8 +161,8 @@ public final class SupBookRecord extends StandardRecord {
         if(isExternalReferences()) {
             StringUtil.writeUnicodeString(out, field_2_encoded_url);
 
-            for(int i=0; i<field_3_sheet_names.length; i++) {
-                StringUtil.writeUnicodeString(out, field_3_sheet_names[i]);
+            for (String field_3_sheet_name : field_3_sheet_names) {
+                StringUtil.writeUnicodeString(out, field_3_sheet_name);
             }
         } else {
             int field2val = _isAddInFunctions ? TAG_ADD_IN_FUNCTIONS : TAG_INTERNAL_REFERENCES;
@@ -194,14 +185,16 @@ public final class SupBookRecord extends StandardRecord {
     }
     public String getURL() {
         String encodedUrl = field_2_encoded_url;
-        switch(encodedUrl.charAt(0)) {
-            case 0: // Reference to an empty workbook name
-                return encodedUrl.substring(1); // will this just be empty string?
-            case 1: // encoded file name
-                return decodeFileName(encodedUrl);
-            case 2: // Self-referential external reference
-                return encodedUrl.substring(1);
+        if (encodedUrl != null && encodedUrl.length() >= 2) {
+            switch(encodedUrl.charAt(0)) {
+                case 0: // Reference to an empty workbook name
+                case 2: // Self-referential external reference
+                    // will this just be empty string?
+                    return encodedUrl.substring(1);
+                case 1: // encoded file name
+                    return decodeFileName(encodedUrl);
 
+            }
         }
         return encodedUrl;
     }
@@ -221,9 +214,7 @@ public final class SupBookRecord extends StandardRecord {
         		}
         		break;
         	case CH_SAME_VOLUME:
-        		sb.append(PATH_SEPERATOR);
-        		break;
-        	case CH_DOWN_DIR:
+            case CH_DOWN_DIR:
         		sb.append(PATH_SEPERATOR);
         		break;
         	case CH_UP_DIR:
@@ -246,11 +237,33 @@ public final class SupBookRecord extends StandardRecord {
         return sb.toString();
     }
     public String[] getSheetNames() {
-        return field_3_sheet_names.clone();
+        return field_3_sheet_names == null ? null : field_3_sheet_names.clone();
     }
-    
+
     public void setURL(String pUrl) {
     	//Keep the first marker character!
-    	field_2_encoded_url = field_2_encoded_url.substring(0, 1) + pUrl; 
+    	field_2_encoded_url = field_2_encoded_url.substring(0, 1) + pUrl;
+    }
+
+    @Override
+    public SupBookRecord copy() {
+        return new SupBookRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.SUP_BOOK;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "externalReferences", this::isExternalReferences,
+            "internalReferences", this::isInternalReferences,
+            "url", this::getURL,
+            "numberOfSheets", this::getNumberOfSheets,
+            "sheetNames", this::getSheetNames,
+            "addInFunctions", this::isAddInFunctions
+        );
     }
 }

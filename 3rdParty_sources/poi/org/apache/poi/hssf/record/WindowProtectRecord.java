@@ -17,18 +17,19 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.util.BitField;
 import org.apache.poi.util.BitFieldFactory;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title: Window Protect Record (0x0019)<p>
- * Description:  flags whether workbook windows are protected<p>
- * REFERENCE:  PG 424 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)
+ * Flags whether workbook windows are protected
  */
 public final class WindowProtectRecord extends StandardRecord {
-    public final static short sid = 0x0019;
+    public static final short sid = 0x0019;
 
     private static final BitField settingsProtectedFlag = BitFieldFactory.getInstance(0x0001);
 
@@ -36,6 +37,11 @@ public final class WindowProtectRecord extends StandardRecord {
 
     public WindowProtectRecord(int options) {
         _options = options;
+    }
+
+    public WindowProtectRecord(WindowProtectRecord other) {
+        super(other);
+        _options = other._options;
     }
 
     public WindowProtectRecord(RecordInputStream in) {
@@ -64,15 +70,6 @@ public final class WindowProtectRecord extends StandardRecord {
         return settingsProtectedFlag.isSet(_options);
     }
 
-    public String toString() {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[WINDOWPROTECT]\n");
-        buffer.append("    .options = ").append(HexDump.shortToHex(_options)).append("\n");
-        buffer.append("[/WINDOWPROTECT]\n");
-        return buffer.toString();
-    }
-
     public void serialize(LittleEndianOutput out) {
         out.writeShort(_options);
     }
@@ -85,8 +82,22 @@ public final class WindowProtectRecord extends StandardRecord {
     {
         return sid;
     }
+
     @Override
-    public Object clone() {
-        return new WindowProtectRecord(_options);
+    public WindowProtectRecord copy() {
+        return new WindowProtectRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.WINDOW_PROTECT;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "options", () -> _options,
+            "protect", this::getProtect
+        );
     }
 }

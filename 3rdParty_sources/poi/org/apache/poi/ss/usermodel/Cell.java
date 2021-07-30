@@ -17,6 +17,8 @@
 
 package org.apache.poi.ss.usermodel;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
@@ -40,66 +42,6 @@ import org.apache.poi.util.Removal;
  * </p>
  */
 public interface Cell {
-
-    /**
-     * Numeric Cell type (0)
-     * @see #setCellType(int)
-     * @see #getCellType()
-     * @deprecated POI 3.15 beta 3. Use {@link CellType#NUMERIC} instead.
-     */
-    @Deprecated
-    @Removal(version="4.0")
-    int CELL_TYPE_NUMERIC = 0; //CellType.NUMERIC.getCode();
-
-    /**
-     * String Cell type (1)
-     * @see #setCellType(int)
-     * @see #getCellType()
-     * @deprecated POI 3.15 beta 3. Use {@link CellType#STRING} instead.
-     */
-    @Deprecated
-    @Removal(version="4.0")
-    int CELL_TYPE_STRING = 1; //CellType.STRING.getCode();
-
-    /**
-     * Formula Cell type (2)
-     * @see #setCellType(int)
-     * @see #getCellType()
-     * @deprecated POI 3.15 beta 3. Use {@link CellType#FORMULA} instead.
-     */
-    @Deprecated
-    @Removal(version="4.0")
-    int CELL_TYPE_FORMULA = 2; //CellType.FORMULA.getCode();
-
-    /**
-     * Blank Cell type (3)
-     * @see #setCellType(int)
-     * @see #getCellType()
-     * @deprecated POI 3.15 beta 3. Use {@link CellType#BLANK} instead.
-     */
-    @Deprecated
-    @Removal(version="4.0")
-    int CELL_TYPE_BLANK = 3; //CellType.BLANK.getCode();
-
-    /**
-     * Boolean Cell type (4)
-     * @see #setCellType(int)
-     * @see #getCellType()
-     * @deprecated POI 3.15 beta 3. Use {@link CellType#BOOLEAN} instead.
-     */
-    @Deprecated
-    @Removal(version="4.0")
-    int CELL_TYPE_BOOLEAN = 4; //CellType.BOOLEAN.getCode();
-
-    /**
-     * Error Cell type (5)
-     * @see #setCellType(int)
-     * @see #getCellType()
-     * @deprecated POI 3.15 beta 3. Use {@link CellType#ERROR} instead.
-     */
-    @Deprecated
-    @Removal(version="4.0")
-    int CELL_TYPE_ERROR = 5; //CellType.ERROR.getCode();
 
     /**
      * Returns column index of this cell
@@ -130,93 +72,59 @@ public interface Cell {
      Row getRow();
 
     /**
-     * Set the cells type (numeric, formula or string).
+     * Set the cells type (blank, numeric, boolean, error or string).
      * <p>If the cell currently contains a value, the value will
      *  be converted to match the new type, if possible. Formatting
      *  is generally lost in the process however.</p>
+     * <p>Conversion rules:</p>
+     * <p>to NUMERIC: numeric value is left as is. True converts to 1.0, false converts to 0. otherwise, the
+     * value is set to 0. Formula is removed.</p>
      * <p>If what you want to do is get a String value for your
-     *  numeric cell, <i>stop!</i>. This is not the way to do it.
+     *  numeric cell, <i>stop!</i> This is not the way to do it.
      *  Instead, for fetching the string value of a numeric or boolean
-     *  or date cell, use {@link DataFormatter} instead.</p> 
+     *  or date cell, use {@link DataFormatter} instead.</p>
+     * <p>If cell is a member of an array formula group containing more than 1 cell, an {@link IllegalStateException}
+     * is thrown. If the array formula group contains only this cell, it is removed.</p>
+     * <p>Passing {@link CellType#FORMULA} is illegal and will result in an {@link IllegalArgumentException}.</p>
      *
-     * @throws IllegalArgumentException if the specified cell type is invalid
-     * @throws IllegalStateException if the current value cannot be converted to the new type
-     * @see CellType#NUMERIC
-     * @see CellType#STRING
-     * @see CellType#FORMULA
-     * @see CellType#BLANK
-     * @see CellType#BOOLEAN
-     * @see CellType#ERROR
-     * @deprecated POI 3.15 beta 3. Use {@link #setCellType(CellType)} instead.
+     * @deprecated This method is deprecated and will be removed in POI 5.0.
+     * Use explicit {@link #setCellFormula(String)}, <code>setCellValue(...)</code> or {@link #setBlank()}
+     * to get the desired result.
+     * @throws IllegalArgumentException if the specified cell type is invalid (null, _NONE or FORMULA)
+     * @throws IllegalStateException if the current value cannot be converted to the new type or
+     * if the cell is a part of an array formula group containing other cells
      */
     @Deprecated
-    @Removal(version="4.0")
-    void setCellType(int cellType);
-    /**
-     * Set the cells type (numeric, formula or string).
-     * <p>If the cell currently contains a value, the value will
-     *  be converted to match the new type, if possible. Formatting
-     *  is generally lost in the process however.</p>
-     * <p>If what you want to do is get a String value for your
-     *  numeric cell, <i>stop!</i>. This is not the way to do it.
-     *  Instead, for fetching the string value of a numeric or boolean
-     *  or date cell, use {@link DataFormatter} instead.</p> 
-     *
-     * @throws IllegalArgumentException if the specified cell type is invalid
-     * @throws IllegalStateException if the current value cannot be converted to the new type
-     */
+    @Removal(version = "5.0")
     void setCellType(CellType cellType);
 
     /**
-     * Return the cell type.
-     * 
-     * Will return {@link CellType} in version 4.0 of POI.
-     * For forwards compatibility, do not hard-code cell type literals in your code.
-     *
-     * @return the cell type
-     * @deprecated POI 3.15. Will return a {@link CellType} enum in the future.
+     * Removes formula and value from the cell, and sets its type to {@link CellType#BLANK}.
+     * Preserves comments and hyperlinks.
+     * While {@link #setCellType(CellType)} exists, is an alias for {@code setCellType(CellType.BLANK)}.
      */
-    @Deprecated
-    int getCellType();
-    
+    void setBlank();
+
     /**
      * Return the cell type.
      *
      * @return the cell type
-     * @since POI 3.15 beta 3
-     * Will be renamed to <code>getCellType()</code> when we make the CellType enum transition in POI 4.0. See bug 59791.
      */
-    @Removal(version="4.2")
-    CellType getCellTypeEnum();
-    
-    /**
-     * Only valid for formula cells
-     * 
-     * Will return {@link CellType} in a future version of POI.
-     * For forwards compatibility, do not hard-code cell type literals in your code.
-     * 
-     * @return one of ({@link CellType#NUMERIC}, {@link CellType#STRING},
-     *     {@link CellType#BOOLEAN}, {@link CellType#ERROR}) depending
-     * on the cached value of the formula
-     * @deprecated 3.15. Will return a {@link CellType} enum in the future.
-     */
-    @Deprecated
-    int getCachedFormulaResultType();
+    CellType getCellType();
 
     /**
      * Only valid for formula cells
-     * @return one of ({@link CellType#NUMERIC}, {@link CellType#STRING},
-     *     {@link CellType#BOOLEAN}, {@link CellType#ERROR}) depending
-     * on the cached value of the formula
-     * @since POI 3.15 beta 3
-     * Will be renamed to <code>getCachedFormulaResultType()</code> when we make the CellType enum transition in POI 4.0. See bug 59791.
-     */
-    CellType getCachedFormulaResultTypeEnum();
-
-    /**
-     * Set a numeric value for the cell
      *
-     * @param value  the numeric value to set this cell to.  For formulas we'll set the
+     * @return one of ({@link CellType#NUMERIC}, {@link CellType#STRING},
+     *     {@link CellType#BOOLEAN}, {@link CellType#ERROR}) depending
+     *      on the cached value of the formula
+     */
+    CellType getCachedFormulaResultType();
+
+    /**
+     * Set a numeric value for the cell.
+     *
+     * @param value the numeric value to set this cell to.  For formulas we'll set the
      *        precalculated value, for numerics we'll set its value. For other types we
      *        will change the cell to a numeric cell and set its value.
      */
@@ -225,7 +133,7 @@ public interface Cell {
     /**
      * <p>Converts the supplied date to its equivalent Excel numeric value and sets
      * that into the cell.</p>
-     * 
+     *
      * <p><b>Note</b> - There is actually no 'DATE' cell type in Excel. In many
      * cases (when entering date values), Excel automatically adjusts the
      * <i>cell style</i> to some date format, creating the illusion that the cell
@@ -238,6 +146,42 @@ public interface Cell {
      *        will change the cell to a numerics cell and set its value.
      */
     void setCellValue(Date value);
+
+    /**
+     * <p>Converts the supplied date to its equivalent Excel numeric value and sets
+     * that into the cell.</p>
+     *
+     * <p><b>Note</b> - There is actually no 'DATE' cell type in Excel. In many
+     * cases (when entering date values), Excel automatically adjusts the
+     * <i>cell style</i> to some date format, creating the illusion that the cell
+     * data type is now something besides {@link CellType#NUMERIC}.  POI
+     * does not attempt to replicate this behaviour.  To make a numeric cell
+     * display as a date, use {@link #setCellStyle(CellStyle)} etc.</p>
+     *
+     * @param value the numeric value to set this cell to.  For formulas we'll set the
+     *        precalculated value, for numerics we'll set its value. For other types we
+     *        will change the cell to a numerics cell and set its value.
+     */
+    void setCellValue(LocalDateTime value);
+
+    /**
+     * <p>Converts the supplied date to its equivalent Excel numeric value and sets
+     * that into the cell.</p>
+     *
+     * <p><b>Note</b> - There is actually no 'DATE' cell type in Excel. In many
+     * cases (when entering date values), Excel automatically adjusts the
+     * <i>cell style</i> to some date format, creating the illusion that the cell
+     * data type is now something besides {@link CellType#NUMERIC}.  POI
+     * does not attempt to replicate this behaviour.  To make a numeric cell
+     * display as a date, use {@link #setCellStyle(CellStyle)} etc.</p>
+     *
+     * @param value the numeric value to set this cell to.  For formulas we'll set the
+     *        precalculated value, for numerics we'll set its value. For other types we
+     *        will change the cell to a numerics cell and set its value.
+     */
+    default void setCellValue(LocalDate value) {
+        setCellValue(value == null ? null : value.atStartOfDay());
+    }
 
     /**
      * <p>Set a date value for the cell. Excel treats dates as numeric so you will need to format the cell as
@@ -280,22 +224,38 @@ public interface Cell {
 
     /**
      * Sets formula for this cell.
-     * <p>
-     * Note, this method only sets the formula string and does not calculate the formula value.
-     * To set the precalculated value use {@link #setCellValue(double)} or {@link #setCellValue(String)}
-     * </p>
+     * <p>If {@code formula} is not null, sets or updates the formula. If {@code formula} is null, removes the formula.
+     * Or use {@link #removeFormula()} to remove the formula.</p>
+     *
+     * <p>Note, this method only sets the formula string and does not calculate the formula value.
+     * To set the precalculated value use {@link #setCellValue}.</p>
+     *
+     * <p>If the cell was blank, sets value to 0. Otherwise, preserves the value as precalculated.</p>
      *
      * @param formula the formula to set, e.g. <code>"SUM(C4:E4)"</code>.
-     *  If the argument is <code>null</code> then the current formula is removed.
+     * If the argument is <code>null</code> then the current formula is removed.
+     *
+     * @see Cell#removeFormula
+     * @throws IllegalStateException if this cell is a part of an array formula group containing other cells
      * @throws FormulaParseException if the formula has incorrect syntax or is otherwise invalid
      */
-    void setCellFormula(String formula) throws FormulaParseException;
+    void setCellFormula(String formula) throws FormulaParseException, IllegalStateException;
+
+    /**
+     * Removes formula, if any.
+     *
+     * If cell was blank, leaves it as is.
+     * If it is a part of an array formula group, blanks the cell.
+     * If has a regular formula, removes the formula preserving the "cached" value.
+     * @throws IllegalStateException if cell is a part of an array formula group containing other cells
+     */
+    void removeFormula() throws IllegalStateException;
 
     /**
      * Return a formula for the cell, for example, <code>SUM(C4:E4)</code>
      *
      * @return a formula for the cell
-     * @throws IllegalStateException if the cell type returned by {@link #getCellTypeEnum()} is not {@link CellType#FORMULA}
+     * @throws IllegalStateException if the cell type returned by {@link #getCellType()} is not {@link CellType#FORMULA}
      */
     String getCellFormula();
 
@@ -306,7 +266,7 @@ public interface Cell {
      * For formulas or error cells we return the precalculated value;
      * </p>
      * @return the value of the cell as a number
-     * @throws IllegalStateException if the cell type returned by {@link #getCellTypeEnum()} is {@link CellType#STRING}
+     * @throws IllegalStateException if the cell type returned by {@link #getCellType()} is {@link CellType#STRING}
      * @exception NumberFormatException if the cell value isn't a parsable <code>double</code>.
      * @see DataFormatter for turning this number into a string similar to that which Excel would render this number as.
      */
@@ -318,11 +278,23 @@ public interface Cell {
      * For strings we throw an exception. For blank cells we return a null.
      * </p>
      * @return the value of the cell as a date
-     * @throws IllegalStateException if the cell type returned by {@link #getCellTypeEnum()} is {@link CellType#STRING}
+     * @throws IllegalStateException if the cell type returned by {@link #getCellType()} is {@link CellType#STRING}
      * @exception NumberFormatException if the cell value isn't a parsable <code>double</code>.
      * @see DataFormatter for formatting  this date into a string similar to how excel does.
      */
     Date getDateCellValue();
+
+    /**
+     * Get the value of the cell as a LocalDateTime.
+     * <p>
+     * For strings we throw an exception. For blank cells we return a null.
+     * </p>
+     * @return the value of the cell as a LocalDateTime
+     * @throws IllegalStateException if the cell type returned by {@link #getCellType()} is {@link CellType#STRING}
+     * @exception NumberFormatException if the cell value isn't a parsable <code>double</code>.
+     * @see DataFormatter for formatting  this date into a string similar to how excel does.
+     */
+    LocalDateTime getLocalDateTimeCellValue();
 
     /**
      * Get the value of the cell as a XSSFRichTextString
@@ -370,7 +342,7 @@ public interface Cell {
      * For strings, numbers, and errors, we throw an exception. For blank cells we return a false.
      * </p>
      * @return the value of the cell as a boolean
-     * @throws IllegalStateException if the cell type returned by {@link #getCellTypeEnum()}
+     * @throws IllegalStateException if the cell type returned by {@link #getCellType()}
      *   is not {@link CellType#BOOLEAN}, {@link CellType#BLANK} or {@link CellType#FORMULA}
      */
     boolean getBooleanCellValue();
@@ -383,7 +355,7 @@ public interface Cell {
      * </p>
      *
      * @return the value of the cell as an error code
-     * @throws IllegalStateException if the cell type returned by {@link #getCellTypeEnum()} isn't {@link CellType#ERROR}
+     * @throws IllegalStateException if the cell type returned by {@link #getCellType()} isn't {@link CellType#ERROR}
      * @see FormulaError for error codes
      */
     byte getErrorCellValue();
@@ -391,7 +363,7 @@ public interface Cell {
     /**
      * <p>Set the style for the cell.  The style should be an CellStyle created/retrieved from
      * the Workbook.</p>
-     * 
+     *
      * <p>To change the style of a cell without affecting other cells that use the same style,
      * use {@link org.apache.poi.ss.util.CellUtil#setCellStyleProperties(Cell, Map)}</p>
      *

@@ -17,9 +17,17 @@
 
 package org.apache.poi.hssf.record.cf;
 
+import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import org.apache.poi.common.Duplicatable;
+import org.apache.poi.common.usermodel.GenericRecord;
 import org.apache.poi.ss.usermodel.IconMultiStateFormatting.IconSet;
 import org.apache.poi.util.BitField;
 import org.apache.poi.util.BitFieldFactory;
+import org.apache.poi.util.GenericRecordJsonWriter;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 import org.apache.poi.util.POILogFactory;
@@ -28,21 +36,30 @@ import org.apache.poi.util.POILogger;
 /**
  * Icon / Multi-State Conditional Formatting Rule Record.
  */
-public final class IconMultiStateFormatting implements Cloneable {
-    private static POILogger log = POILogFactory.getLogger(IconMultiStateFormatting.class);
-            
+public final class IconMultiStateFormatting implements Duplicatable, GenericRecord {
+    private static final POILogger LOG = POILogFactory.getLogger(IconMultiStateFormatting.class);
+
+    private static BitField ICON_ONLY = BitFieldFactory.getInstance(0x01);
+    private static BitField REVERSED = BitFieldFactory.getInstance(0x04);
+
     private IconSet iconSet;
     private byte options;
     private Threshold[] thresholds;
-    
-    private static BitField iconOnly = BitFieldFactory.getInstance(0x01);
-    private static BitField reversed = BitFieldFactory.getInstance(0x04);
 
     public IconMultiStateFormatting() {
         iconSet = IconSet.GYR_3_TRAFFIC_LIGHTS;
         options = 0;
         thresholds = new Threshold[iconSet.num];
     }
+
+    public IconMultiStateFormatting(IconMultiStateFormatting other) {
+        iconSet = other.iconSet;
+        options = other.options;
+        if (other.thresholds != null) {
+            thresholds = Stream.of(other.thresholds).map(Threshold::copy).toArray(Threshold[]::new);
+        }
+    }
+
     public IconMultiStateFormatting(LittleEndianInput in) {
         in.readShort(); // Ignored
         in.readByte();  // Reserved
@@ -50,16 +67,16 @@ public final class IconMultiStateFormatting implements Cloneable {
         int set = in.readByte();
         iconSet = IconSet.byId(set);
         if (iconSet.num != num) {
-            log.log(POILogger.WARN, "Inconsistent Icon Set defintion, found " + iconSet + " but defined as " + num + " entries");
+            LOG.log(POILogger.WARN, "Inconsistent Icon Set defintion, found " + iconSet + " but defined as " + num + " entries");
         }
         options = in.readByte();
-        
+
         thresholds = new Threshold[iconSet.num];
         for (int i=0; i<thresholds.length; i++) {
             thresholds[i] = new IconMultiStateThreshold(in);
         }
     }
-    
+
     public IconSet getIconSet() {
         return iconSet;
     }
@@ -73,51 +90,41 @@ public final class IconMultiStateFormatting implements Cloneable {
     public void setThresholds(Threshold[] thresholds) {
         this.thresholds = (thresholds == null) ? null : thresholds.clone();
     }
-    
+
     public boolean isIconOnly() {
-        return getOptionFlag(iconOnly);
+        return ICON_ONLY.isSet(options);
     }
     public void setIconOnly(boolean only) {
-        setOptionFlag(only, iconOnly);
+        options = ICON_ONLY.setByteBoolean(options, only);
     }
-    
+
     public boolean isReversed() {
-        return getOptionFlag(reversed);
+        return REVERSED.isSet(options);
     }
+
     public void setReversed(boolean rev) {
-        setOptionFlag(rev, reversed);
+        options = REVERSED.setByteBoolean(options, rev);
     }
-    
-    private boolean getOptionFlag(BitField field) {
-        int value = field.getValue(options);
-        return value==0 ? false : true;
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "iconSet", this::getIconSet,
+            "iconOnly", this::isIconOnly,
+            "reversed", this::isReversed,
+            "thresholds", this::getThresholds
+        );
     }
-    private void setOptionFlag(boolean option, BitField field) {
-        options = field.setByteBoolean(options, option);
-    }
-    
+
     public String toString() {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("    [Icon Formatting]\n");
-        buffer.append("          .icon_set = ").append(iconSet).append("\n");
-        buffer.append("          .icon_only= ").append(isIconOnly()).append("\n");
-        buffer.append("          .reversed = ").append(isReversed()).append("\n");
-        for (Threshold t : thresholds) {
-            buffer.append(t);
-        }
-        buffer.append("    [/Icon Formatting]\n");
-        return buffer.toString();
+        return GenericRecordJsonWriter.marshal(this);
     }
-    
-    public Object clone()  {
-      IconMultiStateFormatting rec = new IconMultiStateFormatting();
-      rec.iconSet = iconSet;
-      rec.options = options;
-      rec.thresholds = new Threshold[thresholds.length];
-      System.arraycopy(thresholds, 0, rec.thresholds, 0, thresholds.length);
-      return rec;
+
+    @Override
+    public IconMultiStateFormatting copy()  {
+        return new IconMultiStateFormatting(this);
     }
-    
+
     public int getDataLength() {
         int len = 6;
         for (Threshold t : thresholds) {

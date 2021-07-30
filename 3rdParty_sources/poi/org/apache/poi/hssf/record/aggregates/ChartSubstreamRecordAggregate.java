@@ -38,7 +38,7 @@ public final class ChartSubstreamRecordAggregate extends RecordAggregate {
 
 	public ChartSubstreamRecordAggregate(RecordStream rs) {
 		_bofRec = (BOFRecord) rs.getNext();
-		List<RecordBase> temp = new ArrayList<RecordBase>();
+		List<RecordBase> temp = new ArrayList<>();
 		while (rs.peekNextClass() != EOFRecord.class) {
 			if (PageSettingsBlock.isComponentRecord(rs.peekNextSid())) {
 				if (_psBlock != null) {
@@ -57,7 +57,7 @@ public final class ChartSubstreamRecordAggregate extends RecordAggregate {
 			temp.add(rs.getNext());
 		}
 		_recs = temp;
-		Record eof = rs.getNext(); // no need to save EOF in field
+		org.apache.poi.hssf.record.Record eof = rs.getNext(); // no need to save EOF in field
 		if (!(eof instanceof EOFRecord)) {
 			throw new IllegalStateException("Bad chart EOF");
 		}
@@ -73,7 +73,7 @@ public final class ChartSubstreamRecordAggregate extends RecordAggregate {
 			if (rb instanceof RecordAggregate) {
 				((RecordAggregate) rb).visitContainedRecords(rv);
 			} else {
-				rv.visitRecord((Record) rb);
+				rv.visitRecord((org.apache.poi.hssf.record.Record) rb);
 			}
 		}
 		rv.visitRecord(EOFRecord.instance);

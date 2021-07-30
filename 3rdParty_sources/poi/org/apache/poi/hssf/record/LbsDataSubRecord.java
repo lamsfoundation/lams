@@ -16,8 +16,16 @@
 ==================================================================== */
 package org.apache.poi.hssf.record;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.common.Duplicatable;
+import org.apache.poi.common.usermodel.GenericRecord;
 import org.apache.poi.ss.formula.ptg.Ptg;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordJsonWriter;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 import org.apache.poi.util.RecordFormatException;
@@ -89,6 +97,24 @@ public class LbsDataSubRecord extends SubRecord {
      */
     private boolean[] _bsels;
 
+    LbsDataSubRecord() {}
+
+    public LbsDataSubRecord(LbsDataSubRecord other) {
+        super(other);
+        _cbFContinued = other._cbFContinued;
+        _unknownPreFormulaInt = other._unknownPreFormulaInt;
+        _linkPtg = (other._linkPtg == null) ? null : other._linkPtg.copy();
+        _unknownPostFormulaByte = other._unknownPostFormulaByte;
+        _cLines = other._cLines;
+        _iSel = other._iSel;
+        _flags = other._flags;
+        _idEdit = other._idEdit;
+        _dropData = (other._dropData == null) ? null : other._dropData.copy();
+        _rgLines = (other._rgLines == null) ? null : other._rgLines.clone();
+        _bsels = (other._bsels == null) ? null : other._bsels.clone();
+    }
+
+
     /**
      * @param in the stream to read data from
      * @param cbFContinued the seconf short in the record header
@@ -145,16 +171,12 @@ public class LbsDataSubRecord extends SubRecord {
 
         // From [MS-XLS].pdf 2.5.147 FtLbsData:
         // This array MUST exist if and only if the wListType field is not equal to 0.
-        if(((_flags >> 4) & 0x2) != 0) {
+        if(((_flags >> 4) & 0x1) + (_flags >> 5 & 0x1) != 0) {
             _bsels = new boolean[_cLines];
             for(int i=0; i < _cLines; i++) {
                 _bsels[i] = in.readByte() == 1;
             }
         }
-
-    }
-
-    LbsDataSubRecord(){
 
     }
 
@@ -259,30 +281,8 @@ public class LbsDataSubRecord extends SubRecord {
     }
 
     @Override
-    public LbsDataSubRecord clone() {
-        // TODO: is immutable ???
-        return this;
-    }
-
-    @Override
-    public String toString() {
-        StringBuffer sb = new StringBuffer(256);
-
-        sb.append("[ftLbsData]\n");
-        sb.append("    .unknownShort1 =").append(HexDump.shortToHex(_cbFContinued)).append("\n");
-        sb.append("    .formula        = ").append('\n');
-        if(_linkPtg != null) {
-            sb.append(_linkPtg).append(_linkPtg.getRVAType()).append('\n');
-        }
-        sb.append("    .nEntryCount   =").append(HexDump.shortToHex(_cLines)).append("\n");
-        sb.append("    .selEntryIx    =").append(HexDump.shortToHex(_iSel)).append("\n");
-        sb.append("    .style         =").append(HexDump.shortToHex(_flags)).append("\n");
-        sb.append("    .unknownShort10=").append(HexDump.shortToHex(_idEdit)).append("\n");
-        if(_dropData != null) {
-            sb.append('\n').append(_dropData);
-        }
-        sb.append("[/ftLbsData]\n");
-        return sb.toString();
+    public LbsDataSubRecord copy() {
+        return new LbsDataSubRecord(this);
     }
 
     /**
@@ -300,10 +300,32 @@ public class LbsDataSubRecord extends SubRecord {
         return _cLines;
     }
 
+    @Override
+    public SubRecordTypes getGenericRecordType() {
+        return SubRecordTypes.LBS_DATA;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        final Map<String,Supplier<?>> m = new LinkedHashMap<>();
+        m.put("unknownShort1", () -> _cbFContinued);
+        m.put("unknownPreFormulaInt", () -> _unknownPreFormulaInt);
+        m.put("formula", this::getFormula);
+        m.put("unknownPostFormulaByte", () -> _unknownPostFormulaByte);
+        m.put("numberOfItems", this::getNumberOfItems);
+        m.put("selEntryIx", () -> _iSel);
+        m.put("style", () -> _flags);
+        m.put("unknownShort10", () -> _idEdit);
+        m.put("dropData", () -> _dropData);
+        m.put("rgLines", () -> _rgLines);
+        m.put("bsels", () -> _bsels);
+        return Collections.unmodifiableMap(m);
+    }
+
     /**
      * This structure specifies properties of the dropdown list control
      */
-    public static class LbsDropData {
+    public static class LbsDropData implements Duplicatable, GenericRecord {
         /**
          * Combo dropdown control
          */
@@ -318,7 +340,7 @@ public class LbsDataSubRecord extends SubRecord {
         public static final int STYLE_COMBO_SIMPLE_DROPDOWN = 2;
 
         /**
-         *  An unsigned integer that specifies the style of this dropdown. 
+         *  An unsigned integer that specifies the style of this dropdown.
          */
         private int _wStyle;
 
@@ -343,12 +365,20 @@ public class LbsDataSubRecord extends SubRecord {
          */
         private Byte _unused;
 
-        public LbsDropData(){
+        public LbsDropData() {
             _str = "";
             _unused = 0;
         }
 
-        public LbsDropData(LittleEndianInput in){
+        public LbsDropData(LbsDropData other) {
+            _wStyle = other._wStyle;
+            _cLine = other._cLine;
+            _dxMin = other._dxMin;
+            _str = other._str;
+            _unused = other._unused;
+        }
+
+        public LbsDropData(LittleEndianInput in) {
             _wStyle = in.readUShort();
             _cLine = in.readUShort();
             _dxMin = in.readUShort();
@@ -367,7 +397,7 @@ public class LbsDataSubRecord extends SubRecord {
          * <li>1: Combo Edit dropdown control</li>
          * <li>2: Simple dropdown control (just the dropdown button)</li>
          * </ul>
-         * 
+         *
          * @param style the style - see possible values
          */
         public void setStyle(int style){
@@ -376,7 +406,7 @@ public class LbsDataSubRecord extends SubRecord {
 
         /**
          * Set the number of lines to be displayed in the dropdown.
-         * 
+         *
          * @param num the number of lines to be displayed in the dropdown
          */
         public void setNumLines(int num){
@@ -404,18 +434,23 @@ public class LbsDataSubRecord extends SubRecord {
 
         @Override
         public String toString(){
-            StringBuffer sb = new StringBuffer();
-            sb.append("[LbsDropData]\n");
-            sb.append("  ._wStyle:  ").append(_wStyle).append('\n');
-            sb.append("  ._cLine:  ").append(_cLine).append('\n');
-            sb.append("  ._dxMin:  ").append(_dxMin).append('\n');
-            sb.append("  ._str:  ").append(_str).append('\n');
-            if(_unused != null) {
-                sb.append("  ._unused:  ").append(_unused).append('\n');
-            }
-            sb.append("[/LbsDropData]\n");
+            return GenericRecordJsonWriter.marshal(this);
+        }
 
-            return sb.toString();
+        @Override
+        public LbsDropData copy() {
+            return new LbsDropData(this);
+        }
+
+        @Override
+        public Map<String, Supplier<?>> getGenericProperties() {
+            return GenericRecordUtil.getGenericProperties(
+                "wStyle", () -> _wStyle,
+                "cLine", () -> _cLine,
+                "dxMin", () -> _dxMin,
+                "str", () -> _str,
+                "unused", () -> _unused
+            );
         }
     }
 }

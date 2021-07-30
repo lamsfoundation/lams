@@ -17,7 +17,11 @@
 
 package org.apache.poi.ss.formula.ptg;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.ss.usermodel.FormulaError;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 
@@ -65,6 +69,11 @@ public final class ErrPtg extends ScalarConstantPtg {
         return FormulaError.forInt(field_1_error_code).getString();
     }
 
+    @Override
+    public byte getSid() {
+        return sid;
+    }
+
     public int getSize() {
         return SIZE;
     }
@@ -85,5 +94,15 @@ public final class ErrPtg extends ScalarConstantPtg {
             default:
                 throw new RuntimeException("Unexpected error code (" + code + ")");
         }
+    }
+
+    @Override
+    public ErrPtg copy() {
+        return this;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties("errorCode", this::getErrorCode);
     }
 }

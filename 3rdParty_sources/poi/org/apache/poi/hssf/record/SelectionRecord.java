@@ -17,28 +17,40 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
 import org.apache.poi.hssf.util.CellRangeAddress8Bit;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        Selection Record (0x001D)<P>
- * Description:  shows the user's selection on the sheet
- *               for write set num refs to 0<P>
- *
- * REFERENCE:  PG 291 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)
+ * Shows the user's selection on the sheet for write set num refs to 0
  */
 public final class SelectionRecord extends StandardRecord {
-    public final static short sid = 0x001D;
-    private byte        field_1_pane;
-    private int         field_2_row_active_cell;
-    private int         field_3_col_active_cell;
-    private int         field_4_active_cell_ref_index;
+    public static final short sid = 0x001D;
+
+
+    private byte field_1_pane;
+    private int field_2_row_active_cell;
+    private int field_3_col_active_cell;
+    private int field_4_active_cell_ref_index;
     private CellRangeAddress8Bit[] field_6_refs;
+
+    public SelectionRecord(SelectionRecord other) {
+        super(other);
+        field_1_pane = other.field_1_pane;
+        field_2_row_active_cell = other.field_2_row_active_cell;
+        field_3_col_active_cell = other.field_3_col_active_cell;
+        field_4_active_cell_ref_index = other.field_4_active_cell_ref_index;
+        field_6_refs = (other.field_6_refs == null) ? null
+            : Stream.of(other.field_6_refs).map(CellRangeAddress8Bit::copy).toArray(CellRangeAddress8Bit[]::new);
+    }
 
     /**
      * Creates a default selection record (cell A1, in pane ID 3)
-     * 
+     *
      * @param activeCellRow the active cells row index
      * @param activeCellCol the active cells column index
      */
@@ -79,6 +91,7 @@ public final class SelectionRecord extends StandardRecord {
      */
     public void setActiveCellRow(int row) {
         field_2_row_active_cell = row;
+        resetField6();
     }
 
     /**
@@ -87,6 +100,14 @@ public final class SelectionRecord extends StandardRecord {
      */
     public void setActiveCellCol(short col) {
         field_3_col_active_cell = col;
+        resetField6();
+    }
+
+    private void resetField6() {
+        // this is necessary in Excel to actually make Workbook.setActiveCell() take effect
+        field_6_refs = new CellRangeAddress8Bit[] {
+                new CellRangeAddress8Bit(field_2_row_active_cell, field_2_row_active_cell, field_3_col_active_cell, field_3_col_active_cell),
+        };
     }
 
     /**
@@ -129,19 +150,6 @@ public final class SelectionRecord extends StandardRecord {
     }
 
     @Override
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-
-        sb.append("[SELECTION]\n");
-        sb.append("    .pane            = ").append(HexDump.byteToHex(getPane())).append("\n");
-        sb.append("    .activecellrow   = ").append(HexDump.shortToHex(getActiveCellRow())).append("\n");
-        sb.append("    .activecellcol   = ").append(HexDump.shortToHex(getActiveCellCol())).append("\n");
-        sb.append("    .activecellref   = ").append(HexDump.shortToHex(getActiveCellRef())).append("\n");
-        sb.append("    .numrefs         = ").append(HexDump.shortToHex(field_6_refs.length)).append("\n");
-        sb.append("[/SELECTION]\n");
-        return sb.toString();
-    }
-    @Override
     protected int getDataSize() {
         return 9 // 1 byte + 4 shorts
             + CellRangeAddress8Bit.getEncodedSize(field_6_refs.length);
@@ -165,11 +173,23 @@ public final class SelectionRecord extends StandardRecord {
     }
 
     @Override
-    public Object clone() {
-        SelectionRecord rec = new SelectionRecord(field_2_row_active_cell, field_3_col_active_cell);
-        rec.field_1_pane = field_1_pane;
-        rec.field_4_active_cell_ref_index = field_4_active_cell_ref_index;
-        rec.field_6_refs = field_6_refs;
-        return rec;
+    public SelectionRecord copy() {
+        return new SelectionRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.SELECTION;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "pane", this::getPane,
+            "activeCellRow", this::getActiveCellRow,
+            "activeCellCol", this::getActiveCellCol,
+            "activeCellRef", this::getActiveCellRef,
+            "refs", () -> field_6_refs
+        );
     }
 }

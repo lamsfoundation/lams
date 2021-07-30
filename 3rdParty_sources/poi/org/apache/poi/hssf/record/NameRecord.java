@@ -17,46 +17,53 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.hssf.record.cont.ContinuableRecord;
 import org.apache.poi.hssf.record.cont.ContinuableRecordOutput;
+import org.apache.poi.ss.formula.Formula;
 import org.apache.poi.ss.formula.ptg.Area3DPtg;
 import org.apache.poi.ss.formula.ptg.Ptg;
 import org.apache.poi.ss.formula.ptg.Ref3DPtg;
-import org.apache.poi.ss.formula.Formula;
-import org.apache.poi.util.*;
+import org.apache.poi.util.LittleEndianByteArrayInputStream;
+import org.apache.poi.util.LittleEndianInput;
+import org.apache.poi.util.StringUtil;
 
 /**
- * Title:        DEFINEDNAME Record (0x0018)<p>
- * Description:  Defines a named range within a workbook.
+ * Defines a named range within a workbook.
  */
+@SuppressWarnings("unused")
 public final class NameRecord extends ContinuableRecord {
-    public final static short sid = 0x0018;
+    public static final short sid = 0x0018;
 	/**Included for completeness sake, not implemented */
-	public final static byte  BUILTIN_CONSOLIDATE_AREA      = 1;
+	public static final byte  BUILTIN_CONSOLIDATE_AREA      = 1;
 	/**Included for completeness sake, not implemented */
-	public final static byte  BUILTIN_AUTO_OPEN             = 2;
+	public static final byte  BUILTIN_AUTO_OPEN             = 2;
 	/**Included for completeness sake, not implemented */
-	public final static byte  BUILTIN_AUTO_CLOSE            = 3;
+	public static final byte  BUILTIN_AUTO_CLOSE            = 3;
 	/**Included for completeness sake, not implemented */
-	public final static byte  BUILTIN_DATABASE              = 4;
+	public static final byte  BUILTIN_DATABASE              = 4;
 	/**Included for completeness sake, not implemented */
-	public final static byte  BUILTIN_CRITERIA              = 5;
+	public static final byte  BUILTIN_CRITERIA              = 5;
 
-	public final static byte  BUILTIN_PRINT_AREA            = 6;
-	public final static byte  BUILTIN_PRINT_TITLE           = 7;
+	public static final byte  BUILTIN_PRINT_AREA            = 6;
+	public static final byte  BUILTIN_PRINT_TITLE           = 7;
 
 	/**Included for completeness sake, not implemented */
-	public final static byte  BUILTIN_RECORDER              = 8;
+	public static final byte  BUILTIN_RECORDER              = 8;
 	/**Included for completeness sake, not implemented */
-	public final static byte  BUILTIN_DATA_FORM             = 9;
+	public static final byte  BUILTIN_DATA_FORM             = 9;
 	/**Included for completeness sake, not implemented */
-	public final static byte  BUILTIN_AUTO_ACTIVATE         = 10;
+	public static final byte  BUILTIN_AUTO_ACTIVATE         = 10;
 	/**Included for completeness sake, not implemented */
-	public final static byte  BUILTIN_AUTO_DEACTIVATE       = 11;
+	public static final byte  BUILTIN_AUTO_DEACTIVATE       = 11;
 	/**Included for completeness sake, not implemented */
-	public final static byte  BUILTIN_SHEET_TITLE           = 12;
+	public static final byte  BUILTIN_SHEET_TITLE           = 12;
 
-	public final static byte  BUILTIN_FILTER_DB             = 13;
+	public static final byte  BUILTIN_FILTER_DB             = 13;
 
 	private static final class Option {
 		public static final int OPT_HIDDEN_NAME =   0x0001;
@@ -66,7 +73,7 @@ public final class NameRecord extends ContinuableRecord {
 		public static final int OPT_COMPLEX =       0x0010;
 		public static final int OPT_BUILTIN =       0x0020;
 		public static final int OPT_BINDATA =       0x1000;
-		public static final boolean isFormula(int optValue) {
+		public static boolean isFormula(int optValue) {
 			return (optValue & 0x0F) == 0;
 		}
 	}
@@ -98,10 +105,26 @@ public final class NameRecord extends ContinuableRecord {
 		field_17_status_bar_text = "";
 	}
 
+	public NameRecord(NameRecord other) {
+		super(other);
+		field_1_option_flag = other.field_1_option_flag;
+		field_2_keyboard_shortcut = other.field_2_keyboard_shortcut;
+		field_5_externSheetIndex_plus1 = other.field_5_externSheetIndex_plus1;
+		field_6_sheetNumber = other.field_6_sheetNumber;
+		field_11_nameIsMultibyte = other.field_11_nameIsMultibyte;
+		field_12_built_in_code = other.field_12_built_in_code;
+		field_12_name_text = other.field_12_name_text;
+		field_13_name_definition = other.field_13_name_definition;
+		field_14_custom_menu_text = other.field_14_custom_menu_text;
+		field_15_description_text = other.field_15_description_text;
+		field_16_help_topic_text = other.field_16_help_topic_text;
+		field_17_status_bar_text = other.field_17_status_bar_text;
+	}
+
 	/**
 	 * Constructor to create a built-in named region
 	 * @param builtin Built-in byte representation for the name record, use the public constants
-	 * @param sheetNumber the sheet which the name applies to 
+	 * @param sheetNumber the sheet which the name applies to
 	 */
 	public NameRecord(byte builtin, int sheetNumber)
 	{
@@ -220,6 +243,7 @@ public final class NameRecord extends ContinuableRecord {
 	public boolean isHiddenName() {
 		return (field_1_option_flag & Option.OPT_HIDDEN_NAME) != 0;
 	}
+
 	public void setHidden(boolean b) {
 		if (b) {
 			field_1_option_flag |= Option.OPT_HIDDEN_NAME;
@@ -276,7 +300,7 @@ public final class NameRecord extends ContinuableRecord {
 
 	/**
 	 * Convenience Function to determine if the name is a built-in name
-	 * 
+	 *
 	 * @return true, if the name is a built-in name
 	 */
 	public boolean isBuiltInName()
@@ -398,7 +422,7 @@ public final class NameRecord extends ContinuableRecord {
 		return nChars;
 	}
 
-	protected int getDataSize() {
+	int getDataSize() {
 		return 13 // 3 shorts + 7 bytes
 			+ getNameRawSize()
 			+ field_14_custom_menu_text.length()
@@ -534,37 +558,6 @@ public final class NameRecord extends ContinuableRecord {
 	  3B 00 00 07 00 07 00 00 00 FF 00 ]
 	 */
 
-	@Override
-    public String toString() {
-		StringBuffer sb = new StringBuffer();
-
-		sb.append("[NAME]\n");
-		sb.append("    .option flags           = ").append(HexDump.shortToHex(field_1_option_flag)).append("\n");
-		sb.append("    .keyboard shortcut      = ").append(HexDump.byteToHex(field_2_keyboard_shortcut)).append("\n");
-		sb.append("    .length of the name     = ").append(getNameTextLength()).append("\n");
-		sb.append("    .extSheetIx(1-based, 0=Global)= ").append( field_5_externSheetIndex_plus1 ).append("\n");
-		sb.append("    .sheetTabIx             = ").append(field_6_sheetNumber ).append("\n");
-		sb.append("    .Menu text length       = ").append(field_14_custom_menu_text.length()).append("\n");
-		sb.append("    .Description text length= ").append(field_15_description_text.length()).append("\n");
-		sb.append("    .Help topic text length = ").append(field_16_help_topic_text.length()).append("\n");
-		sb.append("    .Status bar text length = ").append(field_17_status_bar_text.length()).append("\n");
-		sb.append("    .NameIsMultibyte        = ").append(field_11_nameIsMultibyte).append("\n");
-		sb.append("    .Name (Unicode text)    = ").append( getNameText() ).append("\n");
-		Ptg[] ptgs = field_13_name_definition.getTokens();
-		sb.append("    .Formula (nTokens=").append(ptgs.length).append("):") .append("\n");
-		for (Ptg ptg : ptgs) {
-			sb.append("       " + ptg).append(ptg.getRVAType()).append("\n");
-		}
-
-		sb.append("    .Menu text       = ").append(field_14_custom_menu_text).append("\n");
-		sb.append("    .Description text= ").append(field_15_description_text).append("\n");
-		sb.append("    .Help topic text = ").append(field_16_help_topic_text).append("\n");
-		sb.append("    .Status bar text = ").append(field_17_status_bar_text).append("\n");
-		sb.append("[/NAME]\n");
-
-		return sb.toString();
-	}
-
 	/**Creates a human readable name for built in types
 	 * @return Unknown if the built-in name cannot be translated
 	 */
@@ -589,5 +582,35 @@ public final class NameRecord extends ContinuableRecord {
 		}
 
 		return "Unknown";
+	}
+
+	@Override
+	public NameRecord copy() {
+		return new NameRecord(this);
+	}
+
+	@Override
+	public HSSFRecordTypes getGenericRecordType() {
+		return HSSFRecordTypes.NAME;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		final Map<String,Supplier<?>> m = new LinkedHashMap<>();
+		m.put("dataSize", this::getDataSize);
+		m.put("optionFlag", this::getOptionFlag);
+		m.put("keyboardShortcut", this::getKeyboardShortcut);
+		m.put("externSheetIndex", () -> field_5_externSheetIndex_plus1);
+		m.put("sheetNumber", this::getSheetNumber);
+		m.put("nameIsMultibyte", () -> field_11_nameIsMultibyte);
+		m.put("builtInName", this::getBuiltInName);
+		m.put("nameLength", this::getNameTextLength);
+		m.put("nameText", this::getNameText);
+		m.put("formula", this::getNameDefinition);
+		m.put("customMenuText", this::getCustomMenuText);
+		m.put("descriptionText", this::getDescriptionText);
+		m.put("helpTopicText", this::getHelpTopicText);
+		m.put("statusBarText", this::getStatusBarText);
+		return Collections.unmodifiableMap(m);
 	}
 }

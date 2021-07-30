@@ -42,7 +42,7 @@ public final class Mode implements Function {
 	 * Double.NaN. Else returns the value that occurs most times and if there is
 	 * a tie, returns the first such value.
 	 *
-	 * @param v
+	 * @param v An array of values on which the mode is computed.
 	 */
 	public static double evaluate(double[] v) throws EvaluationException {
 		if (v.length < 2) {
@@ -76,9 +76,9 @@ public final class Mode implements Function {
 	public ValueEval evaluate(ValueEval[] args, int srcCellRow, int srcCellCol) {
 		double result;
 		try {
-			List<Double> temp = new ArrayList<Double>();
-			for (int i = 0; i < args.length; i++) {
-				collectValues(args[i], temp);
+			List<Double> temp = new ArrayList<>();
+			for (ValueEval arg : args) {
+				collectValues(arg, temp);
 			}
 			double[] values = new double[temp.size()];
 			for (int i = 0; i < values.length; i++) {
@@ -129,7 +129,7 @@ public final class Mode implements Function {
 			return;
 		}
 		if (arg instanceof NumberEval) {
-			temp.add(new Double(((NumberEval) arg).getNumberValue()));
+			temp.add(Double.valueOf(((NumberEval) arg).getNumberValue()));
 			return;
 		}
 		throw new RuntimeException("Unexpected value type (" + arg.getClass().getName() + ")");

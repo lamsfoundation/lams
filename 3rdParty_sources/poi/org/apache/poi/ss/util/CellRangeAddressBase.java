@@ -18,10 +18,17 @@
 package org.apache.poi.ss.util;
 
 import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.function.Supplier;
 
+import org.apache.poi.common.Duplicatable;
+import org.apache.poi.common.usermodel.GenericRecord;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.util.GenericRecordUtil;
 
 
 /**
@@ -29,13 +36,13 @@ import org.apache.poi.ss.usermodel.Cell;
  *
  * Common superclass of 8-bit and 16-bit versions
  */
-public abstract class CellRangeAddressBase {
+public abstract class CellRangeAddressBase implements Iterable<CellAddress>, Duplicatable, GenericRecord {
 
     /**
      * Indicates a cell or range is in the given relative position in a range.
      * More than one of these may apply at once.
      */
-    public static enum CellPosition {
+    public enum CellPosition {
         /** range starting rows are equal */
         TOP,
         /** range ending rows are equal */
@@ -133,7 +140,7 @@ public abstract class CellRangeAddressBase {
 	}
 
 	/**
-	 * Determines if the given coordinates lie within the bounds 
+	 * Determines if the given coordinates lie within the bounds
 	 * of this range.
 	 *
 	 * @param rowInd The row, 0-based.
@@ -145,11 +152,11 @@ public abstract class CellRangeAddressBase {
 		return _firstRow <= rowInd && rowInd <= _lastRow && //containsRow
 				_firstCol <= colInd && colInd <= _lastCol; //containsColumn
 	}
-	
+
     /**
-     * Determines if the given {@link CellReference} lies within the bounds 
-     * of this range.  
-     * <p>NOTE: It is up to the caller to ensure the reference is 
+     * Determines if the given {@link CellReference} lies within the bounds
+     * of this range.
+     * <p>NOTE: It is up to the caller to ensure the reference is
      * for the correct sheet, since this instance doesn't have a sheet reference.
      *
      * @param ref the CellReference to check
@@ -159,11 +166,25 @@ public abstract class CellRangeAddressBase {
 	public boolean isInRange(CellReference ref) {
 	    return isInRange(ref.getRow(), ref.getCol());
 	}
-	
+
+    /**
+     * Determines if the given {@link CellAddress} lies within the bounds
+     * of this range.
+     * <p>NOTE: It is up to the caller to ensure the reference is
+     * for the correct sheet, since this instance doesn't have a sheet reference.
+     *
+     * @param ref the CellAddress to check
+     * @return True if the reference lies within the bounds, false otherwise.
+     * @see #intersects(CellRangeAddressBase) for checking if two ranges overlap
+     */
+    public boolean isInRange(CellAddress ref) {
+        return isInRange(ref.getRow(), ref.getColumn());
+    }
+
 	/**
-	 * Determines if the given {@link Cell} lies within the bounds 
-	 * of this range.  
-	 * <p>NOTE: It is up to the caller to ensure the reference is 
+	 * Determines if the given {@link Cell} lies within the bounds
+	 * of this range.
+	 * <p>NOTE: It is up to the caller to ensure the reference is
 	 * for the correct sheet, since this instance doesn't have a sheet reference.
 	 *
 	 * @param cell the Cell to check
@@ -173,7 +194,7 @@ public abstract class CellRangeAddressBase {
 	public boolean isInRange(Cell cell) {
 	    return isInRange(cell.getRowIndex(), cell.getColumnIndex());
 	}
-	
+
 	/**
 	 * Check if the row is in the specified cell range
 	 *
@@ -183,7 +204,7 @@ public abstract class CellRangeAddressBase {
 	public boolean containsRow(int rowInd) {
 		return _firstRow <= rowInd && rowInd <= _lastRow;
 	}
-	
+
 	/**
 	 * Check if the column is in the specified cell range
 	 *
@@ -193,7 +214,7 @@ public abstract class CellRangeAddressBase {
 	public boolean containsColumn(int colInd) {
 		return _firstCol <= colInd && colInd <= _lastCol;
 	}
-	
+
 	/**
 	 * Determines whether or not this CellRangeAddress and the specified CellRangeAddress intersect.
 	 *
@@ -207,7 +228,7 @@ public abstract class CellRangeAddressBase {
 				other._firstRow <= this._lastRow &&
 				other._firstCol <= this._lastCol;
 	}
-	
+
 	/**
 	 * Useful for logic like table/range styling, where some elements apply based on relative position in a range.
 	 * @param rowInd
@@ -226,10 +247,10 @@ public abstract class CellRangeAddressBase {
 	    if (rowInd == getLastRow()) positions.add(CellPosition.BOTTOM);
 	    if (colInd == getFirstColumn()) positions.add(CellPosition.LEFT);
 	    if (colInd == getLastColumn()) positions.add(CellPosition.RIGHT);
-	    
+
 	    return positions;
 	}
-	
+
 	/**
 	 * @param firstCol column number for the upper left hand corner
 	 */
@@ -264,13 +285,70 @@ public abstract class CellRangeAddressBase {
 		return (_lastRow - _firstRow + 1) * (_lastCol - _firstCol + 1);
 	}
 
+	/**
+	 * Returns an iterator over the CellAddresses in this cell range in row-major order.
+	 * @since POI 4.0.0
+	 */
 	@Override
-    public final String toString() {
-		CellReference crA = new CellReference(_firstRow, _firstCol);
-		CellReference crB = new CellReference(_lastRow, _lastCol);
+	public Iterator<CellAddress> iterator() {
+		return new RowMajorCellAddressIterator(this);
+	}
+
+	/**
+	 *  Iterates over the cell addresses in a cell range in row major order
+	 *
+	 *  The iterator is unaffected by changes to the CellRangeAddressBase instance
+	 *  after the iterator is created.
+	 */
+	private static class RowMajorCellAddressIterator implements Iterator<CellAddress> {
+		private final int firstRow, firstCol, lastRow, lastCol;
+		private int r, c;
+
+		public RowMajorCellAddressIterator(CellRangeAddressBase ref) {
+			r = firstRow = ref.getFirstRow();
+			c = firstCol = ref.getFirstColumn();
+			lastRow = ref.getLastRow();
+			lastCol = ref.getLastColumn();
+
+			// whole row and whole column ranges currently not supported
+			if (firstRow < 0) throw new IllegalStateException("First row cannot be negative.");
+			if (firstCol < 0) throw new IllegalStateException("First column cannot be negative.");
+
+			// avoid infinite iteration
+			if (firstRow > lastRow) throw new IllegalStateException("First row cannot be greater than last row.");
+			if (firstCol > lastCol) throw new IllegalStateException("First column cannot be greater than last column.");
+		}
+
+		@Override
+		public boolean hasNext() {
+			return r <= lastRow && c <= lastCol;
+		}
+
+		@Override
+		public CellAddress next() {
+			if (hasNext()) {
+				final CellAddress addr = new CellAddress(r, c);
+				// row major order
+				if (c < lastCol) {
+					c++;
+				}
+				else { //c >= lastCol, end of row reached
+					c = firstCol; //CR
+					r++;		  //LF
+				}
+				return addr;
+			}
+			throw new NoSuchElementException();
+		}
+	}
+
+	@Override
+	public final String toString() {
+		CellAddress crA = new CellAddress(_firstRow, _firstCol);
+		CellAddress crB = new CellAddress(_lastRow, _lastCol);
 		return getClass().getName() + " [" + crA.formatAsString() + ":" + crB.formatAsString() +"]";
 	}
-	
+
 	// In case _firstRow > _lastRow or _firstCol > _lastCol
 	protected int getMinRow() {
 		return Math.min(_firstRow, _lastRow);
@@ -284,7 +362,7 @@ public abstract class CellRangeAddressBase {
 	protected int getMaxColumn() {
 		return Math.max(_firstCol, _lastCol);
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		if (other instanceof CellRangeAddressBase) {
@@ -296,13 +374,22 @@ public abstract class CellRangeAddressBase {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
-		int code = (getMinColumn() +
-		(getMaxColumn() << 8) +
-		(getMinRow() << 16) +
-		(getMaxRow() << 24));
-		return code;
+        return (getMinColumn() +
+        (getMaxColumn() << 8) +
+        (getMinRow() << 16) +
+        (getMaxRow() << 24));
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"firstRow", this::getFirstRow,
+			"firstCol", this::getFirstColumn,
+			"lastRow", this::getLastRow,
+			"lastCol", this::getLastColumn
+		);
 	}
 }

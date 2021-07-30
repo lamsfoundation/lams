@@ -27,23 +27,26 @@ import org.apache.poi.hssf.record.InterfaceHdrRecord;
 import org.apache.poi.poifs.crypt.ChunkedCipherInputStream;
 import org.apache.poi.poifs.crypt.Decryptor;
 import org.apache.poi.poifs.crypt.EncryptionInfo;
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.LittleEndian;
 import org.apache.poi.util.LittleEndianConsts;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.RecordFormatException;
+import org.apache.poi.util.SuppressForbidden;
 
 public final class Biff8DecryptingStream implements BiffHeaderInput, LittleEndianInput {
 
     public static final int RC4_REKEYING_INTERVAL = 1024;
+    //arbitrarily selected; may need to increase
+    private static final int MAX_RECORD_LENGTH = 100_000;
 
-    private final EncryptionInfo info;
     private ChunkedCipherInputStream ccis;
-    private final byte buffer[] = new byte[LittleEndianConsts.LONG_SIZE];
-    private boolean shouldSkipEncryptionOnCurrentRecord = false;
+    private final byte[] buffer = new byte[LittleEndianConsts.LONG_SIZE];
+    private boolean shouldSkipEncryptionOnCurrentRecord;
 
 	public Biff8DecryptingStream(InputStream in, int initialOffset, EncryptionInfo info) throws RecordFormatException {
         try {
-    	    byte initialBuf[] = new byte[initialOffset];
+            byte[] initialBuf = IOUtils.safelyAllocate(initialOffset, MAX_RECORD_LENGTH);
     	    InputStream stream;
     	    if (initialOffset == 0) {
     	        stream = in;
@@ -51,9 +54,8 @@ public final class Biff8DecryptingStream implements BiffHeaderInput, LittleEndia
     	        stream = new PushbackInputStream(in, initialOffset);
     	        ((PushbackInputStream)stream).unread(initialBuf);
     	    }
-    	    
-            this.info = info;
-            Decryptor dec = this.info.getDecryptor();
+
+            Decryptor dec = info.getDecryptor();
             dec.setChunkSize(RC4_REKEYING_INTERVAL);
             ccis = (ChunkedCipherInputStream)dec.getDataStream(stream, Integer.MAX_VALUE, 0);
             
@@ -66,6 +68,7 @@ public final class Biff8DecryptingStream implements BiffHeaderInput, LittleEndia
 	}
 
 	@Override
+    @SuppressForbidden("just delegating")
     public int available() {
 		return ccis.available();
 	}
@@ -204,7 +207,7 @@ public final class Biff8DecryptingStream implements BiffHeaderInput, LittleEndia
     }
 
     @Override
-    public void readPlain(byte b[], int off, int len) {
+    public void readPlain(byte[] b, int off, int len) {
         ccis.readPlain(b, off, len);
     }
 

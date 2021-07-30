@@ -14,24 +14,25 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-
 package org.apache.poi.util;
 
-
-
 /**
- * A logger class that strives to make it as easy as possible for
- * developers to write log calls, while simultaneously making those
- * calls as cheap as possible by performing lazy evaluation of the log
- * message.
+ * An implementation of the {@link POILogger} which uses System.out.println.
+ *
+ * This can be used to provide simply output from applications, however the
+ * suggested approach in production systems is to use the {@link CommonsLogger}
+ * and configure proper log-handling via Apache Commons Logging.
  */
-public class SystemOutLogger extends POILogger
-{
+public class SystemOutLogger implements POILogger {
+    /**
+     * Short strings for numeric log level. Use level as array index.
+     */
+    private static final String LEVEL_STRINGS_SHORT = "?D?I?W?E?F?";
+
     private String _cat;
 
     @Override
-    public void initialize(final String cat)
-    {
+    public void initialize(final String cat) {
        this._cat=cat;
     }
 
@@ -42,8 +43,7 @@ public class SystemOutLogger extends POILogger
      * @param obj1 The object to log.
      */
     @Override
-    protected void _log(final int level, final Object obj1)
-    {
+    public void _log(final int level, final Object obj1) {
     	_log(level, obj1, null);
     }
 
@@ -56,13 +56,18 @@ public class SystemOutLogger extends POILogger
      */
     @Override
     @SuppressForbidden("uses printStackTrace")
-    protected void _log(final int level, final Object obj1,
-                    final Throwable exception) {
-        if (check(level)) {
-            System.out.println("[" + _cat + "]" + LEVEL_STRINGS_SHORT[Math.min(LEVEL_STRINGS_SHORT.length-1, level)] + " " + obj1);
-            if (exception != null) {
-            	exception.printStackTrace(System.out);
-            }
+    public void _log(final int level, final Object obj1, final Throwable exception) {
+        if (!check(level)) {
+            return;
+        }
+        System.out.print("[");
+        System.out.print(_cat);
+        System.out.print("]");
+        System.out.print(LEVEL_STRINGS_SHORT.charAt(Math.min(LEVEL_STRINGS_SHORT.length()-1, level)));
+        System.out.print(" ");
+        System.out.println(obj1);
+        if (exception != null) {
+            exception.printStackTrace(System.out);
         }
     }
 
@@ -77,8 +82,7 @@ public class SystemOutLogger extends POILogger
      * @see #FATAL
      */
     @Override
-    public boolean check(final int level)
-    {
+    public boolean check(final int level) {
         int currentLevel;
         try {
             currentLevel = Integer.parseInt(System.getProperty("poi.log.level", WARN + ""));
@@ -88,7 +92,5 @@ public class SystemOutLogger extends POILogger
 
         return level >= currentLevel;
     }
-
-
-}   // end package scope class POILogger
+}
 

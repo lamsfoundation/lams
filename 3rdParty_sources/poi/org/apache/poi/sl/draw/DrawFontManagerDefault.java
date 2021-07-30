@@ -21,10 +21,16 @@ package org.apache.poi.sl.draw;
 
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
+import org.apache.poi.common.usermodel.fonts.FontCharset;
 import org.apache.poi.common.usermodel.fonts.FontInfo;
 import org.apache.poi.sl.draw.Drawable.DrawableHint;
+import org.apache.poi.util.StringUtil;
 
 /**
  * Manages fonts when rendering slides.
@@ -32,6 +38,14 @@ import org.apache.poi.sl.draw.Drawable.DrawableHint;
  * Use this class to handle unknown / missing fonts or to substitute fonts
  */
 public class DrawFontManagerDefault implements DrawFontManager {
+
+    protected final Set<String> knownSymbolFonts = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+
+    public DrawFontManagerDefault() {
+        knownSymbolFonts.add("Wingdings");
+        knownSymbolFonts.add("Symbol");
+        // knownSymbolFonts.add("Monotype Sorts");
+    }
 
     @Override
     public FontInfo getMappedFont(Graphics2D graphics, FontInfo fontInfo) {
@@ -47,27 +61,36 @@ public class DrawFontManagerDefault implements DrawFontManager {
         return fi;
     }
 
+    /**
+     * Symbol fonts like "Wingdings" or "Symbol" have glyphs mapped to a Unicode private use range via the Java font loader,
+     * although a system font viewer might show you the glyphs in the ASCII range.
+     * This maps the chars of the text string to the corresponding private use range chars.
+     *
+     * @param graphics the used graphics context
+     * @param fontInfo the font info
+     * @param text the input string
+     *
+     * @return the mapped string, typically consists of chars in the range of 0xf000 to 0xf0ff
+     *
+     * @since POI 4.0.0
+     */
+    @Override
     public String mapFontCharset(Graphics2D graphics, FontInfo fontInfo, String text) {
-        // TODO: find a real charset mapping solution instead of hard coding for Wingdings
-        String attStr = text;
-        if (fontInfo != null && "Wingdings".equalsIgnoreCase(fontInfo.getTypeface())) {
-            // wingdings doesn't contain high-surrogates, so chars are ok
-            boolean changed = false;
-            char chrs[] = attStr.toCharArray();
-            for (int i=0; i<chrs.length; i++) {
-                // only change valid chars
-                if ((0x20 <= chrs[i] && chrs[i] <= 0x7f) ||
-                    (0xa0 <= chrs[i] && chrs[i] <= 0xff)) {
-                    chrs[i] |= 0xf000;
-                    changed = true;
-                }
-            }
-
-            if (changed) {
-                attStr = new String(chrs);
-            }
+        if (fontInfo == null || text == null || text.isEmpty()) {
+            return text;
         }
-        return attStr;
+
+        String typeface = fontInfo.getTypeface();
+        if (fontInfo.getCharset() == FontCharset.SYMBOL || knownSymbolFonts.contains(typeface)) {
+            int[] cps = text.codePoints().map(DrawFontManagerDefault::mapSymbolChar).toArray();
+            String ret = new String(cps, 0, cps.length);
+
+            String[] allFonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+            boolean hasFont = Arrays.asList(allFonts).contains(typeface);
+            return hasFont ? ret : StringUtil.mapMsCodepointString(ret);
+        }
+
+        return text;
     }
 
     @Override
@@ -87,7 +110,7 @@ public class DrawFontManagerDefault implements DrawFontManager {
         if (fontMap == null) {
             return fontInfo;
         }
-        
+
         String f = (fontInfo != null) ? fontInfo.getTypeface() : null;
         String mappedTypeface = null;
         if (fontMap.containsKey(f)) {
@@ -97,5 +120,10 @@ public class DrawFontManagerDefault implements DrawFontManager {
         }
 
         return (mappedTypeface != null) ? new DrawFontInfo(mappedTypeface) : fontInfo;
+    }
+
+
+    private static int mapSymbolChar(int cp) {
+        return ((0x20 <= cp && cp <= 0x7f) || (0xa0 <= cp && cp <= 0xff)) ? cp | 0xf000 : cp;
     }
 }

@@ -27,6 +27,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 
 import org.apache.poi.util.LocaleUtil;
+import org.apache.poi.util.StringUtil;
 
 /**
  * Formats a date value.
@@ -41,7 +42,7 @@ public class CellDateFormatter extends CellFormatter {
     private final Calendar EXCEL_EPOCH_CAL =
         LocaleUtil.getLocaleCalendar(1904, 0, 1);
 
-    private static /* final */ CellDateFormatter SIMPLE_DATE = null;
+    private static /* final */ CellDateFormatter SIMPLE_DATE;
 
     private class DatePartHandler implements CellFormatPart.PartHandler {
         private int mStart = -1;
@@ -49,6 +50,7 @@ public class CellDateFormatter extends CellFormatter {
         private int hStart = -1;
         private int hLen;
 
+        @Override
         public String handlePart(Matcher m, String part, CellFormatType type,
                 StringBuffer desc) {
 
@@ -110,9 +112,9 @@ public class CellDateFormatter extends CellFormatter {
                     // am/pm marker
                     mStart = -1;
                     showAmPm = true;
-                    showM = Character.toLowerCase(part.charAt(1)) == 'm';
+                    showM = StringUtil.toLowerCase(part.charAt(1)).equals("m");
                     // For some reason "am/pm" becomes AM or PM, but "a/p" becomes a or p
-                    amPmUpper = showM || Character.isUpperCase(part.charAt(0));
+                    amPmUpper = showM || StringUtil.isUpperCase(part.charAt(0));
 
                     return "a";
                 }
@@ -161,7 +163,7 @@ public class CellDateFormatter extends CellFormatter {
     }
 
     /** {@inheritDoc} */
-    public void formatValue(StringBuffer toAppendTo, Object value) {
+    public synchronized void formatValue(StringBuffer toAppendTo, Object value) {
         if (value == null)
             value = 0.0;
         if (value instanceof Number) {
@@ -181,7 +183,6 @@ public class CellDateFormatter extends CellFormatter {
         boolean doneAm = false;
         boolean doneMillis = false;
 
-        it.first();
         for (char ch = it.first();
              ch != CharacterIterator.DONE;
              ch = it.next()) {
@@ -189,12 +190,9 @@ public class CellDateFormatter extends CellFormatter {
                 if (!doneMillis) {
                     Date dateObj = (Date) value;
                     int pos = toAppendTo.length();
-                    Formatter formatter = new Formatter(toAppendTo, Locale.ROOT);
-                    try {
+                    try (Formatter formatter = new Formatter(toAppendTo, Locale.ROOT)) {
                         long msecs = dateObj.getTime() % 1000;
                         formatter.format(locale, sFmt, msecs / 1000.0);
-                    } finally {
-                        formatter.close();
                     }
                     toAppendTo.delete(pos, pos + 2);
                     doneMillis = true;
@@ -203,11 +201,11 @@ public class CellDateFormatter extends CellFormatter {
                 if (!doneAm) {
                     if (showAmPm) {
                         if (amPmUpper) {
-                            toAppendTo.append(Character.toUpperCase(ch));
+                            toAppendTo.append(StringUtil.toUpperCase(ch));
                             if (showM)
                                 toAppendTo.append('M');
                         } else {
-                            toAppendTo.append(Character.toLowerCase(ch));
+                            toAppendTo.append(StringUtil.toLowerCase(ch));
                             if (showM)
                                 toAppendTo.append('m');
                         }

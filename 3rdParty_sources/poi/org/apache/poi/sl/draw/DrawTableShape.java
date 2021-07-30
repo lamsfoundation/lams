@@ -17,6 +17,8 @@
 
 package org.apache.poi.sl.draw;
 
+import static org.apache.poi.sl.draw.DrawPaint.fillPaintWorkaround;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
@@ -83,8 +85,8 @@ public class DrawTableShape extends DrawShape {
                 Paint fillPaint = drawPaint.getPaint(graphics, tc.getFillStyle().getPaint());
                 graphics.setPaint(fillPaint);
                 Rectangle2D cellAnc = tc.getAnchor();
-                graphics.fill(cellAnc);
-                
+                fillPaintWorkaround(graphics, cellAnc);
+
                 for (BorderEdge edge : BorderEdge.values()) {
                     StrokeStyle stroke = tc.getBorderStyle(edge);
                     if (stroke == null) {
@@ -163,7 +165,7 @@ public class DrawTableShape extends DrawShape {
         final int rows = table.getNumberOfRows();
         final int cols = table.getNumberOfColumns();
 
-        BorderEdge edges[] = { BorderEdge.top, BorderEdge.left, null, null };
+        BorderEdge[] edges = {BorderEdge.top, BorderEdge.left, null, null};
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 edges[2] = (col == cols - 1) ? BorderEdge.right : null;
@@ -187,7 +189,7 @@ public class DrawTableShape extends DrawShape {
         final int rows = table.getNumberOfRows();
         final int cols = table.getNumberOfColumns();
 
-        BorderEdge edges[] = new BorderEdge[4];
+        BorderEdge[] edges = new BorderEdge[4];
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 edges[0] = (col == 0) ? BorderEdge.left : null;
@@ -213,7 +215,7 @@ public class DrawTableShape extends DrawShape {
         final int rows = table.getNumberOfRows();
         final int cols = table.getNumberOfColumns();
 
-        BorderEdge edges[] = new BorderEdge[2];
+        BorderEdge[] edges = new BorderEdge[2];
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 edges[0] = (col > 0 && col < cols - 1) ? BorderEdge.right : null;
@@ -230,7 +232,7 @@ public class DrawTableShape extends DrawShape {
      * @param edges the border edges
      * @param args the border attributes
      */
-    private static void setEdges(TableCell<?,?> cell, BorderEdge edges[], Object... args) {
+    private static void setEdges(TableCell<?,?> cell, BorderEdge[] edges, Object... args) {
         if (cell == null) {
             return;
         }

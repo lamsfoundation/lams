@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.util.Set;
 
-import org.apache.poi.hssf.eventusermodel.HSSFUserException;
 import org.apache.poi.hssf.record.*;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
@@ -77,11 +76,8 @@ public class HSSFEventFactory {
             name = WORKBOOK_DIR_ENTRY_NAMES[0];
         }
 
-        InputStream in = dir.createDocumentInputStream(name);
-        try {
+        try (InputStream in = dir.createDocumentInputStream(name)) {
             processEvents(req, in);
-        } finally {
-            in.close();
         }
     }
 
@@ -112,12 +108,9 @@ public class HSSFEventFactory {
 	 */
 	public short abortableProcessWorkbookEvents(HSSFRequest req, DirectoryNode dir)
 		throws IOException, HSSFUserException {
-		InputStream in = dir.createDocumentInputStream("Workbook");
-		try {
-		    return abortableProcessEvents(req, in);
-		} finally {
-		    in.close();
-		}
+        try (InputStream in = dir.createDocumentInputStream("Workbook")) {
+            return abortableProcessEvents(req, in);
+        }
 	}
 
 	/**
@@ -172,7 +165,7 @@ public class HSSFEventFactory {
 
 		// Process each record as they come in
 		while(true) {
-			Record r = recordStream.nextRecord();
+			org.apache.poi.hssf.record.Record r = recordStream.nextRecord();
 			if(r == null) {
 				break;
 			}

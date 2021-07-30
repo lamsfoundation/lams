@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.poi.util.CodePageUtil;
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.Internal;
 import org.apache.poi.util.LittleEndian;
 import org.apache.poi.util.LittleEndianByteArrayInputStream;
@@ -30,17 +31,17 @@ import org.apache.poi.util.POILogger;
 import org.apache.poi.util.StringUtil;
 
 @Internal
-class UnicodeString {
+public class UnicodeString {
     private static final POILogger LOG = POILogFactory.getLogger( UnicodeString.class );
+    //arbitrarily selected; may need to increase
+    private static final int MAX_RECORD_LENGTH = 100_000;
 
     private byte[] _value;
-    
-    UnicodeString() {}
 
-    void read(LittleEndianByteArrayInputStream lei) {
+    public void read(LittleEndianByteArrayInputStream lei) {
         final int length = lei.readInt();
         final int unicodeBytes = length*2;
-        _value = new byte[unicodeBytes];
+        _value = IOUtils.safelyAllocate(unicodeBytes, MAX_RECORD_LENGTH);
         
         // If Length is zero, this field MUST be zero bytes in length. If Length is
         // nonzero, this field MUST be a null-terminated array of 16-bit Unicode characters, followed by
@@ -63,11 +64,11 @@ class UnicodeString {
         TypedPropertyValue.skipPadding(lei);
     }
     
-    byte[] getValue() {
+    public byte[] getValue() {
         return _value;
     }
 
-    String toJavaString() {
+    public String toJavaString() {
         if ( _value.length == 0 ) {
             return null;
         }
@@ -77,7 +78,7 @@ class UnicodeString {
         final int terminator = result.indexOf( '\0' );
         if ( terminator == -1 ) {
             String msg =
-                "String terminator (\\0) for UnicodeString property value not found."+
+                "String terminator (\\0) for UnicodeString property value not found. " +
                 "Continue without trimming and hope for the best.";
             LOG.log(POILogger.WARN, msg);
             return result;
@@ -85,18 +86,18 @@ class UnicodeString {
         
         if ( terminator != result.length() - 1 ) {
             String msg =
-                "String terminator (\\0) for UnicodeString property value occured before the end of string. "+
+                "String terminator (\\0) for UnicodeString property value occured before the end of string. " +
                 "Trimming and hope for the best.";
             LOG.log(POILogger.WARN, msg);
         }
         return result.substring( 0, terminator );
     }
 
-    void setJavaValue( String string ) throws UnsupportedEncodingException {
+    public void setJavaValue( String string ) throws UnsupportedEncodingException {
         _value = CodePageUtil.getBytesInCodePage(string + "\0", CodePageUtil.CP_UNICODE);
     }
 
-    int write( OutputStream out ) throws IOException {
+    public int write( OutputStream out ) throws IOException {
         LittleEndian.putUInt( _value.length / 2, out );
         out.write( _value );
         return LittleEndianConsts.INT_SIZE + _value.length;

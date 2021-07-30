@@ -17,7 +17,10 @@
 
 package org.apache.poi.hssf.record;
 
-import org.apache.poi.util.HexDump;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 import org.apache.poi.util.StringUtil;
 
@@ -26,16 +29,26 @@ import org.apache.poi.util.StringUtil;
  */
 public final class TableStylesRecord extends StandardRecord {
 	public static final short sid = 0x088E;
-	
+
 	private int rt;
 	private int grbitFrt;
-	private byte[] unused = new byte[8];
+	private final byte[] unused = new byte[8];
 	private int cts;
-	
+
 	private String rgchDefListStyle;
 	private String rgchDefPivotStyle;
-	
-	
+
+
+	public TableStylesRecord(TableStylesRecord other) {
+		super(other);
+		rt = other.rt;
+		grbitFrt = other.grbitFrt;
+		System.arraycopy(other.unused, 0, unused, 0, unused.length);
+		cts = other.cts;
+		rgchDefListStyle = other.rgchDefListStyle;
+		rgchDefPivotStyle = other.rgchDefPivotStyle;
+	}
+
 	public TableStylesRecord(RecordInputStream in) {
 		rt = in.readUShort();
 		grbitFrt = in.readUShort();
@@ -43,21 +56,21 @@ public final class TableStylesRecord extends StandardRecord {
 		cts = in.readInt();
 		int cchDefListStyle = in.readUShort();
 		int cchDefPivotStyle = in.readUShort();
-		
+
 		rgchDefListStyle = in.readUnicodeLEString(cchDefListStyle);
 		rgchDefPivotStyle = in.readUnicodeLEString(cchDefPivotStyle);
 	}
-	
+
 	@Override
 	protected void serialize(LittleEndianOutput out) {
 		out.writeShort(rt);
 		out.writeShort(grbitFrt);
 		out.write(unused);
 		out.writeInt(cts);
-		
+
 		out.writeShort(rgchDefListStyle.length());
 		out.writeShort(rgchDefPivotStyle.length());
-		
+
 		StringUtil.putUnicodeLE(rgchDefListStyle, out);
 		StringUtil.putUnicodeLE(rgchDefPivotStyle, out);
 	}
@@ -73,20 +86,25 @@ public final class TableStylesRecord extends StandardRecord {
 		return sid;
 	}
 
+	@Override
+	public TableStylesRecord copy() {
+		return new TableStylesRecord(this);
+	}
 
 	@Override
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
+	public HSSFRecordTypes getGenericRecordType() {
+		return HSSFRecordTypes.TABLE_STYLES;
+	}
 
-		buffer.append("[TABLESTYLES]\n");
-		buffer.append("    .rt      =").append(HexDump.shortToHex(rt)).append('\n');
-		buffer.append("    .grbitFrt=").append(HexDump.shortToHex(grbitFrt)).append('\n');
-		buffer.append("    .unused  =").append(HexDump.toHex(unused)).append('\n');
-		buffer.append("    .cts=").append(HexDump.intToHex(cts)).append('\n');
-		buffer.append("    .rgchDefListStyle=").append(rgchDefListStyle).append('\n');
-		buffer.append("    .rgchDefPivotStyle=").append(rgchDefPivotStyle).append('\n');
-
-		buffer.append("[/TABLESTYLES]\n");
-		return buffer.toString();
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"rt", () -> rt,
+			"grbitFrt", () -> grbitFrt,
+			"unused", () -> unused,
+			"cts", () -> cts,
+			"rgchDefListStyle", () -> rgchDefListStyle,
+			"rgchDefPivotStyle", () -> rgchDefPivotStyle
+		);
 	}
 }

@@ -16,19 +16,25 @@
 ==================================================================== */
 package org.apache.poi.poifs.crypt;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.util.Removal;
+import org.apache.poi.common.Duplicatable;
+import org.apache.poi.common.usermodel.GenericRecord;
 
 /**
  * Reads and processes OOXML Encryption Headers
  * The constants are largely based on ZIP constants.
  */
-public abstract class EncryptionHeader implements Cloneable {
+public abstract class EncryptionHeader implements GenericRecord, Duplicatable {
     public static final int ALGORITHM_RC4 = CipherAlgorithm.rc4.ecmaId;
     public static final int ALGORITHM_AES_128 = CipherAlgorithm.aes128.ecmaId;
     public static final int ALGORITHM_AES_192 = CipherAlgorithm.aes192.ecmaId;
     public static final int ALGORITHM_AES_256 = CipherAlgorithm.aes256.ecmaId;
-    
+
     public static final int HASH_NONE   = HashAlgorithm.none.ecmaId;
     public static final int HASH_SHA1   = HashAlgorithm.sha1.ecmaId;
     public static final int HASH_SHA256 = HashAlgorithm.sha256.ecmaId;
@@ -41,7 +47,7 @@ public abstract class EncryptionHeader implements Cloneable {
     public static final int MODE_ECB = ChainingMode.ecb.ecmaId;
     public static final int MODE_CBC = ChainingMode.cbc.ecmaId;
     public static final int MODE_CFB = ChainingMode.cfb.ecmaId;
-    
+
     private int flags;
     private int sizeExtra;
     private CipherAlgorithm cipherAlgorithm;
@@ -52,13 +58,26 @@ public abstract class EncryptionHeader implements Cloneable {
     private ChainingMode chainingMode;
     private byte[] keySalt;
     private String cspName;
-    
+
     protected EncryptionHeader() {}
+
+    protected EncryptionHeader(EncryptionHeader other) {
+        flags = other.flags;
+        sizeExtra = other.sizeExtra;
+        cipherAlgorithm = other.cipherAlgorithm;
+        hashAlgorithm = other.hashAlgorithm;
+        keyBits = other.keyBits;
+        blockSize = other.blockSize;
+        providerType = other.providerType;
+        chainingMode = other.chainingMode;
+        keySalt = (other.keySalt == null) ? null : other.keySalt.clone();
+        cspName = other.cspName;
+    }
 
     public ChainingMode getChainingMode() {
         return chainingMode;
     }
-    
+
     protected void setChainingMode(ChainingMode chainingMode) {
         this.chainingMode = chainingMode;
     }
@@ -66,24 +85,24 @@ public abstract class EncryptionHeader implements Cloneable {
     public int getFlags() {
         return flags;
     }
-    
-    protected void setFlags(int flags) {
+
+    public void setFlags(int flags) {
         this.flags = flags;
     }
 
     public int getSizeExtra() {
         return sizeExtra;
     }
-    
-    protected void setSizeExtra(int sizeExtra) {
+
+    public void setSizeExtra(int sizeExtra) {
         this.sizeExtra = sizeExtra;
     }
 
     public CipherAlgorithm getCipherAlgorithm() {
         return cipherAlgorithm;
     }
-    
-    protected void setCipherAlgorithm(CipherAlgorithm cipherAlgorithm) {
+
+    public void setCipherAlgorithm(CipherAlgorithm cipherAlgorithm) {
         this.cipherAlgorithm = cipherAlgorithm;
         if (cipherAlgorithm.allowedKeySize.length == 1) {
             setKeySize(cipherAlgorithm.defaultKeySize);
@@ -93,23 +112,15 @@ public abstract class EncryptionHeader implements Cloneable {
     public HashAlgorithm getHashAlgorithm() {
         return hashAlgorithm;
     }
-    
-    /**
-     * @deprecated POI 3.16 beta 1. use {@link #getHashAlgorithm()}
-     */
-    @Removal(version="3.18")
-    public HashAlgorithm getHashAlgorithmEx() {
-        return hashAlgorithm;
-    }
-    
-    protected void setHashAlgorithm(HashAlgorithm hashAlgorithm) {
+
+    public void setHashAlgorithm(HashAlgorithm hashAlgorithm) {
         this.hashAlgorithm = hashAlgorithm;
     }
 
     public int getKeySize() {
         return keyBits;
     }
-    
+
     /**
      * Sets the keySize (in bits). Before calling this method, make sure
      * to set the cipherAlgorithm, as the amount of keyBits gets validated against
@@ -117,7 +128,7 @@ public abstract class EncryptionHeader implements Cloneable {
      *
      * @param keyBits
      */
-    protected void setKeySize(int keyBits) {
+    public void setKeySize(int keyBits) {
         this.keyBits = keyBits;
         for (int allowedBits : getCipherAlgorithm().allowedKeySize) {
             if (allowedBits == keyBits) {
@@ -130,39 +141,50 @@ public abstract class EncryptionHeader implements Cloneable {
     public int getBlockSize() {
     	return blockSize;
     }
-    
-    protected void setBlockSize(int blockSize) {
+
+    public void setBlockSize(int blockSize) {
         this.blockSize = blockSize;
     }
-    
+
     public byte[] getKeySalt() {
         return keySalt;
     }
-    
-    protected void setKeySalt(byte salt[]) {
+
+    public void setKeySalt(byte[] salt) {
         this.keySalt = (salt == null) ? null : salt.clone();
     }
 
     public CipherProvider getCipherProvider() {
         return providerType;
-    }    
+    }
 
-    protected void setCipherProvider(CipherProvider providerType) {
+    public void setCipherProvider(CipherProvider providerType) {
         this.providerType = providerType;
     }
-    
+
     public String getCspName() {
         return cspName;
     }
-    
-    protected void setCspName(String cspName) {
+
+    public void setCspName(String cspName) {
         this.cspName = cspName;
     }
 
+    public abstract EncryptionHeader copy();
+
     @Override
-    public EncryptionHeader clone() throws CloneNotSupportedException {
-        EncryptionHeader other = (EncryptionHeader)super.clone();
-        other.keySalt = (keySalt == null) ? null : keySalt.clone();
-        return other;
+    public Map<String, Supplier<?>> getGenericProperties() {
+        final Map<String,Supplier<?>> m = new LinkedHashMap<>();
+        m.put("flags", this::getFlags);
+        m.put("sizeExtra", this::getSizeExtra);
+        m.put("cipherAlgorithm", this::getCipherAlgorithm);
+        m.put("hashAlgorithm", this::getHashAlgorithm);
+        m.put("keyBits", this::getKeySize);
+        m.put("blockSize", this::getBlockSize);
+        m.put("providerType", this::getCipherProvider);
+        m.put("chainingMode", this::getChainingMode);
+        m.put("keySalt", this::getKeySalt);
+        m.put("cspName", this::getCspName);
+        return Collections.unmodifiableMap(m);
     }
 }

@@ -18,13 +18,14 @@
 package org.apache.poi.util;
 
 /**
- * A logger class that strives to make it as easy as possible for
- * developers to write log calls, while simultaneously making those
- * calls as cheap as possible by performing lazy evaluation of the log
- * message.<p>
+ * An empty-implementation of the {@link POILogger}.
+ *
+ * This can be used to not log anything, however the suggested approach
+ * in production systems is to use the {@link CommonsLogger} and configure
+ * proper log-handling via Apache Commons Logging.
  */
 @Internal
-public class NullLogger extends POILogger {
+public class NullLogger implements POILogger {
     @Override
     public void initialize(final String cat) {
        // do nothing
@@ -38,7 +39,7 @@ public class NullLogger extends POILogger {
      */
 
     @Override
-    protected void _log(final int level, final Object obj1) {
+    public void _log(final int level, final Object obj1) {
         // do nothing
     }
 
@@ -50,7 +51,7 @@ public class NullLogger extends POILogger {
      * @param exception An exception to be logged
      */
     @Override
-    protected void _log(int level, Object obj1, final Throwable exception) {
+    public void _log(int level, Object obj1, final Throwable exception) {
         // do nothing
     }
 
@@ -66,7 +67,7 @@ public class NullLogger extends POILogger {
         // do nothing
     }
 
-    
+
     /**
      * Check if a logger is enabled to log at the specified level
      *

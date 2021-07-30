@@ -17,6 +17,12 @@
 
 package org.apache.poi.ddf;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.LittleEndian;
 
 /**
@@ -27,11 +33,11 @@ import org.apache.poi.util.LittleEndian;
  *
  * @see EscherChildAnchorRecord
  */
-public class EscherClientAnchorRecord
-        extends EscherRecord
-{
-    public static final short RECORD_ID = (short) 0xF010;
-    public static final String RECORD_DESCRIPTION = "MsofbtClientAnchor";
+public class EscherClientAnchorRecord extends EscherRecord {
+    //arbitrarily selected; may need to increase
+    private static final int MAX_RECORD_LENGTH = 100_000;
+
+    public static final short RECORD_ID = EscherRecordTypes.CLIENT_ANCHOR.typeID;
 
     /**
      * bit[0] -  fMove (1 bit): A bit that specifies whether the shape will be kept intact when the cells are moved.
@@ -51,7 +57,24 @@ public class EscherClientAnchorRecord
     private short field_8_row2;
     private short field_9_dy2;
     private byte[] remainingData = new byte[0];
-    private boolean shortRecord = false;
+    private boolean shortRecord;
+
+    public EscherClientAnchorRecord() {}
+
+    public EscherClientAnchorRecord(EscherClientAnchorRecord other) {
+        super(other);
+        field_1_flag = other.field_1_flag;
+        field_2_col1 = other.field_2_col1;
+        field_3_dx1 = other.field_3_dx1;
+        field_4_row1 = other.field_4_row1;
+        field_5_dy1 = other.field_5_dy1;
+        field_6_col2 = other.field_6_col2;
+        field_7_dx2 = other.field_7_dx2;
+        field_8_row2 = other.field_8_row2;
+        field_9_dy2 = other.field_9_dy2;
+        remainingData = (other.remainingData == null) ? null : other.remainingData.clone();
+        shortRecord = other.shortRecord;
+    }
 
     @Override
     public int fillFields(byte[] data, int offset, EscherRecordFactory recordFactory) {
@@ -83,8 +106,8 @@ public class EscherClientAnchorRecord
             }
         }
         bytesRemaining -= size;
-        remainingData  =  new byte[bytesRemaining];
-        System.arraycopy( data, pos + size, remainingData, 0, bytesRemaining );
+        remainingData  = IOUtils.safelyClone(data, pos + size, bytesRemaining, MAX_RECORD_LENGTH);
+
         return 8 + size + bytesRemaining;
     }
 
@@ -131,7 +154,7 @@ public class EscherClientAnchorRecord
 
     @Override
     public String getRecordName() {
-        return "ClientAnchor";
+        return EscherRecordTypes.CLIENT_ANCHOR.recordName;
     }
 
     /**
@@ -343,18 +366,28 @@ public class EscherClientAnchorRecord
     }
 
     @Override
-    protected Object[][] getAttributeMap() {
-        return new Object[][] {
-            { "Flag", field_1_flag },
-            { "Col1", field_2_col1 },
-            { "DX1", field_3_dx1 },
-            { "Row1", field_4_row1 },
-            { "DY1", field_5_dy1 },
-            { "Col2", field_6_col2 },
-            { "DX2", field_7_dx2 },
-            { "Row2", field_8_row2 },
-            { "DY2", field_9_dy2 },
-            { "Extra Data", remainingData }
-        };
+    public Map<String, Supplier<?>> getGenericProperties() {
+        final Map<String,Supplier<?>> m = new LinkedHashMap<>(super.getGenericProperties());
+        m.put("flag", this::getFlag);
+        m.put("col1", this::getCol1);
+        m.put("dx1", this::getDx1);
+        m.put("row1", this::getRow1);
+        m.put("dy1", this::getDy1);
+        m.put("col2", this::getCol2);
+        m.put("dx2", this::getDx2);
+        m.put("row2", this::getRow2);
+        m.put("dy2", this::getDy2);
+        m.put("remainingData", this::getRemainingData);
+        return Collections.unmodifiableMap(m);
+    }
+
+    @Override
+    public Enum getGenericRecordType() {
+        return EscherRecordTypes.CLIENT_ANCHOR;
+    }
+
+    @Override
+    public EscherClientAnchorRecord copy() {
+        return new EscherClientAnchorRecord(this);
     }
 }

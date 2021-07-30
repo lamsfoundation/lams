@@ -17,10 +17,11 @@
 
 package org.apache.poi.util;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 
 /**
@@ -35,9 +36,9 @@ public class ReplacingInputStream extends FilterInputStream {
 
     // while matching, this is where the bytes go.
     final int[] buf;
-    private int matchedIndex=0;
-    private int unbufferIndex=0;
-    private int replacedIndex=0;
+    private int matchedIndex;
+    private int unbufferIndex;
+    private int replacedIndex;
 
     private final byte[] pattern;
     private final byte[] replacement;
@@ -51,8 +52,6 @@ public class ReplacingInputStream extends FilterInputStream {
         UNBUFFER
     }
 
-    private static final Charset UTF8 = Charset.forName("UTF-8");
-
     /**
      * Replace occurrences of pattern in the input. Note: input is assumed to be UTF-8 encoded. If not the case use byte[] based pattern and replacement.
      * @param in input
@@ -60,7 +59,7 @@ public class ReplacingInputStream extends FilterInputStream {
      * @param replacement the replacement or null
      */
     public ReplacingInputStream(InputStream in, String pattern, String replacement) {
-        this(in, pattern.getBytes(UTF8), replacement==null ? null : replacement.getBytes(UTF8));
+        this(in, pattern.getBytes(UTF_8), replacement==null ? null : replacement.getBytes(UTF_8));
     }
 
     /**

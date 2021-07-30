@@ -21,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,11 +32,12 @@ import java.util.TreeMap;
 
 import org.apache.commons.collections4.bidimap.TreeBidiMap;
 import org.apache.poi.hpsf.wellknown.PropertyIDMap;
-import org.apache.poi.hpsf.wellknown.SectionIDMap;
 import org.apache.poi.util.CodePageUtil;
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.LittleEndian;
 import org.apache.poi.util.LittleEndianByteArrayInputStream;
 import org.apache.poi.util.LittleEndianConsts;
+import org.apache.poi.util.LittleEndianOutputStream;
 import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
 
@@ -43,6 +45,9 @@ import org.apache.poi.util.POILogger;
  * Represents a section in a {@link PropertySet}.
  */
 public class Section {
+    //arbitrarily selected; may need to increase
+    private static final int MAX_RECORD_LENGTH = 100_000;
+
     private static final POILogger LOG = POILogFactory.getLogger(Section.class);
 
     /**
@@ -71,14 +76,14 @@ public class Section {
     /**
      * This section's properties.
      */
-    private final Map<Long,Property> properties = new LinkedHashMap<Long,Property>();
+    private final Map<Long,Property> properties = new LinkedHashMap<>();
 
     /**
      * This member is {@code true} if the last call to {@link
      * #getPropertyIntValue} or {@link #getProperty} tried to access a
      * property that was not available, else {@code false}.
      */
-    private boolean wasNull;
+    private transient boolean wasNull;
 
     /**
      * Creates an empty {@link Section}.
@@ -99,7 +104,7 @@ public class Section {
         this._offset = -1;
         setFormatID(s.getFormatID());
         for (Property p : s.properties.values()) {
-            properties.put(p.getID(), new MutableProperty(p));
+            properties.put(p.getID(), new Property(p));
         }
         setDictionary(s.getDictionary());
     }
@@ -175,13 +180,13 @@ public class Section {
          *    seconds pass reads the other properties.
          */
         /* Pass 1: Read the property list. */
-        final TreeBidiMap<Long,Long> offset2Id = new TreeBidiMap<Long,Long>();
+        final TreeBidiMap<Long,Long> offset2Id = new TreeBidiMap<>();
         for (int i = 0; i < propertyCount; i++) {
             /* Read the property ID. */
-            long id = (int)leis.readUInt();
+            long id = leis.readUInt();
 
             /* Offset from the section's start. */
-            long off = (int)leis.readUInt();
+            long off = leis.readUInt();
 
             offset2Id.put(off, id);
         }
@@ -192,7 +197,7 @@ public class Section {
         int codepage = -1;
         if (cpOffset != null) {
             /* Read the property's value type. It must be VT_I2. */
-            leis.setReadIndex((int)(this._offset + cpOffset));
+            leis.setReadIndex(Math.toIntExact(this._offset + cpOffset));
             final long type = leis.readUInt();
 
             if (type != Variant.VT_I2) {
@@ -215,9 +220,9 @@ public class Section {
             if (id == PropertyIDMap.PID_CODEPAGE) {
                 continue;
             }
-            
+
             int pLen = propLen(offset2Id, off, size);
-            leis.setReadIndex((int)(this._offset + off));
+            leis.setReadIndex(Math.toIntExact(this._offset + off));
 
             if (id == PropertyIDMap.PID_DICTIONARY) {
                 leis.mark(100000);
@@ -228,17 +233,17 @@ public class Section {
                     try {
                         // fix id
                         id = Math.max(PropertyIDMap.PID_MAX, offset2Id.inverseBidiMap().lastKey())+1;
-                        setProperty(new MutableProperty(id, leis, pLen, codepage));
+                        setProperty(new Property(id, leis, pLen, codepage));
                     } catch (RuntimeException e) {
                         LOG.log(POILogger.INFO, "Dictionary fallback failed - ignoring property");
                     }
-                };
+                }
             } else {
-                setProperty(new MutableProperty(id, leis, pLen, codepage));
+                setProperty(new Property(id, leis, pLen, codepage));
             }
         }
-        
-        sectionBytes.write(src, (int)_offset, size);
+
+        sectionBytes.write(src, Math.toIntExact(_offset), size);
         padSectionBytes();
     }
 
@@ -257,7 +262,7 @@ public class Section {
         Long nextKey = offset2Id.nextKey(entryOffset);
         long begin = entryOffset;
         long end = (nextKey != null) ? nextKey : maxSize;
-        return (int)(end - begin);
+        return Math.toIntExact(end - begin);
     }
 
 
@@ -289,6 +294,7 @@ public class Section {
      * @param formatID The section's format ID as a byte array. It components
      * are in big-endian format.
      */
+    @SuppressWarnings("WeakerAccess")
     public void setFormatID(final byte[] formatID) {
         ClassID fid = getFormatID();
         if (fid == null) {
@@ -322,7 +328,7 @@ public class Section {
      * @return This section's properties.
      */
     public Property[] getProperties() {
-        return properties.values().toArray(new Property[properties.size()]);
+        return properties.values().toArray(new Property[0]);
     }
 
     /**
@@ -372,7 +378,7 @@ public class Section {
      * @see #getProperty
      */
     public void setProperty(final int id, final int value) {
-        setProperty(id, Variant.VT_I4, Integer.valueOf(value));
+        setProperty(id, Variant.VT_I4, value);
     }
 
 
@@ -387,7 +393,7 @@ public class Section {
      * @see #getProperty
      */
     public void setProperty(final int id, final long value) {
-        setProperty(id, Variant.VT_I8, Long.valueOf(value));
+        setProperty(id, Variant.VT_I8, value);
     }
 
 
@@ -402,7 +408,7 @@ public class Section {
      * @see #getProperty
      */
     public void setProperty(final int id, final boolean value) {
-        setProperty(id, Variant.VT_BOOL, Boolean.valueOf(value));
+        setProperty(id, Variant.VT_BOOL, value);
     }
 
 
@@ -424,7 +430,7 @@ public class Section {
      */
     @SuppressWarnings("deprecation")
     public void setProperty(final int id, final long variantType, final Object value) {
-        setProperty(new MutableProperty(id, variantType, value));
+        setProperty(new Property(id, variantType, value));
     }
 
 
@@ -484,7 +490,7 @@ public class Section {
      *
      * @return The property's value
      */
-    protected int getPropertyIntValue(final long id) {
+    int getPropertyIntValue(final long id) {
         final Number i;
         final Object o = getProperty(id);
         if (o == null) {
@@ -510,12 +516,9 @@ public class Section {
      *
      * @return The property's value
      */
-    protected boolean getPropertyBooleanValue(final int id) {
+    boolean getPropertyBooleanValue(final int id) {
         final Boolean b = (Boolean) getProperty(id);
-        if (b == null) {
-            return false;
-        }
-        return b.booleanValue();
+        return b != null && b;
     }
 
     /**
@@ -529,8 +532,9 @@ public class Section {
      * @see #getProperty
      * @see Variant
      */
+    @SuppressWarnings("unused")
     protected void setPropertyBooleanValue(final int id, final boolean value) {
-        setProperty(id, Variant.VT_BOOL, Boolean.valueOf(value));
+        setProperty(id, Variant.VT_BOOL, value);
     }
 
     /**
@@ -556,8 +560,8 @@ public class Section {
      * properties) and the properties themselves.
      *
      * @return the section's length in bytes.
-     * @throws WritingNotSupportedException
-     * @throws IOException
+     * @throws WritingNotSupportedException If the document is opened read-only.
+     * @throws IOException If an error happens while writing.
      */
     private int calcSize() throws WritingNotSupportedException, IOException {
         sectionBytes.reset();
@@ -588,6 +592,7 @@ public class Section {
      * #getPropertyIntValue} or {@link #getProperty} tried to access a
      * property that was not available, else {@code false}.
      */
+    @SuppressWarnings("WeakerAccess")
     public boolean wasNull() {
         return wasNull;
     }
@@ -596,29 +601,33 @@ public class Section {
 
     /**
      * Returns the PID string associated with a property ID. The ID
-     * is first looked up in the {@link Section}'s private
-     * dictionary. If it is not found there, the method calls {@link
-     * SectionIDMap#getPIDString}.
+     * is first looked up in the {@link Section Sections} private dictionary.
+     * If it is not found there, the property PID string is taken
+     * from sections format IDs namespace.
+     * If the PID is also undefined there, i.e. it is not well-known,
+     * {@code "[undefined]"} is returned.
      *
      * @param pid The property ID
      *
-     * @return The property ID's string value
+     * @return The well-known property ID string associated with the
+     * property ID {@code pid}
      */
     public String getPIDString(final long pid) {
-        String s = null;
         Map<Long,String> dic = getDictionary();
-        if (dic != null) {
-            s = dic.get(pid);
+        if (dic == null || !dic.containsKey(pid)) {
+            ClassID fmt = getFormatID();
+            if (SummaryInformation.FORMAT_ID.equals(fmt)) {
+                dic = PropertyIDMap.getSummaryInformationProperties();
+            } else if (DocumentSummaryInformation.FORMAT_ID[0].equals(fmt)) {
+                dic = PropertyIDMap.getDocumentSummaryInformationProperties();
+            }
         }
-        if (s == null) {
-            s = SectionIDMap.getPIDString(getFormatID(), pid);
-        }
-        return s;
+
+        return (dic != null && dic.containsKey(pid)) ? dic.get(pid) : PropertyIDMap.UNDEFINED;
     }
 
     /**
-     * Removes all properties from the section including 0 (dictionary) and
-     * 1 (codepage).
+     * Removes all properties from the section including 0 (dictionary) and 1 (codepage).
      */
     public void clear() {
         for (Property p : getProperties()) {
@@ -662,7 +671,7 @@ public class Section {
 
         /* Compare all properties except the dictionary (id 0) and
          * the codepage (id 1 / ignored) as they must be handled specially. */
-        Set<Long> propIds = new HashSet<Long>(properties.keySet());
+        Set<Long> propIds = new HashSet<>(properties.keySet());
         propIds.addAll(s.properties.keySet());
         propIds.remove(0L);
         propIds.remove(1L);
@@ -670,7 +679,7 @@ public class Section {
         for (Long id : propIds) {
             Property p1 = properties.get(id);
             Property p2 = s.properties.get(id);
-            if (p1 == null || p2 == null || !p1.equals(p2)) {
+            if (p1 == null || !p1.equals(p2)) {
                 return false;
             }
         }
@@ -679,7 +688,7 @@ public class Section {
         Map<Long,String> d1 = getDictionary();
         Map<Long,String> d2 = s.getDictionary();
 
-        return (d1 == null && d2 == null) || (d1 != null && d2 != null && d1.equals(d2));
+        return (d1 == null && d2 == null) || (d1 != null && d1.equals(d2));
     }
 
     /**
@@ -687,6 +696,7 @@ public class Section {
      *
      * @param id The ID of the property to be removed
      */
+    @SuppressWarnings("WeakerAccess")
     public void removeProperty(final long id) {
         if (properties.remove(id) != null) {
             sectionBytes.reset();
@@ -727,63 +737,54 @@ public class Section {
             codepage = Property.DEFAULT_CODEPAGE;
         }
 
-        /* The properties are written to this stream. */
-        final ByteArrayOutputStream propertyStream = new ByteArrayOutputStream();
+        final int[][] offsets = new int[properties.size()][2];
+        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        final LittleEndianOutputStream leos = new LittleEndianOutputStream(bos);
 
-        /* The property list is established here. After each property that has
-         * been written to "propertyStream", a property list entry is written to
-         * "propertyListStream". */
-        final ByteArrayOutputStream propertyListStream = new ByteArrayOutputStream();
+        /* Write the section's length - dummy value, fixed later */
+        leos.writeInt(-1);
 
-        /* Maintain the current position in the list. */
-        int position = 0;
+        /* Write the section's number of properties: */
+        leos.writeInt(properties.size());
 
-        /* Increase the position variable by the size of the property list so
-         * that it points behind the property list and to the beginning of the
-         * properties themselves. */
-        position += 2 * LittleEndianConsts.INT_SIZE + getPropertyCount() * 2 * LittleEndianConsts.INT_SIZE;
+        int propCnt = 0;
+        for (Property p : properties.values()) {
+            /* Write the property list entry. */
+            leos.writeUInt(p.getID());
+            // dummy offset to be fixed later
+            offsets[propCnt++][0] = bos.size();
+            leos.writeInt(-1);
+        }
+
 
         /* Write the properties and the property list into their respective
          * streams: */
+        propCnt = 0;
         for (Property p : properties.values()) {
-            final long id = p.getID();
-
-            /* Write the property list entry. */
-            LittleEndian.putUInt(id, propertyListStream);
-            LittleEndian.putUInt(position, propertyListStream);
-
+            offsets[propCnt++][1] = bos.size();
             /* If the property ID is not equal 0 we write the property and all
              * is fine. However, if it equals 0 we have to write the section's
              * dictionary which has an implicit type only and an explicit
              * value. */
-            if (id != 0) {
+            if (p.getID() != 0) {
                 /* Write the property and update the position to the next
                  * property. */
-                position += p.write(propertyStream, codepage);
+                p.write(bos, codepage);
             } else {
-                if (codepage == -1) {
-                    throw new IllegalPropertySetDataException("Codepage (property 1) is undefined.");
-                }
-                position += writeDictionary(propertyStream, codepage);
+                writeDictionary(bos, codepage);
             }
         }
 
-        /* Write the section: */
-        int streamLength = LittleEndianConsts.INT_SIZE * 2 + propertyListStream.size() + propertyStream.size();
+        byte[] result = bos.toByteArray();
+        LittleEndian.putInt(result, 0, bos.size());
 
-        /* Write the section's length: */
-        LittleEndian.putInt(streamLength, out);
+        for (int[] off : offsets) {
+            LittleEndian.putUInt(result, off[0], off[1]);
+        }
 
-        /* Write the section's number of properties: */
-        LittleEndian.putInt(getPropertyCount(), out);
+        out.write(result);
 
-        /* Write the property list: */
-        propertyListStream.writeTo(out);
-
-        /* Write the properties: */
-        propertyStream.writeTo(out);
-
-        return streamLength;
+        return bos.size();
     }
 
     /**
@@ -794,13 +795,9 @@ public class Section {
      * @param codepage The codepage of the string values.
      *
      * @return {@code true} if dictionary was read successful, {@code false} otherwise
-     *
-     * @throws UnsupportedEncodingException if the dictionary's codepage is not
-     *         (yet) supported.
      */
-    private boolean readDictionary(LittleEndianByteArrayInputStream leis, final int length, final int codepage)
-    throws UnsupportedEncodingException {
-        Map<Long,String> dic = new HashMap<Long,String>();
+    private boolean readDictionary(LittleEndianByteArrayInputStream leis, final int length, final int codepage) {
+        Map<Long,String> dic = new HashMap<>();
 
         /*
          * Read the number of dictionary entries.
@@ -827,7 +824,7 @@ public class Section {
 
             /* Read the string - Strip 0x00 characters from the end of the string. */
             int cp = (codepage == -1) ? Property.DEFAULT_CODEPAGE : codepage;
-            int nrBytes = (int)((sLength-1) * (cp == CodePageUtil.CP_UNICODE ? 2 : 1));
+            int nrBytes = Math.toIntExact(((sLength-1) * (cp == CodePageUtil.CP_UNICODE ? 2 : 1)));
             if (nrBytes > 0xFFFFFF) {
                 LOG.log(POILogger.WARN, errMsg);
                 isCorrupted = true;
@@ -835,7 +832,7 @@ public class Section {
             }
 
             try {
-                byte buf[] = new byte[nrBytes];
+                byte[] buf = IOUtils.safelyAllocate(nrBytes, MAX_RECORD_LENGTH);
                 leis.readFully(buf, 0, nrBytes);
                 final String str = CodePageUtil.getStringFromCodePage(buf, 0, nrBytes, cp);
 
@@ -843,10 +840,10 @@ public class Section {
                 if (cp == CodePageUtil.CP_UNICODE) {
                     pad = 2+((4 - ((nrBytes+2) & 0x3)) & 0x3);
                 }
-                leis.skip(pad);
+                IOUtils.skipFully(leis, pad);
 
                 dic.put(id, str);
-            } catch (RuntimeException ex) {
+            } catch (RuntimeException|IOException ex) {
                 LOG.log(POILogger.WARN, errMsg, ex);
                 isCorrupted = true;
                 break;
@@ -861,15 +858,13 @@ public class Section {
      * Writes the section's dictionary.
      *
      * @param out The output stream to write to.
-     * @param dictionary The dictionary.
      * @param codepage The codepage to be used to write the dictionary items.
-     * @return The number of bytes written
      * @exception IOException if an I/O exception occurs.
      */
-    private int writeDictionary(final OutputStream out, final int codepage)
+    private void writeDictionary(final OutputStream out, final int codepage)
     throws IOException {
-        final byte padding[] = new byte[4];
-        Map<Long,String> dic = getDictionary();
+        final byte[] padding = new byte[4];
+        final Map<Long,String> dic = getDictionary();
 
         LittleEndian.putUInt(dic.size(), out);
         int length = LittleEndianConsts.INT_SIZE;
@@ -878,26 +873,23 @@ public class Section {
             LittleEndian.putUInt(ls.getKey(), out);
             length += LittleEndianConsts.INT_SIZE;
 
-            String value = ls.getValue()+"\0";
-            LittleEndian.putUInt( value.length(), out );
+            final String value = ls.getValue()+"\0";
+            final byte[] bytes = CodePageUtil.getBytesInCodePage(value, codepage);
+            final int len = (codepage == CodePageUtil.CP_UNICODE) ? value.length() : bytes.length;
+
+            LittleEndian.putUInt( len, out );
             length += LittleEndianConsts.INT_SIZE;
 
-            byte bytes[] = CodePageUtil.getBytesInCodePage(value, codepage);
             out.write(bytes);
             length += bytes.length;
 
-            if (codepage == CodePageUtil.CP_UNICODE) {
-                int pad = (4 - (length & 0x3)) & 0x3;
-                out.write(padding, 0, pad);
-                length += pad;
-            }
+            final int pad = (codepage == CodePageUtil.CP_UNICODE) ? ((4 - (length & 0x3)) & 0x3) : 0;
+            out.write(padding, 0, pad);
+            length += pad;
         }
 
-        int pad = (4 - (length & 0x3)) & 0x3;
+        final int pad = (4 - (length & 0x3)) & 0x3;
         out.write(padding, 0, pad);
-        length += pad;
-
-        return length;
     }
 
     /**
@@ -919,7 +911,7 @@ public class Section {
     public void setDictionary(final Map<Long,String> dictionary) throws IllegalPropertySetDataException {
         if (dictionary != null) {
             if (this.dictionary == null) {
-                this.dictionary = new TreeMap<Long,String>();
+                this.dictionary = new TreeMap<>();
             }
             this.dictionary.putAll(dictionary);
 
@@ -949,17 +941,8 @@ public class Section {
      */
     @Override
     public int hashCode() {
-        long hashCode = 0;
-        hashCode += getFormatID().hashCode();
-        final Property[] pa = getProperties();
-        for (int i = 0; i < pa.length; i++) {
-            hashCode += pa[i].hashCode();
-        }
-        final int returnHashCode = (int) (hashCode & 0x0ffffffffL);
-        return returnHashCode;
+        return Arrays.deepHashCode(new Object[]{getFormatID(),getProperties()});
     }
-
-
 
     /**
      * @see Object#toString()
@@ -968,9 +951,9 @@ public class Section {
     public String toString() {
         return toString(null);
     }
-    
+
     public String toString(PropertyIDMap idMap) {
-        final StringBuffer b = new StringBuffer();
+        final StringBuilder b = new StringBuilder();
         final Property[] pa = getProperties();
         b.append("\n\n\n");
         b.append(getClass().getName());

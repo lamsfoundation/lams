@@ -23,7 +23,6 @@ import static org.apache.poi.hssf.model.InternalWorkbook.WORKBOOK_DIR_ENTRY_NAME
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -53,6 +52,7 @@ import org.apache.poi.ddf.EscherBlipRecord;
 import org.apache.poi.ddf.EscherMetafileBlip;
 import org.apache.poi.ddf.EscherRecord;
 import org.apache.poi.hpsf.ClassID;
+import org.apache.poi.hpsf.ClassIDPredefined;
 import org.apache.poi.hpsf.DocumentSummaryInformation;
 import org.apache.poi.hpsf.SummaryInformation;
 import org.apache.poi.hssf.OldExcelFormatException;
@@ -82,7 +82,6 @@ import org.apache.poi.hssf.record.aggregates.RecordAggregate.RecordVisitor;
 import org.apache.poi.hssf.record.common.UnicodeString;
 import org.apache.poi.hssf.record.crypto.Biff8DecryptingStream;
 import org.apache.poi.hssf.record.crypto.Biff8EncryptionKey;
-import org.apache.poi.hssf.util.CellReference;
 import org.apache.poi.poifs.crypt.ChunkedCipherOutputStream;
 import org.apache.poi.poifs.crypt.Decryptor;
 import org.apache.poi.poifs.crypt.EncryptionInfo;
@@ -93,10 +92,10 @@ import org.apache.poi.poifs.filesystem.DirectoryEntry;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.DocumentNode;
 import org.apache.poi.poifs.filesystem.EntryUtils;
+import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.poifs.filesystem.FilteringDirectoryNode;
-import org.apache.poi.poifs.filesystem.NPOIFSDocument;
-import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.apache.poi.poifs.filesystem.Ole10Native;
+import org.apache.poi.poifs.filesystem.POIFSDocument;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.formula.FormulaShifter;
@@ -110,8 +109,10 @@ import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.SheetVisibility;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.util.Configurator;
 import org.apache.poi.util.HexDump;
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.Internal;
 import org.apache.poi.util.LittleEndian;
 import org.apache.poi.util.LittleEndianByteArrayInputStream;
@@ -128,14 +129,20 @@ import org.apache.poi.util.Removal;
  * @see org.apache.poi.hssf.model.InternalWorkbook
  * @see org.apache.poi.hssf.usermodel.HSSFSheet
  */
+@SuppressWarnings("WeakerAccess")
 public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.usermodel.Workbook {
+
+    //arbitrarily selected; may need to increase
+    private static final int MAX_RECORD_LENGTH = 100_000;
+    private static final int MAX_IMAGE_LENGTH = 50_000_000;
+
     private static final Pattern COMMA_PATTERN = Pattern.compile(",");
 
     /**
      * The maximum number of cell styles in a .xls workbook.
      * The 'official' limit is 4,000, but POI allows a slightly larger number.
      * This extra delta takes into account built-in styles that are automatically
-     *
+     * <p>
      * See http://office.microsoft.com/en-us/excel-help/excel-specifications-and-limits-HP005199291.aspx
      */
     private static final int MAX_STYLES = 4030;
@@ -149,7 +156,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      * since you're never allowed to have more or less than three sheets!
      */
 
-    public final static int INITIAL_CAPACITY = Configurator.getIntValue("HSSFWorkbook.SheetInitialCapacity",3);
+    public final static int INITIAL_CAPACITY = Configurator.getIntValue("HSSFWorkbook.SheetInitialCapacity", 3);
 
     /**
      * this is the reference to the low level Workbook object
@@ -173,13 +180,13 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      * this holds the HSSFFont objects attached to this workbook.
      * We only create these from the low level records as required.
      */
-    private Map<Short,HSSFFont> fonts;
+    private Map<Integer, HSSFFont> fonts;
 
     /**
      * holds whether or not to preserve other nodes in the POIFS.  Used
      * for macros and embedded objects.
      */
-    private boolean   preserveNodes;
+    private boolean preserveNodes;
 
     /**
      * Used to keep track of the data formatter so that all
@@ -191,7 +198,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
     /**
      * The policy to apply in the event of missing or
-     *  blank cells when fetching from a row.
+     * blank cells when fetching from a row.
      * See {@link MissingCellPolicy}
      */
     private MissingCellPolicy missingCellPolicy = MissingCellPolicy.RETURN_NULL_AND_BLANK;
@@ -205,61 +212,48 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
     private UDFFinder _udfFinder = new IndexedUDFFinder(AggregatingUDFFinder.DEFAULT);
 
     public static HSSFWorkbook create(InternalWorkbook book) {
-    	return new HSSFWorkbook(book);
+        return new HSSFWorkbook(book);
     }
+
     /**
      * Creates new HSSFWorkbook from scratch (start here!)
-     *
      */
     public HSSFWorkbook() {
         this(InternalWorkbook.createWorkbook());
     }
 
     private HSSFWorkbook(InternalWorkbook book) {
-        super((DirectoryNode)null);
+        super((DirectoryNode) null);
         workbook = book;
-        _sheets = new ArrayList<HSSFSheet>(INITIAL_CAPACITY);
-        names = new ArrayList<HSSFName>(INITIAL_CAPACITY);
+        _sheets = new ArrayList<>(INITIAL_CAPACITY);
+        names = new ArrayList<>(INITIAL_CAPACITY);
     }
 
     /**
      * Given a POI POIFSFileSystem object, read in its Workbook along
-     *  with all related nodes, and populate the high and low level models.
+     * with all related nodes, and populate the high and low level models.
      * <p>This calls {@link #HSSFWorkbook(POIFSFileSystem, boolean)} with
-     *  preserve nodes set to true.
+     * preserve nodes set to true.
      *
+     * @throws IOException if the stream cannot be read
      * @see #HSSFWorkbook(POIFSFileSystem, boolean)
      * @see org.apache.poi.poifs.filesystem.POIFSFileSystem
-     * @exception IOException if the stream cannot be read
      */
     public HSSFWorkbook(POIFSFileSystem fs) throws IOException {
-        this(fs,true);
-    }
-    /**
-     * Given a POI POIFSFileSystem object, read in its Workbook along
-     *  with all related nodes, and populate the high and low level models.
-     * <p>This calls {@link #HSSFWorkbook(POIFSFileSystem, boolean)} with
-     *  preserve nodes set to true.
-     *
-     * @see #HSSFWorkbook(POIFSFileSystem, boolean)
-     * @see org.apache.poi.poifs.filesystem.POIFSFileSystem
-     * @exception IOException if the stream cannot be read
-     */
-    public HSSFWorkbook(NPOIFSFileSystem fs) throws IOException {
-        this(fs.getRoot(),true);
+        this(fs, true);
     }
 
     /**
      * Given a POI POIFSFileSystem object, read in its Workbook and populate
      * the high and low level models.  If you're reading in a workbook... start here!
      *
-     * @param fs the POI filesystem that contains the Workbook stream.
+     * @param fs            the POI filesystem that contains the Workbook stream.
      * @param preserveNodes whether to preserve other nodes, such as
-     *        macros.  This takes more memory, so only say yes if you
-     *        need to. If set, will store all of the POIFSFileSystem
-     *        in memory
+     *                      macros.  This takes more memory, so only say yes if you
+     *                      need to. If set, will store all of the POIFSFileSystem
+     *                      in memory
+     * @throws IOException if the stream cannot be read
      * @see org.apache.poi.poifs.filesystem.POIFSFileSystem
-     * @exception IOException if the stream cannot be read
      */
     public HSSFWorkbook(POIFSFileSystem fs, boolean preserveNodes)
             throws IOException {
@@ -267,74 +261,67 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
     }
 
     public static String getWorkbookDirEntryName(DirectoryNode directory) {
-
         for (String wbName : WORKBOOK_DIR_ENTRY_NAMES) {
-            try {
-                directory.getEntry(wbName);
+            if (directory.hasEntry(wbName)) {
                 return wbName;
-            } catch (FileNotFoundException e) {
-                // continue - to try other options
             }
         }
 
         // check for an encrypted .xlsx file - they get OLE2 wrapped
-        try {
-        	directory.getEntry(Decryptor.DEFAULT_POIFS_ENTRY);
-        	throw new EncryptedDocumentException("The supplied spreadsheet seems to be an Encrypted .xlsx file. " +
-        			"It must be decrypted before use by XSSF, it cannot be used by HSSF");
-        } catch (FileNotFoundException e) {
-            // fall through
+        if (directory.hasEntry(Decryptor.DEFAULT_POIFS_ENTRY)) {
+            throw new EncryptedDocumentException("The supplied spreadsheet seems to be an Encrypted .xlsx file. " +
+                    "It must be decrypted before use by XSSF, it cannot be used by HSSF");
         }
 
         // check for previous version of file format
-        try {
-            directory.getEntry(OLD_WORKBOOK_DIR_ENTRY_NAME);
+        if (directory.hasEntry(OLD_WORKBOOK_DIR_ENTRY_NAME)) {
             throw new OldExcelFormatException("The supplied spreadsheet seems to be Excel 5.0/7.0 (BIFF5) format. "
                     + "POI only supports BIFF8 format (from Excel versions 97/2000/XP/2003)");
-        } catch (FileNotFoundException e) {
-            // fall through
+        }
+
+        // throw more useful exceptions for known wrong file-extensions
+        if (directory.hasEntry("WordDocument")) {
+            throw new IllegalArgumentException("The document is really a DOC file");
         }
 
         throw new IllegalArgumentException("The supplied POIFSFileSystem does not contain a BIFF8 'Workbook' entry. "
-            + "Is it really an excel file? Had: " + directory.getEntryNames());
+                + "Is it really an excel file? Had: " + directory.getEntryNames());
     }
 
     /**
      * given a POI POIFSFileSystem object, and a specific directory
-     *  within it, read in its Workbook and populate the high and
-     *  low level models.  If you're reading in a workbook...start here.
+     * within it, read in its Workbook and populate the high and
+     * low level models.  If you're reading in a workbook...start here.
      *
-     * @param directory the POI filesystem directory to process from
-     * @param fs the POI filesystem that contains the Workbook stream.
+     * @param directory     the POI filesystem directory to process from
+     * @param fs            the POI filesystem that contains the Workbook stream.
      * @param preserveNodes whether to preserve other nodes, such as
-     *        macros.  This takes more memory, so only say yes if you
-     *        need to. If set, will store all of the POIFSFileSystem
-     *        in memory
+     *                      macros.  This takes more memory, so only say yes if you
+     *                      need to. If set, will store all of the POIFSFileSystem
+     *                      in memory
+     * @throws IOException if the stream cannot be read
      * @see org.apache.poi.poifs.filesystem.POIFSFileSystem
-     * @exception IOException if the stream cannot be read
      */
     public HSSFWorkbook(DirectoryNode directory, POIFSFileSystem fs, boolean preserveNodes)
-            throws IOException
-    {
-       this(directory, preserveNodes);
+            throws IOException {
+        this(directory, preserveNodes);
     }
 
     /**
      * given a POI POIFSFileSystem object, and a specific directory
-     *  within it, read in its Workbook and populate the high and
-     *  low level models.  If you're reading in a workbook...start here.
+     * within it, read in its Workbook and populate the high and
+     * low level models.  If you're reading in a workbook...start here.
      *
-     * @param directory the POI filesystem directory to process from
+     * @param directory     the POI filesystem directory to process from
      * @param preserveNodes whether to preserve other nodes, such as
-     *        macros.  This takes more memory, so only say yes if you
-     *        need to. If set, will store all of the POIFSFileSystem
-     *        in memory
+     *                      macros.  This takes more memory, so only say yes if you
+     *                      need to. If set, will store all of the POIFSFileSystem
+     *                      in memory
+     * @throws IOException if the stream cannot be read
      * @see org.apache.poi.poifs.filesystem.POIFSFileSystem
-     * @exception IOException if the stream cannot be read
      */
     public HSSFWorkbook(DirectoryNode directory, boolean preserveNodes)
-            throws IOException
-    {
+            throws IOException {
         super(directory);
         String workbookName = getWorkbookDirEntryName(directory);
 
@@ -342,18 +329,18 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
         // If we're not preserving nodes, don't track the
         //  POIFS any more
-        if(! preserveNodes) {
+        if (!preserveNodes) {
             clearDirectory();
         }
 
-        _sheets = new ArrayList<HSSFSheet>(INITIAL_CAPACITY);
-        names  = new ArrayList<HSSFName>(INITIAL_CAPACITY);
+        _sheets = new ArrayList<>(INITIAL_CAPACITY);
+        names = new ArrayList<>(INITIAL_CAPACITY);
 
         // Grab the data from the workbook stream, however
         //  it happens to be spelled.
         InputStream stream = directory.createDocumentInputStream(workbookName);
 
-        List<Record> records = RecordFactory.createRecords(stream);
+        List<org.apache.poi.hssf.record.Record> records = RecordFactory.createRecords(stream);
 
         workbook = InternalWorkbook.createWorkbook(records);
         setPropertiesFromWorkbook(workbook);
@@ -372,7 +359,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
             }
         }
 
-        for (int i = 0 ; i < workbook.getNumNames() ; ++i){
+        for (int i = 0; i < workbook.getNumNames(); ++i) {
             NameRecord nameRecord = workbook.getNameRecord(i);
             HSSFName name = new HSSFName(this, nameRecord, workbook.getNameCommentRecord(nameRecord));
             names.add(name);
@@ -381,101 +368,92 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
     /**
      * Companion to HSSFWorkbook(POIFSFileSystem), this constructs the
-     *  POI filesystem around your {@link InputStream}, including all nodes.
+     * POI filesystem around your {@link InputStream}, including all nodes.
      * <p>This calls {@link #HSSFWorkbook(InputStream, boolean)} with
-     *  preserve nodes set to true.
+     * preserve nodes set to true.
      *
+     * @throws IOException if the stream cannot be read
      * @see #HSSFWorkbook(InputStream, boolean)
      * @see #HSSFWorkbook(POIFSFileSystem)
      * @see org.apache.poi.poifs.filesystem.POIFSFileSystem
-     * @exception IOException if the stream cannot be read
      */
     public HSSFWorkbook(InputStream s) throws IOException {
-        this(s,true);
+        this(s, true);
     }
 
     /**
      * Companion to HSSFWorkbook(POIFSFileSystem), this constructs the
      * POI filesystem around your {@link InputStream}.
      *
-     * @param s  the POI filesystem that contains the Workbook stream.
+     * @param s             the POI filesystem that contains the Workbook stream.
      * @param preserveNodes whether to preserve other nodes, such as
-     *        macros.  This takes more memory, so only say yes if you
-     *        need to.
+     *                      macros.  This takes more memory, so only say yes if you
+     *                      need to.
+     * @throws IOException if the stream cannot be read
      * @see org.apache.poi.poifs.filesystem.POIFSFileSystem
      * @see #HSSFWorkbook(POIFSFileSystem)
-     * @exception IOException if the stream cannot be read
      */
-    @SuppressWarnings("resource")   // NPOIFSFileSystem always closes the stream
+    @SuppressWarnings("resource")   // POIFSFileSystem always closes the stream
     public HSSFWorkbook(InputStream s, boolean preserveNodes)
-            throws IOException
-    {
-        this(new NPOIFSFileSystem(s).getRoot(), preserveNodes);
+            throws IOException {
+        this(new POIFSFileSystem(s).getRoot(), preserveNodes);
     }
 
     /**
      * used internally to set the workbook properties.
      */
 
-    private void setPropertiesFromWorkbook(InternalWorkbook book)
-    {
+    private void setPropertiesFromWorkbook(InternalWorkbook book) {
         this.workbook = book;
 
         // none currently
     }
 
     /**
-      * This is basically a kludge to deal with the now obsolete Label records.  If
-      * you have to read in a sheet that contains Label records, be aware that the rest
-      * of the API doesn't deal with them, the low level structure only provides read-only
-      * semi-immutable structures (the sets are there for interface conformance with NO
-      * Implementation).  In short, you need to call this function passing it a reference
-      * to the Workbook object.  All labels will be converted to LabelSST records and their
-      * contained strings will be written to the Shared String table (SSTRecord) within
-      * the Workbook.
-      *
-      * @param records a collection of sheet's records.
-      * @param offset the offset to search at
-      * @see org.apache.poi.hssf.record.LabelRecord
-      * @see org.apache.poi.hssf.record.LabelSSTRecord
-      * @see org.apache.poi.hssf.record.SSTRecord
-      */
+     * This is basically a kludge to deal with the now obsolete Label records.  If
+     * you have to read in a sheet that contains Label records, be aware that the rest
+     * of the API doesn't deal with them, the low level structure only provides read-only
+     * semi-immutable structures (the sets are there for interface conformance with NO
+     * Implementation).  In short, you need to call this function passing it a reference
+     * to the Workbook object.  All labels will be converted to LabelSST records and their
+     * contained strings will be written to the Shared String table (SSTRecord) within
+     * the Workbook.
+     *
+     * @param records a collection of sheet's records.
+     * @param offset  the offset to search at
+     * @see org.apache.poi.hssf.record.LabelRecord
+     * @see org.apache.poi.hssf.record.LabelSSTRecord
+     * @see org.apache.poi.hssf.record.SSTRecord
+     */
 
-     private void convertLabelRecords(List<Record> records, int offset)
-     {
-         if (log.check( POILogger.DEBUG )) {
-            log.log(POILogger.DEBUG, "convertLabelRecords called");
+    private void convertLabelRecords(List<org.apache.poi.hssf.record.Record> records, int offset) {
+        log.log(POILogger.DEBUG, "convertLabelRecords called");
+        for (int k = offset; k < records.size(); k++) {
+            Record rec = records.get(k);
+
+            if (rec.getSid() == LabelRecord.sid) {
+                LabelRecord oldrec = (LabelRecord) rec;
+
+                records.remove(k);
+                LabelSSTRecord newrec = new LabelSSTRecord();
+                int stringid =
+                        workbook.addSSTString(new UnicodeString(oldrec.getValue()));
+
+                newrec.setRow(oldrec.getRow());
+                newrec.setColumn(oldrec.getColumn());
+                newrec.setXFIndex(oldrec.getXFIndex());
+                newrec.setSSTIndex(stringid);
+                records.add(k, newrec);
+            }
         }
-         for (int k = offset; k < records.size(); k++)
-         {
-             Record rec = records.get(k);
-
-             if (rec.getSid() == LabelRecord.sid)
-             {
-                 LabelRecord oldrec = ( LabelRecord ) rec;
-
-                 records.remove(k);
-                 LabelSSTRecord newrec   = new LabelSSTRecord();
-                 int            stringid =
-                     workbook.addSSTString(new UnicodeString(oldrec.getValue()));
-
-                 newrec.setRow(oldrec.getRow());
-                 newrec.setColumn(oldrec.getColumn());
-                 newrec.setXFIndex(oldrec.getXFIndex());
-                 newrec.setSSTIndex(stringid);
-                       records.add(k, newrec);
-             }
-         }
-         if (log.check( POILogger.DEBUG )) {
-            log.log(POILogger.DEBUG, "convertLabelRecords exit");
-        }
-     }
+        log.log(POILogger.DEBUG, "convertLabelRecords exit");
+    }
 
     /**
      * Retrieves the current policy on what to do when
-     *  getting missing or blank cells from a row.
+     * getting missing or blank cells from a row.
      * The default is to return blank and null cells.
-     *  {@link MissingCellPolicy}
+     * {@link MissingCellPolicy}
      */
     @Override
     public MissingCellPolicy getMissingCellPolicy() {
@@ -484,13 +462,13 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
     /**
      * Sets the policy on what to do when
-     *  getting missing or blank cells from a row.
+     * getting missing or blank cells from a row.
      * This will then apply to all calls to
-     *  {@link HSSFRow#getCell(int)}}. See
-     *  {@link MissingCellPolicy}.
+     * {@link HSSFRow#getCell(int)}}. See
+     * {@link MissingCellPolicy}.
      * Note that this has no effect on any
-     *  iterators, only on when fetching Cells
-     *  by their column index.
+     * iterators, only on when fetching Cells
+     * by their column index.
      */
     @Override
     public void setMissingCellPolicy(MissingCellPolicy missingCellPolicy) {
@@ -501,29 +479,29 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      * sets the order of appearance for a given sheet.
      *
      * @param sheetname the name of the sheet to reorder
-     * @param pos the position that we want to insert the sheet into (0 based)
+     * @param pos       the position that we want to insert the sheet into (0 based)
      */
 
     @Override
-    public void setSheetOrder(String sheetname, int pos ) {
+    public void setSheetOrder(String sheetname, int pos) {
         int oldSheetIndex = getSheetIndex(sheetname);
-        _sheets.add(pos,_sheets.remove(oldSheetIndex));
+        _sheets.add(pos, _sheets.remove(oldSheetIndex));
         workbook.setSheetOrder(sheetname, pos);
 
         FormulaShifter shifter = FormulaShifter.createForSheetShift(oldSheetIndex, pos);
         for (HSSFSheet sheet : _sheets) {
-            sheet.getSheet().updateFormulasAfterCellShift(shifter, /* not used */ -1 );
+            sheet.getSheet().updateFormulasAfterCellShift(shifter, /* not used */ -1);
         }
 
         workbook.updateNamesAfterCellShift(shifter);
         updateNamedRangesAfterSheetReorder(oldSheetIndex, pos);
-        
+
         updateActiveSheetAfterSheetReorder(oldSheetIndex, pos);
     }
-    
+
     /**
      * copy-pasted from XSSFWorkbook#updateNamedRangesAfterSheetReorder(int, int)
-     * 
+     * <p>
      * update sheet-scoped named ranges in this workbook after changing the sheet order
      * of a sheet at oldIndex to newIndex.
      * Sheets between these indices will move left or right by 1.
@@ -543,21 +521,21 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
                 }
                 // if oldIndex > newIndex then this sheet moved left and sheets between newIndex and oldIndex moved right
                 else if (newIndex <= i && i < oldIndex) {
-                    name.setSheetIndex(i+1);
+                    name.setSheetIndex(i + 1);
                 }
                 // if oldIndex < newIndex then this sheet moved right and sheets between oldIndex and newIndex moved left
                 else if (oldIndex < i && i <= newIndex) {
-                    name.setSheetIndex(i-1);
+                    name.setSheetIndex(i - 1);
                 }
             }
         }
     }
 
-    
+
     private void updateActiveSheetAfterSheetReorder(int oldIndex, int newIndex) {
         // adjust active sheet if necessary
         int active = getActiveSheetIndex();
-        if(active == oldIndex) {
+        if (active == oldIndex) {
             // moved sheet was the active one
             setActiveSheet(newIndex);
         } else if ((active < oldIndex && active < newIndex) ||
@@ -565,22 +543,22 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
             // not affected
         } else if (newIndex > oldIndex) {
             // moved sheet was below before and is above now => active is one less
-            setActiveSheet(active-1);
+            setActiveSheet(active - 1);
         } else {
             // remaining case: moved sheet was higher than active before and is lower now => active is one more
-            setActiveSheet(active+1);
+            setActiveSheet(active + 1);
         }
     }
 
     private void validateSheetIndex(int index) {
         int lastSheetIx = _sheets.size() - 1;
         if (index < 0 || index > lastSheetIx) {
-            String range = "(0.." +    lastSheetIx + ")";
+            String range = "(0.." + lastSheetIx + ")";
             if (lastSheetIx == -1) {
                 range = "(no sheets)";
             }
             throw new IllegalArgumentException("Sheet index ("
-                    + index +") is out of range " + range);
+                    + index + ") is out of range " + range);
         }
     }
 
@@ -593,10 +571,10 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
         validateSheetIndex(index);
         int nSheets = _sheets.size();
-        for (int i=0; i<nSheets; i++) {
-               getSheetAt(i).setSelected(i == index);
+        for (int i = 0; i < nSheets; i++) {
+            getSheetAt(i).setSelected(i == index);
         }
-        workbook.getWindowOne().setNumSelectedTabs((short)1);
+        workbook.getWindowOne().setNumSelectedTabs((short) 1);
     }
 
     /**
@@ -607,13 +585,13 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      * @param indexes Array of sheets to select, the index is 0-based.
      */
     public void setSelectedTabs(int[] indexes) {
-        Collection<Integer> list = new ArrayList<Integer>(indexes.length);
+        Collection<Integer> list = new ArrayList<>(indexes.length);
         for (int index : indexes) {
             list.add(index);
         }
         setSelectedTabs(list);
     }
-    
+
     /**
      * Selects multiple sheets as a group. This is distinct from
      * the 'active' sheet (which is the sheet with focus).
@@ -627,9 +605,9 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
             validateSheetIndex(index);
         }
         // ignore duplicates
-        Set<Integer> set = new HashSet<Integer>(indexes);
+        Set<Integer> set = new HashSet<>(indexes);
         int nSheets = _sheets.size();
-        for (int i=0; i<nSheets; i++) {
+        for (int i = 0; i < nSheets; i++) {
             boolean bSelect = set.contains(i);
             getSheetAt(i).setSelected(bSelect);
         }
@@ -637,16 +615,16 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
         short nSelected = (short) set.size();
         workbook.getWindowOne().setNumSelectedTabs(nSelected);
     }
-    
+
     /**
-     * Gets the selected sheets (if more than one, Excel calls these a [Group]). 
+     * Gets the selected sheets (if more than one, Excel calls these a [Group]).
      *
      * @return indices of selected sheets
      */
     public Collection<Integer> getSelectedTabs() {
-        Collection<Integer> indexes = new ArrayList<Integer>();
+        Collection<Integer> indexes = new ArrayList<>();
         int nSheets = _sheets.size();
-        for (int i=0; i<nSheets; i++) {
+        for (int i = 0; i < nSheets; i++) {
             HSSFSheet sheet = getSheetAt(i);
             if (sheet.isSelected()) {
                 indexes.add(i);
@@ -654,7 +632,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
         }
         return Collections.unmodifiableCollection(indexes);
     }
-    
+
     /**
      * Convenience method to set the active sheet.  The active sheet is is the sheet
      * which is currently displayed when the workbook is viewed in Excel.
@@ -665,8 +643,8 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
         validateSheetIndex(index);
         int nSheets = _sheets.size();
-        for (int i=0; i<nSheets; i++) {
-             getSheetAt(i).setActive(i == index);
+        for (int i = 0; i < nSheets; i++) {
+            getSheetAt(i).setActive(i == index);
         }
         workbook.getWindowOne().setActiveSheetIndex(index);
     }
@@ -676,6 +654,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      * This may be different from the "selected sheet" since excel seems to
      * allow you to show the data of one sheet when another is seen "selected"
      * in the tabs (at the bottom).
+     *
      * @see org.apache.poi.hssf.usermodel.HSSFSheet#setSelected(boolean)
      */
     @Override
@@ -709,7 +688,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      *
      * @param sheetIx number (0 based)
      * @throws IllegalArgumentException if the name is null or invalid
-     *  or workbook already contains a sheet with this name
+     *                                  or workbook already contains a sheet with this name
      * @see #createSheet(String)
      * @see org.apache.poi.ss.util.WorkbookUtil#createSafeSheetName(String nameProposal)
      */
@@ -756,7 +735,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
         validateSheetIndex(sheetIx);
         return workbook.isSheetVeryHidden(sheetIx);
     }
-    
+
     @Override
     public SheetVisibility getSheetVisibility(int sheetIx) {
         return workbook.getSheetVisibility(sheetIx);
@@ -767,42 +746,26 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
         setSheetVisibility(sheetIx, hidden ? SheetVisibility.HIDDEN : SheetVisibility.VISIBLE);
     }
 
-    @Removal(version="3.18")
-    @Deprecated
-    @Override
-    public void setSheetHidden(int sheetIx, int hidden) {
-        switch (hidden) {
-            case Workbook.SHEET_STATE_VISIBLE:
-                setSheetVisibility(sheetIx, SheetVisibility.VISIBLE);
-                break;
-            case Workbook.SHEET_STATE_HIDDEN:
-                setSheetVisibility(sheetIx, SheetVisibility.HIDDEN);
-                break;
-            case Workbook.SHEET_STATE_VERY_HIDDEN:
-                setSheetVisibility(sheetIx, SheetVisibility.VERY_HIDDEN);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid sheet state : " + hidden + "\n" +
-                        "Sheet state must beone of the Workbook.SHEET_STATE_* constants");
-        }
-    }
-    
     @Override
     public void setSheetVisibility(int sheetIx, SheetVisibility visibility) {
         validateSheetIndex(sheetIx);
         workbook.setSheetHidden(sheetIx, visibility);
     }
 
-    /** Returns the index of the sheet by his name
+    /**
+     * Returns the index of the sheet by his name
+     *
      * @param name the sheet name
      * @return index of the sheet (0 based)
      */
     @Override
-    public int getSheetIndex(String name){
+    public int getSheetIndex(String name) {
         return workbook.getSheetIndex(name);
     }
 
-    /** Returns the index of the given sheet
+    /**
+     * Returns the index of the given sheet
+     *
      * @param sheet the sheet to look up
      * @return index of the sheet (0 based). <tt>-1</tt> if not found
      */
@@ -819,8 +782,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      */
 
     @Override
-    public HSSFSheet createSheet()
-    {
+    public HSSFSheet createSheet() {
         HSSFSheet sheet = new HSSFSheet(this);
 
         _sheets.add(sheet);
@@ -873,7 +835,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
             try {
                 uniqueIndex = Integer.parseInt(suffix.trim());
                 uniqueIndex++;
-                baseName=srcName.substring(0, bracketPos).trim();
+                baseName = srcName.substring(0, bracketPos).trim();
             } catch (NumberFormatException e) {
                 // contents of brackets not numeric
             }
@@ -890,7 +852,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
             //If the sheet name is unique, then set it otherwise move on to the next number.
             if (workbook.getSheetIndex(name) == -1) {
-              return name;
+                return name;
             }
         }
     }
@@ -900,21 +862,21 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      * Use this to create new sheets.
      *
      * <p>
-     *     Note that Excel allows sheet names up to 31 chars in length but other applications
-     *     (such as OpenOffice) allow more. Some versions of Excel crash with names longer than 31 chars,
-     *     others - truncate such names to 31 character.
+     * Note that Excel allows sheet names up to 31 chars in length but other applications
+     * (such as OpenOffice) allow more. Some versions of Excel crash with names longer than 31 chars,
+     * others - truncate such names to 31 character.
      * </p>
      * <p>
-     *     POI's SpreadsheetAPI silently truncates the input argument to 31 characters.
-     *     Example:
+     * POI's SpreadsheetAPI silently truncates the input argument to 31 characters.
+     * Example:
      *
-     *     <pre><code>
+     * <pre><code>
      *     Sheet sheet = workbook.createSheet("My very long sheet name which is longer than 31 chars"); // will be truncated
      *     assert 31 == sheet.getSheetName().length();
      *     assert "My very long sheet name which i" == sheet.getSheetName();
      *     </code></pre>
      * </p>
-     *
+     * <p>
      * Except the 31-character constraint, Excel applies some other rules:
      * <p>
      * Sheet name MUST be unique in the workbook and MUST NOT contain the any of the following characters:
@@ -932,20 +894,19 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      * The string MUST NOT begin or end with the single quote (') character.
      * </p>
      *
-     * @param sheetname  sheetname to set for the sheet.
+     * @param sheetname sheetname to set for the sheet.
      * @return Sheet representing the new sheet.
      * @throws IllegalArgumentException if the name is null or invalid
-     *  or workbook already contains a sheet with this name
+     *                                  or workbook already contains a sheet with this name
      * @see org.apache.poi.ss.util.WorkbookUtil#createSafeSheetName(String nameProposal)
      */
     @Override
-    public HSSFSheet createSheet(String sheetname)
-    {
+    public HSSFSheet createSheet(String sheetname) {
         if (sheetname == null) {
             throw new IllegalArgumentException("sheetName must not be null");
         }
 
-        if (workbook.doesContainsSheetName( sheetname, _sheets.size() )) {
+        if (workbook.doesContainsSheetName(sheetname, _sheets.size())) {
             throw new IllegalArgumentException("The workbook already contains a sheet named '" + sheetname + "'");
         }
 
@@ -960,14 +921,14 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
     }
 
     /**
-     *  Returns an iterator of the sheets in the workbook
-     *  in sheet order. Includes hidden and very hidden sheets.
+     * Returns an iterator of the sheets in the workbook
+     * in sheet order. Includes hidden and very hidden sheets.
      *
      * @return an iterator of the sheets.
      */
     @Override
     public Iterator<Sheet> sheetIterator() {
-        return new SheetIterator<Sheet>();
+        return new SheetIterator<>();
     }
 
     /**
@@ -978,23 +939,27 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
     public Iterator<Sheet> iterator() {
         return sheetIterator();
     }
-    
+
     private final class SheetIterator<T extends Sheet> implements Iterator<T> {
         final private Iterator<T> it;
-        private T cursor = null;
+        private T cursor;
+
         @SuppressWarnings("unchecked")
         public SheetIterator() {
             it = (Iterator<T>) _sheets.iterator();
         }
+
         @Override
         public boolean hasNext() {
             return it.hasNext();
         }
+
         @Override
         public T next() throws NoSuchElementException {
             cursor = it.next();
             return cursor;
         }
+
         /**
          * Unexpected behavior may occur if sheets are reordered after iterator
          * has been created. Support for the remove method may be added in the future
@@ -1002,18 +967,18 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
          */
         @Override
         public void remove() throws IllegalStateException {
-            throw new UnsupportedOperationException("remove method not supported on HSSFWorkbook.iterator(). "+
-                        "Use Sheet.removeSheetAt(int) instead.");
+            throw new UnsupportedOperationException("remove method not supported on HSSFWorkbook.iterator(). " +
+                    "Use Sheet.removeSheetAt(int) instead.");
         }
     }
 
     /**
      * get the number of spreadsheets in the workbook (this will be three after serialization)
+     *
      * @return number of sheets
      */
     @Override
-    public int getNumberOfSheets()
-    {
+    public int getNumberOfSheets() {
         return _sheets.size();
     }
 
@@ -1025,35 +990,33 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
     /**
      * Get the HSSFSheet object at the given index.
+     *
      * @param index of the sheet number (0-based physical &amp; logical)
      * @return HSSFSheet at the provided index
      * @throws IllegalArgumentException if the index is out of range (index
-     *            &lt; 0 || index &gt;= getNumberOfSheets()).
+     *                                  &lt; 0 || index &gt;= getNumberOfSheets()).
      */
     @Override
-    public HSSFSheet getSheetAt(int index)
-    {
+    public HSSFSheet getSheetAt(int index) {
         validateSheetIndex(index);
         return _sheets.get(index);
     }
 
     /**
      * Get sheet with the given name (case insensitive match)
+     *
      * @param name of the sheet
      * @return HSSFSheet with the name provided or <code>null</code> if it does not exist
      */
 
     @Override
-    public HSSFSheet getSheet(String name)
-    {
+    public HSSFSheet getSheet(String name) {
         HSSFSheet retval = null;
 
-        for (int k = 0; k < _sheets.size(); k++)
-        {
+        for (int k = 0; k < _sheets.size(); k++) {
             String sheetname = workbook.getSheetName(k);
 
-            if (sheetname.equalsIgnoreCase(name))
-            {
+            if (sheetname.equalsIgnoreCase(name)) {
                 retval = _sheets.get(k);
             }
         }
@@ -1062,11 +1025,11 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
     /**
      * Removes sheet at the given index.<p>
-     *
+     * <p>
      * Care must be taken if the removed sheet is the currently active or only selected sheet in
      * the workbook. There are a few situations when Excel must have a selection and/or active
      * sheet. (For example when printing - see Bug 40414).<br>
-     *
+     * <p>
      * This method makes sure that if the removed sheet was active, another sheet will become
      * active in its place.  Furthermore, if the removed sheet was the only selected sheet, another
      * sheet will become selected.  The newly active/selected sheet will have the same index, or
@@ -1091,12 +1054,12 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
         // the index of the closest remaining sheet to the one just deleted
         int newSheetIndex = index;
         if (newSheetIndex >= nSheets) {
-            newSheetIndex = nSheets-1;
+            newSheetIndex = nSheets - 1;
         }
 
         if (wasSelected) {
             boolean someOtherSheetIsStillSelected = false;
-            for (int i =0; i < nSheets; i++) {
+            for (int i = 0; i < nSheets; i++) {
                 if (getSheetAt(i).isSelected()) {
                     someOtherSheetIsStillSelected = true;
                     break;
@@ -1109,23 +1072,22 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
         // adjust active sheet
         int active = getActiveSheetIndex();
-        if(active == index) {
+        if (active == index) {
             // removed sheet was the active one, reset active sheet if there is still one left now
             setActiveSheet(newSheetIndex);
         } else if (active > index) {
             // removed sheet was below the active one => active is one less now
-            setActiveSheet(active-1);
+            setActiveSheet(active - 1);
         }
     }
 
     /**
      * determine whether the Excel GUI will backup the workbook when saving.
      *
-     * @param backupValue   true to indicate a backup will be performed.
+     * @param backupValue true to indicate a backup will be performed.
      */
 
-    public void setBackupFlag(boolean backupValue)
-    {
+    public void setBackupFlag(boolean backupValue) {
         BackupRecord backupRecord = workbook.getBackupRecord();
 
         backupRecord.setBackup(backupValue ? (short) 1
@@ -1138,15 +1100,14 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      * @return the current setting for backups.
      */
 
-    public boolean getBackupFlag()
-    {
+    public boolean getBackupFlag() {
         BackupRecord backupRecord = workbook.getBackupRecord();
 
         return backupRecord.getBackup() != 0;
     }
 
     int findExistingBuiltinNameRecordIdx(int sheetIndex, byte builtinCode) {
-        for(int defNameIndex =0; defNameIndex<names.size(); defNameIndex++) {
+        for (int defNameIndex = 0; defNameIndex < names.size(); defNameIndex++) {
             NameRecord r = workbook.getNameRecord(defNameIndex);
             if (r == null) {
                 throw new RuntimeException("Unable to find all defined names to iterate over");
@@ -1154,7 +1115,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
             if (!r.isBuiltInName() || r.getBuiltInName() != builtinCode) {
                 continue;
             }
-            if (r.getSheetNumber() -1 == sheetIndex) {
+            if (r.getSheetNumber() - 1 == sheetIndex) {
                 return defNameIndex;
             }
         }
@@ -1163,40 +1124,36 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
 
     HSSFName createBuiltInName(byte builtinCode, int sheetIndex) {
-      NameRecord nameRecord =
-        workbook.createBuiltInName(builtinCode, sheetIndex + 1);
-      HSSFName newName = new HSSFName(this, nameRecord, null);
-      names.add(newName);
-      return newName;
+        NameRecord nameRecord =
+                workbook.createBuiltInName(builtinCode, sheetIndex + 1);
+        HSSFName newName = new HSSFName(this, nameRecord, null);
+        names.add(newName);
+        return newName;
     }
 
 
     HSSFName getBuiltInName(byte builtinCode, int sheetIndex) {
-      int index = findExistingBuiltinNameRecordIdx(sheetIndex, builtinCode);
-      if (index < 0) {
-        return null;
-      } else {
-        return names.get(index);
-      }
+        int index = findExistingBuiltinNameRecordIdx(sheetIndex, builtinCode);
+        return (index < 0) ? null : names.get(index);
     }
 
 
     /**
      * create a new Font and add it to the workbook's font table
+     *
      * @return new font object
      */
 
     @Override
-    public HSSFFont createFont()
-    {
-        /*FontRecord font =*/ workbook.createNewFont();
-        short fontindex = (short) (getNumberOfFonts() - 1);
+    public HSSFFont createFont() {
+        /*FontRecord font =*/
+        workbook.createNewFont();
+        int fontindex = getNumberOfFonts() - 1;
 
-        if (fontindex > 3)
-        {
+        if (fontindex > 3) {
             fontindex++;   // THERE IS NO FOUR!!
         }
-        if(fontindex == Short.MAX_VALUE){
+        if (fontindex >= Short.MAX_VALUE) {
             throw new IllegalArgumentException("Maximum number of fonts was exceeded");
         }
 
@@ -1211,12 +1168,11 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
     @Override
     public HSSFFont findFont(boolean bold, short color, short fontHeight,
                              String name, boolean italic, boolean strikeout,
-                             short typeOffset, byte underline)
-    {
-        short numberOfFonts = getNumberOfFonts();
-        for (short i=0; i<=numberOfFonts; i++) {
+                             short typeOffset, byte underline) {
+        int numberOfFonts = getNumberOfFonts();
+        for (int i = 0; i <= numberOfFonts; i++) {
             // Remember - there is no 4!
-            if(i == 4) {
+            if (i == 4) {
                 continue;
             }
 
@@ -1228,8 +1184,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
                     && hssfFont.getItalic() == italic
                     && hssfFont.getStrikeout() == strikeout
                     && hssfFont.getTypeOffset() == typeOffset
-                    && hssfFont.getUnderline() == underline)
-            {
+                    && hssfFont.getUnderline() == underline) {
                 return hssfFont;
             }
         }
@@ -1237,33 +1192,29 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
         return null;
     }
 
-    /**
-     * get the number of fonts in the font table
-     * @return number of fonts
-     */
-
     @Override
-    public short getNumberOfFonts()
-    {
-        return (short) workbook.getNumberOfFontRecords();
+    public int getNumberOfFonts() {
+        return workbook.getNumberOfFontRecords();
     }
 
-    /**
-     * Get the font at the given index number
-     * @param idx  index number
-     * @return HSSFFont at the index
-     */
     @Override
-    public HSSFFont getFontAt(short idx) {
-        if(fonts == null) {
-            fonts = new HashMap<Short, HSSFFont>();
+    @Deprecated
+    @Removal(version="6.0.0")
+    public int getNumberOfFontsAsInt() {
+        return getNumberOfFonts();
+    }
+
+    @Override
+    public HSSFFont getFontAt(int idx) {
+        if (fonts == null) {
+            fonts = new HashMap<>();
         }
 
         // So we don't confuse users, give them back
         //  the same object every time, but create
         //  them lazily
-        Short sIdx = Short.valueOf(idx);
-        if(fonts.containsKey(sIdx)) {
+        Integer sIdx = idx;
+        if (fonts.containsKey(sIdx)) {
             return fonts.get(sIdx);
         }
 
@@ -1276,12 +1227,12 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
     /**
      * Reset the fonts cache, causing all new calls
-     *  to getFontAt() to create new objects.
+     * to getFontAt() to create new objects.
      * Should only be called after deleting fonts,
-     *  and that's not something you should normally do
+     * and that's not something you should normally do
      */
-    protected void resetFontCache() {
-        fonts = new HashMap<Short, HSSFFont>();
+    void resetFontCache() {
+        fonts = new HashMap<>();
     }
 
     /**
@@ -1292,9 +1243,8 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      * @throws IllegalStateException if the number of cell styles exceeded the limit for this type of Workbook.
      */
     @Override
-    public HSSFCellStyle createCellStyle()
-    {
-        if(workbook.getNumExFormats() == MAX_STYLES) {
+    public HSSFCellStyle createCellStyle() {
+        if (workbook.getNumExFormats() == MAX_STYLES) {
             throw new IllegalStateException("The maximum number of cell styles was exceeded. " +
                     "You can define up to 4000 styles in a .xls workbook");
         }
@@ -1305,33 +1255,33 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
     /**
      * get the number of styles the workbook contains
+     *
      * @return count of cell styles
      */
     @Override
-    public int getNumCellStyles()
-    {
+    public int getNumCellStyles() {
         return workbook.getNumExFormats();
     }
 
     /**
      * get the cell style object at the given index
-     * @param idx  index within the set of styles
+     *
+     * @param idx index within the set of styles
      * @return HSSFCellStyle object at the index
      */
     @Override
-    public HSSFCellStyle getCellStyleAt(int idx)
-    {
+    public HSSFCellStyle getCellStyleAt(int idx) {
         ExtendedFormatRecord xfr = workbook.getExFormatAt(idx);
-        return new HSSFCellStyle((short)idx, xfr, this);
+        return new HSSFCellStyle((short) idx, xfr, this);
     }
 
     /**
-     * Closes the underlying {@link NPOIFSFileSystem} from which
-     *  the Workbook was read, if any.
+     * Closes the underlying {@link POIFSFileSystem} from which
+     * the Workbook was read, if any.
      *
      * <p>Once this has been called, no further
-     *  operations, updates or reads should be performed on the 
-     *  Workbook.
+     * operations, updates or reads should be performed on the
+     * Workbook.
      */
     @Override
     public void close() throws IOException {
@@ -1340,96 +1290,90 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
     /**
      * Write out this workbook to the currently open {@link File} via the
-     *  writeable {@link POIFSFileSystem} it was opened as. 
-     *  
+     * writeable {@link POIFSFileSystem} it was opened as.
+     *
      * <p>This will fail (with an {@link IllegalStateException} if the
-     *  Workbook was opened read-only, opened from an {@link InputStream}
-     *   instead of a File, or if this is not the root document. For those cases, 
-     *   you must use {@link #write(OutputStream)} or {@link #write(File)} to 
-     *   write to a brand new document.
+     * Workbook was opened read-only, opened from an {@link InputStream}
+     * instead of a File, or if this is not the root document. For those cases,
+     * you must use {@link #write(OutputStream)} or {@link #write(File)} to
+     * write to a brand new document.
      */
     @Override
     public void write() throws IOException {
         validateInPlaceWritePossible();
         final DirectoryNode dir = getDirectory();
-        
+
         // Update the Workbook stream in the file
-        DocumentNode workbookNode = (DocumentNode)dir.getEntry(
+        DocumentNode workbookNode = (DocumentNode) dir.getEntry(
                 getWorkbookDirEntryName(dir));
-        NPOIFSDocument workbookDoc = new NPOIFSDocument(workbookNode);
+        POIFSDocument workbookDoc = new POIFSDocument(workbookNode);
         workbookDoc.replaceContents(new ByteArrayInputStream(getBytes()));
-        
+
         // Update the properties streams in the file
         writeProperties();
-        
+
         // Sync with the File on disk
         dir.getFileSystem().writeFilesystem();
     }
-    
+
     /**
      * Method write - write out this workbook to a new {@link File}. Constructs
      * a new POI POIFSFileSystem, passes in the workbook binary representation and
      * writes it out. If the file exists, it will be replaced, otherwise a new one
      * will be created.
-     * 
+     * <p>
      * Note that you cannot write to the currently open File using this method.
      * If you opened your Workbook from a File, you <i>must</i> use the {@link #write()}
      * method instead!
-     * 
-     * @param newFile The new File you wish to write the XLS to
      *
-     * @exception IOException if anything can't be written.
+     * @param newFile The new File you wish to write the XLS to
+     * @throws IOException if anything can't be written.
      * @see org.apache.poi.poifs.filesystem.POIFSFileSystem
      */
     @Override
     public void write(File newFile) throws IOException {
-        POIFSFileSystem fs = POIFSFileSystem.create(newFile);
-        try {
+        try (POIFSFileSystem fs = POIFSFileSystem.create(newFile)) {
             write(fs);
             fs.writeFilesystem();
-        } finally {
-            fs.close();
         }
     }
-    
+
     /**
      * Method write - write out this workbook to an {@link OutputStream}. Constructs
      * a new POI POIFSFileSystem, passes in the workbook binary representation and
      * writes it out.
-     * 
+     * <p>
      * If {@code stream} is a {@link java.io.FileOutputStream} on a networked drive
      * or has a high cost/latency associated with each written byte,
      * consider wrapping the OutputStream in a {@link java.io.BufferedOutputStream}
      * to improve write performance.
      *
      * @param stream - the java OutputStream you wish to write the XLS to
-     *
-     * @exception IOException if anything can't be written.
+     * @throws IOException if anything can't be written.
      * @see org.apache.poi.poifs.filesystem.POIFSFileSystem
      */
     @Override
-	public void write(OutputStream stream) throws IOException {
-        NPOIFSFileSystem fs = new NPOIFSFileSystem();
-        try {
+    public void write(OutputStream stream) throws IOException {
+        try (POIFSFileSystem fs = new POIFSFileSystem()) {
             write(fs);
             fs.writeFilesystem(stream);
-        } finally {
-            fs.close();
         }
     }
-    
-    /** Writes the workbook out to a brand new, empty POIFS */
-    private void write(NPOIFSFileSystem fs) throws IOException {
+
+    /**
+     * Writes the workbook out to a brand new, empty POIFS
+     */
+    private void write(POIFSFileSystem fs) throws IOException {
         // For tracking what we've written out, used if we're
         //  going to be preserving nodes
-        List<String> excepts = new ArrayList<String>(1);
+        List<String> excepts = new ArrayList<>(1);
 
         // Write out the Workbook stream
         fs.createDocument(new ByteArrayInputStream(getBytes()), "Workbook");
 
         // Write out our HPFS properties, if we have them
         writeProperties(fs, excepts);
-        
+
         if (preserveNodes) {
             // Don't write out the old Workbook, we'll be doing our new one
             // If the file had an "incorrect" name for the workbook stream,
@@ -1439,16 +1383,16 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
             // summary information has been already written via writeProperties and might go in a
             // different stream, if the file is cryptoapi encrypted
             excepts.addAll(Arrays.asList(
-                DocumentSummaryInformation.DEFAULT_STREAM_NAME,
-                SummaryInformation.DEFAULT_STREAM_NAME,
-                getEncryptedPropertyStreamName()
+                    DocumentSummaryInformation.DEFAULT_STREAM_NAME,
+                    SummaryInformation.DEFAULT_STREAM_NAME,
+                    getEncryptedPropertyStreamName()
             ));
 
             // Copy over all the other nodes to our new poifs
             EntryUtils.copyNodes(
                     new FilteringDirectoryNode(getDirectory(), excepts)
                     , new FilteringDirectoryNode(fs.getRoot(), excepts)
-                    );
+            );
 
             // YK: preserve StorageClsid, it is important for embedded workbooks,
             // see Bugzilla 47920
@@ -1461,25 +1405,28 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      */
     private static final class SheetRecordCollector implements RecordVisitor {
 
-        private List<Record> _list;
+        private List<org.apache.poi.hssf.record.Record> _list;
         private int _totalSize;
 
         public SheetRecordCollector() {
             _totalSize = 0;
-            _list = new ArrayList<Record>(128);
+            _list = new ArrayList<>(128);
         }
+
         public int getTotalSize() {
             return _totalSize;
         }
+
         @Override
-        public void visitRecord(Record r) {
+        public void visitRecord(org.apache.poi.hssf.record.Record r) {
             _list.add(r);
-            _totalSize+=r.getRecordSize();
+            _totalSize += r.getRecordSize();
 
         }
+
         public int serialize(int offset, byte[] data) {
             int result = 0;
-            for (Record rec : _list) {
+            for (org.apache.poi.hssf.record.Record rec : _list) {
                 result += rec.serialize(offset + result, data);
             }
             return result;
@@ -1491,15 +1438,14 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      * Method getBytes - get the bytes of just the HSSF portions of the XLS file.
      * Use this to construct a POI POIFSFileSystem yourself.
      *
-     *
      * @return byte[] array containing the binary representation of this workbook and all contained
-     *         sheets, rows, cells, etc.
+     * sheets, rows, cells, etc.
      */
     public byte[] getBytes() {
-        if (log.check( POILogger.DEBUG )) {
+        if (log.check(POILogger.DEBUG)) {
             log.log(DEBUG, "HSSFWorkbook.getBytes()");
         }
-        
+
         HSSFSheet[] sheets = getSheets();
         int nSheets = sheets.length;
 
@@ -1544,12 +1490,12 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
         }
 
         encryptBytes(retval);
-        
+
         return retval;
     }
 
     @SuppressWarnings("resource")
-    protected void encryptBytes(byte buf[]) {
+    void encryptBytes(byte[] buf) {
         EncryptionInfo ei = getEncryptionInfo();
         if (ei == null) {
             return;
@@ -1559,12 +1505,12 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
         LittleEndianByteArrayInputStream plain = new LittleEndianByteArrayInputStream(buf, 0); // NOSONAR
         LittleEndianByteArrayOutputStream leos = new LittleEndianByteArrayOutputStream(buf, 0); // NOSONAR
         enc.setChunkSize(Biff8DecryptingStream.RC4_REKEYING_INTERVAL);
-        byte tmp[] = new byte[1024];
+        byte[] tmp = new byte[1024];
         try {
             ChunkedCipherOutputStream os = enc.getDataStream(leos, initialOffset);
             int totalBytes = 0;
             while (totalBytes < buf.length) {
-                plain.read(tmp, 0, 4);
+                IOUtils.readFully(plain, tmp, 0, 4);
                 final int sid = LittleEndian.getUShort(tmp, 0);
                 final int len = LittleEndian.getUShort(tmp, 2);
                 boolean isPlain = Biff8DecryptingStream.isNeverEncryptedRecord(sid);
@@ -1573,10 +1519,10 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
                 if (sid == BoundSheetRecord.sid) {
                     // special case for the field_1_position_of_BOF (=lbPlyPos) field of
                     // the BoundSheet8 record which must be unencrypted
-                    byte bsrBuf[] = new byte[len];
+                    byte[] bsrBuf = IOUtils.safelyAllocate(len, MAX_RECORD_LENGTH);
                     plain.readFully(bsrBuf);
                     os.writePlain(bsrBuf, 0, 4);
-                    os.write(bsrBuf, 4, len-4);
+                    os.write(bsrBuf, 4, len - 4);
                 } else {
                     int todo = len;
                     while (todo > 0) {
@@ -1597,13 +1543,14 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
             throw new EncryptedDocumentException(e);
         }
     }
-    
-    /*package*/ InternalWorkbook getWorkbook() {
+
+    @Internal
+    public InternalWorkbook getWorkbook() {
         return workbook;
     }
 
     @Override
-    public int getNumberOfNames(){
+    public int getNumberOfNames() {
         return names.size();
     }
 
@@ -1618,9 +1565,9 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
     @Override
     public List<HSSFName> getNames(String name) {
-        List<HSSFName> nameList = new ArrayList<HSSFName>();
-        for(HSSFName nr : names) {
-            if(nr.getNameName().equals(name)) {
+        List<HSSFName> nameList = new ArrayList<>();
+        for (HSSFName nr : names) {
+            if (nr.getNameName().equals(name)) {
                 nameList.add(nr);
             }
         }
@@ -1628,15 +1575,14 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
         return Collections.unmodifiableList(nameList);
     }
 
-    @Override
-    public HSSFName getNameAt(int nameIndex) {
+    HSSFName getNameAt(int nameIndex) {
         int nNames = names.size();
         if (nNames < 1) {
             throw new IllegalStateException("There are no defined names in this workbook");
         }
         if (nameIndex < 0 || nameIndex > nNames) {
             throw new IllegalArgumentException("Specified name index " + nameIndex
-                    + " is outside the allowable range (0.." + (nNames-1) + ").");
+                    + " is outside the allowable range (0.." + (nNames - 1) + ").");
         }
         return names.get(nameIndex);
     }
@@ -1650,11 +1596,13 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
         return getWorkbook().getNameRecord(nameIndex);
     }
 
-    /** gets the named range name
+    /**
+     * gets the named range name
+     *
      * @param index the named range index (0 based)
      * @return named range name
      */
-    public String getNameName(int index){
+    public String getNameName(int index) {
         return getNameAt(index).getNameName();
     }
 
@@ -1662,23 +1610,23 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      * Sets the printarea for the sheet provided
      * <p>
      * i.e. Reference = $A$1:$B$2
+     *
      * @param sheetIndex Zero-based sheet index (0 Represents the first sheet to keep consistent with java)
-     * @param reference Valid name Reference for the Print Area
+     * @param reference  Valid name Reference for the Print Area
      */
     @Override
-    public void setPrintArea(int sheetIndex, String reference)
-    {
-        NameRecord name = workbook.getSpecificBuiltinRecord(NameRecord.BUILTIN_PRINT_AREA, sheetIndex+1);
+    public void setPrintArea(int sheetIndex, String reference) {
+        NameRecord name = workbook.getSpecificBuiltinRecord(NameRecord.BUILTIN_PRINT_AREA, sheetIndex + 1);
 
 
         if (name == null) {
-            name = workbook.createBuiltInName(NameRecord.BUILTIN_PRINT_AREA, sheetIndex+1);
+            name = workbook.createBuiltInName(NameRecord.BUILTIN_PRINT_AREA, sheetIndex + 1);
             // adding one here because 0 indicates a global named region; doesn't make sense for print areas
         }
         String[] parts = COMMA_PATTERN.split(reference);
-        StringBuffer sb = new StringBuffer(32);
+        StringBuilder sb = new StringBuilder(32);
         for (int i = 0; i < parts.length; i++) {
-            if(i>0) {
+            if (i > 0) {
                 sb.append(",");
             }
             SheetNameFormatter.appendFormat(sb, getSheetName(sheetIndex));
@@ -1690,23 +1638,24 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
     /**
      * For the Convenience of Java Programmers maintaining pointers.
-     * @see #setPrintArea(int, String)
-     * @param sheetIndex Zero-based sheet index (0 = First Sheet)
+     *
+     * @param sheetIndex  Zero-based sheet index (0 = First Sheet)
      * @param startColumn Column to begin printarea
-     * @param endColumn Column to end the printarea
-     * @param startRow Row to begin the printarea
-     * @param endRow Row to end the printarea
+     * @param endColumn   Column to end the printarea
+     * @param startRow    Row to begin the printarea
+     * @param endRow      Row to end the printarea
+     * @see #setPrintArea(int, String)
      */
     @Override
     public void setPrintArea(int sheetIndex, int startColumn, int endColumn,
-                              int startRow, int endRow) {
+                             int startRow, int endRow) {
 
         //using absolute references because they don't get copied and pasted anyway
         CellReference cell = new CellReference(startRow, startColumn, true, true);
         String reference = cell.formatAsString();
 
         cell = new CellReference(endRow, endColumn, true, true);
-        reference = reference+":"+cell.formatAsString();
+        reference = reference + ":" + cell.formatAsString();
 
         setPrintArea(sheetIndex, reference);
     }
@@ -1714,12 +1663,13 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
     /**
      * Retrieves the reference for the printarea of the specified sheet, the sheet name is appended to the reference even if it was not specified.
+     *
      * @param sheetIndex Zero-based sheet index (0 Represents the first sheet to keep consistent with java)
      * @return String Null if no print area has been defined
      */
     @Override
     public String getPrintArea(int sheetIndex) {
-        NameRecord name = workbook.getSpecificBuiltinRecord(NameRecord.BUILTIN_PRINT_AREA, sheetIndex+1);
+        NameRecord name = workbook.getSpecificBuiltinRecord(NameRecord.BUILTIN_PRINT_AREA, sheetIndex + 1);
         //adding one here because 0 indicates a global named region; doesn't make sense for print areas
         if (name == null) {
             return null;
@@ -1730,18 +1680,21 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
     /**
      * Delete the printarea for the sheet specified
+     *
      * @param sheetIndex Zero-based sheet index (0 = First Sheet)
      */
     @Override
     public void removePrintArea(int sheetIndex) {
-        getWorkbook().removeBuiltinRecord(NameRecord.BUILTIN_PRINT_AREA, sheetIndex+1);
+        getWorkbook().removeBuiltinRecord(NameRecord.BUILTIN_PRINT_AREA, sheetIndex + 1);
     }
 
-    /** creates a new named range and add it to the model
+    /**
+     * creates a new named range and add it to the model
+     *
      * @return named range high level
      */
     @Override
-    public HSSFName createName(){
+    public HSSFName createName() {
         NameRecord nameRecord = workbook.createName();
 
         HSSFName newName = new HSSFName(this, nameRecord);
@@ -1751,8 +1704,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
         return newName;
     }
 
-    @Override
-    public int getNameIndex(String name) {
+    int getNameIndex(String name) {
 
         for (int k = 0; k < names.size(); k++) {
             String nameName = getNameName(k);
@@ -1770,99 +1722,91 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      * (name + sheet index is unique), this method is more accurate.
      *
      * @param name the name whose index in the list of names of this workbook
-     *        should be looked up.
+     *             should be looked up.
      * @return an index value >= 0 if the name was found; -1, if the name was
-     *         not found
+     * not found
      */
     int getNameIndex(HSSFName name) {
-      for (int k = 0; k < names.size(); k++) {
-        if (name == names.get(k)) {
-            return k;
+        for (int k = 0; k < names.size(); k++) {
+            if (name == names.get(k)) {
+                return k;
+            }
         }
-      }
-      return -1;
+        return -1;
     }
 
-
-    @Override
-    public void removeName(int index){
+    void removeName(int index) {
         names.remove(index);
         workbook.removeName(index);
     }
 
     /**
      * Returns the instance of HSSFDataFormat for this workbook.
+     *
      * @return the HSSFDataFormat object
      * @see org.apache.poi.hssf.record.FormatRecord
      * @see org.apache.poi.hssf.record.Record
      */
     @Override
     public HSSFDataFormat createDataFormat() {
-    if (formatter == null) {
-        formatter = new HSSFDataFormat(workbook);
+        if (formatter == null) {
+            formatter = new HSSFDataFormat(workbook);
+        }
+        return formatter;
     }
-    return formatter;
-    }
-
-
-    @Override
-    public void removeName(String name) {
-        int index = getNameIndex(name);
-        removeName(index);
-    }
-
 
     /**
-     * As {@link #removeName(String)} is not necessarily unique
-     * (name + sheet index is unique), this method is more accurate.
+     * Remove a name.
      *
      * @param name the name to remove.
      */
     @Override
     public void removeName(Name name) {
-      int index = getNameIndex((HSSFName) name);
-      removeName(index);
+        int index = getNameIndex((HSSFName) name);
+        removeName(index);
     }
 
-    public HSSFPalette getCustomPalette()
-    {
+    public HSSFPalette getCustomPalette() {
         return new HSSFPalette(workbook.getCustomPalette());
     }
 
-    /** Test only. Do not use */
-    public void insertChartRecord()
-    {
+    /**
+     * Test only. Do not use
+     */
+    public void insertChartRecord() {
         int loc = workbook.findFirstRecordLocBySid(SSTRecord.sid);
         byte[] data = {
-           (byte)0x0F, (byte)0x00, (byte)0x00, (byte)0xF0, (byte)0x52,
-           (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
-           (byte)0x06, (byte)0xF0, (byte)0x18, (byte)0x00, (byte)0x00,
-           (byte)0x00, (byte)0x01, (byte)0x08, (byte)0x00, (byte)0x00,
-           (byte)0x02, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x02,
-           (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x01, (byte)0x00,
-           (byte)0x00, (byte)0x00, (byte)0x01, (byte)0x00, (byte)0x00,
-           (byte)0x00, (byte)0x03, (byte)0x00, (byte)0x00, (byte)0x00,
-           (byte)0x33, (byte)0x00, (byte)0x0B, (byte)0xF0, (byte)0x12,
-           (byte)0x00, (byte)0x00, (byte)0x00, (byte)0xBF, (byte)0x00,
-           (byte)0x08, (byte)0x00, (byte)0x08, (byte)0x00, (byte)0x81,
-           (byte)0x01, (byte)0x09, (byte)0x00, (byte)0x00, (byte)0x08,
-           (byte)0xC0, (byte)0x01, (byte)0x40, (byte)0x00, (byte)0x00,
-           (byte)0x08, (byte)0x40, (byte)0x00, (byte)0x1E, (byte)0xF1,
-           (byte)0x10, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x0D,
-           (byte)0x00, (byte)0x00, (byte)0x08, (byte)0x0C, (byte)0x00,
-           (byte)0x00, (byte)0x08, (byte)0x17, (byte)0x00, (byte)0x00,
-           (byte)0x08, (byte)0xF7, (byte)0x00, (byte)0x00, (byte)0x10,
+                (byte) 0x0F, (byte) 0x00, (byte) 0x00, (byte) 0xF0, (byte) 0x52,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x06, (byte) 0xF0, (byte) 0x18, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x01, (byte) 0x08, (byte) 0x00, (byte) 0x00,
+                (byte) 0x02, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x02,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x03, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x33, (byte) 0x00, (byte) 0x0B, (byte) 0xF0, (byte) 0x12,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0xBF, (byte) 0x00,
+                (byte) 0x08, (byte) 0x00, (byte) 0x08, (byte) 0x00, (byte) 0x81,
+                (byte) 0x01, (byte) 0x09, (byte) 0x00, (byte) 0x00, (byte) 0x08,
+                (byte) 0xC0, (byte) 0x01, (byte) 0x40, (byte) 0x00, (byte) 0x00,
+                (byte) 0x08, (byte) 0x40, (byte) 0x00, (byte) 0x1E, (byte) 0xF1,
+                (byte) 0x10, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x0D,
+                (byte) 0x00, (byte) 0x00, (byte) 0x08, (byte) 0x0C, (byte) 0x00,
+                (byte) 0x00, (byte) 0x08, (byte) 0x17, (byte) 0x00, (byte) 0x00,
+                (byte) 0x08, (byte) 0xF7, (byte) 0x00, (byte) 0x00, (byte) 0x10,
         };
-        UnknownRecord r = new UnknownRecord((short)0x00EB, data);
+        UnknownRecord r = new UnknownRecord((short) 0x00EB, data);
         workbook.getRecords().add(loc, r);
     }
 
     /**
      * Spits out a list of all the drawing records in the workbook.
      */
-    public void dumpDrawingGroupRecords(boolean fat)
-    {
-        DrawingGroupRecord r = (DrawingGroupRecord) workbook.findFirstRecordBySid( DrawingGroupRecord.sid );
+    public void dumpDrawingGroupRecords(boolean fat) {
+        DrawingGroupRecord r = (DrawingGroupRecord) workbook.findFirstRecordBySid(DrawingGroupRecord.sid);
+        if (r == null) {
+            return;
+        }
         r.decode();
         List<EscherRecord> escherRecords = r.getEscherRecords();
         PrintWriter w = new PrintWriter(new OutputStreamWriter(System.out, Charset.defaultCharset()));
@@ -1876,10 +1820,10 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
         w.flush();
     }
 
-    void initDrawings(){
+    void initDrawings() {
         DrawingManager2 mgr = workbook.findDrawingGroup();
-        if(mgr != null) {
-            for(HSSFSheet sh : _sheets)  {
+        if (mgr != null) {
+            for (HSSFSheet sh : _sheets) {
                 sh.getDrawingPatriarch();
             }
         } else {
@@ -1890,9 +1834,8 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
     /**
      * Adds a picture to the workbook.
      *
-     * @param pictureData       The bytes of the picture
-     * @param format            The format of the picture.  One of <code>PICTURE_TYPE_*</code>
-     *
+     * @param pictureData The bytes of the picture
+     * @param format      The format of the picture.  One of <code>PICTURE_TYPE_*</code>
      * @return the index to this picture (1 based).
      * @see #PICTURE_TYPE_WMF
      * @see #PICTURE_TYPE_EMF
@@ -1903,8 +1846,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      */
     @SuppressWarnings("fallthrough")
     @Override
-    public int addPicture(byte[] pictureData, int format)
-    {
+    public int addPicture(byte[] pictureData, int format) {
         initDrawings();
 
         byte[] uid = DigestUtils.md5(pictureData);
@@ -1913,12 +1855,9 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
         short escherTag;
         switch (format) {
             case PICTURE_TYPE_WMF:
-                // remove first 22 bytes if file starts with magic bytes D7-CD-C6-9A
-                // see also http://de.wikipedia.org/wiki/Windows_Metafile#Hinweise_zur_WMF-Spezifikation
-                if (LittleEndian.getInt(pictureData) == 0x9AC6CDD7) {
-                    byte picDataNoHeader[] = new byte[pictureData.length-22];
-                    System.arraycopy(pictureData, 22, picDataNoHeader, 0, pictureData.length-22);
-                    pictureData = picDataNoHeader;
+                // remove first 22 bytes if file starts with the WMF placeable header
+                if (FileMagic.valueOf(pictureData) == FileMagic.WMF) {
+                    pictureData = IOUtils.safelyClone(pictureData, 22, pictureData.length - 22, MAX_IMAGE_LENGTH);
                 }
                 // fall through
             case PICTURE_TYPE_EMF:
@@ -1927,24 +1866,23 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
                 blipRecordMeta.setUID(uid);
                 blipRecordMeta.setPictureData(pictureData);
                 // taken from libre office export, it won't open, if this is left to 0
-                blipRecordMeta.setFilter((byte)-2);
+                blipRecordMeta.setFilter((byte) -2);
                 blipSize = blipRecordMeta.getCompressedSize() + 58;
                 escherTag = 0;
                 break;
             default:
                 EscherBitmapBlip blipRecordBitmap = new EscherBitmapBlip();
                 blipRecord = blipRecordBitmap;
-                blipRecordBitmap.setUID( uid );
-                blipRecordBitmap.setMarker( (byte) 0xFF );
-                blipRecordBitmap.setPictureData( pictureData );
+                blipRecordBitmap.setUID(uid);
+                blipRecordBitmap.setMarker((byte) 0xFF);
+                blipRecordBitmap.setPictureData(pictureData);
                 blipSize = pictureData.length + 25;
                 escherTag = (short) 0xFF;
-    	        break;
+                break;
         }
 
         blipRecord.setRecordId((short) (EscherBlipRecord.RECORD_ID_START + format));
-        switch (format)
-        {
+        switch (format) {
             case PICTURE_TYPE_EMF:
                 blipRecord.setOptions(HSSFPictureData.MSOBI_EMF);
                 break;
@@ -1968,18 +1906,18 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
         }
 
         EscherBSERecord r = new EscherBSERecord();
-        r.setRecordId( EscherBSERecord.RECORD_ID );
-        r.setOptions( (short) ( 0x0002 | ( format << 4 ) ) );
-        r.setBlipTypeMacOS( (byte) format );
-        r.setBlipTypeWin32( (byte) format );
-        r.setUid( uid );
-        r.setTag( escherTag );
-        r.setSize( blipSize );
-        r.setRef( 0 );
-        r.setOffset( 0 );
-        r.setBlipRecord( blipRecord );
+        r.setRecordId(EscherBSERecord.RECORD_ID);
+        r.setOptions((short) (0x0002 | (format << 4)));
+        r.setBlipTypeMacOS((byte) format);
+        r.setBlipTypeWin32((byte) format);
+        r.setUid(uid);
+        r.setTag(escherTag);
+        r.setSize(blipSize);
+        r.setRef(0);
+        r.setOffset(0);
+        r.setBlipRecord(blipRecord);
 
-        return workbook.addBSERecord( r );
+        return workbook.addBSERecord(r);
     }
 
     /**
@@ -1988,11 +1926,10 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      * @return the list of pictures (a list of {@link HSSFPictureData} objects.)
      */
     @Override
-    public List<HSSFPictureData> getAllPictures()
-    {
+    public List<HSSFPictureData> getAllPictures() {
         // The drawing group record always exists at the top level, so we won't need to do this recursively.
-        List<HSSFPictureData> pictures = new ArrayList<HSSFPictureData>();
-        for (Record r : workbook.getRecords()) {
+        List<HSSFPictureData> pictures = new ArrayList<>();
+        for (org.apache.poi.hssf.record.Record r : workbook.getRecords()) {
             if (r instanceof AbstractEscherHolderRecord) {
                 ((AbstractEscherHolderRecord) r).decode();
                 List<EscherRecord> escherRecords = ((AbstractEscherHolderRecord) r).getEscherRecords();
@@ -2006,20 +1943,17 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      * Performs a recursive search for pictures in the given list of escher records.
      *
      * @param escherRecords the escher records.
-     * @param pictures the list to populate with the pictures.
+     * @param pictures      the list to populate with the pictures.
      */
-    private void searchForPictures(List<EscherRecord> escherRecords, List<HSSFPictureData> pictures)
-    {
-        for(EscherRecord escherRecord : escherRecords) {
+    private void searchForPictures(List<EscherRecord> escherRecords, List<HSSFPictureData> pictures) {
+        for (EscherRecord escherRecord : escherRecords) {
 
-            if (escherRecord instanceof EscherBSERecord)
-            {
+            if (escherRecord instanceof EscherBSERecord) {
                 EscherBlipRecord blip = ((EscherBSERecord) escherRecord).getBlipRecord();
-                if (blip != null)
-                {
+                if (blip != null) {
                     // TODO: Some kind of structure.
                     HSSFPictureData picture = new HSSFPictureData(blip);
-					pictures.add(picture);
+                    pictures.add(picture);
                 }
 
 
@@ -2031,82 +1965,78 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
     }
 
-    protected static Map<String,ClassID> getOleMap() {
-    	Map<String,ClassID> olemap = new HashMap<String,ClassID>();
-    	olemap.put("PowerPoint Document", ClassID.PPT_SHOW);
-    	for (String str : WORKBOOK_DIR_ENTRY_NAMES) {
-    		olemap.put(str, ClassID.XLS_WORKBOOK);
-    	}
-    	// ... to be continued
-    	return olemap;
+    static Map<String, ClassID> getOleMap() {
+        Map<String, ClassID> olemap = new HashMap<>();
+        olemap.put("PowerPoint Document", ClassIDPredefined.POWERPOINT_V8.getClassID());
+        for (String str : WORKBOOK_DIR_ENTRY_NAMES) {
+            olemap.put(str, ClassIDPredefined.EXCEL_V7_WORKBOOK.getClassID());
+        }
+        // ... to be continued
+        return olemap;
     }
 
     /**
      * Adds an OLE package manager object with the given POIFS to the sheet
      *
-     * @param poiData an POIFS containing the embedded document, to be added
-     * @param label the label of the payload
+     * @param poiData  an POIFS containing the embedded document, to be added
+     * @param label    the label of the payload
      * @param fileName the original filename
-     * @param command the command to open the payload
+     * @param command  the command to open the payload
      * @return the index of the added ole object
      * @throws IOException if the object can't be embedded
      */
     public int addOlePackage(POIFSFileSystem poiData, String label, String fileName, String command)
-    throws IOException {
-    	DirectoryNode root = poiData.getRoot();
-    	Map<String,ClassID> olemap = getOleMap();
-    	for (Map.Entry<String,ClassID> entry : olemap.entrySet()) {
-    		if (root.hasEntry(entry.getKey())) {
-    			root.setStorageClsid(entry.getValue());
-    			break;
-    		}
-    	}
+            throws IOException {
+        DirectoryNode root = poiData.getRoot();
+        Map<String, ClassID> olemap = getOleMap();
+        for (Map.Entry<String, ClassID> entry : olemap.entrySet()) {
+            if (root.hasEntry(entry.getKey())) {
+                root.setStorageClsid(entry.getValue());
+                break;
+            }
+        }
 
-    	ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    	poiData.writeFilesystem(bos);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        poiData.writeFilesystem(bos);
         return addOlePackage(bos.toByteArray(), label, fileName, command);
     }
 
     @Override
     public int addOlePackage(byte[] oleData, String label, String fileName, String command)
-    throws IOException {
-    	// check if we were created by POIFS otherwise create a new dummy POIFS for storing the package data
-    	if (initDirectory()) {
-    		preserveNodes = true;
-    	}
+            throws IOException {
+        // check if we were created by POIFS otherwise create a new dummy POIFS for storing the package data
+        if (initDirectory()) {
+            preserveNodes = true;
+        }
 
         // get free MBD-Node
         int storageId = 0;
         DirectoryEntry oleDir = null;
         do {
-            String storageStr = "MBD"+ HexDump.toHex(++storageId);
+            String storageStr = "MBD" + HexDump.toHex(++storageId);
             if (!getDirectory().hasEntry(storageStr)) {
                 oleDir = getDirectory().createDirectory(storageStr);
-                oleDir.setStorageClsid(ClassID.OLE10_PACKAGE);
+                oleDir.setStorageClsid(ClassIDPredefined.OLE_V1_PACKAGE.getClassID());
             }
         } while (oleDir == null);
 
-        // the following data was taken from an example libre office document
-        // beside this "\u0001Ole" record there were several other records, e.g. CompObj,
-        // OlePresXXX, but it seems, that they aren't neccessary
-        byte oleBytes[] = { 1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-        oleDir.createDocument("\u0001Ole", new ByteArrayInputStream(oleBytes));
+        Ole10Native.createOleMarkerEntry(oleDir);
 
         Ole10Native oleNative = new Ole10Native(label, fileName, command, oleData);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         oleNative.writeOut(bos);
         oleDir.createDocument(Ole10Native.OLE10_NATIVE, new ByteArrayInputStream(bos.toByteArray()));
 
-    	return storageId;
+        return storageId;
     }
 
     /**
      * Adds the LinkTable records required to allow formulas referencing
-     *  the specified external workbook to be added to this one. Allows
-     *  formulas such as "[MyOtherWorkbook]Sheet3!$A$5" to be added to the
-     *  file, for workbooks not already referenced.
+     * the specified external workbook to be added to this one. Allows
+     * formulas such as "[MyOtherWorkbook]Sheet3!$A$5" to be added to the
+     * file, for workbooks not already referenced.
      *
-     * @param name The name the workbook will be referenced as in formulas
+     * @param name     The name the workbook will be referenced as in formulas
      * @param workbook The open workbook to fetch the link required information from
      */
     @Override
@@ -2124,17 +2054,18 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
     /**
      * protect a workbook with a password (not encypted, just sets writeprotect
      * flags and the password.
+     *
      * @param password to set
      */
-    public void writeProtectWorkbook( String password, String username ) {
-       this.workbook.writeProtectWorkbook(password, username);
+    public void writeProtectWorkbook(String password, String username) {
+        this.workbook.writeProtectWorkbook(password, username);
     }
 
     /**
      * removes the write protect flag
      */
     public void unwriteProtectWorkbook() {
-       this.workbook.unwriteProtectWorkbook();
+        this.workbook.unwriteProtectWorkbook();
     }
 
     /**
@@ -2142,11 +2073,9 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      *
      * @return the list of embedded objects (a list of {@link HSSFObjectData} objects.)
      */
-    public List<HSSFObjectData> getAllEmbeddedObjects()
-    {
-        List<HSSFObjectData> objects = new ArrayList<HSSFObjectData>();
-        for (HSSFSheet sheet : _sheets)
-        {
+    public List<HSSFObjectData> getAllEmbeddedObjects() {
+        List<HSSFObjectData> objects = new ArrayList<>();
+        for (HSSFSheet sheet : _sheets) {
             getAllEmbeddedObjects(sheet, objects);
         }
         return Collections.unmodifiableList(objects);
@@ -2155,25 +2084,24 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
     /**
      * Gets all embedded OLE2 objects from the Workbook.
      *
-     * @param sheet embedded object attached to
+     * @param sheet   embedded object attached to
      * @param objects the list of embedded objects to populate.
      */
-    private void getAllEmbeddedObjects(HSSFSheet sheet, List<HSSFObjectData> objects)
-    {
+    private void getAllEmbeddedObjects(HSSFSheet sheet, List<HSSFObjectData> objects) {
         HSSFPatriarch patriarch = sheet.getDrawingPatriarch();
-        if (null == patriarch){
+        if (null == patriarch) {
             return;
         }
         getAllEmbeddedObjects(patriarch, objects);
     }
+
     /**
      * Recursively iterates a shape container to get all embedded objects.
      *
-     * @param parent the parent.
+     * @param parent  the parent.
      * @param objects the list of embedded objects to populate.
      */
-    private void getAllEmbeddedObjects(HSSFShapeContainer parent, List<HSSFObjectData> objects)
-    {
+    private void getAllEmbeddedObjects(HSSFShapeContainer parent, List<HSSFObjectData> objects) {
         for (HSSFShape shape : parent.getChildren()) {
             if (shape instanceof HSSFObjectData) {
                 objects.add((HSSFObjectData) shape);
@@ -2182,19 +2110,19 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
             }
         }
     }
+
     @Override
     public HSSFCreationHelper getCreationHelper() {
         return new HSSFCreationHelper(this);
     }
 
     /**
-     *
      * Returns the locator of user-defined functions.
      * The default instance extends the built-in functions with the Analysis Tool Pack
      *
      * @return the locator of user-defined functions
      */
-    /*package*/ UDFFinder getUDFFinder(){
+    /*package*/ UDFFinder getUDFFinder() {
         return _udfFinder;
     }
 
@@ -2204,8 +2132,8 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      * @param toopack the toolpack to register
      */
     @Override
-    public void addToolPack(UDFFinder toopack){
-        AggregatingUDFFinder udfs = (AggregatingUDFFinder)_udfFinder;
+    public void addToolPack(UDFFinder toopack) {
+        AggregatingUDFFinder udfs = (AggregatingUDFFinder) _udfFinder;
         udfs.add(toopack);
     }
 
@@ -2223,11 +2151,11 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      * </p>
      *
      * @param value true if the application will perform a full recalculation of
-     * workbook values when the workbook is opened
+     *              workbook values when the workbook is opened
      * @since 3.8
      */
     @Override
-    public void setForceFormulaRecalculation(boolean value){
+    public void setForceFormulaRecalculation(boolean value) {
         InternalWorkbook iwb = getWorkbook();
         RecalcIdRecord recalc = iwb.getRecalcId();
         recalc.setEngineId(0);
@@ -2239,42 +2167,34 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      * @since 3.8
      */
     @Override
-    public boolean getForceFormulaRecalculation(){
+    public boolean getForceFormulaRecalculation() {
         InternalWorkbook iwb = getWorkbook();
-        RecalcIdRecord recalc = (RecalcIdRecord)iwb.findFirstRecordBySid(RecalcIdRecord.sid);
+        RecalcIdRecord recalc = (RecalcIdRecord) iwb.findFirstRecordBySid(RecalcIdRecord.sid);
         return recalc != null && recalc.getEngineId() != 0;
     }
 
-	/**
-	 * Changes an external referenced file to another file.
-	 * A formula in Excel which references a cell in another file is saved in two parts:
-	 * The referenced file is stored in an reference table. the row/cell information is saved separate.
-	 * This method invocation will only change the reference in the lookup-table itself.
-	 * @param oldUrl The old URL to search for and which is to be replaced
-	 * @param newUrl The URL replacement
-	 * @return true if the oldUrl was found and replaced with newUrl. Otherwise false
-	 */
+    /**
+     * Changes an external referenced file to another file.
+     * A formula in Excel which references a cell in another file is saved in two parts:
+     * The referenced file is stored in an reference table. the row/cell information is saved separate.
+     * This method invocation will only change the reference in the lookup-table itself.
+     *
+     * @param oldUrl The old URL to search for and which is to be replaced
+     * @param newUrl The URL replacement
+     * @return true if the oldUrl was found and replaced with newUrl. Otherwise false
+     */
     public boolean changeExternalReference(String oldUrl, String newUrl) {
-    	return workbook.changeExternalReference(oldUrl, newUrl);
+        return workbook.changeExternalReference(oldUrl, newUrl);
     }
 
-    /** 
-     * @deprecated POI 3.16 beta 1. use {@link POIDocument#getDirectory()} instead
-     */
-    @Deprecated
-    @Removal(version="3.18")
-    public DirectoryNode getRootDirectory(){
-        return getDirectory();
-    }
-    
     @Internal
     public InternalWorkbook getInternalWorkbook() {
         return workbook;
     }
-    
+
     /**
      * Returns the spreadsheet version (EXCLE97) of this workbook
-     * 
+     *
      * @return EXCEL97 SpreadsheetVersion enum
      * @since 3.14 beta 2
      */
@@ -2285,7 +2205,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
     @Override
     public EncryptionInfo getEncryptionInfo() {
-        FilePassRecord fpr = (FilePassRecord)workbook.findFirstRecordBySid(FilePassRecord.sid);
+        FilePassRecord fpr = (FilePassRecord) workbook.findFirstRecordBySid(FilePassRecord.sid);
         return (fpr != null) ? fpr.getEncryptionInfo() : null;
     }
 
@@ -2293,7 +2213,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
     private void updateEncryptionInfo() {
         // make sure, that we've read all the streams ...
         readProperties();
-        FilePassRecord fpr = (FilePassRecord)workbook.findFirstRecordBySid(FilePassRecord.sid);
+        FilePassRecord fpr = (FilePassRecord) workbook.findFirstRecordBySid(FilePassRecord.sid);
 
         String password = Biff8EncryptionKey.getCurrentUserPassword();
         WorkbookRecordList wrl = workbook.getWorkbookRecordList();
@@ -2312,20 +2232,26 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
             // check if the password has been changed
             EncryptionInfo ei = fpr.getEncryptionInfo();
             EncryptionVerifier ver = ei.getVerifier();
-            byte encVer[] = ver.getEncryptedVerifier();
+            byte[] encVer = ver.getEncryptedVerifier();
             Decryptor dec = ei.getDecryptor();
             Encryptor enc = ei.getEncryptor();
             try {
                 if (encVer == null || !dec.verifyPassword(password)) {
                     enc.confirmPassword(password);
                 } else {
-                    byte verifier[] = dec.getVerifier();
-                    byte salt[] = ver.getSalt();
+                    byte[] verifier = dec.getVerifier();
+                    byte[] salt = ver.getSalt();
                     enc.confirmPassword(password, null, null, verifier, salt, null);
                 }
             } catch (GeneralSecurityException e) {
                 throw new EncryptedDocumentException("can't validate/update encryption setting", e);
             }
         }
+    }
+
+
+    @Override
+    public HSSFEvaluationWorkbook createEvaluationWorkbook() {
+        return HSSFEvaluationWorkbook.create(this);
     }
 }

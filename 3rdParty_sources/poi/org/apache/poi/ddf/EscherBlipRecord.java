@@ -17,12 +17,20 @@
 
 package org.apache.poi.ddf;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.LittleEndian;
 
 public class EscherBlipRecord extends EscherRecord {
-    public static final short  RECORD_ID_START    = (short) 0xF018;
-    public static final short  RECORD_ID_END      = (short) 0xF117;
-    public static final String RECORD_DESCRIPTION = "msofbtBlip";
+
+    //arbitrarily selected; may need to increase
+    private static final int MAX_RECORD_LENGTH = 104_857_600;
+
+    public static final short  RECORD_ID_START    = EscherRecordTypes.BLIP_START.typeID;
+    public static final short  RECORD_ID_END      = EscherRecordTypes.BLIP_END.typeID;
 
     private static final int   HEADER_SIZE               = 8;
 
@@ -31,14 +39,17 @@ public class EscherBlipRecord extends EscherRecord {
     public EscherBlipRecord() {
     }
 
+    public EscherBlipRecord(EscherBlipRecord other) {
+        super(other);
+        field_pictureData = (other.field_pictureData == null) ? null : other.field_pictureData.clone();
+    }
+
     @Override
     public int fillFields(byte[] data, int offset, EscherRecordFactory recordFactory) {
         int bytesAfterHeader = readHeader( data, offset );
         int pos              = offset + HEADER_SIZE;
 
-        field_pictureData = new byte[bytesAfterHeader];
-        System.arraycopy(data, pos, field_pictureData, 0, bytesAfterHeader);
-
+        field_pictureData = IOUtils.safelyClone(data, pos, bytesAfterHeader, MAX_RECORD_LENGTH);
         return bytesAfterHeader + 8;
     }
 
@@ -62,7 +73,8 @@ public class EscherBlipRecord extends EscherRecord {
 
     @Override
     public String getRecordName() {
-        return "Blip";
+        EscherRecordTypes t = EscherRecordTypes.forTypeID(getRecordId());
+        return (t != EscherRecordTypes.UNKNOWN ? t : EscherRecordTypes.BLIP_START).recordName;
     }
 
     /**
@@ -94,14 +106,26 @@ public class EscherBlipRecord extends EscherRecord {
         if (pictureData == null || offset < 0 || length < 0 || pictureData.length < offset+length) {
             throw new IllegalArgumentException("picture data can't be null");
         }
-        field_pictureData = new byte[length];
-        System.arraycopy(pictureData, offset, field_pictureData, 0, length);
+        field_pictureData = IOUtils.safelyClone(pictureData, offset, length, MAX_RECORD_LENGTH);
     }
 
     @Override
-    protected Object[][] getAttributeMap() {
-        return new Object[][] {
-            { "Extra Data", getPicturedata() }
-        };
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "base", super::getGenericProperties,
+            "pictureData", this::getPicturedata
+        );
+    }
+
+    @Override
+    public Enum getGenericRecordType() {
+        EscherRecordTypes t = EscherRecordTypes.forTypeID(getRecordId());
+        return (t != EscherRecordTypes.UNKNOWN) ? t : EscherRecordTypes.BLIP_START;
+    }
+
+
+    @Override
+    public EscherBlipRecord copy() {
+        return new EscherBlipRecord(this);
     }
 }

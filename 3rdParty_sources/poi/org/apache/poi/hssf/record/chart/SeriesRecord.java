@@ -17,84 +17,63 @@
 
 package org.apache.poi.hssf.record.chart;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * The series record describes the overall data for a series.
  */
 public final class SeriesRecord extends StandardRecord {
-    public final static short      sid                             = 0x1003;
-    private  short      field_1_categoryDataType;
-    public final static short       CATEGORY_DATA_TYPE_DATES       = 0;
-    public final static short       CATEGORY_DATA_TYPE_NUMERIC     = 1;
-    public final static short       CATEGORY_DATA_TYPE_SEQUENCE    = 2;
-    public final static short       CATEGORY_DATA_TYPE_TEXT        = 3;
-    private  short      field_2_valuesDataType;
-    public final static short       VALUES_DATA_TYPE_DATES         = 0;
-    public final static short       VALUES_DATA_TYPE_NUMERIC       = 1;
-    public final static short       VALUES_DATA_TYPE_SEQUENCE      = 2;
-    public final static short       VALUES_DATA_TYPE_TEXT          = 3;
-    private  short      field_3_numCategories;
-    private  short      field_4_numValues;
-    private  short      field_5_bubbleSeriesType;
-    public final static short       BUBBLE_SERIES_TYPE_DATES       = 0;
-    public final static short       BUBBLE_SERIES_TYPE_NUMERIC     = 1;
-    public final static short       BUBBLE_SERIES_TYPE_SEQUENCE    = 2;
-    public final static short       BUBBLE_SERIES_TYPE_TEXT        = 3;
-    private  short      field_6_numBubbleValues;
+    public static final short sid                         = 0x1003;
+
+    public static final short CATEGORY_DATA_TYPE_DATES    = 0;
+    public static final short CATEGORY_DATA_TYPE_NUMERIC  = 1;
+    public static final short CATEGORY_DATA_TYPE_SEQUENCE = 2;
+    public static final short CATEGORY_DATA_TYPE_TEXT     = 3;
+
+    public static final short VALUES_DATA_TYPE_DATES      = 0;
+    public static final short VALUES_DATA_TYPE_NUMERIC    = 1;
+    public static final short VALUES_DATA_TYPE_SEQUENCE   = 2;
+    public static final short VALUES_DATA_TYPE_TEXT       = 3;
+
+    public static final short BUBBLE_SERIES_TYPE_DATES    = 0;
+    public static final short BUBBLE_SERIES_TYPE_NUMERIC  = 1;
+    public static final short BUBBLE_SERIES_TYPE_SEQUENCE = 2;
+    public static final short BUBBLE_SERIES_TYPE_TEXT     = 3;
+
+    private short field_1_categoryDataType;
+    private short field_2_valuesDataType;
+    private short field_3_numCategories;
+    private short field_4_numValues;
+    private short field_5_bubbleSeriesType;
+    private short field_6_numBubbleValues;
 
 
-    public SeriesRecord()
-    {
+    public SeriesRecord() {}
 
+    public SeriesRecord(SeriesRecord other) {
+        super(other);
+        field_1_categoryDataType = other.field_1_categoryDataType;
+        field_2_valuesDataType   = other.field_2_valuesDataType;
+        field_3_numCategories    = other.field_3_numCategories;
+        field_4_numValues        = other.field_4_numValues;
+        field_5_bubbleSeriesType = other.field_5_bubbleSeriesType;
+        field_6_numBubbleValues  = other.field_6_numBubbleValues;
     }
 
-    public SeriesRecord(RecordInputStream in)
-    {
-        field_1_categoryDataType       = in.readShort();
-        field_2_valuesDataType         = in.readShort();
-        field_3_numCategories          = in.readShort();
-        field_4_numValues              = in.readShort();
-        field_5_bubbleSeriesType       = in.readShort();
-        field_6_numBubbleValues        = in.readShort();
-
-    }
-
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[SERIES]\n");
-        buffer.append("    .categoryDataType     = ")
-            .append("0x").append(HexDump.toHex(  getCategoryDataType ()))
-            .append(" (").append( getCategoryDataType() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-        buffer.append("    .valuesDataType       = ")
-            .append("0x").append(HexDump.toHex(  getValuesDataType ()))
-            .append(" (").append( getValuesDataType() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-        buffer.append("    .numCategories        = ")
-            .append("0x").append(HexDump.toHex(  getNumCategories ()))
-            .append(" (").append( getNumCategories() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-        buffer.append("    .numValues            = ")
-            .append("0x").append(HexDump.toHex(  getNumValues ()))
-            .append(" (").append( getNumValues() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-        buffer.append("    .bubbleSeriesType     = ")
-            .append("0x").append(HexDump.toHex(  getBubbleSeriesType ()))
-            .append(" (").append( getBubbleSeriesType() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-        buffer.append("    .numBubbleValues      = ")
-            .append("0x").append(HexDump.toHex(  getNumBubbleValues ()))
-            .append(" (").append( getNumBubbleValues() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-
-        buffer.append("[/SERIES]\n");
-        return buffer.toString();
+    public SeriesRecord(RecordInputStream in) {
+        field_1_categoryDataType = in.readShort();
+        field_2_valuesDataType   = in.readShort();
+        field_3_numCategories    = in.readShort();
+        field_4_numValues        = in.readShort();
+        field_5_bubbleSeriesType = in.readShort();
+        field_6_numBubbleValues  = in.readShort();
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -115,25 +94,15 @@ public final class SeriesRecord extends StandardRecord {
         return sid;
     }
 
-    public Object clone() {
-        SeriesRecord rec = new SeriesRecord();
-    
-        rec.field_1_categoryDataType = field_1_categoryDataType;
-        rec.field_2_valuesDataType = field_2_valuesDataType;
-        rec.field_3_numCategories = field_3_numCategories;
-        rec.field_4_numValues = field_4_numValues;
-        rec.field_5_bubbleSeriesType = field_5_bubbleSeriesType;
-        rec.field_6_numBubbleValues = field_6_numBubbleValues;
-        return rec;
+    @Override
+    public SeriesRecord copy() {
+        return new SeriesRecord(this);
     }
-
-
-
 
     /**
      * Get the category data type field for the Series record.
      *
-     * @return  One of 
+     * @return  One of
      *        CATEGORY_DATA_TYPE_DATES
      *        CATEGORY_DATA_TYPE_NUMERIC
      *        CATEGORY_DATA_TYPE_SEQUENCE
@@ -148,7 +117,7 @@ public final class SeriesRecord extends StandardRecord {
      * Set the category data type field for the Series record.
      *
      * @param field_1_categoryDataType
-     *        One of 
+     *        One of
      *        CATEGORY_DATA_TYPE_DATES
      *        CATEGORY_DATA_TYPE_NUMERIC
      *        CATEGORY_DATA_TYPE_SEQUENCE
@@ -162,7 +131,7 @@ public final class SeriesRecord extends StandardRecord {
     /**
      * Get the values data type field for the Series record.
      *
-     * @return  One of 
+     * @return  One of
      *        VALUES_DATA_TYPE_DATES
      *        VALUES_DATA_TYPE_NUMERIC
      *        VALUES_DATA_TYPE_SEQUENCE
@@ -177,7 +146,7 @@ public final class SeriesRecord extends StandardRecord {
      * Set the values data type field for the Series record.
      *
      * @param field_2_valuesDataType
-     *        One of 
+     *        One of
      *        VALUES_DATA_TYPE_DATES
      *        VALUES_DATA_TYPE_NUMERIC
      *        VALUES_DATA_TYPE_SEQUENCE
@@ -223,7 +192,7 @@ public final class SeriesRecord extends StandardRecord {
     /**
      * Get the bubble series type field for the Series record.
      *
-     * @return  One of 
+     * @return  One of
      *        BUBBLE_SERIES_TYPE_DATES
      *        BUBBLE_SERIES_TYPE_NUMERIC
      *        BUBBLE_SERIES_TYPE_SEQUENCE
@@ -238,7 +207,7 @@ public final class SeriesRecord extends StandardRecord {
      * Set the bubble series type field for the Series record.
      *
      * @param field_5_bubbleSeriesType
-     *        One of 
+     *        One of
      *        BUBBLE_SERIES_TYPE_DATES
      *        BUBBLE_SERIES_TYPE_NUMERIC
      *        BUBBLE_SERIES_TYPE_SEQUENCE
@@ -263,5 +232,22 @@ public final class SeriesRecord extends StandardRecord {
     public void setNumBubbleValues(short field_6_numBubbleValues)
     {
         this.field_6_numBubbleValues = field_6_numBubbleValues;
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.SERIES;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "categoryDataType", this::getCategoryDataType,
+            "valuesDataType", this::getValuesDataType,
+            "numCategories", this::getNumCategories,
+            "numValues", this::getNumValues,
+            "bubbleSeriesType", this::getBubbleSeriesType,
+            "numBubbleValues", this::getNumBubbleValues
+        );
     }
 }

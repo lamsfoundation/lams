@@ -17,29 +17,34 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        Default Column Width Record (0x0055) <P>
- * Description:  Specifies the default width for columns that have no specific
- *               width set.<P>
- * REFERENCE:  PG 302 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)<P>
- * @author Andrew C. Oliver (acoliver at apache dot org)
- * @author Jason Height (jheight at chariot dot net dot au)
+ * Specifies the default width for columns that have no specific width set.
+ *
  * @version 2.0-pre
  */
-public final class DefaultColWidthRecord extends StandardRecord implements Cloneable {
-    public final static short sid = 0x0055;
-    private int             field_1_col_width;
+public final class DefaultColWidthRecord extends StandardRecord {
+    public static final short sid = 0x0055;
 
     /**
      *  The default column width is 8 characters
      */
-    public final static int DEFAULT_COLUMN_WIDTH = 0x0008;
+    public static final int DEFAULT_COLUMN_WIDTH = 0x0008;
 
-    public DefaultColWidthRecord()
-    {
+    private int field_1_col_width;
+
+    public DefaultColWidthRecord() {
         field_1_col_width = DEFAULT_COLUMN_WIDTH;
+    }
+
+    public DefaultColWidthRecord(DefaultColWidthRecord other) {
+        super(other);
+        field_1_col_width = other.field_1_col_width;
     }
 
     public DefaultColWidthRecord(RecordInputStream in)
@@ -67,17 +72,6 @@ public final class DefaultColWidthRecord extends StandardRecord implements Clone
         return field_1_col_width;
     }
 
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[DEFAULTCOLWIDTH]\n");
-        buffer.append("    .colwidth      = ")
-            .append(Integer.toHexString(getColWidth())).append("\n");
-        buffer.append("[/DEFAULTCOLWIDTH]\n");
-        return buffer.toString();
-    }
-
     public void serialize(LittleEndianOutput out) {
         out.writeShort(getColWidth());
     }
@@ -92,9 +86,19 @@ public final class DefaultColWidthRecord extends StandardRecord implements Clone
     }
 
     @Override
-    public DefaultColWidthRecord clone() {
-      DefaultColWidthRecord rec = new DefaultColWidthRecord();
-      rec.field_1_col_width = field_1_col_width;
-      return rec;
+    public DefaultColWidthRecord copy() {
+      return new DefaultColWidthRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.DEFAULT_COL_WIDTH;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "colWidth", this::getColWidth
+        );
     }
 }

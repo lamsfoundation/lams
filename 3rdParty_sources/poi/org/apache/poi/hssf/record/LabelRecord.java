@@ -17,6 +17,10 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.HexDump;
 import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
@@ -24,33 +28,39 @@ import org.apache.poi.util.RecordFormatException;
 
 /**
  * Label Record (0x0204) - read only support for strings stored directly in the cell...
- * Don't use this (except to read), use LabelSST instead <P>
- * REFERENCE:  PG 325 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)
- * 
+ * Don't use this (except to read), use LabelSST instead
+ *
  * @see org.apache.poi.hssf.record.LabelSSTRecord
  */
-public final class LabelRecord extends Record implements CellValueRecordInterface, Cloneable {
-    private final static POILogger logger = POILogFactory.getLogger(LabelRecord.class);
+public final class LabelRecord extends Record implements CellValueRecordInterface {
+    private static final POILogger logger = POILogFactory.getLogger(LabelRecord.class);
 
-    public final static short sid = 0x0204;
+    public static final short sid = 0x0204;
 
-    private int               field_1_row;
-    private short             field_2_column;
-    private short             field_3_xf_index;
-    private short             field_4_string_len;
-    private byte              field_5_unicode_flag;
-    private String            field_6_value;
+    private int    field_1_row;
+    private short  field_2_column;
+    private short  field_3_xf_index;
+    private short  field_4_string_len;
+    private byte   field_5_unicode_flag;
+    private String field_6_value;
 
     /** Creates new LabelRecord */
-    public LabelRecord()
-    {
+    public LabelRecord() {}
+
+    public LabelRecord(LabelRecord other) {
+        super(other);
+        field_1_row = other.field_1_row;
+        field_2_column = other.field_2_column;
+        field_3_xf_index = other.field_3_xf_index;
+        field_4_string_len = other.field_4_string_len;
+        field_5_unicode_flag = other.field_5_unicode_flag;
+        field_6_value = other.field_6_value;
     }
 
     /**
      * @param in the RecordInputstream to read the record from
      */
-    public LabelRecord(RecordInputStream in)
-    {
+    public LabelRecord(RecordInputStream in) {
         field_1_row          = in.readUShort();
         field_2_column       = in.readShort();
         field_3_xf_index     = in.readShort();
@@ -68,8 +78,8 @@ public final class LabelRecord extends Record implements CellValueRecordInterfac
 
         if (in.remaining() > 0) {
            logger.log(POILogger.INFO,
-                   "LabelRecord data remains: " + in.remaining() +
-                           " : " + HexDump.toHex(in.readRemainder())
+                   "LabelRecord data remains: ", in.remaining(),
+                           " : ", HexDump.toHex(in.readRemainder())
            );
         }
     }
@@ -142,21 +152,6 @@ public final class LabelRecord extends Record implements CellValueRecordInterfac
         return sid;
     }
 
-    @Override
-    public String toString()
-    {
-        StringBuffer sb = new StringBuffer();
-		sb.append("[LABEL]\n");
-		sb.append("    .row       = ").append(HexDump.shortToHex(getRow())).append("\n");
-		sb.append("    .column    = ").append(HexDump.shortToHex(getColumn())).append("\n");
-		sb.append("    .xfindex   = ").append(HexDump.shortToHex(getXFIndex())).append("\n");
-		sb.append("    .string_len= ").append(HexDump.shortToHex(field_4_string_len)).append("\n");
-		sb.append("    .unicode_flag= ").append(HexDump.byteToHex(field_5_unicode_flag)).append("\n");
-		sb.append("    .value       = ").append(getValue()).append("\n");
-		sb.append("[/LABEL]\n");
-        return sb.toString();
-    }
-
     /**
 	 * NO-OP!
 	 */
@@ -177,19 +172,27 @@ public final class LabelRecord extends Record implements CellValueRecordInterfac
      * no op!
      */
     @Override
-    public void setXFIndex(short xf)
-    {
+    public void setXFIndex(short xf) {}
+
+    @Override
+    public LabelRecord copy() {
+        return new LabelRecord(this);
     }
 
     @Override
-    public LabelRecord clone() {
-      LabelRecord rec = new LabelRecord();
-      rec.field_1_row = field_1_row;
-      rec.field_2_column = field_2_column;
-      rec.field_3_xf_index = field_3_xf_index;
-      rec.field_4_string_len = field_4_string_len;
-      rec.field_5_unicode_flag = field_5_unicode_flag;
-      rec.field_6_value = field_6_value;
-      return rec;
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.LABEL;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "row", this::getRow,
+            "column", this::getColumn,
+            "xfIndex", this::getXFIndex,
+            "stringLen", this::getStringLength,
+            "unCompressedUnicode", this::isUnCompressedUnicode,
+            "value", this::getValue
+        );
     }
 }
