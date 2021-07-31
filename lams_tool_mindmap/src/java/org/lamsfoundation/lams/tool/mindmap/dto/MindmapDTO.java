@@ -21,8 +21,6 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.mindmap.dto;
 
 import java.util.Iterator;
@@ -35,8 +33,6 @@ import org.lamsfoundation.lams.tool.mindmap.model.MindmapSession;
 
 public class MindmapDTO {
 
-    private static Logger logger = Logger.getLogger(MindmapDTO.class);
-
     public Long toolContentId;
     public String title;
     public String instructions;
@@ -44,7 +40,13 @@ public class MindmapDTO {
     public boolean contentInUse;
     public boolean lockOnFinish;
     public boolean multiUserMode;
-    public Set<MindmapSessionDTO> sessionDTOs = new TreeSet<MindmapSessionDTO>();
+    public boolean galleryWalkEnabled;
+    public boolean galleryWalkReadOnly;
+    public boolean galleryWalkStarted;
+    public boolean galleryWalkFinished;
+    public boolean galleryWalkEditEnabled;
+    public String galleryWalkInstructions;
+    public Set<MindmapSessionDTO> sessionDTOs = new TreeSet<>();
     public Long currentTab;
     // reflection
     public boolean reflectOnActivity;
@@ -61,6 +63,12 @@ public class MindmapDTO {
 	contentInUse = mindmap.isContentInUse();
 	lockOnFinish = mindmap.isLockOnFinished();
 	multiUserMode = mindmap.isMultiUserMode();
+	galleryWalkEnabled = mindmap.isGalleryWalkEnabled();
+	galleryWalkReadOnly = mindmap.isGalleryWalkReadOnly();
+	galleryWalkStarted = mindmap.isGalleryWalkStarted();
+	galleryWalkFinished = mindmap.isGalleryWalkFinished();
+	galleryWalkEditEnabled = mindmap.isGalleryWalkEditEnabled();
+	galleryWalkInstructions = mindmap.getGalleryWalkInstructions();
 	reflectOnActivity = mindmap.isReflectOnActivity();
 	reflectInstructions = mindmap.getReflectInstructions();
 
@@ -127,6 +135,54 @@ public class MindmapDTO {
 
     public void setMultiUserMode(boolean multiUserMode) {
 	this.multiUserMode = multiUserMode;
+    }
+
+    public boolean isGalleryWalkEnabled() {
+	return galleryWalkEnabled;
+    }
+
+    public void setGalleryWalkEnabled(boolean galleryWalkEnabled) {
+	this.galleryWalkEnabled = galleryWalkEnabled;
+    }
+
+    public boolean isGalleryWalkReadOnly() {
+	return galleryWalkReadOnly;
+    }
+
+    public void setGalleryWalkReadOnly(boolean galleryWalkReadOnly) {
+	this.galleryWalkReadOnly = galleryWalkReadOnly;
+    }
+
+    public boolean isGalleryWalkStarted() {
+	return galleryWalkStarted;
+    }
+
+    public void setGalleryWalkStarted(boolean galleryWalkStarted) {
+	this.galleryWalkStarted = galleryWalkStarted;
+    }
+
+    public boolean isGalleryWalkFinished() {
+	return galleryWalkFinished;
+    }
+
+    public void setGalleryWalkFinished(boolean galleryWalkFinished) {
+	this.galleryWalkFinished = galleryWalkFinished;
+    }
+
+    public boolean isGalleryWalkEditEnabled() {
+	return galleryWalkEditEnabled;
+    }
+
+    public void setGalleryWalkEditEnabled(boolean galleryWalkEditEnabled) {
+	this.galleryWalkEditEnabled = galleryWalkEditEnabled;
+    }
+
+    public String getGalleryWalkInstructions() {
+	return galleryWalkInstructions;
+    }
+
+    public void setGalleryWalkInstructions(String galleryWalkInstructions) {
+	this.galleryWalkInstructions = galleryWalkInstructions;
     }
 
     public Long getCurrentTab() {
