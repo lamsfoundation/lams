@@ -173,8 +173,29 @@ public class MonitoringController {
 	}
 	mindmap.setSubmissionDeadline(tzSubmissionDeadline);
 	mindmapService.saveOrUpdateMindmap(mindmap);
-	
+
 	return formattedDate;
+    }
+
+    @RequestMapping("/startGalleryWalk")
+    public void startGalleryWalk(HttpServletRequest request) throws IOException {
+	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID, false);
+
+	mindmapService.startGalleryWalk(toolContentId);
+    }
+
+    @RequestMapping("/finishGalleryWalk")
+    public void finishGalleryWalk(HttpServletRequest request) throws IOException {
+	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID, false);
+
+	mindmapService.finishGalleryWalk(toolContentId);
+    }
+
+    @RequestMapping("/enableGalleryWalkLearnerEdit")
+    public void enableGalleryWalkLearnerEdit(HttpServletRequest request) throws IOException {
+	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID, false);
+
+	mindmapService.enableGalleryWalkLearnerEdit(toolContentId);
     }
 
 }

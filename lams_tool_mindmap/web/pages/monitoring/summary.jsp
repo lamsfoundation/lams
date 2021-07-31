@@ -2,10 +2,40 @@
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="dto" value="${mindmapDTO}" />
 
-
+<lams:css suffix="jquery.jRating"/>
 <link type="text/css" href="${lams}/css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
-
+<style>
+	#control-buttons {
+		text-align: right;
+	}
+	
+	#gallery-walk-start {
+		margin-left: 20px;
+	}
+	
+	#gallery-walk-rating-table {
+		width: 60%;
+		margin: 50px auto;
+		border-bottom: 1px solid #ddd;
+	}
+	
+	#gallery-walk-rating-table th {
+		font-weight: bold;
+		font-style: normal;
+		text-align: center;
+	}
+	
+	#gallery-walk-rating-table td {
+		text-align: center;
+	}
+	
+	#gallery-walk-rating-table th:first-child,
+	#gallery-walk-rating-table td:first-child {
+		text-align: right;
+	}
+	
+</style>
 <script type="text/javascript">
 	//pass settings to monitorToolSummaryAdvanced.js
 	var submissionDeadlineSettings = {
@@ -16,7 +46,18 @@
 		toolContentID: '${param.toolContentID}',
 		messageNotification: '<fmt:message key="monitor.summary.notification" />',
 		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
-		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
+		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />',
+
+		//var for jquery.jRating.js
+		pathToImageFolder = "${lams}images/css/",
+		//vars for rating.js
+		AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
+		YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
+		MAX_RATES = 0,
+		MIN_RATES = 0,
+		LAMS_URL = '${lams}',
+		COUNT_RATED_ITEMS = true,
+		ALLOW_RERATE = false;
 	};
 </script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
@@ -24,6 +65,8 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script> 
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 
 <script type="text/javascript">
 	$(document).ready(function(){
@@ -34,6 +77,55 @@
 	function openEvalcomixWindow(url) {
     	evalcomixWindow=window.open(url, 'evalcomixWindow', 'width=1152,height=648,scrollbars=yes,resizable=yes');
 		if (window.focus) {evalcomixWindow.focus()}
+	}
+
+	function startGalleryWalk(){
+		if (!confirm('<fmt:message key="monitoring.summary.gallery.walk.start.confirm" />')) {
+			return;
+		}
+		
+		$.ajax({
+			'url' : '<c:url value="/monitoring/startGalleryWalk.do"/>',
+			'data': {
+				toolContentID : ${dto.toolContentId}
+			},
+			'success' : function(){
+				$('#gallery-walk-start').hide();
+				$('#gallery-walk-finish, #gallery-walk-learner-edit').removeClass('hidden');
+			}
+		});
+	}
+	
+	function finishGalleryWalk(){
+		if (!confirm('<fmt:message key="monitoring.summary.gallery.walk.finish.confirm" />')) {
+			return;
+		}
+		
+		$.ajax({
+			'url' : '<c:url value="/monitoring/finishGalleryWalk.do"/>',
+			'data': {
+				toolContentID : ${dto.toolContentId}
+			},
+			'success' : function(){
+				location.reload();
+			}
+		});
+	}
+
+	function enableGalleryWalkLearnerEdit(){
+		if (!confirm('<fmt:message key="monitoring.summary.gallery.walk.learner.edit.confirm" />')) {
+			return;
+		}
+		
+		$.ajax({
+			'url' : '<c:url value="/monitoring/enableGalleryWalkLearnerEdit.do"/>',
+			'data': {
+				toolContentID : ${dto.toolContentId}
+			},
+			'success' : function(){
+				location.reload();
+			}
+		});
 	}
 	
 </script>
@@ -53,6 +145,31 @@
 		</lams:Alert>
 	</c:if>
 </div>
+	
+<c:if test="${not empty dto.sessionDTOs and mindmapDTO.galleryWalkEnabled}">
+	<div id="control-buttons">
+		<button id="gallery-walk-start" type="button"
+		        class="btn btn-default 
+		        	   ${not mindmapDTO.galleryWalkStarted and not mindmapDTO.galleryWalkFinished ? '' : 'hidden'}"
+		        onClick="javascript:startGalleryWalk()">
+			<fmt:message key="monitoring.summary.gallery.walk.start" /> 
+		</button>
+		
+		<button id="gallery-walk-learner-edit" type="button"
+		        class="btn btn-default ${not mindmapDTO.galleryWalkEditEnabled and (mindmapDTO.galleryWalkStarted or mindmapDTO.galleryWalkFinished) ? '' : 'hidden'}"
+		        onClick="javascript:enableGalleryWalkLearnerEdit()">
+			<fmt:message key="monitoring.summary.gallery.walk.learner.edit" /> 
+		</button>
+		
+		<button id="gallery-walk-finish" type="button"
+		        class="btn btn-default ${mindmapDTO.galleryWalkStarted and not mindmapDTO.galleryWalkFinished ? '' : 'hidden'}"
+		        onClick="javascript:finishGalleryWalk()">
+			<fmt:message key="monitoring.summary.gallery.walk.finish" /> 
+		</button>
+	</div>
+	
+	<br>
+</c:if>
 
 <c:if test="${isGroupedActivity}">
 	<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
