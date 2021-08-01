@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.mindmap.dto.MindmapDTO;
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapNode;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapRequest;
@@ -135,6 +136,8 @@ public interface IMindmapService extends ICommonToolService {
     int getNumNodes(Long learnerId, Long toolSessionId);
 
     XStream getXStream();
+
+    void fillGalleryWalkRatings(MindmapDTO mindmapDTO, Long ratingUserId);
 
     void createGalleryWalkRatingCriterion(long toolContentId);
 

@@ -100,6 +100,10 @@ public class MonitoringController {
 		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
 	}
 
+	if (mindmap.isGalleryWalkFinished() && !mindmap.isGalleryWalkReadOnly()) {
+	    mindmapService.fillGalleryWalkRatings(mindmapDTO, null);
+	}
+
 	return "pages/monitoring/monitoring";
     }
 
@@ -121,7 +125,7 @@ public class MonitoringController {
 	    MindmapUser mindmapUser = mindmapService.getUserByUID(userId);
 	    MindmapUserDTO userDTO = new MindmapUserDTO(mindmapUser);
 	    request.setAttribute("userDTO", userDTO);
-	    request.setAttribute("userId", mindmapUser.getUid());
+	    request.setAttribute("userUid", mindmapUser.getUid());
 	}
 
 	return "pages/monitoring/mindmapDisplay";

@@ -29,8 +29,10 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
@@ -44,6 +46,7 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
@@ -64,6 +67,8 @@ import org.lamsfoundation.lams.tool.mindmap.dao.IMindmapNodeDAO;
 import org.lamsfoundation.lams.tool.mindmap.dao.IMindmapRequestDAO;
 import org.lamsfoundation.lams.tool.mindmap.dao.IMindmapSessionDAO;
 import org.lamsfoundation.lams.tool.mindmap.dao.IMindmapUserDAO;
+import org.lamsfoundation.lams.tool.mindmap.dto.MindmapDTO;
+import org.lamsfoundation.lams.tool.mindmap.dto.MindmapSessionDTO;
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapNode;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapRequest;
@@ -1060,6 +1065,35 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	return xstream;
     }
 
+    public void fillGalleryWalkRatings(MindmapDTO mindmapDTO, Long ratingUserId) {
+	Map<Long, ItemRatingDTO> itemRatingDtoMap = null;
+	if (!mindmapDTO.isGalleryWalkReadOnly()) {
+	    // it should have been created on lesson create,
+	    // but in case Live Edit added Gallery Walk, we need to add it now, but just once
+	    try {
+		createGalleryWalkRatingCriterion(mindmapDTO.getToolContentId());
+	    } catch (Exception e) {
+		logger.warn("Ignoring error while processing Mindmap Gallery Walk criteria for tool content ID "
+			+ mindmapDTO.getToolContentId());
+	    }
+	}
+
+	// Item IDs are WhiteboardSession session IDs, i.e. a single Whiteboard
+	Set<Long> itemIds = mindmapDTO.getSessionDTOs().stream()
+		.collect(Collectors.mapping(MindmapSessionDTO::getSessionID, Collectors.toSet()));
+
+	List<ItemRatingDTO> itemRatingDtos = ratingService.getRatingCriteriaDtos(mindmapDTO.getToolContentId(), null,
+		itemIds, true, ratingUserId);
+	// Mapping of Item ID -> DTO
+	itemRatingDtoMap = itemRatingDtos.stream()
+		.collect(Collectors.toMap(ItemRatingDTO::getItemId, Function.identity()));
+
+	for (MindmapSessionDTO sessionDTO : mindmapDTO.getSessionDTOs()) {
+	    sessionDTO.setItemRatingDto(itemRatingDtoMap.get(sessionDTO.getSessionID()));
+	}
+    }
+
+    @Override
     public void createGalleryWalkRatingCriterion(long toolContentId) {
 	List<RatingCriteria> criteria = ratingService.getCriteriasByToolContentId(toolContentId);
 

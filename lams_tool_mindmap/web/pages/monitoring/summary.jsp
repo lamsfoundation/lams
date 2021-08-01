@@ -34,7 +34,12 @@
 	#gallery-walk-rating-table td:first-child {
 		text-align: right;
 	}
-	
+								
+	.mindmap-frame {
+		width: 100%;
+		height: 700px;
+		border: none;
+	}
 </style>
 <script type="text/javascript">
 	//pass settings to monitorToolSummaryAdvanced.js
@@ -71,6 +76,15 @@
 <script type="text/javascript">
 	$(document).ready(function(){
 		initializePortraitPopover("<lams:LAMSURL />");
+
+		// show mindmaps only on Group expand
+		$('.mindmap-collapse').on('show.bs.collapse', function(){
+			var mindmap = $('.mindmap-frame', this);
+			if (mindmap.data('src')) {
+				mindmap.attr('src', mindmap.data('src'));
+				mindmap.data('src', null);
+			}
+		});
 	});
 	
 	var evalcomixWindow = null;
@@ -171,6 +185,30 @@
 	<br>
 </c:if>
 
+<c:if test="${mindmap.galleryWalkFinished and not mindmap.galleryWalkReadOnly}">
+		<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk.ratings.header" /></h4>
+		<table id="gallery-walk-rating-table" class="table table-hover table-condensed">
+		  <thead class="thead-light">
+		    <tr>
+		      <th scope="col"><fmt:message key="monitoring.label.group" /></th>
+		      <th scope="col"><fmt:message key="label.rating" /></th>
+		    </tr>
+		  </thead>
+		  <tbody>
+			<c:forEach var="mindmapSession" items="${mindmapDTO.sessionDTOs}">
+				<tr>
+					<td>${mindmapSession.sessionName}</td>
+					<td>
+						<lams:Rating itemRatingDto="${mindmapSession.itemRatingDto}" 
+									 isItemAuthoredByUser="true"
+									 hideCriteriaTitle="true" />
+					</td>
+				</tr>
+			</c:forEach>
+		  </tbody>
+		</table>
+	</c:if>
+	
 <c:if test="${isGroupedActivity}">
 	<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
 </c:if>
@@ -197,100 +235,83 @@
 	<div class="loffset10">
 		<fmt:message key="heading.totalLearners" />&nbsp;${session.numberOfLearners}
 	</div>
+	
+	<c:if test="${dto.mulitUserMode}">
+		<iframe class="mindmap-frame"
+				data-src='<c:url value="/learning/getGalleryWalkMindmap.do?toolSessionID=${session.sessionID}"/>'>
+		</iframe>
+	</c:if>
 
-	<table class="table table-striped table-condensed voffset10">
-
-		<tr>
-			<th width="40%">
-				<fmt:message key="heading.learner" />
-			</th>
-			<th width="40%">
-				<fmt:message key="heading.mindmapEntry" />
-			</th>
-			<c:if test="${dto.reflectOnActivity == true}">
-			<th>
-				<fmt:message key="label.notebookEntry" />
-			</th>
-			</c:if>
-		</tr>
-
-		<c:choose>
-			<c:when test="${dto.multiUserMode}">
-				
-				<c:choose>
-					<c:when test="${dto.reflectOnActivity == true}">
-						<c:forEach var="user" items="${session.userDTOs}">
-							<tr>
-								<td>
-									<lams:Portrait userId="${user.userId}" hover="true"><c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/></lams:Portrait>
-								</td>
-						
-								<td >
-									<a href="showMindmap.do?toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
-										<fmt:message key="label.view" />
-									</a>		
-								</td>
-						
-								<td width="30%">
-									<a href="reflect.do?userUID=${user.uid}&toolContentID=${dto.toolContentId}">
-										<fmt:message key="label.view" />
-									</a>
-								</td>
-							</tr>
-						</c:forEach>
-					</c:when>
-					
-					<c:otherwise>
+	<c:if test="${not dto.multiUserMode or dto.reflectOnActivity == true}">
+		<table class="table table-striped table-condensed voffset10">
+	
+			<tr>
+				<th width="40%">
+					<fmt:message key="heading.learner" />
+				</th>
+				<c:if test="${not dto.multiUserMode}">
+					<th width="40%">
+						<fmt:message key="heading.mindmapEntry" />
+					</th>
+				</c:if>
+				<c:if test="${dto.reflectOnActivity == true}">
+				<th>
+					<fmt:message key="label.notebookEntry" />
+				</th>
+				</c:if>
+			</tr>
+	
+			<c:choose>
+				<c:when test="${dto.multiUserMode}">
+					<c:forEach var="user" items="${session.userDTOs}">
 						<tr>
 							<td>
-								<fmt:message key="label.multimode" />
+								<lams:Portrait userId="${user.userId}" hover="true"><c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/></lams:Portrait>
 							</td>
 					
-							<td>
-								<a href="showMindmap.do?toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
+							<td width="30%">
+								<a href="reflect.do?userUID=${user.uid}&toolContentID=${dto.toolContentId}">
 									<fmt:message key="label.view" />
-								</a>		
+								</a>
 							</td>
 						</tr>
-					</c:otherwise>
-					
-				</c:choose>
+					</c:forEach>
+				</c:when>
 				
-			</c:when>
-			
-			<c:otherwise>
-				<c:forEach var="user" items="${session.userDTOs}">
-					<tr>
-						<td>
-							<lams:Portrait userId="${user.userId}" hover="true"><c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/></lams:Portrait>
-						</td>
-						
-						<td>
-							<c:choose>
-								<c:when test="${user.finishedActivity != true}">
-									<fmt:message key="label.notAvailable" />
-								</c:when>
-								<c:otherwise>
-									<a href="showMindmap.do?userUID=${user.uid}&toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
-										<fmt:message key="label.view" />
-									</a>									
-								</c:otherwise>
-							</c:choose>
-						</td>
-						
-						<c:if test="${dto.reflectOnActivity}">
-						<td>
-							<a href="reflect.do?userUID=${user.uid}&toolContentID=${dto.toolContentId}"><fmt:message key="label.view" />	</a>
-						</td>
-						</c:if>
-						
-					</tr>
-				</c:forEach>
-			</c:otherwise>
-			
-		</c:choose>
-
-	</table>
+				<c:otherwise>
+					<c:forEach var="user" items="${session.userDTOs}">
+						<tr>
+							<td>
+								<lams:Portrait userId="${user.userId}" hover="true"><c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/></lams:Portrait>
+							</td>
+							
+							<td>
+								<c:choose>
+									<c:when test="${user.finishedActivity != true}">
+										<fmt:message key="label.notAvailable" />
+									</c:when>
+									<c:otherwise>
+										<a href="showMindmap.do?userUID=${user.uid}&toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
+											<fmt:message key="label.view" />
+										</a>									
+									</c:otherwise>
+								</c:choose>
+							</td>
+							
+							<c:if test="${dto.reflectOnActivity}">
+							<td>
+								<a href="reflect.do?userUID=${user.uid}&toolContentID=${dto.toolContentId}"><fmt:message key="label.view" />	</a>
+							</td>
+							</c:if>
+							
+						</tr>
+					</c:forEach>
+				</c:otherwise>
+				
+			</c:choose>
+	
+		</table>
+	</c:if>
 	
 		<c:if test="${isGroupedActivity}">
 		</div> <!-- end collapse area  -->

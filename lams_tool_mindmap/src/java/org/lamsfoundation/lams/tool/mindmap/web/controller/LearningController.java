@@ -28,11 +28,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,8 +39,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
-import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -51,7 +46,6 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mindmap.MindmapConstants;
 import org.lamsfoundation.lams.tool.mindmap.dto.IdeaJSON;
 import org.lamsfoundation.lams.tool.mindmap.dto.MindmapDTO;
-import org.lamsfoundation.lams.tool.mindmap.dto.MindmapSessionDTO;
 import org.lamsfoundation.lams.tool.mindmap.dto.NotifyResponseJSON;
 import org.lamsfoundation.lams.tool.mindmap.dto.RootJSON;
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
@@ -99,9 +93,6 @@ public class LearningController {
 
     @Autowired
     private IMindmapService mindmapService;
-
-    @Autowired
-    private IRatingService ratingService;
 
     @Autowired
     @Qualifier("mindmapMessageService")
@@ -168,32 +159,8 @@ public class LearningController {
 		request);
 
 	if (mindmap.isGalleryWalkStarted()) {
-	    Map<Long, ItemRatingDTO> itemRatingDtoMap = null;
-	    if (!mindmap.isGalleryWalkReadOnly()) {
-		// it should have been created on lesson create,
-		// but in case Live Edit added Gallery Walk, we need to add it now, but just once
-		try {
-		    mindmapService.createGalleryWalkRatingCriterion(mindmap.getToolContentId());
-		} catch (Exception e) {
-		    log.warn("Ignoring error while processing Mindmap Gallery Walk criteria for tool content ID "
-			    + mindmap.getToolContentId());
-		}
-	    }
 
-	    // Item IDs are WhiteboardSession session IDs, i.e. a single Whiteboard
-	    Set<Long> itemIds = mindmapDTO.getSessionDTOs().stream()
-		    .collect(Collectors.mapping(MindmapSessionDTO::getSessionID, Collectors.toSet()));
-
-	    List<ItemRatingDTO> itemRatingDtos = ratingService.getRatingCriteriaDtos(mindmap.getToolContentId(), null,
-		    itemIds, true, mindmapUser.getUserId());
-	    // Mapping of Item ID -> DTO
-	    itemRatingDtoMap = itemRatingDtos.stream()
-		    .collect(Collectors.toMap(ItemRatingDTO::getItemId, Function.identity()));
-
-	    for (MindmapSessionDTO sessionDTO : mindmapDTO.getSessionDTOs()) {
-		sessionDTO.setItemRatingDto(itemRatingDtoMap.get(sessionDTO.getSessionID()));
-	    }
-
+	    mindmapService.fillGalleryWalkRatings(mindmapDTO, mindmapUser.getUserId());
 	    return "pages/learning/galleryWalk";
 	}
 

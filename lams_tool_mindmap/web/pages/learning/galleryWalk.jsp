@@ -76,7 +76,7 @@
 	    $(document).ready(function(){
 			$('[data-toggle="tooltip"]').bootstrapTooltip();
 			
-			// show Whiteboards only on Group expand
+			// show mindmaps only on Group expand
 			$('.mindmap-collapse').on('show.bs.collapse', function(){
 				var mindmap = $('.mindmap-frame', this);
 				if (mindmap.data('src')) {
