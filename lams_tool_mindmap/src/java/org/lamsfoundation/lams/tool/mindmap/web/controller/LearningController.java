@@ -24,10 +24,15 @@
 package org.lamsfoundation.lams.tool.mindmap.web.controller;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,6 +42,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
+import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -44,6 +51,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mindmap.MindmapConstants;
 import org.lamsfoundation.lams.tool.mindmap.dto.IdeaJSON;
 import org.lamsfoundation.lams.tool.mindmap.dto.MindmapDTO;
+import org.lamsfoundation.lams.tool.mindmap.dto.MindmapSessionDTO;
 import org.lamsfoundation.lams.tool.mindmap.dto.NotifyResponseJSON;
 import org.lamsfoundation.lams.tool.mindmap.dto.RootJSON;
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
@@ -57,8 +65,6 @@ import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeConceptModel;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeModel;
 import org.lamsfoundation.lams.tool.mindmap.web.forms.LearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -70,6 +76,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -83,7 +90,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @RequestMapping("/learning")
 public class LearningController {
     private static Logger log = Logger.getLogger(LearningController.class);
-    
+
     private static final boolean MODE_OPTIONAL = false;
 
     private static final String REQUEST_JSON_TYPE = "type"; // Expected to be int: 0 - delete; 1 - create node; 2 - change color; 3 - change text
@@ -92,6 +99,9 @@ public class LearningController {
 
     @Autowired
     private IMindmapService mindmapService;
+
+    @Autowired
+    private IRatingService ratingService;
 
     @Autowired
     @Qualifier("mindmapMessageService")
@@ -118,7 +128,74 @@ public class LearningController {
 	    throw new MindmapException("Cannot retrieve session with toolSessionID: " + toolSessionID);
 	}
 
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, mindmapService.isLastActivity(toolSessionID));
+
+	HttpSession ss = SessionManager.getSession();
+	UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+
+	MindmapUser mindmapUser;
+	if (mode.equals(ToolAccessMode.TEACHER)) {
+	    mindmapUser = mindmapService.getUserByUserIdAndSessionId(userDto.getUserID().longValue(), toolSessionID);
+	} else {
+	    mindmapUser = getCurrentUser(toolSessionID, true);
+	}
+
 	Mindmap mindmap = mindmapSession.getMindmap();
+	if (mindmap.isGalleryWalkEnabled() && mode != null && mode.isAuthor()) {
+	    String[] galleryWalkParameterValuesArray = request.getParameterValues("galleryWalk");
+	    if (galleryWalkParameterValuesArray != null) {
+		Collection<String> galleryWalkParameterValues = Set.of(galleryWalkParameterValuesArray);
+
+		if (!mindmap.isGalleryWalkStarted() && galleryWalkParameterValues.contains("forceStart")) {
+		    mindmap.setGalleryWalkStarted(true);
+		    mindmapService.saveOrUpdateMindmap(mindmap);
+		}
+
+		if (!mindmap.isGalleryWalkFinished() && galleryWalkParameterValues.contains("forceFinish")) {
+		    mindmap.setGalleryWalkFinished(true);
+		    mindmapService.saveOrUpdateMindmap(mindmap);
+		}
+	    }
+	}
+
+	MindmapDTO mindmapDTO = new MindmapDTO(mindmap);
+	request.setAttribute("mindmapDTO", mindmapDTO);
+	request.setAttribute("reflectOnActivity", mindmap.isReflectOnActivity());
+
+	LearningController.storeMindmapCanvasParameters(mindmap, toolSessionID, mindmapUser, mode.toString(),
+		!(mode.equals(ToolAccessMode.TEACHER)
+			|| (mindmap.isLockOnFinished() && mindmapUser.isFinishedActivity())),
+		request);
+
+	if (mindmap.isGalleryWalkStarted()) {
+	    Map<Long, ItemRatingDTO> itemRatingDtoMap = null;
+	    if (!mindmap.isGalleryWalkReadOnly()) {
+		// it should have been created on lesson create,
+		// but in case Live Edit added Gallery Walk, we need to add it now, but just once
+		try {
+		    mindmapService.createGalleryWalkRatingCriterion(mindmap.getToolContentId());
+		} catch (Exception e) {
+		    log.warn("Ignoring error while processing Mindmap Gallery Walk criteria for tool content ID "
+			    + mindmap.getToolContentId());
+		}
+	    }
+
+	    // Item IDs are WhiteboardSession session IDs, i.e. a single Whiteboard
+	    Set<Long> itemIds = mindmapDTO.getSessionDTOs().stream()
+		    .collect(Collectors.mapping(MindmapSessionDTO::getSessionID, Collectors.toSet()));
+
+	    List<ItemRatingDTO> itemRatingDtos = ratingService.getRatingCriteriaDtos(mindmap.getToolContentId(), null,
+		    itemIds, true, mindmapUser.getUserId());
+	    // Mapping of Item ID -> DTO
+	    itemRatingDtoMap = itemRatingDtos.stream()
+		    .collect(Collectors.toMap(ItemRatingDTO::getItemId, Function.identity()));
+
+	    for (MindmapSessionDTO sessionDTO : mindmapDTO.getSessionDTOs()) {
+		sessionDTO.setItemRatingDto(itemRatingDtoMap.get(sessionDTO.getSessionID()));
+	    }
+
+	    return "pages/learning/galleryWalk";
+	}
 
 	// check defineLater
 	if (mindmap.isDefineLater()) {
@@ -126,29 +203,13 @@ public class LearningController {
 	}
 
 	// set mode, toolSessionID and MindmapDTO
-	request.setAttribute("mode", mode.toString());
 	learningForm.setToolSessionID(toolSessionID);
-
-	MindmapDTO mindmapDTO = new MindmapDTO();
-	mindmapDTO.title = mindmap.getTitle();
-	mindmapDTO.instructions = mindmap.getInstructions();
-	mindmapDTO.lockOnFinish = mindmap.isLockOnFinished();
-	mindmapDTO.multiUserMode = mindmap.isMultiUserMode();
-	mindmapDTO.reflectInstructions = mindmap.getReflectInstructions();
-
-	request.setAttribute("mindmapDTO", mindmapDTO);
 
 	// Set the content in use flag.
 	if (!mindmap.isContentInUse()) {
 	    mindmap.setContentInUse(true);
 	    mindmapService.saveOrUpdateMindmap(mindmap);
 	}
-	
-	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, mindmapService.isLastActivity(toolSessionID));
-
-	HttpSession ss = SessionManager.getSession();
-	UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-
 	// check if there is submission deadline
 	Date submissionDeadline = mindmap.getSubmissionDeadline();
 	if (submissionDeadline != null) {
@@ -164,43 +225,8 @@ public class LearningController {
 	    }
 	}
 
-	MindmapUser mindmapUser;
-	if (mode.equals(ToolAccessMode.TEACHER)) {
-	    mindmapUser = mindmapService.getUserByUserIdAndSessionId(userDto.getUserID().longValue(), toolSessionID);
-	} else {
-	    mindmapUser = getCurrentUser(toolSessionID);
-	}
-
-	// set readOnly flag.
-	if (mode.equals(ToolAccessMode.TEACHER) || (mindmap.isLockOnFinished() && mindmapUser.isFinishedActivity())) {
-	    request.setAttribute("contentEditable", false);
-	} else {
-	    request.setAttribute("contentEditable", true);
-	}
-	request.setAttribute("finishedActivity", mindmapUser.isFinishedActivity());
-
-	// mindmapContentPath Parameter
-	String mindmapContentPath = Configuration.get(ConfigurationKeys.SERVER_URL)
-		+ "tool/lamind10/learning.do?dispatch=setMindmapContent%26mindmapId=" + mindmap.getUid() + "%26userId="
-		+ mindmapUser.getUid() + "%26sessionId=" + mindmapSession.getSessionId();
-	request.setAttribute("mindmapContentPath", mindmapContentPath);
-
-	// currentMindmapUser Parameter
-	String currentMindmapUser = mindmapUser.getFirstName() + " " + mindmapUser.getLastName();
-	request.setAttribute("currentMindmapUser", currentMindmapUser);
-
 	// setting userId for reflection
 	request.setAttribute("userIdParam", mindmapUser.getUid());
-	request.setAttribute("toolContentIdParam", mindmap.getUid());
-	request.setAttribute("reflectOnActivity", mindmap.isReflectOnActivity());
-
-	// AJAX calls for saving Mindmap every one minute
-	request.setAttribute("get", Configuration.get(ConfigurationKeys.SERVER_URL) + "tool/lamind10/learning.do");
-	request.setAttribute("dispatch", "saveLastMindmapChanges");
-	request.setAttribute("mindmapId", mindmap.getUid());
-	request.setAttribute("userId", mindmapUser.getUid());
-	request.setAttribute("sessionId", toolSessionID);
-	request.setAttribute("multiMode", mindmap.isMultiUserMode());
 
 	// if not multi-user mode
 	if (!mindmap.isMultiUserMode()) {
@@ -533,14 +559,14 @@ public class LearningController {
     /**
      * Returns current learner
      */
-    private MindmapUser getCurrentUser(Long toolSessionId) {
+    private MindmapUser getCurrentUser(Long toolSessionId, boolean create) {
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	// attempt to retrieve user using userId and toolSessionId
 	MindmapUser mindmapUser = mindmapService.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
 		toolSessionId);
 
-	if (mindmapUser == null) {
+	if (mindmapUser == null && create) {
 	    MindmapSession mindmapSession = mindmapService.getSessionBySessionId(toolSessionId);
 	    mindmapUser = mindmapService.createMindmapUser(user, mindmapSession);
 	}
@@ -555,11 +581,11 @@ public class LearningController {
     public String reflect(@ModelAttribute LearningForm learningForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 
-	Long userId = WebUtil.readLongParam(request, "userId", false);
+	Long userId = WebUtil.readLongParam(request, "userUid", false);
 	Long toolContentId = WebUtil.readLongParam(request, "toolContentId", false);
 
 	MindmapUser mindmapUser = mindmapService.getUserByUID(userId);
-	Mindmap mindmap = mindmapService.getMindmapByUid(toolContentId);
+	Mindmap mindmap = mindmapService.getMindmapByContentId(toolContentId);
 	MindmapSession mindmapSession = mindmapUser.getMindmapSession();
 
 	request.setAttribute("reflectTitle", mindmap.getTitle());
@@ -595,7 +621,7 @@ public class LearningController {
 	    HttpServletResponse response) throws IOException {
 
 	Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
-	MindmapUser mindmapUser = getCurrentUser(toolSessionID);
+	MindmapUser mindmapUser = getCurrentUser(toolSessionID, true);
 
 	// Retrieve the session and content
 	MindmapSession mindmapSession = mindmapService.getSessionBySessionId(toolSessionID);
@@ -658,4 +684,30 @@ public class LearningController {
 	return null;
     }
 
+    @RequestMapping("/getGalleryWalkMindmap")
+    public String getGalleryWalkMindmap(@RequestParam Long toolSessionID, HttpServletRequest request) {
+	MindmapSession session = mindmapService.getSessionBySessionId(toolSessionID);
+	Mindmap mindmap = session.getMindmap();
+	MindmapUser user = getCurrentUser(toolSessionID, false);
+	boolean contentEditable = mindmap.isGalleryWalkEditEnabled() && user != null
+		&& user.getMindmapSession().getSessionId().equals(toolSessionID);
+	LearningController.storeMindmapCanvasParameters(mindmap, toolSessionID, user,
+		user == null ? ToolAccessMode.TEACHER.toString() : ToolAccessMode.LEARNER.toString(), contentEditable,
+		request);
+	return "pages/learning/galleryWalkMindmap";
+    }
+
+    private static void storeMindmapCanvasParameters(Mindmap mindmap, Long toolSessionID, MindmapUser user, String mode,
+	    boolean contentEditable, HttpServletRequest request) {
+	request.setAttribute("mindmapId", mindmap.getUid());
+	request.setAttribute("multiMode", mindmap.isMultiUserMode());
+	request.setAttribute("toolContentID", mindmap.getToolContentId());
+	request.setAttribute("sessionId", toolSessionID);
+	request.setAttribute("toolSessionID", toolSessionID);
+	request.setAttribute("userUid", user == null ? null : user.getUid());
+	request.setAttribute("contentEditable", contentEditable);
+	request.setAttribute("mode", mode);
+	request.setAttribute("currentMindmapUser", user == null ? "" : user.getFirstName() + " " + user.getLastName());
+	request.setAttribute("finishedActivity", user == null ? false : user.isFinishedActivity());
+    }
 }

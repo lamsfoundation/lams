@@ -136,6 +136,8 @@ public interface IMindmapService extends ICommonToolService {
 
     XStream getXStream();
 
+    void createGalleryWalkRatingCriterion(long toolContentId);
+
     void startGalleryWalk(long toolContentId) throws IOException;
 
     void finishGalleryWalk(long toolContentId) throws IOException;

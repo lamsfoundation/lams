@@ -2,9 +2,8 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 	<lams:html>
-		<c:set var="lams"> <lams:LAMSURL /> </c:set>
-		<c:set var="tool"> 	<lams:WebAppURL />	</c:set>
-	
+		<c:set var="lams"><lams:LAMSURL /></c:set>
+		<c:set var="tool"><lams:WebAppURL /></c:set>
 	<lams:head>  
 		<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
 		<title>
@@ -49,15 +48,20 @@
 		 	 	var f = document.getElementById('learningForm');
 		 		f.submit();
 			}
-			
-			</script>
+
+			$(document).ready(function(){
+				$('[data-toggle="tooltip"]').bootstrapTooltip();
+			});
+		</script>
+		
+		<%@ include file="websocket.jsp"%>		
 	</lams:head>
 
 	<body class="stripes">
 		
 		<form:form action="${reflectOnActivity ? 'reflect.do' : 'finishActivity.do'}" method="post" onsubmit="return false;" modelAttribute="learningForm" id="learningForm">
 			<input type="hidden" name="userId" value="${userIdParam}" />
-			<input type="hidden" name="toolContentId" value="${toolContentIdParam}" />
+			<input type="hidden" name="toolContentId" value="${toolContentID}" />
 			<form:hidden path="toolSessionID" />
 			<form:hidden path="mindmapContent" id="mindmapContent" />
 		
@@ -106,6 +110,22 @@
 					
 						<c:otherwise>
 							<c:choose>
+								<c:when test="${mindmapDTO.galleryWalkEnabled}">
+									<button data-toggle="tooltip" 
+											class="btn btn-default voffset5 pull-right ${mode == 'author' ? '' : 'disabled'}"
+											<c:choose>
+												<c:when test="${mode == 'author'}">
+													title="<fmt:message key='label.gallery.walk.wait.start.preview' />"
+													onClick="javascript:location.href = location.href + '&galleryWalk=forceStart'"
+												</c:when>
+												<c:otherwise>
+													title="<fmt:message key='label.gallery.walk.wait.start' />"
+												</c:otherwise>
+											</c:choose>
+										>
+										<fmt:message key="button.continue" />
+									</button>
+								</c:when>
 								<c:when test="${reflectOnActivity}">
 									<a href="javascript:submitForm();" class="btn btn-primary" id="continueButton">
 										   <span class="nextActivity"><fmt:message key="button.continue"/></span>

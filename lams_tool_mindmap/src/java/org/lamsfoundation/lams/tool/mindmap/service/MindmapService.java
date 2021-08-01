@@ -238,6 +238,10 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	Mindmap toContent = Mindmap.newInstance(fromContent, toContentId);
 	mindmapDAO.saveOrUpdate(toContent);
 
+	if (toContent.isGalleryWalkEnabled() && !toContent.isGalleryWalkReadOnly()) {
+	    createGalleryWalkRatingCriterion(toContentId);
+	}
+
 	/* Copying Mindmap Nodes */
 
 	// creating default nodes for current mindmap
@@ -1056,7 +1060,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	return xstream;
     }
 
-    private List<RatingCriteria> createGalleryWalkRatingCriterion(long toolContentId) {
+    public void createGalleryWalkRatingCriterion(long toolContentId) {
 	List<RatingCriteria> criteria = ratingService.getCriteriasByToolContentId(toolContentId);
 
 	if (criteria.size() >= 2) {
@@ -1076,7 +1080,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 		logger.warn("Ignoring error while deleting a duplicate criterion for Mindmap tool content ID "
 			+ toolContentId + ": " + e.getMessage());
 	    }
-	    return criteria;
+	    return;
 	}
 
 	if (criteria.isEmpty()) {
@@ -1091,7 +1095,6 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	    mindmapDAO.insert(criterion);
 	    criteria.add(criterion);
 	}
-	return criteria;
     }
 
     @Override
