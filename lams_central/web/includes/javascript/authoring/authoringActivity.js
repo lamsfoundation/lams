@@ -1288,6 +1288,9 @@ ActivityLib = {
 	},
 		
 	adjustTransitionPoint : function(bottomLimit, topLimit, target) {
+		bottomLimit = Math.round(bottomLimit);
+		topLimit = Math.round(topLimit);
+		target = Math.round(target);
 		// find a good point inside the grid, then make sure it is within bounds
 		return Math.max(bottomLimit + layout.transition.adjustStep, Math.min(topLimit - layout.transition.adjustStep,
 				Math.floor(target / layout.transition.adjustStep) * layout.transition.adjustStep));
