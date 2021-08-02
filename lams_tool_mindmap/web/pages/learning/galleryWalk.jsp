@@ -217,7 +217,7 @@
 			 						<fmt:message key="button.submit" />
 			 					</c:when>
 			 					<c:otherwise>
-			 		 				<fmt:message key="button.finished" />
+			 		 				<fmt:message key="button.finish" />
 			 					</c:otherwise>
 			 				</c:choose>
 						</span>
