@@ -17,31 +17,22 @@
 
 package org.apache.poi.sl.draw;
 
+import static org.apache.poi.sl.draw.DrawPaint.fillPaintWorkaround;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.function.Consumer;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.EventFilter;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
-
-import org.apache.poi.sl.draw.binding.CTCustomGeometry2D;
 import org.apache.poi.sl.draw.geom.Context;
 import org.apache.poi.sl.draw.geom.CustomGeometry;
 import org.apache.poi.sl.draw.geom.Outline;
@@ -49,11 +40,11 @@ import org.apache.poi.sl.draw.geom.Path;
 import org.apache.poi.sl.usermodel.LineDecoration;
 import org.apache.poi.sl.usermodel.LineDecoration.DecorationShape;
 import org.apache.poi.sl.usermodel.LineDecoration.DecorationSize;
+import org.apache.poi.sl.usermodel.PaintStyle;
+import org.apache.poi.sl.usermodel.PaintStyle.PaintModifier;
 import org.apache.poi.sl.usermodel.PaintStyle.SolidPaint;
 import org.apache.poi.sl.usermodel.Shadow;
 import org.apache.poi.sl.usermodel.SimpleShape;
-import org.apache.poi.util.IOUtils;
-import org.apache.poi.util.StaxHelper;
 import org.apache.poi.util.Units;
 
 
@@ -67,9 +58,16 @@ public class DrawSimpleShape extends DrawShape {
 
     @Override
     public void draw(Graphics2D graphics) {
-        DrawPaint drawPaint = DrawFactory.getInstance(graphics).getPaint(getShape());
-        Paint fill = drawPaint.getPaint(graphics, getShape().getFillStyle().getPaint());
-        Paint line = drawPaint.getPaint(graphics, getShape().getStrokeStyle().getPaint());
+        if (getAnchor(graphics, getShape()) == null) {
+            return;
+        }
+
+        Paint oldPaint = graphics.getPaint();
+        Stroke oldStroke = graphics.getStroke();
+        Color oldColor = graphics.getColor();
+
+        Paint fill = getFillPaint(graphics);
+        Paint line = getLinePaint(graphics);
         BasicStroke stroke = getStroke(); // the stroke applies both to the shadow and the shape
         graphics.setStroke(stroke);
 
@@ -80,16 +78,28 @@ public class DrawSimpleShape extends DrawShape {
 
         // then fill the shape interior
         if (fill != null) {
+            final Path2D area = new Path2D.Double();
+            graphics.setRenderingHint(Drawable.GRADIENT_SHAPE, area);
+
+            Consumer<PaintModifier> fun = (pm) -> fillArea(graphics, pm, area);
+
+            PaintModifier pm = null;
             for (Outline o : elems) {
-                if (o.getPath().isFilled()){
-                    Paint fillMod = drawPaint.getPaint(graphics, getShape().getFillStyle().getPaint(), o.getPath().getFill());
-                    if (fillMod != null) {
-                        graphics.setPaint(fillMod);
-                        java.awt.Shape s = o.getOutline();
-                        graphics.setRenderingHint(Drawable.GRADIENT_SHAPE, s);
-                        graphics.fill(s);
+                Path path = o.getPath();
+                if (path.isFilled()) {
+                    PaintModifier pmOld = pm;
+                    pm = path.getFill();
+                    if (pmOld != null && pmOld != pm) {
+                        fun.accept(pmOld);
+                        area.reset();
+                    } else {
+                        area.append(o.getOutline(), false);
                     }
                 }
+            }
+
+            if (area.getCurrentPoint() != null) {
+                fun.accept(pm);
             }
         }
 
@@ -109,9 +119,35 @@ public class DrawSimpleShape extends DrawShape {
             }
         }
 
-		// draw line decorations
+        // draw line decorations
         drawDecoration(graphics, line, stroke);
+
+        graphics.setColor(oldColor);
+        graphics.setPaint(oldPaint);
+        graphics.setStroke(oldStroke);
     }
+
+    private void fillArea(Graphics2D graphics, PaintModifier pm, Path2D area) {
+        final SimpleShape<?, ?> ss = getShape();
+        final PaintStyle ps = ss.getFillStyle().getPaint();
+        final DrawPaint drawPaint = DrawFactory.getInstance(graphics).getPaint(ss);
+        final Paint fillMod = drawPaint.getPaint(graphics, ps, pm);
+        if (fillMod != null) {
+            graphics.setPaint(fillMod);
+            fillPaintWorkaround(graphics, area);
+        }
+    }
+
+    protected Paint getFillPaint(Graphics2D graphics) {
+        DrawPaint drawPaint = DrawFactory.getInstance(graphics).getPaint(getShape());
+        return drawPaint.getPaint(graphics, getShape().getFillStyle().getPaint());
+    }
+
+    protected Paint getLinePaint(Graphics2D graphics) {
+        DrawPaint drawPaint = DrawFactory.getInstance(graphics).getPaint(getShape());
+        return drawPaint.getPaint(graphics, getShape().getStrokeStyle().getPaint());
+    }
+
 
     protected void drawDecoration(Graphics2D graphics, Paint line, BasicStroke stroke) {
         if(line == null) {
@@ -119,7 +155,7 @@ public class DrawSimpleShape extends DrawShape {
         }
         graphics.setPaint(line);
 
-        List<Outline> lst = new ArrayList<Outline>();
+        List<Outline> lst = new ArrayList<>();
         LineDecoration deco = getShape().getLineDecoration();
         Outline head = getHeadDecoration(graphics, deco, stroke);
         if (head != null) {
@@ -189,7 +225,9 @@ public class DrawSimpleShape extends DrawShape {
                 break;
             case STEALTH:
             case ARROW:
-                p = new Path(false, true);
+                p = new Path();
+                p.setFill(PaintModifier.NONE);
+                p.setStroke(true);
                 Path2D.Double arrow = new Path2D.Double();
                 arrow.moveTo((-lineWidth * scaleX), (-lineWidth * scaleY / 2));
                 arrow.lineTo(0, 0);
@@ -261,7 +299,9 @@ public class DrawSimpleShape extends DrawShape {
                 break;
             case STEALTH:
             case ARROW:
-                p = new Path(false, true);
+                p = new Path();
+                p.setFill(PaintModifier.NONE);
+                p.setStroke(true);
                 Path2D.Double arrow = new Path2D.Double();
                 arrow.moveTo((lineWidth * scaleX), (-lineWidth * scaleY / 2));
                 arrow.lineTo(0, 0);
@@ -301,120 +341,70 @@ public class DrawSimpleShape extends DrawShape {
       , Paint fill
       , Paint line
     ) {
-          Shadow<?,?> shadow = getShape().getShadow();
-          if (shadow == null || (fill == null && line == null)) {
-              return;
-          }
+        Shadow<?,?> shadow = getShape().getShadow();
+        if (shadow == null || (fill == null && line == null)) {
+            return;
+        }
 
-          SolidPaint shadowPaint = shadow.getFillStyle();
-          Color shadowColor = DrawPaint.applyColorTransform(shadowPaint.getSolidColor());
+        SolidPaint shadowPaint = shadow.getFillStyle();
+        Color shadowColor = DrawPaint.applyColorTransform(shadowPaint.getSolidColor());
 
-          double shapeRotation = getShape().getRotation();
-          if(getShape().getFlipVertical()) {
-              shapeRotation += 180;
-          }
-          double angle = shadow.getAngle() - shapeRotation;
-          double dist = shadow.getDistance();
-          double dx = dist * Math.cos(Math.toRadians(angle));
-          double dy = dist * Math.sin(Math.toRadians(angle));
+        double shapeRotation = getShape().getRotation();
+        if (getShape().getFlipVertical()) {
+            shapeRotation += 180;
+        }
+        double angle = shadow.getAngle() - shapeRotation;
+        double dist = shadow.getDistance();
+        double dx = dist * Math.cos(Math.toRadians(angle));
+        double dy = dist * Math.sin(Math.toRadians(angle));
 
-          graphics.translate(dx, dy);
+        graphics.translate(dx, dy);
 
-          for(Outline o : outlines){
-              java.awt.Shape s = o.getOutline();
-              Path p = o.getPath();
-              graphics.setRenderingHint(Drawable.GRADIENT_SHAPE, s);
-              graphics.setPaint(shadowColor);
+        for (Outline o : outlines) {
+            java.awt.Shape s = o.getOutline();
+            Path p = o.getPath();
+            graphics.setRenderingHint(Drawable.GRADIENT_SHAPE, s);
+            graphics.setPaint(shadowColor);
 
-              if(fill != null && p.isFilled()){
-                  graphics.fill(s);
-              } else if (line != null && p.isStroked()) {
-                  graphics.draw(s);
-              }
-          }
-
-          graphics.translate(-dx, -dy);
-      }
-
-    protected static CustomGeometry getCustomGeometry(String name) {
-        return getCustomGeometry(name, null);
-    }
-
-    protected static CustomGeometry getCustomGeometry(String name, Graphics2D graphics) {
-        @SuppressWarnings("unchecked")
-        Map<String, CustomGeometry> presets = (graphics == null)
-            ? null
-            : (Map<String, CustomGeometry>)graphics.getRenderingHint(Drawable.PRESET_GEOMETRY_CACHE);
-
-        if (presets == null) {
-            presets = new HashMap<String,CustomGeometry>();
-            if (graphics != null) {
-                graphics.setRenderingHint(Drawable.PRESET_GEOMETRY_CACHE, presets);
-            }
-
-            String packageName = "org.apache.poi.sl.draw.binding";
-            InputStream presetIS = Drawable.class.getResourceAsStream("presetShapeDefinitions.xml");
-
-            // StAX:
-            EventFilter startElementFilter = new EventFilter() {
-                @Override
-                public boolean accept(XMLEvent event) {
-                    return event.isStartElement();
-                }
-            };
-
-            try {
-                XMLInputFactory staxFactory = StaxHelper.newXMLInputFactory();
-                XMLEventReader staxReader = staxFactory.createXMLEventReader(presetIS);
-                XMLEventReader staxFiltRd = staxFactory.createFilteredReader(staxReader, startElementFilter);
-                // Ignore StartElement:
-                staxFiltRd.nextEvent();
-                // JAXB:
-                JAXBContext jaxbContext = JAXBContext.newInstance(packageName);
-                Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-
-                while (staxFiltRd.peek() != null) {
-                    StartElement evRoot = (StartElement)staxFiltRd.peek();
-                    String cusName = evRoot.getName().getLocalPart();
-                    // XMLEvent ev = staxReader.nextEvent();
-                    JAXBElement<org.apache.poi.sl.draw.binding.CTCustomGeometry2D> el = unmarshaller.unmarshal(staxReader, CTCustomGeometry2D.class);
-                    CTCustomGeometry2D cusGeom = el.getValue();
-
-                    presets.put(cusName, new CustomGeometry(cusGeom));
-                }
-
-                staxFiltRd.close();
-                staxReader.close();
-            } catch (Exception e) {
-                throw new RuntimeException("Unable to load preset geometries.", e);
-            } finally {
-                IOUtils.closeQuietly(presetIS);
+            if (fill != null && p.isFilled()) {
+                fillPaintWorkaround(graphics, s);
+            } else if (line != null && p.isStroked()) {
+                graphics.draw(s);
             }
         }
 
-        return presets.get(name);
+        graphics.translate(-dx, -dy);
     }
 
     protected Collection<Outline> computeOutlines(Graphics2D graphics) {
         final SimpleShape<?,?> sh = getShape();
 
-        List<Outline> lst = new ArrayList<Outline>();
+        List<Outline> lst = new ArrayList<>();
         CustomGeometry geom = sh.getGeometry();
         if(geom == null) {
             return lst;
         }
 
         Rectangle2D anchor = getAnchor(graphics, sh);
+        if(anchor == null) {
+            return lst;
+        }
         for (Path p : geom) {
 
-            double w = p.getW(), h = p.getH(), scaleX = Units.toPoints(1), scaleY = scaleX;
+            double w = p.getW(), h = p.getH(), scaleX, scaleY;
             if (w == -1) {
                 w = Units.toEMU(anchor.getWidth());
+                scaleX = Units.toPoints(1);
+            } else if (anchor.getWidth() == 0) {
+                scaleX = 1;
             } else {
                 scaleX = anchor.getWidth() / w;
             }
             if (h == -1) {
                 h = Units.toEMU(anchor.getHeight());
+                scaleY = Units.toPoints(1);
+            } else if (anchor.getHeight() == 0) {
+                scaleY = 1;
             } else {
                 scaleY = anchor.getHeight() / h;
             }

@@ -134,6 +134,11 @@ public interface Name {
      *  <li><code>-PMT(Interest_Rate/12,Number_of_Payments,Loan_Amount)</li>
      * </ul>
      *
+     * Note: Using relative values like 'A1:B1' can lead to unexpected moving of
+     *      the cell that the name points to when working with the workbook in Microsoft Excel,
+     *      usually using absolute references like '$A$1:$B$1' avoids this, see also
+     *      https://superuser.com/a/1031047/126954
+     *
      * @param formulaText the reference for this name
      * @throws IllegalArgumentException if the specified formulaText is unparsable
     */
@@ -152,6 +157,14 @@ public interface Name {
      * @return <code>true</code> if the name refers to a deleted cell, <code>false</code> otherwise
      */
     boolean isDeleted();
+
+    /**
+     * Checks if this name is hidden, eg one of the built-in Excel
+     *  internal names
+     *
+     * @return <code>true</code> if the name is a hidden name, <code>false</code> otherwise
+     */
+    boolean isHidden();
 
     /**
      * Tell Excel that this name applies to the worksheet with the specified index instead of the entire workbook.

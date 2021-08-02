@@ -17,27 +17,29 @@
 
 package org.apache.poi.hssf.record;
 
-import org.apache.poi.util.HexDump;
-import org.apache.poi.util.LittleEndianOutput;
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.util.BitField;
 import org.apache.poi.util.BitFieldFactory;
+import org.apache.poi.util.GenericRecordUtil;
+import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title: COLINFO Record (0x007D)<p>
- * Description:  Defines with width and formatting for a range of columns<p>
- * REFERENCE:  PG 293 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)
+ * Defines with width and formatting for a range of columns
  */
-public final class ColumnInfoRecord extends StandardRecord implements Cloneable {
+public final class ColumnInfoRecord extends StandardRecord {
     public static final short sid = 0x007D;
+
+    private static final BitField hidden    = BitFieldFactory.getInstance(0x01);
+    private static final BitField outlevel  = BitFieldFactory.getInstance(0x0700);
+    private static final BitField collapsed = BitFieldFactory.getInstance(0x1000);
 
     private int _firstCol;
     private int _lastCol;
     private int _colWidth;
     private int _xfIndex;
     private int _options;
-    private static final BitField hidden    = BitFieldFactory.getInstance(0x01);
-    private static final BitField outlevel  = BitFieldFactory.getInstance(0x0700);
-    private static final BitField collapsed = BitFieldFactory.getInstance(0x1000);
     // Excel seems write values 2, 10, and 260, even though spec says "must be zero"
     private int field_6_reserved;
 
@@ -49,6 +51,16 @@ public final class ColumnInfoRecord extends StandardRecord implements Cloneable 
         _options = 2;
         _xfIndex = 0x0f;
         field_6_reserved = 2; // seems to be the most common value
+    }
+
+    public ColumnInfoRecord(ColumnInfoRecord other) {
+        super(other);
+        _firstCol = other._firstCol;
+        _lastCol = other._lastCol;
+        _colWidth = other._colWidth;
+        _xfIndex = other._xfIndex;
+        _options = other._options;
+        field_6_reserved = other.field_6_reserved;
     }
 
     public ColumnInfoRecord(RecordInputStream in) {
@@ -196,7 +208,7 @@ public final class ColumnInfoRecord extends StandardRecord implements Cloneable 
 
     /**
      * @param other the format to match with
-     * 
+     *
      * @return {@code true} if the format, options and column width match
      */
     public boolean formatMatches(ColumnInfoRecord other) {
@@ -206,10 +218,7 @@ public final class ColumnInfoRecord extends StandardRecord implements Cloneable 
         if (_options != other._options) {
             return false;
         }
-        if (_colWidth != other._colWidth) {
-            return false;
-        }
-        return true;
+        return _colWidth == other._colWidth;
     }
 
     public short getSid() {
@@ -229,31 +238,27 @@ public final class ColumnInfoRecord extends StandardRecord implements Cloneable 
         return 12;
     }
 
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("[COLINFO]\n");
-        sb.append("  colfirst = ").append(getFirstColumn()).append("\n");
-        sb.append("  collast  = ").append(getLastColumn()).append("\n");
-        sb.append("  colwidth = ").append(getColumnWidth()).append("\n");
-        sb.append("  xfindex  = ").append(getXFIndex()).append("\n");
-        sb.append("  options  = ").append(HexDump.shortToHex(_options)).append("\n");
-        sb.append("    hidden   = ").append(getHidden()).append("\n");
-        sb.append("    olevel   = ").append(getOutlineLevel()).append("\n");
-        sb.append("    collapsed= ").append(getCollapsed()).append("\n");
-        sb.append("[/COLINFO]\n");
-        return sb.toString();
+    @Override
+    public ColumnInfoRecord copy() {
+        return new ColumnInfoRecord(this);
     }
 
     @Override
-    public ColumnInfoRecord clone() {
-        ColumnInfoRecord rec = new ColumnInfoRecord();
-        rec._firstCol = _firstCol;
-        rec._lastCol = _lastCol;
-        rec._colWidth = _colWidth;
-        rec._xfIndex = _xfIndex;
-        rec._options = _options;
-        rec.field_6_reserved = field_6_reserved;
-        return rec;
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.COLUMN_INFO;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "firstColumn", this::getFirstColumn,
+            "lastColumn", this::getLastColumn,
+            "columnWidth", this::getColumnWidth,
+            "xfIndex", this::getXFIndex,
+            "options", () -> _options,
+            "hidden", this::getHidden,
+            "outlineLevel", this::getOutlineLevel,
+            "collapsed", this::getCollapsed
+        );
     }
 }

@@ -22,20 +22,27 @@ import java.awt.Rectangle;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Supplier;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
 import org.apache.poi.hssf.usermodel.HSSFPictureData;
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.LittleEndian;
 import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
 
 public final class EscherMetafileBlip extends EscherBlipRecord {
     private static final POILogger log = POILogFactory.getLogger(EscherMetafileBlip.class);
+    //arbitrarily selected; may need to increase
+    private static final int MAX_RECORD_LENGTH = 100_000_000;
 
-    public static final short RECORD_ID_EMF = (short) 0xF018 + 2;
-    public static final short RECORD_ID_WMF = (short) 0xF018 + 3;
-    public static final short RECORD_ID_PICT = (short) 0xF018 + 4;
+    public static final short RECORD_ID_EMF = EscherRecordTypes.BLIP_EMF.typeID;
+    public static final short RECORD_ID_WMF = EscherRecordTypes.BLIP_WMF.typeID;
+    public static final short RECORD_ID_PICT = EscherRecordTypes.BLIP_PICT.typeID;
 
     private static final int HEADER_SIZE = 8;
 
@@ -58,6 +65,26 @@ public final class EscherMetafileBlip extends EscherBlipRecord {
     private byte[] raw_pictureData;
     private byte[] remainingData;
 
+    public EscherMetafileBlip() {}
+
+    public EscherMetafileBlip(EscherMetafileBlip other) {
+        super(other);
+        System.arraycopy(other.field_1_UID, 0, field_1_UID, 0, field_1_UID.length);
+        System.arraycopy(other.field_2_UID, 0, field_2_UID, 0, field_2_UID.length);
+        field_2_cb = other.field_2_cb;
+        field_3_rcBounds_x1 = other.field_3_rcBounds_x1;
+        field_3_rcBounds_y1 = other.field_3_rcBounds_y1;
+        field_3_rcBounds_x2 = other.field_3_rcBounds_x2;
+        field_3_rcBounds_y2 = other.field_3_rcBounds_y2;
+        field_4_ptSize_h = other.field_4_ptSize_h;
+        field_4_ptSize_w = other.field_4_ptSize_w;
+        field_5_cbSave = other.field_5_cbSave;
+        field_6_fCompression = other.field_6_fCompression;
+        field_7_fFilter = other.field_7_fFilter;
+        raw_pictureData = (other.raw_pictureData == null) ? null : other.raw_pictureData.clone();
+        remainingData = (other.remainingData == null) ? null : other.remainingData.clone();
+    }
+
     @Override
     public int fillFields(byte[] data, int offset, EscherRecordFactory recordFactory) {
         int bytesAfterHeader = readHeader( data, offset );
@@ -79,8 +106,7 @@ public final class EscherMetafileBlip extends EscherBlipRecord {
         field_6_fCompression = data[pos]; pos++;
         field_7_fFilter = data[pos]; pos++;
 
-        raw_pictureData = new byte[field_5_cbSave];
-        System.arraycopy( data, pos, raw_pictureData, 0, field_5_cbSave );
+        raw_pictureData = IOUtils.safelyClone(data, pos, field_5_cbSave, MAX_RECORD_LENGTH);
         pos += field_5_cbSave;
 
         // 0 means DEFLATE compression
@@ -93,8 +119,7 @@ public final class EscherMetafileBlip extends EscherBlipRecord {
 
         int remaining = bytesAfterHeader - pos + offset + HEADER_SIZE;
         if(remaining > 0) {
-            remainingData = new byte[remaining];
-            System.arraycopy( data, pos, remainingData, 0, remaining );
+            remainingData = IOUtils.safelyClone(data, pos, remaining, MAX_RECORD_LENGTH);
         }
         return bytesAfterHeader + HEADER_SIZE;
     }
@@ -256,7 +281,7 @@ public final class EscherMetafileBlip extends EscherBlipRecord {
     }
 
     /**
-     * Gets the dimensions of the metafile 
+     * Gets the dimensions of the metafile
      *
      * @return the dimensions of the metafile
      */
@@ -276,7 +301,7 @@ public final class EscherMetafileBlip extends EscherBlipRecord {
 
     /**
      * Gets the compressed size of the metafile (in bytes)
-     * 
+     *
      * @return the compressed size
      */
     public int getCompressedSize() {
@@ -318,7 +343,7 @@ public final class EscherMetafileBlip extends EscherBlipRecord {
     public byte getFilter() {
         return field_7_fFilter;
     }
-    
+
     /**
      * Sets the filter byte - this is usually 0xFE
      *
@@ -328,8 +353,8 @@ public final class EscherMetafileBlip extends EscherBlipRecord {
         field_7_fFilter = filter;
     }
 
-    
-    
+
+
     /**
      * Returns any remaining bytes
      *
@@ -338,17 +363,17 @@ public final class EscherMetafileBlip extends EscherBlipRecord {
     public byte[] getRemainingData() {
         return remainingData;
     }
-    
+
     /**
      * Return the blip signature
      *
      * @return the blip signature
      */
     public short getSignature() {
-        switch (getRecordId()) {
-            case RECORD_ID_EMF:  return HSSFPictureData.MSOBI_EMF;
-            case RECORD_ID_WMF:  return HSSFPictureData.MSOBI_WMF;
-            case RECORD_ID_PICT: return HSSFPictureData.MSOBI_PICT;
+        switch (EscherRecordTypes.forTypeID(getRecordId())) {
+            case BLIP_EMF:  return HSSFPictureData.MSOBI_EMF;
+            case BLIP_WMF:  return HSSFPictureData.MSOBI_WMF;
+            case BLIP_PICT: return HSSFPictureData.MSOBI_PICT;
         }
         if (log.check(POILogger.WARN)) {
             log.log(POILogger.WARN, "Unknown metafile: " + getRecordId());
@@ -374,24 +399,26 @@ public final class EscherMetafileBlip extends EscherBlipRecord {
         } catch (IOException e) {
         	throw new RuntimeException("Can't compress metafile picture data", e);
         }
-        
+
         setCompressedSize(raw_pictureData.length);
         setCompressed(true);
     }
 
     @Override
-    protected Object[][] getAttributeMap() {
-        return new Object[][]{
-            // record, version, instance are directly fetched
-            { "UID", field_1_UID, "UID2", field_2_UID },
-            { "Uncompressed Size", field_2_cb },
-            { "Bounds", getBounds().toString() },
-            { "Size in EMU", getSizeEMU().toString() },
-            { "Compressed Size", field_5_cbSave },
-            { "Compression", field_6_fCompression },
-            { "Filter", field_7_fFilter },
-            { "Extra Data", "" },
-            { "Remaining Data", remainingData }
-        };
+    public Map<String, Supplier<?>> getGenericProperties() {
+        final Map<String, Supplier<?>> m = new LinkedHashMap<>(super.getGenericProperties());
+        m.put("uid", this::getUID);
+        m.put("uncompressedSize", this::getUncompressedSize);
+        m.put("bounds", this::getBounds);
+        m.put("sizeInEMU", this::getSizeEMU);
+        m.put("compressedSize", this::getCompressedSize);
+        m.put("isCompressed", this::isCompressed);
+        m.put("filter", this::getFilter);
+        return Collections.unmodifiableMap(m);
+    }
+
+    @Override
+    public EscherMetafileBlip copy() {
+        return new EscherMetafileBlip(this);
     }
 }

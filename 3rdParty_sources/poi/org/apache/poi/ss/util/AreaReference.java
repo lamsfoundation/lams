@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.poi.ss.SpreadsheetVersion;
-import org.apache.poi.util.Removal;
+import org.apache.poi.util.StringUtil;
 
 public class AreaReference {
 
@@ -93,6 +93,59 @@ public class AreaReference {
        }
      }
     
+    /**
+     * Creates an area ref from a pair of Cell References.
+     */
+    public AreaReference(CellReference topLeft, CellReference botRight, SpreadsheetVersion version) {
+        _version = (null != version) ? version : DEFAULT_SPREADSHEET_VERSION;
+        boolean swapRows = topLeft.getRow() > botRight.getRow();
+        boolean swapCols = topLeft.getCol() > botRight.getCol();
+        if (swapRows || swapCols) {
+            String firstSheet;
+            String lastSheet;
+            int firstRow;
+            int lastRow;
+            int firstColumn;
+            int lastColumn;
+            boolean firstRowAbs;
+            boolean lastRowAbs;
+            boolean firstColAbs;
+            boolean lastColAbs;
+            if (swapRows) {
+                firstRow = botRight.getRow();
+                firstRowAbs = botRight.isRowAbsolute();
+                lastRow = topLeft.getRow();
+                lastRowAbs = topLeft.isRowAbsolute();
+            } else {
+                firstRow = topLeft.getRow();
+                firstRowAbs = topLeft.isRowAbsolute();
+                lastRow = botRight.getRow();
+                lastRowAbs = botRight.isRowAbsolute();
+            }
+            if (swapCols) {
+                firstSheet = botRight.getSheetName();
+                firstColumn = botRight.getCol();
+                firstColAbs = botRight.isColAbsolute();
+                lastSheet = topLeft.getSheetName();
+                lastColumn = topLeft.getCol();
+                lastColAbs = topLeft.isColAbsolute();
+            } else {
+                firstSheet = topLeft.getSheetName();
+                firstColumn = topLeft.getCol();
+                firstColAbs = topLeft.isColAbsolute();
+                lastSheet = botRight.getSheetName();
+                lastColumn = botRight.getCol();
+                lastColAbs = botRight.isColAbsolute();
+            }
+            _firstCell = new CellReference(firstSheet, firstRow, firstColumn, firstRowAbs, firstColAbs);
+            _lastCell = new CellReference(lastSheet, lastRow, lastColumn, lastRowAbs, lastColAbs);
+        } else {
+            _firstCell = topLeft;
+            _lastCell = botRight;
+        }
+        _isSingleCell = false;
+    }
+    
     private static boolean isPlainColumn(String refPart) {
         for(int i=refPart.length()-1; i>=0; i--) {
             int ch = refPart.charAt(i);
@@ -107,63 +160,6 @@ public class AreaReference {
     }
 
     /**
-     * Creates an area ref from a pair of Cell References.
-     * @deprecated use {@link #AreaReference(CellReference, CellReference, SpreadsheetVersion)} instead
-     */
-    @Deprecated
-    @Removal(version="3.19")
-    public AreaReference(CellReference topLeft, CellReference botRight) {
-        this(topLeft, botRight, DEFAULT_SPREADSHEET_VERSION);
-    }
-    
-    /**
-     * Creates an area ref from a pair of Cell References.
-     */
-    public AreaReference(CellReference topLeft, CellReference botRight, SpreadsheetVersion version) {
-        _version = (null != version) ? version : DEFAULT_SPREADSHEET_VERSION;
-        boolean swapRows = topLeft.getRow() > botRight.getRow();
-        boolean swapCols = topLeft.getCol() > botRight.getCol();
-        if (swapRows || swapCols) {
-            int firstRow; 
-            int lastRow; 
-            int firstColumn; 
-            int lastColumn;
-            boolean firstRowAbs; 
-            boolean lastRowAbs; 
-            boolean firstColAbs;
-            boolean lastColAbs;   
-            if (swapRows) {
-                firstRow = botRight.getRow();
-                firstRowAbs = botRight.isRowAbsolute();
-                lastRow = topLeft.getRow();
-                lastRowAbs = topLeft.isRowAbsolute();
-            } else {
-                firstRow = topLeft.getRow();
-                firstRowAbs = topLeft.isRowAbsolute();
-                lastRow = botRight.getRow();
-                lastRowAbs = botRight.isRowAbsolute();
-            }
-            if (swapCols) {
-                firstColumn = botRight.getCol();
-                firstColAbs = botRight.isColAbsolute();
-                lastColumn = topLeft.getCol();
-                lastColAbs = topLeft.isColAbsolute();
-            } else {
-                firstColumn = topLeft.getCol();
-                firstColAbs = topLeft.isColAbsolute();
-                lastColumn = botRight.getCol();
-                lastColAbs = botRight.isColAbsolute();
-            }
-            _firstCell = new CellReference(firstRow, firstColumn, firstRowAbs, firstColAbs);
-            _lastCell = new CellReference(lastRow, lastColumn, lastRowAbs, lastColAbs);
-        } else {
-            _firstCell = topLeft;
-            _lastCell = botRight;
-        }
-        _isSingleCell = false;
-    }
-
-    /**
      * Is the reference for a contiguous (i.e.
      *  unbroken) area, or is it made up of
      *  several different parts?
@@ -171,14 +167,7 @@ public class AreaReference {
      *  {@link #generateContiguous(SpreadsheetVersion, String)})
      */
     public static boolean isContiguous(String reference) {
-       // If there's a sheet name, strip it off
-       int sheetRefEnd = reference.indexOf('!'); 
-       if(sheetRefEnd != -1) {
-          reference = reference.substring(sheetRefEnd);
-       }
-
-       // Check for the , as a sign of non-coniguous
-       return !reference.contains(",");
+        return splitAreaReferences(reference).length == 1;
     }
 
     public static AreaReference getWholeRow(SpreadsheetVersion version, String start, String end) {
@@ -207,25 +196,10 @@ public class AreaReference {
         // These are represented as something like
         //   C$1:C$65535 or D$1:F$0
         // i.e. absolute from 1st row to 0th one
-        if(topLeft.getRow() == 0 && topLeft.isRowAbsolute() &&
-            botRight.getRow() == version.getLastRowIndex() && botRight.isRowAbsolute()) {
-            return true;
-        }
-        return false;
-    }
-    public boolean isWholeColumnReference() {
-        return isWholeColumnReference(_version, _firstCell, _lastCell);
-    }
-
-    /**
-     * Takes a non-contiguous area reference, and returns an array of contiguous area references
-     * @return an array of contiguous area references.
-     * @deprecated use {@link #generateContiguous(SpreadsheetVersion, String)} instead
-     */
-    @Deprecated
-    @Removal(version="3.19")
-    public static AreaReference[] generateContiguous(String reference) {
-        return generateContiguous(DEFAULT_SPREADSHEET_VERSION, reference);
+        return (topLeft.getRow() == 0
+                && topLeft.isRowAbsolute()
+                && botRight.getRow() == version.getLastRowIndex()
+                && botRight.isRowAbsolute());
     }
 
     /**
@@ -234,25 +208,132 @@ public class AreaReference {
      */
     public static AreaReference[] generateContiguous(SpreadsheetVersion version, String reference) {
         if (null == version) {
-            version = DEFAULT_SPREADSHEET_VERSION; // how the code used to behave. 
+            version = DEFAULT_SPREADSHEET_VERSION; // how the code used to behave.
         }
-        List<AreaReference> refs = new ArrayList<AreaReference>();
-        StringTokenizer st = new StringTokenizer(reference, ",");
-        while(st.hasMoreTokens()) {
-            refs.add(
-                    new AreaReference(st.nextToken(), version)
-            );
+        List<AreaReference> refs = new ArrayList<>();
+        String[] splitReferences = splitAreaReferences(reference);
+        for (String ref : splitReferences) {
+            refs.add(new AreaReference(ref, version));
         }
-        return refs.toArray(new AreaReference[refs.size()]);
+        return refs.toArray(new AreaReference[0]);
     }
 
+    /**
+     * Separates Area refs in two parts and returns them as separate elements in a String array,
+     * each qualified with the sheet name (if present)
+     *
+     * @return array with one or two elements. never <code>null</code>
+     */
+    private static String[] separateAreaRefs(String reference) {
+        // TODO - refactor cell reference parsing logic to one place.
+        // Current known incarnations:
+        //   FormulaParser.GetName()
+        //   CellReference.separateRefParts()
+        //   AreaReference.separateAreaRefs() (here)
+        //   SheetNameFormatter.format() (inverse)
+
+
+        int len = reference.length();
+        int delimiterPos = -1;
+        boolean insideDelimitedName = false;
+        for(int i=0; i<len; i++) {
+            switch(reference.charAt(i)) {
+                case CELL_DELIMITER:
+                    if(!insideDelimitedName) {
+                        if(delimiterPos >=0) {
+                            throw new IllegalArgumentException("More than one cell delimiter '"
+                                    + CELL_DELIMITER + "' appears in area reference '" + reference + "'");
+                        }
+                        delimiterPos = i;
+                    }
+                    continue; //continue the for-loop
+                case SPECIAL_NAME_DELIMITER:
+                    break;
+                default:
+                    continue; //continue the for-loop
+            }
+            if(!insideDelimitedName) {
+                insideDelimitedName = true;
+                continue;
+            }
+
+            if(i >= len-1) {
+                // reference ends with the delimited name.
+                // Assume names like: "Sheet1!'A1'" are never legal.
+                throw new IllegalArgumentException("Area reference '" + reference
+                        + "' ends with special name delimiter '"  + SPECIAL_NAME_DELIMITER + "'");
+            }
+            if(reference.charAt(i+1) == SPECIAL_NAME_DELIMITER) {
+                // two consecutive quotes is the escape sequence for a single one
+                i++; // skip this and keep parsing the special name
+            } else {
+                // this is the end of the delimited name
+                insideDelimitedName = false;
+            }
+        }
+        if(delimiterPos < 0) {
+            return new String[] { reference, };
+        }
+
+        String partA = reference.substring(0, delimiterPos);
+        String partB = reference.substring(delimiterPos+1);
+        if(partB.indexOf(SHEET_NAME_DELIMITER) >= 0) {
+            // partB contains SHEET_NAME_DELIMITER
+            // TODO - are references like "Sheet1!A1:Sheet1:B2" ever valid?
+            // FormulaParser has code to handle that.
+
+            throw new RuntimeException("Unexpected " + SHEET_NAME_DELIMITER
+                    + " in second cell reference of '" + reference + "'");
+        }
+
+        int plingPos = partA.lastIndexOf(SHEET_NAME_DELIMITER);
+        if(plingPos < 0) {
+            return new String [] { partA, partB, };
+        }
+
+        String sheetName = partA.substring(0, plingPos + 1); // +1 to include delimiter
+
+        return new String [] { partA, sheetName + partB, };
+    }
+
+    /**
+     * Splits a comma-separated area references string into an array of
+     * individual references
+     * @param reference Area references, i.e. A1:B2, 'Sheet1'!A1:B2
+     * @return Area references in an array, size >= 1
+     */
+    private static String[] splitAreaReferences(String reference) {
+        List<String> results = new ArrayList<>();
+        String currentSegment = "";
+        StringTokenizer st = new StringTokenizer(reference, ",");
+        while(st.hasMoreTokens()) {
+            if (currentSegment.length() > 0) {
+                currentSegment += ",";
+            }
+            currentSegment += st.nextToken();
+            int numSingleQuotes = StringUtil.countMatches(currentSegment, '\'');
+            if (numSingleQuotes == 0 || numSingleQuotes == 2) {
+                results.add(currentSegment);
+                currentSegment = "";
+            }
+        }
+        if (currentSegment.length() > 0) {
+            results.add(currentSegment);
+        }
+        return results.toArray(new String[0]);
+    }
+    
+    public boolean isWholeColumnReference() {
+        return isWholeColumnReference(_version, _firstCell, _lastCell);
+    }
+    
     /**
      * @return <code>false</code> if this area reference involves more than one cell
      */
     public boolean isSingleCell() {
         return _isSingleCell;
     }
-    
+
     /**
      * @return the first cell reference which defines this area. Usually this cell is in the upper
      * left corner of the area (but this is not a requirement).
@@ -260,17 +341,18 @@ public class AreaReference {
    public CellReference getFirstCell() {
         return _firstCell;
     }
-    
+
     /**
      * Note - if this area reference refers to a single cell, the return value of this method will
      * be identical to that of <tt>getFirstCell()</tt>
-     * @return the second cell reference which defines this area.  For multi-cell areas, this is 
-     * cell diagonally opposite the 'first cell'.  Usually this cell is in the lower right corner 
+     * @return the second cell reference which defines this area.  For multi-cell areas, this is
+     * cell diagonally opposite the 'first cell'.  Usually this cell is in the lower right corner
      * of the area (but this is not a requirement).
      */
     public CellReference getLastCell() {
         return _lastCell;
     }
+
     /**
      * Returns a reference to every cell covered by this area
      */
@@ -279,22 +361,22 @@ public class AreaReference {
         if(_isSingleCell) {
             return  new CellReference[] { _firstCell, };
         }
- 
+
         // Interpolate between the two
         int minRow = Math.min(_firstCell.getRow(), _lastCell.getRow());
         int maxRow = Math.max(_firstCell.getRow(), _lastCell.getRow());
         int minCol = Math.min(_firstCell.getCol(), _lastCell.getCol());
         int maxCol = Math.max(_firstCell.getCol(), _lastCell.getCol());
         String sheetName = _firstCell.getSheetName();
-        
-        List<CellReference> refs = new ArrayList<CellReference>();
+
+        List<CellReference> refs = new ArrayList<>();
         for(int row=minRow; row<=maxRow; row++) {
             for(int col=minCol; col<=maxCol; col++) {
                 CellReference ref = new CellReference(sheetName, row, col, _firstCell.isRowAbsolute(), _firstCell.isColAbsolute());
                 refs.add(ref);
             }
         }
-        return refs.toArray(new CellReference[refs.size()]);
+        return refs.toArray(new CellReference[0]);
     }
 
     /**
@@ -318,8 +400,8 @@ public class AreaReference {
                 + ":" +
                 CellReference.convertNumToColString(_lastCell.getCol());
         }
-        
-        StringBuffer sb = new StringBuffer(32);
+
+        StringBuilder sb = new StringBuilder(32);
         sb.append(_firstCell.formatAsString());
         if(!_isSingleCell) {
             sb.append(CELL_DELIMITER);
@@ -334,88 +416,14 @@ public class AreaReference {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer(64);
+        StringBuilder sb = new StringBuilder(64);
         sb.append(getClass().getName()).append(" [");
-        sb.append(formatAsString());
-        sb.append("]");
+        try {
+            sb.append(formatAsString());
+        } catch(Exception e) {
+            sb.append(e);
+        }
+        sb.append(']');
         return sb.toString();
-    }
-
-    /**
-     * Separates Area refs in two parts and returns them as separate elements in a String array,
-     * each qualified with the sheet name (if present)
-     * 
-     * @return array with one or two elements. never <code>null</code>
-     */
-    private static String[] separateAreaRefs(String reference) {
-        // TODO - refactor cell reference parsing logic to one place.
-        // Current known incarnations: 
-        //   FormulaParser.GetName()
-        //   CellReference.separateRefParts() 
-        //   AreaReference.separateAreaRefs() (here)
-        //   SheetNameFormatter.format() (inverse)
-        
-        
-        int len = reference.length();
-        int delimiterPos = -1;
-        boolean insideDelimitedName = false;
-        for(int i=0; i<len; i++) {
-            switch(reference.charAt(i)) {
-                case CELL_DELIMITER:
-                    if(!insideDelimitedName) {
-                        if(delimiterPos >=0) {
-                            throw new IllegalArgumentException("More than one cell delimiter '" 
-                                    + CELL_DELIMITER + "' appears in area reference '" + reference + "'");
-                        }
-                        delimiterPos = i;
-                    }
-                    continue; //continue the for-loop
-                case SPECIAL_NAME_DELIMITER:
-                    break;
-                default:
-                    continue; //continue the for-loop
-            }
-            if(!insideDelimitedName) {
-                insideDelimitedName = true;
-                continue;
-            }
-            
-            if(i >= len-1) {
-                // reference ends with the delimited name. 
-                // Assume names like: "Sheet1!'A1'" are never legal.
-                throw new IllegalArgumentException("Area reference '" + reference 
-                        + "' ends with special name delimiter '"  + SPECIAL_NAME_DELIMITER + "'");
-            }
-            if(reference.charAt(i+1) == SPECIAL_NAME_DELIMITER) {
-                // two consecutive quotes is the escape sequence for a single one
-                i++; // skip this and keep parsing the special name
-            } else {
-                // this is the end of the delimited name
-                insideDelimitedName = false;
-            }
-        }
-        if(delimiterPos < 0) {
-            return new String[] { reference, };
-        }
-
-        String partA = reference.substring(0, delimiterPos);
-        String partB = reference.substring(delimiterPos+1);
-        if(partB.indexOf(SHEET_NAME_DELIMITER) >= 0) {
-            // partB contains SHEET_NAME_DELIMITER
-            // TODO - are references like "Sheet1!A1:Sheet1:B2" ever valid?  
-            // FormulaParser has code to handle that.
-            
-            throw new RuntimeException("Unexpected " + SHEET_NAME_DELIMITER 
-                    + " in second cell reference of '" + reference + "'");
-        }
-        
-        int plingPos = partA.lastIndexOf(SHEET_NAME_DELIMITER);
-        if(plingPos < 0) {
-            return new String [] { partA, partB, };
-        }
-        
-        String sheetName = partA.substring(0, plingPos + 1); // +1 to include delimiter
-        
-        return new String [] { partA, sheetName + partB, };
     }
 }

@@ -19,34 +19,28 @@
 package org.apache.poi.hssf.record;
 
 
-import org.apache.poi.util.LittleEndianOutput;
+import java.util.Map;
+import java.util.function.Supplier;
 
+import org.apache.poi.util.GenericRecordUtil;
+import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * Record for the bottom margin.
  */
-public final class BottomMarginRecord extends StandardRecord implements Margin, Cloneable {
-    public final static short sid = 0x29;
+public final class BottomMarginRecord extends StandardRecord implements Margin {
+    public static final short sid = 0x29;
     private double field_1_margin;
 
-    public BottomMarginRecord()
-    {
+    public BottomMarginRecord() {}
 
+    public BottomMarginRecord(BottomMarginRecord other) {
+        super(other);
+        field_1_margin = other.field_1_margin;
     }
 
-    public BottomMarginRecord( RecordInputStream in )
-    {
+    public BottomMarginRecord( RecordInputStream in ) {
         field_1_margin = in.readDouble();
-    }
-
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append( "[BottomMargin]\n" );
-        buffer.append( "    .margin               = " )
-                .append( " (" ).append( getMargin() ).append( " )\n" );
-        buffer.append( "[/BottomMargin]\n" );
-        return buffer.toString();
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -79,10 +73,19 @@ public final class BottomMarginRecord extends StandardRecord implements Margin, 
     }
 
     @Override
-    public BottomMarginRecord clone() {
-        BottomMarginRecord rec = new BottomMarginRecord();
-        rec.field_1_margin = this.field_1_margin;
-        return rec;
+    public BottomMarginRecord copy() {
+        return new BottomMarginRecord(this);
     }
 
-}  // END OF 
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.BOTTOM_MARGIN;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "margin", this::getMargin
+        );
+    }
+}

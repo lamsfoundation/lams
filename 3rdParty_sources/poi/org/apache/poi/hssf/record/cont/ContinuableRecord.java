@@ -17,6 +17,8 @@
 
 package org.apache.poi.hssf.record.cont;
 
+import java.io.IOException;
+
 import org.apache.poi.hssf.record.ContinueRecord;
 import org.apache.poi.hssf.record.Record;
 import org.apache.poi.util.LittleEndianByteArrayOutputStream;
@@ -27,9 +29,12 @@ import org.apache.poi.util.LittleEndianOutput;
  */
 public abstract class ContinuableRecord extends Record {
 
-	protected ContinuableRecord() {
-		// no fields to initialise
+	protected ContinuableRecord() {}
+
+	protected ContinuableRecord(ContinuableRecord other) {
+		super(other);
 	}
+
 	/**
 	 * Serializes this record's content to the supplied data output.<p>
 	 * The standard BIFF header (ushort sid, ushort size) has been handled by the superclass, so
@@ -49,6 +54,7 @@ public abstract class ContinuableRecord extends Record {
 	 * (Note - if any {@link ContinueRecord} is required, this result includes the
 	 * size of those too)
 	 */
+	@Override
 	public final int getRecordSize() {
 		ContinuableRecordOutput out = ContinuableRecordOutput.createForCountingOnly();
 		serialize(out);
@@ -56,12 +62,19 @@ public abstract class ContinuableRecord extends Record {
 		return out.getTotalSize();
 	}
 
+	@Override
 	public final int serialize(int offset, byte[] data) {
-
-		LittleEndianOutput leo = new LittleEndianByteArrayOutputStream(data, offset);
-		ContinuableRecordOutput out = new ContinuableRecordOutput(leo, getSid());
-		serialize(out);
-		out.terminate();
-		return out.getTotalSize();
+		int totalSize = 0;
+		try (LittleEndianByteArrayOutputStream leo =
+				new LittleEndianByteArrayOutputStream(data, offset)) {
+			ContinuableRecordOutput out = new ContinuableRecordOutput(leo, getSid());
+			serialize(out);
+			out.terminate();
+			totalSize = out.getTotalSize();
+		} catch (IOException ioe) {
+			// should never happen in practice
+			throw new IllegalStateException(ioe);
+		}
+		return totalSize;
 	}
 }

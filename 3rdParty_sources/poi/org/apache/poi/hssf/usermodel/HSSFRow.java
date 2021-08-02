@@ -28,6 +28,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.helpers.RowShifter;
 import org.apache.poi.util.Configurator;
 
 /**
@@ -84,12 +85,12 @@ public final class HSSFRow implements Row, Comparable<HSSFRow> {
         this.sheet = sheet;
         row = record;
         setRowNum(record.getRowNumber());
-        
+
         // Size the initial cell list such that a read only case won't waste
         //  lots of memory, and a create/read followed by adding new cells can
         //  add a bit without needing a resize
         cells = new HSSFCell[record.getLastCol()+INITIAL_CAPACITY];
-        
+
         // Don't trust colIx boundaries as read by other apps
         // set the RowRecord empty for the moment
         record.setEmpty();
@@ -113,32 +114,12 @@ public final class HSSFRow implements Row, Comparable<HSSFRow> {
     {
         return this.createCell(column,CellType.BLANK);
     }
-    
+
     /**
      * Use this to create new cells within the row and return it.
      * <p>
      * The cell that is returned will be of the requested type.
-     * The type can be changed either through calling setCellValue 
-     *  or setCellType, but there is a small overhead to doing this,
-     *  so it is best to create the required type up front.
-     *
-     * @param columnIndex - the column number this cell represents
-     *
-     * @return HSSFCell a high level representation of the created cell.
-     * @throws IllegalArgumentException if columnIndex < 0 or greater than 255,
-     *   the maximum number of columns supported by the Excel binary format (.xls)
-     * @deprecated POI 3.15 beta 3
-     */
-    @Override
-    public HSSFCell createCell(int columnIndex, int type)
-    {
-        return createCell(columnIndex, CellType.forInt(type));
-    }
-    /**
-     * Use this to create new cells within the row and return it.
-     * <p>
-     * The cell that is returned will be of the requested type.
-     * The type can be changed either through calling setCellValue 
+     * The type can be changed either through calling setCellValue
      *  or setCellType, but there is a small overhead to doing this,
      *  so it is best to create the required type up front.
      *
@@ -183,7 +164,7 @@ public final class HSSFRow implements Row, Comparable<HSSFRow> {
             throw new RuntimeException("Specified cell is not from this row");
         }
         if(cell.isPartOfArrayFormulaGroup()){
-            cell.notifyArrayFormulaChanging();
+            cell.tryToDeleteArrayFormula(null);
         }
 
         cells[column]=null;
@@ -388,7 +369,7 @@ public final class HSSFRow implements Row, Comparable<HSSFRow> {
             case RETURN_NULL_AND_BLANK:
                 return cell;
             case RETURN_BLANK_AS_NULL:
-                boolean isBlank = (cell != null && cell.getCellTypeEnum() == CellType.BLANK);
+                boolean isBlank = (cell != null && cell.getCellType() == CellType.BLANK);
                 return (isBlank) ? null : cell;
             case CREATE_NULL_AS_BLANK:
                 return (cell == null) ? createCell(cellnum, CellType.BLANK) : cell;
@@ -448,7 +429,9 @@ public final class HSSFRow implements Row, Comparable<HSSFRow> {
     {
         int count = 0;
         for (HSSFCell cell : cells) {
-            if (cell != null) count++;
+            if (cell != null) {
+                count++;
+            }
         }
         return count;
     }
@@ -518,8 +501,11 @@ public final class HSSFRow implements Row, Comparable<HSSFRow> {
 
         //The low-order 15 bits contain the row height.
         //The 0x8000 bit indicates that the row is standard height (optional)
-        if ((height & 0x8000) != 0) height = sheet.getSheet().getDefaultRowHeight();
-        else height &= 0x7FFF;
+        if ((height & 0x8000) != 0) {
+            height = sheet.getSheet().getDefaultRowHeight();
+        } else {
+            height &= 0x7FFF;
+        }
 
         return height;
     }
@@ -646,45 +632,46 @@ public final class HSSFRow implements Row, Comparable<HSSFRow> {
       int thisId=-1;
       int nextId=-1;
 
-      public CellIterator()
-      {
-        findNext();
+      public CellIterator() {
+          findNext();
       }
 
       @Override
-    public boolean hasNext() {
-        return nextId<cells.length;
+      public boolean hasNext() {
+          return nextId < cells.length;
       }
 
       @Override
-    public Cell next() {
-          if (!hasNext())
+      public Cell next() {
+          if (!hasNext()) {
               throw new NoSuchElementException("At last element");
-        HSSFCell cell=cells[nextId];
-        thisId=nextId;
-        findNext();
-        return cell;
+          }
+          HSSFCell cell = cells[nextId];
+          thisId = nextId;
+          findNext();
+          return cell;
       }
 
       @Override
-    public void remove() {
-          if (thisId == -1)
+      public void remove() {
+          if (thisId == -1) {
               throw new IllegalStateException("remove() called before next()");
-        cells[thisId]=null;
+          }
+          cells[thisId] = null;
       }
 
-      private void findNext()
-      {
-        int i=nextId+1;
-        for(;i<cells.length;i++)
-        {
-          if(cells[i]!=null) break;
-        }
-        nextId=i;
+      private void findNext() {
+          int i = nextId + 1;
+          for (; i < cells.length; i++) {
+              if (cells[i] != null) {
+                  break;
+              }
+          }
+          nextId = i;
       }
 
     }
-    
+
     /**
      * Compares two <code>HSSFRow</code> objects.  Two rows are equal if they belong to the same worksheet and
      * their row indexes are equal.
@@ -707,22 +694,19 @@ public final class HSSFRow implements Row, Comparable<HSSFRow> {
      * @throws IllegalArgumentException if the argument row belongs to a different worksheet
      */
     @Override
-    public int compareTo(HSSFRow other)
-    {
+    public int compareTo(HSSFRow other) {
         if (this.getSheet() != other.getSheet()) {
             throw new IllegalArgumentException("The compared rows must belong to the same sheet");
         }
 
-        Integer thisRow = this.getRowNum();
-        Integer otherRow = other.getRowNum();
-        return thisRow.compareTo(otherRow);
+        int thisRow = this.getRowNum();
+        int otherRow = other.getRowNum();
+        return Integer.compare(thisRow, otherRow);
     }
 
     @Override
-    public boolean equals(Object obj)
-    {
-        if (!(obj instanceof HSSFRow))
-        {
+    public boolean equals(Object obj) {
+        if (!(obj instanceof HSSFRow)) {
             return false;
         }
         HSSFRow other = (HSSFRow) obj;
@@ -734,5 +718,61 @@ public final class HSSFRow implements Row, Comparable<HSSFRow> {
     @Override
     public int hashCode() {
         return row.hashCode();
+    }
+
+    /**
+     * Shifts column range [firstShiftColumnIndex-lastShiftColumnIndex] step places to the right.
+     * @param firstShiftColumnIndex the column to start shifting
+     * @param lastShiftColumnIndex the column to end shifting
+     * @param step length of the shifting step
+     */
+    @Override
+    public void shiftCellsRight(int firstShiftColumnIndex, int lastShiftColumnIndex, int step) {
+        RowShifter.validateShiftParameters(firstShiftColumnIndex, lastShiftColumnIndex, step);
+
+        if (lastShiftColumnIndex + step + 1 > cells.length) {
+            extend(lastShiftColumnIndex + step + 1);
+        }
+
+        for (int columnIndex = lastShiftColumnIndex; columnIndex >= firstShiftColumnIndex; columnIndex--){ // process cells backwards, because of shifting
+            HSSFCell cell = getCell(columnIndex);
+            cells[columnIndex+step] = null;
+            if (cell != null) {
+                moveCell(cell, (short)(columnIndex+step));
+            }
+        }
+        for (int columnIndex = firstShiftColumnIndex; columnIndex <= firstShiftColumnIndex+step-1; columnIndex++) {
+            cells[columnIndex] = null;
+        }
+    }
+
+    private void extend(int newLength) {
+        HSSFCell[] temp = cells.clone();
+        cells = new HSSFCell[newLength];
+        System.arraycopy(temp, 0, cells, 0, temp.length);
+    }
+
+    /**
+     * Shifts column range [firstShiftColumnIndex-lastShiftColumnIndex] step places to the left.
+     * @param firstShiftColumnIndex the column to start shifting
+     * @param lastShiftColumnIndex the column to end shifting
+     * @param step length of the shifting step
+     */
+    @Override
+    public void shiftCellsLeft(int firstShiftColumnIndex, int lastShiftColumnIndex, int step) {
+        RowShifter.validateShiftLeftParameters(firstShiftColumnIndex, lastShiftColumnIndex, step);
+
+        for (int columnIndex = firstShiftColumnIndex; columnIndex <= lastShiftColumnIndex; columnIndex++){
+            HSSFCell cell = getCell(columnIndex);
+            if(cell != null){
+                cells[columnIndex-step] = null;
+                moveCell(cell, (short)(columnIndex-step));
+            } else {
+                cells[columnIndex-step] = null;
+            }
+        }
+        for (int columnIndex = lastShiftColumnIndex-step+1; columnIndex <= lastShiftColumnIndex; columnIndex++) {
+            cells[columnIndex] = null;
+        }
     }
 }

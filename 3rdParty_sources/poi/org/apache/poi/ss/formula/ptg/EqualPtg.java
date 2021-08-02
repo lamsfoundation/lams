@@ -24,27 +24,27 @@ package org.apache.poi.ss.formula.ptg;
 public final class EqualPtg extends ValueOperatorPtg {
     public final static byte sid  = 0x0b;
 
-    public static final ValueOperatorPtg instance = new EqualPtg();
+    public static final EqualPtg instance = new EqualPtg();
 
     private EqualPtg() {
     	// enforce singleton
     }
-    
-    protected byte getSid() {
-    	return sid;
+
+    @Override
+    public byte getSid() {
+        return sid;
     }
 
     public int getNumberOfOperands() {
         return 2;
     }
- 
-    public String toFormulaString(String[] operands) {
-         StringBuffer buffer = new StringBuffer();
 
-        
-        buffer.append(operands[ 0 ]);
-        buffer.append("=");
-        buffer.append(operands[ 1 ]);
-        return buffer.toString();
-    }       
+    public String toFormulaString(String[] operands) {
+        return operands[0] + "=" + operands[1];
+    }
+
+    @Override
+    public EqualPtg copy() {
+        return instance;
+    }
 }

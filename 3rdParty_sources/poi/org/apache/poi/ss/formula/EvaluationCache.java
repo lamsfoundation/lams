@@ -56,7 +56,7 @@ final class EvaluationCache {
 		Loc loc = new Loc(bookIndex, sheetIndex, rowIndex, columnIndex);
 		PlainValueCellCacheEntry pcce = _plainCellCache.get(loc);
 
-		if (cell.getCellTypeEnum() == CellType.FORMULA) {
+		if (cell.getCellType() == CellType.FORMULA) {
 			if (fcce == null) {
 				fcce = new FormulaCellCacheEntry();
 				if (pcce == null) {
@@ -118,12 +118,7 @@ final class EvaluationCache {
 	private void updateAnyBlankReferencingFormulas(int bookIndex, int sheetIndex,
 			final int rowIndex, final int columnIndex) {
 		final BookSheetKey bsk = new BookSheetKey(bookIndex, sheetIndex);
-		_formulaCellCache.applyOperation(new IEntryOperation() {
-
-			public void processEntry(FormulaCellCacheEntry entry) {
-				entry.notifyUpdatedBlankCell(bsk, rowIndex, columnIndex, _evaluationListener);
-			}
-		});
+		_formulaCellCache.applyOperation(entry -> entry.notifyUpdatedBlankCell(bsk, rowIndex, columnIndex, _evaluationListener));
 	}
 
 	public PlainValueCellCacheEntry getPlainValueEntry(int bookIndex, int sheetIndex,
@@ -197,7 +192,7 @@ final class EvaluationCache {
 	}
 	public void notifyDeleteCell(int bookIndex, int sheetIndex, EvaluationCell cell) {
 
-		if (cell.getCellTypeEnum() == CellType.FORMULA) {
+		if (cell.getCellType() == CellType.FORMULA) {
 			FormulaCellCacheEntry fcce = _formulaCellCache.remove(cell);
 			if (fcce == null) {
 				// formula cell has not been evaluated yet

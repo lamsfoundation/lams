@@ -18,16 +18,17 @@
 package org.apache.poi.ss.formula.ptg;
 
 import java.util.Locale;
+import java.util.Map;
+import java.util.function.Supplier;
 
 import org.apache.poi.ss.formula.function.FunctionMetadata;
 import org.apache.poi.ss.formula.function.FunctionMetadataRegistry;
+import org.apache.poi.util.GenericRecordUtil;
 
 /**
  * This class provides the base functionality for Excel sheet functions
  * There are two kinds of function Ptgs - tFunc and tFuncVar
  * Therefore, this class will have ONLY two subclasses
- * @author  Avik Sengupta
- * @author Andrew C. Oliver (acoliver at apache dot org)
  */
 public abstract class AbstractFunctionPtg extends OperationPtg {
 
@@ -56,15 +57,6 @@ public abstract class AbstractFunctionPtg extends OperationPtg {
     }
     public final boolean isBaseToken() {
         return false;
-    }
-
-    public final String toString() {
-        StringBuilder sb = new StringBuilder(64);
-        sb.append(getClass().getName()).append(" [");
-        sb.append(lookupName(_functionIndex));
-        sb.append(" nArgs=").append(_numberOfArgs);
-        sb.append("]");
-        return sb.toString();
     }
 
     public final short getFunctionIndex() {
@@ -123,18 +115,27 @@ public abstract class AbstractFunctionPtg extends OperationPtg {
      * @return <code>true</code> if the name specifies a standard worksheet function,
      *  <code>false</code> if the name should be assumed to be an external function.
      */
-    public static final boolean isBuiltInFunctionName(String name) {
+    public static boolean isBuiltInFunctionName(String name) {
         short ix = FunctionMetadataRegistry.lookupIndexByName(name.toUpperCase(Locale.ROOT));
         return ix >= 0;
     }
 
-    protected final String lookupName(short index) {
+    protected String lookupName(short index) {
+        return lookupName(index, false);
+    }
+
+    protected final String lookupName(short index, boolean isCetab) {
         if(index == FunctionMetadataRegistry.FUNCTION_INDEX_EXTERNAL) {
             return "#external#";
         }
-        FunctionMetadata fm = FunctionMetadataRegistry.getFunctionByIndex(index);
+        final FunctionMetadata fm;
+        if(isCetab) {
+            fm = FunctionMetadataRegistry.getCetabFunctionByIndex(index);
+        } else {
+            fm = FunctionMetadataRegistry.getFunctionByIndex(index);
+        }
         if(fm == null) {
-            throw new RuntimeException("bad function index (" + index + ")");
+            throw new RuntimeException("bad function index (" + index + ", " + isCetab + ")");
         }
         return fm.getName();
     }
@@ -165,5 +166,16 @@ public abstract class AbstractFunctionPtg extends OperationPtg {
             return paramClass[paramClass.length - 1];
         }
         return paramClass[index];
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "functionIndex", this::getFunctionIndex,
+            "functionName", this::getName,
+            "numberOfOperands", this::getNumberOfOperands,
+            "externalFunction", this::isExternalFunction,
+            "defaultOperandClass", this::getDefaultOperandClass
+        );
     }
 }

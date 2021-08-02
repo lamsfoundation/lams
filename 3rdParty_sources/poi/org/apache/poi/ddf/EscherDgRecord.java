@@ -18,31 +18,38 @@
 
 package org.apache.poi.ddf;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndian;
 
 /**
  * This record simply holds the number of shapes in the drawing group and the
  * last shape id used for this drawing group.
  */
-public class EscherDgRecord
-    extends EscherRecord
-{
-    public static final short RECORD_ID = (short) 0xF008;
-    public static final String RECORD_DESCRIPTION = "MsofbtDg";
+public class EscherDgRecord extends EscherRecord {
+    public static final short RECORD_ID = EscherRecordTypes.DG.typeID;
 
     private int field_1_numShapes;
     private int field_2_lastMSOSPID;
 
+    public EscherDgRecord() {}
+
+    public EscherDgRecord(EscherDgRecord other) {
+        super(other);
+        field_1_numShapes = other.field_1_numShapes;
+        field_2_lastMSOSPID = other.field_2_lastMSOSPID;
+    }
+
+
     @Override
     public int fillFields(byte[] data, int offset, EscherRecordFactory recordFactory) {
-        /*int bytesRemaining =*/ readHeader( data, offset );
+        readHeader( data, offset );
         int pos            = offset + 8;
         int size           = 0;
         field_1_numShapes   =  LittleEndian.getInt( data, pos + size );     size += 4;
         field_2_lastMSOSPID =  LittleEndian.getInt( data, pos + size );     size += 4;
-//        bytesRemaining -= size;
-//        remainingData  =  new byte[bytesRemaining];
-//        System.arraycopy( data, pos + size, remainingData, 0, bytesRemaining );
         return getRecordSize();
     }
 
@@ -56,8 +63,6 @@ public class EscherDgRecord
         LittleEndian.putInt( data, offset + 4, 8 );
         LittleEndian.putInt( data, offset + 8, field_1_numShapes );
         LittleEndian.putInt( data, offset + 12, field_2_lastMSOSPID );
-//        System.arraycopy( remainingData, 0, data, offset + 26, remainingData.length );
-//        int pos = offset + 8 + 18 + remainingData.length;
 
         listener.afterRecordSerialize( offset + 16, getRecordId(), getRecordSize(), this );
         return getRecordSize();
@@ -81,12 +86,12 @@ public class EscherDgRecord
 
     @Override
     public String getRecordName() {
-        return "Dg";
+        return EscherRecordTypes.DG.recordName;
     }
 
     /**
      * The number of shapes in this drawing group.
-     * 
+     *
      * @return the number of shapes
      */
     public int getNumShapes()
@@ -96,7 +101,7 @@ public class EscherDgRecord
 
     /**
      * The number of shapes in this drawing group.
-     * 
+     *
      * @param field_1_numShapes the number of shapes
      */
     public void setNumShapes( int field_1_numShapes )
@@ -106,7 +111,7 @@ public class EscherDgRecord
 
     /**
      * The last shape id used in this drawing group.
-     * 
+     *
      * @return the last shape id
      */
     public int getLastMSOSPID()
@@ -116,7 +121,7 @@ public class EscherDgRecord
 
     /**
      * The last shape id used in this drawing group.
-     * 
+     *
      * @param field_2_lastMSOSPID the last shape id
      */
     public void setLastMSOSPID( int field_2_lastMSOSPID )
@@ -144,10 +149,22 @@ public class EscherDgRecord
     }
 
     @Override
-    protected Object[][] getAttributeMap() {
-        return new Object[][] {
-            { "NumShapes", field_1_numShapes },
-            { "LastMSOSPID", field_2_lastMSOSPID }
-        };
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "base", super::getGenericProperties,
+            "numShapes", this::getNumShapes,
+            "lastMSOSPID", this::getLastMSOSPID,
+            "drawingGroupId", this::getDrawingGroupId
+        );
+    }
+
+    @Override
+    public Enum getGenericRecordType() {
+        return EscherRecordTypes.DG;
+    }
+
+    @Override
+    public EscherDgRecord copy() {
+        return new EscherDgRecord(this);
     }
 }

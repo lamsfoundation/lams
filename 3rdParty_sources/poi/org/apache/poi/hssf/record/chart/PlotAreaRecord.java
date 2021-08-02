@@ -17,6 +17,10 @@
 
 package org.apache.poi.hssf.record.chart;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
 import org.apache.poi.util.LittleEndianOutput;
@@ -25,31 +29,14 @@ import org.apache.poi.util.LittleEndianOutput;
  * preceeds and identifies a frame as belonging to the plot area.
  */
 public final class PlotAreaRecord extends StandardRecord {
-    public final static short      sid                             = 0x1035;
+    public static final short sid = 0x1035;
 
-
-    public PlotAreaRecord()
-    {
-
-    }
+    public PlotAreaRecord() {}
 
     /**
      * @param in unused (since this record has no data)
      */
-    public PlotAreaRecord(RecordInputStream in)
-    {
-
-    }
-
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[PLOTAREA]\n");
-
-        buffer.append("[/PLOTAREA]\n");
-        return buffer.toString();
-    }
+    public PlotAreaRecord(RecordInputStream in) {}
 
     public void serialize(LittleEndianOutput out) {
     }
@@ -63,9 +50,18 @@ public final class PlotAreaRecord extends StandardRecord {
         return sid;
     }
 
-    public Object clone() {
-        PlotAreaRecord rec = new PlotAreaRecord();
-    
-        return rec;
+    @Override
+    public PlotAreaRecord copy() {
+        return new PlotAreaRecord();
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.PLOT_AREA;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return null;
     }
 }

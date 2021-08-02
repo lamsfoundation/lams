@@ -1624,30 +1624,33 @@ public class GradebookService implements IGradebookFullService {
 	    learners.addAll(lesson.getAllLearners());
 	}
 
+	// same headers are produced for every learner, so we can internationalise them only once
+	String[] learnerViewHeaders = new String[] { getMessage("gradebook.export.activity"),
+		getMessage("gradebook.columntitle.startDate"), getMessage("gradebook.columntitle.completeDate"),
+		getMessage("gradebook.export.time.taken.seconds"), getMessage("gradebook.columntitle.mark") };
+
+	// process dtos into a map to find corresponding data more easily
+	Map<Long, Map<Integer, GBUserGridRowDTO>> activityIdToUserDtoIdMap = activityToUserDTOMap.entrySet().stream()
+		.collect(Collectors.toMap(e -> e.getKey().getActivityId(),
+			e -> e.getValue().stream().collect(Collectors.toMap(u -> Integer.valueOf(u.getId()), u -> u))));
+
 	for (User learner : learners) {
 
 	    userTitleRow = learnerViewSheet.initRow();
 	    userTitleRow.addCell(learner.getFullName() + " (" + learner.getLogin() + ")", true);
 
 	    ExcelRow titleRow = learnerViewSheet.initRow();
-	    titleRow.addCell(getMessage("gradebook.export.activity"), true);
-	    titleRow.addCell(getMessage("gradebook.columntitle.startDate"), true);
-	    titleRow.addCell(getMessage("gradebook.columntitle.completeDate"), true);
-	    titleRow.addCell(getMessage("gradebook.export.time.taken.seconds"), true);
-	    titleRow.addCell(getMessage("gradebook.columntitle.mark"), true);
+	    for (String learnerViewHeader : learnerViewHeaders) {
+		titleRow.addCell(learnerViewHeader, true);
+	    }
 
 	    Map<Long, String> activityIdToName = new HashMap<>();
 
 	    for (ToolActivity activity : activityToUserDTOMap.keySet()) {
 
 		//find userDto corresponding to the user
-		List<GBUserGridRowDTO> userDtos = activityToUserDTOMap.get(activity);
-		GBUserGridRowDTO userDto = null;
-		for (GBUserGridRowDTO dbUserDTO : userDtos) {
-		    if (dbUserDTO.getId().equals(learner.getUserId().toString())) {
-			userDto = dbUserDTO;
-		    }
-		}
+		Map<Integer, GBUserGridRowDTO> userDtoMap = activityIdToUserDtoIdMap.get(activity.getActivityId());
+		GBUserGridRowDTO userDto = userDtoMap.get(learner.getUserId());
 
 		// userDto will be null if this tool activity was within a branch and the user has not attempted that branch
 		if (userDto != null) {

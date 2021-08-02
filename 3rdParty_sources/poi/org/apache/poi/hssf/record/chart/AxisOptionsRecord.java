@@ -17,20 +17,24 @@
 
 package org.apache.poi.hssf.record.chart;
 
+import static org.apache.poi.util.GenericRecordUtil.getBitsAsString;
+
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
 import org.apache.poi.util.BitField;
 import org.apache.poi.util.BitFieldFactory;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * The axis options record provides unit information and other various tidbits about the axis.<p>
- * 
- * @author Andrew C. Oliver(acoliver at apache.org)
+ * The axis options record provides unit information and other various tidbits about the axis.
  */
-public final class AxisOptionsRecord extends StandardRecord implements Cloneable {
-    public final static short sid = 0x1062;
+public final class AxisOptionsRecord extends StandardRecord {
+    public static final short sid = 0x1062;
 
     private static final BitField defaultMinimum      = BitFieldFactory.getInstance(0x01);
     private static final BitField defaultMaximum      = BitFieldFactory.getInstance(0x02);
@@ -40,6 +44,12 @@ public final class AxisOptionsRecord extends StandardRecord implements Cloneable
     private static final BitField defaultBase         = BitFieldFactory.getInstance(0x20);
     private static final BitField defaultCross        = BitFieldFactory.getInstance(0x40);
     private static final BitField defaultDateSettings = BitFieldFactory.getInstance(0x80);
+
+    private static final int[] FLAG_MASKS = { 0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80 };
+
+    private static final String[] FLAG_NAMES = { "DEFAULT_MINIMUM", "DEFAULT_MAXIMUM", "DEFAULT_MAJOR",
+        "DEFAULT_MINOR_UNIT", "IS_DATE", "DEFAULT_BASE", "DEFAULT_CROSS", "DEFAULT_DATE_SETTINGS" };
+
 
     private short field_1_minimumCategory;
     private short field_2_maximumCategory;
@@ -52,76 +62,32 @@ public final class AxisOptionsRecord extends StandardRecord implements Cloneable
     private short field_9_options;
 
 
-    public AxisOptionsRecord()
-    {
+    public AxisOptionsRecord() {}
 
+    public AxisOptionsRecord(AxisOptionsRecord other) {
+        super(other);
+        field_1_minimumCategory = other.field_1_minimumCategory;
+        field_2_maximumCategory = other.field_2_maximumCategory;
+        field_3_majorUnitValue  = other.field_3_majorUnitValue;
+        field_4_majorUnit       = other.field_4_majorUnit;
+        field_5_minorUnitValue  = other.field_5_minorUnitValue;
+        field_6_minorUnit       = other.field_6_minorUnit;
+        field_7_baseUnit        = other.field_7_baseUnit;
+        field_8_crossingPoint   = other.field_8_crossingPoint;
+        field_9_options         = other.field_9_options;
     }
 
-    public AxisOptionsRecord(RecordInputStream in)
-    {
-        field_1_minimumCategory        = in.readShort();
-        field_2_maximumCategory        = in.readShort();
-        field_3_majorUnitValue         = in.readShort();
-        field_4_majorUnit              = in.readShort();
-        field_5_minorUnitValue         = in.readShort();
-        field_6_minorUnit              = in.readShort();
-        field_7_baseUnit               = in.readShort();
-        field_8_crossingPoint          = in.readShort();
-        field_9_options                = in.readShort();
-    }
 
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[AXCEXT]\n");
-        buffer.append("    .minimumCategory      = ")
-            .append("0x").append(HexDump.toHex(  getMinimumCategory ()))
-            .append(" (").append( getMinimumCategory() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-        buffer.append("    .maximumCategory      = ")
-            .append("0x").append(HexDump.toHex(  getMaximumCategory ()))
-            .append(" (").append( getMaximumCategory() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-        buffer.append("    .majorUnitValue       = ")
-            .append("0x").append(HexDump.toHex(  getMajorUnitValue ()))
-            .append(" (").append( getMajorUnitValue() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-        buffer.append("    .majorUnit            = ")
-            .append("0x").append(HexDump.toHex(  getMajorUnit ()))
-            .append(" (").append( getMajorUnit() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-        buffer.append("    .minorUnitValue       = ")
-            .append("0x").append(HexDump.toHex(  getMinorUnitValue ()))
-            .append(" (").append( getMinorUnitValue() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-        buffer.append("    .minorUnit            = ")
-            .append("0x").append(HexDump.toHex(  getMinorUnit ()))
-            .append(" (").append( getMinorUnit() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-        buffer.append("    .baseUnit             = ")
-            .append("0x").append(HexDump.toHex(  getBaseUnit ()))
-            .append(" (").append( getBaseUnit() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-        buffer.append("    .crossingPoint        = ")
-            .append("0x").append(HexDump.toHex(  getCrossingPoint ()))
-            .append(" (").append( getCrossingPoint() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-        buffer.append("    .options              = ")
-            .append("0x").append(HexDump.toHex(  getOptions ()))
-            .append(" (").append( getOptions() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-        buffer.append("         .defaultMinimum           = ").append(isDefaultMinimum()).append('\n'); 
-        buffer.append("         .defaultMaximum           = ").append(isDefaultMaximum()).append('\n'); 
-        buffer.append("         .defaultMajor             = ").append(isDefaultMajor()).append('\n'); 
-        buffer.append("         .defaultMinorUnit         = ").append(isDefaultMinorUnit()).append('\n'); 
-        buffer.append("         .isDate                   = ").append(isIsDate()).append('\n'); 
-        buffer.append("         .defaultBase              = ").append(isDefaultBase()).append('\n'); 
-        buffer.append("         .defaultCross             = ").append(isDefaultCross()).append('\n'); 
-        buffer.append("         .defaultDateSettings      = ").append(isDefaultDateSettings()).append('\n'); 
-
-        buffer.append("[/AXCEXT]\n");
-        return buffer.toString();
+    public AxisOptionsRecord(RecordInputStream in) {
+        field_1_minimumCategory = in.readShort();
+        field_2_maximumCategory = in.readShort();
+        field_3_majorUnitValue  = in.readShort();
+        field_4_majorUnit       = in.readShort();
+        field_5_minorUnitValue  = in.readShort();
+        field_6_minorUnit       = in.readShort();
+        field_7_baseUnit        = in.readShort();
+        field_8_crossingPoint   = in.readShort();
+        field_9_options         = in.readShort();
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -144,25 +110,6 @@ public final class AxisOptionsRecord extends StandardRecord implements Cloneable
     {
         return sid;
     }
-
-    @Override
-    public AxisOptionsRecord clone() {
-        AxisOptionsRecord rec = new AxisOptionsRecord();
-    
-        rec.field_1_minimumCategory = field_1_minimumCategory;
-        rec.field_2_maximumCategory = field_2_maximumCategory;
-        rec.field_3_majorUnitValue = field_3_majorUnitValue;
-        rec.field_4_majorUnit = field_4_majorUnit;
-        rec.field_5_minorUnitValue = field_5_minorUnitValue;
-        rec.field_6_minorUnit = field_6_minorUnit;
-        rec.field_7_baseUnit = field_7_baseUnit;
-        rec.field_8_crossingPoint = field_8_crossingPoint;
-        rec.field_9_options = field_9_options;
-        return rec;
-    }
-
-
-
 
     /**
      * Get the minimum category field for the AxisOptions record.
@@ -450,5 +397,30 @@ public final class AxisOptionsRecord extends StandardRecord implements Cloneable
     public boolean isDefaultDateSettings()
     {
         return defaultDateSettings.isSet(field_9_options);
+    }
+
+    @Override
+    public AxisOptionsRecord copy() {
+        return new AxisOptionsRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.AXIS_OPTIONS;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "minimumCategory", this::getMinimumCategory,
+            "maximumCategory", this::getMaximumCategory,
+            "majorUnitValue", this::getMajorUnitValue,
+            "majorUnit", this::getMajorUnit,
+            "minorUnitValue", this::getMinorUnitValue,
+            "minorUnit", this::getMinorUnit,
+            "baseUnit", this::getBaseUnit,
+            "crossingPoint", this::getCrossingPoint,
+            "options", getBitsAsString(this::getOptions, FLAG_MASKS, FLAG_NAMES)
+        );
     }
 }

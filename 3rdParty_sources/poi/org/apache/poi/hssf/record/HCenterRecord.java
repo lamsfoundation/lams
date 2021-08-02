@@ -14,29 +14,31 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        HCenter record (0x0083)<P>
- * Description:  whether to center between horizontal margins<P>
- * REFERENCE:  PG 320 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)<P>
- * @author Andrew C. Oliver (acoliver at apache dot org)
- * @author Jason Height (jheight at chariot dot net dot au)
+ * Whether to center between horizontal margins
+ *
  * @version 2.0-pre
  */
-public final class HCenterRecord extends StandardRecord implements Cloneable {
-    public final static short sid = 0x0083;
-    private short             field_1_hcenter;
+public final class HCenterRecord extends StandardRecord {
+    public static final short sid = 0x0083;
+    private short field_1_hcenter;
 
-    public HCenterRecord()
-    {
+    public HCenterRecord() {}
+
+    public HCenterRecord(HCenterRecord other) {
+        super(other);
+        field_1_hcenter = other.field_1_hcenter;
     }
 
-    public HCenterRecord(RecordInputStream in)
-    {
+    public HCenterRecord(RecordInputStream in) {
         field_1_hcenter = in.readShort();
     }
 
@@ -44,38 +46,17 @@ public final class HCenterRecord extends StandardRecord implements Cloneable {
      * set whether or not to horizonatally center this sheet.
      * @param hc  center - t/f
      */
-
-    public void setHCenter(boolean hc)
-    {
-        if (hc == true)
-        {
-            field_1_hcenter = 1;
-        }
-        else
-        {
-            field_1_hcenter = 0;
-        }
+    public void setHCenter(boolean hc) {
+        field_1_hcenter = (short)(hc ? 1 : 0);
     }
 
     /**
      * get whether or not to horizonatally center this sheet.
      * @return center - t/f
      */
-
     public boolean getHCenter()
     {
         return (field_1_hcenter == 1);
-    }
-
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[HCENTER]\n");
-        buffer.append("    .hcenter        = ").append(getHCenter())
-            .append("\n");
-        buffer.append("[/HCENTER]\n");
-        return buffer.toString();
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -92,9 +73,17 @@ public final class HCenterRecord extends StandardRecord implements Cloneable {
     }
 
     @Override
-    public HCenterRecord clone() {
-      HCenterRecord rec = new HCenterRecord();
-      rec.field_1_hcenter = field_1_hcenter;
-      return rec;
+    public HCenterRecord copy() {
+        return new HCenterRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.H_CENTER;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties("hcenter", this::getHCenter);
     }
 }

@@ -64,6 +64,14 @@ public abstract class BaseFormulaEvaluator implements FormulaEvaluator, Workbook
     }
 
     /**
+     * internal use
+     * @return evaluation workbook
+     */
+    protected EvaluationWorkbook getEvaluationWorkbook() {
+        return _bookEvaluator.getWorkbook();
+    }
+
+    /**
      * Should be called whenever there are major changes (e.g. moving sheets) to input cells
      * in the evaluated workbook.  If performance is not critical, a single call to this method
      * may be used instead of many specific calls to the notify~ methods.
@@ -92,7 +100,7 @@ public abstract class BaseFormulaEvaluator implements FormulaEvaluator, Workbook
             return null;
         }
 
-        switch (cell.getCellTypeEnum()) {
+        switch (cell.getCellType()) {
             case BOOLEAN:
                 return CellValue.valueOf(cell.getBooleanCellValue());
             case ERROR:
@@ -106,25 +114,25 @@ public abstract class BaseFormulaEvaluator implements FormulaEvaluator, Workbook
             case BLANK:
                 return null;
             default:
-                throw new IllegalStateException("Bad cell type (" + cell.getCellTypeEnum() + ")");
+                throw new IllegalStateException("Bad cell type (" + cell.getCellType() + ")");
         }
     }
-    
+
     /**
      * If cell contains formula, it evaluates the formula, and
      *  puts the formula result back into the cell, in place
      *  of the old formula.
      * Else if cell does not contain formula, this method leaves
      *  the cell unchanged.
-     * Note that the same instance of HSSFCell is returned to
+     * Note that the same instance of {@link Cell} is returned to
      * allow chained calls like:
      * <pre>
      * int evaluatedCellType = evaluator.evaluateInCell(cell).getCellType();
      * </pre>
      * Be aware that your cell value will be changed to hold the
      *  result of the formula. If you simply want the formula
-     *  value computed for you, use {@link #evaluateFormulaCellEnum(Cell)}}
-     * @param cell
+     *  value computed for you, use {@link #evaluateFormulaCell(Cell)}}
+     * @param cell The {@link Cell} to evaluate and modify.
      * @return the {@code cell} that was passed in, allowing for chained calls
      */
     @Override
@@ -132,38 +140,23 @@ public abstract class BaseFormulaEvaluator implements FormulaEvaluator, Workbook
         if (cell == null) {
             return null;
         }
-        Cell result = cell;
-        if (cell.getCellTypeEnum() == CellType.FORMULA) {
+        if (cell.getCellType() == CellType.FORMULA) {
             CellValue cv = evaluateFormulaCellValue(cell);
+
             setCellValue(cell, cv);
             setCellType(cell, cv); // cell will no longer be a formula cell
+
+            // Due to bug 46479 we should call setCellValue() before setCellType(),
+            // but bug 61148 showed a case where it would be better the other
+            // way around, so for now we call setCellValue() a second time to
+            // handle both cases correctly. There is surely a better way to do this, though...
+            setCellValue(cell, cv);
         }
-        return result;
+        return cell;
     }
 
     protected abstract CellValue evaluateFormulaCellValue(Cell cell);
 
-    /**
-     * If cell contains formula, it evaluates the formula, and saves the result of the formula. The
-     * cell remains as a formula cell. If the cell does not contain formula, this method returns -1
-     * and leaves the cell unchanged.
-     *
-     * Note that the type of the <em>formula result</em> is returned, so you know what kind of
-     * cached formula result is also stored with  the formula.
-     * <pre>
-     * int evaluatedCellType = evaluator.evaluateFormulaCell(cell);
-     * </pre>
-     * Be aware that your cell will hold both the formula, and the result. If you want the cell
-     * replaced with the result of the formula, use {@link #evaluateInCell(org.apache.poi.ss.usermodel.Cell)}
-     * @param cell The cell to evaluate
-     * @return -1 for non-formula cells, or the type of the <em>formula result</em>
-     * @deprecated 3.15. Will return a {@link CellType} enum in the future.
-     */
-    @Override
-    public int evaluateFormulaCell(Cell cell) {
-        return evaluateFormulaCellEnum(cell).getCode();
-    }
-    
     /**
      * If cell contains formula, it evaluates the formula,
      *  and saves the result of the formula. The cell
@@ -174,7 +167,7 @@ public abstract class BaseFormulaEvaluator implements FormulaEvaluator, Workbook
      *  so you know what kind of value is also stored with
      *  the formula.
      * <pre>
-     * CellType evaluatedCellType = evaluator.evaluateFormulaCellEnum(cell);
+     * CellType evaluatedCellType = evaluator.evaluateFormulaCell(cell);
      * </pre>
      * Be aware that your cell will hold both the formula,
      *  and the result. If you want the cell replaced with
@@ -182,27 +175,33 @@ public abstract class BaseFormulaEvaluator implements FormulaEvaluator, Workbook
      * @param cell The cell to evaluate
      * @return The type of the formula result (the cell's type remains as CellType.FORMULA however)
      *         If cell is not a formula cell, returns {@link CellType#_NONE} rather than throwing an exception.
-     * @since POI 3.15 beta 3
      */
     @Override
-    public CellType evaluateFormulaCellEnum(Cell cell) {
-        if (cell == null || cell.getCellTypeEnum() != CellType.FORMULA) {
+    public CellType evaluateFormulaCell(Cell cell) {
+        if (cell == null || cell.getCellType() != CellType.FORMULA) {
             return CellType._NONE;
         }
         CellValue cv = evaluateFormulaCellValue(cell);
         // cell remains a formula cell, but the cached value is changed
         setCellValue(cell, cv);
-        return cv.getCellTypeEnum();
+        return cv.getCellType();
     }
 
-    protected static void setCellType(Cell cell, CellValue cv) {
-        CellType cellType = cv.getCellTypeEnum();
+    /**
+     * Set the cell type based on the computed cell type as
+     * part of a formula evaluation.
+     *
+     * @param cell The Cell to populate
+     * @param cv The CellValue to read the result type from
+     */
+    protected void setCellType(Cell cell, CellValue cv) {
+        CellType cellType = cv.getCellType();
         switch (cellType) {
             case BOOLEAN:
             case ERROR:
             case NUMERIC:
             case STRING:
-                cell.setCellType(cellType);
+                setCellType(cell, cellType);
                 return;
             case BLANK:
                 // never happens - blanks eventually get translated to zero
@@ -214,11 +213,22 @@ public abstract class BaseFormulaEvaluator implements FormulaEvaluator, Workbook
                 throw new IllegalStateException("Unexpected cell value type (" + cellType + ")");
         }
     }
-    
+
+    /**
+     * Override if a different variation is needed, e.g. passing the evaluator to the cell method
+     *
+     * @param cell The Cell to populate
+     * @param cellType The wanted type for this Cell
+     */
+    protected void setCellType(Cell cell, CellType cellType) {
+        //noinspection deprecation
+        cell.setCellType(cellType);
+    }
+
     protected abstract RichTextString createRichTextString(String str);
-    
+
     protected void setCellValue(Cell cell, CellValue cv) {
-        CellType cellType = cv.getCellTypeEnum();
+        CellType cellType = cv.getCellType();
         switch (cellType) {
             case BOOLEAN:
                 cell.setCellValue(cv.getBooleanValue());
@@ -240,7 +250,7 @@ public abstract class BaseFormulaEvaluator implements FormulaEvaluator, Workbook
                 throw new IllegalStateException("Unexpected cell value type (" + cellType + ")");
         }
     }
-    
+
 
     /**
      * Loops over all cells in all sheets of the supplied
@@ -263,8 +273,8 @@ public abstract class BaseFormulaEvaluator implements FormulaEvaluator, Workbook
 
             for(Row r : sheet) {
                 for (Cell c : r) {
-                    if (c.getCellTypeEnum() == CellType.FORMULA) {
-                        evaluator.evaluateFormulaCellEnum(c);
+                    if (c.getCellType() == CellType.FORMULA) {
+                        evaluator.evaluateFormulaCell(c);
                     }
                 }
             }

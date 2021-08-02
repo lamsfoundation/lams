@@ -17,7 +17,12 @@
 
 package org.apache.poi.hssf.record;
 
-import org.apache.poi.util.HexDump;
+import static org.apache.poi.util.GenericRecordUtil.getEnumBitsAsString;
+
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 import org.apache.poi.util.RecordFormatException;
@@ -26,10 +31,10 @@ import org.apache.poi.util.RecordFormatException;
 /**
  * The FtCf structure specifies the clipboard format of the picture-type Obj record containing this FtCf.
  */
-public final class FtCfSubRecord extends SubRecord implements Cloneable {
-    public final static short sid = 0x07;
-    public final static short length = 0x02;
-    
+public final class FtCfSubRecord extends SubRecord {
+    public static final short sid = 0x07;
+    public static final short length = 0x02;
+
     /**
      * Specifies the format of the picture is an enhanced metafile.
      */
@@ -39,40 +44,35 @@ public final class FtCfSubRecord extends SubRecord implements Cloneable {
      * Specifies the format of the picture is a bitmap.
      */
     public static final short BITMAP_BIT      = (short)0x0009;
-    
+
     /**
      * Specifies the picture is in an unspecified format that is
      * neither and enhanced metafile nor a bitmap.
      */
     public static final short UNSPECIFIED_BIT = (short)0xFFFF;
-    
-    private short flags = 0;
+
+    private short flags;
 
     /**
      * Construct a new <code>FtPioGrbitSubRecord</code> and
      * fill its data with the default values
      */
-    public FtCfSubRecord() {
+    public FtCfSubRecord() {}
+
+    public FtCfSubRecord(FtCfSubRecord other) {
+        super(other);
+        flags = other.flags;
     }
 
     public FtCfSubRecord(LittleEndianInput in, int size) {
+        this(in,size,-1);
+    }
+
+    FtCfSubRecord(LittleEndianInput in, int size, int cmoOt) {
         if (size != length) {
             throw new RecordFormatException("Unexpected size (" + size + ")");
         }
         flags = in.readShort();
-    }
-
-    /**
-     * Convert this record to string.
-     * Used by BiffViewer and other utilities.
-     */
-    public String toString() {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("[FtCf ]\n");
-        buffer.append("  size     = ").append(length).append("\n");
-        buffer.append("  flags    = ").append(HexDump.toHex(flags)).append("\n");
-        buffer.append("[/FtCf ]\n");
-        return buffer.toString();
     }
 
     /**
@@ -99,17 +99,27 @@ public final class FtCfSubRecord extends SubRecord implements Cloneable {
     }
 
     @Override
-    public FtCfSubRecord clone() {
-        FtCfSubRecord rec = new FtCfSubRecord();
-        rec.flags = this.flags;
-        return rec;
+    public FtCfSubRecord copy() {
+        return new FtCfSubRecord(this);
     }
 
- public short getFlags() {
-   return flags;
- }
+    public short getFlags() {
+        return flags;
+    }
 
- public void setFlags(short flags) {
-   this.flags = flags;
- }
+    public void setFlags(short flags) {
+        this.flags = flags;
+    }
+
+    @Override
+    public SubRecordTypes getGenericRecordType() {
+        return SubRecordTypes.FT_CF;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties("flags", getEnumBitsAsString(this::getFlags,
+            new int[]{METAFILE_BIT,BITMAP_BIT,UNSPECIFIED_BIT},
+            new String[]{"METAFILE","BITMAP","UNSPECIFIED"}));
+    }
 }

@@ -23,11 +23,9 @@ import org.apache.poi.util.RecordFormatException;
 /**
  */
 abstract class DummyRecordBase extends Record {
-	
-	protected DummyRecordBase() {
-		//
-	}
-	
+
+	protected DummyRecordBase() {}
+
 	public final short getSid() {
 		return -1;
 	}
@@ -37,4 +35,6 @@ abstract class DummyRecordBase extends Record {
 	public final int getRecordSize() {
 		throw new RecordFormatException("Cannot serialize a dummy record");
 	}
+
+
 }

@@ -17,12 +17,13 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.ddf.EscherRecord;
 import org.apache.poi.ddf.NullEscherSerializationListener;
 import org.apache.poi.util.LittleEndian;
-
-import java.util.Iterator;
-import java.util.List;
 
 
 public final class DrawingGroupRecord extends AbstractEscherHolderRecord {
@@ -31,12 +32,13 @@ public final class DrawingGroupRecord extends AbstractEscherHolderRecord {
     static final int MAX_RECORD_SIZE = 8228;
     private static final int MAX_DATA_SIZE = MAX_RECORD_SIZE - 4;
 
-    public DrawingGroupRecord()
-    {
+    public DrawingGroupRecord() {}
+
+    public DrawingGroupRecord(DrawingGroupRecord other) {
+        super(other);
     }
 
-    public DrawingGroupRecord( RecordInputStream in )
-    {
+    public DrawingGroupRecord( RecordInputStream in ) {
         super( in );
     }
 
@@ -59,10 +61,8 @@ public final class DrawingGroupRecord extends AbstractEscherHolderRecord {
         }
         byte[] buffer = new byte[getRawDataSize()];
         int pos = 0;
-        for ( Iterator<EscherRecord> iterator = getEscherRecords().iterator(); iterator.hasNext(); )
-        {
-            EscherRecord r = iterator.next();
-            pos += r.serialize(pos, buffer, new NullEscherSerializationListener() );
+        for (EscherRecord r : getEscherRecords()) {
+            pos += r.serialize(pos, buffer, new NullEscherSerializationListener());
         }
 
         return writeData( offset, data, buffer );
@@ -91,9 +91,7 @@ public final class DrawingGroupRecord extends AbstractEscherHolderRecord {
             return rawData.length;
         }
         int size = 0;
-        for ( Iterator<EscherRecord> iterator = escherRecords.iterator(); iterator.hasNext(); )
-        {
-            EscherRecord r = iterator.next();
+        for (EscherRecord r : escherRecords) {
             size += r.getRecordSize();
         }
         return size;
@@ -127,13 +125,28 @@ public final class DrawingGroupRecord extends AbstractEscherHolderRecord {
 
     private void writeHeader( byte[] data, int offset, int sizeExcludingHeader )
     {
-        LittleEndian.putShort(data, 0 + offset, getSid());
-        LittleEndian.putShort(data, 2 + offset, (short) sizeExcludingHeader);
+        LittleEndian.putShort(data, offset, getSid());
+        LittleEndian.putShort(data, offset + 2, (short) sizeExcludingHeader);
     }
 
     private void writeContinueHeader( byte[] data, int offset, int sizeExcludingHeader )
     {
-        LittleEndian.putShort(data, 0 + offset, ContinueRecord.sid);
-        LittleEndian.putShort(data, 2 + offset, (short) sizeExcludingHeader);
+        LittleEndian.putShort(data, offset, ContinueRecord.sid);
+        LittleEndian.putShort(data, offset + 2, (short) sizeExcludingHeader);
+    }
+
+    @Override
+    public DrawingGroupRecord copy() {
+        return new DrawingGroupRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.DRAWING_GROUP;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return null;
     }
 }

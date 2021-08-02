@@ -17,16 +17,18 @@
 
 package org.apache.poi.hssf.record.pivottable;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 import org.apache.poi.util.StringUtil;
 
 /**
- * SXDI - Data Item (0x00C5)<br>
- * 
- * @author Patrick Cheng
+ * SXDI - Data Item (0x00C5)
  */
 public final class DataItemRecord extends StandardRecord {
 	public static final short sid = 0x00C5;
@@ -38,7 +40,18 @@ public final class DataItemRecord extends StandardRecord {
 	private int isxvi;
 	private int ifmt;
 	private String name;
-	
+
+	public DataItemRecord(DataItemRecord other) {
+		super(other);
+		isxvdData = other.isxvdData;
+		iiftab = other.iiftab;
+		df = other.df;
+		isxvd = other.isxvd;
+		isxvi = other.isxvi;
+		ifmt = other.ifmt;
+		name = other.name;
+	}
+
 	public DataItemRecord(RecordInputStream in) {
 		isxvdData = in.readUShort();
 		iiftab = in.readUShort();
@@ -46,20 +59,20 @@ public final class DataItemRecord extends StandardRecord {
 		isxvd = in.readUShort();
 		isxvi = in.readUShort();
 		ifmt = in.readUShort();
-		
+
 		name = in.readString();
 	}
-	
+
 	@Override
 	protected void serialize(LittleEndianOutput out) {
-		
+
 		out.writeShort(isxvdData);
 		out.writeShort(iiftab);
 		out.writeShort(df);
 		out.writeShort(isxvd);
 		out.writeShort(isxvi);
 		out.writeShort(ifmt);
-		
+
 		StringUtil.writeUnicodeString(out, name);
 	}
 
@@ -74,17 +87,24 @@ public final class DataItemRecord extends StandardRecord {
 	}
 
 	@Override
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
-		
-		buffer.append("[SXDI]\n");
-		buffer.append("  .isxvdData = ").append(HexDump.shortToHex(isxvdData)).append("\n");
-		buffer.append("  .iiftab = ").append(HexDump.shortToHex(iiftab)).append("\n");
-		buffer.append("  .df = ").append(HexDump.shortToHex(df)).append("\n");
-		buffer.append("  .isxvd = ").append(HexDump.shortToHex(isxvd)).append("\n");
-		buffer.append("  .isxvi = ").append(HexDump.shortToHex(isxvi)).append("\n");
-		buffer.append("  .ifmt = ").append(HexDump.shortToHex(ifmt)).append("\n");
-		buffer.append("[/SXDI]\n");
-		return buffer.toString();
+	public DataItemRecord copy() {
+		return new DataItemRecord(this);
+	}
+
+	@Override
+	public HSSFRecordTypes getGenericRecordType() {
+		return HSSFRecordTypes.DATA_ITEM;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"isxvdData", () -> isxvdData,
+			"iiftab", () -> iiftab,
+			"df", () -> df,
+			"isxvd", () -> isxvd,
+			"isxvi", () -> isxvi,
+			"ifmt", () -> ifmt
+		);
 	}
 }

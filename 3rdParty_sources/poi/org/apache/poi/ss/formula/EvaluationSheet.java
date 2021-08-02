@@ -42,4 +42,18 @@ public interface EvaluationSheet {
      * @since POI 3.15 beta 3
      */
     public void clearAllCachedResultValues();
+    
+    /**
+     * @return last row index referenced on this sheet, for evaluation optimization
+     * @since POI 4.0.0
+     */
+    public int getLastRowNum();
+    
+    /**
+     * Used by SUBTOTAL and similar functions that have options to ignore hidden rows
+     * @param rowIndex
+     * @return true if the row is hidden, false if not
+     * @since POI 4.1.0
+     */
+    public boolean isRowHidden(int rowIndex);
 }

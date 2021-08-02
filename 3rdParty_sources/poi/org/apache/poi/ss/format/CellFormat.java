@@ -37,7 +37,6 @@ import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.util.DateFormatConverter;
 import org.apache.poi.util.LocaleUtil;
-import org.apache.poi.util.Removal;
 
 /**
  * Format a value according to the standard Excel behavior.  This "standard" is
@@ -82,8 +81,7 @@ import org.apache.poi.util.Removal;
  *  to look these up into Java Locales if desired.
  * <p>
  * In addition to these, there is a general format that is used when no format
- * is specified.  This formatting is presented by the {@link #GENERAL_FORMAT}
- * object.
+ * is specified.
  * 
  * TODO Merge this with {@link DataFormatter} so we only have one set of
  *  code for formatting numbers.
@@ -118,15 +116,6 @@ public class CellFormat {
             "###################################################";
 
     private static String QUOTE = "\"";
-
-    /**
-     * Format a value as it would be were no format specified.  This is also
-     * used when the format specified is <tt>General</tt>.
-     * @deprecated use {@link #getInstance(Locale, String)} instead
-     */
-    @Deprecated
-    @Removal(version="3.18")
-    public static final CellFormat GENERAL_FORMAT = createGeneralFormat(LocaleUtil.getUserLocale());
             
     private static CellFormat createGeneralFormat(final Locale locale) {
         return new CellFormat(locale, "General") {
@@ -140,7 +129,7 @@ public class CellFormat {
 
     /** Maps a format string to its parsed version for efficiencies sake. */
     private static final Map<Locale, Map<String, CellFormat>> formatCache =
-            new WeakHashMap<Locale, Map<String, CellFormat>>();
+            new WeakHashMap<>();
 
     /**
      * Returns a {@link CellFormat} that applies the given format.  Two calls
@@ -164,11 +153,7 @@ public class CellFormat {
      * @return A {@link CellFormat} that applies the given format.
      */
     public static synchronized CellFormat getInstance(Locale locale, String format) {
-        Map<String, CellFormat> formatMap = formatCache.get(locale);
-        if (formatMap == null) {
-            formatMap = new WeakHashMap<String, CellFormat>();
-            formatCache.put(locale, formatMap);
-        }
+        Map<String, CellFormat> formatMap = formatCache.computeIfAbsent(locale, k -> new WeakHashMap<>());
         CellFormat fmt = formatMap.get(format);
         if (fmt == null) {
             if (format.equals("General") || format.equals("@"))
@@ -190,7 +175,7 @@ public class CellFormat {
         this.format = format;
         CellFormatPart defaultTextFormat = new CellFormatPart(locale, "@");
         Matcher m = ONE_PART.matcher(format);
-        List<CellFormatPart> parts = new ArrayList<CellFormatPart>();
+        List<CellFormatPart> parts = new ArrayList<>();
 
         while (m.find()) {
             try {
@@ -300,7 +285,7 @@ public class CellFormat {
      * @return The result, in a {@link CellFormatResult}.
      */
     public CellFormatResult apply(Cell c) {
-        switch (ultimateTypeEnum(c)) {
+        switch (ultimateType(c)) {
         case BLANK:
             return apply("");
         case BOOLEAN:
@@ -370,7 +355,7 @@ public class CellFormat {
      * @return The result, in a {@link CellFormatResult}.
      */
     public CellFormatResult apply(JLabel label, Cell c) {
-        switch (ultimateTypeEnum(c)) {
+        switch (ultimateType(c)) {
             case BLANK:
                 return apply(label, "");
             case BOOLEAN:
@@ -446,38 +431,17 @@ public class CellFormat {
     /**
      * Returns the ultimate cell type, following the results of formulas.  If
      * the cell is a {@link CellType#FORMULA}, this returns the result of
-     * {@link Cell#getCachedFormulaResultTypeEnum()}.  Otherwise this returns the
-     * result of {@link Cell#getCellTypeEnum()}.
+     * {@link Cell#getCachedFormulaResultType()}.  Otherwise this returns the
+     * result of {@link Cell#getCellType()}.
      * 
-     * Will return {@link CellType} in a future version of POI.
-     * For forwards compatibility, do not hard-code cell type literals in your code.
-     *
      * @param cell The cell.
      *
      * @return The ultimate type of this cell.
-     * @deprecated POI 3.15. This will return a CellType enum in the future
      */
-    public static int ultimateType(Cell cell) {
-        return ultimateTypeEnum(cell).getCode();
-    }
-
-    /**
-     * Returns the ultimate cell type, following the results of formulas.  If
-     * the cell is a {@link CellType#FORMULA}, this returns the result of
-     * {@link Cell#getCachedFormulaResultTypeEnum()}.  Otherwise this returns the
-     * result of {@link Cell#getCellTypeEnum()}.
-     *
-     * @param cell The cell.
-     *
-     * @return The ultimate type of this cell.
-     * @since POI 3.15 beta 3
-     * @deprecated POI 3.15 beta 3
-     * Will be deleted when we make the CellType enum transition. See bug 59791.
-     */
-    public static CellType ultimateTypeEnum(Cell cell) {
-        CellType type = cell.getCellTypeEnum();
+    public static CellType ultimateType(Cell cell) {
+        CellType type = cell.getCellType();
         if (type == CellType.FORMULA)
-            return cell.getCachedFormulaResultTypeEnum();
+            return cell.getCachedFormulaResultType();
         else
             return type;
     }

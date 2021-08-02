@@ -17,12 +17,14 @@
 
 package org.apache.poi.hssf.record.common;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.hssf.record.FeatRecord;
 import org.apache.poi.hssf.record.PasswordRecord;
 import org.apache.poi.hssf.record.PasswordRev4Record;
-//import org.apache.poi.hssf.record.Feat11Record;
-//import org.apache.poi.hssf.record.Feat12Record;
 import org.apache.poi.hssf.record.RecordInputStream;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 import org.apache.poi.util.StringUtil;
 
@@ -34,44 +36,41 @@ import org.apache.poi.util.StringUtil;
  *  as {@link FeatRecord}
  */
 public final class FeatProtection implements SharedFeature {
-	public static long NO_SELF_RELATIVE_SECURITY_FEATURE = 0;
-	public static long HAS_SELF_RELATIVE_SECURITY_FEATURE = 1;
+	@SuppressWarnings("RedundantFieldInitialization")
+	public static final long NO_SELF_RELATIVE_SECURITY_FEATURE = 0;
+	public static final long HAS_SELF_RELATIVE_SECURITY_FEATURE = 1;
 
 	private int fSD;
-	
+
 	/**
 	 * 0 means no password. Otherwise indicates the
-	 *  password verifier algorithm (same kind as 
+	 *  password verifier algorithm (same kind as
 	 *   {@link PasswordRecord} and
 	 *   {@link PasswordRev4Record})
 	 */
 	private int passwordVerifier;
-	
+
 	private String title;
 	private byte[] securityDescriptor;
-	
+
 	public FeatProtection() {
 		securityDescriptor = new byte[0];
+	}
+
+	public FeatProtection(FeatProtection other) {
+		fSD = other.fSD;
+		passwordVerifier = other.passwordVerifier;
+		title = other.title;
+		securityDescriptor = (other.securityDescriptor == null) ? null : other.securityDescriptor.clone();
 	}
 
 	public FeatProtection(RecordInputStream in) {
 		fSD = in.readInt();
 		passwordVerifier = in.readInt();
-		
-		title = StringUtil.readUnicodeString(in);
-		
-		securityDescriptor = in.readRemainder();
-	}
 
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append(" [FEATURE PROTECTION]\n");
-		buffer.append("   Self Relative = " + fSD); 
-		buffer.append("   Password Verifier = " + passwordVerifier);
-		buffer.append("   Title = " + title);
-		buffer.append("   Security Descriptor Size = " + securityDescriptor.length);
-		buffer.append(" [/FEATURE PROTECTION]\n");
-		return buffer.toString();
+		title = StringUtil.readUnicodeString(in);
+
+		securityDescriptor = in.readRemainder();
 	}
 
 	public void serialize(LittleEndianOutput out) {
@@ -99,7 +98,25 @@ public final class FeatProtection implements SharedFeature {
 		this.title = title;
 	}
 
+	/**
+	 * @return Self Relative
+	 */
 	public int getFSD() {
 		return fSD;
+	}
+
+	@Override
+	public FeatProtection copy() {
+		return new FeatProtection(this);
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"FSD", this::getFSD,
+			"passwordVerifier", this::getPasswordVerifier,
+			"title", this::getTitle,
+			"securityDescriptor", () -> securityDescriptor
+		);
 	}
 }

@@ -25,14 +25,14 @@ import org.apache.poi.ddf.EscherContainerRecord;
 import org.apache.poi.ddf.EscherRecord;
 import org.apache.poi.ddf.EscherRecordFactory;
 import org.apache.poi.ddf.NullEscherSerializationListener;
-import org.apache.poi.util.LittleEndian;
 import org.apache.poi.hssf.util.LazilyConcatenatedByteArray;
+import org.apache.poi.util.LittleEndian;
 
 /**
  * The escher container record is used to hold escher records.  It is abstract and
  * must be subclassed for maximum benefit.
  */
-public abstract class AbstractEscherHolderRecord extends Record implements Cloneable {
+public abstract class AbstractEscherHolderRecord extends Record {
     private static boolean DESERIALISE;
     static {
     try {
@@ -42,17 +42,17 @@ public abstract class AbstractEscherHolderRecord extends Record implements Clone
         }
     }
 
-    private final List<EscherRecord> escherRecords;
+    private final List<EscherRecord> escherRecords = new ArrayList<>();
     private final LazilyConcatenatedByteArray rawDataContainer = new LazilyConcatenatedByteArray();
 
-    public AbstractEscherHolderRecord()
-    {
-        escherRecords = new ArrayList<EscherRecord>();
+    public AbstractEscherHolderRecord() {}
+
+    public AbstractEscherHolderRecord(AbstractEscherHolderRecord other) {
+        other.escherRecords.stream().map(EscherRecord::copy).forEach(escherRecords::add);
+        rawDataContainer.concatenate(other.rawDataContainer);
     }
 
-    public AbstractEscherHolderRecord(RecordInputStream in)
-    {
-        escherRecords = new ArrayList<EscherRecord>();
+    public AbstractEscherHolderRecord(RecordInputStream in) {
         if (! DESERIALISE ) {
             rawDataContainer.concatenate(in.readRemainder());
         } else {
@@ -81,39 +81,22 @@ public abstract class AbstractEscherHolderRecord extends Record implements Clone
         }
     }
 
-    @Override
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        final String nl = System.getProperty("line.separator");
-        buffer.append('[' + getRecordName() + ']' + nl);
-        if (escherRecords.size() == 0)
-            buffer.append("No Escher Records Decoded" + nl);
-        for (EscherRecord r : escherRecords) {
-            buffer.append(r);
-        }
-        buffer.append("[/" + getRecordName() + ']' + nl);
-
-        return buffer.toString();
-    }
-
     protected abstract String getRecordName();
 
     @Override
     public int serialize(int offset, byte[] data)
     {
-        LittleEndian.putShort( data, 0 + offset, getSid() );
+        LittleEndian.putShort(data,      offset, getSid() );
         LittleEndian.putShort( data, 2 + offset, (short) ( getRecordSize() - 4 ) );
         byte[] rawData = getRawData();
         if ( escherRecords.size() == 0 && rawData != null )
         {
-            LittleEndian.putShort(data, 0 + offset, getSid());
+            LittleEndian.putShort(data,     offset, getSid());
             LittleEndian.putShort(data, 2 + offset, (short)(getRecordSize() - 4));
             System.arraycopy( rawData, 0, data, 4 + offset, rawData.length);
             return rawData.length + 4;
         }
-        LittleEndian.putShort(data, 0 + offset, getSid());
+        LittleEndian.putShort(data,     offset, getSid());
         LittleEndian.putShort(data, 2 + offset, (short)(getRecordSize() - 4));
 
         int pos = offset + 4;
@@ -143,9 +126,7 @@ public abstract class AbstractEscherHolderRecord extends Record implements Clone
     public abstract short getSid();
 
     @Override
-    public AbstractEscherHolderRecord clone() {
-    	return (AbstractEscherHolderRecord)cloneViaReserialise();
-    }
+    public abstract AbstractEscherHolderRecord copy();
 
     public void addEscherRecord(int index, EscherRecord element)
     {
@@ -171,7 +152,7 @@ public abstract class AbstractEscherHolderRecord extends Record implements Clone
      * If we have a EscherContainerRecord as one of our
      *  children (and most top level escher holders do),
      *  then return that.
-     * 
+     *
      * @return the EscherContainerRecord or {@code null} if no child is a container record
      */
     public EscherContainerRecord getEscherContainer() {
@@ -187,15 +168,15 @@ public abstract class AbstractEscherHolderRecord extends Record implements Clone
      * Descends into all our children, returning the
      *  first EscherRecord with the given id, or null
      *  if none found
-     *  
+     *
      * @param id the record to look for
-     * 
+     *
      * @return the record or {@code null} if it can't be found
      */
     public EscherRecord findFirstWithId(short id) {
     	return findFirstWithId(id, getEscherRecords());
     }
-    
+
     private EscherRecord findFirstWithId(short id, List<EscherRecord> records) {
     	// Check at our level
     	for (EscherRecord r : records) {
@@ -227,7 +208,7 @@ public abstract class AbstractEscherHolderRecord extends Record implements Clone
     /**
      * Big drawing group records are split but it's easier to deal with them
      * as a whole group so we need to join them together.
-     * 
+     *
      * @param record the record data to concatenate to the end
      */
     public void join( AbstractEscherHolderRecord record )
@@ -260,5 +241,10 @@ public abstract class AbstractEscherHolderRecord extends Record implements Clone
             byte[] rawData = getRawData();
             convertToEscherRecords(0, rawData.length, rawData );
         }
+    }
+
+    @Override
+    public List<EscherRecord> getGenericChildren() {
+        return escherRecords;
     }
 }

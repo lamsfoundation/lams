@@ -17,26 +17,35 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.hssf.record.common.FtrHeader;
 import org.apache.poi.hssf.record.common.FutureRecord;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * Conditional Formatting Header v12 record CFHEADER12 (0x0879),
  *  for conditional formattings introduced in Excel 2007 and newer.
  */
-public final class CFHeader12Record extends CFHeaderBase implements FutureRecord, Cloneable {
+public final class CFHeader12Record extends CFHeaderBase implements FutureRecord {
     public static final short sid = 0x0879;
 
     private FtrHeader futureHeader;
 
-    /** Creates new CFHeaderRecord */
     public CFHeader12Record() {
         createEmpty();
         futureHeader = new FtrHeader();
         futureHeader.setRecordType(sid);
     }
+
+    public CFHeader12Record(CFHeader12Record other) {
+        super(other);
+        futureHeader = other.futureHeader.copy();
+    }
+
     public CFHeader12Record(CellRangeAddress[] regions, int nRules) {
         super(regions, nRules);
         futureHeader = new FtrHeader();
@@ -78,12 +87,22 @@ public final class CFHeader12Record extends CFHeaderBase implements FutureRecord
     public CellRangeAddress getAssociatedRange() {
         return futureHeader.getAssociatedRange();
     }
-    
+
     @Override
-    public CFHeader12Record clone() {
-        CFHeader12Record result = new CFHeader12Record();
-        result.futureHeader = (FtrHeader)futureHeader.clone();
-        super.copyTo(result);
-        return result;
+    public CFHeader12Record copy() {
+        return new CFHeader12Record(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.CF_HEADER_12;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "base", super::getGenericProperties,
+            "futureHeader", this::getFutureHeader
+        );
     }
 }

@@ -18,6 +18,8 @@
 package org.apache.poi.hssf.record;
 
 import java.io.ByteArrayInputStream;
+import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * This is purely for the biff viewer.  During normal operations we don't want
@@ -26,8 +28,10 @@ import java.io.ByteArrayInputStream;
 public final class DrawingRecordForBiffViewer extends AbstractEscherHolderRecord {
     public static final short sid = 0xEC;
 
-    public DrawingRecordForBiffViewer()
-    {
+    public DrawingRecordForBiffViewer() {}
+
+    public DrawingRecordForBiffViewer(DrawingRecordForBiffViewer other) {
+        super(other);
     }
 
     public DrawingRecordForBiffViewer( RecordInputStream in)
@@ -58,5 +62,20 @@ public final class DrawingRecordForBiffViewer extends AbstractEscherHolderRecord
     public short getSid()
     {
         return sid;
+    }
+
+    @Override
+    public DrawingRecordForBiffViewer copy() {
+        return new DrawingRecordForBiffViewer(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.DRAWING;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return null;
     }
 }

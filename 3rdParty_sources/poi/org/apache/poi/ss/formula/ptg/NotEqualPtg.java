@@ -19,20 +19,19 @@ package org.apache.poi.ss.formula.ptg;
 
 /**
  * Ptg class to implement not equal
- *
- * @author fred at stsci dot edu
  */
 public final class NotEqualPtg extends ValueOperatorPtg {
     public final static byte sid = 0x0e;
 
-    public static final ValueOperatorPtg instance = new NotEqualPtg();
+    public static final NotEqualPtg instance = new NotEqualPtg();
 
     private NotEqualPtg() {
     	// enforce singleton
     }
-    
-    protected byte getSid() {
-    	return sid;
+
+    @Override
+    public byte getSid() {
+        return sid;
     }
 
     public int getNumberOfOperands() {
@@ -40,13 +39,11 @@ public final class NotEqualPtg extends ValueOperatorPtg {
     }
 
     public String toFormulaString(String[] operands) {
-        StringBuffer buffer = new StringBuffer();
+        return operands[0] + "<>" + operands[1];
+    }
 
-        buffer.append( operands[0] );
-
-        buffer.append("<>");
-        buffer.append( operands[1] );
-
-        return buffer.toString();
+    @Override
+    public NotEqualPtg copy() {
+        return instance;
     }
 }

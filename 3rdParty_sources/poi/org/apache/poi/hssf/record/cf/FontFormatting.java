@@ -18,19 +18,26 @@
 
 package org.apache.poi.hssf.record.cf;
 
-import java.util.Locale;
+import static org.apache.poi.util.GenericRecordUtil.getBitsAsString;
+import static org.apache.poi.util.GenericRecordUtil.getEnumBitsAsString;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.common.Duplicatable;
+import org.apache.poi.common.usermodel.GenericRecord;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.util.BitField;
 import org.apache.poi.util.BitFieldFactory;
+import org.apache.poi.util.GenericRecordJsonWriter;
 import org.apache.poi.util.LittleEndian;
 
 /**
  * Font Formatting Block of the Conditional Formatting Rule Record.
  */
-public final class FontFormatting implements Cloneable {
-    private final byte[] _rawData = new byte[RAW_DATA_SIZE];
-
+public final class FontFormatting implements Duplicatable, GenericRecord {
     private static final int OFFSET_FONT_NAME = 0;
     private static final int OFFSET_FONT_HEIGHT = 64;
     private static final int OFFSET_FONT_OPTIONS = 68;
@@ -49,37 +56,15 @@ public final class FontFormatting implements Cloneable {
     private static final int RAW_DATA_SIZE = 118;
 
 
-    public final static int  FONT_CELL_HEIGHT_PRESERVED   = 0xFFFFFFFF;
+    public static final int  FONT_CELL_HEIGHT_PRESERVED   = 0xFFFFFFFF;
 
-    // FONT OPTIONS MASKS
-    private static final BitField posture       = BitFieldFactory.getInstance(0x00000002);
-    private static final BitField outline       = BitFieldFactory.getInstance(0x00000008);
-    private static final BitField shadow        = BitFieldFactory.getInstance(0x00000010);
-    private static final BitField cancellation	= BitFieldFactory.getInstance(0x00000080);
+    // option flags and font options masks
+    // in the options flags, a true bit activates the overriding and in the font option the bit sets the state
+    private static final BitField POSTURE = BitFieldFactory.getInstance(0x00000002);
+    private static final BitField OUTLINE = BitFieldFactory.getInstance(0x00000008);
+    private static final BitField SHADOW = BitFieldFactory.getInstance(0x00000010);
+    private static final BitField CANCELLATION = BitFieldFactory.getInstance(0x00000080);
 
-    // OPTION FLAGS MASKS
-
-    private static final BitField styleModified        = BitFieldFactory.getInstance(0x00000002);
-    private static final BitField outlineModified      = BitFieldFactory.getInstance(0x00000008);
-    private static final BitField shadowModified       = BitFieldFactory.getInstance(0x00000010);
-    private static final BitField cancellationModified = BitFieldFactory.getInstance(0x00000080);
-
-    /** Escapement type - None */
-    public static final short SS_NONE  = 0;
-    /** Escapement type - Superscript */
-    public static final short SS_SUPER = 1;
-    /** Escapement type - Subscript */
-    public static final short SS_SUB   = 2;
-    /** Underline type - None */
-    public static final byte U_NONE               = 0;
-    /** Underline type - Single */
-    public static final byte U_SINGLE             = 1;
-    /** Underline type - Double */
-    public static final byte U_DOUBLE             = 2;
-    /** Underline type - Single Accounting */
-    public static final byte U_SINGLE_ACCOUNTING  = 0x21;
-    /** Underline type - Double Accounting */
-    public static final byte U_DOUBLE_ACCOUNTING  = 0x22;
     /** Normal boldness (not bold) */
     private static final short FONT_WEIGHT_NORMAL = 0x190;
 
@@ -87,6 +72,8 @@ public final class FontFormatting implements Cloneable {
      * Bold boldness (bold)
      */
     private static final short FONT_WEIGHT_BOLD	 = 0x2bc;
+
+    private final byte[] _rawData = new byte[RAW_DATA_SIZE];
 
     public FontFormatting() {
         setFontHeight(-1);
@@ -114,11 +101,12 @@ public final class FontFormatting implements Cloneable {
         setShort(OFFSET_FONT_FORMATING_END, 0x0001);
     }
 
-    /** Creates new FontFormatting */
+    public FontFormatting(FontFormatting other) {
+        System.arraycopy(other._rawData, 0, _rawData, 0, RAW_DATA_SIZE);
+    }
+
     public FontFormatting(RecordInputStream in) {
-        for (int i = 0; i < _rawData.length; i++) {
-            _rawData[i] = in.readByte();
-        }
+        in.readFully(_rawData);
     }
 
     private short getShort(int offset) {
@@ -150,8 +138,7 @@ public final class FontFormatting implements Cloneable {
      * @param height  fontheight (in points/20); or -1 to preserve the cell font height
      */
 
-    public void setFontHeight(int height)
-    {
+    public void setFontHeight(int height) {
         setInt(OFFSET_FONT_HEIGHT, height);
     }
 
@@ -160,20 +147,17 @@ public final class FontFormatting implements Cloneable {
      *
      * @return fontheight (in points/20); or -1 if not modified
      */
-    public int getFontHeight()
-    {
+    public int getFontHeight() {
         return getInt(OFFSET_FONT_HEIGHT);
     }
 
-    private void setFontOption(boolean option, BitField field)
-    {
+    private void setFontOption(boolean option, BitField field) {
         int options = getInt(OFFSET_FONT_OPTIONS);
         options = field.setBoolean(options, option);
         setInt(OFFSET_FONT_OPTIONS, options);
     }
 
-    private boolean getFontOption(BitField field)
-    {
+    private boolean getFontOption(BitField field) {
         int options = getInt(OFFSET_FONT_OPTIONS);
         return field.isSet(options);
     }
@@ -185,9 +169,8 @@ public final class FontFormatting implements Cloneable {
      * @see #setFontOption(boolean, org.apache.poi.util.BitField)
      */
 
-    public void setItalic(boolean italic)
-    {
-        setFontOption(italic, posture);
+    public void setItalic(boolean italic) {
+        setFontOption(italic, POSTURE);
     }
 
     /**
@@ -197,29 +180,24 @@ public final class FontFormatting implements Cloneable {
      * @see #getFontOption(org.apache.poi.util.BitField)
      */
 
-    public boolean isItalic()
-    {
-        return getFontOption(posture);
+    public boolean isItalic() {
+        return getFontOption(POSTURE);
     }
 
-    public void setOutline(boolean on)
-    {
-        setFontOption(on, outline);
+    public void setOutline(boolean on) {
+        setFontOption(on, OUTLINE);
     }
 
-    public boolean isOutlineOn()
-    {
-        return getFontOption(outline);
+    public boolean isOutlineOn() {
+        return getFontOption(OUTLINE);
     }
 
-    public void setShadow(boolean on)
-    {
-        setFontOption(on, shadow);
+    public void setShadow(boolean on) {
+        setFontOption(on, SHADOW);
     }
 
-    public boolean isShadowOn()
-    {
-        return getFontOption(shadow);
+    public boolean isShadowOn() {
+        return getFontOption(SHADOW);
     }
 
     /**
@@ -227,9 +205,8 @@ public final class FontFormatting implements Cloneable {
      *
      * @param strike - whether the font is stricken out or not
      */
-    public void setStrikeout(boolean strike)
-    {
-        setFontOption(strike, cancellation);
+    public void setStrikeout(boolean strike) {
+        setFontOption(strike, CANCELLATION);
     }
 
     /**
@@ -238,9 +215,8 @@ public final class FontFormatting implements Cloneable {
      * @return strike - whether the font is stricken out or not
      * @see #getFontOption(org.apache.poi.util.BitField)
      */
-    public boolean isStruckout()
-    {
-        return getFontOption(cancellation);
+    public boolean isStruckout() {
+        return getFontOption(CANCELLATION);
     }
 
     /**
@@ -249,13 +225,8 @@ public final class FontFormatting implements Cloneable {
      *
      * @param bw - a number between 100-1000 for the fonts "boldness"
      */
-
-    private void setFontWeight(short pbw)
-    {
-        short bw = pbw;
-        if( bw<100) { bw=100; }
-        if( bw>1000){ bw=1000; }
-        setShort(OFFSET_FONT_WEIGHT, bw);
+    private void setFontWeight(short bw) {
+        setShort(OFFSET_FONT_WEIGHT, Math.max(100, Math.min(1000, bw)));
     }
 
     /**
@@ -263,8 +234,7 @@ public final class FontFormatting implements Cloneable {
      *
      * @param bold - set font weight to bold if true; to normal otherwise
      */
-    public void setBold(boolean bold)
-    {
+    public void setBold(boolean bold) {
         setFontWeight(bold?FONT_WEIGHT_BOLD:FONT_WEIGHT_NORMAL);
     }
 
@@ -274,9 +244,7 @@ public final class FontFormatting implements Cloneable {
      *
      * @return bw - a number between 100-1000 for the fonts "boldness"
      */
-
-    public short getFontWeight()
-    {
+    public short getFontWeight() {
         return getShort(OFFSET_FONT_WEIGHT);
     }
 
@@ -285,9 +253,7 @@ public final class FontFormatting implements Cloneable {
      *
      * @return bold - whether the font is bold or not
      */
-
-    public boolean isBold()
-    {
+    public boolean isBold() {
         return getFontWeight()==FONT_WEIGHT_BOLD;
     }
 
@@ -295,12 +261,11 @@ public final class FontFormatting implements Cloneable {
      * get the type of super or subscript for the font
      *
      * @return super or subscript option
-     * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#SS_NONE
-     * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#SS_SUPER
-     * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#SS_SUB
+     * @see org.apache.poi.ss.usermodel.Font#SS_NONE
+     * @see org.apache.poi.ss.usermodel.Font#SS_SUPER
+     * @see org.apache.poi.ss.usermodel.Font#SS_SUB
      */
-    public short getEscapementType()
-    {
+    public short getEscapementType() {
         return getShort(OFFSET_ESCAPEMENT_TYPE);
     }
 
@@ -308,12 +273,11 @@ public final class FontFormatting implements Cloneable {
      * set the escapement type for the font
      *
      * @param escapementType  super or subscript option
-     * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#SS_NONE
-     * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#SS_SUPER
-     * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#SS_SUB
+     * @see org.apache.poi.ss.usermodel.Font#SS_NONE
+     * @see org.apache.poi.ss.usermodel.Font#SS_SUPER
+     * @see org.apache.poi.ss.usermodel.Font#SS_SUB
      */
-    public void setEscapementType( short escapementType)
-    {
+    public void setEscapementType( short escapementType) {
         setShort(OFFSET_ESCAPEMENT_TYPE, escapementType);
     }
 
@@ -322,14 +286,13 @@ public final class FontFormatting implements Cloneable {
      *
      * @return font underlining type
      *
-     * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#U_NONE
-     * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#U_SINGLE
-     * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#U_DOUBLE
-     * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#U_SINGLE_ACCOUNTING
-     * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#U_DOUBLE_ACCOUNTING
+     * @see org.apache.poi.ss.usermodel.Font#U_NONE
+     * @see org.apache.poi.ss.usermodel.Font#U_SINGLE
+     * @see org.apache.poi.ss.usermodel.Font#U_DOUBLE
+     * @see org.apache.poi.ss.usermodel.Font#U_SINGLE_ACCOUNTING
+     * @see org.apache.poi.ss.usermodel.Font#U_DOUBLE_ACCOUNTING
      */
-    public short getUnderlineType()
-    {
+    public short getUnderlineType() {
         return getShort(OFFSET_UNDERLINE_TYPE);
     }
 
@@ -338,36 +301,32 @@ public final class FontFormatting implements Cloneable {
      *
      * @param underlineType underline option
      *
-     * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#U_NONE
-     * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#U_SINGLE
-     * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#U_DOUBLE
-     * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#U_SINGLE_ACCOUNTING
-     * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#U_DOUBLE_ACCOUNTING
+     * @see org.apache.poi.ss.usermodel.Font#U_NONE
+     * @see org.apache.poi.ss.usermodel.Font#U_SINGLE
+     * @see org.apache.poi.ss.usermodel.Font#U_DOUBLE
+     * @see org.apache.poi.ss.usermodel.Font#U_SINGLE_ACCOUNTING
+     * @see org.apache.poi.ss.usermodel.Font#U_DOUBLE_ACCOUNTING
      */
-    public void setUnderlineType( short underlineType)
-    {
+    public void setUnderlineType( short underlineType) {
         setShort(OFFSET_UNDERLINE_TYPE, underlineType);
     }
 
 
-    public short getFontColorIndex()
-    {
+    public short getFontColorIndex() {
         return (short)getInt(OFFSET_FONT_COLOR_INDEX);
     }
 
-    public void setFontColorIndex(short fci )
-    {
+    public void setFontColorIndex(short fci ) {
         setInt(OFFSET_FONT_COLOR_INDEX,fci);
     }
 
     private boolean getOptionFlag(BitField field) {
         int optionFlags = getInt(OFFSET_OPTION_FLAGS);
         int value = field.getValue(optionFlags);
-        return value==0? true : false ;
+        return value == 0;
     }
 
-    private void setOptionFlag(boolean modified, BitField field)
-    {
+    private void setOptionFlag(boolean modified, BitField field) {
         int value = modified? 0 : 1;
         int optionFlags = getInt(OFFSET_OPTION_FLAGS);
         optionFlags = field.setValue(optionFlags, value);
@@ -375,166 +334,96 @@ public final class FontFormatting implements Cloneable {
     }
 
 
-    public boolean isFontStyleModified()
-    {
-        return getOptionFlag(styleModified);
+    public boolean isFontStyleModified() {
+        return getOptionFlag(POSTURE);
     }
 
 
-    public void setFontStyleModified(boolean modified)
-    {
-        setOptionFlag(modified, styleModified);
+    public void setFontStyleModified(boolean modified) {
+        setOptionFlag(modified, POSTURE);
     }
 
-    public boolean isFontOutlineModified()
-    {
-        return getOptionFlag(outlineModified);
+    public boolean isFontOutlineModified() {
+        return getOptionFlag(OUTLINE);
     }
 
-    public void setFontOutlineModified(boolean modified)
-    {
-        setOptionFlag(modified, outlineModified);
+    public void setFontOutlineModified(boolean modified) {
+        setOptionFlag(modified, OUTLINE);
     }
 
-    public boolean isFontShadowModified()
-    {
-        return getOptionFlag(shadowModified);
+    public boolean isFontShadowModified() {
+        return getOptionFlag(SHADOW);
     }
 
-    public void setFontShadowModified(boolean modified)
-    {
-        setOptionFlag(modified, shadowModified);
+    public void setFontShadowModified(boolean modified) {
+        setOptionFlag(modified, SHADOW);
     }
-    public void setFontCancellationModified(boolean modified)
-    {
-        setOptionFlag(modified, cancellationModified);
+    public void setFontCancellationModified(boolean modified) {
+        setOptionFlag(modified, CANCELLATION);
     }
 
-    public boolean isFontCancellationModified()
-    {
-        return getOptionFlag(cancellationModified);
+    public boolean isFontCancellationModified() {
+        return getOptionFlag(CANCELLATION);
     }
 
-    public void setEscapementTypeModified(boolean modified)
-    {
+    public void setEscapementTypeModified(boolean modified) {
         int value = modified? 0 : 1;
         setInt(OFFSET_ESCAPEMENT_TYPE_MODIFIED, value);
     }
-    public boolean isEscapementTypeModified()
-    {
+
+    public boolean isEscapementTypeModified() {
         int escapementModified = getInt(OFFSET_ESCAPEMENT_TYPE_MODIFIED);
         return escapementModified == 0;
     }
 
-    public void setUnderlineTypeModified(boolean modified)
-    {
+    public void setUnderlineTypeModified(boolean modified) {
         int value = modified? 0 : 1;
         setInt(OFFSET_UNDERLINE_TYPE_MODIFIED, value);
     }
 
-    public boolean isUnderlineTypeModified()
-    {
+    public boolean isUnderlineTypeModified() {
         int underlineModified = getInt(OFFSET_UNDERLINE_TYPE_MODIFIED);
         return underlineModified == 0;
     }
 
-    public void setFontWieghtModified(boolean modified)
-    {
+    public void setFontWieghtModified(boolean modified) {
         int value = modified? 0 : 1;
         setInt(OFFSET_FONT_WEIGHT_MODIFIED, value);
     }
 
-    public boolean isFontWeightModified()
-    {
+    public boolean isFontWeightModified() {
         int fontStyleModified = getInt(OFFSET_FONT_WEIGHT_MODIFIED);
         return fontStyleModified == 0;
     }
 
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("    [Font Formatting]\n");
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        final Map<String,Supplier<?>> m = new LinkedHashMap<>();
+        m.put("fontHeight", this::getFontHeight);
+        m.put("options", getBitsAsString(() -> getInt(OFFSET_OPTION_FLAGS),
+            new BitField[]{POSTURE,OUTLINE,SHADOW,CANCELLATION},
+            new String[]{"POSTURE_MODIFIED","OUTLINE_MODIFIED","SHADOW_MODIFIED","STRUCKOUT_MODIFIED"}));
+        m.put("fontOptions", getBitsAsString(() -> getInt(OFFSET_FONT_OPTIONS),
+            new BitField[]{POSTURE,OUTLINE,SHADOW,CANCELLATION},
+            new String[]{"ITALIC","OUTLINE","SHADOW","STRUCKOUT"}));
+        m.put("fontWEightModified", this::isFontWeightModified);
+        m.put("fontWeight", getEnumBitsAsString(this::getFontWeight,
+            new int[]{FONT_WEIGHT_NORMAL,FONT_WEIGHT_BOLD},
+            new String[]{"NORMAL","BOLD"}));
+        m.put("escapementTypeModified", this::isEscapementTypeModified);
+        m.put("escapementType", this::getEscapementType);
+        m.put("underlineTypeModified", this::isUnderlineTypeModified);
+        m.put("underlineType", this::getUnderlineType);
+        m.put("colorIndex", this::getFontColorIndex);
+        return Collections.unmodifiableMap(m);
+    }
 
-        buffer.append("	.font height = ").append(getFontHeight()).append(" twips\n");
-
-        if( isFontStyleModified() )
-        {
-            buffer.append("	.font posture = ").append(isItalic()?"Italic":"Normal").append("\n");
-        }
-        else
-        {
-            buffer.append("	.font posture = ]not modified]").append("\n");
-        }
-
-        if( isFontOutlineModified() )
-        {
-            buffer.append("	.font outline = ").append(isOutlineOn()).append("\n");
-        }
-        else
-        {
-            buffer.append("	.font outline is not modified\n");
-        }
-
-        if( isFontShadowModified() )
-        {
-            buffer.append("	.font shadow = ").append(isShadowOn()).append("\n");
-        }
-        else
-        {
-            buffer.append("	.font shadow is not modified\n");
-        }
-
-        if( isFontCancellationModified() )
-        {
-            buffer.append("	.font strikeout = ").append(isStruckout()).append("\n");
-        }
-        else
-        {
-            buffer.append("	.font strikeout is not modified\n");
-        }
-
-        if( isFontStyleModified() )
-        {
-            buffer.append("	.font weight = ").
-            append(getFontWeight()).
-            append(
-                    getFontWeight() == FONT_WEIGHT_NORMAL ? "(Normal)"
-                    : getFontWeight() == FONT_WEIGHT_BOLD ? "(Bold)" 
-                    : "0x"+Integer.toHexString(getFontWeight())).
-            append("\n");
-        }
-        else
-        {
-            buffer.append("	.font weight = ]not modified]").append("\n");
-        }
-
-        if( isEscapementTypeModified() )
-        {
-            buffer.append("	.escapement type = ").append(getEscapementType()).append("\n");
-        }
-        else
-        {
-            buffer.append("	.escapement type is not modified\n");
-        }
-
-        if( isUnderlineTypeModified() )
-        {
-            buffer.append("	.underline type = ").append(getUnderlineType()).append("\n");
-        }
-        else
-        {
-            buffer.append("	.underline type is not modified\n");
-        }
-        buffer.append("	.color index = ").append("0x"+Integer.toHexString(getFontColorIndex()).toUpperCase(Locale.ROOT)).append("\n");
-
-        buffer.append("    [/Font Formatting]\n");
-        return buffer.toString();
+    public String toString() {
+        return GenericRecordJsonWriter.marshal(this);
     }
 
     @Override
-    public FontFormatting clone() {
-        FontFormatting other = new FontFormatting();
-        System.arraycopy(_rawData, 0, other._rawData, 0, _rawData.length);
-        return other;
+    public FontFormatting copy() {
+        return new FontFormatting(this);
     }
 }

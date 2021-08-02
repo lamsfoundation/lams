@@ -25,6 +25,7 @@ import java.util.Locale;
 import org.apache.poi.hssf.dev.BiffViewer;
 import org.apache.poi.hssf.record.crypto.Biff8DecryptingStream;
 import org.apache.poi.poifs.crypt.EncryptionInfo;
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.Internal;
 import org.apache.poi.util.LittleEndianConsts;
 import org.apache.poi.util.LittleEndianInput;
@@ -32,13 +33,18 @@ import org.apache.poi.util.LittleEndianInputStream;
 import org.apache.poi.util.RecordFormatException;
 
 /**
- * Title:  Record Input Stream<P>
- * Description:  Wraps a stream and provides helper methods for the construction of records.<P>
+ * Title:  Record Input Stream
+ *
+ * Description:  Wraps a stream and provides helper methods for the construction of records.
  */
 public final class RecordInputStream implements LittleEndianInput {
+
+
 	/** Maximum size of a single record (minus the 4 byte header) without a continue*/
-	public final static short MAX_RECORD_DATA_SIZE = 8224;
+	public static final short MAX_RECORD_DATA_SIZE = 8224;
 	private static final int INVALID_SID_VALUE = -1;
+	//arbitrarily selected; may need to increase
+	private static final int MAX_RECORD_LENGTH = 100_000;
 	/**
 	 * When {@link #_currentDataLength} has this value, it means that the previous BIFF record is
 	 * finished, the next sid has been properly read, but the data size field has not been read yet.
@@ -54,7 +60,7 @@ public final class RecordInputStream implements LittleEndianInput {
 	public static final class LeftoverDataException extends RuntimeException {
 		public LeftoverDataException(int sid, int remainingByteCount) {
 			super("Initialisation of record 0x" + Integer.toHexString(sid).toUpperCase(Locale.ROOT)
-					+ "(" + getRecordName(sid) + ") left " + remainingByteCount 
+					+ "(" + getRecordName(sid) + ") left " + remainingByteCount
 					+ " bytes remaining still to be read.");
 		}
 
@@ -100,8 +106,8 @@ public final class RecordInputStream implements LittleEndianInput {
 
 		private final LittleEndianInput _lei;
 
-		public SimpleHeaderInput(InputStream in) {
-			_lei = getLEI(in);
+		private SimpleHeaderInput(LittleEndianInput lei) {
+			_lei = lei;
 		}
 		@Override
         public int available() {
@@ -123,8 +129,12 @@ public final class RecordInputStream implements LittleEndianInput {
 
 	public RecordInputStream(InputStream in, EncryptionInfo key, int initialOffset) throws RecordFormatException {
 		if (key == null) {
-			_dataInput = getLEI(in);
-			_bhi = new SimpleHeaderInput(in);
+			_dataInput = (in instanceof LittleEndianInput)
+				// accessing directly is an optimisation
+				? (LittleEndianInput)in
+				// less optimal, but should work OK just the same. Often occurs in junit tests.
+				: new LittleEndianInputStream(in);
+			_bhi = new SimpleHeaderInput(_dataInput);
 		} else {
 			Biff8DecryptingStream bds = new Biff8DecryptingStream(in, initialOffset, key);
             _dataInput = bds;
@@ -167,9 +177,9 @@ public final class RecordInputStream implements LittleEndianInput {
 	/**
 	 * Note - this method is expected to be called only when completed reading the current BIFF
 	 * record.
-	 * 
+	 *
 	 * @return true, if there's another record in the stream
-	 * 
+	 *
 	 * @throws LeftoverDataException if this method is called before reaching the end of the
 	 * current record.
 	 */
@@ -189,11 +199,9 @@ public final class RecordInputStream implements LittleEndianInput {
 	private int readNextSid() {
 		int nAvailable  = _bhi.available();
 		if (nAvailable < EOFRecord.ENCODED_SIZE) {
-			if (nAvailable > 0) {
-				// some scrap left over?
-				// ex45582-22397.xls has one extra byte after the last record
-				// Excel reads that file OK
-			}
+			// some scrap left over, if nAvailable > 0?
+			// ex45582-22397.xls has one extra byte after the last record
+			// Excel reads that file OK
 			return INVALID_SID_VALUE;
 		}
 		int result = _bhi.readRecordSID();
@@ -260,7 +268,7 @@ public final class RecordInputStream implements LittleEndianInput {
 	}
 
 	/**
-	 * Reads a 32 bit, signed value 
+	 * Reads a 32 bit, signed value
 	 */
 	@Override
     public int readInt() {
@@ -299,21 +307,14 @@ public final class RecordInputStream implements LittleEndianInput {
 
 	@Override
     public double readDouble() {
-		long valueLongBits = readLong();
-		double result = Double.longBitsToDouble(valueLongBits);
-		if (Double.isNaN(result)) {
-            // YK: Excel doesn't write NaN but instead converts the cell type into {@link CellType#ERROR}.
-            // HSSF prior to version 3.7 had a bug: it could write Double.NaN but could not read such a file back.
-            // This behavior was fixed in POI-3.7.
-            //throw new RuntimeException("Did not expect to read NaN"); // (Because Excel typically doesn't write NaN)
-		}
-		return result;
+        // YK: Excel doesn't write NaN but instead converts the cell type into {@link CellType#ERROR}.
+		return Double.longBitsToDouble(readLong());
 	}
-	
+
 	public void readPlain(byte[] buf, int off, int len) {
 	    readFully(buf, 0, buf.length, true);
 	}
-	
+
 	@Override
     public void readFully(byte[] buf) {
 		readFully(buf, 0, buf.length, false);
@@ -323,15 +324,15 @@ public final class RecordInputStream implements LittleEndianInput {
     public void readFully(byte[] buf, int off, int len) {
         readFully(buf, off, len, false);
     }
-	
-    protected void readFully(byte[] buf, int off, int len, boolean isPlain) {
+
+    private void readFully(byte[] buf, int off, int len, boolean isPlain) {
 	    int origLen = len;
 	    if (buf == null) {
 	        throw new NullPointerException();
 	    } else if (off < 0 || len < 0 || len > buf.length - off) {
 	        throw new IndexOutOfBoundsException();
 	    }
-	    
+
 	    while (len > 0) {
 	        int nextChunk = Math.min(available(),len);
 	        if (nextChunk == 0) {
@@ -441,7 +442,7 @@ public final class RecordInputStream implements LittleEndianInput {
 		if (size ==0) {
 			return EMPTY_BYTE_ARRAY;
 		}
-		byte[] result = new byte[size];
+		byte[] result = IOUtils.safelyAllocate(size, MAX_RECORD_LENGTH);
 		readFully(result);
 		return result;
 	}
@@ -451,7 +452,7 @@ public final class RecordInputStream implements LittleEndianInput {
      * into any following continue records.
      *
      * @return all byte data for the current record
-     * 
+     *
      * @deprecated POI 2.0 Best to write a input stream that wraps this one
      *             where there is special sub record that may overlap continue
      *             records.
@@ -510,10 +511,10 @@ public final class RecordInputStream implements LittleEndianInput {
     }
 
     /**
-     * Mark the stream position - experimental function 
+     * Mark the stream position - experimental function
      *
      * @param readlimit the read ahead limit
-     * 
+     *
      * @see InputStream#mark(int)
      */
     @Internal
@@ -521,13 +522,13 @@ public final class RecordInputStream implements LittleEndianInput {
         ((InputStream)_dataInput).mark(readlimit);
         _markedDataOffset = _currentDataOffset;
     }
-    
+
     /**
      * Resets the stream position to the previously marked position.
      * Experimental function - this only works, when nextRecord() wasn't called in the meantime.
      *
      * @throws IOException if marking is not supported
-     * 
+     *
      * @see InputStream#reset()
      */
     @Internal

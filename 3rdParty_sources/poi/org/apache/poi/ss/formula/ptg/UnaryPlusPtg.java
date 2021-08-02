@@ -18,34 +18,35 @@
 package org.apache.poi.ss.formula.ptg;
 
 /**
- * Unary Plus operator
- * does not have any effect on the operand
- * @author Avik Sengupta
+ * Unary Plus operator -  does not have any effect on the operand
  */
 public final class UnaryPlusPtg extends ValueOperatorPtg {
     public final static byte sid  = 0x12;
-    
+
     private final static String ADD = "+";
 
-    public static final ValueOperatorPtg instance = new UnaryPlusPtg();
+    public static final UnaryPlusPtg instance = new UnaryPlusPtg();
 
     private UnaryPlusPtg() {
     	// enforce singleton
     }
-    
-    protected byte getSid() {
-    	return sid;
+
+    @Override
+    public byte getSid() {
+        return sid;
     }
 
     public int getNumberOfOperands() {
         return 1;
     }
-    
-   /** implementation of method from OperationsPtg*/  
+
+   /** implementation of method from OperationsPtg*/
     public String toFormulaString(String[] operands) {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append(ADD);
-        buffer.append(operands[ 0]);
-        return buffer.toString();
+        return ADD + operands[0];
+    }
+
+    @Override
+    public UnaryPlusPtg copy() {
+        return instance;
     }
 }

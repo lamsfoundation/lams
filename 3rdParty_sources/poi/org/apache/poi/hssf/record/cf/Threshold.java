@@ -17,18 +17,22 @@
 
 package org.apache.poi.hssf.record.cf;
 
-import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Supplier;
 
+import org.apache.poi.common.usermodel.GenericRecord;
 import org.apache.poi.ss.formula.Formula;
 import org.apache.poi.ss.formula.ptg.Ptg;
 import org.apache.poi.ss.usermodel.ConditionalFormattingThreshold.RangeType;
+import org.apache.poi.util.GenericRecordJsonWriter;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * Threshold / value (CFVO) for changes in Conditional Formatting
  */
-public abstract class Threshold {
+public abstract class Threshold implements GenericRecord {
     private byte type;
     private Formula formula;
     private Double value;
@@ -37,6 +41,12 @@ public abstract class Threshold {
         type = (byte)RangeType.NUMBER.id;
         formula = Formula.create(null);
         value = 0d;
+    }
+
+    protected Threshold(Threshold other) {
+        type = other.type;
+        formula = other.formula.copy();
+        value = other.value;
     }
 
     /** Creates new Threshold */
@@ -92,7 +102,7 @@ public abstract class Threshold {
     public void setValue(Double value) {
         this.value = value;
     }
-    
+
     public int getDataLength() {
         int len = 1 + formula.getEncodedSize();
         if (value != null) {
@@ -101,20 +111,17 @@ public abstract class Threshold {
         return len;
     }
 
-    public String toString() {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("    [CF Threshold]\n");
-        buffer.append("          .type    = ").append(Integer.toHexString(type)).append("\n");
-        buffer.append("          .formula = ").append(Arrays.toString(formula.getTokens())).append("\n");
-        buffer.append("          .value   = ").append(value).append("\n");
-        buffer.append("    [/CF Threshold]\n");
-        return buffer.toString();
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "type", this::getType,
+            "formula", this::getFormula,
+            "value", this::getValue
+        );
     }
 
-    public void copyTo(Threshold rec) {
-      rec.type = type;
-      rec.formula = formula;
-      rec.value = value;
+    public String toString() {
+        return GenericRecordJsonWriter.marshal(this);
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -128,4 +135,6 @@ public abstract class Threshold {
             out.writeDouble(value);
         }
     }
+
+    public abstract Threshold copy();
 }

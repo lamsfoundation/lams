@@ -20,14 +20,11 @@ package org.apache.poi.ss.formula.ptg;
 import org.apache.poi.util.LittleEndianOutput;
 
 
-/**
- * @author Daniel Noll (daniel at nuix dot com dot au)
- */
 public final class RangePtg  extends OperationPtg {
     public final static int  SIZE = 1;
     public final static byte sid  = 0x11;
 
-    public static final OperationPtg instance = new RangePtg();
+    public static final RangePtg instance = new RangePtg();
 
     private RangePtg() {
     	// enforce singleton
@@ -37,8 +34,12 @@ public final class RangePtg  extends OperationPtg {
         return true;
     }
 
-    public int getSize()
-    {
+    @Override
+    public byte getSid() {
+        return sid;
+    }
+
+    public int getSize() {
         return SIZE;
     }
 
@@ -53,14 +54,8 @@ public final class RangePtg  extends OperationPtg {
 
 
     /** implementation of method from OperationsPtg*/
-    public String toFormulaString(String[] operands)
-    {
-         StringBuffer buffer = new StringBuffer();
-
-         buffer.append(operands[ 0 ]);
-         buffer.append(":");
-         buffer.append(operands[ 1 ]);
-         return buffer.toString();
+    public String toFormulaString(String[] operands) {
+        return operands[0] + ":" + operands[1];
      }
 
     public int getNumberOfOperands()
@@ -68,4 +63,8 @@ public final class RangePtg  extends OperationPtg {
         return 2;
     }
 
+    @Override
+    public RangePtg copy() {
+        return instance;
+    }
 }

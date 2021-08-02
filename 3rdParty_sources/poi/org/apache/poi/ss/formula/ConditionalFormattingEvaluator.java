@@ -26,6 +26,7 @@ import java.util.Map;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.ConditionalFormatting;
 import org.apache.poi.ss.usermodel.ConditionalFormattingRule;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.SheetConditionalFormatting;
@@ -33,7 +34,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressBase;
 import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.ss.util.SheetUtil;
 
 /**
  * Evaluates Conditional Formatting constraints.<p>
@@ -60,7 +60,7 @@ public class ConditionalFormattingEvaluator {
      * there's no guarantee instances won't be recreated on the fly by some implementation.
      * So we use sheet name.
      */
-    private final Map<String, List<EvaluationConditionalFormatRule>> formats = new HashMap<String, List<EvaluationConditionalFormatRule>>();
+    private final Map<String, List<EvaluationConditionalFormatRule>> formats = new HashMap<>();
     
     /**
      * Evaluating rules for cells in their region(s) is expensive, so we want to cache them,
@@ -70,7 +70,7 @@ public class ConditionalFormattingEvaluator {
      * <p>
      * CellReference implements equals().
      */
-    private final Map<CellReference, List<EvaluationConditionalFormatRule>> values = new HashMap<CellReference, List<EvaluationConditionalFormatRule>>();
+    private final Map<CellReference, List<EvaluationConditionalFormatRule>> values = new HashMap<>();
 
     public ConditionalFormattingEvaluator(Workbook wb, WorkbookEvaluatorProvider provider) {
         this.workbook = wb;
@@ -103,7 +103,7 @@ public class ConditionalFormattingEvaluator {
     /**
      * lazy load by sheet since reading can be expensive
      * 
-     * @param sheet
+     * @param sheet The sheet to look at
      * @return unmodifiable list of rules
      */
     protected List<EvaluationConditionalFormatRule> getRules(Sheet sheet) {
@@ -115,7 +115,7 @@ public class ConditionalFormattingEvaluator {
             }
             final SheetConditionalFormatting scf = sheet.getSheetConditionalFormatting();
             final int count = scf.getNumConditionalFormattings();
-            rules = new ArrayList<EvaluationConditionalFormatRule>(count);
+            rules = new ArrayList<>(count);
             formats.put(sheetName, rules);
             for (int i=0; i < count; i++) {
                 ConditionalFormatting f = scf.getConditionalFormattingAt(i);
@@ -143,6 +143,11 @@ public class ConditionalFormattingEvaluator {
      * Note that to properly apply conditional rules, care must be taken to offset the base 
      * formula by the relative position of the current cell, or the wrong value is checked.
      * This is handled by {@link WorkbookEvaluator#evaluate(String, CellReference, CellRangeAddressBase)}.
+     * <p>
+     * If the cell exists and is a formula cell, its cached value may be used for rule evaluation, so
+     * make sure it is up to date.  If values have changed, it is best to call 
+     * {@link FormulaEvaluator#evaluateFormulaCell(Cell)} or {@link FormulaEvaluator#evaluateAll()} first,
+     * or the wrong conditional results may be returned. 
      * 
      * @param cellRef NOTE: if no sheet name is specified, this uses the workbook active sheet
      * @return Unmodifiable List of {@link EvaluationConditionalFormatRule}s that apply to the current cell value,
@@ -154,11 +159,14 @@ public class ConditionalFormattingEvaluator {
         
         if (rules == null) {
             // compute and cache them
-            rules = new ArrayList<EvaluationConditionalFormatRule>();
+            rules = new ArrayList<>();
             
-            Sheet sheet = null;
-            if (cellRef.getSheetName() != null) sheet = workbook.getSheet(cellRef.getSheetName());
-            else sheet = workbook.getSheetAt(workbook.getActiveSheetIndex());
+            final Sheet sheet;
+            if (cellRef.getSheetName() != null) {
+                sheet = workbook.getSheet(cellRef.getSheetName());
+            } else {
+                sheet = workbook.getSheetAt(workbook.getActiveSheetIndex());
+            }
             
             /*
              * Per Excel help:
@@ -196,8 +204,13 @@ public class ConditionalFormattingEvaluator {
      * Note that to properly apply conditional rules, care must be taken to offset the base 
      * formula by the relative position of the current cell, or the wrong value is checked.
      * This is handled by {@link WorkbookEvaluator#evaluate(String, CellReference, CellRangeAddressBase)}.
+     * <p>
+     * If the cell exists and is a formula cell, its cached value may be used for rule evaluation, so
+     * make sure it is up to date.  If values have changed, it is best to call 
+     * {@link FormulaEvaluator#evaluateFormulaCell(Cell)} or {@link FormulaEvaluator#evaluateAll()} first,
+     * or the wrong conditional results may be returned. 
      * 
-     * @param cell
+     * @param cell The cell to look for
      * @return Unmodifiable List of {@link EvaluationConditionalFormatRule}s that apply to the current cell value,
      *         in priority order, as evaluated by Excel (smallest priority # for XSSF, definition order for HSSF), 
      *         or null if none apply
@@ -211,7 +224,9 @@ public class ConditionalFormattingEvaluator {
     }
     
     /**
-     * @param sheetName
+     * Retrieve all formatting rules for the sheet with the given name.
+     *
+     * @param sheetName The name of the sheet to look at
      * @return unmodifiable list of all Conditional format rules for the given sheet, if any
      */
     public List<EvaluationConditionalFormatRule> getFormatRulesForSheet(String sheetName) {
@@ -219,7 +234,9 @@ public class ConditionalFormattingEvaluator {
     }
     
     /**
-     * @param sheet
+     * Retrieve all formatting rules for the given sheet.
+     *
+     * @param sheet The sheet to look at
      * @return unmodifiable list of all Conditional format rules for the given sheet, if any
      */
     public List<EvaluationConditionalFormatRule> getFormatRulesForSheet(Sheet sheet) {
@@ -247,12 +264,13 @@ public class ConditionalFormattingEvaluator {
     }
     
     /**
+     * Retrieve all cells where the given formatting rule evaluates to true.
      *
-     * @param rule
+     * @param rule The rule to look at
      * @return unmodifiable List of all cells in the rule's region matching the rule's condition
      */
     public List<Cell> getMatchingCells(EvaluationConditionalFormatRule rule) {
-        final List<Cell> cells = new ArrayList<Cell>();
+        final List<Cell> cells = new ArrayList<>();
         final Sheet sheet = rule.getSheet();
         
         for (CellRangeAddress region : rule.getRegions()) {

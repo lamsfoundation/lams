@@ -17,7 +17,10 @@
 
 package org.apache.poi.hssf.record;
 
-import org.apache.poi.util.HexDump;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
@@ -29,8 +32,13 @@ public abstract class CellRecord extends StandardRecord implements CellValueReco
     private int _columnIndex;
     private int _formatIndex;
 
-    protected CellRecord() {
-        // fields uninitialised
+    protected CellRecord() {}
+
+    protected CellRecord(CellRecord other) {
+        super(other);
+        _rowIndex = other.getRow();
+        _columnIndex = other.getColumn();
+        _formatIndex = other.getXFIndex();
     }
 
     protected CellRecord(RecordInputStream in) {
@@ -81,40 +89,16 @@ public abstract class CellRecord extends StandardRecord implements CellValueReco
         return (short) _formatIndex;
     }
 
-    @Override
-    public final String toString() {
-        StringBuilder sb = new StringBuilder();
-        String recordName = getRecordName();
-
-        sb.append("[").append(recordName).append("]\n");
-        sb.append("    .row    = ").append(HexDump.shortToHex(getRow())).append("\n");
-        sb.append("    .col    = ").append(HexDump.shortToHex(getColumn())).append("\n");
-        sb.append("    .xfindex= ").append(HexDump.shortToHex(getXFIndex())).append("\n");
-        appendValueText(sb);
-        sb.append("\n");
-        sb.append("[/").append(recordName).append("]\n");
-        return sb.toString();
-    }
-
-    /**
-     * Append specific debug info (used by {@link #toString()} for the value
-     * contained in this record. Trailing new-line should not be appended
-     * (superclass does that).
-     * 
-     * @param sb the StringBuilder to write to
-     */
-    protected abstract void appendValueText(StringBuilder sb);
-
     /**
      * Gets the debug info BIFF record type name (used by {@link #toString()}.
-     * 
+     *
      * @return the record type name
      */
     protected abstract String getRecordName();
 
     /**
      * writes out the value data for this cell record
-     * 
+     *
      * @param out the output
      */
     protected abstract void serializeValue(LittleEndianOutput out);
@@ -137,9 +121,15 @@ public abstract class CellRecord extends StandardRecord implements CellValueReco
         return 6 + getValueDataSize();
     }
 
-    protected final void copyBaseFields(CellRecord rec) {
-        rec._rowIndex = _rowIndex;
-        rec._columnIndex = _columnIndex;
-        rec._formatIndex = _formatIndex;
+    @Override
+    public abstract CellRecord copy();
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "row", this::getRow,
+            "col", this::getColumn,
+            "xfIndex", this::getXFIndex
+        );
     }
 }

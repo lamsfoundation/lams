@@ -27,7 +27,7 @@ import org.apache.poi.ddf.EscherClientDataRecord;
 import org.apache.poi.ddf.EscherComplexProperty;
 import org.apache.poi.ddf.EscherContainerRecord;
 import org.apache.poi.ddf.EscherOptRecord;
-import org.apache.poi.ddf.EscherProperties;
+import org.apache.poi.ddf.EscherPropertyTypes;
 import org.apache.poi.ddf.EscherSimpleProperty;
 import org.apache.poi.ddf.EscherTextboxRecord;
 import org.apache.poi.hssf.model.InternalWorkbook;
@@ -37,23 +37,12 @@ import org.apache.poi.hssf.record.ObjRecord;
 import org.apache.poi.ss.usermodel.ClientAnchor.AnchorType;
 import org.apache.poi.ss.usermodel.Picture;
 import org.apache.poi.ss.util.ImageUtils;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
 import org.apache.poi.util.StringUtil;
 
 /**
  * Represents a escher picture.  Eg. A GIF, JPEG etc...
  */
 public class HSSFPicture extends HSSFSimpleShape implements Picture {
-	@SuppressWarnings("unused")
-    private static POILogger logger = POILogFactory.getLogger(HSSFPicture.class);
-	
-    public static final int PICTURE_TYPE_EMF = HSSFWorkbook.PICTURE_TYPE_EMF;                // Windows Enhanced Metafile
-    public static final int PICTURE_TYPE_WMF = HSSFWorkbook.PICTURE_TYPE_WMF;                // Windows Metafile
-    public static final int PICTURE_TYPE_PICT = HSSFWorkbook.PICTURE_TYPE_PICT;              // Macintosh PICT
-    public static final int PICTURE_TYPE_JPEG = HSSFWorkbook.PICTURE_TYPE_JPEG;              // JFIF
-    public static final int PICTURE_TYPE_PNG = HSSFWorkbook.PICTURE_TYPE_PNG;                // PNG
-    public static final int PICTURE_TYPE_DIB = HSSFWorkbook.PICTURE_TYPE_DIB;                // Windows DIB
 
     public HSSFPicture(EscherContainerRecord spContainer, ObjRecord objRecord) {
         super(spContainer, objRecord);
@@ -72,7 +61,7 @@ public class HSSFPicture extends HSSFSimpleShape implements Picture {
 
     public int getPictureIndex()
     {
-        EscherSimpleProperty property = getOptRecord().lookup(EscherProperties.BLIP__BLIPTODISPLAY);
+        EscherSimpleProperty property = getOptRecord().lookup(EscherPropertyTypes.BLIP__BLIPTODISPLAY);
         if (null == property){
             return -1;
         }
@@ -81,22 +70,23 @@ public class HSSFPicture extends HSSFSimpleShape implements Picture {
 
     public void setPictureIndex( int pictureIndex )
     {
-        setPropertyValue(new EscherSimpleProperty( EscherProperties.BLIP__BLIPTODISPLAY, false, true, pictureIndex));
+        setPropertyValue(new EscherSimpleProperty( EscherPropertyTypes.BLIP__BLIPTODISPLAY, false, true, pictureIndex));
     }
 
     @Override
     protected EscherContainerRecord createSpContainer() {
         EscherContainerRecord spContainer = super.createSpContainer();
         EscherOptRecord opt = spContainer.getChildById(EscherOptRecord.RECORD_ID);
-        opt.removeEscherProperty(EscherProperties.LINESTYLE__LINEDASHING);
-        opt.removeEscherProperty(EscherProperties.LINESTYLE__NOLINEDRAWDASH);
+        assert(opt != null);
+        opt.removeEscherProperty(EscherPropertyTypes.LINESTYLE__LINEDASHING);
+        opt.removeEscherProperty(EscherPropertyTypes.LINESTYLE__NOLINEDRAWDASH);
         spContainer.removeChildRecord(spContainer.getChildById(EscherTextboxRecord.RECORD_ID));
         return spContainer;
     }
 
     /**
      * Reset the image to the dimension of the embedded image
-     * 
+     *
      * <p>
      * Please note, that this method works correctly only for workbooks
      * with default font size (Arial 10pt for .xls).
@@ -117,7 +107,7 @@ public class HSSFPicture extends HSSFSimpleShape implements Picture {
     public void resize(double scale) {
         resize(scale,scale);
     }
-    
+
     /**
      * Resize the image
      * <p>
@@ -129,7 +119,7 @@ public class HSSFPicture extends HSSFSimpleShape implements Picture {
      * <code>resize(1.0,1.0)</code> keeps the original size,<br>
      * <code>resize(0.5,0.5)</code> resize to 50% of the original,<br>
      * <code>resize(2.0,2.0)</code> resizes to 200% of the original.<br>
-     * <code>resize({@link Double#MAX_VALUE},{@link Double#MAX_VALUE})</code> resizes to the dimension of the embedded image. 
+     * <code>resize({@link Double#MAX_VALUE},{@link Double#MAX_VALUE})</code> resizes to the dimension of the embedded image.
      * </p>
      *
      * @param scaleX the amount by which the image width is multiplied relative to the original width.
@@ -175,7 +165,7 @@ public class HSSFPicture extends HSSFSimpleShape implements Picture {
     public HSSFClientAnchor getPreferredSize(double scale){
         return getPreferredSize(scale, scale);
     }
-    
+
     /**
      * Calculate the preferred size for this picture.
      *
@@ -203,7 +193,7 @@ public class HSSFPicture extends HSSFSimpleShape implements Picture {
         int type = bse.getBlipTypeWin32();
         return ImageUtils.getImageDimension(new ByteArrayInputStream(data), type);
     }
-    
+
     /**
      * Return picture data for this shape
      *
@@ -215,7 +205,7 @@ public class HSSFPicture extends HSSFSimpleShape implements Picture {
         if (picIdx == -1) {
             return null;
         }
-        
+
         HSSFPatriarch patriarch = getPatriarch();
         HSSFShape parent = getParent();
         while(patriarch == null && parent != null) {
@@ -247,17 +237,17 @@ public class HSSFPicture extends HSSFSimpleShape implements Picture {
      * The filename of the embedded image
      */
     public String getFileName() {
-        EscherComplexProperty propFile = (EscherComplexProperty) getOptRecord().lookup(
-                      EscherProperties.BLIP__BLIPFILENAME);
+        EscherComplexProperty propFile = getOptRecord().lookup(EscherPropertyTypes.BLIP__BLIPFILENAME);
         return (null == propFile)
             ? ""
             : StringUtil.getFromUnicodeLE(propFile.getComplexData()).trim();
     }
-    
+
     public void setFileName(String data){
-        // TODO: add trailing \u0000? 
-        byte bytes[] = StringUtil.getToUnicodeLE(data);
-        EscherComplexProperty prop = new EscherComplexProperty(EscherProperties.BLIP__BLIPFILENAME, true, bytes);
+        // TODO: add trailing \u0000?
+        byte[] bytes = StringUtil.getToUnicodeLE(data);
+        EscherComplexProperty prop = new EscherComplexProperty(EscherPropertyTypes.BLIP__BLIPFILENAME, true, bytes.length);
+        prop.setComplexData(bytes);
         setPropertyValue(prop);
     }
 
@@ -274,7 +264,7 @@ public class HSSFPicture extends HSSFSimpleShape implements Picture {
         ObjRecord obj = (ObjRecord) getObjRecord().cloneViaReserialise();
         return new HSSFPicture(spContainer, obj);
     }
-    
+
     /**
      * @return the anchor that is used by this picture.
      */
@@ -284,7 +274,7 @@ public class HSSFPicture extends HSSFSimpleShape implements Picture {
         return (a instanceof HSSFClientAnchor) ? (HSSFClientAnchor)a : null;
     }
 
-    
+
     /**
      * @return the sheet which contains the picture shape
      */

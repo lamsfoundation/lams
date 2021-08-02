@@ -21,66 +21,71 @@ package org.apache.poi.util;
  * A logger interface that strives to make it as easy as possible for
  * developers to write log calls, while simultaneously making those
  * calls as cheap as possible by performing lazy evaluation of the log
- * message.<p>
+ * message.
+ *
+ * A logger can be selected via system properties, e.g.
+ * <code>
+ *     -Dorg.apache.poi.util.POILogger=org.apache.poi.util.SystemOutLogger
+ * </code>
+ *
+ * The following Logger-implementations are provided:
+ *
+ * <ul>
+ *     <li>NullLogger</li>
+ *     <li>CommonsLogger</li>
+ *     <li>SystemOutLogger</li>
+ * </ul>
  */
 @Internal
-public abstract class POILogger {
+public interface POILogger {
 
-    public static final int DEBUG = 1;
-    public static final int INFO  = 3;
-    public static final int WARN  = 5;
-    public static final int ERROR = 7;
-    public static final int FATAL = 9;
-
-    /** Short strings for numeric log level. Use level as array index. */
-    protected static final String LEVEL_STRINGS_SHORT[] = {"?", "D", "?", "I", "?", "W", "?", "E", "?", "F", "?"};
-    /** Long strings for numeric log level. Use level as array index. */
-    protected static final String LEVEL_STRINGS[] = {"?0?", "DEBUG", "?2?", "INFO", "?4?", "WARN", "?6?", "ERROR", "?8?", "FATAL", "?10+?"};
-
+    int DEBUG = 1;
+    int INFO  = 3;
+    int WARN  = 5;
+    int ERROR = 7;
+    int FATAL = 9;
 
     /**
-     * package scope so it cannot be instantiated outside of the util
-     * package. You need a POILogger? Go to the POILogFactory for one
+     * Initialize the Logger - belongs to the SPI, called from the POILogFactory
+     * @param cat the String that defines the log
      */
-    POILogger() {
-        // no fields to initialize
-    }
-
-    abstract public void initialize(String cat);
+    void initialize(String cat);
 
     /**
-     * Log a message
+     * Log a message - belongs to the SPI, usually not called from user code
      *
      * @param level One of DEBUG, INFO, WARN, ERROR, FATAL
      * @param obj1 The object to log.  This is converted to a string.
      */
-    abstract protected void _log(int level, Object obj1);
+    @Internal
+    void _log(int level, Object obj1);
 
     /**
-     * Log a message
+     * Log a message - belongs to the SPI, usually not called from user code
      *
      * @param level One of DEBUG, INFO, WARN, ERROR, FATAL
      * @param obj1 The object to log.  This is converted to a string.
      * @param exception An exception to be logged
      */
-    abstract protected void _log(int level, Object obj1, final Throwable exception);
+    @Internal
+    void _log(int level, Object obj1, final Throwable exception);
 
 
     /**
      * Check if a logger is enabled to log at the specified level
      * This allows code to avoid building strings or evaluating functions in
      * the arguments to log.
-     * 
+     *
      * An example:
      * <code><pre>
      * if (logger.check(POILogger.INFO)) {
-     *     logger.log(POILogger.INFO, "Avoid concatenating " + " strings and evaluating " + functions());
+     *     logger.log(POILogger.INFO, "Avoid concatenating ", " strings and evaluating ", functions());
      * }
      * </pre></code>
      *
      * @param level One of DEBUG, INFO, WARN, ERROR, FATAL
      */
-    abstract public boolean check(int level);
+    boolean check(int level);
 
    /**
      * Log a message. Lazily appends Object parameters together.
@@ -89,23 +94,31 @@ public abstract class POILogger {
      * @param level One of DEBUG, INFO, WARN, ERROR, FATAL
      * @param objs the objects to place in the message
      */
-    public void log(int level, Object... objs) {
+    default void log(int level, Object... objs) {
         if (!check(level)) return;
-        StringBuilder sb = new StringBuilder(32);
         Throwable lastEx = null;
-        for (int i=0; i<objs.length; i++) {
-            if (i == objs.length-1 && objs[i] instanceof Throwable) {
-                lastEx = (Throwable)objs[i];
-            } else {
-                sb.append(objs[i]);
+        String msg;
+        if (objs.length == 0) {
+            msg = "";
+        } else if (objs.length == 1) {
+            if (objs[0] instanceof Throwable) {
+                lastEx = (Throwable)objs[0];
             }
+            msg = objs[0].toString();
+        } else {
+            StringBuilder sb = new StringBuilder(32);
+            for (int i=0; i<objs.length; i++) {
+                if (i == objs.length-1 && objs[i] instanceof Throwable) {
+                    lastEx = (Throwable)objs[i];
+                } else {
+                    sb.append(objs[i]);
+                }
+            }
+            msg = sb.toString();
         }
-        
-        String msg = sb.toString();
-        msg = msg.replaceAll("[\r\n]+", " ");  // log forging escape
-        
-        // somehow this ambiguity works and doesn't lead to a loop,
-        // but it's confusing ...
+        // log forging escape
+        msg = msg.replaceAll("[\r\n]+", " ");
+
         if (lastEx == null) {
             _log(level, msg);
         } else {

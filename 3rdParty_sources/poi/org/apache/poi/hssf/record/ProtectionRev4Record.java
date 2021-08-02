@@ -17,18 +17,19 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.util.BitField;
 import org.apache.poi.util.BitFieldFactory;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        Protection Revision 4 Record (0x01AF)<p>
- * Description:  describes whether this is a protected shared/tracked workbook<p>
- * REFERENCE:  PG 373 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)
+ * Describes whether this is a protected shared/tracked workbook<p>
  */
 public final class ProtectionRev4Record extends StandardRecord {
-    public final static short sid = 0x01AF;
+    public static final short sid = 0x01AF;
 
     private static final BitField protectedFlag = BitFieldFactory.getInstance(0x0001);
 
@@ -36,6 +37,11 @@ public final class ProtectionRev4Record extends StandardRecord {
 
     private ProtectionRev4Record(int options) {
         _options = options;
+    }
+
+    private ProtectionRev4Record(ProtectionRev4Record other) {
+        super(other);
+        _options = other._options;
     }
 
     public ProtectionRev4Record(boolean protect) {
@@ -63,15 +69,6 @@ public final class ProtectionRev4Record extends StandardRecord {
         return protectedFlag.isSet(_options);
     }
 
-    public String toString() {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[PROT4REV]\n");
-        buffer.append("    .options = ").append(HexDump.shortToHex(_options)).append("\n");
-        buffer.append("[/PROT4REV]\n");
-        return buffer.toString();
-    }
-
     public void serialize(LittleEndianOutput out) {
         out.writeShort(_options);
     }
@@ -82,5 +79,24 @@ public final class ProtectionRev4Record extends StandardRecord {
 
     public short getSid() {
         return sid;
+    }
+
+    @Override
+    public ProtectionRev4Record copy() {
+        return new ProtectionRev4Record(this);
+    }
+
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.PROTECTION_REV_4;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "options", () -> _options,
+            "protect", this::getProtect
+        );
     }
 }

@@ -17,7 +17,15 @@
 
 package org.apache.poi.hssf.record;
 
-import org.apache.poi.util.HexDump;
+import java.io.IOException;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.common.usermodel.GenericRecord;
+import org.apache.poi.util.GenericRecordJsonWriter;
+import org.apache.poi.util.GenericRecordUtil;
+import org.apache.poi.util.IOUtils;
+import org.apache.poi.util.RecordFormatException;
 
 /**
  * Title:        Bound Sheet Record (aka BundleSheet) (0x0085) for BIFF 5<P>
@@ -25,13 +33,17 @@ import org.apache.poi.util.HexDump;
  *               and tells where the Beginning of file record is within the HSSF
  *               file.
  */
-public final class OldSheetRecord {
-    public final static short sid = 0x0085;
+public final class OldSheetRecord implements GenericRecord {
 
-    private int field_1_position_of_BOF;
-    private int field_2_visibility;
-    private int field_3_type;
-    private byte[] field_5_sheetname;
+    //arbitrarily selected; may need to increase
+    private static final int MAX_RECORD_LENGTH = 100_000;
+
+    public static final short sid = 0x0085;
+
+    private final int field_1_position_of_BOF;
+    private final int field_2_visibility;
+    private final int field_3_type;
+    private final byte[] field_5_sheetname;
     private CodepageRecord codepage;
 
     public OldSheetRecord(RecordInputStream in) {
@@ -39,7 +51,20 @@ public final class OldSheetRecord {
         field_2_visibility = in.readUByte();
         field_3_type = in.readUByte();
         int field_4_sheetname_length = in.readUByte();
-        field_5_sheetname = new byte[field_4_sheetname_length];
+        if (field_4_sheetname_length > 0) {
+            in.mark(1);
+            byte b = in.readByte();
+            // if the sheet name starts with a 0, we need to skip one byte, otherwise the following records will
+            // fail with a LeftOverDataException
+            if (b != 0) {
+                try {
+                    in.reset();
+                } catch (IOException e) {
+                    throw new RecordFormatException(e);
+                }
+            }
+        }
+        field_5_sheetname = IOUtils.safelyAllocate(field_4_sheetname_length, MAX_RECORD_LENGTH);
         in.read(field_5_sheetname, 0, field_4_sheetname_length);
     }
 
@@ -68,15 +93,22 @@ public final class OldSheetRecord {
         return OldStringRecord.getString(field_5_sheetname, codepage);
     }
 
-    public String toString() {
-        StringBuffer buffer = new StringBuffer();
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.BOUND_SHEET;
+    }
 
-        buffer.append("[BOUNDSHEET]\n");
-        buffer.append("    .bof        = ").append(HexDump.intToHex(getPositionOfBof())).append("\n");
-        buffer.append("    .visibility = ").append(HexDump.shortToHex(field_2_visibility)).append("\n");
-        buffer.append("    .type       = ").append(HexDump.byteToHex(field_3_type)).append("\n");
-        buffer.append("    .sheetname  = ").append(getSheetname()).append("\n");
-        buffer.append("[/BOUNDSHEET]\n");
-        return buffer.toString();
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "bof", this::getPositionOfBof,
+            "visibility", () -> field_2_visibility,
+            "type", () -> field_3_type,
+            "sheetName", this::getSheetname
+        );
+    }
+
+    public String toString() {
+        return GenericRecordJsonWriter.marshal(this);
     }
 }

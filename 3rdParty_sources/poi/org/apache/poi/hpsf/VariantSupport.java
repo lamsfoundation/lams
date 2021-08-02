@@ -25,19 +25,18 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.poi.util.CodePageUtil;
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.LittleEndian;
 import org.apache.poi.util.LittleEndianByteArrayInputStream;
 import org.apache.poi.util.LittleEndianConsts;
 import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
-import org.apache.poi.util.Removal;
 
 /**
  * Supports reading and writing of variant data.<p>
  *
  * <strong>FIXME (3):</strong> Reading and writing should be made more
- * uniform than it is now. The following items should be resolved:<p>
+ * uniform than it is now. The following items should be resolved:
  *
  * <ul>
  *
@@ -58,8 +57,11 @@ public class VariantSupport extends Variant {
             Variant.VT_FILETIME, Variant.VT_LPSTR, Variant.VT_LPWSTR,
             Variant.VT_CF, Variant.VT_BOOL };
 
-    
+
     private static final POILogger logger = POILogFactory.getLogger(VariantSupport.class);
+    //arbitrarily selected; may need to increase
+    private static final int MAX_RECORD_LENGTH = 100_000;
+
     private static boolean logUnsupportedTypes;
 
     /**
@@ -67,10 +69,10 @@ public class VariantSupport extends Variant {
      * been issued for.
      */
     private static List<Long> unsupportedMessage;
-    
+
     private static final byte[] paddingBytes = new byte[3];
 
-    
+
     /**
      * Specifies whether warnings about unsupported variant types are to be
      * written to {@code System.err} or not.
@@ -107,7 +109,7 @@ public class VariantSupport extends Variant {
         if (isLogUnsupportedTypes())
         {
             if (unsupportedMessage == null) {
-                unsupportedMessage = new LinkedList<Long>();
+                unsupportedMessage = new LinkedList<>();
             }
             Long vt = Long.valueOf(ex.getVariantType());
             if (!unsupportedMessage.contains(vt))
@@ -164,7 +166,7 @@ public class VariantSupport extends Variant {
         LittleEndianByteArrayInputStream lei = new LittleEndianByteArrayInputStream(src, offset);
         return read( lei, length, type, codepage );
     }
-        
+
     public static Object read( LittleEndianByteArrayInputStream lei,
             final int length, final long type, final int codepage )
     throws ReadingNotSupportedException, UnsupportedEncodingException {
@@ -173,10 +175,12 @@ public class VariantSupport extends Variant {
         try {
             typedPropertyValue.readValue(lei);
         } catch ( UnsupportedOperationException exc ) {
-            int propLength = Math.min( length, lei.available() );
-            final byte[] v = new byte[propLength];
-            lei.readFully(v, 0, propLength);
-            throw new ReadingNotSupportedException( type, v );
+            try {
+                final byte[] v = IOUtils.toByteArray(lei, length, MAX_RECORD_LENGTH);
+                throw new ReadingNotSupportedException( type, v );
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         switch ( (int) type ) {
@@ -229,7 +233,7 @@ public class VariantSupport extends Variant {
              *
              * August 20, 2009
              */
-            // l1 = LittleEndian.getInt(src, o1); o1 += LittleEndian.INT_SIZE;
+            // l1 = LittleEndian.getInt(src, o1); o1 += LittleEndianConts.INT_SIZE;
             // }
             // final byte[] v = new byte[l1];
             // System.arraycopy(src, o1, v, 0, v.length);
@@ -242,7 +246,7 @@ public class VariantSupport extends Variant {
             case Variant.VT_BOOL:
                 VariantBool bool = (VariantBool) typedPropertyValue.getValue();
                 return bool.getValue();
-                
+
             /*
              * it is not very good, but what can do without breaking current
              * API? --sergey
@@ -250,36 +254,11 @@ public class VariantSupport extends Variant {
             default:
                 final int unpadded = lei.getReadIndex()-offset;
                 lei.setReadIndex(offset);
-                final byte[] v = new byte[unpadded];
+                final byte[] v = IOUtils.safelyAllocate(unpadded, MAX_RECORD_LENGTH);
                 lei.readFully( v, 0, unpadded );
                 throw new ReadingNotSupportedException( type, v );
         }
     }
-
-    /**
-     * Turns a codepage number into the equivalent character encoding's
-     * name.
-     *
-     * @param codepage The codepage number
-     *
-     * @return The character encoding's name. If the codepage number is 65001,
-     * the encoding name is "UTF-8". All other positive numbers are mapped to
-     * "cp" followed by the number, e.g. if the codepage number is 1252 the
-     * returned character encoding name will be "cp1252".
-     *
-     * @exception UnsupportedEncodingException if the specified codepage is
-     * less than zero.
-     *
-     * @deprecated POI 3.16 - use {@link CodePageUtil#codepageToEncoding(int)}
-     */
-    @Deprecated
-    @Removal(version="3.18")
-    public static String codepageToEncoding(final int codepage)
-    throws UnsupportedEncodingException
-    {
-        return CodePageUtil.codepageToEncoding(codepage);
-    }
-
 
     /**
      * Writes a variant value to an output stream. This method ensures that
@@ -380,7 +359,7 @@ public class VariantSupport extends Variant {
                     if (bi.bitLength() > 64) {
                         throw new WritingNotSupportedException(type, value);
                     }
-                    
+
                     byte[] biBytesBE = bi.toByteArray(), biBytesLE = new byte[LittleEndianConsts.LONG_SIZE];
                     int i=biBytesBE.length;
                     for (byte b : biBytesBE) {
@@ -389,7 +368,7 @@ public class VariantSupport extends Variant {
                         }
                         i--;
                     }
-    
+
                     out.write(biBytesLE);
                     length = LittleEndianConsts.LONG_SIZE;
                 }
@@ -404,7 +383,7 @@ public class VariantSupport extends Variant {
                 }
                 break;
             }
-            
+
             case Variant.VT_R8:
                 if (value instanceof Number) {
                     LittleEndian.putDouble( ((Number)value).doubleValue(), out);
@@ -433,7 +412,7 @@ public class VariantSupport extends Variant {
                 throw new WritingNotSupportedException(type, value);
             }
         }
-        
+
         /* pad values to 4-bytes */
         int padding = (4-(length & 0x3)) & 0x3;
         out.write(paddingBytes, 0, padding);

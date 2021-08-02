@@ -15,37 +15,40 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-        
+
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        Country Record (aka WIN.INI country)<P>
- * Description:  used for localization.  Currently HSSF always sets this to 1
- * and it seems to work fine even in Germany.  (es geht's auch fuer Deutschland)<P>
+ * Country Record (aka WIN.INI country) - used for localization<p>
  *
- * REFERENCE:  PG 298 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)<P>
- * @author Andrew C. Oliver (acoliver at apache dot org)
+ * Currently HSSF always sets this to 1 and it seems to work fine even in Germany.
+ *
  * @version 2.0-pre
  */
 
-public final class CountryRecord
-    extends StandardRecord
-{
-    public final static short sid = 0x8c;
+public final class CountryRecord extends StandardRecord {
+    public static final short sid = 0x8c;
 
     // 1 for US
-    private short             field_1_default_country;
-    private short             field_2_current_country;
+    private short field_1_default_country;
+    private short field_2_current_country;
 
-    public CountryRecord()
-    {
+    public CountryRecord() {}
+
+    public CountryRecord(CountryRecord other) {
+        super(other);
+        field_1_default_country = other.field_1_default_country;
+        field_2_current_country = other.field_2_current_country;
     }
 
-    public CountryRecord(RecordInputStream in)
-    {
+    public CountryRecord(RecordInputStream in) {
         field_1_default_country = in.readShort();
         field_2_current_country = in.readShort();
     }
@@ -94,19 +97,6 @@ public final class CountryRecord
         return field_2_current_country;
     }
 
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[COUNTRY]\n");
-        buffer.append("    .defaultcountry  = ")
-            .append(Integer.toHexString(getDefaultCountry())).append("\n");
-        buffer.append("    .currentcountry  = ")
-            .append(Integer.toHexString(getCurrentCountry())).append("\n");
-        buffer.append("[/COUNTRY]\n");
-        return buffer.toString();
-    }
-
     public void serialize(LittleEndianOutput out) {
         out.writeShort(getDefaultCountry());
         out.writeShort(getCurrentCountry());
@@ -119,5 +109,23 @@ public final class CountryRecord
     public short getSid()
     {
         return sid;
+    }
+
+    @Override
+    public CountryRecord copy() {
+        return new CountryRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.COUNTRY;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "defaultCountry", this::getDefaultCountry,
+            "currentCountry", this::getCurrentCountry
+        );
     }
 }

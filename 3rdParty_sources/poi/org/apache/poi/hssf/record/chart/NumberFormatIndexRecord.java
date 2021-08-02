@@ -17,41 +17,32 @@
 
 package org.apache.poi.hssf.record.chart;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * The number format index record indexes format table. This applies to an axis.
  */
-public final class NumberFormatIndexRecord extends StandardRecord implements Cloneable {
-    public final static short      sid                             = 0x104E;
-    private  short      field_1_formatIndex;
+public final class NumberFormatIndexRecord extends StandardRecord {
+    public static final short sid = 0x104E;
 
+    private short field_1_formatIndex;
 
-    public NumberFormatIndexRecord()
-    {
+    public NumberFormatIndexRecord() { }
 
+    public NumberFormatIndexRecord(NumberFormatIndexRecord other) {
+        super(other);
+        field_1_formatIndex = other.field_1_formatIndex;
     }
 
-    public NumberFormatIndexRecord(RecordInputStream in)
-    {
-        field_1_formatIndex            = in.readShort();
-    }
-
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[IFMT]\n");
-        buffer.append("    .formatIndex          = ")
-            .append("0x").append(HexDump.toHex(  getFormatIndex ()))
-            .append(" (").append( getFormatIndex() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-
-        buffer.append("[/IFMT]\n");
-        return buffer.toString();
+    public NumberFormatIndexRecord(RecordInputStream in) {
+        field_1_formatIndex = in.readShort();
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -68,15 +59,9 @@ public final class NumberFormatIndexRecord extends StandardRecord implements Clo
     }
 
     @Override
-    public NumberFormatIndexRecord clone() {
-        NumberFormatIndexRecord rec = new NumberFormatIndexRecord();
-    
-        rec.field_1_formatIndex = field_1_formatIndex;
-        return rec;
+    public NumberFormatIndexRecord copy() {
+        return new NumberFormatIndexRecord(this);
     }
-
-
-
 
     /**
      * Get the format index field for the NumberFormatIndex record.
@@ -92,5 +77,15 @@ public final class NumberFormatIndexRecord extends StandardRecord implements Clo
     public void setFormatIndex(short field_1_formatIndex)
     {
         this.field_1_formatIndex = field_1_formatIndex;
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.NUMBER_FORMAT_INDEX;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties("formatIndex", this::getFormatIndex);
     }
 }

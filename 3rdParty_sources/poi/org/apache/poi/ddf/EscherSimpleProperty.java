@@ -17,7 +17,11 @@
 
 package org.apache.poi.ddf;
 
-import org.apache.poi.util.HexDump;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndian;
 
 /**
@@ -25,34 +29,55 @@ import org.apache.poi.util.LittleEndian;
  * to a 32-bit value.  Properties that can't be stored in only 32-bits are
  * stored as EscherComplexProperty objects.
  */
-public class EscherSimpleProperty extends EscherProperty
-{
-    private int propertyValue;
+public class EscherSimpleProperty extends EscherProperty {
+    private final int propertyValue;
 
     /**
      * The id is distinct from the actual property number.  The id includes the property number the blip id
      * flag and an indicator whether the property is complex or not.
-     * 
+     *
      * @param id the property id
      * @param propertyValue the property value
      */
-    public EscherSimpleProperty( short id, int propertyValue )
-    {
+    public EscherSimpleProperty( short id, int propertyValue ) {
         super( id );
         this.propertyValue = propertyValue;
     }
 
     /**
+     * The id is distinct from the actual property number.  The id includes the property number the blip id
+     * flag and an indicator whether the property is complex or not.
+     *
+     * @param type the property type
+     * @param propertyValue the property value
+     */
+    public EscherSimpleProperty( EscherPropertyTypes type, int propertyValue ) {
+        this(type, false, false, propertyValue);
+    }
+
+    /**
      * Constructs a new escher property.  The three parameters are combined to form a property id.
-     * 
+     *
      * @param propertyNumber the property number
      * @param isComplex true, if its a complex property
      * @param isBlipId true, if its a blip
      * @param propertyValue the property value
      */
-    public EscherSimpleProperty( short propertyNumber, boolean isComplex, boolean isBlipId, int propertyValue )
-    {
+    public EscherSimpleProperty( short propertyNumber, boolean isComplex, boolean isBlipId, int propertyValue ) {
         super( propertyNumber, isComplex, isBlipId );
+        this.propertyValue = propertyValue;
+    }
+
+    /**
+     * Constructs a new escher property.  The three parameters are combined to form a property id.
+     *
+     * @param type one of the defined property types
+     * @param isComplex true, if its a complex property
+     * @param isBlipId true, if its a blip
+     * @param propertyValue the property value
+     */
+    public EscherSimpleProperty( EscherPropertyTypes type, boolean isComplex, boolean isBlipId, int propertyValue ) {
+        super( type, isComplex, isBlipId );
         this.propertyValue = propertyValue;
     }
 
@@ -117,32 +142,15 @@ public class EscherSimpleProperty extends EscherProperty
      * require the use of such things.
      */
     @Override
-    public int hashCode()
-    {
-        return propertyValue;
-    }
-
-    /**
-     * @return the string representation of this property.
-     */
-    @Override
-    public String toString()
-    {
-        return "propNum: " + getPropertyNumber()
-                + ", RAW: 0x" + HexDump.toHex( getId() )
-                + ", propName: " + EscherProperties.getPropertyName( getPropertyNumber() )
-                + ", complex: " + isComplex()
-                + ", blipId: " + isBlipId()
-                + ", value: " + propertyValue + " (0x" + HexDump.toHex(propertyValue) + ")";
+    public int hashCode() {
+        return Objects.hash(propertyValue, getId());
     }
 
     @Override
-    public String toXml(String tab){
-        StringBuilder builder = new StringBuilder();
-        builder.append(tab).append("<").append(getClass().getSimpleName()).append(" id=\"0x").append(HexDump.toHex(getId()))
-                .append("\" name=\"").append(getName()).append("\" blipId=\"")
-                .append(isBlipId()).append("\" complex=\"").append(isComplex()).append("\" value=\"").append("0x")
-                .append(HexDump.toHex(propertyValue)).append("\"/>");
-        return builder.toString();
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "base", super::getGenericProperties,
+            "value", this::getPropertyValue
+        );
     }
 }

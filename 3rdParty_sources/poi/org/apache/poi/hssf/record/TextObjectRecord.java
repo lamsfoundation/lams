@@ -17,6 +17,11 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.hssf.record.cont.ContinuableRecord;
 import org.apache.poi.hssf.record.cont.ContinuableRecordOutput;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
@@ -24,7 +29,6 @@ import org.apache.poi.ss.formula.ptg.OperandPtg;
 import org.apache.poi.ss.formula.ptg.Ptg;
 import org.apache.poi.util.BitField;
 import org.apache.poi.util.BitFieldFactory;
-import org.apache.poi.util.HexDump;
 import org.apache.poi.util.RecordFormatException;
 
 /**
@@ -34,7 +38,7 @@ import org.apache.poi.util.RecordFormatException;
  * contains the formatting runs.
  */
 public final class TextObjectRecord extends ContinuableRecord {
-	public final static short sid = 0x01B6;
+	public static final short sid = 0x01B6;
 
 	private static final int FORMAT_RUN_ENCODED_SIZE = 8; // 2 shorts and 4 bytes reserved
 
@@ -42,19 +46,19 @@ public final class TextObjectRecord extends ContinuableRecord {
 	private static final BitField VerticalTextAlignment = BitFieldFactory.getInstance(0x0070);
 	private static final BitField textLocked = BitFieldFactory.getInstance(0x0200);
 
-	public final static short HORIZONTAL_TEXT_ALIGNMENT_LEFT_ALIGNED = 1;
-	public final static short HORIZONTAL_TEXT_ALIGNMENT_CENTERED = 2;
-	public final static short HORIZONTAL_TEXT_ALIGNMENT_RIGHT_ALIGNED = 3;
-	public final static short HORIZONTAL_TEXT_ALIGNMENT_JUSTIFIED = 4;
-	public final static short VERTICAL_TEXT_ALIGNMENT_TOP = 1;
-	public final static short VERTICAL_TEXT_ALIGNMENT_CENTER = 2;
-	public final static short VERTICAL_TEXT_ALIGNMENT_BOTTOM = 3;
-	public final static short VERTICAL_TEXT_ALIGNMENT_JUSTIFY = 4;
+	public static final short HORIZONTAL_TEXT_ALIGNMENT_LEFT_ALIGNED = 1;
+	public static final short HORIZONTAL_TEXT_ALIGNMENT_CENTERED = 2;
+	public static final short HORIZONTAL_TEXT_ALIGNMENT_RIGHT_ALIGNED = 3;
+	public static final short HORIZONTAL_TEXT_ALIGNMENT_JUSTIFIED = 4;
+	public static final short VERTICAL_TEXT_ALIGNMENT_TOP = 1;
+	public static final short VERTICAL_TEXT_ALIGNMENT_CENTER = 2;
+	public static final short VERTICAL_TEXT_ALIGNMENT_BOTTOM = 3;
+	public static final short VERTICAL_TEXT_ALIGNMENT_JUSTIFY = 4;
 
-	public final static short TEXT_ORIENTATION_NONE = 0;
-	public final static short TEXT_ORIENTATION_TOP_TO_BOTTOM = 1;
-	public final static short TEXT_ORIENTATION_ROT_RIGHT = 2;
-	public final static short TEXT_ORIENTATION_ROT_LEFT = 3;
+	public static final short TEXT_ORIENTATION_NONE = 0;
+	public static final short TEXT_ORIENTATION_TOP_TO_BOTTOM = 1;
+	public static final short TEXT_ORIENTATION_ROT_RIGHT = 2;
+	public static final short TEXT_ORIENTATION_ROT_LEFT = 3;
 
 	private int field_1_options;
 	private int field_2_textOrientation;
@@ -80,8 +84,24 @@ public final class TextObjectRecord extends ContinuableRecord {
 	 * Value is often the same as the earlier firstColumn byte. */
 	private Byte _unknownPostFormulaByte;
 
-	public TextObjectRecord() {
-		//
+	public TextObjectRecord() {}
+
+	public TextObjectRecord(TextObjectRecord other) {
+		super(other);
+		field_1_options = other.field_1_options;
+		field_2_textOrientation = other.field_2_textOrientation;
+		field_3_reserved4 = other.field_3_reserved4;
+		field_4_reserved5 = other.field_4_reserved5;
+		field_5_reserved6 = other.field_5_reserved6;
+		field_8_reserved7 = other.field_8_reserved7;
+
+		_text = other._text;
+
+		if (other._linkRefPtg != null) {
+			_unknownPreFormulaInt = other._unknownPreFormulaInt;
+			_linkRefPtg = other._linkRefPtg.copy();
+			_unknownPostFormulaByte = other._unknownPostFormulaByte;
+		}
 	}
 
 	public TextObjectRecord(RecordInputStream in) {
@@ -108,11 +128,7 @@ public final class TextObjectRecord extends ContinuableRecord {
 						+ " tokens but expected exactly 1");
 			}
 			_linkRefPtg = (OperandPtg) ptgs[0];
-			if (in.remaining() > 0) {
-				_unknownPostFormulaByte = Byte.valueOf(in.readByte());
-			} else {
-				_unknownPostFormulaByte = null;
-			}
+			_unknownPostFormulaByte = in.remaining() > 0 ? in.readByte() : null;
 		} else {
 			_linkRefPtg = null;
 		}
@@ -178,7 +194,7 @@ public final class TextObjectRecord extends ContinuableRecord {
 			out.writeInt(_unknownPreFormulaInt);
 			_linkRefPtg.write(out);
 			if (_unknownPostFormulaByte != null) {
-				out.writeByte(_unknownPostFormulaByte.byteValue());
+				out.writeByte(_unknownPostFormulaByte);
 			}
 		}
 	}
@@ -221,6 +237,8 @@ public final class TextObjectRecord extends ContinuableRecord {
 
 	/**
 	 * Sets the Horizontal text alignment field value.
+	 *
+	 * @param value The horizontal alignment, use one of the HORIZONTAL_TEXT_ALIGNMENT_... constants in this class
 	 */
 	public void setHorizontalTextAlignment(int value) {
 		field_1_options = HorizontalTextAlignment.setValue(field_1_options, value);
@@ -235,6 +253,8 @@ public final class TextObjectRecord extends ContinuableRecord {
 
 	/**
 	 * Sets the Vertical text alignment field value.
+	 *
+	 * @param value The vertical alignment, use one of the VERTIUCAL_TEST_ALIGNMENT_... constants in this class
 	 */
 	public void setVerticalTextAlignment(int value) {
 		field_1_options = VerticalTextAlignment.setValue(field_1_options, value);
@@ -249,6 +269,8 @@ public final class TextObjectRecord extends ContinuableRecord {
 
 	/**
 	 * Sets the text locked field value.
+	 *
+	 * @param value If the text should be locked
 	 */
 	public void setTextLocked(boolean value) {
 		field_1_options = textLocked.setBoolean(field_1_options, value);
@@ -294,50 +316,28 @@ public final class TextObjectRecord extends ContinuableRecord {
 		return _linkRefPtg;
 	}
 
-	public String toString() {
-		StringBuffer sb = new StringBuffer();
-
-		sb.append("[TXO]\n");
-		sb.append("    .options        = ").append(HexDump.shortToHex(field_1_options)).append("\n");
-		sb.append("         .isHorizontal = ").append(getHorizontalTextAlignment()).append('\n');
-		sb.append("         .isVertical   = ").append(getVerticalTextAlignment()).append('\n');
-		sb.append("         .textLocked   = ").append(isTextLocked()).append('\n');
-		sb.append("    .textOrientation= ").append(HexDump.shortToHex(getTextOrientation())).append("\n");
-		sb.append("    .reserved4      = ").append(HexDump.shortToHex(field_3_reserved4)).append("\n");
-		sb.append("    .reserved5      = ").append(HexDump.shortToHex(field_4_reserved5)).append("\n");
-		sb.append("    .reserved6      = ").append(HexDump.shortToHex(field_5_reserved6)).append("\n");
-		sb.append("    .textLength     = ").append(HexDump.shortToHex(_text.length())).append("\n");
-		sb.append("    .reserved7      = ").append(HexDump.intToHex(field_8_reserved7)).append("\n");
-
-		sb.append("    .string = ").append(_text).append('\n');
-
-		for (int i = 0; i < _text.numFormattingRuns(); i++) {
-			sb.append("    .textrun = ").append(_text.getFontOfFormattingRun(i)).append('\n');
-
-		}
-		sb.append("[/TXO]\n");
-		return sb.toString();
+	@Override
+	public TextObjectRecord copy() {
+		return new TextObjectRecord(this);
 	}
 
-	public Object clone() {
+	@Override
+	public HSSFRecordTypes getGenericRecordType() {
+		return HSSFRecordTypes.TEXT_OBJECT;
+	}
 
-		TextObjectRecord rec = new TextObjectRecord();
-		rec._text = _text;
-
-		rec.field_1_options = field_1_options;
-		rec.field_2_textOrientation = field_2_textOrientation;
-		rec.field_3_reserved4 = field_3_reserved4;
-		rec.field_4_reserved5 = field_4_reserved5;
-		rec.field_5_reserved6 = field_5_reserved6;
-		rec.field_8_reserved7 = field_8_reserved7;
-
-		rec._text = _text; // clone needed?
-
-		if (_linkRefPtg != null) {
-			rec._unknownPreFormulaInt = _unknownPreFormulaInt;
-			rec._linkRefPtg = _linkRefPtg.copy();
-			rec._unknownPostFormulaByte = _unknownPostFormulaByte;
-		}
-		return rec;
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		final Map<String,Supplier<?>> m = new LinkedHashMap<>();
+		m.put("isHorizontal", this::getHorizontalTextAlignment);
+		m.put("isVertical", this::getVerticalTextAlignment);
+		m.put("textLocked", this::isTextLocked);
+		m.put("textOrientation", this::getTextOrientation);
+		m.put("string", this::getStr);
+		m.put("reserved4", () -> field_3_reserved4);
+		m.put("reserved5", () -> field_4_reserved5);
+		m.put("reserved6", () -> field_5_reserved6);
+		m.put("reserved7", () -> field_8_reserved7);
+		return Collections.unmodifiableMap(m);
 	}
 }

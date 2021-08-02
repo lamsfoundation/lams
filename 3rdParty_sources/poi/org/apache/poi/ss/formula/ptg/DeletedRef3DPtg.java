@@ -18,15 +18,20 @@
 package org.apache.poi.ss.formula.ptg;
 
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.ss.formula.FormulaRenderingWorkbook;
 import org.apache.poi.ss.formula.WorkbookDependentFormula;
 import org.apache.poi.ss.usermodel.FormulaError;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        Deleted Reference 3D Ptg <P>
- * Description:  Defined a cell in extern sheet. <P>
+ * Deleted Reference 3D Ptg<p>
+ * Defined a cell in extern sheet.
+ *
  * @since 1.0-pre
  */
 public final class DeletedRef3DPtg extends OperandPtg implements WorkbookDependentFormula {
@@ -54,6 +59,12 @@ public final class DeletedRef3DPtg extends OperandPtg implements WorkbookDepende
 	public byte getDefaultOperandClass() {
 		return Ptg.CLASS_REF;
 	}
+
+	@Override
+	public byte getSid() {
+		return sid;
+	}
+
 	public int getSize() {
 		return 7;
 	}
@@ -61,5 +72,19 @@ public final class DeletedRef3DPtg extends OperandPtg implements WorkbookDepende
 		out.writeByte(sid + getPtgClass());
 		out.writeShort(field_1_index_extern_sheet);
 		out.writeInt(unused1);
+	}
+
+	@Override
+	public DeletedRef3DPtg copy() {
+		// immutable
+		return this;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"externSheetIndex", () -> field_1_index_extern_sheet,
+			"unused1", () -> unused1
+		);
 	}
 }

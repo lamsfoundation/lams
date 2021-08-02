@@ -17,6 +17,7 @@
 
 package org.apache.poi.util;
 
+import java.io.BufferedInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,12 +30,16 @@ import java.io.InputStream;
  */
 public class LittleEndianInputStream extends FilterInputStream implements LittleEndianInput {
 
+	private static final int BUFFERED_SIZE = 8096;
+
 	private static final int EOF = -1;
+	private int readIndex = 0;
+	private int markIndex = -1;
 
 	public LittleEndianInputStream(InputStream is) {
-		super(is);
+		super(is.markSupported() ? is : new BufferedInputStream(is, BUFFERED_SIZE));
 	}
-	
+
 	@Override
 	@SuppressForbidden("just delegating")
 	public int available() {
@@ -52,7 +57,7 @@ public class LittleEndianInputStream extends FilterInputStream implements Little
 	
 	@Override
 	public int readUByte() {
-		byte buf[] = new byte[1];
+        byte[] buf = new byte[1];
 		try {
 			checkEOF(read(buf), 1);
 		} catch (IOException e) {
@@ -60,7 +65,18 @@ public class LittleEndianInputStream extends FilterInputStream implements Little
 		}
 		return LittleEndian.getUByte(buf);
 	}
-	
+
+	/**
+	 * get a float value, reads it in little endian format
+	 * then converts the resulting revolting IEEE 754 (curse them) floating
+	 * point number to a happy java float
+	 *
+	 * @return the float (32-bit) value
+	 */
+	public float readFloat() {
+		return Float.intBitsToFloat( readInt() );
+	}
+
 	@Override
 	public double readDouble() {
 		return Double.longBitsToDouble(readLong());
@@ -68,7 +84,7 @@ public class LittleEndianInputStream extends FilterInputStream implements Little
 	
 	@Override
 	public int readInt() {
-		byte buf[] = new byte[LittleEndianConsts.INT_SIZE];
+        byte[] buf = new byte[LittleEndianConsts.INT_SIZE];
 		try {
 			checkEOF(read(buf), buf.length);
 		} catch (IOException e) {
@@ -92,7 +108,7 @@ public class LittleEndianInputStream extends FilterInputStream implements Little
 	
 	@Override
 	public long readLong() {
-		byte buf[] = new byte[LittleEndianConsts.LONG_SIZE];
+        byte[] buf = new byte[LittleEndianConsts.LONG_SIZE];
 		try {
 		    checkEOF(read(buf), LittleEndianConsts.LONG_SIZE);
 		} catch (IOException e) {
@@ -108,7 +124,7 @@ public class LittleEndianInputStream extends FilterInputStream implements Little
 	
 	@Override
 	public int readUShort() {
-		byte buf[] = new byte[LittleEndianConsts.SHORT_SIZE];
+        byte[] buf = new byte[LittleEndianConsts.SHORT_SIZE];
 		try {
 		    checkEOF(read(buf), LittleEndianConsts.SHORT_SIZE);
 		} catch (IOException e) {
@@ -137,14 +153,42 @@ public class LittleEndianInputStream extends FilterInputStream implements Little
         }
     }
 
-    //Makes repeated calls to super.read() until length is read or EOF is reached
+	@Override
+	public int read(byte[] b, int off, int len) throws IOException {
+    	int readBytes = super.read(b, off, len);
+		readIndex += readBytes;
+		return readBytes;
+	}
+
+	@Override
+	public synchronized void mark(int readlimit) {
+		super.mark(readlimit);
+		markIndex = readIndex;
+	}
+
+	@Override
+	public synchronized void reset() throws IOException {
+		super.reset();
+		if (markIndex > -1) {
+			readIndex = markIndex;
+			markIndex = -1;
+		}
+	}
+
+	public int getReadIndex() {
+		return readIndex;
+	}
+
+
+
+	//Makes repeated calls to super.read() until length is read or EOF is reached
 	private int _read(byte[] buffer, int offset, int length) throws IOException {
     	//lifted directly from org.apache.commons.io.IOUtils 2.4
 		int remaining = length;
 		while (remaining > 0) {
 			int location = length - remaining;
 			int count = read(buffer, offset + location, remaining);
-			if (EOF == count) { // EOF
+			if (EOF == count) {
 				break;
 			}
 			remaining -= count;
@@ -157,4 +201,16 @@ public class LittleEndianInputStream extends FilterInputStream implements Little
     public void readPlain(byte[] buf, int off, int len) {
         readFully(buf, off, len);
     }
+
+
+	public void skipFully(int len) throws IOException {
+    	if (len == 0) {
+    		return;
+		}
+		long skipped = IOUtils.skipFully(this, len);
+		if (skipped > Integer.MAX_VALUE) {
+			throw new IOException("can't skip further than "+Integer.MAX_VALUE);
+		}
+		checkEOF((int)skipped, len);
+	}
 }

@@ -16,12 +16,16 @@
 ==================================================================== */
 package org.apache.poi.ss.usermodel;
 
-import java.util.*;
+import java.math.RoundingMode;
+import java.text.DateFormatSymbols;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.FieldPosition;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import org.apache.poi.util.LocaleUtil;
-
-import java.math.RoundingMode;
-import java.text.*;
 
 /**
  * A wrapper around a {@link SimpleDateFormat} instance,
@@ -60,7 +64,7 @@ public class ExcelStyleDateFormatter extends SimpleDateFormat {
         DataFormatter.setExcelStyleRoundingMode(format3digit);
         DataFormatter.setExcelStyleRoundingMode(format4digits);
     }
-    
+
     {
         setTimeZone(LocaleUtil.getUserTimeZone());
     }
@@ -87,13 +91,13 @@ public class ExcelStyleDateFormatter extends SimpleDateFormat {
      * with our detection sequences
      */
     private static String processFormatPattern(String f) {
-        String t = f.replaceAll("MMMMM", MMMMM_START_SYMBOL + "MMM" + MMMMM_TRUNCATE_SYMBOL);
-        t = t.replaceAll("\\[H]", String.valueOf(H_BRACKET_SYMBOL));
-        t = t.replaceAll("\\[HH]", String.valueOf(HH_BRACKET_SYMBOL));
-        t = t.replaceAll("\\[m]", String.valueOf(M_BRACKET_SYMBOL));
-        t = t.replaceAll("\\[mm]", String.valueOf(MM_BRACKET_SYMBOL));
-        t = t.replaceAll("\\[s]", String.valueOf(S_BRACKET_SYMBOL));
-        t = t.replaceAll("\\[ss]", String.valueOf(SS_BRACKET_SYMBOL));
+        String t = f.replace("MMMMM", MMMMM_START_SYMBOL + "MMM" + MMMMM_TRUNCATE_SYMBOL);
+        t = t.replace("[H]", String.valueOf(H_BRACKET_SYMBOL));
+        t = t.replace("[HH]", String.valueOf(HH_BRACKET_SYMBOL));
+        t = t.replace("[m]", String.valueOf(M_BRACKET_SYMBOL));
+        t = t.replace("[mm]", String.valueOf(MM_BRACKET_SYMBOL));
+        t = t.replace("[s]", String.valueOf(S_BRACKET_SYMBOL));
+        t = t.replace("[ss]", String.valueOf(SS_BRACKET_SYMBOL));
         t = t.replaceAll("s.000", "s.SSS");
         t = t.replaceAll("s.00", "s." + LL_BRACKET_SYMBOL);
         t = t.replaceAll("s.0", "s." + L_BRACKET_SYMBOL);
@@ -152,7 +156,7 @@ public class ExcelStyleDateFormatter extends SimpleDateFormat {
         }
         if (s.indexOf(S_BRACKET_SYMBOL) != -1 ||
                 s.indexOf(SS_BRACKET_SYMBOL) != -1) {
-            float seconds = (float) (dateToBeFormatted * 24.0 * 60.0 * 60.0);
+            float seconds = (float) (dateToBeFormatted * 24 * 60 * 60);
             s = s.replaceAll(
                     String.valueOf(S_BRACKET_SYMBOL),
                     format1digit.format(seconds)
@@ -165,15 +169,15 @@ public class ExcelStyleDateFormatter extends SimpleDateFormat {
 
         if (s.indexOf(L_BRACKET_SYMBOL) != -1 ||
                 s.indexOf(LL_BRACKET_SYMBOL) != -1) {
-            float millisTemp = (float) ((dateToBeFormatted - Math.floor(dateToBeFormatted)) * 24.0 * 60.0 * 60.0);
+            float millisTemp = (float) ((dateToBeFormatted - Math.floor(dateToBeFormatted)) * 24 * 60 * 60);
             float millis = (millisTemp - (int) millisTemp);
             s = s.replaceAll(
                     String.valueOf(L_BRACKET_SYMBOL),
-                    format3digit.format(millis * 10)
+                    format3digit.format(millis * 10.0)
             );
             s = s.replaceAll(
                     String.valueOf(LL_BRACKET_SYMBOL),
-                    format4digits.format(millis * 100)
+                    format4digits.format(millis * 100.0)
             );
         }
 
@@ -185,13 +189,13 @@ public class ExcelStyleDateFormatter extends SimpleDateFormat {
         if (!(o instanceof ExcelStyleDateFormatter)) {
             return false;
         }
-        
+
         ExcelStyleDateFormatter other = (ExcelStyleDateFormatter) o;
         return dateToBeFormatted == other.dateToBeFormatted;
     }
-    
+
     @Override
     public int hashCode() {
-        return new Double(dateToBeFormatted).hashCode();
+        return Double.valueOf(dateToBeFormatted).hashCode();
     }
 }

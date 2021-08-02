@@ -29,6 +29,11 @@ public abstract class SharedValueRecordBase extends StandardRecord {
 
 	private CellRangeAddress8Bit _range;
 
+	protected SharedValueRecordBase(SharedValueRecordBase other) {
+		super(other);
+		_range = (other._range == null) ? null : other._range.copy();
+	}
+
 	protected SharedValueRecordBase(CellRangeAddress8Bit range) {
 		if (range == null) {
 			throw new IllegalArgumentException("range must be supplied.");
@@ -42,6 +47,8 @@ public abstract class SharedValueRecordBase extends StandardRecord {
 
 	/**
 	 * reads only the range (1 {@link CellRangeAddress8Bit}) from the stream
+	 *
+	 * @param in The interface for reading the record data.
 	 */
 	public SharedValueRecordBase(LittleEndianInput in) {
 		_range = new CellRangeAddress8Bit(in);
@@ -86,9 +93,9 @@ public abstract class SharedValueRecordBase extends StandardRecord {
 	/**
      * @param rowIx the row index
      * @param colIx the column index
-     * 
+     *
 	 * @return {@code true} if (rowIx, colIx) is within the range of this shared value object.
-     * 
+     *
      * @see #getRange()
 	 */
 	public final boolean isInRange(int rowIx, int colIx) {
@@ -99,14 +106,12 @@ public abstract class SharedValueRecordBase extends StandardRecord {
 			&& r.getLastColumn() >= colIx;
 	}
 	/**
-	 * @return {@code true} if (rowIx, colIx) describes the first cell in this shared value
-	 * object's range
-	 * 
 	 * @param rowIx the row index
 	 * @param colIx the column index
-	 * 
-	 * @return {@code true} if its the first cell in this shared value object range
-	 * 
+	 *
+	 * @return {@code true} if (rowIx, colIx) describes the first cell in this shared value
+	 * object's range
+	 *
 	 * @see #getRange()
 	 */
 	public final boolean isFirstCell(int rowIx, int colIx) {

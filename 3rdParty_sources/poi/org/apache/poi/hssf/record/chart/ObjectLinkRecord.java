@@ -17,59 +17,46 @@
 
 package org.apache.poi.hssf.record.chart;
 
+import static org.apache.poi.util.GenericRecordUtil.getEnumBitsAsString;
+
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * Links text to an object on the chart or identifies it as the title.
  */
-public final class ObjectLinkRecord extends StandardRecord implements Cloneable {
-    public final static short      sid                             = 0x1027;
-    private  short      field_1_anchorId;
-    public final static short       ANCHOR_ID_CHART_TITLE          = 1;
-    public final static short       ANCHOR_ID_Y_AXIS               = 2;
-    public final static short       ANCHOR_ID_X_AXIS               = 3;
-    public final static short       ANCHOR_ID_SERIES_OR_POINT      = 4;
-    public final static short       ANCHOR_ID_Z_AXIS               = 7;
-    private  short      field_2_link1;
-    private  short      field_3_link2;
+public final class ObjectLinkRecord extends StandardRecord {
+    public static final short sid                            = 0x1027;
 
+    public static final short ANCHOR_ID_CHART_TITLE          = 1;
+    public static final short ANCHOR_ID_Y_AXIS               = 2;
+    public static final short ANCHOR_ID_X_AXIS               = 3;
+    public static final short ANCHOR_ID_SERIES_OR_POINT      = 4;
+    public static final short ANCHOR_ID_Z_AXIS               = 7;
 
-    public ObjectLinkRecord()
-    {
+    private short field_1_anchorId;
+    private short field_2_link1;
+    private short field_3_link2;
 
+    public ObjectLinkRecord() {}
+
+    public ObjectLinkRecord(ObjectLinkRecord other) {
+        super(other);
+        field_1_anchorId = other.field_1_anchorId;
+        field_2_link1 = other.field_2_link1;
+        field_3_link2 = other.field_3_link2;
     }
 
-    public ObjectLinkRecord(RecordInputStream in)
-    {
-        field_1_anchorId               = in.readShort();
-        field_2_link1                  = in.readShort();
-        field_3_link2                  = in.readShort();
-
-    }
-
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[OBJECTLINK]\n");
-        buffer.append("    .anchorId             = ")
-            .append("0x").append(HexDump.toHex(  getAnchorId ()))
-            .append(" (").append( getAnchorId() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-        buffer.append("    .link1                = ")
-            .append("0x").append(HexDump.toHex(  getLink1 ()))
-            .append(" (").append( getLink1() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-        buffer.append("    .link2                = ")
-            .append("0x").append(HexDump.toHex(  getLink2 ()))
-            .append(" (").append( getLink2() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-
-        buffer.append("[/OBJECTLINK]\n");
-        return buffer.toString();
+    public ObjectLinkRecord(RecordInputStream in) {
+        field_1_anchorId = in.readShort();
+        field_2_link1 = in.readShort();
+        field_3_link2 = in.readShort();
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -88,22 +75,14 @@ public final class ObjectLinkRecord extends StandardRecord implements Cloneable 
     }
 
     @Override
-    public ObjectLinkRecord clone() {
-        ObjectLinkRecord rec = new ObjectLinkRecord();
-    
-        rec.field_1_anchorId = field_1_anchorId;
-        rec.field_2_link1 = field_2_link1;
-        rec.field_3_link2 = field_3_link2;
-        return rec;
+    public ObjectLinkRecord copy() {
+        return new ObjectLinkRecord(this);
     }
-
-
-
 
     /**
      * Get the anchor id field for the ObjectLink record.
      *
-     * @return  One of 
+     * @return  One of
      *        ANCHOR_ID_CHART_TITLE
      *        ANCHOR_ID_Y_AXIS
      *        ANCHOR_ID_X_AXIS
@@ -119,7 +98,7 @@ public final class ObjectLinkRecord extends StandardRecord implements Cloneable 
      * Set the anchor id field for the ObjectLink record.
      *
      * @param field_1_anchorId
-     *        One of 
+     *        One of
      *        ANCHOR_ID_CHART_TITLE
      *        ANCHOR_ID_Y_AXIS
      *        ANCHOR_ID_X_AXIS
@@ -161,5 +140,21 @@ public final class ObjectLinkRecord extends StandardRecord implements Cloneable 
     public void setLink2(short field_3_link2)
     {
         this.field_3_link2 = field_3_link2;
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.OBJECT_LINK;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "anchorId", getEnumBitsAsString(this::getAnchorId,
+                new int[]{ANCHOR_ID_CHART_TITLE, ANCHOR_ID_Y_AXIS, ANCHOR_ID_X_AXIS, ANCHOR_ID_SERIES_OR_POINT, ANCHOR_ID_Z_AXIS},
+                new String[]{"CHART_TITLE","Y_AXIS","X_AXIS","SERIES_OR_POINT","Z_AXIS"}),
+            "link1", this::getLink1,
+            "link2", this::getLink2
+        );
     }
 }

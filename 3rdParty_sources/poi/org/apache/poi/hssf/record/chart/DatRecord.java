@@ -17,53 +17,39 @@
 
 package org.apache.poi.hssf.record.chart;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
 import org.apache.poi.util.BitField;
 import org.apache.poi.util.BitFieldFactory;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * The dat record is used to store options for the chart.
  */
-public final class DatRecord extends StandardRecord implements Cloneable {
-    public final static short sid = 0x1063;
+public final class DatRecord extends StandardRecord {
+    public static final short sid = 0x1063;
 
     private static final BitField horizontalBorder = BitFieldFactory.getInstance(0x1);
     private static final BitField verticalBorder   = BitFieldFactory.getInstance(0x2);
     private static final BitField border           = BitFieldFactory.getInstance(0x4);
     private static final BitField showSeriesKey    = BitFieldFactory.getInstance(0x8);
 
-    private  short      field_1_options;
+    private short field_1_options;
 
+    public DatRecord() {}
 
-    public DatRecord()
-    {
-
+    public DatRecord(DatRecord other) {
+        super(other);
+        field_1_options = other.field_1_options;
     }
 
-    public DatRecord(RecordInputStream in)
-    {
-        field_1_options                = in.readShort();
-    }
-
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[DAT]\n");
-        buffer.append("    .options              = ")
-            .append("0x").append(HexDump.toHex(  getOptions ()))
-            .append(" (").append( getOptions() ).append(" )");
-        buffer.append(System.getProperty("line.separator")); 
-        buffer.append("         .horizontalBorder         = ").append(isHorizontalBorder()).append('\n'); 
-        buffer.append("         .verticalBorder           = ").append(isVerticalBorder()).append('\n'); 
-        buffer.append("         .border                   = ").append(isBorder()).append('\n'); 
-        buffer.append("         .showSeriesKey            = ").append(isShowSeriesKey()).append('\n'); 
-
-        buffer.append("[/DAT]\n");
-        return buffer.toString();
+    public DatRecord(RecordInputStream in) {
+        field_1_options = in.readShort();
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -80,14 +66,9 @@ public final class DatRecord extends StandardRecord implements Cloneable {
     }
 
     @Override
-    public DatRecord clone() {
-        DatRecord rec = new DatRecord();
-        rec.field_1_options = field_1_options;
-        return rec;
+    public DatRecord copy() {
+        return new DatRecord(this);
     }
-
-
-
 
     /**
      * Get the options field for the Dat record.
@@ -175,5 +156,21 @@ public final class DatRecord extends StandardRecord implements Cloneable {
     public boolean isShowSeriesKey()
     {
         return showSeriesKey.isSet(field_1_options);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.DAT;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "options", this::getOptions,
+            "horizontalBorder", this::isHorizontalBorder,
+            "verticalBorder", this::isVerticalBorder,
+            "border", this::isBorder,
+            "showSeriesKey", this::isShowSeriesKey
+        );
     }
 }

@@ -15,34 +15,40 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-        
+
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        Calc Count Record
- * Description:  Specifies the maximum times the gui should perform a formula
- *               recalculation.  For instance: in the case a formula includes
- *               cells that are themselves a result of a formula and a value
- *               changes.  This is essentially a failsafe against an infinate
- *               loop in the event the formulas are not independant. <P>
- * REFERENCE:  PG 292 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)<P>
+ * Specifies the maximum times the gui should perform a formula recalculation.
+ * For instance: in the case a formula includes cells that are themselves a result of a formula and
+ * a value changes.  This is essentially a failsafe against an infinite loop in the event the formulas
+ * are not independent.
+ *
  * @version 2.0-pre
- * @see org.apache.poi.hssf.record.CalcModeRecord
+ * @see CalcModeRecord
  */
 
-public final class CalcCountRecord extends StandardRecord implements Cloneable {
-    public final static short sid = 0xC;
-    private short             field_1_iterations;
+public final class CalcCountRecord extends StandardRecord {
+    public static final short sid = 0xC;
 
-    public CalcCountRecord()
-    {
+    private short field_1_iterations;
+
+    public CalcCountRecord() {}
+
+    public CalcCountRecord(CalcCountRecord other) {
+        super(other);
+        field_1_iterations = other.field_1_iterations;
     }
 
-    public CalcCountRecord(RecordInputStream in)
-    {
+
+    public CalcCountRecord(RecordInputStream in) {
         field_1_iterations = in.readShort();
     }
 
@@ -66,17 +72,6 @@ public final class CalcCountRecord extends StandardRecord implements Cloneable {
         return field_1_iterations;
     }
 
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[CALCCOUNT]\n");
-        buffer.append("    .iterations     = ")
-            .append(Integer.toHexString(getIterations())).append("\n");
-        buffer.append("[/CALCCOUNT]\n");
-        return buffer.toString();
-    }
-
     public void serialize(LittleEndianOutput out) {
         out.writeShort(getIterations());
     }
@@ -91,9 +86,19 @@ public final class CalcCountRecord extends StandardRecord implements Cloneable {
     }
 
     @Override
-    public CalcCountRecord clone() {
-      CalcCountRecord rec = new CalcCountRecord();
-      rec.field_1_iterations = field_1_iterations;
-      return rec;
+    public CalcCountRecord copy() {
+        return new CalcCountRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.CALC_COUNT;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "iterations", this::getIterations
+        );
     }
 }

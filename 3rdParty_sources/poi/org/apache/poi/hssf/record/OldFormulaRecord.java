@@ -17,22 +17,25 @@
 
 package org.apache.poi.hssf.record;
 
-import org.apache.poi.hssf.record.FormulaRecord.SpecialCachedValue;
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.ss.formula.Formula;
 import org.apache.poi.ss.formula.ptg.Ptg;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.util.GenericRecordUtil;
 
 /**
  * Formula Record (0x0006 / 0x0206 / 0x0406) - holds a formula in
  *  encoded form, along with the value if a number
  */
 public final class OldFormulaRecord extends OldCellRecord {
-    public final static short biff2_sid = 0x0006;
-    public final static short biff3_sid = 0x0206;
-    public final static short biff4_sid = 0x0406;
-    public final static short biff5_sid = 0x0006;
+    public static final short biff2_sid = 0x0006;
+    public static final short biff3_sid = 0x0206;
+    public static final short biff4_sid = 0x0406;
+    public static final short biff5_sid = 0x0006;
 
-    private SpecialCachedValue specialCachedValue;
+    private FormulaSpecialCachedValue specialCachedValue;
     private double  field_4_value;
     private short   field_5_options;
     private Formula field_6_parsed_expr;
@@ -44,7 +47,7 @@ public final class OldFormulaRecord extends OldCellRecord {
             field_4_value = ris.readDouble();
         } else {
             long valueLongBits  = ris.readLong();
-            specialCachedValue = SpecialCachedValue.create(valueLongBits);
+            specialCachedValue = FormulaSpecialCachedValue.create(valueLongBits);
             if (specialCachedValue == null) {
                 field_4_value = Double.longBitsToDouble(valueLongBits);
             }
@@ -61,20 +64,36 @@ public final class OldFormulaRecord extends OldCellRecord {
         field_6_parsed_expr = Formula.read(expression_len, ris, nBytesAvailable);
     }
 
+    /**
+     * @deprecated POI 5.0.0, will be removed in 5.0, use getCachedResultTypeEnum until switch to enum is fully done
+     */
+    @Deprecated
     public int getCachedResultType() {
         if (specialCachedValue == null) {
             return CellType.NUMERIC.getCode();
         }
         return specialCachedValue.getValueType();
     }
-    
+
+    /**
+     * Returns the type of the cached result
+     * @return A CellType
+     * @since POI 5.0.0
+     */
+    public CellType getCachedResultTypeEnum() {
+        if (specialCachedValue == null) {
+            return CellType.NUMERIC;
+        }
+        return specialCachedValue.getValueTypeEnum();
+    }
+
     public boolean getCachedBooleanValue() {
         return specialCachedValue.getBooleanValue();
     }
     public int getCachedErrorValue() {
         return specialCachedValue.getErrorValue();
     }
-    
+
     /**
      * get the calculated value of the formula
      *
@@ -104,10 +123,18 @@ public final class OldFormulaRecord extends OldCellRecord {
         return field_6_parsed_expr;
     }
 
-    protected void appendValueText(StringBuilder sb) {
-        sb.append("    .value       = ").append(getValue()).append("\n");
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.FORMULA;
     }
-    protected String getRecordName() {
-        return "Old Formula";
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "base", super::getGenericProperties,
+            "options", this::getOptions,
+            "formula", this::getFormula,
+            "value", this::getValue
+        );
     }
 }

@@ -18,14 +18,17 @@
 package org.apache.poi.hssf.record;
 
 import java.io.ByteArrayInputStream;
+import java.util.Map;
+import java.util.function.Supplier;
 
 import org.apache.poi.ss.formula.ptg.Area3DPtg;
 import org.apache.poi.ss.formula.ptg.AreaPtg;
 import org.apache.poi.ss.formula.ptg.Ptg;
 import org.apache.poi.ss.formula.ptg.Ref3DPtg;
 import org.apache.poi.ss.formula.ptg.RefPtg;
-import org.apache.poi.util.HexDump;
-import org.apache.poi.util.LittleEndian;
+import org.apache.poi.util.GenericRecordUtil;
+import org.apache.poi.util.IOUtils;
+import org.apache.poi.util.LittleEndianConsts;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianInputStream;
 import org.apache.poi.util.LittleEndianOutput;
@@ -39,8 +42,11 @@ import org.apache.poi.util.StringUtil;
  * A sub-record within the OBJ record which stores a reference to an object
  * stored in a separate entry within the OLE2 compound file.
  */
-public final class EmbeddedObjectRefSubRecord extends SubRecord implements Cloneable {
+public final class EmbeddedObjectRefSubRecord extends SubRecord {
 	private static POILogger logger = POILogFactory.getLogger(EmbeddedObjectRefSubRecord.class);
+	//arbitrarily selected; may need to increase
+	private static final int MAX_RECORD_LENGTH = 100_000;
+
 	public static final short sid = 0x0009;
 
 	private static final byte[] EMPTY_BYTE_ARRAY = { };
@@ -69,11 +75,23 @@ public final class EmbeddedObjectRefSubRecord extends SubRecord implements Clone
 		field_4_ole_classname = null;
 	}
 
-	public short getSid() {
-		return sid;
+	public EmbeddedObjectRefSubRecord(EmbeddedObjectRefSubRecord other) {
+		super(other);
+		field_1_unknown_int = other.field_1_unknown_int;
+		field_2_refPtg = (other.field_2_refPtg == null) ? null : other.field_2_refPtg.copy();
+		field_2_unknownFormulaData = (other.field_2_unknownFormulaData == null) ? null : other.field_2_unknownFormulaData.clone();
+		field_3_unicode_flag = other.field_3_unicode_flag;
+		field_4_ole_classname = other.field_4_ole_classname;
+		field_4_unknownByte = other.field_4_unknownByte;
+		field_5_stream_id = other.field_5_stream_id;
+		field_6_unknown = (other.field_6_unknown == null) ? null : other.field_6_unknown.clone();
 	}
 
 	public EmbeddedObjectRefSubRecord(LittleEndianInput in, int size) {
+		this(in,size,-1);
+	}
+
+	EmbeddedObjectRefSubRecord(LittleEndianInput in, int size, int cmoOt) {
 
 		// Much guess-work going on here due to lack of any documentation.
 		// See similar source code in OOO:
@@ -81,13 +99,13 @@ public final class EmbeddedObjectRefSubRecord extends SubRecord implements Clone
 		// 1223 void XclImpOleObj::ReadPictFmla( XclImpStream& rStrm, sal_uInt16 nRecSize )
 
 		int streamIdOffset = in.readShort(); // OOO calls this 'nFmlaLen'
-		int remaining = size - LittleEndian.SHORT_SIZE;
+		int remaining = size - LittleEndianConsts.SHORT_SIZE;
 
 		int dataLenAfterFormula = remaining - streamIdOffset;
 		int formulaSize = in.readUShort();
-		remaining -= LittleEndian.SHORT_SIZE;
+		remaining -= LittleEndianConsts.SHORT_SIZE;
 		field_1_unknown_int = in.readInt();
-		remaining -= LittleEndian.INT_SIZE;
+		remaining -= LittleEndianConsts.INT_SIZE;
 		byte[] formulaRawBytes = readRawData(in, formulaSize);
 		remaining -= formulaSize;
 		field_2_refPtg = readRefPtg(formulaRawBytes);
@@ -103,16 +121,16 @@ public final class EmbeddedObjectRefSubRecord extends SubRecord implements Clone
 		int stringByteCount;
 		if (remaining >= dataLenAfterFormula + 3) {
 			int tag = in.readByte();
-			stringByteCount = LittleEndian.BYTE_SIZE;
+			stringByteCount = LittleEndianConsts.BYTE_SIZE;
 			if (tag != 0x03) {
 				throw new RecordFormatException("Expected byte 0x03 here");
 			}
 			int nChars = in.readUShort();
-			stringByteCount += LittleEndian.SHORT_SIZE;
+			stringByteCount += LittleEndianConsts.SHORT_SIZE;
 			if (nChars > 0) {
 				 // OOO: the 4th way Xcl stores a unicode string: not even a Grbit byte present if length 0
 				field_3_unicode_flag = ( in.readByte() & 0x01 ) != 0;
-				stringByteCount += LittleEndian.BYTE_SIZE;
+				stringByteCount += LittleEndianConsts.BYTE_SIZE;
 				if (field_3_unicode_flag) {
 					field_4_ole_classname = StringUtil.readUnicodeLE(in, nChars);
 					stringByteCount += nChars * 2;
@@ -131,27 +149,31 @@ public final class EmbeddedObjectRefSubRecord extends SubRecord implements Clone
 		// Pad to next 2-byte boundary
 		if (((stringByteCount + formulaSize) % 2) != 0) {
 			int b = in.readByte();
-			remaining -= LittleEndian.BYTE_SIZE;
+			remaining -= LittleEndianConsts.BYTE_SIZE;
 			if (field_2_refPtg != null && field_4_ole_classname == null) {
-				field_4_unknownByte = Byte.valueOf((byte)b);
+				field_4_unknownByte = (byte)b;
 			}
 		}
 		int nUnexpectedPadding = remaining - dataLenAfterFormula;
 
 		if (nUnexpectedPadding > 0) {
-			logger.log( POILogger.ERROR, "Discarding " + nUnexpectedPadding + " unexpected padding bytes ");
+			logger.log( POILogger.ERROR, "Discarding ", nUnexpectedPadding, " unexpected padding bytes");
 			readRawData(in, nUnexpectedPadding);
 			remaining-=nUnexpectedPadding;
 		}
 
 		// Fetch the stream ID
 		if (dataLenAfterFormula >= 4) {
-			field_5_stream_id = Integer.valueOf(in.readInt());
-			remaining -= LittleEndian.INT_SIZE;
+			field_5_stream_id = in.readInt();
+			remaining -= LittleEndianConsts.INT_SIZE;
 		} else {
 			field_5_stream_id = null;
 		}
 		field_6_unknown = readRawData(in, remaining);
+	}
+
+	public short getSid() {
+		return sid;
 	}
 
 	private static Ptg readRefPtg(byte[] formulaRawBytes) {
@@ -173,7 +195,7 @@ public final class EmbeddedObjectRefSubRecord extends SubRecord implements Clone
 		if (size == 0) {
 			return EMPTY_BYTE_ARRAY;
 		}
-		byte[] result = new byte[size];
+		byte[] result = IOUtils.safelyAllocate(size, MAX_RECORD_LENGTH);
 		in.readFully(result);
 		return result;
 	}
@@ -182,13 +204,10 @@ public final class EmbeddedObjectRefSubRecord extends SubRecord implements Clone
 		int result = 2 + 4; // formulaSize + f2unknown_int
 		result += formulaSize;
 
-		int stringLen;
-		if (field_4_ole_classname == null) {
-			// don't write 0x03, stringLen, flag, text
-			stringLen = 0;
-		} else {
+		// don't write 0x03, stringLen, flag, text
+		if (field_4_ole_classname != null) {
 			result += 1 + 2;  // 0x03, stringLen
-			stringLen = field_4_ole_classname.length();
+			int stringLen = field_4_ole_classname.length();
 			if (stringLen > 0) {
 				result += 1; // flag
 				if (field_3_unicode_flag) {
@@ -242,14 +261,11 @@ public final class EmbeddedObjectRefSubRecord extends SubRecord implements Clone
 		}
 		pos += formulaSize;
 
-		int stringLen;
-		if (field_4_ole_classname == null) {
-			// don't write 0x03, stringLen, flag, text
-			stringLen = 0;
-		} else {
+		// don't write 0x03, stringLen, flag, text
+		if (field_4_ole_classname != null) {
 			out.writeByte(0x03);
 			pos+=1;
-			stringLen = field_4_ole_classname.length();
+			int stringLen = field_4_ole_classname.length();
 			out.writeShort(stringLen);
 			pos+=2;
 			if (stringLen > 0) {
@@ -270,7 +286,6 @@ public final class EmbeddedObjectRefSubRecord extends SubRecord implements Clone
 		switch(idOffset - (pos - 6)) { // 6 for 3 shorts: sid, dataSize, idOffset
 			case 1:
 				out.writeByte(field_4_unknownByte == null ? 0x00 : field_4_unknownByte.intValue());
-				pos++;
 				break;
 			case 0:
 				break;
@@ -279,8 +294,7 @@ public final class EmbeddedObjectRefSubRecord extends SubRecord implements Clone
 		}
 
 		if (field_5_stream_id != null) {
-			out.writeInt(field_5_stream_id.intValue());
-			pos += 4;
+			out.writeInt(field_5_stream_id);
 		}
 		out.write(field_6_unknown);
 	}
@@ -306,45 +320,38 @@ public final class EmbeddedObjectRefSubRecord extends SubRecord implements Clone
 	}
 
 	@Override
-	public EmbeddedObjectRefSubRecord clone() {
-		return this; // TODO proper clone
+	public EmbeddedObjectRefSubRecord copy() {
+		return new EmbeddedObjectRefSubRecord(this);
 	}
 
-	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("[ftPictFmla]\n");
-		sb.append("    .f2unknown     = ").append(HexDump.intToHex(field_1_unknown_int)).append("\n");
-		if (field_2_refPtg == null) {
-			sb.append("    .f3unknown     = ").append(HexDump.toHex(field_2_unknownFormulaData)).append("\n");
-		} else {
-			sb.append("    .formula       = ").append(field_2_refPtg).append("\n");
-		}
-		if (field_4_ole_classname != null) {
-			sb.append("    .unicodeFlag   = ").append(field_3_unicode_flag).append("\n");
-			sb.append("    .oleClassname  = ").append(field_4_ole_classname).append("\n");
-		}
-		if (field_4_unknownByte != null) {
-			sb.append("    .f4unknown   = ").append(HexDump.byteToHex(field_4_unknownByte.intValue())).append("\n");
-		}
-		if (field_5_stream_id != null) {
-			sb.append("    .streamId      = ").append(HexDump.intToHex(field_5_stream_id.intValue())).append("\n");
-		}
-		if (field_6_unknown.length > 0) {
-			sb.append("    .f7unknown     = ").append(HexDump.toHex(field_6_unknown)).append("\n");
-		}
-		sb.append("[/ftPictFmla]");
-		return sb.toString();
-	}
-	
 	public void setUnknownFormulaData(byte[] formularData) {
 		field_2_unknownFormulaData = formularData;
 	}
-	
+
 	public void setOleClassname(String oleClassname) {
 		field_4_ole_classname = oleClassname;
 	}
-	
+
 	public void setStorageId(int storageId) {
 		field_5_stream_id = storageId;
+	}
+
+	@Override
+	public SubRecordTypes getGenericRecordType() {
+		return SubRecordTypes.EMBEDDED_OBJECT_REF;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"f2unknown", () -> field_1_unknown_int,
+			"f3unknown", () -> field_2_unknownFormulaData,
+			"formula", () -> field_2_refPtg,
+			"unicodeFlag", () -> field_3_unicode_flag,
+			"oleClassname", () -> field_4_ole_classname,
+			"f4unknown", () -> field_4_unknownByte,
+			"streamId", () -> field_5_stream_id,
+			"f7unknown", () -> field_6_unknown
+		);
 	}
 }

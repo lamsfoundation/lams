@@ -17,16 +17,16 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
-/**
- * Title:        Delta Record (0x0010)<p>
- * Description:  controls the accuracy of the calculations<p>
- * REFERENCE:  PG 303 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)
- */
-public final class DeltaRecord extends StandardRecord implements Cloneable {
-    public final static short sid = 0x0010;
-    public final static double DEFAULT_VALUE = 0.0010;   // should be .001
+/** Controls the accuracy of the calculations */
+public final class DeltaRecord extends StandardRecord {
+    public static final short sid = 0x0010;
+    public static final double DEFAULT_VALUE = 0.0010;
 
     // a double is an IEEE 8-byte float...damn IEEE and their goofy standards an
     // ambiguous numeric identifiers
@@ -34,6 +34,11 @@ public final class DeltaRecord extends StandardRecord implements Cloneable {
 
     public DeltaRecord(double maxChange) {
         field_1_max_change = maxChange;
+    }
+
+    public DeltaRecord(DeltaRecord other) {
+        super(other);
+        field_1_max_change = other.field_1_max_change;
     }
 
     public DeltaRecord(RecordInputStream in) {
@@ -46,15 +51,6 @@ public final class DeltaRecord extends StandardRecord implements Cloneable {
      */
     public double getMaxChange() {
         return field_1_max_change;
-    }
-
-    public String toString() {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[DELTA]\n");
-        buffer.append("    .maxchange = ").append(getMaxChange()).append("\n");
-        buffer.append("[/DELTA]\n");
-        return buffer.toString();
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -70,8 +66,18 @@ public final class DeltaRecord extends StandardRecord implements Cloneable {
     }
 
     @Override
-    public DeltaRecord clone() {
+    public DeltaRecord copy() {
         // immutable
         return this;
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.DELTA;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties("maxChange", this::getMaxChange);
     }
 }

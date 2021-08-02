@@ -17,16 +17,18 @@
 
 package org.apache.poi.hssf.record.pivottable;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 import org.apache.poi.util.StringUtil;
 
 /**
- * SXVD - View Fields (0x00B1)<br>
- * 
- * @author Patrick Cheng
+ * SXVD - View Fields (0x00B1)
  */
 public final class ViewFieldsRecord extends StandardRecord {
 	public static final short sid = 0x00B1;
@@ -40,18 +42,31 @@ public final class ViewFieldsRecord extends StandardRecord {
 	private int _cSub;
 	private int _grbitSub;
 	private int _cItm;
-	
+
 	private String _name;
-	
+
 	/**
 	 * values for the {@link ViewFieldsRecord#_sxaxis} field
 	 */
-	private static final class Axis {
-		public static final int NO_AXIS = 0;
-		public static final int ROW = 1;
-		public static final int COLUMN = 2;
-		public static final int PAGE = 4;
-		public static final int DATA = 8;
+	private enum Axis {
+		NO_AXIS(0),
+		ROW(1),
+		COLUMN(2),
+		PAGE(4),
+		DATA(8);
+		int id;
+		Axis(int id) {
+			this.id = id;
+		}
+	}
+
+	public ViewFieldsRecord(ViewFieldsRecord other) {
+		super(other);
+		_sxaxis = other._sxaxis;
+		_cSub = other._cSub;
+		_grbitSub = other._grbitSub;
+		_cItm = other._cItm;
+		_name = other._name;
 	}
 
 	public ViewFieldsRecord(RecordInputStream in) {
@@ -59,7 +74,7 @@ public final class ViewFieldsRecord extends StandardRecord {
 		_cSub = in.readShort();
 		_grbitSub = in.readShort();
 		_cItm = in.readShort();
-		
+
 		int cchName = in.readUShort();
 		if (cchName != STRING_NOT_PRESENT_LEN) {
 			int flag = in.readByte();
@@ -70,15 +85,15 @@ public final class ViewFieldsRecord extends StandardRecord {
 			}
 		}
 	}
-	
+
 	@Override
 	protected void serialize(LittleEndianOutput out) {
-		
+
 		out.writeShort(_sxaxis);
 		out.writeShort(_cSub);
 		out.writeShort(_grbitSub);
 		out.writeShort(_cItm);
-		
+
 		if (_name != null) {
 			StringUtil.writeUnicodeString(out, _name);
 		} else {
@@ -91,8 +106,8 @@ public final class ViewFieldsRecord extends StandardRecord {
 		if (_name == null) {
 			return BASE_SIZE;
 		}
-		return BASE_SIZE 
-			+ 1 // unicode flag 
+		return BASE_SIZE
+			+ 1 // unicode flag
 			+ _name.length() * (StringUtil.hasMultibyte(_name) ? 2 : 1);
 	}
 
@@ -102,16 +117,23 @@ public final class ViewFieldsRecord extends StandardRecord {
 	}
 
 	@Override
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("[SXVD]\n");
-		buffer.append("    .sxaxis    = ").append(HexDump.shortToHex(_sxaxis)).append('\n');
-		buffer.append("    .cSub      = ").append(HexDump.shortToHex(_cSub)).append('\n');
-		buffer.append("    .grbitSub  = ").append(HexDump.shortToHex(_grbitSub)).append('\n');
-		buffer.append("    .cItm      = ").append(HexDump.shortToHex(_cItm)).append('\n');
-		buffer.append("    .name      = ").append(_name).append('\n');
-		
-		buffer.append("[/SXVD]\n");
-		return buffer.toString();
+	public ViewFieldsRecord copy() {
+		return new ViewFieldsRecord(this);
+	}
+
+	@Override
+	public HSSFRecordTypes getGenericRecordType() {
+		return HSSFRecordTypes.VIEW_FIELDS;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"sxaxis", () -> _sxaxis,
+			"cSub", () -> _cSub,
+			"grbitSub", () -> _grbitSub,
+			"cItm", () -> _cItm,
+			"name", () -> _name
+		);
 	}
 }

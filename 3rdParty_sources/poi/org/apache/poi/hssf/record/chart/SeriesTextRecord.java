@@ -17,21 +17,28 @@
 
 package org.apache.poi.hssf.record.chart;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 import org.apache.poi.util.StringUtil;
 
 /**
- * SERIESTEXT (0x100D)<p> 
+ * SERIESTEXT (0x100D)<p>
  * Defines a series name
  */
 public final class SeriesTextRecord extends StandardRecord {
-	public final static short sid = 0x100D;
+	public static final short sid = 0x100D;
 
-	/** the actual text cannot be longer than 255 characters */
+	/**
+	 * the actual text cannot be longer than 255 characters
+	 */
 	private static final int MAX_LEN = 0xFF;
+
 	private int field_1_id;
 	private boolean is16bit;
 	private String field_4_text;
@@ -39,6 +46,13 @@ public final class SeriesTextRecord extends StandardRecord {
 	public SeriesTextRecord() {
 		field_4_text = "";
 		is16bit = false;
+	}
+
+	public SeriesTextRecord(SeriesTextRecord other) {
+		super(other);
+		field_1_id = other.field_1_id;
+		is16bit = other.is16bit;
+		field_4_text = other.field_4_text;
 	}
 
 	public SeriesTextRecord(RecordInputStream in) {
@@ -50,18 +64,6 @@ public final class SeriesTextRecord extends StandardRecord {
 		} else {
 			field_4_text = in.readCompressedUnicode(field_2_textLength);
 		}
-	}
-
-	public String toString() {
-		StringBuffer sb = new StringBuffer();
-
-		sb.append("[SERIESTEXT]\n");
-		sb.append("  .id     =").append(HexDump.shortToHex(getId())).append('\n');
-		sb.append("  .textLen=").append(field_4_text.length()).append('\n');
-		sb.append("  .is16bit=").append(is16bit).append('\n');
-		sb.append("  .text   =").append(" (").append(getText()).append(" )").append('\n');
-		sb.append("[/SERIESTEXT]\n");
-		return sb.toString();
 	}
 
 	public void serialize(LittleEndianOutput out) {
@@ -87,13 +89,9 @@ public final class SeriesTextRecord extends StandardRecord {
 		return sid;
 	}
 
-	public Object clone() {
-		SeriesTextRecord rec = new SeriesTextRecord();
-
-		rec.field_1_id = field_1_id;
-		rec.is16bit = is16bit;
-		rec.field_4_text = field_4_text;
-		return rec;
+	@Override
+	public SeriesTextRecord copy() {
+		return new SeriesTextRecord(this);
 	}
 
 	/**
@@ -127,5 +125,19 @@ public final class SeriesTextRecord extends StandardRecord {
 		}
 		field_4_text = text;
 		is16bit = StringUtil.hasMultibyte(text);
+	}
+
+	@Override
+	public HSSFRecordTypes getGenericRecordType() {
+		return HSSFRecordTypes.SERIES_TEXT;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"id", this::getId,
+			"bit16", () -> is16bit,
+			"text", this::getText
+		);
 	}
 }

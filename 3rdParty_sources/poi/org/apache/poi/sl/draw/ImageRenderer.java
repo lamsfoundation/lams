@@ -18,17 +18,22 @@
  */
 package org.apache.poi.sl.draw;
 
-import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.geom.Dimension2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+
+import org.apache.poi.common.usermodel.GenericRecord;
+import org.apache.poi.util.Dimension2DDouble;
 
 /**
  * Classes can implement this interfaces to support other formats, for
- * example, use Apache Batik to render WMF, PICT can be rendered using Apple QuickTime API for Java:
+ * example, use Apache Batik to render WMF (since POI 4.0, there's an internal WMF/EMF/EMF+ renderer in POI),
+ * PICT can be rendered using Apple QuickTime API for Java:
  *
  * <pre>
  * <code>
@@ -76,6 +81,13 @@ import java.io.InputStream;
  */
 public interface ImageRenderer {
     /**
+     * Determines if this image renderer implementation supports the given contentType
+     * @param contentType the image content type
+     * @return if the content type is supported
+     */
+    boolean canRender(String contentType);
+
+    /**
      * Load and buffer the image
      *
      * @param data the raw image stream
@@ -89,12 +101,25 @@ public interface ImageRenderer {
      * @param data the raw image bytes
      * @param contentType the content type
      */
-    void loadImage(byte data[], String contentType) throws IOException;
+    void loadImage(byte[] data, String contentType) throws IOException;
 
     /**
-     * @return the dimension of the buffered image
+     * @return the format-specific / not-normalized bounds of the image
      */
-    Dimension getDimension();
+    Rectangle2D getNativeBounds();
+
+    /**
+     * @return the bounds of the buffered image in pixel
+     */
+    Rectangle2D getBounds();
+
+    /**
+     * @return the dimension of the buffered image in pixel
+     */
+    default Dimension2D getDimension() {
+        Rectangle2D r = getBounds();
+        return new Dimension2DDouble(Math.abs(r.getWidth()), Math.abs(r.getHeight()));
+    }
 
     /**
      * @param alpha the alpha [0..1] to be added to the image (possibly already containing an alpha channel)
@@ -102,18 +127,18 @@ public interface ImageRenderer {
     void setAlpha(double alpha);
 
     /**
-     * @return the image as buffered image
+     * @return the image as buffered image or null if image could not be loaded
      */
     BufferedImage getImage();
 
     /**
      * @param dim the dimension in pixels of the returned image
-     * @return the image as buffered image
-     * 
+     * @return the image as buffered image or null if image could not be loaded
+     *
      * @since POI 3.15-beta2
      */
-    BufferedImage getImage(Dimension dim);
-    
+    BufferedImage getImage(Dimension2D dim);
+
     /**
      * Render picture data into the supplied graphics
      *
@@ -127,4 +152,14 @@ public interface ImageRenderer {
      * @return true if the picture data was successfully rendered
      */
     boolean drawImage(Graphics2D graphics, Rectangle2D anchor, Insets clip);
+
+    default GenericRecord getGenericRecord() { return null; }
+
+    /**
+     * Sets the default charset to render text elements.
+     * Opposed to other windows libraries in POI this simply defaults to Windows-1252.
+     *
+     * @param defaultCharset the default charset
+     */
+    default void setDefaultCharset(Charset defaultCharset) {}
 }

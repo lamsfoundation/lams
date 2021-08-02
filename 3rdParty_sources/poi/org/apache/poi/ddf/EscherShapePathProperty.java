@@ -19,8 +19,6 @@ package org.apache.poi.ddf;
 
 /**
  * Defines the constants for the various possible shape paths.
- *
- * @author Glen Stampoultzis (glens at apache.org)
  */
 public class EscherShapePathProperty extends EscherSimpleProperty {
 
@@ -30,8 +28,17 @@ public class EscherShapePathProperty extends EscherSimpleProperty {
     public static final int CLOSED_CURVES = 3;
     public static final int COMPLEX = 4;
 
-    public EscherShapePathProperty( short propertyNumber, int shapePath )
-    {
+    /**
+     * Create an instance of an escher shape path property.
+     *
+     * @param propertyNumber
+     * @param shapePath
+     */
+    public EscherShapePathProperty( short propertyNumber, int shapePath ) {
         super( propertyNumber, false, false, shapePath );
+    }
+
+    public EscherShapePathProperty( EscherPropertyTypes type, int shapePath ) {
+        super( type, false, false, shapePath );
     }
 }
