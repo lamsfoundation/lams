@@ -20,8 +20,8 @@
   ~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
-<module name="org.apache.commons.compress" xmlns="urn:jboss:module:1.5">
+<module name="org.apache.commons.math3" xmlns="urn:jboss:module:1.5">
     <resources>
-        <resource-root path="commons-compress-1.21.jar"/>
+        <resource-root path="commons-math3-3.6.1.jar"/>
     </resources>
 </module>
