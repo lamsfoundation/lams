@@ -36,7 +36,8 @@
 	}
 								
 	.mindmap-frame {
-		width: 100%;
+		width: calc(100% - 35px);
+		margin-left: 17px;
 		height: 700px;
 		border: none;
 	}
@@ -51,10 +52,12 @@
 		toolContentID: '${param.toolContentID}',
 		messageNotification: '<fmt:message key="monitor.summary.notification" />',
 		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
-		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />',
+		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
+	};
 
-		//var for jquery.jRating.js
-		pathToImageFolder = "${lams}images/css/",
+
+	//var for jquery.jRating.js
+	var pathToImageFolder = "${lams}images/css/",
 		//vars for rating.js
 		AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
 		YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
@@ -63,7 +66,6 @@
 		LAMS_URL = '${lams}',
 		COUNT_RATED_ITEMS = true,
 		ALLOW_RERATE = false;
-	};
 </script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
@@ -185,7 +187,7 @@
 	<br>
 </c:if>
 
-<c:if test="${mindmap.galleryWalkFinished and not mindmap.galleryWalkReadOnly}">
+<c:if test="${mindmapDTO.galleryWalkFinished and not mindmapDTO.galleryWalkReadOnly}">
 		<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk.ratings.header" /></h4>
 		<table id="gallery-walk-rating-table" class="table table-hover table-condensed">
 		  <thead class="thead-light">
@@ -219,8 +221,8 @@
 	    <div class="panel panel-default" >
 	        <div class="panel-heading" id="heading${session.sessionID}">
 	        	<span class="panel-title collapsable-icon-left">
-	        		<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${session.sessionID}" 
-							aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${session.sessionID}" >
+	        		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${session.sessionID}" 
+							aria-expanded="false" aria-controls="collapse${session.sessionID}" >
 						<fmt:message key="heading.group" >
 							<fmt:param><c:out value="${session.sessionName}" /></fmt:param>
 						</fmt:message>
@@ -228,7 +230,7 @@
 				</span>
 	        </div>
         
-			<div id="collapse${session.sessionID}" class="panel-collapse collapse ${status.first ? 'in' : ''}" 
+			<div id="collapse${session.sessionID}" class="panel-collapse collapse mindmap-collapse" 
         			role="tabpanel" aria-labelledby="heading${session.sessionID}">
 	</c:if>
 	
@@ -236,7 +238,7 @@
 		<fmt:message key="heading.totalLearners" />&nbsp;${session.numberOfLearners}
 	</div>
 	
-	<c:if test="${dto.mulitUserMode}">
+	<c:if test="${dto.multiUserMode}">
 		<iframe class="mindmap-frame"
 				data-src='<c:url value="/learning/getGalleryWalkMindmap.do?toolSessionID=${session.sessionID}"/>'>
 		</iframe>
