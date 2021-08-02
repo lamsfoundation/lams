@@ -72,7 +72,7 @@ public class AuthoringController {
 
     @Autowired
     private IMindmapService mindmapService;
-    
+
     @Autowired
     @Qualifier("mindmapMessageService")
     private MessageService messageService;
@@ -109,7 +109,7 @@ public class AuthoringController {
 
 	return readDatabaseData(authoringForm, mindmap, request, mode);
     }
-    
+
     /**
      * Set the defineLater flag so that learners cannot use content while we are editing. This flag is released when
      * updateContent is called.
@@ -256,6 +256,9 @@ public class AuthoringController {
 	mindmap.setInstructions(authoringForm.getInstructions());
 	mindmap.setLockOnFinished(authoringForm.isLockOnFinished());
 	mindmap.setMultiUserMode(authoringForm.isMultiUserMode());
+	mindmap.setGalleryWalkEnabled(authoringForm.isGalleryWalkEnabled());
+	mindmap.setGalleryWalkReadOnly(authoringForm.isGalleryWalkReadOnly());
+	mindmap.setGalleryWalkInstructions(authoringForm.getGalleryWalkInstructions());
 	// reflection
 	mindmap.setReflectOnActivity(authoringForm.isReflectOnActivity());
 	mindmap.setReflectInstructions(authoringForm.getReflectInstructions());
@@ -269,6 +272,9 @@ public class AuthoringController {
 	authoringForm.setInstructions(mindmap.getInstructions());
 	authoringForm.setLockOnFinished(mindmap.isLockOnFinished());
 	authoringForm.setMultiUserMode(mindmap.isMultiUserMode());
+	authoringForm.setGalleryWalkEnabled(mindmap.isGalleryWalkEnabled());
+	authoringForm.setGalleryWalkReadOnly(mindmap.isGalleryWalkReadOnly());
+	authoringForm.setGalleryWalkInstructions(mindmap.getGalleryWalkInstructions());
 	// reflection
 	authoringForm.setReflectOnActivity(mindmap.isReflectOnActivity());
 	authoringForm.setReflectInstructions(mindmap.getReflectInstructions());

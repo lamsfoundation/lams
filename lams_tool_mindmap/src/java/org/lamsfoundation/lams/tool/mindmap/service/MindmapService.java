@@ -23,16 +23,22 @@
 
 package org.lamsfoundation.lams.tool.mindmap.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -40,6 +46,10 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
+import org.lamsfoundation.lams.rating.model.RatingCriteria;
+import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
+import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
@@ -57,6 +67,8 @@ import org.lamsfoundation.lams.tool.mindmap.dao.IMindmapNodeDAO;
 import org.lamsfoundation.lams.tool.mindmap.dao.IMindmapRequestDAO;
 import org.lamsfoundation.lams.tool.mindmap.dao.IMindmapSessionDAO;
 import org.lamsfoundation.lams.tool.mindmap.dao.IMindmapUserDAO;
+import org.lamsfoundation.lams.tool.mindmap.dto.MindmapDTO;
+import org.lamsfoundation.lams.tool.mindmap.dto.MindmapSessionDTO;
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapNode;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapRequest;
@@ -74,6 +86,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
@@ -100,6 +113,8 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     private ILogEventService logEventService = null;
     private IExportToolContentService exportContentService;
     private ICoreNotebookService coreNotebookService;
+    private ILearnerService learnerService;
+    private IRatingService ratingService;
     private MindmapOutputFactory mindmapOutputFactory;
     private String nodesToDeleteCondition = null; // string to accumulate nodes to delete
     private MessageService mindmapMessageService;
@@ -227,6 +242,10 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
 	Mindmap toContent = Mindmap.newInstance(fromContent, toContentId);
 	mindmapDAO.saveOrUpdate(toContent);
+
+	if (toContent.isGalleryWalkEnabled() && !toContent.isGalleryWalkReadOnly()) {
+	    createGalleryWalkRatingCriterion(toContentId);
+	}
 
 	/* Copying Mindmap Nodes */
 
@@ -805,6 +824,14 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	this.toolService = toolService;
     }
 
+    public void setRatingService(IRatingService ratingService) {
+	this.ratingService = ratingService;
+    }
+
+    public void setLearnerService(ILearnerService learnerService) {
+	this.learnerService = learnerService;
+    }
+
     public IMindmapUserDAO getMindmapUserDAO() {
 	return mindmapUserDAO;
     }
@@ -1036,5 +1063,129 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     @Override
     public XStream getXStream() {
 	return xstream;
+    }
+
+    public void fillGalleryWalkRatings(MindmapDTO mindmapDTO, Long ratingUserId) {
+	Map<Long, ItemRatingDTO> itemRatingDtoMap = null;
+	if (!mindmapDTO.isGalleryWalkReadOnly()) {
+	    // it should have been created on lesson create,
+	    // but in case Live Edit added Gallery Walk, we need to add it now, but just once
+	    try {
+		createGalleryWalkRatingCriterion(mindmapDTO.getToolContentId());
+	    } catch (Exception e) {
+		logger.warn("Ignoring error while processing Mindmap Gallery Walk criteria for tool content ID "
+			+ mindmapDTO.getToolContentId());
+	    }
+	}
+
+	// Item IDs are WhiteboardSession session IDs, i.e. a single Whiteboard
+	Set<Long> itemIds = mindmapDTO.getSessionDTOs().stream()
+		.collect(Collectors.mapping(MindmapSessionDTO::getSessionID, Collectors.toSet()));
+
+	List<ItemRatingDTO> itemRatingDtos = ratingService.getRatingCriteriaDtos(mindmapDTO.getToolContentId(), null,
+		itemIds, true, ratingUserId);
+	// Mapping of Item ID -> DTO
+	itemRatingDtoMap = itemRatingDtos.stream()
+		.collect(Collectors.toMap(ItemRatingDTO::getItemId, Function.identity()));
+
+	for (MindmapSessionDTO sessionDTO : mindmapDTO.getSessionDTOs()) {
+	    sessionDTO.setItemRatingDto(itemRatingDtoMap.get(sessionDTO.getSessionID()));
+	}
+    }
+
+    @Override
+    public void createGalleryWalkRatingCriterion(long toolContentId) {
+	List<RatingCriteria> criteria = ratingService.getCriteriasByToolContentId(toolContentId);
+
+	if (criteria.size() >= 2) {
+	    criteria = ratingService.getCriteriasByToolContentId(toolContentId);
+	    // Mindmap currently supports only one place for ratings.
+	    // It is rating other groups' boards on results page.
+	    // Criterion gets automatically created and there must be only one.
+	    try {
+		for (int criterionIndex = 1; criterionIndex < criteria.size(); criterionIndex++) {
+		    RatingCriteria criterion = criteria.get(criterionIndex);
+		    Long criterionId = criterion.getRatingCriteriaId();
+		    mindmapDAO.delete(criterion);
+		    logger.warn("Removed a duplicate criterion ID " + criterionId + " for Mindmap tool content ID "
+			    + toolContentId);
+		}
+	    } catch (Exception e) {
+		logger.warn("Ignoring error while deleting a duplicate criterion for Mindmap tool content ID "
+			+ toolContentId + ": " + e.getMessage());
+	    }
+	    return;
+	}
+
+	if (criteria.isEmpty()) {
+	    ToolActivityRatingCriteria criterion = (ToolActivityRatingCriteria) RatingCriteria
+		    .getRatingCriteriaInstance(RatingCriteria.TOOL_ACTIVITY_CRITERIA_TYPE);
+	    criterion.setTitle(mindmapMessageService.getMessage("label.pad.rating.title"));
+	    criterion.setOrderId(1);
+	    criterion.setRatingStyle(RatingCriteria.RATING_STYLE_STAR);
+	    criterion.setCommentsEnabled(true);
+	    criterion.setToolContentId(toolContentId);
+
+	    mindmapDAO.insert(criterion);
+	    criteria.add(criterion);
+	}
+    }
+
+    @Override
+    public void startGalleryWalk(long toolContentId) throws IOException {
+	Mindmap mindmap = getMindmapByContentId(toolContentId);
+	if (!mindmap.isGalleryWalkEnabled()) {
+	    throw new IllegalArgumentException(
+		    "Can not start Gallery Walk as it is not enabled for Mindmap with tool content ID "
+			    + toolContentId);
+	}
+	if (mindmap.isGalleryWalkFinished()) {
+	    throw new IllegalArgumentException(
+		    "Can not start Gallery Walk as it is already finished for Mindmap with tool content ID "
+			    + toolContentId);
+	}
+	mindmap.setGalleryWalkStarted(true);
+	mindmapDAO.update(mindmap);
+
+	sendGalleryWalkRefreshRequest(mindmap);
+    }
+
+    @Override
+    public void finishGalleryWalk(long toolContentId) throws IOException {
+	Mindmap mindmap = getMindmapByContentId(toolContentId);
+	if (!mindmap.isGalleryWalkEnabled()) {
+	    throw new IllegalArgumentException(
+		    "Can not finish Gallery Walk as it is not enabled for Mindmap with tool content ID "
+			    + toolContentId);
+	}
+	mindmap.setGalleryWalkFinished(true);
+	mindmapDAO.update(mindmap);
+
+	sendGalleryWalkRefreshRequest(mindmap);
+    }
+
+    @Override
+    public void enableGalleryWalkLearnerEdit(long toolContentId) throws IOException {
+	Mindmap mindmap = getMindmapByContentId(toolContentId);
+	if (!mindmap.isGalleryWalkEnabled()) {
+	    throw new IllegalArgumentException(
+		    "Can not allow learners to reedit activity as Gallery Walk is not enabled for Mindmap with tool content ID "
+			    + toolContentId);
+	}
+	mindmap.setGalleryWalkEditEnabled(true);
+	mindmapDAO.update(mindmap);
+
+	sendGalleryWalkRefreshRequest(mindmap);
+    }
+
+    private void sendGalleryWalkRefreshRequest(Mindmap mindmap) {
+	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
+	jsonCommand.put("hookTrigger", "mindmap-refresh-" + mindmap.getToolContentId());
+	// get all learners in this mindmap
+	Set<Integer> userIds = mindmap.getMindmapSessions().stream()
+		.flatMap(session -> session.getMindmapUsers().stream())
+		.collect(Collectors.mapping(user -> user.getUserId().intValue(), Collectors.toSet()));
+
+	learnerService.createCommandForLearners(mindmap.getToolContentId(), userIds, jsonCommand.toString());
     }
 }

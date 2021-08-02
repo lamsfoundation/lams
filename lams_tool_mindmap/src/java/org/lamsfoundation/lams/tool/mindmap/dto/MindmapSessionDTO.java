@@ -21,23 +21,23 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.mindmap.dto;
 
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapSession;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapUser;
 
 public class MindmapSessionDTO implements Comparable {
-    Long sessionID;
-    String sessionName;
-    int numberOfLearners;
-    int numberOfFinishedLearners;
-    Set<MindmapUserDTO> userDTOs = new TreeSet<MindmapUserDTO>();
+    private Long sessionID;
+    private String sessionName;
+    private int numberOfLearners;
+    private int numberOfFinishedLearners;
+    private ItemRatingDTO itemRatingDto;
+    private Set<MindmapUserDTO> userDTOs = new TreeSet<>();
 
     public MindmapSessionDTO(MindmapSession session) {
 	this.sessionID = session.getSessionId();
@@ -109,5 +109,13 @@ public class MindmapSessionDTO implements Comparable {
 
     public void setNumberOfFinishedLearners(int numberOfFinishedLearners) {
 	this.numberOfFinishedLearners = numberOfFinishedLearners;
+    }
+
+    public ItemRatingDTO getItemRatingDto() {
+	return itemRatingDto;
+    }
+
+    public void setItemRatingDto(ItemRatingDTO itemRatingDto) {
+	this.itemRatingDto = itemRatingDto;
     }
 }

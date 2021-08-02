@@ -38,7 +38,7 @@
 		$.ajax({ 
 	        method: "POST", 
 	        url: "${url=='author'? 'setMindmapContentJSON.do':'../learning/setMindmapContentJSON.do'}",
-	        data: { mindmapId: "${mindmapId}", userId: "${userId}", 
+	        data: { mindmapId: "${mindmapId}", userId: "${userUid}", 
 				sessionId: "${sessionId}", mode: "${mode}" } , 
 	        dataType: "json", 
 	        success: function (response) {
@@ -167,7 +167,7 @@
 			$.ajax({ 
 		        method: "POST", 
 		        url: "notifyServerActionJSON.do", 
-		        data: { mindmapId: "${mindmapId}", userId: "${userId}", 
+		        data: { mindmapId: "${mindmapId}", userId: "${userUid}", 
 					sessionId: "${sessionId}", lastActionId: lastActionId, actionJSON:  JSON.stringify(updateRequest) } , 
 		        dataType: "json", 
 		        success: function (response) {
@@ -380,7 +380,7 @@
 			        url: "saveLastMindmapChanges.do", 
 			        data: { 
 			        		mindmapId: "${mindmapId}", 
-			        		userId: "${userId}", 
+			        		userId: "${userUid}", 
 			        		toolSessionID: "${sessionId}",
 			        		content: JSON.stringify(window.mapModel.getIdea()) 
 			        },

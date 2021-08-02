@@ -23,9 +23,11 @@
 
 package org.lamsfoundation.lams.tool.mindmap.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.mindmap.dto.MindmapDTO;
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapNode;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapRequest;
@@ -43,31 +45,31 @@ import com.thoughtworks.xstream.XStream;
  */
 public interface IMindmapService extends ICommonToolService {
 
-    public Mindmap copyDefaultContent(Long newContentID);
+    Mindmap copyDefaultContent(Long newContentID);
 
-    public Mindmap getDefaultContent();
+    Mindmap getDefaultContent();
 
-    public Long getDefaultContentIdBySignature(String toolSignature);
+    Long getDefaultContentIdBySignature(String toolSignature);
 
-    public Mindmap getMindmapByContentId(Long toolContentID);
+    Mindmap getMindmapByContentId(Long toolContentID);
 
-    public Mindmap getMindmapByUid(Long Uid);
+    Mindmap getMindmapByUid(Long Uid);
 
-    public void saveOrUpdateMindmap(Mindmap mindmap);
+    void saveOrUpdateMindmap(Mindmap mindmap);
 
-    public MindmapSession getSessionBySessionId(Long toolSessionId);
+    MindmapSession getSessionBySessionId(Long toolSessionId);
 
-    public void saveOrUpdateMindmapSession(MindmapSession mindmapSession);
+    void saveOrUpdateMindmapSession(MindmapSession mindmapSession);
 
-    public MindmapUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId);
+    MindmapUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId);
 
-    public MindmapUser getUserByLoginAndSessionId(String login, long toolSessionId);
+    MindmapUser getUserByLoginAndSessionId(String login, long toolSessionId);
 
-    public MindmapUser getUserByUID(Long uid);
+    MindmapUser getUserByUID(Long uid);
 
-    public void saveOrUpdateMindmapUser(MindmapUser mindmapUser);
+    void saveOrUpdateMindmapUser(MindmapUser mindmapUser);
 
-    public MindmapUser createMindmapUser(UserDTO user, MindmapSession mindmapSession);
+    MindmapUser createMindmapUser(UserDTO user, MindmapSession mindmapSession);
 
     Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
 
@@ -75,63 +77,73 @@ public interface IMindmapService extends ICommonToolService {
 
     void updateEntry(Long uid, String entry);
 
-    public void updateEntry(NotebookEntry notebookEntry);
+    void updateEntry(NotebookEntry notebookEntry);
 
-    public void setMindmapMessageService(MessageService mindmapMessageService);
+    void setMindmapMessageService(MessageService mindmapMessageService);
 
-    public MessageService getMindmapMessageService();
+    MessageService getMindmapMessageService();
 
-    public void deleteNodeByUniqueMindmapUser(Long uniqueId, Long mindmapId, Long userId, Long sessionId);
+    void deleteNodeByUniqueMindmapUser(Long uniqueId, Long mindmapId, Long userId, Long sessionId);
 
-    public void deleteNodes(String nodesToDeleteCondition);
+    void deleteNodes(String nodesToDeleteCondition);
 
-    public String getNodesToDeleteCondition();
+    String getNodesToDeleteCondition();
 
-    public void setNodesToDeleteCondition(String nodesToDeleteCondition);
+    void setNodesToDeleteCondition(String nodesToDeleteCondition);
 
-    public void saveOrUpdateMindmapNode(MindmapNode mindmapNode);
+    void saveOrUpdateMindmapNode(MindmapNode mindmapNode);
 
-    public List getAuthorRootNodeByMindmapId(Long mindmapId);
+    List getAuthorRootNodeByMindmapId(Long mindmapId);
 
-    public List getAuthorRootNodeBySessionId(Long sessionId);
+    List getAuthorRootNodeBySessionId(Long sessionId);
 
-    public List getAuthorRootNodeByMindmapSession(Long mindmapId, Long toolSessionId);
+    List getAuthorRootNodeByMindmapSession(Long mindmapId, Long toolSessionId);
 
-    public List getRootNodeByMindmapIdAndUserId(Long mindmapId, Long userId);
+    List getRootNodeByMindmapIdAndUserId(Long mindmapId, Long userId);
 
-    public List getRootNodeByMindmapIdAndSessionId(Long mindmapId, Long sessionId);
+    List getRootNodeByMindmapIdAndSessionId(Long mindmapId, Long sessionId);
 
-    public List getMindmapNodeByParentId(Long parentId, Long mindmapId);
+    List getMindmapNodeByParentId(Long parentId, Long mindmapId);
 
-    public List getMindmapNodeByParentIdMindmapIdSessionId(Long parentId, Long mindmapId, Long sessionId);
+    List getMindmapNodeByParentIdMindmapIdSessionId(Long parentId, Long mindmapId, Long sessionId);
 
-    public List getMindmapNodeByUniqueId(Long uniqueId, Long mindmapId);
+    List getMindmapNodeByUniqueId(Long uniqueId, Long mindmapId);
 
-    public MindmapNode getMindmapNodeByUniqueIdSessionId(Long uniqueId, Long mindmapId, Long sessionId);
+    MindmapNode getMindmapNodeByUniqueIdSessionId(Long uniqueId, Long mindmapId, Long sessionId);
 
-    public List getMindmapNodeByUniqueIdMindmapIdUserId(Long uniqueId, Long mindmapId, Long userId);
+    List getMindmapNodeByUniqueIdMindmapIdUserId(Long uniqueId, Long mindmapId, Long userId);
 
-    public MindmapNode saveMindmapNode(MindmapNode currentMindmapNode, MindmapNode parentMindmapNode, Long uniqueId,
+    MindmapNode saveMindmapNode(MindmapNode currentMindmapNode, MindmapNode parentMindmapNode, Long uniqueId,
 	    String text, String color, MindmapUser mindmapUser, Mindmap mindmap, MindmapSession session);
 
-    public NodeModel getMindmapXMLFromDatabase(Long rootNodeId, Long mindmapId, NodeModel rootNodeModel,
+    NodeModel getMindmapXMLFromDatabase(Long rootNodeId, Long mindmapId, NodeModel rootNodeModel,
 	    MindmapUser mindmapUser, boolean isMonitor, boolean isAuthor, boolean isUserLocked);
 
-    public void getChildMindmapNodes(List<NodeModel> branches, MindmapNode rootMindmapNode, MindmapUser mindmapUser,
+    void getChildMindmapNodes(List<NodeModel> branches, MindmapNode rootMindmapNode, MindmapUser mindmapUser,
 	    Mindmap mindmap, MindmapSession mindmapSession);
 
-    public void saveOrUpdateMindmapRequest(MindmapRequest mindmapRequest);
+    void saveOrUpdateMindmapRequest(MindmapRequest mindmapRequest);
 
-    public Long getNodeLastUniqueIdByMindmapUidSessionId(Long mindmapUid, Long sessionId);
+    Long getNodeLastUniqueIdByMindmapUidSessionId(Long mindmapUid, Long sessionId);
 
-    public List<MindmapRequest> getLastRequestsAfterGlobalId(Long globalId, Long mindmapId, Long sessionId);
+    List<MindmapRequest> getLastRequestsAfterGlobalId(Long globalId, Long mindmapId, Long sessionId);
 
-    public MindmapRequest getRequestByUniqueId(Long uniqueId, Long userId, Long mindmapId, Long globalId);
+    MindmapRequest getRequestByUniqueId(Long uniqueId, Long userId, Long mindmapId, Long globalId);
 
-    public Long getLastGlobalIdByMindmapId(Long mindmapId, Long sessionId);
+    Long getLastGlobalIdByMindmapId(Long mindmapId, Long sessionId);
 
     // Outputs
-    public int getNumNodes(Long learnerId, Long toolSessionId);
+    int getNumNodes(Long learnerId, Long toolSessionId);
 
-    public XStream getXStream();
+    XStream getXStream();
+
+    void fillGalleryWalkRatings(MindmapDTO mindmapDTO, Long ratingUserId);
+
+    void createGalleryWalkRatingCriterion(long toolContentId);
+
+    void startGalleryWalk(long toolContentId) throws IOException;
+
+    void finishGalleryWalk(long toolContentId) throws IOException;
+
+    void enableGalleryWalkLearnerEdit(long toolContentId) throws IOException;
 }

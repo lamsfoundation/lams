@@ -43,6 +43,8 @@
  				<property name="mindmapToolContentHandler"><ref bean="mindmapToolContentHandler"/></property>
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
 		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
+		   		<property name="ratingService"><ref bean="ratingService" /></property>
+		   		<property name="learnerService"><ref bean="learnerService" /></property>
 		   		<property name="mindmapOutputFactory"><ref bean="mindmapOutputFactory"/></property>
 		   		<property name="mindmapMessageService"><ref bean="mindmapMessageService"/></property>
 			</bean>
