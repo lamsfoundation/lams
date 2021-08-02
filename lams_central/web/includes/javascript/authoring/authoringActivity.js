@@ -443,10 +443,14 @@ ActivityDraw = {
 	 * Draws a Gate activity
 	 */
 	gate : function(x, y) {
+		
 		if (x == undefined || y == undefined) {
 			x = this.items.getBBox().x;
 			y = this.items.getBBox().y;
 		}
+		
+		x = Math.round(x);
+		y = Math.round(y);
 
 		if (this.items) {
 			this.items.remove();
@@ -454,7 +458,7 @@ ActivityDraw = {
 		
 		x = GeneralLib.snapToGrid(x);
 		// make the icon more centred
-		y = GeneralLib.snapToGrid(y) - 20;
+		y = GeneralLib.snapToGrid(y);
 		
 		// create activity SVG elements
 		var shape = ActivityLib.getActivityIcon('gate');

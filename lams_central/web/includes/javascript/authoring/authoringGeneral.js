@@ -260,9 +260,9 @@ GeneralInitLib = {
 							if (learningLibraryID == 'grouping'){
 								activity = new ActivityDefs.GroupingActivity(null, null, x, y)
 							} else if (learningLibraryID == 'gate'){
-								activity = new ActivityDefs.GateActivity(null, null, x, y + 40);
+								activity = new ActivityDefs.GateActivity(null, null, x, GeneralLib.snapToGrid(y) + 20);
 							} else if (learningLibraryID == 'branching') {
-								activity = new ActivityDefs.BranchingEdgeActivity(null, null, x, y, null, false, null, null);
+								activity = new ActivityDefs.BranchingEdgeActivity(null, null, x, y + 10, null, false, null, null);
 							} else if (learningLibraryID == 'optional'){
 								activity = new ActivityDefs.OptionalActivity(null, null, x, y);
 							} else if (learningLibraryID == 'floating') {
@@ -295,7 +295,8 @@ GeneralInitLib = {
 						ActivityLib.dropActivity(activity, eventX, eventY);
 						
 						if (activity instanceof ActivityDefs.BranchingEdgeActivity) {
-							let branchingEnd = new ActivityDefs.BranchingEdgeActivity(null, null, GeneralLib.snapToGrid(x + 120), y, null, false, null, activity.branchingActivity);
+							let branchingEnd = new ActivityDefs.BranchingEdgeActivity(null, null, 
+								GeneralLib.snapToGrid(x + 120), y + 10, null, false, null, activity.branchingActivity);
 							layout.activities.push(branchingEnd);
 						}
 				   }
@@ -1416,7 +1417,7 @@ GeneralLib = {
 					if (activity instanceof ActivityDefs.GateActivity) {
 						// adjust placement for gate activity, so it's in the middle of its cell
 						x += 70;
-						y += 30;
+						y += 20;
 					}
 					
 					activity.draw(x, y);
