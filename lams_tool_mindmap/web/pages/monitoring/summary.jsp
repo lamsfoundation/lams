@@ -6,18 +6,15 @@
 <link type="text/css" href="${lams}/css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 <style>
-	#control-buttons {
-		text-align: right;
+	#gallery-walk-panel {
+		width: 400px;
+		margin: auto;
+		margin-bottom: 20px;
+		text-align: center;
 	}
 	
-	#gallery-walk-start {
-		margin-left: 20px;
-	}
-	
-	#gallery-walk-rating-table {
-		width: 60%;
-		margin: 50px auto;
-		border-bottom: 1px solid #ddd;
+	#gallery-walk-learner-edit {
+		margin-top: 20px;
 	}
 	
 	#gallery-walk-rating-table th {
@@ -106,8 +103,7 @@
 				toolContentID : ${dto.toolContentId}
 			},
 			'success' : function(){
-				$('#gallery-walk-start').hide();
-				$('#gallery-walk-finish, #gallery-walk-learner-edit').removeClass('hidden');
+				location.reload();
 			}
 		});
 	}
@@ -163,54 +159,77 @@
 </div>
 	
 <c:if test="${not empty dto.sessionDTOs and mindmapDTO.galleryWalkEnabled}">
-	<div id="control-buttons">
-		<button id="gallery-walk-start" type="button"
-		        class="btn btn-default 
-		        	   ${not mindmapDTO.galleryWalkStarted and not mindmapDTO.galleryWalkFinished ? '' : 'hidden'}"
-		        onClick="javascript:startGalleryWalk()">
-			<fmt:message key="monitoring.summary.gallery.walk.start" /> 
-		</button>
-		
-		<button id="gallery-walk-learner-edit" type="button"
-		        class="btn btn-default ${not mindmapDTO.galleryWalkEditEnabled and (mindmapDTO.galleryWalkStarted or mindmapDTO.galleryWalkFinished) ? '' : 'hidden'}"
-		        onClick="javascript:enableGalleryWalkLearnerEdit()">
-			<fmt:message key="monitoring.summary.gallery.walk.learner.edit" /> 
-		</button>
-		
-		<button id="gallery-walk-finish" type="button"
-		        class="btn btn-default ${mindmapDTO.galleryWalkStarted and not mindmapDTO.galleryWalkFinished ? '' : 'hidden'}"
-		        onClick="javascript:finishGalleryWalk()">
-			<fmt:message key="monitoring.summary.gallery.walk.finish" /> 
-		</button>
+	<div class="panel panel-default" id="gallery-walk-panel">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">
+			<fmt:message key="label.gallery.walk" />&nbsp;
+			<b>
+				<c:choose>
+					<c:when test="${not mindmapDTO.galleryWalkStarted and not mindmapDTO.galleryWalkFinished}">
+						<fmt:message key="label.gallery.walk.state.not.started" />
+					</c:when>
+					<c:when test="${mindmapDTO.galleryWalkStarted and not mindmapDTO.galleryWalkFinished}">
+						<fmt:message key="label.gallery.walk.state.started" />
+					</c:when>
+					<c:when test="${mindmapDTO.galleryWalkFinished}">
+						<fmt:message key="label.gallery.walk.state.finished" />
+					</c:when>
+				</c:choose>
+				<c:if test="${mindmapDTO.galleryWalkEditEnabled}">
+					<fmt:message key="label.gallery.walk.state.learner.edit.enabled" />
+				</c:if>
+			</b>
+		</h3>
+	  </div>
+	  <div class="panel-body">
+	   		<button id="gallery-walk-start" type="button"
+			        class="btn btn-primary
+			        	   ${not mindmapDTO.galleryWalkStarted and not mindmapDTO.galleryWalkFinished ? '' : 'hidden'}"
+			        onClick="javascript:startGalleryWalk()">
+				<fmt:message key="monitoring.summary.gallery.walk.start" /> 
+			</button>
+			
+			<button id="gallery-walk-finish" type="button"
+			        class="btn btn-primary ${mindmapDTO.galleryWalkStarted and not mindmapDTO.galleryWalkFinished ? '' : 'hidden'}"
+			        onClick="javascript:finishGalleryWalk()">
+				<fmt:message key="monitoring.summary.gallery.walk.finish" /> 
+			</button>
+			
+			<br>
+						
+			<button id="gallery-walk-learner-edit" type="button"
+			        class="btn btn-default ${not mindmapDTO.galleryWalkEditEnabled and (mindmapDTO.galleryWalkStarted or mindmapDTO.galleryWalkFinished) ? '' : 'hidden'}"
+			        onClick="javascript:enableGalleryWalkLearnerEdit()">
+				<fmt:message key="monitoring.summary.gallery.walk.learner.edit" /> 
+			</button>
+			
+			<c:if test="${mindmapDTO.galleryWalkFinished and not mindmapDTO.galleryWalkReadOnly}">
+				<h4 style="text-align: center"><fmt:message key="label.gallery.walk.ratings.header" /></h4>
+				<table id="gallery-walk-rating-table" class="table table-hover table-condensed">
+				  <thead class="thead-light">
+				    <tr>
+				      <th scope="col"><fmt:message key="monitoring.label.group" /></th>
+				      <th scope="col"><fmt:message key="label.rating" /></th>
+				    </tr>
+				  </thead>
+				  <tbody>
+					<c:forEach var="mindmapSession" items="${mindmapDTO.sessionDTOs}">
+						<tr>
+							<td>${mindmapSession.sessionName}</td>
+							<td>
+								<lams:Rating itemRatingDto="${mindmapSession.itemRatingDto}" 
+											 isItemAuthoredByUser="true"
+											 hideCriteriaTitle="true" />
+							</td>
+						</tr>
+					</c:forEach>
+				  </tbody>
+				</table>
+			</c:if>
+	  </div>
 	</div>
-	
-	<br>
 </c:if>
 
-<c:if test="${mindmapDTO.galleryWalkFinished and not mindmapDTO.galleryWalkReadOnly}">
-		<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk.ratings.header" /></h4>
-		<table id="gallery-walk-rating-table" class="table table-hover table-condensed">
-		  <thead class="thead-light">
-		    <tr>
-		      <th scope="col"><fmt:message key="monitoring.label.group" /></th>
-		      <th scope="col"><fmt:message key="label.rating" /></th>
-		    </tr>
-		  </thead>
-		  <tbody>
-			<c:forEach var="mindmapSession" items="${mindmapDTO.sessionDTOs}">
-				<tr>
-					<td>${mindmapSession.sessionName}</td>
-					<td>
-						<lams:Rating itemRatingDto="${mindmapSession.itemRatingDto}" 
-									 isItemAuthoredByUser="true"
-									 hideCriteriaTitle="true" />
-					</td>
-				</tr>
-			</c:forEach>
-		  </tbody>
-		</table>
-	</c:if>
-	
 <c:if test="${isGroupedActivity}">
 	<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
 </c:if>
