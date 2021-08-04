@@ -259,7 +259,7 @@
 	
 	<c:if test="${dto.multiUserMode}">
 		<iframe class="mindmap-frame"
-				data-src='<c:url value="/learning/getGalleryWalkMindmap.do?toolSessionID=${session.sessionID}"/>'>
+				data-src='<c:url value="/learning/getGalleryWalkMindmap.do?allowPrinting=true&toolSessionID=${session.sessionID}"/>'>
 		</iframe>
 	</c:if>
 
@@ -312,7 +312,7 @@
 										<fmt:message key="label.notAvailable" />
 									</c:when>
 									<c:otherwise>
-										<a href="showMindmap.do?userUID=${user.uid}&toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
+										<a href="showMindmap.do?allowPrinting=true&userUID=${user.uid}&toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
 											<fmt:message key="label.view" />
 										</a>									
 									</c:otherwise>
