@@ -1921,7 +1921,9 @@ ActivityLib = {
 		if (title.length > 35) {
 			title = title.substring(0, 35) + '...';
 		}
-		var label = $('<div />').addClass('svg-activity-title-label svg-tool-activity-title-box').text(title),
+		var label = $('<div />').addClass('svg-activity-title-label svg-tool-activity-title-box')
+								.attr('xmlns', 'http://www.w3.org/1999/xhtml')
+								.text(title),
 			wrapper = $('<foreignObject />').append(label).attr({
 				'x'     : x + 75,
 				'y'     : y,
