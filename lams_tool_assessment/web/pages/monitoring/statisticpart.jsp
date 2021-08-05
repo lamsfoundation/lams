@@ -311,7 +311,6 @@
 		          	
 		          	<lams:Popover titleKey="label.qb.stats">
 		          		<fmt:message key="label.qb.stats.tooltip" />
-						<a href="/lams/" tabindex="0" target="_blank">Here is a link</a>
 		          	</lams:Popover>
 
 	      		</span>
@@ -332,34 +331,24 @@
 						<th scope="col" class="text-center">
 							<fmt:message key="label.qb.difficulty.index"/>&nbsp;
 							
-							<lams:Popover data-placement="bottom">
+							<lams:Popover titleKey="label.qb.difficulty.index">
 				          		<fmt:message key="label.qb.difficulty.index.tooltip" />
-								<a href="/lams/" tabindex="0" target="_blank">Here is a link</a>
 				          	</lams:Popover>
 							
 						</th>
 						<th scope="col" class="text-center">
 							<fmt:message key="label.qb.discrimination.index"/>&nbsp;
 							
-							<a id="discrimination-index-popover" class="lams-popover" data-placement="top"/></a>
-							<span id="discrimination-index-popover-content" class="lams-popover-content hidden">
-								<span class="lams-popover-title">
-									<fmt:message key="label.qb.discrimination.index"/>
-								</span>
-								<span class="lams-popover-body">
-									<fmt:message key="label.qb.discrimination.index.tooltip" />
-									<a href="/lams/" tabindex="0" target="_blank">Here is a link</a>
-								</span>
-							</span>
-														
+							<lams:Popover titleKey="label.qb.discrimination.index">
+				          		<fmt:message key="label.qb.discrimination.index.tooltip" />
+				          	</lams:Popover>
 							
 						</th>
 						<th scope="col" class="text-center">
 							<fmt:message key="label.qb.point.biserial"/>&nbsp;
 							
-							<lams:Popover titleKey="label.qb.difficulty.index" data-placement="left">
-								<fmt:message key="label.qb.difficulty.index.tooltip" />
-								<a href="/lams/" tabindex="0" target="_blank">Here is a link</a>
+							<lams:Popover titleKey="label.qb.point.biserial">
+				          		<fmt:message key="label.qb.point.biserial.tooltip" />
 				          	</lams:Popover>
 	
 						</th>
