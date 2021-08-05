@@ -7,10 +7,14 @@
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 <style>
 	#gallery-walk-panel {
-		width: 400px;
+		width: 30%;
 		margin: auto;
 		margin-bottom: 20px;
 		text-align: center;
+	}
+	
+	#gallery-walk-panel.gallery-walk-panel-ratings {
+		width: 100%;
 	}
 	
 	#gallery-walk-learner-edit {
@@ -159,7 +163,8 @@
 </div>
 	
 <c:if test="${not empty dto.sessionDTOs and mindmapDTO.galleryWalkEnabled}">
-	<div class="panel panel-default" id="gallery-walk-panel">
+	<div class="panel panel-default ${mindmapDTO.galleryWalkFinished and not mindmapDTO.galleryWalkReadOnly ? 'gallery-walk-panel-ratings' : ''}"
+		 id="gallery-walk-panel">
 	  <div class="panel-heading">
 	    <h3 class="panel-title">
 			<fmt:message key="label.gallery.walk" />&nbsp;
