@@ -4,9 +4,13 @@
 <lams:SimplePanel titleKey="label.chat.options">
 <div class="checkbox">
 	<label for="filteringEnabled">
-	<form:checkbox path="filteringEnabled" value="1" id="filteringEnabled"/>
-	<fmt:message key="advanced.filteringEnabled" />
+		<form:checkbox path="filteringEnabled" value="1" id="filteringEnabled"/>
+		<fmt:message key="advanced.filteringEnabled" />
 	</label>
+	<lams:Popover titleKey="advanced.filteringEnabled">
+		<fmt:message key="advanced.filteringEnabled.tooltip.1" /><br>
+		<fmt:message key="advanced.filteringEnabled.tooltip.2" />
+	</lams:Popover>
 </div>
 <div class="form-group">
 	<textarea name="filterKeywords" rows="3" class="form-control">${authoringForm.filterKeywords}</textarea>
@@ -18,16 +22,23 @@
 <lams:SimplePanel titleKey="label.activity.completion">
 <div class="checkbox">
 	<label for="lockOnFinished">
-	<form:checkbox path="lockOnFinished" value="1" id="lockOnFinished"/>
-	<fmt:message key="advanced.lockOnFinished" />
+		<form:checkbox path="lockOnFinished" value="1" id="lockOnFinished"/>
+		<fmt:message key="advanced.lockOnFinished" />
 	</label>
+	<lams:Popover titleKey="advanced.lockOnFinished">
+		<fmt:message key="advanced.lockOnFinished.tooltip.1" />
+	</lams:Popover>
 </div>
 
 <div class="checkbox">
 	<label for="reflectOnActivity">
-	<form:checkbox path="reflectOnActivity" value="1" id="reflectOnActivity"/>
-	<fmt:message key="advanced.reflectOnActivity" />
+		<form:checkbox path="reflectOnActivity" value="1" id="reflectOnActivity"/>
+		<fmt:message key="advanced.reflectOnActivity" />
 	</label>
+	<lams:Popover titleKey="advanced.reflectOnActivity">
+		<fmt:message key="advanced.reflectOnActivity.tooltip.1" /><br>
+		<fmt:message key="advanced.reflectOnActivity.tooltip.2" />
+	</lams:Popover>
 </div>
 
 <div class="form-group">
@@ -36,7 +47,7 @@
 </lams:SimplePanel>
 
 <script type="text/javascript">
-<!--
+
 //automatically turn on refect option if there are text input in refect instruction area
 	var ra = document.getElementById("reflectInstructions");
 	var rao = document.getElementById("reflectOnActivity");
@@ -51,6 +62,5 @@
 	}
 
 	ra.onkeyup=turnOnRefect;
-//-->
-</script>
 
+</script>

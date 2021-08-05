@@ -28,7 +28,7 @@
 		<c:set var="title"><fmt:message key="activity.title" /></c:set>
 			<lams:Page title="${title}" type="navbar" formID="authoringForm">
 		
-				<lams:Tabs control="true" title="${title}" helpToolSignature="<%= ChatConstants.TOOL_SIGNATURE %>" helpModule="authoring">
+				<lams:Tabs control="true" title="${title}">
 					<lams:Tab id="1" key="button.basic" />
 					<lams:Tab id="2" key="button.advanced" />
 					<lams:Tab id="3" key="button.conditions" />

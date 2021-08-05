@@ -1,10 +1,12 @@
 <%@include file="/common/taglibs.jsp"%>
 
-<c:set var="ddTitle"><fmt:message key="monitor.summary.date.restriction" /></c:set>
+<c:set var="ddTitle">
+	<fmt:message key="monitor.summary.date.restriction" />
+	<lams:Popover titleKey="monitor.summary.date.restriction">
+		<fmt:message key="monitor.summary.when.date.restriction.is.set" />
+	</lams:Popover>
+</c:set>
 <lams:RestrictedUsageAccordian title="${ddTitle}">
-
-	<p><fmt:message key="monitor.summary.when.date.restriction.is.set" /></p>
-		
 	<div id="datetimeDiv" <c:if test='${not empty submissionDeadline}'> style="display: none;" </c:if>>
 		<div class="form-group">
 		<label for="datetime"><fmt:message key="monitor.summary.after.date" />&nbsp;

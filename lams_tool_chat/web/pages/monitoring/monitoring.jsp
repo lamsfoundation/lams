@@ -26,7 +26,7 @@
 	
 		<lams:Page title="${title}" type="navbar">
 		
-			<lams:Tabs control="true" title="${title}" helpToolSignature="<%= ChatConstants.TOOL_SIGNATURE %>" helpModule="monitoring">
+			<lams:Tabs control="true" title="${title}">
 				<lams:Tab id="1" key="button.summary" />
 				<lams:Tab id="2" key="button.editActivity" />
 				<lams:Tab id="3" key="button.statistics" />

@@ -59,6 +59,10 @@
  <div class="form-inline">
 	<a href="javascript:showConditionMessage('<lams:WebAppURL />authoringCondition/newConditionInit.do?sessionMapID=${authoringForm.sessionMapID}');" 
 		class="btn btn-default btn-sm"><i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.conditions.add.condition" /></a> 
+	<lams:Popover titleKey="label.authoring.heading.conditions">
+		<fmt:message key="label.authoring.conditions.add.condition.tooltip.1" /><br>
+		<fmt:message key="label.authoring.conditions.add.condition.tooltip.2" />
+	</lams:Popover>
 </div>
 
 <div id="conditionInputArea" name="conditionInputArea" class="voffset10"></div>
