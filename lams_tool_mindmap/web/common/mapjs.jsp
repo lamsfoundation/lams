@@ -412,8 +412,17 @@
 
 
 </c:otherwise>
-</c:choose> 
-	
+</c:choose>
+
+<c:if test="${param.allowPrinting}">
+	function showPrintView(){
+    	var printWindow = window.open('<c:url value="/learning/getPrintMindmap.do?toolSessionID=${sessionId}"/>',
+    	    						  'MindmapPrint', 'width=1152,height=900,scrollbars=yes,resizable=yes');
+		if (window.focus) {
+			printWindow.focus();
+		}
+	}
+</c:if>
 </script>	
 
 	<div class="full-screen-content-div">
@@ -434,7 +443,14 @@
 		<div style="display:inline" role="group">
         <a href="#" class="btn btn-default btn-sm full-screen-launch-button pull-right loffset5" id="expand" onclick="javascript:launchIntoFullscreen(this)"><i class="fa fa-arrows-alt" aria-hidden="true"></i></a> 
         <a href="#" class="btn btn-default btn-sm full-screen-exit-button pull-right loffset5" id="shrink" onclick="javascript:exitFullscreen()" style="display: none;"><i class="fa fa-compress" aria-hidden="true"></i></a> 
+		
+		<c:if test="${param.allowPrinting}">
+			<a href="#" class="btn btn-default btn-sm pull-right loffset5" id="print" onclick="javascript:showPrintView()"
+			   title="<fmt:message key='button.print'/>"><i class="fa fa-print" aria-hidden="true"></i></a> 
+		</c:if>
+		
 		<input type="text" id="background-color" class='updateStyle form-control input-sm' data-mm-target-property='background' size="7" width="180px">
+
 		</div>
 		 
 		<div>

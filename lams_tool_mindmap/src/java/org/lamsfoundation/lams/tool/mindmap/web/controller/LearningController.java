@@ -661,7 +661,18 @@ public class LearningController {
 	LearningController.storeMindmapCanvasParameters(mindmap, toolSessionID, user,
 		user == null ? ToolAccessMode.TEACHER.toString() : ToolAccessMode.LEARNER.toString(), contentEditable,
 		request);
-	return "pages/learning/galleryWalkMindmap";
+	return "pages/learning/singleMindmap";
+    }
+
+    @RequestMapping("/getPrintMindmap")
+    public String getPrintMindmap(@RequestParam Long toolSessionID, HttpServletRequest request) {
+	MindmapSession session = mindmapService.getSessionBySessionId(toolSessionID);
+	Mindmap mindmap = session.getMindmap();
+	LearningController.storeMindmapCanvasParameters(mindmap, toolSessionID, null, ToolAccessMode.TEACHER.toString(),
+		false, request);
+	request.setAttribute("printMode", true);
+	request.setAttribute("sessionName", session.getSessionName());
+	return "pages/learning/singleMindmap";
     }
 
     private static void storeMindmapCanvasParameters(Mindmap mindmap, Long toolSessionID, MindmapUser user, String mode,
