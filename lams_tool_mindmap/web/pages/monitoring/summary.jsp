@@ -19,6 +19,7 @@
 	
 	#gallery-walk-learner-edit {
 		margin-top: 20px;
+		margin-bottom: 20px;
 	}
 	
 	#gallery-walk-rating-table th {
