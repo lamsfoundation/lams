@@ -7,7 +7,7 @@
 		<form:checkbox path="filteringEnabled" value="1" id="filteringEnabled"/>
 		<fmt:message key="advanced.filteringEnabled" />
 	</label>
-	<lams:Popover titleKey="advanced.filteringEnabled">
+	<lams:Popover>
 		<fmt:message key="advanced.filteringEnabled.tooltip.1" /><br>
 		<fmt:message key="advanced.filteringEnabled.tooltip.2" />
 	</lams:Popover>
