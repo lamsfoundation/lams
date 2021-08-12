@@ -346,7 +346,7 @@
 				});
 			}
 			
-			var autosaveInterval = "10000"; // 30 seconds interval
+			var autosaveInterval = "30000"; // 30 seconds interval
 			window.setInterval(learnerAutosave, autosaveInterval);
 
 			function onLearnerAutosaveError() {
