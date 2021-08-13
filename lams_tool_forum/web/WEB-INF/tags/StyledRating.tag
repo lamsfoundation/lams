@@ -219,6 +219,10 @@ When true, hides the names and groups the comments.  -->
 			font-style: normal;
 			font-weight: bold;
 		}
+
+		.rubrics-table td:first-child {
+			font-weight: bold;
+		}
 		
 		.rubrics-table .rubrics-rating-cell {
 			border-top: none;
