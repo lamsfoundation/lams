@@ -46,6 +46,11 @@
 	#grid-container > div {
 		padding: 0;
 	}
+	
+	#question-detail-area {
+		overflow-y: hidden;
+	}
+	
 	@media (min-width: 768px){
 		#question-detail-area {
 		    padding-left: 20px !important;
