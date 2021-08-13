@@ -14,6 +14,10 @@
 	.rubrics-table th {
 		font-style: normal;
 		font-weight: bold;
+		}
+
+	.rubrics-table td:first-child {
+		font-weight: bold;
 	}
 	
 	.rubrics-table td:not(:first-child) {
