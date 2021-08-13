@@ -539,6 +539,9 @@ var MenuLib = {
 					// load the imported LD
 					GeneralLib.openLearningDesign(currentLearningDesignID);
 					
+					// use standard layout as if the user clicked "Arrange" button
+					GeneralLib.arrangeActivities();
+					
 					// generate images of the imported LD
 					GeneralLib.saveLearningDesignImage();
 				}

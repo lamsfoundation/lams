@@ -292,7 +292,7 @@ public abstract class LdTemplateController {
 
     protected static final int rowHeightSpace = 120;
     protected static final int activityWidthSpace = 240;
-    protected static final int gateHeightOffset = 30;
+    protected static final int gateHeightOffset = 20;
     protected static final int gateWidthOffset = 70;
 
     /**
