@@ -25,7 +25,7 @@
 		<form:checkbox path="lockOnFinished" value="1" id="lockOnFinished"/>
 		<fmt:message key="advanced.lockOnFinished" />
 	</label>
-	<lams:Popover titleKey="advanced.lockOnFinished">
+	<lams:Popover>
 		<fmt:message key="advanced.lockOnFinished.tooltip.1" />
 	</lams:Popover>
 </div>
@@ -35,7 +35,7 @@
 		<form:checkbox path="reflectOnActivity" value="1" id="reflectOnActivity"/>
 		<fmt:message key="advanced.reflectOnActivity" />
 	</label>
-	<lams:Popover titleKey="advanced.reflectOnActivity">
+	<lams:Popover>
 		<fmt:message key="advanced.reflectOnActivity.tooltip.1" /><br>
 		<fmt:message key="advanced.reflectOnActivity.tooltip.2" />
 	</lams:Popover>

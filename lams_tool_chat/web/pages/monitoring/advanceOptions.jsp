@@ -5,7 +5,7 @@
 	<tr>
 		<td>
 			<fmt:message key="advanced.lockOnFinished" />
-			<lams:Popover titleKey="advanced.lockOnFinished">
+			<lams:Popover>
 				<fmt:message key="advanced.lockOnFinished.tooltip.1" />
 			</lams:Popover>
 		</td>
@@ -25,7 +25,7 @@
 	<tr>
 		<td>
 			<fmt:message key="monitor.summary.td.addNotebook" />
-			<lams:Popover titleKey="advanced.reflectOnActivity">
+			<lams:Popover>
 				<fmt:message key="advanced.reflectOnActivity.tooltip.1" /><br>
 				<fmt:message key="advanced.reflectOnActivity.tooltip.2" />
 			</lams:Popover>
@@ -59,7 +59,7 @@
 	<tr>
 		<td>
 			<fmt:message key="advanced.filteringEnabled" />
-			<lams:Popover titleKey="advanced.filteringEnabled">
+			<lams:Popover>
 				<fmt:message key="advanced.filteringEnabled.tooltip.1" /><br>
 				<fmt:message key="advanced.filteringEnabled.tooltip.2" />
 			</lams:Popover>
