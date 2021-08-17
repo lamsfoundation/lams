@@ -549,15 +549,15 @@
 								   href="#" onClick="javascript:refreshMonitor('sequence')">
 									<i class="fa fa-refresh"></i> <span class="hidden-xs"><fmt:message key="button.refresh"/></span>
 								</a>
-								<a id="liveEditButton" class="btn btn-sm btn-default style="display:none" title="<fmt:message key='button.live.edit.tooltip'/>"
+								<a id="liveEditButton" class="btn btn-sm btn-default" style="display:none" title="<fmt:message key='button.live.edit.tooltip'/>"
 							       href="#" onClick="javascript:openLiveEdit()">
 									<i class="fa fa-pencil"></i> <span class="hidden-xs"><fmt:message key='button.live.edit'/></span>
 								</a>
-								<a id="canvasFitScreenButton" class="btn btn-sm btn-default title="<fmt:message key='button.canvas.fit.screen.tooltip'/>"
+								<a id="canvasFitScreenButton" class="btn btn-sm btn-default" title="<fmt:message key='button.canvas.fit.screen.tooltip'/>"
 							       href="#" onClick="javascript:canvasFitScreen(true)">
 									<i class="fa fa-arrows-alt"></i> <span class="hidden-xs"><fmt:message key='button.canvas.fit.screen'/></span>
 								</a>
-								<a id="canvasOriginalSizeButton" class="btn btn-sm btn-default title="<fmt:message key='button.canvas.original.size.tooltip'/>"
+								<a id="canvasOriginalSizeButton" class="btn btn-sm btn-default" title="<fmt:message key='button.canvas.original.size.tooltip'/>"
 							       href="#" onClick="javascript:canvasFitScreen(false)">
 									<i class="fa fa-arrow-circle-o-up"></i> <span class="hidden-xs"><fmt:message key='button.canvas.original.size'/></span>
 								</a>
