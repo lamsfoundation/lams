@@ -542,8 +542,8 @@ var MenuLib = {
 					// use standard layout as if the user clicked "Arrange" button
 					GeneralLib.arrangeActivities();
 					
-					// generate images of the imported LD
-					GeneralLib.saveLearningDesignImage();
+					// save learning design after rearrange
+					MenuLib.saveLearningDesign();
 				}
 			}, 1000);
 	},
