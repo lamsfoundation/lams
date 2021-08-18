@@ -405,7 +405,7 @@ GeneralInitLib = {
     		}
 			
 			if (copiedResource.isCut) {
-				var parent = tree.treeview('getParent', ldNode);
+				var parent = ldNode;
 				while (parent && parent.nodeId) {
 					if (parent.nodeId == copiedResource.resourceNode.nodeId) {
 						alert(LABELS.FOLDER_MOVE_TO_CHILD_ERROR);
