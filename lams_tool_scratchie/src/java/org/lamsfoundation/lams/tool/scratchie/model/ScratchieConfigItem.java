@@ -34,7 +34,6 @@ import javax.persistence.Table;
 public class ScratchieConfigItem implements java.io.Serializable {
     private static final long serialVersionUID = 6360672537352753361L;
 
-    public static final String KEY_IS_ENABLED_EXTRA_POINT_OPTION = "isEnabledExtraPointOption";
     public static final String KEY_PRESET_MARKS = "presetMarks";
     public static final String KEY_HIDE_TITLES = "hideTitles";
 

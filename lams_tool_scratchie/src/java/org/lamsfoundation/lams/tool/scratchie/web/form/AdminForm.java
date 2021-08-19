@@ -22,25 +22,11 @@
 
 package org.lamsfoundation.lams.tool.scratchie.web.form;
 
-/**
- *
- */
 public class AdminForm {
-    private static final long serialVersionUID = 414425664356226L;
-
-    private boolean enabledExtraPointOption;
 
     private String presetMarks;
 
     private boolean hideTitles;
-
-    public boolean isEnabledExtraPointOption() {
-	return enabledExtraPointOption;
-    }
-
-    public void setEnabledExtraPointOption(boolean isEnabledExtraPointOption) {
-	this.enabledExtraPointOption = isEnabledExtraPointOption;
-    }
 
     public String getPresetMarks() {
 	return presetMarks;

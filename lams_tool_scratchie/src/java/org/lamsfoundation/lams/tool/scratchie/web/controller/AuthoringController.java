@@ -160,11 +160,6 @@ public class AuthoringController {
 	    throw new ServletException(e);
 	}
 
-	ScratchieConfigItem isEnabledExtraPointOption = scratchieService
-		.getConfigItem(ScratchieConfigItem.KEY_IS_ENABLED_EXTRA_POINT_OPTION);
-	sessionMap.put(ScratchieConfigItem.KEY_IS_ENABLED_EXTRA_POINT_OPTION,
-		new Boolean(isEnabledExtraPointOption.getConfigValue()));
-
 	//prepare advanced option allowing to overwrite default preset marks
 	ScratchieConfigItem defaultPresetMarksConfigItem = scratchieService
 		.getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS);
