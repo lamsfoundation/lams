@@ -65,15 +65,6 @@
     <div class="row">
         <div class="col-sm-6">
 
-            <c:if test="${sessionMap.isEnabledExtraPointOption}">
-                <div class="checkbox">
-                    <label for="extraPoint">
-                        <form:checkbox path="scratchie.extraPoint" id="extraPoint"/>
-                        <fmt:message key="label.authoring.advanced.give.extra.point" />
-                    </label>
-                </div>
-            </c:if>
-
             <div class="checkbox">
                 <label for="burning-questions-enabled">
                     <form:checkbox path="scratchie.burningQuestionsEnabled" id="burning-questions-enabled"/>
