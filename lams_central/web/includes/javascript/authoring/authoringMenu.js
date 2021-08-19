@@ -393,8 +393,8 @@ var MenuLib = {
 		}
 		
 		// draw the new activity next to the existing one
-		var x = activity.items.shape.getBBox().x + 10,
-			y = activity.items.shape.getBBox().y + 10,
+		var x = activity.items.shape.getBBox().x + layout.snapToGrid.step / 2,
+			y = activity.items.shape.getBBox().y + layout.snapToGrid.step / 2,
 			newActivity = new ActivityDefs.ToolActivity(null, null, toolContentID, activity.toolID, activity.learningLibraryID,
 													   null, x, y, title);
 		layout.activities.push(newActivity);
@@ -539,8 +539,11 @@ var MenuLib = {
 					// load the imported LD
 					GeneralLib.openLearningDesign(currentLearningDesignID);
 					
-					// generate images of the imported LD
-					GeneralLib.saveLearningDesignImage();
+					// use standard layout as if the user clicked "Arrange" button
+					GeneralLib.arrangeActivities();
+					
+					// save learning design after rearrange
+					MenuLib.saveLearningDesign();
 				}
 			}, 1000);
 	},

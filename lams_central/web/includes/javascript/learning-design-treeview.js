@@ -100,6 +100,9 @@ var ldTreeview = {
 			// if folder is empty, we need to shift its icon a bit to the right 
 			if (result.length === 0) {
 				folder.icon = 'fa fa-folder-open treeview-empty';
+			} else if (folder) {
+				// remove previously set folder-open etc. classes so two folder icons are not displayed
+				folder.icon = '';
 			}
 			return result;
 		},

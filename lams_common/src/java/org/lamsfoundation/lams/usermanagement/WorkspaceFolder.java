@@ -84,10 +84,10 @@ public class WorkspaceFolder implements Serializable {
     private WorkspaceFolder parentWorkspaceFolder;
 
     @OneToMany(mappedBy = "parentWorkspaceFolder")
-    private Set<WorkspaceFolder> childWorkspaceFolders = new HashSet<WorkspaceFolder>();
+    private Set<WorkspaceFolder> childWorkspaceFolders = new HashSet<>();
 
     @OneToMany(mappedBy = "workspaceFolder")
-    private Set<LearningDesign> learningDesigns = new HashSet<LearningDesign>();
+    private Set<LearningDesign> learningDesigns = new HashSet<>();
 
     /**
      * non-nullable persistent field indicating the
@@ -119,7 +119,7 @@ public class WorkspaceFolder implements Serializable {
      * folder. As of now it represents only Files.
      */
     @OneToMany(mappedBy = "workspaceFolder", cascade = CascadeType.REMOVE)
-    private Set<WorkspaceFolderContent> folderContent = new HashSet<WorkspaceFolderContent>();
+    private Set<WorkspaceFolderContent> folderContent = new HashSet<>();
 
     public WorkspaceFolder(String name, Integer userID, Date creationDate, Date lastModifiedDate,
 	    Integer workspaceFolderType) {
@@ -189,6 +189,10 @@ public class WorkspaceFolder implements Serializable {
     }
 
     public void setParentWorkspaceFolder(WorkspaceFolder parentWorkspaceFolder) {
+	if (parentWorkspaceFolder != null
+		&& parentWorkspaceFolder.getWorkspaceFolderId().equals(this.getWorkspaceFolderId())) {
+	    throw new IllegalArgumentException("Workspace folder must not be its own parent");
+	}
 	this.parentWorkspaceFolder = parentWorkspaceFolder;
     }
 

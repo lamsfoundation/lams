@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.leaderselection.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.SortedMap;
@@ -89,10 +90,6 @@ public class LeaderselectionService
     private ICoreNotebookService coreNotebookService;
 
     private LeaderselectionOutputFactory leaderselectionOutputFactory;
-
-    public LeaderselectionService() {
-	super();
-    }
 
     /* ************ Methods from ToolSessionManager ************* */
     @Override
@@ -360,7 +357,12 @@ public class LeaderselectionService
     public List<LeaderselectionUser> getUsersBySession(Long toolSessionId) {
 	return leaderselectionUserDAO.getBySessionId(toolSessionId);
     }
-
+    
+    @Override
+    public Collection<User> getAllGroupUsers(Long toolSessionId) {
+	return toolService.getToolSession(toolSessionId).getLearners();
+    }
+    
     @Override
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
 	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);

@@ -27,20 +27,21 @@
 	.doku-monitoring-summary .panel {
 		overflow: auto;
 	}
-	
-	.doku-monitoring-summary #control-buttons {
-		float: right;
+
+	.doku-monitoring-summary #gallery-walk-panel {
+		width: 30%;
+		margin: auto;
 		margin-bottom: 20px;
+		text-align: center;
 	}
 	
-	.doku-monitoring-summary #gallery-walk-start {
-		margin-left: 20px;
+	.doku-monitoring-summary #gallery-walk-panel.gallery-walk-panel-ratings {
+		width: 100%;
 	}
 	
-	.doku-monitoring-summary #gallery-walk-rating-table {
-		width: 60%;
-		margin: 50px auto;
-		border-bottom: 1px solid #ddd;
+	.doku-monitoring-summary #gallery-walk-learner-edit {
+		margin-top: 20px;
+		margin-bottom: 20px;
 	}
 	
 	.doku-monitoring-summary #gallery-walk-rating-table th {
@@ -312,10 +313,15 @@
 				toolContentID : ${dokumaran.contentId}
 			},
 			'success' : function(){
-				let summaryPane = $('#doku-monitoring-summary-${sessionMap.toolContentID}');
-				
-				$('#gallery-walk-start', summaryPane).hide();
-				$('#gallery-walk-finish, #gallery-walk-learner-edit', summaryPane).removeClass('hidden');
+				<c:choose>
+					<c:when test="${isTbl}">
+						// reload current tab with Doku summary
+						loadTab(null, null, false);
+					</c:when>
+					<c:otherwise>
+						location.reload();
+					</c:otherwise>
+				</c:choose>
 			}
 		});
 	}
@@ -332,9 +338,6 @@
 			},
 			'success' : function(){
 				<c:choose>
-					<c:when test="${dokumaran.galleryWalkReadOnly}">
-						$('#doku-monitoring-summary-${sessionMap.toolContentID} #gallery-walk-finish').hide();
-					</c:when>
 					<c:when test="${isTbl}">
 						// reload current tab with Doku summary
 						loadTab(null, null, false);
@@ -773,55 +776,79 @@
 		<!--For release marks feature-->
 		<i class="fa fa-spinner" style="display:none" id="message-area-busy"></i>
 		<div id="message-area"></div>
+	</div>
 	
-		<c:if test="${not empty summaryList and dokumaran.galleryWalkEnabled}">
-			<div id="control-buttons">
-				<button id="gallery-walk-start" type="button"
-				        class="btn btn-default 
+	<c:if test="${not empty summaryList and dokumaran.galleryWalkEnabled}">
+		<div class="panel panel-default ${dokumaran.galleryWalkFinished and not dokumaran.galleryWalkReadOnly ? 'gallery-walk-panel-ratings' : ''}"
+			 id="gallery-walk-panel">
+		  <div class="panel-heading">
+		    <h3 class="panel-title">
+				<fmt:message key="label.gallery.walk" />&nbsp;
+				<b>
+					<c:choose>
+						<c:when test="${not dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished}">
+							<fmt:message key="label.gallery.walk.state.not.started" />
+						</c:when>
+						<c:when test="${dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished}">
+							<fmt:message key="label.gallery.walk.state.started" />
+						</c:when>
+						<c:when test="${dokumaran.galleryWalkFinished}">
+							<fmt:message key="label.gallery.walk.state.finished" />
+						</c:when>
+					</c:choose>
+					<c:if test="${dokumaran.galleryWalkEditEnabled}">
+						<fmt:message key="label.gallery.walk.state.learner.edit.enabled" />
+					</c:if>
+				</b>
+			</h3>
+		  </div>
+		  <div class="panel-body">
+		   		<button id="gallery-walk-start" type="button"
+				        class="btn btn-primary
 				        	   ${not dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'hidden'}"
 				        onClick="javascript:startGalleryWalk()">
 					<fmt:message key="monitoring.summary.gallery.walk.start" /> 
 				</button>
-								
+				
+				<button id="gallery-walk-finish" type="button"
+				        class="btn btn-primary ${dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'hidden'}"
+				        onClick="javascript:finishGalleryWalk()">
+					<fmt:message key="monitoring.summary.gallery.walk.finish" /> 
+				</button>
+				
+				<br>
+							
 				<button id="gallery-walk-learner-edit" type="button"
 				        class="btn btn-default ${not dokumaran.galleryWalkEditEnabled and (dokumaran.galleryWalkStarted or dokumaran.galleryWalkFinished) ? '' : 'hidden'}"
 				        onClick="javascript:enableGalleryWalkLearnerEdit()">
 					<fmt:message key="monitoring.summary.gallery.walk.learner.edit" /> 
 				</button>
 				
-				<button id="gallery-walk-finish" type="button"
-				        class="btn btn-default ${dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'hidden'}"
-				        onClick="javascript:finishGalleryWalk()">
-					<fmt:message key="monitoring.summary.gallery.walk.finish" /> 
-				</button>
-			</div>
-			
-			<br>
-		</c:if>
-	</div>
-
-	<c:if test="${dokumaran.galleryWalkFinished and not dokumaran.galleryWalkReadOnly}">
-		<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk.ratings.header" /></h4>
-		<table id="gallery-walk-rating-table" class="table table-hover table-condensed">
-		  <thead class="thead-light">
-		    <tr>
-		      <th scope="col"><fmt:message key="monitoring.label.group" /></th>
-		      <th scope="col"><fmt:message key="label.rating" /></th>
-		    </tr>
-		  </thead>
-		  <tbody>
-			<c:forEach var="groupSummary" items="${summaryList}">
-				<tr>
-					<td>${groupSummary.sessionName}</td>
-					<td>
-						<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" 
-									 isItemAuthoredByUser="true"
-									 hideCriteriaTitle="true" />
-					</td>
-				</tr>
-			</c:forEach>
-		  </tbody>
-		</table>
+				<c:if test="${dokumaran.galleryWalkFinished and not dokumaran.galleryWalkReadOnly}">
+					<h4 style="text-align: center"><fmt:message key="label.gallery.walk.ratings.header" /></h4>
+					<table id="gallery-walk-rating-table" class="table table-hover table-condensed">
+					  <thead class="thead-light">
+					    <tr>
+					      <th scope="col"><fmt:message key="monitoring.label.group" /></th>
+					      <th scope="col"><fmt:message key="label.rating" /></th>
+					    </tr>
+					  </thead>
+					  <tbody>
+						<c:forEach var="groupSummary" items="${summaryList}">
+							<tr>
+								<td>${groupSummary.sessionName}</td>
+								<td>
+									<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" 
+												 isItemAuthoredByUser="true"
+												 hideCriteriaTitle="true" />
+								</td>
+							</tr>
+						</c:forEach>
+					  </tbody>
+					</table>
+				</c:if>
+		  </div>
+		</div>
 	</c:if>
 	
 	<c:if test="${sessionMap.isGroupedActivity}">

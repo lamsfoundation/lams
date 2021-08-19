@@ -1490,7 +1490,7 @@ ActivityLib = {
 		return points;
 	},
 	
-	getActivityIcon(activityName) {
+	getActivityIcon : function(activityName) {
 		// check for icon SVG cache in the library
 		var iconData = layout.toolMetadata[activityName].iconData;
 		if (!iconData) {
