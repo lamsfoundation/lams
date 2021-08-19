@@ -90,9 +90,6 @@ public class Scratchie implements Cloneable {
     @SortComparator(QbToolQuestion.QbToolQuestionComparator.class)
     private Set<ScratchieItem> scratchieItems = new TreeSet<>();
 
-    @Column(name = "extra_point")
-    private boolean extraPoint;
-
     @Column(name = "burning_questions_enabled")
     private boolean burningQuestionsEnabled;
 
@@ -339,14 +336,6 @@ public class Scratchie implements Cloneable {
 
     public void setReflectOnActivity(boolean reflectOnActivity) {
 	this.reflectOnActivity = reflectOnActivity;
-    }
-
-    public boolean isExtraPoint() {
-	return extraPoint;
-    }
-
-    public void setExtraPoint(boolean extraPoint) {
-	this.extraPoint = extraPoint;
     }
 
     public boolean isBurningQuestionsEnabled() {
