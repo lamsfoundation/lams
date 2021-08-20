@@ -665,10 +665,12 @@ public class LearningController {
     }
 
     @RequestMapping("/getPrintMindmap")
-    public String getPrintMindmap(@RequestParam Long toolSessionID, HttpServletRequest request) {
+    public String getPrintMindmap(@RequestParam Long toolSessionID, @RequestParam(required = false) Long userUid,
+	    HttpServletRequest request) {
 	MindmapSession session = mindmapService.getSessionBySessionId(toolSessionID);
 	Mindmap mindmap = session.getMindmap();
-	LearningController.storeMindmapCanvasParameters(mindmap, toolSessionID, null, ToolAccessMode.TEACHER.toString(),
+	MindmapUser user = mindmap.isMultiUserMode() || userUid == null ? null : mindmapService.getUserByUID(userUid);
+	LearningController.storeMindmapCanvasParameters(mindmap, toolSessionID, user, ToolAccessMode.TEACHER.toString(),
 		false, request);
 	request.setAttribute("printMode", true);
 	request.setAttribute("sessionName", session.getSessionName());
@@ -686,6 +688,6 @@ public class LearningController {
 	request.setAttribute("contentEditable", contentEditable);
 	request.setAttribute("mode", mode);
 	request.setAttribute("currentMindmapUser", user == null ? "" : user.getFirstName() + " " + user.getLastName());
-	request.setAttribute("finishedActivity", user == null ? false : user.isFinishedActivity());
+	request.setAttribute("finishedActivity", user != null && user.isFinishedActivity());
     }
 }

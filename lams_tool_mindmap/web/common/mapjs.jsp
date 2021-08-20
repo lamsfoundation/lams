@@ -416,7 +416,7 @@
 
 <c:if test="${param.allowPrinting}">
 	function showPrintView(){
-    	var printWindow = window.open('<c:url value="/learning/getPrintMindmap.do?toolSessionID=${sessionId}"/>',
+    	var printWindow = window.open('<c:url value="/learning/getPrintMindmap.do?toolSessionID=${sessionId}&userUid=${userUid}"/>',
     	    						  'MindmapPrint', 'width=1152,height=900,scrollbars=yes,resizable=yes');
 		if (window.focus) {
 			printWindow.focus();
