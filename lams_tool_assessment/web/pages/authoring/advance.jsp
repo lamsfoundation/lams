@@ -73,6 +73,9 @@
 		<form:checkbox path="assessment.useSelectLeaderToolOuput" value="1" id="useSelectLeaderToolOuput"/>
 		<fmt:message key="label.use.select.leader.tool.output" />
 	</label>
+		<lams:Popover>
+			<fmt:message key="label.use.select.leader.tool.output.tip" /><br>
+		 </lams:Popover>
 </div>
 
 <c:if test="${sessionMap.isQuestionEtherpadEnabled}">
@@ -303,6 +306,9 @@
 		<form:checkbox path="assessment.reflectOnActivity" id="reflectOnActivity"/>
 		<fmt:message key="advanced.reflectOnActivity" />
 	</label>
+	<lams:Popover>
+		<fmt:message key="advanced.reflectOnActivity.tip" /><br>
+	 </lams:Popover>
 </div>
 
 <div class="form-group">
