@@ -20,5 +20,8 @@
 		<form:checkbox path="lockOnFinished" id="lockOnFinished" value="1" />
 		<fmt:message key="advanced.lockOnFinished" />
 	</label>
+	<lams:Popover>
+		<fmt:message key="advanced.lockOnFinished.tip" /><br>
+	</lams:Popover>
 </div>
 </lams:SimplePanel>
