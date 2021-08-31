@@ -334,20 +334,16 @@ public class LearningController {
 
 	// finally, work out which page to go to!
 	if (user.isSessionFinished()) {
-	    if (peerreview.isShowRatingsLeftForUser() || peerreview.isShowRatingsLeftByUser()
-		    || entryText.length() > 0) {
-		String redirectURL = SHOW_RESULTS_REDIRECT;
-		redirectURL = WebUtil.appendParameterToURL(redirectURL, PeerreviewConstants.ATTR_SESSION_MAP_ID,
-			sessionMap.getSessionID());
-		return redirectURL;
-	    } else if (peerreview.isReflectOnActivity()) {
+	    if (peerreview.isReflectOnActivity()) {
 		String redirectURL = NEW_REFLECTION_REDIRECT;
 		redirectURL = WebUtil.appendParameterToURL(redirectURL, PeerreviewConstants.ATTR_SESSION_MAP_ID,
 			sessionMap.getSessionID());
 		return redirectURL;
 	    } else {
-		// finish
-		return finish(request, session);
+		String redirectURL = SHOW_RESULTS_REDIRECT;
+		redirectURL = WebUtil.appendParameterToURL(redirectURL, PeerreviewConstants.ATTR_SESSION_MAP_ID,
+			sessionMap.getSessionID());
+		return redirectURL;
 	    }
 	} else {
 	    return doEdit(request, sessionMap, sessionId, peerreview, newCriteria);

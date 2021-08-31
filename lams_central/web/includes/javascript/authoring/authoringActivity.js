@@ -24,7 +24,7 @@ ActivityCategories = {
 		'MCQ' : 3,
 		'Question and Answer' : 6,
 		'Share resources' : 4,
-		'Leaderselection' : 6,
+		'Leaderselection' : 2,
 		'Mindmap' : 6,
 		'Noticeboard' : 4,
 		'Notebook' : 6,

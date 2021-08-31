@@ -8,7 +8,15 @@
 	<lams:head>  
 		<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
 		<c:if test="${printMode}">
-			<title><fmt:message key='activity.title'/>&nbsp;<fmt:message key='monitoring.label.group'/>&nbsp;"<c:out value="${sessionName}" />"</title>
+			<title>
+				<fmt:message key='activity.title'/>
+				<c:if test="${not empty sessionName}">
+					&nbsp;<fmt:message key='monitoring.label.group'/>&nbsp;"<c:out value="${sessionName}" />"
+				</c:if>
+				<c:if test="${not empty currentMindmapUser}">
+					&nbsp;<fmt:message key='node.learner.label'/>&nbsp;"<c:out value="${currentMindmapUser}" />"
+				</c:if>
+				</title>
 		</c:if>
 		<lams:css/>
 		<link rel="stylesheet" type="text/css" href="${lams}css/jquery.minicolors.css"></link>
