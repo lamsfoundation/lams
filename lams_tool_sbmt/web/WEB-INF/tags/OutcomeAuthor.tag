@@ -190,12 +190,17 @@
 		</lams:SimplePanel>
 	</c:when>
 	<c:otherwise>
-		<div class="form-group row">
-		    <label for="outcomeSearchInput${outcomeTagId}" class="col-sm-3">
-		    	<fmt:message key="outcome.authoring.title" />
-		    </label>
+		<div class="form-group row" >
+			<div class="col-sm-2">
+		    	<label for="outcomeSearchInput${outcomeTagId}">
+		    		<fmt:message key="outcome.authoring.title" />
+            		<lams:Popover>
+                 		<fmt:message key="outcome.authoring.title.tip" />
+            		</lams:Popover>				
+		    	</label>
+			</div>
 		    
-		    <div class="col-sm-9">
+		    <div class="col-sm-10">
 		    	<div class="input-group">
 				    <span class="input-group-addon"><i class="fa fa-search"></i></span>
 				    <input type="text" id="outcomeSearchInput${outcomeTagId}" class="ui-autocomplete-input form-control" 
