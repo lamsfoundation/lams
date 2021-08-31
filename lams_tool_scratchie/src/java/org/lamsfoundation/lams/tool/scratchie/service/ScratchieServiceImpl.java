@@ -276,11 +276,6 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	String[] presetMarks = getPresetMarks(scratchie);
 	int maxPossibleScore = (presetMarks.length > 0) ? itemsNumber * Integer.parseInt(presetMarks[0]) : 0;
 
-	// count an extra point if such option is ON
-	if (scratchie.isExtraPoint()) {
-	    maxPossibleScore += itemsNumber;
-	}
-
 	return maxPossibleScore;
     }
 
@@ -1079,11 +1074,6 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		String markStr = (itemAttempts <= presetMarks.length) ? presetMarks[itemAttempts - 1]
 			: presetMarks[presetMarks.length - 1];
 		mark = Integer.parseInt(markStr);
-
-		// add extra point if needed
-		if (scratchie.isExtraPoint() && (itemAttempts == 1)) {
-		    mark++;
-		}
 	    }
 	    item.setMark(mark);
 	}
@@ -1123,7 +1113,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    groupSummary.setNumberColumns(numberColumns);
 
 	    Map<Long, OptionDTO> optionMap = new HashMap<>();
-	    Long i = 0l;
+	    long i = 0l;
 	    for (QbOption dbOption : options) {
 		// clone it so it doesn't interfere with values from other sessions
 		OptionDTO optionDto = new OptionDTO(dbOption);
@@ -2813,7 +2803,6 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	scratchie.setDiscussionSentimentEnabled(
 		JsonUtil.optBoolean(toolContentJSON, RestTags.ENABLE_DISCUSSION_SENTIMENT, false));
 	scratchie.setRelativeTimeLimit(JsonUtil.optInt(toolContentJSON, "timeLimit", 0));
-	scratchie.setExtraPoint(JsonUtil.optBoolean(toolContentJSON, "extraPoint", false));
 	scratchie.setReflectOnActivity(
 		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	scratchie.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));

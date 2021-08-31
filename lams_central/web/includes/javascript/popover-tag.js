@@ -23,7 +23,7 @@ $(document).ready(function() {
 		.popover({
 			'container' : 'body',
 			'html'      : true,
-			'trigger'   : 'focus',
+			'trigger'   : 'click',
 			// without this option the close button in popover title does not show up
 			'sanitize'  : false,
 			'title' : function(){

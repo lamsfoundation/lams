@@ -24,7 +24,7 @@
 package org.lamsfoundation.lams.tool.leaderselection.web.controller;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionUser;
 import org.lamsfoundation.lams.tool.leaderselection.service.ILeaderselectionService;
 import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionConstants;
 import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionException;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -97,7 +98,7 @@ public class LearningController {
 
 	LeaderselectionUser groupLeader = session.getGroupLeader();
 	request.setAttribute(LeaderselectionConstants.ATTR_GROUP_LEADER, groupLeader);
-	List<LeaderselectionUser> groupUsers = leaderselectionService.getUsersBySession(toolSessionId);
+	Collection<User> groupUsers = leaderselectionService.getAllGroupUsers(toolSessionId);
 	request.setAttribute(LeaderselectionConstants.ATTR_GROUP_USERS, groupUsers);
 	request.setAttribute(LeaderselectionConstants.ATTR_TOOL_SESSION_ID, toolSessionId);
 

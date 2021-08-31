@@ -14,6 +14,10 @@
 	.rubrics-table th {
 		font-style: normal;
 		font-weight: bold;
+		}
+
+	.rubrics-table td:first-child {
+		font-weight: bold;
 	}
 	
 	.rubrics-table td:not(:first-child) {
@@ -84,9 +88,9 @@
 					<table class="table table-hover table-bordered rubrics-table">
 						<tr>
 							<%-- Each answer column has the same length, all remaining space is take by the question column --%>
-							<th class="col-xs-${12 - fn:length(criteriaRatings.ratingCriteria.rubricsColumnHeaders) * 2}"></th>
+							<th></th>
 							<c:forEach var="columnHeader" items="${criteriaRatings.ratingCriteria.rubricsColumnHeaders}" varStatus="columnStatus">
-								<th class="col-xs-2">
+								<th>
 									(${columnStatus.count})&nbsp;<c:out value="${columnHeader}" escapeXml="false"/>
 								</th>
 							</c:forEach>

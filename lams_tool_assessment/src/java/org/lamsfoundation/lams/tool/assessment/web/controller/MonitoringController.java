@@ -375,7 +375,7 @@ public class MonitoringController {
 		request.setAttribute(AssessmentConstants.ATTR_CODE_STYLES, codeStyles);
 	    }
 	}
-	
+
 	return "pages/monitoring/parts/usersummary";
     }
 
@@ -877,25 +877,27 @@ public class MonitoringController {
      * @throws IOException
      */
     @RequestMapping(path = "/discloseCorrectAnswers", method = RequestMethod.POST)
-    public void discloseCorrectAnswers(HttpServletRequest request, HttpServletResponse response) throws IOException {
-	Long questionUid = WebUtil.readLongParam(request, "questionUid");
-	Long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
+    public void discloseCorrectAnswers(@RequestParam long questionUid, @RequestParam long toolContentID,
+	    @RequestParam(required = false) boolean skipLearnersNotification, HttpServletResponse response)
+	    throws IOException {
 
 	AssessmentQuestion question = service.getAssessmentQuestionByUid(questionUid);
 	if (question.isCorrectAnswersDisclosed()) {
 	    log.warn(
 		    "Trying to disclose correct answers when they are already disclosed for Assessment tool content ID "
-			    + toolContentId + " and question UID: " + questionUid);
+			    + toolContentID + " and question UID: " + questionUid);
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 	    return;
 	}
 	question.setCorrectAnswersDisclosed(true);
 	service.updateAssessmentQuestion(question);
 
-	service.notifyLearnersOnAnswerDisclose(toolContentId);
+	if (!skipLearnersNotification) {
+	    service.notifyLearnersOnAnswerDisclose(toolContentID);
+	}
 
 	if (log.isDebugEnabled()) {
-	    log.debug("Disclosed correct answers for Assessment tool content ID " + toolContentId + " and question ID "
+	    log.debug("Disclosed correct answers for Assessment tool content ID " + toolContentID + " and question ID "
 		    + questionUid);
 	}
     }
@@ -906,14 +908,14 @@ public class MonitoringController {
      * @throws IOException
      */
     @RequestMapping(path = "/discloseGroupsAnswers", method = RequestMethod.POST)
-    public void discloseGroupsAnswers(HttpServletRequest request, HttpServletResponse response) throws IOException {
-	Long questionUid = WebUtil.readLongParam(request, "questionUid");
-	Long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
+    public void discloseGroupsAnswers(@RequestParam long questionUid, @RequestParam long toolContentID,
+	    @RequestParam(required = false) boolean skipLearnersNotification, HttpServletResponse response)
+	    throws IOException {
 
 	AssessmentQuestion question = service.getAssessmentQuestionByUid(questionUid);
 	if (question.isGroupsAnswersDisclosed()) {
 	    log.warn("Trying to disclose group answers when they are already disclosed for Assessment tool content ID "
-		    + toolContentId + " and question UID: " + questionUid);
+		    + toolContentID + " and question UID: " + questionUid);
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 	    return;
 	}
@@ -921,10 +923,12 @@ public class MonitoringController {
 	question.setGroupsAnswersDisclosed(true);
 	service.updateAssessmentQuestion(question);
 
-	service.notifyLearnersOnAnswerDisclose(toolContentId);
+	if (!skipLearnersNotification) {
+	    service.notifyLearnersOnAnswerDisclose(toolContentID);
+	}
 
 	if (log.isDebugEnabled()) {
-	    log.debug("Disclosed other groups' answers for Assessment tool content ID " + toolContentId
+	    log.debug("Disclosed other groups' answers for Assessment tool content ID " + toolContentID
 		    + " and question ID " + questionUid);
 	}
     }

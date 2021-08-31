@@ -50,7 +50,10 @@
 <div class="c100 p${confidenceLevelDto.level}0 small" data-toggle="tooltip" data-placement="top" title="${confidenceLevelsAnonymous ? '' : confidenceLevelDto.userName}">
 	<span>
 		<c:choose>
-			<c:when test="${confidenceLevelDto.portraitUuid == null or confidenceLevelsAnonymous}">
+			<c:when test="${confidenceLevelsAnonymous}">
+				<div class="portrait-generic-sm"></div>
+			</c:when>
+			<c:when test="${confidenceLevelDto.portraitUuid == null}">
 				<div class="portrait-generic-sm portrait-color-${confidenceLevelDto.userId % 7}"></div>
 			</c:when>
 			<c:otherwise>

@@ -79,10 +79,10 @@ public class LdapConfigController {
 	    }
 	}
 
-	request.setAttribute("config", configurationService.arrangeItems(Configuration.ITEMS_ONLY_LDAP));
-
 	int numLdapUsers = getNumLdapUsers();
 	request.setAttribute("numLdapUsersMsg", getNumLdapUsersMsg(numLdapUsers));
+
+	request.setAttribute("config", configurationService.arrangeItems(Configuration.ITEMS_ONLY_LDAP));
 
 	return "ldap";
     }

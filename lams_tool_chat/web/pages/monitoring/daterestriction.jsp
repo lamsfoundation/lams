@@ -2,7 +2,7 @@
 
 <c:set var="ddTitle">
 	<fmt:message key="monitor.summary.date.restriction" />
-	<lams:Popover titleKey="monitor.summary.date.restriction">
+	<lams:Popover>
 		<fmt:message key="monitor.summary.when.date.restriction.is.set" />
 	</lams:Popover>
 </c:set>

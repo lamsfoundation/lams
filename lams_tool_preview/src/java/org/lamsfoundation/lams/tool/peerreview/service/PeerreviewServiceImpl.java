@@ -758,6 +758,7 @@ public class PeerreviewServiceImpl
 	    toolContentObj.setContentId(toolContentId);
 	    Map<Integer, Integer> groupIdMap = new HashMap<>();
 	    if (toolContentObj.getRatingCriterias() != null) {
+		Integer nextRatingCriteriaGroupId = null;
 		for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
 		    criteria.setToolContentId(toolContentId);
 
@@ -765,7 +766,12 @@ public class PeerreviewServiceImpl
 			int existingGroupId = criteria.getRatingCriteriaGroupId();
 			Integer newGroupId = groupIdMap.get(existingGroupId);
 			if (newGroupId == null) {
-			    newGroupId = ratingService.getNextRatingCriteriaGroupId();
+			    if (nextRatingCriteriaGroupId == null) {
+				nextRatingCriteriaGroupId = ratingService.getNextRatingCriteriaGroupId();
+			    } else {
+				nextRatingCriteriaGroupId++;
+			    }
+			    newGroupId = nextRatingCriteriaGroupId;
 			    groupIdMap.put(existingGroupId, newGroupId);
 
 			    for (int columnIndex = 0; columnIndex < criteria.getRubricsColumnHeaders()

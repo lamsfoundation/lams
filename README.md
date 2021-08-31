@@ -13,8 +13,9 @@ LAMS is written in Java, Javascript and uses an MySQL database for data storage.
 
 <b>Documentation</b>
 
-* <a href="https://wiki.lamsfoundation.org/display/lamsdocs/Home">LAMS User Documentation and Tutorials</a>.
-* <a href="https://wiki.lamsfoundation.org/display/lams/Home">Technical Documention</a> (some what outdated). 
+* <a href="https://docs.lamsfoundation.org">LAMS User Documentation and Tutorials</a>.
+* <a href="https://wakelet.com/wake/Czd6W-JYLt4SMwlj70DAY">Teaching Stategies in LAMS</a>.
+* <a href="http://edutechwiki.unige.ch/en/LAMS_installation_and_configuration">Building Instructions</a> (Thanks University of Geneva). 
 * <a href="https://wiki.lamsfoundation.org/display/lams/Translating+LAMS">Internationalisation</a> efforts.
 
 <b>LAMS Central</b>
@@ -34,7 +35,6 @@ Automated testing made possible by <b>Browserstack</b>
 </p>
 <p><img alt="Lokalise logo" src="https://lokalise.com/build/images/logo.6c425399.svg"></p>
 </p>
-
 
 
 

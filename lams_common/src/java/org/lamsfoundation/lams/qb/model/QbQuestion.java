@@ -499,6 +499,9 @@ public class QbQuestion implements Serializable, Cloneable {
     }
 
     public static String getCodeStyleMime(Integer codeStyle) {
+	if (codeStyle == null) {
+	    return null;
+	}
 	switch (codeStyle) {
 	    case CODE_STYLE_PYTHON:
 		return "text/x-python";

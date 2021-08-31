@@ -119,6 +119,7 @@ public class MonitoringController {
 	request.setAttribute("mindmapId", mindmap.getUid());
 	request.setAttribute("sessionId", WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 	request.setAttribute("mode", ToolAccessMode.TEACHER);
+	request.setAttribute("allowPrinting", true);
 
 	if (!mindmap.isMultiUserMode()) {
 	    Long userId = new Long(WebUtil.readLongParam(request, "userUID"));

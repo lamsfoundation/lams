@@ -256,16 +256,22 @@
 	    	if (!confirm("<fmt:message key='message.disclose.all.correct.answers' />")) {
 	    		return;
 	    	};
-	    	
-		    $('option[correctDisclosed="false"]', questionUidSelect).each(function(){
+
+	    	let nonDisclosedQuestions = $('option[correctDisclosed="false"]', questionUidSelect),
+	    		lastQuestionUid = nonDisclosedQuestions.last().val();	
+	    	nonDisclosedQuestions.each(function(index){
 			    var option = $(this),
-			    	questionUid = option.val();
+			    	questionUid = option.val(),
+			    	// we notify learners only once, by the last question
+			    	isLast = questionUid == lastQuestionUid;
+		    	
 				$.ajax({
                     type: 'POST',
 					'url'  : '<lams:WebAppURL />monitoring/discloseCorrectAnswers.do?<csrf:token/>',
 					'data' : {
 						'questionUid'   : questionUid,
-						'toolContentID' : '${sessionMap.assessment.contentId}'
+						'toolContentID' : '${sessionMap.assessment.contentId}',
+						'skipLearnersNotification' : !isLast
 					}
 				}).done(function(){
 					option.attr('correctDisclosed', 'true');
@@ -282,15 +288,21 @@
 	    		return;
 	    	};
 	    	
-		    $('option[groupsDisclosed="false"]', questionUidSelect).each(function(){
+	    	let nonDisclosedQuestions = $('option[groupsDisclosed="false"]', questionUidSelect),
+	    		lastQuestionUid = nonDisclosedQuestions.last().val();
+	    	nonDisclosedQuestions.each(function(){
 			    var option = $(this),
-			    	questionUid = option.val();
+			    	questionUid = option.val(),
+			    	// we notify learners only once, by the last question
+			    	isLast = questionUid == lastQuestionUid;
+		    	
 				$.ajax({
                     type: 'POST',
 					'url'  : '<lams:WebAppURL />monitoring/discloseGroupsAnswers.do?<csrf:token/>',
 					'data' : {
 						'questionUid'   : questionUid,
-						'toolContentID' : '${sessionMap.assessment.contentId}'
+						'toolContentID' : '${sessionMap.assessment.contentId}',
+						'skipLearnersNotification' : !isLast
 					}
 				}).done(function(){
 					option.attr('groupsDisclosed', 'true');

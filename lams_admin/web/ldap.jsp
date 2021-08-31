@@ -44,6 +44,8 @@
 			<div class="panel-body panel-default">
 				<c:if test="${not empty config}">
 					<form:form action="../config/save.do" modelAttribute="configForm" id="configForm" method="post">
+						<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
+						
 						<c:forEach items="${config}" var="group">
 							<div class="panel panel-default">
 								<div class="panel-heading">

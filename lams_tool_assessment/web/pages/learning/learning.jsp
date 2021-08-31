@@ -345,8 +345,7 @@
 	                error : onLearnerAutosaveError
 				});
 			}
-			
-			var autosaveInterval = "10000"; // 30 seconds interval
+			var autosaveInterval = ${isLeadershipEnabled and isUserLeader ? 10000 : 30000}; // 30 or 10 seconds interval
 			window.setInterval(learnerAutosave, autosaveInterval);
 
 			function onLearnerAutosaveError() {
