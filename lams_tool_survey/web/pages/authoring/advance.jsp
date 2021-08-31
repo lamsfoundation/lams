@@ -16,6 +16,9 @@
 		<form:checkbox path="survey.showOtherUsersAnswers" id="showOtherUsersAnswers"/>
 			<fmt:message key="label.show.answers.from.other.users" />
 		</label>
+		<lams:Popover>
+			<fmt:message key="label.show.answers.from.other.users.tip" /><br>
+		 </lams:Popover>
 	</div>
 
 </lams:SimplePanel>
@@ -40,6 +43,9 @@
 		<form:checkbox path="survey.lockWhenFinished" id="lockWhenFinished"/>
 			<fmt:message key="label.authoring.advance.lock.on.finished" />
 		</label>
+		<lams:Popover>
+			<fmt:message key="label.authoring.advance.lock.on.finished.tip" /><br>
+		 </lams:Popover>
 	</div>
 	
 	<div class="checkbox">
@@ -47,6 +53,9 @@
 		<form:checkbox path="survey.reflectOnActivity" id="reflectOn"/>
 			<fmt:message key="label.authoring.advanced.reflectOnActivity" />
 		</label>
+		<lams:Popover>
+			<fmt:message key="label.authoring.advanced.reflectOnActivity.tip" /><br>
+		 </lams:Popover>
 	</div>
 	
 	<div class="form-group">

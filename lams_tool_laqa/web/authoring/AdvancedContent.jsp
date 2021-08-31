@@ -49,6 +49,9 @@
 			<form:checkbox path="qa.useSelectLeaderToolOuput" id="useSelectLeaderToolOuput"/>
 			<fmt:message key="label.use.select.leader.tool.output" />
 		</label>
+		<lams:Popover>
+			<fmt:message key="label.use.select.leader.tool.output.tip" /><br>
+		 </lams:Popover>
 	</div>
 </lams:SimplePanel>
 
@@ -73,6 +76,9 @@
 			<form:checkbox path="qa.noReeditAllowed" id="noReeditAllowed"/>
 			<fmt:message key="label.no.reedit.allowed" />
 		</label>
+        <lams:Popover>
+            <fmt:message key="label.no.reedit.allowed.tip" /><br>
+         </lams:Popover>
 	</div>
 
 	<div class="checkbox">
@@ -80,6 +86,9 @@
 			<form:checkbox path="qa.showOtherAnswers" id="showOtherAnswers" />
 			<fmt:message key="label.learner.answer" />
 		</label>
+        <lams:Popover>
+            <fmt:message key="label.learner.answer.tip" /><br>
+         </lams:Popover>
 	</div>
 
 	<div class="loffset20" id="show-other-answers-options">
@@ -88,6 +97,9 @@
 				<form:checkbox path="qa.usernameVisible" id="usernameVisible"/>
 				<fmt:message key="label.show.names" />
 			</label>
+        <lams:Popover>
+            <fmt:message key="label.show.names.tip" /><br>
+         </lams:Popover>
 		</div>
 		
 		<div class="checkbox">
@@ -95,6 +107,9 @@
 				<form:checkbox path="qa.allowRateAnswers" id="allowRateAnswers"/>
 				<fmt:message key="label.authoring.allow.rate.answers" />
 			</label>
+        <lams:Popover>
+            <fmt:message key="label.authoring.allow.rate.answers.tip" /><br>
+         </lams:Popover>
 		</div>
 	
 		<div id="criterias-holder" <c:if test="${!authoringForm.qa.allowRateAnswers}"> style="display:none;"</c:if>>
@@ -123,6 +138,9 @@
 			<form:checkbox path="qa.lockWhenFinished" id="lockWhenFinished" disabled="${authoringForm.qa.noReeditAllowed}"/>
 			<fmt:message key="label.lockWhenFinished" />
 		</label>
+		<lams:Popover>
+			<fmt:message key="label.lockWhenFinished.tip" /><br>
+		 </lams:Popover>
 	</div>
 
 	<div class="checkbox">
@@ -130,6 +148,9 @@
 			<form:checkbox path="qa.reflect" id="reflect"/>
 			<fmt:message key="label.reflect" />
 		</label>
+        <lams:Popover>
+            <fmt:message key="label.reflect.tip" /><br>
+         </lams:Popover>
 	</div>
 	
 	<div id="reflectionInstructions" class="form-group">

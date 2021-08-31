@@ -68,6 +68,9 @@
 			<form:checkbox path="useSelectLeaderToolOuput" value="1" id="useSelectLeaderToolOuput"/>
 			<fmt:message key="label.use.select.leader.tool.output" />
 		</label>
+		<lams:Popover>
+			<fmt:message key="advanced.select.leader.tip" /><br>
+		 </lams:Popover>
 	</div>
 </lams:SimplePanel>
 
@@ -133,6 +136,9 @@
 			<form:checkbox path="lockOnFinished" id="lockOnFinished" />
 			<fmt:message key="label.authoring.advance.lock.on.finished" />
 		</label>
+        <lams:Popover>
+            <fmt:message key="label.authoring.advance.lock.on.finished.tip" /><br>
+         </lams:Popover>		
 	</div>
 	
 	<div class="checkbox">
@@ -140,6 +146,9 @@
 			<form:checkbox path="reflectOnActivity" id="reflectOnActivity" />
 			<fmt:message key="label.authoring.advanced.reflectOnActivity" />
 		</label>
+        <lams:Popover>
+            <fmt:message key="label.authoring.advanced.reflectOnActivity.tip" /><br>
+         </lams:Popover>		
 	</div>
 	
 	<div class="form-group">
