@@ -196,8 +196,8 @@
 			    	<fmt:message key="outcome.authoring.title" />
 			    </label>
 				<lams:Popover titleKey="outcome.authoring.title">
-					<fmt:message key="outcome.authoring.tooltip.1" /><br>
-					<fmt:message key="outcome.authoring.tooltip.2" />
+					<fmt:message key="outcome.authoring.title.tip.1" /><br>
+					<fmt:message key="outcome.authoring.title.tip.2" />
 				</lams:Popover>
 		    </div>
 		    <div class="col-sm-9">

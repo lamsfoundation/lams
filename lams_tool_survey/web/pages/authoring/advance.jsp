@@ -17,8 +17,8 @@
 			<fmt:message key="label.show.answers.from.other.users" />
 		</label>
 		<lams:Popover>
-			<fmt:message key="label.show.answers.from.other.users.tip" /><br>
-		 </lams:Popover>
+			<fmt:message key="label.show.answers.from.other.users.tip.1" /><br>
+		</lams:Popover>
 	</div>
 
 </lams:SimplePanel>
@@ -44,7 +44,7 @@
 			<fmt:message key="label.authoring.advance.lock.on.finished" />
 		</label>
 		<lams:Popover>
-			<fmt:message key="label.authoring.advance.lock.on.finished.tip" /><br>
+			<fmt:message key="label.advanced.lockOnFinished.tip.1" /><br>
 		 </lams:Popover>
 	</div>
 	
@@ -54,8 +54,9 @@
 			<fmt:message key="label.authoring.advanced.reflectOnActivity" />
 		</label>
 		<lams:Popover>
-			<fmt:message key="label.authoring.advanced.reflectOnActivity.tip" /><br>
-		 </lams:Popover>
+			<fmt:message key="label.advanced.reflectOnActivity.tip.1" /><br>
+			<fmt:message key="label.advanced.reflectOnActivity.tip.2" />
+		</lams:Popover>
 	</div>
 	
 	<div class="form-group">

@@ -8,8 +8,8 @@
 		<fmt:message key="advanced.filteringEnabled" />
 	</label>
 	<lams:Popover>
-		<fmt:message key="advanced.filteringEnabled.tooltip.1" /><br>
-		<fmt:message key="advanced.filteringEnabled.tooltip.2" />
+		<fmt:message key="advanced.filteringEnabled.tip.1" /><br>
+		<fmt:message key="advanced.filteringEnabled.tip.2" />
 	</lams:Popover>
 </div>
 <div class="form-group">
@@ -26,7 +26,7 @@
 		<fmt:message key="advanced.lockOnFinished" />
 	</label>
 	<lams:Popover>
-		<fmt:message key="advanced.lockOnFinished.tooltip.1" />
+		<fmt:message key="label.advanced.lockOnFinished.tip.1" />
 	</lams:Popover>
 </div>
 
@@ -36,8 +36,8 @@
 		<fmt:message key="advanced.reflectOnActivity" />
 	</label>
 	<lams:Popover>
-		<fmt:message key="advanced.reflectOnActivity.tooltip.1" /><br>
-		<fmt:message key="advanced.reflectOnActivity.tooltip.2" />
+		<fmt:message key="label.advanced.reflectOnActivity.tip.1" /><br>
+		<fmt:message key="label.advanced.reflectOnActivity.tip.2" />
 	</lams:Popover>
 </div>
 

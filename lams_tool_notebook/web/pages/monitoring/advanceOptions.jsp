@@ -6,6 +6,9 @@
 			<tr>
 				<td>
 					<fmt:message key="advanced.lockOnFinished" />
+					<lams:Popover>
+						<fmt:message key="label.advanced.lockOnFinished.tip.1" /><br>
+					</lams:Popover>
 				</td>
 				
 				<td>

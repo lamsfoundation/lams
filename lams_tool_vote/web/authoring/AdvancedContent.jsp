@@ -15,7 +15,7 @@
 			<fmt:message key="label.use.select.leader.tool.output" />
 		</label>
 		<lams:Popover>
-			<fmt:message key="label.use.select.leader.tool.output.tip" /><br>
+			<fmt:message key="label.use.select.leader.tool.output.tip.1" /><br>
 		 </lams:Popover>
 	</div>
 	
@@ -28,9 +28,9 @@
 			<form:checkbox path="allowText" id="allowText" value="1" onchange="changeMinMaxVotes(-1, -1);" />
 			<fmt:message key="label.allowText" />
 		</label>
-        <lams:Popover>
+    	<lams:Popover>
             <fmt:message key="label.allowText.tip" /><br>
-         </lams:Popover>
+		</lams:Popover>
 	</div>
 	
 	<div class="form-group">
@@ -65,7 +65,7 @@
 			<fmt:message key="label.show.results" />
 		</label>
         <lams:Popover>
-            <fmt:message key="label.show.results.tip" /><br>
+            <fmt:message key="label.show.results.tip.1" /><br>
          </lams:Popover>
 	</div>
 
@@ -81,7 +81,7 @@
 			<fmt:message key="label.vote.lockedOnFinish" />
 		</label>
 		<lams:Popover>
-			<fmt:message key="label.vote.lockedOnFinish.tip" /><br>
+			<fmt:message key="label.advanced.lockOnFinished.tip.1" /><br>
 		 </lams:Popover>
 	</div>
 
@@ -91,8 +91,9 @@
 			<fmt:message key="label.reflect" />
 		</label>
         <lams:Popover>
-            <fmt:message key="label.reflect.tip" /><br>
-         </lams:Popover>
+            <fmt:message key="label.advanced.reflectOnActivity.tip.1" /><br>
+			<fmt:message key="label.advanced.reflectOnActivity.tip.2" />
+		</lams:Popover>
 	</div>
 	<div class="form-group">
 		<form:textarea rows="3" path="reflectionSubject" cssClass="form-control"></form:textarea> 

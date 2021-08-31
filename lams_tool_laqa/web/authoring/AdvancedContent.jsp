@@ -50,8 +50,8 @@
 			<fmt:message key="label.use.select.leader.tool.output" />
 		</label>
 		<lams:Popover>
-			<fmt:message key="label.use.select.leader.tool.output.tip" /><br>
-		 </lams:Popover>
+			<fmt:message key="label.use.select.leader.tool.output.tip.1" /><br>
+		</lams:Popover>
 	</div>
 </lams:SimplePanel>
 
@@ -77,7 +77,7 @@
 			<fmt:message key="label.no.reedit.allowed" />
 		</label>
         <lams:Popover>
-            <fmt:message key="label.no.reedit.allowed.tip" /><br>
+            <fmt:message key="label.no.reedit.allowed.tip.1" /><br>
          </lams:Popover>
 	</div>
 
@@ -87,7 +87,7 @@
 			<fmt:message key="label.learner.answer" />
 		</label>
         <lams:Popover>
-            <fmt:message key="label.learner.answer.tip" /><br>
+            <fmt:message key="label.learner.answer.tip.1" /><br>
          </lams:Popover>
 	</div>
 
@@ -98,7 +98,7 @@
 				<fmt:message key="label.show.names" />
 			</label>
         <lams:Popover>
-            <fmt:message key="label.show.names.tip" /><br>
+            <fmt:message key="label.show.names.tip.1" /><br>
          </lams:Popover>
 		</div>
 		
@@ -108,7 +108,7 @@
 				<fmt:message key="label.authoring.allow.rate.answers" />
 			</label>
         <lams:Popover>
-            <fmt:message key="label.authoring.allow.rate.answers.tip" /><br>
+            <fmt:message key="label.authoring.allow.rate.answers.tip.1" /><br>
          </lams:Popover>
 		</div>
 	
@@ -139,7 +139,7 @@
 			<fmt:message key="label.lockWhenFinished" />
 		</label>
 		<lams:Popover>
-			<fmt:message key="label.lockWhenFinished.tip" /><br>
+			<fmt:message key="label.advanced.lockOnFinished.tip.1" /><br>
 		 </lams:Popover>
 	</div>
 
@@ -148,9 +148,10 @@
 			<form:checkbox path="qa.reflect" id="reflect"/>
 			<fmt:message key="label.reflect" />
 		</label>
-        <lams:Popover>
-            <fmt:message key="label.reflect.tip" /><br>
-         </lams:Popover>
+    	<lams:Popover>
+			<fmt:message key="label.advanced.reflectOnActivity.tip.1" /><br>
+			<fmt:message key="label.advanced.reflectOnActivity.tip.2" />
+		</lams:Popover>
 	</div>
 	
 	<div id="reflectionInstructions" class="form-group">

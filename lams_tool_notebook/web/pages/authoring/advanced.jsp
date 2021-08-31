@@ -21,7 +21,7 @@
 		<fmt:message key="advanced.lockOnFinished" />
 	</label>
 	<lams:Popover>
-		<fmt:message key="advanced.lockOnFinished.tip" /><br>
+		<fmt:message key="label.advanced.lockOnFinished.tip.1" /><br>
 	</lams:Popover>
 </div>
 </lams:SimplePanel>

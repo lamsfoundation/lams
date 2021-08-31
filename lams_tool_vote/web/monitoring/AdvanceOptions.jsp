@@ -6,6 +6,9 @@
 	<tr>
 		<td>
 			<fmt:message key="label.use.select.leader.tool.output" />
+			<lams:Popover>
+				<fmt:message key="label.use.select.leader.tool.output.tip.1" /><br>
+			 </lams:Popover>
 		</td>
 		
 		<td>
@@ -23,6 +26,9 @@
 	<tr>
 		<td>
 			<fmt:message key="label.vote.lockedOnFinish" />
+			 <lams:Popover>
+				<fmt:message key="label.advanced.lockOnFinished.tip.1" /><br>
+			 </lams:Popover>
 		</td>
 		<td>
 			<c:choose>
@@ -73,6 +79,9 @@
 	<tr>
 		<td>
 			<fmt:message key="label.show.results" />
+			<lams:Popover>
+	            <fmt:message key="label.show.results.tip.1" /><br>
+	         </lams:Popover>
 		</td>	
 		<td>
 			<c:choose>
@@ -89,6 +98,10 @@
 	<tr>
 		<td>
 			<fmt:message key="monitor.summary.td.addNotebook" />
+			<lams:Popover>
+	            <fmt:message key="label.advanced.reflectOnActivity.tip.1" /><br>
+				<fmt:message key="label.advanced.reflectOnActivity.tip.2" />
+			</lams:Popover>
 		</td>
 		<td>	
 			<c:choose>

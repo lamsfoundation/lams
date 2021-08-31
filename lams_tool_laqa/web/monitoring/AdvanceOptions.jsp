@@ -7,6 +7,9 @@
 	<tr>
 		<td>
 			<fmt:message key="label.learner.answer" />
+			<lams:Popover>
+	            <fmt:message key="label.learner.answer.tip.1" /><br>
+	        </lams:Popover>
 		</td>
 		
 		<td>
@@ -24,6 +27,9 @@
 	<tr>
 		<td>
 			<fmt:message key="label.show.names" />
+			<lams:Popover>
+	        	<fmt:message key="label.show.names.tip.1" /><br>
+	        </lams:Popover>
 		</td>
 		
 		<td>
@@ -58,6 +64,9 @@
 	<tr>
 		<td>
 			<fmt:message key="label.authoring.allow.rate.answers" />
+			<lams:Popover>
+	            <fmt:message key="label.authoring.allow.rate.answers.tip.1" /><br>
+	        </lams:Popover>
 		</td>
 		
 		<td>
@@ -75,6 +84,10 @@
 	<tr>
 		<td>
 			<fmt:message key="monitor.summary.td.addNotebook" />
+			<lams:Popover>
+				<fmt:message key="label.advanced.reflectOnActivity.tip.1" /><br>
+				<fmt:message key="label.advanced.reflectOnActivity.tip.2" />
+			</lams:Popover>
 		</td>
 		
 		<td>
@@ -122,6 +135,9 @@
 	<tr>
 		<td>
 			<fmt:message key="label.lockWhenFinished" />
+			<lams:Popover>
+				<fmt:message key="label.advanced.lockOnFinished.tip.1" /><br>
+			</lams:Popover>
 		</td>
 		
 		<td>
@@ -152,10 +168,33 @@
 			</c:choose>	
 		</td>
 	</tr>
-
+	
+	<tr>
+		<td>
+			<fmt:message key="label.no.reedit.allowed" />
+			<lams:Popover>
+	            <fmt:message key="label.no.reedit.allowed.tip.1" /><br>
+	        </lams:Popover>
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${content.noReeditAllowed}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
 	<tr>
 		<td>
 			<fmt:message key="label.use.select.leader.tool.output" />
+			<lams:Popover>
+				<fmt:message key="label.use.select.leader.tool.output.tip.1" /><br>
+			</lams:Popover>
 		</td>
 		
 		<td>
