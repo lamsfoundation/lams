@@ -690,8 +690,9 @@ public class IntegrationService implements IIntegrationService {
 
 	    final String lessonFinishUrl = server.getLessonFinishUrl();
 	    if (userMark != null && StringUtils.isNotBlank(lessonFinishUrl)) {
-		Double score = lessonMaxPossibleMark.equals(0L) ? 0 : userMark / lessonMaxPossibleMark;
-		final String scoreStr = (userMark == null) || lessonMaxPossibleMark.equals(0L) ? "" : score.toString();
+		double score = lessonMaxPossibleMark.equals(0L) ? 0 : userMark / lessonMaxPossibleMark;
+		final String scoreStr = (userMark == null) || lessonMaxPossibleMark.equals(0L) ? ""
+			: Double.toString(score);
 
 		final String serverKey = server.getServerid();
 		final String serverSecret = server.getServerkey();
@@ -1031,11 +1032,19 @@ public class IntegrationService implements IIntegrationService {
 	    JsonNode member = membership.get("member");
 
 	    //get user id using "userId" property, or "sourcedId" if UseAlternativeUseridParameterName option is ON for this LTI server
-	    JsonNode lisPersonSourcedid = member.get("sourcedId");
-	    String extUserId = extServer.getUserIdParameterName().equalsIgnoreCase("lis_person_sourcedid")
-		    && lisPersonSourcedid != null && StringUtils.isNotBlank(lisPersonSourcedid.asText())
-			    ? lisPersonSourcedid.asText()
-			    : member.get("userId").asText();
+
+	    String extUserId = member.get("userId").asText();
+	    String extUserIdParameterName = extServer.getUserIdParameterName();
+	    // use the same user ID as the server does
+	    if (StringUtils.isNotBlank(extUserIdParameterName)) {
+		if ("lis_person_sourcedid".equalsIgnoreCase(extUserIdParameterName)) {
+		    extUserIdParameterName = "sourcedId";
+		}
+		JsonNode customExtUserId = member.get(extUserIdParameterName);
+		if (customExtUserId != null && StringUtils.isNotBlank(customExtUserId.asText())) {
+		    extUserId = customExtUserId.asText();
+		}
+	    }
 
 	    //to address Moodle version 3.7.1 bug
 	    String firstName = member.get("givenName") == null ? member.get("giveName").asText()
