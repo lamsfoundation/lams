@@ -22,7 +22,9 @@
 		 <div>
 			<div class="media">
 						<div class="media-left">
-							<img src="<lams:LAMSURL/>${tool.iconPath}" />
+							<c:if test="${tool.valid}">
+								<img src="<lams:LAMSURL/>${tool.iconPath}" />
+							</c:if>
 						</div>
 						<div class="media-body media-middle tool-display-name">
 					<c:out value="${tool.toolDisplayName}" />
