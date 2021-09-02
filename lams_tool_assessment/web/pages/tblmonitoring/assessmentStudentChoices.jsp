@@ -2,8 +2,8 @@
 <% pageContext.setAttribute("newLineChar", "\r\n"); %>
 <style>
 	.question-title {
-		white-space: nowrap;
     	overflow: auto;
+    	min-width: 150px;
 	} 
 	
 	#completion-charts-container > div {
