@@ -1775,7 +1775,6 @@ function addActivityIconsHandlers(activity) {
 			if (usersViewable) {
 				dblTap(learnerIcon, function(event){
 					 // double click on learner icon to see activity from his perspective
-					event.stopPropagation();
 					var url = LAMS_URL + 'monitoring/monitoring/getLearnerActivityURL.do?userID=' 
 						               + learner.id + '&activityID=' + activity.id + '&lessonID=' + lessonId;
 					openPopUp(url, "LearnActivity", popupHeight, popupWidth, true);
@@ -2778,9 +2777,11 @@ function dblTap(elem, dblClickFunction) {
  	 // double tap detection on mobile devices; it works also for mouse clicks
 	 // temporarly switched to click as jQuery mobile was removed for bootstrapping
 	 elem.click(function(event) {
+		event.stopPropagation();
 		var currentTime = new Date().getTime();
 		// is the second click on the same element as the first one?
 		if (event.currentTarget == lastTapTarget) {
+			
 			// was the second click quick enough after the first one?
 			var tapLength = currentTime - lastTapTime;
 			if (tapLength < tapTimeout && tapLength > 0) {
