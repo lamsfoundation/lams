@@ -1640,8 +1640,9 @@ function addActivityIcons(activity) {
 				}
 				$(definePortrait(learner.portraitId, learner.id, STYLE_SMALL, true, LAMS_URL))
 					  .css({
-						'left'     : learnerIndex * (activity.learnerCount < 5 ? 46 : 28)  + 'px',
-						'z-index'  : 100 + learnerIndex
+						'left'        : learnerIndex * (activity.learnerCount < 5 ? 46 : 28)  + 'px',
+						'z-index'     : 100 + learnerIndex,
+						'padding-top' : '2px'
 					  })
 					  .addClass('new-popover learner-icon')
 					  .attr({
@@ -1658,7 +1659,8 @@ function addActivityIcons(activity) {
 				allLearnersIcon
 					  .css({
 						'left'     : '140px',
-						'z-index'  : 108
+						'z-index'  : 108,
+						'margin-top' : '1px'
 					  })
 					  .text('+' + (activity.learnerCount - 5))
 					  .appendTo(learnersContainer);
