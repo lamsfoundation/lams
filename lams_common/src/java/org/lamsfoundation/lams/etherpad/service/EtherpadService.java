@@ -102,11 +102,13 @@ public class EtherpadService implements IEtherpadService {
 
 	// cookie needs to be constructed manually so we can set SameSite=None
 	StringBuilder cookieHeaderValue = new StringBuilder("sessionID=\"").append(etherpadSessionIds)
-		.append("\"; Version 1; Path=/; Discard; Secure; SameSite=None;");
+		.append("\"; Path=/; ");
 
 	if (!topLevelDomain.equals("localhost")) {
-	    cookieHeaderValue.append("Domain=").append(topLevelDomain);
+	    cookieHeaderValue.append("Domain=").append(topLevelDomain).append("; ");
 	}
+	
+	cookieHeaderValue.append("Secure; SameSite=None");
 
 	response.setHeader("Set-Cookie", cookieHeaderValue.toString());
     }
