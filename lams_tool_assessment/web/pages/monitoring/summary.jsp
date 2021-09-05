@@ -220,6 +220,12 @@
 	    	if (!confirm("<fmt:message key='message.disclose.correct.answers' />")) {
 	    		return;
 	    	};
+
+			// check if correct answers are disclosed before groups' answers
+			if (!groupsButton.is('.disabled') &&
+				!confirm("<fmt:message key='message.disclose.correct.before.groups.answers' />")) {
+				return;
+			}
 	    	
 			$.ajax({
                 type: 'POST',
@@ -256,7 +262,12 @@
 	    	if (!confirm("<fmt:message key='message.disclose.all.correct.answers' />")) {
 	    		return;
 	    	};
-
+	    	
+			if (!groupsAllButton.is('.disabled') &&
+				!confirm("<fmt:message key='message.disclose.correct.before.groups.answers' />")) {
+				return;
+			}
+			
 	    	let nonDisclosedQuestions = $('option[correctDisclosed="false"]', questionUidSelect),
 	    		lastQuestionUid = nonDisclosedQuestions.last().val();	
 	    	nonDisclosedQuestions.each(function(index){
