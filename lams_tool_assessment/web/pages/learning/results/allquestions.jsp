@@ -28,9 +28,13 @@
 		margin-left: 40px;
 	}
 	
+	.monitor-question-buttons {
+		text-align: right;
+		float: right;
+	}
+	
 	.discussion-sentiment-start-button {
-		margin-top: -2px;
-		margin-right: 5px;
+		margin-top: 5px;
 	}
 	
 	@media (min-width: 0px) and (max-width: 767px){
@@ -137,35 +141,37 @@
 	<div class="panel panel-default">
 		<div class="panel-heading">			
 			<c:if test="${param.embedded and empty toolSessionID}">
-				<c:if test="${assessment.allowDiscloseAnswers}">
-					<div class="btn-group-xs pull-right disclose-button-group" questionUid="${question.uid}">
-						<%-- Allow disclosing correct answers only for multiple choice questions --%>
-						<c:if test="${question.type == 1}">
-							<div class="btn btn-default disclose-correct-button"
-								<c:if test="${question.correctAnswersDisclosed}">
+				<div class="monitor-question-buttons">
+					<c:if test="${assessment.allowDiscloseAnswers}">
+						<div class="btn-group-xs disclose-button-group" questionUid="${question.uid}">
+							<%-- Allow disclosing correct answers only for multiple choice questions --%>
+							<c:if test="${question.type == 1}">
+								<div class="btn btn-default disclose-correct-button"
+									<c:if test="${question.correctAnswersDisclosed}">
+										disabled="disabled"><i class="fa fa-check text-success">&nbsp;</i
+									</c:if>
+									>
+									<fmt:message key="label.disclose.correct.answers"/>
+								</div>
+							</c:if>
+							<div class="btn btn-default disclose-groups-button"
+								<c:if test="${question.groupsAnswersDisclosed}">
 									disabled="disabled"><i class="fa fa-check text-success">&nbsp;</i
 								</c:if>
 								>
-								<fmt:message key="label.disclose.correct.answers"/>
+								<fmt:message key="label.disclose.groups.answers"/>
 							</div>
-						</c:if>
-						<div class="btn btn-default disclose-groups-button"
-							<c:if test="${question.groupsAnswersDisclosed}">
-								disabled="disabled"><i class="fa fa-check text-success">&nbsp;</i
-							</c:if>
-							>
-							<fmt:message key="label.disclose.groups.answers"/>
 						</div>
-					</div>
-				</c:if>
-				
-				<c:if test="${assessment.allowDiscussionSentiment}">
-					<div id="discussion-sentiment-start-button-${question.uid}"
-					     class="btn btn-xs btn-default pull-right discussion-sentiment-start-button"
-					     onClick="javascript:startDiscussionSentiment(${question.uid}, null, true)">
-						<i class="fa fa-comments"></i><fmt:message key="label.monitoring.discussion.start"/>
-					</div>
-				</c:if>
+					</c:if>
+					
+					<c:if test="${assessment.allowDiscussionSentiment}">
+						<div id="discussion-sentiment-start-button-${question.uid}"
+						     class="btn btn-xs btn-default discussion-sentiment-start-button"
+						     onClick="javascript:startDiscussionSentiment(${question.uid}, null, true)">
+							<i class="fa fa-comments"></i><fmt:message key="label.monitoring.discussion.start"/>
+						</div>
+					</c:if>
+				</div>
 			</c:if>
 			
 			<h3 class="panel-title" style="margin-bottom: 10px;font-size: initial;">
