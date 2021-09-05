@@ -51,8 +51,12 @@
 						if (!confirm("<fmt:message key='message.disclose.all.correct.answers' />")) {
 							return;
 						}
-						$('.disclose-correct-button', assessmentPane).not('[disabled]').each(function() {
-							discloseAnswers($(this), resultsPane);
+						
+						let nonDisclosedQuestions = $('.disclose-correct-button', assessmentPane).not('[disabled]'),
+			    			lastQuestionUid = nonDisclosedQuestions.last().closest('.disclose-button-group').attr('questionUid');
+						nonDisclosedQuestions.each(function() {
+							let isLast = lastQuestionUid == $(this).closest('.disclose-button-group').attr('questionUid'); 
+							discloseAnswers($(this), resultsPane, isLast);
 						});
 						disabledAndCheckButton(allCorrectButton);
 					});
@@ -69,8 +73,12 @@
 						if (!confirm("<fmt:message key='message.disclose.all.groups.answers' />")) {
 							return;
 						}
-						$('.disclose-groups-button', assessmentPane).not('[disabled]').each(function() {
-							discloseAnswers($(this), resultsPane);
+
+						let nonDisclosedQuestions = $('.disclose-groups-button', assessmentPane).not('[disabled]'),
+		    				lastQuestionUid = nonDisclosedQuestions.last().closest('.disclose-button-group').attr('questionUid');
+						nonDisclosedQuestions.each(function() {
+							let isLast = lastQuestionUid == $(this).closest('.disclose-button-group').attr('questionUid'); 
+							discloseAnswers($(this), resultsPane, isLast);
 						});
 						disabledAndCheckButton(allGroupsButton);
 					});
@@ -81,7 +89,7 @@
 		});
 	}
 	
-	function discloseAnswers(button, resultsPane) {
+	function discloseAnswers(button, resultsPane, isLast) {
 		let isCorrectButton = button.hasClass('disclose-correct-button'),
 			toolContentId = resultsPane.data('toolContentId');
 		
@@ -93,7 +101,8 @@
 			'data' : {
 				'questionUid'   : button.closest('.disclose-button-group').attr('questionUid'),
 				'toolContentID' : toolContentId,
-				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
+				'<csrf:tokenname/>' : '<csrf:tokenvalue/>',
+				'skipLearnersNotification' : !isLast
 			}
 		}).done(function(){
 			// reload results after disclosing answers
