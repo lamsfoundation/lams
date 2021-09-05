@@ -393,10 +393,10 @@ var MenuLib = {
 		}
 		
 		// draw the new activity next to the existing one
-		var x = activity.items.shape.getBBox().x + layout.snapToGrid.step / 2,
-			y = activity.items.shape.getBBox().y + layout.snapToGrid.step / 2,
+		var x = activity.items.shape.getBBox().x + layout.snapToGrid.step,
+			y = activity.items.shape.getBBox().y + layout.snapToGrid.step,
 			newActivity = new ActivityDefs.ToolActivity(null, null, toolContentID, activity.toolID, activity.learningLibraryID,
-													   null, x, y, title);
+													    null, x, y, title);
 		layout.activities.push(newActivity);
 		
 		if (activity.grouping) {
