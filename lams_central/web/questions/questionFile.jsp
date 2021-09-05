@@ -142,7 +142,7 @@
 			<div id="image-upload-area" class="voffset20"></div>
 
         <c:if test="${param.importType == 'word'}">
-        <div class="voffset5">
+        <div class="voffset10">
 			<a href="/lams/www/public/MSWord-question-import.docx"><fmt:message key="label.download.word.template"/></a>.
         </div>
         </c:if>
