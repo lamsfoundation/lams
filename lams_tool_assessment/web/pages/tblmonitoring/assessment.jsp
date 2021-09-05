@@ -36,6 +36,13 @@
 												: "<fmt:message key='message.disclose.groups.answers' />")) {
 						return;
 					}
+
+					// check if correct answers are disclosed before groups' answers
+					if (isCorrectButton &&
+						!button.closest('.disclose-button-group').find('.disclose-groups-button').is('[disabled]') &&
+						!confirm("<fmt:message key='message.disclose.correct.before.groups.answers' />")) {
+						return;
+					}
 					
 					discloseAnswers(button, resultsPane);
 				});
@@ -49,6 +56,12 @@
 				if (!isRefresh) {
 					allCorrectButton.click(function(){
 						if (!confirm("<fmt:message key='message.disclose.all.correct.answers' />")) {
+							return;
+						}
+
+						// check if correct answers are disclosed before groups' answers
+						if (!$('.disclose-all-groups-button', assessmentPane).is('[disabled]') &&
+							!confirm("<fmt:message key='message.disclose.correct.before.groups.answers' />")) {
 							return;
 						}
 						
