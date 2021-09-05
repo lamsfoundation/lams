@@ -252,6 +252,10 @@ var MenuLib = {
 					
 					// generate images of the imported LD
 					GeneralLib.saveLearningDesignImage();
+					
+					// reload user's private dir so it reflects imported LD
+					var ldTree = layout.ldStoreDialog.data('ldTree');
+					ldTreeview.refresh(ldTree, ldTree.treeview('getNode', 0));
 				}
 			}, 1000);
 	},
@@ -544,6 +548,10 @@ var MenuLib = {
 					
 					// save learning design after rearrange
 					MenuLib.saveLearningDesign();
+					
+					// reload user's private dir so it reflects imported LD
+					var ldTree = layout.ldStoreDialog.data('ldTree');
+					ldTreeview.refresh(ldTree, ldTree.treeview('getNode', 0));
 				}
 			}, 1000);
 	},
