@@ -77,7 +77,7 @@
 		<fmt:message key="label.authoring.advance.lock.on.finished" />
 	</label>
     <lams:Popover>
-        <fmt:message key="label.authoring.advance.lock.on.finished.tip.1" /></br>
+        <fmt:message key="label.advanced.lockOnFinished.tip.1" /></br>
     </lams:Popover>
 	</div>
 	
