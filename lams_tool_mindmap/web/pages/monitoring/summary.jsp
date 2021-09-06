@@ -265,7 +265,17 @@
 	
 	<c:if test="${dto.multiUserMode}">
 		<iframe class="mindmap-frame"
-				data-src='<c:url value="/learning/getGalleryWalkMindmap.do?allowPrinting=true&toolSessionID=${session.sessionID}"/>'>
+			<c:choose>
+				<c:when test="${isGroupedActivity}">
+					<%-- iframe is loaded on collapse panel open --%>
+					data-src=
+				</c:when>
+				<c:otherwise>
+					<%-- iframe is loaded on page open --%>
+					src
+				</c:otherwise>
+			</c:choose>
+			='<c:url value="/learning/getGalleryWalkMindmap.do?allowPrinting=true&toolSessionID=${session.sessionID}"/>'>
 		</iframe>
 	</c:if>
 
