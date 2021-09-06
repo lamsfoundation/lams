@@ -355,10 +355,10 @@ public class LearningController {
 	    request.setAttribute("errorMap", errorMap);
 	    switch (resourceItemForm.getItemType()) {
 		case 1:
-		    return "pages/authoring/parts/addurl";
+		    return "pages/learning/addurl";
 		case 2:
 		    resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
-		    return "pages/authoring/parts/addfile";
+		    return "pages/learning/addfile";
 		default:
 		    throw new IllegalArgumentException("Unknown item type" + resourceItemForm.getItemType());
 	    }
@@ -395,7 +395,7 @@ public class LearningController {
 		    errorMap.add("GLOBAL",
 			    messageService.getMessage("error.upload.failed", new Object[] { e.getMessage() }));
 		    request.setAttribute("errorMap", errorMap);
-		    return "pages/authoring/parts/addurl";
+		    return "pages/learning/addurl";
 		}
 		item.setOpenUrlNewWindow(resourceItemForm.isOpenUrlNewWindow());
 	    } else {

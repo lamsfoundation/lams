@@ -71,7 +71,6 @@
  		});
 
  		function submitResourceForm() {
- 			clearFileError();
 			if ( $(this).valid() ) {
 				$('.btn-disable-on-submit').prop('disabled', true);
 				var formData = new FormData(this);
