@@ -70,7 +70,24 @@
 			initFileUpload('${resourceItemForm.tmpFileUploadId}', extensionValidation, '<lams:user property="localeLanguage"/>');
 		});	
 					
-		$('#resourceItemForm').submit(submitResourceForm);
+		$('#resourceItemForm').submit(submitResourceForm)
+							  .validate({
+				errorClass: "text-danger",
+				wrapper: "span",
+				rules: {
+				    title: {
+				    	required: true
+				    }
+				},
+				messages : {
+					title : {
+						required : '<fmt:message key="error.resource.item.title.blank"/> '
+					}
+				},
+				errorPlacement: function(error, element) {
+			       error.insertAfter(element);
+			    }
+			});	
 	</script>
 	
 </div>
