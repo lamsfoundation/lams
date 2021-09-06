@@ -6,6 +6,10 @@
 
 	<div class="form-group">
 	<label for="maximumRatesPerUser"><fmt:message key="label.max.number.marks.each.user" /></label>
+	<lams:Popover>
+		<fmt:message key="label.max.number.marks.each.user.tip.1" /><br>
+		<i><fmt:message key="label.max.number.marks.each.user.tip.2" /></i>
+	</lams:Popover>
 		<form:select path="peerreview.maximumRatesPerUser" cssClass="form-control form-control-inline">
 			<form:option value="0">
 				<fmt:message key="label.no.maximum" />
@@ -23,25 +27,31 @@
 		</form:select>
 	</div>
 	
-	<div class="checkbox">
-	<label for="show-ratings-left-by-user"><form:checkbox path="peerreview.showRatingsLeftByUser" id="show-ratings-left-by-user"/>
-	<fmt:message key="label.show.ratings.left.by.user" />
-	</label>
-	</div>
 
-	<div class="checkbox">
-	<label for="show-ratings-left-for-user"><form:checkbox path="peerreview.showRatingsLeftForUser" id="show-ratings-left-for-user"/>
-	<fmt:message key="label.show.ratings.left.for.user" />
-	</label>
-	</div>
+	<strong><fmt:message key="label.after.completion" />:</strong>
+	<div style="margin-left: 1em;">
+		
+		<div class="checkbox">
+		<label for="show-ratings-left-by-user"><form:checkbox path="peerreview.showRatingsLeftByUser" id="show-ratings-left-by-user"/>
+		<fmt:message key="label.show.ratings.left.by.user" />
+		</label>
+		</div>
+		<div class="checkbox">
+		<label for="show-ratings-left-for-user"><form:checkbox path="peerreview.showRatingsLeftForUser" id="show-ratings-left-for-user"/>
+		<fmt:message key="label.show.ratings.left.for.user" />
+		</label>
+		</div>
 
-	<div class="checkbox">
-	<label for="self-review"><form:checkbox path="peerreview.selfReview" id="self-review"/>
-	<fmt:message key="label.self.review" />
-	</label>
 	</div>
-
-	<div class="checkbox">
+	<div class="checkbox voffset20">
+		<div class="checkbox">
+		<label for="self-review"><form:checkbox path="peerreview.selfReview" id="self-review"/>
+		<fmt:message key="label.self.review" />
+		</label>
+    		<lams:Popover>
+        	<fmt:message key="label.self.review.tip.1" />
+    	</lams:Popover>	
+		</div>
 	<label for="notify-users-of-results"><form:checkbox path="peerreview.notifyUsersOfResults" id="notify-users-of-results"/>
 	<fmt:message key="label.notify.user.of.results" />
 	</label>
@@ -49,9 +59,13 @@
 
 	<div class="form-group">
 	<label for="tolerance">
-	<fmt:message key="label.authoring.advanced.tolearnce" />
-	<form:input type="number" min="0" max="50" path="peerreview.tolerance" id="tolerance" cssClass="form-control form-control-inline loffset5" />
+		<fmt:message key="label.authoring.advanced.tolearnce" />
 	</label>
+    <lams:Popover>
+		<fmt:message key="label.authoring.advanced.tolearnce.tip.1" /></br>
+		<fmt:message key="label.authoring.advanced.tolearnce.tip.2" />
+    </lams:Popover>
+	<form:input type="number" min="0" max="50" path="peerreview.tolerance" id="tolerance" cssClass="form-control form-control-inline loffset5" />
 	</div>
 </lams:SimplePanel>
 
@@ -60,12 +74,21 @@
 <lams:SimplePanel titleKey="label.activity.completion">
 	<div class="checkbox">
 	<label for="lockWhenFinished"><form:checkbox path="peerreview.lockWhenFinished" id="lockWhenFinished" />
-	<fmt:message key="label.authoring.advance.lock.on.finished" /></label>
+		<fmt:message key="label.authoring.advance.lock.on.finished" />
+	</label>
+    <lams:Popover>
+        <fmt:message key="label.authoring.advance.lock.on.finished.tip.1" /></br>
+    </lams:Popover>
 	</div>
 	
 	<div class="checkbox">
 	<label for="reflectOn"><form:checkbox path="peerreview.reflectOnActivity" id="reflectOn"/>
-	<fmt:message key="label.authoring.advanced.reflectOnActivity" /></label>
+		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
+	</label>
+    <lams:Popover>
+        <fmt:message key="label.advanced.reflectOnActivity.tip.1" /></br>
+		<fmt:message key="label.advanced.reflectOnActivity.tip.2" />
+    </lams:Popover>
 	</div>
 	<div class="form-group">
 	<form:textarea path="peerreview.reflectInstructions" id="reflectInstructions"  cssClass="form-control" rows="3"/>

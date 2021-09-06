@@ -191,11 +191,16 @@
 	</c:when>
 	<c:otherwise>
 		<div class="form-group row">
-		    <label for="outcomeSearchInput${outcomeTagId}" class="col-sm-3">
-		    	<fmt:message key="outcome.authoring.title" />
-		    </label>
-		    
-		    <div class="col-sm-9">
+			<div class="col-sm-2">
+			    <label for="outcomeSearchInput${outcomeTagId}">
+			    	<fmt:message key="outcome.authoring.title" />
+			    </label>
+				<lams:Popover>
+					<fmt:message key="outcome.authoring.tooltip.1" /><br>
+					<fmt:message key="outcome.authoring.tooltip.2" />
+				</lams:Popover>
+		    </div>
+		    <div class="col-sm-10">
 		    	<div class="input-group">
 				    <span class="input-group-addon"><i class="fa fa-search"></i></span>
 				    <input type="text" id="outcomeSearchInput${outcomeTagId}" class="ui-autocomplete-input form-control" 
