@@ -31,15 +31,15 @@
 				'itemId',
 				'<fmt:message key="label.user.name" />',
 				'${heading}',
-				'portraitId'
-				<c:if test="${sessionMap.peerreview.notifyUsersOfResults}">, ''</c:if>
+				'portraitId',
+				''
 			],
 		   	colModel:[
 		   		{name:'itemId', index:'itemId', width:0, hidden: true},
 		   		{name:'itemDescription', index:'itemDescription', width:200, searchoptions: { clearSearch: false }, formatter:userNameFormatter},
 		   		{name:'rating', index:'rating', width:100, align:"center", search:false},
-		   		{name:'itemDescription2', index:'itemId', width:0, hidden: true}
-				<c:if test="${sessionMap.peerreview.notifyUsersOfResults}">, {name:'email', index:'email', width:100, align:"center", search:false}</c:if>		   		
+		   		{name:'itemDescription2', index:'itemId', width:0, hidden: true},
+				{name:'email', index:'email', width:100, align:"center", search:false}		   		
 		   	],
 		   	rowNum:10,
 		   	rowList:[10,20,30,40,50,100],

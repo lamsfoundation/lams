@@ -1200,7 +1200,6 @@ public class PeerreviewServiceImpl
 	peerreview
 		.setShowRatingsLeftByUser(JsonUtil.optBoolean(toolContentJSON, "showRatingsLeftByUser", Boolean.FALSE));
 	peerreview.setSelfReview(JsonUtil.optBoolean(toolContentJSON, "notifyUsersOfResults", Boolean.FALSE));
-	peerreview.setNotifyUsersOfResults(JsonUtil.optBoolean(toolContentJSON, "notifyUsersOfResults", Boolean.TRUE));
 
 	saveOrUpdatePeerreview(peerreview);
 

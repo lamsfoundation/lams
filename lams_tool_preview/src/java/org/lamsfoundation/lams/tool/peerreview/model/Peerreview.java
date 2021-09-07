@@ -124,9 +124,6 @@ public class Peerreview implements Serializable, Cloneable {
     @Column(name = "self_review")
     private boolean selfReview;
 
-    @Column(name = "notify_users_of_results")
-    private boolean notifyUsersOfResults;
-
     @Column
     private int tolerance;
 
@@ -439,14 +436,6 @@ public class Peerreview implements Serializable, Cloneable {
 
     public void setSelfReview(boolean selfReview) {
 	this.selfReview = selfReview;
-    }
-
-    public boolean isNotifyUsersOfResults() {
-	return notifyUsersOfResults;
-    }
-
-    public void setNotifyUsersOfResults(boolean notifyUsersOfResults) {
-	this.notifyUsersOfResults = notifyUsersOfResults;
     }
 
     public boolean isShowRatingsLeftByUser() {
