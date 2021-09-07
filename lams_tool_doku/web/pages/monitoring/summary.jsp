@@ -904,15 +904,6 @@
 					<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" isItemAuthoredByUser="true" />
 				</c:if>
 				
-				<div class="btn-group btn-group-xs pull-right">
-					<c:url  var="exportHtmlUrl" value="${etherpadServerUrl}/p/${groupSummary.padId}/export/html"/>
-					<a href="#nogo" onclick="window.location = '${exportHtmlUrl}';" class="btn btn-default btn-sm " 
-							title="<fmt:message key="label.export.pad.html" />">
-						<i class="fa fa-lg fa-file-text-o"></i>
-						<fmt:message key="label.export.pad.html" />
-					</a>
-				</div>	
-				
 				<lams:Etherpad groupId="${groupSummary.sessionId}" padId="${groupSummary.padId}"
 							   showControls="true" showChat="${dokumaran.showChat}" showOnDemand="${sessionMap.isGroupedActivity}"
 							   heightAutoGrow="true" height="600" />	
