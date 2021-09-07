@@ -54,23 +54,6 @@
 			</c:choose>	
 		</td>
 	</tr>
-		
-	<tr>
-		<td>
-			<fmt:message key="label.notify.user.of.results" />
-		</td>
-			
-		<td>
-			<c:choose>
-				<c:when test="${sessionMap.peerreview.notifyUsersOfResults}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
 	
 	<tr>
 		<td>

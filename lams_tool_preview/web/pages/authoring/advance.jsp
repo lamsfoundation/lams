@@ -41,12 +41,6 @@
 	</label>
 	</div>
 
-	<div class="checkbox">
-	<label for="notify-users-of-results"><form:checkbox path="peerreview.notifyUsersOfResults" id="notify-users-of-results"/>
-	<fmt:message key="label.notify.user.of.results" />
-	</label>
-	</div>
-
 	<div class="form-group" id="tolerance-container">
 		<label for="tolerance">
 		<fmt:message key="label.authoring.advanced.tolearnce" />

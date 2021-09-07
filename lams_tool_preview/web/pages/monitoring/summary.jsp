@@ -152,7 +152,6 @@
 		</c:otherwise>
 	</c:choose>
 
-	<c:if test="${sessionMap.peerreview.reflectOnActivity || sessionMap.peerreview.notifyUsersOfResults}">
 	<div id="btns${groupSummary.sessionId}" class="offset5">
 		<c:set var="offset"></c:set>
 		<c:if test="${sessionMap.peerreview.reflectOnActivity}">
@@ -160,11 +159,8 @@
 			<button onclick="javascript:launchPopup('${url}');return false;" class="btn btn-default  btn-disable-on-submit ${offset}"><fmt:message key="title.reflection"/></button>
 			<c:set var="offset">loffset5</c:set>
 		</c:if>
-		<c:if test="${sessionMap.peerreview.notifyUsersOfResults}">
-			<button onClick="return sendResults(${groupSummary.sessionId});" class="btn btn-default btn-disable-on-submit ${offset}"><fmt:message key="label.notify.user.of.results"/></button>
-		</c:if>
+		<button onClick="return sendResults(${groupSummary.sessionId});" class="btn btn-default btn-disable-on-submit ${offset}"><fmt:message key="label.notify.user.of.results"/></button>
 	</div>
-	</c:if>
 	
 	<c:if test="${sessionMap.isGroupedActivity}">
 		</div> <!-- end collapse area  -->
