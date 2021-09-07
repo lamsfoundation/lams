@@ -10,7 +10,7 @@
 <c:set var="toolSessionId" value="${sessionMap.toolSessionId}" />
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 <c:set var="userId" value="${sessionMap.user.userId }"/>
-<c:set var="displayFinalFinishButton" value="${not peerreview.showRatingsLeftForUser and not peerreview.reflectOnActivity and stepNumber >= numCriteria}" />
+<c:set var="displayFinalFinishButton" value="${not peerreview.showRatingsLeftByUser and not peerreview.showRatingsLeftForUser and not peerreview.reflectOnActivity and stepNumber >= numCriteria}" />
 <c:set var="isComment" value="<%=RatingCriteria.RATING_STYLE_COMMENT%>"/>
 <c:set var="isStar" value="<%=RatingCriteria.RATING_STYLE_STAR%>"/>
 <c:set var="isRanking" value="<%=RatingCriteria.RATING_STYLE_RANKING%>"/>
