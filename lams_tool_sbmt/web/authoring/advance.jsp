@@ -111,13 +111,6 @@
 
 <lams:SimplePanel titleKey="label.notifications">
 	<div class="checkbox">
-		<label for="notifyLearnersOnMarkRelease">
-			<form:checkbox path="notifyLearnersOnMarkRelease" id="notifyLearnersOnMarkRelease" />
-			<fmt:message key="label.authoring.advanced.notify.mark.release" />
-		</label>
-	</div>
-	
-	<div class="checkbox">
 		<label for="notifyTeachersOnFileSubmit">
 			<form:checkbox path="notifyTeachersOnFileSubmit" id="notifyTeachersOnFileSubmit" />
 			<fmt:message key="label.authoring.advanced.notify.onfilesubmit" />

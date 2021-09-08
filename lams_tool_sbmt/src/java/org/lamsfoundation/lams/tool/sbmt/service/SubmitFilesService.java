@@ -960,45 +960,49 @@ public class SubmitFilesService
 	// push outputs to gradebook
 	recalculateUserTotalMarks(true, session, null);
 
-	// notify learners on mark release
-	boolean notifyLearnersOnMarkRelease = getEventNotificationService().eventExists(SbmtConstants.TOOL_SIGNATURE,
-		SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, content.getContentID());
-	if (notifyLearnersOnMarkRelease) {
-	    Map<Integer, StringBuilder> notificationMessages = new TreeMap<>();
-
-	    List<SubmissionDetails> list = submissionDetailsDAO.getSubmissionDetailsBySession(sessionID);
-	    for (SubmissionDetails details : list) {
-		SubmitFilesReport report = details.getReport();
-		if (!details.isRemoved()) {
-		    Integer userId = details.getLearner().getUserID();
-		    StringBuilder notificationMessage = notificationMessages.get(userId);
-		    if (notificationMessage == null) {
-			notificationMessage = new StringBuilder();
-		    }
-		    Object[] notificationMessageParameters = new Object[3];
-		    notificationMessageParameters[0] = details.getFilePath();
-		    notificationMessageParameters[1] = details.getDateOfSubmission();
-		    notificationMessageParameters[2] = report.getMarks();
-		    notificationMessage
-			    .append(getLocalisedMessage("event.mark.release.mark", notificationMessageParameters));
-		    notificationMessages.put(userId, notificationMessage);
-		}
-	    }
-
-	    Object[] notificationMessageParameters = new Object[1];
-	    for (Integer userID : notificationMessages.keySet()) {
-		notificationMessageParameters[0] = notificationMessages.get(userID).toString();
-		getEventNotificationService().triggerForSingleUser(SbmtConstants.TOOL_SIGNATURE,
-			SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, content.getContentID(), userID,
-			notificationMessageParameters);
-	    }
-	}
-
 	//audit log event
 	String sessionName = session.getSessionName() + " (toolSessionId=" + session.getSessionID() + ")";
 	String message = messageService.getMessage("tool.display.name") + ". "
 		+ messageService.getMessage("msg.mark.released", new String[] { sessionName });
 	logEventService.logToolEvent(LogEvent.TYPE_TOOL_MARK_RELEASED, content.getContentID(), null, message);
+    }
+
+    @Override
+    public int notifyLearnersOnMarkRelease(long sessionID) {
+	if (log.isDebugEnabled()) {
+	    log.debug("Sending email with marks to all learners for session ID " + sessionID);
+	}
+
+	Map<Integer, StringBuilder> notificationMessages = new TreeMap<>();
+	List<SubmissionDetails> list = submissionDetailsDAO.getSubmissionDetailsBySession(sessionID);
+	for (SubmissionDetails details : list) {
+	    SubmitFilesReport report = details.getReport();
+	    if (!details.isRemoved()) {
+		Integer userId = details.getLearner().getUserID();
+		StringBuilder notificationMessage = notificationMessages.get(userId);
+		if (notificationMessage == null) {
+		    notificationMessage = new StringBuilder();
+		}
+		Object[] notificationMessageParameters = new Object[3];
+		notificationMessageParameters[0] = details.getFilePath();
+		notificationMessageParameters[1] = details.getDateOfSubmission();
+		notificationMessageParameters[2] = report.getMarks();
+		notificationMessage
+			.append(getLocalisedMessage("event.mark.release.mark", notificationMessageParameters));
+		notificationMessages.put(userId, notificationMessage);
+	    }
+	}
+	Object[] notificationMessageParameters = new Object[1];
+	int learnersNotified = 0;
+	for (Integer userId : notificationMessages.keySet()) {
+	    notificationMessageParameters[0] = notificationMessages.get(userId).toString();
+	    getEventNotificationService().sendMessage(null, userId, IEventNotificationService.DELIVERY_METHOD_MAIL,
+		    getLocalisedMessage("event.mark.release.subject", null),
+		    getLocalisedMessage("event.mark.release.body", notificationMessageParameters), false);
+	    learnersNotified++;
+	}
+
+	return learnersNotified;
     }
 
     @Override
@@ -1338,8 +1342,6 @@ public class SubmitFilesService
 	content.setDefineLater(false);
 	content.setNotifyTeachersOnFileSubmit(
 		JsonUtil.optBoolean(toolContentJSON, "notifyTeachersOnFileSubmit", Boolean.FALSE));
-	content.setNotifyLearnersOnMarkRelease(
-		JsonUtil.optBoolean(toolContentJSON, "notifyLearnersOnMarkRelease", Boolean.FALSE));
 	content.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
 	content.setReflectOnActivity(JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	content.setLockOnFinished(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));

@@ -185,6 +185,11 @@ public interface ISubmitFilesService extends ICommonToolService {
     public void releaseMarksForSession(Long sessionID);
 
     /**
+     * Notify learners about marks being released, via email.
+     */
+    public int notifyLearnersOnMarkRelease(long sessionID);
+
+    /**
      * When learner finish submission, it invokes this function and will remark the <code>finished</code> field.
      *
      * @param sessionID
