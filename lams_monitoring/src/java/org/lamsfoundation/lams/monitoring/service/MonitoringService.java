@@ -1469,7 +1469,7 @@ public class MonitoringService implements IMonitoringFullService {
 		} else {
 		    // the gate is closed, stop here
 		    stopReason = messageService.getMessage(MonitoringService.FORCE_COMPLETE_STOP_MESSAGE_GATE,
-			    new Object[] { activity.getTitle() });
+			    new Object[] { activity.getTitle() == null ? "" : activity.getTitle() });
 		}
 
 	    } else if (activity.isToolActivity()) {

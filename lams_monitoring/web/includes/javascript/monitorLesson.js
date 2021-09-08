@@ -935,10 +935,7 @@ function initSequenceTab(){
 			// go to "force complete" mode, similar to dragging user to an activity
 			activityId = dialog.data('ajaxProperties').data.activityID,
 			dropArea = sequenceCanvas.add('#completedLearnersContainer');
-		dropArea.css('cursor', 'url('
-						+ LAMS_URL + 'images/icons/' 
-						+ (moveAll || selectedLearners.length > 1 ? 'group' : 'user')
-						+ '.png),pointer')
+		dropArea.css('cursor', 'pointer')
 				.one('click', function(event) {
 					dropArea.off('click').css('cursor', 'default');
 					if (moveAll) {
@@ -2779,19 +2776,25 @@ function dblTap(elem, dblClickFunction) {
  	 // double tap detection on mobile devices; it works also for mouse clicks
 	 // temporarly switched to click as jQuery mobile was removed for bootstrapping
 	 elem.click(function(event) {
-		event.stopPropagation();
-		var currentTime = new Date().getTime();
+		// was the second click quick enough after the first one?
+		var currentTime = new Date().getTime(),
+			tapLength = currentTime - lastTapTime;
+		lastTapTime = currentTime;
+		
+		if (lastTapTarget && lastTapTarget.classList.contains('learner-icon') && tapLength < 10) {
+			// after clicking learner icon there is a propagation to activity, which must be ignored
+			// we can not stop propagation completetly as force complete stops working
+			return;
+		}
+		
 		// is the second click on the same element as the first one?
 		if (event.currentTarget == lastTapTarget) {
-			
-			// was the second click quick enough after the first one?
-			var tapLength = currentTime - lastTapTime;
 			if (tapLength < tapTimeout && tapLength > 0) {
 				event.preventDefault();
 				dblClickFunction(event);
 			}
 		}
-		lastTapTime = currentTime;
+		
 		lastTapTarget = event.currentTarget;
 	});
 }
