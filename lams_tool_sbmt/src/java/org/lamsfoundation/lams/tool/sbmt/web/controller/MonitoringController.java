@@ -280,6 +280,12 @@ public class MonitoringController {
 	submitFilesService.releaseMarksForSession(sessionID);
     }
 
+    @RequestMapping(path = "/notifyLearnersOnMarkRelease", method = RequestMethod.POST)
+    @ResponseBody
+    public String notifyLearnersOnMarkRelease(@RequestParam(name = AttributeNames.PARAM_TOOL_SESSION_ID) Long sessionID) {
+	return String.valueOf(submitFilesService.notifyLearnersOnMarkRelease(sessionID));
+    }
+
     /**
      * Download submit file marks by MS Excel file format.
      */

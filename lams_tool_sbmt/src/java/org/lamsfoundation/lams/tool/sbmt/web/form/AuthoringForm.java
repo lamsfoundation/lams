@@ -32,14 +32,12 @@ public class AuthoringForm {
     private boolean useSelectLeaderToolOuput;
 
     private int limitUploadNumber;
-    
+
     private Integer minLimitUploadNumber;
 
     private boolean reflectOnActivity;
 
     private String reflectInstructions;
-
-    private boolean notifyLearnersOnMarkRelease;
 
     private boolean notifyTeachersOnFileSubmit;
 
@@ -67,7 +65,6 @@ public class AuthoringForm {
 
 	reflectOnActivity = content.isReflectOnActivity();
 	reflectInstructions = content.getReflectInstructions();
-	setNotifyLearnersOnMarkRelease(content.isNotifyLearnersOnMarkRelease());
 	setNotifyTeachersOnFileSubmit(content.isNotifyTeachersOnFileSubmit());
     }
 
@@ -161,21 +158,13 @@ public class AuthoringForm {
     public void setLimitUploadNumber(int limitUploadNumber) {
 	this.limitUploadNumber = limitUploadNumber;
     }
-    
+
     public Integer getMinLimitUploadNumber() {
 	return minLimitUploadNumber;
     }
 
     public void setMinLimitUploadNumber(Integer minLimitUploadNumber) {
 	this.minLimitUploadNumber = minLimitUploadNumber;
-    }
-
-    public boolean isNotifyLearnersOnMarkRelease() {
-	return notifyLearnersOnMarkRelease;
-    }
-
-    public void setNotifyLearnersOnMarkRelease(boolean notifyLearnersOnMarkRelease) {
-	this.notifyLearnersOnMarkRelease = notifyLearnersOnMarkRelease;
     }
 
     public boolean isNotifyTeachersOnFileSubmit() {

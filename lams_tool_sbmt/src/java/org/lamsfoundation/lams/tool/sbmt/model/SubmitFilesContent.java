@@ -63,9 +63,6 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     @Column(name = "lock_on_finished")
     private boolean lockOnFinished;
 
-    @Column(name = "mark_release_notify")
-    private boolean notifyLearnersOnMarkRelease;
-
     @Column(name = "file_submit_notify")
     private boolean notifyTeachersOnFileSubmit;
 
@@ -86,7 +83,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     //max limitUploadNumber
     @Column(name = "limit_upload_number")
     private int limitUploadNumber;
-    
+
     @Column(name = "min_limit_upload_number")
     private Integer minLimitUploadNumber;
 
@@ -267,7 +264,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     public void setLimitUploadNumber(int limitUploadNumber) {
 	this.limitUploadNumber = limitUploadNumber;
     }
-    
+
     public Integer getMinLimitUploadNumber() {
 	return minLimitUploadNumber;
     }
@@ -306,14 +303,6 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 
     public void setSubmissionDeadline(Date submissionDeadline) {
 	this.submissionDeadline = submissionDeadline;
-    }
-
-    public boolean isNotifyLearnersOnMarkRelease() {
-	return notifyLearnersOnMarkRelease;
-    }
-
-    public void setNotifyLearnersOnMarkRelease(boolean notifyLearnersOnMarkRelease) {
-	this.notifyLearnersOnMarkRelease = notifyLearnersOnMarkRelease;
     }
 
     public boolean isNotifyTeachersOnFileSubmit() {

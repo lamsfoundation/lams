@@ -82,7 +82,7 @@ public class AuthoringController {
 
 	return readDatabaseData(authoringForm, persistContent, request, mode);
     }
-    
+
     /**
      * Set the defineLater flag so that learners cannot use content while we are editing. This flag is released when
      * updateContent is called.
@@ -100,18 +100,18 @@ public class AuthoringController {
 
 	return readDatabaseData(authoringForm, persistContent, request, ToolAccessMode.TEACHER);
     }
-    
+
     /**
      * Common method for "unspecified" and "defineLater"
      */
-    private String readDatabaseData(AuthoringForm authoringForm, SubmitFilesContent persistContent, HttpServletRequest request,
-	    ToolAccessMode mode) {
+    private String readDatabaseData(AuthoringForm authoringForm, SubmitFilesContent persistContent,
+	    HttpServletRequest request, ToolAccessMode mode) {
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	sessionMap.put(AttributeNames.PARAM_MODE, mode);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	
+
 	// set back STRUTS component value
 	authoringForm.initContentValue(persistContent);
 	// session map
@@ -198,7 +198,6 @@ public class AuthoringController {
 	content.setLimitUploadNumber(authoringForm.getLimitUploadNumber());
 	content.setMinLimitUploadNumber(authoringForm.getMinLimitUploadNumber());
 	content.setUseSelectLeaderToolOuput(authoringForm.isUseSelectLeaderToolOuput());
-	content.setNotifyLearnersOnMarkRelease(authoringForm.isNotifyLearnersOnMarkRelease());
 	content.setNotifyTeachersOnFileSubmit(authoringForm.isNotifyTeachersOnFileSubmit());
 	return content;
     }

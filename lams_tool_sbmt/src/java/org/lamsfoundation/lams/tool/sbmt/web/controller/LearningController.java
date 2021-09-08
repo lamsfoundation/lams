@@ -37,7 +37,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -221,18 +220,6 @@ public class LearningController implements SbmtConstants {
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
 		return "learner/submissionDeadline";
 	    }
-	}
-
-	if (content.isNotifyLearnersOnMarkRelease()) {
-	    boolean isHtmlFormat = false;
-	    submitFilesService.getEventNotificationService().createEvent(SbmtConstants.TOOL_SIGNATURE,
-		    SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, content.getContentID(),
-		    submitFilesService.getLocalisedMessage("event.mark.release.subject", null),
-		    submitFilesService.getLocalisedMessage("event.mark.release.body", null), isHtmlFormat);
-
-	    submitFilesService.getEventNotificationService().subscribe(SbmtConstants.TOOL_SIGNATURE,
-		    SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, content.getContentID(), userID,
-		    IEventNotificationService.DELIVERY_METHOD_MAIL);
 	}
 
 	if (content.isUseSelectLeaderToolOuput() && groupLeader.isFinished() && !mode.isTeacher()) {
