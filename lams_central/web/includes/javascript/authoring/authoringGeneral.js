@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿/**
+﻿﻿﻿﻿﻿﻿﻿﻿/**
  * This file contains main methods for Authoring.
  */
 
@@ -574,9 +574,12 @@ GeneralInitLib = {
 				if (selectedAccess.length > 0 && title == selectedAccess.text()) {
 					learningDesignID = +selectedAccess.data('learningDesignId');
 					folderID = +selectedAccess.data('folderID');
+					folderNode = tree.treeview('getNode', folderID);
+					if (folderNode.learningDesignId) {
+						folderNode = tree.treeview('getParent', folderNode);
+					}
 				}
 			}
-			
 			if (!folderID) {
 				// although an existing sequence can be highlighted 
 				alert(LABELS.FOLDER_NOT_SELECTED_ERROR);
