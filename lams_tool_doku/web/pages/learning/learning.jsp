@@ -65,7 +65,10 @@
 				'showChat':'${dokumaran.showChat}',
 				'showLineNumbers':'${dokumaran.showLineNumbers}',
 				'height':'' + ($(window).height() - 200)
-				<c:if test="${hasEditRight}">,'userName':'<lams:user property="firstName" />&nbsp;<lams:user property="lastName" />'</c:if>
+				<c:if test="${hasEditRight}">
+					<c:set var="fullName"><lams:user property="firstName" />&nbsp;<lams:user property="lastName" /></c:set>
+					,'userName': encodeURIComponent("<c:out value='${fullName}' />")
+				</c:if>
 			});
 			
 			$('[data-toggle="tooltip"]').bootstrapTooltip();

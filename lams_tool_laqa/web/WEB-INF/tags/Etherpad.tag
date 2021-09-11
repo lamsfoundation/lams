@@ -72,7 +72,7 @@
 				'height': ${empty height ? 'undefined' : height}
 				<c:if test="${showControls}">
 					<c:set var="fullName"><lams:user property="firstName" />&nbsp;<lams:user property="lastName" /></c:set>
-					,'userName':'<c:out value="${fullName}" />'
+					,'userName': encodeURIComponent("<c:out value='${fullName}' />")
 				</c:if>
 			}).addClass('initialised');
 		}
