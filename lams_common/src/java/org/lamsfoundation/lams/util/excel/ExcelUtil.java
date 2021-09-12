@@ -237,7 +237,8 @@ public class ExcelUtil {
 
 	for (int columnIndex : columnWidths.keySet()) {
 	    // one unit is 1/256 of character width, plus some characters for padding
-	    sheet.setColumnWidth(columnIndex, (columnWidths.get(columnIndex) + 4) * 256);
+	    // maximum is 255 characters
+	    sheet.setColumnWidth(columnIndex, Math.min(255, columnWidths.get(columnIndex) + 4) * 256);
 	}
     }
 
@@ -371,7 +372,6 @@ public class ExcelUtil {
 		}
 	    }
 
-	    
 	    // Store maximum number of characters in each column.
 	    // XLXS format processing is done chunk by chunk and it is append only, so this information needs to be stored on the fly.
 	    Integer existingColumnWidth = columnWidths.get(columnIndex);
