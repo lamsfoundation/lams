@@ -92,11 +92,14 @@
 					</c:if>
 				</c:forEach>
 				<c:if test="${not empty teams}">
-					<tr class="selected-by-groups">
-						<td></td>
-						<td></td>
-						<td colspan="2">
-							<span><fmt:message key="label.learning.summary.selected.by" /></span> ${teams}
+					<tr class="selected-by-groups" >
+						<td ${isCorrect ? "class='bg-success'" : "" }></td>
+						<td ${isCorrect ? "class='bg-success'" : "" }></td>
+						<td colspan="2" ${isCorrect ? "class='bg-success'" : "" }>
+							<span >
+								<fmt:message key="label.learning.summary.selected.by" />
+							</span>
+							${teams}
 						</td>
 					</tr>
 				</c:if>
