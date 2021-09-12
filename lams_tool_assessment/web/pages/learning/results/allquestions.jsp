@@ -46,6 +46,12 @@
 	.discussion-sentiment-start-button .fa-comments {
 		color: black !important;
 	}
+	
+	<c:if test="${param.embedded and empty toolSessionID and (assessment.allowDiscloseAnswers or assessment.allowDiscussionSentiment)}">	
+		.panel-heading .asterisk {
+			margin-right: 30px;
+		}
+	</c:if>
 </style>
 	
 <script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script> 
@@ -174,6 +180,13 @@
 				</div>
 			</c:if>
 			
+			<c:if test="${question.answerRequired}">
+				<span class="asterisk pull-right">
+					<i class="fa fa-xs fa-asterisk text-danger" title="<fmt:message key="label.answer.required"/>" 
+							alt="<fmt:message key="label.answer.required"/>"></i>
+				</span>
+			</c:if>
+			
 			<h3 class="panel-title" style="margin-bottom: 10px;font-size: initial;">
 				<c:if test="${assessment.numbered}">
 						${status.index + sessionMap.questionNumberingOffset}.
@@ -184,12 +197,7 @@
 				</c:if>
 			</h3>
 			
-			<c:if test="${question.answerRequired}">
-				<span class="asterisk pull-right">
-					<i class="fa fa-xs fa-asterisk text-danger" title="<fmt:message key="label.answer.required"/>" 
-							alt="<fmt:message key="label.answer.required"/>"></i>
-				</span>
-			</c:if>
+	
 							
 			<c:if test="${empty question.question}">
 				<!--  must have something here otherwise the question-numbers span does not float properly -->
