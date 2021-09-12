@@ -102,6 +102,9 @@
 				<c:forEach var="tblQuestionDto" items="${questionDtos}" varStatus="i">
 					<th class="text-center">
 						<div class="question-title">
+							<c:if test="${assessment.numbered}">
+									${i.count}.
+							</c:if>
 							${tblQuestionDto.title}
 						</div>
 					</th>
