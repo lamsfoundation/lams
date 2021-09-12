@@ -118,7 +118,9 @@ public class SignupService implements ISignupService {
     public SignupOrganisation getSignupOrganisation(String context) {
 	SignupOrganisation result = signupDAO.getSignupOrganisation(context);
 	// initialize lazy-loaded organisation here, so it can be used in JSP produced by SignupController#execute()
-	Hibernate.initialize(result.getOrganisation());
+	if (result != null) {
+	    Hibernate.initialize(result.getOrganisation());
+	}
 	return result;
     }
 
