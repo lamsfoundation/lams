@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.rsrc.dto;
 
 import java.util.ArrayList;
@@ -29,6 +28,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 
 /**
  * List contains following element: <br>
@@ -50,7 +50,7 @@ public class ResourceItemDTO {
     private boolean itemCreateByAuthor;
     private boolean itemHide;
     private String itemTitle;
-    private List<String> itemInstructions = new ArrayList<String>();
+    private List<String> itemInstructions = new ArrayList<>();
     private String username;
     private int viewNumber;
     private boolean allowRating;
@@ -79,7 +79,11 @@ public class ResourceItemDTO {
 	    this.itemCreateByAuthor = item.isCreateByAuthor();
 	    this.itemHide = item.isHide();
 	    this.itemTitle = item.getTitle();
-	    this.username = item.getCreateBy() == null ? "" : item.getCreateBy().getLoginName();
+	    ResourceUser user = item.getCreateBy();
+	    if (user != null) {
+		this.username = user.getFirstName() + " " + user.getLastName() + " (" + user.getLoginName() + ")";
+	    }
+
 	    this.setAllowRating(item.isAllowRating());
 	    this.setAllowComments(item.isAllowComments());
 	} else {
@@ -176,10 +180,10 @@ public class ResourceItemDTO {
     }
 
     public boolean isAllowComments() {
-        return allowComments;
+	return allowComments;
     }
 
     public void setAllowComments(boolean allowComments) {
-        this.allowComments = allowComments;
+	this.allowComments = allowComments;
     }
 }
