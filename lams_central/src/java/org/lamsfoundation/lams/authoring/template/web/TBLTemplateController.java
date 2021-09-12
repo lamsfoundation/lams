@@ -248,7 +248,7 @@ public class TBLTemplateController extends LdTemplateController {
 		    }
 
 		    Long aetoolContentId = authoringService.createTblAssessmentToolContent(userDTO,
-			    applicationExerciseTitle, data.getText("boilerplate.ae.instructions"), null, true, false,
+			    applicationExerciseTitle, data.getText("boilerplate.ae.instructions"), null, true, true,
 			    false, true, true, true, questionsJSONArray);
 		    activities.add(createAssessmentActivity(maxUIID, order++, currentActivityPosition, aetoolContentId,
 			    data.contentFolderID, groupingUIID, null, null, applicationExerciseTitle));
