@@ -233,7 +233,7 @@ public class MonitoringController {
 
 		// build candidate dtos
 		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-		    int optionAttemptCount = service.countAttemptsPerOption(contentId, optionDto.getUid());
+		    int optionAttemptCount = service.countAttemptsPerOption(contentId, optionDto.getUid(), false);
 
 		    float percentage = (float) (optionAttemptCount * 100) / totalNumberOfUsers;
 		    optionDto.setPercentage(percentage);

@@ -105,9 +105,9 @@ public interface AssessmentResultDAO extends DAO {
     AssessmentResult getAssessmentResultByUid(Long assessmentResultUid);
 
     /**
-     * Count how many last finished attempts selected specified option.
+     * Count how many last attempts selected specified option.
      */
-    int countAttemptsPerOption(Long toolContentId, Long optionUid);
+    int countAttemptsPerOption(Long toolContentId, Long optionUid, boolean finishedAttemptsOnly);
 
     Map<Integer, Integer> countAnsweredQuestionsByUsers(long toolContentId);
 }
