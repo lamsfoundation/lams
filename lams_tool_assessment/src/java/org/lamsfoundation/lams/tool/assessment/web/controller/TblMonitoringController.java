@@ -104,8 +104,8 @@ public class TblMonitoringController {
 
 		// build candidate dtos
 		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-		    int optionAttemptCount = assessmentService.countAttemptsPerOption(toolContentId,
-			    optionDto.getUid());
+		    int optionAttemptCount = assessmentService.countAttemptsPerOption(toolContentId, optionDto.getUid(),
+			    false);
 
 		    float percentage = (float) (optionAttemptCount * 100) / totalNumberOfUsers;
 		    optionDto.setPercentage(percentage);
@@ -195,7 +195,7 @@ public class TblMonitoringController {
     public String aesStudentChoices(HttpServletRequest request) {
 	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
-	Map<Long, QuestionSummary> questionSummaries = assessmentService.getQuestionSummaryForExport(assessment);
+	Map<Long, QuestionSummary> questionSummaries = assessmentService.getQuestionSummaryForExport(assessment, false);
 	List<TblAssessmentQuestionDTO> tblQuestionDtos = new ArrayList<>();
 	for (QuestionSummary questionSummary : questionSummaries.values()) {
 	    QuestionDTO questionDto = questionSummary.getQuestionDto();

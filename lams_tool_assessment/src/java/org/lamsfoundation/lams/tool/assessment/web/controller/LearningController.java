@@ -1148,7 +1148,7 @@ public class LearningController {
 	}
 	request.setAttribute("sessions", sessionList);
 
-	Map<Long, QuestionSummary> questionSummaries = service.getQuestionSummaryForExport(assessment);
+	Map<Long, QuestionSummary> questionSummaries = service.getQuestionSummaryForExport(assessment, true);
 	request.setAttribute("questionSummaries", questionSummaries);
 
 	// Assessment currently supports only one place for ratings.

@@ -1126,8 +1126,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public int countAttemptsPerOption(Long toolContentId, Long optionUid) {
-	return assessmentResultDao.countAttemptsPerOption(toolContentId, optionUid);
+    public int countAttemptsPerOption(Long toolContentId, Long optionUid, boolean finishedAttemptsOnly) {
+	return assessmentResultDao.countAttemptsPerOption(toolContentId, optionUid, finishedAttemptsOnly);
     }
 
     @Override
@@ -1613,7 +1613,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public Map<Long, QuestionSummary> getQuestionSummaryForExport(Assessment assessment) {
+    public Map<Long, QuestionSummary> getQuestionSummaryForExport(Assessment assessment, boolean finishedAttemptsOnly) {
 	Map<Long, QuestionSummary> questionSummaries = new LinkedHashMap<>();
 
 	if (assessment.getQuestions() == null) {
@@ -1623,8 +1623,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	SortedSet<AssessmentSession> sessions = new TreeSet<>(new AssessmentSessionComparator());
 	sessions.addAll(assessmentSessionDao.getByContentId(assessment.getContentId()));
 
-	List<AssessmentResult> assessmentResults = assessmentResultDao
-		.getLastFinishedAssessmentResults(assessment.getContentId());
+	List<AssessmentResult> assessmentResults = finishedAttemptsOnly
+		? assessmentResultDao.getLastFinishedAssessmentResults(assessment.getContentId())
+		: assessmentResultDao.getLastAssessmentResults(assessment.getUid());
 	Map<Long, AssessmentResult> userUidToResultMap = new HashMap<>();
 	for (AssessmentResult assessmentResult : assessmentResults) {
 	    userUidToResultMap.put(assessmentResult.getUser().getUid(), assessmentResult);
@@ -1862,7 +1863,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	summaryTitleRow.addCell(getMessage("label.export.question.summary"), true);
 	questionSummarySheet.addEmptyRow();
 
-	Map<Long, QuestionSummary> questionSummaries = getQuestionSummaryForExport(assessment);
+	Map<Long, QuestionSummary> questionSummaries = getQuestionSummaryForExport(assessment, true);
 
 	if (assessment.getQuestions() != null) {
 	    Set<AssessmentQuestion> questions = assessment.getQuestions();
@@ -1961,7 +1962,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			.getQuestionResultsPerSession();
 
 		int markCount = 0;
-		Float markTotal = 0.0F;
+		float markTotal = 0.0F;
 		int timeTakenCount = 0;
 		int timeTakenTotal = 0;
 		for (List<AssessmentQuestionResult> resultList : allResultsForQuestion) {

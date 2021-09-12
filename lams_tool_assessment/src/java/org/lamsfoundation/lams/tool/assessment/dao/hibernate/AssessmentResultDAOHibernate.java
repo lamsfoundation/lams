@@ -359,14 +359,15 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     }
 
     @Override
-    public int countAttemptsPerOption(Long toolContentId, Long optionUid) {
+    public int countAttemptsPerOption(Long toolContentId, Long optionUid, boolean finishedAttemptsOnly) {
 	String COUNT_ATTEMPTS_BY_OPTION_UID = "SELECT count(*) " + "FROM tl_laasse10_assessment_result AS result "
 		+ "JOIN tl_laasse10_assessment AS assessment ON assessment.uid = result.assessment_uid "
 		+ "JOIN tl_laasse10_question_result AS questionResult ON questionResult.result_uid = result.uid "
 		+ "JOIN lams_qb_tool_answer AS qbToolAnswer ON qbToolAnswer.answer_uid = questionResult.uid "
 		+ "JOIN tl_laasse10_option_answer AS optionAnswer ON questionResult.uid = optionAnswer.question_result_uid "
-		+ "WHERE (result.finish_date IS NOT NULL) AND result.latest=1 && assessment.content_id = :toolContentId"
-		+ "	AND optionAnswer.question_option_uid = :optionUid AND (optionAnswer.answer_boolean=1 OR qbToolAnswer.qb_option_uid = :optionUid)  ";
+		+ "WHERE " + (finishedAttemptsOnly ? "(result.finish_date IS NOT NULL) AND " : "")
+		+ "result.latest=1 && assessment.content_id = :toolContentId AND optionAnswer.question_option_uid = :optionUid "
+		+ "AND (optionAnswer.answer_boolean=1 OR qbToolAnswer.qb_option_uid = :optionUid)  ";
 
 	NativeQuery<Number> query = getSession().createNativeQuery(COUNT_ATTEMPTS_BY_OPTION_UID);
 	query.setParameter("toolContentId", toolContentId);

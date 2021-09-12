@@ -321,9 +321,9 @@ public interface IAssessmentService extends ICommonToolService {
     Integer getLastFinishedAssessmentResultTimeTaken(Long assessmentUid, Long userId);
 
     /**
-     * Count how many last finished attempts selected specified option.
+     * Count how many last attempts selected specified option.
      */
-    int countAttemptsPerOption(Long toolContentId, Long optionUid);
+    int countAttemptsPerOption(Long toolContentId, Long optionUid, boolean finishedAttemptsOnly);
 
     /**
      * Return the latest *finished* result (the same as the method above). But previously evicting it from the cache. It
@@ -446,7 +446,7 @@ public interface IAssessmentService extends ICommonToolService {
      * @param questionUid
      * @return
      */
-    Map<Long, QuestionSummary> getQuestionSummaryForExport(Assessment assessment);
+    Map<Long, QuestionSummary> getQuestionSummaryForExport(Assessment assessment, boolean finishedAttemptsOnly);
 
     /**
      * Prepares data for Summary excel export
