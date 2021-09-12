@@ -95,9 +95,10 @@
 	<div class="col-xs-12 col-md-12 col-lg-12">
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			<h4 class="panel-title">
-				Q${i.index+1}) <c:out value="${item.qbQuestion.description}" escapeXml="false"/>
-			</h4> 
+			<h3 class="panel-title" style="margin-bottom: 10px;font-size: initial;">
+				${i.index+1}. <c:out value="${item.qbQuestion.name}" escapeXml="false"/>
+			</h3> 
+			<c:out value="${item.qbQuestion.description}" escapeXml="false"/>
 		</div>
 		
 		<div class="panel-body">
