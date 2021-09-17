@@ -249,6 +249,8 @@ public class LearningController {
 	}
 	//add random questions (actually replacing them with real ones)
 	AssessmentResult lastResult = service.getLastAssessmentResult(assessment.getUid(), user.getUserId());
+	Map<Long, AssessmentQuestionResult> questionToResultMap = lastResult.getQuestionResults().stream()
+		.collect(Collectors.toMap(q -> q.getQbToolQuestion().getUid(), q -> q));
 	for (QuestionReference questionReference : questionReferences) {
 	    if (questionReference.isRandomQuestion()) {
 
@@ -262,16 +264,13 @@ public class LearningController {
 		    availableRandomQuestions.remove(randomQuestion);
 
 		} else {
-		    //pick element from the last result
+		    // pick element from the last result
 		    for (Iterator<AssessmentQuestion> iter = availableRandomQuestions.iterator(); iter.hasNext();) {
 			AssessmentQuestion availableRandomQuestion = iter.next();
-
-			for (AssessmentQuestionResult questionResult : lastResult.getQuestionResults()) {
-			    if (availableRandomQuestion.getUid().equals(questionResult.getQbToolQuestion().getUid())) {
-				randomQuestion = availableRandomQuestion;
-				iter.remove();
-				break;
-			    }
+			if (questionToResultMap.containsKey(availableRandomQuestion.getUid())) {
+			    randomQuestion = availableRandomQuestion;
+			    iter.remove();
+			    break;
 			}
 		    }
 		}
@@ -1041,51 +1040,50 @@ public class LearningController {
 	    // release object from the cache (it's required when we have modified result object in the same request)
 	    AssessmentResult result = service.getLastFinishedAssessmentResultNotFromChache(assessment.getUid(), userId);
 
+	    Map<Long, AssessmentQuestionResult> questionToResultMap = result.getQuestionResults().stream()
+		    .collect(Collectors.toMap(q -> q.getQbToolQuestion().getUid(), q -> q));
+
 	    for (Set<QuestionDTO> questionsForOnePage : pagedQuestionDtos) {
 		for (QuestionDTO questionDto : questionsForOnePage) {
+		    AssessmentQuestionResult questionResult = questionToResultMap.get(questionDto.getUid());
+		    if (questionResult != null) {
+			// copy questionResult's info to the question
+			questionDto.setMark(questionResult.getMark());
+			questionDto.setResponseSubmitted(questionResult.getFinishDate() != null);
+			questionDto.setPenalty(questionResult.getPenalty());
 
-		    // find corresponding questionResult
-		    for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
-			if (questionDto.getUid().equals(questionResult.getQbToolQuestion().getUid())) {
+			//question feedback
+			questionDto.setQuestionFeedback(null);
+			for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+			    if (questionResult.getQbOption() != null
+				    && optionDto.getUid().equals(questionResult.getQbOption().getUid())) {
+				questionDto.setQuestionFeedback(optionDto.getFeedback());
+				break;
+			    }
+			}
 
-			    // copy questionResult's info to the question
-			    questionDto.setMark(questionResult.getMark());
-			    questionDto.setResponseSubmitted(questionResult.getFinishDate() != null);
-			    questionDto.setPenalty(questionResult.getPenalty());
-
-			    //question feedback
-			    questionDto.setQuestionFeedback(null);
+			// required for showing right/wrong answers icons on results page correctly
+			if ((questionDto.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS
+				|| questionDto.getType() == QbQuestion.TYPE_NUMERICAL)
+				&& questionResult.getQbOption() != null) {
+			    boolean isAnsweredCorrectly = false;
 			    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-				if (questionResult.getQbOption() != null
-					&& optionDto.getUid().equals(questionResult.getQbOption().getUid())) {
-				    questionDto.setQuestionFeedback(optionDto.getFeedback());
+				if (optionDto.getUid().equals(questionResult.getQbOption().getUid())) {
+				    isAnsweredCorrectly = optionDto.getMaxMark() > 0;
 				    break;
 				}
 			    }
-
-			    // required for showing right/wrong answers icons on results page correctly
-			    if ((questionDto.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS
-				    || questionDto.getType() == QbQuestion.TYPE_NUMERICAL)
-				    && questionResult.getQbOption() != null) {
-				boolean isAnsweredCorrectly = false;
-				for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-				    if (optionDto.getUid().equals(questionResult.getQbOption().getUid())) {
-					isAnsweredCorrectly = optionDto.getMaxMark() > 0;
-					break;
-				    }
-				}
-				questionDto.setAnswerBoolean(isAnsweredCorrectly);
-			    }
-
-			    if (StringUtils.isNotBlank(questionResult.getJustification())) {
-				questionDto.setJustification(questionResult.getJustification());
-			    }
-
-			    // required for markandpenalty area and if it's on - on question's summary page
-			    List<Object[]> questionResults = service
-				    .getAssessmentQuestionResultList(assessment.getUid(), userId, questionDto.getUid());
-			    questionDto.setQuestionResults(questionResults);
+			    questionDto.setAnswerBoolean(isAnsweredCorrectly);
 			}
+
+			if (StringUtils.isNotBlank(questionResult.getJustification())) {
+			    questionDto.setJustification(questionResult.getJustification());
+			}
+
+			// required for markandpenalty area and if it's on - on question's summary page
+			List<Object[]> questionResults = service.getAssessmentQuestionResultList(assessment.getUid(),
+				userId, questionDto.getUid());
+			questionDto.setQuestionResults(questionResults);
 		    }
 		}
 	    }
