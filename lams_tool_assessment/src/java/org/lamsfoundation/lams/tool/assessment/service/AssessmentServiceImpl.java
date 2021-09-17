@@ -275,8 +275,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 		userQuestionResult.setJustification(leaderQuestionResult.getJustification());
 	    }
+	} else if (userResult.getFinishDate().equals(leaderResult.getFinishDate())) {
+	    // the latest result is already copied, so no need to copy it again
+	    return;
 	}
-
+	
+	
 	// copy results from leader to user in both cases (when there is no userResult yet and when if it's been changed
 	// by the leader)
 	userResult.setStartDate(leaderResult.getStartDate());
