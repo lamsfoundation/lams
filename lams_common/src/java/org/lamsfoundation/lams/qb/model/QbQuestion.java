@@ -10,7 +10,6 @@ import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -154,12 +153,12 @@ public class QbQuestion implements Serializable, Cloneable {
     @Column(name = "autocomplete_enabled")
     private boolean autocompleteEnabled;
 
-    @OneToMany(mappedBy = "qbQuestion", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "qbQuestion", cascade = CascadeType.ALL)
     @Fetch(FetchMode.SUBSELECT)
     @OrderBy("displayOrder")
     private List<QbOption> qbOptions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "qbQuestion", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "qbQuestion", cascade = CascadeType.ALL)
     @Fetch(FetchMode.SUBSELECT)
     private List<QbQuestionUnit> units = new ArrayList<>();
 

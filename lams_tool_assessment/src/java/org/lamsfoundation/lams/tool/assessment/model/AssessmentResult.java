@@ -88,7 +88,7 @@ public class AssessmentResult {
     @JoinColumn(name = "user_uid")
     private AssessmentUser user;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "result_uid")
     @SortComparator(QbToolAnswer.QbToolAnswerComparator.class)
     private Set<AssessmentQuestionResult> questionResults = new TreeSet<>();

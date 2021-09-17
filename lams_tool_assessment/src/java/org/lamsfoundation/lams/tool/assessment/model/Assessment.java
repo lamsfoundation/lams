@@ -191,7 +191,7 @@ public class Assessment implements Cloneable {
     @OrderBy("sequence_id ASC")
     private Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "assessment_uid")
     @OrderBy("sequence_id ASC")
     private Set<AssessmentOverallFeedback> overallFeedbacks = new TreeSet<>(new SequencableComparator());
