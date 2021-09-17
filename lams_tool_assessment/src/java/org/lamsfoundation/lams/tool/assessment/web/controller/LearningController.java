@@ -314,7 +314,11 @@ public class LearningController {
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_INSTRUCTION, assessment.getReflectInstructions());
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_ENTRY, entryText);
 
-	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, service.isLastActivity(toolSessionId));
+	Boolean isLastActivity = (Boolean) sessionMap.get(AttributeNames.ATTR_IS_LAST_ACTIVITY);
+	if (isLastActivity == null) {
+	    isLastActivity = service.isLastActivity(toolSessionId);
+	    sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, isLastActivity);
+	}
 
 	// add define later support
 	if (assessment.isDefineLater()) {
