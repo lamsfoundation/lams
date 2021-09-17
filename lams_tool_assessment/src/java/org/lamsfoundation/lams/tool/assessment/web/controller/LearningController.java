@@ -249,8 +249,9 @@ public class LearningController {
 	}
 	//add random questions (actually replacing them with real ones)
 	AssessmentResult lastResult = service.getLastAssessmentResult(assessment.getUid(), user.getUserId());
-	Map<Long, AssessmentQuestionResult> questionToResultMap = lastResult.getQuestionResults().stream()
-		.collect(Collectors.toMap(q -> q.getQbToolQuestion().getUid(), q -> q));
+	Map<Long, AssessmentQuestionResult> questionToResultMap = lastResult == null ? null
+		: lastResult.getQuestionResults().stream()
+			.collect(Collectors.toMap(q -> q.getQbToolQuestion().getUid(), q -> q));
 	for (QuestionReference questionReference : questionReferences) {
 	    if (questionReference.isRandomQuestion()) {
 
