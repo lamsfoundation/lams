@@ -177,6 +177,8 @@ public class LearningController {
 	AssessmentUser groupLeader = assessment.isUseSelectLeaderToolOuput()
 		? service.checkLeaderSelectToolForSessionLeader(user, toolSessionId)
 		: null;
+	boolean isUserLeader = groupLeader != null && user.getUserId().equals(groupLeader.getUserId());
+
 	if (assessment.isUseSelectLeaderToolOuput() && !mode.isTeacher()) {
 
 	    // forwards to the leaderSelection page
@@ -194,8 +196,7 @@ public class LearningController {
 		    && lastLeaderResult.getFinishDate() != null;
 
 	    // forwards to the waitForLeader pages
-	    boolean isNonLeader = !user.getUserId().equals(groupLeader.getUserId());
-	    if (assessment.getRelativeTimeLimit() != 0 && isNonLeader && !isLastAttemptFinishedByLeader) {
+	    if (assessment.getRelativeTimeLimit() != 0 && !isUserLeader && !isLastAttemptFinishedByLeader) {
 
 		//show waitForLeaderLaunchTimeLimit page if the leader hasn't started activity or hasn't pressed OK button to launch time limit
 		if (lastLeaderResult == null || lastLeaderResult.getTimeLimitLaunchedDate() == null) {
@@ -224,7 +225,7 @@ public class LearningController {
 	}
 
 	sessionMap.put(AssessmentConstants.ATTR_GROUP_LEADER, groupLeader);
-	boolean isUserLeader = service.isUserGroupLeader(user.getUserId(), toolSessionId);
+	isUserLeader |= service.isUserGroupLeader(user.getUserId(), toolSessionId);
 	sessionMap.put(AssessmentConstants.ATTR_IS_USER_LEADER, isUserLeader);
 
 	Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
