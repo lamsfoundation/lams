@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -47,6 +48,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.SortComparator;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -57,6 +60,7 @@ import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
  * @author Manpreet Minhas
  */
 @Entity
+@Cacheable
 @Table(name = "lams_learning_design")
 public class LearningDesign implements Serializable {
 
@@ -144,20 +148,21 @@ public class LearningDesign implements Serializable {
     private LearningDesign originalLearningDesign;
 
     @OneToMany(mappedBy = "learningDesign")
-    private Set<Lesson> lessons = new HashSet<Lesson>();
+    private Set<Lesson> lessons = new HashSet<>();
 
     @OneToMany(mappedBy = "learningDesign", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Transition> transitions = new HashSet<Transition>();
+    private Set<Transition> transitions = new HashSet<>();
 
     @OneToMany(mappedBy = "learningDesign", cascade = CascadeType.ALL, orphanRemoval = true)
     @SortComparator(ActivityOrderComparator.class)
-    private Set<Activity> activities = new TreeSet<Activity>(new ActivityOrderComparator());
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    private Set<Activity> activities = new TreeSet<>(new ActivityOrderComparator());
 
     @OneToMany(mappedBy = "learningDesign", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Competence> competences = new HashSet<Competence>();
+    private Set<Competence> competences = new HashSet<>();
 
     @OneToMany(mappedBy = "learningDesignId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<LearningDesignAnnotation> annotations = new HashSet<LearningDesignAnnotation>();
+    private Set<LearningDesignAnnotation> annotations = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workspace_folder_id")
@@ -248,7 +253,7 @@ public class LearningDesign implements Serializable {
 	this.editOverrideLock = false;
 	this.designVersion = 1;
 	this.removed = Boolean.FALSE;
-	this.activities = new TreeSet<Activity>(new ActivityOrderComparator());
+	this.activities = new TreeSet<>(new ActivityOrderComparator());
     }
 
     /**

@@ -40,11 +40,11 @@ public class AssessmentQuestionResultDAOHibernate extends LAMSBaseDAO implements
 
     private static final String FIND_BY_ASSESSMENT_QUESTION_AND_USER = "FROM "
 	    + AssessmentQuestionResult.class.getName() + " AS q, " + AssessmentResult.class.getName() + " AS r "
-	    + " WHERE q.assessmentResult.uid = r.uid and r.assessment.uid = ? AND r.user.userId =? AND q.qbToolQuestion.uid =? ORDER BY r.startDate ASC";
+	    + " WHERE q.assessmentResult.uid = r.uid and r.assessment.uid = :assessmentUid AND r.user.userId = :userId AND q.qbToolQuestion.uid = :qbToolQuestionUid ORDER BY r.startDate ASC";
 
     private static final String FIND_BY_QUESTION_UID = "FROM " + AssessmentQuestionResult.class.getName()
 	    + " AS queRes " + " WHERE queRes.qbToolQuestion.uid =:questionUid ORDER BY queRes.finishDate ASC";
-    
+
     private static final String FIND_WRONG_ANSWERS_NUMBER = "SELECT COUNT(q) FROM  "
 	    + AssessmentQuestionResult.class.getName() + " AS q, " + AssessmentResult.class.getName() + " AS r "
 	    + " WHERE q.assessmentResult.uid = r.uid AND r.assessment.uid = ? AND r.user.userId =? AND q.qbToolQuestion.uid =? AND (ROUND(q.mark + q.penalty) < q.maxMark) AND (r.finishDate != null)";
@@ -66,8 +66,10 @@ public class AssessmentQuestionResultDAOHibernate extends LAMSBaseDAO implements
     @Override
     @SuppressWarnings("unchecked")
     public List<Object[]> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid) {
-	return (List<Object[]>) doFind(FIND_BY_ASSESSMENT_QUESTION_AND_USER,
-		new Object[] { assessmentUid, userId, questionUid });
+	Query<Object[]> query = getSession().createQuery(FIND_BY_ASSESSMENT_QUESTION_AND_USER)
+		.setParameter("assessmentUid", assessmentUid).setParameter("userId", userId)
+		.setParameter("qbToolQuestionUid", questionUid).setCacheable(true);
+	return query.getResultList();
     }
 
     @Override
@@ -81,8 +83,8 @@ public class AssessmentQuestionResultDAOHibernate extends LAMSBaseDAO implements
 
     @Override
     public List<AssessmentQuestionResult> getQuestionResultsByQuestionUid(final Long questionUid) {
-	String FIND_BY_QUESTION_UID = "FROM " + AssessmentQuestionResult.class.getName()
-		    + " AS queRes " + " WHERE queRes.qbToolQuestion.uid =:questionUid AND queRes.finishDate != null ORDER BY queRes.finishDate ASC";
+	String FIND_BY_QUESTION_UID = "FROM " + AssessmentQuestionResult.class.getName() + " AS queRes "
+		+ " WHERE queRes.qbToolQuestion.uid =:questionUid AND queRes.finishDate != null ORDER BY queRes.finishDate ASC";
 	Query<AssessmentQuestionResult> q = getSession().createQuery(FIND_BY_QUESTION_UID,
 		AssessmentQuestionResult.class);
 	q.setParameter("questionUid", questionUid);

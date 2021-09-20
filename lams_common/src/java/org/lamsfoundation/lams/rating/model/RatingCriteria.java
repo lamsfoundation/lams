@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -83,6 +84,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  */
 
 @Entity
+@Cacheable
 @Table(name = "lams_rating_criteria")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "rating_criteria_type_id", discriminatorType = DiscriminatorType.INTEGER)

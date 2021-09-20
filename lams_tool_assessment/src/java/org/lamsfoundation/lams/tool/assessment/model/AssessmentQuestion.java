@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.assessment.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
@@ -43,6 +44,7 @@ import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
  * @author Andrey Balan
  */
 @Entity
+@Cacheable
 @Table(name = "tl_laasse10_assessment_question")
 //in this entity's table primary key is "uid", but it references "tool_question_uid" in lams_qb_tool_question
 @PrimaryKeyJoinColumn(name = "uid")

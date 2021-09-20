@@ -33,6 +33,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -70,6 +71,7 @@ import org.lamsfoundation.lams.util.Nullable;
  * add a ACTIVITY_TYPE constant.
  */
 @Entity
+@Cacheable
 @Table(name = "lams_learning_activity")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "learning_activity_type_id", discriminatorType = DiscriminatorType.INTEGER)

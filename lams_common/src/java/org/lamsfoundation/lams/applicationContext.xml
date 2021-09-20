@@ -14,14 +14,26 @@
 			<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
 			<prop key="hibernate.show_sql">false</prop>
 			<prop key="hibernate.current_session_context_class">org.lamsfoundation.lams.util.hibernate.TransactionAwareSessionContext</prop>
-		    <prop key="hibernate.cache.use_second_level_cache">false</prop>
-		    <prop key="hibernate.cache.use_query_cache">false</prop>
-            <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.infinispan.JndiInfinispanRegionFactory</prop>
-            <prop key="hibernate.cache.default_cache_concurrency_strategy">TRANSACTIONAL</prop>
+			
+			<prop key="hibernate.cache.use_query_cache">true</prop>
+		    <prop key="hibernate.cache.use_second_level_cache">true</prop>
+            <prop key="javax.persistence.sharedCache.mode">ENABLE_SELECTIVE</prop>
+            <prop key="hibernate.cache.infinispan.entity.eviction.strategy">NONE</prop>
+			<prop key="hibernate.cache.infinispan.query.eviction.strategy">NONE</prop>
+            <prop key="hibernate.cache.infinispan.entity.expiration.lifespan">5000</prop>
+			<prop key="hibernate.cache.infinispan.query.expiration.lifespan">5000</prop>
+            <prop key="hibernate.cache.infinispan.entity.expiration.max_idle">-1</prop>
+			<prop key="hibernate.cache.infinispan.query.expiration.max_idle">-1</prop>
+            <prop key="hibernate.cache.infinispan.entity.expiration.wake_up_interval">1000</prop>
+			<prop key="hibernate.cache.infinispan.query.expiration.wake_up_interval">1000</prop>
+			<prop key="hibernate.cache.infinispan.statistics">true</prop>
+
             <prop key="hibernate.transaction.jta.platform">org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform</prop>   
             <prop key="hibernate.transaction.coordinator_class">jta</prop>   
-             
+            
             <!-- 
+            <prop key="hibernate.cache.region.factory_class">org.infinispan.hibernate.cache.v53.InfinispanRegionFactory</prop>
+            <prop key="hibernate.cache.default_cache_concurrency_strategy">TRANSACTIONAL</prop>
             <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrNode.cfg">contentrepository-entity</prop>
             <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrNode.crNodeVersions.cfg">contentrepository-entity</prop>
             <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrNodeVersion.cfg">contentrepository-entity</prop>

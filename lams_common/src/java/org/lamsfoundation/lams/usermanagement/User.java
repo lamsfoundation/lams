@@ -35,6 +35,7 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.UUID;
 
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -69,6 +70,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.LanguageUtil;
 
 @Entity
+@Cacheable
 @Table(name = "lams_user")
 public class User implements Serializable, Comparable<User> {
     private static final long serialVersionUID = 8711215689846731994L;

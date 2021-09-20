@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.assessment.model;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -36,6 +37,7 @@ import javax.persistence.Table;
  * @author Andrey Balan
  */
 @Entity
+@Cacheable
 @Table(name = "tl_laasse10_option_answer")
 public class AssessmentOptionAnswer implements Cloneable {
 

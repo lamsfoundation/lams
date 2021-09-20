@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ColumnResult;
@@ -125,6 +126,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 	@ColumnResult(name = "dependent", type = Boolean.class),
 	@ColumnResult(name = "scheduledFinish", type = Boolean.class) }))
 @Entity
+@Cacheable
 @Table(name = "lams_lesson")
 public class Lesson implements Serializable {
 

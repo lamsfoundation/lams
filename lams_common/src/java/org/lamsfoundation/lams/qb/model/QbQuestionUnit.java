@@ -2,6 +2,7 @@ package org.lamsfoundation.lams.qb.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,6 +21,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * @author Andrey Balan
  */
 @Entity
+@Cacheable
 @Table(name = "lams_qb_question_unit")
 public class QbQuestionUnit implements Serializable, Cloneable, Comparable<QbQuestionUnit> {
     private static final long serialVersionUID = -6772525485898794744L;

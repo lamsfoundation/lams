@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -51,6 +52,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.SortComparator;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
@@ -62,6 +65,7 @@ import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
  * @author Andrey Balan
  */
 @Entity
+@Cacheable
 @Table(name = "tl_laasse10_assessment")
 public class Assessment implements Cloneable {
     private static final Logger log = Logger.getLogger(Assessment.class);
@@ -183,6 +187,7 @@ public class Assessment implements Cloneable {
     @OneToMany
     @JoinColumn(name = "assessment_uid")
     @SortComparator(QbToolQuestion.QbToolQuestionComparator.class)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<AssessmentQuestion> questions = new TreeSet<>();
 
     // assessment questions references that form question list
