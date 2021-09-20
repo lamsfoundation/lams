@@ -825,7 +825,7 @@ public class AuthoringController {
     public String initOverallFeedback(HttpServletRequest request) {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	AssessmentForm assessmentForm = (AssessmentForm) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT_FORM);
-	Assessment assessment = assessmentForm.getAssessment();
+	Assessment assessment = service.getAssessmentByContentId(assessmentForm.getAssessment().getContentId());
 
 	// initial Overall feedbacks list
 	SortedSet<AssessmentOverallFeedback> overallFeedbackList = new TreeSet<>(new SequencableComparator());
