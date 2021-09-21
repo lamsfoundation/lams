@@ -160,7 +160,7 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 	    FIND_BY_QBQUESTION_AND_FINISHED += "AND REGEXP_REPLACE(q.answer, '"
 		    + AssessmentEscapeUtils.VSA_ANSWER_NORMALISE_SQL_REG_EXP + "', '') = :answer";
 	}
-	FIND_BY_QBQUESTION_AND_FINISHED += "ORDER BY r.startDate ASC";
+	FIND_BY_QBQUESTION_AND_FINISHED += " ORDER BY r.startDate ASC";
 
 	Query<AssessmentResult> q = getSession().createQuery(FIND_BY_QBQUESTION_AND_FINISHED, AssessmentResult.class);
 	q.setParameter("qbQuestionUid", qbQuestionUid);
