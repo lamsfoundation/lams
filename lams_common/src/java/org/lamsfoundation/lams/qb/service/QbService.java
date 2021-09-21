@@ -706,8 +706,8 @@ public class QbService implements IQbService {
      */
     @Override
     public void prepareQuestionForExport(QbQuestion qbQuestion) {
-	releaseFromCache(qbQuestion);
 	qbQuestion.clearID();
+	releaseFromCache(qbQuestion);
 	qbQuestion.setQuestionId(null);
 	qbQuestion.setVersion(null);
 	// use plain Java collections instead of Hibernate ones, so XML is more simple
