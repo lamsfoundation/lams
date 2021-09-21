@@ -3,10 +3,14 @@ package org.lamsfoundation.lams.qb.service;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
+import org.lamsfoundation.lams.qb.form.QbQuestionForm;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
@@ -157,4 +161,10 @@ public interface IQbService {
     void replaceQuestionInToolActivities(Collection<Long> toolContentIds, long oldQbQuestionUid, long newQbQuestionUid);
 
     void fillVersionMap(QbQuestion qbQuestion);
+
+    int extractFormToQbQuestion(QbQuestion qbQuestion, QbQuestionForm form, HttpServletRequest request);
+
+    TreeSet<QbOption> getOptionsFromRequest(HttpServletRequest request, boolean isForSaving);
+
+    TreeSet<QbQuestionUnit> getUnitsFromRequest(HttpServletRequest request, boolean isForSaving);
 }
