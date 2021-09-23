@@ -470,16 +470,31 @@
                 </local-cache> 
             </cache-container>
             <cache-container name="hibernate" default-cache="entity" module="org.infinispan.hibernate-cache" statistics-enabled="true">
-                <local-cache name="entity">
-                    <transaction mode="NON_XA" />
-                    <object-memory />
-                    <expiration lifespan="5000" interval="1000" />
+            	<local-cache name="entity">
+                    <transaction mode="NON_XA"/>
+                    <object-memory size="10000"/>
+                    <expiration max-idle="100000"/>
                 </local-cache>
                 <local-cache name="local-query">
-                    <object-memory />
-                    <expiration lifespan="5000" interval="1000"/>
+                    <object-memory size="10000"/>
+                    <expiration max-idle="100000"  />
                 </local-cache>
-                <local-cache name="timestamps"/>
+                <local-cache name="timestamps"/> 
+            
+                <!-- These settings should be used on MULTINODE ENVIRONMENT.
+                 	  See matching settings in LAMS applicationContext.xml
+                <local-cache name="entity">
+                    <transaction mode="NON_XA"/>
+                    <object-memory size="10000"/>
+                    <expiration lifespan="3000" interval="1000"/>
+                </local-cache>
+                <local-cache name="local-query">
+                    <object-memory size="10000"/>
+                    <expiration lifespan="3000" interval="1000"/>
+                </local-cache>
+                <local-cache name="timestamps"/> 
+                 -->
+                
             </cache-container>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:io:3.0">
