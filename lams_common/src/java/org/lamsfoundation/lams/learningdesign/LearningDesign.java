@@ -60,7 +60,6 @@ import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
  * @author Manpreet Minhas
  */
 @Entity
-@Cacheable
 @Table(name = "lams_learning_design")
 public class LearningDesign implements Serializable {
 

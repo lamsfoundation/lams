@@ -40,7 +40,7 @@ public class SurveySessionDAOHibernate extends LAMSBaseDAO implements SurveySess
 
     @Override
     public SurveySession getSessionBySessionId(Long sessionId) {
-	List list = doFind(FIND_BY_SESSION_ID, sessionId);
+	List list = doFindCacheable(FIND_BY_SESSION_ID, sessionId);
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
@@ -50,7 +50,7 @@ public class SurveySessionDAOHibernate extends LAMSBaseDAO implements SurveySess
     @Override
     @SuppressWarnings("unchecked")
     public List<SurveySession> getByContentId(Long toolContentId) {
-	return (List<SurveySession>) doFind(FIND_BY_CONTENT_ID, toolContentId);
+	return doFindCacheable(FIND_BY_CONTENT_ID, toolContentId);
     }
 
     @Override

@@ -190,8 +190,7 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 
     @Override
     public AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId) {
-	Query<AssessmentResult> q = getSession().createQuery(FIND_LAST_BY_ASSESSMENT_AND_USER, AssessmentResult.class)
-		.setCacheable(true);
+	Query<AssessmentResult> q = getSession().createQuery(FIND_LAST_BY_ASSESSMENT_AND_USER, AssessmentResult.class);
 	q.setParameter("userId", userId);
 	q.setParameter("assessmentUid", assessmentUid);
 	return q.uniqueResult();
@@ -209,7 +208,7 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     @Override
     public AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId) {
 	Query<AssessmentResult> q = getSession().createQuery(FIND_LAST_FINISHED_BY_ASSESSMENT_AND_USER,
-		AssessmentResult.class).setCacheable(true);
+		AssessmentResult.class);
 	q.setParameter("userId", userId);
 	q.setParameter("assessmentUid", assessmentUid);
 	return q.uniqueResult();

@@ -54,14 +54,14 @@ public class KumaliveDAO extends LAMSBaseDAO implements IKumaliveDAO {
     @Override
     @SuppressWarnings("unchecked")
     public Kumalive findKumalive(Integer organisationId) {
-	List<Kumalive> result = (List<Kumalive>) doFind(FIND_CURRENT_KUMALIVE_BY_ORGANISATION, organisationId);
+	List<Kumalive> result = doFindCacheable(FIND_CURRENT_KUMALIVE_BY_ORGANISATION, organisationId);
 	return result.isEmpty() ? null : result.get(0);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public List<KumaliveRubric> findRubrics(Integer organisationId) {
-	return (List<KumaliveRubric>) doFind(FIND_RUBRICS_BY_ORGANISATION, organisationId);
+	return doFindCacheable(FIND_RUBRICS_BY_ORGANISATION, organisationId);
     }
 
     @SuppressWarnings("unchecked")
@@ -80,13 +80,13 @@ public class KumaliveDAO extends LAMSBaseDAO implements IKumaliveDAO {
 	    query.append(" DESC");
 	}
 
-	return (List<Kumalive>) doFind(query.toString(), organisationId);
+	return doFindCacheable(query.toString(), organisationId);
     }
 
     @Override
     public List<Kumalive> findKumalives(List<Long> kumaliveIds) {
 	Query<Kumalive> query = getSession().createQuery(FIND_KUMALIVES_BY_IDS, Kumalive.class);
-	query.setParameterList("ids", kumaliveIds);
+	query.setParameterList("ids", kumaliveIds).setCacheable(true);
 	return query.list();
     }
 
@@ -98,19 +98,19 @@ public class KumaliveDAO extends LAMSBaseDAO implements IKumaliveDAO {
 	    query.append(" DESC");
 	}
 
-	return (List<KumaliveScore>) doFind(query.toString(), kumaliveId);
+	return doFind(query.toString(), kumaliveId);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public List<KumaliveScore> findKumaliveScore(Long kumaliveId, Integer userId) {
-	return (List<KumaliveScore>) doFind(FIND_SCORE_BY_KUMALIVE_AND_USER, kumaliveId, userId);
+	return doFind(FIND_SCORE_BY_KUMALIVE_AND_USER, kumaliveId, userId);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public KumalivePoll findPollByKumaliveId(Long kumaliveId) {
-	List<KumalivePoll> result = (List<KumalivePoll>) doFind(FIND_CURRENT_POLL_BY_KUMALIVE, kumaliveId);
+	List<KumalivePoll> result = doFind(FIND_CURRENT_POLL_BY_KUMALIVE, kumaliveId);
 	return result.isEmpty() ? null : result.get(0);
     }
 }

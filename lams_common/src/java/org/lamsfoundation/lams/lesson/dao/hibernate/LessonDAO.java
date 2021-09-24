@@ -241,7 +241,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      */
     @Override
     public List getLessonsCreatedByUser(Integer userID) {
-	List lessons = this.doFind(LessonDAO.FIND_LESSON_BY_CREATOR, userID);
+	List lessons = this.doFindCacheable(LessonDAO.FIND_LESSON_BY_CREATOR, userID);
 	return lessons;
     }
 
@@ -254,7 +254,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      */
     @Override
     public List getPreviewLessonsBeforeDate(Date startDate) {
-	List lessons = this.doFind(LessonDAO.FIND_PREVIEW_BEFORE_START_DATE, startDate);
+	List lessons = this.doFindCacheable(LessonDAO.FIND_PREVIEW_BEFORE_START_DATE, startDate);
 	return lessons;
     }
 
@@ -265,6 +265,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
     public Lesson getLessonForActivity(long activityId) {
 	Query query = getSession().createQuery(LessonDAO.FIND_LESSON_FOR_ACTIVITY);
 	query.setLong("activityId", activityId);
+	query.setCacheable(true);
 	return (Lesson) query.uniqueResult();
     }
 
@@ -276,6 +277,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
     public Long[] getLessonActivityIdsForToolContentId(long toolContentId) {
 	Query query = getSession().createQuery(LessonDAO.FIND_LESSON_ACTIVITY_IDS_BY_TOOL_CONTENT_ID);
 	query.setLong("toolContentId", toolContentId);
+	query.setCacheable(true);
 	List list = query.list();
 
 	Long[] longArray = { null, null };
@@ -325,7 +327,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 
     @Override
     public List getLessonsByGroup(Integer orgId) {
-	return this.doFind(LessonDAO.LESSONS_BY_GROUP, orgId);
+	return this.doFindCacheable(LessonDAO.LESSONS_BY_GROUP, orgId);
     }
 
     /**
@@ -334,7 +336,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
     @Override
     public List getLessonsByOriginalLearningDesign(Long ldId, Integer orgId) {
 	Object[] args = { ldId.longValue(), orgId.intValue() };
-	List lessons = this.doFind(LessonDAO.LESSONS_WITH_ORIGINAL_LEARNING_DESIGN, args);
+	List lessons = this.doFindCacheable(LessonDAO.LESSONS_WITH_ORIGINAL_LEARNING_DESIGN, args);
 	return lessons;
     }
 
@@ -405,9 +407,9 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 
     @Override
     public long[] getPreviewLessonCount() {
-	Query query = getSession().createQuery(LessonDAO.COUNT_LESSONS);
+	Query query = getSession().createQuery(LessonDAO.COUNT_LESSONS).setCacheable(true);
 	long allLessons = ((Number) query.uniqueResult()).longValue();
-	query = getSession().createQuery(LessonDAO.COUNT_PREVIEW_LESSONS);
+	query = getSession().createQuery(LessonDAO.COUNT_PREVIEW_LESSONS).setCacheable(true);
 	long previewLessons = ((Number) query.uniqueResult()).longValue();
 
 	return new long[] { previewLessons, allLessons };
@@ -416,7 +418,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<Long> getPreviewLessons(Integer limit) {
-	Query<Long> query = getSession().createQuery(FIND_PREVIEW_LESSON_IDS);
+	Query<Long> query = getSession().createQuery(FIND_PREVIEW_LESSON_IDS).setCacheable(true);
 	if (limit != null) {
 	    query.setMaxResults(limit);
 	}
@@ -426,8 +428,8 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<Long> getOrganisationLessons(Integer organisationId) {
-	Query<Long> query = getSession().createQuery(FIND_LESSON_IDS_BY_ORG_ID).setParameter("organisationId",
-		organisationId);
+	Query<Long> query = getSession().createQuery(FIND_LESSON_IDS_BY_ORG_ID)
+		.setParameter("organisationId", organisationId).setCacheable(true);
 	return query.list();
     }
 

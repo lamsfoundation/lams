@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.notebook.dao.hibernate;
 
 import java.util.List;
@@ -47,7 +46,7 @@ public class NotebookSessionDAO extends LAMSBaseDAO implements INotebookSessionD
 
     @Override
     public NotebookSession getBySessionId(Long toolSessionId) {
-	List list = doFind(FIND_BY_SESSION_ID, toolSessionId);
+	List list = doFindCacheable(FIND_BY_SESSION_ID, toolSessionId);
 	if (list == null || list.isEmpty()) {
 	    return null;
 	}

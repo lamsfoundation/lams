@@ -41,9 +41,9 @@ public class ResourceDAOHibernate extends LAMSBaseDAO implements ResourceDAO {
 
     @Override
     public Resource getByContentId(Long contentId) {
-	List<Resource> list = (List<Resource>) doFind(GET_RESOURCE_BY_CONTENTID, contentId);
+	List<Resource> list = doFindCacheable(GET_RESOURCE_BY_CONTENTID, contentId);
 	if (list.size() > 0) {
-	    return (Resource) list.get(0);
+	    return list.get(0);
 	} else {
 	    return null;
 	}

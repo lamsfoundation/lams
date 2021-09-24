@@ -46,7 +46,7 @@ public class TaskListSessionDAOHibernate extends LAMSBaseDAO implements TaskList
 
     @Override
     public TaskListSession getSessionBySessionId(Long sessionId) {
-	List list = doFind(FIND_BY_SESSION_ID, sessionId);
+	List list = doFindCacheable(FIND_BY_SESSION_ID, sessionId);
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
@@ -56,7 +56,7 @@ public class TaskListSessionDAOHibernate extends LAMSBaseDAO implements TaskList
     @Override
     @SuppressWarnings("unchecked")
     public List<TaskListSession> getByContentId(Long toolContentId) {
-	return (List<TaskListSession>) doFind(FIND_BY_CONTENT_ID, toolContentId);
+	return doFindCacheable(FIND_BY_CONTENT_ID, toolContentId);
     }
 
     @Override

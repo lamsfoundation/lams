@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.imageGallery.dao.hibernate;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
@@ -36,7 +35,7 @@ public class ImageGalleryConfigItemDAOHibernate extends LAMSBaseDAO implements I
     @Override
     public ImageGalleryConfigItem getConfigItemByKey(final String configKey) {
 	return getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY, ImageGalleryConfigItem.class)
-		.setParameter("key", configKey).uniqueResult();
+		.setParameter("key", configKey).setCacheable(true).uniqueResult();
     }
 
     @Override

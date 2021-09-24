@@ -58,6 +58,6 @@ public class ConfigurationDAO extends LAMSBaseDAO implements IConfigurationDAO {
     @Override
     public ConfigurationItem getConfigItemByKey(final String configKey) {
 	return (ConfigurationItem) getSession().createQuery(ConfigurationDAO.LOAD_CONFIG_ITEM_BY_KEY)
-		.setString("key", configKey).uniqueResult();
+		.setString("key", configKey).setCacheable(true).uniqueResult();
     }
 }

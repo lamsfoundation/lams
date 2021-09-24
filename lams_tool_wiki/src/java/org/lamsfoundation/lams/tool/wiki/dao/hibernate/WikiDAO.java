@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.wiki.dao.hibernate;
 
 import java.util.HashSet;
@@ -45,7 +44,7 @@ public class WikiDAO extends LAMSBaseDAO implements IWikiDAO {
 
     @Override
     public Wiki getByContentId(Long toolContentId) {
-	List list = doFind(FIND_FORUM_BY_CONTENTID, toolContentId);
+	List list = doFindCacheable(FIND_FORUM_BY_CONTENTID, toolContentId);
 	if (list != null && list.size() > 0) {
 	    Wiki wiki = (Wiki) list.get(0);
 	    removeDuplicatePages(wiki);
@@ -72,13 +71,13 @@ public class WikiDAO extends LAMSBaseDAO implements IWikiDAO {
     public void removeDuplicatePages(Wiki wiki) {
 	Set<WikiPage> wikiPages = wiki.getWikiPages();
 	if (wikiPages != null) {
-	    Set<WikiPage> wikiPagesCopy = new HashSet<WikiPage>(wikiPages);
+	    Set<WikiPage> wikiPagesCopy = new HashSet<>(wikiPages);
 	    Iterator<WikiPage> it = wikiPages.iterator();
 	    while (it.hasNext()) {
 		WikiPage page = it.next();
 		if (containsDuplicate(page, wikiPagesCopy)) {
 		    it.remove();
-		    wikiPagesCopy = new HashSet<WikiPage>(wikiPages);
+		    wikiPagesCopy = new HashSet<>(wikiPages);
 		}
 	    }
 	}

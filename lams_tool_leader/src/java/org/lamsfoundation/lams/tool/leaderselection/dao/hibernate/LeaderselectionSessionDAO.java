@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.leaderselection.dao.hibernate;
 
 import java.util.List;
@@ -48,7 +47,7 @@ public class LeaderselectionSessionDAO extends LAMSBaseDAO implements ILeadersel
 
     @Override
     public LeaderselectionSession getBySessionId(Long toolSessionId) {
-	List list = doFind(SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
+	List list = doFindCacheable(SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
 	if (list == null || list.isEmpty()) {
 	    return null;
 	}

@@ -52,7 +52,6 @@ import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
  * @author Andrey Balan
  */
 @Entity
-@Cacheable
 @Table(name = "tl_laasse10_question_result")
 //in this entity's table primary key is "uid", but it references "answer_uid" in lams_qb_tool_answer
 @PrimaryKeyJoinColumn(name = "uid")

@@ -52,7 +52,6 @@ import org.lamsfoundation.lams.qb.model.QbToolAnswer;
  * @author Andrey Balan
  */
 @Entity
-@Cacheable
 @Table(name = "tl_laasse10_assessment_result")
 public class AssessmentResult {
 

@@ -12,6 +12,7 @@ import java.util.Set;
 import javax.persistence.Query;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.jpa.QueryHints;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.type.IntegerType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
@@ -141,13 +142,14 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
 	Query q = getSession().createQuery(FIND_QUESTIONS_BY_QUESTION_ID, QbQuestion.class);
 	q.setParameter("questionId", questionId);
+	q.setHint(QueryHints.HINT_CACHEABLE, true);
 	return q.getResultList();
     }
 
     @Override
     public List<QbQuestion> getQuestionsByToolContentId(long toolContentId) {
 	return getSession().createQuery(FIND_QUESTIONS_BY_TOOL_CONTENT_ID, QbQuestion.class)
-		.setParameter("toolContentId", toolContentId).getResultList();
+		.setParameter("toolContentId", toolContentId).setCacheable(true).getResultList();
     }
 
     @Override
@@ -212,7 +214,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     @SuppressWarnings("unchecked")
     public List<QbQuestion> getQuestionVersions(long qbQuestionUid) {
 	return this.getSession().createQuery(FIND_QUESTION_VERSIONS).setParameter("qbQuestionUid", qbQuestionUid)
-		.list();
+		.setCacheable(true).list();
     }
 
     @Override

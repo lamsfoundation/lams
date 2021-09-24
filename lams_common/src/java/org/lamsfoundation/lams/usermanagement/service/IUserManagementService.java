@@ -111,6 +111,8 @@ public interface IUserManagementService {
      */
     List findByProperty(Class clazz, String name, Object value);
 
+    List findByProperty(Class clazz, String name, Object value, boolean cache);
+
     <T> List<T> findByPropertyValues(Class<T> clazz, String name, Collection<?> values);
 
     /**
@@ -119,6 +121,8 @@ public interface IUserManagementService {
      * @return a list of objects which have the same property values
      */
     List findByProperties(Class clazz, Map<String, Object> properties);
+
+    List findByProperties(Class clazz, Map<String, Object> properties, boolean cache);
 
     /**
      * Retrieves users from the specified organisation

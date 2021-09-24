@@ -65,7 +65,6 @@ import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
  * @author Andrey Balan
  */
 @Entity
-@Cacheable
 @Table(name = "tl_laasse10_assessment")
 public class Assessment implements Cloneable {
     private static final Logger log = Logger.getLogger(Assessment.class);

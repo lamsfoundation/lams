@@ -53,7 +53,8 @@ public class VoteQueContentDAO extends LAMSBaseDAO implements IVoteQueContentDAO
     public VoteQueContent getDefaultVoteContentFirstQuestion() {
 	final long voteContentId = 1;
 	List<VoteQueContent> list = getSessionFactory().getCurrentSession()
-		.createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID).setParameter("voteContentId", voteContentId).list();
+		.createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID).setParameter("voteContentId", voteContentId)
+		.setCacheable(true).list();
 
 	if (list != null && list.size() > 0) {
 	    VoteQueContent voteq = list.get(0);
@@ -66,8 +67,9 @@ public class VoteQueContentDAO extends LAMSBaseDAO implements IVoteQueContentDAO
     @Override
     public VoteQueContent getQuestionByDisplayOrder(final Long displayOrder, final Long voteContentUid) {
 	List<VoteQueContent> list = getSessionFactory().getCurrentSession()
-		.createQuery(LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER).setParameter("displayOrder", displayOrder.intValue())
-		.setParameter("voteContentUid", voteContentUid).list();
+		.createQuery(LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER)
+		.setParameter("displayOrder", displayOrder.intValue()).setParameter("voteContentUid", voteContentUid)
+		.setCacheable(true).list();
 
 	if (list != null && list.size() > 0) {
 	    VoteQueContent voteq = list.get(0);
@@ -81,7 +83,7 @@ public class VoteQueContentDAO extends LAMSBaseDAO implements IVoteQueContentDAO
     public List<VoteQueContent> getAllQuestionsSorted(final long voteContentId) {
 	List<VoteQueContent> list = getSessionFactory().getCurrentSession()
 		.createQuery(SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER).setParameter("voteContentId", voteContentId)
-		.list();
+		.setCacheable(true).list();
 
 	return list;
     }

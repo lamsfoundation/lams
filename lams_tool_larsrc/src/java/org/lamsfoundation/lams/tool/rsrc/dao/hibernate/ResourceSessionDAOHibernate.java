@@ -40,17 +40,17 @@ public class ResourceSessionDAOHibernate extends LAMSBaseDAO implements Resource
 
     @Override
     public ResourceSession getSessionBySessionId(Long sessionId) {
-	List<ResourceSession> list = (List<ResourceSession>) doFind(FIND_BY_SESSION_ID, sessionId);
+	List<ResourceSession> list = doFindCacheable(FIND_BY_SESSION_ID, sessionId);
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
-	return (ResourceSession) list.get(0);
+	return list.get(0);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<ResourceSession> getByContentId(Long toolContentId) {
-	return (List<ResourceSession>) doFind(FIND_BY_CONTENT_ID, toolContentId);
+	return doFindCacheable(FIND_BY_CONTENT_ID, toolContentId);
     }
 
     @Override

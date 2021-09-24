@@ -62,7 +62,7 @@ public class VoteContentDAO extends LAMSBaseDAO implements IVoteContentDAO {
     public VoteContent getVoteContentByContentId(Long voteContentId) {
 	String query = "from VoteContent as vote where vote.voteContentId = :voteContentId";
 	List<VoteContent> list = getSessionFactory().getCurrentSession().createQuery(query)
-		.setParameter("voteContentId", voteContentId).list();
+		.setParameter("voteContentId", voteContentId).setCacheable(true).list();
 
 	if (list != null && list.size() > 0) {
 	    VoteContent vote = list.get(0);
@@ -74,7 +74,7 @@ public class VoteContentDAO extends LAMSBaseDAO implements IVoteContentDAO {
     @Override
     public VoteContent getVoteContentBySession(final Long voteSessionId) {
 	return (VoteContent) getSession().createQuery(VoteContentDAO.LOAD_VOTE_BY_SESSION)
-		.setParameter("sessionId", voteSessionId).uniqueResult();
+		.setParameter("sessionId", voteSessionId).setCacheable(true).uniqueResult();
     }
 
     @Override

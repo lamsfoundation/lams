@@ -46,7 +46,7 @@ public class QaQuestionDAO extends LAMSBaseDAO implements IQaQuestionDAO {
     public QaQueContent getQuestionByDisplayOrder(Integer displayOrder, Long contentUid) {
 	List<QaQueContent> list = getSessionFactory().getCurrentSession()
 		.createQuery(QaQuestionDAO.LOAD_QUESTION_BY_DISPLAY_ORDER).setParameter("displayOrder", displayOrder)
-		.setParameter("uid", contentUid).list();
+		.setParameter("uid", contentUid).setCacheable(true).list();
 
 	if (list != null && list.size() > 0) {
 	    QaQueContent qa = list.get(0);
@@ -73,7 +73,8 @@ public class QaQuestionDAO extends LAMSBaseDAO implements IQaQuestionDAO {
     @Override
     public List<QaQueContent> getAllQuestionEntriesSorted(final long contentUid) {
 	List<QaQueContent> list = getSessionFactory().getCurrentSession()
-		.createQuery(QaQuestionDAO.SORT_QUESTION_BY_DISPLAY_ORDER).setParameter("uid", contentUid).list();
+		.createQuery(QaQuestionDAO.SORT_QUESTION_BY_DISPLAY_ORDER).setParameter("uid", contentUid)
+		.setCacheable(true).list();
 
 	return list;
     }
@@ -82,7 +83,8 @@ public class QaQuestionDAO extends LAMSBaseDAO implements IQaQuestionDAO {
     @Override
     public List<QaQueContent> getAllQuestionEntries(final long contentUid) {
 	List<QaQueContent> list = getSessionFactory().getCurrentSession()
-		.createQuery(QaQuestionDAO.LOAD_QUESTION_BY_CONTENT_UID).setParameter("uid", contentUid).list();
+		.createQuery(QaQuestionDAO.LOAD_QUESTION_BY_CONTENT_UID).setParameter("uid", contentUid)
+		.setCacheable(true).list();
 
 	return list;
     }

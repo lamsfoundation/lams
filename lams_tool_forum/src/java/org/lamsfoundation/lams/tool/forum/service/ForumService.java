@@ -1461,11 +1461,9 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	}
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public ForumConfigItem getConfigItem(String key) {
-	List<ForumConfigItem> result = forumDao.findByProperty(ForumConfigItem.class, "configKey",
-		ForumConfigItem.KEY_KEEP_LEARNER_CONTENT);
+	List<ForumConfigItem> result = forumDao.findByProperty(ForumConfigItem.class, "configKey", key, true);
 	return result.isEmpty() ? null : result.get(0);
     }
 

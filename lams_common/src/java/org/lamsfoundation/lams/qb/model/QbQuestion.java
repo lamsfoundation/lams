@@ -34,7 +34,6 @@ import org.lamsfoundation.lams.qb.service.IQbService;
  * @author Marcin Cieslak
  */
 @Entity
-@Cacheable
 @Table(name = "lams_qb_question")
 public class QbQuestion implements Serializable, Cloneable {
     private static final long serialVersionUID = -6287273838239262151L;

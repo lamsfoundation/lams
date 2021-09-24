@@ -37,7 +37,6 @@ import javax.persistence.Table;
  * @author Andrey Balan
  */
 @Entity
-@Cacheable
 @Table(name = "tl_laasse10_option_answer")
 public class AssessmentOptionAnswer implements Cloneable {
 

@@ -84,7 +84,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  */
 
 @Entity
-@Cacheable
 @Table(name = "lams_rating_criteria")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "rating_criteria_type_id", discriminatorType = DiscriminatorType.INTEGER)

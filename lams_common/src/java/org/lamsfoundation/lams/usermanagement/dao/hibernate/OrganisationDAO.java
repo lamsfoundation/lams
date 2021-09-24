@@ -168,6 +168,7 @@ public class OrganisationDAO extends LAMSBaseDAO implements IOrganisationDAO {
 	query.setString("searchString", searchString);
 	query.setFirstResult(page * size);
 	query.setMaxResults(size);
+	query.setCacheable(true);
 	return query.list();
     }
 
@@ -188,6 +189,6 @@ public class OrganisationDAO extends LAMSBaseDAO implements IOrganisationDAO {
     @Override
     public List<Organisation> getOrganisationsByCodes(Collection<String> codes) {
 	return getSession().createQuery(GET_COURSES_BY_CODES, Organisation.class).setParameter("codes", codes)
-		.getResultList();
+		.setCacheable(true).getResultList();
     }
 }

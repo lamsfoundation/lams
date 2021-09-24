@@ -47,7 +47,6 @@ import javax.persistence.Table;
  * @author Andrey Balan
  */
 @Entity
-@Cacheable
 @Table(name = "tl_laasse10_session")
 public class AssessmentSession {
 

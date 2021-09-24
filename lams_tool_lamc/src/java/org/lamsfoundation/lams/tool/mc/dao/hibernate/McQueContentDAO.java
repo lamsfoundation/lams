@@ -63,7 +63,8 @@ public class McQueContentDAO extends LAMSBaseDAO implements IMcQueContentDAO {
     @SuppressWarnings("unchecked")
     public List<McQueContent> getQuestionsByContentUid(final long contentUid) {
 	List<McQueContent> list = getSessionFactory().getCurrentSession()
-		.createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID).setParameter("contentUid", contentUid).list();
+		.createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID).setParameter("contentUid", contentUid)
+		.setCacheable(true).list();
 
 	return list;
     }
@@ -71,7 +72,8 @@ public class McQueContentDAO extends LAMSBaseDAO implements IMcQueContentDAO {
     @Override
     public McQueContent getQuestionContentByDisplayOrder(final Integer displayOrder, final Long mcContentUid) {
 	List<?> list = getSessionFactory().getCurrentSession().createQuery(LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER)
-		.setParameter("displayOrder", displayOrder).setParameter("mcContentUid", mcContentUid).list();
+		.setParameter("displayOrder", displayOrder).setParameter("mcContentUid", mcContentUid)
+		.setCacheable(true).list();
 
 	if (list != null && list.size() > 0) {
 	    McQueContent mcq = (McQueContent) list.get(0);

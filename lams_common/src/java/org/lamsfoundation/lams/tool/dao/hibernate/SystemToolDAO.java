@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.dao.hibernate;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
@@ -36,13 +35,13 @@ public class SystemToolDAO extends LAMSBaseDAO implements ISystemToolDAO {
 
     @Override
     public SystemTool getSystemToolByID(final Long systemToolID) {
-	return (SystemTool) getSession().get(SystemTool.class, systemToolID);
+	return getSession().get(SystemTool.class, systemToolID);
     }
 
     @Override
     public SystemTool getSystemToolByActivityTypeId(final Integer activityTypeId) {
-	return (SystemTool) getSession().createQuery(LOAD_TOOL_BY_ACT_TYPE).setInteger("activityTypeId", activityTypeId)
-		.uniqueResult();
+	return (SystemTool) getSession().createQuery(LOAD_TOOL_BY_ACT_TYPE).setCacheable(true)
+		.setInteger("activityTypeId", activityTypeId).uniqueResult();
     }
 
 }

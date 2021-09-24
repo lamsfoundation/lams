@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 
 import java.util.List;
@@ -53,15 +52,13 @@ public class BranchActivityEntryDAO extends LAMSBaseDAO implements IBranchActivi
     @Override
     @SuppressWarnings("unchecked")
     public List<BranchActivityEntry> getEntriesByLearningDesign(Long learningDesignId) {
-	return (List<BranchActivityEntry>) this.doFind(BranchActivityEntryDAO.ENTRIES_FOR_LEARNING_DESIGN,
-		learningDesignId);
+	return this.doFindCacheable(BranchActivityEntryDAO.ENTRIES_FOR_LEARNING_DESIGN, learningDesignId);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public BranchCondition getConditionByID(Long conditionID) {
-	List<BranchCondition> result = (List<BranchCondition>) this.doFind(BranchActivityEntryDAO.CONDITION_BY_ID,
-		conditionID);
+	List<BranchCondition> result = this.doFindCacheable(BranchActivityEntryDAO.CONDITION_BY_ID, conditionID);
 	if (result == null || result.isEmpty()) {
 	    return null;
 	}

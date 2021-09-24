@@ -39,7 +39,7 @@ public class PeerreviewSessionDAOHibernate extends LAMSBaseDAO implements Peerre
     @Override
     @SuppressWarnings("rawtypes")
     public PeerreviewSession getSessionBySessionId(Long sessionId) {
-	List list = find(FIND_BY_SESSION_ID, sessionId);
+	List list = doFindCacheable(FIND_BY_SESSION_ID, sessionId);
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
@@ -49,7 +49,7 @@ public class PeerreviewSessionDAOHibernate extends LAMSBaseDAO implements Peerre
     @SuppressWarnings("unchecked")
     @Override
     public List<PeerreviewSession> getByContentId(Long toolContentId) {
-	return find(FIND_BY_CONTENT_ID, toolContentId);
+	return doFindCacheable(FIND_BY_CONTENT_ID, toolContentId);
     }
 
     @Override

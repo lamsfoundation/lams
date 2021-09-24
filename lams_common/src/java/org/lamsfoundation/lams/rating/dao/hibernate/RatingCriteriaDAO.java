@@ -123,7 +123,7 @@ public class RatingCriteriaDAO extends LAMSBaseDAO implements IRatingCriteriaDAO
     @Override
     public List<String> getRubricsColumnHeaders(int groupId) {
 	return getSession().createQuery(GET_RUBRICS_COLUMN_HEADERS, String.class).setParameter("groupId", groupId)
-		.getResultList();
+		.setCacheable(true).getResultList();
     }
 
     @Override

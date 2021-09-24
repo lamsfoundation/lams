@@ -90,11 +90,6 @@ public interface IActivityDAO extends IBaseDAO {
     public List getActivitiesByParentActivityId(Long parentActivityId);
 
     /**
-     * @return List of all the activities
-     */
-    public List getAllActivities();
-
-    /**
      * @param learningDesignId
      *            The id of the learningDesign
      * @return List of all the activities

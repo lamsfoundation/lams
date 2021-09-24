@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.mindmap.dao.hibernate;
 
 import java.util.List;
@@ -48,7 +47,7 @@ public class MindmapSessionDAO extends LAMSBaseDAO implements IMindmapSessionDAO
 
     @Override
     public MindmapSession getBySessionId(Long toolSessionId) {
-	List list = doFind(SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
+	List list = doFindCacheable(SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
 	if (list == null || list.isEmpty()) {
 	    return null;
 	}

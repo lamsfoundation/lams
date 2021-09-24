@@ -39,8 +39,8 @@ public class AssessmentSessionDAOHibernate extends LAMSBaseDAO implements Assess
     @SuppressWarnings("unchecked")
     @Override
     public AssessmentSession getSessionBySessionId(Long sessionId) {
-	List<AssessmentSession> list = getSession().createQuery(FIND_BY_SESSION_ID)
-		.setParameter("sessionId", sessionId).setCacheable(true).getResultList();
+	List<AssessmentSession> list = getSession().createQuery(FIND_BY_SESSION_ID).setParameter("sessionId", sessionId)
+		.getResultList();
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
@@ -53,7 +53,7 @@ public class AssessmentSessionDAOHibernate extends LAMSBaseDAO implements Assess
 		+ " as p where p.assessment.contentId=:contectId order by p.sessionName asc";
 
 	List<AssessmentSession> result = getSession().createQuery(FIND_BY_CONTENT_ID, AssessmentSession.class)
-		.setParameter("contectId", toolContentId).list();
+		.setParameter("contectId", toolContentId).setCacheable(true).list();
 	return result;
     }
 

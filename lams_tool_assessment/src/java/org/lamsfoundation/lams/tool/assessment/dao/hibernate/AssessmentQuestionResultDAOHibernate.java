@@ -68,7 +68,7 @@ public class AssessmentQuestionResultDAOHibernate extends LAMSBaseDAO implements
     public List<Object[]> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid) {
 	Query<Object[]> query = getSession().createQuery(FIND_BY_ASSESSMENT_QUESTION_AND_USER)
 		.setParameter("assessmentUid", assessmentUid).setParameter("userId", userId)
-		.setParameter("qbToolQuestionUid", questionUid).setCacheable(true);
+		.setParameter("qbToolQuestionUid", questionUid);
 	return query.getResultList();
     }
 

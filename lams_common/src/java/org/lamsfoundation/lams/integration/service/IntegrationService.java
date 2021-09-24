@@ -118,9 +118,7 @@ public class IntegrationService implements IIntegrationService {
      */
     @Override
     public ExtServer getExtServer(String serverId) {
-	Map<String, Object> properties = new HashMap<>();
-	properties.put("serverid", serverId);
-	List<ExtServer> list = service.findByProperties(ExtServer.class, properties);
+	List<ExtServer> list = service.findByProperty(ExtServer.class, "serverid", serverId, true);
 	if (list == null || list.size() == 0) {
 	    return null;
 	} else {
@@ -133,7 +131,7 @@ public class IntegrationService implements IIntegrationService {
 	Map<String, Object> properties = new HashMap<>();
 	properties.put("courseid", extCourseId);
 	properties.put("extServer.sid", sid);
-	List<ExtCourseClassMap> list = service.findByProperties(ExtCourseClassMap.class, properties);
+	List<ExtCourseClassMap> list = service.findByProperties(ExtCourseClassMap.class, properties, true);
 
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
@@ -293,7 +291,7 @@ public class IntegrationService implements IIntegrationService {
 	Map<String, Object> properties = new HashMap<>();
 	properties.put("extServer.sid", extServer.getSid());
 	properties.put("extUsername", extUsername);
-	List<ExtUserUseridMap> list = service.findByProperties(ExtUserUseridMap.class, properties);
+	List<ExtUserUseridMap> list = service.findByProperties(ExtUserUseridMap.class, properties, true);
 
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
@@ -577,7 +575,7 @@ public class IntegrationService implements IIntegrationService {
 
 	Map<String, Object> properties = new HashMap<>();
 	properties.put("tool.toolSignature", toolSig);
-	return service.findByProperties(ExtServerToolAdapterMap.class, properties);
+	return service.findByProperties(ExtServerToolAdapterMap.class, properties, true);
     }
 
     @Override
@@ -586,7 +584,7 @@ public class IntegrationService implements IIntegrationService {
 	Map<String, Object> properties = new HashMap<>();
 	properties.put("tool.toolSignature", toolSig);
 	properties.put("extServer.serverid", serverId);
-	List ret = service.findByProperties(ExtServerToolAdapterMap.class, properties);
+	List ret = service.findByProperties(ExtServerToolAdapterMap.class, properties, true);
 	if ((ret != null) && (ret.size() > 0)) {
 	    return (ExtServerToolAdapterMap) ret.get(0);
 	} else {
@@ -871,7 +869,7 @@ public class IntegrationService implements IIntegrationService {
 	Map<String, Object> properties = new HashMap<>();
 	properties.put("extServer.sid", sid);
 	properties.put("organisation.organisationId", lesson.getOrganisation().getOrganisationId());
-	List<ExtCourseClassMap> list = service.findByProperties(ExtCourseClassMap.class, properties);
+	List<ExtCourseClassMap> list = service.findByProperties(ExtCourseClassMap.class, properties, true);
 	return list == null || list.isEmpty() ? null : list.get(0);
     }
 
@@ -944,7 +942,7 @@ public class IntegrationService implements IIntegrationService {
 
     @Override
     public ExtServerLessonMap getExtServerLessonMap(Long lessonId) {
-	List list = service.findByProperty(ExtServerLessonMap.class, "lessonId", lessonId);
+	List list = service.findByProperty(ExtServerLessonMap.class, "lessonId", lessonId, true);
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
 	} else {
@@ -965,7 +963,8 @@ public class IntegrationService implements IIntegrationService {
     }
 
     private ExtCourseClassMap getExtCourseClassMap(Integer organisationId) {
-	List list = service.findByProperty(ExtCourseClassMap.class, "organisation.organisationId", organisationId);
+	List list = service.findByProperty(ExtCourseClassMap.class, "organisation.organisationId", organisationId,
+		true);
 	if (list == null || list.size() == 0) {
 	    return null;
 	} else {

@@ -21,7 +21,6 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * @author Marcin Cieslak
  */
 @Entity
-@Cacheable
 @Table(name = "lams_qb_option")
 public class QbOption implements Serializable, Cloneable, Comparable<QbOption> {
     private static final long serialVersionUID = -2354311780882736829L;

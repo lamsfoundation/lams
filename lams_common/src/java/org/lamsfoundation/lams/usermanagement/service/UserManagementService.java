@@ -228,13 +228,23 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @Override
+    public List findByProperty(Class clazz, String name, Object value, boolean cache) {
+	return baseDAO.findByProperty(clazz, name, value, cache);
+    }
+
+    @Override
     public <T> List<T> findByPropertyValues(Class<T> clazz, String name, Collection<?> values) {
 	return baseDAO.findByPropertyValues(clazz, name, values);
     }
 
     @Override
     public List findByProperties(Class clazz, Map<String, Object> properties) {
-	return baseDAO.findByProperties(clazz, properties);
+	return findByProperties(clazz, properties, false);
+    }
+
+    @Override
+    public List findByProperties(Class clazz, Map<String, Object> properties, boolean cache) {
+	return baseDAO.findByProperties(clazz, properties, cache);
     }
 
     @Override
@@ -300,9 +310,8 @@ public class UserManagementService implements IUserManagementService {
 
     @Override
     public Organisation getRootOrganisation() {
-	return baseDAO
-		.findByProperty(Organisation.class, "organisationType.organisationTypeId", OrganisationType.ROOT_TYPE)
-		.get(0);
+	return baseDAO.findByProperty(Organisation.class, "organisationType.organisationTypeId",
+		OrganisationType.ROOT_TYPE, true).get(0);
     }
 
     @Override
@@ -327,7 +336,7 @@ public class UserManagementService implements IUserManagementService {
 	Map<String, Object> properties = new HashMap<>();
 	properties.put("organisationType.organisationTypeId", typeId);
 	properties.put("organisationState.organisationStateId", stateId);
-	return baseDAO.findByProperties(Organisation.class, properties);
+	return baseDAO.findByProperties(Organisation.class, properties, true);
     }
 
     @Override
@@ -344,7 +353,6 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<UserOrganisationRole> getUserOrganisationRoles(Integer orgId, String login) {
 	Map<String, Object> properties = new HashMap<>();
 	properties.put("userOrganisation.organisation.organisationId", orgId);
@@ -941,7 +949,7 @@ public class UserManagementService implements IUserManagementService {
     @Override
     public Theme getDefaultTheme() {
 	String htmlName = Configuration.get(ConfigurationKeys.DEFAULT_THEME);
-	List<Theme> list = findByProperty(Theme.class, "name", htmlName);
+	List<Theme> list = findByProperty(Theme.class, "name", htmlName, true);
 	return list != null ? list.get(0) : null;
     }
 

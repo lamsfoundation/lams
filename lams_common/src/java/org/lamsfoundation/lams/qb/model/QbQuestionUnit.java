@@ -21,7 +21,6 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * @author Andrey Balan
  */
 @Entity
-@Cacheable
 @Table(name = "lams_qb_question_unit")
 public class QbQuestionUnit implements Serializable, Cloneable, Comparable<QbQuestionUnit> {
     private static final long serialVersionUID = -6772525485898794744L;

@@ -42,7 +42,7 @@ public class DacoDAOHibernate extends LAMSBaseDAO implements DacoDAO {
 
     @Override
     public Daco getByContentId(Long contentId) {
-	List<?> list = doFind(DacoDAOHibernate.FIND_BY_CONTENT_ID, contentId);
+	List<?> list = doFindCacheable(DacoDAOHibernate.FIND_BY_CONTENT_ID, contentId);
 	if (list.size() > 0) {
 	    return (Daco) list.get(0);
 	} else {

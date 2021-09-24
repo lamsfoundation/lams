@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.wiki.dao.hibernate;
 
 import java.util.List;
@@ -48,7 +47,7 @@ public class WikiSessionDAO extends LAMSBaseDAO implements IWikiSessionDAO {
 
     @Override
     public WikiSession getBySessionId(Long toolSessionId) {
-	List list = this.doFind(SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
+	List list = this.doFindCacheable(SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
 	if (list == null || list.isEmpty()) {
 	    return null;
 	}
