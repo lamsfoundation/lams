@@ -35,7 +35,6 @@ public class PolicyDAO extends LAMSBaseDAO implements IPolicyDAO {
 	SQLQuery query = getSession().createSQLQuery(LOAD_POLICIES_WITH_CONSENTS_COUNT);
 	query.addEntity(Policy.class);
 	query.addScalar("userConsentsCount");
-	query.setCacheable(true);
 	List<Object[]> resultQuery = query.list();
 
 	// this map keeps the insertion order
@@ -65,7 +64,6 @@ public class PolicyDAO extends LAMSBaseDAO implements IPolicyDAO {
 
 	Query query = getSession().createSQLQuery(SQL);
 	query.setInteger("userId", userId);
-	query.setCacheable(true);
 	Object value = query.uniqueResult();
 	int result = ((Number) value).intValue();
 
@@ -84,7 +82,6 @@ public class PolicyDAO extends LAMSBaseDAO implements IPolicyDAO {
 	query.addScalar("isConsentedByUser");
 	query.addScalar("dateAgreedOn");
 	query.setInteger("userId", userId);
-	query.setCacheable(true);
 	List<Object[]> resultQuery = query.list();
 
 	// this map keeps the insertion order
