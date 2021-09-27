@@ -35,10 +35,13 @@
 				 * Default eviction algorithm is LRU, least recently used.
             	  
             <prop key="hibernate.cache.infinispan.entity.expiration.lifespan">3000</prop>
+			<prop key="hibernate.cache.infinispan.collection.expiration.lifespan">3000</prop>
 			<prop key="hibernate.cache.infinispan.query.expiration.lifespan">3000</prop>
             <prop key="hibernate.cache.infinispan.entity.expiration.max_idle">-1</prop>
+			<prop key="hibernate.cache.infinispan.collection.expiration.max_idle">-1</prop>
 			<prop key="hibernate.cache.infinispan.query.expiration.max_idle">-1</prop>
             <prop key="hibernate.cache.infinispan.entity.expiration.wake_up_interval">1000</prop>
+			<prop key="hibernate.cache.infinispan.collection.expiration.wake_up_interval">1000</prop>
 			<prop key="hibernate.cache.infinispan.query.expiration.wake_up_interval">1000</prop>
 			 -->
 			 
