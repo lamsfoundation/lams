@@ -2083,7 +2083,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
      * Currently removes only <div> tags.
      */
     private String removeHtmlMarkup(String string) {
-	return string.replaceAll("[<](/)?div[^>]*[>]", "");
+	return string == null ? null : string.replaceAll("[<](/)?div[^>]*[>]", "");
     }
 
     /**

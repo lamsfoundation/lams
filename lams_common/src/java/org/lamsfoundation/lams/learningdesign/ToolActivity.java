@@ -128,18 +128,6 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	    newToolActivity.setEvaluation(newEvaluation);
 	}
 
-	Set<GradebookUserActivity> newGradebookUserActivities = new HashSet<>();
-	if (this.gradebookUserActivities != null) {
-	    for (GradebookUserActivity gradebookAct : this.gradebookUserActivities) {
-		GradebookUserActivity newGradebookAct = new GradebookUserActivity();
-		newGradebookAct.setActivity(newToolActivity);
-		newGradebookAct.setLearner(gradebookAct.getLearner());
-		newGradebookAct.setMark(gradebookAct.getMark());
-		newGradebookAct.setUpdateDate(gradebookAct.getUpdateDate());
-	    }
-	}
-	newToolActivity.setGradebookUserActivities(newGradebookUserActivities);
-
 	if (this.plannerMetadata != null) {
 	    PedagogicalPlannerActivityMetadata plannerMetadata = this.plannerMetadata.clone();
 	    plannerMetadata.setActivity(newToolActivity);
