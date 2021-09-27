@@ -262,7 +262,7 @@ public class LAMSBaseDAO implements IBaseDAO {
     @Override
     public <T> List<T> findByProperty(Class<T> clazz, String name, Object value, boolean cache) {
 	String queryString = buildQueryString(clazz, name, SELECT);
-	return doFindCacheable(queryString, cache, new Object[] { value });
+	return doFind(queryString, cache, new Object[] { value });
     }
 
     @Override
