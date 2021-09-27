@@ -132,7 +132,7 @@
 
             <size-rotating-file-handler name="HIBERNATEFILE"
                 autoflush="true">
-                <level name="INFO" />
+                <level name="DEBUG" />
                 <formatter>
                     <named-formatter name="HIBERNATEPATTERN" />
                 </formatter>
@@ -263,6 +263,22 @@
             
             <logger category="org.springframework.web">
                 <level name="DEBUG"/>
+            </logger>
+            
+            <logger category="Owasp.CsrfGuard" use-parent-handlers="false">
+                <level name="WARN" />
+                <handlers>
+                    <handler name="LAMSFILE" />
+                    <handler name="LAMSCONSOLE" />
+                </handlers>
+            </logger>
+            
+            <logger category="org.hibernate.cache.internal.QueryResultsCacheImpl"
+            	use-parent-handlers="false">
+                <level name="DEBUG" />
+                <handlers>
+                    <handler name="HIBERNATEFILE" />
+                </handlers>
             </logger>
             
             <!-- On production change above settings to INFO -->

@@ -103,7 +103,7 @@
 
             <size-rotating-file-handler name="HIBERNATEFILE"
                 autoflush="true">
-                <level name="INFO" />
+                <level name="DEBUG" />
                 <formatter>
                     <named-formatter name="HIBERNATEPATTERN" />
                 </formatter>
@@ -233,6 +233,14 @@
                 <handlers>
                     <handler name="LAMSFILE" />
                     <handler name="LAMSCONSOLE" />
+                </handlers>
+            </logger>
+            
+           <logger category="org.hibernate.cache.internal.QueryResultsCacheImpl"
+            	use-parent-handlers="false">
+                <level name="DEBUG" />
+                <handlers>
+                    <handler name="HIBERNATEFILE" />
                 </handlers>
             </logger>
             
