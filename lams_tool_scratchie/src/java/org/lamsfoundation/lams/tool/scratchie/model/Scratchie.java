@@ -42,6 +42,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.SortComparator;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 
@@ -88,6 +90,7 @@ public class Scratchie implements Cloneable {
     @OneToMany
     @JoinColumn(name = "scratchie_uid")
     @SortComparator(QbToolQuestion.QbToolQuestionComparator.class)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<ScratchieItem> scratchieItems = new TreeSet<>();
 
     @Column(name = "burning_questions_enabled")

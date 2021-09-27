@@ -41,6 +41,8 @@ import javax.persistence.OneToMany;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.strategy.SequenceActivityStrategy;
 import org.lamsfoundation.lams.tool.SystemTool;
@@ -59,7 +61,8 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
     private static Logger log = Logger.getLogger(SequenceActivity.class);
 
     @OneToMany(mappedBy = "branchSequenceActivity", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<BranchActivityEntry> branchEntries = new HashSet<BranchActivityEntry>();
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    private Set<BranchActivityEntry> branchEntries = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "system_tool_id")
@@ -137,7 +140,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
     public SortedSet<Group> getGroupsForBranch() {
 
 	Set<BranchActivityEntry> mappingEntries = getBranchEntries();
-	TreeSet<Group> sortedGroups = new TreeSet<Group>();
+	TreeSet<Group> sortedGroups = new TreeSet<>();
 
 	if (mappingEntries != null) {
 	    Iterator<BranchActivityEntry> mappingIter = mappingEntries.iterator();
@@ -182,7 +185,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
      */
     @Override
     public Vector<ValidationErrorDTO> validateActivity(MessageService messageService) {
-	Vector<ValidationErrorDTO> listOfValidationErrors = new Vector<ValidationErrorDTO>();
+	Vector<ValidationErrorDTO> listOfValidationErrors = new Vector<>();
 	if (getActivities() != null && getActivities().size() > 0 && getDefaultActivity() == null) {
 	    listOfValidationErrors.add(
 		    new ValidationErrorDTO(ValidationErrorDTO.SEQUENCE_ACTIVITY_MUST_HAVE_FIRST_ACTIVITY_ERROR_CODE,

@@ -27,7 +27,6 @@ import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -41,8 +40,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.SortComparator;
 import org.lamsfoundation.lams.qb.model.QbToolAnswer;
 
@@ -94,7 +91,6 @@ public class AssessmentResult {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "result_uid")
     @SortComparator(QbToolAnswer.QbToolAnswerComparator.class)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<AssessmentQuestionResult> questionResults = new TreeSet<>();
 
     // *************** NON Persist Fields ********************

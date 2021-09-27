@@ -27,7 +27,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ColumnResult;
@@ -51,6 +50,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
@@ -267,10 +268,12 @@ public class Lesson implements Serializable {
      */
     @ManyToMany
     @JoinTable(name = "lams_lesson_dependency", joinColumns = @JoinColumn(name = "lesson_id"), inverseJoinColumns = @JoinColumn(name = "preceding_lesson_id"))
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<Lesson> precedingLessons = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name = "lams_lesson_dependency", joinColumns = @JoinColumn(name = "preceding_lesson_id"), inverseJoinColumns = @JoinColumn(name = "lesson_id"))
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<Lesson> succeedingLessons = new HashSet<>();
 
     // ---------------------------------------------------------------------

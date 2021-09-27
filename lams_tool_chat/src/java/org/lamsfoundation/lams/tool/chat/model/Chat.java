@@ -39,6 +39,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.chat.service.ChatService;
 
@@ -98,11 +100,13 @@ public class Chat implements java.io.Serializable, Cloneable {
     private Date submissionDeadline;
 
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
-    private Set<ChatSession> chatSessions = new HashSet<ChatSession>();
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    private Set<ChatSession> chatSessions = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "content_uid")
-    private Set<ChatCondition> conditions = new TreeSet<ChatCondition>(new TextSearchConditionComparator());
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    private Set<ChatCondition> conditions = new TreeSet<>(new TextSearchConditionComparator());
 
     public Chat() {
     }
@@ -270,10 +274,7 @@ public class Chat implements java.io.Serializable, Cloneable {
 	if (this == other) {
 	    return true;
 	}
-	if (other == null) {
-	    return false;
-	}
-	if (!(other instanceof Chat)) {
+	if ((other == null) || !(other instanceof Chat)) {
 	    return false;
 	}
 	Chat castOther = (Chat) other;
@@ -306,10 +307,10 @@ public class Chat implements java.io.Serializable, Cloneable {
 	    chat.setUid(null);
 
 	    // create an empty set for the chatSession
-	    chat.chatSessions = new HashSet<ChatSession>();
+	    chat.chatSessions = new HashSet<>();
 
 	    if (conditions != null) {
-		Set<ChatCondition> set = new TreeSet<ChatCondition>(new TextSearchConditionComparator());
+		Set<ChatCondition> set = new TreeSet<>(new TextSearchConditionComparator());
 		for (ChatCondition condition : conditions) {
 		    set.add((ChatCondition) condition.clone());
 		}

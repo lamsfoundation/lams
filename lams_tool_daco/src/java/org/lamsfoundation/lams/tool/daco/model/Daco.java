@@ -43,6 +43,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * Daco
@@ -99,7 +101,8 @@ public class Daco implements Cloneable {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "daco", cascade = CascadeType.ALL)
     @OrderBy("uid ASC")
-    private Set<DacoQuestion> dacoQuestions = new LinkedHashSet<DacoQuestion>();
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    private Set<DacoQuestion> dacoQuestions = new LinkedHashSet<>();
 
     @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;

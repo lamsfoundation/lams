@@ -27,7 +27,6 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,8 +39,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbToolAnswer;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
@@ -87,7 +84,6 @@ public class AssessmentQuestionResult extends QbToolAnswer {
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "question_result_uid")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<AssessmentOptionAnswer> optionAnswers = new LinkedHashSet<>();
 
     // *************** NON Persist Fields ********************

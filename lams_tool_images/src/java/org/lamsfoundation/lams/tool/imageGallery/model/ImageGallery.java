@@ -44,6 +44,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 
@@ -101,6 +103,7 @@ public class ImageGallery implements Serializable, Cloneable {
     @OneToMany(cascade = CascadeType.ALL)
     @OrderBy("order_id ASC")
     @JoinColumn(name = "tool_content_id", referencedColumnName = "content_id")
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<LearnerItemRatingCriteria> ratingCriterias = new HashSet<>();
 
     @Column(name = "reflect_on_activity")

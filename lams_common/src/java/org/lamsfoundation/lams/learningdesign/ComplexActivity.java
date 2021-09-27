@@ -39,6 +39,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.SortComparator;
@@ -57,7 +59,8 @@ public abstract class ComplexActivity extends Activity implements Serializable {
     @OneToMany(mappedBy = "parentActivity", fetch = FetchType.EAGER)
     @Cascade(CascadeType.SAVE_UPDATE)
     @SortComparator(ActivityOrderComparator.class)
-    private Set<Activity> activities = new TreeSet<Activity>(new ActivityOrderComparator());
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    private Set<Activity> activities = new TreeSet<>(new ActivityOrderComparator());
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "default_activity_id")
@@ -180,7 +183,7 @@ public abstract class ComplexActivity extends Activity implements Serializable {
     @Override
     public Set<AuthoringActivityDTO> getAuthoringActivityDTOSet(ArrayList<BranchActivityEntryDTO> branchMappings,
 	    String languageCode) {
-	Set<AuthoringActivityDTO> dtoSet = new TreeSet<AuthoringActivityDTO>(new ActivityDTOOrderComparator());
+	Set<AuthoringActivityDTO> dtoSet = new TreeSet<>(new ActivityDTOOrderComparator());
 	dtoSet.add(new AuthoringActivityDTO(this, branchMappings, languageCode)); // add parent activity
 
 	// add the DTO for all child activities

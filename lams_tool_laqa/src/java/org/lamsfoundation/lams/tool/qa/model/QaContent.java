@@ -21,12 +21,10 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.qa.model;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -45,6 +43,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 
@@ -133,21 +133,25 @@ public class QaContent implements Serializable {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "tool_content_id", referencedColumnName = "qa_content_id")
     @OrderBy("orderId asc")
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<LearnerItemRatingCriteria> ratingCriterias;
 
     @OneToMany(mappedBy = "qaContent", cascade = CascadeType.ALL)
     @OrderBy("displayOrder")
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<QaQueContent> qaQueContents;
 
     @OneToMany(mappedBy = "qaContent", cascade = CascadeType.ALL)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<QaSession> qaSessions;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "content_uid")
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<QaCondition> conditions;
 
     public QaContent() {
-	conditions =  new TreeSet<QaCondition>(new TextSearchConditionComparator());
+	conditions = new TreeSet<>(new TextSearchConditionComparator());
     };
 
     /** full constructor */
@@ -176,7 +180,7 @@ public class QaContent implements Serializable {
 	this.qaQueContents = qaQueContents;
 	this.qaSessions = qaSessions;
 	this.conditions = conditions != null ? conditions
-		: new TreeSet<QaCondition>(new TextSearchConditionComparator());
+		: new TreeSet<>(new TextSearchConditionComparator());
 	this.allowRichEditor = allowRichEditor;
 	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
 	this.maximumRates = maximumRates;
@@ -185,7 +189,8 @@ public class QaContent implements Serializable {
     }
 
     /**
-     * Copy Constructor to create a new qa content instance. Note that we don't copy the qa session data here because the
+     * Copy Constructor to create a new qa content instance. Note that we don't copy the qa session data here because
+     * the
      * qa session will be created after we copied tool content.
      *
      * @param qa
@@ -214,7 +219,7 @@ public class QaContent implements Serializable {
 
     public Set<LearnerItemRatingCriteria> deepCopyRatingCriterias(QaContent newQaContent) {
 
-	Set<LearnerItemRatingCriteria> newCriterias = new TreeSet<LearnerItemRatingCriteria>();
+	Set<LearnerItemRatingCriteria> newCriterias = new TreeSet<>();
 	for (Iterator<LearnerItemRatingCriteria> i = ratingCriterias.iterator(); i.hasNext();) {
 	    LearnerItemRatingCriteria criteria = i.next();
 	    LearnerItemRatingCriteria newCriteria = (LearnerItemRatingCriteria) criteria.clone();
@@ -225,7 +230,7 @@ public class QaContent implements Serializable {
     }
 
     public Set<QaQueContent> deepCopyQaQueContent(QaContent newQaContent) {
-	Set<QaQueContent> newQaQueContent = new TreeSet<QaQueContent>();
+	Set<QaQueContent> newQaQueContent = new TreeSet<>();
 	for (Iterator<QaQueContent> i = this.getQaQueContents().iterator(); i.hasNext();) {
 	    QaQueContent queContent = i.next();
 	    newQaQueContent.add(QaQueContent.newInstance(queContent, newQaContent));
@@ -235,7 +240,7 @@ public class QaContent implements Serializable {
 
     public Set<QaCondition> deepCopyConditions(QaContent newQaContent) {
 
-	Set<QaCondition> newConditions = new TreeSet<QaCondition>(new TextSearchConditionComparator());
+	Set<QaCondition> newConditions = new TreeSet<>(new TextSearchConditionComparator());
 	if (getConditions() != null) {
 	    for (QaCondition condition : getConditions()) {
 		newConditions.add(condition.clone(newQaContent));
@@ -246,7 +251,7 @@ public class QaContent implements Serializable {
     }
 
     public Set<QaSession> deepCopyQaSession(QaContent newQaSession) {
-	return new TreeSet<QaSession>();
+	return new TreeSet<>();
     }
 
     public Set<QaQueContent> getQaQueContents() {

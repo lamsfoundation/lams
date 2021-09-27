@@ -37,6 +37,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.lamsfoundation.lams.contentrepository.exception.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 
@@ -98,14 +100,13 @@ public class NoticeboardContent implements Serializable {
     @Column(name = "allow_anonymous")
     private boolean allowAnonymous;
 
-    @OneToMany(mappedBy = "nbContent",
-	    cascade = CascadeType.ALL,
-	    orphanRemoval = true)
+    @OneToMany(mappedBy = "nbContent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<NoticeboardSession> nbSessions;
-    
+
     /** default constructor */
     public NoticeboardContent() {
-	this.nbSessions = new HashSet<NoticeboardSession>();
+	this.nbSessions = new HashSet<>();
     }
 
     /** full constructor */
@@ -126,7 +127,7 @@ public class NoticeboardContent implements Serializable {
 	this.allowComments = allowComments;
 	this.commentsLikeAndDislike = commentsLikeAndDislike;
 	this.allowAnonymous = allowAnonymous;
-	this.nbSessions = new HashSet<NoticeboardSession>();
+	this.nbSessions = new HashSet<>();
     }
 
     /**
@@ -222,7 +223,7 @@ public class NoticeboardContent implements Serializable {
 	this.allowComments = allowComments;
     }
 
-   public boolean isCommentsLikeAndDislike() {
+    public boolean isCommentsLikeAndDislike() {
 	return commentsLikeAndDislike;
     }
 

@@ -26,6 +26,7 @@
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/com/fasterxml/jackson/core/jackson-core/main/jackson-core-2.9.5.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/jackson"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/com/fasterxml/jackson/core/jackson-databind/main/jackson-databind-2.9.5.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/jackson"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/persistence/api/main/javax.persistence-api-2.2.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/persistence-api"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/hibernate/main/hibernate-core-5.3.6.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/hibernate-core"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

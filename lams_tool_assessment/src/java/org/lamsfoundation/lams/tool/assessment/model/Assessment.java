@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -193,11 +192,13 @@ public class Assessment implements Cloneable {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "assessment_uid")
     @OrderBy("sequence_id ASC")
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "assessment_uid")
     @OrderBy("sequence_id ASC")
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<AssessmentOverallFeedback> overallFeedbacks = new TreeSet<>(new SequencableComparator());
 
     // **********************************************************

@@ -39,6 +39,8 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * <p>
@@ -106,9 +108,11 @@ public class VoteContent implements Serializable {
 
     @OneToMany(mappedBy = "voteContent", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("displayOrder")
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<VoteQueContent> voteQueContents;
 
     @OneToMany(mappedBy = "voteContent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<VoteSession> voteSessions;
 
     @Column(name = "submission_deadline")

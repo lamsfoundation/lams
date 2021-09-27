@@ -33,7 +33,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.Vector;
 
-import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -57,6 +56,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.BranchActivityEntryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LibraryActivityDTO;
@@ -259,6 +260,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     @ManyToMany
     @JoinTable(name = "lams_input_activity", joinColumns = @JoinColumn(name = "activity_id"), inverseJoinColumns = @JoinColumn(name = "input_activity_id"))
     @OrderBy("activity_id")
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<Activity> inputActivities = new HashSet<>();
 
     /**
@@ -266,6 +268,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
      * LDEV-1910)
      */
     @OneToMany(mappedBy = "branchingActivity", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<BranchActivityEntry> branchActivityEntries = new HashSet<>();
 
     // ---------------------------------------------------------------------
@@ -937,7 +940,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     }
 
     public boolean isActivityReadOnly() {
-	return readOnly.equals(Boolean.TRUE);
+	return readOnly;
     }
 
     // ---------------------------------------------------------------------

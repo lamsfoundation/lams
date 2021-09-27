@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scribe.model;
 
 import java.util.Date;
@@ -40,13 +39,15 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.lamsfoundation.lams.tool.scribe.service.ScribeService;
 
 @Entity
 @Table(name = "tl_lascrb11_scribe")
 public class Scribe implements java.io.Serializable, Cloneable {
 
-     private static final long serialVersionUID = 579733009969321015L;
+    private static final long serialVersionUID = 579733009969321015L;
 
     static Logger log = Logger.getLogger(ScribeService.class.getName());
 
@@ -92,6 +93,7 @@ public class Scribe implements java.io.Serializable, Cloneable {
     private Long toolContentId;
 
     @OneToMany(mappedBy = "scribe")
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<ScribeSession> scribeSessions;
 
     @OneToMany(mappedBy = "scribe", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -247,10 +249,7 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	if ((this == other)) {
 	    return true;
 	}
-	if ((other == null)) {
-	    return false;
-	}
-	if (!(other instanceof Scribe)) {
+	if ((other == null) || !(other instanceof Scribe)) {
 	    return false;
 	}
 	Scribe castOther = (Scribe) other;
@@ -285,7 +284,7 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	    if (scribeHeadings != null) {
 		// create copy of headings
 		Iterator iter = scribeHeadings.iterator();
-		Set<ScribeHeading> set = new HashSet<ScribeHeading>();
+		Set<ScribeHeading> set = new HashSet<>();
 		while (iter.hasNext()) {
 		    ScribeHeading originalHeading = (ScribeHeading) iter.next();
 		    ScribeHeading newHeading = (ScribeHeading) originalHeading.clone();

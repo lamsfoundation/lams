@@ -44,6 +44,8 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
 
 /**
@@ -82,6 +84,7 @@ public class SurveyQuestion implements Cloneable {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "question_uid")
     @OrderBy("sequence_id")
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<SurveyOption> options = new HashSet<SurveyOption>();
 
     @Column(name = "create_date")

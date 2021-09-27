@@ -36,6 +36,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.lamsfoundation.lams.tool.leaderselection.service.LeaderselectionService;
 
 @Entity
@@ -74,6 +76,7 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
     private Long toolContentId;
 
     @OneToMany(mappedBy = "leaderselection")
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<LeaderselectionSession> leaderselectionSessions = new HashSet<>();
 
     public Long getUid() {
@@ -174,10 +177,7 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
 	if (this == other) {
 	    return true;
 	}
-	if (other == null) {
-	    return false;
-	}
-	if (!(other instanceof Leaderselection)) {
+	if ((other == null) || !(other instanceof Leaderselection)) {
 	    return false;
 	}
 	Leaderselection castOther = (Leaderselection) other;
@@ -210,7 +210,7 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
 	    leaderselection.setUid(null);
 
 	    // create an empty set for the leaderselectionSession
-	    leaderselection.leaderselectionSessions = new HashSet<LeaderselectionSession>();
+	    leaderselection.leaderselectionSessions = new HashSet<>();
 
 	} catch (CloneNotSupportedException cnse) {
 	    Leaderselection.log.error("Error cloning " + Leaderselection.class);

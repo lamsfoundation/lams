@@ -39,6 +39,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
 @Table(name = "tl_lazoom10_zoom")
@@ -102,6 +104,7 @@ public class Zoom implements java.io.Serializable, Cloneable {
     private String meetingPassword;
 
     @OneToMany(mappedBy = "zoom")
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<ZoomSession> zoomSessions;
 
     public Long getUid() {
@@ -283,10 +286,7 @@ public class Zoom implements java.io.Serializable, Cloneable {
 	if ((this == other)) {
 	    return true;
 	}
-	if ((other == null)) {
-	    return false;
-	}
-	if (!(other instanceof Zoom)) {
+	if ((other == null) || !(other instanceof Zoom)) {
 	    return false;
 	}
 	Zoom castOther = (Zoom) other;
