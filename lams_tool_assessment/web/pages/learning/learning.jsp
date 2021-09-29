@@ -381,7 +381,7 @@
 					this.CodeMirror.save();
 				});
 			}
-						
+			
 			//only if time limit is not expired
 			if (!isTimelimitExpired) {
 				if (!validateAnswers()) {
@@ -418,6 +418,15 @@
 			if (${!hasEditRight}) {
 				return true;
 			}
+
+			if (typeof CodeMirror != 'undefined') {
+				$('.CodeMirror').each(function(){
+					this.CodeMirror.save();
+				});
+			}
+			
+			// copy value from lams:textarea (only available in essay and mark hedging type of questions) to hidden input before submit
+			$("textarea[name$=__textarea]").change();
 			
 			var missingRequiredQuestions = [];
 			var minWordsLimitNotReachedQuestions = [];
@@ -448,8 +457,8 @@
 
 						</c:when>
 						
-						<c:when test="${(question.type == 3) || (question.type == 4) || (question.type == 6 && !question.allowRichEditor)}">
-							//shortanswer or numerical or essay without ckeditor
+						<c:when test="${(question.type == 3) || (question.type == 4) || (question.type == 6 && !question.allowRichEditor and empty question.codeStyle)}">
+							// short answer or numerical or essay without ckeditor or code style
 							var inputText = $("input[name=question${status.index}]")[0];
 							if($.trim(inputText.value).length == 0) {
 								missingRequiredQuestions.push("${status.index}");
@@ -465,14 +474,25 @@
 						</c:when>
 							
 						<c:when test="${question.type == 6 && question.allowRichEditor}">
-							//essay with ckeditor
+							// essay with ckeditor
 							var ckeditorData = CKEDITOR.instances["question${status.index}"].getData();
 							//can't be null and empty value
 							if((ckeditorData == null) || (ckeditorData.replace(/&nbsp;| |<br \/>|\s|<p>|<\/p>|\xa0/g, "").length == 0)) {
 								missingRequiredQuestions.push("${status.index}");
 							}
 						</c:when>
-							
+						
+						<c:when test="${question.type == 6 && not empty question.codeStyle}">
+							// essay with code style
+							var textarea = $("textarea[name=question${status.index}]"),
+								codeMirror = textarea.siblings('.CodeMirror')[0],
+								text = codeMirror.CodeMirror.doc.getValue();
+
+							if($.trim(text).length == 0) {
+								missingRequiredQuestions.push("${status.index}");
+							}
+						</c:when>
+					
 						<c:when test="${question.type == 7}">
 							//ordering - do nothing
 						</c:when>
