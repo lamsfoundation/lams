@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" version="1.0">
+	<persistence-unit name="lams_dummy_persistence_unit">
+	<!-- This file is need to trigger WildFly container cache initialisation,
+		 so we can reference it using JNDI in applicationContext. -->
+	</persistence-unit>
+</persistence>

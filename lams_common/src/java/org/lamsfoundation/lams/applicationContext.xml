@@ -20,9 +20,13 @@
             
 			<prop key="hibernate.cache.use_query_cache">true</prop>
 		    <prop key="hibernate.cache.use_second_level_cache">true</prop>
-		    <prop key="hibernate.cache.infinispan.statistics">true</prop>
             <prop key="javax.persistence.sharedCache.mode">ALL</prop>
+            <prop key="hibernate.cache.infinispan.statistics">true</prop>
             
+            <!-- Only entity cache is fetched from WildFly container.
+            	 Query and collection cache templates need to be modified here. -->
+            <prop key="hibernate.cache.infinispan.cachemanager">java:jboss/infinispan/container/hibernate</prop>
+    
             <!-- Following configuration should be used in MULTINODE ENVIRONMENT
             	 before proper distributed cache configuration is not implemented.
             	 It creates local cache with short life span, minimising danger of stale cache on each node.
@@ -45,15 +49,8 @@
 			<prop key="hibernate.cache.infinispan.query.expiration.wake_up_interval">1000</prop>
 			 -->
 			 
-			 <!-- Below are immutable entities which can be kept in cache forever.
-			 	  Configuration is modified for each of them as defining a separate cache configuration template does not seem possible
-			 	  for EAR on WildFly without an explicit persistent unit configuration.
-			 	  None of these configuration entries work:
-			 <prop key="hibernate.cache.infinispan.lams.ear#org.lamsfoundation.lams.usermanagement.Role.expiration.max_idle">-1</prop>
-			 <prop key="hibernate.cache.infinispan.lams.ear#default.org.lamsfoundation.lams.usermanagement.Role.expiration.max_idle">-1</prop>
-			 <prop key="hibernate.cache.infinispan.lams.ear#null.org.lamsfoundation.lams.usermanagement.Role.expiration.max_idle">-1</prop>
-			 -->
 			 
+			 <!-- Below are immutable entities which can be kept in cache forever. -->
 			<prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.learningdesign.LearningLibrary.expiration.max_idle">-1</prop>
 			<prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.themes.Theme.expiration.max_idle">-1</prop>
 			<prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.timezone.Timezone.expiration.max_idle">-1</prop>
@@ -66,8 +63,8 @@
 			<prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.usermanagement.SupportedLocale.expiration.max_idle">-1</prop>
 			<prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.logevent.LogEventType.expiration.max_idle">-1</prop>
 
-
-            <!-- These are obsolete settings but left here as a reminder what we set up in the past.
+			
+            <!-- These are obsolete 2nd level cache settings but left here as a reminder what we set up in the past.
             <prop key="hibernate.cache.region.factory_class">org.infinispan.hibernate.cache.v53.InfinispanRegionFactory</prop>
             <prop key="hibernate.cache.default_cache_concurrency_strategy">TRANSACTIONAL</prop>
             -->		
