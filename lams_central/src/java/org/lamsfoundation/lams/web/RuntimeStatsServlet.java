@@ -29,6 +29,7 @@ import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.ThreadMXBean;
 import java.util.Date;
+import java.util.Locale;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -38,6 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 
@@ -80,7 +82,7 @@ public class RuntimeStatsServlet extends HttpServlet {
 	try {
 	    ObjectName dataSourceName = new ObjectName(
 		    "jboss.as.expr:subsystem=datasources,data-source=lams-ds,statistics=pool");
-	    Integer activeCount = Integer.valueOf((String) server.getAttribute(dataSourceName, "ActiveCount"));
+	    int activeCount = Integer.parseInt((String) server.getAttribute(dataSourceName, "ActiveCount"));
 
 	    resp.append("Overall Status : OK");
 	    if (activeCount > 0) {
@@ -141,7 +143,21 @@ public class RuntimeStatsServlet extends HttpServlet {
 	    resp.append("Connection count [in use/idle/left]: ").append(inUseConnections).append("/")
 		    .append(activeConnections - inUseConnections).append("/")
 		    .append(availConnections - activeConnections).append("\n");
-	    resp.append("Connection max usage time ms: ").append(maxUsageTime);
+	    resp.append("Connection max usage time ms: ").append(maxUsageTime).append("\n\n");
+
+	    // 2nd level cache stats
+	    ObjectName cacheContainerName = new ObjectName(
+		    "org.wildfly.clustering.infinispan:type=CacheManager,name=\"hibernate\",component=CacheContainerStats");
+	    Integer currentNumberOfEntriesInMemory = (Integer) server.getAttribute(cacheContainerName,
+		    "currentNumberOfEntriesInMemory");
+	    resp.append("Cache number of entries in memory: ").append(currentNumberOfEntriesInMemory).append("\n");
+	    Double hitRatio = (Double) server.getAttribute(cacheContainerName, "hitRatio");
+	    resp.append("Cache hit ratio: ").append(NumberUtil.formatLocalisedNumber(hitRatio, (Locale) null, 2))
+		    .append("\n");
+	    Double readWriteRatio = (Double) server.getAttribute(cacheContainerName, "readWriteRatio");
+	    resp.append("Cache read/write ratio: ")
+		    .append(NumberUtil.formatLocalisedNumber(readWriteRatio, (Locale) null, 2));
+
 	} catch (Exception e) {
 	    log.error("Error while getting long runtime stats", e);
 	}
