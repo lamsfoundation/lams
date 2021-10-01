@@ -145,19 +145,46 @@ public class RuntimeStatsServlet extends HttpServlet {
 		    .append(availConnections - activeConnections).append("\n");
 	    resp.append("Connection max usage time ms: ").append(maxUsageTime).append("\n\n");
 
-	    // 2nd level cache stats
+	    // 2nd level cache general stats
 	    ObjectName cacheContainerName = new ObjectName(
 		    "org.wildfly.clustering.infinispan:type=CacheManager,name=\"hibernate\",component=CacheContainerStats");
-	    Integer currentNumberOfEntriesInMemory = (Integer) server.getAttribute(cacheContainerName,
-		    "currentNumberOfEntriesInMemory");
-	    resp.append("Cache number of entries in memory: ").append(currentNumberOfEntriesInMemory).append("\n");
-	    Double hitRatio = (Double) server.getAttribute(cacheContainerName, "hitRatio");
-	    resp.append("Cache hit ratio: ").append(NumberUtil.formatLocalisedNumber(hitRatio, (Locale) null, 2))
-		    .append("\n");
-	    Double readWriteRatio = (Double) server.getAttribute(cacheContainerName, "readWriteRatio");
-	    resp.append("Cache read/write ratio: ")
-		    .append(NumberUtil.formatLocalisedNumber(readWriteRatio, (Locale) null, 2));
+	    boolean isAvailable = server.isRegistered(cacheContainerName);
+	    if (isAvailable) {
+		Integer currentNumberOfEntriesInMemory = (Integer) server.getAttribute(cacheContainerName,
+			"currentNumberOfEntriesInMemory");
+		resp.append("Cache number of entries in memory: ").append(currentNumberOfEntriesInMemory).append("\n");
+		Long hits = (Long) server.getAttribute(cacheContainerName, "hits");
+		resp.append("Cache hits: ").append(hits).append("\n");
+		Long misses = (Long) server.getAttribute(cacheContainerName, "misses");
+		resp.append("Cache misses: ").append(misses).append("\n");
+		Double hitRatio = (Double) server.getAttribute(cacheContainerName, "hitRatio");
+		resp.append("Cache hit ratio: ").append(NumberUtil.formatLocalisedNumber(hitRatio, (Locale) null, 2))
+			.append("\n");
+		Double readWriteRatio = (Double) server.getAttribute(cacheContainerName, "readWriteRatio");
+		resp.append("Cache read/write ratio: ")
+			.append(NumberUtil.formatLocalisedNumber(readWriteRatio, (Locale) null, 2)).append("\n\n");
 
+		// query cache stats
+		cacheContainerName = new ObjectName(
+			"org.wildfly.clustering.infinispan:type=Cache,name=\"default-query-results-region(local)\",manager=\"hibernate\",component=Statistics");
+		isAvailable = server.isRegistered(cacheContainerName);
+		if (isAvailable) {
+		    currentNumberOfEntriesInMemory = (Integer) server.getAttribute(cacheContainerName,
+			    "numberOfEntriesInMemory");
+		    resp.append("Query cache number of entries in memory: ").append(currentNumberOfEntriesInMemory)
+			    .append("\n");
+		    hits = (Long) server.getAttribute(cacheContainerName, "hits");
+		    resp.append("Query cache hits: ").append(hits).append("\n");
+		    misses = (Long) server.getAttribute(cacheContainerName, "misses");
+		    resp.append("Query cache misses: ").append(misses).append("\n");
+		    hitRatio = (Double) server.getAttribute(cacheContainerName, "hitRatio");
+		    resp.append("Query cache hit ratio: ")
+			    .append(NumberUtil.formatLocalisedNumber(hitRatio, (Locale) null, 2)).append("\n");
+		    readWriteRatio = (Double) server.getAttribute(cacheContainerName, "readWriteRatio");
+		    resp.append("Query cache read/write ratio: ")
+			    .append(NumberUtil.formatLocalisedNumber(readWriteRatio, (Locale) null, 2));
+		}
+	    }
 	} catch (Exception e) {
 	    log.error("Error while getting long runtime stats", e);
 	}
