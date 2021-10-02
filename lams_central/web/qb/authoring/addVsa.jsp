@@ -9,6 +9,12 @@
 			textarea {
 			  resize: none;
 			}
+			
+			#option-hint {
+				font-size: 12px;
+				color: #999;
+				margin-bottom: 20px;
+			}
 		</style>
 		
   	    <script>
@@ -205,6 +211,7 @@
 			
 			<!-- Options -->
 			<div class="question-tab">
+				<p id="option-hint"><fmt:message key="label.authoring.short.answer.hint" /></p>
 				<form id="optionForm" name="optionForm">
 					<%@ include file="optionlist.jsp"%>
 					
