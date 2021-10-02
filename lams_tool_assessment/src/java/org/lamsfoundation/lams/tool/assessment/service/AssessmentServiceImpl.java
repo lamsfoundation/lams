@@ -833,6 +833,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		String normalisedQuestionAnswer = AssessmentEscapeUtils.normaliseVSAnswer(questionDto.getAnswer());
 
 		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+		    // refresh latest answers from DB
+		    QbOption qbOption = qbService.getOptionByUid(optionDto.getUid());
+		    optionDto.setName(qbOption.getName());
+
 		    Collection<String> optionAnswers = AssessmentEscapeUtils.normaliseVSOption(optionDto.getName());
 		    boolean isAnswerMatchedCurrentOption = false;
 		    for (String optionAnswer : optionAnswers) {
@@ -848,7 +852,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 		    if (isAnswerMatchedCurrentOption) {
 			mark = optionDto.getMaxMark() * maxMark;
-			QbOption qbOption = qbService.getOptionByUid(optionDto.getUid());
 			questionResult.setQbOption(qbOption);
 			break;
 		    }
@@ -1416,13 +1419,14 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     public QuestionSummary getQuestionSummary(Long contentId, Long questionUid) {
 	AssessmentQuestion question = assessmentQuestionDao.getByUid(questionUid);
 	QbQuestion qbQuestion = question.getQbQuestion();
+	boolean isVSA = question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS;
 	List<AssessmentQuestionResult> allQuestionResults = assessmentQuestionResultDao
-		.getQuestionResultsByQuestionUid(questionUid);
+		.getQuestionResultsByQuestionUid(questionUid, !isVSA);
 
 	QuestionSummary questionSummary = new QuestionSummary(question);
 
 	//prepare extra data for VSA type of questions, so teachers can allocate answers into groups
-	if (question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS) {
+	if (isVSA) {
 	    boolean isQuestionCaseSensitive = question.getQbQuestion().isCaseSensitive();
 	    //find all questionResults that are not allocated into groups yet
 	    List<AssessmentQuestionResult> notAllocatedQuestionResults = new ArrayList<>();
