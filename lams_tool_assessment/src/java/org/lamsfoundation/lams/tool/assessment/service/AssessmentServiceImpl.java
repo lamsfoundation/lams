@@ -1423,8 +1423,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	//prepare extra data for VSA type of questions, so teachers can allocate answers into groups
 	if (question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS) {
+	    boolean isQuestionCaseSensitive = question.getQbQuestion().isCaseSensitive();
 	    //find all questionResults that are not allocated into groups yet
 	    List<AssessmentQuestionResult> notAllocatedQuestionResults = new ArrayList<>();
+	    Set<String> notAllocatedAnswers = new HashSet<>();
 	    for (AssessmentQuestionResult questionResult : allQuestionResults) {
 		String answer = questionResult.getAnswer();
 		if (StringUtils.isBlank(answer)) {
@@ -1432,7 +1434,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		}
 
 		boolean isAnswerAllocated = false;
-		boolean isQuestionCaseSensitive = question.getQbQuestion().isCaseSensitive();
+
 		String normalisedAnswer = AssessmentEscapeUtils.normaliseVSAnswer(answer);
 		for (QbOption option : qbQuestion.getQbOptions()) {
 		    Collection<String> alternatives = AssessmentEscapeUtils.normaliseVSOption(option.getName());
@@ -1449,7 +1451,14 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		}
 
 		if (!isAnswerAllocated) {
-		    notAllocatedQuestionResults.add(questionResult);
+		    if (!isQuestionCaseSensitive) {
+			normalisedAnswer = normalisedAnswer.toLowerCase();
+		    }
+		    // do not add repetitive students' suggestions for teacher to assign to an option
+		    if (!notAllocatedAnswers.contains(normalisedAnswer)) {
+			notAllocatedAnswers.add(normalisedAnswer);
+			notAllocatedQuestionResults.add(questionResult);
+		    }
 		}
 	    }
 	    questionSummary.setNotAllocatedQuestionResults(notAllocatedQuestionResults);
