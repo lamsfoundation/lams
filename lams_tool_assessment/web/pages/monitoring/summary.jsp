@@ -557,7 +557,7 @@
 	<c:if test="${vsaPresent}">
 		<div class="voffset5">
 			<a class="thickbox btn btn-default"
-			   href='<c:url value="/monitoring/displayVsaAllocate.do?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&modal=true"/>'>
+			   href='<c:url value="/monitoring/displayVsaAllocate.do?toolContentID=${sessionMap.assessment.contentId}&KeepThis=true&TB_iframe=true&modal=true"/>'>
 				<fmt:message key="label.vsa.allocate.button" />
 			</a>
 		</div>

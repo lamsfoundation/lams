@@ -309,9 +309,7 @@ public class MonitoringController {
 
     @RequestMapping("/displayVsaAllocate")
     public String displayVsaAllocate(HttpServletRequest request, HttpServletResponse response) {
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-
-	Long contentId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
+	Long contentId = WebUtil.readLongParam(request, AssessmentConstants.ATTR_TOOL_CONTENT_ID);
 	Assessment assessment = service.getAssessmentByContentId(contentId);
 
 	List<QuestionSummary> questionSummaries = new ArrayList<>();

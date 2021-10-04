@@ -7,6 +7,7 @@
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
 		
+		<title><fmt:message key="label.vsa.allocate.button" /></title>
 		<style>
 			body {
 				padding: 10px;
@@ -78,7 +79,7 @@
 	  	});
 	  	
    		function refreshPage() { 
-       		location.href = '<c:url value="/monitoring/displayVsaAllocate.do?sessionMapID=${sessionMapID}"/>';	
+       		location.reload();
    		}
 
    		function closePage() { 

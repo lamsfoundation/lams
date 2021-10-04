@@ -69,10 +69,10 @@
 
 <!-- Notifications -->  
 <div class="row no-gutter">
-	<div class="col-md-6 col-lg-4 ">
+	<div class="col-md-4 col-lg-4 ">
 	</div>
 	
-	<div class="col-xs-12 col-md-6 col-lg-4 col-lg-offset-2">
+	<div class="col-xs-12 col-md-8 col-lg-6 col-lg-offset-2">
 		<a href="#nogo" type="button" class="btn btn-sm btn-default buttons_column"
 				onclick="javascript:loadTab('iraAssessment'); return false;">
 			<i class="fa fa-undo"></i>
@@ -86,6 +86,12 @@
 			<i class="fa fa-file"></i>
 			<fmt:message key="label.excel.export"/>
 		</a>
+		<c:if test="${vsaPresent}">
+			<a class="btn btn-sm btn-default buttons_column" target="_blank"
+			   href='<c:url value="/monitoring/displayVsaAllocate.do?toolContentID=${toolContentID}"/>'>
+				<fmt:message key="label.vsa.allocate.button" />
+			</a>
+		</c:if>
 	</div>
 </div>
 <br>
