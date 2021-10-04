@@ -33,6 +33,11 @@
 				background-color: initial;
 				border: none;
 			}
+			
+			#bottom-buttons {
+				text-align: right;
+				margin: 10px 10px 10px 0;
+			}
 		</style>
 		
 		<script>
@@ -304,7 +309,11 @@
         			self.parent.tb_remove();
         		}
     		}
-
+    		
+    		function refreshQuestionSummaryPage()  { 
+        		location.reload();
+    		}
+    		
     		function responseFormatter (cellvalue) {
         		var codeStyle = ${empty questionDto.codeStyle ? 'null' : questionDto.codeStyle};
         		return codeStyle ? "<pre class='code-style' data-lang='${questionDto.codeStyleMime}'>" + cellvalue + "</pre>" : cellvalue;
@@ -454,10 +463,17 @@
 				</c:forEach>
 			</c:if>
 			
-			<a href="#nogo" onclick="refreshSummaryPage();" class="btn btn-default btn-sm voffset10 pull-right">
-				<fmt:message key="label.close" /> 
-			</a>
-
+			<div id="bottom-buttons">
+				<a href="#nogo" onclick="javascript:refreshQuestionSummaryPage()" class="btn btn-default btn-sm">
+					<i class="fa fa-refresh"></i>
+					<fmt:message key="label.refresh" /> 
+				</a>
+				
+				<a href="#nogo" onclick="javascript:refreshSummaryPage()" class="btn btn-default btn-sm loffset10">
+					<i class="fa fa-close"></i>
+					<fmt:message key="label.close" /> 
+				</a>
+			</div>
 		</div>
 		<!--closes content-->
 	
