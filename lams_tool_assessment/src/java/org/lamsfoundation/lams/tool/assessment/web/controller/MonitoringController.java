@@ -206,19 +206,25 @@ public class MonitoringController {
 
 	// display student choices only if all questions are multiple choice
 	boolean displayStudentChoices = true;
+	boolean vsaPresent = false;
 	int maxOptionsInQuestion = 0;
 
 	for (AssessmentQuestion question : assessment.getQuestions()) {
-	    if (question.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE) {
+	    if (displayStudentChoices && question.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE) {
 		int optionsInQuestion = question.getQbQuestion().getQbOptions().size();
 		if (optionsInQuestion > maxOptionsInQuestion) {
 		    maxOptionsInQuestion = optionsInQuestion;
 		}
 	    } else {
 		displayStudentChoices = false;
-		break;
+	    }
+
+	    if (question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS) {
+		vsaPresent = true;
 	    }
 	}
+
+	request.setAttribute("vsaPresent", vsaPresent);
 
 	request.setAttribute("displayStudentChoices", displayStudentChoices);
 	if (displayStudentChoices) {
@@ -299,6 +305,25 @@ public class MonitoringController {
 	request.setAttribute(AssessmentConstants.ATTR_QUESTION_SUMMARY, questionSummary);
 
 	return "pages/monitoring/parts/questionsummary";
+    }
+
+    @RequestMapping("/displayVsaAllocate")
+    public String displayVsaAllocate(HttpServletRequest request, HttpServletResponse response) {
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
+
+	Long contentId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
+	Assessment assessment = service.getAssessmentByContentId(contentId);
+
+	List<QuestionSummary> questionSummaries = new ArrayList<>();
+	for (AssessmentQuestion question : assessment.getQuestions()) {
+	    if (question.getType().equals(QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
+		QuestionSummary questionSummary = service.getQuestionSummary(contentId, question.getUid());
+		questionSummaries.add(questionSummary);
+	    }
+	}
+	request.setAttribute("questionSummaries", questionSummaries);
+
+	return "pages/monitoring/vsaAllocate";
     }
 
     @RequestMapping(path = "/allocateUserAnswer", method = RequestMethod.POST)
