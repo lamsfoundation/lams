@@ -246,14 +246,6 @@
             <logger category="org.springframework.beans.factory.annotation">
                 <level name="WARN"/>
             </logger>
-                       
-            <logger category="Owasp.CsrfGuard" use-parent-handlers="false">
-                <level name="WARN" />
-                <handlers>
-                    <handler name="LAMSFILE" />
-                    <handler name="LAMSCONSOLE" />
-                </handlers>
-            </logger>
             
             <!-- On production change below settings to INFO -->
             
