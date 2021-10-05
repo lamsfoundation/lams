@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-/* RuntimeStatsServlet.java,v 1.1 2015/04/28 11:52:07 marcin Exp */
 package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
@@ -28,7 +27,6 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.ThreadMXBean;
-import java.util.Date;
 import java.util.Locale;
 
 import javax.management.MBeanServer;
@@ -40,7 +38,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.util.NumberUtil;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 
 public class RuntimeStatsServlet extends HttpServlet {
@@ -49,89 +46,41 @@ public class RuntimeStatsServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	boolean isLongStats = WebUtil.readBooleanParam(request, "long", false);
-	String stats = null;
-	if (isLongStats) {
-	    if (log.isDebugEnabled()) {
-		log.debug("Getting long runtime stats");
-	    }
-	    stats = RuntimeStatsServlet.getLongStats();
-	} else {
-	    if (log.isDebugEnabled()) {
-		log.debug("Getting short runtime stats");
-	    }
-	    stats = RuntimeStatsServlet.getShortStats();
+	if (log.isDebugEnabled()) {
+	    log.debug("Getting runtime stats");
 	}
 
-	if (stats != null) {
-	    response.setContentType("text/plain;charset=utf-8");
-	    response.getWriter().write(stats);
-	}
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-	    throws ServletException, IOException {
-	doGet(request, response);
-    }
-
-    private static String getShortStats() {
-	StringBuilder resp = new StringBuilder();
-	Date date = new Date();
-	MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+	StringBuilder stats = new StringBuilder();
 	try {
-	    ObjectName dataSourceName = new ObjectName(
-		    "jboss.as.expr:subsystem=datasources,data-source=lams-ds,statistics=pool");
-	    int activeCount = Integer.parseInt((String) server.getAttribute(dataSourceName, "ActiveCount"));
-
-	    resp.append("Overall Status : OK");
-	    if (activeCount > 0) {
-		resp.append(" - DB connection established");
-	    }
-	    resp.append("\njvmRoute: ").append(SessionManager.getJvmRoute()).append("\n");
-	    resp.append("Active sessions [user/total]: ").append(SessionManager.getSessionUserCount()).append("/")
-		    .append(SessionManager.getSessionTotalCount()).append("\n");
-	    resp.append("Time of request: ").append(date);
-	} catch (Exception e) {
-	    log.error("Error while getting short runtime stats", e);
-	}
-
-	return resp.toString();
-    }
-
-    private static String getLongStats() {
-	StringBuilder resp = new StringBuilder();
-
-	MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-	try {
-	    resp.append("jvmRoute: ").append(SessionManager.getJvmRoute()).append("\n");
+	    MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+	    stats.append("jvmRoute: ").append(SessionManager.getJvmRoute()).append("\n");
 
 	    MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
 	    MemoryUsage memoryUsage = memoryBean.getHeapMemoryUsage();
-	    resp.append("Heap memory MB [init/used/committed/max]: ")
+	    stats.append("Heap memory MB [init/used/committed/max]: ")
 		    .append(RuntimeStatsServlet.toMB(memoryUsage.getInit())).append("/")
 		    .append(RuntimeStatsServlet.toMB(memoryUsage.getUsed())).append("/")
 		    .append(RuntimeStatsServlet.toMB(memoryUsage.getCommitted())).append("/")
 		    .append(RuntimeStatsServlet.toMB(memoryUsage.getMax())).append("\n");
 
 	    memoryUsage = memoryBean.getNonHeapMemoryUsage();
-	    resp.append("Non-heap memory MB [init/used/committed/max]: ")
+	    stats.append("Non-heap memory MB [init/used/committed/max]: ")
 		    .append(RuntimeStatsServlet.toMB(memoryUsage.getInit())).append("/")
 		    .append(RuntimeStatsServlet.toMB(memoryUsage.getUsed())).append("/")
 		    .append(RuntimeStatsServlet.toMB(memoryUsage.getCommitted())).append("/")
 		    .append(RuntimeStatsServlet.toMB(memoryUsage.getMax())).append("\n");
 
 	    ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
-	    resp.append("JVM threads [daemon/total/peak]: ").append(threadBean.getDaemonThreadCount()).append("/")
+	    stats.append("JVM threads [daemon/total/peak]: ").append(threadBean.getDaemonThreadCount()).append("/")
 		    .append(threadBean.getThreadCount()).append("/").append(threadBean.getPeakThreadCount())
 		    .append("\n");
 
 	    ObjectName connectorName = new ObjectName("jboss.as.expr:subsystem=io,worker=default");
 	    String busyThreads = (String) server.getAttribute(connectorName, "ioThreads");
 	    String maxThreads = (String) server.getAttribute(connectorName, "taskMaxThreads");
-	    resp.append("IO threads [io/task max]: ").append(busyThreads).append("/").append(maxThreads).append("\n");
+	    stats.append("IO threads [io/task max]: ").append(busyThreads).append("/").append(maxThreads).append("\n");
 
-	    resp.append("Active sessions [user/total]: ").append(SessionManager.getSessionUserCount()).append("/")
+	    stats.append("Active sessions [user/total]: ").append(SessionManager.getSessionUserCount()).append("/")
 		    .append(SessionManager.getSessionTotalCount()).append("\n");
 
 	    ObjectName dataSourceName = new ObjectName(
@@ -140,10 +89,10 @@ public class RuntimeStatsServlet extends HttpServlet {
 	    Integer activeConnections = Integer.parseInt((String) server.getAttribute(dataSourceName, "ActiveCount"));
 	    Integer availConnections = Integer.parseInt((String) server.getAttribute(dataSourceName, "AvailableCount"));
 	    String maxUsageTime = (String) server.getAttribute(dataSourceName, "MaxUsageTime");
-	    resp.append("Connection count [in use/idle/left]: ").append(inUseConnections).append("/")
+	    stats.append("Connection count [in use/idle/left]: ").append(inUseConnections).append("/")
 		    .append(activeConnections - inUseConnections).append("/")
 		    .append(availConnections - activeConnections).append("\n");
-	    resp.append("Connection max usage time ms: ").append(maxUsageTime).append("\n\n");
+	    stats.append("Connection max usage time ms: ").append(maxUsageTime).append("\n\n");
 
 	    // 2nd level cache general stats
 	    ObjectName cacheContainerName = new ObjectName(
@@ -152,16 +101,16 @@ public class RuntimeStatsServlet extends HttpServlet {
 	    if (isAvailable) {
 		Integer currentNumberOfEntriesInMemory = (Integer) server.getAttribute(cacheContainerName,
 			"currentNumberOfEntriesInMemory");
-		resp.append("Cache number of entries in memory: ").append(currentNumberOfEntriesInMemory).append("\n");
+		stats.append("Cache number of entries in memory: ").append(currentNumberOfEntriesInMemory).append("\n");
 		Long hits = (Long) server.getAttribute(cacheContainerName, "hits");
-		resp.append("Cache hits: ").append(hits).append("\n");
+		stats.append("Cache hits: ").append(hits).append("\n");
 		Long misses = (Long) server.getAttribute(cacheContainerName, "misses");
-		resp.append("Cache misses: ").append(misses).append("\n");
+		stats.append("Cache misses: ").append(misses).append("\n");
 		Double hitRatio = (Double) server.getAttribute(cacheContainerName, "hitRatio");
-		resp.append("Cache hit ratio: ").append(NumberUtil.formatLocalisedNumber(hitRatio, (Locale) null, 2))
+		stats.append("Cache hit ratio: ").append(NumberUtil.formatLocalisedNumber(hitRatio, (Locale) null, 2))
 			.append("\n");
 		Double readWriteRatio = (Double) server.getAttribute(cacheContainerName, "readWriteRatio");
-		resp.append("Cache read/write ratio: ")
+		stats.append("Cache read/write ratio: ")
 			.append(NumberUtil.formatLocalisedNumber(readWriteRatio, (Locale) null, 2)).append("\n\n");
 
 		// query cache stats
@@ -171,17 +120,17 @@ public class RuntimeStatsServlet extends HttpServlet {
 		if (isAvailable) {
 		    currentNumberOfEntriesInMemory = (Integer) server.getAttribute(cacheContainerName,
 			    "numberOfEntriesInMemory");
-		    resp.append("Query cache number of entries in memory: ").append(currentNumberOfEntriesInMemory)
+		    stats.append("Query cache number of entries in memory: ").append(currentNumberOfEntriesInMemory)
 			    .append("\n");
 		    hits = (Long) server.getAttribute(cacheContainerName, "hits");
-		    resp.append("Query cache hits: ").append(hits).append("\n");
+		    stats.append("Query cache hits: ").append(hits).append("\n");
 		    misses = (Long) server.getAttribute(cacheContainerName, "misses");
-		    resp.append("Query cache misses: ").append(misses).append("\n");
+		    stats.append("Query cache misses: ").append(misses).append("\n");
 		    hitRatio = (Double) server.getAttribute(cacheContainerName, "hitRatio");
-		    resp.append("Query cache hit ratio: ")
+		    stats.append("Query cache hit ratio: ")
 			    .append(NumberUtil.formatLocalisedNumber(hitRatio, (Locale) null, 2)).append("\n");
 		    readWriteRatio = (Double) server.getAttribute(cacheContainerName, "readWriteRatio");
-		    resp.append("Query cache read/write ratio: ")
+		    stats.append("Query cache read/write ratio: ")
 			    .append(NumberUtil.formatLocalisedNumber(readWriteRatio, (Locale) null, 2));
 		}
 	    }
@@ -189,7 +138,16 @@ public class RuntimeStatsServlet extends HttpServlet {
 	    log.error("Error while getting long runtime stats", e);
 	}
 
-	return resp.toString();
+	if (stats.length() > 0) {
+	    response.setContentType("text/plain;charset=utf-8");
+	    response.getWriter().write(stats.toString());
+	}
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
+	doGet(request, response);
     }
 
     private static long toMB(long bytes) {
