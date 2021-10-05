@@ -332,7 +332,6 @@ div#sequenceCanvas div.learner-icon-container div.learner-icon, div#sequenceCanv
 }
 
 #completedLearnersContainer div.learner-icon {
-  display: inline-block;
   margin-right: 5px;
 }
 
@@ -373,6 +372,7 @@ div#sequenceCanvas .activity-requires-attention {
 #completedLearnersContainer #completedLessonLearnersIcon {
   width: 35px;
   height: 35px;
+  margin-right: 5px;
 }
   
 
@@ -422,6 +422,7 @@ img#sequenceSearchedLearnerHighlighter {
 }
 
 div#completedLearnersContainer {
+	display: flex;
 	padding: 4px 0px 3px 5px;
 	border-top: $border-thin-dotted;
 }
