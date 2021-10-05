@@ -3,6 +3,7 @@ package org.lamsfoundation.lams.util.hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.context.internal.ManagedSessionContext;
+import org.hibernate.stat.Statistics;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.orm.hibernate5.SessionHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -51,6 +52,10 @@ public class HibernateSessionManager {
 	// if an open session is missing from Context, it creates it and binds it
 	// with TransactionAwareSessionContext#currentSession()
 	HibernateSessionManager.getSessionFactory().getCurrentSession();
+    }
+
+    public static Statistics getStatistics() {
+	return HibernateSessionManager.getSessionFactory().getStatistics();
     }
 
     private static SessionFactory getSessionFactory() {

@@ -37,7 +37,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.hibernate.stat.CacheRegionStatistics;
 import org.lamsfoundation.lams.util.NumberUtil;
+import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.session.SessionManager;
 
 public class RuntimeStatsServlet extends HttpServlet {
@@ -114,24 +116,18 @@ public class RuntimeStatsServlet extends HttpServlet {
 			.append(NumberUtil.formatLocalisedNumber(readWriteRatio, (Locale) null, 2)).append("\n\n");
 
 		// query cache stats
-		cacheContainerName = new ObjectName(
-			"org.wildfly.clustering.infinispan:type=Cache,name=\"default-query-results-region(local)\",manager=\"hibernate\",component=Statistics");
-		isAvailable = server.isRegistered(cacheContainerName);
-		if (isAvailable) {
-		    currentNumberOfEntriesInMemory = (Integer) server.getAttribute(cacheContainerName,
-			    "numberOfEntriesInMemory");
-		    stats.append("Query cache number of entries in memory: ").append(currentNumberOfEntriesInMemory)
-			    .append("\n");
-		    hits = (Long) server.getAttribute(cacheContainerName, "hits");
+		CacheRegionStatistics queryCacheStatistics = HibernateSessionManager.getStatistics()
+			.getQueryRegionStatistics("default-query-results-region");
+		if (queryCacheStatistics != null) {
+		    stats.append("Query cache number of entries in memory: ")
+			    .append(queryCacheStatistics.getElementCountInMemory()).append("\n");
+		    hits = queryCacheStatistics.getHitCount();
 		    stats.append("Query cache hits: ").append(hits).append("\n");
-		    misses = (Long) server.getAttribute(cacheContainerName, "misses");
+		    misses = queryCacheStatistics.getMissCount();
 		    stats.append("Query cache misses: ").append(misses).append("\n");
-		    hitRatio = (Double) server.getAttribute(cacheContainerName, "hitRatio");
+		    hitRatio = hits.doubleValue() / misses;
 		    stats.append("Query cache hit ratio: ")
 			    .append(NumberUtil.formatLocalisedNumber(hitRatio, (Locale) null, 2)).append("\n");
-		    readWriteRatio = (Double) server.getAttribute(cacheContainerName, "readWriteRatio");
-		    stats.append("Query cache read/write ratio: ")
-			    .append(NumberUtil.formatLocalisedNumber(readWriteRatio, (Locale) null, 2));
 		}
 	    }
 	} catch (Exception e) {

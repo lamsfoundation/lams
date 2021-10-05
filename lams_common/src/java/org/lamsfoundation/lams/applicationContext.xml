@@ -22,6 +22,7 @@
 		    <prop key="hibernate.cache.use_second_level_cache">true</prop>
             <prop key="javax.persistence.sharedCache.mode">ALL</prop>
             <prop key="hibernate.cache.infinispan.statistics">true</prop>
+            <prop key="hibernate.generate_statistics">true</prop>
             
             <!-- Only entity cache is fetched from WildFly container.
             	 Query and collection cache templates need to be modified here. -->
