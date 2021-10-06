@@ -55,7 +55,7 @@ public class RuntimeStatsServlet extends HttpServlet {
 	StringBuilder stats = new StringBuilder();
 	try {
 	    MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-		stats.append("Overall Status : OK").append("\n");
+	    stats.append("Overall Status : OK").append("\n");
 	    stats.append("jvmRoute: ").append(SessionManager.getJvmRoute()).append("\n");
 
 	    MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
@@ -126,7 +126,7 @@ public class RuntimeStatsServlet extends HttpServlet {
 		    stats.append("Query cache hits: ").append(hits).append("\n");
 		    misses = queryCacheStatistics.getMissCount();
 		    stats.append("Query cache misses: ").append(misses).append("\n");
-		    hitRatio = hits.doubleValue() / misses;
+		    hitRatio = hits.doubleValue() / (hits + misses);
 		    stats.append("Query cache hit ratio: ")
 			    .append(NumberUtil.formatLocalisedNumber(hitRatio, (Locale) null, 2)).append("\n");
 		}
