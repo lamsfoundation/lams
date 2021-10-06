@@ -109,6 +109,7 @@
 		
 	    $('#${appexTitleDisplay}').editable({
 	    	mode: 'inline',
+	    	onblur: 'ignore',
 	        type: 'text',
 	 	    validate: validateXEditable,
 	        success: function(response, newValue) {

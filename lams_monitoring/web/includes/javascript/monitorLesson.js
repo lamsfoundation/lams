@@ -105,6 +105,8 @@ function initLessonTab(){
 
 	//turn to inline mode for x-editable.js
 	$.fn.editable.defaults.mode = 'inline';
+	// do not cancel on clicking outside of box
+	$.fn.editable.defaults.onblur = 'ignore';
 	//enable renaming of lesson title  
 	$('#lesson-name-strong').editable({
 	    type: 'text',
