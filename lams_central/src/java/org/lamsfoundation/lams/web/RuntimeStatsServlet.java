@@ -55,6 +55,7 @@ public class RuntimeStatsServlet extends HttpServlet {
 	StringBuilder stats = new StringBuilder();
 	try {
 	    MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+		stats.append("Overall Status : OK").append("\n");
 	    stats.append("jvmRoute: ").append(SessionManager.getJvmRoute()).append("\n");
 
 	    MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
