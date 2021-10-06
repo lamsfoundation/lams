@@ -1500,7 +1500,7 @@ function forceComplete(currentActivityId, learners, x, y) {
 				// move the learner backwards
 				var msgString = LABELS.FORCE_COMPLETE_REMOVE_CONTENT
 						.replace('[0]', learnerNames).replace('[1]', targetActivityName);
-				$('#forceBackwardsMsg', '#forceBackwardsDialogContents').html(msgString);				
+				$('#forceBackwardsMsg', '#forceBackwardsDialog').html(msgString);				
 				$('#forceBackwardsDialog').data({
 					'learners' : learners,
 					'activityId': targetActivityId});
