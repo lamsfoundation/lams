@@ -60,7 +60,13 @@
 	
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h4 class="panel-title"><span class="float-left space-right">Q${i.index+1})</span> ${question.question}</h4>
+				<h4 class="panel-title">
+					<span class="float-left space-right">Q${i.index+1})</span>
+					<c:if test="${not empty question.title}">
+						<p><c:out value="${question.title}"  escapeXml="false" /></p>
+					</c:if>
+					${question.question}
+				</h4>
 			</div>
 			<div class="panel-body">
 				<div class="table-responsive">

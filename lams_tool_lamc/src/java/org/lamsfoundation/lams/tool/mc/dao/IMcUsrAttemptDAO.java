@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.mc.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.mc.dto.ToolOutputDTO;
 import org.lamsfoundation.lams.tool.mc.model.McUsrAttempt;
 
@@ -35,7 +36,7 @@ import org.lamsfoundation.lams.tool.mc.model.McUsrAttempt;
  *         </p>
  *
  */
-public interface IMcUsrAttemptDAO {
+public interface IMcUsrAttemptDAO extends IBaseDAO {
 
     /**
      * *

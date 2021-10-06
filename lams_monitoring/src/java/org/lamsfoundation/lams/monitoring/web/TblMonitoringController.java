@@ -75,6 +75,9 @@ public class TblMonitoringController {
     @Qualifier("laasseAssessmentService")
     private ICommonAssessmentService commonAssessmentService;
     @Autowired
+    @Qualifier("mcService")
+    private ICommonAssessmentService commonMcqService;
+    @Autowired
     @Qualifier("scratchieService")
     private ICommonScratchieService commonScratchieService;
 
@@ -105,15 +108,17 @@ public class TblMonitoringController {
 	setupAvailableActivityTypes(request, lessonActivities);
 	boolean isTraAvailable = (request.getAttribute("isScratchieAvailable") != null)
 		&& ((Boolean) request.getAttribute("isScratchieAvailable"));
-	boolean isIraAvailable = (request.getAttribute("isIraAssessmentAvailable") != null)
+	boolean isIraAssesmentAvailable = request.getAttribute("isIraAssessmentAvailable") != null
 		&& ((Boolean) request.getAttribute("isIraAssessmentAvailable"));
+	boolean isIraMcqAvailable = request.getAttribute("isIraMcqAvailable") != null
+		&& ((Boolean) request.getAttribute("isIraMcqAvailable"));
 	Long iraToolActivityId = request.getAttribute("iraToolActivityId") == null ? null
 		: (Long) request.getAttribute("iraToolActivityId");
 	Long traToolActivityId = request.getAttribute("traToolActivityId") == null ? null
 		: (Long) request.getAttribute("traToolActivityId");
 	Long leaderselectionToolActivityId = request.getAttribute("leaderselectionToolActivityId") == null ? null
 		: (Long) request.getAttribute("leaderselectionToolActivityId");
-	Long iraToolContentId = isIraAvailable
+	Long iraToolContentId = isIraMcqAvailable || isIraAssesmentAvailable
 		? activityDAO.find(ToolActivity.class, iraToolActivityId).getToolContentId()
 		: null;
 	Long traToolContentId = isTraAvailable
@@ -137,8 +142,12 @@ public class TblMonitoringController {
 	Grouping grouping = groupingActivity == null ? null : groupingActivity.getCreateGrouping();
 	Set<Group> groups = grouping == null ? null : grouping.getGroups();
 
-	Map<Integer, Integer> iraCorrectAnswerCountByUser = commonAssessmentService
-		.countCorrectAnswers(iraToolContentId);
+	Map<Integer, Integer> iraCorrectAnswerCountByUser = Map.of();
+	if (isIraMcqAvailable) {
+	    iraCorrectAnswerCountByUser = commonMcqService.countCorrectAnswers(iraToolContentId);
+	} else if (isIraAssesmentAvailable) {
+	    iraCorrectAnswerCountByUser = commonAssessmentService.countCorrectAnswers(iraToolContentId);
+	}
 
 	Set<TblGroupDTO> groupDtos = new TreeSet<>();
 	for (Group group : groups) {
@@ -507,7 +516,6 @@ public class TblMonitoringController {
 		    iraPassed = true;
 		    if (CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
 			request.setAttribute("isIraMcqAvailable", true);
-
 		    } else {
 			request.setAttribute("isIraAssessmentAvailable", true);
 		    }

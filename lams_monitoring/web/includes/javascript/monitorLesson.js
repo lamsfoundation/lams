@@ -105,6 +105,8 @@ function initLessonTab(){
 
 	//turn to inline mode for x-editable.js
 	$.fn.editable.defaults.mode = 'inline';
+	// do not cancel on clicking outside of box
+	$.fn.editable.defaults.onblur = 'ignore';
 	//enable renaming of lesson title  
 	$('#lesson-name-strong').editable({
 	    type: 'text',
@@ -1498,7 +1500,7 @@ function forceComplete(currentActivityId, learners, x, y) {
 				// move the learner backwards
 				var msgString = LABELS.FORCE_COMPLETE_REMOVE_CONTENT
 						.replace('[0]', learnerNames).replace('[1]', targetActivityName);
-				$('#forceBackwardsMsg', '#forceBackwardsDialogContents').html(msgString);				
+				$('#forceBackwardsMsg', '#forceBackwardsDialog').html(msgString);				
 				$('#forceBackwardsDialog').data({
 					'learners' : learners,
 					'activityId': targetActivityId});

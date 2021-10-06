@@ -26,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -55,6 +56,7 @@ import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.util.CellUtil;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
+import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -104,6 +106,7 @@ import org.lamsfoundation.lams.tool.mc.model.McSession;
 import org.lamsfoundation.lams.tool.mc.model.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.util.McSessionComparator;
 import org.lamsfoundation.lams.tool.mc.util.McStringComparator;
+import org.lamsfoundation.lams.tool.service.ICommonAssessmentService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.service.IQbToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -129,8 +132,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  * @author Ozgur Demirtas
  */
-public class McService
-	implements IMcService, ToolContentManager, ToolSessionManager, ToolRestManager, McAppConstants, IQbToolService {
+public class McService implements IMcService, ToolContentManager, ToolSessionManager, ToolRestManager, McAppConstants,
+	IQbToolService, ICommonAssessmentService {
     private static Logger logger = Logger.getLogger(McService.class.getName());
 
     private IMcContentDAO mcContentDAO;
@@ -942,7 +945,7 @@ public class McService
 		    // [+] if the questionDescription mark is modified
 		    for (McQuestionDTO modifiedQuestion : modifiedQuestionsMarksOnly) {
 			if (question.getUid().equals(modifiedQuestion.getUid())) {
-			    Integer newQuestionMark = Integer.valueOf(modifiedQuestion.getMark());
+			    int newQuestionMark = Integer.parseInt(modifiedQuestion.getMark());
 			    Integer oldQuestionMark = question.getMark();
 			    Integer newActualMark = (userAttempt.getMark() * newQuestionMark) / oldQuestionMark;
 
@@ -1055,7 +1058,7 @@ public class McService
 	    cell.setCellValue(rowCount);
 	    rowCount++;
 
-	    Double totalPercentage = 0d;
+	    double totalPercentage = 0d;
 	    for (QbOption option : question.getQbQuestion().getQbOptions()) {
 		int optionAttemptCount = getAttemptsCountPerOption(option.getUid(), question.getUid());
 		cell = row.createCell(count++);
@@ -1190,7 +1193,7 @@ public class McService
 	// class mean
 	Double[] totalPercents = totalPercentList.toArray(new Double[0]);
 	Arrays.sort(totalPercents);
-	Double sum = 0d;
+	double sum = 0d;
 	for (int i = 0; i < totalPercents.length; i++) {
 	    sum += totalPercents[i];
 	}
@@ -2032,6 +2035,31 @@ public class McService
     @Override
     public List<Number> getMarksArrayForLeaders(Long toolContentId) {
 	return mcUserDAO.getRawLeaderMarksByToolContentId(toolContentId);
+    }
+
+    @Override
+    public Collection<VsaAnswerDTO> getVsaAnswers(Long toolSessionId) {
+	return new ArrayList<>();
+    }
+
+    /**
+     * Counts how many questions were answered correctly by the given user, regardless of the mark given.
+     */
+    @Override
+    public Integer countCorrectAnswers(long toolContentId, int userId) {
+	McQueUsr user = getMcUserByContentId(Long.valueOf(userId), toolContentId);
+
+	return Long.valueOf(mcUsrAttemptDAO.getFinalizedUserAttempts(user.getUid()).stream()
+		.filter(McUsrAttempt::isAttemptCorrect).count()).intValue();
+
+    }
+
+    @Override
+    public Map<Integer, Integer> countCorrectAnswers(long toolContentId) {
+	return mcUsrAttemptDAO.findByProperty(McUsrAttempt.class, "qbToolQuestion.toolContentId", toolContentId)
+		.stream().filter(McUsrAttempt::isAttemptCorrect)
+		.collect(Collectors.groupingBy(a -> a.getMcQueUsr().getQueUsrId().intValue(),
+			Collectors.collectingAndThen(Collectors.toList(), List::size)));
     }
 
     // ****************** REST methods *************************

@@ -3430,7 +3430,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	Map<Integer, Integer> counts = new HashMap<>();
 	Assessment assessment = getAssessmentByContentId(toolContentId);
 	long assessmentUid = assessment.getUid();
-	long start = System.currentTimeMillis();
 	Collection<AssessmentResult> assessmentResults = assessmentResultDao.getLastAssessmentResults(assessmentUid);
 	for (AssessmentResult assessmentResult : assessmentResults) {
 	    AssessmentUser user = assessmentResult.getUser();
