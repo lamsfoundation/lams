@@ -2125,8 +2125,14 @@ function openLiveEdit(){
  * Adjusts sequence canvas (SVG) based on space available in the dialog.
  */
 function resizeSequenceCanvas(width, height){
-	var svg = $('svg.svg-learning-design', sequenceCanvas),
-		viewBoxParts = svg.attr('viewBox').split(' '),
+	var svg = $('svg.svg-learning-design', sequenceCanvas);
+	
+	if (svg.length === 0){
+		// skip resizing if the SVG has not loaded (yet)
+		return;
+	}
+	
+	var viewBoxParts = svg.attr('viewBox').split(' '),
 		svgHeight = +viewBoxParts[3],
 		sequenceCanvasHeight = learningDesignSvgFitScreen ? height - 140 : Math.max(svgHeight + 10, height - 140);
 	
