@@ -48,7 +48,7 @@
 									 id="image-${item.uid}-${optionDto.qbOptionUid}">
 							</c:when>
 							<c:otherwise>
-								<a href="#nogo" 
+								<a href="#nogo" data-item-uid="${item.uid}" data-option-uid="${optionDto.qbOptionUid}"
 								    <c:choose>
 								    	<c:when test="${scratchie.revealOnDoubleClick}">
 								    		onDblClick=
@@ -59,11 +59,10 @@
 								    </c:choose>
 								    <%-- call this function either on click or double click --%>
 								    "scratchMcq(${item.uid}, ${optionDto.qbOptionUid}); return false;"
-									
-									
-									id="imageLink-${item.uid}-${optionDto.qbOptionUid}"> <img
-									src="<lams:WebAppURL/>includes/images/answer-${status.index + 1}.png" class="scartchie-image"
-									id="image-${item.uid}-${optionDto.qbOptionUid}" />
+								    
+									id="imageLink-${item.uid}-${optionDto.qbOptionUid}" class="scratchie-link">
+									<img src="<lams:WebAppURL/>includes/images/answer-${status.index + 1}.png"
+										class="scartchie-image"	id="image-${item.uid}-${optionDto.qbOptionUid}" />
 								</a>
 							</c:otherwise>
 						</c:choose> 

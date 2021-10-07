@@ -27,7 +27,7 @@
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/circle.css" />
 	<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>includes/css/scratchie-learning.css" />
-	
+
 	<!-- ********************  javascript ********************** -->
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
@@ -86,7 +86,16 @@
 					etherpadInitMethods[groupId]();
 				}
 			});
-
+			
+			<c:if test="${scratchie.revealOnDoubleClick}">
+				$('.scratchie-link').on('touchend', function(){
+					// allow single touch scratching on iPads even if double click scratching is enabled
+					var itemUid = $(this).data('itemUid'),
+						optionUid = $(this).data('optionUid');
+					scratchMcq(itemUid, optionUid);
+				});
+			</c:if>
+			
 			// hide Finish button for non-leaders until leader finishes
 			if (${hideFinishButton}) {
 				$("#finishButton").hide();
@@ -277,10 +286,17 @@
 
 		//a direct replacement for Java's String.hashCode() method 
 		function hashCode(str) {
-			return str.split('').reduce((prevHash, currVal) =>
-		    	(((prevHash << 5) - prevHash) + currVal.charCodeAt(0))|0, 0);
+			var hash = 0;
+		    if (this.length == 0) {
+		        return hash;
+		    }
+		    for (var i = 0; i < this.length; i++) {
+		        var char = this.charCodeAt(i);
+		        hash = ((hash<<5)-hash)+char;
+		        hash = hash & hash; // Convert to 32bit integer
+		    }
+		    return hash;
 		}
-
 
 		<c:if test="${mode != 'teacher'}">
 			// time limit feature
