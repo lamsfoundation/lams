@@ -247,8 +247,9 @@
 				initSequenceTab();
 				initLearnersTab();
 				initGradebookTab();
-				refreshMonitor();
 			}
+
+			refreshMonitor();
 
 			// remove "loading..." screen
 			$('#loadingOverlay').remove();
