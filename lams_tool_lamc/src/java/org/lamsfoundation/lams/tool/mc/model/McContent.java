@@ -126,11 +126,11 @@ public class McContent implements Serializable {
 
     @OneToMany(mappedBy = "mcContent", cascade = CascadeType.ALL)
     @SortComparator(QbToolQuestion.QbToolQuestionComparator.class)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<McQueContent> mcQueContents;
 
     @OneToMany(mappedBy = "mcContent", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<McSession> mcSessions;
 
     /** full constructor */

@@ -81,7 +81,7 @@ public class Organisation implements Serializable, Comparable<Organisation> {
     private User createdBy;
 
     @OneToMany(mappedBy = "organisationID", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<WorkspaceFolder> workspaceFolders = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -89,16 +89,16 @@ public class Organisation implements Serializable, Comparable<Organisation> {
     private OrganisationType organisationType;
 
     @OneToMany(mappedBy = "organisation", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<UserOrganisation> userOrganisations = new HashSet<>();
 
     @OneToMany(mappedBy = "parentOrganisation", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<Organisation> childOrganisations = new HashSet<>();
 
     @OneToMany(mappedBy = "organisation", cascade = CascadeType.ALL, orphanRemoval = true)
     @LazyCollection(LazyCollectionOption.EXTRA)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<Lesson> lessons = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

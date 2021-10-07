@@ -59,7 +59,7 @@ public abstract class ComplexActivity extends Activity implements Serializable {
     @OneToMany(mappedBy = "parentActivity", fetch = FetchType.EAGER)
     @Cascade(CascadeType.SAVE_UPDATE)
     @SortComparator(ActivityOrderComparator.class)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<Activity> activities = new TreeSet<>(new ActivityOrderComparator());
 
     @OneToOne(fetch = FetchType.LAZY)

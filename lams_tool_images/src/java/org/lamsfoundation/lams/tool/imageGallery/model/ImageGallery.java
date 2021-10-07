@@ -103,7 +103,7 @@ public class ImageGallery implements Serializable, Cloneable {
     @OneToMany(cascade = CascadeType.ALL)
     @OrderBy("order_id ASC")
     @JoinColumn(name = "tool_content_id", referencedColumnName = "content_id")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<LearnerItemRatingCriteria> ratingCriterias = new HashSet<>();
 
     @Column(name = "reflect_on_activity")

@@ -102,7 +102,7 @@ public class TaskList implements Cloneable {
     @OneToMany(cascade = CascadeType.ALL)
     @OrderBy("sequence_id ASC")
     @JoinColumn(name = "taskList_uid")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<TaskListCondition> conditions = new HashSet<TaskListCondition>();
 
     @Column(name = "create_date")

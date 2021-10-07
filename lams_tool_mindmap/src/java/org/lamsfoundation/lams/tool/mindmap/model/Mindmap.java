@@ -117,7 +117,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     private String galleryWalkInstructions;
 
     @OneToMany(mappedBy = "mindmap")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<MindmapSession> mindmapSessions;
 
     // Constructors

@@ -84,7 +84,7 @@ public class SurveyQuestion implements Cloneable {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "question_uid")
     @OrderBy("sequence_id")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<SurveyOption> options = new HashSet<SurveyOption>();
 
     @Column(name = "create_date")

@@ -101,7 +101,7 @@ public class Daco implements Cloneable {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "daco", cascade = CascadeType.ALL)
     @OrderBy("uid ASC")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<DacoQuestion> dacoQuestions = new LinkedHashSet<>();
 
     @Column(name = "reflect_on_activity")

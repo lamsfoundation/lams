@@ -94,12 +94,12 @@ public class Notebook implements java.io.Serializable, Cloneable {
     private Long toolContentId;
 
     @OneToMany(mappedBy = "notebook")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<NotebookSession> notebookSessions = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "content_uid")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<NotebookCondition> conditions = new TreeSet<>(new TextSearchConditionComparator());
 
     public Long getUid() {

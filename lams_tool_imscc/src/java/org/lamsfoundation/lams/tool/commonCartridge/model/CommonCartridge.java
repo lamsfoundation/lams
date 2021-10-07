@@ -103,7 +103,7 @@ public class CommonCartridge implements Cloneable {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "commonCartridge_uid")
     @OrderBy("create_date DESC")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<CommonCartridgeItem> commonCartridgeItems = new HashSet<>();;
 
     @Column(name = "reflect_on_activity")

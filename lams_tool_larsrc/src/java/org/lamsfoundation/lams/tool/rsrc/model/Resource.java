@@ -130,7 +130,7 @@ public class Resource implements Cloneable, Serializable {
     @OneToMany(cascade = CascadeType.ALL)
     @OrderBy("order_id ASC")
     @JoinColumn(name = "tool_content_id", referencedColumnName = "content_id")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<LearnerItemRatingCriteria> ratingCriterias = new HashSet<>();
 
     // *************** NON Persist Fields ********************

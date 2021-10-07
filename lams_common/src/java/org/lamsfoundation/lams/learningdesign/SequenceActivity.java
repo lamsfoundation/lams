@@ -61,7 +61,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
     private static Logger log = Logger.getLogger(SequenceActivity.class);
 
     @OneToMany(mappedBy = "branchSequenceActivity", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<BranchActivityEntry> branchEntries = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER)

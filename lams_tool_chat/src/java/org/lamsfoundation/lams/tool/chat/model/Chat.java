@@ -100,12 +100,12 @@ public class Chat implements java.io.Serializable, Cloneable {
     private Date submissionDeadline;
 
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<ChatSession> chatSessions = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "content_uid")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<ChatCondition> conditions = new TreeSet<>(new TextSearchConditionComparator());
 
     public Chat() {

@@ -93,7 +93,7 @@ public class Scribe implements java.io.Serializable, Cloneable {
     private Long toolContentId;
 
     @OneToMany(mappedBy = "scribe")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<ScribeSession> scribeSessions;
 
     @OneToMany(mappedBy = "scribe", cascade = CascadeType.ALL, orphanRemoval = true)

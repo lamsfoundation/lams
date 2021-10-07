@@ -260,7 +260,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     @ManyToMany
     @JoinTable(name = "lams_input_activity", joinColumns = @JoinColumn(name = "activity_id"), inverseJoinColumns = @JoinColumn(name = "input_activity_id"))
     @OrderBy("activity_id")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<Activity> inputActivities = new HashSet<>();
 
     /**
@@ -268,7 +268,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
      * LDEV-1910)
      */
     @OneToMany(mappedBy = "branchingActivity", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<BranchActivityEntry> branchActivityEntries = new HashSet<>();
 
     // ---------------------------------------------------------------------

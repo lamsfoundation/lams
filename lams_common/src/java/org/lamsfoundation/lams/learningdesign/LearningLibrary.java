@@ -65,7 +65,7 @@ public class LearningLibrary implements Serializable {
     private Date createDateTime;
 
     @OneToMany(mappedBy = "learningLibrary")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<Activity> activities = new HashSet<Activity>();
 
     @Column(name = "valid_flag")

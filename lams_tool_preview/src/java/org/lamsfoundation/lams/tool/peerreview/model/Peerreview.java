@@ -86,7 +86,7 @@ public class Peerreview implements Serializable, Cloneable {
     @Cascade(CascadeType.ALL)
     @JoinColumn(name = "tool_content_id", referencedColumnName = "content_id")
     @OrderBy("orderId asc")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<LearnerItemRatingCriteria> ratingCriterias;
 
     @Column(name = "lock_on_finished")

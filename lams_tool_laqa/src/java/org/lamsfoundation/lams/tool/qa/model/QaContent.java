@@ -133,21 +133,21 @@ public class QaContent implements Serializable {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "tool_content_id", referencedColumnName = "qa_content_id")
     @OrderBy("orderId asc")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<LearnerItemRatingCriteria> ratingCriterias;
 
     @OneToMany(mappedBy = "qaContent", cascade = CascadeType.ALL)
     @OrderBy("displayOrder")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<QaQueContent> qaQueContents;
 
     @OneToMany(mappedBy = "qaContent", cascade = CascadeType.ALL)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<QaSession> qaSessions;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "content_uid")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<QaCondition> conditions;
 
     public QaContent() {

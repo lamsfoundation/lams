@@ -159,12 +159,12 @@ public class QbQuestion implements Serializable, Cloneable {
     @OneToMany(mappedBy = "qbQuestion", cascade = CascadeType.ALL)
     @Fetch(FetchMode.SUBSELECT)
     @OrderBy("displayOrder")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private List<QbOption> qbOptions = new ArrayList<>();
 
     @OneToMany(mappedBy = "qbQuestion", cascade = CascadeType.ALL)
     @Fetch(FetchMode.SUBSELECT)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private List<QbQuestionUnit> units = new ArrayList<>();
 
     // non-persistent field, useful for displaying other versions of this question

@@ -116,13 +116,13 @@ public class Survey implements Cloneable {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "survey_uid")
     @OrderBy("sequence_id")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<SurveyQuestion> questions = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "content_uid")
     @SortComparator(TextSearchConditionComparator.class)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<SurveyCondition> conditions = new TreeSet<>(new TextSearchConditionComparator());
 
     public static Survey newInstance(Survey defaultContent, Long contentId) {

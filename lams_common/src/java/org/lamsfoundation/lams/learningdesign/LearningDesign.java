@@ -146,24 +146,24 @@ public class LearningDesign implements Serializable {
     private LearningDesign originalLearningDesign;
 
     @OneToMany(mappedBy = "learningDesign")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<Lesson> lessons = new HashSet<>();
 
     @OneToMany(mappedBy = "learningDesign", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<Transition> transitions = new HashSet<>();
 
     @OneToMany(mappedBy = "learningDesign", cascade = CascadeType.ALL, orphanRemoval = true)
     @SortComparator(ActivityOrderComparator.class)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<Activity> activities = new TreeSet<>(new ActivityOrderComparator());
 
     @OneToMany(mappedBy = "learningDesign", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<Competence> competences = new HashSet<>();
 
     @OneToMany(mappedBy = "learningDesignId", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<LearningDesignAnnotation> annotations = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

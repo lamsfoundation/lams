@@ -104,7 +104,7 @@ public class Zoom implements java.io.Serializable, Cloneable {
     private String meetingPassword;
 
     @OneToMany(mappedBy = "zoom")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<ZoomSession> zoomSessions;
 
     public Long getUid() {

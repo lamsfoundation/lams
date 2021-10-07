@@ -90,7 +90,7 @@ public class Scratchie implements Cloneable {
     @OneToMany
     @JoinColumn(name = "scratchie_uid")
     @SortComparator(QbToolQuestion.QbToolQuestionComparator.class)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<ScratchieItem> scratchieItems = new TreeSet<>();
 
     @Column(name = "burning_questions_enabled")

@@ -106,7 +106,7 @@ public class Tool implements Serializable {
 
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "tool_id")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<ExtServerToolAdapterMap> mappedServers = new HashSet<ExtServerToolAdapterMap>();
 
     @Column(name = "grouping_support_type_id")

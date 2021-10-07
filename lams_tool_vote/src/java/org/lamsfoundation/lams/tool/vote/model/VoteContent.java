@@ -108,11 +108,11 @@ public class VoteContent implements Serializable {
 
     @OneToMany(mappedBy = "voteContent", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("displayOrder")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<VoteQueContent> voteQueContents;
 
     @OneToMany(mappedBy = "voteContent", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<VoteSession> voteSessions;
 
     @Column(name = "submission_deadline")

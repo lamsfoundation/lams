@@ -76,7 +76,7 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
     private Long toolContentId;
 
     @OneToMany(mappedBy = "leaderselection")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<LeaderselectionSession> leaderselectionSessions = new HashSet<>();
 
     public Long getUid() {

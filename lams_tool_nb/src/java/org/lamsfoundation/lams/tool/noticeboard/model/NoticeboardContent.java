@@ -101,7 +101,7 @@ public class NoticeboardContent implements Serializable {
     private boolean allowAnonymous;
 
     @OneToMany(mappedBy = "nbContent", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<NoticeboardSession> nbSessions;
 
     /** default constructor */
