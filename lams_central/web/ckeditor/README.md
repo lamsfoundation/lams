@@ -299,3 +299,17 @@ Remove from ckeditor.js
 a.changeAttr("aria-label",c);c&&a.changeAttr("title",c)
 ```
 (As in [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=4f3c21320d4784bc94f86b946f1fd304ce442b01](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=4f3c21320d4784bc94f86b946f1fd304ce442b01))
+
+- Fix error when editing image properties and there are no classes set  
+The error in JS console: "Failed to execute 'add' on 'DOMTokenList': The token provided must not be empty."  
+In ckeditor.js change
+
+```
+type:CKEDITOR.NODE_ELEMENT,addClass:g?function(a){this.$.classList.(a);return this}
+```
+to
+
+```
+type:CKEDITOR.NODE_ELEMENT,addClass:g?function(a){if(a)this.$.classList.(a);return this}
+```
+(As in [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=cfec5d4c0ffe681e5e2604dc1163b309974e21f0](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=cfec5d4c0ffe681e5e2604dc1163b309974e21f0))  
