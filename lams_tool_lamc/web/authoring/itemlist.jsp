@@ -35,6 +35,9 @@
 				<a href="#nogo" id="importQTILink"  onClick="javascript:importQTI()" class="btn btn-default" id="importQTI">
 					<fmt:message key="label.authoring.import.qti" />
 				</a>
+				<a href="#nogo" onClick="javascript:exportQTI()" class="btn btn-default">
+					<fmt:message key="label.authoring.export.qti" />
+				</a>
 			</c:if>
 		</div>
 	</div>

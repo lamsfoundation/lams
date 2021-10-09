@@ -39,6 +39,10 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
+import org.lamsfoundation.lams.questions.Answer;
+import org.lamsfoundation.lams.questions.Question;
+import org.lamsfoundation.lams.questions.QuestionExporter;
+import org.lamsfoundation.lams.questions.QuestionParser;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
@@ -94,7 +98,7 @@ public class AuthoringController {
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	return readDatabaseData(mcAuthoringForm, request, mode);
     }
-    
+
     /**
      * Set the defineLater flag so that learners cannot use content while we are editing. This flag is released when
      * updateContent is called.
@@ -106,7 +110,7 @@ public class AuthoringController {
 
 	return readDatabaseData(mcAuthoringForm, request, ToolAccessMode.TEACHER);
     }
-    
+
     /**
      * Common method for "unspecified" and "defineLater"
      */
@@ -813,4 +817,50 @@ public class AuthoringController {
 	return optionDtos;
     }
 
+    /**
+     * Prepares MC questions for QTI packing
+     */
+    @RequestMapping("/exportQTI")
+    public String exportQTI(HttpServletRequest request, HttpServletResponse response) {
+	String sessionMapId = request.getParameter(McAppConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapId);
+	request.setAttribute(McAppConstants.ATTR_SESSION_MAP_ID, sessionMapId);
+
+	List<McQuestionDTO> questionDtos = (List<McQuestionDTO>) sessionMap.get(McAppConstants.QUESTION_DTOS);
+	List<Question> questions = new LinkedList<>();
+
+	for (McQuestionDTO mcQuestion : questionDtos) {
+	    Question question = new Question();
+
+	    question.setType(Question.QUESTION_TYPE_MULTIPLE_CHOICE);
+	    question.setTitle(mcQuestion.getName());
+	    question.setText(mcQuestion.getDescription());
+	    question.setFeedback(mcQuestion.getFeedback());
+	    
+	    QbQuestion qbQuestion = qbService.getQuestionByUid(mcQuestion.getQbQuestionUid());
+	    question.setLabel(QuestionParser.UUID_LABEL_PREFIX + qbQuestion.getUuid());
+	    
+	    List<Answer> answers = new ArrayList<>();
+
+	    for (McOptionDTO mcAnswer : mcQuestion.getOptionDtos()) {
+		Answer answer = new Answer();
+		answer.setText(mcAnswer.getCandidateAnswer());
+		answer.setScore(
+			"Correct".equalsIgnoreCase(mcAnswer.getCorrect()) ? Float.parseFloat(mcQuestion.getMark()) : 0);
+
+		answers.add(answer);
+		question.setAnswers(answers);
+	    }
+
+	    // put the questionDescription in the right place
+	    questions.add(mcQuestion.getDisplayOrder() - 1, question);
+	}
+
+	String title = request.getParameter("title");
+	QuestionExporter exporter = new QuestionExporter(title, questions.toArray(Question.QUESTION_ARRAY_TYPE));
+	exporter.exportQTIPackage(request, response);
+
+	return null;
+    }
 }

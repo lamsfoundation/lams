@@ -85,6 +85,13 @@
 				});
 			}
 		});
+    }    
+    
+    function exportQTI() {
+    	var frame = document.getElementById("downloadFileDummyIframe"),
+    		title = encodeURIComponent(document.getElementsByName("title")[0].value);
+    	frame.src = '<lams:WebAppURL />authoring/exportQTI.do?sessionMapId=${sessionMapId}'
+    			+ '&title=' + title;
     }
 </script>
 
@@ -130,3 +137,6 @@
 		</div>
 	</div>
 </c:if>
+
+<!-- For exporting QTI packages -->
+<iframe id="downloadFileDummyIframe" style="display: none;"></iframe>
