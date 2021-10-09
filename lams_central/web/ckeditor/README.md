@@ -312,4 +312,4 @@ to
 ```
 type:CKEDITOR.NODE_ELEMENT,addClass:g?function(a){if(a)this.$.classList.(a);return this}
 ```
-(As in [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=eeda79bdd48109a22afef04c841d99ec832f9a72](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=eeda79bdd48109a22afef04c841d99ec832f9a72))  
+(As in [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=cfec5d4c0ffe681e5e2604dc1163b309974e21f0](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=cfec5d4c0ffe681e5e2604dc1163b309974e21f0))  
