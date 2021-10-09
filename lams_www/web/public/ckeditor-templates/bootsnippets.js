@@ -330,7 +330,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'<div class="row">' +
 		'    <div class="col-md-6">' +
 		'	    <div class="thumbnail">' +
-		'	        <img alt="" src="/lams/www/public/ckeditor-templates/images/stairs.jpg" style="width:100%">' +
+		'	        <img alt="" src="/lams/www/public/ckeditor-templates/images/stairs.jpg" style="width:100%" class="img-responsive" />' +
 		'	        <div class="caption">' +
 		'	          <p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>' +
 		'	        </div>' +
@@ -338,7 +338,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'	  </div>' +
 		'	  <div class="col-md-6">' +
 		'	    <div class="thumbnail">' +
-		'	        <img alt="" src="/lams/www/public/ckeditor-templates/images/study.jpg" style="width:100%">' +
+		'	        <img alt="" src="/lams/www/public/ckeditor-templates/images/study.jpg" style="width:100%" class="img-responsive" />' +
 		'	        <div class="caption">' +
 		'	          <p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>' +
 		'	        </div>' +
@@ -355,7 +355,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'<div class="row">' +
 		'    <div class="col-md-4">' +
 		'	    <div class="thumbnail">' +
-		'	        <img src="/lams/www/public/ckeditor-templates/images/math.jpg" alt="" style="width:100%">' +
+		'	        <img src="/lams/www/public/ckeditor-templates/images/math.jpg" alt="" style="width:100%" class="img-responsive" />' +
 		'	        <div class="caption">' +
 		'	          <p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>' +
 		'	        </div>' +
@@ -363,7 +363,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'	  </div>' +
 		'	  <div class="col-md-4">' +
 		'	    <div class="thumbnail">' +
-		'	        <img src="/lams/www/public/ckeditor-templates/images/ideas.jpg" alt="" style="width:100%">' +
+		'	        <img src="/lams/www/public/ckeditor-templates/images/ideas.jpg" alt="" style="width:100%" class="img-responsive" />' +
 		'	        <div class="caption">' +
 		'	          <p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>' +
 		'	        </div>' +
@@ -371,7 +371,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'	  </div>' +
 		'	  <div class="col-md-4">' +
 		'	    <div class="thumbnail">' +
-		'	        <img src="/lams/www/public/ckeditor-templates/images/cogs.jpg" alt="" style="width:100%">' +
+		'	        <img src="/lams/www/public/ckeditor-templates/images/cogs.jpg" alt="" style="width:100%" class="img-responsive" />' +
 		'	        <div class="caption">' +
 		'	          <p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>' +
 		'	        </div>' +
