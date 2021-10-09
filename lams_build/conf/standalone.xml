@@ -247,6 +247,18 @@
                 <level name="WARN"/>
             </logger>
             
+            <logger category="org.hibernate.engine.internal.StatisticalLoggingSessionEventListener">
+            	<level name="WARN"/>
+            </logger>
+           
+            <logger category="Owasp.CsrfGuard" use-parent-handlers="false">
+                <level name="WARN" />
+                <handlers>
+                    <handler name="LAMSFILE" />
+                    <handler name="LAMSCONSOLE" />
+                </handlers>
+            </logger>
+            
             <!-- On production change below settings to INFO -->
             
            	 <logger category="io.undertow.request">
@@ -255,14 +267,6 @@
             
             <logger category="org.springframework.web">
                 <level name="DEBUG"/>
-            </logger>
-            
-            <logger category="Owasp.CsrfGuard" use-parent-handlers="false">
-                <level name="WARN" />
-                <handlers>
-                    <handler name="LAMSFILE" />
-                    <handler name="LAMSCONSOLE" />
-                </handlers>
             </logger>
             
             <logger category="org.hibernate.cache.internal.QueryResultsCacheImpl"
