@@ -37,7 +37,7 @@ public class ScratchieDAOHibernate extends LAMSBaseDAO implements ScratchieDAO {
 
     @Override
     public Scratchie getByContentId(Long contentId) {
-	List list = doFind(GET_RESOURCE_BY_CONTENTID, contentId);
+	List list = doFindCacheable(GET_RESOURCE_BY_CONTENTID, contentId);
 	if (list.size() > 0) {
 	    return (Scratchie) list.get(0);
 	} else {

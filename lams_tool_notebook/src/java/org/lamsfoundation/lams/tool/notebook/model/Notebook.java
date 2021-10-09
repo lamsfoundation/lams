@@ -39,6 +39,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.notebook.service.NotebookService;
 
@@ -92,11 +94,13 @@ public class Notebook implements java.io.Serializable, Cloneable {
     private Long toolContentId;
 
     @OneToMany(mappedBy = "notebook")
-    private Set<NotebookSession> notebookSessions = new HashSet<NotebookSession>();
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    private Set<NotebookSession> notebookSessions = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "content_uid")
-    private Set<NotebookCondition> conditions = new TreeSet<NotebookCondition>(new TextSearchConditionComparator());
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    private Set<NotebookCondition> conditions = new TreeSet<>(new TextSearchConditionComparator());
 
     public Long getUid() {
 	return uid;
@@ -236,10 +240,7 @@ public class Notebook implements java.io.Serializable, Cloneable {
 	if (this == other) {
 	    return true;
 	}
-	if (other == null) {
-	    return false;
-	}
-	if (!(other instanceof Notebook)) {
+	if ((other == null) || !(other instanceof Notebook)) {
 	    return false;
 	}
 	Notebook castOther = (Notebook) other;
@@ -272,10 +273,10 @@ public class Notebook implements java.io.Serializable, Cloneable {
 	    notebook.setUid(null);
 
 	    // create an empty set for the notebookSession
-	    notebook.notebookSessions = new HashSet<NotebookSession>();
+	    notebook.notebookSessions = new HashSet<>();
 
 	    if (conditions != null) {
-		Set<NotebookCondition> set = new TreeSet<NotebookCondition>(new TextSearchConditionComparator());
+		Set<NotebookCondition> set = new TreeSet<>(new TextSearchConditionComparator());
 		for (NotebookCondition condition : conditions) {
 		    set.add((NotebookCondition) condition.clone());
 		}

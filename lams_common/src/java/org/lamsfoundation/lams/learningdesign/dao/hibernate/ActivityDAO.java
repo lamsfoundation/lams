@@ -74,7 +74,7 @@ public class ActivityDAO extends LAMSBaseDAO implements IActivityDAO {
      */
     @Override
     public Activity getActivityByActivityId(Long activityId) {
-	Activity act = (Activity) super.find(Activity.class, activityId);
+	Activity act = super.find(Activity.class, activityId);
 	return getNonCGLibActivity(act);
     }
 
@@ -156,22 +156,14 @@ public class ActivityDAO extends LAMSBaseDAO implements IActivityDAO {
      */
     @Override
     public List getActivitiesByParentActivityId(Long parentActivityId) {
-	List list = this.doFind(ActivityDAO.FIND_BY_PARENT, parentActivityId);
+	List list = this.doFindCacheable(ActivityDAO.FIND_BY_PARENT, parentActivityId);
 	return list;
-    }
-
-    /*
-     * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.IActivityDAO#getAllActivities()
-     */
-    @Override
-    public List getAllActivities() {
-	return super.findAll(Activity.class);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public List<Activity> getActivitiesByLearningDesignId(Long learningDesignId) {
-	return this.doFind(ActivityDAO.FIND_BY_LEARNING_DESIGN_ID, learningDesignId);
+	return this.doFindCacheable(ActivityDAO.FIND_BY_LEARNING_DESIGN_ID, learningDesignId);
     }
 
     /**
@@ -183,7 +175,7 @@ public class ActivityDAO extends LAMSBaseDAO implements IActivityDAO {
      */
     @Override
     public List getGroupingActivitiesByLearningDesignId(Long learningDesignId) {
-	return this.doFind(ActivityDAO.FIND_GROUPINGACTIVITY_TYPE_BY_LEARNING_DESIGN_ID, learningDesignId);
+	return this.doFindCacheable(ActivityDAO.FIND_GROUPINGACTIVITY_TYPE_BY_LEARNING_DESIGN_ID, learningDesignId);
     }
 
     /*
@@ -225,6 +217,7 @@ public class ActivityDAO extends LAMSBaseDAO implements IActivityDAO {
 	    Query query = this.getSessionFactory().getCurrentSession().createQuery(ActivityDAO.FIND_BY_UI_ID);
 	    query.setInteger("uiid", id.intValue());
 	    query.setLong("ldId", designID.longValue());
+	    query.setCacheable(true);
 	    return getNonCGLibActivity((Activity) query.uniqueResult());
 	}
 	return null;
@@ -235,14 +228,14 @@ public class ActivityDAO extends LAMSBaseDAO implements IActivityDAO {
      */
     @Override
     public List getActivitiesByLibraryID(Long libraryID) {
-	List list = this.doFind(ActivityDAO.FIND_BY_LIBRARY_ID, libraryID);
+	List list = this.doFindCacheable(ActivityDAO.FIND_BY_LIBRARY_ID, libraryID);
 	return list;
     }
 
     /* @see org.lamsfoundation.lams.learningdesign.dao.IActivityDAO#getTemplateActivityByLibraryID(java.lang.Long) */
     @Override
     public Activity getTemplateActivityByLibraryID(Long libraryID) {
-	List list = this.doFind(ActivityDAO.FIND_BY_LIBRARY_ID, libraryID);
+	List list = this.doFindCacheable(ActivityDAO.FIND_BY_LIBRARY_ID, libraryID);
 	return list != null && list.size() != 0 ? (Activity) list.get(0) : null;
     }
 }

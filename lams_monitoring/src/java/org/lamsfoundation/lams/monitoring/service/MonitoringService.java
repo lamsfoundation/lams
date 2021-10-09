@@ -1925,13 +1925,13 @@ public class MonitoringService implements IMonitoringFullService {
     @SuppressWarnings("unchecked")
     @Override
     public List<EmailNotificationArchive> getArchivedEmailNotifications(Integer organisationId) {
-	return baseDAO.findByProperty(EmailNotificationArchive.class, "organisationId", organisationId);
+	return baseDAO.findByProperty(EmailNotificationArchive.class, "organisationId", organisationId, true);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public List<EmailNotificationArchive> getArchivedEmailNotifications(Long lessonId) {
-	return baseDAO.findByProperty(EmailNotificationArchive.class, "lessonId", lessonId);
+	return baseDAO.findByProperty(EmailNotificationArchive.class, "lessonId", lessonId, true);
     }
 
     @Override

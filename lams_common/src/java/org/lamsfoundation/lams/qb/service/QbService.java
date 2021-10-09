@@ -1,6 +1,8 @@
 package org.lamsfoundation.lams.qb.service;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.URLDecoder;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,11 +18,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
@@ -30,9 +36,11 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
+import org.lamsfoundation.lams.qb.QbConstants;
 import org.lamsfoundation.lams.qb.dao.IQbDAO;
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
+import org.lamsfoundation.lams.qb.form.QbQuestionForm;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
@@ -245,8 +253,8 @@ public class QbService implements IQbService {
 	    // mapping of user ID -> option UID
 	    Map<Integer, Long> activityAnswers = qbDAO.getAnswersForActivity(activity.getActivityId(), qbQuestionUid);
 	    // take only learners who finished (not only submitted) this activity
-	    userLessonGrades = userLessonGrades.stream().filter(g -> activityAnswers.containsKey(g.getLearner().getUserId()))
-		    .collect(Collectors.toList());
+	    userLessonGrades = userLessonGrades.stream()
+		    .filter(g -> activityAnswers.containsKey(g.getLearner().getUserId())).collect(Collectors.toList());
 	    participantCount = userLessonGrades.size();
 	    activityDTO.setParticipantCount(participantCount);
 
@@ -698,8 +706,8 @@ public class QbService implements IQbService {
      */
     @Override
     public void prepareQuestionForExport(QbQuestion qbQuestion) {
-	releaseFromCache(qbQuestion);
 	qbQuestion.clearID();
+	releaseFromCache(qbQuestion);
 	qbQuestion.setQuestionId(null);
 	qbQuestion.setVersion(null);
 	// use plain Java collections instead of Hibernate ones, so XML is more simple
@@ -773,6 +781,289 @@ public class QbService implements IQbService {
 	    versionMap.put(questionVersion.getVersion(), questionVersion.getUid());
 	}
 	qbQuestion.setVersionMap(versionMap);
+    }
+
+    /**
+     * Extract web form content to QB question.
+     *
+     * BE CAREFUL: This method will copy necessary info from request form to an old or new AssessmentQuestion
+     * instance. It gets all info EXCEPT AssessmentQuestion.createDate, which need be set when
+     * persisting this assessment Question.
+     *
+     * @return qbQuestionModified
+     */
+    @Override
+    public int extractFormToQbQuestion(QbQuestion qbQuestion, QbQuestionForm form, HttpServletRequest request) {
+	QbQuestion oldQuestion = qbQuestion.clone();
+	// evict everything manually as we do not use DTOs, just real entities
+	// without eviction changes would be saved immediately into DB
+	releaseFromCache(oldQuestion);
+	releaseFromCache(qbQuestion);
+
+	qbQuestion.setName(form.getTitle().strip());
+	qbQuestion.setDescription(form.getDescription().strip());
+
+	if (!form.isAuthoringRestricted()) {
+	    qbQuestion.setMaxMark(form.getMaxMark());
+	}
+	qbQuestion.setFeedback(form.getFeedback());
+	qbQuestion.setContentFolderId(form.getContentFolderID());
+
+	Integer type = form.getQuestionType();
+	if (type == QbQuestion.TYPE_MULTIPLE_CHOICE) {
+	    qbQuestion.setMultipleAnswersAllowed(form.isMultipleAnswersAllowed());
+	    boolean incorrectAnswerNullifiesMark = form.isMultipleAnswersAllowed()
+		    ? form.isIncorrectAnswerNullifiesMark()
+		    : false;
+	    qbQuestion.setIncorrectAnswerNullifiesMark(incorrectAnswerNullifiesMark);
+	    qbQuestion.setPenaltyFactor(Float.parseFloat(form.getPenaltyFactor()));
+	    qbQuestion.setShuffle(form.isShuffle());
+	    qbQuestion.setPrefixAnswersWithLetters(form.isPrefixAnswersWithLetters());
+	    qbQuestion.setFeedbackOnCorrect(form.getFeedbackOnCorrect());
+	    qbQuestion.setFeedbackOnPartiallyCorrect(form.getFeedbackOnPartiallyCorrect());
+	    qbQuestion.setFeedbackOnIncorrect(form.getFeedbackOnIncorrect());
+
+	} else if ((type == QbQuestion.TYPE_MATCHING_PAIRS)) {
+	    qbQuestion.setPenaltyFactor(Float.parseFloat(form.getPenaltyFactor()));
+	    qbQuestion.setShuffle(form.isShuffle());
+
+	} else if ((type == QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
+	    qbQuestion.setPenaltyFactor(Float.parseFloat(form.getPenaltyFactor()));
+	    qbQuestion.setCaseSensitive(form.isCaseSensitive());
+	    qbQuestion.setAutocompleteEnabled(form.isAutocompleteEnabled());
+
+	} else if ((type == QbQuestion.TYPE_NUMERICAL)) {
+	    qbQuestion.setPenaltyFactor(Float.parseFloat(form.getPenaltyFactor()));
+
+	} else if ((type == QbQuestion.TYPE_TRUE_FALSE)) {
+	    qbQuestion.setPenaltyFactor(Float.parseFloat(form.getPenaltyFactor()));
+	    qbQuestion.setCorrectAnswer(form.isCorrectAnswer());
+	    qbQuestion.setFeedbackOnCorrect(form.getFeedbackOnCorrect());
+	    qbQuestion.setFeedbackOnIncorrect(form.getFeedbackOnIncorrect());
+
+	} else if ((type == QbQuestion.TYPE_ESSAY)) {
+	    qbQuestion.setAllowRichEditor(form.isAllowRichEditor());
+	    qbQuestion.setMaxWordsLimit(form.getMaxWordsLimit());
+	    qbQuestion.setMinWordsLimit(form.getMinWordsLimit());
+	    qbQuestion.setCodeStyle(
+		    form.getCodeStyle() == null || form.getCodeStyle().equals(0) ? null : form.getCodeStyle());
+
+	} else if (type == QbQuestion.TYPE_ORDERING) {
+	    qbQuestion.setPenaltyFactor(Float.parseFloat(form.getPenaltyFactor()));
+	    qbQuestion.setFeedbackOnCorrect(form.getFeedbackOnCorrect());
+	    qbQuestion.setFeedbackOnIncorrect(form.getFeedbackOnIncorrect());
+
+	} else if (type == QbQuestion.TYPE_MARK_HEDGING) {
+	    qbQuestion.setShuffle(form.isShuffle());
+	    qbQuestion.setFeedbackOnCorrect(form.getFeedbackOnCorrect());
+	    qbQuestion.setFeedbackOnPartiallyCorrect(form.getFeedbackOnPartiallyCorrect());
+	    qbQuestion.setFeedbackOnIncorrect(form.getFeedbackOnIncorrect());
+	    qbQuestion.setHedgingJustificationEnabled(form.isHedgingJustificationEnabled());
+	}
+
+	// set options
+	if ((type == QbQuestion.TYPE_MULTIPLE_CHOICE) || (type == QbQuestion.TYPE_ORDERING)
+		|| (type == QbQuestion.TYPE_MATCHING_PAIRS) || (type == QbQuestion.TYPE_VERY_SHORT_ANSWERS)
+		|| (type == QbQuestion.TYPE_NUMERICAL) || (type == QbQuestion.TYPE_MARK_HEDGING)) {
+	    Set<QbOption> optionList = getOptionsFromRequest(request, true);
+	    List<QbOption> options = new ArrayList<>();
+	    int displayOrder = 0;
+	    for (QbOption option : optionList) {
+		option.setDisplayOrder(displayOrder++);
+		options.add(option);
+	    }
+	    qbQuestion.setQbOptions(options);
+	}
+	// set units
+	if (type == QbQuestion.TYPE_NUMERICAL) {
+	    Set<QbQuestionUnit> unitList = getUnitsFromRequest(request, true);
+	    List<QbQuestionUnit> units = new ArrayList<>();
+	    int displayOrder = 0;
+	    for (QbQuestionUnit unit : unitList) {
+		unit.setDisplayOrder(displayOrder++);
+		units.add(unit);
+	    }
+	    qbQuestion.setUnits(units);
+	}
+
+	return qbQuestion.isQbQuestionModified(oldQuestion);
+    }
+
+    /**
+     * Get answer options from <code>HttpRequest</code>
+     *
+     * @param request
+     * @param isForSaving
+     *            whether the blank options will be preserved or not
+     */
+    @Override
+    public TreeSet<QbOption> getOptionsFromRequest(HttpServletRequest request, boolean isForSaving) {
+	Map<String, String> paramMap = splitRequestParameter(request, QbConstants.ATTR_OPTION_LIST);
+
+	int count = NumberUtils.toInt(paramMap.get(QbConstants.ATTR_OPTION_COUNT));
+	int questionType = WebUtil.readIntParam(request, QbConstants.ATTR_QUESTION_TYPE);
+	Integer correctOptionIndex = (paramMap.get(QbConstants.ATTR_OPTION_CORRECT) == null) ? null
+		: NumberUtils.toInt(paramMap.get(QbConstants.ATTR_OPTION_CORRECT));
+
+	TreeSet<QbOption> optionList = new TreeSet<>();
+	for (int i = 0; i < count; i++) {
+
+	    String displayOrder = paramMap.get(QbConstants.ATTR_OPTION_DISPLAY_ORDER_PREFIX + i);
+	    //displayOrder is null, in case this item was removed using Remove button
+	    if (displayOrder == null) {
+		continue;
+	    }
+
+	    QbOption option = null;
+	    String uidStr = paramMap.get(QbConstants.ATTR_OPTION_UID_PREFIX + i);
+	    if (uidStr != null) {
+		Long uid = NumberUtils.toLong(uidStr);
+		option = getOptionByUid(uid);
+
+	    } else {
+		option = new QbOption();
+	    }
+	    option.setDisplayOrder(NumberUtils.toInt(displayOrder));
+
+	    if ((questionType == QbQuestion.TYPE_MULTIPLE_CHOICE)
+		    || (questionType == QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
+		String name = paramMap.get(QbConstants.ATTR_OPTION_NAME_PREFIX + i);
+		if ((name == null) && isForSaving) {
+		    continue;
+		}
+
+		option.setName(name);
+		float maxMark = Float.valueOf(paramMap.get(QbConstants.ATTR_OPTION_MAX_MARK_PREFIX + i));
+		option.setMaxMark(maxMark);
+		option.setFeedback(paramMap.get(QbConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
+
+	    } else if (questionType == QbQuestion.TYPE_MATCHING_PAIRS) {
+		String matchingPair = paramMap.get(QbConstants.ATTR_MATCHING_PAIR_PREFIX + i);
+		if ((matchingPair == null) && isForSaving) {
+		    continue;
+		}
+
+		option.setName(paramMap.get(QbConstants.ATTR_OPTION_NAME_PREFIX + i));
+		option.setMatchingPair(matchingPair);
+
+	    } else if (questionType == QbQuestion.TYPE_NUMERICAL) {
+		String numericalOptionStr = paramMap.get(QbConstants.ATTR_NUMERICAL_OPTION_PREFIX + i);
+		String acceptedErrorStr = paramMap.get(QbConstants.ATTR_OPTION_ACCEPTED_ERROR_PREFIX + i);
+		String maxMarkStr = paramMap.get(QbConstants.ATTR_OPTION_MAX_MARK_PREFIX + i);
+		if (numericalOptionStr.equals("0.0") && numericalOptionStr.equals("0.0") && maxMarkStr.equals("0.0")
+			&& isForSaving) {
+		    continue;
+		}
+
+		try {
+		    float numericalOption = Float.valueOf(numericalOptionStr);
+		    option.setNumericalOption(numericalOption);
+		} catch (Exception e) {
+		    option.setNumericalOption(0);
+		}
+		try {
+		    float acceptedError = Float.valueOf(acceptedErrorStr);
+		    option.setAcceptedError(acceptedError);
+		} catch (Exception e) {
+		    option.setAcceptedError(0);
+		}
+		float maxMark = Float.valueOf(paramMap.get(QbConstants.ATTR_OPTION_MAX_MARK_PREFIX + i));
+		option.setMaxMark(maxMark);
+		option.setFeedback(paramMap.get(QbConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
+
+	    } else if (questionType == QbQuestion.TYPE_ORDERING) {
+		String name = paramMap.get(QbConstants.ATTR_OPTION_NAME_PREFIX + i);
+		if ((name == null) && isForSaving) {
+		    continue;
+		}
+
+		option.setName(name);
+
+	    } else if (questionType == QbQuestion.TYPE_MARK_HEDGING) {
+		String name = paramMap.get(QbConstants.ATTR_OPTION_NAME_PREFIX + i);
+		if ((name == null) && isForSaving) {
+		    continue;
+		}
+
+		option.setName(name);
+		if ((correctOptionIndex != null) && correctOptionIndex.equals(Integer.valueOf(displayOrder))) {
+		    option.setCorrect(true);
+		}
+		option.setFeedback(paramMap.get(QbConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
+	    }
+
+	    optionList.add(option);
+	}
+
+//	//in case of VSA make sure it has 2 option groups, one of which having 0 maxMark
+//	if (questionType == QbQuestion.TYPE_VERY_SHORT_ANSWERS && optionList.size() == 1) {
+//	    QbOption option = new QbOption();
+//	    option.setDisplayOrder(1);
+//	    option.setName("");
+//	    option.setMaxMark(0);
+//	    option.setFeedback("");
+//	    optionList.add(option);
+//	}
+
+	return optionList;
+    }
+
+    /**
+     * Get units from <code>HttpRequest</code>
+     */
+    @Override
+    public TreeSet<QbQuestionUnit> getUnitsFromRequest(HttpServletRequest request, boolean isForSaving) {
+	Map<String, String> paramMap = splitRequestParameter(request, QbConstants.ATTR_UNIT_LIST);
+
+	int count = NumberUtils.toInt(paramMap.get(QbConstants.ATTR_UNIT_COUNT));
+	TreeSet<QbQuestionUnit> unitList = new TreeSet<>();
+	for (int i = 0; i < count; i++) {
+	    String name = paramMap.get(QbConstants.ATTR_UNIT_NAME_PREFIX + i);
+	    if (StringUtils.isBlank(name) && isForSaving) {
+		continue;
+	    }
+
+	    QbQuestionUnit unit = null;
+	    String uidStr = paramMap.get(QbConstants.ATTR_UNIT_UID_PREFIX + i);
+	    if (uidStr != null) {
+		Long uid = NumberUtils.toLong(uidStr);
+		unit = getQuestionUnitByUid(uid);
+
+	    } else {
+		unit = new QbQuestionUnit();
+	    }
+	    String displayOrder = paramMap.get(QbConstants.ATTR_UNIT_DISPLAY_ORDER_PREFIX + i);
+	    unit.setDisplayOrder(NumberUtils.toInt(displayOrder));
+	    unit.setName(name);
+	    float multiplier = Float.valueOf(paramMap.get(QbConstants.ATTR_UNIT_MULTIPLIER_PREFIX + i));
+	    unit.setMultiplier(multiplier);
+	    unitList.add(unit);
+	}
+
+	return unitList;
+    }
+
+    private Map<String, String> splitRequestParameter(HttpServletRequest request, String parameterName) {
+	String list = request.getParameter(parameterName);
+	if (list == null) {
+	    return null;
+	}
+
+	String[] params = list.split("&");
+	Map<String, String> paramMap = new HashMap<>();
+	String[] pair;
+	for (String item : params) {
+	    pair = item.split("=");
+	    if ((pair == null) || (pair.length != 2)) {
+		continue;
+	    }
+	    try {
+		paramMap.put(pair[0], URLDecoder.decode(pair[1], "UTF-8"));
+	    } catch (UnsupportedEncodingException e) {
+		log.error("Error occurs when decode instruction string:" + e.toString());
+	    }
+	}
+	return paramMap;
     }
 
     private static Integer getUserId() {

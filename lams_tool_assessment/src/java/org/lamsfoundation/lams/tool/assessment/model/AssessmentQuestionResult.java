@@ -82,7 +82,7 @@ public class AssessmentQuestionResult extends QbToolAnswer {
     @JoinColumn(name = "result_uid")
     private AssessmentResult assessmentResult;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "question_result_uid")
     private Set<AssessmentOptionAnswer> optionAnswers = new LinkedHashSet<>();
 

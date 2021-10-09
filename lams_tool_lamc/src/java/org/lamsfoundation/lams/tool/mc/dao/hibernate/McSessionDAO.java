@@ -47,7 +47,7 @@ public class McSessionDAO extends LAMSBaseDAO implements IMcSessionDAO {
     public McSession getMcSessionById(Long mcSessionId) {
 
 	List<?> list = getSessionFactory().getCurrentSession().createQuery(LOAD_MCSESSION_BY_MCSESSIONID)
-		.setParameter("mcSessionId", mcSessionId).list();
+		.setParameter("mcSessionId", mcSessionId).setCacheable(true).list();
 
 	if (list != null && list.size() > 0) {
 	    McSession mcs = (McSession) list.get(0);
@@ -74,7 +74,7 @@ public class McSessionDAO extends LAMSBaseDAO implements IMcSessionDAO {
     @Override
     public McSession getMcSessionByUser(final Long userId) {
 	return (McSession) getSession().createQuery(LOAD_MCSESSION_BY_USER).setParameter("userId", userId)
-		.uniqueResult();
+		.setCacheable(true).uniqueResult();
     }
 
 }

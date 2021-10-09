@@ -35,6 +35,7 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.UUID;
 
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;

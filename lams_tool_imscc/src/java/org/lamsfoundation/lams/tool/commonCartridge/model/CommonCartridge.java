@@ -45,6 +45,8 @@ import javax.persistence.Transient;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 
 /**
@@ -101,6 +103,7 @@ public class CommonCartridge implements Cloneable {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "commonCartridge_uid")
     @OrderBy("create_date DESC")
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<CommonCartridgeItem> commonCartridgeItems = new HashSet<>();;
 
     @Column(name = "reflect_on_activity")

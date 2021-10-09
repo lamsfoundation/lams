@@ -48,7 +48,7 @@ public class LearningLibraryDAO extends LAMSBaseDAO implements ILearningLibraryD
     @Override
     @SuppressWarnings("unchecked")
     public List<LearningLibrary> getAllLearningLibraries() {
-	return getSession().createQuery(LearningLibraryDAO.FIND_VALID_LIB).list();
+	return getSession().createQuery(LearningLibraryDAO.FIND_VALID_LIB).setCacheable(true).list();
     }
 
     @Override
@@ -57,7 +57,7 @@ public class LearningLibraryDAO extends LAMSBaseDAO implements ILearningLibraryD
 	if (valid) {
 	    return getAllLearningLibraries();
 	} else {
-	    return doFind(LearningLibraryDAO.FIND_ALL_LIB);
+	    return doFindCacheable(LearningLibraryDAO.FIND_ALL_LIB);
 	}
     }
 }

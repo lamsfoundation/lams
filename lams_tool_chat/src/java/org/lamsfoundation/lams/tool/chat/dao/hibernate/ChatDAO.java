@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.chat.dao.hibernate;
 
 import java.util.List;
@@ -41,7 +40,7 @@ public class ChatDAO extends LAMSBaseDAO implements IChatDAO {
 
     @Override
     public Chat getByContentId(Long toolContentId) {
-	List list = doFind(ChatDAO.FIND_FORUM_BY_CONTENTID, toolContentId);
+	List list = doFindCacheable(ChatDAO.FIND_FORUM_BY_CONTENTID, toolContentId);
 	if (list != null && list.size() > 0) {
 	    return (Chat) list.get(0);
 	} else {

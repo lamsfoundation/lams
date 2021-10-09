@@ -54,7 +54,7 @@ public class ScratchieSessionDAOHibernate extends LAMSBaseDAO implements Scratch
     @SuppressWarnings("rawtypes")
     @Override
     public ScratchieSession getSessionBySessionId(Long sessionId) {
-	List list = doFind(FIND_BY_SESSION_ID, sessionId);
+	List list = doFindCacheable(FIND_BY_SESSION_ID, sessionId);
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
@@ -64,7 +64,7 @@ public class ScratchieSessionDAOHibernate extends LAMSBaseDAO implements Scratch
     @Override
     @SuppressWarnings("unchecked")
     public List<ScratchieSession> getByContentId(Long toolContentId) {
-	List<ScratchieSession> sessions = doFind(FIND_BY_CONTENT_ID, toolContentId);
+	List<ScratchieSession> sessions = doFindCacheable(FIND_BY_CONTENT_ID, toolContentId);
 
 	Set<ScratchieSession> sortedSessions = new TreeSet<>(new ScratchieSessionComparator());
 	sortedSessions.addAll(sessions);

@@ -51,6 +51,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.SortComparator;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
@@ -183,17 +185,20 @@ public class Assessment implements Cloneable {
     @OneToMany
     @JoinColumn(name = "assessment_uid")
     @SortComparator(QbToolQuestion.QbToolQuestionComparator.class)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<AssessmentQuestion> questions = new TreeSet<>();
 
     // assessment questions references that form question list
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "assessment_uid")
     @OrderBy("sequence_id ASC")
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "assessment_uid")
     @OrderBy("sequence_id ASC")
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<AssessmentOverallFeedback> overallFeedbacks = new TreeSet<>(new SequencableComparator());
 
     // **********************************************************

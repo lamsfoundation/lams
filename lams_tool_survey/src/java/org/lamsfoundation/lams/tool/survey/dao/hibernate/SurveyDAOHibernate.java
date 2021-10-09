@@ -44,7 +44,7 @@ public class SurveyDAOHibernate extends LAMSBaseDAO implements SurveyDAO {
 
     @Override
     public Survey getByContentId(Long contentId) {
-	List list = doFind(SurveyDAOHibernate.GET_RESOURCE_BY_CONTENTID, contentId);
+	List list = doFindCacheable(SurveyDAOHibernate.GET_RESOURCE_BY_CONTENTID, contentId);
 	if (list.size() > 0) {
 	    return (Survey) list.get(0);
 	} else {

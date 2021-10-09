@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.assessment.model;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

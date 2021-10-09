@@ -39,7 +39,7 @@ public class ScratchieItemDAOHibernate extends LAMSBaseDAO implements ScratchieI
     @SuppressWarnings("unchecked")
     @Override
     public List<ScratchieItem> getAuthoringItems(Long scratchieUid) {
-	return (List<ScratchieItem>) doFind(FIND_AUTHORING_ITEMS, scratchieUid);
+	return doFindCacheable(FIND_AUTHORING_ITEMS, scratchieUid);
     }
 
     @Override

@@ -198,16 +198,6 @@
 	<!-- Build archives        		    	          					  -->
 	<!-- ================================================================ -->
 
-	<target name="_copy-hbm">
-		<echo>${ant.project.name}: Copying Hibernate mapping files</echo>
-		<copy todir="${basedir}/build/classes/java" overwrite="true">
-			<fileset dir="${conf.dir}/hibernate/mappings" erroronmissingdir="false">
-				<include name="**/*.hbm.xml"/>
-			</fileset>
-		</copy>
-	</target>
-					
-	
 	<target name="_copy-language" if="product.core">
 		<!-- Internal target: Copies language tags to build dir for easier EAR assembly.
 		     Required only for base products, not Tools -->
@@ -236,7 +226,7 @@
 	</target>
 	
 	
-	<target name="_build-jar" depends="_compile-java, _copy-hbm, _build-manifest, _copy-language">
+	<target name="_build-jar" depends="_compile-java, _build-manifest, _copy-language">
 		<!-- Internal target: Creates JAR file. -->
 		<echo>${ant.project.name}: Building JAR</echo>
 		<jar jarfile="${basedir}/build/lib/${product}.jar"

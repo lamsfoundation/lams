@@ -38,7 +38,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class ToolDAO extends LAMSBaseDAO implements IToolDAO {
-    private static final String FIND_ALL = "from obj in class " + Tool.class.getName();
     private static final String LOAD_TOOL_BY_SIG = "from tool in class Tool where tool.toolSignature=:toolSignature";
 
     /**
@@ -46,24 +45,23 @@ public class ToolDAO extends LAMSBaseDAO implements IToolDAO {
      */
     @Override
     public Tool getToolByID(Long toolID) {
-	return (Tool) getSession().get(Tool.class, toolID);
+	return getSession().get(Tool.class, toolID);
     }
 
     @Override
     public List getAllTools() {
-	return this.doFind(FIND_ALL);
+	return findAll(Tool.class);
     }
 
     @Override
     public Tool getToolBySignature(final String toolSignature) {
 	return (Tool) getSession().createQuery(LOAD_TOOL_BY_SIG).setString("toolSignature", toolSignature)
-		.uniqueResult();
+		.setCacheable(true).uniqueResult();
     }
 
     @Override
     public long getToolDefaultContentIdBySignature(final String toolSignature) {
-	Tool tool = (Tool) getSession().createQuery(LOAD_TOOL_BY_SIG).setString("toolSignature", toolSignature)
-		.uniqueResult();
+	Tool tool = getToolBySignature(toolSignature);
 
 	if (tool != null) {
 	    return tool.getDefaultToolContentId();
@@ -76,5 +74,4 @@ public class ToolDAO extends LAMSBaseDAO implements IToolDAO {
     public void saveOrUpdateTool(Tool tool) {
 	this.getSession().saveOrUpdate(tool);
     }
-
 }

@@ -38,6 +38,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.SortComparator;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 
@@ -124,9 +126,11 @@ public class McContent implements Serializable {
 
     @OneToMany(mappedBy = "mcContent", cascade = CascadeType.ALL)
     @SortComparator(QbToolQuestion.QbToolQuestionComparator.class)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<McQueContent> mcQueContents;
 
     @OneToMany(mappedBy = "mcContent", cascade = CascadeType.ALL, orphanRemoval = true)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<McSession> mcSessions;
 
     /** full constructor */

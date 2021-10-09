@@ -16,7 +16,8 @@ public class SignupDAO extends LAMSBaseDAO implements ISignupDAO {
 
     @Override
     public SignupOrganisation getSignupOrganisation(String context) {
-	List list = doFind("from SignupOrganisation s where s.disabled=" + Boolean.FALSE + " and s.context=?", context);
+	List list = doFindCacheable("from SignupOrganisation s where s.disabled=" + Boolean.FALSE + " and s.context=?",
+		context);
 	if (list != null && list.size() > 0) {
 	    return (SignupOrganisation) list.get(0);
 	}
@@ -32,7 +33,7 @@ public class SignupDAO extends LAMSBaseDAO implements ISignupDAO {
     public List<Organisation> getOrganisationCandidates() {
 	String query = "from Organisation o where o.organisationState.organisationStateId=" + OrganisationState.ACTIVE;
 	query += " and o.organisationType.organisationTypeId!=" + OrganisationType.ROOT_TYPE;
-	return (List<Organisation>) doFind(query);
+	return doFindCacheable(query);
     }
 
     @Override

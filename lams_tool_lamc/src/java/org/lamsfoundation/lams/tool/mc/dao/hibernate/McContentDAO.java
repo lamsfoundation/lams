@@ -39,18 +39,19 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class McContentDAO extends LAMSBaseDAO implements IMcContentDAO {
 
-    private static final String FIND_MC_CONTENT = "from " + McContent.class.getName() + " as mc where content_id=:mcContentId";
+    private static final String FIND_MC_CONTENT = "from " + McContent.class.getName()
+	    + " as mc where content_id=:mcContentId";
 
     @Override
     public McContent getMcContentByUID(Long uid) {
-	return (McContent) this.getSession().get(McContent.class, uid);
+	return this.getSession().get(McContent.class, uid);
     }
 
     @SuppressWarnings("rawtypes")
     @Override
     public McContent findMcContentById(Long mcContentId) {
 	List list = getSessionFactory().getCurrentSession().createQuery(FIND_MC_CONTENT)
-		.setParameter("mcContentId", mcContentId.longValue()).list();
+		.setParameter("mcContentId", mcContentId.longValue()).setCacheable(true).list();
 
 	if (list != null && list.size() > 0) {
 	    McContent mc = (McContent) list.get(0);

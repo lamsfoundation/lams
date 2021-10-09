@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.mindmap.dao.hibernate;
 
 import java.util.List;
@@ -43,7 +42,7 @@ public class MindmapDAO extends LAMSBaseDAO implements IMindmapDAO {
 
     @Override
     public Mindmap getByContentId(Long toolContentId) {
-	List list = doFind(MindmapDAO.FIND_MINDMAP_BY_CONTENTID, toolContentId);
+	List list = doFindCacheable(MindmapDAO.FIND_MINDMAP_BY_CONTENTID, toolContentId);
 	if (list != null && list.size() > 0) {
 	    return (Mindmap) list.get(0);
 	} else {

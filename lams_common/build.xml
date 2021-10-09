@@ -46,7 +46,17 @@
 		</sql>
 	</target>
 				
-
+	<target name="_build-jar" depends="_compile-java, _build-manifest, _copy-language">
+		<echo>${ant.project.name}: Copying persistence configuration</echo>
+		<copy todir="${basedir}/build/classes/java/META-INF" file="${conf.dir}/persistence.xml" overwrite="true" verbose="true" />
+		<!-- Internal target: Creates JAR file. -->
+		<echo>${ant.project.name}: Building JAR</echo>
+		<jar jarfile="${basedir}/build/lib/${product}.jar"
+			 manifest="${basedir}/build/MANIFEST.MF">
+			<fileset dir="${basedir}/build/classes/java" />
+		</jar>
+	</target>
+	
 	<target name="deploy-war" depends="_target-not-available"
 		    description="Deploys WAR." />
 	

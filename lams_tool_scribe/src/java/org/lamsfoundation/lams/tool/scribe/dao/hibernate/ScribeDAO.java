@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scribe.dao.hibernate;
 
 import java.util.List;
@@ -41,7 +40,7 @@ public class ScribeDAO extends LAMSBaseDAO implements IScribeDAO {
 
     @Override
     public Scribe getByContentId(Long toolContentId) {
-	List list = doFind(FIND_FORUM_BY_CONTENTID, toolContentId);
+	List list = doFindCacheable(FIND_FORUM_BY_CONTENTID, toolContentId);
 	if (list != null && list.size() > 0) {
 	    return (Scribe) list.get(0);
 	} else {

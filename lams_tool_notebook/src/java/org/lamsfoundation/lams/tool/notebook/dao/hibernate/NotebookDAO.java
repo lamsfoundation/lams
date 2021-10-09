@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.notebook.dao.hibernate;
 
 import java.util.List;
@@ -41,7 +40,7 @@ public class NotebookDAO extends LAMSBaseDAO implements INotebookDAO {
 
     @Override
     public Notebook getByContentId(Long toolContentId) {
-	List list = doFind(NotebookDAO.FIND_FORUM_BY_CONTENTID, toolContentId);
+	List list = doFindCacheable(NotebookDAO.FIND_FORUM_BY_CONTENTID, toolContentId);
 	if (list != null && list.size() > 0) {
 	    return (Notebook) list.get(0);
 	} else {

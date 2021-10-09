@@ -37,7 +37,7 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 public class RatingCriteriaDAO extends LAMSBaseDAO implements IRatingCriteriaDAO {
 
     private static final String FIND_BY_TOOL_CONTENT_ID = "FROM " + RatingCriteria.class.getName()
-	    + " AS r WHERE r.toolContentId=? order by r.orderId asc";
+	    + " AS r WHERE r.toolContentId= :toolContentId order by r.orderId asc";
 
     private static final String IS_COMMENTS_ENABLED_FOR_TOOL_CONTENT_ID = "SELECT COUNT(*) FROM "
 	    + RatingCriteria.class.getName() + " AS r WHERE r.toolContentId=? AND r.ratingStyle = 0";
@@ -64,7 +64,8 @@ public class RatingCriteriaDAO extends LAMSBaseDAO implements IRatingCriteriaDAO
 
     @Override
     public List<RatingCriteria> getByToolContentId(Long toolContentId) {
-	return (doFind(FIND_BY_TOOL_CONTENT_ID, new Object[] { toolContentId }));
+	return getSession().createQuery(FIND_BY_TOOL_CONTENT_ID, RatingCriteria.class)
+		.setParameter("toolContentId", toolContentId).setCacheable(true).getResultList();
     }
 
     @Override
@@ -119,9 +120,10 @@ public class RatingCriteriaDAO extends LAMSBaseDAO implements IRatingCriteriaDAO
 	return result == null ? 1 : result.intValue() + 1;
     }
 
+    @Override
     public List<String> getRubricsColumnHeaders(int groupId) {
 	return getSession().createQuery(GET_RUBRICS_COLUMN_HEADERS, String.class).setParameter("groupId", groupId)
-		.getResultList();
+		.setCacheable(true).getResultList();
     }
 
     @Override

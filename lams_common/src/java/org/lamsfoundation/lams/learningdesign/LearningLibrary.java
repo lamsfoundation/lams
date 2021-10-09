@@ -39,6 +39,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * @author Manpreet Minhas
@@ -63,6 +65,7 @@ public class LearningLibrary implements Serializable {
     private Date createDateTime;
 
     @OneToMany(mappedBy = "learningLibrary")
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<Activity> activities = new HashSet<Activity>();
 
     @Column(name = "valid_flag")

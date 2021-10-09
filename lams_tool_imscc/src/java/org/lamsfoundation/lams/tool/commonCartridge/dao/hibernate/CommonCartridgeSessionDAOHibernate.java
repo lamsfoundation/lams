@@ -40,7 +40,7 @@ public class CommonCartridgeSessionDAOHibernate extends LAMSBaseDAO implements C
 
     @Override
     public CommonCartridgeSession getSessionBySessionId(Long sessionId) {
-	List list = doFind(FIND_BY_SESSION_ID, sessionId);
+	List list = doFindCacheable(FIND_BY_SESSION_ID, sessionId);
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
@@ -50,7 +50,7 @@ public class CommonCartridgeSessionDAOHibernate extends LAMSBaseDAO implements C
     @Override
     @SuppressWarnings("unchecked")
     public List<CommonCartridgeSession> getByContentId(Long toolContentId) {
-	return (List<CommonCartridgeSession>) doFind(FIND_BY_CONTENT_ID, toolContentId);
+	return doFindCacheable(FIND_BY_CONTENT_ID, toolContentId);
     }
 
     @Override
@@ -62,5 +62,4 @@ public class CommonCartridgeSessionDAOHibernate extends LAMSBaseDAO implements C
     public void deleteBySessionId(Long toolSessionId) {
 	this.removeObject(CommonCartridgeSession.class, toolSessionId);
     }
-
 }

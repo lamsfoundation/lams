@@ -46,6 +46,8 @@ import javax.persistence.Transient;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 
 /**
@@ -100,6 +102,7 @@ public class TaskList implements Cloneable {
     @OneToMany(cascade = CascadeType.ALL)
     @OrderBy("sequence_id ASC")
     @JoinColumn(name = "taskList_uid")
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<TaskListCondition> conditions = new HashSet<TaskListCondition>();
 
     @Column(name = "create_date")

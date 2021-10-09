@@ -21,8 +21,6 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.forum.dao.hibernate;
 
 import java.util.List;
@@ -57,7 +55,7 @@ public class ForumToolSessionDao extends LAMSBaseDAO implements IForumToolSessio
 
     @Override
     public List<ForumToolSession> getByContentId(Long contentID) {
-	List list = this.doFind(SQL_QUERY_FIND_BY_CONTENT_ID, contentID);
+	List list = this.doFindCacheable(SQL_QUERY_FIND_BY_CONTENT_ID, contentID);
 	return list;
     }
 

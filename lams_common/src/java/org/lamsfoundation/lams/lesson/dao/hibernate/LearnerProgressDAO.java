@@ -126,7 +126,7 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 
     @Override
     public LearnerProgress getLearnerProgress(Long learnerProgressId) {
-	return (LearnerProgress) getSession().get(LearnerProgress.class, learnerProgressId);
+	return getSession().get(LearnerProgress.class, learnerProgressId);
     }
 
     @Override
@@ -338,7 +338,7 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
     public Map<Long, Integer> getNumUsersCurrentActivities(Long[] activityIds) {
 	List<Object[]> resultQuery = getSession().createQuery(LearnerProgressDAO.COUNT_CURRENT_ACTIVITY)
 		.setParameterList("activityIds", activityIds).list();
-	Map<Long, Integer> result = new TreeMap<Long, Integer>();
+	Map<Long, Integer> result = new TreeMap<>();
 	// put all requested activity IDs into the result
 	for (Long activityId : activityIds) {
 	    result.put(activityId, 0);
@@ -363,7 +363,7 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
     @Override
     public Integer getLearnerProgressArchiveMaxAttemptID(Integer userId, Long lessonId) {
 	Object value = getSession().createQuery(LearnerProgressDAO.FIND_PROGRESS_ARCHIVE_MAX_ATTEMPT)
-		.setInteger("learnerId", userId).setLong("lessonId", lessonId).uniqueResult();
+		.setInteger("learnerId", userId).setLong("lessonId", lessonId).setCacheable(true).uniqueResult();
 	return value == null ? null : ((Number) value).intValue();
     }
 
@@ -371,6 +371,6 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
     public LearnerProgressArchive getLearnerProgressArchive(Long lessonId, Integer userId, Date archiveDate) {
 	return (LearnerProgressArchive) getSession().createQuery(LearnerProgressDAO.FIND_PROGRESS_ARCHIVE_BY_DATE)
 		.setInteger("learnerId", userId).setLong("lessonId", lessonId).setTimestamp("archiveDate", archiveDate)
-		.uniqueResult();
+		.setCacheable(true).uniqueResult();
     }
 }

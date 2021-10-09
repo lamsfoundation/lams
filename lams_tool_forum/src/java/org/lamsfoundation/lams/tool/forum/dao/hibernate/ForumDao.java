@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.forum.dao.hibernate;
 
 import java.util.List;
@@ -51,7 +50,7 @@ public class ForumDao extends LAMSBaseDAO implements IForumDAO {
 
     @Override
     public Forum getById(Long forumId) {
-	return (Forum) getSession().get(Forum.class, forumId);
+	return getSession().get(Forum.class, forumId);
     }
 
     @Override
@@ -61,7 +60,7 @@ public class ForumDao extends LAMSBaseDAO implements IForumDAO {
 
     @Override
     public Forum getByContentId(Long contentID) {
-	List list = doFind(ForumDao.FIND_FORUM_BY_CONTENTID, contentID);
+	List list = doFindCacheable(ForumDao.FIND_FORUM_BY_CONTENTID, contentID);
 	if (list != null && list.size() > 0) {
 	    return (Forum) list.get(0);
 	} else {

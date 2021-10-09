@@ -40,7 +40,7 @@ public class SpreadsheetSessionDAOHibernate extends LAMSBaseDAO implements Sprea
 
     @Override
     public SpreadsheetSession getSessionBySessionId(Long sessionId) {
-	List list = doFind(FIND_BY_SESSION_ID, sessionId);
+	List list = doFindCacheable(FIND_BY_SESSION_ID, sessionId);
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
@@ -50,7 +50,7 @@ public class SpreadsheetSessionDAOHibernate extends LAMSBaseDAO implements Sprea
     @Override
     @SuppressWarnings("unchecked")
     public List<SpreadsheetSession> getByContentId(Long toolContentId) {
-	return (List<SpreadsheetSession>) doFind(FIND_BY_CONTENT_ID, toolContentId);
+	return doFindCacheable(FIND_BY_CONTENT_ID, toolContentId);
     }
 
     @Override

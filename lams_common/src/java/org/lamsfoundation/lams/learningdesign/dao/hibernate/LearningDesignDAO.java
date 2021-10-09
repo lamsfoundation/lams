@@ -64,7 +64,7 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
      */
     @Override
     public LearningDesign getLearningDesignById(Long learningDesignId) {
-	LearningDesign design = (LearningDesign) super.find(LearningDesign.class, learningDesignId);
+	LearningDesign design = super.find(LearningDesign.class, learningDesignId);
 	return design != null && !design.getRemoved() ? design : null;
     }
 
@@ -75,7 +75,8 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
      */
     @Override
     public List getAllValidLearningDesignsInFolder(Integer workspaceFolderID) {
-	return getSession().createQuery(VALID_IN_FOLDER).setParameter("workspace_folder_id", workspaceFolderID).list();
+	return getSession().createQuery(VALID_IN_FOLDER).setParameter("workspace_folder_id", workspaceFolderID)
+		.setCacheable(true).list();
     }
 
     /**
@@ -85,7 +86,8 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
      */
     @Override
     public List getAllLearningDesignsInFolder(Integer workspaceFolderID) {
-	return getSession().createQuery(ALL_IN_FOLDER).setParameter("workspace_folder_id", workspaceFolderID).list();
+	return getSession().createQuery(ALL_IN_FOLDER).setParameter("workspace_folder_id", workspaceFolderID)
+		.setCacheable(true).list();
     }
 
     /**
@@ -95,7 +97,7 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
      */
     @Override
     public List getLearningDesignsByOriginalDesign(Long originalDesignID) {
-	List list = this.doFind(FIND_BY_ORIGINAL, originalDesignID);
+	List list = this.doFindCacheable(FIND_BY_ORIGINAL, originalDesignID);
 	return list;
     }
 
@@ -106,20 +108,19 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
      */
     @Override
     public List getLearningDesignTitlesByWorkspaceFolder(Integer workspaceFolderID, String prefix) {
-	return this.doFind(FIND_LD_NAMES_IN_FOLDER, new Object[] { workspaceFolderID, prefix + "%" });
+	return this.doFindCacheable(FIND_LD_NAMES_IN_FOLDER, workspaceFolderID, prefix + "%");
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public List<LearningDesignAccess> getLearningDesignAccess(Integer userId) {
-	return (List<LearningDesignAccess>) this.doFind(ACCESS_BY_USER, userId);
+	return this.doFind(ACCESS_BY_USER, userId);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public LearningDesignAccess getLearningDesignAccess(Long learningDesignId, Integer userId) {
-	List<LearningDesignAccess> list = (List<LearningDesignAccess>) this.doFind(ACCESS_BY_LD_AND_USER,
-		learningDesignId, userId);
+	List<LearningDesignAccess> list = this.doFind(ACCESS_BY_LD_AND_USER, learningDesignId, userId);
 	return list.isEmpty() ? null : list.get(0);
     }
 
@@ -128,8 +129,8 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
     public List<LearningDesign> getAllPagedLearningDesigns(Integer workspaceFolderID, Integer page, Integer size,
 	    String sortName, String sortDate) {
 	String sortingOrder = setupSortString(sortName, sortDate);
-	Query query = getSession().createQuery(ALL_IN_FOLDER + sortingOrder).setParameter("workspace_folder_id",
-		workspaceFolderID);
+	Query query = getSession().createQuery(ALL_IN_FOLDER + sortingOrder)
+		.setParameter("workspace_folder_id", workspaceFolderID).setCacheable(true);
 	if (page != null && size != null) {
 	    query.setFirstResult(page * size).setMaxResults(size);
 	}
@@ -142,8 +143,8 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
     public List<LearningDesign> getValidPagedLearningDesigns(Integer workspaceFolderID, Integer page, Integer size,
 	    String sortName, String sortDate) {
 	String sortingOrder = setupSortString(sortName, sortDate);
-	Query query = getSession().createQuery(VALID_IN_FOLDER + sortingOrder).setParameter("workspace_folder_id",
-		workspaceFolderID);
+	Query query = getSession().createQuery(VALID_IN_FOLDER + sortingOrder)
+		.setParameter("workspace_folder_id", workspaceFolderID).setCacheable(true);
 	if (page != null && size != null) {
 	    query.setFirstResult(page * size).setMaxResults(size);
 	}
@@ -164,7 +165,7 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
 
     @Override
     public long countAllLearningDesigns(Integer workspaceFolderID, boolean validDesignsOnly) {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	properties.put("workspaceFolder.workspaceFolderId", workspaceFolderID);
 	properties.put("removed", Boolean.FALSE);
 	if (validDesignsOnly) {

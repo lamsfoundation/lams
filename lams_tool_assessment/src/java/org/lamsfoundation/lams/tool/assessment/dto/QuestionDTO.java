@@ -1,5 +1,6 @@
 package org.lamsfoundation.lams.tool.assessment.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -140,7 +141,6 @@ public class QuestionDTO implements Comparable<QuestionDTO> {
 	this.caseSensitive = qbQuestion.isCaseSensitive();
 	this.correctAnswer = qbQuestion.getCorrectAnswer();
 	this.allowRichEditor = qbQuestion.isAllowRichEditor();
-	this.units = qbQuestion.getUnits();
 	this.maxWordsLimit = qbQuestion.getMaxWordsLimit();
 	this.minWordsLimit = qbQuestion.getMinWordsLimit();
 	this.codeStyle = qbQuestion.getCodeStyle();
@@ -151,6 +151,8 @@ public class QuestionDTO implements Comparable<QuestionDTO> {
 	for (QbOption option : qbQuestion.getQbOptions()) {
 	    optionDtos.add(new OptionDTO(option));
 	}
+
+	this.units = new ArrayList<>(qbQuestion.getUnits());
     }
 
     @Override

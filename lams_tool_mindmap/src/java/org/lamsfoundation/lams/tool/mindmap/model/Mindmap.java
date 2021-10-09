@@ -36,6 +36,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.lamsfoundation.lams.tool.mindmap.service.MindmapService;
 //import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 
@@ -115,6 +117,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     private String galleryWalkInstructions;
 
     @OneToMany(mappedBy = "mindmap")
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<MindmapSession> mindmapSessions;
 
     // Constructors
@@ -397,10 +400,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 	if (this == other) {
 	    return true;
 	}
-	if (other == null) {
-	    return false;
-	}
-	if (!(other instanceof Mindmap)) {
+	if ((other == null) || !(other instanceof Mindmap)) {
 	    return false;
 	}
 	Mindmap castOther = (Mindmap) other;

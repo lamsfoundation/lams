@@ -76,20 +76,20 @@ public class LogEventDAO extends LAMSBaseDAO implements ILogEventDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<LogEvent> getByUser(Integer userId) {
-	return (List<LogEvent>) doFind(GET_LOG_EVENT_BY_USER, userId);
+	return doFind(GET_LOG_EVENT_BY_USER, userId);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<LogEvent> getEventsOccurredBetween(Date startDate, Date finishDate) {
-	return (List<LogEvent>) doFind(GET_LOG_EVENTS_OCCURED_BETWEEN_DATES, startDate, finishDate);
+	return doFind(GET_LOG_EVENTS_OCCURED_BETWEEN_DATES, startDate, finishDate);
     }
 
     /** Get the generic event types */
     @Override
     @SuppressWarnings("unchecked")
     public List<LogEventType> getEventTypes() {
-	return (List<LogEventType>) doFind(GET_LOG_EVENT_TYPES);
+	return doFindCacheable(GET_LOG_EVENT_TYPES);
     }
 
     /** Get the date of the oldest log event (and not the time) */

@@ -43,7 +43,7 @@ public class ImageGalleryDAOHibernate extends LAMSBaseDAO implements ImageGaller
 
     @Override
     public ImageGallery getByContentId(Long contentId) {
-	List list = doFind(GET_RESOURCE_BY_CONTENTID, contentId);
+	List list = doFindCacheable(GET_RESOURCE_BY_CONTENTID, contentId);
 	if (list.size() > 0) {
 	    return (ImageGallery) list.get(0);
 	} else {

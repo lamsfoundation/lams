@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.commonCartridge.dao.hibernate;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
@@ -35,8 +34,8 @@ public class CommonCartridgeConfigItemDAOHibernate extends LAMSBaseDAO implement
 
     @Override
     public CommonCartridgeConfigItem getConfigItemByKey(final String configKey) {
-	return (CommonCartridgeConfigItem) getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY).setParameter("key", configKey)
-		.uniqueResult();
+	return (CommonCartridgeConfigItem) getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY)
+		.setParameter("key", configKey).setCacheable(true).uniqueResult();
     }
 
     @Override

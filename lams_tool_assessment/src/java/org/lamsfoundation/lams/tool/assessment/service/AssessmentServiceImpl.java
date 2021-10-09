@@ -275,6 +275,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 		userQuestionResult.setJustification(leaderQuestionResult.getJustification());
 	    }
+	} else if (userResult.getFinishDate().equals(leaderResult.getFinishDate())) {
+	    // the latest result is already copied, so no need to copy it again
+	    return;
 	}
 
 	// copy results from leader to user in both cases (when there is no userResult yet and when if it's been changed
@@ -993,21 +996,22 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    lastFinishedResult = getLastFinishedAssessmentResult(assessmentUid, targetUserId);
 	}
 
+	Map<Long, AssessmentQuestionResult> questionToResultMap = lastResult.getQuestionResults().stream()
+		.collect(Collectors.toMap(q -> q.getQbToolQuestion().getUid(), q -> q));
+	Map<Long, AssessmentQuestionResult> questionToFinishedResultMap = lastFinishedResult == null ? null
+		: lastFinishedResult.getQuestionResults().stream()
+			.collect(Collectors.toMap(q -> q.getQbToolQuestion().getUid(), q -> q));
+
 	for (Set<QuestionDTO> questionsForOnePage : pagedQuestionDtos) {
 	    for (QuestionDTO questionDto : questionsForOnePage) {
 
-		//load last finished results for hedging type of questions (in order to prevent retry)
-		Set<AssessmentQuestionResult> questionResults = lastResult.getQuestionResults();
-		if ((questionDto.getType() == QbQuestion.TYPE_MARK_HEDGING) && (lastResult.getFinishDate() == null)
-			&& (lastFinishedResult != null)) {
-		    questionResults = lastFinishedResult.getQuestionResults();
-		}
-
-		for (AssessmentQuestionResult questionResult : questionResults) {
-		    if (questionDto.getUid().equals(questionResult.getQbToolQuestion().getUid())) {
-			loadupQuestionResultIntoQuestionDto(questionDto, questionResult);
-			break;
-		    }
+		// load last finished results for hedging type of questions (in order to prevent retry)
+		AssessmentQuestionResult questionResult = (questionDto.getType() == QbQuestion.TYPE_MARK_HEDGING)
+			&& (lastResult.getFinishDate() == null) && (lastFinishedResult != null)
+				? questionToFinishedResultMap.get(questionDto.getUid())
+				: questionToResultMap.get(questionDto.getUid());
+		if (questionResult != null) {
+		    loadupQuestionResultIntoQuestionDto(questionDto, questionResult);
 		}
 	    }
 	}
@@ -1026,14 +1030,14 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	questionDto.setPenalty(questionResult.getPenalty());
 	questionDto.setConfidenceLevel(questionResult.getConfidenceLevel());
 
-	for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+	Map<Long, AssessmentOptionAnswer> answerMap = questionResult.getOptionAnswers().stream()
+		.collect(Collectors.toMap(a -> a.getOptionUid(), a -> a));
 
-	    for (AssessmentOptionAnswer optionAnswer : questionResult.getOptionAnswers()) {
-		if (optionDto.getUid().equals(optionAnswer.getOptionUid())) {
-		    optionDto.setAnswerBoolean(optionAnswer.getAnswerBoolean());
-		    optionDto.setAnswerInt(optionAnswer.getAnswerInt());
-		    break;
-		}
+	for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+	    AssessmentOptionAnswer optionAnswer = answerMap.get(optionDto.getUid());
+	    if (optionAnswer != null) {
+		optionDto.setAnswerBoolean(optionAnswer.getAnswerBoolean());
+		optionDto.setAnswerInt(optionAnswer.getAnswerInt());
 	    }
 	}
 

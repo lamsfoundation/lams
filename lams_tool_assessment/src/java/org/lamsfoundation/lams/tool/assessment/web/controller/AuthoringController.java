@@ -172,7 +172,7 @@ public class AuthoringController {
 	for (AssessmentQuestion question : assessment.getQuestions()) {
 	    // since we are iterating anyway, here fill version information to each question
 	    qbService.fillVersionMap(question.getQbQuestion());
-	    
+
 	    if (question.isRandomQuestion()) {
 		randomPoolQuestions.add(question);
 	    }
@@ -825,11 +825,11 @@ public class AuthoringController {
     public String initOverallFeedback(HttpServletRequest request) {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	AssessmentForm assessmentForm = (AssessmentForm) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT_FORM);
-	Assessment assessment = assessmentForm.getAssessment();
+	Assessment assessment = service.getAssessmentByContentId(assessmentForm.getAssessment().getContentId());
 
 	// initial Overall feedbacks list
 	SortedSet<AssessmentOverallFeedback> overallFeedbackList = new TreeSet<>(new SequencableComparator());
-	if (!assessment.getOverallFeedbacks().isEmpty()) {
+	if (assessment != null && !assessment.getOverallFeedbacks().isEmpty()) {
 	    overallFeedbackList.addAll(assessment.getOverallFeedbacks());
 	} else {
 	    for (int i = 1; i <= AssessmentConstants.INITIAL_OVERALL_FEEDBACK_NUMBER; i++) {

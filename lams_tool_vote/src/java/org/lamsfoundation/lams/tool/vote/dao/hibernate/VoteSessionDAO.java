@@ -61,7 +61,7 @@ public class VoteSessionDAO extends LAMSBaseDAO implements IVoteSessionDAO {
 	String query = "from VoteSession votes where votes.voteSessionId=:voteSessionId";
 
 	List<VoteSession> list = getSessionFactory().getCurrentSession().createQuery(query)
-		.setParameter("voteSessionId", voteSessionId).list();
+		.setParameter("voteSessionId", voteSessionId).setCacheable(true).list();
 
 	if (list != null && list.size() > 0) {
 	    VoteSession vote = list.get(0);

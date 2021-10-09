@@ -14,20 +14,60 @@
 			<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
 			<prop key="hibernate.show_sql">false</prop>
 			<prop key="hibernate.current_session_context_class">org.lamsfoundation.lams.util.hibernate.TransactionAwareSessionContext</prop>
-		    <prop key="hibernate.cache.use_second_level_cache">false</prop>
-		    <prop key="hibernate.cache.use_query_cache">false</prop>
-            <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.infinispan.JndiInfinispanRegionFactory</prop>
-            <prop key="hibernate.cache.default_cache_concurrency_strategy">TRANSACTIONAL</prop>
-            <prop key="hibernate.transaction.jta.platform">org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform</prop>   
+			
+			<prop key="hibernate.transaction.jta.platform">org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform</prop>   
             <prop key="hibernate.transaction.coordinator_class">jta</prop>   
-             
-            <!-- 
-            <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrNode.cfg">contentrepository-entity</prop>
-            <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrNode.crNodeVersions.cfg">contentrepository-entity</prop>
-            <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrNodeVersion.cfg">contentrepository-entity</prop>
-            <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrNodeVersion.crNodeVersionProperties.cfg">contentrepository-entity</prop>
-            <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrNodeVersionProperty.cfg">contentrepository-entity</prop>
-            <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrWorkspace.cfg">contentrepository-entity</prop>	
+            
+			<prop key="hibernate.cache.use_query_cache">true</prop>
+		    <prop key="hibernate.cache.use_second_level_cache">true</prop>
+            <prop key="javax.persistence.sharedCache.mode">ALL</prop>
+            <prop key="hibernate.cache.infinispan.statistics">true</prop>
+            <prop key="hibernate.generate_statistics">true</prop>
+            
+            <!-- Only entity cache is fetched from WildFly container.
+            	 Query and collection cache templates need to be modified here. -->
+            <prop key="hibernate.cache.infinispan.cachemanager">java:jboss/infinispan/container/hibernate</prop>
+    
+            <!-- Following configuration should be used in MULTINODE ENVIRONMENT
+            	 before proper distributed cache configuration is not implemented.
+            	 It creates local cache with short life span, minimising danger of stale cache on each node.
+            	 
+            	 Default parameters are:
+            	 https://infinispan.org/docs/stable/titles/hibernate/hibernate.html#default_cluster_configuration_second_level
+            	 * Eviction wake up interval is 5 seconds.
+				 * Max number of entries are 10,000.
+				 * Max idle time before expiration is 100 seconds.
+				 * Default eviction algorithm is LRU, least recently used.
+            	  
+            <prop key="hibernate.cache.infinispan.entity.expiration.lifespan">3000</prop>
+			<prop key="hibernate.cache.infinispan.collection.expiration.lifespan">3000</prop>
+			<prop key="hibernate.cache.infinispan.query.expiration.lifespan">3000</prop>
+            <prop key="hibernate.cache.infinispan.entity.expiration.max_idle">-1</prop>
+			<prop key="hibernate.cache.infinispan.collection.expiration.max_idle">-1</prop>
+			<prop key="hibernate.cache.infinispan.query.expiration.max_idle">-1</prop>
+            <prop key="hibernate.cache.infinispan.entity.expiration.wake_up_interval">1000</prop>
+			<prop key="hibernate.cache.infinispan.collection.expiration.wake_up_interval">1000</prop>
+			<prop key="hibernate.cache.infinispan.query.expiration.wake_up_interval">1000</prop>
+			 -->
+			 
+			 
+			 <!-- Below are immutable entities which can be kept in cache forever. -->
+			<prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.learningdesign.LearningLibrary.expiration.max_idle">-1</prop>
+			<prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.themes.Theme.expiration.max_idle">-1</prop>
+			<prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.timezone.Timezone.expiration.max_idle">-1</prop>
+			<prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.tool.Tool.expiration.max_idle">-1</prop>
+			<prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.tool.SystemTool.expiration.max_idle">-1</prop>
+			<prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.usermanagement.AuthenticationMethodType.expiration.max_idle">-1</prop>
+			<prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.usermanagement.OrganisationState.expiration.max_idle">-1</prop>
+			<prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.usermanagement.OrganisationType.expiration.max_idle">-1</prop>
+			<prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.usermanagement.Role.expiration.max_idle">-1</prop>
+			<prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.usermanagement.SupportedLocale.expiration.max_idle">-1</prop>
+			<prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.logevent.LogEventType.expiration.max_idle">-1</prop>
+
+			
+            <!-- These are obsolete 2nd level cache settings but left here as a reminder what we set up in the past.
+            <prop key="hibernate.cache.region.factory_class">org.infinispan.hibernate.cache.v53.InfinispanRegionFactory</prop>
+            <prop key="hibernate.cache.default_cache_concurrency_strategy">TRANSACTIONAL</prop>
             -->		
 		</props>
 		</property>
