@@ -18,6 +18,9 @@ LAMS is written in Java, Javascript and uses an MySQL database for data storage.
 * <a href="http://edutechwiki.unige.ch/en/LAMS_installation_and_configuration">Building Instructions</a> (Thanks University of Geneva). 
 * <a href="https://wiki.lamsfoundation.org/display/lams/Translating+LAMS">Internationalisation</a> efforts.
 
+<p>Powered by GitBook</br><img alt="Gitbook logo" width="200" src="https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNkEGS7hzeqa35sMXQZ4X%2Flogo%2FTO5E3RjWKeaJmYYWMGWV%2Fspaces_gitbook_avatar-rectangle.png?alt=media&token=a34e957e-f044-4bee-abee-23946d2e9cfb">
+</p>
+
 <b>LAMS Central</b>
 
 <a href="https://lamscommunity.org/lamscentral/">LAMS Central</a> is a learning design repository with lesson created by thousands of teachers from all over the world on many different interests and subjects. 
