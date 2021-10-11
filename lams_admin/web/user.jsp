@@ -505,7 +505,7 @@
 						</c:if>
 						
 						<div class="pull-right">
-							<a href="<lams:LAMSURL/>admin/usersearch.do" class="btn btn-default"> <fmt:message key="admin.cancel" /> </a>
+							<a href="javascript:history.back();" class="btn btn-default"> <fmt:message key="admin.cancel" /> </a>
 							<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 						</div>
 					</div>
