@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.assessment.model;
 
 import java.io.Serializable;
 
-import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
@@ -66,6 +65,8 @@ public class AssessmentQuestion extends QbToolQuestion implements Serializable, 
 	try {
 	    obj = (AssessmentQuestion) super.clone();
 	    obj.setUid(null);
+	    obj.setCorrectAnswersDisclosed(false);
+	    obj.setGroupsAnswersDisclosed(false);
 	} catch (CloneNotSupportedException e) {
 	    log.error("When clone " + AssessmentQuestion.class + " failed");
 	}

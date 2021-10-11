@@ -3070,6 +3070,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	    // we need to save QB questions and options first
 	    for (AssessmentQuestion assessmentQuestion : toolContentObj.getQuestions()) {
+		assessmentQuestion.setCorrectAnswersDisclosed(false);
+		assessmentQuestion.setGroupsAnswersDisclosed(false);
+
 		QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
 
 		// try to match the question to an existing QB question in DB
