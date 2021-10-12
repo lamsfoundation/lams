@@ -85,6 +85,7 @@ public class TblMonitoringController {
 	Set<QuestionDTO> questionDtos = new LinkedHashSet<>();
 	int maxOptionsInQuestion = 0;
 	int displayOrder = 1;
+	boolean vsaPresent = false;
 	for (AssessmentQuestion question : questionList) {
 	    if (QbQuestion.TYPE_MULTIPLE_CHOICE == question.getType()
 		    || QbQuestion.TYPE_VERY_SHORT_ANSWERS == question.getType()) {
@@ -94,9 +95,14 @@ public class TblMonitoringController {
 		if (question.getQbQuestion().getQbOptions().size() > maxOptionsInQuestion) {
 		    maxOptionsInQuestion = question.getQbQuestion().getQbOptions().size();
 		}
+
+		if (QbQuestion.TYPE_VERY_SHORT_ANSWERS == question.getType()) {
+		    vsaPresent = true;
+		}
 	    }
 	}
 	request.setAttribute("maxOptionsInQuestion", maxOptionsInQuestion);
+	request.setAttribute("vsaPresent", vsaPresent);
 
 	int totalNumberOfUsers = assessmentService.getCountUsersByContentId(toolContentId);
 	if (totalNumberOfUsers > 0) {
