@@ -171,18 +171,6 @@
 	    			   onClick='javascript:window.open("<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=${item.qbQuestion.uid}", "_blank")'>
 	    			</i>
 				</td>	
-				
-				<c:if test="${!isAuthoringRestricted}">
-					<td class="arrows" style="width:3%">
-						<c:if test="${not status.first}">
-							<lams:Arrow state="up" titleKey="label.up" onclick="return upItem(${status.index})"/>
-						</c:if>
-			
-						<c:if test="${not status.last}">
-							<lams:Arrow state="down" titleKey="label.down" onclick="return downItem(${status.index})"/>
-						</c:if>
-					</td>
-				</c:if>
 					
 				<td align="center" style="width:3%">
 					<c:set var="editItemUrl" >
