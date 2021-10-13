@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿/**
+﻿﻿﻿﻿﻿﻿﻿/**
  * This file contains main methods for Authoring.
  */
 
@@ -2974,7 +2974,7 @@ GeneralLib = {
 		var systemGate = ld.systemGate,
 			// final success/failure of the save
 			result = false;
-		
+			
 		// it is null if it is a new sequence
 		ld.learningDesignID	= learningDesignID;
 		ld.workspaceFolderID = folderID;
@@ -3002,6 +3002,9 @@ GeneralLib = {
 				layout.ld.folderID = folderID;
 				layout.ld.title = title;
 				layout.ld.invalid = response.validation.length > 0;
+				
+				var wasReadOnly = layout.ld.readOnly;
+				layout.ld.readOnly = ld.readOnly;
 				
 				// check if there were any validation errors
 				if (layout.ld.invalid) {
@@ -3095,9 +3098,14 @@ GeneralLib = {
 						return;
 					}
 					
-					var svgSaveSuccessful = GeneralLib.saveLearningDesignImage();
-					if (!svgSaveSuccessful) {
-						layout.infoDialog.data('show')(LABELS.SVG_SAVE_ERROR);
+					if (wasReadOnly === layout.ld.readOnly) {
+						// If read-only-ness has changed, then current activities colouring does not reflect its real state.
+						// In this case do not generate the image at all.
+						// It will be either created after next save in authoring or regenerated on-the-fly in Add Lesson or Monitoring.
+						var svgSaveSuccessful = GeneralLib.saveLearningDesignImage();
+						if (!svgSaveSuccessful) {
+							layout.infoDialog.data('show')(LABELS.SVG_SAVE_ERROR);
+						}
 					}
 					
 					if (!layout.ld.invalid) {
