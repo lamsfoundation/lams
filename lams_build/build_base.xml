@@ -374,7 +374,7 @@
 	<!-- ====================================================================== -->
 	<target name="_sass.do.compile">
         <apply dest="${basedir}/build/css" executable="${sass_exec_file}" failonerror="true" verbose="true">
-        	<arg value="--sourcemap=none"/>
+        	<arg value="--no-source-map"/>
         	<arg value="--load-path=${scss.common.variables}"/>
             <srcfile/>
             <targetfile/>
@@ -385,7 +385,7 @@
             <mapper from="*.scss" to="*.css" type="glob"/>
         </apply>
 	    <ant target="_css.minify.copy"/>
-	    	<ant target="_css.nominify.copy"/>
+	    <ant target="_css.nominify.copy"/>
 	</target>
 	
 	<target name="_css.minify.copy"  if="${css.minify}">
