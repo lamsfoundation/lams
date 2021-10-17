@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedSet;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -46,7 +45,6 @@ import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.learningdesign.strategy.ToolActivityStrategy;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonClass;
-import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityMetadata;
 import org.lamsfoundation.lams.tool.GroupedToolSession;
 import org.lamsfoundation.lams.tool.NonGroupedToolSession;
 import org.lamsfoundation.lams.tool.Tool;
@@ -87,9 +85,6 @@ public class ToolActivity extends SimpleActivity implements Serializable {
     @OneToMany(mappedBy = "activity")
     private Set<GradebookUserActivity> gradebookUserActivities = new HashSet<>();
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "activity", cascade = CascadeType.ALL)
-    private PedagogicalPlannerActivityMetadata plannerMetadata;
-
     /** default constructor */
     public ToolActivity() {
 	super.simpleActivityStrategy = new ToolActivityStrategy(this);
@@ -126,12 +121,6 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	    newEvaluation.setWeight(evaluation.getWeight());
 	    newEvaluation.setActivity(newToolActivity);
 	    newToolActivity.setEvaluation(newEvaluation);
-	}
-
-	if (this.plannerMetadata != null) {
-	    PedagogicalPlannerActivityMetadata plannerMetadata = this.plannerMetadata.clone();
-	    plannerMetadata.setActivity(newToolActivity);
-	    newToolActivity.setPlannerMetadata(plannerMetadata);
 	}
 
 	return newToolActivity;
@@ -283,13 +272,5 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 
     public void setGradebookUserActivities(Set<GradebookUserActivity> gradebookUserActivities) {
 	this.gradebookUserActivities = gradebookUserActivities;
-    }
-
-    public PedagogicalPlannerActivityMetadata getPlannerMetadata() {
-	return plannerMetadata;
-    }
-
-    public void setPlannerMetadata(PedagogicalPlannerActivityMetadata plannerMetadata) {
-	this.plannerMetadata = plannerMetadata;
     }
 }

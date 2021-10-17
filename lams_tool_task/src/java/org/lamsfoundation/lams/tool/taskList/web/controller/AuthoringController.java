@@ -23,13 +23,11 @@
 
 package org.lamsfoundation.lams.tool.taskList.web.controller;
 
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -54,7 +52,6 @@ import org.lamsfoundation.lams.tool.taskList.util.TaskListConditionComparator;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListItemComparator;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListForm;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListItemForm;
-import org.lamsfoundation.lams.tool.taskList.web.form.TaskListPedagogicalPlannerForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.MessageService;
@@ -125,7 +122,7 @@ public class AuthoringController {
 	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
 	return readDatabaseData(taskListForm, request);
     }
-    
+
     /**
      * Common method for "start" and "defineLater"
      */
@@ -152,7 +149,7 @@ public class AuthoringController {
 	    if (taskList == null) {
 		taskList = taskListService.getDefaultContent(contentId);
 		if (taskList.getTaskListItems() != null) {
-		    items = new ArrayList<TaskListItem>(taskList.getTaskListItems());
+		    items = new ArrayList<>(taskList.getTaskListItems());
 		} else {
 		    items = null;
 		}
@@ -688,77 +685,5 @@ public class AuthoringController {
 	    errorMap.add("GLOBAL", messageService.getMessage("error.resource.item.title.blank"));
 	}
 	return errorMap;
-    }
-
-    @RequestMapping("/initPedagogicalPlannerForm")
-    public String initPedagogicalPlannerForm(@ModelAttribute TaskListPedagogicalPlannerForm plannerForm,
-	    HttpServletRequest request) {
-	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	TaskList taskList = taskListService.getTaskListByContentId(toolContentID);
-	plannerForm.fillForm(taskList);
-	return "pages/authoring/pedagogicalPlannerForm";
-    }
-
-    @RequestMapping(path = "/saveOrUpdatePedagogicalPlannerForm", method = RequestMethod.POST)
-    public String saveOrUpdatePedagogicalPlannerForm(@ModelAttribute TaskListPedagogicalPlannerForm plannerForm,
-	    HttpServletRequest request) throws IOException {
-
-	MultiValueMap<String, String> errorMap = plannerForm.validate(messageService);
-
-	if (errorMap.isEmpty()) {
-	    TaskList taskList = taskListService.getTaskListByContentId(plannerForm.getToolContentID());
-
-	    int itemIndex = 0;
-	    String item = null;
-	    TaskListItem taskListItem = null;
-	    List<TaskListItem> newItems = new LinkedList<>();
-	    Iterator<TaskListItem> taskListTopicIterator = taskList.getTaskListItems().iterator();
-	    do {
-		item = plannerForm.getTaskListItem(itemIndex);
-		if (StringUtils.isEmpty(item)) {
-		    plannerForm.removeTaskListItem(itemIndex);
-		} else {
-		    if (taskListTopicIterator.hasNext()) {
-			taskListItem = taskListTopicIterator.next();
-			taskListItem.setTitle(item);
-		    } else {
-			taskListItem = new TaskListItem();
-			taskListItem.setCreateByAuthor(true);
-			Date currentDate = new Date();
-			taskListItem.setCreateDate(currentDate);
-
-			HttpSession session = SessionManager.getSession();
-			UserDTO user = (UserDTO) session.getAttribute(AttributeNames.USER);
-			TaskListUser taskListUser = taskListService.getUserByIDAndContent(
-				new Long(user.getUserID().intValue()), plannerForm.getToolContentID());
-			taskListItem.setCreateBy(taskListUser);
-
-			taskListItem.setTitle(item);
-
-			newItems.add(taskListItem);
-		    }
-		    itemIndex++;
-		}
-
-	    } while (item != null);
-	    while (taskListTopicIterator.hasNext()) {
-		taskListItem = taskListTopicIterator.next();
-		taskListTopicIterator.remove();
-		taskListService.deleteTaskListItem(taskListItem.getUid());
-	    }
-	    taskList.getTaskListItems().addAll(newItems);
-	    taskListService.saveOrUpdateTaskList(taskList);
-	} else {
-	    request.setAttribute("errorMap", errorMap);
-	}
-
-	return "pages/authoring/pedagogicalPlannerForm";
-    }
-
-    @RequestMapping("/createPedagogicalPlannerItem")
-    public String createPedagogicalPlannerItem(@ModelAttribute TaskListPedagogicalPlannerForm plannerForm,
-	    HttpServletRequest request) {
-	plannerForm.setTaskListItem(plannerForm.getTaskListItemCount().intValue(), "");
-	return "pages/authoring/pedagogicalPlannerForm";
     }
 }

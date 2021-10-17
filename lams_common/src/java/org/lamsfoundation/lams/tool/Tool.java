@@ -41,8 +41,6 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 
@@ -70,9 +68,6 @@ public class Tool implements Serializable {
 
     @Column(name = "monitor_url")
     private String monitorUrl;
-
-    @Column(name = "pedagogical_planner_url")
-    private String pedagogicalPlannerUrl;
 
     @Column(name = "help_url")
     private String helpUrl;
@@ -102,12 +97,12 @@ public class Tool implements Serializable {
     private Date createDateTime;
 
     @OneToMany(mappedBy = "tool")
-    private Set<ToolActivity> activities = new HashSet<ToolActivity>();
+    private Set<ToolActivity> activities = new HashSet<>();
 
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "tool_id")
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
-    private Set<ExtServerToolAdapterMap> mappedServers = new HashSet<ExtServerToolAdapterMap>();
+    private Set<ExtServerToolAdapterMap> mappedServers = new HashSet<>();
 
     @Column(name = "grouping_support_type_id")
     private Integer groupingSupportTypeId;
@@ -352,14 +347,6 @@ public class Tool implements Serializable {
     @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(getToolId()).toHashCode();
-    }
-
-    public String getPedagogicalPlannerUrl() {
-	return pedagogicalPlannerUrl;
-    }
-
-    public void setPedagogicalPlannerUrl(String pedagogicalPlannerUrl) {
-	this.pedagogicalPlannerUrl = pedagogicalPlannerUrl;
     }
 
     public Set<ExtServerToolAdapterMap> getMappedServers() {

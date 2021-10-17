@@ -235,7 +235,6 @@
 			<web-resource-name>Authoring content</web-resource-name>
 			<url-pattern>/authoring/*</url-pattern>
 			<url-pattern>/authoring.do</url-pattern>
-			<url-pattern>/pedagogicalPlanner.do</url-pattern>
 			<http-method>GET</http-method>
  			<http-method>POST</http-method>
 		</web-resource-collection>

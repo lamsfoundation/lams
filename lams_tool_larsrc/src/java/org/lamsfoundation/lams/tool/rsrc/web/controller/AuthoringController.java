@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.rsrc.web.controller;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.Timestamp;
@@ -34,7 +33,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,7 +58,6 @@ import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
-import org.lamsfoundation.lams.tool.rsrc.web.form.ResourcePedagogicalPlannerForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -77,7 +74,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Steve.Ni
@@ -888,139 +884,6 @@ public class AuthoringController {
 	 * }
 	 * }
 	 */
-    }
-
-    @RequestMapping("/initPedagogicalPlannerForm")
-    public String initPedagogicalPlannerForm(ResourcePedagogicalPlannerForm pedagogicalPlannerForm,
-	    HttpServletRequest request) {
-	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	Resource taskList = resourceService.getResourceByContentId(toolContentID);
-	pedagogicalPlannerForm.fillForm(taskList);
-	String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	pedagogicalPlannerForm.setContentFolderID(contentFolderId);
-	return "pages/authoring/pedagogicalPlannerForm";
-    }
-
-    @RequestMapping(value = "/saveOrUpdatePedagogicalPlannerForm", method = RequestMethod.POST)
-    public String saveOrUpdatePedagogicalPlannerForm(ResourcePedagogicalPlannerForm pedagogicalPlannerForm,
-	    HttpServletRequest request) throws IOException {
-
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	pedagogicalPlannerForm.validate(messageService);
-	if (errorMap.isEmpty()) {
-	    Resource taskList = resourceService.getResourceByContentId(pedagogicalPlannerForm.getToolContentID());
-	    taskList.setInstructions(pedagogicalPlannerForm.getInstructions());
-
-	    int itemIndex = 0;
-	    String title = null;
-	    ResourceItem resourceItem = null;
-	    List<ResourceItem> newItems = new LinkedList<>();
-	    // we need a copy for later Hibernate-bound processing
-	    LinkedList<ResourceItem> resourceItems = new LinkedList<>(taskList.getResourceItems());
-	    Iterator<ResourceItem> taskListItemIterator = resourceItems.iterator();
-	    /*
-	     * Not the case anymore (why?):
-	     * We need to reverse the order, since the items are delivered newest-first
-	     * LinkedList<ResourceItem> reversedResourceItems = new LinkedList<ResourceItem>();
-	     * while (taskListItemIterator.hasNext()) {
-	     * reversedResourceItems.addFirst(taskListItemIterator.next());
-	     * }
-	     * taskListItemIterator = reversedResourceItems.iterator();
-	     */
-	    do {
-		title = pedagogicalPlannerForm.getTitle(itemIndex);
-		if (StringUtils.isEmpty(title)) {
-		    pedagogicalPlannerForm.removeItem(itemIndex);
-		} else {
-		    if (taskListItemIterator.hasNext()) {
-			resourceItem = taskListItemIterator.next();
-		    } else {
-			resourceItem = new ResourceItem();
-			resourceItem.setCreateByAuthor(true);
-			Date currentDate = new Date();
-			resourceItem.setCreateDate(currentDate);
-
-			HttpSession session = SessionManager.getSession();
-			UserDTO user = (UserDTO) session.getAttribute(AttributeNames.USER);
-			ResourceUser taskListUser = resourceService.getUserByIDAndContent(user.getUserID().longValue(),
-				pedagogicalPlannerForm.getToolContentID());
-			resourceItem.setCreateBy(taskListUser);
-
-			newItems.add(resourceItem);
-		    }
-		    resourceItem.setTitle(title);
-		    Short type = pedagogicalPlannerForm.getType(itemIndex);
-		    resourceItem.setType(type);
-		    boolean hasFile = resourceItem.getFileUuid() != null;
-		    if (type.equals(ResourceConstants.RESOURCE_TYPE_URL)) {
-			resourceItem.setUrl(pedagogicalPlannerForm.getUrl(itemIndex));
-			if (hasFile) {
-			    resourceItem.setFileName(null);
-			    resourceItem.setFileUuid(null);
-			    resourceItem.setFileVersionId(null);
-			    resourceItem.setFileType(null);
-			}
-		    } else if (type.equals(ResourceConstants.RESOURCE_TYPE_FILE)) {
-			MultipartFile file = pedagogicalPlannerForm.getFile(itemIndex);
-			resourceItem.setUrl(null);
-			if (file != null && !StringUtils.isEmpty(file.getOriginalFilename())) {
-			    try {
-				if (hasFile) {
-				    // delete the old file
-				    resourceService.deleteFromRepository(resourceItem.getFileUuid(),
-					    resourceItem.getFileVersionId());
-				}
-				throw new UnsupportedOperationException(
-					"Temporary file uploading is not implemented for Share Resources yet");
-//				resourceService.uploadResourceItemFile(resourceItem, file);
-			    } catch (Exception e) {
-				AuthoringController.log.error(e);
-				errorMap.add("GLOBAL", messageService.getMessage("error.msg.io.exception"));
-				request.setAttribute("errorMap", errorMap);
-				pedagogicalPlannerForm.setValid(false);
-				return "pages/authoring/pedagogicalPlannerForm";
-			    }
-//			    pedagogicalPlannerForm.setFileName(itemIndex, resourceItem.getFileName());
-//			    pedagogicalPlannerForm.setFileUuid(itemIndex, resourceItem.getFileUuid());
-//			    pedagogicalPlannerForm.setFileVersion(itemIndex, resourceItem.getFileVersionId());
-//			    pedagogicalPlannerForm.setFile(itemIndex, null);
-			}
-		    }
-		    itemIndex++;
-		}
-
-	    } while (title != null);
-	    // we need to clear it now, otherwise we get Hibernate error (item
-	    // re-saved by cascade)
-	    taskList.getResourceItems().clear();
-	    while (taskListItemIterator.hasNext()) {
-		resourceItem = taskListItemIterator.next();
-		taskListItemIterator.remove();
-		resourceService.deleteResourceItem(resourceItem.getUid());
-	    }
-	    resourceItems.addAll(newItems);
-
-	    taskList.getResourceItems().addAll(resourceItems);
-	    resourceService.saveOrUpdateResource(taskList);
-	} else {
-	    request.setAttribute("errorMap", errorMap);
-	}
-	return "pages/authoring/pedagogicalPlannerForm";
-    }
-
-    @RequestMapping("/createPedagogicalPlannerItem")
-    public String createPedagogicalPlannerItem(ResourcePedagogicalPlannerForm pedagogicalPlannerForm,
-	    HttpServletRequest request) throws IOException, ServletException {
-	int insertIndex = pedagogicalPlannerForm.getItemCount();
-	pedagogicalPlannerForm.setTitle(insertIndex, "");
-	pedagogicalPlannerForm.setType(insertIndex,
-		(short) WebUtil.readIntParam(request, ResourceConstants.ATTR_ADD_RESOURCE_TYPE));
-	pedagogicalPlannerForm.setUrl(insertIndex, null);
-	pedagogicalPlannerForm.setFileName(insertIndex, null);
-	pedagogicalPlannerForm.setFile(insertIndex, null);
-	pedagogicalPlannerForm.setFileUuid(insertIndex, null);
-	pedagogicalPlannerForm.setFileVersion(insertIndex, null);
-	return "pages/authoring/pedagogicalPlannerForm";
     }
 
     @RequestMapping("/switchResourceItemPosition")

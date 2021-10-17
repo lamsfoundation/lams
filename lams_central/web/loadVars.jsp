@@ -36,7 +36,4 @@
 		var sys_admin_width = sys_admin_size.substring(0, sys_admin_size.lastIndexOf('x'));
 		var sys_admin_height = sys_admin_size.substring(sys_admin_size.lastIndexOf('x')+1, sys_admin_size.length);
 		
-		var pedagogical_planner_width = 1280;
-		var pedagogical_planner_height = authoring_height;
-		
 //-->

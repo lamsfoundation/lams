@@ -237,8 +237,6 @@ public class AuthoringActivityDTO extends BaseDTO {
      */
     private ArrayList<String> competenceMappingTitles;
 
-    private PlannerActivityMetadataDTO plannerMetadataDTO;
-
     /** List of the UIIDs of the activities that are input activities for this activity */
     private Integer toolActivityUIID;
 
@@ -436,10 +434,6 @@ public class AuthoringActivityDTO extends BaseDTO {
 		evaluation.add(String.valueOf(eval.getWeight()));
 	    }
 	}
-
-	plannerMetadataDTO = toolActivity.getPlannerMetadata() == null ? null
-		: new PlannerActivityMetadataDTO(toolActivity.getPlannerMetadata());
-
     }
 
     private void addGateActivityAttributes(Object activity, ArrayList<BranchActivityEntryDTO> branchMappings) {
@@ -1247,13 +1241,5 @@ public class AuthoringActivityDTO extends BaseDTO {
 
     public void setEvaluation(List<String> evaluation) {
 	this.evaluation = evaluation;
-    }
-
-    public PlannerActivityMetadataDTO getPlannerMetadataDTO() {
-	return plannerMetadataDTO;
-    }
-
-    public void setPlannerMetadataDTO(PlannerActivityMetadataDTO plannerActivityMetadata) {
-	this.plannerMetadataDTO = plannerActivityMetadata;
     }
 }

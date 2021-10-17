@@ -115,7 +115,6 @@ import org.lamsfoundation.lams.learningdesign.dto.ToolOutputBranchActivityEntryD
 import org.lamsfoundation.lams.learningdesign.dto.ToolOutputGateActivityEntryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.TransitionDTO;
 import org.lamsfoundation.lams.lesson.LessonClass;
-import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityMetadata;
 import org.lamsfoundation.lams.qb.dao.IQbDAO;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.SystemTool;
@@ -1443,10 +1442,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    // Any transitions relating with this tool will be removed!
 	    Long fromId = transDto.getFromActivityID();
 	    Long toId = transDto.getToActivityID();
-	    if ((fromId != null) && removedActMap.containsKey(fromId)) {
-		continue;
-	    }
-	    if ((toId != null) && removedActMap.containsKey(toId)) {
+	    if (((fromId != null) && removedActMap.containsKey(fromId)) || ((toId != null) && removedActMap.containsKey(toId))) {
 		continue;
 	    }
 	    Transition trans = getTransition(transDto, activityMapper);
@@ -1899,12 +1895,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    ((ToolActivity) act).setTool(content.getTool());
 		    ((ToolActivity) act).setToolContentId(content.getToolContentId());
 		    ((ToolActivity) act).setToolSessions(null);
-		}
-		if (actDto.getPlannerMetadataDTO() != null) {
-		    PedagogicalPlannerActivityMetadata plannerMetadata = actDto.getPlannerMetadataDTO()
-			    .toPlannerMetadata();
-		    plannerMetadata.setActivity(((ToolActivity) act));
-		    ((ToolActivity) act).setPlannerMetadata(plannerMetadata);
 		}
 
 		act.setLearningLibrary(learningLibraryDAO.getLearningLibraryById(actDto.getLearningLibraryID()));

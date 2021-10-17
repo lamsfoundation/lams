@@ -95,9 +95,6 @@ public class SystemTool implements Serializable {
     @Column(name = "admin_url")
     private String adminUrl;
 
-    @Column(name = "pedagogical_planner_url")
-    private String pedagogicalPlannerUrl;
-
     @Column(name = "create_date_time")
     private Date createDateTime;
 
@@ -235,13 +232,5 @@ public class SystemTool implements Serializable {
     @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(getSystemToolId()).toHashCode();
-    }
-
-    public String getPedagogicalPlannerUrl() {
-	return pedagogicalPlannerUrl;
-    }
-
-    public void setPedagogicalPlannerUrl(String pedagogicalPlannerUrl) {
-	this.pedagogicalPlannerUrl = pedagogicalPlannerUrl;
     }
 }
