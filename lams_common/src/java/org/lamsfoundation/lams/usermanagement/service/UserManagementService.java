@@ -320,7 +320,7 @@ public class UserManagementService implements IUserManagementService {
 	properties.put("userOrganisation.user.userId", userId);
 	properties.put("userOrganisation.organisation.organisationId", orgId);
 	properties.put("role.name", roleName);
-	if (baseDAO.findByProperties(UserOrganisationRole.class, properties).size() == 0) {
+	if (baseDAO.findByProperties(UserOrganisationRole.class, properties, true).size() == 0) {
 	    return false;
 	}
 	return true;
