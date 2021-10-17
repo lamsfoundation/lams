@@ -496,20 +496,22 @@
 					</div>
 					</div>
 					
-					<div class="row">
-					<div class="col-md-12">
-						<c:if test="${not empty userForm.userId}">
-							<div class="pull-left">
-							<a href="<lams:LAMSURL/>admin/userChangePass.jsp?userId=${userForm.userId}&login=${userForm.login}" class="btn btn-primary"><fmt:message key="admin.user.changePassword" /></a>
+					<c:if test="${isSysadmin}">
+						<div class="row">
+						<div class="col-md-12">
+							<c:if test="${not empty userForm.userId}">
+								<div class="pull-left">
+								<a href="<lams:LAMSURL/>admin/userChangePass.jsp?userId=${userForm.userId}&login=${userForm.login}" class="btn btn-primary"><fmt:message key="admin.user.changePassword" /></a>
+								</div>
+							</c:if>
+							
+							<div class="pull-right">
+								<a href="javascript:history.back();" class="btn btn-default"> <fmt:message key="admin.cancel" /> </a>
+								<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 							</div>
-						</c:if>
-						
-						<div class="pull-right">
-							<a href="javascript:history.back();" class="btn btn-default"> <fmt:message key="admin.cancel" /> </a>
-							<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 						</div>
-					</div>
-					</div>
+						</div>
+					</c:if>
 					
 					</div>
 				</div> <!-- End of panel -->
