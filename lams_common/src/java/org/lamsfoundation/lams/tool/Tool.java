@@ -30,7 +30,6 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -99,7 +98,7 @@ public class Tool implements Serializable {
     @OneToMany(mappedBy = "tool")
     private Set<ToolActivity> activities = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany
     @JoinColumn(name = "tool_id")
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<ExtServerToolAdapterMap> mappedServers = new HashSet<>();
