@@ -96,12 +96,6 @@ public class SessionListener implements HttpSessionListener {
 		String login = userDTO.getLogin();
 		Principal principal = new SimplePrincipal(login);
 		SessionListener.authenticationManager.flushCache(principal);
-
-		// remove obsolete mappings to session
-		// the session is either already invalidated or will be very soon by another module
-
-		// it seems obsolete as removeSessionByID() above already clears login mapping
-		// SessionManager.removeSessionByLogin(login, false);
 	    }
 	}
     }
