@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 
 /**
  * A type of Grouping that represents all the Learners in a Lesson. The
@@ -60,9 +61,6 @@ public class LessonClass extends Grouping {
     @JoinColumn(name = "staff_group_id")
     private Group staffGroup;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "lessonClass")
-    private Lesson lesson;
-
     /** Creates a new instance of LessonClass */
     public LessonClass() {
     }
@@ -72,7 +70,6 @@ public class LessonClass extends Grouping {
 	//don't think lesson class need perform doGrouping. set grouper to null.
 	super(groupingId, groups, activities, null);
 	this.staffGroup = staffGroup;
-	this.lesson = lesson;
     }
 
     public Group getStaffGroup() {
@@ -81,14 +78,6 @@ public class LessonClass extends Grouping {
 
     public void setStaffGroup(Group staffGroup) {
 	this.staffGroup = staffGroup;
-    }
-
-    public Lesson getLesson() {
-	return lesson;
-    }
-
-    public void setLesson(Lesson lesson) {
-	this.lesson = lesson;
     }
 
     /**
@@ -113,7 +102,6 @@ public class LessonClass extends Grouping {
     public Grouping createCopy(int uiidOffset) {
 	LessonClass lessonClass = new LessonClass();
 	lessonClass.staffGroup = this.staffGroup;
-	lessonClass.lesson = this.lesson;
 	return lessonClass;
     }
 
@@ -300,6 +288,11 @@ public class LessonClass extends Grouping {
 	    staffGroup = getStaffGroup();
 	}
 	return staffGroup;
+    }
+
+    private Lesson getLesson() {
+	return (Lesson) UserManagementService.getInstance()
+		.findByProperty(Lesson.class, "lessonClass.groupingId", getGroupingId()).get(0);
     }
 
 }
