@@ -31,6 +31,7 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.springframework.web.util.HtmlUtils;
 
 public class GBActivityGridRowDTO extends GradebookGridRowDTO {
@@ -96,7 +97,8 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	if (activity.isToolActivity()) {
 	    ToolActivity toolActivity = (ToolActivity) activity;
 
-	    ActivityEvaluation eval = toolActivity.getEvaluation();
+	    ActivityEvaluation eval = (ActivityEvaluation) UserManagementService.getInstance()
+		    .findById(ActivityEvaluation.class, toolActivity.getActivityId());
 	    if (eval != null && eval.getWeight() != null) {
 		this.weight = eval.getWeight();
 	    }

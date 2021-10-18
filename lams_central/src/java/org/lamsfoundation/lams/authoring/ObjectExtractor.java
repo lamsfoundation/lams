@@ -767,7 +767,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	    throws ObjectExtractorException {
 	String toolOutputDefinition = JsonUtil.optString(activityDetails, AuthoringJsonTags.TOOL_OUTPUT_DEFINITION);
 	if (StringUtils.isNotBlank(toolOutputDefinition)) {
-	    ActivityEvaluation evaluation = toolActivity.getEvaluation();
+	    ActivityEvaluation evaluation = activityDAO.getEvaluationByActivityId(toolActivity.getActivityId());
 	    if (evaluation == null) {
 		evaluation = new ActivityEvaluation();
 		evaluation.setActivity(toolActivity);
@@ -780,59 +780,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	    } else {
 		evaluation.setWeight(Integer.valueOf(weight));
 	    }
-	    toolActivity.setEvaluation(evaluation);
-	} else {
-	    // update the parent toolActivity
-	    toolActivity.setEvaluation(null);
-	}
-	activityDAO.update(toolActivity);
-    }
 
-    private void parseCompetences(ArrayNode competenceList) throws ObjectExtractorException {
-	Set<Competence> existingCompetences = learningDesign.getCompetences();
-	if (competenceList != null) {
-	    for (JsonNode competenceJSON : competenceList) {
-		String title = JsonUtil.optString(competenceJSON, AuthoringJsonTags.TITLE);
-		String description = JsonUtil.optString(competenceJSON, AuthoringJsonTags.DESCRIPTION);
-
-		if (getComptenceFromSet(existingCompetences, title) != null) {
-		    Competence updateCompetence = getComptenceFromSet(existingCompetences, title);
-		    updateCompetence.setDescription(description);
-		    competenceDAO.saveOrUpdate(updateCompetence);
-		} else {
-		    Competence newCompetence = new Competence();
-		    newCompetence.setTitle(title);
-		    newCompetence.setDescription(description);
-		    newCompetence.setLearningDesign(learningDesign);
-		    competenceDAO.saveOrUpdate(newCompetence);
-		}
-	    }
-
-	    // now go through and delete any competences from the old list,
-	    // that dont exist in the new list.
-	    Set<Competence> removeCompetences = new HashSet<>();
-	    if (existingCompetences != null) {
-		if ((competenceList != null) && (competenceList.size() > 0)) {
-		    for (Competence existingCompetence : existingCompetences) {
-			boolean remove = true;
-			for (JsonNode competenceJSON : competenceList) {
-			    if (existingCompetence.getTitle()
-				    .equals(JsonUtil.optString(competenceJSON, AuthoringJsonTags.TITLE))) {
-				remove = false;
-				break;
-			    }
-			}
-
-			if (remove) {
-			    removeCompetences.add(existingCompetence);
-			}
-		    }
-		} else {
-		    removeCompetences.addAll(existingCompetences);
-		}
-		// competenceDAO.deleteAll(removeCompetences);
-		learningDesign.getCompetences().removeAll(removeCompetences);
-	    }
+	    activityDAO.insertOrUpdate(evaluation);
 	}
     }
 
@@ -1228,8 +1177,8 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     private void buildPermissionGateActivity(PermissionGateActivity activity, ObjectNode activityDetails) {
-	activity.setGateStopAtPrecedingActivity(JsonUtil.optBoolean(activityDetails,
-		AuthoringJsonTags.GATE_STOP_AT_PRECEDING_ACTIVITY, false));
+	activity.setGateStopAtPrecedingActivity(
+		JsonUtil.optBoolean(activityDetails, AuthoringJsonTags.GATE_STOP_AT_PRECEDING_ACTIVITY, false));
 	activity.setSystemTool(getSystemTool(SystemTool.PERMISSION_GATE));
     }
 
@@ -1248,8 +1197,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	Boolean isGateActivityCompletionBased = JsonUtil.optBoolean(activityDetails,
 		AuthoringJsonTags.GATE_ACTIVITY_COMPLETION_BASED);
 	activity.setGateActivityCompletionBased(isGateActivityCompletionBased);
-	activity.setGateStopAtPrecedingActivity(JsonUtil.optBoolean(activityDetails,
-		AuthoringJsonTags.GATE_STOP_AT_PRECEDING_ACTIVITY, false));
+	activity.setGateStopAtPrecedingActivity(
+		JsonUtil.optBoolean(activityDetails, AuthoringJsonTags.GATE_STOP_AT_PRECEDING_ACTIVITY, false));
 	activity.setSystemTool(getSystemTool(SystemTool.SCHEDULE_GATE));
     }
 
@@ -1672,8 +1621,8 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     private void buildConditionGateActivity(ConditionGateActivity activity, ObjectNode activityDetails) {
-	activity.setGateStopAtPrecedingActivity(JsonUtil.optBoolean(activityDetails,
-		AuthoringJsonTags.GATE_STOP_AT_PRECEDING_ACTIVITY, false));
+	activity.setGateStopAtPrecedingActivity(
+		JsonUtil.optBoolean(activityDetails, AuthoringJsonTags.GATE_STOP_AT_PRECEDING_ACTIVITY, false));
 	activity.setSystemTool(getSystemTool(SystemTool.CONDITION_GATE));
     }
 }

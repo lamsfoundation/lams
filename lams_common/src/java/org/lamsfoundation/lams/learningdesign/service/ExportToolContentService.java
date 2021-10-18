@@ -484,6 +484,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			exportedContentFolders.add(contentFolderID);
 		    }
 		}
+
 	    } // end all activities export
 
 	    // skipping unwanted elements; learning design DTO is altered
@@ -1337,8 +1338,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    activityEvaluation.setWeight(Integer.valueOf(eval.get(1)));
 		}
 		activityEvaluation.setActivity((ToolActivity) act);
-		((ToolActivity) act).setEvaluation(activityEvaluation);
-		activityDAO.update(act);
+		activityDAO.insert(activityEvaluation);
 	    }
 	}
 
@@ -1442,7 +1442,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    // Any transitions relating with this tool will be removed!
 	    Long fromId = transDto.getFromActivityID();
 	    Long toId = transDto.getToActivityID();
-	    if (((fromId != null) && removedActMap.containsKey(fromId)) || ((toId != null) && removedActMap.containsKey(toId))) {
+	    if (((fromId != null) && removedActMap.containsKey(fromId))
+		    || ((toId != null) && removedActMap.containsKey(toId))) {
 		continue;
 	    }
 	    Transition trans = getTransition(transDto, activityMapper);

@@ -28,6 +28,7 @@ import java.util.List;
 import org.hibernate.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ConditionGateActivity;
 import org.lamsfoundation.lams.learningdesign.FloatingActivity;
@@ -237,5 +238,10 @@ public class ActivityDAO extends LAMSBaseDAO implements IActivityDAO {
     public Activity getTemplateActivityByLibraryID(Long libraryID) {
 	List list = this.doFindCacheable(ActivityDAO.FIND_BY_LIBRARY_ID, libraryID);
 	return list != null && list.size() != 0 ? (Activity) list.get(0) : null;
+    }
+
+    @Override
+    public ActivityEvaluation getEvaluationByActivityId(long activityId) {
+	return find(ActivityEvaluation.class, activityId);
     }
 }
