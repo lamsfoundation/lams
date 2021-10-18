@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.web.session;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -215,8 +216,21 @@ public class SessionManager {
 
     /**
      * Returns number of all sessions stored in the container.
+     * Additionally cleans up invalidated session which linger in mapping.
      */
     public static int getSessionTotalCount() {
+	Iterator<String> sessionIterator = SessionManager.sessionIdMapping.keySet().iterator();
+	while (sessionIterator.hasNext()) {
+	    String sessionId = sessionIterator.next();
+	    HttpSession session = SessionManager.sessionIdMapping.get(sessionId);
+	    try {
+		session.getCreationTime();
+	    } catch (IllegalStateException e) {
+		log.warn("Removing invalid session which should have been removed by SessionListener: " + sessionId);
+		sessionIterator.remove();
+	    }
+	}
+
 	return SessionManager.sessionIdMapping.size();
     }
 
