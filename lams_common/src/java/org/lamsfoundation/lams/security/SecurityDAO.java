@@ -99,7 +99,7 @@ public class SecurityDAO extends LAMSBaseDAO implements ISecurityDAO {
 	SQLQuery query = getSession().createSQLQuery(SecurityDAO.CHECK_LESSON_LEARNER);
 	query.setLong("lessonId", lessonId);
 	query.setInteger("user_id", userId);
-	return !query.setCacheable(true).list().isEmpty();
+	return !query.list().isEmpty();
     }
 
     @Override
