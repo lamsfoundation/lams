@@ -1248,7 +1248,7 @@ function updateSequenceTab() {
 							});		
 						}
 						
-						 $(gateOpenIconData).attr({
+						 $(gateOpenIconData).clone().attr({
 								x : gateClosedIcon.attr('x'),
 								y : gateClosedIcon.attr('y'),
 								width : gateClosedIcon.attr('width'),
