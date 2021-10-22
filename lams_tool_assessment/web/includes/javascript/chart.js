@@ -113,10 +113,12 @@ function drawAnsweredQuestionsChart(data, useGroups, animate){
 		return;
 	}
 	
-	var newData = Object.values(data.answeredQuestionsByUsers);
+	// store current data for custom tooltip
+	$('#answered-questions-chart').data('tooltip-input', data.answeredQuestionsByUsers);
+	
 	if (answeredQuestionsChart != null) {
 		// chart already exists, just update data
-		answeredQuestionsChart.data.datasets[0].data = newData;
+		answeredQuestionsChart.data.datasets[0].data =  Object.values(data.answeredQuestionsByUsersCount);
 		answeredQuestionsChart.update();
 		return;
 	}
@@ -126,11 +128,11 @@ function drawAnsweredQuestionsChart(data, useGroups, animate){
 		type : 'bar',
 		data : {
 			datasets : [ {
-				data : newData,
+				data :  Object.values(data.answeredQuestionsByUsersCount),
 				backgroundColor : 'rgba(255, 195, 55, 1)'
 								  
 			} ],
-			labels :  Object.keys(data.answeredQuestionsByUsers),
+			labels :  Object.keys(data.answeredQuestionsByUsersCount),
 		},
 		options : {
 			layout : {
@@ -176,6 +178,69 @@ function drawAnsweredQuestionsChart(data, useGroups, animate){
 						}
 					}
 				]
+			},
+			tooltips : {
+				 enabled : false,
+				 custom  : function(tooltipModel) {
+							// always remove the tooltip at the beginning
+			                $('.answered-questions-chart-tooltip').remove();
+			 				if (tooltipModel.opacity === 0) {
+								// if it should be hidden, there is nothing to do
+								return;
+							}
+							
+			                // create tooltip
+		                    var tooltipEl = $('<div />').addClass('answered-questions-chart-tooltip')
+														.appendTo(document.body)
+														.css({
+															'opacity' : 1,
+															'position' :'absolute',
+															'pointerEvents' : 'none',
+															'background-color' : 'white',
+															'padding' : '15px',
+															'border'  : 'thin solid #ddd',
+															'border-radius' : '25px'
+														});
+			
+			                // iterate over learners, get their names and portraits
+							var counter = 0,
+								users = $('#answered-questions-chart').data('tooltip-input')[tooltipModel.dataPoints[0].label];
+							$(users).each(function(){
+								var portraitDiv = $(definePortrait(this[1], this[0], STYLE_SMALL, true, LAMS_URL)).css({
+										'vertical-align' : 'middle'
+									}),
+									userDiv = $('<div />').append(portraitDiv).appendTo(tooltipEl).css({
+										'padding-bottom' : '5px'
+									});
+								$('<span />').text(this[2]).appendTo(userDiv).css({
+									'padding-left' : '10px'
+								});
+								
+								if (counter === 15) {
+									// do not display more than 15 learners
+									if (users.length > 16) {
+										$('<div />').text('...').appendTo(tooltipEl).css({
+											'font-weight' : 'bold',
+											'font-size'   : '20px',
+											'text-align'  : 'center'
+ 										});
+									}
+									return false;									
+								}
+								counter++;
+							});
+							
+							// do not add padding for the last element as the tooltip does not look symmetric
+							tooltipEl.children(':last-child').css({
+								'padding-bottom' : '0'
+							});
+			
+			                var position = this._chart.canvas.getBoundingClientRect();
+							tooltipEl.css({
+								'left'  : position.left + window.pageXOffset + tooltipModel.caretX - tooltipEl.width() - 60 + 'px',
+								'top'   : Math.max(10, position.top  + window.pageYOffset + tooltipModel.caretY - tooltipEl.height()/2) + 'px',
+							});
+						}
 			}
 		}
 	});

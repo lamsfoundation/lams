@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.tool.assessment.dao.hibernate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.NativeQuery;
@@ -112,32 +112,32 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 
     private static final String FIND_BY_UID = "FROM " + AssessmentResult.class.getName() + " AS r WHERE r.uid = ?";
 
-    private static final String ANSWERED_QUESTIONS_BY_USER_COUNT = ""
-	    + "SELECT answered_question_count, COUNT(user_uid) AS user_count FROM"
-	    + "	(SELECT user_uid, SUM(IF(                           "
+    private static final String ANSWERED_QUESTIONS_BY_USER = "SELECT user_id, portrait_uuid, user_name, SUM(IF("
 	    + "			(type = 1 AND answer_boolean = 1) OR"
 	    + "			(type = 2 AND answer_int <> -1) OR"
 	    + "			((type BETWEEN 3 AND 6) AND (answer IS NOT NULL AND TRIM(answer) <> '')) OR"
 	    + "			(type = 7 AND mark > 0) OR          "
 	    + "			(type = 8 AND answer_int > 0)"
 	    + "			,1, 0)) AS answered_question_count FROM"
-	    + "		(SELECT ar.user_uid, qbq.type, qr.mark, qbta.answer, oa.answer_boolean, oa.answer_int"
+	    + "		(SELECT u.user_id, BIN_TO_UUID(u.portrait_uuid) AS portrait_uuid, CONCAT(u.first_name, ' ', u.last_name) AS user_name,"
+	    + "		 	qbq.type, qr.mark, qbta.answer, oa.answer_boolean, oa.answer_int"
 	    + "         FROM      tl_laasse10_assessment        AS a"
 	    + "		JOIN      tl_laasse10_assessment_result AS ar   ON a.uid =  ar.assessment_uid"
+	    + "         JOIN      tl_laasse10_user              AS au   ON ar.user_uid = au.uid"
+	    + "         JOIN      lams_user              	AS u	USING (user_id)"
 	    + "         JOIN      tl_laasse10_session           AS s    USING (session_id)"
 	    + "		JOIN      tl_laasse10_question_result   AS qr   ON ar.uid = qr.result_uid"
-	    + "		JOIN      lams_qb_tool_answer           AS qbta ON qbta.answer_uid = qr.uid"
-	    + "		JOIN      lams_qb_tool_question         AS qbtq USING (tool_question_uid)"
-	    + "		JOIN      lams_qb_question              AS qbq  ON qbq.uid = qbtq.qb_question_uid"
-	    + "		LEFT JOIN tl_laasse10_option_answer     AS oa   ON oa.question_result_uid = qr.uid"
+	    + "		LEFT JOIN lams_qb_tool_answer           AS qbta ON qbta.answer_uid = qr.uid"
+	    + "		LEFT JOIN lams_qb_tool_question         AS qbtq USING (tool_question_uid)"
+	    + "		LEFT JOIN lams_qb_question              AS qbq  ON qbq.uid = qbtq.qb_question_uid"
+	    + "		LEFT JOIN tl_laasse10_option_answer     AS oa"
+	    + "			ON oa.question_result_uid = qr.uid"
+	    + "			AND  ((qbq.type = 7 AND qr.mark > 0) OR (qbta.answer IS NOT NULL AND TRIM(qbta.answer) <> '')"
+	    + "                        OR oa.answer_boolean IS NULL OR oa.answer_boolean = 1 OR answer_int <> -1)"
 	    + "		WHERE ar.latest = 1"
 	    + "         AND   (a.use_select_leader_tool_ouput = 0 OR s.group_leader_uid = ar.user_uid)"
-	    + "		AND   ((qbq.type = 7 AND qr.mark > 0) OR (qbta.answer IS NOT NULL AND TRIM(qbta.answer) <> '') "
-	    + "                 OR oa.answer_boolean IS NULL OR oa.answer_boolean = 1 OR answer_int <> -1)"
 	    + "		AND   a.content_id = :toolContentId"
-	    + "		GROUP BY qr.uid, ar.user_uid) AS answered_questions       "
-	    + "	GROUP BY user_uid) AS answered_questions_by_user_count            "
-	    + "GROUP BY answered_question_count";
+	    + "		GROUP BY qr.uid, u.user_id) AS answered_questions GROUP BY user_id ORDER BY user_name";
 
     @Override
     @SuppressWarnings("unchecked")
@@ -377,14 +377,15 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 
     @Override
     @SuppressWarnings("unchecked")
-    public Map<Integer, Integer> countAnsweredQuestionsByUsers(long toolContentId) {
-	Map<Integer, Integer> answeredQuestions = new TreeMap<>();
-	List<Object[]> results = getSession().createNativeQuery(ANSWERED_QUESTIONS_BY_USER_COUNT)
+    public Map<Integer, List<String[]>> getAnsweredQuestionsByUsers(long toolContentId) {
+	List<Object[]> results = getSession().createNativeQuery(ANSWERED_QUESTIONS_BY_USER)
 		.setParameter("toolContentId", toolContentId).getResultList();
-	for (Object[] result : results) {
-	    answeredQuestions.put(((Number) result[0]).intValue(), ((Number) result[1]).intValue());
-	}
-	return answeredQuestions;
+	return results.stream()
+		.collect(
+			Collectors.groupingBy(r -> ((Number) r[3]).intValue(),
+				Collectors.mapping(r -> new String[] { r[0].toString(),
+					r[1] == null ? null : r[1].toString(), r[2] == null ? "" : r[2].toString() },
+					Collectors.toList())));
     }
 
     private List<AssessmentUserDTO> convertResultsToAssessmentUserDTOList(List<Object[]> list) {
