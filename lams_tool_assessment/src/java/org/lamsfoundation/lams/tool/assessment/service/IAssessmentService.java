@@ -539,7 +539,7 @@ public interface IAssessmentService extends ICommonToolService {
 
     List<User> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString);
 
-    Map<Integer, Integer> getCountAnsweredQuestionsByUsers(long toolContentId);
+    Map<Integer, List<String[]>> getAnsweredQuestionsByUsers(long toolContentId);
 
     void changeLeaderForGroup(long toolSessionId, long leaderUserId);
 }

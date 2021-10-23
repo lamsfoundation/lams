@@ -38,7 +38,8 @@
 	        // avoid name clash between bootstrap and jQuery UI
 	        $.fn.bootstrapTooltip = $.fn.tooltip.noConflict();
         
-			var WEB_APP_URL = '<lams:WebAppURL />',
+			var LAMS_URL    = '<lams:LAMSURL />',
+				WEB_APP_URL = '<lams:WebAppURL />',
 				LABELS = {
 					<fmt:message key="label.monitoring.summary.completion" var="ACTIVITY_COMPLETION_CHART_TITLE_VAR"/>
 					ACTIVITY_COMPLETION_CHART_TITLE : '<c:out value="${ACTIVITY_COMPLETION_CHART_TITLE_VAR}" />',

@@ -270,9 +270,12 @@ public class MonitoringController {
 	chartJson.put("completedLearners", service.getCountLearnersWithFinishedCurrentAttempt(toolContentId));
 
 	chartJson.put("sessionCount", service.getSessionsByContentId(toolContentId).size());
-	Map<Integer, Integer> answeredQuestionsByUsers = service.getCountAnsweredQuestionsByUsers(toolContentId);
+	Map<Integer, List<String[]>> answeredQuestionsByUsers = service.getAnsweredQuestionsByUsers(toolContentId);
 	if (!answeredQuestionsByUsers.isEmpty()) {
 	    chartJson.set("answeredQuestionsByUsers", JsonUtil.readObject(answeredQuestionsByUsers));
+	    Map<Integer, Integer> answeredQuestionsByUsersCount = answeredQuestionsByUsers.entrySet().stream()
+		    .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().size()));
+	    chartJson.set("answeredQuestionsByUsersCount", JsonUtil.readObject(answeredQuestionsByUsersCount));
 	}
 
 	response.setContentType("application/json;charset=utf-8");

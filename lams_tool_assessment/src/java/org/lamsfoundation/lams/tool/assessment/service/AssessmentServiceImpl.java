@@ -4018,8 +4018,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public Map<Integer, Integer> getCountAnsweredQuestionsByUsers(long toolContentId) {
-	Map<Integer, Integer> answeredQuestions = assessmentResultDao.countAnsweredQuestionsByUsers(toolContentId);
+    public Map<Integer, List<String[]>> getAnsweredQuestionsByUsers(long toolContentId) {
+	Map<Integer, List<String[]>> answeredQuestions = assessmentResultDao.getAnsweredQuestionsByUsers(toolContentId);
 	if (answeredQuestions.isEmpty()) {
 	    return answeredQuestions;
 	}
@@ -4028,9 +4028,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	int questionCount = assessment.getQuestions().size();
 
 	// list all question counts, from 0 to maximum possible questions
-	Map<Integer, Integer> result = new HashMap<>();
+	Map<Integer, List<String[]>> result = new TreeMap<>();
 	for (int i = 0; i <= questionCount; i++) {
-	    result.put(i, 0);
+	    result.put(i, List.of());
 	}
 	result.putAll(answeredQuestions);
 	return result;
