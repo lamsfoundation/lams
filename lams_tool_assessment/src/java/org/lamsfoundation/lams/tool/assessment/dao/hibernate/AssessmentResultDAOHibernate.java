@@ -133,7 +133,7 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 	    + "		LEFT JOIN tl_laasse10_option_answer     AS oa"
 	    + "			ON oa.question_result_uid = qr.uid"
 	    + "			AND  ((qbq.type = 7 AND qr.mark > 0) OR (qbta.answer IS NOT NULL AND TRIM(qbta.answer) <> '')"
-	    + "                        OR oa.answer_boolean IS NULL OR oa.answer_boolean = 1 OR answer_int <> -1)"
+	    + "                        OR oa.answer_boolean IS NULL OR oa.answer_boolean = 1 OR (qbq.type = 2 AND answer_int <> -1))"
 	    + "		WHERE ar.latest = 1"
 	    + "         AND   (a.use_select_leader_tool_ouput = 0 OR s.group_leader_uid = ar.user_uid)"
 	    + "		AND   a.content_id = :toolContentId"
