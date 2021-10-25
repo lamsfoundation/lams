@@ -473,7 +473,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	    throw new IOException("Learning Design not found, ID: " + learningDesignID);
 	}
 	// only the user who is editing the design may unlock it
-	if (design.getEditOverrideUser().equals(user)) {
+	if (design.getEditOverrideUser() == null || design.getEditOverrideUser().equals(user)) {
 	    design.setEditOverrideLock(false);
 	    design.setEditOverrideUser(null);
 
