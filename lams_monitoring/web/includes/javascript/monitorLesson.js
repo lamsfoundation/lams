@@ -1235,7 +1235,7 @@ function updateSequenceTab() {
 				if (isGate) {
 					var gateClosedIcon = activityGroup.find('.gateClosed');
 					
-					if (activity.gateOpen) {
+					if (activity.gateOpen && gateClosedIcon.length > 0) {
 						if (!gateOpenIconData) {
 							// if SVG is not cached, get it synchronously
 							$.ajax({
