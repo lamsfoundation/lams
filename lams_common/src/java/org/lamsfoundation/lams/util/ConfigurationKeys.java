@@ -328,4 +328,7 @@ public class ConfigurationKeys {
     public static String ETHERPAD_SERVER_URL = "EtherpadServerUrl";
     public static String ETHERPAD_API_KEY = "EtherpadApiKey";
     public static String ETHERPAD_INSTANCE_ID = "EtherpadInstanceID";
+
+    // LDEV-5253 Make Login As feature configurable
+    public static String LOGIN_AS_ENABLE = "LoginAsEnable";
 }

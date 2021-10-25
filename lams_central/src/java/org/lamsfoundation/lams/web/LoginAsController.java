@@ -67,7 +67,7 @@ public class LoginAsController {
     public String execute(HttpServletRequest request) throws Exception {
 	String login = WebUtil.readStrParam(request, "login", false);
 
-	if (userManagementService.isUserSysAdmin()) {
+	if (userManagementService.isUserSysAdmin() && Configuration.getAsBoolean(ConfigurationKeys.LOGIN_AS_ENABLE)) {
 	    if ((login != null) && (login.trim().length() > 0)) {
 		User user = userManagementService.getUserByLogin(login);
 		if (user != null) {
