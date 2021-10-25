@@ -212,7 +212,8 @@ function drawAnsweredQuestionsChart(data, useGroups, animate){
 									userDiv = $('<div />').append(portraitDiv).appendTo(tooltipEl).css({
 										'padding-bottom' : '5px'
 									});
-								$('<span />').text(this[2]).appendTo(userDiv).css({
+
+								$('<span />').text(this[3] ? this[3] + ' (' + this[2] + ')' : this[2]).appendTo(userDiv).css({
 									'padding-left' : '10px'
 								});
 								

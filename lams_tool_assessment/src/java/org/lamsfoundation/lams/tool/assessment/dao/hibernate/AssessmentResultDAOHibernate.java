@@ -112,7 +112,7 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 
     private static final String FIND_BY_UID = "FROM " + AssessmentResult.class.getName() + " AS r WHERE r.uid = ?";
 
-    private static final String ANSWERED_QUESTIONS_BY_USER = "SELECT user_id, portrait_uuid, user_name, SUM(IF("
+    private static final String ANSWERED_QUESTIONS_BY_USER = "SELECT user_id, portrait_uuid, user_name, group_name, SUM(IF("
 	    + "			(type = 1 AND answer_boolean = 1) OR"
 	    + "			(type = 2 AND answer_int <> -1) OR"
 	    + "			((type BETWEEN 3 AND 6) AND (answer IS NOT NULL AND TRIM(answer) <> '')) OR"
@@ -120,7 +120,7 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 	    + "			(type = 8 AND answer_int > 0)"
 	    + "			,1, 0)) AS answered_question_count FROM"
 	    + "		(SELECT u.user_id, BIN_TO_UUID(u.portrait_uuid) AS portrait_uuid, CONCAT(u.first_name, ' ', u.last_name) AS user_name,"
-	    + "		 	qbq.type, qr.mark, qbta.answer, oa.answer_boolean, oa.answer_int"
+	    + "		 	IF(a.use_select_leader_tool_ouput, s.session_name, NULL) AS group_name, qbq.type, qr.mark, qbta.answer, oa.answer_boolean, oa.answer_int"
 	    + "         FROM      tl_laasse10_assessment        AS a"
 	    + "		JOIN      tl_laasse10_assessment_result AS ar   ON a.uid =  ar.assessment_uid"
 	    + "         JOIN      tl_laasse10_user              AS au   ON ar.user_uid = au.uid"
@@ -381,11 +381,11 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 	List<Object[]> results = getSession().createNativeQuery(ANSWERED_QUESTIONS_BY_USER)
 		.setParameter("toolContentId", toolContentId).getResultList();
 	return results.stream()
-		.collect(
-			Collectors.groupingBy(r -> ((Number) r[3]).intValue(),
-				Collectors.mapping(r -> new String[] { r[0].toString(),
-					r[1] == null ? null : r[1].toString(), r[2] == null ? "" : r[2].toString() },
-					Collectors.toList())));
+		.collect(Collectors.groupingBy(r -> ((Number) r[4]).intValue(),
+			Collectors.mapping(
+				r -> new String[] { r[0].toString(), r[1] == null ? null : r[1].toString(),
+					r[2] == null ? "" : r[2].toString(), r[3] == null ? null : r[3].toString() },
+				Collectors.toList())));
     }
 
     private List<AssessmentUserDTO> convertResultsToAssessmentUserDTOList(List<Object[]> list) {
