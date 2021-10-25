@@ -1810,8 +1810,6 @@ GeneralLib = {
 
 				// always arrange activities when SVG gets recreated or it is old authoring version
 				var arrangeNeeded = isReadOnlyMode || +response.ld.version < 4.5,
-					// if system gate is found, it is Live Edit
-					systemGate = null,
 					// should we allow the author to enter activity authoring
 					activitiesReadOnly = !layout.ld.canModify || (!canSetReadOnly && layout.ld.readOnly),
 					branchToBranching = {},
@@ -1931,10 +1929,6 @@ GeneralLib = {
 								activityData.gateActivityCompletionBased,
 								activityData.gateStopAtPrecedingActivity,
 								activityData.gatePassword);
-							
-							if (gateType == 'system'){
-								systemGate = activity;
-							};
 							break;
 
 						// Parallel Activity
@@ -2320,7 +2314,7 @@ GeneralLib = {
 					parentFrame.resizeImportPartFrame(+paper.attr('height'));
 				}
 
-				if (systemGate) {
+				if (ld.editOverrideLock) {
 					// if system gate exists, it is Live Edit
 					layout.liveEdit = true;
 					
