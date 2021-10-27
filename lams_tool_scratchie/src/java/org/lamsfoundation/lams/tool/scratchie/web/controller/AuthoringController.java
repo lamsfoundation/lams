@@ -63,7 +63,6 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchieForm;
-import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchiePedagogicalPlannerForm;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
@@ -78,7 +77,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -776,35 +774,6 @@ public class AuthoringController {
 
 	request.setAttribute(QbConstants.ATTR_OPTION_LIST, optionList);
 	return "pages/authoring/parts/optionlist";
-    }
-
-    // ----------------------- PedagogicalPlannerForm ---------------
-
-    @RequestMapping("/initPedagogicalPlannerForm")
-    public String initPedagogicalPlannerForm(
-	    @ModelAttribute("pedagogicalPlannerForm") ScratchiePedagogicalPlannerForm pedagogicalPlannerForm,
-	    HttpServletRequest request) {
-	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentID);
-	pedagogicalPlannerForm.fillForm(scratchie);
-	String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	pedagogicalPlannerForm.setContentFolderID(contentFolderId);
-	return "pages/authoring/pedagogicalPlannerForm";
-    }
-
-    @RequestMapping(value = "/saveOrUpdatePedagogicalPlannerForm", method = RequestMethod.POST)
-    public String saveOrUpdatePedagogicalPlannerForm(
-	    @ModelAttribute("pedagogicalPlannerForm") ScratchiePedagogicalPlannerForm pedagogicalPlannerForm,
-	    HttpServletRequest request) throws IOException {
-	MultiValueMap<String, String> errorMap = pedagogicalPlannerForm.validate(messageService);
-	if (errorMap.isEmpty()) {
-	    Scratchie scratchie = scratchieService.getScratchieByContentId(pedagogicalPlannerForm.getToolContentID());
-	    scratchie.setInstructions(pedagogicalPlannerForm.getInstructions());
-	    scratchieService.saveOrUpdateScratchie(scratchie);
-	} else {
-	    request.setAttribute("errorMap", errorMap);
-	}
-	return "pages/authoring/pedagogicalPlannerForm";
     }
 
     // *************************************************************************************

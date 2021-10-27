@@ -46,6 +46,17 @@ public class RuntimeStatsServlet extends HttpServlet {
     private static final long serialVersionUID = 6834774025623257743L;
     private static Logger log = Logger.getLogger(RuntimeStatsServlet.class);
 
+    private static final int CACHE_STATS_COLLECT_SECONDS = 5;
+    private static long cacheTimestamp;
+    private static long cacheHits;
+    private static int cacheHitsPerSecond;
+    private static long cacheMisses;
+    private static int cacheMissesPerSecond;
+    private static long queryCacheHits;
+    private static int queryCacheHitsPerSecond;
+    private static long queryCacheMisses;
+    private static int queryCacheMissesPerSecond;
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	if (log.isDebugEnabled()) {
@@ -102,13 +113,30 @@ public class RuntimeStatsServlet extends HttpServlet {
 		    "org.wildfly.clustering.infinispan:type=CacheManager,name=\"hibernate\",component=CacheContainerStats");
 	    boolean isAvailable = server.isRegistered(cacheContainerName);
 	    if (isAvailable) {
+		long currentTimestamp = System.currentTimeMillis();
+		float secondsPassed = cacheTimestamp > 0 ? (currentTimestamp - cacheTimestamp) / 1000f : 0;
+		boolean updatePerSecondStats = secondsPassed >= CACHE_STATS_COLLECT_SECONDS;
+
 		Integer currentNumberOfEntriesInMemory = (Integer) server.getAttribute(cacheContainerName,
 			"currentNumberOfEntriesInMemory");
 		stats.append("Cache number of entries in memory: ").append(currentNumberOfEntriesInMemory).append("\n");
+
 		Long hits = (Long) server.getAttribute(cacheContainerName, "hits");
 		stats.append("Cache hits: ").append(hits).append("\n");
+		if (updatePerSecondStats) {
+		    cacheHitsPerSecond = Math.round((hits - cacheHits) / secondsPassed);
+		    cacheHits = hits;
+		}
+		stats.append("Cache hits per second: ").append(cacheHitsPerSecond).append("\n");
+
 		Long misses = (Long) server.getAttribute(cacheContainerName, "misses");
 		stats.append("Cache misses: ").append(misses).append("\n");
+		if (updatePerSecondStats) {
+		    cacheMissesPerSecond = Math.round((misses - cacheMisses) / secondsPassed);
+		    cacheMisses = misses;
+		}
+		stats.append("Cache misses per second: ").append(cacheMissesPerSecond).append("\n");
+
 		Double hitRatio = (Double) server.getAttribute(cacheContainerName, "hitRatio");
 		stats.append("Cache hit ratio: ").append(NumberUtil.formatLocalisedNumber(hitRatio, (Locale) null, 2))
 			.append("\n");
@@ -124,11 +152,27 @@ public class RuntimeStatsServlet extends HttpServlet {
 			    .append(queryCacheStatistics.getElementCountInMemory()).append("\n");
 		    hits = queryCacheStatistics.getHitCount();
 		    stats.append("Query cache hits: ").append(hits).append("\n");
+		    if (updatePerSecondStats) {
+			queryCacheHitsPerSecond = Math.round((hits - queryCacheHits) / secondsPassed);
+			queryCacheHits = hits;
+		    }
+		    stats.append("Query cache hits per second: ").append(queryCacheHitsPerSecond).append("\n");
+
 		    misses = queryCacheStatistics.getMissCount();
 		    stats.append("Query cache misses: ").append(misses).append("\n");
+		    if (updatePerSecondStats) {
+			queryCacheMissesPerSecond = Math.round((misses - queryCacheMisses) / secondsPassed);
+			queryCacheMisses = misses;
+		    }
+		    stats.append("Query cache misses per second: ").append(queryCacheMissesPerSecond).append("\n");
+
 		    hitRatio = hits.doubleValue() / (hits + misses);
 		    stats.append("Query cache hit ratio: ")
 			    .append(NumberUtil.formatLocalisedNumber(hitRatio, (Locale) null, 2)).append("\n");
+		}
+
+		if (cacheTimestamp == 0 || updatePerSecondStats) {
+		    cacheTimestamp = currentTimestamp;
 		}
 	    }
 	} catch (Exception e) {

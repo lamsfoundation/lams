@@ -1045,6 +1045,9 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	    if (activity.isBranchingActivity()) {
 		activityDAO.insert(activity);
 	    }
+	    if (activity.isToolActivity() && ((ToolActivity) activity).getEvaluation() != null) {
+		activityDAO.insertOrUpdate(((ToolActivity) activity).getEvaluation());
+	    }
 	}
 
 	return newActivities;
@@ -1492,6 +1495,9 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	activity.setXcoord(300);
 	activity.setYcoord(300);
 	activityDAO.insert(activity);
+	if (activity.getEvaluation() != null) {
+	    activityDAO.insert(activity.getEvaluation());
+	}
 
 	// make Gradebook aware of the activity
 	List<ToolOutputDefinitionDTO> defnDTOList = getToolOutputDefinitions(toolContentID,
@@ -1508,7 +1514,6 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	    ActivityEvaluation evaluation = new ActivityEvaluation();
 	    evaluation.setToolOutputDefinition(gradebookToolOutputDefinitionName);
 	    evaluation.setActivity(activity);
-	    activity.setEvaluation(evaluation);
 	    activityDAO.update(activity);
 	}
 

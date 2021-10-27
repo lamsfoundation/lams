@@ -186,18 +186,17 @@ public class LamsToolService implements ILamsToolService {
     @Override
     public String getActivityEvaluation(Long toolContentId) {
 	ToolActivity toolActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
-	ActivityEvaluation evaluation = toolActivity.getEvaluation();
+	ActivityEvaluation evaluation = activityDAO.getEvaluationByActivityId(toolActivity.getActivityId());
 	return evaluation == null ? null : evaluation.getToolOutputDefinition();
     }
 
     @Override
     public void setActivityEvaluation(Long toolContentId, String toolOutputDefinition) {
 	ToolActivity toolActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
-	ActivityEvaluation evaluation = toolActivity.getEvaluation();
+	ActivityEvaluation evaluation = activityDAO.getEvaluationByActivityId(toolActivity.getActivityId());
 
 	if (StringUtils.isEmpty(toolOutputDefinition)) {
 	    if (evaluation != null) {
-		toolActivity.setEvaluation(null);
 		activityDAO.delete(evaluation);
 	    }
 	    gradebookService.removeActivityMark(toolContentId);
@@ -208,7 +207,6 @@ public class LamsToolService implements ILamsToolService {
 	if (evaluation == null) {
 	    evaluation = new ActivityEvaluation();
 	    evaluation.setActivity(toolActivity);
-	    toolActivity.setEvaluation(evaluation);
 	} else {
 	    isToolOutputDefinitionChanged = !toolOutputDefinition.equals(evaluation.getToolOutputDefinition());
 	}

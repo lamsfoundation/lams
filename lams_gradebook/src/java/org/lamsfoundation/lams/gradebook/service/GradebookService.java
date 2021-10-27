@@ -687,14 +687,17 @@ public class GradebookService implements IGradebookFullService {
 	Long activityId = activity.getActivityId();
 	Lesson lesson = lessonDAO.getLessonForActivity(activityId);
 
-	if ((lesson == null) || (activity == null) || !(activity instanceof ToolActivity)
-		|| (((ToolActivity) activity).getEvaluation() == null)) {
+	if ((lesson == null) || (activity == null) || !(activity instanceof ToolActivity)) {
 	    return;
 	}
+
 	ToolActivity toolActivity = (ToolActivity) activity;
+	ActivityEvaluation eval = activityDAO.getEvaluationByActivityId(toolActivity.getActivityId());
+	if (eval == null) {
+	    return;
+	}
 
 	// Getting the first activity evaluation
-	ActivityEvaluation eval = toolActivity.getEvaluation();
 	String toolOutputDefinition = eval.getToolOutputDefinition();
 
 	Map<Integer, GradebookUserActivity> userToGradebookUserActivityMap = getUserToGradebookUserActivityMap(activity,
@@ -733,14 +736,16 @@ public class GradebookService implements IGradebookFullService {
 	ToolSession toolSession = toolService.getToolSessionByLearner(learner, activity);
 
 	if ((toolSession == null) || (toolSession == null) || (learner == null) || (lesson == null)
-		|| (activity == null) || !(activity instanceof ToolActivity)
-		|| (((ToolActivity) activity).getEvaluation() == null)) {
+		|| (activity == null) || !(activity instanceof ToolActivity)) {
 	    return;
 	}
 	ToolActivity toolActivity = (ToolActivity) activity;
 
 	// Getting the first activity evaluation
-	ActivityEvaluation eval = toolActivity.getEvaluation();
+	ActivityEvaluation eval = activityDAO.getEvaluationByActivityId(toolActivity.getActivityId());
+	if (eval == null) {
+	    return;
+	}
 
 	try {
 	    ToolOutput toolOutput = toolService.getOutputFromTool(eval.getToolOutputDefinition(), toolSession,
@@ -793,7 +798,7 @@ public class GradebookService implements IGradebookFullService {
 	    if (activity.isToolActivity()) {
 		// fetch real object, otherwise there is a cast error
 		ToolActivity act = (ToolActivity) activityDAO.getActivityByActivityId(activity.getActivityId());
-		ActivityEvaluation eval = act.getEvaluation();
+		ActivityEvaluation eval = activityDAO.getEvaluationByActivityId(act.getActivityId());
 		if (eval != null && eval.getWeight() != null && eval.getWeight() > 0) {
 		    String[] evaluation = new String[3];
 		    evaluation[0] = act.getTitle();
@@ -1507,7 +1512,8 @@ public class GradebookService implements IGradebookFullService {
 	for (ToolActivity activity : activityToUserDTOMap.keySet()) {
 	    String toolSignature = activity.getTool().getToolSignature();
 	    //check whether toolActivity has a NumericToolOutput
-	    if (activity.getEvaluation() != null && LESSON_EXPORT_TOOL_ACTIVITIES.contains(toolSignature)) {
+	    ActivityEvaluation eval = activityDAO.getEvaluationByActivityId(activity.getActivityId());
+	    if (eval != null && LESSON_EXPORT_TOOL_ACTIVITIES.contains(toolSignature)) {
 		filteredActivityToUserDTOMap.put(activity, activityToUserDTOMap.get(activity));
 	    }
 	}
@@ -1521,7 +1527,7 @@ public class GradebookService implements IGradebookFullService {
 	for (Activity activity : filteredActivityToUserDTOMap.keySet()) {
 	    String activityName = activity.getTitle();
 	    if (isWeighted && activity.isToolActivity()) {
-		ActivityEvaluation eval = ((ToolActivity) activity).getEvaluation();
+		ActivityEvaluation eval = activityDAO.getEvaluationByActivityId(activity.getActivityId());
 		activityName += " " + getMessage("gradebook.export.weight",
 			new Object[] { eval == null || eval.getWeight() == null ? 0 : eval.getWeight() });
 	    }
@@ -1576,7 +1582,7 @@ public class GradebookService implements IGradebookFullService {
 
 	    String activityName = activity.getTitle();
 	    if (isWeighted && activity.isToolActivity()) {
-		ActivityEvaluation eval = ((ToolActivity) activity).getEvaluation();
+		ActivityEvaluation eval = activityDAO.getEvaluationByActivityId(activity.getActivityId());
 		activityName += " " + getMessage("gradebook.export.weight",
 			new Object[] { eval == null || eval.getWeight() == null ? 0 : eval.getWeight() });
 	    }
@@ -1669,7 +1675,7 @@ public class GradebookService implements IGradebookFullService {
 			    : activity.getTitle();
 
 		    if (isWeighted && activity.isToolActivity()) {
-			ActivityEvaluation eval = activity.getEvaluation();
+			ActivityEvaluation eval = activityDAO.getEvaluationByActivityId(activity.getActivityId());
 			activityRowName += " " + getMessage("gradebook.export.weight",
 				new Object[] { eval == null || eval.getWeight() == null ? 0 : eval.getWeight() });
 		    }
@@ -2027,7 +2033,7 @@ public class GradebookService implements IGradebookFullService {
 		    for (Activity activity : activities) {
 			String activityName = activity.getTitle();
 			if (isWeighted && activity.isToolActivity()) {
-			    ActivityEvaluation eval = ((ToolActivity) activity).getEvaluation();
+			    ActivityEvaluation eval = activityDAO.getEvaluationByActivityId(activity.getActivityId());
 			    activityName += " " + getMessage("gradebook.export.weight",
 				    new Object[] { eval == null || eval.getWeight() == null ? 0 : eval.getWeight() });
 			}
@@ -2117,8 +2123,9 @@ public class GradebookService implements IGradebookFullService {
 			}
 			Integer weight = weighted ? 0 : null;
 
-			if (activity.getEvaluation() != null && activity.getEvaluation().getWeight() != null) {
-			    weight = activity.getEvaluation().getWeight();
+			ActivityEvaluation eval = activityDAO.getEvaluationByActivityId(activity.getActivityId());
+			if (eval != null && eval.getWeight() != null) {
+			    weight = eval.getWeight();
 			}
 
 			Long weightedActivityTotalMarks = weight != null ? weight : rawActivityTotalMarks;
@@ -2478,10 +2485,11 @@ public class GradebookService implements IGradebookFullService {
 	Double rawMark = inputRawMark != null ? inputRawMark : 0.0;
 	if (useWeightings) {
 	    ToolActivity activity = guact.getActivity();
-	    if (activity.getEvaluation() == null || activity.getEvaluation().getWeight() == null) {
+	    ActivityEvaluation eval = activityDAO.getEvaluationByActivityId(activity.getActivityId());
+	    if (eval == null || eval.getWeight() == null) {
 		return 0.0;
 	    } else {
-		return doWeightedMarkCalc(rawMark, activity, activity.getEvaluation().getWeight(),
+		return doWeightedMarkCalc(rawMark, activity, eval.getWeight(),
 			toolService.getActivityMaxPossibleMark(activity));
 	    }
 	}

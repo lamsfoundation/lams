@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.security;
 
 import java.io.Serializable;
@@ -80,7 +79,7 @@ public class SecurityDAO extends LAMSBaseDAO implements ISecurityDAO {
 	query.setParameter("orgId", orgId);
 	query.setParameter("userId", userId);
 	query.setParameterList("roles", roles);
-	return !query.list().isEmpty();
+	return !query.setCacheable(true).list().isEmpty();
     }
 
     @Override
@@ -105,7 +104,8 @@ public class SecurityDAO extends LAMSBaseDAO implements ISecurityDAO {
 
     @Override
     public boolean isLessonMonitor(Long lessonId, Integer userId, boolean ownerAccepted) {
-	boolean result = !doFind(SecurityDAO.CHECK_LESSON_MONITOR, new Object[] { lessonId, userId }).isEmpty();
+	boolean result = !doFindCacheable(SecurityDAO.CHECK_LESSON_MONITOR, new Object[] { lessonId, userId })
+		.isEmpty();
 	Lesson lesson = null;
 	if (!result && ownerAccepted) {
 	    lesson = (Lesson) find(Lesson.class, lessonId);
@@ -116,6 +116,6 @@ public class SecurityDAO extends LAMSBaseDAO implements ISecurityDAO {
 
     @Override
     public boolean isSysadmin(Integer userId) {
-	return !doFind(SecurityDAO.CHECK_SYSADMIN, new Object[] { userId }).isEmpty();
+	return !doFindCacheable(SecurityDAO.CHECK_SYSADMIN, new Object[] { userId }).isEmpty();
     }
 }

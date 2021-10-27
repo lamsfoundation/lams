@@ -51,6 +51,7 @@ import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
@@ -673,10 +674,14 @@ public class LearnerService implements ILearnerFullService {
 	User learner = progress.getUser();
 	Lesson lesson = progress.getLesson();
 
-	if ((learner == null) || (lesson == null) || (activity == null) || !(activity instanceof ToolActivity)
-		|| (((ToolActivity) activity).getEvaluation() == null)) {
+	if ((learner == null) || (lesson == null) || (activity == null) || !(activity instanceof ToolActivity)) {
 	    return;
 	}
+	ActivityEvaluation evaluation = activityDAO.getEvaluationByActivityId(activity.getActivityId());
+	if (evaluation == null) {
+	    return;
+	}
+	
 	ToolSession toolSession = lamsCoreToolService.getToolSessionByLearner(learner, activity);
 	if (toolSession == null) {
 	    return;

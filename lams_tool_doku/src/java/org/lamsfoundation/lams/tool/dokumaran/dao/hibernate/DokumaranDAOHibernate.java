@@ -41,7 +41,7 @@ public class DokumaranDAOHibernate extends LAMSBaseDAO implements DokumaranDAO {
 
     @Override
     public Dokumaran getByContentId(Long contentId) {
-	List<?> list = doFind(GET_RESOURCE_BY_CONTENTID, contentId);
+	List<?> list = doFindCacheable(GET_RESOURCE_BY_CONTENTID, contentId);
 	if (list.size() > 0) {
 	    return (Dokumaran) list.get(0);
 	} else {

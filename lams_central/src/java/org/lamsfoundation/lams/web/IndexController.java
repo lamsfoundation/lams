@@ -22,7 +22,6 @@
  */
 package org.lamsfoundation.lams.web;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.time.LocalDateTime;
@@ -68,7 +67,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @RequestMapping("/index")
 public class IndexController {
     private static Logger log = Logger.getLogger(IndexController.class);
-    private static final String PATH_LAMS_PLANNER_WAR = "lams-planner.war";
 
     @Autowired
     private IUserManagementService userManagementService;
@@ -186,9 +184,6 @@ public class IndexController {
     private static void setHeaderLinks(HttpServletRequest request) {
 	List<IndexLinkBean> headerLinks = new ArrayList<>();
 	if (request.isUserInRole(Role.AUTHOR)) {
-	    if (IndexController.isPedagogicalPlannerAvailable()) {
-		headerLinks.add(new IndexLinkBean("index.planner", "javascript:openPedagogicalPlanner()"));
-	    }
 	    headerLinks.add(new IndexLinkBean("index.author", "javascript:showAuthoringDialog()"));
 	}
 
@@ -305,12 +300,5 @@ public class IndexController {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	return learner != null ? learner.getUserID() : null;
-    }
-
-    private static boolean isPedagogicalPlannerAvailable() {
-	String lamsEarPath = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR);
-	String plannerPath = lamsEarPath + File.separator + PATH_LAMS_PLANNER_WAR;
-	File plannerDir = new File(plannerPath);
-	return plannerDir.exists();
     }
 }

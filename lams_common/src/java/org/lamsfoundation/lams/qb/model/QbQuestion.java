@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,10 +21,6 @@ import javax.persistence.Transient;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.lamsfoundation.lams.qb.service.IQbService;
 
 /**
@@ -157,13 +152,11 @@ public class QbQuestion implements Serializable, Cloneable {
     private boolean autocompleteEnabled;
 
     @OneToMany(mappedBy = "qbQuestion", cascade = CascadeType.ALL)
-    @Fetch(FetchMode.SUBSELECT)
     @OrderBy("displayOrder")
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private List<QbOption> qbOptions = new ArrayList<>();
 
     @OneToMany(mappedBy = "qbQuestion", cascade = CascadeType.ALL)
-    @Fetch(FetchMode.SUBSELECT)
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private List<QbQuestionUnit> units = new ArrayList<>();
 

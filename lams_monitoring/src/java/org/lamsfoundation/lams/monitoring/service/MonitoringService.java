@@ -491,7 +491,6 @@ public class MonitoringService implements IMonitoringFullService {
 
 	    LessonClass newLessonClass = this.createLessonClass(organisation, learnerGroupName, organizationUsers,
 		    staffGroupName, staffs, newLesson);
-	    newLessonClass.setLesson(newLesson);
 	    newLesson.setLessonClass(newLessonClass);
 
 	    lessonDAO.updateLesson(newLesson);

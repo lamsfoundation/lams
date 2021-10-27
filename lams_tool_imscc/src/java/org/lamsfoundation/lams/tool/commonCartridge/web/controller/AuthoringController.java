@@ -23,14 +23,12 @@
 
 package org.lamsfoundation.lams.tool.commonCartridge.web.controller;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -38,7 +36,6 @@ import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.PropertyUtils;
@@ -56,7 +53,6 @@ import org.lamsfoundation.lams.tool.commonCartridge.service.UploadCommonCartridg
 import org.lamsfoundation.lams.tool.commonCartridge.util.CommonCartridgeItemComparator;
 import org.lamsfoundation.lams.tool.commonCartridge.web.form.CommonCartridgeForm;
 import org.lamsfoundation.lams.tool.commonCartridge.web.form.CommonCartridgeItemForm;
-import org.lamsfoundation.lams.tool.commonCartridge.web.form.CommonCartridgePedagogicalPlannerForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
@@ -73,7 +69,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Andrey Balan
@@ -345,7 +340,7 @@ public class AuthoringController {
 	    if (commonCartridge == null) {
 		commonCartridge = commonCartridgeService.getDefaultContent(contentId);
 		if (commonCartridge.getCommonCartridgeItems() != null) {
-		    items = new ArrayList<CommonCartridgeItem>(commonCartridge.getCommonCartridgeItems());
+		    items = new ArrayList<>(commonCartridge.getCommonCartridgeItems());
 		} else {
 		    items = null;
 		}
@@ -423,13 +418,15 @@ public class AuthoringController {
     /**
      * This method will persist all inforamtion in this authoring page, include all commonCartridge item, information
      * etc.
-     * @throws NoSuchMethodException 
-     * @throws InvocationTargetException 
-     * @throws IllegalAccessException 
+     *
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
      */
     @RequestMapping(path = "/update", method = RequestMethod.POST)
     private String updateContent(@ModelAttribute("authoringForm") CommonCartridgeForm authoringForm,
-	    HttpServletRequest request) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+	    HttpServletRequest request)
+	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(authoringForm.getSessionMapID());
 
@@ -769,139 +766,5 @@ public class AuthoringController {
 	    }
 	}
 	return errorMap;
-    }
-
-    @RequestMapping("/initPedagogicalPlannerForm")
-    public String initPedagogicalPlannerForm(
-	    @ModelAttribute("pedagogicalPlannerForm") CommonCartridgePedagogicalPlannerForm pedagogicalPlannerForm,
-	    HttpServletRequest request) {
-	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	CommonCartridge taskList = commonCartridgeService.getCommonCartridgeByContentId(toolContentID);
-	String command = WebUtil.readStrParam(request, "command", true);
-	if (command == null) {
-	    pedagogicalPlannerForm.fillForm(taskList);
-	    String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	    pedagogicalPlannerForm.setContentFolderID(contentFolderId);
-	    return "pages/authoring/pedagogicalPlannerForm";
-	}
-
-	return null;
-
-    }
-
-    @RequestMapping(path = "/saveOrUpdatePedagogicalPlannerForm", method = RequestMethod.POST)
-    public String saveOrUpdatePedagogicalPlannerForm(
-	    @ModelAttribute("pedagogicalPlannerForm") CommonCartridgePedagogicalPlannerForm pedagogicalPlannerForm,
-	    HttpServletRequest request) throws IOException {
-	MultiValueMap<String, String> errorMap = pedagogicalPlannerForm.validate();
-	if (errorMap.isEmpty()) {
-	    CommonCartridge taskList = commonCartridgeService
-		    .getCommonCartridgeByContentId(pedagogicalPlannerForm.getToolContentID());
-	    taskList.setInstructions(pedagogicalPlannerForm.getInstructions());
-
-	    int itemIndex = 0;
-	    String title = null;
-	    CommonCartridgeItem commonCartridgeItem = null;
-	    List<CommonCartridgeItem> newItems = new LinkedList<>();
-	    Set<CommonCartridgeItem> commonCartridgeItems = taskList.getCommonCartridgeItems();
-	    Iterator<CommonCartridgeItem> taskListItemIterator = commonCartridgeItems.iterator();
-	    // We need to reverse the order, since the items are delivered newest-first
-	    LinkedList<CommonCartridgeItem> reversedCommonCartridgeItems = new LinkedList<>();
-	    while (taskListItemIterator.hasNext()) {
-		reversedCommonCartridgeItems.addFirst(taskListItemIterator.next());
-	    }
-	    taskListItemIterator = reversedCommonCartridgeItems.iterator();
-	    do {
-		title = pedagogicalPlannerForm.getTitle(itemIndex);
-		if (StringUtils.isEmpty(title)) {
-		    pedagogicalPlannerForm.removeItem(itemIndex);
-		} else {
-		    if (taskListItemIterator.hasNext()) {
-			commonCartridgeItem = taskListItemIterator.next();
-		    } else {
-			commonCartridgeItem = new CommonCartridgeItem();
-			commonCartridgeItem.setCreateByAuthor(true);
-			Date currentDate = new Date();
-			commonCartridgeItem.setCreateDate(currentDate);
-
-			HttpSession session = SessionManager.getSession();
-			UserDTO user = (UserDTO) session.getAttribute(AttributeNames.USER);
-			CommonCartridgeUser taskListUser = commonCartridgeService.getUserByIDAndContent(
-				new Long(user.getUserID().intValue()), pedagogicalPlannerForm.getToolContentID());
-			commonCartridgeItem.setCreateBy(taskListUser);
-
-			newItems.add(commonCartridgeItem);
-		    }
-		    commonCartridgeItem.setTitle(title);
-		    Short type = pedagogicalPlannerForm.getType(itemIndex);
-		    commonCartridgeItem.setType(type);
-		    boolean hasFile = commonCartridgeItem.getFileUuid() != null;
-		    if (type.equals(CommonCartridgeConstants.RESOURCE_TYPE_BASIC_LTI)) {
-			commonCartridgeItem.setUrl(pedagogicalPlannerForm.getUrl(itemIndex));
-			if (hasFile) {
-			    commonCartridgeItem.setFileName(null);
-			    commonCartridgeItem.setFileUuid(null);
-			    commonCartridgeItem.setFileVersionId(null);
-			    commonCartridgeItem.setFileType(null);
-			}
-		    } else if (type.equals(CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE)) {
-			MultipartFile file = pedagogicalPlannerForm.getFile(itemIndex);
-			commonCartridgeItem.setUrl(null);
-			if (file != null) {
-			    try {
-				if (hasFile) {
-				    // delete the old file
-				    commonCartridgeService.deleteFromRepository(commonCartridgeItem.getFileUuid(),
-					    commonCartridgeItem.getFileVersionId());
-				}
-				commonCartridgeService.uploadCommonCartridgeFile(commonCartridgeItem, file);
-			    } catch (Exception e) {
-				AuthoringController.log.error(e);
-				errorMap.add("GLOBAL", messageService.getMessage("error.msg.io.exception"));
-				request.setAttribute("erroeMap", errorMap);
-				pedagogicalPlannerForm.setValid(false);
-				return "pages/authoring/pedagogicalPlannerForm";
-			    }
-			}
-			pedagogicalPlannerForm.setFileName(itemIndex, commonCartridgeItem.getFileName());
-			pedagogicalPlannerForm.setFileUuid(itemIndex, commonCartridgeItem.getFileUuid());
-			pedagogicalPlannerForm.setFileVersion(itemIndex, commonCartridgeItem.getFileVersionId());
-			pedagogicalPlannerForm.setFile(itemIndex, null);
-		    }
-		    itemIndex++;
-		}
-
-	    } while (title != null);
-	    // we need to clear it now, otherwise we get Hibernate error (item re-saved by cascade)
-	    taskList.getCommonCartridgeItems().clear();
-	    while (taskListItemIterator.hasNext()) {
-		commonCartridgeItem = taskListItemIterator.next();
-		taskListItemIterator.remove();
-		commonCartridgeService.deleteCommonCartridgeItem(commonCartridgeItem.getUid());
-	    }
-	    reversedCommonCartridgeItems.addAll(newItems);
-
-	    taskList.getCommonCartridgeItems().addAll(reversedCommonCartridgeItems);
-	    commonCartridgeService.saveOrUpdateCommonCartridge(taskList);
-	} else {
-	    request.setAttribute("eerorMap", errorMap);
-	}
-	return "pages/authoring/pedagogicalPlannerForm";
-    }
-
-    @RequestMapping("/createPedagogicalPlannerItem")
-    public String createPedagogicalPlannerItem(
-	    @ModelAttribute("pedagogicalPlannerForm") CommonCartridgePedagogicalPlannerForm pedagogicalPlannerForm,
-	    HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-	int insertIndex = pedagogicalPlannerForm.getItemCount();
-	pedagogicalPlannerForm.setTitle(insertIndex, "");
-	pedagogicalPlannerForm.setType(insertIndex,
-		new Short(request.getParameter(CommonCartridgeConstants.ATTR_ADD_RESOURCE_TYPE)));
-	pedagogicalPlannerForm.setUrl(insertIndex, null);
-	pedagogicalPlannerForm.setFileName(insertIndex, null);
-	pedagogicalPlannerForm.setFile(insertIndex, null);
-	pedagogicalPlannerForm.setFileUuid(insertIndex, null);
-	pedagogicalPlannerForm.setFileVersion(insertIndex, null);
-	return "pages/authoring/pedagogicalPlannerForm";
     }
 }

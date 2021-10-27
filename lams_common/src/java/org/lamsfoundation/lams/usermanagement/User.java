@@ -211,12 +211,6 @@ public class User implements Serializable, Comparable<User> {
     @Column(name = "first_login")
     private Boolean firstLogin;
 
-    @ElementCollection
-    @JoinTable(name = "lams_planner_recent_learning_designs", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "learning_design_id")
-    @OrderBy("learning_design_id")
-    private Set<Long> recentlyModifiedLearningDesigns = new LinkedHashSet<>();
-
     @Column(name = "modified_date")
     private Date modifiedDate;
 
@@ -660,14 +654,6 @@ public class User implements Serializable, Comparable<User> {
 
     public void setFirstLogin(Boolean firstLogin) {
 	this.firstLogin = firstLogin;
-    }
-
-    public Set<Long> getRecentlyModifiedLearningDesigns() {
-	return recentlyModifiedLearningDesigns;
-    }
-
-    public void setRecentlyModifiedLearningDesigns(Set<Long> recentlyModifiedLearningDesigns) {
-	this.recentlyModifiedLearningDesigns = recentlyModifiedLearningDesigns;
     }
 
     public Date getModifiedDate() {

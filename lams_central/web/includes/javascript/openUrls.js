@@ -43,23 +43,6 @@ function closeAllChildren() {
 	if (gradebookMonLessonWin && !gradebookMonLessonWin.closed) gradebookMonLessonWin.close();
 }
 
-function openPedagogicalPlanner() {
-	if(isMac) {
-			authorWin = window.open('planner/pedagogicalPlanner/start.do','aWindow','width=' + pedagogical_planner_width
-						+ ',height=' + pedagogical_planner_height + ',resizable,scrollbars'
-						+ getCenterParams(pedagogical_planner_width, pedagogical_planner_height));
-	} else {
-		if(authorWin && !authorWin.closed && authorWin.location.pathname.indexOf('pedagogicalPlanner/start.do') > -1) {
-			authorWin.focus();
-		} else {
-			authorWin = window.open('planner/pedagogicalPlanner/start.do','aWindow','width=' + pedagogical_planner_width
-					+ ',height=' + pedagogical_planner_height + ',resizable,scrollbars'
-					+ getCenterParams(pedagogical_planner_width, pedagogical_planner_height));
-			authorWin.focus();
-		}
-	}
-}
-
 function returnToMonitorLessonIntegrated( lessonID ) {
 	window.location = '/lams/home/monitorLesson.do?lessonID='+lessonID;
 }

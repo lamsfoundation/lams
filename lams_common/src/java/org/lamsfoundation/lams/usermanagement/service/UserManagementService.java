@@ -83,6 +83,7 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.imgscalr.ResizePictureUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -97,7 +98,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *
  * @author Fei Yang, Manpreet Minhas
  */
-public class UserManagementService implements IUserManagementService {
+public class UserManagementService implements IUserManagementService, InitializingBean {
 
     private Logger log = Logger.getLogger(UserManagementService.class);
 
@@ -124,6 +125,27 @@ public class UserManagementService implements IUserManagementService {
     private static ILogEventService logEventService;
 
     private IToolContentHandler centralToolContentHandler;
+
+    private static IUserManagementService instance;
+
+    /*
+     * Sometimes we need access to a service from within an entity.
+     * For example when fetching ActivityEvaluation for ToolActivity - they should not be in OneToOne relationship
+     * as it can not be cached, i.e. is always eagerly fetched.
+     * This singleton-type access to service allows fetching data from DB from wherever in code.
+     * It is probably a bad design, but we can not enforce lazy loading in any other reasonable way
+     * and eager loading makes up a good part of queries sent to DB.
+     * The service fetched this way should probably be used for read-only queries
+     * as we deliver the real service object, not its transactional proxy.
+     */
+    @Override
+    public void afterPropertiesSet() {
+	instance = this;
+    }
+
+    public static IUserManagementService getInstance() {
+	return instance;
+    }
 
     // ---------------------------------------------------------------------
     // Service Methods
@@ -320,7 +342,7 @@ public class UserManagementService implements IUserManagementService {
 	properties.put("userOrganisation.user.userId", userId);
 	properties.put("userOrganisation.organisation.organisationId", orgId);
 	properties.put("role.name", roleName);
-	if (baseDAO.findByProperties(UserOrganisationRole.class, properties).size() == 0) {
+	if (baseDAO.findByProperties(UserOrganisationRole.class, properties, true).size() == 0) {
 	    return false;
 	}
 	return true;

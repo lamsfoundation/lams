@@ -90,17 +90,6 @@ CKEDITOR.config.toolbar_CustomWikiInline = [
   	['Format','Font','FontSize']
 ];
 
-
-CKEDITOR.config.toolbar_CustomPedplanner = [
-	['Source','-','Maximize','Preview','Bold','Italic','Underline', '-','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath'], 
-	['Image','Link','Iframe','Table','Font','FontSize']
-];
-
-CKEDITOR.config.toolbar_CustomPedplannerInline = [
-	['Sourcedialog','-','Bold','Italic','Underline', '-','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath'], 
-	['Image','Link','Iframe','Table','Font','FontSize']
-];
-
 CKEDITOR.config.toolbar_LessonDescription = [
     ['Bold','Italic','Underline', '-','Subscript','Superscript'],
 	['NumberedList','BulletedList','-','Outdent','Indent'],
