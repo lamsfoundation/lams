@@ -93,8 +93,7 @@ public abstract class Grouping implements Serializable {
     @Column(name = "grouping_ui_id")
     private Integer groupingUIID;
 
-    @OneToMany(mappedBy = "grouping", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @BatchSize(size = 10)
+    @OneToMany(mappedBy = "grouping", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Group> groups = new HashSet<Group>();
 
     @OneToMany(mappedBy = "grouping")
