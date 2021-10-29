@@ -30,16 +30,19 @@
 		<span>&nbsp;</span>
 		<i class='fa fa-sm fa-pencil'></i>
 		<input type="hidden" name="${appexTitleField}" id="${appexTitleField}" value="${appexTitle}"/>
+		
+		<input type="hidden" name="divappex${param.appexNumber}IsDoku" value="true"/>
      </div>
     
     <div id="collapseAppex${param.appexNumber}" class="panel-body panel-collapse collapse in" 
     	 role="tabpanel" aria-labelledby="headingAppex${param.appexNumber}">	
 		<div class="form-group">
-		    <label for="divappex${param.appexNumber}dokuDescription">
+		    <label for="divappex${param.appexNumber}Description">
 				<fmt:message key="authoring.label.application.exercise.doku.description" />&nbsp;
-				<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="" data-original-title="<fmt:message key="authoring.label.application.exercise.doku.description.tooltip"/>"></i>
+				<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title=""
+				   data-original-title="<fmt:message key="authoring.label.application.exercise.doku.description.tooltip"/>"></i>
 			</label>
-		    <lams:CKEditor id="divappex${param.appexNumber}dokuDescription" value="" contentFolderID="${param.contentFolderID}" height="100"/>
+		    <lams:CKEditor id="divappex${param.appexNumber}Description" value="" contentFolderID="${param.contentFolderID}" height="100"/>
 		</div>
 		
 		<div class="form-group">

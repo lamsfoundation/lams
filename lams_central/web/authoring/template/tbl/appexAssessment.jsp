@@ -126,6 +126,16 @@
 		
 				<div id="advanced-settings-ae-${appexNumber}-collapse" class="panel-body panel-collapse collapse" role="tabpanel" 
 					 aria-labelledby="#advanced-settings-ae-${appexNumber}-heading">
+					 
+					<div class="form-group">
+					    <label for="divappex${param.appexNumber}Description">
+							<fmt:message key="authoring.label.application.exercise.doku.description" />&nbsp;
+							<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title=""
+							   data-original-title="<fmt:message key="authoring.label.application.exercise.doku.description.tooltip"/>"></i>
+						</label>
+					    <lams:CKEditor id="divappex${appexNumber}Description" value="" contentFolderID="${contentFolderID}" height="100"/>
+					</div>
+	
 					<div class="checkbox">
 						<label for="divappex${appexNumber}NB">
 							<input name="divappex${appexNumber}NB" id="divappex${appexNumber}NB" type="checkbox" value="true"/>
