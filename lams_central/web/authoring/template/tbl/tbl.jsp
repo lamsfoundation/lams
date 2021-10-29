@@ -254,47 +254,37 @@
 		<div class="tab-pane" id="tab3">
 			<span class="field-name"><fmt:message key="authoring.tbl.desc.question"/></span>
 
-			<div class="form-group voffset10">
-					<input title="123" type="checkbox" name="confidenceLevelEnable" value="true" class="form-control-inline" id="confidenceLevelEnable" checked/>&nbsp;
-				<label for="confidenceLevelEnable">
-					<fmt:message key="authoring.enable.confidence.levels"/>
-				</label>
-                <i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key='authoring.tbl.enable.confidence.tooltip'/>"></i>
-			</div>
-			
 		 	<input type="hidden" name="numQuestions" id="numQuestions" value="0"/>
 			
 			<div id="divquestions">
 			</div>
 		
-			<span class="voffset10">
-				<div class="btn-group">
-					<button id="createQuestionButton"
-							onClick="javascript:createQuestion('numQuestions', 'divq', 'divquestions', '', '')" 
-							type="button" class="btn btn-default">
-								<i class="fa fa-plus text-primary"></i> <fmt:message key="authoring.create.question"/>
-					</button>
-					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						<span class="caret"></span><span class="sr-only">Toggle Dropdown</span>
-					</button>
-					<ul class="dropdown-menu dropdown-menu-right">
-						<li><a href="javascript:void(0)" onClick="javascript:openQuestionBank()"> 
-							<i class="fa fa-bank text-primary" ></i> <fmt:message key="authoring.create.question.qb"/>
-							</a>
-						</li>
-                        <li role="separator" class="divider"></li>
-						<li class="dropdown-header"><fmt:message key="authoring.tbl.import.questions.from"/></li>
-						<li><a style="margin-left: 1em;" href="javascript:void(0)" id="importWordButton" onClick="javascript:importQTI('mcq', 'mc,mh', 'word')">
-								<i class="fa fa-file-word-o text-primary"></i> <fmt:message key="label.qb.collection.word"/>...
-                            </a>
-                        </li>	
-						<li><a style="margin-left: 1em;" href="javascript:void(0)" onClick="javascript:importQTI('mcq', 'mc,mh', 'qti')" id="importQTIButton">
-								<i class="fa fa-file-code-o text-primary"></i> <fmt:message key="label.qb.collection.qti"/>...
-                            </a>
-                        </li>
-					</ul>
-				</div>
-			</span>
+			<div class="btn-group voffset10">
+				<button id="createQuestionButton"
+						onClick="javascript:createQuestion('numQuestions', 'divq', 'divquestions', '', '')" 
+						type="button" class="btn btn-default">
+							<i class="fa fa-plus text-primary"></i> <fmt:message key="authoring.create.question"/>
+				</button>
+				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<span class="caret"></span><span class="sr-only">Toggle Dropdown</span>
+				</button>
+				<ul class="dropdown-menu dropdown-menu-right">
+					<li><a href="javascript:void(0)" onClick="javascript:openQuestionBank()"> 
+						<i class="fa fa-bank text-primary" ></i> <fmt:message key="authoring.create.question.qb"/>
+						</a>
+					</li>
+                       <li role="separator" class="divider"></li>
+					<li class="dropdown-header"><fmt:message key="authoring.tbl.import.questions.from"/></li>
+					<li><a style="margin-left: 1em;" href="javascript:void(0)" id="importWordButton" onClick="javascript:importQTI('mcq', 'mc,mh', 'word')">
+							<i class="fa fa-file-word-o text-primary"></i> <fmt:message key="label.qb.collection.word"/>...
+                           </a>
+                       </li>	
+					<li><a style="margin-left: 1em;" href="javascript:void(0)" onClick="javascript:importQTI('mcq', 'mc,mh', 'qti')" id="importQTIButton">
+							<i class="fa fa-file-code-o text-primary"></i> <fmt:message key="label.qb.collection.qti"/>...
+                           </a>
+                       </li>
+				</ul>
+			</div>
 			
 			<!-- Question Bank -->
 			<div class="panel-group question-bank-div" id="question-bank-ira-div" role="tablist" aria-multiselectable="true"> 
@@ -312,6 +302,28 @@
 					</div>
 				</div>
 			</div>
+			
+			<div class="panel panel-default voffset20">
+		        <div class="panel-heading collapsable-icon-left" id="advanced-settings-ira-heading">
+		        	<span class="panel-title">
+				    	<a role="button" data-toggle="collapse" href="#advanced-settings-ira-collapse" class="collapsed"
+				    	   aria-expanded="false" aria-controls="advanced-settings-ira-collapse">
+			          		<fmt:message key="label.tab.advanced" />
+			        	</a>
+		      		</span>
+		        </div>
+		
+				<div id="advanced-settings-ira-collapse" class="panel-body panel-collapse collapse" role="tabpanel" aria-labelledby="#advanced-settings-ira-heading">
+					<div class="form-group voffset10">
+						<input type="checkbox" name="confidenceLevelEnable" value="true" class="form-control-inline" id="confidenceLevelEnable" checked/>&nbsp;
+						<label for="confidenceLevelEnable">
+							<fmt:message key="authoring.enable.confidence.levels"/>
+						</label>
+		                <i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key='authoring.tbl.enable.confidence.tooltip'/>"></i>
+					</div>	
+				</div>
+			</div>
+			
 			<!-- Hidden div just for storing ID of the imported QB question -->
 			<div id="itemArea"></div>
 			
@@ -329,7 +341,6 @@
 			<a href="#" onclick="javascript:createApplicationExercise('assessment')" class="btn btn-default">
 				<i class="fa fa-plus"></i> <fmt:message key="authoring.create.application.exercise"/>
 			</a>
-			
 	    </div>
 
 		<c:if test="${usePreview}">

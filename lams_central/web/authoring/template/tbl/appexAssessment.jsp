@@ -94,23 +94,8 @@
 			</div>
 		</div>
 		
-		<div class="space-top space-sides space-bottom">
-			<div class="checkbox">
-				<label for="divappex${appexNumber}NB">
-					<input name="divappex${appexNumber}NB" id="divappex${appexNumber}NB" type="checkbox" value="true"/>
-					<fmt:message key="authoring.tbl.use.noticeboard" />&nbsp; 
-					<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right"
-					   title="<fmt:message key='authoring.tbl.use.noticeboard.tooltip'/>">
-					</i>
-				</label>
-			</div>
-			<div class="form-group" id="divappex${appexNumber}NBEntryDiv">
-				<lams:CKEditor id="divappex${appexNumber}NBEntry" value="" contentFolderID="${contentFolderID}" height="100"></lams:CKEditor>
-			</div>
-		</div>
-		
 		<!-- Question Bank for this Application Excercise -->
-		<div class="panel-group question-bank-div space-sides" id="question-bank-ae-div-${appexNumber}" role="tablist" aria-multiselectable="true"> 
+		<div class="question-bank-div space-sides" id="question-bank-ae-div-${appexNumber}" role="tablist" aria-multiselectable="true"> 
 		    <div class="panel panel-default">
 		        <div class="panel-heading collapsable-icon-left" id="question-bank-ae-heading-${appexNumber}">
 		        	<span class="panel-title">
@@ -124,6 +109,35 @@
 				<div id="question-bank-ae-collapse-${appexNumber}" class="panel-body panel-collapse collapse in" role="tabpanel"
 					 aria-labelledby="question-bank-ae-heading-${appexNumber}">
 					<i class="fa fa-refresh fa-spin fa-2x fa-fw" style="margin: auto; display: block"></i>			
+				</div>
+			</div>
+		</div>
+		
+		<div class="space-top space-sides space-bottom">
+			<div class="panel panel-default">
+		        <div class="panel-heading collapsable-icon-left" id="advanced-settings-ae-${appexNumber}-heading">
+		        	<span class="panel-title">
+				    	<a role="button" data-toggle="collapse" href="#advanced-settings-ae-${appexNumber}-collapse" class="collapsed"
+				    	   aria-expanded="false" aria-controls="advanced-settings-ae-${appexNumber}-collapse">
+			          		<fmt:message key="label.tab.advanced" />
+			        	</a>
+		      		</span>
+		        </div>
+		
+				<div id="advanced-settings-ae-${appexNumber}-collapse" class="panel-body panel-collapse collapse" role="tabpanel" 
+					 aria-labelledby="#advanced-settings-ae-${appexNumber}-heading">
+					<div class="checkbox">
+						<label for="divappex${appexNumber}NB">
+							<input name="divappex${appexNumber}NB" id="divappex${appexNumber}NB" type="checkbox" value="true"/>
+							<fmt:message key="authoring.tbl.use.noticeboard" />&nbsp; 
+							<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right"
+							   title="<fmt:message key='authoring.tbl.use.noticeboard.tooltip'/>">
+							</i>
+						</label>
+					</div>
+					<div class="form-group" id="divappex${appexNumber}NBEntryDiv">
+						<lams:CKEditor id="divappex${appexNumber}NBEntry" value="" contentFolderID="${contentFolderID}" height="100"></lams:CKEditor>
+					</div>
 				</div>
 			</div>
 		</div>
