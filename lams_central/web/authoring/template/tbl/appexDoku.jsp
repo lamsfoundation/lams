@@ -30,16 +30,19 @@
 		<span>&nbsp;</span>
 		<i class='fa fa-sm fa-pencil'></i>
 		<input type="hidden" name="${appexTitleField}" id="${appexTitleField}" value="${appexTitle}"/>
+		
+		<input type="hidden" name="divappex${param.appexNumber}IsDoku" value="true"/>
      </div>
     
     <div id="collapseAppex${param.appexNumber}" class="panel-body panel-collapse collapse in" 
     	 role="tabpanel" aria-labelledby="headingAppex${param.appexNumber}">	
 		<div class="form-group">
-		    <label for="divappex${param.appexNumber}dokuDescription">
+		    <label for="divappex${param.appexNumber}Description">
 				<fmt:message key="authoring.label.application.exercise.doku.description" />&nbsp;
-				<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="" data-original-title="<fmt:message key="authoring.label.application.exercise.doku.description.tooltip"/>"></i>
+				<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title=""
+				   data-original-title="<fmt:message key="authoring.label.application.exercise.doku.description.tooltip"/>"></i>
 			</label>
-		    <lams:CKEditor id="divappex${param.appexNumber}dokuDescription" value="" contentFolderID="${param.contentFolderID}" height="100"/>
+		    <lams:CKEditor id="divappex${param.appexNumber}Description" value="" contentFolderID="${param.contentFolderID}" height="100"/>
 		</div>
 		
 		<div class="form-group">
@@ -49,46 +52,59 @@
 		    </label>
 		    <lams:CKEditor id="divappex${param.appexNumber}dokuInstructions" value="" contentFolderID="${param.contentFolderID}" height="100" toolbarSet="DefaultDoku" method="inline"/>
 		</div>
-
-		<div class="space-top space-sides space-bottom">
-			<div class="checkbox">
-				<label for="divappex${param.appexNumber}dokuGalleryWalkEnabled">
-					<input name="divappex${param.appexNumber}dokuGalleryWalkEnabled" id="divappex${param.appexNumber}dokuGalleryWalkEnabled" type="checkbox" value="true" />
-					<fmt:message key="authoring.label.application.exercise.doku.gallery.walk.enabled" />&nbsp; 
-					<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right"
-					   title="<fmt:message key='authoring.label.application.exercise.doku.gallery.walk.enabled.tooltip'/>">
-					</i>
-				</label>
-			</div>
-			
-			<div id="divappex${param.appexNumber}dokuGalleryWalkOptions" class="loffset10">
+		
+		<div class="panel panel-default">
+	        <div class="panel-heading collapsable-icon-left" id="advanced-settings-ae-${param.appexNumber}-heading">
+	        	<span class="panel-title">
+			    	<a role="button" data-toggle="collapse" href="#advanced-settings-ae-${param.appexNumber}-collapse" class="collapsed"
+			    	   aria-expanded="false" aria-controls="advanced-settings-ae-${param.appexNumber}-collapse">
+		          		<fmt:message key="label.tab.advanced" />
+		        	</a>
+	      		</span>
+	        </div>
+	
+			<div id="advanced-settings-ae-${param.appexNumber}-collapse" class="panel-body panel-collapse collapse" role="tabpanel" 
+				 aria-labelledby="#advanced-settings-ae-${param.appexNumber}-heading">
+				 
 				<div class="checkbox">
-					<label for="divappex${param.appexNumber}dokuGalleryWalkReadOnly">
-						<input name="divappex${param.appexNumber}dokuGalleryWalkReadOnly" id="divappex${param.appexNumber}dokuGalleryWalkReadOnly" 
-							   type="checkbox" value="true" />
-						<fmt:message key="authoring.label.application.exercise.doku.gallery.walk.read.only" />
+					<label for="divappex${param.appexNumber}dokuGalleryWalkEnabled">
+						<input name="divappex${param.appexNumber}dokuGalleryWalkEnabled" id="divappex${param.appexNumber}dokuGalleryWalkEnabled" type="checkbox" value="true" />
+						<fmt:message key="authoring.label.application.exercise.doku.gallery.walk.enabled" />&nbsp; 
+						<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right"
+						   title="<fmt:message key='authoring.label.application.exercise.doku.gallery.walk.enabled.tooltip'/>">
+						</i>
 					</label>
-					<i class="fa fa-question-circle" 
-					   data-toggle="tooltip" title="<fmt:message key='authoring.label.application.exercise.doku.gallery.walk.read.only.tooltip' />"></i>
 				</div>
 				
-				<div class="form-group">
-					<textarea name="divappex${param.appexNumber}dokuGalleryWalkInstructions" class="form-control" rows="3" 
-							  placeholder="<fmt:message key='authoring.label.application.exercise.doku.gallery.walk.instructions'/>"></textarea>
+				<div id="divappex${param.appexNumber}dokuGalleryWalkOptions" class="loffset10">
+					<div class="checkbox">
+						<label for="divappex${param.appexNumber}dokuGalleryWalkReadOnly">
+							<input name="divappex${param.appexNumber}dokuGalleryWalkReadOnly" id="divappex${param.appexNumber}dokuGalleryWalkReadOnly" 
+								   type="checkbox" value="true" />
+							<fmt:message key="authoring.label.application.exercise.doku.gallery.walk.read.only" />
+						</label>
+						<i class="fa fa-question-circle" 
+						   data-toggle="tooltip" title="<fmt:message key='authoring.label.application.exercise.doku.gallery.walk.read.only.tooltip' />"></i>
+					</div>
+					
+					<div class="form-group">
+						<textarea name="divappex${param.appexNumber}dokuGalleryWalkInstructions" class="form-control" rows="3" 
+								  placeholder="<fmt:message key='authoring.label.application.exercise.doku.gallery.walk.instructions'/>"></textarea>
+					</div>
 				</div>
-			</div>
-			
-			<div class="checkbox">
-				<label for="divappex${param.appexNumber}NB">
-					<input name="divappex${param.appexNumber}NB" id="divappex${param.appexNumber}NB" type="checkbox" value="true"/>
-					<fmt:message key="authoring.tbl.use.noticeboard" />&nbsp; 
-					<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right"
-					   title="<fmt:message key='authoring.tbl.use.noticeboard.tooltip'/>">
-					</i>
-				</label>
-			</div>
-			<div class="form-group" id="divappex${param.appexNumber}NBEntryDiv">
-				<lams:CKEditor id="divappex${param.appexNumber}NBEntry" value="" contentFolderID="${param.contentFolderID}" height="100"></lams:CKEditor>
+				
+				<div class="checkbox">
+					<label for="divappex${param.appexNumber}NB">
+						<input name="divappex${param.appexNumber}NB" id="divappex${param.appexNumber}NB" type="checkbox" value="true"/>
+						<fmt:message key="authoring.tbl.use.noticeboard" />&nbsp; 
+						<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right"
+						   title="<fmt:message key='authoring.tbl.use.noticeboard.tooltip'/>">
+						</i>
+					</label>
+				</div>
+				<div class="form-group" id="divappex${param.appexNumber}NBEntryDiv">
+					<lams:CKEditor id="divappex${param.appexNumber}NBEntry" value="" contentFolderID="${param.contentFolderID}" height="100"></lams:CKEditor>
+				</div>
 			</div>
 		</div>
 	</div>

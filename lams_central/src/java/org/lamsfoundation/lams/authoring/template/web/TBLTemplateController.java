@@ -234,7 +234,7 @@ public class TBLTemplateController extends LdTemplateController {
 		if (applicationExercise.assessments == null) {
 		    // it is doKumaran type AE
 		    Long aetoolContentId = createDokumaranToolContent(userDTO, applicationExerciseTitle,
-			    applicationExercise.dokuDescription, applicationExercise.dokuInstructions, false,
+			    applicationExercise.description, applicationExercise.dokuInstructions, false,
 			    applicationExercise.dokuGalleryWalkEnabled, applicationExercise.dokuGalleryWalkReadOnly,
 			    applicationExercise.dokuGalleryWalkInstructions, null);
 		    activities.add(createDokumaranActivity(maxUIID, order++, currentActivityPosition, aetoolContentId,
@@ -248,8 +248,11 @@ public class TBLTemplateController extends LdTemplateController {
 		    }
 
 		    Long aetoolContentId = authoringService.createTblAssessmentToolContent(userDTO,
-			    applicationExerciseTitle, data.getText("boilerplate.ae.instructions"), null, true, true,
-			    false, true, true, true, questionsJSONArray);
+			    applicationExerciseTitle,
+			    StringUtils.isBlank(applicationExercise.description)
+				    ? data.getText("boilerplate.ae.instructions")
+				    : applicationExercise.description,
+			    null, true, true, false, true, true, true, questionsJSONArray);
 		    activities.add(createAssessmentActivity(maxUIID, order++, currentActivityPosition, aetoolContentId,
 			    data.contentFolderID, groupingUIID, null, null, applicationExerciseTitle));
 		}
@@ -333,7 +336,7 @@ public class TBLTemplateController extends LdTemplateController {
 	String title = "Fix me";
 	SortedMap<Integer, Assessment> assessments;
 
-	String dokuDescription;
+	String description;
 	String dokuInstructions;
 	boolean dokuGalleryWalkEnabled;
 	boolean dokuGalleryWalkReadOnly;
@@ -536,7 +539,7 @@ public class TBLTemplateController extends LdTemplateController {
 		String dateTimeString = WebUtil.readStrParam(request, dateField);
 		if (dateTimeString != null) {
 		    try {
-			Long offset = TBLTemplateController.LESSON_SCHEDULING_DATETIME_FORMAT.parse(dateTimeString)
+			long offset = TBLTemplateController.LESSON_SCHEDULING_DATETIME_FORMAT.parse(dateTimeString)
 				.getTime() - this.startTime;
 			return offset > 0 ? offset / 60000 : 0; // from ms to minutes
 		    } catch (ParseException e) {
@@ -555,24 +558,26 @@ public class TBLTemplateController extends LdTemplateController {
 		String appexDiv = "divappex" + i;
 		AppExData newAppex = new AppExData();
 		newAppex.title = WebUtil.readStrParam(request, appexDiv + "Title", true);
-		newAppex.dokuDescription = WebUtil.readStrParam(request, appexDiv + "dokuDescription", true);
-		newAppex.dokuInstructions = WebUtil.readStrParam(request, appexDiv + "dokuInstructions", true);
+		newAppex.description = WebUtil.readStrParam(request, appexDiv + "Description", true);
 
-		// if doKumaran data is present, it is doku type
-		// otherwise either it is Assessment type or the AE got deleted
-		if (StringUtils.isBlank(newAppex.dokuDescription) && StringUtils.isBlank(newAppex.dokuInstructions)) {
-		    newAppex.assessments = processAssessments(request, i, newAppex.title);
-		} else {
+		boolean isDoku = WebUtil.readBooleanParam(request, appexDiv + "IsDoku", false);
+
+		if (isDoku) {
+		    newAppex.dokuInstructions = WebUtil.readStrParam(request, appexDiv + "dokuInstructions", true);
 		    newAppex.dokuGalleryWalkEnabled = WebUtil.readBooleanParam(request,
 			    appexDiv + "dokuGalleryWalkEnabled", false);
 		    newAppex.dokuGalleryWalkReadOnly = WebUtil.readBooleanParam(request,
 			    appexDiv + "dokuGalleryWalkReadOnly", false);
 		    newAppex.dokuGalleryWalkInstructions = WebUtil.readStrParam(request,
 			    appexDiv + "dokuGalleryWalkInstructions", true);
+		} else {
+		    newAppex.assessments = processAssessments(request, i, newAppex.title);
 		}
 
-		if (newAppex.assessments != null || StringUtils.isNotBlank(newAppex.dokuDescription)
-			|| StringUtils.isNotBlank(newAppex.dokuInstructions)) {
+		if (isDoku
+			? StringUtils.isNotBlank(newAppex.description)
+				|| StringUtils.isNotBlank(newAppex.dokuInstructions)
+			: newAppex.assessments != null) {
 		    newAppex.useNoticeboard = WebUtil.readBooleanParam(request, appexDiv + "NB", false);
 		    if (newAppex.useNoticeboard) {
 			newAppex.noticeboardInstructions = getTrimmedString(request, appexDiv + "NBEntry", true);
@@ -817,7 +822,7 @@ public class TBLTemplateController extends LdTemplateController {
 	    }
 	    for (Map.Entry<Integer, AppExData> appExEntry : applicationExercises.entrySet()) {
 		AppExData appEx = appExEntry.getValue();
-		if (StringUtils.isBlank(appEx.dokuDescription) && StringUtils.isBlank(appEx.dokuInstructions)
+		if (StringUtils.isBlank(appEx.description) && StringUtils.isBlank(appEx.dokuInstructions)
 			&& (appEx.assessments == null)) {
 		    addValidationErrorMessage("authoring.error.application.exercise.num",
 			    new String[] { "\"" + appEx.title + "\"" }, applicationExerciseErrors);
