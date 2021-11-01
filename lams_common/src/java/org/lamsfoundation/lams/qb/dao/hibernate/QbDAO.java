@@ -293,6 +293,8 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	} else {
 	    bldr.append(ORDER_BY_NAME);
 	}
+
+	LAMSBaseDAO.sanitiseOrderBy(sortOrder);
 	bldr.append(sortOrder);
 
 	NativeQuery<?> query = getSession().createNativeQuery(bldr.toString());
@@ -494,6 +496,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 		queryBuilder.append(" ORDER BY ").append(orderBy);
 	    }
 	    if (StringUtils.isNotBlank(orderDirection)) {
+		LAMSBaseDAO.sanitiseOrderBy(orderDirection);
 		queryBuilder.append(" ").append(orderDirection);
 	    }
 	}

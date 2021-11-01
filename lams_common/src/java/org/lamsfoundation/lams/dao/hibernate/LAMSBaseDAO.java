@@ -14,6 +14,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -615,5 +616,12 @@ public class LAMSBaseDAO implements IBaseDAO {
     @Override
     public void releaseFromCache(Object o) {
 	getSessionFactory().getCurrentSession().evict(o);
+    }
+
+    public static void sanitiseOrderBy(String sortOrder) {
+	if (StringUtils.isNotBlank(sortOrder)
+		&& !(sortOrder.equalsIgnoreCase("asc") || sortOrder.equalsIgnoreCase("desc"))) {
+	    throw new IllegalArgumentException("Sort order must be one of \"asc\" or \"desc\"");
+	}
     }
 }
