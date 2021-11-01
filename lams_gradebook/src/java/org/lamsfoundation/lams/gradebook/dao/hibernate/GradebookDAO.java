@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.gradebook.dao.hibernate;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
@@ -99,20 +100,6 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		.setParameter("userID", userID.intValue()).setParameter("lessonID", lessonID).list();
 	return result;
     }
-
-//    @Override
-//    public Double getGradebookUserActivityMarkSum(Long lessonID, Integer userID) {
-//	List result = getSession().createQuery(GET_GRADEBOOK_ACTIVITIES_FROM_LESSON_SUM)
-//		.setInteger("userID", userID.intValue()).setLong("lessonID", lessonID.longValue()).list();
-//
-//	if (result != null) {
-//	    if (result.size() > 0) {
-//		return (Double) result.get(0);
-//	    }
-//	}
-//
-//	return 0.0;
-//    }
 
     @Override
     public List<GradebookUserActivity> getAllGradebookUserActivitiesForActivity(Long activityID) {
@@ -284,6 +271,8 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
     @Override
     public List<Lesson> getLessonsByGroupAndUser(final Integer userId, boolean staffOnly, final Integer orgId, int page,
 	    int size, String sortBy, String sortOrder, String searchString) {
+	GradebookDAO.sanitiseSortOrder(sortOrder);
+
 	final String LOAD_LESSONS_ORDERED_BY_FIELDS = "SELECT DISTINCT lesson "
 		+ "FROM Lesson lesson, LearningDesign ld, {0} Organisation lo "
 		+ "WHERE lesson.learningDesign.learningDesignId = ld.learningDesignId AND ld.copyTypeID != 3 "
@@ -351,6 +340,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
     @Override
     public List<User> getUsersByLesson(Long lessonId, int page, int size, String sortBy, String sortOrder,
 	    String searchString) {
+	GradebookDAO.sanitiseSortOrder(sortOrder);
 
 	final String LOAD_LEARNERS_ORDERED_BY_NAME = "SELECT DISTINCT user.* "
 		+ " FROM lams_lesson lesson, lams_group g, lams_user_group ug "
@@ -418,6 +408,8 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
     @Override
     public List<User> getUsersByActivity(Long lessonId, Long activityId, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
+	GradebookDAO.sanitiseSortOrder(sortOrder);
+
 	final String LOAD_LEARNERS_ORDERED_BY_NAME = "SELECT DISTINCT user.* "
 		+ " FROM lams_lesson lesson, lams_group g, lams_user_group ug "
 		+ " INNER JOIN lams_user user ON ug.user_id=user.user_id " + " WHERE lesson.lesson_id = :lessonId "
@@ -477,6 +469,8 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
     @Override
     public List<User> getUsersByGroup(Long lessonId, Long activityId, Long groupId, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
+	GradebookDAO.sanitiseSortOrder(sortOrder);
+
 	final String LOAD_LEARNERS_ORDERED_BY_NAME = "SELECT DISTINCT user.* " + " FROM lams_user_group ug "
 		+ " INNER JOIN lams_user user ON ug.user_id=user.user_id " + " WHERE ug.group_id=:groupId "
 		+ " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) "
@@ -544,6 +538,8 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
      */
     public List<User> getUsersFromOrganisation(Integer orgId, int page, int size, String sortOrder,
 	    String searchString) {
+	GradebookDAO.sanitiseSortOrder(sortOrder);
+
 	final String LOAD_LEARNERS_BY_ORG = "SELECT uo.user FROM UserOrganisation uo"
 		+ " WHERE uo.organisation.organisationId=:orgId"
 		+ " AND CONCAT(uo.user.lastName, ' ', uo.user.firstName) LIKE CONCAT('%', :searchString, '%') "
@@ -624,5 +620,12 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		+ " a.activity.activityId = :activityId AND a.learner.userId = :userId ORDER BY a.archiveDate DESC";
 	return getSession().createQuery(GET_ARCHIVED_ACTIVITY_MARKS, GradebookUserActivityArchive.class)
 		.setParameter("activityId", activityId).setParameter("userId", userId).list();
+    }
+
+    static void sanitiseSortOrder(String sortOrder) {
+	if (StringUtils.isNotBlank(sortOrder)
+		&& !(sortOrder.equalsIgnoreCase("asc") || sortOrder.equalsIgnoreCase("desc"))) {
+	    throw new IllegalArgumentException("Sort order must be one of \"asc\" or \"desc\"");
+	}
     }
 }
