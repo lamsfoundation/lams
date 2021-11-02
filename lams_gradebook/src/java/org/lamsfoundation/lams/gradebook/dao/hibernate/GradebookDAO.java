@@ -270,7 +270,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
     @Override
     public List<Lesson> getLessonsByGroupAndUser(final Integer userId, boolean staffOnly, final Integer orgId, int page,
 	    int size, String sortBy, String sortOrder, String searchString) {
-	LAMSBaseDAO.sanitiseOrderBy(sortOrder);
+	LAMSBaseDAO.sanitiseQueryPart(sortOrder);
 
 	final String LOAD_LESSONS_ORDERED_BY_FIELDS = "SELECT DISTINCT lesson "
 		+ "FROM Lesson lesson, LearningDesign ld, {0} Organisation lo "
@@ -339,7 +339,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
     @Override
     public List<User> getUsersByLesson(Long lessonId, int page, int size, String sortBy, String sortOrder,
 	    String searchString) {
-	LAMSBaseDAO.sanitiseOrderBy(sortOrder);
+	LAMSBaseDAO.sanitiseQueryPart(sortOrder);
 
 	final String LOAD_LEARNERS_ORDERED_BY_NAME = "SELECT DISTINCT user.* "
 		+ " FROM lams_lesson lesson, lams_group g, lams_user_group ug "
@@ -407,7 +407,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
     @Override
     public List<User> getUsersByActivity(Long lessonId, Long activityId, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
-	LAMSBaseDAO.sanitiseOrderBy(sortOrder);
+	LAMSBaseDAO.sanitiseQueryPart(sortOrder);
 
 	final String LOAD_LEARNERS_ORDERED_BY_NAME = "SELECT DISTINCT user.* "
 		+ " FROM lams_lesson lesson, lams_group g, lams_user_group ug "
@@ -468,7 +468,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
     @Override
     public List<User> getUsersByGroup(Long lessonId, Long activityId, Long groupId, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
-	LAMSBaseDAO.sanitiseOrderBy(sortOrder);
+	LAMSBaseDAO.sanitiseQueryPart(sortOrder);
 
 	final String LOAD_LEARNERS_ORDERED_BY_NAME = "SELECT DISTINCT user.* " + " FROM lams_user_group ug "
 		+ " INNER JOIN lams_user user ON ug.user_id=user.user_id " + " WHERE ug.group_id=:groupId "
@@ -537,7 +537,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
      */
     public List<User> getUsersFromOrganisation(Integer orgId, int page, int size, String sortOrder,
 	    String searchString) {
-	LAMSBaseDAO.sanitiseOrderBy(sortOrder);
+	LAMSBaseDAO.sanitiseQueryPart(sortOrder);
 
 	final String LOAD_LEARNERS_BY_ORG = "SELECT uo.user FROM UserOrganisation uo"
 		+ " WHERE uo.organisation.organisationId=:orgId"

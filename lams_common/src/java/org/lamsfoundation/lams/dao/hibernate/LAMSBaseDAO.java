@@ -51,6 +51,8 @@ public class LAMSBaseDAO implements IBaseDAO {
     private static final String EQUAL_TO_WHAT = "=?";
     private static final String LIKE_WHAT = " like ?";
 
+    private static final String QUERY_PART_SANITISE_REGEX = "\\w+";
+
     private static Logger log = Logger.getLogger(LAMSBaseDAO.class);
 
     @Autowired
@@ -618,10 +620,9 @@ public class LAMSBaseDAO implements IBaseDAO {
 	getSessionFactory().getCurrentSession().evict(o);
     }
 
-    public static void sanitiseOrderBy(String sortOrder) {
-	if (StringUtils.isNotBlank(sortOrder)
-		&& !(sortOrder.equalsIgnoreCase("asc") || sortOrder.equalsIgnoreCase("desc"))) {
-	    throw new IllegalArgumentException("Sort order must be one of \"asc\" or \"desc\"");
+    public static void sanitiseQueryPart(String queryPart) {
+	if (StringUtils.isNotBlank(queryPart) && !queryPart.strip().matches(QUERY_PART_SANITISE_REGEX)) {
+	    throw new IllegalArgumentException("Query part contains forbidden characters: " + queryPart);
 	}
     }
 }
