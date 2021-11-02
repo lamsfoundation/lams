@@ -10,6 +10,7 @@ import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,6 +22,10 @@ import javax.persistence.Transient;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.lamsfoundation.lams.qb.service.IQbService;
 
 /**
@@ -151,13 +156,15 @@ public class QbQuestion implements Serializable, Cloneable {
     @Column(name = "autocomplete_enabled")
     private boolean autocompleteEnabled;
 
-    @OneToMany(mappedBy = "qbQuestion", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "qbQuestion", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SELECT)
     @OrderBy("displayOrder")
-    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private List<QbOption> qbOptions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "qbQuestion", cascade = CascadeType.ALL)
-    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    @OneToMany(mappedBy = "qbQuestion", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SELECT)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private List<QbQuestionUnit> units = new ArrayList<>();
 
     // non-persistent field, useful for displaying other versions of this question
