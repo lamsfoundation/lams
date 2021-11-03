@@ -88,7 +88,11 @@
 			});
 			
 			<c:if test="${scratchie.revealOnDoubleClick}">
-				$('.scratchie-link[onDblClick]').on('touchend', function(){
+				$('.scratchie-link').on('touchend', function(){
+					if (!this.hasAttribute('onDblClick')) {
+						return;
+					}
+					
 					// allow single touch scratching on iPads even if double click scratching is enabled
 					var itemUid = $(this).data('itemUid'),
 						optionUid = $(this).data('optionUid');
