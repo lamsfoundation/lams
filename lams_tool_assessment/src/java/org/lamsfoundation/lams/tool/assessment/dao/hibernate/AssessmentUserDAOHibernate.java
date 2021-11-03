@@ -131,6 +131,8 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	} else {
 	    bldr.append(LOAD_USERS_ORDERED_ORDER_BY_NAME);
 	}
+
+	LAMSBaseDAO.sanitiseQueryPart(sortOrder);
 	bldr.append(sortOrder);
 
 	NativeQuery<Object[]> query = getSession().createNativeQuery(bldr.toString());
@@ -234,6 +236,8 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	} else {
 	    bldr.append(LOAD_USERS_ORDERED_ORDER_BY_NAME);
 	}
+
+	LAMSBaseDAO.sanitiseQueryPart(sortOrder);
 	bldr.append(sortOrder);
 
 	NativeQuery<Object[]> query = getSession().createNativeQuery(bldr.toString());

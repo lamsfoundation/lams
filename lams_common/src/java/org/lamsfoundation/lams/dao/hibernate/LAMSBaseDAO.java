@@ -14,6 +14,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -49,6 +50,8 @@ public class LAMSBaseDAO implements IBaseDAO {
     private static final String SPOT = ".";
     private static final String EQUAL_TO_WHAT = "=?";
     private static final String LIKE_WHAT = " like ?";
+
+    private static final String QUERY_PART_SANITISE_REGEX = "\\w+";
 
     private static Logger log = Logger.getLogger(LAMSBaseDAO.class);
 
@@ -615,5 +618,11 @@ public class LAMSBaseDAO implements IBaseDAO {
     @Override
     public void releaseFromCache(Object o) {
 	getSessionFactory().getCurrentSession().evict(o);
+    }
+
+    public static void sanitiseQueryPart(String queryPart) {
+	if (StringUtils.isNotBlank(queryPart) && !queryPart.strip().matches(QUERY_PART_SANITISE_REGEX)) {
+	    throw new IllegalArgumentException("Query part contains forbidden characters: " + queryPart);
+	}
     }
 }
