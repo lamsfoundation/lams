@@ -178,6 +178,7 @@ public class Dokumaran implements Cloneable {
 	    Dokumaran.log.error("When clone " + Dokumaran.class + " failed");
 	}
 
+	dokumaran.setAbsoluteTimeLimit(null);
 	dokumaran.setTimeLimitAdjustments(new HashMap<>(this.getTimeLimitAdjustments()));
 
 	return dokumaran;

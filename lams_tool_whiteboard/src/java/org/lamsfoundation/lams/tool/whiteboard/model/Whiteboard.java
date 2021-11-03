@@ -157,6 +157,7 @@ public class Whiteboard implements Cloneable {
 	    Whiteboard.log.error("When clone " + Whiteboard.class + " failed");
 	}
 
+	whiteboard.setAbsoluteTimeLimit(null);
 	whiteboard.setTimeLimitAdjustments(new HashMap<>(this.getTimeLimitAdjustments()));
 
 	return whiteboard;

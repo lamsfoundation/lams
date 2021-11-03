@@ -42,8 +42,6 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.SortComparator;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 
@@ -153,6 +151,7 @@ public class Scratchie implements Cloneable {
 	try {
 	    scratchie = (Scratchie) super.clone();
 	    scratchie.setUid(null);
+	    scratchie.setAbsoluteTimeLimit(null);
 	    if (scratchieItems != null) {
 		Iterator<ScratchieItem> iter = scratchieItems.iterator();
 		Set<ScratchieItem> set = new TreeSet<>();
@@ -164,6 +163,8 @@ public class Scratchie implements Cloneable {
 		}
 		scratchie.scratchieItems = set;
 	    }
+
+	    scratchie.setAbsoluteTimeLimit(null);
 	} catch (CloneNotSupportedException e) {
 	    log.error("When clone " + Scratchie.class + " failed");
 	}

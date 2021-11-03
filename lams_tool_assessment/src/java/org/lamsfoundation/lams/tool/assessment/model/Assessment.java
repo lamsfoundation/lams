@@ -223,7 +223,7 @@ public class Assessment implements Cloneable {
 	try {
 	    assessment = (Assessment) super.clone();
 	    assessment.setUid(null);
-
+	    
 	    // clone questions
 	    if (questions != null) {
 		Iterator<AssessmentQuestion> iter = questions.iterator();
@@ -276,7 +276,8 @@ public class Assessment implements Cloneable {
 	    if (createdBy != null) {
 		assessment.setCreatedBy((AssessmentUser) createdBy.clone());
 	    }
-
+	    
+	    assessment.setAbsoluteTimeLimit(null);
 	    assessment.setTimeLimitAdjustments(new HashMap<>(this.getTimeLimitAdjustments()));
 	} catch (CloneNotSupportedException e) {
 	    log.error("When clone " + Assessment.class + " failed");
