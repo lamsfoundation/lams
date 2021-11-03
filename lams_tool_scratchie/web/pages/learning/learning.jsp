@@ -88,7 +88,7 @@
 			});
 			
 			<c:if test="${scratchie.revealOnDoubleClick}">
-				$('.scratchie-link').on('touchend', function(){
+				$('.scratchie-link[onDblClick]').on('touchend', function(){
 					// allow single touch scratching on iPads even if double click scratching is enabled
 					var itemUid = $(this).data('itemUid'),
 						optionUid = $(this).data('optionUid');
@@ -158,7 +158,7 @@
 		            	
 		            if (json.optionCorrect) {
 		            	//disable scratching
-		            	$("[id^=imageLink-" + itemUid + "]").removeAttr('onclick'); 
+		            	$("[id^=imageLink-" + itemUid + "]").removeAttr('onClick').removeAttr('onDblClick'); 
 		            	$("[id^=imageLink-" + itemUid + "]").css('cursor','default');
 		            	$("[id^=image-" + itemUid + "]").not("img[src*='scratchie-correct-animation.gif']").not("img[src*='scratchie-correct.gif']").fadeTo(1300, 0.3);
 
