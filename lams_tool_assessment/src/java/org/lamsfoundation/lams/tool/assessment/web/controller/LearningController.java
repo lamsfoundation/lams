@@ -1038,8 +1038,7 @@ public class LearningController {
 	int dbResultCount = service.getAssessmentResultCount(assessment.getUid(), userId);
 	if (dbResultCount > 0) {
 
-	    // release object from the cache (it's required when we have modified result object in the same request)
-	    AssessmentResult result = service.getLastFinishedAssessmentResultNotFromChache(assessment.getUid(), userId);
+	    AssessmentResult result = service.getLastFinishedAssessmentResult(assessment.getUid(), userId);
 
 	    Map<Long, AssessmentQuestionResult> questionToResultMap = result.getQuestionResults().stream()
 		    .collect(Collectors.toMap(q -> q.getQbToolQuestion().getUid(), q -> q));

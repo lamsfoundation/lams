@@ -326,16 +326,6 @@ public interface IAssessmentService extends ICommonToolService {
     int countAttemptsPerOption(Long toolContentId, Long optionUid, boolean finishedAttemptsOnly);
 
     /**
-     * Return the latest *finished* result (the same as the method above). But previously evicting it from the cache. It
-     * might be useful in cases when we modify result and the use it during one request.
-     *
-     * @param assessmentUid
-     * @param userId
-     * @return
-     */
-    AssessmentResult getLastFinishedAssessmentResultNotFromChache(Long assessmentUid, Long userId);
-
-    /**
      * Return number of finished results. I.e. don't count the last not-yet-finished result (it can be autosave one).
      *
      * @param assessmentUid

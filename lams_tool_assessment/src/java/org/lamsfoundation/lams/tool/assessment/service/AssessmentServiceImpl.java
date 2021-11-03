@@ -1138,22 +1138,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public AssessmentResult getLastFinishedAssessmentResultNotFromChache(Long assessmentUid, Long userId) {
-	AssessmentResult finishedResult = getLastFinishedAssessmentResult(assessmentUid, userId);
-
-	//in case user played tricks with accessing Assessment using two tabs, finishedResult can be null and thus we need to request the last *not finished* result
-	if (finishedResult == null) {
-	    AssessmentResult notFinishedResult = getLastAssessmentResult(assessmentUid, userId);
-	    assessmentDao.releaseFromCache(notFinishedResult);
-	    return getLastAssessmentResult(assessmentUid, userId);
-
-	} else {
-	    assessmentDao.releaseFromCache(finishedResult);
-	    return getLastFinishedAssessmentResult(assessmentUid, userId);
-	}
-    }
-
-    @Override
     public int getAssessmentResultCount(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getAssessmentResultCount(assessmentUid, userId);
     }
