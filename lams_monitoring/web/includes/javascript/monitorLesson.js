@@ -1831,6 +1831,11 @@ function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 	if (learners) {
 		// create learner icons, along with handlers
 		$.each(learners, function(learnerIndex, learner){
+			if (learnerIndex >= 23) {
+				// display only first few learners, not all of them
+				return false;
+			}
+			
 			let icon = $(definePortrait(learner.portraitId, learner.id, STYLE_SMALL, true, LAMS_URL))
 				  .addClass('new-popover learner-icon')
 				  .attr({

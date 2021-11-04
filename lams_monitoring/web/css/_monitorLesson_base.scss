@@ -331,8 +331,13 @@ div#sequenceCanvas div.learner-icon-container div.learner-icon, div#sequenceCanv
 	position: absolute;
 }
 
+#completedLearnersContainer {
+	overflow: auto;	
+}
+
 #completedLearnersContainer div.learner-icon {
   margin-right: 5px;
+  min-width: 35px;
 }
 
 div#sequenceCanvas div.more-learner-icon, #completedLearnersContainer div.more-learner-icon {
