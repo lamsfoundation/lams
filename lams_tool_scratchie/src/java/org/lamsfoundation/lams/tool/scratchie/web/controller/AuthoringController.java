@@ -248,6 +248,7 @@ public class AuthoringController {
 	//allow using old and modified questions together
 	Set<ScratchieItem> oldItems = (scratchiePO == null) ? new HashSet<>()
 		: new HashSet<>(scratchiePO.getScratchieItems());
+	String oldPresetMarks = null;
 
 	if (scratchiePO == null) {
 	    // new Scratchie, create it.
@@ -255,6 +256,7 @@ public class AuthoringController {
 	    scratchiePO.setCreated(new Timestamp(new Date().getTime()));
 	    scratchiePO.setUpdated(new Timestamp(new Date().getTime()));
 	} else {
+	    oldPresetMarks = scratchiePO.getPresetMarks();
 	    // copyProperties() below sets scratchiePO's items to empty collection
 	    // but the items still exist in Hibernate cache, so we need to evict them now
 	    for (ScratchieItem item : oldItems) {
@@ -294,7 +296,7 @@ public class AuthoringController {
 
 	//recalculate results in case content is edited from monitoring
 	if (mode.isTeacher()) {
-	    scratchieService.recalculateUserAnswers(scratchiePO, oldItems, newItems);
+	    scratchieService.recalculateUserAnswers(scratchiePO, oldItems, newItems, oldPresetMarks);
 	}
 
 	// delete items from database

@@ -516,31 +516,35 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     }
 
     @Override
-    public void recalculateUserAnswers(Scratchie scratchie, Set<ScratchieItem> oldItems, Set<ScratchieItem> newItems) {
+    public void recalculateUserAnswers(Scratchie scratchie, Set<ScratchieItem> oldItems, Set<ScratchieItem> newItems,
+	    String oldPresetMarks) {
 	// create list of modified questions
 	List<ScratchieItem> modifiedItems = new ArrayList<>();
 	for (ScratchieItem oldItem : oldItems) {
 	    for (ScratchieItem newItem : newItems) {
 		if (oldItem.getDisplayOrder() == newItem.getDisplayOrder()) {
-		    boolean isItemModified = false;
 
 		    // title or question is different - do nothing
 
 		    // options are different
 		    List<QbOption> oldOptions = oldItem.getQbQuestion().getQbOptions();
 		    List<QbOption> newOptions = newItem.getQbQuestion().getQbOptions();
+		    boolean isItemModified = oldOptions.size() != newOptions.size();
+
 		    for (QbOption oldOption : oldOptions) {
+			if (isItemModified) {
+			    break;
+			}
+
 			for (QbOption newOption : newOptions) {
 			    if (oldOption.getDisplayOrder() == newOption.getDisplayOrder()) {
 
 				if (oldOption.isCorrect() != newOption.isCorrect()) {
 				    isItemModified = true;
+				    break;
 				}
 			    }
 			}
-		    }
-		    if (oldOptions.size() != newOptions.size()) {
-			isItemModified = true;
 		    }
 
 		    if (isItemModified) {
@@ -554,7 +558,9 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	for (ScratchieSession session : sessionList) {
 	    Long toolSessionId = session.getSessionId();
 	    List<ScratchieAnswerVisitLog> visitLogsToDelete = new ArrayList<>();
-	    boolean isRecalculateMarks = false;
+	    String newPresetMarks = scratchie.getPresetMarks();
+	    boolean isRecalculateMarks = oldPresetMarks == null ? newPresetMarks != null
+		    : newPresetMarks == null || !oldPresetMarks.equals(newPresetMarks);
 
 	    // remove all scratches for modified items
 

@@ -408,7 +408,7 @@ public interface IScratchieService extends ICommonToolService {
      * @param oldItems
      * @param newItems
      */
-    void recalculateUserAnswers(Scratchie scratchie, Set<ScratchieItem> oldItems, Set<ScratchieItem> newItems);
+    void recalculateUserAnswers(Scratchie scratchie, Set<ScratchieItem> oldItems, Set<ScratchieItem> newItems, String oldPresetMarks);
 
     void releaseFromCache(Object object);
 
