@@ -16,7 +16,6 @@
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 		<c:set var="userGroup" value="${sessionMap.monitoringSummary}" />
 			
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/prototype.js"></script>					
 		<%@ include file="/common/header.jsp"%>
 
 		<lams:JSImport src="includes/javascript/dacoMonitoring.js" relative="true" />
