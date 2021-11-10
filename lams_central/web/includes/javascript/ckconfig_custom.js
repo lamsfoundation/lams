@@ -64,32 +64,6 @@ CKEDITOR.config.toolbar_DefaultMonitorInline = [
   	['Format','Font','FontSize']
 ];
 
-CKEDITOR.config.toolbar_CustomWiki = [
-	['Source','-','Preview'],
-	['Undo','Redo'],
-	['Bold','Italic','Underline', '-','Subscript','Superscript'],
-	['NumberedList','BulletedList','-','Outdent','Indent'],
-	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-	['wikilink','Link','Image'],
-	['Jlatexmath'],
-	['TextColor','BGColor'],
-	['Table','HorizontalRule'],
-	['Format','Font','FontSize']
-];
-
-CKEDITOR.config.toolbar_CustomWikiInline = [
-  	['Sourcedialog'],
-  	['Undo','Redo'],
-  	['Bold','Italic','Underline', '-','Subscript','Superscript'],
-  	['NumberedList','BulletedList','-','Outdent','Indent'],
-  	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-  	['wikilink','Link','Image'],
-  	['Jlatexmath'],
-  	['TextColor','BGColor'],
-  	['Table','HorizontalRule'],
-  	['Format','Font','FontSize']
-];
-
 CKEDITOR.config.toolbar_LessonDescription = [
     ['Bold','Italic','Underline', '-','Subscript','Superscript'],
 	['NumberedList','BulletedList','-','Outdent','Indent'],
