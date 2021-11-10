@@ -273,7 +273,9 @@ public class ExcelUtil {
 			break;
 		}
 	    }
-
+	    // prevent malicious formula injection
+	    sourceCellStyle.setQuotePrefixed(true);
+	    
 	    Cell cell = CellUtil.createCell(row, columnIndex, null, sourceCellStyle);
 
 	    Object excelCellValue = excelCell.getCellValue();
