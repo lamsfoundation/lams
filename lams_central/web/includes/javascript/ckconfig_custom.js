@@ -19,7 +19,6 @@ CKEDITOR.config.toolbar_DefaultDokuInline = [
 // To include it back, just add 'VideoRecorder' in between the MoviePlayer and Kaltura
 
 CKEDITOR.config.toolbar_DefaultLearner = [
-	['Preview'],
 	['Undo','Redo'],
 	['Bold','Italic','Underline', '-','Subscript','Superscript'],
 	['NumberedList','BulletedList','-','Outdent','Indent'],
@@ -96,7 +95,6 @@ CKEDITOR.plugins.addExternal('wikilink', CKEDITOR.basePath + '../tool/lawiki10/w
 CKEDITOR.config.extraPlugins = 'wikilink,jlatexmath,image2,confighelper,bootstrapTabs,bootpanel,bootsnippets,wavepanel';
 CKEDITOR.config.enterMode = CKEDITOR.ENTER_DIV; 
 CKEDITOR.config.removePlugins = 'elementspath,about,specialchar';
-CKEDITOR.config.allowedContent = true;
 CKEDITOR.config.toolbarCanCollapse = true;
 CKEDITOR.config.embed_provider = '//ckeditor.iframe.ly/api/oembed?url={url}&callback={callback}'; //default URL for 'embed' plugin
 CKEDITOR.config.filebrowserUploadMethod	 = 'form';
