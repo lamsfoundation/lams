@@ -388,10 +388,7 @@ public class GradebookMonitoringController {
 	List<ExcelSheet> sheets = gradebookService.exportLessonGradebook(lesson);
 
 	// set cookie that will tell JS script that export has been finished
-	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
-	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
-	fileDownloadTokenCookie.setPath("/");
-	response.addCookie(fileDownloadTokenCookie);
+	WebUtil.setFileDownloadTokenCookie(request, response);
 
 	ExcelUtil.createExcel(out, sheets, gradebookService.getMessage("gradebook.export.dateheader"), true);
     }
@@ -423,10 +420,7 @@ public class GradebookMonitoringController {
 	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
 
 	// set cookie that will tell JS script that export has been finished
-	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
-	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
-	fileDownloadTokenCookie.setPath("/");
-	response.addCookie(fileDownloadTokenCookie);
+	WebUtil.setFileDownloadTokenCookie(request, response);
 
 	// Code to generate file and write file contents to response
 	ServletOutputStream out = response.getOutputStream();
@@ -465,10 +459,7 @@ public class GradebookMonitoringController {
 	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
 
 	// set cookie that will tell JS script that export has been finished
-	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
-	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
-	fileDownloadTokenCookie.setPath("/");
-	response.addCookie(fileDownloadTokenCookie);
+	WebUtil.setFileDownloadTokenCookie(request, response);
 
 	// Code to generate file and write file contents to response
 	ServletOutputStream out = response.getOutputStream();
