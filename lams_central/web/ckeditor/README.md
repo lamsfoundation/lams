@@ -24,7 +24,7 @@ Installing CKEditor is an easy task. Just follow these simple steps:
     
  2. **Extract** (decompress) the downloaded file into the root of your website.
  
- 3. Copy plugins developed by LAMS from the old instance of CKEditor
+ 3. Copy plugins developed by LAMS from the old instance of CKEditor  
 /ckeditor/filemanager  
 /ckeditor/plugins/jlatexmath  
 /ckeditor/plugins/bootsnippets  
@@ -61,12 +61,13 @@ Don't add class to the resulted preview body. It can be achieved by
 removing the following line from the ckeditor.js:
 ,d.getAttribute("class")&&(b+='class\x3d"'+d.getAttribute("class")+'" ')
 (As in [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=f8ccd872d79996df2a3d0e8485e2c95ccbef044b](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=f8ccd872d79996df2a3d0e8485e2c95ccbef044b))  
-For CKEditor 4.16.0 the code to remove is  
+For CKEditor 4.16.2 the code to remove is  
 b.getAttribute("class")&&(c=c.replace("\x3e",' class\x3d"'+b.getAttribute("class")+'"\x3e'));
   
-- bootstrapTabs plugin.
+- (NOT REQUIRED ANYMORE AS OF CKEDITOR 4.16.2)  
+bootstrapTabs plugin.
 The "element.getAscendant"'s function that was specified on Double click and contextMenu listener methods were replaced with the following "return !( element instanceof CKEDITOR.dom.document ) && element.hasClass('bootstrap-tabs') ;". As otherwise it always false positively determined there is a tabs element in CKEditor canvas (due to LAMS header containing a tab).  
-Modify plugins/bootstrapTabs/plugin.js  
+Modify plugins/bootstrapTabs/dialogs/plugin.js  
 or optimised ckeditor.js
 
 ```
@@ -82,7 +83,7 @@ So it should be
 
 ```
 return!(a instanceof CKEDITOR.dom.document)&&(("a"==a.name&&"tab"==a.attributes.role)||a.hasClass("bootstrap-tabs"))
-instea of
+instead of
 return!(a instanceof CKEDITOR.dom.document)&&("a"==a.name&&"tab"==a.attributes.role||a.hasClass("bootstrap-tabs"))
 ```
   
@@ -152,7 +153,7 @@ CKEDITOR.dialog.addIframe(
 
 - Including bootstrap tables CSS styles.  
 Replace /lams_central/web/ckeditor/plugins/table/dialogs/table.js entirely with the following file [https://code.lamsfoundation.org/fisheye/browse/~raw,r=2b9f93362e5be1cb3a8718e7f8f26bda31bd4a60/lams-github/lams_central/web/ckeditor/plugins/table/dialogs/table.js](https://code.lamsfoundation.org/fisheye/browse/~raw,r=2b9f93362e5be1cb3a8718e7f8f26bda31bd4a60/lams-github/lams_central/web/ckeditor/plugins/table/dialogs/table.js)  
-(as in [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=2b9f93362e5be1cb3a8718e7f8f26bda31bd4a60](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=2b9f93362e5be1cb3a8718e7f8f26bda31bd4a60))
+(as in [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=2b9f93362e5be1cb3a8718e7f8f26bda31bd4a60](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=2b9f93362e5be1cb3a8718e7f8f26bda31bd4a60))  
 For 4.16.0 upgrade following code has been added
 
 ```
@@ -282,10 +283,10 @@ table.$.className = bootstrapClass;
 (As in [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=62a52d851ecb5878433ca8ecd5ef422375619f47](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=62a52d851ecb5878433ca8ecd5ef422375619f47))
 
 
-- Add jquery.js and bootstrap.min.js scripts to preview page
-After
-"\x3c/title\x3e"+CKEDITOR.tools.buildStyleHtml(d.contentsCss)+
-Insert the following:
+- Add jquery.js and bootstrap.min.js scripts to preview page  
+After  
+"\x3c/title\x3e"+CKEDITOR.tools.buildStyleHtml(d.contentsCss)+  
+Insert the following:  
 "<script type='text/javascript' src='/lams/includes/javascript/jquery.js'></script><script type='text/javascript' src='/lams/includes/javascript/bootstrap.min.js'></script>"+
 
 (As in [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=cc93c9f975e956a0f5e70032c0dbc1beb106e2fb](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=cc93c9f975e956a0f5e70032c0dbc1beb106e2fb))  

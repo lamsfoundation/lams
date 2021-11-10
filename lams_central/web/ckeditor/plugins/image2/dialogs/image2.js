@@ -8,43 +8,43 @@ c*d):Math.round(a/d*c);isNaN(a)||(b?h:g).setValue(a)}}}function m(a){if(d){if("b
 b=f.lang.image2,c=f.lang.common,O=(new CKEDITOR.template('\x3cdiv\x3e\x3ca href\x3d"javascript:void(0)" tabindex\x3d"-1" title\x3d"'+b.lockRatio+'" class\x3d"cke_btn_locked" id\x3d"{lockButtonId}" role\x3d"checkbox"\x3e\x3cspan class\x3d"cke_icon"\x3e\x3c/span\x3e\x3cspan class\x3d"cke_label"\x3e'+b.lockRatio+'\x3c/span\x3e\x3c/a\x3e\x3ca href\x3d"javascript:void(0)" tabindex\x3d"-1" title\x3d"'+b.resetSize+'" class\x3d"cke_btn_reset" id\x3d"{resetButtonId}" role\x3d"button"\x3e\x3cspan class\x3d"cke_label"\x3e'+
 b.resetSize+"\x3c/span\x3e\x3c/a\x3e\x3c/div\x3e")).output({lockButtonId:J,resetButtonId:K}),H=CKEDITOR.plugins.image2,w=f.config,z=!(!w.filebrowserImageBrowseUrl&&!w.filebrowserBrowseUrl),A=f.widgets.registered.image.features,E=H.getNatural,r,x,L,G,k,l,u,v,n,e,y,d,p,g,h,B,M=[{id:"src",type:"text",label:c.url,onKeyup:F,onChange:F,setup:function(a){this.setValue(a.data.src)},commit:function(a){a.setData("src",this.getValue())},validate:CKEDITOR.dialog.validate.notEmpty(b.urlMissing)}];z&&M.push({type:"button",
 id:"browse",style:"display:inline-block;margin-top:14px;",align:"center",label:f.lang.common.browseServer,hidden:!0,filebrowser:"info:src"});return{title:b.title,minWidth:250,minHeight:100,onLoad:function(){r=this._.element.getDocument();G=N()},onShow:function(){x=this.getModel();L=x.parts.image;n=y=e=!1;B=E(L);u=k=B.width;v=l=B.height},contents:[{id:"info",label:b.infoTab,elements:[{type:"vbox",padding:0,children:[{type:"hbox",widths:["100%"],className:"cke_dialog_image_url",children:M}]},{id:"alt",
-type:"text",label:b.alt,setup:function(a){this.setValue(a.data.alt)},commit:function(a){a.setData("alt",this.getValue())},validate:!0===f.config.image2_altRequired?CKEDITOR.dialog.validate.notEmpty(b.altMissing):null},//**LAMS** the following classes chunk added by LAMS 
-	//**LAMS** the following classes chunk added by LAMS 
-	{
-	    id: 'classes',
-	    type: 'text',
-	    label: 'Classes',
-	    setup: function( widget ) {
-	    	var classesObj = widget.getClasses();
-	    	var classesNames = [];
-	    	for (var classesName in classesObj) {
-	            if (classesObj.hasOwnProperty(classesName)) {
-	            	classesNames.push(classesName);
-	            }
-	        }
-	        this.setValue( classesNames.join(',') );
-	        
-	    },
-	    commit: function( widget ) {
-	    	var oldClasses = widget.getClasses();
-	    	
-	    	//add new classes
-	    	var userEnteredClasses = this.getValue().split(',');
-	    	for (var i = 0; i < userEnteredClasses.length; i++) {
-	    		var userEnteredClass = userEnteredClasses[i];
-	    	    if (!widget.hasClass(userEnteredClass)) {
-	    	    	widget.addClass(userEnteredClass);
-	    	    }
-	    	}
-	        
-	    	//remove obsolete classes
-	        for (var oldClass in oldClasses) {
-	            if (oldClasses.hasOwnProperty(oldClass) && !userEnteredClasses.includes(oldClass)) {
-	            	widget.removeClass(oldClass);
-	            }
-	        }
-	    }
-	},
+type:"text",label:b.alt,setup:function(a){this.setValue(a.data.alt)},commit:function(a){a.setData("alt",this.getValue())},validate:!0===f.config.image2_altRequired?CKEDITOR.dialog.validate.notEmpty(b.altMissing):null},
+//**LAMS** the following classes chunk added by LAMS 
+{
+    id: 'classes',
+    type: 'text',
+    label: 'Classes',
+    setup: function( widget ) {
+    	var classesObj = widget.getClasses();
+    	var classesNames = [];
+    	for (var classesName in classesObj) {
+            if (classesObj.hasOwnProperty(classesName)) {
+            	classesNames.push(classesName);
+            }
+        }
+        this.setValue( classesNames.join(',') );
+        
+    },
+    commit: function( widget ) {
+    	var oldClasses = widget.getClasses();
+    	
+    	//add new classes
+    	var userEnteredClasses = this.getValue().split(',');
+    	for (var i = 0; i < userEnteredClasses.length; i++) {
+    		var userEnteredClass = userEnteredClasses[i];
+    	    if (!widget.hasClass(userEnteredClass)) {
+    	    	widget.addClass(userEnteredClass);
+    	    }
+    	}
+        
+    	//remove obsolete classes
+        for (var oldClass in oldClasses) {
+            if (oldClasses.hasOwnProperty(oldClass) && !userEnteredClasses.includes(oldClass)) {
+            	widget.removeClass(oldClass);
+            }
+        }
+    }
+},
 {type:"hbox",widths:["25%","25%","50%"],requiredContent:A.dimension.requiredContent,children:[{type:"text",width:"45px",id:"width",label:c.width,validate:C,onKeyUp:I,onLoad:function(){g=this},setup:function(a){this.setValue(a.data.width)},commit:function(a){a.setData("width",this.getValue())}},
 {type:"text",id:"height",width:"45px",label:c.height,validate:C,onKeyUp:I,onLoad:function(){h=this},setup:function(a){this.setValue(a.data.height)},commit:function(a){a.setData("height",this.getValue())}},{id:"lock",type:"html",style:"margin-top:18px;width:40px;height:20px;",onLoad:function(){function a(a){a.on("mouseover",function(){this.addClass("cke_btn_over")},a);a.on("mouseout",function(){this.removeClass("cke_btn_over")},a)}var b=this.getDialog();d=r.getById(J);p=r.getById(K);d&&(b.addFocusable(d,
 4+z),d.on("click",function(a){m();a.data&&a.data.preventDefault()},this.getDialog()),a(d));p&&(b.addFocusable(p,5+z),p.on("click",function(a){n?(g.setValue(u),h.setValue(v)):(g.setValue(k),h.setValue(l));a.data&&a.data.preventDefault()},this),a(p))},setup:function(a){m(a.data.lock)},commit:function(a){a.setData("lock",e)},html:O}]},{type:"hbox",id:"alignment",requiredContent:A.align.requiredContent,children:[{id:"align",type:"radio",items:[[c.alignNone,"none"],[c.left,"left"],[c.center,"center"],
