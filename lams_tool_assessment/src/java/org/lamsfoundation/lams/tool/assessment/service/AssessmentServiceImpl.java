@@ -725,18 +725,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    }
 	}
 
-	boolean isAnswerModified = false;
-
-	//if teacher modified question in monitor - update questionDto now
-	if (assessment.isContentModifiedInMonitor(assessmentResult.getStartDate())) {
-	    AssessmentQuestion modifiedQuestion = assessmentQuestionDao.getByUid(questionDto.getUid());
-	    QuestionDTO updatedQuestionDto = modifiedQuestion.getQuestionDTO();
-	    PropertyUtils.copyProperties(questionDto, updatedQuestionDto);
-
-	    isAnswerModified = true;
-	}
-
-	isAnswerModified |= !Objects.equals(questionResult.getAnswerBoolean(), questionDto.getAnswerBoolean())
+	boolean isAnswerModified = !Objects.equals(questionResult.getAnswerBoolean(), questionDto.getAnswerBoolean())
 		|| !Objects.equals(questionResult.getAnswerFloat(), questionDto.getAnswerFloat())
 		|| !Objects.equals(questionResult.getAnswer(), questionDto.getAnswer());
 
@@ -756,9 +745,18 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		}
 	    }
 
-	    // store option answer values
-	    isAnswerModified |= !Objects.equals(optionAnswer.getAnswerBoolean(), optionDto.getAnswerBoolean());
+	    if (optionAnswer == null) {
+		isAnswerModified = true;
+		optionAnswer = new AssessmentOptionAnswer();
+		optionAnswer.setOptionUid(optionDto.getUid());
+		questionResult.getOptionAnswers().add(optionAnswer);
+		assessmentResultDao.insert(optionAnswer);
 
+	    } else {
+		isAnswerModified |= !Objects.equals(optionAnswer.getAnswerBoolean(), optionDto.getAnswerBoolean());
+	    }
+
+	    // store option answer values
 	    optionAnswer.setAnswerBoolean(optionDto.getAnswerBoolean());
 	    if (questionDto.getType() == QbQuestion.TYPE_ORDERING) {
 		isAnswerModified |= !Objects.equals(optionAnswer.getAnswerInt(), optionDto.getDisplayOrder());
@@ -782,8 +780,18 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    questionResult.setJustification(questionDto.getJustification());
 	}
 
+	//if teacher modified question in monitor - update questionDto now
+	if (assessment.isContentModifiedInMonitor(assessmentResult.getStartDate())) {
+	    AssessmentQuestion modifiedQuestion = assessmentQuestionDao.getByUid(questionDto.getUid());
+	    QuestionDTO updatedQuestionDto = modifiedQuestion.getQuestionDTO();
+	    PropertyUtils.copyProperties(questionDto, updatedQuestionDto);
+
+	    assessmentResult.setStartDate(assessment.getUpdated());
+
+	    isAnswerModified = true;
+	}
+
 	questionResult.setAnswerModified(isAnswerModified);
-	;
 	return questionResult;
     }
 
@@ -2590,14 +2598,17 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 				    for (QbOption oldOptionIter : oldQuestion.getQbQuestion().getQbOptions()) {
 					if (oldOptionIter.getUid().equals(oldOptionAnswer.getOptionUid())) {
 					    oldOption = oldOptionIter;
+					    break;
 					}
 				    }
 
-				    //update
-				    for (QbOption newOption : modifiedQuestion.getQbQuestion().getQbOptions()) {
-					if (oldOption.getDisplayOrder() == newOption.getDisplayOrder()) {
-					    oldOptionAnswer.setOptionUid(newOption.getUid());
-					    break;
+				    if (oldOption != null) {
+					//update
+					for (QbOption newOption : modifiedQuestion.getQbQuestion().getQbOptions()) {
+					    if (oldOption.getDisplayOrder() == newOption.getDisplayOrder()) {
+						oldOptionAnswer.setOptionUid(newOption.getUid());
+						break;
+					    }
 					}
 				    }
 				}
