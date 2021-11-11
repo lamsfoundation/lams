@@ -59,7 +59,7 @@ public class ForgotPasswordServlet extends HttpServlet {
 
     private static int MILLISECONDS_IN_A_DAY = 86400000;
 
-    private static String LANGUAGE_KEY = "&languageKey=";
+    private static String LANGUAGE_KEY = "languageKey";
 
     /*
      * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
@@ -93,12 +93,12 @@ public class ForgotPasswordServlet extends HttpServlet {
 	    } else {
 		param = request.getParameter("login");
 	    }
-	    handleEmailRequest(findByEmail, param.trim(), response);
+	    handleEmailRequest(findByEmail, param.trim(), request, response);
 
 	} else if (method.equals("requestPasswordChange")) {
 	    String newPassword = request.getParameter("newPassword");
 	    String key = request.getParameter("key");
-	    handlePasswordChange(newPassword, key, response);
+	    handlePasswordChange(newPassword, key, request, response);
 
 	} else {
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -117,8 +117,8 @@ public class ForgotPasswordServlet extends HttpServlet {
      * @throws ServletException
      * @throws IOException
      */
-    public void handleEmailRequest(Boolean findByEmail, String param, HttpServletResponse response)
-	    throws ServletException, IOException {
+    public void handleEmailRequest(Boolean findByEmail, String param, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException, IOException {
 	if ((param == null) || param.equals("")) {
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 	    return;
@@ -210,10 +210,10 @@ public class ForgotPasswordServlet extends HttpServlet {
 	//show default message if there is no error message
 	languageKey = languageKey == null ? ForgotPasswordServlet.REQUEST_PROCESSED : languageKey;
 
-	String redirectUrl = Configuration.get("ServerURL") + "forgotPasswordProc.jsp?"
-		+ ForgotPasswordServlet.LANGUAGE_KEY + languageKey + "&showErrorMessage=" + showErrorMessage;
+	request.setAttribute(ForgotPasswordServlet.LANGUAGE_KEY, languageKey);
+	request.setAttribute("showErrorMessage", showErrorMessage);
+	request.getRequestDispatcher("/forgotPasswordProc.jsp").forward(request, response);
 
-	response.sendRedirect(redirectUrl);
     }
 
     /**
@@ -222,10 +222,8 @@ public class ForgotPasswordServlet extends HttpServlet {
      * @param key
      *            the key of the forgot password request
      */
-    public void handlePasswordChange(String newPassword, String key, HttpServletResponse response)
-	    throws ServletException, IOException {
-	int success = 0;
-
+    public void handlePasswordChange(String newPassword, String key, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException, IOException {
 	if ((key == null) || key.equals("") || (newPassword == null) || newPassword.equals("")) {
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 	    return;
@@ -256,9 +254,9 @@ public class ForgotPasswordServlet extends HttpServlet {
 	    userManagementService.delete(fp);
 	}
 
-	String redirectUrl = Configuration.get("ServerURL") + "forgotPasswordProc.jsp?"
-		+ ForgotPasswordServlet.LANGUAGE_KEY + languageKey + "&showErrorMessage=" + showErrorMessage;
-	response.sendRedirect(response.encodeRedirectURL(redirectUrl));
+	request.setAttribute(ForgotPasswordServlet.LANGUAGE_KEY, languageKey);
+	request.setAttribute("showErrorMessage", showErrorMessage);
+	request.getRequestDispatcher("/forgotPasswordProc.jsp").forward(request, response);
     }
 
     /**
