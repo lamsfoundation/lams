@@ -44,7 +44,7 @@
 						return;
 					}
 					
-					discloseAnswers(button, resultsPane);
+					discloseAnswers(button, resultsPane, true);
 				});
 			});
 	
