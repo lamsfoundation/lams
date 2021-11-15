@@ -287,8 +287,10 @@ table.$.className = bootstrapClass;
 After  
 "\x3c/title\x3e"+CKEDITOR.tools.buildStyleHtml(d.contentsCss)+  
 Insert the following:  
-"<script type='text/javascript' src='/lams/includes/javascript/jquery.js'></script><script type='text/javascript' src='/lams/includes/javascript/bootstrap.min.js'></script>"+
 
+```
+"<script type='text/javascript' src='/lams/includes/javascript/jquery.js'></script><script type='text/javascript' src='/lams/includes/javascript/bootstrap.min.js'></script>"+
+```
 (As in [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=cc93c9f975e956a0f5e70032c0dbc1beb106e2fb](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=cc93c9f975e956a0f5e70032c0dbc1beb106e2fb))  
 
 - Do not set default tooltip to CKEditor instances  
