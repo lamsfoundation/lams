@@ -2997,7 +2997,7 @@ GeneralLib = {
 				layout.ld.title = title;
 				layout.ld.invalid = response.validation.length > 0;
 				
-				var wasReadOnly = layout.ld.readOnly;
+				var wasReadOnly = layout.ld.readOnly == true;
 				layout.ld.readOnly = ld.readOnly;
 				
 				// check if there were any validation errors

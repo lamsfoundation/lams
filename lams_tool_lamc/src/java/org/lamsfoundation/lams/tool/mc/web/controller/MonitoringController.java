@@ -281,10 +281,7 @@ public class MonitoringController {
 	}
 
 	// set cookie that will tell JS script that export has been finished
-	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
-	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
-	fileDownloadTokenCookie.setPath("/");
-	response.addCookie(fileDownloadTokenCookie);
+	WebUtil.setFileDownloadTokenCookie(request, response);
 
 	// construct download file response header
 	OutputStream out = response.getOutputStream();

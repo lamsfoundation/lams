@@ -1,11 +1,9 @@
 package org.lamsfoundation.lams.learning.kumalive;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -24,7 +22,6 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -35,8 +32,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -134,8 +129,8 @@ public class KumaliveController {
 	String sortOrder = WebUtil.readStrParam(request, CommonConstants.PARAM_SORD);
 	String sortColumn = WebUtil.readStrParam(request, CommonConstants.PARAM_SIDX, true);
 
-	ObjectNode resultJSON = kumaliveService.getReportOrganisationData(organisationId,
-		sortColumn, !"DESC".equalsIgnoreCase(sortOrder), rowLimit, page);
+	ObjectNode resultJSON = kumaliveService.getReportOrganisationData(organisationId, sortColumn,
+		!"DESC".equalsIgnoreCase(sortOrder), rowLimit, page);
 	response.setContentType("text/xml;charset=utf-8");
 	return resultJSON.toString();
     }
@@ -280,10 +275,7 @@ public class KumaliveController {
 	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
 
 	// set cookie that will tell JS script that export has been finished
-	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
-	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
-	fileDownloadTokenCookie.setPath("/");
-	response.addCookie(fileDownloadTokenCookie);
+	WebUtil.setFileDownloadTokenCookie(request, response);
 
 	ExcelUtil.createExcel(response.getOutputStream(), sheets, "Exported on:", true);
     }
@@ -298,8 +290,8 @@ public class KumaliveController {
 	    log.warn(warning);
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
 	}
-	if (!securityService.hasOrgRole(organisationId, userId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get rubrics", false)) {
+	if (!securityService.hasOrgRole(organisationId, userId, new String[] { Role.GROUP_MANAGER, Role.MONITOR },
+		"kumalive get rubrics", false)) {
 	    String warning = "User " + userId + " is not a monitor of organisation " + organisationId;
 	    log.warn(warning);
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);

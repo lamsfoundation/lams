@@ -34,7 +34,6 @@ import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -597,10 +596,7 @@ public class MonitoringController {
 	    List<ExcelSheet> sheets = service.exportTeamReportSpreadsheet(toolContentId);
 
 	    // set cookie that will tell JS script that export has been finished
-	    String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
-	    Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
-	    fileDownloadTokenCookie.setPath("/");
-	    response.addCookie(fileDownloadTokenCookie);
+	    WebUtil.setFileDownloadTokenCookie(request, response);
 
 	    ExcelUtil.createExcel(out, sheets, "Exported on:", true);
 

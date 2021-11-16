@@ -19,7 +19,6 @@ CKEDITOR.config.toolbar_DefaultDokuInline = [
 // To include it back, just add 'VideoRecorder' in between the MoviePlayer and Kaltura
 
 CKEDITOR.config.toolbar_DefaultLearner = [
-	['Preview'],
 	['Undo','Redo'],
 	['Bold','Italic','Underline', '-','Subscript','Superscript'],
 	['NumberedList','BulletedList','-','Outdent','Indent'],
@@ -89,6 +88,20 @@ CKEDITOR.config.toolbar_CustomWikiInline = [
   	['Table','HorizontalRule'],
   	['Format','Font','FontSize']
 ];
+
+CKEDITOR.config.toolbar_CustomWikiLearner = [
+	['Undo','Redo'],
+	['Bold','Italic','Underline', '-','Subscript','Superscript'],
+	['NumberedList','BulletedList','-','Outdent','Indent'],
+	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
+	['wikilink','Link','Image'],
+	['Jlatexmath'],
+	['TextColor','BGColor'],
+	['Table','HorizontalRule'],
+	['Format','Font','FontSize']
+];
+
+CKEDITOR.config.toolbar_CustomWikiLearnerInline = CKEDITOR.config.toolbar_CustomWikiLearner;
 
 CKEDITOR.config.toolbar_LessonDescription = [
     ['Bold','Italic','Underline', '-','Subscript','Superscript'],
@@ -166,7 +179,9 @@ CKEDITOR.on('instanceReady', function(e){
 		
 		var anchors = tempDiv.getElementsByTagName('a');
 		for (var i = 0; i < anchors.length; i++) {
-			anchors[i].setAttribute('target', '_blank');
+			if (!anchors[i].classList.contains('skip-auto-target')) {
+				anchors[i].setAttribute('target', '_blank');
+			}
 		}
 		
 		f.data.dataValue = tempDiv.innerHTML;

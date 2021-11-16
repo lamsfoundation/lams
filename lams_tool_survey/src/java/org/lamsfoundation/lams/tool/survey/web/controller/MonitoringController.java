@@ -32,7 +32,6 @@ import java.util.SortedMap;
 import java.util.TimeZone;
 
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -469,10 +468,7 @@ public class MonitoringController {
 	}
 
 	// set cookie that will tell JS script that export has been finished
-	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
-	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
-	fileDownloadTokenCookie.setPath("/");
-	response.addCookie(fileDownloadTokenCookie);
+	WebUtil.setFileDownloadTokenCookie(request, response);
 
 	String fileName = "lams_survey_" + toolSessionID + ".xlsx";
 	response.setContentType("application/x-download");

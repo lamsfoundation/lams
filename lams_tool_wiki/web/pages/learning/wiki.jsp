@@ -382,7 +382,7 @@
                           </div>
                           <lams:CKEditor id="wikiBody"
                                          value="${currentWikiPage.currentWikiContentDTO.body}"
-                                         contentFolderID="${contentFolderID}" toolbarSet="CustomWiki"
+                                         contentFolderID="${contentFolderID}" toolbarSet="CustomWikiLearner"
                                          height="400px">
                           </lams:CKEditor>
                         </td>
@@ -422,7 +422,7 @@
                             <fmt:message key="label.wiki.body"></fmt:message>
                           </div>
                           <lams:CKEditor id="newPageWikiBody" value="" height="400px"
-                                         contentFolderID="${contentFolderID}" toolbarSet="CustomWiki">
+                                         contentFolderID="${contentFolderID}" toolbarSet="CustomWikiLearner">
                           </lams:CKEditor>
 
                           <a href="javascript:doEditOrAdd('addPage');" class="btn btn-primary pull-right voffset5"><fmt:message key="label.wiki.savechanges"></fmt:message></a> 
