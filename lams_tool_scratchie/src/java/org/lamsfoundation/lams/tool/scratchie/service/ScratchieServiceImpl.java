@@ -1405,8 +1405,12 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	}
 	row.addCell(getMessage("label.total"), true);
 	row.addCell(getMessage("label.total") + " %", true);
+	row.addCell(getMessage("label.marks"), true);
+	row.addCell(getMessage("label.marks") + " %", true);
 
 	List<GroupSummary> summaryByTeam = getSummaryByTeam(scratchie, items);
+	int maxPossibleScore = getMaxPossibleScore(scratchie);
+
 	for (GroupSummary summary : summaryByTeam) {
 
 	    row = immediateAnalysisSheet.initRow();
@@ -1434,6 +1438,10 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    }
 	    row.addCell(Integer.valueOf(numberOfFirstChoiceEvents));
 	    double percentage = (numberOfItems == 0) ? 0 : (double) numberOfFirstChoiceEvents / numberOfItems;
+	    row.addPercentageCell(percentage);
+
+	    row.addCell(summary.getMark());
+	    percentage = (numberOfItems == 0) ? 0 : (double) summary.getMark() / maxPossibleScore;
 	    row.addPercentageCell(percentage);
 	}
 
@@ -1487,6 +1495,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	}
 	row.addCell(getMessage("label.total"));
 	row.addCell(getMessage("label.total") + " %");
+	row.addCell(getMessage("label.marks"));
+	row.addCell(getMessage("label.marks") + " %");
 
 	row = reportByTeamSheet.initRow();
 	row.addCell(getMessage("label.correct.answer"));
@@ -1521,12 +1531,16 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	    percentages[groupCount - 1] = percentage;
 	    groupCount++;
+	    
+	    row.addCell(summary.getMark());
+	    percentage = (numberOfItems == 0) ? 0 : (double) summary.getMark() / maxPossibleScore;
+	    row.addPercentageCell(percentage);
 	}
 
 	Arrays.sort(percentages);
 
 	// avg mean
-	int sum = 0;
+	double sum = 0;
 	for (int i = 0; i < percentages.length; i++) {
 	    sum += percentages[i];
 	}
@@ -1548,7 +1562,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	row = reportByTeamSheet.initRow();
 	row.addCell(getMessage("label.median"));
 	row.addEmptyCells(numberOfItems + 1);
-	row.addCell(median);
+	row.addPercentageCell(median);
 
 	row = reportByTeamSheet.initRow();
 	row.addCell(getMessage("label.legend"));
