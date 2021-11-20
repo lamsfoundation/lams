@@ -101,11 +101,11 @@
 				startTour();
 			</c:if>
 
-			<c:if test="${showTimezoneWarning}"> 
+			<c:if test="${showTimezoneWarning}">
 		    var current_date = new Date( );
 		    var client_gmt_offset_minutes = current_date.getTimezoneOffset( );
 		    $('#offset').html( client_gmt_offset_minutes / 60 );
-		    var lams_gmt_offset_minutes = ( <lams:user property="timeZone.rawOffset"/> + <lams:user property="timeZone.DSTSavings"/> ) / 60000;
+		    var lams_gmt_offset_minutes = <lams:user property="timeZoneOffsetSeconds"/> / 60;
 		    if ( client_gmt_offset_minutes != -lams_gmt_offset_minutes ) {
 			    $('#timezoneWarning').html( '<BR/><fmt:message key="label.timezone.warning"/>');
 				<c:if test="${showTimezoneWarningPopup}"> 
