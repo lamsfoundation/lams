@@ -96,6 +96,7 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
+import org.lamsfoundation.lams.util.ValidationUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -331,12 +332,19 @@ public class ObjectExtractor implements IObjectExtractor {
 	if ((learningDesign != null) && (learningDesign.getCopyTypeID() != null)
 		&& !learningDesign.getCopyTypeID().equals(copyTypeID) && !learningDesign.getEditOverrideLock()) {
 	    throw new ObjectExtractorException(
-		    "Unable to save learning design.  Cannot change copy type on existing design.");
+		    "Unable to save learning design. Cannot change copy type on existing design.");
 	}
 	if (!copyTypeID.equals(LearningDesign.COPY_TYPE_NONE) && !learningDesign.getEditOverrideLock()) {
-	    throw new ObjectExtractorException("Unable to save learning design.  Learning design is read-only");
+	    throw new ObjectExtractorException("Unable to save learning design. Learning design is read-only");
 	}
 	learningDesign.setCopyTypeID(copyTypeID);
+
+	learningDesign.setTitle(JsonUtil.optString(ldJSON, AuthoringJsonTags.TITLE));
+	if (!ValidationUtil.isLearningDesignNameValid(learningDesign.getTitle())) {
+	    throw new ObjectExtractorException(
+		    "Unable to save learning design. Learning design title contains forbidden characters: "
+			    + learningDesign.getTitle());
+	}
 
 	learningDesign.setWorkspaceFolder(workspaceFolder);
 	learningDesign.setUser(user);
@@ -379,7 +387,6 @@ public class ObjectExtractor implements IObjectExtractor {
 	learningDesign.setValidDesign(JsonUtil.optBoolean(ldJSON, AuthoringJsonTags.VALID_DESIGN, false));
 	learningDesign.setLearningDesignUIID(JsonUtil.optInt(ldJSON, AuthoringJsonTags.LEARNING_DESIGN_UIID));
 	learningDesign.setDescription(JsonUtil.optString(ldJSON, AuthoringJsonTags.DESCRIPTION));
-	learningDesign.setTitle(JsonUtil.optString(ldJSON, AuthoringJsonTags.TITLE));
 	learningDesign.setMaxID(JsonUtil.optInt(ldJSON, AuthoringJsonTags.MAX_ID));
 	learningDesign.setReadOnly(JsonUtil.optBoolean(ldJSON, AuthoringJsonTags.READ_ONLY));
 	learningDesign.setDateReadOnly(
@@ -968,6 +975,12 @@ public class ObjectExtractor implements IObjectExtractor {
 	activity.setActivityUIID(activityUIID);
 	activity.setDescription(JsonUtil.optString(activityDetails, AuthoringJsonTags.DESCRIPTION));
 	activity.setTitle(JsonUtil.optString(activityDetails, AuthoringJsonTags.ACTIVITY_TITLE));
+
+	if (!ValidationUtil.isLearningDesignNameValid(activity.getTitle())) {
+	    throw new ObjectExtractorException(
+		    "Unable to save learning design. Activity title contains forbidden characters: "
+			    + activity.getTitle());
+	}
 
 	activity.setXcoord(getCoord(activityDetails, AuthoringJsonTags.XCOORD));
 	activity.setYcoord(getCoord(activityDetails, AuthoringJsonTags.YCOORD));

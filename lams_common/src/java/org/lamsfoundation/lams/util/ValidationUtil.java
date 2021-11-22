@@ -62,6 +62,8 @@ public class ValidationUtil {
     private final static Pattern REGEX_PASSWORD_CHARATERS_ALLOWED = Pattern
 	    .compile("^[A-Za-z0-9\\d`~!@#$%^&*\\(\\)_\\-+={}\\[\\]\\\\|:\\;\\\"\\'\\<\\>,.?\\/]*$");
 
+    private final static Pattern REGEX_LEARNING_DESIGN_NAMES = Pattern.compile("^[^<>^*@%$]*$");
+
     private static BreachDatabase TOP_100K_PASSWORDS_DB = null;
 
     /**
@@ -166,16 +168,11 @@ public class ValidationUtil {
 	if (user == null || StringUtils.isBlank(password)) {
 	    return true;
 	}
-	if (user.getUserId() != null && password.equals(user.getUserId().toString())) {
+	if ((user.getUserId() != null && password.equals(user.getUserId().toString()))
+		|| (StringUtils.isNotBlank(user.getLogin()) && password.equalsIgnoreCase(user.getLogin().trim()))) {
 	    return false;
 	}
-	if (StringUtils.isNotBlank(user.getLogin()) && password.equalsIgnoreCase(user.getLogin().trim())) {
-	    return false;
-	}
-	if (StringUtils.isNotBlank(user.getEmail()) && password.equalsIgnoreCase(user.getEmail().trim())) {
-	    return false;
-	}
-	if (StringUtils.isNotBlank(user.getFirstName()) && password.equalsIgnoreCase(user.getFirstName().trim())) {
+	if ((StringUtils.isNotBlank(user.getEmail()) && password.equalsIgnoreCase(user.getEmail().trim())) || (StringUtils.isNotBlank(user.getFirstName()) && password.equalsIgnoreCase(user.getFirstName().trim()))) {
 	    return false;
 	}
 	if (StringUtils.isNotBlank(user.getLastName()) && password.equalsIgnoreCase(user.getLastName().trim())) {
@@ -320,5 +317,13 @@ public class ValidationUtil {
 
 	// check min words limit is reached
 	return (wordCount >= minWordsLimit);
+    }
+
+    /**
+     * Checks if LD's and activities' titles are valid.
+     * Mirrors regex set in nameValidator in authoringGeneral.js
+     */
+    public static boolean isLearningDesignNameValid(String name) {
+	return ValidationUtil.isRegexMatches(ValidationUtil.REGEX_LEARNING_DESIGN_NAMES, name);
     }
 }
