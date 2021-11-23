@@ -342,7 +342,9 @@ public class QuestionWordParser {
 		    continue;
 		}
 		answers.add(correctVsaAnswer);
-		answers.add(incorrectVsaAnswer);
+		if (incorrectVsaAnswer != null) {
+		    answers.add(incorrectVsaAnswer);
+		}
 		question.setAnswers(answers);
 	    } else if (answers.isEmpty()) {
 		if (!QuestionParser.isQuestionTypeAcceptable(Question.QUESTION_TYPE_ESSAY, limitType, question)) {
