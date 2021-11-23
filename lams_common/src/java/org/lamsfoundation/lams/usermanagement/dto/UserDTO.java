@@ -69,7 +69,8 @@ public class UserDTO implements Serializable {
 	this.email = email;
 	this.theme = htmlTheme;
 	this.timeZone = timezone;
-	this.timeZoneOffsetSeconds = ZoneId.of(timeZone.getID()).getRules().getOffset(Instant.now()).getTotalSeconds();
+	this.timeZoneOffsetSeconds = timeZone == null ? 0
+		: ZoneId.of(timeZone.getID()).getRules().getOffset(Instant.now()).getTotalSeconds();
 	this.authenticationMethodId = authenticationMethodId;
 	this.fckLanguageMapping = fckLanguageMapping;
 	this.firstLogin = firstLogin;
