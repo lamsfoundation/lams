@@ -10,8 +10,8 @@
 	<!-- Spring MVC -->
 	<context:component-scan base-package="org.lamsfoundation.lams.tool.imageGallery.web.controller" />
 	
-	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-		<property name="prefix" value="/" />
-		<property name="suffix" value=".jsp" />
-	</bean>
+   	<!-- This bean initialises controller scanning. 
+   		 It was done automatically up to Spring 4, but had to manually reintroduced for Spring 5. -->		   
+	<bean
+		class="org.lamsfoundation.lams.context.DefaultAnnotationHandlerMapping" />
 </beans>

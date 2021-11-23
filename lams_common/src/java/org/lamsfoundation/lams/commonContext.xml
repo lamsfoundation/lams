@@ -9,7 +9,40 @@
 
 	<import resource="messageContext.xml"/>
 
+	<!-- ========================= SPRING MVC GLOBAL BEANS ========================= -->
+	
+	<!-- This bean is used by DefaultAnnotationHandlerMapping bean in each LAMS module -->
+	<bean
+		class="org.lamsfoundation.lams.context.AnnotationMethodHandlerAdapter">
+		<property name="webBindingInitializer">
+			<bean
+				class="org.springframework.web.bind.support.ConfigurableWebBindingInitializer">
+			</bean>
+		</property>
+		<property name="messageConverters">
+			<list>
+				<bean
+					class="org.springframework.http.converter.ByteArrayHttpMessageConverter" />
+				<bean
+					class="org.springframework.http.converter.StringHttpMessageConverter" />
+				<bean
+					class="org.springframework.http.converter.FormHttpMessageConverter" />
+				<bean
+					class="org.springframework.http.converter.xml.SourceHttpMessageConverter" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- This bean is used by MVC mechanism in each LAMS module -->
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+	
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+	
+	
 
  	<!-- Hibernate SessionFactory. Since LAMS 2.3 it is used in all tools and other parts of LAMS,
  		 rather than several local Session Factories.
