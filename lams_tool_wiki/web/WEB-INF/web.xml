@@ -67,7 +67,7 @@
 
 	<listener>
 		<listener-class>
-			org.springframework.web.context.ContextLoaderListener
+			org.lamsfoundation.lams.web.filter.LamsContextLoaderListener
 		</listener-class>
 	</listener>
 

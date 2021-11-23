@@ -3,36 +3,15 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
-	<!-- This file contains bean definitions that are application contexts. Currently there is single beanRefContext.xml file,
-		 but there can be several of them in classpath. If so, they will be collected by locatorFactorySelector
-		 and put together, creating one definition of beans.
-		 Each bean takes a list of XML files as a constructor argument. These XML files are "real" application context files -
-		 - they contain definitions of service, DAO etc. beans. Each bean in beanRefContext.xml is an application context
-		 containing in result all beans from the listed XML files.
-		 Each bean from this file is a singleton, meaning that these large application contexts are created only once,
-		 at start up.
-		 Beans from this file can be used as parent contexts for web applications like LAMS tools.
-		 Each web application declaring the same parent context uses the same, shared beans. These shared beans are services used
-		 by all web applications. Sharing application contexts allows avoiding replication of common services.
+           				   http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
+	<!-- This file contains definitions for BeanFactoryLocator. It is used to create a single parent application context
+		 for all LAMS modules to use. It scans classpath looking for the listed XML files with bean definitions.
+		 Each LAMS module references this parent context locatorFactorySelector and parentContextKey parameters.
 		 
-		 In LAMS there is currently only one shared application context: "context.central". It contains all service and tool
-		 beans definitions - virtually everything there is, except for some local beans like tools' DB update service
-		 or admin beans.
-		 All tools and core services use this bean as parent context.
-		 Previously each tool created its own set of core services, which resulted in excess memory consumption.
-		 Now all beans are only in one copy and shared among different parts of LAMS system.
-		 
-		 Beans in this file support inheritance, but in Spring 1.2.8 there is a bug(?) which prevents from accessing beans
-		 in programatic way from inheriting application context beans - only beans from the top of bean hierarchy were accessible.
-		 This forces usage of only one shared context bean.
-		 
-		 This entry:
-		 <value>classpath*:org/lamsfoundation/lams/tool/**/*pplicationContext.xml</value>
-		 collects all application context files from all deployed lams tools.
-
-		 If new application context file is used in development and its beans need to be added to shared context,
-		 just add it to the end (or wherever it is suitable) of the list.
+		 In addition to XML files listed here LAMS uses autopatchContext.xml and spring-servlet.xml files.
+	
+		 In Spring 5 BeanFactoryLocator was considered obsolete and was removed.
+		 It was manually reintroduced to LAMS code.
 	 -->
 	 
 	<bean id="context.central"
