@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,6 +23,7 @@ import java.io.PushbackInputStream;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.lang.Nullable;
 
 /**
  * Implementation of {@link ClientHttpResponse} that can not only check if
@@ -31,16 +32,17 @@ import org.springframework.http.client.ClientHttpResponse;
  *
  * @author Brian Clozel
  * @since 4.1.5
- * @see <a href="http://tools.ietf.org/html/rfc7230#section-3.3.3">RFC 7230 Section 3.3.3</a>
+ * @see <a href="https://tools.ietf.org/html/rfc7230#section-3.3.3">RFC 7230 Section 3.3.3</a>
  */
 class MessageBodyClientHttpResponseWrapper implements ClientHttpResponse {
 
 	private final ClientHttpResponse response;
 
+	@Nullable
 	private PushbackInputStream pushbackInputStream;
 
 
-	public MessageBodyClientHttpResponseWrapper(ClientHttpResponse response) throws IOException {
+	public MessageBodyClientHttpResponseWrapper(ClientHttpResponse response) {
 		this.response = response;
 	}
 
@@ -56,15 +58,10 @@ class MessageBodyClientHttpResponseWrapper implements ClientHttpResponse {
 	 * @throws IOException in case of I/O errors
 	 */
 	public boolean hasMessageBody() throws IOException {
-		try {
-			HttpStatus responseStatus = getStatusCode();
-			if (responseStatus.is1xxInformational() || responseStatus == HttpStatus.NO_CONTENT ||
-					responseStatus == HttpStatus.NOT_MODIFIED) {
-				return false;
-			}
-		}
-		catch (IllegalArgumentException ex) {
-			// Ignore - unknown HTTP status code...
+		HttpStatus status = HttpStatus.resolve(getRawStatusCode());
+		if (status != null && (status.is1xxInformational() || status == HttpStatus.NO_CONTENT ||
+				status == HttpStatus.NOT_MODIFIED)) {
+			return false;
 		}
 		if (getHeaders().getContentLength() == 0) {
 			return false;
@@ -82,12 +79,14 @@ class MessageBodyClientHttpResponseWrapper implements ClientHttpResponse {
 	 * @return {@code true} if the response has a zero-length message body, {@code false} otherwise
 	 * @throws IOException in case of I/O errors
 	 */
+	@SuppressWarnings("ConstantConditions")
 	public boolean hasEmptyMessageBody() throws IOException {
 		InputStream body = this.response.getBody();
+		// Per contract body shouldn't be null, but check anyway..
 		if (body == null) {
 			return true;
 		}
-		else if (body.markSupported()) {
+		if (body.markSupported()) {
 			body.mark(1);
 			if (body.read() == -1) {
 				return true;

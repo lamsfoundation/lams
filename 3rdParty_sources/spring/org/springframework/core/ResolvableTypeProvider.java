@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +15,8 @@
  */
 
 package org.springframework.core;
+
+import org.springframework.lang.Nullable;
 
 /**
  * Any object can implement this interface to provide its actual {@link ResolvableType}.
@@ -35,6 +37,7 @@ public interface ResolvableTypeProvider {
 	 * Return the {@link ResolvableType} describing this instance
 	 * (or {@code null} if some sort of default should be applied instead).
 	 */
+	@Nullable
 	ResolvableType getResolvableType();
 
 }

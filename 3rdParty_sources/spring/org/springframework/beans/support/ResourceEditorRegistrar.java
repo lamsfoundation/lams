@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Path;
 
 import org.xml.sax.InputSource;
 
@@ -44,7 +45,6 @@ import org.springframework.core.io.ResourceEditor;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourceArrayPropertyEditor;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.util.ClassUtils;
 
 /**
  * PropertyEditorRegistrar implementation that populates a given
@@ -59,19 +59,6 @@ import org.springframework.util.ClassUtils;
  * @since 2.0
  */
 public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
-
-	private static Class<?> pathClass;
-
-	static {
-		try {
-			pathClass = ClassUtils.forName("java.nio.file.Path", ResourceEditorRegistrar.class.getClassLoader());
-		}
-		catch (ClassNotFoundException ex) {
-			// Java 7 Path class not available
-			pathClass = null;
-		}
-	}
-
 
 	private final PropertyResolver propertyResolver;
 
@@ -118,9 +105,7 @@ public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
 		doRegisterEditor(registry, InputStream.class, new InputStreamEditor(baseEditor));
 		doRegisterEditor(registry, InputSource.class, new InputSourceEditor(baseEditor));
 		doRegisterEditor(registry, File.class, new FileEditor(baseEditor));
-		if (pathClass != null) {
-			doRegisterEditor(registry, pathClass, new PathEditor(baseEditor));
-		}
+		doRegisterEditor(registry, Path.class, new PathEditor(baseEditor));
 		doRegisterEditor(registry, Reader.class, new ReaderEditor(baseEditor));
 		doRegisterEditor(registry, URL.class, new URLEditor(baseEditor));
 

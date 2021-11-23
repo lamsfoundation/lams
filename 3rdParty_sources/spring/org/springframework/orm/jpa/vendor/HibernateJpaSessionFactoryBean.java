@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,11 +17,13 @@
 package org.springframework.orm.jpa.vendor;
 
 import java.lang.reflect.Method;
+
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.SessionFactory;
 
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.lang.Nullable;
 import org.springframework.orm.jpa.EntityManagerFactoryAccessor;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
@@ -65,6 +67,7 @@ import org.springframework.util.ReflectionUtils;
 public class HibernateJpaSessionFactoryBean extends EntityManagerFactoryAccessor implements FactoryBean<SessionFactory> {
 
 	@Override
+	@Nullable
 	public SessionFactory getObject() {
 		EntityManagerFactory emf = getEntityManagerFactory();
 		Assert.state(emf != null, "EntityManagerFactory must not be null");

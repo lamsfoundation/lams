@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,9 +31,9 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HttpContext;
 
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.StreamingHttpOutputMessage;
+import org.springframework.lang.Nullable;
 
 /**
  * {@link ClientHttpRequest} implementation based on
@@ -54,6 +54,7 @@ final class HttpComponentsStreamingClientHttpRequest extends AbstractClientHttpR
 
 	private final HttpContext httpContext;
 
+	@Nullable
 	private Body body;
 
 
@@ -65,8 +66,8 @@ final class HttpComponentsStreamingClientHttpRequest extends AbstractClientHttpR
 
 
 	@Override
-	public HttpMethod getMethod() {
-		return HttpMethod.resolve(this.httpRequest.getMethod());
+	public String getMethodValue() {
+		return this.httpRequest.getMethod();
 	}
 
 	@Override
@@ -127,12 +128,14 @@ final class HttpComponentsStreamingClientHttpRequest extends AbstractClientHttpR
 		}
 
 		@Override
+		@Nullable
 		public Header getContentType() {
 			MediaType contentType = this.headers.getContentType();
 			return (contentType != null ? new BasicHeader("Content-Type", contentType.toString()) : null);
 		}
 
 		@Override
+		@Nullable
 		public Header getContentEncoding() {
 			String contentEncoding = this.headers.getFirst("Content-Encoding");
 			return (contentEncoding != null ? new BasicHeader("Content-Encoding", contentEncoding) : null);

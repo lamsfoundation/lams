@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,11 +25,12 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
  * Date sequence generator for a
- * <a href="http://www.manpagez.com/man/5/crontab/">Crontab pattern</a>,
+ * <a href="https://www.manpagez.com/man/5/crontab/">Crontab pattern</a>,
  * allowing clients to specify a pattern that the sequence matches.
  *
  * <p>The pattern is a list of six single space-separated fields: representing
@@ -52,11 +53,14 @@ import org.springframework.util.StringUtils;
  * @author Ruslan Sibgatullin
  * @since 3.0
  * @see CronTrigger
+ * @deprecated as of 5.3, in favor of {@link CronExpression}
  */
+@Deprecated
 public class CronSequenceGenerator {
 
 	private final String expression;
 
+	@Nullable
 	private final TimeZone timeZone;
 
 	private final BitSet months = new BitSet(12);
@@ -73,23 +77,27 @@ public class CronSequenceGenerator {
 
 
 	/**
-	 * Construct a {@link CronSequenceGenerator} from the pattern provided,
+	 * Construct a {@code CronSequenceGenerator} from the pattern provided,
 	 * using the default {@link TimeZone}.
 	 * @param expression a space-separated list of time fields
 	 * @throws IllegalArgumentException if the pattern cannot be parsed
 	 * @see java.util.TimeZone#getDefault()
+	 * @deprecated as of 5.3, in favor of {@link CronExpression#parse(String)}
 	 */
+	@Deprecated
 	public CronSequenceGenerator(String expression) {
 		this(expression, TimeZone.getDefault());
 	}
 
 	/**
-	 * Construct a {@link CronSequenceGenerator} from the pattern provided,
+	 * Construct a {@code CronSequenceGenerator} from the pattern provided,
 	 * using the specified {@link TimeZone}.
 	 * @param expression a space-separated list of time fields
 	 * @param timeZone the TimeZone to use for generated trigger times
 	 * @throws IllegalArgumentException if the pattern cannot be parsed
+	 * @deprecated as of 5.3, in favor of {@link CronExpression#parse(String)}
 	 */
+	@Deprecated
 	public CronSequenceGenerator(String expression, TimeZone timeZone) {
 		this.expression = expression;
 		this.timeZone = timeZone;
@@ -155,7 +163,7 @@ public class CronSequenceGenerator {
 	}
 
 	private void doNext(Calendar calendar, int dot) {
-		List<Integer> resets = new ArrayList<Integer>();
+		List<Integer> resets = new ArrayList<>();
 
 		int second = calendar.get(Calendar.SECOND);
 		List<Integer> emptyList = Collections.emptyList();
@@ -184,7 +192,7 @@ public class CronSequenceGenerator {
 
 		int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
 		int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-		int updateDayOfMonth = findNextDay(calendar, this.daysOfMonth, dayOfMonth, daysOfWeek, dayOfWeek, resets);
+		int updateDayOfMonth = findNextDay(calendar, this.daysOfMonth, dayOfMonth, this.daysOfWeek, dayOfWeek, resets);
 		if (dayOfMonth == updateDayOfMonth) {
 			resets.add(Calendar.DAY_OF_MONTH);
 		}
@@ -350,7 +358,7 @@ public class CronSequenceGenerator {
 				if (!split[0].contains("-")) {
 					range[1] = max - 1;
 				}
-				int delta = Integer.valueOf(split[1]);
+				int delta = Integer.parseInt(split[1]);
 				if (delta <= 0) {
 					throw new IllegalArgumentException("Incrementer delta must be 1 or higher: '" +
 							field + "' in expression \"" + this.expression + "\"");
@@ -370,7 +378,7 @@ public class CronSequenceGenerator {
 			return result;
 		}
 		if (!field.contains("-")) {
-			result[0] = result[1] = Integer.valueOf(field);
+			result[0] = result[1] = Integer.parseInt(field);
 		}
 		else {
 			String[] split = StringUtils.delimitedListToStringArray(field, "-");
@@ -378,8 +386,8 @@ public class CronSequenceGenerator {
 				throw new IllegalArgumentException("Range has more than two fields: '" +
 						field + "' in expression \"" + this.expression + "\"");
 			}
-			result[0] = Integer.valueOf(split[0]);
-			result[1] = Integer.valueOf(split[1]);
+			result[0] = Integer.parseInt(split[0]);
+			result[1] = Integer.parseInt(split[1]);
 		}
 		if (result[0] >= max || result[1] >= max) {
 			throw new IllegalArgumentException("Range exceeds maximum (" + max + "): '" +
@@ -403,7 +411,7 @@ public class CronSequenceGenerator {
 	 * @return {@code true} if the given expression is a valid cron expression
 	 * @since 4.3
 	 */
-	public static boolean isValidExpression(String expression) {
+	public static boolean isValidExpression(@Nullable String expression) {
 		if (expression == null) {
 			return false;
 		}
@@ -420,13 +428,13 @@ public class CronSequenceGenerator {
 		}
 	}
 
-	private static boolean areValidCronFields(String[] fields) {
+	private static boolean areValidCronFields(@Nullable String[] fields) {
 		return (fields != null && fields.length == 6);
 	}
 
 
 	@Override
-	public boolean equals(Object other) {
+	public boolean equals(@Nullable Object other) {
 		if (this == other) {
 			return true;
 		}

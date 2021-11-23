@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,14 +37,17 @@ import org.springframework.util.Assert;
 
 /**
  * Asynchronous extension of the {@link HttpComponentsClientHttpRequestFactory}. Uses
- * <a href="http://hc.apache.org/httpcomponents-asyncclient-dev/">Apache HttpComponents
+ * <a href="https://hc.apache.org/httpcomponents-asyncclient-dev/">Apache HttpComponents
  * HttpAsyncClient 4.0</a> to create requests.
  *
  * @author Arjen Poutsma
  * @author Stephane Nicoll
  * @since 4.0
  * @see HttpAsyncClient
+ * @deprecated as of Spring 5.0, in favor of
+ * {@link org.springframework.http.client.reactive.HttpComponentsClientHttpConnector}
  */
+@Deprecated
 public class HttpComponentsAsyncClientHttpRequestFactory extends HttpComponentsClientHttpRequestFactory
 		implements AsyncClientHttpRequestFactory, InitializingBean {
 
@@ -68,7 +71,7 @@ public class HttpComponentsAsyncClientHttpRequestFactory extends HttpComponentsC
 	 */
 	public HttpComponentsAsyncClientHttpRequestFactory(HttpAsyncClient asyncClient) {
 		super();
-		setAsyncClient(asyncClient);
+		this.asyncClient = asyncClient;
 	}
 
 	/**
@@ -78,7 +81,7 @@ public class HttpComponentsAsyncClientHttpRequestFactory extends HttpComponentsC
 	 */
 	public HttpComponentsAsyncClientHttpRequestFactory(CloseableHttpAsyncClient asyncClient) {
 		super();
-		setAsyncClient(asyncClient);
+		this.asyncClient = asyncClient;
 	}
 
 	/**
@@ -90,7 +93,7 @@ public class HttpComponentsAsyncClientHttpRequestFactory extends HttpComponentsC
 	 */
 	public HttpComponentsAsyncClientHttpRequestFactory(HttpClient httpClient, HttpAsyncClient asyncClient) {
 		super(httpClient);
-		setAsyncClient(asyncClient);
+		this.asyncClient = asyncClient;
 	}
 
 	/**
@@ -103,7 +106,7 @@ public class HttpComponentsAsyncClientHttpRequestFactory extends HttpComponentsC
 			CloseableHttpClient httpClient, CloseableHttpAsyncClient asyncClient) {
 
 		super(httpClient);
-		setAsyncClient(asyncClient);
+		this.asyncClient = asyncClient;
 	}
 
 
@@ -145,7 +148,7 @@ public class HttpComponentsAsyncClientHttpRequestFactory extends HttpComponentsC
 	 */
 	@Deprecated
 	public CloseableHttpAsyncClient getHttpAsyncClient() {
-		Assert.state(this.asyncClient == null || this.asyncClient instanceof CloseableHttpAsyncClient,
+		Assert.state(this.asyncClient instanceof CloseableHttpAsyncClient,
 				"No CloseableHttpAsyncClient - use getAsyncClient() instead");
 		return (CloseableHttpAsyncClient) this.asyncClient;
 	}
@@ -156,26 +159,28 @@ public class HttpComponentsAsyncClientHttpRequestFactory extends HttpComponentsC
 		startAsyncClient();
 	}
 
-	private void startAsyncClient() {
-        HttpAsyncClient asyncClient = getAsyncClient();
-		if (asyncClient instanceof CloseableHttpAsyncClient) {
-			CloseableHttpAsyncClient closeableAsyncClient = (CloseableHttpAsyncClient) asyncClient;
+	private HttpAsyncClient startAsyncClient() {
+		HttpAsyncClient client = getAsyncClient();
+		if (client instanceof CloseableHttpAsyncClient) {
+			@SuppressWarnings("resource")
+			CloseableHttpAsyncClient closeableAsyncClient = (CloseableHttpAsyncClient) client;
 			if (!closeableAsyncClient.isRunning()) {
 				closeableAsyncClient.start();
 			}
 		}
+		return client;
 	}
 
 	@Override
 	public AsyncClientHttpRequest createAsyncRequest(URI uri, HttpMethod httpMethod) throws IOException {
-		startAsyncClient();
+		HttpAsyncClient client = startAsyncClient();
 
 		HttpUriRequest httpRequest = createHttpUriRequest(httpMethod, uri);
 		postProcessHttpRequest(httpRequest);
-        HttpContext context = createHttpContext(httpMethod, uri);
-        if (context == null) {
-            context = HttpClientContext.create();
-        }
+		HttpContext context = createHttpContext(httpMethod, uri);
+		if (context == null) {
+			context = HttpClientContext.create();
+		}
 
 		// Request configuration not set in the context
 		if (context.getAttribute(HttpClientContext.REQUEST_CONFIG) == null) {
@@ -185,14 +190,14 @@ public class HttpComponentsAsyncClientHttpRequestFactory extends HttpComponentsC
 				config = ((Configurable) httpRequest).getConfig();
 			}
 			if (config == null) {
-				config = createRequestConfig(getAsyncClient());
+				config = createRequestConfig(client);
 			}
 			if (config != null) {
 				context.setAttribute(HttpClientContext.REQUEST_CONFIG, config);
 			}
 		}
 
-		return new HttpComponentsAsyncClientHttpRequest(getAsyncClient(), httpRequest, context);
+		return new HttpComponentsAsyncClientHttpRequest(client, httpRequest, context);
 	}
 
 	@Override

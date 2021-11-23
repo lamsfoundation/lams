@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +15,8 @@
  */
 
 package org.springframework.core.env;
+
+import org.springframework.lang.Nullable;
 
 /**
  * Interface for resolving properties against any underlying source.
@@ -41,6 +43,7 @@ public interface PropertyResolver {
 	 * @see #getProperty(String, Class)
 	 * @see #getRequiredProperty(String)
 	 */
+	@Nullable
 	String getProperty(String key);
 
 	/**
@@ -60,6 +63,7 @@ public interface PropertyResolver {
 	 * @param targetType the expected type of the property value
 	 * @see #getRequiredProperty(String, Class)
 	 */
+	@Nullable
 	<T> T getProperty(String key, Class<T> targetType);
 
 	/**
@@ -71,19 +75,6 @@ public interface PropertyResolver {
 	 * @see #getRequiredProperty(String, Class)
 	 */
 	<T> T getProperty(String key, Class<T> targetType, T defaultValue);
-
-	/**
-	 * Convert the property value associated with the given key to a {@code Class}
-	 * of type {@code T} or {@code null} if the key cannot be resolved.
-	 * @throws org.springframework.core.convert.ConversionException if class specified
-	 * by property value cannot be found or loaded or if targetType is not assignable
-	 * from class specified by property value
-	 * @see #getProperty(String, Class)
-	 * @deprecated as of 4.3, in favor of {@link #getProperty} with manual conversion
-	 * to {@code Class} via the application's {@code ClassLoader}
-	 */
-	@Deprecated
-	<T> Class<T> getPropertyAsClass(String key, Class<T> targetType);
 
 	/**
 	 * Return the property value associated with the given key (never {@code null}).
@@ -107,7 +98,6 @@ public interface PropertyResolver {
 	 * @return the resolved String (never {@code null})
 	 * @throws IllegalArgumentException if given text is {@code null}
 	 * @see #resolveRequiredPlaceholders
-	 * @see org.springframework.util.SystemPropertyUtils#resolvePlaceholders(String)
 	 */
 	String resolvePlaceholders(String text);
 
@@ -118,7 +108,6 @@ public interface PropertyResolver {
 	 * @return the resolved String (never {@code null})
 	 * @throws IllegalArgumentException if given text is {@code null}
 	 * or if any placeholders are unresolvable
-	 * @see org.springframework.util.SystemPropertyUtils#resolvePlaceholders(String, boolean)
 	 */
 	String resolveRequiredPlaceholders(String text) throws IllegalArgumentException;
 
