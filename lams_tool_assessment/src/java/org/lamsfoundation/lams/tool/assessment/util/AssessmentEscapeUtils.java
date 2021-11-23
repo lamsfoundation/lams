@@ -373,7 +373,8 @@ public class AssessmentEscapeUtils {
     }
 
     public static Set<String> normaliseVSOption(String option) {
-	return Stream.of(option.split("\r\n")).collect(
-		Collectors.mapping(answer -> AssessmentEscapeUtils.normaliseVSAnswer(answer), Collectors.toSet()));
+	return option == null ? Set.of()
+		: Stream.of(option.split("\r\n")).collect(Collectors
+			.mapping(answer -> AssessmentEscapeUtils.normaliseVSAnswer(answer), Collectors.toSet()));
     }
 }

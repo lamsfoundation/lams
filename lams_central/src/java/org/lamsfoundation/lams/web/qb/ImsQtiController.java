@@ -153,6 +153,15 @@ public class ImsQtiController {
 		    } else if (isVsaType) {
 			qbQuestion.setType(QbQuestion.TYPE_VERY_SHORT_ANSWERS);
 			qbQuestion.setCaseSensitive(false);
+
+			if (question.getAnswers().size() == 1) {
+			    // add missing incorrect answer
+			    // as the correct answer always has to be present
+			    Answer incorrectAnswer = new Answer();
+			    incorrectAnswer.setDisplayOrder(2);
+			    incorrectAnswer.setScore(0f);
+			    question.getAnswers().add(incorrectAnswer);
+			}
 		    }
 
 		    String correctAnswer = null;
@@ -167,7 +176,7 @@ public class ImsQtiController {
 				continue;
 			    }
 			    QbOption option = new QbOption();
-			    if (isVsaType) {
+			    if (isVsaType && answerText != null) {
 				// convert comma-separated answers to ones accepted by QB VSA questions
 				answerText = Stream.of(answerText.split(",")).map(String::strip)
 					.collect(Collectors.joining("\r\n"));

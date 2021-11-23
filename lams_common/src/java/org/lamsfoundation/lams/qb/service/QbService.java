@@ -928,7 +928,7 @@ public class QbService implements IQbService {
 	    if ((questionType == QbQuestion.TYPE_MULTIPLE_CHOICE)
 		    || (questionType == QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
 		String name = paramMap.get(QbConstants.ATTR_OPTION_NAME_PREFIX + i);
-		if ((name == null) && isForSaving) {
+		if (name == null && isForSaving && !(questionType == QbQuestion.TYPE_VERY_SHORT_ANSWERS && i < 2)) {
 		    continue;
 		}
 
