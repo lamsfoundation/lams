@@ -27,6 +27,7 @@
         <archive javadoc="http://alex-public-doc.s3.amazonaws.com/json_simple-1.1/index.html" path="/lams_build/lib/json/json-simple-1.1.1.jar"/>
         <archive path="/lams_build/lib/mysql/mysql-connector-java-8.0.11.jar" source="/3rdParty_sources/mysql-connector"/>
         <archive path="/lams_build/lib/quartz/quartz-2.2.3.jar" source="/3rdParty_sources/quartz"/>
+        <archive path="/lams_build/lib/reactor/reactor-core-3.4.12.jar" source="/3rdParty_sources/reactor"/>
         <archive path="/lams_build/lib/spring/spring-aop-5.3.13.jar" source="/3rdParty_sources/spring"/>
         <archive path="/lams_build/lib/spring/spring-beans-5.3.13.jar" source="/3rdParty_sources/spring"/>
         <archive path="/lams_build/lib/spring/spring-context-5.3.13.jar" source="/3rdParty_sources/spring"/>

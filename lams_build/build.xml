@@ -636,6 +636,16 @@
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/quartz/main/module.xml"
 			  file="lib/quartz/quartz.module.xml" overwrite="true" verbose="true" />
+		
+		
+		
+		<copy todir="${server.home}/modules/system/layers/base/reactor/main" overwrite="true" verbose="true">
+			<fileset dir="lib/reactor">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/reactor/main/module.xml"
+			  file="lib/reactor/reactor.module.xml" overwrite="true" verbose="true" />
 
 		
 		

@@ -40,6 +40,7 @@
       <module name="org.scilab.forge.jlatexmath" export="true" />
       <module name="org.json.simple" export="true" />
       <module name="org.quartz" export="true" />
+      <module name="reactor" export="true" />
       <module name="org.springframework" export="true" meta-inf="export" />
       <module name="org.tuckey.urlrewritefilter" export="true" />
       <module name="com.thoughtworks.xstream" export="true" />
