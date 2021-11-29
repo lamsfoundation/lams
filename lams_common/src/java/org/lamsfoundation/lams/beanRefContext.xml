@@ -3,42 +3,43 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-           				   http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
-	<!-- This file contains definitions for BeanFactoryLocator. It is used to create a single parent application context
-		 for all LAMS modules to use. It scans classpath looking for the listed XML files with bean definitions.
-		 Each LAMS module references this parent context locatorFactorySelector and parentContextKey parameters.
+           				   http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<!-- This file contains bean definitions for LAMS global application context.
+		 It is used to create a single parent application context for all LAMS modules.
+		 It scans classpath looking for the listed XML files with bean definitions.
+		 Each LAMS module references this parent via LamsContextLoaderListener.
 		 
 		 In addition to XML files listed here LAMS uses autopatchContext.xml and spring-servlet.xml files.
 	
 		 In Spring 5 BeanFactoryLocator was considered obsolete and was removed.
-		 It was manually reintroduced to LAMS code.
+		 LamsContextLoaderListener mimics its function.
 	 -->
 	 
 	<bean id="context.central"
          class="org.springframework.context.support.ClassPathXmlApplicationContext">
-     <constructor-arg>
-       <list>
-       		<value>/org/lamsfoundation/lams/applicationContext.xml</value>
-			<value>/org/lamsfoundation/lams/toolApplicationContext.xml</value>
-			<value>/org/lamsfoundation/lams/comments/commentsContext.xml</value>
-			<value>/org/lamsfoundation/lams/contentrepository/applicationContext.xml</value>
-			<value>/org/lamsfoundation/lams/learning/learningApplicationContext.xml</value>
-			
-			<value>classpath*:org/lamsfoundation/lams/tool/**/*pplicationContext.xml</value>
-			<value>classpath*:org/eucm/lams/tool/**/*pplicationContext.xml</value>
-			
-			<value>/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml</value>
-			<value>/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml</value>
-			<value>/org/lamsfoundation/lams/workspace/workspaceApplicationContext.xml</value>
-			<value>/org/lamsfoundation/lams/web/webApplicationContext.xml</value>
-			<value>/org/lamsfoundation/lams/integrationContext.xml</value>
-			<value>/org/lamsfoundation/lams/usermanagement/ldapContext.xml</value>
-			<value>/org/lamsfoundation/lams/gradebook/gradebookApplicationContext.xml</value>
-			
-			<!-- Extra entry for LAMS subprojects that are not in the standard build -->
-			<value>classpath*:org/lamsfoundation/lams/**/optionalModuleApplicationContext.xml</value>
-			
-       </list>
-	 </constructor-arg>
+	     <constructor-arg>
+	       <list>
+	       		<value>/org/lamsfoundation/lams/applicationContext.xml</value>
+				<value>/org/lamsfoundation/lams/toolApplicationContext.xml</value>
+				<value>/org/lamsfoundation/lams/comments/commentsContext.xml</value>
+				<value>/org/lamsfoundation/lams/contentrepository/applicationContext.xml</value>
+				<value>/org/lamsfoundation/lams/learning/learningApplicationContext.xml</value>
+				
+				<value>classpath*:org/lamsfoundation/lams/tool/**/*pplicationContext.xml</value>
+				<value>classpath*:org/eucm/lams/tool/**/*pplicationContext.xml</value>
+				
+				<value>/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml</value>
+				<value>/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml</value>
+				<value>/org/lamsfoundation/lams/workspace/workspaceApplicationContext.xml</value>
+				<value>/org/lamsfoundation/lams/web/webApplicationContext.xml</value>
+				<value>/org/lamsfoundation/lams/integrationContext.xml</value>
+				<value>/org/lamsfoundation/lams/usermanagement/ldapContext.xml</value>
+				<value>/org/lamsfoundation/lams/gradebook/gradebookApplicationContext.xml</value>
+				
+				<!-- Extra entry for LAMS subprojects that are not in the standard build -->
+				<value>classpath*:org/lamsfoundation/lams/**/optionalModuleApplicationContext.xml</value>
+				
+	       </list>
+		 </constructor-arg>
 	</bean>
 </beans>
