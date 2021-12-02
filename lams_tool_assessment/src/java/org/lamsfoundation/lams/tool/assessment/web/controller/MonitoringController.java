@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.assessment.web.controller;
 
 import java.io.IOException;
 import java.security.InvalidParameterException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -40,8 +41,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -108,14 +107,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import reactor.core.publisher.Flux;
 
 @Controller
 @RequestMapping("/monitoring")
@@ -271,44 +270,19 @@ public class MonitoringController {
 	return chartData;
     }
 
-//    @RequestMapping(path = "/getCompletionChartsDataFlux", method = RequestMethod.GET, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-//    @ResponseBody
-//    public Flux<String> getCompletionChartsDataFlux(@RequestParam long toolContentId)
-//	    throws JsonProcessingException, IOException {
-//
-//	return Flux.interval(Duration.ofSeconds(5)).map(sequence -> {
-//	    String chartData = null;
-//	    try {
-//		chartData = getCompletionChartsData(toolContentId);
-//	    } catch (IOException e) {
-//		log.error(e);
-//	    }
-//	    return chartData;
-//	});
-//    }
-
     @RequestMapping(path = "/getCompletionChartsDataFlux", method = RequestMethod.GET, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @ResponseBody
-    public SseEmitter getCompletionChartsDataFlux(@RequestParam long toolContentId) {
-
-	final SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
-	ExecutorService service = Executors.newSingleThreadExecutor();
-	service.execute(() -> {
-	    while (true) {
-		try {
-		    SseEventBuilder event = SseEmitter.event().data(getCompletionChartsData(toolContentId));
-		    emitter.send(event);
-
-		    Thread.sleep(5000);
-		} catch (Exception e) {
-		    log.error(e);
-		    emitter.completeWithError(e);
-		    return;
-		}
+    public Flux<String> getCompletionChartsDataFlux(@RequestParam long toolContentId)
+	    throws JsonProcessingException, IOException {
+	return Flux.interval(Duration.ZERO, Duration.ofSeconds(5)).map(sequence -> {
+	    String chartData = null;
+	    try {
+		chartData = getCompletionChartsData(toolContentId);
+	    } catch (IOException e) {
+		log.error(e);
 	    }
+	    return chartData;
 	});
-
-	return emitter;
     }
 
     private String getCompletionChartsData(long toolContentId) throws JsonProcessingException, IOException {
