@@ -282,7 +282,7 @@ public class MonitoringController {
 		log.error(e);
 	    }
 	    return chartData;
-	});
+	}).distinctUntilChanged();
     }
 
     private String getCompletionChartsData(long toolContentId) throws JsonProcessingException, IOException {
