@@ -639,6 +639,16 @@
 		
 		
 		
+		<copy todir="${server.home}/modules/system/layers/base/org/reactivestreams/main" overwrite="true" verbose="true">
+			<fileset dir="lib/reactivestreams">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/reactivestreams/main/module.xml"
+			  file="lib/reactivestreams/reactivestreams.module.xml" overwrite="true" verbose="true" />
+		
+		
+		
 		<copy todir="${server.home}/modules/system/layers/base/reactor/main" overwrite="true" verbose="true">
 			<fileset dir="lib/reactor">
 				<include name="*.jar" />
