@@ -18,6 +18,10 @@
 		<property name="suffix" value=".jsp" />
 	</bean>
 	
+	<!-- Existing WildFly task executor for Spring async request processing. It is fetched by JNDI from JEE7+ platform. -->
+	<bean id="serverTaskExecutor" class="org.springframework.scheduling.concurrent.DefaultManagedTaskExecutor" />
+	
+	
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
 	
 	
