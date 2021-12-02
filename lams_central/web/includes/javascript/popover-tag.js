@@ -13,6 +13,10 @@ $(document).ready(function() {
 			"tabindex"      : "0",
 			"role"          : "button"
 		})
+		.css({
+			'color' : 'black',
+			'text-decoration' : 'none'
+		})
 		.on('keypress', function(e){
 		    if (e.keyCode === 32 || e.keyCode == 13) {
 				// check for Space or Enter key and simulate a click
@@ -21,6 +25,7 @@ $(document).ready(function() {
 		    }
 		})
 		.popover({
+			'container' : 'body',
 			'html'      : true,
 			'trigger'   : 'click',
 			// without this option the close button in popover title does not show up

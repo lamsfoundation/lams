@@ -880,16 +880,16 @@ public class LearningController {
 		questionDto.setAnswer(answer);
 
 	    } else if (questionType == QbQuestion.TYPE_ORDERING) {
+		//sort accrording to the new sequenceIds
+		Set<OptionDTO> sortedOptions = new TreeSet<>();
 		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 		    int answerSequenceId = WebUtil.readIntParam(request,
 			    AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getUid());
 		    optionDto.setDisplayOrder(answerSequenceId);
+		    sortedOptions.add(optionDto);
 		}
-		//sort accrording to the new sequenceIds
-		Set<OptionDTO> sortedOptions = new TreeSet<>();
-		sortedOptions.addAll(questionDto.getOptionDtos());
-		questionDto.setOptionDtos(sortedOptions);
 
+		questionDto.setOptionDtos(sortedOptions);
 	    } else if (questionType == QbQuestion.TYPE_MARK_HEDGING) {
 
 		//store hedging marks

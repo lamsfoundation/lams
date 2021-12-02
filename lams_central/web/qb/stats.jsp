@@ -314,7 +314,10 @@
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<fmt:message key="label.qb.stats.usage" />&nbsp;
-			<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key="label.qb.stats.tooltip" />"></i>
+			<lams:Popover>
+          		<fmt:message key="label.qb.stats.tooltip" />
+          	</lams:Popover>
+
 		</div>
 		<div class="panel-body">
 			<c:choose>
@@ -341,15 +344,21 @@
 							</th>
 							<th>
 								<fmt:message key="label.qb.stats.usage.difficulty" />&nbsp;
-								<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key="label.qb.difficulty.index.tooltip" />"></i>
+								<lams:Popover>
+					          		<fmt:message key="label.qb.difficulty.index.tooltip" />
+					          	</lams:Popover>
 							</th>
 							<th>
 								<fmt:message key="label.qb.stats.usage.discrimination" />&nbsp;
-								<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key="label.qb.discrimination.index.tooltip" />"></i>
+								<lams:Popover>
+									<fmt:message key="label.qb.discrimination.index.tooltip" />
+					          	</lams:Popover>
 							</th>
 							<th>
 								<fmt:message key="label.qb.stats.usage.biserial" />&nbsp;
-							 	<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key="label.qb.point.biserial.tooltip" />"></i>
+								<lams:Popover>
+									<fmt:message key="label.qb.point.biserial.tooltip" />
+					          	</lams:Popover>
 							</th>
 						</tr>
 						<c:forEach var="activityDTO" items="${stats.activities}">
