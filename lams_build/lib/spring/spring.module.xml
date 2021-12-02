@@ -53,5 +53,7 @@
   	<module name="org.hibernate" />
   	<module name="org.jboss.vfs" />
   	<module name="org.quartz" />
+  	<module name="reactor" />
+  	<module name="org.reactivestreams" />
   </dependencies>
 </module>
