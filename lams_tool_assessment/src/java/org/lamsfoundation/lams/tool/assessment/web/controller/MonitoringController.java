@@ -274,7 +274,11 @@ public class MonitoringController {
     @ResponseBody
     public Flux<String> getCompletionChartsDataFlux(@RequestParam long toolContentId)
 	    throws JsonProcessingException, IOException {
-	return Flux.interval(Duration.ZERO, Duration.ofSeconds(5)).map(sequence -> {
+	return Flux.interval(Duration.ZERO, Duration.ofSeconds(1)).map(sequence -> {
+	    boolean isAnswersUpdated = service.isAnswersUpdated(toolContentId);
+	    if (!isAnswersUpdated) {
+		return "";
+	    }
 	    String chartData = null;
 	    try {
 		chartData = getCompletionChartsData(toolContentId);
@@ -282,7 +286,7 @@ public class MonitoringController {
 		log.error(e);
 	    }
 	    return chartData;
-	}).distinctUntilChanged();
+	}).filter(chartData -> !chartData.isBlank()).distinctUntilChanged();
     }
 
     private String getCompletionChartsData(long toolContentId) throws JsonProcessingException, IOException {

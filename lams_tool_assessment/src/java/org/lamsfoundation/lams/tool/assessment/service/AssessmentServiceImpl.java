@@ -45,6 +45,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -193,6 +194,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     private IOutcomeService outcomeService;
 
     private ILearnerInteractionService learnerInteractionService;
+
+    private final Map<Long, Boolean> LEARNER_RESULTS_UPDATED_MAP = new ConcurrentHashMap<>();
 
     // *******************************************************************************
     // Service method
@@ -659,6 +662,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    }
 	}
 
+	if (isAnswerModified) {
+	    LEARNER_RESULTS_UPDATED_MAP.put(assessment.getContentId(), true);
+	}
+
 	// store finished date only on user hitting submit all answers button (and not submit mark hedging
 	// question)
 	int maximumGrade = 0;
@@ -793,6 +800,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	questionResult.setAnswerModified(isAnswerModified);
 	return questionResult;
+    }
+
+    @Override
+    public boolean isAnswersUpdated(long toolContentId) {
+	Boolean isAnswersUpdated = LEARNER_RESULTS_UPDATED_MAP.get(toolContentId);
+	LEARNER_RESULTS_UPDATED_MAP.put(toolContentId, false);
+	return isAnswersUpdated == null ? true : isAnswersUpdated;
     }
 
     /**

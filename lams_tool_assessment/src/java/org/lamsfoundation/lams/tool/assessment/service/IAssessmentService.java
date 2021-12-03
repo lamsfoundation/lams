@@ -239,6 +239,8 @@ public interface IAssessmentService extends ICommonToolService {
     boolean storeUserAnswers(Assessment assessment, Long userId, List<Set<QuestionDTO>> pagedQuestions,
 	    boolean isAutosave) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException;
 
+    boolean isAnswersUpdated(long toolContentId);
+
     void loadupLastAttempt(Long assessmentUid, Long userId, List<Set<QuestionDTO>> pagedQuestionDtos);
 
     /**
