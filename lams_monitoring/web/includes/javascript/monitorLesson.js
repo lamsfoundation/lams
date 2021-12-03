@@ -1878,7 +1878,7 @@ function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 		
 	$('<div />')
 	  .addClass('more-learner-icon')
-	  .text(learnerCount)
+	  .text(learnerCount + '/' + learnerTotalCount)
 	  .appendTo(iconsContainer)
       .click(function(){
 			var ajaxProperties = {
