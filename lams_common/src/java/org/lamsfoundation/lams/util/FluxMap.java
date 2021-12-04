@@ -3,6 +3,7 @@ package org.lamsfoundation.lams.util;
 import java.time.Duration;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 import org.apache.log4j.Logger;
@@ -11,8 +12,9 @@ import reactor.core.publisher.Flux;
 
 /**
  * Utility class for serving updates to shared Fluxes.
- * It receives signals from a source Flux, probably a Sink.Many.
+ * It receives signals from a source Flux, probably a part of SharedSink.
  * For each requested key it creates a hot publisher Flux which fetches data for the key.
+ * Supports time-based throttling.
  * If the sink does not produce any matching signals for given timeout, the flux gets removed.
  *
  * @author Marcin Cieslak
@@ -58,37 +60,67 @@ public class FluxMap<T, U> extends ConcurrentHashMap<T, Flux<U>> {
 
 	    // filter out signals which do not match the key
 	    Flux<T> filteringFlux = source.filter(item -> item.equals(key));
+
 	    // do not emit more often than this amount of time
 	    if (throttleSeconds != null) {
 		filteringFlux = filteringFlux.sample(Duration.ofSeconds(throttleSeconds));
 	    }
-	    // fetch data based on the key
-	    flux = filteringFlux.map(item -> fetchFunction.apply(item));
 
-	    // push initial value to the Flux so data is available immediately after subscribing
-	    flux = flux.startWith(fetchFunction.apply(key))
+	    // Manually complete this flux if all subscribers are gone.
+	    // Using available factory methods it does not seem possible to have a cached and shared Flux.
+	    AtomicInteger subscriberCounter = new AtomicInteger();
+	    filteringFlux = filteringFlux.handle((item, sink) -> {
+		int counter = subscriberCounter.get();
+		if (counter <= 0) {
+		    if (log.isDebugEnabled()) {
+			log.debug("Completing and removing flux for \"" + operationDescription + "\" with key " + key);
+		    }
+		    sink.complete();
+		    remove(key);
+		    return;
+		}
+		sink.next(item);
+	    });
+
+	    // map items from sink to fetch function result
+	    flux = filteringFlux.map(item -> fetchFunction.apply(item))
+		    // push initial value to the Flux so data is available immediately after subscribing
+		    .startWith(fetchFunction.apply(key))
+
 		    // make sure the subsequent subscribers also have data immediately available
 		    .cache(1)
+
 		    // just some logging
 		    .doOnSubscribe(subscription -> {
+			int counter = subscriberCounter.incrementAndGet();
+			if (counter <= 0) {
+			    subscriberCounter.set(1);
+			    counter = 1;
+			}
+
 			if (log.isDebugEnabled()) {
-			    log.debug("Subscribed to flux \"" + operationDescription + "\" with key " + key);
+			    log.debug("Subscribed (" + counter + ") to flux \"" + operationDescription + "\" with key "
+				    + key);
 			}
 		    })
+
 		    // just some logging
 		    .doOnCancel(() -> {
+			int counter = subscriberCounter.decrementAndGet();
+
 			if (log.isDebugEnabled()) {
-			    log.debug("Cancelling subscription to flux for \"" + operationDescription + "\" with key "
-				    + key);
+			    log.debug("Cancelling (" + counter + ") subscription to flux for \"" + operationDescription
+				    + "\" with key " + key);
 			}
 		    });
 
-	    // remove Flux on timeout
+	    // remove Flux when source Flux did not emit an accepted signal before given timeout
 	    if (timeoutSeconds != null) {
 		flux = flux.timeout(Duration.ofSeconds(timeoutSeconds)).onErrorResume(TimeoutException.class,
 			throwable -> {
 			    if (log.isDebugEnabled()) {
-				log.debug("Removing flux for \"" + operationDescription + "\" with key " + key);
+				log.debug(
+					"Removing timed out flux for \"" + operationDescription + "\" with key " + key);
 			    }
 			    // remove terminated Flux from the map
 			    remove(key);

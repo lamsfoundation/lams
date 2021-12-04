@@ -133,6 +133,7 @@ import org.lamsfoundation.lams.util.FluxMap;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
+import org.lamsfoundation.lams.util.SharedSink;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelRow;
@@ -144,7 +145,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Sinks;
 
 /**
  * @author Andrey Balan
@@ -199,15 +199,15 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     private ILearnerInteractionService learnerInteractionService;
 
     // sink that accepts tool content ID for which learners' answers changed
-    private final Sinks.Many<Long> answersUpdatedSink;
+    private final SharedSink<Long> answersUpdatedSink;
 
     // flux map for updating completion charts
     private final FluxMap<Long, String> completionChartUpdateFluxMap;
 
     public AssessmentServiceImpl() {
-	answersUpdatedSink = Sinks.many().multicast().onBackpressureBuffer(1);
+	answersUpdatedSink = new SharedSink<>("assessment learner answers update");
 
-	completionChartUpdateFluxMap = new FluxMap<>("assessment completion chart update", answersUpdatedSink.asFlux(),
+	completionChartUpdateFluxMap = new FluxMap<>("assessment completion chart update", answersUpdatedSink.getFlux(),
 		toolContentId -> getCompletionChartsData(toolContentId), FluxMap.STANDARD_THROTTLE,
 		FluxMap.STANDARD_TIMEOUT);
     }
@@ -727,7 +727,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	if (isAnswerModified) {
 	    // need to flush so subscribers to sink see new answers in DB
 	    assessmentResultDao.flush();
-	    answersUpdatedSink.tryEmitNext(assessment.getContentId());
+	    answersUpdatedSink.emit(assessment.getContentId());
 	}
 
 	return true;
