@@ -45,7 +45,6 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -130,6 +129,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.FluxMap;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
@@ -142,6 +142,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Sinks;
 
 /**
  * @author Andrey Balan
@@ -195,7 +198,19 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
     private ILearnerInteractionService learnerInteractionService;
 
-    private final Map<Long, Boolean> LEARNER_RESULTS_UPDATED_MAP = new ConcurrentHashMap<>();
+    // sink that accepts tool content ID for which learners' answers changed
+    private final Sinks.Many<Long> answersUpdatedSink;
+
+    // flux map for updating completion charts
+    private final FluxMap<Long, String> completionChartUpdateFluxMap;
+
+    public AssessmentServiceImpl() {
+	answersUpdatedSink = Sinks.many().multicast().onBackpressureBuffer(1);
+
+	completionChartUpdateFluxMap = new FluxMap<>("assessment completion chart update", answersUpdatedSink.asFlux(),
+		toolContentId -> getCompletionChartsData(toolContentId), FluxMap.STANDARD_THROTTLE,
+		FluxMap.STANDARD_TIMEOUT);
+    }
 
     // *******************************************************************************
     // Service method
@@ -662,10 +677,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    }
 	}
 
-	if (isAnswerModified) {
-	    LEARNER_RESULTS_UPDATED_MAP.put(assessment.getContentId(), true);
-	}
-
 	// store finished date only on user hitting submit all answers button (and not submit mark hedging
 	// question)
 	int maximumGrade = 0;
@@ -711,6 +722,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
 	    jsonCommand.put("hookTrigger", "assessment-leader-triggered-refresh-" + result.getSessionId());
 	    learnerService.createCommandForLearners(assessment.getContentId(), userIds, jsonCommand.toString());
+	}
+
+	if (isAnswerModified) {
+	    // need to flush so subscribers to sink see new answers in DB
+	    assessmentResultDao.flush();
+	    answersUpdatedSink.tryEmitNext(assessment.getContentId());
 	}
 
 	return true;
@@ -802,11 +819,32 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	return questionResult;
     }
 
+    private String getCompletionChartsData(long toolContentId) {
+	try {
+	    ObjectNode chartJson = JsonNodeFactory.instance.objectNode();
+
+	    chartJson.put("possibleLearners", getCountLessonLearnersByContentId(toolContentId));
+	    chartJson.put("startedLearners", getCountUsersByContentId(toolContentId));
+	    chartJson.put("completedLearners", getCountLearnersWithFinishedCurrentAttempt(toolContentId));
+
+	    chartJson.put("sessionCount", getSessionsByContentId(toolContentId).size());
+	    Map<Integer, List<String[]>> answeredQuestionsByUsers = getAnsweredQuestionsByUsers(toolContentId);
+	    if (!answeredQuestionsByUsers.isEmpty()) {
+		chartJson.set("answeredQuestionsByUsers", JsonUtil.readObject(answeredQuestionsByUsers));
+		Map<Integer, Integer> answeredQuestionsByUsersCount = answeredQuestionsByUsers.entrySet().stream()
+			.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().size()));
+		chartJson.set("answeredQuestionsByUsersCount", JsonUtil.readObject(answeredQuestionsByUsersCount));
+	    }
+	    return chartJson.toString();
+	} catch (Exception e) {
+	    log.error("Unable to fetch completion charts data for tool content ID " + toolContentId);
+	    return "";
+	}
+    }
+
     @Override
-    public boolean isAnswersUpdated(long toolContentId) {
-	Boolean isAnswersUpdated = LEARNER_RESULTS_UPDATED_MAP.get(toolContentId);
-	LEARNER_RESULTS_UPDATED_MAP.put(toolContentId, false);
-	return isAnswersUpdated == null ? true : isAnswersUpdated;
+    public Flux<String> getCompletionChartsDataFlux(long toolContentId) {
+	return completionChartUpdateFluxMap.getFlux(toolContentId);
     }
 
     /**

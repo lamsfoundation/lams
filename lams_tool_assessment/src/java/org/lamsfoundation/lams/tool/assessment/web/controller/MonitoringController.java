@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.assessment.web.controller;
 
 import java.io.IOException;
 import java.security.InvalidParameterException;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -261,50 +260,11 @@ public class MonitoringController {
 	return "pages/monitoring/monitoring";
     }
 
-    @RequestMapping(path = "/getCompletionChartsData")
+    @RequestMapping(path = "/getCompletionChartsData", method = RequestMethod.GET, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @ResponseBody
-    public String getCompletionChartsData(@RequestParam long toolContentId, HttpServletResponse response)
+    public Flux<String> getCompletionChartsData(@RequestParam long toolContentId)
 	    throws JsonProcessingException, IOException {
-	String chartData = getCompletionChartsData(toolContentId);
-	response.setContentType("application/json;charset=utf-8");
-	return chartData;
-    }
-
-    @RequestMapping(path = "/getCompletionChartsDataFlux", method = RequestMethod.GET, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    @ResponseBody
-    public Flux<String> getCompletionChartsDataFlux(@RequestParam long toolContentId)
-	    throws JsonProcessingException, IOException {
-	return Flux.interval(Duration.ZERO, Duration.ofSeconds(1)).map(sequence -> {
-	    boolean isAnswersUpdated = service.isAnswersUpdated(toolContentId);
-	    if (!isAnswersUpdated) {
-		return "";
-	    }
-	    String chartData = null;
-	    try {
-		chartData = getCompletionChartsData(toolContentId);
-	    } catch (IOException e) {
-		log.error(e);
-	    }
-	    return chartData;
-	}).filter(chartData -> !chartData.isBlank()).distinctUntilChanged();
-    }
-
-    private String getCompletionChartsData(long toolContentId) throws JsonProcessingException, IOException {
-	ObjectNode chartJson = JsonNodeFactory.instance.objectNode();
-
-	chartJson.put("possibleLearners", service.getCountLessonLearnersByContentId(toolContentId));
-	chartJson.put("startedLearners", service.getCountUsersByContentId(toolContentId));
-	chartJson.put("completedLearners", service.getCountLearnersWithFinishedCurrentAttempt(toolContentId));
-
-	chartJson.put("sessionCount", service.getSessionsByContentId(toolContentId).size());
-	Map<Integer, List<String[]>> answeredQuestionsByUsers = service.getAnsweredQuestionsByUsers(toolContentId);
-	if (!answeredQuestionsByUsers.isEmpty()) {
-	    chartJson.set("answeredQuestionsByUsers", JsonUtil.readObject(answeredQuestionsByUsers));
-	    Map<Integer, Integer> answeredQuestionsByUsersCount = answeredQuestionsByUsers.entrySet().stream()
-		    .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().size()));
-	    chartJson.set("answeredQuestionsByUsersCount", JsonUtil.readObject(answeredQuestionsByUsersCount));
-	}
-	return chartJson.toString();
+	return service.getCompletionChartsDataFlux(toolContentId);
     }
 
     @RequestMapping("/userMasterDetail")

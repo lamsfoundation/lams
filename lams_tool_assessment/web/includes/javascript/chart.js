@@ -1,8 +1,11 @@
 function drawCompletionCharts(toolContentId, useGroups, animate) {
 	
-	const source = new EventSource( WEB_APP_URL + 'monitoring/getCompletionChartsDataFlux.do?toolContentId=' + toolContentId);
+	const source = new EventSource( WEB_APP_URL + 'monitoring/getCompletionChartsData.do?toolContentId=' + toolContentId);
 
 	source.onmessage = function (event) {
+		if (!event.data) {
+			return;
+		}
 		var data = JSON.parse(event.data);
 		drawActivityCompletionChart(data, animate);
 		drawAnsweredQuestionsChart(data, useGroups, animate);

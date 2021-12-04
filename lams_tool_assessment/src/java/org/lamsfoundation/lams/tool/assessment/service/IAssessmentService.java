@@ -50,6 +50,8 @@ import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 
+import reactor.core.publisher.Flux;
+
 /**
  * Interface that defines the contract that all ShareAssessment service provider must follow.
  *
@@ -239,7 +241,7 @@ public interface IAssessmentService extends ICommonToolService {
     boolean storeUserAnswers(Assessment assessment, Long userId, List<Set<QuestionDTO>> pagedQuestions,
 	    boolean isAutosave) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException;
 
-    boolean isAnswersUpdated(long toolContentId);
+    Flux<String> getCompletionChartsDataFlux(long toolContentId);
 
     void loadupLastAttempt(Long assessmentUid, Long userId, List<Set<QuestionDTO>> pagedQuestionDtos);
 
