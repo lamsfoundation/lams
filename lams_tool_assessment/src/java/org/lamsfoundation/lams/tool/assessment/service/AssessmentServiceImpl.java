@@ -58,6 +58,8 @@ import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.flux.FluxMap;
+import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -129,11 +131,9 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.FluxMap;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
-import org.lamsfoundation.lams.util.SharedSink;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelRow;
@@ -198,18 +198,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
     private ILearnerInteractionService learnerInteractionService;
 
-    // sink that accepts tool content ID for which learners' answers changed
-    private final SharedSink<Long> answersUpdatedSink;
-
-    // flux map for updating completion charts
-    private final FluxMap<Long, String> completionChartUpdateFluxMap;
-
     public AssessmentServiceImpl() {
-	answersUpdatedSink = new SharedSink<>("assessment learner answers update");
-
-	completionChartUpdateFluxMap = new FluxMap<>("assessment completion chart update", answersUpdatedSink.getFlux(),
-		toolContentId -> getCompletionChartsData(toolContentId), FluxMap.STANDARD_THROTTLE,
-		FluxMap.STANDARD_TIMEOUT);
+	FluxRegistry.initSink(AssessmentConstants.ANSWERS_UPDATED_SINK_NAME);
+	FluxRegistry.initFluxMap(AssessmentConstants.COMPLETION_CHARTS_UPDATE_FLUX_NAME,
+		AssessmentConstants.ANSWERS_UPDATED_SINK_NAME,
+		(Function<Long, String>) toolContentId -> getCompletionChartsData(toolContentId),
+		FluxMap.STANDARD_THROTTLE, FluxMap.STANDARD_TIMEOUT);
     }
 
     // *******************************************************************************
@@ -727,7 +721,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	if (isAnswerModified) {
 	    // need to flush so subscribers to sink see new answers in DB
 	    assessmentResultDao.flush();
-	    answersUpdatedSink.emit(assessment.getContentId());
+	    FluxRegistry.emit(AssessmentConstants.ANSWERS_UPDATED_SINK_NAME, assessment.getContentId());
 	}
 
 	return true;
@@ -844,7 +838,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
     @Override
     public Flux<String> getCompletionChartsDataFlux(long toolContentId) {
-	return completionChartUpdateFluxMap.getFlux(toolContentId);
+	return FluxRegistry.get(AssessmentConstants.COMPLETION_CHARTS_UPDATE_FLUX_NAME, toolContentId);
     }
 
     /**
