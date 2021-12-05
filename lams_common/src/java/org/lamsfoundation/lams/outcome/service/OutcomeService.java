@@ -292,10 +292,10 @@ public class OutcomeService implements IOutcomeService {
 	// create a new outcome on the fly
 	String code = null;
 	// check if name contains code part
-	String[] nameParts = name.split("\\(");
+	String[] nameParts = name.split("\\[");
 	if (nameParts.length > 1) {
 	    name = nameParts[0].trim();
-	    code = nameParts[1].replaceFirst("\\)", "").trim();
+	    code = nameParts[1].replaceFirst("\\]", "").trim();
 	}
 	Outcome outcome = new Outcome();
 
