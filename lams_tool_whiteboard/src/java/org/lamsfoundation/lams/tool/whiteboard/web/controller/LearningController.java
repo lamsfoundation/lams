@@ -200,7 +200,11 @@ public class LearningController {
 	sessionMap.put(WhiteboardConstants.ATTR_FINISH_LOCK, finishedLock);
 	sessionMap.put(WhiteboardConstants.ATTR_LOCK_ON_FINISH, whiteboard.getLockWhenFinished());
 	sessionMap.put(WhiteboardConstants.ATTR_USER_FINISHED, (user != null) && user.isSessionFinished());
-
+	if (!isUserLeader) {
+	    boolean isLeaderResponseFinalized = session != null && leader != null && leader.isSessionFinished();
+	    sessionMap.put(WhiteboardConstants.ATTR_IS_LEADER_RESPONSE_FINALIZED, isLeaderResponseFinalized);
+	}
+	
 	// add define later support
 	if (whiteboard.isDefineLater()) {
 	    return "pages/learning/definelater";

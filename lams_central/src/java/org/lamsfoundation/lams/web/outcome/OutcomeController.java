@@ -212,7 +212,7 @@ public class OutcomeController {
 	    ObjectNode outcomeJSON = JsonNodeFactory.instance.objectNode();
 	    outcomeJSON.put("value", outcome.getOutcomeId());
 	    outcomeJSON.put("label",
-		    outcome.getName() + (StringUtils.isBlank(outcome.getCode()) ? "" : " (" + outcome.getCode() + ")"));
+		    outcome.getName() + (StringUtils.isBlank(outcome.getCode()) ? "" : " [" + outcome.getCode() + "]"));
 	    responseJSON.add(outcomeJSON);
 	}
 	responseJSON.add(search);
@@ -297,7 +297,7 @@ public class OutcomeController {
 	    outcomeJSON.put("outcomeId", outcome.getOutcomeId());
 	    outcomeJSON.put("qbMapping", outcomeMapping.getQbQuestionId() != null);
 	    outcomeJSON.put("label",
-		    outcome.getName() + (StringUtils.isBlank(outcome.getCode()) ? "" : " (" + outcome.getCode() + ")"));
+		    outcome.getName() + (StringUtils.isBlank(outcome.getCode()) ? "" : " [" + outcome.getCode() + "]"));
 	    responseJSON.add(outcomeJSON);
 	}
 
