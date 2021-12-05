@@ -30,7 +30,7 @@
 <c:if test="${assessment.allowQuestionFeedback}">
 	<div class="feedback">
 		<c:choose>
-			<c:when	test="${question.mark > 0}">
+			<c:when	test="${question.mark >= question.maxMark}">
 				<c:out value="${question.feedbackOnCorrect}" escapeXml="false" />
 			</c:when>
 			<c:otherwise>
