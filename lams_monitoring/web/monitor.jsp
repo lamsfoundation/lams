@@ -880,7 +880,7 @@
 	
 	<div id="emailProgressDialogContents" class="dialogContainer">
 		<div id="emailProgressDialogTable">
-			<div class="row">
+			<div class="row row-no-gutters">
 				<div class="col-xs-12">
 					<table id="emailProgressTable" class="table table-condensed">
 						<tr class="active">
@@ -892,7 +892,7 @@
 					</table>
 				</div>
 			</div>
-			<div class="row">
+			<div class="row row-no-gutters">
 				<div class="col-xs-6">
 					<div class="form-group">
 						<label for="emaildatePicker"><fmt:message key="progress.email.select.date"/></label>
@@ -900,7 +900,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="row">
+			<div class="row row-no-gutters">
 				<div class="col-xs-6">
 					<button id="addEmailProgressDateButton"
 						class="btn btn-sm btn-default pull-left"

@@ -193,7 +193,7 @@ function initLessonTab(){
 
 	var emailProgressDialog = showDialog('emailProgressDialog',{
 			'autoOpen'  : false,
-			'height'    : 700,
+			'height'    : 500,
 			'width'     : 510,
 			'title' 	: LABELS.PROGRESS_EMAIL_TITLE,
 			'resizable' : true,
