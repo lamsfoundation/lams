@@ -6,7 +6,7 @@
   
 <c:catch var="e">
 <div id="wrapper" style="width:100%; text-align:center">
-	<img class="img-responsive" src="${lams}/www/public/ld-templates/${param.templateName}/${param.templateName}.svg"/>
+	<img class="img-responsive center-block" src="${lams}/www/public/ld-templates/${param.templateName}/${param.templateName}.svg"/>
 </div>
 </c:catch>
 
