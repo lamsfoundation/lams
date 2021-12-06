@@ -46,18 +46,18 @@
 				<div class="voffset5 form-inline">
 					<a href="javascript:;" onclick="addInstruction()" class="btn btn-default btn-sm">
 						<fmt:message key="label.authoring.basic.add.option" /> </a>
-					<i class="fa fa-spinner" style="display: none" id="instructionArea_Busy" />
+					<i class="fa fa-spinner" style="display: none" id="instructionArea_Busy"></i>
 
 					<div class="checkbox loffset5"> 
 						<label for="question.allowMultipleAnswer">
-						<form:checkbox	path="question.allowMultipleAnswer" id="questionAllowMultipleAnswer"/>
+						<form:checkbox	path="question.allowMultipleAnswer" id="questionAllowMultipleAnswer"/>&nbsp;
 						<fmt:message key="label.authoring.basic.question.allow.muli.answer" />
 						</label> 
 					</div>
 					
 					<div class="checkbox loffset5"> 
 						<label for="question.appendText">
-						<form:checkbox path="question.appendText" id="questionAppendText"/>
+						<form:checkbox path="question.appendText" id="questionAppendText"/>&nbsp;
 						<fmt:message key="label.authoring.basic.question.append.text" />
 						</label>
 					</div>
