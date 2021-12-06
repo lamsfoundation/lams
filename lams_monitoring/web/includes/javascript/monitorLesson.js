@@ -2306,10 +2306,11 @@ function loadLearnerProgressPage(pageNumber, learnersSearchPhrase){
 	if (!learnerProgressCellsTemplate) {
 		// fill the placeholder, after all required variables were initialised
 		learnerProgressCellsTemplate =
-		  '<tr><td class="active progressBarLabel" id="progressBarLabel;00;"><div id="portrait-;00;" class="roffset5"/><span class="portrait-sm-lineheight" style="font-weight: bold">;11;</span>';
+		  '<tr><td class="active progressBarLabel" id="progressBarLabel;00;"><div id="portrait-;00;" class="roffset5"></div>' + 
+		  '<span class="portrait-sm-lineheight" style="font-weight: bold">;11;</span>';
 
 		learnerProgressCellsTemplate +=
-			'<a class="btn btn-xs btn-default pull-right tour-email-button" href="#" onClick="javascript:showEmailDialog(;00;)"><i class="fa fa-envelope-o"></i> '
+		'<a class="btn btn-xs btn-default pull-right tour-email-button" href="#" onClick="javascript:showEmailDialog(;00;)"><i class="fa fa-envelope-o"></i> '
 		+ LABELS.EMAIL_BUTTON
 		+ '</a></td></tr><tr><td class="progressBarCell" id="progressBar;00;"></td></tr>';
 	}
