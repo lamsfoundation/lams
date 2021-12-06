@@ -1102,8 +1102,11 @@ function initSequenceTab(){
 	$('.modal-body', '#forceBackwardsDialog').empty().append($('#forceBackwardsDialogContents').show());
 	
 	$('#forceBackwardsRemoveContentNoButton', forceBackwardsDialogContents).click(function(){
-		var forceBackwardsDialog = $('#forceBackwardsDialog');
-		forceCompleteExecute(forceBackwardsDialog.data('learners'), null,
+		var forceBackwardsDialog = $('#forceBackwardsDialog'),
+			learners = forceBackwardsDialog.data('learners'),
+			moveAll = learners === true;
+		forceCompleteExecute(moveAll ? null : learners,
+			 moveAll ? forceBackwardsDialog.data('currentActivityId') : null,
 			 forceBackwardsDialog.data('activityId'),
 			 false);
 		forceBackwardsDialog.modal('hide');
@@ -1111,7 +1114,10 @@ function initSequenceTab(){
 
 	$('#forceBackwardsRemoveContentYesButton', forceBackwardsDialogContents).click(function(){
 		var forceBackwardsDialog = $('#forceBackwardsDialog');
-		forceCompleteExecute(forceBackwardsDialog.data('learners'), null,
+			learners = forceBackwardsDialog.data('learners'),
+			moveAll = learners === true;
+		forceCompleteExecute(moveAll ? null : learners,
+			 moveAll ? forceBackwardsDialog.data('currentActivityId') : null,
 			 forceBackwardsDialog.data('activityId'),
 			 true);
 		forceBackwardsDialog.modal('hide');
@@ -1503,6 +1509,7 @@ function forceComplete(currentActivityId, learners, x, y) {
 				$('#forceBackwardsMsg', '#forceBackwardsDialog').html(msgString);				
 				$('#forceBackwardsDialog').data({
 					'learners' : learners,
+					'currentActivityId' : currentActivityId,
 					'activityId': targetActivityId});
 				$('#forceBackwardsDialog').modal('show');
 				// so autoRefreshBlocked = false is not set
