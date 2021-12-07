@@ -350,7 +350,9 @@ const handshake = () => {
       if (settings.globalUserName !== false) {
         pad.notifyChangeName(settings.globalUserName); // Notifies the server
         pad.myUserInfo.name = settings.globalUserName;
-        $('#myusernameedit').val(settings.globalUserName); // Updates the current users UI
+		// LAMS modification: unescape user name before putting it into Authors pop up
+		let unescapedUserName = settings.globalUserName.replaceAll('%20', ' ').replaceAll('&amp;nbsp;', ' ').replaceAll('%0A', ' ');
+        $('#myusernameedit').val(unescapedUserName); // Updates the current users UI
       }
       if (settings.globalUserColor !== false && colorutils.isCssHex(settings.globalUserColor)) {
         // Add a 'globalUserColor' property to myUserInfo,
