@@ -13,6 +13,7 @@
 <%@ attribute name="displayExpanded" required="false" rtexprvalue="true"%>
 <%@ attribute name="resizeParentFrameName" required="false" rtexprvalue="true"%>
 <%@ attribute name="method" required="false" rtexprvalue="true"%>
+<%@ attribute name="maxWords" required="false" rtexprvalue="true"%>
 
 <c:if test="${empty method}">
 	<c:set var="method" value="inline" />
@@ -59,7 +60,7 @@
 </c:if>
 
 <script type="text/javascript">
-	function initializeCKEditor(id, method, resizeParentFrameName, width, height, toolbarSet, classes, language, displayExpanded, contentFolderID){
+	function initializeCKEditor(id, method, resizeParentFrameName, width, height, toolbarSet, classes, language, displayExpanded, contentFolderID, maxWords){
 		
 		if (resizeParentFrameName != ""){
 			CKEDITOR.on('instanceReady', function(e){
@@ -77,7 +78,7 @@
 	    var editor = CKEDITOR.instances[id];
 	    if (editor) { editor.destroy(true); }
 	    
-		var instance = CKEDITOR[method](id, {
+		var configuration = {
 				width                         : width,
 				height                        : height,
 				toolbar                       : toolbarSet,
@@ -93,7 +94,22 @@
 				filebrowserFlashBrowseUrl     : "${ckEditorBasePath}filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/jsp/connector&CurrentFolder=/" + contentFolderID + "/",
 				filebrowserFlashUploadUrl     : "${ckEditorBasePath}filemanager/upload/simpleuploader?Type=Flash&CurrentFolder=/" + contentFolderID + "/",
 				contentFolderID				  : contentFolderID
-		});
+		};
+		
+		if (maxWords > 0) {
+			$.extend(configuration, {
+				wordcount					  : {
+					maxWordCount			  : maxWords,
+					showParagraphs			  : false,
+					showRemaining			  : true,
+					pasteWarningDuration      : 5000
+				}
+			});
+		}
+
+		
+
+		instance = CKEDITOR[method](id, configuration);
 		instance.initializeFunction = function(){
 			 initializeCKEditor(id, method, resizeParentFrameName, width, height, toolbarSet, classes, language, displayExpanded, contentFolderID);
 		};
@@ -101,7 +117,7 @@
 	}
 	
 	// run initialisation code
-	initializeCKEditor("${id}", "${method}", "${resizeParentFrameName}", "${width}", "${height}", "${toolbarSet}", "${classes}", "${language}", ${displayExpanded}, "${contentFolderID}");
+	initializeCKEditor("${id}", "${method}", "${resizeParentFrameName}", "${width}", "${height}", "${toolbarSet}", "${classes}", "${language}", ${displayExpanded}, "${contentFolderID}", ${empty maxWords or maxWords <= 0 ? 0 : maxWords});
 	
 
 	function reinitializeCKEditorInstances(){
