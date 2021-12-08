@@ -40,13 +40,17 @@
 			padding: 0;
 		}
 		
-		[data-toggle="collapse"].collapsed .if-not-collapsed, [data-toggle="collapse"]:not(.collapsed) .if-collapsed {
+		[data-toggle="collapse"].collapsed .if-not-collapsed,
+		[data-toggle="collapse"]:not(.collapsed) .if-collapsed,
+		.max-word-limit-exceeded {
   			display: none;
   		}
   		
   		.countdown-timeout {
   			color: #FF3333 !important;
   		}
+  		
+  		
 	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
@@ -382,12 +386,11 @@
 				});
 			}
 			
-			//only if time limit is not expired
-			if (!isTimelimitExpired) {
-				if (!validateAnswers()) {
-					return;
-				}
+			// only if time limit is not expired
+			if (!isTimelimitExpired && !validateAnswers()) {
+				return;
 			}
+			
 			disableButtons();
 
 			// copy value from lams:textarea (only available in essay and mark hedging type of questions) to hidden input before submit
@@ -430,7 +433,6 @@
 			
 			var missingRequiredQuestions = [];
 			var minWordsLimitNotReachedQuestions = [];
-			var maxWordsLimitExceededQuestions = [];
 			var markHedgingWrongTotalQuestions = [];
 			
 			<c:forEach var="question" items="${sessionMap.pagedQuestions[pageNumber-1]}" varStatus="status">
@@ -503,15 +505,6 @@
 					</c:choose>
 				</c:if>
 				
-				//essay question which has max words limit
-				<c:if test="${question.type == 6 && question.maxWordsLimit != 0}">
-					var wordCount${status.index} = $('#word-count${status.index}').text();
-					//max words limit is exceeded
-					if(wordCount${status.index} > ${question.maxWordsLimit}) {
-						maxWordsLimitExceededQuestions.push("${status.index}");
-					}
-				</c:if>
-				
 				//essay question which has min words limit
 				<c:if test="${question.type == 6 && question.minWordsLimit != 0}">
 					var wordCount${status.index} = $('#word-count${status.index}').text();
@@ -547,7 +540,7 @@
 			
 			//return true in case all required questions were answered, false otherwise
 			if (missingRequiredQuestions.length == 0 && minWordsLimitNotReachedQuestions.length == 0 
-					&& maxWordsLimitExceededQuestions.length == 0 && markHedgingWrongTotalQuestions.length == 0) {
+					&& markHedgingWrongTotalQuestions.length == 0) {
 				return true;
 				
 			} else {
@@ -565,15 +558,6 @@
 					//show alert message as well
 					$("#warning-answers-required").show();
 					
-				}
-				
-				if (maxWordsLimitExceededQuestions.length != 0) {
-					//add .bg-warning class to those needs to be filled
-					for (i = 0; i < maxWordsLimitExceededQuestions.length; i++) {
-					    $("#question-area-" + maxWordsLimitExceededQuestions[i]).addClass('bg-warning');
-					}
-					//show alert message as well
-					$("#warning-words-limit").show();		
 				}
 				
 				if (minWordsLimitNotReachedQuestions.length != 0) {
@@ -600,18 +584,11 @@
 			}
 		}
 
-		function getNumberOfWords(value, isRemoveHtmlTags) {
-			
-		    //HTML tags stripping 
-			if (isRemoveHtmlTags) {
-				value = value.replace(/&nbsp;/g, '').replace(/<\/?[a-z][^>]*>/gi, '');
-			}
-			value = value.trim();
-			
-		    var wordCount = value ? (value.replace(/['";:,.?\-!]+/g, '').match(/\S+/g) || []).length : 0;
-		    return wordCount;
+		function getNumberOfWords(value) {
+			var wordsForCounting = value.trim().replace(/['";:,.?\-!]+/g, '');
+			return value ? (value.match(/\S+/g) || []).length : 0;
 		}
-		
+
 		function logLearnerInteractionEvent(eventType, qbToolQuestionUid, optionUid) {
 			$.ajax({
 				url: '<c:url value="/learning/logLearnerInteractionEvent.do"/>',
