@@ -9,16 +9,23 @@
 			
 		if (isCkeditor) {
 			var ckeditor = CKEDITOR.instances['question${status.index}'];
+			// each event needs to be specified separately
 			ckeditor.on('change', function(){
 				$('#word-count${status.index}').html(this.wordCount.wordCount);
 			});
-
+			ckeditor.on('paste', function(){
+				$('#word-count${status.index}').html(this.wordCount.wordCount);
+			});
+			ckeditor.on('blur', function(){
+				$('#word-count${status.index}').html(this.wordCount.wordCount);
+			});
+			
 			// trigger count after load
 			ckeditor.on('instanceReady', function() {
 				ckeditor.fire('change');
 			});
 		} else {
-			$("#essay-question${status.index}").on('change keydown paste', function(event){
+			$("#essay-question${status.index}").on('change keyup keydown paste', function(event){
 				var newText = '';
 				
 				// if it is a single key typed
