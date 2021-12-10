@@ -89,6 +89,8 @@ var CKBUILDER_CONFIG = {
 		'list' : 1,
 		'liststyle' : 1,
 		'maximize' : 1,
+		'maxwords'  : 1,
+		'notification' : 1,
 		'pastefromword' : 1,
 		'preview' : 1,
 		'resize' : 1,

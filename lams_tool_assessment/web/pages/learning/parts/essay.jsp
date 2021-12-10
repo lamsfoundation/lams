@@ -5,49 +5,70 @@
 <script type="text/javascript">
 	
 	$(document).ready(function() {
-		
-		//word count
-		var counter${status.index} = function() {
-			var isCkeditor = ${question.allowRichEditor};
+		var isCkeditor = ${question.allowRichEditor};
 			
-			var value;
-			if (isCkeditor) {
-				//if (!CKEDITOR.instances.question${status.index}.checkDirty()) {
-				//	return;
-				//}
-			    value = CKEDITOR.instances.question${status.index}.getData();
-			    
-			} else {
-				value =  $("#essay-question${status.index}").val();
-			}
-		    
-			var wordCount = getNumberOfWords(value, isCkeditor);
-			$('#word-count${status.index}').html(wordCount);
-			
-		    var maxWordsLimit = ${question.maxWordsLimit};
-		    if(wordCount > maxWordsLimit){
-				//$('#text').val()  this.value = this.value.substring(0,limit);
-				//fix a bug: when change "this.value", onchange event won't be fired any more. So this will 
-				//manually handle onchange event. It is a kind of crack coding!
-				//filterData(document.getElementById('messageBody'),document.getElementById('message.body__lamshidden'));
-				//onchange="filterData(this,document.getElementById('question1__lamshidden'));"
-			}
-			//filterData(document.getElementById('question1__lamstextarea'),document.getElementById('question1__lamshidden'));
-		};
-		
-		if (${question.allowRichEditor}) {
-			CKEDITOR.instances["question${status.index}"].on("instanceReady", function(){    
-			     this.on("change", counter${status.index});
+		if (isCkeditor) {
+			var ckeditor = CKEDITOR.instances['question${status.index}'];
+			// each event needs to be specified separately
+			ckeditor.on('change', function(){
+				$('#word-count${status.index}').html(this.wordCount.wordCount);
 			});
-			//count words initially
-		    CKEDITOR.instances["question${status.index}"].on('instanceReady', counter${status.index});
-		      
+			ckeditor.on('paste', function(){
+				$('#word-count${status.index}').html(this.wordCount.wordCount);
+			});
+			ckeditor.on('blur', function(){
+				$('#word-count${status.index}').html(this.wordCount.wordCount);
+			});
+			
+			// trigger count after load
+			ckeditor.on('instanceReady', function() {
+				ckeditor.fire('change');
+			});
 		} else {
-			$("#essay-question${status.index}").on('change keydown keypress keyup paste', counter${status.index});
-			//count words initially
-			counter${status.index}();
+			$("#essay-question${status.index}").on('change keyup keydown paste', function(event){
+				var newText = '';
+				
+				// if it is a single key typed
+				if (event.type == 'keydown') {
+					// try to figure out if it is a printable, standard character
+					if (!event.originalEvent.ctrlKey && event.originalEvent.key.length === 1){
+						newText = String.fromCharCode(event.originalEvent.keyCode);
+						if (!/^[a-zA-Z0-9\u0600-\u06FF\u0660-\u0669\u06F0-\u06F9 _.-]$/.test(newText)) {
+							newText = '';
+						}
+					}
+				} else if (event.type == 'paste') {
+					// get pasted data
+					newText = event.originalEvent.clipboardData || window.clipboardData;
+					newText = newText.getData('Text');
+				}
+				
+				var value = $("#essay-question${status.index}").val() + newText,
+			    	wordCount = getNumberOfWords(value),
+			    	maxWordsLimit = ${question.maxWordsLimit};
+			    	
+				    if (newText && maxWordsLimit > 0){
+					    var questionArea = $(this).closest('.question-area'),
+					    	warning = $('.max-word-limit-exceeded', questionArea);
+					    if (wordCount > maxWordsLimit){
+						    // prevent new text from being entered
+						    event.preventDefault();
+						    if (!warning.is(':visible')) {
+						    	questionArea.addClass('bg-warning');
+								warning.slideDown(function(){
+									setTimeout(function() {
+										questionArea.removeClass('bg-warning');
+										warning.slideUp();
+									}, 5000);
+								});
+						    }
+					    	return false;
+						}
+				    }
+				
+				$('#word-count${status.index}').html(wordCount);
+			}).change();
 		}
-
 	});
 </script>
 </c:if>
@@ -76,7 +97,6 @@
 		<c:if test="${isWordsLimitEnabled}">
 			<tr>
 				<td>
-	
 					<c:choose>
 						<c:when test="${question.maxWordsLimit != 0 && question.minWordsLimit != 0}">
 							<div class="reg-info">
@@ -85,12 +105,18 @@
 									<fmt:param>${question.maxWordsLimit}</fmt:param>
 								</fmt:message>
 							</div>
+							<div class="reg-info max-word-limit-exceeded text-danger">
+								<fmt:message key="warn.maximum.number.words" />
+							</div>
 						</c:when>
 						<c:when test="${question.maxWordsLimit != 0}">
 							<div class="reg-info">
 								<fmt:message key="label.info.maximum.number.words" >
 									<fmt:param>${question.maxWordsLimit}</fmt:param>
 								</fmt:message>
+							</div>
+							<div class="reg-info max-word-limit-exceeded text-danger">
+								<fmt:message key="warn.maximum.number.words" />
 							</div>
 						</c:when>
 						<c:when test="${question.minWordsLimit != 0}">
@@ -109,7 +135,7 @@
 			<td>
 				<c:choose>
 					<c:when test="${question.allowRichEditor && hasEditRight}">
-						<lams:CKEditor id="question${status.index}" value="${question.answer}" contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner" height="174px"></lams:CKEditor>
+						<lams:CKEditor id="question${status.index}" value="${question.answer}" contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner" height="174px" maxWords="${question.maxWordsLimit}"></lams:CKEditor>
 					</c:when>
 					<c:when test="${not empty question.codeStyle}">
 						<textarea id="essay-question${status.index}" name="question${status.index}">${question.answer}</textarea>
