@@ -40,7 +40,7 @@
 				${question.question}
 			</div>
 					
-			<div class="panel-body" id="question-area-${status.index}">
+			<div class="panel-body question-area" id="question-area-${status.index}">
 				<c:choose>
 					<c:when test="${question.type == 1}">
 						<c:set var="justificationEligible" value="true" />

@@ -316,3 +316,8 @@ to
 type:CKEDITOR.NODE_ELEMENT,addClass:g?function(a){if(a)this.$.classList.(a);return this}
 ```
 (As in [https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=cfec5d4c0ffe681e5e2604dc1163b309974e21f0](https://code.lamsfoundation.org/fisheye/changelog/lams-github?cs=cfec5d4c0ffe681e5e2604dc1163b309974e21f0))  
+
+- Add wordcount and notification plugins   
+These plugins are required for checking max word count in essay questions.   
+They are a part of CKEditor build file already, but they can be added manually too.   
+The sking office2013 does not have a notification.css file nor its import is added to editor.css. It can be taken from existing LAMS code or directly from another skin.

@@ -386,10 +386,19 @@ function addLesson(learningDesignId, lessonName){
 
 function previewLesson(){
 	var ldNode = tree.treeview('getSelected')[0],
+		learningDesignID = null;
 		popupWidth = 1280,
 		popupHeight = 720;
 
-	if (!ldNode || !ldNode.learningDesignId) {
+	if (ldNode && ldNode.learningDesignId) {
+		// get LD ID from tree
+		learningDesignID = ldNode.learningDesignId;
+	} else {
+		// get data from "recently used sequences" list
+		learningDesignID = +$('div#accessDiv .access-selected').data('learningDesignId');
+	}
+			
+	if (!learningDesignID) {
 		$('#ldNotChosenError').show();
 		doSelectTab(1);
 		return;
@@ -399,7 +408,7 @@ function previewLesson(){
 	$.ajax({
 		url : LAMS_URL + 'monitoring/monitoring/initializeLesson.do',
 		data : {
-			'learningDesignID' : ldNode.learningDesignId,
+			'learningDesignID' : learningDesignID,
 			'copyType' : 3,
 			'lessonName' : LABEL_PREVIEW_LESSON_DEFAULT_TITLE
 		},
