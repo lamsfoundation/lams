@@ -93,7 +93,7 @@
 </div>
 
 <div class="table-responsive">
-	<table class="table table-hover table-condensed">
+	<table class="table table-condensed">
 		<c:if test="${isWordsLimitEnabled}">
 			<tr>
 				<td>
