@@ -256,7 +256,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		description: '',
 		css: '',
 		html: 
-		'<div class="col-md-6">' +
+		'<div class="col-md-12">' +
 		'	<div class="panel panel-default">' +
 		'		<div class="panel-heading">Image header</div>' +
 			
