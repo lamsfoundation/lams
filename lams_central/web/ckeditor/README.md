@@ -64,8 +64,7 @@ removing the following line from the ckeditor.js:
 For CKEditor 4.16.2 the code to remove is  
 b.getAttribute("class")&&(c=c.replace("\x3e",' class\x3d"'+b.getAttribute("class")+'"\x3e'));
   
-- (NOT REQUIRED ANYMORE AS OF CKEDITOR 4.16.2)  
-bootstrapTabs plugin.
+- bootstrapTabs plugin   
 The "element.getAscendant"'s function that was specified on Double click and contextMenu listener methods were replaced with the following "return !( element instanceof CKEDITOR.dom.document ) && element.hasClass('bootstrap-tabs') ;". As otherwise it always false positively determined there is a tabs element in CKEditor canvas (due to LAMS header containing a tab).  
 Modify plugins/bootstrapTabs/dialogs/plugin.js  
 or optimised ckeditor.js
