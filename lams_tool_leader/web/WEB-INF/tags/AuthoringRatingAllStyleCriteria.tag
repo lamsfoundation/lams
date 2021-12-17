@@ -163,9 +163,11 @@
 				<c:set var="maxOrderId" value="${criteria.orderId}"/>
 			</c:if>
 			<c:set var="escapedTitle"><c:out value="${criteria.title}" escapeXml="true"/></c:set>
+			<c:set var="escapedRubricsColumnsJSON">${fn:replace(fn:replace(criteria.rubricsColumnsJSON, "\\", "\\\\"), "'", "\\'")}</c:set>
+			<c:set var="escapedRubricsColumnHeadersJSON">${fn:replace(fn:replace(criteria.rubricsColumnHeadersJSON, "\\", "\\\\"), "'", "\\'")}</c:set>
  			addRow('${criteria.orderId}', '${criteria.ratingStyle}', '${escapedTitle}'.replaceAll('&lt;BR/&gt;', '\r\n'), '${criteria.maxRating}', 
  					${criteria.commentsEnabled}, '${criteria.commentsMinWordsLimit}', '${criteria.minimumRates}', '${criteria.maximumRates}', 
- 					'${criteria.ratingCriteriaGroupId}', '${criteria.rubricsColumnsJSON}', '${criteria.rubricsColumnHeadersJSON}');
+ 					'${criteria.ratingCriteriaGroupId}', '${escapedRubricsColumnsJSON}', '${escapedRubricsColumnHeadersJSON}');
 		</c:forEach>
 		maxOrderId = ${maxOrderId};
 		if ( maxOrderId == 0 ) {
