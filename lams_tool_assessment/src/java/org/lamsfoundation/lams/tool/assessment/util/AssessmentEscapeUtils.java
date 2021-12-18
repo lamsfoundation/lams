@@ -44,6 +44,7 @@ public class AssessmentEscapeUtils {
 
     public static final String VSA_ANSWER_NORMALISE_JAVA_REG_EXP = "\\W";
     public static final String VSA_ANSWER_NORMALISE_SQL_REG_EXP = "[^[:alpha:][:alnum:]_]";
+    public static final String VSA_ANSWER_DELIMITER = "\r\n";
 
     public static class AssessmentExcelCell {
 	public Object value;
@@ -374,7 +375,7 @@ public class AssessmentEscapeUtils {
 
     public static Set<String> normaliseVSOption(String option) {
 	return option == null ? Set.of()
-		: Stream.of(option.split("\r\n")).collect(Collectors
+		: Stream.of(option.split(VSA_ANSWER_DELIMITER)).collect(Collectors
 			.mapping(answer -> AssessmentEscapeUtils.normaliseVSAnswer(answer), Collectors.toSet()));
     }
 }

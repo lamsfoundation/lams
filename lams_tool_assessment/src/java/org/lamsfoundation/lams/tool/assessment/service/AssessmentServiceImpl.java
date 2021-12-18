@@ -34,6 +34,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -1492,7 +1493,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    }
 
 	    String name = targetOption.getName();
-	    name += "\r\n" + answer;
+	    name += AssessmentEscapeUtils.VSA_ANSWER_DELIMITER + answer;
 	    targetOption.setName(name);
 	    assessmentDao.saveObject(targetOption);
 
@@ -1503,60 +1504,34 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    return null;
 	}
 
-	//removing
-	if (targetOptionUid.equals(-1L)) {
-	    for (QbOption previousOption : qbQuestion.getQbOptions()) {
-		if (previousOption.getUid().equals(previousOptionUid)) {
-		    String name = previousOption.getName();
-		    String[] alternatives = name.split(",");
-
-		    StringBuilder nameWithoutUserAnswer = new StringBuilder();
-		    for (String alternative : alternatives) {
-			String normalisedAlternative = AssessmentEscapeUtils.normaliseVSAnswer(alternative);
-			if (!normalisedAlternative.equals(normalisedAnswer)) {
-			    nameWithoutUserAnswer.append(alternative).append("\r\n");
-			}
-		    }
-		    if (nameWithoutUserAnswer.length() > 2) {
-			previousOption.setName(nameWithoutUserAnswer.substring(0, nameWithoutUserAnswer.length() - 2));
-			assessmentDao.saveObject(previousOption);
-		    }
-		    break;
-		}
-	    }
-	    return null;
-	}
-
-	//moving from one to another
-	for (QbOption targetOption : qbQuestion.getQbOptions()) {
-	    if (targetOption.getUid().equals(targetOptionUid)) {
-		String name = targetOption.getName();
-		name += "\r\n" + answer;
-		targetOption.setName(name);
-		assessmentDao.saveObject(targetOption);
-		break;
-	    }
-	}
-
+	// moving back to answer queue or moving to another option, so remove from previous option
 	for (QbOption previousOption : qbQuestion.getQbOptions()) {
 	    if (previousOption.getUid().equals(previousOptionUid)) {
 		String name = previousOption.getName();
-		String[] alternatives = name.split(",");
+		String[] alternatives = name.split(AssessmentEscapeUtils.VSA_ANSWER_DELIMITER);
 
-		StringBuilder nameWithoutUserAnswer = new StringBuilder();
-		for (String alternative : alternatives) {
-		    String normalisedAlternative = AssessmentEscapeUtils.normaliseVSAnswer(alternative);
-		    if (!normalisedAlternative.equals(normalisedAnswer)) {
-			nameWithoutUserAnswer.append(alternative).append("\r\n");
-		    }
-		}
-		previousOption.setName(nameWithoutUserAnswer.length() > 2
-			? nameWithoutUserAnswer.substring(0, nameWithoutUserAnswer.length() - 2)
-			: "");
-		assessmentDao.saveObject(previousOption);
+		Set<String> nameWithoutUserAnswer = new LinkedHashSet<>(List.of(alternatives));
+		nameWithoutUserAnswer.remove(normalisedAnswer);
+		name = nameWithoutUserAnswer.stream()
+			.collect(Collectors.joining(AssessmentEscapeUtils.VSA_ANSWER_DELIMITER));
+		previousOption.setName(name);
 		break;
 	    }
 	}
+
+	if (!targetOptionUid.equals(-1L)) {
+	    //moving from one to another
+	    for (QbOption targetOption : qbQuestion.getQbOptions()) {
+		if (targetOption.getUid().equals(targetOptionUid)) {
+		    String name = targetOption.getName();
+		    name += AssessmentEscapeUtils.VSA_ANSWER_DELIMITER + answer;
+		    targetOption.setName(name);
+		    assessmentDao.saveObject(targetOption);
+		    break;
+		}
+	    }
+	}
+
 	return null;
     }
 
