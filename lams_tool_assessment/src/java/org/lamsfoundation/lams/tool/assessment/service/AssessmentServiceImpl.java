@@ -851,11 +851,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    Collection<String> optionAnswers = AssessmentEscapeUtils.normaliseVSOption(optionDto.getName());
 		    boolean isAnswerMatchedCurrentOption = false;
 		    for (String optionAnswer : optionAnswers) {
-			String normalisedOptionAnswer = AssessmentEscapeUtils.normaliseVSAnswer(optionAnswer);
 
 			// check is item unraveled
-			if (isQuestionCaseSensitive ? normalisedQuestionAnswer.equals(normalisedOptionAnswer)
-				: normalisedQuestionAnswer.equalsIgnoreCase(normalisedOptionAnswer)) {
+			if (isQuestionCaseSensitive ? normalisedQuestionAnswer.equals(optionAnswer)
+				: normalisedQuestionAnswer.equalsIgnoreCase(optionAnswer)) {
 			    isAnswerMatchedCurrentOption = true;
 			    break;
 			}
@@ -1469,17 +1468,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	}
 
 	return questionSummary;
-    }
-
-    public static boolean isAnswersEqual(AssessmentQuestion question, String answer1, String answer2) {
-	if (answer1 == null || answer2 == null) {
-	    return false;
-	}
-	String normalisedAnswer1 = AssessmentEscapeUtils.normaliseVSAnswer(answer1);
-	String normalisedAnswer2 = AssessmentEscapeUtils.normaliseVSAnswer(answer2);
-
-	return question.getQbQuestion().isCaseSensitive() ? normalisedAnswer1.equals(normalisedAnswer2)
-		: normalisedAnswer1.equalsIgnoreCase(normalisedAnswer2);
     }
 
     @Override
