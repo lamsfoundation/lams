@@ -2,13 +2,13 @@
 // Main difference Source became Sourcedialog and Maximize and Preview were dropped.
 
 CKEDITOR.config.toolbar_Default = [
-	['Source','-','Maximize','Preview','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath','-'], 
-	['Image','Link','Iframe','Table','HorizontalRule','Emojione','Format','Font','FontSize']
+	['Source','Preview','-','Maximize','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath','-'], 
+	['Link','Table','HorizontalRule','-','Emojione','bootsnippets-text','bootsnippets-image','bootsnippets-multimedia','bootsnippets-advanced-layout','Format','Font','FontSize']
 ];
 
 CKEDITOR.config.toolbar_DefaultInline = [
 	['Sourcedialog','Preview','-','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath','-'], 
-    ['Image','Link','Iframe','Table','HorizontalRule','-','bootsnippets-text','bootsnippets-image','bootsnippets-multimedia','bootsnippets-advanced-layout','Format','Font','FontSize']
+    ['Link','Table','HorizontalRule','-','Emojione','bootsnippets-text','bootsnippets-image','bootsnippets-multimedia','bootsnippets-advanced-layout','Format','Font','FontSize']
 ];
 
 CKEDITOR.config.toolbar_DefaultDokuInline = [
@@ -25,8 +25,8 @@ CKEDITOR.config.toolbar_DefaultLearner = [
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
 	['Jlatexmath'],
 	['TextColor','BGColor'],
-	['Image','Table','HorizontalRule'],
-	['Format','Font','FontSize']
+	['Table','HorizontalRule'],
+	['bootsnippets-text','bootsnippets-image','bootsnippets-multimedia','Format','Font','FontSize']
 ];
 
 CKEDITOR.config.toolbar_DefaultLearnerInline = [
@@ -36,8 +36,8 @@ CKEDITOR.config.toolbar_DefaultLearnerInline = [
   	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
   	['Jlatexmath','-','Link'],
   	['TextColor','BGColor'],
-  	['Image','Table','HorizontalRule'],
-  	['Format','Font','FontSize']
+  	['Table','HorizontalRule'],
+  	['bootsnippets-text','bootsnippets-image','bootsnippets-multimedia','Format','Font','FontSize']
   ];
 
 CKEDITOR.config.toolbar_DefaultMonitor = [
@@ -69,11 +69,11 @@ CKEDITOR.config.toolbar_CustomWiki = [
 	['Bold','Italic','Underline', '-','Subscript','Superscript'],
 	['NumberedList','BulletedList','-','Outdent','Indent'],
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-	['wikilink','Link','Image'],
+	['wikilink','Link'],
 	['Jlatexmath'],
 	['TextColor','BGColor'],
 	['Table','HorizontalRule'],
-	['Format','Font','FontSize']
+	['bootsnippets-text','bootsnippets-image','bootsnippets-multimedia','Format','Font','FontSize']
 ];
 
 CKEDITOR.config.toolbar_CustomWikiInline = [
@@ -82,11 +82,11 @@ CKEDITOR.config.toolbar_CustomWikiInline = [
   	['Bold','Italic','Underline', '-','Subscript','Superscript'],
   	['NumberedList','BulletedList','-','Outdent','Indent'],
   	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-  	['wikilink','Link','Image'],
+  	['wikilink','Link'],
   	['Jlatexmath'],
   	['TextColor','BGColor'],
   	['Table','HorizontalRule'],
-  	['Format','Font','FontSize']
+  	['bootsnippets-text','bootsnippets-image','bootsnippets-multimedia','Format','Font','FontSize']
 ];
 
 CKEDITOR.config.toolbar_CustomWikiLearner = [
@@ -94,11 +94,11 @@ CKEDITOR.config.toolbar_CustomWikiLearner = [
 	['Bold','Italic','Underline', '-','Subscript','Superscript'],
 	['NumberedList','BulletedList','-','Outdent','Indent'],
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-	['wikilink','Link','Image'],
+	['wikilink','Link'],
 	['Jlatexmath'],
 	['TextColor','BGColor'],
 	['Table','HorizontalRule'],
-	['Format','Font','FontSize']
+	['bootsnippets-text','bootsnippets-image','bootsnippets-multimedia','Format','Font','FontSize']
 ];
 
 CKEDITOR.config.toolbar_CustomWikiLearnerInline = CKEDITOR.config.toolbar_CustomWikiLearner;
@@ -109,7 +109,7 @@ CKEDITOR.config.toolbar_LessonDescription = [
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
 	['TextColor','BGColor'],
 	['Table','HorizontalRule'],
-	['Format','Font','FontSize']
+	['bootsnippets-text','bootsnippets-image','bootsnippets-multimedia','-','Format','Font','FontSize']
 ];
 
 CKEDITOR.config.toolbar_LessonDescriptionInline = [
@@ -118,7 +118,7 @@ CKEDITOR.config.toolbar_LessonDescriptionInline = [
  	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
  	['TextColor','BGColor'],
  	['Table','HorizontalRule'],
- 	['Format','Font','FontSize']
+ 	['bootsnippets-text','bootsnippets-image','bootsnippets-multimedia','-','Format','Font','FontSize']
  ];
 
 
@@ -132,7 +132,7 @@ CKEDITOR.config.bootsnippets_files = [CKEDITOR.basePath + '../www/public/ckedito
 CKEDITOR.config.format_tags	= 'div;h1;h2;h3;h4;h5;h6;pre;address;p' ;
 CKEDITOR.plugins.addExternal('wikilink', CKEDITOR.basePath + '../tool/lawiki10/wikilink/', 'plugin.js');
 // html5audio is available but not used anymore; it probably needs fixes as in CKEditor README doc
-CKEDITOR.config.extraPlugins = 'wikilink,jlatexmath,image2,confighelper,bootstrapTabs,bootpanel,bootsnippets,wavepanel,wordcount,notification';
+CKEDITOR.config.extraPlugins = 'wikilink,jlatexmath,image2,confighelper,bootstrapTabs,bootpanel,bootsnippets,wavepanel,wordcount,notification,oembed';
 CKEDITOR.config.enterMode = CKEDITOR.ENTER_DIV; 
 CKEDITOR.config.removePlugins = 'elementspath,about,specialchar';
 CKEDITOR.config.allowedContent = true;
