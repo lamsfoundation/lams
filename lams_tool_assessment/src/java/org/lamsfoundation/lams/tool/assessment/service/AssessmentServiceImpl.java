@@ -848,20 +848,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    // refresh latest answers from DB
 		    QbOption qbOption = qbService.getOptionByUid(optionDto.getUid());
 		    optionDto.setName(qbOption.getName());
+		    boolean isAnswerAllocated = AssessmentEscapeUtils.isVSAnswerAllocated(qbOption.getName(),
+			    normalisedQuestionAnswer, isQuestionCaseSensitive);
 
-		    Collection<String> optionAnswers = AssessmentEscapeUtils.normaliseVSOption(optionDto.getName());
-		    boolean isAnswerMatchedCurrentOption = false;
-		    for (String optionAnswer : optionAnswers) {
-
-			// check is item unraveled
-			if (isQuestionCaseSensitive ? normalisedQuestionAnswer.equals(optionAnswer)
-				: normalisedQuestionAnswer.equalsIgnoreCase(optionAnswer)) {
-			    isAnswerMatchedCurrentOption = true;
-			    break;
-			}
-		    }
-
-		    if (isAnswerMatchedCurrentOption) {
+		    if (isAnswerAllocated) {
 			mark = optionDto.getMaxMark() * maxMark;
 			questionResult.setQbOption(qbOption);
 			break;
@@ -1433,18 +1423,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    continue;
 		}
 
-		boolean isAnswerAllocated = false;
-
 		String normalisedAnswer = AssessmentEscapeUtils.normaliseVSAnswer(answer);
+
+		boolean isAnswerAllocated = false;
 		for (QbOption option : qbQuestion.getQbOptions()) {
-		    Collection<String> alternatives = AssessmentEscapeUtils.normaliseVSOption(option.getName());
-		    for (String alternative : alternatives) {
-			if (isQuestionCaseSensitive ? normalisedAnswer.equals(alternative)
-				: normalisedAnswer.equalsIgnoreCase(alternative)) {
-			    isAnswerAllocated = true;
-			    break;
-			}
-		    }
+		    String name = option.getName();
+		    isAnswerAllocated = AssessmentEscapeUtils.isVSAnswerAllocated(name, normalisedAnswer,
+			    isQuestionCaseSensitive);
 		    if (isAnswerAllocated) {
 			break;
 		    }
@@ -1476,6 +1461,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	AssessmentQuestion assessmentQuestion = assessmentQuestionDao.getByUid(questionUid);
 	QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
 	String normalisedAnswer = AssessmentEscapeUtils.normaliseVSAnswer(answer);
+	if (normalisedAnswer == null) {
+	    return null;
+	}
 
 	//adding
 	if (previousOptionUid.equals(-1L)) {
@@ -1483,8 +1471,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    QbOption targetOption = null;
 	    for (QbOption option : qbQuestion.getQbOptions()) {
 		String name = option.getName();
-		Collection<String> alternatives = AssessmentEscapeUtils.normaliseVSOption(name);
-		if (alternatives.contains(normalisedAnswer)) {
+		boolean isAnswerAllocated = AssessmentEscapeUtils.isVSAnswerAllocated(name, normalisedAnswer,
+			qbQuestion.isCaseSensitive());
+		if (isAnswerAllocated) {
 		    return option.getUid();
 		}
 		if (option.getUid().equals(targetOptionUid)) {
