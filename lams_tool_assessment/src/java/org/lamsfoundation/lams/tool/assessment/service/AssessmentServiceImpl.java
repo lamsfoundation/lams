@@ -34,6 +34,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -847,21 +848,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    // refresh latest answers from DB
 		    QbOption qbOption = qbService.getOptionByUid(optionDto.getUid());
 		    optionDto.setName(qbOption.getName());
+		    boolean isAnswerAllocated = AssessmentEscapeUtils.isVSAnswerAllocated(qbOption.getName(),
+			    normalisedQuestionAnswer, isQuestionCaseSensitive);
 
-		    Collection<String> optionAnswers = AssessmentEscapeUtils.normaliseVSOption(optionDto.getName());
-		    boolean isAnswerMatchedCurrentOption = false;
-		    for (String optionAnswer : optionAnswers) {
-			String normalisedOptionAnswer = AssessmentEscapeUtils.normaliseVSAnswer(optionAnswer);
-
-			// check is item unraveled
-			if (isQuestionCaseSensitive ? normalisedQuestionAnswer.equals(normalisedOptionAnswer)
-				: normalisedQuestionAnswer.equalsIgnoreCase(normalisedOptionAnswer)) {
-			    isAnswerMatchedCurrentOption = true;
-			    break;
-			}
-		    }
-
-		    if (isAnswerMatchedCurrentOption) {
+		    if (isAnswerAllocated) {
 			mark = optionDto.getMaxMark() * maxMark;
 			questionResult.setQbOption(qbOption);
 			break;
@@ -1433,18 +1423,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    continue;
 		}
 
-		boolean isAnswerAllocated = false;
-
 		String normalisedAnswer = AssessmentEscapeUtils.normaliseVSAnswer(answer);
+
+		boolean isAnswerAllocated = false;
 		for (QbOption option : qbQuestion.getQbOptions()) {
-		    Collection<String> alternatives = AssessmentEscapeUtils.normaliseVSOption(option.getName());
-		    for (String alternative : alternatives) {
-			if (isQuestionCaseSensitive ? normalisedAnswer.equals(alternative)
-				: normalisedAnswer.equalsIgnoreCase(alternative)) {
-			    isAnswerAllocated = true;
-			    break;
-			}
-		    }
+		    String name = option.getName();
+		    isAnswerAllocated = AssessmentEscapeUtils.isVSAnswerAllocated(name, normalisedAnswer,
+			    isQuestionCaseSensitive);
 		    if (isAnswerAllocated) {
 			break;
 		    }
@@ -1471,104 +1456,86 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	return questionSummary;
     }
 
-    public static boolean isAnswersEqual(AssessmentQuestion question, String answer1, String answer2) {
-	if (answer1 == null || answer2 == null) {
-	    return false;
-	}
-	String normalisedAnswer1 = AssessmentEscapeUtils.normaliseVSAnswer(answer1);
-	String normalisedAnswer2 = AssessmentEscapeUtils.normaliseVSAnswer(answer2);
-
-	return question.getQbQuestion().isCaseSensitive() ? normalisedAnswer1.equals(normalisedAnswer2)
-		: normalisedAnswer1.equalsIgnoreCase(normalisedAnswer2);
-    }
-
     @Override
     public Long allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid, String answer) {
+	String normalisedAnswer = AssessmentEscapeUtils.normaliseVSAnswer(answer);
+	if (normalisedAnswer == null) {
+	    return null;
+	}
+
 	AssessmentQuestion assessmentQuestion = assessmentQuestionDao.getByUid(questionUid);
 	QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
-	String normalisedAnswer = AssessmentEscapeUtils.normaliseVSAnswer(answer);
+	boolean isQuestionCaseSensitive = qbQuestion.isCaseSensitive();
 
-	//adding
-	if (previousOptionUid.equals(-1L)) {
-	    //search for duplicates and, if found, return false
-	    QbOption targetOption = null;
-	    for (QbOption option : qbQuestion.getQbOptions()) {
+	QbOption previousOption = null;
+	QbOption targetOption = null;
+
+	// look for source and target options
+	for (QbOption option : qbQuestion.getQbOptions()) {
+	    if (previousOptionUid.equals(-1L)) {
+		// new allocation, check if the answer was not allocated anywhere already
 		String name = option.getName();
-		Collection<String> alternatives = AssessmentEscapeUtils.normaliseVSOption(name);
-		if (alternatives.contains(normalisedAnswer)) {
+		boolean isAnswerAllocated = AssessmentEscapeUtils.isVSAnswerAllocated(name, normalisedAnswer,
+			isQuestionCaseSensitive);
+		if (isAnswerAllocated) {
 		    return option.getUid();
 		}
-		if (option.getUid().equals(targetOptionUid)) {
-		    targetOption = option;
-		}
+	    } else if (previousOption == null && option.getUid().equals(previousOptionUid)) {
+		previousOption = option;
 	    }
+	    if (targetOption == null && !targetOptionUid.equals(-1L) && option.getUid().equals(targetOptionUid)) {
+		targetOption = option;
+	    }
+	}
 
-	    String name = targetOption.getName();
-	    name += "\r\n" + answer;
-	    targetOption.setName(name);
-	    assessmentDao.saveObject(targetOption);
+	if (!targetOptionUid.equals(-1L) && targetOption == null) {
+	    // front end provided incorrect target option UID
+	    log.error("Target option with UID " + targetOptionUid + " was not found in question with UID " + questionUid
+		    + " to allocate answer " + answer);
+	    return null;
+	}
 
-	    if (log.isDebugEnabled()) {
-		log.debug("Adding answer \"" + answer + "\" to option " + targetOptionUid + " in question "
+	// remove from already allocated option
+	if (previousOption != null) {
+	    String name = previousOption.getName();
+	    String[] alternatives = name.split(AssessmentEscapeUtils.VSA_ANSWER_DELIMITER);
+
+	    Set<String> nameWithoutUserAnswer = new LinkedHashSet<>(List.of(alternatives));
+	    nameWithoutUserAnswer.remove(normalisedAnswer);
+	    name = nameWithoutUserAnswer.stream()
+		    .collect(Collectors.joining(AssessmentEscapeUtils.VSA_ANSWER_DELIMITER));
+	    previousOption.setName(name);
+	    assessmentDao.saveObject(previousOption);
+	    assessmentDao.flush();
+
+	    if (log.isInfoEnabled()) {
+		log.info("Removed VS answer \"" + answer + "\" from option " + previousOptionUid + " in question "
 			+ questionUid);
 	    }
-	    return null;
 	}
 
-	//removing
-	if (targetOptionUid.equals(-1L)) {
-	    for (QbOption previousOption : qbQuestion.getQbOptions()) {
-		if (previousOption.getUid().equals(previousOptionUid)) {
-		    String name = previousOption.getName();
-		    String[] alternatives = name.split(",");
+	if (targetOption != null) {
+	    String name = targetOption.getName();
 
-		    StringBuilder nameWithoutUserAnswer = new StringBuilder();
-		    for (String alternative : alternatives) {
-			String normalisedAlternative = AssessmentEscapeUtils.normaliseVSAnswer(alternative);
-			if (!normalisedAlternative.equals(normalisedAnswer)) {
-			    nameWithoutUserAnswer.append(alternative).append("\r\n");
-			}
-		    }
-		    if (nameWithoutUserAnswer.length() > 2) {
-			previousOption.setName(nameWithoutUserAnswer.substring(0, nameWithoutUserAnswer.length() - 2));
-			assessmentDao.saveObject(previousOption);
-		    }
-		    break;
-		}
+	    boolean isAnswerAllocated = AssessmentEscapeUtils.isVSAnswerAllocated(name, normalisedAnswer,
+		    isQuestionCaseSensitive);
+	    if (isAnswerAllocated) {
+		// the answer has been already allocated to the target option
+		return targetOptionUid;
 	    }
-	    return null;
-	}
 
-	//moving from one to another
-	for (QbOption targetOption : qbQuestion.getQbOptions()) {
-	    if (targetOption.getUid().equals(targetOptionUid)) {
-		String name = targetOption.getName();
-		name += "\r\n" + answer;
-		targetOption.setName(name);
-		assessmentDao.saveObject(targetOption);
-		break;
+	    // append new answer to option
+	    name += AssessmentEscapeUtils.VSA_ANSWER_DELIMITER + answer;
+	    targetOption.setName(name);
+	    assessmentDao.saveObject(targetOption);
+	    assessmentDao.flush();
+
+	    if (log.isInfoEnabled()) {
+		log.info("Allocated VS  answer \"" + answer + "\" to option " + targetOptionUid + " in question "
+			+ questionUid);
 	    }
 	}
 
-	for (QbOption previousOption : qbQuestion.getQbOptions()) {
-	    if (previousOption.getUid().equals(previousOptionUid)) {
-		String name = previousOption.getName();
-		String[] alternatives = name.split(",");
-
-		StringBuilder nameWithoutUserAnswer = new StringBuilder();
-		for (String alternative : alternatives) {
-		    String normalisedAlternative = AssessmentEscapeUtils.normaliseVSAnswer(alternative);
-		    if (!normalisedAlternative.equals(normalisedAnswer)) {
-			nameWithoutUserAnswer.append(alternative).append("\r\n");
-		    }
-		}
-		previousOption.setName(nameWithoutUserAnswer.length() > 2
-			? nameWithoutUserAnswer.substring(0, nameWithoutUserAnswer.length() - 2)
-			: "");
-		assessmentDao.saveObject(previousOption);
-		break;
-	    }
-	}
 	return null;
     }
 
