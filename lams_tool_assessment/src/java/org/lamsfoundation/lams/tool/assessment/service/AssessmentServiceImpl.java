@@ -1501,6 +1501,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    name += AssessmentEscapeUtils.VSA_ANSWER_DELIMITER + answer;
 	    targetOption.setName(name);
 	    assessmentDao.saveObject(targetOption);
+	    assessmentDao.flush();
 
 	    if (log.isDebugEnabled()) {
 		log.debug("Adding answer \"" + answer + "\" to option " + targetOptionUid + " in question "
@@ -1519,6 +1520,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    .collect(Collectors.joining(AssessmentEscapeUtils.VSA_ANSWER_DELIMITER));
 	    previousOption.setName(name);
 	    assessmentDao.saveObject(previousOption);
+	    assessmentDao.flush();
 	}
 
 	return null;
