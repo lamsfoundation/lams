@@ -1503,8 +1503,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    assessmentDao.saveObject(targetOption);
 	    assessmentDao.flush();
 
-	    if (log.isDebugEnabled()) {
-		log.debug("Adding answer \"" + answer + "\" to option " + targetOptionUid + " in question "
+	    if (log.isInfoEnabled()) {
+		log.info("Allocated VS answer \"" + answer + "\" to option " + targetOptionUid + " in question "
 			+ questionUid);
 	    }
 	}
@@ -1521,6 +1521,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    previousOption.setName(name);
 	    assessmentDao.saveObject(previousOption);
 	    assessmentDao.flush();
+
+	    if (log.isInfoEnabled()) {
+		log.info("Removed VS answer \"" + answer + "\" from option " + previousOptionUid + " in question "
+			+ questionUid);
+	    }
 	}
 
 	return null;
