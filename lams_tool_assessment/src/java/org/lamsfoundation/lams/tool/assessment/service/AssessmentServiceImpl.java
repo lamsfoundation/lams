@@ -1488,25 +1488,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    }
 	}
 
-	if (!targetOptionUid.equals(-1L)) {
-	    if (targetOption == null) {
-		// front end provided incorrect target option UID
-		log.error("Target option with UID " + targetOptionUid + " was not found in question with UID "
-			+ questionUid + " to allocate answer " + answer);
-		return null;
-	    }
-
-	    // append new answer to option
-	    String name = targetOption.getName();
-	    name += AssessmentEscapeUtils.VSA_ANSWER_DELIMITER + answer;
-	    targetOption.setName(name);
-	    assessmentDao.saveObject(targetOption);
-	    assessmentDao.flush();
-
-	    if (log.isInfoEnabled()) {
-		log.info("Allocated VS answer \"" + answer + "\" to option " + targetOptionUid + " in question "
-			+ questionUid);
-	    }
+	if (!targetOptionUid.equals(-1L) && targetOption == null) {
+	    // front end provided incorrect target option UID
+	    log.error("Target option with UID " + targetOptionUid + " was not found in question with UID " + questionUid
+		    + " to allocate answer " + answer);
+	    return null;
 	}
 
 	// remove from already allocated option
@@ -1524,6 +1510,28 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	    if (log.isInfoEnabled()) {
 		log.info("Removed VS answer \"" + answer + "\" from option " + previousOptionUid + " in question "
+			+ questionUid);
+	    }
+	}
+
+	if (targetOption != null) {
+	    String name = targetOption.getName();
+
+	    boolean isAnswerAllocated = AssessmentEscapeUtils.isVSAnswerAllocated(name, normalisedAnswer,
+		    isQuestionCaseSensitive);
+	    if (isAnswerAllocated) {
+		// the answer has been already allocated to the target option
+		return targetOptionUid;
+	    }
+
+	    // append new answer to option
+	    name += AssessmentEscapeUtils.VSA_ANSWER_DELIMITER + answer;
+	    targetOption.setName(name);
+	    assessmentDao.saveObject(targetOption);
+	    assessmentDao.flush();
+
+	    if (log.isInfoEnabled()) {
+		log.info("Allocated VS  answer \"" + answer + "\" to option " + targetOptionUid + " in question "
 			+ questionUid);
 	    }
 	}
