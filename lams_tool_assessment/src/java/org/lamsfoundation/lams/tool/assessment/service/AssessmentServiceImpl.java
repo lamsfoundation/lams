@@ -1458,29 +1458,45 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
     @Override
     public Long allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid, String answer) {
-	AssessmentQuestion assessmentQuestion = assessmentQuestionDao.getByUid(questionUid);
-	QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
 	String normalisedAnswer = AssessmentEscapeUtils.normaliseVSAnswer(answer);
 	if (normalisedAnswer == null) {
 	    return null;
 	}
 
-	//adding
-	if (previousOptionUid.equals(-1L)) {
-	    //search for duplicates and, if found, return false
-	    QbOption targetOption = null;
-	    for (QbOption option : qbQuestion.getQbOptions()) {
+	AssessmentQuestion assessmentQuestion = assessmentQuestionDao.getByUid(questionUid);
+	QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
+	boolean isQuestionCaseSensitive = qbQuestion.isCaseSensitive();
+
+	QbOption previousOption = null;
+	QbOption targetOption = null;
+
+	// look for source and target options
+	for (QbOption option : qbQuestion.getQbOptions()) {
+	    if (previousOptionUid.equals(-1L)) {
+		// new allocation, check if the answer was not allocated anywhere already
 		String name = option.getName();
 		boolean isAnswerAllocated = AssessmentEscapeUtils.isVSAnswerAllocated(name, normalisedAnswer,
-			qbQuestion.isCaseSensitive());
+			isQuestionCaseSensitive);
 		if (isAnswerAllocated) {
 		    return option.getUid();
 		}
-		if (option.getUid().equals(targetOptionUid)) {
-		    targetOption = option;
-		}
+	    } else if (previousOption == null && option.getUid().equals(previousOptionUid)) {
+		previousOption = option;
+	    }
+	    if (targetOption == null && !targetOptionUid.equals(-1L) && option.getUid().equals(targetOptionUid)) {
+		targetOption = option;
+	    }
+	}
+
+	if (!targetOptionUid.equals(-1L)) {
+	    if (targetOption == null) {
+		// front end provided incorrect target option UID
+		log.error("Target option with UID " + targetOptionUid + " was not found in question with UID "
+			+ questionUid + " to allocate answer " + answer);
+		return null;
 	    }
 
+	    // append new answer to option
 	    String name = targetOption.getName();
 	    name += AssessmentEscapeUtils.VSA_ANSWER_DELIMITER + answer;
 	    targetOption.setName(name);
@@ -1490,35 +1506,19 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		log.debug("Adding answer \"" + answer + "\" to option " + targetOptionUid + " in question "
 			+ questionUid);
 	    }
-	    return null;
 	}
 
-	// moving back to answer queue or moving to another option, so remove from previous option
-	for (QbOption previousOption : qbQuestion.getQbOptions()) {
-	    if (previousOption.getUid().equals(previousOptionUid)) {
-		String name = previousOption.getName();
-		String[] alternatives = name.split(AssessmentEscapeUtils.VSA_ANSWER_DELIMITER);
+	// remove from already allocated option
+	if (previousOption != null) {
+	    String name = previousOption.getName();
+	    String[] alternatives = name.split(AssessmentEscapeUtils.VSA_ANSWER_DELIMITER);
 
-		Set<String> nameWithoutUserAnswer = new LinkedHashSet<>(List.of(alternatives));
-		nameWithoutUserAnswer.remove(normalisedAnswer);
-		name = nameWithoutUserAnswer.stream()
-			.collect(Collectors.joining(AssessmentEscapeUtils.VSA_ANSWER_DELIMITER));
-		previousOption.setName(name);
-		break;
-	    }
-	}
-
-	if (!targetOptionUid.equals(-1L)) {
-	    //moving from one to another
-	    for (QbOption targetOption : qbQuestion.getQbOptions()) {
-		if (targetOption.getUid().equals(targetOptionUid)) {
-		    String name = targetOption.getName();
-		    name += AssessmentEscapeUtils.VSA_ANSWER_DELIMITER + answer;
-		    targetOption.setName(name);
-		    assessmentDao.saveObject(targetOption);
-		    break;
-		}
-	    }
+	    Set<String> nameWithoutUserAnswer = new LinkedHashSet<>(List.of(alternatives));
+	    nameWithoutUserAnswer.remove(normalisedAnswer);
+	    name = nameWithoutUserAnswer.stream()
+		    .collect(Collectors.joining(AssessmentEscapeUtils.VSA_ANSWER_DELIMITER));
+	    previousOption.setName(name);
+	    assessmentDao.saveObject(previousOption);
 	}
 
 	return null;
