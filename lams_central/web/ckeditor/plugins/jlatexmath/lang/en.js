@@ -5,7 +5,7 @@ CKEDITOR.plugins.setLang( 'jlatexmath', 'en', {
 					
 	// Dialog
 	DlgJlatexmathTitle : 'JLaTeXMath',
-	JlatexmathFontSize : 'Font Size',
+	JlatexmathFontSize : 'Font size',
 	JlatexmathLatexFormula : 'Please, enter latex formula:',
 					
 	// Dialog errors
