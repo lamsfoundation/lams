@@ -117,7 +117,7 @@
 	
 </head>
 
-<body>
+<body style="background: #fff;">
 	<%@ include file="buttons.jsp" %>
 	
 	<table cellspacing="5" cellpadding="0" width="100%" border="0">
@@ -150,11 +150,13 @@
 	  
 	  <tr>
           <td style="vertical-align: top; width: 75%" colspan="2">
-          	<textarea id="latex-formula" style="width: 100%" rows="4" cols="50" 
+			  <div class="form-group">
+          	<textarea id="latex-formula" class="form-control" style="width: 100%" rows="4" cols="50" 
           		onkeyup="formulaTextareaChanged()" 
           		onChange="formulaTextareaChanged()"
           		onpaste="formulaTextareaChanged()"
           		oncut="formulaTextareaChanged()"></textarea>
+			  </div>
 		  </td>
 	   </tr>
 
