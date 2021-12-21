@@ -15,7 +15,8 @@
 			}
 			
 			.sortable-on {
-				background: lightgoldenrodyellow;
+				border: 3px solid #286090;
+				border-radius: 10px;
     			height: 200px;
     			padding: 10px;
     			overflow-y: auto;
@@ -31,20 +32,16 @@
 			
 			.tbl-correct-list {
 				border: 3px solid #3c763d;
-				border-radius: 10px;
 				background-color: #3c763d10;
 			}
 			
 			.tbl-incorrect-list {
 				border: 3px solid #a94442;
-				border-radius: 10px;
 				background-color: #a9444210;
 			}
 			
 			.answer-queue {
 				border: 2px solid #ddd;
-				border-radius: 10px;
-				background: initial;
 			}
 			
 			.answer-alternatives {
@@ -225,7 +222,7 @@
 								 data-question-uid="${questionDto.uid}"
 								 data-option-uid="${option0.uid}">
 								<c:forEach var="answer" items="${fn:split(option0.name, newLineChar)}">
-									<button type="button" class="btn btn-xs ${questionSummary.tbl ? 'btn-success' : 'btn-default'}"
+									<button type="button" class="btn btn-xs ${questionSummary.tbl ? 'btn-success' : 'btn-primary'}"
 											title='<fmt:message key="label.vsa.deallocate.button.tip" />'>${answer}</button>
 								</c:forEach>
 							</div>
@@ -277,7 +274,7 @@
 								 data-question-uid="${questionDto.uid}"
 								 data-option-uid="${option1.uid}">
 								<c:forEach var="answer" items="${fn:split(option1.name, newLineChar)}">
-									<button type="button" class="btn btn-xs ${questionSummary.tbl ? 'btn-danger' : 'btn-default'}"
+									<button type="button" class="btn btn-xs ${questionSummary.tbl ? 'btn-danger' : 'btn-primary'}"
 											title='<fmt:message key="label.vsa.deallocate.button.tip" />'>${answer}</button>
 								</c:forEach>
 							</div>
@@ -287,7 +284,7 @@
 				
 				<c:forEach var="optionDto" items="${questionDto.optionDtos}" begin="2" varStatus="status">
 				
-					<c:if test="${status.count % 3 == 0}">
+					<c:if test="${status.count % 3 == 1}">
 						<div class="row">
 					</c:if>
 				
@@ -297,10 +294,19 @@
 						</h4>
 						
 						<div class="list-group col sortable-on" data-question-uid="${questionDto.uid}"
-							 data-option-uid="${optionDto.uid}" id="answer-group${optionDto.uid}"></div>	
-						
-						<fmt:message key="label.answer.alternatives" />: 
-						${fn:replace(optionDto.name, newLineChar, ', ')}
+							 data-option-uid="${optionDto.uid}" id="answer-group${optionDto.uid}"></div>
+							 	
+						<c:if test="${not empty optionDto.name}">
+							<fmt:message key="label.answer.alternatives" />:
+							<div class="answer-alternatives" id="answer-alternatives${optionDto.uid}"
+								 data-question-uid="${questionDto.uid}"
+								 data-option-uid="${optionDto.uid}">
+								<c:forEach var="answer" items="${fn:split(optionDto.name, newLineChar)}">
+									<button type="button" class="btn btn-xs btn-primary"
+											title='<fmt:message key="label.vsa.deallocate.button.tip" />'>${answer}</button>
+								</c:forEach>
+							</div>
+						</c:if>
 					</div>
 					
 					<c:if test="${status.count % 3 == 0 || status.last}">
