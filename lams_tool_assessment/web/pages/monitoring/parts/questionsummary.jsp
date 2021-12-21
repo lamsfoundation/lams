@@ -4,7 +4,6 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="assessment" value="${sessionMap.assessment}"/>
 <c:set var="sessionDtos" value="${sessionMap.sessionDtos}"/>
-<% pageContext.setAttribute("newLineChar", "\r\n"); %>
 
 <lams:html>
 	<lams:head>
@@ -14,21 +13,11 @@
 		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
+		<link type="text/css" href="<lams:WebAppURL />includes/css/vsaAllocate.css" rel="stylesheet">
 		<c:if test="${not empty questionDto.codeStyle}">
 			<link rel="stylesheet" type="text/css" href="${lams}css/codemirror.css" />
 		</c:if>
 		<style>
-			.sortable-on {
-				background: lightgoldenrodyellow;
-    			min-height: 110px;
-    			padding: 10px;
-			}
-			.filtered {
-			    background-color: lightgrey;
-			}
-			.list-group-item {
-				cursor: pointer;
-			}
 	  		pre {
 				background-color: initial;
 				border: none;
@@ -64,6 +53,12 @@
 				COMMENT_TEXTAREA_TIP_LABEL = '',
 				WARN_COMMENTS_IS_BLANK_LABEL = '',
 				WARN_MIN_NUMBER_WORDS_LABEL = '';
+
+			//vars for VSA allocation
+			var VS_ANSWER_ALLOCATED_ALERT = "<fmt:message key="label.someone.allocated.this.answer" />",
+				WEB_APP_URL = "<lams:WebAppURL />",
+				csrfTokenName = "<csrf:tokenname/>",
+				csrfTokenValue = "<csrf:tokenvalue/>";
 		</script>
 		<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
@@ -71,6 +66,7 @@
 	 	<script type="text/javascript" src="${lams}includes/javascript/Sortable.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script> 	
+		<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/vsaAllocate.js"></script>
 
 		<c:if test="${not empty questionDto.codeStyle}">
 			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/runmode-standalone.js"></script>
@@ -262,44 +258,6 @@
 	  		        }
 	  			});
 	  			setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
-
-	  		    //init options sorting feature
-	  			$('.sortable-on').each(function() {
-	  			    new Sortable($(this)[0], {
-	  			    	group: 'shared',
-	  				    animation: 150,
-	  				  	filter: '.filtered', // 'filtered' class is not draggable
-	  				    //ghostClass: 'sortable-placeholder',
-	  				    //direction: 'vertical',
-	  					onStart: function (evt) {
-	  						//stop answers' hover effect, once element dragging started
-	  						//$("#option-table").removeClass("hover-active");
-	  					},
-	  					onEnd: function (evt) {
-	  				        $.ajax({
-	  				            url: '<c:url value="/monitoring/allocateUserAnswer.do"/>',
-	  				            data: {
-	  				            	sessionMapID: "${sessionMapID}",
-	  				            	questionUid: ${questionDto.uid},
-	  				            	targetOptionUid: $(evt.to).data("option-uid"),
-	  				            	previousOptionUid: $(evt.from).data("option-uid"),
-	  				            	questionResultUid: $(evt.item).data("question-result-uid"),
-	  								"<csrf:tokenname/>":"<csrf:tokenvalue/>"
-	  						    },
-	  				            method: 'post',
-	  				          	dataType: "json",
-		  				        success: function (data) {
-		  				            if (data.isAnswerDuplicated) {
-			  				        	alert("<fmt:message key="label.someone.allocated.this.answer" />");
-			  				        	$(evt.item).appendTo("#answer-group" + data.optionUid);
-			  				        	$(evt.item).addClass("filtered");
-				  				    }
-		  				        }
-	  				            	
-	  				       	});
-	  					}
-	  				});
-	  			});
 	  		});  	    	
 	  		
     		function refreshSummaryPage()  { 
@@ -379,88 +337,7 @@
             <!--allocate responses-->
 			<c:if test="${questionDto.type == 3}">
 				<br><br>
-				
-				<div class="row">
-					<div class="col-sm-4 text-center">
-						<c:set var="option0" value="${questionDto.optionDtos.toArray()[0]}"/>
-						<h4>
-							<c:choose>
-								<c:when test="${questionSummary.tbl && option0.maxMark == 1}">
-									<i class="fa fa-check fa-lg text-success"></i> <fmt:message key="label.correct" />
-								</c:when>
-								<c:when test="${questionSummary.tbl && option0.maxMark == 0}">
-									<i class="fa fa-times fa-lg text-danger"></i>	<fmt:message key="label.incorrect" />
-								</c:when>
-								<c:otherwise>
-									<fmt:message key="label.authoring.basic.option.grade"/>: ${option0.maxMark}
-								</c:otherwise>
-							</c:choose>
-						</h4>
-						
-						<div class="list-group col sortable-on" data-option-uid="${option0.uid}" id="answer-group${option0.uid}"></div>
-						
-						<fmt:message key="label.answer.alternatives" />: 
-						${fn:replace(option0.name, newLineChar, ', ')}
-					</div>
-					
-					<div class="col-sm-4 text-center">
-		            	<h4><fmt:message key="label.answer.queue" /></h4>
-	            		(<fmt:message key="label.drag.and.drop" />)	
-	            		
-	            		<div class="list-group col sortable-on" data-option-uid="-1" id="answer-group-1">
-		            		<c:forEach var="questionResult" items="${questionSummary.notAllocatedQuestionResults}">
-		            			<div class="list-group-item" data-question-result-uid="${questionResult.uid}">
-		            				<lams:Portrait userId="${questionResult.assessmentResult.user.userId}"/>&nbsp;
-		            				${questionResult.answer}
-		            			</div>
-		            		</c:forEach>
-	            		</div>		
-					</div>
-					
-					<div class="col-sm-4 text-center">
-						<c:set var="option1" value="${questionDto.optionDtos.toArray()[1]}"/>
-						<h4>
-							<c:choose>
-								<c:when test="${questionSummary.tbl && option1.maxMark == 1}">
-									<i class="fa fa-check fa-lg text-success"></i> <fmt:message key="label.correct" />
-								</c:when>
-								<c:when test="${questionSummary.tbl && option1.maxMark == 0}">
-									<i class="fa fa-times fa-lg text-danger"></i>	<fmt:message key="label.incorrect" />
-								</c:when>
-								<c:otherwise>
-									<fmt:message key="label.authoring.basic.option.grade"/>: ${option1.maxMark}
-								</c:otherwise>
-							</c:choose>
-						</h4>
-						
-						<div class="list-group col sortable-on" data-option-uid="${option1.uid}" id="answer-group${option1.uid}"></div>	
-						
-						<fmt:message key="label.answer.alternatives" />: 
-						${fn:replace(option1.name, newLineChar, ', ')}
-					</div>
-				</div>
-				
-				<c:forEach var="optionDto" items="${questionDto.optionDtos}" begin="2" varStatus="status">
-				
-					<c:if test="${status.count % 3 == 0}">
-						<div class="row">
-					</c:if>
-				
-					<div class="col-sm-4 text-center">
-						<h4>
-							<fmt:message key="label.authoring.basic.option.grade"/>: ${optionDto.maxMark}
-						</h4>
-						
-						<div class="list-group col sortable-on" data-option-uid="${optionDto.uid}" id="answer-group${optionDto.uid}"></div>	
-						
-						<fmt:message key="label.answer.alternatives" />: 
-						${fn:replace(optionDto.name, newLineChar, ', ')}
-					</div>
-					
-					<c:if test="${status.count % 3 == 0 || status.last}">
-						</div>
-					</c:if>
-				</c:forEach>
+				<%@ include file="vsaQuestionAllocate.jsp"%>
 			</c:if>
 			
 			<div id="bottom-buttons">

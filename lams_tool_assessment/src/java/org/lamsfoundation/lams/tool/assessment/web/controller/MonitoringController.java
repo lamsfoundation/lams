@@ -329,9 +329,8 @@ public class MonitoringController {
 
     @RequestMapping(path = "/allocateUserAnswer", method = RequestMethod.POST)
     @ResponseBody
-    public String allocateUserAnswer(HttpServletRequest request, HttpServletResponse response,
-	    @RequestParam Long questionUid, @RequestParam Long targetOptionUid, @RequestParam Long previousOptionUid,
-	    @RequestParam String answer) {
+    public String allocateUserAnswer(HttpServletResponse response, @RequestParam Long questionUid,
+	    @RequestParam Long targetOptionUid, @RequestParam Long previousOptionUid, @RequestParam String answer) {
 
 	Long optionUid = null;
 	boolean answerFoundInResults = false;
