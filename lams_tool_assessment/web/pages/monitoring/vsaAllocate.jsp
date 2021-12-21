@@ -16,28 +16,24 @@
 			
 			.sortable-on {
 				background: lightgoldenrodyellow;
-    			min-height: 110px;
-    			max-height: 250px;
+    			height: 200px;
     			padding: 10px;
     			overflow-y: auto;
 			}
 			
 			.tbl-correct-list {
-				height: 200px;
 				border: 3px solid #3c763d;
 				border-radius: 10px;
 				background-color: #3c763d10;
 			}
 			
 			.tbl-incorrect-list {
-				height: 200px;
 				border: 3px solid #a94442;
 				border-radius: 10px;
 				background-color: #a9444210;
 			}
 			
-			.tbl-answer-queue-list {
-				height: 200px;
+			.answer-queue {
 				border: 2px solid #ddd;
 				border-radius: 10px;
 				background: initial;
@@ -64,6 +60,7 @@
 		    //init options sorting feature
 			$('.sortable-on').each(function() {
 				let questionUid = $(this).data('question-uid');
+				updateAnswerQueueSize(questionUid);
 				
 			    new Sortable(this, {
 			    	group: 'question' + questionUid,
@@ -89,6 +86,8 @@
 				            method: 'post',
 				          	dataType: "json",
   				        success: function (data) {
+  				        	updateAnswerQueueSize(questionUid);
+  				        	
   				            if (data.isAnswerDuplicated) {
 	  				        	alert("<fmt:message key="label.someone.allocated.this.answer" />");
 	  				        	$(evt.item).appendTo("#answer-group" + data.optionUid);
@@ -101,6 +100,11 @@
 				});
 			});
 	  	});
+
+	  	function updateAnswerQueueSize(questionUid) {
+	  		 var answerQueueLength = $('.answer-queue[data-question-uid="' + questionUid + '"] .list-group-item').length;
+			 $('#answer-queue-size' + questionUid).text(answerQueueLength ? ' (' + answerQueueLength + ')' : '');
+		}
 	  	
    		function refreshPage() { 
        		location.reload();
@@ -171,9 +175,12 @@
 					</div>
 					
 					<div class="col-sm-4 text-center">
-		            	<h4><fmt:message key="label.answer.queue" /></h4>
+		            	<h4>
+		            		<fmt:message key="label.answer.queue" />
+		            		<span id="answer-queue-size${questionDto.uid}"></span>
+		            	</h4>
 		           		
-		           		<div class="list-group col sortable-on ${questionSummary.tbl ? 'tbl-answer-queue-list' : ''}"
+		           		<div class="list-group col sortable-on answer-queue"
 		           			 data-question-uid="${questionDto.uid}" 
 		           			 data-option-uid="-1" id="answer-group-1">
 		            		<c:forEach var="questionResult" items="${questionSummary.notAllocatedQuestionResults}">
