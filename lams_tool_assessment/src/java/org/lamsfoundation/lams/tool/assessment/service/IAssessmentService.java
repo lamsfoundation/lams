@@ -426,8 +426,9 @@ public interface IAssessmentService extends ICommonToolService {
 
     /**
      * Recalculate learners' marks after a VSA answer was allocated as correct or incorrect.
+     * Returns true if at least one result was recalculated.
      */
-    void recalculateMarksForAllocatedAnswer(Long questionUid, String answer);
+    boolean recalculateMarksForAllocatedAnswer(Long questionUid, String answer);
 
     /**
      * For export purposes

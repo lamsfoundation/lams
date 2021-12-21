@@ -331,13 +331,12 @@ public class MonitoringController {
     @ResponseBody
     public String allocateUserAnswer(HttpServletRequest request, HttpServletResponse response,
 	    @RequestParam Long questionUid, @RequestParam Long targetOptionUid, @RequestParam Long previousOptionUid,
-	    @RequestParam Long questionResultUid) {
+	    @RequestParam String answer) {
 
 	Long optionUid = null;
+	boolean answerFoundInResults = false;
 
-	if (!targetOptionUid.equals(previousOptionUid)) {
-	    AssessmentQuestionResult questionRes = service.getAssessmentQuestionResultByUid(questionResultUid);
-	    String answer = questionRes.getAnswer();
+	if (!targetOptionUid.equals(previousOptionUid) && StringUtils.isNotBlank(answer)) {
 	    /*
 	     * We need to synchronise this operation.
 	     * When multiple requests are made to modify the same option, for example to add a VSA answer,
@@ -359,12 +358,13 @@ public class MonitoringController {
 		optionUid = service.allocateAnswerToOption(questionUid, targetOptionUid, previousOptionUid, answer);
 	    }
 	    //recalculate marks for all lessons in all cases except for reshuffling inside the same container
-	    service.recalculateMarksForAllocatedAnswer(questionUid, answer);
+	    answerFoundInResults = service.recalculateMarksForAllocatedAnswer(questionUid, answer);
 	}
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("isAnswerDuplicated", optionUid != null);
 	responseJSON.put("optionUid", optionUid == null ? -1 : optionUid);
+	responseJSON.put("answerFoundInResults", answerFoundInResults);
 	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
     }

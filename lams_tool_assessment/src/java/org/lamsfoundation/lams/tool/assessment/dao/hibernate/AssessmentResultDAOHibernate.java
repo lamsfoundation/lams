@@ -146,23 +146,18 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     }
 
     @Override
-    public List<AssessmentResult> getAssessmentResultsByQbQuestion(Long qbQuestionUid) {
-	return getAssessmentResultsByQbQuestionAndAnswer(qbQuestionUid, null);
-    }
-
-    @Override
     public List<AssessmentResult> getAssessmentResultsByQbQuestionAndAnswer(Long qbQuestionUid, String answer) {
-	String FIND_BY_QBQUESTION_AND_FINISHED = "SELECT r FROM  " + AssessmentQuestionResult.class.getName()
-		+ " AS q, " + AssessmentResult.class.getName() + " AS r "
-		+ " WHERE q.assessmentResult.uid = r.uid AND q.qbToolQuestion.qbQuestion.uid =:qbQuestionUid AND (r.finishDate != null) ";
+	String FIND_BY_QBQUESTION = "SELECT r FROM  " + AssessmentQuestionResult.class.getName() + " AS q, "
+		+ AssessmentResult.class.getName() + " AS r "
+		+ " WHERE q.assessmentResult.uid = r.uid AND q.qbToolQuestion.qbQuestion.uid =:qbQuestionUid ";
 	if (StringUtils.isNotBlank(answer)) {
 
-	    FIND_BY_QBQUESTION_AND_FINISHED += "AND REGEXP_REPLACE(q.answer, '"
+	    FIND_BY_QBQUESTION += "AND REGEXP_REPLACE(q.answer, '"
 		    + AssessmentEscapeUtils.VSA_ANSWER_NORMALISE_SQL_REG_EXP + "', '') = :answer";
 	}
-	FIND_BY_QBQUESTION_AND_FINISHED += " ORDER BY r.startDate ASC";
+	FIND_BY_QBQUESTION += " ORDER BY r.startDate ASC";
 
-	Query<AssessmentResult> q = getSession().createQuery(FIND_BY_QBQUESTION_AND_FINISHED, AssessmentResult.class);
+	Query<AssessmentResult> q = getSession().createQuery(FIND_BY_QBQUESTION, AssessmentResult.class);
 	q.setParameter("qbQuestionUid", qbQuestionUid);
 	if (StringUtils.isNotBlank(answer)) {
 	    String normalisedAnswer = AssessmentEscapeUtils.normaliseVSAnswer(answer);

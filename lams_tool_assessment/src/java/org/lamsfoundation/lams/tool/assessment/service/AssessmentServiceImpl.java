@@ -1462,6 +1462,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	if (normalisedAnswer == null) {
 	    return null;
 	}
+	answer = answer.strip();
 
 	AssessmentQuestion assessmentQuestion = assessmentQuestionDao.getByUid(questionUid);
 	QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
@@ -1501,9 +1502,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    String[] alternatives = name.split(AssessmentEscapeUtils.VSA_ANSWER_DELIMITER);
 
 	    Set<String> nameWithoutUserAnswer = new LinkedHashSet<>(List.of(alternatives));
-	    nameWithoutUserAnswer.remove(normalisedAnswer);
-	    name = nameWithoutUserAnswer.stream()
-		    .collect(Collectors.joining(AssessmentEscapeUtils.VSA_ANSWER_DELIMITER));
+	    nameWithoutUserAnswer.remove(answer);
+	    name = nameWithoutUserAnswer.isEmpty() ? ""
+		    : nameWithoutUserAnswer.stream()
+			    .collect(Collectors.joining(AssessmentEscapeUtils.VSA_ANSWER_DELIMITER));
 	    previousOption.setName(name);
 	    assessmentDao.saveObject(previousOption);
 	    assessmentDao.flush();
@@ -1525,7 +1527,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    }
 
 	    // append new answer to option
-	    name += AssessmentEscapeUtils.VSA_ANSWER_DELIMITER + answer;
+	    name += (StringUtils.isBlank(name) ? "" : AssessmentEscapeUtils.VSA_ANSWER_DELIMITER) + answer;
 	    targetOption.setName(name);
 	    assessmentDao.saveObject(targetOption);
 	    assessmentDao.flush();
@@ -1540,7 +1542,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public void recalculateMarksForAllocatedAnswer(Long questionUid, String answer) {
+    public boolean recalculateMarksForAllocatedAnswer(Long questionUid, String answer) {
 	AssessmentQuestion assessmentQuestion = assessmentQuestionDao.getByUid(questionUid);
 	QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
 	// get all finished user results
@@ -1586,6 +1588,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	//recalculate marks in all Scratchie activities, that use modified QbQuestion
 	toolService.recalculateScratchieMarksForVsaQuestion(qbQuestion.getUid(), answer);
+
+	return !assessmentResults.isEmpty();
     }
 
     @Override

@@ -376,7 +376,7 @@ public class AssessmentEscapeUtils {
 
     public static Set<String> normaliseVSOption(String option) {
 	return StringUtils.isBlank(option) ? Set.of()
-		: Stream.of(option.split(VSA_ANSWER_DELIMITER))
+		: Stream.of(option.split(VSA_ANSWER_DELIMITER)).filter(StringUtils::isNotBlank)
 			.collect(Collectors.mapping(answer -> AssessmentEscapeUtils.normaliseVSAnswer(answer),
 				Collectors.toCollection(LinkedHashSet::new)));
     }

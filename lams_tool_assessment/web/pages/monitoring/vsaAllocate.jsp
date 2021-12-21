@@ -21,6 +21,14 @@
     			overflow-y: auto;
 			}
 			
+			.sortable-on .portrait-generic-sm {
+				margin-right: 5px;
+			}
+			
+			.sortable-on .portrait-anonymous {
+				color: #ddd;
+			}
+			
 			.tbl-correct-list {
 				border: 3px solid #3c763d;
 				border-radius: 10px;
@@ -37,6 +45,14 @@
 				border: 2px solid #ddd;
 				border-radius: 10px;
 				background: initial;
+			}
+			
+			.answer-alternatives {
+				text-align: left;
+				margin-top: 5px;
+			}
+			.answer-alternatives button {
+				margin-bottom: 2px;
 			}
 			
 			.filtered {
@@ -80,29 +96,62 @@
 				            	questionUid: questionUid,
 				            	targetOptionUid: $(evt.to).data("option-uid"),
 				            	previousOptionUid: $(evt.from).data("option-uid"),
-				            	questionResultUid: $(evt.item).data("question-result-uid"),
+				            	answer: $('.answer-text', evt.item).text(),
 								"<csrf:tokenname/>":"<csrf:tokenvalue/>"
 						    },
 				            method: 'post',
 				          	dataType: "json",
-  				        success: function (data) {
-  				        	updateAnswerQueueSize(questionUid);
-  				        	
-  				            if (data.isAnswerDuplicated) {
-	  				        	alert("<fmt:message key="label.someone.allocated.this.answer" />");
-	  				        	$(evt.item).appendTo("#answer-group" + data.optionUid);
-	  				        	$(evt.item).addClass("filtered");
-		  				    }
-  				        }
-				            	
+	  				        success: function (data) {
+	  				        	updateAnswerQueueSize(questionUid);
+	  				        	
+	  				            if (data.isAnswerDuplicated) {
+		  				        	alert("<fmt:message key="label.someone.allocated.this.answer" />");
+		  				        	$(evt.item).appendTo("#answer-group" + data.optionUid);
+		  				        	$(evt.item).addClass("filtered");
+			  				    }
+	  				        }
 				       	});
 					}
 				});
 			});
+
+			$('.answer-alternatives button').click(function(){
+				var button = $(this),
+					answer = button.text(),
+					container = button.closest('.answer-alternatives'),
+					questionUid = container.data('question-uid'),
+					optionUid = container.data('option-uid');
+				
+		        $.ajax({
+		            url: '<c:url value="/monitoring/allocateUserAnswer.do"/>',
+		            data: {
+		            	sessionMapID: "${sessionMapID}",
+		            	questionUid: questionUid,
+		            	targetOptionUid: -1,
+		            	previousOptionUid: optionUid,
+		            	answer: answer,
+						"<csrf:tokenname/>":"<csrf:tokenvalue/>"
+				    },
+		            method: 'post',
+		          	dataType: "json",
+				        success: function (data) {
+				            if (data.answerFoundInResults) {
+						        $('<div class="list-group-item" />')
+						        	.append($('<div class="portrait-anonymous portrait-generic-sm" />'))
+						        	.append($('<span class="answer-text"/>').text(answer))
+						        	.appendTo('#answer-queue' + questionUid);
+
+						        updateAnswerQueueSize(questionUid);
+		  				    }
+
+		  				   	button.remove();
+				    }
+		       	});
+			});
 	  	});
 
 	  	function updateAnswerQueueSize(questionUid) {
-	  		 var answerQueueLength = $('.answer-queue[data-question-uid="' + questionUid + '"] .list-group-item').length;
+	  		 var answerQueueLength = $('#answer-queue' + questionUid + ' .list-group-item').length;
 			 $('#answer-queue-size' + questionUid).text(answerQueueLength ? ' (' + answerQueueLength + ')' : '');
 		}
 	  	
@@ -170,8 +219,17 @@
 							 data-question-uid="${questionDto.uid}"
 							 data-option-uid="${option0.uid}" id="answer-group${option0.uid}"></div>
 						
-						<fmt:message key="label.answer.alternatives" />: 
-						${fn:replace(option0.name, newLineChar, ', ')}
+						<c:if test="${not empty option0.name}">
+							<fmt:message key="label.answer.alternatives" />:
+							<div class="answer-alternatives" id="answer-alternatives${option0.uid}"
+								 data-question-uid="${questionDto.uid}"
+								 data-option-uid="${option0.uid}">
+								<c:forEach var="answer" items="${fn:split(option0.name, newLineChar)}">
+									<button type="button" class="btn btn-xs ${questionSummary.tbl ? 'btn-success' : 'btn-default'}"
+											title='<fmt:message key="label.vsa.deallocate.button.tip" />'>${answer}</button>
+								</c:forEach>
+							</div>
+						</c:if>
 					</div>
 					
 					<div class="col-sm-4 text-center">
@@ -182,11 +240,12 @@
 		           		
 		           		<div class="list-group col sortable-on answer-queue"
 		           			 data-question-uid="${questionDto.uid}" 
-		           			 data-option-uid="-1" id="answer-group-1">
+		           			 data-option-uid="-1"
+		           			 id="answer-queue${questionDto.uid}">
 		            		<c:forEach var="questionResult" items="${questionSummary.notAllocatedQuestionResults}">
-		            			<div class="list-group-item" data-question-result-uid="${questionResult.uid}">
-		            				<lams:Portrait userId="${questionResult.assessmentResult.user.userId}"/>&nbsp;
-		            				${questionResult.answer}
+		            			<div class="list-group-item">
+		            				<lams:Portrait userId="${questionResult.assessmentResult.user.userId}"/>
+		            				<span class="answer-text">${questionResult.answer}</span>
 		            			</div>
 		            		</c:forEach>
 		           		</div>		
@@ -210,10 +269,19 @@
 						
 						<div class="list-group col sortable-on ${questionSummary.tbl ? 'tbl-incorrect-list' : ''}"
 							 data-question-uid="${questionDto.uid}"
-							 data-option-uid="${option1.uid}" id="answer-group${option1.uid}"></div>	
-						
-						<fmt:message key="label.answer.alternatives" />: 
-						${fn:replace(option1.name, newLineChar, ', ')}
+							 data-option-uid="${option1.uid}" id="answer-group${option1.uid}"></div>
+							 	
+						<c:if test="${not empty option1.name}">
+							<fmt:message key="label.answer.alternatives" />:
+							<div class="answer-alternatives" id="answer-alternatives${option0.uid}"
+								 data-question-uid="${questionDto.uid}"
+								 data-option-uid="${option1.uid}">
+								<c:forEach var="answer" items="${fn:split(option1.name, newLineChar)}">
+									<button type="button" class="btn btn-xs ${questionSummary.tbl ? 'btn-danger' : 'btn-default'}"
+											title='<fmt:message key="label.vsa.deallocate.button.tip" />'>${answer}</button>
+								</c:forEach>
+							</div>
+						</c:if>
 					</div>
 				</div>
 				
