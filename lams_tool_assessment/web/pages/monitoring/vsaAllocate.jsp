@@ -5,6 +5,7 @@
 
 <lams:html>
 	<lams:head>
+	
 		<%@ include file="/common/header.jsp"%>
 		
 		<title><fmt:message key="label.vsa.allocate.button" /></title>
@@ -16,7 +17,30 @@
 			.sortable-on {
 				background: lightgoldenrodyellow;
     			min-height: 110px;
+    			max-height: 250px;
     			padding: 10px;
+    			overflow-y: auto;
+			}
+			
+			.tbl-correct-list {
+				height: 200px;
+				border: 3px solid #3c763d;
+				border-radius: 10px;
+				background-color: #3c763d10;
+			}
+			
+			.tbl-incorrect-list {
+				height: 200px;
+				border: 3px solid #a94442;
+				border-radius: 10px;
+				background-color: #a9444210;
+			}
+			
+			.tbl-answer-queue-list {
+				height: 200px;
+				border: 2px solid #ddd;
+				border-radius: 10px;
+				background: initial;
 			}
 			
 			.filtered {
@@ -138,7 +162,8 @@
 							</c:choose>
 						</h4>
 						
-						<div class="list-group col sortable-on" data-question-uid="${questionDto.uid}"
+						<div class="list-group col sortable-on ${questionSummary.tbl ? 'tbl-correct-list' : ''}" 
+							 data-question-uid="${questionDto.uid}"
 							 data-option-uid="${option0.uid}" id="answer-group${option0.uid}"></div>
 						
 						<fmt:message key="label.answer.alternatives" />: 
@@ -148,7 +173,8 @@
 					<div class="col-sm-4 text-center">
 		            	<h4><fmt:message key="label.answer.queue" /></h4>
 		           		
-		           		<div class="list-group col sortable-on" data-question-uid="${questionDto.uid}" 
+		           		<div class="list-group col sortable-on ${questionSummary.tbl ? 'tbl-answer-queue-list' : ''}"
+		           			 data-question-uid="${questionDto.uid}" 
 		           			 data-option-uid="-1" id="answer-group-1">
 		            		<c:forEach var="questionResult" items="${questionSummary.notAllocatedQuestionResults}">
 		            			<div class="list-group-item" data-question-result-uid="${questionResult.uid}">
@@ -175,7 +201,8 @@
 							</c:choose>
 						</h4>
 						
-						<div class="list-group col sortable-on" data-question-uid="${questionDto.uid}"
+						<div class="list-group col sortable-on ${questionSummary.tbl ? 'tbl-incorrect-list' : ''}"
+							 data-question-uid="${questionDto.uid}"
 							 data-option-uid="${option1.uid}" id="answer-group${option1.uid}"></div>	
 						
 						<fmt:message key="label.answer.alternatives" />: 
