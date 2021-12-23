@@ -42,6 +42,7 @@ $(document).ready(function(){
 			container = button.closest('.answer-alternatives'),
 			questionUid = container.data('question-uid'),
 			optionUid = container.data('option-uid'),
+			isCorrect = container.data('option-correct'),
 			data = {
 	            	questionUid: questionUid,
 	            	targetOptionUid: -1,
@@ -49,6 +50,10 @@ $(document).ready(function(){
 	            	answer: answer
 				    };
 
+		if (isCorrect && !confirm(VS_ANSWER_DEALLOCATE_CONFIRM)) {
+			return;
+		}
+		
 		data[csrfTokenName] = csrfTokenValue;
 				
         $.ajax({

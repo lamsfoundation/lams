@@ -42,7 +42,8 @@
 					<fmt:message key="label.answer.alternatives" />:
 					<div class="answer-alternatives" id="answer-alternatives${option0.uid}"
 						 data-question-uid="${questionDto.uid}"
-						 data-option-uid="${option0.uid}">
+						 data-option-uid="${option0.uid}"
+						 data-option-correct="${option0.maxMark > 0}">
 						<c:forEach var="answer" items="${fn:split(option0.name, newLineChar)}">
 							<button type="button" class="btn btn-xs ${questionSummary.tbl ? 'btn-success' : 'btn-primary'}"
 									title='<fmt:message key="label.vsa.deallocate.button.tip" />'>${answer}</button>
@@ -94,7 +95,8 @@
 					<fmt:message key="label.answer.alternatives" />:
 					<div class="answer-alternatives" id="answer-alternatives${option0.uid}"
 						 data-question-uid="${questionDto.uid}"
-						 data-option-uid="${option1.uid}">
+						 data-option-uid="${option1.uid}"
+						 data-option-correct="${option1.maxMark > 0}">
 						<c:forEach var="answer" items="${fn:split(option1.name, newLineChar)}">
 							<button type="button" class="btn btn-xs ${questionSummary.tbl ? 'btn-danger' : 'btn-primary'}"
 									title='<fmt:message key="label.vsa.deallocate.button.tip" />'>${answer}</button>
@@ -122,7 +124,8 @@
 					<fmt:message key="label.answer.alternatives" />:
 					<div class="answer-alternatives" id="answer-alternatives${optionDto.uid}"
 						 data-question-uid="${questionDto.uid}"
-						 data-option-uid="${optionDto.uid}">
+						 data-option-uid="${optionDto.uid}"
+						 data-option-correct="${optionDto.maxMark > 0}">
 						<c:forEach var="answer" items="${fn:split(optionDto.name, newLineChar)}">
 							<button type="button" class="btn btn-xs btn-primary"
 									title='<fmt:message key="label.vsa.deallocate.button.tip" />'>${answer}</button>

@@ -24,6 +24,7 @@
 	 	<script type="text/javascript" src="${lams}includes/javascript/Sortable.js"></script>
   	    <script>
 			var VS_ANSWER_ALLOCATED_ALERT = "<fmt:message key="label.someone.allocated.this.answer" />",
+				VS_ANSWER_DEALLOCATE_CONFIRM = "<fmt:message key="label.vsa.deallocate.confirm" />",
 				WEB_APP_URL = "<lams:WebAppURL />",
 				csrfTokenName = "<csrf:tokenname/>",
 				csrfTokenValue = "<csrf:tokenvalue/>";
@@ -36,7 +37,7 @@
 	   			self.parent.tb_remove();
 	   		}
   		</script>
-  		<script src="<lams:WebAppURL />includes/javascript/vsaAllocate.js"></script>
+  		<lams:JSImport src="includes/javascript/vsaAllocate.js" relative="true" />
 	</lams:head>
 	
 <body>
