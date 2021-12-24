@@ -1402,33 +1402,23 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public Map<QbToolQuestion, Map<String, Integer>> getUnallocatedVSAnswersForActivity(long toolContentId) {
+    public Map<QbToolQuestion, Map<String, Integer>> getUnallocatedVSAnswers(long toolContentId) {
 	Map<QbToolQuestion, Map<String, Integer>> result = new LinkedHashMap<>();
 
 	Assessment assessment = getAssessmentByContentId(toolContentId);
 	for (AssessmentQuestion question : assessment.getQuestions()) {
 	    if (question.getType().equals(QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
-		Map<String, Integer> unallocatedQuestionAnswers = getUnallocatedVSAnswersForQuestion(toolContentId,
-			question.getUid());
+		// gets mapping answer -> user ID for all answers which were not allocation into VSA option yet
+		QuestionSummary questionSummary = getQuestionSummary(toolContentId, question.getUid());
+		Map<String, Integer> unallocatedQuestionAnswers = questionSummary.getNotAllocatedQuestionResults()
+			.stream()
+			.collect(Collectors.toMap(AssessmentQuestionResult::getAnswer,
+				r -> r.getAssessmentResult().getUser().getUserId().intValue(), (user1, user2) -> user1,
+				LinkedHashMap::new));
 		result.put(question, unallocatedQuestionAnswers);
 	    }
 	}
 	return result;
-    }
-
-    @Override
-    public Map<String, Integer> getUnallocatedVSAnswersForQuestion(long toolQuestionUid) {
-	AssessmentQuestion question = getAssessmentQuestionByUid(toolQuestionUid);
-	return getUnallocatedVSAnswersForQuestion(question.getToolContentId(), toolQuestionUid);
-    }
-
-    private Map<String, Integer> getUnallocatedVSAnswersForQuestion(long toolContentId, long toolQuestionUid) {
-	// gets mapping answer -> user ID for all answers which were not allocation into VSA option yet
-	QuestionSummary questionSummary = getQuestionSummary(toolContentId, toolQuestionUid);
-	return questionSummary.getNotAllocatedQuestionResults().stream()
-		.collect(Collectors.toMap(AssessmentQuestionResult::getAnswer,
-			r -> r.getAssessmentResult().getUser().getUserId().intValue(), (user1, user2) -> user1,
-			LinkedHashMap::new));
     }
 
     @Override

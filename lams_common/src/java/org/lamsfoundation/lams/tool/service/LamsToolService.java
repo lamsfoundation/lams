@@ -538,7 +538,7 @@ public class LamsToolService implements ILamsToolService {
 	if (tool.getToolSignature().equals(CommonConstants.TOOL_SIGNATURE_ASSESSMENT)) {
 	    ICommonAssessmentService sessionManager = (ICommonAssessmentService) lamsCoreToolService
 		    .findToolService(tool);
-	    return sessionManager.getUnallocatedVSAnswersForActivity(toolContentId);
+	    return sessionManager.getUnallocatedVSAnswers(toolContentId);
 	}
 	return null;
     }

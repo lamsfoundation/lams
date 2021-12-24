@@ -2049,13 +2049,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public Map<QbToolQuestion, Map<String, Integer>> getUnallocatedVSAnswersForActivity(long toolContentId) {
-	// MCQ does not support VSA questions
-	return null;
-    }
-
-    @Override
-    public Map<String, Integer> getUnallocatedVSAnswersForQuestion(long toolQuestionUid) {
+    public Map<QbToolQuestion, Map<String, Integer>> getUnallocatedVSAnswers(long toolContentId) {
 	// MCQ does not support VSA questions
 	return null;
     }

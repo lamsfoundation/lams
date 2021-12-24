@@ -13,7 +13,6 @@
 		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
-		<link type="text/css" href="<lams:WebAppURL />includes/css/vsaAllocate.css" rel="stylesheet">
 		<c:if test="${not empty questionDto.codeStyle}">
 			<link rel="stylesheet" type="text/css" href="${lams}css/codemirror.css" />
 		</c:if>
@@ -53,13 +52,6 @@
 				COMMENT_TEXTAREA_TIP_LABEL = '',
 				WARN_COMMENTS_IS_BLANK_LABEL = '',
 				WARN_MIN_NUMBER_WORDS_LABEL = '';
-
-			//vars for VSA allocation
-			var VS_ANSWER_ALLOCATED_ALERT = "<fmt:message key="label.someone.allocated.this.answer" />",
-				VS_ANSWER_DEALLOCATE_CONFIRM = "<fmt:message key="label.vsa.deallocate.confirm" />",
-				WEB_APP_URL = "<lams:WebAppURL />",
-				csrfTokenName = "<csrf:tokenname/>",
-				csrfTokenValue = "<csrf:tokenvalue/>";
 		</script>
 		<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
@@ -67,7 +59,6 @@
 	 	<script type="text/javascript" src="${lams}includes/javascript/Sortable.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script> 	
-		<lams:JSImport src="includes/javascript/vsaAllocate.js" relative="true" />
 
 		<c:if test="${not empty questionDto.codeStyle}">
 			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/runmode-standalone.js"></script>
@@ -334,12 +325,6 @@
 					<div id="pager${sessionDto.sessionId}"></div>
 				</div>	
 			</c:forEach>
-			
-            <!--allocate responses-->
-			<c:if test="${questionDto.type == 3}">
-				<br><br>
-				<%@ include file="vsaQuestionAllocate.jsp"%>
-			</c:if>
 			
 			<div id="bottom-buttons">
 				<a href="#nogo" onclick="javascript:refreshQuestionSummaryPage()" class="btn btn-default btn-sm">

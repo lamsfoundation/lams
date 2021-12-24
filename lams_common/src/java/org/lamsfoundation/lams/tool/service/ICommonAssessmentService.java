@@ -18,12 +18,7 @@ public interface ICommonAssessmentService {
     /**
      * Returns VS answers which require allocation for the given activity
      */
-    Map<QbToolQuestion, Map<String, Integer>> getUnallocatedVSAnswersForActivity(long toolContentId);
-
-    /**
-     * Returns VS answers which require allocation for the given tool question ID
-     */
-    Map<String, Integer> getUnallocatedVSAnswersForQuestion(long toolQuestionUid);
+    Map<QbToolQuestion, Map<String, Integer>> getUnallocatedVSAnswers(long toolContentId);
 
     /**
      * Counts how many questions were answered correctly by the given user, regardless of the mark given.
