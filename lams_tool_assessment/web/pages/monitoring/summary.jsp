@@ -557,7 +557,7 @@
 	<c:if test="${vsaPresent}">
 		<div class="voffset5">
 			<a class="thickbox btn btn-default"
-			   href='<lams:LAMSURL />qb/vsa/displayVsaAllocate.do?toolContentID=${sessionMap.assessment.contentId}&KeepThis=true&TB_iframe=true&modal=true"/>'>
+			   href='<lams:LAMSURL />qb/vsa/displayVsaAllocate.do?toolContentID=${sessionMap.assessment.contentId}&KeepThis=true&TB_iframe=true&modal=true'>
 				<fmt:message key="label.vsa.allocate.button" />
 			</a>
 		</div>
