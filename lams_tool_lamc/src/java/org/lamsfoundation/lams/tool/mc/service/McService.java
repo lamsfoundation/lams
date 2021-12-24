@@ -2038,8 +2038,26 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public Collection<VsaAnswerDTO> getVsaAnswers(Long toolSessionId) {
+    public Collection<VsaAnswerDTO> getVSAnswers(Long toolSessionId) {
 	return new ArrayList<>();
+    }
+
+    @Override
+    public boolean recalculateMarksForVsaQuestion(Long questionUid, String answer) {
+	// MCQ does not support VSA questions
+	return false;
+    }
+
+    @Override
+    public Map<QbToolQuestion, Map<String, Integer>> getUnallocatedVSAnswersForActivity(long toolContentId) {
+	// MCQ does not support VSA questions
+	return null;
+    }
+
+    @Override
+    public Map<String, Integer> getUnallocatedVSAnswersForQuestion(long toolQuestionUid) {
+	// MCQ does not support VSA questions
+	return null;
     }
 
     /**

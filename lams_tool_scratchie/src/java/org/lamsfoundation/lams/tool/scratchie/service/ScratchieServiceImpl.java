@@ -590,12 +590,13 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     }
 
     @Override
-    public void recalculateScratchieMarksForVsaQuestion(Long qbQuestionUid, String answer) {
+    public boolean recalculateMarksForVsaQuestion(Long qbQuestionUid, String answer) {
 	List<Long> sessionIds = scratchieSessionDao.getSessionIdsByQbQuestion(qbQuestionUid, answer);
 	// recalculate marks if it's required
 	for (Long sessionId : sessionIds) {
 	    recalculateMarkForSession(sessionId, true);
 	}
+	return !sessionIds.isEmpty();
     }
 
     /**
@@ -1531,7 +1532,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	    percentages[groupCount - 1] = percentage;
 	    groupCount++;
-	    
+
 	    row.addCell(summary.getMark());
 	    percentage = (numberOfItems == 0) ? 0 : (double) summary.getMark() / maxPossibleScore;
 	    row.addPercentageCell(percentage);
@@ -1545,7 +1546,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    sum += percentages[i];
 	}
 	int percentagesLength = percentages.length == 0 ? 1 : percentages.length;
-	double avgMean = (double) sum / percentagesLength;
+	double avgMean = sum / percentagesLength;
 	row = reportByTeamSheet.initRow();
 	row.addCell(getMessage("label.avg.mean"));
 	row.addEmptyCells(numberOfItems + 1);

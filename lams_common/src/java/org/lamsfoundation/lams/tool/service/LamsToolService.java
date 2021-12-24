@@ -55,6 +55,7 @@ import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.tool.GroupedToolSession;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -531,11 +532,36 @@ public class LamsToolService implements ILamsToolService {
     }
 
     @Override
-    public void recalculateScratchieMarksForVsaQuestion(Long qbQuestionUid, String answer) {
+    public Map<QbToolQuestion, Map<String, Integer>> getUnallocatedVSAnswers(long toolContentId) {
+	ToolActivity specifiedActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
+	Tool tool = specifiedActivity.getTool();
+	if (tool.getToolSignature().equals(CommonConstants.TOOL_SIGNATURE_ASSESSMENT)) {
+	    ICommonAssessmentService sessionManager = (ICommonAssessmentService) lamsCoreToolService
+		    .findToolService(tool);
+	    return sessionManager.getUnallocatedVSAnswersForActivity(toolContentId);
+	}
+	return null;
+    }
+
+    @Override
+    public boolean recalculateMarksForVsaQuestion(Long toolQuestionUid, String answer) {
+	boolean answerFoundInLearnerResults = recalculateAssessmentMarksForVsaQuestion(toolQuestionUid, answer);
+	answerFoundInLearnerResults |= recalculateScratchieMarksForVsaQuestion(toolQuestionUid, answer);
+	return answerFoundInLearnerResults;
+    }
+
+    private boolean recalculateAssessmentMarksForVsaQuestion(Long tooQuestionUid, String answer) {
+	Tool assessmentTool = toolDAO.getToolBySignature(CommonConstants.TOOL_SIGNATURE_ASSESSMENT);
+	ICommonAssessmentService sessionManager = (ICommonAssessmentService) lamsCoreToolService
+		.findToolService(assessmentTool);
+	return sessionManager.recalculateMarksForVsaQuestion(tooQuestionUid, answer);
+    }
+
+    private boolean recalculateScratchieMarksForVsaQuestion(Long toolQuestionUid, String answer) {
 	Tool scratchieTool = toolDAO.getToolBySignature(CommonConstants.TOOL_SIGNATURE_SCRATCHIE);
 	ICommonScratchieService sessionManager = (ICommonScratchieService) lamsCoreToolService
 		.findToolService(scratchieTool);
-	sessionManager.recalculateScratchieMarksForVsaQuestion(qbQuestionUid, answer);
+	return sessionManager.recalculateMarksForVsaQuestion(toolQuestionUid, answer);
     }
 
     @Override

@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+<c:set var="lams"><lams:LAMSURL /></c:set>
 
 <lams:html>
 	<lams:head>
 	
-		<%@ include file="/common/header.jsp"%>
-		
 		<title><fmt:message key="label.vsa.allocate.button" /></title>
 		
-		<link href="<lams:WebAppURL />includes/css/vsaAllocate.css" rel="stylesheet" type="text/css">
+		<lams:css />
+		<link href="${lams}css/vsaAllocate.css" rel="stylesheet" type="text/css">
 		<style>
 			body {
 				padding: 10px;
@@ -20,12 +20,16 @@
 			}
 		</style>
 		
+		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/Sortable.js"></script>
   	    <script>
 			var VS_ANSWER_ALLOCATED_ALERT = "<fmt:message key="label.someone.allocated.this.answer" />",
 				VS_ANSWER_DEALLOCATE_CONFIRM = "<fmt:message key="label.vsa.deallocate.confirm" />",
-				WEB_APP_URL = "<lams:WebAppURL />",
+				LAMS_URL = "${lams}",
 				csrfTokenName = "<csrf:tokenname/>",
 				csrfTokenValue = "<csrf:tokenvalue/>";
   	    
@@ -37,7 +41,7 @@
 	   			self.parent.tb_remove();
 	   		}
   		</script>
-  		<lams:JSImport src="includes/javascript/vsaAllocate.js" relative="true" />
+  		<lams:JSImport src="includes/javascript/vsaAllocate.js" />
 	</lams:head>
 	
 <body>
@@ -53,9 +57,10 @@
 	<h4 id="page-description"><fmt:message key="label.vsa.allocate.description" /></h4>
 
 	
-	<c:forEach var="questionSummary" items="${questionSummaries}">
-		<c:set var="questionDto" value="${questionSummary.questionDto}"/>
-		<%@ include file="parts/vsaQuestionAllocate.jsp"%>
+	<c:forEach var="questionDto" items="${questions}">
+		<c:set var="question" value="${questionDto.key}" />
+		<c:set var="notAllocatedAnswers" value="${questionDto.value}" />
+		<%@ include file="vsaQuestionAllocate.jsp"%>
 	</c:forEach>		
 	
 	<div id="footer">

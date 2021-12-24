@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.service;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
@@ -32,6 +33,7 @@ import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -231,9 +233,16 @@ public interface ILamsToolService {
 	    Integer requestorUserId, Long requestorToolSessionId);
 
     /**
-     * Recalculate marks for all Scratchie activities that use specified QbQuestion with given answer.
+     * Returns VS answers which require allocation
      */
-    void recalculateScratchieMarksForVsaQuestion(Long qbQuestionUid, String answer);
+    Map<QbToolQuestion, Map<String, Integer>> getUnallocatedVSAnswers(long toolContentId);
+
+    /**
+     * Recalculate marks for all activities that use specified QbQuestion with given answer
+     *
+     * @return whether there is a learner who used the given answer
+     */
+    boolean recalculateMarksForVsaQuestion(Long qbQuestionUid, String answer);
 
     /**
      * Get a count of all the users that would be returned by getUsersForActivity(Long toolSessionId);

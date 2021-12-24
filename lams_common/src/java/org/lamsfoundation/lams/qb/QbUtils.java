@@ -1,8 +1,12 @@
 package org.lamsfoundation.lams.qb;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpSession;
 
@@ -17,6 +21,10 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class QbUtils {
+
+    public static final String VSA_ANSWER_NORMALISE_JAVA_REG_EXP = "\\W";
+    public static final String VSA_ANSWER_NORMALISE_SQL_REG_EXP = "[^[:alpha:][:alnum:]_]";
+    public static final String VSA_ANSWER_DELIMITER = "\r\n";
 
     public static final Function<String, String> QB_MIGRATION_CKEDITOR_CLEANER = string -> string == null ? null
 	    : string.replaceAll(">\\&nbsp;", ">").replaceAll("\\r|\\n", "").trim();
@@ -78,6 +86,25 @@ public class QbUtils {
 	    collectionUid = questionCollections.iterator().next().getUid();
 	}
 	form.setOldCollectionUid(collectionUid);
+    }
+
+    public static String normaliseVSAnswer(String answer) {
+	return StringUtils.isBlank(answer) ? null : answer.replaceAll(VSA_ANSWER_NORMALISE_JAVA_REG_EXP, "");
+    }
+
+    public static Set<String> normaliseVSOption(String option) {
+	return StringUtils.isBlank(option) ? Set.of()
+		: Stream.of(option.split(VSA_ANSWER_DELIMITER)).filter(StringUtils::isNotBlank)
+			.collect(Collectors.mapping(answer -> QbUtils.normaliseVSAnswer(answer),
+				Collectors.toCollection(LinkedHashSet::new)));
+    }
+
+    public static boolean isVSAnswerAllocated(String option, String answer, boolean isCaseSensitive) {
+	if (StringUtils.isBlank(option) || StringUtils.isBlank(answer)) {
+	    return false;
+	}
+	return QbUtils.normaliseVSOption(option).stream()
+		.anyMatch(s -> isCaseSensitive ? s.equals(answer) : s.equalsIgnoreCase(answer));
     }
 
     private static Integer getUserId() {

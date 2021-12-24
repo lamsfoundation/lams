@@ -31,13 +31,13 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.lamsfoundation.lams.qb.QbUtils;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
-import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.stereotype.Repository;
 
@@ -152,15 +152,15 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 		+ " WHERE q.assessmentResult.uid = r.uid AND q.qbToolQuestion.qbQuestion.uid =:qbQuestionUid ";
 	if (StringUtils.isNotBlank(answer)) {
 
-	    FIND_BY_QBQUESTION += "AND REGEXP_REPLACE(q.answer, '"
-		    + AssessmentEscapeUtils.VSA_ANSWER_NORMALISE_SQL_REG_EXP + "', '') = :answer";
+	    FIND_BY_QBQUESTION += "AND REGEXP_REPLACE(q.answer, '" + QbUtils.VSA_ANSWER_NORMALISE_SQL_REG_EXP
+		    + "', '') = :answer";
 	}
 	FIND_BY_QBQUESTION += " ORDER BY r.startDate ASC";
 
 	Query<AssessmentResult> q = getSession().createQuery(FIND_BY_QBQUESTION, AssessmentResult.class);
 	q.setParameter("qbQuestionUid", qbQuestionUid);
 	if (StringUtils.isNotBlank(answer)) {
-	    String normalisedAnswer = AssessmentEscapeUtils.normaliseVSAnswer(answer);
+	    String normalisedAnswer = QbUtils.normaliseVSAnswer(answer);
 	    q.setParameter("answer", normalisedAnswer);
 	}
 	return q.list();

@@ -10,7 +10,7 @@ $(document).ready(function(){
 		  	filter: '.filtered', // 'filtered' class is not draggable
 			onEnd: function (evt) {
 				let data = {
-		            	questionUid: questionUid,
+		            	toolQuestionUid: questionUid,
 		            	targetOptionUid: $(evt.to).data("option-uid"),
 		            	previousOptionUid: $(evt.from).data("option-uid"),
 		            	answer: $('.answer-text', evt.item).text()
@@ -18,7 +18,7 @@ $(document).ready(function(){
 				data[csrfTokenName] = csrfTokenValue;
 				
 		        $.ajax({
-		            url: WEB_APP_URL + 'monitoring/allocateUserAnswer.do',
+		            url: LAMS_URL + 'qb/vsa/allocateUserAnswer.do',
 		            data: data,
 		            method: 'post',
 		          	dataType: "json",
@@ -44,7 +44,7 @@ $(document).ready(function(){
 			optionUid = container.data('option-uid'),
 			isCorrect = container.data('option-correct'),
 			data = {
-	            	questionUid: questionUid,
+	            	toolQuestionUid: questionUid,
 	            	targetOptionUid: -1,
 	            	previousOptionUid: optionUid,
 	            	answer: answer
@@ -57,7 +57,7 @@ $(document).ready(function(){
 		data[csrfTokenName] = csrfTokenValue;
 				
         $.ajax({
-		    url: WEB_APP_URL + 'monitoring/allocateUserAnswer.do',
+		    url: LAMS_URL + 'qb/vsa/allocateUserAnswer.do',
             data: data,
             method: 'post',
           	dataType: "json",

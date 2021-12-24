@@ -22,11 +22,8 @@
 
 package org.lamsfoundation.lams.tool.assessment.util;
 
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -42,10 +39,6 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 
 public class AssessmentEscapeUtils {
-
-    public static final String VSA_ANSWER_NORMALISE_JAVA_REG_EXP = "\\W";
-    public static final String VSA_ANSWER_NORMALISE_SQL_REG_EXP = "[^[:alpha:][:alnum:]_]";
-    public static final String VSA_ANSWER_DELIMITER = "\r\n";
 
     public static class AssessmentExcelCell {
 	public Object value;
@@ -368,24 +361,5 @@ public class AssessmentEscapeUtils {
 	}
 
 	return new AssessmentExcelCell(StringUtils.isBlank(ret) ? null : ret, highlightCell);
-    }
-
-    public static String normaliseVSAnswer(String answer) {
-	return StringUtils.isBlank(answer) ? null : answer.replaceAll(VSA_ANSWER_NORMALISE_JAVA_REG_EXP, "");
-    }
-
-    public static Set<String> normaliseVSOption(String option) {
-	return StringUtils.isBlank(option) ? Set.of()
-		: Stream.of(option.split(VSA_ANSWER_DELIMITER)).filter(StringUtils::isNotBlank)
-			.collect(Collectors.mapping(answer -> AssessmentEscapeUtils.normaliseVSAnswer(answer),
-				Collectors.toCollection(LinkedHashSet::new)));
-    }
-
-    public static boolean isVSAnswerAllocated(String option, String answer, boolean isCaseSensitive) {
-	if (StringUtils.isBlank(option) || StringUtils.isBlank(answer)) {
-	    return false;
-	}
-	return AssessmentEscapeUtils.normaliseVSOption(option).stream()
-		.anyMatch(s -> isCaseSensitive ? s.equals(answer) : s.equalsIgnoreCase(answer));
     }
 }

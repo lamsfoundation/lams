@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.qb.QbConstants;
+import org.lamsfoundation.lams.qb.QbUtils;
 import org.lamsfoundation.lams.qb.dao.IQbDAO;
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
@@ -781,6 +783,101 @@ public class QbService implements IQbService {
 	    versionMap.put(questionVersion.getVersion(), questionVersion.getUid());
 	}
 	qbQuestion.setVersionMap(versionMap);
+    }
+
+    /**
+     * Allocate learner's answer into one of the available answer groups.
+     *
+     * @param qbQuestionUid
+     * @param targetOptionUid
+     * @param previousOptionUid
+     * @param answer
+     * @return if present, it contains optionUid of the option group containing duplicate (added there presumably by
+     *         another teacher working in parallel)
+     */
+    @Override
+    public Long allocateVSAnswerToOption(Long toolQuestionUid, Long targetOptionUid, Long previousOptionUid,
+	    String answer) {
+	String normalisedAnswer = QbUtils.normaliseVSAnswer(answer);
+	if (normalisedAnswer == null) {
+	    return null;
+	}
+	answer = answer.strip();
+
+	QbToolQuestion toolQuestion = qbDAO.find(QbToolQuestion.class, toolQuestionUid);
+	QbQuestion qbQuestion = toolQuestion.getQbQuestion();
+	Long qbQuestionUid = qbQuestion.getUid();
+	boolean isQuestionCaseSensitive = qbQuestion.isCaseSensitive();
+
+	QbOption previousOption = null;
+	QbOption targetOption = null;
+
+	// look for source and target options
+	for (QbOption option : qbQuestion.getQbOptions()) {
+	    if (previousOptionUid.equals(-1L)) {
+		// new allocation, check if the answer was not allocated anywhere already
+		String name = option.getName();
+		boolean isAnswerAllocated = QbUtils.isVSAnswerAllocated(name, normalisedAnswer,
+			isQuestionCaseSensitive);
+		if (isAnswerAllocated) {
+		    return option.getUid();
+		}
+	    } else if (previousOption == null && option.getUid().equals(previousOptionUid)) {
+		previousOption = option;
+	    }
+	    if (targetOption == null && !targetOptionUid.equals(-1L) && option.getUid().equals(targetOptionUid)) {
+		targetOption = option;
+	    }
+	}
+
+	if (!targetOptionUid.equals(-1L) && targetOption == null) {
+	    // front end provided incorrect target option UID
+	    log.error("Target option with UID " + targetOptionUid + " was not found in question with UID "
+		    + qbQuestionUid + " to allocate answer " + answer);
+	    return null;
+	}
+
+	// remove from already allocated option
+	if (previousOption != null) {
+	    String name = previousOption.getName();
+	    String[] alternatives = name.split(QbUtils.VSA_ANSWER_DELIMITER);
+
+	    Set<String> nameWithoutUserAnswer = new LinkedHashSet<>(List.of(alternatives));
+	    nameWithoutUserAnswer.remove(answer);
+	    name = nameWithoutUserAnswer.isEmpty() ? ""
+		    : nameWithoutUserAnswer.stream().collect(Collectors.joining(QbUtils.VSA_ANSWER_DELIMITER));
+	    previousOption.setName(name);
+	    qbDAO.update(previousOption);
+	    qbDAO.flush();
+
+	    if (log.isInfoEnabled()) {
+		log.info("Removed VS answer \"" + answer + "\" from option " + previousOptionUid + " in question "
+			+ qbQuestionUid);
+	    }
+	}
+
+	if (targetOption != null) {
+	    String name = targetOption.getName();
+
+	    boolean isAnswerAllocated = QbUtils.isVSAnswerAllocated(name, normalisedAnswer, isQuestionCaseSensitive);
+	    if (isAnswerAllocated) {
+		// the answer has been already allocated to the target option
+		return targetOptionUid;
+	    }
+
+	    // append new answer to option
+	    name += (StringUtils.isBlank(name) ? "" : QbUtils.VSA_ANSWER_DELIMITER) + answer;
+	    targetOption.setName(name);
+	    qbDAO.update(targetOption);
+	    qbDAO.flush();
+
+	    if (log.isInfoEnabled()) {
+		log.info("Allocated VS  answer \"" + answer + "\" to option " + targetOptionUid + " in question "
+			+ qbQuestionUid);
+	    }
+	}
+
+	return null;
     }
 
     /**

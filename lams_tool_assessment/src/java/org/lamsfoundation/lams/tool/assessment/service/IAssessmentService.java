@@ -413,24 +413,6 @@ public interface IAssessmentService extends ICommonToolService {
     QuestionSummary getQuestionSummary(Long contentId, Long questionUid);
 
     /**
-     * Allocate learner's answer into one of the available answer groups.
-     *
-     * @param questionUid
-     * @param targetOptionUid
-     * @param previousOptionUid
-     * @param questionResultUid
-     * @return if present, it contains optionUid of the option group containing duplicate (added there presumably by
-     *         another teacher working in parallel)
-     */
-    Long allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid, String answer);
-
-    /**
-     * Recalculate learners' marks after a VSA answer was allocated as correct or incorrect.
-     * Returns true if at least one result was recalculated.
-     */
-    boolean recalculateMarksForAllocatedAnswer(Long questionUid, String answer);
-
-    /**
      * For export purposes
      *
      * @param contentId
