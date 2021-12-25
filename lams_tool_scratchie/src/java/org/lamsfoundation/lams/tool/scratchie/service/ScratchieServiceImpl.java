@@ -34,7 +34,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +68,7 @@ import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.outcome.Outcome;
 import org.lamsfoundation.lams.outcome.OutcomeMapping;
 import org.lamsfoundation.lams.outcome.service.IOutcomeService;
+import org.lamsfoundation.lams.qb.QbUtils;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
@@ -597,6 +600,40 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    recalculateMarkForSession(sessionId, true);
 	}
 	return !sessionIds.isEmpty();
+    }
+
+    @Override
+    public Map<QbToolQuestion, Map<String, Integer>> getUnallocatedVSAnswers(long toolContentId) {
+	Map<QbToolQuestion, Map<String, Integer>> result = new LinkedHashMap<>();
+
+	List<ScratchieSession> sessions = scratchieSessionDao.getByContentId(toolContentId);
+	if (sessions.isEmpty()) {
+	    return result;
+	}
+
+	Scratchie scratchie = sessions.get(0).getScratchie();
+	Map<Long, Integer> sessionToLeaderMap = sessions.stream().filter(s -> s.getGroupLeader() != null).collect(
+		Collectors.toMap(ScratchieSession::getSessionId, s -> s.getGroupLeader().getUserId().intValue()));
+
+	for (ScratchieItem item : scratchie.getScratchieItems()) {
+	    QbQuestion qbQuestion = item.getQbQuestion();
+	    if (qbQuestion.getType().equals(QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
+		Set<String> notAllocatedAnswers = new HashSet<>();
+		Map<String, Integer> notAllocatedAnswerMap = new LinkedHashMap<>();
+
+		List<ScratchieAnswerVisitLog> visitLogs = scratchieAnswerVisitDao.getVsaLogsByItem(item.getUid());
+		for (ScratchieAnswerVisitLog visitLog : visitLogs) {
+		    String answer = visitLog.getAnswer();
+		    boolean isAnswerAllocated = QbUtils.isVSAnswerAllocated(qbQuestion, answer, notAllocatedAnswers);
+		    if (!isAnswerAllocated) {
+			notAllocatedAnswerMap.put(answer.strip(), sessionToLeaderMap.get(visitLog.getSessionId()));
+		    }
+		}
+
+		result.put(item, notAllocatedAnswerMap);
+	    }
+	}
+	return result;
     }
 
     /**

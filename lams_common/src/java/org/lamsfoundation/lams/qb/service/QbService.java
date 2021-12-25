@@ -105,6 +105,10 @@ public class QbService implements IQbService {
 	return result.isEmpty() ? null : result.get(0);
     }
 
+    public <T> List<T> getToolQuestionForToolContentId(Class<T> clazz, long toolContentId, long otherToolQuestionUid) {
+	return qbDAO.getToolQuestionForToolContentId(clazz, toolContentId, otherToolQuestionUid);
+    }
+
     @Override
     public QbOption getOptionByUid(Long optionUid) {
 	QbOption option = qbDAO.find(QbOption.class, optionUid);

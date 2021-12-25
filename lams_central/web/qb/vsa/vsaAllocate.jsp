@@ -57,9 +57,9 @@
 	<h4 id="page-description"><fmt:message key="label.vsa.allocate.description" /></h4>
 
 	
-	<c:forEach var="questionDto" items="${questions}">
-		<c:set var="question" value="${questionDto.key}" />
-		<c:set var="notAllocatedAnswers" value="${questionDto.value}" />
+	<c:forEach var="toolQuestionEntry" items="${toolQuestions}">
+		<c:set var="toolQuestion" value="${toolQuestionEntry.key}" />
+		<c:set var="notAllocatedAnswers" value="${toolQuestionEntry.value}" />
 		<%@ include file="vsaQuestionAllocate.jsp"%>
 	</c:forEach>		
 	

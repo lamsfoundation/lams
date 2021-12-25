@@ -26,6 +26,8 @@ public interface IQbDAO extends IBaseDAO {
      */
     List<QbQuestion> getQuestionsByQuestionId(Integer questionId);
 
+    <T> List<T> getToolQuestionForToolContentId(Class<T> clazz, long toolContentId, long otherToolQuestionUid);
+
     List<QbQuestion> getQuestionsByToolContentId(long toolContentId);
 
     // finds next question ID for Question Bank question

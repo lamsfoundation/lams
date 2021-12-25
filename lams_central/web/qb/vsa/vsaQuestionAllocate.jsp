@@ -2,7 +2,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 
-<c:set var="qbQuestion" value="${question.qbQuestion}" />
+<c:set var="qbQuestion" value="${toolQuestion.qbQuestion}" />
 <c:set var="isTbl" value="${qbQuestion.isVsaAndCompatibleWithTbl()}" />
 <c:set var="optionsArray" value="${qbQuestion.qbOptions.toArray()}" />
 
@@ -41,13 +41,13 @@
 				</h4>
 				
 				<div class="list-group col sortable-on ${isTbl ? 'tbl-correct-list' : ''}" 
-					 data-question-uid="${question.uid}"
+					 data-question-uid="${toolQuestion.uid}"
 					 data-option-uid="${option0.uid}" id="answer-group${option0.uid}"></div>
 				
 				<c:if test="${not empty option0.name}">
 					<fmt:message key="label.answer.alternatives" />:
 					<div class="answer-alternatives" id="answer-alternatives${option0.uid}"
-						 data-question-uid="${question.uid}"
+						 data-question-uid="${toolQuestion.uid}"
 						 data-option-uid="${option0.uid}"
 						 data-option-correct="${option0.maxMark > 0}">
 						<c:forEach var="answer" items="${fn:split(option0.name, newLineChar)}">
@@ -61,16 +61,24 @@
 			<div class="col-sm-4 text-center">
             	<h4>
             		<fmt:message key="label.answer.queue" />
-            		<span id="answer-queue-size${question.uid}"></span>
+            		<span id="answer-queue-size${toolQuestion.uid}"></span>
             	</h4>
            		
            		<div class="list-group col sortable-on answer-queue"
-           			 data-question-uid="${question.uid}" 
+           			 data-question-uid="${toolQuestion.uid}" 
            			 data-option-uid="-1"
-           			 id="answer-queue${question.uid}">
+           			 id="answer-queue${toolQuestion.uid}">
             		<c:forEach var="answer" items="${notAllocatedAnswers}">
             			<div class="list-group-item">
-            				<lams:Portrait userId="${answer.value}"/>
+            				<c:choose>
+            					<c:when test="${empty answer.value}">
+            						<div class="portrait-anonymous portrait-generic-sm"></div>
+            					</c:when>
+            					<c:otherwise>
+            						<lams:Portrait userId="${answer.value}"/>
+            					</c:otherwise>
+            				</c:choose>
+            				
             				<span class="answer-text">${answer.key}</span>
             			</div>
             		</c:forEach>
@@ -94,13 +102,13 @@
 				</h4>
 				
 				<div class="list-group col sortable-on ${isTbl ? 'tbl-incorrect-list' : ''}"
-					 data-question-uid="${question.uid}"
+					 data-question-uid="${toolQuestion.uid}"
 					 data-option-uid="${option1.uid}" id="answer-group${option1.uid}"></div>
 					 	
 				<c:if test="${not empty option1.name}">
 					<fmt:message key="label.answer.alternatives" />:
 					<div class="answer-alternatives" id="answer-alternatives${option0.uid}"
-						 data-question-uid="${question.uid}"
+						 data-question-uid="${toolQuestion.uid}"
 						 data-option-uid="${option1.uid}"
 						 data-option-correct="${option1.maxMark > 0}">
 						<c:forEach var="answer" items="${fn:split(option1.name, newLineChar)}">
@@ -123,13 +131,13 @@
 					<fmt:message key="label.authoring.basic.option.grade"/>: ${option.maxMark}
 				</h4>
 				
-				<div class="list-group col sortable-on" data-question-uid="${question.uid}"
+				<div class="list-group col sortable-on" data-question-uid="${toolQuestion.uid}"
 					 data-option-uid="${option.uid}" id="answer-group${option.uid}"></div>
 					 	
 				<c:if test="${not empty option.name}">
 					<fmt:message key="label.answer.alternatives" />:
 					<div class="answer-alternatives" id="answer-alternatives${option.uid}"
-						 data-question-uid="${question.uid}"
+						 data-question-uid="${toolQuestion.uid}"
 						 data-option-uid="${option.uid}"
 						 data-option-correct="${option.maxMark > 0}">
 						<c:forEach var="answer" items="${fn:split(option.name, newLineChar)}">

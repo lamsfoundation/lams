@@ -1,8 +1,11 @@
 package org.lamsfoundation.lams.web.qb;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -30,8 +33,11 @@ public class VsaController {
     @RequestMapping("/displayVsaAllocate")
     public String displayVsaAllocate(@RequestParam(name = AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentId,
 	    Model model) {
-
-	model.addAttribute("questions", toolService.getUnallocatedVSAnswers(toolContentId));
+	
+	// the mapping is tool question -> unallocated answer -> user ID
+	Map<QbToolQuestion, Map<String, Integer>> toolQuestionToUnallocatedAnswersMap = toolService
+		.getUnallocatedVSAnswers(toolContentId);
+	model.addAttribute("toolQuestions", toolQuestionToUnallocatedAnswersMap);
 	return "qb/vsa/vsaAllocate";
     }
 

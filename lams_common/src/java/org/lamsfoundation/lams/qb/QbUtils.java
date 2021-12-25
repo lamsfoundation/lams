@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.qb.form.QbQuestionForm;
 import org.lamsfoundation.lams.qb.model.QbCollection;
+import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -105,6 +106,38 @@ public class QbUtils {
 	}
 	return QbUtils.normaliseVSOption(option).stream()
 		.anyMatch(s -> isCaseSensitive ? s.equals(answer) : s.equalsIgnoreCase(answer));
+    }
+
+    public static boolean isVSAnswerAllocated(QbQuestion qbQuestion, String answer, Set<String> notAllocatedAnswers) {
+	if (StringUtils.isBlank(answer)) {
+	    return false;
+	}
+
+	String normalisedAnswer = QbUtils.normaliseVSAnswer(answer);
+	boolean isQuestionCaseSensitive = qbQuestion.isCaseSensitive();
+	boolean isAnswerAllocated = false;
+
+	for (QbOption option : qbQuestion.getQbOptions()) {
+	    String name = option.getName();
+	    isAnswerAllocated = QbUtils.isVSAnswerAllocated(name, normalisedAnswer, isQuestionCaseSensitive);
+	    if (isAnswerAllocated) {
+		break;
+	    }
+	}
+
+	if (!isAnswerAllocated) {
+	    if (!isQuestionCaseSensitive) {
+		normalisedAnswer = normalisedAnswer.toLowerCase();
+	    }
+	    // do not add repetitive students' suggestions for teacher to assign to an option
+	    if (notAllocatedAnswers.contains(normalisedAnswer)) {
+		isAnswerAllocated = true;
+	    } else {
+		notAllocatedAnswers.add(normalisedAnswer);
+	    }
+	}
+
+	return isAnswerAllocated;
     }
 
     private static Integer getUserId() {
