@@ -2079,6 +2079,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		.stream().filter(s -> s.getGroupLeader() != null)
 		.collect(Collectors.toMap(ScratchieSession::getSessionName, Function.identity()));
 	List<GroupSummary> groupSummaries = getSummaryByTeam(scratchie, items);
+
 	for (GroupSummary summary : groupSummaries) {
 	    ScratchieSession session = sessionsByName.get(summary.getSessionName());
 	    if (session != null) {
@@ -2127,10 +2128,17 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	}
 	model.put("sessionDtos", groupSummaries);
 
+	boolean vsaPresent = false;
 	for (ScratchieItem item : itemList) {
 	    item.setCorrectOnFirstAttemptPercent(groupSummaries.isEmpty() ? 0
 		    : (double) item.getCorrectOnFirstAttemptCount() * 100 / groupSummaries.size());
+
+	    if (!vsaPresent && item.getQbQuestion().getType().equals(QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
+		vsaPresent = true;
+	    }
 	}
+
+	model.put("vsaPresent", vsaPresent);
 
 	return model;
     }

@@ -49,7 +49,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
-import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
@@ -155,13 +154,6 @@ public class MonitoringController {
 	if (scratchie.isReflectOnActivity()) {
 	    List<ReflectDTO> reflections = scratchieService.getReflectionList(contentId);
 	    sessionMap.put(ScratchieConstants.ATTR_REFLECTIONS, reflections);
-	}
-
-	for (ScratchieItem item : scratchie.getScratchieItems()) {
-	    if (item.getQbQuestion().getType().equals(QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
-		request.setAttribute("vsaPresent", true);
-		break;
-	    }
 	}
 
 	Map<String, Object> modelAttributes = scratchieService.prepareStudentChoicesData(scratchie);
