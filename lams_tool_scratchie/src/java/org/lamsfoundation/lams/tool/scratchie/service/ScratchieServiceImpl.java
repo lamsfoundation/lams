@@ -46,7 +46,6 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -654,6 +653,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	int count = 0;
 
 	for (ScratchieItem item : scratchie.getScratchieItems()) {
+
 	    //create a list of attempts user done for the current item
 	    List<ScratchieAnswerVisitLog> visitLogs = new ArrayList<>();
 	    for (ScratchieAnswerVisitLog log : logs) {
@@ -662,7 +662,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		}
 	    }
 
-	    int numberOfAttempts = visitLogs.size();
+	    int numberOfAttempts = ScratchieServiceImpl.getNumberAttemptsForItem(item, visitLogs);
 	    boolean isUnraveledOnFirstAttempt = (numberOfAttempts == 1)
 		    && ScratchieServiceImpl.isItemUnraveled(item, logs);
 	    if (isUnraveledOnFirstAttempt) {
@@ -1070,7 +1070,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	} else {
 	    List<String> userAnswers = new ArrayList<>();
 	    for (ScratchieAnswerVisitLog userLog : userLogs) {
-		if (userLog.getQbToolQuestion().getUid().equals(item.getUid()) && userLog.getAnswer() != null) {
+		if (userLog.getQbToolQuestion().getUid().equals(item.getUid())
+			&& StringUtils.isNotBlank(userLog.getAnswer())) {
 		    userAnswers.add(userLog.getAnswer());
 		}
 	    }
@@ -1086,21 +1087,13 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	QbOption correctAnswersGroup = qbQuestion.getQbOptions().get(0).isCorrect() ? qbQuestion.getQbOptions().get(0)
 		: qbQuestion.getQbOptions().get(1);
-	Collection<String> correctAnswers = Stream.of(correctAnswersGroup.getName().split("\r\n")).collect(Collectors
-		.mapping(answer -> answer.replaceAll(VSA_ANSWER_NORMALISE_JAVA_REG_EXP, ""), Collectors.toSet()));
+	String name = correctAnswersGroup.getName();
 
-	boolean isQuestionCaseSensitive = qbQuestion.isCaseSensitive();
-	for (String correctAnswer : correctAnswers) {
-	    for (String userAnswer : userAnswers) {
-		String normalisedUserAnswer = userAnswer.replaceAll(VSA_ANSWER_NORMALISE_JAVA_REG_EXP, "");
-		// check is item unraveled
-		if (isQuestionCaseSensitive ? normalisedUserAnswer.equals(correctAnswer)
-			: normalisedUserAnswer.equalsIgnoreCase(correctAnswer)) {
-		    return true;
-		}
+	for (String userAnswer : userAnswers) {
+	    if (QbUtils.isVSAnswerAllocated(name, userAnswer, qbQuestion.isCaseSensitive())) {
+		return true;
 	    }
 	}
-
 	return false;
     }
 
@@ -1114,7 +1107,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    int mark = Integer.parseInt(presetMarks[presetMarks.length - 1]);
 	    // add mark only if an item was unravelled
 	    if (ScratchieServiceImpl.isItemUnraveled(item, userLogs)) {
-		int itemAttempts = ScratchieServiceImpl.getNumberAttemptsForItem(userLogs, item);
+		int itemAttempts = ScratchieServiceImpl.getNumberAttemptsForItem(item, userLogs);
 		String markStr = (itemAttempts <= presetMarks.length) ? presetMarks[itemAttempts - 1]
 			: presetMarks[presetMarks.length - 1];
 		mark = Integer.parseInt(markStr);
@@ -1126,11 +1119,25 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     /**
      * Returns number of scraches user done for the specified item.
      */
-    private static int getNumberAttemptsForItem(List<ScratchieAnswerVisitLog> userLogs, ScratchieItem item) {
+    private static int getNumberAttemptsForItem(ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs) {
 	int itemAttempts = 0;
+	String correctVsaOption = null;
+	QbQuestion qbQuestion = item.getQbQuestion();
+	// if VS answer was marked as correct in Scratchie after leader chose another answer,
+	// then the subsequent answers do not count
+	if (qbQuestion.getType().equals(QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
+	    QbOption correctAnswersGroup = qbQuestion.getQbOptions().get(0).isCorrect()
+		    ? qbQuestion.getQbOptions().get(0)
+		    : qbQuestion.getQbOptions().get(1);
+	    correctVsaOption = correctAnswersGroup.getName();
+	}
 	for (ScratchieAnswerVisitLog userLog : userLogs) {
 	    if (userLog.getQbToolQuestion().getUid().equals(item.getUid())) {
 		itemAttempts++;
+		if (correctVsaOption != null && QbUtils.isVSAnswerAllocated(correctVsaOption, userLog.getAnswer(),
+			qbQuestion.isCaseSensitive())) {
+		    break;
+		}
 	    }
 	}
 
@@ -2182,12 +2189,12 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 			    visitLogs.add(log);
 			}
 		    }
-		    numberOfAttempts = visitLogs.size();
+		    numberOfAttempts = ScratchieServiceImpl.getNumberAttemptsForItem(item, visitLogs);
 
 		    // for displaying purposes if there is no attemps we assign -1 which will be shown as "-"
-		    mark = (numberOfAttempts == 0) ? -1 : item.getMark();
+		    mark = numberOfAttempts == 0 ? -1 : item.getMark();
 
-		    isUnraveledOnFirstAttempt = (numberOfAttempts == 1)
+		    isUnraveledOnFirstAttempt = numberOfAttempts == 1
 			    && ScratchieServiceImpl.isItemUnraveled(item, logs);
 
 		    // find out options' sequential letters - A,B,C...
