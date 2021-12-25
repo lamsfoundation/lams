@@ -33,7 +33,7 @@ public class VsaController {
     @RequestMapping("/displayVsaAllocate")
     public String displayVsaAllocate(@RequestParam(name = AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentId,
 	    Model model) {
-	
+
 	// the mapping is tool question -> unallocated answer -> user ID
 	Map<QbToolQuestion, Map<String, Integer>> toolQuestionToUnallocatedAnswersMap = toolService
 		.getUnallocatedVSAnswers(toolContentId);
@@ -72,7 +72,7 @@ public class VsaController {
 			answer);
 	    }
 
-	    // recalculate marks for all lessons in all cases except for reshuffling inside the same container
+	    // recalculate marks for *all lessons* in all cases except for reshuffling inside the same container
 	    answerFoundInResults = toolService.recalculateMarksForVsaQuestion(toolQuestionUid, answer);
 	}
 

@@ -108,6 +108,12 @@ public class QbUtils {
 		.anyMatch(s -> isCaseSensitive ? s.equals(answer) : s.equalsIgnoreCase(answer));
     }
 
+    /**
+     * Check is given answer is present in any of VSA question's options.
+     *
+     * @param notAllocatedAnswers
+     *            is an accumulator for unallocated answers so they do not appear in VSA allocation UI twice
+     */
     public static boolean isVSAnswerAllocated(QbQuestion qbQuestion, String answer, Set<String> notAllocatedAnswers) {
 	if (StringUtils.isBlank(answer)) {
 	    return false;

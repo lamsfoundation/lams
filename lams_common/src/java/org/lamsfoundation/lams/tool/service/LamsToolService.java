@@ -531,6 +531,9 @@ public class LamsToolService implements ILamsToolService {
 	return lamsCoreToolService.getVsaAnswersByToolSession(assessmentSession);
     }
 
+    /**
+     * Get answers for VSA questions which are not already assigned to any of question's options.
+     */
     @Override
     public Map<QbToolQuestion, Map<String, Integer>> getUnallocatedVSAnswers(long toolContentId) {
 	ToolActivity specifiedActivity = activityDAO.getToolActivityByToolContentId(toolContentId);

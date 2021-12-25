@@ -105,6 +105,7 @@ public class QbService implements IQbService {
 	return result.isEmpty() ? null : result.get(0);
     }
 
+    @Override
     public <T> List<T> getToolQuestionForToolContentId(Class<T> clazz, long toolContentId, long otherToolQuestionUid) {
 	return qbDAO.getToolQuestionForToolContentId(clazz, toolContentId, otherToolQuestionUid);
     }
@@ -792,10 +793,6 @@ public class QbService implements IQbService {
     /**
      * Allocate learner's answer into one of the available answer groups.
      *
-     * @param qbQuestionUid
-     * @param targetOptionUid
-     * @param previousOptionUid
-     * @param answer
      * @return if present, it contains optionUid of the option group containing duplicate (added there presumably by
      *         another teacher working in parallel)
      */

@@ -597,6 +597,12 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	// recalculate marks if it's required
 	for (Long sessionId : sessionIds) {
 	    recalculateMarkForSession(sessionId, true);
+	    try {
+		// tell learners that their answers have changed so they not need to keep guessing
+		LearningWebsocketServer.getInstance().sendPageRefreshRequest(null, sessionId);
+	    } catch (IOException e) {
+		log.error("Could not refresh learner page after VSA allocation for session ID " + sessionId, e);
+	    }
 	}
 	return !sessionIds.isEmpty();
     }
