@@ -11,11 +11,20 @@
 		<lams:css />
 		<link href="${lams}css/vsaAllocate.css" rel="stylesheet" type="text/css">
 		<style>
-			body {
-				padding: 10px;
+			#questions-container {
+				max-width: 1500px;
+				margin: auto;
 			}
 			
-			#page-description, .question-description {
+			#page-description {
+				max-width: 1500px;
+				text-align: center;
+				background-color: white;
+				padding: 20px;
+				margin: 5px auto;
+			}
+			
+			.question-description {
 				margin-bottom: 20px;
 			}
 		</style>
@@ -40,20 +49,22 @@
   		<lams:JSImport src="includes/javascript/vsaAllocate.js" />
 	</lams:head>
 	
-<body>
+<body class="stripes">
 	<a href="#nogo" onclick="javascript:refreshPage()" class="btn btn-primary pull-right">
 		<i class="fa fa-refresh"></i>
 		<fmt:message key="label.refresh" /> 
 	</a>
 		
+		
 	<h4 id="page-description"><fmt:message key="label.vsa.allocate.description" /></h4>
 
-	
-	<c:forEach var="toolQuestionEntry" items="${toolQuestions}">
-		<c:set var="toolQuestion" value="${toolQuestionEntry.key}" />
-		<c:set var="notAllocatedAnswers" value="${toolQuestionEntry.value}" />
-		<%@ include file="vsaQuestionAllocate.jsp"%>
-	</c:forEach>		
+	<div id="questions-container">
+		<c:forEach var="toolQuestionEntry" items="${toolQuestions}">
+			<c:set var="toolQuestion" value="${toolQuestionEntry.key}" />
+			<c:set var="notAllocatedAnswers" value="${toolQuestionEntry.value}" />
+			<%@ include file="vsaQuestionAllocate.jsp"%>
+		</c:forEach>		
+	</div>
 	
 	<div id="footer">
 	</div>
