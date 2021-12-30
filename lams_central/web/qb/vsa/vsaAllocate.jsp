@@ -36,19 +36,11 @@
 	   		function refreshPage() { 
 	       		location.reload();
 	   		}
-	
-	   		function closePage() { 
-	   			self.parent.tb_remove();
-	   		}
   		</script>
   		<lams:JSImport src="includes/javascript/vsaAllocate.js" />
 	</lams:head>
 	
 <body>
-	<a href="#nogo" onclick="javascript:closePage()" class="btn btn-default pull-right loffset20">
-		<i class="fa fa-close"></i>
-		<fmt:message key="label.close" /> 
-	</a>
 	<a href="#nogo" onclick="javascript:refreshPage()" class="btn btn-primary pull-right">
 		<i class="fa fa-refresh"></i>
 		<fmt:message key="label.refresh" /> 
