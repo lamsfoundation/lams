@@ -1100,7 +1100,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	String name = correctAnswersGroup.getName();
 
 	for (String userAnswer : userAnswers) {
-	    if (QbUtils.isVSAnswerAllocated(name, userAnswer, qbQuestion.isCaseSensitive())) {
+	    String normalisedQuestionAnswer = QbUtils.normaliseVSAnswer(userAnswer);
+	    if (QbUtils.isVSAnswerAllocated(name, normalisedQuestionAnswer, qbQuestion.isCaseSensitive())) {
 		return true;
 	    }
 	}
@@ -1144,7 +1145,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	for (ScratchieAnswerVisitLog userLog : userLogs) {
 	    if (userLog.getQbToolQuestion().getUid().equals(item.getUid())) {
 		itemAttempts++;
-		if (correctVsaOption != null && QbUtils.isVSAnswerAllocated(correctVsaOption, userLog.getAnswer(),
+		String normalisedQuestionAnswer = QbUtils.normaliseVSAnswer(userLog.getAnswer());
+		if (correctVsaOption != null && QbUtils.isVSAnswerAllocated(correctVsaOption, normalisedQuestionAnswer,
 			qbQuestion.isCaseSensitive())) {
 		    break;
 		}

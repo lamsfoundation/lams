@@ -100,12 +100,12 @@ public class QbUtils {
 				Collectors.toCollection(LinkedHashSet::new)));
     }
 
-    public static boolean isVSAnswerAllocated(String option, String answer, boolean isCaseSensitive) {
-	if (StringUtils.isBlank(option) || StringUtils.isBlank(answer)) {
+    public static boolean isVSAnswerAllocated(String option, String normalisedAnswer, boolean isCaseSensitive) {
+	if (StringUtils.isBlank(option) || StringUtils.isBlank(normalisedAnswer)) {
 	    return false;
 	}
 	return QbUtils.normaliseVSOption(option).stream()
-		.anyMatch(s -> isCaseSensitive ? s.equals(answer) : s.equalsIgnoreCase(answer));
+		.anyMatch(s -> isCaseSensitive ? s.equals(normalisedAnswer) : s.equalsIgnoreCase(normalisedAnswer));
     }
 
     /**
