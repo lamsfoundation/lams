@@ -9,7 +9,7 @@
 <div class="panel panel-default">
 	<div class="panel-heading">
 		<div class="panel-title">
-			<c:out value="${qbQuestion.name}" escapeXml="true"/>
+			${toolQuestionStatus.count})&nbsp;<c:out value="${qbQuestion.name}" escapeXml="true"/>
 		</div>
 	</div>
 		
