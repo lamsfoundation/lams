@@ -629,6 +629,10 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		List<ScratchieAnswerVisitLog> visitLogs = scratchieAnswerVisitDao.getVsaLogsByItem(item.getUid());
 		for (ScratchieAnswerVisitLog visitLog : visitLogs) {
 		    String answer = visitLog.getAnswer();
+		    if (StringUtils.isBlank(answer)) {
+			continue;
+		    }
+
 		    boolean isAnswerAllocated = QbUtils.isVSAnswerAllocated(qbQuestion, answer, notAllocatedAnswers);
 		    if (!isAnswerAllocated) {
 			notAllocatedAnswerMap.put(answer.strip(), sessionToLeaderMap.get(visitLog.getSessionId()));

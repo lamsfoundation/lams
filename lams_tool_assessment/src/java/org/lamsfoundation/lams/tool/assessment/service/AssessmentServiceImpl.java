@@ -1436,9 +1436,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    List<AssessmentQuestionResult> notAllocatedQuestionResults = new ArrayList<>();
 
 	    for (AssessmentQuestionResult questionResult : allQuestionResults) {
+		String answer = questionResult.getAnswer();
+		if (StringUtils.isBlank(answer)) {
+		    continue;
+		}
+		
 		Set<String> notAllocatedAnswers = new HashSet<>();
-		boolean isAnswerAllocated = QbUtils.isVSAnswerAllocated(qbQuestion, questionResult.getAnswer(),
-			notAllocatedAnswers);
+		boolean isAnswerAllocated = QbUtils.isVSAnswerAllocated(qbQuestion, answer, notAllocatedAnswers);
 		if (!isAnswerAllocated) {
 		    notAllocatedQuestionResults.add(questionResult);
 		}
