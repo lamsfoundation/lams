@@ -12,12 +12,12 @@
 		<link href="${lams}css/vsaAllocate.css" rel="stylesheet" type="text/css">
 		<style>
 			#questions-container {
-				max-width: 1500px;
+				max-width: 1550px;
 				margin: auto;
 			}
 			
 			#page-description {
-				max-width: 1500px;
+				max-width: 1550px;
 				text-align: center;
 				background-color: white;
 				padding: 20px;
@@ -26,6 +26,13 @@
 			
 			.question-description {
 				margin-bottom: 20px;
+			}
+			
+			#questions-refresh-button {
+				position: fixed;
+				top: 10px;
+				right: 10px;
+				z-index: 2;
 			}
 		</style>
 		
@@ -50,7 +57,7 @@
 	</lams:head>
 	
 <body class="stripes">
-	<a href="#nogo" onclick="javascript:refreshPage()" class="btn btn-primary pull-right">
+	<a href="#nogo" onclick="javascript:refreshPage()" class="btn btn-primary" id="questions-refresh-button">
 		<i class="fa fa-refresh"></i>
 		<fmt:message key="label.refresh" /> 
 	</a>
