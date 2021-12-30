@@ -108,6 +108,19 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 		'  <strong>Danger!</strong> Indicates a dangerous or potentially negative action.' +
 		'</div>'
 	},
+    {
+        title: 'textLabel',
+        image: 'labels.svg',
+        description: '',
+        css: '',
+        html:
+        '<span class="label label-default">Default</span>&nbsp;' +
+        '<span class="label label-primary">Primary</span>&nbsp;' +
+		'<span class="label label-success">Success</span>&nbsp;' +
+		'<span class="label label-info">Info</span>&nbsp;' +
+		'<span class="label label-warning">Warning</span>&nbsp;' +
+		'<span class="label label-danger">Danger</span>&nbsp;' 
+    },
 	{
 		title: 'textQuote',
 		image: 'quote_paragraph_below.svg',

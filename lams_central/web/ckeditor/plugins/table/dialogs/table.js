@@ -553,7 +553,7 @@
 			// ADDED FOR LAMS
 			{
 				id: 'bootstrapCssTab',
-				label: 'Bootstrap CSS',
+				label: 'Table Styles',
 				elements: [
 					{
 						type: 'hbox',

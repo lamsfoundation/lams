@@ -127,7 +127,7 @@ CKEDITOR.config.disableNativeSpellChecker = false;
 CKEDITOR.config.browserContextMenuOnCtrl = true;
 CKEDITOR.config.bootsnippets = 'bootsnippets-text, bootsnippets-image, bootsnippets-multimedia, bootsnippets-advanced-layout';
 CKEDITOR.config.bootsnippets_icons = CKEDITOR.basePath + '/plugins/bootsnippets/icons/ico_text.ico, ' + CKEDITOR.basePath + '/plugins/bootsnippets/icons/ico_image.ico, ' + CKEDITOR.basePath + '/plugins/bootsnippets/icons/ico_video.png, form';
-CKEDITOR.config.bootsnippets_labels = 'Text Snippets, Image Snippets, Multimedia Snippets, Advanced Layout Snippets';
+CKEDITOR.config.bootsnippets_labels = 'Text Templates, Image Templates, Multimedia Templates, Advanced Layout Templates';
 CKEDITOR.config.bootsnippets_files = [CKEDITOR.basePath + '../www/public/ckeditor-templates/bootsnippets.js'];
 CKEDITOR.config.format_tags	= 'div;h1;h2;h3;h4;h5;h6;pre;address;p' ;
 CKEDITOR.plugins.addExternal('wikilink', CKEDITOR.basePath + '../tool/lawiki10/wikilink/', 'plugin.js');
