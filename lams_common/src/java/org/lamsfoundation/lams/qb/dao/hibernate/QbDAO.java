@@ -247,66 +247,59 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     private List<?> getPagedQuestions(String questionTypes, String collectionUids, int page, int size, String sortBy,
 	    String sortOrder, String searchString, boolean onlyUidsRequested) {
-	String RETURN_VALUE = onlyUidsRequested ? "question.uid" : "question.*";
 
-	//we sort of strip out HTML tags from the search by using REGEXP_REPLACE which skips all the content between < >
-	final String SELECT_QUESTIONS = "SELECT DISTINCT " + RETURN_VALUE + " FROM lams_qb_question question  "
-		+ " LEFT OUTER JOIN lams_qb_option qboption ON qboption.qb_question_uid = question.uid "
-		+ " LEFT OUTER JOIN lams_qb_collection_question collection ON question.question_id = collection.qb_question_id "
-		+ " LEFT JOIN ("//help finding questions with the max available version
-		+ "	SELECT biggerQuestion.* FROM lams_qb_question biggerQuestion "
-		+ " LEFT OUTER JOIN lams_qb_collection_question collection ON biggerQuestion.question_id = collection.qb_question_id "
-		+ " 		LEFT OUTER JOIN lams_qb_option qboption1 "
-		+ "		ON qboption1.qb_question_uid = biggerQuestion.uid WHERE "
-		+ (questionTypes == null ? "" : " biggerQuestion.type in (:questionTypes) AND ")
-		+ (collectionUids == null ? "" : " collection.collection_uid in (:collectionUids) AND ")
-		+ "	(REGEXP_REPLACE(biggerQuestion.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')"
-		+ " 	OR biggerQuestion.name LIKE CONCAT('%', :searchString, '%') "
-		+ " 	OR REGEXP_REPLACE(qboption1.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) "
-		+ ") AS biggerQuestion ON question.question_id = biggerQuestion.question_id AND question.version < biggerQuestion.version "
-		+ " WHERE biggerQuestion.version is NULL "
-		+ (questionTypes == null ? "" : " AND question.type in (:questionTypes) ")
-		+ (collectionUids == null ? "" : " AND collection.collection_uid in (:collectionUids) ")
-		+ " AND (REGEXP_REPLACE(question.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')"
-		+ " OR question.name LIKE CONCAT('%', :searchString, '%') "
-		+ " OR REGEXP_REPLACE(qboption.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) ";
-	final String ORDER_BY_NAME = "ORDER BY question.name, question.description ";
-	final String ORDER_BY_SMTH_ELSE = "ORDER BY question.question_id ";
+	StringBuilder queryBuilder = new StringBuilder("SELECT DISTINCT ").append(onlyUidsRequested ? "q.uid" : "q.*")
+		.append(" FROM (SELECT question.* FROM lams_qb_question question");
+	if (searchString != null) {
+	    queryBuilder.append(" LEFT JOIN lams_qb_option qboption ON qboption.qb_question_uid = question.uid");
+	}
+	if (collectionUids != null) {
+	    queryBuilder.append(
+		    " LEFT JOIN lams_qb_collection_question collection ON question.question_id = collection.qb_question_id");
+	}
 
-	//TODO check the following query with real data. and see maybe it's better than the current (it's unlikely though) [https://stackoverflow.com/a/28090544/10331386 and https://stackoverflow.com/a/612268/10331386]
-//	SELECT t1.*
-//	FROM lams_qb_question t1
-//	INNER JOIN
-//	(
-//	    SELECT `question_id`, MAX(version) AS max_version
-//	    FROM lams_qb_question as t3
-//			LEFT OUTER JOIN lams_qb_option qboption
-//				ON qboption.qb_question_uid = t3.uid
-//		WHERE REGEXP_REPLACE(qboption.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')
-//	    GROUP BY `question_id`
-//	) t2
-//	    ON t1.`question_id` = t2.`question_id` AND t1.version = t2.max_version;
-
-	StringBuilder bldr = new StringBuilder(SELECT_QUESTIONS);
-	if ("smth_else".equalsIgnoreCase(sortBy)) {
-	    bldr.append(ORDER_BY_SMTH_ELSE);
+	queryBuilder.append(" WHERE");
+	if (questionTypes != null) {
+	    queryBuilder.append(" question.type in (:questionTypes) AND");
+	}
+	if (collectionUids != null) {
+	    queryBuilder.append(" collection.collection_uid in (:collectionUids) AND");
+	}
+	if (searchString == null) {
+	    // there has to be something after AND or even after just WHERE
+	    queryBuilder.append(" TRUE");
 	} else {
-	    bldr.append(ORDER_BY_NAME);
+	    // we sort of strip out HTML tags from the search by using REGEXP_REPLACE which skips all the content between < >
+	    queryBuilder.append(
+		    " (REGEXP_REPLACE(question.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')")
+		    .append(" OR question.name LIKE CONCAT('%', :searchString, '%')")
+		    .append(" OR REGEXP_REPLACE(qboption.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%'))");
+	}
+
+	queryBuilder.append(" ORDER BY question.version DESC) AS q GROUP BY q.question_id");
+
+	if ("smth_else".equalsIgnoreCase(sortBy)) {
+	    queryBuilder.append(" ORDER BY q.question_id ");
+	} else {
+	    queryBuilder.append(" ORDER BY q.name, q.description ");
 	}
 
 	LAMSBaseDAO.sanitiseQueryPart(sortOrder);
-	bldr.append(sortOrder);
+	queryBuilder.append(sortOrder);
 
-	NativeQuery<?> query = getSession().createNativeQuery(bldr.toString());
+	NativeQuery<?> query = getSession().createNativeQuery(queryBuilder.toString());
 	if (questionTypes != null) {
 	    query.setParameterList("questionTypes", questionTypes.split(","));
 	}
 	if (collectionUids != null) {
 	    query.setParameterList("collectionUids", collectionUids.split(","));
 	}
-	// support for custom search from a toolbar
-	searchString = searchString == null ? "" : searchString;
-	query.setParameter("searchString", searchString);
+	if (searchString != null) {
+	    // support for custom search from the toolbar
+	    searchString = searchString == null ? "" : searchString;
+	    query.setParameter("searchString", searchString);
+	}
+
 	query.setFirstResult(page * size);
 	query.setMaxResults(size);
 	if (!onlyUidsRequested) {
@@ -319,29 +312,37 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     @Override
     public int getCountQuestions(String questionTypes, String collectionUids, String searchString) {
-	final String SELECT_QUESTIONS = "SELECT COUNT(DISTINCT question.uid) count "
-		+ " FROM lams_qb_question question  "
-		+ " LEFT OUTER JOIN lams_qb_collection_question collection ON question.question_id = collection.qb_question_id "
-		+ " LEFT OUTER JOIN lams_qb_option qboption " + "	ON qboption.qb_question_uid = question.uid "
-		+ " LEFT JOIN ("//help finding questions with the max available version
-		+ "	SELECT biggerQuestion.* FROM lams_qb_question biggerQuestion "
-		+ " LEFT OUTER JOIN lams_qb_collection_question collection ON biggerQuestion.question_id = collection.qb_question_id "
-		+ " 		LEFT OUTER JOIN lams_qb_option qboption1 "
-		+ "		ON qboption1.qb_question_uid = biggerQuestion.uid "
-		+ (questionTypes == null ? "" : " WHERE biggerQuestion.type in (:questionTypes) ")
-		+ (collectionUids == null ? "" : " AND collection.collection_uid in (:collectionUids) ")
-		+ "	AND (REGEXP_REPLACE(biggerQuestion.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')"
-		+ " 	OR biggerQuestion.name LIKE CONCAT('%', :searchString, '%') "
-		+ " 	OR REGEXP_REPLACE(qboption1.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) "
-		+ ") AS biggerQuestion ON question.question_id = biggerQuestion.question_id AND question.version < biggerQuestion.version "
-		+ " WHERE biggerQuestion.version is NULL "
-		+ (questionTypes == null ? "" : " AND question.type in (:questionTypes) ")
-		+ (collectionUids == null ? "" : " AND collection.collection_uid in (:collectionUids) ")
-		+ " AND (REGEXP_REPLACE(question.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')"
-		+ " OR question.name LIKE CONCAT('%', :searchString, '%') "
-		+ " OR REGEXP_REPLACE(qboption.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) ";
+	StringBuilder queryBuilder = new StringBuilder("SELECT COUNT(DISTINCT c.uid) AS cnt FROM (SELECT q.uid FROM ")
+		.append(" (SELECT question.uid, question.question_id FROM lams_qb_question question");
+	if (searchString != null) {
+	    queryBuilder.append(" LEFT JOIN lams_qb_option qboption ON qboption.qb_question_uid = question.uid");
+	}
+	if (collectionUids != null) {
+	    queryBuilder.append(
+		    " LEFT JOIN lams_qb_collection_question collection ON question.question_id = collection.qb_question_id");
+	}
 
-	NativeQuery<?> query = getSession().createNativeQuery(SELECT_QUESTIONS).addScalar("count",
+	queryBuilder.append(" WHERE");
+	if (questionTypes != null) {
+	    queryBuilder.append(" question.type in (:questionTypes) AND");
+	}
+	if (collectionUids != null) {
+	    queryBuilder.append(" collection.collection_uid in (:collectionUids) AND");
+	}
+	if (searchString == null) {
+	    // there has to be something after AND or even after just WHERE
+	    queryBuilder.append(" TRUE");
+	} else {
+	    // we sort of strip out HTML tags from the search by using REGEXP_REPLACE which skips all the content between < >
+	    queryBuilder.append(
+		    " (REGEXP_REPLACE(question.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')")
+		    .append(" OR question.name LIKE CONCAT('%', :searchString, '%')")
+		    .append(" OR REGEXP_REPLACE(qboption.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%'))");
+	}
+
+	queryBuilder.append(") AS q GROUP BY q.question_id) AS c");
+
+	NativeQuery<?> query = getSession().createNativeQuery(queryBuilder.toString()).addScalar("cnt",
 		IntegerType.INSTANCE);
 	if (questionTypes != null) {
 	    query.setParameterList("questionTypes", questionTypes.split(","));
@@ -350,8 +351,11 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    query.setParameterList("collectionUids", collectionUids.split(","));
 	}
 	// support for custom search from a toolbar
-	searchString = searchString == null ? "" : searchString;
-	query.setParameter("searchString", searchString);
+	if (searchString != null) {
+	    // support for custom search from a toolbar
+	    searchString = searchString == null ? "" : searchString;
+	    query.setParameter("searchString", searchString);
+	}
 	int result = (int) query.getSingleResult();
 	return result;
     }
