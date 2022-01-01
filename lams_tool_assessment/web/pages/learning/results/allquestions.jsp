@@ -33,10 +33,6 @@
 		float: right;
 	}
 	
-	.discussion-sentiment-start-button {
-		margin-top: 5px;
-	}
-	
 	@media (min-width: 0px) and (max-width: 767px){
 		.discussion-sentiment-start-button {
 			padding: 1px 5px;
@@ -108,6 +104,10 @@
 	
 		//initialize bootstrap-sliders if "Enable confidence level" option is ON
 		$('.bootstrap-slider').bootstrapSlider();
+
+		<c:if test="${param.showQuestionDetailsButton}">
+			tb_init('a.thickbox');
+		</c:if>
 	
 		<%-- Connect to command websocket only if it is learner UI --%>
 		<c:if test="${not empty toolSessionID}">
@@ -170,13 +170,25 @@
 						</div>
 					</c:if>
 					
-					<c:if test="${assessment.allowDiscussionSentiment}">
-						<div id="discussion-sentiment-start-button-${question.uid}"
-						     class="btn btn-xs btn-default discussion-sentiment-start-button"
-						     onClick="javascript:startDiscussionSentiment(${question.uid}, null, true)">
-							<i class="fa fa-comments"></i><fmt:message key="label.monitoring.discussion.start"/>
+					<c:if test="${param.showQuestionDetailsButton or assessment.allowDiscussionSentiment}">
+						<div class="btn-group-xs voffset5">
+							<c:if test="${param.showQuestionDetailsButton}">
+								<a class="thickbox btn btn-default"
+								   href='<c:url value="/monitoring/questionSummary.do?sessionMapID=${sessionMapID}"/>&questionUid=${question.uid}&KeepThis=true&TB_iframe=true&modal=true'>
+									<fmt:message key="label.monitoring.summary.results.question" />
+								</a>
+							</c:if>
+							
+							<c:if test="${assessment.allowDiscussionSentiment}">
+								<div id="discussion-sentiment-start-button-${question.uid}"
+								     class="btn btn-default discussion-sentiment-start-button"
+								     onClick="javascript:startDiscussionSentiment(${question.uid}, null, true)">
+									<i class="fa fa-comments"></i>&nbsp;<fmt:message key="label.monitoring.discussion.start"/>
+								</div>
+							</c:if>
 						</div>
 					</c:if>
+					
 				</div>
 			</c:if>
 			
