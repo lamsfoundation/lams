@@ -344,7 +344,9 @@
 		
 	<c:if test="${sessionMap.isGroupedActivity}">
 		</div> <!--  end panel group -->
-	</c:if>
+	</c:if>	
+	
+	<h5><fmt:message key="label.monitoring.summary.report.by.question" /></h5>
 
 	<div class="assessment-questions-pane">
 		<c:if test="${assessment.allowDiscloseAnswers or vsaPresent}">
