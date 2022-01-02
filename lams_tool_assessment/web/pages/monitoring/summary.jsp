@@ -3,14 +3,20 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="sessionDtos" value="${sessionMap.sessionDtos}"/>
 <c:set var="assessment" value="${sessionMap.assessment}"/>
+<c:set var="showQuestionMonitoringActionButtons" value="${not empty sessionDtos}" />
+
+<%@ include file="parts/discloseAnswers.jsp"%>
 
 <script type="text/javascript">
 	var activityCompletionChart = null,
 		answeredQuestionsChart = null;
 	// how often completion charts will be updated
-	const COMPLETION_CHART_UPDATE_INTERVAL = 10 * 1000;
+	const COMPLETION_CHART_UPDATE_INTERVAL = 10 * 1000,
+	// for allquestions.jsp to know whether to display an additional button
+	 	  showQuestionDetailsButton = true;
 
 	$(document).ready(function(){
+		loadResultsPane($('#results'), false);
 		
 		initializePortraitPopover("<lams:LAMSURL />");
 		
@@ -166,164 +172,6 @@
 		$('div[id^="collapse"]').on('shown.bs.collapse', function () {
 			resizeJqgrid(jQuery(".ui-jqgrid-btable:visible", this));
 		})
-
-		var questionUidSelect = $('#questionUid'),
-			summaryButton = $('#questionSummaryHref'),
-			correctButton = $('#questionDiscloseCorrect'),
-			correctAllButton = $('#discloseAllCorrect'),
-			groupsAllButton = $('#discloseAllGroups'),
-			groupsButton = $('#questionDiscloseGroups'),
-			correctButtonLabel = "<fmt:message key='label.disclose.correct.answers' />",
-			groupsButtonLabel = "<fmt:message key='label.disclose.groups.answers' />",
-			checkIcon = '<i class="fa fa-check text-success">&nbsp;</i>';
-
-			// when question dropdow changes, manipulate buttons
-			questionUidSelect.change(function(event) {
-				var questionUid = $(this).val(),
-					selectedOption = $('option:selected', this),
-					// disclosing correct answers works only for multiple choice
-					isMultipleChoice = selectedOption.attr('isMultipleChoice') == 'true',
-					correctDisclosed = isMultipleChoice && selectedOption.attr('correctDisclosed'),
-					groupsDisclosed = selectedOption.attr('groupsDisclosed');
-			if (questionUid == -1) {
-				// user went back to "Choose..." option
-				summaryButton.addClass('disabled');
-				correctButton.show().addClass('disabled').text(correctButtonLabel);
-				groupsButton.show().addClass('disabled').text(groupsButtonLabel);
-			} else {
-				// set link for thickbox
-				summaryButton.removeClass('disabled').attr("href", 
-					'<c:url value="/monitoring/questionSummary.do?sessionMapID=${sessionMapID}"/>&questionUid='
-					+ questionUid + "&KeepThis=true&TB_iframe=true&modal=true");
-				// manipulate disclose buttons
-				if (isMultipleChoice) {
-					correctButton.show();
-					if (correctDisclosed == "true") {
-						correctButton.addClass('disabled').html(checkIcon + correctButtonLabel);
-					} else {
-						correctButton.removeClass('disabled').html(correctButtonLabel);
-					}
-				} else {
-					correctButton.hide();
-				}
-				
-				if (groupsDisclosed == "true") {
-					groupsButton.addClass('disabled').html(checkIcon + groupsButtonLabel);
-				} else {
-					groupsButton.removeClass('disabled').html(groupsButtonLabel);
-				}
-			}
-	    });
-
-		// ajax calls to disclose correct/groups answers
-	    correctButton.click(function(){
-	    	if (!confirm("<fmt:message key='message.disclose.correct.answers' />")) {
-	    		return;
-	    	};
-
-			// check if correct answers are disclosed before groups' answers
-			if (!groupsButton.is('.disabled') &&
-				!confirm("<fmt:message key='message.disclose.correct.before.groups.answers' />")) {
-				return;
-			}
-	    	
-			$.ajax({
-                type: 'POST',
-				'url'  : '<lams:WebAppURL />monitoring/discloseCorrectAnswers.do?<csrf:token/>',
-				'data' : {
-					'questionUid'   : questionUidSelect.val(),
-					'toolContentID' : '${sessionMap.assessment.contentId}'
-				}
-			}).done(function(){
-				$('option:selected', questionUidSelect).attr('correctDisclosed', 'true');
-				correctButton.addClass('disabled').html(checkIcon + correctButtonLabel);
-			});
-		});
-
-	    groupsButton.click(function(){
-	    	if (!confirm("<fmt:message key='message.disclose.groups.answers' />")) {
-	    		return;
-	    	};
-	    	
-			$.ajax({
-                type: 'POST',
-				'url'  : '<lams:WebAppURL />monitoring/discloseGroupsAnswers.do?<csrf:token/>',
-				'data' : {
-					'questionUid'   : questionUidSelect.val(),
-					'toolContentID' : '${sessionMap.assessment.contentId}'
-				}
-			}).done(function(){
-				$('option:selected', questionUidSelect).attr('groupsDisclosed', 'true');
-				groupsButton.addClass('disabled').html(checkIcon + groupsButtonLabel);
-			});
-		});
-
-	    correctAllButton.click(function(){
-	    	if (!confirm("<fmt:message key='message.disclose.all.correct.answers' />")) {
-	    		return;
-	    	};
-	    	
-			if (!groupsAllButton.is('.disabled') &&
-				!confirm("<fmt:message key='message.disclose.correct.before.groups.answers' />")) {
-				return;
-			}
-			
-	    	let nonDisclosedQuestions = $('option[correctDisclosed="false"]', questionUidSelect),
-	    		lastQuestionUid = nonDisclosedQuestions.last().val();	
-	    	nonDisclosedQuestions.each(function(index){
-			    var option = $(this),
-			    	questionUid = option.val(),
-			    	// we notify learners only once, by the last question
-			    	isLast = questionUid == lastQuestionUid;
-		    	
-				$.ajax({
-                    type: 'POST',
-					'url'  : '<lams:WebAppURL />monitoring/discloseCorrectAnswers.do?<csrf:token/>',
-					'data' : {
-						'questionUid'   : questionUid,
-						'toolContentID' : '${sessionMap.assessment.contentId}',
-						'skipLearnersNotification' : !isLast
-					}
-				}).done(function(){
-					option.attr('correctDisclosed', 'true');
-					if (questionUidSelect.val() == questionUid) {
-						correctButton.addClass('disabled').html(checkIcon + correctButtonLabel);
-					}
-				});
-			});
-		    correctAllButton.addClass('disabled').html(checkIcon + correctAllButton.text());
-		});
-
-	    groupsAllButton.click(function(){
-	    	if (!confirm("<fmt:message key='message.disclose.all.groups.answers' />")) {
-	    		return;
-	    	};
-	    	
-	    	let nonDisclosedQuestions = $('option[groupsDisclosed="false"]', questionUidSelect),
-	    		lastQuestionUid = nonDisclosedQuestions.last().val();
-	    	nonDisclosedQuestions.each(function(){
-			    var option = $(this),
-			    	questionUid = option.val(),
-			    	// we notify learners only once, by the last question
-			    	isLast = questionUid == lastQuestionUid;
-		    	
-				$.ajax({
-                    type: 'POST',
-					'url'  : '<lams:WebAppURL />monitoring/discloseGroupsAnswers.do?<csrf:token/>',
-					'data' : {
-						'questionUid'   : questionUid,
-						'toolContentID' : '${sessionMap.assessment.contentId}',
-						'skipLearnersNotification' : !isLast
-					}
-				}).done(function(){
-					option.attr('groupsDisclosed', 'true');
-					if (questionUidSelect.val() == questionUid) {
-						groupsButton.addClass('disabled').html(checkIcon + groupsButtonLabel);
-					}
-				});
-			});
-		    groupsAllButton.addClass('disabled').html(checkIcon + groupsAllButton.text());
-		});
 
 		// trigger the resize when the window first opens so that the grid uses all the space available.
 		setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
@@ -497,72 +345,39 @@
 		
 	<c:if test="${sessionMap.isGroupedActivity}">
 		</div> <!--  end panel group -->
-	</c:if>
-
-	<!-- Dropdown menu for choosing a question type -->	
-	<h5><fmt:message key="label.monitoring.summary.report.by.question" /></h5>
-	
-	<c:set var="allCorrectDisclosed" value="true" />
-	<c:set var="allGroupsDisclosed" value="true" />
-	<div class="form-inline form-group voffset5">
-		<select id="questionUid" class="form-control input-sm">
-			<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
-    		<c:forEach var="question" items="${sessionMap.questionList}" varStatus="questionCount">
-				<option value="${question.uid}"
-						isMultipleChoice="${question.type == 1}"
-						correctDisclosed="${question.correctAnswersDisclosed}"
-						groupsDisclosed="${question.groupsAnswersDisclosed}">
-					${questionCount.count})&nbsp;<c:out value="${question.qbQuestion.name}" escapeXml="true"/>
-				</option>
-				<c:set var="allCorrectDisclosed"
-					   value="${allCorrectDisclosed && (question.type != 1 || question.correctAnswersDisclosed)}" />
-				<c:set var="allGroupsDisclosed" value="${allGroupsDisclosed && question.groupsAnswersDisclosed}" />
-		   	</c:forEach>
-		</select>
-			
-		<a id="questionSummaryHref" class="thickbox btn btn-default disabled">
-			<fmt:message key="label.monitoring.summary.results.question" />
-		</a>
-		<c:if test="${assessment.allowDiscloseAnswers}">
-			<a id="questionDiscloseCorrect" class="btn btn-default disabled">
-				<fmt:message key="label.disclose.correct.answers" />
-			</a>
-			<c:if test="${sessionMap.isGroupedActivity}">
-				<a id="questionDiscloseGroups" class="btn btn-default disabled">
-					<fmt:message key="label.disclose.groups.answers" />
-				</a>
-			</c:if>
-		</c:if>
-	</div>
-
-	<c:if test="${assessment.allowDiscloseAnswers}">
-		<div class="voffset5">
-			<a id="discloseAllCorrect" class="btn btn-default ${allCorrectDisclosed ? 'disabled' : ''}">
-				<c:if test="${allCorrectDisclosed}">
-					<i class="fa fa-check text-success">&nbsp;</i>
-				</c:if>
-				<fmt:message key="label.disclose.all.correct.answers" />
-			</a>
-			<c:if test="${sessionMap.isGroupedActivity}">
-				<a id="discloseAllGroups" class="btn btn-default ${allGroupsDisclosed ? 'disabled' : ''}">
-					<c:if test="${allGroupsDisclosed}">
-						<i class="fa fa-check text-success">&nbsp;</i>
-					</c:if>
-					<fmt:message key="label.disclose.all.groups.answers" />
-				</a>
-			</c:if>
-		</div>
-	</c:if>
-	
-	<c:if test="${vsaPresent}">
-		<div class="voffset5">
-			<a class="thickbox btn btn-default"
-			   href='<c:url value="/monitoring/displayVsaAllocate.do?toolContentID=${sessionMap.assessment.contentId}&KeepThis=true&TB_iframe=true&modal=true"/>'>
-				<fmt:message key="label.vsa.allocate.button" />
-			</a>
-		</div>
-	</c:if>
+	</c:if>	
 </c:if>
+
+<h5><fmt:message key="label.monitoring.summary.report.by.question" /></h5>
+
+<div class="assessment-questions-pane">
+	<c:if test="${showQuestionMonitoringActionButtons and (assessment.allowDiscloseAnswers or vsaPresent)}">
+		<%-- Release correct/groups answers for all questions in this assessment --%>
+		<div class="row">
+			<div class="col-xs-12 col-md-12 col-lg-12">
+				<div class="btn-group-sm pull-right disclose-all-button-group">
+					<div class="btn btn-default disclose-all-correct-button">
+						<fmt:message key="label.disclose.all.correct.answers"/>
+					</div>
+					<div class="btn btn-default disclose-all-groups-button">
+						<fmt:message key="label.disclose.all.groups.answers"/>
+					</div>
+				</div>
+				
+				<c:if test="${vsaPresent}">
+					<a class="thickbox btn btn-sm pull-right btn-default roffset5"
+					   href='<c:url value="/monitoring/displayVsaAllocate.do?toolContentID=${assessment.contentId}&KeepThis=true&TB_iframe=true&modal=true"/>'>
+						<fmt:message key="label.vsa.allocate.button" />
+					</a>
+				</c:if>
+			</div>
+		</div>
+	</c:if>	
+	
+	
+	<div id="results" class="voffset10" data-tool-content-id="${assessment.contentId}"></div>
+</div>
+
 
 <br/>
 

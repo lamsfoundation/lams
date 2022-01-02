@@ -8,6 +8,7 @@
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}"/>
 <c:set var="isLeadershipEnabled" value="${assessment.useSelectLeaderToolOuput}"/>
 <c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
+<c:set var="showQuestionMonitoringActionButtons" value="${not empty sessions}" />
 
 <c:if test="${param.embedded}">
 	<lams:css suffix="jquery.jRating"/>
@@ -31,10 +32,6 @@
 	.monitor-question-buttons {
 		text-align: right;
 		float: right;
-	}
-	
-	.discussion-sentiment-start-button {
-		margin-top: 5px;
 	}
 	
 	@media (min-width: 0px) and (max-width: 767px){
@@ -108,6 +105,10 @@
 	
 		//initialize bootstrap-sliders if "Enable confidence level" option is ON
 		$('.bootstrap-slider').bootstrapSlider();
+
+		<c:if test="${param.showQuestionDetailsButton}">
+			tb_init('a.thickbox');
+		</c:if>
 	
 		<%-- Connect to command websocket only if it is learner UI --%>
 		<c:if test="${not empty toolSessionID}">
@@ -148,7 +149,7 @@
 		<div class="panel-heading">			
 			<c:if test="${param.embedded and empty toolSessionID}">
 				<div class="monitor-question-buttons">
-					<c:if test="${assessment.allowDiscloseAnswers}">
+					<c:if test="${assessment.allowDiscloseAnswers and showQuestionMonitoringActionButtons}">
 						<div class="btn-group-xs disclose-button-group" questionUid="${question.uid}">
 							<%-- Allow disclosing correct answers only for multiple choice questions --%>
 							<c:if test="${question.type == 1}">
@@ -170,13 +171,25 @@
 						</div>
 					</c:if>
 					
-					<c:if test="${assessment.allowDiscussionSentiment}">
-						<div id="discussion-sentiment-start-button-${question.uid}"
-						     class="btn btn-xs btn-default discussion-sentiment-start-button"
-						     onClick="javascript:startDiscussionSentiment(${question.uid}, null, true)">
-							<i class="fa fa-comments"></i><fmt:message key="label.monitoring.discussion.start"/>
+					<c:if test="${param.showQuestionDetailsButton or assessment.allowDiscussionSentiment}">
+						<div class="btn-group-xs voffset5">
+							<c:if test="${param.showQuestionDetailsButton}">
+								<a class="thickbox btn btn-default"
+								   href='<c:url value="/monitoring/questionSummary.do?sessionMapID=${sessionMapID}"/>&questionUid=${question.uid}&KeepThis=true&TB_iframe=true&modal=true'>
+									<i class="fa fa-info-circle"></i>&nbsp;<fmt:message key="label.monitoring.summary.results.question" />
+								</a>
+							</c:if>
+							
+							<c:if test="${assessment.allowDiscussionSentiment and showQuestionMonitoringActionButtons}">
+								<div id="discussion-sentiment-start-button-${question.uid}"
+								     class="btn btn-default discussion-sentiment-start-button"
+								     onClick="javascript:startDiscussionSentiment(${question.uid}, null, true)">
+									<i class="fa fa-comments"></i>&nbsp;<fmt:message key="label.monitoring.discussion.start"/>
+								</div>
+							</c:if>
 						</div>
 					</c:if>
+					
 				</div>
 			</c:if>
 			

@@ -80,7 +80,7 @@
 	<div class="tab-content">
 		<c:forEach var="aeToolContentId" items="${aeToolContentIds}" varStatus="status">
 			<div id="assessment-pane-${aeToolContentId}"
-				 class="tab-pane"
+				 class="tab-pane assessment-questions-pane"
 				 data-tool-type="${aeToolTypes[status.index]}"
 				 data-tool-content-id="${aeToolContentId}">
 			</div>
