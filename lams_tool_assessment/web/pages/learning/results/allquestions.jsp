@@ -8,6 +8,7 @@
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}"/>
 <c:set var="isLeadershipEnabled" value="${assessment.useSelectLeaderToolOuput}"/>
 <c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
+<c:set var="showQuestionMonitoringActionButtons" value="${not empty sessions}" />
 
 <c:if test="${param.embedded}">
 	<lams:css suffix="jquery.jRating"/>
@@ -148,7 +149,7 @@
 		<div class="panel-heading">			
 			<c:if test="${param.embedded and empty toolSessionID}">
 				<div class="monitor-question-buttons">
-					<c:if test="${assessment.allowDiscloseAnswers}">
+					<c:if test="${assessment.allowDiscloseAnswers and showQuestionMonitoringActionButtons}">
 						<div class="btn-group-xs disclose-button-group" questionUid="${question.uid}">
 							<%-- Allow disclosing correct answers only for multiple choice questions --%>
 							<c:if test="${question.type == 1}">
@@ -175,11 +176,11 @@
 							<c:if test="${param.showQuestionDetailsButton}">
 								<a class="thickbox btn btn-default"
 								   href='<c:url value="/monitoring/questionSummary.do?sessionMapID=${sessionMapID}"/>&questionUid=${question.uid}&KeepThis=true&TB_iframe=true&modal=true'>
-									<fmt:message key="label.monitoring.summary.results.question" />
+									<i class="fa fa-info-circle"></i>&nbsp;<fmt:message key="label.monitoring.summary.results.question" />
 								</a>
 							</c:if>
 							
-							<c:if test="${assessment.allowDiscussionSentiment}">
+							<c:if test="${assessment.allowDiscussionSentiment and showQuestionMonitoringActionButtons}">
 								<div id="discussion-sentiment-start-button-${question.uid}"
 								     class="btn btn-default discussion-sentiment-start-button"
 								     onClick="javascript:startDiscussionSentiment(${question.uid}, null, true)">

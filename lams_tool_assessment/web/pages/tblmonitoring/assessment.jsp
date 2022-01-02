@@ -1,12 +1,12 @@
 <%@ include file="/common/taglibs.jsp"%>
 <% pageContext.setAttribute("newLineChar", "\r\n"); %>
-
+<c:set var="showQuestionMonitoringActionButtons" value="${attemptedLearnersNumber > 0}" />
 
 <%@ include file="/pages/monitoring/parts/discloseAnswers.jsp"%>
 
 <script>
 	//for allquestions.jsp to know whether to display an additional button
-	const showQuestionDetailsButton = false;
+	var showQuestionDetailsButton = false;
 	
 	$(document).ready(function(){
 		var assessmentPane = $('#assessment-pane-${toolContentID}');
@@ -59,7 +59,7 @@
 		</div>                 
 	</div>
 		
-	<c:if test="${allowDiscloseAnswers}">
+	<c:if test="${allowDiscloseAnswers and showQuestionMonitoringActionButtons}">
 		<%-- Release correct/groups answers for all questions in this assessment --%>
 		<div class="row">
 			<div class="col-xs-12 col-md-12 col-lg-12">

@@ -3,6 +3,7 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="sessionDtos" value="${sessionMap.sessionDtos}"/>
 <c:set var="assessment" value="${sessionMap.assessment}"/>
+<c:set var="showQuestionMonitoringActionButtons" value="${not empty sessionDtos}" />
 
 <%@ include file="parts/discloseAnswers.jsp"%>
 
@@ -345,38 +346,38 @@
 	<c:if test="${sessionMap.isGroupedActivity}">
 		</div> <!--  end panel group -->
 	</c:if>	
-	
-	<h5><fmt:message key="label.monitoring.summary.report.by.question" /></h5>
-
-	<div class="assessment-questions-pane">
-		<c:if test="${assessment.allowDiscloseAnswers or vsaPresent}">
-			<%-- Release correct/groups answers for all questions in this assessment --%>
-			<div class="row">
-				<div class="col-xs-12 col-md-12 col-lg-12">
-					<div class="btn-group-sm pull-right disclose-all-button-group">
-						<div class="btn btn-default disclose-all-correct-button">
-							<fmt:message key="label.disclose.all.correct.answers"/>
-						</div>
-						<div class="btn btn-default disclose-all-groups-button">
-							<fmt:message key="label.disclose.all.groups.answers"/>
-						</div>
-					</div>
-					
-					<c:if test="${vsaPresent}">
-						<a class="thickbox btn btn-sm pull-right btn-default roffset5"
-						   href='<c:url value="/monitoring/displayVsaAllocate.do?toolContentID=${assessment.contentId}&KeepThis=true&TB_iframe=true&modal=true"/>'>
-							<fmt:message key="label.vsa.allocate.button" />
-						</a>
-					</c:if>
-				</div>
-			</div>
-		</c:if>	
-		
-
-		
-		<div id="results" class="voffset10" data-tool-content-id="${assessment.contentId}"></div>
-	</div>
 </c:if>
+
+<h5><fmt:message key="label.monitoring.summary.report.by.question" /></h5>
+
+<div class="assessment-questions-pane">
+	<c:if test="${showQuestionMonitoringActionButtons and (assessment.allowDiscloseAnswers or vsaPresent)}">
+		<%-- Release correct/groups answers for all questions in this assessment --%>
+		<div class="row">
+			<div class="col-xs-12 col-md-12 col-lg-12">
+				<div class="btn-group-sm pull-right disclose-all-button-group">
+					<div class="btn btn-default disclose-all-correct-button">
+						<fmt:message key="label.disclose.all.correct.answers"/>
+					</div>
+					<div class="btn btn-default disclose-all-groups-button">
+						<fmt:message key="label.disclose.all.groups.answers"/>
+					</div>
+				</div>
+				
+				<c:if test="${vsaPresent}">
+					<a class="thickbox btn btn-sm pull-right btn-default roffset5"
+					   href='<c:url value="/monitoring/displayVsaAllocate.do?toolContentID=${assessment.contentId}&KeepThis=true&TB_iframe=true&modal=true"/>'>
+						<fmt:message key="label.vsa.allocate.button" />
+					</a>
+				</c:if>
+			</div>
+		</div>
+	</c:if>	
+	
+	
+	<div id="results" class="voffset10" data-tool-content-id="${assessment.contentId}"></div>
+</div>
+
 
 <br/>
 
