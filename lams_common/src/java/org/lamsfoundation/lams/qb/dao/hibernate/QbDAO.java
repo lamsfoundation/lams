@@ -20,6 +20,7 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.qb.dao.IQbDAO;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.tool.ToolContent;
 
 public class QbDAO extends LAMSBaseDAO implements IQbDAO {
@@ -150,6 +151,18 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     public List<QbQuestion> getQuestionsByToolContentId(long toolContentId) {
 	return getSession().createQuery(FIND_QUESTIONS_BY_TOOL_CONTENT_ID, QbQuestion.class)
 		.setParameter("toolContentId", toolContentId).setCacheable(true).getResultList();
+    }
+
+    @Override
+    public <T> List<T> getToolQuestionForToolContentId(Class<T> clazz, long toolContentId, long otherToolQuestionUid) {
+	QbToolQuestion toolQuestion = find(QbToolQuestion.class, otherToolQuestionUid);
+
+	String queryText = "FROM " + clazz.getName() + " AS tq "
+		+ "WHERE tq.toolContentId = :toolContentId AND tq.qbQuestion.uid = :qbQuestionUid";
+
+	return getSession().createQuery(queryText, clazz).setParameter("toolContentId", toolContentId)
+		.setParameter("qbQuestionUid", toolQuestion.getQbQuestion().getUid()).setCacheable(true)
+		.getResultList();
     }
 
     @Override

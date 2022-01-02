@@ -560,7 +560,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 
 	try {
 	    ICommonAssessmentService sessionManager = (ICommonAssessmentService) findToolService(tool);
-	    return sessionManager.getVsaAnswers(toolSession.getToolSessionId());
+	    return sessionManager.getVSAnswers(toolSession.getToolSessionId());
 	} catch (NoSuchBeanDefinitionException e) {
 	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to get the tool output. toolActivity "
 		    + toolSession.getToolActivity().getActivityId();

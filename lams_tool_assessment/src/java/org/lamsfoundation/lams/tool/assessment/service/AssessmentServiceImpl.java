@@ -34,7 +34,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -76,6 +75,7 @@ import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.outcome.Outcome;
 import org.lamsfoundation.lams.outcome.OutcomeMapping;
 import org.lamsfoundation.lams.outcome.service.IOutcomeService;
+import org.lamsfoundation.lams.qb.QbUtils;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
@@ -842,13 +842,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	    if (questionDto.getAnswer() != null) {
 		boolean isQuestionCaseSensitive = questionDto.isCaseSensitive();
-		String normalisedQuestionAnswer = AssessmentEscapeUtils.normaliseVSAnswer(questionDto.getAnswer());
+		String normalisedQuestionAnswer = QbUtils.normaliseVSAnswer(questionDto.getAnswer());
 
 		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 		    // refresh latest answers from DB
 		    QbOption qbOption = qbService.getOptionByUid(optionDto.getUid());
 		    optionDto.setName(qbOption.getName());
-		    boolean isAnswerAllocated = AssessmentEscapeUtils.isVSAnswerAllocated(qbOption.getName(),
+		    boolean isAnswerAllocated = QbUtils.isVSAnswerAllocated(qbOption.getName(),
 			    normalisedQuestionAnswer, isQuestionCaseSensitive);
 
 		    if (isAnswerAllocated) {
@@ -1402,6 +1402,25 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
+    public Map<QbToolQuestion, Map<String, Integer>> getUnallocatedVSAnswers(long toolContentId) {
+	Map<QbToolQuestion, Map<String, Integer>> result = new LinkedHashMap<>();
+
+	Assessment assessment = getAssessmentByContentId(toolContentId);
+	for (AssessmentQuestion question : assessment.getQuestions()) {
+	    if (question.getType().equals(QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
+		// gets mapping answer -> user ID for all answers which were not allocation into VSA option yet
+		QuestionSummary questionSummary = getQuestionSummary(toolContentId, question.getUid());
+		Map<String, Integer> notAllocatedAnswerMap = questionSummary.getNotAllocatedQuestionResults().stream()
+			.collect(Collectors.toMap(AssessmentQuestionResult::getAnswer,
+				r -> r.getAssessmentResult().getUser().getUserId().intValue(), (user1, user2) -> user1,
+				LinkedHashMap::new));
+		result.put(question, notAllocatedAnswerMap);
+	    }
+	}
+	return result;
+    }
+
+    @Override
     public QuestionSummary getQuestionSummary(Long contentId, Long questionUid) {
 	AssessmentQuestion question = assessmentQuestionDao.getByUid(questionUid);
 	QbQuestion qbQuestion = question.getQbQuestion();
@@ -1413,37 +1432,19 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	//prepare extra data for VSA type of questions, so teachers can allocate answers into groups
 	if (isVSA) {
-	    boolean isQuestionCaseSensitive = question.getQbQuestion().isCaseSensitive();
 	    //find all questionResults that are not allocated into groups yet
 	    List<AssessmentQuestionResult> notAllocatedQuestionResults = new ArrayList<>();
-	    Set<String> notAllocatedAnswers = new HashSet<>();
+
 	    for (AssessmentQuestionResult questionResult : allQuestionResults) {
 		String answer = questionResult.getAnswer();
 		if (StringUtils.isBlank(answer)) {
 		    continue;
 		}
-
-		String normalisedAnswer = AssessmentEscapeUtils.normaliseVSAnswer(answer);
-
-		boolean isAnswerAllocated = false;
-		for (QbOption option : qbQuestion.getQbOptions()) {
-		    String name = option.getName();
-		    isAnswerAllocated = AssessmentEscapeUtils.isVSAnswerAllocated(name, normalisedAnswer,
-			    isQuestionCaseSensitive);
-		    if (isAnswerAllocated) {
-			break;
-		    }
-		}
-
+		
+		Set<String> notAllocatedAnswers = new HashSet<>();
+		boolean isAnswerAllocated = QbUtils.isVSAnswerAllocated(qbQuestion, answer, notAllocatedAnswers);
 		if (!isAnswerAllocated) {
-		    if (!isQuestionCaseSensitive) {
-			normalisedAnswer = normalisedAnswer.toLowerCase();
-		    }
-		    // do not add repetitive students' suggestions for teacher to assign to an option
-		    if (!notAllocatedAnswers.contains(normalisedAnswer)) {
-			notAllocatedAnswers.add(normalisedAnswer);
-			notAllocatedQuestionResults.add(questionResult);
-		    }
+		    notAllocatedQuestionResults.add(questionResult);
 		}
 	    }
 	    questionSummary.setNotAllocatedQuestionResults(notAllocatedQuestionResults);
@@ -1457,100 +1458,15 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public Long allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid, String answer) {
-	String normalisedAnswer = AssessmentEscapeUtils.normaliseVSAnswer(answer);
-	if (normalisedAnswer == null) {
-	    return null;
-	}
-
-	AssessmentQuestion assessmentQuestion = assessmentQuestionDao.getByUid(questionUid);
-	QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
-	boolean isQuestionCaseSensitive = qbQuestion.isCaseSensitive();
-
-	QbOption previousOption = null;
-	QbOption targetOption = null;
-
-	// look for source and target options
-	for (QbOption option : qbQuestion.getQbOptions()) {
-	    if (previousOptionUid.equals(-1L)) {
-		// new allocation, check if the answer was not allocated anywhere already
-		String name = option.getName();
-		boolean isAnswerAllocated = AssessmentEscapeUtils.isVSAnswerAllocated(name, normalisedAnswer,
-			isQuestionCaseSensitive);
-		if (isAnswerAllocated) {
-		    return option.getUid();
-		}
-	    } else if (previousOption == null && option.getUid().equals(previousOptionUid)) {
-		previousOption = option;
-	    }
-	    if (targetOption == null && !targetOptionUid.equals(-1L) && option.getUid().equals(targetOptionUid)) {
-		targetOption = option;
-	    }
-	}
-
-	if (!targetOptionUid.equals(-1L) && targetOption == null) {
-	    // front end provided incorrect target option UID
-	    log.error("Target option with UID " + targetOptionUid + " was not found in question with UID " + questionUid
-		    + " to allocate answer " + answer);
-	    return null;
-	}
-
-	// remove from already allocated option
-	if (previousOption != null) {
-	    String name = previousOption.getName();
-	    String[] alternatives = name.split(AssessmentEscapeUtils.VSA_ANSWER_DELIMITER);
-
-	    Set<String> nameWithoutUserAnswer = new LinkedHashSet<>(List.of(alternatives));
-	    nameWithoutUserAnswer.remove(normalisedAnswer);
-	    name = nameWithoutUserAnswer.stream()
-		    .collect(Collectors.joining(AssessmentEscapeUtils.VSA_ANSWER_DELIMITER));
-	    previousOption.setName(name);
-	    assessmentDao.saveObject(previousOption);
-	    assessmentDao.flush();
-
-	    if (log.isInfoEnabled()) {
-		log.info("Removed VS answer \"" + answer + "\" from option " + previousOptionUid + " in question "
-			+ questionUid);
-	    }
-	}
-
-	if (targetOption != null) {
-	    String name = targetOption.getName();
-
-	    boolean isAnswerAllocated = AssessmentEscapeUtils.isVSAnswerAllocated(name, normalisedAnswer,
-		    isQuestionCaseSensitive);
-	    if (isAnswerAllocated) {
-		// the answer has been already allocated to the target option
-		return targetOptionUid;
-	    }
-
-	    // append new answer to option
-	    name += AssessmentEscapeUtils.VSA_ANSWER_DELIMITER + answer;
-	    targetOption.setName(name);
-	    assessmentDao.saveObject(targetOption);
-	    assessmentDao.flush();
-
-	    if (log.isInfoEnabled()) {
-		log.info("Allocated VS  answer \"" + answer + "\" to option " + targetOptionUid + " in question "
-			+ questionUid);
-	    }
-	}
-
-	return null;
-    }
-
-    @Override
-    public void recalculateMarksForAllocatedAnswer(Long questionUid, String answer) {
-	AssessmentQuestion assessmentQuestion = assessmentQuestionDao.getByUid(questionUid);
-	QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
-	// get all finished user results
+    public boolean recalculateMarksForVsaQuestion(Long qbQuestionUid, String answer) {
+	// get all user results
 	List<AssessmentResult> assessmentResults = assessmentResultDao
-		.getAssessmentResultsByQbQuestionAndAnswer(qbQuestion.getUid(), answer);
+		.getAssessmentResultsByQbQuestionAndAnswer(qbQuestionUid, answer);
 	//stores userId->lastFinishedAssessmentResult
-	Map<Long, AssessmentResult> lastFinishedAssessmentResults = new LinkedHashMap<>();
+	Map<Long, AssessmentResult> assessmentResultsMap = new LinkedHashMap<>();
 	for (AssessmentResult assessmentResult : assessmentResults) {
 	    Long userId = assessmentResult.getUser().getUserId();
-	    lastFinishedAssessmentResults.put(userId, assessmentResult);
+	    assessmentResultsMap.put(userId, assessmentResult);
 	}
 
 	for (AssessmentResult assessmentResult : assessmentResults) {
@@ -1559,13 +1475,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    int assessmentMaxMark = assessmentResult.getMaximumGrade();
 
 	    for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
-		if (questionResult.getQbQuestion().getUid().equals(qbQuestion.getUid())) {
+		if (questionResult.getQbQuestion().getUid().equals(qbQuestionUid)) {
 		    Float oldQuestionAnswerMark = questionResult.getMark();
 		    int oldResultMaxMark = questionResult.getMaxMark() == null ? 0
 			    : questionResult.getMaxMark().intValue();
 
 		    //actually recalculate marks
-		    QuestionDTO questionDto = new QuestionDTO(assessmentQuestion);
+		    QuestionDTO questionDto = new QuestionDTO(questionResult.getQbToolQuestion());
 		    questionDto.setMaxMark(oldResultMaxMark);
 		    loadupQuestionResultIntoQuestionDto(questionDto, questionResult);
 		    calculateAnswerMark(assessmentResult.getAssessment().getUid(), user.getUserId(), questionResult,
@@ -1579,13 +1495,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    }
 
 	    // store new mark and maxMark if they were changed
-	    AssessmentResult lastFinishedAssessmentResult = lastFinishedAssessmentResults.get(user.getUserId());
+	    AssessmentResult lastFinishedAssessmentResult = assessmentResultsMap.get(user.getUserId());
 	    storeAssessmentResultMarkAndMaxMark(assessmentResult, lastFinishedAssessmentResult, assessmentMark,
 		    assessmentMaxMark, user);
 	}
 
-	//recalculate marks in all Scratchie activities, that use modified QbQuestion
-	toolService.recalculateScratchieMarksForVsaQuestion(qbQuestion.getUid(), answer);
+	return !assessmentResults.isEmpty();
     }
 
     @Override
@@ -3303,7 +3218,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public Collection<VsaAnswerDTO> getVsaAnswers(Long toolSessionId) {
+    public Collection<VsaAnswerDTO> getVSAnswers(Long toolSessionId) {
 	if (toolSessionId == null) {
 	    return new ArrayList<>();
 	}

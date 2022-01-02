@@ -345,7 +345,7 @@
 		submissionDeadline: '${submissionDeadline}',
 		submissionDateString: '${submissionDateString}',
 		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>?<csrf:token/>',
-		toolContentID: '${param.toolContentID}',
+		toolContentID: '${scratchie.contentId}',
 		messageNotification: '<fmt:message key="monitor.summary.notification" />',
 		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
 		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
@@ -384,7 +384,7 @@
 	<c:set var="showStudentChoicesTableOnly" value="true" />
 	<h4><fmt:message key="monitoring.tab.summary" /></h4>
 	<%@ include file="studentChoices.jsp"%>
-
+	
 	<div class="form-group">
 		<!-- Dropdown menu for choosing scratchie item -->
 		<label for="item-uid"><h4><fmt:message key="label.monitoring.summary.report.by.scratchie" /></h4></label>
@@ -396,6 +396,13 @@
 		</select>
 		<a href="#nogo" class="thickbox" id="item-summary-href" style="display: none;"></a>
 	</div>
+	
+	<c:if test="${vsaPresent}">
+		<a class="btn btn-sm btn-default buttons_column" target="_blank"
+		   href='<lams:LAMSURL />qb/vsa/displayVsaAllocate.do?toolContentID=${scratchie.contentId}'>
+			<fmt:message key="label.vsa.allocate.button" />
+		</a>
+	</c:if>
 
 	<h4 style="padding-top: 10px"><fmt:message key="label.report.by.team.tra" /></h4>
 	<fmt:message key="label.monitoring.summary.select.student" />

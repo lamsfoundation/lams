@@ -55,6 +55,7 @@ import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.tool.GroupedToolSession;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -530,12 +531,46 @@ public class LamsToolService implements ILamsToolService {
 	return lamsCoreToolService.getVsaAnswersByToolSession(assessmentSession);
     }
 
+    /**
+     * Get answers for VSA questions which are not already assigned to any of question's options.
+     */
     @Override
-    public void recalculateScratchieMarksForVsaQuestion(Long qbQuestionUid, String answer) {
+    public Map<QbToolQuestion, Map<String, Integer>> getUnallocatedVSAnswers(long toolContentId) {
+	ToolActivity specifiedActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
+	Tool tool = specifiedActivity.getTool();
+	if (tool.getToolSignature().equals(CommonConstants.TOOL_SIGNATURE_ASSESSMENT)) {
+	    ICommonAssessmentService sessionManager = (ICommonAssessmentService) lamsCoreToolService
+		    .findToolService(tool);
+	    return sessionManager.getUnallocatedVSAnswers(toolContentId);
+	} else if (tool.getToolSignature().equals(CommonConstants.TOOL_SIGNATURE_SCRATCHIE)) {
+	    ICommonScratchieService sessionManager = (ICommonScratchieService) lamsCoreToolService
+		    .findToolService(tool);
+	    return sessionManager.getUnallocatedVSAnswers(toolContentId);
+	}
+	return null;
+    }
+
+    @Override
+    public boolean recalculateMarksForVsaQuestion(Long toolQuestionUid, String answer) {
+	QbToolQuestion toolQuestion = activityDAO.find(QbToolQuestion.class, toolQuestionUid);
+	Long qbQuestionUid = toolQuestion.getQbQuestion().getUid();
+	boolean answerFoundInLearnerResults = recalculateAssessmentMarksForVsaQuestion(qbQuestionUid, answer);
+	answerFoundInLearnerResults |= recalculateScratchieMarksForVsaQuestion(qbQuestionUid, answer);
+	return answerFoundInLearnerResults;
+    }
+
+    private boolean recalculateAssessmentMarksForVsaQuestion(Long qbQuestionUid, String answer) {
+	Tool assessmentTool = toolDAO.getToolBySignature(CommonConstants.TOOL_SIGNATURE_ASSESSMENT);
+	ICommonAssessmentService sessionManager = (ICommonAssessmentService) lamsCoreToolService
+		.findToolService(assessmentTool);
+	return sessionManager.recalculateMarksForVsaQuestion(qbQuestionUid, answer);
+    }
+
+    private boolean recalculateScratchieMarksForVsaQuestion(Long qbQuestionUid, String answer) {
 	Tool scratchieTool = toolDAO.getToolBySignature(CommonConstants.TOOL_SIGNATURE_SCRATCHIE);
 	ICommonScratchieService sessionManager = (ICommonScratchieService) lamsCoreToolService
 		.findToolService(scratchieTool);
-	sessionManager.recalculateScratchieMarksForVsaQuestion(qbQuestionUid, answer);
+	return sessionManager.recalculateMarksForVsaQuestion(qbQuestionUid, answer);
     }
 
     @Override
