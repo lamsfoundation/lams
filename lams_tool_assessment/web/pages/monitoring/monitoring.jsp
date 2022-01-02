@@ -7,6 +7,8 @@
 
 <lams:html>
 	<lams:head>
+		<title><c:out value="${assessment.title}" /></title>
+		
 		<%@ include file="/common/tabbedheader.jsp" %>
 		<link href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet" type="text/css">
 		<link href="${lams}css/jquery-ui.timepicker.css" rel="stylesheet" type="text/css">

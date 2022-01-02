@@ -1,0 +1,46 @@
+.sortable-on {
+	border: 3px solid #286090;
+	border-radius: 10px;
+	height: 200px;
+	padding: 10px;
+	overflow-y: auto;
+}
+
+.sortable-on .portrait-generic-sm {
+	margin-right: 5px;
+}
+
+.sortable-on .portrait-anonymous {
+	color: #ddd;
+}
+
+.tbl-correct-list {
+	border: 3px solid #3c763d;
+	background-color: #3c763d10;
+}
+
+.tbl-incorrect-list {
+	border: 3px solid #a94442;
+	background-color: #a9444210;
+}
+
+.answer-queue {
+	border: 2px solid #ddd;
+}
+
+.answer-alternatives {
+	text-align: left;
+	margin-top: 5px;
+}
+
+.answer-alternatives button {
+	margin: 2px;
+}
+
+.filtered {
+	background-color: lightgrey;
+}
+
+.list-group-item {
+	cursor: pointer;
+}

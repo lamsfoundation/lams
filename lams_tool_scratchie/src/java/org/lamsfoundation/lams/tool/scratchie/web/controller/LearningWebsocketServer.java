@@ -236,7 +236,13 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
      * The time limit is expired but leader hasn't submitted required notebook/burning questions yet. Non-leaders
      * will need to refresh the page in order to stop showing them questions page.
      */
-    public void sendPageRefreshRequest(long toolContentId, long toolSessionId) throws IOException {
+    public void sendPageRefreshRequest(Long toolContentId, long toolSessionId) throws IOException {
+	if (toolContentId == null) {
+	    // get tool content ID from seession
+	    ScratchieSession scratchieSession = scratchieService.getScratchieSessionBySessionId(toolSessionId);
+	    toolContentId = scratchieSession.getScratchie().getContentId();
+	}
+
 	Set<Session> sessionWebsockets = websockets.get(toolContentId);
 	if (sessionWebsockets == null) {
 	    return;

@@ -45,6 +45,8 @@ public interface IQbService {
 
     QbQuestion getQuestionByUUID(UUID uuid);
 
+    <T> List<T> getToolQuestionForToolContentId(Class<T> clazz, long toolContentId, long otherToolQuestionUid);
+
     /**
      * @param optionUid
      * @return QbOption by its uid. Besides, it releases returned object and associated qbQuestion from the cache.
@@ -167,4 +169,6 @@ public interface IQbService {
     TreeSet<QbOption> getOptionsFromRequest(HttpServletRequest request, boolean isForSaving);
 
     TreeSet<QbQuestionUnit> getUnitsFromRequest(HttpServletRequest request, boolean isForSaving);
+
+    Long allocateVSAnswerToOption(Long qbQuestionUid, Long targetOptionUid, Long previousOptionUid, String answer);
 }

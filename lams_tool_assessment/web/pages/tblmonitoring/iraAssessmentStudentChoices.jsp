@@ -88,7 +88,7 @@
 		</a>
 		<c:if test="${vsaPresent}">
 			<a class="btn btn-sm btn-default buttons_column" target="_blank"
-			   href='<c:url value="/monitoring/displayVsaAllocate.do?toolContentID=${toolContentID}"/>'>
+			   href='<lams:LAMSURL />qb/vsa/displayVsaAllocate.do?toolContentID=${toolContentID}'>
 				<fmt:message key="label.vsa.allocate.button" />
 			</a>
 		</c:if>
