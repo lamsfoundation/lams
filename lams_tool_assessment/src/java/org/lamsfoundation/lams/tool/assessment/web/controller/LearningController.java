@@ -1257,8 +1257,14 @@ public class LearningController {
 		true);
 
 	// initialize Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<>();
-	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+
+	SessionMap<String, Object> sessionMap = null;
+	if (StringUtils.isBlank(request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID))) {
+	    sessionMap = new SessionMap<>();
+	    request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	} else {
+	    sessionMap = getSessionMap(request);
+	}
 
 	Assessment assessment = service.getAssessmentByContentId(toolContentId);
 

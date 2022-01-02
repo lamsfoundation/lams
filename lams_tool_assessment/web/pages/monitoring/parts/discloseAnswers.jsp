@@ -5,8 +5,8 @@
 		var toolContentId = resultsPane.data('toolContentId');
 		// load an embedded results list
 		// show details button needs to be set in the page which included this page
-		resultsPane.load("<c:url value='/learning/showResultsForTeacher.do'/>?embedded=true&showQuestionDetailsButton=" + showQuestionDetailsButton 
-						  + "&toolContentID=" + toolContentId, function(){
+		resultsPane.load("<c:url value='/learning/showResultsForTeacher.do'/>?embedded=true&sessionMapID=${sessionMapID}&showQuestionDetailsButton="
+						  + showQuestionDetailsButton + "&toolContentID=" + toolContentId, function(){
 			var assessmentQuestionsPane = $(this).closest('.assessment-questions-pane'),
 				// are any correct/groups buttons clickable?
 				discloseAllCorrectEnabled = false,

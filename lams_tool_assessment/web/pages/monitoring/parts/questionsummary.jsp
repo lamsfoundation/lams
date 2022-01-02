@@ -368,13 +368,15 @@
             </div></div>
             
             <!--history responses-->
-            <h5><fmt:message key="label.monitoring.question.summary.history.responses" /></h5>
-			<c:forEach var="sessionDto" items="${sessionDtos}">
-				<div class="voffset20">
-					<table id="session${sessionDto.sessionId}"></table>
-					<div id="pager${sessionDto.sessionId}"></div>
-				</div>	
-			</c:forEach>
+            <c:if test="${not empty sessionDtos}">
+	            <h5><fmt:message key="label.monitoring.question.summary.history.responses" /></h5>
+				<c:forEach var="sessionDto" items="${sessionDtos}">
+					<div class="voffset20">
+						<table id="session${sessionDto.sessionId}"></table>
+						<div id="pager${sessionDto.sessionId}"></div>
+					</div>	
+				</c:forEach>
+			</c:if>
 			
             <!--allocate responses-->
 			<c:if test="${questionDto.type == 3}">
