@@ -67,6 +67,8 @@ Undertow core 2.0.13
 
 Undertow servlet 2.0.13
 
+UOC LTI Advantage integration 0.0.3
+
 xmltooling 1.4.0
 
 XStream 1.4.11
