@@ -613,6 +613,7 @@
 		<copy todir="${server.home}/modules/system/layers/base/io/jsonwebtoken/main" overwrite="true" verbose="true">
 			<fileset dir="lib/json">
 				<include name="jjwt-*.jar" />
+				<include name="jwks-*.jar" />
 			</fileset>
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/io/jsonwebtoken/main/module.xml"
