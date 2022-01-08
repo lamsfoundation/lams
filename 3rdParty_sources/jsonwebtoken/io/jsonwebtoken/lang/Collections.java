@@ -26,10 +26,7 @@ import java.util.Properties;
 
 public final class Collections {
 
-    //for code coverage
-    private static final Collections INSTANCE = new Collections();
-
-    private Collections(){}
+    private Collections(){} //prevent instantiation
 
     /**
      * Return <code>true</code> if the supplied Collection is <code>null</code>

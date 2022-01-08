@@ -15,10 +15,29 @@
  */
 package io.jsonwebtoken.impl;
 
+import io.jsonwebtoken.io.Decoder;
+import io.jsonwebtoken.io.Encoder;
+
+/**
+ * @deprecated since 0.10.0.  Use an {@link Encoder} or {@link Decoder}
+ * as needed.  This class will be removed before 1.0.0
+ */
+@Deprecated
 public interface TextCodec {
 
-    public static final TextCodec BASE64    = new DefaultTextCodecFactory().getTextCodec();
-    public static final TextCodec BASE64URL = new Base64UrlCodec();
+    /**
+     * @deprecated since 0.10.0.  Use {@code io.jsonwebtoken.io.Encoders#BASE64} or
+     * {@code io.jsonwebtoken.io.Decoders#BASE64} instead. This class will be removed before 1.0.0
+     */
+    @Deprecated
+    TextCodec BASE64 = new Base64Codec();
+
+    /**
+     * @deprecated since 0.10.0.  Use {@code io.jsonwebtoken.io.Encoders#BASE64URL} or
+     * {@code io.jsonwebtoken.io.Decoders#BASE64URL} instead. This class will be removed before 1.0.0
+     */
+    @Deprecated
+    TextCodec BASE64URL = new Base64UrlCodec();
 
     String encode(String data);
 

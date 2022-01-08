@@ -21,9 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class RuntimeEnvironment {
 
-    private static final RuntimeEnvironment INSTANCE = new RuntimeEnvironment();
-
-    private RuntimeEnvironment(){}
+    private RuntimeEnvironment(){} //prevent instantiation
 
     private static final String BC_PROVIDER_CLASS_NAME = "org.bouncycastle.jce.provider.BouncyCastleProvider";
 
@@ -33,7 +31,7 @@ public final class RuntimeEnvironment {
 
     public static void enableBouncyCastleIfPossible() {
 
-        if (bcLoaded.get()) {
+        if (!BOUNCY_CASTLE_AVAILABLE || bcLoaded.get()) {
             return;
         }
 

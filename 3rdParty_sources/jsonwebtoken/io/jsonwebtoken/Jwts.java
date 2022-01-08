@@ -15,11 +15,7 @@
  */
 package io.jsonwebtoken;
 
-import io.jsonwebtoken.impl.DefaultClaims;
-import io.jsonwebtoken.impl.DefaultHeader;
-import io.jsonwebtoken.impl.DefaultJwsHeader;
-import io.jsonwebtoken.impl.DefaultJwtBuilder;
-import io.jsonwebtoken.impl.DefaultJwtParser;
+import io.jsonwebtoken.lang.Classes;
 
 import java.util.Map;
 
@@ -31,7 +27,10 @@ import java.util.Map;
  */
 public final class Jwts {
 
-    private Jwts(){}
+    private static final Class[] MAP_ARG = new Class[]{Map.class};
+
+    private Jwts() {
+    }
 
     /**
      * Creates a new {@link Header} instance suitable for <em>plaintext</em> (not digitally signed) JWTs.  As this
@@ -41,7 +40,7 @@ public final class Jwts {
      * @return a new {@link Header} instance suitable for <em>plaintext</em> (not digitally signed) JWTs.
      */
     public static Header header() {
-        return new DefaultHeader();
+        return Classes.newInstance("io.jsonwebtoken.impl.DefaultHeader");
     }
 
     /**
@@ -52,7 +51,7 @@ public final class Jwts {
      * @return a new {@link Header} instance suitable for <em>plaintext</em> (not digitally signed) JWTs.
      */
     public static Header header(Map<String, Object> header) {
-        return new DefaultHeader(header);
+        return Classes.newInstance("io.jsonwebtoken.impl.DefaultHeader", MAP_ARG, header);
     }
 
     /**
@@ -62,7 +61,7 @@ public final class Jwts {
      * @see JwtBuilder#setHeader(Header)
      */
     public static JwsHeader jwsHeader() {
-        return new DefaultJwsHeader();
+        return Classes.newInstance("io.jsonwebtoken.impl.DefaultJwsHeader");
     }
 
     /**
@@ -74,7 +73,7 @@ public final class Jwts {
      * @see JwtBuilder#setHeader(Header)
      */
     public static JwsHeader jwsHeader(Map<String, Object> header) {
-        return new DefaultJwsHeader(header);
+        return Classes.newInstance("io.jsonwebtoken.impl.DefaultJwsHeader", MAP_ARG, header);
     }
 
     /**
@@ -83,7 +82,7 @@ public final class Jwts {
      * @return a new {@link Claims} instance to be used as a JWT body.
      */
     public static Claims claims() {
-        return new DefaultClaims();
+        return Classes.newInstance("io.jsonwebtoken.impl.DefaultClaims");
     }
 
     /**
@@ -93,16 +92,42 @@ public final class Jwts {
      * @return a new {@link Claims} instance populated with the specified name/value pairs.
      */
     public static Claims claims(Map<String, Object> claims) {
-        return new DefaultClaims(claims);
+        return Classes.newInstance("io.jsonwebtoken.impl.DefaultClaims", MAP_ARG, claims);
     }
 
     /**
      * Returns a new {@link JwtParser} instance that can be configured and then used to parse JWT strings.
      *
      * @return a new {@link JwtParser} instance that can be configured and then used to parse JWT strings.
+     * @deprecated use {@link Jwts#parserBuilder()} instead. See {@link JwtParserBuilder} for usage details.
+     * <p>Migration to new method structure is minimal, for example:
+     * <p>Old code:
+     * <pre>{@code
+     *     Jwts.parser()
+     *         .requireAudience("string")
+     *         .parse(jwtString)
+     * }</pre>
+     * <p>New code:
+     * <pre>{@code
+     *     Jwts.parserBuilder()
+     *         .requireAudience("string")
+     *         .build()
+     *         .parse(jwtString)
+     * }</pre>
+     * <p><b>NOTE: this method will be removed before version 1.0</b>
      */
+    @Deprecated
     public static JwtParser parser() {
-        return new DefaultJwtParser();
+        return Classes.newInstance("io.jsonwebtoken.impl.DefaultJwtParser");
+    }
+
+    /**
+     * Returns a new {@link JwtParserBuilder} instance that can be configured to create an immutable/thread-safe {@link JwtParser).
+     *
+     * @return a new {@link JwtParser} instance that can be configured create an immutable/thread-safe {@link JwtParser).
+     */
+    public static JwtParserBuilder parserBuilder() {
+        return Classes.newInstance("io.jsonwebtoken.impl.DefaultJwtParserBuilder");
     }
 
     /**
@@ -113,6 +138,6 @@ public final class Jwts {
      * strings.
      */
     public static JwtBuilder builder() {
-        return new DefaultJwtBuilder();
+        return Classes.newInstance("io.jsonwebtoken.impl.DefaultJwtBuilder");
     }
 }

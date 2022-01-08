@@ -15,6 +15,10 @@
  */
 package io.jsonwebtoken.impl;
 
+/**
+ * @deprecated since 0.10.0
+ */
+@Deprecated //remove just before 1.0.0 release
 public class DefaultTextCodecFactory implements TextCodecFactory {
 
     protected String getSystemProperty(String key) {

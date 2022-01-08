@@ -18,16 +18,16 @@ package io.jsonwebtoken;
 /**
  * Compresses and decompresses byte arrays according to a compression algorithm.
  *
- * @see io.jsonwebtoken.impl.compression.DeflateCompressionCodec
- * @see io.jsonwebtoken.impl.compression.GzipCompressionCodec
+ * @see CompressionCodecs#DEFLATE
+ * @see CompressionCodecs#GZIP
  * @since 0.6.0
  */
 public interface CompressionCodec {
 
     /**
-     * The algorithm name to use as the JWT's {@code calg} header value.
+     * The compression algorithm name to use as the JWT's {@code zip} header value.
      *
-     * @return the algorithm name to use as the JWT's {@code calg} header value.
+     * @return the compression algorithm name to use as the JWT's {@code zip} header value.
      */
     String getAlgorithmName();
 

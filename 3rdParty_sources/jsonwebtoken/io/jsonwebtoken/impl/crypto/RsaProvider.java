@@ -16,8 +16,9 @@
 package io.jsonwebtoken.impl.crypto;
 
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.lang.Assert;
+import io.jsonwebtoken.lang.RuntimeEnvironment;
+import io.jsonwebtoken.security.SignatureException;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.Key;
@@ -52,6 +53,10 @@ public abstract class RsaProvider extends SignatureProvider {
         m.put(SignatureAlgorithm.PS512, spec);
 
         return m;
+    }
+
+    static {
+        RuntimeEnvironment.enableBouncyCastleIfPossible(); //PS256, PS384, PS512 on <= JDK 10 require BC
     }
 
     protected RsaProvider(SignatureAlgorithm alg, Key key) {
@@ -111,7 +116,37 @@ public abstract class RsaProvider extends SignatureProvider {
      * @since 0.5
      */
     public static KeyPair generateKeyPair(int keySizeInBits) {
-        return generateKeyPair(keySizeInBits, SignatureProvider.DEFAULT_SECURE_RANDOM);
+        return generateKeyPair(keySizeInBits, DEFAULT_SECURE_RANDOM);
+    }
+
+    /**
+     * Generates a new RSA secure-randomly key pair suitable for the specified SignatureAlgorithm using JJWT's
+     * default {@link SignatureProvider#DEFAULT_SECURE_RANDOM SecureRandom instance}.  This is a convenience method
+     * that immediately delegates to {@link #generateKeyPair(int)} based on the relevant key size for the specified
+     * algorithm.
+     *
+     * @param alg the signature algorithm to inspect to determine a size in bits.
+     * @return a new RSA secure-random key pair of the specified size.
+     * @see #generateKeyPair()
+     * @see #generateKeyPair(int, SecureRandom)
+     * @see #generateKeyPair(String, int, SecureRandom)
+     * @since 0.10.0
+     */
+    @SuppressWarnings("unused") //used by io.jsonwebtoken.security.Keys
+    public static KeyPair generateKeyPair(SignatureAlgorithm alg) {
+        Assert.isTrue(alg.isRsa(), "Only RSA algorithms are supported by this method.");
+        int keySizeInBits = 4096;
+        switch (alg) {
+            case RS256:
+            case PS256:
+                keySizeInBits = 2048;
+                break;
+            case RS384:
+            case PS384:
+                keySizeInBits = 3072;
+                break;
+        }
+        return generateKeyPair(keySizeInBits, DEFAULT_SECURE_RANDOM);
     }
 
     /**
