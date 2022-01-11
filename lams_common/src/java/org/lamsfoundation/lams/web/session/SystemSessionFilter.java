@@ -41,6 +41,9 @@ import javax.servlet.http.HttpServletResponse;
  * @author Steve.Ni
  */
 public class SystemSessionFilter implements Filter {
+
+    private static final String CONTEXT_ERROR_PAGE = "/error.jsp";
+
     @Override
     public void init(FilterConfig config) throws ServletException {
     }
@@ -54,7 +57,15 @@ public class SystemSessionFilter implements Filter {
 	    return;
 	}
 
-	SessionManager.startSession((HttpServletRequest) request);
+	HttpServletRequest httpRequest = (HttpServletRequest) request;
+	String requestURI = httpRequest.getRequestURI();
+	if (requestURI.endsWith(CONTEXT_ERROR_PAGE)) {
+	    // do not create a session for displaying error page
+	    chain.doFilter(request, response);
+	    return;
+	}
+
+	SessionManager.startSession(httpRequest);
 	// do following part of chain
 	chain.doFilter(request, response);
 	SessionManager.endSession();
