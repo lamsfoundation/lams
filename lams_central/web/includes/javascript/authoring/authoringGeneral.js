@@ -8,6 +8,23 @@
  */
 $(document).ready(function() {
 	GeneralInitLib.initAll();
+	
+	// we display authoring in separate window if LAMS acts as a LTI 1.3 Tool
+	if (isLtiContentSelection) {
+	    window.onbeforeunload = function(e) {
+			if (window.opener && typeof window.opener.refreshSeqList === 'function') {
+				window.opener.refreshSeqList();
+			}
+			
+			if (!GeneralLib.canClose()) {
+				e.preventDefault();
+				e.returnValue = LABELS.NAVIGATE_AWAY_CONFIRM;
+				return LABELS.NAVIGATE_AWAY_CONFIRM;
+			}
+			
+			delete e['returnValue'];
+		}
+	}
 });
 
 

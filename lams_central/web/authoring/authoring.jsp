@@ -143,6 +143,9 @@
 				TEMPLATES : decoderDiv.html('<c:out value="${TEMPLATES_VAR}" />').text(),
 				<fmt:message key="authoring.fla.page.menu.apply.changes" var="LIVE_EDIT_SAVE_VAR"/>
 				LIVE_EDIT_SAVE : decoderDiv.html('<c:out value="${LIVE_EDIT_SAVE_VAR}" />').text(),
+				<fmt:message key="authoring.fla.navigate.away.confirm" var="NAVIGATE_AWAY_CONFIRM_VAR"/>
+				NAVIGATE_AWAY_CONFIRM : decoderDiv.html('<c:out value="${NAVIGATE_AWAY_CONFIRM_VAR}" />').text(),
+					
 				
 				// HandlerLib
 				<fmt:message key="authoring.fla.transition.from.exists.error" var="TRANSITION_FROM_EXISTS_ERROR_VAR"/>
@@ -277,6 +280,7 @@
 			canSetReadOnly = ${canSetReadOnly},
 			isReadOnlyMode = false,
 			activitiesOnlySelectable = false,
+			isLtiContentSelection = ${param.ltiContentSelection eq 'true'},
 			initContentFolderID = '${contentFolderID}',
 			initLearningDesignID = '${param.learningDesignID}',
 			initAccess = ${access},
