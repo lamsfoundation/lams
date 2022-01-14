@@ -10,7 +10,7 @@ var ldTreeview = {
 		ldTree : null,
 		// can be i18n
 		LABEL_RUN_SEQUENCES_FOLDER : 'Run sequences',
-		FOLDER_CONTENTS_FETCH_URL = LAMS_URL + 'home/getFolderContents.do',
+		FOLDER_CONTENTS_FETCH_URL : 'home/getFolderContents.do',
 		
 		
 		/**
@@ -58,7 +58,7 @@ var ldTreeview = {
 				result = [];
 				
 			$.ajax({
-				url : FOLDER_CONTENTS_FETCH_URL,
+				url : LAMS_URL + this.FOLDER_CONTENTS_FETCH_URL,
 				data : {
 					'folderID' : folderID,
 					'allowInvalidDesigns' : allowInvalidDesigns
