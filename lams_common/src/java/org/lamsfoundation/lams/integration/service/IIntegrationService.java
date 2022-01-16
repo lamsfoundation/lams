@@ -61,6 +61,8 @@ public interface IIntegrationService {
     ExtUserUseridMap getExtUserUseridMap(ExtServer extServer, String extUsername, boolean prefix)
 	    throws UserInfoFetchException, UserInfoValidationException;
 
+    ExtUserUseridMap getExtUserUseridMapByUserId(ExtServer extServer, Integer userId);
+
     /**
      * compatibility method to support existing integrations. It does callback call to integrated server to get user
      * details.

@@ -950,7 +950,7 @@ public class IntegrationService implements IIntegrationService {
 	}
     }
 
-    private ExtUserUseridMap getExtUserUseridMapByUserId(ExtServer extServer, Integer userId) {
+    public ExtUserUseridMap getExtUserUseridMapByUserId(ExtServer extServer, Integer userId) {
 	Map<String, Object> properties = new HashMap<>();
 	properties.put("extServer.sid", extServer.getSid());
 	properties.put("user.userId", userId);
