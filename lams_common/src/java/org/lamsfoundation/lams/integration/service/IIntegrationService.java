@@ -213,7 +213,8 @@ public interface IIntegrationService {
      * @return
      * @throws UnsupportedEncodingException
      */
-    String getLessonFinishCallbackUrl(User user, Lesson lesson) throws UnsupportedEncodingException;
+    String getLessonFinishCallbackUrl(User user, Lesson lesson, Long finishedActivityId)
+	    throws UnsupportedEncodingException;
 
     /**
      * Check whether specified lesson was created using LTI consumer, and if so - push user mark to that server

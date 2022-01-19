@@ -78,12 +78,27 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						}
 						window.location.href = url;
 					}
-				</script>
-			
-				<script language="JavaScript" type="text/JavaScript">
+					
 					$(document).ready(function(){
+
+						// submit lesson total mark to the integrated server in case request comes from an integrated server
+						if (${not empty param.activityFinishUrl}) {
+							$.ajax({ 
+							    url: "${param.activityFinishUrl}",
+							    type: "POST",
+							    dataType: 'html',
+								cache: false,
+								async: 'false',
+							    error: function (ajaxContext) {
+							        alert("There was an error on trying to submit activity mark to the integrated server: " + ajaxContext.responseText)
+							    }
+							});
+						}
+						
 						redirectPage();
 					});
+
+					
 				</script>
 			
 				<lams:Page type="admin">
