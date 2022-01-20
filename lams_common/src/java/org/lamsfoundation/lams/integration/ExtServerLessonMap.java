@@ -54,6 +54,9 @@ public class ExtServerLessonMap {
     @JoinColumn(name = "ext_server_org_map_id")
     private ExtServer extServer;
 
+    @Column(name = "grading_type")
+    private String gradingType;
+
     public ExtServerLessonMap() {
     }
 
@@ -94,5 +97,13 @@ public class ExtServerLessonMap {
 
     public void setExtServer(ExtServer extServer) {
 	this.extServer = extServer;
+    }
+
+    public String getGradingType() {
+	return gradingType;
+    }
+
+    public void setGradingType(String gradingType) {
+	this.gradingType = gradingType;
     }
 }
