@@ -57,6 +57,9 @@ public class ExtServerLessonMap {
     @Column(name = "grading_type")
     private String gradingType;
 
+    @Column(name = "grading_url")
+    private String gradingUrl;
+
     public ExtServerLessonMap() {
     }
 
@@ -105,5 +108,13 @@ public class ExtServerLessonMap {
 
     public void setGradingType(String gradingType) {
 	this.gradingType = gradingType;
+    }
+
+    public String getGradingUrl() {
+	return gradingUrl;
+    }
+
+    public void setGradingUrl(String gradingUrl) {
+	this.gradingUrl = gradingUrl;
     }
 }
