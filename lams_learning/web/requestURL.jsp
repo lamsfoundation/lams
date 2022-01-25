@@ -32,6 +32,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			function doRedirect() {
 				var myParent = parent;
 				var url = decodeURIComponent("<c:out value='${url}' escapeXml='false' />");
+				<c:if test="${not empty param.finishedActivityId}">
+					url += '&finishedActivityId=${param.finishedActivityId}';
+				</c:if>
 				if ( myParent )
 					myParent.location.href = url;
 				else 
