@@ -28,6 +28,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -37,6 +39,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "lams_ext_server_lesson_map")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class ExtServerLessonMap {
 
     @Id
@@ -53,12 +56,6 @@ public class ExtServerLessonMap {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ext_server_org_map_id")
     private ExtServer extServer;
-
-    @Column(name = "grading_type")
-    private String gradingType;
-
-    @Column(name = "grading_url")
-    private String gradingUrl;
 
     public ExtServerLessonMap() {
     }
@@ -100,21 +97,5 @@ public class ExtServerLessonMap {
 
     public void setExtServer(ExtServer extServer) {
 	this.extServer = extServer;
-    }
-
-    public String getGradingType() {
-	return gradingType;
-    }
-
-    public void setGradingType(String gradingType) {
-	this.gradingType = gradingType;
-    }
-
-    public String getGradingUrl() {
-	return gradingUrl;
-    }
-
-    public void setGradingUrl(String gradingUrl) {
-	this.gradingUrl = gradingUrl;
     }
 }
