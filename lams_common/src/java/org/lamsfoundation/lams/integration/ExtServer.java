@@ -122,6 +122,33 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
     @Column(name = "user_id_parameter_name")
     private String userIdParameterName;
 
+    @Column(name = "lti_adv_issuer")
+    private String issuer;
+
+    @Column(name = "lti_adv_client_id")
+    private String clientId;
+
+    @Column(name = "lti_adv_platform_key_set_url")
+    private String platformKeySetUrl;
+
+    @Column(name = "lti_adv_oidc_auth_url")
+    private String oidcAuthUrl;
+
+    @Column(name = "lti_adv_access_token_url")
+    private String accessTokenUrl;
+
+    @Column(name = "lti_adv_tool_key_set_url")
+    private String toolKeySetUrl;
+
+    @Column(name = "lti_adv_tool_key_id")
+    private String toolKeyId;
+
+    @Column(name = "lti_adv_public_key")
+    private String publicKey;
+
+    @Column(name = "lti_adv_private_key")
+    private String privateKey;
+
     public ExtServer() {
 	timeToLiveLoginRequest = 80;
 	userIdParameterName = "user_id";
@@ -355,5 +382,77 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
 
     public void setUserIdParameterName(String userIdParameterName) {
 	this.userIdParameterName = userIdParameterName;
+    }
+
+    public String getIssuer() {
+	return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+	this.issuer = issuer;
+    }
+
+    public String getClientId() {
+	return clientId;
+    }
+
+    public void setClientId(String clientId) {
+	this.clientId = clientId;
+    }
+
+    public String getPlatformKeySetUrl() {
+	return platformKeySetUrl;
+    }
+
+    public void setPlatformKeySetUrl(String platformKeySetUrl) {
+	this.platformKeySetUrl = platformKeySetUrl;
+    }
+
+    public String getOidcAuthUrl() {
+	return oidcAuthUrl;
+    }
+
+    public void setOidcAuthUrl(String oidcAuthUrl) {
+	this.oidcAuthUrl = oidcAuthUrl;
+    }
+
+    public String getAccessTokenUrl() {
+	return accessTokenUrl;
+    }
+
+    public void setAccessTokenUrl(String accessTokenUrl) {
+	this.accessTokenUrl = accessTokenUrl;
+    }
+
+    public String getToolKeySetUrl() {
+	return toolKeySetUrl;
+    }
+
+    public void setToolKeySetUrl(String toolKeySetUrl) {
+	this.toolKeySetUrl = toolKeySetUrl;
+    }
+
+    public String getToolKeyId() {
+	return toolKeyId;
+    }
+
+    public void setToolKeyId(String toolKeyId) {
+	this.toolKeyId = toolKeyId;
+    }
+
+    public String getPublicKey() {
+	return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+	this.publicKey = publicKey;
+    }
+
+    public String getPrivateKey() {
+	return privateKey;
+    }
+
+    public void setPrivateKey(String privateKey) {
+	this.privateKey = privateKey;
     }
 }

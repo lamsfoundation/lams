@@ -127,6 +127,19 @@ public class IntegrationService implements IIntegrationService {
     }
 
     @Override
+    public ExtServer getExtServer(String ltiAdvantageIssuer, String ltiAdvantageClientId) {
+	Map<String, Object> properties = new HashMap<>();
+	properties.put("issuer", ltiAdvantageIssuer);
+	properties.put("clientId", ltiAdvantageClientId);
+	List<ExtServer> list = service.findByProperties(ExtServer.class, properties, true);
+	if (list == null || list.size() == 0) {
+	    return null;
+	} else {
+	    return list.get(0);
+	}
+    }
+
+    @Override
     public ExtCourseClassMap getExtCourseClassMap(Integer sid, String extCourseId) {
 	Map<String, Object> properties = new HashMap<>();
 	properties.put("courseid", extCourseId);
@@ -671,7 +684,7 @@ public class IntegrationService implements IIntegrationService {
 
 	    lessonFinishCallbackUrl = lessonFinishCallbackUrl.replaceAll("%activityId%",
 		    finishedActivityId == null ? "" : finishedActivityId.toString());
-	    
+
 	    log.debug(lessonFinishCallbackUrl);
 	}
 	// in case of LTI Tool Consumer - pushMarkToIntegratedServer() method will be invoked from GradebookService on mark update

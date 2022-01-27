@@ -58,6 +58,7 @@
       <module name="net.gjerull.etherpad.client" export="true" />
   	  <module name="com.codahale.passpol" export="true" />
   	  <module name="com.zaxxer.sparsebits" export="true" />
+  	  <module name="org.bouncycastle" export="true" />
       
       <!-- Import META-INF/services for ServiceLoader impls as well
       <module name="myservicemodule" services="import"/>

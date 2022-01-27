@@ -112,6 +112,8 @@ public interface IIntegrationService {
      */
     ExtServer getExtServer(String serverId);
 
+    ExtServer getExtServer(String ltiAdvantageIssuer, String ltiAdvantageClientId);
+
     /**
      * Returns ExtServerLessonMap for the LTI Tool Consumer identified by serverId.
      *
@@ -270,4 +272,5 @@ public interface IIntegrationService {
 	    String extCourseName, String parentOrgId, Boolean prefix) throws UserInfoValidationException;
 
     void updateUserRoles(User user, Organisation org, String method);
+
 }

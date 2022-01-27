@@ -57,6 +57,15 @@ public class ExtServerLessonMap {
     @JoinColumn(name = "ext_server_org_map_id")
     private ExtServer extServer;
 
+    @Column(name = "lti_adv_deployment_id")
+    private String deploymentId;
+
+    @Column(name = "lti_adv_grading_type")
+    private String gradingType;
+
+    @Column(name = "lti_adv_grading_url")
+    private String gradingUrl;
+
     public ExtServerLessonMap() {
     }
 
@@ -97,5 +106,29 @@ public class ExtServerLessonMap {
 
     public void setExtServer(ExtServer extServer) {
 	this.extServer = extServer;
+    }
+
+    public String getDeploymentId() {
+	return deploymentId;
+    }
+
+    public void setDeploymentId(String deploymentId) {
+	this.deploymentId = deploymentId;
+    }
+
+    public String getGradingType() {
+	return gradingType;
+    }
+
+    public void setGradingType(String gradingType) {
+	this.gradingType = gradingType;
+    }
+
+    public String getGradingUrl() {
+	return gradingUrl;
+    }
+
+    public void setGradingUrl(String gradingUrl) {
+	this.gradingUrl = gradingUrl;
     }
 }
