@@ -94,26 +94,84 @@
 				<tr>
 					<td><fmt:message key="sysadmin.disabled" />:</td>
 					<td>
-						<form:checkbox path="disabled" />
+						<form:checkbox path="disabled"  />
 					</td>
 				</tr>
 				<tr>
 					<td><fmt:message key="sysadmin.lessonFinishUrl" />:</td>
 					<td>
-						<form:hidden path="lessonFinishUrl"/>
-						<c:out value="${ltiConsumerForm.lessonFinishUrl}"/>
+						<form:input path="lessonFinishUrl" />
 					</td>
 				</tr>
 				<tr>
 					<td><fmt:message key="sysadmin.lti.consumer.monitor.roles" />:</td>
 					<td>
-						<form:input path="ltiToolConsumerMonitorRoles" size="30"/>
+						<form:input path="ltiToolConsumerMonitorRoles"/>
 					</td>
 				</tr>
 				<tr>
 					<td><fmt:message key="sysadmin.user.id.name" />:</td>
 					<td>
-						<form:input path="userIdParameterName" size="30"/>
+						<form:input path="userIdParameterName"/>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<h3><fmt:message key="sysadmin.lti.advantage" /></h3>
+					</td>
+				</tr>
+				<tr>
+					<td><fmt:message key="sysadmin.lti.advantage.platform.issuer" />:</td>
+					<td>
+						<form:input path="issuer"/>
+					</td>
+				</tr>
+				<tr>
+					<td><fmt:message key="sysadmin.lti.advantage.platform.keyset.url" />:</td>
+					<td>
+						<form:input path="platformKeySetUrl"/>
+					</td>
+				</tr>
+				<tr>
+					<td><fmt:message key="sysadmin.lti.advantage.platform.oidc.url" />:</td>
+					<td>
+						<form:input path="oidcAuthUrl"/>
+					</td>
+				</tr>
+				<tr>
+					<td><fmt:message key="sysadmin.lti.advantage.platform.access.token.url" />:</td>
+					<td>
+						<form:input path="accessTokenUrl"/>
+					</td>
+				</tr>
+				<tr>
+					<td><fmt:message key="sysadmin.lti.advantage.tool.client.id" />:</td>
+					<td>
+						<form:input path="clientId"/>
+					</td>
+				</tr>
+				<tr>
+					<td><fmt:message key="sysadmin.lti.advantage.tool.keyset.url" />:</td>
+					<td>
+						<form:input path="toolKeySetUrl"/>
+					</td>
+				</tr>
+				<tr>
+					<td><fmt:message key="sysadmin.lti.advantage.tool.key.id" />:</td>
+					<td>
+						<form:input path="toolKeyId"/>
+					</td>
+				</tr>
+				<tr>
+					<td><fmt:message key="sysadmin.lti.advantage.tool.public.key" />:</td>
+					<td>
+						<form:input path="publicKey"/>
+					</td>
+				</tr>
+				<tr>
+					<td><fmt:message key="sysadmin.lti.advantage.tool.private.key" />:</td>
+					<td>
+						<form:input path="privateKey"/>
 					</td>
 				</tr>
 			</table>

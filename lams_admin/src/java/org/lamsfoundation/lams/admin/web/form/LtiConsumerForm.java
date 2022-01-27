@@ -37,6 +37,24 @@ public class LtiConsumerForm extends ExtServerCommonForm {
 
     private String userIdParameterName;
 
+    private String issuer;
+
+    private String clientId;
+
+    private String platformKeySetUrl;
+
+    private String oidcAuthUrl;
+
+    private String accessTokenUrl;
+
+    private String toolKeySetUrl;
+
+    private String toolKeyId;
+
+    private String publicKey;
+
+    private String privateKey;
+
     public LtiConsumerForm() {
 	userIdParameterName = "user_id";
     }
@@ -49,6 +67,14 @@ public class LtiConsumerForm extends ExtServerCommonForm {
 	this.ltiToolConsumerMonitorRoles = ltiToolConsumerMonitorRoles;
     }
 
+    public String getUserIdParameterName() {
+	return userIdParameterName;
+    }
+
+    public void setUserIdParameterName(String userIdParameterName) {
+	this.userIdParameterName = StringUtils.trim(userIdParameterName);
+    }
+
     @Override
     public String getLessonFinishUrl() {
 	return lessonFinishUrl;
@@ -59,11 +85,75 @@ public class LtiConsumerForm extends ExtServerCommonForm {
 	this.lessonFinishUrl = lessonFinishUrl;
     }
 
-    public String getUserIdParameterName() {
-	return userIdParameterName;
+    public String getIssuer() {
+	return issuer;
     }
 
-    public void setUserIdParameterName(String userIdParameterName) {
-	this.userIdParameterName = StringUtils.trim(userIdParameterName);
+    public void setIssuer(String issuer) {
+	this.issuer = issuer;
+    }
+
+    public String getClientId() {
+	return clientId;
+    }
+
+    public void setClientId(String clientId) {
+	this.clientId = clientId;
+    }
+
+    public String getPlatformKeySetUrl() {
+	return platformKeySetUrl;
+    }
+
+    public void setPlatformKeySetUrl(String platformKeySetUrl) {
+	this.platformKeySetUrl = platformKeySetUrl;
+    }
+
+    public String getOidcAuthUrl() {
+	return oidcAuthUrl;
+    }
+
+    public void setOidcAuthUrl(String oidcAuthUrl) {
+	this.oidcAuthUrl = oidcAuthUrl;
+    }
+
+    public String getAccessTokenUrl() {
+	return accessTokenUrl;
+    }
+
+    public void setAccessTokenUrl(String accessTokenUrl) {
+	this.accessTokenUrl = accessTokenUrl;
+    }
+
+    public String getToolKeySetUrl() {
+	return toolKeySetUrl;
+    }
+
+    public void setToolKeySetUrl(String toolKeySetUrl) {
+	this.toolKeySetUrl = toolKeySetUrl;
+    }
+
+    public String getToolKeyId() {
+	return toolKeyId;
+    }
+
+    public void setToolKeyId(String toolKeyId) {
+	this.toolKeyId = toolKeyId;
+    }
+
+    public String getPublicKey() {
+	return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+	this.publicKey = publicKey;
+    }
+
+    public String getPrivateKey() {
+	return privateKey;
+    }
+
+    public void setPrivateKey(String privateKey) {
+	this.privateKey = privateKey;
     }
 }
