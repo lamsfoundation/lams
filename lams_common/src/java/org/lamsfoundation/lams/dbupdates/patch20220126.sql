@@ -8,15 +8,23 @@ ALTER TABLE lams_ext_server_lesson_map ADD COLUMN lti_adv_deployment_id VARCHAR(
 									   ADD COLUMN lti_adv_grading_type  VARCHAR(10),
 									   ADD COLUMN lti_adv_grading_url   VARCHAR(255);
 									   
-ALTER TABLE lams_ext_server_org_map    ADD COLUMN lti_adv_issuer 				VARCHAR(64),
-									   ADD COLUMN lti_adv_client_id 			VARCHAR(64),
-									   ADD COLUMN lti_adv_platform_key_set_url 	VARCHAR(255),
-									   ADD COLUMN lti_adv_oidc_auth_url			VARCHAR(255),
-									   ADD COLUMN lti_adv_access_token_url		VARCHAR(255),
-									   ADD COLUMN lti_adv_tool_key_set_url		VARCHAR(255),
-									   ADD COLUMN lti_adv_tool_key_id			VARCHAR(32),
-									   ADD COLUMN lti_adv_public_key			TEXT,
-									   ADD COLUMN lti_adv_private_key			TEXT;
+ALTER TABLE lams_ext_server_org_map    ADD COLUMN use_course_prefix					TINYINT NOT NULL DEFAULT 1,
+									   ADD COLUMN user_registration_enabled			TINYINT NOT NULL DEFAULT 1,
+									   ADD COLUMN user_name_lower_case				TINYINT NOT NULL DEFAULT 0,
+									   
+									   ADD COLUMN lti_adv_enforce_cookie			TINYINT NOT NULL DEFAULT 0,
+									   ADD COLUMN lti_adv_reregistration_enabled	TINYINT NOT NULL DEFAULT 1,
+									   ADD COLUMN lti_adv_issuer 					VARCHAR(64),
+									   ADD COLUMN lti_adv_client_id 				VARCHAR(64),
+									   ADD COLUMN lti_adv_platform_key_set_url 		VARCHAR(255),
+									   ADD COLUMN lti_adv_oidc_auth_url				VARCHAR(255),
+									   ADD COLUMN lti_adv_access_token_url			VARCHAR(255),
+									   ADD COLUMN lti_adv_tool_name 				VARCHAR(64),
+									   ADD COLUMN lti_adv_tool_description			VARCHAR(255),
+									   ADD COLUMN lti_adv_tool_key_set_url			VARCHAR(255),
+									   ADD COLUMN lti_adv_tool_key_id				VARCHAR(32),
+									   ADD COLUMN lti_adv_public_key				TEXT,
+									   ADD COLUMN lti_adv_private_key				TEXT;
 									
 
 -- Put all sql statements above here

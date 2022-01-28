@@ -100,19 +100,19 @@
 				<tr>
 					<td><fmt:message key="sysadmin.lessonFinishUrl" />:</td>
 					<td>
-						<form:input path="lessonFinishUrl" />
+						<form:input path="lessonFinishUrl" cssClass="form-control" />
 					</td>
 				</tr>
 				<tr>
 					<td><fmt:message key="sysadmin.lti.consumer.monitor.roles" />:</td>
 					<td>
-						<form:input path="ltiToolConsumerMonitorRoles"/>
+						<form:input path="ltiToolConsumerMonitorRoles" cssClass="form-control"/>
 					</td>
 				</tr>
 				<tr>
 					<td><fmt:message key="sysadmin.user.id.name" />:</td>
 					<td>
-						<form:input path="userIdParameterName"/>
+						<form:input path="userIdParameterName" cssClass="form-control"/>
 					</td>
 				</tr>
 				<tr>
@@ -121,57 +121,99 @@
 					</td>
 				</tr>
 				<tr>
+					<td><fmt:message key="sysadmin.use.course.prefix" />:</td>
+					<td>
+						<form:checkbox path="useCoursePrefix"  />
+					</td>
+				</tr>
+				<tr>
+					<td><fmt:message key="sysadmin.user.registration.enabled" />:</td>
+					<td>
+						<form:checkbox path="userRegistrationEnabled"  />
+					</td>
+				</tr>
+				<tr>
+					<td><fmt:message key="sysadmin.user.name.lower.case" />:</td>
+					<td>
+						<form:checkbox path="userNameLowerCase"  />
+					</td>
+				</tr>
+				<tr>
+					<td><fmt:message key="sysadmin.lti.advantage.enforce.state.cookie" />:</td>
+					<td>
+						<form:checkbox path="enforceStateCookie"  />
+					</td>
+				</tr>
+				<tr>
+					<td><fmt:message key="sysadmin.lti.advantage.tool.reregistration.enabled" />:</td>
+					<td>
+						<form:checkbox path="toolReregistrationEnabled"  />
+					</td>
+				</tr>
+				<tr>
 					<td><fmt:message key="sysadmin.lti.advantage.platform.issuer" />:</td>
 					<td>
-						<form:input path="issuer"/>
+						<form:input path="issuer" cssClass="form-control"/>
 					</td>
 				</tr>
 				<tr>
 					<td><fmt:message key="sysadmin.lti.advantage.platform.keyset.url" />:</td>
 					<td>
-						<form:input path="platformKeySetUrl"/>
+						<form:input path="platformKeySetUrl" cssClass="form-control"/>
 					</td>
 				</tr>
 				<tr>
 					<td><fmt:message key="sysadmin.lti.advantage.platform.oidc.url" />:</td>
 					<td>
-						<form:input path="oidcAuthUrl"/>
+						<form:input path="oidcAuthUrl" cssClass="form-control"/>
 					</td>
 				</tr>
 				<tr>
 					<td><fmt:message key="sysadmin.lti.advantage.platform.access.token.url" />:</td>
 					<td>
-						<form:input path="accessTokenUrl"/>
+						<form:input path="accessTokenUrl" cssClass="form-control"/>
+					</td>
+				</tr>
+				<tr>
+					<td><fmt:message key="sysadmin.lti.advantage.tool.name" />:</td>
+					<td>
+						<form:input path="toolName" cssClass="form-control"/>
+					</td>
+				</tr>
+				<tr>
+					<td><fmt:message key="sysadmin.lti.advantage.tool.description" />:</td>
+					<td>
+						<form:input path="toolDescription" cssClass="form-control"/>
 					</td>
 				</tr>
 				<tr>
 					<td><fmt:message key="sysadmin.lti.advantage.tool.client.id" />:</td>
 					<td>
-						<form:input path="clientId"/>
+						<form:input path="clientId" cssClass="form-control"/>
 					</td>
 				</tr>
 				<tr>
 					<td><fmt:message key="sysadmin.lti.advantage.tool.keyset.url" />:</td>
 					<td>
-						<form:input path="toolKeySetUrl"/>
+						<form:input path="toolKeySetUrl" cssClass="form-control"/>
 					</td>
 				</tr>
 				<tr>
 					<td><fmt:message key="sysadmin.lti.advantage.tool.key.id" />:</td>
 					<td>
-						<form:input path="toolKeyId"/>
+						<form:input path="toolKeyId" cssClass="form-control"/>
 					</td>
 				</tr>
 				<tr>
 					<td><fmt:message key="sysadmin.lti.advantage.tool.public.key" />:</td>
 					<td>
-						<form:input path="publicKey"/>
+						<form:input path="publicKey" cssClass="form-control"/>
 					</td>
 				</tr>
 				<tr>
 					<td><fmt:message key="sysadmin.lti.advantage.tool.private.key" />:</td>
 					<td>
-						<form:input path="privateKey"/>
+						<form:input path="privateKey" cssClass="form-control"/>
 					</td>
 				</tr>
 			</table>

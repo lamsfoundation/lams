@@ -33,9 +33,17 @@ public class LtiConsumerForm extends ExtServerCommonForm {
 
     private String ltiToolConsumerMonitorRoles;
 
-    private String lessonFinishUrl;
-
     private String userIdParameterName;
+
+    private boolean useCoursePrefix;
+
+    private boolean userRegistrationEnabled;
+
+    private boolean userNameLowerCase;
+
+    private boolean enforceStateCookie;
+
+    private boolean toolReregistrationEnabled;
 
     private String issuer;
 
@@ -47,6 +55,10 @@ public class LtiConsumerForm extends ExtServerCommonForm {
 
     private String accessTokenUrl;
 
+    private String toolName;
+
+    private String toolDescription;
+
     private String toolKeySetUrl;
 
     private String toolKeyId;
@@ -57,6 +69,11 @@ public class LtiConsumerForm extends ExtServerCommonForm {
 
     public LtiConsumerForm() {
 	userIdParameterName = "user_id";
+	toolReregistrationEnabled = true;
+	useCoursePrefix = true;
+	userRegistrationEnabled = true;
+	toolName = "LAMS Advantage";
+	toolDescription = "platform for delivering online collaborative learning activities";
     }
 
     public String getLtiToolConsumerMonitorRoles() {
@@ -75,14 +92,44 @@ public class LtiConsumerForm extends ExtServerCommonForm {
 	this.userIdParameterName = StringUtils.trim(userIdParameterName);
     }
 
-    @Override
-    public String getLessonFinishUrl() {
-	return lessonFinishUrl;
+    public boolean isUseCoursePrefix() {
+	return useCoursePrefix;
     }
 
-    @Override
-    public void setLessonFinishUrl(String lessonFinishUrl) {
-	this.lessonFinishUrl = lessonFinishUrl;
+    public void setUseCoursePrefix(boolean useCoursePrefix) {
+	this.useCoursePrefix = useCoursePrefix;
+    }
+
+    public boolean isUserRegistrationEnabled() {
+	return userRegistrationEnabled;
+    }
+
+    public void setUserRegistrationEnabled(boolean userRegistrationEnabled) {
+	this.userRegistrationEnabled = userRegistrationEnabled;
+    }
+
+    public boolean isUserNameLowerCase() {
+	return userNameLowerCase;
+    }
+
+    public void setUserNameLowerCase(boolean userNameLowerCase) {
+	this.userNameLowerCase = userNameLowerCase;
+    }
+
+    public boolean isEnforceStateCookie() {
+	return enforceStateCookie;
+    }
+
+    public void setEnforceStateCookie(boolean enforceStateCookie) {
+	this.enforceStateCookie = enforceStateCookie;
+    }
+
+    public boolean isToolReregistrationEnabled() {
+	return toolReregistrationEnabled;
+    }
+
+    public void setToolReregistrationEnabled(boolean toolReregistrationEnabled) {
+	this.toolReregistrationEnabled = toolReregistrationEnabled;
     }
 
     public String getIssuer() {
@@ -123,6 +170,22 @@ public class LtiConsumerForm extends ExtServerCommonForm {
 
     public void setAccessTokenUrl(String accessTokenUrl) {
 	this.accessTokenUrl = accessTokenUrl;
+    }
+
+    public String getToolName() {
+	return toolName;
+    }
+
+    public void setToolName(String toolName) {
+	this.toolName = toolName;
+    }
+
+    public String getToolDescription() {
+	return toolDescription;
+    }
+
+    public void setToolDescription(String toolDescription) {
+	this.toolDescription = toolDescription;
     }
 
     public String getToolKeySetUrl() {

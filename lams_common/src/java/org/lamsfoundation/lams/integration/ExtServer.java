@@ -122,6 +122,27 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
     @Column(name = "user_id_parameter_name")
     private String userIdParameterName;
 
+    /**
+     * Options currently used by LTI Advantage, but eventually also used in SAML
+     */
+    @Column(name = "use_course_prefix")
+    private boolean useCoursePrefix;
+
+    @Column(name = "user_registration_enabled")
+    private boolean userRegistrationEnabled;
+
+    @Column(name = "user_name_lower_case")
+    private boolean userNameLowerCase;
+
+    /**
+     * Options used by LTI Advantage
+     */
+    @Column(name = "lti_adv_enforce_cookie")
+    private boolean enforceStateCookie;
+
+    @Column(name = "lti_adv_reregistration_enabled")
+    private boolean toolReregistrationEnabled;
+
     @Column(name = "lti_adv_issuer")
     private String issuer;
 
@@ -136,6 +157,12 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
 
     @Column(name = "lti_adv_access_token_url")
     private String accessTokenUrl;
+
+    @Column(name = "lti_adv_tool_name")
+    private String toolName;
+
+    @Column(name = "lti_adv_tool_description")
+    private String toolDescription;
 
     @Column(name = "lti_adv_tool_key_set_url")
     private String toolKeySetUrl;
@@ -152,6 +179,9 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
     public ExtServer() {
 	timeToLiveLoginRequest = 80;
 	userIdParameterName = "user_id";
+	toolReregistrationEnabled = true;
+	useCoursePrefix = true;
+	userRegistrationEnabled = true;
     }
 
     public Integer getSid() {
@@ -382,6 +412,62 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
 
     public void setUserIdParameterName(String userIdParameterName) {
 	this.userIdParameterName = userIdParameterName;
+    }
+
+    public boolean isUseCoursePrefix() {
+	return useCoursePrefix;
+    }
+
+    public void setUseCoursePrefix(boolean useCoursePrefix) {
+	this.useCoursePrefix = useCoursePrefix;
+    }
+
+    public boolean isUserRegistrationEnabled() {
+	return userRegistrationEnabled;
+    }
+
+    public void setUserRegistrationEnabled(boolean userRegistrationEnabled) {
+	this.userRegistrationEnabled = userRegistrationEnabled;
+    }
+
+    public boolean isUserNameLowerCase() {
+	return userNameLowerCase;
+    }
+
+    public void setUserNameLowerCase(boolean userNameLowerCase) {
+	this.userNameLowerCase = userNameLowerCase;
+    }
+
+    public boolean isEnforceStateCookie() {
+	return enforceStateCookie;
+    }
+
+    public void setEnforceStateCookie(boolean enforceStateCookie) {
+	this.enforceStateCookie = enforceStateCookie;
+    }
+
+    public boolean isToolReregistrationEnabled() {
+	return toolReregistrationEnabled;
+    }
+
+    public void setToolReregistrationEnabled(boolean toolReregistrationEnabled) {
+	this.toolReregistrationEnabled = toolReregistrationEnabled;
+    }
+
+    public String getToolName() {
+	return toolName;
+    }
+
+    public void setToolName(String toolName) {
+	this.toolName = toolName;
+    }
+
+    public String getToolDescription() {
+	return toolDescription;
+    }
+
+    public void setToolDescription(String toolDescription) {
+	this.toolDescription = toolDescription;
     }
 
     public String getIssuer() {
