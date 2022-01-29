@@ -90,23 +90,12 @@ public class SessionManager {
 	    HttpSession existingSession = loginMapping.get(login);
 	    // check if it's a different session and if so, which one is newer
 	    if (existingSession != null && !existingSession.getId().equals(sessionId)) {
-		if (session.getCreationTime() > existingSession.getCreationTime()) {
-		    try {
-			// invalidate the other session
-			existingSession.invalidate();
-		    } catch (Exception e) {
-			log.warn("SessionMananger invalidation exception", e);
-			// if it was already invalidated, do nothing
-		    }
-		} else {
-		    try {
-			// invalidate this session
-			session.invalidate();
-		    } catch (Exception e) {
-			log.warn("SessionMananger invalidation exception", e);
-			// if it was already invalidated, do nothing
-		    }
-		    throw new SecurityException("You were logged out");
+		try {
+		    // invalidate the other session
+		    existingSession.invalidate();
+		} catch (Exception e) {
+		    log.warn("SessionMananger invalidation exception", e);
+		    // if it was already invalidated, do nothing
 		}
 	    }
 	    loginMapping.put(login, session);

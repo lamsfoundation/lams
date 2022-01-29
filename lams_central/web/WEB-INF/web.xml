@@ -645,6 +645,7 @@
 			<!-- Static resources -->
 			<url-pattern>/css/*</url-pattern>
 			<url-pattern>/errorpages/*</url-pattern>
+			<url-pattern>/error.jsp</url-pattern>
 			<url-pattern>/images/*</url-pattern>
 			<url-pattern>/includes/javascript/*</url-pattern>
 			<url-pattern>/includes/font-awesome/*</url-pattern>
