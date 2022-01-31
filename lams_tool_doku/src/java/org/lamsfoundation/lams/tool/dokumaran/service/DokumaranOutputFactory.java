@@ -44,7 +44,7 @@ public class DokumaranOutputFactory extends OutputFactory {
 	switch (definitionType) {
 	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
 		ToolOutputDefinition manualGradingDefinition = buildRangeDefinition(
-			DokumaranConstants.MANUAL_GRADING_DEFINITION_NAME, 0L, 100L);
+			DokumaranConstants.MANUAL_GRADING_DEFINITION_NAME, 0L, 100L, true);
 		manualGradingDefinition.setWeightable(true);
 		manualGradingDefinition.setShowConditionNameOnly(true);
 		definitionMap.put(DokumaranConstants.MANUAL_GRADING_DEFINITION_NAME, manualGradingDefinition);
