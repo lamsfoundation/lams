@@ -31,6 +31,10 @@
 		div#errorArea {
 			display: none;
 		}
+		
+		.uppy-DragDrop-inner {
+			padding: 0;
+		}
 	</style>
 
 	<script type="text/javascript" src="/lams/includes/javascript/jquery.js"></script>
