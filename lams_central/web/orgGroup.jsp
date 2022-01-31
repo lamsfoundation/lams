@@ -76,20 +76,23 @@
 				<fmt:message key="label.import.successful" var="LABEL_IMPORT_SUCCESSFUL_VAR"><fmt:param value="%1"/><fmt:param value="%2"/></fmt:message>
 				LABEL_IMPORT_SUCCESSFUL_LABEL : decoderDiv.html('<c:out value="${LABEL_IMPORT_SUCCESSFUL_VAR}" />').text(),
 			};
-	</script>
-	<!-- LDEV_NTU-7 Page jumps to the top when clicking the link in Grouping -->		
-	<script type="text/javascript">
-		jQuery(document).ready(function(){
-		    jQuery('#noscrollinputid').on('click', function(event) {  
-		         jQuery('#collapseUploadGroupFile').toggle('show');
-		    });
-		});
+					
+			<!-- LDEV_NTU-7 Page jumps to the top when clicking the link in Grouping -->		
+			jQuery(document).ready(function(){
+			    jQuery('#noscrollinputid').on('click', function(event) {  
+			         jQuery('#collapseUploadGroupFile').toggle('show');
+			         $('html, body').animate({
+			        	  scrollTop: $("#collapseUploadGroupFile").offset().top
+			         }, 1000);
+			    });
 
-		jQuery(document).ready(function(){
-		    jQuery('#noscrolladvancedid').on('click', function(event) {  
-		         jQuery('#collapseAdvanced').toggle('show');
-		    });
-		});
+			    jQuery('#noscrolladvancedid').on('click', function(event) {  
+			         jQuery('#collapseAdvanced').toggle('show');
+			         $('html, body').animate({
+			        	  scrollTop: $("#collapseAdvanced").offset().top
+			         }, 1000);
+			    });
+			});
 	</script>
 </lams:head>
 <body>
