@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.sbmt.service;
 
 import java.util.List;
@@ -44,10 +43,15 @@ public class SubmitFilesOutputFactory extends OutputFactory {
     @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
 	    int definitionType) throws ToolException {
-	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
+	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<>();
 	Class<SimpleURL[][]> arrayOfSimpleUrlArrayClass = SimpleURL[][].class;
 	switch (definitionType) {
 	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
+		ToolOutputDefinition manualGradingDefinition = buildRangeDefinition(
+			SbmtConstants.MANUAL_GRADING_DEFINITION_NAME, 0L, 100L, true);
+		manualGradingDefinition.setWeightable(true);
+		manualGradingDefinition.setShowConditionNameOnly(true);
+		definitionMap.put(SbmtConstants.MANUAL_GRADING_DEFINITION_NAME, manualGradingDefinition);
 		break;
 	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
 		ToolOutputDefinition itemsSubmittedDefinition = buildComplexOutputDefinition(
@@ -64,12 +68,14 @@ public class SubmitFilesOutputFactory extends OutputFactory {
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, ISubmitFilesService submitFilesService,
 	    Long toolSessionId, Long learnerId) {
 
-	TreeMap<String, ToolOutput> outputs = new TreeMap<String, ToolOutput>();
+	TreeMap<String, ToolOutput> outputs = new TreeMap<>();
 	// tool output cache
-	TreeMap<String, ToolOutput> baseOutputs = new TreeMap<String, ToolOutput>();
+	TreeMap<String, ToolOutput> baseOutputs = new TreeMap<>();
 	if (names == null) {
 	    outputs.put(SbmtConstants.SUBMITTED_ITEMS_DEFINITION_NAME, getToolOutput(
 		    SbmtConstants.SUBMITTED_ITEMS_DEFINITION_NAME, submitFilesService, toolSessionId, learnerId));
+	    outputs.put(SbmtConstants.MANUAL_GRADING_DEFINITION_NAME, getToolOutput(
+		    SbmtConstants.MANUAL_GRADING_DEFINITION_NAME, submitFilesService, toolSessionId, learnerId));
 	} else {
 	    for (String name : names) {
 		String[] nameParts = splitConditionName(name);
@@ -123,6 +129,9 @@ public class SubmitFilesOutputFactory extends OutputFactory {
 		    return new ToolOutput(SbmtConstants.SUBMITTED_ITEMS_DEFINITION_NAME,
 			    getI18NText(SbmtConstants.SUBMITTED_ITEMS_DEFINITION_NAME, true), usersAndUrls, false);
 		}
+	    } else if (SbmtConstants.MANUAL_GRADING_DEFINITION_NAME.equals(nameParts[0])) {
+		return new ToolOutput(SbmtConstants.MANUAL_GRADING_DEFINITION_NAME,
+			getI18NText(SbmtConstants.MANUAL_GRADING_DEFINITION_NAME, true), 0L);
 	    }
 	}
 	return null;

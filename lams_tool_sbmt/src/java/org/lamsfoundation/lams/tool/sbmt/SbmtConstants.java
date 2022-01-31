@@ -21,8 +21,6 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.sbmt;
 
 public interface SbmtConstants {
@@ -70,33 +68,33 @@ public interface SbmtConstants {
     public static final String ATTR_LOCK_ON_FINISH = "lockOnFinish";
 
     public static final String PARAM_MIN_UPLOAD = "minUpload";
-    
+
     public static final String ATTR_GROUP_USERS = "groupUsers";
-    
+
     public static final String ATTR_USE_SEL_LEADER = "useSelectLeaderToolOuput";
-    
+
     public static final String ATTR_GROUP_LEADER = "groupLeader";
 
     public static final String ATTR_IS_MAX_LIMIT_UPLOAD_ENABLED = "isMaxLimitUploadEnabled";
 
     public static final String ATTR_MAX_LIMIT_UPLOAD_NUMBER = "maxLimitUploadNumber";
-    
+
     public static final String ATTR_MIN_LIMIT_UPLOAD_NUMBER = "minLimitUploadNumber";
 
     public static final String ATTR_MAX_LIMIT_REACHED = "maxLimitReached";
 
     public static final String ATTR_USER_FINISHED = "userFinished";
 
-    public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";    
-    
+    public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
+
     public static final String ATTR_IS_MARKS_RELEASED = "isMarksReleased";
-    
+
     public static final String ATTR_SUBMIT_FILES = "submittedFilesMap";
-    
+
     public static final String ATTR_IS_USER_LEADER = "isUserLeader";
-    
+
     public static final String ATTR_HAS_EDIT_RIGHT = "hasEditRight";
-    
+
     public static final String PARAM_WAITING_MESSAGE_KEY = "waitingMessageKey";
 
     public static final String ATTR_UPLOAD_MAX_FILE_SIZE = "uploadMaxFileSize";
@@ -112,9 +110,10 @@ public interface SbmtConstants {
     public static final String EVENT_NAME_NOTIFY_LEARNERS_ON_MARKED_FILE = "notify_learners_on_marked_file";
 
     public static final String SUBMITTED_ITEMS_DEFINITION_NAME = "submitted.items.output.definition.sbmt";
+    public static final String MANUAL_GRADING_DEFINITION_NAME = "manual.grading";
 
     public static final String AUDIT_LOG_MODULE_NAME = "Submit Files";
-    
+
     public static final int SORT_BY_NO = 1;
     public static final int SORT_BY_USERNAME_ASC = 2;
     public static final int SORT_BY_USERNAME_DESC = 3;
