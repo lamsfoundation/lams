@@ -319,14 +319,20 @@ public class IntegrationService implements IIntegrationService {
 	ExtUserUseridMap extUserUseridMap = getExistingExtUserUseridMap(extServer, extUsername);
 
 	if (extUserUseridMap == null) {
-	    String defaultLocale = LanguageUtil.getDefaultLocale().getLocaleName();
-	    String defaultCountry = LanguageUtil.getDefaultCountry();
+	    String defaultLocale = extServer.getDefaultLocale() == null
+		    ? LanguageUtil.getDefaultLocale().getLocaleName()
+		    : extServer.getDefaultLocale().getLocaleName();
+	    String defaultCountry = extServer.getDefaultCountry() == null ? LanguageUtil.getDefaultCountry()
+		    : extServer.getDefaultCountry();
 	    String[] userData = { "", firstName, lastName, "", "", "", "", defaultCountry, "", "", "", email,
 		    defaultLocale };
-	    return createExtUserUseridMap(extServer, extUsername, password, salt, userData, false);
-	} else {
-	    return extUserUseridMap;
+	    extUserUseridMap = createExtUserUseridMap(extServer, extUsername, password, salt, userData, false);
+	    if (extServer.getDefaultTimeZone() != null) {
+		extUserUseridMap.getUser().setTimeZone(extServer.getDefaultTimeZone());
+		service.save(extUserUseridMap.getUser());
+	    }
 	}
+	return extUserUseridMap;
     }
 
     @Override

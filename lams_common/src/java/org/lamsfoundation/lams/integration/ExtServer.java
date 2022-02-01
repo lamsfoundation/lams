@@ -6,13 +6,17 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 
 @Entity
 @Table(name = "lams_ext_server_org_map")
@@ -121,6 +125,16 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
 
     @Column(name = "user_id_parameter_name")
     private String userIdParameterName;
+
+    @Column(name = "default_country")
+    private String defaultCountry;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "default_locale_id")
+    private SupportedLocale defaultLocale;
+
+    @Column(name = "default_timezone")
+    private String defaultTimeZone;
 
     /**
      * Options currently used by LTI Advantage, but eventually also used in SAML
@@ -412,6 +426,30 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
 
     public void setUserIdParameterName(String userIdParameterName) {
 	this.userIdParameterName = userIdParameterName;
+    }
+
+    public String getDefaultCountry() {
+	return defaultCountry;
+    }
+
+    public void setDefaultCountry(String defaultCountry) {
+	this.defaultCountry = defaultCountry;
+    }
+
+    public SupportedLocale getDefaultLocale() {
+	return defaultLocale;
+    }
+
+    public void setDefaultLocale(SupportedLocale defaultLocale) {
+	this.defaultLocale = defaultLocale;
+    }
+
+    public String getDefaultTimeZone() {
+	return defaultTimeZone;
+    }
+
+    public void setDefaultTimeZone(String defaultTimeZone) {
+	this.defaultTimeZone = defaultTimeZone;
     }
 
     public boolean isUseCoursePrefix() {

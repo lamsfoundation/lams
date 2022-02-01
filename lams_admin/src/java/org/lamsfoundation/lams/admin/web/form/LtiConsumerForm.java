@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.admin.web.form;
 
 import org.apache.commons.lang.StringUtils;
+import org.lamsfoundation.lams.util.LanguageUtil;
 
 /**
  * Form for managing LTI tool consumers (ExtServer instances).
@@ -34,6 +35,12 @@ public class LtiConsumerForm extends ExtServerCommonForm {
     private String ltiToolConsumerMonitorRoles;
 
     private String userIdParameterName;
+
+    private String defaultCountry;
+
+    private Integer defaultLocaleId;
+
+    private String defaultTimeZone;
 
     private boolean useCoursePrefix;
 
@@ -69,6 +76,9 @@ public class LtiConsumerForm extends ExtServerCommonForm {
 
     public LtiConsumerForm() {
 	userIdParameterName = "user_id";
+	defaultCountry = LanguageUtil.getDefaultCountry();
+	defaultLocaleId = LanguageUtil.getDefaultLocale().getLocaleId();
+	defaultTimeZone = LanguageUtil.getDefaultTimeZone().getID();
 	toolReregistrationEnabled = true;
 	useCoursePrefix = true;
 	userRegistrationEnabled = true;
@@ -90,6 +100,30 @@ public class LtiConsumerForm extends ExtServerCommonForm {
 
     public void setUserIdParameterName(String userIdParameterName) {
 	this.userIdParameterName = StringUtils.trim(userIdParameterName);
+    }
+
+    public String getDefaultCountry() {
+	return defaultCountry;
+    }
+
+    public void setDefaultCountry(String defaultCountry) {
+	this.defaultCountry = defaultCountry;
+    }
+
+    public Integer getDefaultLocaleId() {
+	return defaultLocaleId;
+    }
+
+    public void setDefaultLocaleId(Integer defaultLocaleId) {
+	this.defaultLocaleId = defaultLocaleId;
+    }
+
+    public String getDefaultTimeZone() {
+	return defaultTimeZone;
+    }
+
+    public void setDefaultTimeZone(String defaultTimeZone) {
+	this.defaultTimeZone = defaultTimeZone;
     }
 
     public boolean isUseCoursePrefix() {

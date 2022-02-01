@@ -121,6 +121,43 @@
 					</td>
 				</tr>
 				<tr>
+					<td><fmt:message key="admin.user.country" />:</td>
+					<td>
+						<form:select path="defaultCountry" cssClass="form-control">
+							<form:option value="0"><fmt:message key="label.select.country" /></form:option>
+							<c:forEach items="${countryCodes}" var="countryCode">
+								<form:option value="${countryCode.key}">
+									${countryCode.value}
+								</form:option>
+							</c:forEach>
+						</form:select>
+					</td>
+				</tr>
+				<tr>
+					<td><fmt:message key="admin.organisation.locale" />:</td>
+					<td>
+						<form:select path="defaultLocaleId" cssClass="form-control">
+							<c:forEach items="${locales}" var="locale">
+								<form:option value="${locale.localeId}">
+									<c:out value="${locale.description}" />
+								</form:option>
+							</c:forEach>
+						</form:select>
+					</td>
+				</tr>
+				<tr>
+					<td><fmt:message key="admin.user.time.zone" />:</td>
+					<td>
+						<form:select path="defaultTimeZone" cssClass="form-control">
+							<c:forEach items="${timezoneDtos}" var="timezoneDto">
+								<form:option value="${timezoneDto.timeZoneId}">
+									${timezoneDto.timeZoneId} - ${timezoneDto.displayName}
+								</form:option>
+							</c:forEach>
+						</form:select>
+					</td>
+				</tr>
+				<tr>
 					<td><fmt:message key="sysadmin.use.course.prefix" />:</td>
 					<td>
 						<form:checkbox path="useCoursePrefix"  />
