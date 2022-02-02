@@ -134,23 +134,38 @@ public class AssessmentEscapeUtils {
 		    String str = "";
 		    if (optionAnswers != null) {
 			for (QbOption option : options) {
-			    str += "<div>";
-			    str += "	<div style='float: left;'>";
-			    str += option.getMatchingPair();
-			    str += "	</div>";
-			    str += "	<div style=' float: right; width: 50%;'>";
-			    str += " 		- ";
+			    boolean isCorrect = false;
+			    String selectedOption = null;
 
 			    for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
 				if (option.getUid().equals(optionAnswer.getOptionUid())) {
 				    for (QbOption option2 : options) {
 					if (option2.getUid() == optionAnswer.getAnswerInt()) {
-					    str += option2.getName();
+					    selectedOption = option2.getName();
+					    isCorrect = option.getUid()
+						    .equals(Long.valueOf(optionAnswer.getAnswerInt()));
+					    break;
 					}
 				    }
 				}
+
+				if (selectedOption != null) {
+				    break;
+				}
 			    }
 
+			    str += "<div";
+			    if (selectedOption != null) {
+				str += " class=\"" + (isCorrect ? "text-success" : "text-danger") + "\"";
+			    }
+			    str += ">	<div style='float: left;'>";
+			    str += option.getMatchingPair();
+			    str += "	</div>";
+			    str += "	<div style=' float: right; width: 50%;'>";
+			    str += " 		- ";
+			    if (selectedOption != null) {
+				str += selectedOption;
+			    }
 			    str += "</div>";
 			    str += "</div>";
 			    str += DELIMITER;
