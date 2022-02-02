@@ -284,9 +284,9 @@ public class TblMonitoringController {
 
 		case QbQuestion.TYPE_MATCHING_PAIRS:
 		    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-			sb.append(
-				(optionDto.getMatchingPair() + " - " + optionDto.getName()).replaceAll("\\<.*?\\>", "")
-					+ " <br>");
+			sb.append("<div><div style='float: left;'>").append(optionDto.getMatchingPair())
+				.append("	</div><div style=' float: right; width: 50%;'> 		- ")
+				.append(optionDto.getName().replaceAll("\\<.*?\\>", "")).append("</div></div><br>");
 		    }
 		    return sb.toString();
 
