@@ -650,7 +650,9 @@
 				<c:if test="${hasEditRight}">					
 					<button type="button" name="submitAll"
 							onclick="return submitAll(false);" 
-							class="btn btn-primary voffset10 pull-right na">
+							class="btn btn-primary voffset10 pull-right na"
+							title='<fmt:message key="label.learning.submit.all.tip" />'
+							>
 						<fmt:message key="label.learning.submit.all" />
 					</button>
 				</c:if>
