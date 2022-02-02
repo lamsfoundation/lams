@@ -2,38 +2,48 @@
 
 <c:if test="${not empty toolSessionID}">
 	<div class="question-type">
-		<fmt:message key="label.learning.matching.pairs.pick.up" />
+		<fmt:message key="label.authoring.basic.type.matching.pairs" />
 	</div>
 </c:if>
+
+<div class="question-type">
+	<fmt:message key="label.learning.matching.pairs.possible" />
+	<ul class="${empty toolSessionID ? 'loffset20' : ''}">
+		<c:forEach var="possibleOption" items="${question.matchingPairOptions}">
+			<li>${possibleOption.name}</li>
+		</c:forEach>
+	</ul>
+</div>
 
 <div class="table-responsive">
 	<table class="table table-hover table-condensed">
 		<c:forEach var="option" items="${question.optionDtos}">
 			<tr>
-				<td class="complete-item-gif">
-					<c:if test="${assessment.allowRightAnswersAfterQuestion && (option.answerInt == option.uid)}">
-						<i class="fa fa-check text-success"></i>	
-					</c:if>
-					<c:if test="${assessment.allowWrongAnswersAfterQuestion && (option.answerInt != -1) && (option.answerInt != option.uid)}">
-						<i class="fa fa-times text-danger"></i>	
-					</c:if>			
-				</td>
+				<c:if test="${not empty toolSessionID}">
+					<td class="complete-item-gif">
+						<c:if test="${assessment.allowRightAnswersAfterQuestion && (option.answerInt == option.uid)}">
+							<i class="fa fa-check text-success"></i>	
+						</c:if>
+						<c:if test="${assessment.allowWrongAnswersAfterQuestion && (option.answerInt != -1) && (option.answerInt != option.uid)}">
+							<i class="fa fa-times text-danger"></i>	
+						</c:if>			
+					</td>
+				</c:if>
 						
 				<td>
 					<c:out value="${option.matchingPair}" escapeXml="false" />
 				</td>
 				
-				<td style="width: 100px;">
-					<select name="question${status.index}_${option.displayOrder}" disabled="disabled">
-						<option value="-1"><fmt:message key="label.learning.matching.pairs.choose" /></option>
-
-						<c:forEach var="selectOption" items="${question.matchingPairOptions}">
-							<option value="${selectOption.uid}"
-									<c:if test="${option.answerInt == selectOption.uid}">selected="selected"</c:if>>
-								${selectOption.name}</option>
+				<c:if test="${not empty toolSessionID}">
+					<td style="width: 100px;">
+						<fmt:message key="label.learning.matching.pairs.chosen" /><br>
+						<c:forEach var="possibleOption" items="${question.matchingPairOptions}">
+							<c:if test="${option.answerInt == possibleOption.uid}">
+								${possibleOption.name}
+							</c:if>
 						</c:forEach>
-					</select>
-				</td>
+					</td>
+				</c:if>
 			</tr>
 		</c:forEach>
 	</table>

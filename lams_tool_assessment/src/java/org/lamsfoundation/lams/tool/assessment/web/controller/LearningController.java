@@ -138,6 +138,16 @@ public class LearningController {
     @Autowired
     private ISecurityService securityService;
 
+    private static final Comparator<OptionDTO> MATCHING_PAIRS_OPTION_COMPARATOR = new Comparator<>() {
+	@Override
+	public int compare(OptionDTO o1, OptionDTO o2) {
+	    String name1 = o1.getName() != null ? o1.getName() : "";
+	    String name2 = o2.getName() != null ? o2.getName() : "";
+
+	    return AlphanumComparator.compareAlphnumerically(name1, name2);
+	}
+    };
+
     /**
      * Read assessment data from database and put them into HttpSession. It will redirect to init.do directly after this
      * method run successfully.
@@ -368,17 +378,9 @@ public class LearningController {
 	    }
 	    if (questionDto.getType() == QbQuestion.TYPE_MATCHING_PAIRS) {
 		//sort answer options alphanumerically (as per LDEV-4326)
-		ArrayList<OptionDTO> optionsSortedByName = new ArrayList<>(questionDto.getOptionDtos());
-		optionsSortedByName.sort(new Comparator<OptionDTO>() {
-		    @Override
-		    public int compare(OptionDTO o1, OptionDTO o2) {
-			String name1 = o1.getName() != null ? o1.getName() : "";
-			String name2 = o2.getName() != null ? o2.getName() : "";
-
-			return AlphanumComparator.compareAlphnumerically(name1, name2);
-		    }
-		});
-		questionDto.setMatchingPairOptions(new LinkedHashSet<>(optionsSortedByName));
+		Set<OptionDTO> optionsSortedByName = new TreeSet<>(MATCHING_PAIRS_OPTION_COMPARATOR);
+		optionsSortedByName.addAll(questionDto.getOptionDtos());
+		questionDto.setMatchingPairOptions(optionsSortedByName);
 	    }
 	}
 
@@ -1286,6 +1288,14 @@ public class LearningController {
 
 	    QuestionDTO questionDto = question.getQuestionDTO();
 	    questionDto.setMaxMark(questionReference.getMaxMark());
+
+	    if (questionDto.getType() == QbQuestion.TYPE_MATCHING_PAIRS) {
+		//sort answer options alphanumerically (as per LDEV-4326)
+		Set<OptionDTO> optionsSortedByName = new TreeSet<>(MATCHING_PAIRS_OPTION_COMPARATOR);
+		optionsSortedByName.addAll(questionDto.getOptionDtos());
+		questionDto.setMatchingPairOptions(optionsSortedByName);
+	    }
+
 	    questionDtos.add(questionDto);
 	}
 
