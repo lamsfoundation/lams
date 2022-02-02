@@ -10,6 +10,7 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
@@ -222,6 +223,13 @@ public class TblMonitoringController {
 		if (!questionResultsPerSession.isEmpty()) {
 		    AssessmentQuestionResult questionResult = questionResultsPerSession.get(0);
 		    answer = AssessmentEscapeUtils.printResponsesForJqgrid(questionResult);
+
+		    if (StringUtils.isNotBlank(questionResult.getJustification())) {
+			answer += "<div style=\"clear: both; text-align: left;\" class=\"voffset20\"><i>"
+				+ assessmentService.getMessage("label.answer.justification") + "</i><br>"
+				+ questionResult.getJustificationEscaped() + "</div>";
+		    }
+
 		    if (questionResult.getMaxMark() != null) {
 			if (questionResult.getMaxMark() == 0) {
 			    // we can not rely of mark calculation when max mark is 0
