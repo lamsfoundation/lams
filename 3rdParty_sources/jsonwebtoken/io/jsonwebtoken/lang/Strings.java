@@ -31,8 +31,6 @@ import java.util.TreeSet;
 
 public final class Strings {
 
-    private static final Strings INSTANCE = new Strings(); //for code coverage
-
     private static final String FOLDER_SEPARATOR = "/";
 
     private static final String WINDOWS_FOLDER_SEPARATOR = "\\";
@@ -45,7 +43,7 @@ public final class Strings {
 
     public static final Charset UTF_8 = Charset.forName("UTF-8");
 
-    private Strings(){}
+    private Strings(){} //prevent instantiation
 
     //---------------------------------------------------------------------
     // General convenience methods for working with Strings

@@ -650,6 +650,7 @@
 			<url-pattern>/includes/javascript/*</url-pattern>
 			<url-pattern>/includes/font-awesome/*</url-pattern>
 			<url-pattern>/ckeditor/*</url-pattern>
+			<url-pattern>/loadVars.jsp</url-pattern>
 			<url-pattern>/favicon.ico</url-pattern>
 			<http-method>GET</http-method>
  			<http-method>POST</http-method>

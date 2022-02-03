@@ -22,6 +22,7 @@ package io.jsonwebtoken;
  * @since 0.6
  */
 public class IncorrectClaimException extends InvalidClaimException {
+
     public IncorrectClaimException(Header header, Claims claims, String message) {
         super(header, claims, message);
     }

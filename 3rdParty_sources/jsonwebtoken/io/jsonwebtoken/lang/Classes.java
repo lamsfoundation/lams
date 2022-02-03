@@ -17,15 +17,14 @@ package io.jsonwebtoken.lang;
 
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
 /**
  * @since 0.1
  */
 public final class Classes {
 
-    private static final Classes INSTANCE = new Classes();
-
-    private Classes() {}
+    private Classes() {} //prevent instantiation
 
     /**
      * @since 0.1
@@ -69,7 +68,8 @@ public final class Classes {
      * @return the located class
      * @throws UnknownClassException if the class cannot be found.
      */
-    public static Class forName(String fqcn) throws UnknownClassException {
+    @SuppressWarnings("unchecked")
+    public static <T> Class<T> forName(String fqcn) throws UnknownClassException {
 
         Class clazz = THREAD_CL_ACCESSOR.loadClass(fqcn);
 
@@ -85,8 +85,8 @@ public final class Classes {
             String msg = "Unable to load class named [" + fqcn + "] from the thread context, current, or " +
                     "system/application ClassLoaders.  All heuristics have been exhausted.  Class could not be found.";
 
-            if (fqcn != null && fqcn.startsWith("com.stormpath.sdk.impl")) {
-                msg += "  Have you remembered to include the stormpath-sdk-impl .jar in your runtime classpath?";
+            if (fqcn != null && fqcn.startsWith("io.jsonwebtoken.impl")) {
+                msg += "  Have you remembered to include the jjwt-impl.jar in your runtime classpath?";
             }
 
             throw new UnknownClassException(msg);
@@ -132,13 +132,19 @@ public final class Classes {
     }
 
     @SuppressWarnings("unchecked")
-    public static Object newInstance(String fqcn) {
-        return newInstance(forName(fqcn));
+    public static <T> T newInstance(String fqcn) {
+        return (T)newInstance(forName(fqcn));
+    }
+
+    public static <T> T newInstance(String fqcn, Class[] ctorArgTypes, Object... args) {
+        Class<T> clazz = forName(fqcn);
+        Constructor<T> ctor = getConstructor(clazz, ctorArgTypes);
+        return instantiate(ctor, args);
     }
 
     @SuppressWarnings("unchecked")
-    public static Object newInstance(String fqcn, Object... args) {
-        return newInstance(forName(fqcn), args);
+    public static <T> T newInstance(String fqcn, Object... args) {
+        return (T)newInstance(forName(fqcn), args);
     }
 
     public static <T> T newInstance(Class<T> clazz) {
@@ -177,6 +183,23 @@ public final class Classes {
         } catch (Exception e) {
             String msg = "Unable to instantiate instance with constructor [" + ctor + "]";
             throw new InstantiationException(msg, e);
+        }
+    }
+
+    /**
+     * @since 0.10.0
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T invokeStatic(String fqcn, String methodName, Class[] argTypes, Object... args) {
+        try {
+            Class clazz = Classes.forName(fqcn);
+            Method method = clazz.getDeclaredMethod(methodName, argTypes);
+            method.setAccessible(true);
+            return(T)method.invoke(null, args);
+        } catch (Exception e) {
+            String msg = "Unable to invoke class method " + fqcn + "#" + methodName + ".  Ensure the necessary " +
+                "implementation is in the runtime classpath.";
+            throw new IllegalStateException(msg, e);
         }
     }
 

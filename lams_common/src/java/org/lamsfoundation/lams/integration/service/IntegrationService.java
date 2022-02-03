@@ -127,6 +127,19 @@ public class IntegrationService implements IIntegrationService {
     }
 
     @Override
+    public ExtServer getExtServer(String ltiAdvantageIssuer, String ltiAdvantageClientId) {
+	Map<String, Object> properties = new HashMap<>();
+	properties.put("issuer", ltiAdvantageIssuer);
+	properties.put("clientId", ltiAdvantageClientId);
+	List<ExtServer> list = service.findByProperties(ExtServer.class, properties, true);
+	if (list == null || list.size() == 0) {
+	    return null;
+	} else {
+	    return list.get(0);
+	}
+    }
+
+    @Override
     public ExtCourseClassMap getExtCourseClassMap(Integer sid, String extCourseId) {
 	Map<String, Object> properties = new HashMap<>();
 	properties.put("courseid", extCourseId);
@@ -306,14 +319,20 @@ public class IntegrationService implements IIntegrationService {
 	ExtUserUseridMap extUserUseridMap = getExistingExtUserUseridMap(extServer, extUsername);
 
 	if (extUserUseridMap == null) {
-	    String defaultLocale = LanguageUtil.getDefaultLocale().getLocaleName();
-	    String defaultCountry = LanguageUtil.getDefaultCountry();
+	    String defaultLocale = extServer.getDefaultLocale() == null
+		    ? LanguageUtil.getDefaultLocale().getLocaleName()
+		    : extServer.getDefaultLocale().getLocaleName();
+	    String defaultCountry = extServer.getDefaultCountry() == null ? LanguageUtil.getDefaultCountry()
+		    : extServer.getDefaultCountry();
 	    String[] userData = { "", firstName, lastName, "", "", "", "", defaultCountry, "", "", "", email,
 		    defaultLocale };
-	    return createExtUserUseridMap(extServer, extUsername, password, salt, userData, false);
-	} else {
-	    return extUserUseridMap;
+	    extUserUseridMap = createExtUserUseridMap(extServer, extUsername, password, salt, userData, false);
+	    if (extServer.getDefaultTimeZone() != null) {
+		extUserUseridMap.getUser().setTimeZone(extServer.getDefaultTimeZone());
+		service.save(extUserUseridMap.getUser());
+	    }
 	}
+	return extUserUseridMap;
     }
 
     @Override
@@ -628,7 +647,8 @@ public class IntegrationService implements IIntegrationService {
     }
 
     @Override
-    public String getLessonFinishCallbackUrl(User user, Lesson lesson) throws UnsupportedEncodingException {
+    public String getLessonFinishCallbackUrl(User user, Lesson lesson, Long finishedActivityId)
+	    throws UnsupportedEncodingException {
 	if (lesson == null) {
 	    return null;
 	}
@@ -641,16 +661,23 @@ public class IntegrationService implements IIntegrationService {
 	Long lessonId = lesson.getLessonId();
 	ExtServerLessonMap extServerLesson = getExtServerLessonMap(lessonId);
 	ExtServer server = extServerLesson == null ? null : extServerLesson.getExtServer();
+	if (server != null) {
+	    lessonFinishCallbackUrl = server.getLessonFinishUrl();
+	    // skip LTI Advantage score push if it is not needed at this stage
+	    if (StringUtils.isNotBlank(lessonFinishCallbackUrl) && !lessonFinishCallbackUrl.contains("%activityId%")
+		    && finishedActivityId != null) {
+		return null;
+	    }
+	}
 	ExtUserUseridMap extUser = extServerLesson == null ? null
 		: getExtUserUseridMapByUserId(server, user.getUserId());
 
 	// checks whether the lesson was created from extServer and whether it has lessonFinishCallbackUrl setting
 	if (extServerLesson != null && extUser != null
 		&& server.getServerTypeId().equals(ExtServer.INTEGRATION_SERVER_TYPE)
-		&& StringUtils.isNotBlank(extServerLesson.getExtServer().getLessonFinishUrl())) {
+		&& StringUtils.isNotBlank(lessonFinishCallbackUrl)) {
 
 	    // construct real lessonFinishCallbackUrl
-	    lessonFinishCallbackUrl = server.getLessonFinishUrl();
 	    String timestamp = Long.toString(new Date().getTime());
 	    String extUsername = extUser.getExtUsername();
 	    String hash = hash(server, extUsername, timestamp);
@@ -660,6 +687,10 @@ public class IntegrationService implements IIntegrationService {
 	    lessonFinishCallbackUrl = lessonFinishCallbackUrl.replaceAll("%username%", encodedExtUsername)
 		    .replaceAll("%lessonid%", lessonId.toString()).replaceAll("%timestamp%", timestamp)
 		    .replaceAll("%hash%", hash);
+
+	    lessonFinishCallbackUrl = lessonFinishCallbackUrl.replaceAll("%activityId%",
+		    finishedActivityId == null ? "" : finishedActivityId.toString());
+
 	    log.debug(lessonFinishCallbackUrl);
 	}
 	// in case of LTI Tool Consumer - pushMarkToIntegratedServer() method will be invoked from GradebookService on mark update
@@ -950,7 +981,8 @@ public class IntegrationService implements IIntegrationService {
 	}
     }
 
-    private ExtUserUseridMap getExtUserUseridMapByUserId(ExtServer extServer, Integer userId) {
+    @Override
+    public ExtUserUseridMap getExtUserUseridMapByUserId(ExtServer extServer, Integer userId) {
 	Map<String, Object> properties = new HashMap<>();
 	properties.put("extServer.sid", extServer.getSid());
 	properties.put("user.userId", userId);

@@ -50,6 +50,7 @@
   	  <module name="javax.mail.api" export="true" />
   	  <module name="com.fasterxml.jackson.core.jackson-core" export="true" />
       <module name="com.fasterxml.jackson.core.jackson-databind" export="true" />
+      <module name="com.fasterxml.jackson.core.jackson-annotations" export="true" />
       <module name="io.jsonwebtoken" export="true" />
       <module name="xyz.capybara.clamav-client" export="true" />
       <module name="org.apache.batik" export="true" />
@@ -57,6 +58,7 @@
       <module name="net.gjerull.etherpad.client" export="true" />
   	  <module name="com.codahale.passpol" export="true" />
   	  <module name="com.zaxxer.sparsebits" export="true" />
+  	  <module name="org.bouncycastle" export="true" />
       
       <!-- Import META-INF/services for ServiceLoader impls as well
       <module name="myservicemodule" services="import"/>

@@ -15,16 +15,23 @@
  */
 package io.jsonwebtoken.impl;
 
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.io.Encoders;
+
+/**
+ * @deprecated since 0.10.0 - will be removed before 1.0.0. Use {@code io.jsonwebtoken.io.Encoders#BASE64}
+ * or {@code io.jsonwebtoken.io.Decoders#BASE64} instead.
+ */
+@Deprecated
 public class AndroidBase64Codec extends AbstractTextCodec {
 
     @Override
     public String encode(byte[] data) {
-        int flags = android.util.Base64.NO_PADDING | android.util.Base64.NO_WRAP;
-        return android.util.Base64.encodeToString(data, flags);
+        return Encoders.BASE64.encode(data);
     }
 
     @Override
     public byte[] decode(String encoded) {
-        return android.util.Base64.decode(encoded, android.util.Base64.DEFAULT);
+        return Decoders.BASE64.decode(encoded);
     }
 }

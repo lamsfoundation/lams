@@ -20,6 +20,8 @@ public interface IGradebookService {
      */
     List<GradebookUserActivity> getGradebookUserActivities(Long activityId);
 
+    GradebookUserActivity getGradebookUserActivity(Long activityID, Integer userID);
+
     /**
      * If specified activity is set to produce ToolOutput, calculates and stores mark to gradebook.
      *
@@ -42,16 +44,16 @@ public interface IGradebookService {
     /**
      * Updates all user marks in specified activity. It recalculates all UserActivityGradebooks and
      * UserLessonGradebooks.
-     * 
+     *
      * @param activity
      */
     void recalculateGradebookMarksForActivity(Activity activity);
-    
+
     /**
      * Recalculates total marks for all users in a lesson. Then stores that mark in a gradebookUserLesson. Doesn't
      * affect anyhow gradebookUserActivity objects. If total mark is positive but there is no gradebookUserLesson
      * available - throws exception.
-     * 
+     *
      * @param lessonId
      * @throws Exception
      */
@@ -75,9 +77,9 @@ public interface IGradebookService {
     List<GradebookUserLesson> getGradebookUserLesson(Long lessonID);
 
     void removeLearnerFromLesson(Long lessonId, Integer learnerId);
-    
+
     void removeActivityMark(Long toolContentID);
-    
+
     /**
      * Delete user activity mark and updates aggregates
      */

@@ -2,6 +2,8 @@ package org.lamsfoundation.lams.admin.web.controller;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.TimeZone;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,7 +14,13 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.web.form.LtiConsumerForm;
 import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
+import org.lamsfoundation.lams.timezone.Timezone;
+import org.lamsfoundation.lams.timezone.dto.TimezoneDTO;
+import org.lamsfoundation.lams.timezone.service.ITimezoneService;
+import org.lamsfoundation.lams.timezone.util.TimezoneIDComparator;
+import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +39,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RequestMapping("/ltiConsumerManagement")
 public class LtiConsumerManagementController {
     private static Logger log = Logger.getLogger(LtiConsumerManagementController.class);
-    
+
     @Autowired
     private IIntegrationService integrationService;
     @Autowired
     private IUserManagementService userManagementService;
+    @Autowired
+    private ITimezoneService timezoneService;
     @Autowired
     @Qualifier("adminMessageService")
     private MessageService messageService;
@@ -63,8 +73,40 @@ public class LtiConsumerManagementController {
 	if (sid != null) {
 	    ExtServer ltiConsumer = integrationService.getExtServer(sid);
 	    BeanUtils.copyProperties(ltiConsumerForm, ltiConsumer);
+
+	    SupportedLocale locale = ltiConsumer.getDefaultLocale();
+	    ltiConsumerForm.setDefaultLocaleId(locale.getLocaleId());
 	} else {
 	    // do nothing in case of creating a tool consumer
+	}
+
+	boolean isLtiAdvantageEnabled = false;
+	try {
+	    Class clazz = Class.forName("org.lamsfoundation.lams.lti.advantage.util.LtiAdvantageUtil", false,
+		    this.getClass().getClassLoader());
+	    isLtiAdvantageEnabled = clazz != null;
+	} catch (Exception e) {
+	}
+
+	if (isLtiAdvantageEnabled) {
+	    request.setAttribute("ltiAdvantageEnabled", isLtiAdvantageEnabled);
+
+	    List<SupportedLocale> locales = userManagementService.findAll(SupportedLocale.class);
+	    Collections.sort(locales);
+	    request.setAttribute("locales", locales);
+
+	    request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(false));
+
+	    List<Timezone> availableTimeZones = timezoneService.getDefaultTimezones();
+	    TreeSet<TimezoneDTO> timezoneDtos = new TreeSet<>(new TimezoneIDComparator());
+	    for (Timezone availableTimeZone : availableTimeZones) {
+		String timezoneId = availableTimeZone.getTimezoneId();
+		TimezoneDTO timezoneDto = new TimezoneDTO();
+		timezoneDto.setTimeZoneId(timezoneId);
+		timezoneDto.setDisplayName(TimeZone.getTimeZone(timezoneId).getDisplayName());
+		timezoneDtos.add(timezoneDto);
+	    }
+	    request.setAttribute("timezoneDtos", timezoneDtos);
 	}
 
 	return "integration/ltiConsumer";
@@ -162,12 +204,17 @@ public class LtiConsumerManagementController {
 		ltiConsumer.setSid(null);
 		ltiConsumer.setServerTypeId(ExtServer.LTI_CONSUMER_SERVER_TYPE);
 		ltiConsumer.setUserinfoUrl("blank");
-		
+
 	    } else {
 		ltiConsumer = integrationService.getExtServer(sid);
 		BeanUtils.copyProperties(ltiConsumer, ltiConsumerForm);
 	    }
 	    ltiConsumer.setTimeToLiveLoginRequestEnabled(false);
+
+	    SupportedLocale locale = (SupportedLocale) userManagementService.findById(SupportedLocale.class,
+		    ltiConsumerForm.getDefaultLocaleId());
+	    ltiConsumer.setDefaultLocale(locale);
+
 	    integrationService.saveExtServer(ltiConsumer);
 	    return start(request);
 

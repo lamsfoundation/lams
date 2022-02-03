@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -75,9 +76,11 @@ public class LessonCompleteActivityController {
 	    request.setAttribute(RELEASED_LESSONS_REQUEST_ATTRIBUTE, releasedLessonNames.toString());
 	}
 
+	// so LTI 1.3 can update last finished activity
+	Long finishedActivityId = WebUtil.readLongParam(request, "finishedActivityId", true);
 	//let non-LTI integrations server know to come and pick up updated marks (it will happen at lessoncomplete.jsp page)
 	String lessonFinishCallbackUrl = integrationService.getLessonFinishCallbackUrl(learnerProgress.getUser(),
-		lesson);
+		lesson, finishedActivityId);
 	if (lessonFinishCallbackUrl != null) {
 	    request.setAttribute("lessonFinishUrl", lessonFinishCallbackUrl);
 	}

@@ -12,7 +12,7 @@
         <archive path="/lams_build/lib/autopatch/autopatch-1.4.2-lams.jar"/>
         <archive path="/lams_build/lib/autopatch/discovery-1.0.5-lams.jar"/>
         <archive path="/lams_build/lib/basiclti-util/basiclti-util-1.2.0.jar" source="/3rdParty_sources/basiclti-util/src/main/java"/>
-        <archive path="/lams_build/lib/basiclti-util/oauth-20100527.jar"/>
+        <archive path="/lams_build/lib/basiclti-util/oauth-20100527.jar" source="/3rdParty_sources/oauth"/>
         <archive path="/lams_build/lib/basiclti-util/oauth-provider-20100527.jar"/>
         <archive path="/lams_build/lib/basiclti-util/signpost-commonshttp4-1.2.1.2.jar"/>
         <archive path="/lams_build/lib/basiclti-util/signpost-core-1.2.1.2.jar"/>
@@ -23,7 +23,6 @@
         <archive path="/lams_build/lib/jakarta-commons/commons-validator-1.6.jar" source="/3rdParty_sources/commons-validator"/>
         <archive path="/lams_build/lib/jakarta-commons/commons-fileupload-1.3.3.jar" source="/3rdParty_sources/commons-fileupload"/>
         <archive path="/lams_build/lib/jlatexmath/jlatexmath-1.0.8.jar" source="/3rdParty_sources/jlatexmath"/>
-        <archive path="/lams_build/lib/json/jjwt-0.9.0.jar" source="/3rdParty_sources/jsonwebtoken"/>
         <archive javadoc="http://alex-public-doc.s3.amazonaws.com/json_simple-1.1/index.html" path="/lams_build/lib/json/json-simple-1.1.1.jar"/>
         <archive path="/lams_build/lib/mysql/mysql-connector-java-8.0.11.jar" source="/3rdParty_sources/mysql-connector"/>
         <archive path="/lams_build/lib/quartz/quartz-2.2.3.jar" source="/3rdParty_sources/quartz"/>
@@ -45,5 +44,8 @@
         <archive path="/lams_build/lib/batik/batik-awt-util.jar" source="/3rdParty_sources/basiclti-util/src/main/java/org"/>
         <archive path="/lams_build/lib/etherpad/etherpad_lite_client-1.2.13.jar" source="/3rdParty_sources/etherpad"/>
         <archive path="/lams_build/lib/passpol/passpol-0.7.1-SNAPSHOT.jar" source="/3rdParty_sources/passpol"/>
+        <archive path="/lams_build/lib/json/jjwt-api-0.11.2.jar" source="/3rdParty_sources/jsonwebtoken"/>
+        <archive path="/lams_build/lib/json/jjwt-impl-0.11.2.jar" source="/3rdParty_sources/jsonwebtoken"/>
+        <archive path="/lams_build/lib/json/jjwt-jackson-0.11.2.jar" source="/3rdParty_sources/jsonwebtoken"/>
     </library>
 </eclipse-userlibraries>

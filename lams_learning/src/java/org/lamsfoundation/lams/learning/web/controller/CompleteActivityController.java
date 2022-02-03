@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.learning.web.controller;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -85,26 +86,37 @@ public class CompleteActivityController {
 	    return null;
 	}
 
-	// if user has already completed the lesson - we need to let non-LTI integrations server know to come and pick up
-	// updated marks (as it won't happen at lessoncomplete.jsp page)
-	if (progress.isComplete()) {
-	    String lessonFinishCallbackUrl = integrationService.getLessonFinishCallbackUrl(progress.getUser(),
-		    progress.getLesson());
-	    if (lessonFinishCallbackUrl != null) {
-		request.setAttribute("lessonFinishUrl", lessonFinishCallbackUrl);
-	    }
-	    if (progress.getLesson().getAllowLearnerRestart()) {
-		request.setAttribute("lessonID", progress.getLesson().getLessonId());
-	    }
+	if (progress.isComplete() && progress.getLesson().getAllowLearnerRestart()) {
+	    request.setAttribute("lessonID", progress.getLesson().getLessonId());
 	}
 
-	// Set activity as complete
 	try {
-
+	    // LTI Advantage also pushes marks on each activity completion, not only on lesson finish
 	    long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	    Activity activity = learnerService.getActivity(activityId);
-	    //return forward
-	    return learnerService.completeActivity(activityMapping, progress, activity, learnerId, false);
+	    String lessonFinishCallbackUrl = null;
+	    if (progress.isComplete() || activity.isToolActivity()) {
+		lessonFinishCallbackUrl = integrationService.getLessonFinishCallbackUrl(progress.getUser(),
+			progress.getLesson(), activityId);
+		if (lessonFinishCallbackUrl != null) {
+		    // if user has already completed the lesson - we need to let non-LTI integrations server know to come and pick up
+		    // updated marks (as it won't happen at lessoncomplete.jsp page)
+		    request.setAttribute("lessonFinishUrl", lessonFinishCallbackUrl);
+		}
+	    }
+	    // Set activity as complete
+
+	    String forward = learnerService.completeActivity(activityMapping, progress, activity, learnerId, false);
+	    if (lessonFinishCallbackUrl != null && forward.startsWith("redirect")) {
+		// loadToolActivity.jsp will make an Ajax call to LTI Advantage servlet
+		forward = WebUtil.appendParameterToURL(forward, "activityFinishUrl",
+			URLEncoder.encode(lessonFinishCallbackUrl, "UTF8"));
+		if (progress.isComplete()) {
+		    // so we can update the last activity score even on lesson finish
+		    forward = WebUtil.appendParameterToURL(forward, "finishedActivityId", String.valueOf(activityId));
+		}
+	    }
+	    return forward;
 
 	} catch (LearnerServiceException e) {
 	    return "error";
