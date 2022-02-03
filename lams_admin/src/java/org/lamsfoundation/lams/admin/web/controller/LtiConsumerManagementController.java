@@ -80,22 +80,34 @@ public class LtiConsumerManagementController {
 	    // do nothing in case of creating a tool consumer
 	}
 
-	List<SupportedLocale> locales = userManagementService.findAll(SupportedLocale.class);
-	Collections.sort(locales);
-	request.setAttribute("locales", locales);
-
-	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(false));
-
-	List<Timezone> availableTimeZones = timezoneService.getDefaultTimezones();
-	TreeSet<TimezoneDTO> timezoneDtos = new TreeSet<>(new TimezoneIDComparator());
-	for (Timezone availableTimeZone : availableTimeZones) {
-	    String timezoneId = availableTimeZone.getTimezoneId();
-	    TimezoneDTO timezoneDto = new TimezoneDTO();
-	    timezoneDto.setTimeZoneId(timezoneId);
-	    timezoneDto.setDisplayName(TimeZone.getTimeZone(timezoneId).getDisplayName());
-	    timezoneDtos.add(timezoneDto);
+	boolean isLtiAdvantageEnabled = false;
+	try {
+	    Class clazz = Class.forName("org.lamsfoundation.lams.lti.advantage.util.LtiAdvantageUtil", false,
+		    this.getClass().getClassLoader());
+	    isLtiAdvantageEnabled = clazz != null;
+	} catch (Exception e) {
 	}
-	request.setAttribute("timezoneDtos", timezoneDtos);
+
+	if (isLtiAdvantageEnabled) {
+	    request.setAttribute("ltiAdvantageEnabled", isLtiAdvantageEnabled);
+
+	    List<SupportedLocale> locales = userManagementService.findAll(SupportedLocale.class);
+	    Collections.sort(locales);
+	    request.setAttribute("locales", locales);
+
+	    request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(false));
+
+	    List<Timezone> availableTimeZones = timezoneService.getDefaultTimezones();
+	    TreeSet<TimezoneDTO> timezoneDtos = new TreeSet<>(new TimezoneIDComparator());
+	    for (Timezone availableTimeZone : availableTimeZones) {
+		String timezoneId = availableTimeZone.getTimezoneId();
+		TimezoneDTO timezoneDto = new TimezoneDTO();
+		timezoneDto.setTimeZoneId(timezoneId);
+		timezoneDto.setDisplayName(TimeZone.getTimeZone(timezoneId).getDisplayName());
+		timezoneDtos.add(timezoneDto);
+	    }
+	    request.setAttribute("timezoneDtos", timezoneDtos);
+	}
 
 	return "integration/ltiConsumer";
     }

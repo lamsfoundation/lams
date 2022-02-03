@@ -115,144 +115,147 @@
 						<form:input path="userIdParameterName" cssClass="form-control"/>
 					</td>
 				</tr>
-				<tr>
-					<td colspan="2">
-						<h3><fmt:message key="sysadmin.lti.advantage" /></h3>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="admin.user.country" />:</td>
-					<td>
-						<form:select path="defaultCountry" cssClass="form-control">
-							<form:option value="0"><fmt:message key="label.select.country" /></form:option>
-							<c:forEach items="${countryCodes}" var="countryCode">
-								<form:option value="${countryCode.key}">
-									${countryCode.value}
-								</form:option>
-							</c:forEach>
-						</form:select>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="admin.organisation.locale" />:</td>
-					<td>
-						<form:select path="defaultLocaleId" cssClass="form-control">
-							<c:forEach items="${locales}" var="locale">
-								<form:option value="${locale.localeId}">
-									<c:out value="${locale.description}" />
-								</form:option>
-							</c:forEach>
-						</form:select>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="admin.user.time.zone" />:</td>
-					<td>
-						<form:select path="defaultTimeZone" cssClass="form-control">
-							<c:forEach items="${timezoneDtos}" var="timezoneDto">
-								<form:option value="${timezoneDto.timeZoneId}">
-									${timezoneDto.timeZoneId} - ${timezoneDto.displayName}
-								</form:option>
-							</c:forEach>
-						</form:select>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.use.course.prefix" />:</td>
-					<td>
-						<form:checkbox path="useCoursePrefix"  />
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.user.registration.enabled" />:</td>
-					<td>
-						<form:checkbox path="userRegistrationEnabled"  />
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.user.name.lower.case" />:</td>
-					<td>
-						<form:checkbox path="userNameLowerCase"  />
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.lti.advantage.enforce.state.cookie" />:</td>
-					<td>
-						<form:checkbox path="enforceStateCookie"  />
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.lti.advantage.tool.reregistration.enabled" />:</td>
-					<td>
-						<form:checkbox path="toolReregistrationEnabled"  />
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.lti.advantage.platform.issuer" />:</td>
-					<td>
-						<form:input path="issuer" cssClass="form-control"/>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.lti.advantage.platform.keyset.url" />:</td>
-					<td>
-						<form:input path="platformKeySetUrl" cssClass="form-control"/>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.lti.advantage.platform.oidc.url" />:</td>
-					<td>
-						<form:input path="oidcAuthUrl" cssClass="form-control"/>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.lti.advantage.platform.access.token.url" />:</td>
-					<td>
-						<form:input path="accessTokenUrl" cssClass="form-control"/>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.lti.advantage.tool.name" />:</td>
-					<td>
-						<form:input path="toolName" cssClass="form-control"/>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.lti.advantage.tool.description" />:</td>
-					<td>
-						<form:input path="toolDescription" cssClass="form-control"/>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.lti.advantage.tool.client.id" />:</td>
-					<td>
-						<form:input path="clientId" cssClass="form-control"/>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.lti.advantage.tool.keyset.url" />:</td>
-					<td>
-						<form:input path="toolKeySetUrl" cssClass="form-control"/>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.lti.advantage.tool.key.id" />:</td>
-					<td>
-						<form:input path="toolKeyId" cssClass="form-control"/>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.lti.advantage.tool.public.key" />:</td>
-					<td>
-						<form:input path="publicKey" cssClass="form-control"/>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.lti.advantage.tool.private.key" />:</td>
-					<td>
-						<form:input path="privateKey" cssClass="form-control"/>
-					</td>
-				</tr>
+				
+				<c:if test="${ltiAdvantageEnabled}">
+					<tr>
+						<td colspan="2">
+							<h3><fmt:message key="sysadmin.lti.advantage" /></h3>
+						</td>
+					</tr>
+					<tr>
+						<td><fmt:message key="admin.user.country" />:</td>
+						<td>
+							<form:select path="defaultCountry" cssClass="form-control">
+								<form:option value="0"><fmt:message key="label.select.country" /></form:option>
+								<c:forEach items="${countryCodes}" var="countryCode">
+									<form:option value="${countryCode.key}">
+										${countryCode.value}
+									</form:option>
+								</c:forEach>
+							</form:select>
+						</td>
+					</tr>
+					<tr>
+						<td><fmt:message key="admin.organisation.locale" />:</td>
+						<td>
+							<form:select path="defaultLocaleId" cssClass="form-control">
+								<c:forEach items="${locales}" var="locale">
+									<form:option value="${locale.localeId}">
+										<c:out value="${locale.description}" />
+									</form:option>
+								</c:forEach>
+							</form:select>
+						</td>
+					</tr>
+					<tr>
+						<td><fmt:message key="admin.user.time.zone" />:</td>
+						<td>
+							<form:select path="defaultTimeZone" cssClass="form-control">
+								<c:forEach items="${timezoneDtos}" var="timezoneDto">
+									<form:option value="${timezoneDto.timeZoneId}">
+										${timezoneDto.timeZoneId} - ${timezoneDto.displayName}
+									</form:option>
+								</c:forEach>
+							</form:select>
+						</td>
+					</tr>
+					<tr>
+						<td><fmt:message key="sysadmin.use.course.prefix" />:</td>
+						<td>
+							<form:checkbox path="useCoursePrefix"  />
+						</td>
+					</tr>
+					<tr>
+						<td><fmt:message key="sysadmin.user.registration.enabled" />:</td>
+						<td>
+							<form:checkbox path="userRegistrationEnabled"  />
+						</td>
+					</tr>
+					<tr>
+						<td><fmt:message key="sysadmin.user.name.lower.case" />:</td>
+						<td>
+							<form:checkbox path="userNameLowerCase"  />
+						</td>
+					</tr>
+					<tr>
+						<td><fmt:message key="sysadmin.lti.advantage.enforce.state.cookie" />:</td>
+						<td>
+							<form:checkbox path="enforceStateCookie"  />
+						</td>
+					</tr>
+					<tr>
+						<td><fmt:message key="sysadmin.lti.advantage.tool.reregistration.enabled" />:</td>
+						<td>
+							<form:checkbox path="toolReregistrationEnabled"  />
+						</td>
+					</tr>
+					<tr>
+						<td><fmt:message key="sysadmin.lti.advantage.platform.issuer" />:</td>
+						<td>
+							<form:input path="issuer" cssClass="form-control"/>
+						</td>
+					</tr>
+					<tr>
+						<td><fmt:message key="sysadmin.lti.advantage.platform.keyset.url" />:</td>
+						<td>
+							<form:input path="platformKeySetUrl" cssClass="form-control"/>
+						</td>
+					</tr>
+					<tr>
+						<td><fmt:message key="sysadmin.lti.advantage.platform.oidc.url" />:</td>
+						<td>
+							<form:input path="oidcAuthUrl" cssClass="form-control"/>
+						</td>
+					</tr>
+					<tr>
+						<td><fmt:message key="sysadmin.lti.advantage.platform.access.token.url" />:</td>
+						<td>
+							<form:input path="accessTokenUrl" cssClass="form-control"/>
+						</td>
+					</tr>
+					<tr>
+						<td><fmt:message key="sysadmin.lti.advantage.tool.name" />:</td>
+						<td>
+							<form:input path="toolName" cssClass="form-control"/>
+						</td>
+					</tr>
+					<tr>
+						<td><fmt:message key="sysadmin.lti.advantage.tool.description" />:</td>
+						<td>
+							<form:input path="toolDescription" cssClass="form-control"/>
+						</td>
+					</tr>
+					<tr>
+						<td><fmt:message key="sysadmin.lti.advantage.tool.client.id" />:</td>
+						<td>
+							<form:input path="clientId" cssClass="form-control"/>
+						</td>
+					</tr>
+					<tr>
+						<td><fmt:message key="sysadmin.lti.advantage.tool.keyset.url" />:</td>
+						<td>
+							<form:input path="toolKeySetUrl" cssClass="form-control"/>
+						</td>
+					</tr>
+					<tr>
+						<td><fmt:message key="sysadmin.lti.advantage.tool.key.id" />:</td>
+						<td>
+							<form:input path="toolKeyId" cssClass="form-control"/>
+						</td>
+					</tr>
+					<tr>
+						<td><fmt:message key="sysadmin.lti.advantage.tool.public.key" />:</td>
+						<td>
+							<form:input path="publicKey" cssClass="form-control"/>
+						</td>
+					</tr>
+					<tr>
+						<td><fmt:message key="sysadmin.lti.advantage.tool.private.key" />:</td>
+						<td>
+							<form:input path="privateKey" cssClass="form-control"/>
+						</td>
+					</tr>
+				</c:if>
 			</table>
 				
 			<%@ include file="extLessonForm.jsp"%>
