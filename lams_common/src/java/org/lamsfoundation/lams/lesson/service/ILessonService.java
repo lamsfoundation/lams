@@ -336,11 +336,14 @@ public interface ILessonService {
     List<User> getLearnersAttemptedOrCompletedActivity(Activity activity) throws LessonServiceException;
 
     /**
-     * Gets the count of the users who have attempted an activity. This is based on the progress engine records. This
+     * Gets the count of the users who have attempted or completed an activity. This is based on the progress engine
+     * records. This
      * will work on all activities, including ones that don't have any tool sessions, i.e. system activities such as
      * branching.
      */
-    Integer getCountLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException;
+    Integer getCountLearnersHaveAttemptedOrCompletedActivity(Activity activity) throws LessonServiceException;
+
+    Integer getCountLearnersHaveAttemptedActivity(Activity activity);
 
     /** Gets the count of the users who are currently in an activity */
     Integer getCountLearnersInCurrentActivity(Activity activity);

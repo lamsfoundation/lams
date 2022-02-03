@@ -335,7 +335,7 @@ public class TblMonitoringController {
 	long forumActivityId = WebUtil.readLongParam(request, "activityId");
 	ToolActivity forumActivity = (ToolActivity) monitoringService.getActivityById(forumActivityId);
 
-	int attemptedLearnersNumber = lessonService.getCountLearnersHaveAttemptedActivity(forumActivity);
+	int attemptedLearnersNumber = lessonService.getCountLearnersHaveAttemptedOrCompletedActivity(forumActivity);
 	request.setAttribute("attemptedLearnersNumber", attemptedLearnersNumber);
 
 	Set<ToolSession> toolSessions = forumActivity.getToolSessions();
@@ -352,7 +352,8 @@ public class TblMonitoringController {
 	long peerreviewActivityId = WebUtil.readLongParam(request, "activityId");
 	ToolActivity peerreviewActivity = (ToolActivity) monitoringService.getActivityById(peerreviewActivityId);
 
-	int attemptedLearnersNumber = lessonService.getCountLearnersHaveAttemptedActivity(peerreviewActivity);
+	int attemptedLearnersNumber = lessonService
+		.getCountLearnersHaveAttemptedOrCompletedActivity(peerreviewActivity);
 	request.setAttribute("attemptedLearnersNumber", attemptedLearnersNumber);
 
 	Set<ToolSession> toolSessions = peerreviewActivity.getToolSessions();

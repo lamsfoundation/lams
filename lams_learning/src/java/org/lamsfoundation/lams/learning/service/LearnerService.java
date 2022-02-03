@@ -681,7 +681,7 @@ public class LearnerService implements ILearnerFullService {
 	if (evaluation == null) {
 	    return;
 	}
-	
+
 	ToolSession toolSession = lamsCoreToolService.getToolSessionByLearner(learner, activity);
 	if (toolSession == null) {
 	    return;

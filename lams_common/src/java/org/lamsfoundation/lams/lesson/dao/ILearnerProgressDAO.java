@@ -169,9 +169,13 @@ public interface ILearnerProgressDAO {
     /**
      * Count of the number of users that have attempted or completed an activity. Useful for activities that don't have
      * tool sessions.
-     *
-     * @param activityId
-     * @return List<User>
+     */
+    Integer getNumUsersAttemptedOrCompletedActivity(Activity activity);
+
+    /**
+     * Count of the number of users that have attempted but not completed an activity. Useful for activities that don't
+     * have
+     * tool sessions.
      */
     Integer getNumUsersAttemptedActivity(Activity activity);
 

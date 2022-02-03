@@ -295,16 +295,20 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
     @Override
     public Integer getNumUsersAttemptedActivity(Activity activity) {
 	Object value = getSession().createQuery(LearnerProgressDAO.COUNT_ATTEMPTED_ACTIVITY)
-		.setLong("activityId", activity.getActivityId().longValue()).uniqueResult();
-	Integer attempted = new Integer(((Number) value).intValue());
-	return new Integer(attempted.intValue() + getNumUsersCompletedActivity(activity).intValue());
+		.setParameter("activityId", activity.getActivityId().longValue()).uniqueResult();
+	return ((Number) value).intValue();
+    }
+
+    @Override
+    public Integer getNumUsersAttemptedOrCompletedActivity(Activity activity) {
+	return getNumUsersAttemptedActivity(activity) + getNumUsersCompletedActivity(activity).intValue();
     }
 
     @Override
     public Integer getNumUsersCompletedActivity(Activity activity) {
 	Object value = getSession().createQuery(LearnerProgressDAO.COUNT_COMPLETED_ACTIVITY)
-		.setLong("activityId", activity.getActivityId().longValue()).uniqueResult();
-	return new Integer(((Number) value).intValue());
+		.setParameter("activityId", activity.getActivityId().longValue()).uniqueResult();
+	return ((Number) value).intValue();
     }
 
     @Override

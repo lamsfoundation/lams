@@ -617,7 +617,12 @@ public class LessonService implements ILessonService {
     }
 
     @Override
-    public Integer getCountLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException {
+    public Integer getCountLearnersHaveAttemptedOrCompletedActivity(Activity activity) throws LessonServiceException {
+	return learnerProgressDAO.getNumUsersAttemptedOrCompletedActivity(activity);
+    }
+
+    @Override
+    public Integer getCountLearnersHaveAttemptedActivity(Activity activity) {
 	return learnerProgressDAO.getNumUsersAttemptedActivity(activity);
     }
 

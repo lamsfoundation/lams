@@ -2553,7 +2553,7 @@ public class MonitoringService implements IMonitoringFullService {
 
     @Override
     public boolean isActivityAttempted(Activity activity) {
-	Integer numAttempted = lessonService.getCountLearnersHaveAttemptedActivity(activity);
+	Integer numAttempted = lessonService.getCountLearnersHaveAttemptedOrCompletedActivity(activity);
 	if (MonitoringService.log.isDebugEnabled()) {
 	    MonitoringService.log.debug("isActivityAttempted: num attempts for activity " + activity.getActivityId()
 		    + " is " + numAttempted);
