@@ -735,7 +735,7 @@
 			<a href="javascript:toggleReleaseMarksPanel()" class="btn btn-sm btn-default" 
 				title="<fmt:message key="gradebook.monitor.releasemarks.toggle.panel.tooltip" />">
 				<i class="fa fa-share-alt "></i> <span class="hidden-xs">
-					<fmt:message key="gradebook.monitor.releasemarks.release" />
+					<fmt:message key="gradebook.monitor.releasemarks.toggle.panel" />
 				</span>
 			</a>
 		</div>
