@@ -1264,6 +1264,7 @@ public abstract class LdTemplateController {
 	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, description,
 		reflectionInstructions, null, null, user);
 	toolContentJSON.put(RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, selectLeaderToolOutput);
+	toolContentJSON.put(RestTags.LOCK_WHEN_FINISHED, true);
 	toolContentJSON.put("etherpadInstructions", instructions);
 	toolContentJSON.put("galleryWalkEnabled", galleryWalkEnabled);
 	toolContentJSON.put("galleryWalkReadOnly", galleryWalkReadOnly);
