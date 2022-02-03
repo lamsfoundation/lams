@@ -1776,6 +1776,22 @@ ActivityLib = {
 		GeneralLib.setModified(true);
 	},
 	
+	/**
+	 * Deletes an item (activity, annotation etc.) as a result of user pressing a button on properties box
+	 */
+	removeItemWithButton : function(item) {
+		if ((item instanceof ActivityDefs.BranchingEdgeActivity) || confirm(LABELS.REMOVE_BUTTON_CONFIRM)) {
+			ActivityLib.removeSelectEffect(item);
+			if (item instanceof DecorationDefs.Label) {
+				DecorationLib.removeLabel(item);
+			} else if (item instanceof DecorationDefs.Region) {
+				DecorationLib.removeRegion(item);
+			} else {
+				ActivityLib.removeActivity(item);
+			}
+		}
+	},
+	
 	
 	/**
 	 * Deselects an activity/transition/annotation
@@ -1860,7 +1876,7 @@ ActivityLib = {
 	/**
 	 * Removes the given transition.
 	 */
-	removeTransition : function(transition, redraw) {
+	removeTransition : function(transition) {
 		// find the transition and remove it
 		var transitions = transition.fromActivity.transitions.from;
 		transitions.splice(transitions.indexOf(transition), 1);

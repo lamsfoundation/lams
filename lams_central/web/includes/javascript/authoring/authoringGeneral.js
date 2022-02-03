@@ -55,7 +55,11 @@ var paper = null,
 				'iconPath'   : 'images/svg/branchingEnd.svg'
 			},
 			'bin' : {
-				'iconPath'   : 'images/svg/authoringBin.svg'
+				'iconPath'       : 'images/svg/authoringBin.svg',
+				'propertyButton' : $('<div>').addClass('propertyBinContainer')
+											 .append($('<img>').attr('src', LAMS_URL + 'images/svg/authoringBin.svg')
+															   .attr('title', LABELS.REMOVE_BUTTON_TOOLTIP)
+															   .addClass('propertyBinButton'))
 			}
 		},
 		
