@@ -238,7 +238,7 @@
 	</target>
 
 	
-	<target name="_build-war" depends="_build-manifest, _copy-language, _copy-jsp, _copy-libs, _copy-deployment-handler">
+	<target name="_build-war" depends="_build-manifest, _copy-language, _copy-jsp, _copy-libs">
 		<!-- Internal target: Creates WAR file. -->
 		<echo>${ant.project.name}: Building WAR</echo>
 		
@@ -358,14 +358,6 @@
 				<include name="**/*"/>
 			</fileset>
 	 	</copy>
-	</target>
-	
-	<target name="_copy-deployment-handler">
-		<!-- Internal target: Copies WildFly deployment handler -->
-		<echo>${ant.project.name}: Copying deployment handler</echo>
-
-	 	<copy todir="${basedir}/build/war/META-INF/services"
-	 		  file="../../lams/lams_build/conf/deployment-handler/io.undertow.servlet.ServletExtension" />
 	</target>
 
 	<!-- ====================================================================== -->
