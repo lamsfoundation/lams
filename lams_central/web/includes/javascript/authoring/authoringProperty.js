@@ -42,6 +42,9 @@ var PropertyDefs = {
 		if (!content) {
 			// first run, create the content
 			content = activity.propertiesContent = $('#propertiesContentBranching').clone().attr('id', null)
+													.append(layout.toolMetadata.bin.propertyButton.clone().click(function(){
+														ActivityLib.removeItemWithButton(activity);
+													}))
 													.show().data('parentObject', activity);
 			// extra buttons for group/input based branching
 			$('.propertiesContentFieldMatchGroups', content).button().click(function(){
@@ -171,6 +174,9 @@ var PropertyDefs = {
 		if (!content) {
 			// first run, create the content
 			content = activity.propertiesContent = $('#propertiesContentGate').clone().attr('id', null)
+													.append(layout.toolMetadata.bin.propertyButton.clone().click(function(){
+														ActivityLib.removeItemWithButton(activity);
+													}))
 													.show().data('parentObject', activity);
 			$('.propertiesContentFieldTitle', content).val(activity.title);
 			if (activity.gateType == 'system') {
@@ -400,6 +406,9 @@ var PropertyDefs = {
 			
 			// first run, create the content
 			content = activity.propertiesContent = $('#propertiesContentGrouping').clone().attr('id', null)
+													.append(layout.toolMetadata.bin.propertyButton.clone().click(function(){
+														ActivityLib.removeItemWithButton(activity);
+													}))
 													.show().data('parentObject', activity);
 			
 			// init widgets
@@ -443,6 +452,9 @@ var PropertyDefs = {
 		if (!content) {
 			// first run, create the content
 			content = label.propertiesContent = $('#propertiesContentLabel').clone().attr('id', null)
+													.append(layout.toolMetadata.bin.propertyButton.clone().click(function(){
+														ActivityLib.removeItemWithButton(label);
+													}))
 													.show().data('parentObject', label);
 			$('.propertiesContentFieldTitle', content).val(label.title);
 			var color = label.items.shape.attr('fill');
@@ -521,6 +533,9 @@ var PropertyDefs = {
 		if (!content) {
 			// first run, create the content
 			content = activity.propertiesContent = $('#propertiesContentOptionalActivity').clone().attr('id', null)
+													.append(layout.toolMetadata.bin.propertyButton.clone().click(function(){
+														ActivityLib.removeItemWithButton(activity);
+													}))
 													.show().data('parentObject', activity);
 			$('.propertiesContentFieldTitle', content).val(activity.title);
 			
@@ -592,6 +607,9 @@ var PropertyDefs = {
 		if (!content) {
 			// first run, create the content
 			content = activity.propertiesContent = $('#propertiesContentParallel').clone().attr('id', null)
+													.append(layout.toolMetadata.bin.propertyButton.clone().click(function(){
+														ActivityLib.removeItemWithButton(activity);
+													}))
 													.show().data('parentObject', activity);
 			$('.propertiesContentFieldTitle', content).val(activity.title);
 			
@@ -646,6 +664,9 @@ var PropertyDefs = {
 		if (!content) {
 			// first run, create the content
 			content = region.propertiesContent = $('#propertiesContentRegion').clone().attr('id', null)
+													.append(layout.toolMetadata.bin.propertyButton.clone().click(function(){
+														ActivityLib.removeItemWithButton(region);
+													}))
 													.show().data('parentObject', region);
 			
 			$('.propertiesContentFieldTitle', content).val(region.title);
@@ -705,6 +726,9 @@ var PropertyDefs = {
 		if (!content) {
 			// first run, create the content
 			content = activity.propertiesContent = $('#propertiesContentTool').clone().attr('id', null)
+													.append(layout.toolMetadata.bin.propertyButton.clone().click(function(){
+														ActivityLib.removeItemWithButton(activity);
+													}))
 													.show().data('parentObject', activity);
 			$('.propertiesContentFieldTitle', content).val(activity.title);
 			if (activity.parentActivity && (activity.parentActivity instanceof ActivityDefs.ParallelActivity)) {

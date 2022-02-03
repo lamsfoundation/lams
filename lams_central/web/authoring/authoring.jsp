@@ -19,12 +19,6 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<lams:JSImport src="includes/javascript/dialog.js" />	
-	<lams:JSImport src="includes/javascript/authoring/authoringGeneral.js" />
-	<lams:JSImport src="includes/javascript/authoring/authoringActivity.js" />
-	<lams:JSImport src="includes/javascript/authoring/authoringDecoration.js" />
-	<lams:JSImport src="includes/javascript/authoring/authoringProperty.js" />
-	<lams:JSImport src="includes/javascript/authoring/authoringHandler.js" />
-	<lams:JSImport src="includes/javascript/authoring/authoringMenu.js" />
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>',
 			LD_THUMBNAIL_URL_BASE = LAMS_URL + 'home/getLearningDesignThumbnail.do?ldId=',
@@ -145,7 +139,10 @@
 				LIVE_EDIT_SAVE : decoderDiv.html('<c:out value="${LIVE_EDIT_SAVE_VAR}" />').text(),
 				<fmt:message key="authoring.fla.navigate.away.confirm" var="NAVIGATE_AWAY_CONFIRM_VAR"/>
 				NAVIGATE_AWAY_CONFIRM : decoderDiv.html('<c:out value="${NAVIGATE_AWAY_CONFIRM_VAR}" />').text(),
-					
+				<fmt:message key="authoring.fla.remove.button.confirm" var="REMOVE_BUTTON_CONFIRM_VAR"/>
+				REMOVE_BUTTON_CONFIRM : decoderDiv.html('<c:out value="${REMOVE_BUTTON_CONFIRM_VAR}" />').text(),
+				<fmt:message key="authoring.fla.remove.button.tip" var="REMOVE_BUTTON_TOOLTIP_VAR"/>
+				REMOVE_BUTTON_TOOLTIP : decoderDiv.html('<c:out value="${REMOVE_BUTTON_TOOLTIP_VAR}" />').text(),
 				
 				// HandlerLib
 				<fmt:message key="authoring.fla.transition.from.exists.error" var="TRANSITION_FROM_EXISTS_ERROR_VAR"/>
@@ -287,6 +284,12 @@
 			csrfTokenName = '<csrf:tokenname/>',
 			csrfTokenValue = '<csrf:tokenvalue/>';
 	</script>
+	<lams:JSImport src="includes/javascript/authoring/authoringGeneral.js" />
+	<lams:JSImport src="includes/javascript/authoring/authoringActivity.js" />
+	<lams:JSImport src="includes/javascript/authoring/authoringDecoration.js" />
+	<lams:JSImport src="includes/javascript/authoring/authoringProperty.js" />
+	<lams:JSImport src="includes/javascript/authoring/authoringHandler.js" />
+	<lams:JSImport src="includes/javascript/authoring/authoringMenu.js" />
 </lams:head>
 <body>
 	<%-- "loading..." screen, gets removed on page full load --%>
