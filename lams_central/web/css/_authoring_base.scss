@@ -109,15 +109,10 @@ div.propertiesDialogContainer .dialogContents td {
 	padding: 5px;
 }
 
-div.propertiesDialogContainer .dialogContents .propertyBinContainer {
-	text-align: right;
-}
-
-div.propertiesDialogContainer .dialogContents .propertyBinButton {
-	width: 30px;
-	height: 30px;
-	margin: 10px;
-	cursor: pointer;
+div.propertiesDialogContainer .propertyBinButton {
+  float: right;
+  margin-right: 2px;
+  cursor: pointer;
 }
 
 input[name="propertiesContentFieldGroupDivide"] {
