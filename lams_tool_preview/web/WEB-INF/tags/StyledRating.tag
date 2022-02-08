@@ -332,7 +332,7 @@ When true, hides the names and groups the comments.  -->
 											<c:if test="${ratingDto.userRating eq columnOrderId.count}">
 												<div class="rubrics-rating-learner">
 													<lams:Portrait userId="${ratingDto.itemDescription2}" hover="false" />
-													&nbsp;<c:out value="${ratingDto.itemDescription}" escapeXml="true"/>
+													&nbsp;<c:out value="${ratingDto.itemDescription}" escapeXml="false"/>
 												</div>
 											</c:if>
 										</c:forEach>
@@ -362,7 +362,7 @@ When true, hides the names and groups the comments.  -->
 									aria-expanded="false" aria-controls="rubrics-collapse-${criteriaGroupId}-${ratingDto.itemId}"
 									data-parent="#rubrics-users-panels-${criteriaGroupId}">
 								<lams:Portrait userId="${ratingDto.itemId}" hover="false" />
-								&nbsp;<c:out value="${ratingDto.itemDescription}" escapeXml="true"/>
+								&nbsp;<c:out value="${ratingDto.itemDescription}" escapeXml="false"/>
 							</a>
 						</span>
 				       </div>

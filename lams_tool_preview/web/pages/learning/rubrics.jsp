@@ -78,7 +78,7 @@
 	       	<span class="panel-title collapsable-icon-left">
 	       		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${ratingDto.itemId}" 
 						aria-expanded="false" aria-controls="collapse${ratingDto.itemId}" data-parent="#rubrics-users-panels">
-					<lams:Portrait userId="${ratingDto.itemId}" hover="false" />&nbsp;<strong><c:out value="${ratingDto.itemDescription}" escapeXml="true"/></strong>
+					<lams:Portrait userId="${ratingDto.itemId}" hover="false" />&nbsp;<strong><c:out value="${ratingDto.itemDescription}" escapeXml="false"/></strong>
 				</a>
 			</span>
 	       </div>
