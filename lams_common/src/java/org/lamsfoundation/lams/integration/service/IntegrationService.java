@@ -567,7 +567,7 @@ public class IntegrationService implements IIntegrationService {
 	String serverKey = extServer.getServerkey();
 	String plaintext = timestamp.trim().toLowerCase() + extUsername.trim().toLowerCase()
 		+ serverId.trim().toLowerCase() + serverKey.trim().toLowerCase();
-	return HashUtil.sha1(plaintext);
+	return HashUtil.sha256(plaintext);
     }
 
     private String buildName(String prefix, String name) {
@@ -865,7 +865,7 @@ public class IntegrationService implements IIntegrationService {
 			    userData[k - 1] = userProperty;
 			}
 			String salt = HashUtil.salt();
-			String password = HashUtil.sha1(RandomPasswordGenerator.nextPassword(10));
+			String password = HashUtil.sha256(RandomPasswordGenerator.nextPassword(10), salt);
 			extUserUseridMap = createExtUserUseridMap(extServer, extUsername, password, salt, userData,
 				true);
 		    }

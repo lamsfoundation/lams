@@ -155,7 +155,7 @@ public class LearningWebsocketServer {
 		    String userName = websocket.userName;
 		    ArrayNode messagesJSON = LearningWebsocketServer.getMessages(chatSession, messages, userName);
 		    // if hash of roster and messages is the same as before, do not send the message, save the bandwidth
-		    String hash = HashUtil.sha1(rosterString + messagesJSON.toString());
+		    String hash = HashUtil.sha256(rosterString + messagesJSON.toString());
 		    if ((websocket.hash == null) || !websocket.hash.equals(hash)) {
 			websocket.hash = hash;
 
@@ -327,10 +327,7 @@ public class LearningWebsocketServer {
      */
     @OnMessage
     public void receiveMessage(String input, Session session) throws JsonProcessingException, IOException {
-	if (StringUtils.isBlank(input)) {
-	    return;
-	}
-	if (input.equalsIgnoreCase("ping")) {
+	if (StringUtils.isBlank(input) || input.equalsIgnoreCase("ping")) {
 	    // just a ping every few minutes
 	    return;
 	}
