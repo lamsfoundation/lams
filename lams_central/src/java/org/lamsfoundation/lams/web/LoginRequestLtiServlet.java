@@ -202,7 +202,7 @@ public class LoginRequestLtiServlet extends HttpServlet {
 		+ method.toLowerCase().trim()
 		+ (IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method) ? lessonId : "")
 		+ consumerKey.toLowerCase().trim() + secret.toLowerCase().trim();
-	String hash = HashUtil.sha1(plaintext);
+	String hash = HashUtil.sha256(plaintext);
 
 	// constructing redirectUrl by getting request.getQueryString() for POST requests
 	String redirectUrl = "lti.do";
