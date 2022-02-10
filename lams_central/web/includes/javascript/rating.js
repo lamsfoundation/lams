@@ -46,7 +46,7 @@ function initializeJRating() {
 	
 	var step; 
 	if ( typeof RATING_STEP === "undefined" || RATING_STEP === undefined ) {
-		step = false; 
+		step = 0.5; 
 	} else {
 		step = RATING_STEP;
 	}
