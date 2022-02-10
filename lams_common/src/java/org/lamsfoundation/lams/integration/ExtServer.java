@@ -79,6 +79,9 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
     @Column(name = "time_to_live_login_request")
     private int timeToLiveLoginRequest;
 
+    @Column(name = "add_staff_to_all_lessons")
+    private boolean addStaffToAllLessons;
+
     @Column(name = "learner_presence_avail")
     private Boolean learnerPresenceAvailable;
 
@@ -196,6 +199,7 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
 	toolReregistrationEnabled = true;
 	useCoursePrefix = true;
 	userRegistrationEnabled = true;
+	addStaffToAllLessons = false;
     }
 
     public Integer getSid() {
@@ -319,6 +323,14 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
 
     public void setTimeToLiveLoginRequest(int timeToLiveLoginRequest) {
 	this.timeToLiveLoginRequest = timeToLiveLoginRequest;
+    }
+
+    public boolean isAddStaffToAllLessons() {
+	return addStaffToAllLessons;
+    }
+
+    public void setAddStaffToAllLessons(boolean addStaffToAllLessons) {
+	this.addStaffToAllLessons = addStaffToAllLessons;
     }
 
     public Set<ExtCourseClassMap> getExtCourseClassMaps() {
