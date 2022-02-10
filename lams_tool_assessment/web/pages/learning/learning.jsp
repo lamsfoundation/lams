@@ -607,7 +607,6 @@
 <body class="stripes">
 
 	<lams:Page type="learner" title="${assessment.title}">
-		
 		<c:if test="${not empty sessionMap.submissionDeadline && (sessionMap.mode == 'author' || sessionMap.mode == 'learner')}">
 			<lams:Alert id="submission-deadline" type="info" close="true">
 				<fmt:message key="authoring.info.teacher.set.restriction" >
@@ -619,7 +618,17 @@
 		<c:if test="${isLeadershipEnabled}">
 			<lams:LeaderDisplay username="${sessionMap.groupLeader.firstName} ${sessionMap.groupLeader.lastName}" userId="${sessionMap.groupLeader.userId}"/>
 		</c:if>
-
+		
+		<c:if test="${assessment.allowDiscloseAnswers}">
+			<lams:Alert type="info" close="true">
+				<fmt:message key="label.learning.disclose.tip" />
+			</lams:Alert>
+		</c:if>
+		
+		<lams:Alert type="info" close="true">
+			<fmt:message key="label.learning.submit.all.tip" />
+		</lams:Alert>
+		
 		<div class="panel">
 			<c:out value="${assessment.instructions}" escapeXml="false"/>
 		</div>
@@ -651,7 +660,6 @@
 					<button type="button" name="submitAll"
 							onclick="return submitAll(false);" 
 							class="btn btn-primary voffset10 pull-right na"
-							title='<fmt:message key="label.learning.submit.all.tip" />'
 							>
 						<fmt:message key="label.learning.submit.all" />
 					</button>
