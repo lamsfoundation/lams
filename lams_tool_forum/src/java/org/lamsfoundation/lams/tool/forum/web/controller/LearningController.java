@@ -686,6 +686,8 @@ public class LearningController {
 		messageForm.getMessage().setSubject(reTitle);
 	    }
 	}
+	
+	messageForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 
 	// Should we show the reflection or not? We shouldn't show it when the View Forum screen is accessed
 	// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.

@@ -13,7 +13,20 @@
 	<lams:head>
 		<title><fmt:message key="activity.title" /></title>
 		<%@ include file="/common/tabbedheader.jsp"%>
+		<link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
 		
+		<script type="text/javascript" src="${lams}includes/javascript/uppy/uppy.min.js"></script>
+		<c:choose>
+			<c:when test="${language eq 'es'}">
+				<script type="text/javascript" src="${lams}includes/javascript/uppy/es_ES.min.js"></script>
+			</c:when>
+			<c:when test="${language eq 'fr'}">
+				<script type="text/javascript" src="${lams}includes/javascript/uppy/fr_FR.min.js"></script>
+			</c:when>
+			<c:when test="${language eq 'el'}">
+				<script type="text/javascript" src="${lams}includes/javascript/uppy/el_GR.min.js"></script>
+			</c:when>
+		</c:choose>
 		<script type="text/javascript">
 		    var csrfTokenName = '<csrf:tokenname/>',
    				csrfTokenValue = '<csrf:tokenvalue/>';
