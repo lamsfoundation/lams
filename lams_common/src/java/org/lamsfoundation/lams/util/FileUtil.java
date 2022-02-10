@@ -911,6 +911,9 @@ public class FileUtil {
      * Gets upload dir for the given ID
      */
     public static File getTmpFileUploadDir(String tmpFileUploadId) {
+	if (StringUtils.isBlank(tmpFileUploadId)) {
+	    throw new IllegalArgumentException("File upload folder name must not be blank");
+	}
 	String uploadSubDir = FileUtil.prefix + tmpFileUploadId;
 	return new File(Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR), uploadSubDir);
     }
