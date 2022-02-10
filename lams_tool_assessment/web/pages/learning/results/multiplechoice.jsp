@@ -86,6 +86,11 @@
 									${teams}
 									<lams:Portrait userId="${session.groupLeader.userId}"/>&nbsp;
 									<c:out value="${session.sessionName}" escapeXml="true"/>&nbsp;
+									<c:if test="${not empty sessionResults.justification}">
+										<lams:Popover titleKey="label.answer.justification">
+							          		<c:out value='${sessionResults.justification}' />
+							          	</lams:Popover>
+									</c:if>
 								</c:set>
 							</c:if>
 						</c:forEach>
