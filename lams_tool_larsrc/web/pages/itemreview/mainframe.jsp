@@ -39,9 +39,32 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</style>
 
 	<script type="text/javascript">
+		var viewUrl = '${resourceItemReviewUrl}';
+		
 		$(document).ready(function(){
 			$.ajaxSetup({ cache: true });
     			$('#headerFrame').load('${initNavUrl}');
+
+    			
+    			if (viewUrl.indexOf('/openUrlPopup') === 0) {
+					$('#resourceFrame').attr('src', "<c:url value='${resourceItemReviewUrl}'/>");
+    			} else {
+        			$('#link-content').empty();
+        			
+	    			$.ajax({
+	    			    url: "http://ckeditor.iframe.ly/api/oembed?url=" + viewUrl,
+	    			    dataType: "jsonp",
+	    			    type: "POST",
+	    			    jsonpCallback: 'iframelyCallback',
+	    			    contentType: "application/json; charset=utf-8",
+	    			    success: function (result, status, xhr) {
+	    			        console.log(result);
+	    			    },
+	    			    error: function (xhr, status, error) {
+	    			        console.log("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
+	    			    }
+	    			});
+        		}
    		});
 		
 		function setIframeHeight() {
@@ -52,6 +75,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	        var height = Math.max( body.scrollHeight, body.offsetHeight, 
 	            html.clientHeight, html.scrollHeight, html.offsetHeight );
 		    rscFrame.style.height = height + "px";
+		}
+		
+		function iframelyCallback(response) {
+			if (response && response.html) {
+				$(response.html).appendTo('#link-content');
+			}
 		}
 	</script>
 </lams:head>
@@ -67,8 +96,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
  				<c:set var="accordianTitle"><fmt:message key="label.comments"/></c:set>
 				<lams:Comments toolSessionId="${toolSessionID}" toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>" embedInAccordian="true" accordionTitle="${accordianTitle}" mode="${mode}" toolItemId="${itemUid}" readOnly="${sessionMap.finishedLock}"/>	
 			</c:if>
-   			<div class="panel-body" style="height:100vh;">
- 				<iframe src="<c:url value='${resourceItemReviewUrl}'/>" id="resourceFrame" style="border:0px;width:100%;height:100%;" onload="setIframeHeight()"></iframe>
+   			<div id="link-content" class="panel-body" style="height:100vh;">
+   				<iframe id="resourceFrame" style="border:0px;width:100%;height:100%;" onload="setIframeHeight()"></iframe>
  			</div> 
    		</div>
 	</lams:Page>
