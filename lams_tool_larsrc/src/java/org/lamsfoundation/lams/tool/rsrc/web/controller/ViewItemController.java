@@ -23,19 +23,19 @@
 
 package org.lamsfoundation.lams.tool.rsrc.web.controller;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.dto.InstructionNavDTO;
@@ -44,6 +44,8 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -54,17 +56,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class ViewItemController {
-    private static final Logger log = Logger.getLogger(ViewItemController.class);
-
     @Autowired
     private IResourceService resourceService;
 
     /**
      * Display main frame to display instrcution and item content.
+     *
+     * @throws UnsupportedEncodingException
      */
     @SuppressWarnings("unchecked")
     @RequestMapping("/reviewItem")
-    private String reviewItem(HttpServletRequest request) {
+    private String reviewItem(HttpServletRequest request) throws UnsupportedEncodingException {
 
 	SessionMap<String, Object> sessionMap = null;
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID, true);
@@ -75,7 +77,7 @@ public class ViewItemController {
 	} else {
 	    sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	}
-	
+
 	String mode = request.getParameter(AttributeNames.ATTR_MODE);
 	ResourceItem item = getResourceItem(request, sessionMap, mode);
 
@@ -95,11 +97,16 @@ public class ViewItemController {
 	if (item.getType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT) {
 	    sessionMap.put(ResourceConstants.ATT_LEARNING_OBJECT, item);
 	}
-	// set url to content frame
 
-	int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX));
-	request.setAttribute(ResourceConstants.ATTR_RESOURCE_REVIEW_URL,
-		getReviewUrl(request, item, sessionMapID, mode, itemIdx));
+	Integer itemIdx = WebUtil.readIntParam(request, ResourceConstants.PARAM_ITEM_INDEX, true);
+	String reviewUrl = getReviewUrl(item, sessionMapID);
+	request.setAttribute(ResourceConstants.ATTR_RESOURCE_REVIEW_URL, reviewUrl);
+	if (item.getType() == ResourceConstants.RESOURCE_TYPE_URL) {
+	    request.setAttribute(ResourceConstants.ATTR_ENCODED_RESOURCE_REVIEW_URL,
+		    URLEncoder.encode(reviewUrl, "UTF-8"));
+	}
+	request.setAttribute(ResourceConstants.ATTR_IS_DOWNLOAD, item.getType() == ResourceConstants.RESOURCE_TYPE_FILE
+		|| item.getType() == ResourceConstants.RESOURCE_TYPE_WEBSITE);
 
 	request.setAttribute(ResourceConstants.ATTR_ALLOW_COMMENTS, item.isAllowComments());
 
@@ -115,7 +122,7 @@ public class ViewItemController {
     }
 
     /**
-     * Return next instrucion to page. It need four input parameters, mode, itemIndex or itemUid, and insIdx.
+     * Return next instruction to page. It need four input parameters, mode, itemIndex or itemUid, and insIdx.
      */
     @RequestMapping("/nextInstruction")
     private String nextInstruction(HttpServletRequest request) {
@@ -130,8 +137,10 @@ public class ViewItemController {
 	    return "error";
 	}
 
-	int currIns = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_CURRENT_INSTRUCTION_INDEX),
-		0);
+	Integer currIns = WebUtil.readIntParam(request, ResourceConstants.PARAM_CURRENT_INSTRUCTION_INDEX, true);
+	if (currIns == null) {
+	    currIns = 0;
+	}
 
 	Set<ResourceItemInstruction> instructions = item.getItemInstructions();
 	InstructionNavDTO navDto = new InstructionNavDTO();
@@ -164,30 +173,6 @@ public class ViewItemController {
 	return "pages/itemreview/instructionsnav";
     }
 
-    /**
-     * Open url or file in a popup window page.
-     */
-    @RequestMapping("/openUrlPopup")
-    private String openUrlPopup(HttpServletRequest request) {
-	String mode = request.getParameter(AttributeNames.ATTR_MODE);
-
-	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-
-	ResourceItem item = getResourceItem(request, sessionMap, mode);
-
-	boolean isUrlItemType = item.getType() == ResourceConstants.RESOURCE_TYPE_URL;
-	request.setAttribute(ResourceConstants.ATTR_IS_URL_ITEM_TYPE, isUrlItemType);
-
-	String popupUrl = (isUrlItemType) ? item.getUrl()
-		: "/download/?uuid=" + item.getFileUuid() + "&preferDownload=false";
-	request.setAttribute(ResourceConstants.PARAM_OPEN_URL_POPUP, popupUrl);
-
-	request.setAttribute(ResourceConstants.PARAM_TITLE, item.getTitle());
-	return "pages/itemreview/openurl";
-    }
-
     // *************************************************************************************
     // Private methods
     // *************************************************************************************
@@ -216,82 +201,31 @@ public class ViewItemController {
 	return item;
     }
 
-    private static Pattern usePopupButtonForURL = Pattern.compile("wikipedia|google",
-	    Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     private static Pattern protocolExists = Pattern.compile("http://|https://|ftp://|nntp://",
 	    Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
-    private static Pattern httpPattern = Pattern.compile("http://", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     public static final String DEFAULT_PROTOCOL = "http://";
     public static final String HTTPS_SCHEME = "https";
 
-    private Object getReviewUrl(HttpServletRequest request, ResourceItem item, String sessionMapID, String mode,
-	    int itemIdx) {
-	short type = item.getType();
+    private String getReviewUrl(ResourceItem item, String sessionMapID) {
 	String url = null;
-	switch (type) {
+	switch (item.getType()) {
 	    case ResourceConstants.RESOURCE_TYPE_URL:
 		// protocol missing? Assume http. Must do before the popup checks otherwise LDEV-4503 case may be missed.
 		url = item.getUrl();
 		if (!protocolExists.matcher(url).find()) {
 		    url = DEFAULT_PROTOCOL + url;
 		}
-
-		// check all three cases that trigger popup - first is set in authoring
-		boolean usePopup = item.isOpenUrlNewWindow();
-		// See LDEV-4503 regarding https/http issues
-		if (!usePopup) {
-		    String serverScheme = request.getScheme();
-		    usePopup = HTTPS_SCHEME.equalsIgnoreCase(serverScheme) && httpPattern.matcher(url).find();
-		}
-		// See LDEV-1736 regarding wikipedia regex
-		if (!usePopup) {
-		    Matcher matcher = usePopupButtonForURL.matcher(url);
-		    usePopup = matcher.find();
-		}
-
-		if (usePopup) {
-		    url = constructUrlOpenInNewWindow(item, sessionMapID, mode, itemIdx);
-		}
 		break;
-
 	    case ResourceConstants.RESOURCE_TYPE_FILE:
-		if (item.isOpenUrlNewWindow()) {
-		    url = constructUrlOpenInNewWindow(item, sessionMapID, mode, itemIdx);
-		} else {
-		    url = "/download/?uuid=" + item.getFileUuid() + "&preferDownload=false";
-		}
-		break;
-
 	    case ResourceConstants.RESOURCE_TYPE_WEBSITE:
-		url = "/download/?uuid=" + item.getFileUuid() + "&preferDownload=false";
+		url = "/download/?uuid=" + item.getFileUuid() + "&preferDownload=true";
 		break;
 
 	    case ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT:
-		url = "/pages/learningobj/mainframe.jsp?sessionMapID=" + sessionMapID;
+		url = Configuration.get(ConfigurationKeys.SERVER_URL) + "pages/learningobj/mainframe.jsp?sessionMapID="
+			+ sessionMapID;
 		break;
 	}
-	return url;
-    }
-
-    /**
-     * Creates url for opening in a new window depending whether it's authoring environment or not.
-     *
-     * @param item
-     * @param sessionMapID
-     * @param mode
-     * @param itemIdx
-     * @return
-     */
-    private String constructUrlOpenInNewWindow(ResourceItem item, String sessionMapID, String mode, int itemIdx) {
-	String url;
-	if (ResourceConstants.MODE_AUTHOR_SESSION.equals(mode)) {
-	    url = "/openUrlPopup.do?" + AttributeNames.ATTR_MODE + "=" + mode + "&" + ResourceConstants.PARAM_ITEM_INDEX
-		    + "=" + itemIdx + "&" + ResourceConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
-	} else {
-	    url = "/openUrlPopup.do?" + ResourceConstants.PARAM_RESOURCE_ITEM_UID + "=" + item.getUid() + "&"
-		    + ResourceConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
-	}
-
 	return url;
     }
 

@@ -22,9 +22,7 @@
 
 		<div class="form-group" id="addurl">
 	    	<label for="url"><fmt:message key="label.authoring.basic.resource.url.input" /></label>
-			<form:input path="url" cssClass="form-control" tabindex="2" id="url"/><br/>&nbsp;
-	        <label><form:checkbox path="openUrlNewWindow" tabindex="3" id="openUrlNewWindow" />&nbsp;
-			 <fmt:message key="open.in.new.window" /></label>
+			<form:input path="url" cssClass="form-control" tabindex="2" id="url"/>
 	    </div>
 
 		<div class="form-group">

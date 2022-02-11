@@ -60,7 +60,7 @@ public class ResourceItem implements Cloneable {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     // Resource Type:1=URL,2=File,3=Website,4=Learning Object
     @Column(name = "item_type")
     private short type;
@@ -73,9 +73,6 @@ public class ResourceItem implements Cloneable {
 
     @Column
     private String url;
-
-    @Column(name = "open_url_new_window")
-    private boolean openUrlNewWindow;
 
     @Column(name = "ims_schema")
     private String imsSchema;
@@ -108,20 +105,20 @@ public class ResourceItem implements Cloneable {
 
     @Column(name = "is_hide")
     private boolean isHide;
-    
+
     @Column(name = "create_by_author")
     private boolean isCreateByAuthor;
 
     @Column(name = "create_date")
     private Date createDate;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by")
     private ResourceUser createBy;
-    
+
     @Column(name = "is_allow_rating")
     private boolean allowRating;
-    
+
     @Column(name = "is_allow_comments")
     private boolean allowComments;
 
@@ -300,14 +297,6 @@ public class ResourceItem implements Cloneable {
 	this.fileName = name;
     }
 
-    public boolean isOpenUrlNewWindow() {
-	return openUrlNewWindow;
-    }
-
-    public void setOpenUrlNewWindow(boolean openUrlNewWindow) {
-	this.openUrlNewWindow = openUrlNewWindow;
-    }
-
     public Integer getOrderId() {
 	return orderId;
     }
@@ -341,11 +330,11 @@ public class ResourceItem implements Cloneable {
     }
 
     public boolean isAllowComments() {
-        return allowComments;
+	return allowComments;
     }
 
     public void setAllowComments(boolean allowComments) {
-        this.allowComments = allowComments;
+	this.allowComments = allowComments;
     }
 
     @Override

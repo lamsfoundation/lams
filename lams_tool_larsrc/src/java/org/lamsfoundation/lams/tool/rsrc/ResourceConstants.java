@@ -86,6 +86,10 @@ public class ResourceConstants {
 
     public static final String ATTR_RESOURCE_REVIEW_URL = "resourceItemReviewUrl";
 
+    public static final String ATTR_ENCODED_RESOURCE_REVIEW_URL = "encodedResourceItemReviewUrl";
+    
+    public static final String ATTR_IS_DOWNLOAD = "isDownload";
+
     public static final String ATTR_RESOURCE = "resource";
 
     public static final String ATTR_RUN_AUTO = "runAuto";
@@ -123,9 +127,9 @@ public class ResourceConstants {
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
 
     public static final String ATTR_IS_URL_ITEM_TYPE = "isUrlItemType";
-    
+
     public static final String ATTR_ALLOW_COMMENTS = "allowComments";
-    
+
     public static final String ATTR_COMPLETED_SUFFICIENT_TO_FINISH = "hasCompletedMinNumber";
 
     // error message keys

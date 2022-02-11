@@ -61,10 +61,6 @@
 					<form:input id="url" path="url"  cssClass="form-control"/>
 					<br/>
 					
-					<form:checkbox path="openUrlNewWindow" id="openUrlNewWindow" cssClass="loffset5"/>
-					&nbsp;<label for="openUrlNewWindow"><fmt:message key="open.in.new.window" /></label>
-					<br/>
-					
 					<%@ include file="ratings.jsp"%>	
 				</div>
 

@@ -22,64 +22,83 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ include file="/common/taglibs.jsp" %>
 <%@ page import="org.lamsfoundation.lams.tool.rsrc.ResourceConstants"%>
 
+<c:set var="initNavUrl"><c:url value="/pages/itemreview/initnav.jsp"/>?mode=${mode}&itemIndex=${itemIndex}&itemUid=${itemUid}&toolSessionID=${toolSessionID}&sessionMapID=${sessionMapID}</c:set>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+	
 <lams:html>
 <lams:head>
 	<%@ include file="/common/header.jsp"%>
 
-	<c:set var="initNavUrl"><c:url value="/pages/itemreview/initnav.jsp"/>?mode=${mode}&itemIndex=${itemIndex}&itemUid=${itemUid}&toolSessionID=${toolSessionID}&sessionMapID=${sessionMapID}</c:set>
-	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
-	
 	<style media="screen,projection" type="text/css">
  	 	#collapseComments, #collapseComments .row {
 	 		padding-left: 6px;
 	 		padding-right: 6px;
 	 	}
-	}
-	
+	 	
+	 	#embedded-open-button, #download-button {
+	 		display: none;
+	 	}
 	</style>
 
-	<script type="text/javascript">
-		var viewUrl = '${resourceItemReviewUrl}';
+	<script>
+		var isDownload = ${isDownload};
 		
 		$(document).ready(function(){
-			$.ajaxSetup({ cache: true });
-    			$('#headerFrame').load('${initNavUrl}');
+   			$('#headerFrame').load('${initNavUrl}');
 
-    			
-    			if (viewUrl.indexOf('/openUrlPopup') === 0) {
-					$('#resourceFrame').attr('src', "<c:url value='${resourceItemReviewUrl}'/>");
-    			} else {
-        			$('#link-content').empty();
-        			
-	    			$.ajax({
-	    			    url: "http://ckeditor.iframe.ly/api/oembed?url=" + viewUrl,
-	    			    dataType: "jsonp",
-	    			    type: "POST",
-	    			    jsonpCallback: 'iframelyCallback',
-	    			    contentType: "application/json; charset=utf-8",
-	    			    success: function (result, status, xhr) {
-	    			        console.log(result);
-	    			    },
-	    			    error: function (xhr, status, error) {
-	    			        console.log("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
-	    			    }
-	    			});
-        		}
+   			if (isDownload) {
+   				$('#download-button').show();
+   				return;
+   	   		}
+   	   		
+   			$('#embedded-open-button').show();
+
+   			<c:if test="${not empty encodedResourceItemReviewUrl}">
+	   			$.ajax({
+	   			    url: "http://ckeditor.iframe.ly/api/oembed?url=${encodedResourceItemReviewUrl}",
+	   			    dataType: "jsonp",
+	   			    cache: true,
+	   			    type: "POST",
+	   			    jsonpCallback: 'iframelyCallback',
+	   			    contentType: "application/json; charset=utf-8",
+	   			    error: function (xhr, status, error) {
+		   			    $('#embedded-open-button').removeClass('btn-default btn-sm pull-right').addClass('btn-primary');
+	   			        console.log("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
+	   			    }
+	   			});
+   			</c:if>
    		});
 		
 		function setIframeHeight() {
-			var rscFrame = document.getElementById('resourceFrame');
-		    var doc = rscFrame.contentDocument? rscFrame.contentDocument : rscFrame.contentWindow.document;
-	        var body = doc.body;
-	        var html = doc.documentElement;
-	        var height = Math.max( body.scrollHeight, body.offsetHeight, 
-	            html.clientHeight, html.scrollHeight, html.offsetHeight );
-		    rscFrame.style.height = height + "px";
+			var frame = $('#embedded-content iframe');
+			if (frame.length === 0) {
+				return;
+			}
+			frame = frame[0];
+			
+		    var doc = frame.contentDocument? frame.contentDocument : frame.contentWindow.document,
+	        	body = doc.body,
+	        	html = doc.documentElement.
+	        	height = Math.max(body.scrollHeight, body.offsetHeight, 
+	            				  html.clientHeight, html.scrollHeight, html.offsetHeight);
+		    frame.style.height = height + "px";
 		}
 		
 		function iframelyCallback(response) {
-			if (response && response.html) {
-				$(response.html).appendTo('#link-content');
+			if (!response) {
+				 $('#embedded-open-button').removeClass('btn-default btn-sm pull-right').addClass('btn-primary');
+				return;
+			}
+			
+			if (response.title) {
+				$('#embedded-title').text(response.title);
+			}
+			if (response.description) {
+				$('#embedded-description').text(response.description);
+			}
+			if (response.html) {
+				$(response.html).appendTo('#embedded-content');
+				setIframeHeight();
 			}
 		}
 	</script>
@@ -94,10 +113,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</div>
  			<c:if test="${allowComments and (mode eq 'learner' or mode eq 'author') and not empty toolSessionID}">
  				<c:set var="accordianTitle"><fmt:message key="label.comments"/></c:set>
-				<lams:Comments toolSessionId="${toolSessionID}" toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>" embedInAccordian="true" accordionTitle="${accordianTitle}" mode="${mode}" toolItemId="${itemUid}" readOnly="${sessionMap.finishedLock}"/>	
+				<lams:Comments toolSessionId="${toolSessionID}" toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>"
+							  embedInAccordian="true" accordionTitle="${accordianTitle}" mode="${mode}" toolItemId="${itemUid}"
+							  readOnly="${sessionMap.finishedLock}"/>	
 			</c:if>
-   			<div id="link-content" class="panel-body" style="height:100vh;">
-   				<iframe id="resourceFrame" style="border:0px;width:100%;height:100%;" onload="setIframeHeight()"></iframe>
+   			<div class="panel-body">
+				<div class="text-center">
+					<a id="download-button" href="<c:url value='${resourceItemReviewUrl}' />" class="btn btn-primary">
+						<fmt:message key="label.download" />
+					</a>
+					<a id="embedded-open-button" href="${resourceItemReviewUrl}" target="_blank" class="btn btn-default btn-sm pull-right">
+						<fmt:message key="open.in.new.window" />
+					</a>
+				</div>
+
+   				<h4  id="embedded-title" class="clearfix"></h3>
+   				<h5  id="embedded-description"></h4>
+   				<div id="embedded-content"></div>
  			</div> 
    		</div>
 	</lams:Page>

@@ -695,7 +695,6 @@ public class AuthoringController {
 	form.setDescription(item.getDescription());
 	form.setTitle(item.getTitle());
 	form.setUrl(item.getUrl());
-	form.setOpenUrlNewWindow(item.isOpenUrlNewWindow());
 	form.setAllowRating(item.isAllowRating());
 	form.setAllowComments(item.isAllowComments());
 	if (itemIdx >= 0) {
@@ -821,9 +820,6 @@ public class AuthoringController {
 
 	if (type == ResourceConstants.RESOURCE_TYPE_URL) {
 	    item.setUrl(itemForm.getUrl());
-	}
-	if (type == ResourceConstants.RESOURCE_TYPE_URL || type == ResourceConstants.RESOURCE_TYPE_FILE) {
-	    item.setOpenUrlNewWindow(itemForm.isOpenUrlNewWindow());
 	}
 	item.setDescription(itemForm.getDescription());
 

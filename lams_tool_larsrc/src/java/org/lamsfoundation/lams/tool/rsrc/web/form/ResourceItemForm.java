@@ -39,7 +39,6 @@ public class ResourceItemForm {
     private short itemType;
     private String description;
     private String url;
-    private boolean openUrlNewWindow;
     //flag of this item has attachment or not
     private boolean hasFile;
     private Long fileUuid;
@@ -127,14 +126,6 @@ public class ResourceItemForm {
 
     public void setHasFile(boolean hasFile) {
 	this.hasFile = hasFile;
-    }
-
-    public boolean isOpenUrlNewWindow() {
-	return openUrlNewWindow;
-    }
-
-    public void setOpenUrlNewWindow(boolean openUrlNewWindow) {
-	this.openUrlNewWindow = openUrlNewWindow;
     }
 
     public String getSessionMapID() {

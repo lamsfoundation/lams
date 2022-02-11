@@ -1276,7 +1276,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    item.setFileVersionId(JsonUtil.optLong(itemData, "crVersionId"));
 	    item.setImsSchema(JsonUtil.optString(itemData, "imsSchema"));
 	    item.setOrganizationXml(JsonUtil.optString(itemData, "organizationXml"));
-	    item.setOpenUrlNewWindow(JsonUtil.optBoolean(itemData, "openUrlNewWindow", Boolean.FALSE));
 	    item.setUrl(JsonUtil.optString(itemData, "url"));
 
 	    ArrayNode instructionStrings = JsonUtil.optArray(itemData, "instructions");

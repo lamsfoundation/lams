@@ -397,13 +397,11 @@ public class LearningController {
 		    request.setAttribute("errorMap", errorMap);
 		    return "pages/learning/addurl";
 		}
-		item.setOpenUrlNewWindow(resourceItemForm.isOpenUrlNewWindow());
 	    } else {
 		throw new ServletException("No file uploaded");
 	    }
 	} else if (type == ResourceConstants.RESOURCE_TYPE_URL) {
 	    item.setUrl(resourceItemForm.getUrl());
-	    item.setOpenUrlNewWindow(resourceItemForm.isOpenUrlNewWindow());
 	}
 	// save and update session
 	ResourceSession resSession = resourceService.getResourceSessionBySessionId(sessionId);
