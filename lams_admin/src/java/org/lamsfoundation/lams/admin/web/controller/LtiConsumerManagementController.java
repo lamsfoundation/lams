@@ -75,7 +75,9 @@ public class LtiConsumerManagementController {
 	    BeanUtils.copyProperties(ltiConsumerForm, ltiConsumer);
 
 	    SupportedLocale locale = ltiConsumer.getDefaultLocale();
-	    ltiConsumerForm.setDefaultLocaleId(locale.getLocaleId());
+	    if (locale != null) {
+		ltiConsumerForm.setDefaultLocaleId(locale.getLocaleId());
+	    }
 	} else {
 	    // do nothing in case of creating a tool consumer
 	}
