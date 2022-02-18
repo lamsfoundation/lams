@@ -41,8 +41,6 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -57,7 +55,7 @@ public class ViewItemController {
     private IResourceService resourceService;
 
     /**
-     * Display main frame to display instrcution and item content.
+     * Display main frame to display item content.
      *
      * @throws UnsupportedEncodingException
      */
@@ -91,9 +89,6 @@ public class ViewItemController {
 	if (item == null) {
 	    return "error";
 	}
-	if (item.getType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT) {
-	    sessionMap.put(ResourceConstants.ATT_LEARNING_OBJECT, item);
-	}
 
 	Integer itemIdx = WebUtil.readIntParam(request, ResourceConstants.PARAM_ITEM_INDEX, true);
 	String reviewUrl = getReviewUrl(item, sessionMapID);
@@ -102,8 +97,8 @@ public class ViewItemController {
 	    request.setAttribute(ResourceConstants.ATTR_ENCODED_RESOURCE_REVIEW_URL,
 		    URLEncoder.encode(reviewUrl, "UTF-8"));
 	}
-	request.setAttribute(ResourceConstants.ATTR_IS_DOWNLOAD, item.getType() == ResourceConstants.RESOURCE_TYPE_FILE
-		|| item.getType() == ResourceConstants.RESOURCE_TYPE_WEBSITE);
+	request.setAttribute(ResourceConstants.ATTR_IS_DOWNLOAD,
+		item.getType() == ResourceConstants.RESOURCE_TYPE_FILE);
 
 	request.setAttribute(ResourceConstants.ATTR_ALLOW_COMMENTS, item.isAllowComments());
 
@@ -133,7 +128,7 @@ public class ViewItemController {
 	if (item == null) {
 	    return "error";
 	}
-	
+
 	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	request.setAttribute(ResourceConstants.ATTR_RESOURCE_INSTRUCTION, item.getInstructions());
 	return "pages/itemreview/instructionsnav";
@@ -145,11 +140,6 @@ public class ViewItemController {
 
     /**
      * Return resource item according to ToolAccessMode.
-     *
-     * @param request
-     * @param sessionMap
-     * @param mode
-     * @return
      */
     private ResourceItem getResourceItem(HttpServletRequest request, SessionMap<String, Object> sessionMap,
 	    String mode) {
@@ -183,13 +173,7 @@ public class ViewItemController {
 		}
 		break;
 	    case ResourceConstants.RESOURCE_TYPE_FILE:
-	    case ResourceConstants.RESOURCE_TYPE_WEBSITE:
 		url = "/download/?uuid=" + item.getFileUuid() + "&preferDownload=true";
-		break;
-
-	    case ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT:
-		url = Configuration.get(ConfigurationKeys.SERVER_URL) + "pages/learningobj/mainframe.jsp?sessionMapID="
-			+ sessionMapID;
 		break;
 	}
 	return url;

@@ -78,9 +78,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class AuthoringController {
     private static Logger log = Logger.getLogger(AuthoringController.class);
 
-    private static final int INIT_INSTRUCTION_COUNT = 2;
-    private static final String INSTRUCTION_ITEM_DESC_PREFIX = "instructionItemDesc";
-    private static final String INSTRUCTION_ITEM_COUNT = "instructionCount";
     private static final String ITEM_TYPE = "itemType";
 
     @Autowired
@@ -160,12 +157,6 @@ public class AuthoringController {
 		    resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 		}
 		return "pages/authoring/parts/addfile";
-	    case 3:
-		resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
-		return "pages/authoring/parts/addwebsite";
-	    case 4:
-		resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
-		return "pages/authoring/parts/addlearningobject";
 	    default:
 		throw new IllegalArgumentException("Unknown item type" + item.getType());
 	}
@@ -180,11 +171,6 @@ public class AuthoringController {
 	resourceItemForm.setSessionMapID(sessionMapID);
 
 	short type = (short) WebUtil.readIntParam(request, AuthoringController.ITEM_TYPE);
-	List<String> instructionList = new ArrayList<>(AuthoringController.INIT_INSTRUCTION_COUNT);
-	for (int idx = 0; idx < AuthoringController.INIT_INSTRUCTION_COUNT; idx++) {
-	    instructionList.add("");
-	}
-	request.setAttribute("instructionList", instructionList);
 	request.setAttribute("resourceItemForm", resourceItemForm);
 	switch (type) {
 	    case 1:
@@ -192,12 +178,6 @@ public class AuthoringController {
 	    case 2:
 		resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 		return "pages/authoring/parts/addfile";
-	    case 3:
-		resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
-		return "pages/authoring/parts/addwebsite";
-	    case 4:
-		resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
-		return "pages/authoring/parts/addlearningobject";
 	    default:
 		throw new IllegalArgumentException("Unknown item type" + type);
 	}
@@ -225,12 +205,6 @@ public class AuthoringController {
 		case 2:
 		    resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 		    return "pages/authoring/parts/addfile";
-		case 3:
-		    resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
-		    return "pages/authoring/parts/addwebsite";
-		case 4:
-		    resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
-		    return "pages/authoring/parts/addlearningobject";
 		default:
 		    throw new IllegalArgumentException("Unknown item type" + resourceItemForm.getItemType());
 	    }
@@ -251,10 +225,6 @@ public class AuthoringController {
 			return "pages/authoring/parts/addurl";
 		    case 2:
 			return "pages/authoring/parts/addfile";
-		    case 3:
-			return "pages/authoring/parts/addwebsite";
-		    case 4:
-			return "pages/authoring/parts/addlearningobject";
 		    default:
 			throw new IllegalArgumentException("Unknown item type" + resourceItemForm.getItemType());
 		}
@@ -601,12 +571,6 @@ public class AuthoringController {
 	if (itemIdx >= 0) {
 	    form.setItemIndex(String.valueOf(itemIdx));
 	}
-
-	// FOR requirment from LDEV-754
-	// add extra blank line for instructions
-	// for(int idx=0;idx<INIT_INSTRUCTION_COUNT;idx++){
-	// instructions.add("");
-	// }
 	if (item.getFileUuid() != null) {
 	    form.setFileUuid(item.getFileUuid());
 	    form.setFileVersionId(item.getFileVersionId());
@@ -646,18 +610,8 @@ public class AuthoringController {
 	}
 	short type = itemForm.getItemType();
 	item.setType(itemForm.getItemType());
-	/*
-	 * Set following fields regards to the type: item.setFileUuid();
-	 * item.setFileVersionId(); item.setFileType(); item.setFileName();
-	 *
-	 * item.getInitialItem() item.setImsSchema() item.setOrganizationXml()
-	 */
-	// if the item is edit (not new add) then the getFile may return null
-	// it may throw exception, so put it as first, to avoid other invlidate
-	// update:
 
-	if ((type == ResourceConstants.RESOURCE_TYPE_WEBSITE || type == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
-		|| type == ResourceConstants.RESOURCE_TYPE_FILE) & !itemForm.isHasFile()) {
+	if (type == ResourceConstants.RESOURCE_TYPE_FILE & !itemForm.isHasFile()) {
 	    File uploadDir = FileUtil.getTmpFileUploadDir(itemForm.getTmpFileUploadId());
 	    if (uploadDir.canRead()) {
 		File[] files = uploadDir.listFiles();
@@ -764,5 +718,4 @@ public class AuthoringController {
 	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
     }
-
 }

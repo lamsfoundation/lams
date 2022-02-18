@@ -37,10 +37,6 @@ public class ResourceConstants {
 
     public static final short RESOURCE_TYPE_FILE = 2;
 
-    public static final short RESOURCE_TYPE_WEBSITE = 3;
-
-    public static final short RESOURCE_TYPE_LEARNING_OBJECT = 4;
-
     // for action forward name
     public static final String SUCCESS = "success";
 
@@ -79,8 +75,6 @@ public class ResourceConstants {
     public static final String ATTR_DELETED_RESOURCE_ITEM_LIST = "deleteResourceList";
 
     public static final String ATTR_DELETED_RESOURCE_ITEM_ATTACHMENT_LIST = "deletedItemAttachmmentList";;
-
-    public static final String ATT_LEARNING_OBJECT = "cpPackage";
 
     public static final String ATTR_RESOURCE_REVIEW_URL = "resourceItemReviewUrl";
 

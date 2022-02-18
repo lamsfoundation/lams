@@ -551,22 +551,6 @@ public class LearningController {
     }
 
     /**
-     * Get <code>java.util.List</code> from HttpSession by given name.
-     *
-     * @param request
-     * @param name
-     * @return
-     */
-    private List getListFromSession(SessionMap sessionMap, String name) {
-	List list = (List) sessionMap.get(name);
-	if (list == null) {
-	    list = new ArrayList();
-	    sessionMap.put(name, list);
-	}
-	return list;
-    }
-
-    /**
      * Return <code>ActionForward</code> according to resource item type.
      *
      * @param type
@@ -611,21 +595,9 @@ public class LearningController {
 	if (resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_URL) {
 	    if (StringUtils.isBlank(resourceItemForm.getUrl())) {
 		errorMap.add("GLOBAL", messageService.getMessage(ResourceConstants.ERROR_MSG_URL_BLANK));
-		// URL validation: Commom URL validate(1.3.0) work not very well: it can not support http://address:port
-		// format!!!
-		// UrlValidator validator = new UrlValidator();
-		// if(!validator.isValid(itemForm.getUrl()))
-		// errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_INVALID_URL));
 	    }
 	}
-	// if(itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE
-	// ||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT){
-	// if(StringUtils.isBlank(itemForm.getDescription()))
-	// errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_DESC_BLANK));
-	// }
-	if ((resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE)
-		|| (resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT)
-		|| (resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE)) {
+	if (resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE) {
 	    File uploadDir = FileUtil.getTmpFileUploadDir(resourceItemForm.getTmpFileUploadId());
 	    if (uploadDir.canRead()) {
 		File[] files = uploadDir.listFiles();
@@ -639,22 +611,6 @@ public class LearningController {
 	    } else {
 		errorMap.add("GLOBAL", "No file uploaded");
 	    }
-//	    if ((resourceItemForm.getFile() != null)
-//		    && FileUtil.isExecutableFile(resourceItemForm.getFile().getOriginalFilename())) {
-//		errorMap.add("Global", messageService.getMessage("error.attachment.executable"));
-//	    }
-//
-//	    // validate item size
-//	    if (!FileValidatorUtil.validateFileSize(resourceItemForm.getFile(), false)) {
-//		errorMap.add("GLOBAL", messageService.getMessage("errors.maxfilesize",
-//			new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));
-//	    }
-//
-//	    // for edit validate: file already exist
-//	    if (!resourceItemForm.isHasFile() && ((resourceItemForm.getFile() == null)
-//		    || StringUtils.isEmpty(resourceItemForm.getFile().getOriginalFilename()))) {
-//		errorMap.add("GLOBAL", messageService.getMessage(ResourceConstants.ERROR_MSG_FILE_BLANK));
-//	    }
 	}
     }
 

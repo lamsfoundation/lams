@@ -55,7 +55,7 @@ public class ResourceItem implements Cloneable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    // Resource Type:1=URL,2=File,3=Website,4=Learning Object
+    // Resource Type:1=URL,2=File
     @Column(name = "item_type")
     private short type;
 
@@ -67,15 +67,6 @@ public class ResourceItem implements Cloneable {
 
     @Column
     private String url;
-
-    @Column(name = "ims_schema")
-    private String imsSchema;
-
-    @Column(name = "init_item")
-    private String initialItem;
-
-    @Column(name = "organization_xml")
-    private String organizationXml;
 
     @Column(name = "file_uuid")
     private Long fileUuid;
@@ -169,30 +160,6 @@ public class ResourceItem implements Cloneable {
 
     public void setInstructions(String description) {
 	this.instructions = description;
-    }
-
-    public String getImsSchema() {
-	return imsSchema;
-    }
-
-    public void setImsSchema(String imsSchema) {
-	this.imsSchema = imsSchema;
-    }
-
-    public String getInitialItem() {
-	return initialItem;
-    }
-
-    public void setInitialItem(String initialItem) {
-	this.initialItem = initialItem;
-    }
-
-    public String getOrganizationXml() {
-	return organizationXml;
-    }
-
-    public void setOrganizationXml(String organizationXml) {
-	this.organizationXml = organizationXml;
     }
 
     public String getTitle() {

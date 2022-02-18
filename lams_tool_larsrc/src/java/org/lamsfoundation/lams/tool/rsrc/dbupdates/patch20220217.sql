@@ -13,6 +13,12 @@ SET r.instructions = CONCAT(IF(r.instructions IS NULL OR TRIM(r.instructions) = 
 
 DROP TABLE tl_larsrc11_item_instruction;
 
+-- remove zipped website and IMS package item types
+
+ALTER TABLE tl_larsrc11_resource_item DROP COLUMN organization_xml,
+									  DROP COLUMN ims_schema,
+									  DROP COLUMN init_item;
+
 -- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on

@@ -19,7 +19,7 @@
 	}
 
 	function previewItem(type,idx,sessionMapID){
-		//1:url, 2:file, 3:website,4:learning object
+		//1:url, 2:file
 		//This mode is special for unsaved author page. It is different with the author mode in preview 
 		var myUrl = "<c:url value='/reviewItem.do?mode=author_session&itemIndex='/>"+idx+"&sessionMapID="+sessionMapID;
 		launchPopup(myUrl,"Review");
@@ -99,10 +99,6 @@
 		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.url" /></button> 
 	<button onClick="showResourceItem('<c:url value="newItemInit.do?sessionMapID=${authoringForm.sessionMapID}&itemType=2"/>');return false;"  class="btn btn-default btn-sm loffset5 btn-disable-on-submit">
 		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.file" /></button>
-	<button onClick="showResourceItem('<c:url value="newItemInit.do?sessionMapID=${authoringForm.sessionMapID}&itemType=3"/>');return false;" class="btn btn-default btn-sm loffset5 btn-disable-on-submit">
-		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.website" /></button>
-	<button onClick="showResourceItem('<c:url value="newItemInit.do?sessionMapID=${authoringForm.sessionMapID}&itemType=4"/>');return false;" class="btn btn-default btn-sm loffset5 btn-disable-on-submit">
-		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.learning.object" /> </button>
 </div>
 
 <div id="resourceInputArea" name="resourceInputArea" class="voffset10"></div>
