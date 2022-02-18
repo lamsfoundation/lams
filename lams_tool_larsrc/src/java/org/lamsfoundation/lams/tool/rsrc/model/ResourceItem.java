@@ -24,11 +24,7 @@
 package org.lamsfoundation.lams.tool.rsrc.model;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -37,8 +33,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -69,7 +63,7 @@ public class ResourceItem implements Cloneable {
     private String title;
 
     @Column
-    private String description;
+    private String instructions;
 
     @Column
     private String url;
@@ -94,11 +88,6 @@ public class ResourceItem implements Cloneable {
 
     @Column(name = "file_type")
     private String fileType;
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    @OrderBy("sequence_id ASC")
-    @JoinColumn(name = "item_uid")
-    private Set<ResourceItemInstruction> itemInstructions = new HashSet<>();
 
     @Column(name = "order_id")
     private Integer orderId;
@@ -133,17 +122,6 @@ public class ResourceItem implements Cloneable {
 	ResourceItem obj = null;
 	try {
 	    obj = (ResourceItem) super.clone();
-	    // clone attachment
-	    if (itemInstructions != null) {
-		Iterator<ResourceItemInstruction> iter = itemInstructions.iterator();
-		Set<ResourceItemInstruction> set = new HashSet<>();
-		while (iter.hasNext()) {
-		    ResourceItemInstruction instruct = iter.next();
-		    ResourceItemInstruction newInsruct = (ResourceItemInstruction) instruct.clone();
-		    set.add(newInsruct);
-		}
-		obj.itemInstructions = set;
-	    }
 	    obj.setUid(null);
 	    // clone ReourceUser as well
 	    if (this.createBy != null) {
@@ -185,12 +163,12 @@ public class ResourceItem implements Cloneable {
 	this.fileVersionId = crVersionId;
     }
 
-    public String getDescription() {
-	return description;
+    public String getInstructions() {
+	return instructions;
     }
 
-    public void setDescription(String description) {
-	this.description = description;
+    public void setInstructions(String description) {
+	this.instructions = description;
     }
 
     public String getImsSchema() {
@@ -207,14 +185,6 @@ public class ResourceItem implements Cloneable {
 
     public void setInitialItem(String initialItem) {
 	this.initialItem = initialItem;
-    }
-
-    public Set<ResourceItemInstruction> getItemInstructions() {
-	return itemInstructions;
-    }
-
-    public void setItemInstructions(Set<ResourceItemInstruction> itemInstructions) {
-	this.itemInstructions = itemInstructions;
     }
 
     public String getOrganizationXml() {

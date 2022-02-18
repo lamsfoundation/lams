@@ -87,7 +87,6 @@ import org.lamsfoundation.lams.tool.rsrc.dto.VisitLogDTO;
 import org.lamsfoundation.lams.tool.rsrc.ims.SimpleContentPackageConverter;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
-import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemVisitLog;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
@@ -633,9 +632,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    } catch (RepositoryCheckedException e) {
 		throw new UploadResourceFileException(
 			messageService.getMessage("error.msg.repository") + " " + e.getMessage());
-	    } catch (IOException e) {
-		throw new UploadResourceFileException(
-			messageService.getMessage("error.msg.io.exception") + " " + e.getMessage());
 	    }
 	}
 	return node;
@@ -1269,7 +1265,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    item.setHide(false);
 	    item.setOrderId(JsonUtil.optInt(itemData, RestTags.DISPLAY_ORDER));
 
-	    item.setDescription(JsonUtil.optString(itemData, "description"));
+	    item.setInstructions(JsonUtil.optString(itemData, "instructions"));
 	    item.setFileName(JsonUtil.optString(itemData, "name"));
 	    item.setFileType(JsonUtil.optString(itemData, "fileType"));
 	    item.setFileUuid(JsonUtil.optLong(itemData, "crUuid"));
@@ -1277,18 +1273,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    item.setImsSchema(JsonUtil.optString(itemData, "imsSchema"));
 	    item.setOrganizationXml(JsonUtil.optString(itemData, "organizationXml"));
 	    item.setUrl(JsonUtil.optString(itemData, "url"));
-
-	    ArrayNode instructionStrings = JsonUtil.optArray(itemData, "instructions");
-	    if ((instructionStrings != null) && (instructionStrings.size() > 0)) {
-		Set<ResourceItemInstruction> instructions = new LinkedHashSet<>();
-		for (int j = 0; j < instructionStrings.size(); j++) {
-		    ResourceItemInstruction rii = new ResourceItemInstruction();
-		    rii.setDescription(instructionStrings.get(j).asText(null));
-		    rii.setSequenceId(j);
-		    instructions.add(rii);
-		}
-		item.setItemInstructions(instructions);
-	    }
 
 	    // TODO files - need to save it somehow, validate the file size, etc. Needed for websites, files & LO
 	    if ((item.getFileName() != null) || (item.getFileUuid() != null)) {

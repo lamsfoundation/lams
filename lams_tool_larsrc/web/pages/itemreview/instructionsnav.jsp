@@ -23,8 +23,6 @@
 
 <lams:html>
 	<lams:head>
-		<title><c:out value="${instructions.title}" escapeXml="true"/></title>
-		
 		<%-- param has higher level for request attribute --%>
 		<c:if test="${not empty param.mode}">
 			<c:set var="mode" value="${param.mode}" />
@@ -84,42 +82,17 @@
 				function continueReflect(){
 					 location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 				}
-
-				function nextIns(currIns){
-					var nextUrl="<c:url value='nextInstruction.do'/>?mode=${mode}&insIdx=" + currIns + "&sessionMapID=${sessionMapID}&itemUid=${param.itemUid}&itemIndex=${param.itemIndex}";
-					$.ajaxSetup({ cache: true });
-					$('#headerFrame').load(nextUrl);
-				} 
 		</script>
 	</lams:head>
 	<body>
 
 		<div class="container-fluid" id="instructions">
- 
-		<c:if test="${instructions.total > 0}" >
-		<div class="row">
-			<div class="col-xs-12 ">
-			<h4><fmt:message key="message.step.of">
-						<fmt:param value="${instructions.current}" />
-						<fmt:param value="${instructions.total}" />
-					</fmt:message>
-			</h4>
-			</div>
-		</div>
-		</c:if>
 		
 		<div class="row">
 			<div class="col-xs-12 ">
-				<c:if test="${instructions.instruction != null}">
-					<c:out value="${instructions.instruction.description}" escapeXml="false"/>
-				</c:if>
+				<c:out value="${instructions}" escapeXml="false"/>
 			
 				<c:choose>
-					<c:when test="${instructions.current < instructions.total}">
-						<input type="button" id="NextInstruction" name="NextInstruction"
-							onClick="javascript:nextIns(${instructions.current})"
-							class="btn btn-sm btn-default pull-right" value="<fmt:message key='label.next.instruction' />" />
-					</c:when>
 					<c:when test="${reflectOn && runAuto}">
 						<input type="button" id="Reflect" name="Reflect"
 							onClick="javascript:continueReflect()" class="btn btn-sm btn-default pull-right" value="<fmt:message

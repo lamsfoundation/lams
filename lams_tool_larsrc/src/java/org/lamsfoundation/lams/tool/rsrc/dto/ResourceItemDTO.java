@@ -23,9 +23,6 @@
 
 package org.lamsfoundation.lams.tool.rsrc.dto;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
@@ -50,7 +47,6 @@ public class ResourceItemDTO {
     private boolean itemCreateByAuthor;
     private boolean itemHide;
     private String itemTitle;
-    private List<String> itemInstructions = new ArrayList<>();
     private String username;
     private int viewNumber;
     private boolean allowRating;
@@ -153,14 +149,6 @@ public class ResourceItemDTO {
 
     public void setInitGroup(boolean isInitGroup) {
 	this.isInitGroup = isInitGroup;
-    }
-
-    public List<String> getItemInstructions() {
-	return itemInstructions;
-    }
-
-    public void setItemInstructions(List<String> itemInstructions) {
-	this.itemInstructions = itemInstructions;
     }
 
     public ItemRatingDTO getRatingDTO() {

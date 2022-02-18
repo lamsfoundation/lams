@@ -24,17 +24,13 @@
 package org.lamsfoundation.lams.tool.rsrc.web.controller;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -52,7 +48,6 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
-import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
@@ -161,7 +156,9 @@ public class AuthoringController {
 	    case 1:
 		return "pages/authoring/parts/addurl";
 	    case 2:
-		resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
+		if (!resourceItemForm.isHasFile()) {
+		    resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
+		}
 		return "pages/authoring/parts/addfile";
 	    case 3:
 		resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
@@ -216,13 +213,11 @@ public class AuthoringController {
     @RequestMapping(path = "/saveOrUpdateItem", method = RequestMethod.POST)
     private String saveOrUpdateItem(@ModelAttribute ResourceItemForm resourceItemForm, HttpServletRequest request) {
 	// get instructions:
-	List<String> instructionList = getInstructionsFromRequest(request);
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	validateResourceItem(resourceItemForm, errorMap);
 
 	if (!errorMap.isEmpty()) {
 	    request.setAttribute("errorMap", errorMap);
-	    request.setAttribute(ResourceConstants.ATTR_INSTRUCTION_LIST, instructionList);
 	    request.setAttribute("resourceItemForm", resourceItemForm);
 	    switch (resourceItemForm.getItemType()) {
 		case 1:
@@ -243,7 +238,7 @@ public class AuthoringController {
 	}
 
 	try {
-	    extractFormToResourceItem(request, instructionList, resourceItemForm);
+	    extractFormToResourceItem(request, resourceItemForm);
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather
 	    // then throw exception directly
@@ -251,7 +246,6 @@ public class AuthoringController {
 		    new Object[] { e.getMessage() }));
 	    if (!errorMap.isEmpty()) {
 		request.setAttribute("errorMap", errorMap);
-		request.setAttribute(ResourceConstants.ATTR_INSTRUCTION_LIST, instructionList);
 		switch (resourceItemForm.getItemType()) {
 		    case 1:
 			return "pages/authoring/parts/addurl";
@@ -270,61 +264,6 @@ public class AuthoringController {
 	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, resourceItemForm.getSessionMapID());
 	// return null to close this window
 	return "pages/authoring/parts/itemlist";
-    }
-
-    /**
-     * Ajax call, will add one more input line for new resource item
-     * instruction.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    @RequestMapping("/newInstruction")
-    private String newInstruction(HttpServletRequest request) {
-	int numberOfInstructions = WebUtil.readIntParam(request, INSTRUCTION_ITEM_COUNT);
-	List<String> instructionList = new ArrayList<>(++numberOfInstructions);
-	for (int idx = 0; idx < numberOfInstructions; idx++) {
-	    String item = request.getParameter(AuthoringController.INSTRUCTION_ITEM_DESC_PREFIX + idx);
-	    if (item == null) {
-		instructionList.add("");
-	    } else {
-		instructionList.add(item);
-	    }
-	}
-	request.setAttribute(ResourceConstants.ATTR_INSTRUCTION_LIST, instructionList);
-	return "pages/authoring/parts/instructions";
-    }
-
-    /**
-     * Ajax call, remove the given line of instruction of resource item.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    @RequestMapping("/removeInstruction")
-    private String removeInstruction(HttpServletRequest request) {
-	int numberOfInstructions = WebUtil.readIntParam(request, INSTRUCTION_ITEM_COUNT);
-	int removeIdx = WebUtil.readIntParam(request, "removeIdx");
-	List<String> instructionList = new ArrayList<>(numberOfInstructions - 1);
-	for (int idx = 0; idx < numberOfInstructions; idx++) {
-	    String item = request.getParameter(AuthoringController.INSTRUCTION_ITEM_DESC_PREFIX + idx);
-	    if (idx == removeIdx) {
-		continue;
-	    }
-	    if (item == null) {
-		instructionList.add("");
-	    } else {
-		instructionList.add(item);
-	    }
-	}
-	request.setAttribute(ResourceConstants.ATTR_INSTRUCTION_LIST, instructionList);
-	return "pages/authoring/parts/instructions";
     }
 
     /**
@@ -645,44 +584,6 @@ public class AuthoringController {
     }
 
     /**
-     * Get resource items instruction from <code>HttpRequest</code>
-     *
-     * @param request
-     */
-    private List<String> getInstructionsFromRequest(HttpServletRequest request) {
-	String list = request.getParameter("instructionList");
-	String[] params = list.split("&");
-	Map<String, String> paramMap = new HashMap<>();
-	String[] pair;
-	for (String item : params) {
-	    pair = item.split("=");
-	    if (pair == null || pair.length != 2) {
-		continue;
-	    }
-	    try {
-		paramMap.put(pair[0], URLDecoder.decode(pair[1], "UTF-8"));
-	    } catch (UnsupportedEncodingException e) {
-		AuthoringController.log.error("Error occurs when decode instruction string:" + e.toString());
-	    }
-	}
-
-	int count = paramMap.keySet().size();
-	List<String> instructionList = new ArrayList<>();
-
-	for (int idx = 0; idx < count; idx++) {
-	    String item = paramMap.get(AuthoringController.INSTRUCTION_ITEM_DESC_PREFIX + idx);
-	    if (item == null) {
-		continue;
-	    }
-
-	    instructionList.add(item);
-	}
-
-	return instructionList;
-
-    }
-
-    /**
      * This method will populate resource item information to its form for edit
      * use.
      *
@@ -692,7 +593,7 @@ public class AuthoringController {
      * @param request
      */
     private void populateItemToForm(int itemIdx, ResourceItem item, ResourceItemForm form, HttpServletRequest request) {
-	form.setDescription(item.getDescription());
+	form.setInstructions(item.getInstructions());
 	form.setTitle(item.getTitle());
 	form.setUrl(item.getUrl());
 	form.setAllowRating(item.isAllowRating());
@@ -701,11 +602,6 @@ public class AuthoringController {
 	    form.setItemIndex(String.valueOf(itemIdx));
 	}
 
-	Set<ResourceItemInstruction> instructionList = item.getItemInstructions();
-	List<String> instructions = new ArrayList<>();
-	for (ResourceItemInstruction in : instructionList) {
-	    instructions.add(in.getDescription());
-	}
 	// FOR requirment from LDEV-754
 	// add extra blank line for instructions
 	// for(int idx=0;idx<INIT_INSTRUCTION_COUNT;idx++){
@@ -719,8 +615,6 @@ public class AuthoringController {
 	} else {
 	    form.setHasFile(false);
 	}
-
-	request.setAttribute(ResourceConstants.ATTR_INSTRUCTION_LIST, instructions);
     }
 
     /**
@@ -732,8 +626,7 @@ public class AuthoringController {
      * when persisting this resource item.
      */
     @SuppressWarnings("unchecked")
-    private void extractFormToResourceItem(HttpServletRequest request, List<String> instructionList,
-	    ResourceItemForm itemForm) throws Exception {
+    private void extractFormToResourceItem(HttpServletRequest request, ResourceItemForm itemForm) throws Exception {
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(itemForm.getSessionMapID());
@@ -763,8 +656,8 @@ public class AuthoringController {
 	// it may throw exception, so put it as first, to avoid other invlidate
 	// update:
 
-	if (type == ResourceConstants.RESOURCE_TYPE_WEBSITE || type == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
-		|| type == ResourceConstants.RESOURCE_TYPE_FILE) {
+	if ((type == ResourceConstants.RESOURCE_TYPE_WEBSITE || type == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
+		|| type == ResourceConstants.RESOURCE_TYPE_FILE) & !itemForm.isHasFile()) {
 	    File uploadDir = FileUtil.getTmpFileUploadDir(itemForm.getTmpFileUploadId());
 	    if (uploadDir.canRead()) {
 		File[] files = uploadDir.listFiles();
@@ -807,21 +700,10 @@ public class AuthoringController {
 	item.setHide(false);
 	item.setAllowRating(itemForm.isAllowRating());
 	item.setAllowComments(itemForm.isAllowComments());
-	// set instructions
-	Set<ResourceItemInstruction> instructions = new LinkedHashSet<>();
-	int idx = 0;
-	for (String ins : instructionList) {
-	    ResourceItemInstruction instruction = new ResourceItemInstruction();
-	    instruction.setDescription(ins);
-	    instruction.setSequenceId(idx++);
-	    instructions.add(instruction);
-	}
-	item.setItemInstructions(instructions);
-
 	if (type == ResourceConstants.RESOURCE_TYPE_URL) {
 	    item.setUrl(itemForm.getUrl());
 	}
-	item.setDescription(itemForm.getDescription());
+	item.setInstructions(itemForm.getInstructions());
 
 	// if it's a new item, add it to resourceList
 	if (itemIdx == -1) {
@@ -844,42 +726,8 @@ public class AuthoringController {
 	if (resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_URL) {
 	    if (StringUtils.isBlank(resourceItemForm.getUrl())) {
 		errorMap.add("GLOBAL", messageService.getMessage(ResourceConstants.ERROR_MSG_URL_BLANK));
-		// URL validation: Commom URL validate(1.3.0) work not very
-		// well: it can not support http://
-		// address:port format!!!
-		// UrlValidator validator = new UrlValidator();
-		// if(!validator.isValid(itemForm.getUrl()))
-		// errors.add(ActionMessages.GLOBAL_MESSAGE,new
-		// ActionMessage(ResourceConstants.ERROR_MSG_INVALID_URL));
 	    }
 	}
-
-	// if(itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE
-	// ||itemForm.getItemType() ==
-	// ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT){
-	// if(StringUtils.isBlank(itemForm.getDescription()))
-	// errors.add(ActionMessages.GLOBAL_MESSAGE,new
-	// ActionMessage(ResourceConstants.ERROR_MSG_DESC_BLANK));
-	// }
-
-	// uploads using tmp file upload servlet made following validation obsolete (?)
-	/*
-	 * if (resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE
-	 * || resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
-	 * || resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE) {
-	 * // validate item size
-	 * if (!FileValidatorUtil.validateFileSize(resourceItemForm.getFile(), false)) {
-	 * errorMap.add("GLOBAL", messageService.getMessage("errors.maxfilesize",
-	 * new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));
-	 * }
-	 *
-	 * // for edit validate: file already exist
-	 * if (!resourceItemForm.isHasFile() && (resourceItemForm.getFile() == null
-	 * || StringUtils.isEmpty(resourceItemForm.getFile().getOriginalFilename()))) {
-	 * errorMap.add("GLOBAL", messageService.getMessage(ResourceConstants.ERROR_MSG_FILE_BLANK));
-	 * }
-	 * }
-	 */
     }
 
     @RequestMapping("/switchResourceItemPosition")

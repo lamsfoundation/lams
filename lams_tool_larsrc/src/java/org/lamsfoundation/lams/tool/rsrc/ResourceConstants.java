@@ -74,8 +74,6 @@ public class ResourceConstants {
 
     public static final String ATTR_TOOL_SESSION_ID = "toolSessionID";
 
-    public static final String ATTR_INSTRUCTION_LIST = "instructionList";
-
     public static final String ATTR_RESOURCE_ITEM_LIST = "resourceList";
 
     public static final String ATTR_DELETED_RESOURCE_ITEM_LIST = "deleteResourceList";
@@ -87,7 +85,7 @@ public class ResourceConstants {
     public static final String ATTR_RESOURCE_REVIEW_URL = "resourceItemReviewUrl";
 
     public static final String ATTR_ENCODED_RESOURCE_REVIEW_URL = "encodedResourceItemReviewUrl";
-    
+
     public static final String ATTR_IS_DOWNLOAD = "isDownload";
 
     public static final String ATTR_RESOURCE = "resource";

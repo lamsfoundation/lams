@@ -370,7 +370,7 @@ public class LearningController {
 	ResourceUser resourceUser = getCurrentUser(resourceService, sessionId);
 	item.setType(type);
 	item.setTitle(resourceItemForm.getTitle());
-	item.setDescription(resourceItemForm.getDescription());
+	item.setInstructions(resourceItemForm.getInstructions());
 	item.setCreateDate(new Timestamp(new Date().getTime()));
 	item.setCreateByAuthor(false);
 	item.setCreateBy(resourceUser);

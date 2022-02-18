@@ -27,7 +27,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
@@ -38,9 +37,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.math.NumberUtils;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
-import org.lamsfoundation.lams.tool.rsrc.dto.InstructionNavDTO;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
-import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -122,7 +119,7 @@ public class ViewItemController {
     }
 
     /**
-     * Return next instruction to page. It need four input parameters, mode, itemIndex or itemUid, and insIdx.
+     * Return next instruction to page
      */
     @RequestMapping("/nextInstruction")
     private String nextInstruction(HttpServletRequest request) {
@@ -136,40 +133,9 @@ public class ViewItemController {
 	if (item == null) {
 	    return "error";
 	}
-
-	Integer currIns = WebUtil.readIntParam(request, ResourceConstants.PARAM_CURRENT_INSTRUCTION_INDEX, true);
-	if (currIns == null) {
-	    currIns = 0;
-	}
-
-	Set<ResourceItemInstruction> instructions = item.getItemInstructions();
-	InstructionNavDTO navDto = new InstructionNavDTO();
-	// For Learner upload item, its instruction will display description/comment fields in ReosourceItem.
-	if (!item.isCreateByAuthor()) {
-	    List<ResourceItemInstruction> navItems = new ArrayList<>(1);
-	    // create a new instruction and put ResourceItem description into it: just for display use.
-	    ResourceItemInstruction ins = new ResourceItemInstruction();
-	    ins.setSequenceId(1);
-	    ins.setDescription(item.getDescription());
-	    navItems.add(ins);
-	    navDto.setAllInstructions(navItems);
-	    instructions.add(ins);
-	} else {
-	    navDto.setAllInstructions(new ArrayList<>(instructions));
-	}
-	navDto.setTitle(item.getTitle());
-	navDto.setType(item.getType());
-	navDto.setTotal(instructions.size());
-	if (instructions.size() > 0) {
-	    navDto.setInstruction(new ArrayList<>(instructions).get(currIns));
-	    navDto.setCurrent(currIns + 1);
-	} else {
-	    navDto.setCurrent(0);
-	    navDto.setInstruction(null);
-	}
-
+	
 	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	request.setAttribute(ResourceConstants.ATTR_RESOURCE_INSTRUCTION, navDto);
+	request.setAttribute(ResourceConstants.ATTR_RESOURCE_INSTRUCTION, item.getInstructions());
 	return "pages/itemreview/instructionsnav";
     }
 

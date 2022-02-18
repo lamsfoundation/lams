@@ -37,7 +37,7 @@ public class ResourceItemForm {
 
     private String title;
     private short itemType;
-    private String description;
+    private String instructions;
     private String url;
     //flag of this item has attachment or not
     private boolean hasFile;
@@ -48,12 +48,12 @@ public class ResourceItemForm {
     private boolean allowRating;
     private boolean allowComments;
 
-    public String getDescription() {
-	return description;
+    public String getInstructions() {
+	return instructions;
     }
 
-    public void setDescription(String description) {
-	this.description = description;
+    public void setInstructions(String description) {
+	this.instructions = description;
     }
 
     public String getTmpFileUploadId() {
