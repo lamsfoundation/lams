@@ -24,7 +24,7 @@
 	
 	<script>
 		$(document).ready(function(){
-			$('.item-panel').load("<c:url value="/itemReviewContent.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&itemUid=${itemUid}");
+			$('.item-panel').load("<c:url value="/itemReviewContent.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&itemIndex=${itemIndex}&itemUid=${itemUid}");
  		});
 
 		function setIframeHeight(panel) {
@@ -64,7 +64,6 @@
 </lams:head>
 
 <body class="stripes">
-	<c:set var="title"><fmt:message key="export.label.resource" /></c:set>
 	<lams:Page title="${title}" type="learner" hideProgressBar="true">
 		<div class="item-panel"></div>
 	</lams:Page>

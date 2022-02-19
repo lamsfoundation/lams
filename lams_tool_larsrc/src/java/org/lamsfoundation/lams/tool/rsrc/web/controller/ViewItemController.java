@@ -65,8 +65,14 @@ public class ViewItemController {
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID, true);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
-	sessionMap.put(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
-	ResourceItem item = getResourceItem(request, sessionMap, ToolAccessMode.TEACHER.toString());
+	String mode = request.getParameter(AttributeNames.ATTR_MODE);
+	if (mode.equals(ToolAccessMode.TEACHER.toString())) {
+	    sessionMap.put(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
+	} else {
+	    sessionMap.put(AttributeNames.ATTR_MODE, ToolAccessMode.AUTHOR);
+	}
+
+	ResourceItem item = getResourceItem(request, sessionMap, mode);
 
 	if (item == null) {
 	    return "error";
@@ -74,10 +80,13 @@ public class ViewItemController {
 
 	Long itemUid = NumberUtils.createLong(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
 	request.setAttribute(ResourceConstants.PARAM_RESOURCE_ITEM_UID, itemUid);
+	Integer itemIdx = WebUtil.readIntParam(request, ResourceConstants.PARAM_ITEM_INDEX, true);
+	request.setAttribute(ResourceConstants.PARAM_ITEM_INDEX, itemIdx);
 	String idStr = request.getParameter(ResourceConstants.ATTR_TOOL_SESSION_ID);
 	Long sessionId = NumberUtils.createLong(idStr);
 	request.setAttribute(ResourceConstants.ATTR_TOOL_SESSION_ID, sessionId);
 	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	request.setAttribute(ResourceConstants.ATTR_TITLE, item.getTitle());
 
 	return "pages/itemreview/mainframe";
     }
@@ -118,7 +127,6 @@ public class ViewItemController {
 	    return "error";
 	}
 
-	Integer itemIdx = WebUtil.readIntParam(request, ResourceConstants.PARAM_ITEM_INDEX, true);
 	String reviewUrl = getReviewUrl(item, sessionMapID);
 	request.setAttribute(ResourceConstants.ATTR_RESOURCE_REVIEW_URL, reviewUrl);
 	if (item.getType() == ResourceConstants.RESOURCE_TYPE_URL) {
@@ -134,8 +142,10 @@ public class ViewItemController {
 
 	// these attribute will be use to instruction navigator page
 	request.setAttribute(AttributeNames.ATTR_MODE, mode);
-	request.setAttribute(ResourceConstants.PARAM_ITEM_INDEX, itemIdx);
-	Long itemUid = NumberUtils.createLong(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
+	Long itemUid = WebUtil.readLongParam(request, ResourceConstants.PARAM_RESOURCE_ITEM_UID, true);
+	if (itemUid == null) {
+	    itemUid = 0L;
+	}
 	request.setAttribute(ResourceConstants.PARAM_RESOURCE_ITEM_UID, itemUid);
 	request.setAttribute(ResourceConstants.ATTR_TOOL_SESSION_ID, sessionId);
 	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
@@ -177,12 +187,12 @@ public class ViewItemController {
     private ResourceItem getResourceItem(HttpServletRequest request, SessionMap<String, Object> sessionMap,
 	    String mode) {
 	ResourceItem item = null;
-	if (ResourceConstants.MODE_AUTHOR_SESSION.equals(mode)) {
+	if (ToolAccessMode.AUTHOR.toString().equals(mode)) {
 	    int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX), 0);
 	    // authoring: does not save item yet, so only has ItemList from session and identity by Index
 	    List<ResourceItem> resourceList = new ArrayList<>(getResourceItemList(sessionMap));
 	    item = resourceList.get(itemIdx);
-	} else if ("teacher".equals(mode)) {
+	} else if (ToolAccessMode.TEACHER.toString().equals(mode)) {
 	    Long itemUid = NumberUtils.createLong(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
 	    // get back the resource and item list and display them on page
 	    item = resourceService.getResourceItemByUid(itemUid);

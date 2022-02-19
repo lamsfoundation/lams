@@ -14,7 +14,7 @@
 		<c:forEach var="resource" items="${sessionMap.resourceList}"
 			varStatus="status">
 			<tr>
-				<%-- Resource Type:1=URL,2=File,3=Website,4=Learning Object --%>
+				<%-- Resource Type:1=URL,2=File--%>
 				<c:if test="${resource.type == 1}">
 					<td>
 						<span class="field-name"> <fmt:message
@@ -24,7 +24,7 @@
 					<td width="10%">
 						<a href="#"
 							onclick="previewItem(1,${status.index},'${sessionMapID}')"> <fmt:message
-								key="label.authoring.basic.resource.verify.url" /> </a>
+								key="label.authoring.basic.resource.preview" /> </a>
 					</td>
 				</c:if>
 
@@ -34,7 +34,7 @@
 								key="label.authoring.basic.resource.file" /> : </span>
 						<c:out value="${resource.title}" escapeXml="true"/>
 					</td>
-					<td>
+					<td width="10%">
 						<a href="#"
 							onclick="previewItem(2,${status.index},'${sessionMapID}')"> <fmt:message
 								key="label.authoring.basic.resource.preview" /> </a>
