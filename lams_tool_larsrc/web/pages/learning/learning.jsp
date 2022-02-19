@@ -87,6 +87,8 @@
 	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	<script>
 		checkNextGateActivity('finishButton', '${toolSessionID}', '', finishSession);
+
+		let itemsComplete = ${itemsComplete};
 	
 		$(document).ready(function(){
 			cancel();
@@ -178,6 +180,12 @@
 					alert('Error while marking item as complete.\nStatus: ' + textStatus + '\nError: ' + errorThrown);
 				},
 				success:  function() {
+					itemsComplete++;
+					if (itemsComplete >= ${resource.miniViewResourceNumber}) {
+						checkNew();
+						return;
+					}
+					
 					let heading = $('#heading' + itemUid);
 					$('.complete-item-button', heading).remove();
 					$('.icon-complete', heading).removeClass('hidden');
@@ -321,17 +329,17 @@
 								<c:when test="${item.complete}">
 									<i class="fa fa-check icon-complete" title='<fmt:message key="label.completed" />'></i>
 								</c:when>
-								<c:otherwise>
+								<c:when test="${not finishedLock}">
 									<i class="fa fa-check icon-complete hidden" title='<fmt:message key="label.completed" />'></i>
 									<button type="button" onClick="javascript:completeItem(${item.uid})"
 										   class="complete-item-button btn btn-xs btn-default">
 										<fmt:message key='label.finish' />
 									</button>
-								</c:otherwise>
+								</c:when>
 							</c:choose>
 							
 							
-							<c:if test="${!item.createByAuthor && userID == item.createBy.userId}">
+							<c:if test="${not finishedLock && !item.createByAuthor && userID == item.createBy.userId}">
 								<i class="fa fa-trash delete-item-button"
 								   title="<fmt:message key="label.delete" />"
 								   onclick="hideItem(${item.uid})"></i>

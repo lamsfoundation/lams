@@ -151,7 +151,7 @@ public class LearningController {
 	// save toolContentID into HTTPSession
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 
-	Long sessionId = new Long(request.getParameter(ResourceConstants.PARAM_TOOL_SESSION_ID));
+	Long sessionId = WebUtil.readLongParam(request, ResourceConstants.PARAM_TOOL_SESSION_ID);
 
 	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	request.setAttribute(AttributeNames.ATTR_MODE, mode);
@@ -257,6 +257,7 @@ public class LearningController {
 	}
 	sessionMap.put(ResourceConstants.ATTR_COMPLETED_SUFFICIENT_TO_FINISH,
 		numItemsCompleted >= resource.getMiniViewResourceNumber());
+	request.setAttribute("itemsComplete", numItemsCompleted);
 
 	sessionMap.put(ResourceConstants.ATTR_RESOURCE, resource);
 	return "pages/learning/learning";
