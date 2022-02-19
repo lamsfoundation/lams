@@ -51,18 +51,20 @@
 </c:if>	
 
 <c:if test="${embedInAccordian}">
-<div class="panel-group" id="accordionComments" role="tablist" aria-multiselectable="true"> 
+<div class="panel-group" id="accordionComments-${toolSessionId}-${toolItemId}" role="tablist" aria-multiselectable="true"> 
     <div class="panel panel-default">
-        <div class="panel-heading collapsable-icon-left" id="headingComments">
+        <div class="panel-heading collapsable-icon-left" id="headingComments-${toolSessionId}-${toolItemId}">
         	<span class="panel-title">
-	    	<a class="collapsed" role="button" data-toggle="collapse" href="#collapseComments" aria-expanded="false" aria-controls="collapseComments">
+	    	<a class="collapsed" role="button" data-toggle="collapse" href="#collapseComments-${toolSessionId}-${toolItemId}"
+	    		aria-expanded="false" aria-controls="collapseComments-${toolSessionId}-${toolItemId}">
           	${not empty accordionTitle?accordionTitle:"Comments"}</a>
       		</span>
         </div>
-        <div id="collapseComments" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingComments" aria-expanded="false" style="">
+        <div id="collapseComments-${toolSessionId}-${toolItemId}" class="panel-collapse collapse"
+        	 role="tabpanel" aria-labelledby="headingComments-${toolSessionId}-${toolItemId}" aria-expanded="false" style="">
 </c:if>
 
-<div id="commentFrame" class="commentFrame"  style="width: ${width}; height: ${height};"></div>
+<div id="commentFrame-${toolSessionId}-${toolItemId}" class="commentFrame"  style="width: ${width}; height: ${height};"></div>
 
 <c:if test="${embedInAccordian}">
 		</div>
@@ -74,6 +76,6 @@
 $(document).ready(function(){
 	var url='<lams:LAMSURL/>comments/init.do?externalID=${toolSessionId}&externalSecondaryID=${toolItemId}&externalSig=${toolSignature}&externalType=1${modeStr}&likeAndDislike=${likeAndDislike}&readOnly=${readOnly}&pageSize=${pageSize}&sortBy=${sortBy}&anonymous=${anonymous}';
 	$.ajaxSetup({ cache: true });
-	$('#commentFrame').load(url);
+	$('#commentFrame-${toolSessionId}-${toolItemId}').load(url);
 });
 </script>
