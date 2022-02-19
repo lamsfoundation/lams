@@ -9,6 +9,7 @@
 				$('#title').focus();
 			});		
 	 		$( "#resourceItemForm" ).validate({
+	 			ignore: 'hidden, div.cke_editable',
 				errorClass: "text-danger",
 				wrapper: "span",
 	 			rules: {

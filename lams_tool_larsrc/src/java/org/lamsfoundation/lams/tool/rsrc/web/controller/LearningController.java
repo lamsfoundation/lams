@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.tool.rsrc.service.UploadResourceFileException;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ReflectionForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -85,6 +86,9 @@ public class LearningController {
     private IResourceService resourceService;
 
     @Autowired
+    private ILamsToolService toolService;
+
+    @Autowired
     @Qualifier("resourceMessageService")
     private MessageService messageService;
 
@@ -100,8 +104,18 @@ public class LearningController {
     @RequestMapping("/addfile")
     private String addfile(ResourceItemForm resourceItemForm, HttpServletRequest request) {
 	resourceItemForm.setMode(WebUtil.readStrParam(request, AttributeNames.ATTR_MODE));
-	resourceItemForm.setSessionMapID(WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID));
+	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
+	resourceItemForm.setSessionMapID(sessionMapID);
 	resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
+
+	HttpSession ss = SessionManager.getSession();
+	// get back login user DTO
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	Long sessionId = (Long) sessionMap.get(ResourceConstants.ATTR_TOOL_SESSION_ID);
+	request.setAttribute(AttributeNames.ATTR_LEARNER_CONTENT_FOLDER,
+		toolService.getLearnerContentFolder(sessionId, user.getUserID().longValue()));
 
 	return "pages/learning/addfile";
     }
@@ -109,7 +123,18 @@ public class LearningController {
     @RequestMapping("/addurl")
     private String addurl(ResourceItemForm resourceItemForm, HttpServletRequest request) {
 	resourceItemForm.setMode(WebUtil.readStrParam(request, AttributeNames.ATTR_MODE));
-	resourceItemForm.setSessionMapID(WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID));
+	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
+	resourceItemForm.setSessionMapID(sessionMapID);
+
+	HttpSession ss = SessionManager.getSession();
+	// get back login user DTO
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	Long sessionId = (Long) sessionMap.get(ResourceConstants.ATTR_TOOL_SESSION_ID);
+	request.setAttribute(AttributeNames.ATTR_LEARNER_CONTENT_FOLDER,
+		toolService.getLearnerContentFolder(sessionId, user.getUserID().longValue()));
+
 	return "pages/learning/addurl";
     }
 

@@ -56,9 +56,6 @@ public class ResourceItemDTO {
     // true: initial group item, false, belong to some group.
     private boolean isInitGroup;
 
-    public ResourceItemDTO() {
-    }
-
     /**
      * Contruction method for monitoring summary function.
      *

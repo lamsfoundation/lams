@@ -26,8 +26,8 @@
 	    </div>
 
 		<div class="form-group">
-	    	<label for="description"><fmt:message key="label.learning.comment.or.instruction" /></label>
-			<form:input path="description" tabindex="5" maxlength="255" cssClass="form-control" />
+	    	<label for="instructions"><fmt:message key="label.authoring.basic.instruction" /></label>
+			<lams:CKEditor id="instructions" value="" contentFolderID="${learnerContentFolder}"></lams:CKEditor>
 	  	</div>	
 
 		<div id="buttons" class="pull-right" >
@@ -49,6 +49,7 @@
 	
 		$('#resourceItemForm').submit(submitResourceForm);
 		$('#resourceItemForm').validate({
+			ignore: 'hidden, div.cke_editable',
 			errorClass: "text-danger",
 			wrapper: "span",
  			rules: {
@@ -74,4 +75,3 @@
 	
 </div>
 </div>
-

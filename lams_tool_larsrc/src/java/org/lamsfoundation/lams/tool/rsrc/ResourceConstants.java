@@ -122,6 +122,8 @@ public class ResourceConstants {
 
     public static final String ATTR_ALLOW_COMMENTS = "allowComments";
 
+    public static final String ATTR_ALLOW_RATING = "allowRating";
+
     public static final String ATTR_COMPLETED_SUFFICIENT_TO_FINISH = "hasCompletedMinNumber";
 
     // error message keys
