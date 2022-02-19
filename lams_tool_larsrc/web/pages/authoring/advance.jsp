@@ -4,11 +4,6 @@
 
 <lams:SimplePanel titleKey="label.resource.options">
 
-	<div class="checkbox">
-	<label for="runAuto"><form:checkbox path="resource.runAuto" id="runAuto" />
-	<fmt:message key="label.authoring.advance.run.content.auto" /></label>
-	</div>
-	
 	<div class="form-group">
 	<form:select path="resource.miniViewResourceNumber" cssClass="form-control form-control-inline input-sm"
 		id="viewNumList" style="width:100px">

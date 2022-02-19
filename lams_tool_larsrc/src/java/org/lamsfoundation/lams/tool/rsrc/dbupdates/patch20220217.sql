@@ -19,6 +19,10 @@ ALTER TABLE tl_larsrc11_resource_item DROP COLUMN organization_xml,
 									  DROP COLUMN ims_schema,
 									  DROP COLUMN init_item;
 
+-- remove auto run functionality									  
+ALTER TABLE tl_larsrc11_resource DROP COLUMN allow_auto_run;
+									  
+
 -- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on

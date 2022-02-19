@@ -176,26 +176,6 @@ public class LearningController {
 	// check whether finish lock is on/off
 	boolean lock = resource.getLockWhenFinished() && (resourceUser != null) && resourceUser.isSessionFinished();
 
-	// check whether there is only one resource item and run auto flag is true or not.
-	boolean runAuto = false;
-	Long runAutoItemUid = null;
-	if (resource.isRunAuto() && items != null) {
-	    int itemsNumber = 0;
-	    for (ResourceItem item : items) {
-		// only visible item can be run auto.
-		if (!item.isHide()) {
-		    itemsNumber++;
-		    runAutoItemUid = item.getUid();
-		}
-	    }
-	    // can't autorun if there is more than one!
-	    if (itemsNumber == 1) {
-		runAuto = true;
-	    } else {
-		runAutoItemUid = null;
-	    }
-	}
-
 	// get notebook entry
 	String entryText = new String();
 	if (resourceUser != null) {
@@ -220,7 +200,6 @@ public class LearningController {
 	sessionMap.put(ResourceConstants.ATTR_REFLECTION_ON, resource.isReflectOnActivity());
 	sessionMap.put(ResourceConstants.ATTR_REFLECTION_INSTRUCTION, resource.getReflectInstructions());
 	sessionMap.put(ResourceConstants.ATTR_REFLECTION_ENTRY, entryText);
-	sessionMap.put(ResourceConstants.ATTR_RUN_AUTO, new Boolean(runAuto));
 
 	// add define later support
 	if (resource.isDefineLater()) {
@@ -280,22 +259,7 @@ public class LearningController {
 		numItemsCompleted >= resource.getMiniViewResourceNumber());
 
 	sessionMap.put(ResourceConstants.ATTR_RESOURCE, resource);
-
-	if (runAuto) {
-	    String redirectURL = "redirect:/reviewItem.do";
-	    redirectURL = WebUtil.appendParameterToURL(redirectURL, ResourceConstants.ATTR_SESSION_MAP_ID,
-		    sessionMap.getSessionID());
-	    redirectURL = WebUtil.appendParameterToURL(redirectURL, ResourceConstants.ATTR_TOOL_SESSION_ID,
-		    sessionId.toString());
-	    redirectURL = WebUtil.appendParameterToURL(redirectURL, ResourceConstants.ATTR_RESOURCE_ITEM_UID,
-		    runAutoItemUid.toString());
-	    redirectURL = WebUtil.appendParameterToURL(redirectURL, AttributeNames.ATTR_MODE, mode.toString());
-	    return redirectURL;
-
-	} else {
-	    return "pages/learning/learning";
-	}
-
+	return "pages/learning/learning";
     }
 
     /**
@@ -316,20 +280,7 @@ public class LearningController {
 		.getAttribute(sessionMapID);
 
 	// get mode and ToolSessionID from sessionMAP
-	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	// auto run mode, when use finish the only one resource item, mark it as complete then finish this activity as
-	// well.
-	String resourceItemUid = request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID);
-	if (resourceItemUid != null) {
-	    doComplete(request);
-	    // NOTE:So far this flag is useless(31/08/2006).
-	    // set flag, then finish page can know redir target is parent(AUTO_RUN) or self(normal)
-	    request.setAttribute(ResourceConstants.ATTR_RUN_AUTO, true);
-	} else {
-	    request.setAttribute(ResourceConstants.ATTR_RUN_AUTO, false);
-	}
 
 	if (!validateBeforeFinish(request, sessionMapID)) {
 	    return "pages/learning/learning";
@@ -340,7 +291,7 @@ public class LearningController {
 	try {
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    Long userID = new Long(user.getUserID().longValue());
+	    Long userID = user.getUserID().longValue();
 
 	    nextActivityUrl = resourceService.finishToolSession(sessionId, userID);
 	    request.setAttribute(ResourceConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);

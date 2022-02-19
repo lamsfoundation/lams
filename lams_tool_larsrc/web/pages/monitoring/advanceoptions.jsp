@@ -23,23 +23,6 @@
 	
 	<tr>
 		<td>
-			<fmt:message key="label.authoring.advance.run.content.auto" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${sessionMap.resource.runAuto == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
 			<fmt:message key="label.authoring.advance.mini.number.resources.view" />
 		</td>
 		

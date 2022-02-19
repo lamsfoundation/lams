@@ -1146,7 +1146,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	resource.setReflectOnActivity(
 		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	resource.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
-	resource.setRunAuto(JsonUtil.optBoolean(toolContentJSON, "runAuto", Boolean.FALSE));
 
 	resource.setContentInUse(false);
 	resource.setDefineLater(false);
