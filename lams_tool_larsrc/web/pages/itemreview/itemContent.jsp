@@ -53,7 +53,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			    jsonpCallback: 'iframelyCallback${itemUid}',
 			    contentType: "application/json; charset=utf-8",
 			    error: function (xhr, status, error) {
- 			    	$('#embedded-open-button', panel).removeClass('btn-default btn-sm pull-right').addClass('btn-primary');
+ 			    	$('.embedded-open-button', panel).removeClass('btn-default btn-sm pull-right').addClass('btn-primary');
 			        console.log("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
 			    }
 			});

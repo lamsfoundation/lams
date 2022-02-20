@@ -3,11 +3,61 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="addheader.jsp"%>
+		
+		<style type="text/css">
+		 	.item-content {
+		 		padding: 5px;
+		 	}
+		 	
+		 	.embedded-title {
+		 		clear: both;
+		 	}
+		 	
+		 	#preview-panel {
+		 		clear: both;
+		 	}
+		</style>
+	
 		<script type="text/javascript">
 			$(document).ready(function(){
-				$('#url').attr("placeholder","<fmt:message key="label.authoring.basic.resource.url.placeholder" />");
 				$('#title').focus();
-			});		
+
+				$('#url').attr("placeholder","<fmt:message key="label.authoring.basic.resource.url.placeholder" />")
+						 .blur(function(){
+							 var url = $(this).val();
+							 if (url.trim() != '') {
+								 url = encodeURIComponent(url);
+								 $('#item-content-0 .content-panel > *').empty();
+								$.ajax({
+								    url: "http://ckeditor.iframe.ly/api/oembed?url=" + url,
+								    dataType: "jsonp",
+								    cache: true,
+								    type: "POST",
+								    jsonpCallback: 'iframelyCallback0',
+								    contentType: "application/json; charset=utf-8",
+								    error: function (xhr, status, error) {
+										$('#preview-panel').addClass('hidden');
+										
+								        console.log("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
+								    }
+								});
+							 }
+						 })
+						 // run on open panel in case it is edit
+						 .blur();
+			});
+
+			// there is no item ID yet, so just use 0
+			function iframelyCallback0(response) {
+				if (!response || !response.html) {
+					$('#preview-panel').addClass('hidden');
+					return;
+				}
+
+				iframelyCallback(0, response);
+				$('#preview-panel').removeClass('hidden');
+			}
+				
 	 		$( "#resourceItemForm" ).validate({
 	 			ignore: 'hidden, div.cke_editable',
 				errorClass: "text-danger",
@@ -34,6 +84,7 @@
 
 		</script>
 		<lams:JSImport src="includes/javascript/rsrcresourceitem.js" relative="true" />
+		<lams:JSImport src="includes/javascript/rsrcembed.js" relative="true" />
 	</lams:head>
 	<body>
 
@@ -75,9 +126,19 @@
 				    <button onclick="hideResourceItem(); return false;" class="btn btn-default btn-sm btn-disable-on-submit">
 						<fmt:message key="label.cancel" /> </button>
 					<button onclick="submitResourceItem(); return false;" class="btn btn-default btn-sm btn-disable-on-submit">
-						<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.url" /> </button>
+						<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.url" /></button>
 				</div>
-			
+				
+				<div id="preview-panel" class="hidden">
+					<h3 class="text-center"><fmt:message key="label.authoring.basic.resource.preview" /></h3>
+					<div id="item-content-0" class="item-content">
+						<div class="content-panel">
+							<h4  class="embedded-title"></h3>
+							<h5  class="embedded-description"></h4>
+							<div class="embedded-content"></div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</body>
