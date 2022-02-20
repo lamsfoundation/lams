@@ -180,6 +180,19 @@
 				$('#sidebar').show();
 			}
 
+			function preventLearnerAutosaveFromMultipleTabs(autosaveInterval) {
+				let currentTime = new Date().getTime(),
+					lamsAutosaveTimestamp = +localStorage.getItem('lamsAutosaveTimestamp');
+				// check if autosave does not happen too often
+				if (autosaveInterval > 0 && lamsAutosaveTimestamp && lamsAutosaveTimestamp + +autosaveInterval - 200 > currentTime) {
+					// this label is required only in tool which implement autosave
+					alert('<fmt:message key="label.prevent.learner.autosave.mutliple.tabs" />');
+					return false;
+				}
+				localStorage.setItem('lamsAutosaveTimestamp', currentTime);
+				return true;
+			}
+
 			function initCommandWebsocket(){
 				commandWebsocketInitTime = Date.now();
 				// it is not an obvious place to init the websocket, but we need lesson ID
@@ -212,7 +225,7 @@
 						if (command.message === 'autosave') {
 							// the name of this function is same in all tools
 							if (typeof learnerAutosave == 'function') {
-								learnerAutosave();
+								learnerAutosave(true);
 							}
 						} else {
 							alert(command.message);

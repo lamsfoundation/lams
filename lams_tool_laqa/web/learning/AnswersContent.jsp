@@ -121,7 +121,16 @@
 			var interval = "30000"; // = 30 seconds
 			window.setInterval(learnerAutosave, interval);
 			
-			function learnerAutosave(){
+			function learnerAutosave(isCommand){
+                // isCommand means that the autosave was triggered by force complete or another command websocket message
+			    // in this case do not check multiple tabs open, just autosave
+			    if (!isCommand) {
+				  let shouldAutosave = preventLearnerAutosaveFromMultipleTabs(interval);
+				  if (!shouldAutosave) {
+					return;
+				  }
+			    }
+			    
 				//fire onchange event for textareas/ckeditors
 				if (${generalLearnerFlowDTO.allowRichEditor}) {
 				    for ( instance in CKEDITOR.instances ) {

@@ -183,11 +183,6 @@
 			});
 			return totalSelected;
 		}
-	
-		//boolean to indicate whether ok dialog is still ON so that autosave can't be run
-		// var isWaitingForConfirmation = ${isTimeLimitEnabled && sessionMap.isTimeLimitNotLaunched};
-	
-		
 		
 		// TIME LIMIT
 
@@ -312,8 +307,18 @@
 		
 		//autosave feature
 		<c:if test="${hasEditRight && (mode != 'teacher')}">
-		
-			function learnerAutosave(){
+			var autosaveInterval = ${isLeadershipEnabled and isUserLeader ? 10000 : 30000}; // 30 or 10 seconds interval
+			
+			function learnerAutosave(isCommand){
+				// isCommand means that the autosave was triggered by force complete or another command websocket message
+				// in this case do not check multiple tabs open, just autosave
+				if (!isCommand) {
+					let shouldAutosave = preventLearnerAutosaveFromMultipleTabs(autosaveInterval);
+					if (!shouldAutosave) {
+						return;
+					}
+				}
+				
 				if (typeof CodeMirror != 'undefined') {
 					$('.CodeMirror').each(function(){
 						this.CodeMirror.save();
@@ -349,7 +354,6 @@
 	                error : onLearnerAutosaveError
 				});
 			}
-			var autosaveInterval = ${isLeadershipEnabled and isUserLeader ? 10000 : 30000}; // 30 or 10 seconds interval
 			window.setInterval(learnerAutosave, autosaveInterval);
 
 			function onLearnerAutosaveError() {
