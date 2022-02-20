@@ -21,10 +21,10 @@
 								key="label.authoring.basic.resource.url" /> : </span>
 						<c:out value="${resource.title}" escapeXml="true"/>
 					</td>
-					<td width="10%">
-						<a href="#"
-							onclick="previewItem(1,${status.index},'${sessionMapID}')"> <fmt:message
-								key="label.authoring.basic.resource.preview" /> </a>
+					<td width="5%">
+						<i class="fa fa-eye" title="<fmt:message key="label.authoring.basic.resource.preview" />"
+							onclick="previewItem(1, ${status.index},'${sessionMapID}')">
+						</i>
 					</td>
 				</c:if>
 
@@ -34,10 +34,10 @@
 								key="label.authoring.basic.resource.file" /> : </span>
 						<c:out value="${resource.title}" escapeXml="true"/>
 					</td>
-					<td width="10%">
-						<a href="#"
-							onclick="previewItem(2,${status.index},'${sessionMapID}')"> <fmt:message
-								key="label.authoring.basic.resource.preview" /> </a>
+					<td width="5%">
+						<i class="fa fa-eye" title="<fmt:message key="label.authoring.basic.resource.preview" />"
+							onclick="previewItem(2, ${status.index},'${sessionMapID}')">
+						</i>
 					</td>
 				</c:if>
 
