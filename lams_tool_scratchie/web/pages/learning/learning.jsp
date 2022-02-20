@@ -440,7 +440,16 @@
 			var autosaveInterval = "60000"; // 60 seconds interval
 			window.setInterval(learnerAutosave,	autosaveInterval);
 			
-			function learnerAutosave(){
+			function learnerAutosave(isCommand){
+                // isCommand means that the autosave was triggered by force complete or another command websocket message
+			    // in this case do not check multiple tabs open, just autosave
+			    if (!isCommand) {
+				  let shouldAutosave = preventLearnerAutosaveFromMultipleTabs(autosaveInterval);
+				  if (!shouldAutosave) {
+					return;
+				  }
+			    }
+			    
 				//ajax form submit
 				$('#burning-questions').ajaxSubmit({
 					url: "<lams:WebAppURL/>learning/autosaveBurningQuestions.do?sessionMapID=${sessionMapID}&date=" + new Date().getTime(),
