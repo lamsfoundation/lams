@@ -78,8 +78,6 @@ public class ResourceConstants {
 
     public static final String ATTR_RESOURCE_REVIEW_URL = "resourceItemReviewUrl";
 
-    public static final String ATTR_ENCODED_RESOURCE_REVIEW_URL = "encodedResourceItemReviewUrl";
-
     public static final String ATTR_IS_DOWNLOAD = "isDownload";
 
     public static final String ATTR_RESOURCE = "resource";

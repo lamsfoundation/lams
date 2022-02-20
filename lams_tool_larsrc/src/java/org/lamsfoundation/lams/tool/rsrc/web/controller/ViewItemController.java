@@ -129,10 +129,6 @@ public class ViewItemController {
 
 	String reviewUrl = getReviewUrl(item, sessionMapID);
 	request.setAttribute(ResourceConstants.ATTR_RESOURCE_REVIEW_URL, reviewUrl);
-	if (item.getType() == ResourceConstants.RESOURCE_TYPE_URL) {
-	    request.setAttribute(ResourceConstants.ATTR_ENCODED_RESOURCE_REVIEW_URL,
-		    URLEncoder.encode(reviewUrl, "UTF-8"));
-	}
 	request.setAttribute(ResourceConstants.ATTR_IS_DOWNLOAD,
 		item.getType() == ResourceConstants.RESOURCE_TYPE_FILE);
 	request.setAttribute(ResourceConstants.ATTR_RESOURCE_INSTRUCTION, item.getInstructions());

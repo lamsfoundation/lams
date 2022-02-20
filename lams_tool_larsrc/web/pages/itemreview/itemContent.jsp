@@ -43,21 +43,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
    		}
    		
 		$('#embedded-open-button', panel).removeClass('hidden');
-
-		<c:if test="${not empty encodedResourceItemReviewUrl}">
-			$.ajax({
-			    url: "http://ckeditor.iframe.ly/api/oembed?url=${encodedResourceItemReviewUrl}",
-			    dataType: "jsonp",
-			    cache: true,
-			    type: "POST",
-			    jsonpCallback: 'iframelyCallback${itemUid}',
-			    contentType: "application/json; charset=utf-8",
-			    error: function (xhr, status, error) {
- 			    	$('.embedded-open-button', panel).removeClass('btn-default btn-sm pull-right').addClass('btn-primary');
-			        console.log("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
-			    }
-			});
-		</c:if>
+		$.ajax({
+		    url: "http://ckeditor.iframe.ly/api/oembed?url=" + encodeURIComponent("${resourceItemReviewUrl}"),
+		    dataType: "jsonp",
+		    cache: true,
+		    type: "POST",
+		    jsonpCallback: 'iframelyCallback${itemUid}',
+		    contentType: "application/json; charset=utf-8",
+		    error: function (xhr, status, error) {
+			    	$('.embedded-open-button', panel).removeClass('btn-default btn-sm pull-right').addClass('btn-primary');
+		        console.log("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
+		    }
+		});
   	});
 	
 	function iframelyCallback${itemUid}(response) {
@@ -94,7 +91,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</a>
 		</div>
 	
-		<h4  class="embedded-title" class="clearfix"></h3>
+		<h4  class="embedded-title"></h3>
 		<h5  class="embedded-description"></h4>
 		<div class="embedded-content"></div>
 	</div>
