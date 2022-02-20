@@ -20,11 +20,12 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.timezone.dto;
 
 import java.util.Date;
 import java.util.TimeZone;
+
+import org.lamsfoundation.lams.timezone.Timezone;
 
 /**
  * DTO object for {@link org.lamsfoundation.lams.timezone.Timezone}
@@ -54,19 +55,11 @@ public class TimezoneDTO {
      * timezone human readable name
      */
     private String displayName;
-    /**
-     * If this timezone is selected.
-     */
-    private boolean selected;
 
     /**
      * Returns new <code>Timezone</code> object with populated values.
-     *
-     * @param timeZone
-     * @param selected
-     * @return
      */
-    public static TimezoneDTO createTimezoneDTO(TimeZone timeZone, boolean selected) {
+    public static TimezoneDTO createTimezoneDTO(TimeZone timeZone) {
 	TimezoneDTO timezoneDTO = new TimezoneDTO();
 	timezoneDTO.timeZoneId = timeZone.getID();
 	int timeZoneRawOffset = timeZone.getRawOffset();
@@ -74,8 +67,11 @@ public class TimezoneDTO {
 	timezoneDTO.isRawOffsetNegative = timeZoneRawOffset < 0;
 	timezoneDTO.dstOffset = timeZone.getDSTSavings() / 60000;
 	timezoneDTO.displayName = timeZone.getDisplayName();
-	timezoneDTO.selected = selected;
 	return timezoneDTO;
+    }
+
+    public static TimezoneDTO createTimezoneDTO(Timezone timeZone) {
+	return TimezoneDTO.createTimezoneDTO(TimeZone.getTimeZone(timeZone.getTimezoneId()));
     }
 
     public String getTimeZoneId() {
@@ -92,14 +88,6 @@ public class TimezoneDTO {
 
     public void setDisplayName(String displayName) {
 	this.displayName = displayName;
-    }
-
-    public boolean isSelected() {
-	return selected;
-    }
-
-    public void setSelected(boolean selected) {
-	this.selected = selected;
     }
 
     public Date getRawOffset() {
