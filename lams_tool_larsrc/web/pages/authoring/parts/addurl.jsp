@@ -110,6 +110,19 @@
 						<form:input id="url" path="url"  cssClass="form-control"/>
 					</div>
 					
+					<div id="preview-panel" class="panel panel-default hidden">
+						<div class="panel-heading panel-title">
+							<fmt:message key="label.authoring.basic.resource.preview" />
+						</div>
+						<div id="item-content-0" class="panel-body item-content">
+							<div class="content-panel">
+								<h4  class="embedded-title"></h3>
+								<h5  class="embedded-description"></h4>
+								<div class="embedded-content"></div>
+							</div>
+						</div>
+					</div>
+				
 					<div class="form-group">
 				    	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>:
 						<form:input path="title" id="title" cssClass="form-control" />
@@ -130,17 +143,6 @@
 						<fmt:message key="label.cancel" /> </button>
 					<button onclick="submitResourceItem(); return false;" class="btn btn-default btn-sm btn-disable-on-submit">
 						<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.url" /></button>
-				</div>
-				
-				<div id="preview-panel" class="hidden">
-					<h3 class="text-center"><fmt:message key="label.authoring.basic.resource.preview" /></h3>
-					<div id="item-content-0" class="item-content">
-						<div class="content-panel">
-							<h4  class="embedded-title"></h3>
-							<h5  class="embedded-description"></h4>
-							<div class="embedded-content"></div>
-						</div>
-					</div>
 				</div>
 			</div>
 		</div>
