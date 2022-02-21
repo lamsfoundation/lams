@@ -54,6 +54,10 @@
 					return;
 				}
 
+				if (response.title && $('#title').val().trim() == '') {
+					$('#title').val(response.title);
+				}
+
 				iframelyCallback(0, response);
 				$('#preview-panel').removeClass('hidden');
 			}
