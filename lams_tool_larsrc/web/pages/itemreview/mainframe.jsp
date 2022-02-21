@@ -23,7 +23,6 @@
 	</style>
 
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-	<c:set var="mode" value="${sessionMap.mode}" />
 	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 	
 	<lams:JSImport src="includes/javascript/rsrcembed.js" relative="true" />

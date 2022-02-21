@@ -69,16 +69,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</div>
 	</c:if>
 	
-	<c:if test="${mode eq 'learner' && sessionMap.rateItems && allowRating}">
-		<lams:Rating itemRatingDto="${ratingDTO}" 
-					 disabled="${mode == 'teacher' || finishedLock}" allowRetries="true" />
-	</c:if>
-	
-	<c:if test="${mode eq 'learner' and allowComments and (mode eq 'learner' or mode eq 'author') and not empty toolSessionID}">
-		<c:set var="accordianTitle"><fmt:message key="label.comments"/></c:set>
-		<lams:Comments toolSessionId="${toolSessionID}" toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>"
-					  embedInAccordian="true" accordionTitle="${accordianTitle}" mode="${mode}" toolItemId="${itemUid}"
-					  readOnly="${finishedLock}"/>	
+	<c:if test="${mode eq 'learner' or mode eq 'author'}">
+		<c:if test="${sessionMap.rateItems && allowRating}">
+			<lams:Rating itemRatingDto="${ratingDTO}" 
+						 disabled="${mode == 'teacher' || finishedLock}" allowRetries="true" />
+		</c:if>
+
+		<c:if test="${allowComments and not empty toolSessionID}">
+			<c:set var="accordianTitle"><fmt:message key="label.comments"/></c:set>
+			<lams:Comments toolSessionId="${toolSessionID}" toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>"
+						  embedInAccordian="true" accordionTitle="${accordianTitle}" mode="${mode}" toolItemId="${itemUid}"
+						  readOnly="${finishedLock}"/>	
+		</c:if>
 	</c:if>
 	
 	<div class="content-panel">

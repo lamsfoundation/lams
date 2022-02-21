@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.rsrc.web.controller;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +34,7 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
@@ -87,6 +87,7 @@ public class ViewItemController {
 	request.setAttribute(ResourceConstants.ATTR_TOOL_SESSION_ID, sessionId);
 	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	request.setAttribute(ResourceConstants.ATTR_TITLE, item.getTitle());
+	request.setAttribute(AttributeNames.ATTR_MODE, mode);
 
 	return "pages/itemreview/mainframe";
     }
@@ -108,15 +109,18 @@ public class ViewItemController {
 	    sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	}
 
-	ToolAccessMode toolAccessMode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
-	String mode = toolAccessMode.toString();
+	String mode = request.getParameter(AttributeNames.ATTR_MODE);
+	if (StringUtils.isBlank(mode)) {
+	    ToolAccessMode toolAccessMode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
+	    mode = toolAccessMode.toString();
+	}
 	ResourceItem item = getResourceItem(request, sessionMap, mode);
 
-	String idStr = request.getParameter(ResourceConstants.ATTR_TOOL_SESSION_ID);
+	String sessionIdString = request.getParameter(ResourceConstants.ATTR_TOOL_SESSION_ID);
 	Long sessionId = null;
 	// mark this item access flag if it is learner
 	if (ToolAccessMode.LEARNER.toString().equals(mode)) {
-	    sessionId = NumberUtils.createLong(idStr);
+	    sessionId = NumberUtils.createLong(sessionIdString);
 	    HttpSession ss = SessionManager.getSession();
 	    // get back login user DTO
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -143,7 +147,7 @@ public class ViewItemController {
 	    itemUid = 0L;
 	}
 	request.setAttribute(ResourceConstants.PARAM_RESOURCE_ITEM_UID, itemUid);
-	request.setAttribute(ResourceConstants.ATTR_TOOL_SESSION_ID, sessionId);
+	request.setAttribute(ResourceConstants.ATTR_TOOL_SESSION_ID, sessionIdString);
 	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
 	return "pages/itemreview/itemContent";
@@ -183,8 +187,11 @@ public class ViewItemController {
     private ResourceItem getResourceItem(HttpServletRequest request, SessionMap<String, Object> sessionMap,
 	    String mode) {
 	ResourceItem item = null;
-	if (ToolAccessMode.AUTHOR.toString().equals(mode)) {
-	    int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX), 0);
+	if (ResourceConstants.MODE_AUTHOR_SESSION.equals(mode)) {
+	    Integer itemIdx = WebUtil.readIntParam(request, ResourceConstants.PARAM_ITEM_INDEX, true);
+	    if (itemIdx == null) {
+		itemIdx = 0;
+	    }
 	    // authoring: does not save item yet, so only has ItemList from session and identity by Index
 	    List<ResourceItem> resourceList = new ArrayList<>(getResourceItemList(sessionMap));
 	    item = resourceList.get(itemIdx);
