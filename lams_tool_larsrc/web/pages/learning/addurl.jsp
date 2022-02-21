@@ -14,16 +14,16 @@
 		<form:hidden path="itemType" id="itemType" />
 		<form:hidden path="mode" id="mode"/>
 		<form:hidden path="sessionMapID"/>
-	
-		<div class="form-group">
-	    	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>:
-			<form:input path="title" tabindex="1" cssClass="form-control" id="resourcetitle"/>
-	  	</div>	
-
+		
 		<div class="form-group" id="addurl">
 	    	<label for="url"><fmt:message key="label.authoring.basic.resource.url.input" /></label>
 			<form:input path="url" cssClass="form-control" tabindex="2" id="url"/>
 	    </div>
+	    
+		<div class="form-group">
+	    	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>:
+			<form:input path="title" tabindex="1" cssClass="form-control" id="resourcetitle"/>
+	  	</div>	
 
 		<div class="form-group">
 	    	<label for="instructions"><fmt:message key="label.authoring.basic.instruction" /></label>
@@ -43,8 +43,7 @@
 	
 	<script type="text/javascript">
 		$(document).ready(function(){
-			$('#url').attr("placeholder","<fmt:message key="label.authoring.basic.resource.url.placeholder" />");
-			$('#title').focus();
+			$('#url').focus().attr("placeholder","<fmt:message key="label.authoring.basic.resource.url.placeholder" />");
 		});		
 	
 		$('#resourceItemForm').submit(submitResourceForm);

@@ -20,9 +20,8 @@
 	
 		<script type="text/javascript">
 			$(document).ready(function(){
-				$('#title').focus();
-
-				$('#url').attr("placeholder","<fmt:message key="label.authoring.basic.resource.url.placeholder" />")
+				$('#url').focus()
+						 .attr("placeholder","<fmt:message key="label.authoring.basic.resource.url.placeholder" />")
 						 .blur(function(){
 							 var url = $(this).val();
 							 if (url.trim() != '') {
@@ -105,16 +104,16 @@
 					<form:hidden path="sessionMapID" />
 					<input type="hidden" name="itemType" id="itemType" value="1" />
 					<form:hidden path="itemIndex" />
-	
-					<div class="form-group">
-				    	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>:
-						<form:input path="title" id="title" cssClass="form-control" />
-				  	</div>	
-				  
+					
 					<div class="form-group">
 						<label for="url"><fmt:message key="label.authoring.basic.resource.url.input" /></label>:
 						<form:input id="url" path="url"  cssClass="form-control"/>
 					</div>
+					
+					<div class="form-group">
+				    	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>:
+						<form:input path="title" id="title" cssClass="form-control" />
+				  	</div>	
 					
 					<div class="form-group">
 					   	<label for="instructions"><fmt:message key="label.authoring.basic.instruction" /></label>:
