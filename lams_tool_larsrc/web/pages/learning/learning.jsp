@@ -104,7 +104,7 @@
 		$(document).ready(function(){
 			cancel();
 
-			// show etherpads only on Group expand
+			// show items only on Group expand
 			$('.item-collapse').on('show.bs.collapse', function(){
 				let collapse = $(this);
 				if (collapse.is(':empty')) {
