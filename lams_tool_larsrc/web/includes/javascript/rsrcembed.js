@@ -14,21 +14,5 @@ function iframelyCallback(itemUid, response) {
 	}
 	if (response.html) {
 		$('.embedded-content', panel).append(response.html);
-		setIframeHeight(panel);
 	}
-}
-
-function setIframeHeight(panel) {
-	var frame = $('.embedded-content iframe', panel);
-	if (frame.length === 0) {
-		return;
-	}
-	frame = frame[0];
-	
-    var doc = frame.contentDocument? frame.contentDocument : frame.contentWindow.document,
-    	body = doc.body,
-    	html = doc.documentElement.
-    	height = Math.max(body.scrollHeight, body.offsetHeight, 
-        				  html.clientHeight, html.scrollHeight, html.offsetHeight);
-    frame.style.height = height + "px";
 }
