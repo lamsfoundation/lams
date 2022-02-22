@@ -21,7 +21,7 @@
 	function previewItem(type,idx,sessionMapID){
 		//1:url, 2:file
 		//This mode is special for unsaved author page. It is different with the author mode in preview 
-		var myUrl = "<c:url value='/reviewItem.do?mode=author&itemIndex='/>"+idx+"&sessionMapID="+sessionMapID;
+		var myUrl = "<c:url value='/reviewItem.do?mode=author_session&itemIndex='/>"+idx+"&sessionMapID="+sessionMapID;
 		launchPopup(myUrl,"Review");
 	}
 	
