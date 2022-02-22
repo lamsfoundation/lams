@@ -42,7 +42,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			return;
    		}
    		
-		$('.embedded-open-button', panel).removeClass('hidden');
 		$.ajax({
 		    url: "http://ckeditor.iframe.ly/api/oembed?url=" + encodeURIComponent("${resourceItemReviewUrl}"),
 		    dataType: "jsonp",
@@ -51,7 +50,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		    jsonpCallback: 'iframelyCallback${itemUid}',
 		    contentType: "application/json; charset=utf-8",
 		    error: function (xhr, status, error) {
-			    $('.embedded-open-button', panel).removeClass('btn-default btn-sm pull-right').addClass('btn-primary');
+			    $('.embedded-open-button', panel).removeClass('btn-default hidden btn-sm pull-right').addClass('btn-primary');
 		        console.log("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
 		    }
 		});
@@ -69,6 +68,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</div>
 	</c:if>
 	
+	<div class="content-panel">
+		<div class="text-center">
+			<a href="<c:url value='${resourceItemReviewUrl}' />" class="download-button hidden btn btn-primary">
+				<fmt:message key="label.download" />
+			</a>
+			<a href="${resourceItemReviewUrl}" target="_blank" class="embedded-open-button hidden btn btn-default btn-sm pull-right">
+				<fmt:message key="open.in.new.window" />
+			</a>
+		</div>
+	
+		<a href="${resourceItemReviewUrl}" target="_blank" style="font-weight: 500; font-size: larger;" class="embedded-title"></a>&nbsp;&nbsp;<i id="new-window-icon" title="<fmt:message key='open.in.new.window' />" class="fa fa-1 hidden fa-external-link" aria-hidden="true"></i>
+		<div style="padding: 0.5em" class="embedded-description"></div>
+		<div class="embedded-content"></div>
+	</div>
+	<hr>
 	<c:if test="${mode eq 'learner' or mode eq 'author'}">
 		<c:if test="${sessionMap.rateItems && allowRating}">
 			<lams:Rating itemRatingDto="${ratingDTO}" 
@@ -81,20 +95,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  embedInAccordian="true" accordionTitle="${accordianTitle}" mode="${mode}" toolItemId="${itemUid}"
 						  readOnly="${finishedLock}"/>	
 		</c:if>
-	</c:if>
-	
-	<div class="content-panel">
-		<div class="text-center">
-			<a href="<c:url value='${resourceItemReviewUrl}' />" class="download-button hidden btn btn-primary">
-				<fmt:message key="label.download" />
-			</a>
-			<a href="${resourceItemReviewUrl}" target="_blank" class="embedded-open-button hidden btn btn-default btn-sm pull-right">
-				<fmt:message key="open.in.new.window" />
-			</a>
-		</div>
-	
-		<h4  class="embedded-title"></h3>
-		<h5  class="embedded-description"></h4>
-		<div class="embedded-content"></div>
-	</div>
+	</c:if>	
 </div>
