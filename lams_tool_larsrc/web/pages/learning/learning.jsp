@@ -304,10 +304,10 @@
 						<div class="pull-right">
 							<c:choose>
 								<c:when test="${item.complete}">
-									<i class="fa fa-check icon-complete" title='<fmt:message key="label.completed" />'></i>
+									<i class="fa fa-check-circle icon-complete" style="font-size: 1.5em;color: green;" title='<fmt:message key="label.completed" />'></i>
 								</c:when>
 								<c:when test="${not finishedLock}">
-									<i class="fa fa-check icon-complete hidden" title='<fmt:message key="label.completed" />'></i>
+									<i class="fa fa-check-circle icon-complete hidden" style="font-size: 1.5em;color: green;" title='<fmt:message key="label.completed" />'></i>
 									<button type="button" onClick="javascript:completeItem(${item.uid})"
 										   class="complete-item-button btn btn-xs btn-default">
 										<fmt:message key='label.finish' />
@@ -317,7 +317,7 @@
 							
 							
 							<c:if test="${not finishedLock && !item.createByAuthor && userID == item.createBy.userId}">
-								<i class="fa fa-trash delete-item-button"
+								<i class="fa fa-trash delete-item-button" style="color: red;"
 								   title="<fmt:message key="label.delete" />"
 								   onclick="hideItem(${item.uid})"></i>
 							</c:if>
