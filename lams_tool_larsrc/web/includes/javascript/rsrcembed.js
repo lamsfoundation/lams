@@ -7,7 +7,7 @@ function iframelyCallback(itemUid, response) {
 	
 	if (response.title) {
 		$('.embedded-title', panel).text(response.title);
-		$('#new-window-icon', panel).removeClass('hidden');
+		$('.new-window-icon', panel).removeClass('hidden');
 	}
 	if (response.description) {
 		$('.embedded-description', panel).text(response.description);

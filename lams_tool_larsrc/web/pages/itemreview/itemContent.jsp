@@ -78,8 +78,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</a>
 		</div>
 	
-		<a href="${resourceItemReviewUrl}" target="_blank" style="font-weight: 500; font-size: larger;" class="embedded-title"></a>&nbsp;&nbsp;<i id="new-window-icon" title="<fmt:message key='open.in.new.window' />" class="fa fa-1 hidden fa-external-link" aria-hidden="true"></i>
-		<div style="padding: 0.5em" class="embedded-description"></div>
+		<a title="<fmt:message key='open.in.new.window' />" class="embedded-title" href="${resourceItemReviewUrl}"  target="_blank"   ></a>&nbsp;&nbsp;
+		<i title="<fmt:message key='open.in.new.window' />" class="new-window-icon fa fa-1 hidden fa-external-link" aria-hidden="true"></i>
+		<div class="embedded-description"></div>
 		<div class="embedded-content"></div>
 	</div>
 	<hr>

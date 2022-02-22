@@ -19,6 +19,12 @@
 	 		 	
 	 	.embedded-title {
 	 		clear: both;
+	 		font-weight: 500;
+	 		font-size: larger;
+	 	}
+	 	
+	 	.embedded-description {
+	 		padding: 0.5em;
 	 	}
 	</style>
 
