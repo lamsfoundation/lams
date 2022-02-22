@@ -60,7 +60,7 @@
           	${not empty accordionTitle?accordionTitle:"Comments"}</a>
       		</span>
         </div>
-        <div id="collapseComments-${toolSessionId}-${toolItemId}" class="panel-collapse collapse"
+        <div id="collapseComments-${toolSessionId}-${toolItemId}" class="panel-collapse collapse collapseComments"
         	 role="tabpanel" aria-labelledby="headingComments-${toolSessionId}-${toolItemId}" aria-expanded="false" style="">
 </c:if>
 
@@ -75,7 +75,17 @@
 <script>
 $(document).ready(function(){
 	var url='<lams:LAMSURL/>comments/init.do?externalID=${toolSessionId}&externalSecondaryID=${toolItemId}&externalSig=${toolSignature}&externalType=1${modeStr}&likeAndDislike=${likeAndDislike}&readOnly=${readOnly}&pageSize=${pageSize}&sortBy=${sortBy}&anonymous=${anonymous}';
-	$.ajaxSetup({ cache: true });
-	$('#commentFrame-${toolSessionId}-${toolItemId}').load(url);
+	
+	<c:choose>
+		<c:when test="${embedInAccordian}">
+			$('#collapseComments-${toolSessionId}-${toolItemId}').on('show.bs.collapse', function(){
+				$('.collapseComments').not('#collapseComments-${toolSessionId}-${toolItemId}').collapse('hide').find('.commentFrame').empty();
+				$('.commentFrame', this).load(url);
+			});
+		</c:when>
+		<c:otherwise>
+			$('#commentFrame-${toolSessionId}-${toolItemId}').load(url);
+		</c:otherwise>
+	</c:choose>
 });
 </script>
