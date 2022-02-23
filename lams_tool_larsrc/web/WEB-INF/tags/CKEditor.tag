@@ -111,7 +111,7 @@
 
 		instance = CKEDITOR[method](id, configuration);
 		instance.initializeFunction = function(){
-			 initializeCKEditor(id, method, resizeParentFrameName, width, height, toolbarSet, classes, language, displayExpanded, contentFolderID);
+			 initializeCKEditor(id, method, resizeParentFrameName, width, height, toolbarSet, classes, language, displayExpanded, contentFolderID, maxWords);
 		};
 		return instance;
 	}

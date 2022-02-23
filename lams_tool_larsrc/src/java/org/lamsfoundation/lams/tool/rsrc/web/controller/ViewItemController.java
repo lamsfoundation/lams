@@ -23,24 +23,22 @@
 
 package org.lamsfoundation.lams.tool.rsrc.web.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
-import org.lamsfoundation.lams.tool.rsrc.dto.InstructionNavDTO;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
-import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -51,20 +49,55 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class ViewItemController {
-    private static final Logger log = Logger.getLogger(ViewItemController.class);
-
     @Autowired
     private IResourceService resourceService;
 
     /**
-     * Display main frame to display instrcution and item content.
+     * Display main frame to display item content in monitoring
      */
     @SuppressWarnings("unchecked")
     @RequestMapping("/reviewItem")
-    private String reviewItem(HttpServletRequest request) {
+    public String reviewItem(HttpServletRequest request) throws UnsupportedEncodingException {
+	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID, true);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	String mode = request.getParameter(AttributeNames.ATTR_MODE);
+	if (mode.equals(ToolAccessMode.TEACHER.toString())) {
+	    sessionMap.put(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
+	} else {
+	    sessionMap.put(AttributeNames.ATTR_MODE, ToolAccessMode.AUTHOR);
+	}
+
+	ResourceItem item = getResourceItem(request, sessionMap, mode);
+
+	if (item == null) {
+	    return "error";
+	}
+
+	Long itemUid = NumberUtils.createLong(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
+	request.setAttribute(ResourceConstants.PARAM_RESOURCE_ITEM_UID, itemUid);
+	Integer itemIdx = WebUtil.readIntParam(request, ResourceConstants.PARAM_ITEM_INDEX, true);
+	request.setAttribute(ResourceConstants.PARAM_ITEM_INDEX, itemIdx);
+	String idStr = request.getParameter(ResourceConstants.ATTR_TOOL_SESSION_ID);
+	Long sessionId = NumberUtils.createLong(idStr);
+	request.setAttribute(ResourceConstants.ATTR_TOOL_SESSION_ID, sessionId);
+	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	request.setAttribute(ResourceConstants.ATTR_TITLE, item.getTitle());
+	request.setAttribute(AttributeNames.ATTR_MODE, mode);
+
+	return "pages/itemreview/mainframe";
+    }
+
+    /**
+     * Display single item content
+     */
+    @SuppressWarnings("unchecked")
+    @RequestMapping("/itemReviewContent")
+    public String getItemReviewContent(HttpServletRequest request) throws UnsupportedEncodingException {
 
 	SessionMap<String, Object> sessionMap = null;
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID, true);
@@ -75,117 +108,73 @@ public class ViewItemController {
 	} else {
 	    sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	}
-	
+
 	String mode = request.getParameter(AttributeNames.ATTR_MODE);
+	if (StringUtils.isBlank(mode)) {
+	    ToolAccessMode toolAccessMode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
+	    mode = toolAccessMode.toString();
+	}
 	ResourceItem item = getResourceItem(request, sessionMap, mode);
 
-	String idStr = request.getParameter(ResourceConstants.ATTR_TOOL_SESSION_ID);
-	Long sessionId = NumberUtils.createLong(idStr);
+	String sessionIdString = request.getParameter(ResourceConstants.ATTR_TOOL_SESSION_ID);
+	Long sessionId = null;
 	// mark this item access flag if it is learner
 	if (ToolAccessMode.LEARNER.toString().equals(mode)) {
+	    sessionId = NumberUtils.createLong(sessionIdString);
 	    HttpSession ss = SessionManager.getSession();
 	    // get back login user DTO
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    resourceService.setItemAccess(item.getUid(), new Long(user.getUserID().intValue()), sessionId);
+	    resourceService.setItemAccess(item.getUid(), user.getUserID().longValue(), sessionId);
 	}
 
 	if (item == null) {
 	    return "error";
 	}
-	if (item.getType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT) {
-	    sessionMap.put(ResourceConstants.ATT_LEARNING_OBJECT, item);
-	}
-	// set url to content frame
 
-	int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX));
-	request.setAttribute(ResourceConstants.ATTR_RESOURCE_REVIEW_URL,
-		getReviewUrl(request, item, sessionMapID, mode, itemIdx));
-
+	String reviewUrl = getReviewUrl(item, sessionMapID);
+	request.setAttribute(ResourceConstants.ATTR_RESOURCE_REVIEW_URL, reviewUrl);
+	request.setAttribute(ResourceConstants.ATTR_IS_DOWNLOAD,
+		item.getType() == ResourceConstants.RESOURCE_TYPE_FILE);
+	request.setAttribute(ResourceConstants.ATTR_RESOURCE_INSTRUCTION, item.getInstructions());
 	request.setAttribute(ResourceConstants.ATTR_ALLOW_COMMENTS, item.isAllowComments());
+	request.setAttribute(ResourceConstants.ATTR_ALLOW_RATING, item.isAllowRating());
+	request.setAttribute("ratingDTO", item.getRatingDTO());
 
 	// these attribute will be use to instruction navigator page
 	request.setAttribute(AttributeNames.ATTR_MODE, mode);
-	request.setAttribute(ResourceConstants.PARAM_ITEM_INDEX, itemIdx);
-	Long itemUid = NumberUtils.createLong(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
+	Long itemUid = WebUtil.readLongParam(request, ResourceConstants.PARAM_RESOURCE_ITEM_UID, true);
+	if (itemUid == null) {
+	    itemUid = 0L;
+	}
 	request.setAttribute(ResourceConstants.PARAM_RESOURCE_ITEM_UID, itemUid);
-	request.setAttribute(ResourceConstants.ATTR_TOOL_SESSION_ID, sessionId);
+	request.setAttribute(ResourceConstants.ATTR_TOOL_SESSION_ID, sessionIdString);
 	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
-	return "pages/itemreview/mainframe";
+	return "pages/itemreview/itemContent";
     }
 
-    /**
-     * Return next instrucion to page. It need four input parameters, mode, itemIndex or itemUid, and insIdx.
-     */
-    @RequestMapping("/nextInstruction")
-    private String nextInstruction(HttpServletRequest request) {
-	String mode = request.getParameter(AttributeNames.ATTR_MODE);
+    @RequestMapping("/completeItem")
+    public void completeItem(@RequestParam String mode, @RequestParam String sessionMapID, @RequestParam Long itemUid,
+	    HttpSession session) {
+	SessionMap sessionMap = (SessionMap) session.getAttribute(sessionMapID);
 
-	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sesionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	HttpSession ss = SessionManager.getSession();
 
-	ResourceItem item = getResourceItem(request, sesionMap, mode);
-	if (item == null) {
-	    return "error";
+	// get back login user DTO
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+
+	Long sessionId = (Long) sessionMap.get(ResourceConstants.ATTR_TOOL_SESSION_ID);
+	resourceService.setItemComplete(itemUid, user.getUserID().longValue(), sessionId);
+
+	// set resource item complete tag
+	Set<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
+	for (ResourceItem item : resourceItemList) {
+	    if (item.getUid().equals(itemUid)) {
+		item.setComplete(true);
+		break;
+	    }
 	}
 
-	int currIns = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_CURRENT_INSTRUCTION_INDEX),
-		0);
-
-	Set<ResourceItemInstruction> instructions = item.getItemInstructions();
-	InstructionNavDTO navDto = new InstructionNavDTO();
-	// For Learner upload item, its instruction will display description/comment fields in ReosourceItem.
-	if (!item.isCreateByAuthor()) {
-	    List<ResourceItemInstruction> navItems = new ArrayList<>(1);
-	    // create a new instruction and put ResourceItem description into it: just for display use.
-	    ResourceItemInstruction ins = new ResourceItemInstruction();
-	    ins.setSequenceId(1);
-	    ins.setDescription(item.getDescription());
-	    navItems.add(ins);
-	    navDto.setAllInstructions(navItems);
-	    instructions.add(ins);
-	} else {
-	    navDto.setAllInstructions(new ArrayList<>(instructions));
-	}
-	navDto.setTitle(item.getTitle());
-	navDto.setType(item.getType());
-	navDto.setTotal(instructions.size());
-	if (instructions.size() > 0) {
-	    navDto.setInstruction(new ArrayList<>(instructions).get(currIns));
-	    navDto.setCurrent(currIns + 1);
-	} else {
-	    navDto.setCurrent(0);
-	    navDto.setInstruction(null);
-	}
-
-	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	request.setAttribute(ResourceConstants.ATTR_RESOURCE_INSTRUCTION, navDto);
-	return "pages/itemreview/instructionsnav";
-    }
-
-    /**
-     * Open url or file in a popup window page.
-     */
-    @RequestMapping("/openUrlPopup")
-    private String openUrlPopup(HttpServletRequest request) {
-	String mode = request.getParameter(AttributeNames.ATTR_MODE);
-
-	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-
-	ResourceItem item = getResourceItem(request, sessionMap, mode);
-
-	boolean isUrlItemType = item.getType() == ResourceConstants.RESOURCE_TYPE_URL;
-	request.setAttribute(ResourceConstants.ATTR_IS_URL_ITEM_TYPE, isUrlItemType);
-
-	String popupUrl = (isUrlItemType) ? item.getUrl()
-		: "/download/?uuid=" + item.getFileUuid() + "&preferDownload=false";
-	request.setAttribute(ResourceConstants.PARAM_OPEN_URL_POPUP, popupUrl);
-
-	request.setAttribute(ResourceConstants.PARAM_TITLE, item.getTitle());
-	return "pages/itemreview/openurl";
     }
 
     // *************************************************************************************
@@ -194,114 +183,61 @@ public class ViewItemController {
 
     /**
      * Return resource item according to ToolAccessMode.
-     *
-     * @param request
-     * @param sessionMap
-     * @param mode
-     * @return
      */
     private ResourceItem getResourceItem(HttpServletRequest request, SessionMap<String, Object> sessionMap,
 	    String mode) {
 	ResourceItem item = null;
 	if (ResourceConstants.MODE_AUTHOR_SESSION.equals(mode)) {
-	    int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX), 0);
+	    Integer itemIdx = WebUtil.readIntParam(request, ResourceConstants.PARAM_ITEM_INDEX, true);
+	    if (itemIdx == null) {
+		itemIdx = 0;
+	    }
 	    // authoring: does not save item yet, so only has ItemList from session and identity by Index
 	    List<ResourceItem> resourceList = new ArrayList<>(getResourceItemList(sessionMap));
 	    item = resourceList.get(itemIdx);
-	} else {
+	} else if (ToolAccessMode.TEACHER.toString().equals(mode)) {
 	    Long itemUid = NumberUtils.createLong(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
 	    // get back the resource and item list and display them on page
 	    item = resourceService.getResourceItemByUid(itemUid);
+	} else {
+	    Long itemUid = NumberUtils.createLong(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
+	    Set<ResourceItem> resourceItems = getResourceItemList(sessionMap);
+	    for (ResourceItem resourceItem : resourceItems) {
+		if (resourceItem.getUid().equals(itemUid)) {
+		    item = resourceItem;
+		    break;
+		}
+	    }
 	}
 	return item;
     }
 
-    private static Pattern usePopupButtonForURL = Pattern.compile("wikipedia|google",
-	    Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     private static Pattern protocolExists = Pattern.compile("http://|https://|ftp://|nntp://",
 	    Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
-    private static Pattern httpPattern = Pattern.compile("http://", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     public static final String DEFAULT_PROTOCOL = "http://";
     public static final String HTTPS_SCHEME = "https";
 
-    private Object getReviewUrl(HttpServletRequest request, ResourceItem item, String sessionMapID, String mode,
-	    int itemIdx) {
-	short type = item.getType();
+    private String getReviewUrl(ResourceItem item, String sessionMapID) {
 	String url = null;
-	switch (type) {
+	switch (item.getType()) {
 	    case ResourceConstants.RESOURCE_TYPE_URL:
 		// protocol missing? Assume http. Must do before the popup checks otherwise LDEV-4503 case may be missed.
 		url = item.getUrl();
 		if (!protocolExists.matcher(url).find()) {
 		    url = DEFAULT_PROTOCOL + url;
 		}
-
-		// check all three cases that trigger popup - first is set in authoring
-		boolean usePopup = item.isOpenUrlNewWindow();
-		// See LDEV-4503 regarding https/http issues
-		if (!usePopup) {
-		    String serverScheme = request.getScheme();
-		    usePopup = HTTPS_SCHEME.equalsIgnoreCase(serverScheme) && httpPattern.matcher(url).find();
-		}
-		// See LDEV-1736 regarding wikipedia regex
-		if (!usePopup) {
-		    Matcher matcher = usePopupButtonForURL.matcher(url);
-		    usePopup = matcher.find();
-		}
-
-		if (usePopup) {
-		    url = constructUrlOpenInNewWindow(item, sessionMapID, mode, itemIdx);
-		}
 		break;
-
 	    case ResourceConstants.RESOURCE_TYPE_FILE:
-		if (item.isOpenUrlNewWindow()) {
-		    url = constructUrlOpenInNewWindow(item, sessionMapID, mode, itemIdx);
-		} else {
-		    url = "/download/?uuid=" + item.getFileUuid() + "&preferDownload=false";
-		}
-		break;
-
-	    case ResourceConstants.RESOURCE_TYPE_WEBSITE:
-		url = "/download/?uuid=" + item.getFileUuid() + "&preferDownload=false";
-		break;
-
-	    case ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT:
-		url = "/pages/learningobj/mainframe.jsp?sessionMapID=" + sessionMapID;
+		url = "/download/?uuid=" + item.getFileUuid() + "&preferDownload=true";
 		break;
 	}
 	return url;
     }
 
     /**
-     * Creates url for opening in a new window depending whether it's authoring environment or not.
-     *
-     * @param item
-     * @param sessionMapID
-     * @param mode
-     * @param itemIdx
-     * @return
+     * List current resource items.
      */
-    private String constructUrlOpenInNewWindow(ResourceItem item, String sessionMapID, String mode, int itemIdx) {
-	String url;
-	if (ResourceConstants.MODE_AUTHOR_SESSION.equals(mode)) {
-	    url = "/openUrlPopup.do?" + AttributeNames.ATTR_MODE + "=" + mode + "&" + ResourceConstants.PARAM_ITEM_INDEX
-		    + "=" + itemIdx + "&" + ResourceConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
-	} else {
-	    url = "/openUrlPopup.do?" + ResourceConstants.PARAM_RESOURCE_ITEM_UID + "=" + item.getUid() + "&"
-		    + ResourceConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
-	}
-
-	return url;
-    }
-
-    /**
-     * List save current resource items.
-     *
-     * @param request
-     * @return
-     */
-    private SortedSet<ResourceItem> getResourceItemList(SessionMap<String, Object> sessionMap) {
+    private Set<ResourceItem> getResourceItemList(SessionMap<String, Object> sessionMap) {
 	SortedSet<ResourceItem> list = (SortedSet) sessionMap.get(ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
 	if (list == null) {
 	    list = new TreeSet<>(new ResourceItemComparator());
@@ -309,5 +245,4 @@ public class ViewItemController {
 	}
 	return list;
     }
-
 }

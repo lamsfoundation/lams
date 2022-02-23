@@ -14,22 +14,33 @@
 		<form:hidden path="itemType" id="itemType" />
 		<form:hidden path="mode" id="mode"/>
 		<form:hidden path="sessionMapID"/>
-	
-		<div class="form-group">
-	    	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>:
-			<form:input path="title" tabindex="1" cssClass="form-control" id="resourcetitle"/>
-	  	</div>	
-
+		
 		<div class="form-group" id="addurl">
 	    	<label for="url"><fmt:message key="label.authoring.basic.resource.url.input" /></label>
-			<form:input path="url" cssClass="form-control" tabindex="2" id="url"/><br/>&nbsp;
-	        <label><form:checkbox path="openUrlNewWindow" tabindex="3" id="openUrlNewWindow" />&nbsp;
-			 <fmt:message key="open.in.new.window" /></label>
+			<form:input path="url" cssClass="form-control" tabindex="2" id="url"/>
 	    </div>
+	    
+  		<div id="preview-panel" class="panel panel-default hidden">
+			<div class="panel-heading panel-title">
+				<fmt:message key="label.authoring.basic.resource.preview" />
+			</div>
+			<div id="item-content-0" class="panel-body item-content">
+				<div class="content-panel">
+					<h4  class="embedded-title"></h3>
+					<h5  class="embedded-description"></h4>
+					<div class="embedded-content"></div>
+				</div>
+			</div>
+		</div>
+					
+		<div class="form-group">
+	    	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>:
+			<form:input path="title" tabindex="1" cssClass="form-control"/>
+	  	</div>	
 
 		<div class="form-group">
-	    	<label for="description"><fmt:message key="label.learning.comment.or.instruction" /></label>
-			<form:input path="description" tabindex="5" maxlength="255" cssClass="form-control" />
+	    	<label for="instructions"><fmt:message key="label.authoring.basic.instruction" /></label>
+			<lams:CKEditor id="instructions" value="" contentFolderID="${learnerContentFolder}"></lams:CKEditor>
 	  	</div>	
 
 		<div id="buttons" class="pull-right" >
@@ -45,12 +56,33 @@
 	
 	<script type="text/javascript">
 		$(document).ready(function(){
-			$('#url').attr("placeholder","<fmt:message key="label.authoring.basic.resource.url.placeholder" />");
-			$('#title').focus();
-		});		
+			$('#addresource #url').focus()
+				.attr("placeholder","<fmt:message key="label.authoring.basic.resource.url.placeholder" />")
+				.blur(function(){
+					 var url = $(this).val();
+					 if (url.trim() != '') {
+						 url = encodeURIComponent(url);
+						 $('#addresource #item-content-0 .content-panel > *').empty();
+						$.ajax({
+						    url: "http://ckeditor.iframe.ly/api/oembed?url=" + url,
+						    dataType: "jsonp",
+						    cache: true,
+						    type: "POST",
+						    jsonpCallback: 'iframelyCallback0',
+						    contentType: "application/json; charset=utf-8",
+						    error: function (xhr, status, error) {
+								$('#addresource #preview-panel').addClass('hidden');
+								
+						        console.log("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
+						    }
+						});
+					 }
+				 });
+			});		
 	
 		$('#resourceItemForm').submit(submitResourceForm);
 		$('#resourceItemForm').validate({
+			ignore: 'hidden, div.cke_editable',
 			errorClass: "text-danger",
 			wrapper: "span",
  			rules: {
@@ -76,4 +108,3 @@
 	
 </div>
 </div>
-

@@ -1,77 +1,48 @@
 <!DOCTYPE html>
-<%-- 
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-  USA
-
-  http://www.gnu.org/licenses/gpl.txt 
---%>
-<%@ include file="/common/taglibs.jsp" %>
-<%@ page import="org.lamsfoundation.lams.tool.rsrc.ResourceConstants"%>
-
+<%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 <lams:head>
+	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
-
-	<c:set var="initNavUrl"><c:url value="/pages/itemreview/initnav.jsp"/>?mode=${mode}&itemIndex=${itemIndex}&itemUid=${itemUid}&toolSessionID=${toolSessionID}&sessionMapID=${sessionMapID}</c:set>
-	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 	
 	<style media="screen,projection" type="text/css">
- 	 	#collapseComments, #collapseComments .row {
-	 		padding-left: 6px;
-	 		padding-right: 6px;
+	 	.item-content {
+	 		padding: 5px;
 	 	}
-	}
-	
+	 	
+	 	.item-instructions {
+	 		margin-bottom: 15px;
+	 		padding-bottom: 10px;
+	 		border-bottom: 1px solid #ddd;
+	 	}
+	 		 	
+	 	.embedded-title {
+	 		clear: both;
+	 		font-weight: 500;
+	 		font-size: larger;
+	 	}
+	 	
+	 	.embedded-description {
+	 		padding: 0.5em;
+	 	}
 	</style>
 
-	<script type="text/javascript">
+	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
+	
+	<lams:JSImport src="includes/javascript/rsrcembed.js" relative="true" />
+	<script>
 		$(document).ready(function(){
-			$.ajaxSetup({ cache: true });
-    			$('#headerFrame').load('${initNavUrl}');
-   		});
-		
-		function setIframeHeight() {
-			var rscFrame = document.getElementById('resourceFrame');
-		    var doc = rscFrame.contentDocument? rscFrame.contentDocument : rscFrame.contentWindow.document;
-	        var body = doc.body;
-	        var html = doc.documentElement;
-	        var height = Math.max( body.scrollHeight, body.offsetHeight, 
-	            html.clientHeight, html.scrollHeight, html.offsetHeight );
-		    rscFrame.style.height = height + "px";
-		}
+			$('#item-panel').load("<c:url value="/itemReviewContent.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&itemIndex=${itemIndex}&itemUid=${itemUid}");
+ 		});
 	</script>
 </lams:head>
 
 <body class="stripes">
-
-	<lams:Page title="" type="learner" usePanel="false" hideProgressBar="${!sessionMap.runAuto}">
-		<div class="panel panel-default">
- 			<div class="panel-heading">
-				<div id="headerFrame"></div>
-			</div>
- 			<c:if test="${allowComments and (mode eq 'learner' or mode eq 'author') and not empty toolSessionID}">
- 				<c:set var="accordianTitle"><fmt:message key="label.comments"/></c:set>
-				<lams:Comments toolSessionId="${toolSessionID}" toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>" embedInAccordian="true" accordionTitle="${accordianTitle}" mode="${mode}" toolItemId="${itemUid}" readOnly="${sessionMap.finishedLock}"/>	
-			</c:if>
-   			<div class="panel-body" style="height:100vh;">
- 				<iframe src="<c:url value='${resourceItemReviewUrl}'/>" id="resourceFrame" style="border:0px;width:100%;height:100%;" onload="setIframeHeight()"></iframe>
- 			</div> 
-   		</div>
+	<lams:Page title="${title}" type="learner" hideProgressBar="true">
+		<div id="item-panel"></div>
 	</lams:Page>
+</body>
 
-</body>	
 </lams:html>

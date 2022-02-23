@@ -46,8 +46,6 @@ import javax.persistence.Transient;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 
@@ -78,10 +76,6 @@ public class Resource implements Cloneable, Serializable {
     private String instructions;
 
     // advance
-
-    @Column(name = "allow_auto_run")
-    private boolean runAuto;
-
     @Column(name = "mini_view_resource_number")
     private int miniViewResourceNumber;
 
@@ -391,18 +385,8 @@ public class Resource implements Cloneable, Serializable {
 	miniViewResourceNumber = minViewResourceNumber;
     }
 
-    public boolean isRunAuto() {
-	return runAuto;
-    }
-
-    public void setRunAuto(boolean runAuto) {
-	this.runAuto = runAuto;
-    }
-
     /**
      * For display use
-     *
-     * @return
      */
     public String getMiniViewNumberStr() {
 	return miniViewNumberStr;

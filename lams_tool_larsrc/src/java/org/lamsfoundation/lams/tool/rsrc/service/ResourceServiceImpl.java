@@ -24,11 +24,9 @@
 package org.lamsfoundation.lams.tool.rsrc.service;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -84,10 +82,8 @@ import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.ResourceItemDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.VisitLogDTO;
-import org.lamsfoundation.lams.tool.rsrc.ims.SimpleContentPackageConverter;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
-import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemVisitLog;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
@@ -99,8 +95,6 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
-import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -633,109 +627,22 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    } catch (RepositoryCheckedException e) {
 		throw new UploadResourceFileException(
 			messageService.getMessage("error.msg.repository") + " " + e.getMessage());
-	    } catch (IOException e) {
-		throw new UploadResourceFileException(
-			messageService.getMessage("error.msg.io.exception") + " " + e.getMessage());
 	    }
-	}
-	return node;
-    }
-
-    private NodeKey processPackage(String packageDirectory, String initFile) throws UploadResourceFileException {
-	NodeKey node = null;
-	try {
-	    node = resourceToolContentHandler.uploadPackage(packageDirectory, initFile);
-	} catch (InvalidParameterException e) {
-	    throw new UploadResourceFileException(messageService.getMessage("error.msg.invaid.param.upload"));
-	} catch (RepositoryCheckedException e) {
-	    throw new UploadResourceFileException(messageService.getMessage("error.msg.repository"));
 	}
 	return node;
     }
 
     @Override
     public void uploadResourceItemFile(ResourceItem item, File file) throws UploadResourceFileException {
-	try {
-	    InputStream is = new FileInputStream(file);
-	    String fileName = file.getName();
-	    // For file only upload one sigle file
-	    if (item.getType() == ResourceConstants.RESOURCE_TYPE_FILE) {
-		NodeKey nodeKey = processFile(file);
-		item.setFileUuid(nodeKey.getUuid());
-		item.setFileVersionId(nodeKey.getVersion());
-	    }
-	    // need unzip upload, and check the initial item :default.htm/html or index.htm/html
-	    if (item.getType() == ResourceConstants.RESOURCE_TYPE_WEBSITE) {
-		String packageDirectory = ZipFileUtil.expandZip(is, fileName);
-		String initFile = findWebsiteInitialItem(packageDirectory);
-		if (initFile == null) {
-		    throw new UploadResourceFileException(
-			    messageService.getMessage("error.msg.website.no.initial.file"));
-		}
-		item.setInitialItem(initFile);
-		// upload package
-		NodeKey nodeKey = processPackage(packageDirectory, initFile);
-		item.setFileUuid(nodeKey.getUuid());
-		item.setFileVersionId(nodeKey.getVersion());
-	    }
-	    // need unzip upload, and parse learning object information from XML file.
-	    if (item.getType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT) {
-		String packageDirectory = ZipFileUtil.expandZip(is, fileName);
-		SimpleContentPackageConverter cpConverter = new SimpleContentPackageConverter(packageDirectory);
-		String initFile = cpConverter.getDefaultItem();
-		item.setInitialItem(initFile);
-		item.setImsSchema(cpConverter.getSchema());
-		item.setOrganizationXml(cpConverter.getOrganzationXML());
-		// upload package
-		NodeKey nodeKey = processPackage(packageDirectory, initFile);
-		item.setFileUuid(nodeKey.getUuid());
-		item.setFileVersionId(nodeKey.getVersion());
-	    }
-	    // create the package from the directory contents
-	    item.setFileName(fileName);
-	} catch (ZipFileUtilException e) {
-	    log.error(messageService.getMessage("error.msg.zip.file.exception") + " : " + e.toString());
-	    throw new UploadResourceFileException(messageService.getMessage("error.msg.zip.file.exception"));
-	} catch (FileNotFoundException e) {
-	    log.error(messageService.getMessage("error.msg.file.not.found") + ":" + e.toString());
-	    throw new UploadResourceFileException(messageService.getMessage("error.msg.file.not.found"));
-	} catch (IOException e) {
-	    log.error(messageService.getMessage("error.msg.io.exception") + ":" + e.toString());
-	    throw new UploadResourceFileException(messageService.getMessage("error.msg.io.exception"));
+	String fileName = file.getName();
+	// For file only upload one sigle file
+	if (item.getType() == ResourceConstants.RESOURCE_TYPE_FILE) {
+	    NodeKey nodeKey = processFile(file);
+	    item.setFileUuid(nodeKey.getUuid());
+	    item.setFileVersionId(nodeKey.getVersion());
 	}
-    }
-
-    /**
-     * Find out default.htm/html or index.htm/html in the given directory folder
-     *
-     * @param packageDirectory
-     * @return
-     */
-    private String findWebsiteInitialItem(String packageDirectory) {
-	File file = new File(packageDirectory);
-	if (!file.isDirectory()) {
-	    return null;
-	}
-
-	File[] initFiles = file.listFiles(new FileFilter() {
-	    @Override
-	    public boolean accept(File pathname) {
-		if ((pathname == null) || (pathname.getName() == null)) {
-		    return false;
-		}
-		String name = pathname.getName();
-		if (name.endsWith("default.html") || name.endsWith("default.htm") || name.endsWith("index.html")
-			|| name.endsWith("index.htm")) {
-		    return true;
-		}
-		return false;
-	    }
-	});
-	if ((initFiles != null) && (initFiles.length > 0)) {
-	    return initFiles[0].getName();
-	} else {
-	    return null;
-	}
+	// create the package from the directory contents
+	item.setFileName(fileName);
     }
 
     /**
@@ -1239,7 +1146,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	resource.setReflectOnActivity(
 		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	resource.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
-	resource.setRunAuto(JsonUtil.optBoolean(toolContentJSON, "runAuto", Boolean.FALSE));
 
 	resource.setContentInUse(false);
 	resource.setDefineLater(false);
@@ -1269,27 +1175,12 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    item.setHide(false);
 	    item.setOrderId(JsonUtil.optInt(itemData, RestTags.DISPLAY_ORDER));
 
-	    item.setDescription(JsonUtil.optString(itemData, "description"));
+	    item.setInstructions(JsonUtil.optString(itemData, "instructions"));
 	    item.setFileName(JsonUtil.optString(itemData, "name"));
 	    item.setFileType(JsonUtil.optString(itemData, "fileType"));
 	    item.setFileUuid(JsonUtil.optLong(itemData, "crUuid"));
 	    item.setFileVersionId(JsonUtil.optLong(itemData, "crVersionId"));
-	    item.setImsSchema(JsonUtil.optString(itemData, "imsSchema"));
-	    item.setOrganizationXml(JsonUtil.optString(itemData, "organizationXml"));
-	    item.setOpenUrlNewWindow(JsonUtil.optBoolean(itemData, "openUrlNewWindow", Boolean.FALSE));
 	    item.setUrl(JsonUtil.optString(itemData, "url"));
-
-	    ArrayNode instructionStrings = JsonUtil.optArray(itemData, "instructions");
-	    if ((instructionStrings != null) && (instructionStrings.size() > 0)) {
-		Set<ResourceItemInstruction> instructions = new LinkedHashSet<>();
-		for (int j = 0; j < instructionStrings.size(); j++) {
-		    ResourceItemInstruction rii = new ResourceItemInstruction();
-		    rii.setDescription(instructionStrings.get(j).asText(null));
-		    rii.setSequenceId(j);
-		    instructions.add(rii);
-		}
-		item.setItemInstructions(instructions);
-	    }
 
 	    // TODO files - need to save it somehow, validate the file size, etc. Needed for websites, files & LO
 	    if ((item.getFileName() != null) || (item.getFileUuid() != null)) {

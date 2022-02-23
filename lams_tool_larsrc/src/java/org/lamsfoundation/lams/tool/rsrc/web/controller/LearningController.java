@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.tool.rsrc.service.UploadResourceFileException;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ReflectionForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -85,6 +86,9 @@ public class LearningController {
     private IResourceService resourceService;
 
     @Autowired
+    private ILamsToolService toolService;
+
+    @Autowired
     @Qualifier("resourceMessageService")
     private MessageService messageService;
 
@@ -100,8 +104,18 @@ public class LearningController {
     @RequestMapping("/addfile")
     private String addfile(ResourceItemForm resourceItemForm, HttpServletRequest request) {
 	resourceItemForm.setMode(WebUtil.readStrParam(request, AttributeNames.ATTR_MODE));
-	resourceItemForm.setSessionMapID(WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID));
+	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
+	resourceItemForm.setSessionMapID(sessionMapID);
 	resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
+
+	HttpSession ss = SessionManager.getSession();
+	// get back login user DTO
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	Long sessionId = (Long) sessionMap.get(ResourceConstants.ATTR_TOOL_SESSION_ID);
+	request.setAttribute(AttributeNames.ATTR_LEARNER_CONTENT_FOLDER,
+		toolService.getLearnerContentFolder(sessionId, user.getUserID().longValue()));
 
 	return "pages/learning/addfile";
     }
@@ -109,7 +123,18 @@ public class LearningController {
     @RequestMapping("/addurl")
     private String addurl(ResourceItemForm resourceItemForm, HttpServletRequest request) {
 	resourceItemForm.setMode(WebUtil.readStrParam(request, AttributeNames.ATTR_MODE));
-	resourceItemForm.setSessionMapID(WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID));
+	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
+	resourceItemForm.setSessionMapID(sessionMapID);
+
+	HttpSession ss = SessionManager.getSession();
+	// get back login user DTO
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	Long sessionId = (Long) sessionMap.get(ResourceConstants.ATTR_TOOL_SESSION_ID);
+	request.setAttribute(AttributeNames.ATTR_LEARNER_CONTENT_FOLDER,
+		toolService.getLearnerContentFolder(sessionId, user.getUserID().longValue()));
+
 	return "pages/learning/addurl";
     }
 
@@ -126,7 +151,7 @@ public class LearningController {
 	// save toolContentID into HTTPSession
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 
-	Long sessionId = new Long(request.getParameter(ResourceConstants.PARAM_TOOL_SESSION_ID));
+	Long sessionId = WebUtil.readLongParam(request, ResourceConstants.PARAM_TOOL_SESSION_ID);
 
 	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	request.setAttribute(AttributeNames.ATTR_MODE, mode);
@@ -150,26 +175,6 @@ public class LearningController {
 
 	// check whether finish lock is on/off
 	boolean lock = resource.getLockWhenFinished() && (resourceUser != null) && resourceUser.isSessionFinished();
-
-	// check whether there is only one resource item and run auto flag is true or not.
-	boolean runAuto = false;
-	Long runAutoItemUid = null;
-	if (resource.isRunAuto() && items != null) {
-	    int itemsNumber = 0;
-	    for (ResourceItem item : items) {
-		// only visible item can be run auto.
-		if (!item.isHide()) {
-		    itemsNumber++;
-		    runAutoItemUid = item.getUid();
-		}
-	    }
-	    // can't autorun if there is more than one!
-	    if (itemsNumber == 1) {
-		runAuto = true;
-	    } else {
-		runAutoItemUid = null;
-	    }
-	}
 
 	// get notebook entry
 	String entryText = new String();
@@ -195,7 +200,6 @@ public class LearningController {
 	sessionMap.put(ResourceConstants.ATTR_REFLECTION_ON, resource.isReflectOnActivity());
 	sessionMap.put(ResourceConstants.ATTR_REFLECTION_INSTRUCTION, resource.getReflectInstructions());
 	sessionMap.put(ResourceConstants.ATTR_REFLECTION_ENTRY, entryText);
-	sessionMap.put(ResourceConstants.ATTR_RUN_AUTO, new Boolean(runAuto));
 
 	// add define later support
 	if (resource.isDefineLater()) {
@@ -253,24 +257,10 @@ public class LearningController {
 	}
 	sessionMap.put(ResourceConstants.ATTR_COMPLETED_SUFFICIENT_TO_FINISH,
 		numItemsCompleted >= resource.getMiniViewResourceNumber());
+	request.setAttribute("itemsComplete", numItemsCompleted);
 
 	sessionMap.put(ResourceConstants.ATTR_RESOURCE, resource);
-
-	if (runAuto) {
-	    String redirectURL = "redirect:/reviewItem.do";
-	    redirectURL = WebUtil.appendParameterToURL(redirectURL, ResourceConstants.ATTR_SESSION_MAP_ID,
-		    sessionMap.getSessionID());
-	    redirectURL = WebUtil.appendParameterToURL(redirectURL, ResourceConstants.ATTR_TOOL_SESSION_ID,
-		    sessionId.toString());
-	    redirectURL = WebUtil.appendParameterToURL(redirectURL, ResourceConstants.ATTR_RESOURCE_ITEM_UID,
-		    runAutoItemUid.toString());
-	    redirectURL = WebUtil.appendParameterToURL(redirectURL, AttributeNames.ATTR_MODE, mode.toString());
-	    return redirectURL;
-
-	} else {
-	    return "pages/learning/learning";
-	}
-
+	return "pages/learning/learning";
     }
 
     /**
@@ -291,20 +281,7 @@ public class LearningController {
 		.getAttribute(sessionMapID);
 
 	// get mode and ToolSessionID from sessionMAP
-	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	// auto run mode, when use finish the only one resource item, mark it as complete then finish this activity as
-	// well.
-	String resourceItemUid = request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID);
-	if (resourceItemUid != null) {
-	    doComplete(request);
-	    // NOTE:So far this flag is useless(31/08/2006).
-	    // set flag, then finish page can know redir target is parent(AUTO_RUN) or self(normal)
-	    request.setAttribute(ResourceConstants.ATTR_RUN_AUTO, true);
-	} else {
-	    request.setAttribute(ResourceConstants.ATTR_RUN_AUTO, false);
-	}
 
 	if (!validateBeforeFinish(request, sessionMapID)) {
 	    return "pages/learning/learning";
@@ -315,7 +292,7 @@ public class LearningController {
 	try {
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    Long userID = new Long(user.getUserID().longValue());
+	    Long userID = user.getUserID().longValue();
 
 	    nextActivityUrl = resourceService.finishToolSession(sessionId, userID);
 	    request.setAttribute(ResourceConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
@@ -370,7 +347,7 @@ public class LearningController {
 	ResourceUser resourceUser = getCurrentUser(resourceService, sessionId);
 	item.setType(type);
 	item.setTitle(resourceItemForm.getTitle());
-	item.setDescription(resourceItemForm.getDescription());
+	item.setInstructions(resourceItemForm.getInstructions());
 	item.setCreateDate(new Timestamp(new Date().getTime()));
 	item.setCreateByAuthor(false);
 	item.setCreateBy(resourceUser);
@@ -397,13 +374,11 @@ public class LearningController {
 		    request.setAttribute("errorMap", errorMap);
 		    return "pages/learning/addurl";
 		}
-		item.setOpenUrlNewWindow(resourceItemForm.isOpenUrlNewWindow());
 	    } else {
 		throw new ServletException("No file uploaded");
 	    }
 	} else if (type == ResourceConstants.RESOURCE_TYPE_URL) {
 	    item.setUrl(resourceItemForm.getUrl());
-	    item.setOpenUrlNewWindow(resourceItemForm.isOpenUrlNewWindow());
 	}
 	// save and update session
 	ResourceSession resSession = resourceService.getResourceSessionBySessionId(sessionId);
@@ -553,22 +528,6 @@ public class LearningController {
     }
 
     /**
-     * Get <code>java.util.List</code> from HttpSession by given name.
-     *
-     * @param request
-     * @param name
-     * @return
-     */
-    private List getListFromSession(SessionMap sessionMap, String name) {
-	List list = (List) sessionMap.get(name);
-	if (list == null) {
-	    list = new ArrayList();
-	    sessionMap.put(name, list);
-	}
-	return list;
-    }
-
-    /**
      * Return <code>ActionForward</code> according to resource item type.
      *
      * @param type
@@ -613,21 +572,9 @@ public class LearningController {
 	if (resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_URL) {
 	    if (StringUtils.isBlank(resourceItemForm.getUrl())) {
 		errorMap.add("GLOBAL", messageService.getMessage(ResourceConstants.ERROR_MSG_URL_BLANK));
-		// URL validation: Commom URL validate(1.3.0) work not very well: it can not support http://address:port
-		// format!!!
-		// UrlValidator validator = new UrlValidator();
-		// if(!validator.isValid(itemForm.getUrl()))
-		// errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_INVALID_URL));
 	    }
 	}
-	// if(itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE
-	// ||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT){
-	// if(StringUtils.isBlank(itemForm.getDescription()))
-	// errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_DESC_BLANK));
-	// }
-	if ((resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE)
-		|| (resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT)
-		|| (resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE)) {
+	if (resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE) {
 	    File uploadDir = FileUtil.getTmpFileUploadDir(resourceItemForm.getTmpFileUploadId());
 	    if (uploadDir.canRead()) {
 		File[] files = uploadDir.listFiles();
@@ -641,22 +588,6 @@ public class LearningController {
 	    } else {
 		errorMap.add("GLOBAL", "No file uploaded");
 	    }
-//	    if ((resourceItemForm.getFile() != null)
-//		    && FileUtil.isExecutableFile(resourceItemForm.getFile().getOriginalFilename())) {
-//		errorMap.add("Global", messageService.getMessage("error.attachment.executable"));
-//	    }
-//
-//	    // validate item size
-//	    if (!FileValidatorUtil.validateFileSize(resourceItemForm.getFile(), false)) {
-//		errorMap.add("GLOBAL", messageService.getMessage("errors.maxfilesize",
-//			new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));
-//	    }
-//
-//	    // for edit validate: file already exist
-//	    if (!resourceItemForm.isHasFile() && ((resourceItemForm.getFile() == null)
-//		    || StringUtils.isEmpty(resourceItemForm.getFile().getOriginalFilename()))) {
-//		errorMap.add("GLOBAL", messageService.getMessage(ResourceConstants.ERROR_MSG_FILE_BLANK));
-//	    }
 	}
     }
 
