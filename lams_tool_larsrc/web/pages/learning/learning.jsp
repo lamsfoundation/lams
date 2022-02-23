@@ -180,6 +180,24 @@
 				$("#sessionMapID").val("${sessionMapID}");
 	        });
 		}
+
+	    /**
+	     Preview for adding learner URL
+	    **/
+		// there is no item ID yet, so just use 0
+		function iframelyCallback0(response) {
+			if (!response || !response.html) {
+				$('#addresource #preview-panel').addClass('hidden');
+				return;
+			}
+
+			if (response.title && $('#addresource  #title').val().trim() == '') {
+				$('#title').val(response.title);
+			}
+
+			iframelyCallback(0, response);
+			$('#addresource #preview-panel').removeClass('hidden');
+		}
 	    
 		function gotoFile(){
 		    var reqIDVar = new Date();
