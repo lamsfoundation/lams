@@ -6,6 +6,10 @@ SET FOREIGN_KEY_CHECKS=0;
 -- LDEV-5287 Use a single instructions field instead of multiple ones
 ALTER TABLE tl_larsrc11_resource_item CHANGE COLUMN description instructions TEXT;
 
+-- set concat max len to its max
+-- https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_group_concat_max_len
+SET SESSION group_concat_max_len=18446744073709551615;
+
 UPDATE tl_larsrc11_resource_item AS r JOIN 
 	(SELECT item_uid, GROUP_CONCAT(description ORDER BY sequence_id SEPARATOR '<br><br>') AS merged_instructions FROM tl_larsrc11_item_instruction GROUP BY item_uid)
 	AS i ON r.uid = i.item_uid
