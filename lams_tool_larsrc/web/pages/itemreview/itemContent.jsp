@@ -43,7 +43,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
    		}
    		
 		$.ajax({
-		    url: "http://ckeditor.iframe.ly/api/oembed?url=" + encodeURIComponent("${resourceItemReviewUrl}"),
+		    url: "https://ckeditor.iframe.ly/api/oembed?url=" + encodeURIComponent("${resourceItemReviewUrl}"),
 		    dataType: "jsonp",
 		    cache: true,
 		    type: "POST",

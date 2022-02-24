@@ -28,7 +28,7 @@
 								 url = encodeURIComponent(url);
 								 $('#item-content-0 .content-panel > *').empty();
 								$.ajax({
-								    url: "http://ckeditor.iframe.ly/api/oembed?url=" + url,
+								    url: "https://ckeditor.iframe.ly/api/oembed?url=" + url,
 								    dataType: "jsonp",
 								    cache: true,
 								    type: "POST",
