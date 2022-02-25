@@ -324,6 +324,15 @@
 			<input type="hidden" id="types-select" value="${questionType}">
 		</c:otherwise>
 	</c:choose>
+	
+	<c:if test="${not empty param.toolContentID}">
+		<div class="checkbox-inline loffset5">
+			<label for="same-ld-checkbox" title='<fmt:message key="label.qb.advanced.search.same.ld.tip"/>'>
+				<input id="same-ld-checkbox" type="checkbox" value="${param.toolContentID}" />
+					<fmt:message key="label.qb.advanced.search.same.ld"/>
+			</label>
+		</div>
+	</c:if>
 </div>
 
 <div id="grid-container">

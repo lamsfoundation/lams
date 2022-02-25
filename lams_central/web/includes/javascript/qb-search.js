@@ -2,6 +2,7 @@ $(document).ready(function(){
 	$('.selectpicker').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
 		gridSearch();
 	});
+	$('#same-ld-checkbox').change(gridSearch);
 });
 
 //auxiliary formatter for jqGrid's question column
@@ -32,6 +33,7 @@ function questionNameFormatter (cellvalue, options, rowObject) {
 		           	postData: { 
 		           		questionTypes: "" + $("#types-select").val(),
 		           		collectionUids: "" + $("#collections-select").val(),
+						toolContentID: $('#same-ld-checkbox').is(":checked") ? $('#same-ld-checkbox').val() : null,
 			           	searchString: $("#filter-questions").val() 
 			        }
 		       	}, 

@@ -244,9 +244,17 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     @SuppressWarnings("unchecked")
     @Override
+    public List<QbQuestion> getPagedQuestions(String questionTypes, String collectionUids, Long learningDesignId,
+	    int page, int size, String sortBy, String sortOrder, String searchString) {
+	return (List<QbQuestion>) getPagedQuestions(questionTypes, collectionUids, learningDesignId, page, size, sortBy,
+		sortOrder, searchString, false);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
     public List<QbQuestion> getPagedQuestions(String questionTypes, String collectionUids, int page, int size,
 	    String sortBy, String sortOrder, String searchString) {
-	return (List<QbQuestion>) getPagedQuestions(questionTypes, collectionUids, page, size, sortBy, sortOrder,
+	return (List<QbQuestion>) getPagedQuestions(questionTypes, collectionUids, null, page, size, sortBy, sortOrder,
 		searchString, false);
     }
 
@@ -254,12 +262,12 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     @Override
     public List<BigInteger> getAllQuestionUids(String collectionUids, String sortBy, String sortOrder,
 	    String searchString) {
-	return (List<BigInteger>) getPagedQuestions(null, collectionUids, 0, 100000, sortBy, sortOrder, searchString,
-		true);
+	return (List<BigInteger>) getPagedQuestions(null, collectionUids, null, 0, 100000, sortBy, sortOrder,
+		searchString, true);
     }
 
-    private List<?> getPagedQuestions(String questionTypes, String collectionUids, int page, int size, String sortBy,
-	    String sortOrder, String searchString, boolean onlyUidsRequested) {
+    private List<?> getPagedQuestions(String questionTypes, String collectionUids, Long learningDesignId, int page,
+	    int size, String sortBy, String sortOrder, String searchString, boolean onlyUidsRequested) {
 
 	StringBuilder queryBuilder = new StringBuilder("SELECT DISTINCT ").append(onlyUidsRequested ? "q.uid" : "q.*")
 		.append(" FROM (SELECT question.* FROM lams_qb_question question");
@@ -268,7 +276,12 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	}
 	if (collectionUids != null) {
 	    queryBuilder.append(
-		    " LEFT JOIN lams_qb_collection_question collection ON question.question_id = collection.qb_question_id");
+		    " JOIN lams_qb_collection_question collection ON question.question_id = collection.qb_question_id");
+	}
+	if (learningDesignId != null) {
+	    queryBuilder.append(
+		    " JOIN lams_qb_tool_question tool_question ON question.uid = tool_question.qb_question_uid")
+		    .append(" JOIN lams_learning_activity activity USING (tool_content_id)");
 	}
 
 	queryBuilder.append(" WHERE");
@@ -277,6 +290,9 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	}
 	if (collectionUids != null) {
 	    queryBuilder.append(" collection.collection_uid in (:collectionUids) AND");
+	}
+	if (learningDesignId != null) {
+	    queryBuilder.append(" activity.learning_design_id = :learningDesignId AND");
 	}
 	if (searchString == null) {
 	    // there has to be something after AND or even after just WHERE
@@ -306,6 +322,9 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	}
 	if (collectionUids != null) {
 	    query.setParameterList("collectionUids", collectionUids.split(","));
+	}
+	if (learningDesignId != null) {
+	    query.setParameter("learningDesignId", learningDesignId);
 	}
 	if (searchString != null) {
 	    // support for custom search from the toolbar

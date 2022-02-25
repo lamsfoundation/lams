@@ -77,6 +77,10 @@ public interface IQbService {
 
     QbStatsActivityDTO getActivityStats(Long activityId, Long qbQuestionUid, Collection<Long> correctOptionUids);
 
+    List<QbQuestion> getPagedQuestions(String questionTypes, String collectionUids,
+	    Long onlyInSameLearningDesignAsToolContentID, int page, int size, String sortBy, String sortOrder,
+	    String searchString);
+
     List<QbQuestion> getPagedQuestions(String questionTypes, String collectionUids, int page, int size, String sortBy,
 	    String sortOrder, String searchString);
 
