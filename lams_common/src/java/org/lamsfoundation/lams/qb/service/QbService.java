@@ -142,9 +142,25 @@ public class QbService implements IQbService {
     }
 
     @Override
+    public List<QbQuestion> getPagedQuestions(String questionTypes, String collectionUids,
+	    Long onlyInSameLearningDesignAsToolContentID, int page, int size, String sortBy, String sortOrder,
+	    String searchString) {
+	Long learningDesignId = null;
+	if (onlyInSameLearningDesignAsToolContentID != null) {
+	    List<ToolActivity> toolActivities = qbDAO.findByProperty(ToolActivity.class, "toolContentId",
+		    onlyInSameLearningDesignAsToolContentID);
+	    if (!toolActivities.isEmpty()) {
+		learningDesignId = toolActivities.get(0).getLearningDesign().getLearningDesignId();
+	    }
+	}
+	return qbDAO.getPagedQuestions(questionTypes, collectionUids, learningDesignId, page, size, sortBy, sortOrder,
+		searchString);
+    }
+
+    @Override
     public List<QbQuestion> getPagedQuestions(String questionTypes, String collectionUids, int page, int size,
 	    String sortBy, String sortOrder, String searchString) {
-	return qbDAO.getPagedQuestions(questionTypes, collectionUids, page, size, sortBy, sortOrder, searchString);
+	return getPagedQuestions(questionTypes, collectionUids, null, page, size, sortBy, sortOrder, searchString);
     }
 
     @Override

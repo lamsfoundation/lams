@@ -57,6 +57,9 @@ public interface IQbDAO extends IBaseDAO {
     List<QbQuestion> getPagedQuestions(String questionTypes, String collectionUids, int page, int size, String sortBy,
 	    String sortOrder, String searchString);
 
+    List<QbQuestion> getPagedQuestions(String questionTypes, String collectionUids, Long learningDesignId, int page,
+	    int size, String sortBy, String sortOrder, String searchString);
+
     List<BigInteger> getAllQuestionUids(String collectionUids, String sortBy, String sortOrder, String searchString);
 
     int getCountQuestions(String questionTypes, String collectionUids, String searchString);

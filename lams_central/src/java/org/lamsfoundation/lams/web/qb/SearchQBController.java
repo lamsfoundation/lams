@@ -140,7 +140,7 @@ public class SearchQBController {
 	    questionTypesAvailable.append(",");
 	    questionTypesAvailable.append(QbQuestion.TYPE_MARK_HEDGING);
 	}
-	
+
 	request.setAttribute("questionType", questionTypeDefault);
 	request.setAttribute("questionTypesAvailable", questionTypesAvailable.toString());
 	//let jsp know it's Scratchie, so we can disable VSA questions not compatible with TBL
@@ -166,8 +166,8 @@ public class SearchQBController {
     @RequestMapping("/getPagedQuestions")
     @ResponseBody
     private String getPagedQuestions(HttpServletRequest request, HttpServletResponse response,
-	    @RequestParam(required = false) String questionTypes,
-	    @RequestParam(required = false) String collectionUids) {
+	    @RequestParam(required = false) String questionTypes, @RequestParam(required = false) String collectionUids,
+	    @RequestParam(required = false) Long toolContentID) {
 	if (StringUtils.isEmpty(questionTypes)) {
 	    questionTypes = null;
 	}
@@ -186,8 +186,8 @@ public class SearchQBController {
 	String searchString = WebUtil.readStrParam(request, "searchString", true);
 
 	// Get the user list from the db
-	List<QbQuestion> questions = qbService.getPagedQuestions(questionTypes, collectionUids, page - 1, rowLimit,
-		sortBy, sortOrder, searchString);
+	List<QbQuestion> questions = qbService.getPagedQuestions(questionTypes, collectionUids, toolContentID, page - 1,
+		rowLimit, sortBy, sortOrder, searchString);
 	int countQuestions = qbService.getCountQuestions(questionTypes, collectionUids, searchString);
 	int totalPages = Double.valueOf(Math.ceil(Double.valueOf(countQuestions) / Double.valueOf(rowLimit)))
 		.intValue();
