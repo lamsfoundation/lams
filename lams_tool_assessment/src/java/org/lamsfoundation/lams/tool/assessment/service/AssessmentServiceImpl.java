@@ -1440,7 +1440,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		if (StringUtils.isBlank(answer)) {
 		    continue;
 		}
-		
+
 		Set<String> notAllocatedAnswers = new HashSet<>();
 		boolean isAnswerAllocated = QbUtils.isVSAnswerAllocated(qbQuestion, answer, notAllocatedAnswers);
 		if (!isAnswerAllocated) {
@@ -2789,6 +2789,98 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	assessmentDao.update(assessment);
 
 	return result;
+    }
+
+    /**
+     * Updates updates this iRAT activity with tRAT questions.
+     */
+    @Override
+    public boolean syncRatQuestions(long toolContentId, List<Long> newQuestionUids) {
+	Assessment assessment = getAssessmentByContentId(toolContentId);
+
+	List<QuestionReference> existingReferences = new ArrayList<>(assessment.getQuestionReferences());
+	List<QuestionReference> newReferences = new ArrayList<>();
+	Set<QuestionReference> referencesToRemove = new HashSet<>(existingReferences);
+	List<AssessmentQuestion> newAssessmentQuestions = new ArrayList<>();
+
+	int displayOrder = 0;
+	boolean syncNeeded = false;
+	for (Long newQuestionUid : newQuestionUids) {
+	    QbQuestion newQuestion = qbService.getQuestionByUid(newQuestionUid);
+	    displayOrder++;
+
+	    QuestionReference matchingReference = null;
+	    for (QuestionReference existingReference : existingReferences) {
+		// try to find exactly same question
+		if (newQuestion.getUid().equals(existingReference.getQuestion().getQbQuestion().getUid())) {
+		    matchingReference = existingReference;
+		    syncNeeded |= displayOrder != existingReference.getSequenceId();
+		    break;
+		}
+	    }
+
+	    if (matchingReference == null) {
+		syncNeeded = true;
+		for (QuestionReference existingReference : existingReferences) {
+		    // try to find same question with another version
+		    if (newQuestion.getQuestionId()
+			    .equals(existingReference.getQuestion().getQbQuestion().getQuestionId())) {
+			existingReference.getQuestion().setQbQuestion(newQuestion);
+			matchingReference = existingReference;
+			break;
+		    }
+		}
+	    }
+	    if (matchingReference == null) {
+		// build question reference from scratch
+		AssessmentQuestion assessmentQuestion = new AssessmentQuestion();
+		assessmentQuestion.setDisplayOrder(displayOrder);
+		assessmentQuestion.setAnswerRequired(true);
+		assessmentQuestion.setQbQuestion(newQuestion);
+		assessmentQuestion.setToolContentId(toolContentId);
+		assessmentQuestionDao.insert(assessmentQuestion);
+
+		matchingReference = new QuestionReference();
+		matchingReference.setQuestion(assessmentQuestion);
+		matchingReference.setSequenceId(displayOrder);
+		matchingReference.setMaxMark(1);
+		assessmentQuestionDao.insert(matchingReference);
+	    } else {
+		matchingReference.setSequenceId(displayOrder);
+		matchingReference.getQuestion().setDisplayOrder(displayOrder);
+		referencesToRemove.remove(matchingReference);
+	    }
+
+	    newReferences.add(matchingReference);
+	    newAssessmentQuestions.add(matchingReference.getQuestion());
+	}
+
+	// all this collections clearing is for Hibernate to feel safe
+	existingReferences.clear();
+	syncNeeded |= !referencesToRemove.isEmpty();
+
+	if (!syncNeeded) {
+	    return false;
+	}
+
+	assessment.getQuestionReferences().clear();
+	assessment.getQuestions().clear();
+
+	for (QuestionReference referenceToRemove : referencesToRemove) {
+	    // remove question removed from the matching RAT activity
+	    assessmentQuestionDao.delete(referenceToRemove.getQuestion());
+	    assessmentQuestionDao.delete(referenceToRemove);
+	}
+	referencesToRemove.clear();
+
+	assessment.getQuestions().addAll(newAssessmentQuestions);
+	assessment.getQuestionReferences().addAll(newReferences);
+	newAssessmentQuestions.clear();
+	newReferences.clear();
+
+	assessmentDao.update(assessment);
+
+	return true;
     }
 
     @Override

@@ -2360,6 +2360,91 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	return result;
     }
 
+    /**
+     * Updates this tRAT activity with iRAT questions.
+     */
+    @Override
+    public boolean syncRatQuestions(long toolContentId, List<Long> newQuestionUids) {
+	Scratchie scratchie = getScratchieByContentId(toolContentId);
+
+	List<ScratchieItem> existingItems = new ArrayList<>(scratchie.getScratchieItems());
+	List<ScratchieItem> newItems = new ArrayList<>();
+	Set<ScratchieItem> itemsToRemove = new HashSet<>(existingItems);
+
+	int displayOrder = 0;
+	boolean syncNeeded = false;
+	for (Long newQuestionUid : newQuestionUids) {
+	    QbQuestion newQuestion = qbService.getQuestionByUid(newQuestionUid);
+
+	    if (!(newQuestion.getType().equals(QbQuestion.TYPE_MULTIPLE_CHOICE)
+		    || newQuestion.getType().equals(QbQuestion.TYPE_MARK_HEDGING)
+		    || newQuestion.getType().equals(QbQuestion.TYPE_VERY_SHORT_ANSWERS))) {
+		log.warn("QB question with UID " + newQuestionUid + " is not supported by TBL tRAT, skipping");
+		continue;
+	    }
+
+	    displayOrder++;
+	    ScratchieItem matchingItem = null;
+	    for (ScratchieItem existingItem : existingItems) {
+		// try to find exactly same question
+		if (newQuestion.getUid().equals(existingItem.getQbQuestion().getUid())) {
+		    matchingItem = existingItem;
+		    syncNeeded |= displayOrder != existingItem.getDisplayOrder();
+		    break;
+		}
+	    }
+
+	    if (matchingItem == null) {
+		syncNeeded = true;
+		for (ScratchieItem existingItem : existingItems) {
+		    // try to find same question with another version
+		    if (newQuestion.getQuestionId().equals(existingItem.getQbQuestion().getQuestionId())) {
+			existingItem.setQbQuestion(newQuestion);
+			matchingItem = existingItem;
+			break;
+		    }
+		}
+	    }
+
+	    if (matchingItem == null) {
+		matchingItem = new ScratchieItem();
+		matchingItem.setDisplayOrder(displayOrder);
+		matchingItem.setAnswerRequired(true);
+		matchingItem.setQbQuestion(newQuestion);
+		matchingItem.setToolContentId(toolContentId);
+		scratchieItemDao.insert(matchingItem);
+	    } else {
+		matchingItem.setDisplayOrder(displayOrder);
+		itemsToRemove.remove(matchingItem);
+	    }
+
+	    newItems.add(matchingItem);
+	}
+
+	// all this collections clearing is for Hibernate to feel safe
+	existingItems.clear();
+	syncNeeded |= !itemsToRemove.isEmpty();
+
+	if (!syncNeeded) {
+	    return false;
+	}
+
+	scratchie.getScratchieItems().clear();
+
+	for (ScratchieItem itemToRemove : itemsToRemove) {
+	    // remove question removed from the matching RAT activity
+	    scratchieItemDao.delete(itemToRemove);
+	}
+	itemsToRemove.clear();
+
+	scratchie.getScratchieItems().addAll(newItems);
+	newItems.clear();
+
+	scratchieDao.update(scratchie);
+
+	return true;
+    }
+
     @Override
     public void replaceQuestion(long toolContentId, long oldQbQuestionUid, long newQbQuestionUid) {
 	Scratchie scratchie = getScratchieByContentId(toolContentId);

@@ -51,6 +51,7 @@ import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IDataFlowDAO;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
+import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
@@ -93,6 +94,7 @@ public class LamsToolService implements ILamsToolService {
     private ILamsCoreToolService lamsCoreToolService;
     private ILessonService lessonService;
     private ILearnerService learnerService;
+    private ILearningDesignService learningDesignService;
     private IUserManagementService userManagementService;
     private IDataFlowDAO dataFlowDAO;
 
@@ -579,6 +581,22 @@ public class LamsToolService implements ILamsToolService {
 	return session.getLearners().size();
     }
 
+    /**
+     * Updates TBL iRAT/tRAT activity with questions from matching tRAT/iRAT activity
+     */
+    @Override
+    public boolean syncRatQuestions(long toolContentId, List<Long> newQuestionUids) {
+	Long matchingRATActivityId = learningDesignService.findMatchingRatActivity(toolContentId);
+	if (matchingRATActivityId == null) {
+	    return false;
+	}
+
+	ToolActivity ratActivity = activityDAO.getToolActivityByToolContentId(matchingRATActivityId);
+	Tool tool = ratActivity.getTool();
+	IQbToolService qbToolService = (IQbToolService) lamsCoreToolService.findToolService(tool);
+	return qbToolService.syncRatQuestions(matchingRATActivityId, newQuestionUids);
+    }
+
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     // ---------------------------------------------------------------------
@@ -627,6 +645,10 @@ public class LamsToolService implements ILamsToolService {
 
     public void setLearnerService(ILearnerService learnerService) {
 	this.learnerService = learnerService;
+    }
+
+    public void setLearningDesignService(ILearningDesignService learningDesignService) {
+	this.learningDesignService = learningDesignService;
     }
 
     /**

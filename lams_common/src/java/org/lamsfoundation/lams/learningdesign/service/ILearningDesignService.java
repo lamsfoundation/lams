@@ -107,4 +107,16 @@ public interface ILearningDesignService {
      */
     String getUniqueNameForLearningDesign(String originalTitle, Integer workspaceFolderId);
 
+    /**
+     * If learning design contains the following activities Grouping->(MCQ or Assessment)->Leader Selection->Scratchie
+     * (potentially with some other gates or activities in the middle), there is a good chance this is a TBL sequence
+     * and all activities must be grouped.
+     */
+    boolean isTBLSequence(long learningDesignId);
+
+    /**
+     * Checks if it is a TBL sequence. If so and given tool content ID is a iRAT or tRAT activity,
+     * it returns tool content ID of a matching tRAT / iRAT activity.
+     */
+    Long findMatchingRatActivity(long toolContentId);
 }

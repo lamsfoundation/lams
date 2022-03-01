@@ -22,4 +22,9 @@ public interface IQbToolService {
      * Replaces existing question in an activity with one provided as a parameter.
      */
     void replaceQuestion(long toolContentId, long oldQbQuestionUid, long newQbQuestionUid);
+
+    /**
+     * Updates TBL iRAT/tRAT activity with questions from matching tRAT/iRAT activity
+     */
+    boolean syncRatQuestions(long toolContentId, List<Long> newQuestionUids);
 }

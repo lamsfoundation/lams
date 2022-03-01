@@ -248,4 +248,9 @@ public interface ILamsToolService {
      * Get a count of all the users that would be returned by getUsersForActivity(Long toolSessionId);
      */
     Integer getCountUsersForActivity(Long toolSessionId);
+    
+    /**
+     * Updates TBL iRAT/tRAT activity with questions from matching tRAT/iRAT activity
+     */
+    boolean syncRatQuestions(long toolContentId, List<Long> newQuestionUids);
 }

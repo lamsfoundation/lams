@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -66,6 +67,7 @@ import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.AssessmentForm;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
@@ -104,6 +106,8 @@ public class AuthoringController {
     private IAssessmentService service;
     @Autowired
     private IQbService qbService;
+    @Autowired
+    private ILamsToolService lamsToolService;
 
     /**
      * Read assessment data from database and put them into HttpSession. It will redirect to init.do directly after this
@@ -349,6 +353,10 @@ public class AuthoringController {
 		service.deleteAssessmentQuestion(delQuestion.getUid());
 	    }
 	}
+
+	List<Long> newQuestionUids = assessmentPO.getQuestionReferences().stream()
+		.collect(Collectors.mapping(q -> q.getQuestion().getQbQuestion().getUid(), Collectors.toList()));
+	lamsToolService.syncRatQuestions(assessmentPO.getContentId(), newQuestionUids);
 
 	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
