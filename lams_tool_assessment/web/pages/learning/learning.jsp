@@ -50,7 +50,9 @@
   			color: #FF3333 !important;
   		}
   		
-  		
+  		#leader-info {
+  			margin-bottom: 10px;
+  		}
 	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
@@ -620,7 +622,8 @@
 		</c:if>
 		
 		<c:if test="${isLeadershipEnabled}">
-			<lams:LeaderDisplay username="${sessionMap.groupLeader.firstName} ${sessionMap.groupLeader.lastName}" userId="${sessionMap.groupLeader.userId}"/>
+			<lams:LeaderDisplay idName="leader-info"
+								username="${sessionMap.groupLeader.firstName} ${sessionMap.groupLeader.lastName}" userId="${sessionMap.groupLeader.userId}"/>
 		</c:if>
 		
 		<c:if test="${assessment.allowDiscloseAnswers}">
