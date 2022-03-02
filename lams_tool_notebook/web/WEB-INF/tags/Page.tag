@@ -184,7 +184,7 @@
 				let currentTime = new Date().getTime(),
 					lamsAutosaveTimestamp = +localStorage.getItem('lamsAutosaveTimestamp');
 				// check if autosave does not happen too often
-				if (autosaveInterval > 0 && lamsAutosaveTimestamp && lamsAutosaveTimestamp + +autosaveInterval - 200 > currentTime) {
+				if (autosaveInterval > 0 && lamsAutosaveTimestamp && lamsAutosaveTimestamp + autosaveInterval/2 > currentTime) {
 					// this label is required only in tool which implement autosave
 					alert('<fmt:message key="label.prevent.learner.autosave.mutliple.tabs" />');
 					return false;
