@@ -81,12 +81,12 @@
 			<c:forEach var="question" items="${daco.dacoQuestions}" varStatus="questionStatus">
 				<tr>
 					<td>
-					<div class="bigNumber">${questionStatus.index+1}</div>
+					<!-- <span>${questionStatus.index+1}</span> -->
 					<c:out value="${question.description}" escapeXml="false"/>
 					<c:choose>
 						<%-- The content varies depending on the question type --%>
 						<c:when test="${question.type==1}"><%-- Single line text --%>
-							<div class="hint"><fmt:message key="label.learning.textfield.hint" /></div>		
+							<fmt:message key="label.learning.textfield.hint" var="textfieldHint"/>	
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
 							</c:if>
@@ -95,24 +95,24 @@
 									depending on the maximum number of characters the teacher provided
 								--%>
 								<c:when test="${question.max!=null}">
-									<form:input path="answer[${answerIndex}]" size="60" maxlength="${question.max}"  cssClass="form-control"/>
+									<form:input placeholder="${textfieldHint}" path="answer[${answerIndex}]" size="60" maxlength="${question.max}"  cssClass="form-control"/>
 								</c:when>
 								<c:otherwise>
-									<form:input path="answer[${answerIndex}]" size="60"  cssClass="form-control"/>
+									<form:input placeholder="${textfieldHint}" path="answer[${answerIndex}]" size="60"  cssClass="form-control"/>
 								</c:otherwise>
 							</c:choose>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
 						<c:when test="${question.type==2}"><%-- Multi-line text --%>
-							<div class="hint"><fmt:message key="label.learning.textarea.hint" /></div>
+							<fmt:message key="label.learning.textarea.hint" var="textareaHint"/>
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
 							</c:if>
-							<form:textarea path="answer[${answerIndex}]" cols="60" rows="3"  cssClass="form-control"/>
+							<form:textarea placeholder="${textareaHint}" path="answer[${answerIndex}]" cols="60" rows="3"  cssClass="form-control"/>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
 						<c:when test="${question.type==3}"><%-- Number --%>
-							<div class="hint"><fmt:message key="label.learning.number.hint" />
+							<fmt:message key="label.learning.number.hint" var="numberHint"/>
 							<c:if test="${not empty question.digitsDecimal}">
 								<br />
 								<%-- An information for the learner is displayed,
@@ -126,7 +126,7 @@
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
 							</c:if>
-							<form:input path="answer[${answerIndex}]" size="10"  cssClass="form-control"/>
+							<form:input placeholder="${numberHint}" path="answer[${answerIndex}]" size="10"  cssClass="form-control"/>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
 						<c:when test="${question.type==4}"><%-- Date can be entered in three textfields --%>
@@ -137,19 +137,19 @@
 							<span class="form-inline">
 								<div class="form-group">
 								<label><fmt:message key="label.learning.date.day" /></label>
-								<form:input path="answer[${answerIndex}]" size="3"  cssClass="form-control"/>&nbsp;
+								<form:input path="answer[${answerIndex}]" size="3"  cssClass="form-control input-sm"/>&nbsp;
 								</div>
 								
 								<div class="form-group">
 								<c:set var="answerIndex" value="${answerIndex+1}" />
 								<label><fmt:message key="label.learning.date.month" /></label>
-								<form:input path="answer[${answerIndex}]" size="3"  cssClass="form-control"/>&nbsp;
+								<form:input path="answer[${answerIndex}]" size="3"  cssClass="form-control input-sm"/>&nbsp;
 								</div>
 								
 								<div class="form-group">
 								<c:set var="answerIndex" value="${answerIndex+1}" />
 								<label><fmt:message key="label.learning.date.year" /></label>
-								<form:input path="answer[${answerIndex}]" size="5"  cssClass="form-control"/>
+								<form:input path="answer[${answerIndex}]" size="5"  cssClass="form-control input-sm"/>
 								</div>
 							</span>							
 							<c:set var="answerIndex" value="${answerIndex+1}" />
@@ -247,11 +247,19 @@
 					</td>
 				</tr>
 			</c:forEach>
+			<tr>
+				<td>
+					<c:if test="${mode != 'teacher'}">
+						<button type="submit" onclick="return saveOrUpdateRecord();" class="btn btn-sm btn-default btn-disable-on-submit voffset5 pull-left"><i class="fa fa-plus"></i> <fmt:message key="label.learning.add" /></button>
+					</c:if>
+					<c:if test="${horizontal}">
+					</td><td style="vertical-align: middle;">
+				</c:if>					
+				</td>
+			</tr>
 		</table>
 
-		<c:if test="${mode != 'teacher'}">
-			<button type="submit" onclick="return saveOrUpdateRecord();" class="btn btn-sm btn-default btn-disable-on-submit voffset5 pull-left"><i class="fa fa-plus"></i> <fmt:message key="label.learning.add" /></button>
-		</c:if>
+
 	</form:form>
 </div>
 <!--  end record panel -->

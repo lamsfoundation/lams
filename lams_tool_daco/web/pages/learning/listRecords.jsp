@@ -74,7 +74,7 @@
 						</div>
 						<div class="col-xs-9" style="padding-left:0">
 						<strong><fmt:message key="label.learning.tableheader.records" /></strong>
-						<c:if test="${fn:length(recordList) > 1}"><fmt:message key="label.scroll.hint"/></c:if>						
+						<c:if test="${fn:length(recordList) > 1}"></c:if>						
 						</div>
 					</div>
 
@@ -87,7 +87,7 @@
 								<c:forEach var="question" items="${daco.dacoQuestions}" varStatus="questionStatus">
 									<tr>
 										<td class="fixedCellHeight">
-											<div class="bigNumber">${questionStatus.index+1}</div>
+											<!-- <div class="bigNumber">${questionStatus.index+1}</div> -->
 											<c:out value="${question.description}" escapeXml="false"/>
 										</td>	
 									</tr>
@@ -176,7 +176,7 @@
 										<c:set var="generated" value="true" />
 										<tr>
 											<td>
-											<div class="bigNumber">${questionStatus.index+1}</div>
+											<!-- <div class="bigNumber">${questionStatus.index+1}</div> -->
 											<c:out value="${question.description}" escapeXml="false"/>
 											<c:choose>
 												<c:when test="${question.type==1}">

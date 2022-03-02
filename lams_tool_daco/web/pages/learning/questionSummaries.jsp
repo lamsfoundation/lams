@@ -70,7 +70,7 @@
 		<c:set var="questionSummary" value="${questionSummaries[questionStatus.index]}" />
 		<tr>
 			<td>
-				<div class="bigNumber">${questionStatus.index+1}</div>
+				<!-- <div class="bigNumber">${questionStatus.index+1}</div> -->
 				<c:out value="${question.description}" escapeXml="false"/>
 				<div class="hint">
 					<c:choose>
