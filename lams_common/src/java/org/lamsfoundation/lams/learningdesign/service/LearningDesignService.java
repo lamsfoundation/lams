@@ -523,6 +523,10 @@ public class LearningDesignService implements ILearningDesignService {
     @Override
     public Long findMatchingRatActivity(long toolContentId) {
 	ToolActivity ratActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
+	if (ratActivity == null) {
+	    // this activity has not been saved yet
+	    return null;
+	}
 	Long iRatToolContentId = null;
 	Long tRatToolContentId = null;
 
