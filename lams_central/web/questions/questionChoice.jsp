@@ -59,27 +59,12 @@
 			});
 			
 			if (anyQuestionsSelected) {
-				var form = $("#questionForm");
-				if (returnURL == '') {
-					form.css('visibility', 'hidden');
-					window.opener.saveQTI(form[0].outerHTML, 'questionForm', callerID);
-					// needs to be called twice for Chrome to close pop up window
-					window.close();
-					window.close();
-				} else {
-					// this code is not really used at the moment, but it's available
-					$.ajax({
-						type: "POST",
-						url: returnURL,
-						data: form.serializeArray(),
-						success: function(response) {
-							window.opener.location.reload();
-							// needs to be called twice for Chrome to close pop up window
-							window.close();
-							window.close();
-						}
-					});
-				}
+				var form = $("#questionForm").css('visibility', 'hidden');
+				window.opener.saveQTI(form[0].outerHTML, 'questionForm', callerID);
+				// needs to be called twice for Chrome to close pop up window
+				window.close();
+				window.close();
+
 			} else {
 				$('#errorArea').show();
 			}
@@ -117,7 +102,7 @@
 			$('#selectAll').click(function(){
 				var checked = $(this).is(':checked');
 				
-				$('.question').attr('checked', checked);
+				$('.question').attr('checked', checked).prop('checked', checked);
 				$('.questionAttribute').attr('disabled', checked ? null : 'disabled');
 				if (checked) {
 					$('#errorArea').hide('slow');

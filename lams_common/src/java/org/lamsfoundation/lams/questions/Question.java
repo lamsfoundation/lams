@@ -145,11 +145,11 @@ public class Question {
     }
 
     public Integer getScore() {
-        return score;
+	return score;
     }
 
     public void setScore(Integer mark) {
-        this.score = mark;
+	this.score = mark;
     }
 
     @Override
@@ -162,10 +162,7 @@ public class Question {
 	if (this == obj) {
 	    return true;
 	}
-	if (obj == null) {
-	    return false;
-	}
-	if (!(obj instanceof Question)) {
+	if ((obj == null) || !(obj instanceof Question)) {
 	    return false;
 	}
 	Question other = (Question) obj;

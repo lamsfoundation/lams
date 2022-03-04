@@ -3,6 +3,7 @@ package org.lamsfoundation.lams.web;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
@@ -109,7 +110,7 @@ public class QuestionsController {
 
 	InputStream uploadedFileStream = new FileInputStream(file);
 
-	Question[] questions;
+	Collection<Question> questions;
 	if (packageName.endsWith(".xml")) {
 	    questions = QuestionParser.parseQTIFile(uploadedFileStream, null, limitType);
 

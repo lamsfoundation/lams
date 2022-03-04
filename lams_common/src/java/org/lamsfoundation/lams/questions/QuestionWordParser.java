@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -74,9 +75,9 @@ public class QuestionWordParser {
     /**
      * Extracts questions from IMS QTI zip file.
      */
-    public static Question[] parseWordFile(InputStream uploadedFileStream, String fileName, Set<String> limitType)
-	    throws XPathExpressionException, ZipFileUtilException, TransformerConfigurationException, IOException,
-	    SAXException, TikaException, ParserConfigurationException {
+    public static Collection<Question> parseWordFile(InputStream uploadedFileStream, String fileName,
+	    Set<String> limitType) throws XPathExpressionException, ZipFileUtilException,
+	    TransformerConfigurationException, IOException, SAXException, TikaException, ParserConfigurationException {
 	final String TEMP_IMAGE_FOLDER = ZipFileUtil.prepareTempDirectory(fileName);
 	TikaInputStream input = TikaInputStream.get(uploadedFileStream);
 	OOXMLParser tikaParser = new OOXMLParser();
@@ -381,7 +382,7 @@ public class QuestionWordParser {
 	    questions.add(question);
 	}
 
-	return questions.toArray(Question.QUESTION_ARRAY_TYPE);
+	return questions;
     }
 
     private static String readNextLine(LSSerializer serializer, NodeList nodes, int counter) {

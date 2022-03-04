@@ -168,6 +168,16 @@ public class ImsQtiController {
 		    if (question.getAnswers() != null) {
 			TreeSet<QbOption> optionList = new TreeSet<>();
 			int orderId = 0;
+			float maxScore = 0;
+
+			for (Answer answer : question.getAnswers()) {
+			    if (answer.getScore() != null && answer.getScore() > maxScore) {
+				maxScore = answer.getScore();
+			    }
+			}
+
+			questionMark = Double.valueOf(Math.ceil(maxScore)).intValue();
+
 			for (Answer answer : question.getAnswers()) {
 			    String answerText = QuestionParser.processHTMLField(answer.getText(), false,
 				    contentFolderID, question.getResourcesFolderPath());
@@ -186,16 +196,14 @@ public class ImsQtiController {
 			    option.setFeedback(answer.getFeedback());
 			    option.setQbQuestion(qbQuestion);
 
-			    if ((answer.getScore() != null) && (answer.getScore() > 0) && (correctAnswer == null)) {
-				if (questionMark == null) {
-				    // whatever the correct answer holds, it becomes the question score
-				    questionMark = Double.valueOf(Math.ceil(answer.getScore())).intValue();
+			    // cast exact score to scale 0-1
+			    if (answer.getScore() != null && answer.getScore() > 0) {
+				if (correctAnswer == null && answer.getScore() == maxScore) {
+				    correctAnswer = answerText;
 				}
-				// 100% goes to the correct answer
-				option.setMaxMark(1);
-				correctAnswer = answerText;
-			    } else {
-				option.setMaxMark(0);
+				float score = Double.valueOf(Math.round(answer.getScore() / maxScore * 100.0) / 100.0)
+					.floatValue();
+				option.setMaxMark(score);
 			    }
 
 			    optionList.add(option);

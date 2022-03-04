@@ -28,7 +28,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -41,12 +43,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.qb.QbUtils;
 import org.lamsfoundation.lams.util.UploadFileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.XMLUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.w3c.dom.Document;
@@ -70,42 +77,35 @@ public class QuestionParser {
     // can be anything
     private static final String TEMP_PACKAGE_NAME_PREFIX = "QTI_PACKAGE_";
     private static final Pattern IMAGE_PATTERN = Pattern.compile("\\[IMAGE: ([^\\]]+)\\]");
+    private static XPath xPath = XPathFactory.newInstance().newXPath();
 
     public static final String UUID_LABEL_PREFIX = "lams-qb-uuid-";
 
     /**
      * Extracts questions from IMS QTI zip file.
      */
-    public static Question[] parseQTIPackage(InputStream packageFileStream, Set<String> limitType)
+    public static Collection<Question> parseQTIPackage(InputStream packageFileStream, Set<String> limitType)
 	    throws SAXParseException, IOException, SAXException, ParserConfigurationException, ZipFileUtilException {
 	List<Question> result = new ArrayList<>();
 
 	// unique folder name
 	String tempPackageName = TEMP_PACKAGE_NAME_PREFIX + System.currentTimeMillis();
 	String tempPackageDirPath = ZipFileUtil.expandZip(packageFileStream, tempPackageName);
-	try {
+	try (packageFileStream) {
 	    List<File> resourceFiles = QuestionParser.getQTIResourceFiles(tempPackageDirPath);
 	    if (resourceFiles.isEmpty()) {
 		log.warn("No resource files found in QTI package");
 	    } else {
 		// extract from every XML file; usually there is just one
 		for (File resourceFile : resourceFiles) {
-		    FileInputStream xmlFileStream = new FileInputStream(resourceFile);
-		    Question[] fileQuestions = null;
-		    try {
-			fileQuestions = QuestionParser.parseQTIFile(xmlFileStream, tempPackageDirPath, limitType);
-		    } finally {
-			xmlFileStream.close();
-		    }
-		    if (fileQuestions != null) {
-			Collections.addAll(result, fileQuestions);
+		    try (FileInputStream xmlFileStream = new FileInputStream(resourceFile)) {
+			Collection<Question> fileQuestions = QuestionParser.parseQTIFile(xmlFileStream,
+				tempPackageDirPath, limitType);
+			result.addAll(fileQuestions);
 		    }
 		}
 	    }
 	} finally {
-	    // clean up
-	    packageFileStream.close();
-
 	    // if there are any images attached, do not delete the exploded ZIP
 	    // unfortunately, in this case it stays there until OS does temp dir clean up
 	    boolean tempFolderStillNeeded = false;
@@ -122,251 +122,264 @@ public class QuestionParser {
 	    }
 	}
 
-	return result.toArray(Question.QUESTION_ARRAY_TYPE);
+	return result;
     }
 
     /**
      * Extracts questions from IMS QTI xml file.
      */
-    public static Question[] parseQTIFile(InputStream xmlFileStream, String resourcesFolderPath, Set<String> limitType)
-	    throws ParserConfigurationException, SAXException, IOException {
-	List<Question> result = new ArrayList<>();
+    public static Collection<Question> parseQTIFile(InputStream xmlFileStream, String resourcesFolderPath,
+	    Set<String> limitType) throws ParserConfigurationException, SAXException, IOException {
+	List<Question> questions = new ArrayList<>();
 	DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 	Document doc = docBuilder.parse(xmlFileStream);
 
+	// in theory in a single QTI package v1 and v2 items can be mixed
 	NodeList questionItems = doc.getElementsByTagName("item");
-	// yes, a label here for convenience
-	questionLoop: for (int questionItemIndex = 0; questionItemIndex < questionItems
-		.getLength(); questionItemIndex++) {
+	for (int questionItemIndex = 0; questionItemIndex < questionItems.getLength(); questionItemIndex++) {
 	    Element questionItem = (Element) questionItems.item(questionItemIndex);
-	    NodeList questionItemTypes = questionItem.getElementsByTagName("qmd_itemtype");
-	    String questionItemType = questionItemTypes.getLength() > 0
-		    ? ((Text) questionItemTypes.item(0).getChildNodes().item(0)).getData()
-		    : null;
-	    Question question = new Question();
-	    // check if it is "matching" question type
-	    if ("Matching".equalsIgnoreCase(questionItemType)
-		    && !QuestionParser.isQuestionTypeAcceptable(Question.QUESTION_TYPE_MATCHING, limitType, question)) {
-		continue;
+	    Question question = QuestionParser.parseQTIItemVesion1(questionItem, resourcesFolderPath, limitType);
+	    if (question != null) {
+		questions.add(question);
 	    }
-	    String questionTitle = questionItem.getAttribute("title");
-	    question.setTitle(questionTitle);
-	    String questionLabel = questionItem.getAttribute("label");
-	    if (StringUtils.isNotBlank(questionLabel)) {
-		question.setLabel(questionLabel);
+	}
+
+	questionItems = doc.getElementsByTagName("assessmentItem");
+	for (int questionItemIndex = 0; questionItemIndex < questionItems.getLength(); questionItemIndex++) {
+	    Element questionItem = (Element) questionItems.item(questionItemIndex);
+	    Question question = QuestionParser.parseQTIItemVesion2(questionItem, resourcesFolderPath, limitType);
+	    if (question != null) {
+		questions.add(question);
 	    }
+	}
 
-	    Map<String, Answer> answerMap = new TreeMap<>();
-	    Map<String, Answer> matchAnswerMap = null;
-	    boolean textBasedQuestion = false;
+	return questions;
+    }
 
-	    Element presentation = (Element) questionItem.getElementsByTagName("presentation").item(0);
-	    NodeList presentationChildrenList = presentation.getChildNodes();
-	    // cumberstone parsing, but there is no other way using this API
-	    for (int presentationChildIndex = 0; presentationChildIndex < presentationChildrenList
-		    .getLength(); presentationChildIndex++) {
-		Node presentationChild = presentationChildrenList.item(presentationChildIndex);
-		// here is where question data is stored
-		if ("material".equals(presentationChild.getNodeName())) {
-		    String questionText = QuestionParser.parseMaterialElement(presentationChild, question,
-			    resourcesFolderPath);
-		    if (questionText.trim().startsWith("<!--")) {
-			// do not support Algorithmic question type
-			continue questionLoop;
+    public static Question parseQTIItemVesion1(Element questionItem, String resourcesFolderPath,
+	    Set<String> limitType) {
+	NodeList questionItemTypes = questionItem.getElementsByTagName("qmd_itemtype");
+	String questionItemType = questionItemTypes.getLength() > 0
+		? ((Text) questionItemTypes.item(0).getChildNodes().item(0)).getData()
+		: null;
+	Question question = new Question();
+	// check if it is "matching" question type
+	if ("Matching".equalsIgnoreCase(questionItemType)
+		&& !QuestionParser.isQuestionTypeAcceptable(Question.QUESTION_TYPE_MATCHING, limitType, question)) {
+	    return null;
+	}
+	String questionTitle = questionItem.getAttribute("title");
+	question.setTitle(questionTitle);
+	String questionLabel = questionItem.getAttribute("label");
+	if (StringUtils.isNotBlank(questionLabel)) {
+	    question.setLabel(questionLabel);
+	}
+
+	Map<String, Answer> answerMap = new TreeMap<>();
+	Map<String, Answer> matchAnswerMap = null;
+	boolean textBasedQuestion = false;
+
+	Element presentation = (Element) questionItem.getElementsByTagName("presentation").item(0);
+	NodeList presentationChildrenList = presentation.getChildNodes();
+	// cumberstone parsing, but there is no other way using this API
+	for (int presentationChildIndex = 0; presentationChildIndex < presentationChildrenList
+		.getLength(); presentationChildIndex++) {
+	    Node presentationChild = presentationChildrenList.item(presentationChildIndex);
+	    // here is where question data is stored
+	    if ("material".equals(presentationChild.getNodeName())) {
+		String questionText = QuestionParser.parseMaterialElement(presentationChild, question,
+			resourcesFolderPath);
+		if (questionText.trim().startsWith("<!--")) {
+		    // do not support Algorithmic question type
+		    return null;
+		}
+		question.setText(questionText);
+	    } else if ("response_lid".equals(presentationChild.getNodeName())) {
+		if (question.getAnswers() == null) {
+		    boolean multipleAnswersAllowed = "multiple"
+			    .equalsIgnoreCase(((Element) presentationChild).getAttribute("rcardinality"));
+		    NodeList answerList = ((Element) presentationChild).getElementsByTagName("response_label");
+		    // parse answers
+		    for (int answerIndex = 0; answerIndex < answerList.getLength(); answerIndex++) {
+			Element answerElement = (Element) answerList.item(answerIndex);
+			Element materialElement = (Element) answerElement.getElementsByTagName("material").item(0);
+			String answerText = QuestionParser.parseMaterialElement(materialElement, question,
+				resourcesFolderPath);
+
+			// if there are answers different thatn true/false,
+			// it is Multiple Choice or Multiple Answers
+			if ((question.getType() == null) && !"true".equalsIgnoreCase(answerText)
+				&& !"false".equalsIgnoreCase(answerText)
+				&& !QuestionParser
+					.isQuestionTypeAcceptable(
+						multipleAnswersAllowed ? Question.QUESTION_TYPE_MULTIPLE_RESPONSE
+							: Question.QUESTION_TYPE_MULTIPLE_CHOICE,
+						limitType, question)) {
+			    return null;
+			}
+
+			Answer answer = new Answer();
+			answer.setText(answerText);
+			if (question.getAnswers() == null) {
+			    question.setAnswers(new ArrayList<Answer>());
+			}
+			question.getAnswers().add(answer);
+
+			// for other metadata parts to find Answer object
+			String answerId = answerElement.getAttribute("ident");
+			answerMap.put(answerId, answer);
 		    }
-		    question.setText(questionText);
-		} else if ("response_lid".equals(presentationChild.getNodeName())) {
-		    if (question.getAnswers() == null) {
-			boolean multipleAnswersAllowed = "multiple"
-				.equalsIgnoreCase(((Element) presentationChild).getAttribute("rcardinality"));
-			NodeList answerList = ((Element) presentationChild).getElementsByTagName("response_label");
-			// parse answers
-			for (int answerIndex = 0; answerIndex < answerList.getLength(); answerIndex++) {
-			    Element answerElement = (Element) answerList.item(answerIndex);
-			    Element materialElement = (Element) answerElement.getElementsByTagName("material").item(0);
-			    String answerText = QuestionParser.parseMaterialElement(materialElement, question,
-				    resourcesFolderPath);
 
-			    // if there are answers different thatn true/false,
-			    // it is Multiple Choice or Multiple Answers
-			    if ((question.getType() == null) && !"true".equalsIgnoreCase(answerText)
-				    && !"false".equalsIgnoreCase(answerText)
-				    && !QuestionParser
-					    .isQuestionTypeAcceptable(
-						    multipleAnswersAllowed ? Question.QUESTION_TYPE_MULTIPLE_RESPONSE
-							    : Question.QUESTION_TYPE_MULTIPLE_CHOICE,
-						    limitType, question)) {
-				continue questionLoop;
-			    }
+		    // if there are only true/false answers, set the question type
+		    if ((question.getType() == null) && (question.getAnswers() != null)
+			    && (question.getAnswers().size() == 2) && !multipleAnswersAllowed && !QuestionParser
+				    .isQuestionTypeAcceptable(Question.QUESTION_TYPE_TRUE_FALSE, limitType, question)) {
+			return null;
+		    }
+		}
+
+		if (Question.QUESTION_TYPE_MATCHING.equals(question.getType())) {
+		    if (question.getMatchAnswers() == null) {
+			// the parsed answers are actually the second part of matching
+			// move collections accordingly
+			question.setMatchAnswers(question.getAnswers());
+			question.setAnswers(new ArrayList<Answer>());
+
+			matchAnswerMap = answerMap;
+			answerMap = new TreeMap<>();
+		    }
+
+		    NodeList responseLidChildrenList = presentationChild.getChildNodes();
+		    for (int responseLidChildIndex = 0; responseLidChildIndex < responseLidChildrenList
+			    .getLength(); responseLidChildIndex++) {
+			// parse answers for first part of matching
+			Node responseLidChild = responseLidChildrenList.item(responseLidChildIndex);
+			if ("material".equals(responseLidChild.getNodeName())) {
+			    String answerText = QuestionParser.parseMaterialElement(responseLidChild, question,
+				    resourcesFolderPath);
 
 			    Answer answer = new Answer();
 			    answer.setText(answerText);
-			    if (question.getAnswers() == null) {
-				question.setAnswers(new ArrayList<Answer>());
-			    }
 			    question.getAnswers().add(answer);
 
-			    // for other metadata parts to find Answer object
-			    String answerId = answerElement.getAttribute("ident");
+			    String answerId = ((Element) presentationChild).getAttribute("ident");
 			    answerMap.put(answerId, answer);
 			}
-
-			// if there are only true/false answers, set the question type
-			if ((question.getType() == null) && (question.getAnswers() != null)
-				&& (question.getAnswers().size() == 2) && !multipleAnswersAllowed
-				&& !QuestionParser.isQuestionTypeAcceptable(Question.QUESTION_TYPE_TRUE_FALSE,
-					limitType, question)) {
-			    continue questionLoop;
-			}
 		    }
-
-		    if (Question.QUESTION_TYPE_MATCHING.equals(question.getType())) {
-			if (question.getMatchAnswers() == null) {
-			    // the parsed answers are actually the second part of matching
-			    // move collections accordingly
-			    question.setMatchAnswers(question.getAnswers());
-			    question.setAnswers(new ArrayList<Answer>());
-
-			    matchAnswerMap = answerMap;
-			    answerMap = new TreeMap<>();
-			}
-
-			NodeList responseLidChildrenList = presentationChild.getChildNodes();
-			for (int responseLidChildIndex = 0; responseLidChildIndex < responseLidChildrenList
-				.getLength(); responseLidChildIndex++) {
-			    // parse answers for first part of matching
-			    Node responseLidChild = responseLidChildrenList.item(responseLidChildIndex);
-			    if ("material".equals(responseLidChild.getNodeName())) {
-				String answerText = QuestionParser.parseMaterialElement(responseLidChild, question,
-					resourcesFolderPath);
-
-				Answer answer = new Answer();
-				answer.setText(answerText);
-				question.getAnswers().add(answer);
-
-				String answerId = ((Element) presentationChild).getAttribute("ident");
-				answerMap.put(answerId, answer);
-			    }
-			}
-		    }
-		} else if ("response_str".equals(presentationChild.getNodeName())) {
-		    // Essay or Fill-in-Blank question types
-		    textBasedQuestion = true;
 		}
+	    } else if ("response_str".equals(presentationChild.getNodeName())) {
+		// Essay or Fill-in-Blank question types
+		textBasedQuestion = true;
 	    }
-
-	    // extract score and feedback
-	    Map<String, String> feedbackMap = new TreeMap<>();
-	    if (textBasedQuestion || !answerMap.isEmpty()) {
-		NodeList answerMetadatas = questionItem.getElementsByTagName("respcondition");
-		// if no answers at all, it is Essay type
-		if ((answerMetadatas.getLength() == 0) && (question.getType() == null) && textBasedQuestion
-			&& !QuestionParser.isQuestionTypeAcceptable(Question.QUESTION_TYPE_ESSAY, limitType,
-				question)) {
-		    continue questionLoop;
-		}
-		for (int answerMetadataIndex = 0; answerMetadataIndex < answerMetadatas
-			.getLength(); answerMetadataIndex++) {
-		    Element answerMetadata = (Element) answerMetadatas.item(answerMetadataIndex);
-		    NodeList scoreReference = answerMetadata.getElementsByTagName("varequal");
-		    // find where given metadata part references to
-		    String answerId = scoreReference.getLength() > 0
-			    ? ((Text) scoreReference.item(0).getChildNodes().item(0)).getData()
-			    : null;
-		    if (answerId == null) {
-			// no answers at all, so it is Essay type
-			if ((question.getType() == null) && textBasedQuestion && !QuestionParser
-				.isQuestionTypeAcceptable(Question.QUESTION_TYPE_ESSAY, limitType, question)) {
-			    continue questionLoop;
-			}
-		    } else {
-			if ((question.getType() == null) && textBasedQuestion && !QuestionParser
-				.isQuestionTypeAcceptable(Question.QUESTION_TYPE_FILL_IN_BLANK, limitType, question)) {
-			    continue questionLoop;
-			}
-
-			Answer answer = null;
-			if (textBasedQuestion) {
-			    // for Fill-in-Blank answer parsing can be done only here
-			    answer = new Answer();
-			    answer.setText(answerId);
-			    if (question.getAnswers() == null) {
-				question.setAnswers(new ArrayList<Answer>());
-			    }
-			    question.getAnswers().add(answer);
-			}
-			// extract score
-			Element setVarElement = (Element) answerMetadata.getElementsByTagName("setvar").item(0);
-			String score = ((Text) setVarElement.getChildNodes().item(0)).getData();
-			if (!StringUtils.isBlank(score)) {
-			    if (Question.QUESTION_TYPE_MATCHING.equals(question.getType())) {
-				// map matching answers to each other, plus set the score
-				if (setVarElement.getAttribute("varname").endsWith("_Correct")) {
-				    Answer matchAnswer = matchAnswerMap.get(answerId);
-				    answerId = ((Element) scoreReference.item(0)).getAttribute("respident");
-				    answer = answerMap.get(answerId);
-				    answer.setScore(Float.parseFloat(score));
-
-				    if (question.getMatchMap() == null) {
-					question.setMatchMap(new TreeMap<Integer, Integer>());
-				    }
-				    Integer answerIndex = question.getAnswers().indexOf(answer);
-				    Integer matchAnswerIndex = question.getMatchAnswers().indexOf(matchAnswer);
-				    question.getMatchMap().put(answerIndex, matchAnswerIndex);
-				}
-			    } else {
-				if (answer == null) {
-				    // for all types except Matching and Fill-in-Blank
-				    answer = answerMap.get(answerId);
-				}
-				answer.setScore(Float.parseFloat(score));
-			    }
-			}
-
-			// extract question and answer feedback references
-			NodeList feedbacks = answerMetadata.getElementsByTagName("displayfeedback");
-			for (int feedbackIndex = 0; feedbackIndex < feedbacks.getLength(); feedbackIndex++) {
-			    Element feedbackElement = (Element) feedbacks.item(feedbackIndex);
-			    String feedbackId = feedbackElement.getAttribute("linkrefid");
-			    // check if it is not a question feedback
-			    if (!feedbackId.endsWith("_ALL")) {
-				feedbackMap.put(feedbackId, answerId);
-			    }
-			}
-		    }
-		}
-	    }
-
-	    // extract question and answer feedbacks
-	    NodeList feedbacks = questionItem.getElementsByTagName("itemfeedback");
-	    for (int feedbackIndex = 0; feedbackIndex < feedbacks.getLength(); feedbackIndex++) {
-		Element feedbackElement = (Element) feedbacks.item(feedbackIndex);
-		Node materialElement = feedbackElement.getElementsByTagName("material").item(0);
-		String feedbackText = QuestionParser.parseMaterialElement(materialElement, question,
-			resourcesFolderPath);
-		if (!StringUtils.isBlank(feedbackText)) {
-		    String feedbackType = feedbackElement.getAttribute("view");
-		    // it is a question feedback
-		    if ("All".equalsIgnoreCase(feedbackType)) {
-			question.setFeedback(feedbackText);
-		    } else {
-			// it is an answer feedback
-			String feedbackId = feedbackElement.getAttribute("ident");
-			String answerId = feedbackMap.get(feedbackId);
-			if (answerId != null) {
-			    Answer answer = answerMap.get(answerId);
-			    if (answer != null) {
-				answer.setFeedback(feedbackText);
-			    }
-			}
-		    }
-		}
-	    }
-
-	    result.add(question);
 	}
 
-	return result.toArray(Question.QUESTION_ARRAY_TYPE);
+	// extract score and feedback
+	Map<String, String> feedbackMap = new TreeMap<>();
+	if (textBasedQuestion || !answerMap.isEmpty()) {
+	    NodeList answerMetadatas = questionItem.getElementsByTagName("respcondition");
+	    // if no answers at all, it is Essay type
+	    if ((answerMetadatas.getLength() == 0) && (question.getType() == null) && textBasedQuestion
+		    && !QuestionParser.isQuestionTypeAcceptable(Question.QUESTION_TYPE_ESSAY, limitType, question)) {
+		return null;
+	    }
+	    for (int answerMetadataIndex = 0; answerMetadataIndex < answerMetadatas
+		    .getLength(); answerMetadataIndex++) {
+		Element answerMetadata = (Element) answerMetadatas.item(answerMetadataIndex);
+		NodeList scoreReference = answerMetadata.getElementsByTagName("varequal");
+		// find where given metadata part references to
+		String answerId = scoreReference.getLength() > 0
+			? ((Text) scoreReference.item(0).getChildNodes().item(0)).getData()
+			: null;
+		if (answerId == null) {
+		    // no answers at all, so it is Essay type
+		    if ((question.getType() == null) && textBasedQuestion && !QuestionParser
+			    .isQuestionTypeAcceptable(Question.QUESTION_TYPE_ESSAY, limitType, question)) {
+			return null;
+		    }
+		} else {
+		    if ((question.getType() == null) && textBasedQuestion && !QuestionParser
+			    .isQuestionTypeAcceptable(Question.QUESTION_TYPE_FILL_IN_BLANK, limitType, question)) {
+			return null;
+		    }
+
+		    Answer answer = null;
+		    if (textBasedQuestion) {
+			// for Fill-in-Blank answer parsing can be done only here
+			answer = new Answer();
+			answer.setText(answerId);
+			if (question.getAnswers() == null) {
+			    question.setAnswers(new ArrayList<Answer>());
+			}
+			question.getAnswers().add(answer);
+		    }
+		    // extract score
+		    Element setVarElement = (Element) answerMetadata.getElementsByTagName("setvar").item(0);
+		    String score = ((Text) setVarElement.getChildNodes().item(0)).getData();
+		    if (!StringUtils.isBlank(score)) {
+			if (Question.QUESTION_TYPE_MATCHING.equals(question.getType())) {
+			    // map matching answers to each other, plus set the score
+			    if (setVarElement.getAttribute("varname").endsWith("_Correct")) {
+				Answer matchAnswer = matchAnswerMap.get(answerId);
+				answerId = ((Element) scoreReference.item(0)).getAttribute("respident");
+				answer = answerMap.get(answerId);
+				answer.setScore(Float.parseFloat(score));
+
+				if (question.getMatchMap() == null) {
+				    question.setMatchMap(new TreeMap<Integer, Integer>());
+				}
+				Integer answerIndex = question.getAnswers().indexOf(answer);
+				Integer matchAnswerIndex = question.getMatchAnswers().indexOf(matchAnswer);
+				question.getMatchMap().put(answerIndex, matchAnswerIndex);
+			    }
+			} else {
+			    if (answer == null) {
+				// for all types except Matching and Fill-in-Blank
+				answer = answerMap.get(answerId);
+			    }
+			    answer.setScore(Float.parseFloat(score));
+			}
+		    }
+
+		    // extract question and answer feedback references
+		    NodeList feedbacks = answerMetadata.getElementsByTagName("displayfeedback");
+		    for (int feedbackIndex = 0; feedbackIndex < feedbacks.getLength(); feedbackIndex++) {
+			Element feedbackElement = (Element) feedbacks.item(feedbackIndex);
+			String feedbackId = feedbackElement.getAttribute("linkrefid");
+			// check if it is not a question feedback
+			if (!feedbackId.endsWith("_ALL")) {
+			    feedbackMap.put(feedbackId, answerId);
+			}
+		    }
+		}
+	    }
+	}
+
+	// extract question and answer feedbacks
+	NodeList feedbacks = questionItem.getElementsByTagName("itemfeedback");
+	for (int feedbackIndex = 0; feedbackIndex < feedbacks.getLength(); feedbackIndex++) {
+	    Element feedbackElement = (Element) feedbacks.item(feedbackIndex);
+	    Node materialElement = feedbackElement.getElementsByTagName("material").item(0);
+	    String feedbackText = QuestionParser.parseMaterialElement(materialElement, question, resourcesFolderPath);
+	    if (!StringUtils.isBlank(feedbackText)) {
+		String feedbackType = feedbackElement.getAttribute("view");
+		// it is a question feedback
+		if ("All".equalsIgnoreCase(feedbackType)) {
+		    question.setFeedback(feedbackText);
+		} else {
+		    // it is an answer feedback
+		    String feedbackId = feedbackElement.getAttribute("ident");
+		    String answerId = feedbackMap.get(feedbackId);
+		    if (answerId != null) {
+			Answer answer = answerMap.get(answerId);
+			if (answer != null) {
+			    answer.setFeedback(feedbackText);
+			}
+		    }
+		}
+	    }
+	}
+
+	return question;
     }
 
     /**
@@ -490,6 +503,285 @@ public class QuestionParser {
 	}
 
 	return result.toArray(Question.QUESTION_ARRAY_TYPE);
+    }
+
+    public static Question parseQTIItemVesion2(Element questionItem, String resourcesFolderPath,
+	    Set<String> limitType) {
+	String questionType = null;
+
+	Element responseDeclarationElement = XMLUtil.findChild(questionItem, "responseDeclaration");
+	Element itemBodyElement = XMLUtil.findChild(questionItem, "itemBody");
+	if (itemBodyElement == null) {
+	    // pretty much every item needs a body
+	    return null;
+	}
+
+	// existence of these elements depends on question type
+	Element choiceInteractionElement = null;
+	List<Element> simpleChoiceElements = null;
+	Element matchInteractionElement = null;
+	Element gapMatchInteractionElement = null;
+	Element textEntryInteractionElement = null;
+	Element extendedTextInteractionElement = null;
+
+	try {
+	    choiceInteractionElement = (Element) xPath.compile(".//choiceInteraction").evaluate(itemBodyElement,
+		    XPathConstants.NODE);
+	    simpleChoiceElements = XMLUtil.findChildren(choiceInteractionElement, "simpleChoice");
+	    matchInteractionElement = (Element) xPath.compile(".//matchInteraction").evaluate(itemBodyElement,
+		    XPathConstants.NODE);
+	    gapMatchInteractionElement = (Element) xPath.compile(".//gapMatchInteraction").evaluate(itemBodyElement,
+		    XPathConstants.NODE);
+	    textEntryInteractionElement = (Element) xPath.compile(".//textEntryInteraction").evaluate(itemBodyElement,
+		    XPathConstants.NODE);
+	    extendedTextInteractionElement = (Element) xPath.compile(".//extendedTextInteraction")
+		    .evaluate(itemBodyElement, XPathConstants.NODE);
+	} catch (Exception e) {
+	    log.error("Error while searching for interaction elements in item body in QTI XML file", e);
+	}
+
+	// try to figure out question type
+	if (responseDeclarationElement != null) {
+	    String cardinality = responseDeclarationElement.getAttribute("cardinality");
+	    String baseType = responseDeclarationElement.getAttribute("baseType");
+	    if ("single".equals(cardinality)) {
+		switch (baseType) {
+		    case "identifier":
+			if (choiceInteractionElement == null) {
+			    return null;
+			}
+
+			// pretty naive detection - what if true/false are in another language or yes/no
+			if (simpleChoiceElements != null && simpleChoiceElements.size() == 2
+				&& simpleChoiceElements.stream().map(e -> e.getTextContent())
+					.allMatch(t -> t.equalsIgnoreCase("true") || t.equalsIgnoreCase("false"))) {
+			    questionType = Question.QUESTION_TYPE_TRUE_FALSE;
+			} else {
+			    questionType = Question.QUESTION_TYPE_MULTIPLE_CHOICE;
+			}
+			break;
+		    case "string":
+			if (extendedTextInteractionElement == null) {
+			    if (textEntryInteractionElement == null) {
+				return null;
+			    }
+			    questionType = Question.QUESTION_TYPE_FILL_IN_BLANK;
+			} else {
+			    questionType = Question.QUESTION_TYPE_ESSAY;
+			}
+
+			break;
+		}
+	    } else if ("multiple".equals(cardinality)) {
+		switch (baseType) {
+		    case "identifier":
+			if (choiceInteractionElement == null) {
+			    return null;
+			}
+			questionType = Question.QUESTION_TYPE_MULTIPLE_RESPONSE;
+			break;
+		    case "directedPair":
+			if (matchInteractionElement == null) {
+			    return null;
+			}
+			questionType = Question.QUESTION_TYPE_MATCHING;
+			break;
+		}
+	    }
+	}
+
+	// check if question type is acceptable
+	Question question = new Question();
+	if (!QuestionParser.isQuestionTypeAcceptable(questionType, limitType, question)) {
+	    return null;
+	}
+	String questionTitle = questionItem.getAttribute("title");
+	question.setTitle(questionTitle);
+
+	// further processing of answers and score
+	switch (questionType) {
+	    case Question.QUESTION_TYPE_MULTIPLE_CHOICE:
+	    case Question.QUESTION_TYPE_MULTIPLE_RESPONSE:
+	    case Question.QUESTION_TYPE_TRUE_FALSE: {
+		Element correctResponseElement = XMLUtil.findChild(responseDeclarationElement, "correctResponse");
+		List<Element> correctResponseValueElements = XMLUtil.findChildren(correctResponseElement, "value");
+		Map<String, Float> correctResponses = new HashMap<>();
+
+		// figure out default score for answers
+		float defaultScore = 1F;
+		Element scoreMappingElement = XMLUtil.findChild(responseDeclarationElement, "mapping");
+		if (scoreMappingElement != null) {
+		    String defaultScoreAttribute = scoreMappingElement.getAttribute("defaultValue");
+		    if (StringUtils.isNotBlank(defaultScoreAttribute)) {
+			defaultScore = Float.valueOf(defaultScoreAttribute);
+		    }
+		}
+
+		// check which answers are correct
+		for (Element correctResponseValue : correctResponseValueElements) {
+		    correctResponses.put(correctResponseValue.getTextContent(), defaultScore);
+		}
+
+		// each answer can have own score
+		if (scoreMappingElement != null) {
+		    List<Element> scoreMappingEntryElements = XMLUtil.findChildren(scoreMappingElement, "mapEntry");
+		    for (Element scoreMappingEntry : scoreMappingEntryElements) {
+			String correctAnswerEntry = scoreMappingEntry.getAttribute("mapKey");
+			if (StringUtils.isBlank(correctAnswerEntry)
+				|| !correctResponses.containsKey(correctAnswerEntry)) {
+			    continue;
+			}
+			String mappedValue = scoreMappingEntry.getAttribute("mappedValue");
+			if (StringUtils.isNotBlank(mappedValue)) {
+			    correctResponses.put(correctAnswerEntry, Float.valueOf(mappedValue));
+			}
+		    }
+		}
+
+		List<Answer> answers = new ArrayList<>();
+		for (Element simpleChoiceElement : simpleChoiceElements) {
+		    Answer answer = new Answer();
+		    answer.setText(simpleChoiceElement.getTextContent());
+		    String identifier = simpleChoiceElement.getAttribute("identifier");
+		    // either set exact score or the default one
+		    Float score = correctResponses.get(identifier);
+		    answer.setScore(score == null ? defaultScore : score);
+		    String feedback = XMLUtil.getChildElementValue(simpleChoiceElement, "feebackInline", null);
+		    answer.setFeedback(feedback);
+		    answers.add(answer);
+		}
+		question.setAnswers(answers);
+		question.setScore(1);
+	    }
+		break;
+	    case Question.QUESTION_TYPE_MATCHING: {
+		Element correctResponseElement = XMLUtil.findChild(responseDeclarationElement, "correctResponse");
+		List<Element> correctResponseValueElements = XMLUtil.findChildren(correctResponseElement, "value");
+		Map<String, Float> correctResponses = new HashMap<>();
+		// figure out default score for answers
+		float defaultScore = 0F;
+		Element scoreMappingElement = XMLUtil.findChild(responseDeclarationElement, "mapping");
+		if (scoreMappingElement != null) {
+		    String defaultScoreAttribute = scoreMappingElement.getAttribute("defaultValue");
+		    if (StringUtils.isNotBlank(defaultScoreAttribute)) {
+			defaultScore = Float.valueOf(defaultScoreAttribute);
+		    }
+		}
+
+		// check which answers are correct
+		for (Element correctResponseValue : correctResponseValueElements) {
+		    correctResponses.put(correctResponseValue.getTextContent(), defaultScore);
+		}
+		// each answer can have own score
+		if (scoreMappingElement != null) {
+		    List<Element> scoreMappingEntryElements = XMLUtil.findChildren(scoreMappingElement, "mapEntry");
+		    for (Element scoreMappingEntry : scoreMappingEntryElements) {
+			String correctAnswerEntry = scoreMappingEntry.getAttribute("mapKey");
+			if (StringUtils.isBlank(correctAnswerEntry)
+				|| !correctResponses.containsKey(correctAnswerEntry)) {
+			    continue;
+			}
+			String mappedValue = scoreMappingEntry.getAttribute("mappedValue");
+			if (StringUtils.isNotBlank(mappedValue)) {
+			    correctResponses.put(correctAnswerEntry, Float.valueOf(mappedValue));
+			}
+		    }
+		}
+
+		// there should be exactly two sets of answers in XML doc
+		List<Answer> answers = new ArrayList<>();
+		List<Answer> matchAnswers = new ArrayList<>();
+		Map<String, Integer> answerMap = new HashMap<>();
+		List<Element> matchSetElements = XMLUtil.findChildren(matchInteractionElement, "simpleMatchSet");
+
+		List<Element> answerElements = XMLUtil.findChildren(matchSetElements.get(0), "simpleAssociableChoice");
+		int answerIndex = 0;
+		for (Element answerElement : answerElements) {
+		    Answer answer = new Answer();
+		    answer.setText(answerElement.getTextContent());
+		    String identifier = answerElement.getAttribute("identifier");
+		    answerMap.put(identifier, answerIndex);
+		    answers.add(answer);
+		    answerIndex++;
+		}
+		question.setAnswers(answers);
+
+		List<Element> matchAnswersElements = XMLUtil.findChildren(matchSetElements.get(1),
+			"simpleAssociableChoice");
+		answerIndex = 0;
+		for (Element matchAnswerElement : matchAnswersElements) {
+		    Answer answer = new Answer();
+		    answer.setText(matchAnswerElement.getTextContent());
+		    String identifier = matchAnswerElement.getAttribute("identifier");
+		    answerMap.put(identifier, answerIndex);
+		    matchAnswers.add(answer);
+		    answerIndex++;
+		}
+		question.setMatchAnswers(matchAnswers);
+
+		Map<Integer, Integer> matchMap = new HashMap<>();
+		for (Element correctResponseValue : correctResponseValueElements) {
+		    String correctResponse = correctResponseValue.getTextContent();
+		    // either set exact score or the default one
+		    Float score = correctResponses.get(correctResponse);
+		    String[] correctResponseParts = correctResponse.split(" ");
+		    answerIndex = answerMap.get(correctResponseParts[0]);
+		    answers.get(answerIndex).setScore(score == null ? defaultScore : score);
+		    int matchAnswerIndex = answerMap.get(correctResponseParts[1]);
+		    matchMap.put(answerIndex, matchAnswerIndex);
+		}
+		question.setMatchMap(matchMap);
+	    }
+		break;
+	    case Question.QUESTION_TYPE_FILL_IN_BLANK: {
+		Element scoreMappingElement = XMLUtil.findChild(responseDeclarationElement, "mapping");
+		List<Element> scoreMappingEntryElements = XMLUtil.findChildren(scoreMappingElement, "mapEntry");
+		String defaultScoreAttribute = scoreMappingElement.getAttribute("defaultValue");
+		Float defaultScore = 0F;
+		if (StringUtils.isNotBlank(defaultScoreAttribute)) {
+		    defaultScore = Float.valueOf(defaultScoreAttribute);
+		}
+		Map<Float, Answer> scoreMapping = new TreeMap<>();
+		for (Element scoreMappingEntry : scoreMappingEntryElements) {
+		    String correctAnswerEntry = scoreMappingEntry.getAttribute("mapKey");
+		    if (StringUtils.isBlank(correctAnswerEntry)) {
+			continue;
+		    }
+		    String mappedValue = scoreMappingEntry.getAttribute("mappedValue");
+		    Float score = StringUtils.isBlank(mappedValue) ? defaultScore : Float.valueOf(mappedValue);
+		    Answer answer = scoreMapping.get(score);
+		    if (answer == null) {
+			answer = new Answer();
+			answer.setText("");
+			answer.setScore(score);
+			scoreMapping.put(score, answer);
+		    }
+
+		    answer.setText(answer.getText() + correctAnswerEntry.strip() + QbUtils.VSA_ANSWER_DELIMITER);
+		}
+
+		question.setAnswers(List.copyOf(scoreMapping.values()));
+	    }
+		break;
+	}
+
+	// remove answer elements from body
+	Element[] elementsToRemove = new Element[] { choiceInteractionElement, matchInteractionElement,
+		gapMatchInteractionElement, textEntryInteractionElement, extendedTextInteractionElement };
+	for (Element elementToRemove : elementsToRemove) {
+	    if (elementToRemove != null) {
+		elementToRemove.getParentNode().removeChild(elementToRemove);
+	    }
+	}
+	boolean imagesReplaced = QuestionParser.replaceImages(itemBodyElement);
+	if (imagesReplaced) {
+	    question.setResourcesFolderPath(resourcesFolderPath);
+	}
+	// it rips off HTML tags
+	String description = itemBodyElement.getTextContent().trim();
+	question.setText(description);
+
+	return question;
     }
 
     /**
@@ -672,5 +964,58 @@ public class QuestionParser {
 	}
 
 	return result.toString();
+    }
+
+    private static boolean replaceImages(Element element) {
+	if (element == null) {
+	    return false;
+	}
+	NodeList imageNodes = null;
+	try {
+	    imageNodes = (NodeList) xPath.compile(".//img|.//object[@data]").evaluate(element, XPathConstants.NODESET);
+	} catch (Exception e) {
+	    log.error("Error while replacing images for QTI", e);
+	    return false;
+	}
+
+	boolean imageReplaced = false;
+
+	for (int nodeIndex = 0; nodeIndex < imageNodes.getLength(); nodeIndex++) {
+	    Element imageElement = (Element) imageNodes.item(nodeIndex);
+	    String fileName = imageElement.getAttribute("src");
+	    if (StringUtils.isBlank(fileName)) {
+		String objectType = imageElement.getAttribute("type");
+		if (objectType != null && objectType.startsWith("image")) {
+		    fileName = imageElement.getAttribute("data");
+		}
+	    }
+	    if (StringUtils.isBlank(fileName)) {
+		continue;
+	    }
+	    String width = imageElement.getAttribute("width");
+	    String height = imageElement.getAttribute("height");
+	    String classAttr = imageElement.getAttribute("class");
+
+	    StringBuilder imageText = new StringBuilder();
+	    imageText.append("[IMAGE: ").append(fileName);
+	    if (StringUtils.isNotBlank(width)) {
+		imageText.append("| width=\"" + width + "\"");
+	    }
+	    if (StringUtils.isNotBlank(height)) {
+		imageText.append("| height=\"" + height + "\"");
+	    }
+	    if (StringUtils.isNotBlank(classAttr)) {
+		imageText.append("| class=\"" + classAttr + "\"");
+	    }
+	    imageText.append("]");
+
+	    Node imageTextNode = element.getOwnerDocument().createTextNode(imageText.toString());
+
+	    imageElement.getParentNode().replaceChild(imageTextNode, imageElement);
+
+	    imageReplaced = true;
+	}
+
+	return imageReplaced;
     }
 }

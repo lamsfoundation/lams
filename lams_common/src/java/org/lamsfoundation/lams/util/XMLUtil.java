@@ -21,18 +21,8 @@ public class XMLUtil {
      * Otherwise returns defaultValue.
      */
     public static String getChildElementValue(Element parentElement, String childElementName, String defaultValue) {
-	if (parentElement == null || childElementName == null) {
-	    return defaultValue;
-	}
-	List<Element> foundElements = XMLUtil.findChildren(parentElement, childElementName);
-	if (foundElements.size() == 0) {
-	    return defaultValue;
-	}
-	if (foundElements.size() == 1) {
-	    return foundElements.get(0).getTextContent();
-	}
-	throw new InvalidParameterException(
-		"There is more than one element with name \"" + childElementName + "\" in its parent");
+	Element childElement = XMLUtil.findChild(parentElement, childElementName);
+	return childElement == null ? defaultValue : childElement.getTextContent();
     }
 
     /**
@@ -144,5 +134,23 @@ public class XMLUtil {
 	    }
 	}
 	return result;
+    }
+
+    /**
+     * Finds immediate child of a given element with given name.
+     */
+    public static Element findChild(Element parentElement, String childElementName) {
+	if (parentElement == null || childElementName == null) {
+	    return null;
+	}
+	List<Element> foundElements = XMLUtil.findChildren(parentElement, childElementName);
+	if (foundElements.size() == 0) {
+	    return null;
+	}
+	if (foundElements.size() == 1) {
+	    return foundElements.get(0);
+	}
+	throw new InvalidParameterException(
+		"There is more than one element with name \"" + childElementName + "\" in its parent");
     }
 }
