@@ -59,13 +59,13 @@ import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
+import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
@@ -125,6 +125,8 @@ public class MonitoringController {
 
     @Autowired
     private ILogEventService logEventService;
+    @Autowired
+    private ILearningDesignService learningDesignService;
     @Autowired
     private ILessonService lessonService;
     @Autowired
@@ -968,92 +970,9 @@ public class MonitoringController {
 		&& userManagementService.isUserInRole(user.getUserID(), organisation.getOrganisationId(), Role.AUTHOR);
 	request.setAttribute("enableLiveEdit", enableLiveEdit);
 	request.setAttribute("lesson", lessonDTO);
-	request.setAttribute("isTBLSequence", isTBLSequence(lessonId));
+	request.setAttribute("isTBLSequence", learningDesignService.isTBLSequence(lessonDTO.getLearningDesignID()));
 
 	return "monitor";
-    }
-
-    /**
-     * If learning design contains the following activities Grouping->(MCQ or Assessment)->Leader Selection->Scratchie
-     * (potentially with some other gates or activities in the middle), there is a good chance this is a TBL sequence
-     * and all activities must be grouped.
-     */
-    private boolean isTBLSequence(Long lessonId) {
-	Lesson lesson = lessonService.getLesson(lessonId);
-	Long firstActivityId = lesson.getLearningDesign().getFirstActivity().getActivityId();
-	//Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity
-	Activity firstActivity = monitoringService.getActivityById(firstActivityId);
-
-	return verifyNextActivityFitsTbl(firstActivity, "Grouping");
-    }
-
-    /**
-     * Traverses the learning design verifying it follows typical TBL structure
-     *
-     * @param activity
-     * @param anticipatedActivity
-     *            could be either "Grouping", "MCQ or Assessment", "Leaderselection" or "Scratchie"
-     */
-    private boolean verifyNextActivityFitsTbl(Activity activity, String anticipatedActivity) {
-
-	Transition transitionFromActivity = activity.getTransitionFrom();
-	//TBL can finish with the Scratchie
-	if (transitionFromActivity == null && !"Scratchie".equals(anticipatedActivity)) {
-	    return false;
-	}
-	// query activity from DB as transition holds only proxied activity object
-	Long nextActivityId = transitionFromActivity == null ? null
-		: transitionFromActivity.getToActivity().getActivityId();
-	Activity nextActivity = nextActivityId == null ? null : monitoringService.getActivityById(nextActivityId);
-
-	switch (anticipatedActivity) {
-	    case "Grouping":
-		//the first activity should be a grouping
-		if (activity instanceof GroupingActivity) {
-		    return verifyNextActivityFitsTbl(nextActivity, "MCQ or Assessment");
-
-		} else {
-		    return verifyNextActivityFitsTbl(nextActivity, "Grouping");
-		}
-
-	    case "MCQ or Assessment":
-		//the second activity shall be a MCQ or Assessment
-		if (activity.isToolActivity() && (CommonConstants.TOOL_SIGNATURE_ASSESSMENT
-			.equals(((ToolActivity) activity).getTool().getToolSignature())
-			|| CommonConstants.TOOL_SIGNATURE_MCQ
-				.equals(((ToolActivity) activity).getTool().getToolSignature()))) {
-		    return verifyNextActivityFitsTbl(nextActivity, "Leaderselection");
-
-		} else {
-		    return verifyNextActivityFitsTbl(nextActivity, "MCQ or Assessment");
-		}
-
-	    case "Leaderselection":
-		//the third activity shall be a Leader Selection
-		if (activity.isToolActivity() && CommonConstants.TOOL_SIGNATURE_LEADERSELECTION
-			.equals(((ToolActivity) activity).getTool().getToolSignature())) {
-		    return verifyNextActivityFitsTbl(nextActivity, "Scratchie");
-
-		} else {
-		    return verifyNextActivityFitsTbl(nextActivity, "Leaderselection");
-		}
-
-	    case "Scratchie":
-		//the fourth activity shall be Scratchie
-		if (activity.isToolActivity() && CommonConstants.TOOL_SIGNATURE_SCRATCHIE
-			.equals(((ToolActivity) activity).getTool().getToolSignature())) {
-		    return true;
-
-		} else if (nextActivity == null) {
-		    return false;
-
-		} else {
-		    return verifyNextActivityFitsTbl(nextActivity, "Scratchie");
-		}
-
-	    default:
-		return false;
-	}
     }
 
     /**

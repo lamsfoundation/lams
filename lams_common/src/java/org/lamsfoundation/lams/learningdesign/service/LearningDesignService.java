@@ -38,10 +38,12 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
@@ -56,6 +58,7 @@ import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.tool.dto.ToolDTO;
 import org.lamsfoundation.lams.tool.dto.ToolDTONameComparator;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.ILoadedMessageSourceService;
 import org.lamsfoundation.lams.util.MessageService;
@@ -498,4 +501,141 @@ public class LearningDesignService implements ILearningDesignService {
 	return newName;
     }
 
+    /**
+     * If learning design contains the following activities Grouping->(MCQ or Assessment)->Leader Selection->Scratchie
+     * (potentially with some other gates or activities in the middle), there is a good chance this is a TBL sequence
+     * and all activities must be grouped.
+     */
+    @Override
+    public boolean isTBLSequence(long learningDesignId) {
+	LearningDesign learningDesign = getLearningDesign(learningDesignId);
+	Long firstActivityId = learningDesign.getFirstActivity().getActivityId();
+	// Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity
+	Activity firstActivity = activityDAO.getActivityByActivityId(firstActivityId);
+
+	return verifyNextActivityFitsTbl(firstActivity, "Grouping", null, null) != null;
+    }
+
+    /**
+     * Checks if it is a TBL sequence. If so and given tool content ID is a iRAT or tRAT activity,
+     * it returns tool content ID of a matching tRAT / iRAT activity.
+     */
+    @Override
+    public Long findMatchingRatActivity(long toolContentId) {
+	ToolActivity ratActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
+	if (ratActivity == null) {
+	    // this activity has not been saved yet
+	    return null;
+	}
+	Long iRatToolContentId = null;
+	Long tRatToolContentId = null;
+
+	if (CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(ratActivity.getTool().getToolSignature())) {
+	    tRatToolContentId = toolContentId;
+	} else if (CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(ratActivity.getTool().getToolSignature())
+		|| CommonConstants.TOOL_SIGNATURE_MCQ.equals(ratActivity.getTool().getToolSignature())) {
+	    iRatToolContentId = toolContentId;
+	}
+
+	if (iRatToolContentId == null && tRatToolContentId == null) {
+	    return null;
+	}
+
+	LearningDesign learningDesign = ratActivity.getLearningDesign();
+	Long firstActivityId = learningDesign.getFirstActivity().getActivityId();
+	// Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity
+	Activity firstActivity = activityDAO.getActivityByActivityId(firstActivityId);
+
+	return verifyNextActivityFitsTbl(firstActivity, "Grouping", iRatToolContentId, tRatToolContentId);
+    }
+
+    /**
+     * Traverses the learning design verifying it follows typical TBL structure.
+     * Also returns matching iRAT / tRAT activity to the provided iRatToolContentId or tRatToolContentId.
+     *
+     * @param activity
+     * @param anticipatedActivity
+     *            could be either "Grouping", "MCQ or Assessment", "Leaderselection" or "Scratchie"
+     */
+    private Long verifyNextActivityFitsTbl(Activity activity, String anticipatedActivity, Long iRatToolContentId,
+	    Long tRatToolContentId) {
+
+	Transition transitionFromActivity = activity.getTransitionFrom();
+	//TBL can finish with the Scratchie
+	if (transitionFromActivity == null && !"Scratchie".equals(anticipatedActivity)) {
+	    return null;
+	}
+	// query activity from DB as transition holds only proxied activity object
+	Long nextActivityId = transitionFromActivity == null ? null
+		: transitionFromActivity.getToActivity().getActivityId();
+	Activity nextActivity = nextActivityId == null ? null : activityDAO.getActivityByActivityId(nextActivityId);
+
+	switch (anticipatedActivity) {
+	    case "Grouping":
+		//the first activity should be a grouping
+		if (activity instanceof GroupingActivity) {
+		    return verifyNextActivityFitsTbl(nextActivity, "MCQ or Assessment", iRatToolContentId,
+			    tRatToolContentId);
+
+		} else {
+		    return verifyNextActivityFitsTbl(nextActivity, "Grouping", iRatToolContentId, tRatToolContentId);
+		}
+
+	    case "MCQ or Assessment":
+		//the second activity shall be a MCQ or Assessment
+		if (activity.isToolActivity() && (CommonConstants.TOOL_SIGNATURE_ASSESSMENT
+			.equals(((ToolActivity) activity).getTool().getToolSignature())
+			|| CommonConstants.TOOL_SIGNATURE_MCQ
+				.equals(((ToolActivity) activity).getTool().getToolSignature()))) {
+		    if (iRatToolContentId == null) {
+			iRatToolContentId = ((ToolActivity) activity).getToolContentId();
+		    }
+		    return verifyNextActivityFitsTbl(nextActivity, "Leaderselection", iRatToolContentId,
+			    tRatToolContentId);
+
+		} else {
+		    return verifyNextActivityFitsTbl(nextActivity, "MCQ or Assessment", iRatToolContentId,
+			    tRatToolContentId);
+		}
+
+	    case "Leaderselection":
+		//the third activity shall be a Leader Selection
+		if (activity.isToolActivity() && CommonConstants.TOOL_SIGNATURE_LEADERSELECTION
+			.equals(((ToolActivity) activity).getTool().getToolSignature())) {
+		    return verifyNextActivityFitsTbl(nextActivity, "Scratchie", iRatToolContentId, tRatToolContentId);
+
+		} else {
+		    return verifyNextActivityFitsTbl(nextActivity, "Leaderselection", iRatToolContentId,
+			    tRatToolContentId);
+		}
+
+	    case "Scratchie":
+		//the fourth activity shall be Scratchie
+		if (activity.isToolActivity() && CommonConstants.TOOL_SIGNATURE_SCRATCHIE
+			.equals(((ToolActivity) activity).getTool().getToolSignature())) {
+		    // if at this point iRAT content ID is null, it means that it was not found
+		    // and it is not a TBL sequence
+		    if (iRatToolContentId == null) {
+			return null;
+		    }
+		    // if tRAT content ID is null it means that iRAT content ID was provided as a parameter
+		    // and we are looking for tRAT content ID, i.e. this activity
+		    if (tRatToolContentId == null) {
+			tRatToolContentId = ((ToolActivity) activity).getToolContentId();
+			return tRatToolContentId;
+		    }
+		    // if tRAT content ID was not null it means that we are looking for iRAT content ID
+		    return iRatToolContentId;
+
+		} else if (nextActivity == null) {
+		    return null;
+
+		} else {
+		    return verifyNextActivityFitsTbl(nextActivity, "Scratchie", iRatToolContentId, tRatToolContentId);
+		}
+
+	    default:
+		return null;
+	}
+    }
 }

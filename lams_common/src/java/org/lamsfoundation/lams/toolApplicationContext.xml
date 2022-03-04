@@ -92,6 +92,7 @@
 			   		<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>
 			   		<property name="lessonService"><ref bean="lessonService"/></property>
 					<property name="learnerService"><ref bean="learnerService"/></property>
+					<property name="learningDesignService"><ref bean="learningDesignService"/></property>
 					<property name="dataFlowDAO"><ref bean="dataFlowDAO"/></property>
 					<property name="userManagementService"><ref bean="userManagementService"/></property>
 				</bean>

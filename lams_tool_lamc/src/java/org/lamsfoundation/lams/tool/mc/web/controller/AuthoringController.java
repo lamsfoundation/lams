@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -52,6 +53,7 @@ import org.lamsfoundation.lams.tool.mc.model.McQueContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.util.AuthoringUtil;
 import org.lamsfoundation.lams.tool.mc.web.form.McAuthoringForm;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -88,6 +90,9 @@ public class AuthoringController {
 
     @Autowired
     private IQbService qbService;
+
+    @Autowired
+    private ILamsToolService lamsToolService;
 
     @Autowired
     @Qualifier("lamcMessageService")
@@ -242,6 +247,11 @@ public class AuthoringController {
 		mcService.saveOrUpdateMcQueContent(existingQuestion);
 		displayOrder++;
 	    }
+
+	    List<Long> newQuestionUids = sortedQuestions.stream()
+		    .collect(Collectors.mapping(q -> q.getQbQuestion().getUid(), Collectors.toList()));
+	    lamsToolService.syncRatQuestions(toolContentID, newQuestionUids);
+
 	}
 
 	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
@@ -837,10 +847,10 @@ public class AuthoringController {
 	    question.setTitle(mcQuestion.getName());
 	    question.setText(mcQuestion.getDescription());
 	    question.setFeedback(mcQuestion.getFeedback());
-	    
+
 	    QbQuestion qbQuestion = qbService.getQuestionByUid(mcQuestion.getQbQuestionUid());
 	    question.setLabel(QuestionParser.UUID_LABEL_PREFIX + qbQuestion.getUuid());
-	    
+
 	    List<Answer> answers = new ArrayList<>();
 
 	    for (McOptionDTO mcAnswer : mcQuestion.getOptionDtos()) {

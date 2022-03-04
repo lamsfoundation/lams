@@ -2241,6 +2241,9 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		: IQbService.QUESTION_MODIFIED_NONE;
     }
 
+    /**
+     * Updates updates this iRAT activity with tRAT questions.
+     */
     @Override
     public List<QbToolQuestion> replaceQuestions(long toolContentId, String newActivityName,
 	    List<QbQuestion> newQuestions) {
@@ -2267,6 +2270,82 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    result.add(mcQuestion);
 	}
 	return result;
+    }
+
+    @Override
+    public boolean syncRatQuestions(long toolContentId, List<Long> newQuestionUids) {
+	McContent mcContent = getMcContent(toolContentId);
+
+	List<McQueContent> existingReferences = new ArrayList<>(mcContent.getMcQueContents());
+	List<McQueContent> newReferences = new ArrayList<>();
+	Set<McQueContent> referencesToRemove = new HashSet<>(existingReferences);
+
+	int displayOrder = 0;
+	boolean syncNeeded = false;
+	for (Long newQuestionUid : newQuestionUids) {
+	    QbQuestion newQuestion = qbService.getQuestionByUid(newQuestionUid);
+	    displayOrder++;
+
+	    McQueContent matchingReference = null;
+	    for (McQueContent existingReference : existingReferences) {
+		// try to find exactly same question
+		if (newQuestion.getUid().equals(existingReference.getQbQuestion().getUid())) {
+		    matchingReference = existingReference;
+		    syncNeeded |= displayOrder != existingReference.getDisplayOrder();
+		    break;
+		}
+	    }
+
+	    if (matchingReference == null) {
+		syncNeeded = true;
+		for (McQueContent existingReference : existingReferences) {
+		    // try to find same question with another version
+		    if (newQuestion.getQuestionId().equals(existingReference.getQbQuestion().getQuestionId())) {
+			existingReference.setQbQuestion(newQuestion);
+			matchingReference = existingReference;
+			break;
+		    }
+		}
+	    }
+
+	    if (matchingReference == null) {
+		// build question reference from scratch
+		matchingReference = new McQueContent();
+		matchingReference.setDisplayOrder(displayOrder);
+		matchingReference.setAnswerRequired(true);
+		matchingReference.setQbQuestion(newQuestion);
+		matchingReference.setToolContentId(toolContentId);
+		mcQueContentDAO.saveOrUpdateMcQueContent(matchingReference);
+	    } else {
+		matchingReference.setDisplayOrder(displayOrder);
+		referencesToRemove.remove(matchingReference);
+	    }
+
+	    newReferences.add(matchingReference);
+	}
+
+	// all this collections clearing is for Hibernate to feel safe
+	existingReferences.clear();
+	syncNeeded |= !referencesToRemove.isEmpty();
+
+	if (!syncNeeded) {
+	    return false;
+	}
+
+	mcContent.getMcQueContents().clear();
+
+	for (McQueContent referenceToRemove : referencesToRemove) {
+	    // remove question removed from the matching RAT activity
+	    mcQueContentDAO.removeMcQueContent(referenceToRemove);
+	}
+	referencesToRemove.clear();
+
+	mcContent.getMcQueContents().addAll(newReferences);
+	newReferences.clear();
+
+	mcContentDAO.saveOrUpdateMc(mcContent);
+
+	return true;
     }
 
     @Override

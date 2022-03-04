@@ -1689,7 +1689,13 @@ GeneralLib = {
 	 */
 	checkQuestionExistsInToolActivities : function(qbQuestionUid) {
 		let resultToolContentIds = [],
-			candidateToolContentIds = [];
+			candidateToolContentIds = [],
+			isTBL = GeneralLib.checkTBLGrouping() !== null;
+			
+		if (isTBL) {
+			// TBL has more sophisticated ways of syncing questions
+			return [];
+		}
 		
 		// list all tool activities
 		$.each(layout.activities, function() {

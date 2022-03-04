@@ -39,6 +39,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -63,6 +64,7 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchieForm;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
@@ -100,6 +102,8 @@ public class AuthoringController {
     private IScratchieService scratchieService;
     @Autowired
     private IQbService qbService;
+    @Autowired
+    private ILamsToolService lamsToolService;
     @Autowired
     private IUserManagementService userManagementService;
     @Autowired
@@ -309,6 +313,10 @@ public class AuthoringController {
 		scratchieService.deleteScratchieItem(item.getUid());
 	    }
 	}
+
+	List<Long> newQuestionUids = scratchiePO.getScratchieItems().stream()
+		.collect(Collectors.mapping(q -> q.getQbQuestion().getUid(), Collectors.toList()));
+	lamsToolService.syncRatQuestions(scratchiePO.getContentId(), newQuestionUids);
 
 	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
