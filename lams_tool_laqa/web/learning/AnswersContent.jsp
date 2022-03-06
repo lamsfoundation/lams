@@ -271,7 +271,7 @@
 				<c:if test="${generalLearnerFlowDTO.initialScreen != 'true'}">
 					<p>
 						<fmt:message key="label.questions.remaining" />&nbsp;
-						<c:out value="${generalLearnerFlowDTO.remainingQuestionCount}" />
+						<c:out value="${generalLearnerFlowDTO.remainingQuestionCount}" />&nbsp;
 					</p>
 				</c:if>
 
@@ -280,9 +280,10 @@
 
 			<c:otherwise>
 				<c:if test="${generalLearnerFlowDTO.totalQuestionCount != 1}">
-					<fmt:message key="label.feedback.combined" /> &nbsp <c:out
-						value="${generalLearnerFlowDTO.remainingQuestionCount}" />
-					<fmt:message key="label.questions.simple" />
+					<p style="font-size: smaller;">
+					<fmt:message key="label.feedback.combined" />&nbsp;<c:out
+						value="${generalLearnerFlowDTO.remainingQuestionCount}" />&nbsp;<fmt:message key="label.questions.simple" />
+					</p>
 				</c:if>
 
 				<jsp:include page="/learning/CombinedAnswersContent.jsp" />
