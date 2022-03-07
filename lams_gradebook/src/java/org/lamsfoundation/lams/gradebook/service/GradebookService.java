@@ -397,11 +397,11 @@ public class GradebookService implements IGradebookFullService {
 		learners = gradebookDAO.getUsersByGroup(lessonId, activityId, groupId, page, size, sortBy, sortOrder,
 			searchString);
 	    } else {
-		learners = gradebookDAO.getUsersByActivity(lessonId, activityId, page, size, sortBy, sortOrder,
+		learners = gradebookDAO.getLearnersByActivity(lessonId, activityId, page, size, sortBy, sortOrder,
 			searchString);
 	    }
 	} else {
-	    learners = gradebookDAO.getUsersByActivity(lessonId, activityId, page, size, sortBy, sortOrder,
+	    learners = gradebookDAO.getLearnersByActivity(lessonId, activityId, page, size, sortBy, sortOrder,
 		    searchString);
 	}
 
@@ -490,7 +490,7 @@ public class GradebookService implements IGradebookFullService {
 		userToGradebookUserLessonMap = getUserToGradebookUserLessonMap(lesson, null);
 
 	    } else {
-		learners = gradebookDAO.getUsersByLesson(lesson.getLessonId(), page, size, sortBy, sortOrder,
+		learners = gradebookDAO.getLearnersByLesson(lesson.getLessonId(), page, size, sortBy, sortOrder,
 			searchString);
 		userToLearnerProgressMap = getUserToLearnerProgressMap(lesson, learners);
 		userToGradebookUserLessonMap = getUserToGradebookUserLessonMap(lesson, learners);
@@ -564,7 +564,7 @@ public class GradebookService implements IGradebookFullService {
 	ArrayList<GBUserGridRowDTO> gradebookUserDTOs = new ArrayList<>();
 
 	if (organisation != null) {
-	    List<User> learners = gradebookDAO.getUsersFromOrganisation(organisation.getOrganisationId(), page, size,
+	    List<User> learners = gradebookDAO.getLearnersFromOrganisation(organisation.getOrganisationId(), page, size,
 		    sortOrder, searchString);
 
 	    if (learners != null) {
