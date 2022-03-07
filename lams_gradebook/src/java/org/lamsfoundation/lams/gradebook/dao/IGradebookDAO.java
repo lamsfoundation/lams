@@ -79,18 +79,18 @@ public interface IGradebookDAO extends IBaseDAO {
     List<Lesson> getLessonsByGroupAndUser(final Integer userId, boolean staffOnly, final Integer orgId, int page,
 	    int size, String sortBy, String sortOrder, String searchString);
 
-    List<User> getUsersByLesson(Long lessonId, int page, int size, String sortBy, String sortOrder,
+    List<User> getLearnersByLesson(Long lessonId, int page, int size, String sortBy, String sortOrder,
 	    String searchString);
 
     List<User> getUsersByGroup(Long lessonId, Long activityId, Long groupId, int page, int size, String sortBy,
 	    String sortOrder, String searchString);
 
-    List<User> getUsersByActivity(Long lessonId, Long activityId, int page, int size, String sortBy, String sortOrder,
+    List<User> getLearnersByActivity(Long lessonId, Long activityId, int page, int size, String sortBy, String sortOrder,
 	    String searchString);
 
     int getCountUsersByLesson(Long lessonId, String searchString);
 
-    List<User> getUsersFromOrganisation(Integer orgId, int page, int size, String sortOrder, String searchString);
+    List<User> getLearnersFromOrganisation(Integer orgId, int page, int size, String sortOrder, String searchString);
 
     int getCountUsersByOrganisation(Integer orgId, String searchString);
 
