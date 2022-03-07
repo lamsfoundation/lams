@@ -495,7 +495,7 @@ function showGradebookCourseDialog(orgID){
 		'width' : Math.max(380, Math.min(955, $(window).width() - 60)),
 		'title' : LABELS.GRADEBOOK_COURSE_TITLE,
 		'open' : function() {
-			console.log("width "+$(window).width()+":"+Math.max(380, Math.min(955, $(window).width() - 60)));
+			// console.log("width "+$(window).width()+":"+Math.max(380, Math.min(955, $(window).width() - 60)));
 			// load contents after opening the dialog
 			$('iframe', this).attr({'src': LAMS_URL
 				+ 'gradebook/gradebookMonitoring/courseMonitor.do?organisationID=' + orgID,
