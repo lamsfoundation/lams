@@ -26,6 +26,20 @@
 	 	.embedded-description {
 	 		padding: 0.5em;
 	 	}
+	 	
+	 	.embedded-file {
+	 		text-align: center;
+	 		margin: auto;
+	 	}
+	 	
+	 	.embedded-file img {
+	 		max-width: 800px;
+	 	}
+	 	
+	 	.embedded-file embed {
+	 		width: 800px;
+	 		min-height: 600px;
+	 	}
 	</style>
 
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
