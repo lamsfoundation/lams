@@ -56,6 +56,9 @@ public class ViewItemController {
     @Autowired
     private IResourceService resourceService;
 
+    private static final Set<String> DISPLAYABLE_IMAGE_EXTENSIONS = Set.of(".jpg", ".jpeg", ".png", ".gif", ".bmp");
+    private static final Set<String> DISPLAYABLE_EMBED_EXTENSIONS = Set.of(".pdf");
+
     /**
      * Display main frame to display item content in monitoring
      */
@@ -131,10 +134,21 @@ public class ViewItemController {
 	    return "error";
 	}
 
+	boolean isDownload = item.getType() == ResourceConstants.RESOURCE_TYPE_FILE;
+	request.setAttribute(ResourceConstants.ATTR_IS_DOWNLOAD, isDownload);
+	String lowercaseFileName = isDownload && StringUtils.isNotBlank(item.getFileName())
+		? item.getFileName().toLowerCase()
+		: null;
+	boolean isDisplayableImage = lowercaseFileName != null
+		&& DISPLAYABLE_IMAGE_EXTENSIONS.stream().anyMatch(ext -> lowercaseFileName.endsWith(ext));
+	request.setAttribute(ResourceConstants.ATTR_IS_DISPLAYABLE_IMAGE, isDisplayableImage);
+	boolean isDisplayableEmbed = lowercaseFileName != null
+		&& DISPLAYABLE_EMBED_EXTENSIONS.stream().anyMatch(ext -> lowercaseFileName.endsWith(ext));
+	request.setAttribute(ResourceConstants.ATTR_IS_DISPLAYABLE_EMBED, isDisplayableEmbed);
+
 	String reviewUrl = getReviewUrl(item, sessionMapID);
 	request.setAttribute(ResourceConstants.ATTR_RESOURCE_REVIEW_URL, reviewUrl);
-	request.setAttribute(ResourceConstants.ATTR_IS_DOWNLOAD,
-		item.getType() == ResourceConstants.RESOURCE_TYPE_FILE);
+
 	request.setAttribute(ResourceConstants.ATTR_RESOURCE_INSTRUCTION, item.getInstructions());
 	request.setAttribute(ResourceConstants.ATTR_ALLOW_COMMENTS, item.isAllowComments());
 	request.setAttribute(ResourceConstants.ATTR_ALLOW_RATING, item.isAllowRating());
@@ -228,7 +242,7 @@ public class ViewItemController {
 		}
 		break;
 	    case ResourceConstants.RESOURCE_TYPE_FILE:
-		url = "/download/?uuid=" + item.getFileUuid() + "&preferDownload=true";
+		url = "/download/?uuid=" + item.getFileUuid();
 		break;
 	}
 	return url;

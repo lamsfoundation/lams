@@ -79,6 +79,10 @@ public class ResourceConstants {
     public static final String ATTR_RESOURCE_REVIEW_URL = "resourceItemReviewUrl";
 
     public static final String ATTR_IS_DOWNLOAD = "isDownload";
+    
+    public static final String ATTR_IS_DISPLAYABLE_IMAGE = "isDisplayableImage";
+    
+    public static final String ATTR_IS_DISPLAYABLE_EMBED = "isDisplayableEmbed";
 
     public static final String ATTR_RESOURCE = "resource";
 

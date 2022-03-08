@@ -70,7 +70,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	<div class="content-panel">
 		<div class="text-center">
-			<a href="<c:url value='${resourceItemReviewUrl}' />" class="download-button hidden btn btn-primary">
+			<a href="<c:url value='${resourceItemReviewUrl}' />&preferDownload=true" class="download-button hidden btn btn-primary">
 				<fmt:message key="label.download" />
 			</a>
 			<a href="${resourceItemReviewUrl}" target="_blank" class="embedded-open-button hidden btn btn-default btn-sm pull-right">
@@ -82,6 +82,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<i title="<fmt:message key='open.in.new.window' />" class="new-window-icon fa fa-1 hidden fa-external-link" aria-hidden="true"></i>
 		<div class="embedded-description"></div>
 		<div class="embedded-content"></div>
+		
+		<c:if test="${isDisplayableImage}">
+			<img src="<c:url value='${resourceItemReviewUrl}' />&preferDownload=false" class="embedded-image" />
+		</c:if>
+		<c:if test="${isDisplayableEmbed}">
+			<embed src="<c:url value='${resourceItemReviewUrl}' />&preferDownload=false" class="embedded-file"  />
+		</c:if>
 	</div>
 	<hr>
 	<c:if test="${mode eq 'learner' or mode eq 'author'}">
