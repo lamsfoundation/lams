@@ -432,14 +432,17 @@
 						</div>
 						
 						<p class="help-block"><small><fmt:message key="errors.required"><fmt:param>*</fmt:param></fmt:message></small></p>
-						<div class="form-group">
+						
 							<c:if test="${hasEditRight}">
-								<button id="uploadButton" type="submit" <c:if test="${sessionMap.finishLock || sessionMap.maxLimitReached}">disabled="disabled"</c:if>
-									class="btn btn-sm btn-default btn-primary btn-disable-on-submit pull-right">
-									<i class="fa fa-xs fa-plus"></i> <fmt:message key="label.add" />
-								</button>
+								<div class="form-group text-center">
+									<h4><fmt:message key="label.add.hint" /></h4>
+									<button id="uploadButton" type="submit" <c:if test="${sessionMap.finishLock || sessionMap.maxLimitReached}">disabled="disabled"</c:if>
+										class="btn btn-lg btn-default btn-primary btn-disable-on-submit">
+										<i class="fa fa-xs fa-plus"></i> <fmt:message key="label.add" />
+									</button>
+								</div>
 							</c:if>
-						</div>
+						
 					</div>
 				</div>
 			</form:form>
