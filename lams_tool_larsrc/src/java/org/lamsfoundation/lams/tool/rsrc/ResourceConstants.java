@@ -81,6 +81,8 @@ public class ResourceConstants {
     public static final String ATTR_IS_DOWNLOAD = "isDownload";
     
     public static final String ATTR_IS_DISPLAYABLE_IMAGE = "isDisplayableImage";
+
+    public static final String  ATTR_IS_DISPLAYABLE_MEDIA = "isDisplayableMedia";
     
     public static final String ATTR_IS_DISPLAYABLE_EMBED = "isDisplayableEmbed";
 

@@ -59,6 +59,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	function iframelyCallback${itemUid}(response) {
 		iframelyCallback(${itemUid}, response);
 	}
+
 </script>
 	
 <div id="item-content-${itemUid}" class="item-content">
@@ -69,6 +70,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</c:if>
 	
 	<div class="content-panel">
+	
 		<div class="text-center">
 			<a href="<c:url value='${resourceItemReviewUrl}' />&preferDownload=true" class="download-button hidden btn btn-primary">
 				<fmt:message key="label.download" />
@@ -77,18 +79,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<fmt:message key="open.in.new.window" />
 			</a>
 		</div>
-	
+
 		<a title="<fmt:message key='open.in.new.window' />" class="embedded-title" href="${resourceItemReviewUrl}"  target="_blank"   ></a>&nbsp;&nbsp;
 		<i title="<fmt:message key='open.in.new.window' />" class="new-window-icon fa fa-1 hidden fa-external-link" aria-hidden="true"></i>
 		<div class="embedded-description"></div>
-		<div class="embedded-content"></div>
+		<div class="embedded-content">
 		
-		<c:if test="${isDisplayableImage}">
-			<img src="<c:url value='${resourceItemReviewUrl}' />&preferDownload=false" class="embedded-image" />
-		</c:if>
-		<c:if test="${isDisplayableEmbed}">
-			<embed src="<c:url value='${resourceItemReviewUrl}' />&preferDownload=false" class="embedded-file"  />
-		</c:if>
+			<c:if test="${isDisplayableImage}">
+				<img src="<c:url value='${resourceItemReviewUrl}' />&preferDownload=false" class="img-responsive embedded-image" />
+			</c:if>
+			<c:if test="${isDisplayableMedia}">
+				<video width="100%" playsinline controls src="<c:url value='${resourceItemReviewUrl}' />&preferDownload=false" class="embedded-file"></video>
+			</c:if>
+			<c:if test="${isDisplayableEmbed}">
+				<iframe src="<c:url value='${resourceItemReviewUrl}' />&preferDownload=false"  width="100%" height="500px" />
+			</c:if>		
+
+		</div>
+
 	</div>
 	<hr>
 	<c:if test="${mode eq 'learner' or mode eq 'author'}">

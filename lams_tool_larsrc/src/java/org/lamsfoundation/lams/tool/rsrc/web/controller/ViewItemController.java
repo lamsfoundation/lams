@@ -56,7 +56,8 @@ public class ViewItemController {
     @Autowired
     private IResourceService resourceService;
 
-    private static final Set<String> DISPLAYABLE_IMAGE_EXTENSIONS = Set.of(".jpg", ".jpeg", ".png", ".gif", ".bmp");
+    private static final Set<String> DISPLAYABLE_IMAGE_EXTENSIONS = Set.of(".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg");
+	private static final Set<String> DISPLAYABLE_MEDIA_EXTENSIONS = Set.of(".mov", ".mp4", ".webm", ".ogg", ".mp3", ".wav");
     private static final Set<String> DISPLAYABLE_EMBED_EXTENSIONS = Set.of(".pdf");
 
     /**
@@ -142,6 +143,11 @@ public class ViewItemController {
 	boolean isDisplayableImage = lowercaseFileName != null
 		&& DISPLAYABLE_IMAGE_EXTENSIONS.stream().anyMatch(ext -> lowercaseFileName.endsWith(ext));
 	request.setAttribute(ResourceConstants.ATTR_IS_DISPLAYABLE_IMAGE, isDisplayableImage);
+
+	boolean isDisplayableMedia = lowercaseFileName != null
+		&& DISPLAYABLE_MEDIA_EXTENSIONS.stream().anyMatch(ext -> lowercaseFileName.endsWith(ext));
+	request.setAttribute(ResourceConstants.ATTR_IS_DISPLAYABLE_MEDIA, isDisplayableMedia);
+	
 	boolean isDisplayableEmbed = lowercaseFileName != null
 		&& DISPLAYABLE_EMBED_EXTENSIONS.stream().anyMatch(ext -> lowercaseFileName.endsWith(ext));
 	request.setAttribute(ResourceConstants.ATTR_IS_DISPLAYABLE_EMBED, isDisplayableEmbed);
