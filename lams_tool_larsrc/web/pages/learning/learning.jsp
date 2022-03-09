@@ -35,7 +35,7 @@
 	 	.embedded-description {
 	 		padding: 0.5em;
 	 	}
-	 		 	
+	 	
 	 	.embedded-file {
 	 		text-align: center;
 	 		margin: auto;
@@ -45,9 +45,13 @@
 	 		max-width: 800px;
 	 	}
 	 	
+	 	.embedded-file video {
+	 		width: 100%;
+	 	}
+	 	
 	 	.embedded-file embed {
-	 		width: 800px;
-	 		min-height: 600px;
+	 		width: 100%;
+	 		min-height: 500px;
 	 	}
 	 	
 	 	.delete-item-button {

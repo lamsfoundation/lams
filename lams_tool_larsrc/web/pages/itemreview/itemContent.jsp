@@ -86,13 +86,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<div class="embedded-content">
 		
 			<c:if test="${isDisplayableImage}">
-				<img src="<c:url value='${resourceItemReviewUrl}' />&preferDownload=false" class="img-responsive embedded-image" />
+				<div class="embedded-file">
+					<img src="<c:url value='${resourceItemReviewUrl}' />&preferDownload=false" />
+				</div>
 			</c:if>
 			<c:if test="${isDisplayableMedia}">
-				<video width="100%" playsinline controls src="<c:url value='${resourceItemReviewUrl}' />&preferDownload=false" class="embedded-file"></video>
+				<div class="embedded-file">
+					<video playsinline controls src="<c:url value='${resourceItemReviewUrl}' />&preferDownload=false"></video>
+				</div>
 			</c:if>
 			<c:if test="${isDisplayableEmbed}">
-				<iframe src="<c:url value='${resourceItemReviewUrl}' />&preferDownload=false"  width="100%" height="500px" />
+				<div class="embedded-file">
+					<embed src="<c:url value='${resourceItemReviewUrl}' />&preferDownload=false#toolbar=0" />
+				</div>
 			</c:if>		
 
 		</div>
