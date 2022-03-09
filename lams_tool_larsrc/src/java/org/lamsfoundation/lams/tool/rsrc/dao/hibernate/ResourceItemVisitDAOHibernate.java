@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemVisitLog;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -143,7 +144,8 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
 		Date completeDate = element[2] == null ? null : new Date(((Timestamp) element[2]).getTime());
 		Date accessDate = element[3] == null ? null : new Date(((Timestamp) element[3]).getTime());
 		Date timeTaken = (element[2] == null || element[3] == null) ? null
-			: new Date(completeDate.getTime() - accessDate.getTime());
+			: DateUtil.convertToUTC(new Date(completeDate.getTime() - accessDate.getTime()));
+
 		String portraitId = (String) element[4];
 
 		VisitLogDTO visitLogDto = new VisitLogDTO();
