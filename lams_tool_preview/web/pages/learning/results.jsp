@@ -10,7 +10,7 @@
 <c:set var="peerreview" value="${sessionMap.peerreview}" />
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 <c:set var="isCommentsEnabled" value="${sessionMap.isCommentsEnabled}" />
-
+<c:set var="finishImmediately" value="${peerreview.lockWhenFinished and not peerreview.showRatingsLeftByUser and not peerreview.showRatingsLeftForUser and not peerreview.reflectOnActivity}" />
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" />
@@ -49,6 +49,13 @@
 		checkNextGateActivity('finishButton', '${toolSessionId}', '', finishSession);
 	
 		$(document).ready(function(){
+			var finishImmediately = ${finishImmediately};
+
+			if (finishImmediately) {
+				$('#finishButton').click();
+				return;
+			}
+		
 			$(".tablesorter").tablesorter({
 				theme: 'bootstrap',
 			    widthFixed: true,
@@ -78,6 +85,7 @@
 		function redoRatings(){
 			document.location.href='<c:url value="/learning/start.do?toolSessionID=${toolSessionId}&mode=${mode}&isRedo=true"/>';
 		}
+
     </script>
 </lams:head>
 <body class="stripes">
@@ -144,7 +152,7 @@
 	<!-- End Reflection -->
 
 	<c:if test="${!peerreview.lockWhenFinished}">
-		<a href="#nogo" class="btn btn-default voffset5 pull-left" onclick="redoRatings();">
+		<a href="#nogo" class="btn btn-default voffset5 pull-left voffset20" onclick="redoRatings();">
 			<fmt:message key="label.redo" />
 		</a>
 	</c:if>	
@@ -153,12 +161,12 @@
 		<div>
 			<c:choose>			
 				<c:when test="${sessionMap.reflectOn and empty sessionMap.reflectEntry}">
-					<a href="#nogo" id="continueButton" onclick="return continueReflect()" class="btn btn-default voffset5 pull-right">
+					<a href="#nogo" id="continueButton" onclick="return continueReflect()" class="btn btn-default voffset5 pull-right voffset20">
 						<fmt:message key="label.continue" />
 					</a>
 				</c:when>
 				<c:otherwise>
-					<a href="#nogo" id="finishButton" class="btn btn-primary voffset5 pull-right na">
+					<a href="#nogo" id="finishButton" class="btn btn-primary voffset5 pull-right na voffset20">
 						<fmt:message key="label.finished" />
 					</a>
 				</c:otherwise>

@@ -36,13 +36,8 @@
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script src="${lams}includes/javascript/jquery.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/bootstrap.min.js" type="text/javascript"></script>
-	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	
 	<script type="text/javascript">
-		<c:if test="${displayFinalFinishButton}">
-			checkNextGateActivity('finishButton', '${toolSessionId}', '', finishSession);
-		</c:if>
-		
 		function hideButtons() {
 			$("#buttonNextPrevDiv").css("visibility", "hidden");
 		}	
@@ -148,9 +143,6 @@
 			<span id="prevButton" class="btn btn-default" onclick="javascript:${method}(false);"><fmt:message key="label.previous"/></span>
 		</c:if>
 		<c:choose>
-			<c:when test="${displayFinalFinishButton}">
-				<span id="finishButton" class="btn btn-primary">${finishButtonLabel}</span>
-			</c:when>
 			<c:when test="${stepNumber == numCriteria}">
 				<span id="finishButton" class="btn btn-primary" onclick="javascript:${method}(true);">${finishButtonLabel}</span>
 			</c:when>
