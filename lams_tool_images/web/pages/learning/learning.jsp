@@ -34,6 +34,7 @@
 	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 	<c:set var="mediumImageDimensions" value="${sessionMap.mediumImageDimensions}" />
 	<c:set var="thumbnailImageDimensions" value="${empty sessionMap.thumbnailImageDimensions ? 100 : sessionMap.thumbnailImageDimensions}" />
+	<c:set var="language"><lams:user property="localeLanguage"/></c:set>
 
 	<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>/includes/css/fotorama.css"/>
 	<link href="<lams:WebAppURL/>includes/css/imageGallery.css" rel="stylesheet" type="text/css">
@@ -42,6 +43,7 @@
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.theme-blue.css">
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.pager.css">
 	<link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
+	<link href="${lams}css/uppy.custom.css" rel="stylesheet" type="text/css" />
     
     <script type="text/javascript">
 		<%-- used for  imageGalleryitem.js --%>

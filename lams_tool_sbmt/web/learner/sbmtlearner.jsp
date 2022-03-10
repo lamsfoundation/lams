@@ -8,13 +8,15 @@
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}"/>
 <c:set var="isLeadershipEnabled" value="${sessionMap.useSelectLeaderToolOuput}"/>
 <c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
+<c:set var="language"><lams:user property="localeLanguage"/></c:set>
 <lams:html>
 <lams:head>
 		
 	<title><fmt:message key="tool.display.name" /></title>
 	<%@ include file="/common/header.jsp"%>
 	
-	<link href="/lams/css/uppy.min.css" rel="stylesheet" type="text/css" />
+	<link href="/lams/css/uppy.min.css"    rel="stylesheet" type="text/css" />
+	<link href="/lams/css/uppy.custom.css" rel="stylesheet" type="text/css" />
 	
 	<script type="text/javascript" src="${lams}/includes/javascript/uppy/uppy.min.js"></script>
 	<c:choose>
@@ -28,7 +30,7 @@
 			<script type="text/javascript" src="${lams}/includes/javascript/uppy/el_GR.min.js"></script>
 		</c:when>
 	</c:choose>
-		<lams:JSImport src="learning/includes/javascript/gate-check.js" />
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 		
 	<script type="text/javascript">
 		checkNextGateActivity('finishButton', '${sessionMap.toolSessionID}', '', finish);
@@ -44,7 +46,7 @@
 			$("time.timeago").timeago();
 			
 			if ($('#file-upload-area').length == 1) {
-				initFileUpload('${learnerForm.tmpFileUploadId}', '<lams:user property="localeLanguage"/>');
+				initFileUpload('${learnerForm.tmpFileUploadId}', '${language}');
 			}
 
 			<%-- Connect to command websocket only if it is learner UI --%>
@@ -63,7 +65,7 @@
 		/**
 		 * Initialise Uppy as the file upload widget
 		 */
-		function initFileUpload(tmpFileUploadId, singleFileUpload, language) {
+		function initFileUpload(tmpFileUploadId, language) {
 			  var uppyProperties = {
 				  // upload immediately 
 				  autoProceed: true,
@@ -111,7 +113,7 @@
 			  uppy.use(Uppy.Dashboard, {
 				  target: '#file-upload-area',
 				  inline: true,
-				  height: 300,
+				  height: 200,
 				  width: '100%',
 				  showProgressDetails : true,
 				  hideRetryButton : true,
@@ -416,7 +418,7 @@
 						<fmt:message key="label.learner.upload" />
 					</div>
 					
-					<div class="panel-body">
+					<div class="panel-body bg-success">
 						<div class="form-group">
 							<label for="file-upload-area"><fmt:message key="label.learner.filePath" />&nbsp;<span style="color: red">*</span></label>
 							
@@ -435,9 +437,9 @@
 						
 							<c:if test="${hasEditRight}">
 								<div class="form-group text-center">
-									<h4><fmt:message key="label.add.hint" /></h4>
 									<button id="uploadButton" type="submit" <c:if test="${sessionMap.finishLock || sessionMap.maxLimitReached}">disabled="disabled"</c:if>
-										class="btn btn-lg btn-default btn-primary btn-disable-on-submit">
+										class="btn btn-default btn-success btn-disable-on-submit"
+										title='<fmt:message key="label.add.tip" />' >
 										<i class="fa fa-xs fa-plus"></i> <fmt:message key="label.add" />
 									</button>
 								</div>

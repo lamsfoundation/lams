@@ -18,6 +18,7 @@
 		<!-- ********************  CSS ********************** -->
 		<lams:css />
 		<link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
+		<link href="${lams}css/uppy.custom.css" rel="stylesheet" type="text/css" />
 		<style media="screen,projection" type="text/css">
 			.info {
 				margin: 10px;

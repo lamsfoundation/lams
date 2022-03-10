@@ -14,6 +14,7 @@
  	<!-- ********************  CSS ********************** -->
 	<lams:css />
 	<link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
+	<link href="${lams}css/uppy.custom.css" rel="stylesheet" type="text/css" />
 
  	<!-- ********************  javascript ********************** -->
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>

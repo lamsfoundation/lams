@@ -29,6 +29,7 @@
 		<link href="${lams}css/jquery.tablesorter.theme.bootstrap.css" rel="stylesheet" >
 		<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
 		<link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
+		<link href="${lams}css/uppy.custom.css" rel="stylesheet" type="text/css" />
 		<style media="screen,projection" type="text/css">
 			.tablesorter,.tablesorter tr {
 				border: 1px solid #ddd;

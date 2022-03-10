@@ -5,6 +5,7 @@
 <%@ page import="org.lamsfoundation.lams.util.FileUtil" %>
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
 <c:set var="tmpFileUploadId"><%=FileUtil.generateTmpFileUploadId()%></c:set>
+<c:set var="language"><lams:user property="localeLanguage"/></c:set>
 <c:set var="title" scope="request">
 	<c:choose>
 		<c:when test="${param.importType == 'word'}">
@@ -22,6 +23,7 @@
 
 	<lams:css />
 	<link href="/lams/css/uppy.min.css" rel="stylesheet" type="text/css" />
+	<link href="/lams/css/uppy.custom.css" rel="stylesheet" type="text/css" />
 	<style type="text/css">
 		.button {
 			float: right;

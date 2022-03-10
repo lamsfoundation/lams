@@ -20,6 +20,7 @@
 	<title>${title}</title>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link href="<lams:LAMSURL/>css/uppy.min.css" rel="stylesheet" type="text/css" />
+	<link href="<lams:LAMSURL/>css/uppy.custom.css" rel="stylesheet" type="text/css" />
 
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">

@@ -14,6 +14,7 @@
 		<title><fmt:message key="activity.title" /></title>
 		<%@ include file="/common/tabbedheader.jsp"%>
 		<link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
+		<link href="${lams}css/uppy.custom.css" rel="stylesheet" type="text/css" />
 		
 		<script type="text/javascript" src="${lams}includes/javascript/uppy/uppy.min.js"></script>
 		<c:choose>
