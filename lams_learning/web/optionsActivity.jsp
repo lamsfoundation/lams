@@ -191,7 +191,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 				<div align="center" class="voffset10">
 					<c:if test="${!optionsActivityForm.maxActivitiesReached}">
-						<button id="choose-branch-button" class="btn btn-default" disabled="disabled">
+						<button id="choose-branch-button" class="btn btn-success" disabled="disabled">
 							<fmt:message key="label.activity.options.choose" />
 						</button>						
 					</c:if>
