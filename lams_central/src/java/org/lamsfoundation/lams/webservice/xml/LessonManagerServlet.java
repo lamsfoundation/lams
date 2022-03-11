@@ -929,7 +929,7 @@ public class LessonManagerServlet extends HttpServlet {
 //			integrationService.addExtUserToLesson(extServer, IntegrationConstants.METHOD_LEARNER, lessonId,
 //				userName, firstName, lastName, email, courseId, countryIsoCode, langIsoCode);
 			integrationService.addExtUserToCourseAndLesson(extServer, IntegrationConstants.METHOD_LEARNER,
-				lessonId, userName, firstName, lastName, email, courseId, country, locale);
+				lessonId, userName, firstName, lastName, email, courseId, country, locale, true);
 		    }
 		    i++;
 		}
@@ -947,7 +947,7 @@ public class LessonManagerServlet extends HttpServlet {
 
 		    if (StringUtils.isNotBlank(userName)) {
 			integrationService.addExtUserToCourseAndLesson(extServer, IntegrationConstants.METHOD_MONITOR,
-				lessonId, userName, firstName, lastName, email, courseId, country, locale);
+				lessonId, userName, firstName, lastName, email, courseId, country, locale, true);
 		    }
 		    i++;
 		}
