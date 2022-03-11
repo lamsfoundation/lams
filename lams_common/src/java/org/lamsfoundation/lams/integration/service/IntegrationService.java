@@ -433,10 +433,18 @@ public class IntegrationService implements IIntegrationService {
     private ExtUserUseridMap createExtUserUseridMap(ExtServer extServer, String extUsername, String password,
 	    String salt, String[] userData, boolean prefix) throws UserInfoValidationException {
 
-	String login = prefix ? buildName(extServer.getPrefix(), extUsername) : extUsername;
+	String email = userData[11];
+	String loginBase = extUsername;
+	// in LTI Advantage external user ID does not need to match LAMS login
+	if (!extUsername.equals(email) && StringUtils.isNotBlank(email)
+		&& StringUtils.isNotBlank(extServer.getUserIdParameterName())
+		&& extServer.getUserIdParameterName().strip().equalsIgnoreCase("email")) {
+	    loginBase = email.strip();
+	}
+
+	String login = prefix ? buildName(extServer.getPrefix(), loginBase) : loginBase;
 	String firstName = userData[1];
 	String lastName = userData[2];
-	String email = userData[11];
 
 	// login validation
 	if (StringUtils.isBlank(login)) {
