@@ -1,0 +1,184 @@
+@font-face {
+  font-family: mont-semibold;
+  src: url(../assets/fonts/mont-semibold.ttf);
+}
+@font-face {
+  font-family: mont-bold;
+  src: url(../assets/fonts/FontsFree-Net-Mont-Bold.ttf);
+}
+@font-face {
+  font-family: mont-regular;
+  src: url(../assets/fonts/FontsFree-Net-Mont1.ttf);
+}
+
+
+@media all and (max-width: 700px) {
+ table.compatibility, div.box { float: none; width: 100%; margin: 0; }
+}
+.tablesorter-bootstrap:not(.table-dark) thead:not(.thead-dark) .tablesorter-header, .tablesorter-bootstrap:not(.table-dark) tfoot th, .tablesorter-bootstrap:not(.table-dark) tfoot td {
+    background-color: #fff !important;
+}
+.table-sorter-header th {
+    border: 0 !important;
+    cursor: pointer;
+}
+.tablesorter td, .tablesorter th {
+    padding: .5rem;
+    border-top: 0;
+}
+.user-table-data{
+	max-width: 90%;
+	margin:auto;
+}
+.user-table-data {
+    background-color: #fff;
+    box-shadow: 0 10px 10px rgba(190, 196, 209, .25);
+    border-radius: 5px;
+    margin-top: 3.5rem;
+    width: 100%;
+    padding: 2rem;
+}
+.table-sorter-header {
+    margin-left: 0;
+    margin-right: 0;
+    border-bottom: 2px solid #20639B;
+    padding-bottom: .3rem;
+}
+.table-sorter-header h1 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    padding-left: 7rem;
+    margin: 0;
+}
+.table-sorter-header h1.h2 {
+    padding-left: 4.4rem;
+}
+.table-sorter-top {
+    margin-left: 0;
+    margin-right: 0;
+    border-bottom: 2px solid #C3CEDC;
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+    transition: all .3s ease;
+}
+.tablesorter td, .tablesorter th {
+    padding: .5rem;
+    border-top: 0;
+}
+.table-sorter-top .table-user-name, .table-sorter-top1 .table-user-name {
+    padding-left: 3.5rem;
+}
+.table-sorter-top img, .table-sorter-top1 img {
+    width: 2.5rem;
+    float: left;
+}
+.table-sorter-top p, .table-sorter-top1 p {
+    float: left;
+    padding-left: 1.5rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: .9rem;
+    padding-top: .6rem;
+    margin: 0;
+}
+.table-sorter-top .table-user-progress, .table-sorter-top1 .table-user-progress {
+    padding-left: 4.9rem;
+}
+.table-sorter-top .table-user-progress .progress-col, .table-sorter-top1 .table-user-progress .progress-col {
+    width: 23rem;
+    max-width: calc(100% - 4rem);
+    height: .4rem;
+    border-radius: 45px;
+    background-color: #F3F5FB;
+    overflow: hidden;
+    float: left;
+    margin-top: 1rem;
+}
+.table-sorter-top .table-user-progress .progress-col .progress1, .table-sorter-top1 .table-user-progress .progress-col .progress1 {
+    float: left;
+    height: 100%;
+    background-color: #FFCF60;
+}
+.table-sorter-top .table-user-progress p, .table-sorter-top1 .table-user-progress p {
+    float: left;
+    padding-top: 0;
+    margin-top: .55rem;
+}
+.table-sorter-content.row {
+    margin: 0;
+    padding: 1.5rem 0;
+    display: none;
+    border-bottom: 2px solid #C3CEDC;
+}
+.table-content-left {
+    -ms-flex: 0 0 27rem;
+    flex: 0 0 27rem;
+    max-width: 27rem;
+    padding-left: 3.5rem;
+}
+.table-sorter-top:hover{
+background-color: #fbfcff;
+}
+.tablesorter td, .tablesorter td a {
+    padding: .5rem;
+    border-top: 0;
+    border: 0;
+    height: 3rem;
+    vertical-align: middle;
+    padding-left: 1.5rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    padding-top: .6rem;
+    margin: 0;
+}
+.tablesorter td a{
+    padding-left: 0 !important
+}
+.tablesorter-bootstrap .tablesorter-header-inner{
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin: 0;
+    padding-left: 1.2rem !important;
+}
+.user-table-data{
+    border:0;
+    box-shadow: 0 0 0 ;
+    margin-top: 0;
+}
+.tablesorter-pager{
+    max-width: 90%;
+    margin: auto;
+    text-align: center;
+    background-color: #F6F5FA;
+    padding: .5rem ;
+}
+.tablesorter-pager form{
+    margin-bottom: 0;
+}
+.tablesorter-pager input{
+    border-radius: 10px;
+}
+.tablesorter-pager .pagedisplay{
+    border: 1px solid #c3cedc;
+    text-align: center;
+}
+
+.tablesorter-pager .pagesize{
+    border: 1px solid #c3cedc;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.table-sorter-header h1{
+	padding-left: 0;
+}
+.table-sorter-top {
+    width: 17rem;
+}
+.table-sorter-top .table-user-name {
+    padding-left: 0.5rem;
+}
+.tablesorter{
+	min-width: 500px;
+}
