@@ -58,6 +58,8 @@ import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.flux.FluxMap;
+import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -143,6 +145,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import reactor.core.publisher.Flux;
+
 /**
  * @author Andrey Balan
  */
@@ -194,6 +198,14 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     private IOutcomeService outcomeService;
 
     private ILearnerInteractionService learnerInteractionService;
+
+    public AssessmentServiceImpl() {
+	FluxRegistry.initSink(AssessmentConstants.ANSWERS_UPDATED_SINK_NAME);
+	FluxRegistry.initFluxMap(AssessmentConstants.COMPLETION_CHARTS_UPDATE_FLUX_NAME,
+		AssessmentConstants.ANSWERS_UPDATED_SINK_NAME,
+		(Function<Long, String>) toolContentId -> getCompletionChartsData(toolContentId),
+		FluxMap.STANDARD_THROTTLE, FluxMap.STANDARD_TIMEOUT);
+    }
 
     // *******************************************************************************
     // Service method
@@ -707,6 +719,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    learnerService.createCommandForLearners(assessment.getContentId(), userIds, jsonCommand.toString());
 	}
 
+	if (isAnswerModified) {
+	    // need to flush so subscribers to sink see new answers in DB
+	    assessmentResultDao.flush();
+	    FluxRegistry.emit(AssessmentConstants.ANSWERS_UPDATED_SINK_NAME, assessment.getContentId());
+	}
+
 	return true;
     }
 
@@ -794,6 +812,34 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	questionResult.setAnswerModified(isAnswerModified);
 	return questionResult;
+    }
+
+    private String getCompletionChartsData(long toolContentId) {
+	try {
+	    ObjectNode chartJson = JsonNodeFactory.instance.objectNode();
+
+	    chartJson.put("possibleLearners", getCountLessonLearnersByContentId(toolContentId));
+	    chartJson.put("startedLearners", getCountUsersByContentId(toolContentId));
+	    chartJson.put("completedLearners", getCountLearnersWithFinishedCurrentAttempt(toolContentId));
+
+	    chartJson.put("sessionCount", getSessionsByContentId(toolContentId).size());
+	    Map<Integer, List<String[]>> answeredQuestionsByUsers = getAnsweredQuestionsByUsers(toolContentId);
+	    if (!answeredQuestionsByUsers.isEmpty()) {
+		chartJson.set("answeredQuestionsByUsers", JsonUtil.readObject(answeredQuestionsByUsers));
+		Map<Integer, Integer> answeredQuestionsByUsersCount = answeredQuestionsByUsers.entrySet().stream()
+			.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().size()));
+		chartJson.set("answeredQuestionsByUsersCount", JsonUtil.readObject(answeredQuestionsByUsersCount));
+	    }
+	    return chartJson.toString();
+	} catch (Exception e) {
+	    log.error("Unable to fetch completion charts data for tool content ID " + toolContentId);
+	    return "";
+	}
+    }
+
+    @Override
+    public Flux<String> getCompletionChartsDataFlux(long toolContentId) {
+	return FluxRegistry.get(AssessmentConstants.COMPLETION_CHARTS_UPDATE_FLUX_NAME, toolContentId);
     }
 
     /**

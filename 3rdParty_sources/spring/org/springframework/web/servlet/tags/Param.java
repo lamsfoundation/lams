@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +15,8 @@
  */
 
 package org.springframework.web.servlet.tags;
+
+import org.springframework.lang.Nullable;
 
 /**
  * Bean used to pass name-value pair parameters from a {@link ParamTag} to a
@@ -29,21 +31,24 @@ package org.springframework.web.servlet.tags;
  */
 public class Param {
 
+	@Nullable
 	private String name;
 
+	@Nullable
 	private String value;
 
 
 	/**
 	 * Set the raw name of the parameter.
 	 */
-	public void setName(String name) {
+	public void setName(@Nullable String name) {
 		this.name = name;
 	}
 
 	/**
 	 * Return the raw parameter name.
 	 */
+	@Nullable
 	public String getName() {
 		return this.name;
 	}
@@ -51,13 +56,14 @@ public class Param {
 	/**
 	 * Set the raw value of the parameter.
 	 */
-	public void setValue(String value) {
+	public void setValue(@Nullable String value) {
 		this.value = value;
 	}
 
 	/**
 	 * Return the raw parameter value.
 	 */
+	@Nullable
 	public String getValue() {
 		return this.value;
 	}

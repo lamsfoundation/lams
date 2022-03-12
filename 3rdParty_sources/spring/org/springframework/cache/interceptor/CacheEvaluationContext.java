@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.springframework.context.expression.MethodBasedEvaluationContext;
 import org.springframework.core.ParameterNameDiscoverer;
+import org.springframework.lang.Nullable;
 
 /**
  * Cache specific evaluation context that adds a method parameters as SpEL
@@ -43,7 +44,7 @@ import org.springframework.core.ParameterNameDiscoverer;
  */
 class CacheEvaluationContext extends MethodBasedEvaluationContext {
 
-	private final Set<String> unavailableVariables = new HashSet<String>(1);
+	private final Set<String> unavailableVariables = new HashSet<>(1);
 
 
 	CacheEvaluationContext(Object rootObject, Method method, Object[] arguments,
@@ -69,6 +70,7 @@ class CacheEvaluationContext extends MethodBasedEvaluationContext {
 	 * Load the param information only when needed.
 	 */
 	@Override
+	@Nullable
 	public Object lookupVariable(String name) {
 		if (this.unavailableVariables.contains(name)) {
 			throw new VariableNotAvailableException(name);

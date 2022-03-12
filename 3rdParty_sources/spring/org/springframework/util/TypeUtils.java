@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,6 +20,8 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
+
+import org.springframework.lang.Nullable;
 
 /**
  * Utility to work with Java 5 generic type parameters.
@@ -211,7 +213,7 @@ public abstract class TypeUtils {
 		return true;
 	}
 
-	public static boolean isAssignableBound(Type lhsType, Type rhsType) {
+	public static boolean isAssignableBound(@Nullable Type lhsType, @Nullable Type rhsType) {
 		if (rhsType == null) {
 			return true;
 		}

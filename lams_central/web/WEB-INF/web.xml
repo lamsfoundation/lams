@@ -10,37 +10,6 @@
 		</param-value>
 	</context-param>
 
-	<!-- In LAMS 2.3 there was a change in this section in all tools and core 
-		parts (central, learning, monitoring etc.) All LAMS web application now use 
-		shared application context. See refBeanContext.xml file in lams_common for 
-		its description. This refBeanContext.xml contains definition of the shared 
-		context. It is located by this entry: <context-param> <param-name>locatorFactorySelector</param-name> 
-		<param-value>classpath:/org/lamsfoundation/lams/beanRefContext.xml</param-value> 
-		</context-param> telling to look for refBeanContext.xml files in selected 
-		part of the classpath. Currently LAMS has only one refBeanContext.xml with 
-		one shared context definition. Lams_central uses only beans from the shared 
-		context "context.central". That is why there is no value in contextConfigLocation. 
-		Even so, this parameter needs to be declared with empty value for locatorFactorySelector 
-		to work properly. Also, if no local application context file is declare, 
-		there MUST be a file named "applicationContext.xml" in web/WEB-INF containing 
-		empty bean list, otherwise there will be errors during start up. If there 
-		are local (private for web application; see tools and admin for example) 
-		bean definitions, path to application context XML file can still be added 
-		to contextConfigLocation. -->
-
-	<context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value></param-value>
-	</context-param>
-	<context-param>
-		<param-name>locatorFactorySelector</param-name>
-		<param-value>classpath:/org/lamsfoundation/lams/beanRefContext.xml
-		</param-value>
-	</context-param>
-	<context-param>
-		<param-name>parentContextKey</param-name>
-		<param-value>context.central</param-value>
-	</context-param>
 	<context-param>
         <param-name>Owasp.CsrfGuard.Config</param-name>
         <param-value>WEB-INF/Owasp.CsrfGuard.properties</param-value>
@@ -167,7 +136,7 @@
 
 	<listener>
 		<listener-class>
-			org.springframework.web.context.ContextLoaderListener
+			org.lamsfoundation.lams.web.filter.LamsContextLoaderListener
 		</listener-class>
 	</listener>
 

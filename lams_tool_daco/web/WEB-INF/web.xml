@@ -16,18 +16,10 @@
 		<param-name>contextConfigLocation</param-name>
 		<param-value>classpath:/org/lamsfoundation/lams/tool/daco/dbupdates/autopatchContext.xml</param-value>
 	</context-param>
-	<context-param>
-		<param-name>locatorFactorySelector</param-name>
-		<param-value>classpath:/org/lamsfoundation/lams/beanRefContext.xml</param-value>
-	</context-param>
-	<context-param>
-		<param-name>parentContextKey</param-name>
-		<param-value>context.central</param-value>
-	</context-param>
 
 	<listener>
 		<listener-class>
-			org.springframework.web.context.ContextLoaderListener
+			org.lamsfoundation.lams.web.filter.LamsContextLoaderListener
 		</listener-class>
 	</listener>
 	

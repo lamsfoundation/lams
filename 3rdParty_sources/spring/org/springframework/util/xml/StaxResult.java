@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,6 +22,8 @@ import javax.xml.transform.sax.SAXResult;
 
 import org.xml.sax.ContentHandler;
 import org.xml.sax.ext.LexicalHandler;
+
+import org.springframework.lang.Nullable;
 
 /**
  * Implementation of the {@code Result} tagging interface for StAX writers. Can be constructed with
@@ -46,8 +48,10 @@ import org.xml.sax.ext.LexicalHandler;
  */
 class StaxResult extends SAXResult {
 
+	@Nullable
 	private XMLEventWriter eventWriter;
 
+	@Nullable
 	private XMLStreamWriter streamWriter;
 
 
@@ -81,6 +85,7 @@ class StaxResult extends SAXResult {
 	 * @return the StAX event writer used by this result
 	 * @see #StaxResult(javax.xml.stream.XMLEventWriter)
 	 */
+	@Nullable
 	public XMLEventWriter getXMLEventWriter() {
 		return this.eventWriter;
 	}
@@ -92,6 +97,7 @@ class StaxResult extends SAXResult {
 	 * @return the StAX stream writer used by this result
 	 * @see #StaxResult(javax.xml.stream.XMLStreamWriter)
 	 */
+	@Nullable
 	public XMLStreamWriter getXMLStreamWriter() {
 		return this.streamWriter;
 	}

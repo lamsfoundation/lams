@@ -45,7 +45,6 @@ import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -113,6 +112,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import reactor.core.publisher.Flux;
 
 @Controller
 @RequestMapping("/monitoring")
@@ -259,27 +260,11 @@ public class MonitoringController {
 	return "pages/monitoring/monitoring";
     }
 
-    @RequestMapping(path = "/getCompletionChartsData")
+    @RequestMapping(path = "/getCompletionChartsData", method = RequestMethod.GET, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @ResponseBody
-    public String getCompletionChartsData(@RequestParam long toolContentId, HttpServletResponse response)
+    public Flux<String> getCompletionChartsData(@RequestParam long toolContentId)
 	    throws JsonProcessingException, IOException {
-	ObjectNode chartJson = JsonNodeFactory.instance.objectNode();
-
-	chartJson.put("possibleLearners", service.getCountLessonLearnersByContentId(toolContentId));
-	chartJson.put("startedLearners", service.getCountUsersByContentId(toolContentId));
-	chartJson.put("completedLearners", service.getCountLearnersWithFinishedCurrentAttempt(toolContentId));
-
-	chartJson.put("sessionCount", service.getSessionsByContentId(toolContentId).size());
-	Map<Integer, List<String[]>> answeredQuestionsByUsers = service.getAnsweredQuestionsByUsers(toolContentId);
-	if (!answeredQuestionsByUsers.isEmpty()) {
-	    chartJson.set("answeredQuestionsByUsers", JsonUtil.readObject(answeredQuestionsByUsers));
-	    Map<Integer, Integer> answeredQuestionsByUsersCount = answeredQuestionsByUsers.entrySet().stream()
-		    .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().size()));
-	    chartJson.set("answeredQuestionsByUsersCount", JsonUtil.readObject(answeredQuestionsByUsersCount));
-	}
-
-	response.setContentType("application/json;charset=utf-8");
-	return chartJson.toString();
+	return service.getCompletionChartsDataFlux(toolContentId);
     }
 
     @RequestMapping("/userMasterDetail")

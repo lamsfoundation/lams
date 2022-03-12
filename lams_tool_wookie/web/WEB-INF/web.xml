@@ -9,15 +9,6 @@
 		Wookie tool
 	</description>
 	
-	<context-param>
-		<param-name>locatorFactorySelector</param-name>
-		<param-value>classpath:/org/lamsfoundation/lams/beanRefContext.xml</param-value>
-	</context-param>
-	<context-param>
-		<param-name>parentContextKey</param-name>
-		<param-value>context.central</param-value>
-	</context-param>
-
 	<filter>
 		<filter-name>SystemSessionFilter</filter-name>
 		<filter-class>
@@ -32,7 +23,7 @@
 
 	<listener>
 		<listener-class>
-			org.springframework.web.context.ContextLoaderListener
+			org.lamsfoundation.lams.web.filter.LamsContextLoaderListener
 		</listener-class>
 	</listener>
 

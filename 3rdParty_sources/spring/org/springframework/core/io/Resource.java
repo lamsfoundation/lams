@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,8 +18,13 @@ package org.springframework.core.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+
+import org.springframework.lang.Nullable;
 
 /**
  * Interface for a resource descriptor that abstracts from the actual
@@ -38,9 +43,9 @@ import java.net.URL;
  * @see WritableResource
  * @see ContextResource
  * @see UrlResource
- * @see ClassPathResource
+ * @see FileUrlResource
  * @see FileSystemResource
- * @see PathResource
+ * @see ClassPathResource
  * @see ByteArrayResource
  * @see InputStreamResource
  */
@@ -55,15 +60,19 @@ public interface Resource extends InputStreamSource {
 	boolean exists();
 
 	/**
-	 * Indicate whether the contents of this resource can be read via
+	 * Indicate whether non-empty contents of this resource can be read via
 	 * {@link #getInputStream()}.
-	 * <p>Will be {@code true} for typical resource descriptors;
-	 * note that actual content reading may still fail when attempted.
+	 * <p>Will be {@code true} for typical resource descriptors that exist
+	 * since it strictly implies {@link #exists()} semantics as of 5.1.
+	 * Note that actual content reading may still fail when attempted.
 	 * However, a value of {@code false} is a definitive indication
 	 * that the resource content cannot be read.
 	 * @see #getInputStream()
+	 * @see #exists()
 	 */
-	boolean isReadable();
+	default boolean isReadable() {
+		return exists();
+	}
 
 	/**
 	 * Indicate whether this resource represents a handle with an open stream.
@@ -71,7 +80,21 @@ public interface Resource extends InputStreamSource {
 	 * and must be read and closed to avoid resource leaks.
 	 * <p>Will be {@code false} for typical resource descriptors.
 	 */
-	boolean isOpen();
+	default boolean isOpen() {
+		return false;
+	}
+
+	/**
+	 * Determine whether this resource represents a file in a file system.
+	 * A value of {@code true} strongly suggests (but does not guarantee)
+	 * that a {@link #getFile()} call will succeed.
+	 * <p>This is conservatively {@code false} by default.
+	 * @since 5.0
+	 * @see #getFile()
+	 */
+	default boolean isFile() {
+		return false;
+	}
 
 	/**
 	 * Return a URL handle for this resource.
@@ -96,6 +119,21 @@ public interface Resource extends InputStreamSource {
 	 * @see #getInputStream()
 	 */
 	File getFile() throws IOException;
+
+	/**
+	 * Return a {@link ReadableByteChannel}.
+	 * <p>It is expected that each call creates a <i>fresh</i> channel.
+	 * <p>The default implementation returns {@link Channels#newChannel(InputStream)}
+	 * with the result of {@link #getInputStream()}.
+	 * @return the byte channel for the underlying resource (must not be {@code null})
+	 * @throws java.io.FileNotFoundException if the underlying resource doesn't exist
+	 * @throws IOException if the content channel could not be opened
+	 * @since 5.0
+	 * @see #getInputStream()
+	 */
+	default ReadableByteChannel readableChannel() throws IOException {
+		return Channels.newChannel(getInputStream());
+	}
 
 	/**
 	 * Determine the content length for this resource.
@@ -125,6 +163,7 @@ public interface Resource extends InputStreamSource {
 	 * <p>Returns {@code null} if this type of resource does not
 	 * have a filename.
 	 */
+	@Nullable
 	String getFilename();
 
 	/**

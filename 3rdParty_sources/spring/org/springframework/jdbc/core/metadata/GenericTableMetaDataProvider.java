@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,56 +31,56 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.jdbc.support.JdbcUtils;
-import org.springframework.jdbc.support.nativejdbc.NativeJdbcExtractor;
+import org.springframework.lang.Nullable;
 
 /**
- * A generic implementation of the {@link TableMetaDataProvider} that should provide
- * enough features for all supported databases.
+ * A generic implementation of the {@link TableMetaDataProvider} interface
+ * which should provide enough features for all supported databases.
  *
  * @author Thomas Risberg
  * @author Juergen Hoeller
+ * @author Sam Brannen
  * @since 2.5
  */
 public class GenericTableMetaDataProvider implements TableMetaDataProvider {
 
-	/** Logger available to subclasses */
+	/** Logger available to subclasses. */
 	protected static final Log logger = LogFactory.getLog(TableMetaDataProvider.class);
 
-	/** indicator whether column metadata should be used */
+	/** indicator whether column meta-data should be used. */
 	private boolean tableColumnMetaDataUsed = false;
 
-	/** the version of the database */
+	/** the version of the database. */
+	@Nullable
 	private String databaseVersion;
 
-	/** the name of the user currently connected */
+	/** the name of the user currently connected. */
+	@Nullable
 	private String userName;
 
-	/** indicates whether the identifiers are uppercased */
+	/** indicates whether the identifiers are uppercased. */
 	private boolean storesUpperCaseIdentifiers = true;
 
-	/** indicates whether the identifiers are lowercased */
+	/** indicates whether the identifiers are lowercased. */
 	private boolean storesLowerCaseIdentifiers = false;
 
-	/** indicates whether generated keys retrieval is supported */
+	/** indicates whether generated keys retrieval is supported. */
 	private boolean getGeneratedKeysSupported = true;
 
-	/** indicates whether the use of a String[] for generated keys is supported */
+	/** indicates whether the use of a String[] for generated keys is supported. */
 	private boolean generatedKeysColumnNameArraySupported = true;
 
-	/** database products we know not supporting the use of a String[] for generated keys */
+	/** database products we know not supporting the use of a String[] for generated keys. */
 	private List<String> productsNotSupportingGeneratedKeysColumnNameArray =
 			Arrays.asList("Apache Derby", "HSQL Database Engine");
 
-	/** Collection of TableParameterMetaData objects */
-	private List<TableParameterMetaData> tableParameterMetaData = new ArrayList<TableParameterMetaData>();
-
-	/** NativeJdbcExtractor that can be used to retrieve the native connection */
-	private NativeJdbcExtractor nativeJdbcExtractor;
+	/** Collection of TableParameterMetaData objects. */
+	private List<TableParameterMetaData> tableParameterMetaData = new ArrayList<>();
 
 
 	/**
-	 * Constructor used to initialize with provided database metadata.
-	 * @param databaseMetaData metadata to be used
+	 * Constructor used to initialize with provided database meta-data.
+	 * @param databaseMetaData meta-data to be used
 	 */
 	protected GenericTableMetaDataProvider(DatabaseMetaData databaseMetaData) throws SQLException {
 		this.userName = databaseMetaData.getUserName();
@@ -125,6 +125,7 @@ public class GenericTableMetaDataProvider implements TableMetaDataProvider {
 	}
 
 	@Override
+	@Nullable
 	public String getSimpleQueryForGetGeneratedKey(String tableName, String keyColumnName) {
 		return null;
 	}
@@ -140,15 +141,6 @@ public class GenericTableMetaDataProvider implements TableMetaDataProvider {
 	@Override
 	public boolean isGeneratedKeysColumnNameArraySupported() {
 		return this.generatedKeysColumnNameArraySupported;
-	}
-
-	@Override
-	public void setNativeJdbcExtractor(NativeJdbcExtractor nativeJdbcExtractor) {
-		this.nativeJdbcExtractor = nativeJdbcExtractor;
-	}
-
-	protected NativeJdbcExtractor getNativeJdbcExtractor() {
-		return this.nativeJdbcExtractor;
 	}
 
 
@@ -221,19 +213,19 @@ public class GenericTableMetaDataProvider implements TableMetaDataProvider {
 				logger.warn("Error retrieving 'DatabaseMetaData.storesLowerCaseIdentifiers': " + ex.getMessage());
 			}
 		}
-
 	}
 
 	@Override
-	public void initializeWithTableColumnMetaData(DatabaseMetaData databaseMetaData, String catalogName,
-			String schemaName, String tableName) throws SQLException {
+	public void initializeWithTableColumnMetaData(DatabaseMetaData databaseMetaData, @Nullable String catalogName,
+			@Nullable String schemaName, @Nullable String tableName) throws SQLException {
 
 		this.tableColumnMetaDataUsed = true;
 		locateTableAndProcessMetaData(databaseMetaData, catalogName, schemaName, tableName);
 	}
 
 	@Override
-	public String tableNameToUse(String tableName) {
+	@Nullable
+	public String tableNameToUse(@Nullable String tableName) {
 		if (tableName == null) {
 			return null;
 		}
@@ -249,7 +241,8 @@ public class GenericTableMetaDataProvider implements TableMetaDataProvider {
 	}
 
 	@Override
-	public String catalogNameToUse(String catalogName) {
+	@Nullable
+	public String catalogNameToUse(@Nullable String catalogName) {
 		if (catalogName == null) {
 			return null;
 		}
@@ -265,7 +258,8 @@ public class GenericTableMetaDataProvider implements TableMetaDataProvider {
 	}
 
 	@Override
-	public String schemaNameToUse(String schemaName) {
+	@Nullable
+	public String schemaNameToUse(@Nullable String schemaName) {
 		if (schemaName == null) {
 			return null;
 		}
@@ -281,12 +275,14 @@ public class GenericTableMetaDataProvider implements TableMetaDataProvider {
 	}
 
 	@Override
-	public String metaDataCatalogNameToUse(String catalogName) {
+	@Nullable
+	public String metaDataCatalogNameToUse(@Nullable String catalogName) {
 		return catalogNameToUse(catalogName);
 	}
 
 	@Override
-	public String metaDataSchemaNameToUse(String schemaName) {
+	@Nullable
+	public String metaDataSchemaNameToUse(@Nullable String schemaName) {
 		if (schemaName == null) {
 			return schemaNameToUse(getDefaultSchema());
 		}
@@ -296,6 +292,7 @@ public class GenericTableMetaDataProvider implements TableMetaDataProvider {
 	/**
 	 * Provide access to default schema for subclasses.
 	 */
+	@Nullable
 	protected String getDefaultSchema() {
 		return this.userName;
 	}
@@ -303,17 +300,18 @@ public class GenericTableMetaDataProvider implements TableMetaDataProvider {
 	/**
 	 * Provide access to version info for subclasses.
 	 */
+	@Nullable
 	protected String getDatabaseVersion() {
 		return this.databaseVersion;
 	}
 
 	/**
-	 * Method supporting the metadata processing for a table.
+	 * Method supporting the meta-data processing for a table.
 	 */
-	private void locateTableAndProcessMetaData(
-			DatabaseMetaData databaseMetaData, String catalogName, String schemaName, String tableName) {
+	private void locateTableAndProcessMetaData(DatabaseMetaData databaseMetaData,
+			@Nullable String catalogName, @Nullable String schemaName, @Nullable String tableName) {
 
-		Map<String, TableMetaData> tableMeta = new HashMap<String, TableMetaData>();
+		Map<String, TableMetaData> tableMeta = new HashMap<>();
 		ResultSet tables = null;
 		try {
 			tables = databaseMetaData.getTables(
@@ -333,7 +331,7 @@ public class GenericTableMetaDataProvider implements TableMetaDataProvider {
 		}
 		catch (SQLException ex) {
 			if (logger.isWarnEnabled()) {
-				logger.warn("Error while accessing table meta data results: " + ex.getMessage());
+				logger.warn("Error while accessing table meta-data results: " + ex.getMessage());
 			}
 		}
 		finally {
@@ -341,8 +339,8 @@ public class GenericTableMetaDataProvider implements TableMetaDataProvider {
 		}
 
 		if (tableMeta.isEmpty()) {
-			if (logger.isWarnEnabled()) {
-				logger.warn("Unable to locate table meta data for '" + tableName + "': column names must be provided");
+			if (logger.isInfoEnabled()) {
+				logger.info("Unable to locate table meta-data for '" + tableName + "': column names must be provided");
 			}
 		}
 		else {
@@ -350,11 +348,13 @@ public class GenericTableMetaDataProvider implements TableMetaDataProvider {
 		}
 	}
 
-	private TableMetaData findTableMetaData(String schemaName, String tableName, Map<String, TableMetaData> tableMeta) {
+	private TableMetaData findTableMetaData(@Nullable String schemaName, @Nullable String tableName,
+			Map<String, TableMetaData> tableMeta) {
+
 		if (schemaName != null) {
 			TableMetaData tmd = tableMeta.get(schemaName.toUpperCase());
 			if (tmd == null) {
-				throw new DataAccessResourceFailureException("Unable to locate table meta data for '" +
+				throw new DataAccessResourceFailureException("Unable to locate table meta-data for '" +
 						tableName + "' in the '" + schemaName + "' schema");
 			}
 			return tmd;
@@ -375,14 +375,14 @@ public class GenericTableMetaDataProvider implements TableMetaDataProvider {
 			}
 			if (tmd == null) {
 				throw new DataAccessResourceFailureException(
-						"Unable to locate table meta data for '" + tableName + "' in the default schema");
+						"Unable to locate table meta-data for '" + tableName + "' in the default schema");
 			}
 			return tmd;
 		}
 	}
 
 	/**
-	 * Method supporting the metadata processing for a table's columns
+	 * Method supporting the meta-data processing for a table's columns.
 	 */
 	private void processTableColumns(DatabaseMetaData databaseMetaData, TableMetaData tmd) {
 		ResultSet tableColumns = null;
@@ -390,7 +390,7 @@ public class GenericTableMetaDataProvider implements TableMetaDataProvider {
 		String metaDataSchemaName = metaDataSchemaNameToUse(tmd.getSchemaName());
 		String metaDataTableName = tableNameToUse(tmd.getTableName());
 		if (logger.isDebugEnabled()) {
-			logger.debug("Retrieving metadata for " + metaDataCatalogName + '/' +
+			logger.debug("Retrieving meta-data for " + metaDataCatalogName + '/' +
 					metaDataSchemaName + '/' + metaDataTableName);
 		}
 		try {
@@ -408,7 +408,7 @@ public class GenericTableMetaDataProvider implements TableMetaDataProvider {
 					if ("NUMBER".equals(typeName) && decimalDigits == 0) {
 						dataType = Types.NUMERIC;
 						if (logger.isDebugEnabled()) {
-							logger.debug("Overriding metadata: " + columnName + " now NUMERIC instead of DECIMAL");
+							logger.debug("Overriding meta-data: " + columnName + " now NUMERIC instead of DECIMAL");
 						}
 					}
 				}
@@ -416,15 +416,19 @@ public class GenericTableMetaDataProvider implements TableMetaDataProvider {
 				TableParameterMetaData meta = new TableParameterMetaData(columnName, dataType, nullable);
 				this.tableParameterMetaData.add(meta);
 				if (logger.isDebugEnabled()) {
-					logger.debug("Retrieved metadata: " + meta.getParameterName() + " " +
-							meta.getSqlType() + " " + meta.isNullable());
+					logger.debug("Retrieved meta-data: '" + meta.getParameterName() + "', sqlType=" +
+							meta.getSqlType() + ", nullable=" + meta.isNullable());
 				}
 			}
 		}
 		catch (SQLException ex) {
 			if (logger.isWarnEnabled()) {
-				logger.warn("Error while retrieving metadata for table columns: " + ex.getMessage());
+				logger.warn("Error while retrieving meta-data for table columns. " +
+						"Consider specifying explicit column names -- for example, via SimpleJdbcInsert#usingColumns().",
+						ex);
 			}
+			// Clear the metadata so that we don't retain a partial list of column names
+			this.tableParameterMetaData.clear();
 		}
 		finally {
 			JdbcUtils.closeResultSet(tableColumns);
@@ -433,20 +437,24 @@ public class GenericTableMetaDataProvider implements TableMetaDataProvider {
 
 
 	/**
-	 * Inner class representing table meta data.
+	 * Class representing table meta-data.
 	 */
 	private static class TableMetaData {
 
+		@Nullable
 		private String catalogName;
 
+		@Nullable
 		private String schemaName;
 
+		@Nullable
 		private String tableName;
 
 		public void setCatalogName(String catalogName) {
 			this.catalogName = catalogName;
 		}
 
+		@Nullable
 		public String getCatalogName() {
 			return this.catalogName;
 		}
@@ -455,6 +463,7 @@ public class GenericTableMetaDataProvider implements TableMetaDataProvider {
 			this.schemaName = schemaName;
 		}
 
+		@Nullable
 		public String getSchemaName() {
 			return this.schemaName;
 		}
@@ -463,6 +472,7 @@ public class GenericTableMetaDataProvider implements TableMetaDataProvider {
 			this.tableName = tableName;
 		}
 
+		@Nullable
 		public String getTableName() {
 			return this.tableName;
 		}

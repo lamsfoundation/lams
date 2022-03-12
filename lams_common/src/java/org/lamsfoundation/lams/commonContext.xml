@@ -3,13 +3,28 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+           				   http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<!-- ========================= GENERAL DEFINITIONS ========================= -->
 
 	<import resource="messageContext.xml"/>
 
+	<!-- ========================= SPRING MVC GLOBAL BEANS ========================= -->
+	
+	<!-- This bean is used by MVC mechanism in each LAMS module -->
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+	
+	<!-- Existing WildFly task executor for Spring async request processing. It is fetched by JNDI from JEE7+ platform. -->
+	<bean id="serverTaskExecutor" class="org.springframework.scheduling.concurrent.DefaultManagedTaskExecutor" />
+	
+	
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+	
+	
 
  	<!-- Hibernate SessionFactory. Since LAMS 2.3 it is used in all tools and other parts of LAMS,
  		 rather than several local Session Factories.

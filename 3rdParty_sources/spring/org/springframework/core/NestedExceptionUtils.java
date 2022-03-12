@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +15,8 @@
  */
 
 package org.springframework.core;
+
+import org.springframework.lang.Nullable;
 
 /**
  * Helper class for implementing exception classes which are capable of
@@ -38,7 +40,8 @@ public abstract class NestedExceptionUtils {
 	 * @param cause the root cause
 	 * @return the full exception message
 	 */
-	public static String buildMessage(String message, Throwable cause) {
+	@Nullable
+	public static String buildMessage(@Nullable String message, @Nullable Throwable cause) {
 		if (cause == null) {
 			return message;
 		}
@@ -56,7 +59,8 @@ public abstract class NestedExceptionUtils {
 	 * @return the innermost exception, or {@code null} if none
 	 * @since 4.3.9
 	 */
-	public static Throwable getRootCause(Throwable original) {
+	@Nullable
+	public static Throwable getRootCause(@Nullable Throwable original) {
 		if (original == null) {
 			return null;
 		}

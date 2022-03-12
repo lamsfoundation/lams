@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,10 +17,12 @@
 package org.springframework.util.concurrent;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -33,18 +35,16 @@ import org.springframework.util.Assert;
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
  * @since 4.1
+ * @param <T> the result type returned by this Future's {@code get} method
  */
 public class SettableListenableFuture<T> implements ListenableFuture<T> {
 
-	private static final Callable<Object> DUMMY_CALLABLE = new Callable<Object>() {
-		@Override
-		public Object call() throws Exception {
-			throw new IllegalStateException("Should never be called");
-		}
+	private static final Callable<Object> DUMMY_CALLABLE = () -> {
+		throw new IllegalStateException("Should never be called");
 	};
 
 
-	private final SettableTask<T> settableTask = new SettableTask<T>();
+	private final SettableTask<T> settableTask = new SettableTask<>();
 
 
 	/**
@@ -54,7 +54,7 @@ public class SettableListenableFuture<T> implements ListenableFuture<T> {
 	 * @param value the value that will be set
 	 * @return {@code true} if the value was successfully set, else {@code false}
 	 */
-	public boolean set(T value) {
+	public boolean set(@Nullable T value) {
 		return this.settableTask.setResultValue(value);
 	}
 
@@ -70,6 +70,7 @@ public class SettableListenableFuture<T> implements ListenableFuture<T> {
 		return this.settableTask.setExceptionResult(exception);
 	}
 
+
 	@Override
 	public void addCallback(ListenableFutureCallback<? super T> callback) {
 		this.settableTask.addCallback(callback);
@@ -79,6 +80,12 @@ public class SettableListenableFuture<T> implements ListenableFuture<T> {
 	public void addCallback(SuccessCallback<? super T> successCallback, FailureCallback failureCallback) {
 		this.settableTask.addCallback(successCallback, failureCallback);
 	}
+
+	@Override
+	public CompletableFuture<T> completable() {
+		return this.settableTask.completable();
+	}
+
 
 	@Override
 	public boolean cancel(boolean mayInterruptIfRunning) {
@@ -139,6 +146,7 @@ public class SettableListenableFuture<T> implements ListenableFuture<T> {
 
 	private static class SettableTask<T> extends ListenableFutureTask<T> {
 
+		@Nullable
 		private volatile Thread completingThread;
 
 		@SuppressWarnings("unchecked")
@@ -146,7 +154,7 @@ public class SettableListenableFuture<T> implements ListenableFuture<T> {
 			super((Callable<T>) DUMMY_CALLABLE);
 		}
 
-		public boolean setResultValue(T value) {
+		public boolean setResultValue(@Nullable T value) {
 			set(value);
 			return checkCompletingThread();
 		}

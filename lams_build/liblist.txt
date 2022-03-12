@@ -63,18 +63,22 @@ odmg              odmg-3.0.jar                          3.0
 
 passpol			  passpol-0.7.1-SNAPSHOT.jar			0.7.1				   Apache License 2.0			 Codahale						  For checking for weak or compromised password. Recompiled manually with Java 11.
 
+reactive-streams  reactive-streams-1.0.3.jar			1.0.3		   	   	   Public Domain			 	 Reactive StreamsVMWare			  Reactive protocol
+
+reactor			  reactor-core-3.4.12.jar				3.4.12			   	   Apache License 2.0			 VMWare							  Reactive backend
+
 quartz			  quartz-2.2.3.jar						2.2.3			   	   Apache License 2.0			 Terracotta						  For running scheduled jobs
 
-spring            spring-core-4.3.12.RELEASE.jar		4.3.12				   Apache License 2.0			 Pivotal						  programming and configuration model for modern Java-based enterprise applications
-				  spring-beans-4.3.12.RELEASE.jar
-				  spring-context-4.3.12.RELEASE.jar
-				  spring-context-support-4.3.12.RELEASE.jar
-				  spring-expression-4.3.12.RELEASE.jar
-				  spring-jdbc-4.3.12.RELEASE.jar
-				  spring-orm-4.3.12.RELEASE.jar
-				  spring-tx-4.3.12.RELEASE.jar
-				  spring-web-4.3.12.RELEASE.jar
-				  spring-webmvc-4.3.12.RELEASE.jar
+spring            spring-core-5.3.13.jar				5.3.13				   Apache License 2.0			 VMWare							  programming and configuration model for modern Java-based enterprise applications
+				  spring-beans-5.3.13.jar
+				  spring-context-5.3.13.jar
+				  spring-context-support-5.3.13.jar
+				  spring-expression-5.3.13.jar
+				  spring-jdbc-5.3.13.jar
+				  spring-orm-5.3.13.jar
+				  spring-tx-5.3.13.jar
+				  spring-web-5.3.13.jar
+				  spring-webmvc-5.3.13.jar
 
 urlrewritefilter urlrewritefilter-4.0.3.jar             4.0.3                  BSD License              	 tuckey.org         			  Java Web Filter which allows rewriting URLs
 

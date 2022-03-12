@@ -16,18 +16,10 @@
 		<param-name>contextConfigLocation</param-name>
 		<param-value>classpath:/org/lamsfoundation/lams/tool/assessment/dbupdates/autopatchContext.xml</param-value>
 	</context-param>
-	<context-param>
-		<param-name>locatorFactorySelector</param-name>
-		<param-value>classpath:/org/lamsfoundation/lams/beanRefContext.xml</param-value>
-	</context-param>
-	<context-param>
-		<param-name>parentContextKey</param-name>
-		<param-value>context.central</param-value>
-	</context-param>
 
 	<listener>
 		<listener-class>
-			org.springframework.web.context.ContextLoaderListener
+			org.lamsfoundation.lams.web.filter.LamsContextLoaderListener
 		</listener-class>
 	</listener>
 
@@ -36,6 +28,7 @@
 		<filter-class>
 			org.springframework.orm.hibernate5.support.OpenSessionInViewFilter
 		</filter-class>
+		<async-supported>true</async-supported>
 		<init-param>
 			<param-name>sessionFactoryBeanName</param-name>
 			<param-value>coreSessionFactory</param-value>
@@ -47,12 +40,14 @@
 		<filter-class>
 			org.lamsfoundation.lams.web.session.SystemSessionFilter
 		</filter-class>
+		<async-supported>true</async-supported>
 	</filter>
 	<filter>
 		<filter-name>LocaleFilter</filter-name>
 		<filter-class>
 			org.lamsfoundation.lams.web.filter.LocaleFilter
 		</filter-class>
+		<async-supported>true</async-supported>
 		<init-param>
 			<param-name>encoding</param-name>
 			<param-value>UTF-8</param-value>
@@ -61,23 +56,32 @@
 	<filter>
 		<filter-name>CSRFGuard</filter-name>
 		<filter-class>org.owasp.csrfguard.CsrfGuardFilter</filter-class>
+		<async-supported>true</async-supported>
 	</filter>
 
 	<filter-mapping>
 		<filter-name>hibernateFilter</filter-name>
 		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+        <dispatcher>ASYNC</dispatcher>
 	</filter-mapping>
 	<filter-mapping>
 		<filter-name>SystemSessionFilter</filter-name>
 		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+        <dispatcher>ASYNC</dispatcher>
 	</filter-mapping>
 	<filter-mapping>
 		<filter-name>LocaleFilter</filter-name>
 		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+        <dispatcher>ASYNC</dispatcher>
 	</filter-mapping>
 	<filter-mapping>
 		<filter-name>CSRFGuard</filter-name> 
 		<url-pattern>*.do</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+        <dispatcher>ASYNC</dispatcher>
 	</filter-mapping>
 	
 	<servlet>
@@ -86,6 +90,7 @@
 			org.springframework.web.servlet.DispatcherServlet
 		</servlet-class>
 		<load-on-startup>1</load-on-startup>
+		<async-supported>true</async-supported>
 	</servlet>
 
 	<servlet>
@@ -114,7 +119,7 @@
 		</init-param>
 		<load-on-startup>3</load-on-startup>
 	</servlet>
-
+	
 	<servlet-mapping>
 		<servlet-name>spring</servlet-name>
 		<url-pattern>*.do</url-pattern>

@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,6 +27,7 @@ import org.springframework.aop.DynamicIntroductionAdvice;
 import org.springframework.aop.IntroductionAdvisor;
 import org.springframework.aop.IntroductionInfo;
 import org.springframework.core.Ordered;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -38,14 +39,14 @@ import org.springframework.util.ClassUtils;
  * @author Juergen Hoeller
  * @since 11.11.2003
  */
-@SuppressWarnings({"serial" })
+@SuppressWarnings("serial")
 public class DefaultIntroductionAdvisor implements IntroductionAdvisor, ClassFilter, Ordered, Serializable {
 
 	private final Advice advice;
 
-	private final Set<Class<?>> interfaces = new LinkedHashSet<Class<?>>();
+	private final Set<Class<?>> interfaces = new LinkedHashSet<>();
 
-	private int order = Integer.MAX_VALUE;
+	private int order = Ordered.LOWEST_PRECEDENCE;
 
 
 	/**
@@ -64,13 +65,14 @@ public class DefaultIntroductionAdvisor implements IntroductionAdvisor, ClassFil
 	 * @param introductionInfo the IntroductionInfo that describes
 	 * the interface to introduce (may be {@code null})
 	 */
-	public DefaultIntroductionAdvisor(Advice advice, IntroductionInfo introductionInfo) {
+	public DefaultIntroductionAdvisor(Advice advice, @Nullable IntroductionInfo introductionInfo) {
 		Assert.notNull(advice, "Advice must not be null");
 		this.advice = advice;
 		if (introductionInfo != null) {
 			Class<?>[] introducedInterfaces = introductionInfo.getInterfaces();
 			if (introducedInterfaces.length == 0) {
-				throw new IllegalArgumentException("IntroductionAdviceSupport implements no interfaces");
+				throw new IllegalArgumentException(
+						"IntroductionInfo defines no interfaces to introduce: " + introductionInfo);
 			}
 			for (Class<?> ifc : introducedInterfaces) {
 				addInterface(ifc);
@@ -81,30 +83,30 @@ public class DefaultIntroductionAdvisor implements IntroductionAdvisor, ClassFil
 	/**
 	 * Create a DefaultIntroductionAdvisor for the given advice.
 	 * @param advice the Advice to apply
-	 * @param intf the interface to introduce
+	 * @param ifc the interface to introduce
 	 */
-	public DefaultIntroductionAdvisor(DynamicIntroductionAdvice advice, Class<?> intf) {
+	public DefaultIntroductionAdvisor(DynamicIntroductionAdvice advice, Class<?> ifc) {
 		Assert.notNull(advice, "Advice must not be null");
 		this.advice = advice;
-		addInterface(intf);
+		addInterface(ifc);
 	}
 
 
 	/**
 	 * Add the specified interface to the list of interfaces to introduce.
-	 * @param intf the interface to introduce
+	 * @param ifc the interface to introduce
 	 */
-	public void addInterface(Class<?> intf) {
-		Assert.notNull(intf, "Interface must not be null");
-		if (!intf.isInterface()) {
-			throw new IllegalArgumentException("Specified class [" + intf.getName() + "] must be an interface");
+	public void addInterface(Class<?> ifc) {
+		Assert.notNull(ifc, "Interface must not be null");
+		if (!ifc.isInterface()) {
+			throw new IllegalArgumentException("Specified class [" + ifc.getName() + "] must be an interface");
 		}
-		this.interfaces.add(intf);
+		this.interfaces.add(ifc);
 	}
 
 	@Override
 	public Class<?>[] getInterfaces() {
-		return this.interfaces.toArray(new Class<?>[this.interfaces.size()]);
+		return ClassUtils.toClassArray(this.interfaces);
 	}
 
 	@Override
@@ -112,12 +114,11 @@ public class DefaultIntroductionAdvisor implements IntroductionAdvisor, ClassFil
 		for (Class<?> ifc : this.interfaces) {
 			if (this.advice instanceof DynamicIntroductionAdvice &&
 					!((DynamicIntroductionAdvice) this.advice).implementsInterface(ifc)) {
-			 throw new IllegalArgumentException("DynamicIntroductionAdvice [" + this.advice + "] " +
-					 "does not implement interface [" + ifc.getName() + "] specified for introduction");
+				throw new IllegalArgumentException("DynamicIntroductionAdvice [" + this.advice + "] " +
+						"does not implement interface [" + ifc.getName() + "] specified for introduction");
 			}
 		}
 	}
-
 
 	public void setOrder(int order) {
 		this.order = order;
@@ -127,7 +128,6 @@ public class DefaultIntroductionAdvisor implements IntroductionAdvisor, ClassFil
 	public int getOrder() {
 		return this.order;
 	}
-
 
 	@Override
 	public Advice getAdvice() {
@@ -151,7 +151,7 @@ public class DefaultIntroductionAdvisor implements IntroductionAdvisor, ClassFil
 
 
 	@Override
-	public boolean equals(Object other) {
+	public boolean equals(@Nullable Object other) {
 		if (this == other) {
 			return true;
 		}
@@ -169,7 +169,7 @@ public class DefaultIntroductionAdvisor implements IntroductionAdvisor, ClassFil
 
 	@Override
 	public String toString() {
-		return ClassUtils.getShortName(getClass()) + ": advice [" + this.advice + "]; interfaces " +
+		return getClass().getName() + ": advice [" + this.advice + "]; interfaces " +
 				ClassUtils.classNamesToString(this.interfaces);
 	}
 

@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -49,12 +50,15 @@ public class CookieGenerator {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	@Nullable
 	private String cookieName;
 
+	@Nullable
 	private String cookieDomain;
 
 	private String cookiePath = DEFAULT_COOKIE_PATH;
 
+	@Nullable
 	private Integer cookieMaxAge;
 
 	private boolean cookieSecure = false;
@@ -66,13 +70,14 @@ public class CookieGenerator {
 	 * Use the given name for cookies created by this generator.
 	 * @see javax.servlet.http.Cookie#getName()
 	 */
-	public void setCookieName(String cookieName) {
+	public void setCookieName(@Nullable String cookieName) {
 		this.cookieName = cookieName;
 	}
 
 	/**
 	 * Return the given name for cookies created by this generator.
 	 */
+	@Nullable
 	public String getCookieName() {
 		return this.cookieName;
 	}
@@ -82,13 +87,14 @@ public class CookieGenerator {
 	 * The cookie is only visible to servers in this domain.
 	 * @see javax.servlet.http.Cookie#setDomain
 	 */
-	public void setCookieDomain(String cookieDomain) {
+	public void setCookieDomain(@Nullable String cookieDomain) {
 		this.cookieDomain = cookieDomain;
 	}
 
 	/**
 	 * Return the domain for cookies created by this generator, if any.
 	 */
+	@Nullable
 	public String getCookieDomain() {
 		return this.cookieDomain;
 	}
@@ -116,13 +122,14 @@ public class CookieGenerator {
 	 * default.
 	 * @see javax.servlet.http.Cookie#setMaxAge
 	 */
-	public void setCookieMaxAge(Integer cookieMaxAge) {
+	public void setCookieMaxAge(@Nullable Integer cookieMaxAge) {
 		this.cookieMaxAge = cookieMaxAge;
 	}
 
 	/**
 	 * Return the maximum age for cookies created by this generator.
 	 */
+	@Nullable
 	public Integer getCookieMaxAge() {
 		return this.cookieMaxAge;
 	}
@@ -188,8 +195,8 @@ public class CookieGenerator {
 			cookie.setHttpOnly(true);
 		}
 		response.addCookie(cookie);
-		if (logger.isDebugEnabled()) {
-			logger.debug("Added cookie with name [" + getCookieName() + "] and value [" + cookieValue + "]");
+		if (logger.isTraceEnabled()) {
+			logger.trace("Added cookie [" + getCookieName() + "=" + cookieValue + "]");
 		}
 	}
 
@@ -213,8 +220,8 @@ public class CookieGenerator {
 			cookie.setHttpOnly(true);
 		}
 		response.addCookie(cookie);
-		if (logger.isDebugEnabled()) {
-			logger.debug("Removed cookie with name [" + getCookieName() + "]");
+		if (logger.isTraceEnabled()) {
+			logger.trace("Removed cookie '" + getCookieName() + "'");
 		}
 	}
 

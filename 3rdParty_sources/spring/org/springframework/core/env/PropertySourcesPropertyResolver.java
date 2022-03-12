@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *	  http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,8 +16,7 @@
 
 package org.springframework.core.env;
 
-import org.springframework.core.convert.ConversionException;
-import org.springframework.util.ClassUtils;
+import org.springframework.lang.Nullable;
 
 /**
  * {@link PropertyResolver} implementation that resolves property values against
@@ -32,6 +31,7 @@ import org.springframework.util.ClassUtils;
  */
 public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 
+	@Nullable
 	private final PropertySources propertySources;
 
 
@@ -39,7 +39,7 @@ public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 	 * Create a new resolver against the given property sources.
 	 * @param propertySources the set of {@link PropertySource} objects to use
 	 */
-	public PropertySourcesPropertyResolver(PropertySources propertySources) {
+	public PropertySourcesPropertyResolver(@Nullable PropertySources propertySources) {
 		this.propertySources = propertySources;
 	}
 
@@ -57,20 +57,24 @@ public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 	}
 
 	@Override
+	@Nullable
 	public String getProperty(String key) {
 		return getProperty(key, String.class, true);
 	}
 
 	@Override
+	@Nullable
 	public <T> T getProperty(String key, Class<T> targetValueType) {
 		return getProperty(key, targetValueType, true);
 	}
 
 	@Override
+	@Nullable
 	protected String getPropertyAsRawString(String key) {
 		return getProperty(key, String.class, false);
 	}
 
+	@Nullable
 	protected <T> T getProperty(String key, Class<T> targetValueType, boolean resolveNestedPlaceholders) {
 		if (this.propertySources != null) {
 			for (PropertySource<?> propertySource : this.propertySources) {
@@ -88,49 +92,8 @@ public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 				}
 			}
 		}
-		if (logger.isDebugEnabled()) {
-			logger.debug("Could not find key '" + key + "' in any property source");
-		}
-		return null;
-	}
-
-	@Override
-	@Deprecated
-	public <T> Class<T> getPropertyAsClass(String key, Class<T> targetValueType) {
-		if (this.propertySources != null) {
-			for (PropertySource<?> propertySource : this.propertySources) {
-				if (logger.isTraceEnabled()) {
-					logger.trace(String.format("Searching for key '%s' in [%s]", key, propertySource.getName()));
-				}
-				Object value = propertySource.getProperty(key);
-				if (value != null) {
-					logKeyFound(key, propertySource, value);
-					Class<?> clazz;
-					if (value instanceof String) {
-						try {
-							clazz = ClassUtils.forName((String) value, null);
-						}
-						catch (Exception ex) {
-							throw new ClassConversionException((String) value, targetValueType, ex);
-						}
-					}
-					else if (value instanceof Class) {
-						clazz = (Class<?>) value;
-					}
-					else {
-						clazz = value.getClass();
-					}
-					if (!targetValueType.isAssignableFrom(clazz)) {
-						throw new ClassConversionException(clazz, targetValueType);
-					}
-					@SuppressWarnings("unchecked")
-					Class<T> targetClass = (Class<T>) clazz;
-					return targetClass;
-				}
-			}
-		}
-		if (logger.isDebugEnabled()) {
-			logger.debug(String.format("Could not find key '%s' in any property source", key));
+		if (logger.isTraceEnabled()) {
+			logger.trace("Could not find key '" + key + "' in any property source");
 		}
 		return null;
 	}
@@ -151,22 +114,6 @@ public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Found key '" + key + "' in PropertySource '" + propertySource.getName() +
 					"' with value of type " + value.getClass().getSimpleName());
-		}
-	}
-
-
-	@SuppressWarnings("serial")
-	@Deprecated
-	private static class ClassConversionException extends ConversionException {
-
-		public ClassConversionException(Class<?> actual, Class<?> expected) {
-			super(String.format("Actual type %s is not assignable to expected type %s",
-					actual.getName(), expected.getName()));
-		}
-
-		public ClassConversionException(String actual, Class<?> expected, Exception ex) {
-			super(String.format("Could not find/load class %s during attempt to convert to %s",
-					actual, expected.getName()), ex);
 		}
 	}
 

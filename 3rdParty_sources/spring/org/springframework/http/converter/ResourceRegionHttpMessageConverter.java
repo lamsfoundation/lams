@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,15 +21,18 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.StreamUtils;
 
@@ -43,9 +46,6 @@ import org.springframework.util.StreamUtils;
  */
 public class ResourceRegionHttpMessageConverter extends AbstractGenericHttpMessageConverter<Object> {
 
-	private static final boolean jafPresent = ClassUtils.isPresent(
-			"javax.activation.FileTypeMap", ResourceHttpMessageConverter.class.getClassLoader());
-
 	public ResourceRegionHttpMessageConverter() {
 		super(MediaType.ALL);
 	}
@@ -54,32 +54,31 @@ public class ResourceRegionHttpMessageConverter extends AbstractGenericHttpMessa
 	@Override
 	@SuppressWarnings("unchecked")
 	protected MediaType getDefaultContentType(Object object) {
-		if (jafPresent) {
-			if (object instanceof ResourceRegion) {
-				return ActivationMediaTypeFactory.getMediaType(((ResourceRegion) object).getResource());
-			}
-			else {
-				Collection<ResourceRegion> regions = (Collection<ResourceRegion>) object;
-				if (!regions.isEmpty()) {
-					return ActivationMediaTypeFactory.getMediaType(regions.iterator().next().getResource());
-				}
+		Resource resource = null;
+		if (object instanceof ResourceRegion) {
+			resource = ((ResourceRegion) object).getResource();
+		}
+		else {
+			Collection<ResourceRegion> regions = (Collection<ResourceRegion>) object;
+			if (!regions.isEmpty()) {
+				resource = regions.iterator().next().getResource();
 			}
 		}
-		return MediaType.APPLICATION_OCTET_STREAM;
+		return MediaTypeFactory.getMediaType(resource).orElse(MediaType.APPLICATION_OCTET_STREAM);
 	}
 
 	@Override
-	public boolean canRead(Class<?> clazz, MediaType mediaType) {
+	public boolean canRead(Class<?> clazz, @Nullable MediaType mediaType) {
 		return false;
 	}
 
 	@Override
-	public boolean canRead(Type type, Class<?> contextClass, MediaType mediaType) {
+	public boolean canRead(Type type, @Nullable Class<?> contextClass, @Nullable MediaType mediaType) {
 		return false;
 	}
 
 	@Override
-	public Object read(Type type, Class<?> contextClass, HttpInputMessage inputMessage)
+	public Object read(Type type, @Nullable Class<?> contextClass, HttpInputMessage inputMessage)
 			throws IOException, HttpMessageNotReadableException {
 
 		throw new UnsupportedOperationException();
@@ -93,15 +92,16 @@ public class ResourceRegionHttpMessageConverter extends AbstractGenericHttpMessa
 	}
 
 	@Override
-	public boolean canWrite(Class<?> clazz, MediaType mediaType) {
+	public boolean canWrite(Class<?> clazz, @Nullable MediaType mediaType) {
 		return canWrite(clazz, null, mediaType);
 	}
 
 	@Override
-	public boolean canWrite(Type type, Class<?> clazz, MediaType mediaType) {
+	public boolean canWrite(@Nullable Type type, @Nullable Class<?> clazz, @Nullable MediaType mediaType) {
 		if (!(type instanceof ParameterizedType)) {
-			return ResourceRegion.class.isAssignableFrom((Class<?>) type);
+			return (type instanceof Class && ResourceRegion.class.isAssignableFrom((Class<?>) type));
 		}
+
 		ParameterizedType parameterizedType = (ParameterizedType) type;
 		if (!(parameterizedType.getRawType() instanceof Class)) {
 			return false;
@@ -117,13 +117,14 @@ public class ResourceRegionHttpMessageConverter extends AbstractGenericHttpMessa
 		if (!(typeArgument instanceof Class)) {
 			return false;
 		}
+
 		Class<?> typeArgumentClass = (Class<?>) typeArgument;
-		return typeArgumentClass.isAssignableFrom(ResourceRegion.class);
+		return ResourceRegion.class.isAssignableFrom(typeArgumentClass);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected void writeInternal(Object object, Type type, HttpOutputMessage outputMessage)
+	protected void writeInternal(Object object, @Nullable Type type, HttpOutputMessage outputMessage)
 			throws IOException, HttpMessageNotWritableException {
 
 		if (object instanceof ResourceRegion) {
@@ -147,7 +148,7 @@ public class ResourceRegionHttpMessageConverter extends AbstractGenericHttpMessa
 
 		long start = region.getPosition();
 		long end = start + region.getCount() - 1;
-		Long resourceLength = region.getResource().contentLength();
+		long resourceLength = region.getResource().contentLength();
 		end = Math.min(end, resourceLength - 1);
 		long rangeLength = end - start + 1;
 		responseHeaders.add("Content-Range", "bytes " + start + '-' + end + '/' + resourceLength);
@@ -178,34 +179,51 @@ public class ResourceRegionHttpMessageConverter extends AbstractGenericHttpMessa
 		responseHeaders.set(HttpHeaders.CONTENT_TYPE, "multipart/byteranges; boundary=" + boundaryString);
 		OutputStream out = outputMessage.getBody();
 
-		for (ResourceRegion region : resourceRegions) {
-			long start = region.getPosition();
-			long end = start + region.getCount() - 1;
-			InputStream in = region.getResource().getInputStream();
-			try {
+		Resource resource = null;
+		InputStream in = null;
+		long inputStreamPosition = 0;
+
+		try {
+			for (ResourceRegion region : resourceRegions) {
+				long start = region.getPosition() - inputStreamPosition;
+				if (start < 0 || resource != region.getResource()) {
+					if (in != null) {
+						in.close();
+					}
+					resource = region.getResource();
+					in = resource.getInputStream();
+					inputStreamPosition = 0;
+					start = region.getPosition();
+				}
+				long end = start + region.getCount() - 1;
 				// Writing MIME header.
 				println(out);
 				print(out, "--" + boundaryString);
 				println(out);
 				if (contentType != null) {
-					print(out, "Content-Type: " + contentType.toString());
+					print(out, "Content-Type: " + contentType);
 					println(out);
 				}
-				Long resourceLength = region.getResource().contentLength();
-				end = Math.min(end, resourceLength - 1);
-				print(out, "Content-Range: bytes " + start + '-' + end + '/' + resourceLength);
+				long resourceLength = region.getResource().contentLength();
+				end = Math.min(end, resourceLength - inputStreamPosition - 1);
+				print(out, "Content-Range: bytes " +
+						region.getPosition() + '-' + (region.getPosition() + region.getCount() - 1) +
+						'/' + resourceLength);
 				println(out);
 				println(out);
 				// Printing content
 				StreamUtils.copyRange(in, out, start, end);
+				inputStreamPosition += (end + 1);
 			}
-			finally {
-				try {
+		}
+		finally {
+			try {
+				if (in != null) {
 					in.close();
 				}
-				catch (IOException ex) {
-					// ignore
-				}
+			}
+			catch (IOException ex) {
+				// ignore
 			}
 		}
 
@@ -219,7 +237,7 @@ public class ResourceRegionHttpMessageConverter extends AbstractGenericHttpMessa
 	}
 
 	private static void print(OutputStream os, String buf) throws IOException {
-		os.write(buf.getBytes("US-ASCII"));
+		os.write(buf.getBytes(StandardCharsets.US_ASCII));
 	}
 
 }

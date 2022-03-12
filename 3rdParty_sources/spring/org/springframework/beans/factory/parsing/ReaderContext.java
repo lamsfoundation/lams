@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,7 @@
 package org.springframework.beans.factory.parsing;
 
 import org.springframework.core.io.Resource;
+import org.springframework.lang.Nullable;
 
 /**
  * Context that gets passed along a bean definition reading process,
@@ -63,28 +64,28 @@ public class ReaderContext {
 	/**
 	 * Raise a fatal error.
 	 */
-	public void fatal(String message, Object source) {
+	public void fatal(String message, @Nullable Object source) {
 		fatal(message, source, null, null);
 	}
 
 	/**
 	 * Raise a fatal error.
 	 */
-	public void fatal(String message, Object source, Throwable ex) {
-		fatal(message, source, null, ex);
+	public void fatal(String message, @Nullable Object source, @Nullable Throwable cause) {
+		fatal(message, source, null, cause);
 	}
 
 	/**
 	 * Raise a fatal error.
 	 */
-	public void fatal(String message, Object source, ParseState parseState) {
+	public void fatal(String message, @Nullable Object source, @Nullable ParseState parseState) {
 		fatal(message, source, parseState, null);
 	}
 
 	/**
 	 * Raise a fatal error.
 	 */
-	public void fatal(String message, Object source, ParseState parseState, Throwable cause) {
+	public void fatal(String message, @Nullable Object source, @Nullable ParseState parseState, @Nullable Throwable cause) {
 		Location location = new Location(getResource(), source);
 		this.problemReporter.fatal(new Problem(message, location, parseState, cause));
 	}
@@ -92,28 +93,28 @@ public class ReaderContext {
 	/**
 	 * Raise a regular error.
 	 */
-	public void error(String message, Object source) {
+	public void error(String message, @Nullable Object source) {
 		error(message, source, null, null);
 	}
 
 	/**
 	 * Raise a regular error.
 	 */
-	public void error(String message, Object source, Throwable ex) {
-		error(message, source, null, ex);
+	public void error(String message, @Nullable Object source, @Nullable Throwable cause) {
+		error(message, source, null, cause);
 	}
 
 	/**
 	 * Raise a regular error.
 	 */
-	public void error(String message, Object source, ParseState parseState) {
+	public void error(String message, @Nullable Object source, @Nullable ParseState parseState) {
 		error(message, source, parseState, null);
 	}
 
 	/**
 	 * Raise a regular error.
 	 */
-	public void error(String message, Object source, ParseState parseState, Throwable cause) {
+	public void error(String message, @Nullable Object source, @Nullable ParseState parseState, @Nullable Throwable cause) {
 		Location location = new Location(getResource(), source);
 		this.problemReporter.error(new Problem(message, location, parseState, cause));
 	}
@@ -121,28 +122,28 @@ public class ReaderContext {
 	/**
 	 * Raise a non-critical warning.
 	 */
-	public void warning(String message, Object source) {
+	public void warning(String message, @Nullable Object source) {
 		warning(message, source, null, null);
 	}
 
 	/**
 	 * Raise a non-critical warning.
 	 */
-	public void warning(String message, Object source, Throwable ex) {
-		warning(message, source, null, ex);
+	public void warning(String message, @Nullable Object source, @Nullable Throwable cause) {
+		warning(message, source, null, cause);
 	}
 
 	/**
 	 * Raise a non-critical warning.
 	 */
-	public void warning(String message, Object source, ParseState parseState) {
+	public void warning(String message, @Nullable Object source, @Nullable ParseState parseState) {
 		warning(message, source, parseState, null);
 	}
 
 	/**
 	 * Raise a non-critical warning.
 	 */
-	public void warning(String message, Object source, ParseState parseState, Throwable cause) {
+	public void warning(String message, @Nullable Object source, @Nullable ParseState parseState, @Nullable Throwable cause) {
 		Location location = new Location(getResource(), source);
 		this.problemReporter.warning(new Problem(message, location, parseState, cause));
 	}
@@ -151,14 +152,14 @@ public class ReaderContext {
 	// Explicit parse events
 
 	/**
-	 * Fire an defaults-registered event.
+	 * Fire a defaults-registered event.
 	 */
 	public void fireDefaultsRegistered(DefaultsDefinition defaultsDefinition) {
 		this.eventListener.defaultsRegistered(defaultsDefinition);
 	}
 
 	/**
-	 * Fire an component-registered event.
+	 * Fire a component-registered event.
 	 */
 	public void fireComponentRegistered(ComponentDefinition componentDefinition) {
 		this.eventListener.componentRegistered(componentDefinition);
@@ -167,21 +168,21 @@ public class ReaderContext {
 	/**
 	 * Fire an alias-registered event.
 	 */
-	public void fireAliasRegistered(String beanName, String alias, Object source) {
+	public void fireAliasRegistered(String beanName, String alias, @Nullable Object source) {
 		this.eventListener.aliasRegistered(new AliasDefinition(beanName, alias, source));
 	}
 
 	/**
 	 * Fire an import-processed event.
 	 */
-	public void fireImportProcessed(String importedResource, Object source) {
+	public void fireImportProcessed(String importedResource, @Nullable Object source) {
 		this.eventListener.importProcessed(new ImportDefinition(importedResource, source));
 	}
 
 	/**
 	 * Fire an import-processed event.
 	 */
-	public void fireImportProcessed(String importedResource, Resource[] actualResources, Object source) {
+	public void fireImportProcessed(String importedResource, Resource[] actualResources, @Nullable Object source) {
 		this.eventListener.importProcessed(new ImportDefinition(importedResource, actualResources, source));
 	}
 
@@ -202,6 +203,7 @@ public class ReaderContext {
 	 * @see #getSourceExtractor()
 	 * @see SourceExtractor#extractSource
 	 */
+	@Nullable
 	public Object extractSource(Object sourceCandidate) {
 		return this.sourceExtractor.extractSource(sourceCandidate, this.resource);
 	}

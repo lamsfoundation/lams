@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,7 +20,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.springframework.core.NamedThreadLocal;
-import org.springframework.lang.UsesJava7;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -48,7 +48,7 @@ import org.springframework.util.StringUtils;
  *   &lt;property name="targetDataSource" ref="myTargetDataSource"/&gt;
  *   &lt;property name="username" value="myusername"/&gt;
  *   &lt;property name="password" value="mypassword"/&gt;
- * &lt;/bean></pre>
+ * &lt;/bean&gt;</pre>
  *
  * <p>If the "username" is empty, this proxy will simply delegate to the
  * standard {@code getConnection()} method of the target DataSource.
@@ -62,16 +62,20 @@ import org.springframework.util.StringUtils;
  */
 public class UserCredentialsDataSourceAdapter extends DelegatingDataSource {
 
+	@Nullable
 	private String username;
 
+	@Nullable
 	private String password;
 
+	@Nullable
 	private String catalog;
 
+	@Nullable
 	private String schema;
 
 	private final ThreadLocal<JdbcUserCredentials> threadBoundCredentials =
-			new NamedThreadLocal<JdbcUserCredentials>("Current JDBC user credentials");
+			new NamedThreadLocal<>("Current JDBC user credentials");
 
 
 	/**
@@ -144,12 +148,12 @@ public class UserCredentialsDataSourceAdapter extends DelegatingDataSource {
 	/**
 	 * Determine whether there are currently thread-bound credentials,
 	 * using them if available, falling back to the statically specified
-	 * username and password (i.e. values of the bean properties) else.
+	 * username and password (i.e. values of the bean properties) otherwise.
 	 * <p>Delegates to {@link #doGetConnection(String, String)} with the
 	 * determined credentials as parameters.
+	 * @see #doGetConnection
 	 */
 	@Override
-	@UsesJava7
 	public Connection getConnection() throws SQLException {
 		JdbcUserCredentials threadCredentials = this.threadBoundCredentials.get();
 		Connection con = (threadCredentials != null ?
@@ -185,7 +189,7 @@ public class UserCredentialsDataSourceAdapter extends DelegatingDataSource {
 	 * @see javax.sql.DataSource#getConnection(String, String)
 	 * @see javax.sql.DataSource#getConnection()
 	 */
-	protected Connection doGetConnection(String username, String password) throws SQLException {
+	protected Connection doGetConnection(@Nullable String username, @Nullable String password) throws SQLException {
 		Assert.state(getTargetDataSource() != null, "'targetDataSource' is required");
 		if (StringUtils.hasLength(username)) {
 			return getTargetDataSource().getConnection(username, password);
@@ -199,13 +203,13 @@ public class UserCredentialsDataSourceAdapter extends DelegatingDataSource {
 	/**
 	 * Inner class used as ThreadLocal value.
 	 */
-	private static class JdbcUserCredentials {
+	private static final class JdbcUserCredentials {
 
 		public final String username;
 
 		public final String password;
 
-		private JdbcUserCredentials(String username, String password) {
+		public JdbcUserCredentials(String username, String password) {
 			this.username = username;
 			this.password = password;
 		}

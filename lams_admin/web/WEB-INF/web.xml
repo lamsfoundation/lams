@@ -15,14 +15,6 @@
 		<param-name>contextConfigLocation</param-name>
 		<param-value>classpath:/org/lamsfoundation/lams/admin/adminApplicationContext.xml</param-value>
 	</context-param>
-	<context-param>
-		<param-name>locatorFactorySelector</param-name>
-		<param-value>classpath:/org/lamsfoundation/lams/beanRefContext.xml</param-value>
-	</context-param>
-	<context-param>
-		<param-name>parentContextKey</param-name>
-		<param-value>context.central</param-value>
-	</context-param>
 
 	<context-param>
 		<param-name>migration.systemname</param-name>
@@ -101,7 +93,7 @@
 	</listener>
 	<listener>
 		<listener-class>
-			org.springframework.web.context.ContextLoaderListener
+			org.lamsfoundation.lams.web.filter.LamsContextLoaderListener
 		</listener-class>
 	</listener>
 

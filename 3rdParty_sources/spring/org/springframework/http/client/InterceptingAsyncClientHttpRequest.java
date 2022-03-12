@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,6 +24,7 @@ import java.util.List;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpRequest;
+import org.springframework.util.Assert;
 import org.springframework.util.StreamUtils;
 import org.springframework.util.concurrent.ListenableFuture;
 
@@ -34,7 +35,9 @@ import org.springframework.util.concurrent.ListenableFuture;
  * @author Jakub Narloch
  * @author Rossen Stoyanchev
  * @see InterceptingAsyncClientHttpRequestFactory
+ * @deprecated as of Spring 5.0, with no direct replacement
  */
+@Deprecated
 class InterceptingAsyncClientHttpRequest extends AbstractBufferingAsyncClientHttpRequest {
 
 	private AsyncClientHttpRequestFactory requestFactory;
@@ -76,8 +79,13 @@ class InterceptingAsyncClientHttpRequest extends AbstractBufferingAsyncClientHtt
 	}
 
 	@Override
+	public String getMethodValue() {
+		return this.httpMethod.name();
+	}
+
+	@Override
 	public URI getURI() {
-		return uri;
+		return this.uri;
 	}
 
 
@@ -102,6 +110,7 @@ class InterceptingAsyncClientHttpRequest extends AbstractBufferingAsyncClientHtt
 				HttpMethod method = request.getMethod();
 				HttpHeaders headers = request.getHeaders();
 
+				Assert.state(method != null, "No standard HTTP method");
 				AsyncClientHttpRequest delegate = requestFactory.createAsyncRequest(uri, method);
 				delegate.getHeaders().putAll(headers);
 				if (body.length > 0) {

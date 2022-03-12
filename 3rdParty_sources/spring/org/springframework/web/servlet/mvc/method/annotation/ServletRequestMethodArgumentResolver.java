@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,19 +16,23 @@
 
 package org.springframework.web.servlet.mvc.method.annotation;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.security.Principal;
 import java.time.ZoneId;
 import java.util.Locale;
 import java.util.TimeZone;
+
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.PushBuilder;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpMethod;
-import org.springframework.lang.UsesJava8;
+import org.springframework.lang.Nullable;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.WebRequest;
@@ -38,13 +42,17 @@ import org.springframework.web.multipart.MultipartRequest;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 /**
- * Resolves request-related method argument values of the following types:
+ * Resolves servlet backed request-related method arguments. Supports values of the
+ * following types:
  * <ul>
  * <li>{@link WebRequest}
  * <li>{@link ServletRequest}
  * <li>{@link MultipartRequest}
  * <li>{@link HttpSession}
- * <li>{@link Principal}
+ * <li>{@link PushBuilder} (as of Spring 5.0 on Servlet 4.0)
+ * <li>{@link Principal} but only if not annotated in order to allow custom
+ * resolvers to resolve it, and the falling back on
+ * {@link PrincipalMethodArgumentResolver}.
  * <li>{@link InputStream}
  * <li>{@link Reader}
  * <li>{@link HttpMethod} (as of Spring 4.0)
@@ -60,6 +68,21 @@ import org.springframework.web.servlet.support.RequestContextUtils;
  */
 public class ServletRequestMethodArgumentResolver implements HandlerMethodArgumentResolver {
 
+	@Nullable
+	private static Class<?> pushBuilder;
+
+	static {
+		try {
+			pushBuilder = ClassUtils.forName("javax.servlet.http.PushBuilder",
+					ServletRequestMethodArgumentResolver.class.getClassLoader());
+		}
+		catch (ClassNotFoundException ex) {
+			// Servlet 4.0 PushBuilder not found - not supported for injection
+			pushBuilder = null;
+		}
+	}
+
+
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
 		Class<?> paramType = parameter.getParameterType();
@@ -67,20 +90,23 @@ public class ServletRequestMethodArgumentResolver implements HandlerMethodArgume
 				ServletRequest.class.isAssignableFrom(paramType) ||
 				MultipartRequest.class.isAssignableFrom(paramType) ||
 				HttpSession.class.isAssignableFrom(paramType) ||
-				Principal.class.isAssignableFrom(paramType) ||
+				(pushBuilder != null && pushBuilder.isAssignableFrom(paramType)) ||
+				(Principal.class.isAssignableFrom(paramType) && !parameter.hasParameterAnnotations()) ||
 				InputStream.class.isAssignableFrom(paramType) ||
 				Reader.class.isAssignableFrom(paramType) ||
 				HttpMethod.class == paramType ||
 				Locale.class == paramType ||
 				TimeZone.class == paramType ||
-				"java.time.ZoneId".equals(paramType.getName()));
+				ZoneId.class == paramType);
 	}
 
 	@Override
-	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-			NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+	public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
+			NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
 
 		Class<?> paramType = parameter.getParameterType();
+
+		// WebRequest / NativeWebRequest / ServletWebRequest
 		if (WebRequest.class.isAssignableFrom(paramType)) {
 			if (!paramType.isInstance(webRequest)) {
 				throw new IllegalStateException(
@@ -89,22 +115,36 @@ public class ServletRequestMethodArgumentResolver implements HandlerMethodArgume
 			return webRequest;
 		}
 
-		HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
+		// ServletRequest / HttpServletRequest / MultipartRequest / MultipartHttpServletRequest
 		if (ServletRequest.class.isAssignableFrom(paramType) || MultipartRequest.class.isAssignableFrom(paramType)) {
-			Object nativeRequest = webRequest.getNativeRequest(paramType);
-			if (nativeRequest == null) {
-				throw new IllegalStateException(
-						"Current request is not of type [" + paramType.getName() + "]: " + request);
-			}
-			return nativeRequest;
+			return resolveNativeRequest(webRequest, paramType);
 		}
-		else if (HttpSession.class.isAssignableFrom(paramType)) {
+
+		// HttpServletRequest required for all further argument types
+		return resolveArgument(paramType, resolveNativeRequest(webRequest, HttpServletRequest.class));
+	}
+
+	private <T> T resolveNativeRequest(NativeWebRequest webRequest, Class<T> requiredType) {
+		T nativeRequest = webRequest.getNativeRequest(requiredType);
+		if (nativeRequest == null) {
+			throw new IllegalStateException(
+					"Current request is not of type [" + requiredType.getName() + "]: " + webRequest);
+		}
+		return nativeRequest;
+	}
+
+	@Nullable
+	private Object resolveArgument(Class<?> paramType, HttpServletRequest request) throws IOException {
+		if (HttpSession.class.isAssignableFrom(paramType)) {
 			HttpSession session = request.getSession();
 			if (session != null && !paramType.isInstance(session)) {
 				throw new IllegalStateException(
 						"Current session is not of type [" + paramType.getName() + "]: " + session);
 			}
 			return session;
+		}
+		else if (pushBuilder != null && pushBuilder.isAssignableFrom(paramType)) {
+			return PushBuilderDelegate.resolvePushBuilder(request, paramType);
 		}
 		else if (InputStream.class.isAssignableFrom(paramType)) {
 			InputStream inputStream = request.getInputStream();
@@ -140,26 +180,30 @@ public class ServletRequestMethodArgumentResolver implements HandlerMethodArgume
 			TimeZone timeZone = RequestContextUtils.getTimeZone(request);
 			return (timeZone != null ? timeZone : TimeZone.getDefault());
 		}
-		else if ("java.time.ZoneId".equals(paramType.getName())) {
-			return ZoneIdResolver.resolveZoneId(request);
+		else if (ZoneId.class == paramType) {
+			TimeZone timeZone = RequestContextUtils.getTimeZone(request);
+			return (timeZone != null ? timeZone.toZoneId() : ZoneId.systemDefault());
 		}
-		else {
-			// Should never happen...
-			throw new UnsupportedOperationException(
-					"Unknown parameter type [" + paramType.getName() + "] in " + parameter.getMethod());
-		}
+
+		// Should never happen...
+		throw new UnsupportedOperationException("Unknown parameter type: " + paramType.getName());
 	}
 
 
 	/**
-	 * Inner class to avoid a hard-coded dependency on Java 8's {@link java.time.ZoneId}.
+	 * Inner class to avoid a hard dependency on Servlet API 4.0 at runtime.
 	 */
-	@UsesJava8
-	private static class ZoneIdResolver {
+	private static class PushBuilderDelegate {
 
-		public static Object resolveZoneId(HttpServletRequest request) {
-			TimeZone timeZone = RequestContextUtils.getTimeZone(request);
-			return (timeZone != null ? timeZone.toZoneId() : ZoneId.systemDefault());
+		@Nullable
+		public static Object resolvePushBuilder(HttpServletRequest request, Class<?> paramType) {
+			PushBuilder pushBuilder = request.newPushBuilder();
+			if (pushBuilder != null && !paramType.isInstance(pushBuilder)) {
+				throw new IllegalStateException(
+						"Current push builder is not of type [" + paramType.getName() + "]: " + pushBuilder);
+			}
+			return pushBuilder;
+
 		}
 	}
 

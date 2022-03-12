@@ -1,26 +1,14 @@
-function drawCompletionCharts(toolContentId, useGroups,animate) {
-	$.ajax({
-		'url' : WEB_APP_URL + 'monitoring/getCompletionChartsData.do',
-		'data': {
-			'toolContentId' : toolContentId
-		},
-		'dataType' : 'json',
-		'success'  : function(data) {
-			// draw charts for the first time
-			drawActivityCompletionChart(data, animate);
-			drawAnsweredQuestionsChart(data, useGroups, animate);
-		}
-	});
+function drawCompletionCharts(toolContentId, useGroups, animate) {
 	
-	if (activityCompletionChart == null && answeredQuestionsChart == null && COMPLETION_CHART_UPDATE_INTERVAL > 0) {
-		if (typeof completionChartInterval != 'undefined' && completionChartInterval) {
-			window.clearInterval(completionChartInterval);
+	const source = new EventSource( WEB_APP_URL + 'monitoring/getCompletionChartsData.do?toolContentId=' + toolContentId);
+
+	source.onmessage = function (event) {
+		if (!event.data) {
+			return;
 		}
-		
-		// set up update interval for the charts
-		completionChartInterval = window.setInterval(function(){
-			drawCompletionCharts(toolContentId, useGroups,animate);
-		}, COMPLETION_CHART_UPDATE_INTERVAL);
+		var data = JSON.parse(event.data);
+		drawActivityCompletionChart(data, animate);
+		drawAnsweredQuestionsChart(data, useGroups, animate);
 	}
 }
 

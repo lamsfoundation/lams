@@ -1,11 +1,11 @@
-/*<
- * Copyright 2002-2017 the original author or authors.
+/*
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +15,8 @@
  */
 
 package org.springframework.aop;
+
+import org.springframework.lang.Nullable;
 
 /**
  * A {@code TargetSource} is used to obtain the current "target" of
@@ -29,6 +31,7 @@ package org.springframework.aop;
  * {@code TargetSources} directly: this is an AOP framework interface.
  *
  * @author Rod Johnson
+ * @author Juergen Hoeller
  */
 public interface TargetSource extends TargetClassAware {
 
@@ -39,6 +42,7 @@ public interface TargetSource extends TargetClassAware {
 	 * @return the type of targets returned by this {@link TargetSource}
 	 */
 	@Override
+	@Nullable
 	Class<?> getTargetClass();
 
 	/**
@@ -57,6 +61,7 @@ public interface TargetSource extends TargetClassAware {
 	 * or {@code null} if there is no actual target instance
 	 * @throws Exception if the target object can't be resolved
 	 */
+	@Nullable
 	Object getTarget() throws Exception;
 
 	/**
