@@ -862,7 +862,8 @@ public class QbService implements IQbService {
 	    Set<String> nameWithoutUserAnswer = new LinkedHashSet<>(List.of(alternatives));
 	    nameWithoutUserAnswer.remove(answer);
 	    name = nameWithoutUserAnswer.isEmpty() ? ""
-		    : nameWithoutUserAnswer.stream().collect(Collectors.joining(QbUtils.VSA_ANSWER_DELIMITER));
+		    : nameWithoutUserAnswer.stream().filter(StringUtils::isNotBlank)
+			    .collect(Collectors.joining(QbUtils.VSA_ANSWER_DELIMITER));
 	    previousOption.setName(name);
 	    qbDAO.update(previousOption);
 	    qbDAO.flush();
