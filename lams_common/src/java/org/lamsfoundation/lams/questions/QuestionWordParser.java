@@ -112,7 +112,13 @@ public class QuestionWordParser {
 	for (int i = 0; i < images.getLength(); i++) {
 	    Node image = images.item(i);
 	    String src = image.getAttributes().getNamedItem("src").getNodeValue();
-	    Text updatedImageTag = doc.createTextNode("[IMAGE: " + src + "]");
+	    StringBuilder updatedImageTagText = new StringBuilder("[IMAGE: ").append(src);
+	    Node altText = image.getAttributes().getNamedItem("alt");
+	    if (altText != null) {
+		updatedImageTagText.append("| alt=\"").append(altText.getNodeValue().replace('"', '\'')).append("\"");
+	    }
+	    updatedImageTagText.append("]");
+	    Text updatedImageTag = doc.createTextNode(updatedImageTagText.toString());
 	    image.getParentNode().insertBefore(updatedImageTag, image);
 	    image.getParentNode().removeChild(image);
 	}
