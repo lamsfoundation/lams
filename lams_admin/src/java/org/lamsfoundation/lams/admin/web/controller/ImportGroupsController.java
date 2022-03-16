@@ -52,20 +52,21 @@ public class ImportGroupsController {
 	importForm.setOrgId(0);
 	File file = null;
 
-	File uploadDir = FileUtil.getTmpFileUploadDir(importForm.getTmpFileUploadId());
-	if (uploadDir.canRead()) {
-	    File[] files = uploadDir.listFiles();
-	    if (files.length > 1) {
-		throw new IOException("Uploaded more than 1 file");
-	    } else if (files.length == 1) {
-		file = files[0];
+	if (importForm.getTmpFileUploadId() != null) {
+	    File uploadDir = FileUtil.getTmpFileUploadDir(importForm.getTmpFileUploadId());
+	    if (uploadDir.canRead()) {
+		File[] files = uploadDir.listFiles();
+		if (files.length > 1) {
+		    throw new IOException("Uploaded more than 1 file");
+		} else if (files.length == 1) {
+		    file = files[0];
+		}
 	    }
 	}
-
-	importForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
-
+	
 	// validation
 	if (file == null) {
+	    importForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 	    return "import/importGroups";
 	}
 
