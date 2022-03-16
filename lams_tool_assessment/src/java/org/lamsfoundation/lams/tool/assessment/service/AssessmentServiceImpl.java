@@ -3421,7 +3421,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    QbToolQuestion qbToolQuestion = questionResult.getQbToolQuestion();
 	    QbQuestion qbQuestion = qbToolQuestion.getQbQuestion();
 	    if (qbQuestion.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE
-		    || qbQuestion.getType() == QbQuestion.TYPE_MARK_HEDGING) {
+		    || qbQuestion.getType() == QbQuestion.TYPE_MARK_HEDGING
+		    || qbQuestion.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS) {
 
 		QuestionDTO questionDTO = new QuestionDTO(qbToolQuestion);
 
