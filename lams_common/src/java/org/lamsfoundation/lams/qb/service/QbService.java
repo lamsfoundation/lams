@@ -816,7 +816,7 @@ public class QbService implements IQbService {
     public Long allocateVSAnswerToOption(Long toolQuestionUid, Long targetOptionUid, Long previousOptionUid,
 	    String answer) {
 	String normalisedAnswer = QbUtils.normaliseVSAnswer(answer);
-	if (normalisedAnswer == null) {
+	if (normalisedAnswer == null && previousOptionUid.equals(-1L)) {
 	    return null;
 	}
 	answer = answer.strip();
@@ -862,7 +862,7 @@ public class QbService implements IQbService {
 	    Set<String> nameWithoutUserAnswer = new LinkedHashSet<>(List.of(alternatives));
 	    nameWithoutUserAnswer.remove(answer);
 	    name = nameWithoutUserAnswer.isEmpty() ? ""
-		    : nameWithoutUserAnswer.stream().filter(StringUtils::isNotBlank)
+		    : nameWithoutUserAnswer.stream().filter(a -> QbUtils.normaliseVSAnswer(a) != null)
 			    .collect(Collectors.joining(QbUtils.VSA_ANSWER_DELIMITER));
 	    previousOption.setName(name);
 	    qbDAO.update(previousOption);

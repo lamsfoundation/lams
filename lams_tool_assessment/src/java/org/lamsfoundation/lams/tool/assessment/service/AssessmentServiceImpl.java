@@ -1437,7 +1437,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	    for (AssessmentQuestionResult questionResult : allQuestionResults) {
 		String answer = questionResult.getAnswer();
-		if (StringUtils.isBlank(answer)) {
+		if (QbUtils.normaliseVSAnswer(answer) == null) {
 		    continue;
 		}
 
