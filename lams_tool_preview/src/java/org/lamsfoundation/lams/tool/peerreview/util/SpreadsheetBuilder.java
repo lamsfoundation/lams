@@ -73,9 +73,19 @@ public class SpreadsheetBuilder {
 	ExcelSheet sessionSheet = new ExcelSheet(session.getSessionName());
 	sheets.add(sessionSheet);
 
+	List<PeerreviewUser> users = peerreviewUserDao.getBySessionID(session.getSessionId());
+	ExcelRow numberOfTeamsRow = sessionSheet.initRow();
+	numberOfTeamsRow.addCell(service.getLocalisedMessage("label.number.of.team.members", null), true);
+	numberOfTeamsRow.addCell(users.size(), IndexedColors.YELLOW);
+	sessionSheet.addEmptyRow();
+
 	//Title row
 	ExcelRow titleRow = sessionSheet.initRow();
-	titleRow.addCell(service.getLocalisedMessage("label.learner", null), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	titleRow.addCell(service.getLocalisedMessage("label.first.name", null), true,
+		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	titleRow.addCell(service.getLocalisedMessage("label.last.name", null), true,
+		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+
 	Map<Long, Integer> criteriaIndexMap = new HashMap<>();
 	int countNonCommentCriteria = 0;
 	Integer previousRatingCriteriaGroupId = null;
@@ -115,17 +125,13 @@ public class SpreadsheetBuilder {
 	titleRow.addCell(service.getLocalisedMessage("label.individual.mark", null), true,
 		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 
-	List<PeerreviewUser> users = peerreviewUserDao.getBySessionID(session.getSessionId());
 	Map<Long, String> userNames = new TreeMap<>();
+	Map<Long, PeerreviewUser> userMap = new HashMap<>();
 	for (PeerreviewUser user : users) {
+	    userMap.put(user.getUserId(), user);
 	    userNames.put(user.getUserId(),
 		    StringEscapeUtils.escapeCsv(user.getFirstName() + " " + user.getLastName()));
 	}
-
-	ExcelRow numberOfTeamsRow = sessionSheet.initRow();
-	numberOfTeamsRow.addCell(service.getLocalisedMessage("label.number.of.team.members", null), true);
-	numberOfTeamsRow.addCell(users.size(), IndexedColors.YELLOW);
-	sessionSheet.addEmptyRow();
 
 	// uses same index as the user row, so allow for the name in the first column
 	Double[] criteriaMarkSum = new Double[countNonCommentCriteria + 1];
@@ -158,7 +164,10 @@ public class SpreadsheetBuilder {
 	    ExcelRow userRow = new ExcelRow();
 	    Long userId = ratingDto.getItemId();
 
-	    userRow.addCell(userNames.get(userId));
+	    PeerreviewUser user = userMap.get(userId);
+	    userRow.addCell(StringEscapeUtils.escapeCsv(user.getFirstName()));
+	    userRow.addCell(StringEscapeUtils.escapeCsv(user.getLastName()));
+
 	    for (double userRowDataIter : userRowData) {
 		userRow.addCell(userRowDataIter);
 	    }
@@ -170,6 +179,7 @@ public class SpreadsheetBuilder {
 	// calculate the group averages
 	ExcelRow avgRow = new ExcelRow();
 	avgRow.addCell(service.getLocalisedMessage("label.average", null), true);
+	avgRow.addEmptyCell();
 	double averageMarkSum = 0D;
 	for (int i = 0; i < criteriaMarkSum.length - 1; i++) {
 	    if (criteriaMarkCount[i] > 0) {

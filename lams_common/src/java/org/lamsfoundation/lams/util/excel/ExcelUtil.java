@@ -341,7 +341,7 @@ public class ExcelUtil {
 			    CellUtil.setCellStyleProperty(cell, CellUtil.BORDER_LEFT, BorderStyle.THICK);
 			    break;
 			case ExcelCell.BORDER_STYLE_BOTTOM_THIN:
-			    CellUtil.setCellStyleProperty(cell, CellUtil.BORDER_RIGHT, BorderStyle.THIN);
+			    CellUtil.setCellStyleProperty(cell, CellUtil.BORDER_BOTTOM, BorderStyle.THIN);
 			    break;
 			case ExcelCell.BORDER_STYLE_RIGHT_THICK:
 			    CellUtil.setCellStyleProperty(cell, CellUtil.BORDER_RIGHT, BorderStyle.THICK);
