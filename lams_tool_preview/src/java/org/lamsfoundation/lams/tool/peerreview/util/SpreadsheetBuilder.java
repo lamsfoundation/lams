@@ -69,7 +69,6 @@ public class SpreadsheetBuilder {
 	return sheets;
     }
 
-    @SuppressWarnings("unchecked")
     private void generateTeamSheet(PeerreviewSession session) {
 	ExcelSheet sessionSheet = new ExcelSheet(session.getSessionName());
 	sheets.add(sessionSheet);
@@ -141,7 +140,7 @@ public class SpreadsheetBuilder {
 	List<ItemRatingDTO> ratingDtos = service.getRatingCriteriaDtos(session.getPeerreview().getContentId(),
 		session.getSessionId(), userNames.keySet(), true, -1L);
 	for (ItemRatingDTO ratingDto : ratingDtos) {
-	    Double userMarkSum = 0D;
+	    double userMarkSum = 0D;
 	    double[] userRowData = new double[countNonCommentCriteria];
 	    for (ItemRatingCriteriaDTO itemRatingCriteriaDTO : ratingDto.getCriteriaDtos()) {
 		if (itemRatingCriteriaDTO.getAverageRatingAsNumber() != null
@@ -171,7 +170,7 @@ public class SpreadsheetBuilder {
 	// calculate the group averages
 	ExcelRow avgRow = new ExcelRow();
 	avgRow.addCell(service.getLocalisedMessage("label.average", null), true);
-	Double averageMarkSum = 0D;
+	double averageMarkSum = 0D;
 	for (int i = 0; i < criteriaMarkSum.length - 1; i++) {
 	    if (criteriaMarkCount[i] > 0) {
 		Double d = criteriaMarkSum[i] / criteriaMarkCount[i];

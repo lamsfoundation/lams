@@ -84,6 +84,9 @@ public class MonitoringController {
     private static final String EMAIL_PREVIEW_PATH = "pages/monitoring/emailpreview";
     private static final String MANAGE_USERS_PATH = "/pages/monitoring/manageUsers";
 
+    // this seems to reflect width of 12.5 the best
+    private static final int SPREADSHEET_EXPORT_FIXED_COLUMN_WIDTH = Double.valueOf(13.22 * 256).intValue();
+
     @Autowired
     @Qualifier("peerreviewService")
     private IPeerreviewService service;
@@ -598,7 +601,7 @@ public class MonitoringController {
 	    // set cookie that will tell JS script that export has been finished
 	    WebUtil.setFileDownloadTokenCookie(request, response);
 
-	    ExcelUtil.createExcel(out, sheets, "Exported on:", true);
+	    ExcelUtil.createExcel(out, sheets, "Exported on:", true, SPREADSHEET_EXPORT_FIXED_COLUMN_WIDTH);
 
 	} catch (IOException e) {
 	    log.error("exportTeamReportExcelSpreadsheet i/o error occured: " + e.getMessage(), e);
