@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -45,6 +44,10 @@ public class SpreadsheetBuilder {
     private IPeerreviewService service;
 
     private List<ExcelSheet> sheets;
+    private ExcelRow titleRow;
+
+    private Map<Long, Integer> criteriaIndexMap = new HashMap<>();
+    private int countNonCommentCriteria;
 
     public SpreadsheetBuilder(Peerreview peerreview, IRatingService ratingService,
 	    PeerreviewSessionDAO peerreviewSessionDao, PeerreviewUserDAO peerreviewUserDao,
@@ -60,34 +63,70 @@ public class SpreadsheetBuilder {
 	// this one is guaranteed to give a consistent order over peerreview.getRatingCriterias()
 	criterias = ratingService.getCriteriasByToolContentId(peerreview.getContentId());
 	sheets = new LinkedList<>();
+	// populate the header row
+	generateTitleRow();
 
 	List<PeerreviewSession> sessions = peerreviewSessionDao.getByContentId(peerreview.getContentId());
+
+	ExcelSheet allLearnersSheet = null;
+	if (sessions.size() > 1) {
+	    // if there are more than 1 group, we generate a summary All Learners tab
+	    allLearnersSheet = new ExcelSheet(service.getLocalisedMessage("label.all.learners", null));
+	    sheets.add(allLearnersSheet);
+
+	    allLearnersSheet.addEmptyRow();
+	    allLearnersSheet.addEmptyRow();
+
+	    List<ExcelCell> allLearnersTitleCells = new LinkedList<>();
+	    for (ExcelCell cell : titleRow.getCells()) {
+		if (allLearnersTitleCells.size() == 2) {
+		    // same cells as in groups' tab header row, plus Group column
+		    ExcelCell groupCell = new ExcelCell(service.getLocalisedMessage("label.group", null), true,
+			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		    allLearnersTitleCells.add(groupCell);
+		}
+
+		allLearnersTitleCells.add(cell);
+	    }
+
+	    ExcelRow allLearnersTitleRow = allLearnersSheet.initRow();
+	    allLearnersTitleRow.setCells(allLearnersTitleCells);
+	}
+
 	for (PeerreviewSession session : sessions) {
-	    generateTeamSheet(session);
+	    List<ExcelRow> userRows = generateTeamSheet(session);
+	    if (allLearnersSheet != null) {
+		for (ExcelRow userRow : userRows) {
+		    List<ExcelCell> allLearnersUserCells = new LinkedList<>();
+		    for (ExcelCell cell : userRow.getCells()) {
+			if (allLearnersUserCells.size() == 2) {
+			    // same cells as in groups' tab header row, plus Group column
+			    ExcelCell groupCell = new ExcelCell(session.getSessionName());
+			    allLearnersUserCells.add(groupCell);
+			}
+
+			allLearnersUserCells.add(cell);
+		    }
+
+		    ExcelRow allLearnersRow = allLearnersSheet.initRow();
+		    allLearnersRow.setCells(allLearnersUserCells);
+		}
+	    }
 	}
 
 	return sheets;
     }
 
-    private void generateTeamSheet(PeerreviewSession session) {
-	ExcelSheet sessionSheet = new ExcelSheet(session.getSessionName());
-	sheets.add(sessionSheet);
-
-	List<PeerreviewUser> users = peerreviewUserDao.getBySessionID(session.getSessionId());
-	ExcelRow numberOfTeamsRow = sessionSheet.initRow();
-	numberOfTeamsRow.addCell(service.getLocalisedMessage("label.number.of.team.members", null), true);
-	numberOfTeamsRow.addCell(users.size(), IndexedColors.YELLOW);
-	sessionSheet.addEmptyRow();
-
-	//Title row
-	ExcelRow titleRow = sessionSheet.initRow();
+    /**
+     * Prepares a header row used by both All Learners tab and groups' tabs
+     */
+    private void generateTitleRow() {
+	titleRow = new ExcelRow();
 	titleRow.addCell(service.getLocalisedMessage("label.first.name", null), true,
 		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	titleRow.addCell(service.getLocalisedMessage("label.last.name", null), true,
 		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 
-	Map<Long, Integer> criteriaIndexMap = new HashMap<>();
-	int countNonCommentCriteria = 0;
 	Integer previousRatingCriteriaGroupId = null;
 
 	for (RatingCriteria criteria : criterias) {
@@ -124,14 +163,21 @@ public class SpreadsheetBuilder {
 		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	titleRow.addCell(service.getLocalisedMessage("label.individual.mark", null), true,
 		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+    }
 
-	Map<Long, String> userNames = new TreeMap<>();
-	Map<Long, PeerreviewUser> userMap = new HashMap<>();
-	for (PeerreviewUser user : users) {
-	    userMap.put(user.getUserId(), user);
-	    userNames.put(user.getUserId(),
-		    StringEscapeUtils.escapeCsv(user.getFirstName() + " " + user.getLastName()));
-	}
+    private List<ExcelRow> generateTeamSheet(PeerreviewSession session) {
+	List<ExcelRow> userRows = new LinkedList<>();
+
+	ExcelSheet sessionSheet = new ExcelSheet(session.getSessionName());
+	sheets.add(sessionSheet);
+
+	List<PeerreviewUser> users = peerreviewUserDao.getBySessionID(session.getSessionId());
+	ExcelRow numberOfTeamsRow = sessionSheet.initRow();
+	numberOfTeamsRow.addCell(service.getLocalisedMessage("label.number.of.team.members", null), true);
+	numberOfTeamsRow.addCell(users.size(), IndexedColors.YELLOW);
+	sessionSheet.addEmptyRow();
+
+	sessionSheet.addRow(titleRow);
 
 	// uses same index as the user row, so allow for the name in the first column
 	Double[] criteriaMarkSum = new Double[countNonCommentCriteria + 1];
@@ -141,10 +187,11 @@ public class SpreadsheetBuilder {
 	    criteriaMarkCount[i] = 0;
 	}
 
+	Map<Long, PeerreviewUser> userMap = users.stream().collect(Collectors.toMap(PeerreviewUser::getUserId, u -> u));
 	Map<Long, ExcelRow> userRowMap = new HashMap<>();
 	// Process all the criterias and build up rows for each rated user. Store in temporary map.
 	List<ItemRatingDTO> ratingDtos = service.getRatingCriteriaDtos(session.getPeerreview().getContentId(),
-		session.getSessionId(), userNames.keySet(), true, -1L);
+		session.getSessionId(), userMap.keySet(), true, -1L);
 	for (ItemRatingDTO ratingDto : ratingDtos) {
 	    double userMarkSum = 0D;
 	    double[] userRowData = new double[countNonCommentCriteria];
@@ -197,7 +244,7 @@ public class SpreadsheetBuilder {
 
 	// the map is: itemId (who was rated) -> userId (who rated) -> rating from all categories
 	Map<Long, Map<Long, Set<Rating>>> ratings = ratingService
-		.getRatingsByCriteriasAndItems(criteriaIndexMap.keySet(), userNames.keySet()).stream()
+		.getRatingsByCriteriasAndItems(criteriaIndexMap.keySet(), userMap.keySet()).stream()
 		.filter(rating -> rating.getRating() != null)
 		.collect(Collectors.groupingBy(Rating::getItemId, Collectors
 			.groupingBy(rating -> rating.getLearner().getUserId().longValue(), Collectors.toSet())));
@@ -207,8 +254,8 @@ public class SpreadsheetBuilder {
 	    ExcelRow userRow = userRowMap.get(user.getUserId());
 	    if (userRow == null) {
 		userRow = sessionSheet.initRow();
-		userRow.addCell(userNames.get(user.getUserId()));
-
+		userRow.addCell(StringEscapeUtils.escapeCsv(user.getFirstName()));
+		userRow.addCell(StringEscapeUtils.escapeCsv(user.getLastName()));
 	    } else {
 		Double learnerAverage = (Double) userRow.getCell(userRow.getCells().size() - 1);
 		Double spa = countNonCommentCriteria > 0 ? roundTo2Places(learnerAverage / finalGroupAverage) : 0D;
@@ -263,6 +310,8 @@ public class SpreadsheetBuilder {
 		userRow.addCell("", IndexedColors.GREEN);
 
 		sessionSheet.addRow(userRow);
+
+		userRows.add(userRow);
 	    }
 	}
 
@@ -280,19 +329,21 @@ public class SpreadsheetBuilder {
 		if (criteria.isHedgeStyleRating()) {
 		    // just need the first entry as it is the same for everyone - the justification
 		    if (users.size() > 0) {
-			generateUsersComments(session, sessionSheet, userNames, criteria, users.get(0), false);
+			generateUsersComments(session, sessionSheet, userMap, criteria, users.get(0), false);
 		    }
 		} else {
 		    for (PeerreviewUser user : users) {
-			generateUsersComments(session, sessionSheet, userNames, criteria, user, true);
+			generateUsersComments(session, sessionSheet, userMap, criteria, user, true);
 		    }
 		}
 	    }
 	}
+
+	return userRows;
     }
 
-    private void generateUsersComments(PeerreviewSession session, ExcelSheet sessionSheet, Map<Long, String> userNames,
-	    RatingCriteria criteria, PeerreviewUser user, boolean showForName) {
+    private void generateUsersComments(PeerreviewSession session, ExcelSheet sessionSheet,
+	    Map<Long, PeerreviewUser> userMap, RatingCriteria criteria, PeerreviewUser user, boolean showForName) {
 	sessionSheet.addEmptyRow();
 
 	List<Object[]> comments = peerreviewUserDao.getDetailedRatingsComments(session.getPeerreview().getContentId(),
@@ -302,13 +353,16 @@ public class SpreadsheetBuilder {
 	    if (comment[1] != null) {
 		if (showForName && !isUserNameRowPrinted) {
 		    ExcelRow userNameRow = sessionSheet.initRow();
-		    userNameRow.addCell(service.getLocalisedMessage("label.for.user",
-			    new Object[] { userNames.get(user.getUserId()) }));
+		    userNameRow.addCell(service.getLocalisedMessage("label.for.user", new Object[] {
+			    StringEscapeUtils.escapeCsv(user.getFirstName() + " " + user.getLastName()) }));
 		    isUserNameRowPrinted = true;
 		}
 
 		ExcelRow commentRow = sessionSheet.initRow();
-		commentRow.addCell(userNames.get(((BigInteger) comment[0]).longValue()));
+		Long commentingUserId = ((BigInteger) comment[0]).longValue();
+		PeerreviewUser commentingUser = userMap.get(commentingUserId);
+		commentRow.addCell(StringEscapeUtils.escapeCsv(commentingUser.getFirstName()));
+		commentRow.addCell(StringEscapeUtils.escapeCsv(commentingUser.getLastName()));
 		commentRow.addCell(StringUtils.replace((String) comment[1], "<BR>", "\n"));
 	    }
 	}
