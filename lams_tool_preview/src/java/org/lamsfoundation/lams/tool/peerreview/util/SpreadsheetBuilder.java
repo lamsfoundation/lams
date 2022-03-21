@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -187,7 +188,8 @@ public class SpreadsheetBuilder {
 	    criteriaMarkCount[i] = 0;
 	}
 
-	Map<Long, PeerreviewUser> userMap = users.stream().collect(Collectors.toMap(PeerreviewUser::getUserId, u -> u));
+	Map<Long, PeerreviewUser> userMap = users.stream()
+		.collect(Collectors.toMap(PeerreviewUser::getUserId, u -> u, (u1, u2) -> u1, LinkedHashMap::new));
 	Map<Long, ExcelRow> userRowMap = new HashMap<>();
 	// Process all the criterias and build up rows for each rated user. Store in temporary map.
 	List<ItemRatingDTO> ratingDtos = service.getRatingCriteriaDtos(session.getPeerreview().getContentId(),
