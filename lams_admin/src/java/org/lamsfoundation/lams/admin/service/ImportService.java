@@ -415,7 +415,9 @@ public class ImportService implements IImportService {
     private boolean isAppadmin(String sessionId) {
 	UserDTO userDTO = (UserDTO) SessionManager.getSession(sessionId).getAttribute(AttributeNames.USER);
 	return service.isUserInRole(userDTO.getUserID(), service.getRootOrganisation().getOrganisationId(),
-		Role.APPADMIN);
+		Role.APPADMIN)
+		|| service.isUserInRole(userDTO.getUserID(), service.getRootOrganisation().getOrganisationId(),
+			Role.SYSADMIN);
     }
 
     /*

@@ -294,7 +294,7 @@ public class SecurityService implements ISecurityService {
 	    throw new SecurityException(error);
 	}
 
-	if (!securityDAO.isAppadmin(userId)) {
+	if (!securityDAO.isSysadmin(userId) || !securityDAO.isAppadmin(userId)) {
 	    String error = "User " + userId + " is not appadmin and can not \"" + action + "\"";
 	    SecurityService.log.debug(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, null, null, error);

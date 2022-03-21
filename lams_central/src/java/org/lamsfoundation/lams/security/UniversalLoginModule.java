@@ -102,7 +102,7 @@ public class UniversalLoginModule implements LoginModule {
      */
     @Override
     public boolean commit() throws LoginException {
-	if (loginOK == false) {
+	if (!loginOK) {
 	    return false;
 	}
 
@@ -439,7 +439,7 @@ public class UniversalLoginModule implements LoginModule {
 	    ps = conn.prepareStatement(UniversalLoginModule.ROLES_QUERY);
 	    ps.setString(1, userName);
 	    rs = ps.executeQuery();
-	    if (rs.next() == false) {
+	    if (!rs.next()) {
 		throw new FailedLoginException("No matching user name found in roles: " + userName);
 	    }
 
@@ -469,7 +469,13 @@ public class UniversalLoginModule implements LoginModule {
 			group.addMember(p);
 			groupMembers.add(name);
 		    }
-		    if (name.equals(Role.APPADMIN)) {
+		    // sysadmin is always app admin
+		    if (name.equals(Role.SYSADMIN) && !groupMembers.contains(Role.APPADMIN)) {
+			UniversalLoginModule.log.info("Assign user: " + userName + " to role " + Role.APPADMIN);
+			group.addMember(p);
+			groupMembers.add(Role.APPADMIN);
+		    }
+		    if (name.equals(Role.APPADMIN) || name.equals(Role.SYSADMIN)) {
 			p = new SimplePrincipal(Role.AUTHOR);
 			UniversalLoginModule.log.info("Found role " + name);
 			if (!groupMembers.contains(Role.AUTHOR)) {
