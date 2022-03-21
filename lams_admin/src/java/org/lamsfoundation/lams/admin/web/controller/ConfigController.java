@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.admin.web.form.ConfigForm;
 import org.lamsfoundation.lams.config.ConfigurationItem;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.LanguageUtil;
@@ -63,8 +64,13 @@ public class ConfigController {
     @Autowired
     private ILogEventService logEventService;
 
+    @Autowired
+    private ISecurityService securityService;
+
     @RequestMapping(path = "/config")
     public String unspecified(@ModelAttribute ConfigForm configForm, HttpServletRequest request) throws Exception {
+
+	securityService.isSysadmin(getUserId(), "open server configuration panel", true);
 
 	request.setAttribute("config", configuration.arrangeItems(Configuration.ITEMS_NON_LDAP));
 	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(false));
@@ -79,6 +85,7 @@ public class ConfigController {
 
     @RequestMapping(path = "/config/save", method = RequestMethod.POST)
     public String save(@ModelAttribute ConfigForm configForm, HttpServletRequest request) throws Exception {
+	securityService.isSysadmin(getUserId(), "save server configuration", true);
 
 	String[] keys = configForm.getKey();
 	String[] values = configForm.getValue();

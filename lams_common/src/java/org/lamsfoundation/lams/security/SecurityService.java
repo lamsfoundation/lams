@@ -309,6 +309,29 @@ public class SecurityService implements ISecurityService {
     }
 
     @Override
+    public boolean isSysadmin(Integer userId, String action, boolean escalate) {
+	if (userId == null) {
+	    String error = "Missing user ID when checking if is sysadmin and can \"" + action + "\"";
+	    SecurityService.log.error(error);
+	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, null, null, error);
+	    throw new SecurityException(error);
+	}
+
+	if (!securityDAO.isSysadmin(userId)) {
+	    String error = "User " + userId + " is not sysadmin and can not \"" + action + "\"";
+	    SecurityService.log.debug(error);
+	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, null, null, error);
+	    if (escalate) {
+		throw new SecurityException(error);
+	    } else {
+		return false;
+	    }
+	}
+
+	return true;
+    }
+
+    @Override
     public boolean isGroupMonitor(Integer orgId, Integer userId, String action, boolean escalate)
 	    throws SecurityException {
 	return hasOrgRole(orgId, userId, SecurityService.GROUP_MONITOR_ROLES, action, escalate);

@@ -62,10 +62,12 @@ public class SecurityDAO extends LAMSBaseDAO implements ISecurityDAO {
     /**
      * Checks if user has a global role of APPADMIN.
      */
-    private static final String CHECK_APPADMIN = "FROM " + UserOrganisation.class.getName()
+    private static final String CHECK_ADMIN = "FROM " + UserOrganisation.class.getName()
 	    + " AS userOrganisation INNER JOIN userOrganisation.userOrganisationRoles AS userOrganisationRole "
 	    + "WHERE userOrganisation.organisation.organisationType.organisationTypeId = 1 AND userOrganisation.user.userId = ? "
-	    + "AND userOrganisationRole.role.name = '" + Role.APPADMIN + "'";
+	    + "AND userOrganisationRole.role.name = ";
+    private static final String CHECK_APPADMIN = CHECK_ADMIN + "'" + Role.APPADMIN + "'";
+    private static final String CHECK_SYSADMIN = CHECK_ADMIN + "'" + Role.SYSADMIN + "'";
 
     @Override
     @SuppressWarnings("rawtypes")
@@ -117,5 +119,10 @@ public class SecurityDAO extends LAMSBaseDAO implements ISecurityDAO {
     @Override
     public boolean isAppadmin(Integer userId) {
 	return !doFindCacheable(SecurityDAO.CHECK_APPADMIN, new Object[] { userId }).isEmpty();
+    }
+
+    @Override
+    public boolean isSysadmin(Integer userId) {
+	return !doFindCacheable(SecurityDAO.CHECK_SYSADMIN, new Object[] { userId }).isEmpty();
     }
 }

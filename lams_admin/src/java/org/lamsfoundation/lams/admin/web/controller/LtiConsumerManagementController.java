@@ -7,6 +7,7 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
@@ -14,15 +15,19 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.web.form.LtiConsumerForm;
 import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.timezone.Timezone;
 import org.lamsfoundation.lams.timezone.dto.TimezoneDTO;
 import org.lamsfoundation.lams.timezone.service.ITimezoneService;
 import org.lamsfoundation.lams.timezone.util.TimezoneIDComparator;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -47,6 +52,8 @@ public class LtiConsumerManagementController {
     @Autowired
     private ITimezoneService timezoneService;
     @Autowired
+    private ISecurityService securityService;
+    @Autowired
     @Qualifier("adminMessageService")
     private MessageService messageService;
 
@@ -55,6 +62,8 @@ public class LtiConsumerManagementController {
      */
     @RequestMapping(path = "/start")
     public String start(HttpServletRequest request) {
+	securityService.isSysadmin(getUserId(), "open LTI consumer list", true);
+
 	List<ExtServer> ltiConsumers = integrationService.getAllToolConsumers();
 	Collections.sort(ltiConsumers);
 	request.setAttribute("ltiConsumers", ltiConsumers);
@@ -67,6 +76,8 @@ public class LtiConsumerManagementController {
      */
     @RequestMapping(path = "/edit")
     public String edit(@ModelAttribute LtiConsumerForm ltiConsumerForm, HttpServletRequest request) throws Exception {
+	securityService.isSysadmin(getUserId(), "open LTI consumer edit page", true);
+
 	Integer sid = WebUtil.readIntParam(request, "sid", true);
 
 	// editing a tool consumer
@@ -119,6 +130,8 @@ public class LtiConsumerManagementController {
      */
     @RequestMapping(path = "/disable", method = RequestMethod.POST)
     public String disable(HttpServletRequest request) throws Exception {
+	securityService.isSysadmin(getUserId(), "disable LTI consumer", true);
+
 	Integer sid = WebUtil.readIntParam(request, "sid", true);
 	boolean disable = WebUtil.readBooleanParam(request, "disable");
 	ExtServer ltiConsumer = integrationService.getExtServer(sid);
@@ -133,6 +146,8 @@ public class LtiConsumerManagementController {
      */
     @RequestMapping(path = "/delete", method = RequestMethod.POST)
     public String delete(HttpServletRequest request) throws Exception {
+	securityService.isSysadmin(getUserId(), "delete LTI consumer", true);
+
 	Integer sid = WebUtil.readIntParam(request, "sid", true);
 	userManagementService.deleteById(ExtServer.class, sid);
 
@@ -145,6 +160,8 @@ public class LtiConsumerManagementController {
     @RequestMapping(path = "/save", method = RequestMethod.POST)
     public String save(@ModelAttribute LtiConsumerForm ltiConsumerForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
+	securityService.isSysadmin(getUserId(), "save LTI consumer", true);
+
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	if (StringUtils.trimToNull(ltiConsumerForm.getServerid()) == null) {
@@ -226,4 +243,9 @@ public class LtiConsumerManagementController {
 	}
     }
 
+    private Integer getUserId() {
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	return user != null ? user.getUserID() : null;
+    }
 }

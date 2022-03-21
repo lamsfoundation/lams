@@ -38,10 +38,12 @@ public interface ISecurityService {
 
     /**
      * Checks if the user is a monitor or owner of the given lesson, or a group manager of the organisation.
-     * 
+     *
      * @param lessonId
      * @param userId
-     * @param action describes action that was requested and is used for logging. If this value is null, no logging will be done.
+     * @param action
+     *            describes action that was requested and is used for logging. If this value is null, no logging will be
+     *            done.
      * @param escalate
      */
     boolean isLessonMonitor(Long lessonId, Integer userId, String action, boolean escalate) throws SecurityException;
@@ -61,6 +63,11 @@ public interface ISecurityService {
      * Checks if the user has a global role of APPADMIN.
      */
     boolean isAppadmin(Integer userId, String action, boolean escalate);
+
+    /**
+     * Checks if the user has a global role of APPADMIN.
+     */
+    boolean isSysadmin(Integer userId, String action, boolean escalate);
 
     /**
      * Checks if the user has any of the given roles in the given organisation. If GROUP_MANAGER and/or GROUP_ADMIN are

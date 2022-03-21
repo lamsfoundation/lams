@@ -30,8 +30,10 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.web.form.ConfigForm;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.dto.BulkUpdateResultDTO;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.ILdapService;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.service.LdapService;
@@ -39,6 +41,7 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -52,7 +55,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/ldap")
 public class LdapConfigController {
     private static Logger log = Logger.getLogger(LdapConfigController.class);
-    
+
     @Autowired
     private Configuration configurationService;
     @Autowired
@@ -60,11 +63,14 @@ public class LdapConfigController {
     @Autowired
     private IUserManagementService userManagementService;
     @Autowired
+    private ISecurityService securityService;
+    @Autowired
     @Qualifier("adminMessageService")
     private MessageService messageService;
 
     @RequestMapping(path = "/start")
     public String execute(@ModelAttribute ConfigForm configForm, HttpServletRequest request) throws Exception {
+	securityService.isSysadmin(getUserId(), "open LDAP management panel", true);
 
 	String action = WebUtil.readStrParam(request, "action", true);
 	if (action != null) {
@@ -89,6 +95,7 @@ public class LdapConfigController {
 
     @RequestMapping(path = "/sync")
     public String sync(HttpServletRequest request) throws Exception {
+	securityService.isSysadmin(getUserId(), "sync LDAP", true);
 
 	String sessionId = SessionManager.getSession().getId();
 	Thread t = new Thread(new LdapSyncThread(sessionId));
@@ -101,6 +108,7 @@ public class LdapConfigController {
 
     @RequestMapping(path = "/waiting")
     public String waiting(HttpServletRequest request) throws Exception {
+	securityService.isSysadmin(getUserId(), "sync LDAP wait", true);
 
 	request.setAttribute("wait", messageService.getMessage("msg.ldap.synchronise.wait"));
 
@@ -109,6 +117,7 @@ public class LdapConfigController {
 
     @RequestMapping(path = "/results")
     public String results(HttpServletRequest request) throws Exception {
+	securityService.isSysadmin(getUserId(), "show LDAP sync results", true);
 
 	HttpSession ss = SessionManager.getSession();
 	Object o = ss.getAttribute(ILdapService.SYNC_RESULTS);
@@ -198,5 +207,11 @@ public class LdapConfigController {
 		e.printStackTrace();
 	    }
 	}
+    }
+
+    private Integer getUserId() {
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	return user != null ? user.getUserID() : null;
     }
 }

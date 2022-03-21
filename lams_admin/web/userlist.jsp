@@ -116,6 +116,10 @@
 				<c:if test="${orgType == 1}">
 				<table class="table table-condensed table-striped">
 					<tr>
+						<td width="30%"><fmt:message key="label.sysadmins"/>:</td>
+						<td><c:out value="${SYSADMIN}"/></td>
+					</tr>
+					<tr>
 						<td width="30%"><fmt:message key="label.appadmins"/>:</td>
 						<td><c:out value="${APPADMIN}"/></td>
 					</tr>

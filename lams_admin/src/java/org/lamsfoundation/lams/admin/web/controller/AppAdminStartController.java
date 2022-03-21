@@ -54,21 +54,28 @@ public class AppAdminStartController {
     @RequestMapping(path = "/appadminstart")
     public String execute(HttpServletRequest request) throws Exception {
 	ArrayList<Object[]> groupedLinks = new ArrayList<>();
+	ArrayList<LinkBean> links = new ArrayList<>();
+
+	if (request.isUserInRole(Role.SYSADMIN)) {
+	    links = new ArrayList<>();
+	    links.add(new LinkBean("config.do", "sysadmin.config.settings.edit"));
+	    links.add(new LinkBean("extserver/serverlist.do", "appadmin.maintain.external.servers"));
+	    links.add(new LinkBean("ltiConsumerManagement/start.do", "label.manage.tool.consumers"));
+	    links.add(new LinkBean("ldap/start.do", "sysadmin.ldap.configuration"));
+	    groupedLinks.add(new Object[] { AdminConstants.START_SYSADMIN_CONFIG_LINKS, links });
+	}
 
 	if (request.isUserInRole(Role.APPADMIN)) {
-	    ArrayList<LinkBean> links = new ArrayList<>();
-	    links.add(new LinkBean("config.do", "sysadmin.config.settings.edit"));
+	    links = new ArrayList<>();
 	    links.add(new LinkBean("timezonemanagement/start.do", "admin.timezone.title"));
 	    links.add(new LinkBean("loginmaintain.do", "appadmin.maintain.loginpage"));
 	    links.add(new LinkBean("signupManagement/start.do", "admin.signup.title"));
-	    links.add(new LinkBean("extserver/serverlist.do", "appadmin.maintain.external.servers"));
-	    links.add(new LinkBean("ltiConsumerManagement/start.do", "label.manage.tool.consumers"));
 	    links.add(new LinkBean("policyManagement/list.do", "admin.policies.title"));
 	    links.add(new LinkBean("toolcontentlist/start.do", "appadmin.tool.management"));
 	    links.add(new LinkBean("../outcome/outcomeManage.do", "admin.outcome.title"));
 	    links.add(new LinkBean("themeManagement/start.do", "admin.themes.title"));
 	    links.add(new LinkBean("sessionmaintain/list.do", "appadmin.maintain.session"));
-	    groupedLinks.add(new Object[] { AdminConstants.START_CONFIG_LINKS, links });
+	    groupedLinks.add(new Object[] { AdminConstants.START_APPADMIN_CONFIG_LINKS, links });
 
 	    links = new ArrayList<>();
 	    links.add(new LinkBean("logevent/start.do", "label.event.log"));
@@ -82,7 +89,6 @@ public class AppAdminStartController {
 	    links.add(new LinkBean("importgroups.do", "appadmin.import.groups.title"));
 	    links.add(new LinkBean("importexcel.do", "admin.user.import"));
 	    links.add(new LinkBean("disabledmanage.do", "admin.list.disabled.users"));
-	    links.add(new LinkBean("ldap/start.do", "sysadmin.ldap.configuration"));
 	    groupedLinks.add(new Object[] { AdminConstants.START_COURSE_LINKS, links });
 
 	    // LKC-213
@@ -94,7 +100,6 @@ public class AppAdminStartController {
 	    }
 
 	} else if (userManagementService.isUserGlobalGroupManager()) {
-	    ArrayList<LinkBean> links = new ArrayList<>();
 	    links.add(new LinkBean("usersearch.do", "admin.user.find"));
 	    links.add(new LinkBean("importgroups.do", "appadmin.import.groups.title"));
 	    links.add(new LinkBean("importexcel.do", "admin.user.import"));

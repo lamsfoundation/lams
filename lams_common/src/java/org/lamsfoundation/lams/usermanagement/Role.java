@@ -53,6 +53,8 @@ public class Role implements Serializable, Comparable<Role> {
 
     public static final String APPADMIN = "APPADMIN";
 
+    public static final String SYSADMIN = "SYSADMIN";
+
     /**
      * Added by Manpreet Minhas
      * final static variables indicating the various roles available
@@ -65,6 +67,7 @@ public class Role implements Serializable, Comparable<Role> {
     public static final Integer ROLE_MONITOR = 4;
     public static final Integer ROLE_LEARNER = 5;
 //    public static final Integer ROLE_GROUP_ADMIN = 6;
+    public static final Integer ROLE_SYSADMIN = 7;
     /***********************************************************/
 
     @Id
@@ -77,9 +80,6 @@ public class Role implements Serializable, Comparable<Role> {
 
     @Column
     private String description;
-
-    public Role() {
-    }
 
     public Integer getRoleId() {
 	return this.roleId;

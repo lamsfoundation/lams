@@ -145,7 +145,7 @@ public class OrgManageController {
 	request.setAttribute("createGroup",
 		request.isUserInRole(Role.APPADMIN) || userManagementService.isUserGlobalGroupManager());
 	request.setAttribute("editGroup", true);
-	request.setAttribute("manageGlobalRoles", request.isUserInRole(Role.APPADMIN));
+	request.setAttribute("manageGlobalRoles", request.isUserInRole(Role.SYSADMIN));
 	return "organisation/list";
     }
 

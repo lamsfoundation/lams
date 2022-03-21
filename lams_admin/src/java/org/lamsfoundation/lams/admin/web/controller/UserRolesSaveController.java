@@ -29,14 +29,19 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.web.form.UserRolesForm;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -52,29 +57,36 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class UserRolesSaveController {
     private static Logger log = Logger.getLogger(UserRolesSaveController.class);
-    
+
     @Autowired
     private IUserManagementService userManagementService;
     @Autowired
+    private ISecurityService securityService;
+    @Autowired
     @Qualifier("adminMessageService")
     private MessageService messageService;
-    
+
     private static List<Role> rolelist;
 
     @RequestMapping(path = "/userrolessave", method = RequestMethod.POST)
     public String execute(@ModelAttribute UserRolesForm userRolesForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
+
+	Integer orgId = userRolesForm.getOrgId();
+	Integer rootOrgId = userManagementService.getRootOrganisation().getOrganisationId();
+	if (orgId.equals(rootOrgId)) {
+	    securityService.isSysadmin(getUserId(), "save global roles", true);
+	}
+
 	if (rolelist == null) {
 	    rolelist = userManagementService.findAll(Role.class);
 	    Collections.sort(rolelist);
 	}
-
-	Integer orgId = userRolesForm.getOrgId();
 	Integer userId = userRolesForm.getUserId();
 	String[] roles = userRolesForm.getRoles();
 
 	request.setAttribute("org", orgId);
-	
+
 	if (log.isDebugEnabled()) {
 	    String numRoles = roles != null ? Integer.toString(roles.length) : "0";
 	    log.debug(new StringBuilder("userId: ").append(userId).append(", orgId: ").append(orgId)
@@ -89,8 +101,8 @@ public class UserRolesSaveController {
 	if (roles == null || roles.length < 1) {
 	    errorMap.add("roles", messageService.getMessage("error.roles.empty"));
 	    request.setAttribute("errorMap", errorMap);
-	    request.setAttribute("rolelist",
-		    userManagementService.filterRoles(rolelist, request.isUserInRole(Role.APPADMIN), org.getOrganisationType()));
+	    request.setAttribute("rolelist", userManagementService.filterRoles(rolelist,
+		    request.isUserInRole(Role.APPADMIN), org.getOrganisationType()));
 	    request.setAttribute("login", user.getLogin());
 	    request.setAttribute("fullName", user.getFullName());
 	    return "forward:/userroles.do";
@@ -101,4 +113,9 @@ public class UserRolesSaveController {
 	return "redirect:/usermanage.do?org=" + orgId;
     }
 
+    private Integer getUserId() {
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	return user != null ? user.getUserID() : null;
+    }
 }

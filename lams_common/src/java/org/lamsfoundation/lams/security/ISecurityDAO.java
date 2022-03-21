@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.security;
 
 import java.io.Serializable;
@@ -38,4 +37,6 @@ public interface ISecurityDAO {
     boolean isLessonMonitor(Long lessonId, Integer userId, boolean ownerAccepted);
 
     boolean isAppadmin(Integer userId);
+
+    boolean isSysadmin(Integer userId);
 }
