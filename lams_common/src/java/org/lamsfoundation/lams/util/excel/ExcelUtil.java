@@ -96,9 +96,21 @@ public class ExcelUtil {
      *            whether to display title (printed in the first (0,0) cell)
      * @throws IOException
      */
+
     public static void createExcel(OutputStream out, List<ExcelSheet> sheets, String dateHeader,
 	    boolean displaySheetTitle) throws IOException {
-	ExcelUtil.createExcel(out, sheets, dateHeader, displaySheetTitle, true);
+	ExcelUtil.createExcel(out, sheets, dateHeader, displaySheetTitle, true, null);
+    }
+
+    // versions of this method with fixedColumnWidth
+    public static void createExcel(OutputStream out, List<ExcelSheet> sheets, String dateHeader,
+	    boolean displaySheetTitle, Integer fixedColumnWidth) throws IOException {
+	ExcelUtil.createExcel(out, sheets, dateHeader, displaySheetTitle, true, fixedColumnWidth);
+    }
+
+    public static void createExcel(OutputStream out, List<ExcelSheet> sheets, String dateHeader,
+	    boolean displaySheetTitle, boolean produceXlsxFile) throws IOException {
+	ExcelUtil.createExcel(out, sheets, dateHeader, displaySheetTitle, true, null);
     }
 
     /**
@@ -124,7 +136,7 @@ public class ExcelUtil {
      * @throws IOException
      */
     public static void createExcel(OutputStream out, List<ExcelSheet> sheets, String dateHeader,
-	    boolean displaySheetTitle, boolean produceXlsxFile) throws IOException {
+	    boolean displaySheetTitle, boolean produceXlsxFile, Integer fixedColumnWidth) throws IOException {
 	//set user time zone, which is required for outputting cells of time format
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -136,7 +148,7 @@ public class ExcelUtil {
 	ExcelUtil.initStyles(workbook);
 
 	for (ExcelSheet sheet : sheets) {
-	    ExcelUtil.createSheet(workbook, sheet, dateHeader, displaySheetTitle);
+	    ExcelUtil.createSheet(workbook, sheet, dateHeader, displaySheetTitle, fixedColumnWidth);
 	}
 
 	workbook.write(out);
@@ -186,7 +198,7 @@ public class ExcelUtil {
     }
 
     private static void createSheet(Workbook workbook, ExcelSheet excelSheet, String dateHeader,
-	    boolean displaySheetTitle) throws IOException {
+	    boolean displaySheetTitle, Integer fixedColumnWidth) throws IOException {
 	// Modify sheet name if required. It should contain only allowed letters and sheets are not allowed with
 	// the same names (case insensitive)
 	String sheetName = WorkbookUtil.createSafeSheetName(excelSheet.getSheetName());
@@ -195,7 +207,7 @@ public class ExcelUtil {
 	}
 
 	Sheet sheet = workbook.createSheet(sheetName);
-	Map<Integer, Integer> columnWidths = new HashMap<>();
+	Map<Integer, Integer> columnWidths = fixedColumnWidth == null ? null : new HashMap<>();
 
 	// Print title if requested
 	boolean isTitleToBePrinted = displaySheetTitle && StringUtils.isNotBlank(excelSheet.getSheetName());
@@ -238,7 +250,10 @@ public class ExcelUtil {
 	for (int columnIndex : columnWidths.keySet()) {
 	    // one unit is 1/256 of character width, plus some characters for padding
 	    // maximum is 255 characters
-	    sheet.setColumnWidth(columnIndex, Math.min(255, columnWidths.get(columnIndex) + 4) * 256);
+	    // or just use the declared fixed column width
+	    int columnWidth = fixedColumnWidth == null ? Math.min(255, columnWidths.get(columnIndex) + 4) * 256
+		    : fixedColumnWidth;
+	    sheet.setColumnWidth(columnIndex, columnWidth);
 	}
     }
 
@@ -275,7 +290,7 @@ public class ExcelUtil {
 	    }
 	    // prevent malicious formula injection
 	    sourceCellStyle.setQuotePrefixed(true);
-	    
+
 	    Cell cell = CellUtil.createCell(row, columnIndex, null, sourceCellStyle);
 
 	    Object excelCellValue = excelCell.getCellValue();
@@ -326,7 +341,7 @@ public class ExcelUtil {
 			    CellUtil.setCellStyleProperty(cell, CellUtil.BORDER_LEFT, BorderStyle.THICK);
 			    break;
 			case ExcelCell.BORDER_STYLE_BOTTOM_THIN:
-			    CellUtil.setCellStyleProperty(cell, CellUtil.BORDER_RIGHT, BorderStyle.THIN);
+			    CellUtil.setCellStyleProperty(cell, CellUtil.BORDER_BOTTOM, BorderStyle.THIN);
 			    break;
 			case ExcelCell.BORDER_STYLE_RIGHT_THICK:
 			    CellUtil.setCellStyleProperty(cell, CellUtil.BORDER_RIGHT, BorderStyle.THICK);
@@ -374,11 +389,13 @@ public class ExcelUtil {
 		}
 	    }
 
-	    // Store maximum number of characters in each column.
-	    // XLXS format processing is done chunk by chunk and it is append only, so this information needs to be stored on the fly.
-	    Integer existingColumnWidth = columnWidths.get(columnIndex);
-	    if (existingColumnWidth == null || existingColumnWidth < cellValueLength) {
-		columnWidths.put(columnIndex, cellValueLength);
+	    if (columnWidths != null) {
+		// Store maximum number of characters in each column.
+		// XLXS format processing is done chunk by chunk and it is append only, so this information needs to be stored on the fly.
+		Integer existingColumnWidth = columnWidths.get(columnIndex);
+		if (existingColumnWidth == null || existingColumnWidth < cellValueLength) {
+		    columnWidths.put(columnIndex, cellValueLength);
+		}
 	    }
 
 	    columnIndex++;
