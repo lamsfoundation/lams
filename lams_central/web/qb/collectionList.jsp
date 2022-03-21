@@ -149,7 +149,7 @@
 <body class="stripes">
 <fmt:message key="label.qb.collection.management" var="label.qb.collection.management" />
 <lams:Page title="${label.qb.collection.management}" type="admin">
-	<%-- This option can be switched off in sysadmin --%>
+	<%-- This option can be switched off in appadmin --%>
 	<c:if test="${createCollectionAllowed}">
 		<div id="add-collection-div">
 			<button id="add-collection-button" class="btn btn-primary" onClick="javascript:addCollection()">

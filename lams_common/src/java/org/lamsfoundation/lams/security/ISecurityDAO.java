@@ -37,5 +37,5 @@ public interface ISecurityDAO {
 
     boolean isLessonMonitor(Long lessonId, Integer userId, boolean ownerAccepted);
 
-    boolean isSysadmin(Integer userId);
+    boolean isAppadmin(Integer userId);
 }

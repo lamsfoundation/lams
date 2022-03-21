@@ -86,7 +86,7 @@
 
 	<security-role>
 		<description>Can add/remove users to the system, set up classes of users for sessions</description>
-		<role-name>SYSADMIN</role-name>
+		<role-name>APPADMIN</role-name>
 	</security-role>
 	
 	<!-- All LAMS JARs go to this directory.

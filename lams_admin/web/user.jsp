@@ -130,7 +130,7 @@
 			$("#portraitPicture").css('background-image','');
 			addPortrait( $("#portraitPicture"), portraitId, 
 					'<c:out value="${userForm.userId}" />', 'large', true, '/lams/' );
-			<c:if test="${isSysadmin}">
+			<c:if test="${isAppadmin}">
 			if ( portraitId.length > 0 )  {
 				$("#portraitButton").css('display','block');
 			} else {
@@ -139,7 +139,7 @@
 			</c:if>
 		}
 		
-		<c:if test="${isSysadmin}">
+		<c:if test="${isAppadmin}">
 			function deletePortrait() {
 				$("#portraitButton").css('display','none');
 				
@@ -257,7 +257,7 @@
 				    <div class="row">
 					<div class="col-md-3">
 			    			<div class="text-center"><div id="portraitPicture" ></div></div>
-						<c:if test="${isSysadmin}">
+						<c:if test="${isAppadmin}">
 			    			<div id="portraitButton" class="text-center voffset10" style="display:none; margin-bottom: 5px;">
 			    			<a href="#" onclick="javascript:deletePortrait();" class="btn btn-primary btn-sm"><fmt:message key="label.delete.portrait" /></a></div>
 			    			</c:if>
@@ -469,7 +469,7 @@
 								</td>
 							</tr>
 							
-							<c:if test="${isSysadmin}">
+							<c:if test="${isAppadmin}">
 								<tr>
 									<td class="align-right">
 										<fmt:message key="label.2FA.property.enable" />:
@@ -496,7 +496,7 @@
 					</div>
 					</div>
 					
-					<c:if test="${isSysadmin}">
+					<c:if test="${isAppadmin}">
 						<div class="row">
 						<div class="col-md-12">
 							<c:if test="${not empty userForm.userId}">

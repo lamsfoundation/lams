@@ -215,7 +215,7 @@ public interface IWorkspaceManagementService {
      *
      * The organisation folders returned are determined based on whether the user has "write" access. A user can
      * write/save his content in an organisation folder the user is a MEMBER of the organisation to which the folder
-     * belongs and the user has one or all of the follwing roles (SYSADMIN. ADMIN, AUTHOR, STAFF, TEACHER)
+     * belongs and the user has one or all of the follwing roles (APPADMIN. ADMIN, AUTHOR, STAFF, TEACHER)
      *
      * @param userID
      *            The <code>user_id</code> of the user for whom the folders have to fetched

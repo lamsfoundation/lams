@@ -207,7 +207,7 @@
 			<role-name>LEARNER</role-name>
 			<role-name>MONITOR</role-name>
 			<role-name>AUTHOR</role-name>
-			<role-name>SYSADMIN</role-name>
+			<role-name>APPADMIN</role-name>
 		</auth-constraint>
 	</security-constraint>
 
@@ -223,7 +223,7 @@
 		<auth-constraint>
 			<role-name>AUTHOR</role-name>
 			<role-name>MONITOR</role-name>
-			<role-name>SYSADMIN</role-name>
+			<role-name>APPADMIN</role-name>
 		</auth-constraint>
 	</security-constraint>
 	<security-constraint>
@@ -236,7 +236,7 @@
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>MONITOR</role-name>
-			<role-name>SYSADMIN</role-name>
+			<role-name>APPADMIN</role-name>
 		</auth-constraint>
 	</security-constraint>
 
@@ -261,8 +261,8 @@
 		<role-name>GROUP MANAGER</role-name>
 	</security-role>
 	<security-role>
-		<description>LAMS System Adminstrator</description>
-		<role-name>SYSADMIN</role-name>
+		<description>LAMS Application Adminstrator</description>
+		<role-name>APPADMIN</role-name>
 	</security-role>
 
 	<!-- Login Configuration -->

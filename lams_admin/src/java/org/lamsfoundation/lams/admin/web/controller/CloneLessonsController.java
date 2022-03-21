@@ -67,7 +67,7 @@ public class CloneLessonsController {
     @RequestMapping(path = "/start")
     public String execute(HttpServletRequest request, HttpServletResponse response) throws UserAccessDeniedException {
 
-	if (!(request.isUserInRole(Role.SYSADMIN))) {
+	if (!(request.isUserInRole(Role.APPADMIN))) {
 	    throw new UserAccessDeniedException();
 	}
 

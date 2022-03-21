@@ -90,7 +90,7 @@ public class UserRolesSaveController {
 	    errorMap.add("roles", messageService.getMessage("error.roles.empty"));
 	    request.setAttribute("errorMap", errorMap);
 	    request.setAttribute("rolelist",
-		    userManagementService.filterRoles(rolelist, request.isUserInRole(Role.SYSADMIN), org.getOrganisationType()));
+		    userManagementService.filterRoles(rolelist, request.isUserInRole(Role.APPADMIN), org.getOrganisationType()));
 	    request.setAttribute("login", user.getLogin());
 	    request.setAttribute("fullName", user.getFullName());
 	    return "forward:/userroles.do";

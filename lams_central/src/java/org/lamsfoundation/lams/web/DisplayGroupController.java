@@ -102,7 +102,7 @@ public class DisplayGroupController {
 		roles.add(roleId);
 	    }
 
-	    IndexOrgBean iob = createOrgBean(org, roles, request.getRemoteUser(), request.isUserInRole(Role.SYSADMIN));
+	    IndexOrgBean iob = createOrgBean(org, roles, request.getRemoteUser(), request.isUserInRole(Role.APPADMIN));
 
 	    request.setAttribute("orgBean", iob);
 	    if (org.getEnableSingleActivityLessons()
@@ -119,19 +119,19 @@ public class DisplayGroupController {
 	return "group";
     }
 
-    private IndexOrgBean createOrgBean(Organisation org, List<Integer> roles, String username, boolean isSysAdmin)
+    private IndexOrgBean createOrgBean(Organisation org, List<Integer> roles, String username, boolean isAppAdmin)
 	    throws SQLException, NamingException {
 	Integer organisationId = org.getOrganisationId();
 	IndexOrgBean orgBean = new IndexOrgBean(organisationId, org.getName(),
 		org.getOrganisationType().getOrganisationTypeId());
 
 	// populate group contents
-	orgBean = populateContentsOrgBean(orgBean, org, roles, username, isSysAdmin);
+	orgBean = populateContentsOrgBean(orgBean, org, roles, username, isAppAdmin);
 
 	// First, populate header part
 	List<IndexLinkBean> links = new ArrayList<>();
 	List<IndexLinkBean> moreLinks = new ArrayList<>();
-	if (isSysAdmin) {
+	if (isAppAdmin) {
 	    if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
 		moreLinks.add(new IndexLinkBean("index.classman",
 			"javascript:openOrgManagement(" + organisationId + ")", "fa fa-fw fa-users", null));
@@ -145,7 +145,7 @@ public class DisplayGroupController {
 
 	if (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR)) {
 	    if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
-		if ((!isSysAdmin) && (roles.contains(Role.ROLE_GROUP_MANAGER))) {
+		if ((!isAppAdmin) && (roles.contains(Role.ROLE_GROUP_MANAGER))) {
 		    moreLinks.add(new IndexLinkBean("index.classman",
 			    "javascript:openOrgManagement(" + organisationId + ")", "fa fa-fw fa-ellipsis-v", null));
 		}
@@ -225,7 +225,7 @@ public class DisplayGroupController {
 
     @SuppressWarnings("unchecked")
     private IndexOrgBean populateContentsOrgBean(IndexOrgBean orgBean, Organisation org, List<Integer> roles,
-	    String username, boolean isSysAdmin) throws SQLException, NamingException {
+	    String username, boolean isAppAdmin) throws SQLException, NamingException {
 	Integer userId = getUser(username).getUserId();
 	
 	// set lesson beans
@@ -250,7 +250,7 @@ public class DisplayGroupController {
 		    List<UserOrganisationRole> userOrganisationRoles = userManagementService
 			    .getUserOrganisationRoles(childOrganisation.getOrganisationId(), username);
 		    // don't list the subgroup if user is not a member, and not a group admin/manager
-		    if (((userOrganisationRoles == null) || userOrganisationRoles.isEmpty()) && !isSysAdmin
+		    if (((userOrganisationRoles == null) || userOrganisationRoles.isEmpty()) && !isAppAdmin
 			    && !roles.contains(Role.ROLE_GROUP_MANAGER)) {
 			continue;
 		    }
@@ -261,7 +261,7 @@ public class DisplayGroupController {
 		    if (roles.contains(Role.ROLE_GROUP_MANAGER)) {
 			classRoles.add(Role.ROLE_GROUP_MANAGER);
 		    }
-		    IndexOrgBean childOrgBean = createOrgBean(childOrganisation, classRoles, username, isSysAdmin);
+		    IndexOrgBean childOrgBean = createOrgBean(childOrganisation, classRoles, username, isAppAdmin);
 		    
 		    //check whether organisation was collapsed by the user
 		    if (isCollapsingSubcoursesEnabled) {

@@ -138,7 +138,7 @@ public class ConfigController {
 
 	Configuration.refreshCache();
 
-	return "redirect:/sysadminstart.do";
+	return "redirect:/appadminstart.do";
     }
 
     private String getRequiredError(String arg) {

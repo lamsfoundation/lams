@@ -165,14 +165,14 @@ public class PortraitSaveController {
 	return "forward:/index.do?redirect=portrait";
     }
 
-    /** Called from sysadmin to delete an inappropriate portrait */
+    /** Called from appadmin to delete an inappropriate portrait */
     @RequestMapping(path = "/deletePortrait", method = RequestMethod.POST)
     public String deletePortrait(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Integer userId = WebUtil.readIntParam(request, "userId", true);
 
-	// check user is sysadmin
-	if (!(request.isUserInRole(Role.SYSADMIN))) {
-	    log.error("Attempt to delete a portrait by user that is not sysadmin. User is " + request.getRemoteUser()
+	// check user is appadmin
+	if (!(request.isUserInRole(Role.APPADMIN))) {
+	    log.error("Attempt to delete a portrait by user that is not appadmin. User is " + request.getRemoteUser()
 		    + " portrait to be deleted is for user " + userId + ".");
 	    return deleteResponse(response, "error");
 	}
@@ -181,11 +181,11 @@ public class PortraitSaveController {
 	User userToModify = (User) userManagementService.findById(User.class, userId);
 	if (userToModify != null && userToModify.getPortraitUuid() != null) {
 
-	    UserDTO sysadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+	    UserDTO appadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 	    Object[] args = new Object[] { userToModify.getFullName(), userToModify.getLogin(),
 		    userToModify.getUserId(), userToModify.getPortraitUuid() };
 	    String auditMessage = messageService.getMessage(PORTRAIT_DELETE_AUDIT_KEY, args);
-	    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, sysadmin.getUserID(), userId, null, null,
+	    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, appadmin.getUserID(), userId, null, null,
 		    auditMessage);
 
 	    try {

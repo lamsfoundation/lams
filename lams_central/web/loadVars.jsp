@@ -29,11 +29,11 @@
 		var learner_height = learner_size.substring(learner_size.lastIndexOf('x')+1, learner_size.length);
 		
 		// Setup screen sizes for Admin
-		var sys_admin_size = "<lams:Configuration key='<%= ConfigurationKeys.ADMIN_SCREEN_SIZE %>'/>";
-		if(!str_regex.test(sys_admin_size))
-			sys_admin_size = "1024x768";			// default size
+		var app_admin_size = "<lams:Configuration key='<%= ConfigurationKeys.ADMIN_SCREEN_SIZE %>'/>";
+		if(!str_regex.test(app_admin_size))
+			app_admin_size = "1024x768";			// default size
 			
-		var sys_admin_width = sys_admin_size.substring(0, sys_admin_size.lastIndexOf('x'));
-		var sys_admin_height = sys_admin_size.substring(sys_admin_size.lastIndexOf('x')+1, sys_admin_size.length);
+		var app_admin_width = app_admin_size.substring(0, app_admin_size.lastIndexOf('x'));
+		var app_admin_height = app_admin_size.substring(app_admin_size.lastIndexOf('x')+1, app_admin_size.length);
 		
 //-->

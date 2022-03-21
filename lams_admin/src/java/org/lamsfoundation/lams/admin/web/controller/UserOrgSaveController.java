@@ -70,11 +70,11 @@ public class UserOrgSaveController {
 
 	boolean canEditRole = false;
 
-	// sysadmin, global course admins can add/change users and their roles.
-	// course manager can add existing users in any role except sysadmin
+	// appadmin, global course admins can add/change users and their roles.
+	// course manager can add existing users in any role except appadmin
 	// course admin can add existing users but only as learner
 	Integer rootOrgId = userManagementService.getRootOrganisation().getOrganisationId();
-	if (request.isUserInRole(Role.SYSADMIN)
+	if (request.isUserInRole(Role.APPADMIN)
 		|| (userManagementService.isUserGlobalGroupManager() && !orgId.equals(rootOrgId))) {
 	    canEditRole = true;
 	} else {
@@ -166,7 +166,7 @@ public class UserOrgSaveController {
 	    return "redirect:/usermanage.do?org=" + orgId;
 	} else {
 	    request.setAttribute("roles", userManagementService.filterRoles(rolelist,
-		    request.isUserInRole(Role.SYSADMIN), organisation.getOrganisationType()));
+		    request.isUserInRole(Role.APPADMIN), organisation.getOrganisationType()));
 	    request.setAttribute("newUserOrganisations", newUserOrganisations);
 	    request.setAttribute("orgId", orgId);
 	    return "forward:/userorgrole.do";

@@ -84,11 +84,11 @@ public class UserSaveController {
 
 	boolean canEditRole = false;
 
-	// sysadmin, global course admins can add/change users and their roles.
+	// appadmin, global course admins can add/change users and their roles.
 	// course manager can add/change users and their roles iff CourseAdminCanAddNewUsers
 	// course admin can add/change users but only set role to learner iff CourseAdminCanAddNewUsers
 	Integer rootOrgId = userManagementService.getRootOrganisation().getOrganisationId();
-	if (request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager()) {
+	if (request.isUserInRole(Role.APPADMIN) || userManagementService.isUserGlobalGroupManager()) {
 	    canEditRole = true;
 	} else {
 
@@ -115,7 +115,7 @@ public class UserSaveController {
 	    }
 	}
 
-	UserDTO sysadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+	UserDTO appadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	log.debug("orgId: " + orgId);
 	Boolean edit = false;
@@ -243,7 +243,7 @@ public class UserSaveController {
 		    userManagementService.updatePassword(user, password);
 
 		    // make 'create user' audit log entry
-		    userManagementService.logUserCreated(user, sysadmin);
+		    userManagementService.logUserCreated(user, appadmin);
 
 		    log.debug("user: " + user.toString());
 		}
@@ -289,9 +289,9 @@ public class UserSaveController {
 	userForm.setUserId(userId);
 	Integer loggeduserId = ((UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
 
-	// check if logged in User is Sysadmin
-	if (!securityService.isSysadmin(loggeduserId, "Change Password of User " + userId, true)) {
-	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Only Sysadmin has edit permisions");
+	// check if logged in User is Appadmin
+	if (!securityService.isAppadmin(loggeduserId, "Change Password of User " + userId, true)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Only Appadmin has edit permisions");
 	    return null;
 	}
 

@@ -71,8 +71,8 @@
 	<c:set var="help"><lams:help style="small" page="LAMS+Policies" /></c:set>
 	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
 		<p>
-			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default">
-				<fmt:message key="sysadmin.maintain" />
+			<a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-default">
+				<fmt:message key="appadmin.maintain" />
 			</a>
 			<c:if test="${viewPreviousVersions}">
 				<a class="btn btn-default" href="<lams:WebAppURL />policyManagement/list.do">

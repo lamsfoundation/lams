@@ -150,7 +150,7 @@ public class IndexController {
 	    boolean isIntegrationUser = integrationService.isIntegrationUser(userDTO.getUserID());
 	    //prevent integration users with mere learner rights from accessing index.do
 	    if (isIntegrationUser && !request.isUserInRole(Role.AUTHOR) && !request.isUserInRole(Role.MONITOR)
-		    && !request.isUserInRole(Role.GROUP_MANAGER) && !request.isUserInRole(Role.SYSADMIN)) {
+		    && !request.isUserInRole(Role.GROUP_MANAGER) && !request.isUserInRole(Role.APPADMIN)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN,
 			"Integration users with learner right are not allowed to access this page");
 		return null;
@@ -174,8 +174,8 @@ public class IndexController {
 	request.setAttribute("favoriteOrganisations", favoriteOrganisations);
 	request.setAttribute("activeOrgId", user.getLastVisitedOrganisationId());
 
-	boolean isSysadmin = request.isUserInRole(Role.SYSADMIN);
-	int userCoursesCount = userManagementService.getCountActiveCoursesByUser(userDTO.getUserID(), isSysadmin, null);
+	boolean isAppadmin = request.isUserInRole(Role.APPADMIN);
+	int userCoursesCount = userManagementService.getCountActiveCoursesByUser(userDTO.getUserID(), isAppadmin, null);
 	request.setAttribute("isCourseSearchOn", userCoursesCount > 10);
 
 	return "main";
@@ -198,12 +198,12 @@ public class IndexController {
 
     private void setAdminLinks(HttpServletRequest request) {
 	List<IndexLinkBean> adminLinks = new ArrayList<>();
-	if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.GROUP_MANAGER)) {
+	if (request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.GROUP_MANAGER)) {
 	    adminLinks.add(new IndexLinkBean("index.courseman", "javascript:openOrgManagement("
 		    + userManagementService.getRootOrganisation().getOrganisationId() + ')'));
 	}
-	if (request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager()) {
-	    adminLinks.add(new IndexLinkBean("index.sysadmin", "javascript:openSysadmin()"));
+	if (request.isUserInRole(Role.APPADMIN) || userManagementService.isUserGlobalGroupManager()) {
+	    adminLinks.add(new IndexLinkBean("index.appadmin", "javascript:openAppadmin()"));
 	}
 
 	request.setAttribute("adminLinks", adminLinks);
@@ -218,7 +218,7 @@ public class IndexController {
 	User loggedInUser = userManagementService.getUserByLogin(request.getRemoteUser());
 
 	Integer userId = loggedInUser.getUserId();
-	boolean isSysadmin = request.isUserInRole(Role.SYSADMIN);
+	boolean isAppadmin = request.isUserInRole(Role.APPADMIN);
 	String searchString = WebUtil.readStrParam(request, "fcol[1]", true);
 
 	// paging parameters of tablesorter
@@ -237,12 +237,12 @@ public class IndexController {
 //
 //	}
 
-	List<OrganisationDTO> orgDtos = userManagementService.getActiveCoursesByUser(userId, isSysadmin, page, size,
+	List<OrganisationDTO> orgDtos = userManagementService.getActiveCoursesByUser(userId, isAppadmin, page, size,
 		searchString);
 
 	ObjectNode responcedata = JsonNodeFactory.instance.objectNode();
 	responcedata.put("total_rows",
-		userManagementService.getCountActiveCoursesByUser(userId, isSysadmin, searchString));
+		userManagementService.getCountActiveCoursesByUser(userId, isAppadmin, searchString));
 
 	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	for (OrganisationDTO orgDto : orgDtos) {

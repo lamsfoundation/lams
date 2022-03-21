@@ -773,7 +773,7 @@ public class UserManagementService implements IUserManagementService, Initializi
 	    log.debug("setting role: " + role.getName() + " in organisation: " + org.getName());
 	    uors.add(uor);
 	    // when a user gets these roles, they need a workspace
-	    if (role.getName().equals(Role.AUTHOR) || role.getName().equals(Role.SYSADMIN)) {
+	    if (role.getName().equals(Role.AUTHOR) || role.getName().equals(Role.APPADMIN)) {
 		if (user.getWorkspaceFolder() == null) {
 		    createWorkspaceFolderForUser(user);
 		}
@@ -859,12 +859,12 @@ public class UserManagementService implements IUserManagementService, Initializi
     }
 
     @Override
-    public List<Role> filterRoles(List<Role> rolelist, Boolean isSysadmin, OrganisationType orgType) {
+    public List<Role> filterRoles(List<Role> rolelist, Boolean isAppadmin, OrganisationType orgType) {
 	List<Role> allRoles = new ArrayList<>();
 	allRoles.addAll(rolelist);
 	Role role = new Role();
-	if (!orgType.getOrganisationTypeId().equals(OrganisationType.ROOT_TYPE) || !isSysadmin) {
-	    role.setRoleId(Role.ROLE_SYSADMIN);
+	if (!orgType.getOrganisationTypeId().equals(OrganisationType.ROOT_TYPE) || !isAppadmin) {
+	    role.setRoleId(Role.ROLE_APPADMIN);
 	    allRoles.remove(role);
 	} else {
 	    role.setRoleId(Role.ROLE_AUTHOR);
@@ -947,10 +947,10 @@ public class UserManagementService implements IUserManagementService, Initializi
     }
 
     @Override
-    public boolean isUserSysAdmin() {
+    public boolean isUserAppAdmin() {
 	Integer rootOrgId = getRootOrganisation().getOrganisationId();
 	Integer requestorId = getRequestorId();
-	return requestorId != null ? isUserInRole(requestorId, rootOrgId, Role.SYSADMIN) : false;
+	return requestorId != null ? isUserInRole(requestorId, rootOrgId, Role.APPADMIN) : false;
     }
 
     @Override
@@ -1031,14 +1031,14 @@ public class UserManagementService implements IUserManagementService, Initializi
     }
 
     @Override
-    public List<OrganisationDTO> getActiveCoursesByUser(Integer userId, boolean isSysadmin, int page, int size,
+    public List<OrganisationDTO> getActiveCoursesByUser(Integer userId, boolean isAppadmin, int page, int size,
 	    String searchString) {
-	return organisationDAO.getActiveCoursesByUser(userId, isSysadmin, page, size, searchString);
+	return organisationDAO.getActiveCoursesByUser(userId, isAppadmin, page, size, searchString);
     }
 
     @Override
-    public int getCountActiveCoursesByUser(Integer userId, boolean isSysadmin, String searchString) {
-	return organisationDAO.getCountActiveCoursesByUser(userId, isSysadmin, searchString);
+    public int getCountActiveCoursesByUser(Integer userId, boolean isAppadmin, String searchString) {
+	return organisationDAO.getCountActiveCoursesByUser(userId, isAppadmin, searchString);
     }
 
     @Override
@@ -1089,7 +1089,7 @@ public class UserManagementService implements IUserManagementService, Initializi
 
     @Override
     public boolean canEditGroup(Integer userId, Integer orgId) {
-	if (isUserSysAdmin() || isUserGlobalGroupManager()) {
+	if (isUserAppAdmin() || isUserGlobalGroupManager()) {
 	    return true;
 	}
 	Organisation org = (Organisation) findById(Organisation.class, orgId);

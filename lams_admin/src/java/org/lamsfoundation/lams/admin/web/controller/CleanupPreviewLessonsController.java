@@ -68,14 +68,14 @@ public class CleanupPreviewLessonsController {
     @RequestMapping(path = "/start")
     public String unspecified(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	
-	if (!securityService.isSysadmin(getUserID(), "display cleanup preview lessons", false)) {
-	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a sysadmin");
+	if (!securityService.isAppadmin(getUserID(), "display cleanup preview lessons", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not an appadmin");
 	    return null;
 	}
 
-	if (!(request.isUserInRole(Role.SYSADMIN))) {
+	if (!(request.isUserInRole(Role.APPADMIN))) {
 	    request.setAttribute("errorName", "CleanupPreviewLessonsController");
-	    request.setAttribute("errorMessage", messageService.getMessage("error.need.sysadmin"));
+	    request.setAttribute("errorMessage", messageService.getMessage("error.need.appadmin"));
 	    return "error";
 	}
 

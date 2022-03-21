@@ -71,7 +71,7 @@ public class ToolContentListController {
     @RequestMapping(path = "/start")
     public String execute(HttpServletRequest request) throws Exception {
 	// check permission
-	if (!(request.isUserInRole(Role.SYSADMIN))) {
+	if (!(request.isUserInRole(Role.APPADMIN))) {
 	    request.setAttribute("errorName", "ToolContentListAction");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
@@ -170,9 +170,9 @@ public class ToolContentListController {
     }
 
     private boolean checkPriviledge(HttpServletRequest request) {
-	if (!userManagementService.isUserSysAdmin()) {
+	if (!userManagementService.isUserAppAdmin()) {
 	    request.setAttribute("errorName", "ToolContentListAction");
-	    request.setAttribute("errorMessage", messageService.getMessage("error.no.sysadmin.priviledge"));
+	    request.setAttribute("errorMessage", messageService.getMessage("error.no.appadmin.priviledge"));
 	    return false;
 	}
 	return true;

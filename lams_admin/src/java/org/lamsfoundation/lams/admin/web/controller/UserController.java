@@ -137,7 +137,7 @@ public class UserController {
 	    }
 	}
 
-	if (!(canEdit || request.isUserInRole(Role.SYSADMIN))) {
+	if (!(canEdit || request.isUserInRole(Role.APPADMIN))) {
 	    request.setAttribute("errorName", "UserController");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
@@ -175,7 +175,7 @@ public class UserController {
 	    userForm.setUserTheme(userSelectedTheme);
 	    userForm.setInitialPortraitId(user.getPortraitUuid() == null ? null : user.getPortraitUuid().toString());
 
-	    //property available for modification only to sysadmins
+	    //property available for modification only to appadmins
 	    userForm.setTwoFactorAuthenticationEnabled(user.isTwoFactorAuthenticationEnabled());
 	} else { // create a user
 	    try {
@@ -192,9 +192,9 @@ public class UserController {
 	}
 	userForm.setOrgId(org == null ? null : org.getOrganisationId());
 
-	// sysadmins can mark users as required to use two-factor authentication
-	if (request.isUserInRole(Role.SYSADMIN)) {
-	    request.setAttribute("isSysadmin", true);
+	// appadmins can mark users as required to use two-factor authentication
+	if (request.isUserInRole(Role.APPADMIN)) {
+	    request.setAttribute("isAppadmin", true);
 	}
 
 	// Get all available time zones
@@ -284,7 +284,7 @@ public class UserController {
     // determine whether to disable or delete user based on their lams data
     @RequestMapping("/remove")
     public String remove(HttpServletRequest request) throws Exception {
-	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager())) {
+	if (!(request.isUserInRole(Role.APPADMIN) || userManagementService.isUserGlobalGroupManager())) {
 	    request.setAttribute("errorName", "UserAction");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
@@ -304,12 +304,12 @@ public class UserController {
 
     @RequestMapping(path = "/disable", method = RequestMethod.POST)
     public String disable(HttpServletRequest request) throws Exception {
-	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager())) {
+	if (!(request.isUserInRole(Role.APPADMIN) || userManagementService.isUserGlobalGroupManager())) {
 	    request.setAttribute("errorName", "UserController");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
 	}
-	UserDTO sysadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+	UserDTO appadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
 	Integer userId = WebUtil.readIntParam(request, "userId");
@@ -317,7 +317,7 @@ public class UserController {
 	String[] args = new String[1];
 	args[0] = userId.toString();
 	String message = messageService.getMessage("audit.user.disable", args);
-	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, sysadmin != null ? sysadmin.getUserID() : null, userId,
+	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, appadmin != null ? appadmin.getUserID() : null, userId,
 		null, null, message);
 	if ((orgId == null) || (orgId == 0)) {
 	    return "forward:../usersearch.do";
@@ -329,12 +329,12 @@ public class UserController {
 
     @RequestMapping(path = "/delete", method = RequestMethod.POST)
     public String delete(HttpServletRequest request) throws Exception {
-	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager())) {
+	if (!(request.isUserInRole(Role.APPADMIN) || userManagementService.isUserGlobalGroupManager())) {
 	    request.setAttribute("errorName", "UserAction");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
 	}
-	UserDTO sysadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+	UserDTO appadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
 	Integer userId = WebUtil.readIntParam(request, "userId");
@@ -348,7 +348,7 @@ public class UserController {
 	String[] args = new String[1];
 	args[0] = userId.toString();
 	String message = messageService.getMessage("audit.user.delete", args);
-	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, sysadmin != null ? sysadmin.getUserID() : null, userId,
+	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, appadmin != null ? appadmin.getUserID() : null, userId,
 		null, null, message);
 	if ((orgId == null) || (orgId == 0)) {
 	    return "forward:/usersearch.do";
@@ -361,7 +361,7 @@ public class UserController {
     // called from disabled users screen
     @RequestMapping(path = "/enable", method = RequestMethod.POST)
     public String enable(HttpServletRequest request) throws Exception {
-	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager())) {
+	if (!(request.isUserInRole(Role.APPADMIN) || userManagementService.isUserGlobalGroupManager())) {
 	    request.setAttribute("errorName", "UserController");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";

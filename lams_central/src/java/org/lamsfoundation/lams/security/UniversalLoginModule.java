@@ -276,11 +276,11 @@ public class UniversalLoginModule implements LoginModule {
 	// there is no session if the request did not go through SsoHandler
 	// it happens on session failover
 	if (SessionManager.getSession() != null) {
-	    // allow sysadmin to login as another user; in this case, the LAMS shared session will be present,
+	    // allow appadmin to login as another user; in this case, the LAMS shared session will be present,
 	    // allowing the following check to work
-	    if (UniversalLoginModule.userManagementService.isUserSysAdmin()) {
+	    if (UniversalLoginModule.userManagementService.isUserAppAdmin()) {
 		if (UniversalLoginModule.log.isDebugEnabled()) {
-		    UniversalLoginModule.log.debug("Authenticated sysadmin");
+		    UniversalLoginModule.log.debug("Authenticated appadmin");
 		}
 		return true;
 	    }
@@ -469,7 +469,7 @@ public class UniversalLoginModule implements LoginModule {
 			group.addMember(p);
 			groupMembers.add(name);
 		    }
-		    if (name.equals(Role.SYSADMIN)) {
+		    if (name.equals(Role.APPADMIN)) {
 			p = new SimplePrincipal(Role.AUTHOR);
 			UniversalLoginModule.log.info("Found role " + name);
 			if (!groupMembers.contains(Role.AUTHOR)) {

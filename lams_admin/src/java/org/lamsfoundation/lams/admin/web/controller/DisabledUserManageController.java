@@ -50,9 +50,9 @@ public class DisabledUserManageController {
 
     @RequestMapping("/disabledmanage")
     public String execute(HttpServletRequest request) throws Exception {
-	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager())) {
+	if (!(request.isUserInRole(Role.APPADMIN) || userManagementService.isUserGlobalGroupManager())) {
 	    request.setAttribute("errorName", "DisabledUserManageAction");
-	    request.setAttribute("errorMessage", adminMessageService.getMessage("error.need.sysadmin"));
+	    request.setAttribute("errorMessage", adminMessageService.getMessage("error.need.appadmin"));
 	    return "error";
 	}
 

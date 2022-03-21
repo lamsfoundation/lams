@@ -68,10 +68,10 @@ public class UserRoleServlet extends HttpServlet {
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed, invalid hash");
 		return;
 	    }
-	    ExtUserUseridMap sysadminUserMap = integrationService.getExtUserUseridMap(extServer, username);
-	    if (!securityService.isSysadmin(sysadminUserMap.getUser().getUserId(), "set user role", false)) {
-		log.error("Sysadmin role check failed while trying to set role for user: " + targetUsername);
-		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed, user is not sysadmin");
+	    ExtUserUseridMap appadminUserMap = integrationService.getExtUserUseridMap(extServer, username);
+	    if (!securityService.isAppadmin(appadminUserMap.getUser().getUserId(), "set user role", false)) {
+		log.error("Appadmin role check failed while trying to set role for user: " + targetUsername);
+		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed, user is not appadmin");
 		return;
 	    }
 	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer, targetUsername);
@@ -106,13 +106,13 @@ public class UserRoleServlet extends HttpServlet {
     }
 
     /**
-     * It only supports SYSADMIN role now, but can be extended in the future.
+     * It only supports APPADMIN role now, but can be extended in the future.
      */
     private void grant(User user, String role) throws IOException {
 	switch (role) {
-	    case Role.SYSADMIN:
+	    case Role.APPADMIN:
 		Organisation rootOrganisation = userManagementService.getRootOrganisation();
-		List<String> roles = new ArrayList<>(Arrays.asList(Role.ROLE_SYSADMIN.toString()));
+		List<String> roles = new ArrayList<>(Arrays.asList(Role.ROLE_APPADMIN.toString()));
 		userManagementService.setRolesForUserOrganisation(user, rootOrganisation.getOrganisationId(), roles);
 		break;
 	    default:
@@ -121,11 +121,11 @@ public class UserRoleServlet extends HttpServlet {
     }
 
     /**
-     * It only supports SYSADMIN role now, but can be extended in the future.
+     * It only supports APPADMIN role now, but can be extended in the future.
      */
     private void revoke(User user, String role) throws IOException {
 	switch (role) {
-	    case Role.SYSADMIN:
+	    case Role.APPADMIN:
 		Organisation rootOrganisation = userManagementService.getRootOrganisation();
 		List<String> roles = new ArrayList<>();
 		userManagementService.setRolesForUserOrganisation(user, rootOrganisation.getOrganisationId(), roles);

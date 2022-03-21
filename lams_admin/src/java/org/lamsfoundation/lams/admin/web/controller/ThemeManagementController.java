@@ -64,7 +64,7 @@ public class ThemeManagementController {
     public String unspecified(@ModelAttribute ThemeForm themeForm, HttpServletRequest request) throws Exception {
 
 	// check permission
-	if (!request.isUserInRole(Role.SYSADMIN)) {
+	if (!request.isUserInRole(Role.APPADMIN)) {
 	    request.setAttribute("errorName", "ThemeManagementAction");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";

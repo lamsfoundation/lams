@@ -358,11 +358,11 @@ public interface IUserManagementService {
      * Returns list of roles suitable for the given orgType.
      *
      * @param rolelist
-     * @param isSysadmin
+     * @param isAppadmin
      * @param orgType
      * @return
      */
-    List<Role> filterRoles(List<Role> rolelist, Boolean isSysadmin, OrganisationType orgType);
+    List<Role> filterRoles(List<Role> rolelist, Boolean isAppadmin, OrganisationType orgType);
 
     boolean hasRoleInOrganisation(User user, Integer roleId);
 
@@ -398,9 +398,9 @@ public interface IUserManagementService {
     boolean isUserGlobalGroupManager();
 
     /**
-     * Return true if user has sysadmin role in root organisation.
+     * Return true if user has appadmin role in root organisation.
      */
-    boolean isUserSysAdmin();
+    boolean isUserAppAdmin();
 
     /**
      * Count then umber of users with a particular role in a given org.
@@ -438,10 +438,10 @@ public interface IUserManagementService {
      */
     int getCountUsers(String searchString);
 
-    List<OrganisationDTO> getActiveCoursesByUser(Integer userId, boolean isSysadmin, int page, int size,
+    List<OrganisationDTO> getActiveCoursesByUser(Integer userId, boolean isAppadmin, int page, int size,
 	    String searchString);
 
-    int getCountActiveCoursesByUser(Integer userId, boolean isSysadmin, String searchString);
+    int getCountActiveCoursesByUser(Integer userId, boolean isAppadmin, String searchString);
 
     /**
      * Search users across login, first name, last name and email fields using the search term. Filters out disabled

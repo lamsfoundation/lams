@@ -98,7 +98,7 @@ public class UserManageController {
 		: organisation;
 	// check permission
 	Integer rootOrgId = userManagementService.getRootOrganisation().getOrganisationId();
-	if (request.isUserInRole(Role.SYSADMIN)
+	if (request.isUserInRole(Role.APPADMIN)
 		|| (userManagementService.isUserGlobalGroupManager() && !orgId.equals(rootOrgId))) {
 	    userManageForm.setCourseAdminCanAddNewUsers(true);
 	    userManageForm.setCourseAdminCanBrowseAllUsers(true);
@@ -113,7 +113,7 @@ public class UserManageController {
 	} else {
 	    return forwardError(request, "error.authorisation");
 	}
-	userManageForm.setCanResetOrgPassword(request.isUserInRole(Role.SYSADMIN));
+	userManageForm.setCanResetOrgPassword(request.isUserInRole(Role.APPADMIN));
 
 	userManageForm.setOrgId(orgId);
 	userManageForm.setOrgName(orgName);
@@ -129,7 +129,7 @@ public class UserManageController {
 	// count roles in the org
 	HashMap<String, Integer> roleCount = new HashMap<>();
 	if (orgId.equals(rootOrgId)) {
-	    roleCount.put(Role.SYSADMIN, Role.ROLE_SYSADMIN);
+	    roleCount.put(Role.APPADMIN, Role.ROLE_APPADMIN);
 	    roleCount.put(Role.GROUP_MANAGER, Role.ROLE_GROUP_MANAGER);
 	} else {
 	    roleCount.put(Role.LEARNER, Role.ROLE_LEARNER);

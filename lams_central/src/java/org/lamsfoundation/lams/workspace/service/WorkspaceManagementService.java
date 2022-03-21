@@ -536,7 +536,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     }
 
     private boolean isSysAuthorAdmin(User user) {
-	return userMgmtService.hasRoleInOrganisation(user, Role.ROLE_SYSADMIN);
+	return userMgmtService.hasRoleInOrganisation(user, Role.ROLE_APPADMIN);
     }
 
     private Vector getFolderContentDTO(List designs, Integer folderPermissions, Vector<FolderContentDTO> folderContent,
@@ -946,7 +946,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	while (roleIterator.hasNext()) {
 	    UserOrganisationRole userOrganisationRole = (UserOrganisationRole) roleIterator.next();
 	    Role role = userOrganisationRole.getRole();
-	    if (role.isAuthor() || role.isSysAdmin() || role.isGroupManager()) {
+	    if (role.isAuthor() || role.isAppAdmin() || role.isGroupManager()) {
 		return true;
 	    }
 	}

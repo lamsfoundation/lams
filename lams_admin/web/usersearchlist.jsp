@@ -145,7 +145,7 @@
 
 	<lams:Page type="admin" title="${title}">
 		<p><a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
-		<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default loffset5"><fmt:message key="sysadmin.maintain" /></a></p>
+		<a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-default loffset5"><fmt:message key="appadmin.maintain" /></a></p>
 		
 		<p><input class="btn btn-default" type="button" value="<fmt:message key="admin.user.create"/>" onclick="javascript:document.location='user/edit.do'" />
 		

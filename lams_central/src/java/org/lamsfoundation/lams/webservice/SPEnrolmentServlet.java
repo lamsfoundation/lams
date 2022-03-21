@@ -182,7 +182,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    // map of user login -> user ID
 		    Map<String, Integer> userIDs = new HashMap<>();
 
-		    // find sysadmin as he/she will be the creator of organisations
+		    // find appadmin as he/she will be the creator of organisations
 		    Organisation rootOrganisation = userManagementService.getRootOrganisation();
 		    Integer creatorId = rootOrganisation.getCreatedBy().getUserId();
 

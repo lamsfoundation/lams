@@ -103,7 +103,7 @@ public class Authenticator {
 	    Date now = new Date();
 	    if (requestTimePlusTimeToLive.before(now) || requestTimeMinusTimeToLive.after(now)) {
 		throw new AuthenticationException("Request is not in the time range of " + timeToLiveLoginRequest
-			+ " minutes. Please, contact sysadmin.");
+			+ " minutes. Please, contact appadmin.");
 	    }
 	}
 

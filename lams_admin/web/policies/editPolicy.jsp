@@ -63,8 +63,8 @@
 
 	<lams:Page type="admin" title="${title}" >
 		<div>
-			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default">
-				<fmt:message key="sysadmin.maintain" />
+			<a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-default">
+				<fmt:message key="appadmin.maintain" />
 			</a>
 			<a href="../policyManagement/list.do" class="btn btn-default loffset5">
 				<fmt:message key="admin.policies.title" />

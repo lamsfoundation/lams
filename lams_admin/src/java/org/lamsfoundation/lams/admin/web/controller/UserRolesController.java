@@ -107,13 +107,13 @@ public class UserRolesController {
 	Integer orgIdOfCourse = (orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE))
 		? org.getParentOrganisation().getOrganisationId()
 		: orgId;
-	Boolean isSysadmin = request.isUserInRole(Role.SYSADMIN);
+	Boolean isAppadmin = request.isUserInRole(Role.APPADMIN);
 	User requestor = userManagementService.getUserByLogin(request.getRemoteUser());
 	Integer rootOrgId = userManagementService.getRootOrganisation().getOrganisationId();
 	Boolean requestorHasRole = userManagementService.isUserInRole(requestor.getUserId(), orgIdOfCourse,
 		Role.GROUP_MANAGER) || (userManagementService.isUserGlobalGroupManager() && !rootOrgId.equals(orgId));
 
-	if (!(requestorHasRole || isSysadmin)) {
+	if (!(requestorHasRole || isAppadmin)) {
 	    request.setAttribute("errorName", "UserRolesController");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
@@ -122,7 +122,7 @@ public class UserRolesController {
 	userRolesForm.setUserId(userId);
 	userRolesForm.setOrgId(org.getOrganisationId());
 	// screen display vars
-	request.setAttribute("rolelist", userManagementService.filterRoles(rolelist, isSysadmin, orgType));
+	request.setAttribute("rolelist", userManagementService.filterRoles(rolelist, isAppadmin, orgType));
 	request.setAttribute("login", user.getLogin());
 	request.setAttribute("fullName", user.getFullName());
 	request.setAttribute("orgName", org.getName());

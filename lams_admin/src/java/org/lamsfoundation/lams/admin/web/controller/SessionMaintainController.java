@@ -61,7 +61,7 @@ public class SessionMaintainController {
 	    SessionManager.removeSessionByLogin(login, true);
 
 	    String message = new StringBuilder("User ").append(login).append(" (").append(user.getUserId())
-		    .append(") got logged out by sysadmin").toString();
+		    .append(") got logged out by appadmin").toString();
 	    logEventService.logEvent(LogEvent.TYPE_LOGOUT, user.getUserId(), user.getUserId(), null, null, message);
 	}
 	return list(request);

@@ -240,13 +240,13 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 	try {
-	    boolean isSysAdmin = false;
+	    boolean isAppAdmin = false;
 	    String remoteUser = request.getRemoteUser();
 	    if (StringUtils.isNotBlank(remoteUser)) {
 		User user = userManagementService.getUserByLogin(remoteUser);
 		if (user != null) {
-		    isSysAdmin = userManagementService.isUserInRole(user.getUserId(),
-			    userManagementService.getRootOrganisation().getOrganisationId(), Role.SYSADMIN);
+		    isAppAdmin = userManagementService.isUserInRole(user.getUserId(),
+			    userManagementService.getRootOrganisation().getOrganisationId(), Role.APPADMIN);
 		}
 	    }
 	    // get parameters
@@ -268,7 +268,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    final boolean isUpdateUserDetails = false;
 	    ExtServer extServer = null;
 
-	    if (!isSysAdmin) {
+	    if (!isAppAdmin) {
 		if ((serverId == null) || (datetime == null) || (hashValue == null) || (username == null)
 			|| (courseId == null) || (country == null) || (locale == null)) {
 		    String msg = "Parameters missing";
@@ -297,7 +297,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 
 	    if ((method != null) && method.equals("exportLD")) {
 		// do export
-		exportLD(request, response, isSysAdmin);
+		exportLD(request, response, isAppAdmin);
 
 	    } else if ((method != null)
 		    && (method.equals("getLearningDesignsJSON") || method.equals("getPagedHomeLearningDesignsJSON"))) {
@@ -418,9 +418,9 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	doGet(request, response);
     }
 
-    public void exportLD(HttpServletRequest request, HttpServletResponse response, boolean isSysAdmin) {
+    public void exportLD(HttpServletRequest request, HttpServletResponse response, boolean isAppAdmin) {
 	Long learningDesignId = WebUtil.readLongParam(request, PARAM_LEARING_DESIGN_ID);
-	boolean getPathOnly = isSysAdmin && WebUtil.readBooleanParam(request, "getPathOnly", false);
+	boolean getPathOnly = isAppAdmin && WebUtil.readBooleanParam(request, "getPathOnly", false);
 
 	List<String> toolsErrorMsgs = new ArrayList<>();
 

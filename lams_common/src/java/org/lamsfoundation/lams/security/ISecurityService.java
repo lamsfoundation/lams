@@ -58,9 +58,9 @@ public interface ISecurityService {
 	    throws SecurityException;
 
     /**
-     * Checks if the user has a global role of SYSADMIN.
+     * Checks if the user has a global role of APPADMIN.
      */
-    boolean isSysadmin(Integer userId, String action, boolean escalate);
+    boolean isAppadmin(Integer userId, String action, boolean escalate);
 
     /**
      * Checks if the user has any of the given roles in the given organisation. If GROUP_MANAGER and/or GROUP_ADMIN are

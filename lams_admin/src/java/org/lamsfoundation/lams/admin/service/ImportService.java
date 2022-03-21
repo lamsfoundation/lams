@@ -379,7 +379,7 @@ public class ImportService implements IImportService {
 		continue;
 	    } else {
 		try {
-		    saveUserRoles(isSysadmin(sessionId), login, orgId, roles, row);
+		    saveUserRoles(isAppadmin(sessionId), login, orgId, roles, row);
 		    successful++;
 		} catch (Exception e) {
 		    ImportService.log.error("Unable to assign roles to user: " + login, e);
@@ -412,16 +412,16 @@ public class ImportService implements IImportService {
     }
 
     // used when importing in a separate thread that doesn't have the user's DTO in session
-    private boolean isSysadmin(String sessionId) {
+    private boolean isAppadmin(String sessionId) {
 	UserDTO userDTO = (UserDTO) SessionManager.getSession(sessionId).getAttribute(AttributeNames.USER);
 	return service.isUserInRole(userDTO.getUserID(), service.getRootOrganisation().getOrganisationId(),
-		Role.SYSADMIN);
+		Role.APPADMIN);
     }
 
     /*
      * user must already exist
      */
-    private void saveUserRoles(boolean isSysadmin, String login, String orgId, List<String> roles, HSSFRow row) {
+    private void saveUserRoles(boolean isAppadmin, String login, String orgId, List<String> roles, HSSFRow row) {
 	User user = null;
 	if (StringUtils.isNotBlank(login)) {
 	    user = service.getUserByLogin(login);
@@ -439,7 +439,7 @@ public class ImportService implements IImportService {
 	if (StringUtils.isBlank(orgId) || (org == null)) {
 	    setError("error.org.invalid", "(" + orgId + ")");
 	} else {
-	    if ((roles == null) || !checkValidRoles(roles, isSysadmin, org.getOrganisationType())) {
+	    if ((roles == null) || !checkValidRoles(roles, isAppadmin, org.getOrganisationType())) {
 		setError("error.roles.invalid", "(" + parseStringCell(row.getCell(ImportService.ROLES)) + ")");
 	    }
 	}
@@ -723,7 +723,7 @@ public class ImportService implements IImportService {
     }
 
     // return false if a role shouldn't be assigned in given org type
-    private boolean checkValidRoles(List<String> idList, boolean isSysadmin, OrganisationType orgType) {
+    private boolean checkValidRoles(List<String> idList, boolean isAppadmin, OrganisationType orgType) {
 	// convert list of id's into list of Roles
 	List<Role> roleList = new ArrayList<>();
 	for (String id : idList) {
@@ -736,7 +736,7 @@ public class ImportService implements IImportService {
 	}
 
 	// check they are valid
-	List<Role> validRoles = service.filterRoles(roleList, isSysadmin, orgType);
+	List<Role> validRoles = service.filterRoles(roleList, isAppadmin, orgType);
 	for (Role r : roleList) {
 	    if (!validRoles.contains(r)) {
 		return false;

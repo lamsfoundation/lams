@@ -17,7 +17,7 @@
 	<c:set var="title">${title}: <fmt:message key="admin.list.disabled.users"/></c:set>
 	<lams:Page type="admin" title="${title}">
 	
-		<p><a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
+		<p><a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-default"><fmt:message key="appadmin.maintain" /></a></p>
 
 		<table class="table table-striped table-condensed">
 		<tr>

@@ -121,8 +121,8 @@
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
 			<lams:Page type="admin" title="${title}" titleHelpURL="${help}" formID="importExcelForm">
 				<p>
-					<a href="<lams:LAMSURL/>admin/sysadminstart.do"
-						class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a>
+					<a href="<lams:LAMSURL/>admin/appadminstart.do"
+						class="btn btn-default"><fmt:message key="appadmin.maintain" /></a>
 				</p>
 				
 				<p>
@@ -189,7 +189,7 @@
 					<div id="file-upload-area" class="voffset20"></div>
 				
 					<div class="pull-right voffset20">
-						<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
+						<a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
 						<input type="submit" id="importButton" class="btn btn-primary loffset5" value="<fmt:message key="label.import" />" />
 						&nbsp;
 					</div>

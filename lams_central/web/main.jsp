@@ -227,9 +227,9 @@
 		               			<c:set var="iconClass">fa-users</c:set>
 		               			<c:set var="linkId">courseManagementButton</c:set>
 		               		</c:when>
-		               		<c:when test="${adminlink.name == 'index.sysadmin'}">
+		               		<c:when test="${adminlink.name == 'index.appadmin'}">
 		               			<c:set var="iconClass">fa-gear</c:set>
-		               			<c:set var="linkId">sysadminButton</c:set>
+		               			<c:set var="linkId">appadminButton</c:set>
 		               		</c:when>
 		               	</c:choose>
 									

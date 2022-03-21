@@ -136,7 +136,7 @@ public class AuthoringController {
 	request.setAttribute("access", JsonUtil.toString(accessList));
 	request.setAttribute("licenses", authoringService.getAvailableLicenses());
 
-	boolean canSetReadOnly = userManagementService.isUserSysAdmin()
+	boolean canSetReadOnly = userManagementService.isUserAppAdmin()
 		|| userManagementService.isUserGlobalGroupManager();
 	request.setAttribute("canSetReadOnly", canSetReadOnly);
 

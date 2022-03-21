@@ -67,7 +67,7 @@ public class LoginAsController {
     public String execute(HttpServletRequest request) throws Exception {
 	String login = WebUtil.readStrParam(request, "login", false);
 
-	if (userManagementService.isUserSysAdmin() && Configuration.getAsBoolean(ConfigurationKeys.LOGIN_AS_ENABLE)) {
+	if (userManagementService.isUserAppAdmin() && Configuration.getAsBoolean(ConfigurationKeys.LOGIN_AS_ENABLE)) {
 	    if ((login != null) && (login.trim().length() > 0)) {
 		User user = userManagementService.getUserByLogin(login);
 		if (user != null) {
@@ -118,7 +118,7 @@ public class LoginAsController {
 	for (Set<Integer> orgRoleSet : orgRoleSets.values()) {
 	    for (Integer role : orgRoleSet) {
 		if (role.equals(Role.ROLE_AUTHOR) || role.equals(Role.ROLE_MONITOR)
-			|| role.equals(Role.ROLE_GROUP_MANAGER) || role.equals(Role.ROLE_SYSADMIN)) {
+			|| role.equals(Role.ROLE_GROUP_MANAGER) || role.equals(Role.ROLE_APPADMIN)) {
 		    return false;
 		}
 	    }
