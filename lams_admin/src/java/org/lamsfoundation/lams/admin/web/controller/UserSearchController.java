@@ -34,6 +34,8 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +55,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Controller
 public class UserSearchController {
     private static Logger log = Logger.getLogger(UserSearchController.class);
-    
+
     @Autowired
     private IUserManagementService userManagementService;
     @Autowired
@@ -69,6 +71,10 @@ public class UserSearchController {
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
 	}
+
+	boolean loginAsEnable = Configuration.getAsBoolean(ConfigurationKeys.LOGIN_AS_ENABLE)
+		&& request.isUserInRole(Role.SYSADMIN);
+	request.setAttribute("loginAsEnable", loginAsEnable);
 
 	return "usersearchlist";
     }
