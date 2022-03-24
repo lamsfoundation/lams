@@ -207,7 +207,7 @@ public class ExcelUtil {
 	}
 
 	Sheet sheet = workbook.createSheet(sheetName);
-	Map<Integer, Integer> columnWidths = fixedColumnWidth == null ? null : new HashMap<>();
+	Map<Integer, Integer> columnWidths = fixedColumnWidth == null ? new HashMap<>() : null;
 
 	// Print title if requested
 	boolean isTitleToBePrinted = displaySheetTitle && StringUtils.isNotBlank(excelSheet.getSheetName());
@@ -247,13 +247,15 @@ public class ExcelUtil {
 	    sheet.addMergedRegion(mergedCells);
 	}
 
-	for (int columnIndex : columnWidths.keySet()) {
-	    // one unit is 1/256 of character width, plus some characters for padding
-	    // maximum is 255 characters
-	    // or just use the declared fixed column width
-	    int columnWidth = fixedColumnWidth == null ? Math.min(255, columnWidths.get(columnIndex) + 4) * 256
-		    : fixedColumnWidth;
-	    sheet.setColumnWidth(columnIndex, columnWidth);
+	if (fixedColumnWidth == null) {
+	    for (int columnIndex : columnWidths.keySet()) {
+		// one unit is 1/256 of character width, plus some characters for padding
+		// maximum is 255 characters
+		int columnWidth = Math.min(255, columnWidths.get(columnIndex) + 4) * 256;
+		sheet.setColumnWidth(columnIndex, columnWidth);
+	    }
+	} else {
+	    sheet.setDefaultColumnWidth(fixedColumnWidth);
 	}
     }
 
