@@ -118,7 +118,7 @@ public class UserSaveController {
 	UserDTO appadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	log.debug("orgId: " + orgId);
-	Boolean edit = false;
+	boolean edit = false;
 	SupportedLocale locale = (SupportedLocale) userManagementService.findById(SupportedLocale.class,
 		userForm.getLocaleId());
 	AuthenticationMethod authenticationMethod = (AuthenticationMethod) userManagementService
@@ -193,6 +193,12 @@ public class UserSaveController {
 		BeanUtils.copyProperties(user, userForm);
 		user.setLocale(locale);
 		user.setAuthenticationMethod(authenticationMethod);
+
+		if (userManagementService.hasRoleInOrganisation(user, Role.ROLE_APPADMIN)
+			&& !request.isUserInRole(Role.SYSADMIN)) {
+		    // appadmins need to have two factor auths always on, unless sysadmin says otherwise
+		    user.setTwoFactorAuthenticationEnabled(true);
+		}
 
 		Theme cssTheme = (Theme) userManagementService.findById(Theme.class, userForm.getUserTheme());
 		user.setTheme(cssTheme);

@@ -469,7 +469,7 @@
 								</td>
 							</tr>
 							
-							<c:if test="${isAppadmin}">
+							<c:if test="${canSetTwoFactorAuthentication}">
 								<tr>
 									<td class="align-right">
 										<fmt:message key="label.2FA.property.enable" />:

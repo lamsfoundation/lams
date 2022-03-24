@@ -74,7 +74,8 @@ public class UserRolesSaveController {
 
 	Integer orgId = userRolesForm.getOrgId();
 	Integer rootOrgId = userManagementService.getRootOrganisation().getOrganisationId();
-	if (orgId.equals(rootOrgId)) {
+	boolean isGlobalRolesSet = orgId.equals(rootOrgId);
+	if (isGlobalRolesSet) {
 	    securityService.isSysadmin(getUserId(), "save global roles", true);
 	}
 
@@ -82,6 +83,7 @@ public class UserRolesSaveController {
 	    rolelist = userManagementService.findAll(Role.class);
 	    Collections.sort(rolelist);
 	}
+
 	Integer userId = userRolesForm.getUserId();
 	String[] roles = userRolesForm.getRoles();
 
@@ -98,7 +100,7 @@ public class UserRolesSaveController {
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	// user must have at least 1 role
-	if (roles == null || roles.length < 1) {
+	if (!isGlobalRolesSet && (roles == null || roles.length < 1)) {
 	    errorMap.add("roles", messageService.getMessage("error.roles.empty"));
 	    request.setAttribute("errorMap", errorMap);
 	    request.setAttribute("rolelist", userManagementService.filterRoles(rolelist,
@@ -108,7 +110,15 @@ public class UserRolesSaveController {
 	    return "forward:/userroles.do";
 	}
 
-	userManagementService.setRolesForUserOrganisation(user, orgId, Arrays.asList(roles));
+	List<String> userRolesList = roles == null || roles.length < 1 ? List.of() : Arrays.asList(roles);
+	userManagementService.setRolesForUserOrganisation(user, orgId, userRolesList);
+
+	if (userRolesList.contains(Role.ROLE_APPADMIN.toString())
+		&& !userRolesList.contains(Role.ROLE_SYSADMIN.toString())) {
+	    // appadmin need to have 2FA on, unless sysadmin says otherwise in user edit panels
+	    user.setTwoFactorAuthenticationEnabled(true);
+	    userManagementService.save(user);
+	}
 
 	return "redirect:/usermanage.do?org=" + orgId;
     }

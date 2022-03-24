@@ -25,15 +25,22 @@ package org.lamsfoundation.lams.admin.web.controller;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.web.dto.UserBean;
 import org.lamsfoundation.lams.admin.web.form.UserOrgRoleForm;
+import org.lamsfoundation.lams.security.ISecurityService;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -47,17 +54,19 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 /**
  * @author jliew
  *
- * Saves roles for users that were just added.
- * Uses session scope because using request scope doesn't copy the form data
- * into UserOrgRoleForm's userBeans ArrayList (the list becomes empty).
+ *         Saves roles for users that were just added.
+ *         Uses session scope because using request scope doesn't copy the form data
+ *         into UserOrgRoleForm's userBeans ArrayList (the list becomes empty).
  */
 @Controller
 @SessionAttributes("userOrgRoleForm")
 public class UserOrgRoleSaveController {
     private static Logger log = Logger.getLogger(UserOrgRoleSaveController.class);
-    
+
     @Autowired
     private IUserManagementService userManagementService;
+    @Autowired
+    private ISecurityService securityService;
     @Autowired
     @Qualifier("adminMessageService")
     private MessageService messageService;
@@ -69,6 +78,12 @@ public class UserOrgRoleSaveController {
 	log.debug("userBeans is null? " + userBeans == null);
 	Integer orgId = userOrgRoleForm.getOrgId();
 	log.debug("orgId: " + orgId);
+
+	Integer rootOrgId = userManagementService.getRootOrganisation().getOrganisationId();
+	boolean isGlobalRolesSet = orgId.equals(rootOrgId);
+	if (isGlobalRolesSet) {
+	    securityService.isSysadmin(getUserId(), "add user with global roles", true);
+	}
 
 	request.setAttribute("org", orgId);
 	request.getSession().removeAttribute("userOrgRoleForm");
@@ -88,16 +103,23 @@ public class UserOrgRoleSaveController {
 		request.setAttribute("orgId", orgId);
 		return "forward:/userorg.do";
 	    }
-	    userManagementService.setRolesForUserOrganisation(user, orgId, Arrays.asList(roleIds));
-	    // FMALIKOFF 5/7/7 Commented out the following code that set the roles in the course if the current org is a class, as the logic
-	    // is done in service.setRolesForUserOrganisation()
-	    //if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
-	    //	if (service.getUserOrganisation(bean.getUserId(), organisation.getParentOrganisation().getOrganisationId())==null) {
-	    //		service.setRolesForUserOrganisation(user, organisation.getParentOrganisation(), (List<String>)Arrays.asList(roleIds));
-	    //	}
-	    //}
+
+	    List<String> userRolesList = Arrays.asList(roleIds);
+	    userManagementService.setRolesForUserOrganisation(user, orgId, userRolesList);
+
+	    if (userRolesList.contains(Role.ROLE_APPADMIN.toString())
+		    && !userRolesList.contains(Role.ROLE_SYSADMIN.toString())) {
+		// appadmin need to have 2FA on, unless sysadmin says otherwise in user edit panels
+		user.setTwoFactorAuthenticationEnabled(true);
+		userManagementService.save(user);
+	    }
 	}
 	return "redirect:/usermanage.do?org=" + orgId;
     }
 
+    private Integer getUserId() {
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	return user != null ? user.getUserID() : null;
+    }
 }
