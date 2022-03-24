@@ -158,20 +158,43 @@ var HandlerLib = {
 	 */
 	dragItemsMoveHandler : function(object, event, startX, startY) {
 		// detect if activity is close to an edge of viewport and scroll automatically
-		if (event.pageX - canvas.scrollLeft() > canvas.width() - layout.activity.width / 2) {
-			canvas.scrollLeft(event.pageX - canvas.width() + layout.activity.width / 2);
-		} else if (event.pageX - canvas.scrollLeft() < layout.activity.width * 1.5) {
-			canvas.scrollLeft(event.pageX - layout.activity.width * 1.5);
+		if (event.pageX - canvas.offset().left > canvas.width() - 150) {
+			canvas.scrollLeft(canvas.scrollLeft() + 10);
+		} else if (event.pageX - canvas.offset().left < 150) {
+			canvas.scrollLeft(Math.max(0, canvas.scrollLeft() - 10));
 		}
 		
-		if (event.pageY - canvas.scrollTop() > canvas.height() - layout.activity.height * 2) {
-			canvas.scrollTop(event.pageY - canvas.height() + layout.activity.height * 2);
-		} else if (event.pageY - canvas.scrollTop() < layout.activity.height) {
-			canvas.scrollTop(event.pageY - layout.activity.height);
+		if (event.pageY - canvas.offset().top > canvas.height() - 150) {
+			canvas.scrollTop(canvas.scrollTop() + 10);
+		} else if (event.pageY - canvas.offset().top < 100) {
+			canvas.scrollTop(Math.max(0, canvas.scrollTop() - 10));
+		}
+	
+		/*
+		Another approach, based on how the event is close to the edge
+		
+		var canvasWidth = canvas.width(), 
+			canvasHeight = canvas.height(),
+			eventX = event.pageX - canvas.offset().left,
+			eventY = event.pageY - canvas.offset().top,
+			scrollYTrigger = layout.activity.height + 20;
+			
+		if (event.pageX - canvas.offset().left > canvas.width() - 50) {
+			canvas.scrollLeft(canvas.scrollLeft() + 10);
+		} else if (event.pageX - canvas.offset().left < 200) {
+			canvas.scrollLeft(Math.max(0, canvas.scrollLeft() - 10));
+		}
+	
+		if (eventY > canvasHeight - 100) {
+			canvas.scrollTop(canvas.scrollTop() + eventY - canvasHeight + 100);
+		} else if (eventY < 80) {
+			canvas.scrollTop(Math.max(0, canvas.scrollTop() - 80 + eventY));
 		}
 		
-		var dx = GeneralLib.snapToGrid(event.pageX + canvas.scrollLeft() - startX, true),
-			dy = GeneralLib.snapToGrid(event.pageY + canvas.scrollTop()  - startY, true);
+		*/
+
+		var dx = event.pageX + canvas.scrollLeft() - startX,
+			dy = event.pageY + canvas.scrollTop()  - startY;
 
 		object.items.transform('t' + dx + ' ' + dy);
 		
