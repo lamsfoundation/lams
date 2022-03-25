@@ -105,6 +105,12 @@ public class UserOrgRoleSaveController {
 	    }
 
 	    List<String> userRolesList = Arrays.asList(roleIds);
+	    if (userRolesList.contains(Role.ROLE_SYSADMIN.toString())
+		    && !userRolesList.contains(Role.ROLE_APPADMIN.toString())) {
+		//all sysadmins are also appadmins
+		userRolesList = new ArrayList<>(userRolesList);
+		userRolesList.add(Role.ROLE_APPADMIN.toString());
+	    }
 	    userManagementService.setRolesForUserOrganisation(user, orgId, userRolesList);
 
 	    if (userRolesList.contains(Role.ROLE_APPADMIN.toString())

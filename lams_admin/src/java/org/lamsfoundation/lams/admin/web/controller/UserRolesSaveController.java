@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.admin.web.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -111,6 +112,12 @@ public class UserRolesSaveController {
 	}
 
 	List<String> userRolesList = roles == null || roles.length < 1 ? List.of() : Arrays.asList(roles);
+	if (userRolesList.contains(Role.ROLE_SYSADMIN.toString())
+		&& !userRolesList.contains(Role.ROLE_APPADMIN.toString())) {
+	    //all sysadmins are also appadmins
+	    userRolesList = new ArrayList<>(userRolesList);
+	    userRolesList.add(Role.ROLE_APPADMIN.toString());
+	}
 	userManagementService.setRolesForUserOrganisation(user, orgId, userRolesList);
 
 	if (userRolesList.contains(Role.ROLE_APPADMIN.toString())
