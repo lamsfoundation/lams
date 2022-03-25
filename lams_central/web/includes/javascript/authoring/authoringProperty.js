@@ -1806,6 +1806,7 @@ PropertyLib = {
 				// if user dragged the dialog at least once, it does not automatically change its position anymore
 				return;
 			}
+			
 			var box = object.items.getBBox(),
 				canvasOffset = canvas.offset(),
 				canvasWidth = canvas.width(),
@@ -1829,9 +1830,12 @@ PropertyLib = {
 				};
 			}		
 			
+			x -= canvas.scrollLeft();
+			y -= canvas.scrollTop();
+			
 			dialog.offset({
-				'left' : x,
-				'top'  : y
+				'left' : Math.max(canvasOffset.left, Math.round(x)),
+				'top'  : Math.max(canvasOffset.top,  Math.round(y))
 			});
 		});
 
