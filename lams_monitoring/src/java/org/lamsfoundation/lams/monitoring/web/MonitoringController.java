@@ -972,7 +972,7 @@ public class MonitoringController {
 	request.setAttribute("lesson", lessonDTO);
 	request.setAttribute("isTBLSequence", learningDesignService.isTBLSequence(lessonDTO.getLearningDesignID()));
 
-	boolean useNewUI = WebUtil.readBooleanParam(request, "newUI", false);
+	boolean useNewUI = WebUtil.readBooleanParam(request, "newUI", true);
 	return "monitor" + (useNewUI ? "5" : "");
     }
 
