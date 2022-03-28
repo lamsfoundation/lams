@@ -9,13 +9,14 @@
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringGeneral.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringActivity.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringDecoration.js"></script>
+	<lams:JSImport src="includes/javascript/authoring/authoringGeneral.js" />
+	<lams:JSImport src="includes/javascript/authoring/authoringActivity.js" />
+	<lams:JSImport src="includes/javascript/authoring/authoringDecoration.js" />
 	<c:if test="${param.selectable}">
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringHandler.js"></script>
+		<lams:JSImport src="includes/javascript/authoring/authoringHandler.js" />
 	</c:if>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringMenu.js"></script>
+	<lams:JSImport src="includes/javascript/authoring/authoringMenu.js" />
+	
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>',
 			LABELS = {

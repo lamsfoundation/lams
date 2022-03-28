@@ -254,8 +254,8 @@ public interface IIntegrationService {
      * Adds an external user to the course with specified courseId.
      */
     ExtUserUseridMap addExtUserToCourse(ExtServer extServer, String method, String username, String firstName,
-	    String lastName, String email, String extCourseId, String countryIsoCode, String langIsoCode)
-	    throws UserInfoFetchException, UserInfoValidationException;
+	    String lastName, String email, String extCourseId, String countryIsoCode, String langIsoCode,
+	    boolean usePrefix) throws UserInfoFetchException, UserInfoValidationException;
 
     /**
      * Add an external user to the course with specified courseId and then adds it the the lesson with specified
@@ -263,7 +263,7 @@ public interface IIntegrationService {
      */
     ExtUserUseridMap addExtUserToCourseAndLesson(ExtServer extServer, String method, Long lessonId, String username,
 	    String firstName, String lastName, String email, String extCourseId, String countryIsoCode,
-	    String langIsoCode) throws UserInfoFetchException, UserInfoValidationException;
+	    String langIsoCode, boolean usePrefix) throws UserInfoFetchException, UserInfoValidationException;
 
     /**
      * Creates an external org and normal org. It does not set roles for the creator.

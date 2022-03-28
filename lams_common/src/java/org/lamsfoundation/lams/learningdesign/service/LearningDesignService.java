@@ -587,8 +587,12 @@ public class LearningDesignService implements ILearningDesignService {
 			.equals(((ToolActivity) activity).getTool().getToolSignature())
 			|| CommonConstants.TOOL_SIGNATURE_MCQ
 				.equals(((ToolActivity) activity).getTool().getToolSignature()))) {
+		    Long toolContentId = ((ToolActivity) activity).getToolContentId();
 		    if (iRatToolContentId == null) {
-			iRatToolContentId = ((ToolActivity) activity).getToolContentId();
+			iRatToolContentId = toolContentId;
+		    } else if (!iRatToolContentId.equals(toolContentId)) {
+			// iRAT tool content ID was provided, but it is not iRAT after all, so just exit
+			return null;
 		    }
 		    return verifyNextActivityFitsTbl(nextActivity, "Leaderselection", iRatToolContentId,
 			    tRatToolContentId);
@@ -618,12 +622,20 @@ public class LearningDesignService implements ILearningDesignService {
 		    if (iRatToolContentId == null) {
 			return null;
 		    }
+
+		    Long toolContentId = ((ToolActivity) activity).getToolContentId();
 		    // if tRAT content ID is null it means that iRAT content ID was provided as a parameter
 		    // and we are looking for tRAT content ID, i.e. this activity
 		    if (tRatToolContentId == null) {
-			tRatToolContentId = ((ToolActivity) activity).getToolContentId();
+			tRatToolContentId = toolContentId;
 			return tRatToolContentId;
 		    }
+
+		    if (!tRatToolContentId.equals(toolContentId)) {
+			// tRAT tool content ID was provided, but it is not tRAT after all, so just exit
+			return null;
+		    }
+
 		    // if tRAT content ID was not null it means that we are looking for iRAT content ID
 		    return iRatToolContentId;
 

@@ -433,10 +433,18 @@ public class IntegrationService implements IIntegrationService {
     private ExtUserUseridMap createExtUserUseridMap(ExtServer extServer, String extUsername, String password,
 	    String salt, String[] userData, boolean prefix) throws UserInfoValidationException {
 
-	String login = prefix ? buildName(extServer.getPrefix(), extUsername) : extUsername;
+	String email = userData[11];
+	String loginBase = extUsername;
+	// in LTI Advantage external user ID does not need to match LAMS login
+	if (!extUsername.equals(email) && StringUtils.isNotBlank(email)
+		&& StringUtils.isNotBlank(extServer.getUserIdParameterName())
+		&& extServer.getUserIdParameterName().strip().equalsIgnoreCase("email")) {
+	    loginBase = email.strip();
+	}
+
+	String login = prefix ? buildName(extServer.getPrefix(), loginBase) : loginBase;
 	String firstName = userData[1];
 	String lastName = userData[2];
-	String email = userData[11];
 
 	// login validation
 	if (StringUtils.isBlank(login)) {
@@ -906,8 +914,8 @@ public class IntegrationService implements IIntegrationService {
 
     @Override
     public ExtUserUseridMap addExtUserToCourse(ExtServer extServer, String method, String username, String firstName,
-	    String lastName, String email, String extCourseId, String countryIsoCode, String langIsoCode)
-	    throws UserInfoFetchException, UserInfoValidationException {
+	    String lastName, String email, String extCourseId, String countryIsoCode, String langIsoCode,
+	    boolean usePrefix) throws UserInfoFetchException, UserInfoValidationException {
 
 	if (log.isDebugEnabled()) {
 	    log.debug("Adding user '" + username + "' as " + method + " to course with extCourseId '" + extCourseId
@@ -918,17 +926,13 @@ public class IntegrationService implements IIntegrationService {
 	if ((firstName == null) && (lastName == null)) {
 	    userMap = getExtUserUseridMap(extServer, username);
 	} else {
-	    final boolean usePrefix = true;
 	    final boolean isUpdateUserDetails = false;
 	    userMap = getImplicitExtUserUseridMap(extServer, username, firstName, lastName, langIsoCode, countryIsoCode,
 		    email, usePrefix, isUpdateUserDetails);
 	}
 
 	// adds user to group
-	ExtCourseClassMap orgMap = getExtCourseClassMap(extServer, userMap, extCourseId, null, method);
-	//TODO when merging to newer branch, check and maybe change to the following
-//		getExtCourseClassMap(extServer, userMap, courseId, countryIsoCode, langIsoCode, null,
-//		method);
+	getExtCourseClassMap(extServer, userMap, extCourseId, null, method);
 
 	return userMap;
     }
@@ -936,14 +940,14 @@ public class IntegrationService implements IIntegrationService {
     @Override
     public ExtUserUseridMap addExtUserToCourseAndLesson(ExtServer extServer, String method, Long lesssonId,
 	    String username, String firstName, String lastName, String email, String extCourseId, String countryIsoCode,
-	    String langIsoCode) throws UserInfoFetchException, UserInfoValidationException {
+	    String langIsoCode, boolean usePrefix) throws UserInfoFetchException, UserInfoValidationException {
 
 	if (log.isDebugEnabled()) {
 	    log.debug("Adding user '" + username + "' as " + method + " to lesson with id '" + lesssonId + "'.");
 	}
 
 	ExtUserUseridMap userMap = addExtUserToCourse(extServer, method, username, firstName, lastName, email,
-		extCourseId, countryIsoCode, langIsoCode);
+		extCourseId, countryIsoCode, langIsoCode, usePrefix);
 
 	User user = userMap.getUser();
 	if (user == null) {
@@ -1103,9 +1107,9 @@ public class IntegrationService implements IIntegrationService {
 	    //empty lessonId means we need to only add users to the course. Otherwise we add them to course AND lesson
 	    ExtUserUseridMap extUser = lessonId == null
 		    ? addExtUserToCourse(extServer, method, extUserId, firstName, lastName, email, courseId,
-			    countryIsoCode, langIsoCode)
+			    countryIsoCode, langIsoCode, true)
 		    : addExtUserToCourseAndLesson(extServer, method, lessonId, extUserId, firstName, lastName, email,
-			    courseId, countryIsoCode, langIsoCode);
+			    courseId, countryIsoCode, langIsoCode, true);
 
 	    // If a result sourcedid is provided, save it to the user object
 	    JsonNode messages = membership.get("message");

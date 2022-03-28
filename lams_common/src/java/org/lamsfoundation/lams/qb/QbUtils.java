@@ -90,14 +90,21 @@ public class QbUtils {
     }
 
     public static String normaliseVSAnswer(String answer) {
-	return StringUtils.isBlank(answer) ? null : answer.replaceAll(VSA_ANSWER_NORMALISE_JAVA_REG_EXP, "");
+	if (StringUtils.isBlank(answer)) {
+	    return null;
+	}
+	String normalisedAnswer = answer.replaceAll(VSA_ANSWER_NORMALISE_JAVA_REG_EXP, "");
+	if (StringUtils.isBlank(normalisedAnswer)) {
+	    return null;
+	}
+	return normalisedAnswer;
     }
 
     public static Set<String> normaliseVSOption(String option) {
 	return StringUtils.isBlank(option) ? Set.of()
 		: Stream.of(option.split(VSA_ANSWER_DELIMITER)).filter(StringUtils::isNotBlank)
-			.collect(Collectors.mapping(answer -> QbUtils.normaliseVSAnswer(answer),
-				Collectors.toCollection(LinkedHashSet::new)));
+			.map(answer -> QbUtils.normaliseVSAnswer(answer)).filter(StringUtils::isNotBlank)
+			.collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public static boolean isVSAnswerAllocated(String option, String normalisedAnswer, boolean isCaseSensitive) {
@@ -115,11 +122,11 @@ public class QbUtils {
      *            is an accumulator for unallocated answers so they do not appear in VSA allocation UI twice
      */
     public static boolean isVSAnswerAllocated(QbQuestion qbQuestion, String answer, Set<String> notAllocatedAnswers) {
-	if (StringUtils.isBlank(answer)) {
+	String normalisedAnswer = QbUtils.normaliseVSAnswer(answer);
+	if (StringUtils.isBlank(normalisedAnswer)) {
 	    return false;
 	}
 
-	String normalisedAnswer = QbUtils.normaliseVSAnswer(answer);
 	boolean isQuestionCaseSensitive = qbQuestion.isCaseSensitive();
 	boolean isAnswerAllocated = false;
 

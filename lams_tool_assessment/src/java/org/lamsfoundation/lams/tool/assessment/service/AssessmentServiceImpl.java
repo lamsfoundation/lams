@@ -1483,7 +1483,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	    for (AssessmentQuestionResult questionResult : allQuestionResults) {
 		String answer = questionResult.getAnswer();
-		if (StringUtils.isBlank(answer)) {
+		if (QbUtils.normaliseVSAnswer(answer) == null) {
 		    continue;
 		}
 
@@ -3467,7 +3467,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    QbToolQuestion qbToolQuestion = questionResult.getQbToolQuestion();
 	    QbQuestion qbQuestion = qbToolQuestion.getQbQuestion();
 	    if (qbQuestion.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE
-		    || qbQuestion.getType() == QbQuestion.TYPE_MARK_HEDGING) {
+		    || qbQuestion.getType() == QbQuestion.TYPE_MARK_HEDGING
+		    || qbQuestion.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS) {
 
 		QuestionDTO questionDTO = new QuestionDTO(qbToolQuestion);
 
