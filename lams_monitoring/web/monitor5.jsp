@@ -5,20 +5,27 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>LAMS Monitor</title>
-		
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap4.min.css">
+	
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.min.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome/css/font-awesome.min.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>css/components-monitoring.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>css/components-monitoring-responsive.css">
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap4.bundle.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chart.bundle.min.js"></script>
-	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/monitorLesson5.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
+	<lams:JSImport src="includes/javascript/dialog5.js" />
+	<lams:JSImport src="includes/javascript/monitorLesson5.js" relative="true" />
 	<script type="text/javascript">
+		<!-- Some of the following settings will be used in progressBar.js -->
 		var lessonId = ${lesson.lessonID},
+			userId = '<lams:user property="userID"/>',
 			ldId = ${lesson.learningDesignID},
+			liveEditEnabled = ${enableLiveEdit && lesson.liveEditEnabled},
 			LAMS_URL = '<lams:LAMSURL/>',
 			csrfToken = '<csrf:tokenname/> : <csrf:tokenvalue/>',
 			csrfTokenName = '<csrf:tokenname/>',
@@ -53,8 +60,6 @@
 				SAVE_BUTTON : '<c:out value="${SAVE_BUTTON_VAR}" />',
 				<fmt:message key="button.cancel" var="CANCEL_BUTTON_VAR"/>
 				CANCEL_BUTTON : '<c:out value="${CANCEL_BUTTON_VAR}" />',
-				<fmt:message key="learner.finished.count" var="LEARNER_FINISHED_COUNT_VAR"/>
-				LEARNER_FINISHED_COUNT : '<c:out value="${LEARNER_FINISHED_COUNT_VAR}" />',
 				<fmt:message key="learner.finished.dialog.title" var="LEARNER_FINISHED_DIALOG_TITLE_VAR"/>
 				LEARNER_FINISHED_DIALOG_TITLE : '<c:out value="${LEARNER_FINISHED_DIALOG_TITLE_VAR}" />',
 				<fmt:message key="lesson.enable.presence.alert" var="LESSON_PRESENCE_ENABLE_ALERT_VAR"/>
@@ -143,8 +148,10 @@
 				CONTRIBUTE_OPEN_GATE_BUTTON : '<c:out value="${CONTRIBUTE_OPEN_GATE_BUTTON_VAR}" />',
 				<fmt:message key="button.task.gate.open.tooltip" var="CONTRIBUTE_OPEN_GATE_TOOLTIP_VAR"/>
 				CONTRIBUTE_OPEN_GATE_TOOLTIP : '<c:out value="${CONTRIBUTE_OPEN_GATE_TOOLTIP_VAR}" />',
-				<fmt:message key="label.task.gate.opened" var="CONTRIBUTE_OPENED_GATE_VAR"/>
+				<fmt:message key="button.task.gate.opened" var="CONTRIBUTE_OPENED_GATE_VAR"/>
 				CONTRIBUTE_OPENED_GATE : '<c:out value="${CONTRIBUTE_OPENED_GATE_VAR}" />',
+				<fmt:message key="button.task.gate.opened.tooltip" var="CONTRIBUTE_OPENED_GATE_TOOLTIP_VAR"/>
+				CONTRIBUTE_OPENED_GATE_TOOLTIP : '<c:out value="${CONTRIBUTE_OPENED_GATE_TOOLTIP_VAR}" />',
 				<fmt:message key="lesson.task.attention" var="CONTRIBUTE_ATTENTION_VAR"/>
 				CONTRIBUTE_ATTENTION : '<c:out value="${CONTRIBUTE_ATTENTION_VAR}" />',
 				<fmt:message key="button.help" var="BUTTON_HELP_VAR"/>
@@ -192,7 +199,6 @@
 				<fmt:message key="label.person.editing.lesson" var="LIVE_EDIT_WARNING_VAR"><fmt:param value="%0"/></fmt:message>
 				LIVE_EDIT_WARNING: '<c:out value="${LIVE_EDIT_WARNING_VAR}" />'
 			};
-			
 		$(document).ready(function(){
 			$('.hamburger').click(function(){
 				$(this).toggleClass('active');
@@ -231,6 +237,7 @@
 				}
 			});
 			
+			initSequenceTab();
 			refreshMonitor();
 		});
 	</script>
@@ -355,14 +362,36 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-12 col-md-9 content-right">
-				<div class="user-map-col h-100">
-					<img src="<lams:LAMSURL/>images/components/user-map.png" alt="#" />
-					<div class="map-pn">
-						<span><img src="<lams:LAMSURL/>images/components/plus.svg" alt="#" /></span>
-						<span><img src="<lams:LAMSURL/>images/components/minus.svg" alt="#" /></span>
-					</div>
+			<div id="canvas-container" class="svg-learner-draggable-area h-100 col-12 col-md-9 content-right">
+				<div id="sequenceTopButtonsContainer" class="topButtonsContainer">
+					<a id="liveEditButton" class="btn btn-sm btn-default" style="display:none" title="<fmt:message key='button.live.edit.tooltip'/>"
+				       href="#" onClick="javascript:openLiveEdit()">
+						<i class="fa fa-pencil"></i> <span class="hidden-xs"><fmt:message key='button.live.edit'/></span>
+					</a>
+					<a id="canvasFitScreenButton" class="btn btn-sm btn-default" title="<fmt:message key='button.canvas.fit.screen.tooltip'/>"
+				       href="#" onClick="javascript:canvasFitScreen(true)">
+						<i class="fa fa-arrows-alt"></i> <span class="hidden-xs"><fmt:message key='button.canvas.fit.screen'/></span>
+					</a>
+					<a id="canvasOriginalSizeButton" class="btn btn-sm btn-default" title="<fmt:message key='button.canvas.original.size.tooltip'/>"
+				       href="#" onClick="javascript:canvasFitScreen(false)">
+						<i class="fa fa-arrow-circle-o-up"></i> <span class="hidden-xs"><fmt:message key='button.canvas.original.size'/></span>
+					</a>
 				</div>
+				<div id="sequenceCanvas"></div>
+				<div id="completedLearnersContainer" class="mt-2" title="<fmt:message key='force.complete.end.lesson.tooltip' />">
+					<img id="completedLessonLearnersIcon" src="<lams:LAMSURL/>images/completed.svg" />
+				</div>
+				<img id="sequenceCanvasLoading"
+				     src="<lams:LAMSURL/>images/ajax-loader-big.gif" />
+				<img id="sequenceSearchedLearnerHighlighter"
+				     src="<lams:LAMSURL/>images/pedag_down_arrow.gif" />
+				<!--
+				<img src="<lams:LAMSURL/>images/components/user-map.png" alt="#" />
+				<div class="map-pn">
+					<span><img src="<lams:LAMSURL/>images/components/plus.svg" alt="#" /></span>
+					<span><img src="<lams:LAMSURL/>images/components/minus.svg" alt="#" /></span>
+				</div>
+				-->
 			</div>
 		</div>
 		<div class="row">
@@ -384,5 +413,26 @@
 	</div>
 </div>
 
+<div id="sequenceInfoDialogContents" class="dialogContainer">
+  <fmt:message key="sequence.help.info"/>
+</div>
+
+<div id="forceBackwardsDialogContents" class="dialogContainer">
+	<div id="forceBackwardsMsg"></div>
+       <div class="pull-right mt-3">
+
+              <button id="forceBackwardsRemoveContentNoButton" class="btn btn-primary me-1">
+                      <span><fmt:message key="force.complete.remove.content.no"/></span>
+              </button>
+
+              <button id="forceBackwardsRemoveContentYesButton" class="btn btn-primary me-1">
+                      <span><fmt:message key="force.complete.remove.content.yes" /></span>
+              </button>
+
+              <button id="forceBackwardsCloseButton" class="btn btn-secondary">
+                      <span><fmt:message key="button.close" /></span>
+              </button>
+      </div>
+</div>
 </body>
 </lams:html>
