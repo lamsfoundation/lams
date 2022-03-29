@@ -254,7 +254,7 @@
 				</form>
 				<div class="top-menu-btn">
 					<a href="#"><img src="<lams:LAMSURL/>images/components/icon1.svg" alt="#" /></a>
-					<a href="#"><img src="<lams:LAMSURL/>images/components/icon2.svg" alt="#" /></a>
+					<a href="#" onClick="javscript:refreshMonitor()"><img src="<lams:LAMSURL/>images/components/icon2.svg" alt="#" /></a>
 					<a href="#"><img src="<lams:LAMSURL/>images/components/icon3.svg" alt="#" /></a>
 				</div>
 			</div>
