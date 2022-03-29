@@ -6,16 +6,19 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>LAMS Monitor</title>
 	
+
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.min.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome/css/font-awesome.min.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>css/components-monitoring.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>css/components-monitoring-responsive.css">
-	
+	<lams:css suffix="chart"/>
+		
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chart.bundle.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/d3.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/chart.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
 	<lams:JSImport src="includes/javascript/dialog5.js" />
@@ -205,38 +208,6 @@
 				$('.component-sidebar, .monitoring-page-content').toggleClass('active');
 			});
 			
-			var ctx = document.getElementById('myChart').getContext('2d');
-			var myChart = new Chart(ctx, {
-				type : 'doughnut',
-				borderWidth : 0,
-				data : {
-					elements : {
-						arc : {
-							borderWidth : 0,
-							fontSize : 0,
-						}
-					},
-					datasets : [ {
-						data : [ 10, 70, 20 ],
-						backgroundColor : [ 'rgba(5, 204, 214, 1)',
-								'rgba(255, 195, 55, 1)', 'rgba(253, 60, 165, 1)', ],
-						label : 'Dataset 1',
-						borderWidth : 0,
-					} ],
-					labels : [ 'Not started', 'In process', 'Completed' ]
-				},
-				options : {
-					responsive : true,
-					legend : {
-						display : false,
-					},
-					animation : {
-						animateScale : true,
-						animateRotate : true
-					}
-				}
-			});
-			
 			initSequenceTab();
 			refreshMonitor();
 		});
@@ -290,7 +261,11 @@
 		</header>
 		<div class="row pt-5">
 			<div class="col-12 col-md-3 content-left">
-				<div class="graph-col">
+				<div class="graph-col monitoring-panel">
+					<h6><fmt:message key="lesson.chart.title"/></h6>
+					<div id="chartDiv" class="panel-body"></div>
+				
+				<!--
 					<div class="graph-con">
 						<canvas id="myChart" class="chartjs-render-monitor"></canvas>
 					</div>
@@ -308,7 +283,10 @@
 							<span class="graph-count"></span> - Completed
 						</li>
 					</ul>
+					-->
 				</div>
+				
+
 				<div class="graph-grades">
 					<div class="graph-star-col">
 						<img src="<lams:LAMSURL/>images/components/star.png" alt="#" />

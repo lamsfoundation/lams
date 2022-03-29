@@ -62,11 +62,10 @@ function updateLessonTab(){
 		}
 	});
 	
-	/*
-		drawChart('pie', 'chartDiv',
-			  LAMS_URL + 'monitoring/monitoring/getLessonChartData.do?lessonID=' + lessonId,
-			  true);
-	*/
+	
+	drawChart('pie', 'chartDiv',
+		  LAMS_URL + 'monitoring/monitoring/getLessonChartData.do?lessonID=' + lessonId,
+		  true);
 }
 
 

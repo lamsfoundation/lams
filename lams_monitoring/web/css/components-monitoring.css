@@ -849,6 +849,12 @@
   overflow: auto;
 }
 
+#chartDiv {
+  width: 200px;
+  height: 200px;
+  padding: 0;
+}
+
 
 /********** CANVAS STYLES **********/
 #canvas-container div#sequenceCanvas {
