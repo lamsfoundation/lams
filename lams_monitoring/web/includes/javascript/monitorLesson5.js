@@ -71,8 +71,13 @@ function updateLessonTab(){
 
 function updateContributeActivities(contributeActivities) {
 	let requiredTasksPanel = $('#required-tasks'),
-		requiredTasksContent = $('#required-tasks-content', requiredTasksPanel),
-		row = null;
+		requiredTasksContent = $('#required-tasks-content', requiredTasksPanel);
+		
+	if (!contributeActivities || contributeActivities.length === 0) {
+		requiredTasksPanel.remove();
+		return;
+	}
+	
 	$('.contribute-row', requiredTasksContent).remove();
 	
 	/*
@@ -89,22 +94,16 @@ function updateContributeActivities(contributeActivities) {
 		row = row.append(cell);
 	}
 	*/
-	
+
 	if (contributeActivities) {
 		$.each(contributeActivities, function(){
 			let contributeActivity = this;
-			if (contributeActivity.title) {
-				$('<div />').addClass('label contribute-activity-title contribute-row')
-							.text(contributeActivity.title)
-							.attr('id', 'contribute' + contributeActivity.activityID)
-							.appendTo(requiredTasksContent);
-			}
 			
 			let row = $('<div />').addClass('row contribute-row' + (contributeActivity.title ? ' ml-1' : ''))
 								  .appendTo(requiredTasksContent);
 			
 			$.each(this.contributeEntries, function(){
-				var entryContent = '<div class="col-3 label">';
+				var entryContent = '<div class="col-8 label">' + (contributeActivity.title ? '<b>' + contributeActivity.title + '</b><br>(<small>' : '');
 				switch (this.contributionType) {
 					case 3  : entryContent += LABELS.CONTRIBUTE_GATE; break;
 					case 6  : entryContent += LABELS.CONTRIBUTE_GROUPING; break;
@@ -113,7 +112,10 @@ function updateContributeActivities(contributeActivities) {
 					case 11 : entryContent += LABELS.CONTRIBUTE_CONTENT_EDITED; break; 
 					case 12 : entryContent += LABELS.CONTRIBUTE_GATE_PASSWORD; break; 
 				}
-				entryContent += '</div><div class="col-9 text-right">';
+				if (contributeActivity.title) {
+					entryContent += ')</small>';
+				}
+				entryContent += '</div><div class="col-4 text-right">';
 				switch (this.contributionType) {
 					case 3  : 
 					case 12 : if (this.isComplete) {

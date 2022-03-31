@@ -424,23 +424,8 @@ body.component .info_icon {
 	color: #ACB5CC;
 }
 
-.component-page-wrapper .graph-con {
-	position: relative;
-	min-height: 12rem;
-	width: calc(100% - 8rem);
-}
-
-.component-page-wrapper .graph-con #myChart {
-	width: 25rem !important;
-	height: 12rem !important;
-	margin-left: -5rem;
-	margin-bottom: -5rem;
-	border: 0;
-}
-
 .component-page-wrapper .graph-col {
-	display: flex;
-	justify-content: space-between;
+		
 }
 
 .component-page-wrapper .graph-col ul {
