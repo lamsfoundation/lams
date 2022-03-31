@@ -8,7 +8,8 @@
 	
 
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.min.css">
-	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/v4-shim.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>css/components-monitoring.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>css/components-monitoring-responsive.css">
