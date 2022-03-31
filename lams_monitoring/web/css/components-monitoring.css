@@ -46,6 +46,7 @@
 	padding-left: 4.8rem;
 }
 
+/*
 .monitoring-page-wrapper .component-sidebar .menu-li a svg .c,
 	.monitoring-page-wrapper .component-sidebar .menu-li a svg .d,
 	.monitoring-page-wrapper .component-sidebar .menu-li a svg rect {
@@ -103,41 +104,12 @@
 	{
 	fill: #3C42E0;
 }
+*/
 
 .monitoring-page-wrapper .top-menu-btn a:nth-child(3) img {
 	width: 1.3rem;
 }
 
-/* User icon in left lower corner - unused? 
-.user-col {
-	position: relative;
-	cursor: pointer;
-	width: 3rem;
-	margin: 0 auto;
-	max-width: 100%;
-}
-
-.user-col img {
-	width: 100%;
-}
-
-.user-col span {
-	width: 7px;
-	height: 7px;
-	border-radius: 50%;
-	background-color: #3C42E0;
-	display: inline-block;
-	position: absolute;
-	border: 1px solid #fff;
-	top: 1px;
-	right: 2px;
-	display: none;
-}
-
-.user-col.active span {
-	display: block;
-}
-*/
 .monitoring-page-wrapper .content-left {
 	-ms-flex: 0 0 26.5rem;
 	flex: 0 0 26.5rem;
