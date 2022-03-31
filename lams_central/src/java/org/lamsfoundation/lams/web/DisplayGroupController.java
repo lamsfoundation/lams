@@ -331,7 +331,7 @@ public class DisplayGroupController {
 
 	    if (isGroupManagerOrMonitor) {
 		lessonLinks.addFirst(new IndexLinkBean("index.monitor",
-			"javascript:showMonitorLessonDialog(" + bean.getId() + ")", "fa fa-fw fa-heartbeat", null));
+			"javascript:openMonitorLesson(" + bean.getId() + ")", "fa fa-fw fa-heartbeat", null));
 	    }
 
 	    // Adding lesson notifications links if enabled

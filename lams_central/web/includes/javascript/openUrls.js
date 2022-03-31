@@ -53,24 +53,7 @@ function openMonitorLesson( lessonID, url ) {
 	}
 	url += 'lessonID='+ lessonID;
 	
-	if (isMac) {
-		if(belowMinRes) {
-			monitorLessonWin = window.open(url,'mWindow','width=' + monitor_width 
-							   + ',height=' + monitor_height + ',resizable,scrollbars' + getCenterParams(monitor_width, monitor_height));
-		} else {
-			monitorLessonWin = window.open(url,'mWindow','width=' + monitor_width
-							   + ',height=' + monitor_height + ',resizable,scrollbars' + getCenterParams(monitor_width, monitor_height));
-		}
-	} else {
-		if (monitorLessonWin && !monitorLessonWin.closed) {
-			monitorLessonWin.location = url;
-			monitorLessonWin.focus();
-		} else {
-			monitorLessonWin = window.open(url,'mWindow','width=' + monitor_width
-							   + ',height=' + monitor_height + ',resizable,resizable,scrollbars'
-							   + getCenterParams(monitor_width, monitor_height));
-		}
-	}
+	window.location.href = url;
 }
 
 function openTBLMonitorLesson( lessonID ) {
