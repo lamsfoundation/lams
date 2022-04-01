@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2021 the original author or authors.
+ * Copyright 2002-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,7 @@ import org.springframework.util.StringUtils;
  * @author Juergen Hoeller
  * @author Costin Leau
  * @author Stephane Nicoll
+ * @author Sam Brannen
  * @since 2.0
  * @see AbstractBeanFactory
  * @see org.springframework.beans.factory.DisposableBean
@@ -109,12 +110,12 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
 		this.beanName = beanName;
 		this.nonPublicAccessAllowed = beanDefinition.isNonPublicAccessAllowed();
 		this.invokeDisposableBean = (bean instanceof DisposableBean &&
-				!beanDefinition.isExternallyManagedDestroyMethod(DESTROY_METHOD_NAME));
+				!beanDefinition.hasAnyExternallyManagedDestroyMethod(DESTROY_METHOD_NAME));
 
 		String destroyMethodName = inferDestroyMethodIfNecessary(bean, beanDefinition);
 		if (destroyMethodName != null &&
 				!(this.invokeDisposableBean && DESTROY_METHOD_NAME.equals(destroyMethodName)) &&
-				!beanDefinition.isExternallyManagedDestroyMethod(destroyMethodName)) {
+				!beanDefinition.hasAnyExternallyManagedDestroyMethod(destroyMethodName)) {
 
 			this.invokeAutoCloseable = (bean instanceof AutoCloseable && CLOSE_METHOD_NAME.equals(destroyMethodName));
 			if (!this.invokeAutoCloseable) {
@@ -138,7 +139,7 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
 									beanName + "' has a non-boolean parameter - not supported as destroy method");
 						}
 					}
-					destroyMethod = ClassUtils.getInterfaceMethodIfPossible(destroyMethod);
+					destroyMethod = ClassUtils.getInterfaceMethodIfPossible(destroyMethod, bean.getClass());
 				}
 				this.destroyMethod = destroyMethod;
 			}
@@ -252,9 +253,9 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
 			invokeCustomDestroyMethod(this.destroyMethod);
 		}
 		else if (this.destroyMethodName != null) {
-			Method methodToInvoke = determineDestroyMethod(this.destroyMethodName);
-			if (methodToInvoke != null) {
-				invokeCustomDestroyMethod(ClassUtils.getInterfaceMethodIfPossible(methodToInvoke));
+			Method destroyMethod = determineDestroyMethod(this.destroyMethodName);
+			if (destroyMethod != null) {
+				invokeCustomDestroyMethod(ClassUtils.getInterfaceMethodIfPossible(destroyMethod, this.bean.getClass()));
 			}
 		}
 	}

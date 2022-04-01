@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2020 the original author or authors.
+ * Copyright 2002-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -177,7 +177,7 @@ final class SynthesizedMergedAnnotationInvocationHandler<A extends Annotation> i
 	private String annotationToString() {
 		String string = this.string;
 		if (string == null) {
-			StringBuilder builder = new StringBuilder("@").append(this.type.getName()).append('(');
+			StringBuilder builder = new StringBuilder("@").append(getName(this.type)).append('(');
 			for (int i = 0; i < this.attributes.size(); i++) {
 				Method attribute = this.attributes.get(i);
 				if (i > 0) {
@@ -194,19 +194,53 @@ final class SynthesizedMergedAnnotationInvocationHandler<A extends Annotation> i
 		return string;
 	}
 
+	/**
+	 * This method currently does not address the following issues which we may
+	 * choose to address at a later point in time.
+	 *
+	 * <ul>
+	 * <li>non-ASCII, non-visible, and non-printable characters within a character
+	 * or String literal are not escaped.</li>
+	 * <li>formatting for float and double values does not take into account whether
+	 * a value is not a number (NaN) or infinite.</li>
+	 * </ul>
+	 * @param value the attribute value to format
+	 * @return the formatted string representation
+	 */
 	private String toString(Object value) {
+		if (value instanceof String) {
+			return '"' + value.toString() + '"';
+		}
+		if (value instanceof Character) {
+			return '\'' + value.toString() + '\'';
+		}
+		if (value instanceof Byte) {
+			return String.format("(byte) 0x%02X", value);
+		}
+		if (value instanceof Long) {
+			return Long.toString(((Long) value)) + 'L';
+		}
+		if (value instanceof Float) {
+			return Float.toString(((Float) value)) + 'f';
+		}
+		if (value instanceof Double) {
+			return Double.toString(((Double) value)) + 'd';
+		}
+		if (value instanceof Enum) {
+			return ((Enum<?>) value).name();
+		}
 		if (value instanceof Class) {
-			return ((Class<?>) value).getName();
+			return getName((Class<?>) value) + ".class";
 		}
 		if (value.getClass().isArray()) {
-			StringBuilder builder = new StringBuilder("[");
+			StringBuilder builder = new StringBuilder("{");
 			for (int i = 0; i < Array.getLength(value); i++) {
 				if (i > 0) {
 					builder.append(", ");
 				}
 				builder.append(toString(Array.get(value, i)));
 			}
-			builder.append(']');
+			builder.append('}');
 			return builder.toString();
 		}
 		return String.valueOf(value);
@@ -269,6 +303,11 @@ final class SynthesizedMergedAnnotationInvocationHandler<A extends Annotation> i
 		Class<?>[] interfaces = isVisible(classLoader, SynthesizedAnnotation.class) ?
 				new Class<?>[] {type, SynthesizedAnnotation.class} : new Class<?>[] {type};
 		return (A) Proxy.newProxyInstance(classLoader, interfaces, handler);
+	}
+
+	private static String getName(Class<?> clazz) {
+		String canonicalName = clazz.getCanonicalName();
+		return (canonicalName != null ? canonicalName : clazz.getName());
 	}
 
 
