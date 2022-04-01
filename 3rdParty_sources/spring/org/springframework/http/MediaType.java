@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,15 +35,16 @@ import org.springframework.util.StringUtils;
 import org.springframework.util.comparator.CompoundComparator;
 
 /**
- * A sub-class of {@link MimeType} that adds support for quality parameters as defined
- * in the HTTP specification.
+ * A subclass of {@link MimeType} that adds support for quality parameters
+ * as defined in the HTTP specification.
  *
  * @author Arjen Poutsma
  * @author Juergen Hoeller
  * @author Rossen Stoyanchev
  * @author Sebastien Deleuze
  * @since 3.0
- * @see <a href="http://tools.ietf.org/html/rfc7231#section-3.1.1.1">HTTP 1.1: Semantics and Content, section 3.1.1.1</a>
+ * @see <a href="https://tools.ietf.org/html/rfc7231#section-3.1.1.1">
+ *     HTTP 1.1: Semantics and Content, section 3.1.1.1</a>
  */
 public class MediaType extends MimeType implements Serializable {
 
@@ -81,7 +82,6 @@ public class MediaType extends MimeType implements Serializable {
 
 	/**
 	 * Public constant media type for {@code application/json}.
-	 * @see #APPLICATION_JSON_UTF8
 	 */
 	public final static MediaType APPLICATION_JSON;
 
@@ -99,7 +99,7 @@ public class MediaType extends MimeType implements Serializable {
 	/**
 	 * A String equivalent of {@link MediaType#APPLICATION_JSON_UTF8}.
 	 */
-	public final static String APPLICATION_JSON_UTF8_VALUE = APPLICATION_JSON_VALUE + ";charset=UTF-8";
+	public final static String APPLICATION_JSON_UTF8_VALUE = "application/json;charset=UTF-8";
 
 	/**
 	 * Public constant media type for {@code application/octet-stream}.
@@ -250,7 +250,6 @@ public class MediaType extends MimeType implements Serializable {
 	 */
 	public final static String TEXT_XML_VALUE = "text/xml";
 
-
 	private static final String PARAM_QUALITY_FACTOR = "q";
 
 
@@ -334,7 +333,7 @@ public class MediaType extends MimeType implements Serializable {
 
 	/**
 	 * Copy-constructor that copies the type and subtype of the given {@code MediaType},
-	 * and allows for different parameter.
+	 * and allows for different parameters.
 	 * @param other the other media type
 	 * @param parameters the parameters, may be {@code null}
 	 * @throws IllegalArgumentException if any of the parameters contain illegal characters
@@ -367,21 +366,25 @@ public class MediaType extends MimeType implements Serializable {
 	}
 
 	/**
-	 * Return the quality value, as indicated by a {@code q} parameter, if any.
+	 * Return the quality factor, as indicated by a {@code q} parameter, if any.
 	 * Defaults to {@code 1.0}.
-	 * @return the quality factory
+	 * @return the quality factor as double value
 	 */
 	public double getQualityValue() {
-		String qualityFactory = getParameter(PARAM_QUALITY_FACTOR);
-		return (qualityFactory != null ? Double.parseDouble(unquote(qualityFactory)) : 1D);
+		String qualityFactor = getParameter(PARAM_QUALITY_FACTOR);
+		return (qualityFactor != null ? Double.parseDouble(unquote(qualityFactor)) : 1D);
 	}
 
 	/**
 	 * Indicate whether this {@code MediaType} includes the given media type.
-	 * <p>For instance, {@code text/*} includes {@code text/plain} and {@code text/html}, and {@code application/*+xml}
-	 * includes {@code application/soap+xml}, etc. This method is <b>not</b> symmetric.
+	 * <p>For instance, {@code text/*} includes {@code text/plain} and {@code text/html},
+	 * and {@code application/*+xml} includes {@code application/soap+xml}, etc.
+	 * This method is <b>not</b> symmetric.
+	 * <p>Simply calls {@link MimeType#includes(MimeType)} but declared with a
+	 * {@code MediaType} parameter for binary backwards compatibility.
 	 * @param other the reference media type with which to compare
-	 * @return {@code true} if this media type includes the given media type; {@code false} otherwise
+	 * @return {@code true} if this media type includes the given media type;
+	 * {@code false} otherwise
 	 */
 	public boolean includes(MediaType other) {
 		return super.includes(other);
@@ -389,18 +392,23 @@ public class MediaType extends MimeType implements Serializable {
 
 	/**
 	 * Indicate whether this {@code MediaType} is compatible with the given media type.
-	 * <p>For instance, {@code text/*} is compatible with {@code text/plain}, {@code text/html}, and vice versa.
-	 * In effect, this method is similar to {@link #includes(MediaType)}, except that it <b>is</b> symmetric.
+	 * <p>For instance, {@code text/*} is compatible with {@code text/plain},
+	 * {@code text/html}, and vice versa. In effect, this method is similar to
+	 * {@link #includes}, except that it <b>is</b> symmetric.
+	 * <p>Simply calls {@link MimeType#isCompatibleWith(MimeType)} but declared with a
+	 * {@code MediaType} parameter for binary backwards compatibility.
 	 * @param other the reference media type with which to compare
-	 * @return {@code true} if this media type is compatible with the given media type; {@code false} otherwise
+	 * @return {@code true} if this media type is compatible with the given media type;
+	 * {@code false} otherwise
 	 */
 	public boolean isCompatibleWith(MediaType other) {
 		return super.isCompatibleWith(other);
 	}
 
 	/**
-	 * Return a replica of this instance with the quality value of the given MediaType.
-	 * @return the same instance if the given MediaType doesn't have a quality value, or a new one otherwise
+	 * Return a replica of this instance with the quality value of the given {@code MediaType}.
+	 * @return the same instance if the given MediaType doesn't have a quality value,
+	 * or a new one otherwise
 	 */
 	public MediaType copyQualityValue(MediaType mediaType) {
 		if (!mediaType.getParameters().containsKey(PARAM_QUALITY_FACTOR)) {
@@ -413,7 +421,8 @@ public class MediaType extends MimeType implements Serializable {
 
 	/**
 	 * Return a replica of this instance with its quality value removed.
-	 * @return the same instance if the media type doesn't contain a quality value, or a new one otherwise
+	 * @return the same instance if the media type doesn't contain a quality value,
+	 * or a new one otherwise
 	 */
 	public MediaType removeQualityValue() {
 		if (!getParameters().containsKey(PARAM_QUALITY_FACTOR)) {
@@ -460,7 +469,7 @@ public class MediaType extends MimeType implements Serializable {
 	}
 
 	/**
-	 * Parse the given comma-separated string into a list of {@code MediaType} objects.
+	 * Parse the comma-separated string into a list of {@code MediaType} objects.
 	 * <p>This method can be used to parse an Accept or Content-Type header.
 	 * @param mediaTypes the string to parse
 	 * @return the list of media types
@@ -537,7 +546,7 @@ public class MediaType extends MimeType implements Serializable {
 	 * <blockquote>audio/basic == text/html</blockquote>
 	 * <blockquote>audio/basic == audio/wave</blockquote>
 	 * @param mediaTypes the list of media types to be sorted
-	 * @see <a href="http://tools.ietf.org/html/rfc7231#section-5.3.2">HTTP 1.1: Semantics
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.3.2">HTTP 1.1: Semantics
 	 * and Content, section 5.3.2</a>
 	 */
 	public static void sortBySpecificity(List<MediaType> mediaTypes) {
@@ -624,7 +633,8 @@ public class MediaType extends MimeType implements Serializable {
 				else {
 					int paramsSize1 = mediaType1.getParameters().size();
 					int paramsSize2 = mediaType2.getParameters().size();
-					return (paramsSize2 < paramsSize1 ? -1 : (paramsSize2 == paramsSize1 ? 0 : 1)); // audio/basic;level=1 < audio/basic
+					// audio/basic;level=1 < audio/basic
+					return (paramsSize2 < paramsSize1 ? -1 : (paramsSize2 == paramsSize1 ? 0 : 1));
 				}
 			}
 		}

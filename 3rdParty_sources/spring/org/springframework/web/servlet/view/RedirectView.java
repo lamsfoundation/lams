@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -58,7 +58,7 @@ import org.springframework.web.util.WebUtils;
  * but this behavior can be changed by overriding the
  * {@link #isEligibleProperty(String, Object)} method.
  *
- * <p>A URL for this view is supposed to be a HTTP redirect URL, i.e.
+ * <p>A URL for this view is supposed to be an HTTP redirect URL, i.e.
  * suitable for HttpServletResponse's {@code sendRedirect} method, which
  * is what actually does the redirect if the HTTP 1.0 flag is on, or via sending
  * back an HTTP 303 code - if the HTTP 1.0 compatibility flag is off.
@@ -332,7 +332,7 @@ public class RedirectView extends AbstractUrlBasedView implements SmartView {
 		StringBuilder targetUrl = new StringBuilder();
 		if (this.contextRelative && getUrl().startsWith("/")) {
 			// Do not apply context path to relative URLs.
-			targetUrl.append(request.getContextPath());
+			targetUrl.append(getContextPath(request));
 		}
 		targetUrl.append(getUrl());
 
@@ -358,12 +358,20 @@ public class RedirectView extends AbstractUrlBasedView implements SmartView {
 		return targetUrl.toString();
 	}
 
+	private String getContextPath(HttpServletRequest request) {
+		String contextPath = request.getContextPath();
+		while (contextPath.startsWith("//")) {
+			contextPath = contextPath.substring(1);
+		}
+		return contextPath;
+	}
+
 	/**
 	 * Replace URI template variables in the target URL with encoded model
 	 * attributes or URI variables from the current request. Model attributes
 	 * referenced in the URL are removed from the model.
 	 * @param targetUrl the redirect URL
-	 * @param model Map that contains model attributes
+	 * @param model a Map that contains model attributes
 	 * @param currentUriVariables current request URI variables to use
 	 * @param encodingScheme the encoding scheme to use
 	 * @throws UnsupportedEncodingException if string encoding failed
@@ -381,7 +389,7 @@ public class RedirectView extends AbstractUrlBasedView implements SmartView {
 			if (value == null) {
 				throw new IllegalArgumentException("Model has no value for key '" + name + "'");
 			}
-			result.append(targetUrl.substring(endLastMatch, matcher.start()));
+			result.append(targetUrl, endLastMatch, matcher.start());
 			result.append(UriUtils.encodePathSegment(value.toString(), encodingScheme));
 			endLastMatch = matcher.end();
 		}
@@ -430,7 +438,7 @@ public class RedirectView extends AbstractUrlBasedView implements SmartView {
 	 * Append query properties to the redirect URL.
 	 * Stringifies, URL-encodes and formats model attributes as query properties.
 	 * @param targetUrl the StringBuilder to append the properties to
-	 * @param model Map that contains model attributes
+	 * @param model a Map that contains model attributes
 	 * @param encodingScheme the encoding scheme to use
 	 * @throws UnsupportedEncodingException if string encoding failed
 	 * @see #queryProperties
@@ -549,8 +557,9 @@ public class RedirectView extends AbstractUrlBasedView implements SmartView {
 
 	/**
 	 * Determine whether the given model element value is eligible for exposure.
-	 * <p>The default implementation considers primitives, Strings, Numbers, Dates,
-	 * URIs, URLs and Locale objects as eligible. This can be overridden in subclasses.
+	 * <p>The default implementation considers primitives, strings, numbers, dates,
+	 * URIs, URLs etc as eligible, according to {@link BeanUtils#isSimpleValueType}.
+	 * This can be overridden in subclasses.
 	 * @param value the model element value
 	 * @return whether the element value is eligible
 	 * @see BeanUtils#isSimpleValueType
@@ -567,7 +576,6 @@ public class RedirectView extends AbstractUrlBasedView implements SmartView {
 	 * @return the encoded output String
 	 * @throws UnsupportedEncodingException if thrown by the JDK URLEncoder
 	 * @see java.net.URLEncoder#encode(String, String)
-	 * @see java.net.URLEncoder#encode(String)
 	 */
 	protected String urlEncode(String input, String encodingScheme) throws UnsupportedEncodingException {
 		return (input != null ? URLEncoder.encode(input, encodingScheme) : null);
@@ -597,7 +605,7 @@ public class RedirectView extends AbstractUrlBasedView implements SmartView {
 	}
 
 	/**
-	 * Send a redirect back to the HTTP client
+	 * Send a redirect back to the HTTP client.
 	 * @param request current HTTP request (allows for reacting to request method)
 	 * @param response current HTTP response (for sending response headers)
 	 * @param targetUrl the target URL to redirect to

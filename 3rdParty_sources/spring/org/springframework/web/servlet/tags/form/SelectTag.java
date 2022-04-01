@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -57,8 +57,8 @@ public class SelectTag extends AbstractHtmlInputElementTag {
 
 
 	/**
-	 * The {@link Collection}, {@link Map} or array of objects used to generate the inner
-	 * '{@code option}' tags.
+	 * The {@link Collection}, {@link Map} or array of objects used to generate
+	 * the inner '{@code option}' tags.
 	 */
 	private Object items;
 
@@ -291,7 +291,7 @@ public class SelectTag extends AbstractHtmlInputElementTag {
 	public int doEndTag() throws JspException {
 		if (this.tagWriter != null) {
 			this.tagWriter.endTag();
-			writeHiddenTagIfNecessary(tagWriter);
+			writeHiddenTagIfNecessary(this.tagWriter);
 		}
 		return EVAL_PAGE;
 	}

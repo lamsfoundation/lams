@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2015 the original author or authors.
+ * Copyright 2002-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -53,8 +53,7 @@ public abstract class AbstractValueAdaptingCache implements Cache {
 
 	@Override
 	public ValueWrapper get(Object key) {
-		Object value = lookup(key);
-		return toValueWrapper(value);
+		return toValueWrapper(lookup(key));
 	}
 
 	@Override
@@ -62,7 +61,8 @@ public abstract class AbstractValueAdaptingCache implements Cache {
 	public <T> T get(Object key, Class<T> type) {
 		Object value = fromStoreValue(lookup(key));
 		if (value != null && type != null && !type.isInstance(value)) {
-			throw new IllegalStateException("Cached value is not of required type [" + type.getName() + "]: " + value);
+			throw new IllegalStateException(
+					"Cached value is not of required type [" + type.getName() + "]: " + value);
 		}
 		return (T) value;
 	}
@@ -70,7 +70,7 @@ public abstract class AbstractValueAdaptingCache implements Cache {
 	/**
 	 * Perform an actual lookup in the underlying store.
 	 * @param key the key whose associated value is to be returned
-	 * @return the raw store value for the key
+	 * @return the raw store value for the key, or {@code null} if none
 	 */
 	protected abstract Object lookup(Object key);
 
@@ -111,6 +111,5 @@ public abstract class AbstractValueAdaptingCache implements Cache {
 	protected Cache.ValueWrapper toValueWrapper(Object storeValue) {
 		return (storeValue != null ? new SimpleValueWrapper(fromStoreValue(storeValue)) : null);
 	}
-
 
 }

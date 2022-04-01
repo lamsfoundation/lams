@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,9 +17,9 @@
 package org.springframework.validation.beanvalidation;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +34,7 @@ import org.springframework.beans.NotReadablePropertyException;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
@@ -115,7 +116,7 @@ public class SpringValidatorAdapter implements SmartValidator, javax.validation.
 				}
 			}
 			processConstraintViolations(
-					this.targetValidator.validate(target, groups.toArray(new Class<?>[groups.size()])), errors);
+					this.targetValidator.validate(target, ClassUtils.toClassArray(groups)), errors);
 		}
 	}
 
@@ -215,7 +216,7 @@ public class SpringValidatorAdapter implements SmartValidator, javax.validation.
 	 * @see org.springframework.validation.DefaultBindingErrorProcessor#getArgumentsForBindError
 	 */
 	protected Object[] getArgumentsForConstraint(String objectName, String field, ConstraintDescriptor<?> descriptor) {
-		List<Object> arguments = new LinkedList<Object>();
+		List<Object> arguments = new ArrayList<Object>();
 		arguments.add(getResolvableField(objectName, field));
 		// Using a TreeMap for alphabetical ordering of attribute names
 		Map<String, Object> attributesToExpose = new TreeMap<String, Object>();
@@ -230,7 +231,7 @@ public class SpringValidatorAdapter implements SmartValidator, javax.validation.
 			}
 		}
 		arguments.addAll(attributesToExpose.values());
-		return arguments.toArray(new Object[arguments.size()]);
+		return arguments.toArray();
 	}
 
 	/**
@@ -263,8 +264,8 @@ public class SpringValidatorAdapter implements SmartValidator, javax.validation.
 	 */
 	protected Object getRejectedValue(String field, ConstraintViolation<Object> violation, BindingResult bindingResult) {
 		Object invalidValue = violation.getInvalidValue();
-		if (!"".equals(field) && (invalidValue == violation.getLeafBean() ||
-				(!field.contains("[]") && (field.contains("[") || field.contains("."))))) {
+		if (!"".equals(field) && !field.contains("[]") &&
+				(invalidValue == violation.getLeafBean() || field.contains("[") || field.contains("."))) {
 			// Possibly a bean constraint with property path: retrieve the actual property value.
 			// However, explicitly avoid this for "address[]" style paths that we can't handle.
 			invalidValue = bindingResult.getRawFieldValue(field);

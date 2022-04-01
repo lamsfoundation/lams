@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -61,6 +61,7 @@ import org.springframework.util.TypeUtils;
  * @author Juergen Hoeller
  * @author Sebastien Deleuze
  * @since 4.1
+ * @see MappingJackson2HttpMessageConverter
  */
 public abstract class AbstractJackson2HttpMessageConverter extends AbstractGenericHttpMessageConverter<Object> {
 
@@ -189,8 +190,9 @@ public abstract class AbstractJackson2HttpMessageConverter extends AbstractGener
 			return;
 		}
 
+		// Do not log warning for serializer not found (note: different message wording on Jackson 2.9)
 		boolean debugLevel = (cause instanceof JsonMappingException &&
-				cause.getMessage().startsWith("Can not find"));
+				(cause.getMessage().startsWith("Can not find") || cause.getMessage().startsWith("Cannot find")));
 
 		if (debugLevel ? logger.isDebugEnabled() : logger.isWarnEnabled()) {
 			String msg = "Failed to evaluate Jackson " + (type instanceof JavaType ? "de" : "") +
@@ -252,10 +254,11 @@ public abstract class AbstractJackson2HttpMessageConverter extends AbstractGener
 		try {
 			writePrefix(generator, object);
 
+			Object value = object;
 			Class<?> serializationView = null;
 			FilterProvider filters = null;
-			Object value = object;
 			JavaType javaType = null;
+
 			if (object instanceof MappingJacksonValue) {
 				MappingJacksonValue container = (MappingJacksonValue) object;
 				value = container.getValue();
@@ -265,15 +268,11 @@ public abstract class AbstractJackson2HttpMessageConverter extends AbstractGener
 			if (type != null && value != null && TypeUtils.isAssignable(type, value.getClass())) {
 				javaType = getJavaType(type, null);
 			}
-			ObjectWriter objectWriter;
-			if (serializationView != null) {
-				objectWriter = this.objectMapper.writerWithView(serializationView);
-			}
-			else if (filters != null) {
-				objectWriter = this.objectMapper.writer(filters);
-			}
-			else {
-				objectWriter = this.objectMapper.writer();
+
+			ObjectWriter objectWriter = (serializationView != null ?
+					this.objectMapper.writerWithView(serializationView) : this.objectMapper.writer());
+			if (filters != null) {
+				objectWriter = objectWriter.with(filters);
 			}
 			if (javaType != null && javaType.isContainerType()) {
 				objectWriter = objectWriter.forType(javaType);
@@ -287,7 +286,6 @@ public abstract class AbstractJackson2HttpMessageConverter extends AbstractGener
 
 			writeSuffix(generator, object);
 			generator.flush();
-
 		}
 		catch (JsonProcessingException ex) {
 			throw new HttpMessageNotWritableException("Could not write JSON: " + ex.getOriginalMessage(), ex);

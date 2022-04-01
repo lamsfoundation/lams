@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -168,19 +168,19 @@ public class AspectJProxyFactory extends ProxyCreatorSupport {
 			synchronized (aspectCache) {
 				// To be safe, check within full lock now...
 				instance = aspectCache.get(aspectClass);
-				if (instance != null) {
-					return instance;
-				}
-				try {
-					instance = aspectClass.newInstance();
-					aspectCache.put(aspectClass, instance);
-					return instance;
-				}
-				catch (InstantiationException ex) {
-					throw new AopConfigException("Unable to instantiate aspect class [" + aspectClass.getName() + "]", ex);
-				}
-				catch (IllegalAccessException ex) {
-					throw new AopConfigException("Cannot access aspect class [" + aspectClass.getName() + "]", ex);
+				if (instance == null) {
+					try {
+						instance = aspectClass.newInstance();
+						aspectCache.put(aspectClass, instance);
+					}
+					catch (InstantiationException ex) {
+						throw new AopConfigException(
+								"Unable to instantiate aspect class: " + aspectClass.getName(), ex);
+					}
+					catch (IllegalAccessException ex) {
+						throw new AopConfigException(
+								"Could not access aspect constructor: " + aspectClass.getName(), ex);
+					}
 				}
 			}
 		}

@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,6 +22,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
@@ -51,7 +52,7 @@ public class ResourceUrlProvider implements ApplicationListener<ContextRefreshed
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private UrlPathHelper urlPathHelper = new UrlPathHelper();
+	private UrlPathHelper urlPathHelper = UrlPathHelper.defaultInstance;
 
 	private PathMatcher pathMatcher = new AntPathMatcher();
 
@@ -148,13 +149,13 @@ public class ResourceUrlProvider implements ApplicationListener<ContextRefreshed
 	protected void detectResourceHandlers(ApplicationContext appContext) {
 		logger.debug("Looking for resource handler mappings");
 
-		Map<String, SimpleUrlHandlerMapping> map = appContext.getBeansOfType(SimpleUrlHandlerMapping.class);
-		List<SimpleUrlHandlerMapping> handlerMappings = new ArrayList<SimpleUrlHandlerMapping>(map.values());
-		AnnotationAwareOrderComparator.sort(handlerMappings);
+		Map<String, SimpleUrlHandlerMapping> beans = appContext.getBeansOfType(SimpleUrlHandlerMapping.class);
+		List<SimpleUrlHandlerMapping> mappings = new ArrayList<SimpleUrlHandlerMapping>(beans.values());
+		AnnotationAwareOrderComparator.sort(mappings);
 
-		for (SimpleUrlHandlerMapping hm : handlerMappings) {
-			for (String pattern : hm.getHandlerMap().keySet()) {
-				Object handler = hm.getHandlerMap().get(pattern);
+		for (SimpleUrlHandlerMapping mapping : mappings) {
+			for (String pattern : mapping.getHandlerMap().keySet()) {
+				Object handler = mapping.getHandlerMap().get(pattern);
 				if (handler instanceof ResourceHttpRequestHandler) {
 					ResourceHttpRequestHandler resourceHandler = (ResourceHttpRequestHandler) handler;
 					if (logger.isDebugEnabled()) {
@@ -182,6 +183,9 @@ public class ResourceUrlProvider implements ApplicationListener<ContextRefreshed
 		}
 		int prefixIndex = getLookupPathIndex(request);
 		int suffixIndex = getEndPathIndex(requestUrl);
+		if (prefixIndex >= suffixIndex) {
+			return null;
+		}
 		String prefix = requestUrl.substring(0, prefixIndex);
 		String suffix = requestUrl.substring(suffixIndex);
 		String lookupPath = requestUrl.substring(prefixIndex, suffixIndex);
@@ -198,12 +202,12 @@ public class ResourceUrlProvider implements ApplicationListener<ContextRefreshed
 
 	private int getEndPathIndex(String lookupPath) {
 		int suffixIndex = lookupPath.length();
-		int queryIndex = lookupPath.indexOf("?");
-		if(queryIndex > 0) {
+		int queryIndex = lookupPath.indexOf('?');
+		if (queryIndex > 0) {
 			suffixIndex = queryIndex;
 		}
-		int hashIndex = lookupPath.indexOf("#");
-		if(hashIndex > 0) {
+		int hashIndex = lookupPath.indexOf('#');
+		if (hashIndex > 0) {
 			suffixIndex = Math.min(suffixIndex, hashIndex);
 		}
 		return suffixIndex;

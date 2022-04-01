@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -75,18 +75,9 @@ public class ForwardedHeaderFilter extends OncePerRequestFilter {
 	}
 
 
-	private final UrlPathHelper pathHelper;
-
 	private boolean removeOnly;
 
 	private boolean relativeRedirects;
-
-
-	public ForwardedHeaderFilter() {
-		this.pathHelper = new UrlPathHelper();
-		this.pathHelper.setUrlDecode(false);
-		this.pathHelper.setRemoveSemicolonContent(false);
-	}
 
 
 	/**
@@ -100,13 +91,13 @@ public class ForwardedHeaderFilter extends OncePerRequestFilter {
 	}
 
 	/**
-	 * Use this property to enable relative redirects as explained in and also
-	 * using the same response wrapper as {@link RelativeRedirectFilter} does.
-	 * Or if both filters are used, only one will wrap the response.
+	 * Use this property to enable relative redirects as explained in
+	 * {@link RelativeRedirectFilter}, and also using the same response wrapper
+	 * as that filter does, or if both are configured, only one will wrap.
 	 * <p>By default, if this property is set to false, in which case calls to
 	 * {@link HttpServletResponse#sendRedirect(String)} are overridden in order
-	 * to turn relative into absolute URLs since (which Servlet containers are
-	 * also required to do) also taking forwarded headers into consideration.
+	 * to turn relative into absolute URLs, also taking into account forwarded
+	 * headers.
 	 * @param relativeRedirects whether to use relative redirects
 	 * @since 4.3.10
 	 */
@@ -146,7 +137,7 @@ public class ForwardedHeaderFilter extends OncePerRequestFilter {
 			filterChain.doFilter(theRequest, response);
 		}
 		else {
-			HttpServletRequest theRequest = new ForwardedHeaderExtractingRequest(request, this.pathHelper);
+			HttpServletRequest theRequest = new ForwardedHeaderExtractingRequest(request);
 			HttpServletResponse theResponse = (this.relativeRedirects ?
 					RelativeRedirectResponseWrapper.wrapIfNecessary(response, HttpStatus.SEE_OTHER) :
 					new ForwardedHeaderExtractingResponse(response, theRequest));
@@ -219,7 +210,7 @@ public class ForwardedHeaderFilter extends OncePerRequestFilter {
 
 		private final String requestUrl;
 
-		public ForwardedHeaderExtractingRequest(HttpServletRequest request, UrlPathHelper pathHelper) {
+		public ForwardedHeaderExtractingRequest(HttpServletRequest request) {
 			super(request);
 
 			HttpRequest httpRequest = new ServletServerHttpRequest(request);
@@ -233,7 +224,7 @@ public class ForwardedHeaderFilter extends OncePerRequestFilter {
 
 			String prefix = getForwardedPrefix(request);
 			this.contextPath = (prefix != null ? prefix : request.getContextPath());
-			this.requestUri = this.contextPath + pathHelper.getPathWithinApplication(request);
+			this.requestUri = this.contextPath + UrlPathHelper.rawPathInstance.getPathWithinApplication(request);
 			this.requestUrl = this.scheme + "://" + this.host + (port == -1 ? "" : ":" + port) + this.requestUri;
 		}
 
@@ -304,10 +295,12 @@ public class ForwardedHeaderFilter extends OncePerRequestFilter {
 
 		@Override
 		public void sendRedirect(String location) throws IOException {
+
 			UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(location);
+			UriComponents uriComponents = builder.build();
 
 			// Absolute location
-			if (builder.build().getScheme() != null) {
+			if (uriComponents.getScheme() != null) {
 				super.sendRedirect(location);
 				return;
 			}
@@ -319,13 +312,18 @@ public class ForwardedHeaderFilter extends OncePerRequestFilter {
 				return;
 			}
 
-			// Relative to Servlet container root or to current request
-			String path = (location.startsWith(FOLDER_SEPARATOR) ? location :
-					StringUtils.applyRelativePath(this.request.getRequestURI(), location));
+			String path = uriComponents.getPath();
+			if (path != null) {
+				// Relative to Servlet container root or to current request
+				path = (path.startsWith(FOLDER_SEPARATOR) ? path :
+						StringUtils.applyRelativePath(this.request.getRequestURI(), path));
+			}
 
 			String result = UriComponentsBuilder
 					.fromHttpRequest(new ServletServerHttpRequest(this.request))
 					.replacePath(path)
+					.replaceQuery(uriComponents.getQuery())
+					.fragment(uriComponents.getFragment())
 					.build().normalize().toUriString();
 
 			super.sendRedirect(result);

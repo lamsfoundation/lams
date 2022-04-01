@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -53,8 +53,8 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	/**
 	 * Name of the ConversionService bean in the factory.
 	 * If none is supplied, default conversion rules apply.
-	 * @see org.springframework.core.convert.ConversionService
 	 * @since 3.0
+	 * @see org.springframework.core.convert.ConversionService
 	 */
 	String CONVERSION_SERVICE_BEAN_NAME = "conversionService";
 
@@ -147,11 +147,12 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	void addProtocolResolver(ProtocolResolver resolver);
 
 	/**
-	 * Load or refresh the persistent representation of the configuration,
-	 * which might an XML file, properties file, or relational database schema.
+	 * Load or refresh the persistent representation of the configuration, which
+	 * might be from Java-based configuration, an XML file, a properties file, a
+	 * relational database schema, or some other format.
 	 * <p>As this is a startup method, it should destroy already created singletons
 	 * if it fails, to avoid dangling resources. In other words, after invocation
-	 * of that method, either all or no singletons at all should be instantiated.
+	 * of this method, either all or no singletons at all should be instantiated.
 	 * @throws BeansException if the bean factory could not be initialized
 	 * @throws IllegalStateException if already initialized and multiple refresh
 	 * attempts are not supported
@@ -196,7 +197,7 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	 * will already have been instantiated before. Use a BeanFactoryPostProcessor
 	 * to intercept the BeanFactory setup process before beans get touched.
 	 * <p>Generally, this internal factory will only be accessible while the context
-	 * is active, that is, inbetween {@link #refresh()} and {@link #close()}.
+	 * is active, that is, in-between {@link #refresh()} and {@link #close()}.
 	 * The {@link #isActive()} flag can be used to check whether the context
 	 * is in an appropriate state.
 	 * @return the underlying bean factory

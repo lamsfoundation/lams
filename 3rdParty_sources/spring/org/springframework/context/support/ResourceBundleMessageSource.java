@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -292,7 +292,7 @@ public class ResourceBundleMessageSource extends AbstractResourceBasedMessageSou
 			try {
 				return bundle.getString(key);
 			}
-			catch (MissingResourceException ex){
+			catch (MissingResourceException ex) {
 				// Assume key not found for some other reason
 				// -> do NOT throw the exception to allow for checking parent message source.
 			}
@@ -387,9 +387,13 @@ public class ResourceBundleMessageSource extends AbstractResourceBasedMessageSou
 		}
 
 		@Override
-		public boolean needsReload(String baseName, Locale locale, String format, ClassLoader loader, ResourceBundle bundle, long loadTime) {
+		public boolean needsReload(
+				String baseName, Locale locale, String format, ClassLoader loader, ResourceBundle bundle, long loadTime) {
+
 			if (super.needsReload(baseName, locale, format, loader, bundle, loadTime)) {
-				cachedBundleMessageFormats.remove(bundle);
+				synchronized (cachedBundleMessageFormats) {
+					cachedBundleMessageFormats.remove(bundle);
+				}
 				return true;
 			}
 			else {

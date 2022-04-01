@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -35,7 +36,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * {@link ClientHttpRequestFactory} implementation that uses
- * <a href="http://square.github.io/okhttp/">OkHttp</a> 3.x to create requests.
+ * <a href="https://square.github.io/okhttp/">OkHttp</a> 3.x to create requests.
  *
  * @author Luciano Leggieri
  * @author Arjen Poutsma
@@ -118,8 +119,9 @@ public class OkHttp3ClientHttpRequestFactory
 	public void destroy() throws IOException {
 		if (this.defaultClient) {
 			// Clean up the client if we created it in the constructor
-			if (this.client.cache() != null) {
-				this.client.cache().close();
+			Cache cache = this.client.cache();
+			if (cache != null) {
+				cache.close();
 			}
 			this.client.dispatcher().executorService().shutdown();
 		}

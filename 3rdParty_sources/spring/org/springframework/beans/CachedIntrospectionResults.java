@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,9 +43,9 @@ import org.springframework.util.StringUtils;
  * Internal class that caches JavaBeans {@link java.beans.PropertyDescriptor}
  * information for a Java class. Not intended for direct use by application code.
  *
- * <p>Necessary for own caching of descriptors within the application's
- * ClassLoader, rather than rely on the JDK's system-wide BeanInfo cache
- * (in order to avoid leaks on ClassLoader shutdown).
+ * <p>Necessary for Spring's own caching of bean descriptors within the application
+ * {@link ClassLoader}, rather than relying on the JDK's system-wide {@link BeanInfo}
+ * cache (in order to avoid leaks on individual application shutdown in a shared JVM).
  *
  * <p>Information is cached statically, so we don't need to create new
  * objects of this class for every JavaBean we manipulate. Hence, this class
@@ -97,7 +97,7 @@ public class CachedIntrospectionResults {
 			SpringProperties.getFlag(IGNORE_BEANINFO_PROPERTY_NAME);
 
 	/** Stores the BeanInfoFactory instances */
-	private static List<BeanInfoFactory> beanInfoFactories = SpringFactoriesLoader.loadFactories(
+	private static final List<BeanInfoFactory> beanInfoFactories = SpringFactoriesLoader.loadFactories(
 			BeanInfoFactory.class, CachedIntrospectionResults.class.getClassLoader());
 
 	private static final Log logger = LogFactory.getLog(CachedIntrospectionResults.class);
@@ -339,10 +339,10 @@ public class CachedIntrospectionResults {
 	PropertyDescriptor getPropertyDescriptor(String name) {
 		PropertyDescriptor pd = this.propertyDescriptorCache.get(name);
 		if (pd == null && StringUtils.hasLength(name)) {
-			// Same lenient fallback checking as in PropertyTypeDescriptor...
-			pd = this.propertyDescriptorCache.get(name.substring(0, 1).toLowerCase() + name.substring(1));
+			// Same lenient fallback checking as in Property...
+			pd = this.propertyDescriptorCache.get(StringUtils.uncapitalize(name));
 			if (pd == null) {
-				pd = this.propertyDescriptorCache.get(name.substring(0, 1).toUpperCase() + name.substring(1));
+				pd = this.propertyDescriptorCache.get(StringUtils.capitalize(name));
 			}
 		}
 		return (pd == null || pd instanceof GenericTypeAwarePropertyDescriptor ? pd :

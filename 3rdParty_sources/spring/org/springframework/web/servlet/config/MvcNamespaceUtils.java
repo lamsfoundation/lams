@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -40,7 +40,7 @@ import org.springframework.web.util.UrlPathHelper;
  * @author Brian Clozel
  * @since 3.1
  */
-abstract class MvcNamespaceUtils {
+public abstract class MvcNamespaceUtils {
 
 	private static final String BEAN_NAME_URL_HANDLER_MAPPING_BEAN_NAME =
 			BeanNameUrlHandlerMapping.class.getName();
@@ -81,8 +81,8 @@ abstract class MvcNamespaceUtils {
 			}
 			parserContext.getRegistry().registerAlias(urlPathHelperRef.getBeanName(), URL_PATH_HELPER_BEAN_NAME);
 		}
-		else if (!parserContext.getRegistry().isAlias(URL_PATH_HELPER_BEAN_NAME)
-				&& !parserContext.getRegistry().containsBeanDefinition(URL_PATH_HELPER_BEAN_NAME)) {
+		else if (!parserContext.getRegistry().isAlias(URL_PATH_HELPER_BEAN_NAME) &&
+				!parserContext.getRegistry().containsBeanDefinition(URL_PATH_HELPER_BEAN_NAME)) {
 			RootBeanDefinition urlPathHelperDef = new RootBeanDefinition(UrlPathHelper.class);
 			urlPathHelperDef.setSource(source);
 			urlPathHelperDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
@@ -106,8 +106,8 @@ abstract class MvcNamespaceUtils {
 			}
 			parserContext.getRegistry().registerAlias(pathMatcherRef.getBeanName(), PATH_MATCHER_BEAN_NAME);
 		}
-		else if (!parserContext.getRegistry().isAlias(PATH_MATCHER_BEAN_NAME)
-				&& !parserContext.getRegistry().containsBeanDefinition(PATH_MATCHER_BEAN_NAME)) {
+		else if (!parserContext.getRegistry().isAlias(PATH_MATCHER_BEAN_NAME) &&
+				!parserContext.getRegistry().containsBeanDefinition(PATH_MATCHER_BEAN_NAME)) {
 			RootBeanDefinition pathMatcherDef = new RootBeanDefinition(AntPathMatcher.class);
 			pathMatcherDef.setSource(source);
 			pathMatcherDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
@@ -121,16 +121,16 @@ abstract class MvcNamespaceUtils {
 	 * Registers  an {@link HttpRequestHandlerAdapter} under a well-known
 	 * name unless already registered.
 	 */
-	private static void registerBeanNameUrlHandlerMapping(ParserContext parserContext, Object source) {
-		if (!parserContext.getRegistry().containsBeanDefinition(BEAN_NAME_URL_HANDLER_MAPPING_BEAN_NAME)){
-			RootBeanDefinition beanNameMappingDef = new RootBeanDefinition(BeanNameUrlHandlerMapping.class);
-			beanNameMappingDef.setSource(source);
-			beanNameMappingDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-			beanNameMappingDef.getPropertyValues().add("order", 2);	// consistent with WebMvcConfigurationSupport
-			RuntimeBeanReference corsConfigurationsRef = MvcNamespaceUtils.registerCorsConfigurations(null, parserContext, source);
-			beanNameMappingDef.getPropertyValues().add("corsConfigurations", corsConfigurationsRef);
-			parserContext.getRegistry().registerBeanDefinition(BEAN_NAME_URL_HANDLER_MAPPING_BEAN_NAME, beanNameMappingDef);
-			parserContext.registerComponent(new BeanComponentDefinition(beanNameMappingDef, BEAN_NAME_URL_HANDLER_MAPPING_BEAN_NAME));
+	private static void registerBeanNameUrlHandlerMapping(ParserContext context, Object source) {
+		if (!context.getRegistry().containsBeanDefinition(BEAN_NAME_URL_HANDLER_MAPPING_BEAN_NAME)) {
+			RootBeanDefinition mappingDef = new RootBeanDefinition(BeanNameUrlHandlerMapping.class);
+			mappingDef.setSource(source);
+			mappingDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+			mappingDef.getPropertyValues().add("order", 2);	// consistent with WebMvcConfigurationSupport
+			RuntimeBeanReference corsRef = MvcNamespaceUtils.registerCorsConfigurations(null, context, source);
+			mappingDef.getPropertyValues().add("corsConfigurations", corsRef);
+			context.getRegistry().registerBeanDefinition(BEAN_NAME_URL_HANDLER_MAPPING_BEAN_NAME, mappingDef);
+			context.registerComponent(new BeanComponentDefinition(mappingDef, BEAN_NAME_URL_HANDLER_MAPPING_BEAN_NAME));
 		}
 	}
 
@@ -138,13 +138,13 @@ abstract class MvcNamespaceUtils {
 	 * Registers  an {@link HttpRequestHandlerAdapter} under a well-known
 	 * name unless already registered.
 	 */
-	private static void registerHttpRequestHandlerAdapter(ParserContext parserContext, Object source) {
-		if (!parserContext.getRegistry().containsBeanDefinition(HTTP_REQUEST_HANDLER_ADAPTER_BEAN_NAME)) {
-			RootBeanDefinition handlerAdapterDef = new RootBeanDefinition(HttpRequestHandlerAdapter.class);
-			handlerAdapterDef.setSource(source);
-			handlerAdapterDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-			parserContext.getRegistry().registerBeanDefinition(HTTP_REQUEST_HANDLER_ADAPTER_BEAN_NAME, handlerAdapterDef);
-			parserContext.registerComponent(new BeanComponentDefinition(handlerAdapterDef, HTTP_REQUEST_HANDLER_ADAPTER_BEAN_NAME));
+	private static void registerHttpRequestHandlerAdapter(ParserContext context, Object source) {
+		if (!context.getRegistry().containsBeanDefinition(HTTP_REQUEST_HANDLER_ADAPTER_BEAN_NAME)) {
+			RootBeanDefinition adapterDef = new RootBeanDefinition(HttpRequestHandlerAdapter.class);
+			adapterDef.setSource(source);
+			adapterDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+			context.getRegistry().registerBeanDefinition(HTTP_REQUEST_HANDLER_ADAPTER_BEAN_NAME, adapterDef);
+			context.registerComponent(new BeanComponentDefinition(adapterDef, HTTP_REQUEST_HANDLER_ADAPTER_BEAN_NAME));
 		}
 	}
 
@@ -152,13 +152,13 @@ abstract class MvcNamespaceUtils {
 	 * Registers a {@link SimpleControllerHandlerAdapter} under a well-known
 	 * name unless already registered.
 	 */
-	private static void registerSimpleControllerHandlerAdapter(ParserContext parserContext, Object source) {
-		if (!parserContext.getRegistry().containsBeanDefinition(SIMPLE_CONTROLLER_HANDLER_ADAPTER_BEAN_NAME)) {
-			RootBeanDefinition handlerAdapterDef = new RootBeanDefinition(SimpleControllerHandlerAdapter.class);
-			handlerAdapterDef.setSource(source);
-			handlerAdapterDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-			parserContext.getRegistry().registerBeanDefinition(SIMPLE_CONTROLLER_HANDLER_ADAPTER_BEAN_NAME, handlerAdapterDef);
-			parserContext.registerComponent(new BeanComponentDefinition(handlerAdapterDef, SIMPLE_CONTROLLER_HANDLER_ADAPTER_BEAN_NAME));
+	private static void registerSimpleControllerHandlerAdapter(ParserContext context, Object source) {
+		if (!context.getRegistry().containsBeanDefinition(SIMPLE_CONTROLLER_HANDLER_ADAPTER_BEAN_NAME)) {
+			RootBeanDefinition beanDef = new RootBeanDefinition(SimpleControllerHandlerAdapter.class);
+			beanDef.setSource(source);
+			beanDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+			context.getRegistry().registerBeanDefinition(SIMPLE_CONTROLLER_HANDLER_ADAPTER_BEAN_NAME, beanDef);
+			context.registerComponent(new BeanComponentDefinition(beanDef, SIMPLE_CONTROLLER_HANDLER_ADAPTER_BEAN_NAME));
 		}
 	}
 
@@ -169,21 +169,21 @@ abstract class MvcNamespaceUtils {
 	 * @return a RuntimeBeanReference to this {@code Map<String, CorsConfiguration>} instance
 	 */
 	public static RuntimeBeanReference registerCorsConfigurations(
-			Map<String, CorsConfiguration> corsConfigurations, ParserContext parserContext, Object source) {
+			Map<String, CorsConfiguration> corsConfigurations, ParserContext context, Object source) {
 
-		if (!parserContext.getRegistry().containsBeanDefinition(CORS_CONFIGURATION_BEAN_NAME)) {
-			RootBeanDefinition corsConfigurationsDef = new RootBeanDefinition(LinkedHashMap.class);
-			corsConfigurationsDef.setSource(source);
-			corsConfigurationsDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+		if (!context.getRegistry().containsBeanDefinition(CORS_CONFIGURATION_BEAN_NAME)) {
+			RootBeanDefinition corsDef = new RootBeanDefinition(LinkedHashMap.class);
+			corsDef.setSource(source);
+			corsDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 			if (corsConfigurations != null) {
-				corsConfigurationsDef.getConstructorArgumentValues().addIndexedArgumentValue(0, corsConfigurations);
+				corsDef.getConstructorArgumentValues().addIndexedArgumentValue(0, corsConfigurations);
 			}
-			parserContext.getReaderContext().getRegistry().registerBeanDefinition(CORS_CONFIGURATION_BEAN_NAME, corsConfigurationsDef);
-			parserContext.registerComponent(new BeanComponentDefinition(corsConfigurationsDef, CORS_CONFIGURATION_BEAN_NAME));
+			context.getReaderContext().getRegistry().registerBeanDefinition(CORS_CONFIGURATION_BEAN_NAME, corsDef);
+			context.registerComponent(new BeanComponentDefinition(corsDef, CORS_CONFIGURATION_BEAN_NAME));
 		}
 		else if (corsConfigurations != null) {
-			BeanDefinition corsConfigurationsDef = parserContext.getRegistry().getBeanDefinition(CORS_CONFIGURATION_BEAN_NAME);
-			corsConfigurationsDef.getConstructorArgumentValues().addIndexedArgumentValue(0, corsConfigurations);
+			BeanDefinition corsDef = context.getRegistry().getBeanDefinition(CORS_CONFIGURATION_BEAN_NAME);
+			corsDef.getConstructorArgumentValues().addIndexedArgumentValue(0, corsConfigurations);
 		}
 		return new RuntimeBeanReference(CORS_CONFIGURATION_BEAN_NAME);
 	}
@@ -193,7 +193,7 @@ abstract class MvcNamespaceUtils {
 	 * unless already registered.
 	 */
 	private static void registerHandlerMappingIntrospector(ParserContext parserContext, Object source) {
-		if (!parserContext.getRegistry().containsBeanDefinition(HANDLER_MAPPING_INTROSPECTOR_BEAN_NAME)){
+		if (!parserContext.getRegistry().containsBeanDefinition(HANDLER_MAPPING_INTROSPECTOR_BEAN_NAME)) {
 			RootBeanDefinition beanDef = new RootBeanDefinition(HandlerMappingIntrospector.class);
 			beanDef.setSource(source);
 			beanDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
@@ -206,7 +206,7 @@ abstract class MvcNamespaceUtils {
 	/**
 	 * Find the {@code ContentNegotiationManager} bean created by or registered
 	 * with the {@code annotation-driven} element.
-	 * @return a bean definition, bean reference, or {@code null}
+	 * @return a bean definition, bean reference, or {@code null} if none defined
 	 */
 	public static Object getContentNegotiationManager(ParserContext context) {
 		String name = AnnotationDrivenBeanDefinitionParser.HANDLER_MAPPING_BEAN_NAME;
@@ -220,6 +220,5 @@ abstract class MvcNamespaceUtils {
 		}
 		return null;
 	}
-
 
 }

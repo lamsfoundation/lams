@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -516,7 +516,7 @@ public class PropertyEditorRegistrySupport implements PropertyEditorRegistry {
 			if (endIndex != -1) {
 				String prefix = propertyPath.substring(0, startIndex);
 				String key = propertyPath.substring(startIndex, endIndex + 1);
-				String suffix = propertyPath.substring(endIndex + 1, propertyPath.length());
+				String suffix = propertyPath.substring(endIndex + 1);
 				// Strip the first key.
 				strippedPaths.add(nestedPath + prefix + suffix);
 				// Search for further keys to strip, with the first key stripped.

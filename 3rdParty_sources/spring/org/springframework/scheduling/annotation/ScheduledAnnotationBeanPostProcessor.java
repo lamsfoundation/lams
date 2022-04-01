@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,10 +17,12 @@
 package org.springframework.scheduling.annotation;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
@@ -30,6 +32,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.aop.framework.AopInfrastructureBean;
+import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -53,6 +57,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.MethodIntrospector;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.config.CronTask;
@@ -97,7 +102,7 @@ public class ScheduledAnnotationBeanPostProcessor
 		SmartInitializingSingleton, ApplicationListener<ContextRefreshedEvent>, DisposableBean {
 
 	/**
-	 * The default name of the {@link TaskScheduler} bean to pick up: "taskScheduler".
+	 * The default name of the {@link TaskScheduler} bean to pick up: {@value}.
 	 * <p>Note that the initial lookup happens by type; this is just the fallback
 	 * in case of multiple scheduler beans found in the context.
 	 * @since 4.2
@@ -207,9 +212,11 @@ public class ScheduledAnnotationBeanPostProcessor
 		}
 
 		if (this.beanFactory instanceof ListableBeanFactory) {
-			Map<String, SchedulingConfigurer> configurers =
+			Map<String, SchedulingConfigurer> beans =
 					((ListableBeanFactory) this.beanFactory).getBeansOfType(SchedulingConfigurer.class);
-			for (SchedulingConfigurer configurer : configurers.values()) {
+			List<SchedulingConfigurer> configurers = new ArrayList<SchedulingConfigurer>(beans.values());
+			AnnotationAwareOrderComparator.sort(configurers);
+			for (SchedulingConfigurer configurer : configurers) {
 				configurer.configureTasks(this.registrar);
 			}
 		}
@@ -300,8 +307,13 @@ public class ScheduledAnnotationBeanPostProcessor
 	}
 
 	@Override
-	public Object postProcessAfterInitialization(final Object bean, String beanName) {
-		Class<?> targetClass = AopUtils.getTargetClass(bean);
+	public Object postProcessAfterInitialization(Object bean, String beanName) {
+		if (bean instanceof AopInfrastructureBean) {
+			// Ignore AOP infrastructure such as scoped proxies.
+			return bean;
+		}
+
+		Class<?> targetClass = AopProxyUtils.ultimateTargetClass(bean);
 		if (!this.nonAnnotatedClasses.contains(targetClass)) {
 			Map<Method, Set<Scheduled>> annotatedMethods = MethodIntrospector.selectMethods(targetClass,
 					new MethodIntrospector.MetadataLookup<Set<Scheduled>>() {
@@ -315,7 +327,7 @@ public class ScheduledAnnotationBeanPostProcessor
 			if (annotatedMethods.isEmpty()) {
 				this.nonAnnotatedClasses.add(targetClass);
 				if (logger.isTraceEnabled()) {
-					logger.trace("No @Scheduled annotations found on bean class: " + bean.getClass());
+					logger.trace("No @Scheduled annotations found on bean class: " + targetClass);
 				}
 			}
 			else {
@@ -335,6 +347,12 @@ public class ScheduledAnnotationBeanPostProcessor
 		return bean;
 	}
 
+	/**
+	 * Process the given {@code @Scheduled} method declaration on the given bean.
+	 * @param scheduled the @Scheduled annotation
+	 * @param method the method that the annotation has been declared on
+	 * @param bean the target bean instance
+	 */
 	protected void processScheduled(Scheduled scheduled, Method method, Object bean) {
 		try {
 			Assert.isTrue(method.getParameterTypes().length == 0,

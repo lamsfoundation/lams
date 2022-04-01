@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2015 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,23 +45,25 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	public void registerAlias(String name, String alias) {
 		Assert.hasText(name, "'name' must not be empty");
 		Assert.hasText(alias, "'alias' must not be empty");
-		if (alias.equals(name)) {
-			this.aliasMap.remove(alias);
-		}
-		else {
-			String registeredName = this.aliasMap.get(alias);
-			if (registeredName != null) {
-				if (registeredName.equals(name)) {
-					// An existing alias - no need to re-register
-					return;
-				}
-				if (!allowAliasOverriding()) {
-					throw new IllegalStateException("Cannot register alias '" + alias + "' for name '" +
-							name + "': It is already registered for name '" + registeredName + "'.");
-				}
+		synchronized (this.aliasMap) {
+			if (alias.equals(name)) {
+				this.aliasMap.remove(alias);
 			}
-			checkForAliasCircle(name, alias);
-			this.aliasMap.put(alias, name);
+			else {
+				String registeredName = this.aliasMap.get(alias);
+				if (registeredName != null) {
+					if (registeredName.equals(name)) {
+						// An existing alias - no need to re-register
+						return;
+					}
+					if (!allowAliasOverriding()) {
+						throw new IllegalStateException("Cannot register alias '" + alias + "' for name '" +
+								name + "': It is already registered for name '" + registeredName + "'.");
+					}
+				}
+				checkForAliasCircle(name, alias);
+				this.aliasMap.put(alias, name);
+			}
 		}
 	}
 
@@ -84,7 +86,9 @@ public class SimpleAliasRegistry implements AliasRegistry {
 			String registeredName = entry.getValue();
 			if (registeredName.equals(name)) {
 				String registeredAlias = entry.getKey();
-				return (registeredAlias.equals(alias) || hasAlias(registeredAlias, alias));
+				if (registeredAlias.equals(alias) || hasAlias(registeredAlias, alias)) {
+					return true;
+				}
 			}
 		}
 		return false;
@@ -92,9 +96,11 @@ public class SimpleAliasRegistry implements AliasRegistry {
 
 	@Override
 	public void removeAlias(String alias) {
-		String name = this.aliasMap.remove(alias);
-		if (name == null) {
-			throw new IllegalStateException("No alias '" + alias + "' registered");
+		synchronized (this.aliasMap) {
+			String name = this.aliasMap.remove(alias);
+			if (name == null) {
+				throw new IllegalStateException("No alias '" + alias + "' registered");
+			}
 		}
 	}
 

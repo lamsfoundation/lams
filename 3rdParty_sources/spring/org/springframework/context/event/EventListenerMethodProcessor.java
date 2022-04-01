@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,7 +31,6 @@ import org.springframework.aop.framework.autoproxy.AutoProxyUtils;
 import org.springframework.aop.scope.ScopedObject;
 import org.springframework.aop.scope.ScopedProxyUtils;
 import org.springframework.aop.support.AopUtils;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.context.ApplicationContext;
@@ -45,8 +44,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Register {@link EventListener} annotated method as individual {@link ApplicationListener}
- * instances.
+ * Registers {@link EventListener} methods as individual {@link ApplicationListener} instances.
  *
  * @author Stephane Nicoll
  * @author Juergen Hoeller
@@ -65,7 +63,7 @@ public class EventListenerMethodProcessor implements SmartInitializingSingleton,
 
 
 	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+	public void setApplicationContext(ApplicationContext applicationContext) {
 		Assert.isTrue(applicationContext instanceof ConfigurableApplicationContext,
 				"ApplicationContext does not implement ConfigurableApplicationContext");
 		this.applicationContext = (ConfigurableApplicationContext) applicationContext;
@@ -119,9 +117,9 @@ public class EventListenerMethodProcessor implements SmartInitializingSingleton,
 	 */
 	protected List<EventListenerFactory> getEventListenerFactories() {
 		Map<String, EventListenerFactory> beans = this.applicationContext.getBeansOfType(EventListenerFactory.class);
-		List<EventListenerFactory> allFactories = new ArrayList<EventListenerFactory>(beans.values());
-		AnnotationAwareOrderComparator.sort(allFactories);
-		return allFactories;
+		List<EventListenerFactory> factories = new ArrayList<EventListenerFactory>(beans.values());
+		AnnotationAwareOrderComparator.sort(factories);
+		return factories;
 	}
 
 	protected void processBean(final List<EventListenerFactory> factories, final String beanName, final Class<?> targetType) {

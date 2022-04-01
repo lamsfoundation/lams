@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -75,7 +75,7 @@ class PropertyDescriptorUtils {
 		}
 
 		if (writeMethod != null) {
-			Class<?> params[] = writeMethod.getParameterTypes();
+			Class<?>[] params = writeMethod.getParameterTypes();
 			if (params.length != 1) {
 				throw new IntrospectionException("Bad write method arg count: " + writeMethod);
 			}
@@ -109,7 +109,7 @@ class PropertyDescriptorUtils {
 		Class<?> indexedPropertyType = null;
 
 		if (indexedReadMethod != null) {
-			Class<?> params[] = indexedReadMethod.getParameterTypes();
+			Class<?>[] params = indexedReadMethod.getParameterTypes();
 			if (params.length != 1) {
 				throw new IntrospectionException("Bad indexed read method arg count: " + indexedReadMethod);
 			}
@@ -123,7 +123,7 @@ class PropertyDescriptorUtils {
 		}
 
 		if (indexedWriteMethod != null) {
-			Class<?> params[] = indexedWriteMethod.getParameterTypes();
+			Class<?>[] params = indexedWriteMethod.getParameterTypes();
 			if (params.length != 2) {
 				throw new IntrospectionException("Bad indexed write method arg count: " + indexedWriteMethod);
 			}

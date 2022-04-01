@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,7 +38,7 @@ public class ReplaceOverride extends MethodOverride {
 
 	private final String methodReplacerBeanName;
 
-	private List<String> typeIdentifiers = new LinkedList<String>();
+	private final List<String> typeIdentifiers = new LinkedList<String>();
 
 
 	/**
@@ -48,7 +48,7 @@ public class ReplaceOverride extends MethodOverride {
 	 */
 	public ReplaceOverride(String methodName, String methodReplacerBeanName) {
 		super(methodName);
-		Assert.notNull(methodName, "Method replacer bean name must not be null");
+		Assert.notNull(methodReplacerBeanName, "Method replacer bean name must not be null");
 		this.methodReplacerBeanName = methodReplacerBeanName;
 	}
 
@@ -69,6 +69,7 @@ public class ReplaceOverride extends MethodOverride {
 		this.typeIdentifiers.add(identifier);
 	}
 
+
 	@Override
 	public boolean matches(Method method) {
 		if (!method.getName().equals(getMethodName())) {
@@ -79,12 +80,13 @@ public class ReplaceOverride extends MethodOverride {
 			return true;
 		}
 		// If we get here, we need to insist on precise argument matching...
-		if (this.typeIdentifiers.size() != method.getParameterTypes().length) {
+		Class<?>[] parameterTypes = method.getParameterTypes();
+		if (this.typeIdentifiers.size() != parameterTypes.length) {
 			return false;
 		}
 		for (int i = 0; i < this.typeIdentifiers.size(); i++) {
 			String identifier = this.typeIdentifiers.get(i);
-			if (!method.getParameterTypes()[i].getName().contains(identifier)) {
+			if (!parameterTypes[i].getName().contains(identifier)) {
 				return false;
 			}
 		}

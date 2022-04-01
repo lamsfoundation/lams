@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,6 +21,7 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import java.util.Map;
 
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Helper class that encapsulates the specification of a method parameter, i.e. a {@link Method}
@@ -46,6 +48,8 @@ import org.springframework.util.ClassUtils;
  * @see org.springframework.core.annotation.SynthesizingMethodParameter
  */
 public class MethodParameter {
+
+	private static final Annotation[] EMPTY_ANNOTATION_ARRAY = new Annotation[0];
 
 	private static final Class<?> javaUtilOptionalClass;
 
@@ -68,11 +72,12 @@ public class MethodParameter {
 
 	private final int parameterIndex;
 
-	private int nestingLevel = 1;
+	private int nestingLevel;
 
 	/** Map from Integer level to Integer type index */
 	Map<Integer, Integer> typeIndexesPerLevel;
 
+	/** The containing class. Could also be supplied by overriding {@link #getContainingClass()} */
 	private volatile Class<?> containingClass;
 
 	private volatile Class<?> parameterType;
@@ -334,7 +339,6 @@ public class MethodParameter {
 		return (isOptional() ? nested() : this);
 	}
 
-
 	/**
 	 * Set a containing class to resolve the parameter type against.
 	 */
@@ -342,6 +346,12 @@ public class MethodParameter {
 		this.containingClass = containingClass;
 	}
 
+	/**
+	 * Return the containing class for this method parameter.
+	 * @return a specific containing class (potentially a subclass of the
+	 * declaring class), or otherwise simply the declaring class itself
+	 * @see #getDeclaringClass()
+	 */
 	public Class<?> getContainingClass() {
 		return (this.containingClass != null ? this.containingClass : getDeclaringClass());
 	}
@@ -358,17 +368,20 @@ public class MethodParameter {
 	 * @return the parameter type (never {@code null})
 	 */
 	public Class<?> getParameterType() {
-		if (this.parameterType == null) {
+		Class<?> paramType = this.parameterType;
+		if (paramType == null) {
 			if (this.parameterIndex < 0) {
-				this.parameterType = (this.method != null ? this.method.getReturnType() : null);
+				Method method = getMethod();
+				paramType = (method != null ? method.getReturnType() : void.class);
 			}
 			else {
-				this.parameterType = (this.method != null ?
-					this.method.getParameterTypes()[this.parameterIndex] :
-					this.constructor.getParameterTypes()[this.parameterIndex]);
+				paramType = (this.method != null ?
+						this.method.getParameterTypes()[this.parameterIndex] :
+						this.constructor.getParameterTypes()[this.parameterIndex]);
 			}
+			this.parameterType = paramType;
 		}
-		return this.parameterType;
+		return paramType;
 	}
 
 	/**
@@ -377,17 +390,30 @@ public class MethodParameter {
 	 * @since 3.0
 	 */
 	public Type getGenericParameterType() {
-		if (this.genericParameterType == null) {
+		Type paramType = this.genericParameterType;
+		if (paramType == null) {
 			if (this.parameterIndex < 0) {
-				this.genericParameterType = (this.method != null ? this.method.getGenericReturnType() : null);
+				Method method = getMethod();
+				paramType = (method != null ? method.getGenericReturnType() : void.class);
 			}
 			else {
-				this.genericParameterType = (this.method != null ?
-					this.method.getGenericParameterTypes()[this.parameterIndex] :
-					this.constructor.getGenericParameterTypes()[this.parameterIndex]);
+				Type[] genericParameterTypes = (this.method != null ?
+						this.method.getGenericParameterTypes() : this.constructor.getGenericParameterTypes());
+				int index = this.parameterIndex;
+				if (this.constructor != null && this.constructor.getDeclaringClass().isMemberClass() &&
+						!Modifier.isStatic(this.constructor.getDeclaringClass().getModifiers()) &&
+						genericParameterTypes.length == this.constructor.getParameterTypes().length - 1) {
+					// Bug in javac: type array excludes enclosing instance parameter
+					// for inner classes with at least one generic constructor parameter,
+					// so access it with the actual parameter index lowered by 1
+					index = this.parameterIndex - 1;
+				}
+				paramType = (index >= 0 && index < genericParameterTypes.length ?
+						genericParameterTypes[index] : getParameterType());
 			}
+			this.genericParameterType = paramType;
 		}
-		return this.genericParameterType;
+		return paramType;
 	}
 
 	/**
@@ -476,17 +502,23 @@ public class MethodParameter {
 	 * Return the annotations associated with the specific method/constructor parameter.
 	 */
 	public Annotation[] getParameterAnnotations() {
-		if (this.parameterAnnotations == null) {
+		Annotation[] paramAnns = this.parameterAnnotations;
+		if (paramAnns == null) {
 			Annotation[][] annotationArray = (this.method != null ?
 					this.method.getParameterAnnotations() : this.constructor.getParameterAnnotations());
-			if (this.parameterIndex >= 0 && this.parameterIndex < annotationArray.length) {
-				this.parameterAnnotations = adaptAnnotationArray(annotationArray[this.parameterIndex]);
+			int index = this.parameterIndex;
+			if (this.constructor != null && this.constructor.getDeclaringClass().isMemberClass() &&
+					!Modifier.isStatic(this.constructor.getDeclaringClass().getModifiers()) &&
+					annotationArray.length == this.constructor.getParameterTypes().length - 1) {
+				// Bug in javac in JDK <9: annotation array excludes enclosing instance parameter
+				// for inner classes, so access it with the actual parameter index lowered by 1
+				index = this.parameterIndex - 1;
 			}
-			else {
-				this.parameterAnnotations = new Annotation[0];
-			}
+			paramAnns = (index >= 0 && index < annotationArray.length ?
+					adaptAnnotationArray(annotationArray[index]) : EMPTY_ANNOTATION_ARRAY);
+			this.parameterAnnotations = paramAnns;
 		}
-		return this.parameterAnnotations;
+		return paramAnns;
 	}
 
 	/**
@@ -588,7 +620,11 @@ public class MethodParameter {
 			return false;
 		}
 		MethodParameter otherParam = (MethodParameter) other;
-		return (this.parameterIndex == otherParam.parameterIndex && getMember().equals(otherParam.getMember()));
+		return (getContainingClass() == otherParam.getContainingClass() &&
+				ObjectUtils.nullSafeEquals(this.typeIndexesPerLevel, otherParam.typeIndexesPerLevel) &&
+				this.nestingLevel == otherParam.nestingLevel &&
+				this.parameterIndex == otherParam.parameterIndex &&
+				getMember().equals(otherParam.getMember()));
 	}
 
 	@Override

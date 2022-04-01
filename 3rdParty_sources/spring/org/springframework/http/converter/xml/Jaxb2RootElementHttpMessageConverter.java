@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -54,9 +54,8 @@ import org.springframework.util.ClassUtils;
  * {@link XmlType}, and write classes annotated with {@link XmlRootElement},
  * or subclasses thereof.
  *
- * <p>Note that if using Spring's Marshaller/Unmarshaller abstractions from the
- * {@code spring-oxm} module you should can the
- * {@link MarshallingHttpMessageConverter} instead.
+ * <p>Note: When using Spring's Marshaller/Unmarshaller abstractions from {@code spring-oxm},
+ * you should use the {@link MarshallingHttpMessageConverter} instead.
  *
  * @author Arjen Poutsma
  * @author Sebastien Deleuze
@@ -72,7 +71,7 @@ public class Jaxb2RootElementHttpMessageConverter extends AbstractJaxb2HttpMessa
 
 
 	/**
-	 * Indicates whether DTD parsing should be supported.
+	 * Indicate whether DTD parsing should be supported.
 	 * <p>Default is {@code false} meaning that DTD is disabled.
 	 */
 	public void setSupportDtd(boolean supportDtd) {
@@ -80,14 +79,14 @@ public class Jaxb2RootElementHttpMessageConverter extends AbstractJaxb2HttpMessa
 	}
 
 	/**
-	 * Whether DTD parsing is supported.
+	 * Return whether DTD parsing is supported.
 	 */
 	public boolean isSupportDtd() {
 		return this.supportDtd;
 	}
 
 	/**
-	 * Indicates whether external XML entities are processed when converting to a Source.
+	 * Indicate whether external XML entities are processed when converting to a Source.
 	 * <p>Default is {@code false}, meaning that external entities are not resolved.
 	 * <p><strong>Note:</strong> setting this option to {@code true} also
 	 * automatically sets {@link #setSupportDtd} to {@code true}.
@@ -100,7 +99,7 @@ public class Jaxb2RootElementHttpMessageConverter extends AbstractJaxb2HttpMessa
 	}
 
 	/**
-	 * Returns the configured value for whether XML external entities are allowed.
+	 * Return whether XML external entities are allowed.
 	 */
 	public boolean isProcessExternalEntities() {
 		return this.processExternalEntities;
@@ -146,10 +145,9 @@ public class Jaxb2RootElementHttpMessageConverter extends AbstractJaxb2HttpMessa
 		}
 		catch (UnmarshalException ex) {
 			throw new HttpMessageNotReadableException("Could not unmarshal to [" + clazz + "]: " + ex.getMessage(), ex);
-
 		}
 		catch (JAXBException ex) {
-			throw new HttpMessageConversionException("Could not instantiate JAXBContext: " + ex.getMessage(), ex);
+			throw new HttpMessageConversionException("Invalid JAXB setup: " + ex.getMessage(), ex);
 		}
 	}
 
@@ -189,7 +187,7 @@ public class Jaxb2RootElementHttpMessageConverter extends AbstractJaxb2HttpMessa
 			throw new HttpMessageNotWritableException("Could not marshal [" + o + "]: " + ex.getMessage(), ex);
 		}
 		catch (JAXBException ex) {
-			throw new HttpMessageConversionException("Could not instantiate JAXBContext: " + ex.getMessage(), ex);
+			throw new HttpMessageConversionException("Invalid JAXB setup: " + ex.getMessage(), ex);
 		}
 	}
 

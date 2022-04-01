@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -47,7 +47,7 @@ public class ByteArrayResource extends AbstractResource {
 
 
 	/**
-	 * Create a new ByteArrayResource.
+	 * Create a new {@code ByteArrayResource}.
 	 * @param byteArray the byte array to wrap
 	 */
 	public ByteArrayResource(byte[] byteArray) {
@@ -55,7 +55,7 @@ public class ByteArrayResource extends AbstractResource {
 	}
 
 	/**
-	 * Create a new ByteArrayResource.
+	 * Create a new {@code ByteArrayResource} with a description.
 	 * @param byteArray the byte array to wrap
 	 * @param description where the byte array comes from
 	 */
@@ -65,13 +65,13 @@ public class ByteArrayResource extends AbstractResource {
 		this.description = (description != null ? description : "");
 	}
 
+
 	/**
 	 * Return the underlying byte array.
 	 */
 	public final byte[] getByteArray() {
 		return this.byteArray;
 	}
-
 
 	/**
 	 * This implementation always returns {@code true}.

@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -149,10 +149,8 @@ public class CodeFlow implements Opcodes {
 	 * Return the descriptor for the item currently on top of the stack (in the current scope).
 	 */
 	public String lastDescriptor() {
-		if (this.compilationScopes.peek().isEmpty()) {
-			return null;
-		}
-		return this.compilationScopes.peek().get(this.compilationScopes.peek().size() - 1);
+		ArrayList<String> scopes = this.compilationScopes.peek();
+		return (!scopes.isEmpty() ? scopes.get(scopes.size() - 1) : null);
 	}
 
 	/**
@@ -161,7 +159,7 @@ public class CodeFlow implements Opcodes {
 	 * @param mv the visitor into which new instructions should be inserted
 	 */
 	public void unboxBooleanIfNecessary(MethodVisitor mv) {
-		if (lastDescriptor().equals("Ljava/lang/Boolean")) {
+		if ("Ljava/lang/Boolean".equals(lastDescriptor())) {
 			mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z", false);
 		}
 	}
@@ -341,72 +339,72 @@ public class CodeFlow implements Opcodes {
 	public static void insertAnyNecessaryTypeConversionBytecodes(MethodVisitor mv, char targetDescriptor, String stackDescriptor) {
 		if (CodeFlow.isPrimitive(stackDescriptor)) {
 			char stackTop = stackDescriptor.charAt(0);
-			if (stackTop=='I' || stackTop=='B' || stackTop=='S' || stackTop=='C') {
-				if (targetDescriptor=='D') {
+			if (stackTop == 'I' || stackTop == 'B' || stackTop == 'S' || stackTop == 'C') {
+				if (targetDescriptor == 'D') {
 					mv.visitInsn(I2D);
 				}
-				else if (targetDescriptor=='F') {
+				else if (targetDescriptor == 'F') {
 					mv.visitInsn(I2F);
 				}
-				else if (targetDescriptor=='J') {
+				else if (targetDescriptor == 'J') {
 					mv.visitInsn(I2L);
 				}
-				else if (targetDescriptor=='I') {
+				else if (targetDescriptor == 'I') {
 					// nop
 				}
 				else {
-					throw new IllegalStateException("cannot get from "+stackTop+" to "+targetDescriptor);
+					throw new IllegalStateException("Cannot get from " + stackTop + " to " + targetDescriptor);
 				}
 			}
-			else if (stackTop=='J') {
-				if (targetDescriptor=='D') {
+			else if (stackTop == 'J') {
+				if (targetDescriptor == 'D') {
 					mv.visitInsn(L2D);
 				}
-				else if (targetDescriptor=='F') {
+				else if (targetDescriptor == 'F') {
 					mv.visitInsn(L2F);
 				}
-				else if (targetDescriptor=='J') {
+				else if (targetDescriptor == 'J') {
 					// nop
 				}
-				else if (targetDescriptor=='I') {
+				else if (targetDescriptor == 'I') {
 					mv.visitInsn(L2I);
 				}
 				else {
-					throw new IllegalStateException("cannot get from "+stackTop+" to "+targetDescriptor);
+					throw new IllegalStateException("Cannot get from " + stackTop + " to " + targetDescriptor);
 				}
 			}
-			else if (stackTop=='F') {
-				if (targetDescriptor=='D') {
+			else if (stackTop == 'F') {
+				if (targetDescriptor == 'D') {
 					mv.visitInsn(F2D);
 				}
-				else if (targetDescriptor=='F') {
+				else if (targetDescriptor == 'F') {
 					// nop
 				}
-				else if (targetDescriptor=='J') {
+				else if (targetDescriptor == 'J') {
 					mv.visitInsn(F2L);
 				}
-				else if (targetDescriptor=='I') {
+				else if (targetDescriptor == 'I') {
 					mv.visitInsn(F2I);
 				}
 				else {
-					throw new IllegalStateException("cannot get from "+stackTop+" to "+targetDescriptor);
+					throw new IllegalStateException("Cannot get from " + stackTop + " to " + targetDescriptor);
 				}
 			}
-			else if (stackTop=='D') {
-				if (targetDescriptor=='D') {
+			else if (stackTop == 'D') {
+				if (targetDescriptor == 'D') {
 					// nop
 				}
-				else if (targetDescriptor=='F') {
+				else if (targetDescriptor == 'F') {
 					mv.visitInsn(D2F);
 				}
-				else if (targetDescriptor=='J') {
+				else if (targetDescriptor == 'J') {
 					mv.visitInsn(D2L);
 				}
-				else if (targetDescriptor=='I') {
+				else if (targetDescriptor == 'I') {
 					mv.visitInsn(D2I);
 				}
 				else {
-					throw new IllegalStateException("cannot get from "+stackDescriptor+" to "+targetDescriptor);
+					throw new IllegalStateException("Cannot get from " + stackDescriptor + " to " + targetDescriptor);
 				}
 			}
 		}
@@ -471,20 +469,14 @@ public class CodeFlow implements Opcodes {
 			}
 		}
 		if (clazz.isPrimitive()) {
-			if (clazz == Void.TYPE) {
-				sb.append('V');
-			}
-			else if (clazz == Integer.TYPE) {
-				sb.append('I');
-			}
-			else if (clazz == Boolean.TYPE) {
+			if (clazz == Boolean.TYPE) {
 				sb.append('Z');
+			}
+			else if (clazz == Byte.TYPE) {
+				sb.append('B');
 			}
 			else if (clazz == Character.TYPE) {
 				sb.append('C');
-			}
-			else if (clazz == Long.TYPE) {
-				sb.append('J');
 			}
 			else if (clazz == Double.TYPE) {
 				sb.append('D');
@@ -492,11 +484,17 @@ public class CodeFlow implements Opcodes {
 			else if (clazz == Float.TYPE) {
 				sb.append('F');
 			}
-			else if (clazz == Byte.TYPE) {
-				sb.append('B');
+			else if (clazz == Integer.TYPE) {
+				sb.append('I');
+			}
+			else if (clazz == Long.TYPE) {
+				sb.append('J');
 			}
 			else if (clazz == Short.TYPE) {
 				sb.append('S');
+			}
+			else if (clazz == Void.TYPE) {
+				sb.append('V');
 			}
 		}
 		else {
@@ -523,24 +521,27 @@ public class CodeFlow implements Opcodes {
 	}
 
 	/**
+	 * Determine whether the descriptor is for a boolean primitive or boolean reference type.
 	 * @param descriptor type descriptor
-	 * @return {@code true} if the descriptor is for a boolean primitive or boolean reference type
+	 * @return {@code true} if the descriptor is boolean compatible
 	 */
 	public static boolean isBooleanCompatible(String descriptor) {
 		return (descriptor != null && (descriptor.equals("Z") || descriptor.equals("Ljava/lang/Boolean")));
 	}
 
 	/**
+	 * Determine whether the descriptor is for a primitive type.
 	 * @param descriptor type descriptor
-	 * @return {@code true} if the descriptor is for a primitive type
+	 * @return {@code true} if a primitive type
 	 */
 	public static boolean isPrimitive(String descriptor) {
 		return (descriptor != null && descriptor.length() == 1);
 	}
 
 	/**
+	 * Determine whether the descriptor is for a primitive array (e.g. "[[I").
 	 * @param descriptor the descriptor for a possible primitive array
-	 * @return {@code true} if the descriptor is for a primitive array (e.g. "[[I")
+	 * @return {@code true} if the descriptor a primitive array
 	 */
 	public static boolean isPrimitiveArray(String descriptor) {
 		boolean primitive = true;
@@ -556,8 +557,8 @@ public class CodeFlow implements Opcodes {
 	}
 
 	/**
-	 * Determine if boxing/unboxing can get from one type to the other. Assumes at least
-	 * one of the types is in boxed form (i.e. single char descriptor).
+	 * Determine whether boxing/unboxing can get from one type to the other.
+	 * Assumes at least one of the types is in boxed form (i.e. single char descriptor).
 	 * @return {@code true} if it is possible to get (via boxing) from one descriptor to the other
 	 */
 	public static boolean areBoxingCompatible(String desc1, String desc2) {
@@ -652,6 +653,7 @@ public class CodeFlow implements Opcodes {
 	}
 
 	/**
+	 * Convert a type descriptor to the single character primitive descriptor.
 	 * @param descriptor a descriptor for a type that should have a primitive representation
 	 * @return the single character descriptor for a primitive input descriptor
 	 */
@@ -767,9 +769,8 @@ public class CodeFlow implements Opcodes {
 	}
 
 	/**
-	 * Deduce the descriptor for a type. Descriptors are like JVM type names but missing
-	 * the trailing ';' so for Object the descriptor is "Ljava/lang/Object" for int it is
-	 * "I".
+	 * Deduce the descriptor for a type. Descriptors are like JVM type names but missing the
+	 * trailing ';' so for Object the descriptor is "Ljava/lang/Object" for int it is "I".
 	 * @param type the type (may be primitive) for which to determine the descriptor
 	 * @return the descriptor
 	 */
@@ -893,16 +894,33 @@ public class CodeFlow implements Opcodes {
 	public static void insertArrayStore(MethodVisitor mv, String arrayElementType) {
 		if (arrayElementType.length()==1) {
 			switch (arrayElementType.charAt(0)) {
-				case 'I': mv.visitInsn(IASTORE); break;
-				case 'J': mv.visitInsn(LASTORE); break;
-				case 'F': mv.visitInsn(FASTORE); break;
-				case 'D': mv.visitInsn(DASTORE); break;
-				case 'B': mv.visitInsn(BASTORE); break;
-				case 'C': mv.visitInsn(CASTORE); break;
-				case 'S': mv.visitInsn(SASTORE); break;
-				case 'Z': mv.visitInsn(BASTORE); break;
+				case 'I':
+					mv.visitInsn(IASTORE);
+					break;
+				case 'J':
+					mv.visitInsn(LASTORE);
+					break;
+				case 'F':
+					mv.visitInsn(FASTORE);
+					break;
+				case 'D':
+					mv.visitInsn(DASTORE);
+					break;
+				case 'B':
+					mv.visitInsn(BASTORE);
+					break;
+				case 'C':
+					mv.visitInsn(CASTORE);
+					break;
+				case 'S':
+					mv.visitInsn(SASTORE);
+					break;
+				case 'Z':
+					mv.visitInsn(BASTORE);
+					break;
 				default:
-					throw new IllegalArgumentException("Unexpected arraytype "+arrayElementType.charAt(0));
+					throw new IllegalArgumentException(
+							"Unexpected arraytype " + arrayElementType.charAt(0));
 			}
 		}
 		else {
@@ -926,19 +944,21 @@ public class CodeFlow implements Opcodes {
 			case 'S': return T_SHORT;
 			case 'Z': return T_BOOLEAN;
 			default:
-				throw new IllegalArgumentException("Unexpected arraytype "+arraytype.charAt(0));
+				throw new IllegalArgumentException("Unexpected arraytype " + arraytype.charAt(0));
 		}
 	}
 
 	/**
-	 * @return true if the supplied array type has a core component reference type
+	 * Return if the supplied array type has a core component reference type.
 	 */
 	public static boolean isReferenceTypeArray(String arraytype) {
 		int length = arraytype.length();
 		for (int i = 0; i < length; i++) {
 			char ch = arraytype.charAt(i);
-			if (ch == '[') continue;
-			return ch=='L';
+			if (ch == '[') {
+				continue;
+			}
+			return (ch == 'L');
 		}
 		return false;
 	}
@@ -958,10 +978,10 @@ public class CodeFlow implements Opcodes {
 		}
 		else {
 			if (arraytype.charAt(0) == '[') {
-				// Handling the nested array case here. If vararg
-				// is [[I then we want [I and not [I;
+				// Handling the nested array case here.
+				// If vararg is [[I then we want [I and not [I;
 				if (CodeFlow.isReferenceTypeArray(arraytype)) {
-					mv.visitTypeInsn(ANEWARRAY, arraytype+";");
+					mv.visitTypeInsn(ANEWARRAY, arraytype + ";");
 				}
 				else {
 					mv.visitTypeInsn(ANEWARRAY, arraytype);
@@ -993,13 +1013,36 @@ public class CodeFlow implements Opcodes {
 		}
 	}
 
+	public static String toBoxedDescriptor(String primitiveDescriptor) {
+		switch (primitiveDescriptor.charAt(0)) {
+			case 'I': return "Ljava/lang/Integer";
+			case 'J': return "Ljava/lang/Long";
+			case 'F': return "Ljava/lang/Float";
+			case 'D': return "Ljava/lang/Double";
+			case 'B': return "Ljava/lang/Byte";
+			case 'C': return "Ljava/lang/Character";
+			case 'S': return "Ljava/lang/Short";
+			case 'Z': return "Ljava/lang/Boolean";
+			default:
+				throw new IllegalArgumentException("Unexpected non primitive descriptor " + primitiveDescriptor);
+		}
+	}
 
+
+	/**
+	 * Interface used to generate fields.
+	 */
+	@FunctionalInterface
 	public interface FieldAdder {
 
 		void generateField(ClassWriter cw, CodeFlow codeflow);
 	}
 
 
+	/**
+	 * Interface used to generate {@code clinit} static initializer blocks.
+	 */
+	@FunctionalInterface
 	public interface ClinitAdder {
 
 		void generateCode(MethodVisitor mv, CodeFlow codeflow);

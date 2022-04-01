@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,7 +35,7 @@ import java.util.TimeZone;
  * Miscellaneous {@link String} utility methods.
  *
  * <p>Mainly for internal use within the framework; consider
- * <a href="http://commons.apache.org/proper/commons-lang/">Apache's Commons Lang</a>
+ * <a href="https://commons.apache.org/proper/commons-lang/">Apache's Commons Lang</a>
  * for a more comprehensive suite of {@code String} utilities.
  *
  * <p>This class delivers some simple functionality that should really be
@@ -135,17 +135,7 @@ public abstract class StringUtils {
 	 * @see Character#isWhitespace
 	 */
 	public static boolean hasText(CharSequence str) {
-		if (!hasLength(str)) {
-			return false;
-		}
-
-		int strLen = str.length();
-		for (int i = 0; i < strLen; i++) {
-			if (!Character.isWhitespace(str.charAt(i))) {
-				return true;
-			}
-		}
-		return false;
+		return (hasLength(str) && containsText(str));
 	}
 
 	/**
@@ -159,7 +149,17 @@ public abstract class StringUtils {
 	 * @see #hasText(CharSequence)
 	 */
 	public static boolean hasText(String str) {
-		return (str != null && !str.isEmpty() && hasText((CharSequence) str));
+		return (hasLength(str) && containsText(str));
+	}
+
+	private static boolean containsText(CharSequence str) {
+		int strLen = str.length();
+		for (int i = 0; i < strLen; i++) {
+			if (!Character.isWhitespace(str.charAt(i))) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -310,7 +310,6 @@ public abstract class StringUtils {
 		return sb.toString();
 	}
 
-
 	/**
 	 * Test if the given {@code String} starts with the specified prefix,
 	 * ignoring upper/lower case.
@@ -319,19 +318,8 @@ public abstract class StringUtils {
 	 * @see java.lang.String#startsWith
 	 */
 	public static boolean startsWithIgnoreCase(String str, String prefix) {
-		if (str == null || prefix == null) {
-			return false;
-		}
-		if (str.startsWith(prefix)) {
-			return true;
-		}
-		if (str.length() < prefix.length()) {
-			return false;
-		}
-
-		String lcStr = str.substring(0, prefix.length()).toLowerCase();
-		String lcPrefix = prefix.toLowerCase();
-		return lcStr.equals(lcPrefix);
+		return (str != null && prefix != null && str.length() >= prefix.length() &&
+				str.regionMatches(true, 0, prefix, 0, prefix.length()));
 	}
 
 	/**
@@ -342,19 +330,8 @@ public abstract class StringUtils {
 	 * @see java.lang.String#endsWith
 	 */
 	public static boolean endsWithIgnoreCase(String str, String suffix) {
-		if (str == null || suffix == null) {
-			return false;
-		}
-		if (str.endsWith(suffix)) {
-			return true;
-		}
-		if (str.length() < suffix.length()) {
-			return false;
-		}
-
-		String lcStr = str.substring(str.length() - suffix.length()).toLowerCase();
-		String lcSuffix = suffix.toLowerCase();
-		return lcStr.equals(lcSuffix);
+		return (str != null && suffix != null && str.length() >= suffix.length() &&
+				str.regionMatches(true, str.length() - suffix.length(), suffix, 0, suffix.length()));
 	}
 
 	/**
@@ -365,9 +342,11 @@ public abstract class StringUtils {
 	 * @param substring the substring to match at the given index
 	 */
 	public static boolean substringMatch(CharSequence str, int index, CharSequence substring) {
-		for (int j = 0; j < substring.length(); j++) {
-			int i = index + j;
-			if (i >= str.length() || str.charAt(i) != substring.charAt(j)) {
+		if (index + substring.length() > str.length()) {
+			return false;
+		}
+		for (int i = 0; i < substring.length(); i++) {
+			if (str.charAt(index + i) != substring.charAt(i)) {
 				return false;
 			}
 		}
@@ -420,14 +399,14 @@ public abstract class StringUtils {
 		int pos = 0;  // our position in the old string
 		int patLen = oldPattern.length();
 		while (index >= 0) {
-			sb.append(inString.substring(pos, index));
+			sb.append(inString, pos, index);
 			sb.append(newPattern);
 			pos = index + patLen;
 			index = inString.indexOf(oldPattern, pos);
 		}
 
 		// append any characters to the right of a match
-		sb.append(inString.substring(pos));
+		sb.append(inString, pos, inString.length());
 		return sb.toString();
 	}
 
@@ -655,11 +634,11 @@ public abstract class StringUtils {
 		// first path element. This is necessary to correctly parse paths like
 		// "file:core/../core/io/Resource.class", where the ".." should just
 		// strip the first "core" directory while keeping the "file:" prefix.
-		int prefixIndex = pathToUse.indexOf(":");
+		int prefixIndex = pathToUse.indexOf(':');
 		String prefix = "";
 		if (prefixIndex != -1) {
 			prefix = pathToUse.substring(0, prefixIndex + 1);
-			if (prefix.contains("/")) {
+			if (prefix.contains(FOLDER_SEPARATOR)) {
 				prefix = "";
 			}
 			else {
@@ -715,11 +694,11 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Parse the given {@code localeString} value into a {@link Locale}.
+	 * Parse the given {@code String} representation into a {@link Locale}.
 	 * <p>This is the inverse operation of {@link Locale#toString Locale's toString}.
-	 * @param localeString the locale {@code String}, following {@code Locale's}
-	 * {@code toString()} format ("en", "en_UK", etc);
-	 * also accepts spaces as separators, as an alternative to underscores
+	 * @param localeString the locale {@code String}: following {@code Locale's}
+	 * {@code toString()} format ("en", "en_UK", etc), also accepting spaces as
+	 * separators (as an alternative to underscores)
 	 * @return a corresponding {@code Locale} instance, or {@code null} if none
 	 * @throws IllegalArgumentException in case of an invalid locale specification
 	 */
@@ -787,6 +766,32 @@ public abstract class StringUtils {
 	//---------------------------------------------------------------------
 
 	/**
+	 * Copy the given {@link Collection} into a {@code String} array.
+	 * <p>The {@code Collection} must contain {@code String} elements only.
+	 * @param collection the {@code Collection} to copy
+	 * @return the resulting {@code String} array
+	 */
+	public static String[] toStringArray(Collection<String> collection) {
+		if (collection == null) {
+			return null;
+		}
+		return collection.toArray(new String[collection.size()]);
+	}
+
+	/**
+	 * Copy the given {@link Enumeration} into a {@code String} array.
+	 * <p>The {@code Enumeration} must contain {@code String} elements only.
+	 * @param enumeration the {@code Enumeration} to copy
+	 * @return the resulting {@code String} array
+	 */
+	public static String[] toStringArray(Enumeration<String> enumeration) {
+		if (enumeration == null) {
+			return null;
+		}
+		return toStringArray(Collections.list(enumeration));
+	}
+
+	/**
 	 * Append the given {@code String} to the given {@code String} array,
 	 * returning a new array consisting of the input array contents plus
 	 * the given {@code String}.
@@ -836,7 +841,10 @@ public abstract class StringUtils {
 	 * @param array1 the first array (can be {@code null})
 	 * @param array2 the second array (can be {@code null})
 	 * @return the new array ({@code null} if both given arrays were {@code null})
+	 * @deprecated as of 4.3.15, in favor of manual merging via {@link LinkedHashSet}
+	 * (with every entry included at most once, even entries within the first array)
 	 */
+	@Deprecated
 	public static String[] mergeStringArrays(String[] array1, String[] array2) {
 		if (ObjectUtils.isEmpty(array1)) {
 			return array2;
@@ -856,8 +864,8 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Turn given source {@code String} array into sorted array.
-	 * @param array the source array
+	 * Sort the given {@code String} array if necessary.
+	 * @param array the original array
 	 * @return the sorted array (never {@code null})
 	 */
 	public static String[] sortStringArray(String[] array) {
@@ -867,35 +875,6 @@ public abstract class StringUtils {
 
 		Arrays.sort(array);
 		return array;
-	}
-
-	/**
-	 * Copy the given {@code Collection} into a {@code String} array.
-	 * <p>The {@code Collection} must contain {@code String} elements only.
-	 * @param collection the {@code Collection} to copy
-	 * @return the {@code String} array
-	 */
-	public static String[] toStringArray(Collection<String> collection) {
-		if (collection == null) {
-			return null;
-		}
-
-		return collection.toArray(new String[collection.size()]);
-	}
-
-	/**
-	 * Copy the given Enumeration into a {@code String} array.
-	 * The Enumeration must contain {@code String} elements only.
-	 * @param enumeration the Enumeration to copy
-	 * @return the {@code String} array
-	 */
-	public static String[] toStringArray(Enumeration<String> enumeration) {
-		if (enumeration == null) {
-			return null;
-		}
-
-		List<String> list = Collections.list(enumeration);
-		return list.toArray(new String[list.size()]);
 	}
 
 	/**
@@ -960,10 +939,9 @@ public abstract class StringUtils {
 
 	/**
 	 * Take an array of strings and split each element based on the given delimiter.
-	 * A {@code Properties} instance is then generated, with the left of the
-	 * delimiter providing the key, and the right of the delimiter providing the value.
-	 * <p>Will trim both the key and value before adding them to the
-	 * {@code Properties} instance.
+	 * A {@code Properties} instance is then generated, with the left of the delimiter
+	 * providing the key, and the right of the delimiter providing the value.
+	 * <p>Will trim both the key and value before adding them to the {@code Properties}.
 	 * @param array the array to process
 	 * @param delimiter to split each element using (typically the equals symbol)
 	 * @return a {@code Properties} instance representing the array contents,

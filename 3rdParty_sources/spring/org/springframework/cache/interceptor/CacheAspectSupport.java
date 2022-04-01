@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -50,25 +50,24 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Base class for caching aspects, such as the {@link CacheInterceptor}
- * or an AspectJ aspect.
+ * Base class for caching aspects, such as the {@link CacheInterceptor} or an
+ * AspectJ aspect.
  *
- * <p>This enables the underlying Spring caching infrastructure to be
- * used easily to implement an aspect for any aspect system.
+ * <p>This enables the underlying Spring caching infrastructure to be used easily
+ * to implement an aspect for any aspect system.
  *
- * <p>Subclasses are responsible for calling methods in this class in
- * the correct order.
+ * <p>Subclasses are responsible for calling relevant methods in the correct order.
  *
- * <p>Uses the <b>Strategy</b> design pattern. A {@link CacheResolver}
- * implementation will resolve the actual cache(s) to use, and a
- * {@link CacheOperationSource} is used for determining caching
- * operations.
+ * <p>Uses the <b>Strategy</b> design pattern. A {@link CacheOperationSource} is
+ * used for determining caching operations, a {@link KeyGenerator} will build the
+ * cache keys, and a {@link CacheResolver} will resolve the actual cache(s) to use.
  *
- * <p>A cache aspect is serializable if its {@code CacheResolver} and
- * {@code CacheOperationSource} are serializable.
+ * <p>Note: A cache aspect is serializable but does not perform any actual caching
+ * after deserialization.
  *
  * @author Costin Leau
  * @author Juergen Hoeller
@@ -132,7 +131,7 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 	/**
 	 * Set the default {@link KeyGenerator} that this cache aspect should delegate to
 	 * if no specific key generator has been set for the operation.
-	 * <p>The default is a {@link SimpleKeyGenerator}
+	 * <p>The default is a {@link SimpleKeyGenerator}.
 	 */
 	public void setKeyGenerator(KeyGenerator keyGenerator) {
 		this.keyGenerator = keyGenerator;
@@ -146,21 +145,11 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 	}
 
 	/**
-	 * Set the {@link CacheManager} to use to create a default {@link CacheResolver}.
-	 * Replace the current {@link CacheResolver}, if any.
-	 * @see #setCacheResolver(CacheResolver)
-	 * @see SimpleCacheResolver
-	 */
-	public void setCacheManager(CacheManager cacheManager) {
-		this.cacheResolver = new SimpleCacheResolver(cacheManager);
-	}
-
-	/**
 	 * Set the default {@link CacheResolver} that this cache aspect should delegate
 	 * to if no specific cache resolver has been set for the operation.
 	 * <p>The default resolver resolves the caches against their names and the
 	 * default cache manager.
-	 * @see #setCacheManager(org.springframework.cache.CacheManager)
+	 * @see #setCacheManager
 	 * @see SimpleCacheResolver
 	 */
 	public void setCacheResolver(CacheResolver cacheResolver) {
@@ -172,6 +161,16 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 	 */
 	public CacheResolver getCacheResolver() {
 		return this.cacheResolver;
+	}
+
+	/**
+	 * Set the {@link CacheManager} to use to create a default {@link CacheResolver}.
+	 * Replace the current {@link CacheResolver}, if any.
+	 * @see #setCacheResolver
+	 * @see SimpleCacheResolver
+	 */
+	public void setCacheManager(CacheManager cacheManager) {
+		this.cacheResolver = new SimpleCacheResolver(cacheManager);
 	}
 
 	/**
@@ -209,8 +208,7 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 			}
 			catch (NoUniqueBeanDefinitionException ex) {
 				throw new IllegalStateException("No CacheResolver specified, and no unique bean of type " +
-						"CacheManager found. Mark one as primary (or give it the name 'cacheManager') or " +
-						"declare a specific CacheManager to use, that serves as the default one.");
+						"CacheManager found. Mark one as primary or declare a specific CacheManager to use.");
 			}
 			catch (NoSuchBeanDefinitionException ex) {
 				throw new IllegalStateException("No CacheResolver specified, and no bean of type CacheManager found. " +
@@ -301,9 +299,9 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 	 * @param expectedType type for the bean
 	 * @return the bean matching that name
 	 * @throws org.springframework.beans.factory.NoSuchBeanDefinitionException if such bean does not exist
-	 * @see CacheOperation#keyGenerator
-	 * @see CacheOperation#cacheManager
-	 * @see CacheOperation#cacheResolver
+	 * @see CacheOperation#getKeyGenerator()
+	 * @see CacheOperation#getCacheManager()
+	 * @see CacheOperation#getCacheResolver()
 	 */
 	protected <T> T getBean(String beanName, Class<T> expectedType) {
 		return BeanFactoryAnnotationUtils.qualifiedBeanOfType(this.beanFactory, expectedType, beanName);
@@ -332,8 +330,8 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 
 	/**
 	 * Execute the underlying operation (typically in case of cache miss) and return
-	 * the result of the invocation. If an exception occurs it will be wrapped in
-	 * a {@link CacheOperationInvoker.ThrowableWrapper}: the exception can be handled
+	 * the result of the invocation. If an exception occurs it will be wrapped in a
+	 * {@link CacheOperationInvoker.ThrowableWrapper}: the exception can be handled
 	 * or modified but it <em>must</em> be wrapped in a
 	 * {@link CacheOperationInvoker.ThrowableWrapper} as well.
 	 * @param invoker the invoker handling the operation being cached
@@ -368,9 +366,9 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 					}));
 				}
 				catch (Cache.ValueRetrievalException ex) {
-					// The invoker wraps any Throwable in a ThrowableWrapper instance so we
-					// can just make sure that one bubbles up the stack.
-					throw (CacheOperationInvoker.ThrowableWrapper) ex.getCause();
+					// Directly propagate ThrowableWrapper from the invoker,
+					// or potentially also an IllegalArgumentException etc.
+					ReflectionUtils.rethrowRuntimeException(ex.getCause());
 				}
 			}
 			else {
@@ -653,6 +651,9 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 	}
 
 
+	/**
+	 * A {@link CacheOperationInvocationContext} context for a {@link CacheOperation}.
+	 */
 	protected class CacheOperationContext implements CacheOperationInvocationContext<CacheOperation> {
 
 		private final CacheOperationMetadata metadata;

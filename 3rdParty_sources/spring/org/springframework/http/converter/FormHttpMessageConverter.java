@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -61,20 +61,22 @@ import org.springframework.util.StringUtils;
  *
  * <p>For example, the following snippet shows how to submit an HTML form:
  * <pre class="code">
- * RestTemplate template = new RestTemplate();  // FormHttpMessageConverter is configured by default
- * MultiValueMap&lt;String, String&gt; form = new LinkedMultiValueMap&lt;String, String&gt;();
+ * RestTemplate template = new RestTemplate();
+ * // AllEncompassingFormHttpMessageConverter is configured by default
+ *
+ * MultiValueMap&lt;String, String&gt; form = new LinkedMultiValueMap&lt;&gt;();
  * form.add("field 1", "value 1");
  * form.add("field 2", "value 2");
  * form.add("field 2", "value 3");
- * template.postForLocation("http://example.com/myForm", form);
+ * template.postForLocation("https://example.com/myForm", form);
  * </pre>
  *
  * <p>The following snippet shows how to do a file upload:
  * <pre class="code">
- * MultiValueMap&lt;String, Object&gt; parts = new LinkedMultiValueMap&lt;String, Object&gt;();
+ * MultiValueMap&lt;String, Object&gt; parts = new LinkedMultiValueMap&lt;&gt;();
  * parts.add("field 1", "value 1");
  * parts.add("file", new ClassPathResource("myFile.jpg"));
- * template.postForLocation("http://example.com/myFileUpload", parts);
+ * template.postForLocation("https://example.com/myFileUpload", parts);
  * </pre>
  *
  * <p>Some methods in this class were inspired by
@@ -84,7 +86,8 @@ import org.springframework.util.StringUtils;
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
  * @since 3.0
- * @see MultiValueMap
+ * @see org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter
+ * @see org.springframework.util.MultiValueMap
  */
 public class FormHttpMessageConverter implements HttpMessageConverter<MultiValueMap<String, ?>> {
 
@@ -104,9 +107,10 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 		this.supportedMediaTypes.add(MediaType.APPLICATION_FORM_URLENCODED);
 		this.supportedMediaTypes.add(MediaType.MULTIPART_FORM_DATA);
 
-		this.partConverters.add(new ByteArrayHttpMessageConverter());
 		StringHttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter();
-		stringHttpMessageConverter.setWriteAcceptCharset(false);
+		stringHttpMessageConverter.setWriteAcceptCharset(false);  // see SPR-7316
+
+		this.partConverters.add(new ByteArrayHttpMessageConverter());
 		this.partConverters.add(stringHttpMessageConverter);
 		this.partConverters.add(new ResourceHttpMessageConverter());
 
@@ -180,7 +184,7 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 	 * and relies on {@code MimeUtility} from "javax.mail".
 	 * <p>If not set file names will be encoded as US-ASCII.
 	 * @since 4.1.1
-	 * @see <a href="http://en.wikipedia.org/wiki/MIME#Encoded-Word">Encoded-Word</a>
+	 * @see <a href="https://en.wikipedia.org/wiki/MIME#Encoded-Word">Encoded-Word</a>
 	 */
 	public void setMultipartCharset(Charset charset) {
 		this.multipartCharset = charset;
@@ -262,8 +266,8 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 		if (contentType != null) {
 			return MediaType.MULTIPART_FORM_DATA.includes(contentType);
 		}
-		for (String name : map.keySet()) {
-			for (Object value : map.get(name)) {
+		for (List<?> values : map.values()) {
+			for (Object value : values) {
 				if (value != null && !(value instanceof String)) {
 					return true;
 				}
@@ -319,7 +323,9 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 		}
 	}
 
-	private void writeMultipart(final MultiValueMap<String, Object> parts, HttpOutputMessage outputMessage) throws IOException {
+	private void writeMultipart(final MultiValueMap<String, Object> parts, HttpOutputMessage outputMessage)
+			throws IOException {
+
 		final byte[] boundary = generateMultipartBoundary();
 		Map<String, String> parameters = Collections.singletonMap("boundary", new String(boundary, "US-ASCII"));
 
@@ -376,7 +382,6 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 		throw new HttpMessageNotWritableException("Could not write request: no suitable HttpMessageConverter " +
 				"found for request type [" + partType.getName() + "]");
 	}
-
 
 	/**
 	 * Generate a multipart boundary.

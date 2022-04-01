@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -68,13 +68,16 @@ public abstract class StatementCreatorUtils {
 	 * System property that instructs Spring to ignore {@link java.sql.ParameterMetaData#getParameterType}
 	 * completely, i.e. to never even attempt to retrieve {@link PreparedStatement#getParameterMetaData()}
 	 * for {@link StatementCreatorUtils#setNull} calls.
-	 * <p>The default is "false", trying {@code getParameterType} calls first and falling back to
+	 * <p>The effective default is "false", trying {@code getParameterType} calls first and falling back to
 	 * {@link PreparedStatement#setNull} / {@link PreparedStatement#setObject} calls based on well-known
 	 * behavior of common databases. Spring records JDBC drivers with non-working {@code getParameterType}
 	 * implementations and won't attempt to call that method for that driver again, always falling back.
-	 * <p>Consider switching this flag to "true" if you experience misbehavior at runtime, e.g. with
-	 * a connection pool setting back the {@link PreparedStatement} instance in case of an exception
-	 * thrown from {@code getParameterType} (as reported on JBoss AS 7).
+	 * <p>Consider switching this flag to "true" if you experience misbehavior at runtime,
+	 * e.g. with connection pool issues in case of an exception thrown from {@code getParameterType}
+	 * (as reported on JBoss AS 7) or in case of performance problems (as reported on PostgreSQL).
+	 * <p>Note that this flag is "true" by default on Oracle 12c since there can be leaks created by
+	 * {@code getParameterType} calls in such a scenario. You need to explicitly set the flag to
+	 * "false" in order to enforce the use of {@code getParameterType} against Oracle drivers.
 	 */
 	public static final String IGNORE_GETPARAMETERTYPE_PROPERTY_NAME = "spring.jdbc.getParameterType.ignore";
 
@@ -244,7 +247,7 @@ public abstract class StatementCreatorUtils {
 	 * respecting database-specific peculiarities.
 	 */
 	private static void setNull(PreparedStatement ps, int paramIndex, int sqlType, String typeName) throws SQLException {
-		if (sqlType == SqlTypeValue.TYPE_UNKNOWN || sqlType == Types.OTHER) {
+		if (sqlType == SqlTypeValue.TYPE_UNKNOWN || (sqlType == Types.OTHER && typeName == null)) {
 			boolean useSetObject = false;
 			Integer sqlTypeToUse = null;
 			DatabaseMetaData dbmd = null;
@@ -306,7 +309,7 @@ public abstract class StatementCreatorUtils {
 					}
 					else if (databaseProductName.startsWith("DB2") ||
 							jdbcDriverName.startsWith("jConnect") ||
-							jdbcDriverName.startsWith("SQLServer")||
+							jdbcDriverName.startsWith("SQLServer") ||
 							jdbcDriverName.startsWith("Apache Derby")) {
 						sqlTypeToUse = Types.VARCHAR;
 					}
@@ -339,9 +342,11 @@ public abstract class StatementCreatorUtils {
 		else if (inValue instanceof SqlValue) {
 			((SqlValue) inValue).setValue(ps, paramIndex);
 		}
-		else if (sqlType == Types.VARCHAR || sqlType == Types.NVARCHAR ||
-				sqlType == Types.LONGVARCHAR || sqlType == Types.LONGNVARCHAR) {
+		else if (sqlType == Types.VARCHAR || sqlType == Types.LONGVARCHAR ) {
 			ps.setString(paramIndex, inValue.toString());
+		}
+		else if (sqlType == Types.NVARCHAR || sqlType == Types.LONGNVARCHAR) {
+			ps.setNString(paramIndex, inValue.toString());
 		}
 		else if ((sqlType == Types.CLOB || sqlType == Types.NCLOB) && isStringValue(inValue.getClass())) {
 			String strVal = inValue.toString();
@@ -364,8 +369,13 @@ public abstract class StatementCreatorUtils {
 					logger.debug("JDBC driver does not support JDBC 4.0 'setClob(int, Reader, long)' method", ex);
 				}
 			}
-			// Fallback: regular setString binding
-			ps.setString(paramIndex, strVal);
+			// Fallback: setString or setNString binding
+			if (sqlType == Types.NCLOB) {
+				ps.setNString(paramIndex, strVal);
+			}
+			else {
+				ps.setString(paramIndex, strVal);
+			}
 		}
 		else if (sqlType == Types.DECIMAL || sqlType == Types.NUMERIC) {
 			if (inValue instanceof BigDecimal) {
@@ -503,11 +513,16 @@ public abstract class StatementCreatorUtils {
 	public static void cleanupParameters(Collection<?> paramValues) {
 		if (paramValues != null) {
 			for (Object inValue : paramValues) {
-				if (inValue instanceof DisposableSqlTypeValue) {
-					((DisposableSqlTypeValue) inValue).cleanup();
+				// Unwrap SqlParameterValue first...
+				if (inValue instanceof SqlParameterValue) {
+					inValue = ((SqlParameterValue) inValue).getValue();
 				}
-				else if (inValue instanceof SqlValue) {
+				// Check for disposable value types
+				if (inValue instanceof SqlValue) {
 					((SqlValue) inValue).cleanup();
+				}
+				else if (inValue instanceof DisposableSqlTypeValue) {
+					((DisposableSqlTypeValue) inValue).cleanup();
 				}
 			}
 		}

@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -125,7 +125,7 @@ public abstract class CollectionUtils {
 	 * Check whether the given Iterator contains the given element.
 	 * @param iterator the Iterator to check
 	 * @param element the element to look for
-	 * @return {@code true} if found, {@code false} else
+	 * @return {@code true} if found, {@code false} otherwise
 	 */
 	public static boolean contains(Iterator<?> iterator, Object element) {
 		if (iterator != null) {
@@ -143,7 +143,7 @@ public abstract class CollectionUtils {
 	 * Check whether the given Enumeration contains the given element.
 	 * @param enumeration the Enumeration to check
 	 * @param element the element to look for
-	 * @return {@code true} if found, {@code false} else
+	 * @return {@code true} if found, {@code false} otherwise
 	 */
 	public static boolean contains(Enumeration<?> enumeration, Object element) {
 		if (enumeration != null) {
@@ -163,7 +163,7 @@ public abstract class CollectionUtils {
 	 * {@code true} for an equal element as well.
 	 * @param collection the Collection to check
 	 * @param element the element to look for
-	 * @return {@code true} if found, {@code false} else
+	 * @return {@code true} if found, {@code false} otherwise
 	 */
 	public static boolean containsInstance(Collection<?> collection, Object element) {
 		if (collection != null) {
@@ -268,7 +268,7 @@ public abstract class CollectionUtils {
 	 * Determine whether the given Collection only contains a single unique object.
 	 * @param collection the Collection to check
 	 * @return {@code true} if the collection contains a single reference or
-	 * multiple references to the same instance, {@code false} else
+	 * multiple references to the same instance, {@code false} otherwise
 	 */
 	public static boolean hasUniqueObject(Collection<?> collection) {
 		if (isEmpty(collection)) {
@@ -326,12 +326,13 @@ public abstract class CollectionUtils {
 	}
 
 	/**
-	 * Adapt an enumeration to an iterator.
-	 * @param enumeration the enumeration
-	 * @return the iterator
+	 * Adapt an {@link Enumeration} to an {@link Iterator}.
+	 * @param enumeration the original {@code Enumeration}
+	 * @return the adapted {@code Iterator}
 	 */
+	@SuppressWarnings("unchecked")
 	public static <E> Iterator<E> toIterator(Enumeration<E> enumeration) {
-		return new EnumerationIterator<E>(enumeration);
+		return (enumeration != null ? new EnumerationIterator<E>(enumeration) : Collections.EMPTY_SET.iterator());
 	}
 
 	/**
@@ -417,7 +418,7 @@ public abstract class CollectionUtils {
 		@Override
 		public V getFirst(K key) {
 			List<V> values = this.map.get(key);
-			return (values != null ? values.get(0) : null);
+			return (values != null && !values.isEmpty() ? values.get(0) : null);
 		}
 
 		@Override
@@ -438,7 +439,10 @@ public abstract class CollectionUtils {
 		public Map<K, V> toSingleValueMap() {
 			LinkedHashMap<K, V> singleValueMap = new LinkedHashMap<K,V>(this.map.size());
 			for (Entry<K, List<V>> entry : map.entrySet()) {
-				singleValueMap.put(entry.getKey(), entry.getValue().get(0));
+				List<V> values = entry.getValue();
+				if (values != null && !values.isEmpty()) {
+					singleValueMap.put(entry.getKey(), values.get(0));
+				}
 			}
 			return singleValueMap;
 		}
@@ -505,10 +509,7 @@ public abstract class CollectionUtils {
 
 		@Override
 		public boolean equals(Object other) {
-			if (this == other) {
-				return true;
-			}
-			return map.equals(other);
+			return (this == other || this.map.equals(other));
 		}
 
 		@Override

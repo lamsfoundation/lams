@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,7 @@
 package org.springframework.core.env;
 
 import java.security.AccessControlException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -249,6 +250,9 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	@Override
 	public void setActiveProfiles(String... profiles) {
 		Assert.notNull(profiles, "Profile array must not be null");
+		if (logger.isDebugEnabled()) {
+			logger.debug("Activating profiles " + Arrays.asList(profiles));
+		}
 		synchronized (this.activeProfiles) {
 			this.activeProfiles.clear();
 			for (String profile : profiles) {
@@ -375,6 +379,31 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 
 	@Override
 	@SuppressWarnings({"unchecked", "rawtypes"})
+	public Map<String, Object> getSystemProperties() {
+		try {
+			return (Map) System.getProperties();
+		}
+		catch (AccessControlException ex) {
+			return (Map) new ReadOnlySystemAttributesMap() {
+				@Override
+				protected String getSystemAttribute(String attributeName) {
+					try {
+						return System.getProperty(attributeName);
+					}
+					catch (AccessControlException ex) {
+						if (logger.isInfoEnabled()) {
+							logger.info("Caught AccessControlException when accessing system property '" +
+									attributeName + "'; its value will be returned [null]. Reason: " + ex.getMessage());
+						}
+						return null;
+					}
+				}
+			};
+		}
+	}
+
+	@Override
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public Map<String, Object> getSystemEnvironment() {
 		if (suppressGetenvAccess()) {
 			return Collections.emptyMap();
@@ -414,31 +443,6 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	 */
 	protected boolean suppressGetenvAccess() {
 		return SpringProperties.getFlag(IGNORE_GETENV_PROPERTY_NAME);
-	}
-
-	@Override
-	@SuppressWarnings({"unchecked", "rawtypes"})
-	public Map<String, Object> getSystemProperties() {
-		try {
-			return (Map) System.getProperties();
-		}
-		catch (AccessControlException ex) {
-			return (Map) new ReadOnlySystemAttributesMap() {
-				@Override
-				protected String getSystemAttribute(String attributeName) {
-					try {
-						return System.getProperty(attributeName);
-					}
-					catch (AccessControlException ex) {
-						if (logger.isInfoEnabled()) {
-							logger.info("Caught AccessControlException when accessing system property '" +
-									attributeName + "'; its value will be returned [null]. Reason: " + ex.getMessage());
-						}
-						return null;
-					}
-				}
-			};
-		}
 	}
 
 	@Override

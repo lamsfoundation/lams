@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -84,8 +84,9 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	 */
 	public DependencyDescriptor(MethodParameter methodParameter, boolean required, boolean eager) {
 		super(methodParameter);
+
 		this.declaringClass = methodParameter.getDeclaringClass();
-		if (this.methodParameter.getMethod() != null) {
+		if (methodParameter.getMethod() != null) {
 			this.methodName = methodParameter.getMethod().getName();
 			this.parameterTypes = methodParameter.getMethod().getParameterTypes();
 		}
@@ -117,6 +118,7 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	 */
 	public DependencyDescriptor(Field field, boolean required, boolean eager) {
 		super(field);
+
 		this.declaringClass = field.getDeclaringClass();
 		this.fieldName = field.getName();
 		this.required = required;
@@ -129,6 +131,7 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	 */
 	public DependencyDescriptor(DependencyDescriptor original) {
 		super(original);
+
 		this.declaringClass = original.declaringClass;
 		this.methodName = original.methodName;
 		this.parameterTypes = original.parameterTypes;
@@ -236,7 +239,7 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	}
 
 	/**
-	 * Build a ResolvableType object for the wrapped parameter/field.
+	 * Build a {@link ResolvableType} object for the wrapped parameter/field.
 	 * @since 4.0
 	 */
 	public ResolvableType getResolvableType() {
@@ -253,7 +256,7 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	/**
 	 * Return whether a fallback match is allowed.
 	 * <p>This is {@code false} by default but may be overridden to return {@code true} in order
-	 * to suggest to a {@link org.springframework.beans.factory.support.AutowireCandidateResolver}
+	 * to suggest to an {@link org.springframework.beans.factory.support.AutowireCandidateResolver}
 	 * that a fallback match is acceptable as well.
 	 * @since 4.0
 	 */
@@ -308,7 +311,6 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 						Type[] args = ((ParameterizedType) type).getActualTypeArguments();
 						type = args[args.length - 1];
 					}
-					// TODO: Object.class if unresolvable
 				}
 				if (type instanceof Class) {
 					return (Class<?>) type;
