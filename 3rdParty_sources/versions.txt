@@ -63,7 +63,7 @@ Reactive Streams 1.0.3
 
 Servlet API 4.0.0
 
-Spring 5.3.13
+Spring 5.3.18
 
 Undertow core 2.0.13
 
