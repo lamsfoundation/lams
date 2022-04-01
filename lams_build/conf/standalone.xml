@@ -191,6 +191,10 @@
             	<level name="INFO"/>
             </logger>
             
+            <logger category="org.lamsfoundation.lams.web.filter.LamsAnnotationMethodHandlerAdapter">
+            	<level name="INFO"/>
+            </logger>
+            
             <logger category="org.lamsfoundation.lams.util.hibernate.TransactionAwareSessionContext">
             	<level name="ERROR"/>
             </logger>
