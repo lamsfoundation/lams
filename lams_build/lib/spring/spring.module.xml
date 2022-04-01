@@ -24,17 +24,17 @@
 
 <module xmlns="urn:jboss:module:1.5" name="org.springframework">
   <resources>
-    <resource-root path="spring-core-4.3.12.RELEASE.jar"/>
-    <resource-root path="spring-aop-4.3.12.RELEASE.jar"/>
-    <resource-root path="spring-beans-4.3.12.RELEASE.jar"/>
-    <resource-root path="spring-context-4.3.12.RELEASE.jar"/>
-    <resource-root path="spring-context-support-4.3.12.RELEASE.jar"/>
-    <resource-root path="spring-expression-4.3.12.RELEASE.jar"/>
-    <resource-root path="spring-jdbc-4.3.12.RELEASE.jar"/>
-    <resource-root path="spring-orm-4.3.12.RELEASE.jar"/>
-    <resource-root path="spring-tx-4.3.12.RELEASE.jar"/>
-    <resource-root path="spring-web-4.3.12.RELEASE.jar"/>
-    <resource-root path="spring-webmvc-4.3.12.RELEASE.jar"/>
+    <resource-root path="spring-core-4.3.30.RELEASE.jar"/>
+    <resource-root path="spring-aop-4.3.30.RELEASE.jar"/>
+    <resource-root path="spring-beans-4.3.30.RELEASE.jar"/>
+    <resource-root path="spring-context-4.3.30.RELEASE.jar"/>
+    <resource-root path="spring-context-support-4.3.30.RELEASE.jar"/>
+    <resource-root path="spring-expression-4.3.30.RELEASE.jar"/>
+    <resource-root path="spring-jdbc-4.3.30.RELEASE.jar"/>
+    <resource-root path="spring-orm-4.3.30.RELEASE.jar"/>
+    <resource-root path="spring-tx-4.3.30.RELEASE.jar"/>
+    <resource-root path="spring-web-4.3.30.RELEASE.jar"/>
+    <resource-root path="spring-webmvc-4.3.30.RELEASE.jar"/>
   </resources>
   
   <dependencies>
