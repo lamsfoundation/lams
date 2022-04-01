@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,6 +35,7 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.NumberUtils;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -254,7 +255,7 @@ class TypeConverterDelegate {
 						}
 					}
 					String trimmedValue = ((String) convertedValue).trim();
-					if (requiredType.isEnum() && "".equals(trimmedValue)) {
+					if (requiredType.isEnum() && trimmedValue.isEmpty()) {
 						// It's an empty enum identifier: reset the enum value to null.
 						return null;
 					}
@@ -324,7 +325,7 @@ class TypeConverterDelegate {
 
 		if (Enum.class == requiredType) {
 			// target type is declared as raw enum, treat the trimmed value as <enum.fqn>.FIELD_NAME
-			int index = trimmedValue.lastIndexOf(".");
+			int index = trimmedValue.lastIndexOf('.');
 			if (index > - 1) {
 				String enumType = trimmedValue.substring(0, index);
 				String fieldName = trimmedValue.substring(index + 1);
@@ -353,6 +354,7 @@ class TypeConverterDelegate {
 			// to be checked, hence we don't return it right away.
 			try {
 				Field enumField = requiredType.getField(trimmedValue);
+				ReflectionUtils.makeAccessible(enumField);
 				convertedValue = enumField.get(null);
 			}
 			catch (Throwable ex) {
@@ -567,8 +569,7 @@ class TypeConverterDelegate {
 			return original;
 		}
 
-		int i = 0;
-		for (; it.hasNext(); i++) {
+		for (int i = 0; it.hasNext(); i++) {
 			Object element = it.next();
 			String indexedPropertyName = buildIndexedPropertyName(propertyName, i);
 			Object convertedElement = convertIfNecessary(indexedPropertyName, null, element,

@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,6 +23,7 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.LocaleResolver;
 
 /**
@@ -96,30 +97,40 @@ public class AcceptHeaderLocaleResolver implements LocaleResolver {
 			return defaultLocale;
 		}
 		Locale requestLocale = request.getLocale();
-		if (isSupportedLocale(requestLocale)) {
+		List<Locale> supportedLocales = getSupportedLocales();
+		if (supportedLocales.isEmpty() || supportedLocales.contains(requestLocale)) {
 			return requestLocale;
 		}
-		Locale supportedLocale = findSupportedLocale(request);
+		Locale supportedLocale = findSupportedLocale(request, supportedLocales);
 		if (supportedLocale != null) {
 			return supportedLocale;
 		}
 		return (defaultLocale != null ? defaultLocale : requestLocale);
 	}
 
-	private boolean isSupportedLocale(Locale locale) {
-		List<Locale> supportedLocales = getSupportedLocales();
-		return (supportedLocales.isEmpty() || supportedLocales.contains(locale));
-	}
-
-	private Locale findSupportedLocale(HttpServletRequest request) {
+	private Locale findSupportedLocale(HttpServletRequest request, List<Locale> supportedLocales) {
 		Enumeration<Locale> requestLocales = request.getLocales();
+		Locale languageMatch = null;
 		while (requestLocales.hasMoreElements()) {
 			Locale locale = requestLocales.nextElement();
-			if (getSupportedLocales().contains(locale)) {
-				return locale;
+			if (supportedLocales.contains(locale)) {
+				if (languageMatch == null || languageMatch.getLanguage().equals(locale.getLanguage())) {
+					// Full match: language + country, possibly narrowed from earlier language-only match
+					return locale;
+				}
+			}
+			else if (languageMatch == null) {
+				// Let's try to find a language-only match as a fallback
+				for (Locale candidate : supportedLocales) {
+					if (!StringUtils.hasLength(candidate.getCountry()) &&
+							candidate.getLanguage().equals(locale.getLanguage())) {
+						languageMatch = candidate;
+						break;
+					}
+				}
 			}
 		}
-		return null;
+		return languageMatch;
 	}
 
 	@Override

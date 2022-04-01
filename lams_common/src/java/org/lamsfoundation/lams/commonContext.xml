@@ -8,6 +8,10 @@
 	<!-- ========================= GENERAL DEFINITIONS ========================= -->
 
 	<import resource="messageContext.xml"/>
+	
+	
+	<!-- Addresses Spring vulnerability CVE-2022-22965 -->
+	<bean class="org.lamsfoundation.lams.web.filter.LamsAnnotationMethodHandlerAdapter" />
 
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
 

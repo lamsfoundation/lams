@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,7 +16,6 @@
 
 package org.springframework.web.servlet.config.annotation;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.springframework.web.cors.CorsConfiguration;
@@ -57,9 +56,16 @@ public class CorsRegistration {
 
 
 	/**
-	 * Set the origins to allow, e.g. {@code "http://domain1.com"}.
+	 * Set the origins to allow, e.g. {@code "https://domain1.com"}.
 	 * <p>The special value {@code "*"} allows all domains.
 	 * <p>By default, all origins are allowed.
+	 * <p><strong>Note:</strong> CORS checks use values from "Forwarded"
+	 * (<a href="https://tools.ietf.org/html/rfc7239">RFC 7239</a>),
+	 * "X-Forwarded-Host", "X-Forwarded-Port", and "X-Forwarded-Proto" headers,
+	 * if present, in order to reflect the client-originated address.
+	 * Consider using the {@code ForwardedHeaderFilter} in order to choose from a
+	 * central place whether to extract and use, or to discard such headers.
+	 * See the Spring Framework reference for more on this filter.
 	 */
 	public CorsRegistration allowedOrigins(String... origins) {
 		this.config.setAllowedOrigins(Arrays.asList(origins));
@@ -116,9 +122,10 @@ public class CorsRegistration {
 	}
 
 	/**
-	 * Whether user credentials are supported.
-	 * <p>By default this is set to {@code true} in which case user credentials
-	 * are supported.
+	 * Whether user credentials are supported in which case the browser should
+	 * include any cookies associated with the domain of the request being
+	 * annotated.
+	 * <p>By default this is {@code false} and user credentials are not allowed.
 	 */
 	public CorsRegistration allowCredentials(boolean allowCredentials) {
 		this.config.setAllowCredentials(allowCredentials);

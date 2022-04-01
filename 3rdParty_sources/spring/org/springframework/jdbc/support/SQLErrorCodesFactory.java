@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -123,8 +123,8 @@ public class SQLErrorCodesFactory {
 
 			// Check all beans of type SQLErrorCodes.
 			errorCodes = lbf.getBeansOfType(SQLErrorCodes.class, true, false);
-			if (logger.isInfoEnabled()) {
-				logger.info("SQLErrorCodes loaded: " + errorCodes.keySet());
+			if (logger.isDebugEnabled()) {
+				logger.debug("SQLErrorCodes loaded: " + errorCodes.keySet());
 			}
 		}
 		catch (BeansException ex) {
@@ -153,7 +153,7 @@ public class SQLErrorCodesFactory {
 
 	/**
 	 * Return the {@link SQLErrorCodes} instance for the given database.
-	 * <p>No need for a database metadata lookup.
+	 * <p>No need for a database meta-data lookup.
 	 * @param databaseName the database name (must not be {@code null})
 	 * @return the {@code SQLErrorCodes} instance for the given database
 	 * @throws IllegalArgumentException if the supplied database name is {@code null}

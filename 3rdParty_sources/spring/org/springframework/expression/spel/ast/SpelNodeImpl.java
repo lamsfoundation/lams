@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,7 +43,7 @@ import org.springframework.util.ObjectUtils;
  */
 public abstract class SpelNodeImpl implements SpelNode, Opcodes {
 
-	private static SpelNodeImpl[] NO_CHILDREN = new SpelNodeImpl[0];
+	private static final SpelNodeImpl[] NO_CHILDREN = new SpelNodeImpl[0];
 
 
 	protected int pos; // start = top 16bits, end = bottom 16bits
@@ -66,12 +66,10 @@ public abstract class SpelNodeImpl implements SpelNode, Opcodes {
 
 	public SpelNodeImpl(int pos, SpelNodeImpl... operands) {
 		this.pos = pos;
-		// pos combines start and end so can never be zero because tokens cannot be zero length
-		Assert.isTrue(pos != 0, "Pos must not be 0");
 		if (!ObjectUtils.isEmpty(operands)) {
 			this.children = operands;
-			for (SpelNodeImpl childNode : operands) {
-				childNode.parent = this;
+			for (SpelNodeImpl operand : operands) {
+				operand.parent = this;
 			}
 		}
 	}

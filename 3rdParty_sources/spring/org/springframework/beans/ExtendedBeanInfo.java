@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2015 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,10 +41,12 @@ import org.springframework.util.ObjectUtils;
 
 /**
  * Decorator for a standard {@link BeanInfo} object, e.g. as created by
- * {@link Introspector#getBeanInfo(Class)}, designed to discover and register static
- * and/or non-void returning setter methods. For example:
+ * {@link Introspector#getBeanInfo(Class)}, designed to discover and register
+ * static and/or non-void returning setter methods. For example:
+ *
  * <pre class="code">
  * public class Bean {
+ *
  *     private Foo foo;
  *
  *     public Foo getFoo() {
@@ -56,6 +58,7 @@ import org.springframework.util.ObjectUtils;
  *         return this;
  *     }
  * }</pre>
+ *
  * The standard JavaBeans {@code Introspector} will discover the {@code getFoo} read
  * method, but will bypass the {@code #setFoo(Foo)} write method, because its non-void
  * returning signature does not comply with the JavaBeans specification.
@@ -64,10 +67,11 @@ import org.springframework.util.ObjectUtils;
  * used within Spring {@code <beans>} XML. {@link #getPropertyDescriptors()} returns all
  * existing property descriptors from the wrapped {@code BeanInfo} as well any added for
  * non-void returning setters. Both standard ("non-indexed") and
- * <a href="http://docs.oracle.com/javase/tutorial/javabeans/writing/properties.html">
+ * <a href="https://docs.oracle.com/javase/tutorial/javabeans/writing/properties.html">
  * indexed properties</a> are fully supported.
  *
  * @author Chris Beams
+ * @author Juergen Hoeller
  * @since 3.1
  * @see #ExtendedBeanInfo(BeanInfo)
  * @see ExtendedBeanInfoFactory
@@ -137,7 +141,7 @@ class ExtendedBeanInfo implements BeanInfo {
 		}
 		// Sort non-void returning write methods to guard against the ill effects of
 		// non-deterministic sorting of methods returned from Class#getDeclaredMethods
-		// under JDK 7. See http://bugs.sun.com/view_bug.do?bug_id=7023180
+		// under JDK 7. See https://bugs.java.com/view_bug.do?bug_id=7023180
 		Collections.sort(matches, new Comparator<Method>() {
 			@Override
 			public int compare(Method m1, Method m2) {
@@ -212,7 +216,7 @@ class ExtendedBeanInfo implements BeanInfo {
 	}
 
 	private String propertyNameFor(Method method) {
-		return Introspector.decapitalize(method.getName().substring(3, method.getName().length()));
+		return Introspector.decapitalize(method.getName().substring(3));
 	}
 
 
@@ -460,7 +464,7 @@ class ExtendedBeanInfo implements BeanInfo {
 		}
 
 		/*
-		 * See java.beans.IndexedPropertyDescriptor#equals(java.lang.Object)
+		 * See java.beans.IndexedPropertyDescriptor#equals
 		 */
 		@Override
 		public boolean equals(Object other) {

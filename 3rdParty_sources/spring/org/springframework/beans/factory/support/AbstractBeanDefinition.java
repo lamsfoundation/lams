@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -318,7 +318,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	/**
 	 * Apply the provided default values to this bean.
-	 * @param defaults the defaults to apply
+	 * @param defaults the default settings to apply
+	 * @since 2.5
 	 */
 	public void applyDefaults(BeanDefinitionDefaults defaults) {
 		setLazyInit(defaults.isLazyInit());
@@ -361,10 +362,13 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Return the class of the wrapped bean, if already resolved.
-	 * @return the bean class, or {@code null} if none defined
+	 * Return the class of the wrapped bean (assuming it is resolved already).
+	 * @return the bean class (never {@code null})
 	 * @throws IllegalStateException if the bean definition does not define a bean class,
-	 * or a specified bean class name has not been resolved into an actual Class
+	 * or a specified bean class name has not been resolved into an actual Class yet
+	 * @see #hasBeanClass()
+	 * @see #setBeanClass(Class)
+	 * @see #resolveBeanClass(ClassLoader)
 	 */
 	public Class<?> getBeanClass() throws IllegalStateException {
 		Object beanClassObject = this.beanClass;
@@ -380,6 +384,9 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	/**
 	 * Return whether this definition specifies a bean class.
+	 * @see #getBeanClass()
+	 * @see #setBeanClass(Class)
+	 * @see #resolveBeanClass(ClassLoader)
 	 */
 	public boolean hasBeanClass() {
 		return (this.beanClass instanceof Class);
@@ -433,7 +440,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 */
 	@Override
 	public boolean isSingleton() {
-		return SCOPE_SINGLETON.equals(scope) || SCOPE_DEFAULT.equals(scope);
+		return SCOPE_SINGLETON.equals(this.scope) || SCOPE_DEFAULT.equals(this.scope);
 	}
 
 	/**
@@ -443,7 +450,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 */
 	@Override
 	public boolean isPrototype() {
-		return SCOPE_PROTOTYPE.equals(scope);
+		return SCOPE_PROTOTYPE.equals(this.scope);
 	}
 
 	/**
@@ -478,6 +485,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	/**
 	 * Return whether this bean should be lazily initialized, i.e. not
 	 * eagerly instantiated on startup. Only applicable to a singleton bean.
+	 * @return whether to apply lazy-init semantics ({@code false} by default)
 	 */
 	@Override
 	public boolean isLazyInit() {
@@ -486,8 +494,9 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	/**
 	 * Set the autowire mode. This determines whether any automagical detection
-	 * and setting of bean references will happen. Default is AUTOWIRE_NO,
-	 * which means there's no autowire.
+	 * and setting of bean references will happen. Default is AUTOWIRE_NO
+	 * which means there won't be convention-based autowiring by name or type
+	 * (however, there may still be explicit annotation-driven autowiring).
 	 * @param autowireMode the autowire mode to set.
 	 * Must be one of the constants defined in this class.
 	 * @see #AUTOWIRE_NO
@@ -625,7 +634,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * Return whether this bean has the specified qualifier.
 	 */
 	public boolean hasQualifier(String typeName) {
-		return this.qualifiers.keySet().contains(typeName);
+		return this.qualifiers.containsKey(typeName);
 	}
 
 	/**
@@ -778,15 +787,15 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	/**
 	 * Return information about methods to be overridden by the IoC
 	 * container. This will be empty if there are no method overrides.
-	 * Never returns {@code null}.
+	 * <p>Never returns {@code null}.
 	 */
 	public MethodOverrides getMethodOverrides() {
 		return this.methodOverrides;
 	}
 
 	/**
-	 * Set the name of the initializer method. The default is {@code null}
-	 * in which case there is no initializer method.
+	 * Set the name of the initializer method.
+	 * <p>The default is {@code null} in which case there is no initializer method.
 	 */
 	public void setInitMethodName(String initMethodName) {
 		this.initMethodName = initMethodName;
@@ -800,16 +809,20 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Specify whether or not the configured init method is the default.
-	 * Default value is {@code false}.
+	 * Specify whether or not the configured initializer method is the default.
+	 * <p>The default value is {@code true} for a locally specified init method
+	 * but switched to {@code false} for a shared setting in a defaults section
+	 * (e.g. {@code bean init-method} versus {@code beans default-init-method}
+	 * level in XML) which might not apply to all contained bean definitions.
 	 * @see #setInitMethodName
+	 * @see #applyDefaults
 	 */
 	public void setEnforceInitMethod(boolean enforceInitMethod) {
 		this.enforceInitMethod = enforceInitMethod;
 	}
 
 	/**
-	 * Indicate whether the configured init method is the default.
+	 * Indicate whether the configured initializer method is the default.
 	 * @see #getInitMethodName()
 	 */
 	public boolean isEnforceInitMethod() {
@@ -817,8 +830,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Set the name of the destroy method. The default is {@code null}
-	 * in which case there is no destroy method.
+	 * Set the name of the destroy method.
+	 * <p>The default is {@code null} in which case there is no destroy method.
 	 */
 	public void setDestroyMethodName(String destroyMethodName) {
 		this.destroyMethodName = destroyMethodName;
@@ -833,8 +846,12 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	/**
 	 * Specify whether or not the configured destroy method is the default.
-	 * Default value is {@code false}.
+	 * <p>The default value is {@code true} for a locally specified destroy method
+	 * but switched to {@code false} for a shared setting in a defaults section
+	 * (e.g. {@code bean destroy-method} versus {@code beans default-destroy-method}
+	 * level in XML) which might not apply to all contained bean definitions.
 	 * @see #setDestroyMethodName
+	 * @see #applyDefaults
 	 */
 	public void setEnforceDestroyMethod(boolean enforceDestroyMethod) {
 		this.enforceDestroyMethod = enforceDestroyMethod;
@@ -842,7 +859,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	/**
 	 * Indicate whether the configured destroy method is the default.
-	 * @see #getDestroyMethodName
+	 * @see #getDestroyMethodName()
 	 */
 	public boolean isEnforceDestroyMethod() {
 		return this.enforceDestroyMethod;

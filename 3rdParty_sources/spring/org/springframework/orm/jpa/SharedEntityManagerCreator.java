@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -65,9 +65,9 @@ public abstract class SharedEntityManagerCreator {
 
 	private static final Class<?>[] NO_ENTITY_MANAGER_INTERFACES = new Class<?>[0];
 
-	private static final Set<String> transactionRequiringMethods = new HashSet<String>(6);
+	private static final Set<String> transactionRequiringMethods = new HashSet<String>(8);
 
-	private static final Set<String> queryTerminationMethods = new HashSet<String>(3);
+	private static final Set<String> queryTerminatingMethods = new HashSet<String>(8);
 
 	static {
 		transactionRequiringMethods.add("joinTransaction");
@@ -77,9 +77,11 @@ public abstract class SharedEntityManagerCreator {
 		transactionRequiringMethods.add("remove");
 		transactionRequiringMethods.add("refresh");
 
-		queryTerminationMethods.add("getResultList");
-		queryTerminationMethods.add("getSingleResult");
-		queryTerminationMethods.add("executeUpdate");
+		queryTerminatingMethods.add("execute");  // JPA 2.1 StoredProcedureQuery
+		queryTerminatingMethods.add("executeUpdate");
+		queryTerminatingMethods.add("getSingleResult");
+		queryTerminatingMethods.add("getResultList");
+		queryTerminatingMethods.add("getResultStream");
 	}
 
 
@@ -124,7 +126,7 @@ public abstract class SharedEntityManagerCreator {
 
 	/**
 	 * Create a transactional EntityManager proxy for the given EntityManagerFactory.
-	 * @param emf EntityManagerFactory to obtain EntityManagers from as needed
+	 * @param emf the EntityManagerFactory to obtain EntityManagers from as needed
 	 * @param properties the properties to be passed into the
 	 * {@code createEntityManager} call (may be {@code null})
 	 * @param entityManagerInterfaces the interfaces to be implemented by the
@@ -139,7 +141,7 @@ public abstract class SharedEntityManagerCreator {
 
 	/**
 	 * Create a transactional EntityManager proxy for the given EntityManagerFactory.
-	 * @param emf EntityManagerFactory to obtain EntityManagers from as needed
+	 * @param emf the EntityManagerFactory to obtain EntityManagers from as needed
 	 * @param properties the properties to be passed into the
 	 * {@code createEntityManager} call (may be {@code null})
 	 * @param synchronizedWithTransaction whether to automatically join ongoing
@@ -185,6 +187,7 @@ public abstract class SharedEntityManagerCreator {
 
 		public SharedEntityManagerInvocationHandler(
 				EntityManagerFactory target, Map<?, ?> properties, boolean synchronizedWithTransaction) {
+
 			this.targetFactory = target;
 			this.properties = properties;
 			this.synchronizedWithTransaction = synchronizedWithTransaction;
@@ -337,11 +340,11 @@ public abstract class SharedEntityManagerCreator {
 
 		private final Query target;
 
-		private EntityManager em;
+		private EntityManager entityManager;
 
-		public DeferredQueryInvocationHandler(Query target, EntityManager em) {
+		public DeferredQueryInvocationHandler(Query target, EntityManager entityManager) {
 			this.target = target;
-			this.em = em;
+			this.entityManager = entityManager;
 		}
 
 		@Override
@@ -376,11 +379,11 @@ public abstract class SharedEntityManagerCreator {
 				throw ex.getTargetException();
 			}
 			finally {
-				if (queryTerminationMethods.contains(method.getName())) {
+				if (queryTerminatingMethods.contains(method.getName())) {
 					// Actual execution of the query: close the EntityManager right
 					// afterwards, since that was the only reason we kept it open.
-					EntityManagerFactoryUtils.closeEntityManager(this.em);
-					this.em = null;
+					EntityManagerFactoryUtils.closeEntityManager(this.entityManager);
+					this.entityManager = null;
 				}
 			}
 		}

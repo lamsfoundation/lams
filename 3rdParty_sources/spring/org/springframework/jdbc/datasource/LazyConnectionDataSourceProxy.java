@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -252,11 +252,11 @@ public class LazyConnectionDataSourceProxy extends DelegatingDataSource {
 
 		private String password;
 
-		private Boolean readOnly = Boolean.FALSE;
-
 		private Integer transactionIsolation;
 
 		private Boolean autoCommit;
+
+		private boolean readOnly = false;
 
 		private boolean closed = false;
 
@@ -311,11 +311,15 @@ public class LazyConnectionDataSourceProxy extends DelegatingDataSource {
 				if (method.getName().equals("toString")) {
 					return "Lazy Connection proxy for target DataSource [" + getTargetDataSource() + "]";
 				}
-				else if (method.getName().equals("isReadOnly")) {
-					return this.readOnly;
+				else if (method.getName().equals("getAutoCommit")) {
+					if (this.autoCommit != null) {
+						return this.autoCommit;
+					}
+					// Else fetch actual Connection and check there,
+					// because we didn't have a default specified.
 				}
-				else if (method.getName().equals("setReadOnly")) {
-					this.readOnly = (Boolean) args[0];
+				else if (method.getName().equals("setAutoCommit")) {
+					this.autoCommit = (Boolean) args[0];
 					return null;
 				}
 				else if (method.getName().equals("getTransactionIsolation")) {
@@ -329,29 +333,19 @@ public class LazyConnectionDataSourceProxy extends DelegatingDataSource {
 					this.transactionIsolation = (Integer) args[0];
 					return null;
 				}
-				else if (method.getName().equals("getAutoCommit")) {
-					if (this.autoCommit != null) {
-						return this.autoCommit;
-					}
-					// Else fetch actual Connection and check there,
-					// because we didn't have a default specified.
+				else if (method.getName().equals("isReadOnly")) {
+					return this.readOnly;
 				}
-				else if (method.getName().equals("setAutoCommit")) {
-					this.autoCommit = (Boolean) args[0];
+				else if (method.getName().equals("setReadOnly")) {
+					this.readOnly = (Boolean) args[0];
 					return null;
 				}
-				else if (method.getName().equals("commit")) {
+				else if (method.getName().equals("commit") || method.getName().equals("rollback")) {
 					// Ignore: no statements created yet.
 					return null;
 				}
-				else if (method.getName().equals("rollback")) {
-					// Ignore: no statements created yet.
-					return null;
-				}
-				else if (method.getName().equals("getWarnings")) {
-					return null;
-				}
-				else if (method.getName().equals("clearWarnings")) {
+				else if (method.getName().equals("getWarnings") || method.getName().equals("clearWarnings")) {
+					// Ignore: no warnings to expose yet.
 					return null;
 				}
 				else if (method.getName().equals("close")) {

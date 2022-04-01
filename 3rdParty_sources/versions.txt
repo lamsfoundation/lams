@@ -61,7 +61,7 @@ picketbox 5.0.3
 
 Servlet API 4.0.0
 
-Spring 4.3.12
+Spring 4.3.30
 
 Undertow core 2.0.13
 

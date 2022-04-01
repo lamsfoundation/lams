@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2012 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,30 +24,32 @@ import org.springframework.jdbc.core.BatchUpdateUtils;
 import org.springframework.jdbc.core.JdbcOperations;
 
 /**
- * Generic utility methods for working with JDBC batch statements using named parameters. Mainly for internal use
- * within the framework.
+ * Generic utility methods for working with JDBC batch statements using named parameters.
+ * Mainly for internal use within the framework.
  *
  * @author Thomas Risberg
+ * @author Juergen Hoeller
+ * @since 3.0
  */
 public class NamedParameterBatchUpdateUtils extends BatchUpdateUtils {
 
-	public static int[] executeBatchUpdateWithNamedParameters(final ParsedSql parsedSql,
-			final SqlParameterSource[] batchArgs, JdbcOperations jdbcOperations) {
-		if (batchArgs.length <= 0) {
-			return new int[] {0};
+	public static int[] executeBatchUpdateWithNamedParameters(
+			final ParsedSql parsedSql, final SqlParameterSource[] batchArgs, JdbcOperations jdbcOperations) {
+
+		if (batchArgs.length == 0) {
+			return new int[0];
 		}
+
 		String sqlToUse = NamedParameterUtils.substituteNamedParameters(parsedSql, batchArgs[0]);
 		return jdbcOperations.batchUpdate(
 				sqlToUse,
 				new BatchPreparedStatementSetter() {
-
 					@Override
 					public void setValues(PreparedStatement ps, int i) throws SQLException {
 						Object[] values = NamedParameterUtils.buildValueArray(parsedSql, batchArgs[i], null);
 						int[] columnTypes = NamedParameterUtils.buildSqlTypeArray(parsedSql, batchArgs[i]);
 						setStatementParameters(values, ps, columnTypes);
 					}
-
 					@Override
 					public int getBatchSize() {
 						return batchArgs.length;

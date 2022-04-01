@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,9 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
-import org.apache.velocity.tools.view.ToolboxManager;
-import org.apache.velocity.tools.view.context.ChainedContext;
-import org.apache.velocity.tools.view.servlet.ServletToolboxManager;
 
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
@@ -99,18 +96,21 @@ public class VelocityToolboxView extends VelocityView {
 	 * @see #initTool
 	 */
 	@Override
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected Context createVelocityContext(
 			Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		// Create a ChainedContext instance.
-		ChainedContext velocityContext = new ChainedContext(
-				new VelocityContext(model), getVelocityEngine(), request, response, getServletContext());
+		org.apache.velocity.tools.view.context.ChainedContext velocityContext =
+				new org.apache.velocity.tools.view.context.ChainedContext(
+						new VelocityContext(model), getVelocityEngine(), request, response, getServletContext());
 
 		// Load a Velocity Tools toolbox, if necessary.
 		if (getToolboxConfigLocation() != null) {
-			ToolboxManager toolboxManager = ServletToolboxManager.getInstance(
-					getServletContext(), getToolboxConfigLocation());
-			Map<?, ?> toolboxContext = toolboxManager.getToolbox(velocityContext);
+			org.apache.velocity.tools.view.ToolboxManager toolboxManager =
+					org.apache.velocity.tools.view.servlet.ServletToolboxManager.getInstance(
+							getServletContext(), getToolboxConfigLocation());
+			Map toolboxContext = toolboxManager.getToolbox(velocityContext);
 			velocityContext.setToolbox(toolboxContext);
 		}
 

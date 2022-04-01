@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,7 +24,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -155,7 +154,7 @@ public abstract class RequestMappingInfoHandlerMapping extends AbstractHandlerMe
 			HttpServletRequest request, Map<String, String> uriVariables) {
 
 		Map<String, MultiValueMap<String, String>> result = new LinkedHashMap<String, MultiValueMap<String, String>>();
-		for (Entry<String, String> uriVar : uriVariables.entrySet()) {
+		for (Map.Entry<String, String> uriVar : uriVariables.entrySet()) {
 			String uriVarValue = uriVar.getValue();
 
 			int equalsIndex = uriVarValue.indexOf('=');
@@ -189,11 +188,10 @@ public abstract class RequestMappingInfoHandlerMapping extends AbstractHandlerMe
 	 * but not by consumable/producible media types
 	 */
 	@Override
-	protected HandlerMethod handleNoMatch(Set<RequestMappingInfo> infos, String lookupPath,
-			HttpServletRequest request) throws ServletException {
+	protected HandlerMethod handleNoMatch(
+			Set<RequestMappingInfo> infos, String lookupPath, HttpServletRequest request) throws ServletException {
 
 		PartialMatchHelper helper = new PartialMatchHelper(infos, request);
-
 		if (helper.isEmpty()) {
 			return null;
 		}
@@ -439,16 +437,16 @@ public abstract class RequestMappingInfoHandlerMapping extends AbstractHandlerMe
 			Set<HttpMethod> result = new LinkedHashSet<HttpMethod>(declaredMethods.size());
 			if (declaredMethods.isEmpty()) {
 				for (HttpMethod method : HttpMethod.values()) {
-					if (!HttpMethod.TRACE.equals(method)) {
+					if (method != HttpMethod.TRACE) {
 						result.add(method);
 					}
 				}
 			}
 			else {
-				boolean hasHead = declaredMethods.contains("HEAD");
 				for (String method : declaredMethods) {
-					result.add(HttpMethod.valueOf(method));
-					if (!hasHead && "GET".equals(method)) {
+					HttpMethod httpMethod = HttpMethod.valueOf(method);
+					result.add(httpMethod);
+					if (httpMethod == HttpMethod.GET) {
 						result.add(HttpMethod.HEAD);
 					}
 				}

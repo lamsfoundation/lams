@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,24 +34,20 @@ import org.springframework.util.StringUtils;
  *
  * <p>By default a newly created {@code CorsConfiguration} does not permit any
  * cross-origin requests and must be configured explicitly to indicate what
- * should be allowed.
- *
- * <p>Use {@link #applyPermitDefaultValues()} to flip the initialization model
- * to start with open defaults that permit all cross-origin requests for GET,
- * HEAD, and POST requests.
+ * should be allowed. Use {@link #applyPermitDefaultValues()} to flip the
+ * initialization model to start with open defaults that permit all cross-origin
+ * requests for GET, HEAD, and POST requests.
  *
  * @author Sebastien Deleuze
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
  * @author Sam Brannen
  * @since 4.2
- * @see <a href="http://www.w3.org/TR/cors/">CORS W3C recommendation</a>
+ * @see <a href="https://www.w3.org/TR/cors/">CORS spec</a>
  */
 public class CorsConfiguration {
 
-	/**
-	 * Wildcard representing <em>all</em> origins, methods, or headers.
-	 */
+	/** Wildcard representing <em>all</em> origins, methods, or headers. */
 	public static final String ALL = "*";
 
 	private static final List<HttpMethod> DEFAULT_METHODS;
@@ -103,9 +99,16 @@ public class CorsConfiguration {
 
 
 	/**
-	 * Set the origins to allow, e.g. {@code "http://domain1.com"}.
+	 * Set the origins to allow, e.g. {@code "https://domain1.com"}.
 	 * <p>The special value {@code "*"} allows all domains.
 	 * <p>By default this is not set.
+	 * <p><strong>Note:</strong> CORS checks use values from "Forwarded"
+	 * (<a href="https://tools.ietf.org/html/rfc7239">RFC 7239</a>),
+	 * "X-Forwarded-Host", "X-Forwarded-Port", and "X-Forwarded-Proto" headers,
+	 * if present, in order to reflect the client-originated address.
+	 * Consider using the {@code ForwardedHeaderFilter} in order to choose from a
+	 * central place whether to extract and use, or to discard such headers.
+	 * See the Spring Framework reference for more on this filter.
 	 */
 	public void setAllowedOrigins(List<String> allowedOrigins) {
 		this.allowedOrigins = (allowedOrigins != null ? new ArrayList<String>(allowedOrigins) : null);
@@ -297,23 +300,21 @@ public class CorsConfiguration {
 		return this.maxAge;
 	}
 
+
 	/**
 	 * By default a newly created {@code CorsConfiguration} does not permit any
 	 * cross-origin requests and must be configured explicitly to indicate what
 	 * should be allowed.
-	 *
 	 * <p>Use this method to flip the initialization model to start with open
 	 * defaults that permit all cross-origin requests for GET, HEAD, and POST
 	 * requests. Note however that this method will not override any existing
 	 * values already set.
-	 *
 	 * <p>The following defaults are applied if not already set:
 	 * <ul>
-	 *     <li>Allow all origins, i.e. {@code "*"}.</li>
-	 *     <li>Allow "simple" methods {@code GET}, {@code HEAD} and {@code POST}.</li>
-	 *     <li>Allow all headers.</li>
-	 *     <li>Allow credentials.</li>
-	 *     <li>Set max age to 1800 seconds (30 minutes).</li>
+	 * <li>Allow all origins.</li>
+	 * <li>Allow "simple" methods {@code GET}, {@code HEAD} and {@code POST}.</li>
+	 * <li>Allow all headers.</li>
+	 * <li>Set max age to 1800 seconds (30 minutes).</li>
 	 * </ul>
 	 */
 	public CorsConfiguration applyPermitDefaultValues() {
@@ -326,9 +327,6 @@ public class CorsConfiguration {
 		}
 		if (this.allowedHeaders == null) {
 			this.addAllowedHeader(ALL);
-		}
-		if (this.allowCredentials == null) {
-			this.setAllowCredentials(true);
 		}
 		if (this.maxAge == null) {
 			this.setMaxAge(1800L);

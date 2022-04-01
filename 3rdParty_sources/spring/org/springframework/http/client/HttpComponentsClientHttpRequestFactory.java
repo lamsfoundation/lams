@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,7 +43,7 @@ import org.springframework.util.ClassUtils;
 
 /**
  * {@link org.springframework.http.client.ClientHttpRequestFactory} implementation that
- * uses <a href="http://hc.apache.org/httpcomponents-client-ga/">Apache HttpComponents
+ * uses <a href="https://hc.apache.org/httpcomponents-client-ga/">Apache HttpComponents
  * HttpClient</a> to create requests.
  *
  * <p>Allows to use a pre-configured {@link HttpClient} instance -
@@ -195,6 +195,7 @@ public class HttpComponentsClientHttpRequestFactory implements ClientHttpRequest
 	 * Indicates whether this request factory should buffer the request body internally.
 	 * <p>Default is {@code true}. When sending large amounts of data via POST or PUT, it is
 	 * recommended to change this property to {@code false}, so as not to run out of memory.
+	 * @since 4.0
 	 */
 	public void setBufferRequestBody(boolean bufferRequestBody) {
 		this.bufferRequestBody = bufferRequestBody;

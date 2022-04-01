@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -58,6 +58,7 @@ public class AnnotationAwareOrderComparator extends OrderComparator {
 	 * elements, in addition to the {@link org.springframework.core.Ordered}
 	 * check in the superclass.
 	 */
+	@Override
 	protected Integer findOrder(Object obj) {
 		// Check for regular Ordered interface
 		Integer order = super.findOrder(obj);
@@ -97,6 +98,7 @@ public class AnnotationAwareOrderComparator extends OrderComparator {
 	 * annotation: typically, selecting one object over another in case of
 	 * multiple matches but only one object to be returned.
 	 */
+	@Override
 	public Integer getPriority(Object obj) {
 		Integer priority = null;
 		if (obj instanceof Class) {
@@ -105,7 +107,7 @@ public class AnnotationAwareOrderComparator extends OrderComparator {
 		else if (obj != null) {
 			priority = OrderUtils.getPriority(obj.getClass());
 			if (priority == null && obj instanceof DecoratingProxy) {
-				priority = OrderUtils.getOrder(((DecoratingProxy) obj).getDecoratedClass());
+				priority = OrderUtils.getPriority(((DecoratingProxy) obj).getDecoratedClass());
 			}
 		}
 		return priority;

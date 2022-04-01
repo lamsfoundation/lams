@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2015 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -166,11 +166,9 @@ public class ResponseBodyEmitter {
 					this.handler.send(object, mediaType);
 				}
 				catch (IOException ex) {
-					completeWithError(ex);
 					throw ex;
 				}
 				catch (Throwable ex) {
-					completeWithError(ex);
 					throw new IllegalStateException("Failed to send " + object, ex);
 				}
 			}
@@ -184,6 +182,10 @@ public class ResponseBodyEmitter {
 	 * Complete request processing.
 	 * <p>A dispatch is made into the app server where Spring MVC completes
 	 * asynchronous request processing.
+	 * <p><strong>Note:</strong> you do not need to call this method after an
+	 * {@link IOException} from any of the {@code send} methods. The Servlet
+	 * container will generate an error notification that Spring MVC will process
+	 * and handle through the exception resolver mechanism and then complete.
 	 */
 	public synchronized void complete() {
 		this.complete = true;

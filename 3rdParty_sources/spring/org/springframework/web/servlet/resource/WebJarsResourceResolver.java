@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,7 +41,7 @@ import org.springframework.core.io.Resource;
  * @author Brian Clozel
  * @since 4.2
  * @see org.springframework.web.servlet.config.annotation.ResourceChainRegistration
- * @see <a href="http://www.webjars.org">webjars.org</a>
+ * @see <a href="https://www.webjars.org">webjars.org</a>
  */
 public class WebJarsResourceResolver extends AbstractResourceResolver {
 
@@ -100,7 +100,7 @@ public class WebJarsResourceResolver extends AbstractResourceResolver {
 
 	protected String findWebJarResourcePath(String path) {
 		int startOffset = (path.startsWith("/") ? 1 : 0);
-		int endOffset = path.indexOf("/", 1);
+		int endOffset = path.indexOf('/', 1);
 		if (endOffset != -1) {
 			String webjar = path.substring(startOffset, endOffset);
 			String partialPath = path.substring(endOffset + 1);

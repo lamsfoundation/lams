@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -44,7 +44,7 @@ public class UnknownHttpStatusCodeException extends RestClientResponseException 
 	public UnknownHttpStatusCodeException(int rawStatusCode, String statusText,
 			HttpHeaders responseHeaders, byte[] responseBody, Charset responseCharset) {
 
-		super("Unknown status code [" + String.valueOf(rawStatusCode) + "]" + " " + statusText,
+		super("Unknown status code [" + rawStatusCode + "]" + " " + statusText,
 				rawStatusCode, statusText, responseHeaders, responseBody, responseCharset);
 	}
 

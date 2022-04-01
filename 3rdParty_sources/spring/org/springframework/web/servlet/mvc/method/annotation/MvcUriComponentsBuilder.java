@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -82,14 +82,13 @@ import org.springframework.web.util.UriComponentsBuilder;
  * {@link #relativeTo(org.springframework.web.util.UriComponentsBuilder)}.
  * </ul>
  *
- * <p><strong>Note:</strong> This class extracts and uses values from the headers
- * "Forwarded" (<a href="http://tools.ietf.org/html/rfc7239">RFC 7239</a>),
- * or "X-Forwarded-Host", "X-Forwarded-Port", and "X-Forwarded-Proto" if
- * "Forwarded" is not found, in order to reflect the client-originated protocol
- * and address. As an alternative consider using the
- * {@link org.springframework.web.filter.ForwardedHeaderFilter} to have such
- * headers extracted once and removed, or removed only (without being used).
- * See the reference for further information including security considerations.
+ * <p><strong>Note:</strong> This class uses values from "Forwarded"
+ * (<a href="https://tools.ietf.org/html/rfc7239">RFC 7239</a>),
+ * "X-Forwarded-Host", "X-Forwarded-Port", and "X-Forwarded-Proto" headers,
+ * if present, in order to reflect the client-originated protocol and address.
+ * Consider using the {@code ForwardedHeaderFilter} in order to choose from a
+ * central place whether to extract and use, or to discard such headers.
+ * See the Spring Framework reference for more on this filter.
  *
  * @author Oliver Gierke
  * @author Rossen Stoyanchev
@@ -253,10 +252,8 @@ public class MvcUriComponentsBuilder {
 	 * controller.getAddressesForCountry("US")
 	 * builder = MvcUriComponentsBuilder.fromMethodCall(controller);
 	 * </pre>
-	 *
 	 * <p><strong>Note:</strong> This method extracts values from "Forwarded"
 	 * and "X-Forwarded-*" headers if found. See class-level docs.
-	 *
 	 * @param info either the value returned from a "mock" controller
 	 * invocation or the "mock" controller itself after an invocation
 	 * @return a UriComponents instance
@@ -726,6 +723,16 @@ public class MvcUriComponentsBuilder {
 	}
 
 
+	public interface MethodInvocationInfo {
+
+		Class<?> getControllerType();
+
+		Method getControllerMethod();
+
+		Object[] getArgumentValues();
+	}
+
+
 	private static class ControllerMethodInvocationInterceptor
 			implements org.springframework.cglib.proxy.MethodInterceptor, MethodInterceptor {
 
@@ -738,11 +745,11 @@ public class MvcUriComponentsBuilder {
 		private static final Method getControllerType =
 				ReflectionUtils.findMethod(MethodInvocationInfo.class, "getControllerType");
 
+		private final Class<?> controllerType;
+
 		private Method controllerMethod;
 
 		private Object[] argumentValues;
-
-		private Class<?> controllerType;
 
 		ControllerMethodInvocationInterceptor(Class<?> controllerType) {
 			this.controllerType = controllerType;
@@ -750,14 +757,14 @@ public class MvcUriComponentsBuilder {
 
 		@Override
 		public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) {
-			if (getControllerMethod.equals(method)) {
+			if (getControllerType.equals(method)) {
+				return this.controllerType;
+			}
+			else if (getControllerMethod.equals(method)) {
 				return this.controllerMethod;
 			}
 			else if (getArgumentValues.equals(method)) {
 				return this.argumentValues;
-			}
-			else if (getControllerType.equals(method)) {
-				return this.controllerType;
 			}
 			else if (ReflectionUtils.isObjectMethod(method)) {
 				return ReflectionUtils.invokeMethod(method, obj, args);
@@ -766,7 +773,13 @@ public class MvcUriComponentsBuilder {
 				this.controllerMethod = method;
 				this.argumentValues = args;
 				Class<?> returnType = method.getReturnType();
-				return (void.class == returnType ? null : returnType.cast(initProxy(returnType, this)));
+				try {
+					return (returnType == void.class ? null : returnType.cast(initProxy(returnType, this)));
+				}
+				catch (Throwable ex) {
+					throw new IllegalStateException(
+							"Failed to create proxy for controller method return type: " + method, ex);
+				}
 			}
 		}
 
@@ -774,16 +787,6 @@ public class MvcUriComponentsBuilder {
 		public Object invoke(org.aopalliance.intercept.MethodInvocation inv) throws Throwable {
 			return intercept(inv.getThis(), inv.getMethod(), inv.getArguments(), null);
 		}
-	}
-
-
-	public interface MethodInvocationInfo {
-
-		Method getControllerMethod();
-
-		Object[] getArgumentValues();
-
-		Class<?> getControllerType();
 	}
 
 

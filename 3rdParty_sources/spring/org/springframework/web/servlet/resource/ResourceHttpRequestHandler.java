@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +17,9 @@
 package org.springframework.web.servlet.resource;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +33,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.EmbeddedValueResolverAware;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -47,6 +52,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.util.StringValueResolver;
 import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.accept.PathExtensionContentNegotiationStrategy;
@@ -56,30 +62,30 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.support.WebContentGenerator;
+import org.springframework.web.util.UrlPathHelper;
 
 /**
  * {@code HttpRequestHandler} that serves static resources in an optimized way
  * according to the guidelines of Page Speed, YSlow, etc.
  *
  * <p>The {@linkplain #setLocations "locations"} property takes a list of Spring
- * {@link Resource} locations from which static resources are allowed to
- * be served by this handler. Resources could be served from a classpath location,
- * e.g. "classpath:/META-INF/public-web-resources/", allowing convenient packaging
+ * {@link Resource} locations from which static resources are allowed to be served
+ * by this handler. Resources could be served from a classpath location, e.g.
+ * "classpath:/META-INF/public-web-resources/", allowing convenient packaging
  * and serving of resources such as .js, .css, and others in jar files.
  *
  * <p>This request handler may also be configured with a
  * {@link #setResourceResolvers(List) resourcesResolver} and
  * {@link #setResourceTransformers(List) resourceTransformer} chains to support
- * arbitrary resolution and transformation of resources being served. By default a
- * {@link PathResourceResolver} simply finds resources based on the configured
- * "locations". An application can configure additional resolvers and
- * transformers such as the {@link VersionResourceResolver} which can resolve
- * and prepare URLs for resources with a version in the URL.
+ * arbitrary resolution and transformation of resources being served. By default
+ * a {@link PathResourceResolver} simply finds resources based on the configured
+ * "locations". An application can configure additional resolvers and transformers
+ * such as the {@link VersionResourceResolver} which can resolve and prepare URLs
+ * for resources with a version in the URL.
  *
- * <p>This handler also properly evaluates the {@code Last-Modified} header (if
- * present) so that a {@code 304} status code will be returned as appropriate,
- * avoiding unnecessary overhead for resources that are already cached by the
- * client.
+ * <p>This handler also properly evaluates the {@code Last-Modified} header
+ * (if present) so that a {@code 304} status code will be returned as appropriate,
+ * avoiding unnecessary overhead for resources that are already cached by the client.
  *
  * @author Keith Donald
  * @author Jeremy Grelle
@@ -90,7 +96,7 @@ import org.springframework.web.servlet.support.WebContentGenerator;
  * @since 3.0.4
  */
 public class ResourceHttpRequestHandler extends WebContentGenerator
-		implements HttpRequestHandler, InitializingBean, CorsConfigurationSource {
+		implements HttpRequestHandler, EmbeddedValueResolverAware, InitializingBean, CorsConfigurationSource {
 
 	// Servlet 3.1 setContentLengthLong(long) available?
 	private static final boolean contentLengthLongAvailable =
@@ -98,8 +104,14 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 
 	private static final Log logger = LogFactory.getLog(ResourceHttpRequestHandler.class);
 
+	private static final String URL_RESOURCE_CHARSET_PREFIX = "[charset=";
+
+
+	private final List<String> locationValues = new ArrayList<String>(4);
 
 	private final List<Resource> locations = new ArrayList<Resource>(4);
+
+	private final Map<Resource, Charset> locationCharsets = new HashMap<Resource, Charset>(4);
 
 	private final List<ResourceResolver> resourceResolvers = new ArrayList<ResourceResolver>(4);
 
@@ -115,6 +127,10 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 
 	private CorsConfiguration corsConfiguration;
 
+	private UrlPathHelper urlPathHelper;
+
+	private StringValueResolver embeddedValueResolver;
+
 
 	public ResourceHttpRequestHandler() {
 		super(HttpMethod.GET.name(), HttpMethod.HEAD.name());
@@ -122,8 +138,23 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 
 
 	/**
-	 * Set the {@code List} of {@code Resource} paths to use as sources
+	 * An alternative to {@link #setLocations(List)} that accepts a list of
+	 * String-based location values, with support for {@link UrlResource}'s
+	 * (e.g. files or HTTP URLs) with a special prefix to indicate the charset
+	 * to use when appending relative paths. For example
+	 * {@code "[charset=Windows-31J]https://example.org/path"}.
+	 * @since 4.3.13
+	 */
+	public void setLocationValues(List<String> locationValues) {
+		Assert.notNull(locationValues, "Location values list must not be null");
+		this.locationValues.clear();
+		this.locationValues.addAll(locationValues);
+	}
+
+	/**
+	 * Set the {@code List} of {@code Resource} locations to use as sources
 	 * for serving static resources.
+	 * @see #setLocationValues(List)
 	 */
 	public void setLocations(List<Resource> locations) {
 		Assert.notNull(locations, "Locations list must not be null");
@@ -132,8 +163,12 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Return the {@code List} of {@code Resource} paths to use as sources
-	 * for serving static resources.
+	 * Return the configured {@code List} of {@code Resource} locations.
+	 * <p>Note that if {@link #setLocationValues(List) locationValues} are provided,
+	 * instead of loaded Resource-based locations, this method will return
+	 * empty until after initialization via {@link #afterPropertiesSet()}.
+	 * @see #setLocationValues
+	 * @see #setLocations
 	 */
 	public List<Resource> getLocations() {
 		return this.locations;
@@ -181,8 +216,8 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	 * <p>By default a {@link ResourceHttpMessageConverter} will be configured.
 	 * @since 4.3
 	 */
-	public void setResourceHttpMessageConverter(ResourceHttpMessageConverter resourceHttpMessageConverter) {
-		this.resourceHttpMessageConverter = resourceHttpMessageConverter;
+	public void setResourceHttpMessageConverter(ResourceHttpMessageConverter messageConverter) {
+		this.resourceHttpMessageConverter = messageConverter;
 	}
 
 	/**
@@ -198,8 +233,8 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	 * <p>By default a {@link ResourceRegionHttpMessageConverter} will be configured.
 	 * @since 4.3
 	 */
-	public void setResourceRegionHttpMessageConverter(ResourceRegionHttpMessageConverter resourceRegionHttpMessageConverter) {
-		this.resourceRegionHttpMessageConverter = resourceRegionHttpMessageConverter;
+	public void setResourceRegionHttpMessageConverter(ResourceRegionHttpMessageConverter messageConverter) {
+		this.resourceRegionHttpMessageConverter = messageConverter;
 	}
 
 	/**
@@ -214,7 +249,6 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	 * Configure a {@code ContentNegotiationManager} to help determine the
 	 * media types for resources being served. If the manager contains a path
 	 * extension strategy it will be checked for registered file extension.
-	 * @param contentNegotiationManager the manager in use
 	 * @since 4.3
 	 */
 	public void setContentNegotiationManager(ContentNegotiationManager contentNegotiationManager) {
@@ -245,9 +279,34 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 		return this.corsConfiguration;
 	}
 
+	/**
+	 * Provide a reference to the {@link UrlPathHelper} used to map requests to
+	 * static resources. This helps to derive information about the lookup path
+	 * such as whether it is decoded or not.
+	 * @since 4.3.13
+	 */
+	public void setUrlPathHelper(UrlPathHelper urlPathHelper) {
+		this.urlPathHelper = urlPathHelper;
+	}
+
+	/**
+	 * The configured {@link UrlPathHelper}.
+	 * @since 4.3.13
+	 */
+	public UrlPathHelper getUrlPathHelper() {
+		return this.urlPathHelper;
+	}
+
+	@Override
+	public void setEmbeddedValueResolver(StringValueResolver resolver) {
+		this.embeddedValueResolver = resolver;
+	}
+
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		resolveResourceLocations();
+
 		if (logger.isWarnEnabled() && CollectionUtils.isEmpty(this.locations)) {
 			logger.warn("Locations list is empty. No resources will be served unless a " +
 					"custom ResourceResolver is configured as an alternative to PathResourceResolver.");
@@ -256,6 +315,7 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 		if (this.resourceResolvers.isEmpty()) {
 			this.resourceResolvers.add(new PathResourceResolver());
 		}
+
 		initAllowedLocations();
 
 		if (this.resourceHttpMessageConverter == null) {
@@ -266,6 +326,46 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 		}
 
 		this.contentNegotiationStrategy = initContentNegotiationStrategy();
+	}
+
+	private void resolveResourceLocations() {
+		if (CollectionUtils.isEmpty(this.locationValues)) {
+			return;
+		}
+		else if (!CollectionUtils.isEmpty(this.locations)) {
+			throw new IllegalArgumentException("Please set either Resource-based \"locations\" or " +
+					"String-based \"locationValues\", but not both.");
+		}
+
+		ApplicationContext applicationContext = getApplicationContext();
+		for (String location : this.locationValues) {
+			if (this.embeddedValueResolver != null) {
+				String resolvedLocation = this.embeddedValueResolver.resolveStringValue(location);
+				if (resolvedLocation == null) {
+					throw new IllegalArgumentException("Location resolved to null: " + location);
+				}
+				location = resolvedLocation;
+			}
+			Charset charset = null;
+			location = location.trim();
+			if (location.startsWith(URL_RESOURCE_CHARSET_PREFIX)) {
+				int endIndex = location.indexOf(']', URL_RESOURCE_CHARSET_PREFIX.length());
+				if (endIndex == -1) {
+					throw new IllegalArgumentException("Invalid charset syntax in location: " + location);
+				}
+				String value = location.substring(URL_RESOURCE_CHARSET_PREFIX.length(), endIndex);
+				charset = Charset.forName(value);
+				location = location.substring(endIndex + 1);
+			}
+			Resource resource = applicationContext.getResource(location);
+			this.locations.add(resource);
+			if (charset != null) {
+				if (!(resource instanceof UrlResource)) {
+					throw new IllegalArgumentException("Unexpected charset for non-UrlResource: " + resource);
+				}
+				this.locationCharsets.put(resource, charset);
+			}
+		}
 	}
 
 	/**
@@ -282,6 +382,10 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 				PathResourceResolver pathResolver = (PathResourceResolver) getResourceResolvers().get(i);
 				if (ObjectUtils.isEmpty(pathResolver.getAllowedLocations())) {
 					pathResolver.setAllowedLocations(getLocations().toArray(new Resource[getLocations().size()]));
+				}
+				if (this.urlPathHelper != null) {
+					pathResolver.setLocationCharsets(this.locationCharsets);
+					pathResolver.setUrlPathHelper(this.urlPathHelper);
 				}
 				break;
 			}
@@ -403,6 +507,7 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 			throw new IllegalStateException("Required request attribute '" +
 					HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE + "' is not set");
 		}
+
 		path = processPath(path);
 		if (!StringUtils.hasText(path) || isInvalidPath(path)) {
 			if (logger.isTraceEnabled()) {
@@ -410,25 +515,19 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 			}
 			return null;
 		}
-		if (path.contains("%")) {
-			try {
-				// Use URLDecoder (vs UriUtils) to preserve potentially decoded UTF-8 chars
-				if (isInvalidPath(URLDecoder.decode(path, "UTF-8"))) {
-					if (logger.isTraceEnabled()) {
-						logger.trace("Ignoring invalid resource path with escape sequences [" + path + "].");
-					}
-					return null;
-				}
+		if (isInvalidEncodedPath(path)) {
+			if (logger.isTraceEnabled()) {
+				logger.trace("Ignoring invalid resource path with escape sequences [" + path + "]");
 			}
-			catch (IllegalArgumentException ex) {
-				// ignore
-			}
+			return null;
 		}
+
 		ResourceResolverChain resolveChain = new DefaultResourceResolverChain(getResourceResolvers());
 		Resource resource = resolveChain.resolveResource(request, path, getLocations());
 		if (resource == null || getResourceTransformers().isEmpty()) {
 			return resource;
 		}
+
 		ResourceTransformerChain transformChain =
 				new DefaultResourceTransformerChain(resolveChain, getResourceTransformers());
 		resource = transformChain.transform(request, resource);
@@ -436,13 +535,47 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Process the given resource path to be used.
-	 * <p>The default implementation replaces any combination of leading '/' and
-	 * control characters (00-1F and 7F) with a single "/" or "". For example
-	 * {@code "  // /// ////  foo/bar"} becomes {@code "/foo/bar"}.
+	 * Process the given resource path.
+	 * <p>The default implementation replaces:
+	 * <ul>
+	 * <li>Backslash with forward slash.
+	 * <li>Duplicate occurrences of slash with a single slash.
+	 * <li>Any combination of leading slash and control characters (00-1F and 7F)
+	 * with a single "/" or "". For example {@code "  / // foo/bar"}
+	 * becomes {@code "/foo/bar"}.
+	 * </ul>
 	 * @since 3.2.12
 	 */
 	protected String processPath(String path) {
+		path = StringUtils.replace(path, "\\", "/");
+		path = cleanDuplicateSlashes(path);
+		return cleanLeadingSlash(path);
+	}
+
+	private String cleanDuplicateSlashes(String path) {
+		StringBuilder sb = null;
+		char prev = 0;
+		for (int i = 0; i < path.length(); i++) {
+			char curr = path.charAt(i);
+			try {
+				if ((curr == '/') && (prev == '/')) {
+					if (sb == null) {
+						sb = new StringBuilder(path.substring(0, i));
+					}
+					continue;
+				}
+				if (sb != null) {
+					sb.append(path.charAt(i));
+				}
+			}
+			finally {
+				prev = curr;
+			}
+		}
+		return sb != null ? sb.toString() : path;
+	}
+
+	private String cleanLeadingSlash(String path) {
 		boolean slash = false;
 		for (int i = 0; i < path.length(); i++) {
 			if (path.charAt(i) == '/') {
@@ -452,14 +585,42 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 				if (i == 0 || (i == 1 && slash)) {
 					return path;
 				}
-				path = slash ? "/" + path.substring(i) : path.substring(i);
+				path = (slash ? "/" + path.substring(i) : path.substring(i));
 				if (logger.isTraceEnabled()) {
-					logger.trace("Path after trimming leading '/' and control characters: " + path);
+					logger.trace("Path after trimming leading '/' and control characters: [" + path + "]");
 				}
 				return path;
 			}
 		}
 		return (slash ? "/" : "");
+	}
+
+	/**
+	 * Check whether the given path contains invalid escape sequences.
+	 * @param path the path to validate
+	 * @return {@code true} if the path is invalid, {@code false} otherwise
+	 */
+	private boolean isInvalidEncodedPath(String path) {
+		if (path.contains("%")) {
+			try {
+				// Use URLDecoder (vs UriUtils) to preserve potentially decoded UTF-8 chars
+				String decodedPath = URLDecoder.decode(path, "UTF-8");
+				if (isInvalidPath(decodedPath)) {
+					return true;
+				}
+				decodedPath = processPath(decodedPath);
+				if (isInvalidPath(decodedPath)) {
+					return true;
+				}
+			}
+			catch (IllegalArgumentException ex) {
+				// Should never happen...
+			}
+			catch (UnsupportedEncodingException ex) {
+				// Should never happen...
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -476,14 +637,12 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	 * path starts predictably with a single '/' or does not have one.
 	 * @param path the path to validate
 	 * @return {@code true} if the path is invalid, {@code false} otherwise
+	 * @since 3.0.6
 	 */
 	protected boolean isInvalidPath(String path) {
-		if (logger.isTraceEnabled()) {
-			logger.trace("Applying \"invalid path\" checks to path: " + path);
-		}
 		if (path.contains("WEB-INF") || path.contains("META-INF")) {
 			if (logger.isTraceEnabled()) {
-				logger.trace("Path contains \"WEB-INF\" or \"META-INF\".");
+				logger.trace("Path with \"WEB-INF\" or \"META-INF\": [" + path + "]");
 			}
 			return true;
 		}
@@ -491,19 +650,16 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 			String relativePath = (path.charAt(0) == '/' ? path.substring(1) : path);
 			if (ResourceUtils.isUrl(relativePath) || relativePath.startsWith("url:")) {
 				if (logger.isTraceEnabled()) {
-					logger.trace("Path represents URL or has \"url:\" prefix.");
+					logger.trace("Path represents URL or has \"url:\" prefix: [" + path + "]");
 				}
 				return true;
 			}
 		}
-		if (path.contains("..")) {
-			path = StringUtils.cleanPath(path);
-			if (path.contains("../")) {
-				if (logger.isTraceEnabled()) {
-					logger.trace("Path contains \"../\" after call to StringUtils#cleanPath.");
-				}
-				return true;
+		if (path.contains("..") && StringUtils.cleanPath(path).contains("../")) {
+			if (logger.isTraceEnabled()) {
+				logger.trace("Path contains \"../\" after call to StringUtils#cleanPath: [" + path + "]");
 			}
+			return true;
 		}
 		return false;
 	}

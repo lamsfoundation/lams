@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,9 +37,13 @@ import org.springframework.expression.TypedValue;
 import org.springframework.util.Assert;
 
 /**
- * Provides a default EvaluationContext implementation.
+ * A powerful and highly configurable {@link EvaluationContext} implementation.
+ * This context uses standard implementations of all applicable strategies,
+ * based on reflection to resolve properties, methods and fields.
  *
- * <p>To resolve properties/methods/fields this context uses a reflection mechanism.
+ * <p>For a simpler builder-style context variant for data-binding purposes,
+ * consider using {@link SimpleEvaluationContext} instead which allows for
+ * opting into several SpEL features as needed by specific evaluation cases.
  *
  * @author Andy Clement
  * @author Juergen Hoeller
@@ -71,10 +75,18 @@ public class StandardEvaluationContext implements EvaluationContext {
 	private final Map<String, Object> variables = new HashMap<String, Object>();
 
 
+	/**
+	 * Create a {@code StandardEvaluationContext} with a null root object.
+	 */
 	public StandardEvaluationContext() {
 		setRootObject(null);
 	}
 
+	/**
+	 * Create a {@code StandardEvaluationContext} with the given root object.
+	 * @param rootObject the root object to use
+	 * @see #setRootObject
+	 */
 	public StandardEvaluationContext(Object rootObject) {
 		setRootObject(rootObject);
 	}
@@ -182,7 +194,7 @@ public class StandardEvaluationContext implements EvaluationContext {
 	@Override
 	public TypeConverter getTypeConverter() {
 		if (this.typeConverter == null) {
-			 this.typeConverter = new StandardTypeConverter();
+			this.typeConverter = new StandardTypeConverter();
 		}
 		return this.typeConverter;
 	}
@@ -212,7 +224,7 @@ public class StandardEvaluationContext implements EvaluationContext {
 		this.variables.put(name, value);
 	}
 
-	public void setVariables(Map<String,Object> variables) {
+	public void setVariables(Map<String, Object> variables) {
 		this.variables.putAll(variables);
 	}
 

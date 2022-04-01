@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,7 +25,6 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -635,7 +634,7 @@ public abstract class ReflectionUtils {
 			for (Method ifcMethod : ifc.getMethods()) {
 				if (!Modifier.isAbstract(ifcMethod.getModifiers())) {
 					if (result == null) {
-						result = new LinkedList<Method>();
+						result = new ArrayList<Method>();
 					}
 					result.add(ifcMethod);
 				}
@@ -645,8 +644,7 @@ public abstract class ReflectionUtils {
 	}
 
 	/**
-	 * Invoke the given callback on all fields in the target class, going up the
-	 * class hierarchy to get all declared fields.
+	 * Invoke the given callback on all locally declared fields in the given class.
 	 * @param clazz the target class to analyze
 	 * @param fc the callback to invoke for each field
 	 * @since 4.2
@@ -803,19 +801,8 @@ public abstract class ReflectionUtils {
 
 
 	/**
-	 * Pre-built FieldFilter that matches all non-static, non-final fields.
-	 */
-	public static final FieldFilter COPYABLE_FIELDS = new FieldFilter() {
-
-		@Override
-		public boolean matches(Field field) {
-			return !(Modifier.isStatic(field.getModifiers()) || Modifier.isFinal(field.getModifiers()));
-		}
-	};
-
-
-	/**
 	 * Pre-built MethodFilter that matches all non-bridge methods.
+	 * @since 3.0
 	 */
 	public static final MethodFilter NON_BRIDGED_METHODS = new MethodFilter() {
 
@@ -829,12 +816,25 @@ public abstract class ReflectionUtils {
 	/**
 	 * Pre-built MethodFilter that matches all non-bridge methods
 	 * which are not declared on {@code java.lang.Object}.
+	 * @since 3.0.5
 	 */
 	public static final MethodFilter USER_DECLARED_METHODS = new MethodFilter() {
 
 		@Override
 		public boolean matches(Method method) {
 			return (!method.isBridge() && method.getDeclaringClass() != Object.class);
+		}
+	};
+
+
+	/**
+	 * Pre-built FieldFilter that matches all non-static, non-final fields.
+	 */
+	public static final FieldFilter COPYABLE_FIELDS = new FieldFilter() {
+
+		@Override
+		public boolean matches(Field field) {
+			return !(Modifier.isStatic(field.getModifiers()) || Modifier.isFinal(field.getModifiers()));
 		}
 	};
 

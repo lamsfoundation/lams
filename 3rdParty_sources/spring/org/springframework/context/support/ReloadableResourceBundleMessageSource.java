@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -84,7 +84,8 @@ import org.springframework.util.StringUtils;
  * @see ResourceBundleMessageSource
  * @see java.util.ResourceBundle
  */
-public class ReloadableResourceBundleMessageSource extends AbstractResourceBasedMessageSource implements ResourceLoaderAware {
+public class ReloadableResourceBundleMessageSource extends AbstractResourceBasedMessageSource
+		implements ResourceLoaderAware {
 
 	private static final String PROPERTIES_SUFFIX = ".properties";
 
@@ -99,15 +100,15 @@ public class ReloadableResourceBundleMessageSource extends AbstractResourceBased
 
 	private ResourceLoader resourceLoader = new DefaultResourceLoader();
 
-	/** Cache to hold filename lists per Locale */
+	// Cache to hold filename lists per Locale
 	private final ConcurrentMap<String, Map<Locale, List<String>>> cachedFilenames =
 			new ConcurrentHashMap<String, Map<Locale, List<String>>>();
 
-	/** Cache to hold already loaded properties per filename */
+	// Cache to hold already loaded properties per filename
 	private final ConcurrentMap<String, PropertiesHolder> cachedProperties =
 			new ConcurrentHashMap<String, PropertiesHolder>();
 
-	/** Cache to hold merged loaded properties per locale */
+	// Cache to hold merged loaded properties per locale
 	private final ConcurrentMap<Locale, PropertiesHolder> cachedMergedProperties =
 			new ConcurrentHashMap<Locale, PropertiesHolder>();
 
@@ -236,6 +237,7 @@ public class ReloadableResourceBundleMessageSource extends AbstractResourceBased
 		if (mergedHolder != null) {
 			return mergedHolder;
 		}
+
 		Properties mergedProps = newProperties();
 		long latestTimestamp = -1;
 		String[] basenames = StringUtils.toStringArray(getBasenameSet());
@@ -252,6 +254,7 @@ public class ReloadableResourceBundleMessageSource extends AbstractResourceBased
 				}
 			}
 		}
+
 		mergedHolder = new PropertiesHolder(mergedProps, latestTimestamp);
 		PropertiesHolder existing = this.cachedMergedProperties.putIfAbsent(locale, mergedHolder);
 		if (existing != null) {
@@ -278,18 +281,28 @@ public class ReloadableResourceBundleMessageSource extends AbstractResourceBased
 				return filenames;
 			}
 		}
+
+		// Filenames for given Locale
 		List<String> filenames = new ArrayList<String>(7);
 		filenames.addAll(calculateFilenamesForLocale(basename, locale));
-		if (isFallbackToSystemLocale() && !locale.equals(Locale.getDefault())) {
-			List<String> fallbackFilenames = calculateFilenamesForLocale(basename, Locale.getDefault());
-			for (String fallbackFilename : fallbackFilenames) {
-				if (!filenames.contains(fallbackFilename)) {
-					// Entry for fallback locale that isn't already in filenames list.
-					filenames.add(fallbackFilename);
+
+		// Filenames for default Locale, if any
+		if (isFallbackToSystemLocale()) {
+			Locale defaultLocale = Locale.getDefault();
+			if (!locale.equals(defaultLocale)) {
+				List<String> fallbackFilenames = calculateFilenamesForLocale(basename, defaultLocale);
+				for (String fallbackFilename : fallbackFilenames) {
+					if (!filenames.contains(fallbackFilename)) {
+						// Entry for fallback locale that isn't already in filenames list.
+						filenames.add(fallbackFilename);
+					}
 				}
 			}
 		}
+
+		// Filename for default bundle file
 		filenames.add(basename);
+
 		if (localeMap == null) {
 			localeMap = new ConcurrentHashMap<Locale, List<String>>();
 			Map<Locale, List<String>> existing = this.cachedFilenames.putIfAbsent(basename, localeMap);

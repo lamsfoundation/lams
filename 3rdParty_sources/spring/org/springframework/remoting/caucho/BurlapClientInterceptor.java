@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -40,7 +40,7 @@ import org.springframework.util.Assert;
  *
  * <p>Burlap is a slim, XML-based RPC protocol.
  * For information on Burlap, see the
- * <a href="http://www.caucho.com/burlap">Burlap website</a>
+ * <a href="https://www.caucho.com/burlap">Burlap website</a>
  *
  * <p>Note: There is no requirement for services accessed with this proxy factory
  * to have been exported using Spring's {@link BurlapServiceExporter}, as there is

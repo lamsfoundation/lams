@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,6 +26,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.FastByteArrayOutputStream;
 
 /**
@@ -40,6 +42,11 @@ import org.springframework.util.FastByteArrayOutputStream;
  * @see ContentCachingRequestWrapper
  */
 public class ContentCachingResponseWrapper extends HttpServletResponseWrapper {
+
+	/** Checking for Servlet 3.0+ HttpServletResponse.getHeader(String) */
+	private static final boolean servlet3Present =
+			ClassUtils.hasMethod(HttpServletResponse.class, "getHeader", String.class);
+
 
 	private final FastByteArrayOutputStream content = new FastByteArrayOutputStream(1024);
 
@@ -214,7 +221,13 @@ public class ContentCachingResponseWrapper extends HttpServletResponseWrapper {
 		if (this.content.size() > 0) {
 			HttpServletResponse rawResponse = (HttpServletResponse) getResponse();
 			if ((complete || this.contentLength != null) && !rawResponse.isCommitted()) {
-				rawResponse.setContentLength(complete ? this.content.size() : this.contentLength);
+				boolean hasTransferEncoding = false;
+				if (servlet3Present) {
+					hasTransferEncoding = (rawResponse.getHeader(HttpHeaders.TRANSFER_ENCODING) != null);
+				}
+				if (!hasTransferEncoding) {
+					rawResponse.setContentLength(complete ? this.content.size() : this.contentLength);
+				}
 				this.contentLength = null;
 			}
 			this.content.writeTo(rawResponse.getOutputStream());
@@ -247,7 +260,7 @@ public class ContentCachingResponseWrapper extends HttpServletResponseWrapper {
 		}
 
 		@Override
-		public void write(char buf[], int off, int len) {
+		public void write(char[] buf, int off, int len) {
 			super.write(buf, off, len);
 			super.flush();
 		}

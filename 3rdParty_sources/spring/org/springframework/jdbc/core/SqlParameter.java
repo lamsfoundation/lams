@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2015 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +16,7 @@
 
 package org.springframework.jdbc.core;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,16 +35,16 @@ import org.springframework.util.Assert;
  */
 public class SqlParameter {
 
-	/** The name of the parameter, if any */
+	// The name of the parameter, if any
 	private String name;
 
-	/** SQL type constant from {@code java.sql.Types} */
+	// SQL type constant from {@code java.sql.Types}
 	private final int sqlType;
 
-	/** Used for types that are user-named like: STRUCT, DISTINCT, JAVA_OBJECT, named array types */
+	// Used for types that are user-named like: STRUCT, DISTINCT, JAVA_OBJECT, named array types
 	private String typeName;
 
-	/** The scale to apply in case of a NUMERIC or DECIMAL type, if any */
+	// The scale to apply in case of a NUMERIC or DECIMAL type, if any
 	private Integer scale;
 
 
@@ -164,7 +165,7 @@ public class SqlParameter {
 
 	/**
 	 * Return whether this parameter is an implicit return parameter used during the
-	 * results preocessing of the CallableStatement.getMoreResults/getUpdateCount.
+	 * results processing of {@code CallableStatement.getMoreResults/getUpdateCount}.
 	 * <p>This implementation always returns {@code false}.
 	 */
 	public boolean isResultsParameter() {
@@ -177,11 +178,15 @@ public class SqlParameter {
 	 * to a List of SqlParameter objects as used in this package.
 	 */
 	public static List<SqlParameter> sqlTypesToAnonymousParameterList(int... types) {
-		List<SqlParameter> result = new LinkedList<SqlParameter>();
+		List<SqlParameter> result;
 		if (types != null) {
+			result = new ArrayList<SqlParameter>(types.length);
 			for (int type : types) {
 				result.add(new SqlParameter(type));
 			}
+		}
+		else {
+			result = new LinkedList<SqlParameter>();
 		}
 		return result;
 	}

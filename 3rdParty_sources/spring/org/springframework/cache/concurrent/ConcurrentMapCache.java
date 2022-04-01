@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -137,24 +137,28 @@ public class ConcurrentMapCache extends AbstractValueAdaptingCache {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T get(Object key, Callable<T> valueLoader) {
-		if (this.store.containsKey(key)) {
-			return (T) get(key).get();
+		// Try efficient lookup on the ConcurrentHashMap first...
+		ValueWrapper storeValue = get(key);
+		if (storeValue != null) {
+			return (T) storeValue.get();
 		}
-		else {
-			synchronized (this.store) {
-				if (this.store.containsKey(key)) {
-					return (T) get(key).get();
-				}
-				T value;
-				try {
-					value = valueLoader.call();
-				}
-				catch (Throwable ex) {
-					throw new ValueRetrievalException(key, valueLoader, ex);
-				}
-				put(key, value);
-				return value;
+
+		// No value found -> load value within full synchronization.
+		synchronized (this.store) {
+			storeValue = get(key);
+			if (storeValue != null) {
+				return (T) storeValue.get();
 			}
+
+			T value;
+			try {
+				value = valueLoader.call();
+			}
+			catch (Throwable ex) {
+				throw new ValueRetrievalException(key, valueLoader, ex);
+			}
+			put(key, value);
+			return value;
 		}
 	}
 

@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,9 +20,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.core.Ordered;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.PathMatcher;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.handler.MappedInterceptor;
 
@@ -43,14 +44,17 @@ public class InterceptorRegistration {
 
 	private PathMatcher pathMatcher;
 
+	private int order = 0;
+
 
 	/**
-	 * Creates an {@link InterceptorRegistration} instance.
+	 * Create an {@link InterceptorRegistration} instance.
 	 */
 	public InterceptorRegistration(HandlerInterceptor interceptor) {
 		Assert.notNull(interceptor, "Interceptor is required");
 		this.interceptor = interceptor;
 	}
+
 
 	/**
 	 * Add URL patterns to which the registered interceptor should apply to.
@@ -80,27 +84,39 @@ public class InterceptorRegistration {
 	}
 
 	/**
-	 * Returns the underlying interceptor. If URL patterns are provided the returned type is
-	 * {@link MappedInterceptor}; otherwise {@link HandlerInterceptor}.
+	 * Specify an order position to be used. Default is 0.
+	 * @since 4.3.23
+	 */
+	public InterceptorRegistration order(int order){
+		this.order = order;
+		return this;
+	}
+
+	/**
+	 * Build the underlying interceptor. If URL patterns are provided, the returned
+	 * type is {@link MappedInterceptor}; otherwise {@link HandlerInterceptor}.
 	 */
 	protected Object getInterceptor() {
 		if (this.includePatterns.isEmpty() && this.excludePatterns.isEmpty()) {
 			return this.interceptor;
 		}
 
-		String[] include = toArray(this.includePatterns);
-		String[] exclude = toArray(this.excludePatterns);
+		String[] include = StringUtils.toStringArray(this.includePatterns);
+		String[] exclude = StringUtils.toStringArray(this.excludePatterns);
 		MappedInterceptor mappedInterceptor = new MappedInterceptor(include, exclude, this.interceptor);
-
 		if (this.pathMatcher != null) {
 			mappedInterceptor.setPathMatcher(this.pathMatcher);
 		}
-
 		return mappedInterceptor;
 	}
 
-	private static String[] toArray(List<String> list) {
-		return (CollectionUtils.isEmpty(list) ? null : list.toArray(new String[list.size()]));
+	Ordered toOrdered() {
+		return new Ordered() {
+			@Override
+			public int getOrder() {
+				return order;
+			}
+		};
 	}
 
 }

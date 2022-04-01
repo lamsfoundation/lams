@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,7 +29,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * Date sequence generator for a
- * <a href="http://www.manpagez.com/man/5/crontab/">Crontab pattern</a>,
+ * <a href="https://www.manpagez.com/man/5/crontab/">Crontab pattern</a>,
  * allowing clients to specify a pattern that the sequence matches.
  *
  * <p>The pattern is a list of six single space-separated fields: representing
@@ -350,7 +350,7 @@ public class CronSequenceGenerator {
 				if (!split[0].contains("-")) {
 					range[1] = max - 1;
 				}
-				int delta = Integer.valueOf(split[1]);
+				int delta = Integer.parseInt(split[1]);
 				if (delta <= 0) {
 					throw new IllegalArgumentException("Incrementer delta must be 1 or higher: '" +
 							field + "' in expression \"" + this.expression + "\"");

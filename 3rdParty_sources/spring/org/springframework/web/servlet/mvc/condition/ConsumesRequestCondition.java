@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,8 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.InvalidMediaTypeException;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
-import org.springframework.web.HttpMediaTypeException;
-import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.servlet.mvc.condition.HeadersRequestCondition.HeaderExpression;
@@ -49,7 +47,6 @@ import org.springframework.web.servlet.mvc.condition.HeadersRequestCondition.Hea
 public final class ConsumesRequestCondition extends AbstractRequestCondition<ConsumesRequestCondition> {
 
 	private final static ConsumesRequestCondition PRE_FLIGHT_MATCH = new ConsumesRequestCondition();
-
 
 	private final List<ConsumeMediaTypeExpression> expressions;
 
@@ -129,6 +126,7 @@ public final class ConsumesRequestCondition extends AbstractRequestCondition<Con
 	/**
 	 * Whether the condition has any media type expressions.
 	 */
+	@Override
 	public boolean isEmpty() {
 		return this.expressions.isEmpty();
 	}
@@ -161,7 +159,7 @@ public final class ConsumesRequestCondition extends AbstractRequestCondition<Con
 	 * @param request the current request
 	 * @return the same instance if the condition contains no expressions;
 	 * or a new condition with matching expressions only;
-	 * or {@code null} if no expressions match.
+	 * or {@code null} if no expressions match
 	 */
 	@Override
 	public ConsumesRequestCondition getMatchingCondition(HttpServletRequest request) {
@@ -171,15 +169,17 @@ public final class ConsumesRequestCondition extends AbstractRequestCondition<Con
 		if (isEmpty()) {
 			return this;
 		}
+
 		MediaType contentType;
 		try {
-			contentType = StringUtils.hasLength(request.getContentType()) ?
+			contentType = (StringUtils.hasLength(request.getContentType()) ?
 					MediaType.parseMediaType(request.getContentType()) :
-					MediaType.APPLICATION_OCTET_STREAM;
+					MediaType.APPLICATION_OCTET_STREAM);
 		}
 		catch (InvalidMediaTypeException ex) {
 			return null;
 		}
+
 		Set<ConsumeMediaTypeExpression> result = new LinkedHashSet<ConsumeMediaTypeExpression>(this.expressions);
 		for (Iterator<ConsumeMediaTypeExpression> iterator = result.iterator(); iterator.hasNext();) {
 			ConsumeMediaTypeExpression expression = iterator.next();
@@ -187,7 +187,7 @@ public final class ConsumesRequestCondition extends AbstractRequestCondition<Con
 				iterator.remove();
 			}
 		}
-		return (result.isEmpty()) ? null : new ConsumesRequestCondition(result);
+		return (!result.isEmpty() ? new ConsumesRequestCondition(result) : null);
 	}
 
 	/**

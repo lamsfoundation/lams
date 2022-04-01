@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2015 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,7 +26,8 @@ import org.springframework.util.Assert;
 /**
  * Pointcut constants for matching getters and setters,
  * and static methods useful for manipulating and evaluating pointcuts.
- * These methods are particularly useful for composing pointcuts
+ *
+ * <p>These methods are particularly useful for composing pointcuts
  * using the union and intersection methods.
  *
  * @author Rod Johnson
@@ -94,7 +95,7 @@ public abstract class Pointcuts {
 	@SuppressWarnings("serial")
 	private static class SetterPointcut extends StaticMethodMatcherPointcut implements Serializable {
 
-		public static SetterPointcut INSTANCE = new SetterPointcut();
+		public static final SetterPointcut INSTANCE = new SetterPointcut();
 
 		@Override
 		public boolean matches(Method method, Class<?> targetClass) {
@@ -115,7 +116,7 @@ public abstract class Pointcuts {
 	@SuppressWarnings("serial")
 	private static class GetterPointcut extends StaticMethodMatcherPointcut implements Serializable {
 
-		public static GetterPointcut INSTANCE = new GetterPointcut();
+		public static final GetterPointcut INSTANCE = new GetterPointcut();
 
 		@Override
 		public boolean matches(Method method, Class<?> targetClass) {

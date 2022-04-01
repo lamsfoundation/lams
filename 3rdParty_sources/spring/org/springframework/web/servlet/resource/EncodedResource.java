@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,7 +27,7 @@ import org.springframework.core.io.Resource;
  *
  * @author Jeremy Grelle
  * @since 4.1
- * @see <a href="http://tools.ietf.org/html/rfc7231#section-3.1.2.2">HTTP/1.1: Semantics
+ * @see <a href="https://tools.ietf.org/html/rfc7231#section-3.1.2.2">HTTP/1.1: Semantics
  * and Content, section 3.1.2.2</a>
  */
 public interface EncodedResource extends Resource {
@@ -35,7 +35,7 @@ public interface EncodedResource extends Resource {
 	/**
 	 * The content coding value, as defined in the IANA registry
 	 * @return the content encoding
-	 * @see <a href="http://tools.ietf.org/html/rfc7231#section-3.1.2.1">HTTP/1.1: Semantics
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-3.1.2.1">HTTP/1.1: Semantics
 	 * and Content, section 3.1.2.1</a>
 	 */
 	String getContentEncoding();

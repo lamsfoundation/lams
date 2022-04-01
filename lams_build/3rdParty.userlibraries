@@ -26,17 +26,17 @@
         <archive javadoc="http://alex-public-doc.s3.amazonaws.com/json_simple-1.1/index.html" path="/lams_build/lib/json/json-simple-1.1.1.jar"/>
         <archive path="/lams_build/lib/mysql/mysql-connector-java-8.0.11.jar" source="/3rdParty_sources/mysql-connector"/>
         <archive path="/lams_build/lib/quartz/quartz-2.2.3.jar" source="/3rdParty_sources/quartz"/>
-        <archive path="/lams_build/lib/spring/spring-aop-4.3.12.RELEASE.jar" source="/3rdParty_sources/spring"/>
-        <archive path="/lams_build/lib/spring/spring-beans-4.3.12.RELEASE.jar" source="/3rdParty_sources/spring"/>
-        <archive path="/lams_build/lib/spring/spring-context-4.3.12.RELEASE.jar" source="/3rdParty_sources/spring"/>
-        <archive path="/lams_build/lib/spring/spring-context-support-4.3.12.RELEASE.jar" source="/3rdParty_sources/spring"/>
-        <archive path="/lams_build/lib/spring/spring-core-4.3.12.RELEASE.jar" source="/3rdParty_sources/spring"/>
-        <archive path="/lams_build/lib/spring/spring-expression-4.3.12.RELEASE.jar" source="/3rdParty_sources/spring"/>
-        <archive path="/lams_build/lib/spring/spring-jdbc-4.3.12.RELEASE.jar" source="/3rdParty_sources/spring"/>
-        <archive path="/lams_build/lib/spring/spring-orm-4.3.12.RELEASE.jar" source="/3rdParty_sources/spring"/>
-        <archive path="/lams_build/lib/spring/spring-tx-4.3.12.RELEASE.jar" source="/3rdParty_sources/spring"/>
-        <archive path="/lams_build/lib/spring/spring-web-4.3.12.RELEASE.jar" source="/3rdParty_sources/spring"/>
-        <archive path="/lams_build/lib/spring/spring-webmvc-4.3.12.RELEASE.jar" source="/3rdParty_sources/spring"/>
+        <archive path="/lams_build/lib/spring/spring-aop-4.3.30.RELEASE.jar" source="/3rdParty_sources/spring"/>
+        <archive path="/lams_build/lib/spring/spring-beans-4.3.30.RELEASE.jar" source="/3rdParty_sources/spring"/>
+        <archive path="/lams_build/lib/spring/spring-context-4.3.30.RELEASE.jar" source="/3rdParty_sources/spring"/>
+        <archive path="/lams_build/lib/spring/spring-context-support-4.3.30.RELEASE.jar" source="/3rdParty_sources/spring"/>
+        <archive path="/lams_build/lib/spring/spring-core-4.3.30.RELEASE.jar" source="/3rdParty_sources/spring"/>
+        <archive path="/lams_build/lib/spring/spring-expression-4.3.30.RELEASE.jar" source="/3rdParty_sources/spring"/>
+        <archive path="/lams_build/lib/spring/spring-jdbc-4.3.30.RELEASE.jar" source="/3rdParty_sources/spring"/>
+        <archive path="/lams_build/lib/spring/spring-orm-4.3.30.RELEASE.jar" source="/3rdParty_sources/spring"/>
+        <archive path="/lams_build/lib/spring/spring-tx-4.3.30.RELEASE.jar" source="/3rdParty_sources/spring"/>
+        <archive path="/lams_build/lib/spring/spring-web-4.3.30.RELEASE.jar" source="/3rdParty_sources/spring"/>
+        <archive path="/lams_build/lib/spring/spring-webmvc-4.3.30.RELEASE.jar" source="/3rdParty_sources/spring"/>
         <archive path="/lams_build/lib/xstream/xstream-1.4.11.jar" source="/3rdParty_sources/xstream"/>
         <archive javadoc="https://jar-download.com/artifacts/xyz.capybara/clamav-client/2.0.2/documentation" path="/lams_build/lib/clamav/clamav-client-2.0.2.jar"/>
         <archive path="/lams_build/lib/batik/batik-dom.jar" source="/3rdParty_sources/basiclti-util/src/main/java/org"/>

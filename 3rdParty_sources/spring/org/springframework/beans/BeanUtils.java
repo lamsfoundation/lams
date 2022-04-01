@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,8 +45,11 @@ import org.springframework.util.StringUtils;
  * Static convenience methods for JavaBeans: for instantiating beans,
  * checking bean property types, copying bean properties, etc.
  *
- * <p>Mainly for use within the framework, but to some degree also
- * useful for application classes.
+ * <p>Mainly for internal use within the framework, but to some degree also
+ * useful for application classes. Consider
+ * <a href="https://commons.apache.org/proper/commons-beanutils/">Apache Commons BeanUtils</a>,
+ * <a href="https://hotelsdotcom.github.io/bull/">BULL - Bean Utils Light Library</a>,
+ * or similar third-party frameworks for more comprehensive bean utilities.
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -311,23 +314,23 @@ public abstract class BeanUtils {
 	public static Method resolveSignature(String signature, Class<?> clazz) {
 		Assert.hasText(signature, "'signature' must not be empty");
 		Assert.notNull(clazz, "Class must not be null");
-		int firstParen = signature.indexOf("(");
-		int lastParen = signature.indexOf(")");
-		if (firstParen > -1 && lastParen == -1) {
+		int startParen = signature.indexOf('(');
+		int endParen = signature.indexOf(')');
+		if (startParen > -1 && endParen == -1) {
 			throw new IllegalArgumentException("Invalid method signature '" + signature +
 					"': expected closing ')' for args list");
 		}
-		else if (lastParen > -1 && firstParen == -1) {
+		else if (startParen == -1 && endParen > -1) {
 			throw new IllegalArgumentException("Invalid method signature '" + signature +
 					"': expected opening '(' for args list");
 		}
-		else if (firstParen == -1 && lastParen == -1) {
+		else if (startParen == -1 && endParen == -1) {
 			return findMethodWithMinimalParameters(clazz, signature);
 		}
 		else {
-			String methodName = signature.substring(0, firstParen);
+			String methodName = signature.substring(0, startParen);
 			String[] parameterTypeNames =
-					StringUtils.commaDelimitedListToStringArray(signature.substring(firstParen + 1, lastParen));
+					StringUtils.commaDelimitedListToStringArray(signature.substring(startParen + 1, endParen));
 			Class<?>[] parameterTypes = new Class<?>[parameterTypeNames.length];
 			for (int i = 0; i < parameterTypeNames.length; i++) {
 				String parameterTypeName = parameterTypeNames[i].trim();
@@ -432,7 +435,8 @@ public abstract class BeanUtils {
 				return null;
 			}
 		}
-		String editorName = targetType.getName() + "Editor";
+		String targetTypeName = targetType.getName();
+		String editorName = targetTypeName + "Editor";
 		try {
 			Class<?> editorClass = cl.loadClass(editorName);
 			if (!PropertyEditor.class.isAssignableFrom(editorClass)) {
@@ -448,7 +452,7 @@ public abstract class BeanUtils {
 		catch (ClassNotFoundException ex) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("No property editor [" + editorName + "] found for type " +
-						targetType.getName() + " according to 'Editor' suffix convention");
+						targetTypeName + " according to 'Editor' suffix convention");
 			}
 			unknownEditorTypes.add(targetType);
 			return null;
@@ -506,13 +510,14 @@ public abstract class BeanUtils {
 
 	/**
 	 * Check if the given type represents a "simple" value type:
-	 * a primitive, a String or other CharSequence, a Number, a Date,
+	 * a primitive, an enum, a String or other CharSequence, a Number, a Date,
 	 * a URI, a URL, a Locale or a Class.
 	 * @param clazz the type to check
 	 * @return whether the given type represents a "simple" value type
 	 */
 	public static boolean isSimpleValueType(Class<?> clazz) {
-		return (ClassUtils.isPrimitiveOrWrapper(clazz) || clazz.isEnum() ||
+		return (ClassUtils.isPrimitiveOrWrapper(clazz) ||
+				Enum.class.isAssignableFrom(clazz) ||
 				CharSequence.class.isAssignableFrom(clazz) ||
 				Number.class.isAssignableFrom(clazz) ||
 				Date.class.isAssignableFrom(clazz) ||
