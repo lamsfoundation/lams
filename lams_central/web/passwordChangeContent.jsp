@@ -47,7 +47,7 @@
 		          password: {
 		              required: true,
 		              minlength: <c:out value="${minNumChars}"/>,
-		              maxlength: 25,
+		              maxlength: 50,
 		              charactersAllowed: true,
 		              pwcheck: true              
 		          },
@@ -159,12 +159,12 @@
  						<div class="input-group voffset5">
 							<span class="input-group-addon"><i class="fa fa-lock"></i></span>
 							<input class="form-control" type="password"  autocomplete="new-password" 
-									placeholder="<fmt:message key='label.password.new.password' />" id="password" name="password" maxlength="25"/> 			
+									placeholder="<fmt:message key='label.password.new.password' />" id="password" name="password" maxlength="50"/> 			
 						</div>
 						<div class="input-group voffset5">
 							<span class="input-group-addon"><i class="fa fa-lock"></i></span>
 							<input class="form-control" type="password" id="passwordConfirm" name="passwordConfirm" autocomplete="new-password" 
-									placeholder="<fmt:message key='label.password.confirm.new.password' />" maxlength="25"/>
+									placeholder="<fmt:message key='label.password.confirm.new.password' />" maxlength="50"/>
 						</div>
 							
 						<div class="form-group" align="right">

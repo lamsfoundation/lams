@@ -58,7 +58,7 @@
 								password : {
 									required : true,
 									minlength : <c:out value="${minNumChars}"/>,
-									maxlength : 25,
+									maxlength : 50,
 									charactersAllowed : true,
 									pwcheck : true
 								},
@@ -196,14 +196,14 @@
 							<div class="form-group">
 								<label for="password"><fmt:message key="signup.password" /></label>:
 
-								<input id="password" name="password" class="form-control" type="password" value="" size="40" maxlength="25" autocomplete="new-password">
+								<input id="password" name="password" class="form-control" type="password" value="" size="40" maxlength="50" autocomplete="new-password">
 								<lams:errors path="password"/>
 							</div>
 
 							<div class="form-group">
 								<label for="confirmPassword"><fmt:message key="signup.confirm.password" /></label>:
 
-								<input id="confirmPassword" name="confirmPassword" class="form-control" type="password" value="" size="40" maxlength="25" autocomplete="new-password">
+								<input id="confirmPassword" name="confirmPassword" class="form-control" type="password" value="" size="40" maxlength="50" autocomplete="new-password">
 								<span style="display: none;'" class="confirmPassword error"><fmt:message
 										key="error.passwords.unequal" /></span>
 							</div>
