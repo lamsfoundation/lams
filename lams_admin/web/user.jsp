@@ -58,7 +58,7 @@
 									password : {
 										required: true,
 										minlength : <c:out value="${minNumChars}"/>,
-										maxlength : 25,
+										maxlength : 50,
 										charactersAllowed : true,
 										pwcheck : true
 									},
@@ -283,13 +283,13 @@
 									*:</td>
 								<td><lams:errors path="password"/>
 									<form:input type="password" path="password" 
-										maxlength="25" id="password" cssClass="form-control" /></td>
+										maxlength="50" id="password" cssClass="form-control" /></td>
 							</tr>
 							<tr>
 								<td class="align-right"><fmt:message
 										key="admin.user.password.confirm" /> *:</td>
 								<td><form:input type="password" path="password2" 
-										maxlength="25" id="password2" cssClass="form-control" /></td>
+										maxlength="50" id="password2" cssClass="form-control" /></td>
 							</tr>
 							</c:if>
 							<tr>

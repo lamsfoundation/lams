@@ -140,14 +140,14 @@
 					learnerPass : {
 						required: false,
 						minlength : <c:out value="${minNumChars}"/>,
-						maxlength : 25,
+						maxlength : 50,
 						charactersAllowed : true,
 						pwcheck : true
 					},
 					staffPass: {
 						required: false,
 						minlength : <c:out value="${minNumChars}"/>,
-						maxlength : 25,
+						maxlength : 50,
 						charactersAllowed : true,
 						pwcheck : true
 					}
@@ -426,7 +426,7 @@
 													<fmt:message key="admin.org.password.change.is.staff" />
 											</label>
 										</div>
-										<form:input path="staffPass" id="staffPass" cssClass="pass form-control" maxlength="25"
+										<form:input path="staffPass" id="staffPass" cssClass="pass form-control" maxlength="50"
 												   title="<fmt:message key='admin.org.password.change.custom' />" />
 										<i class="fa fa-refresh generatePassword" title="<fmt:message key='admin.org.password.change.generate' />"></i>
 									</td>
@@ -437,7 +437,7 @@
 													<fmt:message key="admin.org.password.change.is.learner" />
 											</label>
 										</div>
-										<form:input path="learnerPass" id="learnersPass" cssClass="pass form-control" maxlength="25"
+										<form:input path="learnerPass" id="learnersPass" cssClass="pass form-control" maxlength="50"
 											   title="<fmt:message key='admin.org.password.change.custom' />" />
 										<i class="fa fa-refresh generatePassword" title="<fmt:message key='admin.org.password.change.generate' />"></i>
 									</td>
