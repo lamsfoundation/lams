@@ -24,8 +24,7 @@ batik             batik-1.7.jar                         1.7                    A
 
 clamav-client	  clamav-client-2.0.2.jar				2.0.2				   MIT							 cdarras on GitHub				  ClamAV antivirus client 
 
-csrfguard		  csrfguard-3.1.0-custom-2020.01.07.jar custom build		   BSD License 					 OWASP							  prevents CSRF attacks
-														based on 3.1.0																		  master from 2020.01.07 with a custom modification in CsrfGuard.java
+csrfguard		  csrfguard-4.1.3.jar					4.1.3		   		   BSD License 					 OWASP							  prevents CSRF attacks
 
 etherpad		  etherpad_lite_client-1.2.13.jar		1.2.13					Apache License 2.0			 Nils Fredrik Gjerull			  Client for Etherpad
 
