@@ -135,7 +135,12 @@ public final class CsrfGuardUtils {
     }
 
     public static String normalizeResourceURI(final String resourceURI) {
-        return resourceURI.startsWith("/") ? resourceURI : '/' + resourceURI;
+        String normalizedResourceURI = resourceURI.startsWith("/") ? resourceURI : '/' + resourceURI;
+        
+	// LAMS LDEV-4932 Replace multiple slashes with a single one, so it works the same as Spring MVC
+        normalizedResourceURI = normalizedResourceURI.replaceAll("/{2,}", "/");
+        
+	return normalizedResourceURI;
     }
 
     private static String readInputStreamContent(final InputStream inputStream) {
