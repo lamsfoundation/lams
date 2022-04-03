@@ -92,6 +92,7 @@
 <body class="stripes">
 	<lams:Page type="admin" title="${title}">
 		<form action="<lams:LAMSURL/>ForgotPasswordRequest" method="post" name="changePass">
+			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<input type="hidden" name="method" id="method"	value="requestPasswordChange" />
 			<input type="hidden" name="key"	id="key" value="<c:out value='${param.key}' />" />
 
