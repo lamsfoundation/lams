@@ -38,17 +38,67 @@
 
 .monitoring-page-content {
 	min-height: 100%;
-	padding: 2rem 4.8rem 2rem 11.8rem;
+	padding: 2rem 4.8rem 2rem 4.8rem;
 	transition: all .3s ease;
+	vertical-align: top;
+	text-align: center;	
 }
 
 .monitoring-page-content.active {
-	padding-left: 4.8rem;
+	padding-left: 11.8rem;
 }
 
-.monitoring-page-content {
-	vertical-align: top;
-	text-align: center;	
+.component-sidebar {
+	align-items: center;
+}
+
+.component-sidebar .lams-logo {
+	width: 3.6rem;	
+}
+
+.component-sidebar.active.expanded {
+	width: 30rem;	
+}
+
+.component-sidebar.active.expanded ~ .monitoring-page-content.active {
+	padding-left: 30.8rem;
+}
+
+.component-sidebar .component-menu {
+	width: 100%;
+	display: flex;
+	justify-content: flex-start;
+}
+
+.component-sidebar .component-menu-btn {
+	width: 3.6rem;
+	height: 100%;
+}
+
+.component-sidebar #edit-lesson-btn {
+	margin-bottom: 1.5rem;
+}
+
+.component-sidebar .lesson-properties {
+	width: 0;
+	height: 100%;
+	padding-left: 2rem;
+	overflow: hidden;
+	text-align: left;
+	transition: all .3s ease;
+}
+
+.component-sidebar .lesson-properties.active {
+	width: 100%;
+}
+
+.component-sidebar .lesson-properties #gradebookOnCompleteButton {
+	margin-top: 1rem;
+}
+
+.component-sidebar .lesson-properties .btn {
+	display: block;
+	margin-top: .5rem;
 }
 
 .monitoring-page-content .monitoring-layout-element {

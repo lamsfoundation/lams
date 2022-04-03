@@ -273,10 +273,11 @@ body.component .info_icon {
 	align-items: flex-start;
 	flex-direction: column;
 	transition: all .3s ease;
+	transform: translateX(-7rem);
 }
 
 .component-sidebar.active {
-	transform: translateX(-7rem);
+	transform: translateX(0);
 }
 
 .component-sidebar .component-menu-btn a {
