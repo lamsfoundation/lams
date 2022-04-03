@@ -45,6 +45,7 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.owasp.csrfguard.CsrfValidator;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -111,7 +112,6 @@ public class SsoHandler implements ServletExtension {
 		 * Response is sent in another thread and if UserDTO is not present in session when browser completes
 		 * redirect, it results in error. Winning this race is the easiest option.
 		 */
-
 		String login = request.getParameter("j_username");
 		if (StringUtils.isBlank(login)) {
 		    SsoHandler.clearLoginSessionAttributes(session);
@@ -154,6 +154,16 @@ public class SsoHandler implements ServletExtension {
 
 		//bypass 2FA if using Login-as
 		boolean isPasswordToken = password.startsWith("#LAMS");
+		if (!isPasswordToken) {
+		    // check for CSRF attack only for regular logins
+		    // for LoginAs and integrations existing HTTP session gets invalidated and so is the CSRF token
+		    CsrfValidator csrfValidator = new CsrfValidator();
+		    boolean isCsrfValid = csrfValidator.isValid(request, response);
+		    if (!isCsrfValid) {
+			throw new SecurityException("Login page does not have a valid CSRF token");
+		    }
+		}
+
 		boolean isUsingLoginAsFeature = isPasswordToken && StringUtils.equals(redirectURL, "/lams/index.jsp");
 
 		// if user is not yet authorized and has 2FA shared secret set up - redirect him to
@@ -247,7 +257,7 @@ public class SsoHandler implements ServletExtension {
 
 		    if (failedAttempts >= failedAttemptsConfig) {
 			Integer lockOutTimeConfig = Configuration.getAsInt(ConfigurationKeys.LOCK_OUT_TIME);
-			Long lockOutTimeMillis = lockOutTimeConfig * 60L * 1000;
+			long lockOutTimeMillis = lockOutTimeConfig * 60L * 1000;
 			Long currentTimeMillis = System.currentTimeMillis();
 			Date date = new Date(currentTimeMillis + lockOutTimeMillis);
 			user.setLockOutTime(date);
