@@ -1132,3 +1132,7 @@
 	min-height: 220px;
 	min-width: 220px;
 }
+
+.vertical-timeline {
+	transform: translateX(-40%);
+}

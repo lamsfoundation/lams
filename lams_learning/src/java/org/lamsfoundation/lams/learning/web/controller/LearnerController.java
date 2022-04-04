@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.presence.PresenceWebsocketServer;
@@ -403,6 +404,12 @@ public class LearnerController {
 	    type = "b";
 	}
 	activityJSON.put("type", type);
+
+	// temporary code for monitoring UI upgrade
+	Activity activityObject = (Activity) userManagementService.findById(Activity.class, activity.getActivityId());
+	if (StringUtils.isNotBlank(activityObject.getLibraryActivityUiImage())) {
+	    activityJSON.put("iconURL", activityObject.getLibraryActivityUiImage());
+	}
 
 	if (activity.getChildActivities() != null) {
 	    for (ActivityURL childActivity : activity.getChildActivities()) {

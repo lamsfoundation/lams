@@ -274,6 +274,7 @@ body.component .info_icon {
 	flex-direction: column;
 	transition: all .3s ease;
 	transform: translateX(-7rem);
+	z-index: 1;
 }
 
 .component-sidebar.active {

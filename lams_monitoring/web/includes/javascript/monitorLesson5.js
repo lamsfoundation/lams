@@ -140,13 +140,13 @@ function initLessonTab(){
 	
 	$('#openImButton').click(openChatWindow);
 
-/*
+
 	//turn to inline mode for x-editable.js
 	$.fn.editable.defaults.mode = 'inline';
 	// do not cancel on clicking outside of box
 	$.fn.editable.defaults.onblur = 'ignore';
 	//enable renaming of lesson title  
-	$('#lesson-name-strong').editable({
+	$('#lesson-name').editable({
 	    type: 'text',
 	    pk: lessonId,
 	    url: LAMS_URL + 'monitoring/monitoring/renameLesson.do?' + $("#csrf-form", window.parent.document).serialize(),
@@ -169,7 +169,7 @@ function initLessonTab(){
 	}).on('hidden', function(e, reason) {
 		$(this).nextAll('i.fa-pencil').show();
 	});
-	*/
+	
 	// sets up calendar for schedule date choice
 	$('#scheduleDatetimeField').datetimepicker({
 		'minDate' : 0
