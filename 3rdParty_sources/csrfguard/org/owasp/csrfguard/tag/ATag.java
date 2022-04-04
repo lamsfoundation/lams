@@ -1,19 +1,19 @@
-/**
+/*
  * The OWASP CSRFGuard Project, BSD License
- * Eric Sheridan (eric@infraredsecurity.com), Copyright (c) 2011 
+ * Copyright (c) 2011, Eric Sheridan (eric@infraredsecurity.com)
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- *    1. Redistributions of source code must retain the above copyright notice,
- *       this list of conditions and the following disclaimer.
- *    2. Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *    3. Neither the name of OWASP nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific
- *       prior written permission.
+ *     1. Redistributions of source code must retain the above copyright notice,
+ *        this list of conditions and the following disclaimer.
+ *     2. Redistributions in binary form must reproduce the above copyright
+ *        notice, this list of conditions and the following disclaimer in the
+ *        documentation and/or other materials provided with the distribution.
+ *     3. Neither the name of OWASP nor the names of its contributors may be used
+ *        to endorse or promote products derived from this software without specific
+ *        prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -26,34 +26,38 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.owasp.csrfguard.tag;
 
-import java.io.*;
-import java.util.*;
-
-import javax.servlet.http.*;
-import javax.servlet.jsp.*;
-import javax.servlet.jsp.tagext.*;
-
-import org.owasp.csrfguard.*;
+import org.owasp.csrfguard.CsrfGuard;
+import org.owasp.csrfguard.session.LogicalSession;
 import org.owasp.csrfguard.util.BrowserEncoder;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.tagext.DynamicAttributes;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public final class ATag extends AbstractUriTag implements DynamicAttributes {
 
 	private final static long serialVersionUID = 0x00202937;
-	
-	private Map<String, String> attributes = new HashMap<String, String>();
+
+	private final Map<String, String> attributes = new HashMap<>();
 
 	@Override
 	public int doStartTag() {
-		CsrfGuard csrfGuard = CsrfGuard.getInstance();
-		String tokenValue = csrfGuard.getTokenValue((HttpServletRequest) pageContext.getRequest(), buildUri(attributes.get("href")));
-		String tokenName = csrfGuard.getTokenName();
+		final CsrfGuard csrfGuard = CsrfGuard.getInstance();
+		final String tokenName = csrfGuard.getTokenName();
+
+		final LogicalSession logicalSession = csrfGuard.getLogicalSessionExtractor().extract((HttpServletRequest) this.pageContext.getRequest());
+		final String tokenValue = Objects.nonNull(logicalSession) ? csrfGuard.getTokenService().getTokenValue(logicalSession.getKey(), buildUri(this.attributes.get("href"))) : null;
 
 		try {
-			pageContext.getOut().write(buildStartHtml(tokenName, tokenValue));
-		} catch (IOException e) {
-			pageContext.getServletContext().log(e.getLocalizedMessage(), e);
+			this.pageContext.getOut().write(buildStartHtml(tokenName, tokenValue));
+		} catch (final IOException e) {
+			this.pageContext.getServletContext().log(e.getLocalizedMessage(), e);
 		}
 
 		return EVAL_BODY_INCLUDE;
@@ -62,26 +66,26 @@ public final class ATag extends AbstractUriTag implements DynamicAttributes {
 	@Override
 	public int doEndTag() {
 		try {
-			pageContext.getOut().write("</a>");
-		} catch (IOException e) {
-			pageContext.getServletContext().log(e.getLocalizedMessage(), e);
+			this.pageContext.getOut().write("</a>");
+		} catch (final IOException e) {
+			this.pageContext.getServletContext().log(e.getLocalizedMessage(), e);
 		}
 
 		return EVAL_PAGE;
 	}
 
 	@Override
-	public void setDynamicAttribute(String arg0, String arg1, Object arg2) throws JspException {
-		attributes.put(arg1.toLowerCase(), String.valueOf(arg2));
+	public void setDynamicAttribute(final String arg0, final String arg1, final Object arg2) {
+		this.attributes.put(arg1.toLowerCase(), String.valueOf(arg2));
 	}
 
-	private String buildStartHtml(String tokenName, String tokenValue) {
-		StringBuilder sb = new StringBuilder();
+	private String buildStartHtml(final String tokenName, final String tokenValue) {
+		final StringBuilder sb = new StringBuilder();
 
 		sb.append("<a ");
 
-		for (String name : attributes.keySet()) {
-			String value = attributes.get(name);
+		for (final String name : this.attributes.keySet()) {
+			final String value = this.attributes.get(name);
 
 			sb.append(BrowserEncoder.encodeForAttribute(name));
 			sb.append('=');
@@ -104,7 +108,7 @@ public final class ATag extends AbstractUriTag implements DynamicAttributes {
 			sb.append(' ');
 		}
 
-		sb.append(">");
+		sb.append('>');
 
 		return sb.toString();
 	}

@@ -78,6 +78,7 @@
 
 	<lams:Page type="admin" title="${title}">
 		<form action="<lams:LAMSURL/>ForgotPasswordRequest" method="post" name="forgotForm">
+			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<input type="hidden" name="method" id="method" value="requestEmail" />
 
 			<h4 class="no-tabs-below">
