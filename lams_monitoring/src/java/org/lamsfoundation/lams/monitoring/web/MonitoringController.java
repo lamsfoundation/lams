@@ -975,6 +975,16 @@ public class MonitoringController {
 	boolean useNewUI = WebUtil.readBooleanParam(request, "newUI", true);
 	return "monitor" + (useNewUI ? "5" : "");
     }
+    
+    @RequestMapping("/displaySequenceTab")
+    public String displaySequenceTab() {
+	return "monitor-sequence-tab";
+    }
+    
+    @RequestMapping("/displayLearnersTab")
+    public String displayLearnersTab() {
+	return "monitor-learners-tab";
+    }
 
     /**
      * Gets users whose progress bars will be displayed in Learner tab in Monitor.

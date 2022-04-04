@@ -15,6 +15,7 @@
 
 .monitoring-page-wrapper {
 	position: relative;
+	min-height: 500px;
 }
 
 .monitoring-page-wrapper ul, .monitoring-page-wrapper ol {
@@ -57,11 +58,11 @@
 }
 
 .component-sidebar.active.expanded {
-	width: 30rem;	
+	width: 25rem;	
 }
 
 .component-sidebar.active.expanded ~ .monitoring-page-content.active {
-	padding-left: 30.8rem;
+	padding-left: 25.8rem;
 }
 
 .component-sidebar .component-menu {

@@ -3,7 +3,7 @@
 var originalSequenceCanvas = null,
 // DIV container for lesson SVG
 // it gets accessed so many times it's worth to cache it here
-	sequenceCanvas = $('#sequenceCanvas'),
+	sequenceCanvas = null,
 // switch between SVG original size and fit-to-sreen (enlarge/shrink)
 	learningDesignSvgFitScreen = false,
 // info box show timeout
@@ -30,7 +30,54 @@ var originalSequenceCanvas = null,
 	gateOpenIconPath   = 'images/svg/gateOpen.svg',
 	gateOpenIconData   = null;
 
+$(document).ready(function(){
+	initCommonElements();
+	initSequenceTab();
+	loadTab('sequence');
+});
 
+function loadTab(tabName) {
+	if (tabName == 'sequence') {
+		$('.monitoring-page-content .tab-content').load(LAMS_URL + 'monitoring/monitoring/displaySequenceTab.do', function(){
+			refreshMonitor('sequence');
+			canvasFitScreen(learningDesignSvgFitScreen, true);
+		});
+	} else if (tabName = 'learners') {
+		$('.monitoring-page-content .tab-content').load(LAMS_URL + 'monitoring/monitoring/displayLearnersTab.do', function(){
+			refreshMonitor('learners');
+		});
+	}
+}
+
+function initCommonElements(){
+	$('.hamburger').click(function(){
+		$(this).toggleClass('active');
+		$('.component-sidebar, .monitoring-page-content').toggleClass('active');
+	});
+
+	$('#edit-lesson-btn').click(function(){
+		$('.lesson-properties').toggleClass('active');
+		$('.component-sidebar').toggleClass('expanded');
+	});
+	
+	$('#load-sequence-tab-btn').click(function(){
+		$('.navigate-btn, .lesson-properties').removeClass('active');
+		$('.component-sidebar').removeClass('expanded');
+		$(this).addClass('active');
+
+		loadTab('sequence');
+	});
+	
+	$('#load-learners-tab-btn').click(function(){
+		$('.navigate-btn, .lesson-properties').removeClass('active');
+		$('.component-sidebar').removeClass('expanded');
+		$(this).addClass('active');
+		
+		loadTab('learners');
+	});
+	
+	initLessonTab();
+}
 
 //********** LESSON TAB FUNCTIONS **********
 
@@ -1155,8 +1202,6 @@ function initSequenceTab(){
 	}).find('.modal-header').remove();
 	
 	$('#sequenceInfoDialog .modal-body').empty().append($('#sequenceInfoDialogContents').show());
-	
-	canvasFitScreen(learningDesignSvgFitScreen, true);
 }
 
 function showIntroductionDialog(lessonId) {
@@ -1190,6 +1235,7 @@ function updateSequenceTab() {
 	}
 	sequenceRefreshInProgress = true;
 	
+	sequenceCanvas = $('#sequenceCanvas');
 	sequenceCanvas.css('visibility', 'hidden');
 
 	if (originalSequenceCanvas) {
@@ -1283,8 +1329,6 @@ function updateSequenceTab() {
 			
 			// modyfing SVG in DOM does not render changes, so we need to reload it
 			sequenceCanvas.html(sequenceCanvas.html());
-			// SVG needs resizing after reload
-			window.parent.resizeSequenceCanvas();
 			
 			// only now show SVG so there is no "jump" when resizing
 			sequenceCanvas.css('visibility', 'visible');
@@ -2183,6 +2227,14 @@ function canvasFitScreen(fitScreen, skipResize) {
 	}
 }
 
+
+/**
+ * Refreshes the existing progress bars. 
+ */
+function updateLearnersTab(){
+	//TODO
+}
+
 //********** COMMON FUNCTIONS **********
 
 function isAutoRefreshBlocked(){
@@ -2206,21 +2258,18 @@ function refreshMonitor(tabName, isAuto){
 		}, autoRefreshInterval);
 	}
 
+	// update Lesson tab widgets (state, number of learners etc.)
+	updateLessonTab();
 	if (!tabName) {
-		// update Lesson tab widgets (state, number of learners etc.)
 		updateLessonTab();
 		// update learner progress in Sequence tab
 		updateSequenceTab();
 		// update learner progress in Learners tab
 		// loadLearnerProgressPage();
-	} else if (tabName == 'lesson') {
-		updateLessonTab();
 	} else if (tabName == 'sequence'){
-		updateLessonTab();
 		updateSequenceTab();
 	} else if (tabName == 'learners'){
-		updateLessonTab();
-		// updateLearnersTab();
+		updateLearnersTab();
 	} else if (tabName == 'gradebook'){
 		// updateGradebookTab();
 	}
