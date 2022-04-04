@@ -9,19 +9,19 @@
 
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.min.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable5.css"> 
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>css/components-monitoring.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>css/components-monitoring-responsive.css">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" type="text/css" media="screen" />
-<%-- 	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable.css">  --%>
-<%-- 	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable-lams.css">  --%>
+
 	<lams:css suffix="chart"/>
 		
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.timepicker.js"></script>
-<%-- 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable.js"></script> --%>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable5.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/d3.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/chart.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
@@ -409,7 +409,7 @@
 					<span></span>
 					<span></span>
 				</div>
-				<p>Lesson Name</p>
+				<p id="lesson-name">Lesson Name</p>
 			</div>
 			<div class="top-menu">
 				<form>
