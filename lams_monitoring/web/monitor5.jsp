@@ -423,7 +423,7 @@
 			</div>
 		</header>
 		
-		<div class="tab-content">
+		<div class="tab-content pt-4">
 			
 		</div>
 	</div>

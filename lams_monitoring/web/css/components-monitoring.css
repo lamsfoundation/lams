@@ -110,7 +110,7 @@
 }
 
 .monitoring-page-content .monitoring-layout-element > div {
-	margin: 1.8rem auto 0 auto;
+	margin: 0 auto;
 }
 
 .monitoring-page-content .graph-grades {
@@ -284,7 +284,6 @@
 	box-shadow: 0px 20px 20px #2E384D1A;
 	background-color: #fff;
 	border-radius: 1.2rem;
-	margin-top: 1.8rem;
 	margin-bottom: 2rem;
 	padding: 1.5rem 2rem;
 }
@@ -1011,99 +1010,6 @@
 	margin-top: 3px;
 }
 
-#canvas-container .portrait-color-0 {
-	color: #001f3f;
-}
-
-#canvas-container .portrait-color-1 {
-	color: #FF851B;
-}
-
-#canvas-container .portrait-color-2 {
-	color: #85144b;
-}
-
-#canvas-container .portrait-color-3 {
-	color: #111111;
-}
-
-#canvas-container .portrait-color-4 {
-	color: #3D9970;
-}
-
-#canvas-container .portrait-color-5 {
-	color: #0074D9;
-}
-
-#canvas-container .portrait-color-6 {
-	color: #FF4136;
-}
-
-#canvas-container .portrait-sm-lineheight {
-	line-height: 32px;
-	vertical-align: top;
-}
-
-#canvas-container .portrait-generic-sm {
-	display: inline-block;
-	height: 35px;
-	vertical-align: middle;
-}
-
-#canvas-container .portrait-generic-sm:before {
-	content: "\f2be";
-	font-family: FontAwesome;
-	font-style: normal;
-	font-size: 35px;
-	font-weight: normal;
-	line-height: 35px;
-}
-
-#canvas-container .portrait-generic-md {
-	display: inline-block;
-	height: 80px;
-	vertical-align: middle;
-}
-
-#canvas-container .portrait-generic-md:before {
-	content: "\f2be";
-	font-family: FontAwesome;
-	font-style: normal;
-	font-size: 80px;
-	font-weight: normal;
-	line-height: 65px;
-}
-
-#canvas-container .portrait-generic-lg {
-	display: inline-block;
-	height: 200px;
-	vertical-align: middle;
-}
-
-#canvas-container .portrait-generic-lg:before {
-	content: "\f2be";
-	font-family: FontAwesome;
-	font-style: normal;
-	font-size: 200px;
-	font-weight: normal;
-	line-height: 200px;
-}
-
-#canvas-container .portrait-generic-xl {
-	display: inline-block;
-	height: 400px;
-	vertical-align: middle;
-}
-
-#canvas-container .portrait-generic-xl:before {
-	content: "\f2be";
-	font-family: FontAwesome;
-	font-style: normal;
-	font-size: 400px;
-	font-weight: normal;
-	line-height: 400px;
-}
-
 #canvas-container .leader-display {
 	margin: 0px;
 }
@@ -1133,6 +1039,97 @@
 	min-width: 220px;
 }
 
-.vertical-timeline {
-	transform: translateX(-40%);
+.portrait-color-0 {
+	color: #001f3f;
+}
+
+.portrait-color-1 {
+	color: #FF851B;
+}
+
+.portrait-color-2 {
+	color: #85144b;
+}
+
+.portrait-color-3 {
+	color: #111111;
+}
+
+.portrait-color-4 {
+	color: #3D9970;
+}
+
+.portrait-color-5 {
+	color: #0074D9;
+}
+
+.portrait-color-6 {
+	color: #FF4136;
+}
+
+.portrait-sm-lineheight {
+	line-height: 32px;
+	vertical-align: top;
+}
+
+.portrait-generic-sm {
+	display: inline-block;
+	height: 35px;
+	vertical-align: middle;
+}
+
+.portrait-generic-sm:before {
+	content: "\f2be";
+	font-family: FontAwesome;
+	font-style: normal;
+	font-size: 35px;
+	font-weight: normal;
+	line-height: 35px;
+}
+
+.portrait-generic-md {
+	display: inline-block;
+	height: 80px;
+	vertical-align: middle;
+}
+
+.portrait-generic-md:before {
+	content: "\f2be";
+	font-family: FontAwesome;
+	font-style: normal;
+	font-size: 80px;
+	font-weight: normal;
+	line-height: 65px;
+}
+
+.portrait-generic-lg {
+	display: inline-block;
+	height: 200px;
+	vertical-align: middle;
+}
+
+.portrait-generic-lg:before {
+	content: "\f2be";
+	font-family: FontAwesome;
+	font-style: normal;
+	font-size: 200px;
+	font-weight: normal;
+	line-height: 200px;
+}
+
+.learners-accordion-item-template {
+	display: none;
+}
+
+#learners-accordion .accordion-body {
+	background-color: #F6F5FA;
+}
+
+#learners-accordion .no-progress {
+	display: none;	
+}
+
+#learners-accordion .vertical-timeline {
+	display: none;
+	transform: translateX(-25%);
 }

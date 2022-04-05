@@ -180,4 +180,5 @@ https://www.bootdey.com/snippets/view/tickets-timeline
 
 .vertical-timeline .timeline-entry .timeline-entry-inner .timeline-icon img {
 	width: 25px;
+	margin-top: -2px;
 }

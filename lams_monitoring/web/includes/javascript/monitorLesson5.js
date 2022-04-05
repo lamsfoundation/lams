@@ -2232,7 +2232,82 @@ function canvasFitScreen(fitScreen, skipResize) {
  * Refreshes the existing progress bars. 
  */
 function updateLearnersTab(){
-	//TODO
+	let learnersAccordion = $('#learners-accordion').empty(),
+			itemTemplate = $('.learners-accordion-item-template').clone().removeClass('learners-accordion-item-template');
+		
+	$.ajax({
+		'url' : LAMS_URL + 'monitoring/monitoring/getLearnerProgressPage.do',
+		'data': {
+			lessonID: lessonId
+		},
+		'dataType' : 'json',
+		'success'  : function(response) {
+
+			$(response.learners).each(function(){
+				let learner = this,
+					itemHeaderId = 'learners-accordion-heading-' + learner.id,
+					itemCollapseId = 'learners-accordion-collapse-' + learner.id,
+					item = itemTemplate.clone().data('user-id', learner.id).appendTo(learnersAccordion),
+					portrait = learner.portraitId ? null : $(definePortrait(learner.portraitId, learner.id, STYLE_SMALL, true, LAMS_URL)).addClass('me-2');
+				$('.accordion-header', item).attr('id', itemHeaderId)
+					   .find('.accordion-button').attr('data-bs-target', '#' + itemCollapseId).attr('aria-controls', itemCollapseId)
+											  .html('<span>' + learner.firstName + ' ' + learner.lastName + '</span>')
+											  .prepend(portrait == null ? '' : portrait);
+				$('.accordion-collapse', item).attr('id', itemCollapseId).attr('data-bs-parent', '#learners-accordion')
+					  .on('show.bs.collapse', function () {
+						let learnerId = $(this).closest('.accordion-item').data('user-id'),
+							timeline = $('.vertical-timeline', this).empty(),
+							noProgressLabel = $('.no-progress', this);
+						
+						$.ajax({
+							'url' : LAMS_URL + 'learning/learner/getLearnerProgress.do',
+							'data': {
+								lessonID: lessonId,
+								userID  : learnerId
+							},
+							'dataType' : 'json',
+							'success'  : function(response) {
+								if (!response) {
+									noProgressLabel.show();
+									timeline.hide();
+									return;
+								}
+								noProgressLabel.hide();
+								
+								$(response.activities).each(function(){
+									let activity = this,
+										entry = $('<article />').addClass('timeline-entry').appendTo(timeline),
+										innerEntry = $('<div />').addClass('timeline-entry-inner').appendTo(entry),
+										icon = $('<div />').addClass('timeline-icon').appendTo(innerEntry),
+										content = $('<div />').addClass('timeline-label').appendTo(innerEntry),
+										title = $('<h4 />').addClass('timeline-title').text(activity.name).appendTo(content);
+
+									switch(activity.status){
+										case 0: icon.addClass('bg-primary');break;
+										case 1: icon.addClass('bg-success');break;
+									}
+
+									let iconURL = null;
+									if (activity.iconURL) {
+										iconURL = activity.iconURL;
+									} else if (activity.type === 'g') {
+										iconURL = 'images/svg/gateClosed.svg';
+									} else if (activity.type === 'o') {
+										iconURL = 'images/svg/branchingStart.svg';
+									}
+
+									if (iconURL) {
+										$('<img />').attr('src', LAMS_URL + iconURL).appendTo(icon);
+									}
+								});
+								
+								timeline.show();
+							}
+						});
+					  });
+				});
+		}
+	});
 }
 
 //********** COMMON FUNCTIONS **********

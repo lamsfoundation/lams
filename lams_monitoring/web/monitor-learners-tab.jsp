@@ -1,36 +1,25 @@
 <!DOCTYPE html>
 <%@ include file="/taglibs.jsp"%>
-<script>
-	$(document).ready(function(){
-		$.ajax({
-			'url' : LAMS_URL + 'learning/learner/getLearnerProgress.do',
-			'data': {
-				lessonID: lessonId
-			},
-			'dataType' : 'json',
-			'success'  : function(response) {
-				$(response.activities).each(function(){
-					let activity = this,
-						entry = $('<article />').addClass('timeline-entry').appendTo('.vertical-timeline'),
-						innerEntry = $('<div />').addClass('timeline-entry-inner').appendTo(entry),
-						icon = $('<div />').addClass('timeline-icon').appendTo(innerEntry),
-						content = $('<div />').addClass('timeline-label').appendTo(innerEntry),
-						title = $('<h4 />').addClass('timeline-title').text(activity.name).appendTo(content);
 
-					switch(activity.status){
-						case 0: icon.addClass('bg-primary');break;
-						case 1: icon.addClass('bg-success');break;
-					}
+<div id="learners-accordion" class="accordion">
+</div>
 
-					if (activity.iconURL) {
-						$('<img />').attr('src', LAMS_URL + activity.iconURL).appendTo(icon);
-					}
-				});
-			}
-		});
-	});
-</script>
 
+<div class="learners-accordion-item-template accordion-item">
+  <h2 class="accordion-header">
+    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" aria-expanded="false">
+    </button>
+  </h2>
+  <div class="accordion-collapse collapse">
+	<div class="accordion-body">
+		<h5 class="no-progress">No progress yet</h5>
+		<div class="vertical-timeline timeline-sm">
+		</div>
+    </div>
+   </div>
+</div>
+
+<%--
 <div class="vertical-timeline timeline-sm">
 	<article class="timeline-entry">
 		<div class="timeline-entry-inner">
@@ -93,3 +82,4 @@
 		</div>
 	</article>
 </div>
+ --%>
