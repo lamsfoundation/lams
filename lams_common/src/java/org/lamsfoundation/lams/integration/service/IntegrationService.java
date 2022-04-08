@@ -720,7 +720,10 @@ public class IntegrationService implements IIntegrationService {
 	// checks whether the lesson was created from extServer and whether it's a LTI Tool Consumer - create a new thread to report score back to LMS (in order to do this task in parallel not to slow down later work)
 	if (extServerLesson != null && extUser != null
 		&& server.getServerTypeId().equals(ExtServer.LTI_CONSUMER_SERVER_TYPE)
-		&& StringUtils.isNotBlank(extServerLesson.getExtServer().getLessonFinishUrl())) {
+		&& StringUtils.isNotBlank(extServerLesson.getExtServer().getLessonFinishUrl())
+		// do not run for LTI Advantage as it does lesson score update in lessonComplete.jsp
+		// and also teachers can pull score from LAMS to platform on demand
+		&& !extServerLesson.getExtServer().getLessonFinishUrl().contains("%activityId%")) {
 
 	    // calculate lesson's MaxPossibleMark
 	    Long lessonMaxPossibleMark = toolService.getLessonMaxPossibleMark(lesson);
