@@ -681,9 +681,10 @@ public class IntegrationService implements IIntegrationService {
 		: getExtUserUseridMapByUserId(server, user.getUserId());
 
 	// checks whether the lesson was created from extServer and whether it has lessonFinishCallbackUrl setting
-	if (extServerLesson != null && extUser != null
-		&& server.getServerTypeId().equals(ExtServer.INTEGRATION_SERVER_TYPE)
-		&& StringUtils.isNotBlank(lessonFinishCallbackUrl)) {
+	if (extServerLesson != null && extUser != null && StringUtils.isNotBlank(lessonFinishCallbackUrl)
+		// fill parameters if it is not regular LTI call, i.e. plain integration or LTI Advantage
+		&& (server.getServerTypeId().equals(ExtServer.INTEGRATION_SERVER_TYPE)
+			|| lessonFinishCallbackUrl.contains("%activityId%"))) {
 
 	    // construct real lessonFinishCallbackUrl
 	    String timestamp = Long.toString(new Date().getTime());
