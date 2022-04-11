@@ -130,6 +130,9 @@ public class QbQuestion implements Serializable, Cloneable {
     @Column(name = "case_sensitive")
     private boolean caseSensitive;
 
+    @Column(name = "exact_match")
+    private boolean exactMatch;
+
     @Column(name = "correct_answer")
     private boolean correctAnswer;
 
@@ -446,6 +449,14 @@ public class QbQuestion implements Serializable, Cloneable {
 
     public void setCaseSensitive(boolean caseSensitive) {
 	this.caseSensitive = caseSensitive;
+    }
+
+    public boolean isExactMatch() {
+	return exactMatch;
+    }
+
+    public void setExactMatch(boolean exactMatch) {
+	this.exactMatch = exactMatch;
     }
 
     public boolean getCorrectAnswer() {

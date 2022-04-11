@@ -144,7 +144,17 @@
 							</form:select>
 						</div>
 					</div>
-
+					
+					<div>
+						<label class="switch">
+							<form:checkbox path="exactMatch" id="exact-match"/>
+							<span class="switch-slider round"></span>
+						</label>
+						<label for="exact-match">
+							<fmt:message key="label.exact.match" />
+						</label>
+					</div>
+					
 					<div>
 						<label class="switch">
 							<form:checkbox path="autocompleteEnabled" id="autocomplete-enabled"/>
@@ -154,7 +164,7 @@
 							<fmt:message key="label.autocomplete.as.student" />
 						</label>
 					</div>
-	
+					
 					<div class="voffset5 form-group">
 						<c:set var="GENERAL_FEEDBACK_LABEL"><fmt:message key="label.general.feedback"/></c:set>
 						<lams:CKEditor id="feedback" value="${scratchieItemForm.feedback}" 

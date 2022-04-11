@@ -174,8 +174,10 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 		+ (parentOrganisation == null ? ""
 			: " OR l.organisation.organisationId = :parentOrganisationId OR "
 				+ "l.organisation.parentOrganisation.organisationId = :parentOrganisationId")
-		+ ") AND qr.qbToolQuestion.qbQuestion.uid = :qbQuestionUid AND REGEXP_REPLACE(qr.answer, '"
-		+ QbUtils.VSA_ANSWER_NORMALISE_SQL_REG_EXP + "', '') = :answer ORDER BY r.startDate ASC";
+		+ ") AND qr.qbToolQuestion.qbQuestion.uid = :qbQuestionUid AND "
+		+ (qbToolQuestion.getQbQuestion().isExactMatch() ? "TRIM(qr.answer)"
+			: "REGEXP_REPLACE(qr.answer, '" + QbUtils.VSA_ANSWER_NORMALISE_SQL_REG_EXP + "', '')")
+		+ " = :answer ORDER BY r.startDate ASC";
 
 	Query<AssessmentResult> q = getSession().createQuery(FIND_BY_QBQUESTION, AssessmentResult.class);
 	q.setParameter("qbQuestionUid", qbToolQuestion.getQbQuestion().getUid());
@@ -183,7 +185,7 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 	if (parentOrganisation != null) {
 	    q.setParameter("parentOrganisationId", parentOrganisation.getOrganisationId());
 	}
-	String normalisedAnswer = QbUtils.normaliseVSAnswer(answer);
+	String normalisedAnswer = QbUtils.normaliseVSAnswer(answer, qbToolQuestion.getQbQuestion().isExactMatch());
 	q.setParameter("answer", normalisedAnswer);
 	return q.list();
     }

@@ -815,14 +815,16 @@ public class QbService implements IQbService {
     @Override
     public Long allocateVSAnswerToOption(Long toolQuestionUid, Long targetOptionUid, Long previousOptionUid,
 	    String answer) {
-	String normalisedAnswer = QbUtils.normaliseVSAnswer(answer);
+	QbToolQuestion toolQuestion = qbDAO.find(QbToolQuestion.class, toolQuestionUid);
+	QbQuestion qbQuestion = toolQuestion.getQbQuestion();
+	boolean isExactMatch = qbQuestion.isExactMatch();
+
+	String normalisedAnswer = QbUtils.normaliseVSAnswer(answer, isExactMatch);
 	if (normalisedAnswer == null && previousOptionUid.equals(-1L)) {
 	    return null;
 	}
 	answer = answer.strip();
 
-	QbToolQuestion toolQuestion = qbDAO.find(QbToolQuestion.class, toolQuestionUid);
-	QbQuestion qbQuestion = toolQuestion.getQbQuestion();
 	Long qbQuestionUid = qbQuestion.getUid();
 	boolean isQuestionCaseSensitive = qbQuestion.isCaseSensitive();
 
@@ -834,8 +836,8 @@ public class QbService implements IQbService {
 	    if (previousOptionUid.equals(-1L)) {
 		// new allocation, check if the answer was not allocated anywhere already
 		String name = option.getName();
-		boolean isAnswerAllocated = QbUtils.isVSAnswerAllocated(name, normalisedAnswer,
-			isQuestionCaseSensitive);
+		boolean isAnswerAllocated = QbUtils.isVSAnswerAllocated(name, normalisedAnswer, isQuestionCaseSensitive,
+			isExactMatch);
 		if (isAnswerAllocated) {
 		    return option.getUid();
 		}
@@ -862,7 +864,7 @@ public class QbService implements IQbService {
 	    Set<String> nameWithoutUserAnswer = new LinkedHashSet<>(List.of(alternatives));
 	    nameWithoutUserAnswer.remove(answer);
 	    name = nameWithoutUserAnswer.isEmpty() ? ""
-		    : nameWithoutUserAnswer.stream().filter(a -> QbUtils.normaliseVSAnswer(a) != null)
+		    : nameWithoutUserAnswer.stream().filter(a -> QbUtils.normaliseVSAnswer(a, isExactMatch) != null)
 			    .collect(Collectors.joining(QbUtils.VSA_ANSWER_DELIMITER));
 	    previousOption.setName(name);
 	    qbDAO.update(previousOption);
@@ -877,7 +879,8 @@ public class QbService implements IQbService {
 	if (targetOption != null) {
 	    String name = targetOption.getName();
 
-	    boolean isAnswerAllocated = QbUtils.isVSAnswerAllocated(name, normalisedAnswer, isQuestionCaseSensitive);
+	    boolean isAnswerAllocated = QbUtils.isVSAnswerAllocated(name, normalisedAnswer, isQuestionCaseSensitive,
+		    isExactMatch);
 	    if (isAnswerAllocated) {
 		// the answer has been already allocated to the target option
 		return targetOptionUid;
@@ -945,6 +948,7 @@ public class QbService implements IQbService {
 	} else if ((type == QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
 	    qbQuestion.setPenaltyFactor(Float.parseFloat(form.getPenaltyFactor()));
 	    qbQuestion.setCaseSensitive(form.isCaseSensitive());
+	    qbQuestion.setExactMatch(form.isExactMatch());
 	    qbQuestion.setAutocompleteEnabled(form.isAutocompleteEnabled());
 
 	} else if ((type == QbQuestion.TYPE_NUMERICAL)) {

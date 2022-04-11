@@ -33,12 +33,12 @@ import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.qb.QbUtils;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieSessionDAO;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
-import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieSessionComparator;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -121,9 +121,10 @@ public class ScratchieSessionDAOHibernate extends LAMSBaseDAO implements Scratch
 		+ (parentOrganisation == null ? ""
 			: " OR l.organisation.organisationId = :parentOrganisationId OR "
 				+ "l.organisation.parentOrganisation.organisationId = :parentOrganisationId")
-		+ ") AND item.qbQuestion.uid =:qbQuestionUid "
-		+ "AND session.sessionId = visitLog.sessionId AND REGEXP_REPLACE(visitLog.answer, '"
-		+ IScratchieService.VSA_ANSWER_NORMALISE_SQL_REG_EXP + "', '') = :answer";
+		+ ") AND item.qbQuestion.uid =:qbQuestionUid " + "AND session.sessionId = visitLog.sessionId AND "
+		+ (qbToolQuestion.getQbQuestion().isExactMatch() ? "TRIM(visitLog.answer)"
+			: "REGEXP_REPLACE(visitLog.answer, '" + QbUtils.VSA_ANSWER_NORMALISE_SQL_REG_EXP + "', '')")
+		+ " = :answer";
 
 	Query<Long> q = getSession().createQuery(FIND_BY_QBQUESTION_AND_FINISHED, Long.class);
 	q.setParameter("qbQuestionUid", qbToolQuestion.getQbQuestion().getUid());
@@ -131,7 +132,7 @@ public class ScratchieSessionDAOHibernate extends LAMSBaseDAO implements Scratch
 	if (parentOrganisation != null) {
 	    q.setParameter("parentOrganisationId", parentOrganisation.getOrganisationId());
 	}
-	String normalisedAnswer = answer.replaceAll(IScratchieService.VSA_ANSWER_NORMALISE_JAVA_REG_EXP, "");
+	String normalisedAnswer = answer.replaceAll(QbUtils.VSA_ANSWER_NORMALISE_JAVA_REG_EXP, "");
 	q.setParameter("answer", normalisedAnswer);
 	return q.list();
     }
