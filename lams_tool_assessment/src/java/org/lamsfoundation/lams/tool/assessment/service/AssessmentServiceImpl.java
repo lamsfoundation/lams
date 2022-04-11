@@ -1458,10 +1458,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public boolean recalculateMarksForVsaQuestion(Long qbQuestionUid, String answer) {
+    public boolean recalculateMarksForVsaQuestion(Long toolQuestionUid, String answer) {
 	// get all user results
 	List<AssessmentResult> assessmentResults = assessmentResultDao
-		.getAssessmentResultsByQbQuestionAndAnswer(qbQuestionUid, answer);
+		.getAssessmentResultsByQbToolQuestionAndAnswer(toolQuestionUid, answer);
+	QbToolQuestion toolQuestion = assessmentResultDao.find(QbToolQuestion.class, toolQuestionUid);
+	Long qbQuestionUid = toolQuestion.getQbQuestion().getUid();
 	//stores userId->lastFinishedAssessmentResult
 	Map<Long, AssessmentResult> assessmentResultsMap = new LinkedHashMap<>();
 	for (AssessmentResult assessmentResult : assessmentResults) {

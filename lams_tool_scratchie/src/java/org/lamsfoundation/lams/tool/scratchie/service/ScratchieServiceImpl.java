@@ -592,8 +592,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     }
 
     @Override
-    public boolean recalculateMarksForVsaQuestion(Long qbQuestionUid, String answer) {
-	List<Long> sessionIds = scratchieSessionDao.getSessionIdsByQbQuestion(qbQuestionUid, answer);
+    public boolean recalculateMarksForVsaQuestion(Long toolQuestionUid, String answer) {
+	List<Long> sessionIds = scratchieSessionDao.getSessionIdsByQbToolQuestion(toolQuestionUid, answer);
 	// recalculate marks if it's required
 	for (Long sessionId : sessionIds) {
 	    recalculateMarkForSession(sessionId, true);

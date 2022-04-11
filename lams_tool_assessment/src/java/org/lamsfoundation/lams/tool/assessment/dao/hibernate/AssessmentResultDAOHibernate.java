@@ -31,13 +31,17 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.qb.QbUtils;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
+import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.stereotype.Repository;
 
@@ -146,23 +150,41 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     }
 
     @Override
-    public List<AssessmentResult> getAssessmentResultsByQbQuestionAndAnswer(Long qbQuestionUid, String answer) {
-	String FIND_BY_QBQUESTION = "SELECT r FROM  " + AssessmentQuestionResult.class.getName() + " AS q, "
-		+ AssessmentResult.class.getName() + " AS r "
-		+ " WHERE q.assessmentResult.uid = r.uid AND q.qbToolQuestion.qbQuestion.uid =:qbQuestionUid ";
-	if (StringUtils.isNotBlank(answer)) {
-
-	    FIND_BY_QBQUESTION += "AND REGEXP_REPLACE(q.answer, '" + QbUtils.VSA_ANSWER_NORMALISE_SQL_REG_EXP
-		    + "', '') = :answer";
+    public List<AssessmentResult> getAssessmentResultsByQbToolQuestionAndAnswer(Long toolQuestionUid, String answer) {
+	if (StringUtils.isBlank(answer)) {
+	    return List.of();
 	}
-	FIND_BY_QBQUESTION += " ORDER BY r.startDate ASC";
+
+	QbToolQuestion qbToolQuestion = find(QbToolQuestion.class, toolQuestionUid);
+	ToolActivity toolActivity = findByProperty(ToolActivity.class, "toolContentId",
+		qbToolQuestion.getToolContentId()).get(0);
+	Organisation organisation = toolActivity.getLearningDesign().getLessons().iterator().next().getOrganisation();
+	Organisation parentOrganisation = organisation.getParentOrganisation();
+	if (parentOrganisation != null && parentOrganisation.getOrganisationType().getOrganisationTypeId()
+		.equals(OrganisationType.ROOT_TYPE)) {
+	    parentOrganisation = null;
+	}
+
+	String FIND_BY_QBQUESTION = "SELECT r FROM  " + AssessmentQuestionResult.class.getName() + " AS qr, "
+		+ AssessmentResult.class.getName() + " AS r, " + ToolActivity.class.getName()
+		+ " AS a JOIN a.learningDesign.lessons AS l "
+		+ "WHERE qr.assessmentResult.uid = r.uid AND a.toolContentId = r.assessment.contentId "
+		+ "AND (l.organisation.organisationId = :organisationId OR "
+		+ "     l.organisation.parentOrganisation.organisationId = :organisationId"
+		+ (parentOrganisation == null ? ""
+			: " OR l.organisation.organisationId = :parentOrganisationId OR "
+				+ "l.organisation.parentOrganisation.organisationId = :parentOrganisationId")
+		+ ") AND qr.qbToolQuestion.qbQuestion.uid = :qbQuestionUid AND REGEXP_REPLACE(qr.answer, '"
+		+ QbUtils.VSA_ANSWER_NORMALISE_SQL_REG_EXP + "', '') = :answer ORDER BY r.startDate ASC";
 
 	Query<AssessmentResult> q = getSession().createQuery(FIND_BY_QBQUESTION, AssessmentResult.class);
-	q.setParameter("qbQuestionUid", qbQuestionUid);
-	if (StringUtils.isNotBlank(answer)) {
-	    String normalisedAnswer = QbUtils.normaliseVSAnswer(answer);
-	    q.setParameter("answer", normalisedAnswer);
+	q.setParameter("qbQuestionUid", qbToolQuestion.getQbQuestion().getUid());
+	q.setParameter("organisationId", organisation.getOrganisationId());
+	if (parentOrganisation != null) {
+	    q.setParameter("parentOrganisationId", parentOrganisation.getOrganisationId());
 	}
+	String normalisedAnswer = QbUtils.normaliseVSAnswer(answer);
+	q.setParameter("answer", normalisedAnswer);
 	return q.list();
     }
 
