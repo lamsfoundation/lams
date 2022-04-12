@@ -21,7 +21,8 @@
 									id="unitDisplayOrder${status.index}">						
 								<input type="text" name="unitName${status.index}" value="${unit.name}"
 									id="unitName${status.index}" class="form-control input-sm">
-							</td>									
+							</td>			
+													
 						</tr>
 						<tr>
 							<td>
@@ -37,6 +38,10 @@
 										<input type="text" name="unitMultiplier${status.index}" value="${unit.multiplier}"
 											id="unitMultiplier${status.index}" class="number form-control short-input-text input-sm" 
 											title="<fmt:message key='label.authoring.choice.enter.float'/>">
+										<c:if test="${!assessmentQuestionForm.authoringRestricted}">
+												<i class="fa fa-trash pull-right voffset10" title="<fmt:message key="label.authoring.basic.delete" />"
+													onclick="javascript:removeUnit(${status.index})"></i>
+										</c:if>
 									</c:otherwise>
 								</c:choose>							
 							</td>									

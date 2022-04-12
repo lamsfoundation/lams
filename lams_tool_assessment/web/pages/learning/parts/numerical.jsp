@@ -8,7 +8,9 @@
 	<table class="table table-hover table-condensed">
 		<tr>
 			<td>
-				<input type="text" autocomplete="off" name="question${status.index}" value="<c:out value='${question.answer}' />" class="form-control"
+				<input type="text" autocomplete="off" name="question${status.index}" value="<c:out value='${question.answer}' />"
+					   onkeydown="return event.key != 'Enter';"
+					   class="form-control"
 					<c:if test="${!hasEditRight}">disabled="disabled"</c:if>
 				/>	
 			</td>

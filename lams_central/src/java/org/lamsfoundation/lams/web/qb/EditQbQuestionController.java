@@ -301,6 +301,27 @@ public class EditQbQuestionController {
 	return "qb/authoring/unitlist";
     }
 
+    /**
+     * Ajax call, will remove the given unit
+     */
+    @RequestMapping("/removeUnit")
+    public String removeUnit(HttpServletRequest request, @RequestParam int unitToRemoveIndex)
+	    throws ServletException, IOException {
+	Set<QbQuestionUnit> unitList = qbService.getUnitsFromRequest(request, false);
+	Set<QbQuestionUnit> newUnitList = new TreeSet<>();
+	int displayOrder = 0;
+	for (QbQuestionUnit unit : unitList) {
+	    if (unitToRemoveIndex != unit.getDisplayOrder()) {
+		unit.setDisplayOrder(displayOrder);
+		displayOrder++;
+		newUnitList.add(unit);
+	    }
+	}
+
+	request.setAttribute(QbConstants.ATTR_UNIT_LIST, newUnitList);
+	return "qb/authoring/unitlist";
+    }
+
     @RequestMapping(path = "/checkQuestionExistsInToolActivities")
     @ResponseBody
     public String checkQuestionExistsInToolActivities(@RequestParam(name = "toolContentIds[]") Set<Long> toolContentIds,
