@@ -109,8 +109,8 @@
 			}); 
 
     		function addUnit(){
-    			var url= "<c:url value='/authoring/newUnit.do'/>";
-    			var unitList = $("#unitForm").serialize(true);
+    			var url= "/lams/qb/edit/newUnit.do",
+    				unitList = $("#unitForm").serialize(true);
     			$("#unitArea").load(
     				url,
     				{
