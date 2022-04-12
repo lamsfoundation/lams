@@ -86,7 +86,7 @@
 	<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
 	
 	<div id="option-table" 
-		<c:if test="${!assessmentQuestionForm.authoringRestricted && questionType != 3}">class="sortable-on"</c:if>>
+		<c:if test="${!assessmentQuestionForm.authoringRestricted && questionType != 3 && questionType != 4}">class="sortable-on"</c:if>>
 		
 		<c:forEach var="option" items="${optionList}" varStatus="status">
 			<table id="option-table-${status.index}" class="voffset10-bottom single-option-table" data-id="${status.index}" tabindex="1">
