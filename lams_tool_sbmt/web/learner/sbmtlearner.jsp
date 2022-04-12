@@ -113,7 +113,7 @@
 			  uppy.use(Uppy.Dashboard, {
 				  target: '#file-upload-area',
 				  inline: true,
-				  height: 200,
+				  height: 300,
 				  width: '100%',
 				  showProgressDetails : true,
 				  hideRetryButton : true,
@@ -121,7 +121,6 @@
 				  showRemoveButtonAfterComplete: true,
 				  proudlyDisplayPoweredByUppy: false
 			  });
-			  
 			  uppy.use(Uppy.Webcam, {
 				  target: Uppy.Dashboard,
 				  modes: ['picture']
