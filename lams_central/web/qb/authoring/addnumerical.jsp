@@ -114,10 +114,21 @@
     			$("#unitArea").load(
     				url,
     				{
-    					questionType: QUESTION_TYPE,
     					unitList: unitList 
     				}
     			);
+    		}
+
+    		function removeUnit(index){
+    			var url= "/lams/qb/edit/removeUnit.do",
+					unitList = $("#unitForm").serialize(true);
+				$("#unitArea").load(
+					url,
+					{
+						unitToRemoveIndex : index,
+						unitList: unitList 
+					}
+				);
     		}
   		</script>
 	</lams:head>

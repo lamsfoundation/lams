@@ -992,13 +992,13 @@ public class QbService implements IQbService {
 	// set units
 	if (type == QbQuestion.TYPE_NUMERICAL) {
 	    Set<QbQuestionUnit> unitList = getUnitsFromRequest(request, true);
-	    List<QbQuestionUnit> units = new ArrayList<>();
+	    qbQuestion.getUnits().clear();
 	    int displayOrder = 0;
 	    for (QbQuestionUnit unit : unitList) {
+		unit.setQbQuestion(qbQuestion);
 		unit.setDisplayOrder(displayOrder++);
-		units.add(unit);
+		qbQuestion.getUnits().add(unit);
 	    }
-	    qbQuestion.setUnits(units);
 	}
 
 	return qbQuestion.isQbQuestionModified(oldQuestion);

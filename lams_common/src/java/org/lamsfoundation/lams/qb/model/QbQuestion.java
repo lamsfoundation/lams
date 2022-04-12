@@ -162,7 +162,7 @@ public class QbQuestion implements Serializable, Cloneable {
     @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private List<QbOption> qbOptions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "qbQuestion", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "qbQuestion", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @Fetch(FetchMode.SELECT)
     @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private List<QbQuestionUnit> units = new ArrayList<>();
