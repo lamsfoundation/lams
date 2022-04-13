@@ -102,7 +102,7 @@ public class SsoHandler implements ServletExtension {
 		    SsoHandler.setJvmRoute(request);
 		}
 
-		// recreate session here in case it was invalidated in login.jsp by sysadmin's LoginAs
+		// recreate session here in case it was invalidated in login.jsp by sysadmin's LoginAs or other token password based call
 		HttpSession session = request.getSession();
 		UserDTO loggedInUserDTO = (UserDTO) session.getAttribute(AttributeNames.USER);
 		String loggedInLogin = loggedInUserDTO == null ? "" : loggedInUserDTO.getLogin() + " ";
@@ -149,23 +149,24 @@ public class SsoHandler implements ServletExtension {
 		    return;
 		}
 
-		// LoginRequestServlet (integrations) and LoginAsAction (sysadmin) set this parameter
-		String redirectURL = request.getParameter("redirectURL");
-
 		//bypass 2FA if using Login-as
 		boolean isPasswordToken = password.startsWith("#LAMS");
-		if (!isPasswordToken) {
+		if (!isPasswordToken && !Boolean.TRUE.equals(session.getAttribute("isSignup"))) {
 		    // check for CSRF attack only for regular logins
 		    // for LoginAs and integrations existing HTTP session gets invalidated and so is the CSRF token
 		    CsrfValidator csrfValidator = new CsrfValidator();
 		    boolean isCsrfValid = csrfValidator.isValid(request, response);
 		    if (!isCsrfValid) {
+			SsoHandler.clearLoginSessionAttributes(session);
 			throw new SecurityException("Login page does not have a valid CSRF token");
 		    }
 		}
 
-		boolean isUsingLoginAsFeature = isPasswordToken && StringUtils.equals(redirectURL, "/lams/index.jsp");
+		boolean isUsingLoginAsFeature = isPasswordToken
+			&& Boolean.TRUE.equals(session.getAttribute("isLoginAs"));
 
+		// LoginRequestServlet (integrations) and LoginAsAction (sysadmin) set this parameter
+		String redirectURL = request.getParameter("redirectURL");
 		// if user is not yet authorized and has 2FA shared secret set up - redirect him to
 		// loginTwoFactorAuth.jsp to prompt user to enter his verification code (Time-based One-time Password)
 		if (request.getRemoteUser() == null && user.isTwoFactorAuthenticationEnabled()
@@ -239,6 +240,8 @@ public class SsoHandler implements ServletExtension {
 		    }
 
 		    SsoHandler.logLogin(userDTO, request);
+
+		    SsoHandler.clearLoginSessionAttributes(session);
 		} else {
 		    // clear after failed authentication, if it was set in LoginRequestServlet
 		    SsoHandler.clearLoginSessionAttributes(session);
@@ -378,14 +381,9 @@ public class SsoHandler implements ServletExtension {
 	session.removeAttribute("password");
 	session.removeAttribute("redirectURL");
 	session.removeAttribute("integratedLogoutURL");
+	session.removeAttribute("isSignup");
+	session.removeAttribute("isLoginAs");
     }
-
-//    private static void logLogout(UserDTO user) {
-//	String message = new StringBuilder("User ").append(user.getLogin()).append(" (").append(user.getUserID())
-//		.append(") got logged out from another browser").toString();
-//	SsoHandler.getLogEventService(SessionManager.getServletContext()).logEvent(LogEvent.TYPE_LOGOUT,
-//		user.getUserID(), user.getUserID(), null, null, message);
-//    }
 
     private static IUserManagementService getUserManagementService(ServletContext context) {
 	if (SsoHandler.userManagementService == null) {
