@@ -410,6 +410,7 @@ public class LearnerController {
 	if (StringUtils.isNotBlank(activityObject.getLibraryActivityUiImage())) {
 	    activityJSON.put("iconURL", activityObject.getLibraryActivityUiImage());
 	}
+	activityJSON.put("isGrouping", activityObject.isGroupingActivity());
 
 	if (activity.getChildActivities() != null) {
 	    for (ActivityURL childActivity : activity.getChildActivities()) {

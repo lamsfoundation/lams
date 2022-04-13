@@ -2294,6 +2294,8 @@ function updateLearnersTab(){
 										iconURL = 'images/svg/gateClosed.svg';
 									} else if (activity.type === 'o') {
 										iconURL = 'images/svg/branchingStart.svg';
+									} else if (activity.isGrouping) {
+										iconURL = 'images/svg/grouping.svg';
 									}
 
 									if (iconURL) {
