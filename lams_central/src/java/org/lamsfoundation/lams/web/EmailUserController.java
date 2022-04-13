@@ -114,8 +114,8 @@ public class EmailUserController {
 	}
 
 	boolean IS_HTML_FORMAT = false;
-	eventNotificationService.sendMessage(currentUser.getUserID(), userId.intValue(),
-		IEventNotificationService.DELIVERY_METHOD_MAIL, subject, body, IS_HTML_FORMAT);
+	eventNotificationService.sendMessage(null, userId.intValue(), IEventNotificationService.DELIVERY_METHOD_MAIL,
+		subject, body, IS_HTML_FORMAT);
 
 	String ccEmail = emailForm.getCcEmail();
 	if (StringUtils.isNotBlank(ccEmail) && ValidationUtil.isEmailValid(ccEmail, false)) {
