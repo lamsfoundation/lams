@@ -84,13 +84,23 @@
 	width: 0;
 	height: 100%;
 	padding-left: 2rem;
-	overflow: hidden;
 	text-align: left;
 	transition: all .3s ease;
 }
 
 .component-sidebar .lesson-properties.active {
 	width: 100%;
+}
+
+.component-sidebar .lesson-properties #lessonDetails {
+	opacity: 0;
+	transition: opacity 0 linear 0;
+	
+}
+
+.component-sidebar .lesson-properties.active #lessonDetails {
+	opacity: 1;
+	transition: opacity .3s ease .3s;
 }
 
 .component-sidebar .lesson-properties #gradebookOnCompleteButton {
