@@ -191,8 +191,14 @@
 				if (hs != null) {
 					UserDTO userDTO = (UserDTO) hs.getAttribute("user");
 					if (userDTO != null && !userDTO.getLogin().equals(request.getAttribute("login"))) {
+					    Object isSignup = hs.getAttribute("isSignup");
 					    // remove session from mapping
 					    SessionManager.removeSessionByLogin(userDTO.getLogin(), true);
+					    
+					    // tell SsoHandler about some previous session settings
+					    hs = request.getSession();
+					    hs.setAttribute("isSignup", isSignup);
+					    hs.setAttribute("isLoginAs", request.getAttribute("isLoginAs"));
 					}
 				}
 			%>
