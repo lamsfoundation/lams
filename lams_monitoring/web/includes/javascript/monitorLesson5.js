@@ -14,7 +14,7 @@ var originalSequenceCanvas = null,
 	sequenceRefreshInProgress = false,
 
 //auto refresh all tabs every 30 seconds
-	autoRefreshInterval = 30 * 1000,
+	autoRefreshInterval = 99990 * 1000,
 	autoRefreshIntervalObject = null,
 // when user is doing something, do not auto refresh
 	autoRefreshBlocked = false,
@@ -702,7 +702,7 @@ function updateContributeActivities(contributeActivities) {
 								  .appendTo(requiredTasksContent);
 			
 			$.each(this.contributeEntries, function(){
-				var entryContent = '<div class="col-8 label">' + (contributeActivity.title ? '<b>' + contributeActivity.title + '</b><br>(<small>' : '');
+				var entryContent = '<div class="col label">' + (contributeActivity.title ? '<b>' + contributeActivity.title + '</b><br>(<small>' : '');
 				switch (this.contributionType) {
 					case 3  : entryContent += LABELS.CONTRIBUTE_GATE; break;
 					case 6  : entryContent += LABELS.CONTRIBUTE_GROUPING; break;
@@ -714,7 +714,7 @@ function updateContributeActivities(contributeActivities) {
 				if (contributeActivity.title) {
 					entryContent += ')</small>';
 				}
-				entryContent += '</div><div class="col-4 text-right">';
+				entryContent += '</div><div class="col text-right">';
 				switch (this.contributionType) {
 					case 3  : 
 					case 12 : if (this.isComplete) {

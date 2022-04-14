@@ -112,16 +112,8 @@
 	margin-top: .5rem;
 }
 
-.monitoring-page-content .monitoring-layout-element {
-	display: inline-block;
-	max-width: 80%;
-	min-width: 30%;
-	margin-bottom: 2rem;
-}
 
-.monitoring-page-content .monitoring-layout-element > div {
-	margin: 0 auto;
-}
+
 
 .monitoring-page-content .graph-grades {
 	background-color: #fff;
@@ -291,10 +283,10 @@
 }
 
 .monitoring-page-wrapper .monitoring-panel {
+	display: inline-block;
 	box-shadow: 0px 20px 20px #2E384D1A;
 	background-color: #fff;
 	border-radius: 1.2rem;
-	margin-bottom: 2rem;
 	padding: 1.5rem 2rem;
 }
 
@@ -318,6 +310,9 @@
   padding: 0;
 }
 
+.monitoring-page-wrapper #required-tasks {
+	min-width: 350px;
+}
 
 .monitoring-page-wrapper #required-tasks .row {
 	margin-bottom: 1.5rem;
@@ -349,13 +344,11 @@
 	box-shadow: 0px 3px 6px #3C42E040;
 }
 
-.monitoring-page-wrapper #required-tasks button.contribute-gate-opened-button
-	{
+.monitoring-page-wrapper #required-tasks button.contribute-gate-opened-button {
 	background-color: #05CCD6;
 }
 
-.monitoring-page-wrapper #required-tasks button.contribute-go-button
-	{
+.monitoring-page-wrapper #required-tasks button.contribute-go-button {
 	min-width: 5rem;
 }
 
@@ -365,6 +358,10 @@
 
 .monitoring-page-wrapper #required-tasks .dropdown-item {
 	font-size: .8rem;
+}
+
+.monitoring-page-wrapper #insights {
+	min-width: 350px;
 }
 
 .monitoring-page-wrapper .insight-col-content p {
@@ -833,13 +830,6 @@
 }
 
 /********** CANVAS STYLES **********/
-#canvas-container {
-	float: right;
-	min-width: 50%;
-	max-width: 1000px;
-	margin-bottom: 2rem;
-}
-
 #canvas-container div#sequenceCanvas {
 	width: 100%;
 	display: flex;
@@ -1127,6 +1117,8 @@
 	line-height: 200px;
 }
 
+
+
 .learners-accordion-item-template {
 	display: none;
 }
@@ -1143,3 +1135,7 @@
 	display: none;
 	transform: translateX(-25%);
 }
+
+#learners-accordion .vertical-timeline:before  {
+	bottom: 30px;
+}	
