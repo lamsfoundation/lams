@@ -328,42 +328,30 @@
 									<i class="fa fa-sm fa-info"></i>
 									<span class="hidden-xs"><fmt:message key="label.lesson.introduction"/></span>
 								</button>
-							</c:if>							  
-
-							<button id="gradebookOnCompleteButton" class="btn btn-sm btn-primary
-								<c:if test="${lesson.gradebookOnComplete}">
-									btn-success
-								</c:if>
-								">
-								<i class="fa fa-sm fa-list-ol"></i><span class="hidden-xs">&nbsp;<fmt:message key="label.display.activity.scores"/></span> 
-								</button>
+							</c:if>			
+											   
+							<lams:Switch id="gradebookOnCompleteButton" checked="${lesson.gradebookOnComplete}"
+								labelKey="label.display.activity.scores" iconClass="fa fa-sm fa-list-ol" />
 						</div>
-							
 					</dd>
 
 					<!-- IM & Presence -->
 					<dt><fmt:message key="lesson.im"/>:</dt>
 					<dd>
-						<button id="presenceButton" class="btn btn-primary btn-sm
-							<c:if test="${lesson.learnerPresenceAvailable}">
-								btn-success
-							</c:if>
-							"><i class="fa fa-sm fa-wifi"></i>
-							<span class="hidden-xs"><fmt:message key="lesson.presence"/></span> 
-							<span id="presenceCounter" class="badge">0</span>
-						</button>
-
-						<button id="imButton" class="btn btn-primary btn-sm
-							<c:if test="${lesson.learnerImAvailable}">
-								btn-success
-							</c:if>
-							"
+						
+						<lams:Switch id="presenceButton" checked="${lesson.learnerPresenceAvailable}"
+							labelKey="lesson.presence" iconClass="fa fa-sm fa-wifi"	/>
+						
+						<!-- <span id="presenceCounter" class="badge">0</span> -->
+	
+						<div id="imButtonWrapper"
 							<c:if test="${not lesson.learnerPresenceAvailable}">
 								style="display: none"
 							</c:if>
-						><i class="fa fa-sm fa-comments-o"></i>
-						 <span class="hidden-xs"><fmt:message key="lesson.im"/></span>
-						</button>
+							>
+							<lams:Switch id="imButton" checked="${lesson.learnerImAvailable}"
+								labelKey="lesson.im" iconClass="fa fa-sm fa-comments"	/>
+						</div>
 						
 						<button id="openImButton" class="btn btn-primary btn-sm"
 							<c:if test="${not lesson.learnerImAvailable}">

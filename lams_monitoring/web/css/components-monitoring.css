@@ -95,12 +95,15 @@
 .component-sidebar .lesson-properties #lessonDetails {
 	opacity: 0;
 	transition: opacity 0 linear 0;
-	
 }
 
 .component-sidebar .lesson-properties.active #lessonDetails {
 	opacity: 1;
 	transition: opacity .3s ease .3s;
+}
+
+.component-sidebar .lesson-properties #lessonDetails .btn {
+	width: 75%;
 }
 
 .component-sidebar .lesson-properties #gradebookOnCompleteButton {

@@ -86,12 +86,12 @@ function initCommonElements(){
  */
 function initLessonTab(){
 	// sets presence availability. buttons may be temporarily disable by the tour.
-	$('#presenceButton').click(function(){
-		var checked = $(this).toggleClass('btn-success').hasClass('btn-success');
-		var data = {
-			'presenceAvailable' : checked,
-			'lessonID'      : lessonId
-		};
+	$('#presenceButton').change(function(){
+		var checked = $(this).prop('checked'),
+			data = {
+				'presenceAvailable' : checked,
+				'lessonID'      : lessonId
+			};
 		data[csrfTokenName] = csrfTokenValue;
 		$.ajax({
 			url : LAMS_URL + 'monitoring/monitoring/presenceAvailable.do',
@@ -99,13 +99,13 @@ function initLessonTab(){
 			cache : false,
 			data : data, 
 			success : function() {
-				updatePresenceAvailableCount();
+				// updatePresenceAvailableCount();
 				if (checked) {
-					$('#imButton').show();
-					$('#imButton').prop('disabled', false);
+					$('#imButtonWrapper').show();
 					alert(LABELS.LESSON_PRESENCE_ENABLE_ALERT);
 				} else {
-					$('#imButton').removeClass('btn-success').hide();
+					$('#imButtonWrapper, #openImButton').hide();
+					$('#imButton').prop('checked', false);
 					alert(LABELS.LESSON_PRESENCE_DISABLE_ALERT);
 				}
 			}
@@ -114,11 +114,11 @@ function initLessonTab(){
 	
 	// sets instant messaging availability
 	$('#imButton').click(function(){
-		var checked = $(this).toggleClass('btn-success').hasClass('btn-success');
-		var data = {
-			'presenceImAvailable' : checked,
-			'lessonID'      : lessonId
-		};
+		var checked = $(this).prop('checked'),
+			data = {
+				'presenceImAvailable' : checked,
+				'lessonID'      : lessonId
+			};
 		data[csrfTokenName] = csrfTokenValue;
 		$.ajax({
 			url : LAMS_URL + 'monitoring/monitoring/presenceImAvailable.do',
@@ -247,9 +247,9 @@ function initLessonTab(){
 	$("#emaildatePicker").datetimepicker();
 
 	// sets gradebook on complete functionality
-	$('#gradebookOnCompleteButton').click(function(){
-		var checked = $(this).toggleClass('btn-success').hasClass('btn-success');
-		var data = {
+	$('#gradebookOnCompleteButton').change(function(){
+		var checked = $(this).prop('checked'),
+			data = {
 			'gradebookOnComplete' : checked,
 			'lessonID'      : lessonId
 		};
@@ -535,12 +535,12 @@ function updateLessonTab(){
 			$('#lesson-instructions').html(response.lessonInstructions);
 		}
 	});
-	
+	 
 	drawChart('pie', 'chartDiv',
 			  LAMS_URL + 'monitoring/monitoring/getLessonChartData.do?lessonID=' + lessonId,
 			  true);
 	
-	updatePresenceAvailableCount();
+	// updatePresenceAvailableCount();
 }
 
 function checkScheduleDate(startDateString, endDateString) {
@@ -646,9 +646,9 @@ function showEmailDialog(userId){
 	}, false, true);
 }
 
-
+/*
 function updatePresenceAvailableCount(){
-	var checked = $('#presenceButton').hasClass('btn-success'),
+	var checked = $('#presenceButton').prop('checked');
 		counter = $('#presenceCounter');
 	if (checked) {
 		$.ajax({
@@ -666,7 +666,7 @@ function updatePresenceAvailableCount(){
 		counter.hide();
 	}
 }
-
+*/
 
 function updateContributeActivities(contributeActivities) {
 	let requiredTasksPanel = $('#required-tasks'),

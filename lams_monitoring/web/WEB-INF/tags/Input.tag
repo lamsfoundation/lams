@@ -13,6 +13,7 @@
 <%@ attribute name="labelKey" required="true" rtexprvalue="true" %>
 
 <%@ attribute name="inputCellClass" required="false" rtexprvalue="true" %>
+<%@ attribute name="iconClass" required="false" rtexprvalue="true" %>
 <%@ attribute name="labelCellSize" required="false" rtexprvalue="true" %>
 <%@ attribute name="tooltipKey" required="false" rtexprvalue="true" %>
 <%@ attribute name="tooltipDescriptionKey" required="false" rtexprvalue="true" %>
@@ -22,6 +23,9 @@
 
 <div class="form-group row">
 	<label class="col-sm-${labelCellSize} col-form-label" for="${id}">
+		<c:if test="${not empty iconClass}">
+			<i class="${iconClass}"></i>
+		</c:if>
 		<fmt:message key="${labelKey}" />
 		
 		<c:if test="${not empty tooltipKey}">
