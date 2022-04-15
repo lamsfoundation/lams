@@ -102,11 +102,11 @@ function initLessonTab(){
 				// updatePresenceAvailableCount();
 				if (checked) {
 					$('#imButtonWrapper').show();
-					alert(LABELS.LESSON_PRESENCE_ENABLE_ALERT);
+					showToast(LABELS.LESSON_PRESENCE_ENABLE_ALERT);
 				} else {
 					$('#imButtonWrapper, #openImButton').hide();
 					$('#imButton').prop('checked', false);
-					alert(LABELS.LESSON_PRESENCE_DISABLE_ALERT);
+					showToast(LABELS.LESSON_PRESENCE_DISABLE_ALERT);
 				}
 			}
 		});
@@ -129,10 +129,10 @@ function initLessonTab(){
 				if (checked) {
 					$('#openImButton').show();
 					$('#openImButton').prop('disabled', false);
-					alert(LABELS.LESSON_IM_ENABLE_ALERT);
+					showToast(LABELS.LESSON_IM_ENABLE_ALERT);
 				} else {
 					$('#openImButton').hide();
-					alert(LABELS.LESSON_IM_DISABLE_ALERT);
+					showToast(LABELS.LESSON_IM_DISABLE_ALERT);
 				}
 			}
 		});
@@ -261,9 +261,9 @@ function initLessonTab(){
 			data : data,
 			success : function() {
 				if (checked) {
-					alert(LABELS.LESSON_ACTIVITY_SCORES_ENABLE_ALERT);
+					showToast(LABELS.LESSON_ACTIVITY_SCORES_ENABLE_ALERT);
 				} else {
-					alert(LABELS.LESSON_ACTIVITY_SCORES_DISABLE_ALERT);
+					showToast(LABELS.LESSON_ACTIVITY_SCORES_DISABLE_ALERT);
 				}
 			}
 		});
@@ -2652,6 +2652,13 @@ function togglePagingCells(parent, pageNumber, maxPageNumber) {
 	} else {
 		$('td.pageCell', parent).css('visibility', 'visible').text(pageNumber + ' / ' + maxPageNumber);
 	}
+}
+
+function showToast(text) {
+	let toast = $('#toast-template').clone().attr('id', null).appendTo('#toast-container');
+	toast.find('.toast-body', toast).text(text);
+	toast = new bootstrap.Toast(toast[0]);
+    toast.show();
 }
 
 /**
