@@ -36,15 +36,27 @@ $(document).ready(function(){
 	loadTab('sequence');
 });
 
-function loadTab(tabName) {
+function loadTab(tabName, button) {
+	$('.navigate-btn, .lesson-properties').removeClass('active');
+	$('.component-sidebar').removeClass('expanded');
+	if (button) {
+		$(button).addClass('active');
+	}
+	
+	let tabContent = $('.monitoring-page-content .tab-content');
+		
 	if (tabName == 'sequence') {
-		$('.monitoring-page-content .tab-content').load(LAMS_URL + 'monitoring/monitoring/displaySequenceTab.do', function(){
+		tabContent.load(LAMS_URL + 'monitoring/monitoring/displaySequenceTab.do', function(){
 			refreshMonitor('sequence');
 			canvasFitScreen(learningDesignSvgFitScreen, true);
 		});
-	} else if (tabName = 'learners') {
-		$('.monitoring-page-content .tab-content').load(LAMS_URL + 'monitoring/monitoring/displayLearnersTab.do', function(){
+	} else if (tabName == 'learners') {
+		tabContent.load(LAMS_URL + 'monitoring/monitoring/displayLearnersTab.do', function(){
 			refreshMonitor('learners');
+		});
+	} else if (tabName == 'gradebook') {
+		tabContent.load(LAMS_URL + 'monitoring/monitoring/displayGradebookTab.do', function(){
+			refreshMonitor('gradebook');
 		});
 	}
 }
@@ -61,20 +73,17 @@ function initCommonElements(){
 	});
 	
 	$('#load-sequence-tab-btn').click(function(){
-		$('.navigate-btn, .lesson-properties').removeClass('active');
-		$('.component-sidebar').removeClass('expanded');
-		$(this).addClass('active');
-
-		loadTab('sequence');
+		loadTab('sequence', this);
 	});
 	
 	$('#load-learners-tab-btn').click(function(){
-		$('.navigate-btn, .lesson-properties').removeClass('active');
-		$('.component-sidebar').removeClass('expanded');
-		$(this).addClass('active');
-		
-		loadTab('learners');
+		loadTab('learners', this);
 	});
+	
+	$('#load-gradebook-tab-btn').click(function(){
+		loadTab('gradebook', this);
+	});
+	
 	
 	initLessonTab();
 }

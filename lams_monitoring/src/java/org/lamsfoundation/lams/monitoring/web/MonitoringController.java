@@ -985,6 +985,11 @@ public class MonitoringController {
     public String displayLearnersTab() {
 	return "monitor-learners-tab";
     }
+    
+    @RequestMapping("/displayGradebookTab")
+    public String displayGradebookTab() {
+	return "monitor-gradebook-tab";
+    }
 
     /**
      * Gets users whose progress bars will be displayed in Learner tab in Monitor.
