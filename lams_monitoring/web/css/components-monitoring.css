@@ -977,7 +977,7 @@
 	cursor: pointer;
 }
 
-#canvas-container .portrait-sm {
+.monitoring-page-wrapper .portrait-sm {
 	width: 35px;
 	height: 35px;
 	display: inline-block;
@@ -985,7 +985,7 @@
 	background-size: cover;
 }
 
-#canvas-container .portrait-md {
+.monitoring-page-wrapper .portrait-md {
 	width: 80px;
 	height: 80px;
 	display: inline-block;
@@ -993,7 +993,7 @@
 	background-size: cover;
 }
 
-#canvas-container .portrait-lg {
+.monitoring-page-wrapper .portrait-lg {
 	width: 200px;
 	height: 200px;
 	display: inline-block;
@@ -1001,7 +1001,7 @@
 	background-size: cover;
 }
 
-#canvas-container .portrait-xl {
+.monitoring-page-wrapper .portrait-xl {
 	width: 400px;
 	height: 400px;
 	display: inline-block;
@@ -1009,80 +1009,80 @@
 	background-size: cover;
 }
 
-#canvas-container .portrait-container-sm {
+.monitoring-page-wrapper .portrait-container-sm {
 	height: 38px;
 	margin-top: 3px;
 }
 
-#canvas-container .leader-display {
+.monitoring-page-wrapper .leader-display {
 	margin: 0px;
 }
 
-#canvas-container .leader-display h4 {
+.monitoring-page-wrapper .leader-display h4 {
 	margin-bottom: 0px;
 }
 
-#canvas-container .popover-link {
+.monitoring-page-wrapper .popover-link {
 	color: #337ab7 !important;
 }
 
-#canvas-container .popover-link:hover {
+.monitoring-page-wrapper .popover-link:hover {
 	color: #0E9AEF !important;
 }
 
-#canvas-container .popover-link:focus {
+.monitoring-page-wrapper .popover-link:focus {
 	color: #0E9AEF !important;
 }
 
-#canvas-container .popover-title {
+.monitoring-page-wrapper .popover-title {
 	background-color: #dddddd;
 }
 
-#canvas-container .popover-content-with-portrait {
+.monitoring-page-wrapper .popover-content-with-portrait {
 	min-height: 220px;
 	min-width: 220px;
 }
 
-.portrait-color-0 {
+.monitoring-page-wrapper .portrait-color-0 {
 	color: #001f3f;
 }
 
-.portrait-color-1 {
+.monitoring-page-wrapper .portrait-color-1 {
 	color: #FF851B;
 }
 
-.portrait-color-2 {
+.monitoring-page-wrapper .portrait-color-2 {
 	color: #85144b;
 }
 
-.portrait-color-3 {
+.monitoring-page-wrapper .portrait-color-3 {
 	color: #111111;
 }
 
-.portrait-color-4 {
+.monitoring-page-wrapper .portrait-color-4 {
 	color: #3D9970;
 }
 
-.portrait-color-5 {
+.monitoring-page-wrapper .portrait-color-5 {
 	color: #0074D9;
 }
 
-.portrait-color-6 {
+.monitoring-page-wrapper .portrait-color-6 {
 	color: #FF4136;
 }
 
-.portrait-sm-lineheight {
+.monitoring-page-wrapper .portrait-sm-lineheight {
 	line-height: 32px;
 	vertical-align: top;
 }
 
-.portrait-generic-sm {
+.monitoring-page-wrapper .portrait-generic-sm {
 	display: inline-block;
 	height: 35px;
 	vertical-align: middle;
 }
 
-.portrait-generic-sm:before {
+.monitoring-page-wrapper .portrait-generic-sm:before {
 	content: "\f2be";
 	font-family: FontAwesome;
 	font-style: normal;
@@ -1091,13 +1091,13 @@
 	line-height: 35px;
 }
 
-.portrait-generic-md {
+.monitoring-page-wrapper .portrait-generic-md {
 	display: inline-block;
 	height: 80px;
 	vertical-align: middle;
 }
 
-.portrait-generic-md:before {
+.monitoring-page-wrapper .portrait-generic-md:before {
 	content: "\f2be";
 	font-family: FontAwesome;
 	font-style: normal;
@@ -1106,13 +1106,13 @@
 	line-height: 65px;
 }
 
-.portrait-generic-lg {
+.monitoring-page-wrapper .portrait-generic-lg {
 	display: inline-block;
 	height: 200px;
 	vertical-align: middle;
 }
 
-.portrait-generic-lg:before {
+.monitoring-page-wrapper .portrait-generic-lg:before {
 	content: "\f2be";
 	font-family: FontAwesome;
 	font-style: normal;
@@ -1121,25 +1121,48 @@
 	line-height: 200px;
 }
 
+.monitoring-page-wrapper .portrait-round {
+  border-radius: 50%;
+}
 
 
 .learners-accordion-item-template {
 	display: none;
 }
 
-#learners-accordion .accordion-body {
-	background-color: #F6F5FA;
-}
-
 #learners-accordion .no-progress {
 	display: none;	
+	text-align: center;
+	position: relative;
+	top: 33%;
+}
+
+
+#learners-accordion .learners-accordion-login,
+#learners-accordion .learners-accordion-email {
+	color: #BEC4D1;
+}
+
+#learners-accordion .learners-accordion-login .fa-user,
+#learners-accordion .learners-accordion-email .fa-envelope {
+	margin-right: 10px;
+}
+
+#learners-accordion .learners-accordion-portrait > div {
+	border-radius: 10px;
+}
+
+#learners-accordion .vertical-timeline-container {
+	display: none;
+	background-color: #F6F5FA;
+	padding-top: 5px;
+	border-radius: 10px;
 }
 
 #learners-accordion .vertical-timeline {
-	display: none;
 	transform: translateX(-25%);
 }
 
-#learners-accordion .vertical-timeline:before  {
+#learnersc-accordion .vertical-timeline:before  {
 	bottom: 30px;
 }	

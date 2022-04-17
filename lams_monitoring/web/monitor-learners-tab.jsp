@@ -11,9 +11,26 @@
     </button>
   </h2>
   <div class="accordion-collapse collapse">
-	<div class="accordion-body">
-		<h5 class="no-progress">No progress yet</h5>
-		<div class="vertical-timeline timeline-sm">
+	<div class="accordion-body container-fluid">
+		<div class="row">
+			<div class="col-4 learners-accordion-info">
+				<div class="row">
+					<div class="col">
+						<h3 class="learners-accordion-name"></h3>
+						<p class="learners-accordion-login"></p>
+						<p class="learners-accordion-email"></p>
+					</div>
+					<div class="col learners-accordion-portrait">
+						
+					</div>
+				</div>
+			</div>
+			<div class="col">
+				<h5 class="no-progress align-self-center">No progress yet</h5>
+				<div class="vertical-timeline-container">
+					<div class="vertical-timeline timeline-sm"></div>
+				</div>
+			</div>
 		</div>
     </div>
    </div>

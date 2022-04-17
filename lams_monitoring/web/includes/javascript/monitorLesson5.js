@@ -2258,15 +2258,24 @@ function updateLearnersTab(){
 					itemHeaderId = 'learners-accordion-heading-' + learner.id,
 					itemCollapseId = 'learners-accordion-collapse-' + learner.id,
 					item = itemTemplate.clone().data('user-id', learner.id).appendTo(learnersAccordion),
-					portrait = learner.portraitId ? null : $(definePortrait(learner.portraitId, learner.id, STYLE_SMALL, true, LAMS_URL)).addClass('me-2');
+					portraitSmall = $(definePortrait(learner.portraitId, learner.id, STYLE_SMALL, true, LAMS_URL)).addClass('me-2'),
+					portraitLarge = learner.portraitId ? $(definePortrait(learner.portraitId, learner.id, STYLE_LARGE, false, LAMS_URL)) : null;
 				$('.accordion-header', item).attr('id', itemHeaderId)
 					   .find('.accordion-button').attr('data-bs-target', '#' + itemCollapseId).attr('aria-controls', itemCollapseId)
 											  .html('<span>' + learner.firstName + ' ' + learner.lastName + '</span>')
-											  .prepend(portrait == null ? '' : portrait);
+											  .prepend(portraitSmall);
+				$('.learners-accordion-name', item).text(learner.firstName + ' ' + learner.lastName);
+				$('.learners-accordion-login', item).html('<i class="fa-regular fa-user"></i>' + learner.login);
+				$('.learners-accordion-email', item).html('<i class="fa-regular fa-envelope"></i>' + learner.email);
+				if (portraitLarge) {
+					$('.learners-accordion-portrait', item).append(portraitLarge);
+				}
+				
 				$('.accordion-collapse', item).attr('id', itemCollapseId).attr('data-bs-parent', '#learners-accordion')
 					  .on('show.bs.collapse', function () {
 						let learnerId = $(this).closest('.accordion-item').data('user-id'),
-							timeline = $('.vertical-timeline', this).empty(),
+							timelineContainer = $('.vertical-timeline-container', this),
+							timeline = $('.vertical-timeline', timelineContainer).empty(),
 							noProgressLabel = $('.no-progress', this);
 						
 						$.ajax({
@@ -2279,7 +2288,6 @@ function updateLearnersTab(){
 							'success'  : function(response) {
 								if (!response) {
 									noProgressLabel.show();
-									timeline.hide();
 									return;
 								}
 								noProgressLabel.hide();
@@ -2291,7 +2299,7 @@ function updateLearnersTab(){
 										icon = $('<div />').addClass('timeline-icon').appendTo(innerEntry),
 										content = $('<div />').addClass('timeline-label').appendTo(innerEntry),
 										title = $('<h4 />').addClass('timeline-title').text(activity.name).appendTo(content);
-
+										
 									switch(activity.status){
 										case 0: icon.addClass('bg-primary');break;
 										case 1: icon.addClass('bg-success');break;
@@ -2313,7 +2321,7 @@ function updateLearnersTab(){
 									}
 								});
 								
-								timeline.show();
+								timelineContainer.show();
 							}
 						});
 					  });
@@ -2361,6 +2369,26 @@ function fixPagerInCenter(pagername, numcolshift) {
 	}
 }
 
+		
+var popupWidth = 1280,
+	popupHeight = 720;
+	
+// launches a popup from the page
+function launchPopup(url,title) {
+	var wd = null;
+	if(wd && wd.open && !wd.closed){
+		wd.close();
+	}
+
+	var left = ((screen.width / 2) - (popupWidth / 2));
+	var top = ((screen.height / 2) - (popupHeight / 2));
+
+	wd = window.open(url,title,'resizable,width='+popupWidth+',height='+popupHeight
+			+',scrollbars'
+			+ ",top=" + top + ",left=" + left);
+	wd.window.focus();
+}
+	
 /* gradebook dialog windows	on the ipad do not update the grid width properly using setGridWidth. Calling this is 
 -- setting the grid to parentWidth-1 and the width of the parent to parentWidth+1, leading to growing width window
 -- that overflows the dialog window. Keep the main grids slightly smaller than their containers and all is well. 
