@@ -12,6 +12,9 @@
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/vertical-timeline.css"> 
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable5.css"> 
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/free.ui.jqgrid.custom.css">
+	<link rel="stylesheet" href="<lams:LAMSURL />gradebook/includes/css/gradebook.css" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>css/components-monitoring.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>css/components-monitoring-responsive.css">
@@ -21,14 +24,20 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.timepicker.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.blockUI.js"></script>	
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.cookie.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable5.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/d3.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/chart.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />gradebook/includes/javascript/blockexportbutton.js"></script>
 	<lams:JSImport src="includes/javascript/dialog5.js" />
 	<lams:JSImport src="includes/javascript/monitorLesson5.js" relative="true" />
+	
+	
 	<script type="text/javascript">
 		<!-- Some of the following settings will be used in progressBar.js -->
 		var lessonId = ${lesson.lessonID},
@@ -212,7 +221,11 @@
 				<fmt:message key="label.person.editing.lesson" var="LIVE_EDIT_WARNING_VAR"><fmt:param value="%0"/></fmt:message>
 				LIVE_EDIT_WARNING: '<c:out value="${LIVE_EDIT_WARNING_VAR}" />'
 			};
+
+			<%-- Add jqGrid internationalisation snippet --%> 
+			<c:import url="/jqGrid.i18n.jsp" context="/lams" />
 	</script>
+	
 </head>
 <body class="component">
 <div class="monitoring-page-wrapper component-page-wrapper">

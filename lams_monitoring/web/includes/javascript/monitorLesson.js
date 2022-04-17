@@ -2439,7 +2439,7 @@ function initGradebookTab() {
  * Refreshes Gradebook Tab.
  */
 function updateGradebookTab() {
-	$("#gradebookLoading").show();
+	// $("#gradebookLoading").show();
 	$("#gradebookDiv").load(LAMS_URL + 'gradebook/gradebookMonitoring.do?lessonID=' + lessonId, function() {
 		  $("#gradebookLoading").hide();
 	});

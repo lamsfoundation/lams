@@ -33,6 +33,7 @@ var originalSequenceCanvas = null,
 $(document).ready(function(){
 	initCommonElements();
 	initSequenceTab();
+	initGradebookTab();
 	loadTab('sequence');
 });
 
@@ -2321,6 +2322,80 @@ function updateLearnersTab(){
 	});
 }
 
+//********** GRADEBOOK TAB FUNCTIONS **********
+
+/**
+ * Inits Gradebook Tab.
+ */
+function initGradebookTab() {
+	/*
+	$.extend(true, $.jgrid.icons, {
+	    fontAwesome6: $.extend(true, {}, $.jgrid.icons.fontAwesome, {
+	                           nav: { del: "fa-times" },
+	                           actions: { del: "fa-times" },
+	                           form: { del: "fa-times" }
+	                       })
+	});
+	*/
+	
+	$.extend(true, $.jgrid.icons.fontAwesome, {
+		common : "fa-solid"
+	});
+}
+
+/**
+ * Refreshes Gradebook Tab.
+ */
+function updateGradebookTab() {
+	$("#gradebookLoading").show();
+	$("#gradebookDiv").load(LAMS_URL + 'gradebook/gradebookMonitoring.do?isTab=true&lessonID=' + lessonId, function() {
+		  $("#gradebookLoading").hide();
+	});
+}
+	
+function fixPagerInCenter(pagername, numcolshift) {
+	$('#'+pagername+'_right').css('display','inline');
+	if ( numcolshift > 0 ) {
+		var marginshift = - numcolshift * 12;
+		$('#'+pagername+'_center table').css('margin-left', marginshift+'px');
+	}
+}
+
+/* gradebook dialog windows	on the ipad do not update the grid width properly using setGridWidth. Calling this is 
+-- setting the grid to parentWidth-1 and the width of the parent to parentWidth+1, leading to growing width window
+-- that overflows the dialog window. Keep the main grids slightly smaller than their containers and all is well. 
+*/
+
+function resizeJqgrid(jqgrids) {
+    jqgrids.each(function(index) {
+        var gridId = $(this).attr('id');
+        var parent = jQuery('#gbox_' + gridId).parent();
+        var gridParentWidth = parent.width();
+        if ( parent.hasClass('grid-holder') ) {
+            	gridParentWidth = gridParentWidth - 2;
+        }
+        jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+    });
+}
+
+
+/* Based on jqgrid internal functions */
+function displayCellErrorMessage(table, iRow, iCol, errorLabel, errorMessage, buttonText ) {
+	setTimeout(function () {
+		try {
+	    	var frozenRows = table.grid.fbRows,
+			tr = table.rows[iRow];
+	    	tr = frozenRows != null && frozenRows[0].cells.length > iCol ? frozenRows[tr.rowIndex] : tr;
+		    var td = tr != null && tr.cells != null ? $(tr.cells[iCol]) : $(),
+		    		rect = td[0].getBoundingClientRect();
+		    $.jgrid.info_dialog.call(table, errorLabel, errorMessage, buttonText, {left:rect.left-200, top:rect.top});
+		} catch (e) {
+			alert(errorMessage);
+		}
+	}, 50);
+}
+
+
 //********** COMMON FUNCTIONS **********
 
 function isAutoRefreshBlocked(){
@@ -2357,7 +2432,7 @@ function refreshMonitor(tabName, isAuto){
 	} else if (tabName == 'learners'){
 		updateLearnersTab();
 	} else if (tabName == 'gradebook'){
-		// updateGradebookTab();
+		updateGradebookTab();
 	}
 }
 

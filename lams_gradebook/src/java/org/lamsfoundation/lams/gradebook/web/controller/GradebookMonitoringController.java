@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -132,7 +131,8 @@ public class GradebookMonitoringController {
 	    request.setAttribute("weights", weights);
 	}
 
-	return "gradebookMonitor";
+	boolean isTab = WebUtil.readBooleanParam(request, "isTab", false);
+	return "gradebookMonitor" + (isTab ? "Content" : "");
     }
 
     @RequestMapping("/courseMonitor")
