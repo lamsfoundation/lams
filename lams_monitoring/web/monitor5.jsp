@@ -31,7 +31,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/d3.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/chart.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait5.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />gradebook/includes/javascript/blockexportbutton.js"></script>
 	<lams:JSImport src="includes/javascript/dialog5.js" />
