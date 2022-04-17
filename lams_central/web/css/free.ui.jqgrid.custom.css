@@ -56,10 +56,6 @@
 	font-family: 'Poppins', sans-serif;
 }
 
-.ui-jqgrid .ui-jqgrid-bdiv tr.ui-row-ltr>td:nth-child(4) {
-	padding-left: 3rem !important;
-}
-
 .ui-jqgrid .ui-row-ltr, .ui-jqgrid .ui-jqgrid-labels {
 	height: 3rem;
 }
@@ -134,7 +130,7 @@
 	text-align: center;
 }
 
-.ui-jqgrid.ui-jqgrid-bootstrap .popover-link {
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-jqgrid-btable td > a {
 	text-decoration: none;
 }
 
