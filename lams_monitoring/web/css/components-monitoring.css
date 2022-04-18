@@ -308,13 +308,15 @@
 
 .monitoring-page-wrapper #completion-chart-panel {
 	max-width: 300px;
-	min-width: 250px
+	min-width: 250px;
 }
 
-.monitoring-page-wrapper #chartDiv {
-  width: 200px;
-  height: 200px;
-  padding: 0;
+.monitoring-page-wrapper #completion-chart-panel .panel-body {
+  height: 350px;
+}
+
+.monitoring-page-wrapper #completion-chart-panel #completion-chart {
+	margin-top: -25px;
 }
 
 .monitoring-page-wrapper #required-tasks {

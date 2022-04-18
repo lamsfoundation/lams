@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <%@ include file="/taglibs.jsp"%>
 
-<div class="container-fluid">
+<div id="sequence-tab-content" class="container-fluid">
 	<div class="row">
 		<div class="col mb-5">
 			<div id="canvas-container" class="svg-learner-draggable-area ms-5 text-start monitoring-panel">
@@ -43,7 +43,9 @@
 				<div class="col mb-5">
 					<div id="completion-chart-panel" class="monitoring-panel">
 						<h6><fmt:message key="lesson.chart.title"/></h6>
-						<div id="chartDiv" class="panel-body"></div>
+						<div class="panel-body">
+							<canvas id="completion-chart" height="600px" width="200px"></canvas>
+						</div>
 						<!--
 						<div class="graph-con">
 							<canvas id="myChart" class="chartjs-render-monitor"></canvas>

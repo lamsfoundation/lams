@@ -546,11 +546,116 @@ function updateLessonTab(){
 		}
 	});
 	 
-	drawChart('pie', 'chartDiv',
-			  LAMS_URL + 'monitoring/monitoring/getLessonChartData.do?lessonID=' + lessonId,
-			  true);
+	drawLessonCompletionChart();
 	
-	// updatePresenceAvailableCount();
+	/*
+		drawChart('pie', 'chartDiv',
+				  LAMS_URL + 'monitoring/monitoring/getLessonChartData.do?lessonID=' + lessonId,
+				  true);
+		
+		updatePresenceAvailableCount();
+	*/
+}
+
+function drawLessonCompletionChart(){
+	d3.json(LAMS_URL + 'monitoring/monitoring/getLessonChartData.do?lessonID=' + lessonId,
+			function(error, response){
+				if (error) {
+					// forward error to browser
+					throw error;
+				}
+				
+				if (!response || $.isEmptyObject(response)) {
+					// if there is no data to display
+					return;
+				}
+				
+				
+				let ctx = document.getElementById('completion-chart').getContext('2d'),
+					data = [],
+					labels = [];
+					
+				$(response.data).each(function(){
+					labels.push(this.name);
+					data.push(this.value);
+				});
+				
+				new Chart(ctx, {
+						type : 'doughnut',
+						borderWidth : 0,
+						data : {
+							elements : {
+								arc : {
+									borderWidth : 0,
+									fontSize : 0,
+								}
+							},
+							datasets : [ {
+								data : data,
+								backgroundColor : [ 'rgba(5, 204, 214, 1)',
+													'rgba(255, 195, 55, 1)',
+													'rgba(253, 60, 165, 1)',
+												  ],
+								borderWidth : 0
+							} ],
+							labels : labels
+						},
+						options : {
+							responsive: true,
+							layout : {
+								padding : {
+									top: 0,
+									bottom: 0,
+									right: 0,
+									left: 0
+								}
+							},
+							legend : {
+								position: 'bottom',
+								align: 'start',
+								labels : {
+									generateLabels : function(chart) {
+										var data = chart.data;
+										if (data.labels.length && data.datasets.length) {
+											return data.labels.map(function(label, i) {
+												var meta = chart.getDatasetMeta(0),
+													style = meta.controller.getStyle(i),
+													value = data.datasets[0].data[i];
+				
+												return {
+													text: label + ": " + value,
+													fillStyle: style.backgroundColor,
+													strokeStyle: style.borderColor,
+													lineWidth: style.borderWidth,
+													hidden: isNaN(value) || meta.data[i].hidden,
+				
+													// Extra data used for toggling the
+													// correct item
+													index: i
+												};
+											});
+										}
+										return [];
+									}
+								}
+							},
+							animation : {
+								animateScale : true,
+								animateRotate : true,
+								duration : 1000
+							}
+						},
+						plugins: [{
+						    beforeInit: function(chart) {
+						      chart.legend.afterFit = function() {
+						        this.height = this.height + 250;
+						      };
+						    }
+						}]
+					});
+			});
+			
+	
 }
 
 function checkScheduleDate(startDateString, endDateString) {

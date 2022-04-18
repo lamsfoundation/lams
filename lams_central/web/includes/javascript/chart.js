@@ -6,15 +6,15 @@ function drawChart(type, chartID, dataSource, legendOnHover){
 		case 'string': 
 	// get data with the given URL
 			d3.json(dataSource, function(error, response){
-		if (error) {
-			// forward error to browser
-			throw error;
-		}
-		
-		if (!response || $.isEmptyObject(response)) {
-			// if there is no data to display
-			return;
-		}
+				if (error) {
+					// forward error to browser
+					throw error;
+				}
+				
+				if (!response || $.isEmptyObject(response)) {
+					// if there is no data to display
+					return;
+				}
 		
 				_drawChart(type, chartID, response.data, legendOnHover);
 			});
