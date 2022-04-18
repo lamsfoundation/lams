@@ -230,7 +230,7 @@
 <body class="component">
 <div class="monitoring-page-wrapper component-page-wrapper">
 	<div class="component-sidebar active">
-		<a href="/" class="lams-logo"><img src="<lams:LAMSURL/>images/components/lams_logo_white.png" alt="#" /></a>
+		<a href="/" class="lams-logo"><img src="<lams:LAMSURL/>images/svg/lamsv5_logo.svg" alt="#" /></a>
 		
 		<div class="component-menu">
 			<div class="component-menu-btn">

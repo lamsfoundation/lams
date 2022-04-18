@@ -50,10 +50,12 @@
 
 .component-sidebar {
 	align-items: center;
+	padding-top: 2rem;
 }
 
 .component-sidebar .lams-logo {
 	width: 3.6rem;	
+	margin-bottom: 3rem;
 }
 
 .component-sidebar.active.expanded {
@@ -73,6 +75,7 @@
 .component-sidebar .component-menu-btn {
 	width: 3.6rem;
 	height: 100%;
+	padding-left: 3px;
 }
 
 .component-sidebar #edit-lesson-btn {
