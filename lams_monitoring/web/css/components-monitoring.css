@@ -320,7 +320,7 @@
 }
 
 .monitoring-page-wrapper #completion-chart-panel .panel-body {
-  height: 350px;
+  height: 351px;
 }
 
 .monitoring-page-wrapper #completion-chart-panel #completion-chart {
@@ -342,8 +342,7 @@
 	margin: 0;
 }
 
-.monitoring-page-wrapper #required-taskst .label.contribute-activity-title
-	{
+.monitoring-page-wrapper #required-taskst .label.contribute-activity-title {
 	font-family: mont-bold, sans-serif;
 }
 
@@ -847,6 +846,14 @@
 }
 
 /********** CANVAS STYLES **********/
+
+#canvas-container {
+	min-height: 420px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
 #canvas-container div#sequenceCanvas {
 	width: 100%;
 	display: flex;
