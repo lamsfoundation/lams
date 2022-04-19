@@ -310,7 +310,7 @@ function lessonStateFieldChanged() {
 			$('#lessonStartApply').hide();
 			$('#lessonStateApply').hide();
 			$("#scheduleDisableLessonButton").html(LABELS.SCHEDULE);
-			$("#scheduleDisableLessonButton").css('display', 'inline'); // must be inline or it will be wrong size
+			$("#scheduleDisableLessonButton").css('display', 'block'); // must be inline or it will be wrong size
 			$("#disableLessonButton").show();
 			$('#lessonDisableApply').show();
 			break;
@@ -460,7 +460,7 @@ function updateLessonTab(){
 					labelColour = 'danger'; 
 					break;
 			}
-			$('#lessonStateLabel').attr('class', 'label label-' + labelColour).html(label + ' <i class="fa fa-angle-double-down"></i>');
+			$('#lessonStateLabel').attr('class', 'badge bg-' + labelColour).html(label + ' <i class="fa-solid fa-angles-down"></i>');
 			
 			// update available options in change state dropdown menu
 			var selectField = $('#lessonStateField');

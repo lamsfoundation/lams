@@ -8,11 +8,12 @@
 	
 	<link rel="icon" type="image/x-icon" href="<lams:LAMSURL/>images/svg/lamsv5_logo.svg">
 	
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.min.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/vertical-timeline.css"> 
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable5.css"> 
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable5.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/free.ui.jqgrid.custom.css">
 	<link rel="stylesheet" href="<lams:LAMSURL />gradebook/includes/css/gradebook.css" />
@@ -247,40 +248,46 @@
 					<dt><fmt:message key="lesson.state"/>
 					</dt>
 					<dd>
-						<span data-toggle="collapse" data-target="#changeState" id="lessonStateLabel" class="lessonManageField"></span>
+						<span data-bs-toggle="collapse" data-bs-target="#changeState" id="lessonStateLabel" class="lessonManageField"></span>
 					  	<div style="display:inline-block;vertical-align: middle;"><span id="lessonStartDateSpan" class="lessonManageField loffset5"></span>
 					  	<span id="lessonFinishDateSpan" class="lessonManageField loffset5"></span></div>
 					  	 
 						<!--  Change lesson status or start/schedule start -->
 						<div class="collapse offset10" id="changeState">
 							<div id="lessonScheduler">
-								<form class="form-horizontal">
-									<div class="form-group" id="lessonStartApply">
-										<label for="scheduleDatetimeField" class="col-sm-1"><fmt:message key="lesson.start"/></label>
-										<div class="col-sm-8">
-										<input class="lessonManageField input-sm" id="scheduleDatetimeField" type="text" autocomplete="nope" />
-										<a id="scheduleLessonButton" class="btn btn-xs btn-default lessonManageField" href="#"
-											   onClick="javascript:scheduleLesson()"
-											   title='<fmt:message key="button.schedule.tooltip"/>'>
-										   <fmt:message key="button.schedule"/>
-										</a>
-										<a id="startLessonButton" class="btn btn-xs btn-default" href="#"
-											   onClick="javascript:startLesson()"
-											   title='<fmt:message key="button.start.now.tooltip"/>'>
-										   <fmt:message key="button.start.now"/>
-										</a>
+								<form>
+									<div id="lessonStartApply">
+										<div class="form-group mt-2" >
+											<label for="scheduleDatetimeField" class="form-label"><fmt:message key="lesson.start"/></label>
+											<input class="lessonManageField form-control-sm" id="scheduleDatetimeField" type="text" autocomplete="nope" />
+										</div>
+										
+										<div class="mt-2">
+											<a id="scheduleLessonButton" class="btn btn-sm btn-default lessonManageField" href="#"
+												   onClick="javascript:scheduleLesson()"
+												   title='<fmt:message key="button.schedule.tooltip"/>'>
+											   <fmt:message key="button.schedule"/>
+											</a>
+											<a id="startLessonButton" class="btn btn-sm btn-secondary" href="#"
+													   onClick="javascript:startLesson()"
+													   title='<fmt:message key="button.start.now.tooltip"/>'>
+												   <fmt:message key="button.start.now"/>
+											</a>
 										</div>
 									</div>
-									<div class="form-group" id="lessonDisableApply">
-										<label for="disableDatetimeField" class="col-sm-1"><fmt:message key="lesson.end"/></label>
-										<div class="col-sm-8">
-											<input class="lessonManageField input-sm" id="disableDatetimeField" type="text"/>
-											<a id="scheduleDisableLessonButton" class="btn btn-xs btn-default lessonManageField" href="#"
+									
+									<div id="lessonDisableApply">
+										<div class="form-group mt-2">
+											<label for="disableDatetimeField" class="form-label d-block"><fmt:message key="lesson.end"/></label>
+											<input class="lessonManageField form-control-sm" id="disableDatetimeField" type="text"/>
+										</div>
+										<div class="mt-2">
+											<a id="scheduleDisableLessonButton" class="btn btn-sm btn-secondary lessonManageField" href="#"
 												   onClick="javascript:scheduleDisableLesson()"
 												   title='<fmt:message key="button.schedule.disable.tooltip"/>'>
 										   	<fmt:message key="button.schedule"/>
 											</a>
-											<a id="disableLessonButton" class="btn btn-xs btn-default" href="#"
+											<a id="disableLessonButton" class="btn btn-sm btn-secondary" href="#"
 												   onClick="javascript:disableLesson()"
 												   title='<fmt:message key="button.disable.now.tooltip"/>'>
 											   <fmt:message key="button.disable.now"/>
@@ -291,11 +298,11 @@
 							</div>
 							
 							<div id="lessonStateChanger">
-								<select id="lessonStateField" class="btn btn-xs" onchange="lessonStateFieldChanged()">
+								<select id="lessonStateField" class="form-select-sm mt-2" onchange="lessonStateFieldChanged()">
 									<option value="-1"><fmt:message key="lesson.select.state"/></option>
 								</select>
 								<span id="lessonStateApply">
-									<button type="button" class="lessonManageField btn btn-xs btn-primary"
+									<button type="button" class="lessonManageField btn btn-sm btn-primary"
 											onClick="javascript:changeLessonState()"
 											title='<fmt:message key="lesson.change.state.tooltip"/>'>
 								   		<i class="fa fa-check"></i> 

@@ -104,8 +104,16 @@
 	transition: opacity .3s ease .3s;
 }
 
-.component-sidebar .lesson-properties #lessonDetails .btn {
+.component-sidebar .lesson-properties #lessonDetails .btn,
+.component-sidebar .lesson-properties #lessonDetails select,
+.component-sidebar .lesson-properties #lessonDetails input[type="text"] {
 	width: 75%;
+}
+
+.component-sidebar .lesson-properties #lessonDetails #lessonStateLabel {
+	font-size: 1rem;
+	font-weight: normal;
+	cursor: pointer;
 }
 
 .component-sidebar .lesson-properties #gradebookOnCompleteButton {
@@ -113,7 +121,7 @@
 }
 
 .component-sidebar .lesson-properties .btn {
-	display: block;
+	display: block !important;
 	margin-top: .5rem;
 }
 
@@ -1168,6 +1176,6 @@
 	transform: translateX(-25%);
 }
 
-#learnersc-accordion .vertical-timeline:before  {
+#learners-accordion .vertical-timeline:before  {
 	bottom: 30px;
 }	
