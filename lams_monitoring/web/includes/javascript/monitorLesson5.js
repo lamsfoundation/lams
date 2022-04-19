@@ -545,8 +545,6 @@ function updateLessonTab(){
 			$('#lesson-instructions').html(response.lessonInstructions);
 		}
 	});
-	 
-	drawLessonCompletionChart();
 	
 	/*
 		drawChart('pie', 'chartDiv',
@@ -572,12 +570,14 @@ function drawLessonCompletionChart(){
 				
 				
 				let ctx = document.getElementById('completion-chart').getContext('2d'),
-					data = [],
-					labels = [];
+					percent = [],
+					labels = [],
+					raw = [];
 					
 				$(response.data).each(function(){
 					labels.push(this.name);
-					data.push(this.value);
+					percent.push(this.value);
+					raw.push(this.raw);
 				});
 				
 				new Chart(ctx, {
@@ -591,23 +591,27 @@ function drawLessonCompletionChart(){
 								}
 							},
 							datasets : [ {
-								data : data,
-								backgroundColor : [ 'rgba(5, 204, 214, 1)',
-													'rgba(255, 195, 55, 1)',
+								data : percent,
+								backgroundColor : [ 'rgba(255, 195, 55, 1)',
 													'rgba(253, 60, 165, 1)',
+													'rgba(5, 204, 214, 1)'
 												  ],
 								borderWidth : 0
 							} ],
 							labels : labels
 						},
 						options : {
-							responsive: true,
-							layout : {
-								padding : {
-									top: 0,
-									bottom: 0,
-									right: 0,
-									left: 0
+							tooltips : {
+								enabled : true,
+								callbacks: {
+									label : function(tooltipItem, data) {
+										var index =  tooltipItem.index,
+											label = labels[index],
+											value = percent[index],
+											rawValue = raw[index];
+										
+										return label + ": " + rawValue + " (" + value + "%)";
+									}
 								}
 							},
 							legend : {
@@ -620,10 +624,11 @@ function drawLessonCompletionChart(){
 											return data.labels.map(function(label, i) {
 												var meta = chart.getDatasetMeta(0),
 													style = meta.controller.getStyle(i),
-													value = data.datasets[0].data[i];
+													value = data.datasets[0].data[i],
+													rawValue = raw[i];
 				
 												return {
-													text: label + ": " + value,
+													text: label + ": " + rawValue + " (" + value + "%)",
 													fillStyle: style.backgroundColor,
 													strokeStyle: style.borderColor,
 													lineWidth: style.borderWidth,
@@ -1350,6 +1355,8 @@ function updateSequenceTab() {
 	}
 	sequenceRefreshInProgress = true;
 	
+	drawLessonCompletionChart();
+	
 	sequenceCanvas = $('#sequenceCanvas');
 	sequenceCanvas.css('visibility', 'hidden');
 
@@ -1456,7 +1463,7 @@ function updateSequenceTab() {
 			}
 			
 			var learnerTotalCount = learnerCount + response.completedLearnerCount;
-			$('#learnersStartedPossibleCell').html('<span id="tour-learner-count">'+learnerTotalCount + ' / ' + response.numberPossibleLearners+'</span>');
+			// $('#learnersStartedPossibleCell').html('<span id="tour-learner-count">'+learnerTotalCount + ' / ' + response.numberPossibleLearners+'</span>');
 			addCompletedLearnerIcons(response.completedLearners, response.completedLearnerCount, learnerTotalCount);
 			
 			$.each(response.activities, function(activityIndex, activity){

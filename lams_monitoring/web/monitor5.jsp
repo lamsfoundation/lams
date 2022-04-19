@@ -306,9 +306,11 @@
 						</div>
 					</dd>
 					
+					<!-- 
 					<dt><fmt:message key="lesson.learners"/>:</dt>
 					<dd title='<fmt:message key="lesson.ratio.learners.tooltip"/>' id="learnersStartedPossibleCell"></dd>
-					
+					 -->
+					 
 					<!--  lesson actions -->
 					<dt><fmt:message key="lesson.manage"/>:</dt>
 					<dd>

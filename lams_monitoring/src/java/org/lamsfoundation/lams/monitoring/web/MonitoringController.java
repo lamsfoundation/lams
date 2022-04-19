@@ -975,17 +975,17 @@ public class MonitoringController {
 	boolean useNewUI = WebUtil.readBooleanParam(request, "newUI", true);
 	return "monitor" + (useNewUI ? "5" : "");
     }
-    
+
     @RequestMapping("/displaySequenceTab")
     public String displaySequenceTab() {
 	return "monitor-sequence-tab";
     }
-    
+
     @RequestMapping("/displayLearnersTab")
     public String displayLearnersTab() {
 	return "monitor-learners-tab";
     }
-    
+
     @RequestMapping("/displayGradebookTab")
     public String displayGradebookTab() {
 	return "monitor-gradebook-tab";
@@ -1096,20 +1096,23 @@ public class MonitoringController {
 	Integer notCompletedLearnersCount = possibleLearnersCount - completedLearnersCount - startedLearnersCount;
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	ObjectNode notStartedJSON = JsonNodeFactory.instance.objectNode();
-	notStartedJSON.put("name", messageService.getMessage("lesson.chart.not.completed"));
-	notStartedJSON.put("value", Math.round(notCompletedLearnersCount.doubleValue() / possibleLearnersCount * 100));
-	responseJSON.withArray("data").add(notStartedJSON);
-
 	ObjectNode startedJSON = JsonNodeFactory.instance.objectNode();
 	startedJSON.put("name", messageService.getMessage("lesson.chart.started"));
 	startedJSON.put("value", Math.round((startedLearnersCount.doubleValue()) / possibleLearnersCount * 100));
+	startedJSON.put("raw", startedLearnersCount);
 	responseJSON.withArray("data").add(startedJSON);
 
 	ObjectNode completedJSON = JsonNodeFactory.instance.objectNode();
 	completedJSON.put("name", messageService.getMessage("lesson.chart.completed"));
 	completedJSON.put("value", Math.round(completedLearnersCount.doubleValue() / possibleLearnersCount * 100));
+	completedJSON.put("raw", completedLearnersCount);
 	responseJSON.withArray("data").add(completedJSON);
+	
+	ObjectNode notStartedJSON = JsonNodeFactory.instance.objectNode();
+	notStartedJSON.put("name", messageService.getMessage("lesson.chart.not.completed"));
+	notStartedJSON.put("value", Math.round(notCompletedLearnersCount.doubleValue() / possibleLearnersCount * 100));
+	notStartedJSON.put("raw", notCompletedLearnersCount);
+	responseJSON.withArray("data").add(notStartedJSON);
 
 	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
