@@ -885,9 +885,22 @@
     color: white !important;
 }
 
+.dialogContainer .dialogTitle {
+	text-align: center;
+	font-weight: bold;	
+}
+
 .dialogContainer .bottom-buttons {
 	float: right;
 	margin-bottom: 5px;
+}
+
+.dialogContainer #classMonitorSearchRow {
+	height: 70px;
+}
+
+.dialogContainer #classDialogTable {
+	width: calc(100% - 12px);
 }
 
 /********** CANVAS STYLES **********/

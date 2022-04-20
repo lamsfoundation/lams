@@ -189,6 +189,7 @@ function showDialog(id, initParams, extraButtons, recreate) {
 					$('iframe', this).css('pointer-events', 'none');
 				}).on('resizestop', function(){
 					$('iframe', this).css('pointer-events', 'auto');
+					dialog.modal('handleUpdate');
 				});
 			}
 		});

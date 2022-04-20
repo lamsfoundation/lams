@@ -204,7 +204,7 @@ function initLessonTab(){
 		}
 	}, false);
 	
-	$('.modal-body', classDialog).empty().append($('#classDialogContents').show());
+	$('.modal-body', classDialog).empty().append($('#classDialogContents').show()).closest('.modal-dialog').addClass('modal-lg');
 	
 	// search for users in the organisation with the term the Monitor entered
 	$('.dialogSearchPhrase', classDialog).autocomplete({
@@ -2197,17 +2197,20 @@ function fillClassList(role, disableCreator) {
 	togglePagingCells(table, ajaxProperties.data.pageNumber, Math.ceil(userCount / 10));
 	
 	$.each(users, function(userIndex, user) {
-		var checkbox = $('<input />').attr({
-	    	 'type' : 'checkbox'
-	      }).change(function(){
-	    	editClassMember($(this));
+		var checkboxId = 'class-list-' + role + '-' + user.id,
+			checkbox = $('<input />').attr({
+	    	 'type' : 'checkbox',
+			 'id'   : checkboxId
+	      }).addClass('form-check-input me-1')
+			.change(function(){
+	    		editClassMember($(this));
 	      }),
 	    		
 	      userDiv = $('<div />').attr({
 				'userId'  : user.id
 				})
 	          .addClass('dialogListItem')
-		      .html(getLearnerDisplayName(user))
+			  .prepend($('<label />').addClass('form-check-label').attr('for', checkboxId).text(getLearnerDisplayName(user)))
 		      .prepend(checkbox)
 		      .appendTo(list);
 	    	

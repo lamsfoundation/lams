@@ -518,47 +518,59 @@
 
 <div id="classDialogContents" class="dialogContainer">
 	<div id="classDialogTable">
-		<div class="row no-margin">
-			<div id="leftLearnerTable" class="col-xs-6">
-				<table id="classLearnerTable" class="table table-condensed">
+		<div class="row">
+			<div id="leftLearnerTable" class="col-6">
+				<table id="classLearnerTable" class="table table-borderless">
 					<tr class="active">
 						<td class="dialogTitle" colspan="6"><fmt:message
 								key="lesson.learners" /></td>
 					</tr>
 					<tr>
-						<td><span class="dialogSearchPhraseIcon fa fa-xs fa-search"
-							title="<fmt:message key='search.learner.textbox' />"></span></td>
-						<td colspan="4"><input class="dialogSearchPhrase" style="padding: 0px"
-							title="<fmt:message key='search.learner.textbox' />" /></td>
-						<td><span
-							class="dialogSearchPhraseClear fa fa-xs fa-times-circle"
-							onClick="javascript:classClearSearchPhrase()"
-							title="<fmt:message key='learners.search.phrase.clear.tooltip' />"></span>
+						<td colspan="5">
+							<div class="input-group mb-3">
+							  <input type="text" class="form-control dialogSearchPhrase" placeholder="<fmt:message key='search.learner.textbox' />"
+							  		 aria-label="<fmt:message key='search.learner.textbox' />">
+							  <span class="dialogSearchPhraseIcon input-group-text" title="<fmt:message key='search.learner.textbox' />">
+							  		<i class=" fa-solid fa-sm fa-search"></i>
+							  </span>
+							</div>
+						</td>
+						<td>
+							<span class="dialogSearchPhraseClear fa-solid fa-circle-xmark"
+								  onClick="javascript:classClearSearchPhrase()"
+								  title="<fmt:message key='learners.search.phrase.clear.tooltip' />" 
+							></span>
 						</td>
 					</tr>
 					<tr>
 						<td class="navCell pageMinus10Cell"
 							title="<fmt:message key='learner.group.backward.10'/>"
-							onClick="javascript:shiftClassList('Learner', -10)"><span
-							class="ui-icon ui-icon-seek-prev"></span></td>
+							onClick="javascript:sortClassList('Learner', -10)">
+								<i class="fa-solid fa-step-backward"></i>
+						</td>
 						<td class="navCell pageMinus1Cell"
 							title="<fmt:message key='learner.group.backward.1'/>"
-							onClick="javascript:shiftClassList('Learner', -1)"><span
-							class="ui-icon ui-icon-arrowthick-1-w"></span></td>
-						<td class="pageCell" title="<fmt:message key='learners.page'/>">
+							onClick="javascript:sortClassList('Learner', -1)">
+								<i class="fa-solid fa-backward"></i>
+						</td>
+						<td class="pageCell"
+							title="<fmt:message key='learners.page'/>">
 						</td>
 						<td class="navCell pagePlus1Cell"
 							title="<fmt:message key='learner.group.forward.1'/>"
-							onClick="javascript:shiftClassList('Learner', 1)"><span
-							class="ui-icon ui-icon-arrowthick-1-e"></span></td>
-						<td class="navCell pagePlus10Cell"
+							onClick="javascript:sortClassList('Learner', 1)">
+								<i class="fa-solid fa-forward"></i>
+						</td>
+						<td class="navCell pagePlus10Cell" 
 							title="<fmt:message key='learner.group.forward.10'/>"
-							onClick="javascript:shiftClassList('Learner', 10)"><span
-							class="ui-icon ui-icon-seek-next"></span></td>
-						<td class="navCell sortCell"
-							title="<fmt:message key='learner.group.sort.button'/>"
-							onClick="javascript:sortClassList('Learner')"><span
-							class="ui-icon ui-icon-triangle-1-n"></span></td>
+							onClick="javascript:sortClassList('Learner', 10)">
+								<i class="fa-solid fa-step-forward"></i>
+						</td>
+						<td class="navCell sortCell" 
+							title="<fmt:message key='learner.group.sort.button'/>" 
+							onClick="javascript:sortClassList('Learner')">
+								<i class="fa-solid fa-caret-down"></i>
+						</td>
 					</tr>
 					<tr>
 						<td class="dialogList" colspan="6"></td>
@@ -566,7 +578,7 @@
 					<tr>
 						<td colspan="6">
 							<button id="addAllLearnersButton"
-								class="btn btn-sm btn-default pull-right"
+								class="btn btn-sm btn-secondary float-end"
 								onClick="javascript:addAllLearners()">
 								<fmt:message key="button.edit.class.add.all" />
 							</button>
@@ -574,40 +586,44 @@
 					</tr>
 				</table>
 			</div>
-			<div id="rightMonitorTable" class="col-xs-6">
-				<table id="classMonitorTable" class="table table-condensed">
+			<div id="rightMonitorTable" class="col">
+				<table id="classMonitorTable" class="table table-borderless">
 					<tr class="active">
 						<td class="dialogTitle" colspan="6"><fmt:message
 								key="lesson.monitors" /></td>
 					</tr>
 					<tr>
-						<td colspan="5">
 						<td id="classMonitorSearchRow" colspan="6">&nbsp;</td>
-						</td>
 					</tr>
 					<tr>
 						<td class="navCell pageMinus10Cell"
 							title="<fmt:message key='learner.group.backward.10'/>"
-							onClick="javascript:shiftClassList('Monitor', -10)"><span
-							class="ui-icon ui-icon-seek-prev"></span></td>
+							onClick="javascript:sortClassList('Monitor', -10)">
+								<i class="fa-solid fa-step-backward"></i>
+						</td>
 						<td class="navCell pageMinus1Cell"
 							title="<fmt:message key='learner.group.backward.1'/>"
-							onClick="javascript:shiftClassList('Monitor', -1)"><span
-							class="ui-icon ui-icon-arrowthick-1-w"></span></td>
-						<td class="pageCell" title="<fmt:message key='learners.page'/>">
+							onClick="javascript:sortClassList('Monitor', -1)">
+								<i class="fa-solid fa-backward"></i>
+						</td>
+						<td class="pageCell"
+							title="<fmt:message key='learners.page'/>">
 						</td>
 						<td class="navCell pagePlus1Cell"
 							title="<fmt:message key='learner.group.forward.1'/>"
-							onClick="javascript:shiftClassList('Monitor', 1)"><span
-							class="ui-icon ui-icon-arrowthick-1-e"></span></td>
-						<td class="navCell pagePlus10Cell"
+							onClick="javascript:sortClassList('Monitor', 1)">
+								<i class="fa-solid fa-forward"></i>
+						</td>
+						<td class="navCell pagePlus10Cell" 
 							title="<fmt:message key='learner.group.forward.10'/>"
-							onClick="javascript:shiftClassList('Monitor', 10)"><span
-							class="ui-icon ui-icon-seek-next"></span></td>
-						<td class="navCell sortCell"
-							title="<fmt:message key='learner.group.sort.button'/>"
-							onClick="javascript:sortClassList('Monitor')"><span
-							class="ui-icon ui-icon-triangle-1-n"></span></td>
+							onClick="javascript:sortClassList('Monitor', 10)">
+								<i class="fa-solid fa-step-forward"></i>
+						</td>
+						<td class="navCell sortCell" 
+							title="<fmt:message key='learner.group.sort.button'/>" 
+							onClick="javascript:sortClassList('Monitor')">
+								<i class="fa-solid fa-caret-down"></i>
+						</td>
 					</tr>
 					<tr>
 						<td class="dialogList" colspan="6"></td>
