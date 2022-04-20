@@ -2442,6 +2442,37 @@ function updateLearnersTab(){
 	});
 }
 
+/**
+ * Clears previous run search for phrase, in Learners tab.
+ */
+function learnersClearSearchPhrase(){
+	$('#learnersSearchPhrase').val('').autocomplete("close");
+	loadLearnerProgressPage(1, '');
+	$('#learnersSearchPhraseClear').hide();
+}
+
+/**
+ * Clears previous run search for phrase, in Edit Class dialog.
+ */
+function classClearSearchPhrase(){
+	var dialog = $('#classDialog');
+	$('.dialogSearchPhrase', dialog).val('').autocomplete("close");
+	dialog.data('LearnerAjaxProperties').data.pageNumber = 1;
+	showClassDialog('Learner');
+	$('.dialogSearchPhraseClear', dialog).css('visibility', 'hidden');
+}
+
+
+/**
+ * Clears previous run search for phrase, in Learner Group dialogs.
+ */
+function learnerGroupClearSearchPhrase(){
+	var dialog = $('#learnerGroupDialog');
+	$('.dialogSearchPhrase', dialog).val('').autocomplete("close");
+	dialog.data('ajaxProperties').data.pageNumber = 1;
+	showLearnerGroupDialog();
+	$('.dialogSearchPhraseClear', dialog).css('visibility', 'hidden');
+}
 //********** GRADEBOOK TAB FUNCTIONS **********
 
 /**
@@ -2537,6 +2568,27 @@ function displayCellErrorMessage(table, iRow, iCol, errorLabel, errorMessage, bu
 
 
 //********** COMMON FUNCTIONS **********
+
+
+// generic function for opening a pop up
+function openPopUp(url, title, h, w, status, forceNewWindow) {
+
+	var width = screen.width;
+	var height = screen.height;
+
+	var left = ((width / 2) - (w / 2));
+	var top = ((height / 2) - (h / 2));
+
+	if (forceNewWindow) {
+		// opens a new window rather than loading content to existing one
+		title += new Date().getTime();
+	}
+
+	window.open(url, title, "HEIGHT=" + h + ",WIDTH=" + w
+			+ ",resizable=yes,scrollbars=yes,status=" + status
+			+ ",menubar=no, toolbar=no"
+			+ ",top=" + top + ",left=" + left);
+}
 
 function isAutoRefreshBlocked(){
 	return autoRefreshBlocked || $('#learnerGroupDialog').hasClass('in');
@@ -2716,7 +2768,7 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 	
 	if (!isRefresh) {
 		// show buttons and labels depending on parameters
-		$('span#learnerGroupMultiSelectLabel, button#learnerGroupDialogForceCompleteButton', learnerGroupDialog)
+		$('span#learnerGroupMultiSelectLabel, button#learnerGroupDialogForceCompleteButton, button#learnerGroupDialogForceCompleteAllButton', learnerGroupDialog)
 			.css('display', allowForceComplete ? 'inline' : 'none');
 		$('button#learnerGroupDialogViewButton', learnerGroupDialog)
 			.css('display', allowView ? 'inline' : 'none');

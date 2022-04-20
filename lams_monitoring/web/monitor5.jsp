@@ -444,18 +444,19 @@
 
 <div id="learnerGroupDialogContents" class="dialogContainer">
 	<span id="learnerGroupMultiSelectLabel"><fmt:message key='learner.group.multi.select'/></span>
-	<table id="listLearners" class="table table-condensed">
+	<table id="listLearners" class="table table-borderless">
 		<tr id="learnerGroupSearchRow">
-			<td>
-				<span class="dialogSearchPhraseIcon fa fa-xs fa-search"
-					  title="<fmt:message key='search.learner.textbox' />"></span>
+			<td colspan="5">
+				<div class="input-group mb-3">
+				  <input type="text" class="form-control dialogSearchPhrase" placeholder="<fmt:message key='search.learner.textbox' />"
+				  		 aria-label="<fmt:message key='search.learner.textbox' />">
+				  <span class="dialogSearchPhraseIcon input-group-text" title="<fmt:message key='search.learner.textbox' />">
+				  		<i class=" fa-solid fa-sm fa-search"></i>
+				  </span>
+				</div>
 			</td>
-			<td colspan="4">
-				<input class="dialogSearchPhrase" 
-					   title="<fmt:message key='search.learner.textbox' />"/>
-			</td>
 			<td>
-				<span class="dialogSearchPhraseClear fa fa-xs fa-times-circle"
+				<span class="dialogSearchPhraseClear fa-solid fa-circle-xmark"
 					  onClick="javascript:learnerGroupClearSearchPhrase()"
 					  title="<fmt:message key='learners.search.phrase.clear.tooltip' />" 
 				></span>
@@ -465,12 +466,12 @@
 			<td class="navCell pageMinus10Cell"
 				title="<fmt:message key='learner.group.backward.10'/>"
 				onClick="javascript:shiftLearnerGroupList(-10)">
-					<span class="ui-icon ui-icon-seek-prev"></span>
+					<i class="fa-solid fa-step-backward"></i>
 			</td>
 			<td class="navCell pageMinus1Cell"
 				title="<fmt:message key='learner.group.backward.1'/>"
 				onClick="javascript:shiftLearnerGroupList(-1)">
-				<span class="ui-icon ui-icon-arrowthick-1-w"></span>
+					<i class="fa-solid fa-backward"></i>
 			</td>
 			<td class="pageCell"
 				title="<fmt:message key='learners.page'/>">
@@ -478,43 +479,43 @@
 			<td class="navCell pagePlus1Cell"
 				title="<fmt:message key='learner.group.forward.1'/>"
 				onClick="javascript:shiftLearnerGroupList(1)">
-					<span class="ui-icon ui-icon-arrowthick-1-e"></span>
+					<i class="fa-solid fa-forward"></i>
 			</td>
 			<td class="navCell pagePlus10Cell" 
 				title="<fmt:message key='learner.group.forward.10'/>"
 				onClick="javascript:shiftLearnerGroupList(10)">
-					<span class="ui-icon ui-icon-seek-next"></span>
+					<i class="fa-solid fa-step-forward"></i>
 			</td>
 			<td class="navCell sortCell" 
 				title="<fmt:message key='learner.group.sort.button'/>" 
 				onClick="javascript:sortLearnerGroupList()">
-					<span class="ui-icon ui-icon-triangle-1-n"></span>
+					<i class="fa-solid fa-caret-down"></i>
 			</td>
 		</tr>
 		<tr>
 			<td colspan="6" class="dialogList"></td>
 		</tr>
 	</table>
-	<div class="btn-group pull-right">
-		<button id="learnerGroupDialogForceCompleteAllButton" class="btn btn-default roffset5 pull-right">
+	<div class="bottom-buttons">
+		<button id="learnerGroupDialogForceCompleteAllButton" class="btn btn-secondary me-2">
 			<span><fmt:message key="button.force.complete.all" /></span>
 		</button>
-		<button id="learnerGroupDialogForceCompleteButton" class="learnerGroupDialogSelectableButton btn btn-default roffset5 pull-right">
+		<button id="learnerGroupDialogForceCompleteButton" class="learnerGroupDialogSelectableButton btn btn-secondary me-2">
 			<span><fmt:message key="button.force.complete" /></span>
 		</button>
-		<br>
-		<button id="learnerGroupDialogCloseButton" class="btn btn-default voffset10 pull-right">
-			<span><fmt:message key="button.close" /></span>
+
+		<button id="learnerGroupDialogViewButton" class="learnerGroupDialogSelectableButton btn btn-secondary me-2">
+			<span><fmt:message key="button.view.learner" /></span>
 		</button>
-		<button id="learnerGroupDialogEmailButton" class="learnerGroupDialogSelectableButton btn btn-default roffset5 voffset10 pull-right">
+		<button id="learnerGroupDialogEmailButton" class="learnerGroupDialogSelectableButton btn btn-secondary me-2">
 			<span><fmt:message key="button.email" /></span>
 		</button>
-		<button id="learnerGroupDialogViewButton" class="learnerGroupDialogSelectableButton btn btn-default roffset5 voffset10 pull-right">
-			<span><fmt:message key="button.view.learner" /></span>
+		<button id="learnerGroupDialogCloseButton" class="btn btn-primary me-2">
+			<span><fmt:message key="button.close" /></span>
 		</button>
 	</div>
 </div>
-	
+
 <div id="classDialogContents" class="dialogContainer">
 	<div id="classDialogTable">
 		<div class="row no-margin">

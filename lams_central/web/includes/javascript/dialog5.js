@@ -120,9 +120,12 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	
 	dialog.modal({
 		'keyboard' : false,
-		'backdrop' : initParams.modal ? 'static' : false,
-		'show' : initParams.autoOpen
+		'backdrop' : initParams.modal ? 'static' : false
 	});
+	
+	if (initParams.autoOpen) {
+		dialog.modal('show');
+	}
 	
 	if (!initParams.modal) {
 		// make the dialog non-modal
