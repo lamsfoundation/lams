@@ -244,7 +244,7 @@ function initLessonTab(){
 			'height'    : 500,
 			'width'     : 510,
 			'title' 	: LABELS.PROGRESS_EMAIL_TITLE,
-			'resizable' : true,
+			'resizable' : false,
 			'open'      : function(){
 				autoRefreshBlocked = true;
 			},
@@ -956,13 +956,16 @@ function addCheckbox(dateObj, list, checked) {
 		return;
 
 	// does not exist so add to list
-	var checkbox = $('<input />').attr({
-   	 	'type' : 'checkbox'
-     }).change(function(){
-    	 editEmailProgressDate($(this));
-     }),
+	var checkboxId = 'email-progress-date-' + dateObj.id,
+		checkbox = $('<input />').attr({
+   	 	'type' : 'checkbox',
+		'id'   : checkboxId
+     }).addClass('form-check-input me-1')
+	   .change(function(){
+    		editEmailProgressDate($(this));
+       }),
 
-     dateString = $('<span/>').html(dateObj.date),
+     dateString = $('<label />').addClass('form-check-label').attr('for', checkboxId).text(dateObj.date),
    	
      dateDiv = $('<div />').attr({
 			'dateid'  : dateObj.id,
@@ -982,6 +985,7 @@ function sendProgressEmail() {
 		$.ajax({
 			dataType : 'json',
 			url : LAMS_URL + 'monitoring/emailProgress/sendLessonProgressEmail.do',
+			type: 'post',
 			cache : false,
 			data : {
 				'lessonID'  : lessonId

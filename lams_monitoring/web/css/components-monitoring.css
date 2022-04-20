@@ -887,11 +887,10 @@
 
 .dialogContainer .dialogTitle {
 	text-align: center;
-	font-weight: bold;	
+	font-weight: 500;	
 }
 
 .dialogContainer .bottom-buttons {
-	float: right;
 	margin-bottom: 5px;
 }
 
@@ -899,8 +898,13 @@
 	height: 70px;
 }
 
-.dialogContainer #classDialogTable {
+.dialogContainer #classDialogTable,
+.dialogContainer #emailProgressDialogTable {
 	width: calc(100% - 12px);
+}
+
+.dialogContainer iframe {
+	height: calc(100% - 10px);
 }
 
 /********** CANVAS STYLES **********/

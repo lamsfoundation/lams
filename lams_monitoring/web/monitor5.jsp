@@ -496,7 +496,7 @@
 			<td colspan="6" class="dialogList"></td>
 		</tr>
 	</table>
-	<div class="bottom-buttons">
+	<div class="bottom-buttons float-end">
 		<button id="learnerGroupDialogForceCompleteAllButton" class="btn btn-secondary me-2">
 			<span><fmt:message key="button.force.complete.all" /></span>
 		</button>
@@ -521,7 +521,7 @@
 		<div class="row">
 			<div id="leftLearnerTable" class="col-6">
 				<table id="classLearnerTable" class="table table-borderless">
-					<tr class="active">
+					<tr class="table-active">
 						<td class="dialogTitle" colspan="6"><fmt:message
 								key="lesson.learners" /></td>
 					</tr>
@@ -588,7 +588,7 @@
 			</div>
 			<div id="rightMonitorTable" class="col">
 				<table id="classMonitorTable" class="table table-borderless">
-					<tr class="active">
+					<tr class="table-active">
 						<td class="dialogTitle" colspan="6"><fmt:message
 								key="lesson.monitors" /></td>
 					</tr>
@@ -658,6 +658,44 @@
                       <span><fmt:message key="button.close" /></span>
               </button>
       </div>
+</div>
+
+<div id="emailProgressDialogContents" class="dialogContainer">
+	<div id="emailProgressDialogTable">
+		<div>
+			<table id="emailProgressTable" class="table">
+				<tr class="table-active">
+					<td class="dialogTitle" colspan="6"><fmt:message key="progress.email.will.be.sent.on"/></td>
+				</tr>
+				<tr>
+					<td class="dialogList" colspan="6"></td>
+				</tr>
+			</table>
+		</div>
+		<div class="row mt-2">
+			<div class="col-6 form-group">
+				<label for="emaildatePicker"><fmt:message key="progress.email.select.date"/></label>
+				<input type="text" class="form-control" name="emaildatePicker" id="emaildatePicker" value="" autocomplete="off" />
+			</div>
+		</div>
+
+		<div class="row mt-2">
+			<div class="col-6 text-end">
+				<button id="addEmailProgressDateButton"
+					class="btn btn-sm btn-primary"
+					onClick="javascript:addEmailProgressDate()">
+					<fmt:message key="progress.email.add.date"/>
+				</button>
+			</div>
+			<div class="col-6 text-end">
+				<button id="addEmailProgressSeriesButton"
+					class="btn btn-sm btn-secondary"
+					onClick="javascript:addEmailProgressSeries(true)">
+					<fmt:message key="progress.email.generate.date.list"/>
+				</button>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" id="toast-container">

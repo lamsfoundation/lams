@@ -427,7 +427,7 @@ function showNotificationsDialog(orgID, lessonID) {
 					+ orgID);
 			}
 		}
-	}, true);
+	}, false).find('.modal-dialog').addClass('modal-lg');
 }
 
 
