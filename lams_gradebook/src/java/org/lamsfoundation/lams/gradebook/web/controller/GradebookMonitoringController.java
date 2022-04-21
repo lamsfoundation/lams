@@ -132,7 +132,7 @@ public class GradebookMonitoringController {
 	}
 
 	boolean isTab = WebUtil.readBooleanParam(request, "isTab", false);
-	return "gradebookMonitor" + (isTab ? "Content" : "");
+	return "gradebookMonitor" + (isTab ? "Content5" : "");
     }
 
     @RequestMapping("/courseMonitor")

@@ -28,7 +28,9 @@ var originalSequenceCanvas = null,
 	popupHeight = 720,
 	
 	gateOpenIconPath   = 'images/svg/gateOpen.svg',
-	gateOpenIconData   = null;
+	gateOpenIconData   = null,
+	
+	fileDownloadCheckTimer;
 
 $(document).ready(function(){
 	initCommonElements();
@@ -2575,6 +2577,41 @@ function displayCellErrorMessage(table, iRow, iCol, errorLabel, errorMessage, bu
 	}, 50);
 }
 
+function blockExportButton(areaToBlock, exportExcelUrl) {
+	var token = new Date().getTime(),
+		area = $('#' + areaToBlock).css('cursor', 'wait'),
+		buttons = $('.btn', area).prop('disabled', true),
+		form = $('<form></form>');
+		    
+	fileDownloadCheckTimer = window.setInterval(function () {
+		var cookieValue = $.cookie('fileDownloadToken');
+		if (cookieValue == token) {
+		    //unBlock export button
+			window.clearInterval(fileDownloadCheckTimer);
+			$.cookie('fileDownloadToken', null); //clears this cookie value
+			
+			area.css('cursor', 'auto');
+			buttons.prop('disabled', false);
+			form.remove();
+		}
+	}, 1000);
+	
+	//dynamically create a form and submit it
+    form.attr("method", "post");
+    form.attr("action", exportExcelUrl);
+    
+    var hiddenField = $('<input></input>');
+    hiddenField.attr("type", "hidden");
+    hiddenField.attr("name", "downloadTokenValue");
+    hiddenField.attr("value", token);
+    form.append(hiddenField);
+
+    // The form needs to be a part of the document in order to be submitted
+    $(document.body).append(form);
+    form.submit();
+	
+	return false;
+}
 
 //********** COMMON FUNCTIONS **********
 
