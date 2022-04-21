@@ -8,6 +8,10 @@
 		display: none;
 		margin: 20px 0;
 	}
+	
+	.gbTopButtonsContainer button {
+		margin: 0 0 0 .8rem;
+	}
 </style>
 	
 <script type="text/javascript">
@@ -67,7 +71,8 @@
 		
 		if (releaseMarksPanel.is(':empty')) {
 			releaseMarksPanel.load('<lams:LAMSURL/>gradebook/gradebookMonitoring/displayReleaseMarksPanel.do',{
-				'lessonID' : ${lessonDetails.lessonID}
+				'lessonID' : ${lessonDetails.lessonID},
+				'isTab'	   : true
 			}, function(){
 				releaseMarksPanel.slideDown();
 			});
@@ -83,8 +88,8 @@
 		
 		// Create the user view grid with sub grid for activities
 		jQuery("#userView").jqGrid({
-			guiStyle: "bootstrap",
-			iconSet: 'fontAwesome',
+			guiStyle: "bootstrap4",
+			iconSet: 'fontAwesomeSolid',
 			autoencode:false,
 			caption: "<fmt:message key="gradebook.gridtitle.usergrid"/>",
 		    datatype: "xml",
@@ -143,8 +148,8 @@
 		   	   
 				jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
 				jQuery("#"+subgrid_table_id).jqGrid({
-						 guiStyle: "bootstrap",
-						 iconSet: 'fontAwesome',
+						 guiStyle: "bootstrap4",
+						 iconSet: 'fontAwesomeSolid',
 						 autoencode:false,
 					     datatype: "xml",
 					     url: "<lams:LAMSURL />gradebook/gradebook/getActivityGridData.do?lessonID=${lessonDetails.lessonID}&view=monUserView&userID=" + userID,
@@ -348,8 +353,8 @@
 						   	    activityID = rowData["id"].split("_")[0];
 							jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll archive'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
 							jQuery("#"+subgrid_table_id).jqGrid({
-									 guiStyle: "bootstrap",
-									 iconSet: 'fontAwesome',
+									 guiStyle: "bootstrap4",
+									 iconSet: 'fontAwesomeSolid',
 									 autoencode:false,
 									 autowidth: true,
 								     datatype: "xml",
@@ -403,8 +408,8 @@
 
 			// Creating activity view with sub learner view
 			jQuery("#activityView").jqGrid({
-				guiStyle: "bootstrap",
-				iconSet: 'fontAwesome',
+				guiStyle: "bootstrap4",
+				iconSet: 'fontAwesomeSolid',
 				autoencode:false,
 				caption: "<fmt:message key="gradebook.gridtitle.activitygrid"/>",
 			    datatype: "xml",
@@ -448,8 +453,8 @@
 				   
 				   jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
 				   jQuery("#"+subgrid_table_id).jqGrid({
-							 guiStyle: "bootstrap",
-						 iconSet: 'fontAwesome',
+							 guiStyle: "bootstrap4",
+						 iconSet: 'fontAwesomeSolid',
 						 autoencode:false,
 					     datatype: "xml",
 					     url: "<lams:LAMSURL />gradebook/gradebook/getUserGridData.do?view=monActivityView&lessonID=${lessonDetails.lessonID}&activityID=" + activityID + "&groupId=" + groupID,
@@ -583,8 +588,8 @@
 						   	    userID = nameParts[3];
 							jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll archive'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
 							jQuery("#"+subgrid_table_id).jqGrid({
-									 guiStyle: "bootstrap",
-									 iconSet: 'fontAwesome',
+									 guiStyle: "bootstrap4",
+									 iconSet: 'fontAwesomeSolid',
 									 autoencode:false,
 								     datatype: "xml",
 								     url: "<lams:LAMSURL />gradebook/gradebook/getActivityArchiveGridData.do?lessonID=${lessonDetails.lessonID}&activityID="
@@ -679,53 +684,53 @@
 </script>
 
 
-<div class="gbTopButtonsContainer pull-left flaot-start">
+<div class="gbTopButtonsContainer pull-left float-start">
 	<div class="visible-xs-inline">
 		<div id="padlockLocked" style="display:none">
 			<span class="lockLabel">
-			<i class="fa fa-lock"></i>
+			<i class="fa-solid fa-lock"></i>
 			<fmt:message key="label.marks"/>
 			</span>
 		</div>
 		<div id="padlockUnlocked" style="display:none">
 			<span class="lockLabel">
-			<i class="fa fa-unlock"></i>
+			<i class="fa-solid fa-unlock"></i>
 			<fmt:message key="label.marks"/>
 			</span>
 		</div>
 	</div>
 </div>
 
-<div class="gbTopButtonsContainer pull-right float-end" id="export-link-area">
+<div class="gbTopButtonsContainer d-flex justify-content-end" id="export-link-area">
 
 	<div>
-		<button type="button" id="export-grades-button" class="btn btn-sm btn-default btn-secondary" title="<fmt:message key='gradebook.export.excel'/>" >
-			<i class="fa fa-download"></i><span id="exportSpan" class="hidden-xs">
+		<button type="button" id="export-grades-button" class="btn btn-sm btn-secondary" title="<fmt:message key='gradebook.export.excel'/>" >
+			<i class="fa-solid fa-download"></i><span id="exportSpan" class="hidden-xs">
 			<fmt:message key="gradebook.export.excel" />
 			</span>
 		</button> 
 	</div>
 
 	<div id="tour-release-marks">
-		<button type="button" onClick="javascript:toggleReleaseMarksPanel()" class="btn btn-sm btn-default btn-secondary" 
+		<button type="button" onClick="javascript:toggleReleaseMarksPanel()" class="btn btn-sm btn-secondary" 
 			title="<fmt:message key="gradebook.monitor.releasemarks.toggle.panel.tooltip" />">
-			<i class="fa fa-share-alt "></i> <span class="hidden-xs">
+			<i class="fa-solid fa-share-alt "></i> <span class="hidden-xs">
 				<fmt:message key="gradebook.monitor.releasemarks.toggle.panel" />
 			</span>
 		</button>
 	</div>
 
-		<div id="tour-mark-chart-button">
+	<div id="tour-mark-chart-button">
 		<div id="markChartShown" style="display:none">
-			<button type="button" onClick="javascript:toggleMarkChart()" class="btn btn-sm btn-default btn-secondary" title="<fmt:message key='label.hide.marks.chart'/>" >
-				<i class="fa fa-bar-chart"></i> <span class="hidden-xs">
+			<button type="button" onClick="javascript:toggleMarkChart()" class="btn btn-sm btn-secondary" title="<fmt:message key='label.hide.marks.chart'/>" >
+				<i class="fa-solid fa-bar-chart"></i> <span class="hidden-xs">
 				<fmt:message key="label.hide.marks.chart"/>
 				</span>
 			</button> 
 		</div>
 		<div id="markChartHidden">
-			<button type="button" onClick="javascript:toggleMarkChart()" class="btn btn-sm btn-default btn-secondary" title="<fmt:message key='label.show.marks.chart'/>" >
-				<i class="fa fa-bar-chart"></i> <span class="hidden-xs">
+			<button type="button" onClick="javascript:toggleMarkChart()" class="btn btn-sm btn-secondary" title="<fmt:message key='label.show.marks.chart'/>" >
+				<i class="fa-solid fa-bar-chart"></i> <span class="hidden-xs">
 				<fmt:message key="label.show.marks.chart"/>
 				</span>
 			</button> 
@@ -735,15 +740,15 @@
 	<c:if test="${usesWeights}">
 		<div id="tour-weight-button">
 			<div id="weightShown" style="display:none">
-			<button type="button" onClick="javascript:toggleWeight()" class="btn btn-sm btn-default btn-secondary" title="<fmt:message key='label.button.hide.weights'/>" >
-				<i class="fa fa-balance-scale"></i> <span class="hidden-xs">
+			<button type="button" onClick="javascript:toggleWeight()" class="btn btn-sm btn-secondary" title="<fmt:message key='label.button.hide.weights'/>" >
+				<i class="fa-solid fa-balance-scale"></i> <span class="hidden-xs">
 				<fmt:message key="label.button.hide.weights"/>
 				</span>
 			</button>  
 			</div>
 			<div id="weightHidden">
-				<button type="button" onClick="javascript:toggleWeight()" class="btn btn-sm btn-default btn-secondary" title="<fmt:message key='label.button.show.weights'/>" >
-					<i class="fa fa-balance-scale"></i> <span class="hidden-xs">
+				<button type="button" onClick="javascript:toggleWeight()" class="btn btn-sm btn-secondary" title="<fmt:message key='label.button.show.weights'/>" >
+					<i class="fa-solid fa-balance-scale"></i> <span class="hidden-xs">
 					<fmt:message key="label.button.show.weights"/>
 					</span>
 				</button>  
@@ -751,21 +756,18 @@
 		</div>
 	</c:if>
 	
-	<button onclick="javascript:startTour();return false;" class="btn btn-sm btn-default btn-secondary float-end tour-button"> 
-	<i class="fa fa-question-circle"></i> <span class="hidden-xs">Tour</span></button>
+	<div>
+		<button onclick="javascript:startTour();return false;" class="btn btn-sm btn-secondary tour-button"> 
+			<i class="fa-solid fa-question-circle"></i> <span class="hidden-xs">Tour</span>
+		</button>
+	</div>
 </div> <!-- Closes buttons -->
 		
-<div class="row">
-	<div class="col-xs-12">
-		<div id="releaseMarksPanel"></div>
-	</div>
-</div>
+<div id="releaseMarksPanel"></div>
 		
-<div class="row">
-	 <div class="col-xs-12">
+<div>
 	 <lams:WaitingSpinner id="markChartBusy"/>
-		 <div id="markChartDiv" class="markChartDiv" style="display:none"></div>
-	</div>
+	 <div id="markChartDiv" class="markChartDiv" style="display:none"></div>
 </div>
 
 <c:if test="${usesWeights}">

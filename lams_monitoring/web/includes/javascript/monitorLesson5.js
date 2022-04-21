@@ -76,7 +76,6 @@ function initCommonElements(){
 		$('.lesson-properties').toggleClass('active');
 		$('.component-sidebar').toggleClass('expanded');
 	});
-	
 	$('#load-sequence-tab-btn').click(function(){
 		loadTab('sequence', this);
 	});
@@ -2497,11 +2496,18 @@ function initGradebookTab() {
 	                           actions: { del: "fa-times" },
 	                           form: { del: "fa-times" }
 	                       })
+		$.extend(true, $.jgrid.icons.fontAwesome, {
+			common : "fa-solid"
+		});
 	});
 	*/
-	
-	$.extend(true, $.jgrid.icons.fontAwesome, {
-		common : "fa-solid"
+	$.extend(true, $.jgrid.guiStyles.bootstrap4, {
+		pager : {
+			pagerSelect : 'form-control-select'
+		},
+		searchToolbar : {
+			clearButton : 'btn btn-sm'
+		}
 	});
 }
 

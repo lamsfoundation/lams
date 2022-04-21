@@ -79,15 +79,14 @@
 }
 
 .component-sidebar .lesson-properties {
-	width: 0;
+	visibility: hidden;
 	height: 100%;
 	padding-left: 2rem;
 	text-align: left;
-	transition: all .3s ease;
 }
 
 .component-sidebar .lesson-properties.active {
-	width: 100%;
+	visibility: visible;
 }
 
 .component-sidebar .lesson-properties #lessonDetails {

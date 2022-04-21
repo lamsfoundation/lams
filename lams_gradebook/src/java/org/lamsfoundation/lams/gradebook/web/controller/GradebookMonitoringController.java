@@ -271,7 +271,8 @@ public class GradebookMonitoringController {
     }
 
     @RequestMapping("/displayReleaseMarksPanel")
-    public String displayReleaseMarksPanel(@RequestParam long lessonID, Model model) {
+    public String displayReleaseMarksPanel(@RequestParam long lessonID, @RequestParam(required = false) boolean isTab,
+	    Model model) {
 	Lesson lesson = lessonService.getLesson(lessonID);
 	if (lesson.getMarksReleased()) {
 	    model.addAttribute("marksReleased", true);
@@ -290,7 +291,7 @@ public class GradebookMonitoringController {
 	    }
 	}
 
-	return "releaseLessonMarks";
+	return "releaseLessonMarks" + (isTab ? "5" : "");
     }
 
     @RequestMapping("/getReleaseMarksEmailContent")

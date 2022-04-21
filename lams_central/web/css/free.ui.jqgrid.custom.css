@@ -91,7 +91,7 @@
 .ui-jqgrid .ui-jqgrid-titlebar>.ui-jqgrid-titlebar-close {
 	top: 40%;
 }
-.ui-jqgrid .ui-jqgrid-titlebar>.ui-jqgrid-titlebar-close>span.fa-solid {
+.ui-jqgrid .ui-jqgrid-titlebar>.ui-jqgrid-titlebar-close>span.fas {
 	font-size: 1.3rem;
 }
 
@@ -153,4 +153,8 @@
 
 .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-table .ui-search-clear > a {
 	font-size: 30px;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-table .ui-search-input {
+	width: 90%;
 }
