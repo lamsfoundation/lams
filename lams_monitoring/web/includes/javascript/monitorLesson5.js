@@ -63,11 +63,13 @@ function loadTab(tabName, button) {
 }
 
 function initCommonElements(){
+	/*
 	$('.hamburger').click(function(){
 		$(this).toggleClass('active');
 		$('.component-sidebar, .monitoring-page-content').toggleClass('active');
 	});
-
+	*/
+	
 	$('#edit-lesson-btn').click(function(){
 		$('.lesson-properties').toggleClass('active');
 		$('.component-sidebar').toggleClass('expanded');

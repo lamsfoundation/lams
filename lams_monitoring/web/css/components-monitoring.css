@@ -39,13 +39,9 @@
 
 .monitoring-page-content {
 	min-height: 100%;
-	padding: 2rem 4.8rem 2rem 4.8rem;
+	padding: 2rem 4.8rem 2rem 8rem;
 	transition: all .3s ease;
 	vertical-align: top;
-}
-
-.monitoring-page-content.active {
-	padding-left: 11.8rem;
 }
 
 .component-sidebar {
@@ -123,6 +119,10 @@
 .component-sidebar .lesson-properties .btn {
 	display: block !important;
 	margin-top: .5rem;
+}
+
+.monitoring-page-wrapper #lesson-name {
+	margin-left: 4rem;
 }
 
 

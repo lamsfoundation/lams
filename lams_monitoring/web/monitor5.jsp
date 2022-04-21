@@ -417,11 +417,13 @@
 	<div class="monitoring-page-content active">
 		<header class="d-flex justify-content-between">
 			<div class="hamburger-box">
-				<div class="hamburger">
-					<span></span>
-					<span></span>
-					<span></span>
-				</div>
+				<!-- 
+					<div class="hamburger">
+						<span></span>
+						<span></span>
+						<span></span>
+					</div>
+				 -->
 				<p id="lesson-name">Lesson Name</p>
 			</div>
 			<div class="top-menu">
