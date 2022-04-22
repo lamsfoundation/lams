@@ -2365,7 +2365,8 @@ function canvasFitScreen(fitScreen, skipResize) {
  */
 function updateLearnersTab(){
 	let learnersAccordion = $('#learners-accordion').empty(),
-			itemTemplate = $('.learners-accordion-item-template').clone().removeClass('learners-accordion-item-template');
+		itemTemplate = $('.learners-accordion-item-template').clone().removeClass('learners-accordion-item-template d-none'),
+		activityEntryTemplate = $('.learners-timeline-entry-template').clone().removeClass('learners-timeline-entry-template d-none');
 		
 	$.ajax({
 		'url' : LAMS_URL + 'monitoring/monitoring/getLearnerProgressPage.do',
@@ -2416,18 +2417,19 @@ function updateLearnersTab(){
 								
 								$(response.activities).each(function(){
 									let activity = this,
-										entry = $('<article />').addClass('timeline-entry').appendTo(timeline),
-										innerEntry = $('<div />').addClass('timeline-entry-inner').appendTo(entry),
-										icon = $('<div />').addClass('timeline-icon').appendTo(innerEntry),
-										content = $('<div />').addClass('timeline-label').appendTo(innerEntry),
-										title = $('<h4 />').addClass('timeline-title').text(activity.name).appendTo(content);
+										entry = activityEntryTemplate.clone().appendTo(timeline),
+										icon = $('.timeline-icon', entry),
+										iconURL = null,
+										durationCell = $('.timeline-activity-duration', entry),
+										markCell = $('.timeline-activity-mark', entry);
+										
+									$('.timeline-title', entry).text(activity.name);
 										
 									switch(activity.status){
-										case 0: icon.addClass('bg-primary');break;
-										case 1: icon.addClass('bg-success');break;
+										case 0: icon.addClass('border-primary activity-current');break;
+										case 1: icon.addClass('border-success activity-complete');break;
 									}
-
-									let iconURL = null;
+									
 									if (activity.iconURL) {
 										iconURL = activity.iconURL;
 									} else if (activity.type === 'g') {
@@ -2437,9 +2439,21 @@ function updateLearnersTab(){
 									} else if (activity.isGrouping) {
 										iconURL = 'images/svg/grouping.svg';
 									}
-
+									
 									if (iconURL) {
 										$('<img />').attr('src', LAMS_URL + iconURL).appendTo(icon);
+									}
+									
+									if (typeof activity.mark !== 'undefined') {
+										markCell.text(activity.mark + (activity.maxMark ? ' / ' + activity.maxMark : ''));
+									} else {
+										markCell.closest('tr').remove();
+									}
+									
+									if (activity.duration) {
+										durationCell.text(activity.duration);
+									} else {
+										durationCell.closest('tr').remove();
 									}
 								});
 								

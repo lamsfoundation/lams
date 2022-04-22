@@ -93,7 +93,8 @@ body.component .info_icon {
     border-bottom: 2px solid #20639B;
 }
 
-.component-page-wrapper table.table tbody td {
+.component-page-wrapper table.table tbody td,
+.component-page-wrapper table.table tbody th {
 	border: none;
     border-bottom: 2px solid #C3CEDC;
 }

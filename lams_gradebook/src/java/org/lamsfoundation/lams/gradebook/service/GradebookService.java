@@ -82,6 +82,7 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.lesson.util.LessonUtil;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.outcome.Outcome;
@@ -212,7 +213,7 @@ public class GradebookService implements IGradebookFullService {
 	    // Setting status
 	    activityDTO.setStartDate(getActivityStartDate(learnerProgress, activity, userTimezone));
 	    activityDTO.setFinishDate(getActivityFinishDate(learnerProgress, activity, userTimezone));
-	    activityDTO.setTimeTaken(getActivityDuration(learnerProgress, activity));
+	    activityDTO.setTimeTaken(LessonUtil.getActivityDuration(learnerProgress, activity));
 	    activityDTO.setStatus(getActivityStatusStr(learnerProgress, activity));
 
 	    // Setting averages
@@ -291,7 +292,7 @@ public class GradebookService implements IGradebookFullService {
 		// Setting status
 		activityDTO.setStartDate(getActivityStartDate(learnerProgress, activity, userTimezone));
 		activityDTO.setFinishDate(getActivityFinishDate(learnerProgress, activity, userTimezone));
-		activityDTO.setTimeTaken(getActivityDuration(learnerProgress, activity));
+		activityDTO.setTimeTaken(LessonUtil.getActivityDuration(learnerProgress, activity));
 		activityDTO.setStatus(getActivityStatusStr(learnerProgress, activity));
 
 		for (GradebookUserActivityArchive activityArchive : activityArchives) {
@@ -430,7 +431,7 @@ public class GradebookService implements IGradebookFullService {
 		// Set the progress
 		LearnerProgress learnerProgress = userToLearnerProgressMap.get(learner.getUserId());
 		gUserDTO.setStatus(getActivityStatusStr(learnerProgress, activity));
-		gUserDTO.setTimeTaken(getActivityDuration(learnerProgress, activity));
+		gUserDTO.setTimeTaken(LessonUtil.getActivityDuration(learnerProgress, activity));
 		gUserDTO.setStartDate(getActivityStartDate(learnerProgress, activity, timezone));
 		gUserDTO.setFinishDate(getActivityFinishDate(learnerProgress, activity, timezone));
 
@@ -1396,7 +1397,7 @@ public class GradebookService implements IGradebookFullService {
 
 	    // Set the progress
 	    LearnerProgress learnerProgress = userToLearnerProgressMap.get(learner.getUserId());
-	    userDTO.setTimeTaken(getActivityDuration(learnerProgress, toolActivity));
+	    userDTO.setTimeTaken(LessonUtil.getActivityDuration(learnerProgress, toolActivity));
 	    userDTO.setStartDate(getActivityStartDate(learnerProgress, toolActivity, null));
 	    userDTO.setFinishDate(getActivityFinishDate(learnerProgress, toolActivity, null));
 
@@ -1741,7 +1742,7 @@ public class GradebookService implements IGradebookFullService {
 			Date finishDate = getActivityFinishDate(learnerProgress, activity, null);
 			activityDataRow.addCell(finishDate == null ? ""
 				: FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(finishDate));
-			Long duration = getActivityDuration(learnerProgress, activity);
+			Long duration = LessonUtil.getActivityDuration(learnerProgress, activity);
 			activityDataRow.addCell(duration == null ? "" : duration / 1000);
 			activityDataRow.addCell(activityArchive == null ? "" : activityArchive.getMark(), false);
 		    }
@@ -2642,35 +2643,6 @@ public class GradebookService implements IGradebookFullService {
 	    }
 	}
 	return finishDate;
-    }
-
-    private Long getActivityDuration(Object learnerProgress, Activity activity) {
-	if (learnerProgress != null) {
-	    // this construct looks bad but see LDEV-4609 commit for explanation
-	    if (learnerProgress instanceof LearnerProgressArchive) {
-		CompletedActivityProgressArchive compProg = ((LearnerProgressArchive) learnerProgress)
-			.getCompletedActivities().get(activity);
-		if (compProg != null) {
-		    Date startTime = compProg.getStartDate();
-		    Date endTime = compProg.getFinishDate();
-		    if ((startTime != null) && (endTime != null)) {
-			return endTime.getTime() - startTime.getTime();
-		    }
-		}
-	    } else {
-		CompletedActivityProgress compProg = ((LearnerProgress) learnerProgress).getCompletedActivities()
-			.get(activity);
-		if (compProg != null) {
-		    Date startTime = compProg.getStartDate();
-		    Date endTime = compProg.getFinishDate();
-		    if ((startTime != null) && (endTime != null)) {
-			return endTime.getTime() - startTime.getTime();
-		    }
-		}
-	    }
-
-	}
-	return null;
     }
 
     /**

@@ -39,8 +39,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.presence.PresenceWebsocketServer;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
@@ -59,6 +59,7 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.tool.ToolSession;
+import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -113,6 +114,8 @@ public class LearnerController {
     private ILessonService lessonService;
     @Autowired
     private ILamsToolService lamsToolService;
+    @Autowired
+    private ILamsCoreToolService lamsCoreToolService;
     @Autowired
     @Qualifier("learningMessageService")
     private MessageService messageService;
@@ -371,7 +374,8 @@ public class LearnerController {
 	ObjectNode activityJSON = JsonNodeFactory.instance.objectNode();
 	activityJSON.put("id", activity.getActivityId());
 	activityJSON.put("name", activity.getTitle());
-	activityJSON.put("status", activity.getActivityId().equals(currentActivityId) ? 0 : activity.getStatus());
+	int status = activity.getActivityId().equals(currentActivityId) ? 0 : activity.getStatus();
+	activityJSON.put("status", status);
 
 	// URL in learner mode
 	String url = activity.getUrl();
@@ -402,15 +406,30 @@ public class LearnerController {
 	    type = "o";
 	} else if (actType.contains("branching")) {
 	    type = "b";
-	}
-	activityJSON.put("type", type);
+	} else {
+	    if (activity.getIconURL() != null) {
+		activityJSON.put("iconURL", activity.getIconURL());
+	    }
 
-	// temporary code for monitoring UI upgrade
-	Activity activityObject = (Activity) userManagementService.findById(Activity.class, activity.getActivityId());
-	if (StringUtils.isNotBlank(activityObject.getLibraryActivityUiImage())) {
-	    activityJSON.put("iconURL", activityObject.getLibraryActivityUiImage());
+	    if (status == 1) {
+		GradebookUserActivity activityMark = gradebookService.getGradebookUserActivity(activity.getActivityId(),
+			learnerId);
+		if (activityMark != null && activityMark.getMark() != null) {
+		    activityJSON.put("mark", activityMark.getMark());
+		}
+	    }
 	}
-	activityJSON.put("isGrouping", activityObject.isGroupingActivity());
+
+	Long activityMaxMark = lamsCoreToolService.getActivityMaxPossibleMark(activity.getActivityId());
+	if (activityMaxMark != null) {
+	    activityJSON.put("maxMark", activityMaxMark);
+	}
+	if (activity.getDuration() != null) {
+	    activityJSON.put("duration", DateUtil.convertTimeToString(activity.getDuration()));
+	}
+
+	activityJSON.put("type", type);
+	activityJSON.put("isGrouping", actType.contains("grouping"));
 
 	if (activity.getChildActivities() != null) {
 	    for (ActivityURL childActivity : activity.getChildActivities()) {

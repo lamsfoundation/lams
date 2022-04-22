@@ -1206,11 +1206,6 @@ body.component .portrait-round {
   border-radius: 50%;
 }
 
-
-.learners-accordion-item-template {
-	display: none;
-}
-
 #learners-accordion .no-progress {
 	display: none;	
 	text-align: center;
@@ -1245,5 +1240,5 @@ body.component .portrait-round {
 }
 
 #learners-accordion .vertical-timeline:before  {
-	bottom: 30px;
+	bottom: 90px;
 }	

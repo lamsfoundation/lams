@@ -160,21 +160,21 @@ https://www.bootdey.com/snippets/view/tickets-timeline
   margin: 5px 0 0 10px;
 }
 
-.vertical-timeline .timeline-entry .timeline-entry-inner .timeline-icon.bg-success ~ .timeline-label:after {
+.vertical-timeline .timeline-entry .timeline-entry-inner .timeline-icon.activity-complete ~ .timeline-label:after {
 	margin-left: -13px;
 	border-color: transparent var(--bs-success) transparent transparent;
 }
 
-.vertical-timeline .timeline-entry .timeline-entry-inner .timeline-icon.bg-success ~ .timeline-label{
+.vertical-timeline .timeline-entry .timeline-entry-inner .timeline-icon.activity-complete ~ .timeline-label{
 	border-left: thick solid var(--bs-success);
 }
 
-.vertical-timeline .timeline-entry .timeline-entry-inner .timeline-icon.bg-primary ~ .timeline-label:after {
+.vertical-timeline .timeline-entry .timeline-entry-inner .timeline-icon.activity-current ~ .timeline-label:after {
 	margin-left: -13px;
 	border-color: transparent var(--bs-primary) transparent transparent;
 }
 
-.vertical-timeline .timeline-entry .timeline-entry-inner .timeline-icon.bg-primary ~ .timeline-label{
+.vertical-timeline .timeline-entry .timeline-entry-inner .timeline-icon.activity-current ~ .timeline-label{
 	border-left: thick solid var(--bs-primary);
 }
 
