@@ -219,7 +219,7 @@ public class AssessmentConstants {
     public static final String ATTR_ALL_GROUP_USERS = "allGroupUsers";
 
     //flux management
-    public static final String ANSWERS_UPDATED_SINK_NAME = "assessment learner answers update";
+    public static final String ANSWERS_UPDATED_SINK_NAME = "assessment learner answers updated";
 
-    public static final String COMPLETION_CHARTS_UPDATE_FLUX_NAME = "assessment completion chart update";
+    public static final String COMPLETION_CHARTS_UPDATE_FLUX_NAME = "assessment completion chart updated";
 }

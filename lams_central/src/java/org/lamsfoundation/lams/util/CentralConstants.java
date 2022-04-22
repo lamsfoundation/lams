@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.util;
 
 public class CentralConstants {
@@ -104,7 +103,7 @@ public class CentralConstants {
     public static final String METHOD_VERIFY_EXT_SERVER = "verify";
 
     public static final String METHOD_LIST_MONITOR = "listMonitor";
-    
+
     public static final String METHOD_CHECK_LESSON_FOR_NUMERIC_TOOL_OUTPUTS = "checkLessonForNumericToolOutputs";
 
     public static final String ATTR_COURSE_ID = "courseId";
@@ -152,7 +151,7 @@ public class CentralConstants {
     public static final String MONITORING_SERVICE_BEAN_NAME = "monitoringService";
 
     public static final String CENTRAL_MESSAGE_SERVICE_BEAN_NAME = "centralMessageService";
-    
+
     public static final String TOOL_SERVICE_BEAN_NAME = "lamsToolService";
 
     public static final String ATTR_NODE = "node";
@@ -176,8 +175,8 @@ public class CentralConstants {
     public static final String PARAM_LEARNER_PRESENCE_ENABLE = "learnerSeeOnline";
 
     public static final String PARAM_LEARNER_IM_ENABLE = "learnerInstantMessaging";
-    
+
     public static final String PARAM_ENABLE_NOTIFICATIONS = "enableNotifications";
-    
+
     public static final String PARAM_ALLOW_LEARNER_RESTART = "allowLearnerRestart";
 }

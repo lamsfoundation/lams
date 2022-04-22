@@ -11,8 +11,10 @@
    						   http://www.springframework.org/schema/mvc
         				   http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-	<!-- Initialise Spring MVC. Enforce path suffix use otherwise /start will be recognised but /start.do will not. -->
+	<!-- Initialise Spring MVC. Enforce path suffix use otherwise /start will be recognised but /start.do will not. 
+	 	 Task executor is defined in commonContext.xml and is fetched from underlying JEE7+ platform (WildFly) -->
 	<mvc:annotation-driven>
+		<mvc:async-support default-timeout="10000" task-executor="serverTaskExecutor" />	
 		<mvc:path-matching suffix-pattern="true" />
 	</mvc:annotation-driven>
 

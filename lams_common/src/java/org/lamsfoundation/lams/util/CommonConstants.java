@@ -14,7 +14,7 @@ public class CommonConstants {
     public static final String PARAM_SEARCH_STRING = "searchString";
 
     // default coordinate used if the entry came from Flash is 0 or less.
-    public static final Integer DEFAULT_COORD = new Integer(10);
+    public static final Integer DEFAULT_COORD = 10;
 
     // XML Elemetns
     public static final String ELEMENT_ROWS = "rows";
@@ -66,4 +66,7 @@ public class CommonConstants {
 	    "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SV", "SY", "SZ", "TC", "TD", "TF", "TG", "TH",
 	    "TJ", "TK", "TL", "TM", "TN", "TO", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UM", "US", "UY", "UZ", "VA",
 	    "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "YE", "YT", "ZA", "ZM", "ZW" };
+
+    // flux management
+    public static final String ACTIVITY_COMPLETED_SINK_NAME = "activity completed";
 }

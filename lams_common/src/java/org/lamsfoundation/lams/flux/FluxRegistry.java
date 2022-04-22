@@ -10,29 +10,32 @@ public class FluxRegistry {
     private static final Map<String, FluxMap> fluxRegistry = new ConcurrentHashMap<>();
     private static final Map<String, SharedSink> sinkRegistry = new ConcurrentHashMap<>();
 
-    public static <T> void initSink(String sinkName) {
-	if (sinkRegistry.containsKey(sinkName)) {
-	    throw new IllegalArgumentException("Sink for \"" + sinkName + "\" was already initialised");
+    public static <T> SharedSink<T> initSink(String sinkName) {
+	SharedSink<T> sink = sinkRegistry.get(sinkName);
+	if (sink != null) {
+	    return sink;
 	}
-	SharedSink<T> sink = new SharedSink<>(sinkName);
+	sink = new SharedSink<>(sinkName);
 	sinkRegistry.put(sinkName, sink);
+	return sink;
     }
 
-    public static <T, U> void initFluxMap(String fluxName, String sinkName, Function<T, U> fetchFunction,
+    public static <T> void initFluxMap(String fluxName, String sinkName, Function<T, String> fetchFunction,
 	    Integer throttleSeconds, Integer timeoutSeconds) {
 	if (fluxRegistry.containsKey(fluxName)) {
 	    throw new IllegalArgumentException("FluxMap for \"" + fluxName + "\" was already initialised");
 	}
 	SharedSink<T> sink = sinkRegistry.get(sinkName);
 	if (sink == null) {
-	    throw new IllegalArgumentException("Sink for \"" + sinkName + "\" was not initialised");
+	    sink = FluxRegistry.initSink(sinkName);
 	}
-	FluxMap<T, U> fluxMap = new FluxMap<>(fluxName, sink.getFlux(), fetchFunction, throttleSeconds, timeoutSeconds);
+	FluxMap<T, String> fluxMap = new FluxMap<>(fluxName, sink.getFlux(), fetchFunction, throttleSeconds,
+		timeoutSeconds);
 	fluxRegistry.put(fluxName, fluxMap);
     }
 
-    public static <T, U> Flux<U> get(String fluxName, T key) {
-	FluxMap<T, U> fluxMap = fluxRegistry.get(fluxName);
+    public static <T, String> Flux<String> get(String fluxName, T key) {
+	FluxMap<T, String> fluxMap = fluxRegistry.get(fluxName);
 	if (fluxMap == null) {
 	    throw new IllegalArgumentException("FluxMap for \"" + fluxName + "\" was not initialised");
 	}

@@ -200,7 +200,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     private ILearnerInteractionService learnerInteractionService;
 
     public AssessmentServiceImpl() {
-	FluxRegistry.initSink(AssessmentConstants.ANSWERS_UPDATED_SINK_NAME);
 	FluxRegistry.initFluxMap(AssessmentConstants.COMPLETION_CHARTS_UPDATE_FLUX_NAME,
 		AssessmentConstants.ANSWERS_UPDATED_SINK_NAME,
 		(Function<Long, String>) toolContentId -> getCompletionChartsData(toolContentId),

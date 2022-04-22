@@ -1329,6 +1329,13 @@ function initSequenceTab(){
 	}).find('.modal-header').remove();
 	
 	$('#sequenceInfoDialog .modal-body').empty().append($('#sequenceInfoDialogContents').show());
+	
+	const learnerProgressUpdateSource = new EventSource(LAMS_URL + 'monitoring/monitoring/getLearnerProgressUpdateFlux.do?lessonId=' +  lessonId);
+	learnerProgressUpdateSource.onmessage = function (event) {
+		if ("doRefresh" == event.data){
+			updateSequenceTab();
+		}
+	}
 }
 
 function showIntroductionDialog(lessonId) {
@@ -1353,6 +1360,7 @@ function closeIntroductionDialog() {
 	autoRefreshBlocked = false;
 	$('#introductionDialog').remove();
 }
+
 /**
  * Updates learner progress in sequence tab according to respose sent to refreshMonitor()
  */
@@ -1369,7 +1377,7 @@ function updateSequenceTab() {
 
 	if (originalSequenceCanvas) {
 		// put bottom layer, LD SVG
-		sequenceCanvas.html(originalSequenceCanvas);
+//		sequenceCanvas.html(originalSequenceCanvas);
 	} else {
 		var exit = loadLearningDesignSVG();
 		if (exit) {

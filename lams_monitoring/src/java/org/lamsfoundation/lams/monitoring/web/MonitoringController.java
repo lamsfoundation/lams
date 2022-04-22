@@ -42,6 +42,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
+import java.util.function.Function;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -51,6 +52,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.IAuthoringService;
+import org.lamsfoundation.lams.flux.FluxMap;
+import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
@@ -95,6 +98,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -102,9 +106,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import reactor.core.publisher.Flux;
 
 /**
  * The action servlet that provide all the monitoring functionalities. It interact with the teacher via JSP monitoring
@@ -122,6 +129,8 @@ public class MonitoringController {
     private static final int LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT = 53;
     private static final int LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT = 7;
     private static final int USER_PAGE_SIZE = 10;
+
+    private static final int CANVAS_REFRESH_FLUX_THROTTLE = 10;
 
     @Autowired
     private ILogEventService logEventService;
@@ -145,6 +154,12 @@ public class MonitoringController {
     @Autowired
     private IAuthoringService authoringService;
 
+    public MonitoringController() {
+	FluxRegistry.initFluxMap(MonitoringConstants.CANVAS_REFRESH_FLUX_NAME,
+		CommonConstants.ACTIVITY_COMPLETED_SINK_NAME, (Function<Long, String>) lessonId -> "doRefresh",
+		CANVAS_REFRESH_FLUX_THROTTLE, FluxMap.STANDARD_TIMEOUT);
+    }
+
     private Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -159,6 +174,13 @@ public class MonitoringController {
 	String fullURL = WebUtil.convertToFullURL(url);
 	response.sendRedirect(response.encodeRedirectURL(fullURL));
 	return null;
+    }
+
+    @RequestMapping(path = "/getLearnerProgressUpdateFlux", method = RequestMethod.GET, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @ResponseBody
+    public Flux<String> getLearnerProgressUpdateFlux(@RequestParam long lessonId)
+	    throws JsonProcessingException, IOException {
+	return FluxRegistry.get(MonitoringConstants.CANVAS_REFRESH_FLUX_NAME, lessonId);
     }
 
     /**
@@ -1107,7 +1129,7 @@ public class MonitoringController {
 	completedJSON.put("value", Math.round(completedLearnersCount.doubleValue() / possibleLearnersCount * 100));
 	completedJSON.put("raw", completedLearnersCount);
 	responseJSON.withArray("data").add(completedJSON);
-	
+
 	ObjectNode notStartedJSON = JsonNodeFactory.instance.objectNode();
 	notStartedJSON.put("name", messageService.getMessage("lesson.chart.not.completed"));
 	notStartedJSON.put("value", Math.round(notCompletedLearnersCount.doubleValue() / possibleLearnersCount * 100));
