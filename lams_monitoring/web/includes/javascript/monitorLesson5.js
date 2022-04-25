@@ -571,7 +571,6 @@ function drawLessonCompletionChart(){
 					return;
 				}
 				
-				
 				let ctx = document.getElementById('completion-chart').getContext('2d'),
 					percent = [],
 					labels = [],
