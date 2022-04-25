@@ -30,6 +30,7 @@
 			<param-name>singleSession</param-name>
 			<param-value>true</param-value>
 		</init-param>
+		<async-supported>true</async-supported>
 	</filter>
 
 	<filter>
@@ -37,6 +38,7 @@
 		<filter-class>
 			org.lamsfoundation.lams.web.session.SystemSessionFilter
 		</filter-class>
+		<async-supported>true</async-supported>
 	</filter>
 
 	<filter>
@@ -44,21 +46,28 @@
 		<filter-class>
 			org.lamsfoundation.lams.web.filter.LocaleFilter
 		</filter-class>
+		<async-supported>true</async-supported>
 	</filter>
 
 	<filter-mapping>
 		<filter-name>HibernateFilter</filter-name>
 		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+        <dispatcher>ASYNC</dispatcher>
 	</filter-mapping>
 
 	<filter-mapping>
 		<filter-name>SystemSessionFilter</filter-name>
 		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+        <dispatcher>ASYNC</dispatcher>
 	</filter-mapping>
 
 	<filter-mapping>
 		<filter-name>LocaleFilter</filter-name>
 		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+        <dispatcher>ASYNC</dispatcher>
 	</filter-mapping>
 
 	<servlet>
@@ -66,6 +75,7 @@
 		<servlet-class>
 			org.springframework.web.servlet.DispatcherServlet
 		</servlet-class>
+		<async-supported>true</async-supported>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
@@ -75,6 +85,7 @@
 		<servlet-class>
 			org.lamsfoundation.lams.learning.web.servlet.RepopulateProgressMarksServlet
 		</servlet-class>
+		<async-supported>true</async-supported>
 	</servlet>
 	
 	<servlet>
@@ -82,6 +93,7 @@
 		<servlet-class>
 			org.lamsfoundation.lams.learning.web.servlet.LogLessonMarkPushedToIntegrationsServlet
 		</servlet-class>
+		<async-supported>true</async-supported>
 	</servlet>	
 	
 	<servlet-mapping>

@@ -3,6 +3,7 @@ package org.lamsfoundation.lams.flux;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 import reactor.core.publisher.Flux;
@@ -40,8 +41,8 @@ public class FluxRegistry {
 	}
     }
 
-    public static <T> void initFluxMap(String fluxName, String sinkName, Function<T, String> fetchFunction,
-	    Integer throttleSeconds, Integer timeoutSeconds) {
+    public static <T> void initFluxMap(String fluxName, String sinkName, BiPredicate<T, T> itemEqualsPredicate,
+	    Function<T, String> fetchFunction, Integer throttleSeconds, Integer timeoutSeconds) {
 	if (fluxRegistry.containsKey(fluxName)) {
 	    throw new IllegalArgumentException("FluxMap for \"" + fluxName + "\" was already initialised");
 	}
@@ -49,8 +50,11 @@ public class FluxRegistry {
 	if (sink == null) {
 	    sink = FluxRegistry.getSink(sinkName);
 	}
-	FluxMap<T, String> fluxMap = new FluxMap<>(fluxName, sink.getFlux(), fetchFunction, throttleSeconds,
-		timeoutSeconds);
+	if (itemEqualsPredicate == null) {
+	    itemEqualsPredicate = (key, item) -> item.equals(key);
+	}
+	FluxMap<T, String> fluxMap = new FluxMap<>(fluxName, sink.getFlux(), itemEqualsPredicate, fetchFunction,
+		throttleSeconds, timeoutSeconds);
 	fluxRegistry.put(fluxName, fluxMap);
     }
 

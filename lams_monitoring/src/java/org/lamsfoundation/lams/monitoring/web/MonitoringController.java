@@ -42,7 +42,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
-import java.util.function.Function;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -132,8 +131,6 @@ public class MonitoringController {
     private static final int LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT = 7;
     private static final int USER_PAGE_SIZE = 10;
 
-    private static final int CANVAS_REFRESH_FLUX_THROTTLE = 10;
-
     @Autowired
     private ILogEventService logEventService;
     @Autowired
@@ -165,8 +162,8 @@ public class MonitoringController {
 		lessonJoinedFluxItem -> ((LearnerLessonJoinFluxItem) lessonJoinedFluxItem).getLessonId());
 
 	FluxRegistry.initFluxMap(MonitoringConstants.CANVAS_REFRESH_FLUX_NAME,
-		CommonConstants.LESSON_PROGRESSED_SINK_NAME, (Function<Long, String>) lessonId -> "doRefresh",
-		CANVAS_REFRESH_FLUX_THROTTLE, FluxMap.STANDARD_TIMEOUT);
+		CommonConstants.LESSON_PROGRESSED_SINK_NAME, null, lessonId -> "doRefresh", FluxMap.STANDARD_THROTTLE,
+		FluxMap.STANDARD_TIMEOUT);
     }
 
     private Integer getUserId() {

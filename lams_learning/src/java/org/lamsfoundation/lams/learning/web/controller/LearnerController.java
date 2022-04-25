@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.flux.FluxMap;
 import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
@@ -58,6 +59,7 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgressArchive;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.lesson.util.LearnerActivityCompleteFluxItem;
 import org.lamsfoundation.lams.lesson.util.LearnerLessonJoinFluxItem;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -81,8 +83,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import reactor.core.publisher.Flux;
 
 /**
  * <p>
@@ -133,6 +138,25 @@ public class LearnerController {
     private static final String[] LEARNER_MESSAGE_KEYS = new String[] { "message.learner.progress.restart.confirm",
 	    "message.lesson.restart.button", "label.learner.progress.notebook", "button.exit",
 	    "label.learner.progress.support", "label.my.progress" };
+
+    // flux management
+    public static final String LEARNER_TIMELINE_FLUX_NAME = "learner timeline updated";
+
+    public LearnerController() {
+	FluxRegistry.initFluxMap(LEARNER_TIMELINE_FLUX_NAME, CommonConstants.ACTIVITY_COMPLETED_SINK_NAME,
+		(LearnerActivityCompleteFluxItem item,
+			LearnerActivityCompleteFluxItem key) -> item.getLessonId() == key.getLessonId()
+				&& item.getUserId() == key.getUserId(),
+		(LearnerActivityCompleteFluxItem item) -> {
+		    ObjectNode responseJSON = null;
+		    try {
+			responseJSON = getLearnerProgress(item.getLessonId(), item.getUserId(), true);
+		    } catch (Exception e) {
+			log.error("Error while getting learner timeline flux", e);
+		    }
+		    return responseJSON == null ? "" : responseJSON.toString();
+		}, FluxMap.STANDARD_THROTTLE, FluxMap.STANDARD_TIMEOUT);
+    }
 
     @RequestMapping("/redirectToURL")
     @ResponseBody
@@ -267,7 +291,6 @@ public class LearnerController {
     /**
      * Produces necessary data for learner progress bar.
      */
-    @SuppressWarnings("unchecked")
     @RequestMapping("/getLearnerProgress")
     @ResponseBody
     public String getLearnerProgress(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -284,7 +307,6 @@ public class LearnerController {
 	    monitorId = userId;
 	}
 
-	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
 	if (lessonId == null) {
 	    // depending on when this is called, there may only be a toolSessionId known, not the lessonId.
@@ -293,11 +315,36 @@ public class LearnerController {
 	    lessonId = toolSession.getLesson().getLessonId();
 	}
 
+	ObjectNode responseJSON = getLearnerProgress(lessonId, learnerId, monitorId != null);
+	if (responseJSON == null) {
+	    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+	    return null;
+	}
+
 	responseJSON.set("messages", getProgressBarMessages());
+
+	response.setContentType("application/json;charset=utf-8");
+	return responseJSON.toString();
+    }
+
+    /**
+     * Produces necessary data for learner progress bar.
+     */
+
+    @RequestMapping("/getLearnerProgressUpdateFlux")
+    @ResponseBody
+    public Flux<String> getLearnerProgressUpdateFlux(@RequestParam long lessonId, @RequestParam int userId)
+	    throws JsonProcessingException, IOException {
+	return FluxRegistry.get(LEARNER_TIMELINE_FLUX_NAME,
+		new LearnerActivityCompleteFluxItem(lessonId, userId, null));
+    }
+
+    @SuppressWarnings("unchecked")
+    private ObjectNode getLearnerProgress(long lessonId, int learnerId, boolean monitorMode) throws IOException {
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 
 	Object[] ret = learnerService.getStructuredActivityURLs(learnerId, lessonId);
 	if (ret == null) {
-	    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 	    return null;
 	}
 
@@ -308,17 +355,14 @@ public class LearnerController {
 		// these are support activities
 		for (ActivityURL childActivity : activity.getChildActivities()) {
 		    responseJSON.withArray("support")
-			    .add(activityProgressToJSON(childActivity, null, lessonId, learnerId, monitorId));
+			    .add(activityProgressToJSON(childActivity, null, lessonId, learnerId, monitorMode));
 		}
 	    } else {
 		responseJSON.withArray("activities")
-			.add(activityProgressToJSON(activity, (Long) ret[1], lessonId, learnerId, monitorId));
+			.add(activityProgressToJSON(activity, (Long) ret[1], lessonId, learnerId, monitorMode));
 	    }
 	}
-
-	response.setContentType("application/json;charset=utf-8");
-
-	return responseJSON.toString();
+	return responseJSON;
     }
 
     @RequestMapping("/getPresenceChatActiveUserCount")
@@ -375,7 +419,7 @@ public class LearnerController {
      * Converts an activity in learner progress to a JSON object.
      */
     private ObjectNode activityProgressToJSON(ActivityURL activity, Long currentActivityId, Long lessonId,
-	    Integer learnerId, Integer monitorId) throws IOException {
+	    Integer learnerId, boolean monitorMode) throws IOException {
 	ObjectNode activityJSON = JsonNodeFactory.instance.objectNode();
 	activityJSON.put("id", activity.getActivityId());
 	activityJSON.put("name", activity.getTitle());
@@ -384,7 +428,7 @@ public class LearnerController {
 
 	// URL in learner mode
 	String url = activity.getUrl();
-	if ((url != null) && (monitorId != null)) {
+	if ((url != null) && monitorMode) {
 	    // URL in monitor mode
 	    url = Configuration.get(ConfigurationKeys.SERVER_URL)
 		    + "monitoring/monitoring/getLearnerActivityURL.do?lessonID=" + lessonId + "&activityID="
@@ -438,8 +482,8 @@ public class LearnerController {
 
 	if (activity.getChildActivities() != null) {
 	    for (ActivityURL childActivity : activity.getChildActivities()) {
-		activityJSON.withArray("childActivities")
-			.add(activityProgressToJSON(childActivity, currentActivityId, lessonId, learnerId, monitorId));
+		activityJSON.withArray("childActivities").add(
+			activityProgressToJSON(childActivity, currentActivityId, lessonId, learnerId, monitorMode));
 	    }
 	}
 

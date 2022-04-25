@@ -123,7 +123,7 @@ public class CompleteActivityController {
 
 	    // notify all event subscribers that a learner finished an activity
 	    FluxRegistry.emit(CommonConstants.ACTIVITY_COMPLETED_SINK_NAME,
-		    new LearnerActivityCompleteFluxItem(lessonId, activityId, learnerId));
+		    new LearnerActivityCompleteFluxItem(lessonId, learnerId, activityId));
 
 	    return forward;
 

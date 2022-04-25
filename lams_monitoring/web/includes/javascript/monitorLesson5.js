@@ -2388,8 +2388,7 @@ function canvasFitScreen(fitScreen, skipResize) {
  */
 function updateLearnersTab(){
 	let learnersAccordion = $('#learners-accordion').empty(),
-		itemTemplate = $('.learners-accordion-item-template').clone().removeClass('learners-accordion-item-template d-none'),
-		activityEntryTemplate = $('.learners-timeline-entry-template').clone().removeClass('learners-timeline-entry-template d-none');
+		itemTemplate = $('.learners-accordion-item-template').clone().removeClass('learners-accordion-item-template d-none');
 		
 	$.ajax({
 		'url' : LAMS_URL + 'monitoring/monitoring/getLearnerProgressPage.do',
@@ -2398,14 +2397,16 @@ function updateLearnersTab(){
 		},
 		'dataType' : 'json',
 		'success'  : function(response) {
-
+			let learnerProgressSource = null;
+			
 			$(response.learners).each(function(){
 				let learner = this,
 					itemHeaderId = 'learners-accordion-heading-' + learner.id,
 					itemCollapseId = 'learners-accordion-collapse-' + learner.id,
-					item = itemTemplate.clone().data('user-id', learner.id).appendTo(learnersAccordion),
+					item = itemTemplate.clone().data('user-id', learner.id).attr('id', 'learners-accordion-item-' + learner.id).appendTo(learnersAccordion),
 					portraitSmall = $(definePortrait(learner.portraitId, learner.id, STYLE_SMALL, true, LAMS_URL)).addClass('me-2'),
-					portraitLarge = learner.portraitId ? $(definePortrait(learner.portraitId, learner.id, STYLE_LARGE, false, LAMS_URL)) : null;
+					portraitLarge = learner.portraitId ? $(definePortrait(learner.portraitId, learner.id, STYLE_LARGE, false, LAMS_URL)) : null
+					
 				$('.accordion-header', item).attr('id', itemHeaderId)
 					   .find('.accordion-button').attr('data-bs-target', '#' + itemCollapseId).attr('aria-controls', itemCollapseId)
 											  .html('<span>' + learner.firstName + ' ' + learner.lastName + '</span>')
@@ -2419,74 +2420,84 @@ function updateLearnersTab(){
 				
 				$('.accordion-collapse', item).attr('id', itemCollapseId).attr('data-bs-parent', '#learners-accordion')
 					  .on('show.bs.collapse', function () {
-						let learnerId = $(this).closest('.accordion-item').data('user-id'),
-							timelineContainer = $('.vertical-timeline-container', this),
-							timeline = $('.vertical-timeline', timelineContainer).empty(),
-							noProgressLabel = $('.no-progress', this);
-						
-						$.ajax({
-							'url' : LAMS_URL + 'learning/learner/getLearnerProgress.do',
-							'data': {
-								lessonID: lessonId,
-								userID  : learnerId
-							},
-							'dataType' : 'json',
-							'success'  : function(response) {
-								if (!response) {
-									noProgressLabel.show();
-									return;
-								}
-								noProgressLabel.hide();
-								
-								$(response.activities).each(function(){
-									let activity = this,
-										entry = activityEntryTemplate.clone().appendTo(timeline),
-										icon = $('.timeline-icon', entry),
-										iconURL = null,
-										durationCell = $('.timeline-activity-duration', entry),
-										markCell = $('.timeline-activity-mark', entry);
-										
-									$('.timeline-title', entry).text(activity.name);
-										
-									switch(activity.status){
-										case 0: icon.addClass('border-primary activity-current');break;
-										case 1: icon.addClass('border-success activity-complete');break;
-									}
-									
-									if (activity.iconURL) {
-										iconURL = activity.iconURL;
-									} else if (activity.type === 'g') {
-										iconURL = 'images/svg/gateClosed.svg';
-									} else if (activity.type === 'o') {
-										iconURL = 'images/svg/branchingStart.svg';
-									} else if (activity.isGrouping) {
-										iconURL = 'images/svg/grouping.svg';
-									}
-									
-									if (iconURL) {
-										$('<img />').attr('src', LAMS_URL + iconURL).appendTo(icon);
-									}
-									
-									if (typeof activity.mark !== 'undefined') {
-										markCell.text(activity.mark + (activity.maxMark ? ' / ' + activity.maxMark : ''));
-									} else {
-										markCell.closest('tr').remove();
-									}
-									
-									if (activity.duration) {
-										durationCell.text(activity.duration);
-									} else {
-										durationCell.closest('tr').remove();
-									}
-								});
-								
-								timelineContainer.show();
+						if (learnerProgressSource) {
+							try {
+								learnerProgressSource.close();
+							} catch(e) {
+								console.error(e);
 							}
-						});
+						}
+						
+						let learnerId = $(this).closest('.accordion-item').data('user-id');
+						learnerProgressSource = new EventSource(LAMS_URL + 'learning/learner/getLearnerProgressUpdateFlux.do?lessonId='
+																		 +  lessonId + '&userId=' + learnerId);
+																	
+						learnerProgressSource.onmessage = function (event) {
+							 drawLearnerTimeline(learnerId, event.data);
+						}
 					  });
 				});
 		}
 	});
+}
+
+function drawLearnerTimeline(learnerId, data) {
+	let item = $('#learners-accordion-item-' + learnerId),
+		timelineContainer = $('.vertical-timeline-container', item),
+		timeline = $('.vertical-timeline', timelineContainer).empty(),
+		noProgressLabel = $('.no-progress', item);
+	
+	if (!data) {
+		noProgressLabel.show();
+		return;
+	}
+	noProgressLabel.hide();
+	data = JSON.parse(data);
+	let activityEntryTemplate = $('.learners-timeline-entry-template').clone().removeClass('learners-timeline-entry-template d-none');
+	
+	$(data.activities).each(function(){
+		let activity = this,
+			entry = activityEntryTemplate.clone().appendTo(timeline),
+			icon = $('.timeline-icon', entry),
+			iconURL = null,
+			durationCell = $('.timeline-activity-duration', entry),
+			markCell = $('.timeline-activity-mark', entry);
+			
+		$('.timeline-title', entry).text(activity.name);
+			
+		switch(activity.status){
+			case 0: icon.addClass('border-primary activity-current');break;
+			case 1: icon.addClass('border-success activity-complete');break;
+		}
+		
+		if (activity.iconURL) {
+			iconURL = activity.iconURL;
+		} else if (activity.type === 'g') {
+			iconURL = 'images/svg/gateClosed.svg';
+		} else if (activity.type === 'o') {
+			iconURL = 'images/svg/branchingStart.svg';
+		} else if (activity.isGrouping) {
+			iconURL = 'images/svg/grouping.svg';
+		}
+		
+		if (iconURL) {
+			$('<img />').attr('src', LAMS_URL + iconURL).appendTo(icon);
+		}
+		
+		if (typeof activity.mark !== 'undefined') {
+			markCell.text(activity.mark + (activity.maxMark ? ' / ' + activity.maxMark : ''));
+		} else {
+			markCell.closest('tr').remove();
+		}
+		
+		if (activity.duration) {
+			durationCell.text(activity.duration);
+		} else {
+			durationCell.closest('tr').remove();
+		}
+	});
+	
+	timelineContainer.show();
 }
 
 /**

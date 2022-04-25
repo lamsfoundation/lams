@@ -201,9 +201,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
     public AssessmentServiceImpl() {
 	FluxRegistry.initFluxMap(AssessmentConstants.COMPLETION_CHARTS_UPDATE_FLUX_NAME,
-		AssessmentConstants.ANSWERS_UPDATED_SINK_NAME,
-		(Function<Long, String>) toolContentId -> getCompletionChartsData(toolContentId),
-		FluxMap.STANDARD_THROTTLE, FluxMap.STANDARD_TIMEOUT);
+		AssessmentConstants.ANSWERS_UPDATED_SINK_NAME, null,
+		(Long toolContentId) -> getCompletionChartsData(toolContentId), FluxMap.SHORT_THROTTLE,
+		FluxMap.STANDARD_TIMEOUT);
     }
 
     // *******************************************************************************

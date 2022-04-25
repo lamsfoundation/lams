@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 import org.apache.log4j.Logger;
@@ -23,7 +24,9 @@ import reactor.core.publisher.Flux;
 public class FluxMap<T, U> {
     private static Logger log = Logger.getLogger(FluxMap.class.getName());
 
-    public static final int STANDARD_THROTTLE = 1;
+    public static final int SHORT_THROTTLE = 5;
+    public static final int STANDARD_THROTTLE = 10;
+    public static final int LONG_THROTTLE = 30;
     public static final int STANDARD_TIMEOUT = 5 * 60;
 
     private final Map<T, Flux<U>> map;
@@ -31,16 +34,18 @@ public class FluxMap<T, U> {
     // only for logging purposes
     private final String name;
     private final Flux<T> source;
+    private final BiPredicate<T, T> itemEqualsPredicate;
+    private final Function<T, U> fetchFunction;
     // default timeout is null, i.e. never expire
     private final Integer timeoutSeconds;
     // default throttle time is null, i.e. no throttling
     private final Integer throttleSeconds;
-    private final Function<T, U> fetchFunction;
 
-    public FluxMap(String name, Flux<T> source, Function<T, U> fetchFunction, Integer throttleSeconds,
-	    Integer timeoutSeconds) {
+    public FluxMap(String name, Flux<T> source, BiPredicate<T, T> itemEqualsPredicate, Function<T, U> fetchFunction,
+	    Integer throttleSeconds, Integer timeoutSeconds) {
 	this.name = name;
 	this.source = source;
+	this.itemEqualsPredicate = itemEqualsPredicate;
 	this.fetchFunction = fetchFunction;
 	this.throttleSeconds = throttleSeconds;
 	this.timeoutSeconds = timeoutSeconds;
@@ -61,7 +66,7 @@ public class FluxMap<T, U> {
 	    }
 
 	    // filter out signals which do not match the key
-	    Flux<T> filteringFlux = source.filter(item -> item.equals(key));
+	    Flux<T> filteringFlux = source.filter(item -> itemEqualsPredicate.test(item, key));
 
 	    // do not emit more often than this amount of time
 	    if (throttleSeconds != null) {
@@ -101,8 +106,7 @@ public class FluxMap<T, U> {
 			}
 
 			if (log.isDebugEnabled()) {
-			    log.debug("Subscribed (" + counter + ") to flux \"" + name + "\" with key "
-				    + key);
+			    log.debug("Subscribed (" + counter + ") to flux \"" + name + "\" with key " + key);
 			}
 		    })
 
@@ -111,8 +115,8 @@ public class FluxMap<T, U> {
 			int counter = subscriberCounter.decrementAndGet();
 
 			if (log.isDebugEnabled()) {
-			    log.debug("Cancelling (" + counter + ") subscription to flux for \"" + name
-				    + "\" with key " + key);
+			    log.debug("Cancelling (" + counter + ") subscription to flux for \"" + name + "\" with key "
+				    + key);
 			}
 		    });
 
@@ -121,8 +125,7 @@ public class FluxMap<T, U> {
 		flux = flux.timeout(Duration.ofSeconds(timeoutSeconds)).onErrorResume(TimeoutException.class,
 			throwable -> {
 			    if (log.isDebugEnabled()) {
-				log.debug(
-					"Removing timed out flux for \"" + name + "\" with key " + key);
+				log.debug("Removing timed out flux for \"" + name + "\" with key " + key);
 			    }
 			    // remove terminated Flux from the map
 			    map.remove(key);
