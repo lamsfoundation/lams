@@ -73,6 +73,7 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.lesson.util.LearnerProgressFluxItem;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
@@ -155,8 +156,12 @@ public class MonitoringController {
     private IAuthoringService authoringService;
 
     public MonitoringController() {
+	// bind sinks so a learner finishing an activity also triggers an update in lesson progress
+	FluxRegistry.bindSink(CommonConstants.ACTIVITY_COMPLETED_SINK_NAME, CommonConstants.LESSON_PROGRESSED_SINK_NAME,
+		learnerProgressFluxItem -> ((LearnerProgressFluxItem) learnerProgressFluxItem).getLessonId());
+
 	FluxRegistry.initFluxMap(MonitoringConstants.CANVAS_REFRESH_FLUX_NAME,
-		CommonConstants.ACTIVITY_COMPLETED_SINK_NAME, (Function<Long, String>) lessonId -> "doRefresh",
+		CommonConstants.LESSON_PROGRESSED_SINK_NAME, (Function<Long, String>) lessonId -> "doRefresh",
 		CANVAS_REFRESH_FLUX_THROTTLE, FluxMap.STANDARD_TIMEOUT);
     }
 

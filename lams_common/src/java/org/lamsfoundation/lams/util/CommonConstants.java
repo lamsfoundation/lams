@@ -67,6 +67,10 @@ public class CommonConstants {
 	    "TJ", "TK", "TL", "TM", "TN", "TO", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UM", "US", "UY", "UZ", "VA",
 	    "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "YE", "YT", "ZA", "ZM", "ZW" };
 
-    // flux management
-    public static final String ACTIVITY_COMPLETED_SINK_NAME = "activity completed";
+    // FLUX sinks
+
+    // updated when a learner completes an activity by himself
+    public static final String ACTIVITY_COMPLETED_SINK_NAME = "activity completed by learner";
+    // updated when a there was a change to lesson progress
+    public static final String LESSON_PROGRESSED_SINK_NAME = "lesson progress changed";
 }

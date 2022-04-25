@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.util.LearnerProgressFluxItem;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -121,7 +122,8 @@ public class CompleteActivityController {
 	    }
 
 	    // notify all event subscribers that a learner finished an activity
-	    FluxRegistry.emit(CommonConstants.ACTIVITY_COMPLETED_SINK_NAME, lessonId);
+	    FluxRegistry.emit(CommonConstants.ACTIVITY_COMPLETED_SINK_NAME,
+		    new LearnerProgressFluxItem(lessonId, activityId, learnerId));
 
 	    return forward;
 
