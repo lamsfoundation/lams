@@ -1377,7 +1377,7 @@ function updateSequenceTab() {
 
 	if (originalSequenceCanvas) {
 		// put bottom layer, LD SVG
-//		sequenceCanvas.html(originalSequenceCanvas);
+		sequenceCanvas.html(originalSequenceCanvas);
 	} else {
 		var exit = loadLearningDesignSVG();
 		if (exit) {
@@ -1387,8 +1387,8 @@ function updateSequenceTab() {
 		}
 	}
 	
-	// clear all completed learner icons except the door
-	$('#completedLearnersContainer :not(img#completedLessonLearnersIcon)').remove();
+	// clear all learner icons
+	$('.learner-icon, .more-learner-icon', '#canvas-container').remove();
 	
 	var sequenceTopButtonsContainer = $('#sequenceTopButtonsContainer');
 	if ($('img#sequenceCanvasLoading', sequenceTopButtonsContainer).length == 0){
