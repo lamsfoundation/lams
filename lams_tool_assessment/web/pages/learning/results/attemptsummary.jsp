@@ -46,9 +46,12 @@
 						</c:otherwise>
 					</c:choose>
 					
-					<fmt:formatNumber value="${result.grade}" maxFractionDigits="3"/>
-					&thinsp;<fmt:message key="label.learning.summary.out.of.maximum" />
-					&thinsp;${result.maximumGrade} (${resultPercentage}%)
+					&thinsp;
+					<fmt:message key='label.learning.summary.out.of.maximum'>
+						<fmt:param ><fmt:formatNumber value="${result.grade}" maxFractionDigits="3"/></fmt:param>
+						<fmt:param >${result.maximumGrade}</fmt:param>
+						<fmt:param >${resultPercentage}</fmt:param>
+					</fmt:message>
 				</td>
 			</tr>
 		</c:if>
