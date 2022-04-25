@@ -571,7 +571,8 @@ function drawLessonCompletionChart(){
 					return;
 				}
 				
-				let ctx = document.getElementById('completion-chart').getContext('2d'),
+				let chartDiv = $('#completion-chart'),
+					lessonCompletionChart = chartDiv.data('chart'),
 					percent = [],
 					labels = [],
 					raw = [];
@@ -582,7 +583,16 @@ function drawLessonCompletionChart(){
 					raw.push(this.raw);
 				});
 				
-				new Chart(ctx, {
+				if (lessonCompletionChart != null) {
+					// chart already exists, just update data
+					lessonCompletionChart.data.datasets[0].data = percent;
+					lessonCompletionChart.lessonCompletionChartRawData = raw;
+					lessonCompletionChart.update();
+					return;
+				}
+	
+				let ctx = chartDiv[0].getContext('2d');
+				lessonCompletionChart = new Chart(ctx, {
 						type : 'doughnut',
 						borderWidth : 0,
 						data : {
@@ -607,10 +617,14 @@ function drawLessonCompletionChart(){
 								enabled : true,
 								callbacks: {
 									label : function(tooltipItem, data) {
-										var index =  tooltipItem.index,
+										let index =  tooltipItem.index,
+										
+											rawData = this._chart.lessonCompletionChartRawData,
+											percent = data.datasets[0].data,
+											
 											label = labels[index],
 											value = percent[index],
-											rawValue = raw[index];
+											rawValue = rawData[index];
 										
 										return label + ": " + rawValue + " (" + value + "%)";
 									}
@@ -624,10 +638,11 @@ function drawLessonCompletionChart(){
 										var data = chart.data;
 										if (data.labels.length && data.datasets.length) {
 											return data.labels.map(function(label, i) {
-												var meta = chart.getDatasetMeta(0),
+												let meta = chart.getDatasetMeta(0),
 													style = meta.controller.getStyle(i),
 													value = data.datasets[0].data[i],
-													rawValue = raw[i];
+													rawData = chart.lessonCompletionChartRawData || raw,
+													rawValue = rawData[i];
 				
 												return {
 													text: label + ": " + rawValue + " (" + value + "%)",
@@ -660,9 +675,10 @@ function drawLessonCompletionChart(){
 						    }
 						}]
 					});
-			});
 			
-	
+				lessonCompletionChart.lessonCompletionChartRawData = raw;
+				chartDiv.data('chart', lessonCompletionChart);
+			});
 }
 
 function checkScheduleDate(startDateString, endDateString) {
