@@ -1347,7 +1347,7 @@ function initSequenceTab(){
 	
 	const learnerProgressUpdateSource = new EventSource(LAMS_URL + 'monitoring/monitoring/getLearnerProgressUpdateFlux.do?lessonId=' +  lessonId);
 	learnerProgressUpdateSource.onmessage = function (event) {
-		if ("doRefresh" == event.data){
+		if ("doRefresh" == event.data && $('#sequence-tab-content').length === 1){
 			updateSequenceTab();
 		}
 	}
@@ -2433,7 +2433,9 @@ function updateLearnersTab(){
 																		 +  lessonId + '&userId=' + learnerId);
 																	
 						learnerProgressSource.onmessage = function (event) {
-							 drawLearnerTimeline(learnerId, event.data);
+							if ($('#learners-accordion-item-' + learnerId).length === 1) {
+								drawLearnerTimeline(learnerId, event.data);
+							}
 						}
 					  });
 				});
