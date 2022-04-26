@@ -348,6 +348,18 @@ function moveDialogToTop(id) {
 	// $('#' + id).dialog('moveToTop');
 }
 
+function openAuthoring(learningDesignID, relaunchMonitorLessonID) {
+	var url = LAMS_URL + 'authoring/openAuthoring.do';
+			
+	if (learningDesignID) {
+		url += '?learningDesignID=' + learningDesignID;
+	}
+	if (relaunchMonitorLessonID) {
+		url += '&relaunchMonitorLessonID=' + relaunchMonitorLessonID;
+	}
+	
+	window.location.href = url;
+}
 
 //used by both /lams_central/web/main.jsp and /lams_central/web/lti/addlesson.jsp pages
 function showAuthoringDialog(learningDesignID, relaunchMonitorLessonID){

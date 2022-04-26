@@ -2324,8 +2324,7 @@ function openLiveEdit(){
 				if (response) {
 					alert(response);
 				} else {
-					window.parent.showAuthoringDialog(ldId, lessonId);
-					closeMonitorLessonDialog();
+					openAuthoring(ldId, lessonId);
 				}
 			}
 		});	

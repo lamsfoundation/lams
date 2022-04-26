@@ -49,7 +49,8 @@
 			canSetReadOnly = false,
 			isReadOnlyMode = true,
 			activitiesOnlySelectable = ${param.selectable eq 'true'},
-			initLearningDesignID = '${param.learningDesignID}';
+			initLearningDesignID = '${param.learningDesignID}',
+			initRelaunchMonitorLessonID = null;
 	</script>
 </lams:head>
 

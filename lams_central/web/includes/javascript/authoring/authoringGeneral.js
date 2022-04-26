@@ -10,7 +10,7 @@ $(document).ready(function() {
 	GeneralInitLib.initAll();
 	
 	// we display authoring in separate window if LAMS acts as a LTI 1.3 Tool
-	if (isLtiContentSelection) {
+	if (isLtiContentSelection || initRelaunchMonitorLessonID) {
 	    window.onbeforeunload = function(e) {
 			if (window.opener && typeof window.opener.refreshSeqList === 'function') {
 				window.opener.refreshSeqList();
@@ -1574,8 +1574,7 @@ GeneralLib = {
 					'cancelled' : 'true'
 				},
 				success : function() {
-					GeneralLib.setModified(false);
-					window.parent.closeDialog('dialogAuthoring');
+					window.location.href = LAMS_URL + 'home/monitorLesson.do?lessonID=' + initRelaunchMonitorLessonID;
 				}
 			});
 		} else {
@@ -3106,8 +3105,8 @@ GeneralLib = {
 								// close the Live Edit dialog
 								layout.infoDialog.data('show')(LABELS.LIVEEDIT_SAVE_SUCCESSFUL, true);
 								setTimeout(function(){
-									window.parent.closeDialog('dialogAuthoring');
-								}, 5000);
+									window.location.href = LAMS_URL + 'home/monitorLesson.do?lessonID=' + initRelaunchMonitorLessonID;
+								}, 3000);
 							}
 						});
 						
