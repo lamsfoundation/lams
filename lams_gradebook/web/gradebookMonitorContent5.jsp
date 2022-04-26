@@ -673,6 +673,12 @@
 			   	   });
 		   	   }
 	    	});
+	    	
+	    	$("#userView").bind("jqGridAfterGridComplete", function () {
+		   	   if (sequenceSearchedLearner) {
+			   	   $('tr[id="' + sequenceSearchedLearner + '"]', this).addClass('table-success');
+			   	}
+	    	});
 
 	});
 

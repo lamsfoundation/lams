@@ -13,12 +13,6 @@ var originalSequenceCanvas = null,
 // for synchronisation purposes
 	sequenceRefreshInProgress = false,
 
-//auto refresh all tabs every 30 seconds
-	autoRefreshInterval = 99990 * 1000,
-	autoRefreshIntervalObject = null,
-// when user is doing something, do not auto refresh
-	autoRefreshBlocked = false,
-
 // double tap support
 	tapTimeout = 500,
 	lastTapTime = 0,
@@ -37,6 +31,7 @@ $(document).ready(function(){
 	initSequenceTab();
 	initGradebookTab();
 	loadTab('sequence');
+	updateLessonTab();
 });
 
 function loadTab(tabName, button) {
@@ -198,11 +193,7 @@ function initLessonTab(){
 		'width'     : 950,
 		'title' 	: LABELS.LESSON_EDIT_CLASS,
 		'resizable' : true,
-		'open'      : function(){
-			autoRefreshBlocked = true;
-		},
 		'close' : function(){
-			autoRefreshBlocked = false;
 			refreshMonitor();
 		}
 	}, false);
@@ -247,13 +238,7 @@ function initLessonTab(){
 			'height'    : 500,
 			'width'     : 510,
 			'title' 	: LABELS.PROGRESS_EMAIL_TITLE,
-			'resizable' : false,
-			'open'      : function(){
-				autoRefreshBlocked = true;
-			},
-			'close' : function(){
-				autoRefreshBlocked = false;
-			}
+			'resizable' : false
 		}, false);
 	$('.modal-body', emailProgressDialog).empty().append($('#emailProgressDialogContents').show());
 	//initialize datetimepicker
@@ -407,7 +392,7 @@ function applyStateChange(state, method, newLessonEndDate) {
 				// user chose to finish the lesson, close monitoring and refresh the lesson list
 				closeMonitorLessonDialog(true);
 			} else {
-				refreshMonitor('lesson');
+				refreshMonitor();
 			}
 			if ( state == 4 ) {
 				lessonEndDate = newLessonEndDate;
@@ -700,7 +685,7 @@ function scheduleLesson(){
 				},
 				success : function() {
 					lessonStartDate = date;
-					refreshMonitor('lesson');
+					refreshMonitor();
 				}
 			});
 		} else {
@@ -724,7 +709,7 @@ function startLesson(){
 		cache : false,
 		type : 'POST',
 		success : function() {
-			refreshMonitor('lesson');
+			refreshMonitor();
 		}
 	});
 }
@@ -760,7 +745,7 @@ function showEmailDialog(userId){
 	//calculate width and height based on the dimensions of the window to which dialog is added
 	var dialogWindow = isTopLevelWindow ? $(window) : $(window.parent);
 	
-	var dialog = showDialog("dialogEmail", {
+	showDialog("dialogEmail", {
 		'autoOpen'  : true,
 		'height'    : Math.max(380, Math.min(700, dialogWindow.height() - 30)),
 		'width'     : Math.max(380, Math.min(700, dialogWindow.width() - 60)),
@@ -770,7 +755,6 @@ function showEmailDialog(userId){
 		//dialog needs to be added to a top level window to avoid boundary limitations of the interim iframe
 		"isCreateInParentWindow" : !isTopLevelWindow, 
 		'open'      : function(){
-			autoRefreshBlocked = true;
 			var dialog = $(this);
 			// load contents after opening the dialog
 			$('iframe', dialog).attr('src',
@@ -778,7 +762,6 @@ function showEmailDialog(userId){
 					+ '&userID=' + userId);
 		},
 		'close' : function(){
-			autoRefreshBlocked = false;
 			$(this).remove();
 		}
 	}, false, true);
@@ -1186,12 +1169,8 @@ function initSequenceTab(){
 			'height'	: 450,
 			'resizable' : true,
 			'open'      : function(){
-				autoRefreshBlocked = true;
 				// until operator selects an user, buttons remain disabled
 				$('button.learnerGroupDialogSelectableButton').blur().prop('disabled', true);
-			},
-			'close' 	: function(){
-				autoRefreshBlocked = false;
 			}
 		}, false);
 	
@@ -1269,7 +1248,7 @@ function initSequenceTab(){
 			$(this).val(ui.item.rawLabel);
 			// mark the learner's ID and make him highlighted after the refresh
 			sequenceSearchedLearner = ui.item.value;
-			updateSequenceTab();
+			refreshMonitor();
 			return false;
 		}
 	});
@@ -1281,13 +1260,7 @@ function initSequenceTab(){
 		'resizable' : true,
 		'height'	: 300,
 		'width'  	: 400,
-		'title'		: LABELS.FORCE_COMPLETE_BUTTON,
-		'open'      : function(){
-			autoRefreshBlocked = true;
-		},
-		'close' 	: function(){
-			autoRefreshBlocked = false;
-		}
+		'title'		: LABELS.FORCE_COMPLETE_BUTTON
 	}, false);
 	// only need to do this once as then it updates the msg field directly.
 	$('.modal-body', '#forceBackwardsDialog').empty().append($('#forceBackwardsDialogContents').show());
@@ -1365,7 +1338,6 @@ function showIntroductionDialog(lessonId) {
 		'open'      : function(){
 			$('iframe', this).attr('src', LAMS_URL + 'editLessonIntro/edit.do?lessonID='+lessonId);
 			$('iframe', this).css('height', '360px'); 
-			autoRefreshBlocked = true;
 		},
 		'close' 	: function(){
 			closeIntroductionDialog()
@@ -1374,7 +1346,6 @@ function showIntroductionDialog(lessonId) {
 }	
 	
 function closeIntroductionDialog() {
-	autoRefreshBlocked = false;
 	$('#introductionDialog').remove();
 }
 
@@ -1611,8 +1582,6 @@ function loadLearningDesignSVG() {
  * Forces given learners to move to activity indicated on SVG by coordinated (drag-drop)
  */
 function forceComplete(currentActivityId, learners, x, y) {
-	autoRefreshBlocked = true;
-	
 	var foundActivities = [],
 		targetActivity = null,
 		// if "true", then we are moving all learners from the given activity
@@ -1710,7 +1679,6 @@ function forceComplete(currentActivityId, learners, x, y) {
 					'currentActivityId' : currentActivityId,
 					'activityId': targetActivityId});
 				$('#forceBackwardsDialog').modal('show');
-				// so autoRefreshBlocked = false is not set
 				return;
 			} else {
 				// move the learner forward
@@ -1723,8 +1691,6 @@ function forceComplete(currentActivityId, learners, x, y) {
 	if (executeForceComplete) {
 		forceCompleteExecute(moveAll ? null : learners, moveAll ? currentActivityId : null, targetActivityId, false);
 	}
-
-	autoRefreshBlocked = false;
 }
 
 
@@ -1762,7 +1728,7 @@ function forceCompleteExecute(learners, moveAllFromActivityId, activityId, remov
 			alert(response);
 									
 			// progress changed, show it to monitor
-			refreshMonitor('sequence');
+			refreshMonitor();
 		}
 	});
 }
@@ -1965,9 +1931,6 @@ function addActivityIconsHandlers(activity) {
 							    'helper' : function(){
 							    	return learnerIcon.clone();
 							    },
-								'start' : function(){
-									 autoRefreshBlocked = true;
-								},
 								'stop' : function(event, ui) {
 									var learners = [{
 										'id'   : learner.id,
@@ -2060,9 +2023,6 @@ function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 					'helper'      : function(){
 						// copy of the icon for dragging
 						return icon.clone();
-					},
-					'start' : function(){
-						autoRefreshBlocked = true;
 					},
 					'stop' : function(event, ui) {
 						var learners = [{
@@ -2164,7 +2124,7 @@ function sequenceClearSearchPhrase(refresh){
 	$('#sequenceSearchedLearnerHighlighter').hide();
 	sequenceSearchedLearner = null;
 	if (refresh) {
-		updateSequenceTab();
+		refreshMonitor();
 	}
 }
 
@@ -2410,12 +2370,16 @@ function updateLearnersTab(){
 					itemCollapseId = 'learners-accordion-collapse-' + learner.id,
 					item = itemTemplate.clone().data('user-id', learner.id).attr('id', 'learners-accordion-item-' + learner.id).appendTo(learnersAccordion),
 					portraitSmall = $(definePortrait(learner.portraitId, learner.id, STYLE_SMALL, true, LAMS_URL)).addClass('me-2'),
-					portraitLarge = learner.portraitId ? $(definePortrait(learner.portraitId, learner.id, STYLE_LARGE, false, LAMS_URL)) : null
+					portraitLarge = learner.portraitId ? $(definePortrait(learner.portraitId, learner.id, STYLE_LARGE, false, LAMS_URL)) : null;
+
 					
 				$('.accordion-header', item).attr('id', itemHeaderId)
-					   .find('.accordion-button').attr('data-bs-target', '#' + itemCollapseId).attr('aria-controls', itemCollapseId)
-											  .html('<span>' + learner.firstName + ' ' + learner.lastName + '</span>')
-											  .prepend(portraitSmall);
+					   .find('.accordion-button')
+							.attr('data-bs-target', '#' + itemCollapseId)
+							.attr('aria-controls', itemCollapseId)
+							.addClass(sequenceSearchedLearner == learner.id ? 'bg-primary' : '')
+							.html('<span>' + learner.firstName + ' ' + learner.lastName + '</span>')
+							.prepend(portraitSmall);
 				$('.learners-accordion-name', item).text(learner.firstName + ' ' + learner.lastName);
 				$('.learners-accordion-login', item).html('<i class="fa-regular fa-user"></i>' + learner.login);
 				$('.learners-accordion-email', item).html('<i class="fa-regular fa-envelope"></i>' + learner.email);
@@ -2718,36 +2682,18 @@ function openPopUp(url, title, h, w, status, forceNewWindow) {
 			+ ",top=" + top + ",left=" + left);
 }
 
-function isAutoRefreshBlocked(){
-	return autoRefreshBlocked || $('#learnerGroupDialog').hasClass('in');
-}
-
 /**
  * Updates all changeable elements of monitoring screen.
  */
-function refreshMonitor(tabName, isAuto){
-	if (autoRefreshIntervalObject && !isAuto) {
-		clearInterval(autoRefreshIntervalObject);
-		autoRefreshIntervalObject = null;
+function refreshMonitor(){
+	let tabName = 'sequence';
+	if ($('#learners-accordion').length === 1) {
+		tabName = 'learners';
+	} else if ($('#gradebookDiv').length === 1){
+		tabName = 'gradebook';
 	}
-
-	if (!autoRefreshIntervalObject) {
-		autoRefreshIntervalObject = setInterval(function(){
-			if (!isAutoRefreshBlocked()) {
-				refreshMonitor(null, true);
-			}
-		}, autoRefreshInterval);
-	}
-
-	// update Lesson tab widgets (state, number of learners etc.)
-	updateLessonTab();
-	if (!tabName) {
-		updateLessonTab();
-		// update learner progress in Sequence tab
-		updateSequenceTab();
-		// update learner progress in Learners tab
-		// loadLearnerProgressPage();
-	} else if (tabName == 'sequence'){
+	
+	if (tabName == 'sequence'){
 		updateSequenceTab();
 	} else if (tabName == 'learners'){
 		updateLearnersTab();
