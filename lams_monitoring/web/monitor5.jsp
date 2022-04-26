@@ -427,10 +427,13 @@
 				<p id="lesson-name">Lesson Name</p>
 			</div>
 			<div class="top-menu">
-				<form>
-					<input type="text" name="" placeholder="Search Student">
-					<img src="<lams:LAMSURL/>images/components/search.svg" alt="#" />
-				</form>
+				<div id="sequenceSearchPhraseContainer" class="input-group">
+					<input id="sequenceSearchPhrase" type="text" class="form-control" placeholder="Search Student">
+				    <button id="sequenceSearchPhraseButton" class="btn bg-white opacity-100" type="button" disabled onClick="javascript:sequenceClearSearchPhrase(true)">
+				    	<i id="sequenceSearchPhraseIcon" class="fa-solid fa-fw fa-magnifying-glass"></i>
+				    	<i id="sequenceSearchPhraseClearIcon" class="fa-solid fa-fw fa-xmark"></i>
+				    </button>
+				</div>
 				<!-- 
 				<div class="top-menu-btn component-menu-btn">
 					<a href="#" onClick="javscript:refreshMonitor()"><img src="<lams:LAMSURL/>images/components/icon2.svg" alt="#" /></a>

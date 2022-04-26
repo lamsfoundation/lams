@@ -1240,7 +1240,9 @@ function initSequenceTab(){
 				if (valueParts.length > 1) {
 					this.value = valueParts[0];
 					// portrait div will be added as text, then in open() function below we fix it
-					this.label += definePortrait(valueParts[1], this.value, STYLE_SMALL, true, LAMS_URL);
+					this.portrait = definePortrait(valueParts[1], this.value, STYLE_SMALL, true, LAMS_URL);
+					this.rawLabel = this.label;
+					this.label += this.portrait;
 				}
 			});
 		},
@@ -1264,7 +1266,7 @@ function initSequenceTab(){
 		},
 		'select' : function(event, ui){
 			// put the learner first name, last name and login into the box
-			$(this).val(ui.item.label);
+			$(this).val(ui.item.rawLabel);
 			// mark the learner's ID and make him highlighted after the refresh
 			sequenceSearchedLearner = ui.item.value;
 			updateSequenceTab();
@@ -2130,7 +2132,9 @@ function getActivityCoordinates(activity){
  */
 function highlightSearchedLearner(icon) {
 	// show the "clear" button
-	$('#sequenceSearchPhraseClear').css('visibility', 'visible');
+	$('#sequenceSearchPhraseButton').prop('disabled', false);
+	$('#sequenceSearchPhraseIcon').hide();
+	$('#sequenceSearchPhraseClearIcon').show();
 	
 	// border and z-index are manipulated via CSS
 	icon.addClass('learner-searched');
@@ -2154,7 +2158,9 @@ function highlightSearchedLearner(icon) {
  */
 function sequenceClearSearchPhrase(refresh){
 	$('#sequenceSearchPhrase').val('');
-	$('#sequenceSearchPhraseClear').css('visibility', 'hidden');
+	$('#sequenceSearchPhraseButton').prop('disabled', true);
+	$('#sequenceSearchPhraseClearIcon').hide();
+	$('#sequenceSearchPhraseIcon').show();
 	$('#sequenceSearchedLearnerHighlighter').hide();
 	sequenceSearchedLearner = null;
 	if (refresh) {

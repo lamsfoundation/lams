@@ -824,6 +824,27 @@
 	background-color: #1AD9B2 !important;
 }
 
+.monitoring-page-wrapper #sequenceSearchPhraseContainer {
+	width: 20rem;
+}
+
+.monitoring-page-wrapper #sequenceSearchPhrase {
+	width: 15rem;
+} 
+
+.monitoring-page-wrapper #sequenceSearchPhraseClearIcon {
+	display: none;
+}
+
+body.component .ui-menu-item-wrapper.autocomplete-menu-item-with-portrait {
+	display: flex;
+	justify-content: space-between;
+	padding: 5px;
+}
+
+body.component .ui-menu-item-wrapper.autocomplete-menu-item-with-portrait > p {
+	padding-top: 10px;
+}
 
 .dialogContainer {
   display: none;
@@ -905,6 +926,8 @@
 .dialogContainer iframe {
 	height: calc(100% - 10px);
 }
+
+
 
 /********** CANVAS STYLES **********/
 
@@ -1007,32 +1030,6 @@
 #canvas-container img#sequenceCanvasLoading {
 	padding: 5px 0 0 100px;
 	display: none;
-}
-
-#canvas-container .topButtonsContainer #sequenceSearchPhrase {
-	float: right;
-	margin: 6px 5px 5px 0;
-}
-
-#canvas-container .topButtonsContainer #sequenceSearchPhraseIcon {
-	float: right;
-	margin: 9px 7px 5px 0;
-}
-
-#canvas-container .topButtonsContainer #sequenceSearchPhraseClear {
-	float: right;
-	cursor: pointer;
-	margin: 9px 25px 5px 0;
-	visibility: hidden;
-}
-
-#canvas-container .ui-menu-item-wrapper.autocomplete-menu-item-with-portrait {
-	display: flex;
-	justify-content: space-between;
-}
-
-#canvas-container .ui-menu-item-wrapper.autocomplete-menu-item-with-portrait>p {
-	padding-top: 10px;
 }
 
 #canvas-container img#sequenceSearchedLearnerHighlighter {
