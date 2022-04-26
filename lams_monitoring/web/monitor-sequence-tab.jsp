@@ -67,12 +67,13 @@
 						-->
 					</div>
 				</div>
-				<div class="col mb-5">
-					<div id="required-tasks" class="monitoring-panel">
+				<div id="required-tasks" class="col mb-5">
+					<div class="monitoring-panel">
 						<h6><fmt:message key="lesson.required.tasks"/></h6>
 						<div id="required-tasks-content"></div>
 					</div>
 				</div>
+				<!-- 
 				<div class="col mb-5">
 					<div id="insights" class="monitoring-panel">
 						<h6>insights</h6>
@@ -82,6 +83,7 @@
 						</div>
 					</div>
 				</div>
+				 -->
 			</div>
 
 		</div>

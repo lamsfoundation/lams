@@ -431,9 +431,11 @@
 					<input type="text" name="" placeholder="Search Student">
 					<img src="<lams:LAMSURL/>images/components/search.svg" alt="#" />
 				</form>
+				<!-- 
 				<div class="top-menu-btn component-menu-btn">
 					<a href="#" onClick="javscript:refreshMonitor()"><img src="<lams:LAMSURL/>images/components/icon2.svg" alt="#" /></a>
 				</div>
+				 -->
 			</div>
 		</header>
 		
