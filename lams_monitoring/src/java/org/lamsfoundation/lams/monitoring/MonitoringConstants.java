@@ -68,4 +68,5 @@ public class MonitoringConstants {
 
     // flux management
     public static final String CANVAS_REFRESH_FLUX_NAME = "canvas refresh";
+    public static final String GRADEBOOK_REFRESH_FLUX_NAME = "gradebook refresh";
 }

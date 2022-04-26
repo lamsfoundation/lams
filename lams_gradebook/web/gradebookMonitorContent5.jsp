@@ -660,27 +660,39 @@
 	            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible", this));
 	        })
 
-	        function userNameFormatter (cellvalue, options, rowObject) {
-				return definePortraitPopover(rowObject[8].innerHTML, rowObject.id, cellvalue, cellvalue, true);
-			}
-
-	        // Combine portraits with activityURL. Both are optional so it is mix and match.
-       	 	function userNameFormatterActivity (cellvalue, options, rowObject) {
-       	 		var portProcessed = definePortraitPopover(rowObject[9].innerHTML, rowObject.id, cellvalue, cellvalue, true);
-       	 		if ( rowObject.children.length > 10 && rowObject[10].innerHTML.length > 0 ) {
-       	 			var activityURL = rowObject[10].innerHTML;
-       	 			if ( portProcessed.indexOf('<a') != -1 ) {
-       	 				return portProcessed.replace("<a ", "<a href='"+activityURL+"' ");
-       	 			} else {
-       	 				return "<a href='"+activityURL+"'>"+cellvalue+"</a>";
-       	 			}
-       	 		} 
-       	 		return portProcessed;
-			}
 
 	        setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
+	    	
+	    	$("#userView, #activityView").bind("jqGridAfterGridComplete", function () {
+		   	   let grid = $(this), 
+		   	       expandedGridIds = grid.data('expandedGridIds');
+		   	   $(this).data('expandedGridIds', null);
+		   	   if (expandedGridIds) {
+			   	   $(expandedGridIds).each(function(index, id){
+				   		grid.jqGrid('expandSubGridRow', id);
+			   	   });
+		   	   }
+	    	});
 
 	});
+
+    function userNameFormatter (cellvalue, options, rowObject) {
+		return definePortraitPopover(rowObject[8].innerHTML, rowObject.id, cellvalue, cellvalue, true);
+	}
+
+    // Combine portraits with activityURL. Both are optional so it is mix and match.
+ 	function userNameFormatterActivity (cellvalue, options, rowObject) {
+ 		var portProcessed = definePortraitPopover(rowObject[9].innerHTML, rowObject.id, cellvalue, cellvalue, true);
+ 		if ( rowObject.children.length > 10 && rowObject[10].innerHTML.length > 0 ) {
+ 			var activityURL = rowObject[10].innerHTML;
+ 			if ( portProcessed.indexOf('<a') != -1 ) {
+ 				return portProcessed.replace("<a ", "<a href='"+activityURL+"' ");
+ 			} else {
+ 				return "<a href='"+activityURL+"'>"+cellvalue+"</a>";
+ 			}
+ 		} 
+ 		return portProcessed;
+	}
 </script>
 
 

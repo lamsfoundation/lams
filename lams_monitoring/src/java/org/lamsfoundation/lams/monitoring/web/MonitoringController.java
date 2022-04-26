@@ -164,6 +164,9 @@ public class MonitoringController {
 	FluxRegistry.initFluxMap(MonitoringConstants.CANVAS_REFRESH_FLUX_NAME,
 		CommonConstants.LESSON_PROGRESSED_SINK_NAME, null, lessonId -> "doRefresh", FluxMap.STANDARD_THROTTLE,
 		FluxMap.STANDARD_TIMEOUT);
+	FluxRegistry.initFluxMap(MonitoringConstants.GRADEBOOK_REFRESH_FLUX_NAME,
+		CommonConstants.LESSON_PROGRESSED_SINK_NAME, null, lessonId -> "doRefresh", FluxMap.STANDARD_THROTTLE,
+		FluxMap.STANDARD_TIMEOUT);
     }
 
     private Integer getUserId() {
@@ -187,6 +190,13 @@ public class MonitoringController {
     public Flux<String> getLearnerProgressUpdateFlux(@RequestParam long lessonId)
 	    throws JsonProcessingException, IOException {
 	return FluxRegistry.get(MonitoringConstants.CANVAS_REFRESH_FLUX_NAME, lessonId);
+    }
+
+    @RequestMapping(path = "/getGradebookUpdateFlux", method = RequestMethod.GET, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @ResponseBody
+    public Flux<String> getGradebookUpdateFlux(@RequestParam long lessonId)
+	    throws JsonProcessingException, IOException {
+	return FluxRegistry.get(MonitoringConstants.GRADEBOOK_REFRESH_FLUX_NAME, lessonId);
     }
 
     /**

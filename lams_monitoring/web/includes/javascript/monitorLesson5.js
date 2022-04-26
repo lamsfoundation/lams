@@ -2551,6 +2551,8 @@ function initGradebookTab() {
 		});
 	});
 	*/
+		
+	$('#grid').trigger( 'reloadGrid' );
 	$.extend(true, $.jgrid.guiStyles.bootstrap4, {
 		pager : {
 			pagerSelect : 'form-control-select'
@@ -2559,6 +2561,25 @@ function initGradebookTab() {
 			clearButton : 'btn btn-sm'
 		}
 	});
+	
+	const gradebooksUpdateSource = new EventSource(LAMS_URL + 'monitoring/monitoring/getGradebookUpdateFlux.do?lessonId=' +  lessonId);
+	gradebooksUpdateSource.onmessage = function (event) {
+		if ("doRefresh" == event.data && $('#gradebookDiv').length === 1){
+		    let expandedGridIds = [];
+		    $("#userView tr:has(.sgexpanded)").each(function () {
+		        let num = $(this).attr('id');
+		        expandedGridIds.push(num);
+		    });
+			$('#userView').data('expandedGridIds', expandedGridIds).trigger("reloadGrid");
+		
+			expandedGridIds = [];
+		    $("#activityView tr:has(.sgexpanded)").each(function () {
+		        let num = $(this).attr('id');
+		        expandedGridIds.push(num);
+		    });
+			$('#activityView').data('expandedGridIds', expandedGridIds).trigger("reloadGrid");
+		}
+	};
 }
 
 /**
