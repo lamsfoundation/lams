@@ -16,7 +16,6 @@
 	
 <script type="text/javascript">
 
-	var marksReleased = ${marksReleased};
 	var graphLoaded = false;
 
 	function toggleMarkChart() {
@@ -700,24 +699,6 @@
  		return portProcessed;
 	}
 </script>
-
-
-<div class="gbTopButtonsContainer pull-left float-start">
-	<div class="visible-xs-inline">
-		<div id="padlockLocked" style="display:none">
-			<span class="lockLabel">
-			<i class="fa-solid fa-lock"></i>
-			<fmt:message key="label.marks"/>
-			</span>
-		</div>
-		<div id="padlockUnlocked" style="display:none">
-			<span class="lockLabel">
-			<i class="fa-solid fa-unlock"></i>
-			<fmt:message key="label.marks"/>
-			</span>
-		</div>
-	</div>
-</div>
 
 <div class="gbTopButtonsContainer d-flex justify-content-end" id="export-link-area">
 

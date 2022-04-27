@@ -92,7 +92,7 @@
 
 	// release/hide marks
 	function toggleMarksRelease() {
-		if (confirm(marksReleased ? "<fmt:message key="gradebook.monitor.releasemarks.check.hide"/>" : "<fmt:message key="gradebook.monitor.releasemarks.check.release"/>")) {
+		showConfirm(marksReleased ? "<fmt:message key="gradebook.monitor.releasemarks.check.hide"/>" : "<fmt:message key="gradebook.monitor.releasemarks.check.release"/>", function() {
 			releaseMarksAlertBox.hide();
 			
 			$.ajax({
@@ -112,7 +112,7 @@
 			    	}
 		    	}
 			});
-	    }
+		});
 	}
 	
 	function sendReleaseMarksEmails(){
@@ -134,26 +134,24 @@
 			return;
 		}
 		
-		if (!confirm('<fmt:message key="gradebook.monitor.releasemarks.send.emails.confirm" />'.replace('[COUNT_PLACEHOLDER]', finalList.length))){
-			return;
-		}
-	
-		$.ajax({
-			'url'      : '<lams:LAMSURL/>gradebook/gradebookMonitoring/sendReleaseMarksEmails.do',
-			'data'     : {
-				'lessonID' : releaseMarksLessonID,
-				 'includedLearners' : JSON.stringify(finalList)
-			 },
-			'dataType' : 'text',
-			'cache'    : false,
-			'success' : function(response) {
-				if (response == 'success') {
-					releaseMarksAlertBox.removeClass('alert-danger').addClass('alert-success').text('Emails were sent').show();
-					return;
-				}
+		showConfirm('<fmt:message key="gradebook.monitor.releasemarks.send.emails.confirm" />'.replace('[COUNT_PLACEHOLDER]', finalList.length), function() {
+			$.ajax({
+				'url'      : '<lams:LAMSURL/>gradebook/gradebookMonitoring/sendReleaseMarksEmails.do',
+				'data'     : {
+					'lessonID' : releaseMarksLessonID,
+					 'includedLearners' : JSON.stringify(finalList)
+				 },
+				'dataType' : 'text',
+				'cache'    : false,
+				'success' : function(response) {
+					if (response == 'success') {
+						releaseMarksAlertBox.removeClass('alert-danger').addClass('alert-success').text('Emails were sent').show();
+						return;
+					}
 
-				releaseMarksAlertBox.removeClass('alert-success').addClass('alert-danger').text('There was a problem with sending emails: ' + response).show();
-			}
+					releaseMarksAlertBox.removeClass('alert-success').addClass('alert-danger').text('There was a problem with sending emails: ' + response).show();
+				}
+			});
 		});
 	}
 

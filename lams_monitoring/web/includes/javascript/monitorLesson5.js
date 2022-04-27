@@ -340,11 +340,11 @@ function changeLessonState(){
 			
 		//'remove' is chosen
 		case 7: 
-			if (confirm(LABELS.LESSON_REMOVE_ALERT)){
-				if (confirm(LABELS.LESSON_REMOVE_DOUBLECHECK_ALERT)) {
+			showConfirm(LABELS.LESSON_REMOVE_ALERT, function() {
+				showConfirm(LABELS.LESSON_REMOVE_DOUBLECHECK_ALERT, function() {
 					method = "removeLesson";
-				}
-			}
+				});
+			});
 			break;
 	}
 	
@@ -980,7 +980,7 @@ function addCheckbox(dateObj, list, checked) {
 }
 
 function sendProgressEmail() {
-	if ( confirm(LABELS.PROGRESS_EMAIL_SEND_NOW_QUESTION) ) {
+	showConfirm(LABELS.PROGRESS_EMAIL_SEND_NOW_QUESTION, function() {
 		$.ajax({
 			dataType : 'json',
 			url : LAMS_URL + 'monitoring/emailProgress/sendLessonProgressEmail.do',
@@ -991,12 +991,12 @@ function sendProgressEmail() {
 				},		
 			success : function(response) {
 				if ( response.error || ! response.sent > 0 )
-					alert(LABELS.PROGRESS_EMAIL_SEND_FAILED+"\n"+(response.error ? response.error : ""));
+					showToast(LABELS.PROGRESS_EMAIL_SEND_FAILED+"\n"+(response.error ? response.error : ""));
 				else 
-					alert(LABELS.PROGRESS_EMAIL_SUCCESS.replace('[0]',response.sent));
+					showToast(LABELS.PROGRESS_EMAIL_SUCCESS.replace('[0]',response.sent));
 			}
 		});	
-	}
+	});
 }
 
 function addEmailProgressDate() {
@@ -1609,53 +1609,54 @@ function forceComplete(currentActivityId, learners, x, y) {
 
 	
 	if (isEndLesson) {
-		executeForceComplete =  currentActivityId && confirm(LABELS.FORCE_COMPLETE_END_LESSON_CONFIRM
-				.replace('[0]', learnerNames));
-	} else {
-		var targetActivityId = +targetActivity.attr('id');
-		if (currentActivityId != targetActivityId) {
-			var targetActivityName = targetActivity.hasClass('svg-activity-gate') ? "Gate" : targetActivity.find('.svg-activity-title-label').text(),
-				moveBackwards = currentActivityId == null;
-			
-			// check if target activity is before current activity
-			if (currentActivityId) {
-				$.ajax({
-					dataType : 'text',
-					url : LAMS_URL + 'monitoring/monitoring/isActivityPreceding.do',
-					async : false,
-					cache : false,
-					data : {
-						'activityA' 	 :  targetActivityId,
-						'activityB'		 :  currentActivityId
-					},
-					success : function(response) {
-						moveBackwards = response == 'true';
-					}
-				});
-			}
-			
-			// check if the target activity was found or we are moving the learner from end of lesson
-			if (moveBackwards) {
-				// move the learner backwards
-				var msgString = LABELS.FORCE_COMPLETE_REMOVE_CONTENT
-						.replace('[0]', learnerNames).replace('[1]', targetActivityName);
-				$('#forceBackwardsMsg', '#forceBackwardsDialog').html(msgString);				
-				$('#forceBackwardsDialog').data({
-					'learners' : learners,
-					'currentActivityId' : currentActivityId,
-					'activityId': targetActivityId});
-				$('#forceBackwardsDialog').modal('show');
-				return;
-			} else {
-				// move the learner forward
-				executeForceComplete = confirm(LABELS.FORCE_COMPLETE_ACTIVITY_CONFIRM
-							.replace('[0]', learnerNames).replace('[1]', targetActivityName));
-			}
+		if (currentActivityId) {
+			showConfirm(LABELS.FORCE_COMPLETE_END_LESSON_CONFIRM.replace('[0]', learnerNames), function() {
+				forceCompleteExecute(moveAll ? null : learners, moveAll ? currentActivityId : null, targetActivityId, false);
+			});
 		}
+		return;
 	}
 	
-	if (executeForceComplete) {
-		forceCompleteExecute(moveAll ? null : learners, moveAll ? currentActivityId : null, targetActivityId, false);
+	var targetActivityId = +targetActivity.attr('id');
+	if (currentActivityId != targetActivityId) {
+		var targetActivityName = targetActivity.hasClass('svg-activity-gate') ? "Gate" : targetActivity.find('.svg-activity-title-label').text(),
+			moveBackwards = currentActivityId == null;
+		
+		// check if target activity is before current activity
+		if (currentActivityId) {
+			$.ajax({
+				dataType : 'text',
+				url : LAMS_URL + 'monitoring/monitoring/isActivityPreceding.do',
+				async : false,
+				cache : false,
+				data : {
+					'activityA' 	 :  targetActivityId,
+					'activityB'		 :  currentActivityId
+				},
+				success : function(response) {
+					moveBackwards = response == 'true';
+				}
+			});
+		}
+		
+		// check if the target activity was found or we are moving the learner from end of lesson
+		if (moveBackwards) {
+			// move the learner backwards
+			var msgString = LABELS.FORCE_COMPLETE_REMOVE_CONTENT
+					.replace('[0]', learnerNames).replace('[1]', targetActivityName);
+			$('#forceBackwardsMsg', '#forceBackwardsDialog').html(msgString);				
+			$('#forceBackwardsDialog').data({
+				'learners' : learners,
+				'currentActivityId' : currentActivityId,
+				'activityId': targetActivityId});
+			$('#forceBackwardsDialog').modal('show');
+			return;
+		} 
+		
+		// move the learner forward
+		showConfirm(LABELS.FORCE_COMPLETE_ACTIVITY_CONFIRM.replace('[0]', learnerNames).replace('[1]', targetActivityName), function() {
+			forceCompleteExecute(moveAll ? null : learners, moveAll ? currentActivityId : null, targetActivityId, false);
+		});
 	}
 }
 
@@ -1691,7 +1692,7 @@ function forceCompleteExecute(learners, moveAllFromActivityId, activityId, remov
 		data : data,
 		success : function(response) {
 			// inform user of result
-			alert(response);
+			showToast(response);
 									
 			// progress changed, show it to monitor
 			refreshMonitor();
@@ -2223,7 +2224,7 @@ function editClassMember(userCheckbox){
  * Adds all learners to the class.
  */
 function addAllLearners(){
-	if (confirm(LABELS.CLASS_ADD_ALL_CONFIRM)) {
+	showConfirm(LABELS.CLASS_ADD_ALL_CONFIRM, function() {
 		$.ajax({
 			url : LAMS_URL + 'monitoring/monitoring/addAllOrganisationLearnersToLesson.do',
 			type : 'POST',
@@ -2232,18 +2233,18 @@ function addAllLearners(){
 				'lessonID' : lessonId
 			},
 			success : function(){
-				alert(LABELS.CLASS_ADD_ALL_SUCCESS);
+				showToast(LABELS.CLASS_ADD_ALL_SUCCESS);
 				$('#classDialog').modal('hide');
 			}
 		});
-	}
+	});
 }
 
 /**
  * Opens Authoring for live edit.
  */
 function openLiveEdit(){
-	if (confirm(LABELS.LIVE_EDIT_CONFIRM)) {
+	showConfirm(LABELS.LIVE_EDIT_CONFIRM, function() {
 		$.ajax({
 			dataType : 'text',
 			url : LAMS_URL + 'monitoring/monitoring/startLiveEdit.do',
@@ -2254,13 +2255,13 @@ function openLiveEdit(){
 			},
 			success : function(response) {
 				if (response) {
-					alert(response);
+					showToast(response);
 				} else {
 					openAuthoring(ldId, lessonId);
 				}
 			}
 		});	
-	}
+	});
 }
 
 /**
@@ -2975,6 +2976,22 @@ function showToast(text) {
 	toast.find('.toast-body', toast).text(text);
 	toast = new bootstrap.Toast(toast[0]);
     toast.show();
+}
+
+function showConfirm(body, callback) {
+	let dialog = $('#confirmationDialog');
+	$('.modal-body', dialog).html(body);
+	
+	$("#confirmationDialogConfirmButton").off('click').on("click", function(){
+    	callback(true);
+    	dialog.modal('hide');
+	});
+  
+	$("#confirmationDialogCancelButton").off('click').on("click", function(){
+    	dialog.modal('hide');
+	});
+
+	dialog.modal('show');
 }
 
 /**

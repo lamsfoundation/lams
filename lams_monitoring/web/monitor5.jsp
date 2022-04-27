@@ -646,20 +646,20 @@
 	
 <div id="forceBackwardsDialogContents" class="dialogContainer">
 	<div id="forceBackwardsMsg"></div>
-       <div class="pull-right mt-3">
+    <div class="pull-right mt-3">
 
-              <button id="forceBackwardsRemoveContentNoButton" class="btn btn-primary me-1">
-                      <span><fmt:message key="force.complete.remove.content.no"/></span>
-              </button>
+           <button id="forceBackwardsRemoveContentNoButton" class="btn btn-primary me-1">
+                   <span><fmt:message key="force.complete.remove.content.no"/></span>
+           </button>
 
-              <button id="forceBackwardsRemoveContentYesButton" class="btn btn-primary me-1">
-                      <span><fmt:message key="force.complete.remove.content.yes" /></span>
-              </button>
+           <button id="forceBackwardsRemoveContentYesButton" class="btn btn-primary me-1">
+                   <span><fmt:message key="force.complete.remove.content.yes" /></span>
+           </button>
 
-              <button id="forceBackwardsCloseButton" class="btn btn-secondary">
-                      <span><fmt:message key="button.close" /></span>
-              </button>
-      </div>
+           <button id="forceBackwardsCloseButton" class="btn btn-secondary">
+                   <span><fmt:message key="button.close" /></span>
+           </button>
+   </div>
 </div>
 
 <div id="emailProgressDialogContents" class="dialogContainer">
@@ -699,6 +699,22 @@
 		</div>
 	</div>
 </div>
+
+
+<div id="confirmationDialog" class="modal dialogContainer fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog  modal-dialog-centered">
+    <div class="modal-content">
+    	<div class="modal-body">
+    	</div>
+      	<div class="modal-footer">
+        	<button type="button" class="btn btn-secondary" id="confirmationDialogCancelButton">Cancel</button>
+        	<button type="button" class="btn btn-primary" id="confirmationDialogConfirmButton">Confirm</button>
+      	</div>
+    </div>
+  </div>
+</div>
+
+<div class="alert" role="alert" id="result"></div>
 
 <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" id="toast-container">
 </div>
