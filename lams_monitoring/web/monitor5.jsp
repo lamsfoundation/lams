@@ -644,11 +644,6 @@
 	</div>
 </div>
 	
-	
-<div id="sequenceInfoDialogContents" class="dialogContainer">
-  <fmt:message key="sequence.help.info"/>
-</div>
-
 <div id="forceBackwardsDialogContents" class="dialogContainer">
 	<div id="forceBackwardsMsg"></div>
        <div class="pull-right mt-3">

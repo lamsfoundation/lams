@@ -6,8 +6,6 @@ var originalSequenceCanvas = null,
 	sequenceCanvas = null,
 // switch between SVG original size and fit-to-sreen (enlarge/shrink)
 	learningDesignSvgFitScreen = false,
-// info box show timeout
-	sequenceInfoTimeout = 8000,
 // which learner was selected in the search box
 	sequenceSearchedLearner = null,
 // for synchronisation purposes
@@ -1216,13 +1214,11 @@ function initSequenceTab(){
 			$.each(ui.content, function(){
 				// only add portrait if user has got one
 				let valueParts = this.value.split('_');
-				if (valueParts.length > 1) {
-					this.value = valueParts[0];
-					// portrait div will be added as text, then in open() function below we fix it
-					this.portrait = definePortrait(valueParts[1], this.value, STYLE_SMALL, true, LAMS_URL);
-					this.rawLabel = this.label;
-					this.label += this.portrait;
-				}
+				this.value = valueParts[0];
+				// portrait div will be added as text, then in open() function below we fix it
+				this.portrait = definePortrait(valueParts.length > 1 ? valueParts[1] : null, this.value, STYLE_SMALL, true, LAMS_URL);
+				this.rawLabel = this.label;
+				this.label += this.portrait;
 			});
 		},
 		'open'   : function(event, ui) {
@@ -1291,35 +1287,6 @@ function initSequenceTab(){
 		$('#forceBackwardsDialog').modal('hide');
 	});
 
-	// small info box on Sequence tab, activated when the tab is showed
-	var sequenceInfoDialog = showDialog('sequenceInfoDialog', {
-		'autoOpen'   : false,
-		'width'      : 300,
-		'modal'      : false, 
-		'resizable'  : false,
-		'draggable'  : false,
-		'title'		 : LABELS.HELP,
-		'open'      : function(){
-			// close after given time
-			setTimeout(function(){
-				$('#sequenceInfoDialog').modal('hide')
-			}, sequenceInfoTimeout);
-		},
-		'close' 	: null,
-		'data'		: {
-			'position' : {
-				'my' : 'left top',
-				'at' : 'left top',
-				'of' : '#sequenceCanvas'
-			}
-		}
-	}, false);
-	$(sequenceInfoDialog).click(function(){
-		$('#sequenceInfoDialog').modal('hide');
-	}).find('.modal-header').remove();
-	
-	$('#sequenceInfoDialog .modal-body').empty().append($('#sequenceInfoDialogContents').show());
-	
 	const learnerProgressUpdateSource = new EventSource(LAMS_URL + 'monitoring/monitoring/getLearnerProgressUpdateFlux.do?lessonId=' +  lessonId);
 	learnerProgressUpdateSource.onmessage = function (event) {
 		if ("doRefresh" == event.data && $('#sequence-tab-content').length === 1){
@@ -1461,8 +1428,7 @@ function updateSequenceTab() {
 			if (sequenceSearchedLearner != null && !response.searchedLearnerFound) {
 				// the learner has not started the lesson yet, display an info box
 				sequenceClearSearchPhrase();
-				$('#sequenceInfoDialogContents').html(LABELS.PROGRESS_NOT_STARTED);
-				$('#sequenceInfoDialog').modal('show');
+				showToast(LABELS.PROGRESS_NOT_STARTED);
 			}
 			
 			var learnerTotalCount = learnerCount + response.completedLearnerCount;

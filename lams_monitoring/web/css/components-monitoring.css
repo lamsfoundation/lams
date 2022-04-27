@@ -842,10 +842,6 @@ body.component .ui-menu-item-wrapper.autocomplete-menu-item-with-portrait {
 	padding: 5px;
 }
 
-body.component .ui-menu-item-wrapper.autocomplete-menu-item-with-portrait > p {
-	padding-top: 10px;
-}
-
 .dialogContainer {
   display: none;
   -webkit-overflow-scrolling: touch !important;
