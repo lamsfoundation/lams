@@ -65,17 +65,21 @@
 		
 		// store this frequently used element
 		releaseMarksAlertBox = $('#release-marks-alert');
-		
-		$('#release-marks-schedule-date').datetimepicker({
-			// date must be in future
-			minDate : 0,
-			dateFormat : 'yy-mm-dd'
-		}).change(function(){
-			// if there is no date selected, disable the confirmation button
-			var date = $(this).val();
-			$('#release-marks-schedule-confirm').prop('disabled', !date || date.trim() == '');
-		});
-		
+
+		var marksScheduleDatePicker = $('#release-marks-schedule-date');
+		if (marksScheduleDatePicker.length === 1) {
+			
+			new tempusDominus.TempusDominus(marksScheduleDatePicker[0], tempusDominusDefaultOptions)
+				.dates.formatInput = tempusDominusDateFormatter;
+			
+			marksScheduleDatePicker.change(function(){
+				// if there is no date selected, disable the confirmation button
+				var date = $(this).val();
+				$('#release-marks-schedule-confirm').prop('disabled', !date || date.trim() == '');
+			});
+			
+		}
+
 		onReleaseMarksOpen();
 	});
 
@@ -401,7 +405,7 @@
 								<label for="release-marks-schedule-date" class="form-label"><fmt:message key="gradebook.monitor.releasemarks.schedule.date" /></label>
 							</div>
 							<div class="col-6">
-								<input type="text" class="form-control form-control-sm" id="release-marks-schedule-date" autocomplete="nope" />
+								<input type="text" class="form-control form-control-sm" id="release-marks-schedule-date" autocomplete="off" />
 							</div>
 						</div>
 						<div class="row mt-4">

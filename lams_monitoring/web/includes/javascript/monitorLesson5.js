@@ -22,7 +22,27 @@ var originalSequenceCanvas = null,
 	gateOpenIconPath   = 'images/svg/gateOpen.svg',
 	gateOpenIconData   = null,
 	
-	fileDownloadCheckTimer;
+	fileDownloadCheckTimer,
+	
+	tempusDominusDefaultOptions = {
+		restrictions: {
+			minDate : new Date()
+		},
+		display : {
+			components : {
+				useTwentyfourHour : true
+			},
+			buttons : {
+				today : true,
+				close : true
+			},
+			sideBySide : true
+		}
+	},
+	tempusDominusDateFormatter = function(date) {
+		return date ? date.year + '-' + date.monthFormatted + '-' + date.dateFormatted + ' ' + date.hoursFormatted + ':' + date.minutesFormatted : '';
+	};
+	
 
 $(document).ready(function(){
 	initCommonElements();
@@ -176,14 +196,12 @@ function initLessonTab(){
 		$(this).nextAll('i.fa-pencil').show();
 	});
 	
-	// sets up calendar for schedule date choice
-	$('#scheduleDatetimeField').datetimepicker({
-		'minDate' : 0
-	});
-	// sets up calendar for schedule date choice
-	$('#disableDatetimeField').datetimepicker({
-		'minDate' : 0
-	});
+	new tempusDominus.TempusDominus(document.getElementById('scheduleDatetimeField'), tempusDominusDefaultOptions)
+		.dates.formatInput = tempusDominusDateFormatter;
+		
+	new tempusDominus.TempusDominus(document.getElementById('disableDatetimeField'), tempusDominusDefaultOptions)
+		.dates.formatInput = tempusDominusDateFormatter;
+
 	
 	// sets up dialog for editing class
 	var classDialog = showDialog('classDialog',{
@@ -239,9 +257,11 @@ function initLessonTab(){
 			'resizable' : false
 		}, false);
 	$('.modal-body', emailProgressDialog).empty().append($('#emailProgressDialogContents').show());
+	
 	//initialize datetimepicker
-	$("#emaildatePicker").datetimepicker();
-
+	new tempusDominus.TempusDominus(document.getElementById('emaildatePicker'), tempusDominusDefaultOptions)
+		.dates.formatInput = tempusDominusDateFormatter;
+		
 	// sets gradebook on complete functionality
 	$('#gradebookOnCompleteButton').change(function(){
 		var checked = $(this).prop('checked'),
@@ -1000,9 +1020,11 @@ function sendProgressEmail() {
 }
 
 function addEmailProgressDate() {
+	debugger;
 	var table = $('#emailProgressDialogTable', '#emailProgressDialog'),
 		list = $('.dialogList', table),
-		newDateMS = $('#emaildatePicker').datetimepicker('getDate');
+		newDateMS = new tempusDominus.TempusDominus(document.getElementById('emaildatePicker')).viewDate;
+		
 
 	if ( newDateMS != null ) {
 		if ( newDateMS.getTime() < Date.now()  ) {
