@@ -8,6 +8,7 @@
 	
 	<link rel="icon" type="image/x-icon" href="<lams:LAMSURL/>images/svg/lamsv5_logo.svg">
 	
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.min.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" />
@@ -25,7 +26,6 @@
 		
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.blockUI.js"></script>	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.cookie.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/popper.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
@@ -701,7 +701,6 @@
 	</div>
 </div>
 
-
 <div id="confirmationDialog" class="modal dialogContainer fade" tabindex="-1" role="dialog">
   <div class="modal-dialog  modal-dialog-centered">
     <div class="modal-content">
@@ -714,8 +713,6 @@
     </div>
   </div>
 </div>
-
-<div class="alert" role="alert" id="result"></div>
 
 <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" id="toast-container">
 </div>

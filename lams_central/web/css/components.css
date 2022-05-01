@@ -25,6 +25,7 @@ body.component .info_icon {
 }
 
 .component-page-wrapper {
+	min-height: 100vh;
 	border-radius: 2rem;
 	overflow: hidden;
 	background-color: #F6F5FA;
