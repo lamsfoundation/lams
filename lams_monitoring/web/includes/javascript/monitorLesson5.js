@@ -2510,7 +2510,6 @@ function initGradebookTab() {
 	});
 	*/
 		
-	$('#grid').trigger( 'reloadGrid' );
 	$.extend(true, $.jgrid.guiStyles.bootstrap4, {
 		pager : {
 			pagerSelect : 'form-control-select'
@@ -2523,19 +2522,26 @@ function initGradebookTab() {
 	const gradebooksUpdateSource = new EventSource(LAMS_URL + 'monitoring/monitoring/getGradebookUpdateFlux.do?lessonId=' +  lessonId);
 	gradebooksUpdateSource.onmessage = function (event) {
 		if ("doRefresh" == event.data && $('#gradebookDiv').length === 1){
-		    let expandedGridIds = [];
-		    $("#userView tr:has(.sgexpanded)").each(function () {
+		    let expandedGridIds = [],
+				userGrid = $('#userView'),
+				activityGrid = $('#activityView');
+			// do not update if grid is being edited by the teacher
+			if (userGrid.data('isCellEdited') === true || activityGrid.data('isCellEdited') === true) {
+				return;
+			}
+			
+		    $("tr:has(.sgexpanded)", userGrid).each(function () {
 		        let num = $(this).attr('id');
 		        expandedGridIds.push(num);
 		    });
-			$('#userView').data('expandedGridIds', expandedGridIds).trigger("reloadGrid");
-		
+			userGrid.data('expandedGridIds', expandedGridIds).trigger("reloadGrid");
+			
 			expandedGridIds = [];
-		    $("#activityView tr:has(.sgexpanded)").each(function () {
+		    $("tr:has(.sgexpanded)", activityGrid).each(function () {
 		        let num = $(this).attr('id');
 		        expandedGridIds.push(num);
 		    });
-			$('#activityView').data('expandedGridIds', expandedGridIds).trigger("reloadGrid");
+			activityGrid.data('expandedGridIds', expandedGridIds).trigger("reloadGrid");
 		}
 	};
 }

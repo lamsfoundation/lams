@@ -138,6 +138,7 @@
 			    jQuery("#userView").clearGridData();
 			   	alert("<fmt:message key="gradebook.error.loaderror"/>");
 		    },
+
 		    subGrid: true,
 			subGridRowExpanded: function(subgrid_id, row_id) {
 				var subgrid_table_id = subgrid_id+"_t",
@@ -402,7 +403,13 @@
 				gridComplete: function(){
 			   	 	initializePortraitPopover('<lams:LAMSURL/>');
 				}
-			}).navGrid("#userViewPager", {edit:false,add:false,del:false,search:false}); // applying refresh button
+			}).navGrid("#userViewPager", {edit:false,add:false,del:false,search:false})// applying refresh button
+			  .on('jqGridBeforeEditCell', function(){
+				  $(this).data('isCellEdited', true);
+			  })
+			  .on('jqGridAfterSaveCell jqGridAfterRestoreCell', function(){
+				  $(this).data('isCellEdited', false);
+			  });
 			jQuery("#userView").jqGrid('filterToolbar');
 
 			// Creating activity view with sub learner view
@@ -443,6 +450,12 @@
 		    		jQuery("#activityView").clearGridData();
 		    		alert("<fmt:message key="gradebook.error.loaderror"/>");
 		    	},
+		    	beforeEditCell : function() {
+				    $(this).data('isCellEdited', true);
+				},
+				afterEditCell : function(){
+					$(this).data('isCellEdited', false);
+				},
 			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
 				   var subgrid_table_id;
@@ -503,6 +516,12 @@
 					    		jQuery("#"+subgrid_table_id).clearGridData();
 					    		alert("<fmt:message key="gradebook.error.loaderror"/>");
 					    	 },
+				    	 beforeEditCell : function() {
+						    $("#activityView").data('isCellEdited', true);
+						 },
+						 afterEditCell : function(){
+							$("#activityView").data('isCellEdited', false);
+						 },
 				    	 formatCell: function(rowid, cellname,value, iRow, iCol) {
 				    	 	if (cellname == "mark") {
 				    	 		
@@ -628,7 +647,13 @@
 								     loadError: function(xhr,st,err) {
 								    	jQuery("#"+subgrid_table_id).clearGridData();
 								 	 	alert("<fmt:message key="gradebook.error.loaderror"/>");
-								     }
+								     },
+							    	 beforeEditCell : function() {
+									    $("#activityView").data('isCellEdited', true);
+									 },
+									 afterEditCell : function(){
+										$("#activityView").data('isCellEdited', false);
+									 },
 							  	});
 							}
 					 }).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false}) // applying refresh button
@@ -638,8 +663,14 @@
 				 gridComplete: function(){
 				 	fixPagerInCenter('activityViewPager', 0);
 				 }	 
-			}).navGrid("#activityViewPager", {edit:false,add:false,del:false,search:false}); // enable refresh button
-			
+			}).navGrid("#activityViewPager", {edit:false,add:false,del:false,search:false}) // enable refresh button
+			  .on('jqGridBeforeEditCell', function(){
+				  $(this).data('isCellEdited', true);
+			  })
+			  .on('jqGridAfterSaveCell jqGridAfterRestoreCell', function(){
+				  $(this).data('isCellEdited', false);
+			  });
+			  
 			$("#export-grades-button").click(function() {
 				var areaToBlock = "export-link-area";
 				var exportExcelUrl = "<lams:WebAppURL/>gradebookMonitoring/exportExcelLessonGradebook.do?<csrf:token/>&lessonID=${lessonDetails.lessonID}";
