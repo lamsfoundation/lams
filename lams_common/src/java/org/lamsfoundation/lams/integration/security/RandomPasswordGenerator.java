@@ -69,6 +69,17 @@ public class RandomPasswordGenerator {
     }
 
     /**
+     * Produce a password with
+     */
+    public static String nextPassword() {
+	Integer passwordLength = Configuration.getAsInt(ConfigurationKeys.PASSWORD_POLICY_MINIMUM_CHARACTERS);
+	if (passwordLength == null || passwordLength < MINIMUM_PASSWORD_LENGTH) {
+	    passwordLength = MINIMUM_PASSWORD_LENGTH;
+	}
+	return RandomPasswordGenerator.nextPassword(passwordLength);
+    }
+
+    /**
      * Build a password that passes configured validation
      */
     public static String nextPasswordValidated() {

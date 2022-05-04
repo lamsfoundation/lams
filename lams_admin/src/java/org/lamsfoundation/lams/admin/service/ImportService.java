@@ -39,6 +39,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.CellType;
+import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.themes.Theme;
@@ -110,8 +111,7 @@ public class ImportService implements IImportService {
     private static final short ADMIN_CHANGE_STATUS = 6;
 
     // class-wide variables
-    ArrayList<ArrayList> results = new ArrayList<>();
-    ArrayList<String> rowResult = new ArrayList<>();
+    List<String> rowResult = new ArrayList<>();
     private boolean emptyRow;
     private boolean hasError;
     private Organisation parentOrg;
@@ -139,21 +139,21 @@ public class ImportService implements IImportService {
     }
 
     @Override
-    public List parseSpreadsheet(File fileItem, String sessionId) throws IOException {
+    public List<List<String>> parseSpreadsheet(File fileItem, String sessionId) throws IOException {
 	if (isUserSpreadsheet(fileItem)) {
 	    return parseUserSpreadsheet(fileItem, sessionId);
 	} else if (isRolesSpreadsheet(fileItem)) {
 	    return parseRolesSpreadsheet(fileItem, sessionId);
 	}
-	return new ArrayList();
+	return new ArrayList<>();
     }
 
     // returns x size list where x is number of orgs.
     // each item in the list lists the id, name, and parent's id of that org; otherwise
     // the items in the list are error messages.
     @Override
-    public List parseGroupSpreadsheet(File fileItem, String sessionId) throws IOException {
-	results = new ArrayList<>();
+    public List<List<String>> parseGroupSpreadsheet(File fileItem, String sessionId) throws IOException {
+	List<List<String>> results = new ArrayList<>();
 	parentOrg = service.getRootOrganisation();
 	HSSFSheet sheet = getSheet(fileItem);
 	int startRow = sheet.getFirstRowNum();
@@ -272,8 +272,8 @@ public class ImportService implements IImportService {
     }
 
     @Override
-    public List parseUserSpreadsheet(File fileItem, String sessionId) throws IOException {
-	results = new ArrayList<>();
+    public List<List<String>> parseUserSpreadsheet(File fileItem, String sessionId) throws IOException {
+	List<List<String>> results = new ArrayList<>();
 	HSSFSheet sheet = getSheet(fileItem);
 	int startRow = sheet.getFirstRowNum();
 	int endRow = sheet.getLastRowNum();
@@ -290,8 +290,9 @@ public class ImportService implements IImportService {
 	    emptyRow = true;
 	    hasError = false;
 	    rowResult = new ArrayList<>();
+	    StringBuilder generatedPassword = new StringBuilder();
 	    row = sheet.getRow(i);
-	    user = parseUser(row, i);
+	    user = parseUser(row, i, generatedPassword);
 
 	    if (emptyRow) {
 		ImportService.log.debug("Row " + i + " is empty.");
@@ -301,17 +302,19 @@ public class ImportService implements IImportService {
 		ImportService.log.debug("Row " + i + " has an error which has been sent to the browser.");
 		results.add(rowResult);
 		writeErrorsAuditLog(i + 1, rowResult, userDTO);
-		updateImportStatus(sessionId, results.size());
+		updateImportStatus(sessionId, results.size(), successful);
 		continue;
 	    } else {
 		try {
 		    service.saveUser(user);
 		    successful++;
 		    writeAuditLog(user, userDTO);
-		    ImportService.log.debug("Row " + i + " saved user: " + user.getLogin());
+		    ImportService.log.debug("Row " + i + " saved user: " + user.getLogin()
+			    + (generatedPassword.length() > 0 ? " with a generated password" : ""));
 		} catch (Exception e) {
 		    ImportService.log.debug(e);
 		    rowResult.add(messageService.getMessage("error.fail.add"));
+		    generatedPassword = new StringBuilder();
 		}
 		if (rowResult.size() > 0) {
 		    if (ImportService.log.isDebugEnabled()) {
@@ -319,12 +322,17 @@ public class ImportService implements IImportService {
 		    }
 		    writeErrorsAuditLog(i + 1, rowResult, userDTO);
 		}
+		if (generatedPassword.length() > 0) {
+		    rowResult.add(messageService.getMessage("msg.password.generated",
+			    new String[] { user.getLogin(), generatedPassword.toString() }));
+		}
 		results.add(rowResult);
-		updateImportStatus(sessionId, results.size());
+		updateImportStatus(sessionId, results.size(), successful);
 	    }
 	}
 	ImportService.log.debug("Found " + results.size() + " users in spreadsheet.");
 	writeSuccessAuditLog(successful, userDTO, "audit.successful.user.import");
+
 	return results;
     }
 
@@ -336,15 +344,16 @@ public class ImportService implements IImportService {
 	ss.setAttribute(IImportService.STATUS_IMPORTED, 0);
     }
 
-    private void updateImportStatus(String sessionId, int imported) {
+    private void updateImportStatus(String sessionId, int imported, int successful) {
 	HttpSession ss = SessionManager.getSession(sessionId);
 	ss.removeAttribute(IImportService.STATUS_IMPORTED);
 	ss.setAttribute(IImportService.STATUS_IMPORTED, imported);
+	ss.setAttribute(IImportService.STATUS_SUCCESSFUL, successful);
     }
 
     @Override
-    public List parseRolesSpreadsheet(File fileItem, String sessionId) throws IOException {
-	results = new ArrayList<>();
+    public List<List<String>> parseRolesSpreadsheet(File fileItem, String sessionId) throws IOException {
+	List<List<String>> results = new ArrayList<>();
 	HSSFSheet sheet = getSheet(fileItem);
 	int startRow = sheet.getFirstRowNum();
 	int endRow = sheet.getLastRowNum();
@@ -375,7 +384,7 @@ public class ImportService implements IImportService {
 		ImportService.log.debug("Row " + i + " has an error which has been sent to the browser.");
 		results.add(rowResult);
 		writeErrorsAuditLog(i + 1, rowResult, userDTO);
-		updateImportStatus(sessionId, results.size());
+		updateImportStatus(sessionId, results.size(), successful);
 		continue;
 	    } else {
 		try {
@@ -392,7 +401,7 @@ public class ImportService implements IImportService {
 		    writeErrorsAuditLog(i + 1, rowResult, userDTO);
 		}
 		results.add(rowResult);
-		updateImportStatus(sessionId, results.size());
+		updateImportStatus(sessionId, results.size(), successful);
 	    }
 	}
 	ImportService.log.debug("Found " + results.size() + " users in spreadsheet.");
@@ -456,7 +465,7 @@ public class ImportService implements IImportService {
      * gathers error messages for each cell as required, unless it's the login field in which case, flags whole row as
      * empty.
      */
-    private User parseUser(HSSFRow row, int rowIndex) {
+    private User parseUser(HSSFRow row, int rowIndex, StringBuilder generatedPassword) {
 	User user = new User();
 	String[] args = new String[1];
 
@@ -483,11 +492,9 @@ public class ImportService implements IImportService {
 	String password = parseStringCell(row.getCell(ImportService.PASSWORD));
 	// password validation
 	if (StringUtils.isBlank(password)) {
-	    rowResult.add(messageService.getMessage("error.password.required"));
-	    hasError = true;
-	    return null;
-	}
-	if (!ValidationUtil.isPasswordValueValid(password, password)) {
+	    password = RandomPasswordGenerator.nextPassword();
+	    generatedPassword.append(password);
+	} else if (!ValidationUtil.isPasswordValueValid(password, password)) {
 	    rowResult.add(messageService.getMessage("label.password.restrictions"));
 	    hasError = true;
 	    return null;
@@ -596,6 +603,12 @@ public class ImportService implements IImportService {
 	user.setFirstLogin(true);
 
 	service.updatePassword(user, password);
+
+	if (generatedPassword.length() > 0) {
+	    // if password was generated, make user change it on first log in
+	    user.setChangePassword(true);
+	    service.saveUser(user);
+	}
 
 	return user;
     }

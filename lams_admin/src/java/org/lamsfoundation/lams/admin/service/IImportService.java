@@ -42,6 +42,7 @@ public interface IImportService {
     public static final String IMPORT_GROUPS_HELP_PAGE = "Import+Groups";
     public static final String STATUS_IMPORT_TOTAL = "importTotal";
     public static final String STATUS_IMPORTED = "imported";
+    public static final String STATUS_SUCCESSFUL = "successful";
     public static final String IMPORT_FILE = "file";
     public static final String IMPORT_RESULTS = "results";
     public static final int THRESHOLD = 500;
