@@ -25,6 +25,8 @@ package org.lamsfoundation.lams.admin.service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -45,6 +47,7 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.timezone.service.ITimezoneService;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
+import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -53,6 +56,10 @@ import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.Emailer;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
@@ -110,6 +117,15 @@ public class ImportService implements IImportService {
     private static final short ADMIN_BROWSE_ALL_USERS = 5;
     private static final short ADMIN_CHANGE_STATUS = 6;
 
+    private static String USER_IMPORT_PASSWORD_CHANGE_EMAIL_TEMPLATE_CONTENT;
+    private static final String USER_IMPORT_PASSWORD_CHANGE_EMAIL_PAGE_TITLE_PLACEHOLDER = "[PAGE_TITLE_PLACEHOLDER]";
+    private static final String USER_IMPORT_PASSWORD_CHANGE_EMAIL_TOP_HEADER_PLACEHOLDER = "[TOP_HEADER_PLACEHOLDER]";
+    private static final String USER_IMPORT_PASSWORD_CHANGE_EMAIL_CONTENT_START_PLACEHOLDER = "[CONTENT_START_PLACEHOLDER]";
+    private static final String USER_IMPORT_PASSWORD_CHANGE_EMAIL_CONTENT_LINK_PLACEHOLDER = "[CONTENT_LINK_PLACEHOLDER]";
+    private static final String USER_IMPORT_PASSWORD_CHANGE_EMAIL_CONTENT_END_PLACEHOLDER = "[CONTENT_END_PLACEHOLDER]";
+    private static final String USER_IMPORT_PASSWORD_CHANGE_EMAIL_CONTENT_THANKS_PLACEHOLDER = "[CONTENT_THANKS_PLACEHOLDER]";
+    private static final String USER_IMPORT_PASSWORD_CHANGE_EMAIL_FOOTER_PLACEHOLDER = "[FOOTER_PLACEHOLDER]";
+
     // class-wide variables
     List<String> rowResult = new ArrayList<>();
     private boolean emptyRow;
@@ -139,9 +155,9 @@ public class ImportService implements IImportService {
     }
 
     @Override
-    public List<List<String>> parseSpreadsheet(File fileItem, String sessionId) throws IOException {
+    public List<List<String>> parseSpreadsheet(File fileItem, String sessionId, boolean sendEmail) throws IOException {
 	if (isUserSpreadsheet(fileItem)) {
-	    return parseUserSpreadsheet(fileItem, sessionId);
+	    return parseUserSpreadsheet(fileItem, sessionId, sendEmail);
 	} else if (isRolesSpreadsheet(fileItem)) {
 	    return parseRolesSpreadsheet(fileItem, sessionId);
 	}
@@ -271,8 +287,8 @@ public class ImportService implements IImportService {
 	return endRow - startRow;
     }
 
-    @Override
-    public List<List<String>> parseUserSpreadsheet(File fileItem, String sessionId) throws IOException {
+    private List<List<String>> parseUserSpreadsheet(File fileItem, String sessionId, boolean sendEmail)
+	    throws IOException {
 	List<List<String>> results = new ArrayList<>();
 	HSSFSheet sheet = getSheet(fileItem);
 	int startRow = sheet.getFirstRowNum();
@@ -311,6 +327,9 @@ public class ImportService implements IImportService {
 		    writeAuditLog(user, userDTO);
 		    ImportService.log.debug("Row " + i + " saved user: " + user.getLogin()
 			    + (generatedPassword.length() > 0 ? " with a generated password" : ""));
+		    if (sendEmail) {
+			sendUserImportPasswordChangeEmail(user);
+		    }
 		} catch (Exception e) {
 		    ImportService.log.debug(e);
 		    rowResult.add(messageService.getMessage("error.fail.add"));
@@ -349,6 +368,81 @@ public class ImportService implements IImportService {
 	ss.removeAttribute(IImportService.STATUS_IMPORTED);
 	ss.setAttribute(IImportService.STATUS_IMPORTED, imported);
 	ss.setAttribute(IImportService.STATUS_SUCCESSFUL, successful);
+    }
+
+    /**
+     * Send an email with password change link so the user can set up their password after account got created.
+     */
+    private void sendUserImportPasswordChangeEmail(User user) {
+	try {
+	    if (USER_IMPORT_PASSWORD_CHANGE_EMAIL_TEMPLATE_CONTENT == null) {
+		USER_IMPORT_PASSWORD_CHANGE_EMAIL_TEMPLATE_CONTENT = Files
+			.readString(Paths.get(Configuration.get(ConfigurationKeys.LAMS_EAR_DIR), FileUtil.LAMS_WWW_DIR,
+				"userImportPasswordChangeEmailTemplate.html"));
+	    }
+
+	    String key = RandomPasswordGenerator.generateForgotPasswordKey();
+
+	    // all good, save the request in the db
+	    ForgotPasswordRequest fp = new ForgotPasswordRequest();
+	    fp.setRequestDate(new Date());
+	    fp.setUserId(user.getUserId());
+	    fp.setRequestKey(key);
+	    service.save(fp);
+
+	    // fill email content with given user's data
+	    StringBuilder content = new StringBuilder(USER_IMPORT_PASSWORD_CHANGE_EMAIL_TEMPLATE_CONTENT);
+	    String emailSubject = messageService.getMessage("user.import.password.change.email.content.subject");
+
+	    int placeholderStart = content.indexOf(USER_IMPORT_PASSWORD_CHANGE_EMAIL_PAGE_TITLE_PLACEHOLDER);
+	    int placeholderEnd = placeholderStart + USER_IMPORT_PASSWORD_CHANGE_EMAIL_PAGE_TITLE_PLACEHOLDER.length();
+	    content.replace(placeholderStart, placeholderEnd, emailSubject);
+
+	    placeholderStart = content.indexOf(USER_IMPORT_PASSWORD_CHANGE_EMAIL_TOP_HEADER_PLACEHOLDER);
+	    placeholderEnd = placeholderStart + USER_IMPORT_PASSWORD_CHANGE_EMAIL_TOP_HEADER_PLACEHOLDER.length();
+	    content.replace(placeholderStart, placeholderEnd, emailSubject);
+
+	    placeholderStart = content.indexOf(USER_IMPORT_PASSWORD_CHANGE_EMAIL_CONTENT_START_PLACEHOLDER);
+	    placeholderEnd = placeholderStart + USER_IMPORT_PASSWORD_CHANGE_EMAIL_CONTENT_START_PLACEHOLDER.length();
+	    content.replace(placeholderStart, placeholderEnd,
+		    messageService.getMessage("user.import.password.change.email.content.start",
+			    new Object[] { user.getFirstName() + " " + user.getLastName() }));
+
+	    StringBuilder link = new StringBuilder("<a href=\"").append(Configuration.get(ConfigurationKeys.SERVER_URL))
+		    .append("forgotPasswordChange.jsp?key=").append(key).append("\">")
+		    .append(messageService.getMessage("user.import.password.change.email.content.link.label"))
+		    .append("</a>");
+
+	    placeholderStart = content.indexOf(USER_IMPORT_PASSWORD_CHANGE_EMAIL_CONTENT_LINK_PLACEHOLDER);
+	    placeholderEnd = placeholderStart + USER_IMPORT_PASSWORD_CHANGE_EMAIL_CONTENT_LINK_PLACEHOLDER.length();
+	    content.replace(placeholderStart, placeholderEnd,
+		    messageService.getMessage("user.import.password.change.email.content.account.created",
+			    new Object[] { user.getLogin(), link.toString() }));
+
+	    placeholderStart = content.indexOf(USER_IMPORT_PASSWORD_CHANGE_EMAIL_CONTENT_END_PLACEHOLDER);
+	    placeholderEnd = placeholderStart + USER_IMPORT_PASSWORD_CHANGE_EMAIL_CONTENT_END_PLACEHOLDER.length();
+	    content.replace(placeholderStart, placeholderEnd,
+		    messageService.getMessage("user.import.password.change.email.content.end"));
+
+	    placeholderStart = content.indexOf(USER_IMPORT_PASSWORD_CHANGE_EMAIL_CONTENT_THANKS_PLACEHOLDER);
+	    placeholderEnd = placeholderStart + USER_IMPORT_PASSWORD_CHANGE_EMAIL_CONTENT_THANKS_PLACEHOLDER.length();
+	    content.replace(placeholderStart, placeholderEnd,
+		    messageService.getMessage("user.import.password.change.email.content.thanks"));
+
+	    placeholderStart = content.indexOf(USER_IMPORT_PASSWORD_CHANGE_EMAIL_FOOTER_PLACEHOLDER);
+	    placeholderEnd = placeholderStart + USER_IMPORT_PASSWORD_CHANGE_EMAIL_FOOTER_PLACEHOLDER.length();
+	    content.replace(placeholderStart, placeholderEnd,
+		    messageService.getMessage("user.import.password.change.email.content.footer"));
+
+	    boolean isHtmlFormat = true;
+
+	    // log.info(content.toString());
+	    // send the email
+	    Emailer.sendFromSupportEmail(emailSubject, user.getEmail(), content.toString(), isHtmlFormat);
+	} catch (Exception e) {
+	    // failure handling
+	    log.error("Problem sending email to: " + user.getLogin() + " with email: " + user.getEmail(), e);
+	}
     }
 
     @Override
@@ -603,12 +697,6 @@ public class ImportService implements IImportService {
 	user.setFirstLogin(true);
 
 	service.updatePassword(user, password);
-
-	if (generatedPassword.length() > 0) {
-	    // if password was generated, make user change it on first log in
-	    user.setChangePassword(true);
-	    service.saveUser(user);
-	}
 
 	return user;
     }

@@ -20,11 +20,19 @@
  */
 package org.lamsfoundation.lams.integration.security;
 
+import java.io.IOException;
+import java.util.Properties;
 import java.util.Random;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.hibernate.HibernateException;
+import org.hibernate.id.Configurable;
+import org.hibernate.id.IdentifierGenerator;
+import org.hibernate.id.UUIDGenerator;
+import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.ValidationUtil;
 
 /**
@@ -112,5 +120,22 @@ public class RandomPasswordGenerator {
 	}
 
 	return result;
+    }
+
+    /**
+     * Generates the unique key used for the forgot password request
+     *
+     * @return a unique key
+     * @throws HibernateException
+     * @throws FileUtilException
+     * @throws IOException
+     */
+    public static String generateForgotPasswordKey() {
+	Properties props = new Properties();
+
+	IdentifierGenerator uuidGen = new UUIDGenerator();
+	((Configurable) uuidGen).configure(StringType.INSTANCE, props, null);
+
+	return ((String) uuidGen.generate(null, null)).toLowerCase();
     }
 }
