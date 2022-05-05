@@ -63,6 +63,7 @@ import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -408,8 +409,9 @@ public class ImportService implements IImportService {
 		    messageService.getMessage("user.import.password.change.email.content.start",
 			    new Object[] { user.getFirstName() + " " + user.getLastName() }));
 
-	    StringBuilder link = new StringBuilder("<a href=\"").append(Configuration.get(ConfigurationKeys.SERVER_URL))
-		    .append("forgotPasswordChange.jsp?key=").append(key).append("\">")
+	    StringBuilder changePasswordLink = new StringBuilder("<a href=\"")
+		    .append(Configuration.get(ConfigurationKeys.SERVER_URL)).append("forgotPasswordChange.jsp?key=")
+		    .append(key).append("\">")
 		    .append(messageService.getMessage("user.import.password.change.email.content.link.label"))
 		    .append("</a>");
 
@@ -417,12 +419,16 @@ public class ImportService implements IImportService {
 	    placeholderEnd = placeholderStart + USER_IMPORT_PASSWORD_CHANGE_EMAIL_CONTENT_LINK_PLACEHOLDER.length();
 	    content.replace(placeholderStart, placeholderEnd,
 		    messageService.getMessage("user.import.password.change.email.content.account.created",
-			    new Object[] { user.getLogin(), link.toString() }));
+			    new Object[] { user.getLogin(), changePasswordLink.toString() }));
+
+	    String baseServerURL = WebUtil.getBaseServerURL();
+	    StringBuilder serverLink = new StringBuilder("<a href=\"").append(baseServerURL).append("\">")
+		    .append(baseServerURL).append("</a>");
 
 	    placeholderStart = content.indexOf(USER_IMPORT_PASSWORD_CHANGE_EMAIL_CONTENT_END_PLACEHOLDER);
 	    placeholderEnd = placeholderStart + USER_IMPORT_PASSWORD_CHANGE_EMAIL_CONTENT_END_PLACEHOLDER.length();
-	    content.replace(placeholderStart, placeholderEnd,
-		    messageService.getMessage("user.import.password.change.email.content.end"));
+	    content.replace(placeholderStart, placeholderEnd, messageService.getMessage(
+		    "user.import.password.change.email.content.end", new Object[] { serverLink.toString() }));
 
 	    placeholderStart = content.indexOf(USER_IMPORT_PASSWORD_CHANGE_EMAIL_CONTENT_THANKS_PLACEHOLDER);
 	    placeholderEnd = placeholderStart + USER_IMPORT_PASSWORD_CHANGE_EMAIL_CONTENT_THANKS_PLACEHOLDER.length();
@@ -436,7 +442,7 @@ public class ImportService implements IImportService {
 
 	    boolean isHtmlFormat = true;
 
-	    // log.info(content.toString());
+	    log.info(content.toString());
 	    // send the email
 	    Emailer.sendFromSupportEmail(emailSubject, user.getEmail(), content.toString(), isHtmlFormat);
 	} catch (Exception e) {
