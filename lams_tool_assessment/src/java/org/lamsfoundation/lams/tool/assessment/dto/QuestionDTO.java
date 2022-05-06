@@ -51,6 +51,8 @@ public class QuestionDTO implements Comparable<QuestionDTO> {
 
     private boolean caseSensitive;
 
+    private boolean exactMatch;
+
     private boolean correctAnswer;
 
     private boolean allowRichEditor;
@@ -139,6 +141,7 @@ public class QuestionDTO implements Comparable<QuestionDTO> {
 	this.shuffle = qbQuestion.isShuffle();
 	this.prefixAnswersWithLetters = qbQuestion.isPrefixAnswersWithLetters();
 	this.caseSensitive = qbQuestion.isCaseSensitive();
+	this.exactMatch = qbQuestion.isExactMatch();
 	this.correctAnswer = qbQuestion.getCorrectAnswer();
 	this.allowRichEditor = qbQuestion.isAllowRichEditor();
 	this.maxWordsLimit = qbQuestion.getMaxWordsLimit();
@@ -294,6 +297,14 @@ public class QuestionDTO implements Comparable<QuestionDTO> {
 
     public void setCaseSensitive(boolean caseSensitive) {
 	this.caseSensitive = caseSensitive;
+    }
+
+    public boolean isExactMatch() {
+	return exactMatch;
+    }
+
+    public void setExactMatch(boolean exactMatch) {
+	this.exactMatch = exactMatch;
     }
 
     public boolean getCorrectAnswer() {

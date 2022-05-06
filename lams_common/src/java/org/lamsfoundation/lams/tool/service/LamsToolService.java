@@ -554,25 +554,23 @@ public class LamsToolService implements ILamsToolService {
 
     @Override
     public boolean recalculateMarksForVsaQuestion(Long toolQuestionUid, String answer) {
-	QbToolQuestion toolQuestion = activityDAO.find(QbToolQuestion.class, toolQuestionUid);
-	Long qbQuestionUid = toolQuestion.getQbQuestion().getUid();
-	boolean answerFoundInLearnerResults = recalculateAssessmentMarksForVsaQuestion(qbQuestionUid, answer);
-	answerFoundInLearnerResults |= recalculateScratchieMarksForVsaQuestion(qbQuestionUid, answer);
+	boolean answerFoundInLearnerResults = recalculateAssessmentMarksForVsaQuestion(toolQuestionUid, answer);
+	answerFoundInLearnerResults |= recalculateScratchieMarksForVsaQuestion(toolQuestionUid, answer);
 	return answerFoundInLearnerResults;
     }
 
-    private boolean recalculateAssessmentMarksForVsaQuestion(Long qbQuestionUid, String answer) {
+    private boolean recalculateAssessmentMarksForVsaQuestion(Long toolQuestionUid, String answer) {
 	Tool assessmentTool = toolDAO.getToolBySignature(CommonConstants.TOOL_SIGNATURE_ASSESSMENT);
 	ICommonAssessmentService sessionManager = (ICommonAssessmentService) lamsCoreToolService
 		.findToolService(assessmentTool);
-	return sessionManager.recalculateMarksForVsaQuestion(qbQuestionUid, answer);
+	return sessionManager.recalculateMarksForVsaQuestion(toolQuestionUid, answer);
     }
 
-    private boolean recalculateScratchieMarksForVsaQuestion(Long qbQuestionUid, String answer) {
+    private boolean recalculateScratchieMarksForVsaQuestion(Long toolQuestionUid, String answer) {
 	Tool scratchieTool = toolDAO.getToolBySignature(CommonConstants.TOOL_SIGNATURE_SCRATCHIE);
 	ICommonScratchieService sessionManager = (ICommonScratchieService) lamsCoreToolService
 		.findToolService(scratchieTool);
-	return sessionManager.recalculateMarksForVsaQuestion(qbQuestionUid, answer);
+	return sessionManager.recalculateMarksForVsaQuestion(toolQuestionUid, answer);
     }
 
     @Override

@@ -135,6 +135,7 @@ public class EditQbQuestionController {
 	form.setShuffle(qbQuestion.isShuffle());
 	form.setPrefixAnswersWithLetters(qbQuestion.isPrefixAnswersWithLetters());
 	form.setCaseSensitive(qbQuestion.isCaseSensitive());
+	form.setExactMatch(qbQuestion.isExactMatch());
 	form.setCorrectAnswer(qbQuestion.getCorrectAnswer());
 	form.setAllowRichEditor(qbQuestion.isAllowRichEditor());
 	form.setMaxWordsLimit(qbQuestion.getMaxWordsLimit());

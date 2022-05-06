@@ -56,9 +56,6 @@ import org.lamsfoundation.lams.util.excel.ExcelSheet;
  */
 public interface IScratchieService extends ICommonToolService {
 
-    public static final String VSA_ANSWER_NORMALISE_JAVA_REG_EXP = "\\W";
-    public static final String VSA_ANSWER_NORMALISE_SQL_REG_EXP = "[^[:alpha:][:alnum:]_]";
-
     /**
      * Get <code>Scratchie</code> by toolContentID.
      *
@@ -408,7 +405,8 @@ public interface IScratchieService extends ICommonToolService {
      * @param oldItems
      * @param newItems
      */
-    void recalculateUserAnswers(Scratchie scratchie, Set<ScratchieItem> oldItems, Set<ScratchieItem> newItems, String oldPresetMarks);
+    void recalculateUserAnswers(Scratchie scratchie, Set<ScratchieItem> oldItems, Set<ScratchieItem> newItems,
+	    String oldPresetMarks);
 
     void releaseFromCache(Object object);
 

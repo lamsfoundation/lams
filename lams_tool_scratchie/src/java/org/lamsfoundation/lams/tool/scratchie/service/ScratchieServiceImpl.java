@@ -592,8 +592,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     }
 
     @Override
-    public boolean recalculateMarksForVsaQuestion(Long qbQuestionUid, String answer) {
-	List<Long> sessionIds = scratchieSessionDao.getSessionIdsByQbQuestion(qbQuestionUid, answer);
+    public boolean recalculateMarksForVsaQuestion(Long toolQuestionUid, String answer) {
+	List<Long> sessionIds = scratchieSessionDao.getSessionIdsByQbToolQuestion(toolQuestionUid, answer);
 	// recalculate marks if it's required
 	for (Long sessionId : sessionIds) {
 	    recalculateMarkForSession(sessionId, true);
@@ -629,7 +629,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		List<ScratchieAnswerVisitLog> visitLogs = scratchieAnswerVisitDao.getVsaLogsByItem(item.getUid());
 		for (ScratchieAnswerVisitLog visitLog : visitLogs) {
 		    String answer = visitLog.getAnswer();
-		    if (QbUtils.normaliseVSAnswer(answer) == null) {
+		    if (QbUtils.normaliseVSAnswer(answer, qbQuestion.isExactMatch()) == null) {
 			continue;
 		    }
 
@@ -1100,8 +1100,9 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	String name = correctAnswersGroup.getName();
 
 	for (String userAnswer : userAnswers) {
-	    String normalisedQuestionAnswer = QbUtils.normaliseVSAnswer(userAnswer);
-	    if (QbUtils.isVSAnswerAllocated(name, normalisedQuestionAnswer, qbQuestion.isCaseSensitive())) {
+	    String normalisedQuestionAnswer = QbUtils.normaliseVSAnswer(userAnswer, qbQuestion.isExactMatch());
+	    if (QbUtils.isVSAnswerAllocated(name, normalisedQuestionAnswer, qbQuestion.isCaseSensitive(),
+		    qbQuestion.isExactMatch())) {
 		return true;
 	    }
 	}
@@ -1145,9 +1146,10 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	for (ScratchieAnswerVisitLog userLog : userLogs) {
 	    if (userLog.getQbToolQuestion().getUid().equals(item.getUid())) {
 		itemAttempts++;
-		String normalisedQuestionAnswer = QbUtils.normaliseVSAnswer(userLog.getAnswer());
+		String normalisedQuestionAnswer = QbUtils.normaliseVSAnswer(userLog.getAnswer(),
+			qbQuestion.isExactMatch());
 		if (correctVsaOption != null && QbUtils.isVSAnswerAllocated(correctVsaOption, normalisedQuestionAnswer,
-			qbQuestion.isCaseSensitive())) {
+			qbQuestion.isCaseSensitive(), qbQuestion.isExactMatch())) {
 		    break;
 		}
 	    }

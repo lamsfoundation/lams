@@ -89,29 +89,31 @@ public class QbUtils {
 	form.setOldCollectionUid(collectionUid);
     }
 
-    public static String normaliseVSAnswer(String answer) {
+    public static String normaliseVSAnswer(String answer, boolean isExactMatch) {
 	if (StringUtils.isBlank(answer)) {
 	    return null;
 	}
-	String normalisedAnswer = answer.replaceAll(VSA_ANSWER_NORMALISE_JAVA_REG_EXP, "");
+	String normalisedAnswer = isExactMatch ? answer.strip()
+		: answer.replaceAll(VSA_ANSWER_NORMALISE_JAVA_REG_EXP, "");
 	if (StringUtils.isBlank(normalisedAnswer)) {
 	    return null;
 	}
 	return normalisedAnswer;
     }
 
-    public static Set<String> normaliseVSOption(String option) {
+    public static Set<String> normaliseVSOption(String option, boolean isExactMatch) {
 	return StringUtils.isBlank(option) ? Set.of()
 		: Stream.of(option.split(VSA_ANSWER_DELIMITER)).filter(StringUtils::isNotBlank)
-			.map(answer -> QbUtils.normaliseVSAnswer(answer)).filter(StringUtils::isNotBlank)
+			.map(answer -> QbUtils.normaliseVSAnswer(answer, isExactMatch)).filter(StringUtils::isNotBlank)
 			.collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public static boolean isVSAnswerAllocated(String option, String normalisedAnswer, boolean isCaseSensitive) {
+    public static boolean isVSAnswerAllocated(String option, String normalisedAnswer, boolean isCaseSensitive,
+	    boolean isExactMatch) {
 	if (StringUtils.isBlank(option) || StringUtils.isBlank(normalisedAnswer)) {
 	    return false;
 	}
-	return QbUtils.normaliseVSOption(option).stream()
+	return QbUtils.normaliseVSOption(option, isExactMatch).stream()
 		.anyMatch(s -> isCaseSensitive ? s.equals(normalisedAnswer) : s.equalsIgnoreCase(normalisedAnswer));
     }
 
@@ -122,7 +124,9 @@ public class QbUtils {
      *            is an accumulator for unallocated answers so they do not appear in VSA allocation UI twice
      */
     public static boolean isVSAnswerAllocated(QbQuestion qbQuestion, String answer, Set<String> notAllocatedAnswers) {
-	String normalisedAnswer = QbUtils.normaliseVSAnswer(answer);
+	boolean isExactMatch = qbQuestion.isExactMatch();
+
+	String normalisedAnswer = QbUtils.normaliseVSAnswer(answer, isExactMatch);
 	if (StringUtils.isBlank(normalisedAnswer)) {
 	    return false;
 	}
@@ -132,7 +136,8 @@ public class QbUtils {
 
 	for (QbOption option : qbQuestion.getQbOptions()) {
 	    String name = option.getName();
-	    isAnswerAllocated = QbUtils.isVSAnswerAllocated(name, normalisedAnswer, isQuestionCaseSensitive);
+	    isAnswerAllocated = QbUtils.isVSAnswerAllocated(name, normalisedAnswer, isQuestionCaseSensitive,
+		    isExactMatch);
 	    if (isAnswerAllocated) {
 		break;
 	    }
