@@ -76,12 +76,12 @@ public class ImportExcelSaveController {
 	String sessionId = SessionManager.getSession().getId();
 	SessionManager.getSession().setAttribute(IImportService.IMPORT_FILE, file);
 	// use a new thread only if number of users is > threshold
-	if (importService.getNumRows(file) < IImportService.THRESHOLD) {
-	    List results = importService.parseSpreadsheet(file, sessionId);
+	if (!importExcelForm.isSendEmail() && importService.getNumRows(file) < IImportService.THRESHOLD) {
+	    List results = importService.parseSpreadsheet(file, sessionId, importExcelForm.isSendEmail());
 	    SessionManager.getSession(sessionId).setAttribute(IImportService.IMPORT_RESULTS, results);
 	    return "forward:/importuserresult.do";
 	} else {
-	    Thread t = new Thread(new ImportExcelThread(sessionId));
+	    Thread t = new Thread(new ImportExcelThread(sessionId, importExcelForm.isSendEmail()));
 	    t.start();
 	    return "import/status";
 	}
@@ -89,9 +89,11 @@ public class ImportExcelSaveController {
 
     private class ImportExcelThread implements Runnable {
 	private String sessionId;
+	private boolean sendEmail;
 
-	public ImportExcelThread(String sessionId) {
+	public ImportExcelThread(String sessionId, boolean sendEmail) {
 	    this.sessionId = sessionId;
+	    this.sendEmail = sendEmail;
 	}
 
 	@Override
@@ -101,7 +103,7 @@ public class ImportExcelSaveController {
 	    IImportService importService = (IImportService) wac.getBean("importService");
 	    try {
 		File file = (File) SessionManager.getSession(sessionId).getAttribute(IImportService.IMPORT_FILE);
-		List results = importService.parseSpreadsheet(file, sessionId);
+		List results = importService.parseSpreadsheet(file, sessionId, sendEmail);
 		SessionManager.getSession(sessionId).setAttribute(IImportService.IMPORT_RESULTS, results);
 	    } catch (Exception e) {
 		log.warn("Exception in ImportExcelThread: ", e);

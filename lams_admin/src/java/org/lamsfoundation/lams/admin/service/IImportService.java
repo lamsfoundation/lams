@@ -42,6 +42,7 @@ public interface IImportService {
     public static final String IMPORT_GROUPS_HELP_PAGE = "Import+Groups";
     public static final String STATUS_IMPORT_TOTAL = "importTotal";
     public static final String STATUS_IMPORTED = "imported";
+    public static final String STATUS_SUCCESSFUL = "successful";
     public static final String IMPORT_FILE = "file";
     public static final String IMPORT_RESULTS = "results";
     public static final int THRESHOLD = 500;
@@ -60,7 +61,7 @@ public interface IImportService {
      * Checks first row of spreadsheet and determines whether to parse as
      * a user or orgrole spreadsheet.
      */
-    public List parseSpreadsheet(File fileItem, String sessionId) throws IOException;
+    public List parseSpreadsheet(File fileItem, String sessionId, boolean sendEmail) throws IOException;
 
     public List parseGroupSpreadsheet(File fileItem, String sessionId) throws IOException;
 
@@ -68,11 +69,6 @@ public interface IImportService {
      * Returns number of rows found in spreadsheet.
      */
     public int getNumRows(File fileItem) throws IOException;
-
-    /**
-     * Returns message results from parsing list of users in spreadsheet.
-     */
-    public List parseUserSpreadsheet(File file, String sessionId) throws IOException;
 
     /**
      * Returns message results from parsing list of organisation memberships.
