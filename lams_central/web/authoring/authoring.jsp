@@ -280,6 +280,7 @@
 			isLtiContentSelection = ${param.ltiContentSelection eq 'true'},
 			initContentFolderID = '${contentFolderID}',
 			initLearningDesignID = '${param.learningDesignID}',
+			initRelaunchMonitorLessonID = '${param.relaunchMonitorLessonID}',
 			initAccess = ${access},
 			csrfTokenName = '<csrf:tokenname/>',
 			csrfTokenValue = '<csrf:tokenvalue/>';
