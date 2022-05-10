@@ -64,7 +64,7 @@
 						var $form=$(document.createElement('form'))
 							.css({display:'none'})
 							.attr("method","POST")
-							.attr("action","<lams:LAMSURL/>ForgotPasswordRequest?method=showForgotYourPasswordPage");
+							.attr("action","<lams:LAMSURL/>ForgotPasswordRequest?method=showForgotYourPasswordPage&<csrf:token/>");
 						$("body").append($form);
 						$form.submit();
 					});
@@ -116,6 +116,7 @@
 						</c:if>
 
 						<form action="/lams/j_security_check" method="POST" name="loginForm" role="form" class="form-horizontal" id="loginForm">
+							<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 							<input type="hidden" name="redirectURL" value='<c:out value="${param.redirectURL}" 
 						  		 escapeXml="true" />' />
              				 <div class="input-group">
@@ -177,7 +178,8 @@
 				</div>
 
 				<form style="display: none" method="POST" action="j_security_check">
-					<input type="hidden" name="j_username" value="${login}" /> <input type="hidden" name="j_password"
+					<input type="hidden" name="j_username" value="${login}" />
+					<input type="hidden" name="j_password"
 						value="${password}" /> <input type="hidden" name="redirectURL"
 						value='<c:out value="${empty param.redirectURL ? redirectURL : param.redirectURL}" escapeXml="true" />' />
 				</form>
@@ -189,8 +191,14 @@
 				if (hs != null) {
 					UserDTO userDTO = (UserDTO) hs.getAttribute("user");
 					if (userDTO != null && !userDTO.getLogin().equals(request.getAttribute("login"))) {
+					    Object isSignup = hs.getAttribute("isSignup");
 					    // remove session from mapping
 					    SessionManager.removeSessionByLogin(userDTO.getLogin(), true);
+					    
+					    // tell SsoHandler about some previous session settings
+					    hs = request.getSession();
+					    hs.setAttribute("isSignup", isSignup);
+					    hs.setAttribute("isLoginAs", request.getAttribute("isLoginAs"));
 					}
 				}
 			%>

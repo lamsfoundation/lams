@@ -296,6 +296,9 @@
 			           match="(${moduleActivationPlaceholder})"
 			           replace="${moduleActivationEntry}    \1"
 		/>
+		<setpermissions mode="644" nonPosixMode="pass" failonerror="false">
+			<file file="${server.home}/standalone/deployments/lams.ear/META-INF/application.xml" />
+		</setpermissions>
 	</target>
 
 	<!-- =================================================================== -->

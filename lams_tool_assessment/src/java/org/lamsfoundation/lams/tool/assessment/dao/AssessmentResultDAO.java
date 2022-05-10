@@ -33,7 +33,7 @@ public interface AssessmentResultDAO extends DAO {
 
     List<AssessmentResult> getAssessmentResults(Long assessmentUid, Long userId);
 
-    List<AssessmentResult> getAssessmentResultsByQbQuestionAndAnswer(Long qbQuestionUid, String answer);
+    List<AssessmentResult> getAssessmentResultsByQbToolQuestionAndAnswer(Long toolQuestionUid, String answer);
 
     List<AssessmentResult> getAssessmentResultsBySession(Long sessionId, Long userId);
 

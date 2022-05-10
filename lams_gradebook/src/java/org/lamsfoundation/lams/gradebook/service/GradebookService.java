@@ -1085,17 +1085,15 @@ public class GradebookService implements IGradebookFullService {
 
     @Override
     public String getReleaseMarksEmailContent(long lessonID, int userID) {
-	// temporary comment so template gets loaded every time
-	// eventually it will be loaded just once
-//	if (RELEASE_MARKS_EMAIL_TEMPLATE_CONTENT == null) {
-	try {
-	    RELEASE_MARKS_EMAIL_TEMPLATE_CONTENT = Files
-		    .readString(Paths.get(Configuration.get(ConfigurationKeys.LAMS_EAR_DIR), FileUtil.LAMS_WWW_DIR,
-			    "gradebookReleaseLessonMarksEmailTemplate.html"));
-	} catch (Exception e) {
-	    throw new RuntimeException("Can not read release marks email template", e);
+	if (RELEASE_MARKS_EMAIL_TEMPLATE_CONTENT == null) {
+	    try {
+		RELEASE_MARKS_EMAIL_TEMPLATE_CONTENT = Files
+			.readString(Paths.get(Configuration.get(ConfigurationKeys.LAMS_EAR_DIR), FileUtil.LAMS_WWW_DIR,
+				"gradebookReleaseLessonMarksEmailTemplate.html"));
+	    } catch (Exception e) {
+		throw new RuntimeException("Can not read release marks email template", e);
+	    }
 	}
-//	}
 
 	User user = userService.getUserById(userID);
 	Lesson lesson = lessonService.getLesson(lessonID);

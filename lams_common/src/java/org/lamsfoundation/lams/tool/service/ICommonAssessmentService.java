@@ -35,5 +35,5 @@ public interface ICommonAssessmentService {
      */
     Map<Integer, Integer> countCorrectAnswers(long toolContentId);
 
-    boolean recalculateMarksForVsaQuestion(Long qbQuestionUid, String answer);
+    boolean recalculateMarksForVsaQuestion(Long toolQuestionUid, String answer);
 }

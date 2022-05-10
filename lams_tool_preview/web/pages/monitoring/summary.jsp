@@ -44,6 +44,19 @@
 		var exportExcelUrl = '<c:url value="/monitoring/exportTeamReport.do"/>?<csrf:token/>&sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}';
 		return downloadFile(exportExcelUrl, 'messageArea_Busy', '<fmt:message key="label.file.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
 	}
+
+	function getResultsElement(sessionId, selector) {
+		let element = null;
+		if (sessionId) {
+			// if Peer Review is grouped, try to find the element within own group
+			element = $('#collapse' + sessionId + ' ' + selector);
+		}
+		if (!element || element.length == 0) {
+			element = $(selector);
+		}
+		return element;
+	}
+	
 	function sendResults(sessionId) {
 		if (!confirm('<fmt:message key="confirm.notify.user.of.results" />')) {
 			return;
@@ -160,6 +173,12 @@
 			<c:set var="offset">loffset5</c:set>
 		</c:if>
 		<button onClick="return sendResults(${groupSummary.sessionId});" class="btn btn-default btn-disable-on-submit ${offset}"><fmt:message key="label.notify.user.of.results"/></button>
+		
+		<c:if test="${fn:length(criterias) > 1}">
+			<!--For send results feature-->
+			<i class="fa fa-spinner messageArea2_Busy" style="display:none"></i>
+			<div class="voffset5 messageArea2"></div>
+		</c:if>
 	</div>
 	
 	<c:if test="${sessionMap.isGroupedActivity}">

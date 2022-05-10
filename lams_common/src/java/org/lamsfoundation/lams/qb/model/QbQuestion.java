@@ -130,6 +130,9 @@ public class QbQuestion implements Serializable, Cloneable {
     @Column(name = "case_sensitive")
     private boolean caseSensitive;
 
+    @Column(name = "exact_match")
+    private boolean exactMatch;
+
     @Column(name = "correct_answer")
     private boolean correctAnswer;
 
@@ -162,7 +165,7 @@ public class QbQuestion implements Serializable, Cloneable {
     @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private List<QbOption> qbOptions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "qbQuestion", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "qbQuestion", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @Fetch(FetchMode.SELECT)
     @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private List<QbQuestionUnit> units = new ArrayList<>();
@@ -446,6 +449,14 @@ public class QbQuestion implements Serializable, Cloneable {
 
     public void setCaseSensitive(boolean caseSensitive) {
 	this.caseSensitive = caseSensitive;
+    }
+
+    public boolean isExactMatch() {
+	return exactMatch;
+    }
+
+    public void setExactMatch(boolean exactMatch) {
+	this.exactMatch = exactMatch;
     }
 
     public boolean getCorrectAnswer() {

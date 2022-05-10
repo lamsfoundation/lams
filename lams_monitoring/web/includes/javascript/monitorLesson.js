@@ -1469,8 +1469,15 @@ function updateSequenceTab() {
 				if (response.contributeActivities) {
 					$.each(response.contributeActivities, function(){
 						if (activity.id == this.activityID) {
-							 activity.requiresAttention = true;
-							 return false;
+							let allComplete = true;
+							$.each(this.contributeEntries, function(){
+								if (!this.isComplete) {
+									allComplete = false;
+									return false;
+								}
+							});
+							activity.requiresAttention = !allComplete;
+							return false;
 						}
 					});
 				}

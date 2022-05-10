@@ -380,6 +380,7 @@ public class AuthoringController {
 	if (!isMcqQuestionType) {
 	    form.setFeedback(qbQuestion.getFeedback());
 	    form.setCaseSensitive(qbQuestion.isCaseSensitive());
+	    form.setExactMatch(qbQuestion.isExactMatch());
 	    form.setAutocompleteEnabled(qbQuestion.isAutocompleteEnabled());
 	}
 
@@ -531,6 +532,7 @@ public class AuthoringController {
 	if (!isMcqQuestionType) {
 	    qbQuestion.setFeedback(form.getFeedback());
 	    qbQuestion.setCaseSensitive(form.isCaseSensitive());
+	    qbQuestion.setExactMatch(form.isExactMatch());
 	    qbQuestion.setAutocompleteEnabled(form.isAutocompleteEnabled());
 	}
 

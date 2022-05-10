@@ -185,6 +185,12 @@
 				<form:form action="importexcelsave.do" modelAttribute="importExcelForm" id="importExcelForm" method="post">
 					<form:hidden path="orgId" />
 					<form:hidden path="tmpFileUploadId" />
+					
+					<div class="checkbox">
+						<label>
+							<form:checkbox path="sendEmail" /> <fmt:message key='label.import.email' />
+						</label>
+					</div>
 				
 					<div id="file-upload-area" class="voffset20"></div>
 				

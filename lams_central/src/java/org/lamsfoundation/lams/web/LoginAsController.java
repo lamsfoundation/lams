@@ -101,6 +101,7 @@ public class LoginAsController {
 		    UniversalLoginModule.setAuthenticationToken(token);
 		    // redirect to login page
 		    request.setAttribute("redirectURL", "/lams/index.jsp");
+		    request.setAttribute("isLoginAs", true);
 		    return "login";
 		}
 	    }

@@ -887,14 +887,15 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	    if (questionDto.getAnswer() != null) {
 		boolean isQuestionCaseSensitive = questionDto.isCaseSensitive();
-		String normalisedQuestionAnswer = QbUtils.normaliseVSAnswer(questionDto.getAnswer());
+		boolean isExactMatch = questionDto.isExactMatch();
+		String normalisedQuestionAnswer = QbUtils.normaliseVSAnswer(questionDto.getAnswer(), isExactMatch);
 
 		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 		    // refresh latest answers from DB
 		    QbOption qbOption = qbService.getOptionByUid(optionDto.getUid());
 		    optionDto.setName(qbOption.getName());
 		    boolean isAnswerAllocated = QbUtils.isVSAnswerAllocated(qbOption.getName(),
-			    normalisedQuestionAnswer, isQuestionCaseSensitive);
+			    normalisedQuestionAnswer, isQuestionCaseSensitive, isExactMatch);
 
 		    if (isAnswerAllocated) {
 			mark = optionDto.getMaxMark() * maxMark;
@@ -1482,7 +1483,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	    for (AssessmentQuestionResult questionResult : allQuestionResults) {
 		String answer = questionResult.getAnswer();
-		if (QbUtils.normaliseVSAnswer(answer) == null) {
+		if (QbUtils.normaliseVSAnswer(answer, qbQuestion.isExactMatch()) == null) {
 		    continue;
 		}
 
@@ -1503,10 +1504,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public boolean recalculateMarksForVsaQuestion(Long qbQuestionUid, String answer) {
+    public boolean recalculateMarksForVsaQuestion(Long toolQuestionUid, String answer) {
 	// get all user results
 	List<AssessmentResult> assessmentResults = assessmentResultDao
-		.getAssessmentResultsByQbQuestionAndAnswer(qbQuestionUid, answer);
+		.getAssessmentResultsByQbToolQuestionAndAnswer(toolQuestionUid, answer);
+	QbToolQuestion toolQuestion = assessmentResultDao.find(QbToolQuestion.class, toolQuestionUid);
+	Long qbQuestionUid = toolQuestion.getQbQuestion().getUid();
 	//stores userId->lastFinishedAssessmentResult
 	Map<Long, AssessmentResult> assessmentResultsMap = new LinkedHashMap<>();
 	for (AssessmentResult assessmentResult : assessmentResults) {
@@ -3778,6 +3781,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		qbQuestion.setAllowRichEditor(
 			JsonUtil.optBoolean(questionJSONData, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
 		qbQuestion.setCaseSensitive(JsonUtil.optBoolean(questionJSONData, "caseSensitive", Boolean.FALSE));
+		qbQuestion.setExactMatch(JsonUtil.optBoolean(questionJSONData, "exactMatch", Boolean.FALSE));
 		qbQuestion.setCorrectAnswer(JsonUtil.optBoolean(questionJSONData, "correctAnswer", Boolean.FALSE));
 		qbQuestion.setFeedback(JsonUtil.optString(questionJSONData, "feedback"));
 		qbQuestion.setFeedbackOnCorrect(JsonUtil.optString(questionJSONData, "feedbackOnCorrect"));

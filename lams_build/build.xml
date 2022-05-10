@@ -917,7 +917,6 @@
 				<include name="javax/faces/"/>
 				<include name="nu/"/>
 				<include name="org/apache/avro/"/>
-				<include name="org/apache/commons/lang3/"/>
 				<include name="org/apache/james/"/>
 				<include name="org/apache/lucene/"/>
 				<include name="org/apache/neethi/"/>

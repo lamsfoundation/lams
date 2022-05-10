@@ -186,6 +186,7 @@ public class SignupController {
 		HttpSession hses = request.getSession();
 		hses.setAttribute("login", login);
 		hses.setAttribute("password", password);
+		hses.setAttribute("isSignup", true);
 		response.sendRedirect("/lams/login.jsp?redirectURL=/lams");
 		return null;
 	    }

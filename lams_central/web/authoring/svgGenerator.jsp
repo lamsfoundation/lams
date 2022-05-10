@@ -49,8 +49,11 @@
 			canSetReadOnly = false,
 			isReadOnlyMode = true,
 			activitiesOnlySelectable = ${param.selectable eq 'true'},
+			isLtiContentSelection = false,
 			initLearningDesignID = '${param.learningDesignID}',
-			initRelaunchMonitorLessonID = null;
+			initRelaunchMonitorLessonID = null,
+			csrfTokenName = '<csrf:tokenname/>',
+			csrfTokenValue = '<csrf:tokenvalue/>';
 	</script>
 </lams:head>
 
