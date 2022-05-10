@@ -13,6 +13,7 @@
 <%@ attribute name="displayExpanded" required="false" rtexprvalue="true"%>
 <%@ attribute name="resizeParentFrameName" required="false" rtexprvalue="true"%>
 <%@ attribute name="method" required="false" rtexprvalue="true"%>
+<%@ attribute name="maxWords" required="false" rtexprvalue="true"%>
 
 <c:if test="${empty method}">
 	<c:set var="method" value="inline" />
@@ -59,12 +60,12 @@
 </c:if>
 
 <script type="text/javascript">
-	function initializeCKEditor(){
+	function initializeCKEditor(id, method, resizeParentFrameName, width, height, toolbarSet, classes, language, displayExpanded, contentFolderID, maxWords){
 		
-		if ("${resizeParentFrameName}" != ""){
+		if (resizeParentFrameName != ""){
 			CKEDITOR.on('instanceReady', function(e){
-				if (e.editor.element.$.id == "${id}"){
-					var messageAreaFrame = window.parent.document.getElementById("${resizeParentFrameName}");
+				if (e.editor.element.$.id == id){
+					var messageAreaFrame = window.parent.document.getElementById(resizeParentFrameName);
 					if (messageAreaFrame != null){
 						messageAreaFrame.style.height=messageAreaFrame.contentWindow.document.body.scrollHeight+'px';
 					}
@@ -74,32 +75,50 @@
 		
 		CKEDITOR.basePath = "${ckEditorBasePath}";
 	    
-	    var editor = CKEDITOR.instances["${id}"];
+	    var editor = CKEDITOR.instances[id];
 	    if (editor) { editor.destroy(true); }
 	    
-		var instance = CKEDITOR.${method}( "${id}", {
-				width                         : "${width}",
-				height                        : "${height}",
-				toolbar                       : "${toolbarSet}",
-				classes                       : "${classes}",
-				language                      : "${language}",
+		var configuration = {
+				width                         : width,
+				height                        : height,
+				toolbar                       : toolbarSet,
+				classes                       : classes,
+				language                      : language,
 				defaultLangugage              : "en",
-				toolbarStartupExpanded        : ${displayExpanded},
-				filebrowserBrowseUrl          : "${ckEditorBasePath}filemanager/browser/default/browser.html?Type=File&Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/",
-				filebrowserUploadUrl          : "${ckEditorBasePath}filemanager/upload/simpleuploader?Type=File&CurrentFolder=/${contentFolderID}/",
-				filebrowserImageBrowseUrl     : "${ckEditorBasePath}filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/",
-				filebrowserImageUploadUrl     : "${ckEditorBasePath}filemanager/upload/simpleuploader?Type=Image&CurrentFolder=/${contentFolderID}/",
-				filebrowserImageBrowseLinkUrl : "${ckEditorBasePath}filemanager/browser/default/browser.html?Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/",
-				filebrowserFlashBrowseUrl     : "${ckEditorBasePath}filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/",
-				filebrowserFlashUploadUrl     : "${ckEditorBasePath}filemanager/upload/simpleuploader?Type=Flash&CurrentFolder=/${contentFolderID}/",
-				contentFolderID				  : "${contentFolderID}"
-		});
-		instance.initializeFunction = initializeCKEditor;
+				toolbarStartupExpanded        : displayExpanded,
+				filebrowserBrowseUrl          : "${ckEditorBasePath}filemanager/browser/default/browser.html?Type=File&Connector=connectors/jsp/connector&CurrentFolder=/" + contentFolderID + "/",
+				filebrowserUploadUrl          : "${ckEditorBasePath}filemanager/upload/simpleuploader?Type=File&CurrentFolder=/" + contentFolderID + "/",
+				filebrowserImageBrowseUrl     : "${ckEditorBasePath}filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector&CurrentFolder=/" + contentFolderID + "/",
+				filebrowserImageUploadUrl     : "${ckEditorBasePath}filemanager/upload/simpleuploader?Type=Image&CurrentFolder=/" + contentFolderID + "/",
+				filebrowserImageBrowseLinkUrl : "${ckEditorBasePath}filemanager/browser/default/browser.html?Connector=connectors/jsp/connector&CurrentFolder=/" + contentFolderID + "/",
+				filebrowserFlashBrowseUrl     : "${ckEditorBasePath}filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/jsp/connector&CurrentFolder=/" + contentFolderID + "/",
+				filebrowserFlashUploadUrl     : "${ckEditorBasePath}filemanager/upload/simpleuploader?Type=Flash&CurrentFolder=/" + contentFolderID + "/",
+				contentFolderID				  : contentFolderID
+		};
+		
+		if (maxWords > 0) {
+			$.extend(configuration, {
+				wordcount					  : {
+					maxWordCount			  : maxWords,
+					showParagraphs			  : false,
+					showRemaining			  : true,
+					pasteWarningDuration      : 5000
+				}
+			});
+		}
+
+		
+
+		instance = CKEDITOR[method](id, configuration);
+		instance.initializeFunction = function(){
+			 initializeCKEditor(id, method, resizeParentFrameName, width, height, toolbarSet, classes, language, displayExpanded, contentFolderID, maxWords);
+		};
 		return instance;
 	}
 	
-	// run when page is loaded
-	initializeCKEditor();
+	// run initialisation code
+	initializeCKEditor("${id}", "${method}", "${resizeParentFrameName}", "${width}", "${height}", "${toolbarSet}", "${classes}", "${language}", ${displayExpanded}, "${contentFolderID}", ${empty maxWords or maxWords <= 0 ? 0 : maxWords});
+	
 
 	function reinitializeCKEditorInstances(){
 		for (var instanceId in CKEDITOR.instances){

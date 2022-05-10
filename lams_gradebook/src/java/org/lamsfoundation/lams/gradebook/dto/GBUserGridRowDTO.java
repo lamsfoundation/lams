@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.springframework.web.util.HtmlUtils;
 
 public class GBUserGridRowDTO extends GradebookGridRowDTO {
@@ -67,9 +68,9 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 
 	    ret.add(rowName);
 	    ret.add(status);
-	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
-	    ret.add(startDate != null ? convertDateToString(startDate, null) : CELL_EMPTY);
-	    ret.add(finishDate != null ? convertDateToString(finishDate, null) : CELL_EMPTY);
+	    ret.add((timeTaken != null) ? DateUtil.convertTimeToString(timeTaken) : CELL_EMPTY);
+	    ret.add(startDate != null ? DateUtil.convertToString(startDate, null) : CELL_EMPTY);
+	    ret.add(finishDate != null ? DateUtil.convertToString(finishDate, null) : CELL_EMPTY);
 	    ret.add(feedback);
 	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark, displayMarkAsPercent) : CELL_EMPTY);
 	    ret.add(portraitId != null ? portraitId.toString() : "");
@@ -80,9 +81,9 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(marksAvailable != null ? marksAvailable.toString() : "");
 	    ret.add(rowName);
 	    ret.add(status);
-	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
-	    ret.add(startDate != null ? convertDateToString(startDate, null) : CELL_EMPTY);
-	    ret.add(finishDate != null ? convertDateToString(finishDate, null) : CELL_EMPTY);
+	    ret.add((timeTaken != null) ? DateUtil.convertTimeToString(timeTaken) : CELL_EMPTY);
+	    ret.add(startDate != null ? DateUtil.convertToString(startDate, null) : CELL_EMPTY);
+	    ret.add(finishDate != null ? DateUtil.convertToString(finishDate, null) : CELL_EMPTY);
 	    ret.add(feedback);
 	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
 	    ret.add(portraitId != null ? portraitId.toString() : "");
@@ -94,9 +95,9 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	} else if (view == GBGridView.MON_COURSE) {
 	    ret.add(rowName);
 	    ret.add(status);
-	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
-	    ret.add(startDate != null ? convertDateToString(startDate, null) : CELL_EMPTY);
-	    ret.add(finishDate != null ? convertDateToString(finishDate, null) : CELL_EMPTY);
+	    ret.add((timeTaken != null) ? DateUtil.convertTimeToString(timeTaken) : CELL_EMPTY);
+	    ret.add(startDate != null ? DateUtil.convertToString(startDate, null) : CELL_EMPTY);
+	    ret.add(finishDate != null ? DateUtil.convertToString(finishDate, null) : CELL_EMPTY);
 	    ret.add(feedback);
 	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark, displayMarkAsPercent) : CELL_EMPTY);
 	    ret.add(portraitId != null ? portraitId.toString() : "");

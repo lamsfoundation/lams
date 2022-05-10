@@ -26,6 +26,7 @@
 		<property name="logEventService"><ref bean="logEventService"/></property>
 		<property name="outcomeService"><ref bean="outcomeService"/></property> 
 		<property name="integrationService"><ref bean="integrationService"/></property>
+		<property name="scheduler"><ref bean="scheduler"/></property>
 	</bean>
 	
 	<bean id="gradebookService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean" >

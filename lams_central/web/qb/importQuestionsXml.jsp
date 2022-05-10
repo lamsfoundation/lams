@@ -6,12 +6,14 @@
 <%@ page import="org.lamsfoundation.lams.util.FileUtil" %>
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
 <c:set var="tmpFileUploadId"><%=FileUtil.generateTmpFileUploadId()%></c:set>
+<c:set var="language"><lams:user property="localeLanguage"/></c:set>
 
 <lams:html>
 <lams:head>
 	<title>x</title>
 	<lams:css/>
 	<link href="/lams/css/uppy.min.css" rel="stylesheet" type="text/css" />
+	<link href="/lams/css/uppy.custom.css" rel="stylesheet" type="text/css" />
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
@@ -67,17 +69,7 @@
 						  // its format is: upload_<userId>_<timestamp>
 						  'tmpFileUploadId' : tmpFileUploadId,
 						  'largeFilesAllowed' : true
-					  },
-					  onBeforeFileAdded: function(currentFile, files) {
-						  var name = currentFile.data.name,
-						  	  extensionIndex = name.lastIndexOf('.'),
-						  	  valid = allowedFileTypes.includes(name.substring(extensionIndex).trim());
-						  if (!valid) {
-							  uppy.info('<fmt:message key="error.import.file.format" />', 'error', 10000);
-						  }
-						  
-						  return valid;
-				    }
+					  }
 				  };
 			  
 			  switch(language) {

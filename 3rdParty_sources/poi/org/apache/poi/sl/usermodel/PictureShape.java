@@ -21,7 +21,7 @@ import java.awt.Insets;
 
 public interface PictureShape<
     S extends Shape<S,P>,
-    P extends TextParagraph<S,P,?>
+    P extends TextParagraph<S,P,? extends TextRun>
 > extends SimpleShape<S,P> {
     /**
      * Returns the picture data for this picture.
@@ -29,6 +29,16 @@ public interface PictureShape<
      * @return the picture data for this picture.
      */
     PictureData getPictureData();
+
+	/**
+	 * Returns an alternative picture data, e.g. an embedded SVG image
+	 *
+	 * @return an alternative picture data
+	 *
+	 * @since POI 4.1.0
+	 */
+    default PictureData getAlternativePictureData() { return null; }
+
 
 	/**
 	 * Returns the clipping values as percent ratio relatively to the image size.

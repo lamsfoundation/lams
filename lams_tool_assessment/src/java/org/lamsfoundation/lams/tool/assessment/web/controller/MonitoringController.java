@@ -37,7 +37,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
@@ -56,6 +55,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.logevent.LearnerInteractionEvent;
+import org.lamsfoundation.lams.logevent.service.ILearnerInteractionService;
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
@@ -66,13 +67,13 @@ import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.LeaderResultsDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.GradeStatsDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
+import org.lamsfoundation.lams.tool.assessment.dto.UserSummaryItem;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
@@ -109,9 +110,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.HtmlUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import reactor.core.publisher.Flux;
 
 @Controller
 @RequestMapping("/monitoring")
@@ -134,6 +138,9 @@ public class MonitoringController {
     @Autowired
     private IRatingService ratingService;
 
+    @Autowired
+    private ILearnerInteractionService learnerInteractionService;
+
     @RequestMapping("/summary")
     public String summary(HttpServletRequest request, HttpServletResponse response) {
 
@@ -143,7 +150,7 @@ public class MonitoringController {
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	List<SessionDTO> sessionDtos = service.getSessionDtos(contentId, false);
+	List<GradeStatsDTO> sessionDtos = service.getSessionDtos(contentId, false);
 
 	Assessment assessment = service.getAssessmentByContentId(contentId);
 
@@ -168,7 +175,7 @@ public class MonitoringController {
 	}
 
 	//prepare list of the questions to display in question drop down menu, filtering out questions that aren't supposed to be answered
-	Set<AssessmentQuestion> questionList = new TreeSet<>();
+	List<AssessmentQuestion> questionList = new LinkedList<>();
 	//in case there is at least one random question - we need to show all questions in a drop down select
 	if (assessment.hasRandomQuestion()) {
 	    questionList.addAll(assessment.getQuestions());
@@ -212,18 +219,25 @@ public class MonitoringController {
 
 	// display student choices only if all questions are multiple choice
 	boolean displayStudentChoices = true;
+	boolean vsaPresent = false;
 	int maxOptionsInQuestion = 0;
+
 	for (AssessmentQuestion question : assessment.getQuestions()) {
-	    if (question.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE) {
+	    if (displayStudentChoices && question.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE) {
 		int optionsInQuestion = question.getQbQuestion().getQbOptions().size();
 		if (optionsInQuestion > maxOptionsInQuestion) {
 		    maxOptionsInQuestion = optionsInQuestion;
 		}
 	    } else {
 		displayStudentChoices = false;
-		break;
+	    }
+
+	    if (question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS) {
+		vsaPresent = true;
 	    }
 	}
+
+	request.setAttribute("vsaPresent", vsaPresent);
 
 	request.setAttribute("displayStudentChoices", displayStudentChoices);
 	if (displayStudentChoices) {
@@ -238,7 +252,7 @@ public class MonitoringController {
 
 		// build candidate dtos
 		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-		    int optionAttemptCount = service.countAttemptsPerOption(contentId, optionDto.getUid());
+		    int optionAttemptCount = service.countAttemptsPerOption(contentId, optionDto.getUid(), false);
 
 		    float percentage = (float) (optionAttemptCount * 100) / totalNumberOfUsers;
 		    optionDto.setPercentage(percentage);
@@ -247,7 +261,22 @@ public class MonitoringController {
 	    request.setAttribute("questions", questionDtos);
 	}
 
+	// lists all code styles used in this assessment
+	Set<Integer> codeStyles = questionList.stream().filter(q -> q.getQbQuestion().getCodeStyle() != null)
+		.collect(Collectors.mapping(q -> q.getQbQuestion().getCodeStyle(), Collectors.toSet()));
+
+	if (!codeStyles.isEmpty()) {
+	    request.setAttribute(AssessmentConstants.ATTR_CODE_STYLES, codeStyles);
+	}
+
 	return "pages/monitoring/monitoring";
+    }
+
+    @RequestMapping(path = "/getCompletionChartsData", method = RequestMethod.GET, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @ResponseBody
+    public Flux<String> getCompletionChartsData(@RequestParam long toolContentId)
+	    throws JsonProcessingException, IOException {
+	return service.getCompletionChartsDataFlux(toolContentId);
     }
 
     @RequestMapping("/userMasterDetail")
@@ -278,21 +307,6 @@ public class MonitoringController {
 	return "pages/monitoring/parts/questionsummary";
     }
 
-    @RequestMapping(path = "/allocateUserAnswer", method = RequestMethod.POST)
-    @ResponseBody
-    public String allocateUserAnswer(HttpServletRequest request, HttpServletResponse response,
-	    @RequestParam Long questionUid, @RequestParam Long targetOptionUid, @RequestParam Long previousOptionUid,
-	    @RequestParam Long questionResultUid) {
-	Optional<Long> optionUid = service.allocateAnswerToOption(questionUid, targetOptionUid, previousOptionUid,
-		questionResultUid);
-
-	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	responseJSON.put("isAnswerDuplicated", optionUid.isPresent());
-	responseJSON.put("optionUid", optionUid.orElse(-1L));
-	response.setContentType("application/json;charset=utf-8");
-	return responseJSON.toString();
-    }
-
     @RequestMapping("/userSummary")
     public String userSummary(HttpServletRequest request, HttpServletResponse response) {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
@@ -304,12 +318,27 @@ public class MonitoringController {
 	UserSummary userSummary = service.getUserSummary(contentId, userId, sessionId);
 	request.setAttribute(AssessmentConstants.ATTR_USER_SUMMARY, userSummary);
 
+	Map<Long, LearnerInteractionEvent> learnerInteractions = learnerInteractionService
+		.getFirstLearnerInteractions(contentId, userId.intValue());
+	request.setAttribute("learnerInteractions", learnerInteractions);
+
 	Assessment assessment = service.getAssessmentByContentId(contentId);
 	boolean questionEtherpadEnabled = assessment.isUseSelectLeaderToolOuput()
 		&& assessment.isQuestionEtherpadEnabled()
 		&& StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
 	request.setAttribute(AssessmentConstants.ATTR_IS_QUESTION_ETHERPAD_ENABLED, questionEtherpadEnabled);
 	request.setAttribute(AssessmentConstants.ATTR_TOOL_SESSION_ID, sessionId);
+
+	if (userSummary.getUserSummaryItems() != null) {
+	    // lists all code styles used in this assessment
+	    Set<Integer> codeStyles = userSummary.getUserSummaryItems().stream().map(UserSummaryItem::getQuestionDto)
+		    .filter(q -> q.getCodeStyle() != null)
+		    .collect(Collectors.mapping(q -> q.getCodeStyle(), Collectors.toSet()));
+
+	    if (!codeStyles.isEmpty()) {
+		request.setAttribute(AssessmentConstants.ATTR_CODE_STYLES, codeStyles);
+	    }
+	}
 
 	return "pages/monitoring/parts/usersummary";
     }
@@ -404,14 +433,14 @@ public class MonitoringController {
 
 	    if (groupLeader != null) {
 
-		float assessmentResult = service.getLastTotalScoreByUser(assessment.getUid(), groupLeader.getUserId());
+		Float assessmentResult = service.getLastTotalScoreByUser(assessment.getUid(), groupLeader.getUserId());
 		String portraitId = service.getPortraitId(groupLeader.getUserId());
 
 		AssessmentUserDTO userDto = new AssessmentUserDTO();
 		userDto.setUserId(groupLeader.getUserId());
 		userDto.setFirstName(groupLeader.getFirstName());
 		userDto.setLastName(groupLeader.getLastName());
-		userDto.setGrade(assessmentResult);
+		userDto.setGrade(assessmentResult == null ? 0 : assessmentResult);
 		userDto.setPortraitId(portraitId);
 		userDtos.add(userDto);
 		countSessionUsers = 1;
@@ -556,7 +585,8 @@ public class MonitoringController {
 		userData.add(questionResult.getMark());
 		// show confidence levels if this feature is turned ON
 		if (assessment.isEnableConfidenceLevels()) {
-		    userData.add(questionResult.getConfidenceLevel());
+		    userData.add(questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_MARK_HEDGING) ? -1
+			    : questionResult.getConfidenceLevel());
 		}
 
 		// show average rating
@@ -704,14 +734,15 @@ public class MonitoringController {
 
 	Long contentId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = service.getAssessmentByContentId(contentId);
-	List<Number> results = null;
+	List<Float> results = null;
 
 	if (assessment != null) {
 	    if (assessment.isUseSelectLeaderToolOuput()) {
 		results = service.getMarksArrayForLeaders(contentId);
 	    } else {
-		Long sessionId = WebUtil.readLongParam(request, AssessmentConstants.ATTR_TOOL_SESSION_ID);
-		results = service.getMarksArray(sessionId);
+		Long sessionId = WebUtil.readLongParam(request, AssessmentConstants.ATTR_TOOL_SESSION_ID, true);
+		results = sessionId == null ? service.getMarksArrayByContentId(contentId)
+			: service.getMarksArray(sessionId);
 	    }
 	}
 
@@ -737,20 +768,15 @@ public class MonitoringController {
     public void exportSummary(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	String fileName = null;
-
 	Long contentId = null;
-	List<SessionDTO> sessionDtos;
 	if (sessionMapID != null) {
 	    SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		    .getAttribute(sessionMapID);
 	    request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    contentId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
-	    sessionDtos = (List<SessionDTO>) sessionMap.get("sessionDtos");
-
 	} else {
 	    contentId = WebUtil.readLongParam(request, "toolContentID");
 	    fileName = WebUtil.readStrParam(request, "fileName");
-	    sessionDtos = service.getSessionDtos(contentId, true);
 	}
 
 	Assessment assessment = service.getAssessmentByContentId(contentId);
@@ -758,7 +784,7 @@ public class MonitoringController {
 	    return;
 	}
 
-	List<ExcelSheet> sheets = service.exportSummary(assessment, sessionDtos);
+	List<ExcelSheet> sheets = service.exportSummary(assessment, contentId);
 
 	// Setting the filename if it wasn't passed in the request
 	if (fileName == null) {
@@ -770,10 +796,7 @@ public class MonitoringController {
 	log.debug("Exporting assessment to a spreadsheet: " + assessment.getContentId());
 
 	// set cookie that will tell JS script that export has been finished
-	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
-	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
-	fileDownloadTokenCookie.setPath("/");
-	response.addCookie(fileDownloadTokenCookie);
+	WebUtil.setFileDownloadTokenCookie(request, response);
 
 	ServletOutputStream out = response.getOutputStream();
 	ExcelUtil.createExcel(out, sheets, service.getMessage("label.export.exported.on"), true);
@@ -828,11 +851,14 @@ public class MonitoringController {
 	Assessment assessment = service.getAssessmentByContentId(contentId);
 	if (assessment != null) {
 	    if (assessment.isUseSelectLeaderToolOuput()) {
-		LeaderResultsDTO leaderDto = service.getLeaderResultsDTOForLeaders(contentId);
+		GradeStatsDTO leaderDto = service.getStatsDtoForLeaders(contentId);
 		sessionMap.put("leaderDto", leaderDto);
 	    } else {
-		List<SessionDTO> sessionDtos = service.getSessionDtos(contentId, true);
+		List<GradeStatsDTO> sessionDtos = service.getSessionDtos(contentId, true);
 		sessionMap.put("sessionDtos", sessionDtos);
+
+		GradeStatsDTO activityDto = service.getStatsDtoForActivity(contentId);
+		sessionMap.put("activityDto", activityDto);
 	    }
 
 	    List<QbStatsActivityDTO> qbStats = new LinkedList<>();
@@ -853,25 +879,27 @@ public class MonitoringController {
      * @throws IOException
      */
     @RequestMapping(path = "/discloseCorrectAnswers", method = RequestMethod.POST)
-    public void discloseCorrectAnswers(HttpServletRequest request, HttpServletResponse response) throws IOException {
-	Long questionUid = WebUtil.readLongParam(request, "questionUid");
-	Long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
+    public void discloseCorrectAnswers(@RequestParam long questionUid, @RequestParam long toolContentID,
+	    @RequestParam(required = false) boolean skipLearnersNotification, HttpServletResponse response)
+	    throws IOException {
 
 	AssessmentQuestion question = service.getAssessmentQuestionByUid(questionUid);
 	if (question.isCorrectAnswersDisclosed()) {
 	    log.warn(
 		    "Trying to disclose correct answers when they are already disclosed for Assessment tool content ID "
-			    + toolContentId + " and question UID: " + questionUid);
+			    + toolContentID + " and question UID: " + questionUid);
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 	    return;
 	}
 	question.setCorrectAnswersDisclosed(true);
 	service.updateAssessmentQuestion(question);
 
-	service.notifyLearnersOnAnswerDisclose(toolContentId);
+	if (!skipLearnersNotification) {
+	    service.notifyLearnersOnAnswerDisclose(toolContentID);
+	}
 
 	if (log.isDebugEnabled()) {
-	    log.debug("Disclosed correct answers for Assessment tool content ID " + toolContentId + " and question ID "
+	    log.debug("Disclosed correct answers for Assessment tool content ID " + toolContentID + " and question ID "
 		    + questionUid);
 	}
     }
@@ -882,14 +910,14 @@ public class MonitoringController {
      * @throws IOException
      */
     @RequestMapping(path = "/discloseGroupsAnswers", method = RequestMethod.POST)
-    public void discloseGroupsAnswers(HttpServletRequest request, HttpServletResponse response) throws IOException {
-	Long questionUid = WebUtil.readLongParam(request, "questionUid");
-	Long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
+    public void discloseGroupsAnswers(@RequestParam long questionUid, @RequestParam long toolContentID,
+	    @RequestParam(required = false) boolean skipLearnersNotification, HttpServletResponse response)
+	    throws IOException {
 
 	AssessmentQuestion question = service.getAssessmentQuestionByUid(questionUid);
 	if (question.isGroupsAnswersDisclosed()) {
 	    log.warn("Trying to disclose group answers when they are already disclosed for Assessment tool content ID "
-		    + toolContentId + " and question UID: " + questionUid);
+		    + toolContentID + " and question UID: " + questionUid);
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 	    return;
 	}
@@ -897,10 +925,12 @@ public class MonitoringController {
 	question.setGroupsAnswersDisclosed(true);
 	service.updateAssessmentQuestion(question);
 
-	service.notifyLearnersOnAnswerDisclose(toolContentId);
+	if (!skipLearnersNotification) {
+	    service.notifyLearnersOnAnswerDisclose(toolContentID);
+	}
 
 	if (log.isDebugEnabled()) {
-	    log.debug("Disclosed other groups' answers for Assessment tool content ID " + toolContentId
+	    log.debug("Disclosed other groups' answers for Assessment tool content ID " + toolContentID
 		    + " and question ID " + questionUid);
 	}
     }
@@ -1054,6 +1084,26 @@ public class MonitoringController {
 	    }
 	}
 	service.saveOrUpdateAssessment(assessment);
+    }
+
+    @RequestMapping(path = "/displayChangeLeaderForGroupDialogFromActivity")
+    public String displayChangeLeaderForGroupDialogFromActivity(
+	    // tell Change Leader dialog in Leader Selection tool which learner has already reached this activity
+	    @RequestParam(name = AssessmentConstants.PARAM_TOOL_SESSION_ID) long toolSessionId) {
+	String availableLearners = service.getUsersBySession(toolSessionId).stream()
+		.collect(Collectors.mapping(user -> Long.toString(user.getUserId()), Collectors.joining(",")));
+
+	return new StringBuilder("redirect:").append(Configuration.get(ConfigurationKeys.SERVER_URL))
+		.append("tool/lalead11/monitoring/displayChangeLeaderForGroupDialogFromActivity.do?toolSessionId=")
+		.append(toolSessionId).append("&availableLearners=").append(availableLearners).toString();
+    }
+
+    @RequestMapping(path = "/changeLeaderForGroup", method = RequestMethod.POST)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public void changeLeaderForGroup(@RequestParam(name = AssessmentConstants.PARAM_TOOL_SESSION_ID) long toolSessionId,
+	    @RequestParam long leaderUserId) {
+	service.changeLeaderForGroup(toolSessionId, leaderUserId);
     }
 
     @SuppressWarnings("unchecked")

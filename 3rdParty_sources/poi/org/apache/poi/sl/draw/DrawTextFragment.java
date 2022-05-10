@@ -17,15 +17,19 @@
 
 package org.apache.poi.sl.draw;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.font.TextAttribute;
 import java.awt.font.TextLayout;
-import java.text.*;
+import java.text.AttributedCharacterIterator;
+import java.text.AttributedString;
+import java.text.CharacterIterator;
 
 public class DrawTextFragment implements Drawable  {
     final TextLayout layout;
     final AttributedString str;
     double x, y;
-    
+
     public DrawTextFragment(TextLayout layout, AttributedString str) {
         this.layout = layout;
         this.str = str;
@@ -48,7 +52,22 @@ public class DrawTextFragment implements Drawable  {
         if(textMode != null && textMode == Drawable.TEXT_AS_SHAPES){
             layout.draw(graphics, (float)x, (float)yBaseline);
         } else {
-            graphics.drawString(str.getIterator(), (float)x, (float)yBaseline );
+            try {
+                graphics.drawString(str.getIterator(), (float) x, (float) yBaseline);
+            } catch (ClassCastException e) {
+                // workaround: batik issue, which expects only Color as forground color
+                replaceForgroundPaintWithBlack(str);
+                graphics.drawString(str.getIterator(), (float) x, (float) yBaseline);
+            }
+        }
+    }
+
+    private void replaceForgroundPaintWithBlack(AttributedString as) {
+        AttributedCharacterIterator iter = as.getIterator(new TextAttribute[]{TextAttribute.FOREGROUND});
+        for (char ch = iter.first();
+             ch != CharacterIterator.DONE;
+             ch = iter.next()) {
+            as.addAttribute(TextAttribute.FOREGROUND, Color.BLACK, iter.getBeginIndex(), iter.getEndIndex());
         }
     }
 
@@ -57,7 +76,7 @@ public class DrawTextFragment implements Drawable  {
 
     public void drawContent(Graphics2D graphics) {
     }
-    
+
     public TextLayout getLayout() {
         return layout;
     }
@@ -65,12 +84,12 @@ public class DrawTextFragment implements Drawable  {
     public AttributedString getAttributedString() {
         return str;
     }
-    
+
     /**
      * @return full height of this text run which is sum of ascent, descent and leading
      */
-    public float getHeight(){ 
-        double h = layout.getAscent() + layout.getDescent() + getLeading();
+    public float getHeight(){
+        double h = layout.getAscent() + layout.getDescent();
         return (float)h;
     }
 
@@ -80,6 +99,7 @@ public class DrawTextFragment implements Drawable  {
     public float getLeading() {
         // fix invalid leadings (leading == 0)
         double l = layout.getLeading();
+
         if (l == 0) {
             // see https://stackoverflow.com/questions/925147
             // we use a 115% value instead of the 120% proposed one, as this seems to be closer to LO/OO
@@ -87,7 +107,7 @@ public class DrawTextFragment implements Drawable  {
         }
         return (float)l;
     }
-    
+
     /**
      *
      * @return width if this text run
@@ -115,5 +135,5 @@ public class DrawTextFragment implements Drawable  {
     public String toString(){
         return "[" + getClass().getSimpleName() + "] " + getString();
     }
-    
+
 }

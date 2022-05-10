@@ -1,6 +1,6 @@
 .svg-tool-activity-border {
 	fill: none;
-	stroke: black;
+	stroke: #b6b6b6;
 	stroke-width: 1;
 }
 
@@ -8,6 +8,10 @@
 	fill: none;
 	stroke: red;
 	stroke-width: 3;
+}
+
+.svg-tool-activity-border-grouped {
+	fill: white;
 }
 
 .svg-tool-activity-background {
@@ -26,13 +30,14 @@
 }
 
 .svg-tool-activity-category-3 {
-	stroke: none;
-	fill: #ece9f7;
+	fill: #2DBCE9;
+	opacity: 0.25;
 }
 
 .svg-tool-activity-category-4 {
-	stroke: none;
-	fill: #fdf1d3;
+	fill: #FF72AC;
+	opacity: 0.25;	
+
 }
 
 .svg-tool-activity-category-5 {
@@ -41,8 +46,27 @@
 }
 
 .svg-tool-activity-category-6 {
-	stroke: none;
-	fill: #e9f9c0;
+	fill: #1AD9B2;
+	opacity: 0.25;
+}
+
+.svg-activity-title-label {
+	font-size   : 16px;
+	font-family : sans-serif;
+}
+
+.svg-tool-activity-title-box {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	word-wrap: break-word;
+	padding-right: 2px;
+	text-align: center;
+}
+
+.svg-activity-title-label.svg-activity-title-label-small {
+	font-size   : 12px;
 }
 
 .svg-branching {
@@ -62,6 +86,16 @@
 	stroke: blue;
 }
 
+.svg-annotation-container {
+	stroke: #b6b6b6;
+}
+
+.svg-activity-optional .svg-annotation-container,
+.svg-activity-parallel .svg-annotation-container,
+.svg-activity-floating .svg-annotation-container {
+	fill : #f0f8ff;
+}
+
 .svg-transition {
 	stroke-width: 1;
 	stroke: rgb(119, 126, 157);
@@ -77,4 +111,9 @@
 	stroke-width: 2;
 	stroke: rgb(119, 126, 157);
 	stroke-dasharray: 5, 3;
+}
+
+.svg-shadow {
+	-webkit-filter: drop-shadow( 2px 2px 2px rgba(0, 0, 0, .3));
+  	filter: drop-shadow( 2px 2px 2px rgba(0, 0, 0, .3));
 }

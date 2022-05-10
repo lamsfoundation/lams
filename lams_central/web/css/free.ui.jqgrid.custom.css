@@ -122,3 +122,32 @@
 	padding: 0;
 	text-align: center;
 }
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-jqgrid-btable td > a {
+	text-decoration: none;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .sgbutton > .fa-solid {
+	font-weight: 1000;
+	color: #3C42E0;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-pg-button span {
+	margin: 5px 5px 0 0;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-pg-table .ui-pg-selbox {
+	padding-left: 5px;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-table td {
+	border-bottom: none;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-table .ui-search-clear > a {
+	font-size: 30px;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-table .ui-search-input {
+	width: 90%;
+}

@@ -17,11 +17,13 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
-/**
- * DrawingRecord (0x00EC)
- */
-public final class DrawingRecord extends StandardRecord implements Cloneable {
+
+public final class DrawingRecord extends StandardRecord {
     public static final short sid = 0x00EC;
 
     private static final byte[] EMPTY_BYTE_ARRAY = {};
@@ -33,15 +35,26 @@ public final class DrawingRecord extends StandardRecord implements Cloneable {
         recordData = EMPTY_BYTE_ARRAY;
     }
 
+    public DrawingRecord(DrawingRecord other) {
+        super(other);
+        recordData = (other.recordData == null) ? null : other.recordData.clone();
+        // TODO - this code probably never copies a contd array ...
+        contd = (other.contd == null) ? null : other.contd.clone();
+    }
+
     public DrawingRecord(RecordInputStream in) {
         recordData = in.readRemainder();
+    }
+
+    public DrawingRecord(byte[] data) {
+        recordData = data.clone();
     }
 
     /**
      * @deprecated POI 3.9
      */
     @Deprecated
-    public void processContinueRecord(byte[] record) {
+    void processContinueRecord(byte[] record) {
         //don't merge continue record with the drawing record, it must be serialized separately
         contd = record;
     }
@@ -74,19 +87,20 @@ public final class DrawingRecord extends StandardRecord implements Cloneable {
      * @return cloned drawing records
      */
     @Override
-    public DrawingRecord clone() {
-        DrawingRecord rec = new DrawingRecord();
-        rec.recordData = recordData.clone();
-        if (contd != null) {
-            // TODO - this code probably never executes
-            rec.contd = contd.clone();
-        }
-
-        return rec;
+    public DrawingRecord copy() {
+        return new DrawingRecord(this);
     }
 
     @Override
-    public String toString() {
-        return "DrawingRecord["+recordData.length+"]";
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.DRAWING;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "recordData", this::getRecordData,
+            "contd", () -> contd
+        );
     }
 }

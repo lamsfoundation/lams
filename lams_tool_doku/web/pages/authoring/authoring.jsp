@@ -6,7 +6,16 @@
 <lams:head>
 	<title><fmt:message key="label.author.title" /></title>
 	<%@ include file="/common/tabbedheader.jsp"%>
-
+	
+	<style>
+		#relativeTimeLimit {
+			width: 70px;
+		}
+		
+		#timeLimitManualStartDiv {
+			margin: 0 0 25px 0;
+		}
+	</style>
 	<script type="text/javascript">
         function init(){
             var tag = document.getElementById("currentTab");
@@ -24,6 +33,16 @@
 	    	// end optional tab controller stuff
 	    	selectTab(tabId);
         }
+        
+        $(document).ready(function(){
+			$('#timeLimit').change(function() {
+				let widget = $(this),
+					timeLimit = widget.val();
+				if (!timeLimit || timeLimit < 0) {
+					widget.val(0);
+				}
+			});
+        });
     </script>
 </lams:head>
 
@@ -50,11 +69,11 @@
 		    <!--  Set up tabs  -->
 		    <lams:TabBodys>
 				<!-- tab content 1 (Basic) -->
-				<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />
+				<lams:TabBody id="1" page="basic.jsp" />
 				<!-- end of content (Basic) -->
 	
 				<!-- tab content 2 (Advanced) -->
-				<lams:TabBody id="2" titleKey="label.authoring.heading.advance.desc" page="advance.jsp" />
+				<lams:TabBody id="2" page="advance.jsp" />
 				<!-- end of content (Advanced) -->
 			</lams:TabBodys>
 				

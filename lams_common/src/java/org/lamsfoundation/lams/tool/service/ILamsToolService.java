@@ -25,12 +25,15 @@ package org.lamsfoundation.lams.tool.service;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
+import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -92,7 +95,7 @@ public interface ILamsToolService {
      *             in case of problems.
      */
     String completeToolSession(Long toolSessionId, Long learnerId);
-    
+
     /**
      * Checks whether specified activity is the last one in the learning design.
      */
@@ -122,6 +125,8 @@ public interface ILamsToolService {
      * @return
      */
     Boolean isGroupedActivity(long toolContentID);
+
+    Group getGroup(long toolSessionId);
 
     /**
      * Audit log the teacher has started editing activity in monitor.
@@ -179,6 +184,8 @@ public interface ILamsToolService {
      */
     Set<Long> getLeaderUserId(Long leaderSelectionActivityId);
 
+    Long getNearestLeaderSelectionToolContentId(long toolSessionId);
+
     /**
      * Returns all activities that precede specified activity and produce confidence levels.
      *
@@ -187,7 +194,7 @@ public interface ILamsToolService {
      * @return
      */
     Set<ToolActivity> getActivitiesProvidingConfidenceLevels(Long toolContentId);
-    
+
     /**
      * Returns all activities that precede specified activity and can provide VSA answers.
      *
@@ -210,7 +217,7 @@ public interface ILamsToolService {
      */
     List<ConfidenceLevelDTO> getConfidenceLevelsByActivity(Integer confidenceLevelActivityUiid, Integer requestorUserId,
 	    Long requestorToolSessionId);
-    
+
     /**
      * Returns VSA answers from the specified activity.
      *
@@ -224,16 +231,26 @@ public interface ILamsToolService {
      */
     Collection<VsaAnswerDTO> getVsaAnswersFromAssessment(Integer activityUiidProvidingVsaAnswers,
 	    Integer requestorUserId, Long requestorToolSessionId);
-    
+
     /**
-     * Recalculate marks for all Scratchie activities that use specified QbQuestion.
-     * 
-     * @param qbQuestionUid
+     * Returns VS answers which require allocation
      */
-    void recalculateScratchieMarksForVsaQuestion(Long qbQuestionUid);
+    Map<QbToolQuestion, Map<String, Integer>> getUnallocatedVSAnswers(long toolContentId);
+
+    /**
+     * Recalculate marks for all activities that use specified QbQuestion with given answer
+     *
+     * @return whether there is a learner who used the given answer
+     */
+    boolean recalculateMarksForVsaQuestion(Long qbQuestionUid, String answer);
 
     /**
      * Get a count of all the users that would be returned by getUsersForActivity(Long toolSessionId);
      */
     Integer getCountUsersForActivity(Long toolSessionId);
+    
+    /**
+     * Updates TBL iRAT/tRAT activity with questions from matching tRAT/iRAT activity
+     */
+    boolean syncRatQuestions(long toolContentId, List<Long> newQuestionUids);
 }

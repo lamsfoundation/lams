@@ -14,6 +14,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -49,6 +50,8 @@ public class LAMSBaseDAO implements IBaseDAO {
     private static final String SPOT = ".";
     private static final String EQUAL_TO_WHAT = "=?";
     private static final String LIKE_WHAT = " like ?";
+
+    private static final String QUERY_PART_SANITISE_REGEX = "\\w+";
 
     private static Logger log = Logger.getLogger(LAMSBaseDAO.class);
 
@@ -254,16 +257,15 @@ public class LAMSBaseDAO implements IBaseDAO {
 	return loadAll(clazz);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.lamsfoundation.lams.dao.IBaseDAO#findByProperty(java.lang.Class,
-     * java.lang.String, java.lang.Object)
-     */
     @Override
     public <T> List<T> findByProperty(Class<T> clazz, String name, Object value) {
+	return findByProperty(clazz, name, value, false);
+    }
+
+    @Override
+    public <T> List<T> findByProperty(Class<T> clazz, String name, Object value, boolean cache) {
 	String queryString = buildQueryString(clazz, name, SELECT);
-	return doFind(queryString, value);
+	return doFind(queryString, cache, new Object[] { value });
     }
 
     @Override
@@ -275,18 +277,17 @@ public class LAMSBaseDAO implements IBaseDAO {
 	return getSession().createQuery(queryString, clazz).setParameterList("param", values).getResultList();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.lamsfoundation.lams.dao.IBaseDAO#findByProperties(java.lang.Class,
-     * java.util.Map)
-     */
     @SuppressWarnings("unchecked")
     @Override
     public <T> List<T> findByProperties(Class<T> clazz, Map<String, Object> properties) {
+	return findByProperties(clazz, properties, false);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> List<T> findByProperties(Class<T> clazz, Map<String, Object> properties, boolean cache) {
 	Qv qv = buildQueryString(clazz, properties, SELECT, EQUAL_TO_WHAT);
-	return doFind(qv.queryString, qv.values);
+	return doFind(qv.queryString, cache, qv.values);
     }
 
     private String buildQueryString(Class clazz, String operation) {
@@ -471,8 +472,16 @@ public class LAMSBaseDAO implements IBaseDAO {
     }
 
     public List doFind(final String queryString, final Object... values) {
+	return doFind(queryString, false, values);
+    }
+
+    public List doFindCacheable(final String queryString, final Object... values) {
+	return doFind(queryString, true, values);
+    }
+
+    private List doFind(final String queryString, boolean cache, final Object... values) {
 	Query queryObject = convertLegacyStyleParameters(queryString, values);
-	return queryObject.list();
+	return queryObject.setCacheable(cache).list();
     }
 
     private Query convertLegacyStyleParameters(final String queryString, final Object... values) {
@@ -520,7 +529,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 	CriteriaQuery<T> query = builder.createQuery(entityClass);
 	Root<T> variableRoot = query.from(entityClass);
 	query.select(variableRoot);
-	return getSession().createQuery(query).getResultList();
+	return getSession().createQuery(query).setCacheable(true).getResultList();
 
     }
 
@@ -609,5 +618,11 @@ public class LAMSBaseDAO implements IBaseDAO {
     @Override
     public void releaseFromCache(Object o) {
 	getSessionFactory().getCurrentSession().evict(o);
+    }
+
+    public static void sanitiseQueryPart(String queryPart) {
+	if (StringUtils.isNotBlank(queryPart) && !queryPart.strip().matches(QUERY_PART_SANITISE_REGEX)) {
+	    throw new IllegalArgumentException("Query part contains forbidden characters: " + queryPart);
+	}
     }
 }

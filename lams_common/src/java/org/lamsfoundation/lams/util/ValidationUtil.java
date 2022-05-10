@@ -22,15 +22,24 @@
 
 package org.lamsfoundation.lams.util;
 
+import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.usermanagement.User;
+
+import com.codahale.passpol.BreachDatabase;
+import com.codahale.passpol.PasswordPolicy;
+import com.codahale.passpol.Status;
 
 /**
  * Utility methods for String validation.
  */
 public class ValidationUtil {
+
+    private static Logger log = Logger.getLogger(ValidationUtil.class);
 
     private final static Pattern REGEX_USER_NAME = Pattern.compile("^[^<>^!#&()/\\|\"?,:{}= ~`*%$]*$");
 
@@ -52,6 +61,10 @@ public class ValidationUtil {
 
     private final static Pattern REGEX_PASSWORD_CHARATERS_ALLOWED = Pattern
 	    .compile("^[A-Za-z0-9\\d`~!@#$%^&*\\(\\)_\\-+={}\\[\\]\\\\|:\\;\\\"\\'\\<\\>,.?\\/]*$");
+
+    private final static Pattern REGEX_LEARNING_DESIGN_NAMES = Pattern.compile("^[^<>^*@%$]*$");
+
+    private static BreachDatabase TOP_100K_PASSWORDS_DB = null;
 
     /**
      * Checks whether supplied username is valid. Username can only contain alphanumeric characters and no spaces.
@@ -82,6 +95,10 @@ public class ValidationUtil {
     }
 
     public static boolean isPasswordValueValid(String password, String password2) {
+	return ValidationUtil.isPasswordValueValid(password, password2, null);
+    }
+
+    public static boolean isPasswordValueValid(String password, String password2, User user) {
 
 	if (password == null || password2 == null || !password.equals(password2)) {
 	    return false;
@@ -136,6 +153,76 @@ public class ValidationUtil {
 
 	}
 
+	boolean isPasswordNotUserDetails = ValidationUtil.isPasswordNotUserDetails(password, user);
+	if (!isPasswordNotUserDetails) {
+	    return false;
+	}
+
+	return ValidationUtil.isPasswordNotBreached(password);
+    }
+
+    /**
+     * Checks if password is not the same as user ID, login, email or names.
+     */
+    public static boolean isPasswordNotUserDetails(String password, User user) {
+	if (user == null || StringUtils.isBlank(password)) {
+	    return true;
+	}
+	if ((user.getUserId() != null && password.equals(user.getUserId().toString()))
+		|| (StringUtils.isNotBlank(user.getLogin()) && password.equalsIgnoreCase(user.getLogin().trim()))) {
+	    return false;
+	}
+	if ((StringUtils.isNotBlank(user.getEmail()) && password.equalsIgnoreCase(user.getEmail().trim())) || (StringUtils.isNotBlank(user.getFirstName()) && password.equalsIgnoreCase(user.getFirstName().trim()))) {
+	    return false;
+	}
+	if (StringUtils.isNotBlank(user.getLastName()) && password.equalsIgnoreCase(user.getLastName().trim())) {
+	    return false;
+	}
+
+	return true;
+    }
+
+    /**
+     * Checks if password has not been used in recent history.
+     */
+    public static boolean isPasswordNotInHistory(String newPassword, Collection<String> hashesAndSalts) {
+	int historyLimit = Configuration.getAsInt(ConfigurationKeys.PASSWORD_HISTORY_LIMIT);
+	if (historyLimit <= 0) {
+	    return true;
+	}
+	for (String hashAndSalt : hashesAndSalts) {
+	    String[] hashAndSaltSplit = hashAndSalt.split("=");
+	    String oldHash = hashAndSaltSplit[0];
+	    String oldSalt = hashAndSaltSplit[1];
+	    String newHash = HashUtil.sha256(newPassword, oldSalt);
+	    if (oldHash.equals(newHash)) {
+		return false;
+	    }
+	}
+	return true;
+    }
+
+    public static boolean isPasswordNotBreached(String password) {
+	try {
+	    // load file with passwords only once
+	    if (TOP_100K_PASSWORDS_DB == null) {
+		TOP_100K_PASSWORDS_DB = BreachDatabase.top100K();
+	    }
+	    // check for a static list of 100k known weak passwords
+	    PasswordPolicy commonPasswordPolicy = new PasswordPolicy(TOP_100K_PASSWORDS_DB, 0, Integer.MAX_VALUE);
+	    if (Status.OK != commonPasswordPolicy.check(password)) {
+		return false;
+	    }
+
+	    // check online DB
+	    PasswordPolicy pwnedPolicy = new PasswordPolicy(BreachDatabase.haveIBeenPwned(), 0, Integer.MAX_VALUE);
+	    if (Status.OK != pwnedPolicy.check(password)) {
+		return false;
+	    }
+
+	} catch (Exception e) {
+	    log.error("Error while checking password for breach", e);
+	}
 	return true;
     }
 
@@ -219,15 +306,24 @@ public class ValidationUtil {
 	}
 
 	int wordCount = 0;
-	if ( text.length() >  0) {
+	if (text.length() > 0) {
 	    String cleanedString = text.replaceAll("[\'\";:,\\.\\?\\-!]+", "").trim();
 	    wordCount = cleanedString.split("\\S+").length;//.match(/\S+/g) || []) ;
 	    // special case - if only one word and no spaces then the split array is empty.
-	    if ( wordCount == 0 && cleanedString.length() > 0)
+	    if (wordCount == 0 && cleanedString.length() > 0) {
 		wordCount = 1;
+	    }
 	}
-    	
+
 	// check min words limit is reached
 	return (wordCount >= minWordsLimit);
+    }
+
+    /**
+     * Checks if LD's and activities' titles are valid.
+     * Mirrors regex set in nameValidator in authoringGeneral.js
+     */
+    public static boolean isLearningDesignNameValid(String name) {
+	return ValidationUtil.isRegexMatches(ValidationUtil.REGEX_LEARNING_DESIGN_NAMES, name);
     }
 }

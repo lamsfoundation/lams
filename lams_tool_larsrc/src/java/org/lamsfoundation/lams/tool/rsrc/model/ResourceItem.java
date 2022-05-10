@@ -24,11 +24,7 @@
 package org.lamsfoundation.lams.tool.rsrc.model;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -37,8 +33,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -60,8 +54,8 @@ public class ResourceItem implements Cloneable {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
-    // Resource Type:1=URL,2=File,3=Website,4=Learning Object
+
+    // Resource Type:1=URL,2=File
     @Column(name = "item_type")
     private short type;
 
@@ -69,22 +63,10 @@ public class ResourceItem implements Cloneable {
     private String title;
 
     @Column
-    private String description;
+    private String instructions;
 
     @Column
     private String url;
-
-    @Column(name = "open_url_new_window")
-    private boolean openUrlNewWindow;
-
-    @Column(name = "ims_schema")
-    private String imsSchema;
-
-    @Column(name = "init_item")
-    private String initialItem;
-
-    @Column(name = "organization_xml")
-    private String organizationXml;
 
     @Column(name = "file_uuid")
     private Long fileUuid;
@@ -98,30 +80,25 @@ public class ResourceItem implements Cloneable {
     @Column(name = "file_type")
     private String fileType;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    @OrderBy("sequence_id ASC")
-    @JoinColumn(name = "item_uid")
-    private Set<ResourceItemInstruction> itemInstructions = new HashSet<>();
-
     @Column(name = "order_id")
     private Integer orderId;
 
     @Column(name = "is_hide")
     private boolean isHide;
-    
+
     @Column(name = "create_by_author")
     private boolean isCreateByAuthor;
 
     @Column(name = "create_date")
     private Date createDate;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by")
     private ResourceUser createBy;
-    
+
     @Column(name = "is_allow_rating")
     private boolean allowRating;
-    
+
     @Column(name = "is_allow_comments")
     private boolean allowComments;
 
@@ -136,17 +113,6 @@ public class ResourceItem implements Cloneable {
 	ResourceItem obj = null;
 	try {
 	    obj = (ResourceItem) super.clone();
-	    // clone attachment
-	    if (itemInstructions != null) {
-		Iterator<ResourceItemInstruction> iter = itemInstructions.iterator();
-		Set<ResourceItemInstruction> set = new HashSet<>();
-		while (iter.hasNext()) {
-		    ResourceItemInstruction instruct = iter.next();
-		    ResourceItemInstruction newInsruct = (ResourceItemInstruction) instruct.clone();
-		    set.add(newInsruct);
-		}
-		obj.itemInstructions = set;
-	    }
 	    obj.setUid(null);
 	    // clone ReourceUser as well
 	    if (this.createBy != null) {
@@ -188,44 +154,12 @@ public class ResourceItem implements Cloneable {
 	this.fileVersionId = crVersionId;
     }
 
-    public String getDescription() {
-	return description;
+    public String getInstructions() {
+	return instructions;
     }
 
-    public void setDescription(String description) {
-	this.description = description;
-    }
-
-    public String getImsSchema() {
-	return imsSchema;
-    }
-
-    public void setImsSchema(String imsSchema) {
-	this.imsSchema = imsSchema;
-    }
-
-    public String getInitialItem() {
-	return initialItem;
-    }
-
-    public void setInitialItem(String initialItem) {
-	this.initialItem = initialItem;
-    }
-
-    public Set<ResourceItemInstruction> getItemInstructions() {
-	return itemInstructions;
-    }
-
-    public void setItemInstructions(Set<ResourceItemInstruction> itemInstructions) {
-	this.itemInstructions = itemInstructions;
-    }
-
-    public String getOrganizationXml() {
-	return organizationXml;
-    }
-
-    public void setOrganizationXml(String organizationXml) {
-	this.organizationXml = organizationXml;
+    public void setInstructions(String description) {
+	this.instructions = description;
     }
 
     public String getTitle() {
@@ -300,14 +234,6 @@ public class ResourceItem implements Cloneable {
 	this.fileName = name;
     }
 
-    public boolean isOpenUrlNewWindow() {
-	return openUrlNewWindow;
-    }
-
-    public void setOpenUrlNewWindow(boolean openUrlNewWindow) {
-	this.openUrlNewWindow = openUrlNewWindow;
-    }
-
     public Integer getOrderId() {
 	return orderId;
     }
@@ -341,11 +267,11 @@ public class ResourceItem implements Cloneable {
     }
 
     public boolean isAllowComments() {
-        return allowComments;
+	return allowComments;
     }
 
     public void setAllowComments(boolean allowComments) {
-        this.allowComments = allowComments;
+	this.allowComments = allowComments;
     }
 
     @Override

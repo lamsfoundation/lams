@@ -17,6 +17,12 @@
 
 package org.apache.poi.hssf.record.cf;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.common.Duplicatable;
+import org.apache.poi.common.usermodel.GenericRecord;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 
@@ -24,12 +30,16 @@ import org.apache.poi.util.LittleEndianOutput;
  * Color Gradient / Color Scale specific Threshold / value (CFVO),
  *  for changes in Conditional Formatting
  */
-public final class ColorGradientThreshold extends Threshold implements Cloneable {
+public final class ColorGradientThreshold extends Threshold implements Duplicatable, GenericRecord {
     private double position;
 
     public ColorGradientThreshold() {
-        super();
         position = 0d;
+    }
+
+    public ColorGradientThreshold(ColorGradientThreshold other) {
+        super(other);
+        position = other.position;
     }
 
     /** Creates new Color Gradient Threshold */
@@ -50,15 +60,17 @@ public final class ColorGradientThreshold extends Threshold implements Cloneable
     }
 
     @Override
-    public ColorGradientThreshold clone() {
-      ColorGradientThreshold rec = new ColorGradientThreshold();
-      super.copyTo(rec);
-      rec.position = position;
-      return rec;
+    public ColorGradientThreshold copy() {
+      return new ColorGradientThreshold(this);
     }
 
     public void serialize(LittleEndianOutput out) {
         super.serialize(out);
         out.writeDouble(position);
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties("position", this::getPosition);
     }
 }

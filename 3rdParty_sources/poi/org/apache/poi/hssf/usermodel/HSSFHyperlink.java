@@ -38,7 +38,7 @@ public class HSSFHyperlink implements Hyperlink {
 
     /**
      * Construct a new hyperlink
-     * 
+     *
      * This method is internal to be used only by
      * {@link HSSFCreationHelper#createHyperlink(HyperlinkType)}.
      *
@@ -75,7 +75,7 @@ public class HSSFHyperlink implements Hyperlink {
         this.record = record;
         link_type = getType(record);
     }
-    
+
     private static HyperlinkType getType(HyperlinkRecord record) {
         HyperlinkType link_type;
         // Figure out the type
@@ -93,15 +93,15 @@ public class HSSFHyperlink implements Hyperlink {
         }
         return link_type;
     }
-    
+
     protected HSSFHyperlink(Hyperlink other) {
         if (other instanceof HSSFHyperlink) {
             HSSFHyperlink hlink = (HSSFHyperlink) other;
-            record = hlink.record.clone();
+            record = hlink.record.copy();
             link_type = getType(record);
         }
         else {
-            link_type = other.getTypeEnum();
+            link_type = other.getType();
             record = new HyperlinkRecord();
             setFirstRow(other.getFirstRow());
             setFirstColumn(other.getFirstColumn());
@@ -257,25 +257,12 @@ public class HSSFHyperlink implements Hyperlink {
      * Return the type of this hyperlink
      *
      * @return the type of this hyperlink
-     * @see HyperlinkType#forInt
-     * @deprecated POI 3.15. Use {@link #getTypeEnum()} instead.
-     * getType will return a HyperlinkType enum in the future.
      */
     @Override
-    public int getType() {
-        return link_type.getCode();
-    }
-    
-    /**
-     * Return the type of this hyperlink
-     *
-     * @return the type of this hyperlink
-     */
-    @Override
-    public HyperlinkType getTypeEnum() {
+    public HyperlinkType getType() {
         return link_type;
     }
-    
+
     /**
      * @return whether the objects have the same HyperlinkRecord
      */
@@ -286,7 +273,7 @@ public class HSSFHyperlink implements Hyperlink {
         HSSFHyperlink otherLink = (HSSFHyperlink) other;
         return record == otherLink.record;
     }
-    
+
     @Override
     public int hashCode() {
         return record.hashCode();

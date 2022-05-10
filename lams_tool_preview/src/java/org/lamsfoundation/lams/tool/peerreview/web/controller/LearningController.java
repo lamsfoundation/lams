@@ -27,8 +27,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -46,6 +49,7 @@ import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.tool.peerreview.service.IPeerreviewService;
 import org.lamsfoundation.lams.tool.peerreview.service.PeerreviewApplicationException;
+import org.lamsfoundation.lams.tool.peerreview.service.PeerreviewServiceImpl;
 import org.lamsfoundation.lams.tool.peerreview.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -97,7 +101,7 @@ public class LearningController {
     public String start(HttpServletRequest request, HttpSession session) throws IOException, ServletException {
 
 	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	session.setAttribute(sessionMap.getSessionID(), sessionMap);
 
 	// save toolContentID into HTTPSession
@@ -265,9 +269,13 @@ public class LearningController {
 	}
 
 	RatingCriteria newCriteria = null;
+	List<RatingCriteria> criterias = null;
 	if (!user.isSessionFinished()) {
 	    // mark user as finished if there are not any criterias or we have processed the last one.
-	    List<RatingCriteria> criterias = service.getCriteriasByToolContentId(peerreview.getContentId());
+	    criterias = service.getCriteriasByToolContentId(peerreview.getContentId());
+
+	    // for criteria groups, like rubrics, count only first criterion
+	    PeerreviewServiceImpl.removeGroupedCriteria(criterias);
 
 	    if (criterias.size() > 0) {
 		if (currentCriteria == null) {
@@ -326,18 +334,16 @@ public class LearningController {
 
 	// finally, work out which page to go to!
 	if (user.isSessionFinished()) {
-	    if (peerreview.isShowRatingsLeftForUser() || peerreview.isShowRatingsLeftByUser()
-		    || entryText.length() > 0) {
-		String redirectURL = SHOW_RESULTS_REDIRECT;
-		redirectURL = WebUtil.appendParameterToURL(redirectURL, PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-		return redirectURL;
-	    } else if (peerreview.isReflectOnActivity()) {
+	    if (peerreview.isReflectOnActivity()) {
 		String redirectURL = NEW_REFLECTION_REDIRECT;
-		redirectURL = WebUtil.appendParameterToURL(redirectURL, PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+		redirectURL = WebUtil.appendParameterToURL(redirectURL, PeerreviewConstants.ATTR_SESSION_MAP_ID,
+			sessionMap.getSessionID());
 		return redirectURL;
 	    } else {
-		// finish
-		return finish(request, session);
+		String redirectURL = SHOW_RESULTS_REDIRECT;
+		redirectURL = WebUtil.appendParameterToURL(redirectURL, PeerreviewConstants.ATTR_SESSION_MAP_ID,
+			sessionMap.getSessionID());
+		return redirectURL;
 	    }
 	} else {
 	    return doEdit(request, sessionMap, sessionId, peerreview, newCriteria);
@@ -371,13 +377,21 @@ public class LearningController {
 	// ratings left by and by the user
 	List<RatingCriteria> ratingCriterias = service.getRatingCriterias(peerreview.getContentId());
 	List<StyledCriteriaRatingDTO> allUsersDtos = peerreview.isShowRatingsLeftByUser()
-		? new ArrayList<StyledCriteriaRatingDTO>(ratingCriterias.size())
+		? new ArrayList<>(ratingCriterias.size())
 		: null;
 	List<StyledCriteriaRatingDTO> currentUserDtos = peerreview.isShowRatingsLeftForUser()
-		? new ArrayList<StyledCriteriaRatingDTO>(ratingCriterias.size())
+		? new ArrayList<>(ratingCriterias.size())
 		: null;
 
+	Set<Integer> processedCriteriaGroups = new HashSet<>();
 	for (RatingCriteria criteria : ratingCriterias) {
+	    if (criteria.getRatingCriteriaGroupId() != null) {
+		if (processedCriteriaGroups.contains(criteria.getRatingCriteriaGroupId())) {
+		    continue;
+		}
+		processedCriteriaGroups.add(criteria.getRatingCriteriaGroupId());
+	    }
+
 	    boolean showAllUsers = peerreview.isSelfReview() || criteria.isRankingStyleRating()
 		    || criteria.isHedgeStyleRating() || (mode != null && mode.isTeacher());
 
@@ -386,15 +400,28 @@ public class LearningController {
 		    : PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC;
 
 	    if (allUsersDtos != null) {
-		allUsersDtos.add(service.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(), sessionId,
-			criteria, user.getUserId(), false, sorting, null, showAllUsers, true));
+		Function<RatingCriteria, StyledCriteriaRatingDTO> dtoBuilder = c -> service
+			.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(), sessionId, c,
+				user.getUserId(), false, sorting, null, showAllUsers, true);
+
+		// for rubrics there is a single dto (first row) with list of all rows (including first) filled
+		StyledCriteriaRatingDTO dto = criteria.isRubricsStyleRating()
+			? PeerreviewServiceImpl.fillCriteriaGroup(criteria, ratingCriterias, dtoBuilder)
+			: dtoBuilder.apply(criteria);
+		allUsersDtos.add(dto);
 	    }
 
 	    if (currentUserDtos != null) {
-		currentUserDtos.add(service.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(), sessionId,
-			criteria, user.getUserId(), false, sorting, null, showAllUsers, false));
-	    }
+		Function<RatingCriteria, StyledCriteriaRatingDTO> dtoBuilder = c -> service
+			.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(), sessionId, c,
+				user.getUserId(), false, sorting, null, showAllUsers, false);
 
+		// for rubrics there is a single dto (first row) with list of all rows (including first) filled
+		StyledCriteriaRatingDTO dto = criteria.isRubricsStyleRating()
+			? PeerreviewServiceImpl.fillCriteriaGroup(criteria, ratingCriterias, dtoBuilder)
+			: dtoBuilder.apply(criteria);
+		currentUserDtos.add(dto);
+	    }
 	}
 
 	if (allUsersDtos != null) {
@@ -509,33 +536,44 @@ public class LearningController {
 	}
 
 	Long userId = (mode != null && mode.isTeacher()) ? -1 : user.getUserId();
+	StyledCriteriaRatingDTO criteriaDto = null;
 
-	StyledCriteriaRatingDTO dto = service.getUsersRatingsCommentsByCriteriaIdDTO(toolContentId, toolSessionId,
-		criteria, userId, (criteria.isCommentRating() || criteria.isStarStyleRating()),
-		PeerreviewConstants.SORT_BY_USERNAME_ASC, null, peerreview.isSelfReview(), true);
+	if (criteria.isRubricsStyleRating()) {
+	    List<RatingCriteria> criterias = service.getRatingCriterias(peerreview.getContentId());
+	    criteriaDto = PeerreviewServiceImpl.fillCriteriaGroup(criteria, criterias,
+		    entryCriteria -> service.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(),
+			    toolSessionId, entryCriteria, userId, false, PeerreviewConstants.SORT_BY_USERNAME_ASC, null,
+			    peerreview.isSelfReview(), true));
+	} else {
+	    criteriaDto = service.getUsersRatingsCommentsByCriteriaIdDTO(toolContentId, toolSessionId, criteria, userId,
+		    (criteria.isCommentRating() || criteria.isStarStyleRating()),
+		    PeerreviewConstants.SORT_BY_USERNAME_ASC, null, peerreview.isSelfReview(), true);
 
-	// Send the number of users to rate in rateAll, or send 0. Do not want to modify the criteria min/max as it is originally
-	// a Hibernate object and don't want to risk updating it in the db. Need to send a flag so why not make flag double as the
-	// runtime min/max value while leaving min/max as the original criteria definition.
-	int rateAllUsers = 0;
-	if ((criteria.isRankingStyleRating() && criteria.getMaxRating() == RatingCriteria.RATING_RANK_ALL)
-		|| (criteria.isStarStyleRating() && criteria.getMinimumRates() == RatingCriteria.RATING_RANK_ALL)
-		|| (criteria.isCommentRating() && criteria.getMinimumRates() == RatingCriteria.RATING_RANK_ALL)) {
-	    rateAllUsers = service.getCountUsersBySession(toolSessionId, peerreview.isSelfReview() ? -1 : userId);
-	} else if ((criteria.isStarStyleRating() || criteria.isCommentRating())
-		&& (peerreview.getMinimumRates() > 0 || peerreview.getMaximumRates() > 0)
-		&& (dto.getRatingCriteria().getMinimumRates() == 0 && dto.getRatingCriteria().getMaximumRates() == 0)) {
-	    // override the min/max for stars based on old settings if needed (original Peer Review kept one setting for all criteria )
-	    // does not matter if this change gets persisted to database.
-	    criteria.setMinimumRates(peerreview.getMinimumRates());
-	    criteria.setMaximumRates(peerreview.getMaximumRates());
+	    // Send the number of users to rate in rateAll, or send 0. Do not want to modify the criteria min/max as it is originally
+	    // a Hibernate object and don't want to risk updating it in the db. Need to send a flag so why not make flag double as the
+	    // runtime min/max value while leaving min/max as the original criteria definition.
+	    int rateAllUsers = 0;
+	    if ((criteria.isRankingStyleRating() && criteria.getMaxRating() == RatingCriteria.RATING_RANK_ALL)
+		    || (criteria.isStarStyleRating() && criteria.getMinimumRates() == RatingCriteria.RATING_RANK_ALL)
+		    || (criteria.isCommentRating() && criteria.getMinimumRates() == RatingCriteria.RATING_RANK_ALL)) {
+		rateAllUsers = service.getCountUsersBySession(toolSessionId, peerreview.isSelfReview() ? -1 : userId);
+	    } else if ((criteria.isStarStyleRating() || criteria.isCommentRating())
+		    && (peerreview.getMinimumRates() > 0 || peerreview.getMaximumRates() > 0)
+		    && (criteriaDto.getRatingCriteria().getMinimumRates() == 0
+			    && criteriaDto.getRatingCriteria().getMaximumRates() == 0)) {
+		// override the min/max for stars based on old settings if needed (original Peer Review kept one setting for all criteria )
+		// does not matter if this change gets persisted to database.
+		criteria.setMinimumRates(peerreview.getMinimumRates());
+		criteria.setMaximumRates(peerreview.getMaximumRates());
+	    }
+
+	    int countRatedUsers = service.getCountItemsRatedByUserByCriteria(criteria.getRatingCriteriaId(),
+		    user.getUserId().intValue());
+	    request.setAttribute(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedUsers);
+	    request.setAttribute("rateAllUsers", rateAllUsers);
 	}
+	request.setAttribute("criteriaRatings", criteriaDto);
 
-	int countRatedUsers = service.getCountItemsRatedByUserByCriteria(criteria.getRatingCriteriaId(),
-		user.getUserId().intValue());
-	request.setAttribute(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedUsers);
-	request.setAttribute("rateAllUsers", rateAllUsers);
-	request.setAttribute("criteriaRatings", dto);
 	return LEARNING_SUCCESS_PATH;
     }
 
@@ -703,7 +741,7 @@ public class LearningController {
 	if (!(peerreview.getLockWhenFinished() && user.isSessionFinished())) {
 
 	    Integer userId = user.getUserId().intValue();
-	    Map<Long, Float> ratings = new HashMap<Long, Float>();
+	    Map<Long, Float> ratings = new HashMap<>();
 	    boolean valid = false;
 
 	    if (criteria.isHedgeStyleRating()) {
@@ -873,5 +911,4 @@ public class LearningController {
 
 	return finish(request, session);
     }
-
 }

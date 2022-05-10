@@ -144,8 +144,8 @@ public interface ILearnerService {
      *            the activity is being run.
      * @return the updated learner progress
      */
-    String completeActivity(LearnerProgress progress, Activity currentActivity, Integer learnerId,
-	    boolean redirect) throws UnsupportedEncodingException;
+    String completeActivity(LearnerProgress progress, Activity currentActivity, Integer learnerId, boolean redirect)
+	    throws UnsupportedEncodingException;
 
     /**
      * Retrieve all lessons that has been started, suspended or finished. All finished but archived lesson should not be
@@ -178,11 +178,15 @@ public interface ILearnerService {
      *            the learner who wants to go through the gate.
      * @param forceGate
      *            if forceGate==true and the lesson is a preview lesson then the gate is opened straight away.
-     * @param key 
-     * 		  additional information provided by user to open gate, for example password
+     * @param key
+     *            additional information provided by user to open gate, for example password
      * @return Updated gate details
      */
     GateActivityDTO knockGate(GateActivity gateActivity, User knocker, boolean forceGate, Object key);
+
+    GateActivityDTO isNextGateActivityOpenByToolSessionId(int learnerId, long toolSessionId);
+
+    GateActivityDTO isNextGateActivityOpenByActivityId(int learnerId, long lessonId);
 
     Set<Group> getGroupsForGate(GateActivity gate);
 
@@ -199,4 +203,8 @@ public interface ILearnerService {
     void createCommandForLearner(Long lessonId, String userName, String jsonCommand);
 
     void createCommandForLearners(Long toolContentId, Collection<Integer> userIds, String jsonCommand);
+
+    void createCommandForLessonLearners(Long toolContentId, String jsonCommand);
+
+    boolean isLearnerStartedLessonByContentId(int userId, long toolContentId);
 }

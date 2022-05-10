@@ -185,6 +185,11 @@ public interface ISubmitFilesService extends ICommonToolService {
     public void releaseMarksForSession(Long sessionID);
 
     /**
+     * Notify learners about marks being released, via email.
+     */
+    public int notifyLearnersOnMarkRelease(long sessionID);
+
+    /**
      * When learner finish submission, it invokes this function and will remark the <code>finished</code> field.
      *
      * @param sessionID
@@ -348,9 +353,6 @@ public interface ISubmitFilesService extends ICommonToolService {
 
     /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
-     *
-     * @param userId
-     * @param toolSessionID
      */
     SubmitUser checkLeaderSelectToolForSessionLeader(SubmitUser user, Long toolSessionID);
 
@@ -359,13 +361,9 @@ public interface ISubmitFilesService extends ICommonToolService {
      */
     void createUser(SubmitUser submitUser);
 
-    /**
-     * @param userId
-     * @param toolSessionId
-     * @return
-     */
     boolean isUserGroupLeader(Long userId, Long toolSessionId);
 
     void copyLearnerContent(SubmitUser fromUser, SubmitUser toUser);
 
+    void changeLeaderForGroup(long toolSessionId, int leaderUserId);
 }

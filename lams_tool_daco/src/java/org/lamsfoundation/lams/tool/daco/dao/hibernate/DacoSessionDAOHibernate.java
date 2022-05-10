@@ -54,7 +54,7 @@ public class DacoSessionDAOHibernate extends LAMSBaseDAO implements DacoSessionD
 
     @Override
     public DacoSession getSessionBySessionId(Long sessionId) {
-	List<?> list = doFind(DacoSessionDAOHibernate.FIND_BY_SESSION_ID, sessionId);
+	List<?> list = doFindCacheable(DacoSessionDAOHibernate.FIND_BY_SESSION_ID, sessionId);
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
@@ -64,7 +64,7 @@ public class DacoSessionDAOHibernate extends LAMSBaseDAO implements DacoSessionD
     @Override
     @SuppressWarnings("unchecked")
     public List<DacoSession> getByContentId(Long toolContentId) {
-	return (List<DacoSession>) doFind(DacoSessionDAOHibernate.FIND_BY_CONTENT_ID, toolContentId);
+	return doFindCacheable(DacoSessionDAOHibernate.FIND_BY_CONTENT_ID, toolContentId);
     }
 
     @Override
@@ -75,7 +75,8 @@ public class DacoSessionDAOHibernate extends LAMSBaseDAO implements DacoSessionD
     @Override
     @SuppressWarnings("unchecked")
     public List<MonitoringSummarySessionDTO> statistics(Long toolContentUid) {
-	NativeQuery<MonitoringSummarySessionDTO> query = getSession().createNativeQuery(DacoSessionDAOHibernate.CALC_SESSION_STATS);
+	NativeQuery<MonitoringSummarySessionDTO> query = getSession()
+		.createNativeQuery(DacoSessionDAOHibernate.CALC_SESSION_STATS);
 	query.addScalar("sessionId", LongType.INSTANCE).addScalar("sessionName", StringType.INSTANCE)
 		.addScalar("numberLearners", IntegerType.INSTANCE).addScalar("totalRecordCount", IntegerType.INSTANCE)
 		.setParameter("contentUid", toolContentUid)

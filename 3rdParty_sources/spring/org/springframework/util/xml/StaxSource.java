@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,6 +23,8 @@ import javax.xml.transform.sax.SAXSource;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
+import org.springframework.lang.Nullable;
+
 /**
  * Implementation of the {@code Source} tagging interface for StAX readers. Can be constructed with
  * an {@code XMLEventReader} or an {@code XMLStreamReader}.
@@ -35,7 +37,7 @@ import org.xml.sax.XMLReader;
  * {@code SAXSource} is <strong>not supported</strong>. In general, the only supported operation
  * on this class is to use the {@code XMLReader} obtained via {@link #getXMLReader()} to parse the
  * input source obtained via {@link #getInputSource()}. Calling {@link #setXMLReader(XMLReader)}
- * or {@link #setInputSource(InputSource)} will result in {@code UnsupportedOperationException}s.
+ * or {@link #setInputSource(InputSource)} will result in {@code UnsupportedOperationException #setInputSource(InputSource)} will result in {@code UnsupportedOperationExceptions}.
  *
  * @author Arjen Poutsma
  * @since 3.0
@@ -45,8 +47,10 @@ import org.xml.sax.XMLReader;
  */
 class StaxSource extends SAXSource {
 
+	@Nullable
 	private XMLEventReader eventReader;
 
+	@Nullable
 	private XMLStreamReader streamReader;
 
 
@@ -82,6 +86,7 @@ class StaxSource extends SAXSource {
 	 * @return the StAX event reader used by this source
 	 * @see StaxSource#StaxSource(javax.xml.stream.XMLEventReader)
 	 */
+	@Nullable
 	XMLEventReader getXMLEventReader() {
 		return this.eventReader;
 	}
@@ -93,6 +98,7 @@ class StaxSource extends SAXSource {
 	 * @return the StAX event reader used by this source
 	 * @see StaxSource#StaxSource(javax.xml.stream.XMLEventReader)
 	 */
+	@Nullable
 	XMLStreamReader getXMLStreamReader() {
 		return this.streamReader;
 	}

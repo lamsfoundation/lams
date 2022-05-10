@@ -17,11 +17,15 @@
 
 package org.apache.poi.hssf.record.chart;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
 import org.apache.poi.util.BitField;
 import org.apache.poi.util.BitFieldFactory;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
@@ -43,9 +47,18 @@ public final class ChartFormatRecord extends StandardRecord {
     private int field5_grbit;
     private int field6_unknown;
 
-    public ChartFormatRecord() {
-        // fields uninitialised
+    public ChartFormatRecord() {}
+
+    public ChartFormatRecord(ChartFormatRecord other) {
+        super(other);
+        field1_x_position = other.field1_x_position;
+        field2_y_position = other.field2_y_position;
+        field3_width = other.field3_width;
+        field4_height = other.field4_height;
+        field5_grbit = other.field5_grbit;
+        field6_unknown = other.field6_unknown;
     }
+
 
     public ChartFormatRecord(RecordInputStream in) {
         field1_x_position = in.readInt();
@@ -54,19 +67,6 @@ public final class ChartFormatRecord extends StandardRecord {
         field4_height = in.readInt();
         field5_grbit = in.readUShort();
         field6_unknown = in.readUShort();
-    }
-
-    public String toString() {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[CHARTFORMAT]\n");
-        buffer.append("    .xPosition       = ").append(getXPosition()).append("\n");
-        buffer.append("    .yPosition       = ").append(getYPosition()).append("\n");
-        buffer.append("    .width           = ").append(getWidth()).append("\n");
-        buffer.append("    .height          = ").append(getHeight()).append("\n");
-        buffer.append("    .grBit           = ").append(HexDump.intToHex(field5_grbit)).append("\n");
-        buffer.append("[/CHARTFORMAT]\n");
-        return buffer.toString();
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -124,5 +124,28 @@ public final class ChartFormatRecord extends StandardRecord {
 
     public void setVaryDisplayPattern(boolean value) {
         field5_grbit = varyDisplayPattern.setBoolean(field5_grbit, value);
+    }
+
+    @Override
+    public ChartFormatRecord copy() {
+        return new ChartFormatRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.CHART_FORMAT;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "x", this::getXPosition,
+            "y", this::getYPosition,
+            "width", this::getWidth,
+            "height", this::getHeight,
+            "grbit", () -> field5_grbit,
+            "varyDisplayPattern", this::getVaryDisplayPattern,
+            "unknown", () -> field6_unknown
+        );
     }
 }

@@ -10,7 +10,7 @@
 <c:set var="peerreview" value="${sessionMap.peerreview}" />
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 <c:set var="isCommentsEnabled" value="${sessionMap.isCommentsEnabled}" />
-
+<c:set var="finishImmediately" value="${peerreview.lockWhenFinished and not peerreview.showRatingsLeftByUser and not peerreview.showRatingsLeftForUser and not peerreview.reflectOnActivity}" />
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" />
@@ -38,16 +38,24 @@
 		WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="warning.comment.blank"/>',
 		WARN_MIN_NUMBER_WORDS_LABEL = "<fmt:message key="warning.minimum.number.words"><fmt:param value="${criteriaRatings.ratingCriteria.commentsMinWordsLimit}"/></fmt:message>";
 	</script>
-	<script src="${lams}includes/javascript/jquery.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-pager.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/common.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script>	
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${toolSessionId}', '', finishSession);
 	
 		$(document).ready(function(){
+			var finishImmediately = ${finishImmediately};
+
+			if (finishImmediately) {
+				$('#finishButton').click();
+				return;
+			}
+		
 			$(".tablesorter").tablesorter({
 				theme: 'bootstrap',
 			    widthFixed: true,
@@ -67,9 +75,7 @@
 		 });
 	
 		function finishSession(){
-			document.getElementById("finishButton").disabled = true;
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionId=${toolSessionId}"/>';
-			return false;
 		}
 		
 		function continueReflect(){
@@ -79,6 +85,7 @@
 		function redoRatings(){
 			document.location.href='<c:url value="/learning/start.do?toolSessionID=${toolSessionId}&mode=${mode}&isRedo=true"/>';
 		}
+
     </script>
 </lams:head>
 <body class="stripes">
@@ -103,9 +110,11 @@
 		<c:if test="${not empty allCriteriaRatings}">
 		<c:forEach var="criteriaRatings" items="${allCriteriaRatings}" varStatus="status">
 			<div class="panel panel-default">
-			<div class="panel-heading panel-title">
-				<c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/>
-			</div>
+			<c:if test="${not criteriaRatings.ratingCriteria.rubricsStyleRating}">
+				<div class="panel-heading panel-title">
+					<c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/>
+				</div>
+			</c:if>
 			<div class="panel-body">
 			<lams:StyledRating criteriaRatings="${criteriaRatings}" showJustification="true" alwaysShowAverage="false" currentUserDisplay="false" />
 			</div>
@@ -127,7 +136,9 @@
 			</lams:Alert>
 		
 			<c:forEach var="criteriaRatings" items="${userRatings}" varStatus="status">
-				<h4><c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/></h4>
+				<c:if test="${not criteriaRatings.ratingCriteria.rubricsStyleRating}">
+					<h4><c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/></h4>
+				</c:if>
 		 		<lams:StyledRating criteriaRatings="${criteriaRatings}" showJustification="false" alwaysShowAverage="true" currentUserDisplay="true"/>
 			</c:forEach>
 		</div>
@@ -141,7 +152,7 @@
 	<!-- End Reflection -->
 
 	<c:if test="${!peerreview.lockWhenFinished}">
-		<a href="#nogo" class="btn btn-default voffset5 pull-left" onclick="redoRatings();">
+		<a href="#nogo" class="btn btn-default voffset5 pull-left voffset20" onclick="redoRatings();">
 			<fmt:message key="label.redo" />
 		</a>
 	</c:if>	
@@ -150,12 +161,12 @@
 		<div>
 			<c:choose>			
 				<c:when test="${sessionMap.reflectOn and empty sessionMap.reflectEntry}">
-					<a href="#nogo" id="finishButton" onclick="return continueReflect()" class="btn btn-default voffset5 pull-right">
+					<a href="#nogo" id="continueButton" onclick="return continueReflect()" class="btn btn-default voffset5 pull-right voffset20">
 						<fmt:message key="label.continue" />
 					</a>
 				</c:when>
 				<c:otherwise>
-					<a href="#nogo" id="finishButton" onclick="return finishSession()" class="btn btn-primary voffset5 pull-right na">
+					<a href="#nogo" id="finishButton" class="btn btn-primary voffset5 pull-right na voffset20">
 						<fmt:message key="label.finished" />
 					</a>
 				</c:otherwise>

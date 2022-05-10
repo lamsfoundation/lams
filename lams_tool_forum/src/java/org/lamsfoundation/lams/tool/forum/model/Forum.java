@@ -45,6 +45,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 
 /**
@@ -122,9 +124,9 @@ public class Forum implements Cloneable {
      * TODO: I don't think this is going to work as the create_by column is in this table and hibernate will expect it
      * in the user table.
      * Probably need to revert to a hacked many - to - one
-     * 
+     *
      * @ManyToOne(fetch = FetchType.LAZY)
-     * 
+     *
      * @JoinColumn(name = "create_by")
      */
     @OneToOne(fetch = FetchType.EAGER)
@@ -168,6 +170,7 @@ public class Forum implements Cloneable {
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "content_uid")
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<ForumCondition> conditions;
 
     /**
@@ -176,7 +179,7 @@ public class Forum implements Cloneable {
      */
     public Forum() {
 	messages = new HashSet();
-	conditions = new TreeSet<ForumCondition>(new TextSearchConditionComparator());
+	conditions = new TreeSet<>(new TextSearchConditionComparator());
     }
 
     // **********************************************************
@@ -199,7 +202,7 @@ public class Forum implements Cloneable {
 		forum.messages = set;
 	    }
 	    if (getConditions() != null) {
-		Set<ForumCondition> conditionsCopy = new TreeSet<ForumCondition>(new TextSearchConditionComparator());
+		Set<ForumCondition> conditionsCopy = new TreeSet<>(new TextSearchConditionComparator());
 		for (ForumCondition condition : getConditions()) {
 		    conditionsCopy.add(condition.clone(forum));
 		}

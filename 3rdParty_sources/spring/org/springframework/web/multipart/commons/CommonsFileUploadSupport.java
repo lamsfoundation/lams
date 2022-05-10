@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,7 +31,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.core.io.Resource;
+import org.springframework.core.log.LogFormatUtils;
 import org.springframework.http.MediaType;
+import org.springframework.lang.Nullable;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
@@ -47,16 +49,10 @@ import org.springframework.web.util.WebUtils;
  * as representation of uploaded files and a String-based parameter Map as
  * representation of uploaded form fields.
  *
- * <p>Subclasses implement concrete resolution strategies for Servlet or Portlet
- * environments: see CommonsMultipartResolver and CommonsPortletMultipartResolver,
- * respectively. This base class is not tied to either of those APIs, factoring
- * out common functionality.
- *
  * @author Juergen Hoeller
  * @since 2.0
  * @see CommonsMultipartFile
  * @see CommonsMultipartResolver
- * @see org.springframework.web.portlet.multipart.CommonsPortletMultipartResolver
  */
 public abstract class CommonsFileUploadSupport {
 
@@ -226,7 +222,7 @@ public abstract class CommonsFileUploadSupport {
 	 * @param encoding the character encoding to use
 	 * @return an appropriate FileUpload instance.
 	 */
-	protected FileUpload prepareFileUpload(String encoding) {
+	protected FileUpload prepareFileUpload(@Nullable String encoding) {
 		FileUpload fileUpload = getFileUpload();
 		FileUpload actualFileUpload = fileUpload;
 
@@ -245,34 +241,29 @@ public abstract class CommonsFileUploadSupport {
 	/**
 	 * Parse the given List of Commons FileItems into a Spring MultipartParsingResult,
 	 * containing Spring MultipartFile instances and a Map of multipart parameter.
-	 * @param fileItems the Commons FileIterms to parse
+	 * @param fileItems the Commons FileItems to parse
 	 * @param encoding the encoding to use for form fields
 	 * @return the Spring MultipartParsingResult
 	 * @see CommonsMultipartFile#CommonsMultipartFile(org.apache.commons.fileupload.FileItem)
 	 */
 	protected MultipartParsingResult parseFileItems(List<FileItem> fileItems, String encoding) {
-		MultiValueMap<String, MultipartFile> multipartFiles = new LinkedMultiValueMap<String, MultipartFile>();
-		Map<String, String[]> multipartParameters = new HashMap<String, String[]>();
-		Map<String, String> multipartParameterContentTypes = new HashMap<String, String>();
+		MultiValueMap<String, MultipartFile> multipartFiles = new LinkedMultiValueMap<>();
+		Map<String, String[]> multipartParameters = new HashMap<>();
+		Map<String, String> multipartParameterContentTypes = new HashMap<>();
 
 		// Extract multipart files and multipart parameters.
 		for (FileItem fileItem : fileItems) {
 			if (fileItem.isFormField()) {
 				String value;
 				String partEncoding = determineEncoding(fileItem.getContentType(), encoding);
-				if (partEncoding != null) {
-					try {
-						value = fileItem.getString(partEncoding);
-					}
-					catch (UnsupportedEncodingException ex) {
-						if (logger.isWarnEnabled()) {
-							logger.warn("Could not decode multipart item '" + fileItem.getFieldName() +
-									"' with encoding '" + partEncoding + "': using platform default");
-						}
-						value = fileItem.getString();
-					}
+				try {
+					value = fileItem.getString(partEncoding);
 				}
-				else {
+				catch (UnsupportedEncodingException ex) {
+					if (logger.isWarnEnabled()) {
+						logger.warn("Could not decode multipart item '" + fileItem.getFieldName() +
+								"' with encoding '" + partEncoding + "': using platform default");
+					}
 					value = fileItem.getString();
 				}
 				String[] curParam = multipartParameters.get(fileItem.getFieldName());
@@ -291,11 +282,11 @@ public abstract class CommonsFileUploadSupport {
 				// multipart file field
 				CommonsMultipartFile file = createMultipartFile(fileItem);
 				multipartFiles.add(file.getName(), file);
-				if (logger.isDebugEnabled()) {
-					logger.debug("Found multipart file [" + file.getName() + "] of size " + file.getSize() +
-							" bytes with original filename [" + file.getOriginalFilename() + "], stored " +
-							file.getStorageDescription());
-				}
+				LogFormatUtils.traceDebug(logger, traceOn ->
+						"Part '" + file.getName() + "', size " + file.getSize() +
+								" bytes, filename='" + file.getOriginalFilename() + "'" +
+								(traceOn ? ", storage=" + file.getStorageDescription() : "")
+				);
 			}
 		}
 		return new MultipartParsingResult(multipartFiles, multipartParameters, multipartParameterContentTypes);
@@ -319,7 +310,7 @@ public abstract class CommonsFileUploadSupport {
 	 * Cleanup the Spring MultipartFiles created during multipart parsing,
 	 * potentially holding temporary data on disk.
 	 * <p>Deletes the underlying Commons FileItem instances.
-	 * @param multipartFiles Collection of MultipartFile instances
+	 * @param multipartFiles a Collection of MultipartFile instances
 	 * @see org.apache.commons.fileupload.FileItem#delete()
 	 */
 	protected void cleanupFileItems(MultiValueMap<String, MultipartFile> multipartFiles) {
@@ -328,10 +319,10 @@ public abstract class CommonsFileUploadSupport {
 				if (file instanceof CommonsMultipartFile) {
 					CommonsMultipartFile cmf = (CommonsMultipartFile) file;
 					cmf.getFileItem().delete();
-					if (logger.isDebugEnabled()) {
-						logger.debug("Cleaning up multipart file [" + cmf.getName() + "] with original filename [" +
-								cmf.getOriginalFilename() + "], stored " + cmf.getStorageDescription());
-					}
+					LogFormatUtils.traceDebug(logger, traceOn ->
+							"Cleaning up part '" + cmf.getName() +
+									"', filename '" + cmf.getOriginalFilename() + "'" +
+									(traceOn ? ", stored " + cmf.getStorageDescription() : ""));
 				}
 			}
 		}

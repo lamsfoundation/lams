@@ -58,7 +58,7 @@
 									password : {
 										required: true,
 										minlength : <c:out value="${minNumChars}"/>,
-										maxlength : 25,
+										maxlength : 50,
 										charactersAllowed : true,
 										pwcheck : true
 									},
@@ -239,6 +239,13 @@
 										<li><span class="fa fa-check"></span> <fmt:message
 												key='label.password.must.symbol' /></li>
 									</c:if>
+									
+									<li><span class="fa fa-check"></span>
+										<fmt:message key='label.password.user.details' />
+									</li>
+									<li><span class="fa fa-check"></span>
+										<fmt:message key='label.password.common' />
+									</li>
 								</ul>
 							</lams:Alert>
 						</c:if>
@@ -276,13 +283,13 @@
 									*:</td>
 								<td><lams:errors path="password"/>
 									<form:input type="password" path="password" 
-										maxlength="25" id="password" cssClass="form-control" /></td>
+										maxlength="50" id="password" cssClass="form-control" /></td>
 							</tr>
 							<tr>
 								<td class="align-right"><fmt:message
 										key="admin.user.password.confirm" /> *:</td>
 								<td><form:input type="password" path="password2" 
-										maxlength="25" id="password2" cssClass="form-control" /></td>
+										maxlength="50" id="password2" cssClass="form-control" /></td>
 							</tr>
 							</c:if>
 							<tr>
@@ -489,20 +496,22 @@
 					</div>
 					</div>
 					
-					<div class="row">
-					<div class="col-md-12">
-						<c:if test="${not empty userForm.userId}">
-							<div class="pull-left">
-							<a href="<lams:LAMSURL/>admin/userChangePass.jsp?userId=${userForm.userId}&login=${userForm.login}" class="btn btn-primary"><fmt:message key="admin.user.changePassword" /></a>
+					<c:if test="${isSysadmin}">
+						<div class="row">
+						<div class="col-md-12">
+							<c:if test="${not empty userForm.userId}">
+								<div class="pull-left">
+								<a href="<lams:LAMSURL/>admin/userChangePass.jsp?userId=${userForm.userId}&login=${userForm.login}" class="btn btn-primary"><fmt:message key="admin.user.changePassword" /></a>
+								</div>
+							</c:if>
+							
+							<div class="pull-right">
+								<a href="javascript:history.back();" class="btn btn-default"> <fmt:message key="admin.cancel" /> </a>
+								<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 							</div>
-						</c:if>
-						
-						<div class="pull-right">
-							<a href="<lams:LAMSURL/>admin/usersearch.do" class="btn btn-default"> <fmt:message key="admin.cancel" /> </a>
-							<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 						</div>
-					</div>
-					</div>
+						</div>
+					</c:if>
 					
 					</div>
 				</div> <!-- End of panel -->

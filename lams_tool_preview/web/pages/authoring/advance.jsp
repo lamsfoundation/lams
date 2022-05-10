@@ -41,17 +41,11 @@
 	</label>
 	</div>
 
-	<div class="checkbox">
-	<label for="notify-users-of-results"><form:checkbox path="peerreview.notifyUsersOfResults" id="notify-users-of-results"/>
-	<fmt:message key="label.notify.user.of.results" />
-	</label>
-	</div>
-
-	<div class="form-group">
-	<label for="tolerance">
-	<fmt:message key="label.authoring.advanced.tolearnce" />
-	<form:input type="number" min="0" max="50" path="peerreview.tolerance" id="tolerance" cssClass="form-control form-control-inline loffset5" />
-	</label>
+	<div class="form-group" id="tolerance-container">
+		<label for="tolerance">
+		<fmt:message key="label.authoring.advanced.tolearnce" />
+		<form:input type="number" min="0" max="50" path="peerreview.tolerance" id="tolerance" cssClass="form-control form-control-inline loffset5" />
+		</label>
 	</div>
 </lams:SimplePanel>
 
@@ -87,4 +81,12 @@
 	}
 
 	ra.onkeyup=turnOnRefect;
+
+	$('#self-review').change(function(){
+		if ($(this).is(':checked')) {
+			$('#tolerance-container').slideDown();
+		} else {
+			$('#tolerance-container').slideUp().find('#tolerance').val(0);
+		}
+	}).change();
 </script>

@@ -5,25 +5,6 @@
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
 		<lams:css />
-		<link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
-		
-		<script type="text/javascript" src="${lams}includes/javascript/uppy/uppy.min.js"></script>
-		<c:choose>
-			<c:when test="${language eq 'es'}">
-				<script type="text/javascript" src="${lams}includes/javascript/uppy/es_ES.min.js"></script>
-			</c:when>
-			<c:when test="${language eq 'fr'}">
-				<script type="text/javascript" src="${lams}includes/javascript/uppy/fr_FR.min.js"></script>
-			</c:when>
-			<c:when test="${language eq 'el'}">
-				<script type="text/javascript" src="${lams}includes/javascript/uppy/el_GR.min.js"></script>
-			</c:when>
-		</c:choose>
-		<script>
-			$(document).ready(function(){
-				initFileUpload('${topicFormId.tmpFileUploadId}', true, '<lams:user property="localeLanguage"/>');
-			});
-		</script>
 	</lams:head>
 	
 	<body>
@@ -55,12 +36,9 @@
 
 			<c:set var="itemAttachment" value="${topicFormId}" />
 			<div class="form-group">
-				<input type="hidden" id="tmpFileUploadId" name="tmpFileUploadId" value="${topicFormId.tmpFileUploadId}" />
-				<label for="image-upload-area"><fmt:message key="message.label.attachment" /></label>
-				<div id="image-upload-area" class="voffset20"></div>
-				
-				<form:errors path="message.attachments" />
-			    <lams:errors path="message.attachments"/>
+				<div id="itemAttachmentArea" class="small-space-bottom">
+					<%@ include file="/jsps/authoring/parts/msgattachment.jsp"%>
+				</div>
 			</div>
 
 			<div class="voffset5 pull-right">

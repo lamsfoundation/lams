@@ -15,6 +15,7 @@
 	<%@ include file="/common/tabbedheader.jsp"%>
 	<link href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet" type="text/css" />
 	<link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
+	<link href="${lams}css/uppy.custom.css" rel="stylesheet" type="text/css" />
 
 	<script type="text/javascript">
 		<%-- used for  imageGalleryitem.js --%>
@@ -24,9 +25,8 @@
 		// convert Java syntax to JSON
 		var UPLOAD_ALLOWED_EXTENSIONS = JSON.parse("[" + "${ALLOWED_EXTENSIONS_IMAGE}".replace(/\.\w+/g, '"$&"') + "]");
 		var LABEL_ITEM_BLANK = '<fmt:message key="error.resource.item.file.blank"/>';
-		var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.resource.image.not.alowed.format"/>';
 	</script>
-	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/imageGalleryitem.js"></script>
+	<lams:JSImport src="includes/javascript/imageGalleryitem.js" relative="true" />
 	
 	<script type="text/javascript" src="${lams}includes/javascript/uppy/uppy.min.js"></script>
 	<c:choose>
@@ -87,8 +87,8 @@
 		 		
 				<!--  Set up tabs  -->
 		 		<lams:TabBodys>
-   					<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />
- 					<lams:TabBody id="2" titleKey="label.authoring.heading.advance.desc" page="advance.jsp" />
+   					<lams:TabBody id="1" page="basic.jsp" />
+ 					<lams:TabBody id="2" page="advance.jsp" />
   				</lams:TabBodys>
 		
 				<!-- Button Row -->

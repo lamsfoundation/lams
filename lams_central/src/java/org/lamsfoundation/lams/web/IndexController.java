@@ -22,9 +22,9 @@
  */
 package org.lamsfoundation.lams.web;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,7 +67,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @RequestMapping("/index")
 public class IndexController {
     private static Logger log = Logger.getLogger(IndexController.class);
-    private static final String PATH_LAMS_PLANNER_WAR = "lams-planner.war";
 
     @Autowired
     private IUserManagementService userManagementService;
@@ -89,32 +88,40 @@ public class IndexController {
 	// taken based on that parameter; immediatelly, the value in DB is updated
 	HttpSession ss = SessionManager.getSession();
 	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	User user = userManagementService.getUserByLogin(userDTO.getLogin());
 	if (userDTO.isFirstLogin()) {
 	    request.setAttribute("firstLogin", true);
-	    User user = userManagementService.getUserByLogin(userDTO.getLogin());
 	    user.setFirstLogin(false);
 	    userManagementService.saveUser(user);
 	    userDTO.setFirstLogin(false);
 	}
 
-	// check if user is flagged as needing to change their password
-	User loggedInUser = userManagementService.getUserByLogin(request.getRemoteUser());
-	if (loggedInUser.getChangePassword() != null && loggedInUser.getChangePassword()) {
+	if (user.getPasswordChangeDate() != null) {
+	    int expirationPeriod = Configuration.getAsInt(ConfigurationKeys.PASSWORD_EXPIRATION_MONTHS);
+	    if (expirationPeriod > 0) {
+		LocalDateTime expirationDate = user.getPasswordChangeDate().plusMonths(expirationPeriod);
+		if (LocalDateTime.now().isAfter(expirationDate)) {
+		    user.setChangePassword(true);
+		    userManagementService.save(user);
+		    return "forward:/password.do?passwordExpired=true";
+		}
+	    }
+	}
+
+	if (user.getChangePassword() != null && user.getChangePassword()) {
 	    return "forward:/password.do";
 	}
 
 	// check if user needs to get his shared two-factor authorization secret
-	if (loggedInUser.isTwoFactorAuthenticationEnabled()
-		&& loggedInUser.getTwoFactorAuthenticationSecret() == null) {
+	if (user.isTwoFactorAuthenticationEnabled() && user.getTwoFactorAuthenticationSecret() == null) {
 	    return "forward:/twoFactorAuthentication.do";
 	}
 
 	// check if user needs to get his shared two-factor authorization secret
-	if (policyService.isPolicyConsentRequiredForUser(loggedInUser.getUserId())) {
+	if (policyService.isPolicyConsentRequiredForUser(user.getUserId())) {
 	    return "forward:/policyConsents.do";
 	}
 
-	User user = userManagementService.getUserByLogin(userDTO.getLogin());
 	request.setAttribute("portraitUuid", user.getPortraitUuid());
 
 	String redirectParam = WebUtil.readStrParam(request, "redirect", true);
@@ -177,9 +184,6 @@ public class IndexController {
     private static void setHeaderLinks(HttpServletRequest request) {
 	List<IndexLinkBean> headerLinks = new ArrayList<>();
 	if (request.isUserInRole(Role.AUTHOR)) {
-	    if (IndexController.isPedagogicalPlannerAvailable()) {
-		headerLinks.add(new IndexLinkBean("index.planner", "javascript:openPedagogicalPlanner()"));
-	    }
 	    headerLinks.add(new IndexLinkBean("index.author", "javascript:showAuthoringDialog()"));
 	}
 
@@ -296,12 +300,5 @@ public class IndexController {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	return learner != null ? learner.getUserID() : null;
-    }
-
-    private static boolean isPedagogicalPlannerAvailable() {
-	String lamsEarPath = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR);
-	String plannerPath = lamsEarPath + File.separator + PATH_LAMS_PLANNER_WAR;
-	File plannerDir = new File(plannerPath);
-	return plannerDir.exists();
     }
 }

@@ -45,8 +45,8 @@ public class FormatTrackingHSSFListener implements HSSFListener {
 	private final HSSFListener _childListener;
 	private final HSSFDataFormatter _formatter;
 	private final NumberFormat _defaultFormat;
-	private final Map<Integer, FormatRecord> _customFormatRecords = new HashMap<Integer, FormatRecord>();
-	private final List<ExtendedFormatRecord> _xfRecords = new ArrayList<ExtendedFormatRecord>();
+	private final Map<Integer, FormatRecord> _customFormatRecords = new HashMap<>();
+	private final List<ExtendedFormatRecord> _xfRecords = new ArrayList<>();
 
 	/**
 	 * Creates a format tracking wrapper around the given listener, using
@@ -84,7 +84,7 @@ public class FormatTrackingHSSFListener implements HSSFListener {
 	 * Process this record ourselves, and then pass it on to our child listener
 	 */
 	@Override
-    public void processRecord(Record record) {
+    public void processRecord(org.apache.poi.hssf.record.Record record) {
 		// Handle it ourselves
 		processRecordInternally(record);
 
@@ -98,7 +98,7 @@ public class FormatTrackingHSSFListener implements HSSFListener {
 	 *
 	 * @param record the record to be processed
 	 */
-	public void processRecordInternally(Record record) {
+	public void processRecordInternally(org.apache.poi.hssf.record.Record record) {
 		if (record instanceof FormatRecord) {
 			FormatRecord fr = (FormatRecord) record;
 			_customFormatRecords.put(Integer.valueOf(fr.getIndexCode()), fr);
@@ -155,8 +155,8 @@ public class FormatTrackingHSSFListener implements HSSFListener {
 		if (formatIndex >= HSSFDataFormat.getNumberOfBuiltinBuiltinFormats()) {
 			FormatRecord tfr = _customFormatRecords.get(Integer.valueOf(formatIndex));
 			if (tfr == null) {
-				logger.log( POILogger.ERROR, "Requested format at index " + formatIndex
-						+ ", but it wasn't found");
+				logger.log( POILogger.ERROR, "Requested format at index ", formatIndex,
+						", but it wasn't found");
 			} else {
 				format = tfr.getFormatString();
 			}
@@ -192,8 +192,8 @@ public class FormatTrackingHSSFListener implements HSSFListener {
 	public int getFormatIndex(CellValueRecordInterface cell) {
 		ExtendedFormatRecord xfr = _xfRecords.get(cell.getXFIndex());
 		if (xfr == null) {
-			logger.log( POILogger.ERROR, "Cell " + cell.getRow() + "," + cell.getColumn()
-					+ " uses XF with index " + cell.getXFIndex() + ", but we don't have that");
+			logger.log( POILogger.ERROR, "Cell ", cell.getRow(), ",", cell.getColumn(),
+					" uses XF with index ", cell.getXFIndex(), ", but we don't have that");
 			return -1;
 		}
 		return xfr.getFormatIndex();

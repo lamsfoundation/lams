@@ -16,7 +16,7 @@ CKEDITOR.addTemplates( 'lams_templates', {
 		description: 'One main image with a title and text that surround the image.',
 		html: '<h3>' +
 			// Use src=" " so image is not filtered out by the editor as incorrect (src is required).
-			'<img src=" " alt="" style="margin-right: 10px" height="100" width="100" align="left" />' +
+			'<img src=" " alt="" style="margin-right: 10px" height="100" width="100" align="left" class="img-responsive" />' +
 			'Type the title here' +
 			'</h3>' +
 			'<p>' +

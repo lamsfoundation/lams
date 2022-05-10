@@ -132,7 +132,7 @@ public class CellElapsedFormatter extends CellFormatter {
     public CellElapsedFormatter(String pattern) {
         super(pattern);
 
-        specs = new ArrayList<TimeSpec>();
+        specs = new ArrayList<>();
 
         StringBuffer desc = CellFormatPart.parseFormat(pattern,
                 CellFormatType.ELAPSED, new ElapsedPartHandler());
@@ -176,7 +176,6 @@ public class CellElapsedFormatter extends CellFormatter {
         case 'h':
             return 24;
         case 'm':
-            return 60;
         case 's':
             return 60;
         case '0':
@@ -201,11 +200,8 @@ public class CellElapsedFormatter extends CellFormatter {
             parts[i] = specs.get(i).valueFor(elapsed);
         }
 
-        Formatter formatter = new Formatter(toAppendTo, Locale.ROOT);
-        try {
+        try (Formatter formatter = new Formatter(toAppendTo, Locale.ROOT)) {
             formatter.format(printfFmt, parts);
-        } finally {
-            formatter.close();
         }
     }
 

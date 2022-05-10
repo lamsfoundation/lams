@@ -75,7 +75,7 @@ public final class CellUtil {
     public static final String WRAP_TEXT = "wrapText";
     
     private static final Set<String> shortValues = Collections.unmodifiableSet(
-            new HashSet<String>(Arrays.asList(
+            new HashSet<>(Arrays.asList(
                     BOTTOM_BORDER_COLOR,
                     LEFT_BORDER_COLOR,
                     RIGHT_BORDER_COLOR,
@@ -84,26 +84,28 @@ public final class CellUtil {
                     FILL_BACKGROUND_COLOR,
                     INDENTION,
                     DATA_FORMAT,
-                    FONT,
                     ROTATION
-    )));
+            )));
+    private static final Set<String> intValues = Collections.unmodifiableSet(
+            new HashSet<>(Arrays.asList(
+                    FONT
+            )));
     private static final Set<String> booleanValues = Collections.unmodifiableSet(
-            new HashSet<String>(Arrays.asList(
+            new HashSet<>(Arrays.asList(
                     LOCKED,
                     HIDDEN,
                     WRAP_TEXT
-    )));
+            )));
     private static final Set<String> borderTypeValues = Collections.unmodifiableSet(
-            new HashSet<String>(Arrays.asList(
+            new HashSet<>(Arrays.asList(
                     BORDER_BOTTOM,
                     BORDER_LEFT,
                     BORDER_RIGHT,
                     BORDER_TOP
-    )));
-    
+            )));
 
 
-    private static UnicodeMapping unicodeMappings[];
+    private static UnicodeMapping[] unicodeMappings;
 
     private static final class UnicodeMapping {
 
@@ -234,7 +236,7 @@ public final class CellUtil {
     public static void setFont(Cell cell, Font font) {
         // Check if font belongs to workbook
         Workbook wb = cell.getSheet().getWorkbook();
-        final short fontIndex = font.getIndex();
+        final int fontIndex = font.getIndexAsInt();
         if (!wb.getFontAt(fontIndex).equals(font)) {
             throw new IllegalArgumentException("Font does not belong to this workbook");
         }
@@ -334,16 +336,16 @@ public final class CellUtil {
      * @see #setFormatProperties(org.apache.poi.ss.usermodel.CellStyle, org.apache.poi.ss.usermodel.Workbook, java.util.Map)
      */
     private static Map<String, Object> getFormatProperties(CellStyle style) {
-        Map<String, Object> properties = new HashMap<String, Object>();
-        put(properties, ALIGNMENT, style.getAlignmentEnum());
-        put(properties, VERTICAL_ALIGNMENT, style.getVerticalAlignmentEnum());
-        put(properties, BORDER_BOTTOM, style.getBorderBottomEnum());
-        put(properties, BORDER_LEFT, style.getBorderLeftEnum());
-        put(properties, BORDER_RIGHT, style.getBorderRightEnum());
-        put(properties, BORDER_TOP, style.getBorderTopEnum());
+        Map<String, Object> properties = new HashMap<>();
+        put(properties, ALIGNMENT, style.getAlignment());
+        put(properties, VERTICAL_ALIGNMENT, style.getVerticalAlignment());
+        put(properties, BORDER_BOTTOM, style.getBorderBottom());
+        put(properties, BORDER_LEFT, style.getBorderLeft());
+        put(properties, BORDER_RIGHT, style.getBorderRight());
+        put(properties, BORDER_TOP, style.getBorderTop());
         put(properties, BOTTOM_BORDER_COLOR, style.getBottomBorderColor());
         put(properties, DATA_FORMAT, style.getDataFormat());
-        put(properties, FILL_PATTERN, style.getFillPatternEnum());
+        put(properties, FILL_PATTERN, style.getFillPattern());
         put(properties, FILL_FOREGROUND_COLOR, style.getFillForegroundColor());
         put(properties, FILL_BACKGROUND_COLOR, style.getFillBackgroundColor());
         put(properties, FONT, style.getFontIndex());
@@ -370,6 +372,8 @@ public final class CellUtil {
         for (final String key : src.keySet()) {
             if (shortValues.contains(key)) {
                 dest.put(key, getShort(src, key));
+            } else if (intValues.contains(key)) {
+                dest.put(key, getInt(src, key));
             } else if (booleanValues.contains(key)) {
                 dest.put(key, getBoolean(src, key));
             } else if (borderTypeValues.contains(key)) {
@@ -381,9 +385,7 @@ public final class CellUtil {
             } else if (FILL_PATTERN.equals(key)) {
                 dest.put(key, getFillPattern(src, key));
             } else {
-                if (log.check(POILogger.INFO)) {
-                    log.log(POILogger.INFO, "Ignoring unrecognized CellUtil format properties key: " + key);
-                }
+                log.log(POILogger.INFO, "Ignoring unrecognized CellUtil format properties key: ", key);
             }
         }
     }
@@ -408,7 +410,7 @@ public final class CellUtil {
         style.setFillPattern(getFillPattern(properties, FILL_PATTERN));
         style.setFillForegroundColor(getShort(properties, FILL_FOREGROUND_COLOR));
         style.setFillBackgroundColor(getShort(properties, FILL_BACKGROUND_COLOR));
-        style.setFont(workbook.getFontAt(getShort(properties, FONT)));
+        style.setFont(workbook.getFontAt(getInt(properties, FONT)));
         style.setHidden(getBoolean(properties, HIDDEN));
         style.setIndention(getShort(properties, INDENTION));
         style.setLeftBorderColor(getShort(properties, LEFT_BORDER_COLOR));
@@ -420,7 +422,7 @@ public final class CellUtil {
     }
 
     /**
-     * Utility method that returns the named short value form the given map.
+     * Utility method that returns the named short value from the given map.
      *
      * @param properties map of named properties (String -> Object)
      * @param name property name
@@ -429,14 +431,30 @@ public final class CellUtil {
      */
     private static short getShort(Map<String, Object> properties, String name) {
         Object value = properties.get(name);
-        if (value instanceof Short) {
-            return ((Short) value).shortValue();
+        if (value instanceof Number) {
+            return ((Number) value).shortValue();
+        }
+        return 0;
+    }
+
+    /**
+     * Utility method that returns the named int value from the given map.
+     *
+     * @param properties map of named properties (String -> Object)
+     * @param name property name
+     * @return zero if the property does not exist, or is not a {@link Integer}
+     *         otherwise the property value
+     */
+    private static int getInt(Map<String, Object> properties, String name) {
+        Object value = properties.get(name);
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
         }
         return 0;
     }
     
     /**
-     * Utility method that returns the named BorderStyle value form the given map.
+     * Utility method that returns the named BorderStyle value from the given map.
      *
      * @param properties map of named properties (String -> Object)
      * @param name property name
@@ -467,7 +485,7 @@ public final class CellUtil {
     }
     
     /**
-     * Utility method that returns the named FillPatternType value form the given map.
+     * Utility method that returns the named FillPatternType value from the given map.
      *
      * @param properties map of named properties (String -> Object)
      * @param name property name
@@ -499,7 +517,7 @@ public final class CellUtil {
     }
     
     /**
-     * Utility method that returns the named HorizontalAlignment value form the given map.
+     * Utility method that returns the named HorizontalAlignment value from the given map.
      *
      * @param properties map of named properties (String -> Object)
      * @param name property name
@@ -531,7 +549,7 @@ public final class CellUtil {
     }
     
     /**
-     * Utility method that returns the named VerticalAlignment value form the given map.
+     * Utility method that returns the named VerticalAlignment value from the given map.
      *
      * @param properties map of named properties (String -> Object)
      * @param name property name
@@ -563,7 +581,7 @@ public final class CellUtil {
     }
 
     /**
-     * Utility method that returns the named boolean value form the given map.
+     * Utility method that returns the named boolean value from the given map.
      *
      * @param properties map of properties (String -> Object)
      * @param name property name
@@ -578,7 +596,7 @@ public final class CellUtil {
         }
         return false;
     }
-    
+
     /**
      * Utility method that puts the given value to the given map.
      *

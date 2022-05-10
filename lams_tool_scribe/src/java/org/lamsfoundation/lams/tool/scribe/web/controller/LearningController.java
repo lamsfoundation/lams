@@ -239,6 +239,7 @@ public class LearningController {
 	ScribeUser scribeUser = scribeService.getUserByUID(learningform.getScribeUserUID());
 	ScribeDTO scribeDTO = new ScribeDTO(scribeUser.getScribeSession().getScribe());
 	request.setAttribute("scribeDTO", scribeDTO);
+	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, scribeUser.getScribeSession().getSessionId());
 
 	boolean isLastActivity = scribeService.isLastActivity(scribeUser.getScribeSession().getSessionId());
 	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, isLastActivity);

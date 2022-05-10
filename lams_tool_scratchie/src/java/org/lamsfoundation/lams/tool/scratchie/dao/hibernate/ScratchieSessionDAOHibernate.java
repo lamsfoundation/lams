@@ -28,16 +28,20 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
-import org.hibernate.type.FloatType;
-import org.hibernate.type.IntegerType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.qb.QbUtils;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieSessionDAO;
-import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieSessionComparator;
+import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -50,16 +54,12 @@ public class ScratchieSessionDAOHibernate extends LAMSBaseDAO implements Scratch
 
     private static final String LOAD_MARKS = "SELECT mark FROM tl_lascrt11_session session "
 	    + " JOIN tl_lascrt11_scratchie scratchie ON session.scratchie_uid = scratchie.uid "
-	    + " WHERE session.scratching_finished = 1 AND scratchie.content_id = :toolContentId";
-    private static final String FIND_MARK_STATS = "SELECT MIN(mark) min_grade, AVG(mark) avg_grade, MAX(mark) max_grade, COUNT(mark) num_complete "
-	    + " FROM tl_lascrt11_session session "
-	    + " JOIN tl_lascrt11_scratchie scratchie ON session.scratchie_uid = scratchie.uid "
-	    + " WHERE session.scratching_finished = 1 AND scratchie.content_id = :toolContentId";
+	    + " WHERE scratchie.content_id = :toolContentId";
 
     @SuppressWarnings("rawtypes")
     @Override
     public ScratchieSession getSessionBySessionId(Long sessionId) {
-	List list = doFind(FIND_BY_SESSION_ID, sessionId);
+	List list = doFindCacheable(FIND_BY_SESSION_ID, sessionId);
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
@@ -69,12 +69,12 @@ public class ScratchieSessionDAOHibernate extends LAMSBaseDAO implements Scratch
     @Override
     @SuppressWarnings("unchecked")
     public List<ScratchieSession> getByContentId(Long toolContentId) {
-	List<ScratchieSession> sessions = (List<ScratchieSession>) doFind(FIND_BY_CONTENT_ID, toolContentId);
+	List<ScratchieSession> sessions = doFindCacheable(FIND_BY_CONTENT_ID, toolContentId);
 
-	Set<ScratchieSession> sortedSessions = new TreeSet<ScratchieSession>(new ScratchieSessionComparator());
+	Set<ScratchieSession> sortedSessions = new TreeSet<>(new ScratchieSessionComparator());
 	sortedSessions.addAll(sessions);
 
-	return new ArrayList<ScratchieSession>(sortedSessions);
+	return new ArrayList<>(sortedSessions);
     }
 
     @Override
@@ -89,38 +89,51 @@ public class ScratchieSessionDAOHibernate extends LAMSBaseDAO implements Scratch
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Number> getRawLeaderMarksByToolContentId(Long toolContentId) {
-	NativeQuery<?> query = getSession().createNativeQuery(LOAD_MARKS);
+    public List<Integer> getRawLeaderMarksByToolContentId(Long toolContentId) {
+	NativeQuery<Integer> query = getSession().createNativeQuery(LOAD_MARKS);
 	query.setParameter("toolContentId", toolContentId);
-	return (List<Number>) query.list();
-    }
-    
-    @Override
-    public Object[] getStatsMarksForLeaders(Long toolContentId) {
-	NativeQuery<?> query = getSession().createNativeQuery(FIND_MARK_STATS)
-		.addScalar("min_grade", FloatType.INSTANCE)
-		.addScalar("avg_grade", FloatType.INSTANCE)
-		.addScalar("max_grade", FloatType.INSTANCE)
-		.addScalar("num_complete", IntegerType.INSTANCE);
-	query.setParameter("toolContentId", toolContentId);
-	@SuppressWarnings("unchecked")
-	List<Object[]> list = (List<Object[]>) query.list();
-	if ((list == null) || (list.size() == 0)) {
-	    return null;
-	} else {
-	    return (Object[]) list.get(0);
-	}
+	return query.list();
     }
 
     @Override
-    public List<Long> getSessionIdsByQbQuestion(Long qbQuestionUid) {
-	final String FIND_BY_QBQUESTION_AND_FINISHED = "SELECT DISTINCT session.sessionId FROM  " + Scratchie.class.getName()
-		+ " AS scratchie, " + ScratchieItem.class.getName() + " AS item, " + ScratchieSession.class.getName()
-		+ " AS session "
-		+ " WHERE session.scratchie.uid = scratchie.uid AND scratchie.uid = item.scratchieUid AND item.qbQuestion.uid =:qbQuestionUid";
-	
+    public List<Long> getSessionIdsByQbToolQuestion(Long toolQuestionUid, String answer) {
+	if (StringUtils.isBlank(answer)) {
+	    return List.of();
+	}
+
+	QbToolQuestion qbToolQuestion = find(QbToolQuestion.class, toolQuestionUid);
+	ToolActivity toolActivity = findByProperty(ToolActivity.class, "toolContentId",
+		qbToolQuestion.getToolContentId()).get(0);
+	Organisation organisation = toolActivity.getLearningDesign().getLessons().iterator().next().getOrganisation();
+	Organisation parentOrganisation = organisation.getParentOrganisation();
+	if (parentOrganisation != null && parentOrganisation.getOrganisationType().getOrganisationTypeId()
+		.equals(OrganisationType.ROOT_TYPE)) {
+	    parentOrganisation = null;
+	}
+
+	final String FIND_BY_QBQUESTION_AND_FINISHED = "SELECT DISTINCT session.sessionId FROM "
+		+ ScratchieItem.class.getName() + " AS item, " + ScratchieSession.class.getName() + " AS session, "
+		+ ScratchieAnswerVisitLog.class.getName() + " AS visitLog, " + ToolActivity.class.getName()
+		+ " AS a JOIN a.learningDesign.lessons AS l "
+		+ "WHERE session.scratchie.uid = item.scratchieUid AND a.toolContentId = session.scratchie.contentId "
+		+ "AND (l.organisation.organisationId = :organisationId OR "
+		+ "     l.organisation.parentOrganisation.organisationId = :organisationId"
+		+ (parentOrganisation == null ? ""
+			: " OR l.organisation.organisationId = :parentOrganisationId OR "
+				+ "l.organisation.parentOrganisation.organisationId = :parentOrganisationId")
+		+ ") AND item.qbQuestion.uid =:qbQuestionUid " + "AND session.sessionId = visitLog.sessionId AND "
+		+ (qbToolQuestion.getQbQuestion().isExactMatch() ? "TRIM(visitLog.answer)"
+			: "REGEXP_REPLACE(visitLog.answer, '" + QbUtils.VSA_ANSWER_NORMALISE_SQL_REG_EXP + "', '')")
+		+ " = :answer";
+
 	Query<Long> q = getSession().createQuery(FIND_BY_QBQUESTION_AND_FINISHED, Long.class);
-	q.setParameter("qbQuestionUid", qbQuestionUid);
+	q.setParameter("qbQuestionUid", qbToolQuestion.getQbQuestion().getUid());
+	q.setParameter("organisationId", organisation.getOrganisationId());
+	if (parentOrganisation != null) {
+	    q.setParameter("parentOrganisationId", parentOrganisation.getOrganisationId());
+	}
+	String normalisedAnswer = answer.replaceAll(QbUtils.VSA_ANSWER_NORMALISE_JAVA_REG_EXP, "");
+	q.setParameter("answer", normalisedAnswer);
 	return q.list();
     }
 }

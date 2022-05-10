@@ -178,10 +178,7 @@ public class GroupingUploadAJAXController {
 	}
 
 	// set cookie that will tell JS script that export has been finished
-	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
-	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
-	fileDownloadTokenCookie.setPath("/");
-	response.addCookie(fileDownloadTokenCookie);
+	WebUtil.setFileDownloadTokenCookie(request, response);
 
 	response.setContentType("application/x-download");
 	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);

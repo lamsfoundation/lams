@@ -13,7 +13,7 @@
 		</title>
 		<link href="${tool}includes/css/chat.css" rel="stylesheet" type="text/css">
 		<lams:headItems />
-		<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/authoring.js"></script>
+		<lams:JSImport src="includes/javascript/authoring.js" relative="true" />
 	</lams:head>
 	
 	<body class="stripes" onload="init();">
@@ -40,9 +40,9 @@
 				
 					<%-- Page tabs --%>
 					<lams:TabBodys>
-						<lams:TabBody id="1" titleKey="button.basic" page="basic.jsp" />
-						<lams:TabBody id="2" titleKey="button.advanced" page="advanced.jsp" />
-						<lams:TabBody id="3" titleKey="button.conditions" page="conditions.jsp" />
+						<lams:TabBody id="1" page="basic.jsp" />
+						<lams:TabBody id="2" page="advanced.jsp" />
+						<lams:TabBody id="3" page="conditions.jsp" />
 					</lams:TabBodys>
 					
 					<lams:AuthoringButton formID="authoringForm"

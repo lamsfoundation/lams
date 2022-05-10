@@ -40,7 +40,7 @@
 				${question.question}
 			</div>
 					
-			<div class="panel-body" id="question-area-${status.index}">
+			<div class="panel-body question-area" id="question-area-${status.index}">
 				<c:choose>
 					<c:when test="${question.type == 1}">
 						<c:set var="justificationEligible" value="true" />
@@ -87,7 +87,7 @@
 					</c:when>						
 				</c:choose>
 				
-				<c:if test="${assessment.enableConfidenceLevels}">
+				<c:if test="${assessment.enableConfidenceLevels and question.type != 8}">
 					<%@ include file="confidencelevel.jsp"%>
 				</c:if>
 			</div>
@@ -95,7 +95,8 @@
 		</div>
 		
 		<%--Display jsutification for each question --%>
-		<c:if test="${assessment.allowAnswerJustification && justificationEligible && (!isLeadershipEnabled or isUserLeader)}">
+		<c:if test="${(assessment.allowAnswerJustification || (question.type == 8 && question.hedgingJustificationEnabled)) 
+					&& justificationEligible && (!isLeadershipEnabled or isUserLeader)}">
 			<div class="form-group answer-justification-container">
 				<a data-toggle="collapse" data-target="#answer-justification-${question.uid}" role="button" class="collapsed">
 					<span class="if-collapsed"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i></span>
@@ -120,10 +121,10 @@
 					<fmt:message key="label.etherpad.discussion" />
 				</a>
 				
-				<div id="question-etherpad-${question.uid}" class="collapse">
+				<div id="question-etherpad-${question.uid}" class="question-etherpad-collapse collapse">
 					<div class="panel panel-default question-etherpad">
 						<lams:Etherpad groupId="etherpad-assessment-${toolSessionID}-question-${question.uid}" 
-						   showControls="${mode eq 'teacher'}" showChat="false" heightAutoGrow="true"
+						   showControls="${mode eq 'teacher'}" showChat="false" heightAutoGrow="true" showOnDemand="true"
 						>${questionEtherpadContent}</lams:Etherpad>
 					</div>
 				</div>

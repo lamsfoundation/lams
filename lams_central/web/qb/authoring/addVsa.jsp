@@ -9,6 +9,12 @@
 			textarea {
 			  resize: none;
 			}
+			
+			#option-hint {
+				font-size: 12px;
+				color: #999;
+				margin-bottom: 20px;
+			}
 		</style>
 		
   	    <script>
@@ -184,6 +190,16 @@
 					
 					<div>
 						<label class="switch">
+							<form:checkbox path="exactMatch" id="exact-match"/>
+							<span class="switch-slider round"></span>
+						</label>
+						<label for="exact-match">
+							<fmt:message key="label.authoring.short.answer.exact.match" />
+						</label>
+					</div>
+					
+					<div>
+						<label class="switch">
 							<form:checkbox path="autocompleteEnabled" id="autocomplete-enabled"/>
 							<span class="switch-slider round"></span>
 						</label>
@@ -205,6 +221,7 @@
 			
 			<!-- Options -->
 			<div class="question-tab">
+				<p id="option-hint"><fmt:message key="label.authoring.short.answer.hint" /></p>
 				<form id="optionForm" name="optionForm">
 					<%@ include file="optionlist.jsp"%>
 					

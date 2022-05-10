@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -66,6 +67,7 @@ import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.AssessmentForm;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
@@ -104,6 +106,8 @@ public class AuthoringController {
     private IAssessmentService service;
     @Autowired
     private IQbService qbService;
+    @Autowired
+    private ILamsToolService lamsToolService;
 
     /**
      * Read assessment data from database and put them into HttpSession. It will redirect to init.do directly after this
@@ -170,6 +174,9 @@ public class AuthoringController {
 	List<AssessmentQuestion> randomPoolQuestions = getRandomPoolQuestions(sessionMap);
 	randomPoolQuestions.clear();
 	for (AssessmentQuestion question : assessment.getQuestions()) {
+	    // since we are iterating anyway, here fill version information to each question
+	    qbService.fillVersionMap(question.getQbQuestion());
+
 	    if (question.isRandomQuestion()) {
 		randomPoolQuestions.add(question);
 	    }
@@ -347,6 +354,10 @@ public class AuthoringController {
 	    }
 	}
 
+	List<Long> newQuestionUids = assessmentPO.getQuestionReferences().stream()
+		.collect(Collectors.mapping(q -> q.getQuestion().getQbQuestion().getUid(), Collectors.toList()));
+	lamsToolService.syncRatQuestions(assessmentPO.getContentId(), newQuestionUids);
+
 	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	return "pages/authoring/authoring";
@@ -476,8 +487,12 @@ public class AuthoringController {
 		    break;
 		}
 	    }
+
+	    request.setAttribute("oldQbQuestionUid", oldQbQuestionUid);
+	    request.setAttribute("newQbQuestionUid", qbQuestionUid);
 	}
 	request.setAttribute("qbQuestionModified", questionModificationStatus);
+	qbService.fillVersionMap(qbQuestion);
 
 	// set session map ID so that questionlist.jsp can get sessionMAP
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapId);
@@ -608,6 +623,7 @@ public class AuthoringController {
 	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 	assessmentQuestion.setQbQuestion(qbQuestion);
 	assessmentQuestion.setDisplayOrder(getNextDisplayOrder(sessionMap));
+	qbService.fillVersionMap(qbQuestion);
 
 	QuestionReference reference = new QuestionReference();
 	reference.setQuestion(assessmentQuestion);
@@ -678,6 +694,22 @@ public class AuthoringController {
 	question.setAnswerRequired(!question.isAnswerRequired());
 
 	return String.valueOf(question.isAnswerRequired());
+    }
+
+    @RequestMapping("/changeItemQuestionVersion")
+    private String changeItemQuestionVersion(@RequestParam int referenceSequenceId, @RequestParam long newQbQuestionUid,
+	    HttpServletRequest request) {
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
+	SortedSet<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
+
+	List<QuestionReference> rList = new ArrayList<>(questionReferences);
+	QuestionReference questionReference = rList.remove(referenceSequenceId);
+	AssessmentQuestion question = questionReference.getQuestion();
+	QbQuestion newQbQuestion = qbService.getQuestionByUid(newQbQuestionUid);
+	qbService.fillVersionMap(newQbQuestion);
+	question.setQbQuestion(newQbQuestion);
+
+	return "pages/authoring/parts/questionlist";
     }
 
     @RequestMapping("/getAllQbQuestionUids")
@@ -801,11 +833,11 @@ public class AuthoringController {
     public String initOverallFeedback(HttpServletRequest request) {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	AssessmentForm assessmentForm = (AssessmentForm) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT_FORM);
-	Assessment assessment = assessmentForm.getAssessment();
+	Assessment assessment = service.getAssessmentByContentId(assessmentForm.getAssessment().getContentId());
 
 	// initial Overall feedbacks list
 	SortedSet<AssessmentOverallFeedback> overallFeedbackList = new TreeSet<>(new SequencableComparator());
-	if (!assessment.getOverallFeedbacks().isEmpty()) {
+	if (assessment != null && !assessment.getOverallFeedbacks().isEmpty()) {
 	    overallFeedbackList.addAll(assessment.getOverallFeedbacks());
 	} else {
 	    for (int i = 1; i <= AssessmentConstants.INITIAL_OVERALL_FEEDBACK_NUMBER; i++) {

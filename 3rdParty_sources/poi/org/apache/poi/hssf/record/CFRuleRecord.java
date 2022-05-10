@@ -17,33 +17,30 @@
 
 package org.apache.poi.hssf.record;
 
-import java.util.Arrays;
-
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.ss.formula.Formula;
 import org.apache.poi.ss.formula.ptg.Ptg;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Conditional Formatting Rule Record (0x01B1). 
- * 
+ * Conditional Formatting Rule Record (0x01B1).
+ *
  * <p>This is for the older-style Excel conditional formattings,
  *  new-style (Excel 2007+) also make use of {@link CFRule12Record}
  *  for their rules.</p>
  */
-public final class CFRuleRecord extends CFRuleBase implements Cloneable {
+public final class CFRuleRecord extends CFRuleBase {
     public static final short sid = 0x01B1;
 
-    /** Creates new CFRuleRecord */
-    private CFRuleRecord(byte conditionType, byte comparisonOperation) {
-        super(conditionType, comparisonOperation);
-        setDefaults();
+    public CFRuleRecord(CFRuleRecord other) {
+        super(other);
     }
 
     private CFRuleRecord(byte conditionType, byte comparisonOperation, Ptg[] formula1, Ptg[] formula2) {
         super(conditionType, comparisonOperation, formula1, formula2);
         setDefaults();
     }
+
     private void setDefaults() {
         // Set modification flags to 1: by default options are not modified
         formatting_options = modificationBits.setValue(formatting_options, -1);
@@ -59,10 +56,10 @@ public final class CFRuleRecord extends CFRuleBase implements Cloneable {
 
     /**
      * Creates a new comparison operation rule
-     * 
+     *
      * @param sheet the sheet
      * @param formulaText the formula text
-     * 
+     *
      * @return a new comparison operation rule
      */
     public static CFRuleRecord create(HSSFSheet sheet, String formulaText) {
@@ -72,12 +69,12 @@ public final class CFRuleRecord extends CFRuleBase implements Cloneable {
     }
     /**
      * Creates a new comparison operation rule
-     * 
+     *
      * @param sheet the sheet
      * @param comparisonOperation the comparison operation
      * @param formulaText1 the first formula text
      * @param formulaText2 the second formula text
-     * 
+     *
      * @return a new comparison operation rule
      */
     public static CFRuleRecord create(HSSFSheet sheet, byte comparisonOperation,
@@ -120,7 +117,7 @@ public final class CFRuleRecord extends CFRuleBase implements Cloneable {
         out.writeByte(getComparisonOperation());
         out.writeShort(formula1Len);
         out.writeShort(formula2Len);
-        
+
         serializeFormattingBlock(out);
 
         getFormula1().serializeTokens(out);
@@ -135,30 +132,12 @@ public final class CFRuleRecord extends CFRuleBase implements Cloneable {
     }
 
     @Override
-    public String toString() {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("[CFRULE]\n");
-        buffer.append("    .condition_type   =").append(getConditionType()).append("\n");
-        buffer.append("    OPTION FLAGS=0x").append(Integer.toHexString(getOptions())).append("\n");
-        if (containsFontFormattingBlock()) {
-            buffer.append(_fontFormatting).append("\n");
-        }
-        if (containsBorderFormattingBlock()) {
-            buffer.append(_borderFormatting).append("\n");
-        }
-        if (containsPatternFormattingBlock()) {
-            buffer.append(_patternFormatting).append("\n");
-        }
-        buffer.append("    Formula 1 =").append(Arrays.toString(getFormula1().getTokens())).append("\n");
-        buffer.append("    Formula 2 =").append(Arrays.toString(getFormula2().getTokens())).append("\n");
-        buffer.append("[/CFRULE]\n");
-        return buffer.toString();
+    public CFRuleRecord copy() {
+        return new CFRuleRecord(this);
     }
 
     @Override
-    public CFRuleRecord clone() {
-        CFRuleRecord rec = new CFRuleRecord(getConditionType(), getComparisonOperation());
-        super.copyTo(rec);
-        return rec;
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.CF_RULE;
     }
 }

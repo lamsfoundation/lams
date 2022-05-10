@@ -51,6 +51,7 @@ import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
@@ -333,7 +334,6 @@ public class LearnerService implements ILearnerFullService {
 		lamsCoreToolService.createToolSession(learnerProgress.getUser(), (ToolActivity) activity, lesson);
 	    }
 	} catch (RequiredGroupMissingException e) {
-	    log.warn("error occurred in 'createToolSessionFor':" + e.getMessage());
 	    throw e;
 	} catch (ToolException e) {
 	    log.error("error occurred in 'createToolSessionFor':" + e.getMessage());
@@ -521,7 +521,6 @@ public class LearnerService implements ILearnerFullService {
 	} catch (ProgressException e) {
 	    throw new LearnerServiceException(e.getMessage());
 	}
-
     }
 
     @Override
@@ -675,10 +674,14 @@ public class LearnerService implements ILearnerFullService {
 	User learner = progress.getUser();
 	Lesson lesson = progress.getLesson();
 
-	if ((learner == null) || (lesson == null) || (activity == null) || !(activity instanceof ToolActivity)
-		|| (((ToolActivity) activity).getEvaluation() == null)) {
+	if ((learner == null) || (lesson == null) || (activity == null) || !(activity instanceof ToolActivity)) {
 	    return;
 	}
+	ActivityEvaluation evaluation = activityDAO.getEvaluationByActivityId(activity.getActivityId());
+	if (evaluation == null) {
+	    return;
+	}
+
 	ToolSession toolSession = lamsCoreToolService.getToolSessionByLearner(learner, activity);
 	if (toolSession == null) {
 	    return;
@@ -889,6 +892,58 @@ public class LearnerService implements ILearnerFullService {
 	// the database.
 	activityDAO.update(gate);
 	return new GateActivityDTO(gate, expectedLearnerCount, waitingLearnerCount, gateOpen);
+    }
+
+    @Override
+    public GateActivityDTO isNextGateActivityOpenByToolSessionId(int learnerId, long toolSessionId) {
+	ToolSession toolSession = lamsCoreToolService.getToolSessionById(toolSessionId);
+	return isNextGateActivityOpenByActivityId(learnerId, toolSession.getToolActivity().getActivityId());
+    }
+
+    @Override
+    public GateActivityDTO isNextGateActivityOpenByActivityId(int learnerId, long currentActivityId) {
+	Activity currentActivity = activityDAO.getActivityByActivityId(currentActivityId, Activity.class);
+
+	LearnerProgress learnerProgress = getProgress(learnerId,
+		currentActivity.getLearningDesign().getLessons().iterator().next().getLessonId());
+	if (learnerProgress.getLesson().getLearningDesign().getCopyTypeID() == LearningDesign.COPY_TYPE_PREVIEW) {
+	    // teacher can rush through preview lessons ignoring gates
+	    return null;
+	}
+
+	Activity parentActivity = currentActivity.getParentActivity();
+	if (parentActivity != null && parentActivity.isOptionsActivity()) {
+	    // it is the optional activity which controls gate flow, not the nested tool
+	    return null;
+	}
+
+	Activity nextActivity = null;
+	Transition transition = currentActivity.getTransitionFrom();
+	Activity grandParentActivity = parentActivity == null ? null : parentActivity.getParentActivity();
+	if (transition != null) {
+	    nextActivity = transition.getToActivity();
+	} else if (grandParentActivity != null && !grandParentActivity.isOptionsWithSequencesActivity()) {
+	    // if it is branching, then it is activity -> sequence activity -> branching activity
+	    // and the branching activity is what we need to check
+	    transition = grandParentActivity.getTransitionFrom();
+	    if (transition != null) {
+		nextActivity = transition.getToActivity();
+	    }
+	}
+
+	if (nextActivity == null || !nextActivity.isGateActivity()) {
+	    return null;
+	}
+
+	GateActivity gateActivity = (GateActivity) activityDAO.getActivityByActivityId(nextActivity.getActivityId(),
+		GateActivity.class);
+	if (!gateActivity.getGateStopAtPrecedingActivity()) {
+	    return null;
+	}
+
+	User learner = userManagementService.getUserById(learnerId);
+	GateActivityDTO gateDto = knockGate(gateActivity, learner, false, null);
+	return gateDto.getAllowToPass() ? null : gateDto;
     }
 
     /**
@@ -1445,6 +1500,19 @@ public class LearnerService implements ILearnerFullService {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public void createCommandForLessonLearners(Long toolContentId, String jsonCommand) {
+	// find lesson for given tool content ID
+	Long lessonId = lessonService.getLessonByToolContentId(toolContentId).getLessonId();
+
+	Collection<User> learners = lessonService.getActiveLessonLearners(lessonId);
+	for (User learner : learners) {
+	    Command command = new Command(lessonId, learner.getLogin(), jsonCommand);
+	    commandDAO.insert(command);
+	}
+    }
+
+    @Override
     public List<Command> getCommandsForLesson(Long lessonId, Date laterThan) {
 	return commandDAO.getNewCommands(lessonId, laterThan);
     }
@@ -1656,4 +1724,9 @@ public class LearnerService implements ILearnerFullService {
 	return kumalive == null || kumalive.getFinished();
     }
 
+    @Override
+    public boolean isLearnerStartedLessonByContentId(int userId, long toolContentId) {
+	Lesson lesson = lessonService.getLessonByToolContentId(toolContentId);
+	return lesson != null && getProgress(userId, lesson.getLessonId()) != null;
+    }
 }

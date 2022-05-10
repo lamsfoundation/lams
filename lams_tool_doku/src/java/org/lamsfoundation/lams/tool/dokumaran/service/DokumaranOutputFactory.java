@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.dokumaran.service;
 
 import java.util.List;
@@ -28,7 +27,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.lamsfoundation.lams.tool.OutputFactory;
-import org.lamsfoundation.lams.tool.SimpleURL;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
@@ -42,15 +40,16 @@ public class DokumaranOutputFactory extends OutputFactory {
     @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
 	    int definitionType) throws ToolException {
-	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
-	Class simpleUrlArrayClass = SimpleURL[].class;
+	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<>();
 	switch (definitionType) {
 	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
+		ToolOutputDefinition manualGradingDefinition = buildRangeDefinition(
+			DokumaranConstants.MANUAL_GRADING_DEFINITION_NAME, 0L, 100L, true);
+		manualGradingDefinition.setWeightable(true);
+		manualGradingDefinition.setShowConditionNameOnly(true);
+		definitionMap.put(DokumaranConstants.MANUAL_GRADING_DEFINITION_NAME, manualGradingDefinition);
 		break;
 	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
-		ToolOutputDefinition sharedItemsDefinition = buildComplexOutputDefinition(
-			DokumaranConstants.SHARED_ITEMS_DEFINITION_NAME, simpleUrlArrayClass);
-		definitionMap.put(DokumaranConstants.SHARED_ITEMS_DEFINITION_NAME, sharedItemsDefinition);
 		break;
 	}
 	return definitionMap;
@@ -63,13 +62,14 @@ public class DokumaranOutputFactory extends OutputFactory {
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IDokumaranService dokumaranService,
 	    Long toolSessionId, Long learnerId) {
 
-	TreeMap<String, ToolOutput> outputs = new TreeMap<String, ToolOutput>();
-	// tool output cache
-	TreeMap<String, ToolOutput> baseOutputs = new TreeMap<String, ToolOutput>();
+	TreeMap<String, ToolOutput> outputs = new TreeMap<>();
+
 	if (names == null) {
-	    outputs.put(DokumaranConstants.SHARED_ITEMS_DEFINITION_NAME, getToolOutput(
-		    DokumaranConstants.SHARED_ITEMS_DEFINITION_NAME, dokumaranService, toolSessionId, learnerId));
+	    outputs.put(DokumaranConstants.MANUAL_GRADING_DEFINITION_NAME, getToolOutput(
+		    DokumaranConstants.MANUAL_GRADING_DEFINITION_NAME, dokumaranService, toolSessionId, learnerId));
 	} else {
+	    // tool output cache
+	    TreeMap<String, ToolOutput> baseOutputs = new TreeMap<>();
 	    for (String name : names) {
 		String[] nameParts = splitConditionName(name);
 		if (baseOutputs.get(nameParts[0]) != null) {
@@ -88,42 +88,14 @@ public class DokumaranOutputFactory extends OutputFactory {
 
     }
 
-    public ToolOutput getToolOutput(String name, IDokumaranService dokumaranService, Long toolSessionId, Long learnerId) {
+    public ToolOutput getToolOutput(String name, IDokumaranService dokumaranService, Long toolSessionId,
+	    Long learnerId) {
 	if (name != null) {
 	    String[] nameParts = splitConditionName(name);
-//	    if (DokumaranConstants.SHARED_ITEMS_DEFINITION_NAME.equals(nameParts[0])) {
-//		List<DokumaranItem> items = dokumaranService.getDokumaranItemsBySessionId(toolSessionId);
-//		List<DokumaranItem> uploadedItems = new ArrayList<DokumaranItem>(items.size());
-//		for (DokumaranItem item : items) {
-//		    if (!item.isCreateByAuthor()) {
-//			uploadedItems.add(item);
-//		    }
-//		}
-//		SimpleURL[] uploadedItemUrls = new SimpleURL[uploadedItems.size()];
-//		int uploadedItemIndex = 0;
-//		if (!uploadedItems.isEmpty()) {
-//		    String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
-//		    for (DokumaranItem uploadedItem : uploadedItems) {
-//
-//			String path = uploadedItem.getUrl();
-//			if (path == null) {
-//			    path = serverUrl + "download/?uuid=" + uploadedItem.getFileUuid() + "&preferDownload=false&"
-//				    + AttributeNames.PARAM_TOOL_CONTENT_HANDLER_NAME + "="
-//				    + DokumaranConstants.TOOL_CONTENT_HANDLER_NAME;
-//
-//			}
-//			path = "javascript:var dummy = window.open('" + path + "','" + uploadedItem.getTitle()
-//				+ "','resizable,scrollbars')";
-//			SimpleURL url = new SimpleURL(uploadedItem.getTitle(), path);
-//			uploadedItemUrls[uploadedItemIndex] = url;
-//			uploadedItemIndex++;
-//		    }
-//		    return new ToolOutput(DokumaranConstants.SHARED_ITEMS_DEFINITION_NAME,
-//			    getI18NText(DokumaranConstants.SHARED_ITEMS_DEFINITION_NAME, true), uploadedItemUrls, false);
-//		}
-//
-//	    }
-
+	    if (DokumaranConstants.MANUAL_GRADING_DEFINITION_NAME.equals(nameParts[0])) {
+		return new ToolOutput(DokumaranConstants.MANUAL_GRADING_DEFINITION_NAME,
+			getI18NText(DokumaranConstants.MANUAL_GRADING_DEFINITION_NAME, true), 0L);
+	    }
 	}
 	return null;
     }

@@ -17,18 +17,20 @@
 
 package org.apache.poi.ddf;
 
-import org.apache.poi.util.HexDump;
+import static org.apache.poi.util.GenericRecordUtil.getBitsAsString;
+
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndian;
 
 /**
  * Together the the EscherOptRecord this record defines some of the basic
  * properties of a shape.
  */
-public class EscherSpRecord
-    extends EscherRecord
-{
-    public static final short RECORD_ID = (short) 0xF00A;
-    public static final String RECORD_DESCRIPTION = "MsofbtSp";
+public class EscherSpRecord extends EscherRecord {
+    public static final short RECORD_ID = EscherRecordTypes.SP.typeID;
 
     public static final int FLAG_GROUP = 0x0001;
     public static final int FLAG_CHILD = 0x0002;
@@ -43,19 +45,54 @@ public class EscherSpRecord
     public static final int FLAG_BACKGROUND = 0x0400;
     public static final int FLAG_HASSHAPETYPE = 0x0800;
 
+    private static final int[] FLAGS_MASKS = {
+        FLAG_GROUP,
+        FLAG_CHILD,
+        FLAG_PATRIARCH,
+        FLAG_DELETED,
+        FLAG_OLESHAPE,
+        FLAG_HAVEMASTER,
+        FLAG_FLIPHORIZ,
+        FLAG_FLIPVERT,
+        FLAG_CONNECTOR,
+        FLAG_HAVEANCHOR,
+        FLAG_BACKGROUND,
+        FLAG_HASSHAPETYPE
+    };
+
+    private static final String[] FLAGS_NAMES = {
+            "GROUP",
+            "CHILD",
+            "PATRIARCH",
+            "DELETED",
+            "OLESHAPE",
+            "HAVEMASTER",
+            "FLIPHORIZ",
+            "FLIPVERT",
+            "CONNECTOR",
+            "HAVEANCHOR",
+            "BACKGROUND",
+            "HASSHAPETYPE"
+    };
+
     private int field_1_shapeId;
     private int field_2_flags;
 
+    public EscherSpRecord() {}
+
+    public EscherSpRecord(EscherSpRecord other) {
+        super(other);
+        field_1_shapeId = other.field_1_shapeId;
+        field_2_flags = other.field_2_flags;
+    }
+
     @Override
     public int fillFields(byte[] data, int offset, EscherRecordFactory recordFactory) {
-        /*int bytesRemaining =*/ readHeader( data, offset );
+        readHeader( data, offset );
         int pos            = offset + 8;
         int size           = 0;
         field_1_shapeId    =  LittleEndian.getInt( data, pos + size );     size += 4;
         field_2_flags      =  LittleEndian.getInt( data, pos + size );     size += 4;
-//        bytesRemaining -= size;
-//        remainingData  =  new byte[bytesRemaining];
-//        System.arraycopy( data, pos + size, remainingData, 0, bytesRemaining );
         return getRecordSize();
     }
 
@@ -79,8 +116,6 @@ public class EscherSpRecord
         LittleEndian.putInt( data, offset + 4, remainingBytes );
         LittleEndian.putInt( data, offset + 8, field_1_shapeId );
         LittleEndian.putInt( data, offset + 12, field_2_flags );
-//        System.arraycopy( remainingData, 0, data, offset + 26, remainingData.length );
-//        int pos = offset + 8 + 18 + remainingData.length;
         listener.afterRecordSerialize( offset + getRecordSize(), getRecordId(), getRecordSize(), this );
         return 8 + 8;
     }
@@ -98,7 +133,7 @@ public class EscherSpRecord
 
     @Override
     public String getRecordName() {
-        return "Sp";
+        return EscherRecordTypes.SP.recordName;
     }
 
     /**
@@ -106,7 +141,7 @@ public class EscherSpRecord
      */
     private String decodeFlags( int flags )
     {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         result.append( ( flags & FLAG_GROUP ) != 0 ? "|GROUP" : "" );
         result.append( ( flags & FLAG_CHILD ) != 0 ? "|CHILD" : "" );
         result.append( ( flags & FLAG_PATRIARCH ) != 0 ? "|PATRIARCH" : "" );
@@ -137,7 +172,7 @@ public class EscherSpRecord
 
     /**
      * Sets a number that identifies this shape.
-     * 
+     *
      * @param field_1_shapeId the shape id
      */
     public void setShapeId( int field_1_shapeId )
@@ -147,7 +182,7 @@ public class EscherSpRecord
 
     /**
      * The flags that apply to this shape.
-     * 
+     *
      * @return the flags
      *
      * @see #FLAG_GROUP
@@ -170,7 +205,7 @@ public class EscherSpRecord
 
     /**
      * The flags that apply to this shape.
-     * 
+     *
      * @param field_2_flags the flags
      *
      * @see #FLAG_GROUP
@@ -194,7 +229,7 @@ public class EscherSpRecord
     /**
      * Returns shape type. Must be one of MSOSPT values (see [MS-ODRAW] for
      * details).
-     * 
+     *
      * @return shape type
      */
     public short getShapeType()
@@ -205,7 +240,7 @@ public class EscherSpRecord
     /**
      * Sets shape type. Must be one of MSOSPT values (see [MS-ODRAW] for
      * details).
-     * 
+     *
      * @param value
      *            new shape type
      */
@@ -215,11 +250,22 @@ public class EscherSpRecord
     }
 
     @Override
-    protected Object[][] getAttributeMap() {
-        return new Object[][] {
-            { "ShapeType", getShapeType() },
-            { "ShapeId", field_1_shapeId },
-            { "Flags", decodeFlags(field_2_flags)+" (0x"+HexDump.toHex(field_2_flags)+")" }
-        };
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "base", super::getGenericProperties,
+            "shapeType", this::getShapeType,
+            "shapeId", this::getShapeId,
+            "flags", getBitsAsString(this::getFlags, FLAGS_MASKS, FLAGS_NAMES)
+        );
+    }
+
+    @Override
+    public Enum getGenericRecordType() {
+        return EscherRecordTypes.SP;
+    }
+
+    @Override
+    public EscherSpRecord copy() {
+        return new EscherSpRecord(this);
     }
 }

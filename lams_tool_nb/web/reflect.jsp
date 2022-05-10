@@ -11,6 +11,12 @@
 	<title><fmt:message key="activity.title"/></title>
 	<script src="${lams}includes/javascript/jquery.js"></script>
 	<script src="${lams}includes/javascript/bootstrap.min.js" type="text/javascript"></script>
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
+	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${nbLearnerForm.toolSessionID}', '', function(){
+			submitForm('finish');
+		});
+	</script>
 </lams:head>
 
 <body class="stripes">
@@ -40,7 +46,7 @@
 			<form:hidden path="toolSessionID" />
 			<form:hidden path="mode" />
 
-			<a href="#nogo" class="btn btn-primary pull-right voffset10" onclick="submitForm('finish')">
+			<a href="#nogo" class="btn btn-primary pull-right voffset10" id="finishButton">
 				<c:choose>
 					<c:when test="${isLastActivity}">
 						<fmt:message key="button.submit" />

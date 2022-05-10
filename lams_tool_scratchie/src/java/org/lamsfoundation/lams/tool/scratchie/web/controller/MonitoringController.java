@@ -24,6 +24,11 @@
 package org.lamsfoundation.lams.tool.scratchie.web.controller;
 
 import java.io.IOException;
+import java.security.InvalidParameterException;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,6 +36,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -45,6 +51,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
+import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.LeaderResultsDTO;
@@ -53,10 +60,14 @@ import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.AlphanumComparator;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
@@ -73,9 +84,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -133,7 +146,8 @@ public class MonitoringController {
 	if (scratchie.isBurningQuestionsEnabled()) {
 	    List<BurningQuestionItemDTO> burningQuestionItemDtos = scratchieService.getBurningQuestionDtos(scratchie,
 		    null, true, true);
-	    sessionMap.put(ScratchieConstants.ATTR_BURNING_QUESTION_ITEM_DTOS, burningQuestionItemDtos);
+	    MonitoringController.setUpBurningQuestions(burningQuestionItemDtos);
+	    request.setAttribute(ScratchieConstants.ATTR_BURNING_QUESTION_ITEM_DTOS, burningQuestionItemDtos);
 	}
 
 	// Create reflectList if reflection is enabled.
@@ -234,10 +248,7 @@ public class MonitoringController {
 	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
 
 	// set cookie that will tell JS script that export has been finished
-	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
-	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
-	fileDownloadTokenCookie.setPath("/");
-	response.addCookie(fileDownloadTokenCookie);
+	WebUtil.setFileDownloadTokenCookie(request, response);
 
 	// Code to generate file and write file contents to response
 	ServletOutputStream out = response.getOutputStream();
@@ -253,7 +264,7 @@ public class MonitoringController {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 
 	Scratchie scratchie = (Scratchie) sessionMap.get(ScratchieConstants.ATTR_SCRATCHIE);
-	List<Number> results = null;
+	List<Integer> results = null;
 
 	if (scratchie != null) {
 	    results = scratchieService.getMarksArray(scratchie.getContentId());
@@ -263,7 +274,7 @@ public class MonitoringController {
 	if (results != null) {
 	    responseJSON.set("data", JsonUtil.readArray(results));
 	} else {
-	    responseJSON.set("data", JsonUtil.readArray(new Float[0]));
+	    responseJSON.set("data", JsonUtil.readArray(new Integer[0]));
 	}
 
 	res.setContentType("application/json;charset=utf-8");
@@ -296,10 +307,126 @@ public class MonitoringController {
 	return "pages/monitoring/parts/statisticpart";
     }
 
+    @RequestMapping(path = "/updateTimeLimit", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void updateTimeLimit(@RequestParam(name = AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentId,
+	    @RequestParam int relativeTimeLimit, @RequestParam(required = false) Long absoluteTimeLimit) {
+	if (relativeTimeLimit < 0) {
+	    throw new InvalidParameterException(
+		    "Relative time limit must not be negative and it is " + relativeTimeLimit);
+	}
+	if (absoluteTimeLimit != null && relativeTimeLimit != 0) {
+	    throw new InvalidParameterException(
+		    "Relative time limit must not be provided when absolute time limit is set");
+	}
+
+	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
+	scratchie.setRelativeTimeLimit(relativeTimeLimit);
+	// set time limit as seconds from start of epoch, using current server time zone
+	scratchie.setAbsoluteTimeLimit(absoluteTimeLimit == null ? null
+		: LocalDateTime.ofEpochSecond(absoluteTimeLimit, 0, OffsetDateTime.now().getOffset()));
+	scratchieService.saveOrUpdateScratchie(scratchie);
+    }
+
+    @RequestMapping(path = "/getPossibleIndividualTimeLimitUsers", method = RequestMethod.GET)
+    @ResponseBody
+    public String getPossibleIndividualTimeLimitUsers(
+	    @RequestParam(name = AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentId,
+	    @RequestParam(name = "term") String searchString) {
+
+	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
+	String groupLabel = scratchieService.getMessage("monitoring.label.group") + " \"";
+	for (ScratchieSession session : scratchieService.getSessionsByContentId(toolContentId)) {
+	    if (session.getSessionName().toLowerCase().contains(searchString.toLowerCase())) {
+		ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
+		groupJSON.put("label", groupLabel + session.getSessionName() + "\"");
+		groupJSON.put("value", "group-" + session.getSessionId());
+		responseJSON.add(groupJSON);
+	    }
+	}
+	return responseJSON.toString();
+    }
+
+    @RequestMapping(path = "/getExistingIndividualTimeLimitUsers", method = RequestMethod.GET)
+    @ResponseBody
+    public String getExistingIndividualTimeLimitUsers(
+	    @RequestParam(name = AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentId) {
+
+	String groupLabel = scratchieService.getMessage("monitoring.label.group") + " \"";
+	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
+	for (ScratchieSession session : scratchieService.getSessionsByContentId(toolContentId)) {
+	    if (session.getTimeLimitAdjustment() == null) {
+		continue;
+	    }
+	    ObjectNode userJSON = JsonNodeFactory.instance.objectNode();
+	    userJSON.put("sessionId", session.getSessionId());
+	    userJSON.put("adjustment", session.getTimeLimitAdjustment());
+	    userJSON.put("name", groupLabel + session.getSessionName() + "\"");
+
+	    responseJSON.add(userJSON);
+	}
+	return responseJSON.toString();
+    }
+
+    @RequestMapping(path = "/updateIndividualTimeLimit", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void updateIndividualTimeLimit(@RequestParam String itemId,
+	    @RequestParam(required = false) Integer adjustment) {
+
+	String[] itemIdParts = itemId.split("-");
+	ScratchieSession session = scratchieService.getScratchieSessionBySessionId(Long.valueOf(itemIdParts[1]));
+	session.setTimeLimitAdjustment(adjustment);
+	scratchieService.saveOrUpdateScratchieSession(session);
+    }
+
+    @RequestMapping(path = "/displayChangeLeaderForGroupDialogFromActivity")
+    public String displayChangeLeaderForGroupDialogFromActivity(
+	    @RequestParam(name = AttributeNames.PARAM_TOOL_SESSION_ID) long toolSessionId) {
+	// tell Change Leader dialog in Leader Selection tool which learner has already reached this activity
+	String availableLearners = scratchieService.getUsersBySession(toolSessionId).stream()
+		.collect(Collectors.mapping(user -> Long.toString(user.getUserId()), Collectors.joining(",")));
+
+	return new StringBuilder("redirect:").append(Configuration.get(ConfigurationKeys.SERVER_URL))
+		.append("tool/lalead11/monitoring/displayChangeLeaderForGroupDialogFromActivity.do?toolSessionId=")
+		.append(toolSessionId).append("&availableLearners=").append(availableLearners).toString();
+    }
+
+    @RequestMapping(path = "/changeLeaderForGroup", method = RequestMethod.POST)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    private void changeLeaderForGroup(@RequestParam(name = AttributeNames.PARAM_TOOL_SESSION_ID) long toolSessionId,
+	    @RequestParam long leaderUserId) {
+	scratchieService.changeLeaderForGroup(toolSessionId, leaderUserId);
+    }
+
     @SuppressWarnings("unchecked")
     private SessionMap<String, Object> getSessionMap(HttpServletRequest request) {
 	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+    }
+
+    static void setUpBurningQuestions(List<BurningQuestionItemDTO> burningQuestionItemDtos) {
+	//unescape previously escaped session names
+	for (BurningQuestionItemDTO burningQuestionItemDto : burningQuestionItemDtos) {
+	    List<BurningQuestionDTO> burningQuestionDtos = burningQuestionItemDto.getBurningQuestionDtos();
+
+	    for (BurningQuestionDTO burningQuestionDto : burningQuestionItemDto.getBurningQuestionDtos()) {
+
+		String escapedBurningQuestion = StringEscapeUtils
+			.unescapeJavaScript(burningQuestionDto.getEscapedBurningQuestion());
+		burningQuestionDto.setEscapedBurningQuestion(escapedBurningQuestion);
+
+		String sessionName = StringEscapeUtils.unescapeJavaScript(burningQuestionDto.getSessionName());
+		burningQuestionDto.setSessionName(sessionName);
+	    }
+
+	    Collections.sort(burningQuestionDtos, new Comparator<BurningQuestionDTO>() {
+		@Override
+		public int compare(BurningQuestionDTO o1, BurningQuestionDTO o2) {
+		    return new AlphanumComparator().compare(o1.getSessionName(), o2.getSessionName());
+		}
+	    });
+	}
     }
 }

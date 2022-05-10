@@ -76,12 +76,14 @@ public class GradebookServlet extends HttpServlet {
     private static Logger logger = LoggerFactory.getLogger(GradebookServlet.class);
 
     /**
-     * Receives call from Lams ab lesson completion. After that get the latest marks for this user in this lesson and stores it in DB. 
+     * Receives call from Lams ab lesson completion. After that get the latest marks for this user in this lesson and
+     * stores it in DB.
      */
+    @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 	ContextManager ctxMgr = null;
-	
+
 	try {
 	    // get Blackboard context
 	    ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
@@ -104,9 +106,16 @@ public class GradebookServlet extends HttpServlet {
 	    //check user rights
 	    String secretKey = LamsPluginUtil.getServerSecretKey();
 	    String serverId = LamsPluginUtil.getServerId();
-	    if (!LamsSecurityUtil.sha1(
-		    timeStamp.toLowerCase() + userName.toLowerCase() + serverId.toLowerCase()
-			    + secretKey.toLowerCase()).equals(hash)) {
+	    String plaintext = timeStamp.toLowerCase() + userName.toLowerCase() + serverId.toLowerCase()
+		    + secretKey.toLowerCase();
+	    String parametersHash = null;
+	    if (hash.length() == LamsSecurityUtil.SHA1_HEX_LENGTH) {
+		// for some time support SHA-1 for authentication
+		parametersHash = LamsSecurityUtil.sha1(plaintext);
+	    } else {
+		parametersHash = LamsSecurityUtil.sha256(plaintext);
+	    }
+	    if (!hash.equals(parametersHash)) {
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "authentication failed");
 		return;
 	    }
@@ -117,7 +126,7 @@ public class GradebookServlet extends HttpServlet {
 		throw new ServletException("User not found with userName:" + userName);
 	    }
 	    Id userId = user.getId();
-	    
+
 	    //allow lessonComplete.jsp on LAMS side to make an Ajax call to this servlet
 	    String serverUrlWithLamsWord = LamsPluginUtil.getServerUrl();
 	    URI uri = new URI(serverUrlWithLamsWord);
@@ -139,10 +148,8 @@ public class GradebookServlet extends HttpServlet {
 		    + " scores.");
 
 	    String getLamsMarkURL = LamsPluginUtil.getServerUrl() + "/services/xml/LessonManager?"
-		    + LamsSecurityUtil.generateAuthenticateParameters(userName)
-		    + "&method=gradebookMarksUser"
-		    + "&lsId=" + lamsLessonIdParam 
-		    + "&outputsUser=" + URLEncoder.encode(userName, "UTF8");
+		    + LamsSecurityUtil.generateAuthenticateParameters(userName) + "&method=gradebookMarksUser"
+		    + "&lsId=" + lamsLessonIdParam + "&outputsUser=" + URLEncoder.encode(userName, "UTF8");
 	    URL url = new URL(getLamsMarkURL);
 	    URLConnection conn = url.openConnection();
 	    if (!(conn instanceof HttpURLConnection)) {
@@ -163,7 +170,7 @@ public class GradebookServlet extends HttpServlet {
 	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 	    DocumentBuilder db = dbf.newDocumentBuilder();
 	    Document document = db.parse(is);
-	    
+
 	    Node lesson = document.getDocumentElement().getFirstChild();
 	    Node learnerResult = lesson.getFirstChild();
 
@@ -179,15 +186,15 @@ public class GradebookServlet extends HttpServlet {
 		currentScore.setLineitemId(lineitem.getId());
 		currentScore.setCourseMembershipId(courseMembership.getId());
 	    }
-	    
+
 	    //updates and persists currentScore in the DB
 	    LineitemUtil.updateScoreBasedOnLamsResponse(lesson, learnerResult, currentScore);
-	    
+
 	    //notifying LAMS that score has been stored successfully
 	    response.setContentType("text/html");
 	    PrintWriter out = response.getWriter();
 	    out.write("OK");
-	    
+
 	    //the following paragraph is kept due to the Ernie's request to keep it for potential usage in the future
 //	    NodeList activities = document.getDocumentElement().getFirstChild().getChildNodes();
 //
@@ -195,28 +202,28 @@ public class GradebookServlet extends HttpServlet {
 //	    float userResult = 0;
 //	    for (int i = 0; i < activities.getLength(); i++) {
 //		Node activity = activities.item(i);
-//		
+//
 //		for (int j = 0; j < activity.getChildNodes().getLength(); j++) {
-//		    
+//
 //		    Node toolOutput = activity.getChildNodes().item(j);
 //		    String toolOutputName = toolOutput.getAttributes().getNamedItem("name").getNodeValue();
 //		    // The only numeric outputs we get from LAMS are for the MCQ and Assessment activities
-//		    // learner.total.score = Assessment 
+//		    // learner.total.score = Assessment
 //		    // learner.mark = MCQ
 //		    if ("learner.mark".equals(toolOutputName) || "learner.total.score".equals(toolOutputName)) {
 //			String userResultStr = toolOutput.getAttributes().getNamedItem("output").getNodeValue();
 //			String maxResultStr = toolOutput.getAttributes().getNamedItem("marksPossible").getNodeValue();
-//			
+//
 //			userResult += Float.parseFloat(userResultStr);
 //			maxResult += Float.parseFloat(maxResultStr);
 //		    }
 //		}
-//		
+//
 //	    }
-	    
+
 	} catch (MalformedURLException e) {
-	    throw new ServletException("Unable to get LAMS learning designs, bad URL: "
-		    + ", please check lams.properties", e);
+	    throw new ServletException(
+		    "Unable to get LAMS learning designs, bad URL: " + ", please check lams.properties", e);
 	} catch (IllegalStateException e) {
 	    throw new ServletException(
 		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
@@ -251,7 +258,7 @@ public class GradebookServlet extends HttpServlet {
 	}
 
     }
-    
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 	doGet(req, resp);

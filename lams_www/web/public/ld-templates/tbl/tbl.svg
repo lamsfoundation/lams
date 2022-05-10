@@ -1,0 +1,2278 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:xhtml="http://www.w3.org/1999/xhtml"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   inkscape:version="1.0 (4035a4f, 2020-05-01)"
+   sodipodi:docname="learning_design.svg"
+   id="svg2425"
+   class="svg-learning-design"
+   preserveAspectRatio="xMinYMin slice"
+   viewBox="40 40 800 523.59393"
+   width="800"
+   version="1.1"
+   height="523.59393">
+  <metadata
+     id="metadata2429">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     inkscape:current-layer="svg2425"
+     inkscape:window-maximized="0"
+     inkscape:window-y="26"
+     inkscape:window-x="0"
+     inkscape:cy="302.50007"
+     inkscape:cx="459.78752"
+     inkscape:zoom="0.75572685"
+     fit-margin-bottom="0"
+     fit-margin-right="0"
+     fit-margin-left="0"
+     fit-margin-top="0"
+     showgrid="false"
+     id="namedview2427"
+     inkscape:window-height="1024"
+     inkscape:window-width="1680"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0"
+     guidetolerance="10"
+     gridtolerance="10"
+     objecttolerance="10"
+     borderopacity="1"
+     bordercolor="#666666"
+     pagecolor="#ffffff" />
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g1657"
+     uiid="24">
+    <path
+       id="path1651"
+       class="svg-transition"
+       d="M 322.57388,360 H 380" />
+    <circle
+       id="circle1653"
+       class="svg-transition-element"
+       r="3"
+       cy="360"
+       cx="322.57388" />
+    <polygon
+       id="polygon1655"
+       class="svg-transition-element"
+       transform="rotate(90,10,370)"
+       points="5,10 -5,10 0,0 " />
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g1665"
+     uiid="26">
+    <path
+       id="path1659"
+       class="svg-transition"
+       d="m 588,360 h 52.42609" />
+    <circle
+       id="circle1661"
+       class="svg-transition-element"
+       r="3"
+       cy="360"
+       cx="588" />
+    <polygon
+       id="polygon1663"
+       class="svg-transition-element"
+       transform="rotate(90,140.21305,500.21305)"
+       points="5,10 -5,10 0,0 " />
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g1673"
+     uiid="32">
+    <path
+       id="path1667"
+       class="svg-transition"
+       d="M 322.57388,520 H 360" />
+    <circle
+       id="circle1669"
+       class="svg-transition-element"
+       r="3"
+       cy="520"
+       cx="322.57388" />
+    <polygon
+       id="polygon1671"
+       class="svg-transition-element"
+       transform="rotate(90,-80,440)"
+       points="5,10 -5,10 0,0 " />
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g1681"
+     uiid="31">
+    <path
+       id="path1675"
+       class="svg-transition"
+       d="m 248,520 h 32.42612" />
+    <circle
+       id="circle1677"
+       class="svg-transition-element"
+       r="3"
+       cy="520"
+       cx="248" />
+    <polygon
+       id="polygon1679"
+       class="svg-transition-element"
+       transform="rotate(90,-119.78695,400.21305)"
+       points="5,10 -5,10 0,0 " />
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g1689"
+     uiid="28">
+    <path
+       id="path1683"
+       class="svg-transition"
+       d="m 660,382.57388 v 33.71306 q 0,15 -15,15 H 235 q -15,0 -15,15 V 480" />
+    <circle
+       id="circle1685"
+       class="svg-transition-element"
+       r="3"
+       cy="382.57388"
+       cx="660" />
+    <polygon
+       id="polygon1687"
+       class="svg-transition-element"
+       transform="rotate(180,110,240)"
+       points="5,10 -5,10 0,0 " />
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g1697"
+     uiid="23">
+    <path
+       id="path1691"
+       class="svg-transition"
+       d="m 243,360 h 37.42612" />
+    <circle
+       id="circle1693"
+       class="svg-transition-element"
+       r="3"
+       cy="360"
+       cx="243" />
+    <polygon
+       id="polygon1695"
+       class="svg-transition-element"
+       transform="rotate(90,-39.78695,320.21305)"
+       points="5,10 -5,10 0,0 " />
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g1705"
+     uiid="20">
+    <path
+       id="path1699"
+       class="svg-transition"
+       d="m 860,222.5739 v 33.71305 q 0,15 -15,15 H 235 q -15,0 -15,15 V 320" />
+    <circle
+       id="circle1701"
+       class="svg-transition-element"
+       r="3"
+       cy="222.5739"
+       cx="860" />
+    <polygon
+       id="polygon1703"
+       class="svg-transition-element"
+       transform="rotate(180,110,160)"
+       points="5,10 -5,10 0,0 " />
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g1713"
+     uiid="18">
+    <path
+       id="path1707"
+       class="svg-transition"
+       d="m 803,200 h 37.42609" />
+    <circle
+       id="circle1709"
+       class="svg-transition-element"
+       r="3"
+       cy="200"
+       cx="803" />
+    <polygon
+       id="polygon1711"
+       class="svg-transition-element"
+       transform="rotate(90,320.21305,520.21305)"
+       points="5,10 -5,10 0,0 " />
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g1721"
+     uiid="16">
+    <path
+       id="path1715"
+       class="svg-transition"
+       d="M 562.57391,200 H 600" />
+    <circle
+       id="circle1717"
+       class="svg-transition-element"
+       r="3"
+       cy="200"
+       cx="562.57391" />
+    <polygon
+       id="polygon1719"
+       class="svg-transition-element"
+       transform="rotate(90,200,400)"
+       points="5,10 -5,10 0,0 " />
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g1729"
+     uiid="14">
+    <path
+       id="path1723"
+       class="svg-transition"
+       d="m 483,200 h 37.42609" />
+    <circle
+       id="circle1725"
+       class="svg-transition-element"
+       r="3"
+       cy="200"
+       cx="483" />
+    <polygon
+       id="polygon1727"
+       class="svg-transition-element"
+       transform="rotate(90,160.21305,360.21305)"
+       points="5,10 -5,10 0,0 " />
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g1737"
+     uiid="12">
+    <path
+       id="path1731"
+       class="svg-transition"
+       d="m 248,200 h 32" />
+    <circle
+       id="circle1733"
+       class="svg-transition-element"
+       r="3"
+       cy="200"
+       cx="248" />
+    <polygon
+       id="polygon1735"
+       class="svg-transition-element"
+       transform="rotate(90,40,240)"
+       points="5,10 -5,10 0,0 " />
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g1745"
+     uiid="10">
+    <path
+       id="path1739"
+       class="svg-transition"
+       d="m 540,102.57389 v 13.71306 q 0,15 -15,15 H 235 q -15,0 -15,15 V 160" />
+    <circle
+       id="circle1741"
+       class="svg-transition-element"
+       r="3"
+       cy="102.57389"
+       cx="540" />
+    <polygon
+       id="polygon1743"
+       class="svg-transition-element"
+       transform="rotate(180,110,80)"
+       points="5,10 -5,10 0,0 " />
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g1753"
+     uiid="8">
+    <path
+       id="path1747"
+       class="svg-transition"
+       d="m 483,80 h 37.42609" />
+    <circle
+       id="circle1749"
+       class="svg-transition-element"
+       r="3"
+       cy="80"
+       cx="483" />
+    <polygon
+       id="polygon1751"
+       class="svg-transition-element"
+       transform="rotate(90,220.21305,300.21305)"
+       points="5,10 -5,10 0,0 " />
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g1761"
+     uiid="6">
+    <path
+       id="path1755"
+       class="svg-transition"
+       d="m 243,80 h 37" />
+    <circle
+       id="circle1757"
+       class="svg-transition-element"
+       r="3"
+       cy="80"
+       cx="243" />
+    <polygon
+       id="polygon1759"
+       class="svg-transition-element"
+       transform="rotate(90,100,180)"
+       points="5,10 -5,10 0,0 " />
+  </g>
+  <desc
+     id="desc1763">Created with Snap</desc>
+  <defs
+     id="defs1768">
+    <filter
+       filterUnits="userSpaceOnUse"
+       id="Skwtuth5r1">
+      <feColorMatrix
+         id="feColorMatrix1765"
+         values="0.2126 0.7152 0.0722 0 0 0.2126 0.7152 0.0722 0 0 0.2126 0.7152 0.0722 0 0 0 0 0 1 0"
+         type="matrix" />
+    </filter>
+  </defs>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g1799"
+     class="svg-activity svg-activity-grouping"
+     data-height="80"
+     data-width="200"
+     data-y="40"
+     data-x="280"
+     uiid="3">
+    <path
+       id="path1770"
+       class="svg-tool-activity-background svg-shadow"
+       d="m 285,40 h 190 q 5,0 5,5 v 70 q 0,5 -5,5 H 285 q -5,0 -5,-5 V 45 q 0,-5 5,-5" />
+    <path
+       id="path1772"
+       class="svg-tool-activity-border"
+       d="m 285,40 h 190 q 5,0 5,5 v 70 q 0,5 -5,5 H 285 q -5,0 -5,-5 V 45 q 0,-5 5,-5" />
+    <foreignObject
+       height="80"
+       width="125"
+       y="40"
+       x="355">
+      <xhtml:div
+         class="svg-activity-title-label svg-tool-activity-title-box">Team Setup</xhtml:div>
+    </foreignObject>
+    <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+    <svg
+       id="svg1797"
+       height="50"
+       width="50"
+       y="55"
+       x="300"
+       version="1.1"
+       viewBox="0 0 512 512"
+       xml:space="preserve"
+       class="grouping"><metadata
+   id="metadata878"><rdf:rdf><cc:work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title /></cc:work></rdf:rdf></metadata><defs
+   id="defs876">
+	
+	
+	
+	
+
+		
+		
+		
+		
+	
+		
+		
+		
+		
+	</defs>
+<style
+   type="text/css"
+   id="style833">
+	svg.grouping .st0{opacity:0.6;fill:#38C1CE;}
+	svg.grouping .st1{fill:#38C1CE;}
+	svg.grouping .st2{fill:none;stroke:#111342;stroke-width:10.7714;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+</style>
+
+<g
+   id="g1122"
+   transform="translate(0,11)"><g
+     transform="matrix(1.0922905,0,0,0.99920734,-31.801735,1.3639471)"
+     id="g869">
+		<g
+   id="g863">
+			<path
+   class="st2"
+   d="m 284.06,223.87 v 21.78 l 16.33,16.33 c 38.11,21.78 76.22,16.33 76.22,70.78 v 49 H 137.06 v -49 c 0,-54.44 38.11,-49 76.22,-70.78 l 16.33,-16.33 v -21.78"
+   id="path857" />
+			<path
+   class="st2"
+   d="m 305.84,153.1 c 0,-33.08 -15.92,-49 -49,-49 -33.08,0 -49,15.92 -49,49 v 21.78 c 5.44,38.11 21.78,49 21.78,49 10.89,5.44 27.22,5.44 27.22,5.44 0,0 16.33,0 27.22,-5.44 0,0 16.33,-10.89 21.78,-49 z"
+   id="path859" />
+			<polyline
+   class="st2"
+   points="207.84,153.1 229.62,142.21 256.84,153.1 284.06,163.99 305.84,153.1    "
+   id="polyline861" />
+		</g>
+		<line
+   class="st2"
+   x1="180.62"
+   y1="381.76001"
+   x2="180.62"
+   y2="338.20999"
+   id="line865" />
+		<line
+   class="st2"
+   x1="333.06"
+   y1="381.76001"
+   x2="333.06"
+   y2="338.20999"
+   id="line867" />
+	</g><g
+     transform="matrix(1.0922905,0,0,0.99920734,-31.801735,1.3639471)"
+     id="g1029"><path
+       class="st1"
+       d="m 166.61573,164.09405 c 0,30.62 -17.16,56.85999 -43.73,56.85999 -7.01,0 -13.37,-1.81999 -18.92,-5.08 -6.3,-10.01 -9.81,-22.95 -9.81,-36.77 0,-30.62 8.74,-48.1 43.73,-48.1 10.01,0 17.89,1.43 24,4.2 3.48,7.57 4.73,17.3 4.73,28.89001 z"
+       id="path837" /><path
+       class="st2"
+       d="m 166.61573,164.09405 c 0,30.62 -17.16,56.85999 -43.73,56.85999 -7.01,0 -13.37,-1.81999 -18.92,-5.08 -15.51,-9.08 -24.81,-29.24 -24.81,-51.78 0,-30.62 8.74,-48.09999 43.73,-48.09999 21.73,0 33.34,6.75 39.01,19.19999 3.47,7.58 4.72,17.31 4.72,28.90001 z"
+       id="path839" /><path
+       class="st2"
+       d="m 96.64573,212.20404 -61.23,34.99001 c 0,0 0,3.00999 0,17.49 0,14.49 8.75,26.24 17.49,26.24 h 99.37"
+       id="path843"
+       style="stroke-width:10.771;stroke-miterlimit:10;stroke-dasharray:none" /><path
+       style="fill:none;stroke:#111342;stroke-width:10.771;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none"
+       id="path843-3"
+       d="m 141.02022,215.9209 56.19629,31.3945 v 17.49 c 0,13.0518 -26.13337,6.70292 -44.94078,26.11865 l -71.919214,0.12135"
+       class="st2" /></g><g
+     transform="matrix(1.0922905,0,0,0.99920734,-31.801735,1.3639471)"
+     id="g1023"><path
+       class="st1"
+       d="m 360.82247,164.18393 c 0,30.62 17.16,56.86 43.73,56.86 7.01,0 13.37,-1.82 18.92,-5.08 6.3,-10.01 9.81,-22.95 9.81,-36.77 0,-30.62 -8.74,-48.1 -43.73,-48.1 -10.01,0 -17.89,1.43 -24,4.2 -3.48,7.57 -4.73,17.3 -4.73,28.89 z"
+       id="path847" /><path
+       class="st2"
+       d="m 360.82247,164.18393 c 0,30.62 17.16,56.86 43.73,56.86 7.01,0 13.37,-1.82 18.92,-5.08 15.51,-9.08 24.81,-29.24 24.81,-51.78 0,-30.62 -8.74,-48.1 -43.73,-48.1 -21.73,0 -33.34,6.75 -39.01,19.2 -3.47,7.58 -4.72,17.31 -4.72,28.9 z"
+       id="path849" /><path
+       class="st2"
+       d="m 430.79247,211.0937 61.23,34.99 c 0,0 0,3.01 0,17.49 0,14.49 -8.75,26.24 -17.49,26.24 h -99.37"
+       id="path853" /><path
+       id="path853-5"
+       d="m 378.32506,211.56715 -61.31342,34.98698 -0.44557,21.9437 c 22.75147,10.03311 35.5278,14.454 42.49498,20.24594 l 25.89072,1.09092"
+       class="st2"
+       style="fill:none;stroke:#111342;stroke-width:10.7783;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10" /></g></g><desc
+   id="desc1795">Created with Snap</desc></svg>
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g1843"
+     class="svg-activity svg-activity-tool"
+     data-height="80"
+     data-width="200"
+     data-y="40"
+     data-x="40"
+     uiid="1">
+    <path
+       id="path1801"
+       class="svg-tool-activity-background svg-shadow"
+       d="m 45,120 q -5,0 -5,-5 V 45 q 0,-5 5,-5 h 190 q 5,0 5,5 v 70 q 0,5 -5,5 z" />
+    <path
+       id="path1803"
+       class="svg-tool-banner-wide svg-tool-activity-category-4"
+       d="m 45,120 q -5,0 -5,-5 V 45 q 0,-5 5,-5 h 60 v 80 z" />
+    <path
+       id="path1805"
+       class="svg-tool-banner-narrow svg-tool-activity-category-4"
+       style="display:none"
+       d="m 45,120 q -5,0 -5,-5 V 45 q 0,-5 5,-5 h 10 v 80 z" />
+    <path
+       id="path1807"
+       class="svg-tool-activity-border"
+       d="m 45,120 q -5,0 -5,-5 V 45 q 0,-5 5,-5 h 190 q 5,0 5,5 v 70 q 0,5 -5,5 z" />
+    <foreignObject
+       height="80"
+       width="125"
+       y="40"
+       x="115">
+      <xhtml:div
+         class="svg-activity-title-label svg-tool-activity-title-box">Introduction to TBL</xhtml:div>
+    </foreignObject>
+    <!--?xml version="1.0" encoding="UTF-8"?-->
+    <svg
+       id="svg1841"
+       version="1.1"
+       height="40"
+       width="40"
+       y="60"
+       x="55"
+       viewBox="0 0 512 512"
+       class="nb">
+      <style
+         id="style1809">svg.nb .G{stroke-miterlimit:10}svg.nb .H{stroke:#111342}svg.nb .I{stroke-width:13.701}svg.nb .J{stroke-linejoin:round}svg.nb .K{stroke-linecap:round}</style>
+      <path
+         id="path1811"
+         class="G H I J"
+         fill="#ffffff"
+         d="M 452.558,503.466 H 59.715 A 24.69,24.69 0 0 1 35.034,478.785 V 33.215 A 24.69,24.69 0 0 1 59.715,8.534 h 392.854 a 24.69,24.69 0 0 1 24.681,24.681 v 445.57 c 0,13.627 -11.053,24.681 -24.692,24.681 z" />
+      <g
+         id="g1835"
+         transform="matrix(1.231969,0,0,1.251961,-60.456929,-67.234351)">
+        <g
+           id="g1817"
+           class="G H I J"
+           fill="none">
+          <path
+             id="path1813"
+             d="M 379.44,245.77 H 128.63 a 13.7,13.7 0 0 1 -13.7,-13.7 v -110.7 a 13.7,13.7 0 0 1 13.7,-13.7 h 250.81 a 13.7,13.7 0 0 1 13.7,13.7 v 110.7 c 0,7.56 -6.13,13.7 -13.7,13.7 z" />
+          <path
+             id="path1815"
+             class="K"
+             d="m 255.5,133.88 h 7.94 m -126.68,41.1 H 366.2 M 136.76,213.8 H 366.2" />
+        </g>
+        <path
+           id="path1819"
+           fill="#ff72ac"
+           d="m 391.44,420.68 h -98.98 c -6.72,0 -12.16,-5.44 -12.16,-12.16 v -98.25 c 0,-6.72 5.44,-12.16 12.16,-12.16 h 98.98 c 6.72,0 12.16,5.44 12.16,12.16 v 98.25 a 12.17,12.17 0 0 1 -12.16,12.16 z" />
+        <g
+           id="g1833"
+           class="H I J"
+           fill="none">
+          <g
+             id="g1827"
+             class="G">
+            <path
+               id="path1821"
+               d="M 386.29,417.03 H 274.77 a 13.7,13.7 0 0 1 -13.7,-13.7 v -110.7 a 13.7,13.7 0 0 1 13.7,-13.7 h 111.52 a 13.7,13.7 0 0 1 13.7,13.7 v 110.7 c 0,7.56 -6.13,13.7 -13.7,13.7 z" />
+            <path
+               id="path1823"
+               d="m 337.88,341.58 v 0 a 19.73,19.73 0 0 1 -19.73,-19.73 v 0 a 19.73,19.73 0 0 1 19.73,-19.73 v 0 a 19.73,19.73 0 0 1 19.73,19.73 v 0 a 19.73,19.73 0 0 1 -19.73,19.73 z" />
+            <path
+               id="path1825"
+               class="K"
+               d="m 261.07,378.39 28.77,-30.41 48.04,37.08 34.16,-25.3 27.95,25.3" />
+          </g>
+          <circle
+             id="circle1829"
+             cx="175.57001"
+             cy="351.72"
+             r="65.760002" />
+          <path
+             id="path1831"
+             class="G"
+             d="m 155.78,381.52 48.14,-27.79 -48.14,-27.79 z" />
+        </g>
+      </g>
+      <desc
+         id="desc1837">Created with Snap</desc>
+      <defs
+         id="defs1839" />
+    </svg>
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g1861"
+     class="svg-activity svg-activity-gate svg-shadow"
+     data-height="40"
+     data-width="40"
+     data-y="60"
+     data-x="520"
+     uiid="7">
+    <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+    <svg
+       id="svg1859"
+       height="40"
+       width="40"
+       y="60"
+       x="520"
+       xml:space="preserve"
+       viewBox="0 0 512 512"
+       version="1.1"
+       class="gateClosed"><metadata
+   id="metadata1181"><rdf:rdf><cc:work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title /></cc:work></rdf:rdf></metadata><defs
+   id="defs1179">
+	
+	
+	
+</defs>
+<style
+   id="style1150"
+   type="text/css">
+	svg.gateClosed .st0{fill:#FBA919;stroke:#111342;stroke-width:14.3597;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	svg.gateClosed .st1{display:none;}
+	
+		svg.gateClosed .st2{display:inline;fill:#FFFFFF;stroke:#111342;stroke-width:14.3597;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	svg.gateClosed .st3{fill:#FFFFFF;stroke:#111342;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+</style>
+<circle
+   style="fill:#ff2a2a;stroke:#ff2a2a;stroke-width:8.9083;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   r="250.54585"
+   class="st0"
+   cx="256"
+   cy="256"
+   id="circle1152" /><g
+   class="st1"
+   id="g1158">
+		<circle
+   class="st2"
+   cx="256.28"
+   cy="118.83"
+   r="37.34"
+   id="circle1154" />
+		<path
+   class="st2"
+   d="m 341.4,309.48 21.75,-11.32 c 3.35,-1.74 4.65,-5.87 2.91,-9.22 L 303.67,173.2 C 300,166.4 292.83,162.22 285.1,162.4 l -61.75,1.43 c -7.49,0.17 -14.3,4.41 -17.76,11.06 l -59.35,114.05 c -1.74,3.35 -0.44,7.48 2.91,9.22 l 21.75,11.32 c 3.35,1.74 7.48,0.44 9.22,-2.91 l 31.08,-59.73 v 57.76 3.49 110.28 c 0,3.78 3.06,6.84 6.84,6.84 h 24.52 c 3.78,0 6.84,-3.06 6.84,-6.84 V 314.93 c 0,-3.78 3.06,-6.84 6.84,-6.84 v 0 c 3.78,0 6.84,3.06 6.84,6.84 v 103.45 c 0,3.78 3.06,6.84 6.84,6.84 h 24.52 c 3.78,0 6.84,-3.06 6.84,-6.84 V 304.61 h -0.09 v -57.63 l 31.01,59.59 c 1.72,3.35 5.85,4.65 9.2,2.91 z"
+   id="path1156" />
+	</g><g
+   style="stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none"
+   id="g1172"
+   transform="matrix(1.1135371,0,0,1.1135371,-29.377288,-28.631235)">
+		<path
+   style="stroke:#ffffff;stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   class="st3"
+   d="M 292.21,418.27 V 284.14 h 20.63 V 201.6 c 0,-19.94 -16.17,-36.11 -36.11,-36.11 h -41.27 c -19.94,0 -36.11,16.17 -36.11,36.11 v 82.54 h 20.63 v 134.13 z"
+   id="path1160" />
+		<line
+   style="stroke:#ff2a2a;stroke-width:15;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   class="st3"
+   x1="256.10001"
+   y1="422.84918"
+   x2="256.10001"
+   y2="299.62"
+   id="line1162" />
+		<path
+   style="stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none"
+   class="st3"
+   d="m 281.9,119.07 c 0,14.25 -11.56,25.78 -25.8,25.78 -3.85,0 -7.51,-0.85 -10.8,-2.37 -1.52,-3.27 -2.37,-6.92 -2.37,-10.78 0,-14.25 11.56,-25.8 25.8,-25.8 3.85,0 7.51,0.85 10.8,2.37 1.52,3.29 2.37,6.94 2.37,10.8 z"
+   id="path1164" />
+		<path
+   style="stroke:#ffffff;stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   class="st3"
+   d="m 281.9,119.07 c 0,14.25 -11.56,25.78 -25.8,25.78 -3.85,0 -7.51,-0.85 -10.8,-2.37 -8.87,-4.08 -15,-13.04 -15,-23.42 0,-14.25 11.56,-25.8 25.8,-25.8 10.4,0 19.36,6.16 23.44,15 1.51,3.3 2.36,6.95 2.36,10.81 z"
+   id="path1166" />
+		
+		
+	</g>
+<desc
+   id="desc1857">Created with Snap</desc></svg>
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g1933"
+     class="svg-activity svg-activity-tool"
+     data-height="80"
+     data-width="200"
+     data-y="160"
+     data-x="40"
+     uiid="9">
+    <rect
+       id="rect1863"
+       class="svg-tool-activity-border svg-tool-activity-border-grouped svg-shadow"
+       ry="5"
+       rx="5"
+       height="80"
+       width="200"
+       y="165"
+       x="45" />
+    <path
+       id="path1865"
+       class="svg-tool-activity-background"
+       d="m 45,240 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 190 q 5,0 5,5 v 70 q 0,5 -5,5 z" />
+    <path
+       id="path1867"
+       class="svg-tool-banner-wide svg-tool-activity-category-3"
+       d="m 45,240 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 60 v 80 z" />
+    <path
+       id="path1869"
+       class="svg-tool-banner-narrow svg-tool-activity-category-3"
+       style="display:none"
+       d="m 45,240 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 10 v 80 z" />
+    <path
+       id="path1871"
+       class="svg-tool-activity-border"
+       d="m 45,240 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 190 q 5,0 5,5 v 70 q 0,5 -5,5 z" />
+    <foreignObject
+       height="80"
+       width="125"
+       y="160"
+       x="115">
+      <xhtml:div
+         class="svg-activity-title-label svg-tool-activity-title-box">iRAT</xhtml:div>
+    </foreignObject>
+    <!--?xml version="1.0" encoding="UTF-8"?-->
+    <svg
+       id="svg1931"
+       version="1.1"
+       height="40"
+       width="40"
+       y="180"
+       x="55"
+       viewBox="0 0 512 512"
+       class="assessment">
+      <style
+         id="style1873">svg.assessment .Bab1{stroke-linejoin:round}svg.assessment .Cab1{stroke-miterlimit:10}svg.assessment .Dab1{stroke-linecap:round}svg.assessment .Eab1{stroke:#111342}svg.assessment .Fab1{fill:none}svg.assessment .Gab1{stroke-width:13.787}svg.assessment .Hab1{stroke-width:16.211}svg.assessment .Iab1{stroke-width:12.197}</style>
+      <g
+         id="g1925"
+         transform="matrix(1.069845,0,0,1.069845,-41.821515,-0.069845)">
+        <g
+           id="g1913"
+           transform="matrix(1.175791,0,0,1.175791,-56.669986,-42.206274)">
+          <g
+             id="g1879"
+             class="Bab1 Cab1 Dab1 Eab1 Gab1"
+             fill="#ffffff">
+            <path
+               id="path1875"
+               d="m 316.02,91.131 h 75.257 c 0.984,0 1.783,0.798 1.783,1.783 v 340.274 a 2.1,2.1 0 0 1 -2.098,2.098 H 99.997 a 0.53,0.53 0 0 1 -0.53,-0.53 V 92.915 c 0,-0.986 0.799,-1.785 1.785,-1.785 h 74.394" />
+            <path
+               id="path1877"
+               d="M 178.414,123.395 H 133.259 V 400.938 H 294.04 358.97 V 123.395 h -39.2" />
+          </g>
+          <g
+             id="g1891"
+             class="Fab1 Bab1 Cab1 Dab1 Eab1">
+            <path
+               id="path1881"
+               class="Gab1"
+               d="m 166.926,193.054 12.842,12.918 20.151,-19.565" />
+            <g
+               id="g1887"
+               stroke-width="15.651">
+              <path
+                 id="path1883"
+                 d="m 171.049,275.636 22.876,-22.211" />
+              <path
+                 id="path1885"
+                 d="M 193.925,275.636 171.049,253.425" />
+            </g>
+            <path
+               id="path1889"
+               class="Gab1"
+               d="m 166.926,329.852 12.842,12.918 20.151,-19.565" />
+          </g>
+          <path
+             id="path1893"
+             fill="#2dbce9"
+             d="m 292.343,85.954 c -5.251,0 -9.645,-3.608 -11.019,-8.614 -3.763,-13.715 -16.29,-19.194 -31.165,-19.194 -14.875,0 -27.403,10.075 -31.166,23.79 -1.373,5.006 -5.768,8.614 -11.019,8.614 h -4.188 c -9.561,0 -17.313,7.772 -17.313,17.359 v 32.647 a 1.03,1.03 0 0 0 1.035,1.022 h 125.301 a 1.03,1.03 0 0 0 1.035,-1.022 v -37.243 c 0,-9.588 -7.752,-17.359 -17.314,-17.359 z" />
+          <g
+             id="g1911"
+             class="Eab1 Bab1 Cab1 Fab1">
+            <g
+               id="g1899"
+               class="Gab1">
+              <path
+                 id="path1895"
+                 d="m 287.958,79.402 c -3.224,0 -6.01,-2.323 -6.503,-5.509 -2.65,-17.135 -17.463,-30.253 -35.34,-30.253 -17.877,0 -32.691,13.118 -35.341,30.253 -0.493,3.186 -3.279,5.509 -6.503,5.509 h -9.468 a 19.16,19.16 0 0 0 -19.157,19.157 v 36.016 c 0,0.632 0.512,1.144 1.144,1.144 h 138.649 c 0.632,0 1.144,-0.512 1.144,-1.144 V 98.561 c 0,-10.581 -8.578,-19.159 -19.159,-19.159 z" />
+              <path
+                 id="path1897"
+                 class="Dab1"
+                 d="m 243.265,77 h 8.329 m -20.223,109.301 h 98.258" />
+            </g>
+            <path
+               id="path1901"
+               class="Dab1 Iab1"
+               d="m 231.371,210.321 h 58.762" />
+            <path
+               id="path1903"
+               class="Dab1 Gab1"
+               d="m 231.371,253.657 h 98.258" />
+            <path
+               id="path1905"
+               class="Dab1 Iab1"
+               d="m 231.371,277.676 h 58.762" />
+            <path
+               id="path1907"
+               class="Dab1 Gab1"
+               d="m 231.371,323.311 h 98.258" />
+            <path
+               id="path1909"
+               class="Dab1 Iab1"
+               d="m 231.371,347.33 h 58.762" />
+          </g>
+        </g>
+        <path
+           id="path1915"
+           class="Bab1 Cab1 Eab1 Hab1"
+           fill="#2dbce9"
+           d="m 444.577,433.073 h 51.928 v 36.474 h -51.928 z m 51.927,-269.797 h -51.928 l 24.154,-61.87 c 0.891,-1.945 3.647,-1.945 4.539,0 z" />
+        <path
+           id="path1917"
+           class="Bab1 Cab1 Eab1 Hab1"
+           fill="#ffffff"
+           d="m 444.577,163.276 h 51.928 v 269.797 h -51.928 z" />
+        <g
+           id="g1923"
+           class="Dab1 Bab1 Cab1 Eab1 Hab1">
+          <path
+             id="path1919"
+             class="Fab1"
+             d="M 470.551,172.223 V 433.071" />
+          <path
+             id="path1921"
+             fill="#6a71b5"
+             d="M 463.427,123.484 H 477.84" />
+        </g>
+      </g>
+      <desc
+         id="desc1927">Created with Snap</desc>
+      <defs
+         id="defs1929" />
+    </svg>
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g1963"
+     class="svg-activity svg-activity-gate svg-shadow"
+     data-height="40"
+     data-width="40"
+     data-y="180"
+     data-x="520"
+     uiid="13">
+    <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+    <svg
+       id="svg1961"
+       height="40"
+       width="40"
+       y="180"
+       x="520"
+       xml:space="preserve"
+       viewBox="0 0 512 512"
+       version="1.1"
+       class="gateClosed"><metadata
+   id="metadata1935"><rdf:rdf><cc:work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title /></cc:work></rdf:rdf></metadata><defs
+   id="defs1937">
+	
+	
+	
+</defs>
+<style
+   id="style1939"
+   type="text/css">
+	svg.gateClosed .st0{fill:#FBA919;stroke:#111342;stroke-width:14.3597;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	svg.gateClosed .st1{display:none;}
+	
+		svg.gateClosed .st2{display:inline;fill:#FFFFFF;stroke:#111342;stroke-width:14.3597;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	svg.gateClosed .st3{fill:#FFFFFF;stroke:#111342;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+</style>
+<circle
+   style="fill:#ff2a2a;stroke:#ff2a2a;stroke-width:8.9083;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   r="250.54585"
+   class="st0"
+   cx="256"
+   cy="256"
+   id="circle1941" /><g
+   class="st1"
+   id="g1947">
+		<circle
+   class="st2"
+   cx="256.28"
+   cy="118.83"
+   r="37.34"
+   id="circle1943" />
+		<path
+   class="st2"
+   d="m 341.4,309.48 21.75,-11.32 c 3.35,-1.74 4.65,-5.87 2.91,-9.22 L 303.67,173.2 C 300,166.4 292.83,162.22 285.1,162.4 l -61.75,1.43 c -7.49,0.17 -14.3,4.41 -17.76,11.06 l -59.35,114.05 c -1.74,3.35 -0.44,7.48 2.91,9.22 l 21.75,11.32 c 3.35,1.74 7.48,0.44 9.22,-2.91 l 31.08,-59.73 v 57.76 3.49 110.28 c 0,3.78 3.06,6.84 6.84,6.84 h 24.52 c 3.78,0 6.84,-3.06 6.84,-6.84 V 314.93 c 0,-3.78 3.06,-6.84 6.84,-6.84 v 0 c 3.78,0 6.84,3.06 6.84,6.84 v 103.45 c 0,3.78 3.06,6.84 6.84,6.84 h 24.52 c 3.78,0 6.84,-3.06 6.84,-6.84 V 304.61 h -0.09 v -57.63 l 31.01,59.59 c 1.72,3.35 5.85,4.65 9.2,2.91 z"
+   id="path1945" />
+	</g><g
+   style="stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none"
+   id="g1957"
+   transform="matrix(1.1135371,0,0,1.1135371,-29.377288,-28.631235)">
+		<path
+   style="stroke:#ffffff;stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   class="st3"
+   d="M 292.21,418.27 V 284.14 h 20.63 V 201.6 c 0,-19.94 -16.17,-36.11 -36.11,-36.11 h -41.27 c -19.94,0 -36.11,16.17 -36.11,36.11 v 82.54 h 20.63 v 134.13 z"
+   id="path1949" />
+		<line
+   style="stroke:#ff2a2a;stroke-width:15;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   class="st3"
+   x1="256.10001"
+   y1="422.84918"
+   x2="256.10001"
+   y2="299.62"
+   id="line1951" />
+		<path
+   style="stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none"
+   class="st3"
+   d="m 281.9,119.07 c 0,14.25 -11.56,25.78 -25.8,25.78 -3.85,0 -7.51,-0.85 -10.8,-2.37 -1.52,-3.27 -2.37,-6.92 -2.37,-10.78 0,-14.25 11.56,-25.8 25.8,-25.8 3.85,0 7.51,0.85 10.8,2.37 1.52,3.29 2.37,6.94 2.37,10.8 z"
+   id="path1953" />
+		<path
+   style="stroke:#ffffff;stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   class="st3"
+   d="m 281.9,119.07 c 0,14.25 -11.56,25.78 -25.8,25.78 -3.85,0 -7.51,-0.85 -10.8,-2.37 -8.87,-4.08 -15,-13.04 -15,-23.42 0,-14.25 11.56,-25.8 25.8,-25.8 10.4,0 19.36,6.16 23.44,15 1.51,3.3 2.36,6.95 2.36,10.81 z"
+   id="path1955" />
+		
+		
+	</g>
+<desc
+   id="desc1959">Created with Snap</desc></svg>
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g1993"
+     class="svg-activity svg-activity-gate svg-shadow"
+     data-height="40"
+     data-width="40"
+     data-y="180"
+     data-x="840"
+     uiid="17">
+    <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+    <svg
+       id="svg1991"
+       height="40"
+       width="40"
+       y="180"
+       x="840"
+       xml:space="preserve"
+       viewBox="0 0 512 512"
+       version="1.1"
+       class="gateClosed"><metadata
+   id="metadata1965"><rdf:rdf><cc:work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title /></cc:work></rdf:rdf></metadata><defs
+   id="defs1967">
+	
+	
+	
+</defs>
+<style
+   id="style1969"
+   type="text/css">
+	svg.gateClosed .st0{fill:#FBA919;stroke:#111342;stroke-width:14.3597;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	svg.gateClosed .st1{display:none;}
+	
+		svg.gateClosed .st2{display:inline;fill:#FFFFFF;stroke:#111342;stroke-width:14.3597;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	svg.gateClosed .st3{fill:#FFFFFF;stroke:#111342;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+</style>
+<circle
+   style="fill:#ff2a2a;stroke:#ff2a2a;stroke-width:8.9083;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   r="250.54585"
+   class="st0"
+   cx="256"
+   cy="256"
+   id="circle1971" /><g
+   class="st1"
+   id="g1977">
+		<circle
+   class="st2"
+   cx="256.28"
+   cy="118.83"
+   r="37.34"
+   id="circle1973" />
+		<path
+   class="st2"
+   d="m 341.4,309.48 21.75,-11.32 c 3.35,-1.74 4.65,-5.87 2.91,-9.22 L 303.67,173.2 C 300,166.4 292.83,162.22 285.1,162.4 l -61.75,1.43 c -7.49,0.17 -14.3,4.41 -17.76,11.06 l -59.35,114.05 c -1.74,3.35 -0.44,7.48 2.91,9.22 l 21.75,11.32 c 3.35,1.74 7.48,0.44 9.22,-2.91 l 31.08,-59.73 v 57.76 3.49 110.28 c 0,3.78 3.06,6.84 6.84,6.84 h 24.52 c 3.78,0 6.84,-3.06 6.84,-6.84 V 314.93 c 0,-3.78 3.06,-6.84 6.84,-6.84 v 0 c 3.78,0 6.84,3.06 6.84,6.84 v 103.45 c 0,3.78 3.06,6.84 6.84,6.84 h 24.52 c 3.78,0 6.84,-3.06 6.84,-6.84 V 304.61 h -0.09 v -57.63 l 31.01,59.59 c 1.72,3.35 5.85,4.65 9.2,2.91 z"
+   id="path1975" />
+	</g><g
+   style="stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none"
+   id="g1987"
+   transform="matrix(1.1135371,0,0,1.1135371,-29.377288,-28.631235)">
+		<path
+   style="stroke:#ffffff;stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   class="st3"
+   d="M 292.21,418.27 V 284.14 h 20.63 V 201.6 c 0,-19.94 -16.17,-36.11 -36.11,-36.11 h -41.27 c -19.94,0 -36.11,16.17 -36.11,36.11 v 82.54 h 20.63 v 134.13 z"
+   id="path1979" />
+		<line
+   style="stroke:#ff2a2a;stroke-width:15;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   class="st3"
+   x1="256.10001"
+   y1="422.84918"
+   x2="256.10001"
+   y2="299.62"
+   id="line1981" />
+		<path
+   style="stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none"
+   class="st3"
+   d="m 281.9,119.07 c 0,14.25 -11.56,25.78 -25.8,25.78 -3.85,0 -7.51,-0.85 -10.8,-2.37 -1.52,-3.27 -2.37,-6.92 -2.37,-10.78 0,-14.25 11.56,-25.8 25.8,-25.8 3.85,0 7.51,0.85 10.8,2.37 1.52,3.29 2.37,6.94 2.37,10.8 z"
+   id="path1983" />
+		<path
+   style="stroke:#ffffff;stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   class="st3"
+   d="m 281.9,119.07 c 0,14.25 -11.56,25.78 -25.8,25.78 -3.85,0 -7.51,-0.85 -10.8,-2.37 -8.87,-4.08 -15,-13.04 -15,-23.42 0,-14.25 11.56,-25.8 25.8,-25.8 10.4,0 19.36,6.16 23.44,15 1.51,3.3 2.36,6.95 2.36,10.81 z"
+   id="path1985" />
+		
+		
+	</g>
+<desc
+   id="desc1989">Created with Snap</desc></svg>
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g2023"
+     class="svg-activity svg-activity-gate svg-shadow"
+     data-height="40"
+     data-width="40"
+     data-y="340"
+     data-x="280"
+     uiid="22">
+    <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+    <svg
+       id="svg2021"
+       height="40"
+       width="40"
+       y="340"
+       x="280"
+       xml:space="preserve"
+       viewBox="0 0 512 512"
+       version="1.1"
+       class="gateClosed"><metadata
+   id="metadata1995"><rdf:rdf><cc:work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title /></cc:work></rdf:rdf></metadata><defs
+   id="defs1997">
+	
+	
+	
+</defs>
+<style
+   id="style1999"
+   type="text/css">
+	svg.gateClosed .st0{fill:#FBA919;stroke:#111342;stroke-width:14.3597;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	svg.gateClosed .st1{display:none;}
+	
+		svg.gateClosed .st2{display:inline;fill:#FFFFFF;stroke:#111342;stroke-width:14.3597;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	svg.gateClosed .st3{fill:#FFFFFF;stroke:#111342;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+</style>
+<circle
+   style="fill:#ff2a2a;stroke:#ff2a2a;stroke-width:8.9083;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   r="250.54585"
+   class="st0"
+   cx="256"
+   cy="256"
+   id="circle2001" /><g
+   class="st1"
+   id="g2007">
+		<circle
+   class="st2"
+   cx="256.28"
+   cy="118.83"
+   r="37.34"
+   id="circle2003" />
+		<path
+   class="st2"
+   d="m 341.4,309.48 21.75,-11.32 c 3.35,-1.74 4.65,-5.87 2.91,-9.22 L 303.67,173.2 C 300,166.4 292.83,162.22 285.1,162.4 l -61.75,1.43 c -7.49,0.17 -14.3,4.41 -17.76,11.06 l -59.35,114.05 c -1.74,3.35 -0.44,7.48 2.91,9.22 l 21.75,11.32 c 3.35,1.74 7.48,0.44 9.22,-2.91 l 31.08,-59.73 v 57.76 3.49 110.28 c 0,3.78 3.06,6.84 6.84,6.84 h 24.52 c 3.78,0 6.84,-3.06 6.84,-6.84 V 314.93 c 0,-3.78 3.06,-6.84 6.84,-6.84 v 0 c 3.78,0 6.84,3.06 6.84,6.84 v 103.45 c 0,3.78 3.06,6.84 6.84,6.84 h 24.52 c 3.78,0 6.84,-3.06 6.84,-6.84 V 304.61 h -0.09 v -57.63 l 31.01,59.59 c 1.72,3.35 5.85,4.65 9.2,2.91 z"
+   id="path2005" />
+	</g><g
+   style="stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none"
+   id="g2017"
+   transform="matrix(1.1135371,0,0,1.1135371,-29.377288,-28.631235)">
+		<path
+   style="stroke:#ffffff;stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   class="st3"
+   d="M 292.21,418.27 V 284.14 h 20.63 V 201.6 c 0,-19.94 -16.17,-36.11 -36.11,-36.11 h -41.27 c -19.94,0 -36.11,16.17 -36.11,36.11 v 82.54 h 20.63 v 134.13 z"
+   id="path2009" />
+		<line
+   style="stroke:#ff2a2a;stroke-width:15;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   class="st3"
+   x1="256.10001"
+   y1="422.84918"
+   x2="256.10001"
+   y2="299.62"
+   id="line2011" />
+		<path
+   style="stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none"
+   class="st3"
+   d="m 281.9,119.07 c 0,14.25 -11.56,25.78 -25.8,25.78 -3.85,0 -7.51,-0.85 -10.8,-2.37 -1.52,-3.27 -2.37,-6.92 -2.37,-10.78 0,-14.25 11.56,-25.8 25.8,-25.8 3.85,0 7.51,0.85 10.8,2.37 1.52,3.29 2.37,6.94 2.37,10.8 z"
+   id="path2013" />
+		<path
+   style="stroke:#ffffff;stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   class="st3"
+   d="m 281.9,119.07 c 0,14.25 -11.56,25.78 -25.8,25.78 -3.85,0 -7.51,-0.85 -10.8,-2.37 -8.87,-4.08 -15,-13.04 -15,-23.42 0,-14.25 11.56,-25.8 25.8,-25.8 10.4,0 19.36,6.16 23.44,15 1.51,3.3 2.36,6.95 2.36,10.81 z"
+   id="path2015" />
+		
+		
+	</g>
+<desc
+   id="desc2019">Created with Snap</desc></svg>
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g2053"
+     class="svg-activity svg-activity-gate svg-shadow"
+     data-height="40"
+     data-width="40"
+     data-y="340"
+     data-x="640"
+     uiid="25">
+    <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+    <svg
+       id="svg2051"
+       height="40"
+       width="40"
+       y="340"
+       x="640"
+       xml:space="preserve"
+       viewBox="0 0 512 512"
+       version="1.1"
+       class="gateClosed"><metadata
+   id="metadata2025"><rdf:rdf><cc:work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title /></cc:work></rdf:rdf></metadata><defs
+   id="defs2027">
+	
+	
+	
+</defs>
+<style
+   id="style2029"
+   type="text/css">
+	svg.gateClosed .st0{fill:#FBA919;stroke:#111342;stroke-width:14.3597;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	svg.gateClosed .st1{display:none;}
+	
+		svg.gateClosed .st2{display:inline;fill:#FFFFFF;stroke:#111342;stroke-width:14.3597;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	svg.gateClosed .st3{fill:#FFFFFF;stroke:#111342;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+</style>
+<circle
+   style="fill:#ff2a2a;stroke:#ff2a2a;stroke-width:8.9083;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   r="250.54585"
+   class="st0"
+   cx="256"
+   cy="256"
+   id="circle2031" /><g
+   class="st1"
+   id="g2037">
+		<circle
+   class="st2"
+   cx="256.28"
+   cy="118.83"
+   r="37.34"
+   id="circle2033" />
+		<path
+   class="st2"
+   d="m 341.4,309.48 21.75,-11.32 c 3.35,-1.74 4.65,-5.87 2.91,-9.22 L 303.67,173.2 C 300,166.4 292.83,162.22 285.1,162.4 l -61.75,1.43 c -7.49,0.17 -14.3,4.41 -17.76,11.06 l -59.35,114.05 c -1.74,3.35 -0.44,7.48 2.91,9.22 l 21.75,11.32 c 3.35,1.74 7.48,0.44 9.22,-2.91 l 31.08,-59.73 v 57.76 3.49 110.28 c 0,3.78 3.06,6.84 6.84,6.84 h 24.52 c 3.78,0 6.84,-3.06 6.84,-6.84 V 314.93 c 0,-3.78 3.06,-6.84 6.84,-6.84 v 0 c 3.78,0 6.84,3.06 6.84,6.84 v 103.45 c 0,3.78 3.06,6.84 6.84,6.84 h 24.52 c 3.78,0 6.84,-3.06 6.84,-6.84 V 304.61 h -0.09 v -57.63 l 31.01,59.59 c 1.72,3.35 5.85,4.65 9.2,2.91 z"
+   id="path2035" />
+	</g><g
+   style="stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none"
+   id="g2047"
+   transform="matrix(1.1135371,0,0,1.1135371,-29.377288,-28.631235)">
+		<path
+   style="stroke:#ffffff;stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   class="st3"
+   d="M 292.21,418.27 V 284.14 h 20.63 V 201.6 c 0,-19.94 -16.17,-36.11 -36.11,-36.11 h -41.27 c -19.94,0 -36.11,16.17 -36.11,36.11 v 82.54 h 20.63 v 134.13 z"
+   id="path2039" />
+		<line
+   style="stroke:#ff2a2a;stroke-width:15;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   class="st3"
+   x1="256.10001"
+   y1="422.84918"
+   x2="256.10001"
+   y2="299.62"
+   id="line2041" />
+		<path
+   style="stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none"
+   class="st3"
+   d="m 281.9,119.07 c 0,14.25 -11.56,25.78 -25.8,25.78 -3.85,0 -7.51,-0.85 -10.8,-2.37 -1.52,-3.27 -2.37,-6.92 -2.37,-10.78 0,-14.25 11.56,-25.8 25.8,-25.8 3.85,0 7.51,0.85 10.8,2.37 1.52,3.29 2.37,6.94 2.37,10.8 z"
+   id="path2043" />
+		<path
+   style="stroke:#ffffff;stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   class="st3"
+   d="m 281.9,119.07 c 0,14.25 -11.56,25.78 -25.8,25.78 -3.85,0 -7.51,-0.85 -10.8,-2.37 -8.87,-4.08 -15,-13.04 -15,-23.42 0,-14.25 11.56,-25.8 25.8,-25.8 10.4,0 19.36,6.16 23.44,15 1.51,3.3 2.36,6.95 2.36,10.81 z"
+   id="path2045" />
+		
+		
+	</g>
+<desc
+   id="desc2049">Created with Snap</desc></svg>
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g2125"
+     class="svg-activity svg-activity-tool"
+     data-height="80"
+     data-width="200"
+     data-y="320"
+     data-x="40"
+     uiid="19">
+    <rect
+       id="rect2055"
+       class="svg-tool-activity-border svg-tool-activity-border-grouped svg-shadow"
+       ry="5"
+       rx="5"
+       height="80"
+       width="200"
+       y="325"
+       x="45" />
+    <path
+       id="path2057"
+       class="svg-tool-activity-background"
+       d="m 45,400 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 190 q 5,0 5,5 v 70 q 0,5 -5,5 z" />
+    <path
+       id="path2059"
+       class="svg-tool-banner-wide svg-tool-activity-category-3"
+       d="m 45,400 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 60 v 80 z" />
+    <path
+       id="path2061"
+       class="svg-tool-banner-narrow svg-tool-activity-category-3"
+       style="display:none"
+       d="m 45,400 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 10 v 80 z" />
+    <path
+       id="path2063"
+       class="svg-tool-activity-border"
+       d="m 45,400 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 190 q 5,0 5,5 v 70 q 0,5 -5,5 z" />
+    <foreignObject
+       height="80"
+       width="125"
+       y="320"
+       x="115">
+      <xhtml:div
+         class="svg-activity-title-label svg-tool-activity-title-box">App Exercise 1 MCQ</xhtml:div>
+    </foreignObject>
+    <!--?xml version="1.0" encoding="UTF-8"?-->
+    <svg
+       id="svg2123"
+       version="1.1"
+       height="40"
+       width="40"
+       y="340"
+       x="55"
+       viewBox="0 0 512 512"
+       class="assessment">
+      <style
+         id="style2065">svg.assessment .Bab1{stroke-linejoin:round}svg.assessment .Cab1{stroke-miterlimit:10}svg.assessment .Dab1{stroke-linecap:round}svg.assessment .Eab1{stroke:#111342}svg.assessment .Fab1{fill:none}svg.assessment .Gab1{stroke-width:13.787}svg.assessment .Hab1{stroke-width:16.211}svg.assessment .Iab1{stroke-width:12.197}</style>
+      <g
+         id="g2117"
+         transform="matrix(1.069845,0,0,1.069845,-41.821515,-0.069845)">
+        <g
+           id="g2105"
+           transform="matrix(1.175791,0,0,1.175791,-56.669986,-42.206274)">
+          <g
+             id="g2071"
+             class="Bab1 Cab1 Dab1 Eab1 Gab1"
+             fill="#ffffff">
+            <path
+               id="path2067"
+               d="m 316.02,91.131 h 75.257 c 0.984,0 1.783,0.798 1.783,1.783 v 340.274 a 2.1,2.1 0 0 1 -2.098,2.098 H 99.997 a 0.53,0.53 0 0 1 -0.53,-0.53 V 92.915 c 0,-0.986 0.799,-1.785 1.785,-1.785 h 74.394" />
+            <path
+               id="path2069"
+               d="M 178.414,123.395 H 133.259 V 400.938 H 294.04 358.97 V 123.395 h -39.2" />
+          </g>
+          <g
+             id="g2083"
+             class="Fab1 Bab1 Cab1 Dab1 Eab1">
+            <path
+               id="path2073"
+               class="Gab1"
+               d="m 166.926,193.054 12.842,12.918 20.151,-19.565" />
+            <g
+               id="g2079"
+               stroke-width="15.651">
+              <path
+                 id="path2075"
+                 d="m 171.049,275.636 22.876,-22.211" />
+              <path
+                 id="path2077"
+                 d="M 193.925,275.636 171.049,253.425" />
+            </g>
+            <path
+               id="path2081"
+               class="Gab1"
+               d="m 166.926,329.852 12.842,12.918 20.151,-19.565" />
+          </g>
+          <path
+             id="path2085"
+             fill="#2dbce9"
+             d="m 292.343,85.954 c -5.251,0 -9.645,-3.608 -11.019,-8.614 -3.763,-13.715 -16.29,-19.194 -31.165,-19.194 -14.875,0 -27.403,10.075 -31.166,23.79 -1.373,5.006 -5.768,8.614 -11.019,8.614 h -4.188 c -9.561,0 -17.313,7.772 -17.313,17.359 v 32.647 a 1.03,1.03 0 0 0 1.035,1.022 h 125.301 a 1.03,1.03 0 0 0 1.035,-1.022 v -37.243 c 0,-9.588 -7.752,-17.359 -17.314,-17.359 z" />
+          <g
+             id="g2103"
+             class="Eab1 Bab1 Cab1 Fab1">
+            <g
+               id="g2091"
+               class="Gab1">
+              <path
+                 id="path2087"
+                 d="m 287.958,79.402 c -3.224,0 -6.01,-2.323 -6.503,-5.509 -2.65,-17.135 -17.463,-30.253 -35.34,-30.253 -17.877,0 -32.691,13.118 -35.341,30.253 -0.493,3.186 -3.279,5.509 -6.503,5.509 h -9.468 a 19.16,19.16 0 0 0 -19.157,19.157 v 36.016 c 0,0.632 0.512,1.144 1.144,1.144 h 138.649 c 0.632,0 1.144,-0.512 1.144,-1.144 V 98.561 c 0,-10.581 -8.578,-19.159 -19.159,-19.159 z" />
+              <path
+                 id="path2089"
+                 class="Dab1"
+                 d="m 243.265,77 h 8.329 m -20.223,109.301 h 98.258" />
+            </g>
+            <path
+               id="path2093"
+               class="Dab1 Iab1"
+               d="m 231.371,210.321 h 58.762" />
+            <path
+               id="path2095"
+               class="Dab1 Gab1"
+               d="m 231.371,253.657 h 98.258" />
+            <path
+               id="path2097"
+               class="Dab1 Iab1"
+               d="m 231.371,277.676 h 58.762" />
+            <path
+               id="path2099"
+               class="Dab1 Gab1"
+               d="m 231.371,323.311 h 98.258" />
+            <path
+               id="path2101"
+               class="Dab1 Iab1"
+               d="m 231.371,347.33 h 58.762" />
+          </g>
+        </g>
+        <path
+           id="path2107"
+           class="Bab1 Cab1 Eab1 Hab1"
+           fill="#2dbce9"
+           d="m 444.577,433.073 h 51.928 v 36.474 h -51.928 z m 51.927,-269.797 h -51.928 l 24.154,-61.87 c 0.891,-1.945 3.647,-1.945 4.539,0 z" />
+        <path
+           id="path2109"
+           class="Bab1 Cab1 Eab1 Hab1"
+           fill="#ffffff"
+           d="m 444.577,163.276 h 51.928 v 269.797 h -51.928 z" />
+        <g
+           id="g2115"
+           class="Dab1 Bab1 Cab1 Eab1 Hab1">
+          <path
+             id="path2111"
+             class="Fab1"
+             d="M 470.551,172.223 V 433.071" />
+          <path
+             id="path2113"
+             fill="#6a71b5"
+             d="M 463.427,123.484 H 477.84" />
+        </g>
+      </g>
+      <desc
+         id="desc2119">Created with Snap</desc>
+      <defs
+         id="defs2121" />
+    </svg>
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g2185"
+     class="svg-activity svg-activity-tool"
+     data-height="80"
+     data-width="200"
+     data-y="160"
+     data-x="280"
+     uiid="11">
+    <rect
+       id="rect2127"
+       class="svg-tool-activity-border svg-tool-activity-border-grouped svg-shadow"
+       ry="5"
+       rx="5"
+       height="80"
+       width="200"
+       y="165"
+       x="285" />
+    <path
+       id="path2129"
+       class="svg-tool-activity-background"
+       d="m 285,240 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 190 q 5,0 5,5 v 70 q 0,5 -5,5 z" />
+    <path
+       id="path2131"
+       class="svg-tool-banner-wide svg-tool-activity-category-2"
+       d="m 285,240 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 60 v 80 z" />
+    <path
+       id="path2133"
+       class="svg-tool-banner-narrow svg-tool-activity-category-2"
+       style="display:none"
+       d="m 285,240 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 10 v 80 z" />
+    <path
+       id="path2135"
+       class="svg-tool-activity-border"
+       d="m 285,240 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 190 q 5,0 5,5 v 70 q 0,5 -5,5 z" />
+    <foreignObject
+       height="80"
+       width="125"
+       y="160"
+       x="355">
+      <xhtml:div
+         class="svg-activity-title-label svg-tool-activity-title-box">Leader Selection</xhtml:div>
+    </foreignObject>
+    <!--?xml version="1.0" encoding="UTF-8"?-->
+    <svg
+       id="svg2183"
+       version="1.1"
+       height="40"
+       width="40"
+       y="180"
+       x="295"
+       viewBox="0 0 512 512"
+       class="leaderselection">
+      <style
+         id="style2137">svg.leaderselection .M{fill:#fff}svg.leaderselection .N{stroke-linejoin:round}svg.leaderselection .O{stroke-miterlimit:10}svg.leaderselection .P{stroke:#111342}svg.leaderselection .Q{stroke-linecap:round}svg.leaderselection .R{stroke-width:17.419}</style>
+      <path
+         id="path2139"
+         class="M"
+         d="M 247.977,460.442 V 340.235 l 119.88,-55.313 h 39.285 L 407,497 306,499 272,463 Z"
+         stroke="#000000" />
+      <g
+         id="g2159"
+         class="P N O">
+        <g
+           id="g2145"
+           class="Q"
+           fill="none">
+          <path
+             id="path2141"
+             class="R"
+             d="m 247.977,460.442 h 13.945 c 5.09,0 9.966,2.048 13.529,5.689 l 23.368,23.88 a 22.43,22.43 0 0 0 16.042,6.747 h 79.148" />
+          <path
+             id="path2143"
+             d="m 16.869,311.907 h 221.969 a 2.29,2.29 0 0 1 2.294,2.284 v 175.454 a 2.29,2.29 0 0 1 -2.294,2.284 H 16.869"
+             stroke-width="15.738" />
+        </g>
+        <g
+           id="g2151"
+           class="M"
+           stroke-width="16.518">
+          <path
+             id="path2147"
+             d="m 450.073,375.683 h -47.919 c -12.486,0 -22.608,-9.068 -22.608,-20.254 v 0 c 0,-11.186 10.121,-20.254 22.608,-20.254 h 47.919 c 12.486,0 22.607,9.068 22.607,20.254 v 0 c 0,11.186 -10.121,20.254 -22.607,20.254 z m 0,81.018 h -47.919 c -12.486,0 -22.608,-9.068 -22.608,-20.254 v 0 c 0,-11.186 10.121,-20.254 22.608,-20.254 h 47.919 c 12.486,0 22.607,9.068 22.607,20.254 v 0 c 0,11.185 -10.121,20.254 -22.607,20.254 z" />
+          <path
+             id="path2149"
+             d="m 433.443,497.21 h -31.289 c -12.486,0 -22.608,-9.068 -22.608,-20.255 v 0 c 0,-11.186 10.121,-20.254 22.608,-20.254 h 31.289 c 12.486,0 22.607,9.068 22.607,20.254 v 0 c 10e-4,11.186 -10.121,20.255 -22.607,20.255 z m 30.278,-81.018 h -61.567 c -12.486,0 -22.608,-9.068 -22.608,-20.254 v 0 c 0,-11.186 10.121,-20.254 22.608,-20.254 h 61.567 c 12.486,0 22.607,9.068 22.607,20.254 v 0 c 0.001,11.186 -10.121,20.254 -22.607,20.254 z" />
+        </g>
+        <g
+           id="g2157"
+           class="R">
+          <path
+             id="path2153"
+             class="Q"
+             d="m 305.056,368.669 c 0,25.483 -20.658,46.142 -46.142,46.142 m -10.937,-74.576 119.88,-55.313 h 39.285"
+             fill="none" />
+          <path
+             id="path2155"
+             class="M"
+             d="M 151.297,241.734 182.907,156.819 150.95,81.623 H 285.304 V 241.734 H 253.692 Z" />
+        </g>
+      </g>
+      <path
+         id="path2161"
+         d="m 179.806,99.67 h 97.187 v 133.265 h -24.156 -72.766 l 24.153,-70.678 z"
+         fill="#ffcf60" />
+      <g
+         id="g2167"
+         class="N O P">
+        <path
+           id="path2163"
+           class="M R"
+           d="M 285.304,58.549 H 496.291 V 228.016 H 285.304 Z" />
+        <path
+           id="path2165"
+           d="m 451.756,228.54 v 93.532 z"
+           fill="none"
+           stroke-width="17.936" />
+      </g>
+      <path
+         id="path2169"
+         d="M 294.04,77.215 H 487.515 V 219.02 H 294.04 Z"
+         fill="#ffcf60" />
+      <g
+         id="g2175"
+         class="N O P">
+        <path
+           id="path2171"
+           d="m 405.275,228.569 v 93.908 z"
+           fill="none"
+           stroke-width="17.972" />
+        <path
+           id="path2173"
+           class="M Q"
+           d="M 398.57,58.549 V 14.676 h 56.63 v 43.873"
+           stroke-width="16.353" />
+      </g>
+      <path
+         id="path2177"
+         class="M"
+         d="m 414.107,236.218 h 28.744 v 90.755 h -28.744 z" />
+      <desc
+         id="desc2179">Created with Snap</desc>
+      <defs
+         id="defs2181" />
+    </svg>
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g2215"
+     class="svg-activity svg-activity-tool"
+     data-height="80"
+     data-width="200"
+     data-y="160"
+     data-x="600"
+     uiid="15">
+    <rect
+       id="rect2187"
+       class="svg-tool-activity-border svg-tool-activity-border-grouped svg-shadow"
+       ry="5"
+       rx="5"
+       height="80"
+       width="200"
+       y="165"
+       x="605" />
+    <path
+       id="path2189"
+       class="svg-tool-activity-background"
+       d="m 605,240 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 190 q 5,0 5,5 v 70 q 0,5 -5,5 z" />
+    <path
+       id="path2191"
+       class="svg-tool-banner-wide svg-tool-activity-category-3"
+       d="m 605,240 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 60 v 80 z" />
+    <path
+       id="path2193"
+       class="svg-tool-banner-narrow svg-tool-activity-category-3"
+       style="display:none"
+       d="m 605,240 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 10 v 80 z" />
+    <path
+       id="path2195"
+       class="svg-tool-activity-border"
+       d="m 605,240 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 190 q 5,0 5,5 v 70 q 0,5 -5,5 z" />
+    <foreignObject
+       height="80"
+       width="125"
+       y="160"
+       x="675">
+      <xhtml:div
+         class="svg-activity-title-label svg-tool-activity-title-box">tRAT</xhtml:div>
+    </foreignObject>
+    <!--?xml version="1.0" encoding="UTF-8"?-->
+    <svg
+       id="svg2213"
+       version="1.1"
+       height="40"
+       width="40"
+       y="180"
+       x="615"
+       viewBox="0 0 512 512"
+       class="scratchie">
+      <g
+         id="g2207"
+         transform="matrix(1.044745,0,0,1.044745,-0.410365,-11.130041)">
+        <g
+           id="g2201"
+           stroke-miterlimit="10"
+           stroke-linejoin="round"
+           stroke="#111342">
+          <path
+             id="path2197"
+             stroke-width="15.07"
+             fill="none"
+             d="M 8.885,29.741 H 481.973 V 481.628 H 8.885 Z" />
+          <path
+             id="path2199"
+             stroke-width="15.421"
+             fill="#ffffff"
+             d="m 367.544,435.998 39.095,-38.912 c 12.013,-11.955 12.652,-32.026 1.434,-44.82 l -9.502,-10.835 c 14.703,-14.933 15.414,-39.722 1.507,-55.565 l -1.695,-1.939 4.207,-4.188 c 18.585,-18.502 19.579,-49.548 2.208,-69.349 l -0.764,-0.87 7.409,-7.367 c 19.119,-19.021 20.196,-50.897 2.491,-71.358 l 8.895,-8.966 c 10.642,-10.715 11.113,-28.597 1.046,-39.932 l -4.154,-4.678 C 409.654,65.884 392.869,65.384 382.227,76.109 l -24.361,24.539 C 339.752,80.967 310.117,80.287 291.239,99.299 l -7.367,7.417 -0.774,-0.87 c -17.476,-19.691 -46.64,-20.551 -65.12,-1.939 l -4.186,4.208 -1.706,-1.919 C 198.095,90.433 174.822,89.653 159.921,104.367 L 150.356,93.592 C 139.054,80.868 120.218,80.308 108.268,92.343 L 69.39,131.505 c -11.95,12.035 -12.474,32.106 -1.172,44.83 l 10.768,12.125 c -7.587,14.653 -5.829,33.425 5.536,46.239 l 1.789,2.019 c -16.325,18.792 -16.387,48.108 0.366,66.98 l 0.774,0.87 -1.549,1.559 c -18.878,19.011 -19.893,50.577 -2.459,70.928 l -14.336,14.434 c -10.642,10.715 -11.113,28.597 -1.046,39.932 l 4.154,4.678 c 10.067,11.335 26.852,11.835 37.494,1.11 l 29.824,-30.036 c 18.093,18.522 46.839,18.931 65.403,0.47 l 1.559,-1.549 0.764,0.87 c 16.649,18.981 44.129,20.721 62.745,4.538 l 1.779,2.029 c 11.302,12.884 28.788,15.903 42.988,8.746 l 10.695,12.195 c 11.228,12.804 30.064,13.484 42.078,1.529 z" />
+        </g>
+        <path
+           id="path2203"
+           fill="#2dbce9"
+           d="m 346.437,194.677 -141.741,163.047 -59.637,-62.802 25.638,-27.328 37.065,39.492 122.12,-130.071 z" />
+        <path
+           id="path2205"
+           stroke-width="15.421"
+           stroke-miterlimit="10"
+           stroke-linejoin="round"
+           stroke="#111342"
+           fill="none"
+           d="m 204.696,357.724 -59.637,-62.802 -14.514,-15.273 38.091,-40.602 37.065,39.502 122.12,-130.071 30.504,32.515 -11.888,13.684 z" />
+      </g>
+      <desc
+         id="desc2209">Created with Snap</desc>
+      <defs
+         id="defs2211" />
+    </svg>
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g2271"
+     class="svg-activity svg-activity-tool"
+     data-height="80"
+     data-width="200"
+     data-y="480"
+     data-x="40"
+     uiid="27">
+    <rect
+       id="rect2217"
+       class="svg-tool-activity-border svg-tool-activity-border-grouped svg-shadow"
+       ry="5"
+       rx="5"
+       height="80"
+       width="200"
+       y="485"
+       x="45" />
+    <path
+       id="path2219"
+       class="svg-tool-activity-background"
+       d="m 45,560 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 190 q 5,0 5,5 v 70 q 0,5 -5,5 z" />
+    <path
+       id="path2221"
+       class="svg-tool-banner-wide svg-tool-activity-category-3"
+       d="m 45,560 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 60 v 80 z" />
+    <path
+       id="path2223"
+       class="svg-tool-banner-narrow svg-tool-activity-category-3"
+       style="display:none"
+       d="m 45,560 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 10 v 80 z" />
+    <path
+       id="path2225"
+       class="svg-tool-activity-border"
+       d="m 45,560 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 190 q 5,0 5,5 v 70 q 0,5 -5,5 z" />
+    <foreignObject
+       height="80"
+       width="125"
+       y="480"
+       x="115">
+      <xhtml:div
+         class="svg-activity-title-label svg-tool-activity-title-box">Peer Evaluation</xhtml:div>
+    </foreignObject>
+    <!--?xml version="1.0" encoding="UTF-8"?-->
+    <svg
+       id="svg2269"
+       version="1.1"
+       height="40"
+       width="40"
+       y="500"
+       x="55"
+       viewBox="0 0 512 512"
+       class="peerreview">
+      <style
+         id="style2227">svg.peerreview .Bp1{fill-opacity:.6}svg.peerreview .Cp1{stroke:#111342}svg.peerreview .Dp1{stroke-linejoin:round}svg.peerreview .Ep1{stroke-miterlimit:10}svg.peerreview .Fp1{stroke-linecap:round}svg.peerreview .Gp1{stroke-width:19.139}svg.peerreview .Hp1{stroke-width:16.61}</style>
+      <g
+         id="g2261"
+         transform="matrix(1.136838,0,0,1.136838,-0.136838,-33.926165)">
+        <g
+           id="g2233"
+           class="Bp1"
+           fill="#ffffff">
+          <path
+             id="path2229"
+             d="m 158.02,54.963 h 243.428 v 156.105 h -26.915 l -7.775,40.671 -62.058,-46.297 -146.68,5.626 z" />
+          <path
+             id="path2231"
+             d="M 13.279,127.932 H 213.046 V 283.439 H 13.279 Z" />
+        </g>
+        <path
+           id="path2235"
+           fill="#2dbce9"
+           d="m 207.095,147.272 v 135.884 c 0,1.091 -0.884,1.976 -1.976,1.976 h -91.275 v 22.384 29.703 c 0,2.313 -2.889,3.364 -4.374,1.589 L 53.859,285.132 H 29.543 c -1.091,0 -1.976,-0.883 -1.976,-1.975 V 147.272 c 0,-1.09 0.884,-1.976 1.976,-1.976 h 175.576 a 1.98,1.98 0 0 1 1.976,1.976 z" />
+        <g
+           id="g2243"
+           class="Cp1 Dp1 Ep1 Gp1"
+           fill="none">
+          <path
+             id="path2237"
+             class="Fp1"
+             d="M 148.696,95.959 V 47.836 c 0,-1.252 1.014,-2.266 2.266,-2.266 h 256.696 c 1.253,0 2.266,1.016 2.266,2.266 v 155.34 c 0,1.252 -1.014,2.266 -2.266,2.266 h -34.376 v 25.59 33.959 c 0,2.644 -3.305,3.846 -5.002,1.817 L 304.7,205.442 h -78.743" />
+          <path
+             id="path2239"
+             d="m 215.823,129.062 v 155.355 a 2.26,2.26 0 0 1 -2.259,2.259 H 109.21 v 25.591 33.959 c 0,2.644 -3.303,3.846 -5.001,1.817 L 40.63,286.676 H 12.828 a 2.26,2.26 0 0 1 -2.259,-2.258 V 129.062 a 2.26,2.26 0 0 1 2.259,-2.259 h 200.735 a 2.26,2.26 0 0 1 2.26,2.259 z" />
+          <path
+             id="path2241"
+             class="Fp1"
+             d="M 192.773,87.73 H 355.762 M 253.818,128.687 H 355.761 M 253.818,166.38 h 101.943" />
+        </g>
+        <g
+           id="g2253"
+           class="Bp1 Cp1 Dp1 Ep1"
+           fill="#ffffff">
+          <path
+             id="path2245"
+             class="Gp1"
+             d="m 119.922,168.84 9.575,19.401 c 0.643,1.302 1.885,2.206 3.323,2.414 l 21.411,3.111 c 3.62,0.526 5.065,4.974 2.446,7.527 l -15.493,15.101 c -1.04,1.014 -1.514,2.475 -1.269,3.906 l 3.658,21.324 c 0.618,3.605 -3.166,6.354 -6.403,4.653 l -19.151,-10.068 c -1.285,-0.676 -2.822,-0.676 -4.107,0 l -19.151,10.068 c -3.237,1.702 -7.021,-1.047 -6.403,-4.653 L 92.016,220.3 a 4.41,4.41 0 0 0 -1.27,-3.906 L 75.253,201.293 c -2.619,-2.553 -1.173,-7.002 2.446,-7.527 l 21.411,-3.111 a 4.41,4.41 0 0 0 3.323,-2.414 l 9.575,-19.401 c 1.619,-3.281 6.297,-3.281 7.915,0 z" />
+          <g
+             id="g2251"
+             class="Hp1">
+            <use
+               height="100%"
+               width="100%"
+               y="0"
+               x="0"
+               id="use2247"
+               xlink:href="#Bp1" />
+            <use
+               height="100%"
+               width="100%"
+               y="0"
+               x="0"
+               id="use2249"
+               class="Fp1"
+               xlink:href="#Cp1" />
+          </g>
+        </g>
+        <g
+           id="g2259"
+           class="Cp1 Dp1 Ep1 Hp1"
+           fill="#2dbce9">
+          <use
+             height="100%"
+             width="100%"
+             y="0"
+             id="use2255"
+             x="231.26199"
+             xlink:href="#Bp1" />
+          <use
+             height="100%"
+             width="100%"
+             y="0"
+             id="use2257"
+             class="Fp1"
+             x="231.261"
+             xlink:href="#Cp1" />
+        </g>
+      </g>
+      <defs
+         id="defs2265">
+        <path
+           d="m 184.468,368.541 c 0,5.504 -1.695,16.08 -4.503,19.97 -3.476,4.813 -8.657,7.867 -14.446,7.867 -4.755,0 -9.101,-2.061 -12.428,-5.465 -3.996,-4.089 -6.521,-15.651 -6.521,-22.371 0,-12.316 8.484,-16.763 18.949,-16.763 10.465,0 18.949,4.447 18.949,16.762 z"
+           id="Bp1" />
+        <path
+           d="m 117.332,463.776 v -29.344 c 0,-11.315 9.173,-20.488 20.488,-20.488 h 8.846 l 18.399,16.438 18.807,-16.438 h 5.686 c 11.315,0 20.488,9.173 20.488,20.488 v 31.32"
+           id="Cp1" />
+      </defs>
+      <desc
+         id="desc2267">Created with Snap</desc>
+    </svg>
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g2301"
+     class="svg-activity svg-activity-gate svg-shadow"
+     data-height="40"
+     data-width="40"
+     data-y="500"
+     data-x="280"
+     uiid="30">
+    <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+    <svg
+       id="svg2299"
+       height="40"
+       width="40"
+       y="500"
+       x="280"
+       xml:space="preserve"
+       viewBox="0 0 512 512"
+       version="1.1"
+       class="gateClosed"><metadata
+   id="metadata2273"><rdf:rdf><cc:work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title /></cc:work></rdf:rdf></metadata><defs
+   id="defs2275">
+	
+	
+	
+</defs>
+<style
+   id="style2277"
+   type="text/css">
+	svg.gateClosed .st0{fill:#FBA919;stroke:#111342;stroke-width:14.3597;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	svg.gateClosed .st1{display:none;}
+	
+		svg.gateClosed .st2{display:inline;fill:#FFFFFF;stroke:#111342;stroke-width:14.3597;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	svg.gateClosed .st3{fill:#FFFFFF;stroke:#111342;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+</style>
+<circle
+   style="fill:#ff2a2a;stroke:#ff2a2a;stroke-width:8.9083;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   r="250.54585"
+   class="st0"
+   cx="256"
+   cy="256"
+   id="circle2279" /><g
+   class="st1"
+   id="g2285">
+		<circle
+   class="st2"
+   cx="256.28"
+   cy="118.83"
+   r="37.34"
+   id="circle2281" />
+		<path
+   class="st2"
+   d="m 341.4,309.48 21.75,-11.32 c 3.35,-1.74 4.65,-5.87 2.91,-9.22 L 303.67,173.2 C 300,166.4 292.83,162.22 285.1,162.4 l -61.75,1.43 c -7.49,0.17 -14.3,4.41 -17.76,11.06 l -59.35,114.05 c -1.74,3.35 -0.44,7.48 2.91,9.22 l 21.75,11.32 c 3.35,1.74 7.48,0.44 9.22,-2.91 l 31.08,-59.73 v 57.76 3.49 110.28 c 0,3.78 3.06,6.84 6.84,6.84 h 24.52 c 3.78,0 6.84,-3.06 6.84,-6.84 V 314.93 c 0,-3.78 3.06,-6.84 6.84,-6.84 v 0 c 3.78,0 6.84,3.06 6.84,6.84 v 103.45 c 0,3.78 3.06,6.84 6.84,6.84 h 24.52 c 3.78,0 6.84,-3.06 6.84,-6.84 V 304.61 h -0.09 v -57.63 l 31.01,59.59 c 1.72,3.35 5.85,4.65 9.2,2.91 z"
+   id="path2283" />
+	</g><g
+   style="stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none"
+   id="g2295"
+   transform="matrix(1.1135371,0,0,1.1135371,-29.377288,-28.631235)">
+		<path
+   style="stroke:#ffffff;stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   class="st3"
+   d="M 292.21,418.27 V 284.14 h 20.63 V 201.6 c 0,-19.94 -16.17,-36.11 -36.11,-36.11 h -41.27 c -19.94,0 -36.11,16.17 -36.11,36.11 v 82.54 h 20.63 v 134.13 z"
+   id="path2287" />
+		<line
+   style="stroke:#ff2a2a;stroke-width:15;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   class="st3"
+   x1="256.10001"
+   y1="422.84918"
+   x2="256.10001"
+   y2="299.62"
+   id="line2289" />
+		<path
+   style="stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none"
+   class="st3"
+   d="m 281.9,119.07 c 0,14.25 -11.56,25.78 -25.8,25.78 -3.85,0 -7.51,-0.85 -10.8,-2.37 -1.52,-3.27 -2.37,-6.92 -2.37,-10.78 0,-14.25 11.56,-25.8 25.8,-25.8 3.85,0 7.51,0.85 10.8,2.37 1.52,3.29 2.37,6.94 2.37,10.8 z"
+   id="path2291" />
+		<path
+   style="stroke:#ffffff;stroke-width:1;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   class="st3"
+   d="m 281.9,119.07 c 0,14.25 -11.56,25.78 -25.8,25.78 -3.85,0 -7.51,-0.85 -10.8,-2.37 -8.87,-4.08 -15,-13.04 -15,-23.42 0,-14.25 11.56,-25.8 25.8,-25.8 10.4,0 19.36,6.16 23.44,15 1.51,3.3 2.36,6.95 2.36,10.81 z"
+   id="path2293" />
+		
+		
+	</g>
+<desc
+   id="desc2297">Created with Snap</desc></svg>
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g2361"
+     class="svg-activity svg-activity-tool"
+     data-height="80"
+     data-width="200"
+     data-y="480"
+     data-x="360"
+     uiid="29">
+    <path
+       id="path2303"
+       class="svg-tool-activity-background svg-shadow"
+       d="m 365,560 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 190 q 5,0 5,5 v 70 q 0,5 -5,5 z" />
+    <path
+       id="path2305"
+       class="svg-tool-banner-wide svg-tool-activity-category-6"
+       d="m 365,560 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 60 v 80 z" />
+    <path
+       id="path2307"
+       class="svg-tool-banner-narrow svg-tool-activity-category-6"
+       style="display:none"
+       d="m 365,560 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 10 v 80 z" />
+    <path
+       id="path2309"
+       class="svg-tool-activity-border"
+       d="m 365,560 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 190 q 5,0 5,5 v 70 q 0,5 -5,5 z" />
+    <foreignObject
+       height="80"
+       width="125"
+       y="480"
+       x="435">
+      <xhtml:div
+         class="svg-activity-title-label svg-tool-activity-title-box">Final Reflection</xhtml:div>
+    </foreignObject>
+    <!--?xml version="1.0" encoding="UTF-8"?-->
+    <svg
+       id="svg2359"
+       version="1.1"
+       height="40"
+       width="40"
+       y="500"
+       x="375"
+       viewBox="0 0 512 512"
+       class="notebook">
+      <style
+         id="style2311">svg.notebook .Dz{stroke-linejoin:round}svg.notebook .Ez{stroke-miterlimit:10}svg.notebook .Fz{stroke:#111342}svg.notebook .Gz{fill:none}svg.notebook .Hz{stroke-linecap:round}svg.notebook .Iz{stroke-width:14.533}svg.notebook .Jz{fill:#1ad9b2}</style>
+      <g
+         id="g2345"
+         transform="matrix(1.095962,0,0,1.095962,-25.372744,-23.224239)">
+        <g
+           id="g2317"
+           class="Dz Ez Fz Iz"
+           fill="#ffffff">
+          <path
+             id="path2313"
+             class="Hz"
+             d="m 116.23,42.6 h 208.98 31.49 c 20.06,0 36.45,16.4 36.45,36.45 v 306.72 c 0,20.03 -16.4,36.45 -36.45,36.45 H 116.23" />
+          <path
+             id="path2315"
+             d="m 48.3,385.77 c 0,20.05 16.4,36.45 36.45,36.45 h 240.47 c 20.05,0 36.45,-16.4 36.45,-36.45 V 79.05 C 361.67,59 345.27,42.6 325.22,42.6 H 84.75 C 64.7,42.6 48.3,59 48.3,79.05 Z" />
+        </g>
+        <g
+           id="g2323"
+           class="Jz">
+          <circle
+             id="circle2319"
+             cx="106.47"
+             cy="141.31"
+             r="18.17" />
+          <circle
+             id="circle2321"
+             cx="106.47"
+             cy="235.14"
+             r="18.17" />
+        </g>
+        <path
+           id="path2325"
+           class="Dz Ez Fz Iz"
+           fill="#ffffff"
+           d="m 113.08,425.73 h 80.19 v 41.59 h -80.19 z" />
+        <g
+           id="g2331"
+           class="Jz">
+          <circle
+             id="circle2327"
+             cx="106.47"
+             cy="334.19"
+             r="18.17" />
+          <path
+             id="path2329"
+             d="m 133.77,439.86 h 52.624 v 20.711 H 133.77 Z" />
+        </g>
+        <g
+           id="g2343"
+           class="Fz Iz Dz Gz">
+          <path
+             id="path2333"
+             class="Ez Hz"
+             d="M 97.7,134.04 H 31.33 M 97.7,229.11 H 31.33 M 97.7,325.53 H 31.33" />
+          <circle
+             id="circle2335"
+             cx="99.209999"
+             cy="134.03999"
+             r="23.610001" />
+          <circle
+             id="circle2337"
+             cx="99.209999"
+             cy="227.87"
+             r="23.610001" />
+          <circle
+             id="circle2339"
+             cx="99.209999"
+             cy="326.92001"
+             r="23.610001" />
+          <path
+             id="path2341"
+             class="Ez Hz"
+             d="M 165.29,133.43 H 317.01 M 165.29,206.1 h 151.72 m -151.72,72.66 h 151.72 m -151.72,72.67 h 151.72" />
+        </g>
+      </g>
+      <path
+         id="path2347"
+         class="Dz Ez Fz Jz"
+         stroke-width="17.706"
+         d="m 445.431,448.237 h 56.716 v 39.838 h -56.716 z m 56.716,-294.704 h -56.716 l 26.38,-67.577 c 0.975,-2.126 3.989,-2.126 4.954,0 z" />
+      <g
+         id="g2353"
+         class="Dz Ez Fz"
+         stroke-width="15.928">
+        <path
+           id="path2349"
+           fill="#ffffff"
+           d="m 445.431,153.533 h 56.716 v 294.693 h -56.716 z" />
+        <path
+           id="path2351"
+           class="Gz Hz"
+           d="M 473.805,163.308 V 448.225" />
+      </g>
+      <desc
+         id="desc2355">Created with Snap</desc>
+      <defs
+         id="defs2357" />
+    </svg>
+  </g>
+  <g
+     transform="matrix(0.92753562,0,0,0.92753562,19.072992,31.072534)"
+     id="g2421"
+     class="svg-activity svg-activity-tool"
+     data-height="80"
+     data-width="200"
+     data-y="320"
+     data-x="380"
+     uiid="21">
+    <rect
+       id="rect2363"
+       class="svg-tool-activity-border svg-tool-activity-border-grouped svg-shadow"
+       ry="5"
+       rx="5"
+       height="80"
+       width="200"
+       y="325"
+       x="385" />
+    <path
+       id="path2365"
+       class="svg-tool-activity-background"
+       d="m 385,400 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 190 q 5,0 5,5 v 70 q 0,5 -5,5 z" />
+    <path
+       id="path2367"
+       class="svg-tool-banner-wide svg-tool-activity-category-2"
+       d="m 385,400 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 60 v 80 z" />
+    <path
+       id="path2369"
+       class="svg-tool-banner-narrow svg-tool-activity-category-2"
+       style="display:none"
+       d="m 385,400 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 10 v 80 z" />
+    <path
+       id="path2371"
+       class="svg-tool-activity-border"
+       d="m 385,400 q -5,0 -5,-5 v -70 q 0,-5 5,-5 h 190 q 5,0 5,5 v 70 q 0,5 -5,5 z" />
+    <foreignObject
+       height="80"
+       width="125"
+       y="320"
+       x="455">
+      <xhtml:div
+         class="svg-activity-title-label svg-tool-activity-title-box">App Exercise 2 Doc</xhtml:div>
+    </foreignObject>
+    <!--?xml version="1.0" encoding="UTF-8"?-->
+    <svg
+       id="svg2419"
+       version="1.1"
+       height="40"
+       width="40"
+       y="340"
+       x="395"
+       viewBox="0 0 512 512"
+       class="dokumaran">
+      <style
+         id="style2373">svg.dokumaran .B{stroke:#111342}svg.dokumaran .C{stroke-linejoin:round}svg.dokumaran .D{stroke-miterlimit:10}svg.dokumaran .E{stroke-linecap:round}svg.dokumaran .F{stroke-width:14.719}svg.dokumaran .G{stroke-width:14.72}</style>
+      <g
+         id="g2411"
+         transform="matrix(1.032354,0,0,1.032354,-16.819975,-5.287889)">
+        <ellipse
+           id="ellipse2375"
+           fill="#ffffff"
+           cx="258.95499"
+           cy="294.07199"
+           rx="200.442"
+           ry="197.076" />
+        <path
+           id="path2377"
+           fill="#ffcf60"
+           d="m 302.847,225.119 30.245,28.131 v 99.3 H 220.991 V 225.309 Z" />
+        <g
+           id="g2385"
+           class="B C D G"
+           fill="none">
+          <path
+             id="path2379"
+             class="E"
+             d="m 329.555,252.577 v 89.505 c 0,2.748 -3.058,5.065 -6.682,5.065 H 212.414 c -3.625,0 -6.681,-2.278 -6.681,-5.065 V 217.319 c 0,-2.787 3.005,-5.065 6.681,-5.065 h 71.125" />
+          <path
+             id="path2381"
+             d="M 329.555,254.94 H 293.26 c -3.62,0 -6.58,-2.923 -6.58,-6.5 v -35.854 z" />
+          <path
+             id="path2383"
+             class="E"
+             d="m 229.973,252.495 h 35.201 m -35.201,32.912 h 70.406 m -70.406,28.671 h 70.406" />
+        </g>
+        <g
+           id="g2393"
+           class="F B C"
+           fill="#ffffff">
+          <ellipse
+             id="ellipse2387"
+             cx="95.433998"
+             cy="364.215"
+             rx="70.813004"
+             ry="69.957001" />
+          <ellipse
+             id="ellipse2389"
+             cx="260.27399"
+             cy="93.094002"
+             rx="70.813004"
+             ry="69.957001" />
+          <ellipse
+             id="ellipse2391"
+             cx="433.10599"
+             cy="364.215"
+             rx="70.813004"
+             ry="69.957001" />
+        </g>
+        <g
+           id="g2409"
+           class="D B C"
+           fill="none">
+          <path
+             id="path2395"
+             class="E F"
+             d="m 354.994,124.082 c 53.239,29.587 90.936,83.237 97.992,146.031 M 67.505,263.688 c 8.8,-59.829 45.526,-110.715 96.689,-139.335 m -26.283,316.708 c 33.337,26.585 75.739,42.5 121.93,42.5 45.348,0 87.065,-15.356 120.125,-41.088" />
+          <use
+             height="100%"
+             width="100%"
+             y="0"
+             x="0"
+             id="use2397"
+             class="G"
+             xlink:href="#B" />
+          <use
+             height="100%"
+             width="100%"
+             y="0"
+             x="0"
+             id="use2399"
+             class="E F"
+             xlink:href="#C" />
+          <use
+             height="100%"
+             width="100%"
+             id="use2401"
+             class="G"
+             y="269.87799"
+             x="174.05901"
+             xlink:href="#B" />
+          <use
+             height="100%"
+             width="100%"
+             id="use2403"
+             class="E F"
+             y="269.87799"
+             x="174.05901"
+             xlink:href="#C" />
+          <use
+             height="100%"
+             width="100%"
+             id="use2405"
+             class="G"
+             y="269.87799"
+             x="-163.61301"
+             xlink:href="#B" />
+          <use
+             height="100%"
+             width="100%"
+             id="use2407"
+             class="E F"
+             y="269.87799"
+             x="-163.612"
+             xlink:href="#C" />
+        </g>
+      </g>
+      <defs
+         id="defs2415">
+        <path
+           d="m 277.574,65.126 c 0,4.848 -1.511,14.163 -4.015,17.589 -3.099,4.239 -7.719,6.929 -12.88,6.929 -4.24,0 -8.114,-1.816 -11.081,-4.813 -3.563,-3.602 -5.814,-13.785 -5.814,-19.704 0,-10.848 7.564,-14.765 16.895,-14.765 9.331,0 16.895,3.917 16.895,14.765 z"
+           id="B" />
+        <path
+           d="m 217.716,149.008 v -25.845 c 0,-9.966 8.178,-18.046 18.267,-18.046 h 7.887 l 16.404,14.478 16.768,-14.478 h 5.07 c 10.088,0 18.267,8.08 18.267,18.046 v 27.587"
+           id="C" />
+      </defs>
+      <desc
+         id="desc2417">Created with Snap</desc>
+    </svg>
+  </g>
+  <style
+     id="style2423">.svg-tool-activity-border {
+	fill: none;
+	stroke: #b6b6b6;
+	stroke-width: 1;
+}
+
+.svg-tool-activity-border-require-grouping {
+	fill: none;
+	stroke: red;
+	stroke-width: 3;
+}
+
+.svg-tool-activity-border-grouped {
+	fill: white;
+}
+
+.svg-tool-activity-background {
+	stroke: none;
+	fill: white;
+}
+
+.svg-tool-activity-category-1 {
+	stroke: none;
+	fill: #caddfb;
+}
+
+.svg-tool-activity-category-2 {
+	stroke: none;
+	fill: #ffffbb;
+}
+
+.svg-tool-activity-category-3 {
+	fill: #2DBCE9;
+	opacity: 0.25;
+}
+
+.svg-tool-activity-category-4 {
+	fill: #FF72AC;
+	opacity: 0.25;	
+
+}
+
+.svg-tool-activity-category-5 {
+	stroke: none;
+	fill: #caddfb;
+}
+
+.svg-tool-activity-category-6 {
+	fill: #1AD9B2;
+	opacity: 0.25;
+}
+
+.svg-activity-title-label {
+	font-size   : 16px;
+	font-family : sans-serif;
+}
+
+.svg-tool-activity-title-box {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	word-wrap: break-word;
+	padding-right: 2px;
+	text-align: center;
+}
+
+.svg-activity-title-label.svg-activity-title-label-small {
+	font-size   : 12px;
+}
+
+.svg-branching {
+	stroke-width: 3;
+	fill: white;
+}
+
+.svg-branching-start {
+	stroke: green;
+}
+
+.svg-branching-end {
+	stroke: red;
+}
+
+.svg-branching-match {
+	stroke: blue;
+}
+
+.svg-annotation-container {
+	stroke: #b6b6b6;
+}
+
+.svg-activity-optional .svg-annotation-container,
+.svg-activity-parallel .svg-annotation-container,
+.svg-activity-floating .svg-annotation-container {
+	fill : #f0f8ff;
+}
+
+.svg-transition {
+	stroke-width: 1;
+	stroke: rgb(119, 126, 157);
+	fill: none;
+}
+
+.svg-transition-element {
+	stroke: rgb(119, 126, 157);
+	fill: rgb(119, 126, 157);
+}
+
+.svg-transition-draw {
+	stroke-width: 2;
+	stroke: rgb(119, 126, 157);
+	stroke-dasharray: 5, 3;
+}
+
+.svg-shadow {
+	-webkit-filter: drop-shadow( 2px 2px 2px rgba(0, 0, 0, .3));
+  	filter: drop-shadow( 2px 2px 2px rgba(0, 0, 0, .3));
+}
+</style>
+</svg>

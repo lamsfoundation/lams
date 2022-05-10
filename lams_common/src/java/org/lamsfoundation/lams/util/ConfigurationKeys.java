@@ -276,6 +276,10 @@ public class ConfigurationKeys {
 
     public static String PASSWORD_POLICY_SYMBOLS = "PasswordPolicySymbols";
 
+    public static String PASSWORD_EXPIRATION_MONTHS = "PasswordExpirationMonths";
+
+    public static String PASSWORD_HISTORY_LIMIT = "PasswordHistoryLimit";
+
     // LDEV-4049 Option for not displaying stacktraces in config settings
     public static String ERROR_STACK_TRACE = "ErrorStackTrace";
 
@@ -319,9 +323,12 @@ public class ConfigurationKeys {
     public static String WORKFLOW_AUTOMATION_REVIEW_REMINDER_PERIOD_DAYS = "WorkflowAutomationReviewPeriod";
     public static String WORKFLOW_AUTOMATION_REVIEW_REMINDER_TIME = "WorkflowAutomationReviewTime";
     public static String WORKFLOW_AUTOMATION_REVIEW_REMINDER_EMAILS = "WorkflowAutomationReviewEmails";
-    
+
     // LDEV-4997 Etherpad as service
     public static String ETHERPAD_SERVER_URL = "EtherpadServerUrl";
     public static String ETHERPAD_API_KEY = "EtherpadApiKey";
     public static String ETHERPAD_INSTANCE_ID = "EtherpadInstanceID";
+
+    // LDEV-5253 Make Login As feature configurable
+    public static String LOGIN_AS_ENABLE = "LoginAsEnable";
 }

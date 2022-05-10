@@ -313,7 +313,11 @@
 	
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			<fmt:message key="label.qb.stats.usage" />
+			<fmt:message key="label.qb.stats.usage" />&nbsp;
+			<lams:Popover>
+          		<fmt:message key="label.qb.stats.tooltip" />
+          	</lams:Popover>
+
 		</div>
 		<div class="panel-body">
 			<c:choose>
@@ -339,13 +343,22 @@
 								<fmt:message key="label.qb.stats.usage.participant.count" />
 							</th>
 							<th>
-								<fmt:message key="label.qb.stats.usage.difficulty" />
+								<fmt:message key="label.qb.stats.usage.difficulty" />&nbsp;
+								<lams:Popover>
+					          		<fmt:message key="label.qb.difficulty.index.tooltip" />
+					          	</lams:Popover>
 							</th>
 							<th>
-								<fmt:message key="label.qb.stats.usage.discrimination" />
+								<fmt:message key="label.qb.stats.usage.discrimination" />&nbsp;
+								<lams:Popover>
+									<fmt:message key="label.qb.discrimination.index.tooltip" />
+					          	</lams:Popover>
 							</th>
 							<th>
-								<fmt:message key="label.qb.stats.usage.biserial" />
+								<fmt:message key="label.qb.stats.usage.biserial" />&nbsp;
+								<lams:Popover>
+									<fmt:message key="label.qb.point.biserial.tooltip" />
+					          	</lams:Popover>
 							</th>
 						</tr>
 						<c:forEach var="activityDTO" items="${stats.activities}">
@@ -384,9 +397,15 @@
 										<td>-</td>
 									</c:when>
 									<c:otherwise>
-										<td><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.difficultyIndex}" /></td>
-										<td><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.discriminationIndex}" /></td>
-										<td><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.pointBiserial}" /></td>
+										<td class="text-center ${activityDTO.difficultyIndex < 0.3 or activityDTO.difficultyIndex > 0.7 ? 'bg-danger' : 'bg-success'}">
+											<fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.difficultyIndex}" />
+										</td>
+										<td class="text-center ${activityDTO.discriminationIndex < -0.2 ? 'bg-danger' : (activityDTO.discriminationIndex < 0.2 ? 'bg-warning' : 'bg-success')}">
+											<fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.discriminationIndex}" />
+										</td>
+										<td class="text-center ${activityDTO.pointBiserial < -0.2 ? 'bg-danger' : (activityDTO.pointBiserial< 0.2 ? 'bg-warning' : 'bg-success')}">
+											<fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.pointBiserial}" />
+										</td>
 									</c:otherwise>
 								</c:choose>
 							</tr>

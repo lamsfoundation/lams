@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.web.session;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -89,23 +90,12 @@ public class SessionManager {
 	    HttpSession existingSession = loginMapping.get(login);
 	    // check if it's a different session and if so, which one is newer
 	    if (existingSession != null && !existingSession.getId().equals(sessionId)) {
-		if (session.getCreationTime() > existingSession.getCreationTime()) {
-		    try {
-			// invalidate the other session
-			existingSession.invalidate();
-		    } catch (Exception e) {
-			log.warn("SessionMananger invalidation exception", e);
-			// if it was already invalidated, do nothing
-		    }
-		} else {
-		    try {
-			// invalidate this session
-			session.invalidate();
-		    } catch (Exception e) {
-			log.warn("SessionMananger invalidation exception", e);
-			// if it was already invalidated, do nothing
-		    }
-		    throw new SecurityException("You were logged out");
+		try {
+		    // invalidate the other session
+		    existingSession.invalidate();
+		} catch (Exception e) {
+		    log.warn("SessionMananger invalidation exception", e);
+		    // if it was already invalidated, do nothing
 		}
 	    }
 	    loginMapping.put(login, session);
@@ -215,8 +205,21 @@ public class SessionManager {
 
     /**
      * Returns number of all sessions stored in the container.
+     * Additionally cleans up invalidated session which linger in mapping.
      */
     public static int getSessionTotalCount() {
+	Iterator<String> sessionIterator = SessionManager.sessionIdMapping.keySet().iterator();
+	while (sessionIterator.hasNext()) {
+	    String sessionId = sessionIterator.next();
+	    HttpSession session = SessionManager.sessionIdMapping.get(sessionId);
+	    try {
+		session.getCreationTime();
+	    } catch (IllegalStateException e) {
+		log.warn("Removing invalid session which should have been removed by SessionListener: " + sessionId);
+		sessionIterator.remove();
+	    }
+	}
+
 	return SessionManager.sessionIdMapping.size();
     }
 

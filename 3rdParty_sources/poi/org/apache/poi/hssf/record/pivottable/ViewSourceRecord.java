@@ -17,25 +17,32 @@
 
 package org.apache.poi.hssf.record.pivottable;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * SXVS - View Source (0x00E3)<br>
- * 
- * @author Patrick Cheng
  */
 public final class ViewSourceRecord extends StandardRecord {
 	public static final short sid = 0x00E3;
 
 	private int vs;
-	
+
+	public ViewSourceRecord(ViewSourceRecord other) {
+		super(other);
+		vs = other.vs;
+	}
+
 	public ViewSourceRecord(RecordInputStream in) {
 		vs = in.readShort();
 	}
-	
+
 	@Override
 	protected void serialize(LittleEndianOutput out) {
 		out.writeShort(vs);
@@ -52,13 +59,17 @@ public final class ViewSourceRecord extends StandardRecord {
 	}
 
 	@Override
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
+	public ViewSourceRecord copy() {
+		return new ViewSourceRecord(this);
+	}
 
-		buffer.append("[SXVS]\n");
-		buffer.append("    .vs      =").append(HexDump.shortToHex(vs)).append('\n');
+	@Override
+	public HSSFRecordTypes getGenericRecordType() {
+		return HSSFRecordTypes.VIEW_SOURCE;
+	}
 
-		buffer.append("[/SXVS]\n");
-		return buffer.toString();
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties("vs", () -> vs);
 	}
 }

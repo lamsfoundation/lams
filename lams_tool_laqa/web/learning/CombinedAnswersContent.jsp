@@ -11,7 +11,7 @@
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<div class="panel-title">
-								<c:if test="${generalLearnerFlowDTO.mapQuestionContentLearner.size() !=1}"><c:out value="${questionEntry.key}" />.</c:if>  <c:out value="${questionEntry.value.name}" escapeXml="false" />
+								<c:if test="${generalLearnerFlowDTO.mapQuestionContentLearner.size() !=1}"><c:out value="${questionEntry.key}" />. </c:if>  <c:out value="${questionEntry.value.name}" escapeXml="false" />
 							</div>
 						</div>
 

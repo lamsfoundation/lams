@@ -18,7 +18,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/dialog.js"></script>
+	<lams:JSImport src="includes/javascript/dialog.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/orgGroup.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
@@ -76,20 +76,23 @@
 				<fmt:message key="label.import.successful" var="LABEL_IMPORT_SUCCESSFUL_VAR"><fmt:param value="%1"/><fmt:param value="%2"/></fmt:message>
 				LABEL_IMPORT_SUCCESSFUL_LABEL : decoderDiv.html('<c:out value="${LABEL_IMPORT_SUCCESSFUL_VAR}" />').text(),
 			};
-	</script>
-	<!-- LDEV_NTU-7 Page jumps to the top when clicking the link in Grouping -->		
-	<script type="text/javascript">
-		jQuery(document).ready(function(){
-		    jQuery('#noscrollinputid').on('click', function(event) {  
-		         jQuery('#collapseUploadGroupFile').toggle('show');
-		    });
-		});
+					
+			<!-- LDEV_NTU-7 Page jumps to the top when clicking the link in Grouping -->		
+			jQuery(document).ready(function(){
+			    jQuery('#noscrollinputid').on('click', function(event) {  
+			         jQuery('#collapseUploadGroupFile').toggle('show');
+			         $('html, body').animate({
+			        	  scrollTop: $("#collapseUploadGroupFile").offset().top
+			         }, 1000);
+			    });
 
-		jQuery(document).ready(function(){
-		    jQuery('#noscrolladvancedid').on('click', function(event) {  
-		         jQuery('#collapseAdvanced').toggle('show');
-		    });
-		});
+			    jQuery('#noscrolladvancedid').on('click', function(event) {  
+			         jQuery('#collapseAdvanced').toggle('show');
+			         $('html, body').animate({
+			        	  scrollTop: $("#collapseAdvanced").offset().top
+			         }, 1000);
+			    });
+			});
 	</script>
 </lams:head>
 <body>
@@ -147,7 +150,7 @@
 			<div class="userContainerTitle">
 				<fmt:message key="label.course.groups.unassigned" />
 				<span class="sortUsersButton"
-				      title="<fmt:message key='label.course.groups.sort.tooltip' />">?</span>
+				      title="<fmt:message key='label.course.groups.sort.tooltip' />">&#9650;</span>
 			</div>
 			<div class="userContainer"></div>
 		</td>
@@ -173,7 +176,7 @@
 			</c:if>
 		/>
 		<span class="sortUsersButton"
-		      title="<fmt:message key='label.course.groups.sort.tooltip' />">?</span>
+		      title="<fmt:message key='label.course.groups.sort.tooltip' />">&#9650;</span>
 	</div>
 	<div class="userContainer"></div>
 </div>

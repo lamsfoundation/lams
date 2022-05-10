@@ -8,6 +8,23 @@
  */
 $(document).ready(function() {
 	GeneralInitLib.initAll();
+	
+	// we display authoring in separate window if LAMS acts as a LTI 1.3 Tool
+	if (isLtiContentSelection || initRelaunchMonitorLessonID) {
+	    window.onbeforeunload = function(e) {
+			if (window.opener && typeof window.opener.refreshSeqList === 'function') {
+				window.opener.refreshSeqList();
+			}
+			
+			if (!GeneralLib.canClose()) {
+				e.preventDefault();
+				e.returnValue = LABELS.NAVIGATE_AWAY_CONFIRM;
+				return LABELS.NAVIGATE_AWAY_CONFIRM;
+			}
+			
+			delete e['returnValue'];
+		}
+	}
 });
 
 
@@ -32,22 +49,22 @@ var paper = null,
 		'addBranchingStart' : null,
 		// list of all dialogs, so they can be easily closed all at once 
 		'dialogs' : [],
-		// icons for special activities
+		// for storing icons and other activity metadata
 		'toolMetadata': {
-			'gate'     : {
-				'iconPath' : '../images/stop.gif'
+			'branchingEnd'   : {
+				'iconPath'   : 'images/svg/branchingEnd.svg'
 			},
-			'grouping' : {
-				'iconPath' : '../images/grouping.png'
+			'bin' : {
+				'iconPath'       : 'images/svg/authoringBin.svg'
 			}
 		},
 		
 		// graphics constants
 		'conf' : {
-			'arrangeHorizontalSpace'           : 200,
-			'arrangeVerticalSpace'             : 100,
-			'arrangeHorizontalPadding'         : 35,
-			'arrangeVerticalPadding'           : 50,
+			'arrangeHorizontalSpace'           : 240,
+			'arrangeVerticalSpace'             : 120,
+			'arrangeHorizontalPadding'         : 40,
+			'arrangeVerticalPadding'           : 40,
 			
 			'dragStartThreshold'               : 300,
 			
@@ -58,8 +75,8 @@ var paper = null,
 			'defaultGroupingGroupCount'        : 2,
 			'defaultGroupingLearnerCount'      : 1,
 			
-			'containerActivityEmptyWidth'  	   : 50,
-			'containerActivityEmptyHeight' 	   : 70,
+			'containerActivityEmptyWidth'  	   : 200,
+			'containerActivityEmptyHeight' 	   : 100,
 			'containerActivityPadding'	       : 20,
 			'containerActivityChildrenPadding' : 10,
 			'regionEmptyWidth'				   : 20,
@@ -80,15 +97,16 @@ var paper = null,
 		'snapToGrid' : {
 			// snapping grid step when dragging an activity
 			'step' : 40,
-			'padding' : 20,
-			'offset' : 10
+			// distance from canvas border so activities are not on edge
+			'padding' : 40
 		},
 		
 		'activity' : {
 			'width'					   : 200,
 			'height'				   : 80,
 			'borderCurve'			   : 5,
-			'bannerWidth'			   : 10
+			'bannerNarrowWidth'		   : 10,
+			'bannerWideWidth'		   : 60
 		},
 		
 		'transition' : {
@@ -99,8 +117,6 @@ var paper = null,
 		},
 		
 		'colors' : {
-			'activityBorder'	  : 'black',
-			'activityText' 		  : 'black',
 			// default region colour
 			'annotation'		  : '#CCFF99',
 			// region colours to choose from
@@ -110,14 +126,6 @@ var paper = null,
 
 			// when mouse hovers over rubbish bin
 			'binSelect' 		  : 'red',
-			
-			'gate'         		  : 'red',
-            'gateBorder'          : '#801515',
-			'gateText'     		  : 'white',
-			'grouping'		      : '#caddfb',
-			'groupingBorder'	  : '#00007f',
-			'optionalActivity'    : '#caddfb',
-			'optionalActivityBorder'    : '#00007f',
 			// dashed border around a selected activity 
 			'selectEffect'        : 'black',
 			// highlight TBL activities which should be grouped
@@ -175,9 +183,11 @@ GeneralInitLib = {
 	 * Draw boxes with Tool Activity templates in the panel on the left.
 	 */
 	initTemplates : function(){
+		var templateContainerCell = $('#templateContainerCell');
+		
 		// store some template data in JS structures
-		$('.template').each(function(){
-			var learningLibraryID = +$(this).attr('learningLibraryId'),
+		$('.template', templateContainerCell).each(function(){
+			var learningLibraryID = $(this).attr('learningLibraryId'),
 				learningLibraryTitle = $(this).attr('learningLibraryTitle'),
 				activityCategoryID = ActivityCategories[learningLibraryTitle],
 				parallelChildActivityDefs = null;
@@ -197,10 +207,6 @@ GeneralInitLib = {
 				});
 			}
 			
-			// assign icons' data uris to their learning library IDs instead of labels
-			ActivityIcons[learningLibraryID] = ActivityIcons[learningLibraryTitle];
-			delete ActivityIcons[learningLibraryTitle];
-			$('<img />').attr('src', ActivityIcons[learningLibraryID]).appendTo(".img-"+learningLibraryID);
 			// register tool properties so they are later easily accessible
 			layout.toolMetadata[learningLibraryID] = {
 				'iconPath'				    : $(this).attr('iconPath'),
@@ -209,55 +215,20 @@ GeneralInitLib = {
 				'activityCategoryID' 	    : activityCategoryID,
 				'parallelChildActivityDefs' : parallelChildActivityDefs
 			};
-			
 		});
 		
 		if (!isReadOnlyMode){
 			// store the initial window height now as on iPad the iframe grows when templates are show,
 			// reporting incorrect window height to the first resizePaper() run
 			layout.initWindowHeight = $(window).height();
-			// create list of learning libraries for each group
-			var templateContainerCell = $('#templateContainerCell'),
-				learningLibraryGroupSelect = $('select', templateContainerCell),
-				allGroup = $('option', learningLibraryGroupSelect),
-				allTemplates = $('#templateContainerCell .templateContainer').show();
-		
-			learningLibraryGroupSelect.change(function(){
-				$('.templateContainer').hide();
-				// show DIV with the selected learning libraries group
-				$('option:selected', this).data('templates').show();
-			});
-			allGroup.data('templates', allTemplates);
 			
-			$.each(learningLibraryGroups, function(){
-				var learningLibraries = this.learningLibraries;
-				if (!learningLibraries) {
-					return true;
-				}
-				
-				var templates = allTemplates.clone().appendTo(templateContainerCell);
-				// cloned everything, now remove ones that are not in the list
-				$('.template', templates).each(function(){
-					var learningLibraryId = $(this).attr('learningLibraryId'),
-						found = false;
-					$.each(learningLibraries, function(){
-						if (learningLibraryId == this) {
-							found = true;
-							return false;
-						}
-					});
+			$('.template', templateContainerCell).each(function(){
+				let learningLibraryID = $(this).attr('learningLibraryId'),
+					isFlowActivity = isNaN(+learningLibraryID),
+					activityCategoryID = layout.toolMetadata[learningLibraryID].activityCategoryID;
 					
-					if (!found) {
-						$(this).remove();
-					}
-				});
+				$('#collapse-tool-category-' + activityCategoryID, templateContainerCell).append(this);
 				
-				$('<option />').text(this.name)
-							   .data('templates', templates)
-							   .appendTo(learningLibraryGroupSelect);
-			});
-			
-			$('.template').each(function(){
 				// allow dragging a template to canvas
 				$(this).draggable({
 					'containment' : '#authoringTable',
@@ -265,19 +236,24 @@ GeneralInitLib = {
 				    'distance'    : 20,
 				    'scroll'      : false,
 				    'scope'       : 'template',
-				    'helper'      : function(event){
+				    'helper'      : function(){
+						let helper = null;
 				    	// build a simple helper
-						return $(this).clone().css({
-							'width'   : '150px',
-							'border'  : 'thin black solid',
-							'z-index' : 1,
-							'cursor'  : 'move'
-						});
-					}
+						if (isFlowActivity){
+							helper = $('img', this).clone();
+						} else {
+							helper =  $(this).clone();
+						}
+
+						return helper.addClass('template-drag-helper');
+					},
+					'cursorAt'   : isFlowActivity ? {
+						'right' : 20,
+						'bottom': 45
+					} : false
 				});
 			});
 
-			
 			// allow dropping templates to canvas
 			canvas.droppable({
 				   'tolerance'   : 'touch',
@@ -287,24 +263,38 @@ GeneralInitLib = {
 						$(draggable.helper).remove();
 						
 						// calculate the position and create an instance of the tool activity
-					    var learningLibraryID = +draggable.draggable.attr('learningLibraryId'),
+					    var learningLibraryID = draggable.draggable.attr('learningLibraryId'),
 					    	toolID = +draggable.draggable.attr('toolId'),
 							activityCategoryID = layout.toolMetadata[learningLibraryID].activityCategoryID,
 					    	x = draggable.offset.left  + canvas.scrollLeft() - canvas.offset().left,
 					    	y = draggable.offset.top   + canvas.scrollTop()  - canvas.offset().top,
-					    	label = $('#toolDisplayName', draggable.draggable).text().trim(),
+					    	label = $('.tool-display-name', draggable.draggable).text().trim(),
 					    	activity = null,
 					    	translatedEvent = GeneralLib.translateEventOnCanvas(event),
 							eventX = translatedEvent[0],
 							eventY = translatedEvent[1];
-
-					    if (activityCategoryID == 5) {
+						if (activityCategoryID === 1) {
+							if (learningLibraryID == 'grouping'){
+								activity = new ActivityDefs.GroupingActivity(null, null, x, y)
+							} else if (learningLibraryID == 'gate'){
+								activity = new ActivityDefs.GateActivity(null, null, x, GeneralLib.snapToGrid(y) + 20);
+							} else if (learningLibraryID == 'branching') {
+								activity = new ActivityDefs.BranchingEdgeActivity(null, null, x, y + 10, null, false, null, null);
+							} else if (learningLibraryID == 'optional'){
+								activity = new ActivityDefs.OptionalActivity(null, null, x, y);
+							} else if (learningLibraryID == 'floating') {
+								activity = new ActivityDefs.FloatingActivity(null, null, x, y);
+								
+								// there can be only one floating activity on canvas
+								$('.template[learningLibraryId="floating"]').slideUp();
+							}
+						} else if (activityCategoryID === 5) {
 					    	// construct child activities out of previously referenced HTML templates
 					    	var childActivities = [];
 					    	layout.toolMetadata[learningLibraryID].parallelChildActivityDefs.each(function(){
 					    		var childLearningLibraryID = +$(this).attr('learningLibraryId'),
 					    			childToolID = +$(this).attr('toolId'),
-					    			toolLabel = $('#toolDisplayName', this).text().trim(),
+					    			toolLabel = $('.tool-display-name', this).text().trim(),
 					    			childActivity = new ActivityDefs.ToolActivity(null, null, null,
 					    					childToolID, childLearningLibraryID, null, x, y, toolLabel);
 					    	
@@ -320,8 +310,16 @@ GeneralInitLib = {
 						layout.activities.push(activity);
 						HandlerLib.dropObject(activity);
 						ActivityLib.dropActivity(activity, eventX, eventY);
+						
+						if (activity instanceof ActivityDefs.BranchingEdgeActivity) {
+							let branchingEnd = new ActivityDefs.BranchingEdgeActivity(null, null, 
+								GeneralLib.snapToGrid(x + 120), y + 10, null, false, null, activity.branchingActivity);
+							layout.activities.push(branchingEnd);
+						}
 				   }
 			});
+			
+			$('.templateContainer', templateContainerCell).show();
 		}
 	},
 
@@ -424,7 +422,7 @@ GeneralInitLib = {
     		}
 			
 			if (copiedResource.isCut) {
-				var parent = tree.treeview('getParent', ldNode);
+				var parent = ldNode;
 				while (parent && parent.nodeId) {
 					if (parent.nodeId == copiedResource.resourceNode.nodeId) {
 						alert(LABELS.FOLDER_MOVE_TO_CHILD_ERROR);
@@ -511,8 +509,8 @@ GeneralInitLib = {
     			return;
     		}
     		var isFolder = !ldNode.learningDesignId,
-    			title = prompt(LABELS.RENAME_TITLE_PROMPT + ' ' + (isFolder ? LABELS.FOLDER : LABELS.SEQUENCE)
-						+ ' "' + ldNode.label + '"');
+    			title = prompt(LABELS.RENAME_TITLE_PROMPT + ' ' +
+						(isFolder ? LABELS.FOLDER + ' "' + ldNode.text + '"' : LABELS.SEQUENCE + ' "' + ldNode.label + '"'));
 			
 			// skip if no name or the same name was provided
 			if (!title || ldNode.label == title) {
@@ -593,9 +591,12 @@ GeneralInitLib = {
 				if (selectedAccess.length > 0 && title == selectedAccess.text()) {
 					learningDesignID = +selectedAccess.data('learningDesignId');
 					folderID = +selectedAccess.data('folderID');
+					folderNode = tree.treeview('getNode', folderID);
+					if (folderNode.learningDesignId) {
+						folderNode = tree.treeview('getParent', folderNode);
+					}
 				}
 			}
-			
 			if (!folderID) {
 				// although an existing sequence can be highlighted 
 				alert(LABELS.FOLDER_NOT_SELECTED_ERROR);
@@ -775,7 +776,10 @@ GeneralInitLib = {
 		        }, 500);
 				
 			},
-			'close' : null,
+			'close' : function(){
+				// CSS loaded from an old LD SVG can interfere with current authoring layout
+				$('#ldScreenshotAuthor', this).empty();
+			},
 			'data' : {
 				'prepareForOpen' : function(dialogTitle, learningDesignTitle, shownElementIDs, highlightFolder){
 					$('#ldStoreDialogNameContainer input', layout.ldStoreDialog).val(learningDesignTitle);
@@ -813,7 +817,6 @@ GeneralInitLib = {
 					// activities in the another LD have different clousures, so they can not be imported directly
 					// they need to be recreated from a scratch with current LD being their context
 					var frameWindow = $('#ldStoreDialogImportPartFrame', layout.ldStoreDialog)[0].contentWindow,
-		     			frameActivities = frameWindow.layout.activities,
 		     			frameActivityDefs = frameWindow.ActivityDefs,
 		     			// the local activity
 		     			addActivity = null;
@@ -842,7 +845,8 @@ GeneralInitLib = {
 					} else if (activity instanceof frameActivityDefs.GateActivity) {
 						addActivity = new ActivityDefs.GateActivity(
 								null, activity.uiid, 0, 0, activity.title, activity.description, false, activity.gateType,
-								activity.startTimeoffset, activity.gateActivityCompletionBased
+								activity.startTimeoffset, activity.gateActivityCompletionBased, activity.gateStopAtPrecedingActivity,
+								activity.password
 								);
 					} else if (activity instanceof frameActivityDefs.GroupingActivity) {
 						addActivity = new ActivityDefs.GroupingActivity(
@@ -972,6 +976,7 @@ GeneralInitLib = {
 				if (canSetReadOnly && !isOpenDialog) {
 					// detect which folders/sequences are marked as read-only
 					// and which ones are immutable
+
 					if (!node.nodes) {
 						$('#ldStoreDialogReadOnlyCheckbox', layout.ldStoreDialog)
 							.prop('disabled', !node.canModify || !node.canHaveReadOnly)
@@ -983,7 +988,7 @@ GeneralInitLib = {
 					}
 				} else {
 					// is this is normal user or open dialog, only show/hide read-only label
-					if (node.nodes ? !node.canSave : node.readOnly || !node.canModify){
+					if (node.nodes ? !node.canSave : node.readOnly){
 						$('#ldStoreDialogReadOnlySpan', layout.ldStoreDialog).show();
 					} else {
 						$('#ldStoreDialogReadOnlySpan', layout.ldStoreDialog).hide();
@@ -1249,6 +1254,8 @@ GeneralLib = {
 			return;
 		}
 		
+		
+		// warn that annotation labels and regions will not be arranged
 		if (!append && (layout.regions.length > 0 || layout.labels.length > 0)
 			&& !isReadOnlyMode && !confirm(LABELS.ARRANGE_CONFIRM)) {
 			return;
@@ -1264,7 +1271,7 @@ GeneralLib = {
 		
 		var row = 0;
 		if (append) {
-			// find the lowest existing activity and append the new activities beneath
+			// find the lowest (highest Y) existing activity and append the new activities beneath
 			$.each(layout.activities, function(){
 				row = Math.max(row,
 						Math.ceil((this.items.getBBox().y2 - layout.conf.arrangeVerticalPadding)
@@ -1278,6 +1285,7 @@ GeneralLib = {
 			forceRowY = null,
 			paperWidth = paper.attr('width'),
 			// check how many columns current paper can hold
+			// paperMinWidth is used for SVG auto regenerate
 			maxColumns = Math.floor(((paperWidth < 300 && paperMinWidth ? paperMinWidth : paperWidth) 
 									    - layout.conf.arrangeHorizontalPadding)
 					                 / layout.conf.arrangeHorizontalSpace),
@@ -1286,8 +1294,10 @@ GeneralLib = {
 	        // a shallow copy of activities array without inner activities
 			activitiesCopy = [],
 			// just to speed up processing when there are only activities with no transitions left
-			onlyDetachedLeft = false;
-	
+			onlyDetachedLeft = false,
+			// TBL sequences get arranged differently
+			isTBL = GeneralLib.checkTBLGrouping() !== null;
+			
 		$.each(activities, function(){
 			if (!this.parentActivity || !(this.parentActivity instanceof DecorationDefs.Container)){
 				activitiesCopy.push(this);
@@ -1295,7 +1305,7 @@ GeneralLib = {
 		});
 		
 		// branches will not be broken into few rows; if they are long, paper will be resized
-		// find the longes branch to find the new paper size
+		// find the longes branch and use it for a new paper size
 		$.each(activities, function(){
 			if (this instanceof ActivityDefs.BranchingEdgeActivity && this.isStart) {
 				// add start and end edges to the longest branch length in the branching
@@ -1327,6 +1337,7 @@ GeneralLib = {
 				$.each(activitiesCopy, function(){
 					if (this.transitions.to.length > 0) {
 						activity = this;
+						// crawl back using "to" transition all the way to the beggining of sequence
 						while (activity.transitions.to.length > 0) {
 							// check if previous activity was not drawn already
 							// it can happen for branching edges
@@ -1380,11 +1391,11 @@ GeneralLib = {
 						complex.branchingRow = row + Math.floor(branchingActivity.branches.length / 2);
 						// edge points go to middle of rows with branches
 						var startX = layout.conf.arrangeHorizontalPadding +
-									 column * layout.conf.arrangeHorizontalSpace + 54,
+									 column * layout.conf.arrangeHorizontalSpace + 80,
 							edgeY = layout.conf.arrangeVerticalPadding +
-									complex.branchingRow * layout.conf.arrangeVerticalSpace + 17,
+									complex.branchingRow * layout.conf.arrangeVerticalSpace + 20,
 							endX = layout.conf.arrangeHorizontalPadding +
-								   end.column * layout.conf.arrangeHorizontalSpace + 54;
+								   end.column * layout.conf.arrangeHorizontalSpace + 80;
 						
 						activitiesCopy.splice(activitiesCopy.indexOf(start), 1);
 						activitiesCopy.splice(activitiesCopy.indexOf(end), 1);
@@ -1425,10 +1436,8 @@ GeneralLib = {
 					
 					if (activity instanceof ActivityDefs.GateActivity) {
 						// adjust placement for gate activity, so it's in the middle of its cell
-						x += 57;
-						y += 10;
-					} else if (activity instanceof ActivityDefs.OptionalActivity){
-						x -= 20;
+						x += 70;
+						y += 20;
 					}
 					
 					activity.draw(x, y);
@@ -1446,12 +1455,18 @@ GeneralLib = {
 				}
 				
 				// find the next row and column
-				column = (column + 1) % maxColumns;
+				if (isTBL && activity instanceof ActivityDefs.GateActivity) {
+					// in TBL sequences break after each gate
+					column = 0;
+				} else {
+					column = (column + 1) % maxColumns;
+				}
+				
 				if (column == 0) {
 					row++;
 					// if an Optional Activity forced next activities to be drawn lower than usual
 					if (forceRowY) {
-						while (forceRowY > layout.conf.arrangeVerticalPadding + 10 + row * layout.conf.arrangeVerticalSpace) {
+						while (forceRowY > layout.conf.arrangeVerticalPadding + row * layout.conf.arrangeVerticalSpace) {
 							row++;
 						}
 						forceRowY = null;
@@ -1517,8 +1532,14 @@ GeneralLib = {
 				row++;
 				column = 0;
 			}
+			// if last activity was optional activity, we may need to go lower with rows
+			if (forceRowY) {
+				while (forceRowY > layout.conf.arrangeVerticalPadding + row * layout.conf.arrangeVerticalSpace) {
+					row++;
+				}
+			}
 			var x = layout.conf.arrangeHorizontalPadding,
-				y = layout.conf.arrangeVerticalPadding - 30 + row * layout.conf.arrangeVerticalSpace;
+				y = layout.conf.arrangeVerticalPadding + row * layout.conf.arrangeVerticalSpace;
 			
 			layout.floatingActivity.draw(x, y);
 		}
@@ -1553,8 +1574,7 @@ GeneralLib = {
 					'cancelled' : 'true'
 				},
 				success : function() {
-					GeneralLib.setModified(false);
-					window.parent.closeDialog('dialogAuthoring');
+					window.location.href = LAMS_URL + 'home/monitorLesson.do?lessonID=' + initRelaunchMonitorLessonID;
 				}
 			});
 		} else {
@@ -1660,7 +1680,46 @@ GeneralLib = {
 				this.draw();
 			}
 		});
-		return activitiesToGroup.length === 0 ? null : activitiesToGroup;
+		return activitiesToGroup;
+	},
+	
+	/**
+	 * Check if given question exists in tool activities in this sequence
+	 */
+	checkQuestionExistsInToolActivities : function(qbQuestionUid) {
+		let resultToolContentIds = [],
+			candidateToolContentIds = [],
+			isTBL = GeneralLib.checkTBLGrouping() !== null;
+			
+		if (isTBL) {
+			// TBL has more sophisticated ways of syncing questions
+			return [];
+		}
+		
+		// list all tool activities
+		$.each(layout.activities, function() {
+			if (this.toolContentID) {
+				candidateToolContentIds.push(this.toolContentID);
+			}
+		});
+		
+		// ask back end if given activities contain the given question
+		$.ajax({
+			cache    : false,
+			async    : false,
+			url      : LAMS_URL + "qb/edit/checkQuestionExistsInToolActivities.do",
+			dataType : 'json',
+			data     : {
+				'toolContentIds' : candidateToolContentIds,
+				'qbQuestionUid' : qbQuestionUid
+			},
+			success : function(responseToolContentIds){
+				// the response is list of tool content IDs which contain the given question
+				resultToolContentIds = responseToolContentIds;
+			}
+		});
+		
+		return resultToolContentIds;
 	},
 	
 	/**
@@ -1770,10 +1829,9 @@ GeneralLib = {
 					$('#ldDescriptionLicenseSelect').val(ld.licenseID || 0).change();
 					$('#ldDescriptionLicenseText').text(ld.licenseText || null);
 				}
-				
-				var arrangeNeeded = false,
-					// if system gate is found, it is Live Edit
-					systemGate = null,
+
+				// always arrange activities when SVG gets recreated or it is old authoring version
+				var arrangeNeeded = isReadOnlyMode || +response.ld.version < 4.5,
 					// should we allow the author to enter activity authoring
 					activitiesReadOnly = !layout.ld.canModify || (!canSetReadOnly && layout.ld.readOnly),
 					branchToBranching = {},
@@ -1891,11 +1949,8 @@ GeneralLib = {
 								gateType,
 								activityData.gateStartTimeOffset,
 								activityData.gateActivityCompletionBased,
+								activityData.gateStopAtPrecedingActivity,
 								activityData.gatePassword);
-							
-							if (gateType == 'system'){
-								systemGate = activity;
-							};
 							break;
 
 						// Parallel Activity
@@ -2281,7 +2336,7 @@ GeneralLib = {
 					parentFrame.resizeImportPartFrame(+paper.attr('height'));
 				}
 
-				if (systemGate) {
+				if (ld.editOverrideLock) {
 					// if system gate exists, it is Live Edit
 					layout.liveEdit = true;
 					
@@ -2329,25 +2384,43 @@ GeneralLib = {
 				var candidate = this.branchingActivity ? coreActivity.start : this,
 					groupingFound = false,
 					inputFound = false;
-				do {
-					if (candidate.transitions && candidate.transitions.to.length > 0) {
-						candidate = candidate.transitions.to[0].fromActivity;
-					} else if (candidate.branchingActivity && !candidate.isStart) {
-						candidate = candidate.branchingActivity.start;
-					}  else if (!candidate.branchingActivity && candidate.parentActivity) {
-						candidate = candidate.parentActivity;
-					} else {
-						candidate = null;
-					}
-					
-					if (coreActivity.grouping == candidate) {
-						groupingFound = true;
-					}
-					if (coreActivity.input == candidate) {
-						inputFound = true;
-					}
-				} while (candidate != null);
 				
+				// if it is a support activity, grouping does not need to be connected with it
+				// it just needs to exist
+				if (coreActivity.parentActivity && 
+					 (coreActivity.parentActivity instanceof ActivityDefs.FloatingActivity 
+				     || coreActivity.parentActivity.parentActivity instanceof ActivityDefs.FloatingActivity)) {
+					// above: parent of parent check is because a parallel activity can be a support activity
+					if (!coreActivity.grouping) {
+						return true;
+					}
+					$.each(layout.activities, function(){
+						candidate = this;
+						if (coreActivity.grouping == candidate) {
+							groupingFound = true;
+							return false;
+						}
+					});
+				} else {
+					do {
+						if (candidate.transitions && candidate.transitions.to.length > 0) {
+							candidate = candidate.transitions.to[0].fromActivity;
+						} else if (candidate.branchingActivity && !candidate.isStart) {
+							candidate = candidate.branchingActivity.start;
+						}  else if (!candidate.branchingActivity && candidate.parentActivity) {
+							candidate = candidate.parentActivity;
+						} else {
+							candidate = null;
+						}
+						
+						if (coreActivity.grouping == candidate) {
+							groupingFound = true;
+						}
+						if (coreActivity.input == candidate) {
+							inputFound = true;
+						}
+					} while (candidate != null);
+				}
 				if (coreActivity.grouping && !groupingFound) {
 					coreActivity.grouping = null;
 					this.draw();
@@ -2511,17 +2584,14 @@ GeneralLib = {
 		
 		$.each(layoutActivityDefs, function(){
 			var activity = this,
-				activityBox = activity.items ? activity.items.shape.getBBox() : null,
+				activityBox = activity.items ? activity.items.getBBox() : null,
 				x = activityBox ? parseInt(activityBox.x) : null,
 				y = activityBox ? parseInt(activityBox.y) : null,
 				activityTypeID = null,
-				activityCategoryID = activity instanceof ActivityDefs.ToolActivity ?
-						   			 layout.toolMetadata[activity.learningLibraryID].activityCategoryID : 
-						             activity instanceof ActivityDefs.ParallelActivity ? 5 : 1,
 				iconPath = null,
 				isGrouped = activity.grouping ? true : false,
-				parentActivityID = activity.parentActivity ? activity.parentActivity.id : null,
 				gateActivityCompletionBased = false,
+				gateStopAtPrecedingActivity = false,
 				activityTransitions = activity instanceof ActivityDefs.BranchingActivity ?
 						activity.end.transitions : activity.transitions;
 			
@@ -2571,21 +2641,26 @@ GeneralLib = {
 				});
 				
 			} else if (activity instanceof  ActivityDefs.GateActivity){
+				let previousActivityExists = activityTransitions && activityTransitions.to && activityTransitions.to.length > 0;
+				
 				switch(activity.gateType) {
 					case 'sync'       : activityTypeID = 3; break;
 					case 'schedule'   : 
 						activityTypeID = 4; 
-						gateActivityCompletionBased = activity.gateActivityCompletionBased
-							//check the previous activity is available as well
-							&& (activityTransitions && activityTransitions.to && activityTransitions.to.length > 0);
+						gateActivityCompletionBased = activity.gateActivityCompletionBased && previousActivityExists;
+						gateStopAtPrecedingActivity = activity.gateStopAtPrecedingActivity && previousActivityExists;
 						break;
 						
-					case 'permission' : activityTypeID = 5; break;
+					case 'permission' : 
+						activityTypeID = 5;
+						gateStopAtPrecedingActivity = activity.gateStopAtPrecedingActivity && previousActivityExists;
+						break;
 					case 'password'   : activityTypeID = 16; break;
 					case 'system' 	  : activityTypeID = 9; systemGate = activity; break;
 					case 'condition'  :
 						activityTypeID = 14;
-							
+						gateStopAtPrecedingActivity = activity.gateStopAtPrecedingActivity && previousActivityExists;
+								
 						if (activity.input) {
 							$.each(activity.conditionsToBranches, function(index){
 								if (!this.branch) {
@@ -2712,6 +2787,7 @@ GeneralLib = {
 				'gateStartTimeOffset'	 : activity.gateType == 'schedule' ?
 											activity.offsetDay*24*60 + activity.offsetHour*60 + activity.offsetMinute : null,
 				'gateActivityCompletionBased' : gateActivityCompletionBased,
+				'gateStopAtPrecedingActivity' : gateStopAtPrecedingActivity,
 				'gatePassword'			 : activity.gateType == 'password' ? activity.password : null,
 				'gateActivityLevelID'    : activity instanceof ActivityDefs.GateActivity ? 1 : null,
 				'minOptions'			 : activity.minOptions || null,
@@ -2798,6 +2874,42 @@ GeneralLib = {
 		};
 	},
 	
+	/**
+	 * Replaces the old question with new question in given tool activities in this sequence
+	 */
+	replaceQuestionInToolActivities : function(thisToolContentId, allToolContentIds, oldQbQuestionUid, newQbQuestionUid) {
+		let activityTitles = '',
+			questionReplaced = false;
+		
+		// list names of all tool activities which contain the old question
+		$.each(layout.activities, function() {
+			if (this.toolContentID && this.toolContentID != thisToolContentId && allToolContentIds.indexOf(this.toolContentID) > -1) {
+				activityTitles += '"' + this.title + '", ';
+			}
+		});
+	
+		// ask teacher if he wants to update other activities too
+		if (activityTitles != '' && confirm(LABELS.REPLACE_QUESTION_PROMPT.replace('[0]', activityTitles.substring(0, activityTitles.length - 2)))) {
+			$.ajax({
+				type     : 'POST',
+				cache    : false,
+				async    : false,
+				url      : LAMS_URL + "qb/edit/replaceQuestionInToolActivities.do",
+				dataType : 'text',
+				data     : {
+					'toolContentIds'   : allToolContentIds,
+					'oldQbQuestionUid' : oldQbQuestionUid,
+					'newQbQuestionUid' : newQbQuestionUid
+				},
+				success : function(){
+					questionReplaced = true;
+				}
+			});
+		}
+		
+		return questionReplaced;
+	},
+	
 	
 	resizeImportPartFrame : function(svgHeight) {
 		$('#ldStoreDialogImportPartFrame').height(svgHeight + 40);
@@ -2817,14 +2929,14 @@ GeneralLib = {
 		// next runs use the regular window height
 		layout.initWindowHeight = null;
 		// height of window minus toolbar, padding...
-		$('.templateContainer').height(windowHeight - 80);
-		$('#canvas').height(windowHeight - 75)
+		$('.templateContainer').height(windowHeight - 105);
+		$('#canvas').height(windowHeight - 85);
 		// width of window minus templates on the left; minimum is toolbar width so it does not collapse
-					.width(Math.max($('#toolbar').width() - 180, $(window).width() - 190));
+		// .width(Math.max($('#toolbar').width() - 200, $(window).width() - $('#templateContainerCell').width()));
 		
 		if (!width || !height) {
-			var width = 0,
-				height = 0;
+			width = 0;
+			height = 0;
 			$.each(layout.activities, function(){
 				// find new dimensions of paper
 				var activityBox = this.items.shape.getBBox();
@@ -2853,9 +2965,14 @@ GeneralLib = {
 			}
 			
 			// draw rubbish bin on canvas
-			layout.bin = paper.image(ActivityIcons.bin, width - 55, height - 55, 48, 48);
-			// so it can be found when SVG code gets cloned
-			$(layout.bin.node).attr('id', 'rubbishBin');
+			layout.bin = paper.g(ActivityLib.getActivityIcon('bin'));
+			layout.bin.attr('id', 'rubbishBin');
+			layout.bin.select('svg').attr({
+				'x' : width - 65,
+				'y' : height - 65,
+				'width' : 48,
+				'height': 48
+			});
 			
 			HandlerLib.resetCanvasMode(true);
 		}
@@ -2873,7 +2990,7 @@ GeneralLib = {
 		var systemGate = ld.systemGate,
 			// final success/failure of the save
 			result = false;
-		
+			
 		// it is null if it is a new sequence
 		ld.learningDesignID	= learningDesignID;
 		ld.workspaceFolderID = folderID;
@@ -2902,6 +3019,9 @@ GeneralLib = {
 				layout.ld.title = title;
 				layout.ld.invalid = response.validation.length > 0;
 				
+				var wasReadOnly = layout.ld.readOnly == true;
+				layout.ld.readOnly = ld.readOnly;
+				
 				// check if there were any validation errors
 				if (layout.ld.invalid) {
 					var message = LABELS.SEQUENCE_VALIDATION_ISSUES + '<br/>';
@@ -2929,7 +3049,7 @@ GeneralLib = {
 					
 					if (layout.liveEdit) {
 						var missingGroupingOnActivities = GeneralLib.checkTBLGrouping();
-						if (missingGroupingOnActivities) {
+						if (missingGroupingOnActivities && missingGroupingOnActivities.length > 0) {
 							var info = LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING;
 							$.each(missingGroupingOnActivities, function(){
 									info += '<br /> * ' + this.title; 
@@ -2985,8 +3105,8 @@ GeneralLib = {
 								// close the Live Edit dialog
 								layout.infoDialog.data('show')(LABELS.LIVEEDIT_SAVE_SUCCESSFUL, true);
 								setTimeout(function(){
-									window.parent.closeDialog('dialogAuthoring');
-								}, 5000);
+									window.location.href = LAMS_URL + 'home/monitorLesson.do?lessonID=' + initRelaunchMonitorLessonID;
+								}, 3000);
 							}
 						});
 						
@@ -2994,14 +3114,19 @@ GeneralLib = {
 						return;
 					}
 					
-					var svgSaveSuccessful = GeneralLib.saveLearningDesignImage();
-					if (!svgSaveSuccessful) {
-						layout.infoDialog.data('show')(LABELS.SVG_SAVE_ERROR);
+					if (wasReadOnly === layout.ld.readOnly) {
+						// If read-only-ness has changed, then current activities colouring does not reflect its real state.
+						// In this case do not generate the image at all.
+						// It will be either created after next save in authoring or regenerated on-the-fly in Add Lesson or Monitoring.
+						var svgSaveSuccessful = GeneralLib.saveLearningDesignImage();
+						if (!svgSaveSuccessful) {
+							layout.infoDialog.data('show')(LABELS.SVG_SAVE_ERROR);
+						}
 					}
 					
 					if (!layout.ld.invalid) {
 						var missingGroupingOnActivities = GeneralLib.checkTBLGrouping();
-						if (missingGroupingOnActivities) {
+						if (missingGroupingOnActivities && missingGroupingOnActivities.length > 0) {
 							var info = LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING;
 							$.each(missingGroupingOnActivities, function(){
 								info += '<br /> * ' + this.title; 
@@ -3312,6 +3437,6 @@ GeneralLib = {
 	 
 	 snapToGrid : function(input, skipPadding) {
 		 var snapped = Snap.snapTo(layout.snapToGrid.step, input, layout.snapToGrid.step / 2);
-		 return skipPadding ? snapped : (Math.max(snapped, layout.snapToGrid.padding) + layout.snapToGrid.offset);
+		 return skipPadding ? snapped : Math.max(snapped, layout.snapToGrid.padding);
 	 }
 };

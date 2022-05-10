@@ -61,6 +61,8 @@ public interface IIntegrationService {
     ExtUserUseridMap getExtUserUseridMap(ExtServer extServer, String extUsername, boolean prefix)
 	    throws UserInfoFetchException, UserInfoValidationException;
 
+    ExtUserUseridMap getExtUserUseridMapByUserId(ExtServer extServer, Integer userId);
+
     /**
      * compatibility method to support existing integrations. It does callback call to integrated server to get user
      * details.
@@ -109,6 +111,8 @@ public interface IIntegrationService {
      * @return
      */
     ExtServer getExtServer(String serverId);
+
+    ExtServer getExtServer(String ltiAdvantageIssuer, String ltiAdvantageClientId);
 
     /**
      * Returns ExtServerLessonMap for the LTI Tool Consumer identified by serverId.
@@ -211,7 +215,8 @@ public interface IIntegrationService {
      * @return
      * @throws UnsupportedEncodingException
      */
-    String getLessonFinishCallbackUrl(User user, Lesson lesson) throws UnsupportedEncodingException;
+    String getLessonFinishCallbackUrl(User user, Lesson lesson, Long finishedActivityId)
+	    throws UnsupportedEncodingException;
 
     /**
      * Check whether specified lesson was created using LTI consumer, and if so - push user mark to that server
@@ -242,15 +247,15 @@ public interface IIntegrationService {
      * @param lessonId
      *            if supplied, user will be added to the according lesson; and only to the course otherwise
      */
-    void addUsersUsingMembershipService(ExtServer extServer, Long lessonId, String extCourseId, String resourceLinkId)
-	    throws IOException, UserInfoFetchException, UserInfoValidationException;
+    void addUsersUsingMembershipService(ExtServer extServer, Long lessonId, String extCourseId, String resourceLinkId,
+	    String customContextMembershipUrl) throws IOException, UserInfoFetchException, UserInfoValidationException;
 
     /**
      * Adds an external user to the course with specified courseId.
      */
     ExtUserUseridMap addExtUserToCourse(ExtServer extServer, String method, String username, String firstName,
-	    String lastName, String email, String extCourseId, String countryIsoCode, String langIsoCode)
-	    throws UserInfoFetchException, UserInfoValidationException;
+	    String lastName, String email, String extCourseId, String countryIsoCode, String langIsoCode,
+	    boolean usePrefix) throws UserInfoFetchException, UserInfoValidationException;
 
     /**
      * Add an external user to the course with specified courseId and then adds it the the lesson with specified
@@ -258,7 +263,7 @@ public interface IIntegrationService {
      */
     ExtUserUseridMap addExtUserToCourseAndLesson(ExtServer extServer, String method, Long lessonId, String username,
 	    String firstName, String lastName, String email, String extCourseId, String countryIsoCode,
-	    String langIsoCode) throws UserInfoFetchException, UserInfoValidationException;
+	    String langIsoCode, boolean usePrefix) throws UserInfoFetchException, UserInfoValidationException;
 
     /**
      * Creates an external org and normal org. It does not set roles for the creator.
@@ -267,4 +272,5 @@ public interface IIntegrationService {
 	    String extCourseName, String parentOrgId, Boolean prefix) throws UserInfoValidationException;
 
     void updateUserRoles(User user, Organisation org, String method);
+
 }

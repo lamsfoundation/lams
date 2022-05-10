@@ -13,8 +13,8 @@
 
 <div class="panel panel-default">
 	<div class="panel-heading" id="questionPanelHeading${questionNumber}">
-		<c:if test="${questionNumber > 1}"><a href="#" onclick="javascript:deleteMCQDiv('divq${questionNumber}', '${questionTitleField}');" class="btn btn-default btn-sm panel-title-button" id="deleteAssessmentButton${questionNumber}">
-			<i class="fa fa-lg fa-trash-o"></i> <fmt:message key="authoring.fla.delete.button"/></a></c:if>
+		<a href="#" onclick="javascript:deleteQuestionDiv('divq${questionNumber}', '${questionTitleField}');" class="btn btn-default btn-sm panel-title-button" id="deleteAssessmentButton${questionNumber}">
+			<i class="fa fa-lg fa-trash-o"></i> <fmt:message key="authoring.fla.delete.button"/></a>
 		<div class="panel-title collapsable-icon-left">	
 			<a role="button" data-toggle="collapse" href="#questionPanelCollapse${questionNumber}" 
 				aria-expanded="true" aria-controls="questionPanelCollapse${questionNumber}" >&nbsp;&nbsp;
@@ -28,7 +28,24 @@
 		<input type="hidden" name="question${questionNumber}uuid" value="${question.uuid}"/>
 		<lams:CKEditor id="question${questionNumber}" value="${question.text}" contentFolderID="${contentFolderID}" height="100"></lams:CKEditor>
 		
-		<table class="table table-condensed table-no-border">
+		<div class="voffset5"> 
+			<label for="question${questionNumber}mark"><fmt:message key="label.marks"/></label>
+			<input type="number" step="1" min="1" value="${not empty question.defaultGrade ? question.defaultGrade : 1}" style="width: 70px !important"
+				   name="question${questionNumber}mark" id="question${questionNumber}mark"  class="form-control form-control-inline voffset5"/>
+			
+			<span class="pull-right">
+				<div class="form-group voffset10">
+					<label for="question${questionNumber}markHedging">
+						<input name="question${questionNumber}markHedging" id="question${questionNumber}markHedging" type="checkbox" value="true" ${question.type == 8 ? "checked=" : "" }/> 
+						<fmt:message key="authoring.tbl.mark.hedging" />
+					</label>
+					<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="top" 
+					   title="<fmt:message key='authoring.tbl.mark.hedging.tooltip'/>"></i>
+				</div>
+			</span>
+		</div>
+		
+		<table class="table table-condensed table-no-border voffset10">
 		<tr><td></td>
 		<td width="60px" class="align-center">
 			<span class="field-name">
@@ -90,6 +107,7 @@
 <script type="text/javascript">
    $('#${questionTitleDisplay}').editable({
    		mode: 'inline',
+    	onblur: 'ignore',
       	type: 'text',
        	validate: validateXEditable,
        	success: function(response, newValue) {
@@ -100,4 +118,7 @@
    }).on('shown', onShownForXEditable)
 	  .on('hidden', onHiddenForXEditable);
 
+   $(document).ready(function(){
+	   $('[data-toggle="tooltip"]').tooltip();
+   });
 </script>

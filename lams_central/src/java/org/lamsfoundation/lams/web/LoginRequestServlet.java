@@ -21,7 +21,6 @@
 package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -42,6 +41,7 @@ import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.integration.util.IntegrationConstants;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.security.UniversalLoginModule;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -170,22 +170,23 @@ public class LoginRequestServlet extends HttpServlet {
 		userMap = integrationService.getImplicitExtUserUseridMap(extServer, extUsername, firstName, lastName,
 			locale, country, email, prefix, isUpdateUserDetails);
 	    }
+	    ExtCourseClassMap courseMap = null;
 
 	    if (!isWorkflowAutomation && extCourseId == null && StringUtils.isNotBlank(lessonId)) {
 		// derive course ID from lesson ID
-		ExtCourseClassMap classMap = integrationService.getExtCourseClassMap(extServer.getSid(),
-			Long.parseLong(lessonId));
-		if (classMap == null) {
+		courseMap = integrationService.getExtCourseClassMap(extServer.getSid(), Long.parseLong(lessonId));
+		if (courseMap == null) {
 		    log.warn("Lesson " + lessonId + " is not mapped to any course for server "
 			    + extServer.getServername());
 		} else {
-		    extCourseId = classMap.getCourseid();
+		    extCourseId = courseMap.getCourseid();
 		}
 	    }
 
 	    if (!isWorkflowAutomation && extCourseId != null) {
 		// check if organisation, ExtCourseClassMap and user roles exist and up-to-date, and if not update them
-		integrationService.getExtCourseClassMap(extServer, userMap, extCourseId, courseName, method, prefix);
+		courseMap = integrationService.getExtCourseClassMap(extServer, userMap, extCourseId, courseName, method,
+			prefix);
 	    }
 
 	    User user = userMap.getUser();
@@ -195,15 +196,22 @@ public class LoginRequestServlet extends HttpServlet {
 		throw new UserInfoFetchException(error);
 	    }
 
-	    //adds users to the lesson with respective roles
-	    if (!isWorkflowAutomation && StringUtils.isNotBlank(lessonId)) {
-		if (IntegrationConstants.METHOD_LEARNER.equals(method)
-			|| IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)) {
-		    lessonService.addLearner(Long.parseLong(lessonId), user.getUserId());
-
+	    // adds users to the lesson with respective roles
+	    Integer userId = user.getUserId();
+	    if (!isWorkflowAutomation) {
+		if (StringUtils.isNotBlank(lessonId) && (IntegrationConstants.METHOD_LEARNER.equals(method)
+			|| IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method))) {
+		    lessonService.addLearner(Long.parseLong(lessonId), userId);
 		} else if (IntegrationConstants.METHOD_MONITOR.equals(method)
 			|| IntegrationConstants.METHOD_AUTHOR.equals(method)) {
-		    lessonService.addStaffMember(Long.parseLong(lessonId), user.getUserId());
+		    if (extServer.isAddStaffToAllLessons() && courseMap != null) {
+			// add staff to all lessons
+			for (Lesson lesson : courseMap.getOrganisation().getLessons()) {
+			    lessonService.addStaffMember(lesson.getLessonId(), userId);
+			}
+		    } else if (StringUtils.isNotBlank(lessonId)) {
+			lessonService.addStaffMember(Long.parseLong(lessonId), userId);
+		    }
 		}
 	    }
 
@@ -215,7 +223,7 @@ public class LoginRequestServlet extends HttpServlet {
 		    ? IntegrationConstants.METHOD_LEARNER
 		    : method;
 	    // check if there is a redirect URL parameter already
-	    if ((loggedInLogin != null) && loggedInLogin.equals(login) && request.isUserInRole(role)) {
+	    if ((loggedInLogin != null) && loggedInLogin.equals(login) && request.isUserInRole(role.toUpperCase())) {
 		response.sendRedirect(response.encodeRedirectURL(redirectURL));
 		return;
 	    }
@@ -231,8 +239,8 @@ public class LoginRequestServlet extends HttpServlet {
 	    UniversalLoginModule.setAuthenticationToken(token);
 
 	    redirectURL = WebUtil.getBaseServerURL() + redirectURL;
-	    redirectURL = URLEncoder.encode(redirectURL, "UTF-8");
-	    response.sendRedirect("login.jsp?redirectURL=" + redirectURL);
+	    hses.setAttribute("redirectURL", redirectURL);
+	    response.sendRedirect("login.jsp");
 	} catch (AuthenticationException e) {
 	    log.error("Authentication error: ", e);
 	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED,

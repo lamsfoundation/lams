@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,7 @@
 package org.springframework.aop.framework.autoproxy;
 
 import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.lang.Nullable;
 
 /**
  * {@code BeanPostProcessor} implementation that creates AOP proxies based on all
@@ -37,12 +38,13 @@ import org.springframework.beans.factory.BeanNameAware;
 @SuppressWarnings("serial")
 public class DefaultAdvisorAutoProxyCreator extends AbstractAdvisorAutoProxyCreator implements BeanNameAware {
 
-	/** Separator between prefix and remainder of bean name */
-	public final static String SEPARATOR = ".";
+	/** Separator between prefix and remainder of bean name. */
+	public static final String SEPARATOR = ".";
 
 
 	private boolean usePrefix = false;
 
+	@Nullable
 	private String advisorBeanNamePrefix;
 
 
@@ -68,7 +70,7 @@ public class DefaultAdvisorAutoProxyCreator extends AbstractAdvisorAutoProxyCrea
 	 * references. Default value is the bean name of this object + a dot.
 	 * @param advisorBeanNamePrefix the exclusion prefix
 	 */
-	public void setAdvisorBeanNamePrefix(String advisorBeanNamePrefix) {
+	public void setAdvisorBeanNamePrefix(@Nullable String advisorBeanNamePrefix) {
 		this.advisorBeanNamePrefix = advisorBeanNamePrefix;
 	}
 
@@ -76,6 +78,7 @@ public class DefaultAdvisorAutoProxyCreator extends AbstractAdvisorAutoProxyCrea
 	 * Return the prefix for bean names that will cause them to be included
 	 * for auto-proxying by this object.
 	 */
+	@Nullable
 	public String getAdvisorBeanNamePrefix() {
 		return this.advisorBeanNamePrefix;
 	}
@@ -96,7 +99,11 @@ public class DefaultAdvisorAutoProxyCreator extends AbstractAdvisorAutoProxyCrea
 	 */
 	@Override
 	protected boolean isEligibleAdvisorBean(String beanName) {
-		return (!isUsePrefix() || beanName.startsWith(getAdvisorBeanNamePrefix()));
+		if (!isUsePrefix()) {
+			return true;
+		}
+		String prefix = getAdvisorBeanNamePrefix();
+		return (prefix != null && beanName.startsWith(prefix));
 	}
 
 }

@@ -86,6 +86,7 @@ public interface AuthoringJsonTags {
     public static final String GATE_START_OFFSET = "gateStartTimeOffset";
     public static final String GATE_END_OFFSET = "gateEndTimeOffset";
     public static final String GATE_ACTIVITY_COMPLETION_BASED = "gateActivityCompletionBased";
+    public static final String GATE_STOP_AT_PRECEDING_ACTIVITY = "gateStopAtPrecedingActivity";
     public static final String GATE_PASSWORD = "gatePassword";
 
     /** Grouping Activity specific tags */

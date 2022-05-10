@@ -12,12 +12,20 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chart.bundle.min.js"></script>
 	<script>
+		if (typeof $.fn.bootstrapTooltip == 'undefined') {
+			$.fn.bootstrapTooltip = $.fn.tooltip.noConflict();    
+		}
+	
 		var TOTAL_LESSON_LEARNERS_NUMBER = ${totalLearnersNumber},
 			LAMS_URL = '<lams:LAMSURL/>',
-			TAB_REFRESH_INTERVAL = 20 * 1000, // refresh tab every 20 seconds
+			TAB_REFRESH_INTERVAL = 20 * 1000, // refresh tab every 20 seconds,
+			refreshIntervalReference = null, // stores reference to interval so it can be cancelled
 			lastTabMethod = null, // these variables are needed for tab refresh
-			lastTabToolContentID = null;
+			lastTabToolContentID = null,
+			tlbMonitorHorizontalScrollElement = null; // keeps ID of element which can be scrolled right,
+												      // so we can re-scroll it after refresh
 	
 		$(document).ready(function(){
 			<!-- Menu Toggle Script -->
@@ -52,19 +60,28 @@
 		       	});
 			}
 			
+			restartRefreshInterval();
+		});
+
+		function restartRefreshInterval() {
+			if (refreshIntervalReference) {
+				window.clearInterval(refreshIntervalReference);
+			}
+			
 			// refresh automatically every X seconds
-			window.setInterval(function(){
+			refreshIntervalReference = window.setInterval(function(){
 				refresh(true);
 			}, TAB_REFRESH_INTERVAL);
-		});
+		}
 
 		function loadTab(method, toolContentID, autoRefresh) {
 			if (!method && !toolContentID) {
 				// tab was refreshed, get stored parameters
 				method = lastTabMethod;
 
-				if (autoRefresh && (method == 'burningQuestions' || method == 'aes' || method == 'aesStudentChoices' || method == 'sequence' || $('.modal').hasClass('in'))){
-					// do not auto refresh Burning Questions nor AES tabs
+				if (autoRefresh && (method == 'burningQuestions' || method == 'aes' || method == 'sequence' || 
+									method == 'gates' || method == 'iraAssessment'  || $('.modal').hasClass('in'))){
+					// do not auto refresh pages with mostly static content
 					// or if a modal dialog is open
 					return;
 				}	
@@ -75,9 +92,26 @@
 				lastTabMethod = method;
 				lastTabToolContentID = toolContentID;
 			}
+
+			if (!method) {
+				// we should not have this situation!
+				return;
+			}
+
+			// if there is a timer running, destroy it before loading a new page
+			var counter = $('#absolute-time-limit-counter');
+			if (counter.length > 0) {
+				counter.countdown('destroy');
+			}
+			// no need to refresh soon if we are loading new tab anyway
+			restartRefreshInterval();
 			
 			var url = "<lams:LAMSURL/>monitoring/tblmonitor/"
 			var options = {};
+			// check if tab declared an element scrollable
+			// if so, store where it was scrolled to
+			var horizontalScroll = tlbMonitorHorizontalScrollElement == null ? null : $(tlbMonitorHorizontalScrollElement).scrollLeft();
+			tlbMonitorHorizontalScrollElement = null;
 			
 			if (method == "tra" || method == "traStudentChoices" || method == "burningQuestions") {
 				toolContentID = "${traToolContentId}";
@@ -87,11 +121,11 @@
 				toolContentID = "${iraToolContentId}";
 				url = "<lams:LAMSURL/>tool/laasse10/tblmonitoring/";
 	
-			} else if (method == "aes" || method == "aesStudentChoices") {
-				url = "<lams:LAMSURL/>tool/laasse10/tblmonitoring/";
+			} else if (method == "aes") {
 				options = {
-					assessmentToolContentIds: "${assessmentToolContentIds}",
-					assessmentActivityTitles: "${assessmentActivityTitles}"
+					aeToolContentIds: "${aeToolContentIds}",
+					aeToolTypes: "${aeToolTypes}",
+					aeActivityTitles: "${aeActivityTitles}"
 				};
 
 			} else if (method == "forum") {
@@ -105,23 +139,24 @@
 			}
 
 			// Merge additional options into existing options object, convert method to url call
-			url = url+method+".do";
+			url = url + method + ".do";
 			$.extend( options, {
 				lessonID: ${lesson.lessonId},
 				toolContentID: toolContentID
 			});
 
+			
 			$("#tblmonitor-tab-content").load(
 				url,
-				options, 
-				//callback function fired on complete
-				function() { 
-					//use jqeury toggle instead of bootstrap collapse 
-					$(".burning-question-title").on('click', function () {
-						var div =  $("#collapse-" + $(this).data("itemuid"));
-						div.toggleClass("in");
-						$(this).toggleClass("collapsed");
-					});
+				options,
+				function(){
+					$('[data-toggle="tooltip"]').bootstrapTooltip();
+					
+					if (horizontalScroll == null || horizontalScroll == 0 || tlbMonitorHorizontalScrollElement == null) {
+						return;
+					}
+					// re-scroll to the same position horizontally
+					$(tlbMonitorHorizontalScrollElement).scrollLeft(horizontalScroll);
 				}
 			);
 		}
@@ -161,7 +196,7 @@
 		}
 
         function switchToRegularMonitor() {
-        	location.href = "<lams:LAMSURL/>home/monitorLesson.do?lessonID=${lesson.lessonId}";
+        	location.href = "<lams:LAMSURL/>home/monitorLesson.do?forceRegularMonitor=true&lessonID=${lesson.lessonId}";
     	}
 	</script>
 </lams:head>
@@ -176,12 +211,6 @@
 			<div class="offcanvas-logo">
 				<div class="logo">
 				</div>
-			</div>
-				
-			<div class="offcanvas-header">
-				<span class="courses-title ">
-					${lesson.lessonName}
-				</span>
 			</div>
 
 			<table class="tablesorter">
@@ -282,30 +311,31 @@
 	        </div>
 	    </nav>
 		<!-- /Offcanvas Bar -->
-    
-    		<!-- Page Content -->
+		
+    	<!-- Page Content -->
 		<div id="page-content-wrapper">
 
 			<!-- Top bar -->
 			<div class="top-nav">
-				<div class="col-xs-5 col-md-3 col-lg-3">
+				<div id="menu-left-controls">
 					<a href="#">
 						<i class="fa fa-bars fa-lg" id="menu-toggle-bars"></i>
 					</a>
+					<span class="courses-title">
+						<c:out value="${lesson.lessonName}" escapeXml="true" />
+					</span>
 				</div>
 						
-				<div>
-					<button id="regular-monitor-button" type="button" class="btn btn-sm btn-default pull-right" onclick="return switchToRegularMonitor();" style="margin-right: 10px;">
-						<i class="fa fa-heartbeat" title="<fmt:message key="label.monitor" />"></i><span class="hidden-xs">  <fmt:message key="label.switch.to.regular.monitor" /></span>
-					</button>
-					
-					<button id="refresh-button" type="button" class="btn btn-sm btn-default pull-right" onclick="Javascript: refresh(); return false;" style="margin-right: 10px;">
+				<div id="menu-right-controls">
+					<button id="timer-button" type="button" class="btn btn-sm btn-default"  onclick="javascript:openPopUp('<lams:LAMSURL/>monitoring/timer.jsp', '<fmt:message key="label.countdown.timer"/>', 648, 1152, true);return false;">
+							<i class="fa fa-hourglass-half"></i><span class="hidden-xs"> <fmt:message key="label.countdown.timer"/></span>
+					</button>	
+					<button id="refresh-button" type="button" class="btn btn-sm btn-default" onclick="Javascript: refresh(); return false;">
 						<i class="fa fa-refresh"></i><span class="hidden-xs">  <fmt:message key="button.refresh"/></span>
 					</button>
-					
-					<button id="timer-button" type="button" class="btn btn-sm btn-default pull-right"  onclick="javascript:openPopUp('<lams:LAMSURL/>monitoring/timer.jsp', '<fmt:message key="label.countdown.timer"/>', 648, 1152, true);return false;" style="margin-right: 10px;">
-							<i class="fa fa-hourglass-half"></i><span class="hidden-xs"> <fmt:message key="label.countdown.timer"/></span>
-					</button>		
+					<button id="regular-monitor-button" type="button" class="btn btn-sm btn-default" onclick="return switchToRegularMonitor();">
+						<i class="fa fa-heartbeat" title="<fmt:message key="label.monitor" />"></i><span class="hidden-xs">  <fmt:message key="label.switch.to.regular.monitor" /></span>
+					</button>
 				</div>
 			</div>
 			<!-- End top bar -->

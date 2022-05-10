@@ -15,33 +15,35 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-        
+
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        Backup Record <P>
- * Description:  Boolean specifying whether
- *               the GUI should store a backup of the file.<P>
- * REFERENCE:  PG 287 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)<P>
- * @author Andrew C. Oliver (acoliver at apache dot org)
+ * Boolean specifying whether the GUI should store a backup of the file.
+ *
  * @version 2.0-pre
  */
 
-public final class BackupRecord
-    extends StandardRecord
-{
-    public final static short sid = 0x40;
-    private short             field_1_backup;   // = 0;
+public final class BackupRecord extends StandardRecord {
+    public static final short sid = 0x40;
 
-    public BackupRecord()
-    {
+    private short field_1_backup;
+
+    public BackupRecord() {}
+
+    public BackupRecord(BackupRecord other) {
+        super(other);
+        field_1_backup = other.field_1_backup;
     }
 
-    public BackupRecord(RecordInputStream in)
-    {
+    public BackupRecord(RecordInputStream in) {
         field_1_backup = in.readShort();
     }
 
@@ -67,17 +69,6 @@ public final class BackupRecord
         return field_1_backup;
     }
 
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[BACKUP]\n");
-        buffer.append("    .backup          = ")
-            .append(Integer.toHexString(getBackup())).append("\n");
-        buffer.append("[/BACKUP]\n");
-        return buffer.toString();
-    }
-
     public void serialize(LittleEndianOutput out) {
         out.writeShort(getBackup());
     }
@@ -89,5 +80,22 @@ public final class BackupRecord
     public short getSid()
     {
         return sid;
+    }
+
+    @Override
+    public BackupRecord copy() {
+        return new BackupRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.BACKUP;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "backup", this::getBackup
+        );
     }
 }

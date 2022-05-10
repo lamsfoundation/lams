@@ -181,10 +181,10 @@
 <body class="stripes">
 
 	<lams:Page title="${title}" type="monitoring">
-	<div id="fullPageContentDiv">
-	<div id="flexDiv">
+	<div class="full-screen-content-div">
+	<div class="full-screen-flex-div">
 
-	<div id="mainDiv" class="panel panel-default">
+	<div class="panel panel-default full-screen-main-div">
 	<div class="panel-body">
 	<div id="enterTimeDiv" class="setup">
 		<span><fmt:message key='label.enter.countdown.time' /></span>
@@ -220,8 +220,8 @@
 		<a href="#" class="btn btn-default btn-primary fixed-button-width timer" id="resume" onclick="javascript:resume()" ><fmt:message key="label.resume"/></a>
 		<a href="#" class="btn btn-default loffset10 fixed-button-width timer" id="reset" onclick="javascript:reset()"><fmt:message key="label.reset"/></a>
 
-        <a href="#" class="btn btn-default loffset10 fixed-button-width pull-right launch-fullscreen" id="expand" onclick="javascript:launchIntoFullscreen()"><i class="fa fa-arrows-alt" aria-hidden="true"></i></a> 
-        <a href="#" class="btn btn-default loffset10 fixed-button-width pull-right exit-fullscreen" id="shrink" onclick="javascript:exitFullscreen()" style="display: none;"><i class="fa fa-compress" aria-hidden="true"></i></a> 
+        <a href="#" class="btn btn-default loffset10 fixed-button-width pull-right full-screen-launch-button" id="expand" onclick="javascript:launchIntoFullscreen(this)"><i class="fa fa-arrows-alt" aria-hidden="true"></i></a> 
+        <a href="#" class="btn btn-default loffset10 fixed-button-width pull-right full-screen-exit-button" id="shrink" onclick="javascript:exitFullscreen()" style="display: none;"><i class="fa fa-compress" aria-hidden="true"></i></a> 
 		<a href="#" class="btn btn-default loffset10 fixed-button-width pull-right" id="bellOn" onclick="javascript:toggleBell()"><i class="fa fa-volume-up" aria-hidden="true"></i></a>
 		<a href="#" class="btn btn-default loffset10 fixed-button-width pull-right" id="bellOff" onclick="javascript:toggleBell()" style="padding-top: 0px; padding-bottom: 0px; display: none;">
         <span class="fa fa-stack"><i class="fa fa-volume-up" aria-hidden="true"></i><i class="fa fa-ban fa-stack-2x text-danger" aria-hidden="true"></i>

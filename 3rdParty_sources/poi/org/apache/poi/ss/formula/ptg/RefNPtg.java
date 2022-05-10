@@ -17,12 +17,9 @@
 
 package org.apache.poi.ss.formula.ptg;
 
+import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.util.LittleEndianInput;
 
-/**
- * RefNPtg
- * @author Jason Height (jheight at apache dot com)
- */
 public final class RefNPtg extends Ref2DPtgBase {
 	public final static byte sid = 0x2C;
 
@@ -30,7 +27,36 @@ public final class RefNPtg extends Ref2DPtgBase {
 		super(in);
 	}
 
-	protected byte getSid() {
-		return sid;
-	}
+    public RefNPtg(RefNPtg other) {
+	    super(other);
+    }
+
+    @Override
+    public byte getSid() {
+        return sid;
+    }
+
+    protected final String formatReferenceAsString() {
+        StringBuilder builder = new StringBuilder();
+
+        // The bits in RefNPtg indicate offset, not relative/absolute values!
+        if(isRowRelative()) {
+            builder.append("RowOffset: ").append(getRow()).append(" ");
+        } else {
+            builder.append(getRow()+1);
+        }
+
+        if(isColRelative()) {
+            builder.append(" ColOffset: ").append(getColumn());
+        } else {
+            builder.append(CellReference.convertNumToColString(getColumn()));
+        }
+
+        return builder.toString();
+    }
+
+    @Override
+    public RefNPtg copy() {
+        return new RefNPtg(this);
+    }
 }

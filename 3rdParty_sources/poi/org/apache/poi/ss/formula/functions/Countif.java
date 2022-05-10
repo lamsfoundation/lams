@@ -138,7 +138,7 @@ public final class Countif extends Fixed2ArgFunction {
         }
         @Override
         public String toString() {
-            StringBuffer sb = new StringBuffer(64);
+            StringBuilder sb = new StringBuilder(64);
             sb.append(getClass().getName());
             sb.append(" [").append(_representation).append("]");
             return sb.toString();
@@ -165,12 +165,7 @@ public final class Countif extends Fixed2ArgFunction {
         }
         @Override
         public final String toString() {
-            StringBuffer sb = new StringBuffer(64);
-            sb.append(getClass().getName()).append(" [");
-            sb.append(_operator.getRepresentation());
-            sb.append(getValueText());
-            sb.append("]");
-            return sb.toString();
+            return getClass().getName() + " [" + _operator.getRepresentation() + getValueText() + "]";
         }
         protected abstract String getValueText();
     }
@@ -386,7 +381,7 @@ public final class Countif extends Fixed2ArgFunction {
          */
         public static Pattern getWildCardPattern(String value) {
             int len = value.length();
-            StringBuffer sb = new StringBuffer(len);
+            StringBuilder sb = new StringBuilder(len);
             boolean hasWildCard = false;
             for(int i=0; i<len; i++) {
                 char ch = value.charAt(i);

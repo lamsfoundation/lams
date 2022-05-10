@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -28,6 +29,8 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
+
+import org.springframework.lang.Nullable;
 
 /**
  * Abstract base class for SAX {@code ContentHandler} and {@code LexicalHandler}
@@ -40,7 +43,7 @@ import org.xml.sax.ext.LexicalHandler;
  */
 abstract class AbstractStaxHandler implements ContentHandler, LexicalHandler {
 
-	private final List<Map<String, String>> namespaceMappings = new ArrayList<Map<String, String>>();
+	private final List<Map<String, String>> namespaceMappings = new ArrayList<>();
 
 	private boolean inCData;
 
@@ -100,7 +103,7 @@ abstract class AbstractStaxHandler implements ContentHandler, LexicalHandler {
 	}
 
 	@Override
-	public final void characters(char ch[], int start, int length) throws SAXException {
+	public final void characters(char[] ch, int start, int length) throws SAXException {
 		try {
 			String data = new String(ch, start, length);
 			if (!this.inCData) {
@@ -147,7 +150,7 @@ abstract class AbstractStaxHandler implements ContentHandler, LexicalHandler {
 	}
 
 	@Override
-	public final void startDTD(String name, String publicId, String systemId) throws SAXException {
+	public final void startDTD(String name, @Nullable String publicId, String systemId) throws SAXException {
 		try {
 			StringBuilder builder = new StringBuilder("<!DOCTYPE ");
 			builder.append(name);
@@ -233,7 +236,7 @@ abstract class AbstractStaxHandler implements ContentHandler, LexicalHandler {
 	}
 
 	private void newNamespaceMapping() {
-		this.namespaceMappings.add(new HashMap<String, String>());
+		this.namespaceMappings.add(new HashMap<>());
 	}
 
 	private void removeNamespaceMapping() {

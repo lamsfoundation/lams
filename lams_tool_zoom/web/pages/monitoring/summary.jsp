@@ -68,6 +68,61 @@
 <c:set var="adTitle"><fmt:message key="monitor.summary.th.advancedSettings" /></c:set>
 <lams:AdvancedAccordian title="${adTitle}">
 	<table class="table table-striped table-condensed">
-
+		<tr>
+			<td>
+				<fmt:message key="advanced.startInMonitor" />
+			</td>
+			
+			<td>
+				<c:choose>
+					<c:when test="${contentDTO.startInMonitor}">
+						<fmt:message key="label.on" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.off" />
+					</c:otherwise>
+				</c:choose>	
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<fmt:message key="advanced.duration" />
+			</td>
+			
+			<td>
+				<c:if test="${not empty contentDTO.duration && contentDTO.duration > 0}">
+					${contentDTO.duration}
+				</c:if>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<fmt:message key="advanced.reflectOnActivity" />
+			</td>
+			
+			<td>
+				<c:choose>
+					<c:when test="${contentDTO.reflectOnActivity}">
+						<fmt:message key="label.on" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.off" />
+					</c:otherwise>
+				</c:choose>	
+			</td>
+		</tr>
+		
+		<c:choose>
+			<c:when test="${contentDTO.reflectOnActivity}">
+				<tr>
+					<td>
+						<fmt:message key="advanced.reflectOnActivity" />
+					</td>
+					<td>
+						<lams:out escapeHtml="true" value="${contentDTO.reflectInstructions}"/>	
+					</td>
+				</tr>
+			</c:when>
+		</c:choose>
 	</table>
 </lams:AdvancedAccordian>

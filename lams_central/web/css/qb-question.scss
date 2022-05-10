@@ -135,10 +135,6 @@ label {
    	top: 60px;
     right: 20px;
    	z-index: 2;
-   	visibility:hidden;
-}	
-form:hover #question-settings-link, #question-settings-link.btn-primary {
-	visibility:visible;
 }
 
 /* Overwrite default CKEditor style */

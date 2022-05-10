@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learningdesign.dto;
 
 import java.util.List;
@@ -41,12 +40,14 @@ public class ActivityURL {
     private String type;
     private Long activityId;
     private String url;
+    private String iconURL;
     private String title;
     private String description;
     private boolean complete;
     private boolean floating;
     private byte status;
     private boolean defaultURL;
+    private long duration;
     private List<ActivityURL> childActivities;
 
     public ActivityURL() {
@@ -110,6 +111,14 @@ public class ActivityURL {
 	this.url = url;
     }
 
+    public String getIconURL() {
+	return iconURL;
+    }
+
+    public void setIconURL(String iconURL) {
+	this.iconURL = iconURL;
+    }
+
     public String getDescription() {
 	return description;
     }
@@ -134,6 +143,14 @@ public class ActivityURL {
 	this.status = status;
     }
 
+    public Long getDuration() {
+	return duration;
+    }
+
+    public void setDuration(Long duration) {
+	this.duration = duration;
+    }
+
     /** Get a list of the urls for the child activities. Only used on the jsp progress display page */
     public List<ActivityURL> getChildActivities() {
 	return childActivities;
@@ -148,5 +165,4 @@ public class ActivityURL {
 	return new ToStringBuilder(this).append("activityId", activityId).append("title", title).append("url", url)
 		.toString();
     }
-
 }

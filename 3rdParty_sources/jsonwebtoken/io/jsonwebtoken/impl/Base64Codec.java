@@ -15,14 +15,22 @@
  */
 package io.jsonwebtoken.impl;
 
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.io.Encoders;
+
+/**
+ * @deprecated since 0.10.0 - will be removed before 1.0.0. Use {@code io.jsonwebtoken.io.Encoders#BASE64}
+ * or {@code io.jsonwebtoken.io.Decoders#BASE64}
+ */
+@Deprecated
 public class Base64Codec extends AbstractTextCodec {
 
     public String encode(byte[] data) {
-        return javax.xml.bind.DatatypeConverter.printBase64Binary(data);
+        return Encoders.BASE64.encode(data);
     }
 
     @Override
     public byte[] decode(String encoded) {
-        return javax.xml.bind.DatatypeConverter.parseBase64Binary(encoded);
+        return Decoders.BASE64.decode(encoded);
     }
 }

@@ -3,7 +3,7 @@ Copyright (c) 2003-2017, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.plugins.setLang( 'bootpanel', 'en', {
-	button: 'Bootstrap Element',
+	button: 'Element',
 	panelHeading: 'Panel Text',
 	border: 'Border',
 	btnUpload: 'Send it to the Server',
@@ -15,7 +15,7 @@ CKEDITOR.plugins.setLang( 'bootpanel', 'en', {
 	lockRatio: 'Lock Ratio',
 	menu: 'Image Properties',
 	resetSize: 'Reset Size',
-	title: 'Editing Bootstrap Panel',
+	title: 'Editing Panel',
 	upload: 'Upload',
 	typeButton: 'Button',
 	typeLink: 'Link',

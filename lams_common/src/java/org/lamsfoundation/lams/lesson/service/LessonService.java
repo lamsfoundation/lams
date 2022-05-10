@@ -123,8 +123,9 @@ public class LessonService implements ILessonService {
 
     @Override
     public Map<User, Boolean> getUsersWithLessonParticipation(Long lessonId, String role, String searchPhrase,
-	    Integer limit, Integer offset, boolean orderAscending) {
-	return lessonDAO.getUsersWithLessonParticipation(lessonId, role, searchPhrase, limit, offset, orderAscending);
+	    Integer limit, Integer offset, boolean orderByLastName, boolean orderAscending) {
+	return lessonDAO.getUsersWithLessonParticipation(lessonId, role, searchPhrase, limit, offset, orderByLastName,
+		orderAscending);
     }
 
     @Override
@@ -149,6 +150,7 @@ public class LessonService implements ILessonService {
 	return lessonDAO.getLesson(lessonId);
     }
 
+    @Override
     public Lesson getLessonByToolContentId(long toolContentId) {
 	ToolActivity toolActivity = baseDAO.findByProperty(ToolActivity.class, "toolContentId", toolContentId).get(0);
 	return toolActivity.getLearningDesign().getLessons().iterator().next();
@@ -615,7 +617,12 @@ public class LessonService implements ILessonService {
     }
 
     @Override
-    public Integer getCountLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException {
+    public Integer getCountLearnersHaveAttemptedOrCompletedActivity(Activity activity) throws LessonServiceException {
+	return learnerProgressDAO.getNumUsersAttemptedOrCompletedActivity(activity);
+    }
+
+    @Override
+    public Integer getCountLearnersHaveAttemptedActivity(Activity activity) {
 	return learnerProgressDAO.getNumUsersAttemptedActivity(activity);
     }
 

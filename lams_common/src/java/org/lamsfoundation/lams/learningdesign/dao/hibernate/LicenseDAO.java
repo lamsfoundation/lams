@@ -40,12 +40,12 @@ public class LicenseDAO extends LAMSBaseDAO implements ILicenseDAO {
 
     @Override
     public License getLicenseByID(Long licenseID) {
-	return (License) super.find(License.class, licenseID);
+	return super.find(License.class, licenseID);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<License> getLicensesByOrderId() {
-	return (List<License>) getSession().createQuery(LICENSES_BY_ORDER_ID).list();
+	return getSession().createQuery(LICENSES_BY_ORDER_ID).setCacheable(true).list();
     }
 }

@@ -277,4 +277,6 @@ public interface IVoteService extends ICommonToolService {
 
     int getCountUsersForOpenTextEntries(Long sessionUid, Long contentUid, String searchStringVote,
 	    String searchStringUsername);
+
+    void changeLeaderForGroup(long toolSessionId, long leaderUserId);
 }

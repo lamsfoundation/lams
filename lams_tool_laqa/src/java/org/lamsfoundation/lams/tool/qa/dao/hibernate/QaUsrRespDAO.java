@@ -112,10 +112,11 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 
     private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING_SELECT = "SELECT resp.*, ans.*, AVG(rating.rating) avg_rating ";
     private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING_FROM = " FROM tl_laqa11_usr_resp resp ";
-    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING_JOIN = " JOIN lams_qb_tool_answer ans ON ans.answer_uid = resp.uid "
+    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING_JOIN1 = " JOIN lams_qb_tool_answer ans ON ans.answer_uid = resp.uid "
 	    + " AND ans.answer IS NOT NULL AND ans.tool_question_uid = :questionId JOIN tl_laqa11_que_usr usr"
-	    + " ON resp.que_usr_id = usr.uid AND usr.que_usr_id!=:excludeUserId "
-	    + " JOIN tl_laqa11_session sess ON usr.qa_session_id = sess.uid AND sess.qa_session_id = :qaSessionId";
+	    + " ON resp.que_usr_id = usr.uid AND usr.que_usr_id!=:excludeUserId ";
+    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING_JOIN2 = " JOIN tl_laqa11_session sess ON usr.qa_session_id = sess.uid AND sess.qa_session_id = :qaSessionId";
+    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING_JOIN3 = " AND sess.qa_group_leader_uid = usr.uid ";
 
     private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING_JOIN_RATING = " LEFT JOIN ("
 	    + " 	SELECT rat.item_id, rat.rating FROM lams_rating rat JOIN lams_rating_criteria crit"
@@ -124,11 +125,13 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 
     private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_COMMENT_COUNT_SELECT = "SELECT resp.*, ans.*, COUNT(rating_comment.item_id) count_comment ";
     private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_COMMENT_COUNT_FROM = " FROM tl_laqa11_usr_resp resp ";
-    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_COMMENT_COUNT_JOIN = " JOIN lams_qb_tool_answer ans ON ans.answer_uid = resp.uid "
+    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_COMMENT_COUNT_JOIN1 = " JOIN lams_qb_tool_answer ans ON ans.answer_uid = resp.uid "
 	    + " AND ans.answer IS NOT NULL AND ans.tool_question_uid = :questionId "
-	    + " JOIN tl_laqa11_que_usr usr ON resp.que_usr_id = usr.uid AND usr.que_usr_id!=:excludeUserId "
-	    + " JOIN tl_laqa11_session sess "
-	    + " ON usr.qa_session_id = sess.uid AND sess.qa_session_id = :qaSessionId LEFT JOIN ("
+	    + " JOIN tl_laqa11_que_usr usr ON resp.que_usr_id = usr.uid AND usr.que_usr_id!=:excludeUserId ";
+    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_COMMENT_COUNT_JOIN2 = " JOIN tl_laqa11_session sess "
+	    + " ON usr.qa_session_id = sess.uid AND sess.qa_session_id = :qaSessionId ";
+    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_COMMENT_COUNT_JOIN3 = " AND sess.qa_group_leader_uid = usr.uid ";
+    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_COMMENT_COUNT_JOIN_RATING = " LEFT JOIN ("
 	    + " 	SELECT ratcom.item_id FROM lams_rating_comment ratcom JOIN lams_rating_criteria crit"
 	    + " 	ON ratcom.rating_criteria_id = crit.rating_criteria_id AND crit.tool_content_id = :toolContentId"
 	    + " 	) rating_comment " + " ON rating_comment.item_id = resp.uid ";
@@ -139,10 +142,9 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
     private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_FROM = " FROM tl_laqa11_usr_resp resp ";
     private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_JOIN1 = " JOIN lams_qb_tool_answer ans ON ans.answer_uid = resp.uid "
 	    + " AND ans.answer IS NOT NULL AND ans.tool_question_uid = :questionId JOIN tl_laqa11_que_usr usr"
-	    + " ON resp.que_usr_id = usr.uid " + " AND usr.que_usr_id!=:excludeUserId "
-	    + " JOIN tl_laqa11_session sess "
-	    + " ON usr.qa_session_id = sess.uid AND sess.qa_session_id = :qaSessionId ";
-    private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_JOIN2 = " AND sess.qa_group_leader_uid = usr.uid ";
+	    + " ON resp.que_usr_id = usr.uid " + " AND usr.que_usr_id!=:excludeUserId ";
+    private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_JOIN2 = " JOIN tl_laqa11_session sess ON usr.qa_session_id = sess.uid AND sess.qa_session_id = :qaSessionId ";
+    private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_JOIN3 = " AND sess.qa_group_leader_uid = usr.uid ";
     private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_ORDER_BY = " order by ";
 
     @SuppressWarnings("unchecked")
@@ -185,16 +187,23 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 	StringBuilder queryText = null;
 	String[] portraitStrings = userManagementService.getPortraitSQL("usr.que_usr_id");
 	boolean needsToolContentId = false;
+	// we do need to specify session ID if this is learner UI with a leader
+	boolean needsQaSessionId = !isOnlyLeadersIncluded || excludeUserId.equals(-1L);
 
 	if (sorting == QaAppConstants.SORT_BY_RATING_ASC || sorting == QaAppConstants.SORT_BY_RATING_DESC) {
-
 	    String filteredSearchString = buildNameSearch(searchString, "usr");
 	    queryText = new StringBuilder(
 		    SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING_SELECT)
 			    .append(portraitStrings[0])
 			    .append(SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING_FROM)
-			    .append(SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING_JOIN)
+			    .append(SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING_JOIN1)
+			    .append(needsQaSessionId
+				    ? SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING_JOIN2
+				    : "")
 			    .append(filteredSearchString != null ? filteredSearchString : "").append(portraitStrings[1])
+			    .append(needsQaSessionId && isOnlyLeadersIncluded
+				    ? SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING_JOIN3
+				    : "")
 			    .append(SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING_JOIN_RATING)
 			    .append(sortingOrder);
 	    needsToolContentId = true;
@@ -204,7 +213,13 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 	    queryText = new StringBuilder(SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_COMMENT_COUNT_SELECT)
 		    .append(portraitStrings[0])
 		    .append(SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_COMMENT_COUNT_FROM)
-		    .append(SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_COMMENT_COUNT_JOIN)
+		    .append(SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_COMMENT_COUNT_JOIN1)
+		    .append(needsQaSessionId ? SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_COMMENT_COUNT_JOIN2
+			    : "")
+		    .append(needsQaSessionId && isOnlyLeadersIncluded
+			    ? SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_COMMENT_COUNT_JOIN3
+			    : "")
+		    .append(SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_COMMENT_COUNT_JOIN_RATING)
 		    .append(portraitStrings[1])
 		    .append(SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_COMMENT_COUNT_ORDER_BY);
 	    needsToolContentId = true;
@@ -215,12 +230,13 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 		    .append(portraitStrings[0])
 		    .append(LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_FROM)
 		    .append(LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_JOIN1)
+		    .append(needsQaSessionId ? LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_JOIN2 : "")
 		    .append(filteredSearchString != null ? filteredSearchString : "")
-		    .append(isOnlyLeadersIncluded ? LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_JOIN2
+		    .append(needsQaSessionId && isOnlyLeadersIncluded
+			    ? LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_JOIN3
 			    : "")
 		    .append(portraitStrings[1])
 		    .append(LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_ORDER_BY).append(sortingOrder);
-
 	}
 
 	Query<Object[]> query = getSessionFactory().getCurrentSession().createSQLQuery(queryText.toString())
@@ -229,8 +245,12 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 	if (needsToolContentId) {
 	    query.setParameter("toolContentId", toolContentId.longValue());
 	}
-	query.setParameter("questionId", questionId.longValue()).setParameter("qaSessionId", qaSessionId.longValue())
-		.setParameter("excludeUserId", excludeUserId.longValue());
+	query.setParameter("questionId", questionId.longValue()).setParameter("excludeUserId",
+		excludeUserId.longValue());
+
+	if (needsQaSessionId) {
+	    query.setParameter("qaSessionId", qaSessionId.longValue());
+	}
 
 	if (size > 0) {
 	    query.setFirstResult(page * size);

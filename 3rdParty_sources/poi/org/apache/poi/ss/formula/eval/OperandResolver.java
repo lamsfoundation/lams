@@ -17,6 +17,11 @@
 
 package org.apache.poi.ss.formula.eval;
 
+import org.apache.poi.ss.formula.EvaluationCell;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.util.CellRangeAddress;
+
+import java.time.DateTimeException;
 import java.util.regex.Pattern;
 
 /**
@@ -32,10 +37,10 @@ public final class OperandResolver {
     private static final String Digits    = "(\\p{Digit}+)";
     private static final String Exp    = "[eE][+-]?"+Digits;
     private static final String fpRegex    =
-                ("[\\x00-\\x20]*" +    
-                 "[+-]?(" +    
-                   "((("+Digits+"(\\.)?("+Digits+"?)("+Exp+")?)|"+        
-                 "(\\.("+Digits+")("+Exp+")?))))"+       
+                ("[\\x00-\\x20]*" +
+                 "[+-]?(" +
+                   "("+Digits+"(\\.)?("+Digits+"?)("+Exp+")?)|"+
+                 "(\\."+Digits+"("+Exp+")?))"+
                  "[\\x00-\\x20]*"); 
             
     
@@ -51,7 +56,7 @@ public final class OperandResolver {
      * @param srcCellCol used when arg is a single row AreaRef
      * @return a <tt>NumberEval</tt>, <tt>StringEval</tt>, <tt>BoolEval</tt> or <tt>BlankEval</tt>.
      * Never <code>null</code> or <tt>ErrorEval</tt>.
-     * @throws EvaluationException(#VALUE!) if srcCellRow or srcCellCol do not properly index into
+     * @throws EvaluationException if srcCellRow or srcCellCol do not properly index into
      *  an AreaEval.  If the actual value retrieved is an ErrorEval, a corresponding
      *  EvaluationException is thrown.
      */
@@ -69,6 +74,39 @@ public final class OperandResolver {
             throw new EvaluationException((ErrorEval) result);
         }
         return result;
+    }
+    
+    /**
+     * Retrieves a single value from an area evaluation utilizing the 2D indices of the cell
+     * within its own area reference to index the value in the area evaluation.
+     *
+     * @param ae area reference after evaluation
+     * @param cell the source cell of the formula that contains its 2D indices
+     * @return a <tt>NumberEval</tt>, <tt>StringEval</tt>, <tt>BoolEval</tt> or <tt>BlankEval</tt>. or <tt>ErrorEval<tt>
+     * Never <code>null</code>.
+     */
+
+    public static ValueEval getElementFromArray(AreaEval ae, EvaluationCell cell) {
+        CellRangeAddress range =  cell.getArrayFormulaRange();
+        int relativeRowIndex = cell.getRowIndex() - range.getFirstRow();
+        int relativeColIndex = cell.getColumnIndex() - range.getFirstColumn();
+
+        if (ae.isColumn()) {
+            if (ae.isRow()) {
+                return ae.getRelativeValue(0, 0);
+            }
+            else if(relativeRowIndex < ae.getHeight()) {
+                return ae.getRelativeValue(relativeRowIndex, 0);
+            }
+        }
+        else if (!ae.isRow() && relativeRowIndex < ae.getHeight() && relativeColIndex < ae.getWidth()) {
+            return ae.getRelativeValue(relativeRowIndex, relativeColIndex);
+        }
+        else if (ae.isRow() && relativeColIndex < ae.getWidth()) {
+            return ae.getRelativeValue(0, relativeColIndex);
+        }
+        
+        return ErrorEval.NA;
     }
 
     /**
@@ -165,7 +203,7 @@ public final class OperandResolver {
         if(!ae.isRow()) {
             // multi-column, multi-row area
             if(ae.containsRow(srcCellRow) && ae.containsColumn(srcCellCol)) {
-                return ae.getAbsoluteValue(ae.getFirstRow(), ae.getFirstColumn());
+                return ae.getAbsoluteValue(srcCellRow, srcCellCol);
             }
             throw EvaluationException.invalidValue();
         }
@@ -207,7 +245,7 @@ public final class OperandResolver {
      * @param ev must be a {@link NumberEval}, {@link StringEval}, {@link BoolEval} or
      * {@link BlankEval}
      * @return actual, parsed or interpreted double value (respectively).
-     * @throws EvaluationException(#VALUE!) only if a StringEval is supplied and cannot be parsed
+     * @throws EvaluationException if a StringEval is supplied and cannot be parsed
      * as a double (See <tt>parseDouble()</tt> for allowable formats).
      * @throws RuntimeException if the supplied parameter is not {@link NumberEval},
      * {@link StringEval}, {@link BoolEval} or {@link BlankEval}
@@ -222,7 +260,9 @@ public final class OperandResolver {
             return ((NumericValueEval)ev).getNumberValue();
         }
         if (ev instanceof StringEval) {
-            Double dd = parseDouble(((StringEval) ev).getStringValue());
+            String sval = ((StringEval) ev).getStringValue();
+            Double dd = parseDouble(sval);
+            if(dd == null) dd = parseDateTime(sval);
             if (dd == null) {
                 throw EvaluationException.invalidValue();
             }
@@ -264,6 +304,16 @@ public final class OperandResolver {
         
     }
 
+    public static Double parseDateTime(String pText) {
+
+        try {
+            return DateUtil.parseDateTime(pText);
+        } catch (DateTimeException e) {
+            return null;
+        }
+
+    }
+
     /**
      * @param ve must be a <tt>NumberEval</tt>, <tt>StringEval</tt>, <tt>BoolEval</tt>, or <tt>BlankEval</tt>
      * @return the converted string value. never <code>null</code>
@@ -291,10 +341,6 @@ public final class OperandResolver {
         }
         if (ve instanceof BoolEval) {
             return Boolean.valueOf(((BoolEval) ve).getBooleanValue());
-        }
-
-        if (ve == BlankEval.instance) {
-            return null;
         }
 
         if (ve instanceof StringEval) {

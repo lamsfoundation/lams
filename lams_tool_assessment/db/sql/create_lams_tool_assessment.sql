@@ -28,6 +28,7 @@ create table tl_laasse10_assessment (
    reflect_instructions MEDIUMTEXT,
    numbered tinyint(1) DEFAULT 1,
    use_select_leader_tool_ouput tinyint(1) NOT NULL DEFAULT 0,
+   question_etherpad_enabled TINYINT(1) DEFAULT 0,
    enable_confidence_levels TINYINT(1) NOT NULL DEFAULT 0,
    confidence_levels_type TINYINT DEFAULT 1,
    PRIMARY KEY (uid),

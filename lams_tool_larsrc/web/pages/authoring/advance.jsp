@@ -4,11 +4,6 @@
 
 <lams:SimplePanel titleKey="label.resource.options">
 
-	<div class="checkbox">
-	<label for="runAuto"><form:checkbox path="resource.runAuto" id="runAuto" />
-	<fmt:message key="label.authoring.advance.run.content.auto" /></label>
-	</div>
-	
 	<div class="form-group">
 	<form:select path="resource.miniViewResourceNumber" cssClass="form-control form-control-inline input-sm"
 		id="viewNumList" style="width:100px">
@@ -52,13 +47,6 @@
 	<label for="notifyTeachersOnAssigmentSumbit">
 	<form:checkbox path="resource.notifyTeachersOnAssigmentSumbit" id="notifyTeachersOnAssigmentSumbit"/>
 	<fmt:message key="label.authoring.advanced.notify.onassigmentsubmit" />
-	</label>
-	</div>
-	
-	<div class="checkbox">
-	<label for="notifyTeachersOnFileUpload">
-	<form:checkbox path="resource.notifyTeachersOnFileUpload" id="notifyTeachersOnFileUpload"/>
-	<fmt:message key="label.authoring.advanced.notify.onfileupload" />
 	</label>
 	</div>
 	

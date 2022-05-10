@@ -97,11 +97,6 @@ public class LearningController implements QaAppConstants {
     @Qualifier("qaMessageService")
     private MessageService messageService;
 
-    @RequestMapping("/")
-    public String unspecified() throws IOException, ServletException, ToolException {
-	return null;
-    }
-
     @RequestMapping("/learning")
     public String execute(@ModelAttribute("qaLearningForm") QaLearningForm qaLearningForm, HttpServletRequest request)
 	    throws IOException, ServletException {
@@ -126,7 +121,8 @@ public class LearningController implements QaAppConstants {
 	request.setAttribute("qaLearningForm", qaLearningForm);
 	QaQueUsr groupLeader = null;
 	if (qaContent.isUseSelectLeaderToolOuput()) {
-	    groupLeader = qaService.checkLeaderSelectToolForSessionLeader(user, new Long(toolSessionID).longValue());
+	    groupLeader = qaService.checkLeaderSelectToolForSessionLeader(user,
+		    Long.valueOf(toolSessionID).longValue());
 
 	    // forwards to the leaderSelection page
 	    if (groupLeader == null && !mode.equals(ToolAccessMode.TEACHER.toString())) {
@@ -433,6 +429,7 @@ public class LearningController implements QaAppConstants {
 
 	//finalize response so user won't need to edit his answers again, if coming back to the activity after leaving activity at this point
 	if (errorMap.isEmpty()) {
+
 	    qaQueUsr.setResponseFinalized(true);
 	    qaService.updateUser(qaQueUsr);
 
@@ -441,7 +438,6 @@ public class LearningController implements QaAppConstants {
 	    request.setAttribute("errorMap", errorMap);
 	    forwardName = QaAppConstants.LOAD_LEARNER;
 	}
-
 	generalLearnerFlowDTO.setMapAnswers(mapAnswers);
 	generalLearnerFlowDTO.setMapAnswersPresentable(mapAnswersPresentable);
 
@@ -1174,15 +1170,21 @@ public class LearningController implements QaAppConstants {
 	List<ItemRatingDTO> itemRatingDtos = null;
 	if (isAllowRateAnswers && !responses.isEmpty()) {
 	    //create itemIds list
+
+	    List<QaUsrResp> responsesForRatings = responses;
+	    if (isOnlyLeadersIncluded && userId.equals(-1L)) {
+		responsesForRatings = qaService.getResponsesForTablesorter(qaContentId, qaSessionId, questionUid, 0L,
+			isOnlyLeadersIncluded, page, size, sorting, searchString);
+	    }
 	    List<Long> itemIds = new LinkedList<>();
-	    for (QaUsrResp response : responses) {
+	    for (QaUsrResp response : responsesForRatings) {
 		itemIds.add(response.getUid());
 	    }
 
 	    //all comments required only for monitoring
 	    boolean isCommentsByOtherUsersRequired = isMonitoring;
-	    itemRatingDtos = qaService.getRatingCriteriaDtos(qaContentId, qaSessionId, itemIds,
-		    isCommentsByOtherUsersRequired, userId);
+	    itemRatingDtos = qaService.getRatingCriteriaDtos(qaContentId, isOnlyLeadersIncluded ? null : qaSessionId,
+		    itemIds, isCommentsByOtherUsersRequired, userId);
 
 	    // store how many items are rated
 	    int countRatedQuestions = qaService.getCountItemsRatedByUser(qaContentId, userId.intValue());
@@ -1212,6 +1214,7 @@ public class LearningController implements QaAppConstants {
 	    responseRow.put("responseUid", response.getUid().toString());
 	    responseRow.put("answer", response.getAnswer());
 	    responseRow.put("userName", StringEscapeUtils.escapeCsv(user.getFullname()));
+	    responseRow.put("sessionName", StringEscapeUtils.escapeCsv(user.getQaSession().getSession_name()));
 	    responseRow.put("visible", new Boolean(response.isVisible()).toString());
 	    responseRow.put("userID", user.getQueUsrId());
 	    responseRow.put("portraitId", response.getPortraitId());

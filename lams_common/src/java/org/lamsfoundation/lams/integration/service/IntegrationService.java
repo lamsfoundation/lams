@@ -118,9 +118,20 @@ public class IntegrationService implements IIntegrationService {
      */
     @Override
     public ExtServer getExtServer(String serverId) {
+	List<ExtServer> list = service.findByProperty(ExtServer.class, "serverid", serverId, true);
+	if (list == null || list.size() == 0) {
+	    return null;
+	} else {
+	    return list.get(0);
+	}
+    }
+
+    @Override
+    public ExtServer getExtServer(String ltiAdvantageIssuer, String ltiAdvantageClientId) {
 	Map<String, Object> properties = new HashMap<>();
-	properties.put("serverid", serverId);
-	List<ExtServer> list = service.findByProperties(ExtServer.class, properties);
+	properties.put("issuer", ltiAdvantageIssuer);
+	properties.put("clientId", ltiAdvantageClientId);
+	List<ExtServer> list = service.findByProperties(ExtServer.class, properties, true);
 	if (list == null || list.size() == 0) {
 	    return null;
 	} else {
@@ -133,7 +144,7 @@ public class IntegrationService implements IIntegrationService {
 	Map<String, Object> properties = new HashMap<>();
 	properties.put("courseid", extCourseId);
 	properties.put("extServer.sid", sid);
-	List<ExtCourseClassMap> list = service.findByProperties(ExtCourseClassMap.class, properties);
+	List<ExtCourseClassMap> list = service.findByProperties(ExtCourseClassMap.class, properties, true);
 
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
@@ -227,6 +238,7 @@ public class IntegrationService implements IIntegrationService {
      * @param org
      * @param method
      */
+    @Override
     public void updateUserRoles(User user, Organisation org, String method) {
 
 	//create UserOrganisation if it doesn't exist
@@ -292,7 +304,7 @@ public class IntegrationService implements IIntegrationService {
 	Map<String, Object> properties = new HashMap<>();
 	properties.put("extServer.sid", extServer.getSid());
 	properties.put("extUsername", extUsername);
-	List<ExtUserUseridMap> list = service.findByProperties(ExtUserUseridMap.class, properties);
+	List<ExtUserUseridMap> list = service.findByProperties(ExtUserUseridMap.class, properties, true);
 
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
@@ -307,14 +319,20 @@ public class IntegrationService implements IIntegrationService {
 	ExtUserUseridMap extUserUseridMap = getExistingExtUserUseridMap(extServer, extUsername);
 
 	if (extUserUseridMap == null) {
-	    String defaultLocale = LanguageUtil.getDefaultLocale().getLocaleName();
-	    String defaultCountry = LanguageUtil.getDefaultCountry();
+	    String defaultLocale = extServer.getDefaultLocale() == null
+		    ? LanguageUtil.getDefaultLocale().getLocaleName()
+		    : extServer.getDefaultLocale().getLocaleName();
+	    String defaultCountry = extServer.getDefaultCountry() == null ? LanguageUtil.getDefaultCountry()
+		    : extServer.getDefaultCountry();
 	    String[] userData = { "", firstName, lastName, "", "", "", "", defaultCountry, "", "", "", email,
 		    defaultLocale };
-	    return createExtUserUseridMap(extServer, extUsername, password, salt, userData, false);
-	} else {
-	    return extUserUseridMap;
+	    extUserUseridMap = createExtUserUseridMap(extServer, extUsername, password, salt, userData, false);
+	    if (extServer.getDefaultTimeZone() != null) {
+		extUserUseridMap.getUser().setTimeZone(extServer.getDefaultTimeZone());
+		service.save(extUserUseridMap.getUser());
+	    }
 	}
+	return extUserUseridMap;
     }
 
     @Override
@@ -415,10 +433,18 @@ public class IntegrationService implements IIntegrationService {
     private ExtUserUseridMap createExtUserUseridMap(ExtServer extServer, String extUsername, String password,
 	    String salt, String[] userData, boolean prefix) throws UserInfoValidationException {
 
-	String login = prefix ? buildName(extServer.getPrefix(), extUsername) : extUsername;
+	String email = userData[11];
+	String loginBase = extUsername;
+	// in LTI Advantage external user ID does not need to match LAMS login
+	if (!extUsername.equals(email) && StringUtils.isNotBlank(email)
+		&& StringUtils.isNotBlank(extServer.getUserIdParameterName())
+		&& extServer.getUserIdParameterName().strip().equalsIgnoreCase("email")) {
+	    loginBase = email.strip();
+	}
+
+	String login = prefix ? buildName(extServer.getPrefix(), loginBase) : loginBase;
 	String firstName = userData[1];
 	String lastName = userData[2];
-	String email = userData[11];
 
 	// login validation
 	if (StringUtils.isBlank(login)) {
@@ -452,30 +478,33 @@ public class IntegrationService implements IIntegrationService {
 		    + ", firstName:" + firstName + ", lastName:" + lastName);
 	}
 
-	User user = new User();
-	user.setLogin(login);
-	user.setPassword(password);
-	user.setSalt(salt);
-	user.setTitle(userData[0]);
-	user.setFirstName(userData[1]);
-	user.setLastName(userData[2]);
-	user.setAddressLine1(userData[3]);
-	user.setCity(userData[4]);
-	user.setState(userData[5]);
-	user.setPostcode(userData[6]);
-	user.setCountry(LanguageUtil.getSupportedCountry(userData[7]));
-	user.setDayPhone(userData[8]);
-	user.setMobilePhone(userData[9]);
-	user.setFax(userData[10]);
-	user.setEmail(userData[11]);
-	user.setAuthenticationMethod(
-		(AuthenticationMethod) service.findById(AuthenticationMethod.class, AuthenticationMethod.DB));
-	user.setCreateDate(new Date());
-	user.setDisabledFlag(false);
-	user.setLocale(LanguageUtil.getSupportedLocaleByNameOrLanguageCode(userData[12]));
-	user.setTimeZone(timezoneService.getServerTimezone().getTimezoneId());
-	user.setTheme(service.getDefaultTheme());
-	service.saveUser(user);
+	User user = service.getUserByLogin(login);
+	if (user == null) {
+	    user = new User();
+	    user.setLogin(login);
+	    user.setPassword(password);
+	    user.setSalt(salt);
+	    user.setTitle(userData[0]);
+	    user.setFirstName(userData[1]);
+	    user.setLastName(userData[2]);
+	    user.setAddressLine1(userData[3]);
+	    user.setCity(userData[4]);
+	    user.setState(userData[5]);
+	    user.setPostcode(userData[6]);
+	    user.setCountry(LanguageUtil.getSupportedCountry(userData[7]));
+	    user.setDayPhone(userData[8]);
+	    user.setMobilePhone(userData[9]);
+	    user.setFax(userData[10]);
+	    user.setEmail(userData[11]);
+	    user.setAuthenticationMethod(
+		    (AuthenticationMethod) service.findById(AuthenticationMethod.class, AuthenticationMethod.DB));
+	    user.setCreateDate(new Date());
+	    user.setDisabledFlag(false);
+	    user.setLocale(LanguageUtil.getSupportedLocaleByNameOrLanguageCode(userData[12]));
+	    user.setTimeZone(timezoneService.getServerTimezone().getTimezoneId());
+	    user.setTheme(service.getDefaultTheme());
+	    service.saveUser(user);
+	}
 	ExtUserUseridMap extUserUseridMap = new ExtUserUseridMap();
 	extUserUseridMap.setExtServer(extServer);
 	extUserUseridMap.setExtUsername(extUsername);
@@ -549,7 +578,7 @@ public class IntegrationService implements IIntegrationService {
 	String serverKey = extServer.getServerkey();
 	String plaintext = timestamp.trim().toLowerCase() + extUsername.trim().toLowerCase()
 		+ serverId.trim().toLowerCase() + serverKey.trim().toLowerCase();
-	return HashUtil.sha1(plaintext);
+	return HashUtil.sha256(plaintext);
     }
 
     private String buildName(String prefix, String name) {
@@ -576,7 +605,7 @@ public class IntegrationService implements IIntegrationService {
 
 	Map<String, Object> properties = new HashMap<>();
 	properties.put("tool.toolSignature", toolSig);
-	return service.findByProperties(ExtServerToolAdapterMap.class, properties);
+	return service.findByProperties(ExtServerToolAdapterMap.class, properties, true);
     }
 
     @Override
@@ -585,7 +614,7 @@ public class IntegrationService implements IIntegrationService {
 	Map<String, Object> properties = new HashMap<>();
 	properties.put("tool.toolSignature", toolSig);
 	properties.put("extServer.serverid", serverId);
-	List ret = service.findByProperties(ExtServerToolAdapterMap.class, properties);
+	List ret = service.findByProperties(ExtServerToolAdapterMap.class, properties, true);
 	if ((ret != null) && (ret.size() > 0)) {
 	    return (ExtServerToolAdapterMap) ret.get(0);
 	} else {
@@ -629,7 +658,8 @@ public class IntegrationService implements IIntegrationService {
     }
 
     @Override
-    public String getLessonFinishCallbackUrl(User user, Lesson lesson) throws UnsupportedEncodingException {
+    public String getLessonFinishCallbackUrl(User user, Lesson lesson, Long finishedActivityId)
+	    throws UnsupportedEncodingException {
 	if (lesson == null) {
 	    return null;
 	}
@@ -642,16 +672,23 @@ public class IntegrationService implements IIntegrationService {
 	Long lessonId = lesson.getLessonId();
 	ExtServerLessonMap extServerLesson = getExtServerLessonMap(lessonId);
 	ExtServer server = extServerLesson == null ? null : extServerLesson.getExtServer();
+	if (server != null) {
+	    lessonFinishCallbackUrl = server.getLessonFinishUrl();
+	    // skip LTI Advantage score push if it is not needed at this stage
+	    if (StringUtils.isNotBlank(lessonFinishCallbackUrl) && !lessonFinishCallbackUrl.contains("%activityId%")
+		    && finishedActivityId != null) {
+		return null;
+	    }
+	}
 	ExtUserUseridMap extUser = extServerLesson == null ? null
 		: getExtUserUseridMapByUserId(server, user.getUserId());
 
 	// checks whether the lesson was created from extServer and whether it has lessonFinishCallbackUrl setting
-	if (extServerLesson != null && extUser != null
-		&& server.getServerTypeId().equals(ExtServer.INTEGRATION_SERVER_TYPE)
-		&& StringUtils.isNotBlank(extServerLesson.getExtServer().getLessonFinishUrl())) {
+	if (extServerLesson != null && extUser != null && StringUtils.isNotBlank(lessonFinishCallbackUrl)
+	// fill parameters if it is not regular LTI call, i.e. plain integration or LTI Advantage
+		&& (server.isIntegrationServer() || lessonFinishCallbackUrl.contains("%activityId%"))) {
 
 	    // construct real lessonFinishCallbackUrl
-	    lessonFinishCallbackUrl = server.getLessonFinishUrl();
 	    String timestamp = Long.toString(new Date().getTime());
 	    String extUsername = extUser.getExtUsername();
 	    String hash = hash(server, extUsername, timestamp);
@@ -661,6 +698,10 @@ public class IntegrationService implements IIntegrationService {
 	    lessonFinishCallbackUrl = lessonFinishCallbackUrl.replaceAll("%username%", encodedExtUsername)
 		    .replaceAll("%lessonid%", lessonId.toString()).replaceAll("%timestamp%", timestamp)
 		    .replaceAll("%hash%", hash);
+
+	    lessonFinishCallbackUrl = lessonFinishCallbackUrl.replaceAll("%activityId%",
+		    finishedActivityId == null ? "" : finishedActivityId.toString());
+
 	    log.debug(lessonFinishCallbackUrl);
 	}
 	// in case of LTI Tool Consumer - pushMarkToIntegratedServer() method will be invoked from GradebookService on mark update
@@ -680,17 +721,20 @@ public class IntegrationService implements IIntegrationService {
 		: getExtUserUseridMapByUserId(server, user.getUserId());
 
 	// checks whether the lesson was created from extServer and whether it's a LTI Tool Consumer - create a new thread to report score back to LMS (in order to do this task in parallel not to slow down later work)
-	if (extServerLesson != null && extUser != null
-		&& server.getServerTypeId().equals(ExtServer.LTI_CONSUMER_SERVER_TYPE)
-		&& StringUtils.isNotBlank(extServerLesson.getExtServer().getLessonFinishUrl())) {
+	if (extServerLesson != null && extUser != null && server.isLtiConsumer()
+		&& StringUtils.isNotBlank(extServerLesson.getExtServer().getLessonFinishUrl())
+		// do not run for LTI Advantage as it does lesson score update in lessonComplete.jsp
+		// and also teachers can pull score from LAMS to platform on demand
+		&& !extServerLesson.getExtServer().getLessonFinishUrl().contains("%activityId%")) {
 
 	    // calculate lesson's MaxPossibleMark
 	    Long lessonMaxPossibleMark = toolService.getLessonMaxPossibleMark(lesson);
 
 	    final String lessonFinishUrl = server.getLessonFinishUrl();
 	    if (userMark != null && StringUtils.isNotBlank(lessonFinishUrl)) {
-		Double score = lessonMaxPossibleMark.equals(0L) ? 0 : userMark / lessonMaxPossibleMark;
-		final String scoreStr = (userMark == null) || lessonMaxPossibleMark.equals(0L) ? "" : score.toString();
+		double score = lessonMaxPossibleMark.equals(0L) ? 0 : userMark / lessonMaxPossibleMark;
+		final String scoreStr = (userMark == null) || lessonMaxPossibleMark.equals(0L) ? ""
+			: Double.toString(score);
 
 		final String serverKey = server.getServerid();
 		final String serverSecret = server.getServerkey();
@@ -834,7 +878,7 @@ public class IntegrationService implements IIntegrationService {
 			    userData[k - 1] = userProperty;
 			}
 			String salt = HashUtil.salt();
-			String password = HashUtil.sha1(RandomPasswordGenerator.nextPassword(10));
+			String password = HashUtil.sha256(RandomPasswordGenerator.nextPassword(10), salt);
 			extUserUseridMap = createExtUserUseridMap(extServer, extUsername, password, salt, userData,
 				true);
 		    }
@@ -869,14 +913,14 @@ public class IntegrationService implements IIntegrationService {
 	Map<String, Object> properties = new HashMap<>();
 	properties.put("extServer.sid", sid);
 	properties.put("organisation.organisationId", lesson.getOrganisation().getOrganisationId());
-	List<ExtCourseClassMap> list = service.findByProperties(ExtCourseClassMap.class, properties);
+	List<ExtCourseClassMap> list = service.findByProperties(ExtCourseClassMap.class, properties, true);
 	return list == null || list.isEmpty() ? null : list.get(0);
     }
 
     @Override
     public ExtUserUseridMap addExtUserToCourse(ExtServer extServer, String method, String username, String firstName,
-	    String lastName, String email, String extCourseId, String countryIsoCode, String langIsoCode)
-	    throws UserInfoFetchException, UserInfoValidationException {
+	    String lastName, String email, String extCourseId, String countryIsoCode, String langIsoCode,
+	    boolean usePrefix) throws UserInfoFetchException, UserInfoValidationException {
 
 	if (log.isDebugEnabled()) {
 	    log.debug("Adding user '" + username + "' as " + method + " to course with extCourseId '" + extCourseId
@@ -887,17 +931,13 @@ public class IntegrationService implements IIntegrationService {
 	if ((firstName == null) && (lastName == null)) {
 	    userMap = getExtUserUseridMap(extServer, username);
 	} else {
-	    final boolean usePrefix = true;
 	    final boolean isUpdateUserDetails = false;
 	    userMap = getImplicitExtUserUseridMap(extServer, username, firstName, lastName, langIsoCode, countryIsoCode,
 		    email, usePrefix, isUpdateUserDetails);
 	}
 
 	// adds user to group
-	ExtCourseClassMap orgMap = getExtCourseClassMap(extServer, userMap, extCourseId, null, method);
-	//TODO when merging to newer branch, check and maybe change to the following
-//		getExtCourseClassMap(extServer, userMap, courseId, countryIsoCode, langIsoCode, null,
-//		method);
+	getExtCourseClassMap(extServer, userMap, extCourseId, null, method);
 
 	return userMap;
     }
@@ -905,14 +945,14 @@ public class IntegrationService implements IIntegrationService {
     @Override
     public ExtUserUseridMap addExtUserToCourseAndLesson(ExtServer extServer, String method, Long lesssonId,
 	    String username, String firstName, String lastName, String email, String extCourseId, String countryIsoCode,
-	    String langIsoCode) throws UserInfoFetchException, UserInfoValidationException {
+	    String langIsoCode, boolean usePrefix) throws UserInfoFetchException, UserInfoValidationException {
 
 	if (log.isDebugEnabled()) {
 	    log.debug("Adding user '" + username + "' as " + method + " to lesson with id '" + lesssonId + "'.");
 	}
 
 	ExtUserUseridMap userMap = addExtUserToCourse(extServer, method, username, firstName, lastName, email,
-		extCourseId, countryIsoCode, langIsoCode);
+		extCourseId, countryIsoCode, langIsoCode, usePrefix);
 
 	User user = userMap.getUser();
 	if (user == null) {
@@ -942,7 +982,7 @@ public class IntegrationService implements IIntegrationService {
 
     @Override
     public ExtServerLessonMap getExtServerLessonMap(Long lessonId) {
-	List list = service.findByProperty(ExtServerLessonMap.class, "lessonId", lessonId);
+	List list = service.findByProperty(ExtServerLessonMap.class, "lessonId", lessonId, true);
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
 	} else {
@@ -950,7 +990,8 @@ public class IntegrationService implements IIntegrationService {
 	}
     }
 
-    private ExtUserUseridMap getExtUserUseridMapByUserId(ExtServer extServer, Integer userId) {
+    @Override
+    public ExtUserUseridMap getExtUserUseridMapByUserId(ExtServer extServer, Integer userId) {
 	Map<String, Object> properties = new HashMap<>();
 	properties.put("extServer.sid", extServer.getSid());
 	properties.put("user.userId", userId);
@@ -963,7 +1004,8 @@ public class IntegrationService implements IIntegrationService {
     }
 
     private ExtCourseClassMap getExtCourseClassMap(Integer organisationId) {
-	List list = service.findByProperty(ExtCourseClassMap.class, "organisation.organisationId", organisationId);
+	List list = service.findByProperty(ExtCourseClassMap.class, "organisation.organisationId", organisationId,
+		true);
 	if (list == null || list.size() == 0) {
 	    return null;
 	} else {
@@ -973,16 +1015,26 @@ public class IntegrationService implements IIntegrationService {
 
     @Override
     public void addUsersUsingMembershipService(ExtServer extServer, Long lessonId, String courseId,
-	    String resourceLinkId) throws IOException, UserInfoFetchException, UserInfoValidationException {
+	    String resourceLinkId, String customContextMembershipUrl)
+	    throws IOException, UserInfoFetchException, UserInfoValidationException {
 
-	String membershipUrl = extServer.getMembershipUrl();
-	//if tool consumer haven't provided  membershipUrl (ToolProxyBinding.memberships.url parameter) we can't add any users
+	String membershipUrl = customContextMembershipUrl;
+	if (StringUtils.isBlank(membershipUrl)) {
+	    membershipUrl = extServer.getMembershipUrl();
+	}
+
+	// if tool consumer haven't provided  membershipUrl (ToolProxyBinding.memberships.url parameter) we can't add any users
 	if (StringUtils.isBlank(membershipUrl)) {
 	    return;
 	}
 
-	membershipUrl += membershipUrl.contains("?") ? "&" : "?";
-	membershipUrl += "rlid=" + resourceLinkId;
+	// if the membership URL is configured to depend on context_id, replace the placeholder now
+	membershipUrl = membershipUrl.replace("{context_id}", courseId);
+
+	if (StringUtils.isNotBlank(resourceLinkId)) {
+	    membershipUrl += membershipUrl.contains("?") ? "&" : "?";
+	    membershipUrl += "rlid=" + resourceLinkId;
+	}
 
 	log.debug("Make a call to remote membershipUrl:" + membershipUrl);
 	HttpGet ltiServiceGetRequest = new HttpGet(membershipUrl);
@@ -1020,11 +1072,19 @@ public class IntegrationService implements IIntegrationService {
 	    JsonNode member = membership.get("member");
 
 	    //get user id using "userId" property, or "sourcedId" if UseAlternativeUseridParameterName option is ON for this LTI server
-	    JsonNode lisPersonSourcedid = member.get("sourcedId");
-	    String extUserId = extServer.getUserIdParameterName().equalsIgnoreCase("lis_person_sourcedid")
-		    && lisPersonSourcedid != null && StringUtils.isNotBlank(lisPersonSourcedid.asText())
-			    ? lisPersonSourcedid.asText()
-			    : member.get("userId").asText();
+
+	    String extUserId = member.get("userId").asText();
+	    String extUserIdParameterName = extServer.getUserIdParameterName();
+	    // use the same user ID as the server does
+	    if (StringUtils.isNotBlank(extUserIdParameterName)) {
+		if ("lis_person_sourcedid".equalsIgnoreCase(extUserIdParameterName)) {
+		    extUserIdParameterName = "sourcedId";
+		}
+		JsonNode customExtUserId = member.get(extUserIdParameterName);
+		if (customExtUserId != null && StringUtils.isNotBlank(customExtUserId.asText())) {
+		    extUserId = customExtUserId.asText();
+		}
+	    }
 
 	    //to address Moodle version 3.7.1 bug
 	    String firstName = member.get("givenName") == null ? member.get("giveName").asText()
@@ -1052,9 +1112,9 @@ public class IntegrationService implements IIntegrationService {
 	    //empty lessonId means we need to only add users to the course. Otherwise we add them to course AND lesson
 	    ExtUserUseridMap extUser = lessonId == null
 		    ? addExtUserToCourse(extServer, method, extUserId, firstName, lastName, email, courseId,
-			    countryIsoCode, langIsoCode)
+			    countryIsoCode, langIsoCode, true)
 		    : addExtUserToCourseAndLesson(extServer, method, lessonId, extUserId, firstName, lastName, email,
-			    courseId, countryIsoCode, langIsoCode);
+			    courseId, countryIsoCode, langIsoCode, true);
 
 	    // If a result sourcedid is provided, save it to the user object
 	    JsonNode messages = membership.get("message");

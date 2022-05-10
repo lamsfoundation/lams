@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.authoring.service.AuthoringService;
 import org.lamsfoundation.lams.authoring.service.IAuthoringFullService;
 import org.lamsfoundation.lams.authoring.template.AssessMCAnswer;
 import org.lamsfoundation.lams.authoring.template.Assessment;
@@ -58,10 +59,8 @@ import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.questions.QuestionParser;
 import org.lamsfoundation.lams.rest.RestTags;
-import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
-import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.AuthoringJsonTags;
@@ -110,7 +109,7 @@ public abstract class LdTemplateController {
     NumberFormat groupNumberFormatter = new DecimalFormat("00");
 
     private static Logger log = Logger.getLogger(LdTemplateController.class);
-    public static final int MAX_OPTION_COUNT = 6;
+    public static final int MAX_OPTION_COUNT = 20;
     public static final int MAX_FLOATING_ACTIVITY_OPTIONS = 6; // Hardcoded in the Flash client
 
     public static final String PARENT_ACTIVITY_TYPE = "parentActivityType"; // used to work out transitions - not used by the authoring module
@@ -130,37 +129,39 @@ public abstract class LdTemplateController {
 
     // icon strings found in the lams_learningdesign_activity table
     protected static final String ASSESSMENT_TOOL_SIGNATURE = "laasse10";
-    protected static final String ASSESSMENT_ICON = "tool/laasse10/images/icon_assessment.swf";
+    protected static final String ASSESSMENT_ICON = "tool/laasse10/images/icon_assessment.svg";
     protected static final String ASSESSMENT_TOOL_OUTPUT_DEFINITION = "learner.total.score";
     protected static final String CHAT_TOOL_SIGNATURE = "lachat11";
-    protected static final String CHAT_ICON = "tool/lachat11/images/icon_chat.swf";
+    protected static final String CHAT_ICON = "tool/lachat11/images/icon_chat.svg";
+    protected static final String DOKU_TOOL_SIGNATURE = "ladoku11";
+    protected static final String DOKU_ICON = "tool/ladoku11/images/icon_dokumaran.svg";
     protected static final String FORUM_TOOL_SIGNATURE = "lafrum11";
-    protected static final String FORUM_ICON = "tool/lafrum11/images/icon_forum.swf";
+    protected static final String FORUM_ICON = "tool/lafrum11/images/icon_forum.svg";
     protected static final String LEADER_TOOL_SIGNATURE = "lalead11";
     protected static final String LEADER_ICON = "tool/lalead11/images/icon_leaderselection.swf";
     protected static final String NOTEBOOK_TOOL_SIGNATURE = "lantbk11";
-    protected static final String NOTEBOOK_ICON = "tool/lantbk11/images/icon_notebook.swf";
+    protected static final String NOTEBOOK_ICON = "tool/lantbk11/images/icon_notebook.svg";
     protected static final String NOTICEBOARD_TOOL_SIGNATURE = "lanb11";
-    protected static final String NOTICEBOARD_ICON = "tool/lanb11/images/icon_htmlnb.swf";
+    protected static final String NOTICEBOARD_ICON = "tool/lanb11/images/icon_htmlnb.svg";
     protected static final String QA_TOOL_SIGNATURE = "laqa11";
-    protected static final String QA_ICON = "tool/laqa11/images/icon_questionanswer.swf";
+    protected static final String QA_ICON = "tool/laqa11/images/icon_questionanswer.svg";
     protected static final String SHARE_RESOURCES_TOOL_SIGNATURE = "larsrc11";
-    protected static final String SHARE_RESOURCES_ICON = "tool/larsrc11/images/icon_rsrc.swf";
+    protected static final String SHARE_RESOURCES_ICON = "tool/larsrc11/images/icon_rsrc.svg";
     protected static final String SCRATCHIE_TOOL_SIGNATURE = "lascrt11";
-    protected static final String SCRATCHIE_ICON = "tool/lascrt11/images/icon_scratchie.swf";
+    protected static final String SCRATCHIE_ICON = "tool/lascrt11/images/icon_scratchie.svg";
     protected static final String SCRATCHIE_TOOL_OUTPUT_DEFINITION = "learner.mark";
     protected static final String SCRIBE_TOOL_SIGNATURE = "lascrb11";
-    protected static final String SCRIBE_ICON = "tool/lascrb11/images/icon_scribe.swf";
+    protected static final String SCRIBE_ICON = "tool/lascrb11/images/icon_scribe.svg";
     protected static final String SUBMIT_TOOL_SIGNATURE = "lasbmt11";
-    protected static final String SUBMIT_ICON = "tool/lasbmt11/images/icon_reportsubmission.swf";
+    protected static final String SUBMIT_ICON = "tool/lasbmt11/images/icon_reportsubmission.svg";
     protected static final String SURVEY_TOOL_SIGNATURE = "lasurv11";
-    protected static final String SURVEY_ICON = "tool/lasurv11/images/icon_survey.swf";
+    protected static final String SURVEY_ICON = "tool/lasurv11/images/icon_survey.svg";
     protected static final String WIKI_TOOL_SIGNATURE = "lawiki10";
-    protected static final String WIKI_ICON = "tool/lawiki10/images/icon_wiki.swf";
+    protected static final String WIKI_ICON = "tool/lawiki10/images/icon_wiki.svg";
     protected static final String MINDMAP_TOOL_SIGNATURE = "lamind10";
-    protected static final String MINDMAP_ICON = "tool/lamind10/images/icon_mindmap.swf";
+    protected static final String MINDMAP_ICON = "tool/lamind10/images/icon_mindmap.svg";
     protected static final String VOTE_TOOL_SIGNATURE = "lavote11";
-    protected static final String VOTE_ICON = "tool/lavote11/images/icon_ranking.swf";
+    protected static final String VOTE_ICON = "tool/lavote11/images/icon_ranking.svg";
     protected static final String PEER_REVIEW_TOOL_SIGNATURE = "laprev11";
     protected static final String PEER_REVIEW_ICON = "tool/laprev11/images/icon_peerreview.svg";
 
@@ -286,10 +287,10 @@ public abstract class LdTemplateController {
 	return transitions;
     }
 
-    protected static final int rowHeightSpace = 100;
-    protected static final int activityWidthSpace = 185;
-    protected static final int gateHeightOffset = 5;
-    protected static final int gateWidthOffset = 50;
+    protected static final int rowHeightSpace = 120;
+    protected static final int activityWidthSpace = 240;
+    protected static final int gateHeightOffset = 20;
+    protected static final int gateWidthOffset = 70;
 
     /**
      * Calculate where to draw an activity. Aim for 4 activities per line. Returns Integer[x,y]
@@ -399,7 +400,7 @@ public abstract class LdTemplateController {
 
     /* ************************************** Non-Tool Activity methods ******************************************** */
     protected ObjectNode createGateActivity(AtomicInteger uiid, int order, Integer[] layoutCoords, String activityTitle,
-	    String activityDescription) {
+	    String activityDescription, boolean gateStopAtPrecedingActivity) {
 
 	ObjectNode activityJSON = JsonNodeFactory.instance.objectNode();
 	Integer[] pos = layoutCoords;
@@ -421,14 +422,16 @@ public abstract class LdTemplateController {
 	}
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TYPE_ID, Activity.PERMISSION_GATE_ACTIVITY_TYPE);
 	activityJSON.put(AuthoringJsonTags.GATE_ACTIVITY_LEVEL_ID, GateActivity.LEARNER_GATE_LEVEL);
+	activityJSON.put(AuthoringJsonTags.GATE_STOP_AT_PRECEDING_ACTIVITY, gateStopAtPrecedingActivity);
 
 	return activityJSON;
     }
 
     protected ObjectNode createScheduledGateActivity(AtomicInteger uiid, int order, Integer[] layoutCoords,
-	    String activityTitle, String activityDescription, Long startOffset) {
+	    String activityTitle, String activityDescription, Long startOffset, boolean gateStopAtPrecedingActivity) {
 
-	ObjectNode activityJSON = createGateActivity(uiid, order, layoutCoords, activityTitle, activityDescription);
+	ObjectNode activityJSON = createGateActivity(uiid, order, layoutCoords, activityTitle, activityDescription,
+		gateStopAtPrecedingActivity);
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TYPE_ID, Activity.SCHEDULE_GATE_ACTIVITY_TYPE);
 	activityJSON.put(AuthoringJsonTags.GATE_START_OFFSET, startOffset);
 
@@ -662,29 +665,6 @@ public abstract class LdTemplateController {
 	return activityJSON;
     }
 
-    /* ************************************** Tool related methods ********************************************** */
-    /** General method to create a tool content. All calls to create tool content should go through this method */
-    protected Long createToolContent(UserDTO user, String toolSignature, ObjectNode toolContentJSON)
-	    throws IOException {
-	try {
-	    Tool tool = getTool(toolSignature);
-	    Long toolContentID = authoringService.insertToolContentID(tool.getToolId());
-
-	    // Tools' services implement an interface for processing REST requests
-	    ToolRestManager toolRestService = (ToolRestManager) lamsCoreToolService.findToolService(tool);
-	    toolRestService.createRestToolContent(user.getUserID(), toolContentID, toolContentJSON);
-
-	    return toolContentID;
-	} catch (Exception e) {
-	    log.error("Unable to create tool content for " + toolSignature + " with details " + toolContentJSON
-		    + ". \nThe tool probably threw an exception - check the server logs for more details.\n"
-		    + "If the exception is \"Servlet.service() for servlet ToolContentRestServlet threw exception java.lang.ClassCastException: com.sun.proxy.$ProxyXXX cannot be cast to org.lamsfoundation.lams.rest.ToolRestManager)\""
-		    + " then the tool doesn't support the LDTemplate service calls (ie has not implemented the ToolRestManager interface / createRestToolContent() method.");
-	    throw new ToolException(
-		    "Unable to create tool content for " + toolSignature + " with details " + toolContentJSON);
-	}
-    }
-
     /**
      * General method to create tool activity. All calls to create an activity relating to a tool should go through this
      * method
@@ -732,86 +712,6 @@ public abstract class LdTemplateController {
 	return activityJSON;
     }
 
-    /** Sets up the standard fields that are used by many tools! */
-    protected ObjectNode createStandardToolContent(String title, String instructions, String reflectionInstructions,
-	    Boolean lockWhenFinished, Boolean allowRichTextEditor, UserDTO user) {
-	ObjectNode toolContentJSON = JsonNodeFactory.instance.objectNode();
-	toolContentJSON.put(RestTags.TITLE, title != null ? title : "");
-	toolContentJSON.put(RestTags.INSTRUCTIONS, instructions != null ? instructions : "");
-
-	if (reflectionInstructions != null) {
-	    toolContentJSON.put(RestTags.REFLECT_ON_ACTIVITY, true);
-	    toolContentJSON.put(RestTags.REFLECT_INSTRUCTIONS, reflectionInstructions);
-	}
-
-	toolContentJSON.put(RestTags.LOCK_WHEN_FINISHED, lockWhenFinished);
-	toolContentJSON.put(RestTags.ALLOW_RICH_TEXT_EDITOR, allowRichTextEditor);
-
-	if (user != null) {
-	    toolContentJSON.put("firstName", user.getFirstName());
-	    toolContentJSON.put("lastName", user.getLastName());
-	    toolContentJSON.put("loginName", user.getLogin());
-	}
-	return toolContentJSON;
-    }
-
-    /**
-     * Helper method to create a Assessment tool content. Assessment is one of the unusuals tool in that it caches
-     * user's login names and
-     * first/last names Mandatory fields in toolContentJSON: title, instructions, resources, user fields firstName,
-     * lastName and loginName.
-     *
-     * Required fields in toolContentJSON: "title", "instructions", "questions", "firstName", "lastName", "lastName",
-     * "questions" and "references".
-     *
-     * The questions entry should be ArrayNode containing JSON objects, which in turn must contain
-     * "questionTitle", "questionText", "displayOrder" (Integer), "type" (Integer). If the type is Multiple Choice,
-     * Numerical or Matching Pairs
-     * then a ArrayNode "answers" is required.
-     *
-     * The answers entry should be ArrayNode
-     * containing JSON objects, which in turn must contain "answerText" or "answerFloat", "displayOrder" (Integer),
-     * "grade" (Integer).
-     *
-     * For the templates, all the questions that are created will be set up as references, therefore the questions in
-     * the assessment == the bank of questions.
-     * So references entry will be a ArrayNode containing JSON objects, which in turn must contain "displayOrder"
-     * (Integer),
-     * "questionDisplayOrder" (Integer - to match to the question). If default grade or random questions are needed then
-     * this method needs
-     * to be expanded.
-     */
-    protected Long createAssessmentToolContent(UserDTO user, String title, String instructions,
-	    String reflectionInstructions, boolean selectLeaderToolOutput, boolean enableNumbering,
-	    boolean enableConfidenceLevels, boolean allowDiscloseAnswers, boolean allowAnswerJustification,
-	    ArrayNode questions) throws IOException {
-
-	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, reflectionInstructions, null, null,
-		user);
-	toolContentJSON.put(RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, selectLeaderToolOutput);
-	toolContentJSON.put(RestTags.ENABLE_CONFIDENCE_LEVELS, enableConfidenceLevels);
-	toolContentJSON.put("numbered", enableNumbering);
-	toolContentJSON.put("displaySummary", Boolean.TRUE);
-	toolContentJSON.put("allowDiscloseAnswers", allowDiscloseAnswers);
-	toolContentJSON.put("allowAnswerJustification", allowAnswerJustification);
-
-	toolContentJSON.set(RestTags.QUESTIONS, questions);
-
-	ArrayNode references = JsonNodeFactory.instance.arrayNode();
-	for (int i = 0; i < questions.size(); i++) {
-	    ObjectNode question = (ObjectNode) questions.get(i);
-	    question.put("answerRequired", true);
-
-	    Integer questionDisplayOrder = question.get(RestTags.DISPLAY_ORDER).asInt();
-	    Integer defaultGrade = JsonUtil.optInt(question, "defaultGrade", 1);
-	    references.add(JsonNodeFactory.instance.objectNode().put(RestTags.DISPLAY_ORDER, questionDisplayOrder)
-		    .put("questionDisplayOrder", questionDisplayOrder).put("defaultGrade", defaultGrade));
-	}
-	toolContentJSON.set("references", references);
-
-	return createToolContent(user, LdTemplateController.ASSESSMENT_TOOL_SIGNATURE, toolContentJSON);
-    }
-
     /**
      * Creates a forum activity's JSON details.
      */
@@ -833,10 +733,10 @@ public abstract class LdTemplateController {
     protected Long createChatToolContent(UserDTO user, String title, String instructions, boolean lockWhenFinished,
 	    String filterKeywords, String reflectionInstructions) throws IOException {
 
-	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, reflectionInstructions,
-		lockWhenFinished, null, null);
+	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, instructions,
+		reflectionInstructions, lockWhenFinished, null, null);
 	toolContentJSON.put("filterKeywords", filterKeywords);
-	return createToolContent(user, LdTemplateController.CHAT_TOOL_SIGNATURE, toolContentJSON);
+	return authoringService.createToolContent(user, LdTemplateController.CHAT_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -872,8 +772,8 @@ public abstract class LdTemplateController {
 	    boolean allowRichTextEditor, boolean allowNewTopic, boolean allowRateMessages, boolean allowUpload,
 	    boolean limitedMaxCharacters, Integer maxCharacters, ArrayNode topics) throws IOException {
 
-	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, lockWhenFinished,
-		allowRichTextEditor, user);
+	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, instructions, null,
+		lockWhenFinished, allowRichTextEditor, user);
 	toolContentJSON.set("topics", topics);
 	toolContentJSON.put("allowNewTopic", allowNewTopic);
 	toolContentJSON.put("allowRateMessages", allowRateMessages);
@@ -882,7 +782,7 @@ public abstract class LdTemplateController {
 	if (limitedMaxCharacters && maxCharacters != null) {
 	    toolContentJSON.put("maxCharacters", maxCharacters);
 	}
-	return createToolContent(user, LdTemplateController.FORUM_TOOL_SIGNATURE, toolContentJSON);
+	return authoringService.createToolContent(user, LdTemplateController.FORUM_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -903,8 +803,9 @@ public abstract class LdTemplateController {
      */
     protected Long createLeaderSelectionToolContent(UserDTO user, String title, String instructions)
 	    throws IOException {
-	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, null, null, null);
-	return createToolContent(user, LdTemplateController.LEADER_TOOL_SIGNATURE, toolContentJSON);
+	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, instructions, null, null, null,
+		null);
+	return authoringService.createToolContent(user, LdTemplateController.LEADER_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -926,9 +827,9 @@ public abstract class LdTemplateController {
     protected Long createNotebookToolContent(UserDTO user, String title, String instructions, boolean lockWhenFinished,
 	    boolean allowRichTextEditor) throws IOException {
 
-	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, lockWhenFinished,
-		allowRichTextEditor, null);
-	return createToolContent(user, LdTemplateController.NOTEBOOK_TOOL_SIGNATURE, toolContentJSON);
+	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, instructions, null,
+		lockWhenFinished, allowRichTextEditor, null);
+	return authoringService.createToolContent(user, LdTemplateController.NOTEBOOK_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -950,9 +851,11 @@ public abstract class LdTemplateController {
     protected Long createNoticeboardToolContent(UserDTO user, String title, String content,
 	    String reflectionInstructions) throws IOException {
 
-	ObjectNode toolContentJSON = createStandardToolContent(title, null, reflectionInstructions, null, null, null);
+	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, null, reflectionInstructions,
+		null, null, null);
 	toolContentJSON.put("content", content != null ? content : "");
-	return createToolContent(user, LdTemplateController.NOTICEBOARD_TOOL_SIGNATURE, toolContentJSON);
+	return authoringService.createToolContent(user, LdTemplateController.NOTICEBOARD_TOOL_SIGNATURE,
+		toolContentJSON);
     }
 
     /**
@@ -975,13 +878,13 @@ public abstract class LdTemplateController {
 	    boolean allowRichTextEditor, boolean oneQuestionPerPage, boolean showOtherLearnersAnswers,
 	    boolean showOtherLearnersNames, ArrayNode questions) throws IOException {
 
-	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, lockWhenFinished,
-		allowRichTextEditor, null);
+	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, instructions, null,
+		lockWhenFinished, allowRichTextEditor, null);
 	toolContentJSON.set(RestTags.QUESTIONS, questions);
 	toolContentJSON.put("questionsSequenced", oneQuestionPerPage);
 	toolContentJSON.put("showOtherAnswers", showOtherLearnersAnswers);
 	toolContentJSON.put("usernameVisible", showOtherLearnersNames);
-	return createToolContent(user, LdTemplateController.QA_TOOL_SIGNATURE, toolContentJSON);
+	return authoringService.createToolContent(user, LdTemplateController.QA_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -1002,9 +905,10 @@ public abstract class LdTemplateController {
     protected Long createMindmapToolContent(UserDTO user, String title, String instructions, boolean lockWhenFinished,
 	    boolean multiUserMode, String reflectionInstruction) throws IOException {
 
-	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, lockWhenFinished, null, null);
+	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, instructions, null,
+		lockWhenFinished, null, null);
 	toolContentJSON.put("multiUserMode", multiUserMode);
-	return createToolContent(user, LdTemplateController.MINDMAP_TOOL_SIGNATURE, toolContentJSON);
+	return authoringService.createToolContent(user, LdTemplateController.MINDMAP_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -1031,8 +935,8 @@ public abstract class LdTemplateController {
 	    boolean notifyInstructors, Integer minResourcesToView, String reflectionInstructions, ArrayNode resources)
 	    throws IOException {
 
-	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, reflectionInstructions,
-		lockWhenFinished, null, user);
+	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, instructions,
+		reflectionInstructions, lockWhenFinished, null, user);
 	toolContentJSON.put("allowAddFiles", allowLearnerAddFile);
 	toolContentJSON.put("allowAddUrls", allowLearnerAddURL);
 	toolContentJSON.put("notifyTeachersOnAssigmentSumbit", notifyInstructors);
@@ -1041,7 +945,8 @@ public abstract class LdTemplateController {
 	    toolContentJSON.put("minViewResourceNumber", minResourcesToView);
 	}
 	toolContentJSON.set("resources", resources);
-	return createToolContent(user, LdTemplateController.SHARE_RESOURCES_TOOL_SIGNATURE, toolContentJSON);
+	return authoringService.createToolContent(user, LdTemplateController.SHARE_RESOURCES_TOOL_SIGNATURE,
+		toolContentJSON);
     }
 
     // resource type - copied from ResourceConstants
@@ -1122,21 +1027,24 @@ public abstract class LdTemplateController {
      * full details of questions). Other fields are optional.
      */
     protected Long createScratchieToolContent(UserDTO user, String title, String instructions,
-	    boolean useSelectLeaderToolOuput, Integer confidenceLevelsActivityUiid, ArrayNode questions)
-	    throws IOException {
+	    boolean useSelectLeaderToolOuput, boolean enableDiscussionSentiment, Integer confidenceLevelsActivityUiid,
+	    ArrayNode questions) throws IOException {
 
-	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, null, null, null);
+	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, instructions, null, null, null,
+		null);
 	toolContentJSON.set(RestTags.QUESTIONS, questions);
 	if (confidenceLevelsActivityUiid != null) {
 	    toolContentJSON.put(RestTags.CONFIDENCE_LEVELS_ACTIVITY_UIID, confidenceLevelsActivityUiid);
 	}
+
+	toolContentJSON.put(RestTags.ENABLE_DISCUSSION_SENTIMENT, enableDiscussionSentiment);
 
 	for (int i = 0; i < questions.size(); i++) {
 	    ObjectNode question = (ObjectNode) questions.get(i);
 	    question.put("answerRequired", true);
 	}
 
-	return createToolContent(user, LdTemplateController.SCRATCHIE_TOOL_SIGNATURE, toolContentJSON);
+	return authoringService.createToolContent(user, LdTemplateController.SCRATCHIE_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -1160,12 +1068,12 @@ public abstract class LdTemplateController {
 	    boolean autoSelectScribe, boolean showAggregatedReports, String reflectionInstructions, ArrayNode questions)
 	    throws IOException {
 
-	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, reflectionInstructions,
-		lockWhenFinished, null, null);
+	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, instructions,
+		reflectionInstructions, lockWhenFinished, null, null);
 	toolContentJSON.set(RestTags.QUESTIONS, questions);
 	toolContentJSON.put("autoSelectScribe", autoSelectScribe);
 	toolContentJSON.put("showAggregatedReports", showAggregatedReports);
-	return createToolContent(user, LdTemplateController.SCRIBE_TOOL_SIGNATURE, toolContentJSON);
+	return authoringService.createToolContent(user, LdTemplateController.SCRIBE_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -1188,13 +1096,13 @@ public abstract class LdTemplateController {
     protected Long createSubmitToolContent(UserDTO user, String title, String instructions, boolean lockWhenFinished,
 	    Boolean limitUpload, Integer limitUploadNumber, String reflectionInstructions) throws IOException {
 
-	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, reflectionInstructions,
-		lockWhenFinished, null, user);
+	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, instructions,
+		reflectionInstructions, lockWhenFinished, null, user);
 	if (limitUploadNumber != null) {
 	    toolContentJSON.put("limitUpload", limitUpload != null ? limitUpload : true);
 	    toolContentJSON.put("limitUploadNumber", limitUploadNumber);
 	}
-	return createToolContent(user, LdTemplateController.SUBMIT_TOOL_SIGNATURE, toolContentJSON);
+	return authoringService.createToolContent(user, LdTemplateController.SUBMIT_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -1216,9 +1124,10 @@ public abstract class LdTemplateController {
     protected Long createSurveyToolContent(UserDTO user, String title, String instructions, Boolean lockWhenFinished,
 	    ArrayNode questions) throws IOException {
 
-	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, lockWhenFinished, null, user);
+	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, instructions, null,
+		lockWhenFinished, null, user);
 	toolContentJSON.set("questions", questions);
-	return createToolContent(user, LdTemplateController.SURVEY_TOOL_SIGNATURE, toolContentJSON);
+	return authoringService.createToolContent(user, LdTemplateController.SURVEY_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -1240,10 +1149,11 @@ public abstract class LdTemplateController {
     protected Long createVoteToolContent(UserDTO user, String title, String instructions, ArrayNode answers,
 	    Boolean showResults) throws IOException {
 
-	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, null, null, null);
+	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, instructions, null, null, null,
+		null);
 	toolContentJSON.set(RestTags.ANSWERS, answers);
 	toolContentJSON.put("showResults", showResults);
-	return createToolContent(user, LdTemplateController.VOTE_TOOL_SIGNATURE, toolContentJSON);
+	return authoringService.createToolContent(user, LdTemplateController.VOTE_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -1264,9 +1174,10 @@ public abstract class LdTemplateController {
     protected Long createWikiToolContent(UserDTO user, String title, String instructions, boolean lockWhenFinished,
 	    String reflectionInstruction, ArrayNode pages) throws IOException {
 
-	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, lockWhenFinished, null, null);
+	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, instructions, null,
+		lockWhenFinished, null, null);
 	toolContentJSON.set("pages", pages);
-	return createToolContent(user, LdTemplateController.WIKI_TOOL_SIGNATURE, toolContentJSON);
+	return authoringService.createToolContent(user, LdTemplateController.WIKI_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -1291,10 +1202,11 @@ public abstract class LdTemplateController {
     protected Long createPeerReviewToolContent(UserDTO user, String title, String instructions,
 	    String reflectionInstructions, ArrayNode criterias) throws IOException {
 
-	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, reflectionInstructions, null, null,
-		user);
+	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, instructions,
+		reflectionInstructions, null, null, user);
 	toolContentJSON.set("criterias", criterias);
-	return createToolContent(user, LdTemplateController.PEER_REVIEW_TOOL_SIGNATURE, toolContentJSON);
+	return authoringService.createToolContent(user, LdTemplateController.PEER_REVIEW_TOOL_SIGNATURE,
+		toolContentJSON);
     }
 
     /**
@@ -1307,6 +1219,36 @@ public abstract class LdTemplateController {
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.PEER_REVIEW_TOOL_SIGNATURE,
 		LdTemplateController.PEER_REVIEW_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
 		parentActivityType, activityTitle != null ? activityTitle : "Peer Review");
+    }
+
+    /**
+     * Helper method to create a doKumaran tool content.
+     */
+    protected Long createDokumaranToolContent(UserDTO user, String title, String description, String instructions,
+	    boolean selectLeaderToolOutput, boolean galleryWalkEnabled, boolean galleryWalkReadOnly,
+	    String galleryWalkInstructions, String reflectionInstructions) throws IOException {
+
+	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, description,
+		reflectionInstructions, null, null, user);
+	toolContentJSON.put(RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, selectLeaderToolOutput);
+	toolContentJSON.put(RestTags.LOCK_WHEN_FINISHED, true);
+	toolContentJSON.put("etherpadInstructions", instructions);
+	toolContentJSON.put("galleryWalkEnabled", galleryWalkEnabled);
+	toolContentJSON.put("galleryWalkReadOnly", galleryWalkReadOnly);
+	toolContentJSON.put("galleryWalkInstructions", galleryWalkInstructions);
+	return authoringService.createToolContent(user, LdTemplateController.DOKU_TOOL_SIGNATURE, toolContentJSON);
+    }
+
+    /**
+     * Creates a doKumaran activity's JSON details.
+     */
+    protected ObjectNode createDokumaranActivity(AtomicInteger uiid, int order, Integer[] layoutCoords,
+	    Long toolContentID, String contentFolderID, Integer groupingUIID, Integer parentUIID,
+	    Integer parentActivityType, String activityTitle) {
+
+	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.DOKU_TOOL_SIGNATURE,
+		LdTemplateController.DOKU_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
+		parentActivityType, activityTitle != null ? activityTitle : "doKumaran");
     }
 
     /**
@@ -1389,7 +1331,7 @@ public abstract class LdTemplateController {
 	model.addAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, qbQuestion.getContentFolderId());
 	model.addAttribute("question", question);
 
-	if (question.getType() == Assessment.ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE) {
+	if (question.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE) {
 	    Set<AssessMCAnswer> answers = question.getAnswers();
 	    for (QbOption qbOption : qbQuestion.getQbOptions()) {
 		AssessMCAnswer answer = new AssessMCAnswer(qbOption.getDisplayOrder(), qbOption.getName(),
@@ -1410,10 +1352,11 @@ public abstract class LdTemplateController {
 	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 
 	Assessment question = new Assessment();
-	question.setType(Assessment.ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE);
+	question.setType(qbQuestion.getType());
 	question.setTitle(qbQuestion.getName());
 	question.setText(qbQuestion.getDescription());
 	question.setUuid(qbQuestion.getUuid().toString());
+	question.setDefaultGrade(qbQuestion.getMaxMark());
 
 	Set<AssessMCAnswer> answers = question.getAnswers();
 	for (QbOption qbOption : qbQuestion.getQbOptions()) {
@@ -1439,16 +1382,17 @@ public abstract class LdTemplateController {
 	    assessments.add(assessment);
 
 	    boolean isMultipleChoice = Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType());
+	    boolean isMarkHedging = Question.QUESTION_TYPE_MARK_HEDGING.equals(question.getType());
 	    boolean isMultipleResponse = Question.QUESTION_TYPE_MULTIPLE_RESPONSE.equals(question.getType());
-	    int defaultGrade = 1;
+	    Integer defaultGrade = question.getScore();
 
 	    assessment.setText(QuestionParser.processHTMLField(question.getText(), false, contentFolderID,
 		    question.getResourcesFolderPath()));
 	    assessment.setTitle(question.getTitle());
 	    assessment.setUuid(question.getQbUUID());
 
-	    if (isMultipleChoice) {
-		assessment.setType(Assessment.ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE);
+	    if (isMultipleChoice || isMarkHedging) {
+		assessment.setType(isMultipleChoice ? QbQuestion.TYPE_MULTIPLE_CHOICE : QbQuestion.TYPE_MARK_HEDGING);
 		assessment.setMultipleAnswersAllowed(false);
 		String correctAnswer = null;
 
@@ -1467,8 +1411,10 @@ public abstract class LdTemplateController {
 
 			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
 			    if (correctAnswer == null) {
-				// whatever the correct answer holds, it becomes the question score
-				defaultGrade = Double.valueOf(Math.ceil(answer.getScore())).intValue();
+				if (defaultGrade == null) {
+				    // if grade not explicitly set, whatever the correct answer holds, it becomes the question score
+				    defaultGrade = Double.valueOf(Math.ceil(answer.getScore())).intValue();
+				}
 				// 100% goes to the correct answer
 				newAnswer.setGrade(1F);
 				correctAnswer = answerText;
@@ -1488,7 +1434,7 @@ public abstract class LdTemplateController {
 		}
 
 	    } else if (isMultipleResponse) {
-		assessment.setType(Assessment.ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE);
+		assessment.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
 		assessment.setMultipleAnswersAllowed(true);
 
 		if (question.getAnswers() != null) {
@@ -1499,7 +1445,10 @@ public abstract class LdTemplateController {
 			    totalScore += answer.getScore();
 			}
 		    }
-		    defaultGrade = Double.valueOf(Math.round(totalScore)).intValue();
+		    if (defaultGrade == null) {
+			// if grade not explicitly set, user total score as grade
+			defaultGrade = Double.valueOf(Math.round(totalScore)).intValue();
+		    }
 
 		    int displayOrder = 1;
 		    for (Answer answer : question.getAnswers()) {
@@ -1519,10 +1468,12 @@ public abstract class LdTemplateController {
 		    }
 		}
 	    } else {
-		assessment.setType(Assessment.ASSESSMENT_QUESTION_TYPE_ESSAY);
+		assessment.setType(QbQuestion.TYPE_ESSAY);
 	    }
 
-	    assessment.setDefaultGrade(defaultGrade);
+	    assessment.setDefaultGrade(defaultGrade == null ? 1 : defaultGrade);
+
+	    assessment.setLearningOutcomes(question.getLearningOutcomes());
 	}
 
 	return assessments;

@@ -45,7 +45,7 @@
 								password : {
 									required: true,
 									minlength : <c:out value="${minNumChars}"/>,
-									maxlength : 25,
+									maxlength : 50,
 									charactersAllowed : true,
 									pwcheck : true
 									 
@@ -128,6 +128,13 @@
 									<li><span class="fa fa-check"></span> <fmt:message
 											key='label.password.must.symbol' /></li>
 								</c:if>
+								
+								<li><span class="fa fa-check"></span>
+									<fmt:message key='label.password.user.details' />
+								</li>
+								<li><span class="fa fa-check"></span>
+									<fmt:message key='label.password.common' />
+								</li>
 							</ul>
 						</lams:Alert>
 						
@@ -140,13 +147,13 @@
 						<div class="form-group">
 							<label for="password"><fmt:message
 									key="admin.user.password" />:</label> <input type="password"
-								name="password" maxlength="25" id="password"
+								name="password" maxlength="50" id="password"
 								class="form-control" />
 						</div>
 						<div class="form-group">
 							<label for="password2"><fmt:message
 									key="admin.user.password.confirm" />:</label> <input type="password"
-								name="password2" maxlength="25" id="password2"
+								name="password2" maxlength="50" id="password2"
 								class="form-control" />
 						</div>
 						<div class="pull-right">

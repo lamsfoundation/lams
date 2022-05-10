@@ -93,7 +93,7 @@ public class OutcomeController {
 
     @RequestMapping("/outcomeManage")
     public String outcomeManage(HttpServletRequest request, HttpServletResponse response) throws Exception {
-	UserDTO user = getUserDTO();
+	UserDTO user = OutcomeController.getUserDTO();
 	securityService.isSysadmin(user.getUserID(), "import outcomes", true);
 
 	List<Outcome> outcomes = outcomeService.getOutcomes();
@@ -104,7 +104,7 @@ public class OutcomeController {
     @RequestMapping("/outcomeEdit")
     public String outcomeEdit(@ModelAttribute OutcomeForm outcomeForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-	UserDTO user = getUserDTO();
+	UserDTO user = OutcomeController.getUserDTO();
 	securityService.isSysadmin(user.getUserID(), "import outcomes", true);
 
 	Long outcomeId = WebUtil.readLongParam(request, "outcomeId", true);
@@ -131,7 +131,7 @@ public class OutcomeController {
     @RequestMapping(path = "/outcomeSave", method = RequestMethod.POST)
     public String outcomeSave(@ModelAttribute OutcomeForm outcomeForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-	Integer userId = getUserDTO().getUserID();
+	Integer userId = OutcomeController.getUserDTO().getUserID();
 	Long outcomeId = outcomeForm.getOutcomeId();
 	Outcome outcome = outcomeId == null ? null : (Outcome) userManagementService.findById(Outcome.class, outcomeId);
 
@@ -176,7 +176,7 @@ public class OutcomeController {
 
     @RequestMapping(path = "/outcomeRemove", method = RequestMethod.POST)
     public String outcomeRemove(HttpServletRequest request, HttpServletResponse response) throws Exception {
-	UserDTO user = getUserDTO();
+	UserDTO user = OutcomeController.getUserDTO();
 	securityService.isSysadmin(user.getUserID(), "import outcomes", true);
 
 	Long outcomeId = WebUtil.readLongParam(request, "outcomeId", false);
@@ -212,7 +212,7 @@ public class OutcomeController {
 	    ObjectNode outcomeJSON = JsonNodeFactory.instance.objectNode();
 	    outcomeJSON.put("value", outcome.getOutcomeId());
 	    outcomeJSON.put("label",
-		    outcome.getName() + (StringUtils.isBlank(outcome.getCode()) ? "" : " (" + outcome.getCode() + ")"));
+		    outcome.getName() + (StringUtils.isBlank(outcome.getCode()) ? "" : " [" + outcome.getCode() + "]"));
 	    responseJSON.add(outcomeJSON);
 	}
 	responseJSON.add(search);
@@ -237,31 +237,7 @@ public class OutcomeController {
 	    if (!addEnabled) {
 		throw new SecurityException("Adding Learning Outcomes on the fly is disabled");
 	    }
-	    // create a new outcome on the fly
-	    String code = null;
-	    // check if name contains code part
-	    String[] nameParts = name.split("\\(");
-	    if (nameParts.length > 1) {
-		name = nameParts[0].trim();
-		code = nameParts[1].replaceFirst("\\)", "").trim();
-	    }
-	    outcome = new Outcome();
-
-	    Integer userId = getUserDTO().getUserID();
-	    User user = (User) userManagementService.findById(User.class, userId);
-	    outcome.setCreateBy(user);
-	    outcome.setCreateDateTime(new Date());
-
-	    outcome.setName(name);
-	    outcome.setCode(code);
-	    OutcomeScale scale = (OutcomeScale) userManagementService.findById(OutcomeScale.class,
-		    IOutcomeService.DEFAULT_SCALE_ID);
-	    outcome.setScale(scale);
-	    userManagementService.save(outcome);
-
-	    if (log.isDebugEnabled()) {
-		log.debug("Saved outcome " + outcome.getOutcomeId());
-	    }
+	    outcome = outcomeService.createOutcome(name, OutcomeController.getUserDTO().getUserID());
 
 	} else {
 	    outcome = (Outcome) userManagementService.findById(Outcome.class, outcomeId);
@@ -302,7 +278,7 @@ public class OutcomeController {
 	    throw new IllegalArgumentException(
 		    "Either lesson ID or tool content ID or QB question ID must not be null when fetching outcome mappings");
 	}
-	Integer userId = getUserDTO().getUserID();
+	Integer userId = OutcomeController.getUserDTO().getUserID();
 	if (!request.isUserInRole(Role.SYSADMIN) && !request.isUserInRole(Role.AUTHOR)) {
 	    String error = "User " + userId + " is not sysadmin nor an author and can not map outcome";
 	    log.error(error);
@@ -321,7 +297,7 @@ public class OutcomeController {
 	    outcomeJSON.put("outcomeId", outcome.getOutcomeId());
 	    outcomeJSON.put("qbMapping", outcomeMapping.getQbQuestionId() != null);
 	    outcomeJSON.put("label",
-		    outcome.getName() + (StringUtils.isBlank(outcome.getCode()) ? "" : " (" + outcome.getCode() + ")"));
+		    outcome.getName() + (StringUtils.isBlank(outcome.getCode()) ? "" : " [" + outcome.getCode() + "]"));
 	    responseJSON.add(outcomeJSON);
 	}
 
@@ -353,7 +329,7 @@ public class OutcomeController {
 	if (lessonId == null) {
 	    lessonId = lessonService.getLessonByToolContentId(outcomeMapping.getToolContentId()).getLessonId();
 	}
-	Integer userId = getUserDTO().getUserID();
+	Integer userId = OutcomeController.getUserDTO().getUserID();
 	securityService.isLessonMonitor(lessonId, userId, "set outcome result", true);
 
 	OutcomeResult result = outcomeService.getOutcomeResult(userId, mappingId);
@@ -403,7 +379,7 @@ public class OutcomeController {
 
     @RequestMapping("/outcomeExport")
     public void outcomeExport(HttpServletRequest request, HttpServletResponse response) throws Exception {
-	UserDTO user = getUserDTO();
+	UserDTO user = OutcomeController.getUserDTO();
 	securityService.isSysadmin(user.getUserID(), "export outcomes", true);
 
 	List<ExcelSheet> sheets = outcomeService.exportOutcomes();
@@ -415,10 +391,7 @@ public class OutcomeController {
 	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
 
 	// set cookie that will tell JS script that export has been finished
-	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
-	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
-	fileDownloadTokenCookie.setPath("/");
-	response.addCookie(fileDownloadTokenCookie);
+	WebUtil.setFileDownloadTokenCookie(request, response);
 
 	// Code to generate file and write file contents to response
 	ServletOutputStream out = response.getOutputStream();
@@ -428,7 +401,7 @@ public class OutcomeController {
     @RequestMapping("/outcomeImport")
     public String outcomeImport(@RequestParam("file") MultipartFile file, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-	UserDTO user = getUserDTO();
+	UserDTO user = OutcomeController.getUserDTO();
 	securityService.isSysadmin(user.getUserID(), "import outcomes", true);
 
 	try {
@@ -498,7 +471,7 @@ public class OutcomeController {
     @RequestMapping("/scaleSave")
     public String scaleSave(@ModelAttribute("scaleForm") OutcomeScaleForm scaleForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-	Integer userId = getUserDTO().getUserID();
+	Integer userId = OutcomeController.getUserDTO().getUserID();
 	Long scaleId = scaleForm.getScaleId();
 	OutcomeScale scale = scaleId == null ? null
 		: (OutcomeScale) userManagementService.findById(OutcomeScale.class, scaleId);
@@ -576,7 +549,7 @@ public class OutcomeController {
 
     @RequestMapping("/scaleExport")
     public void scaleExport(HttpServletRequest request, HttpServletResponse response) throws Exception {
-	UserDTO user = getUserDTO();
+	UserDTO user = OutcomeController.getUserDTO();
 	securityService.isSysadmin(user.getUserID(), "export outcome scales", true);
 
 	List<ExcelSheet> sheets = outcomeService.exportScales();
@@ -588,10 +561,7 @@ public class OutcomeController {
 	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
 
 	// set cookie that will tell JS script that export has been finished
-	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
-	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
-	fileDownloadTokenCookie.setPath("/");
-	response.addCookie(fileDownloadTokenCookie);
+	WebUtil.setFileDownloadTokenCookie(request, response);
 
 	// Code to generate file and write file contents to response
 	ServletOutputStream out = response.getOutputStream();
@@ -601,7 +571,7 @@ public class OutcomeController {
     @RequestMapping("/scaleImport")
     public String scaleImport(@RequestParam("file") MultipartFile file, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-	UserDTO user = getUserDTO();
+	UserDTO user = OutcomeController.getUserDTO();
 	securityService.isSysadmin(user.getUserID(), "import outcome scales", true);
 
 	try {
@@ -617,7 +587,7 @@ public class OutcomeController {
 	return scaleManage(request, response);
     }
 
-    private UserDTO getUserDTO() {
+    private static UserDTO getUserDTO() {
 	HttpSession ss = SessionManager.getSession();
 	return (UserDTO) ss.getAttribute(AttributeNames.USER);
     }

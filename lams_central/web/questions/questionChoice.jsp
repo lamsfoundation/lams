@@ -102,7 +102,7 @@
 					answerDiv.toggle('slow');
 				}
 				$('input', answerDiv).add(selector + 'feedback').add(selector + 'type').add(selector + 'text')
-				                     .add(selector + 'resourcesFolder')
+				                     .add(selector + 'score').add(selector + 'resourcesFolder')
 				                     .attr('disabled', checked ? null : 'disabled');
 				
 				if (checked) {
@@ -136,6 +136,15 @@
 				// FF does not seem to do it right
 				$(this).attr('checked', $(this).is(':checked'));
 			});
+			
+			// as the form HTML is being passed, not its real values
+			// we need to alter HTML manually on collection change
+			$('#collectionUid').change(function(){
+				let collectionSelect = $(this),
+					value = collectionSelect.val();
+				$('option', collectionSelect).removeAttr('selected');
+				$('option[value="' + value + '"]', collectionSelect).attr('selected', 'selected');
+			});
 		});
 	</script>
 </lams:head>
@@ -161,10 +170,10 @@
 			<!-- Choose a collection where questions should be imported to -->
 			<label id="collectionSelect">
 				<fmt:message key="label.questions.choice.collection" />&nbsp;
-				<select name="collectionUid">
+				<select name="collectionUid" id="collectionUid">
 					<c:forEach items="${collections}" var="collection">
-						<option value="${collection.uid}" ${empty collection.userId ? "selected" : ""}>
-							<c:out value="${collection.name}" />
+						<option value="${collection.uid}" ${empty collection.personal ? "selected" : ""}>
+							<c:out value="${collection.name}"/> 
 						</option>
 					</c:forEach>
 				</select>
@@ -195,6 +204,9 @@
 				<c:when test="${question.type eq 'tf'}">
 					(<fmt:message key="label.questions.choice.type.tf" />)
 				</c:when>
+				<c:when test="${question.type eq 'mh'}">
+					(<fmt:message key="label.questions.choice.type.mh" />)
+				</c:when>
 				<c:otherwise>
 					(<fmt:message key="label.questions.choice.type.unknown" />)
 				</c:otherwise>
@@ -212,6 +224,12 @@
 			<input type="hidden" id="question${questionStatus.index}type" name="question${questionStatus.index}type"
 		           value="${question.type}"
 		           class="questionAttribute" disabled="disabled" />
+		           
+		    <c:if test="${not empty question.score}">
+		     	<input type="hidden" id="question${questionStatus.index}score" name="question${questionStatus.index}score"
+		           value="${question.score}"
+		           class="questionAttribute" disabled="disabled" />
+		    </c:if>
 			<%-- Question feedback --%>
 		    <input type="hidden" id="question${questionStatus.index}feedback" name="question${questionStatus.index}feedback"
 		           value="<c:out value='${question.feedback}' />"
@@ -229,7 +247,7 @@
 					<c:forEach var="answer" items="${question.answers}" varStatus="answerStatus">
 						<%-- Answer itself --%>
 						<c:choose>
-							<c:when test="${question.type eq 'mc' or question.type eq 'mr' or question.type eq 'fb'}">
+							<c:when test="${question.type eq 'mc' or question.type eq 'mr' or question.type eq 'mh' or question.type eq 'fb'}">
 								<input name="question${questionStatus.index}answer${answerStatus.index}"
 					       			   value="<c:out value='${answer.text}' />" class="answer"
 					       			   type="checkbox" checked="checked" disabled="disabled" />${answer.text}<br />
@@ -262,6 +280,16 @@
 					    </c:forEach>
 					</c:if>
 				</div>
+			</c:if>
+			
+			 <%-- Learning Outcomes, if required and exist --%>
+			<c:if test="${fn:length(question.learningOutcomes) > 0}">
+				<input type="hidden" name="learningOutcomeCount${questionStatus.index}" 
+					       value="${fn:length(question.learningOutcomes)}" />
+				<c:forEach var="learningOutcome" items="${question.learningOutcomes}" varStatus="learningOutcomeStatus">
+					<input name="question${questionStatus.index}learningOutcome${learningOutcomeStatus.index}"
+					       value="<c:out value='${learningOutcome}'/>" type="hidden" />
+				</c:forEach>
 			</c:if>
 		</c:forEach>
 		

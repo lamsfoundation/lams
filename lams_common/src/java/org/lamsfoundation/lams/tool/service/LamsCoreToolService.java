@@ -159,9 +159,9 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	// if haven't found an existing tool session then create one
 	if (toolSession == null) {
 	    if (log.isDebugEnabled()) {
-		log.debug("Creating tool session for [" + activity.getActivityId() + ","
-			+ activity.getTitle() + "] for learner [" + learner.getLogin() + "] lesson ["
-			+ lesson.getLessonId() + "," + lesson.getLessonName() + "].");
+		log.debug("Creating tool session for [" + activity.getActivityId() + "," + activity.getTitle()
+			+ "] for learner [" + learner.getLogin() + "] lesson [" + lesson.getLessonId() + ","
+			+ lesson.getLessonName() + "].");
 	    }
 
 	    toolSession = activity.createToolSessionForActivity(messageService, learner, lesson);
@@ -238,7 +238,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
     @Override
     public Long notifyToolToCopyContent(Long toolContentId, String customCSV)
 	    throws DataMissingException, ToolException {
-	ToolContent toolContent = (ToolContent) toolContentDAO.find(ToolContent.class, toolContentId);
+	ToolContent toolContent = toolContentDAO.find(ToolContent.class, toolContentId);
 	if (toolContent == null) {
 	    String error = "The toolContentID " + toolContentId
 		    + " is not valid. No such record exists on the database.";
@@ -349,8 +349,8 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 
     private boolean isActivityReadOnlyFlag(Activity activity) {
 	if (activity.isComplexActivity()) {
-	    for (Activity childActivity : (Set<Activity>) ((ComplexActivity) systemToolDAO.find(ComplexActivity.class,
-		    activity.getActivityId())).getActivities()) {
+	    for (Activity childActivity : systemToolDAO.find(ComplexActivity.class, activity.getActivityId())
+		    .getActivities()) {
 		if (isActivityReadOnlyFlag(childActivity)) {
 		    return true;
 		}
@@ -365,7 +365,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
     public SortedMap<String, ToolOutputDefinition> getOutputDefinitionsFromTool(Long toolContentId, int definitionType)
 	    throws ToolException {
 
-	ToolContent toolContent = (ToolContent) toolContentDAO.find(ToolContent.class, toolContentId);
+	ToolContent toolContent = toolContentDAO.find(ToolContent.class, toolContentId);
 	if (toolContent == null) {
 	    String error = "The toolContentID " + toolContentId
 		    + " is not valid. No such record exists on the database.";
@@ -402,7 +402,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    int definitionType, Long inputToolContentId) throws ToolException {
 	SortedMap<String, ToolOutputDefinition> definitions = getOutputDefinitionsFromTool(outputToolContentId,
 		definitionType);
-	ToolContent toolContent = (ToolContent) toolContentDAO.find(ToolContent.class, inputToolContentId);
+	ToolContent toolContent = toolContentDAO.find(ToolContent.class, inputToolContentId);
 	if (toolContent == null) {
 	    String error = "The toolContentID " + inputToolContentId
 		    + " is not valid. No such record exists on the database.";
@@ -422,7 +422,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 
 	    Class<?>[] supportedClasses = contentManager.getSupportedToolOutputDefinitionClasses(definitionType);
 	    if (supportedClasses != null) {
-		Set<String> keysToRemove = new TreeSet<String>();
+		Set<String> keysToRemove = new TreeSet<>();
 		for (String key : definitions.keySet()) {
 		    ToolOutputDefinition value = definitions.get(key);
 		    Class<?> valueClass = value.getValueClass();
@@ -550,7 +550,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    LamsCoreToolService.log.error(error);
 	    throw new DataMissingException(error);
 	}
-	
+
 	if (!CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(tool.getToolSignature())) {
 	    String error = "Only Assessment is capable of providing VSA answers. Bu this session belongs to tool: "
 		    + tool.getToolSignature();
@@ -560,7 +560,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 
 	try {
 	    ICommonAssessmentService sessionManager = (ICommonAssessmentService) findToolService(tool);
-	    return sessionManager.getVsaAnswers(toolSession.getToolSessionId());
+	    return sessionManager.getVSAnswers(toolSession.getToolSessionId());
 	} catch (NoSuchBeanDefinitionException e) {
 	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to get the tool output. toolActivity "
 		    + toolSession.getToolActivity().getActivityId();
@@ -573,7 +573,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    throw new ToolException(message, e);
 	}
     }
-    
+
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevelsByToolSession(ToolSession toolSession) {
 
@@ -605,7 +605,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    throw new ToolException(message, e);
 	}
     }
-    
+
     @Override
     public boolean isUserLeaderInActivity(ToolSession toolSession, User learner) throws ToolException {
 	if (toolSession == null) {
@@ -710,15 +710,24 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	}
     }
 
+    public Long getActivityMaxPossibleMark(long toolActivityId) {
+	ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(toolActivityId,
+		ToolActivity.class);
+	return getActivityMaxPossibleMark(toolActivity);
+    }
+
     @Override
     public Long getActivityMaxPossibleMark(ToolActivity activity) {
 	// if ActivityEvaluation is not set it means activity will produce no toolOutputs and thus max possible mark is null
-	if ((activity == null) || (activity.getEvaluation() == null)) {
+	if (activity == null) {
 	    return null;
 	}
 
 	// the first available activity evaluation will be the only one that activity has
-	ActivityEvaluation evaluation = activity.getEvaluation();
+	ActivityEvaluation evaluation = activityDAO.getEvaluationByActivityId(activity.getActivityId());
+	if (evaluation == null) {
+	    return null;
+	}
 
 	// searching for the according toolOutputDefinition
 	SortedMap<String, ToolOutputDefinition> toolOutputDefinitions = getOutputDefinitionsFromTool(
@@ -742,7 +751,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	Set<ToolActivity> activities = getLearningDesignActivities(lesson.getLearningDesign());
 
 	// calculate lesson's MaxPossibleMark
-	Long lessonMaxPossibleMark = 0L;
+	long lessonMaxPossibleMark = 0L;
 	//take into account whether learning design uses grade weight
 	if (isWeightedMarks(activities)) {
 	    lessonMaxPossibleMark = 100L;
@@ -767,7 +776,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 
     private boolean isWeightedMarks(Set<ToolActivity> activities) {
 	for (ToolActivity toolActivity : activities) {
-	    ActivityEvaluation eval = toolActivity.getEvaluation();
+	    ActivityEvaluation eval = activityDAO.getEvaluationByActivityId(toolActivity.getActivityId());
 	    if (eval != null && eval.getWeight() != null && eval.getWeight() > 0) {
 		return true;
 	    }
@@ -779,10 +788,9 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
      * Returns lesson tool activities. It works almost the same as lesson.getLearningDesign().getActivities() except it
      * solves problem with first activity unable to cast to ToolActivity.
      */
-    @SuppressWarnings("unchecked")
     private Set<ToolActivity> getLearningDesignActivities(LearningDesign design) {
-	Set<Activity> activities = new TreeSet<Activity>();
-	Set<ToolActivity> toolActivities = new TreeSet<ToolActivity>();
+	Set<Activity> activities = new TreeSet<>();
+	Set<ToolActivity> toolActivities = new TreeSet<>();
 
 	/*
 	 * Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity for some mysterious
@@ -796,8 +804,12 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	activities.addAll(design.getActivities());
 
 	for (Activity activity : activities) {
-	    if (activity instanceof ToolActivity) {
-		ToolActivity toolActivity = (ToolActivity) activity;
+	    if (activity.isToolActivity()) {
+		if (!(activity instanceof ToolActivity)) {
+
+		}
+		ToolActivity toolActivity = (ToolActivity) (activity instanceof ToolActivity ? activity
+			: activityDAO.getActivityByActivityId(activity.getActivityId()));
 		toolActivities.add(toolActivity);
 	    }
 	}
@@ -829,11 +841,11 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	try {
 	    sessionManager.removeToolSession(toolSession.getToolSessionId());
 	} catch (DataMissingException e) {
-	    log.error("Unable to delete tool data for tool session "
-		    + toolSession.getToolSessionId() + " as toolSession does not exist", e);
+	    log.error("Unable to delete tool data for tool session " + toolSession.getToolSessionId()
+		    + " as toolSession does not exist", e);
 	} catch (ToolException e) {
-	    log.error("Unable to delete tool data for tool session "
-		    + toolSession.getToolSessionId() + " as tool threw an exception", e);
+	    log.error("Unable to delete tool data for tool session " + toolSession.getToolSessionId()
+		    + " as tool threw an exception", e);
 	}
 
 	// now remove the tool session from the core tables.
@@ -929,7 +941,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_TOOL_CONTENT_ID,
 		activity.getToolContentId().toString());
 	// should have used LessonService, but reusing existing tools is just easier
-	Lesson lesson = (Lesson) toolContentDAO.find(Lesson.class, lessonID);
+	Lesson lesson = toolContentDAO.find(Lesson.class, lessonID);
 	url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_CONTENT_FOLDER_ID,
 		lesson.getLearningDesign().getContentFolderID());
 

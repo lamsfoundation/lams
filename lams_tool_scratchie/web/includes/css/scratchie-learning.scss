@@ -26,9 +26,8 @@
 	opacity: .6;
 	border-radius: 10px;
 	width: 230px;
-	padding: 10px 20px;
 	margin: 10px 20px;
-	background: $gray-base url(#{$url_css_directory}/check48.png) no-repeat 10px 10px;
+	background: #eedc94 url(#{$url_css_directory}/check48.png) no-repeat 10px 10px;
 }
 .jGrowl-message {
 	padding-left: 60px;
@@ -47,7 +46,7 @@
 .c100.small {
 	font-size: 41px;
 	margin-right: 5px;
-	margin-bottom: 23px;
+	margin-bottom: 28px;
 }
 .confidence-level-percentage {
 	font-size: 13px;
@@ -93,4 +92,16 @@ box-shadow:none;
 
 .question-etherpad {
 	padding: 0;
+}
+
+.countdown-timeout {
+	color: #FF3333 !important;
+}		
+
+#countdown {
+	width: 150px; 
+	font-size: 110%; 
+	font-style: italic; 
+	color:#47bc23;
+	text-align: center;
 }

@@ -4,8 +4,6 @@
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
 		<lams:css/>
-		<link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
-		
 		<script type="text/javascript">
 			var removeItemAttachmentUrl = "<c:url value="/authoring/deleteAttachment.do"/>";
 		</script>

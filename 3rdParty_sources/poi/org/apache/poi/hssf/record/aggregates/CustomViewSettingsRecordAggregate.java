@@ -29,8 +29,8 @@ import org.apache.poi.hssf.record.*;
  */
 public final class CustomViewSettingsRecordAggregate extends RecordAggregate {
 
-	private final Record _begin;
-	private final Record _end;
+	private final org.apache.poi.hssf.record.Record _begin;
+	private final org.apache.poi.hssf.record.Record _end;
 	/**
 	 * All the records between BOF and EOF
 	 */
@@ -42,7 +42,7 @@ public final class CustomViewSettingsRecordAggregate extends RecordAggregate {
 		if (_begin.getSid() != UserSViewBegin.sid) {
 			throw new IllegalStateException("Bad begin record");
 		}
-		List<RecordBase> temp = new ArrayList<RecordBase>();
+		List<RecordBase> temp = new ArrayList<>();
 		while (rs.peekNextSid() != UserSViewEnd.sid) {
 			if (PageSettingsBlock.isComponentRecord(rs.peekNextSid())) {
                 if (_psBlock != null) {
@@ -77,7 +77,7 @@ public final class CustomViewSettingsRecordAggregate extends RecordAggregate {
 			if (rb instanceof RecordAggregate) {
 				((RecordAggregate) rb).visitContainedRecords(rv);
 			} else {
-				rv.visitRecord((Record) rb);
+				rv.visitRecord((org.apache.poi.hssf.record.Record) rb);
 			}
 		}
 		rv.visitRecord(_end);

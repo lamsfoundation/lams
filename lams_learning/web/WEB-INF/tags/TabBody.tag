@@ -30,8 +30,6 @@
 
 %>
 <%@ attribute name="id" required="true" rtexprvalue="true"%>
-<%@ attribute name="tabTitle" required="false" rtexprvalue="true"%>
-<%@ attribute name="titleKey" required="false" rtexprvalue="true"%>
 <%@ attribute name="page" required="false" rtexprvalue="true"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 

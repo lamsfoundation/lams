@@ -132,6 +132,26 @@
 		</property>
 	</bean>
 	
+	<bean id="discussionSentimentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="target">
+			<bean class="org.lamsfoundation.lams.learning.discussion.service.DiscussionSentimentService">
+				<property name="discussionSentimentDAO"><ref bean="discussionSentimentDAO"/></property>
+				<property name="learnerService"><ref bean="learnerService"/></property>
+			</bean>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="*">PROPAGATION_REQUIRED</prop>
+   			</props>
+		</property>
+	</bean> 
+	
 	<bean id="presenceChatDAO" class="org.lamsfoundation.lams.learning.presence.dao.hibernate.PresenceChatDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>	
@@ -144,8 +164,10 @@
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>	
 	
-	<!-- bean id="toolService" class="org.lamsfoundation.lams.tool.service.DummyToolService" singleton="false">
-	</bean-->
+	<bean id="discussionSentimentDAO" class="org.lamsfoundation.lams.learning.discussion.dao.hibernate.DiscussionSentimentDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>	
+	
 
 	<bean id="progressEngine" class="org.lamsfoundation.lams.learning.progress.ProgressEngine" >
 		<property name="activityDAO"><ref bean="activityDAO"/></property>

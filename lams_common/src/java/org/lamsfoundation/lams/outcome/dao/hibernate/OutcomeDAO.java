@@ -61,7 +61,7 @@ public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
     @SuppressWarnings("unchecked")
     public List<Outcome> getOutcomesSortedByName() {
 	String queryString = FIND_OUTCOMES_SORTED_BY_NAME.replace("?", "");
-	return find(queryString);
+	return doFindCacheable(queryString);
     }
 
     @Override
@@ -73,7 +73,7 @@ public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
 	}
 	queryString = queryString.replace("?", "");
 
-	Query<Outcome> query = getSession().createQuery(queryString);
+	Query<Outcome> query = getSession().createQuery(queryString).setCacheable(true);
 	if (StringUtils.isNotBlank(search)) {
 	    query.setParameter("search", "%" + search + "%");
 	}
@@ -103,7 +103,7 @@ public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
 	}
 	// find mappings bound to the given lesson/activity/item
 	if (!properties.isEmpty()) {
-	    result.addAll(findByProperties(OutcomeMapping.class, properties));
+	    result.addAll(findByProperties(OutcomeMapping.class, properties, true));
 	}
 
 	// find mappings bound to an activity via its QB questions
@@ -113,7 +113,7 @@ public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
 	if (!qbQuestionIds.isEmpty()) {
 	    Query<OutcomeMapping> query = getSession()
 		    .createQuery(FIND_OUTCOME_MAPPINGS_BY_QUESTION_ID, OutcomeMapping.class)
-		    .setParameter("qbQuestionIds", qbQuestionIds);
+		    .setParameter("qbQuestionIds", qbQuestionIds).setCacheable(true);
 	    result.addAll(query.getResultList());
 	}
 	return result;
@@ -125,7 +125,7 @@ public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<OutcomeScale> getScalesSortedByName() {
-	return find(FIND_SCALES_SORTED_BY_NAME);
+	return doFindCacheable(FIND_SCALES_SORTED_BY_NAME);
     }
 
     @Override

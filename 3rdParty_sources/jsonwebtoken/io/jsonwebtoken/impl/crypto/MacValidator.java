@@ -19,7 +19,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 import java.security.Key;
 import java.security.MessageDigest;
-import java.util.Arrays;
 
 public class MacValidator implements SignatureValidator {
 

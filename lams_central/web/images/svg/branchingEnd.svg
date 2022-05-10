@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg class="branchingEnd"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xml:space="preserve"
+   style="enable-background:new 0 0 512 512;"
+   viewBox="0 0 512 512"
+   
+   
+   
+   version="1.1"><metadata
+   id="metadata856"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+   id="defs854">
+	
+	
+	
+	
+	
+	
+	
+</defs>
+<style
+   id="style833"
+   type="text/css">
+	svg.branchingEnd .st0{opacity:0.6;fill:#FBA919;}
+	svg.branchingEnd .st1{fill:#FBA919;}
+	svg.branchingEnd .st2{fill:none;stroke:#111342;stroke-width:14.7646;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+</style>
+<g
+   transform="matrix(1.1041812,0,0,1.1041812,-53.236591,-14.231764)"
+   id="g965"><path
+     id="path837"
+     d="m 367.08259,245.94443 c 0,37.71249 30.55507,68.26756 68.26756,68.26756 14.04278,0 27.081,-4.22748 37.92177,-11.51047 7.29346,-10.84077 11.51048,-23.88946 11.51048,-37.92177 0,-37.71249 -30.55507,-68.26756 -68.26756,-68.26756 -14.04278,0 -27.081,4.22748 -37.92178,11.51047 -7.28298,10.84077 -11.51047,23.88946 -11.51047,37.92177 z"
+     class="st1"
+     style="stroke-width:1.04641" /><path
+     id="path839"
+     d="m 367.08259,245.94443 c 0,37.71249 30.55507,68.26756 68.26756,68.26756 14.04278,0 27.081,-4.22748 37.92177,-11.51047 18.29119,-12.21156 30.34579,-33.08737 30.34579,-56.75709 0,-37.71249 -30.55507,-68.26756 -68.26756,-68.26756 -23.66971,0 -44.54552,12.05461 -56.75709,30.34579 -7.28298,10.84077 -11.51047,23.88946 -11.51047,37.92177 z"
+     class="st2" /><path
+     id="path841"
+     d="m 341.74909,245.94443 h -4.803 c -44.25253,0 -85.16703,-23.53368 -107.41363,-61.77984 v 0 c -22.2466,-38.24615 -63.1611,-61.77984 -107.41363,-61.77984 h -10.192"
+     class="st2" /><polygon
+     id="polygon843"
+     points="440.39,66.4 442.14,188.37 386.82,126.76 "
+     class="st2"
+     transform="matrix(-1.0464065,0,0,1.0464065,520.36022,-10.257734)" /><path
+     id="path845"
+     d="m 341.74909,242.12505 h -4.803 c -44.25253,0 -85.16703,23.53368 -107.41363,61.77984 v 0 c -22.2466,38.24616 -63.1611,61.77984 -107.41363,61.77984 h -10.192"
+     class="st2" /><polygon
+     id="polygon847"
+     points="442.14,297.67 442.96,419.64 386.82,359.28 "
+     class="st2"
+     transform="matrix(-1.0464065,0,0,1.0464065,520.36022,-10.257734)" /></g>
+</svg>

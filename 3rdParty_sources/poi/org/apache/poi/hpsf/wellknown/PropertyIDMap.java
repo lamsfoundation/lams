@@ -33,8 +33,11 @@ import org.apache.poi.hpsf.SummaryInformation;
  * The methods {@link #getSummaryInformationProperties} and {@link
  * #getDocumentSummaryInformationProperties} return singleton {@link
  * PropertyIDMap}s. An application that wants to extend these maps
- * should treat them as unmodifiable, copy them and modifiy the
+ * should treat them as unmodifiable, copy them and modify the
  * copies.
+ *
+ * Trying to modify the map directly will cause exceptions
+ * {@link UnsupportedOperationException} to be thrown.
  */
 public class PropertyIDMap implements Map<Long,String> {
 
@@ -317,6 +320,11 @@ public class PropertyIDMap implements Map<Long,String> {
     public static final int PID_BEHAVIOUR = 0x80000003;
     
     /**
+     * A property without a known name is described by this string.
+     */
+    public static final String UNDEFINED = "[undefined]";
+    
+    /**
      * Contains the summary information property ID values and
      * associated strings. See the overall HPSF documentation for
      * details!
@@ -417,10 +425,10 @@ public class PropertyIDMap implements Map<Long,String> {
     /**
      * Creates a {@link PropertyIDMap} backed by another map.
      *
-     * @param map The instance to be created is backed by this map.
+     * @param idValues an array of key/value pairs via nested Object[2] arrays
      */
     private PropertyIDMap(Object[][] idValues) {
-        Map<Long,String> m = new HashMap<Long,String>(idValues.length);
+        Map<Long,String> m = new HashMap<>(idValues.length);
         for (Object[] idValue : idValues) {
             m.put((Long)idValue[0], (String)idValue[1]);
         }
@@ -450,6 +458,8 @@ public class PropertyIDMap implements Map<Long,String> {
     /**
      * Returns a property map, which is only used as a fallback, i.e. if available, the correct map
      * for {@link DocumentSummaryInformation} or {@link SummaryInformation} should be used.
+     *
+     * @return the resulting property map
      */
     public static synchronized PropertyIDMap getFallbackProperties() {
         if (fallbackProperties == null) {
@@ -485,11 +495,13 @@ public class PropertyIDMap implements Map<Long,String> {
 
     @Override
     public String put(Long key, String value) {
+        //noinspection ConstantConditions
         return idMap.put(key, value);
     }
 
     @Override
     public String remove(Object key) {
+        //noinspection ConstantConditions
         return idMap.remove(key);
     }
 

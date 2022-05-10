@@ -37,9 +37,9 @@ final class FunctionDataBuilder {
 
 	public FunctionDataBuilder(int sizeEstimate) {
 		_maxFunctionIndex = -1;
-		_functionDataByName = new HashMap<String,FunctionMetadata>(sizeEstimate * 3 / 2);
-		_functionDataByIndex = new HashMap<Integer,FunctionMetadata>(sizeEstimate * 3 / 2);
-		_mutatingFunctionIndexes = new HashSet<Integer>();
+		_functionDataByName = new HashMap<>(sizeEstimate * 3 / 2);
+		_functionDataByIndex = new HashMap<>(sizeEstimate * 3 / 2);
+		_mutatingFunctionIndexes = new HashSet<>();
 	}
 
 	public void add(int functionIndex, String functionName, int minParams, int maxParams,
@@ -81,8 +81,7 @@ final class FunctionDataBuilder {
 		FunctionMetadata[] jumbledArray =  new FunctionMetadata[_functionDataByName.size()];
 		_functionDataByName.values().toArray(jumbledArray);
 		FunctionMetadata[] fdIndexArray = new FunctionMetadata[_maxFunctionIndex+1];
-		for (int i = 0; i < jumbledArray.length; i++) {
-			FunctionMetadata fd = jumbledArray[i];
+		for (FunctionMetadata fd : jumbledArray) {
 			fdIndexArray[fd.getIndex()] = fd;
 		}
 

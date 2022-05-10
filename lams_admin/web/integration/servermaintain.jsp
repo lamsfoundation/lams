@@ -97,7 +97,7 @@
 		</div>
 		<div class="checkbox">
 		    <label>
-		    <form:checkbox path="disabled" /><fmt:message key="sysadmin.disabled" />
+		    	<form:checkbox path="disabled" /><fmt:message key="sysadmin.disabled" />
 		    </label>
 		</div>
 		<div class="checkbox">
@@ -108,6 +108,11 @@
 		<div class="form-group" <c:if test="${!formBean.map.timeToLiveLoginRequestEnabled}">style="display:none;"</c:if> >
 		    <label for="ttl-login-request"><fmt:message key="sysadmin.login.request.ttl" /></label>
 		    <form:input path="timeToLiveLoginRequest" size="10" id="ttl-login-request" cssClass="form-control"/>
+		</div>
+		<div class="checkbox">
+		    <label>
+		    	<form:checkbox path="addStaffToAllLessons" /><fmt:message key="sysadmin.add.staff.to.all.lessons" />
+		    </label>
 		</div>
 		<div class="form-group">
 		    <label for="userinfoUrl"><fmt:message key="sysadmin.userinfoUrl" /></label>

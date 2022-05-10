@@ -17,17 +17,19 @@
 
 package org.apache.poi.hssf.record.chart;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * ENDBLOCK - Chart Future Record Type End Block (0x0853)<br>
- * 
- * @author Patrick Cheng
+ * ENDBLOCK - Chart Future Record Type End Block (0x0853)
  */
-public final class ChartEndBlockRecord extends StandardRecord implements Cloneable {
+public final class ChartEndBlockRecord extends StandardRecord {
 	public static final short sid = 0x0853;
 
 	private short rt;
@@ -35,9 +37,16 @@ public final class ChartEndBlockRecord extends StandardRecord implements Cloneab
 	private short iObjectKind;
 	private byte[] unused;
 
-	public ChartEndBlockRecord() {
+	public ChartEndBlockRecord() {}
+
+	public ChartEndBlockRecord(ChartEndBlockRecord other) {
+		super(other);
+		rt = other.rt;
+		grbitFrt = other.grbitFrt;
+		iObjectKind = other.iObjectKind;
+		unused = (other.unused == null) ? null : other.unused.clone();
 	}
-	
+
 	public ChartEndBlockRecord(RecordInputStream in) {
 		rt = in.readShort();
 		grbitFrt = in.readShort();
@@ -72,27 +81,22 @@ public final class ChartEndBlockRecord extends StandardRecord implements Cloneab
 	}
 
 	@Override
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
-
-		buffer.append("[ENDBLOCK]\n");
-		buffer.append("    .rt         =").append(HexDump.shortToHex(rt)).append('\n');
-		buffer.append("    .grbitFrt   =").append(HexDump.shortToHex(grbitFrt)).append('\n');
-		buffer.append("    .iObjectKind=").append(HexDump.shortToHex(iObjectKind)).append('\n');
-		buffer.append("    .unused     =").append(HexDump.toHex(unused)).append('\n');
-		buffer.append("[/ENDBLOCK]\n");
-		return buffer.toString();
+	public ChartEndBlockRecord copy() {
+		return new ChartEndBlockRecord(this);
 	}
-	
+
 	@Override
-	public ChartEndBlockRecord clone() {
-		ChartEndBlockRecord record = new ChartEndBlockRecord();
-		
-		record.rt = rt ;
-		record.grbitFrt = grbitFrt ;
-		record.iObjectKind = iObjectKind ;
-		record.unused = unused.clone() ;
-		
-		return record;
+	public HSSFRecordTypes getGenericRecordType() {
+		return HSSFRecordTypes.CHART_END_BLOCK;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"rt", () -> rt,
+			"grbitFrt", () -> grbitFrt,
+			"iObjectKind", () -> iObjectKind,
+			"unused", () -> unused
+		);
 	}
 }

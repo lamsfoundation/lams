@@ -52,7 +52,7 @@ import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 @Table(name = "tl_laasse10_question_result")
 //in this entity's table primary key is "uid", but it references "answer_uid" in lams_qb_tool_answer
 @PrimaryKeyJoinColumn(name = "uid")
-public class AssessmentQuestionResult extends QbToolAnswer implements Comparable<AssessmentQuestionResult> {
+public class AssessmentQuestionResult extends QbToolAnswer {
 
     @Column(name = "answer_float")
     private float answerFloat;
@@ -82,7 +82,7 @@ public class AssessmentQuestionResult extends QbToolAnswer implements Comparable
     @JoinColumn(name = "result_uid")
     private AssessmentResult assessmentResult;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "question_result_uid")
     private Set<AssessmentOptionAnswer> optionAnswers = new LinkedHashSet<>();
 
@@ -94,6 +94,8 @@ public class AssessmentQuestionResult extends QbToolAnswer implements Comparable
     private String answerEscaped;
     @Transient
     private QuestionDTO questionDto;
+    @Transient
+    private boolean answerModified;
 
     public QbQuestion getQbQuestion() {
 	return qbToolQuestion.getQbQuestion();
@@ -225,13 +227,11 @@ public class AssessmentQuestionResult extends QbToolAnswer implements Comparable
 	this.questionDto = questionDto;
     }
 
-    @Override
-    public int compareTo(AssessmentQuestionResult o) {
-	if (o != null) {
-	    return qbToolQuestion.getDisplayOrder() - o.qbToolQuestion.getDisplayOrder();
-	} else {
-	    return 1;
-	}
+    public boolean isAnswerModified() {
+	return answerModified;
     }
 
+    public void setAnswerModified(boolean answerModified) {
+	this.answerModified = answerModified;
+    }
 }

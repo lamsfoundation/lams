@@ -5,6 +5,7 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/tabbedheader.jsp" %>
+		
 		<style type="text/css">
 			.panel-collapse > .btn-group.btn-group-xs {
 				margin-top: -33px;
@@ -19,8 +20,6 @@
 			.faulty-pad-container a{
 				margin-left: 10px;
 			}
-			
-			    margin-top: -33px;
 		</style>
 		
 		<script>
@@ -58,9 +57,9 @@
 		
 		<lams:TabBodyArea>
 		<lams:TabBodys>
-			<lams:TabBody id="1" titleKey="monitoring.tab.summary" page="summary.jsp" />
-			<lams:TabBody id="2" titleKey="monitoring.tab.edit.activity" page="editactivity.jsp" />			
-			<lams:TabBody id="3" titleKey="monitoring.tab.statistics" page="statistic.jsp" />
+			<lams:TabBody id="1" page="summary.jsp" />
+			<lams:TabBody id="2" page="editactivity.jsp" />			
+			<lams:TabBody id="3" page="statistic.jsp" />
 		</lams:TabBodys>
 		</lams:TabBodyArea>
 		

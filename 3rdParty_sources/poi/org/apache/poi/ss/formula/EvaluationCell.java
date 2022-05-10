@@ -18,6 +18,7 @@
 package org.apache.poi.ss.formula;
 
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.util.CellRangeAddress;
 
 /**
  * Abstracts a cell for the purpose of formula evaluation.  This interface represents both formula
@@ -37,38 +38,17 @@ public interface EvaluationCell {
 	EvaluationSheet getSheet();
 	int getRowIndex();
 	int getColumnIndex();
-	/**
-	 * Will return {@link CellType} in a future version of POI.
-	 * For forwards compatibility, do not hard-code cell type literals in your code.
-	 *
-	 * @return cell type
-	 * @deprecated 3.15. Will return a {@link CellType} enum in the future.
-	 */
-	int getCellType();
-	/**
-	 * @since POI 3.15 beta 3
-	 * @deprecated POI 3.15 beta 3.
-	 * Will be deleted when we make the CellType enum transition. See bug 59791.
-	 */
-	CellType getCellTypeEnum();
+	CellType getCellType();
 
 	double getNumericCellValue();
 	String getStringCellValue();
 	boolean getBooleanCellValue();
 	int getErrorCellValue();
+	CellRangeAddress getArrayFormulaRange();
+	boolean isPartOfArrayFormulaGroup();
 
 	/**
-	 * Will return {@link CellType} in a future version of POI.
-	 * For forwards compatibility, do not hard-code cell type literals in your code.
-	 *
 	 * @return cell type of cached formula result
-	 * @deprecated 3.15. Will return a {@link CellType} enum in the future.
 	 */
-	int getCachedFormulaResultType();
-	/**
-	 * @since POI 3.15 beta 3
-	 * @deprecated POI 3.15 beta 3.
-	 * Will be deleted when we make the CellType enum transition. See bug 59791.
-	 */
-	CellType getCachedFormulaResultTypeEnum();
+	CellType getCachedFormulaResultType();
 }

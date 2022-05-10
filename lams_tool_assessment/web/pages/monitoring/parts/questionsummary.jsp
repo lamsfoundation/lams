@@ -4,7 +4,6 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="assessment" value="${sessionMap.assessment}"/>
 <c:set var="sessionDtos" value="${sessionMap.sessionDtos}"/>
-<% pageContext.setAttribute("newLineChar", "\r\n"); %>
 
 <lams:html>
 	<lams:head>
@@ -14,17 +13,18 @@
 		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
+		<c:if test="${not empty questionDto.codeStyle}">
+			<link rel="stylesheet" type="text/css" href="${lams}css/codemirror.css" />
+		</c:if>
 		<style>
-			.sortable-on {
-				background: lightgoldenrodyellow;
-    			min-height: 110px;
-    			padding: 10px;
+	  		pre {
+				background-color: initial;
+				border: none;
 			}
-			.filtered {
-			    background-color: lightgrey;
-			}
-			.list-group-item {
-				cursor: pointer;
+			
+			#bottom-buttons {
+				text-align: right;
+				margin: 10px 10px 10px 0;
 			}
 		</style>
 		
@@ -58,7 +58,24 @@
 	 	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/Sortable.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script> 	
+
+		<c:if test="${not empty questionDto.codeStyle}">
+			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/runmode-standalone.js"></script>
+			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/colorize.js"></script>
+			<c:choose>
+				<c:when test="${questionDto.codeStyle == 1}">
+					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/python.js"></script>
+				</c:when>
+				<c:when test="${questionDto.codeStyle == 2}">
+					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/javascript.js"></script>
+				</c:when>
+				<c:when test="${questionDto.codeStyle >= 3}">
+					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/clike.js"></script>
+				</c:when>
+			</c:choose>
+		</c:if>
+		
   	    <script>
   	    	var isEdited = false;
   	    	var previousCellValue = "";
@@ -83,7 +100,7 @@
 	  				   	    'maxMark',
 	  		  				"<fmt:message key="label.monitoring.summary.user.name" />",
 	  		  			    "<fmt:message key="label.monitoring.user.summary.grade" />",
-		  			   		<c:if test="${assessment.enableConfidenceLevels}">
+		  			   		<c:if test="${assessment.enableConfidenceLevels and questionDto.type != 8}">
 		  			   			"<fmt:message key="label.confidence" />",
 		  			  		</c:if>
 			  			   	<c:if test="${questionDto.groupsAnswersDisclosed}">
@@ -101,13 +118,13 @@
 				    			return definePortraitPopover(rowObject[rowObject.length - 1], rowObject[rowObject.length - 2], rowObject[2]);
 							}},
 							{name:'grade', index:'grade', width:30, sorttype:"float", search:false, editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' },
-	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
+	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels and questionDto.type != 8}">
 			  			   		{name:'confidence', index:'confidence', width: 80, search:false, classes: 'vertical-align', formatter: gradientNumberFormatter},
 			  			  	</c:if>
 				  			<c:if test="${questionDto.groupsAnswersDisclosed}">
 				  				{name:'rating', index:'rating', width:120, align:"center", sortable:false, search:false},
 		  			  		</c:if>
-			  			   	{name:'response', index:'response', width:400, sortable:false, search:false},
+			  			   	{name:'response', index:'response', width:400, sortable:false, search:false, formatter: responseFormatter},
 			  				{name:'userId', index:'userId', width:0, hidden: true},
 		  				   	{name:'portraitId', index:'portraitId', width:0, hidden: true}
 	  				   	],
@@ -148,6 +165,10 @@
   						loadComplete: function () {
   							initializeJRating();
   					   	 	initializePortraitPopover('<lams:LAMSURL/>');
+
+	  						if (typeof CodeMirror != 'undefined') {
+	  							CodeMirror.colorize($('.code-style'));
+	  						}
   					    },
   					    subGrid: true,
   						subGridOptions: {
@@ -229,44 +250,6 @@
 	  		        }
 	  			});
 	  			setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
-
-	  		    //init options sorting feature
-	  			$('.sortable-on').each(function() {
-	  			    new Sortable($(this)[0], {
-	  			    	group: 'shared',
-	  				    animation: 150,
-	  				  	filter: '.filtered', // 'filtered' class is not draggable
-	  				    //ghostClass: 'sortable-placeholder',
-	  				    //direction: 'vertical',
-	  					onStart: function (evt) {
-	  						//stop answers' hover effect, once element dragging started
-	  						//$("#option-table").removeClass("hover-active");
-	  					},
-	  					onEnd: function (evt) {
-	  				        $.ajax({
-	  				            url: '<c:url value="/monitoring/allocateUserAnswer.do"/>',
-	  				            data: {
-	  				            	sessionMapID: "${sessionMapID}",
-	  				            	questionUid: ${questionDto.uid},
-	  				            	targetOptionUid: $(evt.to).data("option-uid"),
-	  				            	previousOptionUid: $(evt.from).data("option-uid"),
-	  				            	questionResultUid: $(evt.item).data("question-result-uid"),
-	  								"<csrf:tokenname/>":"<csrf:tokenvalue/>"
-	  						    },
-	  				            method: 'post',
-	  				          	dataType: "json",
-		  				        success: function (data) {
-		  				            if (data.isAnswerDuplicated) {
-			  				        	alert("<fmt:message key="label.someone.allocated.this.answer" />");
-			  				        	$(evt.item).appendTo("#answer-group" + data.optionUid);
-			  				        	$(evt.item).addClass("filtered");
-				  				    }
-		  				        }
-	  				            	
-	  				       	});
-	  					}
-	  				});
-	  			});
 	  		});  	    	
 	  		
     		function refreshSummaryPage()  { 
@@ -275,6 +258,15 @@
         		} else {
         			self.parent.tb_remove();
         		}
+    		}
+    		
+    		function refreshQuestionSummaryPage()  { 
+        		location.reload();
+    		}
+    		
+    		function responseFormatter (cellvalue) {
+        		var codeStyle = ${empty questionDto.codeStyle ? 'null' : questionDto.codeStyle};
+        		return codeStyle ? "<pre class='code-style' data-lang='${questionDto.codeStyleMime}'>" + cellvalue + "</pre>" : cellvalue;
     		}
   		</script>
 	</lams:head>
@@ -326,105 +318,27 @@
             </div></div>
             
             <!--history responses-->
-            <h5><fmt:message key="label.monitoring.question.summary.history.responses" /></h5>
-			<c:forEach var="sessionDto" items="${sessionDtos}">
-				<div class="voffset20">
-					<table id="session${sessionDto.sessionId}"></table>
-					<div id="pager${sessionDto.sessionId}"></div>
-				</div>	
-			</c:forEach>
-			
-            <!--allocate responses-->
-			<c:if test="${questionDto.type == 3}">
-				<br><br>
-				
-				<div class="row">
-					<div class="col-sm-4 text-center">
-						<c:set var="option0" value="${questionDto.optionDtos.toArray()[0]}"/>
-						<h4>
-							<c:choose>
-								<c:when test="${questionSummary.tbl && option0.maxMark == 1}">
-									<i class="fa fa-check fa-lg text-success"></i> <fmt:message key="label.correct" />
-								</c:when>
-								<c:when test="${questionSummary.tbl && option0.maxMark == 0}">
-									<i class="fa fa-times fa-lg text-danger"></i>	<fmt:message key="label.incorrect" />
-								</c:when>
-								<c:otherwise>
-									<fmt:message key="label.authoring.basic.option.grade"/>: ${option0.maxMark}
-								</c:otherwise>
-							</c:choose>
-						</h4>
-						
-						<fmt:message key="label.answer.alternatives" />: 
-						${fn:replace(option0.name, newLineChar, ', ')}
-						
-						<div class="list-group col sortable-on" data-option-uid="${option0.uid}" id="answer-group${option0.uid}"></div>	
-					</div>
-					
-					<div class="col-sm-4 text-center">
-		            	<h4><fmt:message key="label.answer.queue" /></h4>
-	            		(<fmt:message key="label.drag.and.drop" />)	
-	            		
-	            		<div class="list-group col sortable-on" data-option-uid="-1" id="answer-group-1">
-		            		<c:forEach var="questionResult" items="${questionSummary.notAllocatedQuestionResults}">
-		            			<div class="list-group-item" data-question-result-uid="${questionResult.uid}">
-		            				<lams:Portrait userId="${questionResult.assessmentResult.user.userId}"/>&nbsp;
-		            				${questionResult.answer}
-		            			</div>
-		            		</c:forEach>
-	            		</div>		
-					</div>
-					
-					<div class="col-sm-4 text-center">
-						<c:set var="option1" value="${questionDto.optionDtos.toArray()[1]}"/>
-						<h4>
-							<c:choose>
-								<c:when test="${questionSummary.tbl && option1.maxMark == 1}">
-									<i class="fa fa-check fa-lg text-success"></i> <fmt:message key="label.correct" />
-								</c:when>
-								<c:when test="${questionSummary.tbl && option1.maxMark == 0}">
-									<i class="fa fa-times fa-lg text-danger"></i>	<fmt:message key="label.incorrect" />
-								</c:when>
-								<c:otherwise>
-									<fmt:message key="label.authoring.basic.option.grade"/>: ${option1.maxMark}
-								</c:otherwise>
-							</c:choose>
-						</h4>
-						
-						<fmt:message key="label.answer.alternatives" />: 
-						${fn:replace(option1.name, newLineChar, ', ')}
-						
-						<div class="list-group col sortable-on" data-option-uid="${option1.uid}" id="answer-group${option1.uid}"></div>	
-					</div>
-				</div>
-				
-				<c:forEach var="optionDto" items="${questionDto.optionDtos}" begin="2" varStatus="status">
-				
-					<c:if test="${status.count % 3 == 0}">
-						<div class="row">
-					</c:if>
-				
-					<div class="col-sm-4 text-center">
-						<h4>
-							<fmt:message key="label.authoring.basic.option.grade"/>: ${optionDto.maxMark}
-						</h4>
-	
-						<fmt:message key="label.answer.alternatives" />: 
-						${fn:replace(optionDto.name, newLineChar, ', ')}
-						
-						<div class="list-group col sortable-on" data-option-uid="${optionDto.uid}" id="answer-group${optionDto.uid}"></div>	
-					</div>
-					
-					<c:if test="${status.count % 3 == 0 || status.last}">
-						</div>
-					</c:if>
+            <c:if test="${not empty sessionDtos}">
+	            <h5><fmt:message key="label.monitoring.question.summary.history.responses" /></h5>
+				<c:forEach var="sessionDto" items="${sessionDtos}">
+					<div class="voffset20">
+						<table id="session${sessionDto.sessionId}"></table>
+						<div id="pager${sessionDto.sessionId}"></div>
+					</div>	
 				</c:forEach>
 			</c:if>
 			
-			<a href="#nogo" onclick="refreshSummaryPage();" class="btn btn-default btn-sm voffset10 pull-right">
-				<fmt:message key="label.close" /> 
-			</a>
-
+			<div id="bottom-buttons">
+				<a href="#nogo" onclick="javascript:refreshQuestionSummaryPage()" class="btn btn-default btn-sm">
+					<i class="fa fa-refresh"></i>
+					<fmt:message key="label.refresh" /> 
+				</a>
+				
+				<a href="#nogo" onclick="javascript:refreshSummaryPage()" class="btn btn-default btn-sm loffset10">
+					<i class="fa fa-close"></i>
+					<fmt:message key="label.close" /> 
+				</a>
+			</div>
 		</div>
 		<!--closes content-->
 	

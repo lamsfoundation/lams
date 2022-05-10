@@ -17,20 +17,28 @@
 
 package org.apache.poi.hssf.record;
 
-import org.apache.poi.util.HexDump;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        Password Record (0x0013)<p>
- * Description:  stores the encrypted password for a sheet or workbook (HSSF doesn't support encryption)
- * REFERENCE:  PG 371 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)
+ * Stores the encrypted password for a sheet or workbook (HSSF doesn't support encryption)
  */
 public final class PasswordRecord extends StandardRecord {
-    public final static short sid = 0x0013;
-    private int field_1_password;   // not sure why this is only 2 bytes, but it is... go figure
+    public static final short sid = 0x0013;
+
+    // not sure why this is only 2 bytes, but it is... go figure
+    private int field_1_password;
 
     public PasswordRecord(int password) {
         field_1_password = password;
+    }
+
+    public PasswordRecord(PasswordRecord other) {
+        super(other);
+        field_1_password = other.field_1_password;
     }
 
     public PasswordRecord(RecordInputStream in) {
@@ -56,15 +64,6 @@ public final class PasswordRecord extends StandardRecord {
         return field_1_password;
     }
 
-    public String toString() {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[PASSWORD]\n");
-        buffer.append("    .password = ").append(HexDump.shortToHex(field_1_password)).append("\n");
-        buffer.append("[/PASSWORD]\n");
-        return buffer.toString();
-    }
-
     public void serialize(LittleEndianOutput out) {
         out.writeShort(field_1_password);
     }
@@ -80,7 +79,17 @@ public final class PasswordRecord extends StandardRecord {
     /**
      * Clone this record.
      */
-    public Object clone() {
-        return new PasswordRecord(field_1_password);
+    public PasswordRecord copy() {
+        return new PasswordRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.PASSWORD;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties("password", this::getPassword);
     }
 }

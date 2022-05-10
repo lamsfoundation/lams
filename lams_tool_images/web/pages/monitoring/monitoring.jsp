@@ -29,6 +29,7 @@
 		<link href="${lams}css/jquery.tablesorter.theme.bootstrap.css" rel="stylesheet" >
 		<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
 		<link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
+		<link href="${lams}css/uppy.custom.css" rel="stylesheet" type="text/css" />
 		<style media="screen,projection" type="text/css">
 			.tablesorter,.tablesorter tr {
 				border: 1px solid #ddd;
@@ -65,9 +66,8 @@
 			// convert Java syntax to JSON
 			var UPLOAD_ALLOWED_EXTENSIONS = JSON.parse("[" + "${ALLOWED_EXTENSIONS_IMAGE}".replace(/\.\w+/g, '"$&"') + "]");
 			var LABEL_ITEM_BLANK = '<fmt:message key="error.resource.item.file.blank"/>';
-			var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.resource.image.not.alowed.format"/>';
 		</script>
-		<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/imageGalleryitem.js"></script>
+		<lams:JSImport src="includes/javascript/imageGalleryitem.js" relative="true" />
 		
 		<script type="text/javascript" src="${lams}includes/javascript/uppy/uppy.min.js"></script>
 		<c:choose>
@@ -82,7 +82,7 @@
 			</c:when>
 		</c:choose>
 	
-		<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/uploadImageLearning.js"></script>
+		<lams:JSImport src="includes/javascript/uploadImageLearning.js" relative="true" />
     	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
@@ -190,9 +190,9 @@
 	
 	  		<lams:TabBodyArea>
 				<lams:TabBodys>
-					<lams:TabBody id="1" titleKey="monitoring.tab.summary" page="summary.jsp" />
-					<lams:TabBody id="2" titleKey="monitoring.tab.edit.activity" page="editactivity.jsp" />			
-					<lams:TabBody id="3" titleKey="monitoring.tab.statistics" page="statistic.jsp" />
+					<lams:TabBody id="1" page="summary.jsp" />
+					<lams:TabBody id="2" page="editactivity.jsp" />			
+					<lams:TabBody id="3" page="statistic.jsp" />
 				</lams:TabBodys> 
 			</lams:TabBodyArea> 
 	

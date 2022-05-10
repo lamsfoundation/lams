@@ -14,6 +14,7 @@
  	<!-- ********************  CSS ********************** -->
 	<lams:css />
 	<link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
+	<link href="${lams}css/uppy.custom.css" rel="stylesheet" type="text/css" />
 
  	<!-- ********************  javascript ********************** -->
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
@@ -39,8 +40,6 @@
 
 	<script type="text/javascript">
 	   <%-- used by rsrcresourceitem.js --%>
-		var removeInstructionUrl = "<c:url value='/authoring/removeInstruction.do'/>";
-		var addInstructionUrl = "<c:url value='/authoring/newInstruction.do'/>";
        	var removeItemAttachmentUrl = "<c:url value='/authoring/removeItemAttachment.do'/>";
        	
 		var LAMS_URL = '${lams}',

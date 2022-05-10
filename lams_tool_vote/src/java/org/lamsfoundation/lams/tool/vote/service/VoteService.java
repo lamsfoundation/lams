@@ -22,6 +22,7 @@
 
 package org.lamsfoundation.lams.tool.vote.service;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -37,6 +38,7 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -45,6 +47,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
 import org.lamsfoundation.lams.learningdesign.dao.IDataFlowDAO;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -102,6 +105,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.dao.DataAccessException;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -120,6 +124,7 @@ public class VoteService
     private IVoteUserDAO voteUserDAO;
     private IVoteUsrAttemptDAO voteUsrAttemptDAO;
     private IUserManagementService userManagementService;
+    private ILearnerService learnerService;
     private ILogEventService logEventService;
     private ILamsToolService toolService;
     private IExportToolContentService exportContentService;
@@ -152,26 +157,15 @@ public class VoteService
 	// check leader select tool for a leader only in case QA tool doesn't know it. As otherwise it will screw
 	// up previous scratches done
 	if (leader == null) {
-	    if (logger.isDebugEnabled()) {
-		logger.debug("If QA tool does not know it checking leader select tool for leader only" + leader);
-	    }
 	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getQueUsrId().intValue());
-	    if (leaderUserId != null) {
-
+	    // set leader only if the leader entered the activity
+	    if (user.getQueUsrId().equals(leaderUserId)) {
+		// is it me?
+		leader = user;
+	    } else {
 		leader = getVoteUserBySession(leaderUserId, session.getUid());
-
-		// create new user in a DB
-		if (leader == null) {
-		    if (logger.isDebugEnabled()) {
-			logger.debug("creating new user with userId: " + leaderUserId);
-		    }
-		    User leaderDto = (User) getUserManagementService().findById(User.class, leaderUserId.intValue());
-		    String userName = leaderDto.getLogin();
-		    String fullName = leaderDto.getFirstName() + " " + leaderDto.getLastName();
-		    leader = new VoteQueUsr(leaderUserId, userName, fullName, session, new TreeSet<VoteUsrAttempt>());
-		    voteUserDAO.saveVoteUser(user);
-		}
-
+	    }
+	    if (leader != null) {
 		// set group leader
 		session.setGroupLeader(leader);
 		voteSessionDAO.updateVoteSession(session);
@@ -239,6 +233,58 @@ public class VoteService
     }
 
     @Override
+    public void changeLeaderForGroup(long toolSessionId, long leaderUserId) {
+	VoteSession session = getSessionBySessionId(toolSessionId);
+	if (VoteAppConstants.COMPLETED.equals(session.getSessionStatus())) {
+	    throw new InvalidParameterException("Attempting to assing a new leader with user ID " + leaderUserId
+		    + " to a finished session wtih ID " + toolSessionId);
+	}
+
+	VoteQueUsr existingLeader = session.getGroupLeader();
+	if (existingLeader == null || existingLeader.getQueUsrId().equals(leaderUserId)) {
+	    return;
+	}
+
+	VoteQueUsr newLeader = getVoteUserBySession(leaderUserId, session.getUid());
+	if (newLeader == null) {
+	    User user = userManagementService.getUserById(Long.valueOf(leaderUserId).intValue());
+
+	    String userName = user.getLogin();
+	    String fullName = user.getFirstName() + " " + user.getLastName();
+
+	    newLeader = new VoteQueUsr(leaderUserId, userName, fullName, session, new TreeSet<VoteUsrAttempt>());
+	    createVoteQueUsr(newLeader);
+
+	    if (logger.isDebugEnabled()) {
+		logger.debug("Created user with ID " + leaderUserId + " to become a new leader for session with ID "
+			+ toolSessionId);
+	    }
+	}
+
+	session.setGroupLeader(newLeader);
+	voteSessionDAO.updateVoteSession(session);
+
+	voteUsrAttemptDAO.removeAttemptsForUserandSession(existingLeader.getQueUsrId(), toolSessionId);
+
+	for (VoteUsrAttempt vote : existingLeader.getVoteUsrAttempts()) {
+	    vote.setVoteQueUsr(newLeader);
+	    voteUsrAttemptDAO.updateVoteUsrAttempt(vote);
+	}
+
+	if (logger.isDebugEnabled()) {
+	    logger.debug("User with ID " + leaderUserId + " became a new leader for session with ID " + toolSessionId);
+	}
+
+	Set<Integer> userIds = session.getVoteQueUsers().stream()
+		.collect(Collectors.mapping(voteUser -> voteUser.getQueUsrId().intValue(), Collectors.toSet()));
+
+	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
+	jsonCommand.put("hookTrigger", "vote-leader-change-refresh-" + toolSessionId);
+	learnerService.createCommandForLearners(session.getVoteContent().getVoteContentId(), userIds,
+		jsonCommand.toString());
+    }
+
+    @Override
     public VoteGeneralLearnerFlowDTO prepareChartData(HttpServletRequest request, Long toolContentID,
 	    Long toolSessionUid, VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO) {
 
@@ -251,19 +297,19 @@ public class VoteService
 	    if (voteContent.isAllowText()) {
 		userEntries = voteUsrAttemptDAO.getSessionOpenTextUserEntries(toolSessionUid);
 	    } else {
-		userEntries = new ArrayList<VoteUsrAttempt>(0);
+		userEntries = new ArrayList<>(0);
 	    }
 	}
 
 	Long mapIndex = 1L;
 	int totalStandardVotesCount = 0;
 
-	Map<Long, Long> mapStandardUserCount = new TreeMap<Long, Long>(new VoteComparator());
-	Map<Long, String> mapStandardNominationsHTMLedContent = new TreeMap<Long, String>(new VoteComparator());
-	Map<Long, Long> mapStandardQuestionUid = new TreeMap<Long, Long>(new VoteComparator());
-	Map<Long, Long> mapStandardToolSessionUid = new TreeMap<Long, Long>(new VoteComparator());
-	Map<Long, String> mapStandardNominationsContent = new TreeMap<Long, String>(new VoteComparator());
-	Map<Long, Double> mapVoteRates = new TreeMap<Long, Double>(new VoteComparator());
+	Map<Long, Long> mapStandardUserCount = new TreeMap<>(new VoteComparator());
+	Map<Long, String> mapStandardNominationsHTMLedContent = new TreeMap<>(new VoteComparator());
+	Map<Long, Long> mapStandardQuestionUid = new TreeMap<>(new VoteComparator());
+	Map<Long, Long> mapStandardToolSessionUid = new TreeMap<>(new VoteComparator());
+	Map<Long, String> mapStandardNominationsContent = new TreeMap<>(new VoteComparator());
+	Map<Long, Double> mapVoteRates = new TreeMap<>(new VoteComparator());
 
 	for (VoteQueContent question : voteContent.getVoteQueContents()) {
 
@@ -318,7 +364,7 @@ public class VoteService
     @Override
     public LinkedList<SessionDTO> getSessionDTOs(Long toolContentID) {
 
-	LinkedList<SessionDTO> sessionDTOs = new LinkedList<SessionDTO>();
+	LinkedList<SessionDTO> sessionDTOs = new LinkedList<>();
 
 	VoteContent voteContent = this.getVoteContent(toolContentID);
 	for (VoteSession session : voteContent.getVoteSessions()) {
@@ -332,11 +378,11 @@ public class VoteService
 	    Long mapIndex = 1L;
 	    int totalStandardVotesCount = 0;
 
-	    Map<Long, Double> mapVoteRates = new TreeMap<Long, Double>(new VoteComparator());
-	    Map<Long, Long> mapStandardUserCount = new TreeMap<Long, Long>(new VoteComparator());
-	    Map<Long, String> mapStandardNominationsHTMLedContent = new TreeMap<Long, String>(new VoteComparator());
-	    Map<Long, Long> mapStandardQuestionUid = new TreeMap<Long, Long>(new VoteComparator());
-	    Map<Long, Long> mapStandardToolSessionUid = new TreeMap<Long, Long>(new VoteComparator());
+	    Map<Long, Double> mapVoteRates = new TreeMap<>(new VoteComparator());
+	    Map<Long, Long> mapStandardUserCount = new TreeMap<>(new VoteComparator());
+	    Map<Long, String> mapStandardNominationsHTMLedContent = new TreeMap<>(new VoteComparator());
+	    Map<Long, Long> mapStandardQuestionUid = new TreeMap<>(new VoteComparator());
+	    Map<Long, Long> mapStandardToolSessionUid = new TreeMap<>(new VoteComparator());
 
 	    for (VoteQueContent question : voteContent.getVoteQueContents()) {
 		mapStandardNominationsHTMLedContent.put(mapIndex, question.getQuestion());
@@ -390,11 +436,11 @@ public class VoteService
 	    totalSessionDTO.setSessionId("0");
 	    totalSessionDTO.setSessionName(messageService.getMessage("label.all.groups.total"));
 
-	    List<VoteMonitoredAnswersDTO> totalOpenVotes = new ArrayList<VoteMonitoredAnswersDTO>();
+	    List<VoteMonitoredAnswersDTO> totalOpenVotes = new ArrayList<>();
 	    int totalPotentialUserCount = 0;
 	    int totalCompletedSessionUserCount = 0;
 	    int allSessionsVotesCount = 0;
-	    Map<Long, Long> totalMapStandardUserCount = new TreeMap<Long, Long>(new VoteComparator());
+	    Map<Long, Long> totalMapStandardUserCount = new TreeMap<>(new VoteComparator());
 	    for (SessionDTO sessionDTO : sessionDTOs) {
 
 		totalPotentialUserCount += sessionDTO.getSessionUserCount();
@@ -440,7 +486,7 @@ public class VoteService
 
 	    // All groups total -- totalMapVoteRates part
 	    Long mapIndex = 1L;
-	    Map<Long, Double> totalMapVoteRates = new TreeMap<Long, Double>(new VoteComparator());
+	    Map<Long, Double> totalMapVoteRates = new TreeMap<>(new VoteComparator());
 	    int totalStandardVotesCount = 0;
 	    for (VoteQueContent question : voteContent.getVoteQueContents()) {
 
@@ -472,7 +518,7 @@ public class VoteService
     @Override
     public SortedSet<SummarySessionDTO> getMonitoringSessionDTOs(Long toolContentID) {
 
-	SortedSet<SummarySessionDTO> sessionDTOs = new TreeSet<SummarySessionDTO>();
+	SortedSet<SummarySessionDTO> sessionDTOs = new TreeSet<>();
 
 	VoteContent voteContent = this.getVoteContent(toolContentID);
 	for (VoteSession session : voteContent.getVoteSessions()) {
@@ -482,6 +528,8 @@ public class VoteService
 	    sessionDTO.setSessionUid(session.getUid());
 	    sessionDTO.setToolSessionId(session.getVoteSessionId());
 	    sessionDTO.setNominations(new TreeSet<SessionNominationDTO>());
+	    sessionDTO.setSessionUserCount(session.getVoteQueUsers().size());
+	    sessionDTO.setSessionFinished(VoteAppConstants.COMPLETED.equals(session.getSessionStatus()));
 
 	    int entriesCount = voteUsrAttemptDAO.getSessionEntriesCount(session.getUid());
 
@@ -525,7 +573,7 @@ public class VoteService
 	    totalSessionDTO.setSessionName(messageService.getMessage("label.all.groups.total"));
 	    totalSessionDTO.setNominations(new TreeSet<SessionNominationDTO>());
 
-	    HashMap<Long, SessionNominationDTO> nominationsTotals = new HashMap<Long, SessionNominationDTO>();
+	    HashMap<Long, SessionNominationDTO> nominationsTotals = new HashMap<>();
 	    int totalOpenVotes = 0;
 	    int totalVotes = 0;
 	    for (SummarySessionDTO sessionDTO : sessionDTOs) {
@@ -583,7 +631,7 @@ public class VoteService
     public List<VoteMonitoredAnswersDTO> getOpenVotes(Long voteContentUid, Long currentSessionId, Long userId) {
 	Set<String> userEntries = voteUsrAttemptDAO.getUserEntries(voteContentUid);
 
-	List<VoteMonitoredAnswersDTO> monitoredAnswersDTOs = new LinkedList<VoteMonitoredAnswersDTO>();
+	List<VoteMonitoredAnswersDTO> monitoredAnswersDTOs = new LinkedList<>();
 	for (String userEntry : userEntries) {
 
 	    if ((userEntry == null) || (userEntry.length() == 0)) {
@@ -594,7 +642,7 @@ public class VoteService
 	    voteMonitoredAnswersDTO.setQuestion(userEntry);
 
 	    List<VoteUsrAttempt> userAttempts = voteUsrAttemptDAO.getUserAttempts(voteContentUid, userEntry);
-	    List<VoteMonitoredUserDTO> monitoredUserContainerDTOs = new LinkedList<VoteMonitoredUserDTO>();
+	    List<VoteMonitoredUserDTO> monitoredUserContainerDTOs = new LinkedList<>();
 
 	    for (VoteUsrAttempt voteUsrAttempt : userAttempts) {
 		VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
@@ -664,7 +712,7 @@ public class VoteService
 
     @Override
     public List<ReflectionDTO> getReflectionData(VoteContent voteContent, Long userID) {
-	List<ReflectionDTO> reflectionsContainerDTO = new LinkedList<ReflectionDTO>();
+	List<ReflectionDTO> reflectionsContainerDTO = new LinkedList<>();
 
 	if (userID == null) {
 	    for (Iterator<VoteSession> sessionIter = voteContent.getVoteSessions().iterator(); sessionIter.hasNext();) {
@@ -744,7 +792,7 @@ public class VoteService
 	List<VoteUsrAttempt> list = voteUsrAttemptDAO.getAttemptsForUserAndSessionUseOpenAnswer(userUid, sessionUid);
 
 	//String openAnswer = "";
-	Set<String> userEntries = new HashSet<String>();
+	Set<String> userEntries = new HashSet<>();
 	if ((list != null) && (list.size() > 0)) {
 	    Iterator<VoteUsrAttempt> listIterator = list.iterator();
 	    while (listIterator.hasNext()) {
@@ -829,7 +877,7 @@ public class VoteService
 
     @Override
     public Map<String, String> buildQuestionMap(VoteContent voteContent, Collection<String> checkedOptions) {
-	Map<String, String> mapQuestionsContent = new TreeMap<String, String>(new VoteComparator());
+	Map<String, String> mapQuestionsContent = new TreeMap<>(new VoteComparator());
 	Set<VoteQueContent> questions = voteContent.getVoteQueContents();
 
 	// should we add questions from data flow from other activities?
@@ -1219,7 +1267,7 @@ public class VoteService
 	    List<VoteQuestionDTO> questionDTOs, List<VoteQuestionDTO> deletedQuestions) {
 
 	// create list of modified questions
-	List<VoteQuestionDTO> modifiedQuestions = new ArrayList<VoteQuestionDTO>();
+	List<VoteQuestionDTO> modifiedQuestions = new ArrayList<>();
 	for (VoteQueContent oldQuestion : oldQuestions) {
 	    for (VoteQuestionDTO questionDTO : questionDTOs) {
 		if (oldQuestion.getUid().equals(questionDTO.getUid())) {
@@ -1563,7 +1611,7 @@ public class VoteService
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);
@@ -1614,7 +1662,7 @@ public class VoteService
 
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<ToolOutput>();
+	return new ArrayList<>();
     }
 
     @Override
@@ -1753,6 +1801,10 @@ public class VoteService
 
     public void setUserManagementService(IUserManagementService userManagementService) {
 	this.userManagementService = userManagementService;
+    }
+
+    public void setLearnerService(ILearnerService learnerService) {
+	this.learnerService = learnerService;
     }
 
     public void setToolService(ILamsToolService toolService) {

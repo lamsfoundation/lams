@@ -20,10 +20,7 @@ import java.util.Map;
 
 public final class Assert {
 
-    //for code coverage
-    private static final Assert INSTANCE = new Assert();
-
-    private Assert(){}
+    private Assert(){} //prevent instantiation
 
     /**
      * Assert a boolean expression, throwing <code>IllegalArgumentException</code>

@@ -356,7 +356,7 @@ td.arrows{
   border: $border-thin-default-light
 }
 /* Icons to show panel is collapsed */
-.collapsable-icon-right a:after {
+.collapsable-icon-right a[data-toggle="collapse"]:after {
     font-family: FontAwesome;
     content:"\f078";
     float: right;
@@ -366,7 +366,7 @@ td.arrows{
 .collapsable-icon-right a.collapsed:after {
     content:"\f054";
 }
-.collapsable-icon-left a:after {
+.collapsable-icon-left a[data-toggle="collapse"]:after {
     font-family: FontAwesome;
     content:"\f078";
     float: left;
@@ -720,6 +720,10 @@ nav.sidebar p.no-portrait{
 	padding-right: 35px;
 }
 
+#bs-sidebar-navbar-collapse-1 .lessonName {
+	word-break: break-word;
+}
+
 /* .....NavBar: Fully showing nav bar..... */
 
 @media (min-width: 1330px) {
@@ -812,12 +816,13 @@ div.growlUI h1,div.growlUI h2 {
 }
 
 // Tooltips used for learner progress and gradebook (large version)
-.tooltip {
+.progress-bar-tooltip {
+	display: none;
 	position: absolute;
 	border: $border-thin-default;
 	background-color: $gray-light-mid;
 	padding: 3px;
-	z-index: 5;
+	z-index: 1001;
 	width: 150px;
 	font-size: 0.9em;
 	word-wrap: break-word;
@@ -1178,72 +1183,25 @@ $portrait-size-image-xl: 400px;
     margin-left: 0px; 
 }
 
-// Full screen sizing - expects the div to be fullscreened to be called fullPageContentDiv, which contains a flexDiv and a mainDiv
+// Full screen sizing - expects the div to be fullscreened to have class full-screen-content-div, which contains a full-screen-flex-div and a full-screen-main-div
 // You may need to tweak complicated structures within the div (e.g. see Mindmap's height control)
-@mixin fullPageContentDivDefn() {
-	width: 100%;
+
+.full-screen-content-div:fullscreen {
+  	width: 100%;
 	height: 100vh;
 	background-color: $body-bg;
 	display: flex;
 	align-items: center;
 }
 
-@mixin flexDivDefn() {
+.full-screen-content-div:fullscreen .full-screen-flex-div {
     margin-left: 5%;
     margin-right: 5%;
     display: block;
 }
 
-@mixin mainDivDefn() {
+.full-screen-content-div:fullscreen .full-screen-main-div {
 	width: 90vw;
-}
-
-#fullPageContentDiv:-webkit-full-screen {
-  @include fullPageContentDivDefn;
-}
-
-#fullPageContentDiv:-webkit-full-screen #flexDiv {
-  @include flexDivDefn;
-}
-
-#fullPageContentDiv:-webkit-full-screen #mainDiv {
-  @include mainDivDefn;
-}
-
-#fullPageContentDiv:-moz-full-screen {
-  @include fullPageContentDivDefn;
-}
-
-#fullPageContentDiv:-moz-full-screen  #flexDiv {
-  @include flexDivDefn;
-}
-
-#fullPageContentDiv:-moz-full-screen #mainDiv {
-  @include mainDivDefn;
-}
-
-#fullPageContentDiv:-ms-fullscreen {
-  @include fullPageContentDivDefn;
-}
-
-#fullPageContentDiv:-ms-fullscreen  #flexDiv {
-  @include flexDivDefn;
-}
-
-#fullPageContentDiv:-ms-full-screen #mainDiv {
-  @include mainDivDefn;
-}
-
-#fullPageContentDiv:fullscreen {
-  @include fullPageContentDivDefn;
-}
-
-#fullPageContentDiv:fullscreen #flexDiv {
-  @include flexDivDefn;
-}
-
-#fullPageContentDiv:fullscreen #mainDiv {
-  @include mainDivDefn;
 }
     
 /* jqGrid text wrapping */
@@ -1256,4 +1214,17 @@ $portrait-size-image-xl: 400px;
 	word-wrap: break-word; /* IE 5.5+ and CSS3 */
     overflow: hidden;
     vertical-align: middle;
+}
+/* Wave headers see LDEV-5167 */
+.wave-orange {background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGwtcnVsZT0iZXZlbm9kZCIgZmlsbD0iI2Q1NmExMSIgd2lkdGg9IjEyNDAiIGhlaWdodD0iMzA0IiAgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48cGF0aCBvcGFjaXR5PSIuMTUiIGQ9Ik0wIDBoMTIzOC4wOTV2Mjk2LjQ3N2MtMzQzLjQ0OCAyNi4xNjEtMzA1LjgxNi0yNC44NjEtNjE5LjA0OC0xNy45MDdTMjkxLjk5IDMxNS43ODggMCAyNzguNTdWMHoiLz48cGF0aCBkPSJNMTI0MCAwSC45NTN2MjY0LjgwNGM3Ni41NjYtNy4zNjUgMTQ2Ljg0NC0xOC4xMiAzMjcuMzUxLTcuMzY1czI0NC4yNDUgNTMuNzcxIDUwNi42MjggMTIuOTkxYzE3NC45MjItMjcuMTg3IDMwOS45NDUtMjUuMTg2IDQwNS4wNjggNi4wMDF6IiBmaWxsPSIjZjkzIi8+PC9zdmc+");text-align:center;color: white;background-size: cover;background-repeat: no-repeat;background-position: top;padding: 5% 0 12% 0;margin: -16px; }
+.wave-blue {background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjQwIiBoZWlnaHQ9IjMwNCIgIGZpbGw9IiMwOTRiYWMiIGZpbGwtcnVsZT0iZXZlbm9kZCIgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48cGF0aCBvcGFjaXR5PSIuMTUiIGQ9Ik0wIDBoMTIzOC4wOTV2Mjk2LjQ3N2MtMzQzLjQ0OCAyNi4xNjEtMzA1LjgxNi0yNC44NjEtNjE5LjA0OC0xNy45MDdTMjkxLjk5IDMxNS43ODggMCAyNzguNTdWMHoiLz48cGF0aCBkPSJNMTI0MCAwSC45NTN2MjY0LjgwNGM3Ni41NjYtNy4zNjUgMTQ2Ljg0NC0xOC4xMiAzMjcuMzUxLTcuMzY1czI0NC4yNDUgNTMuNzcxIDUwNi42MjggMTIuOTkxYzE3NC45MjItMjcuMTg3IDMwOS45NDUtMjUuMTg2IDQwNS4wNjggNi4wMDF6Ii8+PC9zdmc+");text-align:center;color: white;background-size: cover;background-repeat: no-repeat;background-position: top;padding: 5% 0 12% 0;margin: -16px; }
+.wave-purple {background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjQwIiBoZWlnaHQ9IjMwNCIgIGZpbGw9IiM1ZDM3YTIiIGZpbGwtcnVsZT0iZXZlbm9kZCIgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48cGF0aCBvcGFjaXR5PSIuMTUiIGQ9Ik0wIDBoMTIzOC4wOTV2Mjk2LjQ3N2MtMzQzLjQ0OCAyNi4xNjEtMzA1LjgxNi0yNC44NjEtNjE5LjA0OC0xNy45MDdTMjkxLjk5IDMxNS43ODggMCAyNzguNTdWMHoiLz48cGF0aCBkPSJNMTI0MCAwSC45NTN2MjY0LjgwNGM3Ni41NjYtNy4zNjUgMTQ2Ljg0NC0xOC4xMiAzMjcuMzUxLTcuMzY1czI0NC4yNDUgNTMuNzcxIDUwNi42MjggMTIuOTkxYzE3NC45MjItMjcuMTg3IDMwOS45NDUtMjUuMTg2IDQwNS4wNjggNi4wMDF6Ii8+PC9zdmc+");text-align:center;color: white;background-size: cover;background-repeat: no-repeat;background-position: top;padding: 5% 0 12% 0;margin: -16px; }
+.wave-green {background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjQwIiBoZWlnaHQ9IjMwNCIgIGZpbGw9IiMyMjhjM2EiIGZpbGwtcnVsZT0iZXZlbm9kZCIgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48cGF0aCBvcGFjaXR5PSIuMTUiIGQ9Ik0wIDBoMTIzOC4wOTV2Mjk2LjQ3N2MtMzQzLjQ0OCAyNi4xNjEtMzA1LjgxNi0yNC44NjEtNjE5LjA0OC0xNy45MDdTMjkxLjk5IDMxNS43ODggMCAyNzguNTdWMHoiLz48cGF0aCBkPSJNMTI0MCAwSC45NTN2MjY0LjgwNGM3Ni41NjYtNy4zNjUgMTQ2Ljg0NC0xOC4xMiAzMjcuMzUxLTcuMzY1czI0NC4yNDUgNTMuNzcxIDUwNi42MjggMTIuOTkxYzE3NC45MjItMjcuMTg3IDMwOS45NDUtMjUuMTg2IDQwNS4wNjggNi4wMDF6Ii8+PC9zdmc+");text-align:center;color: white;background-size: cover;background-repeat: no-repeat;background-position: top;padding: 5% 0 12% 0;margin: -16px; }
+.wave-pink {background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGwtcnVsZT0iZXZlbm9kZCIgZmlsbD0iI2ZmOTdmZiIgaGVpZ2h0PSIzMDQiIHdpZHRoPSIxMjQwIiAgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48cGF0aCBkPSJNMCAwaDEyMzguMDk1djI5Ni40NzdjLTM0My40NDggMjYuMTYxLTMwNS44MTYtMjQuODYxLTYxOS4wNDgtMTcuOTA3UzI5MS45OSAzMTUuNzg4IDAgMjc4LjU3VjB6IiBvcGFjaXR5PSIuMTUiLz48cGF0aCBkPSJNMTI0MCAwSC45NTN2MjY0LjgwNGM3Ni41NjYtNy4zNjUgMTQ2Ljg0NC0xOC4xMiAzMjcuMzUxLTcuMzY1czI0NC4yNDUgNTMuNzcxIDUwNi42MjggMTIuOTkxYzE3NC45MjItMjcuMTg3IDMwOS45NDUtMjUuMTg2IDQwNS4wNjggNi4wMDF6Ii8+PC9zdmc+");text-align:center;color: white;background-size: cover;background-repeat: no-repeat;background-position: top;padding: 5% 0 12% 0;margin: -16px; }
+.wave-red {background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGwtcnVsZT0iZXZlbm9kZCIgZmlsbD0iI2MwMCIgaGVpZ2h0PSIzMDQiIHdpZHRoPSIxMjQwIiAgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48cGF0aCBkPSJNMCAwaDEyMzguMDk1djI5Ni40NzdjLTM0My40NDggMjYuMTYxLTMwNS44MTYtMjQuODYxLTYxOS4wNDgtMTcuOTA3UzI5MS45OSAzMTUuNzg4IDAgMjc4LjU3VjB6IiBvcGFjaXR5PSIuMTUiLz48cGF0aCBkPSJNMTI0MCAwSC45NTN2MjY0LjgwNGM3Ni41NjYtNy4zNjUgMTQ2Ljg0NC0xOC4xMiAzMjcuMzUxLTcuMzY1czI0NC4yNDUgNTMuNzcxIDUwNi42MjggMTIuOTkxYzE3NC45MjItMjcuMTg3IDMwOS45NDUtMjUuMTg2IDQwNS4wNjggNi4wMDF6Ii8+PC9zdmc+");text-align:center;color: white;background-size: cover;background-repeat: no-repeat;background-position: top;padding: 5% 0 12% 0;margin: -16px; }
+.img-soft-shadow {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.img-extra-rounded {
+    border-radius: 50px;
 }

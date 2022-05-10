@@ -1,14 +1,13 @@
 package org.lamsfoundation.lams.tool.leaderselection.web.controller;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.OnClose;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
@@ -51,7 +50,7 @@ public class LearningWebsocketServer {
 
 		    Iterator<Entry<Long, Set<Session>>> entryIterator = LearningWebsocketServer.websockets.entrySet()
 			    .iterator();
-		    // go through activities and update registered learners with reports and vote count
+		    // go through activities and update registered learners with selected leader
 		    while (entryIterator.hasNext()) {
 			Entry<Long, Set<Session>> entry = entryIterator.next();
 			Long toolSessionId = entry.getKey();
@@ -62,9 +61,14 @@ public class LearningWebsocketServer {
 			    continue;
 			}
 
-			boolean finished = LearningWebsocketServer.getLeaderService()
-				.getSessionBySessionId(toolSessionId).getGroupLeader() != null;
-			if (finished) {
+			LeaderselectionUser leader = LearningWebsocketServer.getLeaderService()
+				.getSessionBySessionId(toolSessionId).getGroupLeader();
+			Long existingLeaderUid = leaders.get(toolSessionId);
+
+			// check if a leader has been selected or it has changed
+			if ((existingLeaderUid == null && leader != null) || (existingLeaderUid != null
+				&& (leader == null || !leader.getUid().equals(existingLeaderUid)))) {
+			    leaders.put(toolSessionId, leader == null ? null : leader.getUid());
 			    LearningWebsocketServer.sendPageRefreshRequest(toolSessionId);
 			}
 		    }
@@ -90,6 +94,7 @@ public class LearningWebsocketServer {
 
     private static final SendWorker sendWorker = new SendWorker();
     private static final Map<Long, Set<Session>> websockets = new ConcurrentHashMap<>();
+    private static final Map<Long, Long> leaders = new HashMap<>();
     private static ILeaderselectionService leaderService;
 
     static {
@@ -128,7 +133,7 @@ public class LearningWebsocketServer {
      * When user leaves the activity.
      */
     @OnClose
-    public void unregisterUser(Session websocket, CloseReason reason) {
+    public void unregisterUser(Session websocket) {
 	Long toolSessionId = Long
 		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
 	websockets.get(toolSessionId).remove(websocket);
@@ -136,12 +141,7 @@ public class LearningWebsocketServer {
 	if (log.isDebugEnabled()) {
 	    // If there was something wrong with the connection, put it into logs.
 	    log.debug("User " + websocket.getUserPrincipal().getName() + " left Leader Selection with Tool Session ID: "
-		    + toolSessionId
-		    + (!(reason.getCloseCode().equals(CloseCodes.GOING_AWAY)
-			    || reason.getCloseCode().equals(CloseCodes.NORMAL_CLOSURE))
-				    ? ". Abnormal close. Code: " + reason.getCloseCode() + ". Reason: "
-					    + reason.getReasonPhrase()
-				    : ""));
+		    + toolSessionId);
 	}
     }
 

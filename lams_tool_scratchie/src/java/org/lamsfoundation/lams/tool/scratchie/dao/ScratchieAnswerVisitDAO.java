@@ -33,20 +33,22 @@ public interface ScratchieAnswerVisitDAO extends DAO {
      * Get log for MCQ question.
      */
     ScratchieAnswerVisitLog getLog(Long optionUid, Long itemUid, Long sessionId);
-  
+
     /**
      * Get log for VSA question.
      */
     ScratchieAnswerVisitLog getLog(Long sessionId, Long itemUid, boolean isCaseSensitive, String answer);
 
     int getLogCountTotal(Long sessionId);
-    
+
     int getLogCountPerItem(Long sessionId, Long itemUid);
 
     List<ScratchieAnswerVisitLog> getLogsBySessionAndItem(Long sessionId, Long itemUid);
 
     List<ScratchieAnswerVisitLog> getLogsBySession(Long sessionId);
-    
+
+    List<ScratchieAnswerVisitLog> getVsaLogsByItem(Long itemUid);
+
     /**
      * @param scratchieUid
      * @return all visit logs left for the activity with specified scratchieUid

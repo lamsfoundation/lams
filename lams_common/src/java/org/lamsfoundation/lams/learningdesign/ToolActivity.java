@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedSet;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -37,22 +36,21 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
-import org.hibernate.annotations.Cascade;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.learningdesign.strategy.ToolActivityStrategy;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonClass;
-import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityMetadata;
 import org.lamsfoundation.lams.tool.GroupedToolSession;
 import org.lamsfoundation.lams.tool.NonGroupedToolSession;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.RequiredGroupMissingException;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 
 /**
@@ -75,20 +73,16 @@ public class ToolActivity extends SimpleActivity implements Serializable {
     private Tool tool;
 
     @OneToMany(mappedBy = "toolActivity")
-    private Set<ToolSession> toolSessions = new HashSet<ToolSession>();
+    private Set<ToolSession> toolSessions = new HashSet<>();
 
     @OneToMany(mappedBy = "toolActivity")
-    private Set<CompetenceMapping> competenceMappings = new HashSet<CompetenceMapping>();
-
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "activity")
-    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
-    private ActivityEvaluation evaluation;
+    private Set<CompetenceMapping> competenceMappings = new HashSet<>();
 
     @OneToMany(mappedBy = "activity")
-    private Set<GradebookUserActivity> gradebookUserActivities = new HashSet<GradebookUserActivity>();
+    private Set<GradebookUserActivity> gradebookUserActivities = new HashSet<>();
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "activity", cascade = CascadeType.ALL)
-    private PedagogicalPlannerActivityMetadata plannerMetadata;
+    @Transient
+    private ActivityEvaluation evaluation;
 
     /** default constructor */
     public ToolActivity() {
@@ -120,30 +114,14 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 
 	newToolActivity.setCompetenceMappings(newCompetenceMappings);
 
-	if (this.evaluation != null) {
+	ActivityEvaluation evaluation = (ActivityEvaluation) UserManagementService.getInstance()
+		.findById(ActivityEvaluation.class, this.getActivityId());
+	if (evaluation != null) {
 	    ActivityEvaluation newEvaluation = new ActivityEvaluation();
 	    newEvaluation.setToolOutputDefinition(evaluation.getToolOutputDefinition());
 	    newEvaluation.setWeight(evaluation.getWeight());
 	    newEvaluation.setActivity(newToolActivity);
-	    newToolActivity.setEvaluation(newEvaluation);
-	}
-
-	Set<GradebookUserActivity> newGradebookUserActivities = new HashSet<>();
-	if (this.gradebookUserActivities != null) {
-	    for (GradebookUserActivity gradebookAct : this.gradebookUserActivities) {
-		GradebookUserActivity newGradebookAct = new GradebookUserActivity();
-		newGradebookAct.setActivity(newToolActivity);
-		newGradebookAct.setLearner(gradebookAct.getLearner());
-		newGradebookAct.setMark(gradebookAct.getMark());
-		newGradebookAct.setUpdateDate(gradebookAct.getUpdateDate());
-	    }
-	}
-	newToolActivity.setGradebookUserActivities(newGradebookUserActivities);
-
-	if (this.plannerMetadata != null) {
-	    PedagogicalPlannerActivityMetadata plannerMetadata = this.plannerMetadata.clone();
-	    plannerMetadata.setActivity(newToolActivity);
-	    newToolActivity.setPlannerMetadata(plannerMetadata);
+	    newToolActivity.evaluation = newEvaluation;
 	}
 
 	return newToolActivity;
@@ -187,8 +165,9 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 
 		//check if activity requires existing grouping but no group for user exists yet
 		if (group == null || group.isNull()) {
-		    String errorMessage = messageService.getMessage("error.requires.existing.grouping",
-			    new Object[] { getActivityId(), learner.getUserId() });
+		    log.warn("Activity " + getActivityId() + " requires existing grouping but no group for user "
+			    + learner.getUserId() + " exists yet.");
+		    String errorMessage = messageService.getMessage("error.requires.existing.grouping");
 		    throw new RequiredGroupMissingException(errorMessage);
 		}
 
@@ -284,10 +263,6 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	return evaluation;
     }
 
-    public void setEvaluation(ActivityEvaluation evaluation) {
-	this.evaluation = evaluation;
-    }
-
     public Set<GradebookUserActivity> getGradebookUserActivities() {
 	return gradebookUserActivities;
     }
@@ -296,11 +271,4 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	this.gradebookUserActivities = gradebookUserActivities;
     }
 
-    public PedagogicalPlannerActivityMetadata getPlannerMetadata() {
-	return plannerMetadata;
-    }
-
-    public void setPlannerMetadata(PedagogicalPlannerActivityMetadata plannerMetadata) {
-	this.plannerMetadata = plannerMetadata;
-    }
 }

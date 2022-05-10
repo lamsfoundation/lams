@@ -499,7 +499,8 @@ function lamslesson_get_members($form) {
   $monitorlnamestr = '';
   $monitoremailstr = '';
 
-  $context = get_context_instance(CONTEXT_MODULE, $form->coursemodule);
+  // $context = get_context_instance(CONTEXT_MODULE, $form->coursemodule);
+  $context = context_module::instance($form->coursemodule);
 	
   if (!$form->groupingid) {  // get all course members
     $userids = lamslesson_get_course_userids($form->coursemodule, $context);
@@ -754,17 +755,20 @@ function lamslesson_get_course_userids($lamslessonid, $context=NULL) {
 		if (! $cm = get_coursemodule_from_instance('lamslesson', $lamslesson->id, $lamslesson->course)) {
 			error('Course Module ID was incorrect');
 		}
-		$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+		// $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+		$context = context_module::instance($cm->id);
 	}
 	
 	// we are looking for all users assigned in this context or higher
 	if ($usercontexts = $context->get_parent_context_ids($context)) {
 		$listofcontexts = '('.implode(',', $usercontexts).')';
 	} else {
-		$sitecontext = get_context_instance(CONTEXT_SYSTEM);
+		// $sitecontext = get_context_instance(CONTEXT_SYSTEM);
+		$sitecontext = context_system::instance();
+
 		$listofcontexts = '('.$sitecontext->id.')'; // must be site
 	}
-	$sql = "SELECT u.id
+	$sql = "SELECT DISTINCT u.id
 		FROM {user} u INNER JOIN {role_assignments} r ON u.id=r.userid
 		WHERE r.contextid IN $listofcontexts OR r.contextid=$context->id
 		AND u.deleted=0 AND u.username!='guest'";

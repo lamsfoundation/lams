@@ -3,14 +3,19 @@ package org.lamsfoundation.lams.qb.service;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
+import org.lamsfoundation.lams.qb.form.QbQuestionForm;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
+import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 
 public interface IQbService {
@@ -39,6 +44,8 @@ public interface IQbService {
     List<QbQuestion> getQuestionsByQuestionId(Integer questionId);
 
     QbQuestion getQuestionByUUID(UUID uuid);
+
+    <T> List<T> getToolQuestionForToolContentId(Class<T> clazz, long toolContentId, long otherToolQuestionUid);
 
     /**
      * @param optionUid
@@ -69,6 +76,10 @@ public interface IQbService {
     QbStatsActivityDTO getActivityStats(Long activityId, Long qbQuestionUid);
 
     QbStatsActivityDTO getActivityStats(Long activityId, Long qbQuestionUid, Collection<Long> correctOptionUids);
+
+    List<QbQuestion> getPagedQuestions(String questionTypes, String collectionUids,
+	    Long onlyInSameLearningDesignAsToolContentID, int page, int size, String sortBy, String sortOrder,
+	    String searchString);
 
     List<QbQuestion> getPagedQuestions(String questionTypes, String collectionUids, int page, int size, String sortBy,
 	    String sortOrder, String searchString);
@@ -150,4 +161,18 @@ public interface IQbService {
     int mergeQuestions(long sourceQbQuestionUid, long targetQbQuestionUid);
 
     boolean isQuestionDefaultInTool(long qbQuestionUid, String toolSignature);
+
+    Collection<ToolContent> getQuestionActivities(long qbQuestionUid, Collection<Long> toolContentIds);
+
+    void replaceQuestionInToolActivities(Collection<Long> toolContentIds, long oldQbQuestionUid, long newQbQuestionUid);
+
+    void fillVersionMap(QbQuestion qbQuestion);
+
+    int extractFormToQbQuestion(QbQuestion qbQuestion, QbQuestionForm form, HttpServletRequest request);
+
+    TreeSet<QbOption> getOptionsFromRequest(HttpServletRequest request, boolean isForSaving);
+
+    TreeSet<QbQuestionUnit> getUnitsFromRequest(HttpServletRequest request, boolean isForSaving);
+
+    Long allocateVSAnswerToOption(Long qbQuestionUid, Long targetOptionUid, Long previousOptionUid, String answer);
 }

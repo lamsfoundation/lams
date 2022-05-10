@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
@@ -142,7 +141,7 @@ public class CommandWebsocketServer {
      * Removes Learner websocket from the collection.
      */
     @OnClose
-    public void unregisterUser(Session session, CloseReason reason) {
+    public void unregisterUser(Session session) {
 	String login = session.getUserPrincipal().getName();
 	if (login == null) {
 	    return;

@@ -700,7 +700,7 @@ public class AuthoringController {
      */
     private void populateItemToForm(int itemIdx, SurveyQuestion item, QuestionForm form, HttpServletRequest request) {
 	// fetch question from DB rather than from HTTP session so we can lazy load its options
-	item = surveyService.getQuestion(item.getUid());
+	item = item.getUid() == null ? item : surveyService.getQuestion(item.getUid());
 
 	if (itemIdx >= 0) {
 	    form.setItemIndex(new Integer(itemIdx).toString());

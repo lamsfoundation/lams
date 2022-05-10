@@ -31,7 +31,6 @@ import java.util.Vector;
 
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
-import org.lamsfoundation.lams.learningdesign.LearningLibraryGroup;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
@@ -82,13 +81,6 @@ public interface ILearningDesignService {
     LearningLibrary getLearningLibrary(Long learningLibraryId);
 
     /**
-     * Gets all existing learning library groups.
-     */
-    List<LearningLibraryGroup> getLearningLibraryGroups();
-
-    void saveLearningLibraryGroups(Collection<LearningLibraryGroup> groups);
-
-    /**
      * Set valid flag to learning library.
      */
     void setValid(Long learningLibraryId, boolean valid);
@@ -99,12 +91,12 @@ public interface ILearningDesignService {
 	    throws ImportToolContentException;
 
     String internationaliseActivityTitle(Long learningLibraryID);
-    
+
     /**
      * Get a unique name for a learning design, based on the names of the learning designs in the folder. If the
      * learning design has duplicated name in same folder, then the new name will have a timestamp. The new name format
      * will be oldname_ddMMYYYY_idx. The idx will be auto incremental index number, start from 1. Warning - this may be
-     * quite intensive as it gets all the learning designs in a folder. Moved from AuthoringService to here so that the 
+     * quite intensive as it gets all the learning designs in a folder. Moved from AuthoringService to here so that the
      * Import code can use it.
      *
      *
@@ -115,5 +107,16 @@ public interface ILearningDesignService {
      */
     String getUniqueNameForLearningDesign(String originalTitle, Integer workspaceFolderId);
 
+    /**
+     * If learning design contains the following activities Grouping->(MCQ or Assessment)->Leader Selection->Scratchie
+     * (potentially with some other gates or activities in the middle), there is a good chance this is a TBL sequence
+     * and all activities must be grouped.
+     */
+    boolean isTBLSequence(long learningDesignId);
 
+    /**
+     * Checks if it is a TBL sequence. If so and given tool content ID is a iRAT or tRAT activity,
+     * it returns tool content ID of a matching tRAT / iRAT activity.
+     */
+    Long findMatchingRatActivity(long toolContentId);
 }

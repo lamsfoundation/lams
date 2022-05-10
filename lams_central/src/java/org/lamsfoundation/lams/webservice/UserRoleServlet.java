@@ -56,20 +56,25 @@ public class UserRoleServlet extends HttpServlet {
 	    String plaintext = datetime.toLowerCase().trim() + username.toLowerCase().trim()
 		    + targetUsername.toLowerCase().trim() + method.toLowerCase().trim() + role.toLowerCase().trim()
 		    + extServer.getServerid().toLowerCase().trim() + extServer.getServerkey().toLowerCase().trim();
-	    if (!hashValue.equals(HashUtil.sha1(plaintext))) {
+	    String parametersHash = null;
+	    if (hashValue.length() == HashUtil.SHA1_HEX_LENGTH) {
+		// for some time support SHA-1 for authentication
+		parametersHash = HashUtil.sha1(plaintext);
+	    } else {
+		parametersHash = HashUtil.sha256(plaintext);
+	    }
+	    if (!hashValue.equals(parametersHash)) {
 		log.error("Hash check failed while trying to set role for user: " + targetUsername);
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed, invalid hash");
 		return;
 	    }
-	    ExtUserUseridMap sysadminUserMap = integrationService.getExtUserUseridMap(extServer,
-		    username);
+	    ExtUserUseridMap sysadminUserMap = integrationService.getExtUserUseridMap(extServer, username);
 	    if (!securityService.isSysadmin(sysadminUserMap.getUser().getUserId(), "set user role", false)) {
 		log.error("Sysadmin role check failed while trying to set role for user: " + targetUsername);
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed, user is not sysadmin");
 		return;
 	    }
-	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer,
-		    targetUsername);
+	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer, targetUsername);
 	    User targetUser = userMap.getUser();
 	    if ("grant".equalsIgnoreCase(method)) {
 		grant(targetUser, role);
@@ -107,7 +112,7 @@ public class UserRoleServlet extends HttpServlet {
 	switch (role) {
 	    case Role.SYSADMIN:
 		Organisation rootOrganisation = userManagementService.getRootOrganisation();
-		List<String> roles = new ArrayList<String>(Arrays.asList(Role.ROLE_SYSADMIN.toString()));
+		List<String> roles = new ArrayList<>(Arrays.asList(Role.ROLE_SYSADMIN.toString()));
 		userManagementService.setRolesForUserOrganisation(user, rootOrganisation.getOrganisationId(), roles);
 		break;
 	    default:
@@ -122,7 +127,7 @@ public class UserRoleServlet extends HttpServlet {
 	switch (role) {
 	    case Role.SYSADMIN:
 		Organisation rootOrganisation = userManagementService.getRootOrganisation();
-		List<String> roles = new ArrayList<String>();
+		List<String> roles = new ArrayList<>();
 		userManagementService.setRolesForUserOrganisation(user, rootOrganisation.getOrganisationId(), roles);
 		break;
 	    default:

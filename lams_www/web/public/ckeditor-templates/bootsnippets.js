@@ -12,7 +12,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 	snippets: [
 	{
 		title: 'textParagraphFullWidth',
-		image: 'paragraph.png',
+		image: 'paragraph.svg',
 		description: '',
 		css: '',
 		html: 
@@ -22,7 +22,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 	},
 	{
 		title: 'textParagraphAndHeading',
-		image: 'paragraph_with_heading.png',
+		image: 'paragraph_with_heading.svg',
 		description: '',
 		css: '',
 		html: 
@@ -33,7 +33,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 	},
 	{
 		title: 'textTwoColumns',
-		image: 'two_columns.png',
+		image: 'two_columns.svg',
 		description: '',
 		css: '',
 		html: 
@@ -51,7 +51,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 	},
 	{
 		title: 'textThreeColumns',
-		image: 'three_columns.png',
+		image: 'three_columns.svg',
 		description: '',
 		css: '',
 		html: 
@@ -74,7 +74,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 	},
 	{
 		title: 'textStatement',
-		image: 'statement.png',
+		image: 'statement.svg',
 		description: '',
 		css: '',
 		html: 
@@ -88,7 +88,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 	},
 	{
 		title: 'textNote',
-		image: 'note.png',
+		image: 'note.svg',
 		description: '',
 		css: '',
 		html: 
@@ -108,9 +108,22 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 		'  <strong>Danger!</strong> Indicates a dangerous or potentially negative action.' +
 		'</div>'
 	},
+    {
+        title: 'textLabel',
+        image: 'labels.svg',
+        description: '',
+        css: '',
+        html:
+        '<span class="label label-default">Default</span>&nbsp;' +
+        '<span class="label label-primary">Primary</span>&nbsp;' +
+		'<span class="label label-success">Success</span>&nbsp;' +
+		'<span class="label label-info">Info</span>&nbsp;' +
+		'<span class="label label-warning">Warning</span>&nbsp;' +
+		'<span class="label label-danger">Danger</span>&nbsp;' 
+    },
 	{
 		title: 'textQuote',
-		image: 'quote_paragraph_below.png',
+		image: 'quote_paragraph_below.svg',
 		description: '',
 		css: '',
 		html: 
@@ -124,42 +137,9 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 		'</div>'
 	},
 	{
-		title: 'textTable',
-		image: 'panel_table.png',
-		description: '',
-		css: 'panel_table.css',
-		html: 
-		'<div class="container"><div class="row"><div class="col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">' +
-		'	 <div class="panel panel-default panel-table">' +
-		'	     <div class="panel-heading">' +
-		'	         <div class="tr">' +
-		'	             <div class="td">heading</div>' +
-		'	             <div class="td">heading</div>' +
-		'	             <div class="td">heading</div>' +
-		'	         </div>' +
-		'	     </div>' +
-		'	     <div class="panel-body">' +
-		'	         <div class="tr">' +
-		'	             <div class="td">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Similique facere necessitatibus quo laboriosam consequuntur</div>' +
-		'	             <div class="td">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Excepturi aliquam placeat odit quasi autem distinctio veritatis ex numquam nihil</div>' +
-		'	             <div class="td">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Excepturi aliquam placeat odit quasi autem distinctio veritatis ex numquam nihil nulla tempora a dolorem omnis beatae facilis perspiciatis doloribus? Error dolore!</div>' +
-		'	         </div>' +
-		'	     </div>' +
-		'	     <div class="panel-footer">' +
-		'	         <div class="tr">' +
-		'	             <div class="td">footer</div>' +
-		'	             <div class="td">footer</div>' +
-		'	             <div class="td">footer</div>' +
-		'	         </div>' +
-		'	     </div>' +
-		'	 </div>' +
-		'</div></div></div>'
-	},
-	{
 		title: 'textPanel',
-		image: 'panel.png',
+		image: 'panel.svg',
 		html: 
-		'<script type="text/javascript" src="/lams/includes/javascript/clickable.js"></script>' +
 		'<div class="panel panel-primary lams-bootpanel">' +
 		'    <div class="panel-heading">' +
 		'        <h3 class="panel-title">' +
@@ -176,9 +156,8 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 	},
 	{
 		title: 'textPanelFooter',
-		image: 'panel_footer.png',
+		image: 'panel_footer.svg',
 		html: 
-			'<script type="text/javascript" src="/lams/includes/javascript/clickable.js"></script>' +
 			'<div class="panel panel-primary lams-bootpanel">' +
 			'    <div class="panel-heading">' +
 			'        <h3 class="panel-title">' +
@@ -196,14 +175,30 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 	},
 	{
 		title: 'textJumbotron',
-		image: 'jumbotron_with_text.png',
+		image: 'jumbotron_with_text.svg',
 		html: 
 		'	<div class="jumbotron">' +
 		'   	<h1>Header</h1>' +
 		'    	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Similique facere necessitatibus quo laboriosam consequuntur</p>' +
 		'	</div>'
-	}
-	
+	},
+	{
+		title: 'textWaveHeaders',
+        description: 'New headers with waves. You can change the colour by double clicking on it.',
+		image: 'background-blue3.svg',
+		html:
+		'<style type="text/css">@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap");</style>' +
+        '<div class="lams-wavepanel wave-blue">' + 
+		'<div class="container"><div class="row"><div class="col-xs-12">' +
+		'<h1 style="font-size: 59px;font-family: \'Montserrat\', sans-serif; font-weight: 700;">Lorem Ipsum</h1>' +
+		'<p style="font-size: 28px;font-family: \'Montserrat\', sans-serif;">Lorem ipsum dolor sit amet, consectetur adipiscing elit</p></div></div></div></div>' +
+		'<div>&nbsp;</div>' +
+		'<div style="font-size: 19px;font-family: \'Montserrat\', sans-serif;"><span style="font-size:36px;">Sed ut perspiciatis!&nbsp;</span></div>' +
+		'<div style="font-size: 19px;font-family: \'Montserrat\', sans-serif;">&nbsp;</div>' +
+		'<div style="font-size: 19px;font-family: \'Montserrat\', sans-serif;">At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi.</div>' +
+		'<div style="font-size: 19px;font-family: \'Montserrat\', sans-serif;">&nbsp;</div>' 
+		},
+
 	]
 } );
 
@@ -274,7 +269,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		description: '',
 		css: '',
 		html: 
-		'<div class="col-md-6">' +
+		'<div class="col-md-12">' +
 		'	<div class="panel panel-default">' +
 		'		<div class="panel-heading">Image header</div>' +
 			
@@ -348,7 +343,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'<div class="row">' +
 		'    <div class="col-md-6">' +
 		'	    <div class="thumbnail">' +
-		'	        <img alt="" src="/lams/www/public/ckeditor-templates/images/stairs.jpg" style="width:100%">' +
+		'	        <img alt="" src="/lams/www/public/ckeditor-templates/images/stairs.jpg" style="width:100%" class="img-responsive" />' +
 		'	        <div class="caption">' +
 		'	          <p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>' +
 		'	        </div>' +
@@ -356,7 +351,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'	  </div>' +
 		'	  <div class="col-md-6">' +
 		'	    <div class="thumbnail">' +
-		'	        <img alt="" src="/lams/www/public/ckeditor-templates/images/study.jpg" style="width:100%">' +
+		'	        <img alt="" src="/lams/www/public/ckeditor-templates/images/study.jpg" style="width:100%" class="img-responsive" />' +
 		'	        <div class="caption">' +
 		'	          <p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>' +
 		'	        </div>' +
@@ -373,7 +368,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'<div class="row">' +
 		'    <div class="col-md-4">' +
 		'	    <div class="thumbnail">' +
-		'	        <img src="/lams/www/public/ckeditor-templates/images/math.jpg" alt="" style="width:100%">' +
+		'	        <img src="/lams/www/public/ckeditor-templates/images/math.jpg" alt="" style="width:100%" class="img-responsive" />' +
 		'	        <div class="caption">' +
 		'	          <p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>' +
 		'	        </div>' +
@@ -381,7 +376,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'	  </div>' +
 		'	  <div class="col-md-4">' +
 		'	    <div class="thumbnail">' +
-		'	        <img src="/lams/www/public/ckeditor-templates/images/ideas.jpg" alt="" style="width:100%">' +
+		'	        <img src="/lams/www/public/ckeditor-templates/images/ideas.jpg" alt="" style="width:100%" class="img-responsive" />' +
 		'	        <div class="caption">' +
 		'	          <p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>' +
 		'	        </div>' +
@@ -389,7 +384,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'	  </div>' +
 		'	  <div class="col-md-4">' +
 		'	    <div class="thumbnail">' +
-		'	        <img src="/lams/www/public/ckeditor-templates/images/cogs.jpg" alt="" style="width:100%">' +
+		'	        <img src="/lams/www/public/ckeditor-templates/images/cogs.jpg" alt="" style="width:100%" class="img-responsive" />' +
 		'	        <div class="caption">' +
 		'	          <p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>' +
 		'	        </div>' +

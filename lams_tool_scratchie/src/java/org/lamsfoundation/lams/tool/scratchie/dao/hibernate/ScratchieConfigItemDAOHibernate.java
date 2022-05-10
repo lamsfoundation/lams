@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scratchie.dao.hibernate;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
@@ -35,7 +34,7 @@ public class ScratchieConfigItemDAOHibernate extends LAMSBaseDAO implements Scra
 
     @Override
     public ScratchieConfigItem getConfigItemByKey(final String configKey) {
-	return getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY, ScratchieConfigItem.class)
+	return getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY, ScratchieConfigItem.class).setCacheable(true)
 		.setParameter("key", configKey).uniqueResult();
     }
 

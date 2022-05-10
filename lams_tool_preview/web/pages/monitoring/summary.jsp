@@ -23,14 +23,14 @@
 		
 	//vars for rating.js
 	var MAX_RATES = 0,
-	MIN_RATES = 0,
-	COMMENTS_MIN_WORDS_LIMIT = 0,
-	MAX_RATINGS_FOR_ITEM = 0,
-	LAMS_URL = '',
-	COUNT_RATED_ITEMS = 0,
-	COMMENT_TEXTAREA_TIP_LABEL = '',
-	WARN_COMMENTS_IS_BLANK_LABEL = '',
-	WARN_MIN_NUMBER_WORDS_LABEL = '';
+		MIN_RATES = 0,
+		COMMENTS_MIN_WORDS_LIMIT = 0,
+		MAX_RATINGS_FOR_ITEM = 0,
+		LAMS_URL = '',
+		COUNT_RATED_ITEMS = 0,
+		COMMENT_TEXTAREA_TIP_LABEL = '',
+		WARN_COMMENTS_IS_BLANK_LABEL = '',
+		WARN_MIN_NUMBER_WORDS_LABEL = '';
 </script>
 <script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 
@@ -44,15 +44,32 @@
 		var exportExcelUrl = '<c:url value="/monitoring/exportTeamReport.do"/>?<csrf:token/>&sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}';
 		return downloadFile(exportExcelUrl, 'messageArea_Busy', '<fmt:message key="label.file.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
 	}
+
+	function getResultsElement(sessionId, selector) {
+		let element = null;
+		if (sessionId) {
+			// if Peer Review is grouped, try to find the element within own group
+			element = $('#collapse' + sessionId + ' ' + selector);
+		}
+		if (!element || element.length == 0) {
+			element = $(selector);
+		}
+		return element;
+	}
+	
 	function sendResults(sessionId) {
 		if (!confirm('<fmt:message key="confirm.notify.user.of.results" />')) {
 			return;
 		}
-		var url = "<c:url value="/monitoring/sendResultsToSessionUsers.do"/>";
-		$("#messageArea").html("");
-		$("#messageArea_Busy").show();
-		$(".btn-disable-on-submit").prop("disabled", true);
-		$("#messageArea").load(
+		let buttons = getResultsElement(sessionId, ".btn-disable-on-submit"),
+			messageArea = getResultsElement(sessionId, ".messageArea2"),
+			messageAreaBusy = getResultsElement(sessionId, ".messageArea2_Busy"),
+			url = "<c:url value="/monitoring/sendResultsToSessionUsers.do"/>";
+		
+		messageArea.html("");
+		messageAreaBusy.show();
+		buttons.prop("disabled", true);
+		messageArea.load(
 			url,
 			{
 				sessionMapID: "${sessionMapID}",
@@ -61,8 +78,8 @@
 				reqID: (new Date()).getTime()
 			},
 			function() {
-				$("#messageArea_Busy").hide();
-				$(".btn-disable-on-submit").prop("disabled", false);
+				messageAreaBusy.hide();
+				buttons.prop("disabled", false);
 			}
 		);
 		return false;
@@ -108,26 +125,46 @@
         <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
 	</c:if>
 	
+	<c:set var="rubricsCriteriaCounter" value="1" />
 	<c:choose>
-		<c:when test="${not empty criterias && fn:length(criterias) eq 1}">
-			<c:forEach var="criteria" items="${criterias}">
-			<h4><c:out value="${criteria.title}" escapeXml="true"/></h4>
+		<c:when test="${fn:length(criterias) eq 1}">
+			<c:set var="criteria" value="${criterias[0]}" scope="request"/>
 			<c:set var="toolSessionId" value="${groupSummary.sessionId}" scope="request"/>
 			<c:set var="criteria" value="${criteria}" scope="request"/>
 			<c:set var="sessionMap" value="${sessionMap}" scope="request"/>
-			<jsp:include page="criteriapart.jsp"/>
-			</c:forEach>
+			<c:choose>
+				<c:when test="${criteria.rubricsStyleRating}">
+					<c:set var="rubricsLearnerData" value="${rubricsData[toolSessionId]}" scope="request"/>
+					<%@ include file="rubricspart.jsp" %>
+				</c:when>
+				<c:otherwise>
+					<h4><c:out value="${criteria.title}" escapeXml="true"/></h4>
+					<%@ include file="criteriapart.jsp" %>
+				</c:otherwise>
+			</c:choose>
 		</c:when>
 		<c:otherwise>
 			<c:forEach var="criteria" items="${criterias}">
 				<c:set var='url'><c:url value="/monitoring/criteria.do"/>?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&criteriaId=${criteria.ratingCriteriaId}</c:set>
 				<button onclick="javascript:launchPopup('${url}');return false;" class="btn btn-default btn-disable-on-submit voffset5 loffset5">
-					<fmt:message key="label.monitoring.view"><fmt:param><c:out value="${criteria.title}" escapeXml="true"/></fmt:param></fmt:message></button>
+					<fmt:message key="label.monitoring.view">
+						<fmt:param>
+							<c:choose>
+								<c:when test="${criteria.rubricsStyleRating}">
+									<fmt:message key="label.rating.style.rubrics" />&nbsp;${rubricsCriteriaCounter}
+									<c:set var="rubricsCriteriaCounter" value="${rubricsCriteriaCounter + 1}" />
+								</c:when>
+								<c:otherwise>
+									<c:out value="${criteria.title}" escapeXml="true"/>
+								</c:otherwise>
+							</c:choose>
+						</fmt:param>
+					</fmt:message>
+				</button>
 			</c:forEach>
 		</c:otherwise>
 	</c:choose>
 
-	<c:if test="${sessionMap.peerreview.reflectOnActivity || sessionMap.peerreview.notifyUsersOfResults}">
 	<div id="btns${groupSummary.sessionId}" class="offset5">
 		<c:set var="offset"></c:set>
 		<c:if test="${sessionMap.peerreview.reflectOnActivity}">
@@ -135,11 +172,14 @@
 			<button onclick="javascript:launchPopup('${url}');return false;" class="btn btn-default  btn-disable-on-submit ${offset}"><fmt:message key="title.reflection"/></button>
 			<c:set var="offset">loffset5</c:set>
 		</c:if>
-		<c:if test="${sessionMap.peerreview.notifyUsersOfResults}">
-			<button onClick="return sendResults(${groupSummary.sessionId});" class="btn btn-default btn-disable-on-submit ${offset}"><fmt:message key="label.notify.user.of.results"/></button>
+		<button onClick="return sendResults(${groupSummary.sessionId});" class="btn btn-default btn-disable-on-submit ${offset}"><fmt:message key="label.notify.user.of.results"/></button>
+		
+		<c:if test="${fn:length(criterias) > 1}">
+			<!--For send results feature-->
+			<i class="fa fa-spinner messageArea2_Busy" style="display:none"></i>
+			<div class="voffset5 messageArea2"></div>
 		</c:if>
 	</div>
-	</c:if>
 	
 	<c:if test="${sessionMap.isGroupedActivity}">
 		</div> <!-- end collapse area  -->

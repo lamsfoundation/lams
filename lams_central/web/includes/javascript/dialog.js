@@ -61,6 +61,7 @@ function showDialog(id, initParams, extraButtons, recreate) {
 		'modal'    : false,
 		'draggable' : true,
 		'resizable' : extraButtons == true,
+		'startMaximized' : false,
 		'beforeClose' : function(){
 			$('iframe', this).attr('src', null);
 		},
@@ -193,12 +194,11 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	}
 	
 	if (extraButtons) {
-		$('.dialogMaximise', dialog).click(function(){
+		var maximizeButton = $('.dialogMaximise', dialog).click(function(){
 			var icon = $('i', this),
 				wasMaxed = icon.hasClass('fa-clone'),
 				internalDialog = $('.modal-dialog', dialog),
-				internalContent = $('.modal-content', dialog),
-				positionTarget = initParams.modal ? internalDialog : dialog;
+				internalContent = $('.modal-content', dialog);
 			icon.toggleClass('fa-plus').toggleClass('fa-clone');
 			if (wasMaxed) {
 				// restore dialog
@@ -254,6 +254,10 @@ function showDialog(id, initParams, extraButtons, recreate) {
 			
 			internalContent.trigger('resizestop');
 		});
+		
+		if (initParams.startMaximized) {
+			maximizeButton.click();
+		}
 		
 	    $('.dialogMinimise', dialog).click(function() {
 	        if (dialog.hasClass('dialogMin')) {
@@ -347,7 +351,7 @@ function moveDialogToTop(id) {
 function showAuthoringDialog(learningDesignID, relaunchMonitorLessonID){
 	var dialog = showDialog('dialogAuthoring', {
 		'height' : Math.max(300, $(window).height() - 30),
-		'width' : Math.max(600, Math.min(1280, $(window).width() - 60)),
+		'width' : Math.max(600, Math.min(1290, $(window).width() - 60)),
 		'title' : LABELS.AUTHORING_TITLE,
 		'beforeClose' : function(){
 			// if LD was modified, ask the user if he really wants to exit
@@ -386,7 +390,6 @@ function showAuthoringDialog(learningDesignID, relaunchMonitorLessonID){
 
 //used by both /lams_central/web/main.jsp and /lams_monitoring/web/monitor.jsp pages
 function showNotificationsDialog(orgID, lessonID) {
-	
 	//check whether current window is a top level one (otherwise it's an iframe or popup)
 	var isTopLevelWindow = window.top == window.self;
 	//calculate width and height based on the dimensions of the window to which dialog is added
@@ -397,37 +400,32 @@ function showNotificationsDialog(orgID, lessonID) {
 		height = width < 798 ? 850 : 650;
 	height = Math.max(380, Math.min(height, dialogWindow.height() - 30));
 		
-	var id = "dialogNotifications" + (lessonID ? "Lesson" + lessonID : "Org" + orgID),
-		dialog = showDialog(id, {
-			'data' : {
-				'orgID' : orgID,
-				'lessonID' : lessonID
-			},
-			'height': height,
-			'width' : width,
-			//dialog needs to be added to a top level window to avoid boundary limitations of the interim iframe
-			"isCreateInParentWindow" : !isTopLevelWindow,		
-			'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
-			'open' : function() {
-				var dialog = $(this),
-					lessonID = dialog.data('lessonID');
-				// if lesson ID is given, use lesson view; otherwise use course view
-				if (lessonID) {
-					// load contents after opening the dialog
-					$('iframe', dialog).attr('src', LAMS_URL
-						+ 'monitoring/emailNotifications/getLessonView.do?lessonID='
-						+ lessonID);
-				} else {
-					$('iframe', dialog).attr('src', LAMS_URL
-						+ 'monitoring/emailNotifications/getCourseView.do?organisationID='
-						+ orgID);
-				}
+	var id = "dialogNotifications" + (lessonID ? "Lesson" + lessonID : "Org" + orgID);
+	showDialog(id, {
+		'data' : {
+			'orgID' : orgID,
+			'lessonID' : lessonID
+		},
+		'height': height,
+		'width' : width,
+		//dialog needs to be added to a top level window to avoid boundary limitations of the interim iframe
+		"isCreateInParentWindow" : !isTopLevelWindow,		
+		'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
+		'open' : function() {
+			var dialog = $(this);
+			// if lesson ID is given, use lesson view; otherwise use course view
+			if (lessonID) {
+				// load contents after opening the dialog
+				$('iframe', dialog).attr('src', LAMS_URL
+					+ 'monitoring/emailNotifications/getLessonView.do?lessonID='
+					+ lessonID);
+			} else {
+				$('iframe', dialog).attr('src', LAMS_URL
+					+ 'monitoring/emailNotifications/getCourseView.do?organisationID='
+					+ orgID);
 			}
-		}, true)
-		
-//	dialog.on('shown.bs.modal', function(){
-//		dialog.css('top', '15px');
-//	});
+		}
+	}, true);
 }
 
 

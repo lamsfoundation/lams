@@ -30,12 +30,14 @@ public class ExtServerForm extends ExtServerCommonForm {
     private String userinfoUrl;
 
     private String extGroupsUrl;
-    
+
     private String logoutUrl;
-    
+
     private boolean timeToLiveLoginRequestEnabled = true;
 
     private Integer timeToLiveLoginRequest = 80;
+
+    private boolean addStaffToAllLessons = false;
 
     public String getUserinfoUrl() {
 	return userinfoUrl;
@@ -52,13 +54,13 @@ public class ExtServerForm extends ExtServerCommonForm {
     public void setExtGroupsUrl(String extGroupsUrl) {
 	this.extGroupsUrl = extGroupsUrl;
     }
-    
+
     public String getLogoutUrl() {
-        return logoutUrl;
+	return logoutUrl;
     }
 
     public void setLogoutUrl(String logoutUrl) {
-        this.logoutUrl = logoutUrl;
+	this.logoutUrl = logoutUrl;
     }
 
     public boolean isTimeToLiveLoginRequestEnabled() {
@@ -77,4 +79,11 @@ public class ExtServerForm extends ExtServerCommonForm {
 	this.timeToLiveLoginRequest = timeToLiveLoginRequest;
     }
 
+    public boolean isAddStaffToAllLessons() {
+	return addStaffToAllLessons;
+    }
+
+    public void setAddStaffToAllLessons(boolean addStaffToAllLessons) {
+	this.addStaffToAllLessons = addStaffToAllLessons;
+    }
 }

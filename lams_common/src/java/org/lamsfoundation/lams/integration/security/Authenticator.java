@@ -144,7 +144,14 @@ public class Authenticator {
     }
 
     public static void checkHash(String plaintext, String hashValue) throws AuthenticationException {
-	if (!hashValue.equals(HashUtil.sha1(plaintext))) {
+	String parametersHash = null;
+	if (hashValue.length() == HashUtil.SHA1_HEX_LENGTH) {
+	    // for some time support SHA-1 for authentication
+	    parametersHash = HashUtil.sha1(plaintext);
+	} else {
+	    parametersHash = HashUtil.sha256(plaintext);
+	}
+	if (!hashValue.equals(parametersHash)) {
 	    throw new AuthenticationException("Authentication failed!");
 	}
     }

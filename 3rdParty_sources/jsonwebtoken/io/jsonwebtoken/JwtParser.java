@@ -15,10 +15,13 @@
  */
 package io.jsonwebtoken;
 
-import io.jsonwebtoken.impl.DefaultClock;
+import io.jsonwebtoken.io.Decoder;
+import io.jsonwebtoken.io.Deserializer;
+import io.jsonwebtoken.security.SignatureException;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * A parser for reading JWT strings, used to convert them into a {@link Jwt} object representing the expanded JWT.
@@ -38,7 +41,12 @@ public interface JwtParser {
      * @return the parser method for chaining.
      * @see MissingClaimException
      * @see IncorrectClaimException
+     * @deprecated see {@link JwtParserBuilder#requireId(String)}.
+     * To construct a JwtParser use the corresponding builder via {@link Jwts#parserBuilder()}. This will construct an
+     * immutable JwtParser.
+     * <p><b>NOTE: this method will be removed before version 1.0</b>
      */
+    @Deprecated
     JwtParser requireId(String id);
 
     /**
@@ -50,7 +58,12 @@ public interface JwtParser {
      * @return the parser for method chaining.
      * @see MissingClaimException
      * @see IncorrectClaimException
+     * @deprecated see {@link JwtParserBuilder#requireSubject(String)}.
+     * To construct a JwtParser use the corresponding builder via {@link Jwts#parserBuilder()}. This will construct an
+     * immutable JwtParser.
+     * <p><b>NOTE: this method will be removed before version 1.0</b>
      */
+    @Deprecated
     JwtParser requireSubject(String subject);
 
     /**
@@ -62,7 +75,12 @@ public interface JwtParser {
      * @return the parser for method chaining.
      * @see MissingClaimException
      * @see IncorrectClaimException
+     * @deprecated see {@link JwtParserBuilder#requireAudience(String)}.
+     * To construct a JwtParser use the corresponding builder via {@link Jwts#parserBuilder()}. This will construct an
+     * immutable JwtParser.
+     * <p><b>NOTE: this method will be removed before version 1.0</b>
      */
+    @Deprecated
     JwtParser requireAudience(String audience);
 
     /**
@@ -74,7 +92,12 @@ public interface JwtParser {
      * @return the parser for method chaining.
      * @see MissingClaimException
      * @see IncorrectClaimException
+     * @deprecated see {@link JwtParserBuilder#requireIssuer(String)}.
+     * To construct a JwtParser use the corresponding builder via {@link Jwts#parserBuilder()}. This will construct an
+     * immutable JwtParser.
+     * <p><b>NOTE: this method will be removed before version 1.0</b>
      */
+    @Deprecated
     JwtParser requireIssuer(String issuer);
 
     /**
@@ -86,7 +109,12 @@ public interface JwtParser {
      * @return the parser for method chaining.
      * @see MissingClaimException
      * @see IncorrectClaimException
+     * @deprecated see {@link JwtParserBuilder#requireIssuedAt(Date)}.
+     * To construct a JwtParser use the corresponding builder via {@link Jwts#parserBuilder()}. This will construct an
+     * immutable JwtParser.
+     * <p><b>NOTE: this method will be removed before version 1.0</b>
      */
+    @Deprecated
     JwtParser requireIssuedAt(Date issuedAt);
 
     /**
@@ -98,7 +126,12 @@ public interface JwtParser {
      * @return the parser for method chaining.
      * @see MissingClaimException
      * @see IncorrectClaimException
+     * @deprecated see {@link JwtParserBuilder#requireExpiration(Date)}.
+     * To construct a JwtParser use the corresponding builder via {@link Jwts#parserBuilder()}. This will construct an
+     * immutable JwtParser.
+     * <p><b>NOTE: this method will be removed before version 1.0</b>
      */
+    @Deprecated
     JwtParser requireExpiration(Date expiration);
 
     /**
@@ -110,7 +143,12 @@ public interface JwtParser {
      * @return the parser for method chaining
      * @see MissingClaimException
      * @see IncorrectClaimException
+     * @deprecated see {@link JwtParserBuilder#requireNotBefore(Date)}.
+     * To construct a JwtParser use the corresponding builder via {@link Jwts#parserBuilder()}. This will construct an
+     * immutable JwtParser.
+     * <p><b>NOTE: this method will be removed before version 1.0</b>
      */
+    @Deprecated
     JwtParser requireNotBefore(Date notBefore);
 
     /**
@@ -123,17 +161,27 @@ public interface JwtParser {
      * @return the parser for method chaining.
      * @see MissingClaimException
      * @see IncorrectClaimException
+     * @deprecated see {@link JwtParserBuilder#require(String, Object)}.
+     * To construct a JwtParser use the corresponding builder via {@link Jwts#parserBuilder()}. This will construct an
+     * immutable JwtParser.
+     * <p><b>NOTE: this method will be removed before version 1.0</b>
      */
+    @Deprecated
     JwtParser require(String claimName, Object value);
 
     /**
      * Sets the {@link Clock} that determines the timestamp to use when validating the parsed JWT.
-     * The parser uses a {@link DefaultClock DefaultClock} instance by default.
+     * The parser uses a default Clock implementation that simply returns {@code new Date()} when called.
      *
      * @param clock a {@code Clock} object to return the timestamp to use when validating the parsed JWT.
      * @return the parser for method chaining.
      * @since 0.7.0
+     * @deprecated see {@link JwtParserBuilder#setClock(Clock)}.
+     * To construct a JwtParser use the corresponding builder via {@link Jwts#parserBuilder()}. This will construct an
+     * immutable JwtParser.
+     * <p><b>NOTE: this method will be removed before version 1.0</b>
      */
+    @Deprecated
     JwtParser setClock(Clock clock);
 
     /**
@@ -143,8 +191,15 @@ public interface JwtParser {
      * @param seconds the number of seconds to tolerate for clock skew when verifying {@code exp} or {@code nbf} claims.
      * @return the parser for method chaining.
      * @since 0.7.0
+     * @throws IllegalArgumentException if {@code seconds} is a value greater than {@code Long.MAX_VALUE / 1000} as
+     * any such value would cause numeric overflow when multiplying by 1000 to obtain a millisecond value.
+     * @deprecated see {@link JwtParserBuilder#setAllowedClockSkewSeconds(long)}.
+     * To construct a JwtParser use the corresponding builder via {@link Jwts#parserBuilder()}. This will construct an
+     * immutable JwtParser.
+     * <p><b>NOTE: this method will be removed before version 1.0</b>
      */
-    JwtParser setAllowedClockSkewSeconds(long seconds);
+    @Deprecated
+    JwtParser setAllowedClockSkewSeconds(long seconds) throws IllegalArgumentException;
 
     /**
      * Sets the signing key used to verify any discovered JWS digital signature.  If the specified JWT string is not
@@ -158,26 +213,59 @@ public interface JwtParser {
      * @param key the algorithm-specific signature verification key used to validate any discovered JWS digital
      *            signature.
      * @return the parser for method chaining.
+     * @deprecated see {@link JwtParserBuilder#setSigningKey(byte[])}.
+     * To construct a JwtParser use the corresponding builder via {@link Jwts#parserBuilder()}. This will construct an
+     * immutable JwtParser.
+     * <p><b>NOTE: this method will be removed before version 1.0</b>
      */
+    @Deprecated
     JwtParser setSigningKey(byte[] key);
 
     /**
      * Sets the signing key used to verify any discovered JWS digital signature.  If the specified JWT string is not
      * a JWS (no signature), this key is not used.
-     * <p>
+     *
      * <p>Note that this key <em>MUST</em> be a valid key for the signature algorithm found in the JWT header
      * (as the {@code alg} header parameter).</p>
-     * <p>
+     *
      * <p>This method overwrites any previously set key.</p>
-     * <p>
+     *
      * <p>This is a convenience method: the string argument is first BASE64-decoded to a byte array and this resulting
      * byte array is used to invoke {@link #setSigningKey(byte[])}.</p>
      *
-     * @param base64EncodedKeyBytes the BASE64-encoded algorithm-specific signature verification key to use to validate
-     *                              any discovered JWS digital signature.
+     * <h4>Deprecation Notice: Deprecated as of 0.10.0, will be removed in 1.0.0</h4>
+     *
+     * <p>This method has been deprecated because the {@code key} argument for this method can be confusing: keys for
+     * cryptographic operations are always binary (byte arrays), and many people were confused as to how bytes were
+     * obtained from the String argument.</p>
+     *
+     * <p>This method always expected a String argument that was effectively the same as the result of the following
+     * (pseudocode):</p>
+     *
+     * <p>{@code String base64EncodedSecretKey = base64Encode(secretKeyBytes);}</p>
+     *
+     * <p>However, a non-trivial number of JJWT users were confused by the method signature and attempted to
+     * use raw password strings as the key argument - for example {@code setSigningKey(myPassword)} - which is
+     * almost always incorrect for cryptographic hashes and can produce erroneous or insecure results.</p>
+     *
+     * <p>See this
+     * <a href="https://stackoverflow.com/questions/40252903/static-secret-as-byte-key-or-string/40274325#40274325">
+     * StackOverflow answer</a> explaining why raw (non-base64-encoded) strings are almost always incorrect for
+     * signature operations.</p>
+     *
+     * <p>Finally, please use the {@link #setSigningKey(Key) setSigningKey(Key)} instead, as this method and the
+     * {@code byte[]} variant will be removed before the 1.0.0 release.</p>
+     *
+     * @param base64EncodedSecretKey the BASE64-encoded algorithm-specific signature verification key to use to validate
+     *                               any discovered JWS digital signature.
      * @return the parser for method chaining.
+     * @deprecated see {@link JwtParserBuilder#setSigningKey(String)}.
+     * To construct a JwtParser use the corresponding builder via {@link Jwts#parserBuilder()}. This will construct an
+     * immutable JwtParser.
+     * <p><b>NOTE: this method will be removed before version 1.0</b>
      */
-    JwtParser setSigningKey(String base64EncodedKeyBytes);
+    @Deprecated
+    JwtParser setSigningKey(String base64EncodedSecretKey);
 
     /**
      * Sets the signing key used to verify any discovered JWS digital signature.  If the specified JWT string is not
@@ -191,7 +279,12 @@ public interface JwtParser {
      * @param key the algorithm-specific signature verification key to use to validate any discovered JWS digital
      *            signature.
      * @return the parser for method chaining.
+     * @deprecated see {@link JwtParserBuilder#setSigningKey(Key)}.
+     * To construct a JwtParser use the corresponding builder via {@link Jwts#parserBuilder()}. This will construct an
+     * immutable JwtParser.
+     * <p><b>NOTE: this method will be removed before version 1.0</b>
      */
+    @Deprecated
     JwtParser setSigningKey(Key key);
 
     /**
@@ -221,7 +314,12 @@ public interface JwtParser {
      * @param signingKeyResolver the signing key resolver used to retrieve the signing key.
      * @return the parser for method chaining.
      * @since 0.4
+     * @deprecated see {@link JwtParserBuilder#setSigningKeyResolver(SigningKeyResolver)}.
+     * To construct a JwtParser use the corresponding builder via {@link Jwts#parserBuilder()}. This will construct an
+     * immutable JwtParser.
+     * <p><b>NOTE: this method will be removed before version 1.0</b>
      */
+    @Deprecated
     JwtParser setSigningKeyResolver(SigningKeyResolver signingKeyResolver);
 
     /**
@@ -233,8 +331,8 @@ public interface JwtParser {
      * the same behavior.</p>
      * <h3>Default Support</h3>
      * <p>JJWT's default {@link JwtParser} implementation supports both the
-     * {@link io.jsonwebtoken.impl.compression.DeflateCompressionCodec DEFLATE}
-     * and {@link io.jsonwebtoken.impl.compression.GzipCompressionCodec GZIP} algorithms by default - you do not need to
+     * {@link CompressionCodecs#DEFLATE DEFLATE}
+     * and {@link CompressionCodecs#GZIP GZIP} algorithms by default - you do not need to
      * specify a {@code CompressionCodecResolver} in these cases.</p>
      * <p>However, if you want to use a compression algorithm other than {@code DEF} or {@code GZIP}, you must implement
      * your own {@link CompressionCodecResolver} and specify that via this method and also when
@@ -243,8 +341,51 @@ public interface JwtParser {
      * @param compressionCodecResolver the compression codec resolver used to decompress the JWT body.
      * @return the parser for method chaining.
      * @since 0.6.0
+     * @deprecated see {@link JwtParserBuilder#setCompressionCodecResolver(CompressionCodecResolver)}.
+     * To construct a JwtParser use the corresponding builder via {@link Jwts#parserBuilder()}. This will construct an
+     * immutable JwtParser.
+     * <p><b>NOTE: this method will be removed before version 1.0</b>
      */
+    @Deprecated
     JwtParser setCompressionCodecResolver(CompressionCodecResolver compressionCodecResolver);
+
+    /**
+     * Perform Base64Url decoding with the specified Decoder
+     *
+     * <p>JJWT uses a spec-compliant decoder that works on all supported JDK versions, but you may call this method
+     * to specify a different decoder if you desire.</p>
+     *
+     * @param base64UrlDecoder the decoder to use when Base64Url-decoding
+     * @return the parser for method chaining.
+     * @since 0.10.0
+     * @deprecated see {@link JwtParserBuilder#base64UrlDecodeWith(Decoder)}.
+     * To construct a JwtParser use the corresponding builder via {@link Jwts#parserBuilder()}. This will construct an
+     * immutable JwtParser.
+     * <p><b>NOTE: this method will be removed before version 1.0</b>
+     */
+    @Deprecated
+    JwtParser base64UrlDecodeWith(Decoder<String, byte[]> base64UrlDecoder);
+
+    /**
+     * Uses the specified deserializer to convert JSON Strings (UTF-8 byte arrays) into Java Map objects.  This is
+     * used by the parser after Base64Url-decoding to convert JWT/JWS/JWT JSON headers and claims into Java Map
+     * objects.
+     *
+     * <p>If this method is not called, JJWT will use whatever deserializer it can find at runtime, checking for the
+     * presence of well-known implementations such Jackson, Gson, and org.json.  If one of these is not found
+     * in the runtime classpath, an exception will be thrown when one of the various {@code parse}* methods is
+     * invoked.</p>
+     *
+     * @param deserializer the deserializer to use when converting JSON Strings (UTF-8 byte arrays) into Map objects.
+     * @return the parser for method chaining.
+     * @since 0.10.0
+     * @deprecated see {@link JwtParserBuilder#deserializeJsonWith(Deserializer)} )}.
+     * To construct a JwtParser use the corresponding builder via {@link Jwts#parserBuilder()}. This will construct an
+     * immutable JwtParser.
+     * <p><b>NOTE: this method will be removed before version 1.0</b>
+     */
+    @Deprecated
+    JwtParser deserializeJsonWith(Deserializer<Map<String,?>> deserializer);
 
     /**
      * Returns {@code true} if the specified JWT compact string represents a signed JWT (aka a 'JWS'), {@code false}
@@ -333,7 +474,7 @@ public interface JwtParser {
      * @since 0.2
      */
     <T> T parse(String jwt, JwtHandler<T> handler)
-            throws ExpiredJwtException, UnsupportedJwtException, MalformedJwtException, SignatureException, IllegalArgumentException;
+        throws ExpiredJwtException, UnsupportedJwtException, MalformedJwtException, SignatureException, IllegalArgumentException;
 
     /**
      * Parses the specified compact serialized JWT string based on the builder's current configuration state and
@@ -363,7 +504,7 @@ public interface JwtParser {
      * @since 0.2
      */
     Jwt<Header, String> parsePlaintextJwt(String plaintextJwt)
-            throws UnsupportedJwtException, MalformedJwtException, SignatureException, IllegalArgumentException;
+        throws UnsupportedJwtException, MalformedJwtException, SignatureException, IllegalArgumentException;
 
     /**
      * Parses the specified compact serialized JWT string based on the builder's current configuration state and
@@ -394,7 +535,7 @@ public interface JwtParser {
      * @since 0.2
      */
     Jwt<Header, Claims> parseClaimsJwt(String claimsJwt)
-            throws ExpiredJwtException, UnsupportedJwtException, MalformedJwtException, SignatureException, IllegalArgumentException;
+        throws ExpiredJwtException, UnsupportedJwtException, MalformedJwtException, SignatureException, IllegalArgumentException;
 
     /**
      * Parses the specified compact serialized JWS string based on the builder's current configuration state and
@@ -422,7 +563,7 @@ public interface JwtParser {
      * @since 0.2
      */
     Jws<String> parsePlaintextJws(String plaintextJws)
-            throws UnsupportedJwtException, MalformedJwtException, SignatureException, IllegalArgumentException;
+        throws UnsupportedJwtException, MalformedJwtException, SignatureException, IllegalArgumentException;
 
     /**
      * Parses the specified compact serialized JWS string based on the builder's current configuration state and
@@ -451,5 +592,5 @@ public interface JwtParser {
      * @since 0.2
      */
     Jws<Claims> parseClaimsJws(String claimsJws)
-            throws ExpiredJwtException, UnsupportedJwtException, MalformedJwtException, SignatureException, IllegalArgumentException;
+        throws ExpiredJwtException, UnsupportedJwtException, MalformedJwtException, SignatureException, IllegalArgumentException;
 }

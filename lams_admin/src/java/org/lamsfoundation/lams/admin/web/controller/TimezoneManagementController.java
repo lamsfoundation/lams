@@ -23,22 +23,15 @@
 package org.lamsfoundation.lams.admin.web.controller;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.TimeZone;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.lamsfoundation.lams.admin.web.form.TimezoneForm;
 import org.lamsfoundation.lams.timezone.Timezone;
 import org.lamsfoundation.lams.timezone.dto.TimezoneDTO;
 import org.lamsfoundation.lams.timezone.service.ITimezoneService;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Implements time zone manager.
@@ -53,72 +46,30 @@ public class TimezoneManagementController {
     private ITimezoneService timezoneService;
 
     /**
-     * Displays list of all JRE available timezones.
-     */
-    @RequestMapping("/start")
-    public String unspecified(@ModelAttribute TimezoneForm timezoneForm, HttpServletRequest request) throws Exception {
-	List<Timezone> defaultTimezones = timezoneService.getDefaultTimezones();
-
-	ArrayList<TimezoneDTO> timezoneDtos = new ArrayList<>();
-	for (String availableTimezoneId : TimeZone.getAvailableIDs()) {
-	    boolean isSelected = defaultTimezones.contains(new Timezone(availableTimezoneId));
-	    TimeZone timeZone = TimeZone.getTimeZone(availableTimezoneId);
-	    TimezoneDTO timezoneDto = TimezoneDTO.createTimezoneDTO(timeZone, isSelected);
-	    timezoneDtos.add(timezoneDto);
-	}
-
-	request.setAttribute("timezoneDtos", timezoneDtos);
-	request.setAttribute("serverTimezone", timezoneService.getServerTimezone().getTimezoneId());
-
-	return "timezoneManagement";
-    }
-
-    /**
-     * Makes selected timezones default ones.
-     */
-    @RequestMapping(path = "/save", method = RequestMethod.POST)
-    public String save(@ModelAttribute TimezoneForm timezoneForm, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-	String[] selectedTimezoneIds = timezoneForm.getSelected();
-
-	List<Timezone> selectedTimezones = new ArrayList<>();
-	for (String selectedTimezoneId : selectedTimezoneIds) {
-	    selectedTimezones.add(new Timezone(selectedTimezoneId));
-	}
-	timezoneService.updateTimezones(selectedTimezones);
-
-	return "redirect:/sysadminstart.do";
-    }
-
-    /**
      * Shows page where admin can choose server timezone.
      */
-    @RequestMapping(path = "/serverTimezoneManagement")
-    public String serverTimezoneManagement(@ModelAttribute TimezoneForm timezoneForm, HttpServletRequest request)
-	    throws Exception {
+    @RequestMapping(path = "/start")
+    public String serverTimezoneManagement(Model model) throws Exception {
 	ArrayList<TimezoneDTO> timezoneDtos = new ArrayList<>();
-	for (String availableTimezoneId : TimeZone.getAvailableIDs()) {
-	    TimeZone timeZone = TimeZone.getTimeZone(availableTimezoneId);
-	    TimezoneDTO timezoneDto = TimezoneDTO.createTimezoneDTO(timeZone, false);
+
+	for (Timezone timeZone : timezoneService.getDefaultTimezones()) {
+	    TimezoneDTO timezoneDto = TimezoneDTO.createTimezoneDTO(timeZone);
 	    timezoneDtos.add(timezoneDto);
 	}
 
-	request.setAttribute("timezoneDtos", timezoneDtos);
-	request.setAttribute("serverTimezone", timezoneService.getServerTimezone().getTimezoneId());
+	model.addAttribute("timezoneDtos", timezoneDtos);
+	model.addAttribute("serverTimezone", timezoneService.getServerTimezone().getTimezoneId());
 
-	return "timezoneServerManagement";
+	return "timezoneManagement";
     }
 
     /**
      * Changes server timezone with the one selected by user.
      */
     @RequestMapping(path = "/changeServerTimezone")
-    public String changeServerTimezone(@ModelAttribute TimezoneForm timezoneForm, HttpServletRequest request)
-	    throws Exception {
-	String timeZoneId = WebUtil.readStrParam(request, "timeZoneId");
-	timezoneService.setServerTimezone(timeZoneId);
+    public String changeServerTimezone(@RequestParam String serverTimezone) throws Exception {
+	timezoneService.setServerTimezone(serverTimezone);
 
-	return unspecified(timezoneForm, request);
+	return "forward:start.do?saved=true";
     }
-
 }

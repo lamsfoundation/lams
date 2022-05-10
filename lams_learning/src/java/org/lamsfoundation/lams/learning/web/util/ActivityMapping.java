@@ -27,15 +27,14 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.lamsfoundation.lams.learning.service.ILearnerFullService;
+import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.controller.DisplayActivityController;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.util.LessonUtil;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -191,7 +190,15 @@ public class ActivityMapping implements Serializable {
 	activityURL.setStatus(status);
 	if (status == LearnerProgress.ACTIVITY_COMPLETED) {
 	    activityURL.setComplete(true);
+
+	    Long duration = LessonUtil.getActivityDuration(learnerProgress, activity);
+	    activityURL.setDuration(duration);
 	}
+
+	if (StringUtils.isNotBlank(activity.getLibraryActivityUiImage())) {
+	    activityURL.setIconURL(activity.getLibraryActivityUiImage());
+	}
+
 	activityURL.setFloating(isFloating);
 	activityURL.setDefaultURL(defaultURL);
 	return activityURL;

@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -687,6 +688,8 @@ public class LearningController {
 	    }
 	}
 
+	messageForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
+
 	// Should we show the reflection or not? We shouldn't show it when the View Forum screen is accessed
 	// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.
 	// Need to constantly past this value on, rather than hiding just the once, as the View Forum
@@ -715,7 +718,7 @@ public class LearningController {
 
     /**
      * In case validation was successful, we store message and return JSON object back to HTML
-     * 
+     *
      * @throws ServletException
      */
     @RequestMapping("/replyTopicJSON")
@@ -839,7 +842,7 @@ public class LearningController {
 
     /**
      * In case validation was successful, we store message and return JSON object back to HTML
-     * 
+     *
      * @throws ServletException
      */
     @RequestMapping("/updateTopicJSON")
@@ -902,7 +905,7 @@ public class LearningController {
     public String updateMessageHideFlag(HttpServletRequest request) {
 
 	Long msgId = new Long(WebUtil.readLongParam(request, ForumConstants.ATTR_TOPIC_ID));
-	Boolean hideFlag = new Boolean(WebUtil.readBooleanParam(request, "hideFlag"));
+	boolean hideFlag = WebUtil.readBooleanParam(request, "hideFlag");
 
 	// TODO Skipping permissions for now, currently having issues with default learning designs not having an
 	// create_by field
@@ -917,7 +920,7 @@ public class LearningController {
 
 	// we should be looking at whether a user is a teacher and more specifically staff
 	// if (currentUser.getUserId().equals(forumCreatedBy.getUserId())) {
-	forumService.updateMessageHideFlag(msgId, hideFlag.booleanValue());
+	forumService.updateMessageHideFlag(msgId, hideFlag);
 	// } else {
 	// log.info(currentUser + "does not have permission to hide/show postings in forum: " + forum.getUid());
 	// log.info("Forum created by :" + forumCreatedBy.getUid() + ", Current User is: " + currentUser.getUid());
@@ -1077,7 +1080,7 @@ public class LearningController {
 
     private void setAttachment(MessageForm messageForm, Message message) throws ServletException {
 	// update attachment
-	if (!messageForm.isHasAttachment()) {
+	if (!messageForm.isHasAttachment() && StringUtils.isNotBlank(messageForm.getTmpFileUploadId())) {
 	    Set<Attachment> attSet = message.getAttachments();
 	    attSet.clear();
 

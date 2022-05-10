@@ -78,7 +78,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									<fmt:message key="label.reschedule"/>
 								</a>
 								<%-- padding keeps the inputs the same height as the buttons. No flicking when shown/hidden --%>
-								<form:input cssClass="input input-sm" path="scheduleDate" id="scheduleDate" style="vertical-align:bottom"/> 
+								<form:input cssClass="input input-sm" path="scheduleDate" id="scheduleDate" style="vertical-align:bottom" autocomplete="nope" /> 
 								<input type="submit" id="scheduleDatetimeApply" class="btn btn-primary btn-sm loffset2" value="<fmt:message key="button.apply"/>" />
 							</div>
 						</form:form>

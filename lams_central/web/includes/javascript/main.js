@@ -291,16 +291,15 @@ function makeSortable(element) {
 
 
 function showMonitorLessonDialog(lessonID) {
-
 	var id = "dialogMonitorLesson" + lessonID,
-		dialog = showDialog(id, {
+	    dialog = showDialog(id, {
 			'data' : {
 				'isMonitorDialog' : true,
 				'lessonID' : lessonID
 			},
 			'autoOpen' : false,
-			'height': Math.max(380, Math.min(800, $(window).height() - 30)),
-			'width' : Math.max(380, Math.min(1024, $(window).width() - 60)),
+			'height': Math.max(380, Math.min(monitor_height, $(window).height() - 30)),
+			'width' : Math.max(380, Math.min(monitor_width, $(window).width() - 60)),
 			'title' : LABELS.MONITORING_TITLE,
 			'open' : function() {
 				// load contents after opening the dialog
@@ -309,15 +308,15 @@ function showMonitorLessonDialog(lessonID) {
 					+ $(this).data('lessonID'),
 					'id' : 'monitorModal'});
 			},
-
-		}, true, true);
 	
+		}, true, true);
+		
+
+		
 	// if it was just created
 	if (dialog) {
 		// tell the dialog contents that it was resized
 		$('.modal-content', dialog).on('resizestop', resizeSequenceCanvas);
-		// initial resize
-		$('iframe', dialog).on('load', resizeSequenceCanvas);
 		
 		dialog.modal('show');
 	}
@@ -327,10 +326,12 @@ function showMonitorLessonDialog(lessonID) {
  * Adjust the position of LD SVG in Monitoring.
  */
 function resizeSequenceCanvas(){
-	$('div[id^="dialogMonitorLesson"] iframe').each(function(){
-		var win = this.contentWindow || this.contentDocument;
+	$('div[id^="dialogMonitorLesson"]').each(function(){
+		var iframe = $('iframe', this)[0], 
+			win = iframe.contentWindow || iframe.contentDocument;
 		if (win.resizeSequenceCanvas) {
-			var body = $(this).closest('.modal-body');
+			// find out the size of content area in the monitoring modal
+			var body = $(this).find('.modal-body');
 			win.resizeSequenceCanvas(body.width(), body.height());
 		}
 	});
@@ -494,7 +495,7 @@ function showGradebookCourseDialog(orgID){
 		'width' : Math.max(380, Math.min(955, $(window).width() - 60)),
 		'title' : LABELS.GRADEBOOK_COURSE_TITLE,
 		'open' : function() {
-			console.log("width "+$(window).width()+":"+Math.max(380, Math.min(955, $(window).width() - 60)));
+			// console.log("width "+$(window).width()+":"+Math.max(380, Math.min(955, $(window).width() - 60)));
 			// load contents after opening the dialog
 			$('iframe', this).attr({'src': LAMS_URL
 				+ 'gradebook/gradebookMonitoring/courseMonitor.do?organisationID=' + orgID,

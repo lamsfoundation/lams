@@ -17,20 +17,35 @@
 
 package org.apache.poi.hssf.usermodel;
 
-import org.apache.poi.ddf.*;
-import org.apache.poi.hssf.record.*;
-
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
+
+import org.apache.poi.ddf.DefaultEscherRecordFactory;
+import org.apache.poi.ddf.EscherBoolProperty;
+import org.apache.poi.ddf.EscherChildAnchorRecord;
+import org.apache.poi.ddf.EscherClientAnchorRecord;
+import org.apache.poi.ddf.EscherClientDataRecord;
+import org.apache.poi.ddf.EscherContainerRecord;
+import org.apache.poi.ddf.EscherOptRecord;
+import org.apache.poi.ddf.EscherPropertyTypes;
+import org.apache.poi.ddf.EscherRecord;
+import org.apache.poi.ddf.EscherRecordTypes;
+import org.apache.poi.ddf.EscherSpRecord;
+import org.apache.poi.ddf.EscherSpgrRecord;
+import org.apache.poi.hssf.record.CommonObjectDataSubRecord;
+import org.apache.poi.hssf.record.EndSubRecord;
+import org.apache.poi.hssf.record.EscherAggregate;
+import org.apache.poi.hssf.record.GroupMarkerSubRecord;
+import org.apache.poi.hssf.record.ObjRecord;
 
 /**
  * A shape group may contain other shapes.  It was no actual form on the
  * sheet.
  */
 public class HSSFShapeGroup extends HSSFShape implements HSSFShapeContainer {
-    private final List<HSSFShape> shapes = new ArrayList<HSSFShape>();
+    private final List<HSSFShape> shapes = new ArrayList<>();
     private EscherSpgrRecord _spgrRecord;
 
     public HSSFShapeGroup(EscherContainerRecord spgrContainer, ObjRecord objRecord) {
@@ -40,13 +55,13 @@ public class HSSFShapeGroup extends HSSFShape implements HSSFShapeContainer {
         EscherContainerRecord spContainer = spgrContainer.getChildContainers().get(0);
         _spgrRecord = (EscherSpgrRecord) spContainer.getChild(0);
         for (EscherRecord ch : spContainer.getChildRecords()) {
-            switch (ch.getRecordId()) {
-                case EscherSpgrRecord.RECORD_ID:
+            switch (EscherRecordTypes.forTypeID(ch.getRecordId())) {
+                case SPGR:
                     break;
-                case EscherClientAnchorRecord.RECORD_ID:
+                case CLIENT_ANCHOR:
                     anchor = new HSSFClientAnchor((EscherClientAnchorRecord) ch);
                     break;
-                case EscherChildAnchorRecord.RECORD_ID:
+                case CHILD_ANCHOR:
                     anchor = new HSSFChildAnchor((EscherChildAnchorRecord) ch);
                     break;
                 default:
@@ -89,8 +104,8 @@ public class HSSFShapeGroup extends HSSFShape implements HSSFShapeContainer {
         }
         opt.setRecordId(EscherOptRecord.RECORD_ID);
         opt.setOptions((short) 0x0023);
-        opt.addEscherProperty(new EscherBoolProperty(EscherProperties.PROTECTION__LOCKAGAINSTGROUPING, 0x00040004));
-        opt.addEscherProperty(new EscherBoolProperty(EscherProperties.GROUPSHAPE__PRINT, 0x00080000));
+        opt.addEscherProperty(new EscherBoolProperty(EscherPropertyTypes.PROTECTION__LOCKAGAINSTGROUPING, 0x00040004));
+        opt.addEscherProperty(new EscherBoolProperty(EscherPropertyTypes.GROUPSHAPE__FLAGS, 0x00080000));
 
         anchor = getAnchor().getEscherAnchor();
         clientData.setRecordId(EscherClientDataRecord.RECORD_ID);
@@ -268,7 +283,7 @@ public class HSSFShapeGroup extends HSSFShape implements HSSFShapeContainer {
     }
 
     public void clear() {
-        ArrayList <HSSFShape> copy = new ArrayList<HSSFShape>(shapes);
+        ArrayList <HSSFShape> copy = new ArrayList<>(shapes);
         for (HSSFShape shape: copy){
             removeShape(shape);
         }
@@ -307,8 +322,7 @@ public class HSSFShapeGroup extends HSSFShape implements HSSFShapeContainer {
      */
     public int countOfAllChildren() {
         int count = shapes.size();
-        for (Iterator<HSSFShape> iterator = shapes.iterator(); iterator.hasNext(); ) {
-            HSSFShape shape = iterator.next();
+        for (HSSFShape shape : shapes) {
             count += shape.countOfAllChildren();
         }
         return count;

@@ -24,7 +24,21 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.poi.hssf.model.RecordStream;
-import org.apache.poi.hssf.record.*;
+import org.apache.poi.hssf.record.ArrayRecord;
+import org.apache.poi.hssf.record.CellValueRecordInterface;
+import org.apache.poi.hssf.record.ContinueRecord;
+import org.apache.poi.hssf.record.DBCellRecord;
+import org.apache.poi.hssf.record.DConRefRecord;
+import org.apache.poi.hssf.record.DimensionsRecord;
+import org.apache.poi.hssf.record.FormulaRecord;
+import org.apache.poi.hssf.record.IndexRecord;
+import org.apache.poi.hssf.record.MergeCellsRecord;
+import org.apache.poi.hssf.record.MulBlankRecord;
+import org.apache.poi.hssf.record.Record;
+import org.apache.poi.hssf.record.RowRecord;
+import org.apache.poi.hssf.record.SharedFormulaRecord;
+import org.apache.poi.hssf.record.TableRecord;
+import org.apache.poi.hssf.record.UnknownRecord;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.formula.FormulaShifter;
 
@@ -38,12 +52,12 @@ public final class RowRecordsAggregate extends RecordAggregate {
     private int _lastrow  = -1;
     private final Map<Integer, RowRecord> _rowRecords;
     private final ValueRecordsAggregate _valuesAgg;
-    private final List<Record> _unknownRecords;
+    private final List<org.apache.poi.hssf.record.Record> _unknownRecords;
     private final SharedValueManager _sharedValueManager;
 
     // Cache values to speed up performance of
     // getStartRowNumberForBlock / getEndRowNumberForBlock, see Bugzilla 47405
-    private RowRecord[] _rowRecordValues = null;
+    private RowRecord[] _rowRecordValues;
 
     /** Creates a new instance of ValueRecordsAggregate */
     public RowRecordsAggregate() {
@@ -53,9 +67,9 @@ public final class RowRecordsAggregate extends RecordAggregate {
         if (svm == null) {
             throw new IllegalArgumentException("SharedValueManager must be provided.");
         }
-        _rowRecords = new TreeMap<Integer, RowRecord>();
+        _rowRecords = new TreeMap<>();
         _valuesAgg = new ValueRecordsAggregate();
-        _unknownRecords = new ArrayList<Record>();
+        _unknownRecords = new ArrayList<>();
         _sharedValueManager = svm;
     }
 
@@ -102,7 +116,7 @@ public final class RowRecordsAggregate extends RecordAggregate {
     /**
      * Handles UnknownRecords which appear within the row/cell records
      */
-    private void addUnknownRecord(Record rec) {
+    private void addUnknownRecord(org.apache.poi.hssf.record.Record rec) {
         // ony a few distinct record IDs are encountered by the existing POI test cases:
         // 0x1065 // many
         // 0x01C2 // several
@@ -116,7 +130,7 @@ public final class RowRecordsAggregate extends RecordAggregate {
         // Integer integer = Integer.valueOf(row.getRowNumber());
         _rowRecords.put(Integer.valueOf(row.getRowNumber()), row);
         // Clear the cached values
-        _rowRecordValues = null; 
+        _rowRecordValues = null;
         if ((row.getRowNumber() < _firstrow) || (_firstrow == -1)) {
             _firstrow = row.getRowNumber();
         }
@@ -137,7 +151,7 @@ public final class RowRecordsAggregate extends RecordAggregate {
             _rowRecords.put(key, rr);
             throw new RuntimeException("Attempt to remove row that does not belong to this sheet");
         }
-        
+
         // Clear the cached values
         _rowRecordValues = null;
     }
@@ -195,7 +209,7 @@ public final class RowRecordsAggregate extends RecordAggregate {
         int startIndex = block * DBCellRecord.BLOCK_SIZE;
 
         if (_rowRecordValues == null) {
-            _rowRecordValues = _rowRecords.values().toArray(new RowRecord[_rowRecords.size()]);
+            _rowRecordValues = _rowRecords.values().toArray(new RowRecord[0]);
         }
 
         try {
@@ -212,7 +226,7 @@ public final class RowRecordsAggregate extends RecordAggregate {
             endIndex = _rowRecords.size()-1;
 
         if (_rowRecordValues == null){
-            _rowRecordValues = _rowRecords.values().toArray(new RowRecord[_rowRecords.size()]);
+            _rowRecordValues = _rowRecords.values().toArray(new RowRecord[0]);
         }
 
         try {
@@ -260,7 +274,9 @@ public final class RowRecordsAggregate extends RecordAggregate {
             // Serialize a block of cells for those rows
             final int startRowNumber = getStartRowNumberForBlock(blockIndex);
             final int endRowNumber = getEndRowNumberForBlock(blockIndex);
-            DBCellRecord.Builder dbcrBuilder = new DBCellRecord.Builder();
+
+            final List<Short> cellOffsets = new ArrayList<>();
+
             // Note: Cell references start from the second row...
             int cellRefOffset = (rowBlockSize - RowRecord.ENCODED_SIZE);
             for (int row = startRowNumber; row <= endRowNumber; row++) {
@@ -271,17 +287,25 @@ public final class RowRecordsAggregate extends RecordAggregate {
                     pos += rowCellSize;
                     // Add the offset to the first cell for the row into the
                     // DBCellRecord.
-                    dbcrBuilder.addCellOffset(cellRefOffset);
+                    cellOffsets.add((short)cellRefOffset);
                     cellRefOffset = rowCellSize;
                 }
             }
             // Calculate Offset from the start of a DBCellRecord to the first Row
-            rv.visitRecord(dbcrBuilder.build(pos));
+            rv.visitRecord(new DBCellRecord(pos, shortListToArray(cellOffsets)));
         }
-        for (Record _unknownRecord : _unknownRecords) {
-            // Potentially breaking the file here since we don't know exactly where to write these records
-            rv.visitRecord(_unknownRecord);
+
+        // Potentially breaking the file here since we don't know exactly where to write these records
+        _unknownRecords.forEach(rv::visitRecord);
+    }
+
+    private static short[] shortListToArray(List<Short> list) {
+        final short[] arr = new short[list.size()];
+        int idx = 0;
+        for (Short s : list) {
+            arr[idx++] = s;
         }
+        return arr;
     }
 
     public Iterator<RowRecord> getIterator() {
@@ -434,7 +458,7 @@ public final class RowRecordsAggregate extends RecordAggregate {
 
         return startHidden;
     }
-    
+
     /**
      * Returns an iterator for the cell values
      */

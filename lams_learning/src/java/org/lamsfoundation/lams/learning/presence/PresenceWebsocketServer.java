@@ -11,8 +11,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
@@ -278,7 +276,7 @@ public class PresenceWebsocketServer {
      * If there was something wrong with the connection, put it into logs.
      */
     @OnClose
-    public void unregisterUser(Session websocket, CloseReason reason) {
+    public void unregisterUser(Session websocket) {
 	Long lessonId = (Long) websocket.getUserProperties().get(AttributeNames.PARAM_LESSON_ID);
 	Set<Session> lessonWebsockets = PresenceWebsocketServer.websockets.get(lessonId);
 	Iterator<Session> sessionIterator = lessonWebsockets.iterator();
@@ -292,12 +290,7 @@ public class PresenceWebsocketServer {
 
 	if (PresenceWebsocketServer.log.isDebugEnabled()) {
 	    PresenceWebsocketServer.log.debug("User " + websocket.getUserProperties().get(PARAM_NICKNAME)
-		    + " left Presence Chat with lessonId: " + lessonId
-		    + (!(reason.getCloseCode().equals(CloseCodes.GOING_AWAY)
-			    || reason.getCloseCode().equals(CloseCodes.NORMAL_CLOSURE))
-				    ? ". Abnormal close. Code: " + reason.getCloseCode() + ". Reason: "
-					    + reason.getReasonPhrase()
-				    : "(unknown)"));
+		    + " left Presence Chat with lessonId: " + lessonId);
 	}
     }
 

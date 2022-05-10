@@ -48,6 +48,7 @@ import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.ToolBranchingActivity;
+import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.HelpUtil;
 
 /**
@@ -176,6 +177,8 @@ public class AuthoringActivityDTO extends BaseDTO {
 
     private Boolean gateActivityCompletionBased;
 
+    private boolean gateStopAtPrecedingActivity;
+
     private String gatePassword;
 
     private Boolean applyGrouping;
@@ -234,8 +237,6 @@ public class AuthoringActivityDTO extends BaseDTO {
      * List of all the competence mappings for this activity, only applies to tool activities
      */
     private ArrayList<String> competenceMappingTitles;
-
-    private PlannerActivityMetadataDTO plannerMetadataDTO;
 
     /** List of the UIIDs of the activities that are input activities for this activity */
     private Integer toolActivityUIID;
@@ -426,18 +427,15 @@ public class AuthoringActivityDTO extends BaseDTO {
 	    }
 	}
 
-	if (toolActivity.getEvaluation() != null) {
+	ActivityEvaluation eval = (ActivityEvaluation) UserManagementService.getInstance()
+		.findById(ActivityEvaluation.class, toolActivity.getActivityId());
+	if (eval != null) {
 	    evaluation = new ArrayList<>();
-	    ActivityEvaluation eval = toolActivity.getEvaluation();
 	    evaluation.add(eval.getToolOutputDefinition());
 	    if (eval.getWeight() != null) {
 		evaluation.add(String.valueOf(eval.getWeight()));
 	    }
 	}
-
-	plannerMetadataDTO = toolActivity.getPlannerMetadata() == null ? null
-		: new PlannerActivityMetadataDTO(toolActivity.getPlannerMetadata());
-
     }
 
     private void addGateActivityAttributes(Object activity, ArrayList<BranchActivityEntryDTO> branchMappings) {
@@ -451,6 +449,7 @@ public class AuthoringActivityDTO extends BaseDTO {
 	GateActivity gateActivity = (GateActivity) activity;
 	gateActivityLevelID = gateActivity.getGateActivityLevelId();
 	gateOpen = gateActivity.getGateOpen();
+	gateStopAtPrecedingActivity = gateActivity.getGateStopAtPrecedingActivity();
 	adminURL = gateActivity.getSystemTool().getAdminUrl();
     }
 
@@ -576,6 +575,14 @@ public class AuthoringActivityDTO extends BaseDTO {
 
     public void setGateActivityCompletionBased(Boolean gateActivityCompletionBased) {
 	this.gateActivityCompletionBased = gateActivityCompletionBased;
+    }
+
+    public boolean isGateStopAtPrecedingActivity() {
+	return gateStopAtPrecedingActivity;
+    }
+
+    public void setGateStopAtPrecedingActivity(boolean gateStopAtPrecedingActivity) {
+	this.gateStopAtPrecedingActivity = gateStopAtPrecedingActivity;
     }
 
     public String getGatePassword() {
@@ -1236,13 +1243,5 @@ public class AuthoringActivityDTO extends BaseDTO {
 
     public void setEvaluation(List<String> evaluation) {
 	this.evaluation = evaluation;
-    }
-
-    public PlannerActivityMetadataDTO getPlannerMetadataDTO() {
-	return plannerMetadataDTO;
-    }
-
-    public void setPlannerMetadataDTO(PlannerActivityMetadataDTO plannerActivityMetadata) {
-	this.plannerMetadataDTO = plannerActivityMetadata;
     }
 }

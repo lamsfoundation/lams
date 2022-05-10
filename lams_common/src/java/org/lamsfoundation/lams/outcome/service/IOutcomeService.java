@@ -47,4 +47,6 @@ public interface IOutcomeService {
     int importScales(MultipartFile fileItem) throws IOException;
 
     int importOutcomes(MultipartFile fileItem) throws IOException;
+
+    Outcome createOutcome(String name, int creatorId);
 }

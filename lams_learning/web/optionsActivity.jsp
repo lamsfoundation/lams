@@ -33,8 +33,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:css />
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-	<script type="text/JavaScript">
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
+	
+	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '', ${optionsActivityForm.activityID}, finishActivity);
+		
 		function validate() {
 			var validated = false;
 		
@@ -55,6 +60,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				return true;
 			}
 		}
+		
 		function finishActivity() {
 			document.getElementById('messageForm').submit();
 		}
@@ -185,7 +191,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 				<div align="center" class="voffset10">
 					<c:if test="${!optionsActivityForm.maxActivitiesReached}">
-						<button id="choose-branch-button" class="btn btn-default" disabled="disabled">
+						<button id="choose-branch-button" class="btn btn-success" disabled="disabled">
 							<fmt:message key="label.activity.options.choose" />
 						</button>						
 					</c:if>
@@ -194,7 +200,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</form:form>
 		</div>
 		
-		<c:if test="${optionsActivityForm.minimumLimitReached}">
+		<c:if test="${optionsActivityForm.minimumLimitReached or isPreview}">
 			<form:form action="/lams/learning/CompleteActivity.do" modelAttribute="messageForm" method="post" id="messageForm">
 				<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />">
 				<input type="hidden" name="activityID" value="<c:out value='${optionsActivityForm.activityID}' />">
@@ -204,8 +210,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<hr class="msg-hr">
 		
 				<div class="voffset10">
-					<a href="javascript:;" class="btn btn-primary pull-right na" id="finishButton"
-						onclick="finishActivity()">
+					<a href="#nogo" class="btn btn-primary pull-right na" id="finishButton">
 						<c:choose>
 							<c:when test="${activityPosition.last}">
 								<fmt:message key="label.submit.button" />

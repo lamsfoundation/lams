@@ -21,6 +21,7 @@
 				</div>
 	</div>
 </c:if>		
+
 <p id="gate-waiting-learners-p">
 <span><fmt:message key="label.grouping.status"/></span> 
 	<strong> <fmt:message key="label.gate.waiting.learners">
@@ -31,3 +32,8 @@
 </p>
 
 
+<c:if test="${not gateForm.gate.gateOpen and gateForm.gate.gateStopAtPrecedingActivity}">
+	<p>
+		<fmt:message key="label.gate.stop.at.preceding"/>
+	</p>
+</c:if>

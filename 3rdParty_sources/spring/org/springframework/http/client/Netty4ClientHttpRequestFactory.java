@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,7 @@ package org.springframework.http.client;
 import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.TimeUnit;
+
 import javax.net.ssl.SSLException;
 
 import io.netty.bootstrap.Bootstrap;
@@ -39,11 +40,12 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.http.HttpMethod;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
  * {@link org.springframework.http.client.ClientHttpRequestFactory} implementation
- * that uses <a href="http://netty.io/">Netty 4</a> to create requests.
+ * that uses <a href="https://netty.io/">Netty 4</a> to create requests.
  *
  * <p>Allows to use a pre-configured {@link EventLoopGroup} instance: useful for
  * sharing across multiple clients.
@@ -56,7 +58,10 @@ import org.springframework.util.Assert;
  * @author Brian Clozel
  * @author Mark Paluch
  * @since 4.1.2
+ * @deprecated as of Spring 5.0, in favor of
+ * {@link org.springframework.http.client.reactive.ReactorClientHttpConnector}
  */
+@Deprecated
 public class Netty4ClientHttpRequestFactory implements ClientHttpRequestFactory,
 		AsyncClientHttpRequestFactory, InitializingBean, DisposableBean {
 
@@ -73,12 +78,14 @@ public class Netty4ClientHttpRequestFactory implements ClientHttpRequestFactory,
 
 	private int maxResponseSize = DEFAULT_MAX_RESPONSE_SIZE;
 
+	@Nullable
 	private SslContext sslContext;
 
 	private int connectTimeout = -1;
 
 	private int readTimeout = -1;
 
+	@Nullable
 	private volatile Bootstrap bootstrap;
 
 
@@ -109,8 +116,8 @@ public class Netty4ClientHttpRequestFactory implements ClientHttpRequestFactory,
 	/**
 	 * Set the default maximum response size.
 	 * <p>By default this is set to {@link #DEFAULT_MAX_RESPONSE_SIZE}.
-	 * @see HttpObjectAggregator#HttpObjectAggregator(int)
 	 * @since 4.1.5
+	 * @see HttpObjectAggregator#HttpObjectAggregator(int)
 	 */
 	public void setMaxResponseSize(int maxResponseSize) {
 		this.maxResponseSize = maxResponseSize;
@@ -181,14 +188,16 @@ public class Netty4ClientHttpRequestFactory implements ClientHttpRequestFactory,
 			return buildBootstrap(uri, true);
 		}
 		else {
-			if (this.bootstrap == null) {
-				this.bootstrap = buildBootstrap(uri, false);
+			Bootstrap bootstrap = this.bootstrap;
+			if (bootstrap == null) {
+				bootstrap = buildBootstrap(uri, false);
+				this.bootstrap = bootstrap;
 			}
-			return this.bootstrap;
+			return bootstrap;
 		}
 	}
 
-	private Bootstrap buildBootstrap(final URI uri, final boolean isSecure) {
+	private Bootstrap buildBootstrap(URI uri, boolean isSecure) {
 		Bootstrap bootstrap = new Bootstrap();
 		bootstrap.group(this.eventLoopGroup).channel(NioSocketChannel.class)
 				.handler(new ChannelInitializer<SocketChannel>() {

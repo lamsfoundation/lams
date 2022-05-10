@@ -38,6 +38,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -62,7 +64,7 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchieForm;
-import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchiePedagogicalPlannerForm;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
@@ -77,7 +79,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -101,6 +102,8 @@ public class AuthoringController {
     private IScratchieService scratchieService;
     @Autowired
     private IQbService qbService;
+    @Autowired
+    private ILamsToolService lamsToolService;
     @Autowired
     private IUserManagementService userManagementService;
     @Autowired
@@ -159,11 +162,6 @@ public class AuthoringController {
 	    throw new ServletException(e);
 	}
 
-	ScratchieConfigItem isEnabledExtraPointOption = scratchieService
-		.getConfigItem(ScratchieConfigItem.KEY_IS_ENABLED_EXTRA_POINT_OPTION);
-	sessionMap.put(ScratchieConfigItem.KEY_IS_ENABLED_EXTRA_POINT_OPTION,
-		new Boolean(isEnabledExtraPointOption.getConfigValue()));
-
 	//prepare advanced option allowing to overwrite default preset marks
 	ScratchieConfigItem defaultPresetMarksConfigItem = scratchieService
 		.getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS);
@@ -187,6 +185,9 @@ public class AuthoringController {
 		scratchieItem.setDisplayOrder(i);
 	    }
 	    i++;
+
+	    // prepare other version data for displaying
+	    qbService.fillVersionMap(scratchieItem.getQbQuestion());
 	}
 
 	//display confidence providing activities
@@ -251,6 +252,7 @@ public class AuthoringController {
 	//allow using old and modified questions together
 	Set<ScratchieItem> oldItems = (scratchiePO == null) ? new HashSet<>()
 		: new HashSet<>(scratchiePO.getScratchieItems());
+	String oldPresetMarks = null;
 
 	if (scratchiePO == null) {
 	    // new Scratchie, create it.
@@ -258,6 +260,7 @@ public class AuthoringController {
 	    scratchiePO.setCreated(new Timestamp(new Date().getTime()));
 	    scratchiePO.setUpdated(new Timestamp(new Date().getTime()));
 	} else {
+	    oldPresetMarks = scratchiePO.getPresetMarks();
 	    // copyProperties() below sets scratchiePO's items to empty collection
 	    // but the items still exist in Hibernate cache, so we need to evict them now
 	    for (ScratchieItem item : oldItems) {
@@ -297,7 +300,7 @@ public class AuthoringController {
 
 	//recalculate results in case content is edited from monitoring
 	if (mode.isTeacher()) {
-	    scratchieService.recalculateUserAnswers(scratchiePO, oldItems, newItems);
+	    scratchieService.recalculateUserAnswers(scratchiePO, oldItems, newItems, oldPresetMarks);
 	}
 
 	// delete items from database
@@ -310,6 +313,10 @@ public class AuthoringController {
 		scratchieService.deleteScratchieItem(item.getUid());
 	    }
 	}
+
+	List<Long> newQuestionUids = scratchiePO.getScratchieItems().stream()
+		.collect(Collectors.mapping(q -> q.getQbQuestion().getUid(), Collectors.toList()));
+	lamsToolService.syncRatQuestions(scratchiePO.getContentId(), newQuestionUids);
 
 	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
@@ -368,10 +375,12 @@ public class AuthoringController {
 	    form.setItemIndex(String.valueOf(itemIdx));
 	}
 	form.setQuestionType(qbQuestion.getType());
-	boolean isMcqQuestionType = qbQuestion.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
+	boolean isMcqQuestionType = qbQuestion.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE
+		|| qbQuestion.getType() == QbQuestion.TYPE_MARK_HEDGING;
 	if (!isMcqQuestionType) {
 	    form.setFeedback(qbQuestion.getFeedback());
 	    form.setCaseSensitive(qbQuestion.isCaseSensitive());
+	    form.setExactMatch(qbQuestion.isExactMatch());
 	    form.setAutocompleteEnabled(qbQuestion.isAutocompleteEnabled());
 	}
 
@@ -436,6 +445,9 @@ public class AuthoringController {
 	itemList.add(item);
 	ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 
+	// prepare other version data for displaying
+	qbService.fillVersionMap(item.getQbQuestion());
+
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return "pages/authoring/parts/itemlist";
@@ -460,7 +472,8 @@ public class AuthoringController {
      * persisted.
      */
     @RequestMapping(value = "/saveItem", method = RequestMethod.POST)
-    private String saveItem(@ModelAttribute("scratchieItemForm") QbQuestionForm form, HttpServletRequest request) {
+    private String saveItem(@ModelAttribute("scratchieItemForm") QbQuestionForm form, HttpServletRequest request,
+	    @RequestParam(name = "newVersion", required = false) boolean enforceNewVersion) {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(form.getSessionMapID());
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
@@ -513,11 +526,13 @@ public class AuthoringController {
 	qbQuestion.setDescription(form.getDescription().strip());
 	qbQuestion.setContentFolderId(form.getContentFolderID());
 
-	boolean isMcqQuestionType = qbQuestion.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
+	boolean isMcqQuestionType = qbQuestion.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE
+		|| qbQuestion.getType() == QbQuestion.TYPE_MARK_HEDGING;
 	//handle VSA question type
 	if (!isMcqQuestionType) {
 	    qbQuestion.setFeedback(form.getFeedback());
 	    qbQuestion.setCaseSensitive(form.isCaseSensitive());
+	    qbQuestion.setExactMatch(form.isExactMatch());
 	    qbQuestion.setAutocompleteEnabled(form.isAutocompleteEnabled());
 	}
 
@@ -528,6 +543,9 @@ public class AuthoringController {
 
 	int isQbQuestionModified = isDefaultQuestion ? IQbService.QUESTION_MODIFIED_ID_BUMP
 		: qbQuestion.isQbQuestionModified(oldQbQuestion);
+	if (isQbQuestionModified < IQbService.QUESTION_MODIFIED_VERSION_BUMP && enforceNewVersion) {
+	    isQbQuestionModified = IQbService.QUESTION_MODIFIED_VERSION_BUMP;
+	}
 	QbQuestion updatedQuestion = null;
 	switch (isQbQuestionModified) {
 	    case IQbService.QUESTION_MODIFIED_VERSION_BUMP: {
@@ -536,6 +554,7 @@ public class AuthoringController {
 		updatedQuestion.clearID();
 		updatedQuestion.setVersion(qbService.getMaxQuestionVersion(qbQuestion.getQuestionId()) + 1);
 		updatedQuestion.setCreateDate(new Date());
+		updatedQuestion.setUuid(UUID.randomUUID());
 	    }
 		break;
 	    case IQbService.QUESTION_MODIFIED_ID_BUMP: {
@@ -545,6 +564,7 @@ public class AuthoringController {
 		updatedQuestion.setQuestionId(qbService.generateNextQuestionId());
 		updatedQuestion.setVersion(1);
 		updatedQuestion.setCreateDate(new Date());
+		updatedQuestion.setUuid(UUID.randomUUID());
 	    }
 		break;
 	    case IQbService.QUESTION_MODIFIED_NONE: {
@@ -555,7 +575,12 @@ public class AuthoringController {
 	}
 	userManagementService.save(updatedQuestion);
 	item.setQbQuestion(updatedQuestion);
+
 	request.setAttribute("qbQuestionModified", isQbQuestionModified);
+	if (isQbQuestionModified == IQbService.QUESTION_MODIFIED_VERSION_BUMP) {
+	    request.setAttribute("oldQbQuestionUid", qbQuestion.getUid());
+	    request.setAttribute("newQbQuestionUid", updatedQuestion.getUid());
+	}
 
 	//take care about question's collections. add to collection first
 	Long oldCollectionUid = form.getOldCollectionUid();
@@ -569,6 +594,9 @@ public class AuthoringController {
 	    qbService.removeQuestionFromCollectionByQuestionId(oldCollectionUid, updatedQuestion.getQuestionId(),
 		    false);
 	}
+
+	// prepare other version data for displaying
+	qbService.fillVersionMap(item.getQbQuestion());
 
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, form.getSessionMapID());
@@ -627,6 +655,21 @@ public class AuthoringController {
 	}
 	itemList.clear();
 	itemList.addAll(updatedItemList);
+    }
+
+    @RequestMapping("/changeItemQuestionVersion")
+    private String changeItemQuestionVersion(@RequestParam int itemIndex, @RequestParam long newQbQuestionUid,
+	    HttpServletRequest request) {
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
+	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
+	List<ScratchieItem> rList = new ArrayList<>(itemList);
+	ScratchieItem item = rList.get(itemIndex);
+	QbQuestion newQbQuestion = qbService.getQuestionByUid(newQbQuestionUid);
+	qbService.fillVersionMap(newQbQuestion);
+	item.setQbQuestion(newQbQuestion);
+
+	request.setAttribute(ScratchieConstants.ATTR_ITEM_LIST, itemList);
+	return "pages/authoring/parts/itemlist";
     }
 
     // ----------------------- Options functions ---------------
@@ -743,35 +786,6 @@ public class AuthoringController {
 
 	request.setAttribute(QbConstants.ATTR_OPTION_LIST, optionList);
 	return "pages/authoring/parts/optionlist";
-    }
-
-    // ----------------------- PedagogicalPlannerForm ---------------
-
-    @RequestMapping("/initPedagogicalPlannerForm")
-    public String initPedagogicalPlannerForm(
-	    @ModelAttribute("pedagogicalPlannerForm") ScratchiePedagogicalPlannerForm pedagogicalPlannerForm,
-	    HttpServletRequest request) {
-	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentID);
-	pedagogicalPlannerForm.fillForm(scratchie);
-	String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	pedagogicalPlannerForm.setContentFolderID(contentFolderId);
-	return "pages/authoring/pedagogicalPlannerForm";
-    }
-
-    @RequestMapping(value = "/saveOrUpdatePedagogicalPlannerForm", method = RequestMethod.POST)
-    public String saveOrUpdatePedagogicalPlannerForm(
-	    @ModelAttribute("pedagogicalPlannerForm") ScratchiePedagogicalPlannerForm pedagogicalPlannerForm,
-	    HttpServletRequest request) throws IOException {
-	MultiValueMap<String, String> errorMap = pedagogicalPlannerForm.validate(messageService);
-	if (errorMap.isEmpty()) {
-	    Scratchie scratchie = scratchieService.getScratchieByContentId(pedagogicalPlannerForm.getToolContentID());
-	    scratchie.setInstructions(pedagogicalPlannerForm.getInstructions());
-	    scratchieService.saveOrUpdateScratchie(scratchie);
-	} else {
-	    request.setAttribute("errorMap", errorMap);
-	}
-	return "pages/authoring/pedagogicalPlannerForm";
     }
 
     // *************************************************************************************

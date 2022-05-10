@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -464,6 +465,7 @@ public class WebUtil {
 	userJSON.put("firstName", user.getFirstName());
 	userJSON.put("lastName", user.getLastName());
 	userJSON.put("login", user.getLogin());
+	userJSON.put("email", user.getEmail());
 	userJSON.put("portraitId", user.getPortraitUuid() == null ? null : user.getPortraitUuid().toString());
 	return userJSON;
     }
@@ -554,5 +556,14 @@ public class WebUtil {
 	Transformer transformer = tf.newTransformer();
 	transformer.transform(domSource, result);
 	return writer.toString();
+    }
+
+    public static void setFileDownloadTokenCookie(HttpServletRequest request, HttpServletResponse response) {
+	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
+	// cookie needs to be constructed manually so we can set SameSite=None
+	StringBuilder cookieHeaderValue = new StringBuilder("fileDownloadToken=").append(downloadTokenValue)
+		.append("; Path=/; ");
+	cookieHeaderValue.append("Secure; SameSite=Strict");
+	response.setHeader("Set-Cookie", cookieHeaderValue.toString());
     }
 }

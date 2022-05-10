@@ -28,17 +28,20 @@
 			<fmt:message key="label.users.from.group" />
 		</div>
 
-		<div>
-			<c:forEach var="user" items="${groupUsers}" varStatus="status">
-				<div class="user">
-					<c:out value="${user.fullname}" escapeXml="true" />
+		<div id="usersInGroup">
+			<c:forEach var="user" items="${groupUsers}">
+				<div class="voffset10 loffset10">
+					<lams:Portrait userId="${user.queUsrId}"/>
+					<span>
+						<c:out value="${user.fullname}" escapeXml="true" />
+					</span>
 				</div>
 			</c:forEach>
 		</div>
 
-		<form:button path="refreshButton" onclick="refresh();" cssClass="btn btn-sm btn-primary pull-right">
+		<button onclick="refresh();" class="btn btn-sm btn-primary pull-right">
 			<fmt:message key="label.refresh" />
-		</form:button>
+		</button>
 	</lams:Page>
 </body>
 </lams:html>

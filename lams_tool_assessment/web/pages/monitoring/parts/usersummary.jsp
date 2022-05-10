@@ -10,6 +10,10 @@
 		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
+		<c:if test="${not empty codeStyles}">
+			<link rel="stylesheet" type="text/css" href="${lams}css/codemirror.css" />
+		</c:if>
+	
 		<style>
 			.question-etherpad {
 				padding: 0;
@@ -18,6 +22,11 @@
 			[data-toggle="collapse"].collapsed .if-not-collapsed, [data-toggle="collapse"]:not(.collapsed) .if-collapsed {
 	  			display: none;
 	  		}
+	  		
+	  		pre {
+				background-color: initial;
+				border: none;
+			}
 		</style>
 		
 		<script>
@@ -34,6 +43,26 @@
 		</script>
 		<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
+	 	
+	 	<c:if test="${not empty codeStyles}">
+			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/runmode-standalone.js"></script>
+			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/colorize.js"></script>
+		</c:if>
+		<%-- codeStyles is a set, so each code style will be listed only once --%>
+		<c:forEach items="${codeStyles}" var="codeStyle">
+			<c:choose>
+				<c:when test="${codeStyle == 1}">
+					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/python.js"></script>
+				</c:when>
+				<c:when test="${codeStyle == 2}">
+					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/javascript.js"></script>
+				</c:when>
+				<c:when test="${codeStyle >= 3}">
+					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/clike.js"></script>
+				</c:when>
+			</c:choose>
+		</c:forEach>
+		
   	    <script>
 	    	var isEdited = false;
   	    	var previousCellValue = "";  	    	
@@ -55,7 +84,7 @@
 	  						'questionResultUid',
 	  						"<fmt:message key="label.monitoring.user.summary.time" />",
 	  						"<fmt:message key="label.monitoring.user.summary.response" />",
-	  						<c:if test="${assessment.enableConfidenceLevels}">
+	  						<c:if test="${assessment.enableConfidenceLevels and question.type != 8}">
 	  							"<fmt:message key="label.confidence" />",
 	  						</c:if>
 	  						"<fmt:message key="label.monitoring.user.summary.grade" />"
@@ -65,7 +94,7 @@
 	  				   		{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
 	  				   		{name:'time', index:'time', width:150, sorttype:'date', datefmt:'Y-m-d'},
 	  				   		{name:'response', index:'response', width:341, sortable:false},
-	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
+	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels and question.type != 8}">
 			  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align', formatter: gradientNumberFormatter},
 			  			  	</c:if>
 	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' }		
@@ -108,13 +137,14 @@
 	  				});
 	  				
 	  	   	        <c:forEach var="questionResult" items="${userSummaryItem.questionResults}" varStatus="i">
+	  	   	        	<c:set var="learnerInteraction" value="${learnerInteractions[questionResult.qbToolQuestion.uid]}" />
 	  	   	        	var responseStr = "";
 	  	   	       		<%@ include file="userresponse.jsp"%>
 	  	   	     		var table = jQuery("#user${question.uid}");
 	  	   	     		table.addRowData(${i.index + 1}, {
 	  	   	   	     		id:"${i.index + 1}",
 	  	   	   	   			questionResultUid:"${questionResult.uid}",
-	  	   	   	   			time:"${questionResult.finishDate}",
+	  	   	   	   			time:"${empty learnerInteraction ? questionResult.finishDate : learnerInteraction.formattedDate}",
 	  	   	   	   			response:responseStr,
 		  	   	   	   		<c:if test="${assessment.enableConfidenceLevels}">
 		  	 	   	   			confidence:"${questionResult.confidenceLevel}",
@@ -140,6 +170,20 @@
 	  		        }
 	  			});
 	  			setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
+	  			
+				// show etherpads only on Discussion expand
+				$('.question-etherpad-collapse').on('show.bs.collapse', function(){
+					var etherpad = $('.etherpad-container', this);
+					if (!etherpad.hasClass('initialised')) {
+						var id = etherpad.attr('id'),
+							groupId = id.substring('etherpad-container-'.length);
+						etherpadInitMethods[groupId]();
+					}
+				});
+
+				if (typeof CodeMirror != 'undefined') {
+					CodeMirror.colorize($('.code-style'));
+				}
 	  		});  	    	
 
     		function refreshSummaryPage()  { 
@@ -245,10 +289,10 @@
 							<fmt:message key="label.etherpad.discussion" />
 						</a>
 						
-						<div id="question-etherpad-${userSummaryItem.questionDto.uid}" class="collapse">
+						<div id="question-etherpad-${userSummaryItem.questionDto.uid}" class="question-etherpad-collapse collapse">
 							<div class="panel panel-default question-etherpad">
 								<lams:Etherpad groupId="etherpad-assessment-${toolSessionID}-question-${userSummaryItem.questionDto.uid}" 
-								   showControls="true" showChat="false" heightAutoGrow="true" />
+								   showControls="true" showChat="false" heightAutoGrow="true" showOnDemand="true" />
 							</div>
 						</div>
 					</div>

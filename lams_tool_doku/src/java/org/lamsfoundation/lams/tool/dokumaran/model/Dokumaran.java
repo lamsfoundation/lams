@@ -23,9 +23,15 @@
 
 package org.lamsfoundation.lams.tool.dokumaran.model;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -33,6 +39,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.StringUtils;
@@ -76,12 +83,17 @@ public class Dokumaran implements Cloneable {
     @Column(name = "allow_multiple_leaders")
     private boolean allowMultipleLeaders;
 
-    @Column(name = "time_limit")
-    private int timeLimit;
+    @Column(name = "relative_time_limit")
+    private int relativeTimeLimit;
 
-    //date when teacher has started time counter (pressed start button)
-    @Column(name = "time_limit_launched_date")
-    private Date timeLimitLaunchedDate;
+    @Column(name = "absolute_time_limit")
+    private LocalDateTime absoluteTimeLimit;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "tl_ladoku11_time_limit", joinColumns = @JoinColumn(name = "dokumaran_uid"))
+    @MapKeyColumn(name = "user_id")
+    @Column(name = "adjustment")
+    private Map<Integer, Integer> timeLimitAdjustments = new HashMap<>();
 
     @Column(name = "show_chat")
     private boolean showChat;
@@ -107,8 +119,25 @@ public class Dokumaran implements Cloneable {
     @Column(name = "reflect_instructions")
     private String reflectInstructions;
 
-    // general information
+    @Column(name = "gallery_walk_enabled")
+    private boolean galleryWalkEnabled;
 
+    @Column(name = "gallery_walk_read_only")
+    private boolean galleryWalkReadOnly;
+
+    @Column(name = "gallery_walk_started")
+    private boolean galleryWalkStarted;
+
+    @Column(name = "gallery_walk_finished")
+    private boolean galleryWalkFinished;
+
+    @Column(name = "gallery_walk_edit_enabled")
+    private boolean galleryWalkEditEnabled;
+
+    @Column(name = "gallery_walk_instructions")
+    private String galleryWalkInstructions;
+
+    // general information
     @Column(name = "create_date")
     private Date created;
 
@@ -148,6 +177,9 @@ public class Dokumaran implements Cloneable {
 	} catch (CloneNotSupportedException e) {
 	    Dokumaran.log.error("When clone " + Dokumaran.class + " failed");
 	}
+
+	dokumaran.setAbsoluteTimeLimit(null);
+	dokumaran.setTimeLimitAdjustments(new HashMap<>(this.getTimeLimitAdjustments()));
 
 	return dokumaran;
     }
@@ -326,27 +358,36 @@ public class Dokumaran implements Cloneable {
     /**
      * @return Returns the time limitation, that students have to complete an attempt.
      */
-    public int getTimeLimit() {
-	return timeLimit;
+    public int getRelativeTimeLimit() {
+	return relativeTimeLimit;
     }
 
     /**
      * @param timeLimit
      *            the time limitation, that students have to complete an attempt.
      */
-    public void setTimeLimit(int timeLimit) {
-	this.timeLimit = timeLimit;
+    public void setRelativeTimeLimit(int timeLimit) {
+	this.relativeTimeLimit = timeLimit;
     }
 
-    /**
-     * @return date when teacher has started time counter (pressed start button)
-     */
-    public Date getTimeLimitLaunchedDate() {
-	return timeLimitLaunchedDate;
+    public LocalDateTime getAbsoluteTimeLimit() {
+	return absoluteTimeLimit;
     }
 
-    public void setTimeLimitLaunchedDate(Date timeLimitLaunchedDate) {
-	this.timeLimitLaunchedDate = timeLimitLaunchedDate;
+    public void setAbsoluteTimeLimit(LocalDateTime absoluteTimeLimit) {
+	this.absoluteTimeLimit = absoluteTimeLimit;
+    }
+
+    public Long getAbsoluteTimeLimitSeconds() {
+	return absoluteTimeLimit == null ? null : absoluteTimeLimit.atZone(ZoneId.systemDefault()).toEpochSecond();
+    }
+
+    public Map<Integer, Integer> getTimeLimitAdjustments() {
+	return timeLimitAdjustments;
+    }
+
+    public void setTimeLimitAdjustments(Map<Integer, Integer> timeLimitAdjustments) {
+	this.timeLimitAdjustments = timeLimitAdjustments;
     }
 
     public boolean isShowChat() {
@@ -407,5 +448,53 @@ public class Dokumaran implements Cloneable {
 
     public void setReflectOnActivity(boolean reflectOnActivity) {
 	this.reflectOnActivity = reflectOnActivity;
+    }
+
+    public boolean isGalleryWalkEnabled() {
+	return galleryWalkEnabled;
+    }
+
+    public void setGalleryWalkEnabled(boolean galleryWalkEnabled) {
+	this.galleryWalkEnabled = galleryWalkEnabled;
+    }
+
+    public boolean isGalleryWalkReadOnly() {
+	return galleryWalkReadOnly;
+    }
+
+    public void setGalleryWalkReadOnly(boolean galleryWalkReadOnly) {
+	this.galleryWalkReadOnly = galleryWalkReadOnly;
+    }
+
+    public boolean isGalleryWalkStarted() {
+	return galleryWalkStarted;
+    }
+
+    public void setGalleryWalkStarted(boolean galleryWalkStarted) {
+	this.galleryWalkStarted = galleryWalkStarted;
+    }
+
+    public boolean isGalleryWalkFinished() {
+	return galleryWalkFinished;
+    }
+
+    public void setGalleryWalkFinished(boolean galleryWalkFinished) {
+	this.galleryWalkFinished = galleryWalkFinished;
+    }
+
+    public boolean isGalleryWalkEditEnabled() {
+	return galleryWalkEditEnabled;
+    }
+
+    public void setGalleryWalkEditEnabled(boolean galleryWalkEditEnabled) {
+	this.galleryWalkEditEnabled = galleryWalkEditEnabled;
+    }
+
+    public String getGalleryWalkInstructions() {
+	return galleryWalkInstructions;
+    }
+
+    public void setGalleryWalkInstructions(String galleryWalkInstructions) {
+	this.galleryWalkInstructions = galleryWalkInstructions;
     }
 }

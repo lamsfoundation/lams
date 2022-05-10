@@ -66,7 +66,10 @@
 	</style>
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${toolSessionID}', '', finishSession);
+		
 		function likeEntry(scratchieItemUid, rowid, burningQuestionUid) {
 			
 			var jqGrid = $("#burningQuestions" + scratchieItemUid);
@@ -335,14 +338,15 @@
 		})
 	
 		function finishSession() {
-			document.getElementById("finishButton").disabled = true;
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}"/>';
-			return false;
 		}
 		function continueReflect() {
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
-		function refresh() {
+		
+		function refreshToBurningQuestions() {
+			// setting href does not navigate if url contains #, we still need a reload
+			location.hash = '#burning-questions-container';
 			location.reload();
 			return false;
 		}
@@ -374,12 +378,7 @@
 				<fmt:param>${scorePercentage}</fmt:param>
 			</fmt:message>
 		</lams:Alert>
-<!--	
-		<div class="row voffset5" >
-            <a class="btn btn-sm btn-default pull-right roffset10" href="#" onclick="return refresh();">
-                <i class="fa fa-refresh"></i> <span class="hidden-xs"><fmt:message key="label.refresh" /></span></a>
-		</div>
--->		
+
 		<c:if test="${showResults}">
 			<%@ include file="scratchies.jsp"%>
 		</c:if>
@@ -387,7 +386,7 @@
 		<!-- Display burningQuestionItemDtos -->
 		<c:if test="${sessionMap.isBurningQuestionsEnabled}">
             
-            <a class="btn btn-sm btn-default pull-right roffset10" href="#" onclick="return refresh();">
+            <a class="btn btn-sm btn-default pull-right roffset10" href="#" onclick="return refreshToBurningQuestions()">
             	<i class="fa fa-refresh"></i> 
             	<span class="hidden-xs">
             		<fmt:message key="label.refresh" />
@@ -401,7 +400,7 @@
             	</span>
             </a>
             
-			<div class="voffset5">
+			<div id="burning-questions-container" class="voffset5">
 				<div class="lead">
 					<fmt:message key="label.burning.questions" />
 				</div>
@@ -461,7 +460,7 @@
 		<!-- Display finish buttons -->
 		<c:if test="${mode != 'teacher'}">
 			<div class="voffset10 pull-right">
-				<a href="#nogo" name="finishButton" id="finishButton" onclick="return finishSession()"
+				<a href="#nogo" name="finishButton" id="finishButton"
 					class="btn btn-primary na">
 					<c:choose>
 						<c:when test="${sessionMap.isLastActivity}">

@@ -20,6 +20,9 @@ package org.apache.poi.ss.formula.ptg;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.poi.common.Duplicatable;
+import org.apache.poi.common.usermodel.GenericRecord;
+import org.apache.poi.util.GenericRecordJsonWriter;
 import org.apache.poi.util.LittleEndianByteArrayOutputStream;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
@@ -36,20 +39,32 @@ import org.apache.poi.util.LittleEndianOutput;
  * <em>Reverse-Polish Notation</em> order. The RPN ordering also simplifies formula
  * evaluation logic, so POI mostly accesses <tt>Ptg</tt>s in the same way.
  */
-public abstract class Ptg {
+public abstract class Ptg implements Duplicatable, GenericRecord {
 	public static final Ptg[] EMPTY_PTG_ARRAY = { };
+
+	public static final byte CLASS_REF = 0x00;
+	public static final byte CLASS_VALUE = 0x20;
+	public static final byte CLASS_ARRAY = 0x40;
+
+	private byte ptgClass = CLASS_REF; //base ptg
+
+	protected Ptg() {}
+
+	protected Ptg(Ptg other) {
+		ptgClass = other.ptgClass;
+	}
 
 	/**
 	 * Reads <tt>size</tt> bytes of the input stream, to create an array of <tt>Ptg</tt>s.
 	 * Extra data (beyond <tt>size</tt>) may be read if and <tt>ArrayPtg</tt>s are present.
 	 */
 	public static Ptg[] readTokens(int size, LittleEndianInput in) {
-		List<Ptg> temp = new ArrayList<Ptg>(4 + size / 2);
+		List<Ptg> temp = new ArrayList<>(4 + size / 2);
 		int pos = 0;
 		boolean hasArrayPtgs = false;
 		while (pos < size) {
 			Ptg ptg = Ptg.createPtg(in);
-			if (ptg instanceof ArrayPtg.Initial) {
+			if (ptg instanceof ArrayInitialPtg) {
 				hasArrayPtgs = true;
 			}
 			pos += ptg.getSize();
@@ -61,8 +76,8 @@ public abstract class Ptg {
 		if (hasArrayPtgs) {
 			Ptg[] result = toPtgArray(temp);
 			for (int i=0;i<result.length;i++) {
-				if (result[i] instanceof ArrayPtg.Initial) {
-					result[i] = ((ArrayPtg.Initial) result[i]).finishReading(in);
+				if (result[i] instanceof ArrayInitialPtg) {
+					result[i] = ((ArrayInitialPtg) result[i]).finishReading(in);
 				}
 			}
 			return result;
@@ -94,7 +109,7 @@ public abstract class Ptg {
 		int baseId = id & 0x1F | 0x20;
 
 		switch (baseId) {
-			case ArrayPtg.sid:    return new ArrayPtg.Initial(in);//0x20, 0x40, 0x60
+			case ArrayPtg.sid:    return new ArrayInitialPtg(in);//0x20, 0x40, 0x60
 			case FuncPtg.sid:     return FuncPtg.create(in);  // 0x21, 0x41, 0x61
 			case FuncVarPtg.sid:  return FuncVarPtg.create(in);//0x22, 0x42, 0x62
 			case NamePtg.sid:     return new NamePtg(in);     // 0x23, 0x43, 0x63
@@ -145,6 +160,7 @@ public abstract class Ptg {
 			case MissingArgPtg.sid:   return MissingArgPtg.instance;  // 0x16
 
 			case StringPtg.sid:       return new StringPtg(in);       // 0x17
+			// not implemented yet: case SxNamePtg.sid:       return new SxNamePtg(in);       // 0x18
 			case AttrPtg.sid:         return new AttrPtg(in);         // 0x19
 			case ErrPtg.sid:          return ErrPtg.read(in);         // 0x1c
 			case BoolPtg.sid:         return BoolPtg.read(in);        // 0x1d
@@ -198,14 +214,14 @@ public abstract class Ptg {
 	 */
 	public static int serializePtgs(Ptg[] ptgs, byte[] array, int offset) {
 		LittleEndianByteArrayOutputStream out = new LittleEndianByteArrayOutputStream(array, offset); // NOSONAR
-		
+
 		List<Ptg> arrayPtgs = null;
 
 		for (Ptg ptg : ptgs) {
 			ptg.write(out);
 			if (ptg instanceof ArrayPtg) {
 				if (arrayPtgs == null) {
-					arrayPtgs = new ArrayList<Ptg>(5);
+					arrayPtgs = new ArrayList<>(5);
 				}
 				arrayPtgs.add(ptg);
 			}
@@ -231,20 +247,10 @@ public abstract class Ptg {
 	 */
 	public abstract String toFormulaString();
 
-	/** Overridden toString method to ensure object hash is not printed.
-	 * This helps get rid of gratuitous diffs when comparing two dumps
-	 * Subclasses may output more relevant information by overriding this method
-	 **/
 	@Override
-	public String toString(){
-		return this.getClass().toString();
+	public final String toString() {
+		return GenericRecordJsonWriter.marshal(this);
 	}
-
-	public static final byte CLASS_REF = 0x00;
-	public static final byte CLASS_VALUE = 0x20;
-	public static final byte CLASS_ARRAY = 0x40;
-
-	private byte ptgClass = CLASS_REF; //base ptg
 
 	public final void setClass(byte thePtgClass) {
 		if (isBaseToken()) {
@@ -310,4 +316,12 @@ public abstract class Ptg {
 		}
 		return false;
 	}
+
+	@Override
+	public abstract Ptg copy();
+
+	/**
+	 * @return structure id of the parsed thing, or {@code -1} if the record has no sid
+	 */
+	public abstract byte getSid();
 }

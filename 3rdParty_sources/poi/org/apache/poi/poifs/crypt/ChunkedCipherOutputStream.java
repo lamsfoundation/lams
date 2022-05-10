@@ -25,13 +25,13 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
-import java.util.BitSet;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.ShortBufferException;
 
+import com.zaxxer.sparsebits.SparseBitSet;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.POIFSWriterEvent;
@@ -47,13 +47,16 @@ import org.apache.poi.util.TempFile;
 @Internal
 public abstract class ChunkedCipherOutputStream extends FilterOutputStream {
     private static final POILogger LOG = POILogFactory.getLogger(ChunkedCipherOutputStream.class);
+    //arbitrarily selected; may need to increase
+    private static final int MAX_RECORD_LENGTH = 100_000;
+
     private static final int STREAMING = -1;
 
     private final int chunkSize;
     private final int chunkBits;
 
     private final byte[] chunk;
-    private final BitSet plainByteFlags;
+    private final SparseBitSet plainByteFlags;
     private final File fileOut;
     private final DirectoryNode dir;
 
@@ -64,14 +67,14 @@ public abstract class ChunkedCipherOutputStream extends FilterOutputStream {
     // the cipher can't be final, because for the last chunk we change the padding
     // and therefore need to change the cipher too
     private Cipher cipher;
-    private boolean isClosed = false;
+    private boolean isClosed;
 
     public ChunkedCipherOutputStream(DirectoryNode dir, int chunkSize) throws IOException, GeneralSecurityException {
         super(null);
         this.chunkSize = chunkSize;
         int cs = chunkSize == STREAMING ? 4096 : chunkSize;
-        this.chunk = new byte[cs];
-        this.plainByteFlags = new BitSet(cs);
+        this.chunk = IOUtils.safelyAllocate(cs, MAX_RECORD_LENGTH);
+        this.plainByteFlags = new SparseBitSet(cs);
         this.chunkBits = Integer.bitCount(cs-1);
         this.fileOut = TempFile.createTempFile("encrypted_package", "crypt");
         this.fileOut.deleteOnExit();
@@ -84,8 +87,8 @@ public abstract class ChunkedCipherOutputStream extends FilterOutputStream {
         super(stream);
         this.chunkSize = chunkSize;
         int cs = chunkSize == STREAMING ? 4096 : chunkSize;
-        this.chunk = new byte[cs];
-        this.plainByteFlags = new BitSet(cs);
+        this.chunk = IOUtils.safelyAllocate(cs, MAX_RECORD_LENGTH);
+        this.plainByteFlags = new SparseBitSet(cs);
         this.chunkBits = Integer.bitCount(cs-1);
         this.fileOut = null;
         this.dir = null;
@@ -93,6 +96,13 @@ public abstract class ChunkedCipherOutputStream extends FilterOutputStream {
     }
 
     public final Cipher initCipherForBlock(int block, boolean lastChunk) throws IOException, GeneralSecurityException {
+        return initCipherForBlock(cipher, block, lastChunk);
+    }
+
+    // helper method to break a recursion loop introduced because of an IBMJCE bug, i.e. not resetting on Cipher.doFinal()
+    @Internal
+    protected Cipher initCipherForBlockNoFlush(Cipher existing, int block, boolean lastChunk)
+    throws IOException, GeneralSecurityException {
         return initCipherForBlock(cipher, block, lastChunk);
     }
 
@@ -209,15 +219,36 @@ public abstract class ChunkedCipherOutputStream extends FilterOutputStream {
      * @throws IllegalBlockSizeException 
      * @throws ShortBufferException
      */
-    protected int invokeCipher(int posInChunk, boolean doFinal) throws GeneralSecurityException {
-        byte plain[] = (plainByteFlags.isEmpty()) ? null : chunk.clone();
+    protected int invokeCipher(int posInChunk, boolean doFinal) throws GeneralSecurityException, IOException {
+        byte[] plain = (plainByteFlags.isEmpty()) ? null : chunk.clone();
 
         int ciLen = (doFinal)
             ? cipher.doFinal(chunk, 0, posInChunk, chunk)
             : cipher.update(chunk, 0, posInChunk, chunk);
-        
-        for (int i = plainByteFlags.nextSetBit(0); i >= 0 && i < posInChunk; i = plainByteFlags.nextSetBit(i+1)) {
-            chunk[i] = plain[i];
+
+        if (doFinal && "IBMJCE".equals(cipher.getProvider().getName()) && "RC4".equals(cipher.getAlgorithm())) {
+            // workaround for IBMs cipher not resetting on doFinal
+
+            int index = (int)(pos >> chunkBits);
+            boolean lastChunk;
+            if (posInChunk==0) {
+                index--;
+                posInChunk = chunk.length;
+                lastChunk = false;
+            } else {
+                // pad the last chunk
+                lastChunk = true;
+            }
+
+            cipher = initCipherForBlockNoFlush(cipher, index, lastChunk);
+        }
+
+        if (plain != null) {
+            int i = plainByteFlags.nextSetBit(0);
+            while (i >= 0 && i < posInChunk) {
+                chunk[i] = plain[i];
+                i = plainByteFlags.nextSetBit(i+1);
+            }
         }
         
         return ciLen;
@@ -252,7 +283,7 @@ public abstract class ChunkedCipherOutputStream extends FilterOutputStream {
         return chunk;
     }
 
-    protected BitSet getPlainByteFlags() {
+    protected SparseBitSet getPlainByteFlags() {
         return plainByteFlags;
     }
 
@@ -278,27 +309,22 @@ public abstract class ChunkedCipherOutputStream extends FilterOutputStream {
         @Override
         public void processPOIFSWriterEvent(POIFSWriterEvent event) {
             try {
-                OutputStream os = event.getStream();
+                try (OutputStream os = event.getStream();
+                     FileInputStream fis = new FileInputStream(fileOut)) {
 
-                // StreamSize (8 bytes): An unsigned integer that specifies the number of bytes used by data
-                // encrypted within the EncryptedData field, not including the size of the StreamSize field.
-                // Note that the actual size of the \EncryptedPackage stream (1) can be larger than this
-                // value, depending on the block size of the chosen encryption algorithm
-                byte buf[] = new byte[LittleEndianConsts.LONG_SIZE];
-                LittleEndian.putLong(buf, 0, pos);
-                os.write(buf);
+                    // StreamSize (8 bytes): An unsigned integer that specifies the number of bytes used by data
+                    // encrypted within the EncryptedData field, not including the size of the StreamSize field.
+                    // Note that the actual size of the \EncryptedPackage stream (1) can be larger than this
+                    // value, depending on the block size of the chosen encryption algorithm
+                    byte[] buf = new byte[LittleEndianConsts.LONG_SIZE];
+                    LittleEndian.putLong(buf, 0, pos);
+                    os.write(buf);
 
-                FileInputStream fis = new FileInputStream(fileOut);
-                try {
                     IOUtils.copy(fis, os);
-                } finally {
-                    fis.close();
                 }
 
-                os.close();
-
                 if (!fileOut.delete()) {
-                    LOG.log(POILogger.ERROR, "Can't delete temporary encryption file: "+fileOut);
+                    LOG.log(POILogger.ERROR, "Can't delete temporary encryption file: ", fileOut);
                 }
             } catch (IOException e) {
                 throw new EncryptedDocumentException(e);

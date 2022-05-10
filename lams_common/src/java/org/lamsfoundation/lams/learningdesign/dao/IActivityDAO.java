@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 
@@ -90,11 +91,6 @@ public interface IActivityDAO extends IBaseDAO {
     public List getActivitiesByParentActivityId(Long parentActivityId);
 
     /**
-     * @return List of all the activities
-     */
-    public List getAllActivities();
-
-    /**
      * @param learningDesignId
      *            The id of the learningDesign
      * @return List of all the activities
@@ -148,5 +144,6 @@ public interface IActivityDAO extends IBaseDAO {
      * @return
      */
     ToolActivity getToolActivityByToolContentId(Long toolContentId);
-
+    
+    ActivityEvaluation getEvaluationByActivityId(long activityId);
 }

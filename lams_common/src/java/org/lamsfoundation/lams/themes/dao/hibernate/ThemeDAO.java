@@ -43,7 +43,7 @@ public class ThemeDAO extends LAMSBaseDAO implements IThemeDAO {
      */
     @Override
     public List getAllThemes() {
-	return doFind("from Theme c");
+	return doFindCacheable("from Theme c");
     }
 
     /**
@@ -53,7 +53,7 @@ public class ThemeDAO extends LAMSBaseDAO implements IThemeDAO {
     @Override
     public Theme getThemeById(Long themeId) {
 	String queryString = "from Theme c where c.themeId=?";
-	List<Theme> list = (List<Theme>) doFind(queryString, themeId);
+	List<Theme> list = doFind(queryString, themeId);
 	if ((list != null) && (list.size() > 0)) {
 	    return list.get(0);
 	} else {
@@ -68,7 +68,7 @@ public class ThemeDAO extends LAMSBaseDAO implements IThemeDAO {
     @Override
     public List<Theme> getThemeByName(String name) {
 	String queryString = "from Theme c where c.name=?";
-	return (List<Theme>) doFind(queryString, name);
+	return doFindCacheable(queryString, name);
     }
 
     /**

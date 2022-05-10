@@ -410,6 +410,14 @@
        <path>/WEB-INF/tags/WaitingSpinner.tag</path>
    	</tag-file>
    	<tag-file>
+       <name>JSImport</name>
+       <path>/WEB-INF/tags/JSImport.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>Popover</name>
+       <path>/WEB-INF/tags/Popover.tag</path>
+   	</tag-file>
+   	<tag-file>
 	    <name>Panel</name>
 		<path>/WEB-INF/tags/Panel.tag</path>
    	</tag-file>  

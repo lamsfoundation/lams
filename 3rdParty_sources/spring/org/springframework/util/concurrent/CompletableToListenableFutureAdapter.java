@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,9 +21,6 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.BiFunction;
-
-import org.springframework.lang.UsesJava8;
 
 /**
  * Adapts a {@link CompletableFuture} or {@link CompletionStage} into a
@@ -32,13 +29,13 @@ import org.springframework.lang.UsesJava8;
  * @author Sebastien Deleuze
  * @author Juergen Hoeller
  * @since 4.2
+ * @param <T> the result type returned by this Future's {@code get} method
  */
-@UsesJava8
 public class CompletableToListenableFutureAdapter<T> implements ListenableFuture<T> {
 
 	private final CompletableFuture<T> completableFuture;
 
-	private final ListenableFutureCallbackRegistry<T> callbacks = new ListenableFutureCallbackRegistry<T>();
+	private final ListenableFutureCallbackRegistry<T> callbacks = new ListenableFutureCallbackRegistry<>();
 
 
 	/**
@@ -54,16 +51,12 @@ public class CompletableToListenableFutureAdapter<T> implements ListenableFuture
 	 */
 	public CompletableToListenableFutureAdapter(CompletableFuture<T> completableFuture) {
 		this.completableFuture = completableFuture;
-		this.completableFuture.handle(new BiFunction<T, Throwable, Object>() {
-			@Override
-			public Object apply(T result, Throwable ex) {
-				if (ex != null) {
-					callbacks.failure(ex);
-				}
-				else {
-					callbacks.success(result);
-				}
-				return null;
+		this.completableFuture.whenComplete((result, ex) -> {
+			if (ex != null) {
+				this.callbacks.failure(ex);
+			}
+			else {
+				this.callbacks.success(result);
 			}
 		});
 	}
@@ -79,6 +72,12 @@ public class CompletableToListenableFutureAdapter<T> implements ListenableFuture
 		this.callbacks.addSuccessCallback(successCallback);
 		this.callbacks.addFailureCallback(failureCallback);
 	}
+
+	@Override
+	public CompletableFuture<T> completable() {
+		return this.completableFuture;
+	}
+
 
 	@Override
 	public boolean cancel(boolean mayInterruptIfRunning) {

@@ -18,9 +18,13 @@
  */
 package org.apache.poi.hssf.record;
 
+import java.io.ByteArrayInputStream;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Supplier;
 
-import org.apache.poi.util.LittleEndian;
+import org.apache.poi.util.GenericRecordUtil;
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.LittleEndianOutput;
 import org.apache.poi.util.RecordFormatException;
 import org.apache.poi.util.StringUtil;
@@ -66,8 +70,10 @@ import org.apache.poi.util.StringUtil;
  *
  * At the moment this class is read-only.
  */
-public class DConRefRecord extends StandardRecord
-{
+public class DConRefRecord extends StandardRecord {
+
+    //arbitrarily selected; may need to increase
+    private static final int MAX_RECORD_LENGTH = 100_000;
 
     /**
      * The id of the record type,
@@ -104,54 +110,25 @@ public class DConRefRecord extends StandardRecord
      */
     private byte[] _unused;
 
+    public DConRefRecord(DConRefRecord other) {
+        super(other);
+        firstCol = other.firstCol;
+        firstRow = other.firstRow;
+        lastCol = other.lastCol;
+        lastRow = other.lastRow;
+        charCount = other.charCount;
+        charType = other.charType;
+        path = (other.path == null) ? null : other.path.clone();
+        _unused = (other._unused == null) ? null : other._unused.clone();
+    }
+
     /**
      * Read constructor.
      *
      * @param data byte array containing a DConRef Record, including the header.
      */
-    public DConRefRecord(byte[] data)
-    {
-        int offset = 0;
-        if (!(LittleEndian.getShort(data, offset) == DConRefRecord.sid))
-            throw new RecordFormatException("incompatible sid.");
-        offset += LittleEndian.SHORT_SIZE;
-
-        //length = LittleEndian.getShort(data, offset);
-        offset += LittleEndian.SHORT_SIZE;
-
-        firstRow = LittleEndian.getUShort(data, offset);
-        offset += LittleEndian.SHORT_SIZE;
-        lastRow = LittleEndian.getUShort(data, offset);
-        offset += LittleEndian.SHORT_SIZE;
-        firstCol = LittleEndian.getUByte(data, offset);
-        offset += LittleEndian.BYTE_SIZE;
-        lastCol = LittleEndian.getUByte(data, offset);
-        offset += LittleEndian.BYTE_SIZE;
-        charCount = LittleEndian.getUShort(data, offset);
-        offset += LittleEndian.SHORT_SIZE;
-        if (charCount < 2)
-            throw new RecordFormatException("Character count must be >= 2");
-
-        charType = LittleEndian.getUByte(data, offset);
-        offset += LittleEndian.BYTE_SIZE; //7 bits reserved + 1 bit type
-
-        /*
-         * bytelength is the length of the string in bytes, which depends on whether the string is
-         * made of single- or double-byte chars. This is given by charType, which equals 0 if
-         * single-byte, 1 if double-byte.
-         */
-        int byteLength = charCount * ((charType & 1) + 1);
-
-        path = LittleEndian.getByteArray(data, offset, byteLength);
-        offset += byteLength;
-
-        /*
-         * If it's a self reference, the last one or two bytes (depending on char type) are the
-         * unused field. Not sure If i need to bother with this...
-         */
-        if (path[0] == 0x02)
-            _unused = LittleEndian.getByteArray(data, offset, (charType + 1));
-
+    public DConRefRecord(byte[] data) {
+        this(bytesToRIStream(data));
     }
 
     /**
@@ -159,10 +136,10 @@ public class DConRefRecord extends StandardRecord
      *
      * @param inStream RecordInputStream containing a DConRefRecord structure.
      */
-    public DConRefRecord(RecordInputStream inStream)
-    {
-        if (inStream.getSid() != sid)
+    public DConRefRecord(RecordInputStream inStream) {
+        if (inStream.getSid() != sid) {
             throw new RecordFormatException("Wrong sid: " + inStream.getSid());
+        }
 
         firstRow = inStream.readUShort();
         lastRow = inStream.readUShort();
@@ -170,17 +147,23 @@ public class DConRefRecord extends StandardRecord
         lastCol = inStream.readUByte();
 
         charCount = inStream.readUShort();
-        charType = inStream.readUByte() & 0x01; //first bit only.
 
-        // byteLength depends on whether we are using single- or double-byte chars.
-        int byteLength = charCount * (charType + 1);
+        // 7 bits reserved + 1 bit type - first bit only
+        charType = inStream.readUByte() & 0x01;
 
-        path = new byte[byteLength];
+        // bytelength is the length of the string in bytes, which depends on whether the string is
+        // made of single- or double-byte chars. This is given by charType, which equals 0 if
+        // single-byte, 1 if double-byte.
+        final int byteLength = charCount * (charType + 1);
+
+        path = IOUtils.safelyAllocate(byteLength, MAX_RECORD_LENGTH);
         inStream.readFully(path);
 
-        if (path[0] == 0x02)
+        // If it's a self reference, the last one or two bytes (depending on char type) are the
+        // unused field. Not sure If i need to bother with this...
+        if (path[0] == 0x02) {
             _unused = inStream.readRemainder();
-
+        }
     }
 
     /*
@@ -248,25 +231,6 @@ public class DConRefRecord extends StandardRecord
         return lastRow;
     }
 
-    @Override
-    public String toString()
-    {
-        StringBuilder b = new StringBuilder();
-	b.append("[DCONREF]\n");
-        b.append("    .ref\n");
-        b.append("        .firstrow   = ").append(firstRow).append("\n");
-        b.append("        .lastrow    = ").append(lastRow).append("\n");
-        b.append("        .firstcol   = ").append(firstCol).append("\n");
-        b.append("        .lastcol    = ").append(lastCol).append("\n");
-        b.append("    .cch            = ").append(charCount).append("\n");
-	b.append("    .stFile\n");
-	b.append("        .h          = ").append(charType).append("\n");
-	b.append("        .rgb        = ").append(getReadablePath()).append("\n");
-	b.append("[/DCONREF]\n");
-
-        return b.toString();
-    }
-
     /**
      *
      * @return raw path byte array.
@@ -287,8 +251,7 @@ public class DConRefRecord extends StandardRecord
             //all of the path strings start with either 0x02 or 0x01 followed by zero or
             //more of 0x01..0x08
             int offset = 1;
-            while (path[offset] < 0x20 && offset < path.length)
-            {
+            while (offset < path.length && path[offset] < 0x20) {
                 offset++;
             }
             String out = new String(Arrays.copyOfRange(path, offset, path.length), StringUtil.UTF8);
@@ -306,8 +269,35 @@ public class DConRefRecord extends StandardRecord
      */
     public boolean isExternalRef()
     {
-        if (path[0] == 0x01)
-            return true;
-        return false;
+        return path[0] == 0x01;
+    }
+
+    @Override
+    public DConRefRecord copy() {
+        return new DConRefRecord(this);
+    }
+
+    private static RecordInputStream bytesToRIStream(byte[] data) {
+        RecordInputStream ric = new RecordInputStream(new ByteArrayInputStream(data));
+        ric.nextRecord();
+        return ric;
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.DCON_REF;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "firstRow", this::getFirstRow,
+            "lastRow", this::getLastRow,
+            "firstColumn", this::getFirstColumn,
+            "lastColumn", this::getLastColumn,
+            "charCount", () -> charCount,
+            "charType", () -> charType,
+            "path", this::getReadablePath
+        );
     }
 }

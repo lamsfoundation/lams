@@ -38,13 +38,4 @@
       </KEYS>
     </TABLE>
   </TABLES>
-  <STATEMENTS>
-    <STATEMENT NAME="insert log_display" TYPE="insert" TABLE="log_display" COMMENT="Initial insert of records on table log_display">
-      <SENTENCES>
-        <SENTENCE TEXT="(module, action, mtable, field) VALUES ('lamslesson', 'add', 'lamslesson', 'name')" />
-        <SENTENCE TEXT="(module, action, mtable, field) VALUES ('lamslesson', 'update', 'lamslesson', 'name')" />
-        <SENTENCE TEXT="(module, action, mtable, field) VALUES ('lamslesson', 'view lamslesson', 'lamslesson', 'name')" />
-      </SENTENCES>
-    </STATEMENT>
-  </STATEMENTS>
 </XMLDB>

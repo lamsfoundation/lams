@@ -111,6 +111,8 @@ public interface IUserManagementService {
      */
     List findByProperty(Class clazz, String name, Object value);
 
+    List findByProperty(Class clazz, String name, Object value, boolean cache);
+
     <T> List<T> findByPropertyValues(Class<T> clazz, String name, Collection<?> values);
 
     /**
@@ -119,6 +121,8 @@ public interface IUserManagementService {
      * @return a list of objects which have the same property values
      */
     List findByProperties(Class clazz, Map<String, Object> properties);
+
+    List findByProperties(Class clazz, Map<String, Object> properties, boolean cache);
 
     /**
      * Retrieves users from the specified organisation
@@ -265,17 +269,10 @@ public interface IUserManagementService {
      * @return the User
      */
     User getUserByLogin(String login);
-    
+
     User getUserById(Integer userId);
 
-    /**
-     * @param login
-     *            user's login
-     * @param password
-     *            new password
-     * @return void
-     */
-    void updatePassword(String login, String password);
+    void updatePassword(User user, String password);
 
     /**
      * @param userId

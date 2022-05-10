@@ -11,13 +11,15 @@
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 
-<%@ attribute name="name" required="true" rtexprvalue="true" %>
+
 <%@ attribute name="labelKey" required="true" rtexprvalue="true" %>
 
+<%@ attribute name="name" required="false" rtexprvalue="true" %>
 <%@ attribute name="checked" required="false" rtexprvalue="true" %>
 <%@ attribute name="id" required="false" rtexprvalue="true" %>
 <%@ attribute name="useSpringForm" required="false" rtexprvalue="true" %>
 <%@ attribute name="inputCellClass" required="false" rtexprvalue="true" %>
+<%@ attribute name="iconClass" required="false" rtexprvalue="true" %>
 <%@ attribute name="tooltipKey" required="false" rtexprvalue="true" %>
 <%@ attribute name="tooltipDescriptionKey" required="false" rtexprvalue="true" %>
 
@@ -26,13 +28,17 @@
 <c:set var="useSpringForm" value="${empty useSpringForm ? false : useSpringForm}" />
 
 <lams:Input id="${id}" labelKey="${labelKey}" inputCellClass="d-flex justify-content-end switch switch-sm ${inputCellClass}"
-		    tooltipKey="${tooltipKey}" tooltipDescriptionKey="${tooltipDescriptionKey}" >
+			iconClass="${iconClass}" tooltipKey="${tooltipKey}" tooltipDescriptionKey="${tooltipDescriptionKey}">
     <c:choose>
    		<c:when test="${useSpringForm}">
    			<form:checkbox path="${name}" id="${id}" cssClass="switch" />
    		</c:when>
    		<c:otherwise>
-			<input type="checkbox" class="switch" name="${name}" id="${id}" ${checked ? ' checked' : ''}>
+			<input type="checkbox" class="switch" id="${id}" ${checked ? ' checked' : ''}
+				<c:if test="${not empty name}">
+					name="${name}"
+				</c:if>
+			>
    		</c:otherwise>
    	</c:choose>
 	

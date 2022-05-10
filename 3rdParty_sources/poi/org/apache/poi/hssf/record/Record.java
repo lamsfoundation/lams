@@ -19,14 +19,18 @@ package org.apache.poi.hssf.record;
 
 import java.io.ByteArrayInputStream;
 
+import org.apache.poi.common.Duplicatable;
+import org.apache.poi.common.usermodel.GenericRecord;
+import org.apache.poi.util.GenericRecordJsonWriter;
+
 /**
  * All HSSF Records inherit from this class.
  */
-public abstract class Record extends RecordBase {
+public abstract class Record extends RecordBase implements Duplicatable, GenericRecord {
 
-    protected Record() {
-        // no fields to initialise
-    }
+    protected Record() {}
+
+    protected Record(Record other) {}
 
     /**
      * called by the class that is responsible for writing this sucker.
@@ -46,21 +50,16 @@ public abstract class Record extends RecordBase {
      * get a string representation of the record (for biffview/debugging)
      */
     @Override
-    public String toString() {
-        return super.toString();
+    public final String toString() {
+        return GenericRecordJsonWriter.marshal(this);
     }
 
     /**
      * return the non static version of the id for this record.
-     * 
+     *
      * @return he id for this record
      */
     public abstract short getSid();
-
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        throw new CloneNotSupportedException("The class "+getClass().getName()+" needs to define a clone method");
-    }
 
     /**
      * Clone the current record, via a call to serialize
@@ -70,7 +69,7 @@ public abstract class Record extends RecordBase {
      *  internal counts / ids in them. For those which
      *  do, a full model-aware cloning is needed, which
      *  allocates new ids / counts as needed.
-     * 
+     *
      * @return the cloned current record
      */
     public Record cloneViaReserialise() {
@@ -86,4 +85,9 @@ public abstract class Record extends RecordBase {
         }
         return r[0];
     }
+
+    public abstract Record copy();
+
+    @Override
+    public abstract HSSFRecordTypes getGenericRecordType();
 }

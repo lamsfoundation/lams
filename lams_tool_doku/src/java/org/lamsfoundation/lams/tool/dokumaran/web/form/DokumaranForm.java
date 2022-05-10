@@ -68,7 +68,7 @@ public class DokumaranForm {
 	// if it is start page, all data read out from database or current session
 	// so need not reset checkbox to refresh value!
 	if (!StringUtils.equals(param, "start") && !StringUtils.equals(param, "initPage")) {
-	    dokumaran.setTimeLimit(0);
+	    dokumaran.setRelativeTimeLimit(0);
 	    dokumaran.setShowChat(false);
 	    dokumaran.setShowLineNumbers(false);
 	    dokumaran.setLockWhenFinished(false);

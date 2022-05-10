@@ -91,7 +91,7 @@ public class UniversalLoginModule implements LoginModule {
     private static IThemeService themeService;
     private static IUserManagementService userManagementService;
 
-    private static final long INTERNAL_AUTHENTICATION_TIMEOUT = 10 * 1000;
+    private static final long INTERNAL_AUTHENTICATION_TIMEOUT = 60 * 1000;
     private static final String ROLES_QUERY = "SELECT DISTINCT r.name,'Roles' FROM lams_user u "
 	    + "LEFT OUTER JOIN lams_user_organisation uo USING(user_id) "
 	    + "LEFT OUTER JOIN lams_user_organisation_role urr USING(user_organisation_id) "

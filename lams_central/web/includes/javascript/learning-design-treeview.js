@@ -10,6 +10,7 @@ var ldTreeview = {
 		ldTree : null,
 		// can be i18n
 		LABEL_RUN_SEQUENCES_FOLDER : 'Run sequences',
+		FOLDER_CONTENTS_FETCH_URL : 'home/getFolderContents.do',
 		
 		
 		/**
@@ -57,7 +58,7 @@ var ldTreeview = {
 				result = [];
 				
 			$.ajax({
-				url : LAMS_URL + 'home/getFolderContents.do',
+				url : LAMS_URL + this.FOLDER_CONTENTS_FETCH_URL,
 				data : {
 					'folderID' : folderID,
 					'allowInvalidDesigns' : allowInvalidDesigns
@@ -71,7 +72,8 @@ var ldTreeview = {
 						$.each(response.folders, function(index){
 							// folderID == -2 is courses folder
 							var canSave = this.folderID > 0 && !this.isRunSequencesFolder;
-							result.push({'text'                : (this.isRunSequencesFolder ? runSequencesFolderLabel : this.name)
+							result.push({'text'                : (this.isRunSequencesFolder ? runSequencesFolderLabel 
+																							: ldTreeview.escapeHtml(this.name))
 																	+ (canSave ? '' : '&nbsp;<i class="fa fa-lock read-only-folder"></i>'),
 										 'nodes'			   : [],
 									  	 'folderID'		       : this.folderID,
@@ -84,9 +86,10 @@ var ldTreeview = {
 					}
 					if (response.learningDesigns) {
 						$.each(response.learningDesigns, function(){
-							var canModify = canSave && this.canModify;
-							result.push({'label'            : this.name,
-										 'text'             : this.name + (this.readOnly || !canModify ? ' <i class="fa fa-lock"></i>' : ''),
+							var canModify = canSave && this.canModify,
+								name = ldTreeview.escapeHtml(this.name);
+							result.push({'label'            : name,
+										 'text'             : name + (this.readOnly ? ' <i class="fa fa-lock"></i>' : ''),
 							  	         'learningDesignId' : this.learningDesignId,
 							  	         'canHaveReadOnly'	: canHaveReadOnly,
 							  	         'canModify'		: canModify,
@@ -100,6 +103,9 @@ var ldTreeview = {
 			// if folder is empty, we need to shift its icon a bit to the right 
 			if (result.length === 0) {
 				folder.icon = 'fa fa-folder-open treeview-empty';
+			} else if (folder) {
+				// remove previously set folder-open etc. classes so two folder icons are not displayed
+				folder.icon = '';
 			}
 			return result;
 		},
@@ -145,5 +151,17 @@ var ldTreeview = {
 			// update counters for next click
 			this.nodeLastSelectedTime = currentTimestamp;
 			this.nodeLastSelectedId = node.nodeId;
+		},
+		
+		/**
+		 * Escapes HTML tags to prevent XSS injection.
+		 */
+		escapeHtml : function(unsafe) {
+		    return unsafe
+		        .replace(/&/g, "&amp;")
+		        .replace(/</g, "&lt;")
+		        .replace(/>/g, "&gt;")
+		        .replace(/"/g, "&quot;")
+		        .replace(/'/g, "&#039;");
 		}
 }

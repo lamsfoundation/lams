@@ -27,7 +27,6 @@ import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
-import org.lamsfoundation.lams.learningdesign.LearningLibraryGroup;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningLibraryDAO;
 import org.springframework.stereotype.Repository;
 
@@ -43,13 +42,13 @@ public class LearningLibraryDAO extends LAMSBaseDAO implements ILearningLibraryD
 
     @Override
     public LearningLibrary getLearningLibraryById(Long learningLibraryId) {
-	return (LearningLibrary) super.find(LearningLibrary.class, learningLibraryId);
+	return super.find(LearningLibrary.class, learningLibraryId);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<LearningLibrary> getAllLearningLibraries() {
-	return getSession().createQuery(LearningLibraryDAO.FIND_VALID_LIB).list();
+	return getSession().createQuery(LearningLibraryDAO.FIND_VALID_LIB).setCacheable(true).list();
     }
 
     @Override
@@ -58,13 +57,7 @@ public class LearningLibraryDAO extends LAMSBaseDAO implements ILearningLibraryD
 	if (valid) {
 	    return getAllLearningLibraries();
 	} else {
-	    return (List<LearningLibrary>) doFind(LearningLibraryDAO.FIND_ALL_LIB);
+	    return doFindCacheable(LearningLibraryDAO.FIND_ALL_LIB);
 	}
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<LearningLibraryGroup> getLearningLibraryGroups() {
-	return loadAll(LearningLibraryGroup.class);
     }
 }

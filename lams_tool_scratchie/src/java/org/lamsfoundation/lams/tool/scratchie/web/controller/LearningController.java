@@ -76,7 +76,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -103,10 +102,12 @@ public class LearningController {
 
     /**
      * Read scratchie data from database and put them into HttpSession.
+     *
+     * @throws IOException
      */
     @RequestMapping("/start")
     private String start(HttpServletRequest request, HttpServletResponse response, @RequestParam Long toolSessionID)
-	    throws ScratchieApplicationException {
+	    throws ScratchieApplicationException, IOException {
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 	ScratchieSession toolSession = scratchieService.getScratchieSessionBySessionId(toolSessionID);
@@ -133,6 +134,7 @@ public class LearningController {
 	    List<User> groupUserDtos = new ArrayList<>();
 	    for (ScratchieUser groupUser : groupUsers) {
 		User groupUserDto = new User();
+		groupUserDto.setUserId(groupUser.getUserId().intValue());
 		groupUserDto.setFirstName(groupUser.getFirstName());
 		groupUserDto.setLastName(groupUser.getLastName());
 		groupUserDtos.add(groupUserDto);
@@ -236,87 +238,81 @@ public class LearningController {
 	    redirectURL = WebUtil.appendParameterToURL(redirectURL, AttributeNames.ATTR_MODE, mode.toString());
 	    return redirectURL;
 
-	    // show results page
-	} else if (isShowResults) {
+	}
 
+	// show results page
+	if (isShowResults) {
 	    String redirectURL = "redirect:showResults.do";
 	    redirectURL = WebUtil.appendParameterToURL(redirectURL, ScratchieConstants.ATTR_SESSION_MAP_ID,
 		    sessionMap.getSessionID());
 	    redirectURL = WebUtil.appendParameterToURL(redirectURL, AttributeNames.ATTR_MODE, mode.toString());
 	    return redirectURL;
 
-	    // show learning.jsp page
-	} else {
-
-	    // time limit feature
-	    boolean isTimeLimitEnabled = isUserLeader && !isScratchingFinished && scratchie.getTimeLimit() != 0;
-	    boolean isTimeLimitNotLaunched = toolSession.getTimeLimitLaunchedDate() == null;
-	    long secondsLeft = 1;
-	    if (isTimeLimitEnabled) {
-		// if user has pressed OK button already - calculate remaining time, and full time otherwise
-		secondsLeft = isTimeLimitNotLaunched ? scratchie.getTimeLimit() * 60
-			: scratchie.getTimeLimit() * 60
-				- (System.currentTimeMillis() - toolSession.getTimeLimitLaunchedDate().getTime())
-					/ 1000;
-		// change negative number or zero to 1 so it can autosubmit results
-		secondsLeft = Math.max(1, secondsLeft);
-	    }
-	    request.setAttribute(ScratchieConstants.ATTR_IS_TIME_LIMIT_ENABLED, isTimeLimitEnabled);
-	    request.setAttribute(ScratchieConstants.ATTR_IS_TIME_LIMIT_NOT_LAUNCHED, isTimeLimitNotLaunched);
-	    request.setAttribute(ScratchieConstants.ATTR_SECONDS_LEFT, secondsLeft);
-
-	    // in case we can't show learning.jsp to non-leaders forward them to the waitForLeaderTimeLimit page
-	    if (!isUserLeader && scratchie.getTimeLimit() != 0 && !mode.isTeacher()) {
-
-		// show waitForLeaderLaunchTimeLimit page if the leader hasn't started activity or hasn't pressed OK
-		// button to launch time limit
-		if (toolSession.getTimeLimitLaunchedDate() == null) {
-		    request.setAttribute(ScratchieConstants.ATTR_WAITING_MESSAGE_KEY,
-			    "label.waiting.for.leader.launch.time.limit");
-		    return "pages/learning/waitForLeaderTimeLimit";
-		}
-
-		// check if the time limit is exceeded
-		boolean isTimeLimitExceeded = toolSession.getTimeLimitLaunchedDate().getTime()
-			+ scratchie.getTimeLimit() * 60000 < System.currentTimeMillis();
-
-		// if the time limit is over and the leader hasn't submitted notebook or burning questions (thus
-		// non-leaders should wait) - show waitForLeaderFinish page
-		if (isTimeLimitExceeded && isWaitingForLeaderToSubmitNotebook) {
-		    request.setAttribute(ScratchieConstants.ATTR_WAITING_MESSAGE_KEY,
-			    "label.waiting.for.leader.submit.notebook");
-		    return "pages/learning/waitForLeaderTimeLimit";
-		}
-	    }
-
-	    if (mode.isTeacher()) {
-		scratchieService.populateScratchieItemsWithMarks(scratchie, items, toolSessionID);
-		// get updated score from ScratchieSession
-		int score = toolSession.getMark();
-		request.setAttribute(ScratchieConstants.ATTR_SCORE, score);
-		int percentage = (maxScore == 0) ? 0 : ((score * 100) / maxScore);
-		request.setAttribute(ScratchieConstants.ATTR_SCORE_PERCENTAGE, percentage);
-	    }
-
-	    sessionMap.put(ScratchieConstants.ATTR_IS_SCRATCHING_FINISHED, isScratchingFinished);
-	    // make non-leaders wait for notebook to be submitted, if required
-	    sessionMap.put(ScratchieConstants.ATTR_IS_WAITING_FOR_LEADER_TO_SUBMIT_NOTEBOOK,
-		    isWaitingForLeaderToSubmitNotebook);
-
-	    boolean questionEtherpadEnabled = scratchie.isQuestionEtherpadEnabled()
-		    && StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
-	    request.setAttribute(ScratchieConstants.ATTR_IS_QUESTION_ETHERPAD_ENABLED, questionEtherpadEnabled);
-	    if (questionEtherpadEnabled && scratchieService.isGroupedActivity(scratchie.getContentId())) {
-		// get all users from the group, even if they did not reach the Scratchie yet
-		// order them by first and last name
-		Collection<User> allGroupUsers = scratchieService.getAllGroupUsers(toolSessionID).stream()
-			.sorted(Comparator.comparing(u -> u.getFirstName() + u.getLastName()))
-			.collect(Collectors.toList());
-		request.setAttribute(ScratchieConstants.ATTR_ALL_GROUP_USERS, allGroupUsers);
-	    }
-
-	    return "pages/learning/learning";
 	}
+
+	// check time limits
+	if ((scratchie.getRelativeTimeLimit() != 0 || scratchie.getAbsoluteTimeLimit() != null) && !mode.isTeacher()) {
+
+	    // show waitForLeaderLaunchTimeLimit page if the leader hasn't started activity
+	    if (!isUserLeader && toolSession.getTimeLimitLaunchedDate() == null) {
+		request.setAttribute(ScratchieConstants.ATTR_WAITING_MESSAGE_KEY,
+			"label.waiting.for.leader.launch.time.limit");
+		return "pages/learning/waitForLeaderTimeLimit";
+	    }
+
+	    // if the time limit is over and the leader hasn't submitted notebook or burning questions (thus
+	    // non-leaders should wait) - show waitForLeaderFinish page
+	    if (!isUserLeader && isScratchingFinished && isWaitingForLeaderToSubmitNotebook) {
+		request.setAttribute(ScratchieConstants.ATTR_WAITING_MESSAGE_KEY,
+			"label.waiting.for.leader.submit.notebook");
+		return "pages/learning/waitForLeaderTimeLimit";
+	    }
+
+	    // check if the time limit is exceeded
+	    boolean isTimeLimitExceeded = scratchieService.checkTimeLimitExceeded(scratchie.getContentId(),
+		    groupLeader.getUserId().intValue());
+
+	    if (isTimeLimitExceeded) {
+		// first learner, even non-leader, who detects that scratching is finished (probably after time expired refresh)
+		// marks scratching as finished (but does not send refresh to everyone as they are already refreshing on time expired)
+		if (!isScratchingFinished) {
+		    scratchieService.setScratchingFinished(toolSessionID);
+		}
+
+		// go through whole method again, with new settings
+		return "forward:start.do";
+
+	    }
+	}
+
+	// show learning.jsp page
+	if (mode.isTeacher()) {
+	    scratchieService.populateScratchieItemsWithMarks(scratchie, items, toolSessionID);
+	    // get updated score from ScratchieSession
+	    int score = toolSession.getMark();
+	    request.setAttribute(ScratchieConstants.ATTR_SCORE, score);
+	    int percentage = (maxScore == 0) ? 0 : ((score * 100) / maxScore);
+	    request.setAttribute(ScratchieConstants.ATTR_SCORE_PERCENTAGE, percentage);
+	}
+
+	sessionMap.put(ScratchieConstants.ATTR_IS_SCRATCHING_FINISHED, isScratchingFinished);
+	// make non-leaders wait for notebook to be submitted, if required
+	sessionMap.put(ScratchieConstants.ATTR_IS_WAITING_FOR_LEADER_TO_SUBMIT_NOTEBOOK,
+		isWaitingForLeaderToSubmitNotebook);
+
+	boolean questionEtherpadEnabled = scratchie.isQuestionEtherpadEnabled()
+		&& StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
+	request.setAttribute(ScratchieConstants.ATTR_IS_QUESTION_ETHERPAD_ENABLED, questionEtherpadEnabled);
+	if (questionEtherpadEnabled && scratchieService.isGroupedActivity(scratchie.getContentId())) {
+	    // get all users from the group, even if they did not reach the Scratchie yet
+	    // order them by first and last name
+	    Collection<User> allGroupUsers = scratchieService.getAllGroupUsers(toolSessionID).stream()
+		    .sorted(Comparator.comparing(u -> u.getFirstName() + u.getLastName())).collect(Collectors.toList());
+	    request.setAttribute(ScratchieConstants.ATTR_ALL_GROUP_USERS, allGroupUsers);
+	}
+
+	return "pages/learning/learning";
+
     }
 
     /**
@@ -532,25 +528,6 @@ public class LearningController {
     }
 
     /**
-     * Stores date when user has started activity with time limit.
-     */
-    @RequestMapping("/launchTimeLimit")
-    @ResponseStatus(HttpStatus.OK)
-    private void launchTimeLimit(HttpServletRequest request) throws ScratchieApplicationException, SchedulerException {
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	final Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	ScratchieSession toolSession = scratchieService.getScratchieSessionBySessionId(toolSessionId);
-
-	ScratchieUser leader = getCurrentUser(toolSessionId);
-	// only leader is allowed to launch time limit
-	if (!toolSession.isUserGroupLeader(leader.getUid())) {
-	    return;
-	}
-
-	scratchieService.launchTimeLimit(toolSessionId);
-    }
-
-    /**
      * Displays results page. When leader gets to this page, scratchingFinished column is set to true for all users.
      */
     @RequestMapping("/showResults")
@@ -573,6 +550,8 @@ public class LearningController {
 
 	if (toolSession.isUserGroupLeader(userUid) && !toolSession.isScratchingFinished()) {
 	    scratchieService.setScratchingFinished(toolSessionId);
+	    // non-leaders need to go to results page
+	    LearningWebsocketServer.getInstance().sendPageRefreshRequest(scratchie.getContentId(), toolSessionId);
 	}
 
 	// get updated score from ScratchieSession
@@ -798,6 +777,8 @@ public class LearningController {
 	// in case of the leader we should let all other learners see Next Activity button
 	if (toolSession.isUserGroupLeader(userUid) && !toolSession.isScratchingFinished()) {
 	    scratchieService.setScratchingFinished(toolSessionId);
+	    // non-leaders need to go to results page
+	    LearningWebsocketServer.getInstance().sendPageRefreshRequest(scratchie.getContentId(), toolSessionId);
 	}
 
 	return "pages/learning/notebook";
@@ -808,7 +789,7 @@ public class LearningController {
      */
     @RequestMapping("/submitReflection")
     public String submitReflection(@ModelAttribute("reflectionForm") ReflectionForm reflectionForm,
-	    HttpServletRequest request) throws ScratchieApplicationException {
+	    HttpServletRequest request) throws ScratchieApplicationException, IOException {
 	final Integer userId = reflectionForm.getUserID();
 	final String entryText = reflectionForm.getEntryText();
 
@@ -830,6 +811,10 @@ public class LearningController {
 	    scratchieService.updateEntry(entry);
 	}
 	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ENTRY, entryText);
+
+	Scratchie scratchie = scratchieService.getScratchieBySessionId(sessionId);
+	// non-leaders need to go to results page
+	LearningWebsocketServer.getInstance().sendPageRefreshRequest(scratchie.getContentId(), sessionId);
 
 	String redirectURL = "redirect:showResults.do";
 	redirectURL = WebUtil.appendParameterToURL(redirectURL, ScratchieConstants.ATTR_SESSION_MAP_ID,

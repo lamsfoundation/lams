@@ -68,12 +68,15 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
     @Column(name = "gate_open_time")
     private Date gateOpenTime;
 
+    @Column(name = "gate_stop_at_preceding_activity")
+    private boolean gateStopAtPrecedingActivity;
+
     /**
      * The learners who passed the gate.
      */
     @ManyToMany
     @JoinTable(name = "lams_gate_allowed_learners", joinColumns = @JoinColumn(name = "activity_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private Set<User> allowedToPassLearners = new HashSet<User>();
+    private Set<User> allowedToPassLearners = new HashSet<>();
 
     /** full constructor */
     public GateActivity(Long activityId, Integer id, String description, String title, Integer xcoord, Integer ycoord,
@@ -186,5 +189,13 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
 
     public void setAllowedToPassLearners(Set<User> allowedToPassLearners) {
 	this.allowedToPassLearners = allowedToPassLearners;
+    }
+
+    public boolean getGateStopAtPrecedingActivity() {
+	return gateStopAtPrecedingActivity;
+    }
+
+    public void setGateStopAtPrecedingActivity(boolean stopAtPrecedingActivity) {
+	this.gateStopAtPrecedingActivity = stopAtPrecedingActivity;
     }
 }

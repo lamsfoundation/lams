@@ -2,106 +2,10 @@
 <c:set var="lams">
 	<lams:LAMSURL />
 </c:set>
-<%-- param has higher level for request attribute --%>
-<c:if test="${not empty param.sessionMapID}">
-	<c:set var="sessionMapID" value="${param.sessionMapID}" />
-</c:if>
-<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-<c:set var="mode" value="${sessionMap.mode}" />
-<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
-<c:set var="scratchie" value="${sessionMap.scratchie}" />
-<c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
-<c:set var="isScratchingFinished" value="${sessionMap.isScratchingFinished}" />
-<c:set var="isWaitingForLeaderToSubmitNotebook" value="${sessionMap.isWaitingForLeaderToSubmitNotebook}" />
-<c:set var="hideFinishButton" value="${!isUserLeader && (!isScratchingFinished || isWaitingForLeaderToSubmitNotebook)}" />
 
 <!-- Used by TestHarness 
 	 isUserLeader=${isUserLeader}
 	 hideFinishButton=${hideFinishButton} -->
-
-<c:if test="${not isUserLeader}">
-	<script type="text/javascript">
-	$(document).ready(function(){
-		// hide Finish button for non-leaders until leader finishes
-		if (${hideFinishButton}) {
-			$("#finishButton").hide();
-		}
-	});
-	
-	//init the connection with server using server URL but with different protocol
-	var scratchieWebsocketInitTime = Date.now(),
-		scratchieWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
-					+ 'learningWebsocket?toolSessionID=' + ${toolSessionID}),
-		scratchieWebsocketPingTimeout = null,
-		scratchieWebsocketPingFunc = null;
-	
-	scratchieWebsocket.onclose = function(e) {
-		// react only on abnormal close
-		if (e.code === 1006 &&
-			Date.now() - scratchieWebsocketInitTime > 1000) {
-			location.reload();		
-		}
-	};
-	
-	scratchieWebsocketPingFunc = function(skipPing){
-		if (scratchieWebsocket.readyState == scratchieWebsocket.CLOSING 
-				|| scratchieWebsocket.readyState == scratchieWebsocket.CLOSED){
-			return;
-		}
-		
-		// check and ping every 3 minutes
-		scratchieWebsocketPingTimeout = setTimeout(scratchieWebsocketPingFunc, 3*60*1000);
-		// initial set up does not send ping
-		if (!skipPing) {
-			scratchieWebsocket.send("ping");
-		}
-	};
-	
-	// set up timer for the first time
-	scratchieWebsocketPingFunc(true);
-	
-	// run when the server pushes new reports and vote statistics
-	scratchieWebsocket.onmessage = function(e) {
-		// create JSON object
-		var input = JSON.parse(e.data);
-
-		//time limit is expired but leader hasn't submitted required notebook yet. Non-leaders
-        //will need to refresh the page in order to stop showing them questions page.
-		if (input.pageRefresh) {
-			location.reload();
-			return;
-		}
-		
-		// reset ping timer
-		clearTimeout(scratchieWebsocketPingTimeout);
-		scratchieWebsocketPingFunc(true);
-		
-		// leader finished the activity
-		if (input.close) {
-			$('#finishButton').show();
-			return;
-		}
-
-		// only updates come via websockets
-		$.each(input, function(itemUid, options) {
-			$.each(options, function(optionUid, optionProperties){
-				
-				if (optionProperties.isVSA) {
-					var answer = optionUid;
-					optionUid = hashCode(optionUid);
-
-					//check if such image exists, create it otherwise
-					if ($('#image-' + itemUid + '-' + optionUid).length == 0) {
-						paintNewVsaAnswer(eval(itemUid), answer);
-					}
-				}
-				
-				scratchImage(itemUid, optionUid, optionProperties.isCorrect);
-			});
-		});
-	};
-	</script>
-</c:if>
 
 <form id="burning-questions" name="burning-questions" method="post" action="">
 	<%@ include file="scratchies.jsp"%>

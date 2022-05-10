@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -51,6 +52,10 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.logevent.LearnerInteractionEvent;
+import org.lamsfoundation.lams.logevent.service.ILearnerInteractionService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
@@ -59,6 +64,7 @@ import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
@@ -95,6 +101,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -120,6 +128,25 @@ public class LearningController {
 
     @Autowired
     private IUserManagementService userManagementService;
+
+    @Autowired
+    private ILessonService lessonService;
+
+    @Autowired
+    private ILearnerInteractionService learnerInteractionService;
+
+    @Autowired
+    private ISecurityService securityService;
+
+    private static final Comparator<OptionDTO> MATCHING_PAIRS_OPTION_COMPARATOR = new Comparator<>() {
+	@Override
+	public int compare(OptionDTO o1, OptionDTO o2) {
+	    String name1 = o1.getName() != null ? o1.getName() : "";
+	    String name2 = o2.getName() != null ? o2.getName() : "";
+
+	    return AlphanumComparator.compareAlphnumerically(name1, name2);
+	}
+    };
 
     /**
      * Read assessment data from database and put them into HttpSession. It will redirect to init.do directly after this
@@ -151,7 +178,7 @@ public class LearningController {
 	    user = getSpecifiedUser(service, toolSessionId,
 		    WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
 	} else {
-	    user = getCurrentUser(toolSessionId);
+	    user = getCurrentAssessmentUser(toolSessionId);
 	}
 
 	Assessment assessment = service.getAssessmentBySessionId(toolSessionId);
@@ -160,6 +187,8 @@ public class LearningController {
 	AssessmentUser groupLeader = assessment.isUseSelectLeaderToolOuput()
 		? service.checkLeaderSelectToolForSessionLeader(user, toolSessionId)
 		: null;
+	boolean isUserLeader = groupLeader != null && user.getUserId().equals(groupLeader.getUserId());
+
 	if (assessment.isUseSelectLeaderToolOuput() && !mode.isTeacher()) {
 
 	    // forwards to the leaderSelection page
@@ -177,8 +206,7 @@ public class LearningController {
 		    && lastLeaderResult.getFinishDate() != null;
 
 	    // forwards to the waitForLeader pages
-	    boolean isNonLeader = !user.getUserId().equals(groupLeader.getUserId());
-	    if (assessment.getRelativeTimeLimit() != 0 && isNonLeader && !isLastAttemptFinishedByLeader) {
+	    if (assessment.getRelativeTimeLimit() != 0 && !isUserLeader && !isLastAttemptFinishedByLeader) {
 
 		//show waitForLeaderLaunchTimeLimit page if the leader hasn't started activity or hasn't pressed OK button to launch time limit
 		if (lastLeaderResult == null || lastLeaderResult.getTimeLimitLaunchedDate() == null) {
@@ -188,8 +216,8 @@ public class LearningController {
 		}
 
 		//if the time is up and leader hasn't submitted response - show waitForLeaderFinish page
-		boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(assessment.getUid(),
-			groupLeader.getUserId());
+		boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(assessment.getContentId(),
+			groupLeader.getUserId().intValue());
 		if (isTimeLimitExceeded) {
 		    request.setAttribute(AssessmentConstants.PARAM_WAITING_MESSAGE_KEY,
 			    "label.waiting.for.leader.finish");
@@ -207,7 +235,7 @@ public class LearningController {
 	}
 
 	sessionMap.put(AssessmentConstants.ATTR_GROUP_LEADER, groupLeader);
-	boolean isUserLeader = service.isUserGroupLeader(user.getUserId(), toolSessionId);
+	isUserLeader |= service.isUserGroupLeader(user.getUserId(), toolSessionId);
 	sessionMap.put(AssessmentConstants.ATTR_IS_USER_LEADER, isUserLeader);
 
 	Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
@@ -231,6 +259,9 @@ public class LearningController {
 	}
 	//add random questions (actually replacing them with real ones)
 	AssessmentResult lastResult = service.getLastAssessmentResult(assessment.getUid(), user.getUserId());
+	Map<Long, AssessmentQuestionResult> questionToResultMap = lastResult == null ? null
+		: lastResult.getQuestionResults().stream()
+			.collect(Collectors.toMap(q -> q.getQbToolQuestion().getUid(), q -> q));
 	for (QuestionReference questionReference : questionReferences) {
 	    if (questionReference.isRandomQuestion()) {
 
@@ -244,16 +275,13 @@ public class LearningController {
 		    availableRandomQuestions.remove(randomQuestion);
 
 		} else {
-		    //pick element from the last result
+		    // pick element from the last result
 		    for (Iterator<AssessmentQuestion> iter = availableRandomQuestions.iterator(); iter.hasNext();) {
 			AssessmentQuestion availableRandomQuestion = iter.next();
-
-			for (AssessmentQuestionResult questionResult : lastResult.getQuestionResults()) {
-			    if (availableRandomQuestion.getUid().equals(questionResult.getQbToolQuestion().getUid())) {
-				randomQuestion = availableRandomQuestion;
-				iter.remove();
-				break;
-			    }
+			if (questionToResultMap.containsKey(availableRandomQuestion.getUid())) {
+			    randomQuestion = availableRandomQuestion;
+			    iter.remove();
+			    break;
 			}
 		    }
 		}
@@ -296,7 +324,11 @@ public class LearningController {
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_INSTRUCTION, assessment.getReflectInstructions());
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_ENTRY, entryText);
 
-	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, service.isLastActivity(toolSessionId));
+	Boolean isLastActivity = (Boolean) sessionMap.get(AttributeNames.ATTR_IS_LAST_ACTIVITY);
+	if (isLastActivity == null) {
+	    isLastActivity = service.isLastActivity(toolSessionId);
+	    sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, isLastActivity);
+	}
 
 	// add define later support
 	if (assessment.isDefineLater()) {
@@ -346,17 +378,9 @@ public class LearningController {
 	    }
 	    if (questionDto.getType() == QbQuestion.TYPE_MATCHING_PAIRS) {
 		//sort answer options alphanumerically (as per LDEV-4326)
-		ArrayList<OptionDTO> optionsSortedByName = new ArrayList<>(questionDto.getOptionDtos());
-		optionsSortedByName.sort(new Comparator<OptionDTO>() {
-		    @Override
-		    public int compare(OptionDTO o1, OptionDTO o2) {
-			String name1 = o1.getName() != null ? o1.getName() : "";
-			String name2 = o2.getName() != null ? o2.getName() : "";
-
-			return AlphanumComparator.compareAlphnumerically(name1, name2);
-		    }
-		});
-		questionDto.setMatchingPairOptions(new LinkedHashSet<>(optionsSortedByName));
+		Set<OptionDTO> optionsSortedByName = new TreeSet<>(MATCHING_PAIRS_OPTION_COMPARATOR);
+		optionsSortedByName.addAll(questionDto.getOptionDtos());
+		questionDto.setMatchingPairOptions(optionsSortedByName);
 	    }
 	}
 
@@ -368,12 +392,19 @@ public class LearningController {
 	LinkedHashSet<QuestionDTO> questionsForOnePage = new LinkedHashSet<>();
 	pagedQuestionDtos.add(questionsForOnePage);
 	int count = 0;
+
+	// lists all code styles used in this assessment
+	Set<Integer> codeStyles = new HashSet<>();
 	for (QuestionDTO questionDto : questionDtos) {
 	    questionsForOnePage.add(questionDto);
 	    count++;
 	    if ((questionsForOnePage.size() == maxQuestionsPerPage) && (count != questionDtos.size())) {
 		questionsForOnePage = new LinkedHashSet<>();
 		pagedQuestionDtos.add(questionsForOnePage);
+	    }
+
+	    if (questionDto.getCodeStyle() != null) {
+		codeStyles.add(questionDto.getCodeStyle());
 	    }
 	}
 
@@ -384,6 +415,13 @@ public class LearningController {
 
 	// loadupLastAttempt for displaying purposes
 	service.loadupLastAttempt(assessment.getUid(), user.getUserId(), pagedQuestionDtos);
+
+	sessionMap.put(AssessmentConstants.CONFIG_KEY_HIDE_TITLES,
+		Boolean.valueOf(service.getConfigValue(AssessmentConstants.CONFIG_KEY_HIDE_TITLES)));
+
+	if (!codeStyles.isEmpty()) {
+	    request.setAttribute(AssessmentConstants.ATTR_CODE_STYLES, codeStyles);
+	}
 
 	if (showResults) {
 
@@ -396,9 +434,6 @@ public class LearningController {
 	    if (hasEditRight) {
 		service.setAttemptStarted(assessment, user, toolSessionId, pagedQuestionDtos);
 	    }
-
-	    sessionMap.put(AssessmentConstants.CONFIG_KEY_HIDE_TITLES,
-		    Boolean.valueOf(service.getConfigValue(AssessmentConstants.CONFIG_KEY_HIDE_TITLES)));
 
 	    // display Etherpads after each question
 	    boolean questionEtherpadEnabled = assessment.isUseSelectLeaderToolOuput()
@@ -416,28 +451,6 @@ public class LearningController {
 
 	    return "pages/learning/learning";
 	}
-    }
-
-    /**
-     * Checks Leader Progress
-     */
-    @RequestMapping("/checkLeaderProgress")
-    @ResponseBody
-    public String checkLeaderProgress(HttpServletRequest request, HttpServletResponse response) throws IOException {
-	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	AssessmentSession session = service.getSessionBySessionId(toolSessionId);
-	AssessmentUser leader = session.getGroupLeader();
-
-	//in case of time limit - prevent user from seeing questions page longer than time limit allows
-	boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(session.getAssessment().getUid(),
-		leader.getUserId());
-	boolean isLeaderResponseFinalized = service.isLastAttemptFinishedByUser(leader);
-
-	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	responseJSON.put("isPageRefreshRequested", isLeaderResponseFinalized || isTimeLimitExceeded);
-	response.setContentType("application/json;charset=utf-8");
-	return responseJSON.toString();
     }
 
     /**
@@ -671,18 +684,28 @@ public class LearningController {
 
     /**
      * auto saves responses
+     *
+     * @throws IOException
      */
     @RequestMapping("/autoSaveAnswers")
     @ResponseStatus(HttpStatus.OK)
-    public void autoSaveAnswers(HttpServletRequest request)
-	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    @ResponseBody
+    public String autoSaveAnswers(HttpServletRequest request, HttpServletResponse response)
+	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, IOException {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
+	if (sessionMap == null) {
+	    log.warn("No sessionMap found in session for user: " + request.getRemoteUser());
+	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No session found for the user");
+	    return null;
+	}
 	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
 
 	//get user answers from request and store them into sessionMap
 	storeUserAnswersIntoSessionMap(request, pageNumber);
 	//store results from sessionMap into DB
 	storeUserAnswersIntoDatabase(sessionMap, true);
+
+	return "ok";
     }
 
     @RequestMapping("/vsaAutocomplete")
@@ -849,20 +872,26 @@ public class LearningController {
 
 	    } else if (questionType == QbQuestion.TYPE_ESSAY) {
 		String answer = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
-		answer = answer.replaceAll("[\n\r\f]", "");
+		if (questionDto.getCodeStyle() == null) {
+		    answer = answer.replaceAll("[\n\r\f]", "");
+		} else {
+		    // text coming from CodeMirror uses \n as separator
+		    answer = answer.replaceAll("\n", "<BR>");
+		}
+
 		questionDto.setAnswer(answer);
 
 	    } else if (questionType == QbQuestion.TYPE_ORDERING) {
+		//sort accrording to the new sequenceIds
+		Set<OptionDTO> sortedOptions = new TreeSet<>();
 		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 		    int answerSequenceId = WebUtil.readIntParam(request,
 			    AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getUid());
 		    optionDto.setDisplayOrder(answerSequenceId);
+		    sortedOptions.add(optionDto);
 		}
-		//sort accrording to the new sequenceIds
-		Set<OptionDTO> sortedOptions = new TreeSet<>();
-		sortedOptions.addAll(questionDto.getOptionDtos());
-		questionDto.setOptionDtos(sortedOptions);
 
+		questionDto.setOptionDtos(sortedOptions);
 	    } else if (questionType == QbQuestion.TYPE_MARK_HEDGING) {
 
 		//store hedging marks
@@ -884,13 +913,16 @@ public class LearningController {
 
 	    // store confidence level entered by the learner
 	    if (assessment.isEnableConfidenceLevels()) {
-		int confidenceLevel = WebUtil.readIntParam(request,
-			AssessmentConstants.ATTR_CONFIDENCE_LEVEL_PREFIX + i);
-		questionDto.setConfidenceLevel(confidenceLevel);
+		Integer confidenceLevel = WebUtil.readIntParam(request,
+			AssessmentConstants.ATTR_CONFIDENCE_LEVEL_PREFIX + i, true);
+		if (confidenceLevel != null) {
+		    questionDto.setConfidenceLevel(confidenceLevel);
+		}
 	    }
 
 	    // store justification entered by the learner
-	    if (assessment.isAllowAnswerJustification()) {
+	    if (assessment.isAllowAnswerJustification() || (questionDto.getType().equals(QbQuestion.TYPE_MARK_HEDGING)
+		    && questionDto.isHedgingJustificationEnabled())) {
 		String justification = WebUtil.readStrParam(request,
 			AssessmentConstants.ATTR_ANSWER_JUSTIFICATION_PREFIX + i, true);
 		questionDto.setJustification(justification);
@@ -956,11 +988,6 @@ public class LearningController {
 			    sumMarkHedging += optionDto.getAnswerInt();
 			}
 			isAnswered = sumMarkHedging == questionDto.getMaxMark();
-
-			//verify justification of hedging is provided if it was enabled
-			if (questionDto.isHedgingJustificationEnabled()) {
-			    isAnswered &= StringUtils.isNotBlank(questionDto.getAnswer());
-			}
 		    }
 
 		    // check all questions were answered
@@ -1013,54 +1040,52 @@ public class LearningController {
 	int dbResultCount = service.getAssessmentResultCount(assessment.getUid(), userId);
 	if (dbResultCount > 0) {
 
-	    // release object from the cache (it's required when we have modified result object in the same request)
-	    AssessmentResult result = service.getLastFinishedAssessmentResultNotFromChache(assessment.getUid(), userId);
+	    AssessmentResult result = service.getLastFinishedAssessmentResult(assessment.getUid(), userId);
+
+	    Map<Long, AssessmentQuestionResult> questionToResultMap = result.getQuestionResults().stream()
+		    .collect(Collectors.toMap(q -> q.getQbToolQuestion().getUid(), q -> q));
 
 	    for (Set<QuestionDTO> questionsForOnePage : pagedQuestionDtos) {
 		for (QuestionDTO questionDto : questionsForOnePage) {
+		    AssessmentQuestionResult questionResult = questionToResultMap.get(questionDto.getUid());
+		    if (questionResult != null) {
+			// copy questionResult's info to the question
+			questionDto.setMark(questionResult.getMark());
+			questionDto.setResponseSubmitted(questionResult.getFinishDate() != null);
+			questionDto.setPenalty(questionResult.getPenalty());
 
-		    // find corresponding questionResult
-		    for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
-			if (questionDto.getUid().equals(questionResult.getQbToolQuestion().getUid())) {
+			//question feedback
+			questionDto.setQuestionFeedback(null);
+			for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+			    if (questionResult.getQbOption() != null
+				    && optionDto.getUid().equals(questionResult.getQbOption().getUid())) {
+				questionDto.setQuestionFeedback(optionDto.getFeedback());
+				break;
+			    }
+			}
 
-			    // copy questionResult's info to the question
-			    questionDto.setMark(questionResult.getMark());
-			    questionDto.setResponseSubmitted(questionResult.getFinishDate() != null);
-			    questionDto.setPenalty(questionResult.getPenalty());
-
-			    //question feedback
-			    questionDto.setQuestionFeedback(null);
+			// required for showing right/wrong answers icons on results page correctly
+			if ((questionDto.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS
+				|| questionDto.getType() == QbQuestion.TYPE_NUMERICAL)
+				&& questionResult.getQbOption() != null) {
+			    boolean isAnsweredCorrectly = false;
 			    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-				if (questionResult.getQbOption() != null
-					&& optionDto.getUid().equals(questionResult.getQbOption().getUid())) {
-				    questionDto.setQuestionFeedback(optionDto.getFeedback());
+				if (optionDto.getUid().equals(questionResult.getQbOption().getUid())) {
+				    isAnsweredCorrectly = optionDto.getMaxMark() > 0;
 				    break;
 				}
 			    }
-
-			    // required for showing right/wrong answers icons on results page correctly
-			    if ((questionDto.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS
-				    || questionDto.getType() == QbQuestion.TYPE_NUMERICAL)
-				    && questionResult.getQbOption() != null) {
-				boolean isAnsweredCorrectly = false;
-				for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-				    if (optionDto.getUid().equals(questionResult.getQbOption().getUid())) {
-					isAnsweredCorrectly = optionDto.getMaxMark() > 0;
-					break;
-				    }
-				}
-				questionDto.setAnswerBoolean(isAnsweredCorrectly);
-			    }
-
-			    if (StringUtils.isNotBlank(questionResult.getJustification())) {
-				questionDto.setJustification(questionResult.getJustification());
-			    }
-
-			    // required for markandpenalty area and if it's on - on question's summary page
-			    List<Object[]> questionResults = service
-				    .getAssessmentQuestionResultList(assessment.getUid(), userId, questionDto.getUid());
-			    questionDto.setQuestionResults(questionResults);
+			    questionDto.setAnswerBoolean(isAnsweredCorrectly);
 			}
+
+			if (StringUtils.isNotBlank(questionResult.getJustification())) {
+			    questionDto.setJustification(questionResult.getJustification());
+			}
+
+			// required for markandpenalty area and if it's on - on question's summary page
+			List<Object[]> questionResults = service.getAssessmentQuestionResultList(assessment.getUid(),
+				userId, questionDto.getUid());
+			questionDto.setQuestionResults(questionResults);
 		    }
 		}
 	    }
@@ -1094,101 +1119,7 @@ public class LearningController {
 
 	    // if answers are going to be disclosed, prepare data for the table in results page
 	    if (assessment.isAllowDiscloseAnswers()) {
-		// such entities should not go into session map, but as request attributes instead
-		SortedSet<AssessmentSession> sessions = new TreeSet<>(new AssessmentSessionComparator());
-		sessions.addAll(service.getSessionsByContentId(assessment.getContentId()));
-
-		Long userSessionId = user.getSession().getSessionId();
-		Integer userSessionIndex = null;
-		int sessionIndex = 0;
-		// find user session in order to put it first
-		List<AssessmentSession> sessionList = new ArrayList<>();
-		for (AssessmentSession session : sessions) {
-		    if (userSessionId.equals(session.getSessionId())) {
-			userSessionIndex = sessionIndex;
-		    } else {
-			sessionList.add(session);
-		    }
-		    sessionIndex++;
-		}
-		// put user's own group first
-		sessionList.add(0, user.getSession());
-		request.setAttribute("sessions", sessionList);
-
-		Map<Long, QuestionSummary> questionSummaries = service.getQuestionSummaryForExport(assessment);
-		request.setAttribute("questionSummaries", questionSummaries);
-
-		// Assessment currently supports only one place for ratings.
-		// It is rating other groups' answers on results page.
-		// Criterion gets automatically created and there must be only one.
-		List<RatingCriteria> criteria = ratingService.getCriteriasByToolContentId(assessment.getContentId());
-		if (criteria.size() >= 2) {
-		    throw new IllegalArgumentException("There can be only one criterion for an Assessment activity. "
-			    + "If other criteria are introduced, the criterion for rating other groups' answers needs to become uniquely identifiable.");
-		}
-		ToolActivityRatingCriteria criterion = null;
-		if (criteria.isEmpty()) {
-		    criterion = (ToolActivityRatingCriteria) RatingCriteria
-			    .getRatingCriteriaInstance(RatingCriteria.TOOL_ACTIVITY_CRITERIA_TYPE);
-		    criterion.setTitle(service.getMessage("label.answer.rating.title"));
-		    criterion.setOrderId(1);
-		    criterion.setCommentsEnabled(true);
-		    criterion.setRatingStyle(RatingCriteria.RATING_STYLE_STAR);
-		    criterion.setToolContentId(assessment.getContentId());
-
-		    userManagementService.save(criterion);
-		} else {
-		    criterion = (ToolActivityRatingCriteria) criteria.get(0);
-		}
-
-		// Item IDs are AssessmentQuestionResults UIDs, i.e. a user answer for a particular question
-		// Get all item IDs no matter which session they belong to.
-		Set<Long> itemIds = questionSummaries.values().stream()
-			.flatMap(s -> s.getQuestionResultsPerSession().stream())
-			.collect(Collectors.mapping(l -> l.get(l.size() - 1).getUid(), Collectors.toSet()));
-
-		List<ItemRatingDTO> itemRatingDtos = ratingService.getRatingCriteriaDtos(assessment.getContentId(),
-			null, itemIds, true, userId);
-		// Mapping of Item ID -> DTO
-		Map<Long, ItemRatingDTO> itemRatingDtoMap = itemRatingDtos.stream()
-			.collect(Collectors.toMap(ItemRatingDTO::getItemId, Function.identity()));
-
-		Long ratingUserId = user.getSession().getGroupLeader() == null ? userId
-			: user.getSession().getGroupLeader().getUserId();
-
-		for (QuestionSummary summary : questionSummaries.values()) {
-
-		    List<List<AssessmentQuestionResult>> questionResultsPerSession = summary
-			    .getQuestionResultsPerSession();
-		    if (questionResultsPerSession != null) {
-			List<AssessmentQuestionResult> questionResults = questionResultsPerSession
-				.remove((int) userSessionIndex);
-			// user or his leader should rate all other groups' answers in order to show ratings left for own group
-			int expectedRatedItemCount = questionResultsPerSession.size();
-
-			Set<Long> questionItemIds = questionResultsPerSession.stream()
-				.collect(Collectors.mapping(l -> l.get(l.size() - 1).getUid(), Collectors.toSet()));
-
-			// question results need to be in the same order as sessions, i.e. user group first
-			questionResultsPerSession.add(0, questionResults);
-
-			// count how many ratings user or his leader left
-			// maybe exact session ID matching should be used here to make sure
-			int ratedItemCount = 0;
-			for (Long questionItemId : questionItemIds) {
-			    ItemRatingDTO itemRatingDTO = itemRatingDtoMap.get(questionItemId);
-			    for (RatingCommentDTO ratingCommentDTO : itemRatingDTO.getCommentDtos()) {
-				if (ratingCommentDTO.getUserId().equals(ratingUserId)) {
-				    ratedItemCount++;
-				}
-			    }
-			}
-
-			summary.setShowOwnGroupRating(ratedItemCount == expectedRatedItemCount);
-		    }
-		}
-
-		request.setAttribute("itemRatingDtos", itemRatingDtoMap);
+		populateDisclosedAnswers(request, assessment, user);
 	    }
 	}
 
@@ -1196,6 +1127,210 @@ public class LearningController {
 	int attemptsAllowed = assessment.getAttemptsAllowed();
 	boolean isResubmitAllowed = ((attemptsAllowed > dbResultCount) | (attemptsAllowed == 0));
 	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, isResubmitAllowed);
+    }
+
+    private void populateDisclosedAnswers(HttpServletRequest request, Assessment assessment, AssessmentUser user) {
+	// such entities should not go into session map, but as request attributes instead
+	SortedSet<AssessmentSession> sessions = new TreeSet<>(new AssessmentSessionComparator());
+	sessions.addAll(service.getSessionsByContentId(assessment.getContentId()));
+
+	Long userSessionId = user == null ? null : user.getSession().getSessionId();
+	Integer userSessionIndex = null;
+	int sessionIndex = 0;
+	// find user session in order to put it first
+	List<AssessmentSession> sessionList = new ArrayList<>();
+	for (AssessmentSession session : sessions) {
+	    if (userSessionId != null && userSessionId.equals(session.getSessionId())) {
+		userSessionIndex = sessionIndex;
+	    } else {
+		sessionList.add(session);
+	    }
+	    sessionIndex++;
+	}
+	// put user's own group first
+	if (user != null) {
+	    sessionList.add(0, user.getSession());
+	}
+	request.setAttribute("sessions", sessionList);
+
+	Map<Long, QuestionSummary> questionSummaries = service.getQuestionSummaryForExport(assessment, true);
+	request.setAttribute("questionSummaries", questionSummaries);
+
+	// Assessment currently supports only one place for ratings.
+	// It is rating other groups' answers on results page.
+	// Criterion gets automatically created and there must be only one.
+	List<RatingCriteria> criteria = ratingService.getCriteriasByToolContentId(assessment.getContentId());
+	if (criteria.size() >= 2) {
+	    try {
+		for (int criterionIndex = 1; criterionIndex < criteria.size(); criterionIndex++) {
+		    RatingCriteria criterion = criteria.get(criterionIndex);
+		    Long criterionId = criterion.getRatingCriteriaId();
+		    userManagementService.delete(criterion);
+		    log.warn("Removed a duplicate criterion ID " + criterionId + " for Assessment tool content ID "
+			    + assessment.getContentId());
+		}
+	    } catch (Exception e) {
+		log.warn("Ignoring error while deleting a duplicate criterion for Assessment tool content ID "
+			+ assessment.getContentId() + ": " + e.getMessage());
+	    }
+	}
+	ToolActivityRatingCriteria criterion = null;
+	if (criteria.isEmpty()) {
+	    criterion = (ToolActivityRatingCriteria) RatingCriteria
+		    .getRatingCriteriaInstance(RatingCriteria.TOOL_ACTIVITY_CRITERIA_TYPE);
+	    criterion.setTitle(service.getMessage("label.answer.rating.title"));
+	    criterion.setOrderId(1);
+	    criterion.setCommentsEnabled(true);
+	    criterion.setRatingStyle(RatingCriteria.RATING_STYLE_STAR);
+	    criterion.setToolContentId(assessment.getContentId());
+
+	    userManagementService.save(criterion);
+	} else {
+	    criterion = (ToolActivityRatingCriteria) criteria.get(0);
+	}
+
+	// Item IDs are AssessmentQuestionResults UIDs, i.e. a user answer for a particular question
+	// Get all item IDs no matter which session they belong to.
+	Set<Long> itemIds = questionSummaries.values().stream().flatMap(s -> s.getQuestionResultsPerSession().stream())
+		.filter(l -> l != null && !l.isEmpty() && l.get(l.size() - 1).getUid() != null)
+		.collect(Collectors.mapping(l -> l.get(l.size() - 1).getUid(), Collectors.toSet()));
+
+	List<ItemRatingDTO> itemRatingDtos = ratingService.getRatingCriteriaDtos(assessment.getContentId(), null,
+		itemIds, true, user == null ? null : user.getUserId());
+	// Mapping of Item ID -> DTO
+	Map<Long, ItemRatingDTO> itemRatingDtoMap = itemRatingDtos.stream()
+		.collect(Collectors.toMap(ItemRatingDTO::getItemId, Function.identity()));
+
+	Long ratingUserId = null;
+	if (user != null) {
+	    ratingUserId = user.getSession().getGroupLeader() == null ? user.getUserId()
+		    : user.getSession().getGroupLeader().getUserId();
+	}
+
+	if (userSessionIndex != null) {
+	    for (QuestionSummary summary : questionSummaries.values()) {
+
+		List<List<AssessmentQuestionResult>> questionResultsPerSession = summary.getQuestionResultsPerSession();
+		if (questionResultsPerSession != null) {
+		    List<AssessmentQuestionResult> questionResults = questionResultsPerSession
+			    .remove((int) userSessionIndex);
+
+		    Set<Long> questionItemIds = questionResultsPerSession.stream()
+			    .filter(l -> l != null && !l.isEmpty() && l.get(l.size() - 1).getUid() != null)
+			    .collect(Collectors.mapping(l -> l.get(l.size() - 1).getUid(), Collectors.toSet()));
+
+		    // user or his leader should rate all other groups' answers in order to show ratings left for own group
+		    int expectedRatedItemCount = questionItemIds.size();
+
+		    // question results need to be in the same order as sessions, i.e. user group first
+		    questionResultsPerSession.add(0, questionResults);
+
+		    // count how many ratings user or his leader left
+		    // maybe exact session ID matching should be used here to make sure
+		    int ratedItemCount = 0;
+		    for (Long questionItemId : questionItemIds) {
+			ItemRatingDTO itemRatingDTO = itemRatingDtoMap.get(questionItemId);
+			for (RatingCommentDTO ratingCommentDTO : itemRatingDTO.getCommentDtos()) {
+			    if (ratingCommentDTO.getUserId().equals(ratingUserId)) {
+				ratedItemCount++;
+			    }
+			}
+		    }
+
+		    summary.setShowOwnGroupRating(ratedItemCount == expectedRatedItemCount);
+		}
+	    }
+	}
+
+	request.setAttribute("itemRatingDtos", itemRatingDtoMap);
+    }
+
+    /**
+     * A view to show other groups' answers and correct answers without specyfing a learner
+     */
+    @RequestMapping("/showResultsForTeacher")
+    public String showResultsForTeacher(HttpServletRequest request) {
+	long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
+	boolean embedded = WebUtil.readBooleanParam(request, "embedded", false);
+	UserDTO user = LearningController.getCurrentUser();
+	Lesson lesson = lessonService.getLessonByToolContentId(toolContentId);
+
+	securityService.isLessonMonitor(lesson.getLessonId(), user.getUserID(), "show Assessment results for teacher",
+		true);
+
+	// initialize Session Map
+
+	SessionMap<String, Object> sessionMap = null;
+	if (StringUtils.isBlank(request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID))) {
+	    sessionMap = new SessionMap<>();
+	    request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	} else {
+	    sessionMap = getSessionMap(request);
+	}
+
+	Assessment assessment = service.getAssessmentByContentId(toolContentId);
+
+	Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
+	questionReferences.addAll(assessment.getQuestionReferences());
+	HashMap<Long, AssessmentQuestion> questionToReferenceMap = new HashMap<>();
+
+	//add non-random questions
+	for (QuestionReference questionReference : questionReferences) {
+	    if (!questionReference.isRandomQuestion()) {
+		AssessmentQuestion question = questionReference.getQuestion();
+		questionToReferenceMap.put(questionReference.getUid(), question);
+	    }
+	}
+
+	LinkedList<QuestionDTO> questionDtos = new LinkedList<>();
+	for (QuestionReference questionReference : questionReferences) {
+	    AssessmentQuestion question = questionToReferenceMap.get(questionReference.getUid());
+
+	    QuestionDTO questionDto = question.getQuestionDTO();
+	    questionDto.setMaxMark(questionReference.getMaxMark());
+
+	    if (questionDto.getType() == QbQuestion.TYPE_MATCHING_PAIRS) {
+		//sort answer options alphanumerically (as per LDEV-4326)
+		Set<OptionDTO> optionsSortedByName = new TreeSet<>(MATCHING_PAIRS_OPTION_COMPARATOR);
+		optionsSortedByName.addAll(questionDto.getOptionDtos());
+		questionDto.setMatchingPairOptions(optionsSortedByName);
+	    }
+
+	    questionDtos.add(questionDto);
+	}
+
+	// paging - always all questions on a single page for teachers
+	List<Set<QuestionDTO>> pagedQuestionDtos = new ArrayList<>();
+	LinkedHashSet<QuestionDTO> questionsForOnePage = new LinkedHashSet<>(questionDtos);
+	pagedQuestionDtos.add(questionsForOnePage);
+
+	populateDisclosedAnswers(request, assessment, null);
+
+	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	sessionMap.put(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
+	sessionMap.put(AssessmentConstants.ATTR_TITLE, assessment.getTitle());
+	sessionMap.put(AssessmentConstants.ATTR_INSTRUCTIONS, assessment.getInstructions());
+	sessionMap.put(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS, pagedQuestionDtos);
+	sessionMap.put(AssessmentConstants.ATTR_QUESTION_NUMBERING_OFFSET, 1);
+	sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, 1);
+	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, assessment);
+	sessionMap.put(AssessmentConstants.CONFIG_KEY_HIDE_TITLES,
+		Boolean.valueOf(service.getConfigValue(AssessmentConstants.CONFIG_KEY_HIDE_TITLES)));
+
+	return "pages/learning/results" + (embedded ? "/allquestions" : "");
+    }
+
+    @RequestMapping(path = "/logLearnerInteractionEvent", method = RequestMethod.POST)
+    @ResponseStatus(code = HttpStatus.OK)
+    public void logLearnerInteractionEvent(@RequestParam int eventType, @RequestParam long qbToolQuestionUid,
+	    @RequestParam long optionUid) {
+	UserDTO user = LearningController.getCurrentUser();
+
+	LearnerInteractionEvent learnerInteractionEvent = new LearnerInteractionEvent(eventType, user.getUserID());
+	learnerInteractionEvent.setQbToolQuestionUid(qbToolQuestionUid);
+	learnerInteractionEvent.setOptionUid(optionUid);
+
+	learnerInteractionService.saveEvent(learnerInteractionEvent);
     }
 
     /**
@@ -1217,7 +1352,7 @@ public class LearningController {
 	// notify teachers
 	if ((mode != null) && !mode.isTeacher() && !isAutosave && isResultsStored
 		&& assessment.isNotifyTeachersOnAttemptCompletion()) {
-	    AssessmentUser assessmentUser = getCurrentUser(toolSessionId);
+	    AssessmentUser assessmentUser = getCurrentAssessmentUser(toolSessionId);
 	    String fullName = assessmentUser.getLastName() + " " + assessmentUser.getFirstName();
 	    service.notifyTeachersOnAttemptCompletion(toolSessionId, fullName);
 	}
@@ -1225,19 +1360,23 @@ public class LearningController {
 	return isResultsStored;
     }
 
-    private AssessmentUser getCurrentUser(Long sessionId) {
-	// try to get form system session
-	HttpSession ss = SessionManager.getSession();
-	// get back login user DTO
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	AssessmentUser assessmentUser = service.getUserByIDAndSession(user.getUserID().longValue(), sessionId);
+    private AssessmentUser getCurrentAssessmentUser(Long sessionId) {
+	UserDTO user = LearningController.getCurrentUser();
 
+	AssessmentUser assessmentUser = service.getUserByIDAndSession(user.getUserID().longValue(), sessionId);
 	if (assessmentUser == null) {
 	    AssessmentSession session = service.getSessionBySessionId(sessionId);
 	    assessmentUser = new AssessmentUser(user, session);
 	    service.createUser(assessmentUser);
 	}
 	return assessmentUser;
+    }
+
+    private static UserDTO getCurrentUser() {
+	// try to get form system session
+	HttpSession ss = SessionManager.getSession();
+	// get back login user DTO
+	return (UserDTO) ss.getAttribute(AttributeNames.USER);
     }
 
     private AssessmentUser getSpecifiedUser(IAssessmentService service, Long sessionId, Integer userId) {

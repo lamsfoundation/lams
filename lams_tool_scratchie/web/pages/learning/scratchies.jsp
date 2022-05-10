@@ -29,7 +29,7 @@
 	</c:if>
 
 	<c:choose>
-	<c:when test="${item.qbQuestion.type == 1}">
+	<c:when test="${item.qbQuestion.type == 1 or item.qbQuestion.type == 8}">
 		<table class="table table-hover scratches">
 			<c:forEach var="optionDto" items="${item.optionDtos}" varStatus="status">
 				<tr id="tr${optionDto.qbOptionUid}">
@@ -48,10 +48,21 @@
 									 id="image-${item.uid}-${optionDto.qbOptionUid}">
 							</c:when>
 							<c:otherwise>
-								<a href="#nogo" onclick="scratchMcq(${item.uid}, ${optionDto.qbOptionUid}); return false;"
-									id="imageLink-${item.uid}-${optionDto.qbOptionUid}"> <img
-									src="<lams:WebAppURL/>includes/images/answer-${status.index + 1}.png" class="scartchie-image"
-									id="image-${item.uid}-${optionDto.qbOptionUid}" />
+								<a href="#nogo" data-item-uid="${item.uid}" data-option-uid="${optionDto.qbOptionUid}"
+								    <c:choose>
+								    	<c:when test="${scratchie.revealOnDoubleClick}">
+								    		onDblClick=
+								    	</c:when>
+								    	<c:otherwise>
+								    		onClick=
+								    	</c:otherwise>
+								    </c:choose>
+								    <%-- call this function either on click or double click --%>
+								    "scratchMcq(${item.uid}, ${optionDto.qbOptionUid}); return false;"
+								    
+									id="imageLink-${item.uid}-${optionDto.qbOptionUid}" class="scratchie-link">
+									<img src="<lams:WebAppURL/>includes/images/answer-${status.index + 1}.png"
+										class="scartchie-image"	id="image-${item.uid}-${optionDto.qbOptionUid}" />
 								</a>
 							</c:otherwise>
 						</c:choose> 
@@ -169,10 +180,10 @@
 				<fmt:message key="label.etherpad.discussion" />
 			</a>
 			
-			<div id="question-etherpad-${item.uid}" class="collapse">
+			<div id="question-etherpad-${item.uid}" class="question-etherpad-collapse collapse">
 				<div class="panel panel-default question-etherpad">
 					<lams:Etherpad groupId="etherpad-scratchie-${toolSessionID}-question-${item.uid}" 
-					   showControls="${mode eq 'teacher'}" showChat="false" heightAutoGrow="true"
+					   showControls="${mode eq 'teacher'}" showChat="false" heightAutoGrow="true" showOnDemand="true"
 					>${questionEtherpadContent}</lams:Etherpad>
 				</div>
 			</div>

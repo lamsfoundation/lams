@@ -15,34 +15,32 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-        
-
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        Print Headers Record<P>
- * Description:  Whether or not to print the row/column headers when you
- *               enjoy your spreadsheet in the physical form.<P>
- * REFERENCE:  PG 373 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)<P>
- * @author Andrew C. Oliver (acoliver at apache dot org)
- * @author Jason Height (jheight at chariot dot net dot au)
+ * Whether or not to print the row/column headers when you enjoy your spreadsheet in the physical form.
+ *
  * @version 2.0-pre
  */
+public final class PrintHeadersRecord extends StandardRecord {
+    public static final short sid = 0x2a;
+    private short field_1_print_headers;
 
-public final class PrintHeadersRecord
-    extends StandardRecord
-{
-    public final static short sid = 0x2a;
-    private short             field_1_print_headers;
+    public PrintHeadersRecord() {}
 
-    public PrintHeadersRecord()
-    {
+    public PrintHeadersRecord(PrintHeadersRecord other) {
+        super(other);
+        field_1_print_headers = other.field_1_print_headers;
     }
 
-    public PrintHeadersRecord(RecordInputStream in)
-    {
+
+    public PrintHeadersRecord(RecordInputStream in) {
         field_1_print_headers = in.readShort();
     }
 
@@ -50,15 +48,10 @@ public final class PrintHeadersRecord
      * set to print the headers - y/n
      * @param p printheaders or not
      */
-
-    public void setPrintHeaders(boolean p)
-    {
-        if (p == true)
-        {
+    public void setPrintHeaders(boolean p) {
+        if (p) {
             field_1_print_headers = 1;
-        }
-        else
-        {
+        } else {
             field_1_print_headers = 0;
         }
     }
@@ -67,21 +60,9 @@ public final class PrintHeadersRecord
      * get whether to print the headers - y/n
      * @return printheaders or not
      */
-
     public boolean getPrintHeaders()
     {
         return (field_1_print_headers == 1);
-    }
-
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[PRINTHEADERS]\n");
-        buffer.append("    .printheaders   = ").append(getPrintHeaders())
-            .append("\n");
-        buffer.append("[/PRINTHEADERS]\n");
-        return buffer.toString();
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -97,9 +78,17 @@ public final class PrintHeadersRecord
         return sid;
     }
 
-    public Object clone() {
-      PrintHeadersRecord rec = new PrintHeadersRecord();
-      rec.field_1_print_headers = field_1_print_headers;
-      return rec;
+    public PrintHeadersRecord copy() {
+      return new PrintHeadersRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.PRINT_HEADERS;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties("printHeaders", this::getPrintHeaders);
     }
 }

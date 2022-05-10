@@ -24,11 +24,14 @@
 package org.lamsfoundation.lams.tool.dokumaran.service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 
 import org.lamsfoundation.lams.etherpad.EtherpadException;
+import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.dokumaran.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.dokumaran.dto.SessionDTO;
@@ -36,6 +39,7 @@ import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
@@ -106,33 +110,21 @@ public interface IDokumaranService extends ICommonToolService {
 
     /**
      * Stores date when user has started activity with time limit.
-     *
-     * @param toolContentId
-     * @throws IOException
-     * @throws JSONException
      */
-    void launchTimeLimit(Long toolContentId) throws IOException;
-
-    void addOneMinute(Long toolContentId) throws IOException;
+    LocalDateTime launchTimeLimit(long toolContentId, int userId);
 
     /**
-     * Calculates how many seconds left till the time limit will expire.
-     *
-     * @param assessment
-     * @return
-     */
-    long getSecondsLeft(Dokumaran dokumaran);
-
-    /**
-     * @param assessment
      * @return whether the time limit is exceeded already
      */
-    boolean checkTimeLimitExceeded(Dokumaran dokumaran);
+    boolean checkTimeLimitExceeded(Dokumaran dokumaran, int userId);
 
-    Cookie createEtherpadCookieForLearner(DokumaranUser user, DokumaranSession session)
+    List<User> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString);
+
+    void createEtherpadCookieForLearner(DokumaranUser user, DokumaranSession session, HttpServletResponse response)
 	    throws DokumaranApplicationException, EtherpadException;
 
-    Cookie createEtherpadCookieForMonitor(UserDTO user, Long contentId) throws EtherpadException;
+    void createEtherpadCookieForMonitor(UserDTO user, Long contentId, HttpServletResponse response)
+	    throws EtherpadException;
 
     /**
      * Creates pad on Etherpad server side.
@@ -141,9 +133,9 @@ public interface IDokumaranService extends ICommonToolService {
 
     // ********** for user methods *************
     /**
-     * Create a new user in database.
+     * Get learner by given user ID and tool content ID, i.e. user who has a session assigned.
      */
-    void saveUser(DokumaranUser dokumaranUser);
+    DokumaranUser getLearnerByIDAndContent(Long userId, Long contentId);
 
     /**
      * Get user by given userID and toolContentID.
@@ -152,8 +144,6 @@ public interface IDokumaranService extends ICommonToolService {
      * @return
      */
     DokumaranUser getUserByIDAndContent(Long userID, Long contentId);
-
-    DokumaranUser getUserByLoginAndContent(String login, long contentId);
 
     /**
      * Get user by sessionID and UserID
@@ -173,51 +163,29 @@ public interface IDokumaranService extends ICommonToolService {
     List<DokumaranUser> getUsersBySession(Long toolSessionId);
 
     /**
-     * Save or update dokumaran into database.
-     *
-     * @param Dokumaran
+     * Save or update any object into database.
      */
-    void saveOrUpdateDokumaran(Dokumaran Dokumaran);
+    void saveOrUpdate(Object entity);
 
     /**
      * Get dokumaran which is relative with the special toolSession.
-     *
-     * @param sessionId
-     * @return
      */
     Dokumaran getDokumaranBySessionId(Long sessionId);
 
     /**
      * Get dokumaran toolSession by toolSessionId
-     *
-     * @param sessionId
-     * @return
      */
     DokumaranSession getDokumaranSessionBySessionId(Long sessionId);
 
     /**
-     * Save or update dokumaran session.
-     *
-     * @param resSession
-     */
-    void saveOrUpdateDokumaranSession(DokumaranSession resSession);
-
-    /**
      * If success return next activity's url, otherwise return null.
-     *
-     * @param toolSessionId
-     * @param userId
-     * @return
      */
     String finishToolSession(Long toolSessionId, Long userId) throws DokumaranApplicationException;
 
     /**
      * Return monitoring summary list. The return value is list of dokumaran summaries for each groups.
-     *
-     * @param contentId
-     * @return
      */
-    List<SessionDTO> getSummary(Long contentId);
+    List<SessionDTO> getSummary(Long contentId, Long ratingUserId);
 
     /**
      * Create refection entry into notebook tool.
@@ -262,4 +230,14 @@ public interface IDokumaranService extends ICommonToolService {
      * @return
      */
     DokumaranUser getUser(Long uid);
+
+    void startGalleryWalk(long toolContentId) throws IOException;
+
+    void finishGalleryWalk(long toolContentId) throws IOException;
+
+    void enableGalleryWalkLearnerEdit(long toolContentId) throws IOException;
+
+    void changeLeaderForGroup(long toolSessionId, long leaderUserId);
+
+    Grouping getGrouping(long toolContentId);
 }

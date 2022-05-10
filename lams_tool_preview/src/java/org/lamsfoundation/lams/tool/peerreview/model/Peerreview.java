@@ -43,6 +43,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
@@ -84,6 +86,7 @@ public class Peerreview implements Serializable, Cloneable {
     @Cascade(CascadeType.ALL)
     @JoinColumn(name = "tool_content_id", referencedColumnName = "content_id")
     @OrderBy("orderId asc")
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<LearnerItemRatingCriteria> ratingCriterias;
 
     @Column(name = "lock_on_finished")
@@ -123,9 +126,6 @@ public class Peerreview implements Serializable, Cloneable {
 
     @Column(name = "self_review")
     private boolean selfReview;
-
-    @Column(name = "notify_users_of_results")
-    private boolean notifyUsersOfResults;
 
     @Column
     private int tolerance;
@@ -439,14 +439,6 @@ public class Peerreview implements Serializable, Cloneable {
 
     public void setSelfReview(boolean selfReview) {
 	this.selfReview = selfReview;
-    }
-
-    public boolean isNotifyUsersOfResults() {
-	return notifyUsersOfResults;
-    }
-
-    public void setNotifyUsersOfResults(boolean notifyUsersOfResults) {
-	this.notifyUsersOfResults = notifyUsersOfResults;
     }
 
     public boolean isShowRatingsLeftByUser() {

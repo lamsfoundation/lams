@@ -71,7 +71,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -97,8 +96,6 @@ public class HomeController {
     private IWorkspaceManagementService workspaceManagementService;
     @Autowired
     private ISecurityService securityService;
-    @Autowired
-    private WebApplicationContext applicationcontext;
     @Autowired
     private ILogEventService logEventService;
 
@@ -188,6 +185,11 @@ public class HomeController {
 		return "lessonIntro";
 	    }
 
+	    if (lesson.getForceLearnerRestart()) {
+		// start the lesson from the beginning each time
+		lessonService.removeLearnerProgress(lessonId, user.getUserID());
+	    }
+
 	    if (mode != null) {
 		req.setAttribute(AttributeNames.PARAM_MODE, mode);
 	    }
@@ -242,9 +244,11 @@ public class HomeController {
 	    return "errorContent";
 	}
 
+	boolean forceRegularMonitor = WebUtil.readBooleanParam(req, "forceRegularMonitor", false);
 	// security check will be done there
 	String url = Configuration.get(ConfigurationKeys.SERVER_URL)
-		+ "monitoring/monitoring/monitorLesson.do?lessonID=" + lessonId;
+		+ "monitoring/monitoring/monitorLesson.do?lessonID=" + lessonId + "&forceRegularMonitor="
+		+ forceRegularMonitor;
 	res.sendRedirect(url);
 	return null;
     }
@@ -281,12 +285,8 @@ public class HomeController {
 	    userJSON.put("lastName", user.getLastName());
 	    userJSON.put("login", user.getLogin());
 
-	    if (userDTO.getUserID().equals(user.getUserId())) {
-		// creator is always selected
-		users.withArray("selectedMonitors").add(userJSON);
-	    } else {
-		users.withArray("unselectedMonitors").add(userJSON);
-	    }
+	    // all monitors are added by default
+	    users.withArray("selectedMonitors").add(userJSON);
 	}
 	req.setAttribute("users", users.toString());
 

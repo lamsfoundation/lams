@@ -79,12 +79,14 @@
 			   		<property name="voteOutputFactory"><ref bean="voteOutputFactory"/></property>
 			   		<property name="messageService"><ref bean="lavoteMessageService"/></property>
 			   		<property name="userManagementService"><ref bean="userManagementService"/></property>
+			   		<property name="learnerService"><ref bean="learnerService"/></property>
 				</bean>
 			</property>
 			<property name="transactionAttributes">
 				<props>			
             		<prop key="audit*">PROPAGATION_REQUIRED</prop>	    
 					<prop key="buildQuestionMap">PROPAGATION_REQUIRED</prop>
+					<prop key="changeLeader*">PROPAGATION_REQUIRED</prop>
 				    <prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED</prop>
 					<prop key="copy*">PROPAGATION_REQUIRED</prop>
 					<prop key="count*">PROPAGATION_REQUIRED</prop>

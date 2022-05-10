@@ -386,10 +386,19 @@ function addLesson(learningDesignId, lessonName){
 
 function previewLesson(){
 	var ldNode = tree.treeview('getSelected')[0],
+		learningDesignID = null;
 		popupWidth = 1280,
 		popupHeight = 720;
 
-	if (!ldNode || !ldNode.learningDesignId) {
+	if (ldNode && ldNode.learningDesignId) {
+		// get LD ID from tree
+		learningDesignID = ldNode.learningDesignId;
+	} else {
+		// get data from "recently used sequences" list
+		learningDesignID = +$('div#accessDiv .access-selected').data('learningDesignId');
+	}
+			
+	if (!learningDesignID) {
 		$('#ldNotChosenError').show();
 		doSelectTab(1);
 		return;
@@ -399,7 +408,7 @@ function previewLesson(){
 	$.ajax({
 		url : LAMS_URL + 'monitoring/monitoring/initializeLesson.do',
 		data : {
-			'learningDesignID' : ldNode.learningDesignId,
+			'learningDesignID' : learningDesignID,
 			'copyType' : 3,
 			'lessonName' : LABEL_PREVIEW_LESSON_DEFAULT_TITLE
 		},
@@ -454,8 +463,8 @@ function loadLearningDesignSVG(ldId) {
 			$('#ldScreenshotAuthor').html(response);
 			$('#ldScreenshotAuthor').css('display', 'block').css('width', 'auto').css('height', 'auto');
 
-			originalThumbnailWidth = $('svg','#ldScreenshotAuthor').attr('width');
-			originalThumbnailHeight = $('svg','#ldScreenshotAuthor').attr('height');
+			originalThumbnailWidth = $('svg.svg-learning-design','#ldScreenshotAuthor').attr('width');
+			originalThumbnailHeight = $('svg.svg-learning-design','#ldScreenshotAuthor').attr('height');
 
 			// resize if needed
 			var resized = resizeSequenceThumbnail();
@@ -504,7 +513,7 @@ function loadLearningDesignSVG(ldId) {
 function resizeSequenceThumbnail(reset) {
 
 	var returnValue = false;
-	var svg = $('svg','#ldScreenshotAuthor');
+	var svg = $('svg.svg-learning-design','#ldScreenshotAuthor');
 	if ( svg ) {
 		if ( reset ) {
 			svg.attr('width',originalThumbnailWidth);
@@ -735,7 +744,7 @@ function updateSplitLearnersFields(){
 		var maxLearnerCount = $('#selected-learners div.draggableItem').length,
 			learnerCount = $('#splitLearnersCountField').val(),
 			instances = Math.ceil(maxLearnerCount/learnerCount);
-		learnerCount = Math.ceil(maxLearnerCount/instances);
+		learnerCount = instances ? Math.ceil(maxLearnerCount/instances) : learnerCount;
 		var description = SPLIT_LEARNERS_DESCRIPTION.replace('[0]', instances).replace('[1]', learnerCount);
 		$('#splitLearnersDescription').html(description);
 	}

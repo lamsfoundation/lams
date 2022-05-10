@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_3_1.xsd"
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
 	version="3.1">
 	<context-param>
 		<param-name>javax.servlet.jsp.jstl.fmt.localizationContext
@@ -10,37 +10,6 @@
 		</param-value>
 	</context-param>
 
-	<!-- In LAMS 2.3 there was a change in this section in all tools and core 
-		parts (central, learning, monitoring etc.) All LAMS web application now use 
-		shared application context. See refBeanContext.xml file in lams_common for 
-		its description. This refBeanContext.xml contains definition of the shared 
-		context. It is located by this entry: <context-param> <param-name>locatorFactorySelector</param-name> 
-		<param-value>classpath:/org/lamsfoundation/lams/beanRefContext.xml</param-value> 
-		</context-param> telling to look for refBeanContext.xml files in selected 
-		part of the classpath. Currently LAMS has only one refBeanContext.xml with 
-		one shared context definition. Lams_central uses only beans from the shared 
-		context "context.central". That is why there is no value in contextConfigLocation. 
-		Even so, this parameter needs to be declared with empty value for locatorFactorySelector 
-		to work properly. Also, if no local application context file is declare, 
-		there MUST be a file named "applicationContext.xml" in web/WEB-INF containing 
-		empty bean list, otherwise there will be errors during start up. If there 
-		are local (private for web application; see tools and admin for example) 
-		bean definitions, path to application context XML file can still be added 
-		to contextConfigLocation. -->
-
-	<context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value></param-value>
-	</context-param>
-	<context-param>
-		<param-name>locatorFactorySelector</param-name>
-		<param-value>classpath:/org/lamsfoundation/lams/beanRefContext.xml
-		</param-value>
-	</context-param>
-	<context-param>
-		<param-name>parentContextKey</param-name>
-		<param-value>context.central</param-value>
-	</context-param>
 	<context-param>
         <param-name>Owasp.CsrfGuard.Config</param-name>
         <param-value>WEB-INF/Owasp.CsrfGuard.properties</param-value>
@@ -162,12 +131,13 @@
 	<filter-mapping>
 		<filter-name>CSRFGuard</filter-name> 
 		<url-pattern>*.do</url-pattern>
+		<url-pattern>/ForgotPasswordRequest</url-pattern>
 	</filter-mapping>
 
 
 	<listener>
 		<listener-class>
-			org.springframework.web.context.ContextLoaderListener
+			org.lamsfoundation.lams.web.filter.LamsContextLoaderListener
 		</listener-class>
 	</listener>
 
@@ -315,13 +285,6 @@
 	</servlet>
 
 	<servlet>
-		<servlet-name>GradebookServlet</servlet-name>
-		<servlet-class>
-			org.lamsfoundation.lams.web.GradebookServlet
-		</servlet-class>
-	</servlet>
-
-	<servlet>
 		<servlet-name>CourseGroupManager</servlet-name>
 		<servlet-class>
 			org.lamsfoundation.lams.web.OrganisationGroupServlet
@@ -444,11 +407,6 @@
 	</servlet-mapping>
 
 	<servlet-mapping>
-		<servlet-name>GradebookServlet</servlet-name>
-		<url-pattern>/services/Gradebook</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
 		<servlet-name>CourseGroupManager</servlet-name>
 		<url-pattern>/services/CourseGroupManager</url-pattern>
 	</servlet-mapping>
@@ -556,11 +514,6 @@
 	</error-page>
 
 	<jsp-config>
-		<jsp-property-group>
-			<url-pattern>*.jsp</url-pattern>
-			<page-encoding>UTF-8</page-encoding>
-			<default-content-type>text/html; charset=UTF-8</default-content-type>
-  		</jsp-property-group>
 
 		<!-- ======================================================== -->
 		<!-- JSTL 1.2 Tag Library -->
@@ -607,6 +560,12 @@
 			<taglib-uri>csrfguard</taglib-uri>
 			<taglib-location>/WEB-INF/tlds/security/csrfguard.tld</taglib-location>
 		</taglib>
+		
+		<jsp-property-group>
+			<url-pattern>*.jsp</url-pattern>
+			<page-encoding>UTF-8</page-encoding>
+			<default-content-type>text/html; charset=UTF-8</default-content-type>
+  		</jsp-property-group>
 
 	</jsp-config>
 
@@ -656,10 +615,12 @@
 			<!-- Static resources -->
 			<url-pattern>/css/*</url-pattern>
 			<url-pattern>/errorpages/*</url-pattern>
+			<url-pattern>/error.jsp</url-pattern>
 			<url-pattern>/images/*</url-pattern>
 			<url-pattern>/includes/javascript/*</url-pattern>
 			<url-pattern>/includes/font-awesome/*</url-pattern>
 			<url-pattern>/ckeditor/*</url-pattern>
+			<url-pattern>/loadVars.jsp</url-pattern>
 			<url-pattern>/favicon.ico</url-pattern>
 			<http-method>GET</http-method>
  			<http-method>POST</http-method>

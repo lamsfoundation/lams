@@ -13,6 +13,7 @@
 		
 		<lams:css />
 		<link href="/lams/css/uppy.min.css" rel="stylesheet" type="text/css" />
+		<link href="/lams/css/uppy.custom.css" rel="stylesheet" type="text/css" />
 		
 		<script type="text/javascript" src="/lams/includes/javascript/uppy/uppy.min.js"></script>
 		<c:choose>
@@ -60,17 +61,7 @@
 							  // its format is: upload_<userId>_<timestamp>
 							  'tmpFileUploadId' : tmpFileUploadId,
 							  'largeFilesAllowed' : false
-						  },
-						  onBeforeFileAdded: function(currentFile, files) {
-							  var name = currentFile.data.name,
-							  	  extensionIndex = name.lastIndexOf('.'),
-							  	  valid = allowedFileTypes.includes(name.substring(extensionIndex).trim());
-							  if (!valid) {
-								  uppy.info('<fmt:message key="error.ld.zip.file" />', 'error', 10000);
-							  }
-							  
-							  return valid;
-					    }
+						  }
 					  };
 				  
 				  switch(language) {

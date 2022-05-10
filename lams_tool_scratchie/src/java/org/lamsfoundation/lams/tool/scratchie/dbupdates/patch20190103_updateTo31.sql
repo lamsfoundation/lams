@@ -1,7 +1,8 @@
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS = 0;
 
--- This patch contains files patch20170221.sql to patch20190103.sql
+-- This patch contains files patch20170209.sql to patch20200413.sql
+-- but 4.0 introduced other patches in between, so we officially say it is just 20190103 patch so 4.0 patches execute
 -- It should upgrade this tool to version 3.1
 
 
@@ -48,9 +49,18 @@ UPDATE lams_tool SET tool_version='20180828' WHERE tool_signature='lascrt11';
 
 
 
+-- LDEV-4817 Delete existing blank burning questions
+DELETE FROM tl_lascrt11_burning_question WHERE question IS NULL OR TRIM(question) = '';
+
+
+
+--LDEV-5002 Add question Etherpads
+ALTER TABLE tl_lascrt11_scratchie ADD COLUMN question_etherpad_enabled TINYINT(1) DEFAULT 0 AFTER burning_questions_enabled;
+
+
+
 -- LDEV-4743 Update tool version to mark LAMS 3.1 release
 UPDATE lams_tool SET tool_version='20190103' WHERE tool_signature='lascrt11';
-
 
 
 -- If there were no errors, commit and restore autocommit to on

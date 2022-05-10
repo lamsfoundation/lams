@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,8 +19,8 @@ package org.springframework.web.servlet;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
@@ -40,6 +40,7 @@ import org.springframework.core.env.EnvironmentCapable;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceEditor;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -81,12 +82,13 @@ import org.springframework.web.context.support.StandardServletEnvironment;
 @SuppressWarnings("serial")
 public abstract class HttpServletBean extends HttpServlet implements EnvironmentCapable, EnvironmentAware {
 
-	/** Logger available to subclasses */
+	/** Logger available to subclasses. */
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	@Nullable
 	private ConfigurableEnvironment environment;
 
-	private final Set<String> requiredProperties = new HashSet<String>(4);
+	private final Set<String> requiredProperties = new HashSet<>(4);
 
 
 	/**
@@ -145,9 +147,6 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 	 */
 	@Override
 	public final void init() throws ServletException {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Initializing servlet '" + getServletName() + "'");
-		}
 
 		// Set bean properties from init parameters.
 		PropertyValues pvs = new ServletConfigPropertyValues(getServletConfig(), this.requiredProperties);
@@ -169,10 +168,6 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 
 		// Let subclasses do whatever initialization they like.
 		initServletBean();
-
-		if (logger.isDebugEnabled()) {
-			logger.debug("Servlet '" + getServletName() + "' configured successfully");
-		}
 	}
 
 	/**
@@ -202,18 +197,9 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 	 * @see #getServletConfig()
 	 */
 	@Override
-	public final String getServletName() {
+	@Nullable
+	public String getServletName() {
 		return (getServletConfig() != null ? getServletConfig().getServletName() : null);
-	}
-
-	/**
-	 * Overridden method that simply returns {@code null} when no
-	 * ServletConfig set yet.
-	 * @see #getServletConfig()
-	 */
-	@Override
-	public final ServletContext getServletContext() {
-		return (getServletConfig() != null ? getServletConfig().getServletContext() : null);
 	}
 
 
@@ -224,7 +210,7 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 
 		/**
 		 * Create new ServletConfigPropertyValues.
-		 * @param config ServletConfig we'll use to take PropertyValues from
+		 * @param config the ServletConfig we'll use to take PropertyValues from
 		 * @param requiredProperties set of property names we need, where
 		 * we can't accept default values
 		 * @throws ServletException if any required properties are missing
@@ -233,7 +219,7 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 				throws ServletException {
 
 			Set<String> missingProps = (!CollectionUtils.isEmpty(requiredProperties) ?
-					new HashSet<String>(requiredProperties) : null);
+					new HashSet<>(requiredProperties) : null);
 
 			Enumeration<String> paramNames = config.getInitParameterNames();
 			while (paramNames.hasMoreElements()) {

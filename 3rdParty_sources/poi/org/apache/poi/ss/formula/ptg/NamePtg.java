@@ -17,20 +17,22 @@
 
 package org.apache.poi.ss.formula.ptg;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.ss.formula.FormulaRenderingWorkbook;
 import org.apache.poi.ss.formula.WorkbookDependentFormula;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * See the spec at 2.5.198.76 PtgName
- * 
- * @author andy
- * @author Jason Height (jheight at chariot dot net dot au)
  */
 public final class NamePtg extends OperandPtg implements WorkbookDependentFormula {
 	public final static short sid = 0x23;
 	private final static int SIZE = 5;
+
 	/** one-based index to defined name record */
 	private int field_1_label_index;
 	private short field_2_zero; // reserved must be 0
@@ -40,6 +42,12 @@ public final class NamePtg extends OperandPtg implements WorkbookDependentFormul
 	 */
 	public NamePtg(int nameIndex) {
 		field_1_label_index = 1 + nameIndex; // convert to 1-based
+	}
+
+	public NamePtg(NamePtg other) {
+		super(other);
+		field_1_label_index = other.field_1_label_index;
+		field_2_zero = other.field_2_zero;
 	}
 
 	/** Creates new NamePtg */
@@ -63,6 +71,11 @@ public final class NamePtg extends OperandPtg implements WorkbookDependentFormul
 	}
 
 	@Override
+	public byte getSid() {
+		return sid;
+	}
+
+	@Override
 	public int getSize() {
 		return SIZE;
 	}
@@ -80,5 +93,15 @@ public final class NamePtg extends OperandPtg implements WorkbookDependentFormul
 	@Override
 	public byte getDefaultOperandClass() {
 		return Ptg.CLASS_REF;
+	}
+
+	@Override
+	public NamePtg copy() {
+		return new NamePtg(this);
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties("index", this::getIndex);
 	}
 }

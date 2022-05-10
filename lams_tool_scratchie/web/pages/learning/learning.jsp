@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams"><lams:LAMSURL/></c:set>
+
 <%-- param has higher level for request attribute --%>
 <c:if test="${not empty param.sessionMapID}">
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
@@ -10,6 +11,9 @@
 <c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 <c:set var="scratchie" value="${sessionMap.scratchie}" />
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
+<c:set var="isScratchingFinished" value="${sessionMap.isScratchingFinished}" />
+<c:set var="isWaitingForLeaderToSubmitNotebook" value="${sessionMap.isWaitingForLeaderToSubmitNotebook}" />
+<c:set var="hideFinishButton" value="${!isUserLeader && (!isScratchingFinished || isWaitingForLeaderToSubmitNotebook)}" />
 
 <lams:html>
 <lams:head>
@@ -41,6 +45,8 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jgrowl.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript">
+		var isScratching = false;
+		
 		$(document).ready(function(){
 			//initialize tooltips showing user names next to confidence levels
 			$('[data-toggle="tooltip"]').tooltip();
@@ -70,6 +76,45 @@
 					'minLength' : 3
 				});
 			});
+			
+			// show etherpads only on Discussion expand
+			$('.question-etherpad-collapse').on('show.bs.collapse', function(){
+				var etherpad = $('.etherpad-container', this);
+				if (!etherpad.hasClass('initialised')) {
+					var id = etherpad.attr('id'),
+						groupId = id.substring('etherpad-container-'.length);
+					etherpadInitMethods[groupId]();
+				}
+			});
+			
+			<c:if test="${scratchie.revealOnDoubleClick}">
+				$('.scratchie-link').on('touchend', function(){
+					if (!this.hasAttribute('onDblClick')) {
+						return;
+					}
+					
+					// allow single touch scratching on iPads even if double click scratching is enabled
+					var itemUid = $(this).data('itemUid'),
+						optionUid = $(this).data('optionUid');
+					scratchMcq(itemUid, optionUid);
+				});
+			</c:if>
+			
+			// hide Finish button for non-leaders until leader finishes
+			if (${hideFinishButton}) {
+				$("#finishButton").hide();
+			}
+
+			<%-- Connect to command websocket only if it is learner UI --%>
+			<c:if test="${mode == 'learner'}">
+				// command websocket stuff for refreshing
+				// trigger is an unique ID of page and action that command websocket code in Page.tag recognises
+				commandWebsocketHookTrigger = 'scratchie-leader-change-refresh-${toolSessionID}';
+				// if the trigger is recognised, the following action occurs
+				commandWebsocketHook = function() {
+					location.reload();
+				};
+			</c:if>
 		});
 
 		//scratch image (used by both scratchMcq() and scratchVsa())
@@ -97,6 +142,12 @@
 
 		//scratch MCQ answer
 		function scratchMcq(itemUid, optionUid){
+			if (isScratching) {
+				// do not allow parallel scratching
+				return;
+			}
+			
+			isScratching = true;
 	        $.ajax({
 	            url: '<c:url value="/learning/recordItemScratched.do"/>',
 	            data: 'sessionMapID=${sessionMapID}&optionUid=' + optionUid + '&itemUid=' + itemUid,
@@ -111,7 +162,7 @@
 		            	
 		            if (json.optionCorrect) {
 		            	//disable scratching
-		            	$("[id^=imageLink-" + itemUid + "]").removeAttr('onclick'); 
+		            	$("[id^=imageLink-" + itemUid + "]").removeAttr('onClick').removeAttr('onDblClick'); 
 		            	$("[id^=imageLink-" + itemUid + "]").css('cursor','default');
 		            	$("[id^=image-" + itemUid + "]").not("img[src*='scratchie-correct-animation.gif']").not("img[src*='scratchie-correct.gif']").fadeTo(1300, 0.3);
 
@@ -120,6 +171,10 @@
 		            	$('#imageLink' + id).removeAttr('onclick');
 		            	$('#imageLink' + id).css('cursor','default');
 		            }
+	            },
+	            complete : function(){
+    				// enable scratching again
+    				isScratching = false;
 	            }
 	       	});
 		}
@@ -132,6 +187,13 @@
 			if (answer == "") {
 				return;
 			}
+			
+			if (isScratching) {
+				// do not allow parallel scratching
+				return;
+			}
+			
+			isScratching = true;
 
 			$.ajax({
 		    	url: '<c:url value="/learning/recordVsaAnswer.do"/>',
@@ -183,7 +245,11 @@
 				           	$("#type-your-answer-" + itemUid).hide();
 				        }
 					}
-		        }
+		        },
+	            complete : function(){
+    				// enable scratching again
+    				isScratching = false;
+	            }
 	       	});
 
 	        //blank input field
@@ -224,50 +290,22 @@
 
 		//a direct replacement for Java's String.hashCode() method 
 		function hashCode(str) {
-			return str.split('').reduce((prevHash, currVal) =>
-		    	(((prevHash << 5) - prevHash) + currVal.charCodeAt(0))|0, 0);
+			var hash = 0;
+		    if (str.length == 0) {
+		        return hash;
+		    }
+		    for (var i = 0; i < str.length; i++) {
+		        var char = str.charCodeAt(i);
+		        hash = ((hash<<5)-hash)+char;
+		        hash = hash & hash; // Convert to 32bit integer
+		    }
+		    return hash;
 		}
 
-		//boolean to indicate whether ok dialog is still ON so that autosave can't be run
-		var isWaitingForConfirmation = ${isTimeLimitEnabled && isTimeLimitNotLaunched};
-
-		//time limit feature
-		<c:if test="${isTimeLimitEnabled}">
-			$(document).ready(function(){
-				
-				//show timelimit-start-dialog in order to start countdown
-				if (${isTimeLimitNotLaunched}) {
-					
-					//show confirmation dialog
-					$.blockUI({ 
-						message: $('#timelimit-start-dialog'), 
-						css: { width: '325px', height: '120px'}, 
-						overlayCSS: { opacity: '.98'} 
-					});
-						
-					//once OK button pressed start countdown
-				    $('#timelimit-start-ok').click(function() {
-				    	
-			        		//store date when user has started activity with time limit
-				        $.ajax({
-				        	async: true,
-				            url: '<c:url value="/learning/launchTimeLimit.do"/>',
-				            data: 'sessionMapID=${sessionMapID}',
-				            type: 'post'
-				       	});
-			        	
-				       	$.unblockUI();
-				       	displayCountdown();
-				       	isWaitingForConfirmation = false;
-				    });
-					
-				} else {
-					displayCountdown();
-				}
-
-			});
+		<c:if test="${mode != 'teacher'}">
+			// time limit feature
 			
-			function displayCountdown(){
+			function displayCountdown(secondsLeft){
 				var countdown = '<div id="countdown"></div>' 
 				$.blockUI({
 					message: countdown, 
@@ -285,38 +323,133 @@
 				});
 				
 				$('#countdown').countdown({
-					until: '+${secondsLeft}S',  
+					until: '+' + secondsLeft +'S',
 					format: 'hMS',
 					compact: true,
+					alwaysExpire : true,
 					onTick: function(periods) {
-						//check for 30 seconds
-						if ((periods[4] == 0) && (periods[5] == 0) && (periods[6] <= 30)) {
-							$('#countdown').css('color', '#FF3333');
-						}		
+						// check for 30 seconds or less and display timer in red
+						var secondsLeft = $.countdown.periodsToSeconds(periods);
+						if (secondsLeft <= 30) {
+							$(this).addClass('countdown-timeout');
+						} else {
+							$(this).removeClass('countdown-timeout');
+						}
 					},
 					onExpiry: function(periods) {
-				        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-fw"></i> <fmt:message key="label.time.is.over" /></h1>' }); 
+				        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <fmt:message key="label.time.is.over" /></h1>' }); 
 				        
-				        setTimeout(
-							function() {
-				        			finish(true);
-				        		}, 
-				        		4000
-				        ); 
+				        setTimeout(function() { 
+					        if (${isUserLeader}) {
+						    	finish(true);
+					        } else {
+					        	location.reload();
+						    }
+				        }, 4000);
 					},
 					description: "<div id='countdown-label'><fmt:message key='label.countdown.time.left' /></div>"
 				});
 			}
-		</c:if>
+	
+			//init the connection with server using server URL but with different protocol
+			var scratchieWebsocketInitTime = Date.now(),
+				scratchieWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
+							+ 'learningWebsocket?toolSessionID=' + ${toolSessionID} + '&toolContentID=' + ${scratchie.contentId}),
+				scratchieWebsocketPingTimeout = null,
+				scratchieWebsocketPingFunc = null;
+			
+			scratchieWebsocket.onclose = function(e) {
+				// react only on abnormal close
+				if (e.code === 1006 &&
+					Date.now() - scratchieWebsocketInitTime > 1000) {
+					location.reload();		
+				}
+			};
+			
+			scratchieWebsocketPingFunc = function(skipPing){
+				if (scratchieWebsocket.readyState == scratchieWebsocket.CLOSING 
+						|| scratchieWebsocket.readyState == scratchieWebsocket.CLOSED){
+					return;
+				}
+				
+				// check and ping every 3 minutes
+				scratchieWebsocketPingTimeout = setTimeout(scratchieWebsocketPingFunc, 3*60*1000);
+				// initial set up does not send ping
+				if (!skipPing) {
+					scratchieWebsocket.send("ping");
+				}
+			};
+			
+			// set up timer for the first time
+			scratchieWebsocketPingFunc(true);
+			
+			// run when the server pushes new reports and vote statistics
+			scratchieWebsocket.onmessage = function(e) {
+				// create JSON object
+				var input = JSON.parse(e.data);
 
+				if (input.pageRefresh) {
+					location.reload();
+					return;
+				}
+			
+				if (input.clearTimer == true) {
+					// teacher stopped the timer, destroy it
+					$('#countdown').countdown('destroy').remove();
+				} else if (typeof input.secondsLeft != 'undefined'){
+					// teacher updated the timer
+					var secondsLeft = +input.secondsLeft,
+						counterInitialised = $('#countdown').length > 0;
+						
+					if (counterInitialised) {
+						// just set the new time
+						$('#countdown').countdown('option', 'until', secondsLeft + 'S');
+					} else {
+						// initialise the timer
+						displayCountdown(secondsLeft);
+					}
+				} else if (${not isUserLeader}){
+					// reflect the leader's choices
+					$.each(input, function(itemUid, options) {
+						$.each(options, function(optionUid, optionProperties){
+							
+							if (optionProperties.isVSA) {
+								var answer = optionUid;
+								optionUid = hashCode(optionUid);
+	
+								//check if such image exists, create it otherwise
+								if ($('#image-' + itemUid + '-' + optionUid).length == 0) {
+									paintNewVsaAnswer(eval(itemUid), answer);
+								}
+							}
+							
+							scratchImage(itemUid, optionUid, optionProperties.isCorrect);
+						});
+					});
+				}
+				
+				// reset ping timer
+				clearTimeout(scratchieWebsocketPingTimeout);
+				scratchieWebsocketPingFunc(true);
+			};
+		</c:if>
+			
+		
 		//autosave feature
 		<c:if test="${isUserLeader && (mode != 'teacher')}">
 			var autosaveInterval = "60000"; // 60 seconds interval
 			window.setInterval(learnerAutosave,	autosaveInterval);
 			
-			function learnerAutosave(){
-				if (isWaitingForConfirmation) return;
-				
+			function learnerAutosave(isCommand){
+                // isCommand means that the autosave was triggered by force complete or another command websocket message
+			    // in this case do not check multiple tabs open, just autosave
+			    if (!isCommand) {
+				  let shouldAutosave = preventLearnerAutosaveFromMultipleTabs(autosaveInterval);
+				  if (!shouldAutosave) {
+					return;
+				  }
+			    }
+			    
 				//ajax form submit
 				$('#burning-questions').ajaxSubmit({
 					url: "<lams:WebAppURL/>learning/autosaveBurningQuestions.do?sessionMapID=${sessionMapID}&date=" + new Date().getTime(),
@@ -366,6 +499,16 @@
 						<fmt:param>${scorePercentage}</fmt:param>
 					</fmt:message>
 				</lams:Alert>
+			</div>
+		</c:if>
+		
+		<c:if test="${isUserLeader and scratchie.revealOnDoubleClick}">
+			<div class="row no-gutter voffset20">
+				<div class="col-xs-12 col-sm-offset-3 col-sm-6">
+					<div class="alert alert-warning">
+						<i class="fa fa-info-circle fa-lg" aria-hidden="true"></i> <fmt:message key="label.learning.reveal.double.click" />
+					</div>
+				</div>
 			</div>
 		</c:if>
 

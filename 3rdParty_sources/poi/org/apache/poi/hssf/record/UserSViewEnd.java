@@ -17,9 +17,10 @@
 
 package org.apache.poi.hssf.record;
 
-import java.util.Locale;
+import java.util.Map;
+import java.util.function.Supplier;
 
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
@@ -27,8 +28,13 @@ import org.apache.poi.util.LittleEndianOutput;
  */
 public final class UserSViewEnd extends StandardRecord {
 
-    public final static short sid = 0x01AB;
+    public static final short sid = 0x01AB;
 	private byte[] _rawData;
+
+    public UserSViewEnd(UserSViewEnd other) {
+        super(other);
+        _rawData = (other._rawData == null) ? null : other._rawData.clone();
+    }
 
     public UserSViewEnd(byte[] data) {
         _rawData = data;
@@ -59,20 +65,18 @@ public final class UserSViewEnd extends StandardRecord {
         return sid;
     }
 
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-
-        sb.append("[").append("USERSVIEWEND").append("] (0x");
-        sb.append(Integer.toHexString(sid).toUpperCase(Locale.ROOT) + ")\n");
-        sb.append("  rawData=").append(HexDump.toHex(_rawData)).append("\n");
-        sb.append("[/").append("USERSVIEWEND").append("]\n");
-        return sb.toString();
+    @Override
+    public UserSViewEnd copy() {
+        return new UserSViewEnd(this);
     }
 
-    //HACK: do a "cheat" clone, see Record.java for more information
-    public Object clone() {
-        return cloneViaReserialise();
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.USER_SVIEW_END;
     }
 
-    
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties("rawData", () -> _rawData);
+    }
 }

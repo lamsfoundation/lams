@@ -40,6 +40,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -49,6 +50,7 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -92,6 +94,7 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.dao.DataAccessException;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -121,6 +124,8 @@ public class SubmitFilesService
     private ICoreNotebookService coreNotebookService;
 
     private IUserManagementService userManagementService;
+
+    private ILearnerService learnerService;
 
     private IEventNotificationService eventNotificationService;
 
@@ -238,6 +243,11 @@ public class SubmitFilesService
 		}
 
 		toolService.removeActivityMark(user.getUserID(), session.getSessionID());
+
+		if (session.getGroupLeader() != null && session.getGroupLeader().getUid() == user.getUid()) {
+		    session.setGroupLeader(null);
+		    submitFilesSessionDAO.update(session);
+		}
 
 		submitUserDAO.delete(user);
 	    }
@@ -950,45 +960,49 @@ public class SubmitFilesService
 	// push outputs to gradebook
 	recalculateUserTotalMarks(true, session, null);
 
-	// notify learners on mark release
-	boolean notifyLearnersOnMarkRelease = getEventNotificationService().eventExists(SbmtConstants.TOOL_SIGNATURE,
-		SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, content.getContentID());
-	if (notifyLearnersOnMarkRelease) {
-	    Map<Integer, StringBuilder> notificationMessages = new TreeMap<>();
-
-	    List<SubmissionDetails> list = submissionDetailsDAO.getSubmissionDetailsBySession(sessionID);
-	    for (SubmissionDetails details : list) {
-		SubmitFilesReport report = details.getReport();
-		if (!details.isRemoved()) {
-		    Integer userId = details.getLearner().getUserID();
-		    StringBuilder notificationMessage = notificationMessages.get(userId);
-		    if (notificationMessage == null) {
-			notificationMessage = new StringBuilder();
-		    }
-		    Object[] notificationMessageParameters = new Object[3];
-		    notificationMessageParameters[0] = details.getFilePath();
-		    notificationMessageParameters[1] = details.getDateOfSubmission();
-		    notificationMessageParameters[2] = report.getMarks();
-		    notificationMessage
-			    .append(getLocalisedMessage("event.mark.release.mark", notificationMessageParameters));
-		    notificationMessages.put(userId, notificationMessage);
-		}
-	    }
-
-	    Object[] notificationMessageParameters = new Object[1];
-	    for (Integer userID : notificationMessages.keySet()) {
-		notificationMessageParameters[0] = notificationMessages.get(userID).toString();
-		getEventNotificationService().triggerForSingleUser(SbmtConstants.TOOL_SIGNATURE,
-			SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, content.getContentID(), userID,
-			notificationMessageParameters);
-	    }
-	}
-
 	//audit log event
 	String sessionName = session.getSessionName() + " (toolSessionId=" + session.getSessionID() + ")";
 	String message = messageService.getMessage("tool.display.name") + ". "
 		+ messageService.getMessage("msg.mark.released", new String[] { sessionName });
 	logEventService.logToolEvent(LogEvent.TYPE_TOOL_MARK_RELEASED, content.getContentID(), null, message);
+    }
+
+    @Override
+    public int notifyLearnersOnMarkRelease(long sessionID) {
+	if (log.isDebugEnabled()) {
+	    log.debug("Sending email with marks to all learners for session ID " + sessionID);
+	}
+
+	Map<Integer, StringBuilder> notificationMessages = new TreeMap<>();
+	List<SubmissionDetails> list = submissionDetailsDAO.getSubmissionDetailsBySession(sessionID);
+	for (SubmissionDetails details : list) {
+	    SubmitFilesReport report = details.getReport();
+	    if (!details.isRemoved()) {
+		Integer userId = details.getLearner().getUserID();
+		StringBuilder notificationMessage = notificationMessages.get(userId);
+		if (notificationMessage == null) {
+		    notificationMessage = new StringBuilder();
+		}
+		Object[] notificationMessageParameters = new Object[3];
+		notificationMessageParameters[0] = details.getFilePath();
+		notificationMessageParameters[1] = details.getDateOfSubmission();
+		notificationMessageParameters[2] = report.getMarks();
+		notificationMessage
+			.append(getLocalisedMessage("event.mark.release.mark", notificationMessageParameters));
+		notificationMessages.put(userId, notificationMessage);
+	    }
+	}
+	Object[] notificationMessageParameters = new Object[1];
+	int learnersNotified = 0;
+	for (Integer userId : notificationMessages.keySet()) {
+	    notificationMessageParameters[0] = notificationMessages.get(userId).toString();
+	    getEventNotificationService().sendMessage(null, userId, IEventNotificationService.DELIVERY_METHOD_MAIL,
+		    getLocalisedMessage("event.mark.release.subject", null),
+		    getLocalisedMessage("event.mark.release.body", notificationMessageParameters), false);
+	    learnersNotified++;
+	}
+
+	return learnersNotified;
     }
 
     @Override
@@ -1238,6 +1252,10 @@ public class SubmitFilesService
 	this.userManagementService = userManagementService;
     }
 
+    public void setLearnerService(ILearnerService learnerService) {
+	this.learnerService = learnerService;
+    }
+
     @Override
     public IEventNotificationService getEventNotificationService() {
 	return eventNotificationService;
@@ -1324,8 +1342,6 @@ public class SubmitFilesService
 	content.setDefineLater(false);
 	content.setNotifyTeachersOnFileSubmit(
 		JsonUtil.optBoolean(toolContentJSON, "notifyTeachersOnFileSubmit", Boolean.FALSE));
-	content.setNotifyLearnersOnMarkRelease(
-		JsonUtil.optBoolean(toolContentJSON, "notifyLearnersOnMarkRelease", Boolean.FALSE));
 	content.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
 	content.setReflectOnActivity(JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	content.setLockOnFinished(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
@@ -1360,24 +1376,17 @@ public class SubmitFilesService
 	// up previous scratches done
 	if (leader == null) {
 	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getUserID().intValue());
-	    if (leaderUserId != null) {
-		leader = submitUserDAO.getLearner(toolSessionId, leaderUserId.intValue());
-		// create new user in a DB
-		if (leader == null) {
-		    log.debug("creating new user with userId: " + leaderUserId);
-		    User leaderDto = (User) userManagementService.findById(User.class, leaderUserId.intValue());
-//		    String userName = leaderDto.getLogin();
-//		    String fullName = leaderDto.getFirstName() + " " + leaderDto.getLastName();
-		    //  leader = new SubmitUser(leaderDto.getUserDTO(), submitFileSession);
-		    leader = new SubmitUser();
-		    leader.setLogin(leaderDto.getLogin());
-		    leader.setFirstName(leaderDto.getFirstName());
-		    leader.setLastName(leaderDto.getLastName());
-		    leader.setUserID(leaderDto.getUserId());
-
-		    createUser(leader);
-		}
-
+	    // set leader only if the leader entered the activity
+	    if (leaderUserId == null) {
+		return null;
+	    }
+	    if (user.getUserID().equals(leaderUserId.intValue())) {
+		// is it me?
+		leader = user;
+	    } else {
+		leader = getSessionUser(toolSessionId, leaderUserId.intValue());
+	    }
+	    if (leader != null) {
 		// set group leader
 		submitFileSession.setGroupLeader(leader);
 		submitFilesSessionDAO.insertOrUpdate(submitFileSession);
@@ -1385,6 +1394,59 @@ public class SubmitFilesService
 	}
 
 	return leader;
+    }
+
+    @Override
+    public void changeLeaderForGroup(long toolSessionId, int leaderUserId) {
+	SubmitFilesSession session = getSessionById(toolSessionId);
+	if (session.getStatus() != null && session.getStatus().equals(SubmitFilesSession.COMPLETED)) {
+	    throw new java.security.InvalidParameterException("Attempting to assing a new leader with user ID "
+		    + leaderUserId + " to a finished session wtih ID " + toolSessionId);
+	}
+
+	SubmitUser existingLeader = session.getGroupLeader();
+	if (existingLeader == null || existingLeader.getUserID().equals(leaderUserId)) {
+	    return;
+	}
+
+	SubmitUser newLeader = getSessionUser(toolSessionId, leaderUserId);
+	if (newLeader == null) {
+	    User user = userManagementService.getUserById(Long.valueOf(leaderUserId).intValue());
+	    newLeader = createSessionUser(user.getUserDTO(), toolSessionId);
+
+	    if (log.isDebugEnabled()) {
+		log.debug("Created user with ID " + leaderUserId + " to become a new leader for session with ID "
+			+ toolSessionId);
+	    }
+	} else {
+	    List<SubmissionDetails> newLeaderSubmissions = submissionDetailsDAO.getBySessionAndLearner(toolSessionId,
+		    leaderUserId);
+	    for (SubmissionDetails submission : newLeaderSubmissions) {
+		submissionDetailsDAO.delete(submission);
+	    }
+	}
+
+	session.setGroupLeader(newLeader);
+	submitFilesSessionDAO.update(session);
+
+	List<SubmissionDetails> existingLeaderSubmissions = submissionDetailsDAO.getBySessionAndLearner(toolSessionId,
+		existingLeader.getUserID());
+
+	for (SubmissionDetails submission : existingLeaderSubmissions) {
+	    submission.setLearner(newLeader);
+	    submissionDetailsDAO.update(submission);
+	}
+
+	if (log.isDebugEnabled()) {
+	    log.debug("User with ID " + leaderUserId + " became a new leader for session with ID " + toolSessionId);
+	}
+
+	Set<Integer> userIds = getUsersBySession(toolSessionId).stream()
+		.collect(Collectors.mapping(submitUser -> submitUser.getUserID(), Collectors.toSet()));
+
+	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
+	jsonCommand.put("hookTrigger", "submit-files-leader-change-refresh-" + toolSessionId);
+	learnerService.createCommandForLearners(session.getContent().getContentID(), userIds, jsonCommand.toString());
     }
 
     @Override

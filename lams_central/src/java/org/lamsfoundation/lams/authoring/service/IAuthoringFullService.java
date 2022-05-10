@@ -36,9 +36,11 @@ import org.lamsfoundation.lams.learningdesign.dto.LicenseDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.tool.dto.ToolOutputDefinitionDTO;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -109,6 +111,8 @@ public interface IAuthoringFullService extends IAuthoringService {
      */
     Long copyToolContent(Long toolContentID, String customCSV) throws IOException;
 
+    Long createToolContent(UserDTO user, String toolSignature, ObjectNode toolContentJSON) throws IOException;
+
     /**
      * Get the available licenses. This will include our supported Creative Common licenses and an "OTHER" license which
      * may be used for user entered license details. The picture url supplied should be a full URL i.e. if it was a
@@ -141,4 +145,9 @@ public interface IAuthoringFullService extends IAuthoringService {
     List<LearningDesignAccess> updateLearningDesignAccessByUser(Integer userId);
 
     void storeLearningDesignAccess(Long learningDesignId, Integer userId);
+
+    Long createTblAssessmentToolContent(UserDTO user, String title, String instructions, String reflectionInstructions,
+	    boolean selectLeaderToolOutput, boolean enableNumbering, boolean enableConfidenceLevels,
+	    boolean allowDiscloseAnswers, boolean allowAnswerJustification, boolean enableDiscussionSentiment,
+	    ArrayNode questions) throws IOException;
 }

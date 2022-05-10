@@ -106,16 +106,16 @@ public final class FunctionEval {
         retval[38] = BooleanFunction.NOT;
         retval[39] = NumericFunction.MOD;
         // 40: DCOUNT
-        // 41: DSUM
+        retval[41] = new DStarRunner(DStarRunner.DStarAlgorithmEnum.DSUM);
         // 42: DAVERAGE
         retval[43] = new DStarRunner(DStarRunner.DStarAlgorithmEnum.DMIN);
-        // 44: DMAX
+        retval[44] = new DStarRunner(DStarRunner.DStarAlgorithmEnum.DMAX);
         // 45: DSTDEV
         retval[46] = AggregateFunction.VAR;
         // 47: DVAR
         retval[48] = TextFunction.TEXT;
         // 49: LINEST
-        // 50: TREND
+        retval[50] = new Trend();
         // 51: LOGEST
         // 52: GROWTH
 
@@ -138,13 +138,13 @@ public final class FunctionEval {
         retval[72] = CalendarFieldFunction.MINUTE;
         retval[73] = CalendarFieldFunction.SECOND;
         retval[74] = new Now();
-        // 75: AREAS
+        retval[75] = new Areas();
         retval[76] = new Rows();
         retval[77] = new Columns();
         retval[FunctionID.OFFSET] = new Offset(); //nominally 78
 
         retval[82] = TextFunction.SEARCH;
-        // 83: TRANSPOSE
+        retval[83] = MatrixFunction.TRANSPOSE;
 
         // 86: TYPE
 
@@ -172,16 +172,27 @@ public final class FunctionEval {
         retval[121] = new Code();
 
         retval[124] = TextFunction.FIND;
+        // 125: CELL
 
         retval[126] = LogicalFunction.ISERR;
         retval[127] = LogicalFunction.ISTEXT;
         retval[128] = LogicalFunction.ISNUMBER;
         retval[129] = LogicalFunction.ISBLANK;
         retval[130] = new T();
+        // 131: N
+        retval[140] = new DateValue();
+        // 141: TIMEVALUE
+        // 142: SLN
+        // 143: SYD
+        // 144: DDB
 
         retval[FunctionID.INDIRECT] = null; // Indirect.evaluate has different signature
 
         retval[162] = TextFunction.CLEAN;
+
+        retval[163] = MatrixFunction.MDETERM;
+        retval[164] = MatrixFunction.MINVERSE;
+        retval[165] = MatrixFunction.MMULT;
 
         retval[167] = new IPMT();
         retval[168] = new PPMT();
@@ -190,12 +201,15 @@ public final class FunctionEval {
         retval[183] = AggregateFunction.PRODUCT;
         retval[184] = NumericFunction.FACT;
 
+        // 189: DPRODUCT
         retval[190] = LogicalFunction.ISNONTEXT;
 
         retval[194] = AggregateFunction.VARP;
-
+        // 195: DSTDEVP
+        // 196: DVARP
         retval[197] = NumericFunction.TRUNC;
         retval[198] = LogicalFunction.ISLOGICAL;
+        // 199: DCOUNTA
 
         //204: USDOLLAR (YEN in BIFF3)
         //205: FINDB
@@ -228,7 +242,9 @@ public final class FunctionEval {
         // 244: INFO
 
         // 247: DB
-        
+        // 252: FEQUENCY
+        retval[252] = Frequency.instance;
+
         retval[FunctionID.EXTERNAL_FUNC] = null; // ExternalFunction is a FreeRefFunction, nominally 255
 
         retval[261] = new Errortype();
@@ -283,7 +299,7 @@ public final class FunctionEval {
         // 316: TTEST
         // 317: PROB
         retval[318] = AggregateFunction.DEVSQ;
-        // 319: GEOMEAN
+        retval[319] = AggregateFunction.GEOMEAN;
         // 320: HARMEAN
         retval[321] = AggregateFunction.SUMSQ;
         // 322: KURT
@@ -378,7 +394,7 @@ public final class FunctionEval {
         if(functions[idx] instanceof NotImplementedFunction) {
             functions[idx] = func;
         } else {
-            throw new IllegalArgumentException("POI already implememts " + name +
+            throw new IllegalArgumentException("POI already implements " + name +
                     ". You cannot override POI's implementations of Excel functions");
         }
     }
@@ -390,7 +406,7 @@ public final class FunctionEval {
      * @since 3.8 beta6
      */
     public static Collection<String> getSupportedFunctionNames() {
-        Collection<String> lst = new TreeSet<String>();
+        Collection<String> lst = new TreeSet<>();
         for (int i = 0; i < functions.length; i++) {
             Function func = functions[i];
             FunctionMetadata metaData = FunctionMetadataRegistry.getFunctionByIndex(i);
@@ -409,7 +425,7 @@ public final class FunctionEval {
      * @since 3.8 beta6
      */
     public static Collection<String> getNotSupportedFunctionNames() {
-        Collection<String> lst = new TreeSet<String>();
+        Collection<String> lst = new TreeSet<>();
         for (int i = 0; i < functions.length; i++) {
             Function func = functions[i];
             if (func != null && (func instanceof NotImplementedFunction)) {

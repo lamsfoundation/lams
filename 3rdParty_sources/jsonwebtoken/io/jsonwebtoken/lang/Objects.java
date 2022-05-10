@@ -22,10 +22,7 @@ import java.util.Arrays;
 
 public final class Objects {
 
-    //for code coverage
-    private static final Objects INSTANCE = new Objects();
-
-    private Objects(){}
+    private Objects(){} //prevent instantiation
 
     private static final int INITIAL_HASH = 7;
     private static final int MULTIPLIER   = 31;

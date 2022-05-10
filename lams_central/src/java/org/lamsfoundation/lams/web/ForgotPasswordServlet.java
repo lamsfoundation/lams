@@ -3,7 +3,6 @@ package org.lamsfoundation.lams.web;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
@@ -15,18 +14,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.hibernate.HibernateException;
-import org.hibernate.id.Configurable;
-import org.hibernate.id.IdentifierGenerator;
-import org.hibernate.id.UUIDGenerator;
-import org.hibernate.type.StringType;
+import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
 import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.Emailer;
-import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
@@ -59,7 +53,7 @@ public class ForgotPasswordServlet extends HttpServlet {
 
     private static int MILLISECONDS_IN_A_DAY = 86400000;
 
-    private static String LANGUAGE_KEY = "&languageKey=";
+    private static String LANGUAGE_KEY = "languageKey";
 
     /*
      * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
@@ -93,12 +87,12 @@ public class ForgotPasswordServlet extends HttpServlet {
 	    } else {
 		param = request.getParameter("login");
 	    }
-	    handleEmailRequest(findByEmail, param.trim(), response);
+	    handleEmailRequest(findByEmail, param.trim(), request, response);
 
 	} else if (method.equals("requestPasswordChange")) {
 	    String newPassword = request.getParameter("newPassword");
 	    String key = request.getParameter("key");
-	    handlePasswordChange(newPassword, key, response);
+	    handlePasswordChange(newPassword, key, request, response);
 
 	} else {
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -117,8 +111,8 @@ public class ForgotPasswordServlet extends HttpServlet {
      * @throws ServletException
      * @throws IOException
      */
-    public void handleEmailRequest(Boolean findByEmail, String param, HttpServletResponse response)
-	    throws ServletException, IOException {
+    public void handleEmailRequest(Boolean findByEmail, String param, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException, IOException {
 	if ((param == null) || param.equals("")) {
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 	    return;
@@ -172,7 +166,7 @@ public class ForgotPasswordServlet extends HttpServlet {
 	    if (!skipSendingEmail) {
 		boolean isHtmlFormat = false;
 		// generate a key for the request
-		String key = ForgotPasswordServlet.generateUniqueKey();
+		String key = RandomPasswordGenerator.generateForgotPasswordKey();
 
 		// all good, save the request in the db
 		ForgotPasswordRequest fp = new ForgotPasswordRequest();
@@ -210,10 +204,10 @@ public class ForgotPasswordServlet extends HttpServlet {
 	//show default message if there is no error message
 	languageKey = languageKey == null ? ForgotPasswordServlet.REQUEST_PROCESSED : languageKey;
 
-	String redirectUrl = Configuration.get("ServerURL") + "forgotPasswordProc.jsp?"
-		+ ForgotPasswordServlet.LANGUAGE_KEY + languageKey + "&showErrorMessage=" + showErrorMessage;
+	request.setAttribute(ForgotPasswordServlet.LANGUAGE_KEY, languageKey);
+	request.setAttribute("showErrorMessage", showErrorMessage);
+	request.getRequestDispatcher("/forgotPasswordProc.jsp").forward(request, response);
 
-	response.sendRedirect(redirectUrl);
     }
 
     /**
@@ -222,10 +216,8 @@ public class ForgotPasswordServlet extends HttpServlet {
      * @param key
      *            the key of the forgot password request
      */
-    public void handlePasswordChange(String newPassword, String key, HttpServletResponse response)
-	    throws ServletException, IOException {
-	int success = 0;
-
+    public void handlePasswordChange(String newPassword, String key, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException, IOException {
 	if ((key == null) || key.equals("") || (newPassword == null) || newPassword.equals("")) {
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 	    return;
@@ -244,8 +236,8 @@ public class ForgotPasswordServlet extends HttpServlet {
 
 	    if (now < cutoffTime) {
 		User user = (User) userManagementService.findById(User.class, fp.getUserId());
-		userManagementService.updatePassword(user.getLogin(), newPassword);
-		userManagementService.logPasswordChanged(user, user);
+		userManagementService.updatePassword(user, newPassword);
+
 		languageKey = ForgotPasswordServlet.SUCCESS_CHANGE_PASS;
 
 	    } else {
@@ -256,26 +248,8 @@ public class ForgotPasswordServlet extends HttpServlet {
 	    userManagementService.delete(fp);
 	}
 
-	String redirectUrl = Configuration.get("ServerURL") + "forgotPasswordProc.jsp?"
-		+ ForgotPasswordServlet.LANGUAGE_KEY + languageKey + "&showErrorMessage=" + showErrorMessage;
-	response.sendRedirect(response.encodeRedirectURL(redirectUrl));
+	request.setAttribute(ForgotPasswordServlet.LANGUAGE_KEY, languageKey);
+	request.setAttribute("showErrorMessage", showErrorMessage);
+	request.getRequestDispatcher("/forgotPasswordProc.jsp").forward(request, response);
     }
-
-    /**
-     * Generates the unique key used for the forgot password request
-     *
-     * @return a unique key
-     * @throws HibernateException
-     * @throws FileUtilException
-     * @throws IOException
-     */
-    public static String generateUniqueKey() throws HibernateException {
-	Properties props = new Properties();
-
-	IdentifierGenerator uuidGen = new UUIDGenerator();
-	((Configurable) uuidGen).configure(StringType.INSTANCE, props, null);
-
-	return ((String) uuidGen.generate(null, null)).toLowerCase();
-    }
-
 }

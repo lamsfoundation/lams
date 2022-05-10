@@ -24,6 +24,8 @@
 package org.lamsfoundation.lams.usermanagement.dto;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.TimeZone;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -47,6 +49,7 @@ public class UserDTO implements Serializable {
     private String email;
     private ThemeDTO theme;
     private TimeZone timeZone;
+    private int timeZoneOffsetSeconds;
     private Integer authenticationMethodId;
     private Boolean firstLogin;
     private Integer lastVisitedOrganisationId;
@@ -65,7 +68,9 @@ public class UserDTO implements Serializable {
 	this.direction = direction;
 	this.email = email;
 	this.theme = htmlTheme;
-	timeZone = timezone;
+	this.timeZone = timezone;
+	this.timeZoneOffsetSeconds = timeZone == null ? 0
+		: ZoneId.of(timeZone.getID()).getRules().getOffset(Instant.now()).getTotalSeconds();
 	this.authenticationMethodId = authenticationMethodId;
 	this.fckLanguageMapping = fckLanguageMapping;
 	this.firstLogin = firstLogin;
@@ -151,6 +156,10 @@ public class UserDTO implements Serializable {
     /** User's timezone. */
     public TimeZone getTimeZone() {
 	return timeZone;
+    }
+
+    public int getTimeZoneOffsetSeconds() {
+	return timeZoneOffsetSeconds;
     }
 
     public Integer getAuthenticationMethodId() {

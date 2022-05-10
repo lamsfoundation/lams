@@ -38,7 +38,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap-treeview.js" ></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/learning-design-treeview.js" ></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.dialogextend.js"></script>	
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
+	<lams:JSImport src="includes/javascript/dialog.js" />
 	<script type="text/javascript">
     	var isSelected = false;
 		var tree;
@@ -153,6 +153,8 @@
              alert("<fmt:message key='label.select.sequence' />");
              return false;
          }
+         
+         $('#addNewLtiConsumer').button('loading');
 	}
 		
      // Utility function to trim
@@ -174,6 +176,8 @@
     	<input type="hidden" name="resource_link_id" value="${resource_link_id}">
         <input type="hidden" name="courseId" value="${courseId}">
         <input type="hidden" name="context_id" value="${context_id}">
+        <input type="hidden" name="custom_context_memberships_url" value="${custom_context_memberships_url}">
+        <input type="hidden" name="tool_consumer_info_product_family_code" value="${tool_consumer_info_product_family_code}">
     	<input type="hidden" name="ldId" id="ldId" value="0">
     	
     	<%-- ContentItemSelectionRequest items --%>
@@ -233,7 +237,10 @@
 			</p>
 		</lams:SimplePanel>
 		
-		<input type="submit" class="btn btn-primary pull-right" name="addNewLtiConsumer" value="<fmt:message key='authoring.fla.save.button' />" />
+		<button type="submit" class="btn btn-primary pull-right" name="addNewLtiConsumer" id="addNewLtiConsumer"
+			    data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> <fmt:message key='authoring.fla.save.button' />">
+			<fmt:message key='authoring.fla.save.button' />
+		</button>
     </form>
 	   
 	<div id="footer"></div>

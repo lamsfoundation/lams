@@ -1,4 +1,3 @@
-
 /* ====================================================================
    Licensed to the Apache Software Foundation (ASF) under one or more
    contributor license agreements.  See the NOTICE file distributed with
@@ -15,33 +14,31 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-        
-
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        Print Gridlines Record<P>
- * Description:  whether to print the gridlines when you enjoy you spreadsheet on paper.<P>
- * REFERENCE:  PG 373 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)<P>
- * @author Andrew C. Oliver (acoliver at apache dot org)
- * @author Jason Height (jheight at chariot dot net dot au)
+ * Whether to print the gridlines when you enjoy the spreadsheet on paper.
+ *
  * @version 2.0-pre
  */
+public final class PrintGridlinesRecord extends StandardRecord {
+    public static final short sid = 0x2b;
+    private short field_1_print_gridlines;
 
-public final class PrintGridlinesRecord
-    extends StandardRecord
-{
-    public final static short sid = 0x2b;
-    private short             field_1_print_gridlines;
+    public PrintGridlinesRecord() {}
 
-    public PrintGridlinesRecord()
-    {
+    public PrintGridlinesRecord(PrintGridlinesRecord other) {
+        super(other);
+        field_1_print_gridlines = other.field_1_print_gridlines;
     }
 
-    public PrintGridlinesRecord(RecordInputStream in)
-    {
+    public PrintGridlinesRecord(RecordInputStream in) {
         field_1_print_gridlines = in.readShort();
     }
 
@@ -50,17 +47,8 @@ public final class PrintGridlinesRecord
      *
      * @param pg  make spreadsheet ugly - Y/N
      */
-
-    public void setPrintGridlines(boolean pg)
-    {
-        if (pg == true)
-        {
-            field_1_print_gridlines = 1;
-        }
-        else
-        {
-            field_1_print_gridlines = 0;
-        }
+    public void setPrintGridlines(boolean pg) {
+        field_1_print_gridlines = (short) (pg ? 1 : 0);
     }
 
     /**
@@ -68,21 +56,9 @@ public final class PrintGridlinesRecord
      *
      * @return make spreadsheet ugly - Y/N
      */
-
     public boolean getPrintGridlines()
     {
         return (field_1_print_gridlines == 1);
-    }
-
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[PRINTGRIDLINES]\n");
-        buffer.append("    .printgridlines = ").append(getPrintGridlines())
-            .append("\n");
-        buffer.append("[/PRINTGRIDLINES]\n");
-        return buffer.toString();
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -98,9 +74,17 @@ public final class PrintGridlinesRecord
         return sid;
     }
 
-    public Object clone() {
-      PrintGridlinesRecord rec = new PrintGridlinesRecord();
-      rec.field_1_print_gridlines = field_1_print_gridlines;
-      return rec;
+    public PrintGridlinesRecord copy() {
+        return new PrintGridlinesRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.PRINT_GRIDLINES;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties("printGridlines", this::getPrintGridlines);
     }
 }

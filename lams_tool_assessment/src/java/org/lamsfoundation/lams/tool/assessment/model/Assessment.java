@@ -51,6 +51,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.SortComparator;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
@@ -142,6 +144,9 @@ public class Assessment implements Cloneable {
     @Column(name = "allow_answer_justification")
     private boolean allowAnswerJustification;
 
+    @Column(name = "allow_discussion_sentiment")
+    private boolean allowDiscussionSentiment;
+
     @Column(name = "display_summary")
     private boolean displaySummary;
 
@@ -180,17 +185,20 @@ public class Assessment implements Cloneable {
     @OneToMany
     @JoinColumn(name = "assessment_uid")
     @SortComparator(QbToolQuestion.QbToolQuestionComparator.class)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<AssessmentQuestion> questions = new TreeSet<>();
 
     // assessment questions references that form question list
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "assessment_uid")
     @OrderBy("sequence_id ASC")
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "assessment_uid")
     @OrderBy("sequence_id ASC")
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<AssessmentOverallFeedback> overallFeedbacks = new TreeSet<>(new SequencableComparator());
 
     // **********************************************************
@@ -215,7 +223,7 @@ public class Assessment implements Cloneable {
 	try {
 	    assessment = (Assessment) super.clone();
 	    assessment.setUid(null);
-
+	    
 	    // clone questions
 	    if (questions != null) {
 		Iterator<AssessmentQuestion> iter = questions.iterator();
@@ -268,7 +276,8 @@ public class Assessment implements Cloneable {
 	    if (createdBy != null) {
 		assessment.setCreatedBy((AssessmentUser) createdBy.clone());
 	    }
-
+	    
+	    assessment.setAbsoluteTimeLimit(null);
 	    assessment.setTimeLimitAdjustments(new HashMap<>(this.getTimeLimitAdjustments()));
 	} catch (CloneNotSupportedException e) {
 	    log.error("When clone " + Assessment.class + " failed");
@@ -612,6 +621,14 @@ public class Assessment implements Cloneable {
 
     public void setAllowAnswerJustification(boolean allowAnswerJustification) {
 	this.allowAnswerJustification = allowAnswerJustification;
+    }
+
+    public boolean isAllowDiscussionSentiment() {
+	return allowDiscussionSentiment;
+    }
+
+    public void setAllowDiscussionSentiment(boolean allowDiscussionSentiment) {
+	this.allowDiscussionSentiment = allowDiscussionSentiment;
     }
 
     public boolean isDisplaySummary() {

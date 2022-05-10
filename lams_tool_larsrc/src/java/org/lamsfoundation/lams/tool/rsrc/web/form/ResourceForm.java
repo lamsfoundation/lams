@@ -111,5 +111,4 @@ public class ResourceForm {
     public void setContentFolderID(String contentFolderID) {
 	this.contentFolderID = contentFolderID;
     }
-
 }

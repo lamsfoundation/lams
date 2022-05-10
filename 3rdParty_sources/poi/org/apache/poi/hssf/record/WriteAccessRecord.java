@@ -18,7 +18,10 @@
 package org.apache.poi.hssf.record;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Supplier;
 
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndian;
 import org.apache.poi.util.LittleEndianOutput;
 import org.apache.poi.util.RecordFormatException;
@@ -26,26 +29,31 @@ import org.apache.poi.util.StringUtil;
 
 /**
  * Title: Write Access Record (0x005C)<p>
- * 
- * Description: Stores the username of that who owns the spreadsheet generator (on unix the user's 
+ *
+ * Description: Stores the username of that who owns the spreadsheet generator (on unix the user's
  * login, on Windoze its the name you typed when you installed the thing)<p>
- * 
- * REFERENCE: PG 424 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)
  */
 public final class WriteAccessRecord extends StandardRecord {
-	public final static short sid = 0x005C;
+	public static final short sid = 0x005C;
 
 	private static final byte PAD_CHAR = (byte) ' ';
 	private static final int DATA_SIZE = 112;
-	private String field_1_username;
 	/** this record is always padded to a constant length */
 	private static final byte[] PADDING = new byte[DATA_SIZE];
 	static {
 		Arrays.fill(PADDING, PAD_CHAR);
 	}
 
+	private String field_1_username;
+
+
 	public WriteAccessRecord() {
 		setUsername("");
+	}
+
+	public WriteAccessRecord(WriteAccessRecord other) {
+		super(other);
+		field_1_username = other.field_1_username;
 	}
 
 	public WriteAccessRecord(RecordInputStream in) {
@@ -91,7 +99,7 @@ public final class WriteAccessRecord extends StandardRecord {
 	/**
 	 * set the username for the user that created the report. HSSF uses the
 	 * logged in user.
-	 * 
+	 *
 	 * @param username of the user who is logged in (probably "tomcat" or "apache")
 	 */
 	public void setUsername(String username) {
@@ -109,20 +117,11 @@ public final class WriteAccessRecord extends StandardRecord {
 	 * get the username for the user that created the report. HSSF uses the
 	 * logged in user. On natively created M$ Excel sheet this would be the name
 	 * you typed in when you installed it in most cases.
-	 * 
+	 *
 	 * @return username of the user who is logged in (probably "tomcat" or "apache")
 	 */
 	public String getUsername() {
 		return field_1_username;
-	}
-
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
-
-		buffer.append("[WRITEACCESS]\n");
-		buffer.append("    .name = ").append(field_1_username).append("\n");
-		buffer.append("[/WRITEACCESS]\n");
-		return buffer.toString();
 	}
 
 	public void serialize(LittleEndianOutput out) {
@@ -147,5 +146,20 @@ public final class WriteAccessRecord extends StandardRecord {
 
 	public short getSid() {
 		return sid;
+	}
+
+	@Override
+	public WriteAccessRecord copy() {
+		return new WriteAccessRecord(this);
+	}
+
+	@Override
+	public HSSFRecordTypes getGenericRecordType() {
+		return HSSFRecordTypes.WRITE_ACCESS;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties("username", this::getUsername);
 	}
 }

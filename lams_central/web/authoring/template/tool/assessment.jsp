@@ -13,6 +13,8 @@
 
 <div class="panel panel-default">
 	<div class="panel-heading" id="${containingDivName}assessmentQuestionPanelHeading${questionNumber}">
+		<a href="#" onclick="javascript:deleteQuestionDiv('${containingDivName}divassess${questionNumber}', '${questionTitleField}');" class="btn btn-default btn-sm panel-title-button">
+			<i class="fa fa-lg fa-trash-o"></i> <fmt:message key="authoring.fla.delete.button"/></a>
 		<div class="panel-title collapsable-icon-left">
 			<a role="button" data-toggle="collapse" href="#${containingDivName}assessmentQuestionPanelCollapse${questionNumber}" 
 				aria-expanded="true" aria-controls="${containingDivName}assessmentQuestionPanelCollapse${questionNumber}" >&nbsp;&nbsp;
@@ -40,6 +42,7 @@
 <script type="text/javascript">
    $('#${questionTitleDisplay}').editable({
    		mode: 'inline',
+    	onblur: 'ignore',
        	type: 'text',
        	validate: validateXEditable,
        	success: function(response, newValue) {

@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.leaderselection.service;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -31,6 +32,7 @@ import org.lamsfoundation.lams.tool.leaderselection.model.Leaderselection;
 import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionSession;
 import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionUser;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
@@ -45,6 +47,8 @@ public interface ILeaderselectionService extends ICommonToolService {
      * @return
      */
     List<LeaderselectionUser> getUsersBySession(Long toolSessionId);
+
+    Collection<User> getAllGroupUsers(Long toolSessionId);
 
     /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.

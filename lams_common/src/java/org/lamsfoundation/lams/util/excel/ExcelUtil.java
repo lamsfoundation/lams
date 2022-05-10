@@ -20,15 +20,14 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.util.excel;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpSession;
@@ -45,10 +44,10 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.util.LocaleUtil;
-import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -66,28 +65,24 @@ public class ExcelUtil {
     private static short dateFormat;
     private static short timeFormat;
     private static short percentageFormat;
-    
+
     private static CellStyle defaultStyle;
-    private static CellStyle boldStyle;
 
     private static CellStyle greenColor;
     private static CellStyle blueColor;
     private static CellStyle redColor;
     private static CellStyle yellowColor;
 
-    private static CellStyle borderStyleLeftThin;
-    private static CellStyle borderStyleLeftThick;
-    private static CellStyle borderStyleRightThick;
-    private static CellStyle borderStyleLeftThinBoldFont;
-    private static CellStyle borderStyleLeftThickBoldFont;
-    private static CellStyle borderStyleRightThickBoldFont;
-    private static CellStyle borderStyleBottomThin;
-    private static CellStyle borderStyleBottomThinBoldFont;
+    private static Font boldFont;
 
     public final static String DEFAULT_FONT_NAME = "Calibri-Regular";
+    public final static float DEFAULT_CHARACTER_WIDTH = 1.14388f;
+
+    private final static int MAX_CELL_TEXT_LENGTH = 32767;
 
     /**
-     * Create .xlsx file out of provided data and then write out it to an OutputStream. It will be saved with the .xlsx extension.
+     * Create .xlsx file out of provided data and then write out it to an OutputStream. It will be saved with the .xlsx
+     * extension.
      *
      * @param out
      *            output stream to which the file written; usually taken from HTTP response
@@ -101,15 +96,27 @@ public class ExcelUtil {
      *            whether to display title (printed in the first (0,0) cell)
      * @throws IOException
      */
+
     public static void createExcel(OutputStream out, List<ExcelSheet> sheets, String dateHeader,
 	    boolean displaySheetTitle) throws IOException {
-	ExcelUtil.createExcel(out, sheets, dateHeader, displaySheetTitle, true);
+	ExcelUtil.createExcel(out, sheets, dateHeader, displaySheetTitle, true, null);
     }
-    
+
+    // versions of this method with fixedColumnWidth
+    public static void createExcel(OutputStream out, List<ExcelSheet> sheets, String dateHeader,
+	    boolean displaySheetTitle, Integer fixedColumnWidth) throws IOException {
+	ExcelUtil.createExcel(out, sheets, dateHeader, displaySheetTitle, true, fixedColumnWidth);
+    }
+
+    public static void createExcel(OutputStream out, List<ExcelSheet> sheets, String dateHeader,
+	    boolean displaySheetTitle, boolean produceXlsxFile) throws IOException {
+	ExcelUtil.createExcel(out, sheets, dateHeader, displaySheetTitle, produceXlsxFile, null);
+    }
+
     /**
-     * Creates Excel file based on the provided data and writes it out to an OutputStream. 
-     * 
-     * 
+     * Creates Excel file based on the provided data and writes it out to an OutputStream.
+     *
+     *
      * Warning: The styling is untested with this option and may fail. If you want full styling look at createExcel()
      *
      * @param out
@@ -122,32 +129,32 @@ public class ExcelUtil {
      *            {@link #EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT}
      * @param displaySheetTitle
      *            whether to display title (printed in the first (0,0) cell)
-     * 
+     *
      * @param produceXlsxFile
      *            whether excel file should be of .xlsx or .xls format. Use .xls only if you want to read the file back
      *            in again afterwards.
      * @throws IOException
      */
     public static void createExcel(OutputStream out, List<ExcelSheet> sheets, String dateHeader,
-	    boolean displaySheetTitle, boolean produceXlsxFile) throws IOException {
-	//set user time zone, which is required for outputting cells of time format 
+	    boolean displaySheetTitle, boolean produceXlsxFile, Integer fixedColumnWidth) throws IOException {
+	//set user time zone, which is required for outputting cells of time format
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	TimeZone userTimeZone = user.getTimeZone();
 	LocaleUtil.setUserTimeZone(userTimeZone);
-	
+
 	//in case .xlsx is requested use SXSSFWorkbook.class (which keeps 100 rows in memory, exceeding rows will be flushed to disk)
-	Workbook workbook = produceXlsxFile ? new SXSSFWorkbook(100): new HSSFWorkbook();
+	Workbook workbook = produceXlsxFile ? new SXSSFWorkbook(100) : new HSSFWorkbook();
 	ExcelUtil.initStyles(workbook);
-	
+
 	for (ExcelSheet sheet : sheets) {
-	    ExcelUtil.createSheet(workbook, sheet, dateHeader, displaySheetTitle);
+	    ExcelUtil.createSheet(workbook, sheet, dateHeader, displaySheetTitle, fixedColumnWidth);
 	}
 
 	workbook.write(out);
 	out.close();
     }
-    
+
     private static void initStyles(Workbook workbook) {
 	Font defaultFont = workbook.createFont();
 	defaultFont.setFontName(DEFAULT_FONT_NAME);
@@ -156,12 +163,10 @@ public class ExcelUtil {
 	defaultStyle = workbook.createCellStyle();
 	defaultStyle.setFont(defaultFont);
 
-	//create bold style
-	boldStyle = workbook.createCellStyle();
-	Font boldFont = workbook.createFont();
+	//create bold font
+	boldFont = workbook.createFont();
 	boldFont.setBold(true);
 	boldFont.setFontName(DEFAULT_FONT_NAME);
-	boldStyle.setFont(boldFont);
 
 	//create color style
 	blueColor = workbook.createCellStyle();
@@ -187,39 +192,13 @@ public class ExcelUtil {
 	// create data formats
 	floatFormat = workbook.createDataFormat().getFormat("0.00");
 	numberFormat = workbook.createDataFormat().getFormat("0");
-	dateFormat = (short)14;// built-in 0xe format - "m/d/yy"
-	timeFormat = (short)19;// built-in 0x13 format - "h:mm:ss AM/PM"
+	dateFormat = (short) 14;// built-in 0xe format - "m/d/yy"
+	timeFormat = (short) 19;// built-in 0x13 format - "h:mm:ss AM/PM"
 	percentageFormat = workbook.createDataFormat().getFormat(FORMAT_PERCENTAGE);
-
-	//create border style
-	borderStyleLeftThin = workbook.createCellStyle();
-	borderStyleLeftThin.setBorderLeft(BorderStyle.THIN);
-	borderStyleLeftThin.setFont(defaultFont);
-	borderStyleLeftThick = workbook.createCellStyle();
-	borderStyleLeftThick.setBorderLeft(BorderStyle.THICK);
-	borderStyleLeftThick.setFont(defaultFont);
-	borderStyleRightThick = workbook.createCellStyle();
-	borderStyleRightThick.setBorderRight(BorderStyle.THICK);
-	borderStyleRightThick.setFont(defaultFont);
-	borderStyleLeftThinBoldFont = workbook.createCellStyle();
-	borderStyleLeftThinBoldFont.setBorderLeft(BorderStyle.THIN);
-	borderStyleLeftThinBoldFont.setFont(boldFont);
-	borderStyleLeftThickBoldFont = workbook.createCellStyle();
-	borderStyleLeftThickBoldFont.setBorderLeft(BorderStyle.THICK);
-	borderStyleLeftThickBoldFont.setFont(boldFont);
-	borderStyleRightThickBoldFont = workbook.createCellStyle();
-	borderStyleRightThickBoldFont.setBorderRight(BorderStyle.THICK);
-	borderStyleRightThickBoldFont.setFont(boldFont);
-	borderStyleBottomThin = workbook.createCellStyle();
-	borderStyleBottomThin.setBorderBottom(BorderStyle.THIN);
-	borderStyleBottomThin.setFont(defaultFont);
-	borderStyleBottomThinBoldFont = workbook.createCellStyle();
-	borderStyleBottomThinBoldFont.setBorderBottom(BorderStyle.THIN);
-	borderStyleBottomThinBoldFont.setFont(boldFont);
     }
 
-    private static void createSheet(Workbook workbook, ExcelSheet excelSheet, String dateHeader, boolean displaySheetTitle)
-	    throws IOException {
+    private static void createSheet(Workbook workbook, ExcelSheet excelSheet, String dateHeader,
+	    boolean displaySheetTitle, Integer fixedColumnWidth) throws IOException {
 	// Modify sheet name if required. It should contain only allowed letters and sheets are not allowed with
 	// the same names (case insensitive)
 	String sheetName = WorkbookUtil.createSafeSheetName(excelSheet.getSheetName());
@@ -228,17 +207,14 @@ public class ExcelUtil {
 	}
 
 	Sheet sheet = workbook.createSheet(sheetName);
-	//make sure columns are tracked prior to auto-sizing them
-	if (workbook instanceof SXSSFWorkbook) {
-	    ((SXSSFSheet)sheet).trackAllColumnsForAutoSizing();
-	}
+	Map<Integer, Integer> columnWidths = fixedColumnWidth == null ? new HashMap<>() : null;
 
 	// Print title if requested
 	boolean isTitleToBePrinted = displaySheetTitle && StringUtils.isNotBlank(excelSheet.getSheetName());
 	if (isTitleToBePrinted) {
 	    ExcelRow excelRow = new ExcelRow();
 	    excelRow.addCell(excelSheet.getSheetName(), true);
-	    ExcelUtil.createRow(excelRow, 0, sheet);
+	    ExcelUtil.createRow(workbook, excelRow, 0, sheet, columnWidths);
 	}
 
 	// Print current date, if needed
@@ -246,7 +222,7 @@ public class ExcelUtil {
 	    ExcelRow excelRow = new ExcelRow();
 	    excelRow.addCell(dateHeader);
 	    excelRow.addCell(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(new Date()));
-	    ExcelUtil.createRow(excelRow, 1, sheet);
+	    ExcelUtil.createRow(workbook, excelRow, 1, sheet, columnWidths);
 	}
 
 	int maxCellsNumber = 0;
@@ -257,7 +233,7 @@ public class ExcelUtil {
 
 	    // in case there is a sheet title or dateHeader available start from 4th row
 	    int rowIndexOffset = !isTitleToBePrinted && StringUtils.isBlank(dateHeader) ? 0 : 4;
-	    ExcelUtil.createRow(excelRow, rowIndex + rowIndexOffset, sheet);
+	    ExcelUtil.createRow(workbook, excelRow, rowIndex + rowIndexOffset, sheet, columnWidths);
 
 	    //calculate max column size
 	    int cellsNumber = excelRow.getCells().size();
@@ -266,107 +242,115 @@ public class ExcelUtil {
 	    }
 	}
 
-	//autoSizeColumns
-	for (int i = 0; i < maxCellsNumber; i++) {
-	    sheet.autoSizeColumn(i);
+	// merge cells
+	for (CellRangeAddress mergedCells : excelSheet.mergedCells) {
+	    sheet.addMergedRegion(mergedCells);
+	}
+
+	if (fixedColumnWidth == null) {
+	    for (int columnIndex : columnWidths.keySet()) {
+		// one unit is 1/256 of character width, plus some characters for padding
+		// maximum is 255 characters
+		int columnWidth = Math.min(255, columnWidths.get(columnIndex) + 4) * 256;
+		sheet.setColumnWidth(columnIndex, columnWidth);
+	    }
+	} else {
+	    sheet.setDefaultColumnWidth(fixedColumnWidth);
 	}
     }
 
-    private static void createRow(ExcelRow excelRow, int rowIndex, Sheet sheet) {
+    private static void createRow(Workbook workbook, ExcelRow excelRow, int rowIndex, Sheet sheet,
+	    Map<Integer, Integer> columnWidths) {
 	Row row = sheet.createRow(rowIndex);
-	
+
 	int columnIndex = 0;
 	for (ExcelCell excelCell : excelRow.getCells()) {
 	    if (excelCell == null) {
 		continue;
 	    }
 
-	    Cell cell = row.createCell(columnIndex++);
-	    Object excelCellValue = excelCell.getCellValue();
+	    //figure out cell's style
+	    CellStyle sourceCellStyle = defaultStyle;
 
+	    if (excelCell.getColor() != null) {
+		switch (excelCell.getColor()) {
+		    case BLUE:
+			sourceCellStyle = blueColor;
+			break;
+		    case GREEN:
+			sourceCellStyle = greenColor;
+			break;
+		    case RED:
+			sourceCellStyle = redColor;
+			break;
+		    case YELLOW:
+			sourceCellStyle = yellowColor;
+			break;
+		    default:
+			break;
+		}
+	    }
+	    // prevent malicious formula injection
+	    sourceCellStyle.setQuotePrefixed(true);
+
+	    Cell cell = CellUtil.createCell(row, columnIndex, null, sourceCellStyle);
+
+	    Object excelCellValue = excelCell.getCellValue();
+	    int cellValueLength = 0;
 	    //cast excelCell's value
 	    if (excelCellValue != null) {
 		if (excelCell.getDataFormat() == ExcelCell.CELL_FORMAT_TIME && excelCellValue instanceof Date) {
 		    cell.setCellValue((Date) excelCellValue);
+		    cellValueLength = ((Date) excelCellValue).toString().length();
 
 		} else if (excelCellValue instanceof Date) {
 		    cell.setCellValue(FileUtil.EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT.format(excelCellValue));
+		    cellValueLength = cell.getStringCellValue().length();
 
 		} else if (excelCellValue instanceof java.lang.Float) {
 		    cell.setCellValue((Float) excelCellValue);
+		    cellValueLength = String.valueOf(cell.getNumericCellValue()).length();
 
 		} else if (excelCellValue instanceof java.lang.Double) {
 		    cell.setCellValue((Double) excelCellValue);
+		    cellValueLength = String.valueOf(cell.getNumericCellValue()).length();
 
 		} else if (excelCellValue instanceof java.lang.Long) {
 		    cell.setCellValue(((Long) excelCellValue).doubleValue());
+		    cellValueLength = String.valueOf(cell.getNumericCellValue()).length();
 
 		} else if (excelCellValue instanceof java.lang.Integer) {
 		    cell.setCellValue(((Integer) excelCellValue).doubleValue());
+		    cellValueLength = String.valueOf(cell.getNumericCellValue()).length();
 
 		} else {
-		    cell.setCellValue(excelCellValue.toString());
+		    cell.setCellValue(ExcelUtil.ensureCorrectCellLength(excelCellValue.toString()));
+		    cellValueLength = cell.getStringCellValue().length();
 		}
 	    }
 
-	    //figure out cell's style
-	    CellStyle cellStyle = defaultStyle;
 	    if (excelCell.isBold() || excelRow.isBold()) {
-		cellStyle = boldStyle;
+		CellUtil.setFont(cell, boldFont);
 	    }
-	    if (excelCell.getColor() != null) {
-		switch (excelCell.getColor()) {
-		    case BLUE:
-			cellStyle = blueColor;
-			break;
-		    case GREEN:
-			cellStyle = greenColor;
-			break;
-		    case RED:
-			cellStyle = redColor;
-			break;
-		    case YELLOW:
-			cellStyle = yellowColor;
-			break;
-		    default:
-			break;
+
+	    if (excelCell.getBorderStyle() != null) {
+		for (int borderStyle : excelCell.getBorderStyle()) {
+		    switch (borderStyle) {
+			case ExcelCell.BORDER_STYLE_LEFT_THIN:
+			    CellUtil.setCellStyleProperty(cell, CellUtil.BORDER_LEFT, BorderStyle.THIN);
+			    break;
+			case ExcelCell.BORDER_STYLE_LEFT_THICK:
+			    CellUtil.setCellStyleProperty(cell, CellUtil.BORDER_LEFT, BorderStyle.THICK);
+			    break;
+			case ExcelCell.BORDER_STYLE_BOTTOM_THIN:
+			    CellUtil.setCellStyleProperty(cell, CellUtil.BORDER_BOTTOM, BorderStyle.THIN);
+			    break;
+			case ExcelCell.BORDER_STYLE_RIGHT_THICK:
+			    CellUtil.setCellStyleProperty(cell, CellUtil.BORDER_RIGHT, BorderStyle.THICK);
+			    break;
+		    }
 		}
 	    }
-	    if (excelCell.getBorderStyle() != 0) {
-		switch (excelCell.getBorderStyle()) {
-		    case ExcelCell.BORDER_STYLE_LEFT_THIN:
-			if (excelCell.isBold()) {
-			    cellStyle = borderStyleLeftThinBoldFont;
-			} else {
-			    cellStyle = borderStyleLeftThin;
-			}
-			break;
-		    case ExcelCell.BORDER_STYLE_LEFT_THICK:
-			if (excelCell.isBold()) {
-			    cellStyle = borderStyleLeftThickBoldFont;
-			} else {
-			    cellStyle = borderStyleLeftThick;
-			}
-			break;
-		    case ExcelCell.BORDER_STYLE_RIGHT_THICK:
-			if (excelCell.isBold()) {
-			    cellStyle = borderStyleRightThickBoldFont;
-			} else {
-			    cellStyle = borderStyleRightThick;
-			}
-			break;
-		    case ExcelCell.BORDER_STYLE_BOTTOM_THIN:
-			if (excelCell.isBold()) {
-			    cellStyle = borderStyleBottomThinBoldFont;
-			} else {
-			    cellStyle = borderStyleBottomThin;
-			}
-			break;
-		    default:
-			break;
-		}
-	    }
-	    cell.setCellStyle(cellStyle);
 
 	    //set data format
 	    if (excelCellValue != null
@@ -406,7 +390,21 @@ public class ExcelUtil {
 			break;
 		}
 	    }
+
+	    if (columnWidths != null) {
+		// Store maximum number of characters in each column.
+		// XLXS format processing is done chunk by chunk and it is append only, so this information needs to be stored on the fly.
+		Integer existingColumnWidth = columnWidths.get(columnIndex);
+		if (existingColumnWidth == null || existingColumnWidth < cellValueLength) {
+		    columnWidths.put(columnIndex, cellValueLength);
+		}
+	    }
+
+	    columnIndex++;
 	}
     }
 
+    public static String ensureCorrectCellLength(String cellText) {
+	return cellText.length() > MAX_CELL_TEXT_LENGTH ? cellText.substring(0, MAX_CELL_TEXT_LENGTH) : cellText;
+    }
 }

@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,7 +16,13 @@
 
 package org.springframework.beans.factory.support;
 
+import java.util.function.Supplier;
+
+import org.springframework.beans.factory.config.AutowiredPropertyMarker;
+import org.springframework.beans.factory.config.BeanDefinitionCustomizer;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.core.ResolvableType;
+import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -30,14 +36,22 @@ import org.springframework.util.ObjectUtils;
  * @author Juergen Hoeller
  * @since 2.0
  */
-public class BeanDefinitionBuilder {
+public final class BeanDefinitionBuilder {
 
 	/**
 	 * Create a new {@code BeanDefinitionBuilder} used to construct a {@link GenericBeanDefinition}.
 	 */
 	public static BeanDefinitionBuilder genericBeanDefinition() {
-		BeanDefinitionBuilder builder = new BeanDefinitionBuilder();
-		builder.beanDefinition = new GenericBeanDefinition();
+		return new BeanDefinitionBuilder(new GenericBeanDefinition());
+	}
+
+	/**
+	 * Create a new {@code BeanDefinitionBuilder} used to construct a {@link GenericBeanDefinition}.
+	 * @param beanClassName the class name for the bean that the definition is being created for
+	 */
+	public static BeanDefinitionBuilder genericBeanDefinition(String beanClassName) {
+		BeanDefinitionBuilder builder = new BeanDefinitionBuilder(new GenericBeanDefinition());
+		builder.beanDefinition.setBeanClassName(beanClassName);
 		return builder;
 	}
 
@@ -46,41 +60,21 @@ public class BeanDefinitionBuilder {
 	 * @param beanClass the {@code Class} of the bean that the definition is being created for
 	 */
 	public static BeanDefinitionBuilder genericBeanDefinition(Class<?> beanClass) {
-		BeanDefinitionBuilder builder = new BeanDefinitionBuilder();
-		builder.beanDefinition = new GenericBeanDefinition();
+		BeanDefinitionBuilder builder = new BeanDefinitionBuilder(new GenericBeanDefinition());
 		builder.beanDefinition.setBeanClass(beanClass);
 		return builder;
 	}
 
 	/**
 	 * Create a new {@code BeanDefinitionBuilder} used to construct a {@link GenericBeanDefinition}.
-	 * @param beanClassName the class name for the bean that the definition is being created for
-	 */
-	public static BeanDefinitionBuilder genericBeanDefinition(String beanClassName) {
-		BeanDefinitionBuilder builder = new BeanDefinitionBuilder();
-		builder.beanDefinition = new GenericBeanDefinition();
-		builder.beanDefinition.setBeanClassName(beanClassName);
-		return builder;
-	}
-
-	/**
-	 * Create a new {@code BeanDefinitionBuilder} used to construct a {@link RootBeanDefinition}.
 	 * @param beanClass the {@code Class} of the bean that the definition is being created for
+	 * @param instanceSupplier a callback for creating an instance of the bean
+	 * @since 5.0
 	 */
-	public static BeanDefinitionBuilder rootBeanDefinition(Class<?> beanClass) {
-		return rootBeanDefinition(beanClass, null);
-	}
-
-	/**
-	 * Create a new {@code BeanDefinitionBuilder} used to construct a {@link RootBeanDefinition}.
-	 * @param beanClass the {@code Class} of the bean that the definition is being created for
-	 * @param factoryMethodName the name of the method to use to construct the bean instance
-	 */
-	public static BeanDefinitionBuilder rootBeanDefinition(Class<?> beanClass, String factoryMethodName) {
-		BeanDefinitionBuilder builder = new BeanDefinitionBuilder();
-		builder.beanDefinition = new RootBeanDefinition();
+	public static <T> BeanDefinitionBuilder genericBeanDefinition(Class<T> beanClass, Supplier<T> instanceSupplier) {
+		BeanDefinitionBuilder builder = new BeanDefinitionBuilder(new GenericBeanDefinition());
 		builder.beanDefinition.setBeanClass(beanClass);
-		builder.beanDefinition.setFactoryMethodName(factoryMethodName);
+		builder.beanDefinition.setInstanceSupplier(instanceSupplier);
 		return builder;
 	}
 
@@ -97,12 +91,55 @@ public class BeanDefinitionBuilder {
 	 * @param beanClassName the class name for the bean that the definition is being created for
 	 * @param factoryMethodName the name of the method to use to construct the bean instance
 	 */
-	public static BeanDefinitionBuilder rootBeanDefinition(String beanClassName, String factoryMethodName) {
-		BeanDefinitionBuilder builder = new BeanDefinitionBuilder();
-		builder.beanDefinition = new RootBeanDefinition();
+	public static BeanDefinitionBuilder rootBeanDefinition(String beanClassName, @Nullable String factoryMethodName) {
+		BeanDefinitionBuilder builder = new BeanDefinitionBuilder(new RootBeanDefinition());
 		builder.beanDefinition.setBeanClassName(beanClassName);
 		builder.beanDefinition.setFactoryMethodName(factoryMethodName);
 		return builder;
+	}
+
+	/**
+	 * Create a new {@code BeanDefinitionBuilder} used to construct a {@link RootBeanDefinition}.
+	 * @param beanClass the {@code Class} of the bean that the definition is being created for
+	 */
+	public static BeanDefinitionBuilder rootBeanDefinition(Class<?> beanClass) {
+		return rootBeanDefinition(beanClass, (String) null);
+	}
+
+	/**
+	 * Create a new {@code BeanDefinitionBuilder} used to construct a {@link RootBeanDefinition}.
+	 * @param beanClass the {@code Class} of the bean that the definition is being created for
+	 * @param factoryMethodName the name of the method to use to construct the bean instance
+	 */
+	public static BeanDefinitionBuilder rootBeanDefinition(Class<?> beanClass, @Nullable String factoryMethodName) {
+		BeanDefinitionBuilder builder = new BeanDefinitionBuilder(new RootBeanDefinition());
+		builder.beanDefinition.setBeanClass(beanClass);
+		builder.beanDefinition.setFactoryMethodName(factoryMethodName);
+		return builder;
+	}
+
+	/**
+	 * Create a new {@code BeanDefinitionBuilder} used to construct a {@link RootBeanDefinition}.
+	 * @param beanType the {@link ResolvableType type} of the bean that the definition is being created for
+	 * @param instanceSupplier a callback for creating an instance of the bean
+	 * @since 5.3.9
+	 */
+	public static <T> BeanDefinitionBuilder rootBeanDefinition(ResolvableType beanType, Supplier<T> instanceSupplier) {
+		RootBeanDefinition beanDefinition = new RootBeanDefinition();
+		beanDefinition.setTargetType(beanType);
+		beanDefinition.setInstanceSupplier(instanceSupplier);
+		return new BeanDefinitionBuilder(beanDefinition);
+	}
+
+	/**
+	 * Create a new {@code BeanDefinitionBuilder} used to construct a {@link RootBeanDefinition}.
+	 * @param beanClass the {@code Class} of the bean that the definition is being created for
+	 * @param instanceSupplier a callback for creating an instance of the bean
+	 * @since 5.3.9
+	 * @see #rootBeanDefinition(ResolvableType, Supplier)
+	 */
+	public static <T> BeanDefinitionBuilder rootBeanDefinition(Class<T> beanClass, Supplier<T> instanceSupplier) {
+		return rootBeanDefinition(ResolvableType.forClass(beanClass), instanceSupplier);
 	}
 
 	/**
@@ -110,16 +147,14 @@ public class BeanDefinitionBuilder {
 	 * @param parentName the name of the parent bean
 	 */
 	public static BeanDefinitionBuilder childBeanDefinition(String parentName) {
-		BeanDefinitionBuilder builder = new BeanDefinitionBuilder();
-		builder.beanDefinition = new ChildBeanDefinition(parentName);
-		return builder;
+		return new BeanDefinitionBuilder(new ChildBeanDefinition(parentName));
 	}
 
 
 	/**
 	 * The {@code BeanDefinition} instance we are creating.
 	 */
-	private AbstractBeanDefinition beanDefinition;
+	private final AbstractBeanDefinition beanDefinition;
 
 	/**
 	 * Our current position with respect to constructor args.
@@ -130,7 +165,8 @@ public class BeanDefinitionBuilder {
 	/**
 	 * Enforce the use of factory methods.
 	 */
-	private BeanDefinitionBuilder() {
+	private BeanDefinitionBuilder(AbstractBeanDefinition beanDefinition) {
+		this.beanDefinition = beanDefinition;
 	}
 
 	/**
@@ -170,6 +206,8 @@ public class BeanDefinitionBuilder {
 	/**
 	 * Set the name of a non-static factory method to use for this definition,
 	 * including the bean name of the factory instance to call the method on.
+	 * @param factoryMethod the name of the factory method
+	 * @param factoryBean the name of the bean to call the specified factory method on
 	 * @since 4.3.6
 	 */
 	public BeanDefinitionBuilder setFactoryMethodOnBean(String factoryMethod, String factoryBean) {
@@ -181,19 +219,8 @@ public class BeanDefinitionBuilder {
 	/**
 	 * Add an indexed constructor arg value. The current index is tracked internally
 	 * and all additions are at the present point.
-	 * @deprecated since Spring 2.5, in favor of {@link #addConstructorArgValue}.
-	 * This variant just remains around for Spring Security 2.x compatibility.
 	 */
-	@Deprecated
-	public BeanDefinitionBuilder addConstructorArg(Object value) {
-		return addConstructorArgValue(value);
-	}
-
-	/**
-	 * Add an indexed constructor arg value. The current index is tracked internally
-	 * and all additions are at the present point.
-	 */
-	public BeanDefinitionBuilder addConstructorArgValue(Object value) {
+	public BeanDefinitionBuilder addConstructorArgValue(@Nullable Object value) {
 		this.beanDefinition.getConstructorArgumentValues().addIndexedArgumentValue(
 				this.constructorArgIndex++, value);
 		return this;
@@ -210,9 +237,9 @@ public class BeanDefinitionBuilder {
 	}
 
 	/**
-	 * Add the supplied property value under the given name.
+	 * Add the supplied property value under the given property name.
 	 */
-	public BeanDefinitionBuilder addPropertyValue(String name, Object value) {
+	public BeanDefinitionBuilder addPropertyValue(String name, @Nullable Object value) {
 		this.beanDefinition.getPropertyValues().add(name, value);
 		return this;
 	}
@@ -228,9 +255,20 @@ public class BeanDefinitionBuilder {
 	}
 
 	/**
+	 * Add an autowired marker for the specified property on the specified bean.
+	 * @param name the name of the property to mark as autowired
+	 * @since 5.2
+	 * @see AutowiredPropertyMarker
+	 */
+	public BeanDefinitionBuilder addAutowiredProperty(String name) {
+		this.beanDefinition.getPropertyValues().add(name, AutowiredPropertyMarker.INSTANCE);
+		return this;
+	}
+
+	/**
 	 * Set the init method for this definition.
 	 */
-	public BeanDefinitionBuilder setInitMethodName(String methodName) {
+	public BeanDefinitionBuilder setInitMethodName(@Nullable String methodName) {
 		this.beanDefinition.setInitMethodName(methodName);
 		return this;
 	}
@@ -238,7 +276,7 @@ public class BeanDefinitionBuilder {
 	/**
 	 * Set the destroy method for this definition.
 	 */
-	public BeanDefinitionBuilder setDestroyMethodName(String methodName) {
+	public BeanDefinitionBuilder setDestroyMethodName(@Nullable String methodName) {
 		this.beanDefinition.setDestroyMethodName(methodName);
 		return this;
 	}
@@ -249,7 +287,7 @@ public class BeanDefinitionBuilder {
 	 * @see org.springframework.beans.factory.config.BeanDefinition#SCOPE_SINGLETON
 	 * @see org.springframework.beans.factory.config.BeanDefinition#SCOPE_PROTOTYPE
 	 */
-	public BeanDefinitionBuilder setScope(String scope) {
+	public BeanDefinitionBuilder setScope(@Nullable String scope) {
 		this.beanDefinition.setScope(scope);
 		return this;
 	}
@@ -274,15 +312,15 @@ public class BeanDefinitionBuilder {
 	 * Set the autowire mode for this definition.
 	 */
 	public BeanDefinitionBuilder setAutowireMode(int autowireMode) {
-		beanDefinition.setAutowireMode(autowireMode);
+		this.beanDefinition.setAutowireMode(autowireMode);
 		return this;
 	}
 
 	/**
-	 * Set the depency check mode for this definition.
+	 * Set the dependency check mode for this definition.
 	 */
 	public BeanDefinitionBuilder setDependencyCheck(int dependencyCheck) {
-		beanDefinition.setDependencyCheck(dependencyCheck);
+		this.beanDefinition.setDependencyCheck(dependencyCheck);
 		return this;
 	}
 
@@ -302,10 +340,40 @@ public class BeanDefinitionBuilder {
 	}
 
 	/**
+	 * Set whether this bean is a primary autowire candidate.
+	 * @since 5.1.11
+	 */
+	public BeanDefinitionBuilder setPrimary(boolean primary) {
+		this.beanDefinition.setPrimary(primary);
+		return this;
+	}
+
+	/**
 	 * Set the role of this definition.
 	 */
 	public BeanDefinitionBuilder setRole(int role) {
 		this.beanDefinition.setRole(role);
+		return this;
+	}
+
+	/**
+	 * Set whether this bean is 'synthetic', that is, not defined by
+	 * the application itself.
+	 * @since 5.3.9
+	 */
+	public BeanDefinitionBuilder setSynthetic(boolean synthetic) {
+		this.beanDefinition.setSynthetic(synthetic);
+		return this;
+	}
+
+	/**
+	 * Apply the given customizers to the underlying bean definition.
+	 * @since 5.0
+	 */
+	public BeanDefinitionBuilder applyCustomizers(BeanDefinitionCustomizer... customizers) {
+		for (BeanDefinitionCustomizer customizer : customizers) {
+			customizer.customize(this.beanDefinition);
+		}
 		return this;
 	}
 

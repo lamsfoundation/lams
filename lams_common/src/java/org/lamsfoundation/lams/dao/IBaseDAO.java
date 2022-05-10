@@ -223,12 +223,16 @@ public interface IBaseDAO {
 
     public <T> List<T> findByPropertyValues(Class<T> clazz, String name, Collection<?> values);
 
+    public <T> List<T> findByProperty(Class<T> clazz, String name, Object value, boolean cache);
+
     /**
      * @param properties
      *            a map of property names and values
      * @return a list of objects which have the same property values
      */
     public <T> List<T> findByProperties(Class<T> clazz, Map<String, Object> properties);
+
+    <T> List<T> findByProperties(Class<T> clazz, Map<String, Object> properties, boolean cache);
 
     public List find(String queryString);
 

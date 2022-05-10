@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.admin.web.controller;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -109,7 +110,7 @@ public class UserOrgSaveController {
 	Set uos = organisation.getUserOrganisations();
 
 	String[] userIds = userOrgForm.getUserIds();
-	List<String> userIdList = Arrays.asList(userIds);
+	List<String> userIdList = userIds == null ? Collections.emptyList() : Arrays.asList(userIds);
 	log.debug("new user membership of orgId=" + orgId + " will be: " + userIdList);
 
 	// remove UserOrganisations that aren't in form data
@@ -129,7 +130,7 @@ public class UserOrgSaveController {
 	    }
 	}
 	// add UserOrganisations that are in form data
-	List<UserOrganisation> newUserOrganisations = new ArrayList<UserOrganisation>();
+	List<UserOrganisation> newUserOrganisations = new ArrayList<>();
 	for (int i = 0; i < userIdList.size(); i++) {
 	    Integer userId = new Integer(userIdList.get(i));
 	    Iterator iter2 = uos.iterator();

@@ -119,7 +119,7 @@
 														
 									<c:when test="${question.type == 8}">
 										<c:forEach var="option" items="${question.optionDtos}">
-											<div>';
+											<div>
 												<div style="float: left;">
 													${option.name}
 												</div>
@@ -138,10 +138,6 @@
 											</div>
 											<br>
 										</c:forEach>
-															
-										<c:if test="${question.hedgingJustificationEnabled}">
-											${questionResult.answer}
-										</c:if>
 									</c:when>
 								</c:choose>
 							</td>

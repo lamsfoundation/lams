@@ -41,7 +41,7 @@ public class CommonCartridgeDAOHibernate extends LAMSBaseDAO implements CommonCa
 
     @Override
     public CommonCartridge getByContentId(Long contentId) {
-	List list = doFind(GET_RESOURCE_BY_CONTENTID, contentId);
+	List list = doFindCacheable(GET_RESOURCE_BY_CONTENTID, contentId);
 	if (list.size() > 0) {
 	    return (CommonCartridge) list.get(0);
 	} else {

@@ -27,7 +27,7 @@
 	
 	<div class="pull-right">
 		<c:choose>
-			<c:when test="${fn:length(otherVersions) == 1}">
+			<c:when test="${fn:length(question.versionMap) == 1}">
 				<button class="btn btn-default btn-xs dropdown-toggle2" disabled="disabled">
 				    <fmt:message key="label.version"/> &nbsp; ${question.version}
 				</button>
@@ -40,9 +40,9 @@
 					</button>
 					
 					<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-						<c:forEach items="${otherVersions}" var="otherVersion">
-				    		<li <c:if test="${question.version == otherVersion.version}">class="disabled"</c:if>>
-				    			<a href="#nogo" onclick="javascript:loadQuestionDetailsArea(${otherVersion.uid});">Version ${otherVersion.version}</a>
+						<c:forEach items="${question.versionMap}" var="otherVersion">
+				    		<li <c:if test="${question.version == otherVersion.key}">class="disabled"</c:if>>
+				    			<a href="#nogo" onclick="javascript:loadQuestionDetailsArea(${otherVersion.value});">Version ${otherVersion.key}</a>
 				    		</li>
 				    	</c:forEach>
 					</ul>

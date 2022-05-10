@@ -23,10 +23,10 @@ import java.util.Map;
 import org.apache.poi.ddf.EscherClientDataRecord;
 import org.apache.poi.ddf.EscherContainerRecord;
 import org.apache.poi.ddf.EscherOptRecord;
-import org.apache.poi.ddf.EscherProperties;
 import org.apache.poi.ddf.EscherProperty;
+import org.apache.poi.ddf.EscherPropertyTypes;
 import org.apache.poi.ddf.EscherRecord;
-import org.apache.poi.ddf.EscherTextboxRecord;
+import org.apache.poi.ddf.EscherRecordTypes;
 import org.apache.poi.hssf.record.CommonObjectDataSubRecord;
 import org.apache.poi.hssf.record.EmbeddedObjectRefSubRecord;
 import org.apache.poi.hssf.record.EscherAggregate;
@@ -58,11 +58,8 @@ public class HSSFShapeFactory {
             HSSFShapeGroup group = new HSSFShapeGroup(container, obj);
             List<EscherContainerRecord> children = container.getChildContainers();
             // skip the first child record, it is group descriptor
-            for (int i = 0; i < children.size(); i++) {
-                EscherContainerRecord spContainer = children.get(i);
-                if (i != 0) {
-                    createShapeTree(spContainer, agg, group, root);
-                }
+            if (children.size() > 1) {
+                children.subList(1, children.size()).forEach(c -> createShapeTree(c, agg, group, root));
             }
             out.addShape(group);
         } else if (container.getRecordId() == EscherContainerRecord.SP_CONTAINER) {
@@ -71,11 +68,11 @@ public class HSSFShapeFactory {
             TextObjectRecord txtRecord = null;
 
             for (EscherRecord record : container) {
-                switch (record.getRecordId()) {
-                    case EscherClientDataRecord.RECORD_ID:
+                switch (EscherRecordTypes.forTypeID(record.getRecordId())) {
+                    case CLIENT_DATA:
                         objRecord = (ObjRecord) shapeToObj.get(record);
                         break;
-                    case EscherTextboxRecord.RECORD_ID:
+                    case CLIENT_TEXTBOX:
                         txtRecord = (TextObjectRecord) shapeToObj.get(record);
                         break;
                     default:
@@ -110,7 +107,7 @@ public class HSSFShapeFactory {
                     if(optRecord == null) {
                     	shape = new HSSFSimpleShape(container, objRecord, txtRecord);
                     } else {
-                        EscherProperty property = optRecord.lookup(EscherProperties.GEOMETRY__VERTICES);
+                        EscherProperty property = optRecord.lookup(EscherPropertyTypes.GEOMETRY__VERTICES);
                         if (null != property) {
                             shape = new HSSFPolygon(container, objRecord, txtRecord);
                         } else {

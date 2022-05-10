@@ -13,7 +13,7 @@ Apache HttpClient 4.5.2
 
 Apache HttpCore 4.4.4
 
-Apache POI 3.17
+Apache POI 4.1.2
 
 Commons Digester 2.1
 
@@ -25,7 +25,8 @@ Commons IO 2.5
 
 Commons Validator 1.6
 
-CSRF Guard master from 2020.01.07 with a custom modification in CsrfGuard.java
+CSRF Guard 4.1.3 with a custom modification in CsrfGuardUtils.java
+
 
 Etherpad Client 1.2.13
 
@@ -39,7 +40,7 @@ javax.persistence API 2.2
 
 jLaTexMath 1.0.6
 
-jsonwebtoken 0.9.0
+jsonwebtoken 0.11.2
 
 JSP API 2.3 1.0.3
 
@@ -55,15 +56,21 @@ openws 1.5.0
 
 Quartz 2.2.3
 
+passpol 0.7.1-SNAPSHOT
+
 picketbox 5.0.3
+
+Reactive Streams 1.0.3
 
 Servlet API 4.0.0
 
-Spring 4.3.12
+Spring 5.3.18
 
 Undertow core 2.0.13
 
 Undertow servlet 2.0.13
+
+UOC LTI Advantage integration 0.0.3
 
 xmltooling 1.4.0
 

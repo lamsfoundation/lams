@@ -58,7 +58,7 @@
 								password : {
 									required : true,
 									minlength : <c:out value="${minNumChars}"/>,
-									maxlength : 25,
+									maxlength : 50,
 									charactersAllowed : true,
 									pwcheck : true
 								},
@@ -183,6 +183,12 @@
 											<li><span class="fa fa-check"></span> <fmt:message
 													key='label.password.must.symbol' /></li>
 										</c:if>
+										<li><span class="fa fa-check"></span>
+											<fmt:message key='label.password.user.details' />
+										</li>
+										<li><span class="fa fa-check"></span>
+											<fmt:message key='label.password.common' />
+										</li>
 									</ul>
 								</lams:Alert>
 							</div>
@@ -190,14 +196,14 @@
 							<div class="form-group">
 								<label for="password"><fmt:message key="signup.password" /></label>:
 
-								<input id="password" name="password" class="form-control" type="password" value="" size="40" maxlength="25" autocomplete="new-password">
+								<input id="password" name="password" class="form-control" type="password" value="" size="40" maxlength="50" autocomplete="new-password">
 								<lams:errors path="password"/>
 							</div>
 
 							<div class="form-group">
 								<label for="confirmPassword"><fmt:message key="signup.confirm.password" /></label>:
 
-								<input id="confirmPassword" name="confirmPassword" class="form-control" type="password" value="" size="40" maxlength="25" autocomplete="new-password">
+								<input id="confirmPassword" name="confirmPassword" class="form-control" type="password" value="" size="40" maxlength="50" autocomplete="new-password">
 								<span style="display: none;'" class="confirmPassword error"><fmt:message
 										key="error.passwords.unequal" /></span>
 							</div>

@@ -29,22 +29,6 @@
 				</td>				
 			</tr>
 		</c:forEach>
-		
-		<c:if test="${question.hedgingJustificationEnabled}">
-			<tr>
-				<td colspan="2">
-					<c:if test="${hasEditRight}">
-						<div>
-							<fmt:message key="label.justify.hedging.marks" />
-						</div>
-					</c:if>
-					<lams:textarea id="justification-question${questionIndex}" name="question${questionIndex}" class="mark-hedging-select" disabled="${!hasEditRight}" 
-								    data-question-index="${questionIndex}" rows="4" cols="60">
-						<c:out value="${question.answer}" />
-					</lams:textarea>
-				</td>
-			</tr>
-		</c:if>
 	</table>
 </div>
 

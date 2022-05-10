@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.mindmap.model;
 
 import java.util.Date;
@@ -37,6 +36,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.lamsfoundation.lams.tool.mindmap.service.MindmapService;
 //import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 
@@ -50,12 +51,11 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     private static final long serialVersionUID = 579733009969321015L;
     static Logger log = Logger.getLogger(MindmapService.class.getName());
 
-    // Fields
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column(name = "create_date")
     private Date createDate;
 
@@ -98,9 +98,28 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     @Column(name = "reflect_instructions")
     private String reflectInstructions;
 
+    @Column(name = "gallery_walk_enabled")
+    private boolean galleryWalkEnabled;
+
+    @Column(name = "gallery_walk_read_only")
+    private boolean galleryWalkReadOnly;
+
+    @Column(name = "gallery_walk_started")
+    private boolean galleryWalkStarted;
+
+    @Column(name = "gallery_walk_finished")
+    private boolean galleryWalkFinished;
+
+    @Column(name = "gallery_walk_edit_enabled")
+    private boolean galleryWalkEditEnabled;
+
+    @Column(name = "gallery_walk_instructions")
+    private String galleryWalkInstructions;
+
     @OneToMany(mappedBy = "mindmap")
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<MindmapSession> mindmapSessions;
-    
+
     // Constructors
 
     /** default constructor */
@@ -307,12 +326,54 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 	this.reflectInstructions = reflectInstructions;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     */
+    public boolean isGalleryWalkEnabled() {
+	return galleryWalkEnabled;
+    }
+
+    public void setGalleryWalkEnabled(boolean galleryWalkEnabled) {
+	this.galleryWalkEnabled = galleryWalkEnabled;
+    }
+
+    public boolean isGalleryWalkReadOnly() {
+	return galleryWalkReadOnly;
+    }
+
+    public void setGalleryWalkReadOnly(boolean galleryWalkReadOnly) {
+	this.galleryWalkReadOnly = galleryWalkReadOnly;
+    }
+
+    public boolean isGalleryWalkStarted() {
+	return galleryWalkStarted;
+    }
+
+    public void setGalleryWalkStarted(boolean galleryWalkStarted) {
+	this.galleryWalkStarted = galleryWalkStarted;
+    }
+
+    public boolean isGalleryWalkFinished() {
+	return galleryWalkFinished;
+    }
+
+    public void setGalleryWalkFinished(boolean galleryWalkFinished) {
+	this.galleryWalkFinished = galleryWalkFinished;
+    }
+
+    public boolean isGalleryWalkEditEnabled() {
+	return galleryWalkEditEnabled;
+    }
+
+    public void setGalleryWalkEditEnabled(boolean galleryWalkEditEnabled) {
+	this.galleryWalkEditEnabled = galleryWalkEditEnabled;
+    }
+
+    public String getGalleryWalkInstructions() {
+	return galleryWalkInstructions;
+    }
+
+    public void setGalleryWalkInstructions(String galleryWalkInstructions) {
+	this.galleryWalkInstructions = galleryWalkInstructions;
+    }
+
     public Set<MindmapSession> getMindmapSessions() {
 	return mindmapSessions;
     }
@@ -321,11 +382,6 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 	this.mindmapSessions = mindmapSessions;
     }
 
-    /**
-     * toString
-     *
-     * @return String
-     */
     @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();
@@ -344,10 +400,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 	if (this == other) {
 	    return true;
 	}
-	if (other == null) {
-	    return false;
-	}
-	if (!(other instanceof Mindmap)) {
+	if ((other == null) || !(other instanceof Mindmap)) {
 	    return false;
 	}
 	Mindmap castOther = (Mindmap) other;
@@ -380,7 +433,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 	    mindmap.setUid(null);
 
 	    // create an empty set for the mindmapSession
-	    mindmap.mindmapSessions = new HashSet<MindmapSession>();
+	    mindmap.mindmapSessions = new HashSet<>();
 
 	} catch (CloneNotSupportedException cnse) {
 	    Mindmap.log.error("Error cloning " + Mindmap.class);

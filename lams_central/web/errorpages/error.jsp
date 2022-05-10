@@ -17,12 +17,15 @@
 		}
 		<c:if test="${showErrorStack1}">
 		function showHide() {
-			if (Element.visible("messageDetail")) {
-				$("showButt").innerHTML = "<fmt:message key='msg.show.detail'/>";
-				Element.hide("messageDetail");
+			var messageDetail = document.getElementById('messageDetail'),
+				showButt = document.getElementById('showButt');
+			if (messageDetail.style.display == 'none') {
+				showButt.innerHTML = "<fmt:message key='msg.hide.detail'/>";
+				messageDetail.style.display = 'inline';
+
 			} else {
-				$("showButt").innerHTML = "<fmt:message key='msg.hide.detail'/>";
-				Element.show("messageDetail");
+				showButt.innerHTML = "<fmt:message key='msg.show.detail'/>";
+				messageDetail.style.display = 'none';
 			}
 		}
 		</c:if>

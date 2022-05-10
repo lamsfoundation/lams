@@ -23,10 +23,13 @@
 package org.lamsfoundation.lams.gradebook.service;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
@@ -38,8 +41,8 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
+import org.quartz.SchedulerException;
 
 public interface IGradebookFullService extends IGradebookService {
 
@@ -192,10 +195,20 @@ public interface IGradebookFullService extends IGradebookService {
 
     /**
      * Toggle on/off marks released option
-     *
-     * @param lessonId
      */
     void toggleMarksReleased(Long lessonId);
+
+    boolean releaseMarks(Long lessonId, int userId);
+
+    Map<String, Object> getReleaseMarksSchedule(long lessonId, int currentUserId);
+
+    void scheduleReleaseMarks(long lessonId, Integer currentUserId, boolean sendEmails, Date scheduleDate)
+	    throws SchedulerException;
+
+    String getReleaseMarksEmailContent(long lessonId, int userID);
+
+    void sendReleaseMarksEmails(long lessonId, Collection<Integer> recipientIDs,
+	    IEventNotificationService eventNotificationService);
 
     /**
      * Gets the lesson row dtos for a given organisation

@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2015 the original author or authors.
+ * Copyright 2002-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,15 +26,24 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.lang.Nullable;
 
 /**
  * JavaBean that allows for configuring a {@link java.util.concurrent.ThreadPoolExecutor}
  * in bean style (through its "corePoolSize", "maxPoolSize", "keepAliveSeconds",
  * "queueCapacity" properties) and exposing it as a bean reference of its native
  * {@link java.util.concurrent.ExecutorService} type.
+ *
+ * <p>The default configuration is a core pool size of 1, with unlimited max pool size
+ * and unlimited queue capacity. This is roughly equivalent to
+ * {@link java.util.concurrent.Executors#newSingleThreadExecutor()}, sharing a single
+ * thread for all tasks. Setting {@link #setQueueCapacity "queueCapacity"} to 0 mimics
+ * {@link java.util.concurrent.Executors#newCachedThreadPool()}, with immediate scaling
+ * of threads in the pool to a potentially very high number. Consider also setting a
+ * {@link #setMaxPoolSize "maxPoolSize"} at that point, as well as possibly a higher
+ * {@link #setCorePoolSize "corePoolSize"} (see also the
+ * {@link #setAllowCoreThreadTimeOut "allowCoreThreadTimeOut"} mode of scaling).
  *
  * <p>For an alternative, you may set up a {@link ThreadPoolExecutor} instance directly
  * using constructor injection, or use a factory method definition that points to the
@@ -54,7 +63,7 @@ import org.springframework.beans.factory.InitializingBean;
  */
 @SuppressWarnings("serial")
 public class ThreadPoolExecutorFactoryBean extends ExecutorConfigurationSupport
-		implements FactoryBean<ExecutorService>, InitializingBean, DisposableBean {
+		implements FactoryBean<ExecutorService> {
 
 	private int corePoolSize = 1;
 
@@ -64,10 +73,13 @@ public class ThreadPoolExecutorFactoryBean extends ExecutorConfigurationSupport
 
 	private boolean allowCoreThreadTimeOut = false;
 
+	private boolean prestartAllCoreThreads = false;
+
 	private int queueCapacity = Integer.MAX_VALUE;
 
 	private boolean exposeUnconfigurableExecutor = false;
 
+	@Nullable
 	private ExecutorService exposedExecutor;
 
 
@@ -107,6 +119,16 @@ public class ThreadPoolExecutorFactoryBean extends ExecutorConfigurationSupport
 	}
 
 	/**
+	 * Specify whether to start all core threads, causing them to idly wait for work.
+	 * <p>Default is "false".
+	 * @since 5.3.14
+	 * @see java.util.concurrent.ThreadPoolExecutor#prestartAllCoreThreads
+	 */
+	public void setPrestartAllCoreThreads(boolean prestartAllCoreThreads) {
+		this.prestartAllCoreThreads = prestartAllCoreThreads;
+	}
+
+	/**
 	 * Set the capacity for the ThreadPoolExecutor's BlockingQueue.
 	 * Default is {@code Integer.MAX_VALUE}.
 	 * <p>Any positive value will lead to a LinkedBlockingQueue instance;
@@ -140,6 +162,9 @@ public class ThreadPoolExecutorFactoryBean extends ExecutorConfigurationSupport
 				this.keepAliveSeconds, queue, threadFactory, rejectedExecutionHandler);
 		if (this.allowCoreThreadTimeOut) {
 			executor.allowCoreThreadTimeOut(true);
+		}
+		if (this.prestartAllCoreThreads) {
+			executor.prestartAllCoreThreads();
 		}
 
 		// Wrap executor with an unconfigurable decorator.
@@ -181,15 +206,16 @@ public class ThreadPoolExecutorFactoryBean extends ExecutorConfigurationSupport
 	 */
 	protected BlockingQueue<Runnable> createQueue(int queueCapacity) {
 		if (queueCapacity > 0) {
-			return new LinkedBlockingQueue<Runnable>(queueCapacity);
+			return new LinkedBlockingQueue<>(queueCapacity);
 		}
 		else {
-			return new SynchronousQueue<Runnable>();
+			return new SynchronousQueue<>();
 		}
 	}
 
 
 	@Override
+	@Nullable
 	public ExecutorService getObject() {
 		return this.exposedExecutor;
 	}

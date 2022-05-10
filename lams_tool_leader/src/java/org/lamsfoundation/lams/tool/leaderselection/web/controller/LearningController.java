@@ -24,7 +24,7 @@
 package org.lamsfoundation.lams.tool.leaderselection.web.controller;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,13 +38,16 @@ import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionUser;
 import org.lamsfoundation.lams.tool.leaderselection.service.ILeaderselectionService;
 import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionConstants;
 import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionException;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Controller
 @RequestMapping("/learning")
@@ -95,14 +98,15 @@ public class LearningController {
 
 	LeaderselectionUser groupLeader = session.getGroupLeader();
 	request.setAttribute(LeaderselectionConstants.ATTR_GROUP_LEADER, groupLeader);
-	List<LeaderselectionUser> groupUsers = leaderselectionService.getUsersBySession(toolSessionId);
+	Collection<User> groupUsers = leaderselectionService.getAllGroupUsers(toolSessionId);
 	request.setAttribute(LeaderselectionConstants.ATTR_GROUP_USERS, groupUsers);
 	request.setAttribute(LeaderselectionConstants.ATTR_TOOL_SESSION_ID, toolSessionId);
 
 	// checks whether to display dialog prompting to become a leader
 	boolean isSelectLeaderActive = (groupLeader == null) && !user.isFinishedActivity() && !mode.isTeacher();
 	request.setAttribute("isSelectLeaderActive", isSelectLeaderActive);
-	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, leaderselectionService.isLastActivity(toolSessionId));
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY,
+		leaderselectionService.isLastActivity(toolSessionId));
 	return "pages/learning/leaderselection";
     }
 
@@ -112,6 +116,7 @@ public class LearningController {
      * @throws JSONException
      */
     @RequestMapping(value = "/becomeLeader")
+    @ResponseStatus(code = HttpStatus.OK)
     public void becomeLeader(HttpServletRequest request) throws IOException {
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	LeaderselectionSession session = leaderselectionService.getSessionBySessionId(toolSessionId);

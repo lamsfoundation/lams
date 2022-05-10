@@ -24,7 +24,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script> 	
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.dialogextend.js"></script>	
-	<script type="text/javascript" src="${lams}includes/javascript/dialog.js"></script>
+	<lams:JSImport src="includes/javascript/dialog.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-tourist.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.ui.touch-punch.js"></script>
@@ -101,11 +101,11 @@
 				startTour();
 			</c:if>
 
-			<c:if test="${showTimezoneWarning}"> 
+			<c:if test="${showTimezoneWarning}">
 		    var current_date = new Date( );
 		    var client_gmt_offset_minutes = current_date.getTimezoneOffset( );
 		    $('#offset').html( client_gmt_offset_minutes / 60 );
-		    var lams_gmt_offset_minutes = ( <lams:user property="timeZone.rawOffset"/> + <lams:user property="timeZone.DSTSavings"/> ) / 60000;
+		    var lams_gmt_offset_minutes = <lams:user property="timeZoneOffsetSeconds"/> / 60;
 		    if ( client_gmt_offset_minutes != -lams_gmt_offset_minutes ) {
 			    $('#timezoneWarning').html( '<BR/><fmt:message key="label.timezone.warning"/>');
 				<c:if test="${showTimezoneWarningPopup}"> 
@@ -215,7 +215,7 @@
 					<c:if test="${showQbCollectionsLink}">
 						<li>
 							<a href="#" id="showQbCollectionsButton" onclick="javascript:openQbCollections(); return false;">
-								<i class="fa fa-question"></i> <fmt:message key="index.qb.collections"/>
+								<i class="fa fa-bank"></i> <fmt:message key="index.qb.collections"/>
 							</a>
 						</li>
 					</c:if>

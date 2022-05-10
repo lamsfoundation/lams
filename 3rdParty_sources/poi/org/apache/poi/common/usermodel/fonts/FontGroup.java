@@ -44,29 +44,42 @@ public enum FontGroup {
 
 
     public static class FontGroupRange {
-        private int len;
-        private FontGroup fontGroup;
+        private final FontGroup fontGroup;
+        private int len = 0;
+
+        FontGroupRange(FontGroup fontGroup) {
+            this.fontGroup = fontGroup;
+        }
+
         public int getLength() {
             return len;
         }
+
         public FontGroup getFontGroup( ) {
             return fontGroup;
+        }
+
+        void increaseLength(int len) {
+            this.len += len;
         }
     }
 
     private static class Range {
-        int upper;
-        FontGroup fontGroup;
+        private final int upper;
+        private final FontGroup fontGroup;
         Range(int upper, FontGroup fontGroup) {
             this.upper = upper;
             this.fontGroup = fontGroup;
         }
+
+        int getUpper() { return upper; }
+        FontGroup getFontGroup() { return fontGroup; }
     }
 
     private static NavigableMap<Integer,Range> UCS_RANGES;
 
     static {
-        UCS_RANGES = new TreeMap<Integer,Range>();
+        UCS_RANGES = new TreeMap<>();
         UCS_RANGES.put(0x0000,  new Range(0x007F, LATIN));
         UCS_RANGES.put(0x0080,  new Range(0x00A6, LATIN));
         UCS_RANGES.put(0x00A9,  new Range(0x00AF, LATIN));
@@ -101,7 +114,7 @@ public enum FontGroup {
         UCS_RANGES.put(0xFB1D,  new Range(0xFB4F, COMPLEX_SCRIPT));
         UCS_RANGES.put(0xFE50,  new Range(0xFE6F, LATIN));
         // All others EAST_ASIAN
-    };
+    }
 
 
     /**
@@ -110,16 +123,19 @@ public enum FontGroup {
      * @param runText the text which font groups are to be analyzed
      * @return the FontGroup
      */
-    public static List<FontGroupRange> getFontGroupRanges(String runText) {
-        List<FontGroupRange> ttrList = new ArrayList<FontGroupRange>();
+    public static List<FontGroupRange> getFontGroupRanges(final String runText) {
+        final List<FontGroupRange> ttrList = new ArrayList<>();
+        if (runText == null || runText.isEmpty()) {
+            return ttrList;
+        }
         FontGroupRange ttrLast = null;
-        final int rlen = (runText != null) ? runText.length() : 0;
+        final int rlen = runText.length();
         for(int cp, i = 0, charCount; i < rlen; i += charCount) {
             cp = runText.codePointAt(i);
             charCount = Character.charCount(cp);
 
             // don't switch the font group for a few default characters supposedly available in all fonts
-            FontGroup tt;
+            final FontGroup tt;
             if (ttrLast != null && " \n\r".indexOf(cp) > -1) {
                 tt = ttrLast.fontGroup;
             } else {
@@ -127,11 +143,10 @@ public enum FontGroup {
             }
 
             if (ttrLast == null || ttrLast.fontGroup != tt) {
-                ttrLast = new FontGroupRange();
-                ttrLast.fontGroup = tt;
+                ttrLast = new FontGroupRange(tt);
                 ttrList.add(ttrLast);
             }
-            ttrLast.len += charCount;
+            ttrLast.increaseLength(charCount);
         }
         return ttrList;
     }
@@ -142,8 +157,8 @@ public enum FontGroup {
 
     private static FontGroup lookup(int codepoint) {
         // Do a lookup for a match in UCS_RANGES
-        Map.Entry<Integer,Range> entry = UCS_RANGES.floorEntry(codepoint);
+        Map.Entry<Integer, Range> entry = UCS_RANGES.floorEntry(codepoint);
         Range range = (entry != null) ? entry.getValue() : null;
-        return (range != null && codepoint <= range.upper) ? range.fontGroup : EAST_ASIAN;
+        return (range != null && codepoint <= range.getUpper()) ? range.getFontGroup() : EAST_ASIAN;
     }
 }

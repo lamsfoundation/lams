@@ -24,11 +24,15 @@
 package org.lamsfoundation.lams.learning.web.controller;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -36,27 +40,38 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.flux.FluxMap;
+import org.lamsfoundation.lams.flux.FluxRegistry;
+import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.presence.PresenceWebsocketServer;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
+import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
+import org.lamsfoundation.lams.learningdesign.dto.GateActivityDTO;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgressArchive;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgressArchive;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.lesson.util.LearnerActivityCompleteFluxItem;
+import org.lamsfoundation.lams.lesson.util.LearnerLessonJoinFluxItem;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.tool.ToolSession;
+import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -65,10 +80,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import reactor.core.publisher.Flux;
 
 /**
  * <p>
@@ -104,6 +123,8 @@ public class LearnerController {
     @Autowired
     private ILamsToolService lamsToolService;
     @Autowired
+    private ILamsCoreToolService lamsCoreToolService;
+    @Autowired
     @Qualifier("learningMessageService")
     private MessageService messageService;
     @Autowired
@@ -117,6 +138,25 @@ public class LearnerController {
     private static final String[] LEARNER_MESSAGE_KEYS = new String[] { "message.learner.progress.restart.confirm",
 	    "message.lesson.restart.button", "label.learner.progress.notebook", "button.exit",
 	    "label.learner.progress.support", "label.my.progress" };
+
+    // flux management
+    public static final String LEARNER_TIMELINE_FLUX_NAME = "learner timeline updated";
+
+    public LearnerController() {
+	FluxRegistry.initFluxMap(LEARNER_TIMELINE_FLUX_NAME, CommonConstants.ACTIVITY_COMPLETED_SINK_NAME,
+		(LearnerActivityCompleteFluxItem item,
+			LearnerActivityCompleteFluxItem key) -> item.getLessonId() == key.getLessonId()
+				&& item.getUserId() == key.getUserId(),
+		(LearnerActivityCompleteFluxItem item) -> {
+		    ObjectNode responseJSON = null;
+		    try {
+			responseJSON = getLearnerProgress(item.getLessonId(), item.getUserId(), true);
+		    } catch (Exception e) {
+			log.error("Error while getting learner timeline flux", e);
+		    }
+		    return responseJSON == null ? "" : responseJSON.toString();
+		}, FluxMap.STANDARD_THROTTLE, FluxMap.STANDARD_TIMEOUT);
+    }
 
     @RequestMapping("/redirectToURL")
     @ResponseBody
@@ -189,6 +229,8 @@ public class LearnerController {
 	    String url = "learning/" + activityMapping.getDisplayActivityAction(lessonID);
 	    redirectToURL(response, url);
 
+	    FluxRegistry.emit(CommonConstants.LESSON_JOINED_SINK_NAME, new LearnerLessonJoinFluxItem(lessonID, userId));
+
 	} catch (Exception e) {
 	    log.error("An error occurred while learner " + userId + " attempting to join the lesson.", e);
 	    return "error";
@@ -249,7 +291,6 @@ public class LearnerController {
     /**
      * Produces necessary data for learner progress bar.
      */
-    @SuppressWarnings("unchecked")
     @RequestMapping("/getLearnerProgress")
     @ResponseBody
     public String getLearnerProgress(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -266,7 +307,6 @@ public class LearnerController {
 	    monitorId = userId;
 	}
 
-	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
 	if (lessonId == null) {
 	    // depending on when this is called, there may only be a toolSessionId known, not the lessonId.
@@ -275,11 +315,36 @@ public class LearnerController {
 	    lessonId = toolSession.getLesson().getLessonId();
 	}
 
+	ObjectNode responseJSON = getLearnerProgress(lessonId, learnerId, monitorId != null);
+	if (responseJSON == null) {
+	    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+	    return null;
+	}
+
 	responseJSON.set("messages", getProgressBarMessages());
+
+	response.setContentType("application/json;charset=utf-8");
+	return responseJSON.toString();
+    }
+
+    /**
+     * Produces necessary data for learner progress bar.
+     */
+
+    @RequestMapping("/getLearnerProgressUpdateFlux")
+    @ResponseBody
+    public Flux<String> getLearnerProgressUpdateFlux(@RequestParam long lessonId, @RequestParam int userId)
+	    throws JsonProcessingException, IOException {
+	return FluxRegistry.get(LEARNER_TIMELINE_FLUX_NAME,
+		new LearnerActivityCompleteFluxItem(lessonId, userId, null));
+    }
+
+    @SuppressWarnings("unchecked")
+    private ObjectNode getLearnerProgress(long lessonId, int learnerId, boolean monitorMode) throws IOException {
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 
 	Object[] ret = learnerService.getStructuredActivityURLs(learnerId, lessonId);
 	if (ret == null) {
-	    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 	    return null;
 	}
 
@@ -290,17 +355,14 @@ public class LearnerController {
 		// these are support activities
 		for (ActivityURL childActivity : activity.getChildActivities()) {
 		    responseJSON.withArray("support")
-			    .add(activityProgressToJSON(childActivity, null, lessonId, learnerId, monitorId));
+			    .add(activityProgressToJSON(childActivity, null, lessonId, learnerId, monitorMode));
 		}
 	    } else {
 		responseJSON.withArray("activities")
-			.add(activityProgressToJSON(activity, (Long) ret[1], lessonId, learnerId, monitorId));
+			.add(activityProgressToJSON(activity, (Long) ret[1], lessonId, learnerId, monitorMode));
 	    }
 	}
-
-	response.setContentType("application/json;charset=utf-8");
-
-	return responseJSON.toString();
+	return responseJSON;
     }
 
     @RequestMapping("/getPresenceChatActiveUserCount")
@@ -357,15 +419,16 @@ public class LearnerController {
      * Converts an activity in learner progress to a JSON object.
      */
     private ObjectNode activityProgressToJSON(ActivityURL activity, Long currentActivityId, Long lessonId,
-	    Integer learnerId, Integer monitorId) throws IOException {
+	    Integer learnerId, boolean monitorMode) throws IOException {
 	ObjectNode activityJSON = JsonNodeFactory.instance.objectNode();
 	activityJSON.put("id", activity.getActivityId());
 	activityJSON.put("name", activity.getTitle());
-	activityJSON.put("status", activity.getActivityId().equals(currentActivityId) ? 0 : activity.getStatus());
+	int status = activity.getActivityId().equals(currentActivityId) ? 0 : activity.getStatus();
+	activityJSON.put("status", status);
 
 	// URL in learner mode
 	String url = activity.getUrl();
-	if ((url != null) && (monitorId != null)) {
+	if ((url != null) && monitorMode) {
 	    // URL in monitor mode
 	    url = Configuration.get(ConfigurationKeys.SERVER_URL)
 		    + "monitoring/monitoring/getLearnerActivityURL.do?lessonID=" + lessonId + "&activityID="
@@ -392,13 +455,35 @@ public class LearnerController {
 	    type = "o";
 	} else if (actType.contains("branching")) {
 	    type = "b";
+	} else {
+	    if (activity.getIconURL() != null) {
+		activityJSON.put("iconURL", activity.getIconURL());
+	    }
+
+	    if (status == 1) {
+		GradebookUserActivity activityMark = gradebookService.getGradebookUserActivity(activity.getActivityId(),
+			learnerId);
+		if (activityMark != null && activityMark.getMark() != null) {
+		    activityJSON.put("mark", activityMark.getMark());
+		}
+	    }
 	}
+
+	Long activityMaxMark = lamsCoreToolService.getActivityMaxPossibleMark(activity.getActivityId());
+	if (activityMaxMark != null) {
+	    activityJSON.put("maxMark", activityMaxMark);
+	}
+	if (activity.getDuration() != null) {
+	    activityJSON.put("duration", DateUtil.convertTimeToString(activity.getDuration()));
+	}
+
 	activityJSON.put("type", type);
+	activityJSON.put("isGrouping", actType.contains("grouping"));
 
 	if (activity.getChildActivities() != null) {
 	    for (ActivityURL childActivity : activity.getChildActivities()) {
-		activityJSON.withArray("childActivities")
-			.add(activityProgressToJSON(childActivity, currentActivityId, lessonId, learnerId, monitorId));
+		activityJSON.withArray("childActivities").add(
+			activityProgressToJSON(childActivity, currentActivityId, lessonId, learnerId, monitorMode));
 	    }
 	}
 
@@ -445,6 +530,64 @@ public class LearnerController {
 	responseJSON.put(AttributeNames.PARAM_PRESENCE_IM_ENABLED, lesson.getLearnerImAvailable());
 
 	response.setContentType("application/json;charset=utf-8");
+
+	return responseJSON.toString();
+    }
+
+    @RequestMapping("/isNextGateActivityOpen")
+    @ResponseBody
+    public String isNextGateActivityOpen(@RequestParam(required = false) Long toolSessionId,
+	    @RequestParam(required = false) Long activityId, HttpSession session, Locale locale) {
+
+	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
+	if (userDto == null) {
+	    throw new IllegalArgumentException("No user is logged in");
+	}
+
+	Integer userId = userDto.getUserID();
+	GateActivityDTO gateDto = null;
+	if (toolSessionId != null) {
+	    gateDto = learnerService.isNextGateActivityOpenByToolSessionId(userId, toolSessionId);
+	} else if (activityId != null) {
+	    gateDto = learnerService.isNextGateActivityOpenByActivityId(userId, activityId);
+	} else {
+	    throw new IllegalArgumentException("Either tool session ID or activity ID has to be provided");
+	}
+
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	if (gateDto == null) {
+	    responseJSON.put("status", "open");
+	} else {
+	    responseJSON.put("status", "closed");
+
+	    String message = null;
+	    GateActivity gate = gateDto.getGate();
+	    if (gate.isScheduleGate()) {
+		ScheduleGateActivity scheduleGate = (ScheduleGateActivity) gate;
+		if (!Boolean.TRUE.equals(scheduleGate.getGateActivityCompletionBased())) {
+		    Lesson lesson = gate.getLearningDesign().getLessons().iterator().next();
+		    User user = userManagementService.getUserById(userId);
+		    TimeZone userTimeZone = TimeZone.getTimeZone(user.getTimeZone());
+
+		    Calendar openTime = new GregorianCalendar(userTimeZone);
+		    Date lessonStartTime = DateUtil.convertToTimeZoneFromDefault(userTimeZone,
+			    lesson.getStartDateTime());
+		    openTime.setTime(lessonStartTime);
+		    openTime.add(Calendar.MINUTE, scheduleGate.getGateStartTimeOffset().intValue());
+		    String openDateString = DateUtil.convertToStringForJSON(openTime.getTime(), locale);
+		    message = messageService.getMessage("label.gate.closed.preceding.activity.schedule",
+			    new Object[] { openDateString });
+		}
+	    } else if (gate.isConditionGate()) {
+		message = messageService.getMessage("label.gate.closed.preceding.activity.condition");
+	    }
+
+	    if (message == null) {
+		message = messageService.getMessage("label.gate.closed.preceding.activity");
+	    }
+
+	    responseJSON.put("message", message);
+	}
 
 	return responseJSON.toString();
     }

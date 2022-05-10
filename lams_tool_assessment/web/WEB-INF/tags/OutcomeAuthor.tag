@@ -87,7 +87,7 @@
 				ui.content.splice(index, 2);
 				while(index--) {
 					var label = ui.content[index].label;
-					if (label.split('(')[0].trim() == term) {
+					if (label.split('[')[0].trim() == term) {
 						// do not offer to create an output which perfectly matches an existing one
 						sameNameFound = true;
 					}

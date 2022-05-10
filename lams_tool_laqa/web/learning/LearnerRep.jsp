@@ -49,6 +49,7 @@
 		
 		.rate-answers-area {
 			 min-height: 120px;
+			 margin-bottom: 20px;
 		}
 	</style>
 
@@ -79,11 +80,16 @@
 	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/portrait.js" type="text/javascript" ></script>
-
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
+	
 	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${toolSessionID}', '', function(){
+			submitMethod('endLearning');
+		});
+		
 		var AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
-		YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
-		IS_DISABLED =  ${sessionMap.isDisabled};
+			YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
+			IS_DISABLED =  ${sessionMap.isDisabled};
 		
 		$(document).ready(function(){
 			
@@ -111,7 +117,7 @@
 				      // {sortList:col} adds the sortList to the url into a "col" array, and {filterList:fcol} adds
 				      // the filterList to the url into an "fcol" array.
 				      // So a sortList = [[2,0],[3,0]] becomes "&col[2]=0&col[3]=0" in the url
-					ajaxUrl : "<c:url value='getResponses.do'/>?page={page}&size={size}&{sortList:column}&isAllowRateAnswers=${qaContent.allowRateAnswers}&isAllowRichEditor=${qaContent.allowRichEditor}&qaContentId=${qaContent.qaContentId}&qaSessionId=" + $("#toolSessionID").val() + "&questionUid=" + $(this).attr('data-question-uid') + "&userId=" + $("#userID").val() + "&reqID=" + (new Date()).getTime(),
+					ajaxUrl : "<c:url value='getResponses.do'/>?page={page}&size={size}&{sortList:column}&isAllowRateAnswers=${qaContent.allowRateAnswers}&isAllowRichEditor=${qaContent.allowRichEditor}&isOnlyLeadersIncluded=${qaContent.useSelectLeaderToolOuput}&qaContentId=${qaContent.qaContentId}&qaSessionId=" + $("#toolSessionID").val() + "&questionUid=" + $(this).attr('data-question-uid') + "&userId=" + $("#userID").val() + "&reqID=" + (new Date()).getTime(),
 					ajaxProcessing: function (data) {
 				    	if (data && data.hasOwnProperty('rows')) {
 				    		var rows = [],
@@ -127,7 +133,8 @@
 								rows += '<td style="vertical-align:top;">';
 								
 								if (${generalLearnerFlowDTO.userNameVisible}) {
-									rows += definePortraitMiniHeader(userData["portraitId"], userData["userID"], '${lams}', userData["userName"], 
+									rows += definePortraitMiniHeader(userData["portraitId"], userData["userID"], '${lams}',
+																	 ${qaContent.useSelectLeaderToolOuput} ? userData["sessionName"] : userData["userName"], 
 											'<time class="timeago" title="' + userData["attemptTime"] + '" datetime="' + userData["timeAgo"] + '"></time>', 
 											false, "sbox-heading bg-warning")
 								}
@@ -264,6 +271,7 @@
 					jQuery("time.timeago").timeago();
 				});
 			});
+
 		 });
 
 		function refreshPage(reload) {
@@ -274,7 +282,6 @@
 			}
 		}
 		function submitMethod(actionMethod) {
-			$('.btn').prop('disabled', true);
 			document.forms.qaLearningForm.action=actionMethod+".do"; 
 			document.forms.qaLearningForm.submit();
 		}
@@ -499,8 +506,7 @@
 						</c:when>
 	
 						<c:when test="${(generalLearnerFlowDTO.reflection != 'true') || !hasEditRight || generalLearnerFlowDTO.isLearnerFinished}">
-							<button type="button" id="finishButton"
-									onclick="javascript:submitMethod('endLearning'); return false;" class="btn btn-primary pull-right na">
+							<button type="button" id="finishButton" class="btn btn-primary pull-right na">
 								<c:choose>
 									<c:when test="${sessionMap.isLastActivity}">
 										<fmt:message key="button.submit" />

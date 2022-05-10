@@ -52,7 +52,7 @@
 			};
 			
 	</script>
-	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/kumalive.js"></script>
+	<lams:JSImport src="includes/javascript/kumalive.js" relative="true" />
 </lams:head>
 <body>
 	<div id="initDiv">

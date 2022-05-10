@@ -1,0 +1,78 @@
+.lams-wavepanel .clickable {
+    cursor: pointer;
+}
+
+.lams-wavepanel .clickable .fa {
+    background: rgba(0, 0, 0, 0.15);
+    display: inline-block;
+    padding: 5px 7px;
+    border-radius: 4px;
+    margin-right: -7px;
+}
+
+.lams-wavepanel .panel-heading span {
+    margin-top: -20px;
+}
+
+
+.btn {
+    padding: 6px 12px;
+    border: 1px solid transparent;
+}
+.lams-wavepanel .panel-heading {
+    padding: 7px 10px;
+}
+.lams-wavepanel .panel-body {
+    padding: 15px;
+}
+.lams-wavepanel.panel-default {
+    border-color: #ddd;
+}
+.lams-wavepanel.panel-primary {
+    border-color: #337ab7;
+}
+.lams-wavepanel.panel-success {
+    border-color: #d6e9c6;
+}
+.lams-wavepanel.panel-info {
+    border-color: #bce8f1;
+}
+.lams-wavepanel.panel-warning {
+    border-color: #faebcc;
+}
+.lams-wavepanel.panel-danger {
+    border-color: #ebccd1;
+}
+.cke_reset_all, .cke_reset_all * {
+	border: 1px solid transparent; 
+}
+
+.btn-block {
+    width: 100%;
+    text-align: center;
+}
+.cke_dialog .ImagePreviewBox {
+    border: none;
+    width: 98%;
+    padding: 10px;
+    margin-top: 10px;
+}
+.cke_dialog_ui_labeled_content {
+    padding-top: 5px;
+}
+.cke_dialog_contents {
+	background-color: #f3f3f3;
+}
+.cke_tpl_list a:hover .cke_tpl_item,
+.cke_tpl_list a:focus .cke_tpl_item,
+.cke_tpl_list a:active .cke_tpl_item {
+	background-color: #f3f3f3;
+}
+.cke_tpl_list {
+	border: #dcdcdc 1px solid;
+	background-color: #ffffff;
+	overflow-y: auto;
+	overflow-x: hidden;
+	width: 100%;
+	height: 560px;
+}

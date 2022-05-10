@@ -25,17 +25,16 @@
 	    	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>:
 			<form:input path="title" class="form-control" tabindex="1" id="resourcetitle"/>
 	  	</div>	
-
+		<div class="form-group">
+	    	<label for="instructions"><fmt:message key="label.authoring.basic.instruction" /></label>
+			<lams:CKEditor id="instructions" value="" contentFolderID="${learnerContentFolder}"></lams:CKEditor>
+	  	</div>	
+	  	
 		<input type="hidden" id="tmpFileUploadId" name="tmpFileUploadId" value="${resourceItemForm.tmpFileUploadId}" />
 		<div id="image-upload-area" class="voffset20"></div>
 		
-		<div class="form-group voffset10">
-	    	<label for="description"><fmt:message key="label.learning.comment.or.instruction" /></label>
-			<form:input path="description" tabindex="3" cssClass="form-control" maxlength="255"/>
-	  	</div>	
-
 		<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>	
-		<div id="buttons" class="pull-right">
+		<div id="buttons" class="pull-right voffset10">
 	 		<button name="goback" onclick="javascript:cancel()" class="btn btn-sm btn-default" id="cancelButton">
 				<fmt:message key="button.cancel" />
 			</button>&nbsp;
@@ -58,7 +57,7 @@
 			$('#title').focus();
 			
 			var extensionValidation = function(currentFile, files) {
-			  var name = currentFile.data.name,
+			  var name = currentFile.data.name || currentFile.name,
 			  	  extensionIndex = name.lastIndexOf('.'),
 			  	  valid = extensionIndex < 0 || !EXE_FILE_TYPES.includes(name.substring(extensionIndex).trim());
 			  if (!valid) {
@@ -70,7 +69,25 @@
 			initFileUpload('${resourceItemForm.tmpFileUploadId}', extensionValidation, '<lams:user property="localeLanguage"/>');
 		});	
 					
-		$('#resourceItemForm').submit(submitResourceForm);
+		$('#resourceItemForm').submit(submitResourceForm)
+							  .validate({
+				ignore: 'hidden, div.cke_editable',
+				errorClass: "text-danger",
+				wrapper: "span",
+				rules: {
+				    title: {
+				    	required: true
+				    }
+				},
+				messages : {
+					title : {
+						required : '<fmt:message key="error.resource.item.title.blank"/> '
+					}
+				},
+				errorPlacement: function(error, element) {
+			       error.insertAfter(element);
+			    }
+			});	
 	</script>
 	
 </div>

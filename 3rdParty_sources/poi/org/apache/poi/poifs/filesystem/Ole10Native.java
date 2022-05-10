@@ -17,40 +17,77 @@
 
 package org.apache.poi.poifs.filesystem;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
-import org.apache.poi.util.LittleEndian;
+import org.apache.poi.util.IOUtils;
+import org.apache.poi.util.LittleEndianByteArrayInputStream;
 import org.apache.poi.util.LittleEndianConsts;
+import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutputStream;
 import org.apache.poi.util.StringUtil;
 
 /**
  * Represents an Ole10Native record which is wrapped around certain binary
- * files being embedded in OLE2 documents.
+ * files being embedded in OLE2 documents.<p>
  *
- * @author Rainer Schwarze
+ * Ole10Native objects come in different shapes:
+ * <ul>
+ *     <li>unparsed: we can't identify it's structure</li>
+ *     <li>compact: same as unparsed but with a leading flag</li>
+ *     <li>parsed - Ole-Class "Package": data + ASCII label,command,filename</li>
+ *     <li>parsed - Ole-Class "Package2": as above plus UTF16 label,command,filename</li>
+ * </ul>
  */
+@SuppressWarnings("unused")
 public class Ole10Native {
 
+
     public static final String OLE10_NATIVE = "\u0001Ole10Native";
-    protected static final String ISO1 = "ISO-8859-1";
-  
-    // (the fields as they appear in the raw record:)
-    private int totalSize;             // 4 bytes, total size of record not including this field
-    private short flags1 = 2;          // 2 bytes, unknown, mostly [02 00]
-    private String label;              // ASCIIZ, stored in this field without the terminating zero
-    private String fileName;           // ASCIIZ, stored in this field without the terminating zero
-    private short flags2 = 0;          // 2 bytes, unknown, mostly [00 00]
-    private short unknown1 = 3;        // see below
-    private String command;            // ASCIIZ, stored in this field without the terminating zero
-    private byte[] dataBuffer;         // varying size, the actual native data
-    private short flags3 = 0;          // some final flags? or zero terminators?, sometimes not there
-  
+    private static final Charset ISO1 = StandardCharsets.ISO_8859_1;
+    // arbitrarily selected; may need to increase
+    private static final int MAX_RECORD_LENGTH = 100_000_000;
+    // arbitrarily selected; may need to increase
+    private static final int MAX_STRING_LENGTH = 1024;
+
+    /**
+     * Default content of the \u0001Ole entry
+     */
+    private static final byte[] OLE_MARKER_BYTES =
+            {1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    private static final String OLE_MARKER_NAME = "\u0001Ole";
+
+
+    // 4 bytes, total size of record not including this field
+    private int totalSize;
+    // 2 bytes, unknown, mostly [02 00]
+    private short flags1 = 2;
+    // ASCIIZ, stored in this field without the terminating zero
+    private String label;
+    // ASCIIZ, stored in this field without the terminating zero
+    private String fileName;
+    // 2 bytes, unknown, mostly [00 00]
+    private short flags2;
+    // see below
+    private short unknown1 = 3;
+    // ASCIIZ, stored in this field without the terminating zero
+    private String command;
+    // varying size, the actual native data
+    private byte[] dataBuffer;
+    // UTF16-LE String with leading length
+    private String command2;
+    // UTF16-LE String with leading length
+    private String label2;
+    // UTF16-LE String with leading length
+    private String fileName2;
+
     /**
      * the field encoding mode - merely a try-and-error guess ...
-     **/ 
+     **/
     private enum EncodingMode {
         /**
          * the data is stored in parsed format - including label, command, etc.
@@ -65,11 +102,10 @@ public class Ole10Native {
          */
         compact
     }
-    
+
     private EncodingMode mode;
 
-    
-    
+
     /**
      * Creates an instance of this class from an embedded OLE Object. The OLE Object is expected
      * to include a stream &quot;{01}Ole10Native&quot; which contains the actual
@@ -77,13 +113,13 @@ public class Ole10Native {
      *
      * @param poifs POI Filesystem object
      * @return Returns an instance of this class
-     * @throws IOException on IO error
+     * @throws IOException          on IO error
      * @throws Ole10NativeException on invalid or unexcepted data format
      */
     public static Ole10Native createFromEmbeddedOleObject(POIFSFileSystem poifs) throws IOException, Ole10NativeException {
-       return createFromEmbeddedOleObject(poifs.getRoot());
+        return createFromEmbeddedOleObject(poifs.getRoot());
     }
-    
+
     /**
      * Creates an instance of this class from an embedded OLE Object. The OLE Object is expected
      * to include a stream &quot;{01}Ole10Native&quot; which contains the actual
@@ -91,30 +127,29 @@ public class Ole10Native {
      *
      * @param directory POI Filesystem object
      * @return Returns an instance of this class
-     * @throws IOException on IO error
+     * @throws IOException          on IO error
      * @throws Ole10NativeException on invalid or unexcepted data format
      */
     public static Ole10Native createFromEmbeddedOleObject(DirectoryNode directory) throws IOException, Ole10NativeException {
-       DocumentEntry nativeEntry = 
-          (DocumentEntry)directory.getEntry(OLE10_NATIVE);
-       byte[] data = new byte[nativeEntry.getSize()];
-       int readBytes = directory.createDocumentInputStream(nativeEntry).read(data);
-       assert(readBytes == data.length);
-  
-       return new Ole10Native(data, 0);
+        DocumentEntry nativeEntry = (DocumentEntry) directory.getEntry(OLE10_NATIVE);
+        try (DocumentInputStream dis = directory.createDocumentInputStream(nativeEntry)) {
+            byte[] data = IOUtils.toByteArray(dis, nativeEntry.getSize(), MAX_RECORD_LENGTH);
+            return new Ole10Native(data, 0);
+        }
     }
-    
+
     /**
      * Creates an instance and fills the fields based on ... the fields
      */
     public Ole10Native(String label, String filename, String command, byte[] data) {
-       setLabel(label);
-       setFileName(filename);
-       setCommand(command);
-       setDataBuffer(data);
-       mode = EncodingMode.parsed;
+        setLabel(label);
+        setFileName(filename);
+        setCommand(command);
+        command2 = command;
+        setDataBuffer(data);
+        mode = EncodingMode.parsed;
     }
-    
+
     /**
      * Creates an instance and fills the fields based on the data in the given buffer.
      *
@@ -122,101 +157,117 @@ public class Ole10Native {
      * @param offset The start offset of the record in the buffer
      * @throws Ole10NativeException on invalid or unexcepted data format
      */
-    public Ole10Native(byte[] data, int offset) throws Ole10NativeException {
-        int ofs = offset; // current offset, initialized to start
-        
-        if (data.length < offset + 2) {
-            throw new Ole10NativeException("data is too small");
-        }
-        
-        totalSize = LittleEndian.getInt(data, ofs);
-        ofs += LittleEndianConsts.INT_SIZE;
-        
-        mode = EncodingMode.unparsed;
-        if (LittleEndian.getShort(data, ofs) == 2) {
-            // some files like equations don't have a valid filename,
-            // but somehow encode the formula right away in the ole10 header
-            if (Character.isISOControl(data[ofs+LittleEndianConsts.SHORT_SIZE])) {
-                mode = EncodingMode.compact;
+    public Ole10Native(final byte[] data, final int offset) throws Ole10NativeException {
+        LittleEndianByteArrayInputStream leis = new LittleEndianByteArrayInputStream(data, offset);
+
+        totalSize = leis.readInt();
+        leis.limit(totalSize + LittleEndianConsts.INT_SIZE);
+
+        leis.mark(0);
+
+        try {
+            flags1 = leis.readShort();
+            if (flags1 == 2) {
+                leis.mark(0);
+                // some files like equations don't have a valid filename,
+                // but somehow encode the formula right away in the ole10 header
+                boolean validFileName = !Character.isISOControl(leis.readByte());
+                leis.reset();
+
+                if (validFileName) {
+                    readParsed(leis);
+                } else {
+                    readCompact(leis);
+                }
             } else {
-                mode = EncodingMode.parsed;
+                leis.reset();
+                readUnparsed(leis);
             }
+        } catch (IOException e) {
+            throw new Ole10NativeException("Invalid Ole10Native", e);
         }
-
-        int dataSize;
-        switch (mode) {
-        case parsed: {
-            flags1 = LittleEndian.getShort(data, ofs);
-            
-            // structured format
-            ofs += LittleEndianConsts.SHORT_SIZE;
-        
-            int len = getStringLength(data, ofs);
-            label = StringUtil.getFromCompressedUnicode(data, ofs, len - 1);
-            ofs += len;
-            
-            len = getStringLength(data, ofs);
-            fileName = StringUtil.getFromCompressedUnicode(data, ofs, len - 1);
-            ofs += len;
-    
-            flags2 = LittleEndian.getShort(data, ofs);
-            ofs += LittleEndianConsts.SHORT_SIZE;
-            
-            unknown1 = LittleEndian.getShort(data, ofs);
-            ofs += LittleEndianConsts.SHORT_SIZE;
-          
-            len = LittleEndian.getInt(data, ofs);
-            ofs += LittleEndianConsts.INT_SIZE;
-            command = StringUtil.getFromCompressedUnicode(data, ofs, len - 1);
-            ofs += len;
-            
-            if (totalSize < ofs) {
-                throw new Ole10NativeException("Invalid Ole10Native");
-            }
-          
-            dataSize = LittleEndian.getInt(data, ofs);
-            ofs += LittleEndianConsts.INT_SIZE;
-          
-            if (dataSize < 0 || totalSize - (ofs - LittleEndianConsts.INT_SIZE) < dataSize) {
-                throw new Ole10NativeException("Invalid Ole10Native");
-            }
-            break;
-        }
-        case compact:
-            flags1 = LittleEndian.getShort(data, ofs);
-            ofs += LittleEndianConsts.SHORT_SIZE;
-            dataSize = totalSize - LittleEndianConsts.SHORT_SIZE;
-            break;
-        default:
-        case unparsed:
-            dataSize = totalSize;
-            break;
-        }
-
-        if ((long)dataSize + (long)ofs > (long)data.length) { //cast to avoid overflow
-            throw new Ole10NativeException("Invalid Ole10Native: declared data length > available data");
-        }
-        dataBuffer = new byte[dataSize];
-        System.arraycopy(data, ofs, dataBuffer, 0, dataSize);
-        ofs += dataSize;
     }
 
-    /*
-     * Helper - determine length of zero terminated string (ASCIIZ).
-     */
-    private static int getStringLength(byte[] data, int ofs) {
-        int len = 0;
-        while (len + ofs < data.length && data[ofs + len] != 0) {
-            len++;
+    private void readParsed(LittleEndianByteArrayInputStream leis) throws Ole10NativeException, IOException {
+        mode = EncodingMode.parsed;
+        label = readAsciiZ(leis);
+        fileName = readAsciiZ(leis);
+        flags2 = leis.readShort();
+        unknown1 = leis.readShort();
+        command = readAsciiLen(leis);
+        dataBuffer = IOUtils.toByteArray(leis, leis.readInt(), MAX_RECORD_LENGTH);
+
+        leis.mark(0);
+        short lowSize = leis.readShort();
+        if (lowSize != 0) {
+            leis.reset();
+            command2 = readUtf16(leis);
+            label2 = readUtf16(leis);
+            fileName2 = readUtf16(leis);
         }
-        len++;
-        return len;
+    }
+
+    private void readCompact(LittleEndianByteArrayInputStream leis) throws IOException {
+        mode = EncodingMode.compact;
+        dataBuffer = IOUtils.toByteArray(leis, totalSize - LittleEndianConsts.SHORT_SIZE, MAX_RECORD_LENGTH);
+    }
+
+    private void readUnparsed(LittleEndianByteArrayInputStream leis) throws IOException {
+        mode = EncodingMode.unparsed;
+        dataBuffer = IOUtils.toByteArray(leis, totalSize, MAX_RECORD_LENGTH);
+    }
+
+    /**
+     * Add the \1OLE marker entry, which is not the Ole10Native entry.
+     * Beside this "\u0001Ole" record there were several other records, e.g. CompObj,
+     * OlePresXXX, but it seems, that they aren't necessary
+     */
+    public static void createOleMarkerEntry(final DirectoryEntry parent) throws IOException {
+        if (!parent.hasEntry(OLE_MARKER_NAME)) {
+            parent.createDocument(OLE_MARKER_NAME, new ByteArrayInputStream(OLE_MARKER_BYTES));
+        }
+    }
+
+    /**
+     * Add the \1OLE marker entry, which is not the Ole10Native entry.
+     * Beside this "\u0001Ole" record there were several other records, e.g. CompObj,
+     * OlePresXXX, but it seems, that they aren't necessary
+     */
+    public static void createOleMarkerEntry(final POIFSFileSystem poifs) throws IOException {
+        createOleMarkerEntry(poifs.getRoot());
+    }
+
+
+    /**
+     * Read zero terminated string (ASCIIZ).
+     */
+    private static String readAsciiZ(LittleEndianInput is) throws Ole10NativeException {
+        // arbitrary sized buffer - not sure how big strings can get in an Ole10 record
+        byte[] buf = new byte[MAX_STRING_LENGTH];
+        for (int i=0; i<buf.length; i++) {
+            if ((buf[i] = is.readByte()) == 0) {
+                return StringUtil.getFromCompressedUnicode(buf, 0, i);
+            }
+        }
+        throw new Ole10NativeException("AsciiZ string was not null terminated after " + MAX_STRING_LENGTH + " bytes - Exiting.");
+    }
+
+    private static String readAsciiLen(LittleEndianByteArrayInputStream leis) throws IOException {
+        int size = leis.readInt();
+        byte[] buf = IOUtils.toByteArray(leis, size, MAX_STRING_LENGTH);
+        return (buf.length == 0) ? "" : StringUtil.getFromCompressedUnicode(buf, 0, size - 1);
+    }
+
+    private static String readUtf16(LittleEndianByteArrayInputStream leis) throws IOException {
+        int size = leis.readInt();
+        byte[] buf = IOUtils.toByteArray(leis, size * 2, MAX_STRING_LENGTH);
+        return StringUtil.getFromUnicodeLE(buf, 0, size);
     }
 
     /**
      * Returns the value of the totalSize field - the total length of the
      * structure is totalSize + 4 (value of this field + size of this field).
-     * 
+     *
      * @return the totalSize
      */
     public int getTotalSize() {
@@ -225,7 +276,7 @@ public class Ole10Native {
 
     /**
      * Returns flags1 - currently unknown - usually 0x0002.
-     * 
+     *
      * @return the flags1
      */
     public short getFlags1() {
@@ -236,7 +287,7 @@ public class Ole10Native {
      * Returns the label field - usually the name of the file (without
      * directory) but probably may be any name specified during
      * packaging/embedding the data.
-     * 
+     *
      * @return the label
      */
     public String getLabel() {
@@ -246,7 +297,7 @@ public class Ole10Native {
     /**
      * Returns the fileName field - usually the name of the file being embedded
      * including the full path.
-     * 
+     *
      * @return the fileName
      */
     public String getFileName() {
@@ -255,7 +306,7 @@ public class Ole10Native {
 
     /**
      * Returns flags2 - currently unknown - mostly 0x0000.
-     * 
+     *
      * @return the flags2
      */
     public short getFlags2() {
@@ -264,7 +315,7 @@ public class Ole10Native {
 
     /**
      * Returns unknown1 field - currently unknown.
-     * 
+     *
      * @return the unknown1
      */
     public short getUnknown1() {
@@ -275,7 +326,7 @@ public class Ole10Native {
      * Returns the command field - usually the name of the file being embedded
      * including the full path, may be a command specified during embedding the
      * file.
-     * 
+     *
      * @return the command
      */
     public String getCommand() {
@@ -286,7 +337,7 @@ public class Ole10Native {
      * Returns the size of the embedded file. If the size is 0 (zero), no data
      * has been embedded. To be sure, that no data has been embedded, check
      * whether {@link #getDataBuffer()} returns <code>null</code>.
-     * 
+     *
      * @return the dataSize
      */
     public int getDataSize() {
@@ -299,20 +350,11 @@ public class Ole10Native {
      * provide information about the data, but the actual data is not included.
      * (So label, filename etc. are available, but this method returns
      * <code>null</code>.)
-     * 
+     *
      * @return the dataBuffer
      */
     public byte[] getDataBuffer() {
         return dataBuffer;
-    }
-
-    /**
-     * Returns the flags3 - currently unknown.
-     * 
-     * @return the flags3
-     */
-    public short getFlags3() {
-        return flags3;
     }
 
     /**
@@ -327,42 +369,55 @@ public class Ole10Native {
 
         @SuppressWarnings("resource")
         LittleEndianOutputStream leosOut = new LittleEndianOutputStream(out);
-        
-        switch (mode) {
-        case parsed: {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            LittleEndianOutputStream leos = new LittleEndianOutputStream(bos);
-            // total size, will be determined later ..
 
-            leos.writeShort(getFlags1());
-            leos.write(getLabel().getBytes(ISO1));
-            leos.write(0);
-            leos.write(getFileName().getBytes(ISO1));
-            leos.write(0);
-            leos.writeShort(getFlags2());
-            leos.writeShort(getUnknown1());
-            leos.writeInt(getCommand().length() + 1);
-            leos.write(getCommand().getBytes(ISO1));
-            leos.write(0);
-            leos.writeInt(getDataSize());
-            leos.write(getDataBuffer());
-            leos.writeShort(getFlags3());
-            leos.close(); // satisfy compiler ...
-            
-            leosOut.writeInt(bos.size()); // total size
-            bos.writeTo(out);
-            break;
-        }
-        case compact:
-            leosOut.writeInt(getDataSize()+LittleEndianConsts.SHORT_SIZE);
-            leosOut.writeShort(getFlags1());
-            out.write(getDataBuffer());
-            break;
-        default:
-        case unparsed:
-            leosOut.writeInt(getDataSize());
-            out.write(getDataBuffer());
-            break;
+        switch (mode) {
+            case parsed: {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                try (LittleEndianOutputStream leos = new LittleEndianOutputStream(bos)) {
+                    // total size, will be determined later ..
+
+                    leos.writeShort(getFlags1());
+                    leos.write(getLabel().getBytes(ISO1));
+                    leos.write(0);
+                    leos.write(getFileName().getBytes(ISO1));
+                    leos.write(0);
+                    leos.writeShort(getFlags2());
+                    leos.writeShort(getUnknown1());
+                    leos.writeInt(getCommand().length() + 1);
+                    leos.write(getCommand().getBytes(ISO1));
+                    leos.write(0);
+                    leos.writeInt(getDataSize());
+                    leos.write(getDataBuffer());
+
+                    if (command2 == null || label2 == null || fileName2 == null) {
+                        leos.writeShort(0);
+                    } else {
+                        leos.writeUInt(command2.length());
+                        leos.write(StringUtil.getToUnicodeLE(command2));
+                        leos.writeUInt(label2.length());
+                        leos.write(StringUtil.getToUnicodeLE(label2));
+                        leos.writeUInt(fileName2.length());
+                        leos.write(StringUtil.getToUnicodeLE(fileName2));
+                    }
+                }
+
+                // total size
+                leosOut.writeInt(bos.size());
+                bos.writeTo(out);
+                break;
+            }
+
+            case compact:
+                leosOut.writeInt(getDataSize() + LittleEndianConsts.SHORT_SIZE);
+                leosOut.writeShort(getFlags1());
+                out.write(getDataBuffer());
+                break;
+
+            default:
+            case unparsed:
+                leosOut.writeInt(getDataSize());
+                out.write(getDataBuffer());
+                break;
         }
 
     }
@@ -373,10 +428,6 @@ public class Ole10Native {
 
     public void setFlags2(short flags2) {
         this.flags2 = flags2;
-    }
-
-    public void setFlags3(short flags3) {
-        this.flags3 = flags3;
     }
 
     public void setLabel(String label) {
@@ -395,7 +446,49 @@ public class Ole10Native {
         this.unknown1 = unknown1;
     }
 
-    public void setDataBuffer(byte dataBuffer[]) {
+    public void setDataBuffer(byte[] dataBuffer) {
         this.dataBuffer = dataBuffer.clone();
+    }
+
+    /**
+     * Get Command string of UTF16 extended OLE packages or {@code null} if not set or not UTF16 extended
+     */
+    public String getCommand2() {
+        return command2;
+    }
+
+    /**
+     * Set Command string for UTF16 extended OLE packages or {@code null} if not set or not UTF16 extended
+     */
+    public void setCommand2(String command2) {
+        this.command2 = command2;
+    }
+
+    /**
+     * Get Label string for UTF16 extended OLE packages or {@code null} if not set or not UTF16 extended
+     */
+    public String getLabel2() {
+        return label2;
+    }
+
+    /**
+     * Set Label string for UTF16 extended OLE packages or {@code null} if not set or not UTF16 extended
+     */
+    public void setLabel2(String label2) {
+        this.label2 = label2;
+    }
+
+    /**
+     * Get filename string for UTF16 extended OLE packages or {@code null} if not set or not UTF16 extended
+     */
+    public String getFileName2() {
+        return fileName2;
+    }
+
+    /**
+     * Set filename string for UTF16 extended OLE packages or {@code null} if not set or not UTF16 extended
+     */
+    public void setFileName2(String fileName2) {
+        this.fileName2 = fileName2;
     }
 }

@@ -49,9 +49,9 @@ public class UserDataServlet extends HttpServlet {
 
     /**
      * The doGet method of the servlet. <br>
-     * 
+     *
      * This method is called when a form has its tag value method equals to get.
-     * 
+     *
      * @param request
      *            the request send by the client to the server
      * @param response
@@ -61,25 +61,33 @@ public class UserDataServlet extends HttpServlet {
      * @throws IOException
      *             if an error occurred
      */
+    @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 	// get Parameter values
 	String usernameParam = request.getParameter(Constants.PARAM_USER_ID);
 	String tsParam = request.getParameter(Constants.PARAM_TIMESTAMP);
-	String hashParam = request.getParameter(Constants.PARAM_HASH);
+	String hash = request.getParameter(Constants.PARAM_HASH);
 
 	// check paramaeters
-	if (usernameParam == null || tsParam == null || hashParam == null) {
+	if (usernameParam == null || tsParam == null || hash == null) {
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing expected parameters");
 	    return;
 	}
 
 	String secretKey = LamsPluginUtil.getServerSecretKey();
 	String serverId = LamsPluginUtil.getServerId();
+	String plaintext = tsParam.toLowerCase() + usernameParam.toLowerCase() + serverId.toLowerCase()
+		+ secretKey.toLowerCase();
+	String parametersHash = null;
+	if (hash.length() == LamsSecurityUtil.SHA1_HEX_LENGTH) {
+	    // for some time support SHA-1 for authentication
+	    parametersHash = LamsSecurityUtil.sha1(plaintext);
+	} else {
+	    parametersHash = LamsSecurityUtil.sha256(plaintext);
+	}
 
-	if (!LamsSecurityUtil.sha1(
-		tsParam.toLowerCase() + usernameParam.toLowerCase() + serverId.toLowerCase() + secretKey.toLowerCase())
-		.equals(hashParam)) {
+	if (!hash.equals(parametersHash)) {
 	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "authentication failed");
 	    return;
 	}
@@ -112,10 +120,10 @@ public class UserDataServlet extends HttpServlet {
 	// <Postcode>,<Country ISO code>,<Day time number>,<Mobile number>,
 	// <Fax number>,<Email>,<Locale>
 	String[] valList = { user.getTitle(), user.getGivenName(), user.getFamilyName(),
-		user.getStreet1() + user.getStreet2(), user.getCity(), user.getState(), user.getZipCode(),
-		countryCode, user.getHomePhone1(), user.getMobilePhone(), user.getBusinessFax(),
-		user.getEmailAddress(), user.getLocale() };
-	
+		user.getStreet1() + user.getStreet2(), user.getCity(), user.getState(), user.getZipCode(), countryCode,
+		user.getHomePhone1(), user.getMobilePhone(), user.getBusinessFax(), user.getEmailAddress(),
+		user.getLocale() };
+
 	PrintWriter out = response.getWriter();
 	out.println(CSVUtil.write(valList));
     }

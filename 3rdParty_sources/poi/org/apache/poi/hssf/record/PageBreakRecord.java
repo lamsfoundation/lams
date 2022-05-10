@@ -20,27 +20,28 @@ package org.apache.poi.hssf.record;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
+import org.apache.poi.common.usermodel.GenericRecord;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * <p>Record that contains the functionality page breaks (horizontal and vertical)</p>
+ * Record that contains the functionality page breaks (horizontal and vertical)<p>
  *
- * <p>The other two classes just specifically set the SIDS for record creation.</p>
+ * The other two classes just specifically set the SIDS for record creation.<p>
  *
- * <p>REFERENCE:  Microsoft Excel SDK page 322 and 420</p>
+ * REFERENCE:  Microsoft Excel SDK page 322 and 420
  *
  * @see HorizontalPageBreakRecord
  * @see VerticalPageBreakRecord
- * @author Danny Mui (dmui at apache dot org)
  */
 public abstract class PageBreakRecord extends StandardRecord {
     private static final int[] EMPTY_INT_ARRAY = { };
 
-    private List<Break> _breaks;
-    private Map<Integer, Break> _breakMap;
+    private final ArrayList<Break> _breaks = new ArrayList<>();
+    private final Map<Integer, Break> _breakMap = new HashMap<>();
 
     /**
      * Since both records store 2byte integers (short), no point in
@@ -49,15 +50,20 @@ public abstract class PageBreakRecord extends StandardRecord {
      * The subs (rows or columns, don't seem to be able to set but excel sets
      * them automatically)
      */
-    public static final class Break {
+    public static final class Break implements GenericRecord {
 
         public static final int ENCODED_SIZE = 6;
-        public int main;
-        public int subFrom;
-        public int subTo;
+        private int main;
+        private int subFrom;
+        private int subTo;
 
-        public Break(int main, int subFrom, int subTo)
-        {
+        public Break(Break other) {
+            main = other.main;
+            subFrom = other.subFrom;
+            subTo = other.subTo;
+        }
+
+        public Break(int main, int subFrom, int subTo) {
             this.main = main;
             this.subFrom = subFrom;
             this.subTo = subTo;
@@ -69,30 +75,52 @@ public abstract class PageBreakRecord extends StandardRecord {
             subTo = in.readUShort();
         }
 
+        public int getMain() {
+            return main;
+        }
+
+        public int getSubFrom() {
+            return subFrom;
+        }
+
+        public int getSubTo() {
+            return subTo;
+        }
+
         public void serialize(LittleEndianOutput out) {
             out.writeShort(main + 1);
             out.writeShort(subFrom);
             out.writeShort(subTo);
         }
-    }
 
-    protected PageBreakRecord() {
-        _breaks = new ArrayList<Break>();
-        _breakMap = new HashMap<Integer, Break>();
-    }
-
-    public PageBreakRecord(RecordInputStream in)
-    {
-        int nBreaks = in.readShort();
-        _breaks = new ArrayList<Break>(nBreaks + 2);
-        _breakMap = new HashMap<Integer, Break>();
-
-        for(int k = 0; k < nBreaks; k++) {
-            Break br = new Break(in);
-            _breaks.add(br);
-            _breakMap.put(Integer.valueOf(br.main), br);
+        @Override
+        public Map<String, Supplier<?>> getGenericProperties() {
+            return GenericRecordUtil.getGenericProperties(
+                "main", () -> main,
+                "subFrom", () -> subFrom,
+                "subTo", () -> subTo
+            );
         }
+    }
 
+    protected PageBreakRecord() {}
+
+    protected PageBreakRecord(PageBreakRecord other) {
+        _breaks.addAll(other._breaks);
+        initMap();
+    }
+
+    protected PageBreakRecord(RecordInputStream in) {
+        final int nBreaks = in.readShort();
+        _breaks.ensureCapacity(nBreaks + 2);
+        for(int k = 0; k < nBreaks; k++) {
+            _breaks.add(new Break(in));
+        }
+        initMap();
+    }
+
+    private void initMap() {
+        _breaks.forEach(br -> _breakMap.put(br.main, br));
     }
 
     public boolean isEmpty() {
@@ -105,8 +133,8 @@ public abstract class PageBreakRecord extends StandardRecord {
     public final void serialize(LittleEndianOutput out) {
         int nBreaks = _breaks.size();
         out.writeShort(nBreaks);
-        for (int i=0; i<nBreaks; i++) {
-            _breaks.get(i).serialize(out);
+        for (Break aBreak : _breaks) {
+            aBreak.serialize(out);
         }
     }
 
@@ -118,40 +146,6 @@ public abstract class PageBreakRecord extends StandardRecord {
         return _breaks.iterator();
     }
 
-    public String toString() {
-        StringBuffer retval = new StringBuffer();
-
-        String label;
-        String mainLabel;
-        String subLabel;
-
-        if (getSid() == HorizontalPageBreakRecord.sid) {
-           label = "HORIZONTALPAGEBREAK";
-           mainLabel = "row";
-           subLabel = "col";
-        } else {
-           label = "VERTICALPAGEBREAK";
-           mainLabel = "column";
-           subLabel = "row";
-        }
-
-        retval.append("["+label+"]").append("\n");
-        retval.append("     .sid        =").append(getSid()).append("\n");
-        retval.append("     .numbreaks =").append(getNumBreaks()).append("\n");
-        Iterator<Break> iterator = getBreaksIterator();
-        for(int k = 0; k < getNumBreaks(); k++)
-        {
-            Break region = iterator.next();
-
-            retval.append("     .").append(mainLabel).append(" (zero-based) =").append(region.main).append("\n");
-            retval.append("     .").append(subLabel).append("From    =").append(region.subFrom).append("\n");
-            retval.append("     .").append(subLabel).append("To      =").append(region.subTo).append("\n");
-        }
-
-        retval.append("["+label+"]").append("\n");
-        return retval.toString();
-    }
-
    /**
     * Adds the page break at the specified parameters
     * @param main Depending on sid, will determine row or column to put page break (zero-based)
@@ -160,7 +154,7 @@ public abstract class PageBreakRecord extends StandardRecord {
     */
     public void addBreak(int main, int subFrom, int subTo) {
 
-        Integer key = Integer.valueOf(main);
+        Integer key = main;
         Break region = _breakMap.get(key);
         if(region == null) {
             region = new Break(main, subFrom, subTo);
@@ -178,7 +172,7 @@ public abstract class PageBreakRecord extends StandardRecord {
      * @param main (zero-based)
      */
     public final void removeBreak(int main) {
-        Integer rowKey = Integer.valueOf(main);
+        Integer rowKey = main;
         Break region = _breakMap.get(rowKey);
         _breaks.remove(region);
         _breakMap.remove(rowKey);
@@ -190,7 +184,7 @@ public abstract class PageBreakRecord extends StandardRecord {
      * @return The Break or null if no break exists at the row/col specified.
      */
     public final Break getBreak(int main) {
-        Integer rowKey = Integer.valueOf(main);
+        Integer rowKey = main;
         return _breakMap.get(rowKey);
     }
 
@@ -205,5 +199,16 @@ public abstract class PageBreakRecord extends StandardRecord {
             result[i] = breakItem.main;
         }
         return result;
+    }
+
+    @Override
+    public abstract PageBreakRecord copy();
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "numBreaks", this::getNumBreaks,
+            "breaks", () -> _breaks
+        );
     }
 }

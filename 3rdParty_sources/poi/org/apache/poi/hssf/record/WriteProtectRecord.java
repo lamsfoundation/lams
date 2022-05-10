@@ -17,20 +17,20 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        Write Protect Record<P>
- * Description:  Indicated that the sheet/workbook is write protected. 
- * REFERENCE:  PG 425 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)<P>
+ * Indicated that the sheet/workbook is write protected.
+ *
  * @version 3.0-pre
  */
 public final class WriteProtectRecord extends StandardRecord {
-    public final static short sid = 0x86;
+    public static final short sid = 0x86;
 
-    public WriteProtectRecord()
-    {
-    }
+    public WriteProtectRecord() {}
 
     /**
      * @param in unused (since this record has no data)
@@ -40,15 +40,6 @@ public final class WriteProtectRecord extends StandardRecord {
         if (in.remaining() == 2) {
             in.readShort();
         }
-    }
-
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[WRITEPROTECT]\n");
-        buffer.append("[/WRITEPROTECT]\n");
-        return buffer.toString();
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -61,5 +52,20 @@ public final class WriteProtectRecord extends StandardRecord {
     public short getSid()
     {
         return sid;
+    }
+
+    @Override
+    public WriteProtectRecord copy() {
+        return new WriteProtectRecord();
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.WRITE_PROTECT;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return null;
     }
 }

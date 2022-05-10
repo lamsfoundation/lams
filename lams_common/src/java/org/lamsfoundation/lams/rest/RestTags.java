@@ -54,14 +54,16 @@ public class RestTags {
     public static String MAXIMUM_RATES = "maximumRates";
     public static String ENABLE_CONFIDENCE_LEVELS = "enableConfidenceLevels";
     public static String CONFIDENCE_LEVELS_ACTIVITY_UIID = "confidenceLevelsActivityUiid";
+    public static String ENABLE_DISCUSSION_SENTIMENT = "enableDiscussionSentiment";
 
     public static String QUESTIONS = "questions";
     public static String QUESTION_TEXT = "questionText";
     public static String QUESTION_TITLE = "questionTitle";
     public static String QUESTION_UUID = "questionUuid";
+    public static String COLLECTION_UID = "collectionUid";
     public static String ANSWERS = "answers";
     public static String ANSWER_TEXT = "answerText";
     public static String DISPLAY_ORDER = "displayOrder";
     public static String CORRECT = "correct";
-
+    public static String LEARNING_OUTCOMES = "learningOutcomes";
 }

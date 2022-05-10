@@ -51,24 +51,29 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.IAuthoringService;
+import org.lamsfoundation.lams.flux.FluxMap;
+import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
+import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.lesson.util.LearnerActivityCompleteFluxItem;
+import org.lamsfoundation.lams.lesson.util.LearnerLessonJoinFluxItem;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
@@ -94,6 +99,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -101,9 +107,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import reactor.core.publisher.Flux;
 
 /**
  * The action servlet that provide all the monitoring functionalities. It interact with the teacher via JSP monitoring
@@ -125,6 +134,8 @@ public class MonitoringController {
     @Autowired
     private ILogEventService logEventService;
     @Autowired
+    private ILearningDesignService learningDesignService;
+    @Autowired
     private ILessonService lessonService;
     @Autowired
     private ISecurityService securityService;
@@ -142,6 +153,22 @@ public class MonitoringController {
     @Autowired
     private IAuthoringService authoringService;
 
+    public MonitoringController() {
+	// bind sinks so a learner finishing an activity also triggers an update in lesson progress
+	FluxRegistry.bindSink(CommonConstants.ACTIVITY_COMPLETED_SINK_NAME, CommonConstants.LESSON_PROGRESSED_SINK_NAME,
+		learnerProgressFluxItem -> ((LearnerActivityCompleteFluxItem) learnerProgressFluxItem).getLessonId());
+	// bind sinks so a learner entering a lesson also triggers an update in lesson progress
+	FluxRegistry.bindSink(CommonConstants.LESSON_JOINED_SINK_NAME, CommonConstants.LESSON_PROGRESSED_SINK_NAME,
+		lessonJoinedFluxItem -> ((LearnerLessonJoinFluxItem) lessonJoinedFluxItem).getLessonId());
+
+	FluxRegistry.initFluxMap(MonitoringConstants.CANVAS_REFRESH_FLUX_NAME,
+		CommonConstants.LESSON_PROGRESSED_SINK_NAME, null, lessonId -> "doRefresh", FluxMap.STANDARD_THROTTLE,
+		FluxMap.STANDARD_TIMEOUT);
+	FluxRegistry.initFluxMap(MonitoringConstants.GRADEBOOK_REFRESH_FLUX_NAME,
+		CommonConstants.LESSON_PROGRESSED_SINK_NAME, null, lessonId -> "doRefresh", FluxMap.STANDARD_THROTTLE,
+		FluxMap.STANDARD_TIMEOUT);
+    }
+
     private Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -156,6 +183,20 @@ public class MonitoringController {
 	String fullURL = WebUtil.convertToFullURL(url);
 	response.sendRedirect(response.encodeRedirectURL(fullURL));
 	return null;
+    }
+
+    @RequestMapping(path = "/getLearnerProgressUpdateFlux", method = RequestMethod.GET, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @ResponseBody
+    public Flux<String> getLearnerProgressUpdateFlux(@RequestParam long lessonId)
+	    throws JsonProcessingException, IOException {
+	return FluxRegistry.get(MonitoringConstants.CANVAS_REFRESH_FLUX_NAME, lessonId);
+    }
+
+    @RequestMapping(path = "/getGradebookUpdateFlux", method = RequestMethod.GET, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @ResponseBody
+    public Flux<String> getGradebookUpdateFlux(@RequestParam long lessonId)
+	    throws JsonProcessingException, IOException {
+	return FluxRegistry.get(MonitoringConstants.GRADEBOOK_REFRESH_FLUX_NAME, lessonId);
     }
 
     /**
@@ -583,7 +624,9 @@ public class MonitoringController {
 	}
 
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	String learnerIDs = request.getParameter(MonitoringConstants.PARAM_LEARNER_ID);
+	String learnerIDsParam = request.getParameter(MonitoringConstants.PARAM_LEARNER_ID);
+	// are we moving selected learners or all of learners who are currently in the activity
+	Long moveAllFromActivityId = WebUtil.readLongParam(request, "moveAllFromActivityID", true);
 	Integer requesterId = getUserId();
 	boolean removeLearnerContent = WebUtil.readBooleanParam(request,
 		MonitoringConstants.PARAM_REMOVE_LEARNER_CONTENT, false);
@@ -596,43 +639,49 @@ public class MonitoringController {
 	String activityDescription = null;
 	if (activityId != null) {
 	    Activity activity = monitoringService.getActivityById(activityId);
-	    activityDescription = new StringBuffer(activity.getTitle()).append(" (").append(activityId).append(")")
-		    .toString();
+	    activityDescription = new StringBuffer(activity.getTitle() == null ? "" : activity.getTitle()).append(" (")
+		    .append(activityId).append(")").toString();
 	}
 
-	StringBuffer learnerIdNameBuf = new StringBuffer();
-	String message = null;
-	User learner = null;
-	boolean oneOrMoreProcessed = false;
-	try {
-	    for (String learnerIDString : learnerIDs.split(",")) {
-		if (oneOrMoreProcessed) {
-		    learnerIdNameBuf.append(", ");
-		} else {
-		    oneOrMoreProcessed = true;
-		}
+	List<User> learners = null;
+	if (moveAllFromActivityId == null) {
+	    learners = new LinkedList<>();
+	    for (String learnerIDString : learnerIDsParam.split(",")) {
 		Integer learnerID = Integer.valueOf(learnerIDString);
-		message = monitoringService.forceCompleteActivitiesByUser(learnerID, requesterId, lessonId, activityId,
-			removeLearnerContent);
+		User learner = (User) userManagementService.findById(User.class, learnerID);
+		learners.add(learner);
+	    }
+	} else {
+	    learners = monitoringService.getLearnersByActivities(new Long[] { moveAllFromActivityId }, null, null,
+		    true);
+	}
 
-		learner = (User) userManagementService.findById(User.class, learnerID);
+	String message = null;
+	StringBuilder learnerIdNameBuilder = new StringBuilder();
+
+	try {
+	    for (User learner : learners) {
+		message = monitoringService.forceCompleteActivitiesByUser(learner.getUserId(), requesterId, lessonId,
+			activityId, removeLearnerContent);
 		learnerService.createCommandForLearner(lessonId, learner.getLogin(), command);
-		learnerIdNameBuf.append(learner.getLogin()).append(" (").append(learnerID).append(")");
+		learnerIdNameBuilder.append(learner.getLogin()).append(" (").append(learner.getUserId()).append(")")
+			.append(", ");
 	    }
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return;
 	}
 
+	String learnerIdNameString = learnerIdNameBuilder.substring(0, learnerIdNameBuilder.length() - 2);
 	if (log.isDebugEnabled()) {
-	    log.debug("Force complete for learners " + learnerIdNameBuf.toString() + " lesson " + lessonId + ". "
+	    log.debug("Force complete for learners " + learnerIdNameString.toString() + " lesson " + lessonId + ". "
 		    + message);
 	}
 
 	// audit log force completion attempt
 	String messageKey = (activityId == null) ? "audit.force.complete.end.lesson" : "audit.force.complete";
 
-	Object[] args = new Object[] { learnerIdNameBuf.toString(), activityDescription, lessonId };
+	Object[] args = new Object[] { learnerIdNameString, activityDescription, lessonId };
 	String auditMessage = messageService.getMessage(messageKey, args);
 	logEventService.logEvent(LogEvent.TYPE_FORCE_COMPLETE, requesterId, null, lessonId, activityId,
 		auditMessage + " " + message);
@@ -706,7 +755,7 @@ public class MonitoringController {
 
 	// find organisation users and whether they participate in the current lesson
 	Map<User, Boolean> users = lessonService.getUsersWithLessonParticipation(lessonId, role, searchPhrase,
-		MonitoringController.USER_PAGE_SIZE, (pageNumber - 1) * MonitoringController.USER_PAGE_SIZE,
+		MonitoringController.USER_PAGE_SIZE, (pageNumber - 1) * MonitoringController.USER_PAGE_SIZE, true,
 		orderAscending);
 
 	// if the result is less then page size, then no need for full check of user count
@@ -959,90 +1008,25 @@ public class MonitoringController {
 		&& userManagementService.isUserInRole(user.getUserID(), organisation.getOrganisationId(), Role.AUTHOR);
 	request.setAttribute("enableLiveEdit", enableLiveEdit);
 	request.setAttribute("lesson", lessonDTO);
-	request.setAttribute("isTBLSequence", isTBLSequence(lessonId));
+	request.setAttribute("isTBLSequence", learningDesignService.isTBLSequence(lessonDTO.getLearningDesignID()));
 
-	return "monitor5";
+	boolean useNewUI = WebUtil.readBooleanParam(request, "newUI", true);
+	return "monitor" + (useNewUI ? "5" : "");
     }
 
-    /**
-     * If learning design contains the following activities Grouping->Assessment->Leader Selection->Scratchie
-     * (potentially with some other gates or activities in the middle), there is a good chance this is a TBL sequence
-     * and all activities must be grouped.
-     */
-    private boolean isTBLSequence(Long lessonId) {
-	Lesson lesson = lessonService.getLesson(lessonId);
-	Long firstActivityId = lesson.getLearningDesign().getFirstActivity().getActivityId();
-	//Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity
-	Activity firstActivity = monitoringService.getActivityById(firstActivityId);
-
-	return verifyNextActivityFitsTbl(firstActivity, "Grouping");
+    @RequestMapping("/displaySequenceTab")
+    public String displaySequenceTab() {
+	return "monitor-sequence-tab";
     }
 
-    /**
-     * Traverses the learning design verifying it follows typical TBL structure
-     *
-     * @param activity
-     * @param anticipatedActivity
-     *            could be either "Grouping", "Assessment", "Leaderselection" or "Scratchie"
-     */
-    private boolean verifyNextActivityFitsTbl(Activity activity, String anticipatedActivity) {
+    @RequestMapping("/displayLearnersTab")
+    public String displayLearnersTab() {
+	return "monitor-learners-tab";
+    }
 
-	Transition transitionFromActivity = activity.getTransitionFrom();
-	//TBL can finish with the Scratchie
-	if (transitionFromActivity == null && !"Scratchie".equals(anticipatedActivity)) {
-	    return false;
-	}
-	// query activity from DB as transition holds only proxied activity object
-	Long nextActivityId = transitionFromActivity == null ? null
-		: transitionFromActivity.getToActivity().getActivityId();
-	Activity nextActivity = nextActivityId == null ? null : monitoringService.getActivityById(nextActivityId);
-
-	switch (anticipatedActivity) {
-	    case "Grouping":
-		//the first activity should be a grouping
-		if (activity instanceof GroupingActivity) {
-		    return verifyNextActivityFitsTbl(nextActivity, "Assessment");
-
-		} else {
-		    return verifyNextActivityFitsTbl(nextActivity, "Grouping");
-		}
-
-	    case "Assessment":
-		//the second activity shall be Assessment
-		if (activity.isToolActivity() && (CommonConstants.TOOL_SIGNATURE_ASSESSMENT
-			.equals(((ToolActivity) activity).getTool().getToolSignature()))) {
-		    return verifyNextActivityFitsTbl(nextActivity, "Leaderselection");
-
-		} else {
-		    return verifyNextActivityFitsTbl(nextActivity, "Assessment");
-		}
-
-	    case "Leaderselection":
-		//the third activity shall be a Leader Selection
-		if (activity.isToolActivity() && CommonConstants.TOOL_SIGNATURE_LEADERSELECTION
-			.equals(((ToolActivity) activity).getTool().getToolSignature())) {
-		    return verifyNextActivityFitsTbl(nextActivity, "Scratchie");
-
-		} else {
-		    return verifyNextActivityFitsTbl(nextActivity, "Leaderselection");
-		}
-
-	    case "Scratchie":
-		//the fourth activity shall be Scratchie
-		if (activity.isToolActivity() && CommonConstants.TOOL_SIGNATURE_SCRATCHIE
-			.equals(((ToolActivity) activity).getTool().getToolSignature())) {
-		    return true;
-
-		} else if (nextActivity == null) {
-		    return false;
-
-		} else {
-		    return verifyNextActivityFitsTbl(nextActivity, "Scratchie");
-		}
-
-	    default:
-		return false;
-	}
+    @RequestMapping("/displayGradebookTab")
+    public String displayGradebookTab() {
+	return "monitor-gradebook-tab";
     }
 
     /**
@@ -1059,7 +1043,7 @@ public class MonitoringController {
 
 	String searchPhrase = request.getParameter("searchPhrase");
 	Integer pageNumber = WebUtil.readIntParam(request, "pageNumber", true);
-	if (pageNumber == null) {
+	if (pageNumber == null || pageNumber < 1) {
 	    pageNumber = 1;
 	}
 	// are the learners sorted by the most completed first?
@@ -1107,7 +1091,7 @@ public class MonitoringController {
 	responseJSON.put("lessonStateID", lesson.getLessonStateId());
 
 	responseJSON.put("lessonName", HtmlUtils.htmlEscape(lesson.getLessonName()));
-	responseJSON.put("lessonDescription", lesson.getLessonDescription());
+	responseJSON.put("lessonInstructions", learningDesign.getDescription());
 
 	Date startOrScheduleDate = lesson.getStartDateTime() == null ? lesson.getScheduleStartDate()
 		: lesson.getStartDateTime();
@@ -1150,20 +1134,23 @@ public class MonitoringController {
 	Integer notCompletedLearnersCount = possibleLearnersCount - completedLearnersCount - startedLearnersCount;
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	ObjectNode notStartedJSON = JsonNodeFactory.instance.objectNode();
-	notStartedJSON.put("name", messageService.getMessage("lesson.chart.not.completed"));
-	notStartedJSON.put("value", Math.round(notCompletedLearnersCount.doubleValue() / possibleLearnersCount * 100));
-	responseJSON.withArray("data").add(notStartedJSON);
-
 	ObjectNode startedJSON = JsonNodeFactory.instance.objectNode();
 	startedJSON.put("name", messageService.getMessage("lesson.chart.started"));
 	startedJSON.put("value", Math.round((startedLearnersCount.doubleValue()) / possibleLearnersCount * 100));
+	startedJSON.put("raw", startedLearnersCount);
 	responseJSON.withArray("data").add(startedJSON);
 
 	ObjectNode completedJSON = JsonNodeFactory.instance.objectNode();
 	completedJSON.put("name", messageService.getMessage("lesson.chart.completed"));
 	completedJSON.put("value", Math.round(completedLearnersCount.doubleValue() / possibleLearnersCount * 100));
+	completedJSON.put("raw", completedLearnersCount);
 	responseJSON.withArray("data").add(completedJSON);
+
+	ObjectNode notStartedJSON = JsonNodeFactory.instance.objectNode();
+	notStartedJSON.put("name", messageService.getMessage("lesson.chart.not.completed"));
+	notStartedJSON.put("value", Math.round(notCompletedLearnersCount.doubleValue() / possibleLearnersCount * 100));
+	notStartedJSON.put("raw", notCompletedLearnersCount);
+	responseJSON.withArray("data").add(notStartedJSON);
 
 	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
@@ -1238,6 +1225,10 @@ public class MonitoringController {
 	    activityJSON.put("uiid", activity.getActivityUIID());
 	    activityJSON.put("title", activity.getTitle());
 	    activityJSON.put("type", activity.getActivityTypeId());
+
+	    if (activity.isGateActivity()) {
+		activityJSON.put("gateOpen", ((GateActivity) activity).getGateOpen());
+	    }
 
 	    Activity parentActivity = activity.getParentActivity();
 	    if (activity.isBranchingActivity()) {
@@ -1391,7 +1382,7 @@ public class MonitoringController {
 	if (isOrganisationSearch) {
 	    // search for Learners in the organisation
 	    Map<User, Boolean> result = lessonService.getUsersWithLessonParticipation(lessonId, Role.LEARNER,
-		    searchPhrase, MonitoringController.USER_PAGE_SIZE, null, true);
+		    searchPhrase, MonitoringController.USER_PAGE_SIZE, null, false, true);
 	    users = result.keySet();
 	} else {
 	    // search for Learners in the lesson
@@ -1403,7 +1394,8 @@ public class MonitoringController {
 	for (User user : users) {
 	    ObjectNode userJSON = JsonNodeFactory.instance.objectNode();
 	    userJSON.put("label", user.getFirstName() + " " + user.getLastName() + " " + user.getLogin());
-	    userJSON.put("value", user.getUserId());
+	    userJSON.put("value",
+		    user.getUserId() + (user.getPortraitUuid() == null ? "" : "_" + user.getPortraitUuid().toString()));
 
 	    responseJSON.add(userJSON);
 	}

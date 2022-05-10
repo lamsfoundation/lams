@@ -36,7 +36,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-	<script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 </lams:head>
 <body class="stripes">
 	
@@ -127,7 +127,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  var modal = $(this);
 			  modal.find('.modal-body').html('<fmt:message key="label.group.confirm.areyoujoining"/>:&nbsp;<strong>' + groupName + '</strong>?')
 			  modal.find('#submitter').click(function(){
-				$(this).parent().children('button').button('loading');
+				$(this).parent().children('button').each(function(){
+					$(this).prop('disabled', true).html($(this).data('loadingText'));
+				});
 				document.getElementById(url).submit();
 			  });
 		})

@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,13 +20,14 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -60,14 +61,18 @@ import org.springframework.util.StringUtils;
 public class InterfaceBasedMBeanInfoAssembler extends AbstractConfigurableMBeanInfoAssembler
 		implements BeanClassLoaderAware, InitializingBean {
 
+	@Nullable
 	private Class<?>[] managedInterfaces;
 
-	/** Mappings of bean keys to an array of classes */
+	/** Mappings of bean keys to an array of classes. */
+	@Nullable
 	private Properties interfaceMappings;
 
+	@Nullable
 	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
-	/** Mappings of bean keys to an array of classes */
+	/** Mappings of bean keys to an array of classes. */
+	@Nullable
 	private Map<String, Class<?>[]> resolvedInterfaceMappings;
 
 
@@ -79,7 +84,7 @@ public class InterfaceBasedMBeanInfoAssembler extends AbstractConfigurableMBeanI
 	 * Each entry <strong>MUST</strong> be an interface.
 	 * @see #setInterfaceMappings
 	 */
-	public void setManagedInterfaces(Class<?>... managedInterfaces) {
+	public void setManagedInterfaces(@Nullable Class<?>... managedInterfaces) {
 		if (managedInterfaces != null) {
 			for (Class<?> ifc : managedInterfaces) {
 				if (!ifc.isInterface()) {
@@ -98,12 +103,12 @@ public class InterfaceBasedMBeanInfoAssembler extends AbstractConfigurableMBeanI
 	 * will check these mappings first.
 	 * @param mappings the mappings of bean keys to interface names
 	 */
-	public void setInterfaceMappings(Properties mappings) {
+	public void setInterfaceMappings(@Nullable Properties mappings) {
 		this.interfaceMappings = mappings;
 	}
 
 	@Override
-	public void setBeanClassLoader(ClassLoader beanClassLoader) {
+	public void setBeanClassLoader(@Nullable ClassLoader beanClassLoader) {
 		this.beanClassLoader = beanClassLoader;
 	}
 
@@ -121,7 +126,7 @@ public class InterfaceBasedMBeanInfoAssembler extends AbstractConfigurableMBeanI
 	 * @return the resolved interface mappings (with Class objects as values)
 	 */
 	private Map<String, Class<?>[]> resolveInterfaceMappings(Properties mappings) {
-		Map<String, Class<?>[]> resolvedMappings = new HashMap<String, Class<?>[]>(mappings.size());
+		Map<String, Class<?>[]> resolvedMappings = CollectionUtils.newHashMap(mappings.size());
 		for (Enumeration<?> en = mappings.propertyNames(); en.hasMoreElements();) {
 			String beanKey = (String) en.nextElement();
 			String[] classNames = StringUtils.commaDelimitedListToStringArray(mappings.getProperty(beanKey));
@@ -202,7 +207,7 @@ public class InterfaceBasedMBeanInfoAssembler extends AbstractConfigurableMBeanI
 	 * configured interfaces and is public, otherwise {@code false}.
 	 */
 	private boolean isPublicInInterface(Method method, String beanKey) {
-		return ((method.getModifiers() & Modifier.PUBLIC) > 0) && isDeclaredInInterface(method, beanKey);
+		return Modifier.isPublic(method.getModifiers()) && isDeclaredInInterface(method, beanKey);
 	}
 
 	/**
@@ -226,6 +231,7 @@ public class InterfaceBasedMBeanInfoAssembler extends AbstractConfigurableMBeanI
 		for (Class<?> ifc : ifaces) {
 			for (Method ifcMethod : ifc.getMethods()) {
 				if (ifcMethod.getName().equals(method.getName()) &&
+						ifcMethod.getParameterCount() == method.getParameterCount() &&
 						Arrays.equals(ifcMethod.getParameterTypes(), method.getParameterTypes())) {
 					return true;
 				}

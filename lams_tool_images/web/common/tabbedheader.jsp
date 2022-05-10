@@ -11,4 +11,4 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
-<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/imageGallerycommon.js"></script>
+<lams:JSImport src="includes/javascript/imageGallerycommon.js" relative="true" />

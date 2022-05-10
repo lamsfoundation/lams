@@ -30,13 +30,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -57,11 +54,9 @@ import org.lamsfoundation.lams.tool.forum.model.ForumToolSession;
 import org.lamsfoundation.lams.tool.forum.model.ForumUser;
 import org.lamsfoundation.lams.tool.forum.model.Message;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
-import org.lamsfoundation.lams.tool.forum.util.MessageComparator;
 import org.lamsfoundation.lams.tool.forum.util.MessageDtoComparator;
 import org.lamsfoundation.lams.tool.forum.util.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
-import org.lamsfoundation.lams.tool.forum.web.forms.ForumPedagogicalPlannerForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
@@ -778,116 +773,5 @@ public class AuthoringController {
      */
     private List getDeletedForumConditionList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, ForumConstants.ATTR_DELETED_CONDITION_LIST);
-    }
-
-    @RequestMapping("/initPedagogicalPlannerForm")
-    public String initPedagogicalPlannerForm(@ModelAttribute ForumPedagogicalPlannerForm plannerForm,
-	    HttpServletRequest request) {
-
-	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	Forum forum = forumService.getForumByContentId(toolContentID);
-	plannerForm.fillForm(forum);
-	String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	plannerForm.setContentFolderID(contentFolderId);
-	return "jsps/authoring/pedagogicalPlannerForm";
-
-    }
-
-    @RequestMapping("/saveOrUpdatePedagogicalPlannerForm")
-    public String saveOrUpdatePedagogicalPlannerForm(@ModelAttribute ForumPedagogicalPlannerForm plannerForm,
-	    HttpServletRequest request) throws IOException {
-
-	MultiValueMap<String, String> errorMap = plannerForm.validate();
-	if (errorMap.isEmpty()) {
-	    Forum forum = forumService.getForumByContentId(plannerForm.getToolContentID());
-	    forum.setInstructions(plannerForm.getInstructions());
-
-	    int topicIndex = 0;
-	    int sequenceId = 1;
-	    Date currentDate = new Date();
-	    String topic = null;
-	    String subject = null;
-	    Message message = null;
-	    List<Message> newTopics = new LinkedList<>();
-	    Set<Message> forumTopics = new TreeSet<>(new MessageComparator());
-	    for (Message existingMessage : forum.getMessages()) {
-		if (existingMessage.getIsAuthored() && existingMessage.getToolSession() == null) {
-		    forumTopics.add(existingMessage);
-		}
-	    }
-	    Iterator<Message> forumTopicIterator = forumTopics.iterator();
-	    Pattern regexPattern = Pattern.compile(ForumConstants.WORD_REGEX, ForumConstants.PATTERN_MATCHING_OPTIONS);
-
-	    Matcher matcher = null;
-	    HttpSession ss = SessionManager.getSession();
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    ForumUser forumUser = forumService.getUserByID(new Long(user.getUserID().intValue()));
-
-	    do {
-		topic = plannerForm.getTopic(topicIndex);
-		subject = WebUtil.removeHTMLtags(topic);
-
-		// Getting 3 first words from body and making the subject out of it
-		if (StringUtils.isBlank(subject)) {
-		    subject = null;
-		} else {
-		    subject = subject.trim();
-		    matcher = regexPattern.matcher(subject);
-		    int currentEnd = subject.length();
-		    for (short wordIndex = 0; wordIndex < ForumConstants.SUBJECT_WORD_COUNT; wordIndex++) {
-			if (matcher.find()) {
-			    currentEnd = matcher.end();
-			} else {
-			    break;
-			}
-		    }
-		    subject = subject.substring(0, currentEnd).concat("...");
-		}
-
-		if (StringUtils.isEmpty(subject)) {
-		    plannerForm.removeTopic(topicIndex);
-		} else if (forumTopicIterator.hasNext()) {
-		    message = forumTopicIterator.next();
-		    message.setUpdated(currentDate);
-		    message.setSubject(subject);
-		    message.setBody(topic);
-		    message.setSequenceId(sequenceId++);
-		} else {
-		    message = new Message();
-		    message.setIsAuthored(true);
-		    message.setCreated(currentDate);
-		    message.setUpdated(currentDate);
-		    message.setLastReplyDate(currentDate);
-		    message.setCreatedBy(forumUser);
-		    message.setModifiedBy(forumUser);
-		    message.setSubject(subject);
-		    message.setBody(topic);
-		    message.setSequenceId(sequenceId++);
-
-		    newTopics.add(message);
-		    message.setForum(forum);
-		    forumService.createRootTopic(forum.getUid(), null, message);
-		}
-		topicIndex++;
-	    } while (topic != null);
-
-	    while (forumTopicIterator.hasNext()) {
-		message = forumTopicIterator.next();
-		forumTopicIterator.remove();
-		forumService.deleteTopic(message.getUid());
-	    }
-	    forum.getMessages().addAll(newTopics);
-	    forumService.updateForum(forum);
-	} else {
-	    request.setAttribute("errorMap", errorMap);
-	}
-	return "jsps/authoring/pedagogicalPlannerForm";
-    }
-
-    @RequestMapping("/createPedagogicalPlannerTopic")
-    public String createPedagogicalPlannerTopic(@ModelAttribute ForumPedagogicalPlannerForm plannerForm,
-	    HttpServletRequest request) throws IOException, ServletException, PersistenceException {
-	plannerForm.setTopic(plannerForm.getTopicCount().intValue(), "");
-	return "jsps/authoring/pedagogicalPlannerForm";
     }
 }

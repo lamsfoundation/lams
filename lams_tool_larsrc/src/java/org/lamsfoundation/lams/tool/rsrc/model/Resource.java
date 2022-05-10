@@ -76,10 +76,6 @@ public class Resource implements Cloneable, Serializable {
     private String instructions;
 
     // advance
-
-    @Column(name = "allow_auto_run")
-    private boolean runAuto;
-
     @Column(name = "mini_view_resource_number")
     private int miniViewResourceNumber;
 
@@ -100,9 +96,6 @@ public class Resource implements Cloneable, Serializable {
 
     @Column(name = "assigment_submit_notify")
     private boolean notifyTeachersOnAssigmentSumbit;
-
-    @Column(name = "file_upload_notify")
-    private boolean notifyTeachersOnFileUpload;
 
     @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;
@@ -131,6 +124,7 @@ public class Resource implements Cloneable, Serializable {
     @OneToMany(cascade = CascadeType.ALL)
     @OrderBy("order_id ASC")
     @JoinColumn(name = "tool_content_id", referencedColumnName = "content_id")
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<LearnerItemRatingCriteria> ratingCriterias = new HashSet<>();
 
     // *************** NON Persist Fields ********************
@@ -391,18 +385,8 @@ public class Resource implements Cloneable, Serializable {
 	miniViewResourceNumber = minViewResourceNumber;
     }
 
-    public boolean isRunAuto() {
-	return runAuto;
-    }
-
-    public void setRunAuto(boolean runAuto) {
-	this.runAuto = runAuto;
-    }
-
     /**
      * For display use
-     *
-     * @return
      */
     public String getMiniViewNumberStr() {
 	return miniViewNumberStr;
@@ -436,14 +420,6 @@ public class Resource implements Cloneable, Serializable {
 	this.notifyTeachersOnAssigmentSumbit = notifyTeachersOnAssigmentSumbit;
     }
 
-    public boolean isNotifyTeachersOnFileUpload() {
-	return notifyTeachersOnFileUpload;
-    }
-
-    public void setNotifyTeachersOnFileUpload(boolean notifyTeachersOnFileUpload) {
-	this.notifyTeachersOnFileUpload = notifyTeachersOnFileUpload;
-    }
-
     public Set<LearnerItemRatingCriteria> getRatingCriterias() {
 	return ratingCriterias;
     }
@@ -451,5 +427,4 @@ public class Resource implements Cloneable, Serializable {
     public void setRatingCriterias(Set<LearnerItemRatingCriteria> ratingCriterias) {
 	this.ratingCriterias = ratingCriterias;
     }
-
 }

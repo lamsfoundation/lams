@@ -17,9 +17,13 @@
 
 package org.apache.poi.hssf.record.chart;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
@@ -33,6 +37,14 @@ public final class ChartEndObjectRecord extends StandardRecord {
 	private short iObjectKind;
 	private byte[] reserved;
 
+	public ChartEndObjectRecord(ChartEndObjectRecord other) {
+		super(other);
+		rt = other.rt;
+		grbitFrt = other.grbitFrt;
+		iObjectKind = other.iObjectKind;
+		reserved = (other.reserved == null) ? null : other.reserved.clone();
+	}
+
 	public ChartEndObjectRecord(RecordInputStream in) {
 		rt = in.readShort();
 		grbitFrt = in.readShort();
@@ -45,7 +57,7 @@ public final class ChartEndObjectRecord extends StandardRecord {
 		if(in.available() == 0) {
 		   // They've gone missing...
 		} else {
-		   // Read the reserved bytes 
+		   // Read the reserved bytes
 		   in.readFully(reserved);
 		}
 	}
@@ -70,15 +82,22 @@ public final class ChartEndObjectRecord extends StandardRecord {
 	}
 
 	@Override
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
+	public ChartEndObjectRecord copy() {
+		return new ChartEndObjectRecord(this);
+	}
 
-		buffer.append("[ENDOBJECT]\n");
-		buffer.append("    .rt         =").append(HexDump.shortToHex(rt)).append('\n');
-		buffer.append("    .grbitFrt   =").append(HexDump.shortToHex(grbitFrt)).append('\n');
-		buffer.append("    .iObjectKind=").append(HexDump.shortToHex(iObjectKind)).append('\n');
-		buffer.append("    .reserved   =").append(HexDump.toHex(reserved)).append('\n');
-		buffer.append("[/ENDOBJECT]\n");
-		return buffer.toString();
+	@Override
+	public HSSFRecordTypes getGenericRecordType() {
+		return HSSFRecordTypes.CHART_END_OBJECT;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"rt", () -> rt,
+			"grbitFrt", () -> grbitFrt,
+			"iObjectKind", () -> iObjectKind,
+			"reserved", () -> reserved
+		);
 	}
 }

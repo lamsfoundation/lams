@@ -17,23 +17,30 @@
 
 package org.apache.poi.hssf.record;
 
+import static org.apache.poi.util.GenericRecordUtil.getBitsAsString;
+
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.util.BitField;
 import org.apache.poi.util.BitFieldFactory;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        USESELFS (0x0160) - Use Natural Language Formulas Flag <p>
- * Description:  Tells the GUI if this was written by something that can use
- *               "natural language" formulas. HSSF can't.<p>
- * REFERENCE:  PG 420 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)
+ * Tells the GUI if this was written by something that can use "natural language" formulas. HSSF can't.
  */
 public final class UseSelFSRecord extends StandardRecord {
-    public final static short sid   = 0x0160;
+    public static final short sid   = 0x0160;
 
     private static final BitField useNaturalLanguageFormulasFlag = BitFieldFactory.getInstance(0x0001);
 
     private int _options;
+
+    private UseSelFSRecord(UseSelFSRecord other) {
+        super(other);
+        _options = other._options;
+    }
 
     private UseSelFSRecord(int options) {
         _options = options;
@@ -46,15 +53,6 @@ public final class UseSelFSRecord extends StandardRecord {
     public UseSelFSRecord(boolean b) {
         this(0);
         _options = useNaturalLanguageFormulasFlag.setBoolean(_options, b);
-    }
-
-    public String toString() {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[USESELFS]\n");
-        buffer.append("    .options = ").append(HexDump.shortToHex(_options)).append("\n");
-        buffer.append("[/USESELFS]\n");
-        return buffer.toString();
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -70,7 +68,18 @@ public final class UseSelFSRecord extends StandardRecord {
     }
 
     @Override
-    public Object clone() {
-        return new UseSelFSRecord(_options);
+    public UseSelFSRecord copy() {
+        return new UseSelFSRecord(this);
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.USE_SEL_FS;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties("options", getBitsAsString(() -> _options,
+             new BitField[]{useNaturalLanguageFormulasFlag}, new String[]{"USE_NATURAL_LANGUAGE_FORMULAS_FLAG"}));
     }
 }

@@ -21,6 +21,38 @@
 		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
 		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
 	};
+
+
+	function showChangeLeaderModal(toolSessionId) {
+		$('#change-leader-modals').empty()
+		.load('<c:url value="/monitoring/displayChangeLeaderForGroupDialogFromActivity.do" />',{
+			toolSessionID : toolSessionId
+		});
+	}
+
+	function onChangeLeaderCallback(response, leaderUserId, toolSessionId){
+        if (response.isSuccessful) {
+            $.ajax({
+    			'url' : '<c:url value="/monitoring/changeLeaderForGroup.do"/>',
+    			'type': 'post',
+    			'cache' : 'false',
+    			'data': {
+    				'toolSessionID' : toolSessionId,
+    				'leaderUserId' : leaderUserId,
+    				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
+    			},
+    			success : function(){
+    				alert("<fmt:message key='label.monitoring.leader.successfully.changed'/>");
+    			},
+    			error : function(){
+    				alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+        		}
+            });
+        	
+		} else {
+			alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+		}
+	}
 </script>
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
  
@@ -52,3 +84,4 @@
  
 <%@include file="daterestriction.jsp"%>
  
+<div id="change-leader-modals"></div>

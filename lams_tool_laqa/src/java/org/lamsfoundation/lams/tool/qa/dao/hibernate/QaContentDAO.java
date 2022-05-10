@@ -43,7 +43,7 @@ public class QaContentDAO extends LAMSBaseDAO implements IQaContentDAO {
     public QaContent getQaByContentId(long qaId) {
 	String query = "from QaContent as qa where qa.qaContentId = :qaContentId";
 	List<?> list = getSessionFactory().getCurrentSession().createQuery(query).setParameter("qaContentId", qaId)
-		.list();
+		.setCacheable(true).list();
 
 	if (list != null && list.size() > 0) {
 	    QaContent qa = (QaContent) list.get(0);

@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemVisitLog;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -100,10 +101,11 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
     @Override
     @SuppressWarnings("unchecked")
     public List<ResourceItemVisitLog> getResourceItemLogBySession(Long sessionId, Long itemUid) {
-	return (List<ResourceItemVisitLog>) doFind(FIND_BY_ITEM_BYSESSION, new Object[] { sessionId, itemUid });
+	return doFind(FIND_BY_ITEM_BYSESSION, new Object[] { sessionId, itemUid });
     }
 
-    private static String LOAD_USERS_ORDERED_BY_NAME_SELECT = " SELECT user.user_id, CONCAT(user.last_name, ' ', user.first_name), visit.complete_date, visit.access_date ";
+    private static String LOAD_USERS_ORDERED_BY_NAME_SELECT = " SELECT user.user_id, CONCAT(user.first_name, ' ', user.last_name, ' (', user.login_name, ')'), "
+	    + "visit.complete_date, visit.access_date ";
     private static String LOAD_USERS_ORDERED_BY_NAME_FROM = " FROM tl_larsrc11_item_log visit "
 	    + " JOIN tl_larsrc11_user user ON visit.user_uid = user.uid "
 	    + "	AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%'))";
@@ -142,7 +144,8 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
 		Date completeDate = element[2] == null ? null : new Date(((Timestamp) element[2]).getTime());
 		Date accessDate = element[3] == null ? null : new Date(((Timestamp) element[3]).getTime());
 		Date timeTaken = (element[2] == null || element[3] == null) ? null
-			: new Date(completeDate.getTime() - accessDate.getTime());
+			: DateUtil.convertToUTC(new Date(completeDate.getTime() - accessDate.getTime()));
+
 		String portraitId = (String) element[4];
 
 		VisitLogDTO visitLogDto = new VisitLogDTO();

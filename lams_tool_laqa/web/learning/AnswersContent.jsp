@@ -121,7 +121,16 @@
 			var interval = "30000"; // = 30 seconds
 			window.setInterval(learnerAutosave, interval);
 			
-			function learnerAutosave(){
+			function learnerAutosave(isCommand){
+                // isCommand means that the autosave was triggered by force complete or another command websocket message
+			    // in this case do not check multiple tabs open, just autosave
+			    if (!isCommand) {
+				  let shouldAutosave = preventLearnerAutosaveFromMultipleTabs(interval);
+				  if (!shouldAutosave) {
+					return;
+				  }
+			    }
+			    
 				//fire onchange event for textareas/ckeditors
 				if (${generalLearnerFlowDTO.allowRichEditor}) {
 				    for ( instance in CKEDITOR.instances ) {
@@ -189,6 +198,16 @@
 				
 			});
 
+			<%-- Connect to command websocket only if it is learner UI --%>
+			<c:if test="${isLeadershipEnabled and mode == 'learner'}">
+				// command websocket stuff for refreshing
+				// trigger is an unique ID of page and action that command websocket code in Page.tag recognises
+				commandWebsocketHookTrigger = 'qa-leader-change-refresh-${generalLearnerFlowDTO.toolSessionID}';
+				// if the trigger is recognised, the following action occurs
+				commandWebsocketHook = function() {
+					location.reload();
+				};
+			</c:if>
 		});
 		
 	</script>
@@ -252,7 +271,7 @@
 				<c:if test="${generalLearnerFlowDTO.initialScreen != 'true'}">
 					<p>
 						<fmt:message key="label.questions.remaining" />&nbsp;
-						<c:out value="${generalLearnerFlowDTO.remainingQuestionCount}" />
+						<c:out value="${generalLearnerFlowDTO.remainingQuestionCount}" />&nbsp;
 					</p>
 				</c:if>
 
@@ -261,9 +280,10 @@
 
 			<c:otherwise>
 				<c:if test="${generalLearnerFlowDTO.totalQuestionCount != 1}">
-					<fmt:message key="label.feedback.combined" /> &nbsp <c:out
-						value="${generalLearnerFlowDTO.remainingQuestionCount}" />
-					<fmt:message key="label.questions.simple" />
+					<p style="font-size: smaller;">
+					<fmt:message key="label.feedback.combined" />&nbsp;<c:out
+						value="${generalLearnerFlowDTO.remainingQuestionCount}" />&nbsp;<fmt:message key="label.questions.simple" />
+					</p>
 				</c:if>
 
 				<jsp:include page="/learning/CombinedAnswersContent.jsp" />

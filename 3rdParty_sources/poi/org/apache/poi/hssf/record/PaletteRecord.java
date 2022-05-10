@@ -18,62 +18,59 @@
 package org.apache.poi.hssf.record;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Supplier;
 
+import org.apache.poi.common.usermodel.GenericRecord;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * PaletteRecord (0x0092) - Supports custom palettes.
- * @author Andrew C. Oliver (acoliver at apache dot org)
- * @author Brian Sanders (bsanders at risklabs dot com) - custom palette editing
- *
+ * Supports custom palettes.
  */
 public final class PaletteRecord extends StandardRecord {
-    public final static short sid = 0x0092;
+    public static final short sid = 0x0092;
     /** The standard size of an XLS palette */
-    public final static byte STANDARD_PALETTE_SIZE = (byte) 56;
+    public static final byte STANDARD_PALETTE_SIZE = (byte) 56;
     /** The byte index of the first color */
-    public final static short FIRST_COLOR_INDEX = (short) 0x8;
+    public static final short FIRST_COLOR_INDEX = (short) 0x8;
 
-    private final List<PColor>  _colors;
+    private static final int[] DEFAULT_COLORS = {
+        0x000000, 0xFFFFFF, 0xFF0000, 0x00FF00, 0x0000FF, 0xFFFF00, 0xFF00FF, 0x00FFFF,
+        0x800000, 0x008000, 0x000080, 0x808000, 0x800080, 0x008080, 0xC0C0C0, 0x808080,
+        0x9999FF, 0x993366, 0xFFFFCC, 0xCCFFFF, 0x660066, 0xFF8080, 0x0066CC, 0xCCCCFF,
+        0x000080, 0xFF00FF, 0xFFFF00, 0x00FFFF, 0x800080, 0x800000, 0x008080, 0x0000FF,
+        0x00CCFF, 0xCCFFFF, 0xCCFFCC, 0xFFFF99, 0x99CCFF, 0xFF99CC, 0xCC99FF, 0xFFCC99,
+        0x3366FF, 0x33CCCC, 0x99CC00, 0xFFCC00, 0xFF9900, 0xFF6600, 0x666699, 0x969696,
+        0x003366, 0x339966, 0x003300, 0x333300, 0x993300, 0x993366, 0x333399, 0x333333
+    };
+
+    private final ArrayList<PColor> _colors = new ArrayList<>(100);
 
     public PaletteRecord() {
-      PColor[] defaultPalette = createDefaultPalette();
-      _colors    = new ArrayList<PColor>(defaultPalette.length);
-      for (PColor element : defaultPalette) {
-        _colors.add(element);
-      }
+        Arrays.stream(DEFAULT_COLORS).mapToObj(PColor::new).forEach(_colors::add);
+    }
+
+    public PaletteRecord(PaletteRecord other) {
+        super(other);
+        _colors.ensureCapacity(other._colors.size());
+        other._colors.stream().map(PColor::new).forEach(_colors::add);
     }
 
     public PaletteRecord(RecordInputStream in) {
        int field_1_numcolors = in.readShort();
-       _colors    = new ArrayList<PColor>(field_1_numcolors);
+       _colors.ensureCapacity(field_1_numcolors);
        for (int k = 0; k < field_1_numcolors; k++) {
            _colors.add(new PColor(in));
        }
     }
 
     @Override
-    public String toString() {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[PALETTE]\n");
-        buffer.append("  numcolors     = ").append(_colors.size()).append('\n');
-        for (int i = 0; i < _colors.size(); i++) {
-            PColor c = _colors.get(i);
-            buffer.append("* colornum      = ").append(i).append('\n');
-            buffer.append(c);
-            buffer.append("/*colornum      = ").append(i).append('\n');
-        }
-        buffer.append("[/PALETTE]\n");
-        return buffer.toString();
-    }
-
-    @Override
     public void serialize(LittleEndianOutput out) {
         out.writeShort(_colors.size());
-        for (int i = 0; i < _colors.size(); i++) {
-          _colors.get(i).serialize(out);
+        for (PColor color : _colors) {
+            color.serialize(out);
         }
     }
 
@@ -89,7 +86,7 @@ public final class PaletteRecord extends StandardRecord {
 
     /**
      * Returns the color value at a given index
-     * 
+     *
      * @param byteIndex palette index, must be &gt;= 0x8
      *
      * @return the RGB triplet for the color, or <code>null</code> if the specified index
@@ -130,102 +127,60 @@ public final class PaletteRecord extends StandardRecord {
         _colors.set(i, custColor);
     }
 
-    /**
-     * Creates the default palette as PaletteRecord binary data
-     */
-    private static PColor[] createDefaultPalette()
-    {
-        return new PColor[] {
-                pc(0, 0, 0),
-                pc(255, 255, 255),
-                pc(255, 0, 0),
-                pc(0, 255, 0),
-                pc(0, 0, 255),
-                pc(255, 255, 0),
-                pc(255, 0, 255),
-                pc(0, 255, 255),
-                pc(128, 0, 0),
-                pc(0, 128, 0),
-                pc(0, 0, 128),
-                pc(128, 128, 0),
-                pc(128, 0, 128),
-                pc(0, 128, 128),
-                pc(192, 192, 192),
-                pc(128, 128, 128),
-                pc(153, 153, 255),
-                pc(153, 51, 102),
-                pc(255, 255, 204),
-                pc(204, 255, 255),
-                pc(102, 0, 102),
-                pc(255, 128, 128),
-                pc(0, 102, 204),
-                pc(204, 204, 255),
-                pc(0, 0, 128),
-                pc(255, 0, 255),
-                pc(255, 255, 0),
-                pc(0, 255, 255),
-                pc(128, 0, 128),
-                pc(128, 0, 0),
-                pc(0, 128, 128),
-                pc(0, 0, 255),
-                pc(0, 204, 255),
-                pc(204, 255, 255),
-                pc(204, 255, 204),
-                pc(255, 255, 153),
-                pc(153, 204, 255),
-                pc(255, 153, 204),
-                pc(204, 153, 255),
-                pc(255, 204, 153),
-                pc(51, 102, 255),
-                pc(51, 204, 204),
-                pc(153, 204, 0),
-                pc(255, 204, 0),
-                pc(255, 153, 0),
-                pc(255, 102, 0),
-                pc(102, 102, 153),
-                pc(150, 150, 150),
-                pc(0, 51, 102),
-                pc(51, 153, 102),
-                pc(0, 51, 0),
-                pc(51, 51, 0),
-                pc(153, 51, 0),
-                pc(153, 51, 102),
-                pc(51, 51, 153),
-                pc(51, 51, 51),
-        };
+    @Override
+    public PaletteRecord copy() {
+        return new PaletteRecord(this);
     }
 
-    private static PColor pc(int r, int g, int b) {
-        return new PColor(r, g, b);
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.PALETTE;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties("colors", () -> _colors);
     }
 
     /**
      * PColor - element in the list of colors
      */
-    private static final class PColor {
+    private static final class PColor implements GenericRecord {
         public static final short ENCODED_SIZE = 4;
         private final int _red;
         private final int _green;
         private final int _blue;
 
-        public PColor(int red, int green, int blue) {
+        PColor(int rgb) {
+            _red = (rgb >>> 16) & 0xFF;
+            _green = (rgb >>> 8) & 0xFF;
+            _blue = rgb & 0xFF;
+        }
+
+        PColor(int red, int green, int blue) {
             _red = red;
             _green = green;
             _blue = blue;
         }
 
-        public byte[] getTriplet() {
-            return new byte[] { (byte) _red, (byte) _green, (byte) _blue };
+        PColor(PColor other) {
+            _red = other._red;
+            _green = other._green;
+            _blue = other._blue;
         }
 
-        public PColor(RecordInputStream in) {
+        PColor(RecordInputStream in) {
             _red = in.readByte();
             _green = in.readByte();
             _blue = in.readByte();
             in.readByte(); // unused
         }
 
-        public void serialize(LittleEndianOutput out) {
+        byte[] getTriplet() {
+            return new byte[] { (byte) _red, (byte) _green, (byte) _blue };
+        }
+
+        void serialize(LittleEndianOutput out) {
             out.writeByte(_red);
             out.writeByte(_green);
             out.writeByte(_blue);
@@ -233,12 +188,12 @@ public final class PaletteRecord extends StandardRecord {
         }
 
         @Override
-        public String toString() {
-            StringBuffer buffer = new StringBuffer();
-            buffer.append("  red   = ").append(_red & 0xff).append('\n');
-            buffer.append("  green = ").append(_green & 0xff).append('\n');
-            buffer.append("  blue  = ").append(_blue & 0xff).append('\n');
-            return buffer.toString();
+        public Map<String, Supplier<?>> getGenericProperties() {
+            return GenericRecordUtil.getGenericProperties(
+                "red", () -> _red & 0xFF,
+                "green", () -> _green & 0xFF,
+                "blue", () -> _blue & 0xFF
+            );
         }
     }
 }

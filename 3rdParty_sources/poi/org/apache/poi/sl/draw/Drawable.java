@@ -28,11 +28,11 @@ public interface Drawable {
         protected DrawableHint(int id) {
             super(id);
         }
-        
+
         public boolean isCompatibleValue(Object val) {
             return true;
         }
-        
+
         public String toString() {
             switch (intKey()) {
             case 1: return "DRAW_FACTORY";
@@ -46,11 +46,15 @@ public interface Drawable {
             case 9: return "FONT_MAP";
             case 10: return "GSAVE";
             case 11: return "GRESTORE";
+            case 12: return "CURRENT_SLIDE";
+            case 13: return "BUFFERED_IMAGE";
+            case 14: return "DEFAULT_CHARSET";
+            case 15: return "EMF_FORCE_HEADER_BOUNDS";
             default: return "UNKNOWN_ID "+intKey();
             }
         }
     }
-    
+
     /**
      * {@link DrawFactory} which will be used to draw objects into this graphics context
      */
@@ -94,7 +98,7 @@ public interface Drawable {
      * Internal key for caching the preset geometries
      */
     DrawableHint PRESET_GEOMETRY_CACHE = new DrawableHint(6);
-    
+
     /**
      * draw text via {@link java.awt.Graphics2D#drawString(java.text.AttributedCharacterIterator, float, float)}
      */
@@ -108,11 +112,11 @@ public interface Drawable {
     /**
      * Use this object to resolve unknown / missing fonts when rendering slides.
      * The font handler must be of type {@link DrawFontManager}.<p>
-     * 
-     * In case a {@code FONT_HANDLER} is register, {@code FONT_FALLBACK} and {@code FONT_MAP} are ignored 
+     *
+     * In case a {@code FONT_HANDLER} is register, {@code FONT_FALLBACK} and {@code FONT_MAP} are ignored
      */
     DrawableHint FONT_HANDLER = new DrawableHint(7);
-    
+
     /**
      * Key for a font fallback map of type {@code Map<String,String>} which maps
      * the original font family (key) to the fallback font family (value).
@@ -126,36 +130,60 @@ public interface Drawable {
      * the original font family (key) to the mapped font family (value)
      */
     DrawableHint FONT_MAP = new DrawableHint(9);
-    
+
     DrawableHint GSAVE = new DrawableHint(10);
     DrawableHint GRESTORE = new DrawableHint(11);
-    
+
     /**
      * The Common SL Draw API works sometimes cascading, but there are places
      * where the current slide context need to be evaluated, e.g. when slide numbers
      * are printed. In this situation we need to have a way to access the current slide
      */
     DrawableHint CURRENT_SLIDE = new DrawableHint(12);
-    
-    
+
+    /**
+     * Stores a reference (WEAK_REFERENCE) to the buffered image, if the rendering is
+     * based on a buffered image
+     */
+    DrawableHint BUFFERED_IMAGE = new DrawableHint(13);
+
+    /**
+     * Sets the default charset to render text elements.
+     * Opposed to other windows libraries in POI this simply defaults to Windows-1252.
+     * The rendering value is of type {@link java.nio.charset.Charset}
+     */
+    DrawableHint DEFAULT_CHARSET = new DrawableHint(14);
+
+    /**
+     * A boolean value to force the usage of the bounding box, which is specified in the EMF header.
+     * Defaults to {@code FALSE} - in this case the records are scanned for window and
+     * viewport records to determine the initial bounding box by using the following
+     * condition: {@code isValid(viewport) ? viewport : isValid(window) ? window : headerBounds }
+     * <p>
+     * This is a workaround switch, which might be removed in future releases, when the bounding box
+     * determination for the special cases is fixed.
+     * In most cases it's recommended to leave the default value.
+     */
+    DrawableHint EMF_FORCE_HEADER_BOUNDS = new DrawableHint(15);
+
     /**
      * Apply 2-D transforms before drawing this shape. This includes rotation and flipping.
      *
      * @param graphics the graphics whos transform matrix will be modified
      */
     void applyTransform(Graphics2D graphics);
-    
+
     /**
      * Draw this shape into the supplied canvas
      *
      * @param graphics the graphics to draw into
      */
     void draw(Graphics2D graphics);
-    
+
     /**
      * draw any content within this shape (image, text, etc.).
      *
      * @param graphics the graphics to draw into
      */
-    void drawContent(Graphics2D graphics);    
+    void drawContent(Graphics2D graphics);
 }

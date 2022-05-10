@@ -117,6 +117,12 @@
 		<property name="qbService">
 			<ref bean="qbService"/>
 		</property>
+		<property name="learnerService">
+			<ref bean="learnerService"/>
+		</property>
+		<property name="outcomeService">
+			<ref bean="outcomeService"/>
+		</property>
 		<property name="scratchieOutputFactory"><ref bean="scratchieOutputFactory"/></property>
     </bean>
 
@@ -138,6 +144,7 @@
             	<prop key="addLike">PROPAGATION_REQUIRED,-java.lang.Exception</prop> 
             	<prop key="audit*">PROPAGATION_REQUIRED</prop>
                 <prop key="changeUserMark">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="changeLeader*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="copy*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="count*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

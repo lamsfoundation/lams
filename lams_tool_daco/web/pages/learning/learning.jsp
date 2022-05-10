@@ -12,7 +12,8 @@
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
-	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>		
+	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>	
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />	
 	
 	<c:if test="${not empty param.sessionMapID}">
 		<c:set var="sessionMapID" value="${param.sessionMapID}" />
@@ -38,6 +39,10 @@
 	</c:choose>
 	
 	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${toolSessionID}', '', function(){
+			finishSession();
+		});
+	
 	 	var currentTab = ${learningCurrentTab};
 	 	var changeViewUrl = "<c:url value='/learning/changeView.do' />";
 	 	var finishUrl = '<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&displayedRecordNumber=${displayedRecordNumber}"/>';
@@ -56,7 +61,7 @@
 		var LABEL_NOT_ALLOWED_FORMAT = '<c:out value="${LABEL_NOT_ALLOWED_FORMAT_VAR}" />';	
 
     </script>
-    <script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/dacoLearning.js"></script>
+    <lams:JSImport src="includes/javascript/dacoLearning.js" relative="true" />
 </lams:head>
 
 
@@ -89,9 +94,9 @@
 
 <lams:TabBodyArea>
 	<lams:TabBodys>
-	 	<lams:TabBody id="1" titleKey="label.learning.heading.add" page="addRecord.jsp?displayedRecordNumber=${displayedRecordNumber}" />
- 		<lams:TabBody id="2" titleKey="label.learning.heading.list" page="listRecords.jsp?includeMode=learning" />
-	 	<lams:TabBody id="3" titleKey="label.learning.heading.summary" page="questionSummaries.jsp" />
+	 	<lams:TabBody id="1" page="addRecord.jsp?displayedRecordNumber=${displayedRecordNumber}" />
+ 		<lams:TabBody id="2" page="listRecords.jsp?includeMode=learning" />
+	 	<lams:TabBody id="3" page="questionSummaries.jsp" />
 	 </lams:TabBodys>
 
 <c:if test="${mode != 'teacher'}">
@@ -102,7 +107,7 @@
 				</button>
 			</c:when>
 			<c:otherwise>
-				<button type="submit" name="FinishButton" id="finishButton" onclick="javascript:finishSession()" class="btn btn-primary btn-disable-on-submit voffset5 pull-right na">
+				<button type="submit" name="FinishButton" id="finishButton" class="btn btn-primary btn-disable-on-submit voffset5 pull-right na">
 					<c:choose>
 		 					<c:when test="${sessionMap.isLastActivity}">
 		 						<fmt:message key="label.learning.submit" />

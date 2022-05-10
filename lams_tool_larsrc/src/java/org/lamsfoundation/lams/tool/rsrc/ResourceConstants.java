@@ -37,10 +37,6 @@ public class ResourceConstants {
 
     public static final short RESOURCE_TYPE_FILE = 2;
 
-    public static final short RESOURCE_TYPE_WEBSITE = 3;
-
-    public static final short RESOURCE_TYPE_LEARNING_OBJECT = 4;
-
     // for action forward name
     public static final String SUCCESS = "success";
 
@@ -74,21 +70,23 @@ public class ResourceConstants {
 
     public static final String ATTR_TOOL_SESSION_ID = "toolSessionID";
 
-    public static final String ATTR_INSTRUCTION_LIST = "instructionList";
-
     public static final String ATTR_RESOURCE_ITEM_LIST = "resourceList";
 
     public static final String ATTR_DELETED_RESOURCE_ITEM_LIST = "deleteResourceList";
 
     public static final String ATTR_DELETED_RESOURCE_ITEM_ATTACHMENT_LIST = "deletedItemAttachmmentList";;
 
-    public static final String ATT_LEARNING_OBJECT = "cpPackage";
-
     public static final String ATTR_RESOURCE_REVIEW_URL = "resourceItemReviewUrl";
 
-    public static final String ATTR_RESOURCE = "resource";
+    public static final String ATTR_IS_DOWNLOAD = "isDownload";
+    
+    public static final String ATTR_IS_DISPLAYABLE_IMAGE = "isDisplayableImage";
 
-    public static final String ATTR_RUN_AUTO = "runAuto";
+    public static final String  ATTR_IS_DISPLAYABLE_MEDIA = "isDisplayableMedia";
+    
+    public static final String ATTR_IS_DISPLAYABLE_EMBED = "isDisplayableEmbed";
+
+    public static final String ATTR_RESOURCE = "resource";
 
     public static final String ATTR_RATE_ITEMS = "rateItems";
 
@@ -123,9 +121,11 @@ public class ResourceConstants {
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
 
     public static final String ATTR_IS_URL_ITEM_TYPE = "isUrlItemType";
-    
+
     public static final String ATTR_ALLOW_COMMENTS = "allowComments";
-    
+
+    public static final String ATTR_ALLOW_RATING = "allowRating";
+
     public static final String ATTR_COMPLETED_SUFFICIENT_TO_FINISH = "hasCompletedMinNumber";
 
     // error message keys
@@ -154,8 +154,6 @@ public class ResourceConstants {
     public static final String ATTR_REFLECT_LIST = "reflectList";
 
     public static final String ATTR_USER_UID = "userUid";
-
-    public static final String EVENT_NAME_NOTIFY_TEACHERS_ON_ASSIGMENT_SUBMIT = "notify_teachers_on_assigment_submit";
 
     public static final String SHARED_ITEMS_DEFINITION_NAME = "shared.items.output.definition.rsrc";
 }

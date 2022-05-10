@@ -5,7 +5,7 @@
 <lams:html>
 	<lams:head>
 		<lams:headItems/>
-		<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/authoring.js"></script>
+		<lams:JSImport src="includes/javascript/authoring.js" relative="true" />
 	</lams:head>
 	<body class="stripes">
 		<form:form action="/lams/tool/lantbk11/authoring/updateContent.do" modelAttribute="authoringForm" id="authoringForm" method="post">
@@ -28,9 +28,9 @@
 	   
 	    <!--  Set up tabs  -->
 	     <lams:TabBodys>
-			<lams:TabBody id="1" titleKey="button.basic" page="basic.jsp" />
-			<lams:TabBody id="2" titleKey="button.advanced" page="advanced.jsp" />
-			<lams:TabBody id="3" titleKey="button.conditions" page="conditions.jsp" />
+			<lams:TabBody id="1" page="basic.jsp" />
+			<lams:TabBody id="2" page="advanced.jsp" />
+			<lams:TabBody id="3" page="conditions.jsp" />
 	    </lams:TabBodys>
 
 

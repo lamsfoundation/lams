@@ -43,6 +43,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -79,21 +81,25 @@ public class Organisation implements Serializable, Comparable<Organisation> {
     private User createdBy;
 
     @OneToMany(mappedBy = "organisationID", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<WorkspaceFolder> workspaceFolders = new HashSet<WorkspaceFolder>();
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    private Set<WorkspaceFolder> workspaceFolders = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organisation_type_id")
     private OrganisationType organisationType;
 
     @OneToMany(mappedBy = "organisation", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<UserOrganisation> userOrganisations = new HashSet<UserOrganisation>();
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    private Set<UserOrganisation> userOrganisations = new HashSet<>();
 
     @OneToMany(mappedBy = "parentOrganisation", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Organisation> childOrganisations = new HashSet<Organisation>();
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    private Set<Organisation> childOrganisations = new HashSet<>();
 
     @OneToMany(mappedBy = "organisation", cascade = CascadeType.ALL, orphanRemoval = true)
     @LazyCollection(LazyCollectionOption.EXTRA)
-    private Set<Lesson> lessons = new HashSet<Lesson>();
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    private Set<Lesson> lessons = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organisation_state_id")

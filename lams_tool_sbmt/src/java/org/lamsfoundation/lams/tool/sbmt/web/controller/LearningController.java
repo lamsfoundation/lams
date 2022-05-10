@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.SortedMap;
 import java.util.TimeZone;
 
 import javax.servlet.ServletException;
@@ -38,7 +37,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -126,28 +124,70 @@ public class LearningController implements SbmtConstants {
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    userID = user.getUserID();
 	}
-
-	SubmitFilesSession session = submitFilesService.getSessionById(toolSessionID);
-	SubmitFilesContent content = session.getContent();
-
 	// this must before getFileUploadByUser() method becuase getCurrentLearner()
 	// will create session user if it does not exist.
 	SubmitUser learner = getCurrentLearner(toolSessionID, submitFilesService);
+
+	SubmitFilesSession session = submitFilesService.getSessionById(toolSessionID);
+	SubmitFilesContent content = session.getContent();
+	// support for leader select feature
+	SubmitUser groupLeader = content.isUseSelectLeaderToolOuput()
+		? submitFilesService.checkLeaderSelectToolForSessionLeader(learner, toolSessionID)
+		: null;
+
+	sessionMap.put(AttributeNames.PARAM_MODE, mode);
+	sessionMap.put(SbmtConstants.ATTR_TITLE, content.getTitle());
+	sessionMap.put(SbmtConstants.ATTR_INSTRUCTION, content.getInstruction());
+
+	// if content in use, return special page.
+	if (content.isDefineLater()) {
+	    return "learner/definelater";
+	}
+
+	if (content.isUseSelectLeaderToolOuput() && !mode.isTeacher()) {
+
+	    // forwards to the leaderSelection page
+	    if (groupLeader == null) {
+		request.setAttribute("groupUsers", submitFilesService.getUsersBySession(toolSessionID));
+		request.setAttribute(SbmtConstants.PARAM_WAITING_MESSAGE_KEY, "label.waiting.for.leader");
+		return "learner/waitforleader";
+	    }
+
+	    // forwards to the waitForLeader pages
+	    boolean isNonLeader = !userID.equals(groupLeader.getUserID());
+
+	    if (isNonLeader && !learner.isFinished()) {
+		List<FileDetailsDTO> filesUploadedByLeader = submitFilesService
+			.getFilesUploadedByUser(groupLeader.getUserID(), toolSessionID, request.getLocale(), false);
+
+		if (filesUploadedByLeader == null) {
+		    request.setAttribute(SbmtConstants.PARAM_WAITING_MESSAGE_KEY,
+			    "label.waiting.for.leader.launch.time.limit");
+		    request.setAttribute("groupUsers", submitFilesService.getUsersBySession(toolSessionID));
+		    return "learner/waitforleader";
+		}
+
+		//if the time is up and leader hasn't submitted response - show waitForLeaderFinish page
+		if (!groupLeader.isFinished()) {
+		    request.setAttribute(SbmtConstants.PARAM_WAITING_MESSAGE_KEY, "label.waiting.for.leader.finish");
+		    request.setAttribute("groupUsers", submitFilesService.getUsersBySession(toolSessionID));
+		    return "learner/waitforleader";
+		}
+	    }
+	}
+
 	List<FileDetailsDTO> filesUploaded = submitFilesService.getFilesUploadedByUser(userID, toolSessionID,
 		request.getLocale(), false);
 
 	// check whehter finish lock is on/off
 	boolean lock = content.isLockOnFinished() && learner.isFinished();
 
-	sessionMap.put(AttributeNames.PARAM_MODE, mode);
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
 	sessionMap.put(SbmtConstants.ATTR_FINISH_LOCK, lock);
 	sessionMap.put(SbmtConstants.ATTR_LOCK_ON_FINISH, content.isLockOnFinished());
 	sessionMap.put(SbmtConstants.ATTR_USE_SEL_LEADER, content.isUseSelectLeaderToolOuput());
 	sessionMap.put(SbmtConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
 	sessionMap.put(SbmtConstants.ATTR_REFLECTION_INSTRUCTION, content.getReflectInstructions());
-	sessionMap.put(SbmtConstants.ATTR_TITLE, content.getTitle());
-	sessionMap.put(SbmtConstants.ATTR_INSTRUCTION, content.getInstruction());
 	sessionMap.put(SbmtConstants.ATTR_IS_MAX_LIMIT_UPLOAD_ENABLED, content.isLimitUpload());
 	sessionMap.put(SbmtConstants.ATTR_MAX_LIMIT_UPLOAD_NUMBER, content.getLimitUploadNumber());
 	sessionMap.put(SbmtConstants.ATTR_MIN_LIMIT_UPLOAD_NUMBER, content.getMinLimitUploadNumber());
@@ -157,11 +197,6 @@ public class LearningController implements SbmtConstants {
 	sessionMap.put(SbmtConstants.ATTR_UPLOAD_MAX_FILE_SIZE,
 		FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)));
 	setLearnerDTO(request, sessionMap, learner, filesUploaded, mode);
-
-	// if content in use, return special page.
-	if (content.isDefineLater()) {
-	    return "learner/definelater";
-	}
 
 	// set contentInUse flag to true!
 	content.setContentInUse(true);
@@ -187,63 +222,12 @@ public class LearningController implements SbmtConstants {
 	    }
 	}
 
-	if (content.isNotifyLearnersOnMarkRelease()) {
-	    boolean isHtmlFormat = false;
-	    submitFilesService.getEventNotificationService().createEvent(SbmtConstants.TOOL_SIGNATURE,
-		    SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, content.getContentID(),
-		    submitFilesService.getLocalisedMessage("event.mark.release.subject", null),
-		    submitFilesService.getLocalisedMessage("event.mark.release.body", null), isHtmlFormat);
-
-	    submitFilesService.getEventNotificationService().subscribe(SbmtConstants.TOOL_SIGNATURE,
-		    SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, content.getContentID(), userID,
-		    IEventNotificationService.DELIVERY_METHOD_MAIL);
-	}
-
-	SortedMap<SubmitUserDTO, List<FileDetailsDTO>> submittedFilesMap = submitFilesService
-		.getFilesUploadedBySession(toolSessionID, request.getLocale());
-	// support for leader select feature
-	SubmitUser groupLeader = content.isUseSelectLeaderToolOuput()
-		? submitFilesService.checkLeaderSelectToolForSessionLeader(learner, toolSessionID)
-		: null;
-
-	if (content.isUseSelectLeaderToolOuput() && !mode.isTeacher()) {
-
-	    // forwards to the leaderSelection page
-	    if (groupLeader == null) {
-		List<SubmitUser> groupUsers = submitFilesService.getUsersBySession(toolSessionID);
-		request.setAttribute(SbmtConstants.ATTR_GROUP_USERS, groupUsers);
-		request.setAttribute(SbmtConstants.ATTR_SUBMIT_FILES, submittedFilesMap);
-		request.setAttribute(SbmtConstants.PARAM_WAITING_MESSAGE_KEY, "label.waiting.for.leader");
-		return "learner/waitForLeaderTimeLimit";
-	    }
-
-	    // forwards to the waitForLeader pages
-	    boolean isNonLeader = !userID.equals(groupLeader.getUserID());
-
-	    if (isNonLeader && !learner.isFinished()) {
-		List<FileDetailsDTO> filesUploadedByLeader = submitFilesService
-			.getFilesUploadedByUser(groupLeader.getUserID(), toolSessionID, request.getLocale(), false);
-
-		if (filesUploadedByLeader == null) {
-		    request.setAttribute(SbmtConstants.PARAM_WAITING_MESSAGE_KEY,
-			    "label.waiting.for.leader.launch.time.limit");
-		    return "learner/waitForLeaderTimeLimit";
-		}
-
-		//if the time is up and leader hasn't submitted response - show waitForLeaderFinish page
-		if (!groupLeader.isFinished()) {
-		    request.setAttribute(SbmtConstants.PARAM_WAITING_MESSAGE_KEY, "label.waiting.for.leader.finish");
-		    return "learner/waitForLeaderTimeLimit";
-		}
-	    }
-
+	if (content.isUseSelectLeaderToolOuput() && groupLeader.isFinished() && !mode.isTeacher()) {
 	    // check if leader has submitted all answers
-	    if (groupLeader.isFinished()) {
-		submitFilesService.copyLearnerContent(groupLeader, learner);
-		filesUploaded = submitFilesService.getFilesUploadedByUser(learner.getUserID(), learner.getSessionID(),
-			request.getLocale(), false);
-		setLearnerDTO(request, sessionMap, learner, filesUploaded, mode);
-	    }
+	    submitFilesService.copyLearnerContent(groupLeader, learner);
+	    filesUploaded = submitFilesService.getFilesUploadedByUser(learner.getUserID(), learner.getSessionID(),
+		    request.getLocale(), false);
+	    setLearnerDTO(request, sessionMap, learner, filesUploaded, mode);
 	}
 
 	sessionMap.put(SbmtConstants.ATTR_GROUP_LEADER, groupLeader);
@@ -355,9 +339,21 @@ public class LearningController implements SbmtConstants {
 	String fileDescription = learnerForm.getDescription();
 	// reset fields and display a new form for next new file upload
 	learnerForm.setDescription("");
+
+	SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
+	SubmitFilesContent content = submitFilesService.getSessionById(sessionID).getContent();
 	try {
 	    for (File file : files) {
 		submitFilesService.uploadFileToSession(sessionID, file, fileDescription, userID);
+
+		if (content.isNotifyTeachersOnFileSubmit()) {
+		    String message = submitFilesService.getLocalisedMessage("event.file.submit.body",
+			    new Object[] { learner.getFullName(), file.getName(), fileDescription });
+
+		    submitFilesService.getEventNotificationService().notifyLessonMonitors(sessionID,
+			    submitFilesService.getLocalisedMessage("event.file.submit.subject", new Object[] {}),
+			    message, true);
+		}
 	    }
 	} catch (SubmitFilesException e) {
 	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
@@ -368,16 +364,6 @@ public class LearningController implements SbmtConstants {
 	    return "learner/sbmtlearner";
 	} finally {
 	    FileUtil.deleteTmpFileUploadDir(learnerForm.getTmpFileUploadId());
-	}
-
-	SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
-
-	SubmitFilesContent content = submitFilesService.getSessionById(sessionID).getContent();
-	if (content.isNotifyTeachersOnFileSubmit()) {
-
-	    String message = submitFilesService.getLocalisedMessage("event.file.submit.body",
-		    new Object[] { learner.getFullName() });
-	    submitFilesService.getEventNotificationService().notifyLessonMonitors(sessionID, message, false);
 	}
 
 	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMapID);

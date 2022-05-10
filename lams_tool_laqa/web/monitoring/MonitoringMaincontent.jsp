@@ -319,6 +319,38 @@
         function doSelectTab(tabId) {
 	    	selectTab(tabId);
         } 
+
+
+    	function showChangeLeaderModal(toolSessionId) {
+    		$('#change-leader-modals').empty()
+    		.load('<c:url value="/monitoring/displayChangeLeaderForGroupDialogFromActivity.do" />',{
+    			toolSessionID : toolSessionId
+    		});
+    	}
+
+    	function onChangeLeaderCallback(response, leaderUserId, toolSessionId){
+            if (response.isSuccessful) {
+                $.ajax({
+        			'url' : '<c:url value="/monitoring/changeLeaderForGroup.do"/>',
+        			'type': 'post',
+        			'cache' : 'false',
+        			'data': {
+        				'toolSessionID' : toolSessionId,
+        				'leaderUserId' : leaderUserId,
+        				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
+        			},
+        			success : function(){
+        				alert("<fmt:message key='label.monitoring.leader.successfully.changed'/>");
+        			},
+        			error : function(){
+        				alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+            		}
+                });
+            	
+    		} else {
+    			alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+    		}
+    	}
 	</script>
 	
 </lams:head>
@@ -335,9 +367,9 @@
 	
 		<lams:TabBodyArea>
 			<lams:TabBodys>
-				<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp" />
-				<lams:TabBody id="2" titleKey="label.editActivity" page="Edit.jsp" />
-				<lams:TabBody id="3" titleKey="label.stats" page="Stats.jsp" />
+				<lams:TabBody id="1" page="SummaryContent.jsp" />
+				<lams:TabBody id="2" page="Edit.jsp" />
+				<lams:TabBody id="3" page="Stats.jsp" />
 			</lams:TabBodys>
 		</lams:TabBodyArea>
 			

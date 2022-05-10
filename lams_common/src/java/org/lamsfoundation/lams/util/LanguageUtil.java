@@ -117,11 +117,11 @@ public class LanguageUtil {
 	String serverCountry = Configuration.get(ConfigurationKeys.SERVER_COUNTRY);
 	return StringUtils.isBlank(serverCountry) ? LanguageUtil.DEFAULT_COUNTRY : serverCountry;
     }
-    
+
     /**
      * Checks whether specified country belongs to the list of allowed country codes. If positive return it, and if not
      * - default country.
-     * 
+     *
      * @param input
      * @return
      */
@@ -161,18 +161,18 @@ public class LanguageUtil {
      * default locale.
      */
     public static SupportedLocale getSupportedLocale(String input) {
-	List list = LanguageUtil.getService().findByProperty(SupportedLocale.class, "languageIsoCode", input);
+	List list = LanguageUtil.getService().findByProperty(SupportedLocale.class, "languageIsoCode", input, true);
 	if ((list != null) && (list.size() > 0)) {
 	    return (SupportedLocale) list.get(0);
 	} else {
-	    list = LanguageUtil.getService().findByProperty(SupportedLocale.class, "countryIsoCode", input);
+	    list = LanguageUtil.getService().findByProperty(SupportedLocale.class, "countryIsoCode", input, true);
 	    if ((list != null) && (list.size() > 0)) {
 		return (SupportedLocale) list.get(0);
 	    }
 	}
 	return LanguageUtil.getDefaultLocale();
     }
-    
+
     /**
      * Wrapper method for getSupportedLocaleByNameOrLanguageCode(String input).
      */
@@ -181,7 +181,7 @@ public class LanguageUtil {
 	SupportedLocale supportedLocale = LanguageUtil.getSupportedLocaleByNameOrLanguageCode(localeId);
 	return new Locale(supportedLocale.getLanguageIsoCode(), supportedLocale.getCountryIsoCode());
     }
-	
+
     /**
      * Searches for a supported locale based on the provided input, first assuming it has "xx_XX" format, then that the
      * first two letters is a language ISO code. Otherwise returns server default locale.
@@ -202,7 +202,7 @@ public class LanguageUtil {
 		String localeLanguage = input.substring(0, 2).toLowerCase();
 
 		List<SupportedLocale> list = LanguageUtil.getService().findByProperty(SupportedLocale.class,
-			"languageIsoCode", localeLanguage);
+			"languageIsoCode", localeLanguage, true);
 		if ((list != null) && (list.size() > 0)) {
 		    locale = list.get(0);
 		}
@@ -234,7 +234,7 @@ public class LanguageUtil {
     private static SupportedLocale getSupportedLocaleOrNull(String langIsoCode, String countryIsoCode) {
 	SupportedLocale locale = null;
 
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 
 	if (StringUtils.isNotBlank(countryIsoCode)) {
 	    properties.put("countryIsoCode", countryIsoCode.trim());
@@ -247,7 +247,7 @@ public class LanguageUtil {
 	    return null;
 	}
 
-	List list = LanguageUtil.getService().findByProperties(SupportedLocale.class, properties);
+	List list = LanguageUtil.getService().findByProperties(SupportedLocale.class, properties, true);
 	if ((list != null) && (list.size() > 0)) {
 	    Collections.sort(list);
 	    locale = (SupportedLocale) list.get(0);
@@ -267,7 +267,7 @@ public class LanguageUtil {
 	LanguageUtil.getMessageService();
 	SupportedLocale lamsDefaultLocale = enforceUsingDefaultLocale ? LanguageUtil.getDefaultLocale() : null;
 
-	Map<String, String> countryCodesMap = new HashMap<String, String>();
+	Map<String, String> countryCodesMap = new HashMap<>();
 	for (String countryCode : CommonConstants.COUNTRY_CODES) {
 	    String countryName = enforceUsingDefaultLocale
 		    ? messageService.getMessage("country." + countryCode, lamsDefaultLocale)

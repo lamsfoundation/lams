@@ -21,10 +21,7 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.qa.dto;
-
-import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -41,12 +38,13 @@ public class GroupDTO implements Comparable {
 
     private String sessionName;
 
-    private List groupData;
+    private int numberOfLearners;
+
+    private boolean sessionFinished;
 
     @Override
     public String toString() {
-	return new ToStringBuilder(this).append("sessionId:", sessionId).append("sessionName:", sessionName)
-		.append("groupData: ", groupData).toString();
+	return new ToStringBuilder(this).append("sessionId:", sessionId).append("sessionName:", sessionName).toString();
     }
 
     @Override
@@ -58,21 +56,6 @@ public class GroupDTO implements Comparable {
 	} else {
 	    return 0;
 	}
-    }
-
-    /**
-     * @return Returns the groupData.
-     */
-    public List getGroupData() {
-	return groupData;
-    }
-
-    /**
-     * @param groupData
-     *            The groupData to set.
-     */
-    public void setGroupData(List groupData) {
-	this.groupData = groupData;
     }
 
     /**
@@ -103,5 +86,21 @@ public class GroupDTO implements Comparable {
      */
     public void setSessionId(String sessionId) {
 	this.sessionId = sessionId;
+    }
+
+    public int getNumberOfLearners() {
+	return numberOfLearners;
+    }
+
+    public void setNumberOfLearners(int numberOfLearners) {
+	this.numberOfLearners = numberOfLearners;
+    }
+
+    public boolean isSessionFinished() {
+	return sessionFinished;
+    }
+
+    public void setSessionFinished(boolean sessionFinished) {
+	this.sessionFinished = sessionFinished;
     }
 }

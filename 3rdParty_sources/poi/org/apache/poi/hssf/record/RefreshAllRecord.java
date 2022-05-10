@@ -17,19 +17,20 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.util.BitField;
 import org.apache.poi.util.BitFieldFactory;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        Refresh All Record (0x01B7)<p>
- * Description:  Flag whether to refresh all external data when loading a sheet.
- *               (which hssf doesn't support anyhow so who really cares?)<p>
- * REFERENCE:  PG 376 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)
+ * Flag whether to refresh all external data when loading a sheet.
+ * (which hssf doesn't support anyhow so who really cares?)
  */
 public final class RefreshAllRecord extends StandardRecord {
-    public final static short sid = 0x01B7;
+    public static final short sid = 0x01B7;
 
     private static final BitField refreshFlag = BitFieldFactory.getInstance(0x0001);
 
@@ -37,6 +38,11 @@ public final class RefreshAllRecord extends StandardRecord {
 
     private RefreshAllRecord(int options) {
         _options = options;
+    }
+
+    private RefreshAllRecord(RefreshAllRecord other) {
+        super(other);
+        _options = other._options;
     }
 
     public RefreshAllRecord(RecordInputStream in) {
@@ -64,15 +70,6 @@ public final class RefreshAllRecord extends StandardRecord {
         return refreshFlag.isSet(_options);
     }
 
-    public String toString() {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("[REFRESHALL]\n");
-        buffer.append("    .options      = ").append(HexDump.shortToHex(_options)).append("\n");
-        buffer.append("[/REFRESHALL]\n");
-        return buffer.toString();
-    }
-
     public void serialize(LittleEndianOutput out) {
         out.writeShort(_options);
     }
@@ -84,8 +81,23 @@ public final class RefreshAllRecord extends StandardRecord {
     public short getSid() {
         return sid;
     }
+
     @Override
-    public Object clone() {
-        return new RefreshAllRecord(_options);
+    public RefreshAllRecord copy() {
+        return new RefreshAllRecord(this);
+    }
+
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.REFRESH_ALL;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "options", () -> _options,
+            "refreshAll", this::getRefreshAll
+        );
     }
 }

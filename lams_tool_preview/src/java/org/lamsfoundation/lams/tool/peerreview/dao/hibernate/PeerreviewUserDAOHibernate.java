@@ -51,7 +51,7 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 	    + " AS u WHERE u.userId =? AND u.session.sessionId=?";
 
     private static final String FIND_BY_SESSION_ID = "FROM " + PeerreviewUser.class.getName()
-	    + " AS u WHERE u.session.sessionId=? AND u.hidden=0";
+	    + " AS u WHERE u.session.sessionId=? AND u.hidden=0 ORDER BY u.firstName, u.lastName";
 
     private static final String GET_COUNT_USERS_FOR_SESSION_EXCLUDE_USER = "SELECT COUNT(*) FROM "
 	    + PeerreviewUser.class.getName() + " AS u WHERE u.session.sessionId=? AND u.userId!=? AND u.hidden=0";

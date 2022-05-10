@@ -53,6 +53,7 @@
 		<property name="exportContentService"><ref bean="exportToolContentService"/></property>
 		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>		
 		<property name="userManagementService"><ref bean="userManagementService"/></property>
+		<property name="learnerService"><ref bean="learnerService"/></property>
 		<property name="messageService"><ref bean="sbmtMessageService"/></property>
 		<property name="eventNotificationService"><ref bean="eventNotificationService"/></property>
 		<property name="logEventService"><ref bean="logEventService" /></property>
@@ -75,6 +76,7 @@
 		<property name="transactionAttributes">
 			<props>
             	<prop key="audit*">PROPAGATION_REQUIRED</prop>
+            	<prop key="change*">PROPAGATION_REQUIRED</prop>
             	<prop key="check*">PROPAGATION_REQUIRED</prop>
 				<prop key="copy*">PROPAGATION_REQUIRED</prop>
                 <prop key="create*">PROPAGATION_REQUIRED</prop>

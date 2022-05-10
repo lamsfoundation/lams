@@ -1,5 +1,5 @@
 	<script type="text/javascript" src="${lams}includes/javascript/interact.min.js"></script>
-	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/ranking.js"></script>
+	<lams:JSImport src="includes/javascript/ranking.js" relative="true" />
 
 	<%-- Build up the divs now and the ordering, then include the divs in the body and trigger the ordering in document.ready --%>
 	<c:choose>

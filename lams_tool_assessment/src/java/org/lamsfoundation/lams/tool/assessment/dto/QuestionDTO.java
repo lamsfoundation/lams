@@ -1,5 +1,6 @@
 package org.lamsfoundation.lams.tool.assessment.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -50,6 +51,8 @@ public class QuestionDTO implements Comparable<QuestionDTO> {
 
     private boolean caseSensitive;
 
+    private boolean exactMatch;
+
     private boolean correctAnswer;
 
     private boolean allowRichEditor;
@@ -59,6 +62,8 @@ public class QuestionDTO implements Comparable<QuestionDTO> {
     private int maxWordsLimit;
 
     private int minWordsLimit;
+
+    private Integer codeStyle;
 
     private boolean hedgingJustificationEnabled;
 
@@ -100,14 +105,17 @@ public class QuestionDTO implements Comparable<QuestionDTO> {
 
     /**
      * Expanded version of the constructor which also sets correctAnswersDisclosed and groupsAnswersDisclosed.
-     *
-     * @param assessmentQuestion
      */
     public QuestionDTO(AssessmentQuestion assessmentQuestion) {
 	this((QbToolQuestion) assessmentQuestion);
 
 	this.correctAnswersDisclosed = assessmentQuestion.isCorrectAnswersDisclosed();
 	this.groupsAnswersDisclosed = assessmentQuestion.isGroupsAnswersDisclosed();
+    }
+
+    public QuestionDTO(AssessmentQuestion assessmentQuestion, int displayOrder) {
+	this(assessmentQuestion);
+	this.displayOrder = displayOrder;
     }
 
     /**
@@ -133,11 +141,12 @@ public class QuestionDTO implements Comparable<QuestionDTO> {
 	this.shuffle = qbQuestion.isShuffle();
 	this.prefixAnswersWithLetters = qbQuestion.isPrefixAnswersWithLetters();
 	this.caseSensitive = qbQuestion.isCaseSensitive();
+	this.exactMatch = qbQuestion.isExactMatch();
 	this.correctAnswer = qbQuestion.getCorrectAnswer();
 	this.allowRichEditor = qbQuestion.isAllowRichEditor();
-	this.units = qbQuestion.getUnits();
 	this.maxWordsLimit = qbQuestion.getMaxWordsLimit();
 	this.minWordsLimit = qbQuestion.getMinWordsLimit();
+	this.codeStyle = qbQuestion.getCodeStyle();
 	this.hedgingJustificationEnabled = qbQuestion.isHedgingJustificationEnabled();
 	this.autocompleteEnabled = qbQuestion.isAutocompleteEnabled();
 
@@ -145,6 +154,8 @@ public class QuestionDTO implements Comparable<QuestionDTO> {
 	for (QbOption option : qbQuestion.getQbOptions()) {
 	    optionDtos.add(new OptionDTO(option));
 	}
+
+	this.units = new ArrayList<>(qbQuestion.getUnits());
     }
 
     @Override
@@ -288,6 +299,14 @@ public class QuestionDTO implements Comparable<QuestionDTO> {
 	this.caseSensitive = caseSensitive;
     }
 
+    public boolean isExactMatch() {
+	return exactMatch;
+    }
+
+    public void setExactMatch(boolean exactMatch) {
+	this.exactMatch = exactMatch;
+    }
+
     public boolean getCorrectAnswer() {
 	return correctAnswer;
     }
@@ -326,6 +345,18 @@ public class QuestionDTO implements Comparable<QuestionDTO> {
 
     public void setMinWordsLimit(int minWordsLimit) {
 	this.minWordsLimit = minWordsLimit;
+    }
+
+    public Integer getCodeStyle() {
+	return codeStyle;
+    }
+
+    public void setCodeStyle(Integer codeStyle) {
+	this.codeStyle = codeStyle;
+    }
+
+    public String getCodeStyleMime() {
+	return QbQuestion.getCodeStyleMime(codeStyle);
     }
 
     public boolean isHedgingJustificationEnabled() {

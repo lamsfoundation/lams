@@ -1,8 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <% pageContext.setAttribute("newLineChar", "\r\n"); %>
 
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/common.js"></script>
-
 <style>
 	/* show horizontal scroller for iPads */
 	body {
@@ -38,6 +36,10 @@
 	  color: white;
 	  border-radius: 3px; }
 	
+	span.user-response .fa, .question-detail-modal .fa {
+	  cursor: default;
+	}
+	
 	span.successful-response {
 	  background-color: #5cb85c; }
 	
@@ -45,8 +47,13 @@
 	  background-color: #d9534f; }
 </style>
 
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/common.js"></script>
+
 <c:if test="${not showStudentChoicesTableOnly}">
 	<script>
+		// tell TBL monitor that this element is scrollable horizontally
+		tlbMonitorHorizontalScrollElement = '#questions-data-container';
+		
 		function exportExcel(){
 			//dynamically create a form and submit it
 			var exportExcelUrl = "<lams:LAMSURL/>tool/lascrt11/tblmonitoring/exportExcel.do?toolContentID=${toolContentID}&reqID=" + (new Date()).getTime();
@@ -70,10 +77,10 @@
 	
 	<!-- Notifications -->  
 	<div class="row">
-		<div class="col-md-6 col-lg-4 ">
+		<div class="col-md-5 col-lg-4 ">
 		</div>
 		
-		<div class="col-xs-12 col-md-6 col-lg-4 col-lg-offset-2">
+		<div class="col-xs-12 col-md-7 col-lg-5 col-lg-offset-3">
 			<a href="#nogo" type="button" class="btn btn-sm btn-default buttons_column"
 					onclick="javascript:loadTab('tra'); return false;">
 				<i class="fa fa-undo"></i>
@@ -87,6 +94,12 @@
 				<i class="fa fa-file"></i>
 				<fmt:message key="label.export.excel"/>
 			</a>
+			<c:if test="${vsaPresent}">
+				<a class="btn btn-sm btn-default buttons_column" target="_blank"
+				   href='<lams:LAMSURL />qb/vsa/displayVsaAllocate.do?toolContentID=${scratchie.contentId}'>
+					<fmt:message key="label.vsa.allocate.button" />
+				</a>
+			</c:if>
 		</div>
 	</div>
 	<br>
@@ -98,7 +111,7 @@
 <div class="col-xs-12 col-md-12 col-lg-12">
 <div class="panel">
 <div class="panel-body">
-<div class="table-responsive">
+<div id="questions-data-container" class="table-responsive">
 	<table id="questions-data" class="table table-striped table-bordered table-hover table-condensed">
 		<thead>
 			<tr role="row">
@@ -111,13 +124,17 @@
 						</a>
 					</th>
 				</c:forEach>
-				<th class="text-center">
-					<fmt:message key="label.total"/>
-				</th>
-				<th class="text-center">
-					<fmt:message key="label.total"/> %
-				</th>
 				
+				<c:if test="${not empty sessionDtos}">
+					<th class="text-center">
+						<fmt:message key="label.total"/>&nbsp;
+						<i class="fa fa-question-circle text-primary" data-toggle="tooltip" data-placement="top" data-container="body" 
+						   title="<fmt:message key="label.total.1st.attempt.by.team"/>"></i>
+					</th>
+					<th class="text-center">
+						<fmt:message key="label.total"/> %
+					</th>
+				</c:if>
 			</tr>
 		</thead>
 		<tbody>
@@ -128,17 +145,21 @@
 						<fmt:message key="label.correct.answer"/>
 					</b>
 				</th>
-				<c:forEach var="correctAnswerLetter"  items="${correctAnswerLetters}" varStatus="status">
+				<c:forEach var="item" items="${items}">
 					<td class="text-center">
-						${correctAnswerLetter}
+						<c:if test="${item.qbQuestion.type == 1 or item.qbQuestion.type == 8}">
+							${item.correctAnswerLetter}
+						</c:if>
 					</td>
 				</c:forEach>
 				
-				<td class="text-center"></td>
-				<td class="text-center"></td>
+				<c:if test="${not empty sessionDtos}">
+					<td class="text-center"></td>
+					<td class="text-center"></td>
+				</c:if>
 			</tr>
 			
-			<c:if test="${not showStudentChoicesTableOnly or sessionMap.isGroupedActivity}">
+			<c:if test="${not empty sessionDtos and (not showStudentChoicesTableOnly or sessionMap.isGroupedActivity)}">
 				<tr>
 					<th colspan="0" style="font-weight: bold;">
 						<fmt:message key="label.teams.notuppercase"/>
@@ -152,7 +173,7 @@
 						<c:if test="${not showStudentChoicesTableOnly or sessionMap.isGroupedActivity}">
 							<c:choose>
 								<c:when test="${empty sessionDto.leaderUid}">
-							${sessionDto.sessionName}
+									${sessionDto.sessionName}
 								</c:when>
 								<c:otherwise>
 									<c:url var="userSummaryUrl" value='/learning/start.do'>
@@ -180,25 +201,102 @@
 									<c:forEach var="optionDto" items="${itemDto.optionDtos}">
 										<c:if test="${optionDto.answer != ''}">
 											<span class="user-response <c:if test="${optionDto.correct}">successful-response</c:if> <c:if test="${!optionDto.correct}">wrong-response</c:if>">
-												<c:out value="${optionDto.answer}" escapeXml="${!optionDto.mcqType}"/>
+												<c:choose>
+													<c:when test="${itemDto.type == 1 or itemDto.type == 8}">
+														<c:out value="${optionDto.answer}" escapeXml="false"/>
+													</c:when>
+													<c:when test="${optionDto.correct}"><i class="fa fa-check"></i></c:when>
+													<c:otherwise><i class="fa fa-close"></i></c:otherwise>
+												</c:choose>
+												
 											</span>
 										</c:if>
 									</c:forEach>
 								</td>
 							</c:forEach>
 							
-							<td class="text-center">
+							<c:set var="highlightClass">
+								<c:choose>
+									<c:when test="${sessionDto.totalPercentage > 95}">bg-success</c:when>
+									<c:when test="${sessionDto.totalPercentage < 40}">bg-danger</c:when>
+									<c:when test="${sessionDto.totalPercentage < 75}">bg-warning</c:when>
+								</c:choose>
+							</c:set>
+							
+							<td class="text-center ${highlightClass}">
 								${sessionDto.mark}
 							</td>
 							
-							<td class="text-center">
+							<td class="text-center ${highlightClass}">
 								<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${sessionDto.totalPercentage}" /> %
 							</td>
 						</c:otherwise>
 					</c:choose>
-					
 				</tr>
-			</c:forEach>                                               
+			</c:forEach>      
+			
+			<c:if test="${not empty sessionDtos}">
+				<c:set var="totalSum" value="0" />
+				<c:set var="totalPercentSum" value="0" />
+				<tr>
+					<th><fmt:message key="label.total"/>&nbsp;
+					<i class="fa fa-question-circle text-primary" data-toggle="tooltip" data-placement="top" data-container="body" 
+					   title="<fmt:message key="label.total.1st.attempt.by.question"/>"></i></th>
+					   
+					<c:forEach var="item" items="${items}">
+						<c:set var="highlightClass">
+							<c:choose>
+								<c:when test="${item.correctOnFirstAttemptPercent > 95}">bg-success</c:when>
+								<c:when test="${item.correctOnFirstAttemptPercent < 40}">bg-danger</c:when>
+								<c:when test="${item.correctOnFirstAttemptPercent < 75}">bg-warning</c:when>
+							</c:choose>
+						</c:set>
+						
+						<td class="text-center ${highlightClass}">
+							${item.correctOnFirstAttemptCount}
+						</td>
+						<c:set var="totalSum" value="${totalSum + item.correctOnFirstAttemptCount}" />
+						<c:set var="totalPercentSum" value="${totalPercentSum + item.correctOnFirstAttemptPercent}" />
+					</c:forEach>
+					
+					<c:set var="totalPercentAverage" value="${totalPercentSum / fn:length(items)}" />
+					<c:set var="totalAverageHighlightClass">
+						<c:choose>
+							<c:when test="${totalPercentAverage > 95}">bg-success</c:when>
+							<c:when test="${totalPercentAverage < 40}">bg-danger</c:when>
+							<c:when test="${totalPercentAverage < 75}">bg-warning</c:when>
+						</c:choose>
+					</c:set>
+					<td class="text-center ${totalAverageHighlightClass}">
+						<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${totalSum / fn:length(items)}" />&nbsp;
+						<i class="fa fa-question-circle text-primary" data-toggle="tooltip" data-placement="top" data-container="body" 
+						    title="<fmt:message key="label.total.1st.attempt.average"/>"></i>
+					</td>
+					<td class="text-center">-</td>
+				</tr>
+				<tr>
+					<th><fmt:message key="label.total"/> %</th>
+					<c:forEach var="item" items="${items}">
+						<c:set var="highlightClass">
+							<c:choose>
+								<c:when test="${item.correctOnFirstAttemptPercent > 95}">bg-success</c:when>
+								<c:when test="${item.correctOnFirstAttemptPercent < 40}">bg-danger</c:when>
+								<c:when test="${item.correctOnFirstAttemptPercent < 75}">bg-warning</c:when>
+							</c:choose>
+						</c:set>
+						
+						<td class="text-center ${highlightClass}">
+							<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${item.correctOnFirstAttemptPercent}" /> %
+						</td>
+					</c:forEach>
+					<td class="text-center">-</td>
+					<td class="text-center ${totalAverageHighlightClass}">					
+						<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${totalPercentAverage}" />&nbsp;%&nbsp;
+						<i class="fa fa-question-circle text-primary" data-toggle="tooltip" data-placement="top" data-container="body" 
+						    title="<fmt:message key="label.total.1st.attempt.average"/>"></i>
+					</td>
+				</tr>                         
+			</c:if>                     
 		</tbody>
 	</table>
 	</div>
@@ -209,7 +307,7 @@
 
 <!-- Question detail modal -->
 <c:forEach var="item" items="${items}" varStatus="i">
-	<div class="modal fade" id="question${i.index}Modal">
+	<div class="modal fade question-detail-modal" id="question${i.index}Modal">
 	<div class="modal-dialog">
 	<div class="modal-content">
 	<div class="modal-body">
@@ -230,24 +328,34 @@
 						
 							<c:forEach var="qbOption" items="${item.qbQuestion.qbOptions}" varStatus="j">
 								<c:set var="cssClass"><c:if test='${qbOption.correct}'>bg-success</c:if></c:set>
-								
-								<tr>
-									<td width="5px" class="${cssClass}">
-										${ALPHABET[j.index]}.
-									</td>									
-									<td class="${cssClass}">
+									<tr>
 										<c:choose>
-											<c:when test="${item.qbQuestion.type == 1}">
-												<c:out value="${qbOption.name}" escapeXml="false"/>
+											<c:when test="${item.qbQuestion.type == 1 or item.qbQuestion.type == 8}">
+												<td width="5px" class="${cssClass}">
+													${ALPHABET[j.index]}.
+												</td>
+												<td class="${cssClass}">
+													<c:out value="${qbOption.name}" escapeXml="false"/>
+												</td>
 											</c:when>
 											<c:otherwise>
-												${fn:replace(qbOption.name, newLineChar, ', ')}
+												<td width="5px" class="${cssClass}">
+													<c:choose>
+														<c:when test="${qbOption.correct}">
+															<i class="fa fa-check"></i>
+														</c:when>
+														<c:otherwise>
+															<i class="fa fa-close"></i>
+														</c:otherwise>
+													</c:choose>
+												</td>
+												<td class="${cssClass}">
+													${fn:replace(qbOption.name, newLineChar, ', ')}
+												</td>
 											</c:otherwise>
 										</c:choose>
-									</td>
-								</tr>					
+									</tr>
 							</c:forEach>
-							
 						</tbody>
 					</table>
 				</div>
@@ -266,3 +374,7 @@
 	</div>
 </c:forEach>
 <!-- End question detail modal -->
+
+<c:if test="${isTbl}">
+	<%@ include file="parts/timeLimit.jsp"%>
+</c:if>

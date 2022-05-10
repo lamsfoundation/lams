@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.timezone.dao.hibernate;
 
 import java.util.List;
@@ -47,7 +46,7 @@ public class TimezoneDAO extends LAMSBaseDAO implements ITimezoneDAO {
 
     @Override
     public List<Timezone> getDefaultTimezones() {
-	List timezones = this.doFind(FIND_DEFAULT_TIMEZONES);
+	List timezones = this.doFindCacheable(FIND_DEFAULT_TIMEZONES);
 	return timezones;
     }
 
@@ -63,7 +62,7 @@ public class TimezoneDAO extends LAMSBaseDAO implements ITimezoneDAO {
 
     @Override
     public Timezone getServerTimezone() {
-	List list = doFind(FIND_SERVER_TIMEZONE);
+	List list = doFindCacheable(FIND_SERVER_TIMEZONE);
 	if (list.size() > 0) {
 	    return (Timezone) list.get(0);
 	} else {
@@ -75,5 +74,4 @@ public class TimezoneDAO extends LAMSBaseDAO implements ITimezoneDAO {
     public void setServerTimezone(Timezone serverTimezone) {
 	super.update(serverTimezone);
     }
-
 }

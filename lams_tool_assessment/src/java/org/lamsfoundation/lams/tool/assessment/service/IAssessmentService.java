@@ -29,18 +29,16 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.LeaderResultsDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.GradeStatsDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
@@ -52,6 +50,8 @@ import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
+
+import reactor.core.publisher.Flux;
 
 /**
  * Interface that defines the contract that all ShareAssessment service provider must follow.
@@ -90,18 +90,15 @@ public interface IAssessmentService extends ICommonToolService {
 
     /**
      * Stores date when user has started activity with time limit.
-     *
-     * @param assessmentUid
-     * @param userId
      */
-    LocalDateTime launchTimeLimit(Long assessmentUid, Long userId);
+    LocalDateTime launchTimeLimit(long toolContentId, int userId);
 
     /**
      * @param assessment
      * @param groupLeader
      * @return whether the time limit is exceeded already
      */
-    boolean checkTimeLimitExceeded(long assessmentUid, long userId);
+    boolean checkTimeLimitExceeded(long assessmentUid, int userId);
 
     /**
      * Get users by given toolSessionID.
@@ -117,6 +114,10 @@ public interface IAssessmentService extends ICommonToolService {
     int getCountUsersBySession(Long sessionId, String searchString);
 
     int getCountUsersByContentId(Long contentId);
+
+    int getCountLessonLearnersByContentId(long contentId);
+
+    int getCountLearnersWithFinishedCurrentAttempt(long contentId);
 
     List<AssessmentUserDTO> getPagedUsersBySessionAndQuestion(Long sessionId, Long questionUid, int page, int size,
 	    String sortBy, String sortOrder, String searchString);
@@ -241,6 +242,8 @@ public interface IAssessmentService extends ICommonToolService {
     boolean storeUserAnswers(Assessment assessment, Long userId, List<Set<QuestionDTO>> pagedQuestions,
 	    boolean isAutosave) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException;
 
+    Flux<String> getCompletionChartsDataFlux(long toolContentId);
+
     void loadupLastAttempt(Long assessmentUid, Long userId, List<Set<QuestionDTO>> pagedQuestionDtos);
 
     /**
@@ -323,19 +326,9 @@ public interface IAssessmentService extends ICommonToolService {
     Integer getLastFinishedAssessmentResultTimeTaken(Long assessmentUid, Long userId);
 
     /**
-     * Count how many last finished attempts selected specified option.
+     * Count how many last attempts selected specified option.
      */
-    int countAttemptsPerOption(Long toolContentId, Long optionUid);
-
-    /**
-     * Return the latest *finished* result (the same as the method above). But previously evicting it from the cache. It
-     * might be useful in cases when we modify result and the use it during one request.
-     *
-     * @param assessmentUid
-     * @param userId
-     * @return
-     */
-    AssessmentResult getLastFinishedAssessmentResultNotFromChache(Long assessmentUid, Long userId);
+    int countAttemptsPerOption(Long toolContentId, Long optionUid, boolean finishedAttemptsOnly);
 
     /**
      * Return number of finished results. I.e. don't count the last not-yet-finished result (it can be autosave one).
@@ -396,7 +389,9 @@ public interface IAssessmentService extends ICommonToolService {
      * @param contentId
      * @return
      */
-    List<SessionDTO> getSessionDtos(Long contentId, boolean includeStatistics);
+    List<GradeStatsDTO> getSessionDtos(Long contentId, boolean includeStatistics);
+
+    GradeStatsDTO getStatsDtoForActivity(Long contentId);
 
     /**
      * Prepares question results to be displayed in "Learner Summary" table. Shows all of them in case there is at least
@@ -423,35 +418,18 @@ public interface IAssessmentService extends ICommonToolService {
     QuestionSummary getQuestionSummary(Long contentId, Long questionUid);
 
     /**
-     * Allocate learner's answer into one of the available answer groups.
-     *
-     * @param questionUid
-     * @param targetOptionUid
-     * @param previousOptionUid
-     * @param questionResultUid
-     * @return if present, it contains optionUid of the option group containing duplicate (added there presumably by
-     *         another teacher working in parallel)
-     */
-    Optional<Long> allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid,
-	    Long questionResultUid);
-
-    /**
      * For export purposes
      *
      * @param contentId
      * @param questionUid
      * @return
      */
-    Map<Long, QuestionSummary> getQuestionSummaryForExport(Assessment assessment);
+    Map<Long, QuestionSummary> getQuestionSummaryForExport(Assessment assessment, boolean finishedAttemptsOnly);
 
     /**
      * Prepares data for Summary excel export
-     *
-     * @param assessment
-     * @param sessionDtos
-     * @return
      */
-    List<ExcelSheet> exportSummary(Assessment assessment, List<SessionDTO> sessionDtos);
+    List<ExcelSheet> exportSummary(Assessment assessment, long toolContentId);
 
     /**
      * Alternative Excel export. (Copied from now obsolete MCQ tool.)
@@ -461,30 +439,23 @@ public interface IAssessmentService extends ICommonToolService {
     /**
      * Gets the basic statistics for the grades for the Leaders when an Assessment is done using
      * Group Leaders. So the averages, etc are for the whole Assessment, not for a Group.
-     *
-     * @param contentId
-     * @return
      */
-    LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId);
+    GradeStatsDTO getStatsDtoForLeaders(Long contentId);
 
     /**
      * Prepares data for the marks summary graph on the statistics page
      *
-     * @param assessment
-     * @param sessionDtos
-     * @return
      */
-    List<Number> getMarksArray(Long sessionId);
+    List<Float> getMarksArray(Long sessionId);
+
+    List<Float> getMarksArrayByContentId(Long toolContentId);
 
     /**
      * Prepares data for the marks summary graph on the statistics page, using the grades for the Leaders
      * when an Assessment is done using Group Leaders. So the grades are for the whole Assessment, not for a Group.
      *
-     * @param assessment
-     * @param sessionDtos
-     * @return
      */
-    List<Number> getMarksArrayForLeaders(Long contentId);
+    List<Float> getMarksArrayForLeaders(Long contentId);
 
     void changeQuestionResultMark(Long questionResultUid, float newMark);
 
@@ -550,4 +521,8 @@ public interface IAssessmentService extends ICommonToolService {
     Grouping getGrouping(long toolContentId);
 
     List<User> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString);
+
+    Map<Integer, List<String[]>> getAnsweredQuestionsByUsers(long toolContentId);
+
+    void changeLeaderForGroup(long toolSessionId, long leaderUserId);
 }

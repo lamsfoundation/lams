@@ -17,13 +17,14 @@
 
 package org.apache.poi.hpsf;
 
+import static org.apache.poi.hpsf.ClassIDPredefined.SUMMARY_PROPERTIES;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
 import org.apache.poi.hpsf.wellknown.PropertyIDMap;
-import org.apache.poi.hpsf.wellknown.SectionIDMap;
 
 /**
  * Convenience class representing a Summary Information stream in a
@@ -31,13 +32,19 @@ import org.apache.poi.hpsf.wellknown.SectionIDMap;
  *
  * @see DocumentSummaryInformation
  */
-public final class SummaryInformation extends SpecialPropertySet {
+public final class SummaryInformation extends PropertySet {
 
     /**
      * The document name a summary information stream usually has in a POIFS filesystem.
      */
     public static final String DEFAULT_STREAM_NAME = "\005SummaryInformation";
 
+    /**
+     * The SummaryInformation's section's format ID.
+     */
+    public static final ClassID FORMAT_ID = SUMMARY_PROPERTIES.getClassID();
+
+    @Override
     public PropertyIDMap getPropertySetIDMap() {
     	return PropertyIDMap.getSummaryInformationProperties();
     }
@@ -46,9 +53,9 @@ public final class SummaryInformation extends SpecialPropertySet {
      * Creates an empty {@link SummaryInformation}.
      */
     public SummaryInformation() {
-        getFirstSection().setFormatID(SectionIDMap.SUMMARY_INFORMATION_ID);
+        getFirstSection().setFormatID(FORMAT_ID);
     }
-        
+
     /**
      * Creates a {@link SummaryInformation} from a given {@link
      * PropertySet}.
@@ -92,7 +99,7 @@ public final class SummaryInformation extends SpecialPropertySet {
         super(stream);
     }
 
-    
+
     /**
      * @return The title or {@code null}
      */
@@ -309,7 +316,7 @@ public final class SummaryInformation extends SpecialPropertySet {
 
 
     /**
-     * Returns the revision number (or {@code null}). 
+     * Returns the revision number (or {@code null}).
      *
      * @return The revision number or {@code null}
      */
@@ -576,7 +583,7 @@ public final class SummaryInformation extends SpecialPropertySet {
      * change!</strong><p>
      *
      * To process this data, you may wish to make use of the
-     *  {@link Thumbnail} class. The raw data is generally 
+     *  {@link Thumbnail} class. The raw data is generally
      *  an image in WMF or Clipboard (BMP?) format
      *
      * @return The thumbnail or {@code null}
@@ -594,7 +601,9 @@ public final class SummaryInformation extends SpecialPropertySet {
      */
     public Thumbnail getThumbnailThumbnail() {
         byte[] data = getThumbnail();
-        if (data == null) return null;
+        if (data == null) {
+            return null;
+        }
         return new Thumbnail(data);
     }
 

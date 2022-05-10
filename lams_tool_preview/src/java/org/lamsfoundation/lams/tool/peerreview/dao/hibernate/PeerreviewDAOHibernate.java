@@ -40,20 +40,19 @@ import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 public class PeerreviewDAOHibernate extends LAMSBaseDAO implements PeerreviewDAO {
     private static final String GET_RESOURCE_BY_CONTENTID = "from " + Peerreview.class.getName()
 	    + " as r where r.contentId=?";
-    
-    // ANY_VALUE is needed for Mysql setting ONLY_FULL_GROUP_BY - the sessionName will always be the same 
+
+    // ANY_VALUE is needed for Mysql setting ONLY_FULL_GROUP_BY - the sessionName will always be the same
     // as it is from the same table as sessionId.  (LDEV-4222)
     private static final String GET_STATS = "SELECT s.session_id as \"sessionId\", ANY_VALUE(s.session_name) as \"sessionName\", "
 	    + " count(u.uid) as \"numLearnersInSession\", sum(u.session_finished) as \"numLearnersComplete\" "
 	    + " FROM tl_laprev11_session s "
 	    + " JOIN tl_laprev11_peerreview p ON p.content_id = :toolContentId AND s.peerreview_uid = p.uid "
-	    + " LEFT JOIN tl_laprev11_user u ON u.session_uid = s.uid "
-	    + " GROUP BY session_id";
+	    + " LEFT JOIN tl_laprev11_user u ON u.session_uid = s.uid " + " GROUP BY session_id";
 
     @SuppressWarnings("rawtypes")
     @Override
     public Peerreview getByContentId(Long contentId) {
-	List list = find(GET_RESOURCE_BY_CONTENTID, contentId);
+	List list = doFindCacheable(GET_RESOURCE_BY_CONTENTID, contentId);
 	if (list.size() > 0) {
 	    return (Peerreview) list.get(0);
 	} else {
@@ -69,10 +68,8 @@ public class PeerreviewDAOHibernate extends LAMSBaseDAO implements PeerreviewDAO
     @SuppressWarnings("unchecked")
     @Override
     public List<PeerreviewStatisticsDTO> getStatistics(Long toolContentId) {
-	return getSession().createSQLQuery(GET_STATS)
-		.setParameter("toolContentId", toolContentId)
-		.setResultTransformer( Transformers.aliasToBean( PeerreviewStatisticsDTO.class ) )
-		.list();
-	
+	return getSession().createSQLQuery(GET_STATS).setParameter("toolContentId", toolContentId)
+		.setResultTransformer(Transformers.aliasToBean(PeerreviewStatisticsDTO.class)).list();
+
     }
 }

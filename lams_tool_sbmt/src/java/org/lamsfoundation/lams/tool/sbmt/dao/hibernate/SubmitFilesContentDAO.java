@@ -21,8 +21,6 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.sbmt.dao.hibernate;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
@@ -38,7 +36,7 @@ public class SubmitFilesContentDAO extends LAMSBaseDAO implements ISubmitFilesCo
 
     @Override
     public SubmitFilesContent getContentByID(Long contentID) {
-	return (SubmitFilesContent) super.find(SubmitFilesContent.class, contentID);
+	return super.find(SubmitFilesContent.class, contentID);
     }
 
     @Override

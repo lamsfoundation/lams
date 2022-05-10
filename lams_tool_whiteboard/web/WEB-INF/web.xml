@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+	version="3.1">
+	<display-name>Whiteboard</display-name>
+	<description>
+		Whiteboard tool
+	</description>
+	<context-param>
+		<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+		<param-value>org.lamsfoundation.lams.tool.whiteboard.ApplicationResources</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:/org/lamsfoundation/lams/tool/whiteboard/dbupdates/autopatchContext.xml</param-value>
+	</context-param>
+
+	<listener>
+		<listener-class>
+			org.lamsfoundation.lams.web.filter.LamsContextLoaderListener
+		</listener-class>
+	</listener>
+
+	<filter>
+		<filter-name>hibernateFilter</filter-name>
+		<filter-class>
+			org.springframework.orm.hibernate5.support.OpenSessionInViewFilter
+		</filter-class>
+		<init-param>
+			<param-name>sessionFactoryBeanName</param-name>
+			<param-value>coreSessionFactory</param-value>
+		</init-param>
+	</filter>
+	<!-- System session filter -->
+	<filter>
+		<filter-name>SystemSessionFilter</filter-name>
+		<filter-class>
+			org.lamsfoundation.lams.web.session.SystemSessionFilter
+		</filter-class>
+	</filter>
+	<filter>
+		<filter-name>LocaleFilter</filter-name>
+		<filter-class>
+			org.lamsfoundation.lams.web.filter.LocaleFilter
+		</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>CSRFGuard</filter-name>
+		<filter-class>org.owasp.csrfguard.CsrfGuardFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>hibernateFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>SystemSessionFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>LocaleFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>CSRFGuard</filter-name> 
+		<url-pattern>*.do</url-pattern>
+	</filter-mapping>
+
+	<servlet>
+		<servlet-name>spring</servlet-name>
+		<servlet-class>
+			org.springframework.web.servlet.DispatcherServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet>
+		<servlet-name>Connector</servlet-name>
+		<servlet-class>net.fckeditor.connector.ConnectorServlet</servlet-class>
+		<init-param>
+			<param-name>baseDir</param-name>
+			<param-value>/UserFiles/</param-value>
+		</init-param>
+		<init-param>
+			<param-name>debug</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<!-- The download servlet, reused from the content repository jar -->
+	<servlet>
+		<description>Instructions Download</description>
+		<display-name>Instructions Download</display-name>
+		<servlet-name>download</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.contentrepository.client.ToolDownload</servlet-class>
+		<init-param>
+			<param-name>toolContentHandlerBeanName</param-name>
+			<param-value>whiteboardToolContentHandler</param-value>
+		</init-param>
+		<load-on-startup>3</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>spring</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>Connector</servlet-name>
+		<url-pattern>/ckeditor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>download</servlet-name>
+		<url-pattern>/download/*</url-pattern>
+	</servlet-mapping>
+
+	<jsp-config>
+		<!-- ======================================================== -->
+		<!-- JSTL 1.2 Tag Library -->
+		<!-- ======================================================== -->
+		<taglib>
+			<taglib-uri>tags-fmt</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/fmt.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-core</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/c.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-function</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/fn.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-xml</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/x.tld</taglib-location>
+		</taglib>
+		<!-- ======================================================== -->
+		<!-- Customized Tag Library -->
+		<!-- ======================================================== -->
+		<taglib>
+			<taglib-uri>tags-lams</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/lams/lams.tld</taglib-location>
+		</taglib>
+		<!-- ======================================================== -->
+		<!-- CSRF Guard Tag Library -->
+		<!-- ======================================================== -->
+		<taglib>
+			<taglib-uri>csrfguard</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/security/csrfguard.tld</taglib-location>
+		</taglib>
+		
+		<jsp-property-group>
+			<url-pattern>*.jsp</url-pattern>
+			<page-encoding>UTF-8</page-encoding>
+			<default-content-type>text/html; charset=UTF-8</default-content-type>
+  		</jsp-property-group>
+
+	</jsp-config>
+
+	<!-- Security Constraint -->
+	<deny-uncovered-http-methods />
+	
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Secure content</web-resource-name>
+			<url-pattern>/*</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>LEARNER</role-name>
+			<role-name>MONITOR</role-name>
+			<role-name>AUTHOR</role-name>
+			<role-name>SYSADMIN</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Authoring content</web-resource-name>
+			<url-pattern>/authoring/*</url-pattern>
+			<url-pattern>/pages/authoring/*</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>AUTHOR</role-name>
+			<role-name>MONITOR</role-name>
+			<role-name>SYSADMIN</role-name>
+		</auth-constraint>
+	</security-constraint>
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Staff content</web-resource-name>
+			<url-pattern>/monitoring/*</url-pattern>
+			<url-pattern>/pages/monitoring/*</url-pattern>
+			<url-pattern>/definelater.do</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>MONITOR</role-name>
+			<role-name>SYSADMIN</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+	<!-- Security Roles -->
+	<security-role>
+		<description>Student</description>
+		<role-name>LEARNER</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Authors Learning Designs</description>
+		<role-name>AUTHOR</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Member of Staff</description>
+		<role-name>MONITOR</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Group Manager</description>
+		<role-name>GROUP MANAGER</role-name>
+	</security-role>
+
+	<security-role>
+		<description>LAMS System Adminstrator</description>
+		<role-name>SYSADMIN</role-name>
+	</security-role>
+
+	<!-- Login Configuration -->
+	<login-config>
+		<auth-method>FORM</auth-method>
+		<realm-name>LAMS</realm-name>
+		<form-login-config>
+			<form-login-page>/login.jsp</form-login-page>
+			<form-error-page>/login.jsp?failed=y</form-error-page>
+		</form-login-config>
+	</login-config>
+
+	<error-page>
+		<error-code>500</error-code>
+		<location>/error.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>403</error-code>
+		<location>/403.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>404</error-code>
+		<location>/404.jsp</location>
+	</error-page>
+</web-app>

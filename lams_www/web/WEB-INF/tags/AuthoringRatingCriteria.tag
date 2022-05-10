@@ -86,6 +86,28 @@
 	</c:if>
 </c:forEach>
 
+<style>
+	.rating-criteria-tag #criterias-table td.criteria-info {
+		padding-top: 5px;
+		padding-bottom: 5px;
+	}
+	
+	.rating-criteria-tag #criterias-table .arrow-up {
+		margin-left: 10px;
+	}
+	
+	.rating-criteria-tag #criterias-table .arrow-down {
+		margin-right: 8px;
+	}
+	
+	.rating-criteria-tag #criterias-table .fa.fa-times {
+		margin-left: 10px;
+	}
+	
+	.rating-criteria-tag #minimum-rates {
+		margin-right: 10px;
+	}
+</style>
 <script type="text/javascript">
 $(document).ready(function() { 
 	

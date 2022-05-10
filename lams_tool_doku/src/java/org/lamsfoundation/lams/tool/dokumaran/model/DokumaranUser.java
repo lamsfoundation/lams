@@ -23,7 +23,7 @@
 
 package org.lamsfoundation.lams.tool.dokumaran.model;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -34,7 +34,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -82,19 +81,9 @@ public class DokumaranUser implements Cloneable {
     @JoinColumn(name = "dokumaran_uid")
     private Dokumaran dokumaran;
 
-    // =============== NON Persisit value: for display use ===========
-
-    // the user access some reousrce item date time. Use in monitoring summary page
-    @Transient
-    private Date accessDate;
-
-    // dokumaran item complete date. Use in monitoring summary page
-    @Transient
-    private Date completeDate;
-
-    // difference between completeDate and accessDate
-    @Transient
-    private Date timeTaken;
+    // date when user has started activity
+    @Column(name = "time_limit_launched_date")
+    private LocalDateTime timeLimitLaunchedDate;
 
     public DokumaranUser() {
     }
@@ -105,7 +94,7 @@ public class DokumaranUser implements Cloneable {
 	this.lastName = user.getLastName();
 	this.loginName = user.getLogin();
 	this.session = session;
-	this.dokumaran = null;
+	this.dokumaran = session.getDokumaran();
 	this.sessionFinished = false;
 	this.leader = false;
     }
@@ -232,28 +221,11 @@ public class DokumaranUser implements Cloneable {
 	this.leader = leader;
     }
 
-    public Date getAccessDate() {
-	return accessDate;
+    public LocalDateTime getTimeLimitLaunchedDate() {
+	return timeLimitLaunchedDate;
     }
 
-    public void setAccessDate(Date accessDate) {
-	this.accessDate = accessDate;
+    public void setTimeLimitLaunchedDate(LocalDateTime timeLimitLaunchedDate) {
+	this.timeLimitLaunchedDate = timeLimitLaunchedDate;
     }
-
-    public Date getCompleteDate() {
-	return completeDate;
-    }
-
-    public void setCompleteDate(Date completeDate) {
-	this.completeDate = completeDate;
-    }
-
-    public Date getTimeTaken() {
-	return timeTaken;
-    }
-
-    public void setTimeTaken(Date timeTaken) {
-	this.timeTaken = timeTaken;
-    }
-
 }

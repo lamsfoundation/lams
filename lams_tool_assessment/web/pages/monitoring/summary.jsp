@@ -3,9 +3,20 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="sessionDtos" value="${sessionMap.sessionDtos}"/>
 <c:set var="assessment" value="${sessionMap.assessment}"/>
+<c:set var="showQuestionMonitoringActionButtons" value="${not empty sessionDtos}" />
+
+<%@ include file="parts/discloseAnswers.jsp"%>
 
 <script type="text/javascript">
+	var activityCompletionChart = null,
+		answeredQuestionsChart = null;
+	// how often completion charts will be updated
+	const COMPLETION_CHART_UPDATE_INTERVAL = 10 * 1000,
+	// for allquestions.jsp to know whether to display an additional button
+	 	  showQuestionDetailsButton = true;
+
 	$(document).ready(function(){
+		loadResultsPane($('#results'), false);
 		
 		initializePortraitPopover("<lams:LAMSURL />");
 		
@@ -162,154 +173,10 @@
 			resizeJqgrid(jQuery(".ui-jqgrid-btable:visible", this));
 		})
 
-		var questionUidSelect = $('#questionUid'),
-			summaryButton = $('#questionSummaryHref'),
-			correctButton = $('#questionDiscloseCorrect'),
-			correctAllButton = $('#discloseAllCorrect'),
-			groupsAllButton = $('#discloseAllGroups'),
-			groupsButton = $('#questionDiscloseGroups'),
-			correctButtonLabel = "<fmt:message key='label.disclose.correct.answers' />",
-			groupsButtonLabel = "<fmt:message key='label.disclose.groups.answers' />",
-			checkIcon = '<i class="fa fa-check text-success">&nbsp;</i>';
-
-			// when question dropdow changes, manipulate buttons
-			questionUidSelect.change(function(event) {
-				var questionUid = $(this).val(),
-					selectedOption = $('option:selected', this),
-					// disclosing correct answers works only for multiple choice
-					isMultipleChoice = selectedOption.attr('isMultipleChoice') == 'true',
-					correctDisclosed = isMultipleChoice && selectedOption.attr('correctDisclosed'),
-					groupsDisclosed = selectedOption.attr('groupsDisclosed');
-			if (questionUid == -1) {
-				// user went back to "Choose..." option
-				summaryButton.addClass('disabled');
-				correctButton.show().addClass('disabled').text(correctButtonLabel);
-				groupsButton.show().addClass('disabled').text(groupsButtonLabel);
-			} else {
-				// set link for thickbox
-				summaryButton.removeClass('disabled').attr("href", 
-					'<c:url value="/monitoring/questionSummary.do?sessionMapID=${sessionMapID}"/>&questionUid='
-					+ questionUid + "&KeepThis=true&TB_iframe=true&modal=true");
-				// manipulate disclose buttons
-				if (isMultipleChoice) {
-					correctButton.show();
-					if (correctDisclosed == "true") {
-						correctButton.addClass('disabled').html(checkIcon + correctButtonLabel);
-					} else {
-						correctButton.removeClass('disabled').html(correctButtonLabel);
-					}
-				} else {
-					correctButton.hide();
-				}
-				
-				if (groupsDisclosed == "true") {
-					groupsButton.addClass('disabled').html(checkIcon + groupsButtonLabel);
-				} else {
-					groupsButton.removeClass('disabled').html(groupsButtonLabel);
-				}
-			}
-	    });
-
-		// ajax calls to disclose correct/groups answers
-	    correctButton.click(function(){
-	    	if (!confirm("<fmt:message key='message.disclose.correct.answers' />")) {
-	    		return;
-	    	};
-	    	
-			$.ajax({
-                type: 'POST',
-				'url'  : '<lams:WebAppURL />monitoring/discloseCorrectAnswers.do?<csrf:token/>',
-				'data' : {
-					'questionUid'   : questionUidSelect.val(),
-					'toolContentID' : '${sessionMap.assessment.contentId}'
-				}
-			}).done(function(){
-				$('option:selected', questionUidSelect).attr('correctDisclosed', 'true');
-				correctButton.addClass('disabled').html(checkIcon + correctButtonLabel);
-			});
-		});
-
-	    groupsButton.click(function(){
-	    	if (!confirm("<fmt:message key='message.disclose.groups.answers' />")) {
-	    		return;
-	    	};
-	    	
-			$.ajax({
-                type: 'POST',
-				'url'  : '<lams:WebAppURL />monitoring/discloseGroupsAnswers.do?<csrf:token/>',
-				'data' : {
-					'questionUid'   : questionUidSelect.val(),
-					'toolContentID' : '${sessionMap.assessment.contentId}'
-				}
-			}).done(function(){
-				$('option:selected', questionUidSelect).attr('groupsDisclosed', 'true');
-				groupsButton.addClass('disabled').html(checkIcon + groupsButtonLabel);
-			});
-		});
-
-	    correctAllButton.click(function(){
-	    	if (!confirm("<fmt:message key='message.disclose.all.correct.answers' />")) {
-	    		return;
-	    	};
-	    	
-		    $('option[correctDisclosed="false"]', questionUidSelect).each(function(){
-			    var option = $(this),
-			    	questionUid = option.val();
-				$.ajax({
-                    type: 'POST',
-					'url'  : '<lams:WebAppURL />monitoring/discloseCorrectAnswers.do?<csrf:token/>',
-					'data' : {
-						'questionUid'   : questionUid,
-						'toolContentID' : '${sessionMap.assessment.contentId}'
-					}
-				}).done(function(){
-					option.attr('correctDisclosed', 'true');
-					if (questionUidSelect.val() == questionUid) {
-						correctButton.addClass('disabled').html(checkIcon + correctButtonLabel);
-					}
-				});
-			});
-		    correctAllButton.addClass('disabled').html(checkIcon + correctAllButton.text());
-		});
-
-	    groupsAllButton.click(function(){
-	    	if (!confirm("<fmt:message key='message.disclose.all.groups.answers' />")) {
-	    		return;
-	    	};
-	    	
-		    $('option[groupsDisclosed="false"]', questionUidSelect).each(function(){
-			    var option = $(this),
-			    	questionUid = option.val();
-				$.ajax({
-                    type: 'POST',
-					'url'  : '<lams:WebAppURL />monitoring/discloseGroupsAnswers.do?<csrf:token/>',
-					'data' : {
-						'questionUid'   : questionUid,
-						'toolContentID' : '${sessionMap.assessment.contentId}'
-					}
-				}).done(function(){
-					option.attr('groupsDisclosed', 'true');
-					if (questionUidSelect.val() == questionUid) {
-						groupsButton.addClass('disabled').html(checkIcon + groupsButtonLabel);
-					}
-				});
-			});
-		    groupsAllButton.addClass('disabled').html(checkIcon + groupsAllButton.text());
-		});
-
 		// trigger the resize when the window first opens so that the grid uses all the space available.
 		setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 		
-		// create counter if absolute time limit is set
-		if (absoluteTimeLimit) {
-			updateAbsoluteTimeLimitCounter();
-			
-			// expand time limit panel if absolute time limit is set and not expired
-			if (absoluteTimeLimit > new Date().getTime() / 1000) {
-				$('#time-limit-collapse').collapse('show');
-			}
-		}
-		initInidividualTimeLimitAutocomplete();
+		drawCompletionCharts(${assessment.contentId}, ${assessment.useSelectLeaderToolOuput}, true);
 	});
 
 	function resizeJqgrid(jqgrids) {
@@ -328,335 +195,39 @@
 		var url = "<c:url value='/monitoring/exportSummary.do'/>?<csrf:token/>&sessionMapID=${sessionMapID}&reqID="+(new Date()).getTime();
 		return downloadFile(url, 'messageArea_Busy', '<fmt:message key="label.summary.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
 	};
-
 	
-	// TIME LIMIT
-	
-		// in minutes since learner entered the activity
-	var relativeTimeLimit = ${assessment.relativeTimeLimit},
-		// in seconds since epoch started
-		absoluteTimeLimit = ${empty assessment.absoluteTimeLimit ? 'null' : assessment.absoluteTimeLimitSeconds};
-	
-	function updateTimeLimit(type, toggle, adjust) {
-		// relavite time limit set
-		if (type == 'relative') {
-			// what is set at the moment on screen, not at server
-			var displayedRelativeTimeLimit = +$('#relative-time-limit-value').text();
-			
-			// start/stop
-			if (toggle !== null) {
-				
-				if (toggle === false) {
-					// stop, i.e. set time limit to 0
-					relativeTimeLimit = 0;
-					updateTimeLimitOnServer();
-					return;
-				}
-				
-				// start, i.e. set backend time limit to whatever is set on screen
-				if (toggle === true && displayedRelativeTimeLimit > 0) {
-					relativeTimeLimit = displayedRelativeTimeLimit;
-					// when teacher enables relative time limit, absolute one gets disabled
-					absoluteTimeLimit = null;
-					updateTimeLimitOnServer();
-				}
-				return;
-			}
-			
-			// no negative time limit is allowed
-			if (displayedRelativeTimeLimit == 0 && adjust < 0) {
-				return;
-			}
-			
-			var adjustedRelativeTimeLimit = displayedRelativeTimeLimit + adjust;
-			// at least one minute is required
-			// if teacher wants to set less, he should disable the limit or click "finish now"
-			if (adjustedRelativeTimeLimit < 1) {
-				adjustedRelativeTimeLimit = 1;
-			}
-			
-			// is time limit already enforced? if so, update the server
-			if (relativeTimeLimit > 0) {
-				relativeTimeLimit = adjustedRelativeTimeLimit;
-				updateTimeLimitOnServer();
-				return;
-			}
-			
-			// if time limit is not enforced yet, just update the screen
-			displayedRelativeTimeLimit = adjustedRelativeTimeLimit;
-			$('#relative-time-limit-value').text(displayedRelativeTimeLimit);
-			$('#relative-time-limit-start').prop('disabled', false);
-			return;
-		}
-		
-		if (type == 'absolute') {
-			// get existing value on counter, if it is set already
-			var counter = $('#absolute-time-limit-counter'),
-				secondsLeft = null;
-			if (counter.length === 1) {
-				var periods = counter.countdown('getTimes');
-				secondsLeft = $.countdown.periodsToSeconds(periods);
-			}
-			
-			if (toggle !== null) {
-				
-				// start/stop
-				if (toggle === false) {
-					absoluteTimeLimit = null;
-					updateAbsoluteTimeLimitCounter();
-					return;
-				} 
-				
-				// turn on the time limit, if there is any value on counter set already
-				if (toggle === true && secondsLeft) {
-					updateAbsoluteTimeLimitCounter(secondsLeft, true);
-					return;
-				}
-				
-				if (toggle === 'stop') {
-					absoluteTimeLimit =  Math.round(new Date().getTime() / 1000);
-					updateAbsoluteTimeLimitCounter();
-				}
-				return;
-			}
-			
-			// counter is not set yet and user clicked negative value
-			if (!secondsLeft && adjust < 0) {
-				return;
-			}
-			
-			// adjust time
-			secondsLeft += adjust * 60;
-			if (secondsLeft < 60) {
-				secondsLeft = 60;
-			}
-
-			// is time limit already enforced, update the server
-			// if time limit is not enforced yet, just update the screen
-			updateAbsoluteTimeLimitCounter(secondsLeft);
-			$('#absolute-time-limit-start').prop('disabled', false);
-			return;
-		}
-		
-		if (type == 'individual') {
-			// this method is called with updateTimeLimit.call() so we can change meaning of "this"
-			// and identify row and userUid
-			var button = $(this),
-				row = button.closest('.individual-time-limit-row'),
-				userId = row.data('userId');
-			
-			// disable individual time adjustment
-			if (toggle === false) {
-				updateIndividualTimeLimitOnServer('user-' + userId);
-				return;
-			}
-			var existingAdjustment = +$('.individual-time-limit-value', row).text(),
-				newAdjustment = existingAdjustment + adjust;
-			
-			updateIndividualTimeLimitOnServer('user-' + userId, newAdjustment);
-			return;
-		}
-	}
-	
-	function updateTimeLimitOnServer() {
-		
-		// absolute time limit has higher priority
-		if (absoluteTimeLimit != null) {
-			relativeTimeLimit = 0;
-		}
-		
-		$.ajax({
-			'url' : '<c:url value="/monitoring/updateTimeLimit.do"/>',
-			'type': 'post',
-			'cache' : 'false',
-			'data': {
-				'toolContentID' : '${assessment.contentId}',
-				'relativeTimeLimit' : relativeTimeLimit,
-				'absoluteTimeLimit' : absoluteTimeLimit,
-				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
-			},
-			success : function(){
-				// update widgets
-				$('#relative-time-limit-value').text(relativeTimeLimit);
-				
-				if (relativeTimeLimit > 0) {
-					$('#relative-time-limit-disabled').addClass('hidden');
-					$('#relative-time-limit-cancel').removeClass('hidden');
-					$('#relative-time-limit-enabled').removeClass('hidden');
-					$('#relative-time-limit-start').addClass('hidden');
-				} else {
-					$('#relative-time-limit-disabled').removeClass('hidden');
-					$('#relative-time-limit-cancel').addClass('hidden');
-					$('#relative-time-limit-enabled').addClass('hidden');
-					$('#relative-time-limit-start').removeClass('hidden').prop('disabled', true);
-				}
-				
-				if (absoluteTimeLimit === null) {
-					// no absolute time limit? destroy the counter
-					$('#absolute-time-limit-counter').countdown('destroy');
-					$('#absolute-time-limit-value').empty();
-					
-					$('#absolute-time-limit-disabled').removeClass('hidden');
-					$('#absolute-time-limit-cancel').addClass('hidden');
-					$('#absolute-time-limit-enabled').addClass('hidden');
-					$('#absolute-time-limit-start').removeClass('hidden').prop('disabled', true);
-					$('#absolute-time-limit-finish-now').prop('disabled', false);
-				} else {
-					$('#absolute-time-limit-disabled').addClass('hidden');
-					$('#absolute-time-limit-cancel').removeClass('hidden');
-					$('#absolute-time-limit-enabled').removeClass('hidden');
-					$('#absolute-time-limit-start').addClass('hidden');
-					$('#absolute-time-limit-finish-now').prop('disabled', absoluteTimeLimit <= Math.round(new Date().getTime() / 1000));
-				}
-			}
+	function showChangeLeaderModal(toolSessionId) {
+		$('#change-leader-modals').empty()
+		.load('<c:url value="/monitoring/displayChangeLeaderForGroupDialogFromActivity.do" />',{
+			toolSessionID : toolSessionId
 		});
 	}
-	
-	function updateAbsoluteTimeLimitCounter(secondsLeft, start) {
-		var now = Math.round(new Date().getTime() / 1000),
-			// preset means that counter is set just on screen and the time limit is not enforced for learners
-			preset = start !== true && absoluteTimeLimit == null;
-		
-		if (secondsLeft) {
-			if (!preset) {
-				// time limit is already enforced on server, so update it there now
-				absoluteTimeLimit = now + secondsLeft;
-				updateTimeLimitOnServer();
-			}
+
+	function onChangeLeaderCallback(response, leaderUserId, toolSessionId){
+        if (response.isSuccessful) {
+            $.ajax({
+    			'url' : '<c:url value="/monitoring/changeLeaderForGroup.do"/>',
+    			'type': 'post',
+    			'cache' : 'false',
+    			'data': {
+    				'toolSessionID' : toolSessionId,
+    				'leaderUserId' : leaderUserId,
+    				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
+    			},
+    			success : function(){
+    				alert("<fmt:message key='label.monitoring.leader.successfully.changed'/>");
+    				location.reload();
+    			},
+    			error : function(){
+    				alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+        		}
+            });
+        	
 		} else {
-			if (absoluteTimeLimit == null) {
-				// disable the counter
-				updateTimeLimitOnServer();
-				return;
-			}
-			// counter initialisation on page load or "finish now"
-			secondsLeft = absoluteTimeLimit - now;
-			if (secondsLeft <= 0) {
-				// finish now
-				updateTimeLimitOnServer();
-			}
-		}
-		
-		var counter = $('#absolute-time-limit-counter');
-	
-		if (counter.length == 0) {
-			counter = $('<div />').attr('id', 'absolute-time-limit-counter').appendTo('#absolute-time-limit-value')
-				.countdown({
-					until: '+' + secondsLeft +'S',
-					format: 'hMS',
-					compact: true,
-					alwaysExpire : true,
-					onTick: function(periods) {
-						// check for 30 seconds or less and display timer in red
-						var secondsLeft = $.countdown.periodsToSeconds(periods);
-						if (secondsLeft <= 30) {
-							counter.addClass('countdown-timeout');
-						} else {
-							counter.removeClass('countdown-timeout');
-						}				
-					},
-					expiryText : '<span class="countdown-timeout">Expired</span>'
-				});
-		} else {
-			// if counter is paused, we can not adjust time, so resume it for a moment
-			counter.countdown('resume');
-			counter.countdown('option', 'until', secondsLeft + 'S');
-		}
-		
-		if (preset) {
-			counter.countdown('pause');
-			$('#absolute-time-limit-start').removeClass('disabled');
-		} else {
-			counter.countdown('resume');
+			alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
 		}
 	}
 	
-	function timeLimitFinishNow(){
-		if (confirm('<fmt:message key="label.monitoring.summary.time.limit.finish.now.confirm" />')) {
-			updateTimeLimit('absolute', 'stop');
-		}
-	}
-	
-	
-	function initInidividualTimeLimitAutocomplete(){
-		$('#individual-time-limit-autocomplete').autocomplete({
-			'source' : '<c:url value="/monitoring/getPossibleIndividualTimeLimitUsers.do"/>?toolContentID=${assessment.contentId}',
-			'delay'  : 700,
-			'minLength' : 3,
-			'select' : function(event, ui){
-				// user ID or group ID, and default 0 adjustment
-				updateIndividualTimeLimitOnServer(ui.item.value, 0);
-
-				// clear search field
-				$(this).val('');
-				return false;
-			},
-			'focus': function() {
-				// Stop the autocomplete of resetting the value to the selected one
-				// It puts LAMS user ID instead of user name
-				event.preventDefault();
-			}
-		});
-		
-		refreshInidividualTimeLimitUsers();
-	}
-	
-	
-	function updateIndividualTimeLimitOnServer(itemId, adjustment) {
-		$.ajax({
-			'url' : '<c:url value="/monitoring/updateIndividualTimeLimit.do"/>',
-			'type': 'post',
-			'cache' : 'false',
-			'data': {
-				'toolContentID' : '${assessment.contentId}',
-				// itemId can user-<userId> or group-<groupId>
-				'itemId' : itemId,
-				'adjustment' : adjustment,
-				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
-			},
-			success : function(){
-				refreshInidividualTimeLimitUsers();
-			}
-		});
-	}
-
-
-	function refreshInidividualTimeLimitUsers() {
-		var table = $('#time-limit-table');
-		
-		$.ajax({
-			'url' : '<c:url value="/monitoring/getExistingIndividualTimeLimitUsers.do"/>',
-			'dataType' : 'json',
-			'cache' : 'false',
-			'data': {
-				'toolContentID' : '${assessment.contentId}'
-			},
-			success : function(users) {
-				// remove existing users
-				$('.individual-time-limit-row', table).remove();
-				
-				if (!users) {
-					return;
-				}
-				
-				var template = $('#individual-time-limit-template-row'),
-					now = new Date().getTime();
-				$.each(users, function(){
-					var row = template.clone()
-									  .attr('id', 'individual-time-limit-row-' + this.userId)
-									  .data('userId', this.userId)
-									  .addClass('individual-time-limit-row')
-									  .appendTo(table);
-					$('.individual-time-limit-user-name', row).text(this.name);
-					$('.individual-time-limit-value', row).text(this.adjustment);
-					
-					row.removeClass('hidden');
-				});
-			}
-		});
-	}
-	
-	// END OF TIME LIMIT
 	
 </script>
 
@@ -669,36 +240,47 @@
 	  <c:out value="${assessment.instructions}" escapeXml="false"/>
 	</div>
 	
-	<c:if test="${empty sessionDtos}">
-		<lams:Alert type="info" id="no-session-summary" close="false">
-			<fmt:message key="message.monitoring.summary.no.session" />
-		</lams:Alert>
-	</c:if>
+	<c:choose>
+		<c:when test="${empty sessionDtos}">
+			<lams:Alert type="info" id="no-session-summary" close="false">
+				<fmt:message key="message.monitoring.summary.no.session" />
+			</lams:Alert>
+		</c:when>
+		<c:otherwise>
+			<div id="completion-charts-container">
+				<div class="col-sm-12 col-md-6">
+					<canvas id="activity-completion-chart"></canvas>
+				</div>
+				
+				<div class="col-sm-12 col-md-6">
+					<canvas id="answered-questions-chart"></canvas>
+				</div>
+			</div>
+		</c:otherwise>
+	</c:choose>
+
 
 	<lams:WaitingSpinner id="messageArea_Busy"></lams:WaitingSpinner>
 	<div class="voffset5 help-block" id="messageArea"></div>
-			
 </div>
 
 <c:if test="${not empty sessionDtos}">
 	
-	<c:if test="${displayStudentChoices}">
-		<h5><fmt:message key="label.student.choices" /></h5>
-		
-		<%@ include file="/pages/monitoring/parts/mcqStudentChoices.jsp" %>
-	</c:if>
+	<c:choose>
+		<c:when test="${displayStudentChoices and not empty questions}">
+			<h5><fmt:message key="label.student.choices" /></h5>
+			<%@ include file="/pages/monitoring/parts/mcqStudentChoices.jsp" %>
+		</c:when>
+		<c:otherwise>
+			<%-- To maintain structure as if student choices table was present --%>
+			<div class="row"></div>
+		</c:otherwise>
+	</c:choose>
 	
 	<button onclick="return exportSummary();" class="btn btn-default btn-sm btn-disable-on-submit pull-right">
 		<i class="fa fa-download" aria-hidden="true"></i> 
 		<fmt:message key="label.monitoring.summary.export.summary" />
 	</button>
-	
-	<c:if test="${sessionMap.isOnlyMcqQuestionsAvailable}">
-		<button onclick="return exportMarksMCQ();" class="btn btn-default btn-sm btn-disable-on-submit pull-right btn btn-default btn-sm btn-disable-on-submit pull-right roffset10">
-			<i class="fa fa-download" aria-hidden="true"></i> 
-			<fmt:message key="label.export.marks.mcq" />
-		</button>
-	</c:if>
 			
 	<h5><fmt:message key="label.monitoring.summary.summary" /></h5>
 	
@@ -717,20 +299,36 @@
 	
 	<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
 	
-		<c:if test="${sessionMap.isGroupedActivity}">	
-		    <div class="panel panel-default" >
-		        <div class="panel-heading" id="heading${sessionDto.sessionId}">
-		        	<span class="panel-title collapsable-icon-left">
-		        		<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${sessionDto.sessionId}" 
-								aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${sessionDto.sessionId}" >
-							<fmt:message key="monitoring.label.group" />:	<c:out value="${sessionDto.sessionName}" />
-						</a>
-					</span>
-		        </div>
-	        
-	        <div id="collapse${sessionDto.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" 
-	        		role="tabpanel" aria-labelledby="heading${sessionSummary.sessionId}">
-		</c:if>
+		<c:choose>
+			<c:when test="${sessionMap.isGroupedActivity}">	
+			    <div class="panel panel-default" >
+			        <div class="panel-heading" id="heading${sessionDto.sessionId}">
+			        	<span class="panel-title collapsable-icon-left">
+			        		<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${sessionDto.sessionId}" 
+									aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${sessionDto.sessionId}" >
+								<fmt:message key="monitoring.label.group" />:	<c:out value="${sessionDto.sessionName}" />
+							</a>
+						</span>
+						<c:if test="${assessment.useSelectLeaderToolOuput and sessionDto.numberOfLearners > 0 and not sessionDto.leaderFinished}">
+							<button type="button" class="btn btn-default btn-xs pull-right"
+									onClick="javascript:showChangeLeaderModal(${sessionDto.sessionId})">
+								<fmt:message key='label.monitoring.change.leader'/>
+							</button>
+						</c:if>
+			        </div>
+		        
+		        <div id="collapse${sessionDto.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" 
+		        		role="tabpanel" aria-labelledby="heading${sessionSummary.sessionId}">
+			</c:when>
+			<c:when test="${assessment.useSelectLeaderToolOuput and sessionDto.numberOfLearners > 0 and not sessionDto.leaderFinished}">
+				<div style="text-align: right">
+					<button type="button" class="btn btn-default btn-sm voffset10" style="margin-bottom: 10px;"
+							onClick="javascript:showChangeLeaderModal(${sessionDto.sessionId})">
+						<fmt:message key='label.monitoring.change.leader'/>
+					</button>
+				</div>
+			</c:when>
+		</c:choose>
 				
 		<table id="list${sessionDto.sessionId}"></table>
 		<div class="voffset10"></div>
@@ -747,63 +345,39 @@
 		
 	<c:if test="${sessionMap.isGroupedActivity}">
 		</div> <!--  end panel group -->
-	</c:if>
+	</c:if>	
+</c:if>
 
-	<!-- Dropdown menu for choosing a question type -->	
-	<h5><fmt:message key="label.monitoring.summary.report.by.question" /></h5>
-	
-	<c:set var="allCorrectDisclosed" value="true" />
-	<c:set var="allGroupsDisclosed" value="true" />
-	<div class="form-inline form-group voffset5">
-		<select id="questionUid" class="form-control input-sm">
-			<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
-    		<c:forEach var="question" items="${sessionMap.questionList}" varStatus="questionCount">
-				<option value="${question.uid}"
-						isMultipleChoice="${question.type == 1}"
-						correctDisclosed="${question.correctAnswersDisclosed}"
-						groupsDisclosed="${question.groupsAnswersDisclosed}">
-					${questionCount.count})&nbsp;<c:out value="${question.qbQuestion.name}" escapeXml="true"/>
-				</option>
-				<c:set var="allCorrectDisclosed"
-					   value="${allCorrectDisclosed && (question.type != 1 || question.correctAnswersDisclosed)}" />
-				<c:set var="allGroupsDisclosed" value="${allGroupsDisclosed && question.groupsAnswersDisclosed}" />
-		   	</c:forEach>
-		</select>
-			
-		<a id="questionSummaryHref" class="thickbox btn btn-default disabled">
-			<fmt:message key="label.monitoring.summary.results.question" />
-		</a>
-		<c:if test="${assessment.allowDiscloseAnswers}">
-			<a id="questionDiscloseCorrect" class="btn btn-default disabled">
-				<fmt:message key="label.disclose.correct.answers" />
-			</a>
-			<c:if test="${sessionMap.isGroupedActivity}">
-				<a id="questionDiscloseGroups" class="btn btn-default disabled">
-					<fmt:message key="label.disclose.groups.answers" />
-				</a>
-			</c:if>
-		</c:if>
-	</div>
+<h5><fmt:message key="label.monitoring.summary.report.by.question" /></h5>
 
-		<c:if test="${assessment.allowDiscloseAnswers}">
-			<div class="voffset5">
-				<a id="discloseAllCorrect" class="btn btn-default ${allCorrectDisclosed ? 'disabled' : ''}">
-					<c:if test="${allCorrectDisclosed}">
-						<i class="fa fa-check text-success">&nbsp;</i>
-					</c:if>
-					<fmt:message key="label.disclose.all.correct.answers" />
-				</a>
-				<c:if test="${sessionMap.isGroupedActivity}">
-					<a id="discloseAllGroups" class="btn btn-default ${allGroupsDisclosed ? 'disabled' : ''}">
-						<c:if test="${allGroupsDisclosed}">
-							<i class="fa fa-check text-success">&nbsp;</i>
-						</c:if>
-						<fmt:message key="label.disclose.all.groups.answers" />
+<div class="assessment-questions-pane">
+	<c:if test="${showQuestionMonitoringActionButtons and (assessment.allowDiscloseAnswers or vsaPresent)}">
+		<%-- Release correct/groups answers for all questions in this assessment --%>
+		<div class="row">
+			<div class="col-xs-12 col-md-12 col-lg-12">
+				<div class="btn-group-sm pull-right disclose-all-button-group">
+					<div class="btn btn-default disclose-all-correct-button">
+						<fmt:message key="label.disclose.all.correct.answers"/>
+					</div>
+					<div class="btn btn-default disclose-all-groups-button">
+						<fmt:message key="label.disclose.all.groups.answers"/>
+					</div>
+				</div>
+				
+				<c:if test="${vsaPresent}">
+					<a class="btn btn-sm pull-right btn-default roffset5" target="_blank"
+			   		   href='<lams:LAMSURL />qb/vsa/displayVsaAllocate.do?toolContentID=${sessionMap.assessment.contentId}'>
+						<fmt:message key="label.vsa.allocate.button" />
 					</a>
 				</c:if>
 			</div>
-		</c:if>
-</c:if>
+		</div>
+	</c:if>	
+	
+	
+	<div id="results" class="voffset10" data-tool-content-id="${assessment.contentId}"></div>
+</div>
+
 
 <br/>
 
@@ -816,3 +390,5 @@
 <%@ include file="parts/timeLimit.jsp"%>
 
 <%@ include file="parts/dateRestriction.jsp"%>
+
+<div id="change-leader-modals"></div>

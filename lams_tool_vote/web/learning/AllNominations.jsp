@@ -16,10 +16,16 @@
 
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/common.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/d3.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/chart.js"></script>
-
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
+	
 	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${voteLearningForm.toolSessionID}', '', function() {
+			submitMethod('learnerFinished');
+		});
+		
 		function submitMethod(actionMethod) {
 			$('.btn').prop('disabled', true);
 			document.forms.voteLearningForm.action = actionMethod + ".do";
@@ -217,7 +223,7 @@
 				</c:if>
 
 				<c:if test="${voteGeneralLearnerFlowDTO.reflection != 'true' || !hasEditRight}">
-					<button type="submit" onclick="javascript:submitMethod('learnerFinished');"
+					<button type="button"
 						class="btn btn-primary pull-right voffset10 na" id="finishButton">
 						<c:choose>
 							<c:when test="${isLastActivity}">

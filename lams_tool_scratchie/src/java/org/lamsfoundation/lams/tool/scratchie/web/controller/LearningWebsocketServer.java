@@ -1,20 +1,16 @@
 package org.lamsfoundation.lams.tool.scratchie.web.controller;
 
 import java.io.IOException;
-import java.util.Calendar;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collection;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCodes;
-import javax.websocket.OnClose;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
@@ -23,11 +19,13 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.OptionDTO;
+import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
-import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
+import org.lamsfoundation.lams.web.controller.AbstractTimeLimitWebsocketServer;
+import org.lamsfoundation.lams.web.controller.AbstractTimeLimitWebsocketServer.EndpointConfigurator;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -37,123 +35,140 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * Sends Scratchies actions to non-leaders.
+ * Sends Scratchies actions to non-leaders and time limit to leaders.
  *
  * @author Marcin Cieslak
  */
-@ServerEndpoint("/learningWebsocket")
-public class LearningWebsocketServer {
+@ServerEndpoint(value = "/learningWebsocket", configurator = EndpointConfigurator.class)
+public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
+
+    private static final Logger log = Logger.getLogger(LearningWebsocketServer.class);
+
+    private IScratchieService scratchieService;
+
+    // maps toolContentId -> toolSessionId -> itemUid -> optionUid -> isCorrect
+    private final Map<Long, Map<Long, Map<Long, Map<String, Boolean>>>> scratchCache = new ConcurrentHashMap<>();
+
+    public LearningWebsocketServer() {
+	if (scratchieService == null) {
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(SessionManager.getServletContext());
+	    scratchieService = (IScratchieService) wac.getBean(ScratchieConstants.SCRATCHIE_SERVICE);
+	}
+    }
+
+    @Override
+    protected Logger getLog() {
+	return LearningWebsocketServer.log;
+    }
+
+    @Override
+    @OnOpen
+    public void registerUser(Session websocket) throws IOException {
+	super.registerUser(websocket);
+
+	Long toolContentId = Long
+		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_CONTENT_ID).get(0));
+	Long toolSessionId = Long
+		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
+	websocket.getUserProperties().put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
+
+	Map<Long, Map<Long, Map<String, Boolean>>> sessionCache = scratchCache.get(toolContentId);
+	Map<Long, Map<String, Boolean>> questionCache = null;
+	if (sessionCache == null) {
+	    sessionCache = new ConcurrentHashMap<>();
+	    scratchCache.put(toolContentId, sessionCache);
+	} else {
+	    questionCache = sessionCache.get(toolSessionId);
+	}
+
+	if (questionCache == null) {
+	    questionCache = new HashMap<>();
+	    sessionCache.put(toolSessionId, questionCache);
+	}
+    }
 
     /**
-     * A singleton which updates Learners with reports and votes.
+     * Fetches or creates a singleton of this websocket server.
      */
-    private static class SendWorker extends Thread {
-	private boolean stopFlag = false;
-	// how ofter the thread runs
-	private static final long CHECK_INTERVAL = 3000;
+    public static LearningWebsocketServer getInstance() {
+	LearningWebsocketServer result = (LearningWebsocketServer) AbstractTimeLimitWebsocketServer
+		.getInstance(LearningWebsocketServer.class.getName());
+	if (result == null) {
+	    result = new LearningWebsocketServer();
+	    AbstractTimeLimitWebsocketServer.registerInstance(result);
+	}
+	return result;
+    }
 
-	@Override
-	public void run() {
-	    while (!stopFlag) {
-		try {
-		    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
-		    HibernateSessionManager.openSession();
+    @Override
+    protected TimeCache getExistingTimeSettings(long toolContentId, Collection<Integer> userIds) {
+	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
+	TimeCache existingTimeSettings = new TimeCache();
 
-		    Iterator<Entry<Long, Set<Session>>> entryIterator = LearningWebsocketServer.websockets.entrySet()
-			    .iterator();
-		    // go through activities and update registered learners with reports and vote count
-		    while (entryIterator.hasNext()) {
-			Entry<Long, Set<Session>> entry = entryIterator.next();
-			Long toolSessionId = entry.getKey();
+	existingTimeSettings.absoluteTimeLimit = scratchie.getAbsoluteTimeLimit();
+	existingTimeSettings.relativeTimeLimit = scratchie.getRelativeTimeLimit() * 60;
+	existingTimeSettings.timeLimitAdjustment = new HashMap<>();
 
-			Set<Session> sessionWebsockets = entry.getValue();
-			ScratchieSession toolSession = LearningWebsocketServer.getScratchieService()
-				.getScratchieSessionBySessionId(toolSessionId);
-			// if all learners left the activity or session is missing, remove the obsolete mapping
-			if (sessionWebsockets.isEmpty() || toolSession == null) {
-			    entryIterator.remove();
-			    LearningWebsocketServer.cache.remove(toolSessionId);
-			    continue;
-			}
+	Map<Long, LocalDateTime> sessionLaunchDates = new HashMap<>();
+	Map<Long, Integer> sessionTimeLimitAdjustments = new HashMap<>();
 
-			boolean timeLimitUp = false;
-			boolean scratchingFinished = toolSession.isScratchingFinished();
-			// is Scratchie time limited?
-			if (toolSession.getTimeLimitLaunchedDate() != null) {
-			    // missing whole cache is a marker that we already checked time limit and it is up
-			    if (LearningWebsocketServer.cache.get(toolSessionId) == null) {
-				timeLimitUp = true;
-			    } else {
-				// calculate whether time limit is up
-				Calendar currentTime = new GregorianCalendar(TimeZone.getDefault());
-				Calendar timeLimitFinishDate = new GregorianCalendar(TimeZone.getDefault());
-				timeLimitFinishDate.setTime(toolSession.getTimeLimitLaunchedDate());
-				timeLimitFinishDate.add(Calendar.MINUTE, toolSession.getScratchie().getTimeLimit());
-				//adding 5 extra seconds to let leader auto-submit results and store them in DB
-				timeLimitFinishDate.add(Calendar.SECOND, 5);
-				if (timeLimitFinishDate.compareTo(currentTime) <= 0) {
-				    // time is up
-				    if (!scratchingFinished) {
-					// Leader did not finish scratching yet? Pity. We do it for him
-					LearningWebsocketServer.getScratchieService()
-						.setScratchingFinished(toolSessionId);
-					scratchingFinished = true;
-				    }
-				    // mark time limit as up with this trick
-				    LearningWebsocketServer.cache.remove(toolSessionId);
-				    timeLimitUp = true;
-				}
-			    }
-			}
+	for (Integer userId : userIds) {
+	    ScratchieUser user = scratchieService.getUserByUserIDAndContentID(userId.longValue(), toolContentId);
+	    if (user == null) {
+		continue;
+	    }
 
-			boolean isWaitingForLeaderToSubmit = LearningWebsocketServer.getScratchieService()
-				.isWaitingForLeaderToSubmitNotebook(toolSession);
-			if (timeLimitUp) {
-			    // time limit is up
-			    if (isWaitingForLeaderToSubmit) {
-				// if Leader did not finish burning questions or notebook, push non-leaders to wait page
-				LearningWebsocketServer.sendPageRefreshRequest(toolSessionId);
-			    } else {
-				// if Leader finished everything, non-leaders see Finish button
-				LearningWebsocketServer.sendCloseRequest(toolSessionId);
-			    }
-			} else if (scratchingFinished && !isWaitingForLeaderToSubmit) {
-			    // time limit not set or not up yet, but everything is finished
-			    // show non-leaders Finish button
-			    LearningWebsocketServer.sendCloseRequest(toolSessionId);
-			} else {
-			    // regular send of scratched items
-			    SendWorker.send(toolSessionId);
-			}
-		    }
-		} catch (IllegalStateException e) {
-		    // do nothing as server is probably shutting down and we could not obtain Hibernate session
-		} catch (Exception e) {
-		    //TODO remove this once NullPointerExceptions do not show anymore in logs
-		    e.printStackTrace();
-		    // error caught, but carry on
-		    log.error("Error in Scratchie worker thread", e);
-		} finally {
-		    try {
-			HibernateSessionManager.closeSession();
-			Thread.sleep(SendWorker.CHECK_INTERVAL);
-		    } catch (IllegalStateException | InterruptedException e) {
-			stopFlag = true;
-			LearningWebsocketServer.log.warn("Stopping Scratchie worker thread");
-		    }
+	    ScratchieSession session = user.getSession();
+	    LocalDateTime sessionLaunchDate = null;
+	    Integer timeLimitAdjustment = null;
+
+	    if (sessionLaunchDates.containsKey(session.getUid())) {
+		sessionLaunchDate = sessionLaunchDates.get(session.getUid());
+		timeLimitAdjustment = sessionTimeLimitAdjustments.get(session.getUid());
+	    } else {
+		Date launchDate = session.getTimeLimitLaunchedDate();
+		if (launchDate != null) {
+		    sessionLaunchDate = launchDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+		    timeLimitAdjustment = session.getTimeLimitAdjustment();
+
+		    sessionLaunchDates.put(session.getUid(), sessionLaunchDate);
+		    sessionTimeLimitAdjustments.put(session.getUid(), timeLimitAdjustment);
+		}
+	    }
+
+	    if (sessionLaunchDate != null) {
+		existingTimeSettings.timeLimitLaunchedDate.put(userId, sessionLaunchDate);
+		if (timeLimitAdjustment != null) {
+		    existingTimeSettings.timeLimitAdjustment.put(userId, timeLimitAdjustment);
 		}
 	    }
 	}
 
-	/**
-	 * Feeds websockets with scratched options.
-	 */
-	private static void send(Long toolSessionId) throws IOException {
+	return existingTimeSettings;
+    }
+
+    @Override
+    protected LocalDateTime launchUserTimeLimit(long toolContentId, int userId) {
+	return scratchieService.launchTimeLimit(toolContentId, userId);
+    }
+
+    @Override
+    protected boolean processActivity(long toolContentId, Collection<Session> websockets) throws IOException {
+	boolean result = super.processActivity(toolContentId, websockets);
+	if (!result) {
+	    // there are no more learners on the learner screen, so remove cached answers
+	    scratchCache.remove(toolContentId);
+	    return false;
+	}
+
+	Map<Long, Map<Long, Map<String, Boolean>>> sessionScratchCache = scratchCache.get(toolContentId);
+
+	for (Long toolSessionId : sessionScratchCache.keySet()) {
 	    ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 
-	    Collection<ScratchieItem> items = LearningWebsocketServer.getScratchieService()
-		    .getItemsWithIndicatedScratches(toolSessionId);
-	    Map<Long, Map<String, Boolean>> sessionCache = LearningWebsocketServer.cache.get(toolSessionId);
+	    Collection<ScratchieItem> items = scratchieService.getItemsWithIndicatedScratches(toolSessionId);
+	    Map<Long, Map<String, Boolean>> questionCache = sessionScratchCache.get(toolSessionId);
 	    for (ScratchieItem item : items) {
 		Long itemUid = item.getUid();
 		// do not init variables below until it's really needed
@@ -163,16 +178,16 @@ public class LearningWebsocketServer {
 		    if (optionDto.isScratched()) {
 			// answer is scratched, check if it is present in cache
 			if (itemCache == null) {
-			    itemCache = sessionCache.get(itemUid);
+			    itemCache = questionCache.get(itemUid);
 			    if (itemCache == null) {
 				itemCache = new TreeMap<>();
-				sessionCache.put(itemUid, itemCache);
+				questionCache.put(itemUid, itemCache);
 			    }
 			}
 
-			boolean isMCQItem = QbQuestion.TYPE_MULTIPLE_CHOICE == item.getQbQuestion().getType();
-			String optionUidOrAnswer = isMCQItem
-				? optionDto.getQbOptionUid().toString()
+			boolean isMCQItem = QbQuestion.TYPE_MULTIPLE_CHOICE == item.getQbQuestion().getType()
+				|| QbQuestion.TYPE_MARK_HEDGING == item.getQbQuestion().getType();
+			String optionUidOrAnswer = isMCQItem ? optionDto.getQbOptionUid().toString()
 				: optionDto.getAnswer();
 			Boolean isCorrectStoredAnswer = optionDto.isCorrect();
 
@@ -197,110 +212,38 @@ public class LearningWebsocketServer {
 	    }
 
 	    // are there any updates to send?
-	    if (responseJSON.size() == 0) {
-		return;
-	    }
-
-	    String response = responseJSON.toString();
-	    Set<Session> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
-	    for (Session websocket : sessionWebsockets) {
-		websocket.getBasicRemote().sendText(response);
-	    }
-	}
-    }
-
-    private static final Logger log = Logger.getLogger(LearningWebsocketServer.class);
-
-    private static IScratchieService scratchieService;
-
-    private static final SendWorker sendWorker = new SendWorker();
-    // maps toolSessionId -> itemUid -> optionUid -> isCorrect
-    private static final Map<Long, Map<Long, Map<String, Boolean>>> cache = new ConcurrentHashMap<>();
-    private static final Map<Long, Set<Session>> websockets = new ConcurrentHashMap<>();
-
-    static {
-	// run the singleton thread
-	LearningWebsocketServer.sendWorker.start();
-    }
-
-    /**
-     * Registeres the Learner for processing by SendWorker.
-     */
-    @OnOpen
-    public void registerUser(Session websocket) throws IOException {
-	Long toolSessionId = Long
-		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
-	String login = websocket.getUserPrincipal().getName();
-	ScratchieUser user = LearningWebsocketServer.getScratchieService().getUserByLoginAndSessionId(login,
-		toolSessionId);
-	if (user == null) {
-	    throw new SecurityException("User \"" + login
-		    + "\" is not a participant in Scratchie activity with tool session ID " + toolSessionId);
-	}
-
-	Set<Session> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
-	if (sessionWebsockets == null) {
-	    sessionWebsockets = ConcurrentHashMap.newKeySet();
-	    LearningWebsocketServer.websockets.put(toolSessionId, sessionWebsockets);
-
-	    Map<Long, Map<String, Boolean>> sessionCache = new TreeMap<>();
-	    LearningWebsocketServer.cache.put(toolSessionId, sessionCache);
-	}
-	sessionWebsockets.add(websocket);
-
-	if (log.isDebugEnabled()) {
-	    log.debug("User " + login + " entered Scratchie with toolSessionId: " + toolSessionId);
-	}
-    }
-
-    /**
-     * When user leaves the activity.
-     */
-    @OnClose
-    public void unregisterUser(Session websocket, CloseReason reason) {
-	Long toolSessionId = Long
-		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
-	LearningWebsocketServer.websockets.get(toolSessionId).remove(websocket);
-
-	if (log.isDebugEnabled()) {
-	    // If there was something wrong with the connection, put it into logs.
-	    log.debug("User " + websocket.getUserPrincipal().getName() + " left Scratchie with Tool Session ID: "
-		    + toolSessionId
-		    + (!(reason.getCloseCode().equals(CloseCodes.GOING_AWAY)
-			    || reason.getCloseCode().equals(CloseCodes.NORMAL_CLOSURE))
-				    ? ". Abnormal close. Code: " + reason.getCloseCode() + ". Reason: "
-					    + reason.getReasonPhrase()
-				    : ""));
-	}
-    }
-
-    /**
-     * The leader finished scratching and also . Non-leaders will have
-     * Finish button displayed.
-     */
-    public static void sendCloseRequest(Long toolSessionId) throws IOException {
-	Set<Session> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
-	if (sessionWebsockets == null) {
-	    return;
-	}
-
-	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	responseJSON.put("close", true);
-	String response = responseJSON.toString();
-
-	for (Session websocket : sessionWebsockets) {
-	    if (websocket.isOpen()) {
-		websocket.getBasicRemote().sendText(response);
+	    if (responseJSON.size() > 0) {
+		String response = responseJSON.toString();
+		for (Session websocket : websockets) {
+		    long userSessionId = (Long) websocket.getUserProperties().get(AttributeNames.PARAM_TOOL_SESSION_ID);
+		    if (toolSessionId.equals(userSessionId)) {
+			websocket.getBasicRemote().sendText(response);
+		    }
+		}
 	    }
 	}
+
+	return true;
+    }
+
+    public static Long getSecondsLeft(long toolContentId, int userId) {
+	LearningWebsocketServer instance = LearningWebsocketServer.getInstance();
+	// get time limit launch date only if it exists; only leader launches the timer
+	return AbstractTimeLimitWebsocketServer.getSecondsLeft(instance, toolContentId, userId, false);
     }
 
     /**
      * The time limit is expired but leader hasn't submitted required notebook/burning questions yet. Non-leaders
      * will need to refresh the page in order to stop showing them questions page.
      */
-    public static void sendPageRefreshRequest(Long toolSessionId) throws IOException {
-	Set<Session> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
+    public void sendPageRefreshRequest(Long toolContentId, long toolSessionId) throws IOException {
+	if (toolContentId == null) {
+	    // get tool content ID from seession
+	    ScratchieSession scratchieSession = scratchieService.getScratchieSessionBySessionId(toolSessionId);
+	    toolContentId = scratchieSession.getScratchie().getContentId();
+	}
+
+	Set<Session> sessionWebsockets = websockets.get(toolContentId);
 	if (sessionWebsockets == null) {
 	    return;
 	}
@@ -310,18 +253,10 @@ public class LearningWebsocketServer {
 	String response = responseJSON.toString();
 
 	for (Session websocket : sessionWebsockets) {
-	    if (websocket.isOpen()) {
+	    long userSessionId = (Long) websocket.getUserProperties().get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	    if (toolSessionId == userSessionId) {
 		websocket.getBasicRemote().sendText(response);
 	    }
 	}
-    }
-
-    private static IScratchieService getScratchieService() {
-	if (scratchieService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(SessionManager.getServletContext());
-	    scratchieService = (IScratchieService) wac.getBean(ScratchieConstants.SCRATCHIE_SERVICE);
-	}
-	return scratchieService;
     }
 }

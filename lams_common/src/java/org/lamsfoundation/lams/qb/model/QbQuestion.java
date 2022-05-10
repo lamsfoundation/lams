@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -16,10 +17,13 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.lamsfoundation.lams.qb.service.IQbService;
@@ -44,6 +48,17 @@ public class QbQuestion implements Serializable, Cloneable {
     public static final int TYPE_ESSAY = 6;
     public static final int TYPE_ORDERING = 7;
     public static final int TYPE_MARK_HEDGING = 8;
+
+    // code styles
+    public static final int CODE_STYLE_PYTHON = 1;
+    public static final int CODE_STYLE_JAVASCRIPT = 2;
+    public static final int CODE_STYLE_JAVA = 3;
+    public static final int CODE_STYLE_SCALA = 4;
+    public static final int CODE_STYLE_KOTLIN = 5;
+    public static final int CODE_STYLE_C = 6;
+    public static final int CODE_STYLE_OBJECTIVE_C = 7;
+    public static final int CODE_STYLE_CPP = 8;
+    public static final int CODE_STYLE_CSHARP = 9;
 
     // primary key
     // another candidate is questionId + version, but single uid can be searched faster
@@ -115,6 +130,9 @@ public class QbQuestion implements Serializable, Cloneable {
     @Column(name = "case_sensitive")
     private boolean caseSensitive;
 
+    @Column(name = "exact_match")
+    private boolean exactMatch;
+
     @Column(name = "correct_answer")
     private boolean correctAnswer;
 
@@ -129,6 +147,10 @@ public class QbQuestion implements Serializable, Cloneable {
     @Column(name = "min_words_limit")
     private int minWordsLimit;
 
+    // only for essay type of question
+    @Column(name = "code_style")
+    private Integer codeStyle;
+
     /** ---- only for hedging type of question ---- */
     @Column(name = "hedging_justification_enabled")
     private boolean hedgingJustificationEnabled;
@@ -137,14 +159,20 @@ public class QbQuestion implements Serializable, Cloneable {
     @Column(name = "autocomplete_enabled")
     private boolean autocompleteEnabled;
 
-    @OneToMany(mappedBy = "qbQuestion", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(mappedBy = "qbQuestion", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SELECT)
     @OrderBy("displayOrder")
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private List<QbOption> qbOptions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "qbQuestion", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(mappedBy = "qbQuestion", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SELECT)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private List<QbQuestionUnit> units = new ArrayList<>();
+
+    // non-persistent field, useful for displaying other versions of this question
+    @Transient
+    private Map<Integer, Long> versionMap;
 
     // checks if important parts of another question are the same as current question's.
     // And if not, determines whether another question/version be created.
@@ -423,6 +451,14 @@ public class QbQuestion implements Serializable, Cloneable {
 	this.caseSensitive = caseSensitive;
     }
 
+    public boolean isExactMatch() {
+	return exactMatch;
+    }
+
+    public void setExactMatch(boolean exactMatch) {
+	this.exactMatch = exactMatch;
+    }
+
     public boolean getCorrectAnswer() {
 	return correctAnswer;
     }
@@ -469,6 +505,45 @@ public class QbQuestion implements Serializable, Cloneable {
 	this.minWordsLimit = minWordsLimit;
     }
 
+    public Integer getCodeStyle() {
+	return codeStyle;
+    }
+
+    public void setCodeStyle(Integer codeStyle) {
+	this.codeStyle = codeStyle;
+    }
+
+    public static String getCodeStyleMime(Integer codeStyle) {
+	if (codeStyle == null) {
+	    return null;
+	}
+	switch (codeStyle) {
+	    case CODE_STYLE_PYTHON:
+		return "text/x-python";
+	    case CODE_STYLE_JAVASCRIPT:
+		return "text/javascript";
+	    case CODE_STYLE_JAVA:
+		return "text/x-java";
+	    case CODE_STYLE_SCALA:
+		return "text/x-scala";
+	    case CODE_STYLE_KOTLIN:
+		return "text/x-kotlin";
+	    case CODE_STYLE_C:
+		return "text/x-csrc";
+	    case CODE_STYLE_OBJECTIVE_C:
+		return "text/x-objectivec";
+	    case CODE_STYLE_CPP:
+		return "text/x-c++src";
+	    case CODE_STYLE_CSHARP:
+		return "text/x-csharp";
+	}
+	return null;
+    }
+
+    public String getCodeStyleMime() {
+	return QbQuestion.getCodeStyleMime(codeStyle);
+    }
+
     public boolean isHedgingJustificationEnabled() {
 	return hedgingJustificationEnabled;
     }
@@ -507,5 +582,13 @@ public class QbQuestion implements Serializable, Cloneable {
 
     public void setUnits(List<QbQuestionUnit> units) {
 	this.units = units;
+    }
+
+    public Map<Integer, Long> getVersionMap() {
+	return versionMap;
+    }
+
+    public void setVersionMap(Map<Integer, Long> otherVersions) {
+	this.versionMap = otherVersions;
     }
 }

@@ -60,7 +60,9 @@
 							</fmt:message>
 						</c:if>
 						</small>
-						<i class="fa fa-check-square"></i>
+						<i class="fa fa-check-square" 
+						   onClick="javascript:openPopUp('${permissionGate.url}','ContributeActivity', 600, 800, true)"
+						   title="<fmt:message key='button.task.gate.opened.tooltip'/>"></i>
 					</c:when>
 					<c:otherwise>
 						<c:if test="${permissionGate.waitingLearnersCount > 0}">

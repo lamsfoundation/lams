@@ -30,15 +30,15 @@
 			<fmt:message key="label.users.from.group" />
 		</div>
 
-		<div class="voffset5">
-		
-			<div class="roffset10">
-				<c:forEach var="user" items="${groupUsers}" varStatus="status">
-					<div class="user">
+		<div id="usersInGroup">
+			<c:forEach var="user" items="${groupUsers}">
+				<div class="voffset10 loffset10">
+					<lams:Portrait userId="${user.userId}"/>
+					<span>
 						<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
-					</div>
-				</c:forEach>
+					</span>
 				</div>
+			</c:forEach>
 		</div>
 
 		<c:if test="${mode != teacher}">

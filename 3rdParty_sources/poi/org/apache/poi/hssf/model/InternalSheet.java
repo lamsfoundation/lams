@@ -66,9 +66,9 @@ public final class InternalSheet {
     private static POILogger            log              = POILogFactory.getLogger(InternalSheet.class);
 
     private List<RecordBase>             _records;
-    protected PrintGridlinesRecord       printGridlines    =     null;
-    protected PrintHeadersRecord         printHeaders      =     null;
-    protected GridsetRecord              gridset           =     null;
+    protected PrintGridlinesRecord       printGridlines;
+    protected PrintHeadersRecord         printHeaders;
+    protected GridsetRecord              gridset;
     private   GutsRecord                 _gutsRecord;
     protected DefaultColWidthRecord      defaultcolwidth   =     new DefaultColWidthRecord();
     protected DefaultRowHeightRecord     defaultrowheight  =     new DefaultRowHeightRecord();
@@ -80,8 +80,8 @@ public final class InternalSheet {
      */
     private final WorksheetProtectionBlock _protectionBlock = new WorksheetProtectionBlock();
 
-    protected WindowTwoRecord            windowTwo         =     null;
-    protected SelectionRecord            _selection         =     null;
+    protected WindowTwoRecord            windowTwo;
+    protected SelectionRecord            _selection;
     /** java object always present, but if empty no BIFF records are written */
     private final MergedCellsTable       _mergedCellsTable;
     /** always present in this POI object, not always written to Excel file */
@@ -90,13 +90,13 @@ public final class InternalSheet {
     private DimensionsRecord             _dimensions;
     /** always present */
     protected final RowRecordsAggregate  _rowsAggregate;
-    private   DataValidityTable          _dataValidityTable=     null;
+    private   DataValidityTable          _dataValidityTable;
     private   ConditionalFormattingTable condFormatting;
 
-    private   Iterator<RowRecord>        rowRecIterator    =     null;
+    private   Iterator<RowRecord>        rowRecIterator;
 
     /** Add an UncalcedRecord if not true indicating formulas have not been calculated */
-    protected boolean _isUncalced = false;
+    protected boolean _isUncalced;
 
     public static final byte PANE_LOWER_RIGHT = (byte)0;
     public static final byte PANE_UPPER_RIGHT = (byte)1;
@@ -125,14 +125,14 @@ public final class InternalSheet {
         _mergedCellsTable = new MergedCellsTable();
         RowRecordsAggregate rra = null;
 
-        List<RecordBase> records = new ArrayList<RecordBase>(128);
+        List<RecordBase> records = new ArrayList<>(128);
         _records = records; // needed here due to calls to findFirstRecordLocBySid before we're done
         int dimsloc = -1;
 
         if (rs.peekNextSid() != BOFRecord.sid) {
             throw new RecordFormatException("BOF record expected");
         }
-        
+
         BOFRecord bof = (BOFRecord) rs.getNext();
         if (bof.getType() == BOFRecord.TYPE_WORKSHEET) {
             // Good, well supported
@@ -144,7 +144,7 @@ public final class InternalSheet {
             // Not a supported type
             // Skip onto the EOF, then complain
             while (rs.hasNext()) {
-                Record rec = rs.getNext();
+                org.apache.poi.hssf.record.Record rec = rs.getNext();
                 if (rec instanceof EOFRecord) {
                     break;
                 }
@@ -152,7 +152,7 @@ public final class InternalSheet {
             throw new UnsupportedBOFType(bof.getType());
         }
         records.add(bof);
-        
+
         while (rs.hasNext()) {
             int recSid = rs.peekNextSid();
 
@@ -229,7 +229,7 @@ public final class InternalSheet {
                 continue;
             }
 
-            Record rec = rs.getNext();
+            org.apache.poi.hssf.record.Record rec = rs.getNext();
             if ( recSid == IndexRecord.sid ) {
                 // ignore INDEX record because it is only needed by Excel,
                 // and POI always re-calculates its contents
@@ -334,19 +334,16 @@ public final class InternalSheet {
             log.log(POILogger.DEBUG, "sheet createSheet (existing file) exited");
     }
     private static void spillAggregate(RecordAggregate ra, final List<RecordBase> recs) {
-        ra.visitContainedRecords(new RecordVisitor() {
-            public void visitRecord(Record r) {
-                recs.add(r);
-            }});
+        ra.visitContainedRecords(r -> recs.add(r));
     }
-    
+
     public static class UnsupportedBOFType extends RecordFormatException {
         private final int type;
         protected UnsupportedBOFType(int type) {
             super("BOF not of a supported type, found " + type);
             this.type = type;
         }
-        
+
         public int getType() {
             return type;
         }
@@ -354,17 +351,13 @@ public final class InternalSheet {
 
     private static final class RecordCloner implements RecordVisitor {
 
-        private final List<Record> _destList;
+        private final List<org.apache.poi.hssf.record.Record> _destList;
 
-        public RecordCloner(List<Record> destList) {
+        public RecordCloner(List<org.apache.poi.hssf.record.Record> destList) {
             _destList = destList;
         }
-        public void visitRecord(Record r) {
-            try {
-                _destList.add((Record)r.clone());
-            } catch (CloneNotSupportedException e) {
-                throw new RecordFormatException(e);
-            }
+        public void visitRecord(org.apache.poi.hssf.record.Record r) {
+            _destList.add(r.copy());
         }
     }
 
@@ -374,11 +367,11 @@ public final class InternalSheet {
      * can be added to a sheet. The <b>Record</b> object does not implement cloneable.
      * When adding a new record, implement a public clone method if and only if the record
      * belongs to a sheet.
-     * 
+     *
      * @return the cloned sheet
      */
     public InternalSheet cloneSheet() {
-        List<Record> clonedRecords = new ArrayList<Record>(_records.size());
+        List<org.apache.poi.hssf.record.Record> clonedRecords = new ArrayList<>(_records.size());
         for (int i = 0; i < _records.size(); i++) {
             RecordBase rb = _records.get(i);
             if (rb instanceof RecordAggregate) {
@@ -391,12 +384,8 @@ public final class InternalSheet {
                  */
                 rb = new DrawingRecord();
             }
-            try {
-                Record rec = (Record) ((Record) rb).clone();
-                clonedRecords.add(rec);
-            } catch (CloneNotSupportedException e) {
-                throw new RecordFormatException(e);
-            }
+            org.apache.poi.hssf.record.Record rec = ((org.apache.poi.hssf.record.Record) rb).copy();
+            clonedRecords.add(rec);
         }
         return createSheet(new RecordStream(clonedRecords, 0));
     }
@@ -411,12 +400,12 @@ public final class InternalSheet {
     public static InternalSheet createSheet() {
         return new InternalSheet();
     }
+
     private InternalSheet() {
         _mergedCellsTable = new MergedCellsTable();
-        List<RecordBase> records = new ArrayList<RecordBase>(32);
+        List<RecordBase> records = new ArrayList<>(32);
 
-        if (log.check( POILogger.DEBUG ))
-            log.log(POILogger.DEBUG, "Sheet createsheet from scratch called");
+        log.log(POILogger.DEBUG, "Sheet createsheet from scratch called");
 
         records.add(createBOF());
 
@@ -463,8 +452,7 @@ public final class InternalSheet {
         records.add(EOFRecord.instance);
 
         _records = records;
-        if (log.check( POILogger.DEBUG ))
-            log.log(POILogger.DEBUG, "Sheet createsheet from scratch exit");
+        log.log(POILogger.DEBUG, "Sheet createsheet from scratch exit");
     }
 
     public RowRecordsAggregate getRowsAggregate() {
@@ -478,7 +466,7 @@ public final class InternalSheet {
 
     /**
      * Updates formulas in cells and conditional formats due to moving of cells
-     * 
+     *
      * @param shifter the formular shifter
      * @param externSheetIndex the externSheet index of this sheet
      */
@@ -553,7 +541,7 @@ public final class InternalSheet {
         {
             log.log(POILogger.DEBUG, "Sheet.setDimensions");
             log.log(POILogger.DEBUG,
-                    (new StringBuffer("firstrow")).append(firstrow)
+                    (new StringBuilder("firstrow")).append(firstrow)
                         .append("firstcol").append(firstcol).append("lastrow")
                         .append(lastrow).append("lastcol").append(lastcol)
                         .toString());
@@ -562,8 +550,7 @@ public final class InternalSheet {
         _dimensions.setFirstRow(firstrow);
         _dimensions.setLastCol(lastcol);
         _dimensions.setLastRow(lastrow);
-        if (log.check( POILogger.DEBUG ))
-            log.log(POILogger.DEBUG, "Sheet.setDimensions exiting");
+        log.log(POILogger.DEBUG, "Sheet.setDimensions exiting");
     }
 
     public void visitContainedRecords(RecordVisitor rv, int offset) {
@@ -579,7 +566,7 @@ public final class InternalSheet {
                 RecordAggregate agg = (RecordAggregate) record;
                 agg.visitContainedRecords(ptv);
             } else {
-                ptv.visitRecord((Record) record);
+                ptv.visitRecord((org.apache.poi.hssf.record.Record) record);
             }
 
             // If the BOF record was just serialized then add the IndexRecord
@@ -995,7 +982,7 @@ public final class InternalSheet {
 
     /**
      * set the default row height for the sheet (if the rows do not define their own height)
-     * 
+     *
      * @param dch the default row height
      */
     public void setDefaultRowHeight(short dch) {
@@ -1247,7 +1234,7 @@ public final class InternalSheet {
 
     /**
      * Gets the gridset record for this sheet.
-     * 
+     *
      * @return the gridset record for this sheet
      */
     public GridsetRecord getGridsetRecord()
@@ -1257,17 +1244,17 @@ public final class InternalSheet {
 
     /**
      * Returns the first occurrence of a record matching a particular sid.
-     * 
+     *
      * @param sid the sid to search for
-     * 
+     *
      * @return the matching record or {@code null} if it wasn't found
      */
-    public Record findFirstRecordBySid(short sid) {
+    public org.apache.poi.hssf.record.Record findFirstRecordBySid(short sid) {
         int ix = findFirstRecordLocBySid(sid);
         if (ix < 0) {
             return null;
         }
-        return (Record) _records.get(ix);
+        return (org.apache.poi.hssf.record.Record) _records.get(ix);
     }
 
     /**
@@ -1298,10 +1285,10 @@ public final class InternalSheet {
         int max = _records.size();
         for (int i=0; i< max; i++) {
             Object rb = _records.get(i);
-            if (!(rb instanceof Record)) {
+            if (!(rb instanceof org.apache.poi.hssf.record.Record)) {
                 continue;
             }
-            Record record = (Record) rb;
+            org.apache.poi.hssf.record.Record record = (org.apache.poi.hssf.record.Record) rb;
             if (record.getSid() == sid) {
                 return i;
             }
@@ -1330,7 +1317,7 @@ public final class InternalSheet {
     {
         printGridlines = newPrintGridlines;
     }
-    
+
     /**
      * Returns the PrintHeadersRecord.
      * @return PrintHeadersRecord for the sheet.
@@ -1377,7 +1364,9 @@ public final class InternalSheet {
             windowTwo.setFreezePanes(false);
             windowTwo.setFreezePanesNoSplit(false);
             SelectionRecord sel = (SelectionRecord) findFirstRecordBySid(SelectionRecord.sid);
-            sel.setPane(PaneInformation.PANE_UPPER_LEFT);
+            if (sel != null) {
+                sel.setPane(PaneInformation.PANE_UPPER_LEFT);
+            }
             return;
         }
 
@@ -1402,8 +1391,9 @@ public final class InternalSheet {
         windowTwo.setFreezePanesNoSplit(true);
 
         SelectionRecord sel = (SelectionRecord) findFirstRecordBySid(SelectionRecord.sid);
-        sel.setPane((byte)pane.getActivePane());
-
+        if (sel != null) {
+            sel.setPane((byte) pane.getActivePane());
+        }
     }
 
     /**
@@ -1437,7 +1427,9 @@ public final class InternalSheet {
         windowTwo.setFreezePanesNoSplit(false);
 
         SelectionRecord sel = (SelectionRecord) findFirstRecordBySid(SelectionRecord.sid);
-        sel.setPane(PANE_LOWER_RIGHT);
+        if (sel != null) {
+            sel.setPane(PANE_LOWER_RIGHT);
+        }
 
     }
 
@@ -1514,7 +1506,7 @@ public final class InternalSheet {
     public boolean isDisplayRowColHeadings() {
         return windowTwo.getDisplayRowColHeadings();
     }
-    
+
     /**
      * Sets whether the RowColHeadings are shown in a viewer.
      * @param show whether to show RowColHeadings or not
@@ -1662,7 +1654,7 @@ public final class InternalSheet {
      * @return never <code>null</code>, typically empty array
      */
     public NoteRecord[] getNoteRecords() {
-        List<NoteRecord> temp = new ArrayList<NoteRecord>();
+        List<NoteRecord> temp = new ArrayList<>();
         for(int i=_records.size()-1; i>=0; i--) {
             RecordBase rec = _records.get(i);
             if (rec instanceof NoteRecord) {
@@ -1676,8 +1668,16 @@ public final class InternalSheet {
         temp.toArray(result);
         return result;
     }
-    
+
     public int getColumnOutlineLevel(int columnIndex) {
         return _columnInfos.getOutlineLevel(columnIndex);
+    }
+
+    public int getMinColumnIndex() {
+        return _columnInfos.getMinColumnIndex();
+    }
+
+    public int getMaxColumnIndex() {
+        return _columnInfos.getMaxColumnIndex();
     }
 }

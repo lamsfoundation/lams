@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.noticeboard.dao.hibernate;
 
 import java.util.List;
@@ -52,7 +51,7 @@ public class NoticeboardSessionDAO extends LAMSBaseDAO implements INoticeboardSe
     @Override
     public NoticeboardSession findNbSessionById(Long nbSessionId) {
 	String query = "from NoticeboardSession nbS where nbS.nbSessionId=?";
-	List<NoticeboardSession> session = (List<NoticeboardSession>) doFind(query, nbSessionId);
+	List<NoticeboardSession> session = doFindCacheable(query, nbSessionId);
 
 	if ((session != null) && (session.size() == 0)) {
 	    return null;
@@ -61,13 +60,17 @@ public class NoticeboardSessionDAO extends LAMSBaseDAO implements INoticeboardSe
 	}
     }
 
-    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#saveNbSession(org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardSession) */
+    /**
+     * @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#saveNbSession(org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardSession)
+     */
     @Override
     public void saveNbSession(NoticeboardSession nbSession) {
 	this.getSession().save(nbSession);
     }
 
-    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#updateNbSession(org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardSession) */
+    /**
+     * @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#updateNbSession(org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardSession)
+     */
     @Override
     public void updateNbSession(NoticeboardSession nbSession) {
 	this.getSession().update(nbSession);
@@ -91,7 +94,9 @@ public class NoticeboardSessionDAO extends LAMSBaseDAO implements INoticeboardSe
 
     }
 
-    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#removeNbSession(org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardSession) */
+    /**
+     * @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#removeNbSession(org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardSession)
+     */
     @Override
     public void removeNbSession(NoticeboardSession nbSession) {
 	removeNbSession(nbSession.getNbSessionId());
@@ -104,7 +109,9 @@ public class NoticeboardSessionDAO extends LAMSBaseDAO implements INoticeboardSe
 		.setParameter("userId", userId.longValue()).uniqueResult();
     }
 
-    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#removeNbUsers(org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardSession) */
+    /**
+     * @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#removeNbUsers(org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardSession)
+     */
     @Override
     public void removeNbUsers(NoticeboardSession nbSession) {
 	deleteAll(nbSession.getNbUsers());

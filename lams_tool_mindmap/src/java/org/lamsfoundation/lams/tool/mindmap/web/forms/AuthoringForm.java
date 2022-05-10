@@ -23,29 +23,23 @@
 
 package org.lamsfoundation.lams.tool.mindmap.web.forms;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
-/**
- *
- */
 public class AuthoringForm {
 
-    private static final long serialVersionUID = 3950453134542135495L;
+    private String title;
+    private String instructions;
+    private boolean lockOnFinished;
+    private boolean multiUserMode;
+    private boolean galleryWalkEnabled;
+    private boolean galleryWalkReadOnly;
+    private String galleryWalkInstructions;
+    private String currentTab;
+    private String dispatch;
+    private String sessionMapID;
+    private SessionMap sessionMap;
+    private String mindmapContent;
 
-    String title;
-    String instructions;
-    boolean lockOnFinished;
-    boolean multiUserMode;
-    String currentTab;
-    String dispatch;
-    String sessionMapID;
-    SessionMap sessionMap;
-    String mindmapContent;
     // reflection
     private boolean reflectOnActivity;
     private String reflectInstructions;
@@ -112,6 +106,30 @@ public class AuthoringForm {
 
     public void setMultiUserMode(boolean multiUserMode) {
 	this.multiUserMode = multiUserMode;
+    }
+
+    public boolean isGalleryWalkEnabled() {
+	return galleryWalkEnabled;
+    }
+
+    public void setGalleryWalkEnabled(boolean galleryWalkEnabled) {
+	this.galleryWalkEnabled = galleryWalkEnabled;
+    }
+
+    public boolean isGalleryWalkReadOnly() {
+	return galleryWalkReadOnly;
+    }
+
+    public void setGalleryWalkReadOnly(boolean galleryWalkReadOnly) {
+	this.galleryWalkReadOnly = galleryWalkReadOnly;
+    }
+
+    public String getGalleryWalkInstructions() {
+	return galleryWalkInstructions;
+    }
+
+    public void setGalleryWalkInstructions(String galleryWalkInstructions) {
+	this.galleryWalkInstructions = galleryWalkInstructions;
     }
 
     public String getMindmapContent() {

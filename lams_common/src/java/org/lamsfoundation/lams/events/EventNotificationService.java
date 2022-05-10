@@ -120,7 +120,7 @@ public class EventNotificationService implements IEventNotificationService {
     @Override
     public void notifyLessonMonitors(Long lessonId, String subject, String message, boolean isHtmlFormat) {
 	Map<User, Boolean> monitoringUsers = lessonService.getUsersWithLessonParticipation(lessonId, "MONITOR", null,
-		null, null, true);
+		null, null, true, true);
 	if (monitoringUsers.isEmpty()) {
 	    return;
 	}

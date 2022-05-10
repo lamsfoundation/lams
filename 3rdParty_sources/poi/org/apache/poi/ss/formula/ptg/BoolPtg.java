@@ -17,15 +17,15 @@
 
 package org.apache.poi.ss.formula.ptg;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * Boolean (boolean) Stores a (java) boolean value in a formula.
- *
- * @author Paul Krause (pkrause at soundbite dot com)
- * @author Andrew C. Oliver (acoliver at apache dot org)
- * @author Jason Height (jheight at chariot dot net dot au)
  */
 public final class BoolPtg extends ScalarConstantPtg {
 	public static final int SIZE = 2;
@@ -56,11 +56,26 @@ public final class BoolPtg extends ScalarConstantPtg {
 		out.writeByte(_value ? 1 : 0);
 	}
 
+	@Override
+	public byte getSid() {
+		return sid;
+	}
+
 	public int getSize() {
 		return SIZE;
 	}
 
 	public String toFormulaString() {
 		return _value ? "TRUE" : "FALSE";
+	}
+
+	@Override
+	public BoolPtg copy() {
+		return this;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties("value", this::getValue);
 	}
 }

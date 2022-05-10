@@ -38,7 +38,7 @@
 		$.ajax({ 
 	        method: "POST", 
 	        url: "${url=='author'? 'setMindmapContentJSON.do':'../learning/setMindmapContentJSON.do'}",
-	        data: { mindmapId: "${mindmapId}", userId: "${userId}", 
+	        data: { mindmapId: "${mindmapId}", userId: "${userUid}", 
 				sessionId: "${sessionId}", mode: "${mode}" } , 
 	        dataType: "json", 
 	        success: function (response) {
@@ -167,7 +167,7 @@
 			$.ajax({ 
 		        method: "POST", 
 		        url: "notifyServerActionJSON.do", 
-		        data: { mindmapId: "${mindmapId}", userId: "${userId}", 
+		        data: { mindmapId: "${mindmapId}", userId: "${userUid}", 
 					sessionId: "${sessionId}", lastActionId: lastActionId, actionJSON:  JSON.stringify(updateRequest) } , 
 		        dataType: "json", 
 		        success: function (response) {
@@ -380,7 +380,7 @@
 			        url: "saveLastMindmapChanges.do", 
 			        data: { 
 			        		mindmapId: "${mindmapId}", 
-			        		userId: "${userId}", 
+			        		userId: "${userUid}", 
 			        		toolSessionID: "${sessionId}",
 			        		content: JSON.stringify(window.mapModel.getIdea()) 
 			        },
@@ -412,13 +412,22 @@
 
 
 </c:otherwise>
-</c:choose> 
-	
+</c:choose>
+
+<c:if test="${param.allowPrinting}">
+	function showPrintView(){
+    	var printWindow = window.open('<c:url value="/learning/getPrintMindmap.do?toolSessionID=${sessionId}&userUid=${userUid}"/>',
+    	    						  'MindmapPrint', 'width=1152,height=900,scrollbars=yes,resizable=yes');
+		if (window.focus) {
+			printWindow.focus();
+		}
+	}
+</c:if>
 </script>	
 
-	<div id="fullPageContentDiv">
-	<div id="flexDiv">
-	<div id="mainDiv">
+	<div class="full-screen-content-div">
+	<div class="full-screen-flex-div">
+	<div class="full-screen-main-div">
 	
 	<c:if test="${contentEditable and (mode == 'learner' || mode == 'author')}">
 		<div>
@@ -432,9 +441,16 @@
 	
 		<!-- Color picker & expand buttons must be outside the next div or it can't float on top of the mindmap. The float is done in javascript. -->
 		<div style="display:inline" role="group">
-        <a href="#" class="btn btn-default btn-sm launch-fullscreen pull-right loffset5" id="expand" onclick="javascript:launchIntoFullscreen()"><i class="fa fa-arrows-alt" aria-hidden="true"></i></a> 
-        <a href="#" class="btn btn-default btn-sm exit-fullscreen pull-right loffset5" id="shrink" onclick="javascript:exitFullscreen()" style="display: none;"><i class="fa fa-compress" aria-hidden="true"></i></a> 
+        <a href="#" class="btn btn-default btn-sm full-screen-launch-button pull-right loffset5" id="expand" onclick="javascript:launchIntoFullscreen(this)"><i class="fa fa-arrows-alt" aria-hidden="true"></i></a> 
+        <a href="#" class="btn btn-default btn-sm full-screen-exit-button pull-right loffset5" id="shrink" onclick="javascript:exitFullscreen()" style="display: none;"><i class="fa fa-compress" aria-hidden="true"></i></a> 
+		
+		<c:if test="${param.allowPrinting}">
+			<a href="#" class="btn btn-default btn-sm pull-right loffset5" id="print" onclick="javascript:showPrintView()"
+			   title="<fmt:message key='button.print'/>"><i class="fa fa-print" aria-hidden="true"></i></a> 
+		</c:if>
+		
 		<input type="text" id="background-color" class='updateStyle form-control input-sm' data-mm-target-property='background' size="7" width="180px">
+
 		</div>
 		 
 		<div>

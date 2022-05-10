@@ -44,8 +44,8 @@
 			<lams:errors/>
 	
 		     <lams:TabBodys>
-				<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />
-				<lams:TabBody id="2" titleKey="label.authoring.heading.advance.desc" page="advance.jsp" />
+				<lams:TabBody id="1" page="basic.jsp" />
+				<lams:TabBody id="2" page="advance.jsp" />
 		    </lams:TabBodys>
 	
 			<lams:AuthoringButton formID="authoringForm"

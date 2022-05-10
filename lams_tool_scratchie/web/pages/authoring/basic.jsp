@@ -12,7 +12,7 @@
 		//question bank div
 		$('#question-bank-collapse').on('show.bs.collapse', function () {
 			$('#question-bank-collapse.contains-nothing').load(
-				"<lams:LAMSURL/>/searchQB/start.do",
+				"<lams:LAMSURL/>/searchQB/start.do?toolContentID=${sessionMap.toolContentID}",
 				{
 					returnUrl: "<c:url value='/authoring/importQbQuestion.do'/>?sessionMapID=${sessionMapID}",
 					toolContentId: ${sessionMap.toolContentID}
@@ -43,6 +43,37 @@
 		};
 	}
 
+	
+	function changeItemQuestionVersion(itemIndex, oldQbQuestionUid, newQbQuestionUid) {
+		if (oldQbQuestionUid == newQbQuestionUid) {
+			return;
+		}
+		
+		var url = "<c:url value="/authoring/changeItemQuestionVersion.do"/>";
+		$(itemTargetDiv).load(
+			url,
+			{
+				itemIndex: itemIndex,
+				sessionMapID: "${sessionMapID}",
+				newQbQuestionUid : newQbQuestionUid
+			},
+			function(){
+				refreshThickbox();
+				
+				// check if we are in main authoring environment
+				if (typeof window.parent.GeneralLib != 'undefined') {
+					// check if any other activities require updating
+					let activitiesWithQuestion = window.parent.GeneralLib.checkQuestionExistsInToolActivities(oldQbQuestionUid);
+					if (activitiesWithQuestion.length > 1) {
+						// update, if teacher agrees to it
+						window.parent.GeneralLib.replaceQuestionInToolActivities('${sessionMap.toolContentID}', activitiesWithQuestion,
+																				 oldQbQuestionUid, newQbQuestionUid);
+					}
+				}
+			}
+		);
+	}
+	
 	function initNewItemHref() {
 		var itemTypeDropdown = document.getElementById("item-type");
 		var itemType = itemTypeDropdown.value;
@@ -57,8 +88,8 @@
 		tb_init('a.thickbox, area.thickbox, input.thickbox');//pass where to apply thickbox
 	}
 	
-    function importQTI(){
-    	window.open('<lams:LAMSURL/>questions/questionFile.jsp?limitType=mc&collectionChoice=true',
+    function importQTI(type){
+    	window.open('<lams:LAMSURL/>questions/questionFile.jsp?limitType=mc,mh,fb&collectionChoice=true&importType='+type,
     			    'QuestionFile','width=500,height=370,scrollbars=yes');
     }
   	
@@ -119,7 +150,19 @@
 		<a onclick="initNewItemHref();return false;" href="#nogo" class="btn btn-default btn-sm thickbox" id="item-init-href">  
 			<i class="fa fa-lg fa-plus-circle" aria-hidden="true" title="<fmt:message key="label.authoring.basic.add.another.scratchie" />"></i>
 		</a>
+        
+       <div class="dropdown pull-right" style="padding-left: 1em;">
+          <button class="btn btn-default btn-sm dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="fa fa-plus text-primary"></i> <fmt:message key="label.authoring.import"/>&nbsp;
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-right">
+              <li><a href="javascript:void(0)" id="divass${appexNumber}CQTI" onClick="javascript:importQTI('word')"><i class="fa fa-file-word-o text-primary"></i> <fmt:message key="label.authoring.basic.import.word"/>...</a></li>
+            <li><a href="javascript:void(0)" id="divass${appexNumber}CWord" onClick="javascript:importQTI('qti')"><i class="fa fa-file-code-o text-primary"></i> <fmt:message key="label.authoring.basic.import.qti"/>...</a></li>
+           </ul>
+        </div>
 	</div>
+
 	
 	<!-- Question Bank -->
 	<div class="panel-group" id="question-bank-div" role="tablist" aria-multiselectable="true"> 

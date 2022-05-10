@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,6 +21,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.core.Ordered;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -34,8 +35,10 @@ import org.springframework.util.ClassUtils;
  */
 public class SimpleBeanFactoryAwareAspectInstanceFactory implements AspectInstanceFactory, BeanFactoryAware {
 
+	@Nullable
 	private String aspectBeanName;
 
+	@Nullable
 	private BeanFactory beanFactory;
 
 
@@ -60,10 +63,13 @@ public class SimpleBeanFactoryAwareAspectInstanceFactory implements AspectInstan
 	 */
 	@Override
 	public Object getAspectInstance() {
+		Assert.state(this.beanFactory != null, "No BeanFactory set");
+		Assert.state(this.aspectBeanName != null, "No 'aspectBeanName' set");
 		return this.beanFactory.getBean(this.aspectBeanName);
 	}
 
 	@Override
+	@Nullable
 	public ClassLoader getAspectClassLoader() {
 		if (this.beanFactory instanceof ConfigurableBeanFactory) {
 			return ((ConfigurableBeanFactory) this.beanFactory).getBeanClassLoader();
@@ -75,7 +81,8 @@ public class SimpleBeanFactoryAwareAspectInstanceFactory implements AspectInstan
 
 	@Override
 	public int getOrder() {
-		if (this.beanFactory.isSingleton(this.aspectBeanName) &&
+		if (this.beanFactory != null && this.aspectBeanName != null &&
+				this.beanFactory.isSingleton(this.aspectBeanName) &&
 				this.beanFactory.isTypeMatch(this.aspectBeanName, Ordered.class)) {
 			return ((Ordered) this.beanFactory.getBean(this.aspectBeanName)).getOrder();
 		}

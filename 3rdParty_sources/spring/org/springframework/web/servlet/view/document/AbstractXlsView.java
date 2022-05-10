@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,9 +16,9 @@
 
 package org.springframework.web.servlet.view.document;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.util.Map;
+
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,7 +33,7 @@ import org.springframework.web.servlet.view.AbstractView;
  * Compatible with Apache POI 3.5 and higher.
  *
  * <p>For working with the workbook in the subclass, see
- * <a href="http://poi.apache.org">Apache's POI site</a>
+ * <a href="https://poi.apache.org">Apache's POI site</a>
  *
  * @author Juergen Hoeller
  * @since 4.2
@@ -98,11 +98,7 @@ public abstract class AbstractXlsView extends AbstractView {
 	protected void renderWorkbook(Workbook workbook, HttpServletResponse response) throws IOException {
 		ServletOutputStream out = response.getOutputStream();
 		workbook.write(out);
-
-		// Closeable only implemented as of POI 3.10
-		if (workbook instanceof Closeable) {
-			((Closeable) workbook).close();
-		}
+		workbook.close();
 	}
 
 	/**

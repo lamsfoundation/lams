@@ -17,15 +17,19 @@
 
 package org.apache.poi.ss.formula.ptg;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.ss.formula.FormulaRenderingWorkbook;
 import org.apache.poi.ss.formula.WorkbookDependentFormula;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * A Name, be that a Named Range or a Function / User Defined
  *  Function, addressed in the HSSF External Sheet style.
- *  
+ *
  * <p>This is HSSF only, as it matches the HSSF file format way of
  *  referring to the sheet by an extern index. The XSSF equivalent
  *  is {@link NameXPxg}
@@ -66,6 +70,11 @@ public final class NameXPtg extends OperandPtg implements WorkbookDependentFormu
 		out.writeShort(_reserved);
 	}
 
+	@Override
+	public byte getSid() {
+		return sid;
+	}
+
 	public int getSize() {
 		return SIZE;
 	}
@@ -77,13 +86,7 @@ public final class NameXPtg extends OperandPtg implements WorkbookDependentFormu
 	public String toFormulaString() {
 		throw new RuntimeException("3D references need a workbook to determine formula text");
 	}
-	
-	public String toString(){
-	   String retValue = "NameXPtg:[sheetRefIndex:" + _sheetRefIndex + 
-	      " , nameNumber:" + _nameNumber + "]" ;
-	   return retValue;
-	}
-	
+
 	public byte getDefaultOperandClass() {
 		return Ptg.CLASS_VALUE;
 	}
@@ -93,5 +96,19 @@ public final class NameXPtg extends OperandPtg implements WorkbookDependentFormu
 	}
 	public int getNameIndex() {
 		return _nameNumber - 1;
+	}
+
+	@Override
+	public NameXPtg copy() {
+		// immutable
+		return this;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"sheetRefIndex", this::getSheetRefIndex,
+			"nameIndex", this::getNameIndex
+		);
 	}
 }

@@ -215,37 +215,57 @@ var PropertyDefs = {
 				
 				activity.gateType = $('.propertiesContentFieldGateType', content).val();
 				
+				$('.propertiesContentRowGateTypeBased', content).hide();
 				if (activity.gateType == 'schedule') {
 					// show inputs for setting delay before the gate is closed
 					$(".propertiesContentRowGateSchedule", content).show();
 					activity.offsetDay = +$('.propertiesContentFieldOffsetDay', content).val();
 					activity.offsetHour = +$('.propertiesContentFieldOffsetHour', content).val();
 					activity.offsetMinute = +$('.propertiesContentFieldOffsetMinute', content).val();
+					
+					// both of these options must not be on at the same time
+					// stop-at-preceding-activity may prevent preceding activity from completion,
+					// meaning that timer-from-previous-activity-completion will never start
 					activity.gateActivityCompletionBased = $('.propertiesContentFieldActivityCompletionBased', content).is(':checked');
-				} else {
-					$(".propertiesContentRowGateSchedule", content).hide();
+					if (activity.gateActivityCompletionBased) {
+						activity.gateStopAtPrecedingActivity = false;
+						$('.propertiesContentFieldStopAtPrecedingActivity', content).prop('disabled', true).prop('checked', false);
+					} else {
+						activity.gateStopAtPrecedingActivity = $('.propertiesContentFieldStopAtPrecedingActivity', content).is(':checked');
+						$('.propertiesContentFieldStopAtPrecedingActivity', content).prop('disabled', false);
+					}
+					
+					if (activity.gateStopAtPrecedingActivity) {
+						activity.gateActivityCompletionBased = false;
+						$('.propertiesContentFieldActivityCompletionBased', content).prop('disabled', true).prop('checked', false);
+					} else {
+						$('.propertiesContentFieldActivityCompletionBased', content).prop('disabled', false);
+					}
 				}
 				
 				if (activity.gateType == 'password') {
 					$(".propertiesContentRowGatePassword", content).show();
 					activity.password = $('.propertiesContentFieldPassword', content).val();
-				} else {
-					$(".propertiesContentRowGatePassword", content).hide();
 				}
 				
 				// Gate can be input-based
-				var inputRow = $('.propertiesContentFieldInput', content).closest('tr'),
-					inputDefinitionRows = $('.propertiesContentRowConditions', content);
 				if (activity.gateType == 'condition') {
+					var inputRow = $('.propertiesContentFieldInput', content).closest('tr'),
+						inputDefinitionRows = $('.propertiesContentRowConditions', content);
+						
+					activity.gateStopAtPrecedingActivity = $('.propertiesContentFieldStopAtPrecedingActivity', content).is(':checked');
+					
 					activity.input = inputRow.show().find('option:selected').data('input');
 					if (activity.input) {
 						inputDefinitionRows.show();
 					} else {
-						inputDefinitionRows.hide();
+						$('.propertiesContentFieldStopAtPrecedingActivity', content).closest('tr').show();
 					}
-				} else {
-					inputRow.hide();
-					inputDefinitionRows.hide();
+				}			
+					
+				if (activity.gateType == 'permission') {
+					$(".propertiesContentRowPermission", content).show();
+					activity.gateStopAtPrecedingActivity = $('.propertiesContentFieldStopAtPrecedingActivity', content).is(':checked');
 				}
 				
 				if (redrawNeeded) {
@@ -277,8 +297,11 @@ var PropertyDefs = {
 			  .on('input', changeFunction);
 			
 			$('.propertiesContentFieldActivityCompletionBased', content)
-				.attr('checked', activity.gateActivityCompletionBased? 'checked' : null);
+				.attr('checked', activity.gateActivityCompletionBased ? 'checked' : null);
 			
+			$('.propertiesContentFieldStopAtPrecedingActivity', content)
+				.attr('checked', activity.gateStopAtPrecedingActivity ? 'checked' : null);
+				
 			$('.propertiesContentFieldPassword', content)
 			  .val(activity.password);
 			
@@ -833,6 +856,17 @@ PropertyLib = {
 			}
 		}, false);
 		$('.modal-body', propertiesDialog).empty();
+		$('<span class="propertyBinButton" aria-hidden="true">' + 
+			 '<i class="fa fa-trash text-danger"></i>' + 
+           '</span>')
+			.appendTo($('.modal-title', propertiesDialog))
+			.click(function(){
+				let item = $('.dialogContents', propertiesDialog).data('parentObject');
+				if (item) {
+					ActivityLib.removeItemWithButton(item);
+				}
+			});
+			
 		// for proximity detection throttling (see handlers)
 		propertiesDialog.data('lastRun', 0);
 		// remove close button, add dimming
@@ -1282,25 +1316,32 @@ PropertyLib = {
 						}
 						break;
 				}
+									
+				if (typeof condition.startValue != 'undefined' && typeof condition.endValue != 'undefined'
+				    && +condition.startValue > +condition.endValue) {
+					alert(LABELS.RANGE_CONDITION_ADD_START_GREATER_THAN_END_ERROR);
+					return;
+				}
 				
 				$('td', rangeConditionNames).closest('tr').each(function(){
 					var existingCondition = $(this).data('mappingEntry').condition;
+
 					
 					// validate the new condition so it does not overlap with an existing one
-					if ((typeof condition.startValue == 'undefined' && existingCondition.startValue <= condition.endValue)
+					if ((typeof condition.startValue == 'undefined' && +existingCondition.startValue <= +condition.endValue)
 						|| (typeof condition.endValue == 'undefined'
-							&& (typeof existingCondition.endValue == 'undefined' || existingCondition.endValue >= condition.startValue))
-						|| (!(condition.startValue > existingCondition.endValue) && !(condition.endValue < existingCondition.startValue))) {
-						layout.infoDialog.data('show')(LABELS.RANGE_CONDITION_ADD_START_ERROR);
+							&& (typeof existingCondition.endValue == 'undefined' || +existingCondition.endValue >= +condition.startValue))
+						|| (!(+condition.startValue > +existingCondition.endValue) && !(+condition.endValue < +existingCondition.startValue))) {
+						alert(LABELS.RANGE_CONDITION_ADD_START_ERROR);
 						condition = null;
 						return false;
 					}
 					
-					if ((typeof condition.endValue == 'undefined' && existingCondition.endValue >= condition.startValue)
+					if ((typeof condition.endValue == 'undefined' && +existingCondition.endValue >= +condition.startValue)
 						|| (typeof condition.startValue == 'undefined'
-							&& (typeof existingCondition.startValue == 'undefined' || existingCondition.startValue <= condition.endValue))
-						|| (!(condition.endValue < existingCondition.startValue) && !(condition.startValue > existingCondition.endValue))) {
-						layout.infoDialog.data('show')(LABELS.RANGE_CONDITION_ADD_END_ERROR);
+							&& (typeof existingCondition.startValue == 'undefined' || +existingCondition.startValue <= +condition.endValue))
+						|| (!(+condition.endValue < +existingCondition.startValue) && !(+condition.startValue > +existingCondition.endValue))) {
+						alert(LABELS.RANGE_CONDITION_ADD_END_ERROR);
 						condition = null;
 						return false;
 					}
@@ -1570,15 +1611,17 @@ PropertyLib = {
 			optionsFound = true;
 			
 			var suffix = '';
-			switch(this.type) {
-				case 'OUTPUT_BOOLEAN' :
-					suffix = LABELS.BOOLEAN_OUTPUT_SUFFIX;
-					break;
-                                                            
-				case 'OUTPUT_LONG' :
-					suffix = LABELS.RANGE_OUTPUT_SUFFIX;
-					break;
-			};
+			if (!this.showConditionNameOnly) {
+				switch(this.type) {
+					case 'OUTPUT_BOOLEAN' :
+						suffix = LABELS.BOOLEAN_OUTPUT_SUFFIX;
+						break;
+	                                                            
+					case 'OUTPUT_LONG' :
+						suffix = LABELS.RANGE_OUTPUT_SUFFIX;
+						break;
+				};
+			}
 			
 			var option = $('<option />')
 						   .text(this.description + ' ' + suffix)
@@ -1750,12 +1793,20 @@ PropertyLib = {
 			modalBody.find('input, select, textarea').prop('disabled', true);
 			modalBody.find('.spinner').prop('disabled', true);
 		}
+		
+		// hide trashcan button on properties dialog if read only or the item should not be deleted
+		$('.propertyBinButton', dialog).toggle(!object.readOnly 
+			&& !(object.parentActivity && object.parentActivity.readOnly) 
+			&& !(object.branchingActivity && object.branchingActivity.readOnly)
+			&& !(object instanceof ActivityDefs.Transition));
+		
 		modalBody.find('input').blur();
 		dialog.on('shown.bs.modal', function(){
 			if (dialog.data('dragged')){
 				// if user dragged the dialog at least once, it does not automatically change its position anymore
 				return;
 			}
+			
 			var box = object.items.getBBox(),
 				canvasOffset = canvas.offset(),
 				canvasWidth = canvas.width(),
@@ -1779,9 +1830,12 @@ PropertyLib = {
 				};
 			}		
 			
+			x -= canvas.scrollLeft();
+			y -= canvas.scrollTop();
+			
 			dialog.offset({
-				'left' : x,
-				'top'  : y
+				'left' : Math.max(canvasOffset.left, Math.round(x)),
+				'top'  : Math.max(canvasOffset.top,  Math.round(y))
 			});
 		});
 

@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,6 +18,7 @@ package org.springframework.beans;
 
 import java.io.Serializable;
 
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
@@ -43,18 +44,22 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
 
 	private final String name;
 
+	@Nullable
 	private final Object value;
 
 	private boolean optional = false;
 
 	private boolean converted = false;
 
+	@Nullable
 	private Object convertedValue;
 
-	/** Package-visible field that indicates whether conversion is necessary */
+	/** Package-visible field that indicates whether conversion is necessary. */
+	@Nullable
 	volatile Boolean conversionNecessary;
 
-	/** Package-visible field for caching the resolved property path tokens */
+	/** Package-visible field for caching the resolved property path tokens. */
+	@Nullable
 	transient volatile Object resolvedTokens;
 
 
@@ -63,7 +68,8 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
 	 * @param name the name of the property (never {@code null})
 	 * @param value the value of the property (possibly before type conversion)
 	 */
-	public PropertyValue(String name, Object value) {
+	public PropertyValue(String name, @Nullable Object value) {
+		Assert.notNull(name, "Name must not be null");
 		this.name = name;
 		this.value = value;
 	}
@@ -91,7 +97,7 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
 	 * @param original the PropertyValue to link to (never {@code null})
 	 * @param newValue the new value to apply
 	 */
-	public PropertyValue(PropertyValue original, Object newValue) {
+	public PropertyValue(PropertyValue original, @Nullable Object newValue) {
 		Assert.notNull(original, "Original must not be null");
 		this.name = original.getName();
 		this.value = newValue;
@@ -116,6 +122,7 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
 	 * It is the responsibility of the BeanWrapper implementation to
 	 * perform type conversion.
 	 */
+	@Nullable
 	public Object getValue() {
 		return this.value;
 	}
@@ -162,25 +169,26 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
 	}
 
 	/**
-	 * Set the converted value of the constructor argument,
+	 * Set the converted value of this property value,
 	 * after processed type conversion.
 	 */
-	public synchronized void setConvertedValue(Object value) {
+	public synchronized void setConvertedValue(@Nullable Object value) {
 		this.converted = true;
 		this.convertedValue = value;
 	}
 
 	/**
-	 * Return the converted value of the constructor argument,
+	 * Return the converted value of this property value,
 	 * after processed type conversion.
 	 */
+	@Nullable
 	public synchronized Object getConvertedValue() {
 		return this.convertedValue;
 	}
 
 
 	@Override
-	public boolean equals(Object other) {
+	public boolean equals(@Nullable Object other) {
 		if (this == other) {
 			return true;
 		}

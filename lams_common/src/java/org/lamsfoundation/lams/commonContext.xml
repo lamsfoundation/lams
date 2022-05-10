@@ -3,13 +3,28 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+           				   http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<!-- ========================= GENERAL DEFINITIONS ========================= -->
 
 	<import resource="messageContext.xml"/>
 
+	<!-- ========================= SPRING MVC GLOBAL BEANS ========================= -->
+	
+	<!-- This bean is used by MVC mechanism in each LAMS module -->
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+	
+	<!-- Existing WildFly task executor for Spring async request processing. It is fetched by JNDI from JEE7+ platform. -->
+	<bean id="serverTaskExecutor" class="org.springframework.scheduling.concurrent.DefaultManagedTaskExecutor" />
+	
+	
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+	
+	
 
  	<!-- Hibernate SessionFactory. Since LAMS 2.3 it is used in all tools and other parts of LAMS,
  		 rather than several local Session Factories.
@@ -28,7 +43,6 @@
 				<value>org.lamsfoundation.lams.lesson</value>
 				<value>org.lamsfoundation.lams.logevent</value>
 				<value>org.lamsfoundation.lams.outcome</value>
-				<value>org.lamsfoundation.lams.planner</value>
 				<value>org.lamsfoundation.lams.policies</value>
 				<value>org.lamsfoundation.lams.qb</value>
 				<value>org.lamsfoundation.lams.themes</value>
@@ -486,6 +500,28 @@
 		</property>
 	</bean>	
 	
+	<!-- Learner Interaction Service -->
+	
+	<bean id="learnerInteractionService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name ="target">
+			<bean class="org.lamsfoundation.lams.logevent.service.LearnerInteractionService">
+				<property name="learnerInteractionDAO"><ref bean="learnerInteractionDAO"/></property>
+			</bean>	
+		</property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="transactionAttributes">
+			<props>
+				<prop key="*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>	
+	
 	<!--  Configuration service -->
 	<bean id="configurationService"  class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
@@ -705,6 +741,11 @@
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>		
 	
+	<!-- Learner Interaction related beans -->
+	<bean id="learnerInteractionDAO" class="org.lamsfoundation.lams.logevent.dao.hibernate.LearnerInteractionDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>		
+		
 	<!-- Core Notebook related beans -->
 	<bean id="notebookEntryDAO" class="org.lamsfoundation.lams.notebook.dao.hibernate.NotebookEntryDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>

@@ -33,8 +33,9 @@ public class GroupSummary {
     private String sessionName;
     private int mark;
     private int totalAttempts;
-    private String totalPercentage;
+    private Double totalPercentage;
     private Long leaderUid;
+    private boolean scratchingFinished;
 
     //used for itemSummary page
     private int numberColumns;
@@ -94,11 +95,11 @@ public class GroupSummary {
 	this.totalAttempts = totalAttempts;
     }
 
-    public String getTotalPercentage() {
+    public Double getTotalPercentage() {
 	return totalPercentage;
     }
 
-    public void setTotalPercentage(String totalPercentage) {
+    public void setTotalPercentage(Double totalPercentage) {
 	this.totalPercentage = totalPercentage;
     }
 
@@ -116,6 +117,14 @@ public class GroupSummary {
 
     public void setLeaderUid(Long leaderUid) {
 	this.leaderUid = leaderUid;
+    }
+
+    public boolean isScratchingFinished() {
+	return scratchingFinished;
+    }
+
+    public void setScratchingFinished(boolean scratchingFinished) {
+	this.scratchingFinished = scratchingFinished;
     }
 
     public Collection<ScratchieUser> getUsers() {

@@ -274,6 +274,7 @@ public class MonitoringController {
 	NotebookPrintDTO printDTO = new NotebookPrintDTO();
 	printDTO.setTitle(notebook.getTitle());
 	printDTO.setInstructions(notebook.getInstructions());
+	printDTO.setAllowRichEditor(notebook.isAllowRichEditor());
 
 	boolean isGroupedActivity = notebookService.isGroupedActivity(toolContentID);
 	printDTO.setGroupedActivity(isGroupedActivity);

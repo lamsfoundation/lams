@@ -3,7 +3,7 @@
 }
 
 .hidden-xs {
-	display: block !important;
+	display: initial !important;
 }
 
 @media ( max-width : 1200px) {

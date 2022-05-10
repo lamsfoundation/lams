@@ -56,10 +56,12 @@ public class QbQuestionForm {
     private boolean shuffle;
     private boolean prefixAnswersWithLetters;
     private boolean caseSensitive;
+    private boolean exactMatch;
     private boolean correctAnswer;
     private boolean allowRichEditor;
     private int maxWordsLimit;
     private int minWordsLimit;
+    private Integer codeStyle;
     private boolean hedgingJustificationEnabled;
     private boolean autocompleteEnabled;
     private boolean authoringRestricted;
@@ -215,6 +217,14 @@ public class QbQuestionForm {
 	this.caseSensitive = caseSensitive;
     }
 
+    public boolean isExactMatch() {
+	return exactMatch;
+    }
+
+    public void setExactMatch(boolean exactMatch) {
+	this.exactMatch = exactMatch;
+    }
+
     public boolean isCorrectAnswer() {
 	return correctAnswer;
     }
@@ -245,6 +255,14 @@ public class QbQuestionForm {
 
     public void setMinWordsLimit(int minWordsLimit) {
 	this.minWordsLimit = minWordsLimit;
+    }
+
+    public Integer getCodeStyle() {
+	return codeStyle;
+    }
+
+    public void setCodeStyle(Integer codeStyle) {
+	this.codeStyle = codeStyle;
     }
 
     public boolean isPrefixAnswersWithLetters() {

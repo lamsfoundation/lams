@@ -27,19 +27,27 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Hibernate;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
@@ -51,8 +59,11 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
+import org.lamsfoundation.lams.rating.dto.StyledRatingDTO;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
+import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
+import org.lamsfoundation.lams.rating.model.RatingRubricsColumn;
 import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
@@ -74,6 +85,7 @@ import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.tool.peerreview.util.EmailAnalysisBuilder;
+import org.lamsfoundation.lams.tool.peerreview.util.EmailAnalysisBuilder.LearnerData;
 import org.lamsfoundation.lams.tool.peerreview.util.SpreadsheetBuilder;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -82,6 +94,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
+import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -166,6 +179,11 @@ public class PeerreviewServiceImpl
     @Override
     public PeerreviewUser getUserByIDAndSession(Long userId, Long sessionId) {
 	return peerreviewUserDao.getUserByUserIDAndSessionID(userId, sessionId);
+    }
+
+    @Override
+    public List<PeerreviewUser> getUsersBySession(Long sessionId) {
+	return peerreviewUserDao.getBySessionID(sessionId);
     }
 
     @Override
@@ -272,7 +290,7 @@ public class PeerreviewServiceImpl
 
     @Override
     public PeerreviewUser getUser(Long uid) {
-	return (PeerreviewUser) peerreviewUserDao.find(PeerreviewUser.class, uid);
+	return peerreviewUserDao.find(PeerreviewUser.class, uid);
     }
 
     @Override
@@ -349,6 +367,14 @@ public class PeerreviewServiceImpl
 
 	if (skipRatings) {
 	    return ratingService.convertToStyledDTO(criteria, currentUserId, getAllUsers, null);
+	}
+
+	if (criteria.isRubricsStyleRating() && !getByUser) {
+	    Collection<Rating> ratings = ratingService
+		    .getRatingsByCriteriasAndItems(Set.of(criteria.getRatingCriteriaId()), Set.of(currentUserId));
+
+	    return PeerreviewServiceImpl.getRubricsCriteriaDTO(criteria, currentUserId.intValue(), getAllUsers,
+		    ratings);
 	}
 
 	List<Object[]> rawData = peerreviewUserDao.getRatingsComments(toolContentId, toolSessionId, criteria,
@@ -465,6 +491,14 @@ public class PeerreviewServiceImpl
     }
 
     @Override
+    public Map<Long, LearnerData> getLearnerData(Long toolContentId, Long sessionId) {
+	PeerreviewSession session = peerreviewSessionDao.getSessionBySessionId(sessionId);
+	Peerreview peerreview = getPeerreviewByContentId(toolContentId);
+	return new EmailAnalysisBuilder(peerreview, session, ratingService, peerreviewSessionDao, peerreviewUserDao,
+		this, messageService).generateTeamData();
+    }
+
+    @Override
     public String generateEmailReportToUser(Long toolContentId, Long sessionId, Long userId) {
 	PeerreviewSession session = peerreviewSessionDao.getSessionBySessionId(sessionId);
 	Peerreview peerreview = getPeerreviewByContentId(toolContentId);
@@ -474,6 +508,9 @@ public class PeerreviewServiceImpl
 
     @Override
     public int emailReportToUser(Long toolContentId, Long sessionId, Long userId, String email) {
+	if (log.isDebugEnabled()) {
+	    log.debug("Sending email with results to learner " + userId + " for session ID " + sessionId);
+	}
 	PeerreviewUser user = peerreviewUserDao.getUserByUserIDAndSessionID(userId, sessionId);
 	if (user != null) {
 	    eventNotificationService.sendMessage(null, userId.intValue(),
@@ -489,6 +526,10 @@ public class PeerreviewServiceImpl
 
     @Override
     public int emailReportToSessionUsers(Long toolContentId, Long sessionId) {
+	if (log.isDebugEnabled()) {
+	    log.debug("Sending email with results to all learners for session ID " + sessionId);
+	}
+
 	PeerreviewSession session = peerreviewSessionDao.getSessionBySessionId(sessionId);
 	Peerreview peerreview = getPeerreviewByContentId(toolContentId);
 	Map<Long, String> emails = new EmailAnalysisBuilder(peerreview, session, ratingService, peerreviewSessionDao,
@@ -529,6 +570,108 @@ public class PeerreviewServiceImpl
 	Peerreview peerreview = peerreviewDao.getByContentId(toolContentId);
 	retValue[1] = peerreview.isSelfReview() ? numUsersInSession : numUsersInSession - 1;
 	return retValue;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Map<Long, Map<PeerreviewUser, StyledCriteriaRatingDTO>> getRubricsData(SessionMap<String, Object> sessionMap,
+	    RatingCriteria criteria, Collection<RatingCriteria> criterias) {
+	List<GroupSummary> sessionList = (List<GroupSummary>) sessionMap.get(PeerreviewConstants.ATTR_SUMMARY_LIST);
+
+	Map<Long, Map<PeerreviewUser, StyledCriteriaRatingDTO>> rubricsData = new HashMap<>();
+	for (GroupSummary session : sessionList) {
+	    Long toolSessionId = session.getSessionId();
+	    Map<PeerreviewUser, StyledCriteriaRatingDTO> learnerData = getRubricsLearnerData(toolSessionId, criteria,
+		    criterias);
+	    rubricsData.put(toolSessionId, learnerData);
+	}
+
+	return rubricsData;
+    }
+
+    @Override
+    public Map<PeerreviewUser, StyledCriteriaRatingDTO> getRubricsLearnerData(Long toolSessionId,
+	    RatingCriteria criteria, Collection<RatingCriteria> criterias) {
+	Map<PeerreviewUser, StyledCriteriaRatingDTO> learnerData = new TreeMap<>(
+		Comparator.comparing(PeerreviewUser::getFirstName).thenComparing(PeerreviewUser::getLastName));
+
+	criterias = criterias.stream()
+		.filter(c -> criteria.getRatingCriteriaGroupId().equals(c.getRatingCriteriaGroupId()))
+		.collect(Collectors.toList());
+	Collection<Long> criteriaIds = criterias.stream()
+		.collect(Collectors.mapping(RatingCriteria::getRatingCriteriaId, Collectors.toSet()));
+
+	Collection<PeerreviewUser> learners = getUsersBySession(toolSessionId);
+	List<Rating> ratings = ratingService.getRatingsByCriteriasAndItems(criteriaIds,
+		learners.stream().collect(Collectors.mapping(PeerreviewUser::getUserId, Collectors.toSet())));
+
+	for (PeerreviewUser learner : learners) {
+	    Function<RatingCriteria, StyledCriteriaRatingDTO> dtoBuilder = c -> PeerreviewServiceImpl
+		    .getRubricsCriteriaDTO(c, learner.getUserId().intValue(), true, ratings);
+	    StyledCriteriaRatingDTO dto = PeerreviewServiceImpl.fillCriteriaGroup(criteria, criterias, dtoBuilder);
+	    learnerData.put(learner, dto);
+	}
+
+	return learnerData;
+    }
+
+    public static StyledCriteriaRatingDTO fillCriteriaGroup(RatingCriteria targetCriteria,
+	    Collection<RatingCriteria> allCriteria, Function<RatingCriteria, StyledCriteriaRatingDTO> dtoProducer) {
+	Integer groupId = targetCriteria.getRatingCriteriaGroupId();
+	StyledCriteriaRatingDTO result = null;
+	List<StyledCriteriaRatingDTO> criteriaGroup = new LinkedList<>();
+	for (RatingCriteria criteriaInGroup : allCriteria) {
+	    if (!groupId.equals(criteriaInGroup.getRatingCriteriaGroupId())) {
+		continue;
+	    }
+
+	    StyledCriteriaRatingDTO dto = dtoProducer.apply(criteriaInGroup);
+	    if (criteriaInGroup.getRatingCriteriaId().equals(targetCriteria.getRatingCriteriaId())) {
+		criteriaGroup.add(0, dto);
+		result = dto;
+		result.setCriteriaGroup(criteriaGroup);
+	    } else {
+		criteriaGroup.add(dto);
+	    }
+	}
+	return result;
+    }
+
+    public static void removeGroupedCriteria(Collection<RatingCriteria> criteria) {
+	Set<Integer> processedCriteriaGroups = new HashSet<>();
+	Iterator<RatingCriteria> criteriaIter = criteria.iterator();
+	while (criteriaIter.hasNext()) {
+	    RatingCriteria criterion = criteriaIter.next();
+	    if (criterion.getRatingCriteriaGroupId() != null) {
+		if (processedCriteriaGroups.contains(criterion.getRatingCriteriaGroupId())) {
+		    criteriaIter.remove();
+		} else {
+		    processedCriteriaGroups.add(criterion.getRatingCriteriaGroupId());
+		}
+	    }
+	}
+    }
+
+    public static StyledCriteriaRatingDTO getRubricsCriteriaDTO(RatingCriteria criteria, Integer currentUserId,
+	    boolean includeCurrentUser, Collection<Rating> ratings) {
+	StyledCriteriaRatingDTO dto = new StyledCriteriaRatingDTO();
+	dto.setRatingCriteria(criteria);
+	List<StyledRatingDTO> ratingDtos = ratings.stream()
+		.filter(rating -> rating.getRatingCriteria().getRatingCriteriaId()
+			.equals(criteria.getRatingCriteriaId()) && rating.getItemId().equals(currentUserId.longValue())
+			&& (includeCurrentUser || !rating.getLearner().getUserId().equals(currentUserId)))
+		.collect(Collectors.mapping(rating -> {
+		    StyledRatingDTO ratingDto = new StyledRatingDTO(currentUserId.longValue());
+		    if (rating.getRating() != null) {
+			ratingDto.setUserRating(String.valueOf(rating.getRating().intValue()));
+		    }
+		    ratingDto.setItemDescription(rating.getLearner().getFullName());
+		    ratingDto.setItemDescription2(rating.getLearner().getUserId().toString());
+		    return ratingDto;
+		}, Collectors.toList()));
+
+	dto.setRatingDtos(ratingDtos);
+	return dto;
     }
 
     // *****************************************************************************
@@ -583,6 +726,8 @@ public class PeerreviewServiceImpl
 	}
 	toolContentObj.setCreatedBy(null);
 
+	fillRubricsColumnHeaders(toolContentObj.getRatingCriterias());
+
 	// set PeerreviewToolContentHandler as null to avoid copy file node in repository again.
 	toolContentObj = Peerreview.newInstance(toolContentObj, toolContentId);
 	try {
@@ -611,9 +756,35 @@ public class PeerreviewServiceImpl
 
 	    // reset it to new toolContentId
 	    toolContentObj.setContentId(toolContentId);
+	    Map<Integer, Integer> groupIdMap = new HashMap<>();
 	    if (toolContentObj.getRatingCriterias() != null) {
+		Integer nextRatingCriteriaGroupId = null;
 		for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
 		    criteria.setToolContentId(toolContentId);
+
+		    if (criteria.getRatingStyle().equals(RatingCriteria.RATING_STYLE_RUBRICS)) {
+			int existingGroupId = criteria.getRatingCriteriaGroupId();
+			Integer newGroupId = groupIdMap.get(existingGroupId);
+			if (newGroupId == null) {
+			    if (nextRatingCriteriaGroupId == null) {
+				nextRatingCriteriaGroupId = ratingService.getNextRatingCriteriaGroupId();
+			    } else {
+				nextRatingCriteriaGroupId++;
+			    }
+			    newGroupId = nextRatingCriteriaGroupId;
+			    groupIdMap.put(existingGroupId, newGroupId);
+
+			    for (int columnIndex = 0; columnIndex < criteria.getRubricsColumnHeaders()
+				    .size(); columnIndex++) {
+				RatingRubricsColumn columnHeader = new RatingRubricsColumn(columnIndex + 1,
+					criteria.getRubricsColumnHeaders().get(columnIndex));
+				columnHeader.setRatingCriteriaGroupId(newGroupId);
+				peerreviewDao.insert(columnHeader);
+			    }
+			}
+
+			criteria.setRatingCriteriaGroupId(newGroupId);
+		    }
 		}
 	    }
 
@@ -786,7 +957,26 @@ public class PeerreviewServiceImpl
 
     @Override
     public List<RatingCriteria> getRatingCriterias(Long toolContentId) {
-	return ratingService.getCriteriasByToolContentId(toolContentId);
+	List<RatingCriteria> result = ratingService.getCriteriasByToolContentId(toolContentId);
+	fillRubricsColumnHeaders(result);
+	for (RatingCriteria ratingCriteria : result) {
+	    Hibernate.initialize(ratingCriteria.getRubricsColumns());
+	}
+	return result;
+    }
+
+    private void fillRubricsColumnHeaders(Collection<? extends RatingCriteria> ratingCriterias) {
+	for (RatingCriteria ratingCriteria : ratingCriterias) {
+	    fillRubricsColumnHeaders(ratingCriteria);
+	}
+    }
+
+    @Override
+    public void fillRubricsColumnHeaders(RatingCriteria ratingCriteria) {
+	if (ratingCriteria.getRatingStyle().equals(RatingCriteria.RATING_STYLE_RUBRICS)) {
+	    ratingCriteria.setRubricsColumnHeaders(
+		    ratingService.getRubricsColumnHeaders(ratingCriteria.getRatingCriteriaGroupId()));
+	}
     }
 
     @Override
@@ -1010,7 +1200,6 @@ public class PeerreviewServiceImpl
 	peerreview
 		.setShowRatingsLeftByUser(JsonUtil.optBoolean(toolContentJSON, "showRatingsLeftByUser", Boolean.FALSE));
 	peerreview.setSelfReview(JsonUtil.optBoolean(toolContentJSON, "notifyUsersOfResults", Boolean.FALSE));
-	peerreview.setNotifyUsersOfResults(JsonUtil.optBoolean(toolContentJSON, "notifyUsersOfResults", Boolean.TRUE));
 
 	saveOrUpdatePeerreview(peerreview);
 
@@ -1028,4 +1217,5 @@ public class PeerreviewServiceImpl
 
 	saveOrUpdatePeerreview(peerreview);
     }
+
 }

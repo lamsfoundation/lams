@@ -56,9 +56,11 @@
 			<include name="org/jboss/dmr/main/jboss-dmr-*.jar" />
 			<include name="com/fasterxml/jackson/core/jackson-core/main/jackson-core-*.jar" />
 			<include name="com/fasterxml/jackson/core/jackson-databind/main/jackson-databind-*.jar" />
+			<include name="com/fasterxml/jackson/core/jackson-annotations/main/jackson-annotations-*.jar" />
 			<include name="javax/activation/api/main/activation-*.jar" />
 			<include name="javax/persistence/api/main/javax.persistence-api-*.jar" />
 			<include name="org/hibernate/main/hibernate-core-*.Final.jar" />
+			<include name="org/bouncycastle/main/bcprov-*.jar" />
 		</fileset>
 		<!-- Optional project own libraries -->
 		<fileset dir="lib" erroronmissingdir="false">
@@ -198,16 +200,6 @@
 	<!-- Build archives        		    	          					  -->
 	<!-- ================================================================ -->
 
-	<target name="_copy-hbm">
-		<echo>${ant.project.name}: Copying Hibernate mapping files</echo>
-		<copy todir="${basedir}/build/classes/java" overwrite="true">
-			<fileset dir="${conf.dir}/hibernate/mappings" erroronmissingdir="false">
-				<include name="**/*.hbm.xml"/>
-			</fileset>
-		</copy>
-	</target>
-					
-	
 	<target name="_copy-language" if="product.core">
 		<!-- Internal target: Copies language tags to build dir for easier EAR assembly.
 		     Required only for base products, not Tools -->
@@ -236,7 +228,7 @@
 	</target>
 	
 	
-	<target name="_build-jar" depends="_compile-java, _copy-hbm, _build-manifest, _copy-language">
+	<target name="_build-jar" depends="_compile-java, _build-manifest, _copy-language">
 		<!-- Internal target: Creates JAR file. -->
 		<echo>${ant.project.name}: Building JAR</echo>
 		<jar jarfile="${basedir}/build/lib/${product}.jar"
@@ -246,7 +238,7 @@
 	</target>
 
 	
-	<target name="_build-war" depends="_build-manifest, _copy-language, _copy-jsp, _copy-libs, _copy-deployment-handler">
+	<target name="_build-war" depends="_build-manifest, _copy-language, _copy-jsp, _copy-libs">
 		<!-- Internal target: Creates WAR file. -->
 		<echo>${ant.project.name}: Building WAR</echo>
 		
@@ -304,6 +296,9 @@
 			           match="(${moduleActivationPlaceholder})"
 			           replace="${moduleActivationEntry}    \1"
 		/>
+		<setpermissions mode="644" nonPosixMode="pass" failonerror="false">
+			<file file="${server.home}/standalone/deployments/lams.ear/META-INF/application.xml" />
+		</setpermissions>
 	</target>
 
 	<!-- =================================================================== -->
@@ -367,14 +362,6 @@
 			</fileset>
 	 	</copy>
 	</target>
-	
-	<target name="_copy-deployment-handler">
-		<!-- Internal target: Copies WildFly deployment handler -->
-		<echo>${ant.project.name}: Copying deployment handler</echo>
-
-	 	<copy todir="${basedir}/build/war/META-INF/services"
-	 		  file="../../lams/lams_build/conf/deployment-handler/io.undertow.servlet.ServletExtension" />
-	</target>
 
 	<!-- ====================================================================== -->
 	<!--  Compile scss files to css files. Assumes SASS is installed. See       -->
@@ -384,7 +371,7 @@
 	<!-- ====================================================================== -->
 	<target name="_sass.do.compile">
         <apply dest="${basedir}/build/css" executable="${sass_exec_file}" failonerror="true" verbose="true">
-        	<arg value="--sourcemap=none"/>
+        	<arg value="--no-source-map"/>
         	<arg value="--load-path=${scss.common.variables}"/>
             <srcfile/>
             <targetfile/>
@@ -395,7 +382,7 @@
             <mapper from="*.scss" to="*.css" type="glob"/>
         </apply>
 	    <ant target="_css.minify.copy"/>
-	    	<ant target="_css.nominify.copy"/>
+	    <ant target="_css.nominify.copy"/>
 	</target>
 	
 	<target name="_css.minify.copy"  if="${css.minify}">

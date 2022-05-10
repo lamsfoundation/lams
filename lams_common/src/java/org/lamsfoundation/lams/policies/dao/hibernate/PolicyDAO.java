@@ -22,7 +22,7 @@ public class PolicyDAO extends LAMSBaseDAO implements IPolicyDAO {
 
     @Override
     public Policy getPolicyByUid(Long uid) {
-	return (Policy) super.find(Policy.class, uid);
+	return super.find(Policy.class, uid);
     }
 
     @Override
@@ -38,7 +38,7 @@ public class PolicyDAO extends LAMSBaseDAO implements IPolicyDAO {
 	List<Object[]> resultQuery = query.list();
 
 	// this map keeps the insertion order
-	LinkedList<Policy> policies = new LinkedList<Policy>();
+	LinkedList<Policy> policies = new LinkedList<>();
 	// make the result easier to process
 	for (Object[] entry : resultQuery) {
 	    Policy policy = (Policy) entry[0];
@@ -53,7 +53,7 @@ public class PolicyDAO extends LAMSBaseDAO implements IPolicyDAO {
     @Override
     public List<Policy> getPreviousVersionsPolicies(Long policyId) {
 	String query = "from Policy p where p.policyId=? ORDER BY p.lastModified ASC";
-	return (List<Policy>) doFind(query, policyId);
+	return doFindCacheable(query, policyId);
     }
 
     @Override
@@ -85,7 +85,7 @@ public class PolicyDAO extends LAMSBaseDAO implements IPolicyDAO {
 	List<Object[]> resultQuery = query.list();
 
 	// this map keeps the insertion order
-	LinkedList<PolicyDTO> policyDtos = new LinkedList<PolicyDTO>();
+	LinkedList<PolicyDTO> policyDtos = new LinkedList<>();
 	// make the result easier to process
 	for (Object[] entry : resultQuery) {
 	    Policy policy = (Policy) entry[0];
@@ -106,7 +106,7 @@ public class PolicyDAO extends LAMSBaseDAO implements IPolicyDAO {
     @Override
     public List<PolicyConsent> getConsentsByUserId(Integer userId) {
 	String query = "from PolicyConsent consent where consent.user.userId=? ORDER BY consent.dateAgreedOn ASC";
-	return (List<PolicyConsent>) doFind(query, userId);
+	return doFind(query, userId);
     }
 
     @Override
@@ -159,7 +159,7 @@ public class PolicyDAO extends LAMSBaseDAO implements IPolicyDAO {
 	List<Object[]> list = query.list();
 
 	//group by userId as long as it returns all completed visitLogs for each user
-	List<UserPolicyConsentDTO> policyConsentDtos = new ArrayList<UserPolicyConsentDTO>();
+	List<UserPolicyConsentDTO> policyConsentDtos = new ArrayList<>();
 	for (Object[] element : list) {
 	    Integer userId = ((Number) element[0]).intValue();
 	    String login = (String) element[1];

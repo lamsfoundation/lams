@@ -16,12 +16,18 @@
 ==================================================================== */
 package org.apache.poi.poifs.crypt;
 
-import org.apache.poi.util.Removal;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.common.Duplicatable;
+import org.apache.poi.common.usermodel.GenericRecord;
 
 /**
- * Used when checking if a key is valid for a document 
+ * Used when checking if a key is valid for a document
  */
-public abstract class EncryptionVerifier implements Cloneable {
+public abstract class EncryptionVerifier implements GenericRecord, Duplicatable {
     private byte[] salt;
     private byte[] encryptedVerifier;
     private byte[] encryptedVerifierHash;
@@ -31,8 +37,19 @@ public abstract class EncryptionVerifier implements Cloneable {
     private CipherAlgorithm cipherAlgorithm;
     private ChainingMode chainingMode;
     private HashAlgorithm hashAlgorithm;
-    
+
     protected EncryptionVerifier() {}
+
+    protected EncryptionVerifier(EncryptionVerifier other) {
+        salt = (other.salt == null) ? null : other.salt.clone();
+        encryptedVerifier = (other.encryptedVerifier == null) ? null : other.encryptedVerifier.clone();
+        encryptedVerifierHash = (other.encryptedVerifierHash == null) ? null : other.encryptedVerifierHash.clone();
+        encryptedKey = (other.encryptedKey == null) ? null : other.encryptedKey.clone();
+        spinCount = other.spinCount;
+        cipherAlgorithm = other.cipherAlgorithm;
+        chainingMode = other.chainingMode;
+        hashAlgorithm = other.hashAlgorithm;
+    }
 
     public byte[] getSalt() {
         return salt;
@@ -40,86 +57,77 @@ public abstract class EncryptionVerifier implements Cloneable {
 
     public byte[] getEncryptedVerifier() {
         return encryptedVerifier;
-    }    
-    
+    }
+
     public byte[] getEncryptedVerifierHash() {
         return encryptedVerifierHash;
-    }    
-    
+    }
+
     public int getSpinCount() {
         return spinCount;
-    }
-
-    /**
-     * @deprecated POI 3.16 beta 1. use {@link #getChainingMode()}
-     */
-    @Removal(version="3.18")
-    public int getCipherMode() {
-        return chainingMode.ecmaId;
-    }
-
-    /**
-     * @deprecated POI 3.16 beta 1. use {@link #getCipherAlgorithm()}
-     */
-    public int getAlgorithm() {
-        return cipherAlgorithm.ecmaId;
     }
 
     public byte[] getEncryptedKey() {
         return encryptedKey;
     }
-    
+
     public CipherAlgorithm getCipherAlgorithm() {
         return cipherAlgorithm;
     }
-    
+
     public HashAlgorithm getHashAlgorithm() {
         return hashAlgorithm;
     }
-    
+
     public ChainingMode getChainingMode() {
         return chainingMode;
     }
 
-    protected void setSalt(byte[] salt) {
+    public void setSalt(byte[] salt) {
         this.salt = (salt == null) ? null : salt.clone();
     }
 
-    protected void setEncryptedVerifier(byte[] encryptedVerifier) {
+    public void setEncryptedVerifier(byte[] encryptedVerifier) {
         this.encryptedVerifier = (encryptedVerifier == null) ? null : encryptedVerifier.clone();
     }
 
-    protected void setEncryptedVerifierHash(byte[] encryptedVerifierHash) {
+    public void setEncryptedVerifierHash(byte[] encryptedVerifierHash) {
         this.encryptedVerifierHash = (encryptedVerifierHash == null) ? null : encryptedVerifierHash.clone();
     }
 
-    protected void setEncryptedKey(byte[] encryptedKey) {
+    public void setEncryptedKey(byte[] encryptedKey) {
         this.encryptedKey = (encryptedKey == null) ? null : encryptedKey.clone();
     }
 
-    protected void setSpinCount(int spinCount) {
+    public void setSpinCount(int spinCount) {
         this.spinCount = spinCount;
     }
 
-    protected void setCipherAlgorithm(CipherAlgorithm cipherAlgorithm) {
+    public void setCipherAlgorithm(CipherAlgorithm cipherAlgorithm) {
         this.cipherAlgorithm = cipherAlgorithm;
     }
 
-    protected void setChainingMode(ChainingMode chainingMode) {
+    public void setChainingMode(ChainingMode chainingMode) {
         this.chainingMode = chainingMode;
     }
 
-    protected void setHashAlgorithm(HashAlgorithm hashAlgorithm) {
+    public void setHashAlgorithm(HashAlgorithm hashAlgorithm) {
         this.hashAlgorithm = hashAlgorithm;
     }
-    
+
+    public abstract EncryptionVerifier copy();
+
     @Override
-    public EncryptionVerifier clone() throws CloneNotSupportedException {
-        EncryptionVerifier other = (EncryptionVerifier)super.clone();
-        other.salt = (salt == null) ? null : salt.clone();
-        other.encryptedVerifier = (encryptedVerifier == null) ? null : encryptedVerifier.clone();
-        other.encryptedVerifierHash = (encryptedVerifierHash == null) ? null : encryptedVerifierHash.clone();
-        other.encryptedKey = (encryptedKey == null) ? null : encryptedKey.clone();
-        return other;
+    public Map<String, Supplier<?>> getGenericProperties() {
+        final Map<String,Supplier<?>> m = new LinkedHashMap<>();
+        m.put("salt", this::getSalt);
+        m.put("encryptedVerifier", this::getEncryptedVerifier);
+        m.put("encryptedVerifierHash", this::getEncryptedVerifierHash);
+        m.put("encryptedKey", this::getEncryptedKey);
+        m.put("spinCount", this::getSpinCount);
+        m.put("cipherAlgorithm", this::getCipherAlgorithm);
+        m.put("chainingMode", this::getChainingMode);
+        m.put("hashAlgorithm", this::getHashAlgorithm);
+        return Collections.unmodifiableMap(m);
     }
 }

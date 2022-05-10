@@ -2,11 +2,11 @@
 
 Folder            Library                               Version                License                       Vendor                           Description
 
-apache-poi        poi-4.0.1.jar           				4.0.1                  Apache License 2.0            Apache                           the Java API for Microsoft Documents
-                  poi-ooxml-4.0.1.jar
-                  poi-ooxml-schemas-4.0.1.jar
-                  poi-scratchpad-4.0.1.jar
-                  xmlbeans-3.0.2.jar					3.0.2
+apache-poi        poi-4.1.2.jar           				4.1.2                  Apache License 2.0            Apache                           the Java API for Microsoft Documents
+                  poi-ooxml-4.1.2.jar
+                  poi-ooxml-schemas-4.1.2.jar
+                  poi-scratchpad-4.1.2.jar
+                  xmlbeans-3.1.0.jar					3.1.0
 
 apache-tika       tika-core-1.24.jar             		1.24                   Apache License 2.0            Apache                           a content analysis toolkit that detects and extracts metadata and text from over a thousand different file types
                   tika-parsers-1.24.jar
@@ -24,9 +24,8 @@ batik             batik-1.7.jar                         1.7                    A
 
 clamav-client	  clamav-client-2.0.2.jar				2.0.2				   MIT							 cdarras on GitHub				  ClamAV antivirus client 
 
-csrfguard		  csrfguard-3.1.0-custom-2020.01.07.jar custom build		   BSD License 					 OWASP							  prevents CSRF attacks
-														based on 3.1.0																		  master from 2020.01.07 with a custom modification in CsrfGuard.java
-
+csrfguard		  csrfguard-4.1.3-custom-2022.04.03.jar	custom build   		   BSD License 					 OWASP							  prevents CSRF attacks
+														based on 4.1.3																		  4.1.3 tag with a custom modification in CsrfGuardUtils.java
 etherpad		  etherpad_lite_client-1.2.13.jar		1.2.13					Apache License 2.0			 Nils Fredrik Gjerull			  Client for Etherpad
 
 fckeditor         fckeditor-java-core-2.6.jar           2.6					   GPL, LGPL, MPL				 Frederico Caldeira Knabben       Java connector for CKEditor                                                        
@@ -36,17 +35,22 @@ googleauth        googleauth-1.1.1.jar                  1.1.1				   Public Domai
 hibernate		  hibernate-core-5.3.6.Final.jar		5.3.6				   LGPL							 Hibernate						  ORM library
 				  hibernate-envers-5.3.6.Final.jar
 				  
-jakarta-commons   commons-digester-2.1.jar              2.1                    Apache Software License 2.0   The Apache Software Foundation   XML -> Java object mapping tool
+jakarta-commons   commons-codec-1.15.jar				1.15				   Apache Software License 2.0   The Apache Software Foundation   provides implementations of common encoders and decoders
+				  commons-collections4-4.4.jar			4.4					   Apache Software License 2.0   The Apache Software Foundation   adds many powerful data structures that accelerate development of Java applications
+				  commons-digester-2.1.jar              2.1                    Apache Software License 2.0   The Apache Software Foundation   XML -> Java object mapping tool
                   commons-fileupload-1.3.3.jar          1.3.3                  Apache Software License 1.1   The Apache Software Foundation   File upload component for Java servlets
                   commons-validator-1.6.jar             1.6	                   Apache License 2.0            The Apache Software Foundation   Commons Validator
                   commons-discovery-0.5.jar             0.5	                   Apache License 2.0            The Apache Software Foundation
-                  commons-compress-1.18.jar             1.18                   Apache License 2.0            The Apache Software Foundation   Defines an API for working with ar, cpio, Unix dump, tar, zip, gzip, XZ, Pack200, bzip2, 7z, arj, lzma, snappy, DEFLATE, lz4, Brotli, Zstandard, DEFLATE64 and Z files
+                  commons-compress-1.19.jar             1.19                   Apache License 2.0            The Apache Software Foundation   Defines an API for working with ar, cpio, Unix dump, tar, zip, gzip, XZ, Pack200, bzip2, 7z, arj, lzma, snappy, DEFLATE, lz4, Brotli, Zstandard, DEFLATE64 and Z files
 
 jlatexmath		  jlatexmath-1.0.8.jar                  1.0.8                  GPL                           scilab.org                       A Java API to render LaTeX
 
 json-simple       json-simple-1.1.1.jar                 1.1.1                  Apache License 2.0            fangyidong                       A simple Java toolkit for JSON
 
-jsonwebtoken	  jjwt-0.9.0.jar						0.9.0				   JWTK							 Apache
+jsonwebtoken	  jjwt-api-0.11.2.jar					0.11.2				   JWTK							 Apache
+				  jjwt-impl-0.11.2.jar
+				  jjwt-jackson-0.11.2.jar
+				  jwks-rsa-0.20.0.jar
 
 kotlin-stdlib	  kotlin-stdlib-1.3.11.jar				1.3.11				   Apache License 2.0			 JetBrains						  Kotlin runtime
 
@@ -56,18 +60,24 @@ mysql             mysql-connector-java-8.0.11.jar		8.0.11				   GPL							 Oracl
 
 odmg              odmg-3.0.jar                          3.0                                                                                   
 
+passpol			  passpol-0.7.1-SNAPSHOT.jar			0.7.1				   Apache License 2.0			 Codahale						  For checking for weak or compromised password. Recompiled manually with Java 11.
+
+reactive-streams  reactive-streams-1.0.3.jar			1.0.3		   	   	   Public Domain			 	 Reactive StreamsVMWare			  Reactive protocol
+
+reactor			  reactor-core-3.4.12.jar				3.4.12			   	   Apache License 2.0			 VMWare							  Reactive backend
+
 quartz			  quartz-2.2.3.jar						2.2.3			   	   Apache License 2.0			 Terracotta						  For running scheduled jobs
 
-spring            spring-core-4.3.12.RELEASE.jar		4.3.12				   Apache License 2.0			 Pivotal						  programming and configuration model for modern Java-based enterprise applications
-				  spring-beans-4.3.12.RELEASE.jar
-				  spring-context-4.3.12.RELEASE.jar
-				  spring-context-support-4.3.12.RELEASE.jar
-				  spring-expression-4.3.12.RELEASE.jar
-				  spring-jdbc-4.3.12.RELEASE.jar
-				  spring-orm-4.3.12.RELEASE.jar
-				  spring-tx-4.3.12.RELEASE.jar
-				  spring-web-4.3.12.RELEASE.jar
-				  spring-webmvc-4.3.12.RELEASE.jar
+spring            spring-core-5.3.18.jar				5.3.18				   Apache License 2.0			 VMWare							  programming and configuration model for modern Java-based enterprise applications
+				  spring-beans-5.3.18.jar
+				  spring-context-5.3.18.jar
+				  spring-context-support-5.3.18.jar
+				  spring-expression-5.3.18.jar
+				  spring-jdbc-5.3.18.jar
+				  spring-orm-5.3.18.jar
+				  spring-tx-5.3.18.jar
+				  spring-web-5.3.18.jar
+				  spring-webmvc-5.3.18.jar
 
 urlrewritefilter urlrewritefilter-4.0.3.jar             4.0.3                  BSD License              	 tuckey.org         			  Java Web Filter which allows rewriting URLs
 

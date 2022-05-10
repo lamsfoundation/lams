@@ -30,8 +30,6 @@ import java.util.Map;
 
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
-import org.hibernate.type.FloatType;
-import org.hibernate.type.IntegerType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentUserDAO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
@@ -49,17 +47,14 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 
     private static final String LOAD_MARKS_FOR_SESSION = "SELECT grade FROM tl_laasse10_assessment_result "
 	    + " WHERE finish_date IS NOT NULL AND latest = 1 AND session_id = :sessionId";
-    private static final String FIND_MARK_STATS_FOR_SESSION = "SELECT MIN(grade) min_grade, AVG(grade) avg_grade, MAX(grade) max_grade FROM tl_laasse10_assessment_result "
-	    + " WHERE finish_date IS NOT NULL AND latest = 1 AND session_id = :sessionId";
 
     private static final String LOAD_MARKS_FOR_LEADERS = "SELECT r.grade FROM tl_laasse10_assessment_result r "
 	    + " JOIN tl_laasse10_session s ON r.session_id = s.session_id AND r.user_uid = s.group_leader_uid "
 	    + " JOIN tl_laasse10_assessment a ON s.assessment_uid = a.uid "
 	    + " WHERE r.finish_date IS NOT NULL AND r.latest = 1 AND a.content_id = :toolContentId";
-    private static final String FIND_MARK_STATS_FOR_LEADERS = "SELECT MIN(grade) min_grade, AVG(grade) avg_grade, MAX(grade) max_grade, COUNT(grade) num_complete "
-	    + " FROM tl_laasse10_assessment_result r "
-	    + " JOIN tl_laasse10_session s ON r.session_id = s.session_id AND r.user_uid = s.group_leader_uid "
-	    + " JOIN tl_laasse10_assessment a ON s.assessment_uid = a.uid "
+
+    private static final String LOAD_MARKS_FOR_CONTENT = "SELECT r.grade FROM tl_laasse10_assessment_result r "
+	    + " JOIN tl_laasse10_assessment a ON r.assessment_uid = a.uid "
 	    + " WHERE r.finish_date IS NOT NULL AND r.latest = 1 AND a.content_id = :toolContentId";
 
     @SuppressWarnings("rawtypes")
@@ -136,6 +131,8 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	} else {
 	    bldr.append(LOAD_USERS_ORDERED_ORDER_BY_NAME);
 	}
+
+	LAMSBaseDAO.sanitiseQueryPart(sortOrder);
 	bldr.append(sortOrder);
 
 	NativeQuery<Object[]> query = getSession().createNativeQuery(bldr.toString());
@@ -155,15 +152,17 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 		String firstName = (String) element[1];
 		String lastName = (String) element[2];
 		String login = (String) element[3];
-		float grade = element[4] == null ? 0 : ((Number) element[4]).floatValue();
-		String portraitId = (String) element[5];
+		boolean resultSubmitted = element[4] != null;
+		float grade = resultSubmitted ? ((Number) element[4]).floatValue() : 0;
 
+		String portraitId = (String) element[5];
 		AssessmentUserDTO userDto = new AssessmentUserDTO();
 		userDto.setUserId(userId);
 		userDto.setFirstName(firstName);
 		userDto.setLastName(lastName);
 		userDto.setLogin(login);
 		userDto.setGrade(grade);
+		userDto.setResultSubmitted(resultSubmitted);
 		userDto.setPortraitId(portraitId);
 		userDtos.add(userDto);
 	    }
@@ -204,36 +203,6 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	return query.uniqueResult().intValue();
     }
 
-    @SuppressWarnings("rawtypes")
-    @Override
-    public Object[] getStatsMarksBySession(Long sessionId) {
-	Query query = getSession().createNativeQuery(FIND_MARK_STATS_FOR_SESSION)
-		.addScalar("min_grade", FloatType.INSTANCE).addScalar("avg_grade", FloatType.INSTANCE)
-		.addScalar("max_grade", FloatType.INSTANCE);
-	query.setParameter("sessionId", sessionId);
-	List list = query.list();
-	if ((list == null) || (list.size() == 0)) {
-	    return null;
-	} else {
-	    return (Object[]) list.get(0);
-	}
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public Object[] getStatsMarksForLeaders(Long toolContentId) {
-	NativeQuery<Object[]> query = getSession().createNativeQuery(FIND_MARK_STATS_FOR_LEADERS)
-		.addScalar("min_grade", FloatType.INSTANCE).addScalar("avg_grade", FloatType.INSTANCE)
-		.addScalar("max_grade", FloatType.INSTANCE).addScalar("num_complete", IntegerType.INSTANCE);
-	query.setParameter("toolContentId", toolContentId);
-	List list = query.list();
-	if ((list == null) || (list.size() == 0)) {
-	    return null;
-	} else {
-	    return (Object[]) list.get(0);
-	}
-    }
-
     private static String LOAD_USERS_ORDERED_BY_SESSION_QUESTION_SELECT = "SELECT DISTINCT question_result.uid, user.last_name, user.first_name, user.login_name, question_result.mark";
     private static String LOAD_USERS_ORDERED_BY_SESSION_QUESTION_FROM = " FROM tl_laasse10_user user";
     private static String LOAD_USERS_ORDERED_BY_SESSION_QUESTION_JOIN = " INNER JOIN tl_laasse10_session session"
@@ -267,6 +236,8 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	} else {
 	    bldr.append(LOAD_USERS_ORDERED_ORDER_BY_NAME);
 	}
+
+	LAMSBaseDAO.sanitiseQueryPart(sortOrder);
 	bldr.append(sortOrder);
 
 	NativeQuery<Object[]> query = getSession().createNativeQuery(bldr.toString());
@@ -305,21 +276,27 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	return userDtos;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public List<Number> getRawUserMarksBySession(Long sessionId) {
-	@SuppressWarnings("unchecked")
-	NativeQuery<Number> query = getSession().createNativeQuery(LOAD_MARKS_FOR_SESSION);
+    public List<Float> getRawUserMarksBySession(Long sessionId) {
+	NativeQuery<Float> query = getSession().createNativeQuery(LOAD_MARKS_FOR_SESSION);
 	query.setParameter("sessionId", sessionId);
-	List<Number> list = query.list();
-	return list;
+	return query.list();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public List<Number> getRawLeaderMarksByToolContentId(Long toolContentId) {
-	@SuppressWarnings("unchecked")
-	NativeQuery<Number> query = getSession().createNativeQuery(LOAD_MARKS_FOR_LEADERS);
+    public List<Float> getRawUserMarksByToolContentId(Long toolContentId) {
+	NativeQuery<Float> query = getSession().createNativeQuery(LOAD_MARKS_FOR_CONTENT);
 	query.setParameter("toolContentId", toolContentId);
-	List<Number> list = query.list();
-	return list;
+	return query.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Float> getRawLeaderMarksByToolContentId(Long toolContentId) {
+	NativeQuery<Float> query = getSession().createNativeQuery(LOAD_MARKS_FOR_LEADERS);
+	query.setParameter("toolContentId", toolContentId);
+	return query.list();
     }
 }

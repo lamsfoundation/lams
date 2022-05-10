@@ -17,32 +17,32 @@
 
 package org.apache.poi.hssf.record;
 
-import org.apache.poi.util.*;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
+import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * Record for the top margin.
  */
 public final class TopMarginRecord extends StandardRecord implements Margin {
-    public final static short sid = 0x28;
+    public static final short sid = 0x28;
+
     private double field_1_margin;
 
-    public TopMarginRecord()    {    }
+    public TopMarginRecord() {}
+
+    public TopMarginRecord(TopMarginRecord other) {
+        super(other);
+        field_1_margin = other.field_1_margin;
+    }
 
     /**
      * @param in the RecordInputstream to read the record from
      */
-    public TopMarginRecord( RecordInputStream in )
-    {
+    public TopMarginRecord( RecordInputStream in ) {
         field_1_margin = in.readDouble();
-    }
-
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append( "[TopMargin]\n" );
-        buffer.append( "    .margin               = " ).append( " (" ).append( getMargin() ).append( " )\n" );
-        buffer.append( "[/TopMargin]\n" );
-        return buffer.toString();
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -66,10 +66,19 @@ public final class TopMarginRecord extends StandardRecord implements Margin {
     public void setMargin( double field_1_margin )
     {        this.field_1_margin = field_1_margin;    }
 
-    public Object clone()
-    {
-        TopMarginRecord rec = new TopMarginRecord();
-        rec.field_1_margin = this.field_1_margin;
-        return rec;
+    @Override
+    public TopMarginRecord copy() {
+        return new TopMarginRecord(this);
     }
-}  // END OF 
+
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.TOP_MARGIN;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties("magin", this::getMargin);
+    }
+}

@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2015 the original author or authors.
+ * Copyright 2002-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,13 +20,14 @@ import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import org.springframework.transaction.support.ResourceHolderSupport;
-import org.springframework.util.Assert;
+import org.springframework.lang.Nullable;
+import org.springframework.orm.jpa.EntityManagerHolder;
 
 /**
- * Session holder, wrapping a Hibernate Session and a Hibernate Transaction.
- * HibernateTransactionManager binds instances of this class to the thread,
- * for a given SessionFactory.
+ * Resource holder wrapping a Hibernate {@link Session} (plus an optional {@link Transaction}).
+ * {@link HibernateTransactionManager} binds instances of this class to the thread,
+ * for a given {@link org.hibernate.SessionFactory}. Extends {@link EntityManagerHolder}
+ * as of 5.1, automatically exposing an {@code EntityManager} handle on Hibernate 5.2+.
  *
  * <p>Note: This is an SPI class, not intended to be used by applications.
  *
@@ -35,36 +36,39 @@ import org.springframework.util.Assert;
  * @see HibernateTransactionManager
  * @see SessionFactoryUtils
  */
-public class SessionHolder extends ResourceHolderSupport {
+public class SessionHolder extends EntityManagerHolder {
 
-	private Session session;
-
+	@Nullable
 	private Transaction transaction;
 
+	@Nullable
 	private FlushMode previousFlushMode;
 
 
 	public SessionHolder(Session session) {
-		Assert.notNull(session, "Session must not be null");
-		this.session = session;
+		super(session);
 	}
+
 
 	public Session getSession() {
-		return this.session;
+		return (Session) getEntityManager();
 	}
 
-	public void setTransaction(Transaction transaction) {
+	public void setTransaction(@Nullable Transaction transaction) {
 		this.transaction = transaction;
+		setTransactionActive(transaction != null);
 	}
 
+	@Nullable
 	public Transaction getTransaction() {
 		return this.transaction;
 	}
 
-	public void setPreviousFlushMode(FlushMode previousFlushMode) {
+	public void setPreviousFlushMode(@Nullable FlushMode previousFlushMode) {
 		this.previousFlushMode = previousFlushMode;
 	}
 
+	@Nullable
 	public FlushMode getPreviousFlushMode() {
 		return this.previousFlushMode;
 	}

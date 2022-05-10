@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,12 +23,12 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
@@ -36,7 +36,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.core.ResolvableType;
-import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.log.LogFormatUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpMethod;
@@ -47,10 +47,11 @@ import org.springframework.http.converter.GenericHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.server.ServletServerHttpRequest;
-import org.springframework.lang.UsesJava8;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import org.springframework.util.StreamUtils;
 import org.springframework.validation.Errors;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.validation.annotation.ValidationAnnotationUtils;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -58,7 +59,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 
 /**
  * A base class for resolving method argument values by reading from the body of
- * a request with {@link HttpMessageConverter}s.
+ * a request with {@link HttpMessageConverter HttpMessageConverters}.
  *
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
@@ -77,8 +78,6 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 
 	protected final List<HttpMessageConverter<?>> messageConverters;
 
-	protected final List<MediaType> allSupportedMediaTypes;
-
 	private final RequestResponseBodyAdviceChain advice;
 
 
@@ -94,27 +93,11 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 	 * @since 4.2
 	 */
 	public AbstractMessageConverterMethodArgumentResolver(List<HttpMessageConverter<?>> converters,
-			List<Object> requestResponseBodyAdvice) {
+			@Nullable List<Object> requestResponseBodyAdvice) {
 
 		Assert.notEmpty(converters, "'messageConverters' must not be empty");
 		this.messageConverters = converters;
-		this.allSupportedMediaTypes = getAllSupportedMediaTypes(converters);
 		this.advice = new RequestResponseBodyAdviceChain(requestResponseBodyAdvice);
-	}
-
-
-	/**
-	 * Return the media types supported by all provided message converters sorted
-	 * by specificity via {@link MediaType#sortBySpecificity(List)}.
-	 */
-	private static List<MediaType> getAllSupportedMediaTypes(List<HttpMessageConverter<?>> messageConverters) {
-		Set<MediaType> allSupportedMediaTypes = new LinkedHashSet<MediaType>();
-		for (HttpMessageConverter<?> messageConverter : messageConverters) {
-			allSupportedMediaTypes.addAll(messageConverter.getSupportedMediaTypes());
-		}
-		List<MediaType> result = new ArrayList<MediaType>(allSupportedMediaTypes);
-		MediaType.sortBySpecificity(result);
-		return Collections.unmodifiableList(result);
 	}
 
 
@@ -123,7 +106,7 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 	 * {@link RequestBodyAdvice} where each instance may be wrapped as a
 	 * {@link org.springframework.web.method.ControllerAdviceBean ControllerAdviceBean}.
 	 */
-	protected RequestResponseBodyAdviceChain getAdvice() {
+	RequestResponseBodyAdviceChain getAdvice() {
 		return this.advice;
 	}
 
@@ -138,6 +121,7 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 	 * @throws IOException if the reading from the request fails
 	 * @throws HttpMediaTypeNotSupportedException if no suitable message converter is found
 	 */
+	@Nullable
 	protected <T> Object readWithMessageConverters(NativeWebRequest webRequest, MethodParameter parameter,
 			Type paramType) throws IOException, HttpMediaTypeNotSupportedException, HttpMessageNotReadableException {
 
@@ -150,7 +134,7 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 	 * from the given HttpInputMessage.
 	 * @param <T> the expected type of the argument value to be created
 	 * @param inputMessage the HTTP input message representing the current request
-	 * @param parameter the method parameter descriptor (may be {@code null})
+	 * @param parameter the method parameter descriptor
 	 * @param targetType the target type, not necessarily the same as the method
 	 * parameter type, e.g. for {@code HttpEntity<String>}.
 	 * @return the created method argument value
@@ -158,6 +142,7 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 	 * @throws HttpMediaTypeNotSupportedException if no suitable message converter is found
 	 */
 	@SuppressWarnings("unchecked")
+	@Nullable
 	protected <T> Object readWithMessageConverters(HttpInputMessage inputMessage, MethodParameter parameter,
 			Type targetType) throws IOException, HttpMediaTypeNotSupportedException, HttpMessageNotReadableException {
 
@@ -174,68 +159,64 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 			contentType = MediaType.APPLICATION_OCTET_STREAM;
 		}
 
-		Class<?> contextClass = (parameter != null ? parameter.getContainingClass() : null);
+		Class<?> contextClass = parameter.getContainingClass();
 		Class<T> targetClass = (targetType instanceof Class ? (Class<T>) targetType : null);
 		if (targetClass == null) {
-			ResolvableType resolvableType = (parameter != null ?
-					ResolvableType.forMethodParameter(parameter) : ResolvableType.forType(targetType));
+			ResolvableType resolvableType = ResolvableType.forMethodParameter(parameter);
 			targetClass = (Class<T>) resolvableType.resolve();
 		}
 
-		HttpMethod httpMethod = ((HttpRequest) inputMessage).getMethod();
+		HttpMethod httpMethod = (inputMessage instanceof HttpRequest ? ((HttpRequest) inputMessage).getMethod() : null);
 		Object body = NO_VALUE;
 
+		EmptyBodyCheckingHttpInputMessage message = null;
 		try {
-			inputMessage = new EmptyBodyCheckingHttpInputMessage(inputMessage);
+			message = new EmptyBodyCheckingHttpInputMessage(inputMessage);
 
 			for (HttpMessageConverter<?> converter : this.messageConverters) {
 				Class<HttpMessageConverter<?>> converterType = (Class<HttpMessageConverter<?>>) converter.getClass();
-				if (converter instanceof GenericHttpMessageConverter) {
-					GenericHttpMessageConverter<?> genericConverter = (GenericHttpMessageConverter<?>) converter;
-					if (genericConverter.canRead(targetType, contextClass, contentType)) {
-						if (logger.isDebugEnabled()) {
-							logger.debug("Read [" + targetType + "] as \"" + contentType + "\" with [" + converter + "]");
-						}
-						if (inputMessage.getBody() != null) {
-							inputMessage = getAdvice().beforeBodyRead(inputMessage, parameter, targetType, converterType);
-							body = genericConverter.read(targetType, contextClass, inputMessage);
-							body = getAdvice().afterBodyRead(body, inputMessage, parameter, targetType, converterType);
-						}
-						else {
-							body = getAdvice().handleEmptyBody(null, inputMessage, parameter, targetType, converterType);
-						}
-						break;
+				GenericHttpMessageConverter<?> genericConverter =
+						(converter instanceof GenericHttpMessageConverter ? (GenericHttpMessageConverter<?>) converter : null);
+				if (genericConverter != null ? genericConverter.canRead(targetType, contextClass, contentType) :
+						(targetClass != null && converter.canRead(targetClass, contentType))) {
+					if (message.hasBody()) {
+						HttpInputMessage msgToUse =
+								getAdvice().beforeBodyRead(message, parameter, targetType, converterType);
+						body = (genericConverter != null ? genericConverter.read(targetType, contextClass, msgToUse) :
+								((HttpMessageConverter<T>) converter).read(targetClass, msgToUse));
+						body = getAdvice().afterBodyRead(body, msgToUse, parameter, targetType, converterType);
 					}
-				}
-				else if (targetClass != null) {
-					if (converter.canRead(targetClass, contentType)) {
-						if (logger.isDebugEnabled()) {
-							logger.debug("Read [" + targetType + "] as \"" + contentType + "\" with [" + converter + "]");
-						}
-						if (inputMessage.getBody() != null) {
-							inputMessage = getAdvice().beforeBodyRead(inputMessage, parameter, targetType, converterType);
-							body = ((HttpMessageConverter<T>) converter).read(targetClass, inputMessage);
-							body = getAdvice().afterBodyRead(body, inputMessage, parameter, targetType, converterType);
-						}
-						else {
-							body = getAdvice().handleEmptyBody(null, inputMessage, parameter, targetType, converterType);
-						}
-						break;
+					else {
+						body = getAdvice().handleEmptyBody(null, message, parameter, targetType, converterType);
 					}
+					break;
 				}
 			}
 		}
 		catch (IOException ex) {
-			throw new HttpMessageNotReadableException("I/O error while reading input message", ex);
+			throw new HttpMessageNotReadableException("I/O error while reading input message", ex, inputMessage);
+		}
+		finally {
+			if (message != null && message.hasBody()) {
+				closeStreamIfNecessary(message.getBody());
+			}
 		}
 
 		if (body == NO_VALUE) {
 			if (httpMethod == null || !SUPPORTED_METHODS.contains(httpMethod) ||
-					(noContentType && inputMessage.getBody() == null)) {
+					(noContentType && !message.hasBody())) {
 				return null;
 			}
-			throw new HttpMediaTypeNotSupportedException(contentType, this.allSupportedMediaTypes);
+			throw new HttpMediaTypeNotSupportedException(contentType,
+					getSupportedMediaTypes(targetClass != null ? targetClass : Object.class));
 		}
+
+		MediaType selectedContentType = contentType;
+		Object theBody = body;
+		LogFormatUtils.traceDebug(logger, traceOn -> {
+			String formatted = LogFormatUtils.formatValue(theBody, !traceOn);
+			return "Read \"" + selectedContentType + "\" to [" + formatted + "]";
+		});
 
 		return body;
 	}
@@ -247,6 +228,7 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 	 */
 	protected ServletServerHttpRequest createInputMessage(NativeWebRequest webRequest) {
 		HttpServletRequest servletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
+		Assert.state(servletRequest != null, "No HttpServletRequest");
 		return new ServletServerHttpRequest(servletRequest);
 	}
 
@@ -263,10 +245,8 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 	protected void validateIfApplicable(WebDataBinder binder, MethodParameter parameter) {
 		Annotation[] annotations = parameter.getParameterAnnotations();
 		for (Annotation ann : annotations) {
-			Validated validatedAnn = AnnotationUtils.getAnnotation(ann, Validated.class);
-			if (validatedAnn != null || ann.annotationType().getSimpleName().startsWith("Valid")) {
-				Object hints = (validatedAnn != null ? validatedAnn.value() : AnnotationUtils.getValue(ann));
-				Object[] validationHints = (hints instanceof Object[] ? (Object[]) hints : new Object[] {hints});
+			Object[] validationHints = ValidationAnnotationUtils.determineValidationHints(ann);
+			if (validationHints != null) {
 				binder.validate(validationHints);
 				break;
 			}
@@ -282,9 +262,24 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 	 */
 	protected boolean isBindExceptionRequired(WebDataBinder binder, MethodParameter parameter) {
 		int i = parameter.getParameterIndex();
-		Class<?>[] paramTypes = parameter.getMethod().getParameterTypes();
+		Class<?>[] paramTypes = parameter.getExecutable().getParameterTypes();
 		boolean hasBindingResult = (paramTypes.length > (i + 1) && Errors.class.isAssignableFrom(paramTypes[i + 1]));
 		return !hasBindingResult;
+	}
+
+	/**
+	 * Return the media types supported by all provided message converters sorted
+	 * by specificity via {@link MediaType#sortBySpecificity(List)}.
+	 * @since 5.3.4
+	 */
+	protected List<MediaType> getSupportedMediaTypes(Class<?> clazz) {
+		Set<MediaType> mediaTypeSet = new LinkedHashSet<>();
+		for (HttpMessageConverter<?> converter : this.messageConverters) {
+			mediaTypeSet.addAll(converter.getSupportedMediaTypes(clazz));
+		}
+		List<MediaType> result = new ArrayList<>(mediaTypeSet);
+		MediaType.sortBySpecificity(result);
+		return result;
 	}
 
 	/**
@@ -294,8 +289,27 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 	 * @return the adapted argument, or the original resolved argument as-is
 	 * @since 4.3.5
 	 */
-	protected Object adaptArgumentIfNecessary(Object arg, MethodParameter parameter) {
-		return (parameter.isOptional() ? OptionalResolver.resolveValue(arg) : arg);
+	@Nullable
+	protected Object adaptArgumentIfNecessary(@Nullable Object arg, MethodParameter parameter) {
+		if (parameter.getParameterType() == Optional.class) {
+			if (arg == null || (arg instanceof Collection && ((Collection<?>) arg).isEmpty()) ||
+					(arg instanceof Object[] && ((Object[]) arg).length == 0)) {
+				return Optional.empty();
+			}
+			else {
+				return Optional.of(arg);
+			}
+		}
+		return arg;
+	}
+
+	/**
+	 * Allow for closing the body stream if necessary,
+	 * e.g. for part streams in a multipart request.
+	 */
+	void closeStreamIfNecessary(InputStream body) {
+		// No-op by default: A standard HttpInputMessage exposes the HTTP request stream
+		// (ServletRequest#getInputStream), with its lifecycle managed by the container.
 	}
 
 
@@ -303,18 +317,13 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 
 		private final HttpHeaders headers;
 
+		@Nullable
 		private final InputStream body;
-
-		private final HttpMethod method;
-
 
 		public EmptyBodyCheckingHttpInputMessage(HttpInputMessage inputMessage) throws IOException {
 			this.headers = inputMessage.getHeaders();
 			InputStream inputStream = inputMessage.getBody();
-			if (inputStream == null) {
-				this.body = null;
-			}
-			else if (inputStream.markSupported()) {
+			if (inputStream.markSupported()) {
 				inputStream.mark(1);
 				this.body = (inputStream.read() != -1 ? inputStream : null);
 				inputStream.reset();
@@ -330,7 +339,6 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 					pushbackInputStream.unread(b);
 				}
 			}
-			this.method = ((HttpRequest) inputMessage).getMethod();
 		}
 
 		@Override
@@ -339,28 +347,12 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 		}
 
 		@Override
-		public InputStream getBody() throws IOException {
-			return this.body;
+		public InputStream getBody() {
+			return (this.body != null ? this.body : StreamUtils.emptyInput());
 		}
 
-		public HttpMethod getMethod() {
-			return this.method;
-		}
-	}
-
-
-	/**
-	 * Inner class to avoid hard-coded dependency on Java 8 Optional type...
-	 */
-	@UsesJava8
-	private static class OptionalResolver {
-
-		public static Object resolveValue(Object value) {
-			if (value == null || (value instanceof Collection && ((Collection) value).isEmpty()) ||
-					(value instanceof Object[] && ((Object[]) value).length == 0)) {
-				return Optional.empty();
-			}
-			return Optional.of(value);
+		public boolean hasBody() {
+			return (this.body != null);
 		}
 	}
 

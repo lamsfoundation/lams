@@ -6,29 +6,46 @@
 <table class="table table-striped table-condensed">
 	<tr>
 		<td>
-			<fmt:message key="label.authoring.advanced.give.extra.point" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${sessionMap.scratchie.extraPoint}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
 			<fmt:message key="label.authoring.advanced.burning.questions" />
 		</td>
 		
 		<td>
 			<c:choose>
 				<c:when test="${sessionMap.scratchie.burningQuestionsEnabled}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.advanced.discussion" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${sessionMap.scratchie.discussionSentimentEnabled}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.advanced.question.etherpad" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${sessionMap.scratchie.questionEtherpadEnabled}">
 					<fmt:message key="label.on" />
 				</c:when>
 				<c:otherwise>
@@ -57,11 +74,45 @@
 	
 	<tr>
 		<td>
-			<fmt:message key="label.time.limit" />
+			<fmt:message key="label.authoring.advanced.reveal.double.click" />
 		</td>
-			
+		
 		<td>
-			<c:out value="${sessionMap.scratchie.timeLimit}" escapeXml="true"/>
+			<c:choose>
+				<c:when test="${sessionMap.scratchie.revealOnDoubleClick}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+		
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.advanced.show.scratchies.in.results" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${sessionMap.scratchie.showScrachiesInResults}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="admin.preset.marks" />
+		</td>
+		
+		<td>
+			<c:out value="${sessionMap.scratchie.presetMarks}" />
 		</td>
 	</tr>
 	

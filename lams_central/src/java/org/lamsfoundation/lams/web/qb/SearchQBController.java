@@ -103,8 +103,9 @@ public class SearchQBController {
 	    questionTypesAvailable.append(QbQuestion.TYPE_MULTIPLE_CHOICE);
 	    questionTypesAvailable.append(",");
 	    questionTypesAvailable.append(QbQuestion.TYPE_VERY_SHORT_ANSWERS);
+	    questionTypesAvailable.append(",");
+	    questionTypesAvailable.append(QbQuestion.TYPE_MARK_HEDGING);
 
-	    //CommonConstants.TOOL_SIGNATURE_SURVEY
 	} else if ("lasurv11".equals(toolSignature)) {
 	    questionTypesAvailable.append(QbQuestion.TYPE_MULTIPLE_CHOICE);
 	    questionTypesAvailable.append(",");
@@ -130,7 +131,14 @@ public class SearchQBController {
 	    //CommonConstants.TOOL_SIGNATURE_QA
 	} else if ("laqa11".equals(toolSignature)) {
 	    questionTypeDefault = QbQuestion.TYPE_ESSAY;
+	} else if ("tblIrat".equals(toolSignature)) {
+	    // this is a special tool "signature" which allows mcq and mark hedging
+	    // used by iRAT page in TBL template
+	    questionTypesAvailable.append(QbQuestion.TYPE_MULTIPLE_CHOICE);
+	    questionTypesAvailable.append(",");
+	    questionTypesAvailable.append(QbQuestion.TYPE_MARK_HEDGING);
 	}
+
 	request.setAttribute("questionType", questionTypeDefault);
 	request.setAttribute("questionTypesAvailable", questionTypesAvailable.toString());
 	//let jsp know it's Scratchie, so we can disable VSA questions not compatible with TBL
@@ -224,8 +232,8 @@ public class SearchQBController {
     @RequestMapping("/getPagedQuestions")
     @ResponseBody
     private String getPagedQuestions(HttpServletRequest request, HttpServletResponse response,
-	    @RequestParam(required = false) String questionTypes,
-	    @RequestParam(required = false) String collectionUids) {
+	    @RequestParam(required = false) String questionTypes, @RequestParam(required = false) String collectionUids,
+	    @RequestParam(required = false) Long toolContentID) {
 	if (StringUtils.isEmpty(questionTypes)) {
 	    questionTypes = null;
 	}
@@ -244,8 +252,8 @@ public class SearchQBController {
 	String searchString = WebUtil.readStrParam(request, "searchString", true);
 
 	// Get the user list from the db
-	List<QbQuestion> questions = qbService.getPagedQuestions(questionTypes, collectionUids, page - 1, rowLimit,
-		sortBy, sortOrder, searchString);
+	List<QbQuestion> questions = qbService.getPagedQuestions(questionTypes, collectionUids, toolContentID, page - 1,
+		rowLimit, sortBy, sortOrder, searchString);
 	int countQuestions = qbService.getCountQuestions(questionTypes, collectionUids, searchString);
 	int totalPages = Double.valueOf(Math.ceil(Double.valueOf(countQuestions) / Double.valueOf(rowLimit)))
 		.intValue();
@@ -291,8 +299,7 @@ public class SearchQBController {
 	boolean isScratchie = WebUtil.readBooleanParam(request, "isScratchie", false);
 	request.setAttribute("isScratchie", isScratchie);
 
-	List<QbQuestion> otherVersions = qbService.getQuestionsByQuestionId(qbQuestion.getQuestionId());
-	request.setAttribute("otherVersions", otherVersions);
+	qbService.fillVersionMap(qbQuestion);
 
 	return "qb/qbQuestionDetails";
     }

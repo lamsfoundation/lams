@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,6 +18,7 @@ package org.springframework.context.expression;
 
 import java.lang.reflect.AnnotatedElement;
 
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
@@ -34,6 +35,7 @@ public final class AnnotatedElementKey implements Comparable<AnnotatedElementKey
 
 	private final AnnotatedElement element;
 
+	@Nullable
 	private final Class<?> targetClass;
 
 
@@ -41,7 +43,7 @@ public final class AnnotatedElementKey implements Comparable<AnnotatedElementKey
 	 * Create a new instance with the specified {@link AnnotatedElement} and
 	 * optional target {@link Class}.
 	 */
-	public AnnotatedElementKey(AnnotatedElement element, Class<?> targetClass) {
+	public AnnotatedElementKey(AnnotatedElement element, @Nullable Class<?> targetClass) {
 		Assert.notNull(element, "AnnotatedElement must not be null");
 		this.element = element;
 		this.targetClass = targetClass;
@@ -49,7 +51,7 @@ public final class AnnotatedElementKey implements Comparable<AnnotatedElementKey
 
 
 	@Override
-	public boolean equals(Object other) {
+	public boolean equals(@Nullable Object other) {
 		if (this == other) {
 			return true;
 		}

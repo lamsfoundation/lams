@@ -1,5 +1,7 @@
 package org.lamsfoundation.lams.qb.model;
 
+import java.util.Comparator;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -22,7 +24,18 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 @Entity
 @Table(name = "lams_qb_tool_answer")
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class QbToolAnswer {
+public abstract class QbToolAnswer implements Comparable<QbToolAnswer> {
+    public static final Comparator<QbToolAnswer> COMPARATOR = Comparator
+	    .comparing(a -> a.getQbToolQuestion().getDisplayOrder());
+
+    // it makes sense to put comparator here as an internal class, so we do not need to look for it in other classes
+    public static class QbToolAnswerComparator implements Comparator<QbToolAnswer> {
+	@Override
+	public int compare(QbToolAnswer o1, QbToolAnswer o2) {
+	    return COMPARATOR.compare(o1, o2);
+	}
+    }
+
     @Id
     @Column(name = "answer_uid")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,6 +51,11 @@ public abstract class QbToolAnswer {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "qb_option_uid")
     protected QbOption qbOption;
+
+    @Override
+    public int compareTo(QbToolAnswer other) {
+	return COMPARATOR.compare(this, other);
+    }
 
     public Long getUid() {
 	return this.uid;
@@ -84,4 +102,5 @@ public abstract class QbToolAnswer {
 	QbToolAnswer other = (QbToolAnswer) obj;
 	return new EqualsBuilder().append(this.getUid(), other.getUid()).isEquals();
     }
+
 }

@@ -29,6 +29,7 @@ public class ImportExcelForm {
 
     private Integer orgId;
     private String tmpFileUploadId;
+    private boolean sendEmail;
 
     public Integer getOrgId() {
 	return orgId;
@@ -44,5 +45,13 @@ public class ImportExcelForm {
 
     public void setTmpFileUploadId(String tmpFileUploadId) {
 	this.tmpFileUploadId = tmpFileUploadId;
+    }
+
+    public boolean isSendEmail() {
+        return sendEmail;
+    }
+
+    public void setSendEmail(boolean sendEmail) {
+        this.sendEmail = sendEmail;
     }
 }

@@ -46,6 +46,7 @@
 
 			// validate the main form
 			var validator = $("#templateForm").validate({
+				ignore : 'div.cke_editable',
 				rules: {
 					sequenceTitle: {
 						required: true,
@@ -76,27 +77,35 @@
 			initializeWizard(validator);
 		});
 
-		function createApplicationExercise() {
-			var numAppex = $('#numAppEx');
-			var currNum = numAppex.val();
-			var nextNum = +currNum + 1;
-			var newDiv = document.createElement("div");
-			newDiv.id = 'divappex'+nextNum;
-			newDiv.className = 'panel panel-default';
-			var url=getSubmissionURL()+"/createApplicationExercise.do?appexNumber="+nextNum;
-			$('#accordianAppEx').append(newDiv);
+		function createApplicationExercise(type, callingAppexNumber) {
+			var targetNum = null,
+				targetDiv = null;
+			// if user chose a new doku question and current AE is empty, put the new doku AE instead of current AE
+			if (type == 'doku' && callingAppexNumber && $('#divass' + callingAppexNumber).is(':empty')) {
+				targetNum = callingAppexNumber;
+				targetDiv = $('#divappex' + targetNum);
+			} else {
+				// create a new AE
+				var numAppex = $('#numAppEx'),
+					currNum = numAppex.val();
+				targetNum = +currNum + 1;
+				targetDiv = $('<div />').attr('id', 'divappex' + targetNum).addClass('panel panel-default').appendTo('#accordianAppEx');
+			}
+
+			var url = getSubmissionURL() + "/createApplicationExercise.do?appexNumber=" 
+					 + targetNum + "&type=" + type + "&contentFolderID=${contentFolderID}";
+
 			$.ajaxSetup({ cache: true });
-			$(newDiv).load(url, function( response, status, xhr ) {
+			$(targetDiv).load(url, function( response, status, xhr ) {
 				if ( status == "error" ) {
 					console.log( xhr.status + " " + xhr.statusText );
-					newDiv.remove();
-				} else {
-					numAppex.val(nextNum);
-					newDiv.scrollIntoView();
+					targetDiv.remove();
+				} else if (targetNum != callingAppexNumber){
+					$('#numAppEx').val(targetNum);
+					targetDiv[0].scrollIntoView();
 					// close all the others
-					var i;
-					for (i = 1; i <= currNum; i++) {
-						$('#collapseAppex'+i).removeClass('in');
+					for (var i = 1; i < targetNum; i++) {
+						$('#collapseAppex' + i).removeClass('in');
 					}
 				}
 			});
@@ -119,7 +128,7 @@
 						if ( status == "error" ) {
 							console.log( xhr.status + " " + xhr.statusText );
 						} else {
-							$('#divquestions').append(response);
+							$('#divquestions').append(response).find('.collapse').collapse('hide');
 							$('#divq'+nextNum)[0].scrollIntoView();
 						}
 					}
@@ -140,7 +149,7 @@
 						if ( status == "error" ) {
 							console.log( xhr.status + " " + xhr.statusText );
 						} else {
-							$('#'+containingDivName).append(response);
+							$('#'+containingDivName).append(response).find('.collapse').collapse('hide');
 							$('#'+containingDivName+'divassess'+nextNum)[0].scrollIntoView();
 						}
 					}
@@ -163,8 +172,8 @@
 						// this action returns ID of the created QB question
 						// which is put into itemArea div
 						returnUrl: "<lams:LAMSURL/>qb/edit/returnQuestionUid.do",
-						// limit question to multiple choice (ira) or essay and multiple choice (ae)
-						toolSignature: appexNumber ? "lasurv11" : "lamc11"
+						// limit question to multiple choice and mark hedging (ira) or essay and multiple choice (ae)
+						toolSignature: appexNumber ? "lasurv11" : "tblIrat"
 					}, function(){
 						 container.scrollIntoView(true);
 					}
@@ -245,39 +254,37 @@
 		<div class="tab-pane" id="tab3">
 			<span class="field-name"><fmt:message key="authoring.tbl.desc.question"/></span>
 
-			<div class="form-group voffset10">
-					<input title="123" type="checkbox" name="confidenceLevelEnable" value="true" class="form-control-inline" id="confidenceLevelEnable" checked/>&nbsp;
-				<label for="confidenceLevelEnable">
-					<fmt:message key="authoring.enable.confidence.levels"/>
-				</label>
-                <i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key='authoring.tbl.enable.confidence.tooltip'/>"></i>
-			</div>
-			
 		 	<input type="hidden" name="numQuestions" id="numQuestions" value="0"/>
 			
 			<div id="divquestions">
 			</div>
 		
-			<span class="voffset10">
-				<div class="btn-group">
-					<button id="createQuestionButton"
-							onClick="javascript:createQuestion('numQuestions', 'divq', 'divquestions', '', '')" 
-							type="button" class="btn btn-default">
-								<i class="fa fa-plus"></i> <fmt:message key="authoring.create.question"/>
-					</button>
-					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						<span class="caret"></span><span class="sr-only">Toggle Dropdown</span>
-					</button>
-					<ul class="dropdown-menu">
-						<li><a href="#" onClick="javascript:openQuestionBank()"> 
-							<i class="fa fa-upload"></i> <fmt:message key="authoring.create.question.qb"/>
-							</a>
-						</li>
-					</ul>
-				</div>
-				
-				<a href="#"  id="importQTIButton" onClick="javascript:importQTI('mcq', 'mc')" class="btn btn-default pull-right">	<i class="fa fa-upload"></i> <fmt:message key="authoring.template.basic.import.qti" /></a>
-			</span>
+			<div class="btn-group voffset10">
+				<button id="createQuestionButton"
+						onClick="javascript:createQuestion('numQuestions', 'divq', 'divquestions', '', '')" 
+						type="button" class="btn btn-default">
+							<i class="fa fa-plus text-primary"></i> <fmt:message key="authoring.create.question"/>
+				</button>
+				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<span class="caret"></span><span class="sr-only">Toggle Dropdown</span>
+				</button>
+				<ul class="dropdown-menu dropdown-menu-right">
+					<li><a href="javascript:void(0)" onClick="javascript:openQuestionBank()"> 
+						<i class="fa fa-bank text-primary" ></i> <fmt:message key="authoring.create.question.qb"/>
+						</a>
+					</li>
+                       <li role="separator" class="divider"></li>
+					<li class="dropdown-header"><fmt:message key="authoring.tbl.import.questions.from"/></li>
+					<li><a style="margin-left: 1em;" href="javascript:void(0)" id="importWordButton" onClick="javascript:importQTI('mcq', 'mc,mh', 'word')">
+							<i class="fa fa-file-word-o text-primary"></i> <fmt:message key="label.qb.collection.word"/>...
+                           </a>
+                       </li>	
+					<li><a style="margin-left: 1em;" href="javascript:void(0)" onClick="javascript:importQTI('mcq', 'mc,mh', 'qti')" id="importQTIButton">
+							<i class="fa fa-file-code-o text-primary"></i> <fmt:message key="label.qb.collection.qti"/>...
+                           </a>
+                       </li>
+				</ul>
+			</div>
 			
 			<!-- Question Bank -->
 			<div class="panel-group question-bank-div" id="question-bank-ira-div" role="tablist" aria-multiselectable="true"> 
@@ -295,6 +302,28 @@
 					</div>
 				</div>
 			</div>
+			
+			<div class="panel panel-default voffset20">
+		        <div class="panel-heading collapsable-icon-left" id="advanced-settings-ira-heading">
+		        	<span class="panel-title">
+				    	<a role="button" data-toggle="collapse" href="#advanced-settings-ira-collapse" class="collapsed"
+				    	   aria-expanded="false" aria-controls="advanced-settings-ira-collapse">
+			          		<fmt:message key="label.tab.advanced" />
+			        	</a>
+		      		</span>
+		        </div>
+		
+				<div id="advanced-settings-ira-collapse" class="panel-body panel-collapse collapse" role="tabpanel" aria-labelledby="#advanced-settings-ira-heading">
+					<div class="form-group voffset10">
+						<input type="checkbox" name="confidenceLevelEnable" value="true" class="form-control-inline" id="confidenceLevelEnable" checked/>&nbsp;
+						<label for="confidenceLevelEnable">
+							<fmt:message key="authoring.enable.confidence.levels"/>
+						</label>
+		                <i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key='authoring.tbl.enable.confidence.tooltip'/>"></i>
+					</div>	
+				</div>
+			</div>
+			
 			<!-- Hidden div just for storing ID of the imported QB question -->
 			<div id="itemArea"></div>
 			
@@ -306,11 +335,12 @@
 	
 			<div class="panel-group" id="accordianAppEx" role="tablist" aria-multiselectable="true"> 
 			<c:set var="appexNumber" scope="page">1</c:set>
-			<%@ include file="appex.jsp" %>
+			<%@ include file="appexAssessment.jsp" %>
 			</div> <!--  end panel group -->
 
-			<a href="#" id="createApplicationExerciseButton" onclick="javascript:createApplicationExercise();" class="btn btn-default"><i class="fa fa-plus"></i> <fmt:message key="authoring.create.application.exercise"/></a>
-			
+			<a href="#" onclick="javascript:createApplicationExercise('assessment')" class="btn btn-default">
+				<i class="fa fa-plus"></i> <fmt:message key="authoring.create.application.exercise"/>
+			</a>
 	    </div>
 
 		<c:if test="${usePreview}">

@@ -28,6 +28,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -39,6 +40,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.stream.Collectors;
@@ -81,6 +83,7 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.imgscalr.ResizePictureUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -95,11 +98,13 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *
  * @author Fei Yang, Manpreet Minhas
  */
-public class UserManagementService implements IUserManagementService {
+public class UserManagementService implements IUserManagementService, InitializingBean {
 
     private Logger log = Logger.getLogger(UserManagementService.class);
 
     private static final String SEQUENCES_FOLDER_NAME_KEY = "runsequences.folder.name";
+
+    private static final int PASSWORD_HISTORY_DEFAULT_LIMIT = 50;
 
     private IBaseDAO baseDAO;
 
@@ -120,6 +125,27 @@ public class UserManagementService implements IUserManagementService {
     private static ILogEventService logEventService;
 
     private IToolContentHandler centralToolContentHandler;
+
+    private static IUserManagementService instance;
+
+    /*
+     * Sometimes we need access to a service from within an entity.
+     * For example when fetching ActivityEvaluation for ToolActivity - they should not be in OneToOne relationship
+     * as it can not be cached, i.e. is always eagerly fetched.
+     * This singleton-type access to service allows fetching data from DB from wherever in code.
+     * It is probably a bad design, but we can not enforce lazy loading in any other reasonable way
+     * and eager loading makes up a good part of queries sent to DB.
+     * The service fetched this way should probably be used for read-only queries
+     * as we deliver the real service object, not its transactional proxy.
+     */
+    @Override
+    public void afterPropertiesSet() {
+	instance = this;
+    }
+
+    public static IUserManagementService getInstance() {
+	return instance;
+    }
 
     // ---------------------------------------------------------------------
     // Service Methods
@@ -224,13 +250,23 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @Override
+    public List findByProperty(Class clazz, String name, Object value, boolean cache) {
+	return baseDAO.findByProperty(clazz, name, value, cache);
+    }
+
+    @Override
     public <T> List<T> findByPropertyValues(Class<T> clazz, String name, Collection<?> values) {
 	return baseDAO.findByPropertyValues(clazz, name, values);
     }
 
     @Override
     public List findByProperties(Class clazz, Map<String, Object> properties) {
-	return baseDAO.findByProperties(clazz, properties);
+	return findByProperties(clazz, properties, false);
+    }
+
+    @Override
+    public List findByProperties(Class clazz, Map<String, Object> properties, boolean cache) {
+	return baseDAO.findByProperties(clazz, properties, cache);
     }
 
     @Override
@@ -296,9 +332,8 @@ public class UserManagementService implements IUserManagementService {
 
     @Override
     public Organisation getRootOrganisation() {
-	return (Organisation) baseDAO
-		.findByProperty(Organisation.class, "organisationType.organisationTypeId", OrganisationType.ROOT_TYPE)
-		.get(0);
+	return baseDAO.findByProperty(Organisation.class, "organisationType.organisationTypeId",
+		OrganisationType.ROOT_TYPE, true).get(0);
     }
 
     @Override
@@ -307,7 +342,7 @@ public class UserManagementService implements IUserManagementService {
 	properties.put("userOrganisation.user.userId", userId);
 	properties.put("userOrganisation.organisation.organisationId", orgId);
 	properties.put("role.name", roleName);
-	if (baseDAO.findByProperties(UserOrganisationRole.class, properties).size() == 0) {
+	if (baseDAO.findByProperties(UserOrganisationRole.class, properties, true).size() == 0) {
 	    return false;
 	}
 	return true;
@@ -323,7 +358,7 @@ public class UserManagementService implements IUserManagementService {
 	Map<String, Object> properties = new HashMap<>();
 	properties.put("organisationType.organisationTypeId", typeId);
 	properties.put("organisationState.organisationStateId", stateId);
-	return baseDAO.findByProperties(Organisation.class, properties);
+	return baseDAO.findByProperties(Organisation.class, properties, true);
     }
 
     @Override
@@ -340,7 +375,6 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<UserOrganisationRole> getUserOrganisationRoles(Integer orgId, String login) {
 	Map<String, Object> properties = new HashMap<>();
 	properties.put("userOrganisation.organisation.organisationId", orgId);
@@ -398,24 +432,39 @@ public class UserManagementService implements IUserManagementService {
 	List results = baseDAO.findByProperty(User.class, "login", login);
 	return results.isEmpty() ? null : (User) results.get(0);
     }
-    
+
     @Override
     public User getUserById(Integer userId) {
 	return (User) findById(User.class, userId);
-    }   
+    }
 
     @Override
-    public void updatePassword(String login, String password) {
-	try {
-	    User user = getUserByLogin(login);
-	    String salt = HashUtil.salt();
-	    user.setSalt(salt);
-	    user.setPassword(HashUtil.sha256(password, salt));
-	    user.setModifiedDate(new Date());
-	    baseDAO.update(user);
-	} catch (Exception e) {
-	    log.debug(e);
+    public void updatePassword(User user, String password) {
+	String salt = HashUtil.salt();
+	user.setSalt(salt);
+	String hash = HashUtil.sha256(password, salt);
+	user.setPassword(hash);
+	user.setModifiedDate(new Date());
+	LocalDateTime date = LocalDateTime.now();
+	user.setPasswordChangeDate(date);
+
+	// add new password to history
+	SortedMap<LocalDateTime, String> history = user.getPasswordHistory();
+	history.put(date, hash + "=" + salt);
+
+	// clear old password, about the limit
+	int historyLimit = Configuration.getAsInt(ConfigurationKeys.PASSWORD_HISTORY_LIMIT);
+	// if no limit is set then set some high limit to keep the table tidy
+	historyLimit = historyLimit <= 0 ? PASSWORD_HISTORY_DEFAULT_LIMIT : historyLimit;
+	while (historyLimit < history.size()) {
+	    history.remove(history.firstKey());
 	}
+
+	user.setChangePassword(false);
+
+	baseDAO.insertOrUpdate(user);
+
+	logPasswordChanged(user, user);
     }
 
     @Override
@@ -922,7 +971,7 @@ public class UserManagementService implements IUserManagementService {
     @Override
     public Theme getDefaultTheme() {
 	String htmlName = Configuration.get(ConfigurationKeys.DEFAULT_THEME);
-	List<Theme> list = findByProperty(Theme.class, "name", htmlName);
+	List<Theme> list = findByProperty(Theme.class, "name", htmlName, true);
 	return list != null ? list.get(0) : null;
     }
 
@@ -1113,7 +1162,7 @@ public class UserManagementService implements IUserManagementService {
 
 	for (int userId = minUserId; userId <= maxUserId; userId++) {
 	    try {
-		User user = (User) baseDAO.find(User.class, userId);
+		User user = baseDAO.find(User.class, userId);
 		if (user == null) {
 		    if (log.isDebugEnabled()) {
 			log.debug("User " + userId + " not found when batch uploading portraits, skipping");

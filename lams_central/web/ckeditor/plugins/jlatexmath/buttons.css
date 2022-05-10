@@ -1,8 +1,10 @@
 #formulaTabs {
-	height: 270px;
+	min-height: 270px;
 }
 
 #formulaTabs > div.ui-tabs-panel {
+	display: flex;
+	flex-wrap: wrap;
 	padding-left: 5px;
 }
 
@@ -13,7 +15,7 @@
 #formulaTabs button {
 	width: 30px;
 	height: 25px;
-	margin: 0 0 4px 0;
+	margin: 0 4px 4px 0;
 	background: none;
 	background-color: #EEEEEE;
 	color: black;

@@ -1,18 +1,23 @@
 <%@ include file="/common/taglibs.jsp"%>
 <!DOCTYPE html>
 
+<c:set var="sessionMapID" value="${param.sessionMapID}" />
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+	
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" />
 	</title>
 	<%@ include file="/common/header.jsp"%>
-	
+		<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${sessionMap.toolSessionId}', '', submitForm);
+		
 		function disableFinishButton() {
 			document.getElementById("finishButton").disabled = true;
 		}
 		
-		function submitForm(methodName){
+		function submitForm(){
 			var f = document.getElementById('reflectionForm');
 			f.submit();
 		}
@@ -20,9 +25,6 @@
 </lams:head>
 <body class="stripes">
 
-	<c:set var="sessionMapID" value="${param.sessionMapID}" />
-	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-	
 	<form:form action="submitReflection.do" method="post" onsubmit="disableFinishButton();" modelAttribute="reflectionForm">
 		<form:hidden path="userID" />
 		<form:hidden path="sessionMapID" />
@@ -38,7 +40,7 @@
 			<form:textarea id="focused" rows="5" path="entryText" cssClass="form-control"></form:textarea>
 
 			<div class="space-bottom-top align-right">
-				<a href="#nogo" class="btn btn-primary voffset5 pull-right na" id="finishButton" onclick="submitForm('finish')">
+				<a href="#nogo" class="btn btn-primary voffset5 pull-right na" id="finishButton">
 					<fmt:message key="label.finished" />
 				</a>
 			</div>

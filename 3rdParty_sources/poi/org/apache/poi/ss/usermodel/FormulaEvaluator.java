@@ -17,6 +17,8 @@
 
 package org.apache.poi.ss.usermodel;
 
+import org.apache.poi.util.Removal;
+
 import java.util.Map;
 
 /**
@@ -74,7 +76,7 @@ public interface FormulaEvaluator {
      * the cell and also its cell type. This method should be preferred over
      * evaluateInCell() when the call should not modify the contents of the
      * original cell.
-     * @param cell
+     * @param cell The {@link Cell} to evaluate
      */
     CellValue evaluate(Cell cell);
 
@@ -99,32 +101,8 @@ public interface FormulaEvaluator {
      *      or one of {@link CellType#NUMERIC}, {@link CellType#STRING},
      *      {@link CellType#BOOLEAN}, {@link CellType#ERROR}
      *      Note: the cell's type remains as CellType.FORMULA however.
-     * @deprecated 3.15. Will return a {@link CellType} enum in the future
      */
-    int evaluateFormulaCell(Cell cell);
-    
-    /**
-     * If cell contains formula, it evaluates the formula,
-     *  and saves the result of the formula. The cell
-     *  remains as a formula cell.
-     * Else if cell does not contain formula, this method leaves
-     *  the cell unchanged.
-     * Note that the type of the formula result is returned,
-     *  so you know what kind of value is also stored with
-     *  the formula.
-     * <pre>
-     * CellType evaluatedCellType = evaluator.evaluateFormulaCellEnum(cell);
-     * </pre>
-     * Be aware that your cell will hold both the formula,
-     *  and the result. If you want the cell replaced with
-     *  the result of the formula, use {@link #evaluateInCell(Cell)}
-     * @param cell The cell to evaluate
-     * @return The type of the formula result, i.e. -1 if the cell is not a formula, 
-     *      or one of {@link CellType#NUMERIC}, {@link CellType#STRING},
-     *      {@link CellType#BOOLEAN}, {@link CellType#ERROR}
-     *      Note: the cell's type remains as CellType.FORMULA however.
-     */
-    CellType evaluateFormulaCellEnum(Cell cell);
+    CellType evaluateFormulaCell(Cell cell);
 
     /**
      * If cell contains formula, it evaluates the formula, and
@@ -139,8 +117,8 @@ public interface FormulaEvaluator {
      * </pre>
      * Be aware that your cell value will be changed to hold the
      *  result of the formula. If you simply want the formula
-     *  value computed for you, use {@link #evaluateFormulaCellEnum(Cell)}
-     * @param cell
+     *  value computed for you, use {@link #evaluateFormulaCell(Cell)}
+     * @param cell The {@link Cell} to evaluate and modify.
      */
     Cell evaluateInCell(Cell cell);
     

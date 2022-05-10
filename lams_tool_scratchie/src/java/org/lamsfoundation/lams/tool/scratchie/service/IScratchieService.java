@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.scratchie.service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,6 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
-import org.quartz.SchedulerException;
 
 /**
  * Interface that defines the contract that all ShareScratchie service provider must follow.
@@ -119,19 +119,10 @@ public interface IScratchieService extends ICommonToolService {
 
     /**
      * Stores date when user has started activity with time limit.
-     *
-     * @param sessionId
-     * @throws SchedulerException
      */
-    void launchTimeLimit(Long sessionId) throws SchedulerException;
+    LocalDateTime launchTimeLimit(long toolContentId, int userId);
 
-    /**
-     * Checks if non-leaders should still wait for leader to submit notebook.
-     *
-     * @param toolSession
-     * @return
-     */
-    boolean isWaitingForLeaderToSubmitNotebook(ScratchieSession toolSession);
+    boolean checkTimeLimitExceeded(long toolContentId, int userId);
 
     List<ScratchieBurningQuestion> getBurningQuestionsBySession(Long sessionId);
 
@@ -290,11 +281,7 @@ public interface IScratchieService extends ICommonToolService {
     void recalculateMarkForSession(Long sessionId, boolean isPropagateToGradebook);
 
     /**
-     * Mark all users in agroup as ScratchingFinished so that users can't continue scratching after this.
-     *
-     * @param toolSessionId
-     * @throws IOException
-     * @throws JSONException
+     * Mark all users in a group as ScratchingFinished so that users can't continue scratching after this.
      */
     void setScratchingFinished(Long toolSessionId) throws IOException;
 
@@ -326,7 +313,8 @@ public interface IScratchieService extends ICommonToolService {
      *            whether it should include questions that don't have any burning questions
      * @return
      */
-    List<BurningQuestionItemDTO> getBurningQuestionDtos(Scratchie scratchie, Long sessionId, boolean includeEmptyItems, boolean prepareForHTML);
+    List<BurningQuestionItemDTO> getBurningQuestionDtos(Scratchie scratchie, Long sessionId, boolean includeEmptyItems,
+	    boolean prepareForHTML);
 
     boolean addLike(Long burningQuestionUid, Long sessionId);
 
@@ -417,7 +405,8 @@ public interface IScratchieService extends ICommonToolService {
      * @param oldItems
      * @param newItems
      */
-    void recalculateUserAnswers(Scratchie scratchie, Set<ScratchieItem> oldItems, Set<ScratchieItem> newItems);
+    void recalculateUserAnswers(Scratchie scratchie, Set<ScratchieItem> oldItems, Set<ScratchieItem> newItems,
+	    String oldPresetMarks);
 
     void releaseFromCache(Object object);
 
@@ -443,10 +432,14 @@ public interface IScratchieService extends ICommonToolService {
     int getMaxPossibleScore(Scratchie scratchie);
 
     /** Get the raw marks for display in a graph in monitoring */
-    List<Number> getMarksArray(Long contentId);
+    List<Integer> getMarksArray(Long contentId);
 
     /** Get the statistics such as average, max, min for the marks. Used in monitoring */
-    LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId);
+    LeaderResultsDTO getLeaderResultsDTOForLeaders(Long toolContentId);
 
     Map<String, Object> prepareStudentChoicesData(Scratchie scratchie);
+
+    boolean isLearnerEligibleForMark(long learnerId, long toolContentId);
+
+    void changeLeaderForGroup(long toolSessionId, long leaderUserId);
 }

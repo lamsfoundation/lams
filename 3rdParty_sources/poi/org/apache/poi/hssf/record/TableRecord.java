@@ -17,22 +17,22 @@
 
 package org.apache.poi.hssf.record;
 
-import org.apache.poi.ss.formula.ptg.TblPtg;
+import static org.apache.poi.util.GenericRecordUtil.getBitsAsString;
+
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.hssf.util.CellRangeAddress8Bit;
-import org.apache.poi.hssf.util.CellReference;
+import org.apache.poi.ss.formula.ptg.TblPtg;
+import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.util.BitField;
 import org.apache.poi.util.BitFieldFactory;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 /**
- * DATATABLE (0x0236)<p>
- *
- * TableRecord - The record specifies a data table.
- * This record is preceded by a single Formula record that
- *  defines the first cell in the data table, which should
- *  only contain a single Ptg, {@link TblPtg}.
- *
- * See p536 of the June 08 binary docs
+ * The record specifies a data table.<p>
+ * This record is preceded by a single Formula record that defines the first cell in the data table,
+ * which should only contain a single {@link TblPtg Ptg}.
  */
 public final class TableRecord extends SharedValueRecordBase {
 	public static final short sid = 0x0236;
@@ -50,6 +50,16 @@ public final class TableRecord extends SharedValueRecordBase {
 	private int field_8_colInputRow;
 	private int field_9_rowInputCol;
 	private int field_10_colInputCol;
+
+	public TableRecord(TableRecord other) {
+		super(other);
+		field_5_flags        = other.field_5_flags;
+		field_6_res          = other.field_6_res;
+		field_7_rowInputRow  = other.field_7_rowInputRow;
+		field_8_colInputRow  = other.field_8_colInputRow;
+		field_9_rowInputCol  = other.field_9_rowInputCol;
+		field_10_colInputCol = other.field_10_colInputCol;
+	}
 
 	public TableRecord(RecordInputStream in) {
 		super(in);
@@ -142,7 +152,7 @@ public final class TableRecord extends SharedValueRecordBase {
 		return sid;
 	}
 	protected int getExtraDataSize() {
-		return 
+		return
 		2 // 2 byte fields
 		+ 8; // 4 short fields
 	}
@@ -155,19 +165,9 @@ public final class TableRecord extends SharedValueRecordBase {
 		out.writeShort(field_10_colInputCol);
 	}
 
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("[TABLE]\n");
-		buffer.append("    .range    = ").append(getRange()).append("\n");
-		buffer.append("    .flags    = ") .append(HexDump.byteToHex(field_5_flags)).append("\n");
-		buffer.append("    .alwaysClc= ").append(isAlwaysCalc()).append("\n");
-		buffer.append("    .reserved = ").append(HexDump.intToHex(field_6_res)).append("\n");
-		CellReference crRowInput = cr(field_7_rowInputRow, field_8_colInputRow);
-		CellReference crColInput = cr(field_9_rowInputCol, field_10_colInputCol);
-		buffer.append("    .rowInput = ").append(crRowInput.formatAsString()).append("\n");
-		buffer.append("    .colInput = ").append(crColInput.formatAsString()).append("\n");
-		buffer.append("[/TABLE]\n");
-		return buffer.toString();
+	@Override
+	public TableRecord copy() {
+		return new TableRecord(this);
 	}
 
 	private static CellReference cr(int rowIx, int colIxAndFlags) {
@@ -175,5 +175,23 @@ public final class TableRecord extends SharedValueRecordBase {
 		boolean isRowAbs = (colIxAndFlags & 0x8000) == 0;
 		boolean isColAbs = (colIxAndFlags & 0x4000) == 0;
 		return new CellReference(rowIx, colIx, isRowAbs, isColAbs);
+	}
+
+	@Override
+	public HSSFRecordTypes getGenericRecordType() {
+		return HSSFRecordTypes.TABLE;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"range", this::getRange,
+			"flags", getBitsAsString(this::getFlags,
+				new BitField[]{alwaysCalc, calcOnOpen, rowOrColInpCell, oneOrTwoVar, rowDeleted, colDeleted},
+				new String[]{"ALWAYS_CALC","CALC_ON_OPEN","ROW_OR_COL_INP_CELL","ONE_OR_TWO_VAR","ROW_DELETED","COL_DELETED"}),
+			"reserved", () -> field_6_res,
+			"rowInput", () -> cr(field_7_rowInputRow, field_8_colInputRow),
+			"colInput", () -> cr(field_9_rowInputCol, field_10_colInputCol)
+		);
 	}
 }

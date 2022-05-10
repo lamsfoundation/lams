@@ -44,9 +44,9 @@
 			</lams:Tabs>
 			<lams:TabBodyArea>
 				<lams:TabBodys>
-					<lams:TabBody id="1" titleKey="button.summary" page="summary.jsp" />
-					<lams:TabBody id="2" titleKey="button.editActivity" page="editActivity.jsp" />
-					<lams:TabBody id="3" titleKey="button.statistics" page="statistics.jsp" />
+					<lams:TabBody id="1" page="summary.jsp" />
+					<lams:TabBody id="2" page="editActivity.jsp" />
+					<lams:TabBody id="3" page="statistics.jsp" />
 				</lams:TabBodys>
 			</lams:TabBodyArea>
 			

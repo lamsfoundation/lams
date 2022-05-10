@@ -19,13 +19,10 @@ package org.apache.poi.ss.formula.ptg;
 
 import org.apache.poi.util.LittleEndianOutput;
 
-/**
- * @author Daniel Noll (daniel at nuix dot com dot au)
- */
 public final class IntersectionPtg extends OperationPtg {
 	public final static byte sid = 0x0f;
 
-	public static final OperationPtg instance = new IntersectionPtg();
+	public static final IntersectionPtg instance = new IntersectionPtg();
 
 	private IntersectionPtg() {
 		// enforce singleton
@@ -33,6 +30,11 @@ public final class IntersectionPtg extends OperationPtg {
 
 	public final boolean isBaseToken() {
 		return true;
+	}
+
+	@Override
+	public byte getSid() {
+		return sid;
 	}
 
 	public int getSize() {
@@ -48,15 +50,15 @@ public final class IntersectionPtg extends OperationPtg {
 	}
 
 	public String toFormulaString(String[] operands) {
-		StringBuffer buffer = new StringBuffer();
-
-		buffer.append(operands[0]);
-		buffer.append(" ");
-		buffer.append(operands[1]);
-		return buffer.toString();
+		return operands[0] + " " + operands[1];
 	}
 
 	public int getNumberOfOperands() {
 		return 2;
+	}
+
+	@Override
+	public IntersectionPtg copy() {
+		return instance;
 	}
 }

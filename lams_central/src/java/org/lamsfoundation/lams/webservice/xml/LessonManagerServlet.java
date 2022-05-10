@@ -928,8 +928,8 @@ public class LessonManagerServlet extends HttpServlet {
 		    if (StringUtils.isNotBlank(userName)) {
 //			integrationService.addExtUserToLesson(extServer, IntegrationConstants.METHOD_LEARNER, lessonId,
 //				userName, firstName, lastName, email, courseId, countryIsoCode, langIsoCode);
-			integrationService.addExtUserToCourseAndLesson(extServer, IntegrationConstants.METHOD_LEARNER, lessonId,
-				userName, firstName, lastName, email, courseId, country, locale);
+			integrationService.addExtUserToCourseAndLesson(extServer, IntegrationConstants.METHOD_LEARNER,
+				lessonId, userName, firstName, lastName, email, courseId, country, locale, true);
 		    }
 		    i++;
 		}
@@ -946,8 +946,8 @@ public class LessonManagerServlet extends HttpServlet {
 		    }
 
 		    if (StringUtils.isNotBlank(userName)) {
-			integrationService.addExtUserToCourseAndLesson(extServer, IntegrationConstants.METHOD_MONITOR, lessonId,
-				userName, firstName, lastName, email, courseId, country, locale);
+			integrationService.addExtUserToCourseAndLesson(extServer, IntegrationConstants.METHOD_MONITOR,
+				lessonId, userName, firstName, lastName, email, courseId, country, locale, true);
 		    }
 		    i++;
 		}
@@ -1018,8 +1018,8 @@ public class LessonManagerServlet extends HttpServlet {
 	    Element lessonElement = document.createElement(CentralConstants.ELEM_LESSON);
 	    lessonElement.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lessonId);
 	    lessonElement.setAttribute("lessonName", lesson.getLessonName());
-        String createDateTime = lesson.getCreateDateTime().toString();
-        lessonElement.setAttribute("createDateTime", StringUtils.isBlank(createDateTime) ? "" : createDateTime);
+	    String createDateTime = lesson.getCreateDateTime().toString();
+	    lessonElement.setAttribute("createDateTime", StringUtils.isBlank(createDateTime) ? "" : createDateTime);
 
 	    // calculate lesson's MaxPossibleMark
 	    Long lessonMaxPossibleMark = lamsCoreToolService.getLessonMaxPossibleMark(lesson);
@@ -1179,8 +1179,8 @@ public class LessonManagerServlet extends HttpServlet {
 
 	toolOutputsElement.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lessonId);
 	toolOutputsElement.setAttribute("name", lesson.getLessonName());
-    String createDateTime = lesson.getCreateDateTime().toString();
-    toolOutputsElement.setAttribute("createDateTime", StringUtils.isBlank(createDateTime) ? "" : createDateTime);
+	String createDateTime = lesson.getCreateDateTime().toString();
+	toolOutputsElement.setAttribute("createDateTime", StringUtils.isBlank(createDateTime) ? "" : createDateTime);
 
 	List<LearnerProgress> learnerProgresses = lessonService.getUserProgressForLesson(lesson.getLessonId());
 	List<ToolSession> toolSessions = lamsCoreToolService.getToolSessionsByLesson(lesson);
@@ -1369,7 +1369,8 @@ public class LessonManagerServlet extends HttpServlet {
 		    ToolOutputDefinition definition = toolOutputDefinitions.get(outputName);
 
 		    if (isAuthoredToolOutputs) {
-			ActivityEvaluation evaluation = activity.getEvaluation();
+			ActivityEvaluation evaluation = (ActivityEvaluation) userManagementService
+				.findById(ActivityEvaluation.class, activity.getActivityId());
 			if (evaluation != null) {
 			    if (outputName.equals(evaluation.getToolOutputDefinition())) {
 				ToolOutput toolOutput = lamsCoreToolService.getOutputFromTool(outputName, toolSession,

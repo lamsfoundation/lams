@@ -17,18 +17,17 @@
 
 package org.apache.poi.ss.formula.ptg;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 
-/**
- *
- * @author  andy
- * @author Jason Height (jheight at chariot dot net dot au)
- * @author dmui (save existing implementation)
- */
 public final class ExpPtg extends ControlPtg {
     private final static int  SIZE = 5;
     public final static short sid  = 0x1;
+
     private final int field_1_first_row;
     private final int field_2_first_col;
 
@@ -50,6 +49,11 @@ public final class ExpPtg extends ControlPtg {
     }
 
     @Override
+    public byte getSid() {
+        return sid;
+    }
+
+    @Override
     public int getSize() {
         return SIZE;
     }
@@ -68,10 +72,15 @@ public final class ExpPtg extends ControlPtg {
     }
 
     @Override
-    public String toString() {
-        StringBuffer buffer = new StringBuffer("[Array Formula or Shared Formula]\n");
-        buffer.append("row = ").append(getRow()).append("\n");
-        buffer.append("col = ").append(getColumn()).append("\n");
-        return buffer.toString();
+    public ExpPtg copy() {
+        return this;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "row", this::getRow,
+            "column", this::getColumn
+        );
     }
 }

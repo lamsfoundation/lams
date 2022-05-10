@@ -24,10 +24,8 @@ import java.util.List;
 
 import org.apache.poi.hssf.model.HSSFFormulaParser;
 import org.apache.poi.hssf.record.FormulaRecord;
-import org.apache.poi.hssf.record.Record;
 import org.apache.poi.hssf.record.RecordFactory;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.formula.ptg.ExpPtg;
 import org.apache.poi.ss.formula.ptg.FuncPtg;
 import org.apache.poi.ss.formula.ptg.Ptg;
@@ -42,7 +40,7 @@ import org.apache.poi.ss.formula.ptg.Ptg;
 public class FormulaViewer
 {
     private String file;
-    private boolean list=false;
+    private boolean list;
 
     /** Creates new FormulaViewer */
 
@@ -52,17 +50,15 @@ public class FormulaViewer
 
     /**
      * Method run
-     * 
-     * @throws IOException if the file contained errors 
+     *
+     * @throws IOException if the file contained errors
      */
     public void run() throws IOException {
-        NPOIFSFileSystem fs  = new NPOIFSFileSystem(new File(file), true);
-        try {
-            InputStream is = BiffViewer.getPOIFSInputStream(fs);
-            try {
-                List<Record> records = RecordFactory.createRecords(is);
+        try (POIFSFileSystem fs = new POIFSFileSystem(new File(file), true)) {
+            try (InputStream is = BiffViewer.getPOIFSInputStream(fs)) {
+                List<org.apache.poi.hssf.record.Record> records = RecordFactory.createRecords(is);
 
-                for (Record record : records) {
+                for (org.apache.poi.hssf.record.Record record : records) {
                     if (record.getSid() == FormulaRecord.sid) {
                         if (list) {
                             listFormula((FormulaRecord) record);
@@ -71,68 +67,39 @@ public class FormulaViewer
                         }
                     }
                 }
-            } finally {
-                is.close();
             }
-        } finally {
-            fs.close();
         }
     }
-    
+
     private void listFormula(FormulaRecord record) {
-        String sep="~";
         Ptg[] tokens= record.getParsedExpression();
-        Ptg token;
         int numptgs = tokens.length;
-        String numArg;
-            token = tokens[numptgs-1];
-            if (token instanceof FuncPtg) {
-                numArg = String.valueOf(numptgs-1);
-            } else { 
-            	numArg = String.valueOf(-1);
-            }
-            
-            StringBuilder buf = new StringBuilder();
-            
-            if (token instanceof ExpPtg) return;
-            buf.append(token.toFormulaString());
-            buf.append(sep);
-            switch (token.getPtgClass()) {
-                case Ptg.CLASS_REF :
-                    buf.append("REF");
-                    break;
-                case Ptg.CLASS_VALUE :
-                    buf.append("VALUE");
-                    break;
-                case Ptg.CLASS_ARRAY :
-                    buf.append("ARRAY");
-                    break;
-                default:
-                    throwInvalidRVAToken(token);
-            }
-            
-            buf.append(sep);
-            if (numptgs>1) {
-                token = tokens[numptgs-2];
-                switch (token.getPtgClass()) {
-                    case Ptg.CLASS_REF :
-                        buf.append("REF");
-                        break;
-                    case Ptg.CLASS_VALUE :
-                        buf.append("VALUE");
-                        break;
-                    case Ptg.CLASS_ARRAY :
-                        buf.append("ARRAY");
-                        break;
-                    default:
-                        throwInvalidRVAToken(token);
-                }
-            }else {
-                buf.append("VALUE");
-            }
-            buf.append(sep);
-            buf.append(numArg);
-            System.out.println(buf);
+        final Ptg lastToken = tokens[numptgs-1];
+
+        if (lastToken instanceof ExpPtg) return;
+
+        String buf = String.join("~",
+            lastToken.toFormulaString(),
+            mapToken(lastToken),
+            (numptgs > 1 ? mapToken(tokens[numptgs - 2]) : "VALUE"),
+            String.valueOf(lastToken instanceof FuncPtg ? numptgs-1 : -1)
+        );
+
+        System.out.println(buf);
+    }
+
+    private static String mapToken(Ptg token) {
+        switch (token.getPtgClass()) {
+            case Ptg.CLASS_REF :
+                return "REF";
+            case Ptg.CLASS_VALUE :
+                return "VALUE";
+            case Ptg.CLASS_ARRAY :
+                return "ARRAY";
+            default:
+                throwInvalidRVAToken(token);
+                return "";
+        }
     }
 
     /**
@@ -174,18 +141,18 @@ public class FormulaViewer
                     throwInvalidRVAToken(token);
             }
             buf.append(' ');
-        } 
+        }
         return buf.toString();
     }
-    
+
     private static void throwInvalidRVAToken(Ptg token) {
         throw new IllegalStateException("Invalid RVA type (" + token.getPtgClass() + "). This should never happen.");
     }
-    
-    
+
+
     private static String composeFormula(FormulaRecord record)
     {
-       return  HSSFFormulaParser.toFormulaString((HSSFWorkbook)null, record.getParsedExpression());
+       return  HSSFFormulaParser.toFormulaString(null, record.getParsedExpression());
     }
 
     /**
@@ -198,7 +165,7 @@ public class FormulaViewer
     {
         this.file = file;
     }
-    
+
     public void setList(boolean list) {
         this.list=list;
     }
@@ -211,7 +178,7 @@ public class FormulaViewer
      * @param args pass one argument with the filename or --help
      * @throws IOException if the file can't be read or contained errors
      */
-    public static void main(String args[]) throws IOException
+    public static void main(String[] args) throws IOException
     {
         if ((args == null) || (args.length >2 )
                 || args[ 0 ].equals("--help"))

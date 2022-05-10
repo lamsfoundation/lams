@@ -21,62 +21,124 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scratchie.dto;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import org.lamsfoundation.lams.util.NumberUtil;
 
 public class LeaderResultsDTO {
 
     private Long contentId;
-    private int numberGroupsLeaderFinished;
-    private String minMark;
-    private String maxMark;
-    private String avgMark; 
+    private int count;
+    private Integer min;
+    private Integer max;
+    private Float average;
+    private Float median;
+    private Collection<Integer> modes;
 
-    public LeaderResultsDTO() {
-    }
-
-    public LeaderResultsDTO(Long contentId) {
+    public LeaderResultsDTO(Long contentId, List<Integer> grades) {
 	this.contentId = contentId;
+
+	if (grades == null || grades.isEmpty()) {
+	    return;
+	}
+
+	float sum = 0;
+	min = Integer.MAX_VALUE;
+	max = Integer.MIN_VALUE;
+	for (Integer grade : grades) {
+	    if (grade < min) {
+		min = grade;
+	    }
+	    if (grade > max) {
+		max = grade;
+	    }
+	    sum += grade;
+	}
+
+	count = grades.size();
+	average = sum / count;
+
+	Collections.sort(grades);
+	median = grades.get(count / 2).floatValue();
+	if (count % 2 == 0) {
+	    median = (median + grades.get(count / 2 - 1)) / 2;
+	}
+
+	modes = grades.stream().collect(Collectors.groupingBy(Function.identity(), Collectors.counting())) // grade -> its count
+		.entrySet().stream().collect(Collectors.groupingBy(Map.Entry::getValue, // convert to count -> grades that have this count (can be many)
+			TreeMap::new, Collectors.mapping(Map.Entry::getKey, Collectors.toCollection(TreeSet::new))))
+		.lastEntry().getValue(); // get top count
     }
 
     public Long getContentId() {
 	return contentId;
     }
 
-    public void setContentId(Long contentId) {
-	this.contentId = contentId;
+    public int getCount() {
+	return count;
     }
 
-    public int getNumberGroupsLeaderFinished() {
-	return numberGroupsLeaderFinished;
+    public Integer getMin() {
+	return min;
     }
 
-    public void setNumberGroupsLeaderFinished(int numberGroupsLeaderFinished) {
-	this.numberGroupsLeaderFinished = numberGroupsLeaderFinished;
+    public String getMinString() {
+	return LeaderResultsDTO.format(min);
     }
 
-    public String getAvgMark() {
-	return avgMark;
+    public Integer getMax() {
+	return max;
     }
 
-    public void setAvgMark(String avgMark) {
-	this.avgMark = avgMark;
+    public String getMaxString() {
+	return LeaderResultsDTO.format(max);
     }
 
-    public String getMinMark() {
-	return minMark;
+    public Float getAverage() {
+	return average;
     }
 
-    public void setMinMark(String minMark) {
-	this.minMark = minMark;
+    public String getAverageString() {
+	return LeaderResultsDTO.format(average);
     }
 
-    public String getMaxMark() {
-	return maxMark;
+    public Float getMedian() {
+	return median;
     }
 
-    public void setMaxMark(String maxMark) {
-	this.maxMark = maxMark;
+    public String getMedianString() {
+	return LeaderResultsDTO.format(median);
     }
 
+    public Collection<Integer> getModes() {
+	return modes;
+    }
+
+    public String getModesString() {
+	if (modes == null || modes.isEmpty()) {
+	    return "-";
+	}
+
+	Iterator<Integer> modeIterator = modes.iterator();
+	StringBuilder result = new StringBuilder(LeaderResultsDTO.format(modeIterator.next()));
+	while (modeIterator.hasNext()) {
+	    result.append(", ").append(LeaderResultsDTO.format(modeIterator.next()));
+	}
+	return result.toString();
+    }
+
+    private static String format(Number input) {
+	return input == null ? "-" : NumberUtil.formatLocalisedNumber(input, (Locale) null, 2);
+    }
 }

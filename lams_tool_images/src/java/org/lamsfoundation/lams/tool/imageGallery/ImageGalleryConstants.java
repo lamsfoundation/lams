@@ -66,8 +66,6 @@ public interface ImageGalleryConstants {
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
 
     // error message keys
-    public static final String ERROR_MSG_NOT_ALLOWED_FORMAT = "error.resource.image.not.alowed.format";
-    public static final String ERROR_MSG_NOT_ALLOWED_FORMAT_FOR = "error.resource.image.not.alowed.format.for";
     public static final String ERROR_MSG_FILE_BLANK = "error.resource.item.file.blank";
     public static final String ERROR_MSG_UPLOAD_FAILED = "error.upload.failed";
     public static final String ERROR_MSG_REQUIRED_FIELDS_MISSING = "error.required.fields.missing";

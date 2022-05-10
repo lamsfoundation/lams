@@ -8,35 +8,46 @@
 </style>
 
 <!-- ChartJS. Colour used is brand-primary for purple skin. -->
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chartjs.js"></script>
 <script>
 	$(document).ready(function(){
-		var barData = {
-			labels: [<c:forEach var="groupSummary" items="${groupSummaries}">"${groupSummary.sessionName}",</c:forEach>],
-			datasets: [{
-				label: "My First dataset",
-				fillColor: "#85237d",
-				strokeColor: "#85237d",
-				highlightFill: "#85237d",
-				highlightStroke: "#85237d",
-				data: [<c:forEach var="groupSummary" items="${groupSummaries}">${groupSummary.totalPercentage},</c:forEach>]
-			}]
-		};
-
-		var barOptions = {
-			scaleBeginAtZero: true,
-			scaleShowGridLines: true,
-			scaleGridLineColor: "rgba(0,0,0,.05)",
-			scaleGridLineWidth: 1,
-			barShowStroke: true,
-			barStrokeWidth: 2,
-			barValueSpacing: 5,
-			barDatasetSpacing: 1,
-	<%--	responsive: true,  When responsive the font becomes too small on larger screen --%>
-		};
-
-		var ctx = document.getElementById("barChart").getContext("2d");
-		var myNewChart = new Chart(ctx).Bar(barData, barOptions);
+		var ctx = document.getElementById("barChart").getContext("2d"),
+			myNewChart = new Chart(ctx, {
+				type : 'bar',
+				data : {
+					datasets : [ {
+						data : [<c:forEach var="groupSummary" items="${groupSummaries}">${groupSummary.totalPercentage},</c:forEach>],
+						backgroundColor : "#85237d",
+						borderColor     :  "#85237d",
+						hoverBackgroundColor : "#85237d",
+						hoverBorderColor: "#85237d"
+					} ],
+					labels :  [<c:forEach var="groupSummary" items="${groupSummaries}">"${groupSummary.sessionName}",</c:forEach>],
+				},
+				options : {
+					legend : {
+						display : false
+					},
+					scales : {
+						xAxes : [
+							{
+								 ticks : {
+									fontSize : 30
+								}
+							}
+						],
+						yAxes : [
+							{
+							    ticks : {
+									beginAtZero   : true,
+									maxTicksLimit : 6,
+									suggestedMax  : 100,
+									fontSize : 25
+								}
+							}
+						]
+					}
+				}
+			});
 
 		//insert total learners number taken from the parent tblmonitor.jsp
 		$("#total-learners-number").html(TOTAL_LESSON_LEARNERS_NUMBER);
@@ -84,9 +95,10 @@
 	<div class="col-xs-12 col-md-12 col-lg-12">
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			<h4 class="panel-title">
-				Q${i.index+1}) <c:out value="${item.qbQuestion.description}" escapeXml="false"/>
-			</h4> 
+			<h3 class="panel-title" style="margin-bottom: 10px;font-size: initial;">
+				${i.index+1}. <c:out value="${item.qbQuestion.name}" escapeXml="false"/>
+			</h3> 
+			<c:out value="${item.qbQuestion.description}" escapeXml="false"/>
 		</div>
 		
 		<div class="panel-body">
@@ -94,20 +106,33 @@
 				<table class="table table-striped">
 					<tbody>
 						<c:forEach var="qbOption" items="${item.qbQuestion.qbOptions}" varStatus="j">
+							<c:set var="cssClass"><c:if test='${qbOption.correct}'>bg-success</c:if></c:set>
 							<tr>
-								<td width="5px">
-									${ALPHABET[j.index]}.
-								</td>									
-								<td>
-									<c:choose>
-										<c:when test="${item.qbQuestion.type == 1}">
+								<c:choose>
+									<c:when test="${item.qbQuestion.type == 1 or item.qbQuestion.type == 8}">
+										<td width="5px" class="${cssClass}">
+											${ALPHABET[j.index]}.
+										</td>
+										<td class="${cssClass}">
 											<c:out value="${qbOption.name}" escapeXml="false"/>
-										</c:when>
-										<c:otherwise>
+										</td>
+									</c:when>
+									<c:otherwise>
+										<td width="5px" class="${cssClass}">
+											<c:choose>
+												<c:when test="${qbOption.correct}">
+													<i class="fa fa-check"></i>
+												</c:when>
+												<c:otherwise>
+													<i class="fa fa-close"></i>
+												</c:otherwise>
+											</c:choose>
+										</td>
+										<td class="${cssClass}">
 											${fn:replace(qbOption.name, newLineChar, ', ')}
-										</c:otherwise>
-									</c:choose>
-								</td>
+										</td>
+									</c:otherwise>
+								</c:choose>
 							</tr>					
 						</c:forEach>
 					</tbody>
@@ -135,3 +160,4 @@
 	</div>
 </div>
 <!-- Chart ends-->
+

@@ -51,11 +51,9 @@ public interface AssessmentUserDAO extends DAO {
     List<AssessmentUserDTO> getPagedUsersBySessionAndQuestion(Long sessionId, Long questionUid, int page, int size,
 	    String sortBy, String sortOrder, String searchString, IUserManagementService userManagementService);
 
-    List<Number> getRawUserMarksBySession(Long sessionId);
+    List<Float> getRawUserMarksBySession(Long sessionId);
 
-    Object[] getStatsMarksBySession(Long sessionId);
+    List<Float> getRawUserMarksByToolContentId(Long toolContentId);
 
-    List<Number> getRawLeaderMarksByToolContentId(Long toolContentId);
-
-    Object[] getStatsMarksForLeaders(Long toolContentId);
+    List<Float> getRawLeaderMarksByToolContentId(Long toolContentId);
 }

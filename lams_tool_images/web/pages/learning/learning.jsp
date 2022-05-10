@@ -34,6 +34,7 @@
 	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 	<c:set var="mediumImageDimensions" value="${sessionMap.mediumImageDimensions}" />
 	<c:set var="thumbnailImageDimensions" value="${empty sessionMap.thumbnailImageDimensions ? 100 : sessionMap.thumbnailImageDimensions}" />
+	<c:set var="language"><lams:user property="localeLanguage"/></c:set>
 
 	<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>/includes/css/fotorama.css"/>
 	<link href="<lams:WebAppURL/>includes/css/imageGallery.css" rel="stylesheet" type="text/css">
@@ -42,6 +43,7 @@
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.theme-blue.css">
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.pager.css">
 	<link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
+	<link href="${lams}css/uppy.custom.css" rel="stylesheet" type="text/css" />
     
     <script type="text/javascript">
 		<%-- used for  imageGalleryitem.js --%>
@@ -49,9 +51,8 @@
 		// convert Java syntax to JSON
 		var UPLOAD_ALLOWED_EXTENSIONS = JSON.parse("[" + "${ALLOWED_EXTENSIONS_IMAGE}".replace(/\.\w+/g, '"$&"') + "]");
 		var LABEL_ITEM_BLANK = '<fmt:message key="error.resource.item.file.blank"/>';
-		var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.resource.image.not.alowed.format"/>';
 	</script>
-	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/imageGalleryitem.js"></script>
+	<lams:JSImport src="includes/javascript/imageGalleryitem.js" relative="true" />
 	
 	<script type="text/javascript" src="${lams}includes/javascript/uppy/uppy.min.js"></script>
 	<c:choose>
@@ -66,11 +67,14 @@
 		</c:when>
 	</c:choose>
 	
-	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/uploadImageLearning.js"></script>
+	<lams:JSImport src="includes/javascript/uploadImageLearning.js" relative="true" />
     <script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
  	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
- 	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/fotorama.js"></script>
+ 	<lams:JSImport src="includes/javascript/fotorama.js" relative="true" />
+ 	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
+		
 	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${toolSessionID}', '', finishSession);
 	
 		$(document).ready(function(){ 
 			$('.fotorama')
@@ -126,11 +130,11 @@
 			document.location.href = "<c:url value="/learning/start.do"/>?mode=${mode}&toolSessionID=${toolSessionID}";
  		    return false;
 		}
+		
 		function finishSession(){
-			$('#finishButton').attr('disabled', true);
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
-			return false;
 		}
+		
 		function continueReflect() {
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
@@ -276,7 +280,7 @@
 						</button>
 					</c:when>
 					<c:otherwise>
-						<a href="#nogo" name="FinishButton" id="finishButton"	onclick="return finishSession()" class="btn btn-primary pull-right" >
+						<a href="#nogo" name="FinishButton" id="finishButton" class="btn btn-primary pull-right" >
 							<span class="na">
 								<c:choose>
 				 					<c:when test="${sessionMap.isLastActivity}">

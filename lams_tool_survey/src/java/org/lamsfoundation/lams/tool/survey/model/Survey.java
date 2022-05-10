@@ -45,6 +45,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.SortComparator;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
@@ -114,12 +116,14 @@ public class Survey implements Cloneable {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "survey_uid")
     @OrderBy("sequence_id")
-    private Set<SurveyQuestion> questions = new HashSet<SurveyQuestion>();
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    private Set<SurveyQuestion> questions = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "content_uid")
     @SortComparator(TextSearchConditionComparator.class)
-    private Set<SurveyCondition> conditions = new TreeSet<SurveyCondition>(new TextSearchConditionComparator());
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    private Set<SurveyCondition> conditions = new TreeSet<>(new TextSearchConditionComparator());
 
     public static Survey newInstance(Survey defaultContent, Long contentId) {
 	Survey toContent = new Survey();
@@ -146,7 +150,7 @@ public class Survey implements Cloneable {
 	    survey.setUid(null);
 	    if (questions != null) {
 		Iterator<SurveyQuestion> iter = questions.iterator();
-		Set<SurveyQuestion> set = new HashSet<SurveyQuestion>();
+		Set<SurveyQuestion> set = new HashSet<>();
 		while (iter.hasNext()) {
 		    SurveyQuestion item = iter.next();
 		    SurveyQuestion newItem = (SurveyQuestion) item.clone();
@@ -155,7 +159,7 @@ public class Survey implements Cloneable {
 		survey.questions = set;
 	    }
 	    if (getConditions() != null) {
-		Set<SurveyCondition> set = new TreeSet<SurveyCondition>(new TextSearchConditionComparator());
+		Set<SurveyCondition> set = new TreeSet<>(new TextSearchConditionComparator());
 		for (SurveyCondition condition : getConditions()) {
 		    set.add(condition.clone(survey));
 		}

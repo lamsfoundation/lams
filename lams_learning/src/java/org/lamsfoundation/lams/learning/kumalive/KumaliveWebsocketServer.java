@@ -97,8 +97,8 @@ public class KumaliveWebsocketServer {
     private static class KumalivePollDTO {
 	private final Long pollId;
 	private final ObjectNode pollJSON = JsonNodeFactory.instance.objectNode();
-	private final List<Long> answerIds = new ArrayList<Long>();
-	private final ArrayList<List<UserDTO>> voters = new ArrayList<List<UserDTO>>();
+	private final List<Long> answerIds = new ArrayList<>();
+	private final ArrayList<List<UserDTO>> voters = new ArrayList<>();
 	private final Set<String> voterLogins = ConcurrentHashMap.newKeySet();
 	private final ArrayNode votersJSON = JsonNodeFactory.instance.arrayNode();
 	private boolean finished = false;
@@ -143,7 +143,7 @@ public class KumaliveWebsocketServer {
     }
 
     @OnClose
-    public void unregisterUser(Session websocket, CloseReason reason) throws IOException {
+    public void unregisterUser(Session websocket) throws IOException {
 	String login = websocket.getUserPrincipal().getName();
 	if (login == null) {
 	    return;

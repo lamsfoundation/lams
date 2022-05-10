@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,10 +21,12 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Month;
 import java.time.MonthDay;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.time.Period;
+import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -35,7 +37,6 @@ import java.util.Map;
 import org.springframework.format.FormatterRegistrar;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
-import org.springframework.lang.UsesJava8;
 
 /**
  * Configures the JSR-310 <code>java.time</code> formatting system for use with Spring.
@@ -51,7 +52,6 @@ import org.springframework.lang.UsesJava8;
  * @see org.springframework.format.datetime.DateFormatterRegistrar
  * @see org.springframework.format.datetime.joda.DateTimeFormatterFactoryBean
  */
-@UsesJava8
 public class DateTimeFormatterRegistrar implements FormatterRegistrar {
 
 	private enum Type {DATE, TIME, DATE_TIME}
@@ -60,14 +60,12 @@ public class DateTimeFormatterRegistrar implements FormatterRegistrar {
 	/**
 	 * User-defined formatters.
 	 */
-	private final Map<Type, DateTimeFormatter> formatters =
-			new EnumMap<Type, DateTimeFormatter>(Type.class);
+	private final Map<Type, DateTimeFormatter> formatters = new EnumMap<>(Type.class);
 
 	/**
 	 * Factories used when specific formatters have not been specified.
 	 */
-	private final Map<Type, DateTimeFormatterFactory> factories =
-			new EnumMap<Type, DateTimeFormatterFactory>(Type.class);
+	private final Map<Type, DateTimeFormatterFactory> factories = new EnumMap<>(Type.class);
 
 
 	public DateTimeFormatterRegistrar() {
@@ -84,9 +82,9 @@ public class DateTimeFormatterRegistrar implements FormatterRegistrar {
 	 * properties are effectively ignored.
 	 */
 	public void setUseIsoFormat(boolean useIsoFormat) {
-		this.factories.get(Type.DATE).setIso(useIsoFormat ? ISO.DATE : null);
-		this.factories.get(Type.TIME).setIso(useIsoFormat ? ISO.TIME : null);
-		this.factories.get(Type.DATE_TIME).setIso(useIsoFormat ? ISO.DATE_TIME : null);
+		this.factories.get(Type.DATE).setIso(useIsoFormat ? ISO.DATE : ISO.NONE);
+		this.factories.get(Type.TIME).setIso(useIsoFormat ? ISO.TIME : ISO.NONE);
+		this.factories.get(Type.DATE_TIME).setIso(useIsoFormat ? ISO.DATE_TIME : ISO.NONE);
 	}
 
 	/**
@@ -194,6 +192,8 @@ public class DateTimeFormatterRegistrar implements FormatterRegistrar {
 		registry.addFormatterForFieldType(Instant.class, new InstantFormatter());
 		registry.addFormatterForFieldType(Period.class, new PeriodFormatter());
 		registry.addFormatterForFieldType(Duration.class, new DurationFormatter());
+		registry.addFormatterForFieldType(Year.class, new YearFormatter());
+		registry.addFormatterForFieldType(Month.class, new MonthFormatter());
 		registry.addFormatterForFieldType(YearMonth.class, new YearMonthFormatter());
 		registry.addFormatterForFieldType(MonthDay.class, new MonthDayFormatter());
 

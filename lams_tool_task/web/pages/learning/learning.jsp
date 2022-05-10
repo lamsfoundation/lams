@@ -39,8 +39,11 @@
 			<script type="text/javascript" src="${lams}includes/javascript/uppy/el_GR.min.js"></script>
 		</c:when>
 	</c:choose>
+	
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
+	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${toolSessionID}', '', finishSession);
 		
-	<script type="text/javascript">			
 		var LAMS_URL = '${lams}',
 	 		UPLOAD_FILE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>',
 			// convert Java syntax to JSON
@@ -157,8 +160,9 @@
 		/**
 		 * Initialised Uppy as the file upload widget
 		 */
-		function initFileUpload(tmpFileUploadId, language) {
+		function initFileUpload(target, tmpFileUploadId, language) {
 			  var uppyProperties = {
+				  id : 'uppy-' + target,
 				  // upload immediately 
 				  autoProceed: true,
 				  allowMultipleUploads: true,
@@ -177,7 +181,7 @@
 				  onBeforeFileAdded: function(currentFile, files) {
 					  var name = currentFile.data.name,
 					  	  extensionIndex = name.lastIndexOf('.'),
-					  	  valid = extensionIndex < 0 || !EXE_FILE_TYPES.includes(name.substring(extensionIndex).trim());
+					  	  valid = extensionIndex < 0 || !EXE_FILE_TYPES.includes(name.substring(extensionIndex).trim().toLowerCase());
 					  if (!valid) {
 						  uppy.info(EXE_FILE_ERROR, 'error', 10000);
 					  }
@@ -193,8 +197,7 @@
 			  }
 			  
 			  
-			  // global variable
-			  uppy = Uppy.Core(uppyProperties);
+			  let uppy = Uppy.Core(uppyProperties);
 			  // upload using Ajax
 			  uppy.use(Uppy.XHRUpload, {
 				  endpoint: LAMS_URL + 'tmpFileUpload',
@@ -204,18 +207,18 @@
 			  });
 			  
 			  uppy.use(Uppy.DragDrop, {
-				  target: '#image-upload-area',
+				  target: target,
 				  inline: true,
 				  height: 120,
 				  width: '100%'
 				});
 			  
 			  uppy.use(Uppy.Informer, {
-				  target: '#image-upload-area'
+				  target: target
 			  });
 			  
 			  uppy.use(Uppy.StatusBar, {
-				  target: '#image-upload-area',
+				  target: target,
 				  hideAfterFinish: false,
 				  hideUploadButton: true,
 				  hideRetryButton: true,
@@ -389,7 +392,7 @@
 					</c:when>
 
 					<c:otherwise>
-						<button type="submit" id="finishButton" onclick="return finishSession()"
+						<button type="submit" id="finishButton"
 							class="btn btn-primary btn-disable-on-submit voffset10 pull-right na">
 							<span class="nextActivity"> <c:choose>
 									<c:when test="${sessionMap.isLastActivity}">

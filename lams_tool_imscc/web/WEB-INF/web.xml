@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_3_1.xsd"
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
 	version="3.1">
 	<display-name>Shared CommonCartridge</display-name>
 	<description>
@@ -16,18 +16,10 @@
 		<param-name>contextConfigLocation</param-name>
 		<param-value>classpath:/org/lamsfoundation/lams/tool/commonCartridge/dbupdates/autopatchContext.xml</param-value>
 	</context-param>
-	<context-param>
-		<param-name>locatorFactorySelector</param-name>
-		<param-value>classpath:/org/lamsfoundation/lams/beanRefContext.xml</param-value>
-	</context-param>
-	<context-param>
-		<param-name>parentContextKey</param-name>
-		<param-value>context.central</param-value>
-	</context-param>
 
 	<listener>
 		<listener-class>
-			org.springframework.web.context.ContextLoaderListener
+			org.lamsfoundation.lams.web.filter.LamsContextLoaderListener
 		</listener-class>
 	</listener>
 
@@ -143,12 +135,6 @@
 	</servlet-mapping>
 
 	<jsp-config>
-		<jsp-property-group>
-			<url-pattern>*.jsp</url-pattern>
-			<page-encoding>UTF-8</page-encoding>
-			<default-content-type>text/html; charset=UTF-8</default-content-type>
-  		</jsp-property-group>
-  		
 		<!-- ======================================================== -->
 		<!-- JSTL 1.2 Tag Library -->
 		<!-- ======================================================== -->
@@ -182,6 +168,12 @@
 			<taglib-uri>csrfguard</taglib-uri>
 			<taglib-location>/WEB-INF/tlds/security/csrfguard.tld</taglib-location>
 		</taglib>
+		
+		<jsp-property-group>
+			<url-pattern>*.jsp</url-pattern>
+			<page-encoding>UTF-8</page-encoding>
+			<default-content-type>text/html; charset=UTF-8</default-content-type>
+  		</jsp-property-group>
 
 	</jsp-config>
 

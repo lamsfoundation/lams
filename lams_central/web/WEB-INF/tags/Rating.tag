@@ -23,6 +23,7 @@
 <%@ attribute name="yourRatingLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="averageRatingLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="minNumberWordsLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="hideCriteriaTitle" required="false" rtexprvalue="true" %>
 <%@ attribute name="showComments" required="false" rtexprvalue="true" %>
 <%@ attribute name="showAllComments" required="false" rtexprvalue="true" %>
 <%@ attribute name="allowRetries" required="false" rtexprvalue="true" %>
@@ -50,6 +51,9 @@
 </c:if>
 <c:if test="${empty minNumberWordsLabel}">
 	<c:set var="minNumberWordsLabel" value="label.comment.minimum.number.words" scope="request"/>
+</c:if>
+<c:if test="${empty hideCriteriaName}">
+	<c:set var="hideCriteriaTitle" value="false" scope="request"/>
 </c:if>
 <c:if test="${empty showAllComments}">
 	<c:set var="showAllComments" value="false" scope="request"/>
@@ -99,9 +103,11 @@
 			</c:otherwise>
 		</c:choose>
 			
-		<strong>
-			${criteriaDto.ratingCriteria.title}
-		</strong>
+		<c:if test="${not hideCriteriaTitle}">
+			<strong>
+				${criteriaDto.ratingCriteria.title}
+			</strong>
+		</c:if>
 			
 		<c:choose>
 			<c:when test='${isItemAuthoredByUser || not isCriteriaNotRatedByUser}'>

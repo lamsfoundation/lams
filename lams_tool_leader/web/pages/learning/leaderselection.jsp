@@ -25,84 +25,86 @@
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+		<lams:JSImport src="learning/includes/javascript/gate-check.js" />
+		
+		<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${toolSessionID}', '', finishActivity);
+		
+			$(document).ready(function(){
+				$("#leaderSelectionDialog").modal({
+					show: ${isSelectLeaderActive},
+					keyboard: true
+				});
+			});
+		
+			function leaderSelection() {
+				$.ajax({
+			    	async: false,
+			        url: '<c:url value="/learning/becomeLeader.do?toolSessionID=${toolSessionID}"/>',
+			        type: 'post',
+			        dataType : 'text',
+			        success: function () {
+			          	location.reload();
+			        }
+			   	});
+			}
+		
+		    function finishActivity(){
+				location.href = '<c:url value="/learning/finishActivity.do?toolSessionID=${toolSessionID}"/>';
+		    }
+		
+		 	//init the connection with server using server URL but with different protocol
+		 	var leaderWebsocketInitTime = Date.now(),
+		 		leaderWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
+		 			+ 'learningWebsocket?toolSessionID=' + ${toolSessionID}),
+				leaderWebsocketPingTimeout = null,
+				leaderWebsocketPingFunc = null;
+		 	
+		 	leaderWebsocket.onclose = function(e){
+		 		// react only on abnormal close
+		 		if (e.code === 1006 &&
+		 		 	Date.now() - leaderWebsocketInitTime > 1000) {
+		 	 		location.reload();
+		 		}
+		 	};
+		 	
+			leaderWebsocketPingFunc = function(skipPing){
+				if (leaderWebsocket.readyState == leaderWebsocket.CLOSING 
+						|| leaderWebsocket.readyState == leaderWebsocket.CLOSED){
+					return;
+				}
+				
+				// check and ping every 3 minutes
+				leaderWebsocketPingTimeout = setTimeout(leaderWebsocketPingFunc, 3*60*1000);
+				// initial set up does not send ping
+				if (!skipPing) {
+					leaderWebsocket.send("ping");
+				}
+			};
+			
+			// set up timer for the first time
+			leaderWebsocketPingFunc(true);
+		
+		 	
+			// run when the leader has just been selected
+			leaderWebsocket.onmessage = function(e) {
+				// no need to reset ping timer as the only possible message is page refresh
+				
+				// create JSON object
+				var input = JSON.parse(e.data);
+				
+				// The leader has just been selected and all non-leaders should refresh their pages in order
+		     	// to see new leader's name and a Finish button.
+				if (input.pageRefresh) {
+					location.reload();
+					return;
+				}
+			};
+		</script>
 	</lams:head>
 	
 	<body class="stripes">
-		<script type="text/javascript">
-	$(window).on('load', function(){
-		$("#leaderSelectionDialog").modal({
-			show: ${isSelectLeaderActive},
-			keyboard: true
-		});
-	});
-
-	function leaderSelection() {
-		$.ajax({
-	    	async: false,
-	        url: '<c:url value="/learning/becomeLeader.do?toolSessionID=${toolSessionID}"/>',
-	        type: 'post',
-	        success: function (json) {
-	          	location.reload();
-	        }
-	   	});
-	}
-
-    function finishActivity(){
-    	document.getElementById("finishButton").disabled = true;
-		location.href = '<c:url value="/learning/finishActivity.do?toolSessionID=${toolSessionID}"/>';
-    }
-
-    <%-- Init websocket only if group leader is not chosen --%>
-    <c:if test="${empty groupLeader}">
-	 	//init the connection with server using server URL but with different protocol
-	 	var leaderWebsocketInitTime = Date.now(),
-	 		leaderWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
-	 			+ 'learningWebsocket?toolSessionID=' + ${toolSessionID}),
-			leaderWebsocketPingTimeout = null,
-			leaderWebsocketPingFunc = null;
-	 	
-	 	leaderWebsocket.onclose = function(e){
-	 		// react only on abnormal close
-	 		if (e.code === 1006 &&
-	 		 	Date.now() - leaderWebsocketInitTime > 1000) {
-	 	 		location.reload();
-	 		}
-	 	};
-	 	
-		leaderWebsocketPingFunc = function(skipPing){
-			if (leaderWebsocket.readyState == leaderWebsocket.CLOSING 
-					|| leaderWebsocket.readyState == leaderWebsocket.CLOSED){
-				return;
-			}
-			
-			// check and ping every 3 minutes
-			leaderWebsocketPingTimeout = setTimeout(leaderWebsocketPingFunc, 3*60*1000);
-			// initial set up does not send ping
-			if (!skipPing) {
-				leaderWebsocket.send("ping");
-			}
-		};
 		
-		// set up timer for the first time
-		leaderWebsocketPingFunc(true);
-	
-	 	
-		// run when the leader has just been selected
-		leaderWebsocket.onmessage = function(e) {
-			// no need to reset ping timer as the only possible message is page refresh
-			
-			// create JSON object
-			var input = JSON.parse(e.data);
-			
-			// The leader has just been selected and all non-leaders should refresh their pages in order
-	     	// to see new leader's name and a Finish button.
-			if (input.pageRefresh) {
-				location.reload();
-				return;
-			}
-		};
-	</c:if>
-		</script>
 
 		<lams:Page type="learner" title="${content.title}">
 			<c:choose>
@@ -126,10 +128,10 @@
 			</div>
 		
 			<div id="usersInGroup">
-				<c:forEach var="user" items="${groupUsers}" varStatus="status">
-					<div id="user-${user.userId}" class="voffset5">
+				<c:forEach var="user" items="${groupUsers}">
+					<div id="user-${user.userId}" class="voffset10 loffset10">
 						<lams:Portrait userId="${user.userId}"/>
-						<span class="portrait-sm-lineheight">
+						<span>
 							<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
 						</span>
 					</div>
@@ -145,7 +147,7 @@
 				</button>
 				
 				<c:if test="${!isSelectLeaderActive}">
-					<a href="#nogo" class="btn btn-primary pull-right na" id="finishButton" onclick="finishActivity()">
+					<a href="#nogo" class="btn btn-primary pull-right na" id="finishButton">
 						<span class="nextActivity"> <c:choose>
 								<c:when test="${isLastActivity}">
 									<fmt:message key="button.submit" />
@@ -184,11 +186,12 @@
 						</div>
 	
 						<div id="usersInGroup" class="voffset10">
-							<c:forEach var="user" items="${groupUsers}" varStatus="status">
-								<div id="user-${user.userId}" class="voffset2">
-									<div class="user loffset10" id="user-${user.userId}">
+							<c:forEach var="user" items="${groupUsers}">
+								<div id="user-${user.userId}" class="voffset10 loffset10">
+									<lams:Portrait userId="${user.userId}"/>
+									<span>
 										<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
-									</div>
+									</span>
 								</div>
 							</c:forEach>
 						</div>

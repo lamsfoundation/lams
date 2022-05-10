@@ -31,10 +31,10 @@
 				
 				<c:if test="${sessionMap.mode != 'teacher'}">
 					<input type="hidden" id="tmpFileUploadId" name="tmpFileUploadId"
-						   value="${taskListItemForm.tmpFileUploadId}" />
-					<div id="image-upload-area" class="voffset20"></div>
+						   value="${taskListItemForm.tmpFileUploadId}_${item.uid}" />
+					<div id="file-upload-area-${item.uid}" class="voffset20"></div>
 					<script>
-						initFileUpload('${taskListItemForm.tmpFileUploadId}', '<lams:user property="localeLanguage"/>');
+						initFileUpload('#file-upload-area-${item.uid}', '${taskListItemForm.tmpFileUploadId}_${item.uid}', '<lams:user property="localeLanguage"/>');
 					</script>
 					
 					<input type="submit" name="uploadedFileButton" value='<fmt:message key="label.preview.upload.button" />'

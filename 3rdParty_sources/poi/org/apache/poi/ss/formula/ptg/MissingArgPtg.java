@@ -17,14 +17,13 @@
 
 package org.apache.poi.ss.formula.ptg;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * Missing Function Arguments
- * 
- * Avik Sengupta &lt;avik at apache.org&gt;
- * 
- * @author Jason Height (jheight at chariot dot net dot au)
  */
 public final class MissingArgPtg extends ScalarConstantPtg {
 
@@ -41,11 +40,26 @@ public final class MissingArgPtg extends ScalarConstantPtg {
 		out.writeByte(sid + getPtgClass());
 	}
 
+	@Override
+	public byte getSid() {
+		return sid;
+	}
+
 	public int getSize() {
 		return SIZE;
 	}
 
 	public String toFormulaString() {
 		return " ";
+	}
+
+	@Override
+	public MissingArgPtg copy() {
+		return this;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return null;
 	}
 }

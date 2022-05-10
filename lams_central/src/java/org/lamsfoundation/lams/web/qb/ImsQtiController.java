@@ -9,12 +9,17 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.outcome.Outcome;
+import org.lamsfoundation.lams.outcome.OutcomeMapping;
+import org.lamsfoundation.lams.outcome.service.IOutcomeService;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
@@ -23,9 +28,12 @@ import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.questions.QuestionExporter;
 import org.lamsfoundation.lams.questions.QuestionParser;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -56,9 +64,13 @@ public class ImsQtiController {
     @Autowired
     private IUserManagementService userManagementService;
 
+    @Autowired
+    private IOutcomeService outcomeService;
+
     /**
      * Parses questions extracted from IMS QTI file and adds them as new QB questions.
      */
+    @SuppressWarnings("unchecked")
     @RequestMapping(path = "/saveQTI", produces = "text/plain", method = RequestMethod.POST)
     @ResponseBody
     public String saveQTI(HttpServletRequest request, @RequestParam long collectionUid,
@@ -71,10 +83,11 @@ public class ImsQtiController {
 	for (Question question : questions) {
 
 	    String uuid = question.getQbUUID();
+	    QbQuestion qbQuestion = null;
 
 	    // try to match the question to an existing QB question in DB
 	    if (uuid != null) {
-		QbQuestion qbQuestion = qbService.getQuestionByUUID(UUID.fromString(uuid));
+		qbQuestion = qbService.getQuestionByUUID(UUID.fromString(uuid));
 		if (qbQuestion != null) {
 		    // found an existing question with same UUID
 		    // now check if it is in the collection already
@@ -87,7 +100,7 @@ public class ImsQtiController {
 
 		    if (collectionUUIDs.contains(uuid)) {
 			if (log.isDebugEnabled()) {
-			    log.debug("Skipping an existing question. Name: " + qbQuestion.getName() + ", uid: "
+			    log.debug("Found existing question. Name: " + qbQuestion.getName() + ", uid: "
 				    + qbQuestion.getUid());
 			}
 		    } else {
@@ -99,247 +112,243 @@ public class ImsQtiController {
 				    + ", uid: " + qbQuestion.getUid());
 			}
 		    }
-		    continue;
 		}
 	    }
 
-	    QbQuestion qbQuestion = new QbQuestion();
-	    qbQuestion.setUuid(uuid);
-	    qbQuestion.setName(question.getTitle());
-	    qbQuestion.setDescription(QuestionParser.processHTMLField(question.getText(), false, contentFolderID,
-		    question.getResourcesFolderPath()));
-	    qbQuestion.setFeedback(QuestionParser.processHTMLField(question.getFeedback(), false, contentFolderID,
-		    question.getResourcesFolderPath()));
-	    qbQuestion.setPenaltyFactor(0);
-	    int questionId = qbService.generateNextQuestionId();
-	    qbQuestion.setQuestionId(questionId);
-	    qbQuestion.setVersion(1);
-	    qbQuestion.setContentFolderId(FileUtil.generateUniqueContentFolderID());
+	    if (qbQuestion == null) {
 
-	    int questionMark = 1;
+		qbQuestion = new QbQuestion();
+		qbQuestion.setUuid(uuid);
+		qbQuestion.setName(question.getTitle());
+		qbQuestion.setContentFolderId(
+			StringUtils.isBlank(contentFolderID) ? FileUtil.generateUniqueContentFolderID()
+				: contentFolderID);
+		qbQuestion.setDescription(QuestionParser.processHTMLField(question.getText(), false,
+			qbQuestion.getContentFolderId(), question.getResourcesFolderPath()));
+		qbQuestion.setFeedback(QuestionParser.processHTMLField(question.getFeedback(), false,
+			qbQuestion.getContentFolderId(), question.getResourcesFolderPath()));
+		qbQuestion.setPenaltyFactor(0);
+		int questionId = qbService.generateNextQuestionId();
+		qbQuestion.setQuestionId(questionId);
+		qbQuestion.setVersion(1);
 
-	    // options are different depending on the type
-	    if (Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType())
-		    || Question.QUESTION_TYPE_FILL_IN_BLANK.equals(question.getType())
-		    || Question.QUESTION_TYPE_MARK_HEDGING.equals(question.getType())) {
+		Integer questionMark = question.getScore();
 		boolean isMultipleChoice = Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType());
 		boolean isMarkHedgingType = Question.QUESTION_TYPE_MARK_HEDGING.equals(question.getType());
+		boolean isVsaType = Question.QUESTION_TYPE_FILL_IN_BLANK.contentEquals(question.getType());
 
-		// setting answers is very similar in both types, so they were put together here
-		if (isMarkHedgingType) {
-		    qbQuestion.setType(QbQuestion.TYPE_MARK_HEDGING);
+		// options are different depending on the type
+		if (isMultipleChoice || isMarkHedgingType || isVsaType) {
 
-		} else if (isMultipleChoice) {
-		    qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
-		    qbQuestion.setMultipleAnswersAllowed(false);
-		    qbQuestion.setShuffle(false);
-		    qbQuestion.setPrefixAnswersWithLetters(false);
+		    // setting answers is very similar in both types, so they were put together here
+		    if (isMarkHedgingType) {
+			qbQuestion.setType(QbQuestion.TYPE_MARK_HEDGING);
 
-		} else {
-		    qbQuestion.setType(QbQuestion.TYPE_VERY_SHORT_ANSWERS);
-		    qbQuestion.setCaseSensitive(false);
-		}
+		    } else if (isMultipleChoice) {
+			qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
+			qbQuestion.setMultipleAnswersAllowed(false);
+			qbQuestion.setShuffle(false);
+			qbQuestion.setPrefixAnswersWithLetters(false);
 
-		String correctAnswer = null;
-		if (question.getAnswers() != null) {
-		    TreeSet<QbOption> optionList = new TreeSet<>();
-		    int orderId = 0;
-		    for (Answer answer : question.getAnswers()) {
-			String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
-				question.getResourcesFolderPath());
-			if ((correctAnswer != null) && correctAnswer.equals(answerText)) {
-			    log.warn("Skipping an answer with same text as the correct answer: " + answerText);
-			    continue;
-			}
-			QbOption option = new QbOption();
-			option.setName(answerText);
-			option.setDisplayOrder(orderId++);
-			option.setFeedback(answer.getFeedback());
-			option.setQbQuestion(qbQuestion);
+		    } else if (isVsaType) {
+			qbQuestion.setType(QbQuestion.TYPE_VERY_SHORT_ANSWERS);
+			qbQuestion.setCaseSensitive(false);
 
-			if ((answer.getScore() != null) && (answer.getScore() > 0) && (correctAnswer == null)) {
-			    // whatever the correct answer holds, it becomes the question score
-			    questionMark = Double.valueOf(Math.ceil(answer.getScore())).intValue();
-			    // 100% goes to the correct answer
-			    option.setMaxMark(1);
-			    correctAnswer = answerText;
-			} else {
-			    option.setMaxMark(0);
-			}
-
-			optionList.add(option);
-		    }
-
-		    qbQuestion.setQbOptions(new ArrayList<>(optionList));
-		}
-
-		if (correctAnswer == null) {
-		    log.warn("No correct answer found for question: " + question.getText());
-		    continue;
-		}
-
-	    } else if (Question.QUESTION_TYPE_MULTIPLE_RESPONSE.equals(question.getType())) {
-		qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
-		qbQuestion.setMultipleAnswersAllowed(true);
-		qbQuestion.setShuffle(false);
-		qbQuestion.setPrefixAnswersWithLetters(false);
-
-		if (question.getAnswers() != null) {
-		    float totalScore = 0;
-		    for (Answer answer : question.getAnswers()) {
-			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
-			    // the question score information is stored as sum of answer scores
-			    totalScore += answer.getScore();
+			if (question.getAnswers().size() == 1) {
+			    // add missing incorrect answer
+			    // as the correct answer always has to be present
+			    Answer incorrectAnswer = new Answer();
+			    incorrectAnswer.setDisplayOrder(2);
+			    incorrectAnswer.setScore(0f);
+			    question.getAnswers().add(incorrectAnswer);
 			}
 		    }
-		    questionMark = Double.valueOf(Math.round(totalScore)).intValue();
 
-		    TreeSet<QbOption> optionList = new TreeSet<>();
-		    int orderId = 1;
-		    for (Answer answer : question.getAnswers()) {
-			String answerText = answer.getText();
-			QbOption qbOption = new QbOption();
-			qbOption.setName(answerText);
-			qbOption.setDisplayOrder(orderId++);
-			qbOption.setFeedback(answer.getFeedback());
-			qbOption.setQbQuestion(qbQuestion);
-
-			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
-			    // set the factor of score for correct answers
-			    qbOption.setMaxMark(answer.getScore() / totalScore);
-			} else {
-			    qbOption.setMaxMark(0);
-			}
-
-			optionList.add(qbOption);
-		    }
-
-		    qbQuestion.setQbOptions(new ArrayList<>(optionList));
-		}
-
-	    } else if (Question.QUESTION_TYPE_TRUE_FALSE.equals(question.getType())) {
-		qbQuestion.setType(QbQuestion.TYPE_TRUE_FALSE);
-
-		if (question.getAnswers() == null) {
-		    log.warn("Answers missing from true-false question: " + question.getText());
-		    continue;
-		} else {
-		    for (Answer answer : question.getAnswers()) {
-			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
-			    qbQuestion.setCorrectAnswer(Boolean.parseBoolean(answer.getText()));
-			    questionMark = Double.valueOf(Math.ceil(answer.getScore())).intValue();
-			}
-			if (!StringUtils.isBlank(answer.getFeedback())) {
-			    // set feedback for true/false answers
-			    if (Boolean.parseBoolean(answer.getText())) {
-				qbQuestion.setFeedbackOnCorrect(answer.getFeedback());
-			    } else {
-				qbQuestion.setFeedbackOnIncorrect(answer.getFeedback());
+		    String correctAnswer = null;
+		    if (question.getAnswers() != null) {
+			TreeSet<QbOption> optionList = new TreeSet<>();
+			int orderId = 0;
+			for (Answer answer : question.getAnswers()) {
+			    String answerText = QuestionParser.processHTMLField(answer.getText(), false,
+				    contentFolderID, question.getResourcesFolderPath());
+			    if ((correctAnswer != null) && correctAnswer.equals(answerText)) {
+				log.warn("Skipping an answer with same text as the correct answer: " + answerText);
+				continue;
 			    }
-			}
-		    }
-		}
-	    } else if (Question.QUESTION_TYPE_MATCHING.equals(question.getType())) {
-		qbQuestion.setType(QbQuestion.TYPE_MATCHING_PAIRS);
-		qbQuestion.setShuffle(true);
+			    QbOption option = new QbOption();
+			    if (isVsaType && answerText != null) {
+				// convert comma-separated answers to ones accepted by QB VSA questions
+				answerText = Stream.of(answerText.split(",")).map(String::strip)
+					.collect(Collectors.joining("\r\n"));
+			    }
+			    option.setName(answerText);
+			    option.setDisplayOrder(orderId++);
+			    option.setFeedback(answer.getFeedback());
+			    option.setQbQuestion(qbQuestion);
 
-		if (question.getAnswers() != null) {
-		    // the question score information is stored as sum of answer scores
-		    float totalScore = 0;
-		    for (Answer answer : question.getAnswers()) {
-			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
-			    totalScore += answer.getScore();
-			}
-		    }
-		    questionMark = Double.valueOf(Math.round(totalScore)).intValue();
-
-		    TreeSet<QbOption> optionList = new TreeSet<>();
-		    int orderId = 1;
-		    for (int answerIndex = 0; answerIndex < question.getAnswers().size(); answerIndex++) {
-			// QTI allows answers without a match, but LAMS assessment tool does not
-			Integer matchAnswerIndex = question.getMatchMap() == null ? null
-				: question.getMatchMap().get(answerIndex);
-			Answer matchAnswer = (matchAnswerIndex == null) || (question.getMatchAnswers() == null) ? null
-				: question.getMatchAnswers().get(matchAnswerIndex);
-			if (matchAnswer != null) {
-			    Answer answer = question.getAnswers().get(answerIndex);
-			    String answerText = answer.getText();
-			    QbOption assessmentAnswer = new QbOption();
-			    assessmentAnswer.setMatchingPair(answerText);
-			    assessmentAnswer.setName(matchAnswer.getText());
-			    assessmentAnswer.setDisplayOrder(orderId++);
-			    assessmentAnswer.setFeedback(answer.getFeedback());
-			    assessmentAnswer.setQbQuestion(qbQuestion);
-
-			    optionList.add(assessmentAnswer);
-			}
-		    }
-
-		    qbQuestion.setQbOptions(new ArrayList<>(optionList));
-		}
-	    } else if (Question.QUESTION_TYPE_ESSAY.equals(question.getType())) {
-		qbQuestion.setType(QbQuestion.TYPE_ESSAY);
-		qbQuestion.setAllowRichEditor(false);
-
-	    } else if (Question.QUESTION_TYPE_ESSAY.equals(question.getType())) {
-		qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
-		qbQuestion.setShuffle(false);
-		qbQuestion.setPrefixAnswersWithLetters(false);
-
-		String correctAnswer = null;
-		if (question.getAnswers() != null) {
-		    TreeSet<QbOption> optionList = new TreeSet<>();
-		    int orderId = 1;
-		    for (Answer answer : question.getAnswers()) {
-			String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
-				question.getResourcesFolderPath());
-			if ((correctAnswer != null) && correctAnswer.equals(answerText)) {
-			    log.warn("Skipping an answer with same text as the correct answer: " + answerText);
-			    continue;
-			}
-			QbOption option = new QbOption();
-			option.setName(answerText);
-			option.setDisplayOrder(orderId++);
-			option.setFeedback(answer.getFeedback());
-			option.setQbQuestion(qbQuestion);
-
-			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
-			    // for fill in blanks question all answers are correct and get full mark
-			    if (correctAnswer == null) {
-				// whatever the correct answer holds, it becomes the question score
-				questionMark = Double.valueOf(Math.ceil(answer.getScore())).intValue();
+			    if ((answer.getScore() != null) && (answer.getScore() > 0) && (correctAnswer == null)) {
+				if (questionMark == null) {
+				    // whatever the correct answer holds, it becomes the question score
+				    questionMark = Double.valueOf(Math.ceil(answer.getScore())).intValue();
+				}
 				// 100% goes to the correct answer
 				option.setMaxMark(1);
 				correctAnswer = answerText;
 			    } else {
-				log.warn("Choosing only first correct answer, despite another one was found: "
-					+ answerText);
 				option.setMaxMark(0);
 			    }
-			} else {
-			    option.setMaxMark(0);
+
+			    optionList.add(option);
 			}
 
-			optionList.add(option);
+			qbQuestion.setQbOptions(new ArrayList<>(optionList));
 		    }
 
-		    qbQuestion.setQbOptions(new ArrayList<>(optionList));
-		}
+		    if (correctAnswer == null) {
+			log.warn("No correct answer found for question: " + question.getText());
+			continue;
+		    }
 
-		if (correctAnswer == null) {
-		    log.warn("No correct answer found for question: " + question.getText());
+		} else if (Question.QUESTION_TYPE_MULTIPLE_RESPONSE.equals(question.getType())) {
+		    qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
+		    qbQuestion.setMultipleAnswersAllowed(true);
+		    qbQuestion.setShuffle(false);
+		    qbQuestion.setPrefixAnswersWithLetters(false);
+
+		    if (question.getAnswers() != null) {
+			float totalScore = 0;
+			for (Answer answer : question.getAnswers()) {
+			    if ((answer.getScore() != null) && (answer.getScore() > 0)) {
+				// the question score information is stored as sum of answer scores
+				totalScore += answer.getScore();
+			    }
+			}
+			if (questionMark == null) {
+			    questionMark = Double.valueOf(Math.round(totalScore)).intValue();
+			}
+
+			TreeSet<QbOption> optionList = new TreeSet<>();
+			int orderId = 1;
+			for (Answer answer : question.getAnswers()) {
+			    String answerText = answer.getText();
+			    QbOption qbOption = new QbOption();
+			    qbOption.setName(answerText);
+			    qbOption.setDisplayOrder(orderId++);
+			    qbOption.setFeedback(answer.getFeedback());
+			    qbOption.setQbQuestion(qbQuestion);
+
+			    if ((answer.getScore() != null) && (answer.getScore() > 0)) {
+				// set the factor of score for correct answers
+				qbOption.setMaxMark(answer.getScore() / totalScore);
+			    } else {
+				qbOption.setMaxMark(0);
+			    }
+
+			    optionList.add(qbOption);
+			}
+
+			qbQuestion.setQbOptions(new ArrayList<>(optionList));
+		    }
+
+		} else if (Question.QUESTION_TYPE_TRUE_FALSE.equals(question.getType())) {
+		    qbQuestion.setType(QbQuestion.TYPE_TRUE_FALSE);
+
+		    if (question.getAnswers() == null) {
+			log.warn("Answers missing from true-false question: " + question.getText());
+			continue;
+		    } else {
+			for (Answer answer : question.getAnswers()) {
+			    if ((answer.getScore() != null) && (answer.getScore() > 0)) {
+				qbQuestion.setCorrectAnswer(Boolean.parseBoolean(answer.getText()));
+				if (questionMark == null) {
+				    questionMark = Double.valueOf(Math.ceil(answer.getScore())).intValue();
+				}
+			    }
+			    if (!StringUtils.isBlank(answer.getFeedback())) {
+				// set feedback for true/false answers
+				if (Boolean.parseBoolean(answer.getText())) {
+				    qbQuestion.setFeedbackOnCorrect(answer.getFeedback());
+				} else {
+				    qbQuestion.setFeedbackOnIncorrect(answer.getFeedback());
+				}
+			    }
+			}
+		    }
+		} else if (Question.QUESTION_TYPE_MATCHING.equals(question.getType())) {
+		    qbQuestion.setType(QbQuestion.TYPE_MATCHING_PAIRS);
+		    qbQuestion.setShuffle(true);
+
+		    if (question.getAnswers() != null) {
+			// the question score information is stored as sum of answer scores
+			float totalScore = 0;
+			for (Answer answer : question.getAnswers()) {
+			    if ((answer.getScore() != null) && (answer.getScore() > 0)) {
+				totalScore += answer.getScore();
+			    }
+			}
+			if (questionMark == null) {
+			    questionMark = Double.valueOf(Math.round(totalScore)).intValue();
+			}
+
+			TreeSet<QbOption> optionList = new TreeSet<>();
+			int orderId = 1;
+			for (int answerIndex = 0; answerIndex < question.getAnswers().size(); answerIndex++) {
+			    // QTI allows answers without a match, but LAMS assessment tool does not
+			    Integer matchAnswerIndex = question.getMatchMap() == null ? null
+				    : question.getMatchMap().get(answerIndex);
+			    Answer matchAnswer = (matchAnswerIndex == null) || (question.getMatchAnswers() == null)
+				    ? null
+				    : question.getMatchAnswers().get(matchAnswerIndex);
+			    if (matchAnswer != null) {
+				Answer answer = question.getAnswers().get(answerIndex);
+				String answerText = answer.getText();
+				QbOption assessmentAnswer = new QbOption();
+				assessmentAnswer.setMatchingPair(answerText);
+				assessmentAnswer.setName(matchAnswer.getText());
+				assessmentAnswer.setDisplayOrder(orderId++);
+				assessmentAnswer.setFeedback(answer.getFeedback());
+				assessmentAnswer.setQbQuestion(qbQuestion);
+
+				optionList.add(assessmentAnswer);
+			    }
+			}
+
+			qbQuestion.setQbOptions(new ArrayList<>(optionList));
+		    }
+		} else if (Question.QUESTION_TYPE_ESSAY.equals(question.getType())) {
+		    qbQuestion.setType(QbQuestion.TYPE_ESSAY);
+		    qbQuestion.setAllowRichEditor(false);
+
+		} else {
+		    log.warn("Unknow QTI question type: " + question.getType());
 		    continue;
 		}
 
-	    } else {
-		log.warn("Unknow QTI question type: " + question.getType());
-		continue;
+		qbQuestion.setMaxMark(questionMark == null ? 1 : questionMark);
+		userManagementService.save(qbQuestion);
+
+		if (question.getLearningOutcomes() != null && !question.getLearningOutcomes().isEmpty()) {
+		    for (String learningOutcomeText : question.getLearningOutcomes()) {
+			learningOutcomeText = learningOutcomeText.strip();
+			List<Outcome> learningOutcomes = userManagementService.findByProperty(Outcome.class, "name",
+				learningOutcomeText);
+			Outcome learningOutcome = null;
+			if (learningOutcomes.isEmpty()) {
+			    learningOutcome = outcomeService.createOutcome(learningOutcomeText,
+				    ImsQtiController.getUserDTO().getUserID());
+			} else {
+			    learningOutcome = learningOutcomes.get(0);
+			}
+
+			OutcomeMapping outcomeMapping = new OutcomeMapping();
+			outcomeMapping.setOutcome(learningOutcome);
+			outcomeMapping.setQbQuestionId(questionId);
+			userManagementService.save(outcomeMapping);
+		    }
+		}
+
+		qbService.addQuestionToCollection(collectionUid, qbQuestion.getQuestionId(), false);
 	    }
-
-	    qbQuestion.setMaxMark(questionMark);
-	    userManagementService.save(qbQuestion);
-
-	    qbService.addQuestionToCollection(collectionUid, qbQuestion.getQuestionId(), false);
 
 	    qbQuestionUidsString.append(qbQuestion.getUid()).append(',');
 
@@ -548,5 +557,10 @@ public class ImsQtiController {
 
 	QuestionExporter exporter = new QuestionExporter(fileTitle, questions.toArray(Question.QUESTION_ARRAY_TYPE));
 	exporter.exportQTIPackage(request, response);
+    }
+
+    private static UserDTO getUserDTO() {
+	HttpSession ss = SessionManager.getSession();
+	return (UserDTO) ss.getAttribute(AttributeNames.USER);
     }
 }

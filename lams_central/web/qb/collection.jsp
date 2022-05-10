@@ -99,6 +99,9 @@
 			    height: "100%",
 			    autowidth:true,
 				shrinkToFit: true,
+				<%-- Do not allow batch removing questions from the public collection --%>
+				multiselect: !isPublicCollection,
+				multiPageSelection: !isPublicCollection,
 				viewrecords: true,
 			    cellEdit: false,
 			    cmTemplate: { title: false, search: false },
@@ -133,7 +136,7 @@
 			    ],
 				beforeSelectRow: function(rowid, e) {
 					// do not select rows at all
-				    return false;
+				    return !isPublicCollection;
 				},
 				loadComplete: function(data) {
 					//init thickbox
@@ -193,8 +196,10 @@
 			}).jqGrid('filterToolbar');
 
 			if (!isPublicCollection) {
-				//turn to inline mode for x-editable.js
+				// turn to inline mode for x-editable.js
 				$.fn.editable.defaults.mode = 'inline';
+				// do not cancel on clicking outside of box
+				$.fn.editable.defaults.onblur = 'ignore';
 				//enable renaming of lesson title  
 				$('#collection-name').editable({
 				    type: 'text',
@@ -372,7 +377,7 @@
 
 	    function importWordQuestions(){
 	    	window.open('<lams:LAMSURL/>questions/questionFile.jsp?importType=word',
-				'QuestionFile','width=500,height=240,scrollbars=yes');
+				'QuestionFile','width=500,height=370,scrollbars=yes');
 	    }
 
 	    function importQTI(){
@@ -407,6 +412,31 @@
 		    $(document.body).append(form);
 		    form.submit();
 		}
+
+
+		function removeQuestions(){
+			let questionsToRemove = $('#collection-grid').jqGrid('getGridParam','selarrrow');
+			if (questionsToRemove.length == 0){
+				return;
+			}
+			$.ajax({
+				'url'  : '<lams:LAMSURL />qb/collection/removeCollectionQuestions.do',
+				'type' : 'POST',
+				'dataType' : 'text',
+				'data' : {
+					'collectionUid' : ${collection.uid},
+	 				'qbQuestionIds' : questionsToRemove,
+					"<csrf:tokenname/>" : "<csrf:tokenvalue/>"
+				},
+				'cache' : false
+			}).done(function(response){
+				if (response == 'fail') {
+					// not all questions were removed
+					alert('<fmt:message key="label.qb.collection.remove.questions.fail" />');
+				}
+				document.location.reload();
+			});
+		}
 		
 		//create proper href for "Create question" button
 		function initLinkHref() {
@@ -435,7 +465,7 @@
 	
 	<div id="collection-name-row" class="row h4">
 		
-		<div class="col-xs-12 col-sm-8">
+		<div class="col-xs-12 col-sm-6">
 			<span id="collection-name">
 				<strong>
 					<c:out value="${collection.name}" />
@@ -452,8 +482,13 @@
 			</c:if>
 		</div>
 		
-		<div class=" col-xs-12 col-sm-4">
-
+		<div class=" col-xs-12 col-sm-6">
+			<a class="btn btn-default btn-xs loffset10 pull-right"
+			   onClick="javascript:removeQuestions()"
+			   title="<fmt:message key="label.qb.collection.remove.questions.tooltip" />">
+				<fmt:message key="label.qb.collection.remove.questions" />&nbsp;<i class="fa fa-trash"></i>
+			</a>
+			
 			<%-- Do not display button for public and private collections --%>
 			<c:if test="${not empty collection.userId and not collection.personal}">
 				<div class="btn-group-xs pull-right loffset10">
@@ -504,8 +539,8 @@
 					<i class="fa fa-upload"></i>
 				</a>
 			</div>
-				
-			<div class="btn-group-xs pull-right" style="display: flex;">
+			
+			<div class="btn-group-xs pull-right voffset10" style="display: flex;">
 				<select id="question-type" class="form-control btn-xs">
 					<option selected="selected"><fmt:message key="label.question.type.multiple.choice" /></option>
 					<option><fmt:message key="label.question.type.matching.pairs" /></option>

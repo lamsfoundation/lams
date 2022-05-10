@@ -378,7 +378,7 @@ public class MonitoringService implements IMonitoringFullService {
 	Lesson precedingLesson = (precedingLessonId == null) ? null : lessonDAO.getLesson(precedingLessonId);
 
 	// The duplicated sequence should go in the run sequences folder under the given organisation
-	Organisation org = (Organisation) baseDAO.find(Organisation.class, organisationId);
+	Organisation org = baseDAO.find(Organisation.class, organisationId);
 	WorkspaceFolder runSeqFolder = null;
 	int MAX_DEEP_LEVEL_FOLDER = 50;
 	for (int idx = 0; idx < MAX_DEEP_LEVEL_FOLDER; idx++) {
@@ -491,7 +491,6 @@ public class MonitoringService implements IMonitoringFullService {
 
 	    LessonClass newLessonClass = this.createLessonClass(organisation, learnerGroupName, organizationUsers,
 		    staffGroupName, staffs, newLesson);
-	    newLessonClass.setLesson(newLesson);
 	    newLesson.setLessonClass(newLessonClass);
 
 	    lessonDAO.updateLesson(newLesson);
@@ -517,7 +516,7 @@ public class MonitoringService implements IMonitoringFullService {
 	}
 
 	// Change client/users schedule date to server's timezone.
-	User user = (User) baseDAO.find(User.class, userId);
+	User user = baseDAO.find(User.class, userId);
 	TimeZone userTimeZone = TimeZone.getTimeZone(user.getTimeZone());
 	Date tzStartLessonDate = DateUtil.convertFromTimeZoneToDefault(userTimeZone, startDate);
 	String triggerName = "startLessonOnScheduleTrigger:" + lessonId;
@@ -581,7 +580,7 @@ public class MonitoringService implements IMonitoringFullService {
 	}
 
 	// Change client/users schedule date to server's timezone.
-	User user = (User) baseDAO.find(User.class, userId);
+	User user = baseDAO.find(User.class, userId);
 	TimeZone userTimeZone = TimeZone.getTimeZone(user.getTimeZone());
 	Date tzEndLessonDate = DateUtil.convertFromTimeZoneToDefault(userTimeZone, userEnteredEndDate);
 	finishLessonOnScheduleAsServerDate(requestedLesson, tzEndLessonDate, userId);
@@ -878,7 +877,7 @@ public class MonitoringService implements IMonitoringFullService {
 	    MonitoringService.log.debug("Setting gate schedule for gate " + gateId + "to " + schedulingDatetime);
 	}
 
-	User user = (User) baseDAO.find(User.class, userId);
+	User user = baseDAO.find(User.class, userId);
 	TimeZone userTimeZone = TimeZone.getTimeZone(user.getTimeZone());
 	Date tzSchedulingDatetime = DateUtil.convertFromTimeZoneToDefault(userTimeZone, schedulingDatetime);
 
@@ -1256,23 +1255,10 @@ public class MonitoringService implements IMonitoringFullService {
     public GateActivity openGate(Long gateId, Integer openerId) {
 	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateId);
 	if (gate != null) {
-	    gate.setGateOpen(new Boolean(true));
+	    gate.setGateOpen(true);
 	    gate.setGateOpenTime(new Date());
 	    if (openerId != null) {
-		gate.setGateOpenUser((User) baseDAO.find(User.class, openerId));
-	    }
-
-	    // we un-schedule the gate from the scheduler if it's of a scheduled
-	    // gate (LDEV-1271)
-	    if (gate.isScheduleGate()) {
-		try {
-		    scheduler.unscheduleJob(TriggerKey.triggerKey("openGateTrigger:" + gate.getActivityId()));
-		} catch (SchedulerException e) {
-		    MonitoringService.log
-			    .error("Error unscheduling trigger for gate activity id:" + gate.getActivityId(), e);
-		    throw new MonitoringServiceException(
-			    "Error unscheduling trigger for gate activity id:" + gate.getActivityId(), e);
-		}
+		gate.setGateOpenUser(baseDAO.find(User.class, openerId));
 	    }
 
 	    activityDAO.update(gate);
@@ -1284,7 +1270,7 @@ public class MonitoringService implements IMonitoringFullService {
     public GateActivity openGateForSingleUser(Long gateId, Integer[] userIds) {
 	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateId);
 	for (Integer userId : userIds) {
-	    User user = (User) baseDAO.find(User.class, userId);
+	    User user = baseDAO.find(User.class, userId);
 	    gate.getAllowedToPassLearners().add(user);
 	    activityDAO.update(gate);
 	}
@@ -1305,7 +1291,7 @@ public class MonitoringService implements IMonitoringFullService {
     @Override
     public GateActivity closeGate(Long gateId) {
 	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateId);
-	gate.setGateOpen(new Boolean(false));
+	gate.setGateOpen(false);
 	gate.setGateOpenUser(null);
 	gate.setGateOpenTime(null);
 	activityDAO.update(gate);
@@ -1321,7 +1307,7 @@ public class MonitoringService implements IMonitoringFullService {
 	    securityService.isLessonMonitor(lessonId, requesterId, "force complete", true);
 	}
 	Lesson lesson = lessonDAO.getLesson(Long.valueOf(lessonId));
-	User learner = (User) baseDAO.find(User.class, learnerId);
+	User learner = baseDAO.find(User.class, learnerId);
 
 	LearnerProgress learnerProgress = learnerService.getProgress(learnerId, lessonId);
 
@@ -1482,7 +1468,7 @@ public class MonitoringService implements IMonitoringFullService {
 		} else {
 		    // the gate is closed, stop here
 		    stopReason = messageService.getMessage(MonitoringService.FORCE_COMPLETE_STOP_MESSAGE_GATE,
-			    new Object[] { activity.getTitle() });
+			    new Object[] { activity.getTitle() == null ? "" : activity.getTitle() });
 		}
 
 	    } else if (activity.isToolActivity()) {
@@ -1916,8 +1902,8 @@ public class MonitoringService implements IMonitoringFullService {
 	Set<User> sortedUsers = new TreeSet<>(new Comparator<User>() {
 	    @Override
 	    public int compare(User usr0, User usr1) {
-		return ((usr0.getFirstName() + usr0.getLastName() + usr0.getLogin())
-			.compareTo(usr1.getFirstName() + usr1.getLastName() + usr1.getLogin()));
+		return ((usr0.getLastName() + usr0.getFirstName() + usr0.getLogin())
+			.compareTo(usr1.getLastName() + usr1.getFirstName() + usr1.getLogin()));
 	    }
 	});
 	sortedUsers.addAll(users);
@@ -1938,13 +1924,13 @@ public class MonitoringService implements IMonitoringFullService {
     @SuppressWarnings("unchecked")
     @Override
     public List<EmailNotificationArchive> getArchivedEmailNotifications(Integer organisationId) {
-	return baseDAO.findByProperty(EmailNotificationArchive.class, "organisationId", organisationId);
+	return baseDAO.findByProperty(EmailNotificationArchive.class, "organisationId", organisationId, true);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public List<EmailNotificationArchive> getArchivedEmailNotifications(Long lessonId) {
-	return baseDAO.findByProperty(EmailNotificationArchive.class, "lessonId", lessonId);
+	return baseDAO.findByProperty(EmailNotificationArchive.class, "lessonId", lessonId, true);
     }
 
     @Override
@@ -1954,8 +1940,7 @@ public class MonitoringService implements IMonitoringFullService {
 
     @Override
     public List<ExcelSheet> exportArchivedEmailNotification(Long emailNotificationUid) {
-	EmailNotificationArchive notification = (EmailNotificationArchive) baseDAO.find(EmailNotificationArchive.class,
-		emailNotificationUid);
+	EmailNotificationArchive notification = baseDAO.find(EmailNotificationArchive.class, emailNotificationUid);
 
 	List<ExcelSheet> sheets = new LinkedList<>();
 	ExcelSheet sheet = new ExcelSheet(messageService.getMessage("email.notifications.archived.export.sheet.name"));
@@ -2057,7 +2042,7 @@ public class MonitoringService implements IMonitoringFullService {
 	Lesson lesson = lessonDAO.getLesson(lessonID);
 
 	Activity activity = activityDAO.getActivityByActivityId(activityID);
-	User learner = (User) baseDAO.find(User.class, learnerUserID);
+	User learner = baseDAO.find(User.class, learnerUserID);
 
 	String url = null;
 	if ((activity == null) || (learner == null)) {
@@ -2187,7 +2172,7 @@ public class MonitoringService implements IMonitoringFullService {
     @Override
     public void createPreviewClassForLesson(int userID, long lessonID) throws UserAccessDeniedException {
 
-	User user = (User) baseDAO.find(User.class, userID);
+	User user = baseDAO.find(User.class, userID);
 	if (user == null) {
 	    throw new UserAccessDeniedException("User " + userID + " not found");
 	}
@@ -2337,7 +2322,7 @@ public class MonitoringService implements IMonitoringFullService {
 	    boolean added = false;
 	    try {
 		Integer learnerID = new Integer(Integer.parseInt(strlearnerID));
-		User learner = (User) baseDAO.find(User.class, learnerID);
+		User learner = baseDAO.find(User.class, learnerID);
 		if (learner != null) {
 		    learners.add(learner);
 		    added = true;
@@ -2568,7 +2553,7 @@ public class MonitoringService implements IMonitoringFullService {
 
     @Override
     public boolean isActivityAttempted(Activity activity) {
-	Integer numAttempted = lessonService.getCountLearnersHaveAttemptedActivity(activity);
+	Integer numAttempted = lessonService.getCountLearnersHaveAttemptedOrCompletedActivity(activity);
 	if (MonitoringService.log.isDebugEnabled()) {
 	    MonitoringService.log.debug("isActivityAttempted: num attempts for activity " + activity.getActivityId()
 		    + " is " + numAttempted);
@@ -2663,7 +2648,7 @@ public class MonitoringService implements IMonitoringFullService {
 
     @Override
     public Organisation getOrganisation(Integer organisationId) {
-	return (Organisation) baseDAO.find(Organisation.class, organisationId);
+	return baseDAO.find(Organisation.class, organisationId);
     }
 
     @Override

@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.admin.web.form;
 
 import org.apache.commons.lang.StringUtils;
+import org.lamsfoundation.lams.util.LanguageUtil;
 
 /**
  * Form for managing LTI tool consumers (ExtServer instances).
@@ -33,12 +34,56 @@ public class LtiConsumerForm extends ExtServerCommonForm {
 
     private String ltiToolConsumerMonitorRoles;
 
-    private String lessonFinishUrl;
-
     private String userIdParameterName;
+
+    private String defaultCountry;
+
+    private Integer defaultLocaleId;
+
+    private String defaultTimeZone;
+
+    private boolean useCoursePrefix;
+
+    private boolean userRegistrationEnabled;
+
+    private boolean userNameLowerCase;
+
+    private boolean enforceStateCookie;
+
+    private boolean toolReregistrationEnabled;
+
+    private String issuer;
+
+    private String clientId;
+
+    private String platformKeySetUrl;
+
+    private String oidcAuthUrl;
+
+    private String accessTokenUrl;
+
+    private String toolName;
+
+    private String toolDescription;
+
+    private String toolKeySetUrl;
+
+    private String toolKeyId;
+
+    private String publicKey;
+
+    private String privateKey;
 
     public LtiConsumerForm() {
 	userIdParameterName = "user_id";
+	defaultCountry = LanguageUtil.getDefaultCountry();
+	defaultLocaleId = LanguageUtil.getDefaultLocale().getLocaleId();
+	defaultTimeZone = LanguageUtil.getDefaultTimeZone().getID();
+	toolReregistrationEnabled = true;
+	useCoursePrefix = true;
+	userRegistrationEnabled = true;
+	toolName = "LAMS Advantage";
+	toolDescription = "platform for delivering online collaborative learning activities";
     }
 
     public String getLtiToolConsumerMonitorRoles() {
@@ -49,21 +94,163 @@ public class LtiConsumerForm extends ExtServerCommonForm {
 	this.ltiToolConsumerMonitorRoles = ltiToolConsumerMonitorRoles;
     }
 
-    @Override
-    public String getLessonFinishUrl() {
-	return lessonFinishUrl;
-    }
-
-    @Override
-    public void setLessonFinishUrl(String lessonFinishUrl) {
-	this.lessonFinishUrl = lessonFinishUrl;
-    }
-
     public String getUserIdParameterName() {
 	return userIdParameterName;
     }
 
     public void setUserIdParameterName(String userIdParameterName) {
 	this.userIdParameterName = StringUtils.trim(userIdParameterName);
+    }
+
+    public String getDefaultCountry() {
+	return defaultCountry;
+    }
+
+    public void setDefaultCountry(String defaultCountry) {
+	this.defaultCountry = defaultCountry;
+    }
+
+    public Integer getDefaultLocaleId() {
+	return defaultLocaleId;
+    }
+
+    public void setDefaultLocaleId(Integer defaultLocaleId) {
+	this.defaultLocaleId = defaultLocaleId;
+    }
+
+    public String getDefaultTimeZone() {
+	return defaultTimeZone;
+    }
+
+    public void setDefaultTimeZone(String defaultTimeZone) {
+	this.defaultTimeZone = defaultTimeZone;
+    }
+
+    public boolean isUseCoursePrefix() {
+	return useCoursePrefix;
+    }
+
+    public void setUseCoursePrefix(boolean useCoursePrefix) {
+	this.useCoursePrefix = useCoursePrefix;
+    }
+
+    public boolean isUserRegistrationEnabled() {
+	return userRegistrationEnabled;
+    }
+
+    public void setUserRegistrationEnabled(boolean userRegistrationEnabled) {
+	this.userRegistrationEnabled = userRegistrationEnabled;
+    }
+
+    public boolean isUserNameLowerCase() {
+	return userNameLowerCase;
+    }
+
+    public void setUserNameLowerCase(boolean userNameLowerCase) {
+	this.userNameLowerCase = userNameLowerCase;
+    }
+
+    public boolean isEnforceStateCookie() {
+	return enforceStateCookie;
+    }
+
+    public void setEnforceStateCookie(boolean enforceStateCookie) {
+	this.enforceStateCookie = enforceStateCookie;
+    }
+
+    public boolean isToolReregistrationEnabled() {
+	return toolReregistrationEnabled;
+    }
+
+    public void setToolReregistrationEnabled(boolean toolReregistrationEnabled) {
+	this.toolReregistrationEnabled = toolReregistrationEnabled;
+    }
+
+    public String getIssuer() {
+	return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+	this.issuer = issuer;
+    }
+
+    public String getClientId() {
+	return clientId;
+    }
+
+    public void setClientId(String clientId) {
+	this.clientId = clientId;
+    }
+
+    public String getPlatformKeySetUrl() {
+	return platformKeySetUrl;
+    }
+
+    public void setPlatformKeySetUrl(String platformKeySetUrl) {
+	this.platformKeySetUrl = platformKeySetUrl;
+    }
+
+    public String getOidcAuthUrl() {
+	return oidcAuthUrl;
+    }
+
+    public void setOidcAuthUrl(String oidcAuthUrl) {
+	this.oidcAuthUrl = oidcAuthUrl;
+    }
+
+    public String getAccessTokenUrl() {
+	return accessTokenUrl;
+    }
+
+    public void setAccessTokenUrl(String accessTokenUrl) {
+	this.accessTokenUrl = accessTokenUrl;
+    }
+
+    public String getToolName() {
+	return toolName;
+    }
+
+    public void setToolName(String toolName) {
+	this.toolName = toolName;
+    }
+
+    public String getToolDescription() {
+	return toolDescription;
+    }
+
+    public void setToolDescription(String toolDescription) {
+	this.toolDescription = toolDescription;
+    }
+
+    public String getToolKeySetUrl() {
+	return toolKeySetUrl;
+    }
+
+    public void setToolKeySetUrl(String toolKeySetUrl) {
+	this.toolKeySetUrl = toolKeySetUrl;
+    }
+
+    public String getToolKeyId() {
+	return toolKeyId;
+    }
+
+    public void setToolKeyId(String toolKeyId) {
+	this.toolKeyId = toolKeyId;
+    }
+
+    public String getPublicKey() {
+	return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+	this.publicKey = publicKey;
+    }
+
+    public String getPrivateKey() {
+	return privateKey;
+    }
+
+    public void setPrivateKey(String privateKey) {
+	this.privateKey = privateKey;
     }
 }

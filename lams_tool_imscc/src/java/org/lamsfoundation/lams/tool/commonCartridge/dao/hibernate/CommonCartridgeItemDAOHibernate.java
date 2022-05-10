@@ -39,7 +39,7 @@ public class CommonCartridgeItemDAOHibernate extends LAMSBaseDAO implements Comm
     @SuppressWarnings("unchecked")
     @Override
     public List<CommonCartridgeItem> getAuthoringItems(Long commonCartridgeUid) {
-	return (List<CommonCartridgeItem>) this.doFind(FIND_AUTHORING_ITEMS, commonCartridgeUid);
+	return this.doFindCacheable(FIND_AUTHORING_ITEMS, commonCartridgeUid);
     }
 
     @Override

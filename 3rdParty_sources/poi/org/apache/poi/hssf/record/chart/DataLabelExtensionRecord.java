@@ -17,9 +17,13 @@
 
 package org.apache.poi.hssf.record.chart;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
@@ -27,17 +31,24 @@ import org.apache.poi.util.LittleEndianOutput;
  */
 public final class DataLabelExtensionRecord extends StandardRecord {
 	public static final short sid = 0x086A;
-	
+
 	private int rt;
 	private int grbitFrt;
-	private byte[] unused = new byte[8];
-	
+	private final byte[] unused = new byte[8];
+
+	public DataLabelExtensionRecord(DataLabelExtensionRecord other) {
+		super(other);
+		rt = other.rt;
+		grbitFrt = other.grbitFrt;
+		System.arraycopy(other.unused, 0, unused, 0, unused.length);
+	}
+
 	public DataLabelExtensionRecord(RecordInputStream in) {
 		rt = in.readShort();
 		grbitFrt = in.readShort();
 		in.readFully(unused);
 	}
-	
+
 	@Override
 	protected int getDataSize() {
 		return 2 + 2 + 8;
@@ -56,15 +67,21 @@ public final class DataLabelExtensionRecord extends StandardRecord {
 	}
 
 	@Override
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
+	public DataLabelExtensionRecord copy() {
+		return new DataLabelExtensionRecord(this);
+	}
 
-		buffer.append("[DATALABEXT]\n");
-		buffer.append("    .rt      =").append(HexDump.shortToHex(rt)).append('\n');
-		buffer.append("    .grbitFrt=").append(HexDump.shortToHex(grbitFrt)).append('\n');
-		buffer.append("    .unused  =").append(HexDump.toHex(unused)).append('\n');
+	@Override
+	public HSSFRecordTypes getGenericRecordType() {
+		return HSSFRecordTypes.DATA_LABEL_EXTENSION;
+	}
 
-		buffer.append("[/DATALABEXT]\n");
-		return buffer.toString();
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"rt", () -> rt,
+			"grbitFrt", () -> grbitFrt,
+			"unused", () -> unused
+		);
 	}
 }

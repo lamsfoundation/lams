@@ -24,10 +24,7 @@
 package org.lamsfoundation.lams.tool.scratchie.model;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -36,7 +33,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
@@ -74,6 +70,9 @@ public class ScratchieSession {
     //date when user has started activity (pressed start button) that has time limitation
     @Column(name = "time_limit_launched_date")
     private Date timeLimitLaunchedDate;
+
+    @Column(name = "time_limit_adjustment")
+    private Integer timeLimitAdjustment;
 
     // finish or not
     @Column
@@ -115,6 +114,14 @@ public class ScratchieSession {
 
     public void setTimeLimitLaunchedDate(Date timeLimitLaunchedDate) {
 	this.timeLimitLaunchedDate = timeLimitLaunchedDate;
+    }
+
+    public Integer getTimeLimitAdjustment() {
+	return timeLimitAdjustment;
+    }
+
+    public void setTimeLimitAdjustment(Integer relativeTimeLimitAdjustment) {
+	this.timeLimitAdjustment = relativeTimeLimitAdjustment;
     }
 
     public Date getSessionStartDate() {

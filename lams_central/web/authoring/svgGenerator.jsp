@@ -9,13 +9,14 @@
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringGeneral.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringActivity.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringDecoration.js"></script>
+	<lams:JSImport src="includes/javascript/authoring/authoringGeneral.js" />
+	<lams:JSImport src="includes/javascript/authoring/authoringActivity.js" />
+	<lams:JSImport src="includes/javascript/authoring/authoringDecoration.js" />
 	<c:if test="${param.selectable}">
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringHandler.js"></script>
+		<lams:JSImport src="includes/javascript/authoring/authoringHandler.js" />
 	</c:if>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringMenu.js"></script>
+	<lams:JSImport src="includes/javascript/authoring/authoringMenu.js" />
+	
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>',
 			LABELS = {
@@ -48,28 +49,18 @@
 			canSetReadOnly = false,
 			isReadOnlyMode = true,
 			activitiesOnlySelectable = ${param.selectable eq 'true'},
-			initLearningDesignID = '${param.learningDesignID}';
+			isLtiContentSelection = false,
+			initLearningDesignID = '${param.learningDesignID}',
+			initRelaunchMonitorLessonID = null,
+			csrfTokenName = '<csrf:tokenname/>',
+			csrfTokenValue = '<csrf:tokenvalue/>';
 	</script>
 </lams:head>
 
 <body>
-	<div style="display: none">
-		<c:forEach var="tool" items="${tools}">
-			<div
-				 toolId="${tool.toolId}"
-				 learningLibraryId="${tool.learningLibraryId}"
-				 learningLibraryTitle="${tool.learningLibraryTitle}"
-				 supportsOutputs="${tool.supportsOutputs}"
-				 iconPath="${tool.iconPath}"
-				 childToolIds="
-				 <c:forEach var='childId' items='${tool.childToolIds}'>
-				 	${childId},
-				 </c:forEach>
-				 "
-				 class="template">
-				<div><c:out value="${tool.toolDisplayName}" /></div>
-			</div>
-		</c:forEach>
+	<div id="templateContainerCell" style="display: none">
+		<%-- Shared with svgGenerator.jsp --%>
+		<%@ include file="authoringTemplatePart.jsp"%> 
 	</div>
 
 	<div id="canvas"></div>

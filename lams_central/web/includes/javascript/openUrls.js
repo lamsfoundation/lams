@@ -43,50 +43,53 @@ function closeAllChildren() {
 	if (gradebookMonLessonWin && !gradebookMonLessonWin.closed) gradebookMonLessonWin.close();
 }
 
-function openPedagogicalPlanner() {
-	if(isMac) {
-			authorWin = window.open('planner/pedagogicalPlanner/start.do','aWindow','width=' + pedagogical_planner_width
-						+ ',height=' + pedagogical_planner_height + ',resizable,scrollbars'
-						+ getCenterParams(pedagogical_planner_width, pedagogical_planner_height));
-	} else {
-		if(authorWin && !authorWin.closed && authorWin.location.pathname.indexOf('pedagogicalPlanner/start.do') > -1) {
-			authorWin.focus();
-		} else {
-			authorWin = window.open('planner/pedagogicalPlanner/start.do','aWindow','width=' + pedagogical_planner_width
-					+ ',height=' + pedagogical_planner_height + ',resizable,scrollbars'
-					+ getCenterParams(pedagogical_planner_width, pedagogical_planner_height));
-			authorWin.focus();
-		}
-	}
-}
-
 function returnToMonitorLessonIntegrated( lessonID ) {
 	window.location = '/lams/home/monitorLesson.do?lessonID='+lessonID;
 }
 
-function openMonitorLesson( lessonID ) {
+function openMonitorLesson( lessonID, url, displayFullScreen ) {
+	if (!url) {
+		// change back to Home controller after upgrade!!
+		url = '/lams/monitoring/monitoring/monitorLesson.do?';
+	}
+	url += 'lessonID='+ lessonID;
+	
+	if (displayFullScreen) {
+		window.location.href = url;
+		return;
+	}
+	
+	url += '&newUI=false';
+	
 	if (isMac) {
 		if(belowMinRes) {
-			monitorLessonWin = window.open('/lams/home/monitorLesson.do?lessonID='+ lessonID,'mWindow','width=' + monitor_width 
+			monitorLessonWin = window.open(url,'mWindow','width=' + monitor_width 
 							   + ',height=' + monitor_height + ',resizable,scrollbars' + getCenterParams(monitor_width, monitor_height));
 		} else {
-			monitorLessonWin = window.open('/lams/home/monitorLesson.do?lessonID='+lessonID,'mWindow','width=' + monitor_width
+			monitorLessonWin = window.open(url,'mWindow','width=' + monitor_width
 							   + ',height=' + monitor_height + ',resizable,scrollbars' + getCenterParams(monitor_width, monitor_height));
 		}
 	} else {
 		if (monitorLessonWin && !monitorLessonWin.closed) {
-			monitorLessonWin.location = '/lams/home/monitorLesson.do?lessonID='+lessonID;
+			monitorLessonWin.location = url;
 			monitorLessonWin.focus();
 		} else {
-			monitorLessonWin = window.open('/lams/home/monitorLesson.do?lessonID='+lessonID,'mWindow','width=' + monitor_width
+			monitorLessonWin = window.open(url,'mWindow','width=' + monitor_width
 							   + ',height=' + monitor_height + ',resizable,resizable,scrollbars'
 							   + getCenterParams(monitor_width, monitor_height));
 		}
 	}
 }
 
-function openLearner( lessonId ) {
-	var learnerUrl = '/lams/home/learner.do?lessonID=' + lessonId;
+function openTBLMonitorLesson( lessonID ) {
+	openMonitorLesson(lessonID, '/lams/monitoring/tblmonitor/start.do?')
+}
+
+function openLearner( lessonId, url ) {
+	if (!url) {
+		url = '/lams/home/learner.do?';
+	}
+	var learnerUrl = url + 'lessonID=' + lessonId;
 	
 	if (isMac) {
 		learnWin = window.open(learnerUrl,'lWindow','width=' + learner_width + ',height=' + learner_height 

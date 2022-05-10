@@ -15,22 +15,8 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
+	<lams:JSImport src="includes/javascript/dialog.js" />
 	
-	<script type="text/javascript">
-		function openToolGroups(){
-			showDialog("dialogToolGroup", {
-				'width' : 900,
-				'height': 700,
-				'title'	: '<fmt:message key="tool.groups.dialog.title" />',
-				'open' : function() {
-					// load contents after opening the dialog
-					$('iframe', this).attr('src', 'openLearningLibraryGroups.do');
-				}
-			}, false);
-		}
-	</script>
-				
 </lams:head>
     
 <body class="stripes">
@@ -49,10 +35,6 @@
 					<p>
 						<fmt:message key="msg.edit.tool.content.3" />
 					</p>
-					
-					<a href="javascript:openToolGroups()" class="btn btn-default pull-right" 
-					   title="<fmt:message key='tool.groups.open.button.tooltip' />" ><fmt:message key="tool.groups.open.button" /></a>
-					<div class="clearfix"></div>
 					
 					<p>${fn:length(toolLibrary)}&nbsp;<fmt:message key="sysadmin.library.totals" /></p>
 				</div>	

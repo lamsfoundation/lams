@@ -1,15 +1,17 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<div class="question-type">
-	<c:choose>
-		<c:when test="${question.multipleAnswersAllowed}">
-			<fmt:message key="label.learning.choose.at.least.one.answer" />
-		</c:when>
-		<c:otherwise>
-			<fmt:message key="label.learning.choose.one.answer" />
-		</c:otherwise>
-	</c:choose>
-</div>
+<c:if test="${not empty toolSessionID}">
+	<div class="question-type">
+		<c:choose>
+			<c:when test="${question.multipleAnswersAllowed}">
+				<fmt:message key="label.learning.choose.at.least.one.answer" />
+			</c:when>
+			<c:otherwise>
+				<fmt:message key="label.learning.choose.one.answer" />
+			</c:otherwise>
+		</c:choose>
+	</div>
+</c:if>
 
 <div class="table-responsive">
 	<table class="table table-hover table-condensed">
@@ -32,20 +34,23 @@
 				    </c:if>			
                 </td>
 				<td class="${question.prefixAnswersWithLetters?'has-radio-button-prefix':'has-radio-button'}">
-					<c:choose>
-						<c:when test="${question.multipleAnswersAllowed}">
-							<input type="checkbox" name="question${status.index}_${option.displayOrder}" value="${true}"
-		 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
-								disabled="disabled"
-							/>
-						</c:when>
-						<c:otherwise>
-							<input type="radio" name="question${status.index}" value="${option.displayOrder}"
-		 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
-		 						disabled="disabled"
-							/>
-						</c:otherwise>
-					</c:choose>
+					<c:if test="${not empty toolSessionID}">
+						<c:choose>
+							<c:when test="${question.multipleAnswersAllowed}">
+								<input type="checkbox" name="question${status.index}_${option.displayOrder}" value="${true}"
+			 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
+									disabled="disabled"
+								/>
+							</c:when>
+							<c:otherwise>
+								<input type="radio" name="question${status.index}" value="${option.displayOrder}"
+			 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
+			 						disabled="disabled"
+								/>
+							</c:otherwise>
+						</c:choose>
+					</c:if>
+					
 					<c:if test="${question.prefixAnswersWithLetters}">
 			 			&nbsp;${option.formatPrefixLetter(answerStatus.index)}
  	                </c:if>	
@@ -81,17 +86,25 @@
 									${teams}
 									<lams:Portrait userId="${session.groupLeader.userId}"/>&nbsp;
 									<c:out value="${session.sessionName}" escapeXml="true"/>&nbsp;
+									<c:if test="${not empty sessionResults.justification}">
+										<lams:Popover titleKey="label.answer.justification">
+							          		<c:out value='${sessionResults.justification}' />
+							          	</lams:Popover>
+									</c:if>
 								</c:set>
 							</c:if>
 						</c:forEach>
 					</c:if>
 				</c:forEach>
 				<c:if test="${not empty teams}">
-					<tr class="selected-by-groups">
-						<td></td>
-						<td></td>
-						<td colspan="2">
-							<span><fmt:message key="label.learning.summary.selected.by" /></span> ${teams}
+					<tr class="selected-by-groups" >
+						<td ${isCorrect ? "class='bg-success'" : "" }></td>
+						<td ${isCorrect ? "class='bg-success'" : "" }></td>
+						<td colspan="2" ${isCorrect ? "class='bg-success'" : "" }>
+							<span >
+								<fmt:message key="label.learning.summary.selected.by" />
+							</span>
+							${teams}
 						</td>
 					</tr>
 				</c:if>

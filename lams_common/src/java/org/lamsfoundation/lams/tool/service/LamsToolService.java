@@ -45,15 +45,19 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
 import org.lamsfoundation.lams.learningdesign.FloatingActivity;
+import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IDataFlowDAO;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
+import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
+import org.lamsfoundation.lams.tool.GroupedToolSession;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -66,7 +70,6 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 /**
  * @author Jacky Fang
@@ -90,6 +93,7 @@ public class LamsToolService implements ILamsToolService {
     private ILamsCoreToolService lamsCoreToolService;
     private ILessonService lessonService;
     private ILearnerService learnerService;
+    private ILearningDesignService learningDesignService;
     private IUserManagementService userManagementService;
     private IDataFlowDAO dataFlowDAO;
 
@@ -171,6 +175,12 @@ public class LamsToolService implements ILamsToolService {
     }
 
     @Override
+    public Group getGroup(long toolSessionId) {
+	GroupedToolSession session = activityDAO.find(GroupedToolSession.class, toolSessionId);
+	return session == null ? null : session.getSessionGroup();
+    }
+
+    @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	logEventService.logStartEditingActivityInMonitor(toolContentID);
     }
@@ -178,18 +188,17 @@ public class LamsToolService implements ILamsToolService {
     @Override
     public String getActivityEvaluation(Long toolContentId) {
 	ToolActivity toolActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
-	ActivityEvaluation evaluation = toolActivity.getEvaluation();
+	ActivityEvaluation evaluation = activityDAO.getEvaluationByActivityId(toolActivity.getActivityId());
 	return evaluation == null ? null : evaluation.getToolOutputDefinition();
     }
 
     @Override
     public void setActivityEvaluation(Long toolContentId, String toolOutputDefinition) {
 	ToolActivity toolActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
-	ActivityEvaluation evaluation = toolActivity.getEvaluation();
+	ActivityEvaluation evaluation = activityDAO.getEvaluationByActivityId(toolActivity.getActivityId());
 
 	if (StringUtils.isEmpty(toolOutputDefinition)) {
 	    if (evaluation != null) {
-		toolActivity.setEvaluation(null);
 		activityDAO.delete(evaluation);
 	    }
 	    gradebookService.removeActivityMark(toolContentId);
@@ -200,7 +209,6 @@ public class LamsToolService implements ILamsToolService {
 	if (evaluation == null) {
 	    evaluation = new ActivityEvaluation();
 	    evaluation.setActivity(toolActivity);
-	    toolActivity.setEvaluation(evaluation);
 	} else {
 	    isToolOutputDefinitionChanged = !toolOutputDefinition.equals(evaluation.getToolOutputDefinition());
 	}
@@ -232,12 +240,11 @@ public class LamsToolService implements ILamsToolService {
 
 	ToolSession toolSession = this.getToolSession(toolSessionId);
 	ToolActivity specifiedActivity = toolSession.getToolActivity();
-	Activity leaderSelectionActivity = getNearestLeaderSelectionActivity(specifiedActivity, learnerId,
-		toolSession.getLesson().getLessonId());
+	Activity leaderSelectionActivity = getNearestLeaderSelectionActivity(specifiedActivity, learnerId);
 
 	// check if there is leaderSelectionTool available
 	if (leaderSelectionActivity != null) {
-	    User learner = (User) toolContentDAO.find(User.class, learnerId);
+	    User learner = toolContentDAO.find(User.class, learnerId);
 	    String outputName = LamsToolService.LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID;
 	    ToolSession leaderSelectionSession = toolSessionDAO.getToolSessionByLearner(learner,
 		    leaderSelectionActivity);
@@ -260,8 +267,7 @@ public class LamsToolService implements ILamsToolService {
 
 	ToolSession toolSession = this.getToolSession(toolSessionId);
 	ToolActivity specifiedActivity = toolSession.getToolActivity();
-	Activity leaderSelectionActivity = getNearestLeaderSelectionActivity(specifiedActivity, learnerId,
-		toolSession.getLesson().getLessonId());
+	Activity leaderSelectionActivity = getNearestLeaderSelectionActivity(specifiedActivity, learnerId);
 
 	// check if there is leaderSelectionTool available
 	if (leaderSelectionActivity != null) {
@@ -276,7 +282,7 @@ public class LamsToolService implements ILamsToolService {
     public Set<Long> getLeaderUserId(Long leaderSelectionActivityId) {
 	Activity activity = activityDAO.getActivityByActivityId(leaderSelectionActivityId);
 	List<ToolSession> toolSessions = toolSessionDAO.getToolSessionByActivity(activity);
-	Set<Long> result = new TreeSet<Long>();
+	Set<Long> result = new TreeSet<>();
 	for (ToolSession toolSession : toolSessions) {
 	    ToolOutput output = lamsCoreToolService.getOutputFromTool(LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID,
 		    toolSession, null);
@@ -290,14 +296,26 @@ public class LamsToolService implements ILamsToolService {
 	return result;
     }
 
+    @Override
+    public Long getNearestLeaderSelectionToolContentId(long toolSessionId) {
+	ToolSession session = activityDAO.find(ToolSession.class, toolSessionId);
+	ToolActivity leaderSelection = getNearestLeaderSelectionActivity(session.getToolActivity(), null);
+	return leaderSelection == null ? null : leaderSelection.getToolContentId();
+    }
+
     /**
      * Finds the nearest Leader Select activity. Works recursively. Tries to find Leader Select activity in the previous
      * activities set first, and then inside the parent set.
      */
     @SuppressWarnings("rawtypes")
-    private Activity getNearestLeaderSelectionActivity(Activity activity, Integer userId, Long lessonId) {
+    private ToolActivity getNearestLeaderSelectionActivity(Activity activity, Integer userId) {
 	// check if current activity is Leader Select one. if so - stop searching and return it.
 	Class activityClass = Hibernate.getClass(activity);
+
+	if (userId == null && activityClass.equals(FloatingActivity.class)) {
+	    return null;
+	}
+
 	if (activityClass.equals(ToolActivity.class)) {
 	    ToolActivity toolActivity;
 
@@ -312,17 +330,18 @@ public class LamsToolService implements ILamsToolService {
 	    }
 
 	    if (ILamsToolService.LEADER_SELECTION_TOOL_SIGNATURE.equals(toolActivity.getTool().getToolSignature())) {
-		return activity;
+		return toolActivity;
 	    }
 
 	    //in case of a floating activity
 	} else if (activityClass.equals(FloatingActivity.class)) {
+	    Long lessonId = activity.getLearningDesign().getLessons().iterator().next().getLessonId();
 	    LearnerProgress learnerProgress = lessonService.getUserProgressForLesson(userId, lessonId);
 	    Map<Activity, CompletedActivityProgress> completedActivities = learnerProgress.getCompletedActivities();
 
 	    //find the earliest finished Leader Select Activity
 	    Date leaderSelectActivityFinishDate = null;
-	    Activity leaderSelectionActivity = null;
+	    ToolActivity leaderSelectionActivity = null;
 	    for (Activity completedActivity : completedActivities.keySet()) {
 
 		if (completedActivity instanceof ToolActivity) {
@@ -349,13 +368,13 @@ public class LamsToolService implements ILamsToolService {
 	Transition transitionTo = activity.getTransitionTo();
 	if (transitionTo != null) {
 	    Activity fromActivity = transitionTo.getFromActivity();
-	    return getNearestLeaderSelectionActivity(fromActivity, userId, lessonId);
+	    return getNearestLeaderSelectionActivity(fromActivity, userId);
 	}
 
 	// check parent activity
 	Activity parent = activity.getParentActivity();
 	if (parent != null) {
-	    return getNearestLeaderSelectionActivity(parent, userId, lessonId);
+	    return getNearestLeaderSelectionActivity(parent, userId);
 	}
 
 	return null;
@@ -370,10 +389,10 @@ public class LamsToolService implements ILamsToolService {
 	    return null;
 	}
 
-	Set<Long> confidenceProvidingActivityIds = new LinkedHashSet<Long>();
+	Set<Long> confidenceProvidingActivityIds = new LinkedHashSet<>();
 	findPrecedingAssessmentActivities(specifiedActivity, confidenceProvidingActivityIds);
 
-	Set<ToolActivity> confidenceProvidingActivities = new LinkedHashSet<ToolActivity>();
+	Set<ToolActivity> confidenceProvidingActivities = new LinkedHashSet<>();
 	for (Long confidenceProvidingActivityId : confidenceProvidingActivityIds) {
 	    ToolActivity confidenceProvidingActivity = (ToolActivity) activityDAO
 		    .getActivityByActivityId(confidenceProvidingActivityId, ToolActivity.class);
@@ -438,7 +457,7 @@ public class LamsToolService implements ILamsToolService {
 	    return;
 	}
     }
-    
+
     @Override
     public Set<ToolActivity> getActivitiesProvidingVsaAnswers(Long toolContentId) {
 	ToolActivity specifiedActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
@@ -448,10 +467,10 @@ public class LamsToolService implements ILamsToolService {
 	    return null;
 	}
 
-	Set<Long> providingVsaAnswersActivityIds = new LinkedHashSet<Long>();
+	Set<Long> providingVsaAnswersActivityIds = new LinkedHashSet<>();
 	findPrecedingAssessmentActivities(specifiedActivity, providingVsaAnswersActivityIds);
 
-	Set<ToolActivity> activitiesProvidingVsaAnswers = new LinkedHashSet<ToolActivity>();
+	Set<ToolActivity> activitiesProvidingVsaAnswers = new LinkedHashSet<>();
 	for (Long confidenceProvidingActivityId : providingVsaAnswersActivityIds) {
 	    ToolActivity activityProvidingVsaAnswers = (ToolActivity) activityDAO
 		    .getActivityByActivityId(confidenceProvidingActivityId, ToolActivity.class);
@@ -464,7 +483,7 @@ public class LamsToolService implements ILamsToolService {
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevelsByActivity(Integer confidenceLevelActivityUiid,
 	    Integer requestorUserId, Long requestorToolSessionId) {
-	User user = (User) activityDAO.find(User.class, requestorUserId);
+	User user = activityDAO.find(User.class, requestorUserId);
 	if (user == null) {
 	    throw new ToolException("No user found for userId=" + requestorUserId);
 	}
@@ -490,11 +509,11 @@ public class LamsToolService implements ILamsToolService {
 		.getConfidenceLevelsByToolSession(confidenceLevelSession);
 	return confidenceLevelDtos;
     }
-    
+
     @Override
     public Collection<VsaAnswerDTO> getVsaAnswersFromAssessment(Integer activityUiidProvidingVsaAnswers,
 	    Integer requestorUserId, Long requestorToolSessionId) {
-	User user = (User) activityDAO.find(User.class, requestorUserId);
+	User user = activityDAO.find(User.class, requestorUserId);
 	if (user == null) {
 	    throw new ToolException("No user found for userId=" + requestorUserId);
 	}
@@ -509,19 +528,67 @@ public class LamsToolService implements ILamsToolService {
 	ToolSession assessmentSession = toolSessionDAO.getToolSessionByLearner(user, activityProvidingVsaAnswers);
 	return lamsCoreToolService.getVsaAnswersByToolSession(assessmentSession);
     }
-    
+
+    /**
+     * Get answers for VSA questions which are not already assigned to any of question's options.
+     */
     @Override
-    public void recalculateScratchieMarksForVsaQuestion(Long qbQuestionUid) {
+    public Map<QbToolQuestion, Map<String, Integer>> getUnallocatedVSAnswers(long toolContentId) {
+	ToolActivity specifiedActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
+	Tool tool = specifiedActivity.getTool();
+	if (tool.getToolSignature().equals(CommonConstants.TOOL_SIGNATURE_ASSESSMENT)) {
+	    ICommonAssessmentService sessionManager = (ICommonAssessmentService) lamsCoreToolService
+		    .findToolService(tool);
+	    return sessionManager.getUnallocatedVSAnswers(toolContentId);
+	} else if (tool.getToolSignature().equals(CommonConstants.TOOL_SIGNATURE_SCRATCHIE)) {
+	    ICommonScratchieService sessionManager = (ICommonScratchieService) lamsCoreToolService
+		    .findToolService(tool);
+	    return sessionManager.getUnallocatedVSAnswers(toolContentId);
+	}
+	return null;
+    }
+
+    @Override
+    public boolean recalculateMarksForVsaQuestion(Long toolQuestionUid, String answer) {
+	boolean answerFoundInLearnerResults = recalculateAssessmentMarksForVsaQuestion(toolQuestionUid, answer);
+	answerFoundInLearnerResults |= recalculateScratchieMarksForVsaQuestion(toolQuestionUid, answer);
+	return answerFoundInLearnerResults;
+    }
+
+    private boolean recalculateAssessmentMarksForVsaQuestion(Long toolQuestionUid, String answer) {
+	Tool assessmentTool = toolDAO.getToolBySignature(CommonConstants.TOOL_SIGNATURE_ASSESSMENT);
+	ICommonAssessmentService sessionManager = (ICommonAssessmentService) lamsCoreToolService
+		.findToolService(assessmentTool);
+	return sessionManager.recalculateMarksForVsaQuestion(toolQuestionUid, answer);
+    }
+
+    private boolean recalculateScratchieMarksForVsaQuestion(Long toolQuestionUid, String answer) {
 	Tool scratchieTool = toolDAO.getToolBySignature(CommonConstants.TOOL_SIGNATURE_SCRATCHIE);
 	ICommonScratchieService sessionManager = (ICommonScratchieService) lamsCoreToolService
 		.findToolService(scratchieTool);
-	sessionManager.recalculateScratchieMarksForVsaQuestion(qbQuestionUid);
+	return sessionManager.recalculateMarksForVsaQuestion(toolQuestionUid, answer);
     }
 
     @Override
     public Integer getCountUsersForActivity(Long toolSessionId) {
 	ToolSession session = toolSessionDAO.getToolSession(toolSessionId);
 	return session.getLearners().size();
+    }
+
+    /**
+     * Updates TBL iRAT/tRAT activity with questions from matching tRAT/iRAT activity
+     */
+    @Override
+    public boolean syncRatQuestions(long toolContentId, List<Long> newQuestionUids) {
+	Long matchingRATActivityId = learningDesignService.findMatchingRatActivity(toolContentId);
+	if (matchingRATActivityId == null) {
+	    return false;
+	}
+
+	ToolActivity ratActivity = activityDAO.getToolActivityByToolContentId(matchingRATActivityId);
+	Tool tool = ratActivity.getTool();
+	IQbToolService qbToolService = (IQbToolService) lamsCoreToolService.findToolService(tool);
+	return qbToolService.syncRatQuestions(matchingRATActivityId, newQuestionUids);
     }
 
     // ---------------------------------------------------------------------
@@ -572,6 +639,10 @@ public class LamsToolService implements ILamsToolService {
 
     public void setLearnerService(ILearnerService learnerService) {
 	this.learnerService = learnerService;
+    }
+
+    public void setLearningDesignService(ILearningDesignService learningDesignService) {
+	this.learningDesignService = learningDesignService;
     }
 
     /**

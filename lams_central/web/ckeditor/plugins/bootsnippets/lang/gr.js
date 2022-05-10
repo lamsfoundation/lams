@@ -18,6 +18,7 @@ CKEDITOR.plugins.setLang( 'bootsnippets', 'gr', {
 	textThreeColumns: 'Three columns',
 	textStatement: 'Statement',
 	textNote: 'Note',
+	textLabel: 'Labels'
 	textQuote: 'Quote (center picture) paragraph above',
 	textTable: 'Table',
 	textPanel: 'Panel (heading and body)',

@@ -21,14 +21,11 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.rsrc.dto;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 
 /**
  * List contains following element: <br>
@@ -50,7 +47,6 @@ public class ResourceItemDTO {
     private boolean itemCreateByAuthor;
     private boolean itemHide;
     private String itemTitle;
-    private List<String> itemInstructions = new ArrayList<String>();
     private String username;
     private int viewNumber;
     private boolean allowRating;
@@ -59,9 +55,6 @@ public class ResourceItemDTO {
 
     // true: initial group item, false, belong to some group.
     private boolean isInitGroup;
-
-    public ResourceItemDTO() {
-    }
 
     /**
      * Contruction method for monitoring summary function.
@@ -79,7 +72,11 @@ public class ResourceItemDTO {
 	    this.itemCreateByAuthor = item.isCreateByAuthor();
 	    this.itemHide = item.isHide();
 	    this.itemTitle = item.getTitle();
-	    this.username = item.getCreateBy() == null ? "" : item.getCreateBy().getLoginName();
+	    ResourceUser user = item.getCreateBy();
+	    if (user != null) {
+		this.username = user.getFirstName() + " " + user.getLastName() + " (" + user.getLoginName() + ")";
+	    }
+
 	    this.setAllowRating(item.isAllowRating());
 	    this.setAllowComments(item.isAllowComments());
 	} else {
@@ -151,14 +148,6 @@ public class ResourceItemDTO {
 	this.isInitGroup = isInitGroup;
     }
 
-    public List<String> getItemInstructions() {
-	return itemInstructions;
-    }
-
-    public void setItemInstructions(List<String> itemInstructions) {
-	this.itemInstructions = itemInstructions;
-    }
-
     public ItemRatingDTO getRatingDTO() {
 	return ratingDTO;
     }
@@ -176,10 +165,10 @@ public class ResourceItemDTO {
     }
 
     public boolean isAllowComments() {
-        return allowComments;
+	return allowComments;
     }
 
     public void setAllowComments(boolean allowComments) {
-        this.allowComments = allowComments;
+	this.allowComments = allowComments;
     }
 }

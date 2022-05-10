@@ -24,11 +24,15 @@
 
 <module xmlns="urn:jboss:module:1.5" name="org.owasp.csrfguard">
   <resources>
-    <resource-root path="csrfguard-3.1.0-custom-2020.01.07.jar"/>
+    <resource-root path="csrfguard-4.1.3-custom-2022.04.03.jar"/>
+    <resource-root path="csrfguard-extension-session-4.1.3.jar"/>
+    <resource-root path="csrfguard-jsp-tags-4.1.3.jar"/>
   </resources>
   
   <dependencies>
   	<module name="javax.servlet.api" />
   	<module name="javax.servlet.jsp.api" />
+  	<module name="org.slf4j"/>
+  	<module name="org.apache.commons.lang3"/>
   </dependencies>
 </module>

@@ -18,6 +18,7 @@
 package org.apache.poi.hssf.record.aggregates;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import org.apache.poi.hssf.model.RecordStream;
 import org.apache.poi.hssf.record.BlankRecord;
@@ -28,8 +29,10 @@ import org.apache.poi.hssf.record.Record;
 import org.apache.poi.hssf.record.RecordBase;
 import org.apache.poi.hssf.record.StringRecord;
 import org.apache.poi.hssf.record.aggregates.RecordAggregate.RecordVisitor;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.formula.FormulaShifter;
 import org.apache.poi.ss.formula.ptg.Ptg;
+import org.apache.poi.util.Removal;
 
 /**
  *
@@ -250,7 +253,7 @@ public final class ValueRecordsAggregate implements Iterable<CellValueRecordInte
 				RecordAggregate agg = (RecordAggregate) cvr;
 				agg.visitContainedRecords(rv);
 			} else {
-				rv.visitRecord((Record) cvr);
+				rv.visitRecord((org.apache.poi.hssf.record.Record) cvr);
 			}
 		}
 	}
@@ -275,7 +278,7 @@ public final class ValueRecordsAggregate implements Iterable<CellValueRecordInte
 
 		short[] xfs = new short[nBlank];
 		for (int i = 0; i < xfs.length; i++) {
-			xfs[i] = ((BlankRecord)cellValues[startIx + i]).getXFIndex();
+			xfs[i] = cellValues[startIx + i].getXFIndex();
 		}
 		int rowIx = cellValues[startIx].getRow();
 		return new MulBlankRecord(rowIx, startIx, xfs);
@@ -307,8 +310,8 @@ public final class ValueRecordsAggregate implements Iterable<CellValueRecordInte
 	 */
 	class ValueIterator implements Iterator<CellValueRecordInterface> {
 
-		int curRowIndex = 0, curColIndex = -1;
-		int nextRowIndex = 0, nextColIndex = -1;
+		int curRowIndex, curColIndex = -1;
+		int nextRowIndex, nextColIndex = -1;
 
 		public ValueIterator() {
 			getNextPos();
@@ -337,8 +340,9 @@ public final class ValueRecordsAggregate implements Iterable<CellValueRecordInte
 		}
 
 		public CellValueRecordInterface next() {
-			if (!hasNext())
-				throw new IndexOutOfBoundsException("iterator has no next");
+			if (!hasNext()) {
+				throw new NoSuchElementException();
+			}
 
 			curRowIndex = nextRowIndex;
 			curColIndex = nextColIndex;
@@ -357,6 +361,13 @@ public final class ValueRecordsAggregate implements Iterable<CellValueRecordInte
 		return new ValueIterator();
 	}
 
+	/**
+	 * @deprecated use {@link org.apache.poi.hssf.usermodel.HSSFSheet#cloneSheet(HSSFWorkbook)} instead
+	 */
+	@Override
+	@SuppressWarnings("squid:S2975")
+	@Deprecated
+	@Removal(version = "5.0.0")
 	public Object clone() {
 		throw new RuntimeException("clone() should not be called.  ValueRecordsAggregate should be copied via Sheet.cloneSheet()");
 	}

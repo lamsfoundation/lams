@@ -32,10 +32,31 @@
 	    -webkit-border-radius:0;
 	    -khtml-border-radius:0;
 	}
+	
+	#collapseBurning .panel {
+		margin-bottom: 20px;
+	}
+	
+	#collapseBurning .panel-heading a:after {
+	  font-family: FontAwesome;
+	  content: "\f139";
+	  float: right;
+	  color: grey;
+	}
+	
+	#collapseBurning .panel-heading a.collapsed:after {
+	  content: "\f13a";
+	 }
+	
+	#collapseBurning .burning-question-title {
+	  cursor: pointer;
+	}
 </style>
 
 <script type="text/javascript">
 	$(document).ready(function(){
+		 $('[data-toggle="tooltip"]').bootstrapTooltip();
+		 
 		var oldValue = 0;
 		
 		<c:forEach var="summary" items="${summaryList}" varStatus="status">
@@ -119,7 +140,7 @@
    	   				totalAttempts:"${summary.leaderUid eq user.uid ? summary.totalAttempts : ''}",
    	   				mark:"${summary.leaderUid eq user.uid ? (summary.totalAttempts == 0 ? '-' : summary.mark) : ''}",
    	   				portraitId:"${user.portraitId}",
-   	   				isLeader : "${summary.leaderUid eq user.uid}",
+   	   				isLeader : "${not empty summary.leaderUid and summary.leaderUid eq user.uid}",
    	   				reachedActivity : "${summary.getUsersWhoReachedActivity().contains(user.userId)}"
    	   	   	    });
 	        </c:forEach>
@@ -142,7 +163,7 @@
 				guiStyle: "bootstrap",
 				iconSet: 'fontAwesome',
 			   	colNames:['#',
-						"<fmt:message key='label.monitoring.summary.user.name' />",
+						"<fmt:message key='label.team' />",
 					    "<fmt:message key='label.burning.questions' />",
 						"<fmt:message key='label.count' />"
 				],
@@ -217,7 +238,7 @@
     		var icon = '';
     		
     		if (rowObject.isLeader == 'true') {
-    			icon = '&nbsp;<i title="leader" class="text-primary fa fa-star"></i>';
+    			icon = '&nbsp;<i title="<fmt:message key="label.monitoring.team.leader"/>" class="text-primary fa fa-star"></i>';
     		} else if (rowObject.reachedActivity == 'true') {
     			icon = '&nbsp;<i class="text-primary fa fa-check"></i>';
     		}
@@ -229,7 +250,7 @@
     				name = name.replace('</a>', icon + '</a>');
     			}
     		}
-        
+    		
     		return name;
     	}
         
@@ -285,6 +306,38 @@
 		var url = "<c:url value='/monitoring/exportExcel.do'/>?<csrf:token/>&sessionMapID=${sessionMapID}&reqID=" + (new Date()).getTime();
 		return downloadFile(url, 'messageArea_Busy', '<fmt:message key="label.summary.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
 	};
+
+	function showChangeLeaderModal(toolSessionId) {
+		$('#change-leader-modals').empty()
+		.load('<c:url value="/monitoring/displayChangeLeaderForGroupDialogFromActivity.do" />',{
+			toolSessionID : toolSessionId
+		});
+	}
+
+	function onChangeLeaderCallback(response, leaderUserId, toolSessionId){
+        if (response.isSuccessful) {
+            $.ajax({
+    			'url' : '<c:url value="/monitoring/changeLeaderForGroup.do"/>',
+    			'type': 'post',
+    			'cache' : 'false',
+    			'data': {
+    				'toolSessionID' : toolSessionId,
+    				'leaderUserId' : leaderUserId,
+    				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
+    			},
+    			success : function(){
+    				alert("<fmt:message key='label.monitoring.leader.successfully.changed'/>");
+    				location.reload();
+    			},
+    			error : function(){
+    				alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+        		}
+            });
+        	
+		} else {
+			alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+		}
+	}
 	
 	// pass settings to monitorToolSummaryAdvanced.js
 	var submissionDeadlineSettings = {
@@ -292,11 +345,12 @@
 		submissionDeadline: '${submissionDeadline}',
 		submissionDateString: '${submissionDateString}',
 		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>?<csrf:token/>',
-		toolContentID: '${param.toolContentID}',
+		toolContentID: '${scratchie.contentId}',
 		messageNotification: '<fmt:message key="monitor.summary.notification" />',
 		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
 		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
 	};
+
 
 </script>
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
@@ -330,7 +384,7 @@
 	<c:set var="showStudentChoicesTableOnly" value="true" />
 	<h4><fmt:message key="monitoring.tab.summary" /></h4>
 	<%@ include file="studentChoices.jsp"%>
-
+	
 	<div class="form-group">
 		<!-- Dropdown menu for choosing scratchie item -->
 		<label for="item-uid"><h4><fmt:message key="label.monitoring.summary.report.by.scratchie" /></h4></label>
@@ -342,6 +396,13 @@
 		</select>
 		<a href="#nogo" class="thickbox" id="item-summary-href" style="display: none;"></a>
 	</div>
+	
+	<c:if test="${vsaPresent}">
+		<a class="btn btn-sm btn-default buttons_column" target="_blank"
+		   href='<lams:LAMSURL />qb/vsa/displayVsaAllocate.do?toolContentID=${scratchie.contentId}'>
+			<fmt:message key="label.vsa.allocate.button" />
+		</a>
+	</c:if>
 
 	<h4 style="padding-top: 10px"><fmt:message key="label.report.by.team.tra" /></h4>
 	<fmt:message key="label.monitoring.summary.select.student" />
@@ -360,6 +421,12 @@
 					aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${summary.sessionId}" >
 				${summaryTitle}</a>
 			</span>
+			<c:if test="${fn:length(summary.users) > 0 and not summary.scratchingFinished}">
+				<button type="button" class="btn btn-default btn-xs pull-right"
+						onClick="javascript:showChangeLeaderModal(${summary.sessionId})">
+					<fmt:message key='label.monitoring.change.leader'/>
+				</button>
+			</c:if>
         </div>
         
         <div id="collapse${summary.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${summary.sessionId}">
@@ -383,19 +450,8 @@
 		      		</span>
 		        </div>
 		
-		        <div id="collapseBurning" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingBurning">
-					<c:forEach var="burningQuestionItemDto" items="${sessionMap.burningQuestionItemDtos}" varStatus="i">
-						<div class="voffset5"><strong>
-							<c:if test="${not i.last}">
-								${i.count})&nbsp;
-								
-							</c:if>
-							<c:if test="${not sessionMap.hideTitles}">
-								<c:out value="${burningQuestionItemDto.scratchieItem.qbQuestion.name}" />
-							</c:if>
-						</strong></div>
-						<table id="burningQuestions${burningQuestionItemDto.scratchieItem.uid}" class="scroll" cellpadding="0" cellspacing="0"></table>
-					</c:forEach>
+		        <div id="collapseBurning" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingBurning" style="padding: 10px;">
+					<%@ include file="parts/burningQuestions.jsp"%>
 				</div>
 			</div>
 		</div>
@@ -429,4 +485,8 @@
 	
 <%@ include file="parts/advanceOptions.jsp"%>
 
+<%@ include file="parts/timeLimit.jsp"%>
+
 <%@ include file="parts/dateRestriction.jsp"%>
+
+<div id="change-leader-modals"></div>

@@ -52,7 +52,7 @@
 			   		{name:'name',index:'name', width:260, firstsortorder:'desc', sorttype: 'text'}
 			   	],
 			    rowList:[10,20,30,40,50,100],
-			   	rowNum:10,
+			   	rowNum:2,
 			   	pager: '#pager3',
 			   	sortname: 'name',
 			   	multiselect: true,

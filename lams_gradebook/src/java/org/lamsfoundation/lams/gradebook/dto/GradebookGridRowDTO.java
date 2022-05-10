@@ -22,7 +22,6 @@
 
 package org.lamsfoundation.lams.gradebook.dto;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -33,9 +32,6 @@ public abstract class GradebookGridRowDTO {
     public abstract ArrayList<String> toStringArray(GBGridView view);
 
     protected static final String CELL_EMPTY = "-";
-
-    protected static final DateFormat DEFAULT_DATE_FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT,
-	    DateFormat.SHORT);
 
     // The id for a row, might be activityId, userId, lessonID etc
     protected String id;
@@ -77,60 +73,6 @@ public abstract class GradebookGridRowDTO {
     protected String outcomes;
 
     protected boolean displayMarkAsPercent = false;
-
-    /**
-     * A shared function to convert milliseconds into a readable string
-     *
-     * @param timeInMillis
-     * @return
-     */
-    protected String convertTimeToString(Long timeInMillis) {
-	StringBuilder sb = new StringBuilder();
-	if (timeInMillis != null && timeInMillis > 1000) {
-	    long totalTimeInSeconds = timeInMillis / 1000;
-
-	    long seconds = (totalTimeInSeconds >= 60 ? totalTimeInSeconds % 60 : totalTimeInSeconds);
-	    long minutes = (totalTimeInSeconds = (totalTimeInSeconds / 60)) >= 60 ? totalTimeInSeconds % 60
-		    : totalTimeInSeconds;
-	    long hours = (totalTimeInSeconds = (totalTimeInSeconds / 60)) >= 24 ? totalTimeInSeconds % 24
-		    : totalTimeInSeconds;
-	    long days = (totalTimeInSeconds = (totalTimeInSeconds / 24));
-
-	    if (days != 0) {
-		sb.append("" + days + "d, ");
-	    }
-	    if (hours != 0) {
-		sb.append("" + hours + "h, ");
-	    }
-	    if (minutes != 0) {
-		sb.append("" + minutes + "m, ");
-	    }
-	    if (seconds != 0) {
-		sb.append("" + seconds + "s");
-	    }
-	}
-
-	if (sb.length() > 0) {
-	    return sb.toString();
-	} else {
-	    return null;
-	}
-    }
-
-    /**
-     * A shared function to convert date into a readable string
-     *
-     * @param date
-     *            to format
-     * @return formatted date
-     */
-    protected String convertDateToString(Date date, DateFormat format) {
-	if (date != null) {
-	    DateFormat usedFormat = format == null ? DEFAULT_DATE_FORMAT : format;
-	    return usedFormat.format(date);
-	}
-	return null;
-    }
 
     protected String toItalic(String string) {
 	return "<i>" + string + "</i>";

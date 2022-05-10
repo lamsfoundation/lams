@@ -32,56 +32,14 @@ import org.apache.poi.ddf.EscherContainerRecord;
 import org.apache.poi.ddf.EscherDgRecord;
 import org.apache.poi.ddf.EscherDggRecord;
 import org.apache.poi.ddf.EscherOptRecord;
-import org.apache.poi.ddf.EscherProperties;
+import org.apache.poi.ddf.EscherPropertyTypes;
 import org.apache.poi.ddf.EscherRGBProperty;
 import org.apache.poi.ddf.EscherRecord;
 import org.apache.poi.ddf.EscherSimpleProperty;
 import org.apache.poi.ddf.EscherSpRecord;
 import org.apache.poi.ddf.EscherSplitMenuColorsRecord;
 import org.apache.poi.hssf.extractor.OldExcelExtractor;
-import org.apache.poi.hssf.record.BOFRecord;
-import org.apache.poi.hssf.record.BackupRecord;
-import org.apache.poi.hssf.record.BookBoolRecord;
-import org.apache.poi.hssf.record.BoundSheetRecord;
-import org.apache.poi.hssf.record.CodepageRecord;
-import org.apache.poi.hssf.record.CountryRecord;
-import org.apache.poi.hssf.record.DSFRecord;
-import org.apache.poi.hssf.record.DateWindow1904Record;
-import org.apache.poi.hssf.record.DrawingGroupRecord;
-import org.apache.poi.hssf.record.EOFRecord;
-import org.apache.poi.hssf.record.EscherAggregate;
-import org.apache.poi.hssf.record.ExtSSTRecord;
-import org.apache.poi.hssf.record.ExtendedFormatRecord;
-import org.apache.poi.hssf.record.ExternSheetRecord;
-import org.apache.poi.hssf.record.FileSharingRecord;
-import org.apache.poi.hssf.record.FnGroupCountRecord;
-import org.apache.poi.hssf.record.FontRecord;
-import org.apache.poi.hssf.record.FormatRecord;
-import org.apache.poi.hssf.record.HideObjRecord;
-import org.apache.poi.hssf.record.HyperlinkRecord;
-import org.apache.poi.hssf.record.InterfaceEndRecord;
-import org.apache.poi.hssf.record.InterfaceHdrRecord;
-import org.apache.poi.hssf.record.MMSRecord;
-import org.apache.poi.hssf.record.NameCommentRecord;
-import org.apache.poi.hssf.record.NameRecord;
-import org.apache.poi.hssf.record.PaletteRecord;
-import org.apache.poi.hssf.record.PasswordRecord;
-import org.apache.poi.hssf.record.PasswordRev4Record;
-import org.apache.poi.hssf.record.PrecisionRecord;
-import org.apache.poi.hssf.record.ProtectRecord;
-import org.apache.poi.hssf.record.ProtectionRev4Record;
-import org.apache.poi.hssf.record.RecalcIdRecord;
-import org.apache.poi.hssf.record.Record;
-import org.apache.poi.hssf.record.RefreshAllRecord;
-import org.apache.poi.hssf.record.SSTRecord;
-import org.apache.poi.hssf.record.StyleRecord;
-import org.apache.poi.hssf.record.SupBookRecord;
-import org.apache.poi.hssf.record.TabIdRecord;
-import org.apache.poi.hssf.record.UseSelFSRecord;
-import org.apache.poi.hssf.record.WindowOneRecord;
-import org.apache.poi.hssf.record.WindowProtectRecord;
-import org.apache.poi.hssf.record.WriteAccessRecord;
-import org.apache.poi.hssf.record.WriteProtectRecord;
+import org.apache.poi.hssf.record.*;
 import org.apache.poi.hssf.record.common.UnicodeString;
 import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
 import org.apache.poi.poifs.crypt.CryptoFunctions;
@@ -136,6 +94,7 @@ public final class InternalWorkbook {
         "Workbook", // as per BIFF8 spec
         "WORKBOOK", // Typically from third party programs
         "BOOK",     // Typically odd Crystal Reports exports
+        "WorkBook", // Another third party program special
     };
     /**
      * Name of older (pre-Excel 97) Workbook streams, which
@@ -183,7 +142,7 @@ public final class InternalWorkbook {
     /** whether 1904 date windowing is being used */
     private boolean uses1904datewindowing;
     private DrawingManager2 drawingManager;
-    private List<EscherBSERecord> escherBSERecords;
+    private final List<EscherBSERecord> escherBSERecords;
     private WindowOneRecord windowOne;
     private FileSharingRecord fileShare;
     private WriteAccessRecord writeAccess;
@@ -197,15 +156,15 @@ public final class InternalWorkbook {
     private InternalWorkbook() {
     	records     = new WorkbookRecordList();
 
-		boundsheets = new ArrayList<BoundSheetRecord>();
-		formats = new ArrayList<FormatRecord>();
-		hyperlinks = new ArrayList<HyperlinkRecord>();
+		boundsheets = new ArrayList<>();
+		formats = new ArrayList<>();
+		hyperlinks = new ArrayList<>();
 		numxfs = 0;
 		numfonts = 0;
 		maxformatid = -1;
 		uses1904datewindowing = false;
-		escherBSERecords = new ArrayList<EscherBSERecord>();
-		commentRecords = new LinkedHashMap<String, NameCommentRecord>();
+		escherBSERecords = new ArrayList<>();
+		commentRecords = new LinkedHashMap<>();
     }
 
     /**
@@ -220,15 +179,15 @@ public final class InternalWorkbook {
      * @param recs an array of Record objects
      * @return Workbook object
      */
-    public static InternalWorkbook createWorkbook(List<Record> recs) {
+    public static InternalWorkbook createWorkbook(List<org.apache.poi.hssf.record.Record> recs) {
         LOG.log(DEBUG, "Workbook (readfile) created with reclen=", recs.size());
         InternalWorkbook retval = new InternalWorkbook();
-        List<Record> records = new ArrayList<Record>(recs.size() / 3);
+        List<org.apache.poi.hssf.record.Record> records = new ArrayList<>(recs.size() / 3);
         retval.records.setRecords(records);
 
         boolean eofPassed = false;
         for (int k = 0; k < recs.size(); k++) {
-            Record rec = recs.get(k);
+            org.apache.poi.hssf.record.Record rec = recs.get(k);
             String logObj;
             switch (rec.getSid()) {
 
@@ -289,7 +248,7 @@ public final class InternalWorkbook {
                     logObj = "format";
                     FormatRecord fr = (FormatRecord) rec;
                     retval.formats.add(fr);
-                    retval.maxformatid = retval.maxformatid >= fr.getIndexCode() ? retval.maxformatid : fr.getIndexCode();
+                    retval.maxformatid = Math.max(retval.maxformatid, fr.getIndexCode());
                     break;
 
                 case DateWindow1904Record.sid :
@@ -369,7 +328,7 @@ public final class InternalWorkbook {
         LOG.log( DEBUG, "creating new workbook from scratch" );
 
         InternalWorkbook retval = new InternalWorkbook();
-        List<Record> records = new ArrayList<Record>( 30 );
+        List<org.apache.poi.hssf.record.Record> records = new ArrayList<>(30);
         retval.records.setRecords(records);
         List<FormatRecord> formats = retval.formats;
 
@@ -377,7 +336,8 @@ public final class InternalWorkbook {
         records.add(new InterfaceHdrRecord(CODEPAGE));
         records.add(createMMS());
         records.add(InterfaceEndRecord.instance);
-        records.add(createWriteAccess());
+        // store the write-access record at the proper position
+        retval.getWriteAccess();
         records.add(createCodepage());
         records.add(createDSF());
         records.add(createTabId());
@@ -408,7 +368,7 @@ public final class InternalWorkbook {
         // set up format records
         for (int i = 0; i <= 7; i++) {
             FormatRecord rec = createFormat(i);
-            retval.maxformatid = retval.maxformatid >= rec.getIndexCode() ? retval.maxformatid : rec.getIndexCode();
+            retval.maxformatid = Math.max(retval.maxformatid, rec.getIndexCode());
             formats.add(rec);
             records.add(rec);
         }
@@ -488,13 +448,10 @@ public final class InternalWorkbook {
         }
         if (index > (numfonts - 1)) {
             throw new ArrayIndexOutOfBoundsException(
-            "There are only " + numfonts
-            + " font records, you asked for " + idx);
+            "There are only " + numfonts + " font records, but you asked for index " + idx);
         }
-        FontRecord retval =
-        ( FontRecord ) records.get((records.getFontpos() - (numfonts - 1)) + index);
 
-        return retval;
+        return ( FontRecord ) records.get((records.getFontpos() - (numfonts - 1)) + index);
     }
 
     /**
@@ -648,7 +605,7 @@ public final class InternalWorkbook {
         // also adjust order of Records, calculate the position of the Boundsheets via getBspos()...
         int initialBspos = records.getBspos();
         int pos0 = initialBspos - (boundsheets.size() - 1);
-        Record removed = records.get(pos0 + sheetNumber);
+        org.apache.poi.hssf.record.Record removed = records.get(pos0 + sheetNumber);
         records.remove(pos0 + sheetNumber);
 		records.add(pos0 + pos, removed);
         records.setBspos(initialBspos);
@@ -729,6 +686,8 @@ public final class InternalWorkbook {
      * @since 3.16 beta 2
      */
     public void setSheetHidden(int sheetnum, SheetVisibility visibility) {
+        checkSheets(sheetnum);
+
         BoundSheetRecord bsr = getBoundSheetRec(sheetnum);
         bsr.setHidden(visibility == SheetVisibility.HIDDEN);
         bsr.setVeryHidden(visibility == SheetVisibility.VERY_HIDDEN);
@@ -816,7 +775,7 @@ public final class InternalWorkbook {
      * make the tabid record look like the current situation.
      */
     private void fixTabIdRecord() {
-        Record rec = records.get(records.getTabpos());
+        org.apache.poi.hssf.record.Record rec = records.get(records.getTabpos());
 
         // see bug 55982, quite a number of documents do not have a TabIdRecord and
         // thus there is no way to do the fixup here,
@@ -867,10 +826,8 @@ public final class InternalWorkbook {
         int xfptr = records.getXfpos() - (numxfs - 1);
 
         xfptr += index;
-        ExtendedFormatRecord retval =
-        ( ExtendedFormatRecord ) records.get(xfptr);
 
-        return retval;
+        return ( ExtendedFormatRecord ) records.get(xfptr);
     }
 
     /**
@@ -929,7 +886,7 @@ public final class InternalWorkbook {
         // Style records always follow after
         //  the ExtendedFormat records
         for(int i=records.getXfpos(); i<records.size(); i++) {
-            Record r = records.get(i);
+            org.apache.poi.hssf.record.Record r = records.get(i);
             if (r instanceof StyleRecord) {
                 StyleRecord sr = (StyleRecord)r;
                 if (sr.getXFIndex() == xfIndex) {
@@ -938,6 +895,27 @@ public final class InternalWorkbook {
             }
         }
         return null;
+    }
+
+    /**
+     * Update the StyleRecord to point to the new
+     * given index.
+     *
+     * @param oldXf the extended format index that was previously associated with this StyleRecord
+     * @param newXf the extended format index that is now associated with this StyleRecord
+     */
+    public void updateStyleRecord(int oldXf, int newXf) {
+        // Style records always follow after
+        //  the ExtendedFormat records
+        for(int i=records.getXfpos(); i<records.size(); i++) {
+            org.apache.poi.hssf.record.Record r = records.get(i);
+            if (r instanceof StyleRecord) {
+                StyleRecord sr = (StyleRecord)r;
+                if (sr.getXFIndex() == oldXf) {
+                    sr.setXFIndex(newXf);
+                }
+            }
+        }
     }
 
     /**
@@ -959,7 +937,7 @@ public final class InternalWorkbook {
         int addAt = -1;
         for(int i=records.getXfpos(); i<records.size() &&
                 addAt == -1; i++) {
-            Record r = records.get(i);
+            org.apache.poi.hssf.record.Record r = records.get(i);
             if(r instanceof ExtendedFormatRecord ||
                     r instanceof StyleRecord) {
                 // Keep going
@@ -1038,7 +1016,7 @@ public final class InternalWorkbook {
         SSTRecord lSST = null;
         int sstPos = 0;
         boolean wroteBoundSheets = false;
-        for ( Record record : records.getRecords() ) {
+        for ( org.apache.poi.hssf.record.Record record : records.getRecords() ) {
             int len = 0;
             if (record instanceof SSTRecord) {
                 lSST = (SSTRecord)record;
@@ -1059,7 +1037,7 @@ public final class InternalWorkbook {
             }
             pos += len;
         }
-        
+
         LOG.log( DEBUG, "Exiting serialize workbook" );
         return pos;
     }
@@ -1074,7 +1052,7 @@ public final class InternalWorkbook {
         // Can be a few short if new sheets were added
         if(records.getTabpos() > 0) {
             TabIdRecord tir = ( TabIdRecord ) records.get(records.getTabpos());
-            if(tir._tabids.length < boundsheets.size()) {
+            if(tir.getTabIdSize() < boundsheets.size()) {
                 fixTabIdRecord();
             }
         }
@@ -1084,7 +1062,7 @@ public final class InternalWorkbook {
         int retval = 0;
 
         SSTRecord lSST = null;
-        for ( Record record : records.getRecords() ) {
+        for ( org.apache.poi.hssf.record.Record record : records.getRecords() ) {
             if (record instanceof SSTRecord) {
                 lSST = (SSTRecord)record;
             }
@@ -1320,7 +1298,7 @@ public final class InternalWorkbook {
      */
     private static FormatRecord createFormat(int id) {
         // we'll need multiple editions for the different formats
-        final int mappings[] = { 5, 6, 7, 8, 0x2a, 0x29, 0x2c, 0x2b };
+        final int[] mappings = {5, 6, 7, 8, 0x2a, 0x29, 0x2c, 0x2b};
         if (id < 0 || id >= mappings.length) {
             throw new  IllegalArgumentException("Unexpected id " + id);
         }
@@ -1415,8 +1393,8 @@ public final class InternalWorkbook {
      */
     private static StyleRecord createStyle(int id) {
         // we'll need multiple editions
-        final int mappings[][] = {
-            { 0x010, 3 }, { 0x011, 6 }, { 0x012, 4 }, { 0x013, 7 }, { 0x000, 0 }, { 0x014, 5 }  
+        final int[][] mappings = {
+                {0x010, 3}, {0x011, 6}, {0x012, 4}, {0x013, 7}, {0x000, 0}, {0x014, 5}
         };
         if (id < 0 || id >= mappings.length) {
             throw new  IllegalArgumentException("Unexpected style id " + id);
@@ -1756,8 +1734,8 @@ public final class InternalWorkbook {
      *
      * @return the matching record or {@code null} if it wasn't found
      */
-    public Record findFirstRecordBySid(short sid) {
-        for (Record record : records.getRecords() ) {
+    public org.apache.poi.hssf.record.Record findFirstRecordBySid(short sid) {
+        for (org.apache.poi.hssf.record.Record record : records.getRecords() ) {
             if (record.getSid() == sid) {
                 return record;
             }
@@ -1772,7 +1750,7 @@ public final class InternalWorkbook {
      */
     public int findFirstRecordLocBySid(short sid) {
         int index = 0;
-        for (Record record : records.getRecords() ) {
+        for (org.apache.poi.hssf.record.Record record : records.getRecords() ) {
             if (record.getSid() == sid) {
                 return index;
             }
@@ -1789,9 +1767,9 @@ public final class InternalWorkbook {
      *
      * @return the matching record or {@code null} if it wasn't found
      */
-    public Record findNextRecordBySid(short sid, int pos) {
+    public org.apache.poi.hssf.record.Record findNextRecordBySid(short sid, int pos) {
         int matches = 0;
-        for (Record record : records.getRecords() ) {
+        for (org.apache.poi.hssf.record.Record record : records.getRecords() ) {
             if (record.getSid() == sid && matches++ == pos) {
                 return record;
             }
@@ -1804,7 +1782,7 @@ public final class InternalWorkbook {
         return hyperlinks;
     }
 
-    public List<Record> getRecords() {
+    public List<org.apache.poi.hssf.record.Record> getRecords() {
         return records.getRecords();
     }
 
@@ -1828,7 +1806,7 @@ public final class InternalWorkbook {
         PaletteRecord palette;
         int palettePos = records.getPalettepos();
         if (palettePos != -1) {
-            Record rec = records.get(palettePos);
+            org.apache.poi.hssf.record.Record rec = records.get(palettePos);
             if (rec instanceof PaletteRecord) {
                 palette = (PaletteRecord) rec;
             } else {
@@ -1855,7 +1833,7 @@ public final class InternalWorkbook {
         }
 
         // Need to find a DrawingGroupRecord that contains a EscherDggRecord
-        for(Record r : records.getRecords() ) {
+        for(org.apache.poi.hssf.record.Record r : records.getRecords() ) {
             if (!(r instanceof DrawingGroupRecord)) {
                 continue;
             }
@@ -1873,7 +1851,7 @@ public final class InternalWorkbook {
         drawingManager = findDrawingManager(dg, escherBSERecords);
         return drawingManager;
     }
-    
+
     private static DrawingManager2 findDrawingManager(DrawingGroupRecord dg, List<EscherBSERecord> escherBSERecords) {
         if (dg == null) {
             return null;
@@ -1897,7 +1875,7 @@ public final class InternalWorkbook {
         if(dgg == null) {
             return null;
         }
-            
+
         DrawingManager2 dm = new DrawingManager2(dgg);
         if(bStore != null){
             for(EscherRecord bs : bStore.getChildRecords()){
@@ -1941,9 +1919,9 @@ public final class InternalWorkbook {
             }
             opt.setRecordId((short) 0xF00B);
             opt.setOptions((short) 0x0033);
-            opt.addEscherProperty( new EscherBoolProperty(EscherProperties.TEXT__SIZE_TEXT_TO_FIT_SHAPE, 524296) );
-            opt.addEscherProperty( new EscherRGBProperty(EscherProperties.FILL__FILLCOLOR, 0x08000041) );
-            opt.addEscherProperty( new EscherRGBProperty(EscherProperties.LINESTYLE__COLOR, 134217792) );
+            opt.addEscherProperty( new EscherBoolProperty(EscherPropertyTypes.TEXT__SIZE_TEXT_TO_FIT_SHAPE, 524296) );
+            opt.addEscherProperty( new EscherRGBProperty(EscherPropertyTypes.FILL__FILLCOLOR, 0x08000041) );
+            opt.addEscherProperty( new EscherRGBProperty(EscherPropertyTypes.LINESTYLE__COLOR, 134217792) );
             splitMenuColors.setRecordId((short) 0xF11E);
             splitMenuColors.setOptions((short) 0x0040);
             splitMenuColors.setColor1(0x0800000D);
@@ -2133,7 +2111,7 @@ public final class InternalWorkbook {
         if(aggLoc == -1) {
             return;
         }
-        
+
         EscherAggregate agg = (EscherAggregate) sheet.findFirstRecordBySid(EscherAggregate.sid);
         EscherContainerRecord escherContainer = agg.getEscherContainer();
         if (escherContainer == null) {
@@ -2169,8 +2147,8 @@ public final class InternalWorkbook {
                             sp.setShapeId(shapeId);
                         } else if (recordId == EscherOptRecord.RECORD_ID){
                             EscherOptRecord opt = (EscherOptRecord)shapeChildRecord;
-                            EscherSimpleProperty prop = (EscherSimpleProperty)opt.lookup(
-                                    EscherProperties.BLIP__BLIPTODISPLAY );
+                            EscherSimpleProperty prop = opt.lookup(
+                                    EscherPropertyTypes.BLIP__BLIPTODISPLAY );
                             if (prop != null){
                                 int pictureIndex = prop.getPropertyValue();
                                 // increment reference count for pictures
@@ -2258,6 +2236,8 @@ public final class InternalWorkbook {
 
     /**
      * Only for internal calls - code based on this is not supported ...
+     *
+     * @return The list of records.
      */
     @Internal
     public WorkbookRecordList getWorkbookRecordList() {

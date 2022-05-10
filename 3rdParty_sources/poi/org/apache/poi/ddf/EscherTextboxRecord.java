@@ -17,9 +17,11 @@
 
 package org.apache.poi.ddf;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
+import org.apache.poi.util.GenericRecordUtil;
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.LittleEndian;
 import org.apache.poi.util.RecordFormatException;
 
@@ -29,27 +31,31 @@ import org.apache.poi.util.RecordFormatException;
  *  Escher format. We don't attempt to understand the contents, since
  *  they will be in the parent's format, not Escher format.
  */
-public final class EscherTextboxRecord extends EscherRecord implements Cloneable {
-    public static final short RECORD_ID = (short)0xF00D;
-    public static final String RECORD_DESCRIPTION = "msofbtClientTextbox";
+public final class EscherTextboxRecord extends EscherRecord {
+
+    //arbitrarily selected; may need to increase
+    private static final int MAX_RECORD_LENGTH = 100_000;
+
+    public static final short RECORD_ID = EscherRecordTypes.CLIENT_TEXTBOX.typeID;
 
     private static final byte[] NO_BYTES = new byte[0];
 
     /** The data for this record not including the the 8 byte header */
     private byte[] thedata = NO_BYTES;
 
-    public EscherTextboxRecord()
-    {
+    public EscherTextboxRecord() {}
+
+    public EscherTextboxRecord(EscherTextboxRecord other) {
+        super(other);
+        thedata = (other.thedata == null) ? NO_BYTES : other.thedata.clone();
     }
 
     @Override
     public int fillFields(byte[] data, int offset, EscherRecordFactory recordFactory) {
         int bytesRemaining = readHeader( data, offset );
 
-        // Save the data, ready for the calling code to do something
-        //  useful with it
-        thedata = new byte[bytesRemaining];
-        System.arraycopy( data, offset + 8, thedata, 0, bytesRemaining );
+        // Save the data, ready for the calling code to do something useful with it
+        thedata = IOUtils.safelyClone(data, offset + 8, bytesRemaining, MAX_RECORD_LENGTH);
         return bytesRemaining + 8;
     }
 
@@ -78,7 +84,7 @@ public final class EscherTextboxRecord extends EscherRecord implements Cloneable
      * does not seem to put anything here, but with PowerPoint this will
      * contain the bytes that make up a TextHeaderAtom followed by a
      * TextBytesAtom/TextCharsAtom
-     * 
+     *
      * @return the extra data
      */
     public byte[] getData()
@@ -90,22 +96,20 @@ public final class EscherTextboxRecord extends EscherRecord implements Cloneable
      * Sets the extra data (in the parent application's format) to be
      * contained by the record. Used when the parent application changes
      * the contents.
-     * 
+     *
      * @param b the buffer which contains the data
      * @param start the start position in the buffer
      * @param length the length of the block
      */
-    public void setData(byte[] b, int start, int length)
-    {
-        thedata = new byte[length];
-        System.arraycopy(b,start,thedata,0,length);
+    public void setData(byte[] b, int start, int length) {
+        thedata = IOUtils.safelyClone(b, start, length, MAX_RECORD_LENGTH);
     }
-    
+
     /**
      * Sets the extra data (in the parent application's format) to be
      * contained by the record. Used when the parent application changes
      * the contents.
-     * 
+     *
      * @param b the data
      */
     public void setData(byte[] b) {
@@ -119,34 +123,26 @@ public final class EscherTextboxRecord extends EscherRecord implements Cloneable
     }
 
     @Override
-    public EscherTextboxRecord clone() {
-        EscherTextboxRecord etr = new EscherTextboxRecord();
-        etr.setOptions(this.getOptions());
-        etr.setRecordId(this.getRecordId());
-        etr.thedata = this.thedata.clone();
-        return etr;
-    }
-
-    @Override
     public String getRecordName() {
-        return "ClientTextbox";
+        return EscherRecordTypes.CLIENT_TEXTBOX.recordName;
     }
 
     @Override
-    protected Object[][] getAttributeMap() {
-        int numCh = getChildRecords().size();
-        List<Object> chLst = new ArrayList<Object>(numCh*2+2);
-        chLst.add("children");
-        chLst.add(numCh);
-        for (EscherRecord er : getChildRecords()) {
-            chLst.add(er.getRecordName());
-            chLst.add(er);
-        }
-        
-        return new Object[][] {
-            { "isContainer", isContainerRecord() },
-            chLst.toArray(),
-            { "Extra Data", thedata }
-        };
+    public Enum getGenericRecordType() {
+        return EscherRecordTypes.CLIENT_TEXTBOX;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "base", super::getGenericProperties,
+            "isContainer", this::isContainerRecord,
+            "extraData", this::getData
+        );
+    }
+
+    @Override
+    public EscherTextboxRecord copy() {
+        return new EscherTextboxRecord(this);
     }
 }

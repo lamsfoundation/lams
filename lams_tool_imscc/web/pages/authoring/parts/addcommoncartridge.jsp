@@ -11,7 +11,7 @@
 <lams:head>
 	<%@ include file="/common/header.jsp"%>
 	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
-	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/commonCartridgeItem.js"></script>
+	<lams:JSImport src="includes/javascript/commonCartridgeItem.js" relative="true" />
 	
 	<script type="text/javascript">
 		function verifyAndSubmit() {

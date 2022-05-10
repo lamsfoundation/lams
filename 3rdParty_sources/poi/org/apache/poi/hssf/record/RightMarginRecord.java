@@ -17,29 +17,28 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
  * Record for the right margin.
  */
 public final class RightMarginRecord extends StandardRecord implements Margin {
-    public final static short sid = 0x27;
+    public static final short sid = 0x27;
     private double field_1_margin;
 
-    public RightMarginRecord()    {    }
+    public RightMarginRecord() {}
 
-    public RightMarginRecord( RecordInputStream in )
-    {
-        field_1_margin = in.readDouble();
+    public RightMarginRecord(RightMarginRecord other) {
+        super(other);
+        field_1_margin = other.field_1_margin;
     }
 
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append( "[RightMargin]\n" );
-        buffer.append( "    .margin               = " ).append( " (" ).append( getMargin() ).append( " )\n" );
-        buffer.append( "[/RightMargin]\n" );
-        return buffer.toString();
+    public RightMarginRecord( RecordInputStream in ) {
+        field_1_margin = in.readDouble();
     }
 
     public void serialize(LittleEndianOutput out) {
@@ -63,10 +62,17 @@ public final class RightMarginRecord extends StandardRecord implements Margin {
     public void setMargin( double field_1_margin )
     {        this.field_1_margin = field_1_margin;    }
 
-    public Object clone()
-    {
-        RightMarginRecord rec = new RightMarginRecord();
-        rec.field_1_margin = this.field_1_margin;
-        return rec;
+    public RightMarginRecord copy() {
+        return new RightMarginRecord(this);
     }
-}  // END OF
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.RIGHT_MARGIN;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties("margin", this::getMargin);
+    }
+}

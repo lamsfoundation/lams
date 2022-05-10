@@ -64,23 +64,25 @@ public class ImportUserResultController {
 	    log.error("Couldn't check spreadsheet type!", e);
 	}
 
-	int successful = 0;
-	for (int i = 0; i < results.size(); i++) {
-	    ArrayList rowResult = (ArrayList) results.get(i);
-	    if (rowResult.isEmpty()) {
-		successful++;
+	Integer successful = (Integer) ss.getAttribute(IImportService.STATUS_SUCCESSFUL);
+	if (successful == null) {
+	    successful = 0;
+	    for (int i = 0; i < results.size(); i++) {
+		ArrayList rowResult = (ArrayList) results.get(i);
+		if (rowResult.isEmpty()) {
+		    successful++;
+		}
 	    }
 	}
-	String[] args = new String[1];
-	args[0] = String.valueOf(successful);
 
 	request.setAttribute("results", results);
-	request.setAttribute("successful", messageService.getMessage(successMessageKey, args));
+	request.setAttribute("successful", messageService.getMessage(successMessageKey, new Integer[] { successful }));
 
 	// remove temporary session vars that allowed status to be displayed
 	// to user during import
 	ss.removeAttribute(IImportService.STATUS_IMPORT_TOTAL);
 	ss.removeAttribute(IImportService.STATUS_IMPORTED);
+	ss.removeAttribute(IImportService.STATUS_SUCCESSFUL);
 	ss.removeAttribute(IImportService.IMPORT_FILE);
 	ss.removeAttribute(IImportService.IMPORT_RESULTS);
 

@@ -24,6 +24,30 @@
 		#add-question-div {
 			margin-top: -5px;
 		}
+		.question-type-alert {
+			white-space: nowrap;
+			display: inline-block;
+			margin-top: 8px;
+		}
+		.newer-version-prompt {
+			text-align: left;
+			color: orange;
+			font-size: 1.3em;
+		}
+		.question-version-dropdown {
+			margin-top: -3px;
+		}
+		
+		.question-version-dropdown .dropdown-menu {
+			min-width: 160px;
+		}
+		
+		.question-version-dropdown li a {
+			display: inline-block;
+		}
+		.question-version-dropdown li.disabled a:first-child {
+			text-decoration: underline;
+		}
 	</style>
 	
 	<script>
@@ -43,11 +67,24 @@
 	    	// end optional tab controller stuff
 	    	selectTab(tabId);	    	
         }
+        
+        // avoid name clash between bootstrap and jQuery UI
+        $.fn.bootstrapTooltip = $.fn.tooltip.noConflict();
+
+        function validateForm(){
+			var timeLimit = $('#relativeTimeLimit').val();
+			if (!timeLimit || timeLimit < 1) {
+				$('#relativeTimeLimit').val(0);
+			}
+
+			return true;
+        }
     </script>
  
 </lams:head>
 <body class="stripes" onLoad="init()">
-	<form:form action="/lams/tool/lascrt11/authoring/update.do" modelAttribute="authoringForm" method="post" id="authoringForm" >
+	<form:form action="/lams/tool/lascrt11/authoring/update.do" modelAttribute="authoringForm" method="post" id="authoringForm"
+			   onSubmit="javascript:return validateForm()">
 		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 		<form:hidden path="scratchie.contentId" />
 		<form:hidden path="sessionMapID" />
@@ -69,11 +106,11 @@
 		
 				 <lams:TabBodys>
 					 <!-- tab content 1 (Basic) -->
-					<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />
+					<lams:TabBody id="1" page="basic.jsp" />
 					<!-- end of content (Basic) -->
 		
 					<!-- tab content 2 (Advanced) -->
-					<lams:TabBody id="2" titleKey="label.authoring.heading.advance.desc" page="advance.jsp" />
+					<lams:TabBody id="2" page="advance.jsp" />
 					<!-- end of content (Advanced) -->
 				</lams:TabBodys>	
 	

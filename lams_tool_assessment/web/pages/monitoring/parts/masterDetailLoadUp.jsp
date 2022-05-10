@@ -20,7 +20,7 @@
  	   	   		title:"${fn:escapeXml(title)}",
  	   	   		response:responseStr,
  	   	   		<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
- 	   	   			confidence:"${questionResult.confidenceLevel}",
+ 	   	   			confidence:"${question.type == 8 ? -1 : questionResult.confidenceLevel}",
  	   	   		</c:if>
  	   	   		grade:"<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>"
  	   	   	});
@@ -28,6 +28,10 @@
  	 	    // set maxGrade attribute to cell DOM element
  	 	    table.setCell(${i.index + 1}, "grade", "", null, {"maxGrade" :  "${questionResult.maxMark}"});
 		</c:forEach>
+
+		if (typeof CodeMirror != 'undefined') {
+			CodeMirror.colorize($('.code-style'));
+		}
 	};
 	masterDetailLoadUp();
 </script>

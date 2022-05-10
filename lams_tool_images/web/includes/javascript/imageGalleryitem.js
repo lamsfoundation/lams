@@ -79,17 +79,7 @@ function initFileUpload(tmpFileUploadId, singleFileUpload, language) {
 			  // for server-side file type validation; consistent with CKEditor parameter
 			  'Type' : 'Image',
 			  'largeFilesAllowed' : true
-		  },
-		  onBeforeFileAdded: function(currentFile, files) {
-			  var name = currentFile.data.name,
-			  	  extensionIndex = name.lastIndexOf('.'),
-			  	  valid = UPLOAD_ALLOWED_EXTENSIONS.includes(name.substring(extensionIndex).trim());
-			  if (!valid) {
-				  uppy.info(LABEL_NOT_ALLOWED_FORMAT, 'error', 10000);
-			  }
-			  
-			  return valid;
-	    }
+		  }
 	  };
 	  
 	  switch(language) {
@@ -125,12 +115,12 @@ function initFileUpload(tmpFileUploadId, singleFileUpload, language) {
 		  modes: ['picture']
 	  });
 	  
-	  uppy.on('upload-success', (file, response) => {
+	  uppy.on('upload-success', function (file, response) {
 		  // if file name was modified by server, reflect it in Uppy
 		  file.meta.name = response.body.name;
 	  });
 	  
-	  uppy.on('file-removed', (file, reason) => {
+	  uppy.on('file-removed', function (file, reason) {
 		  if (reason === 'removed-by-user') {
 			 // delete file from temporary folder on server
 		    $.ajax({

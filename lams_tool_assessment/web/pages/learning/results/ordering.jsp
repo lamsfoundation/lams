@@ -1,9 +1,11 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<div class="question-type">
-	<fmt:message key="label.learning.ordering.sort.answers" />
-</div>
-	
+<c:if test="${not empty toolSessionID}">
+	<div class="question-type">
+		<fmt:message key="label.learning.ordering.sort.answers" />
+	</div>
+</c:if>
+
 <div class="table-responsive">
 	<table class="table table-hover table-condensed">
 		<c:forEach var="option" items="${question.optionDtos}" varStatus="ordStatus">
@@ -28,7 +30,7 @@
 <c:if test="${assessment.allowQuestionFeedback}">
 	<div class="feedback">
 		<c:choose>
-			<c:when	test="${question.mark > 0}">
+			<c:when	test="${question.mark >= question.maxMark}">
 				<c:out value="${question.feedbackOnCorrect}" escapeXml="false" />
 			</c:when>
 			<c:otherwise>

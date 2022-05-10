@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,6 @@ import org.lamsfoundation.lams.outcome.dao.IOutcomeDAO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelRow;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -115,15 +113,15 @@ public class OutcomeService implements IOutcomeService {
 
     @Override
     public List<ExcelSheet> exportScales() {
-	List<ExcelSheet> sheets = new LinkedList<ExcelSheet>();
+	List<ExcelSheet> sheets = new LinkedList<>();
 	ExcelSheet scalesSheet = new ExcelSheet(messageService.getMessage("scale.title"));
- 	sheets.add(scalesSheet);
+	sheets.add(scalesSheet);
 
- 	ExcelRow headerRow = scalesSheet.initRow();
- 	headerRow.addCell(messageService.getMessage("outcome.manage.add.name"), true);
- 	headerRow.addCell(messageService.getMessage("outcome.manage.add.code"), true);
- 	headerRow.addCell(messageService.getMessage("outcome.manage.add.description"), true);
- 	headerRow.addCell(messageService.getMessage("scale.manage.add.value"), true);
+	ExcelRow headerRow = scalesSheet.initRow();
+	headerRow.addCell(messageService.getMessage("outcome.manage.add.name"), true);
+	headerRow.addCell(messageService.getMessage("outcome.manage.add.code"), true);
+	headerRow.addCell(messageService.getMessage("outcome.manage.add.description"), true);
+	headerRow.addCell(messageService.getMessage("scale.manage.add.value"), true);
 
 	List<OutcomeScale> scales = getScales();
 	for (OutcomeScale scale : scales) {
@@ -136,12 +134,11 @@ public class OutcomeService implements IOutcomeService {
 	return sheets;
     }
 
-
     @Override
     public List<ExcelSheet> exportOutcomes() {
-	List<ExcelSheet> sheets = new LinkedList<ExcelSheet>();
+	List<ExcelSheet> sheets = new LinkedList<>();
 	ExcelSheet outcomeSheet = new ExcelSheet(messageService.getMessage("index.outcome.manage"));
- 	sheets.add(outcomeSheet);
+	sheets.add(outcomeSheet);
 
 	// The entire data list
 	ExcelRow headerRow = outcomeSheet.initRow();
@@ -288,6 +285,35 @@ public class OutcomeService implements IOutcomeService {
 	    }
 	}
 	return counter;
+    }
+
+    @Override
+    public Outcome createOutcome(String name, int creatorId) {
+	// create a new outcome on the fly
+	String code = null;
+	// check if name contains code part
+	String[] nameParts = name.split("\\[");
+	if (nameParts.length > 1) {
+	    name = nameParts[0].trim();
+	    code = nameParts[1].replaceFirst("\\]", "").trim();
+	}
+	Outcome outcome = new Outcome();
+
+	User user = outcomeDAO.find(User.class, creatorId);
+	outcome.setCreateBy(user);
+	outcome.setCreateDateTime(new Date());
+
+	outcome.setName(name);
+	outcome.setCode(code);
+	OutcomeScale scale = outcomeDAO.find(OutcomeScale.class, IOutcomeService.DEFAULT_SCALE_ID);
+	outcome.setScale(scale);
+	outcomeDAO.insert(outcome);
+
+	if (log.isDebugEnabled()) {
+	    log.debug("Saved outcome " + outcome.getOutcomeId());
+	}
+
+	return outcome;
     }
 
     /**

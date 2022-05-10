@@ -196,15 +196,15 @@ public class Lesson implements Serializable {
     @Column(name = "previous_state_id")
     private Integer previousLessonStateId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "learning_design_id")
     private LearningDesign learningDesign;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "class_grouping_id")
     private LessonClass lessonClass;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "organisation_id")
     private Organisation organisation;
 
@@ -266,10 +266,12 @@ public class Lesson implements Serializable {
      */
     @ManyToMany
     @JoinTable(name = "lams_lesson_dependency", joinColumns = @JoinColumn(name = "lesson_id"), inverseJoinColumns = @JoinColumn(name = "preceding_lesson_id"))
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<Lesson> precedingLessons = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name = "lams_lesson_dependency", joinColumns = @JoinColumn(name = "preceding_lesson_id"), inverseJoinColumns = @JoinColumn(name = "lesson_id"))
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<Lesson> succeedingLessons = new HashSet<>();
 
     // ---------------------------------------------------------------------

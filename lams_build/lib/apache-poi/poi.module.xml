@@ -24,16 +24,18 @@
 
 <module xmlns="urn:jboss:module:1.5" name="org.apache.poi">
   <resources>
-    <resource-root path="poi-4.0.1.jar"/>
-    <resource-root path="poi-ooxml-4.0.1.jar"/>
-    <resource-root path="poi-ooxml-schemas-4.0.1.jar"/>
-    <resource-root path="poi-scratchpad-4.0.1.jar"/>
+    <resource-root path="poi-4.1.2.jar"/>
+    <resource-root path="poi-ooxml-4.1.2.jar"/>
+    <resource-root path="poi-ooxml-schemas-4.1.2.jar"/>
+    <resource-root path="poi-scratchpad-4.1.2.jar"/>
   </resources>
   <dependencies>
     <module name="javax.api"/>
     <module name="org.apache.xmlbeans"/>
     <module name="org.apache.commons.collections4"/>
     <module name="org.apache.commons.compress"/>
+    <module name="org.apache.commons.math3"/>
     <module name="org.dom4j"/>
+    <module name="com.zaxxer.sparsebits" />
   </dependencies>
 </module>

@@ -17,12 +17,13 @@
 
 package org.apache.poi.ss.formula.ptg;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 
-/**
- * @author Daniel Noll (daniel at nuix dot com dot au)
- */
 public final class MemAreaPtg extends OperandPtg {
 	public final static short sid = 0x26;
 	private final static int SIZE = 7;
@@ -51,6 +52,11 @@ public final class MemAreaPtg extends OperandPtg {
 		out.writeShort(field_2_subex_len);
 	}
 
+	@Override
+	public byte getSid() {
+		return sid;
+	}
+
 	public int getSize() {
 		return SIZE;
 	}
@@ -64,11 +70,13 @@ public final class MemAreaPtg extends OperandPtg {
 	}
 
 	@Override
-	public final String toString() {
-		StringBuffer sb = new StringBuffer(64);
-		sb.append(getClass().getName()).append(" [len=");
-		sb.append(field_2_subex_len);
-		sb.append("]");
-		return sb.toString();
+	public MemAreaPtg copy() {
+		// immutable
+		return this;
+	}
+
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties("lenRefSubexpression", this::getLenRefSubexpression);
 	}
 }

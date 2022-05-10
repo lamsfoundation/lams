@@ -1,4 +1,4 @@
-﻿/**
+﻿﻿/**
  * This file contains event handlers for interaction with canvas and other Authoring elements.
  */
 
@@ -8,8 +8,7 @@
 var HandlerLib = {
 	// taken from http://jsfiddle.net/LQuyr/8/
 	touchHandler : function(event) {
-	    var self = this,
-	    	touches = event.changedTouches,
+	    var touches = event.changedTouches,
 	        first = touches[0],
 	        type = "";
 
@@ -33,13 +32,11 @@ var HandlerLib = {
 
 	    first.target.dispatchEvent(simulatedEvent);
 
-	    var scrollables = [],
-	    	clickedInScrollArea = false,
+	    var scrollables = [];
 	    	// check if any of the parents has is-scollable class
-	    	parentEls = $(event.target).parents().map(function() {
+	    $(event.target).parents().map(function() {
 	        try {
 	            if ($(this).hasClass('scrollable')) {
-	                clickedInScrollArea = true;
 	                // get vertical direction of touch event
 	                var direction = (window.startY < first.clientY) ? 'down' : 'up';
 	                // calculate stuff... :o)
@@ -160,8 +157,44 @@ var HandlerLib = {
 	 * Moves dragged elements on the canvas.
 	 */
 	dragItemsMoveHandler : function(object, event, startX, startY) {
-		var dx = GeneralLib.snapToGrid(event.pageX - startX, true),
-			dy = GeneralLib.snapToGrid(event.pageY - startY, true);
+		// detect if activity is close to an edge of viewport and scroll automatically
+		if (event.pageX - canvas.offset().left > canvas.width() - 150) {
+			canvas.scrollLeft(canvas.scrollLeft() + 10);
+		} else if (event.pageX - canvas.offset().left < 150) {
+			canvas.scrollLeft(Math.max(0, canvas.scrollLeft() - 10));
+		}
+		
+		if (event.pageY - canvas.offset().top > canvas.height() - 150) {
+			canvas.scrollTop(canvas.scrollTop() + 10);
+		} else if (event.pageY - canvas.offset().top < 100) {
+			canvas.scrollTop(Math.max(0, canvas.scrollTop() - 10));
+		}
+	
+		/*
+		Another approach, based on how the event is close to the edge
+		
+		var canvasWidth = canvas.width(), 
+			canvasHeight = canvas.height(),
+			eventX = event.pageX - canvas.offset().left,
+			eventY = event.pageY - canvas.offset().top,
+			scrollYTrigger = layout.activity.height + 20;
+			
+		if (event.pageX - canvas.offset().left > canvas.width() - 50) {
+			canvas.scrollLeft(canvas.scrollLeft() + 10);
+		} else if (event.pageX - canvas.offset().left < 200) {
+			canvas.scrollLeft(Math.max(0, canvas.scrollLeft() - 10));
+		}
+	
+		if (eventY > canvasHeight - 100) {
+			canvas.scrollTop(canvas.scrollTop() + eventY - canvasHeight + 100);
+		} else if (eventY < 80) {
+			canvas.scrollTop(Math.max(0, canvas.scrollTop() - 80 + eventY));
+		}
+		
+		*/
+
+		var dx = event.pageX + canvas.scrollLeft() - startX,
+			dy = event.pageY + canvas.scrollTop()  - startY;
 
 		object.items.transform('t' + dx + ' ' + dy);
 		
@@ -177,11 +210,12 @@ var HandlerLib = {
 		// highlight rubbish bin if dragged elements are over it
 		if (HandlerLib.isElemenentBinned(event)) {
 			if (!layout.bin.glowEffect) {
+				let binSvg = layout.bin.select('svg');
 				layout.bin.glowEffect = paper.path(Snap.format('M {x} {y} h {side} v {side} h -{side} z',
 												   {
-													'x'     : layout.bin.attr('x'),
-													'y'     : layout.bin.attr('y'),
-													'side'  : layout.bin.attr('width')
+													'x'     : binSvg.attr('x'),
+													'y'     : binSvg.attr('y'),
+													'side'  : binSvg.attr('width')
 												   }))
 								   			.attr({
 												   'stroke'           : layout.colors.binSelect,
@@ -189,6 +223,7 @@ var HandlerLib = {
 												   'stroke-dasharray' : '5,3',
 												   'fill' : 'none'
 												  });
+				layout.bin.append(layout.bin.glowEffect);
 			}
 		} else if (layout.bin.glowEffect){
 			layout.bin.glowEffect.remove();
@@ -281,17 +316,6 @@ var HandlerLib = {
 		      .off('mouseup')
 		      .off('mousemove');
 		
-		// if the user started adding a branching and did not finish it
-		if (layout.addBranchingStart){
-			layout.infoDialog.modal('hide');
-			
-			if (layout.addBranchingStart instanceof ActivityDefs.BranchingEdgeActivity) {
-				layout.activities.splice(layout.activities.indexOf(layout.addBranchingStart), 1);
-				layout.addBranchingStart.items.remove();
-			}
-			layout.addBranchingStart = null;
-		}
-
 		if (init) {
 			 // if clicked anywhere, activity selection is gone
 			canvas.click(HandlerLib.canvasClickHandler)
@@ -396,7 +420,7 @@ HandlerActivityLib = {
 
 			var transitions = activity.transitions.from.concat(activity.transitions.to);
 			// start dragging the activity
-			HandlerLib.dragItemsStartHandler(activity, this, mouseupHandler, event, x, y, transitions);
+			HandlerLib.dragItemsStartHandler(activity, this, mouseupHandler, event, x + canvas.scrollLeft(), y + canvas.scrollTop(), transitions);
 		}
 	},
 	
@@ -486,7 +510,7 @@ HandlerDecorationLib = {
 			}
 		}
 			
-		HandlerLib.dragItemsStartHandler(container, this, mouseupHandler, event, x, y);
+		HandlerLib.dragItemsStartHandler(container, this, mouseupHandler, event, x + canvas.scrollLeft(), y + canvas.scrollTop());
 	},
 		
 	/**
@@ -588,7 +612,7 @@ HandlerDecorationLib = {
 			}
 		}
 			
-		HandlerLib.dragItemsStartHandler(label, this, mouseupHandler, event, x, y);
+		HandlerLib.dragItemsStartHandler(label, this, mouseupHandler, event, x + canvas.scrollLeft(), y + canvas.scrollTop());
 	},
 	
 	
@@ -744,9 +768,6 @@ HandlerTransitionLib = {
 		if (targetElement) {
 			endActivity = ActivityLib.getParentObject(targetElement);
 		}
-		if (endActivity == null) {
-			endActivity = ActivityLib.getParentObject(targetElement.parent());
-		}
 
 		if (endActivity && activity != endActivity) {
 			ActivityLib.addTransition(activity, endActivity);
@@ -778,6 +799,6 @@ HandlerTransitionLib = {
 			}
 		}
 			
-		HandlerLib.dragItemsStartHandler(transition, this, mouseupHandler, event, x, y);
+		HandlerLib.dragItemsStartHandler(transition, this, mouseupHandler, event, x + canvas.scrollLeft(), y + canvas.scrollTop());
 	}
 };

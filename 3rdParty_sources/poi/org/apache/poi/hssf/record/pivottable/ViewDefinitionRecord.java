@@ -17,9 +17,14 @@
 
 package org.apache.poi.hssf.record.pivottable;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.hssf.record.HSSFRecordTypes;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
-import org.apache.poi.util.HexDump;
 import org.apache.poi.util.LittleEndianOutput;
 import org.apache.poi.util.StringUtil;
 
@@ -38,26 +43,52 @@ public final class ViewDefinitionRecord extends StandardRecord {
 	private int colFirstData;
 	private int iCache;
 	private int reserved;
-	
+
 	private int sxaxis4Data;
 	private int ipos4Data;
 	private int cDim;
-	
+
 	private int cDimRw;
-	
+
 	private int cDimCol;
 	private int cDimPg;
-	
+
 	private int cDimData;
 	private int cRw;
 	private int cCol;
 	private int grbit;
 	private int itblAutoFmt;
-	
+
 	private String dataField;
 	private String name;
 
-	
+
+	public ViewDefinitionRecord(ViewDefinitionRecord other) {
+		super(other);
+		rwFirst = other.rwFirst;
+		rwLast = other.rwLast;
+		colFirst = other.colFirst;
+		colLast = other.colLast;
+		rwFirstHead = other.rwFirstHead;
+		rwFirstData = other.rwFirstData;
+		colFirstData = other.colFirstData;
+		iCache = other.iCache;
+		reserved = other.reserved;
+		sxaxis4Data = other.sxaxis4Data;
+		ipos4Data = other.ipos4Data;
+		cDim = other.cDim;
+		cDimRw = other.cDimRw;
+		cDimCol = other.cDimCol;
+		cDimPg = other.cDimPg;
+		cDimData = other.cDimData;
+		cRw = other.cRw;
+		cCol = other.cCol;
+		grbit = other.grbit;
+		itblAutoFmt = other.itblAutoFmt;
+		name = other.name;
+		dataField = other.dataField;
+	}
+
 	public ViewDefinitionRecord(RecordInputStream in) {
 		rwFirst = in.readUShort();
 		rwLast = in.readUShort();
@@ -85,7 +116,7 @@ public final class ViewDefinitionRecord extends StandardRecord {
 		name = StringUtil.readUnicodeString(in, cchName);
 		dataField = StringUtil.readUnicodeString(in, cchData);
 	}
-	
+
 	@Override
 	protected void serialize(LittleEndianOutput out) {
 		out.writeShort(rwFirst);
@@ -112,7 +143,7 @@ public final class ViewDefinitionRecord extends StandardRecord {
 		out.writeShort(dataField.length());
 
 		StringUtil.writeUnicodeStringFlagAndData(out, name);
-		StringUtil.writeUnicodeStringFlagAndData(out, dataField);		
+		StringUtil.writeUnicodeStringFlagAndData(out, dataField);
 	}
 
 	@Override
@@ -127,34 +158,42 @@ public final class ViewDefinitionRecord extends StandardRecord {
 	}
 
 	@Override
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
+	public ViewDefinitionRecord copy() {
+		return new ViewDefinitionRecord(this);
+	}
 
-		buffer.append("[SXVIEW]\n");
-		buffer.append("    .rwFirst      =").append(HexDump.shortToHex(rwFirst)).append('\n');
-		buffer.append("    .rwLast       =").append(HexDump.shortToHex(rwLast)).append('\n');
-		buffer.append("    .colFirst     =").append(HexDump.shortToHex(colFirst)).append('\n');
-		buffer.append("    .colLast      =").append(HexDump.shortToHex(colLast)).append('\n');
-		buffer.append("    .rwFirstHead  =").append(HexDump.shortToHex(rwFirstHead)).append('\n');
-		buffer.append("    .rwFirstData  =").append(HexDump.shortToHex(rwFirstData)).append('\n');
-		buffer.append("    .colFirstData =").append(HexDump.shortToHex(colFirstData)).append('\n');
-		buffer.append("    .iCache       =").append(HexDump.shortToHex(iCache)).append('\n');
-		buffer.append("    .reserved     =").append(HexDump.shortToHex(reserved)).append('\n');
-		buffer.append("    .sxaxis4Data  =").append(HexDump.shortToHex(sxaxis4Data)).append('\n');
-		buffer.append("    .ipos4Data    =").append(HexDump.shortToHex(ipos4Data)).append('\n');
-		buffer.append("    .cDim         =").append(HexDump.shortToHex(cDim)).append('\n');
-		buffer.append("    .cDimRw       =").append(HexDump.shortToHex(cDimRw)).append('\n');
-		buffer.append("    .cDimCol      =").append(HexDump.shortToHex(cDimCol)).append('\n');
-		buffer.append("    .cDimPg       =").append(HexDump.shortToHex(cDimPg)).append('\n');
-		buffer.append("    .cDimData     =").append(HexDump.shortToHex(cDimData)).append('\n');
-		buffer.append("    .cRw          =").append(HexDump.shortToHex(cRw)).append('\n');
-		buffer.append("    .cCol         =").append(HexDump.shortToHex(cCol)).append('\n');
-		buffer.append("    .grbit        =").append(HexDump.shortToHex(grbit)).append('\n');
-		buffer.append("    .itblAutoFmt  =").append(HexDump.shortToHex(itblAutoFmt)).append('\n');
-		buffer.append("    .name         =").append(name).append('\n');
-		buffer.append("    .dataField    =").append(dataField).append('\n');
+	@Override
+	public HSSFRecordTypes getGenericRecordType() {
+		return HSSFRecordTypes.VIEW_DEFINITION;
+	}
 
-		buffer.append("[/SXVIEW]\n");
-		return buffer.toString();
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		final Map<String,Supplier<?>> m = new LinkedHashMap<>();
+
+		m.put("rwFirst", () -> rwFirst);
+		m.put("rwLast", () -> rwLast);
+		m.put("colFirst", () -> colFirst);
+		m.put("colLast", () -> colLast);
+		m.put("rwFirstHead", () -> rwFirstHead);
+		m.put("rwFirstData", () -> rwFirstData);
+		m.put("colFirstData", () -> colFirstData);
+		m.put("iCache", () -> iCache);
+		m.put("reserved", () -> reserved);
+		m.put("sxaxis4Data", () -> sxaxis4Data);
+		m.put("ipos4Data", () -> ipos4Data);
+		m.put("cDim", () -> cDim);
+		m.put("cDimRw", () -> cDimRw);
+		m.put("cDimCol", () -> cDimCol);
+		m.put("cDimPg", () -> cDimPg);
+		m.put("cDimData", () -> cDimData);
+		m.put("cRw", () -> cRw);
+		m.put("cCol", () -> cCol);
+		m.put("grbit", () -> grbit);
+		m.put("itblAutoFmt", () -> itblAutoFmt);
+		m.put("name", () -> name);
+		m.put("dataField", () -> dataField);
+
+		return Collections.unmodifiableMap(m);
 	}
 }

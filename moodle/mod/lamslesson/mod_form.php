@@ -63,15 +63,18 @@ class mod_lamslesson_mod_form extends moodleform_mod {
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->addHelpButton('name', 'lamslessonname', 'lamslesson');
 
-    /// Adding the standard "intro" and "introformat" fields
-        $this->add_intro_editor();
+    // Adding the standard "intro" and "introformat" fields
+        $this->standard_intro_elements();
 
 //-------------------------------------------------------------------------------
     /// Adding the rest of lamslesson settings, spreeading all them into this fieldset
     /// or adding more fieldsets ('header' elements) if needed for better logic
 
     // Set needed vars
-	$context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
+		//$context = get_context_instance(CONTEXT_COURSE, $COURSE->id); 
+		// using context_course now instead
+	$context = context_course::instance($COURSE->id);
+		
 	$canmanage = has_capability('mod/lamslesson:manage', $context);
 
     //-- Open Author & Preview URL buttons
@@ -86,6 +89,7 @@ class mod_lamslesson_mod_form extends moodleform_mod {
 	  $popupoptions = LAMSLESSON_POPUP_OPTIONS;
 	  $openauthorlabel = get_string('openauthor', 'lamslesson');
 	  $openpreviewlabel = get_string('previewthislesson', 'lamslesson');
+	  $refreshlabel = get_string('refresh', 'lamslesson');
 
     	  // display user's lams workspace
     	  $lds = lamslesson_get_sequences_rest($USER->username, $USER->firstname, $USER->lastname, $USER->email, $COURSE->id, $COURSE->fullname, $COURSE->timecreated, $USER->country, $USER->lang) ;
@@ -104,10 +108,13 @@ class mod_lamslesson_mod_form extends moodleform_mod {
     	$authorpreviewbutton .= html_writer::start_tag('div', array('id' => 'buttons', 'style' => 'float:right'));
         
         // Preview button
-        $authorpreviewbutton .= html_writer::link('#nogo', $openpreviewlabel, array('onclick' => js_writer::function_call('openPreview', array('1' => $previewurl, '2' => 'preview', '3' => 1280, '4' => 720)), 'id' => 'previewbutton', 'style' => 'visibility:hidden;', 'class' => 'btn btn-primary'));
+        $authorpreviewbutton .= html_writer::link('#nogo', $openpreviewlabel, array('onclick' => js_writer::function_call('openPreview', array('1' => $previewurl, '2' => 'preview', '3' => 1280, '4' => 720)), 'id' => 'previewbutton', 'style' => 'visibility:hidden;margin: 1em;', 'class' => 'btn btn-primary'));
 
         //Authoring button
-        $authorpreviewbutton .= html_writer::link('#nogo', $openauthorlabel, array('onclick' => js_writer::function_call('PopupCenter', array('1' => $authorurl, '2' => 'author', '3' => 1280, '4' => 720)), 'class' => 'btn btn-primary', 'id' => 'authorbutton'));
+        $authorpreviewbutton .= html_writer::link('#nogo', $openauthorlabel, array('onclick' => js_writer::function_call('PopupCenter', array('1' => $authorurl, '2' => 'author', '3' => 1280, '4' => 720)), 'class' => 'btn btn-primary', 'style' => 'margin: 1em;','id' => 'authorbutton'));
+
+        //Refresh button
+	$authorpreviewbutton .= html_writer::link('#nogo', $refreshlabel, array('onclick' => js_writer::function_call('location.reload'), 'class' => 'btn btn-primary', 'style' => 'margin: 1em;','id' => 'authorbutton'));
 
         $authorpreviewbutton .= html_writer::end_tag('div');
 	}
@@ -131,8 +138,10 @@ class mod_lamslesson_mod_form extends moodleform_mod {
 		$mform->setExpanded('selectsequence', true);
 
         $mform->addElement('static', 'sequencemessage', '', $html);
-    	$mform->addElement('checkbox', 'displaydesign', get_string('displaydesign', 'lamslesson'));
-    	$mform->addElement('checkbox', 'allowlearnerrestart', get_string('allowlearnerrestart', 'lamslesson'));
+	$mform->addElement('advcheckbox', 'displaydesign', get_string('displaydesign', 'lamslesson'),'',array(0,1));
+	$mform->addHelpButton('displaydesign', 'displaydesign', 'lamslesson');
+	$mform->addElement('advcheckbox', 'allowlearnerrestart', get_string('allowlearnerrestart', 'lamslesson'),'', array(0,1));
+	$mform->addHelpButton('allowlearnerrestart', 'allowlearnerrestart', 'lamslesson');
 
 		//-------------------------------------------------------------------------------
 		$this->standard_grading_coursemodule_elements();
@@ -148,7 +157,7 @@ class mod_lamslesson_mod_form extends moodleform_mod {
         $this->add_action_buttons();
     }
 	
-    function validation($data) {
+    function validation($data, $files) {
       $errors = array();
       // a sequence needs to be selected                                                                                   
       if (empty($data['sequence_id']) || $data['sequence_id'] <= 0) {

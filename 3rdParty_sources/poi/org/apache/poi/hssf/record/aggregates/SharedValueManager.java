@@ -18,6 +18,7 @@
 package org.apache.poi.hssf.record.aggregates;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,11 +93,9 @@ public final class SharedValueManager {
 		}
 
 		public final String toString() {
-			StringBuffer sb = new StringBuffer(64);
-			sb.append(getClass().getName()).append(" [");
-			sb.append(_sfr.getRange());
-			sb.append("]");
-			return sb.toString();
+			return getClass().getName() + " [" +
+					_sfr.getRange() +
+					"]";
 		}
 	}
 
@@ -122,7 +121,7 @@ public final class SharedValueManager {
 		}
 		_arrayRecords = toList(arrayRecords);
 		_tableRecords = tableRecords;
-		Map<SharedFormulaRecord, SharedFormulaGroup> m = new HashMap<SharedFormulaRecord, SharedFormulaGroup>(nShF * 3 / 2);
+		Map<SharedFormulaRecord, SharedFormulaGroup> m = new HashMap<>(nShF * 3 / 2);
 		for (int i = 0; i < nShF; i++) {
 			SharedFormulaRecord sfr = sharedFormulaRecords[i];
 			m.put(sfr, new SharedFormulaGroup(sfr, firstCells[i]));
@@ -134,10 +133,8 @@ public final class SharedValueManager {
 	 * @return a modifiable list, independent of the supplied array
 	 */
 	private static <Z> List<Z> toList(Z[] zz) {
-		List<Z> result = new ArrayList<Z>(zz.length);
-		for (int i = 0; i < zz.length; i++) {
-			result.add(zz[i]);
-		}
+		List<Z> result = new ArrayList<>(zz.length);
+		Collections.addAll(result, zz);
 		return result;
 	}
 
@@ -167,13 +164,12 @@ public final class SharedValueManager {
 
     private SharedFormulaGroup findFormulaGroupForCell(final CellReference cellRef) {
         if(null == _groupsCache) {
-            _groupsCache = new HashMap<Integer,SharedFormulaGroup>(_groupsBySharedFormulaRecord.size());
+            _groupsCache = new HashMap<>(_groupsBySharedFormulaRecord.size());
             for(SharedFormulaGroup group: _groupsBySharedFormulaRecord.values()) {
                 _groupsCache.put(getKeyForCache(group._firstCell),group);
             }
         }
-        SharedFormulaGroup sfg = _groupsCache.get(getKeyForCache(cellRef));
-        return sfg;
+        return _groupsCache.get(getKeyForCache(cellRef));
     }
 
     private Integer getKeyForCache(final CellReference cellRef) {

@@ -18,17 +18,17 @@
 package org.apache.poi.hssf.record;
 
 import java.util.Locale;
+import java.util.Map;
+import java.util.function.Supplier;
 
 import org.apache.poi.hssf.record.aggregates.PageSettingsBlock;
-import org.apache.poi.util.HexDump;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title:        Unknown Record (for debugging)<p>
- * Description:  Unknown record just tells you the sid so you can figure out
- *               what records you are missing.  Also helps us read/modify sheets we
- *               don't know all the records to.  (HSSF leaves these alone!)<p>
- * Company:      SuperLink Software, Inc.
+ * Unknown record just tells you the sid so you can figure out what records you are missing.
+ * Also helps us read/modify sheets we don't know all the records to.
+ * (HSSF leaves these alone!)
  */
 public final class UnknownRecord extends StandardRecord {
 
@@ -80,13 +80,10 @@ public final class UnknownRecord extends StandardRecord {
     public UnknownRecord(RecordInputStream in) {
         _sid = in.getSid();
         _rawData = in.readRemainder();
-//        if (false && getBiffName(_sid) == null) {
-//            // unknown sids in the range 0x0004-0x0013 are probably 'sub-records' of ObjectRecord
-//            // those sids are in a different number space.
-//            // TODO - put unknown OBJ sub-records in a different class
-//            System.out.println("Unknown record 0x" + 
-//                               Integer.toHexString(_sid).toUpperCase(Locale.ROOT));
-//        }
+
+        // TODO - put unknown OBJ sub-records in a different class
+        // unknown sids in the range 0x0004-0x0013 are probably 'sub-records' of ObjectRecord
+        // those sids are in a different number space.
     }
 
     /**
@@ -101,27 +98,6 @@ public final class UnknownRecord extends StandardRecord {
     protected int getDataSize() {
         return _rawData.length;
     }
-
-    /**
-     * print a sort of string representation ([UNKNOWN RECORD] id = x [/UNKNOWN RECORD])
-     */
-    @Override
-    public String toString() {
-        String biffName = getBiffName(_sid);
-        if (biffName == null) {
-            biffName = "UNKNOWNRECORD";
-        }
-        StringBuffer sb = new StringBuffer();
-
-        sb.append("[").append(biffName).append("] (0x");
-        sb.append(Integer.toHexString(_sid).toUpperCase(Locale.ROOT) + ")\n");
-        if (_rawData.length > 0) {
-            sb.append("  rawData=").append(HexDump.toHex(_rawData)).append("\n");
-        }
-        sb.append("[/").append(biffName).append("]\n");
-        return sb.toString();
-    }
-
     @Override
     public short getSid() {
         return (short) _sid;
@@ -129,6 +105,8 @@ public final class UnknownRecord extends StandardRecord {
 
     /**
      * These BIFF record types are known but still uninterpreted by POI
+     *
+     * @param sid The identifier for an unknown record type
      *
      * @return the documented name of this BIFF record type, <code>null</code> if unknown to POI
      */
@@ -207,7 +185,7 @@ public final class UnknownRecord extends StandardRecord {
             case 0x08A7: return "CRTLAYOUT12A";
 
             case 0x08C8: return "PLV{Mac Excel}";
-            
+
             case 0x1001: return "UNITS";
             case 0x1006: return "CHARTDATAFORMAT";
             case 0x1007: return "CHARTLINEFORMAT";
@@ -287,8 +265,27 @@ public final class UnknownRecord extends StandardRecord {
     }
 
     @Override
-    public Object clone() {
+    public UnknownRecord copy() {
         // immutable - OK to return this
         return this;
+    }
+
+    @Override
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.UNKNOWN;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        Supplier<String> biffName = () -> {
+            String bn = getBiffName(_sid);
+            return bn == null ? "UNKNOWNRECORD" : bn;
+        };
+
+        return GenericRecordUtil.getGenericProperties(
+            "sid", this::getSid,
+            "biffName", biffName,
+            "rawData", () -> _rawData
+        );
     }
 }

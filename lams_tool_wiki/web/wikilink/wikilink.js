@@ -14,13 +14,12 @@ function init()
 	
 	document.getElementById("linkAliasLabel").firstChild.data = CK.lang.wikilink.WikiLinkText;
 	document.getElementById("existingLinkMenuLabel").firstChild.data = CK.lang.wikilink.WikiLinkExisting;
-	
-	document.getElementById("linkAlias").value = getSelectedText();
+
+	document.getElementById("linkAlias").value = CK.getSelection().getSelectedText();
 	
 	// remove our previously registered listeners and reregister a new one
 	var okButton = thisDialog.getButton('ok');
 	var newListeners = [];
-	var oldListeners = okButton._.events.click.listeners;
 	for (var i = 0; i < okButton._.events.click.listeners.length; i++){
 		if (okButton._.events.click.listeners[i].priority != 1) {
 			newListeners.push(okButton._.events.click.listeners[i]);
@@ -34,22 +33,6 @@ function init()
 }
 
 
-function getSelectedText() 
-{
-    var selection = "";
-    var CKSelection = CK.getSelection();
-    if( CKGlobal.env.ie ) {
-    	// doesn't work otherwise
-    	CKSelection.unlock(true);
-    	selection = CKSelection.getNative().createRange().text; // (Internet Explorer)
-    } 
-    else {
-    
-      selection = CKSelection.getNative(); // (FireFox) after this, won't be a string 
-      selection = "" + selection; // now a string again
-    }
-    return selection;
-}
 
 function addOption(dropDownMenu, wikiName, wikiURL)
 {
@@ -90,8 +73,8 @@ function triggerOK(ev)
 	// workaround for FF "security feature" clearing malicious code
 	// to be inserted in contenteditable secitions
 	var escapedWikiUrl = 'mediaembedInsertData|---' + escape(wikiUrl) + '---|mediaembedInsertData';
-	CK.insertHtml( '<a href="' + escapedWikiUrl + '">' + linkAlias + '</a>' );
+	CK.insertHtml( '<a href="' + escapedWikiUrl + '" class="skip-auto-target">' + linkAlias + '</a>' );
 	var updatedEditorData = CK.getData();
-	var cleanEditorData = updatedEditorData.replace(escapedWikiUrl,wikiUrl);
+	var cleanEditorData = updatedEditorData.replace(escapedWikiUrl, wikiUrl);
 	CK.setData(cleanEditorData);
 }

@@ -23,6 +23,8 @@
 
 package org.lamsfoundation.lams.tool.scratchie.model;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
@@ -86,13 +88,14 @@ public class Scratchie implements Cloneable {
     @OneToMany
     @JoinColumn(name = "scratchie_uid")
     @SortComparator(QbToolQuestion.QbToolQuestionComparator.class)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<ScratchieItem> scratchieItems = new TreeSet<>();
-
-    @Column(name = "extra_point")
-    private boolean extraPoint;
 
     @Column(name = "burning_questions_enabled")
     private boolean burningQuestionsEnabled;
+
+    @Column(name = "discussion_sentiment_enabled")
+    private boolean discussionSentimentEnabled;
 
     @Column(name = "question_etherpad_enabled")
     private boolean questionEtherpadEnabled;
@@ -100,8 +103,14 @@ public class Scratchie implements Cloneable {
     @Column(name = "shuffle_items")
     private boolean shuffleItems;
 
-    @Column(name = "time_limit")
-    private int timeLimit;
+    @Column(name = "relative_time_limit")
+    private int relativeTimeLimit;
+
+    @Column(name = "absolute_time_limit")
+    private LocalDateTime absoluteTimeLimit;
+
+    @Column(name = "double_click")
+    private boolean revealOnDoubleClick;
 
     @Column(name = "confidence_levels_activity_uiid")
     private Integer confidenceLevelsActivityUiid;
@@ -142,6 +151,7 @@ public class Scratchie implements Cloneable {
 	try {
 	    scratchie = (Scratchie) super.clone();
 	    scratchie.setUid(null);
+	    scratchie.setAbsoluteTimeLimit(null);
 	    if (scratchieItems != null) {
 		Iterator<ScratchieItem> iter = scratchieItems.iterator();
 		Set<ScratchieItem> set = new TreeSet<>();
@@ -153,6 +163,8 @@ public class Scratchie implements Cloneable {
 		}
 		scratchie.scratchieItems = set;
 	    }
+
+	    scratchie.setAbsoluteTimeLimit(null);
 	} catch (CloneNotSupportedException e) {
 	    log.error("When clone " + Scratchie.class + " failed");
 	}
@@ -330,20 +342,20 @@ public class Scratchie implements Cloneable {
 	this.reflectOnActivity = reflectOnActivity;
     }
 
-    public boolean isExtraPoint() {
-	return extraPoint;
-    }
-
-    public void setExtraPoint(boolean extraPoint) {
-	this.extraPoint = extraPoint;
-    }
-
     public boolean isBurningQuestionsEnabled() {
 	return burningQuestionsEnabled;
     }
 
     public void setBurningQuestionsEnabled(boolean burningQuestionsEnabled) {
 	this.burningQuestionsEnabled = burningQuestionsEnabled;
+    }
+
+    public boolean isDiscussionSentimentEnabled() {
+	return discussionSentimentEnabled;
+    }
+
+    public void setDiscussionSentimentEnabled(boolean discussionSentimentEnabled) {
+	this.discussionSentimentEnabled = discussionSentimentEnabled;
     }
 
     public boolean isQuestionEtherpadEnabled() {
@@ -365,16 +377,36 @@ public class Scratchie implements Cloneable {
     /**
      * @return Returns the time limitation, that students have to complete an attempt.
      */
-    public int getTimeLimit() {
-	return timeLimit;
+    public int getRelativeTimeLimit() {
+	return relativeTimeLimit;
     }
 
     /**
      * @param timeLimit
      *            the time limitation, that students have to complete an attempt.
      */
-    public void setTimeLimit(int timeLimit) {
-	this.timeLimit = timeLimit;
+    public void setRelativeTimeLimit(int timeLimit) {
+	this.relativeTimeLimit = timeLimit;
+    }
+
+    public LocalDateTime getAbsoluteTimeLimit() {
+	return absoluteTimeLimit;
+    }
+
+    public void setAbsoluteTimeLimit(LocalDateTime absoluteTimeLimit) {
+	this.absoluteTimeLimit = absoluteTimeLimit;
+    }
+
+    public Long getAbsoluteTimeLimitSeconds() {
+	return absoluteTimeLimit == null ? null : absoluteTimeLimit.atZone(ZoneId.systemDefault()).toEpochSecond();
+    }
+
+    public boolean isRevealOnDoubleClick() {
+	return revealOnDoubleClick;
+    }
+
+    public void setRevealOnDoubleClick(boolean revealOnDoubleClick) {
+	this.revealOnDoubleClick = revealOnDoubleClick;
     }
 
     /**

@@ -25,8 +25,6 @@ package org.lamsfoundation.lams.tool.scratchie.web.controller;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -38,10 +36,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
-import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.ScratchieItemDTO;
@@ -51,7 +47,6 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
-import org.lamsfoundation.lams.util.AlphanumComparator;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
@@ -106,7 +101,7 @@ public class TblMonitorController {
 		}
 
 		Double percentage = (items.size() == 0) ? 0 : (double) numberOfFirstChoiceEvents * 100 / items.size();
-		summary.setTotalPercentage(percentage.toString());
+		summary.setTotalPercentage(percentage);
 	    }
 
 	    request.setAttribute("groupSummaries", groupSummaries);
@@ -127,6 +122,9 @@ public class TblMonitorController {
 	model.addAllAttributes(modelAttributes);
 
 	model.addAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
+	model.addAttribute("scratchie", scratchie);
+	model.addAttribute("isTbl", true);
+
 	return "pages/monitoring/studentChoices";
     }
 
@@ -185,27 +183,7 @@ public class TblMonitorController {
 	    List<BurningQuestionItemDTO> burningQuestionItemDtos = scratchieService.getBurningQuestionDtos(scratchie,
 		    null, true, true);
 
-	    //unescape previously escaped session names
-	    for (BurningQuestionItemDTO burningQuestionItemDto : burningQuestionItemDtos) {
-		List<BurningQuestionDTO> burningQuestionDtos = burningQuestionItemDto.getBurningQuestionDtos();
-
-		for (BurningQuestionDTO burningQuestionDto : burningQuestionItemDto.getBurningQuestionDtos()) {
-
-		    String escapedBurningQuestion = StringEscapeUtils
-			    .unescapeJavaScript(burningQuestionDto.getEscapedBurningQuestion());
-		    burningQuestionDto.setEscapedBurningQuestion(escapedBurningQuestion);
-
-		    String sessionName = StringEscapeUtils.unescapeJavaScript(burningQuestionDto.getSessionName());
-		    burningQuestionDto.setSessionName(sessionName);
-		}
-
-		Collections.sort(burningQuestionDtos, new Comparator<BurningQuestionDTO>() {
-		    @Override
-		    public int compare(BurningQuestionDTO o1, BurningQuestionDTO o2) {
-			return new AlphanumComparator().compare(o1.getSessionName(), o2.getSessionName());
-		    }
-		});
-	    }
+	    MonitoringController.setUpBurningQuestions(burningQuestionItemDtos);
 
 	    request.setAttribute(ScratchieConstants.ATTR_BURNING_QUESTION_ITEM_DTOS, burningQuestionItemDtos);
 
@@ -214,7 +192,11 @@ public class TblMonitorController {
 
 	}
 
-	return "pages/tblmonitoring/burningQuestions";
+	request.setAttribute("isTbl", true);
+	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, scratchie.getContentId());
+	request.setAttribute("discussionSentimentEnabled", scratchie.isDiscussionSentimentEnabled());
+
+	return "pages/monitoring/parts/burningQuestions";
     }
 
     /**

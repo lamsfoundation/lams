@@ -18,6 +18,7 @@
 		<!-- ********************  CSS ********************** -->
 		<lams:css />
 		<link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
+		<link href="${lams}css/uppy.custom.css" rel="stylesheet" type="text/css" />
 		<style media="screen,projection" type="text/css">
 			.info {
 				margin: 10px;
@@ -67,7 +68,7 @@
 	</lams:head>
 	
 	<body class="stripes">
-		<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/message.js"></script>
+		<lams:JSImport src="includes/javascript/message.js" relative="true" />
 
 		<script type="text/javascript">
 			// The treetable code uses the clicks to expand and collapse the replies but then 

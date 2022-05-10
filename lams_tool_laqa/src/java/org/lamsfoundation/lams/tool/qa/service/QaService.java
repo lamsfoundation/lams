@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.qa.service;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -31,6 +32,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -39,6 +41,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -88,6 +91,7 @@ import org.springframework.dao.DataAccessException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -107,6 +111,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 
     private IToolContentHandler qaToolContentHandler = null;
     private IUserManagementService userManagementService;
+    private ILearnerService learnerService;
     private ILamsToolService toolService;
     private ILogEventService logEventService;
     private IExportToolContentService exportContentService;
@@ -141,18 +146,14 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	if (leader == null) {
 
 	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getQueUsrId().intValue());
-	    if (leaderUserId != null) {
+	    // set leader only if the leader entered the activity
+	    if (user.getQueUsrId().equals(leaderUserId)) {
+		// is it me?
+		leader = user;
+	    } else {
 		leader = getUserByIdAndSession(leaderUserId, toolSessionId);
-
-		// create new user in a DB
-		if (leader == null) {
-		    User leaderDto = (User) getUserManagementService().findById(User.class, leaderUserId.intValue());
-		    String userName = leaderDto.getLogin();
-		    String fullName = leaderDto.getFirstName() + " " + leaderDto.getLastName();
-		    leader = new QaQueUsr(leaderUserId, userName, fullName, qaSession, new TreeSet<>());
-		    qaQueUsrDAO.createUsr(user);
-		}
-
+	    }
+	    if (leader != null) {
 		// set group leader
 		qaSession.setGroupLeader(leader);
 		this.updateSession(qaSession);
@@ -548,6 +549,62 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 		+ message + NEW_LINE_CHARACTER + NEW_LINE_CHARACTER;
 
 	eventNotificationService.notifyLessonMonitors(sessionId, message, true);
+    }
+
+    @Override
+    public void changeLeaderForGroup(long toolSessionId, long leaderUserId) {
+	QaSession session = getSessionById(toolSessionId);
+	if (QaAppConstants.COMPLETED.equals(session.getSession_status())) {
+	    throw new InvalidParameterException("Attempting to assing a new leader with user ID " + leaderUserId
+		    + " to a finished session wtih ID " + toolSessionId);
+	}
+
+	QaQueUsr existingLeader = session.getGroupLeader();
+	if (existingLeader == null || existingLeader.getQueUsrId().equals(leaderUserId)) {
+	    return;
+	}
+
+	if (existingLeader.isResponseFinalized() || existingLeader.isLearnerFinished()) {
+	    throw new InvalidParameterException(
+		    "Attempting to assing a new leader with user ID " + leaderUserId + " to a session wtih ID "
+			    + toolSessionId + " after response has been submitted by existing leader.");
+	}
+
+	QaQueUsr newLeader = getUserByIdAndSession(leaderUserId, toolSessionId);
+	if (newLeader == null) {
+	    newLeader = createUser(toolSessionId, Long.valueOf(leaderUserId).intValue());
+
+	    if (logger.isDebugEnabled()) {
+		logger.debug("Created user with ID " + leaderUserId + " to become a new leader for session with ID "
+			+ toolSessionId);
+	    }
+	} else {
+	    List<QaUsrResp> newLeaderResponses = getResponsesByUserUid(newLeader.getUid());
+	    for (QaUsrResp response : newLeaderResponses) {
+		qaUsrRespDAO.removeUserResponse(response);
+	    }
+	}
+
+	session.setGroupLeader(newLeader);
+	qaSessionDAO.UpdateQaSession(session);
+
+	List<QaUsrResp> existingLeaderResponses = getResponsesByUserUid(existingLeader.getUid());
+	for (QaUsrResp response : existingLeaderResponses) {
+	    response.setQaQueUser(newLeader);
+	    qaUsrRespDAO.updateUserResponse(response);
+	}
+
+	if (logger.isDebugEnabled()) {
+	    logger.debug("User with ID " + leaderUserId + " became a new leader for session with ID " + toolSessionId);
+	}
+
+	Set<Integer> userIds = session.getQaQueUsers().stream()
+		.collect(Collectors.mapping(qaQueUsr -> qaQueUsr.getQueUsrId().intValue(), Collectors.toSet()));
+
+	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
+	jsonCommand.put("hookTrigger", "qa-leader-change-refresh-" + toolSessionId);
+	learnerService.createCommandForLearners(session.getQaContent().getQaContentId(), userIds,
+		jsonCommand.toString());
     }
 
     @Override
@@ -971,6 +1028,10 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	this.userManagementService = userManagementService;
     }
 
+    public void setLearnerService(ILearnerService learnerService) {
+	this.learnerService = learnerService;
+    }
+
     public void setToolService(ILamsToolService toolService) {
 	this.toolService = toolService;
     }
@@ -1126,21 +1187,23 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	user.setLearnerFinished(true);
 	updateUser(user);
 
-	//if this is a leader finishes, complete all non-leaders as well, also copy leader results to them
+	//if this is a leader finished, complete all non-leaders as well, also copy leader results to them
 	QaSession session = user.getQaSession();
-	QaQueUsr groupLeader = checkLeaderSelectToolForSessionLeader(user, toolSessionID);
-	if (isUserGroupLeader(userID, toolSessionID)) {
-	    session.getQaQueUsers().forEach(sessionUser -> {
-		//finish users
-		sessionUser.setResponseFinalized(true);
-		sessionUser.setLearnerFinished(true);
-		updateUser(user);
+	if (session.getQaContent().isUseSelectLeaderToolOuput()) {
+	    QaQueUsr groupLeader = checkLeaderSelectToolForSessionLeader(user, toolSessionID);
+	    if (isUserGroupLeader(userID, toolSessionID)) {
+		session.getQaQueUsers().forEach(sessionUser -> {
+		    //finish users
+		    sessionUser.setResponseFinalized(true);
+		    sessionUser.setLearnerFinished(true);
+		    updateUser(user);
 
-		//copy answers from leader to non-leaders
-		copyAnswersFromLeader(sessionUser, groupLeader);
-	    });
+		    //copy answers from leader to non-leaders
+		    copyAnswersFromLeader(sessionUser, groupLeader);
+		});
+	    }
 	}
-
+	
 	//return nextActivityUrl
 	return leaveToolSession(toolSessionID, userID);
     }

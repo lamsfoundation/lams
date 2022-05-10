@@ -1,6 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <!-- Table -->
+<c:if test="${not empty questions}">
 <div class="row no-gutter">
 <div class="col-xs-12 col-md-12 col-lg-12">
 <div class="panel">
@@ -47,6 +48,7 @@
 </div>          
 </div>
 </div>
+
 <!-- End table -->
 
 <!-- Question detail modal -->
@@ -58,7 +60,13 @@
 	
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h4 class="panel-title"><span class="float-left space-right">Q${i.index+1})</span> ${question.question}</h4>
+				<h4 class="panel-title">
+					<span class="float-left space-right">Q${i.index+1})</span>
+					<c:if test="${not empty question.title}">
+						<p><c:out value="${question.title}"  escapeXml="false" /></p>
+					</c:if>
+					${question.question}
+				</h4>
 			</div>
 			<div class="panel-body">
 				<div class="table-responsive">
@@ -98,3 +106,4 @@
 	</div>
 </c:forEach>
 <!-- End question detail modal -->
+</c:if>

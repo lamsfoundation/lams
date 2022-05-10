@@ -18,6 +18,7 @@ CKEDITOR.plugins.setLang( 'bootsnippets', 'ru', {
 	textThreeColumns: 'Три колонки',
 	textStatement: 'Утверждение',
 	textNote: 'Запись',
+	textLabel: 'Labels'
 	textQuote: 'Цитата',
 	textTable: 'Таблица',
 	textPanel: 'Панель (с заголовком)',

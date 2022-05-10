@@ -27,6 +27,10 @@
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/bootstrap-slider.css" />
+	<c:if test="${not empty codeStyles}">
+		<link rel="stylesheet" type="text/css" href="${lams}css/codemirror.css" />
+		<link rel="stylesheet" type="text/css" href="${lams}css/codemirror_simplescrollbars.css" />
+	</c:if>
 	<style>
 		.slider.slider-horizontal {
 			margin-left: 40px;
@@ -36,12 +40,18 @@
 			padding: 0;
 		}
 		
-		[data-toggle="collapse"].collapsed .if-not-collapsed, [data-toggle="collapse"]:not(.collapsed) .if-collapsed {
+		[data-toggle="collapse"].collapsed .if-not-collapsed,
+		[data-toggle="collapse"]:not(.collapsed) .if-collapsed,
+		.max-word-limit-exceeded {
   			display: none;
   		}
   		
   		.countdown-timeout {
   			color: #FF3333 !important;
+  		}
+  		
+  		#leader-info {
+  			margin-bottom: 10px;
   		}
 	</style>
 
@@ -52,7 +62,43 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jgrowl.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-slider.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/Sortable.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/Sortable.js"></script>
+	
+	<c:if test="${not empty codeStyles}">
+		<script type="text/javascript" src="${lams}includes/javascript/codemirror/codemirror.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/scroll/simplescrollbars.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/selection/active-line.js"></script>
+		<c:if test="${hasEditRight}">
+			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/comment/continuecomment.js"></script>
+			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/edit/closebrackets.js"></script>
+			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/edit/matchbrackets.js"></script>
+		</c:if>
+
+		<script type="text/javascript">
+			CodeMirror.defaults.readOnly = ${!hasEditRight};
+			CodeMirror.defaults.lineNumbers = true;
+			CodeMirror.defaults.continueComments = true;
+			CodeMirror.defaults.autoCloseBrackets = true; 
+			CodeMirror.defaults.matchBrackets = true;
+			CodeMirror.defaults.scrollbarStyle = 'simple';
+			CodeMirror.defaults.styleActiveLine = true;
+		</script>
+	</c:if>
+	<%-- codeStyles is a set, so each code style will be listed only once --%>
+	<c:forEach items="${codeStyles}" var="codeStyle">
+		<c:choose>
+			<c:when test="${codeStyle == 1}">
+				<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/python.js"></script>
+			</c:when>
+			<c:when test="${codeStyle == 2}">
+				<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/javascript.js"></script>
+			</c:when>
+			<c:when test="${codeStyle >= 3}">
+				<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/clike.js"></script>
+			</c:when>
+		</c:choose>
+	</c:forEach>
+	
 	<script type="text/javascript">
 		$(document).ready(function(){
 			//if isLeadershipEnabled - enable/disable submit buttons for hedging marks type of questions
@@ -65,12 +111,6 @@
 					var totalSelected = countHedgeQuestionSelectTotal(questionIndex);
 					
 					var isButtonEnabled = (totalSelected == maxMark);
-					
-					//check if hedging justification is enabled
-					var justificationTextarea = $("#justification-question" + questionIndex);
-					if( justificationTextarea.length) {
-						isButtonEnabled = isButtonEnabled && $.trim(justificationTextarea.val());
-					}
 					
 					//if totalSelected equals to question's maxMark - show button
 					if (isButtonEnabled) {
@@ -103,9 +143,9 @@
 						}			            
 			        });
 			    });
-				
-				initAssessmentTimeLimitWebsocket();
 			}
+
+			initAssessmentTimeLimitWebsocket();
 
 			//autocomplete for VSA
 			$('.ui-autocomplete-input').each(function(){
@@ -115,6 +155,27 @@
 					'minLength' : 3
 				});
 			});
+			
+			// show etherpads only on Discussion expand
+			$('.question-etherpad-collapse').on('show.bs.collapse', function(){
+				var etherpad = $('.etherpad-container', this);
+				if (!etherpad.hasClass('initialised')) {
+					var id = etherpad.attr('id'),
+						groupId = id.substring('etherpad-container-'.length);
+					etherpadInitMethods[groupId]();
+				}
+			});
+
+			<%-- Connect to command websocket only if it is learner UI --%>
+			<c:if test="${isLeadershipEnabled and mode == 'learner'}">
+				// command websocket stuff for refreshing
+				// trigger is an unique ID of page and action that command websocket code in Page.tag recognises
+				commandWebsocketHookTrigger = 'assessment-leader-triggered-refresh-${toolSessionID}';
+				// if the trigger is recognised, the following action occurs
+				commandWebsocketHook = function() {
+					location.reload();
+				};
+			</c:if>
 		});
 		
 		function countHedgeQuestionSelectTotal(questionIndex) {
@@ -124,11 +185,6 @@
 			});
 			return totalSelected;
 		}
-	
-		//boolean to indicate whether ok dialog is still ON so that autosave can't be run
-		// var isWaitingForConfirmation = ${isTimeLimitEnabled && sessionMap.isTimeLimitNotLaunched};
-	
-		
 		
 		// TIME LIMIT
 
@@ -237,13 +293,15 @@
 						$(this).removeClass('countdown-timeout');
 					}
 				},
-				onExpiry: function(periods) {
-			        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <fmt:message key="label.learning.blockui.time.is.over" /></h1>' }); 
-			        
-			        setTimeout(function() { 
-			        	submitAll(true);
-			        }, 4000); 
-				},
+				<c:if test="${hasEditRight && (mode != 'teacher')}">
+					onExpiry: function(periods) {
+				        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <fmt:message key="label.learning.blockui.time.is.over" /></h1>' }); 
+				        
+				        setTimeout(function() { 
+				        	submitAll(true);
+				        }, 4000); 
+					},
+				</c:if>
 				description: "<div id='countdown-label'><fmt:message key='label.learning.countdown.time.left' /></div>"
 			});
 		}
@@ -251,30 +309,59 @@
 		
 		//autosave feature
 		<c:if test="${hasEditRight && (mode != 'teacher')}">
-		
-			function learnerAutosave(){
-				// if (isWaitingForConfirmation) return;
+			var autosaveInterval = ${isLeadershipEnabled and isUserLeader ? 10000 : 30000}; // 30 or 10 seconds interval
+			
+			function learnerAutosave(isCommand){
+				// isCommand means that the autosave was triggered by force complete or another command websocket message
+				// in this case do not check multiple tabs open, just autosave
+				if (!isCommand) {
+					let shouldAutosave = preventLearnerAutosaveFromMultipleTabs(autosaveInterval);
+					if (!shouldAutosave) {
+						return;
+					}
+				}
+				
+				if (typeof CodeMirror != 'undefined') {
+					$('.CodeMirror').each(function(){
+						this.CodeMirror.save();
+					});
+				}
 				
 				//copy value from CKEditor (only available in essay type of questions) to textarea before ajax submit
 				$("textarea[id^='question']").each(function()  {
 					var ckeditorData = CKEDITOR.instances[this.name].getData();
 					//skip out empty values
-					this.value = ((ckeditorData == null) || (ckeditorData.replace(/&nbsp;| |<br \/>|\s|<p>|<\/p>|\xa0/g, "").length == 0)) ? "" : ckeditorData;						
+					this.value = ((ckeditorData == null) || (ckeditorData.replace(/&nbsp;| |<br \/>|\s|<p>|<\/p>|\xa0/g, "").length == 0)) ? "" : ckeditorData;		
 				});
+
+				
+
+				// copy value from lams:textarea (only available in essay and mark hedging type of questions) to hidden input before ajax submit
+				$("textarea[name$=__textarea]").change();
 				
 				//ajax form submit
 				$('#answers').ajaxSubmit({
 					url: "<c:url value='/learning/autoSaveAnswers.do'/>?sessionMapID=${sessionMapID}&date=" + new Date().getTime(),
-	                success: function() {
+	                success: function(response) {
+		                if (response != 'ok') {
+		                	 onLearnerAutosaveError();
+		                	 return;
+			            }
+			            
 		                $.jGrowl(
 		                	"<i class='fa fa-lg fa-floppy-o'></i> <fmt:message key="label.learning.draft.autosaved" />",
 		                	{ life: 2000, closeTemplate: '' }
 		                );
-	                }
+	                },
+	                error : onLearnerAutosaveError
 				});
 			}
-			var autosaveInterval = "30000"; // 30 seconds interval
 			window.setInterval(learnerAutosave, autosaveInterval);
+
+			function onLearnerAutosaveError() {
+				alert('<fmt:message key="label.learning.draft.autosave.error" />');
+				location.reload();
+			}
 		</c:if>
 		
 		//check if we came back due to failed answers' validation (missing required question's answer or min words limit not reached)
@@ -299,13 +386,22 @@
 		}
 		
 		function submitAll(isTimelimitExpired){
-			//only if time limit is not expired
-			if (!isTimelimitExpired) {
-				if (!validateAnswers()) {
-					return;
-				}
+			if (typeof CodeMirror != 'undefined') {
+				$('.CodeMirror').each(function(){
+					this.CodeMirror.save();
+				});
 			}
+			
+			// only if time limit is not expired
+			if (!isTimelimitExpired && !validateAnswers()) {
+				return;
+			}
+			
 			disableButtons();
+
+			// copy value from lams:textarea (only available in essay and mark hedging type of questions) to hidden input before submit
+			$("textarea[name$=__textarea]").change();
+			
 	        var myForm = $("#answers");
 	        myForm.attr("action", "<c:url value='/learning/submitAll.do?sessionMapID=${sessionMapID}'/>&isTimelimitExpired=" + isTimelimitExpired);
 	        myForm.submit();
@@ -327,35 +423,23 @@
 			});
 		}
 		
-		if (${!hasEditRight && mode != "teacher"}) {
-			setInterval("checkLeaderProgress();", 15000);// Auto-Refresh every 15 seconds for non-leaders
-		}
-		
-		function checkLeaderProgress() {
-	        $.ajax({
-	        	async: false,
-	            url: '<c:url value="/learning/checkLeaderProgress.do"/>',
-	            data: 'toolSessionID=${toolSessionID}',
-	            dataType: 'json',
-	            type: 'post',
-	            success: function (json) {
-	            	if (json.isPageRefreshRequested) {
-	            		location.reload();
-	            	}
-	            }
-	       	});
-		}
-		
 		function validateAnswers() {
 			if (${!hasEditRight}) {
 				return true;
 			}
+
+			if (typeof CodeMirror != 'undefined') {
+				$('.CodeMirror').each(function(){
+					this.CodeMirror.save();
+				});
+			}
+			
+			// copy value from lams:textarea (only available in essay and mark hedging type of questions) to hidden input before submit
+			$("textarea[name$=__textarea]").change();
 			
 			var missingRequiredQuestions = [];
 			var minWordsLimitNotReachedQuestions = [];
-			var maxWordsLimitExceededQuestions = [];
 			var markHedgingWrongTotalQuestions = [];
-			var markHedgingWrongJustification = [];
 			
 			<c:forEach var="question" items="${sessionMap.pagedQuestions[pageNumber-1]}" varStatus="status">
 				<c:if test="${question.answerRequired}">
@@ -381,8 +465,8 @@
 
 						</c:when>
 						
-						<c:when test="${(question.type == 3) || (question.type == 4) || (question.type == 6 && !question.allowRichEditor)}">
-							//shortanswer or numerical or essay without ckeditor
+						<c:when test="${(question.type == 3) || (question.type == 4) || (question.type == 6 && !question.allowRichEditor and empty question.codeStyle)}">
+							// short answer or numerical or essay without ckeditor or code style
 							var inputText = $("input[name=question${status.index}]")[0];
 							if($.trim(inputText.value).length == 0) {
 								missingRequiredQuestions.push("${status.index}");
@@ -398,14 +482,25 @@
 						</c:when>
 							
 						<c:when test="${question.type == 6 && question.allowRichEditor}">
-							//essay with ckeditor
+							// essay with ckeditor
 							var ckeditorData = CKEDITOR.instances["question${status.index}"].getData();
 							//can't be null and empty value
 							if((ckeditorData == null) || (ckeditorData.replace(/&nbsp;| |<br \/>|\s|<p>|<\/p>|\xa0/g, "").length == 0)) {
 								missingRequiredQuestions.push("${status.index}");
 							}
 						</c:when>
-							
+						
+						<c:when test="${question.type == 6 && not empty question.codeStyle}">
+							// essay with code style
+							var textarea = $("textarea[name=question${status.index}]"),
+								codeMirror = textarea.siblings('.CodeMirror')[0],
+								text = codeMirror.CodeMirror.doc.getValue();
+
+							if($.trim(text).length == 0) {
+								missingRequiredQuestions.push("${status.index}");
+							}
+						</c:when>
+					
 						<c:when test="${question.type == 7}">
 							//ordering - do nothing
 						</c:when>
@@ -414,15 +509,6 @@
 							//mark hedging - processed below
 						</c:when>
 					</c:choose>
-				</c:if>
-				
-				//essay question which has max words limit
-				<c:if test="${question.type == 6 && question.maxWordsLimit != 0}">
-					var wordCount${status.index} = $('#word-count${status.index}').text();
-					//max words limit is exceeded
-					if(wordCount${status.index} > ${question.maxWordsLimit}) {
-						maxWordsLimitExceededQuestions.push("${status.index}");
-					}
 				</c:if>
 				
 				//essay question which has min words limit
@@ -452,9 +538,6 @@
 						if (totalSelected != maxMark) {
 							markHedgingWrongTotalQuestions.push("${status.index}");
 						}
-						if(${question.hedgingJustificationEnabled} && !$.trim($("#justification-question" + questionIndex).val())){
-							markHedgingWrongJustification.push("${status.index}");
-						}
 					}
 					
 				</c:if>
@@ -463,7 +546,7 @@
 			
 			//return true in case all required questions were answered, false otherwise
 			if (missingRequiredQuestions.length == 0 && minWordsLimitNotReachedQuestions.length == 0 
-					&& maxWordsLimitExceededQuestions.length == 0 && markHedgingWrongTotalQuestions.length == 0 && markHedgingWrongJustification.length ==0) {
+					&& markHedgingWrongTotalQuestions.length == 0) {
 				return true;
 				
 			} else {
@@ -472,7 +555,6 @@
 				$('#warning-answers-required').hide();
 				$('#warning-words-limit').hide();
 				$('#warning-mark-hedging-wrong-total').hide();
-				$('#warning-mark-hedging-wrong-justification').hide();
 				
 				if (missingRequiredQuestions.length != 0) {
 					//add .bg-warning class to those needs to be filled
@@ -482,15 +564,6 @@
 					//show alert message as well
 					$("#warning-answers-required").show();
 					
-				}
-				
-				if (maxWordsLimitExceededQuestions.length != 0) {
-					//add .bg-warning class to those needs to be filled
-					for (i = 0; i < maxWordsLimitExceededQuestions.length; i++) {
-					    $("#question-area-" + maxWordsLimitExceededQuestions[i]).addClass('bg-warning');
-					}
-					//show alert message as well
-					$("#warning-words-limit").show();		
 				}
 				
 				if (minWordsLimitNotReachedQuestions.length != 0) {
@@ -510,14 +583,6 @@
 					//show alert message as well
 					$("#warning-mark-hedging-wrong-total").show();		
 				}
-				if (markHedgingWrongJustification.length != 0) {
-					//add .bg-warning class to those needs to be filled
-					for (i = 0; i < markHedgingWrongJustification.length; i++) {
-					    $("#question-area-" + markHedgingWrongJustification[i]).addClass('bg-warning');
-					}
-					//show alert message as well
-					$("#warning-mark-hedging-wrong-justification").show();
-				}
 				
 				$("html, body").animate({ scrollTop: 0 }, "slow");//window.scrollTo(0, 0);
 				
@@ -525,23 +590,29 @@
 			}
 		}
 
-		function getNumberOfWords(value, isRemoveHtmlTags) {
-			
-		    //HTML tags stripping 
-			if (isRemoveHtmlTags) {
-				value = value.replace(/&nbsp;/g, '').replace(/<\/?[a-z][^>]*>/gi, '');
-			}
-			value = value.trim();
-			
-		    var wordCount = value ? (value.replace(/['";:,.?\-!]+/g, '').match(/\S+/g) || []).length : 0;
-		    return wordCount;
+		function getNumberOfWords(value) {
+			var wordsForCounting = value.trim().replace(/['";:,.?\-!]+/g, '');
+			return value ? (value.match(/\S+/g) || []).length : 0;
+		}
+
+		function logLearnerInteractionEvent(eventType, qbToolQuestionUid, optionUid) {
+			$.ajax({
+				url: '<c:url value="/learning/logLearnerInteractionEvent.do"/>',
+				data: {
+					eventType         : eventType,
+					qbToolQuestionUid : qbToolQuestionUid,
+					optionUid         : optionUid
+				},
+				cache : false,
+				type  : 'post',
+				dataType : 'text'
+			});
 		}
     </script>
 </lams:head>
 <body class="stripes">
 
 	<lams:Page type="learner" title="${assessment.title}">
-		
 		<c:if test="${not empty sessionMap.submissionDeadline && (sessionMap.mode == 'author' || sessionMap.mode == 'learner')}">
 			<lams:Alert id="submission-deadline" type="info" close="true">
 				<fmt:message key="authoring.info.teacher.set.restriction" >
@@ -551,9 +622,20 @@
 		</c:if>
 		
 		<c:if test="${isLeadershipEnabled}">
-			<lams:LeaderDisplay username="${sessionMap.groupLeader.firstName} ${sessionMap.groupLeader.lastName}" userId="${sessionMap.groupLeader.userId}"/>
+			<lams:LeaderDisplay idName="leader-info"
+								username="${sessionMap.groupLeader.firstName} ${sessionMap.groupLeader.lastName}" userId="${sessionMap.groupLeader.userId}"/>
 		</c:if>
-
+		
+		<c:if test="${assessment.allowDiscloseAnswers}">
+			<lams:Alert type="info" close="true">
+				<fmt:message key="label.learning.disclose.tip" />
+			</lams:Alert>
+		</c:if>
+		
+		<lams:Alert type="info" close="true">
+			<fmt:message key="label.learning.submit.all.tip" />
+		</lams:Alert>
+		
 		<div class="panel">
 			<c:out value="${assessment.instructions}" escapeXml="false"/>
 		</div>
@@ -570,10 +652,6 @@
 			<fmt:message key="warn.mark.hedging.wrong.total" />
 		</lams:Alert>
 		
-		<lams:Alert id="warning-mark-hedging-wrong-justification" type="warning" close="true">
-			<fmt:message key="warn.mark.hedging.wrong.justification" />
-		</lams:Alert>
-		
 		<lams:errors/>
 		<br>
 		
@@ -588,7 +666,8 @@
 				<c:if test="${hasEditRight}">					
 					<button type="button" name="submitAll"
 							onclick="return submitAll(false);" 
-							class="btn btn-primary voffset10 pull-right na">
+							class="btn btn-primary voffset10 pull-right na"
+							>
 						<fmt:message key="label.learning.submit.all" />
 					</button>
 				</c:if>

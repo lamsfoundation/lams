@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.leaderselection.dao.hibernate;
 
 import java.util.List;
@@ -41,7 +40,7 @@ public class LeaderselectionDAO extends LAMSBaseDAO implements ILeaderselectionD
 
     @Override
     public Leaderselection getByContentId(Long toolContentId) {
-	List list = doFind(LeaderselectionDAO.FIND_FORUM_BY_CONTENTID, toolContentId);
+	List list = doFindCacheable(LeaderselectionDAO.FIND_FORUM_BY_CONTENTID, toolContentId);
 	if (list != null && list.size() > 0) {
 	    return (Leaderselection) list.get(0);
 	} else {

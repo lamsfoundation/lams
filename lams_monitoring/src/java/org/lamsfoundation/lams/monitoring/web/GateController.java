@@ -135,7 +135,15 @@ public class GateController {
     public String openGate(@ModelAttribute GateForm gateForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 	GateActivity gate = monitoringService.openGate(gateForm.getActivityId(), getUserId());
+	return findViewByGateType(gateForm, gate);
+    }
 
+    /**
+     * Close the gate again.
+     */
+    @RequestMapping(path = "/closeGate", method = RequestMethod.POST)
+    public String closeGate(@ModelAttribute GateForm gateForm) {
+	GateActivity gate = monitoringService.closeGate(gateForm.getActivityId());
 	return findViewByGateType(gateForm, gate);
     }
 

@@ -100,6 +100,10 @@ public class MonitoringController {
 		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
 	}
 
+	if (mindmap.isGalleryWalkFinished() && !mindmap.isGalleryWalkReadOnly()) {
+	    mindmapService.fillGalleryWalkRatings(mindmapDTO, null);
+	}
+
 	return "pages/monitoring/monitoring";
     }
 
@@ -115,13 +119,14 @@ public class MonitoringController {
 	request.setAttribute("mindmapId", mindmap.getUid());
 	request.setAttribute("sessionId", WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 	request.setAttribute("mode", ToolAccessMode.TEACHER);
+	request.setAttribute("allowPrinting", true);
 
 	if (!mindmap.isMultiUserMode()) {
 	    Long userId = new Long(WebUtil.readLongParam(request, "userUID"));
 	    MindmapUser mindmapUser = mindmapService.getUserByUID(userId);
 	    MindmapUserDTO userDTO = new MindmapUserDTO(mindmapUser);
 	    request.setAttribute("userDTO", userDTO);
-	    request.setAttribute("userId", mindmapUser.getUid());
+	    request.setAttribute("userUid", mindmapUser.getUid());
 	}
 
 	return "pages/monitoring/mindmapDisplay";
@@ -173,8 +178,29 @@ public class MonitoringController {
 	}
 	mindmap.setSubmissionDeadline(tzSubmissionDeadline);
 	mindmapService.saveOrUpdateMindmap(mindmap);
-	
+
 	return formattedDate;
+    }
+
+    @RequestMapping("/startGalleryWalk")
+    public void startGalleryWalk(HttpServletRequest request) throws IOException {
+	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID, false);
+
+	mindmapService.startGalleryWalk(toolContentId);
+    }
+
+    @RequestMapping("/finishGalleryWalk")
+    public void finishGalleryWalk(HttpServletRequest request) throws IOException {
+	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID, false);
+
+	mindmapService.finishGalleryWalk(toolContentId);
+    }
+
+    @RequestMapping("/enableGalleryWalkLearnerEdit")
+    public void enableGalleryWalkLearnerEdit(HttpServletRequest request) throws IOException {
+	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID, false);
+
+	mindmapService.enableGalleryWalkLearnerEdit(toolContentId);
     }
 
 }

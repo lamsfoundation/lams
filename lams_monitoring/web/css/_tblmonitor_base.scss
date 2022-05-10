@@ -56,10 +56,6 @@
     border-radius: 0 0 6px 6px;
 }
 
-#refresh-button {
-	margin-right: 15px;
-}
-
 /* Sidebar Styles */
 
 table.tablesorter {
@@ -71,11 +67,16 @@ table.tablesorter {
 	text-decoration: none;
 }
 
+#page-content-wrapper #menu-left-controls {
+	padding-top: 25px;
+}
+
 .courses-title {
-    padding-left: 0;
-    word-break: break-all;
     line-height: 10px;
-    font-size: 19px;
+    font-size: 24px;
+	font-weight: 400;
+	vertical-align: middle;
+	padding-left: 10px;
 }
 
 .offcanvas-header {
@@ -151,10 +152,21 @@ table.tablesorter {
     background: none;
 }
 
+.top-nav {
+	padding: 0 10px 0 15px;
+	display: flex;
+    justify-content: space-between;
+}
+
 .top-nav div {
     padding-top: 13px;
 }
 
+.top-nav #menu-right-controls {
+	min-width: 100px;
+}
+	
+	
 @media(min-width:768px) {
     #wrapper {
         padding-left: 154px;
@@ -175,7 +187,11 @@ table.tablesorter {
     #wrapper.toggled #page-content-wrapper {
         margin-right: 0;
     }
-   
+
+    .top-nav #menu-right-controls {
+	    min-width: 400px;
+	}
+	
    .top-nav div {
 	    padding-top: 20px;
 	}
@@ -260,6 +276,7 @@ table.tablesorter {
 
 i.fa.fa-check-square{
      float: right;
+     cursor: pointer;
      color:green;
 	 font-size:2.2em;
 	 margin-top:-8px;

@@ -49,11 +49,11 @@
 	
 	 		<lams:TabBodys>
 				<!-- tab content 1 (Basic) -->
-				<lams:TabBody id="1" titleKey="label.authoring.heading.basic.description" page="basic.jsp" />
+				<lams:TabBody id="1" page="basic.jsp" />
 				<!-- end of content (Basic) -->
 	
 				<!-- tab content 2 (Advanced) -->
-				<lams:TabBody id="2" titleKey="label.authoring.heading.advanced.description" page="advanced.jsp" />
+				<lams:TabBody id="2" page="advanced.jsp" />
 				<!-- end of content (Advanced) -->
 			</lams:TabBodys>
 	

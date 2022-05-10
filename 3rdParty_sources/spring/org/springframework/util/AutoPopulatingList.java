@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,12 +17,15 @@
 package org.springframework.util;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+
+import org.springframework.lang.Nullable;
 
 /**
  * Simple {@link List} wrapper class that allows for elements to be
@@ -38,6 +41,7 @@ import java.util.ListIterator;
  * @author Rob Harrop
  * @author Juergen Hoeller
  * @since 2.0
+ * @param <E> the element type
  */
 @SuppressWarnings("serial")
 public class AutoPopulatingList<E> implements List<E>, Serializable {
@@ -60,7 +64,7 @@ public class AutoPopulatingList<E> implements List<E>, Serializable {
 	 * to the backing {@link List} on demand.
 	 */
 	public AutoPopulatingList(Class<? extends E> elementClass) {
-		this(new ArrayList<E>(), elementClass);
+		this(new ArrayList<>(), elementClass);
 	}
 
 	/**
@@ -69,7 +73,7 @@ public class AutoPopulatingList<E> implements List<E>, Serializable {
 	 * {@link List} on demand.
 	 */
 	public AutoPopulatingList(List<E> backingList, Class<? extends E> elementClass) {
-		this(backingList, new ReflectiveElementFactory<E>(elementClass));
+		this(backingList, new ReflectiveElementFactory<>(elementClass));
 	}
 
 	/**
@@ -77,7 +81,7 @@ public class AutoPopulatingList<E> implements List<E>, Serializable {
 	 * {@link ArrayList} and creates new elements on demand using the supplied {@link ElementFactory}.
 	 */
 	public AutoPopulatingList(ElementFactory<E> elementFactory) {
-		this(new ArrayList<E>(), elementFactory);
+		this(new ArrayList<>(), elementFactory);
 	}
 
 	/**
@@ -229,7 +233,7 @@ public class AutoPopulatingList<E> implements List<E>, Serializable {
 
 
 	@Override
-	public boolean equals(Object other) {
+	public boolean equals(@Nullable Object other) {
 		return this.backingList.equals(other);
 	}
 
@@ -242,7 +246,10 @@ public class AutoPopulatingList<E> implements List<E>, Serializable {
 	/**
 	 * Factory interface for creating elements for an index-based access
 	 * data structure such as a {@link java.util.List}.
+	 *
+	 * @param <E> the element type
 	 */
+	@FunctionalInterface
 	public interface ElementFactory<E> {
 
 		/**
@@ -271,8 +278,8 @@ public class AutoPopulatingList<E> implements List<E>, Serializable {
 
 
 	/**
-	 * Reflective implementation of the ElementFactory interface,
-	 * using {@code Class.newInstance()} on a given element class.
+	 * Reflective implementation of the ElementFactory interface, using
+	 * {@code Class.getDeclaredConstructor().newInstance()} on a given element class.
 	 */
 	private static class ReflectiveElementFactory<E> implements ElementFactory<E>, Serializable {
 
@@ -288,7 +295,11 @@ public class AutoPopulatingList<E> implements List<E>, Serializable {
 		@Override
 		public E createElement(int index) {
 			try {
-				return this.elementClass.newInstance();
+				return ReflectionUtils.accessibleConstructor(this.elementClass).newInstance();
+			}
+			catch (NoSuchMethodException ex) {
+				throw new ElementInstantiationException(
+						"No default constructor on element class: " + this.elementClass.getName(), ex);
 			}
 			catch (InstantiationException ex) {
 				throw new ElementInstantiationException(
@@ -297,6 +308,10 @@ public class AutoPopulatingList<E> implements List<E>, Serializable {
 			catch (IllegalAccessException ex) {
 				throw new ElementInstantiationException(
 						"Could not access element constructor: " + this.elementClass.getName(), ex);
+			}
+			catch (InvocationTargetException ex) {
+				throw new ElementInstantiationException(
+						"Failed to invoke element constructor: " + this.elementClass.getName(), ex.getTargetException());
 			}
 		}
 	}

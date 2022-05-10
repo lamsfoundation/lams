@@ -17,21 +17,35 @@
 
 package org.apache.poi.hssf.record;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
- * Title: Merged Cells Record (0x00E5)<p>
- * 
- * Description:  Optional record defining a square area of cells to "merged" into one cell.
+ * Optional record defining a square area of cells to "merged" into one cell.
  */
-public final class MergeCellsRecord extends StandardRecord implements Cloneable {
-    public final static short sid = 0x00E5;
-    /** sometimes the regions array is shared with other MergedCellsRecords */ 
+public final class MergeCellsRecord extends StandardRecord {
+    public static final short sid = 0x00E5;
+
+    /** sometimes the regions array is shared with other MergedCellsRecords */
     private final CellRangeAddress[] _regions;
     private final int _startIndex;
     private final int _numberOfRegions;
+
+    public MergeCellsRecord(MergeCellsRecord other) {
+        super(other);
+        _regions = (other._regions == null) ? null
+            : Stream.of(other._regions).map(CellRangeAddress::copy).toArray(CellRangeAddress[]::new);
+        _startIndex = other._startIndex;
+        _numberOfRegions = other._numberOfRegions;
+    }
+
 
     public MergeCellsRecord(CellRangeAddress[] regions, int startIndex, int numberOfRegions) {
 		_regions = regions;
@@ -63,7 +77,7 @@ public final class MergeCellsRecord extends StandardRecord implements Cloneable 
 
     /**
      * @param index the n-th MergedRegion
-     * 
+     *
      * @return MergedRegion at the given index representing the area that is Merged (r1,c1 - r2,c2)
      */
     public CellRangeAddress getAreaAt(int index) {
@@ -82,38 +96,27 @@ public final class MergeCellsRecord extends StandardRecord implements Cloneable 
 
     @Override
     public void serialize(LittleEndianOutput out) {
-        int nItems = _numberOfRegions;
-        out.writeShort(nItems);
+        out.writeShort(_numberOfRegions);
         for (int i = 0; i < _numberOfRegions; i++) {
 			_regions[_startIndex + i].serialize(out);
 		}
     }
 
     @Override
-    public String toString() {
-        StringBuffer retval = new StringBuffer();
-
-        retval.append("[MERGEDCELLS]").append("\n");
-        retval.append("     .numregions =").append(getNumAreas()).append("\n");
-        for (int k = 0; k < _numberOfRegions; k++) {
-            CellRangeAddress r = _regions[_startIndex + k];
-
-            retval.append("     .rowfrom =").append(r.getFirstRow()).append("\n");
-            retval.append("     .rowto   =").append(r.getLastRow()).append("\n");
-            retval.append("     .colfrom =").append(r.getFirstColumn()).append("\n");
-            retval.append("     .colto   =").append(r.getLastColumn()).append("\n");
-        }
-        retval.append("[MERGEDCELLS]").append("\n");
-        return retval.toString();
+    public MergeCellsRecord copy() {
+        return new MergeCellsRecord(this);
     }
 
     @Override
-    public MergeCellsRecord clone() {
-    	int nRegions = _numberOfRegions;
-    	CellRangeAddress[] clonedRegions = new CellRangeAddress[nRegions];
-		for (int i = 0; i < clonedRegions.length; i++) {
-			clonedRegions[i] = _regions[_startIndex + i].copy();
-		}
-        return new MergeCellsRecord(clonedRegions, 0, nRegions);
+    public HSSFRecordTypes getGenericRecordType() {
+        return HSSFRecordTypes.MERGE_CELLS;
+    }
+
+    @Override
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "numRegions", this::getNumAreas,
+            "regions", () -> Arrays.copyOfRange(_regions, _startIndex, _startIndex+_numberOfRegions)
+        );
     }
 }

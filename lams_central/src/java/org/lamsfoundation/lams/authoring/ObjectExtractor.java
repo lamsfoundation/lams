@@ -96,6 +96,7 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
+import org.lamsfoundation.lams.util.ValidationUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -331,12 +332,19 @@ public class ObjectExtractor implements IObjectExtractor {
 	if ((learningDesign != null) && (learningDesign.getCopyTypeID() != null)
 		&& !learningDesign.getCopyTypeID().equals(copyTypeID) && !learningDesign.getEditOverrideLock()) {
 	    throw new ObjectExtractorException(
-		    "Unable to save learning design.  Cannot change copy type on existing design.");
+		    "Unable to save learning design. Cannot change copy type on existing design.");
 	}
 	if (!copyTypeID.equals(LearningDesign.COPY_TYPE_NONE) && !learningDesign.getEditOverrideLock()) {
-	    throw new ObjectExtractorException("Unable to save learning design.  Learning design is read-only");
+	    throw new ObjectExtractorException("Unable to save learning design. Learning design is read-only");
 	}
 	learningDesign.setCopyTypeID(copyTypeID);
+
+	learningDesign.setTitle(JsonUtil.optString(ldJSON, AuthoringJsonTags.TITLE));
+	if (!ValidationUtil.isLearningDesignNameValid(learningDesign.getTitle())) {
+	    throw new ObjectExtractorException(
+		    "Unable to save learning design. Learning design title contains forbidden characters: "
+			    + learningDesign.getTitle());
+	}
 
 	learningDesign.setWorkspaceFolder(workspaceFolder);
 	learningDesign.setUser(user);
@@ -379,7 +387,6 @@ public class ObjectExtractor implements IObjectExtractor {
 	learningDesign.setValidDesign(JsonUtil.optBoolean(ldJSON, AuthoringJsonTags.VALID_DESIGN, false));
 	learningDesign.setLearningDesignUIID(JsonUtil.optInt(ldJSON, AuthoringJsonTags.LEARNING_DESIGN_UIID));
 	learningDesign.setDescription(JsonUtil.optString(ldJSON, AuthoringJsonTags.DESCRIPTION));
-	learningDesign.setTitle(JsonUtil.optString(ldJSON, AuthoringJsonTags.TITLE));
 	learningDesign.setMaxID(JsonUtil.optInt(ldJSON, AuthoringJsonTags.MAX_ID));
 	learningDesign.setReadOnly(JsonUtil.optBoolean(ldJSON, AuthoringJsonTags.READ_ONLY));
 	learningDesign.setDateReadOnly(
@@ -767,7 +774,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	    throws ObjectExtractorException {
 	String toolOutputDefinition = JsonUtil.optString(activityDetails, AuthoringJsonTags.TOOL_OUTPUT_DEFINITION);
 	if (StringUtils.isNotBlank(toolOutputDefinition)) {
-	    ActivityEvaluation evaluation = toolActivity.getEvaluation();
+	    ActivityEvaluation evaluation = activityDAO.getEvaluationByActivityId(toolActivity.getActivityId());
 	    if (evaluation == null) {
 		evaluation = new ActivityEvaluation();
 		evaluation.setActivity(toolActivity);
@@ -780,59 +787,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	    } else {
 		evaluation.setWeight(Integer.valueOf(weight));
 	    }
-	    toolActivity.setEvaluation(evaluation);
-	} else {
-	    // update the parent toolActivity
-	    toolActivity.setEvaluation(null);
-	}
-	activityDAO.update(toolActivity);
-    }
 
-    private void parseCompetences(ArrayNode competenceList) throws ObjectExtractorException {
-	Set<Competence> existingCompetences = learningDesign.getCompetences();
-	if (competenceList != null) {
-	    for (JsonNode competenceJSON : competenceList) {
-		String title = JsonUtil.optString(competenceJSON, AuthoringJsonTags.TITLE);
-		String description = JsonUtil.optString(competenceJSON, AuthoringJsonTags.DESCRIPTION);
-
-		if (getComptenceFromSet(existingCompetences, title) != null) {
-		    Competence updateCompetence = getComptenceFromSet(existingCompetences, title);
-		    updateCompetence.setDescription(description);
-		    competenceDAO.saveOrUpdate(updateCompetence);
-		} else {
-		    Competence newCompetence = new Competence();
-		    newCompetence.setTitle(title);
-		    newCompetence.setDescription(description);
-		    newCompetence.setLearningDesign(learningDesign);
-		    competenceDAO.saveOrUpdate(newCompetence);
-		}
-	    }
-
-	    // now go through and delete any competences from the old list,
-	    // that dont exist in the new list.
-	    Set<Competence> removeCompetences = new HashSet<>();
-	    if (existingCompetences != null) {
-		if ((competenceList != null) && (competenceList.size() > 0)) {
-		    for (Competence existingCompetence : existingCompetences) {
-			boolean remove = true;
-			for (JsonNode competenceJSON : competenceList) {
-			    if (existingCompetence.getTitle()
-				    .equals(JsonUtil.optString(competenceJSON, AuthoringJsonTags.TITLE))) {
-				remove = false;
-				break;
-			    }
-			}
-
-			if (remove) {
-			    removeCompetences.add(existingCompetence);
-			}
-		    }
-		} else {
-		    removeCompetences.addAll(existingCompetences);
-		}
-		// competenceDAO.deleteAll(removeCompetences);
-		learningDesign.getCompetences().removeAll(removeCompetences);
-	    }
+	    activityDAO.insertOrUpdate(evaluation);
 	}
     }
 
@@ -1019,6 +975,12 @@ public class ObjectExtractor implements IObjectExtractor {
 	activity.setActivityUIID(activityUIID);
 	activity.setDescription(JsonUtil.optString(activityDetails, AuthoringJsonTags.DESCRIPTION));
 	activity.setTitle(JsonUtil.optString(activityDetails, AuthoringJsonTags.ACTIVITY_TITLE));
+
+	if (!ValidationUtil.isLearningDesignNameValid(activity.getTitle())) {
+	    throw new ObjectExtractorException(
+		    "Unable to save learning design. Activity title contains forbidden characters: "
+			    + activity.getTitle());
+	}
 
 	activity.setXcoord(getCoord(activityDetails, AuthoringJsonTags.XCOORD));
 	activity.setYcoord(getCoord(activityDetails, AuthoringJsonTags.YCOORD));
@@ -1209,11 +1171,11 @@ public class ObjectExtractor implements IObjectExtractor {
 	if (activity instanceof SynchGateActivity) {
 	    buildSynchGateActivity((SynchGateActivity) activity);
 	} else if (activity instanceof PermissionGateActivity) {
-	    buildPermissionGateActivity((PermissionGateActivity) activity);
+	    buildPermissionGateActivity((PermissionGateActivity) activity, activityDetails);
 	} else if (activity instanceof SystemGateActivity) {
 	    buildSystemGateActivity((SystemGateActivity) activity);
 	} else if (activity instanceof ConditionGateActivity) {
-	    buildConditionGateActivity((ConditionGateActivity) activity);
+	    buildConditionGateActivity((ConditionGateActivity) activity, activityDetails);
 	} else if (activity instanceof ScheduleGateActivity) {
 	    buildScheduleGateActivity((ScheduleGateActivity) activity, activityDetails);
 	} else {
@@ -1227,7 +1189,9 @@ public class ObjectExtractor implements IObjectExtractor {
 	activity.setSystemTool(getSystemTool(SystemTool.SYNC_GATE));
     }
 
-    private void buildPermissionGateActivity(PermissionGateActivity activity) {
+    private void buildPermissionGateActivity(PermissionGateActivity activity, ObjectNode activityDetails) {
+	activity.setGateStopAtPrecedingActivity(
+		JsonUtil.optBoolean(activityDetails, AuthoringJsonTags.GATE_STOP_AT_PRECEDING_ACTIVITY, false));
 	activity.setSystemTool(getSystemTool(SystemTool.PERMISSION_GATE));
     }
 
@@ -1246,6 +1210,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	Boolean isGateActivityCompletionBased = JsonUtil.optBoolean(activityDetails,
 		AuthoringJsonTags.GATE_ACTIVITY_COMPLETION_BASED);
 	activity.setGateActivityCompletionBased(isGateActivityCompletionBased);
+	activity.setGateStopAtPrecedingActivity(
+		JsonUtil.optBoolean(activityDetails, AuthoringJsonTags.GATE_STOP_AT_PRECEDING_ACTIVITY, false));
 	activity.setSystemTool(getSystemTool(SystemTool.SCHEDULE_GATE));
     }
 
@@ -1667,7 +1633,9 @@ public class ObjectExtractor implements IObjectExtractor {
 		JsonUtil.optBoolean(groupingDetails, AuthoringJsonTags.VIEW_STUDENTS_BEFORE_SELECTION));
     }
 
-    private void buildConditionGateActivity(ConditionGateActivity activity) {
+    private void buildConditionGateActivity(ConditionGateActivity activity, ObjectNode activityDetails) {
+	activity.setGateStopAtPrecedingActivity(
+		JsonUtil.optBoolean(activityDetails, AuthoringJsonTags.GATE_STOP_AT_PRECEDING_ACTIVITY, false));
 	activity.setSystemTool(getSystemTool(SystemTool.CONDITION_GATE));
     }
 }

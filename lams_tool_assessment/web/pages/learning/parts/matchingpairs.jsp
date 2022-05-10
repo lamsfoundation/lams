@@ -4,6 +4,15 @@
 	<fmt:message key="label.learning.matching.pairs.pick.up" />
 </div>
 
+<div class="question-type">
+	<fmt:message key="label.learning.matching.pairs.possible" />
+	<ul>
+		<c:forEach var="possibleOption" items="${question.matchingPairOptions}">
+			<li>${possibleOption.name}</li>
+		</c:forEach>
+	</ul>
+</div>
+
 <div class="table-responsive">
 	<table class="table table-hover table-condensed">
 		<c:forEach var="option" items="${question.optionDtos}">

@@ -31,6 +31,8 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.springframework.web.util.HtmlUtils;
 
 public class GBActivityGridRowDTO extends GradebookGridRowDTO {
@@ -96,7 +98,8 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	if (activity.isToolActivity()) {
 	    ToolActivity toolActivity = (ToolActivity) activity;
 
-	    ActivityEvaluation eval = toolActivity.getEvaluation();
+	    ActivityEvaluation eval = (ActivityEvaluation) UserManagementService.getInstance()
+		    .findById(ActivityEvaluation.class, toolActivity.getActivityId());
 	    if (eval != null && eval.getWeight() != null) {
 		this.weight = eval.getWeight();
 	    }
@@ -134,9 +137,9 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 		ret.add(rowName);
 	    }
 	    ret.add(status);
-	    ret.add(timeTaken != null ? convertTimeToString(timeTaken) : CELL_EMPTY);
-	    ret.add(startDate != null ? convertDateToString(startDate, null) : CELL_EMPTY);
-	    ret.add(finishDate != null ? convertDateToString(finishDate, null) : CELL_EMPTY);
+	    ret.add(timeTaken != null ? DateUtil.convertTimeToString(timeTaken) : CELL_EMPTY);
+	    ret.add(startDate != null ? DateUtil.convertToString(startDate, null) : CELL_EMPTY);
+	    ret.add(finishDate != null ? DateUtil.convertToString(finishDate, null) : CELL_EMPTY);
 	    ret.add(feedback);
 	    ret.add(outcomes != null ? outcomes : CELL_EMPTY);
 	    ret.add(mark != null ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
@@ -152,7 +155,7 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 		ret.add(rowName);
 	    }
 
-	    ret.add((medianTimeTaken != null) ? convertTimeToString(medianTimeTaken) : CELL_EMPTY);
+	    ret.add((medianTimeTaken != null) ? DateUtil.convertTimeToString(medianTimeTaken) : CELL_EMPTY);
 	    ret.add(CELL_EMPTY);
 	    ret.add(CELL_EMPTY);
 	    ret.add(competences);
@@ -162,8 +165,8 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(rowName);
 	    ret.add(status);
 	    ret.add(feedback);
-	    ret.add((medianTimeTaken != null) ? convertTimeToString(medianTimeTaken) : CELL_EMPTY);
-	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
+	    ret.add((medianTimeTaken != null) ? DateUtil.convertTimeToString(medianTimeTaken) : CELL_EMPTY);
+	    ret.add((timeTaken != null) ? DateUtil.convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add(averageMark != null ? GradebookUtil.niceFormatting(averageMark) : CELL_EMPTY);
 	    ret.add(mark != null ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
 

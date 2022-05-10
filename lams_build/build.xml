@@ -86,11 +86,11 @@
 			<ant antfile="../lams_tool_bbb/build.xml"           target="_clean-dirs" inheritAll="false" />
 			<ant antfile="../lams_tool_dimdim/build.xml"        target="_clean-dirs" inheritAll="false" />
 			<ant antfile="../lams_tool_gmap/build.xml"          target="_clean-dirs" inheritAll="false" />
-			<ant antfile="../lams_tool_lamc/build.xml"          target="_clean-dirs" inheritAll="false"/>
 			
 			<ant antfile="../lams_tool_doku/build.xml"          target="_clean-dirs" inheritAll="false" />
 			<ant antfile="../lams_tool_zoom/build.xml"          target="_clean-dirs" inheritAll="false" />
 			<ant antfile="../lams_tool_preview/build.xml"       target="_clean-dirs" inheritAll="false" />
+			<ant antfile="../lams_tool_whiteboard/build.xml"    target="_clean-dirs" inheritAll="false" />
 		-->
 	</target>
 	
@@ -123,6 +123,7 @@
 		<ant antfile="../lams_tool_survey/build.xml"        target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_task/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_vote/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_whiteboard/build.xml"    target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_wiki/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_zoom/build.xml"          target="copy-tags" inheritAll="false"/>
 		
@@ -286,6 +287,7 @@
 			<ant antfile="../lams_tool_gmap/build.xml"          target="deploy-tool" inheritAll="false" />
 			
 			<ant antfile="../lams_tool_doku/build.xml"          target="deploy-tool" inheritAll="false" />
+			<ant antfile="../lams_tool_whiteboard/build.xml"    target="deploy-tool" inheritAll="false" />
 			<ant antfile="../lams_tool_zoom/build.xml"          target="deploy-tool" inheritAll="false" />
 		-->
 	</target>
@@ -400,6 +402,22 @@
 		<copy tofile="${server.home}/modules/system/layers/base/org/apache/poi/main/module.xml"
 			  file="lib/apache-poi/poi.module.xml" overwrite="true" verbose="true" />
 		
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/compress/main" overwrite="true" verbose="true">
+			<fileset dir="lib/apache-poi">
+				<include name="commons-compress-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/compress/main/module.xml"
+			  file="lib/apache-poi/compress.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/math3/main" overwrite="true" verbose="true">
+			<fileset dir="lib/apache-poi">
+				<include name="commons-math3-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/math3/main/module.xml"
+			  file="lib/apache-poi/math.module.xml" overwrite="true" verbose="true" />
+		
 		<copy todir="${server.home}/modules/system/layers/base/org/apache/xmlbeans/main" overwrite="true" verbose="true">
 			<fileset dir="lib/apache-poi">
 				<include name="xmlbeans-*.jar" />
@@ -407,6 +425,15 @@
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/apache/xmlbeans/main/module.xml"
 			  file="lib/apache-poi/xmlbeans.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${server.home}/modules/system/layers/base/com/zaxxer/sparsebits/main" overwrite="true" verbose="true">
+			<fileset dir="lib/apache-poi">
+				<include name="SparseBitSet-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/com/zaxxer/sparsebits/main/module.xml"
+			  file="lib/apache-poi/sparse-bit-set.module.xml" overwrite="true" verbose="true" />
+		
 		
 		<copy todir="${server.home}/modules/system/layers/base/org/apache/tika/main" overwrite="true" verbose="true">
 			<fileset dir="lib/apache-tika">
@@ -424,13 +451,14 @@
 		<copy tofile="${server.home}/modules/system/layers/base/org/apache/batik/main/module.xml"
 			file="lib/batik/batik.module.xml" overwrite="true" verbose="true" />
 
-		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/compress/main" overwrite="true" verbose="true">
-			<fileset dir="lib/apache-poi">
-				<include name="commons-compress-*.jar" />
+		<copy todir="${server.home}/modules/system/layers/base/com/codahale/passpol/main/" overwrite="true" verbose="true">
+			<fileset dir="lib/passpol">
+				<include name="passpol-*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/compress/main/module.xml"
-			  file="lib/apache-poi/compress.module.xml" overwrite="true" verbose="true" />
+		<copy tofile="${server.home}/modules/system/layers/base/com/codahale/passpol/main/module.xml"
+			file="lib/passpol/passpol.module.xml" overwrite="true" verbose="true" />
+
 
 		<copy todir="${server.home}/modules/system/layers/base/org/owasp/csrfguard/main" overwrite="true" verbose="true">
 			<fileset dir="lib/csrfguard">
@@ -510,6 +538,16 @@
 		<copy tofile="${server.home}/modules/system/layers/base/net/fckeditor/main/module.xml"
 			  file="lib/fckeditor/fckeditor.module.xml" overwrite="true" verbose="true" />
 		
+		
+		
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/codec/main" overwrite="true" verbose="true">
+					<fileset dir="lib/jakarta-commons">
+						<include name="commons-codec-*.jar" />
+					</fileset>
+				</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/codec/main/module.xml"
+			  file="lib/jakarta-commons/codec.module.xml" overwrite="true" verbose="true" />
+				
 		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/collections4/main" overwrite="true" verbose="true">
 			<fileset dir="lib/jakarta-commons">
 				<include name="commons-collections4-*.jar" />
@@ -573,6 +611,7 @@
 		<copy todir="${server.home}/modules/system/layers/base/io/jsonwebtoken/main" overwrite="true" verbose="true">
 			<fileset dir="lib/json">
 				<include name="jjwt-*.jar" />
+				<include name="jwks-*.jar" />
 			</fileset>
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/io/jsonwebtoken/main/module.xml"
@@ -596,6 +635,26 @@
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/quartz/main/module.xml"
 			  file="lib/quartz/quartz.module.xml" overwrite="true" verbose="true" />
+		
+		
+		
+		<copy todir="${server.home}/modules/system/layers/base/org/reactivestreams/main" overwrite="true" verbose="true">
+			<fileset dir="lib/reactivestreams">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/reactivestreams/main/module.xml"
+			  file="lib/reactivestreams/reactivestreams.module.xml" overwrite="true" verbose="true" />
+		
+		
+		
+		<copy todir="${server.home}/modules/system/layers/base/reactor/main" overwrite="true" verbose="true">
+			<fileset dir="lib/reactor">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/reactor/main/module.xml"
+			  file="lib/reactor/reactor.module.xml" overwrite="true" verbose="true" />
 
 		
 		
@@ -763,6 +822,7 @@
 		<ant antfile="../lams_tool_doku/build.xml"          target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_zoom/build.xml"          target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_preview/build.xml"       target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_whiteboard/build.xml"    target="deploy-tool" inheritAll="false" />
 	</target>
 	
 	
@@ -854,7 +914,6 @@
 				<include name="javax/faces/"/>
 				<include name="nu/"/>
 				<include name="org/apache/avro/"/>
-				<include name="org/apache/commons/lang3/"/>
 				<include name="org/apache/james/"/>
 				<include name="org/apache/lucene/"/>
 				<include name="org/apache/neethi/"/>

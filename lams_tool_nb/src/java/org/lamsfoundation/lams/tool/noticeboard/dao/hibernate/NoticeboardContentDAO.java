@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.noticeboard.dao.hibernate;
 
 import java.util.List;
@@ -50,14 +49,14 @@ public class NoticeboardContentDAO extends LAMSBaseDAO implements INoticeboardCo
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO#getNbContentByUID(java.lang.Long) */
     @Override
     public NoticeboardContent getNbContentByUID(Long uid) {
-	return (NoticeboardContent) this.getSession().get(NoticeboardContent.class, uid);
+	return this.getSession().get(NoticeboardContent.class, uid);
     }
 
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO#findNbContentById(java.lang.Long) */
     @Override
     public NoticeboardContent findNbContentById(Long nbContentId) {
 	String query = "from NoticeboardContent as nb where nb.nbContentId = ?";
-	List content = doFind(query, nbContentId);
+	List content = doFindCacheable(query, nbContentId);
 
 	if (content != null && content.size() == 0) {
 	    return null;
@@ -67,20 +66,26 @@ public class NoticeboardContentDAO extends LAMSBaseDAO implements INoticeboardCo
 
     }
 
-    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO#getNbContentBySession(java.lang.Long) */
+    /**
+     * @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO#getNbContentBySession(java.lang.Long)
+     */
     @Override
     public NoticeboardContent getNbContentBySession(final Long nbSessionId) {
 	return (NoticeboardContent) getSession().createQuery(LOAD_NB_BY_SESSION)
-		.setParameter("sessionId", nbSessionId.longValue()).uniqueResult();
+		.setParameter("sessionId", nbSessionId.longValue()).setCacheable(true).uniqueResult();
     }
 
-    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO#saveNbContent(org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent) */
+    /**
+     * @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO#saveNbContent(org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent)
+     */
     @Override
     public void saveNbContent(NoticeboardContent nbContent) {
 	this.getSession().save(nbContent);
     }
 
-    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO#updateNbContent(org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent) */
+    /**
+     * @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO#updateNbContent(org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent)
+     */
     @Override
     public void updateNbContent(NoticeboardContent nbContent) {
 	this.getSession().update(nbContent);
@@ -101,13 +106,17 @@ public class NoticeboardContentDAO extends LAMSBaseDAO implements INoticeboardCo
 	}
     }
 
-    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO#removeNoticeboard(org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent) */
+    /**
+     * @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO#removeNoticeboard(org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent)
+     */
     @Override
     public void removeNoticeboard(NoticeboardContent nbContent) {
 	removeNoticeboard(nbContent.getNbContentId());
     }
 
-    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO#removeNbSessions(org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent) */
+    /**
+     * @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO#removeNbSessions(org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent)
+     */
     @Override
     public void removeNbSessions(NoticeboardContent nbContent) {
 	this.deleteAll(nbContent.getNbSessions());

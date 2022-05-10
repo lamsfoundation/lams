@@ -16,10 +16,9 @@
 	<script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript">
 		jQuery(document).ready(function(){
-			var selectedTab = (${(signupOrganisation != null) && signupOrganisation.loginTabActive}) ? 1 : 0;
-			$("#tabs").tabs({
-				selected: selectedTab
-			});
+			if (${selectedTab == 'login' || (signupOrganisation != null && signupOrganisation.loginTabActive)}){
+				$('#signupMenu #loginTab > a').tab('show');
+			}
 		});
 	</script>
 </lams:head>
@@ -68,10 +67,10 @@
 			<div class="col-md-12">
 				<div class="panel with-nav-tabs panel-default">
 					<div class="panel-heading" style="height: 51px">
-						<ul class="nav nav-tabs">
-							<li class="active"><a href="#tab1default" data-toggle="tab"><fmt:message
+						<ul id="signupMenu" class="nav nav-tabs">
+							<li id="signupTab" class="active"><a href="#tab1default" data-toggle="tab"><fmt:message
 										key="register.signup.to.lams" /></a></li>
-							<li><a href="#tab2default" data-toggle="tab"><fmt:message
+							<li id="loginTab"><a href="#tab2default" data-toggle="tab"><fmt:message
 										key="register.login" /></a></li>
 						</ul>
 					</div>

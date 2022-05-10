@@ -13,7 +13,21 @@
 	<lams:head>
 		<title><fmt:message key="activity.title" /></title>
 		<%@ include file="/common/tabbedheader.jsp"%>
+		<link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
+		<link href="${lams}css/uppy.custom.css" rel="stylesheet" type="text/css" />
 		
+		<script type="text/javascript" src="${lams}includes/javascript/uppy/uppy.min.js"></script>
+		<c:choose>
+			<c:when test="${language eq 'es'}">
+				<script type="text/javascript" src="${lams}includes/javascript/uppy/es_ES.min.js"></script>
+			</c:when>
+			<c:when test="${language eq 'fr'}">
+				<script type="text/javascript" src="${lams}includes/javascript/uppy/fr_FR.min.js"></script>
+			</c:when>
+			<c:when test="${language eq 'el'}">
+				<script type="text/javascript" src="${lams}includes/javascript/uppy/el_GR.min.js"></script>
+			</c:when>
+		</c:choose>
 		<script type="text/javascript">
 		    var csrfTokenName = '<csrf:tokenname/>',
    				csrfTokenValue = '<csrf:tokenvalue/>';
@@ -73,9 +87,9 @@
 				   
 				    <!--  Set up tabs  -->
 				     <lams:TabBodys>
-						<lams:TabBody id="1" titleKey="authoring.tab.basic" page="basic.jsp" />
-						<lams:TabBody id="2" titleKey="authoring.tab.advanced" page="advance.jsp" />
-						<lams:TabBody id="3" titleKey="authoring.tab.conditions" page="conditions.jsp" />
+						<lams:TabBody id="1" page="basic.jsp" />
+						<lams:TabBody id="2" page="advance.jsp" />
+						<lams:TabBody id="3" page="conditions.jsp" />
 				    </lams:TabBodys>
 				
 					<!-- Button Row -->

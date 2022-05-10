@@ -18,7 +18,7 @@
 package org.apache.poi.poifs.crypt;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.poifs.crypt.standard.EncryptionRecord;
@@ -26,6 +26,7 @@ import org.apache.poi.poifs.filesystem.DirectoryEntry;
 import org.apache.poi.poifs.filesystem.DocumentEntry;
 import org.apache.poi.poifs.filesystem.POIFSWriterEvent;
 import org.apache.poi.poifs.filesystem.POIFSWriterListener;
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.LittleEndianByteArrayOutputStream;
 import org.apache.poi.util.LittleEndianConsts;
 import org.apache.poi.util.LittleEndianInput;
@@ -33,6 +34,10 @@ import org.apache.poi.util.LittleEndianOutput;
 import org.apache.poi.util.StringUtil;
 
 public class DataSpaceMapUtils {
+
+    //arbitrarily selected; may need to increase
+    private static final int MAX_RECORD_LENGTH = 100_000;
+
     public static void addDefaultDataSpace(DirectoryEntry dir) throws IOException {
         DataSpaceMapEntry dsme = new DataSpaceMapEntry(
                 new int[]{ 0 }
@@ -59,14 +64,14 @@ public class DataSpaceMapUtils {
     }
     
     public static DocumentEntry createEncryptionEntry(DirectoryEntry dir, String path, EncryptionRecord out) throws IOException {
-        String parts[] = path.split("/");
+        String[] parts = path.split("/");
         for (int i=0; i<parts.length-1; i++) {
             dir = dir.hasEntry(parts[i])
                 ? (DirectoryEntry)dir.getEntry(parts[i])
                 : dir.createDirectory(parts[i]);
         }
-        
-        final byte buf[] = new byte[5000];        
+
+        final byte[] buf = new byte[5000];
         LittleEndianByteArrayOutputStream bos = new LittleEndianByteArrayOutputStream(buf, 0);
         out.write(bos);
         
@@ -88,9 +93,9 @@ public class DataSpaceMapUtils {
     }   
     
     public static class DataSpaceMap implements EncryptionRecord {
-        DataSpaceMapEntry entries[];
+        DataSpaceMapEntry[] entries;
         
-        public DataSpaceMap(DataSpaceMapEntry entries[]) {
+        public DataSpaceMap(DataSpaceMapEntry[] entries) {
             this.entries = entries.clone();
         }
         
@@ -113,11 +118,11 @@ public class DataSpaceMapUtils {
     }
     
     public static class DataSpaceMapEntry implements EncryptionRecord {
-        final int referenceComponentType[];
-        final String referenceComponent[];
+        final int[] referenceComponentType;
+        final String[] referenceComponent;
         final String dataSpaceName;
         
-        public DataSpaceMapEntry(int referenceComponentType[], String referenceComponent[], String dataSpaceName) {
+        public DataSpaceMapEntry(int[] referenceComponentType, String[] referenceComponent, String dataSpaceName) {
             this.referenceComponentType = referenceComponentType.clone();
             this.referenceComponent = referenceComponent.clone();
             this.dataSpaceName = dataSpaceName;
@@ -149,9 +154,9 @@ public class DataSpaceMapUtils {
     }
     
     public static class DataSpaceDefinition implements EncryptionRecord {
-        String transformer[];
+        String[] transformer;
         
-        public DataSpaceDefinition(String transformer[]) {
+        public DataSpaceDefinition(String[] transformer) {
             this.transformer = transformer.clone();
         }
         
@@ -203,9 +208,9 @@ public class DataSpaceMapUtils {
         int transformType;
         String transformerId;
         String transformerName;
-        int readerVersionMajor = 1, readerVersionMinor = 0;
-        int updaterVersionMajor = 1, updaterVersionMinor = 0;
-        int writerVersionMajor = 1, writerVersionMinor = 0;
+        int readerVersionMajor = 1, readerVersionMinor;
+        int updaterVersionMajor = 1, updaterVersionMinor;
+        int writerVersionMajor = 1, writerVersionMinor;
 
         public TransformInfoHeader(
             int transformType,
@@ -257,9 +262,9 @@ public class DataSpaceMapUtils {
     
     public static class DataSpaceVersionInfo implements EncryptionRecord {
         String featureIdentifier;
-        int readerVersionMajor = 1, readerVersionMinor = 0;
-        int updaterVersionMajor = 1, updaterVersionMinor = 0;
-        int writerVersionMajor = 1, writerVersionMinor = 0;
+        int readerVersionMajor = 1, readerVersionMinor;
+        int updaterVersionMajor = 1, updaterVersionMinor;
+        int writerVersionMajor = 1, writerVersionMinor;
         
         public DataSpaceVersionInfo(LittleEndianInput is) {
             featureIdentifier = readUnicodeLPP4(is);
@@ -317,7 +322,7 @@ public class DataSpaceMapUtils {
     }
     
     public static void writeUnicodeLPP4(LittleEndianOutput os, String string) {
-        byte buf[] = StringUtil.getToUnicodeLE(string);
+        byte[] buf = StringUtil.getToUnicodeLE(string);
         os.writeInt(buf.length);
         os.write(buf);
         if (buf.length%4==2) {
@@ -331,8 +336,8 @@ public class DataSpaceMapUtils {
             /* int skip = */ is.readInt();
             return length == 0 ? null : "";
         }
-        
-        byte data[] = new byte[length];
+
+        byte[] data = IOUtils.safelyAllocate(length, MAX_RECORD_LENGTH);
         is.readFully(data);
 
         // Padding (variable): A set of bytes that MUST be of correct size such that the size of the UTF-8-LP-P4
@@ -347,15 +352,15 @@ public class DataSpaceMapUtils {
             }
         }
 
-        return new String(data, 0, data.length, Charset.forName("UTF-8"));
+        return new String(data, 0, data.length, StandardCharsets.UTF_8);
     }
     
     public static void writeUtf8LPP4(LittleEndianOutput os, String str) {
-        if (str == null || "".equals(str)) {
+        if (str == null || str.isEmpty()) {
             os.writeInt(str == null ? 0 : 4);
             os.writeInt(0);
         } else {
-            byte buf[] = str.getBytes(Charset.forName("UTF-8"));
+            byte[] buf = str.getBytes(StandardCharsets.UTF_8);
             os.writeInt(buf.length);
             os.write(buf);
             int scratchBytes = buf.length%4;

@@ -12,6 +12,7 @@ import java.util.Set;
 import javax.persistence.Query;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.jpa.QueryHints;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.type.IntegerType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
@@ -19,6 +20,8 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.qb.dao.IQbDAO;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
+import org.lamsfoundation.lams.tool.ToolContent;
 
 public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
@@ -32,29 +35,36 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    + "WHERE a.toolContentId = q.toolContentId AND l IS NOT EMPTY AND l.lessonStateId IN (3,4,5,6) AND q.qbQuestion.uid = :qbQuestionUid "
 	    + "ORDER BY l.organisation.name, l.lessonName";
 
+    private static final String FIND_QUESTION_ACTIVITIES_FILTERED_BY_TOOL_CONTENT_ID = "SELECT c FROM QbToolQuestion AS q, ToolContent AS c "
+	    + "WHERE c.toolContentId = q.toolContentId AND c.tool.toolSignature IN ('laasse10', 'lascrt11') AND "
+	    + "q.qbQuestion.uid = :qbQuestionUid AND q.toolContentId IN (:toolContentIds)";
+
     private static final String FIND_QUESTION_VERSIONS = "SELECT q FROM QbQuestion AS q, QbQuestion AS r "
 	    + "WHERE q.questionId = r.questionId AND q.uid <> r.uid AND r.uid = :qbQuestionUid";
 
     private static final String FIND_ANSWER_STATS_BY_QB_QUESTION = "SELECT COALESCE(a.qb_option_uid, aa.question_option_uid) AS opt, COUNT(a.answer_uid) "
 	    + "FROM lams_qb_tool_question AS tq JOIN lams_qb_tool_answer AS a USING (tool_question_uid) "
 	    + "LEFT JOIN tl_lascrt11_answer_log AS sa ON a.answer_uid = sa.uid "
-	    + "LEFT JOIN tl_lascrt11_session AS ss ON sa.session_id = ss.session_id "
+	    + "LEFT JOIN tl_lascrt11_session AS ss ON sa.session_id = ss.session_id AND ss.scratching_finished = 1 "
 	    + "LEFT JOIN tl_lascrt11_user AS su ON ss.uid = su.session_uid "
 	    + "LEFT JOIN tl_laasse10_option_answer AS aa ON a.answer_uid = aa.question_result_uid AND aa.answer_boolean = 1 "
 	    + "WHERE tq.qb_question_uid = :qbQuestionUid GROUP BY opt HAVING opt IS NOT NULL";
 
-    private static final String FIND_ANSWERS_BY_ACTIVITY = "SELECT COALESCE(su.user_id, au.user_id), "
-	    + "COALESCE(a.qb_option_uid, aa.question_option_uid) AS opt "
+    private static final String FIND_ANSWERS_BY_ACTIVITY = "SELECT COALESCE(mcu.que_usr_id, su.user_id, au.user_id) AS user_id, "
+	    + "IF(su.user_id IS NULL, COALESCE(a.qb_option_uid, aa.question_option_uid), IF(COUNT(a.qb_option_uid) > 1, -1, a.qb_option_uid)) AS opt "
 	    + "FROM lams_learning_activity AS act JOIN lams_qb_tool_question AS tq USING (tool_content_id) "
 	    + "JOIN lams_qb_tool_answer AS a USING (tool_question_uid) "
+	    + "LEFT JOIN tl_lamc11_usr_attempt AS mca ON a.answer_uid = mca.uid "
+	    + "LEFT JOIN tl_lamc11_que_usr AS mcu ON mca.que_usr_id = mcu.uid "
 	    + "LEFT JOIN tl_lascrt11_answer_log AS sa ON a.answer_uid = sa.uid "
-	    + "LEFT JOIN tl_lascrt11_session AS ss ON sa.session_id = ss.session_id "
-	    + "LEFT JOIN tl_lascrt11_user AS su ON ss.uid = su.session_uid "
+	    + "LEFT JOIN tl_lascrt11_session AS ss ON sa.session_id = ss.session_id AND ss.scratching_finished = 1 "
+	    + "LEFT JOIN tl_lascrt11_user AS su ON ss.uid = su.session_uid AND su.session_finished = 1 "
 	    + "LEFT JOIN tl_laasse10_option_answer AS aa ON a.answer_uid = aa.question_result_uid AND aa.answer_boolean = 1 "
 	    + "LEFT JOIN tl_laasse10_question_result AS aq ON a.answer_uid = aq.uid "
-	    + "LEFT JOIN tl_laasse10_assessment_result AS ar ON aq.result_uid = ar.uid "
-	    + "LEFT JOIN tl_laasse10_user AS au ON ar.user_uid = au.uid "
-	    + "WHERE act.activity_id = :activityId AND tq.qb_question_uid = :qbQuestionUid HAVING opt IS NOT NULL";
+	    + "LEFT JOIN tl_laasse10_assessment_result AS ar ON aq.result_uid = ar.uid AND ar.finish_date IS NOT NULL AND ar.latest = 1 "
+	    + "LEFT JOIN tl_laasse10_user AS au ON ar.user_uid = au.uid AND au.session_finished = 1 "
+	    + "WHERE act.activity_id = :activityId AND tq.qb_question_uid = :qbQuestionUid GROUP BY user_id "
+	    + "HAVING opt IS NOT NULL AND user_id IS NOT NULL";
 
     private static final String FIND_BURNING_QUESTIONS = "SELECT b.question, COUNT(bl.uid) FROM ScratchieBurningQuestion b LEFT OUTER JOIN "
 	    + "BurningQuestionLike AS bl ON bl.burningQuestion = b WHERE b.scratchieItem.qbQuestion.uid = :qbQuestionUid "
@@ -133,13 +143,26 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
 	Query q = getSession().createQuery(FIND_QUESTIONS_BY_QUESTION_ID, QbQuestion.class);
 	q.setParameter("questionId", questionId);
+	q.setHint(QueryHints.HINT_CACHEABLE, true);
 	return q.getResultList();
     }
 
     @Override
     public List<QbQuestion> getQuestionsByToolContentId(long toolContentId) {
 	return getSession().createQuery(FIND_QUESTIONS_BY_TOOL_CONTENT_ID, QbQuestion.class)
-		.setParameter("toolContentId", toolContentId).getResultList();
+		.setParameter("toolContentId", toolContentId).setCacheable(true).getResultList();
+    }
+
+    @Override
+    public <T> List<T> getToolQuestionForToolContentId(Class<T> clazz, long toolContentId, long otherToolQuestionUid) {
+	QbToolQuestion toolQuestion = find(QbToolQuestion.class, otherToolQuestionUid);
+
+	String queryText = "FROM " + clazz.getName() + " AS tq "
+		+ "WHERE tq.toolContentId = :toolContentId AND tq.qbQuestion.uid = :qbQuestionUid";
+
+	return getSession().createQuery(queryText, clazz).setParameter("toolContentId", toolContentId)
+		.setParameter("qbQuestionUid", toolQuestion.getQbQuestion().getUid()).setCacheable(true)
+		.getResultList();
     }
 
     @Override
@@ -194,9 +217,17 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     @Override
     @SuppressWarnings("unchecked")
+    public List<ToolContent> getQuestionActivities(long qbQuestionUid, Collection<Long> filteringToolContentIds) {
+	return this.getSession().createQuery(FIND_QUESTION_ACTIVITIES_FILTERED_BY_TOOL_CONTENT_ID)
+		.setParameter("qbQuestionUid", qbQuestionUid)
+		.setParameterList("toolContentIds", filteringToolContentIds).list();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public List<QbQuestion> getQuestionVersions(long qbQuestionUid) {
 	return this.getSession().createQuery(FIND_QUESTION_VERSIONS).setParameter("qbQuestionUid", qbQuestionUid)
-		.list();
+		.setCacheable(true).list();
     }
 
     @Override
@@ -213,9 +244,17 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     @SuppressWarnings("unchecked")
     @Override
+    public List<QbQuestion> getPagedQuestions(String questionTypes, String collectionUids, Long learningDesignId,
+	    int page, int size, String sortBy, String sortOrder, String searchString) {
+	return (List<QbQuestion>) getPagedQuestions(questionTypes, collectionUids, learningDesignId, page, size, sortBy,
+		sortOrder, searchString, false);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
     public List<QbQuestion> getPagedQuestions(String questionTypes, String collectionUids, int page, int size,
 	    String sortBy, String sortOrder, String searchString) {
-	return (List<QbQuestion>) getPagedQuestions(questionTypes, collectionUids, page, size, sortBy, sortOrder,
+	return (List<QbQuestion>) getPagedQuestions(questionTypes, collectionUids, null, page, size, sortBy, sortOrder,
 		searchString, false);
     }
 
@@ -223,70 +262,76 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     @Override
     public List<BigInteger> getAllQuestionUids(String collectionUids, String sortBy, String sortOrder,
 	    String searchString) {
-	return (List<BigInteger>) getPagedQuestions(null, collectionUids, 0, 100000, sortBy, sortOrder, searchString,
-		true);
+	return (List<BigInteger>) getPagedQuestions(null, collectionUids, null, 0, 100000, sortBy, sortOrder,
+		searchString, true);
     }
 
-    private List<?> getPagedQuestions(String questionTypes, String collectionUids, int page, int size, String sortBy,
-	    String sortOrder, String searchString, boolean onlyUidsRequested) {
-	String RETURN_VALUE = onlyUidsRequested ? "question.uid" : "question.*";
+    private List<?> getPagedQuestions(String questionTypes, String collectionUids, Long learningDesignId, int page,
+	    int size, String sortBy, String sortOrder, String searchString, boolean onlyUidsRequested) {
 
-	//we sort of strip out HTML tags from the search by using REGEXP_REPLACE which skips all the content between < >
-	final String SELECT_QUESTIONS = "SELECT DISTINCT " + RETURN_VALUE + " FROM lams_qb_question question  "
-		+ " LEFT OUTER JOIN lams_qb_option qboption ON qboption.qb_question_uid = question.uid "
-		+ " LEFT OUTER JOIN lams_qb_collection_question collection ON question.question_id = collection.qb_question_id "
-		+ " LEFT JOIN ("//help finding questions with the max available version
-		+ "	SELECT biggerQuestion.* FROM lams_qb_question biggerQuestion "
-		+ " LEFT OUTER JOIN lams_qb_collection_question collection ON biggerQuestion.question_id = collection.qb_question_id "
-		+ " 		LEFT OUTER JOIN lams_qb_option qboption1 "
-		+ "		ON qboption1.qb_question_uid = biggerQuestion.uid WHERE "
-		+ (questionTypes == null ? "" : " biggerQuestion.type in (:questionTypes) AND ")
-		+ (collectionUids == null ? "" : " collection.collection_uid in (:collectionUids) AND ")
-		+ "	(REGEXP_REPLACE(biggerQuestion.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')"
-		+ " 	OR biggerQuestion.name LIKE CONCAT('%', :searchString, '%') "
-		+ " 	OR REGEXP_REPLACE(qboption1.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) "
-		+ ") AS biggerQuestion ON question.question_id = biggerQuestion.question_id AND question.version < biggerQuestion.version "
-		+ " WHERE biggerQuestion.version is NULL "
-		+ (questionTypes == null ? "" : " AND question.type in (:questionTypes) ")
-		+ (collectionUids == null ? "" : " AND collection.collection_uid in (:collectionUids) ")
-		+ " AND (REGEXP_REPLACE(question.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')"
-		+ " OR question.name LIKE CONCAT('%', :searchString, '%') "
-		+ " OR REGEXP_REPLACE(qboption.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) ";
-	final String ORDER_BY_NAME = "ORDER BY question.name, question.description ";
-	final String ORDER_BY_SMTH_ELSE = "ORDER BY question.question_id ";
-
-	//TODO check the following query with real data. and see maybe it's better than the current (it's unlikely though) [https://stackoverflow.com/a/28090544/10331386 and https://stackoverflow.com/a/612268/10331386]
-//	SELECT t1.*
-//	FROM lams_qb_question t1
-//	INNER JOIN
-//	(
-//	    SELECT `question_id`, MAX(version) AS max_version
-//	    FROM lams_qb_question as t3
-//			LEFT OUTER JOIN lams_qb_option qboption
-//				ON qboption.qb_question_uid = t3.uid
-//		WHERE REGEXP_REPLACE(qboption.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')
-//	    GROUP BY `question_id`
-//	) t2
-//	    ON t1.`question_id` = t2.`question_id` AND t1.version = t2.max_version;
-
-	StringBuilder bldr = new StringBuilder(SELECT_QUESTIONS);
-	if ("smth_else".equalsIgnoreCase(sortBy)) {
-	    bldr.append(ORDER_BY_SMTH_ELSE);
-	} else {
-	    bldr.append(ORDER_BY_NAME);
+	StringBuilder queryBuilder = new StringBuilder("SELECT DISTINCT ").append(onlyUidsRequested ? "q.uid" : "q.*")
+		.append(" FROM (SELECT question.* FROM lams_qb_question question");
+	if (searchString != null) {
+	    queryBuilder.append(" LEFT JOIN lams_qb_option qboption ON qboption.qb_question_uid = question.uid");
 	}
-	bldr.append(sortOrder);
+	if (collectionUids != null) {
+	    queryBuilder.append(
+		    " JOIN lams_qb_collection_question collection ON question.question_id = collection.qb_question_id");
+	}
+	if (learningDesignId != null) {
+	    queryBuilder.append(
+		    " JOIN lams_qb_tool_question tool_question ON question.uid = tool_question.qb_question_uid")
+		    .append(" JOIN lams_learning_activity activity USING (tool_content_id)");
+	}
 
-	NativeQuery<?> query = getSession().createNativeQuery(bldr.toString());
+	queryBuilder.append(" WHERE");
+	if (questionTypes != null) {
+	    queryBuilder.append(" question.type in (:questionTypes) AND");
+	}
+	if (collectionUids != null) {
+	    queryBuilder.append(" collection.collection_uid in (:collectionUids) AND");
+	}
+	if (learningDesignId != null) {
+	    queryBuilder.append(" activity.learning_design_id = :learningDesignId AND");
+	}
+	if (searchString == null) {
+	    // there has to be something after AND or even after just WHERE
+	    queryBuilder.append(" TRUE");
+	} else {
+	    // we sort of strip out HTML tags from the search by using REGEXP_REPLACE which skips all the content between < >
+	    queryBuilder.append(
+		    " (REGEXP_REPLACE(question.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')")
+		    .append(" OR question.name LIKE CONCAT('%', :searchString, '%')")
+		    .append(" OR REGEXP_REPLACE(qboption.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%'))");
+	}
+
+	queryBuilder.append(" ORDER BY question.version DESC) AS q GROUP BY q.question_id");
+
+	if ("smth_else".equalsIgnoreCase(sortBy)) {
+	    queryBuilder.append(" ORDER BY q.question_id ");
+	} else {
+	    queryBuilder.append(" ORDER BY q.name, q.description ");
+	}
+
+	LAMSBaseDAO.sanitiseQueryPart(sortOrder);
+	queryBuilder.append(sortOrder);
+
+	NativeQuery<?> query = getSession().createNativeQuery(queryBuilder.toString());
 	if (questionTypes != null) {
 	    query.setParameterList("questionTypes", questionTypes.split(","));
 	}
 	if (collectionUids != null) {
 	    query.setParameterList("collectionUids", collectionUids.split(","));
 	}
-	// support for custom search from a toolbar
-	searchString = searchString == null ? "" : searchString;
-	query.setParameter("searchString", searchString);
+	if (learningDesignId != null) {
+	    query.setParameter("learningDesignId", learningDesignId);
+	}
+	if (searchString != null) {
+	    // support for custom search from the toolbar
+	    searchString = searchString == null ? "" : searchString;
+	    query.setParameter("searchString", searchString);
+	}
+
 	query.setFirstResult(page * size);
 	query.setMaxResults(size);
 	if (!onlyUidsRequested) {
@@ -299,29 +344,37 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     @Override
     public int getCountQuestions(String questionTypes, String collectionUids, String searchString) {
-	final String SELECT_QUESTIONS = "SELECT COUNT(DISTINCT question.uid) count "
-		+ " FROM lams_qb_question question  "
-		+ " LEFT OUTER JOIN lams_qb_collection_question collection ON question.question_id = collection.qb_question_id "
-		+ " LEFT OUTER JOIN lams_qb_option qboption " + "	ON qboption.qb_question_uid = question.uid "
-		+ " LEFT JOIN ("//help finding questions with the max available version
-		+ "	SELECT biggerQuestion.* FROM lams_qb_question biggerQuestion "
-		+ " LEFT OUTER JOIN lams_qb_collection_question collection ON biggerQuestion.question_id = collection.qb_question_id "
-		+ " 		LEFT OUTER JOIN lams_qb_option qboption1 "
-		+ "		ON qboption1.qb_question_uid = biggerQuestion.uid "
-		+ (questionTypes == null ? "" : " WHERE biggerQuestion.type in (:questionTypes) ")
-		+ (collectionUids == null ? "" : " AND collection.collection_uid in (:collectionUids) ")
-		+ "	AND (REGEXP_REPLACE(biggerQuestion.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')"
-		+ " 	OR biggerQuestion.name LIKE CONCAT('%', :searchString, '%') "
-		+ " 	OR REGEXP_REPLACE(qboption1.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) "
-		+ ") AS biggerQuestion ON question.question_id = biggerQuestion.question_id AND question.version < biggerQuestion.version "
-		+ " WHERE biggerQuestion.version is NULL "
-		+ (questionTypes == null ? "" : " AND question.type in (:questionTypes) ")
-		+ (collectionUids == null ? "" : " AND collection.collection_uid in (:collectionUids) ")
-		+ " AND (REGEXP_REPLACE(question.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')"
-		+ " OR question.name LIKE CONCAT('%', :searchString, '%') "
-		+ " OR REGEXP_REPLACE(qboption.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) ";
+	StringBuilder queryBuilder = new StringBuilder("SELECT COUNT(DISTINCT c.uid) AS cnt FROM (SELECT q.uid FROM ")
+		.append(" (SELECT question.uid, question.question_id FROM lams_qb_question question");
+	if (searchString != null) {
+	    queryBuilder.append(" LEFT JOIN lams_qb_option qboption ON qboption.qb_question_uid = question.uid");
+	}
+	if (collectionUids != null) {
+	    queryBuilder.append(
+		    " LEFT JOIN lams_qb_collection_question collection ON question.question_id = collection.qb_question_id");
+	}
 
-	NativeQuery<?> query = getSession().createNativeQuery(SELECT_QUESTIONS).addScalar("count",
+	queryBuilder.append(" WHERE");
+	if (questionTypes != null) {
+	    queryBuilder.append(" question.type in (:questionTypes) AND");
+	}
+	if (collectionUids != null) {
+	    queryBuilder.append(" collection.collection_uid in (:collectionUids) AND");
+	}
+	if (searchString == null) {
+	    // there has to be something after AND or even after just WHERE
+	    queryBuilder.append(" TRUE");
+	} else {
+	    // we sort of strip out HTML tags from the search by using REGEXP_REPLACE which skips all the content between < >
+	    queryBuilder.append(
+		    " (REGEXP_REPLACE(question.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')")
+		    .append(" OR question.name LIKE CONCAT('%', :searchString, '%')")
+		    .append(" OR REGEXP_REPLACE(qboption.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%'))");
+	}
+
+	queryBuilder.append(") AS q GROUP BY q.question_id) AS c");
+
+	NativeQuery<?> query = getSession().createNativeQuery(queryBuilder.toString()).addScalar("cnt",
 		IntegerType.INSTANCE);
 	if (questionTypes != null) {
 	    query.setParameterList("questionTypes", questionTypes.split(","));
@@ -330,8 +383,11 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    query.setParameterList("collectionUids", collectionUids.split(","));
 	}
 	// support for custom search from a toolbar
-	searchString = searchString == null ? "" : searchString;
-	query.setParameter("searchString", searchString);
+	if (searchString != null) {
+	    // support for custom search from a toolbar
+	    searchString = searchString == null ? "" : searchString;
+	    query.setParameter("searchString", searchString);
+	}
 	int result = (int) query.getSingleResult();
 	return result;
     }
@@ -473,9 +529,11 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    if (orderBy.equalsIgnoreCase("usage")) {
 		queryBuilder = new StringBuilder(FIND_COLLECTION_QUESTIONS_BY_USAGE);
 	    } else {
+		LAMSBaseDAO.sanitiseQueryPart(orderBy);
 		queryBuilder.append(" ORDER BY ").append(orderBy);
 	    }
 	    if (StringUtils.isNotBlank(orderDirection)) {
+		LAMSBaseDAO.sanitiseQueryPart(orderDirection);
 		queryBuilder.append(" ").append(orderDirection);
 	    }
 	}

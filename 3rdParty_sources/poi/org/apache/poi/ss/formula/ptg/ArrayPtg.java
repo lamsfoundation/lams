@@ -17,10 +17,13 @@
 
 package org.apache.poi.ss.formula.ptg;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.apache.poi.ss.formula.constant.ConstantValueParser;
 import org.apache.poi.ss.formula.constant.ErrorConstant;
 import org.apache.poi.ss.util.NumberToTextConverter;
-import org.apache.poi.util.LittleEndianInput;
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
@@ -31,18 +34,16 @@ import org.apache.poi.util.LittleEndianOutput;
  * It is only after the "size" of all the Ptgs is met, that the ArrayPtg data is actually
  * held after this. So Ptg.createParsedExpression keeps track of the number of
  * ArrayPtg elements and need to parse the data upto the FORMULA record size.
- *
- * @author Jason Height (jheight at chariot dot net dot au)
  */
 public final class ArrayPtg extends Ptg {
-	public static final byte sid  = 0x20;
+	public static final byte sid = 0x20;
 
 	private static final int RESERVED_FIELD_LEN = 7;
 	/**
 	 * The size of the plain tArray token written within the standard formula tokens
 	 * (not including the data which comes after all formula tokens)
 	 */
-	public static final int PLAIN_TOKEN_SIZE = 1+RESERVED_FIELD_LEN;
+	public static final int PLAIN_TOKEN_SIZE = 1 + RESERVED_FIELD_LEN;
 
 	// 7 bytes of data (stored as an int, short and byte here)
 	private final int _reserved0Int;
@@ -50,7 +51,7 @@ public final class ArrayPtg extends Ptg {
 	private final int _reserved2Byte;
 
 	// data from these fields comes after the Ptg data of all tokens in current formula
-	private final int  _nColumns;
+	private final int _nColumns;
 	private final int _nRows;
 	private final Object[] _arrayValues;
 
@@ -62,6 +63,16 @@ public final class ArrayPtg extends Ptg {
 		_nRows = nRows;
 		_arrayValues = arrayValues.clone();
 	}
+
+	public ArrayPtg(ArrayPtg other) {
+		_reserved0Int = other._reserved0Int;
+		_reserved1Short = other._reserved1Short;
+		_reserved2Byte = other._reserved2Byte;
+		_nColumns = other._nColumns;
+		_nRows = other._nRows;
+		_arrayValues = (other._arrayValues == null) ? null : other._arrayValues.clone();
+	}
+
 	/**
 	 * @param values2d array values arranged in rows
 	 */
@@ -104,19 +115,6 @@ public final class ArrayPtg extends Ptg {
 
 	public boolean isBaseToken() {
 		return false;
-	}
-
-	public String toString() {
-		StringBuffer sb = new StringBuffer("[ArrayPtg]\n");
-
-		sb.append("nRows = ").append(getRowCount()).append("\n");
-		sb.append("nCols = ").append(getColumnCount()).append("\n");
-		if (_arrayValues == null) {
-			sb.append("  #values#uninitialised#\n");
-		} else {
-			sb.append("  ").append(toFormulaString());
-		}
-		return sb.toString();
 	}
 
 	/**
@@ -166,8 +164,13 @@ public final class ArrayPtg extends Ptg {
 			+ ConstantValueParser.getEncodedSize(_arrayValues);
 	}
 
+	@Override
+	public byte getSid() {
+		return sid;
+	}
+
 	public String toFormulaString() {
-		StringBuffer b = new StringBuffer();
+		StringBuilder b = new StringBuilder();
 		b.append("{");
 		for (int y = 0; y < _nRows; y++) {
 			if (y > 0) {
@@ -191,13 +194,13 @@ public final class ArrayPtg extends Ptg {
 			throw new RuntimeException("Array item cannot be null");
 		}
 		if (o instanceof String) {
-			return "\"" + (String)o + "\"";
+			return "\"" + o + "\"";
 		}
 		if (o instanceof Double) {
-			return NumberToTextConverter.toText(((Double)o).doubleValue());
+			return NumberToTextConverter.toText((Double) o);
 		}
 		if (o instanceof Boolean) {
-			return ((Boolean)o).booleanValue() ? "TRUE" : "FALSE";
+			return (Boolean) o ? "TRUE" : "FALSE";
 		}
 		if (o instanceof ErrorConstant) {
 			return ((ErrorConstant)o).getText();
@@ -209,60 +212,20 @@ public final class ArrayPtg extends Ptg {
 		return Ptg.CLASS_ARRAY;
 	}
 
-	/**
-	 * Represents the initial plain tArray token (without the constant data that trails the whole
-	 * formula).  Objects of this class are only temporary and cannot be used as {@link Ptg}s.
-	 * These temporary objects get converted to {@link ArrayPtg} by the
-	 * {@link #finishReading(LittleEndianInput)} method.
-	 */
-	static final class Initial extends Ptg {
-		private final int _reserved0;
-		private final int _reserved1;
-		private final int _reserved2;
+	@Override
+	public ArrayPtg copy() {
+		return new ArrayPtg(this);
+	}
 
-		public Initial(LittleEndianInput in) {
-			_reserved0 = in.readInt();
-			_reserved1 = in.readUShort();
-			_reserved2 = in.readUByte();
-		}
-		private static RuntimeException invalid() {
-			throw new IllegalStateException("This object is a partially initialised tArray, and cannot be used as a Ptg");
-		}
-		public byte getDefaultOperandClass() {
-			throw invalid();
-		}
-		public int getSize() {
-			return PLAIN_TOKEN_SIZE;
-		}
-		public boolean isBaseToken() {
-			return false;
-		}
-		public String toFormulaString() {
-			throw invalid();
-		}
-		public void write(LittleEndianOutput out) {
-			throw invalid();
-		}
-		/**
-		 * Read in the actual token (array) values. This occurs
-		 * AFTER the last Ptg in the expression.
-		 * See page 304-305 of Excel97-2007BinaryFileFormat(xls)Specification.pdf
-		 */
-		public ArrayPtg finishReading(LittleEndianInput in) {
-			int nColumns = in.readUByte();
-			short nRows = in.readShort();
-			//The token_1_columns and token_2_rows do not follow the documentation.
-			//The number of physical rows and columns is actually +1 of these values.
-			//Which is not explicitly documented.
-			nColumns++;
-			nRows++;
-
-			int totalCount = nRows * nColumns;
-			Object[] arrayValues = ConstantValueParser.parse(in, totalCount);
-
-			ArrayPtg result = new ArrayPtg(_reserved0, _reserved1, _reserved2, nColumns, nRows, arrayValues);
-			result.setClass(getPtgClass());
-			return result;
-		}
+	@Override
+	public Map<String, Supplier<?>> getGenericProperties() {
+		return GenericRecordUtil.getGenericProperties(
+			"reserved0", () -> _reserved0Int,
+			"reserved1", () -> _reserved1Short,
+			"reserved2", () -> _reserved2Byte,
+			"columnCount", this::getColumnCount,
+			"rowCount", this::getRowCount,
+			"arrayValues", () -> _arrayValues == null ? "#values#uninitialised#" : toFormulaString()
+		);
 	}
 }

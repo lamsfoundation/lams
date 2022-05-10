@@ -2,9 +2,8 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 	<lams:html>
-		<c:set var="lams"> <lams:LAMSURL /> </c:set>
-		<c:set var="tool"> 	<lams:WebAppURL />	</c:set>
-	
+		<c:set var="lams"><lams:LAMSURL /></c:set>
+		<c:set var="tool"><lams:WebAppURL /></c:set>
 	<lams:head>  
 		<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
 		<title>
@@ -21,24 +20,26 @@
 		<link rel="stylesheet" type="text/css" href="${tool}includes/css/mindmap.css"></link>
 		
 		<script src="${lams}includes/javascript/jquery.minicolors.min.js"></script>
-<script src="${lams}includes/javascript/fullscreen.js"></script>
+		<script src="${lams}includes/javascript/fullscreen.js"></script>
 		<script src="${tool}includes/javascript/jquery.timer.js"></script>
 		<script src="${tool}includes/javascript/mapjs/main.js"></script>
 		<script src="${tool}includes/javascript/mapjs/underscore-min.js"></script>
 		
+		<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 		<script type="text/javascript">
+			checkNextGateActivity('finishButton', '${learningForm.toolSessionID}', '', submitForm);
 		
 			var mode = "${mode}";		// learner, teacher, ...
 			
 			function disableButtons() {
-				$("#finishButton").attr("disabled", true);
+				$("#finishButton, #continueButton").attr("disabled", true);
 				// show the waiting area during the upload
 				$("#spinnerArea_Busy").show();
 			}
 		
 			function enableButtons() {
 				$("#spinnerArea_Busy").hide();
-				$("#finishButton").removeAttr("disabled");
+				$("#finishButton, #continueButton").removeAttr("disabled");
 			}
 		
 			function submitForm() {
@@ -47,15 +48,20 @@
 		 	 	var f = document.getElementById('learningForm');
 		 		f.submit();
 			}
-			
-			</script>
+
+			$(document).ready(function(){
+				$('[data-toggle="tooltip"]').bootstrapTooltip();
+			});
+		</script>
+		
+		<%@ include file="websocket.jsp"%>		
 	</lams:head>
 
 	<body class="stripes">
 		
 		<form:form action="${reflectOnActivity ? 'reflect.do' : 'finishActivity.do'}" method="post" onsubmit="return false;" modelAttribute="learningForm" id="learningForm">
 			<input type="hidden" name="userId" value="${userIdParam}" />
-			<input type="hidden" name="toolContentId" value="${toolContentIdParam}" />
+			<input type="hidden" name="toolContentId" value="${toolContentID}" />
 			<form:hidden path="toolSessionID" />
 			<form:hidden path="mindmapContent" id="mindmapContent" />
 		
@@ -104,14 +110,30 @@
 					
 						<c:otherwise>
 							<c:choose>
+								<c:when test="${mindmapDTO.galleryWalkEnabled}">
+									<button data-toggle="tooltip" 
+											class="btn btn-default voffset5 pull-right ${mode == 'author' ? '' : 'disabled'}"
+											<c:choose>
+												<c:when test="${mode == 'author'}">
+													title="<fmt:message key='label.gallery.walk.wait.start.preview' />"
+													onClick="javascript:location.href = location.href + '&galleryWalk=forceStart'"
+												</c:when>
+												<c:otherwise>
+													title="<fmt:message key='label.gallery.walk.wait.start' />"
+												</c:otherwise>
+											</c:choose>
+										>
+										<fmt:message key="button.continue" />
+									</button>
+								</c:when>
 								<c:when test="${reflectOnActivity}">
-									<a href="javascript:submitForm();" class="btn btn-primary" id="finishButton">
+									<a href="javascript:submitForm();" class="btn btn-primary" id="continueButton">
 										   <span class="nextActivity"><fmt:message key="button.continue"/></span>
 									</a>
 								</c:when>
 				
 								<c:otherwise>
-									<a href="javascript:submitForm();" class="btn btn-primary" id="finishButton">
+									<button type="button" class="btn btn-primary" id="finishButton">
 										<span class="na">
 											<c:choose>
 							 					<c:when test="${isLastActivity}">
@@ -122,7 +144,7 @@
 							 					</c:otherwise>
 							 				</c:choose>
 									 	</span>
-									</a>
+									</button>
 								</c:otherwise>
 							</c:choose>
 						</c:otherwise>

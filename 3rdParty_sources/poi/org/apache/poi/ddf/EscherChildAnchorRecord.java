@@ -18,6 +18,10 @@
 
 package org.apache.poi.ddf;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndian;
 
 /**
@@ -26,16 +30,23 @@ import org.apache.poi.util.LittleEndian;
  *
  * @see EscherChildAnchorRecord
  */
-public class EscherChildAnchorRecord
-        extends EscherRecord
-{
-    public static final short RECORD_ID = (short) 0xF00F;
-    public static final String RECORD_DESCRIPTION = "MsofbtChildAnchor";
+public class EscherChildAnchorRecord extends EscherRecord {
+    public static final short RECORD_ID = EscherRecordTypes.CHILD_ANCHOR.typeID;
 
     private int field_1_dx1;
     private int field_2_dy1;
     private int field_3_dx2;
     private int field_4_dy2;
+
+    public EscherChildAnchorRecord() {}
+
+    public EscherChildAnchorRecord(EscherChildAnchorRecord other) {
+        super(other);
+        field_1_dx1 = other.field_1_dx1;
+        field_2_dy1 = other.field_2_dy1;
+        field_3_dx2 = other.field_3_dx2;
+        field_4_dy2 = other.field_4_dy2;
+    }
 
     @Override
     public int fillFields(byte[] data, int offset, EscherRecordFactory recordFactory) {
@@ -58,7 +69,7 @@ public class EscherChildAnchorRecord
         default:
             throw new RuntimeException("Invalid EscherChildAnchorRecord - neither 8 nor 16 bytes.");
         }
-            
+
         return 8 + size;
     }
 
@@ -91,13 +102,13 @@ public class EscherChildAnchorRecord
 
     @Override
     public String getRecordName() {
-        return "ChildAnchor";
+        return EscherRecordTypes.CHILD_ANCHOR.recordName;
     }
 
 
     /**
      * Retrieves offset within the parent coordinate space for the top left point.
-     * 
+     *
      * @return the x offset of the top left point
      */
     public int getDx1()
@@ -107,7 +118,7 @@ public class EscherChildAnchorRecord
 
     /**
      * Sets offset within the parent coordinate space for the top left point.
-     * 
+     *
      * @param field_1_dx1 the x offset of the top left point
      */
     public void setDx1( int field_1_dx1 )
@@ -117,7 +128,7 @@ public class EscherChildAnchorRecord
 
     /**
      * Gets offset within the parent coordinate space for the top left point.
-     * 
+     *
      * @return the y offset of the top left point
      */
     public int getDy1()
@@ -127,8 +138,8 @@ public class EscherChildAnchorRecord
 
     /**
      * Sets offset within the parent coordinate space for the top left point.
-     * 
-     * @param field_2_dy1 the y offset of the top left point 
+     *
+     * @param field_2_dy1 the y offset of the top left point
      */
     public void setDy1( int field_2_dy1 )
     {
@@ -137,7 +148,7 @@ public class EscherChildAnchorRecord
 
     /**
      * Retrieves offset within the parent coordinate space for the bottom right point.
-     * 
+     *
      * @return the x offset of the bottom right point
      */
     public int getDx2()
@@ -147,7 +158,7 @@ public class EscherChildAnchorRecord
 
     /**
      * Sets offset within the parent coordinate space for the bottom right point.
-     * 
+     *
      * @param field_3_dx2 the x offset of the bottom right point
      */
     public void setDx2( int field_3_dx2 )
@@ -157,7 +168,7 @@ public class EscherChildAnchorRecord
 
     /**
      * Gets the offset within the parent coordinate space for the bottom right point.
-     * 
+     *
      * @return the y offset of the bottom right point
      */
     public int getDy2()
@@ -167,7 +178,7 @@ public class EscherChildAnchorRecord
 
     /**
      * Sets the offset within the parent coordinate space for the bottom right point.
-     * 
+     *
      * @param field_4_dy2 the y offset of the bottom right point
      */
     public void setDy2( int field_4_dy2 )
@@ -176,12 +187,23 @@ public class EscherChildAnchorRecord
     }
 
     @Override
-    protected Object[][] getAttributeMap() {
-        return new Object[][] {
-            { "X1", field_1_dx1 },
-            { "Y1", field_2_dy1 },
-            { "X2", field_3_dx2 },
-            { "Y2", field_4_dy2 }
-        };
+    public Map<String, Supplier<?>> getGenericProperties() {
+        return GenericRecordUtil.getGenericProperties(
+            "base", super::getGenericProperties,
+            "x1", this::getDx1,
+            "y1", this::getDy1,
+            "x2", this::getDx2,
+            "y2", this::getDy2
+        );
+    }
+
+    @Override
+    public Enum getGenericRecordType() {
+        return EscherRecordTypes.CHILD_ANCHOR;
+    }
+
+    @Override
+    public EscherChildAnchorRecord copy() {
+        return new EscherChildAnchorRecord(this);
     }
 }

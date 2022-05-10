@@ -29,10 +29,13 @@
 			<fmt:message key="label.users.from.group" />
 		</div>
 		
-		<div>
-			<c:forEach var="user" items="${groupUsers}" varStatus="status">
-				<div class="user">
-					<c:out value="${user.firstName}" escapeXml="true"/> <c:out value="${user.lastName}" escapeXml="true"/>
+		<div id="usersInGroup">
+			<c:forEach var="user" items="${groupUsers}">
+				<div class="voffset10 loffset10">
+					<lams:Portrait userId="${user.userId}"/>
+					<span>
+						<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
+					</span>
 				</div>
 			</c:forEach>
 		</div>

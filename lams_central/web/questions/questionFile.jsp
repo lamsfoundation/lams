@@ -5,10 +5,11 @@
 <%@ page import="org.lamsfoundation.lams.util.FileUtil" %>
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
 <c:set var="tmpFileUploadId"><%=FileUtil.generateTmpFileUploadId()%></c:set>
+<c:set var="language"><lams:user property="localeLanguage"/></c:set>
 <c:set var="title" scope="request">
 	<c:choose>
 		<c:when test="${param.importType == 'word'}">
-			<fmt:message key="label.choose.word.document" />
+			<fmt:message key="label.import.word" />
 		</c:when>
 		<c:otherwise>
 			<fmt:message key="label.questions.file.title" />	
@@ -18,10 +19,11 @@
 
 <lams:html>
 <lams:head>
-	<title><fmt:message key="title.lams" /> :: ${title}</title>
+    <title><c:out value="${title}"/></title>
 
 	<lams:css />
 	<link href="/lams/css/uppy.min.css" rel="stylesheet" type="text/css" />
+	<link href="/lams/css/uppy.custom.css" rel="stylesheet" type="text/css" />
 	<style type="text/css">
 		.button {
 			float: right;
@@ -30,6 +32,10 @@
 		
 		div#errorArea {
 			display: none;
+		}
+		
+		.uppy-DragDrop-inner {
+			padding: 0;
 		}
 	</style>
 
@@ -48,6 +54,7 @@
 		</c:when>
 	</c:choose>
 		
+
 	<script type="text/javascript">
 		/**
 		 * Initialise Uppy as the file upload widget
@@ -56,7 +63,7 @@
 	 		UPLOAD_FILE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>';
 			
 		function initFileUpload(tmpFileUploadId, language) {
-			var allowedFileTypes = ['.zip', '.xml'],
+			var allowedFileTypes = ['.zip', '.xml', '.docx'],
   	  			uppyProperties = {
 				  // upload immediately 
 				  autoProceed: true,
@@ -73,17 +80,7 @@
 					  // its format is: upload_<userId>_<timestamp>
 					  'tmpFileUploadId' : tmpFileUploadId,
 					  'largeFilesAllowed' : true
-				  },
-				  onBeforeFileAdded: function(currentFile, files) {
-					  var name = currentFile.data.name,
-					  	  extensionIndex = name.lastIndexOf('.'),
-					  	  valid = allowedFileTypes.includes(name.substring(extensionIndex).trim());
-					  if (!valid) {
-						  uppy.info('<fmt:message key="label.questions.file.missing" />', 'error', 10000);
-					  }
-					  
-					  return valid;
-			    }
+				  }
 			  };
 			  
 			  switch(language) {
@@ -130,10 +127,16 @@
 		});	
 	</script>
 </lams:head>
+
 <body class="stripes">
 	<lams:Page type="admin" title="${title}">
 		<lams:errors/>				
 
+		<c:if test="${param.importType == 'word'}">
+		<div>
+			<p><fmt:message key="label.choose.word.document"/></p>
+		</div>
+		</c:if>
 		<form id="questionForm" action="<lams:LAMSURL/>questions.do" enctype="multipart/form-data" method="post">
 			<input type="hidden" name="tmpFileUploadId" value="${tmpFileUploadId}" /> 
 			<input type="hidden" name="returnURL" value="${empty param.returnURL ? returnURL : param.returnURL}" /> 
@@ -143,6 +146,12 @@
 			<input type="hidden" name="collectionChoice" value="${empty param.collectionChoice ? collectionChoice : param.collectionChoice}" /> 
 			
 			<div id="image-upload-area" class="voffset20"></div>
+
+        <c:if test="${param.importType == 'word'}">
+        <div class="voffset10">
+			<a href="/lams/www/public/MSWord-question-import.docx"><fmt:message key="label.download.word.template"/></a>.
+        </div>
+        </c:if>
 			
 			<div class="pull-right voffset20" id="buttonsDiv">
 				<input class="btn btn-sm btn-default" value='<fmt:message key="button.cancel"/>' type="button"

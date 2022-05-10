@@ -28,6 +28,7 @@ public class AssessmentUserDTO {
     private String lastName;
     private String login;
     private float grade;
+    private boolean resultSubmitted;
 
     private Long questionResultUid;
     private String portraitId;
@@ -62,6 +63,14 @@ public class AssessmentUserDTO {
 
     public void setGrade(float grade) {
 	this.grade = grade;
+    }
+
+    public boolean isResultSubmitted() {
+	return resultSubmitted;
+    }
+
+    public void setResultSubmitted(boolean resultSubmitted) {
+	this.resultSubmitted = resultSubmitted;
     }
 
     public Long getUserId() {

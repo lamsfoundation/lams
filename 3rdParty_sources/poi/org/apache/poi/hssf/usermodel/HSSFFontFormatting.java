@@ -21,31 +21,23 @@ import org.apache.poi.hssf.record.CFRuleBase;
 import org.apache.poi.hssf.record.cf.FontFormatting;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Color;
+
 /**
  * High level representation for Font Formatting component
  * of Conditional Formatting settings
  */
+@SuppressWarnings("unused")
 public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.FontFormatting {
-    /** Underline type - None */
-    public final static byte U_NONE              = FontFormatting.U_NONE;
-    /** Underline type - Single */
-    public final static byte U_SINGLE            = FontFormatting.U_SINGLE;
-    /** Underline type - Double */
-    public final static byte U_DOUBLE            = FontFormatting.U_DOUBLE;
-    /**  Underline type - Single Accounting */
-    public final static byte U_SINGLE_ACCOUNTING = FontFormatting.U_SINGLE_ACCOUNTING;
-    /** Underline type - Double Accounting */
-    public final static byte U_DOUBLE_ACCOUNTING = FontFormatting.U_DOUBLE_ACCOUNTING;
 
     private final FontFormatting fontFormatting;
     private final HSSFWorkbook workbook;
 
-    protected HSSFFontFormatting(CFRuleBase cfRuleRecord, HSSFWorkbook workbook) {
+    HSSFFontFormatting(CFRuleBase cfRuleRecord, HSSFWorkbook workbook) {
         this.fontFormatting = cfRuleRecord.getFontFormatting();
         this.workbook = workbook;
     }
 
-    protected FontFormatting getFontFormattingBlock() {
+    FontFormatting getFontFormattingBlock() {
         return fontFormatting;
     }
 
@@ -53,9 +45,9 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
      * get the type of super or subscript for the font
      *
      * @return super or subscript option
-     * @see #SS_NONE
-     * @see #SS_SUPER
-     * @see #SS_SUB
+     * @see org.apache.poi.ss.usermodel.Font#SS_NONE
+     * @see org.apache.poi.ss.usermodel.Font#SS_SUPER
+     * @see org.apache.poi.ss.usermodel.Font#SS_SUB
      */
     public short getEscapementType()
     {
@@ -107,7 +99,7 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
     /**
      * @see org.apache.poi.hssf.record.cf.FontFormatting#getRawRecord()
      */
-    protected byte[] getRawRecord() {
+    byte[] getRawRecord() {
         return fontFormatting.getRawRecord();
     }
 
@@ -116,11 +108,11 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
      *
      * @return font underlining type
      *
-     * @see #U_NONE
-     * @see #U_SINGLE
-     * @see #U_DOUBLE
-     * @see #U_SINGLE_ACCOUNTING
-     * @see #U_DOUBLE_ACCOUNTING
+     * @see org.apache.poi.ss.usermodel.Font#U_NONE
+     * @see org.apache.poi.ss.usermodel.Font#U_SINGLE
+     * @see org.apache.poi.ss.usermodel.Font#U_DOUBLE
+     * @see org.apache.poi.ss.usermodel.Font#U_SINGLE_ACCOUNTING
+     * @see org.apache.poi.ss.usermodel.Font#U_DOUBLE_ACCOUNTING
      */
     public short getUnderlineType()
     {
@@ -138,7 +130,7 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
     }
 
     /**
-     * @return true if escapement type was modified from default   
+     * @return true if escapement type was modified from default
      */
     public boolean isEscapementTypeModified()
     {
@@ -146,7 +138,7 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
     }
 
     /**
-     * @return true if font cancellation was modified from default   
+     * @return true if font cancellation was modified from default
      */
     public boolean isFontCancellationModified()
     {
@@ -154,7 +146,7 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
     }
 
     /**
-     * @return true if font outline type was modified from default   
+     * @return true if font outline type was modified from default
      */
     public boolean isFontOutlineModified()
     {
@@ -162,7 +154,7 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
     }
 
     /**
-     * @return true if font shadow type was modified from default   
+     * @return true if font shadow type was modified from default
      */
     public boolean isFontShadowModified()
     {
@@ -170,7 +162,7 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
     }
 
     /**
-     * @return true if font style was modified from default   
+     * @return true if font style was modified from default
      */
     public boolean isFontStyleModified()
     {
@@ -178,7 +170,7 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
     }
 
     /**
-     * @return true if font style was set to <i>italic</i> 
+     * @return true if font style was set to <i>italic</i>
      */
     public boolean isItalic()
     {
@@ -210,7 +202,7 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
     }
 
     /**
-     * @return true if font underline type was modified from default   
+     * @return true if font underline type was modified from default
      */
     public boolean isUnderlineTypeModified()
     {
@@ -218,7 +210,7 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
     }
 
     /**
-     * @return true if font weight was modified from default   
+     * @return true if font weight was modified from default
      */
     public boolean isFontWeightModified()
     {
@@ -227,8 +219,8 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
 
     /**
      * set font style options.
-     * 
-     * @param italic - if true, set posture style to italic, otherwise to normal 
+     *
+     * @param italic - if true, set posture style to italic, otherwise to normal
      * @param bold if true, set font weight to bold, otherwise to normal
      */
 
@@ -253,18 +245,18 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
      * set the escapement type for the font
      *
      * @param escapementType  super or subscript option
-     * @see #SS_NONE
-     * @see #SS_SUPER
-     * @see #SS_SUB
+     * @see org.apache.poi.ss.usermodel.Font#SS_NONE
+     * @see org.apache.poi.ss.usermodel.Font#SS_SUPER
+     * @see org.apache.poi.ss.usermodel.Font#SS_SUB
      */
     public void setEscapementType(short escapementType) {
         switch(escapementType) {
-            case HSSFFontFormatting.SS_SUB:
-            case HSSFFontFormatting.SS_SUPER:
+            case org.apache.poi.ss.usermodel.Font.SS_SUB:
+            case org.apache.poi.ss.usermodel.Font.SS_SUPER:
                 fontFormatting.setEscapementType(escapementType);
                 fontFormatting.setEscapementTypeModified(true);
                 break;
-            case HSSFFontFormatting.SS_NONE:
+            case org.apache.poi.ss.usermodel.Font.SS_NONE:
                 fontFormatting.setEscapementType(escapementType);
                 fontFormatting.setEscapementTypeModified(false);
                 break;
@@ -273,7 +265,7 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
     }
 
     /**
-     * @param modified
+     * @param modified flag, if escapement type is modified
      * @see org.apache.poi.hssf.record.cf.FontFormatting#setEscapementTypeModified(boolean)
      */
     public void setEscapementTypeModified(boolean modified) {
@@ -281,7 +273,7 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
     }
 
     /**
-     * @param modified
+     * @param modified flag, if font cancellation is modified
      * @see org.apache.poi.hssf.record.cf.FontFormatting#setFontCancellationModified(boolean)
      */
     public void setFontCancellationModified(boolean modified)
@@ -290,7 +282,7 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
     }
 
     /**
-     * @param fci
+     * @param fci the font color index
      * @see org.apache.poi.hssf.record.cf.FontFormatting#setFontColorIndex(short)
      */
     public void setFontColorIndex(short fci)
@@ -299,7 +291,7 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
     }
 
     /**
-     * @param height
+     * @param height the font height
      * @see org.apache.poi.hssf.record.cf.FontFormatting#setFontHeight(int)
      */
     public void setFontHeight(int height)
@@ -308,7 +300,7 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
     }
 
     /**
-     * @param modified
+     * @param modified flag, if font outline is modified
      * @see org.apache.poi.hssf.record.cf.FontFormatting#setFontOutlineModified(boolean)
      */
     public void setFontOutlineModified(boolean modified)
@@ -317,7 +309,7 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
     }
 
     /**
-     * @param modified
+     * @param modified flag, if font shadow is modified
      * @see org.apache.poi.hssf.record.cf.FontFormatting#setFontShadowModified(boolean)
      */
     public void setFontShadowModified(boolean modified)
@@ -326,7 +318,7 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
     }
 
     /**
-     * @param modified
+     * @param modified flag, if font style is modified
      * @see org.apache.poi.hssf.record.cf.FontFormatting#setFontStyleModified(boolean)
      */
     public void setFontStyleModified(boolean modified)
@@ -335,7 +327,7 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
     }
 
     /**
-     * @param on
+     * @param on flag, if outline is set
      * @see org.apache.poi.hssf.record.cf.FontFormatting#setOutline(boolean)
      */
     public void setOutline(boolean on)
@@ -345,7 +337,7 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
     }
 
     /**
-     * @param on
+     * @param on flag, if shadow is set
      * @see org.apache.poi.hssf.record.cf.FontFormatting#setShadow(boolean)
      */
     public void setShadow(boolean on)
@@ -355,7 +347,7 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
     }
 
     /**
-     * @param strike
+     * @param strike flag, if strikeout is set
      * @see org.apache.poi.hssf.record.cf.FontFormatting#setStrikeout(boolean)
      */
     public void setStrikeout(boolean strike)
@@ -369,23 +361,23 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
      *
      * @param underlineType  super or subscript option
      *
-     * @see #U_NONE
-     * @see #U_SINGLE
-     * @see #U_DOUBLE
-     * @see #U_SINGLE_ACCOUNTING
-     * @see #U_DOUBLE_ACCOUNTING
+     * @see org.apache.poi.ss.usermodel.Font#U_NONE
+     * @see org.apache.poi.ss.usermodel.Font#U_SINGLE
+     * @see org.apache.poi.ss.usermodel.Font#U_DOUBLE
+     * @see org.apache.poi.ss.usermodel.Font#U_SINGLE_ACCOUNTING
+     * @see org.apache.poi.ss.usermodel.Font#U_DOUBLE_ACCOUNTING
      */
     public void setUnderlineType(short underlineType) {
         switch(underlineType) {
-            case HSSFFontFormatting.U_SINGLE:
-            case HSSFFontFormatting.U_DOUBLE:
-            case HSSFFontFormatting.U_SINGLE_ACCOUNTING:
-            case HSSFFontFormatting.U_DOUBLE_ACCOUNTING:
+            case org.apache.poi.ss.usermodel.Font.U_SINGLE:
+            case org.apache.poi.ss.usermodel.Font.U_DOUBLE:
+            case org.apache.poi.ss.usermodel.Font.U_SINGLE_ACCOUNTING:
+            case org.apache.poi.ss.usermodel.Font.U_DOUBLE_ACCOUNTING:
                 fontFormatting.setUnderlineType(underlineType);
                 setUnderlineTypeModified(true);
                 break;
-    
-            case HSSFFontFormatting.U_NONE:
+
+            case org.apache.poi.ss.usermodel.Font.U_NONE:
                 fontFormatting.setUnderlineType(underlineType);
                 setUnderlineTypeModified(false);
                 break;
@@ -394,11 +386,10 @@ public final class HSSFFontFormatting implements org.apache.poi.ss.usermodel.Fon
     }
 
     /**
-     * @param modified
+     * @param modified flag, if underline type is modified
      * @see org.apache.poi.hssf.record.cf.FontFormatting#setUnderlineTypeModified(boolean)
      */
-    public void setUnderlineTypeModified(boolean modified)
-    {
+    public void setUnderlineTypeModified(boolean modified) {
         fontFormatting.setUnderlineTypeModified(modified);
     }
 }

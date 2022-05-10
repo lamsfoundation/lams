@@ -57,12 +57,6 @@ public class AdminController {
     public String start(@ModelAttribute("scratchieAdminForm") AdminForm scratchieAdminForm,
 	    HttpServletRequest request) {
 
-	ScratchieConfigItem isEnabledExtraPointOption = scratchieService
-		.getConfigItem(ScratchieConfigItem.KEY_IS_ENABLED_EXTRA_POINT_OPTION);
-	if (isEnabledExtraPointOption != null) {
-	    scratchieAdminForm.setEnabledExtraPointOption(Boolean.valueOf(isEnabledExtraPointOption.getConfigValue()));
-	}
-
 	ScratchieConfigItem presetMarks = scratchieService.getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS);
 	if (presetMarks != null) {
 	    scratchieAdminForm.setPresetMarks(presetMarks.getConfigValue());
@@ -86,11 +80,6 @@ public class AdminController {
 	    request.setAttribute("errorMap", errorMap);
 	    return "pages/admin/config";
 	}
-
-	ScratchieConfigItem isEnabledExtraPointOption = scratchieService
-		.getConfigItem(ScratchieConfigItem.KEY_IS_ENABLED_EXTRA_POINT_OPTION);
-	isEnabledExtraPointOption.setConfigValue("" + scratchieAdminForm.isEnabledExtraPointOption());
-	scratchieService.saveOrUpdateScratchieConfigItem(isEnabledExtraPointOption);
 
 	ScratchieConfigItem presetMarks = scratchieService.getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS);
 	presetMarks.setConfigValue(scratchieAdminForm.getPresetMarks());

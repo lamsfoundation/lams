@@ -21,8 +21,6 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.sbmt.dao.hibernate;
 
 import java.util.List;
@@ -43,7 +41,7 @@ public class SubmitFilesSessionDAO extends LAMSBaseDAO implements ISubmitFilesSe
 
     @Override
     public SubmitFilesSession getSessionByID(Long sessionID) {
-	return (SubmitFilesSession) super.find(SubmitFilesSession.class, sessionID);
+	return super.find(SubmitFilesSession.class, sessionID);
     }
 
     @Override
@@ -55,7 +53,7 @@ public class SubmitFilesSessionDAO extends LAMSBaseDAO implements ISubmitFilesSe
     public List<SubmitFilesSession> getSubmitFilesSessionByContentID(Long contentID) {
 	if (contentID != null) {
 	    return getSession().createQuery(FIND_LEARNER_BY_CONTENT_ID, SubmitFilesSession.class)
-		    .setParameter("contentID", contentID).list();
+		    .setParameter("contentID", contentID).setCacheable(true).list();
 	}
 	return null;
     }

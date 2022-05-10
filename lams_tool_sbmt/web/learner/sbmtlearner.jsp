@@ -8,13 +8,20 @@
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}"/>
 <c:set var="isLeadershipEnabled" value="${sessionMap.useSelectLeaderToolOuput}"/>
 <c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
+<c:set var="language"><lams:user property="localeLanguage"/></c:set>
 <lams:html>
 <lams:head>
 		
 	<title><fmt:message key="tool.display.name" /></title>
 	<%@ include file="/common/header.jsp"%>
 	
-	<link href="/lams/css/uppy.min.css" rel="stylesheet" type="text/css" />
+	<link href="/lams/css/uppy.min.css"    rel="stylesheet" type="text/css" />
+	<link href="/lams/css/uppy.custom.css" rel="stylesheet" type="text/css" />
+	<style>
+		.btn-hide-on-min-not-met {
+			display: none;
+		}
+	</style>
 	
 	<script type="text/javascript" src="${lams}/includes/javascript/uppy/uppy.min.js"></script>
 	<c:choose>
@@ -28,8 +35,11 @@
 			<script type="text/javascript" src="${lams}/includes/javascript/uppy/el_GR.min.js"></script>
 		</c:when>
 	</c:choose>
-	
+	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
+		
 	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${sessionMap.toolSessionID}', '', finish);
+		
 		var LAMS_URL = '<lams:LAMSURL/>',
 			UPLOAD_FILE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>',
 			// convert Java syntax to JSON
@@ -41,14 +51,33 @@
 			$("time.timeago").timeago();
 			
 			if ($('#file-upload-area').length == 1) {
-				initFileUpload('${learnerForm.tmpFileUploadId}', '<lams:user property="localeLanguage"/>');
+				initFileUpload('${learnerForm.tmpFileUploadId}', '${language}');
 			}
+
+			<c:if test="${sessionMap.mode != 'author' and sessionMap.minLimitUploadNumber != null}">
+				var uploadedFilesNumber = +${learner.filesUploaded.size()};
+				if (uploadedFilesNumber >= ${sessionMap.minLimitUploadNumber}) {
+					$('.btn-hide-on-min-not-met').removeClass('btn-hide-on-min-not-met');
+				}
+			</c:if>
+
+			<%-- Connect to command websocket only if it is learner UI --%>
+			<c:if test="${isLeadershipEnabled and sessionMap.mode == 'learner'}">
+				// command websocket stuff for refreshing
+				// trigger is an unique ID of page and action that command websocket code in Page.tag recognises
+				commandWebsocketHookTrigger = 'submit-files-leader-change-refresh-${sessionMap.toolSessionID}';
+				// if the trigger is recognised, the following action occurs
+				commandWebsocketHook = function() {
+					// in case in the address bar there is refresh.do, direct to the main learner URL
+					location.href = '<lams:WebAppURL />learning/learner.do?toolSessionID=${sessionMap.toolSessionID}';
+				};
+			</c:if>
 		});
 		
 		/**
 		 * Initialise Uppy as the file upload widget
 		 */
-		function initFileUpload(tmpFileUploadId, singleFileUpload, language) {
+		function initFileUpload(tmpFileUploadId, language) {
 			  var uppyProperties = {
 				  // upload immediately 
 				  autoProceed: true,
@@ -66,9 +95,9 @@
 					  'largeFilesAllowed' : false
 				  },
 				  onBeforeFileAdded: function(currentFile, files) {
-					  var name = currentFile.data.name,
+					  var name = currentFile.data.name || currentFile.name,
 					  	  extensionIndex = name.lastIndexOf('.'),
-					  	  valid = extensionIndex < 0 || !EXE_FILE_TYPES.includes(name.substring(extensionIndex).trim());
+					  	  valid = extensionIndex < 0 || !EXE_FILE_TYPES.includes(name.substring(extensionIndex).trim().toLowerCase());
 					  if (!valid) {
 						  uppy.info(EXE_FILE_ERROR, 'error', 10000);
 					  }
@@ -104,7 +133,6 @@
 				  showRemoveButtonAfterComplete: true,
 				  proudlyDisplayPoweredByUppy: false
 			  });
-			  
 			  uppy.use(Uppy.Webcam, {
 				  target: Uppy.Dashboard,
 				  modes: ['picture']
@@ -143,8 +171,13 @@
 			//enforce min files upload limit
 			<c:if test="${sessionMap.minLimitUploadNumber != null}">
 				if (uploadedFilesNumber < ${sessionMap.minLimitUploadNumber}) {
-					alert('<fmt:message key="label.should.upload.another"><fmt:param value="${sessionMap.minLimitUploadNumber}" /></fmt:message>');
-					return false;
+					if (${sessionMap.mode eq 'author'}) {
+						alert('<fmt:message key="label.should.upload.another"><fmt:param value="${sessionMap.minLimitUploadNumber}" /></fmt:message>' + 
+							  '\n<fmt:message key="label.min.limit.preview"/>');
+					} else {
+						alert('<fmt:message key="label.should.upload.another"><fmt:param value="${sessionMap.minLimitUploadNumber}" /></fmt:message>');
+						return false;
+					}
 				}
 			</c:if>
 
@@ -179,7 +212,7 @@
 				errDivId = 'file-error-msg';
 			}
 			var errDiv = $('#'+errDivId);
-			if ( errDiv.size() > 0 ) {
+			if ( errDiv.length > 0 ) {
 				errDiv.append(error);
 				errDiv.css( "display", "block" );
 			} else {
@@ -290,6 +323,55 @@
 		</c:if>
 		<lams:errors/>
 
+		<!-- upload form (we display it only if the user is not finished and lockedWhenFinished or no more files allowed) -->
+		<c:if test="${!sessionMap.finishLock && !sessionMap.maxLimitReached && hasEditRight && sessionMap.mode != 'teacher'}">
+			<form:form action="uploadFile.do" modelAttribute="learnerForm" id="learnerForm" method="post" enctype="multipart/form-data" onsubmit="return validateFileUpload();" >
+				<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
+				<input type="hidden" name="toolSessionID" value="${toolSessionID}" />
+				<input type="hidden" name="tmpFileUploadId" value="${learnerForm.tmpFileUploadId}" />
+				
+				<!--File path row -->
+				<div class="panel panel-default">
+					<div class="panel-heading panel-title">
+						<fmt:message key="label.learner.upload" />
+					</div>
+					
+					<div class="panel-body bg-success">
+						<div class="form-group">
+							<label for="file-upload-area"><fmt:message key="label.learner.filePath" />&nbsp;<span style="color: red">*</span></label>
+							
+							<div id="file-upload-area" class="voffset20"></div>
+						</div>
+						
+						<!--File Description -->
+						<div class="form-group">	
+							<label for="description"><fmt:message key="label.learner.fileDescription" />&nbsp;<span
+								style="color: red">*</span></label>
+							<form:textarea id="description" cssClass="form-control" path="description"></form:textarea>
+							<div id="desc-error-msg" class="text-danger" style="display: none;"></div>
+						</div>
+						
+						<p class="help-block"><small><fmt:message key="errors.required"><fmt:param>*</fmt:param></fmt:message></small></p>
+						
+							<c:if test="${hasEditRight}">
+								<div class="form-group text-center">
+									<button id="uploadButton" type="submit" <c:if test="${sessionMap.finishLock || sessionMap.maxLimitReached}">disabled="disabled"</c:if>
+										class="btn btn-default btn-success btn-disable-on-submit"
+										title='<fmt:message key="label.add.tip" />' >
+										<i class="fa fa-xs fa-plus"></i> <fmt:message key="label.add" />
+									</button>
+								</div>
+							</c:if>
+						
+					</div>
+				</div>
+			</form:form>
+				
+			<lams:WaitingSpinner id="attachmentArea_Busy"/>
+			
+			<hr width="100%"/>
+		</c:if>
+		
 		<!--Checks if the filesUploaded property of the SbmtLearnerForm is set -->
 		<c:choose>
 			<c:when test="${empty learner.filesUploaded && hasEditRight}">
@@ -385,52 +467,6 @@
 				</table>
 			</c:otherwise>
 		</c:choose>
-
-		<hr width="100%"/>
-
-		<!-- upload form (we display it only if the user is not finished and lockedWhenFinished or no more files allowed) -->
-		<c:if test="${!sessionMap.finishLock && !sessionMap.maxLimitReached && hasEditRight && sessionMap.mode != 'teacher'}">
-			<form:form action="uploadFile.do" modelAttribute="learnerForm" id="learnerForm" method="post" enctype="multipart/form-data" onsubmit="return validateFileUpload();" >
-				<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
-				<input type="hidden" name="toolSessionID" value="${toolSessionID}" />
-				<input type="hidden" name="tmpFileUploadId" value="${tmpFileUploadId}" />
-				
-				<!--File path row -->
-				<div class="panel panel-default">
-					<div class="panel-heading panel-title">
-						<fmt:message key="label.learner.upload" />
-					</div>
-					
-					<div class="panel-body">
-						<div class="form-group">
-							<label for="file-upload-area"><fmt:message key="label.learner.filePath" />&nbsp;<span style="color: red">*</span></label>
-							
-							<div id="file-upload-area" class="voffset20"></div>
-						</div>
-						
-						<!--File Description -->
-						<div class="form-group">	
-							<label for="description"><fmt:message key="label.learner.fileDescription" />&nbsp;<span
-								style="color: red">*</span></label>
-							<form:textarea id="description" cssClass="form-control" path="description"></form:textarea>
-							<div id="desc-error-msg" class="text-danger" style="display: none;"></div>
-						</div>
-						
-						<p class="help-block"><small><fmt:message key="errors.required"><fmt:param>*</fmt:param></fmt:message></small></p>
-						<div class="form-group">
-							<c:if test="${hasEditRight}">
-								<button id="uploadButton" type="submit" <c:if test="${sessionMap.finishLock || sessionMap.maxLimitReached}">disabled="disabled"</c:if>
-									class="btn btn-sm btn-default btn-primary btn-disable-on-submit pull-right">
-									<i class="fa fa-xs fa-plus"></i> <fmt:message key="label.add" />
-								</button>
-							</c:if>
-						</div>
-					</div>
-				</div>
-			</form:form>
-				
-			<lams:WaitingSpinner id="attachmentArea_Busy"/>
-		</c:if>
 		
 		<!-- reflection -->
 
@@ -475,12 +511,15 @@
 		<c:if test="${sessionMap.mode != 'teacher'}">
 			<c:choose>
 				<c:when test="${sessionMap.reflectOn and (not sessionMap.userFinished)}">
-					<button id="notebookButton" onclick="javascript:notebook();" class="btn btn-primary btn-disable-on-submit pull-right">
+					<button id="notebookButton" onclick="javascript:notebook();"
+							class="btn btn-primary btn-disable-on-submit pull-right ${sessionMap.mode eq 'author' ? '' : 'btn-hide-on-min-not-met'}">
 						<fmt:message key="label.continue" />
 					</button>
 				</c:when>
 				<c:otherwise>
-					<button type="submit" onclick="javascript:finish();" class="btn btn-primary btn-disable-on-submit pull-right na" id="finishButton">
+					<button type="button" 
+							class="btn btn-primary btn-disable-on-submit pull-right na ${sessionMap.mode eq 'author' ? '' : 'btn-hide-on-min-not-met'}"
+							id="finishButton">
 						<c:choose>
 							<c:when test="${isLastActivity}">
 								<fmt:message key="button.submit" />

@@ -17,6 +17,6 @@
 
 <module xmlns="urn:jboss:module:1.5" name="org.apache.commons.collections4">
 	<resources>
-		<resource-root path="commons-collections4-4.2.jar" />
+		<resource-root path="commons-collections4-4.4.jar" />
 	</resources>
 </module>

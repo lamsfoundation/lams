@@ -24,25 +24,27 @@
 package org.lamsfoundation.lams.learning.web.controller;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
-import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.util.LearnerActivityCompleteFluxItem;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -71,8 +73,8 @@ public class CompleteActivityController {
      * @throws ServletException
      */
     @RequestMapping("/CompleteActivity")
-    public String execute(@ModelAttribute("messageForm") ActivityForm messageForm, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    public String execute(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 	Integer learnerId = LearningWebUtil.getUserId();
 
 	// This must get the learner progress from the progress id, not cached from the request,
@@ -87,26 +89,43 @@ public class CompleteActivityController {
 	    return null;
 	}
 
-	// if user has already completed the lesson - we need to let non-LTI integrations server know to come and pick up
-	// updated marks (as it won't happen at lessoncomplete.jsp page)
-	if (progress.isComplete()) {
-	    String lessonFinishCallbackUrl = integrationService.getLessonFinishCallbackUrl(progress.getUser(),
-		    progress.getLesson());
-	    if (lessonFinishCallbackUrl != null) {
-		request.setAttribute("lessonFinishUrl", lessonFinishCallbackUrl);
-	    }
-	    if (progress.getLesson().getAllowLearnerRestart()) {
-		request.setAttribute("lessonID", progress.getLesson().getLessonId());
-	    }
+	long lessonId = progress.getLesson().getLessonId();
+	if (progress.isComplete() && progress.getLesson().getAllowLearnerRestart()) {
+	    request.setAttribute("lessonID", lessonId);
 	}
 
-	// Set activity as complete
 	try {
-
+	    // LTI Advantage also pushes marks on each activity completion, not only on lesson finish
 	    long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	    Activity activity = learnerService.getActivity(activityId);
-	    //return forward
-	    return learnerService.completeActivity(activityMapping, progress, activity, learnerId, false);
+	    String lessonFinishCallbackUrl = null;
+	    if (progress.isComplete() || activity.isToolActivity()) {
+		lessonFinishCallbackUrl = integrationService.getLessonFinishCallbackUrl(progress.getUser(),
+			progress.getLesson(), activityId);
+		if (lessonFinishCallbackUrl != null) {
+		    // if user has already completed the lesson - we need to let non-LTI integrations server know to come and pick up
+		    // updated marks (as it won't happen at lessoncomplete.jsp page)
+		    request.setAttribute("lessonFinishUrl", lessonFinishCallbackUrl);
+		}
+	    }
+	    // Set activity as complete
+
+	    String forward = learnerService.completeActivity(activityMapping, progress, activity, learnerId, false);
+	    if (lessonFinishCallbackUrl != null && forward.startsWith("redirect")) {
+		// loadToolActivity.jsp will make an Ajax call to LTI Advantage servlet
+		forward = WebUtil.appendParameterToURL(forward, "activityFinishUrl",
+			URLEncoder.encode(lessonFinishCallbackUrl, "UTF8"));
+		if (progress.isComplete()) {
+		    // so we can update the last activity score even on lesson finish
+		    forward = WebUtil.appendParameterToURL(forward, "finishedActivityId", String.valueOf(activityId));
+		}
+	    }
+
+	    // notify all event subscribers that a learner finished an activity
+	    FluxRegistry.emit(CommonConstants.ACTIVITY_COMPLETED_SINK_NAME,
+		    new LearnerActivityCompleteFluxItem(lessonId, learnerId, activityId));
+
+	    return forward;
 
 	} catch (LearnerServiceException e) {
 	    return "error";

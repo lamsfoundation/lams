@@ -37,9 +37,8 @@ public class ResourceItemForm {
 
     private String title;
     private short itemType;
-    private String description;
+    private String instructions;
     private String url;
-    private boolean openUrlNewWindow;
     //flag of this item has attachment or not
     private boolean hasFile;
     private Long fileUuid;
@@ -49,12 +48,12 @@ public class ResourceItemForm {
     private boolean allowRating;
     private boolean allowComments;
 
-    public String getDescription() {
-	return description;
+    public String getInstructions() {
+	return instructions;
     }
 
-    public void setDescription(String description) {
-	this.description = description;
+    public void setInstructions(String description) {
+	this.instructions = description;
     }
 
     public String getTmpFileUploadId() {
@@ -127,14 +126,6 @@ public class ResourceItemForm {
 
     public void setHasFile(boolean hasFile) {
 	this.hasFile = hasFile;
-    }
-
-    public boolean isOpenUrlNewWindow() {
-	return openUrlNewWindow;
-    }
-
-    public void setOpenUrlNewWindow(boolean openUrlNewWindow) {
-	this.openUrlNewWindow = openUrlNewWindow;
     }
 
     public String getSessionMapID() {
