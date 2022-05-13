@@ -196,7 +196,7 @@
 		}
 
         function switchToRegularMonitor() {
-        	location.href = "<lams:LAMSURL/>home/monitorLesson.do?forceRegularMonitor=true&lessonID=${lesson.lessonId}";
+        	location.href = "<lams:LAMSURL/>monitoring/monitoring/monitorLesson.do?forceRegularMonitor=true&newUI=false&lessonID=${lesson.lessonId}";
     	}
 	</script>
 </lams:head>
