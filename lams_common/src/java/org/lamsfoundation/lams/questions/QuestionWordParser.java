@@ -70,6 +70,7 @@ public class QuestionWordParser {
     private final static String FEEDBACK_TAG = "feedback:";
     private final static String LEARNING_OUTCOME_TAG = "lo:";
     private static final String CUSTOM_IMAGE_TAG_REGEX = "\\[IMAGE: .*?]";
+    private static final String NON_BREAK_SPACE_REGEX = "(^\\h*)|(\\h*$)";
 
     /**
      * Extracts questions from IMS QTI zip file.
@@ -166,9 +167,11 @@ public class QuestionWordParser {
 	    boolean answerTagFound = false;
 	    for (Node questionParagraph : questionParagraphs) {
 		// formatted text that includes starting and ending <p> as well as all children tags
-		String formattedText = serializer.writeToString(questionParagraph).strip();
+		String formattedText = serializer.writeToString(questionParagraph);
+		formattedText = QuestionWordParser.strip(formattedText);
 		//text without HTML tags
-		String text = questionParagraph.getTextContent().strip().toLowerCase();
+		String text = questionParagraph.getTextContent().toLowerCase();
+		text = QuestionWordParser.strip(text);
 		boolean isTypeParagraph = "p".equals(questionParagraph.getNodeName());
 
 		if (StringUtils.isBlank(text) && !questionParagraph.hasChildNodes()) {
@@ -182,7 +185,8 @@ public class QuestionWordParser {
 
 		    //process a-z) answers
 		    //remove <p> formatting "a-z)"
-		    formattedText = formattedText.replaceFirst("^<p.*>\\s*[a-zA-Z]\\)", "").replace("</p>", "").strip();
+		    formattedText = formattedText.replaceFirst("^<p.*>\\s*[a-zA-Z]\\)", "").replace("</p>", "");
+		    formattedText = QuestionWordParser.strip(formattedText);
 
 		    Answer answer = new Answer();
 		    answer.setText(formattedText);
@@ -227,7 +231,8 @@ public class QuestionWordParser {
 		    feedbackStarted = false;
 
 		    String vsaAnswers = WebUtil.removeHTMLtags(formattedText).replaceAll("(?i)" + CORRECT_TAG, "")
-			    .replaceAll("(?i)" + INCORRECT_TAG, "").strip();
+			    .replaceAll("(?i)" + INCORRECT_TAG, "");
+		    vsaAnswers = QuestionWordParser.strip(vsaAnswers);
 
 		    Answer answer = new Answer();
 		    answer.setText(vsaAnswers);
@@ -249,7 +254,9 @@ public class QuestionWordParser {
 		    feedbackStarted = false;
 
 		    String learningOutcome = WebUtil.removeHTMLtags(formattedText)
-			    .replaceAll("(?i)" + LEARNING_OUTCOME_TAG + "\\s*", "").strip();
+			    .replaceAll("(?i)" + LEARNING_OUTCOME_TAG + "\\s*", "");
+		    learningOutcome = QuestionWordParser.strip(learningOutcome);
+
 		    learningOutcomes.add(learningOutcome);
 		    continue;
 		}
@@ -258,7 +265,8 @@ public class QuestionWordParser {
 		    optionsStarted = true;
 		    feedbackStarted = false;
 
-		    mark = WebUtil.removeHTMLtags(text).replaceAll("(?i)" + MARK_TAG + "\\s*", "").strip();
+		    mark = WebUtil.removeHTMLtags(text).replaceAll("(?i)" + MARK_TAG + "\\s*", "");
+		    mark = QuestionWordParser.strip(mark);
 		    continue;
 		}
 
@@ -266,8 +274,9 @@ public class QuestionWordParser {
 		    optionsStarted = true;
 		    feedbackStarted = false;
 
-		    String markHedging = WebUtil.removeHTMLtags(text).replaceAll("(?i)" + MARK_HEDGING_TAG + "\\s*", "")
-			    .strip();
+		    String markHedging = WebUtil.removeHTMLtags(text).replaceAll("(?i)" + MARK_HEDGING_TAG + "\\s*",
+			    "");
+		    markHedging = QuestionWordParser.strip(markHedging);
 		    isMarkHedging = Boolean.valueOf(markHedging);
 		    continue;
 		}
@@ -278,7 +287,8 @@ public class QuestionWordParser {
 		}
 
 		if (feedbackStarted) {
-		    String strippedFormattedText = formattedText.replaceAll("(?i)" + FEEDBACK_TAG + "\\s*", "").strip();
+		    String strippedFormattedText = formattedText.replaceAll("(?i)" + FEEDBACK_TAG + "\\s*", "");
+		    strippedFormattedText = QuestionWordParser.strip(strippedFormattedText);
 		    feedback = feedback == null ? strippedFormattedText : feedback + strippedFormattedText;
 		    continue;
 		}
@@ -287,11 +297,12 @@ public class QuestionWordParser {
 		    // if we are still before all options and no answers section started,
 		    // then interpret it as question title or description
 		    if (text.startsWith(QUESTION_TAG)) {
-			title = WebUtil.removeHTMLtags(formattedText).replaceAll("(?i)" + QUESTION_TAG + "\\s*", "")
-				.strip();
+			title = WebUtil.removeHTMLtags(formattedText).replaceAll("(?i)" + QUESTION_TAG + "\\s*", "");
+			title = QuestionWordParser.strip(title);
 			continue;
 		    }
-		    description = description == null ? formattedText.strip() : description + formattedText.strip();
+		    String strippedFormattedText = QuestionWordParser.strip(formattedText);
+		    description = description == null ? strippedFormattedText : description + strippedFormattedText;
 		}
 	    }
 
@@ -397,9 +408,14 @@ public class QuestionWordParser {
 	}
 
 	Node node = nodes.item(counter);
-	String htmlText = serializer.writeToString(node).strip();
+	String htmlText = serializer.writeToString(node);
+	htmlText = QuestionWordParser.strip(htmlText);
 	log.debug("Reading the next line from word document: " + htmlText);
 	return htmlText;
+    }
+
+    private static String strip(String input) {
+	return input == null ? null : input.strip().replaceAll(NON_BREAK_SPACE_REGEX, "");
     }
 
     /**
