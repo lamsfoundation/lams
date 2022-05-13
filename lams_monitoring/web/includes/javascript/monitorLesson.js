@@ -1,20 +1,30 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
 // copy of lesson SVG so it does no need to be fetched every time
 var originalSequenceCanvas = null,
 // DIV container for lesson SVG
 // it gets accessed so many times it's worth to cache it here
-	sequenceCanvas = null,
+	sequenceCanvas = $('#sequenceCanvas'),
 // switch between SVG original size and fit-to-sreen (enlarge/shrink)
 	learningDesignSvgFitScreen = false,
 // info box show timeout
 	sequenceInfoTimeout = 8000,
 // which learner was selected in the search box
 	sequenceSearchedLearner = null,
+// container for learners' progress bars metadata
+	bars = null,
+// placeholder for single learner's progress bar and title
+	learnerProgressCellsTemplate = null,
 // for synchronisation purposes
+	learnersRefreshInProgress = false,
 	sequenceRefreshInProgress = false,
 
+// total number of learners with ongoing progress
+	learnerPossibleNumber = 0,
+// page in Learners tab
+	learnerProgressCurrentPageNumber = 1,
+
 //auto refresh all tabs every 30 seconds
-	autoRefreshInterval = 99990 * 1000,
+	autoRefreshInterval = 30 * 1000,
 	autoRefreshIntervalObject = null,
 // when user is doing something, do not auto refresh
 	autoRefreshBlocked = false,
@@ -28,69 +38,9 @@ var originalSequenceCanvas = null,
 	popupHeight = 720,
 	
 	gateOpenIconPath   = 'images/svg/gateOpen.svg',
-	gateOpenIconData   = null,
-	
-	fileDownloadCheckTimer;
+	gateOpenIconData   = null;
 
-$(document).ready(function(){
-	initCommonElements();
-	initSequenceTab();
-	initGradebookTab();
-	loadTab('sequence');
-});
 
-function loadTab(tabName, button) {
-	$('.navigate-btn, .lesson-properties').removeClass('active');
-	$('.component-sidebar').removeClass('expanded');
-	if (button) {
-		$(button).addClass('active');
-	}
-	
-	let tabContent = $('.monitoring-page-content .tab-content');
-		
-	if (tabName == 'sequence') {
-		tabContent.load(LAMS_URL + 'monitoring/monitoring/displaySequenceTab.do', function(){
-			refreshMonitor('sequence');
-			canvasFitScreen(learningDesignSvgFitScreen, true);
-		});
-	} else if (tabName == 'learners') {
-		tabContent.load(LAMS_URL + 'monitoring/monitoring/displayLearnersTab.do', function(){
-			refreshMonitor('learners');
-		});
-	} else if (tabName == 'gradebook') {
-		tabContent.load(LAMS_URL + 'monitoring/monitoring/displayGradebookTab.do', function(){
-			refreshMonitor('gradebook');
-		});
-	}
-}
-
-function initCommonElements(){
-	/*
-	$('.hamburger').click(function(){
-		$(this).toggleClass('active');
-		$('.component-sidebar, .monitoring-page-content').toggleClass('active');
-	});
-	*/
-	
-	$('#edit-lesson-btn').click(function(){
-		$('.lesson-properties').toggleClass('active');
-		$('.component-sidebar').toggleClass('expanded');
-	});
-	$('#load-sequence-tab-btn').click(function(){
-		loadTab('sequence', this);
-	});
-	
-	$('#load-learners-tab-btn').click(function(){
-		loadTab('learners', this);
-	});
-	
-	$('#load-gradebook-tab-btn').click(function(){
-		loadTab('gradebook', this);
-	});
-	
-	
-	initLessonTab();
-}
 
 //********** LESSON TAB FUNCTIONS **********
 
@@ -99,12 +49,12 @@ function initCommonElements(){
  */
 function initLessonTab(){
 	// sets presence availability. buttons may be temporarily disable by the tour.
-	$('#presenceButton').change(function(){
-		var checked = $(this).prop('checked'),
-			data = {
-				'presenceAvailable' : checked,
-				'lessonID'      : lessonId
-			};
+	$('#presenceButton').click(function(){
+		var checked = $(this).toggleClass('btn-success').hasClass('btn-success');
+		var data = {
+			'presenceAvailable' : checked,
+			'lessonID'      : lessonId
+		};
 		data[csrfTokenName] = csrfTokenValue;
 		$.ajax({
 			url : LAMS_URL + 'monitoring/monitoring/presenceAvailable.do',
@@ -112,14 +62,14 @@ function initLessonTab(){
 			cache : false,
 			data : data, 
 			success : function() {
-				// updatePresenceAvailableCount();
+				updatePresenceAvailableCount();
 				if (checked) {
-					$('#imButtonWrapper').show();
-					showToast(LABELS.LESSON_PRESENCE_ENABLE_ALERT);
+					$('#imButton').show();
+					$('#imButton').prop('disabled', false);
+					alert(LABELS.LESSON_PRESENCE_ENABLE_ALERT);
 				} else {
-					$('#imButtonWrapper, #openImButton').hide();
-					$('#imButton').prop('checked', false);
-					showToast(LABELS.LESSON_PRESENCE_DISABLE_ALERT);
+					$('#imButton').removeClass('btn-success').hide();
+					alert(LABELS.LESSON_PRESENCE_DISABLE_ALERT);
 				}
 			}
 		});
@@ -127,11 +77,11 @@ function initLessonTab(){
 	
 	// sets instant messaging availability
 	$('#imButton').click(function(){
-		var checked = $(this).prop('checked'),
-			data = {
-				'presenceImAvailable' : checked,
-				'lessonID'      : lessonId
-			};
+		var checked = $(this).toggleClass('btn-success').hasClass('btn-success');
+		var data = {
+			'presenceImAvailable' : checked,
+			'lessonID'      : lessonId
+		};
 		data[csrfTokenName] = csrfTokenValue;
 		$.ajax({
 			url : LAMS_URL + 'monitoring/monitoring/presenceImAvailable.do',
@@ -142,10 +92,10 @@ function initLessonTab(){
 				if (checked) {
 					$('#openImButton').show();
 					$('#openImButton').prop('disabled', false);
-					showToast(LABELS.LESSON_IM_ENABLE_ALERT);
+					alert(LABELS.LESSON_IM_ENABLE_ALERT);
 				} else {
 					$('#openImButton').hide();
-					showToast(LABELS.LESSON_IM_DISABLE_ALERT);
+					alert(LABELS.LESSON_IM_DISABLE_ALERT);
 				}
 			}
 		});
@@ -153,13 +103,12 @@ function initLessonTab(){
 	
 	$('#openImButton').click(openChatWindow);
 
-
 	//turn to inline mode for x-editable.js
 	$.fn.editable.defaults.mode = 'inline';
 	// do not cancel on clicking outside of box
 	$.fn.editable.defaults.onblur = 'ignore';
 	//enable renaming of lesson title  
-	$('#lesson-name').editable({
+	$('#lesson-name-strong').editable({
 	    type: 'text',
 	    pk: lessonId,
 	    url: LAMS_URL + 'monitoring/monitoring/renameLesson.do?' + $("#csrf-form", window.parent.document).serialize(),
@@ -207,7 +156,7 @@ function initLessonTab(){
 		}
 	}, false);
 	
-	$('.modal-body', classDialog).empty().append($('#classDialogContents').show()).closest('.modal-dialog').addClass('modal-lg');
+	$('.modal-body', classDialog).empty().append($('#classDialogContents').show());
 	
 	// search for users in the organisation with the term the Monitor entered
 	$('.dialogSearchPhrase', classDialog).autocomplete({
@@ -247,7 +196,7 @@ function initLessonTab(){
 			'height'    : 500,
 			'width'     : 510,
 			'title' 	: LABELS.PROGRESS_EMAIL_TITLE,
-			'resizable' : false,
+			'resizable' : true,
 			'open'      : function(){
 				autoRefreshBlocked = true;
 			},
@@ -260,9 +209,9 @@ function initLessonTab(){
 	$("#emaildatePicker").datetimepicker();
 
 	// sets gradebook on complete functionality
-	$('#gradebookOnCompleteButton').change(function(){
-		var checked = $(this).prop('checked'),
-			data = {
+	$('#gradebookOnCompleteButton').click(function(){
+		var checked = $(this).toggleClass('btn-success').hasClass('btn-success');
+		var data = {
 			'gradebookOnComplete' : checked,
 			'lessonID'      : lessonId
 		};
@@ -274,9 +223,9 @@ function initLessonTab(){
 			data : data,
 			success : function() {
 				if (checked) {
-					showToast(LABELS.LESSON_ACTIVITY_SCORES_ENABLE_ALERT);
+					alert(LABELS.LESSON_ACTIVITY_SCORES_ENABLE_ALERT);
 				} else {
-					showToast(LABELS.LESSON_ACTIVITY_SCORES_DISABLE_ALERT);
+					alert(LABELS.LESSON_ACTIVITY_SCORES_DISABLE_ALERT);
 				}
 			}
 		});
@@ -313,7 +262,7 @@ function lessonStateFieldChanged() {
 			$('#lessonStartApply').hide();
 			$('#lessonStateApply').hide();
 			$("#scheduleDisableLessonButton").html(LABELS.SCHEDULE);
-			$("#scheduleDisableLessonButton").css('display', 'block'); // must be inline or it will be wrong size
+			$("#scheduleDisableLessonButton").css('display', 'inline'); // must be inline or it will be wrong size
 			$("#disableLessonButton").show();
 			$('#lessonDisableApply').show();
 			break;
@@ -463,7 +412,7 @@ function updateLessonTab(){
 					labelColour = 'danger'; 
 					break;
 			}
-			$('#lessonStateLabel').attr('class', 'badge bg-' + labelColour).html(label + ' <i class="fa-solid fa-angles-down"></i>');
+			$('#lessonStateLabel').attr('class', 'label label-' + labelColour).html(label + ' <i class="fa fa-angle-double-down"></i>');
 			
 			// update available options in change state dropdown menu
 			var selectField = $('#lessonStateField');
@@ -549,136 +498,11 @@ function updateLessonTab(){
 		}
 	});
 	
-	/*
-		drawChart('pie', 'chartDiv',
-				  LAMS_URL + 'monitoring/monitoring/getLessonChartData.do?lessonID=' + lessonId,
-				  true);
-		
-		updatePresenceAvailableCount();
-	*/
-}
-
-function drawLessonCompletionChart(){
-	d3.json(LAMS_URL + 'monitoring/monitoring/getLessonChartData.do?lessonID=' + lessonId,
-			function(error, response){
-				if (error) {
-					// forward error to browser
-					throw error;
-				}
-				
-				if (!response || $.isEmptyObject(response)) {
-					// if there is no data to display
-					return;
-				}
-				
-				let chartDiv = $('#completion-chart'),
-					lessonCompletionChart = chartDiv.data('chart'),
-					percent = [],
-					labels = [],
-					raw = [];
-					
-				$(response.data).each(function(){
-					labels.push(this.name);
-					percent.push(this.value);
-					raw.push(this.raw);
-				});
-				
-				if (lessonCompletionChart != null) {
-					// chart already exists, just update data
-					lessonCompletionChart.data.datasets[0].data = percent;
-					lessonCompletionChart.lessonCompletionChartRawData = raw;
-					lessonCompletionChart.update();
-					return;
-				}
+	drawChart('pie', 'chartDiv',
+			  LAMS_URL + 'monitoring/monitoring/getLessonChartData.do?lessonID=' + lessonId,
+			  true);
 	
-				let ctx = chartDiv[0].getContext('2d');
-				lessonCompletionChart = new Chart(ctx, {
-						type : 'doughnut',
-						borderWidth : 0,
-						data : {
-							elements : {
-								arc : {
-									borderWidth : 0,
-									fontSize : 0,
-								}
-							},
-							datasets : [ {
-								data : percent,
-								backgroundColor : [ 'rgba(255, 195, 55, 1)',
-													'rgba(253, 60, 165, 1)',
-													'rgba(5, 204, 214, 1)'
-												  ],
-								borderWidth : 0
-							} ],
-							labels : labels
-						},
-						options : {
-							tooltips : {
-								enabled : true,
-								callbacks: {
-									label : function(tooltipItem, data) {
-										let index =  tooltipItem.index,
-										
-											rawData = this._chart.lessonCompletionChartRawData,
-											percent = data.datasets[0].data,
-											
-											label = labels[index],
-											value = percent[index],
-											rawValue = rawData[index];
-										
-										return label + ": " + rawValue + " (" + value + "%)";
-									}
-								}
-							},
-							legend : {
-								position: 'bottom',
-								align: 'start',
-								labels : {
-									generateLabels : function(chart) {
-										var data = chart.data;
-										if (data.labels.length && data.datasets.length) {
-											return data.labels.map(function(label, i) {
-												let meta = chart.getDatasetMeta(0),
-													style = meta.controller.getStyle(i),
-													value = data.datasets[0].data[i],
-													rawData = chart.lessonCompletionChartRawData || raw,
-													rawValue = rawData[i];
-				
-												return {
-													text: label + ": " + rawValue + " (" + value + "%)",
-													fillStyle: style.backgroundColor,
-													strokeStyle: style.borderColor,
-													lineWidth: style.borderWidth,
-													hidden: isNaN(value) || meta.data[i].hidden,
-				
-													// Extra data used for toggling the
-													// correct item
-													index: i
-												};
-											});
-										}
-										return [];
-									}
-								}
-							},
-							animation : {
-								animateScale : true,
-								animateRotate : true,
-								duration : 1000
-							}
-						},
-						plugins: [{
-						    beforeInit: function(chart) {
-						      chart.legend.afterFit = function() {
-						        this.height = this.height + 250;
-						      };
-						    }
-						}]
-					});
-			
-				lessonCompletionChart.lessonCompletionChartRawData = raw;
-				chartDiv.data('chart', lessonCompletionChart);
-			});
+	updatePresenceAvailableCount();
 }
 
 function checkScheduleDate(startDateString, endDateString) {
@@ -784,9 +608,9 @@ function showEmailDialog(userId){
 	}, false, true);
 }
 
-/*
+
 function updatePresenceAvailableCount(){
-	var checked = $('#presenceButton').prop('checked');
+	var checked = $('#presenceButton').hasClass('btn-success'),
 		counter = $('#presenceCounter');
 	if (checked) {
 		$.ajax({
@@ -804,20 +628,12 @@ function updatePresenceAvailableCount(){
 		counter.hide();
 	}
 }
-*/
 
 function updateContributeActivities(contributeActivities) {
-	let requiredTasksPanel = $('#required-tasks'),
-		requiredTasksContent = $('#required-tasks-content', requiredTasksPanel);
-		
-	if (!contributeActivities || contributeActivities.length === 0) {
-		requiredTasksPanel.remove();
-		return;
-	}
+	$('.contributeRow').remove();
+	var header = $('#contributeHeader'),
+		row = header;
 	
-	$('.contribute-row', requiredTasksContent).remove();
-	
-	/*
 	// special case - add a Live Edit option. This does not directly map to an activity
 	if ( lockedForEdit && lockedForEditUserId == userId) {
 		// show Live Edit task only if currently editing myself, not if someone else is editing.
@@ -830,63 +646,62 @@ function updateContributeActivities(contributeActivities) {
 		cell = $('<div />').addClass('contributeEntryCell').html(entryContent);
 		row = row.append(cell);
 	}
-	*/
-
 	if (contributeActivities) {
 		$.each(contributeActivities, function(){
-			let contributeActivity = this;
-			
-			let row = $('<div />').addClass('row contribute-row' + (contributeActivity.title ? ' ml-1' : ''))
-								  .appendTo(requiredTasksContent);
+			var contributeId = 'contribute' + this.activityID,
+				contributeActivity = this,
+				cell = $('<div />').addClass('contributeActivityCell').text(this.title).attr('id', contributeId);
+			row = $('<div />').addClass('contributeRow').insertAfter(row).append(cell);
 			
 			$.each(this.contributeEntries, function(){
-				var entryContent = '<div class="col label">' + (contributeActivity.title ? '<b>' + contributeActivity.title + '</b><br>(<small>' : '');
+				var entryContent = '';
 				switch (this.contributionType) {
-					case 3  : entryContent += LABELS.CONTRIBUTE_GATE; break;
-					case 6  : entryContent += LABELS.CONTRIBUTE_GROUPING; break;
-					case 7  : entryContent += LABELS.CONTRIBUTE_TOOL; break;
-					case 9  : entryContent += LABELS.CONTRIBUTE_BRANCHING; break;
-					case 11 : entryContent += LABELS.CONTRIBUTE_CONTENT_EDITED; break; 
-					case 12 : entryContent += LABELS.CONTRIBUTE_GATE_PASSWORD; break; 
+					case 3  : entryContent = LABELS.CONTRIBUTE_GATE; break;
+					case 6  : entryContent = LABELS.CONTRIBUTE_GROUPING; break;
+					case 7  : entryContent = LABELS.CONTRIBUTE_TOOL; break;
+					case 9  : entryContent = LABELS.CONTRIBUTE_BRANCHING; break;
+					case 11 : entryContent = LABELS.CONTRIBUTE_CONTENT_EDITED; break; 
+					case 12 : entryContent = LABELS.CONTRIBUTE_GATE_PASSWORD; break; 
 				}
-				if (contributeActivity.title) {
-					entryContent += ')</small>';
-				}
-				entryContent += '</div><div class="col text-right">';
 				switch (this.contributionType) {
 					case 3  : 
 					case 12 : if (this.isComplete) {
-						 		entryContent += '<div class="pull-right"><button class="contribute-gate-opened-button btn btn-success" '
+						 		entryContent += '<div class="pull-right"><button class="btn btn-xs btn-success" '
 						 					 + 'onClick="javascript:openPopUp(\'' + this.url 
 						 					 + '\',\'ContributeActivity\', 800, 1280, true)" '
 						 					 + 'title="' + LABELS.CONTRIBUTE_OPENED_GATE_TOOLTIP + '">'
 						 					 + LABELS.CONTRIBUTE_OPENED_GATE 
 						 					 + '</button></div>';
 							} else {
-								entryContent += '<div class="btn-group" role="group"><button onClick="javascript:openGateNow('
-                                    + contributeActivity.activityID + ')" type="button" class="btn" title="' 
+								entryContent += '<div class="pull-right btn-group btn-group-xs"><button onClick="javascript:openGateNow('
+                                    + contributeActivity.activityID + ')" type="button" class="btn btn-xs btn-primary" title="' 
 									+ LABELS.CONTRIBUTE_OPEN_GATE_NOW_TOOLTIP + '">' 
-									+ LABELS.CONTRIBUTE_OPEN_GATE_NOW_BUTTON 
-									+ '</button><button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'
-									+ '<div class="dropdown-menu"><a href="#" class="dropdown-item" onClick="javascript:openPopUp(\''
+									+ LABELS.CONTRIBUTE_OPEN_GATE_NOW_BUTTON + '</button>'
+									+ '<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" '
+									+ 		   'aria-expanded="false"><span class="caret"></span><span class="sr-only"'
+									+ '>Toggle Dropdown</span></button><ul class="dropdown-menu"><li>'
+									+ '<a href="#" onClick="javascript:openPopUp(\''
                                     + this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' 
 									+ LABELS.CONTRIBUTE_OPEN_GATE_TOOLTIP + '">' 
-									+ LABELS.CONTRIBUTE_OPEN_GATE_BUTTON + '</a></div></div>';
-									
+									+ LABELS.CONTRIBUTE_OPEN_GATE_BUTTON + '</a></li></ul></div>';
 							}
 							break;
-					default : entryContent += '<button type="button" class="btn contribute-go-button" onClick="javascript:openPopUp(\''
+					default : entryContent += '<span id="' + contributeId + 'Btn" class="btn btn-xs btn-primary pull-right" '
+						 + 'onClick="javascript:openPopUp(\''
 						 + this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' + LABELS.CONTRIBUTE_TOOLTIP
-						 + '">' + LABELS.CONTRIBUTE_BUTTON + '</button>';
+						 + '">' + LABELS.CONTRIBUTE_BUTTON + '</span>';
 				}
 
-				row.html(entryContent + "</div>");
+				cell = $('<div />').addClass('contributeEntryCell').html(entryContent);
+				row = row.append(cell);
 			});
 		});
-		
-		requiredTasksPanel.show();
+	}
+	
+	if ($('.contributeRow').length == 0) {
+		$('#requiredTasks').hide();
 	} else {
-		requiredTasksPanel.hide();
+		$('#requiredTasks').show();
 	}
 }
 
@@ -974,16 +789,13 @@ function addCheckbox(dateObj, list, checked) {
 		return;
 
 	// does not exist so add to list
-	var checkboxId = 'email-progress-date-' + dateObj.id,
-		checkbox = $('<input />').attr({
-   	 	'type' : 'checkbox',
-		'id'   : checkboxId
-     }).addClass('form-check-input me-1')
-	   .change(function(){
-    		editEmailProgressDate($(this));
-       }),
+	var checkbox = $('<input />').attr({
+   	 	'type' : 'checkbox'
+     }).change(function(){
+    	 editEmailProgressDate($(this));
+     }),
 
-     dateString = $('<label />').addClass('form-check-label').attr('for', checkboxId).text(dateObj.date),
+     dateString = $('<span/>').html(dateObj.date),
    	
      dateDiv = $('<div />').attr({
 			'dateid'  : dateObj.id,
@@ -1003,7 +815,6 @@ function sendProgressEmail() {
 		$.ajax({
 			dataType : 'json',
 			url : LAMS_URL + 'monitoring/emailProgress/sendLessonProgressEmail.do',
-			type: 'post',
 			cache : false,
 			data : {
 				'lessonID'  : lessonId
@@ -1345,12 +1156,7 @@ function initSequenceTab(){
 	
 	$('#sequenceInfoDialog .modal-body').empty().append($('#sequenceInfoDialogContents').show());
 	
-	const learnerProgressUpdateSource = new EventSource(LAMS_URL + 'monitoring/monitoring/getLearnerProgressUpdateFlux.do?lessonId=' +  lessonId);
-	learnerProgressUpdateSource.onmessage = function (event) {
-		if ("doRefresh" == event.data && $('#sequence-tab-content').length === 1){
-			updateSequenceTab();
-		}
-	}
+	canvasFitScreen(learningDesignSvgFitScreen, true);
 }
 
 function showIntroductionDialog(lessonId) {
@@ -1375,7 +1181,6 @@ function closeIntroductionDialog() {
 	autoRefreshBlocked = false;
 	$('#introductionDialog').remove();
 }
-
 /**
  * Updates learner progress in sequence tab according to respose sent to refreshMonitor()
  */
@@ -1385,9 +1190,6 @@ function updateSequenceTab() {
 	}
 	sequenceRefreshInProgress = true;
 	
-	drawLessonCompletionChart();
-	
-	sequenceCanvas = $('#sequenceCanvas');
 	sequenceCanvas.css('visibility', 'hidden');
 
 	if (originalSequenceCanvas) {
@@ -1402,8 +1204,8 @@ function updateSequenceTab() {
 		}
 	}
 	
-	// clear all learner icons
-	$('.learner-icon, .more-learner-icon', '#canvas-container').remove();
+	// clear all completed learner icons except the door
+	$('#completedLearnersContainer :not(img#completedLessonLearnersIcon)').remove();
 	
 	var sequenceTopButtonsContainer = $('#sequenceTopButtonsContainer');
 	if ($('img#sequenceCanvasLoading', sequenceTopButtonsContainer).length == 0){
@@ -1488,6 +1290,8 @@ function updateSequenceTab() {
 			
 			// modyfing SVG in DOM does not render changes, so we need to reload it
 			sequenceCanvas.html(sequenceCanvas.html());
+			// SVG needs resizing after reload
+			window.parent.resizeSequenceCanvas();
 			
 			// only now show SVG so there is no "jump" when resizing
 			sequenceCanvas.css('visibility', 'visible');
@@ -1500,7 +1304,7 @@ function updateSequenceTab() {
 			}
 			
 			var learnerTotalCount = learnerCount + response.completedLearnerCount;
-			// $('#learnersStartedPossibleCell').html('<span id="tour-learner-count">'+learnerTotalCount + ' / ' + response.numberPossibleLearners+'</span>');
+			$('#learnersStartedPossibleCell').html('<span id="tour-learner-count">'+learnerTotalCount + ' / ' + response.numberPossibleLearners+'</span>');
 			addCompletedLearnerIcons(response.completedLearners, response.completedLearnerCount, learnerTotalCount);
 			
 			$.each(response.activities, function(activityIndex, activity){
@@ -2234,20 +2038,17 @@ function fillClassList(role, disableCreator) {
 	togglePagingCells(table, ajaxProperties.data.pageNumber, Math.ceil(userCount / 10));
 	
 	$.each(users, function(userIndex, user) {
-		var checkboxId = 'class-list-' + role + '-' + user.id,
-			checkbox = $('<input />').attr({
-	    	 'type' : 'checkbox',
-			 'id'   : checkboxId
-	      }).addClass('form-check-input me-1')
-			.change(function(){
-	    		editClassMember($(this));
+		var checkbox = $('<input />').attr({
+	    	 'type' : 'checkbox'
+	      }).change(function(){
+	    	editClassMember($(this));
 	      }),
 	    		
 	      userDiv = $('<div />').attr({
 				'userId'  : user.id
 				})
 	          .addClass('dialogListItem')
-			  .prepend($('<label />').addClass('form-check-label').attr('for', checkboxId).text(getLearnerDisplayName(user)))
+		      .html(getLearnerDisplayName(user))
 		      .prepend(checkbox)
 		      .appendTo(list);
 	    	
@@ -2389,125 +2190,216 @@ function canvasFitScreen(fitScreen, skipResize) {
 	}
 }
 
+//********** LEARNERS TAB FUNCTIONS **********
+
+/**
+ * Inits Learners tab widgets.
+ */
+function initLearnersTab() {
+	// search for users with the term the Monitor entered
+	$("#learnersSearchPhrase").autocomplete( {
+		'source'   : LAMS_URL + "monitoring/monitoring/autocomplete.do?scope=lesson&lessonID=" + lessonId,
+		'delay'    : 700,
+		'select' : function(event, ui){
+		    // learner's ID in ui.item.value is not used here
+			$(this).val(ui.item.label);
+			$('#learnersSearchPhraseClear').show();
+			loadLearnerProgressPage(1, ui.item.label);
+			return false;
+		}
+	})
+	// run the real search when the Monitor presses Enter
+	.keypress(function(e){
+		if (e.which == 13) {
+			$(this).autocomplete("close");
+			if ($(this).val()) {
+				$('#learnersSearchPhraseClear').show();
+			}
+			loadLearnerProgressPage(1);
+		}
+	});
+}
+
+
+/**
+ * Handler for shift page numbers bar.
+ */
+function learnersPageShift(increment){
+	var pageNumberCell = $('#learnersPageLeft').next();
+	if (pageNumberCell.hasClass('learnersHeaderPageCell')) {
+		var startIndex = +pageNumberCell.text() + (increment ? 10 : -10);
+		var endIndex = startIndex + 9;
+		shiftLearnerProgressPageHeader(startIndex, endIndex);
+	}
+}
+
+
+/**
+ * Do the actual shifting of page numbers bar.
+ */
+function shiftLearnerProgressPageHeader(startIndex, endIndex) {
+	var pageLeftCell = $('#learnersPageLeft');
+	var pageCount = Math.ceil(learnerPossibleNumber / 10);
+	$('#tabLearnerControlTable td.learnersHeaderPageCell').remove();
+	
+	if (startIndex < 1) {
+		startIndex = 1;
+		endIndex = 10;
+	}
+	if (endIndex > pageCount) {
+		// put a bit more on the left, since right end of scale is too short
+		startIndex -= endIndex - pageCount;
+		if (startIndex < 1) {
+			startIndex = 1;
+		}
+		endIndex = pageCount;
+	}
+
+	for (var pageIndex = endIndex; pageIndex >= startIndex; pageIndex--) {
+		// produce the page number cells
+		var pageHeaderCell = 
+			$('<td class="learnersHeaderCell learnersHeaderPageCell"></td>')
+			.text(pageIndex)
+			.insertAfter(pageLeftCell)
+			.click(function(){
+				loadLearnerProgressPage(+$(this).text());
+			});
+		if (pageIndex == learnerProgressCurrentPageNumber){
+			// highlight the currently selected one
+			pageHeaderCell.addClass('selectedLearnersHeaderPageCell');
+		}
+	}
+}
+
+/**
+ * After page change, refresh values in the control bar.
+ */
+function updateLearnerProgressHeader(pageNumber) {
+	var controlRow = $('#tabLearnerControlTable tr'),
+		learnersSearchPhrase = $('#learnersSearchPhrase').val();
+	if (learnerPossibleNumber < 10 && (!learnersSearchPhrase || learnersSearchPhrase.trim() == '')) {
+		// do not show the bar at all
+		$('.learnersHeaderCell', controlRow).hide();
+		return;
+	}
+	// show the bar
+	$('.learnersHeaderCell', controlRow).show();
+	
+	var pageCount = Math.ceil(learnerPossibleNumber / 10);
+	if (!pageNumber) {
+		pageNumber = 1;
+	} else if (pageNumber > pageCount) {
+		pageNumber = pageCount;
+	}
+	learnerProgressCurrentPageNumber = pageNumber;
+	// update "Page X / Y" field
+	$('#learnersPageCounter').html(pageNumber + '&nbsp;/&nbsp;' + pageCount + '&nbsp;');
+	
+	// remove arrows for shifting page numbers, if they are not needed
+	if (pageCount < 10) {
+		$('td.learnersPageShifter', controlRow).hide();
+	}
+	
+	// calculate currently visible page numbers
+	var pageStartIndex = pageNumber - 5,
+		pageEndIndex = pageNumber + 5 - Math.min(pageStartIndex,0);
+	shiftLearnerProgressPageHeader(pageStartIndex, pageEndIndex, pageNumber);
+}
+
+/**
+ * Load the give page of learners' progress.
+ */
+function loadLearnerProgressPage(pageNumber, learnersSearchPhrase){
+
+	// prevent double refresh at the same time
+	if (learnersRefreshInProgress) {
+		return;
+	}
+	learnersRefreshInProgress = true;
+	
+	if (!learnerProgressCellsTemplate) {
+		// fill the placeholder, after all required variables were initialised
+		learnerProgressCellsTemplate =
+		  '<tr><td class="active progressBarLabel" id="progressBarLabel;00;"><div id="portrait-;00;" class="roffset5"></div>' + 
+		  '<span class="portrait-sm-lineheight" style="font-weight: bold">;11;</span>';
+
+		learnerProgressCellsTemplate +=
+		'<a class="btn btn-xs btn-default pull-right tour-email-button" href="#" onClick="javascript:showEmailDialog(;00;)"><i class="fa fa-envelope-o"></i> '
+		+ LABELS.EMAIL_BUTTON
+		+ '</a></td></tr><tr><td class="progressBarCell" id="progressBar;00;"></td></tr>';
+	}
+	
+	// remove existing progress bars
+	$('#tabLearnersTable').html(null);
+	bars = {};
+	var isProgressSorted = $('#orderByCompletionCheckbox:checked').length > 0;
+	// either go to the given page or refresh the current one
+	pageNumber = pageNumber || learnerProgressCurrentPageNumber;
+	learnersSearchPhrase = learnersSearchPhrase || $('#learnersSearchPhrase').val();
+	if (learnersSearchPhrase && learnersSearchPhrase.trim() == ''){
+		learnersSearchPhrase = null;
+	}
+	
+	$.ajax({
+		dataType : 'json',
+		url : LAMS_URL + 'monitoring/monitoring/getLearnerProgressPage.do',
+		cache : false,
+		data : {
+			'lessonID'         : lessonId,
+			'searchPhrase'     : learnersSearchPhrase,
+			'pageNumber'       : pageNumber,
+			'isProgressSorted' : isProgressSorted
+			
+		},
+		
+		success : function(response) {
+			learnerPossibleNumber = response.learnerPossibleNumber;
+			updateLearnerProgressHeader(pageNumber);
+			
+			if (response.learners) {
+				$.each(response.learners, function(){
+					var barId = 'bar' + this.id;
+					// create a new bar metadata entry
+					bars[barId] = {
+						'userId'      : this.id,
+						'containerId' : 'progressBar' + this.id
+					};
+					
+					// prepare HTML for progress bar
+					var learnerProgressCellsInstance = learnerProgressCellsTemplate
+						.replace(/;00;/g, this.id)
+						.replace(/;11;/g, getLearnerDisplayName(this));
+					$(learnerProgressCellsInstance).appendTo('#tabLearnersTable');
+					addPortrait($("#portrait-"+this.id), this.portraitId, this.id, 'small', true, LAMS_URL );
+					
+					// request data to build progress bar SVG
+					fillProgressBar(barId);
+				});
+			}
+			
+			learnersRefreshInProgress = false;
+		}
+	});
+
+}
+
 
 /**
  * Refreshes the existing progress bars. 
  */
 function updateLearnersTab(){
-	let learnersAccordion = $('#learners-accordion').empty(),
-		itemTemplate = $('.learners-accordion-item-template').clone().removeClass('learners-accordion-item-template d-none');
-		
-	$.ajax({
-		'url' : LAMS_URL + 'monitoring/monitoring/getLearnerProgressPage.do',
-		'data': {
-			lessonID: lessonId
-		},
-		'dataType' : 'json',
-		'success'  : function(response) {
-			let learnerProgressSource = null;
-			
-			$(response.learners).each(function(){
-				let learner = this,
-					itemHeaderId = 'learners-accordion-heading-' + learner.id,
-					itemCollapseId = 'learners-accordion-collapse-' + learner.id,
-					item = itemTemplate.clone().data('user-id', learner.id).attr('id', 'learners-accordion-item-' + learner.id).appendTo(learnersAccordion),
-					portraitSmall = $(definePortrait(learner.portraitId, learner.id, STYLE_SMALL, true, LAMS_URL)).addClass('me-2'),
-					portraitLarge = learner.portraitId ? $(definePortrait(learner.portraitId, learner.id, STYLE_LARGE, false, LAMS_URL)) : null
-					
-				$('.accordion-header', item).attr('id', itemHeaderId)
-					   .find('.accordion-button').attr('data-bs-target', '#' + itemCollapseId).attr('aria-controls', itemCollapseId)
-											  .html('<span>' + learner.firstName + ' ' + learner.lastName + '</span>')
-											  .prepend(portraitSmall);
-				$('.learners-accordion-name', item).text(learner.firstName + ' ' + learner.lastName);
-				$('.learners-accordion-login', item).html('<i class="fa-regular fa-user"></i>' + learner.login);
-				$('.learners-accordion-email', item).html('<i class="fa-regular fa-envelope"></i>' + learner.email);
-				if (portraitLarge) {
-					$('.learners-accordion-portrait', item).append(portraitLarge);
-				}
-				
-				$('.accordion-collapse', item).attr('id', itemCollapseId).attr('data-bs-parent', '#learners-accordion')
-					  .on('show.bs.collapse', function () {
-						if (learnerProgressSource) {
-							try {
-								learnerProgressSource.close();
-							} catch(e) {
-								console.error(e);
-							}
-						}
-						
-						let learnerId = $(this).closest('.accordion-item').data('user-id');
-						learnerProgressSource = new EventSource(LAMS_URL + 'learning/learner/getLearnerProgressUpdateFlux.do?lessonId='
-																		 +  lessonId + '&userId=' + learnerId);
-																	
-						learnerProgressSource.onmessage = function (event) {
-							if ($('#learners-accordion-item-' + learnerId).length === 1) {
-								drawLearnerTimeline(learnerId, event.data);
-							}
-						}
-					  });
-				});
-		}
-	});
-}
-
-function drawLearnerTimeline(learnerId, data) {
-	let item = $('#learners-accordion-item-' + learnerId),
-		timelineContainer = $('.vertical-timeline-container', item),
-		timeline = $('.vertical-timeline', timelineContainer).empty(),
-		noProgressLabel = $('.no-progress', item);
-	
-	if (!data) {
-		noProgressLabel.show();
+	// prevent double refresh
+	if (learnersRefreshInProgress) {
 		return;
 	}
-	noProgressLabel.hide();
-	data = JSON.parse(data);
-	let activityEntryTemplate = $('.learners-timeline-entry-template').clone().removeClass('learners-timeline-entry-template d-none');
+	learnersRefreshInProgress = true;
 	
-	$(data.activities).each(function(){
-		let activity = this,
-			entry = activityEntryTemplate.clone().appendTo(timeline),
-			icon = $('.timeline-icon', entry),
-			iconURL = null,
-			durationCell = $('.timeline-activity-duration', entry),
-			markCell = $('.timeline-activity-mark', entry);
-			
-		$('.timeline-title', entry).text(activity.name);
-			
-		switch(activity.status){
-			case 0: icon.addClass('border-primary activity-current');break;
-			case 1: icon.addClass('border-success activity-complete');break;
-		}
-		
-		if (activity.iconURL) {
-			iconURL = activity.iconURL;
-		} else if (activity.type === 'g') {
-			iconURL = 'images/svg/gateClosed.svg';
-		} else if (activity.type === 'o') {
-			iconURL = 'images/svg/branchingStart.svg';
-		} else if (activity.isGrouping) {
-			iconURL = 'images/svg/grouping.svg';
-		}
-		
-		if (iconURL) {
-			$('<img />').attr('src', LAMS_URL + iconURL).appendTo(icon);
-		}
-		
-		if (typeof activity.mark !== 'undefined') {
-			markCell.text(activity.mark + (activity.maxMark ? ' / ' + activity.maxMark : ''));
-		} else {
-			markCell.closest('tr').remove();
-		}
-		
-		if (activity.duration) {
-			durationCell.text(activity.duration);
-		} else {
-			durationCell.closest('tr').remove();
-		}
-	});
-	
-	timelineContainer.show();
+	for (var barId in bars) {
+		fillProgressBar(barId);
+	}
+	learnersRefreshInProgress = false;
 }
+
 
 /**
  * Clears previous run search for phrase, in Learners tab.
@@ -2540,32 +2432,14 @@ function learnerGroupClearSearchPhrase(){
 	showLearnerGroupDialog();
 	$('.dialogSearchPhraseClear', dialog).css('visibility', 'hidden');
 }
+
 //********** GRADEBOOK TAB FUNCTIONS **********
 
 /**
  * Inits Gradebook Tab.
  */
 function initGradebookTab() {
-	/*
-	$.extend(true, $.jgrid.icons, {
-	    fontAwesome6: $.extend(true, {}, $.jgrid.icons.fontAwesome, {
-	                           nav: { del: "fa-times" },
-	                           actions: { del: "fa-times" },
-	                           form: { del: "fa-times" }
-	                       })
-		$.extend(true, $.jgrid.icons.fontAwesome, {
-			common : "fa-solid"
-		});
-	});
-	*/
-	$.extend(true, $.jgrid.guiStyles.bootstrap4, {
-		pager : {
-			pagerSelect : 'form-control-select'
-		},
-		searchToolbar : {
-			clearButton : 'btn btn-sm'
-		}
-	});
+	$("#gradebookLoading").hide();
 }
 
 /**
@@ -2573,131 +2447,12 @@ function initGradebookTab() {
  */
 function updateGradebookTab() {
 	$("#gradebookLoading").show();
-	$("#gradebookDiv").load(LAMS_URL + 'gradebook/gradebookMonitoring.do?isTab=true&lessonID=' + lessonId, function() {
+	$("#gradebookDiv").load(LAMS_URL + 'gradebook/gradebookMonitoring.do?lessonID=' + lessonId, function() {
 		  $("#gradebookLoading").hide();
 	});
 }
-	
-function fixPagerInCenter(pagername, numcolshift) {
-	$('#'+pagername+'_right').css('display','inline');
-	if ( numcolshift > 0 ) {
-		var marginshift = - numcolshift * 12;
-		$('#'+pagername+'_center table').css('margin-left', marginshift+'px');
-	}
-}
-
-		
-var popupWidth = 1280,
-	popupHeight = 720;
-	
-// launches a popup from the page
-function launchPopup(url,title) {
-	var wd = null;
-	if(wd && wd.open && !wd.closed){
-		wd.close();
-	}
-
-	var left = ((screen.width / 2) - (popupWidth / 2));
-	var top = ((screen.height / 2) - (popupHeight / 2));
-
-	wd = window.open(url,title,'resizable,width='+popupWidth+',height='+popupHeight
-			+',scrollbars'
-			+ ",top=" + top + ",left=" + left);
-	wd.window.focus();
-}
-	
-/* gradebook dialog windows	on the ipad do not update the grid width properly using setGridWidth. Calling this is 
--- setting the grid to parentWidth-1 and the width of the parent to parentWidth+1, leading to growing width window
--- that overflows the dialog window. Keep the main grids slightly smaller than their containers and all is well. 
-*/
-
-function resizeJqgrid(jqgrids) {
-    jqgrids.each(function(index) {
-        var gridId = $(this).attr('id');
-        var parent = jQuery('#gbox_' + gridId).parent();
-        var gridParentWidth = parent.width();
-        if ( parent.hasClass('grid-holder') ) {
-            	gridParentWidth = gridParentWidth - 2;
-        }
-        jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
-    });
-}
-
-
-/* Based on jqgrid internal functions */
-function displayCellErrorMessage(table, iRow, iCol, errorLabel, errorMessage, buttonText ) {
-	setTimeout(function () {
-		try {
-	    	var frozenRows = table.grid.fbRows,
-			tr = table.rows[iRow];
-	    	tr = frozenRows != null && frozenRows[0].cells.length > iCol ? frozenRows[tr.rowIndex] : tr;
-		    var td = tr != null && tr.cells != null ? $(tr.cells[iCol]) : $(),
-		    		rect = td[0].getBoundingClientRect();
-		    $.jgrid.info_dialog.call(table, errorLabel, errorMessage, buttonText, {left:rect.left-200, top:rect.top});
-		} catch (e) {
-			alert(errorMessage);
-		}
-	}, 50);
-}
-
-function blockExportButton(areaToBlock, exportExcelUrl) {
-	var token = new Date().getTime(),
-		area = $('#' + areaToBlock).css('cursor', 'wait'),
-		buttons = $('.btn', area).prop('disabled', true),
-		form = $('<form></form>');
-		    
-	fileDownloadCheckTimer = window.setInterval(function () {
-		var cookieValue = $.cookie('fileDownloadToken');
-		if (cookieValue == token) {
-		    //unBlock export button
-			window.clearInterval(fileDownloadCheckTimer);
-			$.cookie('fileDownloadToken', null); //clears this cookie value
-			
-			area.css('cursor', 'auto');
-			buttons.prop('disabled', false);
-			form.remove();
-		}
-	}, 1000);
-	
-	//dynamically create a form and submit it
-    form.attr("method", "post");
-    form.attr("action", exportExcelUrl);
-    
-    var hiddenField = $('<input></input>');
-    hiddenField.attr("type", "hidden");
-    hiddenField.attr("name", "downloadTokenValue");
-    hiddenField.attr("value", token);
-    form.append(hiddenField);
-
-    // The form needs to be a part of the document in order to be submitted
-    $(document.body).append(form);
-    form.submit();
-	
-	return false;
-}
 
 //********** COMMON FUNCTIONS **********
-
-
-// generic function for opening a pop up
-function openPopUp(url, title, h, w, status, forceNewWindow) {
-
-	var width = screen.width;
-	var height = screen.height;
-
-	var left = ((width / 2) - (w / 2));
-	var top = ((height / 2) - (h / 2));
-
-	if (forceNewWindow) {
-		// opens a new window rather than loading content to existing one
-		title += new Date().getTime();
-	}
-
-	window.open(url, title, "HEIGHT=" + h + ",WIDTH=" + w
-			+ ",resizable=yes,scrollbars=yes,status=" + status
-			+ ",menubar=no, toolbar=no"
-			+ ",top=" + top + ",left=" + left);
-}
 
 function isAutoRefreshBlocked(){
 	return autoRefreshBlocked || $('#learnerGroupDialog').hasClass('in');
@@ -2720,17 +2475,20 @@ function refreshMonitor(tabName, isAuto){
 		}, autoRefreshInterval);
 	}
 
-	// update Lesson tab widgets (state, number of learners etc.)
-	updateLessonTab();
 	if (!tabName) {
+		// update Lesson tab widgets (state, number of learners etc.)
 		updateLessonTab();
 		// update learner progress in Sequence tab
 		updateSequenceTab();
 		// update learner progress in Learners tab
-		// loadLearnerProgressPage();
+		loadLearnerProgressPage();
+	} else if (tabName == 'lesson') {
+		updateLessonTab();
 	} else if (tabName == 'sequence'){
+		updateLessonTab();
 		updateSequenceTab();
 	} else if (tabName == 'learners'){
+		updateLessonTab();
 		updateLearnersTab();
 	} else if (tabName == 'gradebook'){
 		updateGradebookTab();
@@ -2877,7 +2635,7 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 	
 	if (!isRefresh) {
 		// show buttons and labels depending on parameters
-		$('span#learnerGroupMultiSelectLabel, button#learnerGroupDialogForceCompleteButton, button#learnerGroupDialogForceCompleteAllButton', learnerGroupDialog)
+		$('span#learnerGroupMultiSelectLabel, button#learnerGroupDialogForceCompleteButton', learnerGroupDialog)
 			.css('display', allowForceComplete ? 'inline' : 'none');
 		$('button#learnerGroupDialogViewButton', learnerGroupDialog)
 			.css('display', allowView ? 'inline' : 'none');
@@ -3037,13 +2795,6 @@ function togglePagingCells(parent, pageNumber, maxPageNumber) {
 	} else {
 		$('td.pageCell', parent).css('visibility', 'visible').text(pageNumber + ' / ' + maxPageNumber);
 	}
-}
-
-function showToast(text) {
-	let toast = $('#toast-template').clone().attr('id', null).appendTo('#toast-container');
-	toast.find('.toast-body', toast).text(text);
-	toast = new bootstrap.Toast(toast[0]);
-    toast.show();
 }
 
 /**
