@@ -21,16 +21,16 @@ var PropertyDefs = {
 				PropertyLib.fillGroupingDropdown(activity, activity.branchingActivity.grouping);
 				PropertyLib.fillToolInputDropdown(activity, activity.branchingActivity.input);
 				
-				$('.propertiesContentFieldOptionalSequenceMin', content).attr('value',
-																				 activity.branchingActivity.minOptions)
-																		.attr('max',
-																				 activity.branchingActivity.branches.length);
-				$('.propertiesContentFieldOptionalSequenceMax', content).attr('value',
-																				 activity.branchingActivity.maxOptions)
-																		.attr({
+				$('.propertiesContentFieldOptionalSequenceMin', content).attr('max', activity.branchingActivity.branches.length)
+																		.val(activity.branchingActivity.minOptions ?
+																			 activity.branchingActivity.minOptions : 0);
+																		
+				$('.propertiesContentFieldOptionalSequenceMax', content).attr({
 																			'min' : activity.branchingActivity.minOptions,
 																			'max' : activity.branchingActivity.branches.length
-																		});
+																		})
+																		.val(activity.branchingActivity.maxOptions ? 
+																		     activity.branchingActivity.maxOptions : 0);
 				if (activity.branchingActivity.branches.length == 0) {
 					// no branches = no buttons to define and match groups/conditions to branches
 					$('.propertiesContentRowConditions', content)
@@ -133,10 +133,13 @@ var PropertyDefs = {
 				  var value = +$(this).val();
 				  activity.branchingActivity.minOptions = Math.min(value, activity.branchingActivity.branches.length);
 				  if (value != activity.branchingActivity.minOptions) {
-					  $(this, content).attr('value', activity.branchingActivity.minOptions);
+					  value = activity.branchingActivity.minOptions;
+					  $(this, content).val(value);
 				  }
-				  if (activity.branchingActivity.minOptions > activity.branchingActivity.maxOptions) {
-					  $('.propertiesContentFieldOptionalSequenceMax', content).attr('value', value);
+				
+				  if (activity.branchingActivity.maxOptions && value > activity.branchingActivity.maxOptions) {
+					  activity.branchingActivity.maxOptions = value;
+					  $('.propertiesContentFieldOptionalSequenceMax', content).val(value);
 				  }
 				  $('.propertiesContentFieldOptionalSequenceMax', content).attr('min', value);
 			  });
@@ -552,10 +555,11 @@ var PropertyDefs = {
 				  var value = +$(this).val();
 				  activity.minOptions = Math.min(value, activity.childActivities.length);
 				  if (value != activity.minOptions) {
-					  $(this, content).attr('value', activity.minOptions);
+					  value = activity.minOptions;
+					  $(this, content).val(value);
 				  }
-				  if (activity.minOptions > activity.maxOptions) {
-					  $('.propertiesContentFieldOptionalActivityMax', content).attr('value', value);
+				  if (activity.maxOptions && value > activity.maxOptions) {
+					  $('.propertiesContentFieldOptionalActivityMax', content).val(value);
 				  }
 				  $('.propertiesContentFieldOptionalActivityMax', content).attr('min', value);
 			  });
@@ -571,14 +575,18 @@ var PropertyDefs = {
 			  });
 		}
 		
-		$('.propertiesContentFieldOptionalActivityMin', content).attr('value', activity.minOptions)
-																.attr('max', activity.childActivities.length);
-		$('.propertiesContentFieldOptionalActivityMax', content).attr('value', activity.maxOptions)
-																.attr({
+		$('.propertiesContentFieldOptionalActivityMin', content).attr('max', activity.childActivities.length)
+																.val(activity.minOptions ?
+																	 activity.minOptions : 0);
+																
+		$('.propertiesContentFieldOptionalActivityMax', content).attr({
 																	'min' : activity.minOptions,
 																	'max' : activity.childActivities.length
-																});
+																})
+																.val(activity.maxOptions ?
+																	 activity.maxOptions : 0);
 	},
+	
 
 	
 	/**
