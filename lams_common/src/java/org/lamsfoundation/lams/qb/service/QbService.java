@@ -887,7 +887,11 @@ public class QbService implements IQbService {
 	    }
 
 	    // append new answer to option
-	    name += (StringUtils.isBlank(name) ? "" : QbUtils.VSA_ANSWER_DELIMITER) + answer;
+	    if (StringUtils.isBlank(name)) {
+		name = answer;
+	    } else {
+		name += QbUtils.VSA_ANSWER_DELIMITER + answer;
+	    }
 	    targetOption.setName(name);
 	    qbDAO.update(targetOption);
 	    qbDAO.flush();
