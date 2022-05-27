@@ -14,6 +14,13 @@
 				window.opener.location.reload();
 			}
 		</c:if>
+
+		<c:if test="${gateJustToggled}">
+			if (window.opener && typeof window.opener.updateSequenceTab === 'function') {
+				window.opener.updateLessonTab();
+				window.opener.updateSequenceTab();
+			}
+		</c:if>
 	});
 </script>
 	        

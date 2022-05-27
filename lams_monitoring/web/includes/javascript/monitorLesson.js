@@ -904,6 +904,7 @@ function openGateNow(activityId) {
 		'data'  : data,
 		'success' : function(){
 			updateLessonTab();
+			updateSequenceTab();
 		}
 	});
 }
