@@ -376,5 +376,11 @@
 <!-- End question detail modal -->
 
 <c:if test="${isTbl}">
-	<%@ include file="parts/timeLimit.jsp"%>
+	<c:import url="/timelimit/timeLimit.jsp" context="/lams/monitoring">
+		<c:param name="toolContentId" value="${scratchie.contentId}"/>
+		<c:param name="absoluteTimeLimit" value="${scratchie.absoluteTimeLimitSeconds}"/>
+		<c:param name="relativeTimeLimit" value="${scratchie.relativeTimeLimit}"/>
+		<c:param name="isTbl" value="true" />
+		<c:param name="controllerContext" value="tool/lascrt11/monitoring" />
+	</c:import>
 </c:if>

@@ -366,7 +366,7 @@
 				
 				<c:if test="${vsaPresent}">
 					<a class="btn btn-sm pull-right btn-default roffset5" target="_blank"
-			   		   href='<lams:LAMSURL />qb/vsa/displayVsaAllocate.do?toolContentID=${sessionMap.assessment.contentId}'>
+			   		   href='<lams:LAMSURL />qb/vsa/displayVsaAllocate.do?toolContentID=${assessment.contentId}'>
 						<fmt:message key="label.vsa.allocate.button" />
 					</a>
 				</c:if>
@@ -387,7 +387,13 @@
 
 <%@ include file="parts/advanceoptions.jsp"%>
 
-<%@ include file="parts/timeLimit.jsp"%>
+<c:import url="/timelimit/timeLimit.jsp" context="/lams/monitoring">
+	<c:param name="toolContentId" value="${assessment.contentId}"/>
+	<c:param name="absoluteTimeLimit" value="${assessment.absoluteTimeLimitSeconds}"/>
+	<c:param name="relativeTimeLimit" value="${assessment.relativeTimeLimit}"/>
+	<c:param name="isTbl" value="false" />
+	<c:param name="controllerContext" value="tool/laasse10/monitoring" />
+</c:import>
 
 <%@ include file="parts/dateRestriction.jsp"%>
 
