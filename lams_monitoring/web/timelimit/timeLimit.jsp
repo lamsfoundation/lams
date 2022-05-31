@@ -12,6 +12,36 @@
 	#time-limit-table td.centered {
 		text-align: center;
 	}
+		
+	#time-limit-widget {
+	  /* The main widget sticks to right browser edge */
+	  position: fixed;
+	  top: 45px;
+	  right: 0;
+	  /* Collapsed by default */
+	  width: 100px;
+	  display: none;
+	}	
+	
+	#time-limit-widget .panel-title a {
+		/* Underlining the link in title does not look nice*/
+		text-decoration: none !important;
+		color: black;
+	}
+
+	#time-limit-widget #time-limit-widget-content > div {
+		text-align: center;
+		padding: 10px 0;
+	}
+	
+	#time-limit-widget #time-limit-widget-content > div button {
+		width: 70%;
+	}
+	
+	#time-limit-widget #absolute-time-limit-widget-value {
+		display: inline-block;
+		margin-left: 5px;
+	}
 </style>
 
 <script>
@@ -21,8 +51,39 @@ var relativeTimeLimit = ${param.relativeTimeLimit},
 	absoluteTimeLimit = ${empty param.absoluteTimeLimit ? 'null' : param.absoluteTimeLimit};
 
 $(document).ready(function(){
+	let timeLimitWidget = $('#time-limit-widget'),
+		timeLimitContent = $('#time-limit-widget-content', timeLimitWidget)
+			.on('hidden.bs.collapse', function () {
+				// leave just the timer icon
+				$('.panel-heading', timeLimitWidget).removeClass('collapsable-icon-left');
+				
+				timeLimitWidget.animate({
+					width: '100px'
+				}, function(){
+					// if hideTimeLimitLearnerWidget() set it to true, then we are deleting the widget
+					var remove = timeLimitContent.data('remove');
+					if (remove) {
+						window.setTimeout(function(){
+							// remove after a short delay
+							timeLimitWidget.hide();
+						}, 1000);
+					}
+				});
+			})
+			.on('show.bs.collapse', function() {
+				// hide content at first as it does not look nice when widget get expanded
+				timeLimitContent.css('visibility', 'hidden');
+				timeLimitWidget.animate({
+					width: '200px'
+				}, function(){
+					$('.panel-heading', timeLimitWidget).addClass('collapsable-icon-left');
+					timeLimitContent.css('visibility', 'visible');
+				});
+			});
+	
 	// create counter if absolute time limit is set
 	if (absoluteTimeLimit) {
+		showTimeLimitWidget(false);
 		updateAbsoluteTimeLimitCounter();
 		
 		// expand time limit panel if absolute time limit is set and not expired
@@ -30,6 +91,7 @@ $(document).ready(function(){
 			$('#time-limit-collapse').collapse('show');
 		}
 	}
+	
 	initInidividualTimeLimitAutocomplete();
 });
 
@@ -87,10 +149,10 @@ function updateTimeLimit(type, toggle, adjust) {
 	
 	if (type == 'absolute') {
 		// get existing value on counter, if it is set already
-		var counter = $('#absolute-time-limit-counter'),
+		var counters = $('.absolute-time-limit-counter'),
 			secondsLeft = null;
-		if (counter.length === 1) {
-			var periods = counter.countdown('getTimes');
+		if (counters.length > 0) {
+			var periods = counters.first().countdown('getTimes');
 			secondsLeft = $.countdown.periodsToSeconds(periods);
 		}
 		
@@ -191,8 +253,9 @@ function updateTimeLimitOnServer() {
 			
 			if (absoluteTimeLimit === null) {
 				// no absolute time limit? destroy the counter
-				$('#absolute-time-limit-counter').countdown('destroy');
-				$('#absolute-time-limit-value').empty();
+				$('.absolute-time-limit-counter').countdown('destroy');
+				$('.absolute-time-limit-value').empty();
+				hideTimeLimitWidget(true);
 				
 				$('#absolute-time-limit-disabled').removeClass('hidden');
 				$('#absolute-time-limit-cancel').addClass('hidden');
@@ -200,6 +263,8 @@ function updateTimeLimitOnServer() {
 				$('#absolute-time-limit-start').removeClass('hidden').prop('disabled', true);
 				$('#absolute-time-limit-finish-now').prop('disabled', false);
 			} else {
+				showTimeLimitWidget(false);
+				
 				$('#absolute-time-limit-disabled').addClass('hidden');
 				$('#absolute-time-limit-cancel').removeClass('hidden');
 				$('#absolute-time-limit-enabled').removeClass('hidden');
@@ -235,37 +300,63 @@ function updateAbsoluteTimeLimitCounter(secondsLeft, start) {
 		}
 	}
 	
-	var counter = $('#absolute-time-limit-counter');
+	var counters = $('.absolute-time-limit-counter');
 
-	if (counter.length == 0) {
-		counter = $('<div />').attr('id', 'absolute-time-limit-counter').appendTo('#absolute-time-limit-value')
-			.countdown({
-				until: '+' + secondsLeft +'S',
-				format: 'hMS',
-				compact: true,
-				alwaysExpire : true,
-				onTick: function(periods) {
-					// check for 30 seconds or less and display timer in red
-					var secondsLeft = $.countdown.periodsToSeconds(periods);
-					if (secondsLeft <= 30) {
-						counter.addClass('countdown-timeout');
-					} else {
-						counter.removeClass('countdown-timeout');
-					}				
-				},
-				expiryText : '<span class="countdown-timeout"><fmt:message key="label.monitoring.time.limit.expired" /></span>'
-			});
+	if (counters.length == 0) {
+		counters = $('<div />').attr('id', 'absolute-time-limit-panel-counter')
+							  .addClass('absolute-time-limit-counter')
+							  .appendTo('#absolute-time-limit-panel-value')
+				  			  .add(
+						  		$('<div />').attr('id', 'absolute-time-limit-widget-counter')
+						  					.addClass('absolute-time-limit-counter')
+						  					.appendTo('#absolute-time-limit-widget-value'))
+							  .countdown({
+									until: '+' + secondsLeft +'S',
+									format: 'hMS',
+									compact: true,
+									alwaysExpire : true,
+									onTick: function(periods) {
+										// check for 30 seconds or less and display timer in red
+										var secondsLeft = $.countdown.periodsToSeconds(periods),
+											keepOpen = secondsLeft <= 60 && secondsLeft > 0 
+													   && $('#absolute-time-limit-start').hasClass('disabled'),
+											widgetToggle = $('#time-limit-widget-toggle'),
+											widgetAddTimeButtonContainer = $('#time-limit-widget-add-5-minutes').closest('div');
+											
+										counters.data('keepOpen', keepOpen);
+										
+										if (keepOpen) {
+											showTimeLimitWidget(true);
+											widgetToggle.attr('data-toggle', null);
+										} else {
+											widgetToggle.attr('data-toggle', "collapse");
+										}
+										
+										if (secondsLeft <= 30) {
+											counters.addClass('countdown-timeout');
+										} else {
+											counters.removeClass('countdown-timeout');
+										}		
+											
+										if (secondsLeft > 0) {
+											widgetAddTimeButtonContainer.show();
+										} else {
+											widgetAddTimeButtonContainer.hide();
+										}
+									},
+									expiryText : '<span class="countdown-timeout"><fmt:message key="label.monitoring.time.limit.expired" /></span>'
+								});
 	} else {
 		// if counter is paused, we can not adjust time, so resume it for a moment
-		counter.countdown('resume');
-		counter.countdown('option', 'until', secondsLeft + 'S');
+		counters.countdown('resume');
+		counters.countdown('option', 'until', secondsLeft + 'S');
 	}
 	
 	if (preset) {
-		counter.countdown('pause');
+		counters.countdown('pause');
 		$('#absolute-time-limit-start').removeClass('disabled');
 	} else {
-		counter.countdown('resume');
+		counters.countdown('resume');
 	}
 }
 
@@ -354,12 +445,46 @@ function refreshInidividualTimeLimits() {
 		}
 	});
 }
+
+function hideTimeLimitWidget(remove){
+	var timeLimitWidget = $('#time-limit-widget'),
+		timeLimitContent = $('#time-limit-widget-content', timeLimitWidget);
+	if (timeLimitContent.hasClass('in')){
+		// if the widget is expanded, collapse it and then hide it
+		timeLimitContent.data('remove', remove).collapse('hide');
+	} else if (remove){
+		// if the widget is collapsed, hide it straight away
+		timeLimitWidget.hide();
+	}
+}
+
+function showTimeLimitWidget(expand) {
+	var timeLimitWidget = $('#time-limit-widget'),
+		timeLimitContent = $('#time-limit-widget-content', timeLimitWidget);
+	timeLimitWidget.show();
+	
+	if (expand && !timeLimitContent.hasClass('in')){
+		timeLimitContent.collapse('show');
+	}
+}
+
+function scrollToTimeLimitPanel() {
+	    $([document.documentElement, document.body]).animate({
+	        scrollTop: $("#time-limit-panel").offset().top
+	    }, 2000);
+	    
+	    $('#time-limit-collapse').collapse('show');
+	    
+	    if (!$('#absolute-time-limit-widget-counter').data('keepOpen')){
+	    	hideTimeLimitWidget(false);
+		}
+}
 </script>
 
 <c:set var="absoluteTimeLimitEnabled" value="${not empty param.absoluteTimeLimit}" />
 <c:set var="relativeTimeLimitEnabled" value="${param.relativeTimeLimit != 0}" />
 		
-<div class="panel panel-default ${param.isTbl ? 'voffset20' : ''}" >
+<div class="panel panel-default ${param.isTbl ? 'voffset20' : ''}" id="time-limit-panel">
    	<c:choose>
    		<c:when test="${param.isTbl}">
    			 <div class="panel-heading">
@@ -436,8 +561,8 @@ function refreshInidividualTimeLimits() {
 			</tr>
 			<tr>
 				<td colspan="6">
-                         <div style="height: 30px; overflow:hidden;">
-                         </div>
+	                        <div style="height: 30px; overflow:hidden;">
+	                        </div>
 				</td>
 			</tr>	
 			<tr class="info">
@@ -446,7 +571,7 @@ function refreshInidividualTimeLimits() {
 				</td>
 			</tr>
 			<tr>
-				<td id="absolute-time-limit-value"></td>
+				<td id="absolute-time-limit-panel-value" class="absolute-time-limit-value"></td>
 				<td>
 					<div id="absolute-time-limit-enabled" class="text-success ${absoluteTimeLimitEnabled ? '' : 'hidden'}">
 						<fmt:message key="label.monitoring.time.limit.enabled"/>
@@ -493,11 +618,11 @@ function refreshInidividualTimeLimits() {
 				</td>
 			</tr>
 			<tr>
-                   <td colspan="6">
+	                  <td colspan="6">
 					  <div style="height: 30px; overflow:hidden;">
 					  </div>
-                   </td>
-               </tr>
+	                  </td>
+	              </tr>
 							
 			<tr>
 				<td colspan="6" class="info">
@@ -554,5 +679,36 @@ function refreshInidividualTimeLimits() {
 			</tr>
 			
 		</table>
+	</div>
+</div>
+
+<div class="panel panel-default" id="time-limit-widget">
+	<div class="panel-heading"
+		 id="time-limit-widget-heading">
+       	<span class="panel-title">
+	    	<a class="collapsed" role="button" data-toggle="collapse" href="#time-limit-widget-content"
+	    	   aria-expanded="false" aria-controls="time-limit-widget-content" id="time-limit-widget-toggle">
+	    	   <i class="fa fa-clock-o"></i>
+	    	   <div id="absolute-time-limit-widget-value" class="absolute-time-limit-value"
+	    	   		 title="<fmt:message key="label.monitoring.time.limit" />"></div>
+	       	</a>
+     	</span>
+    </div>
+
+    <div id="time-limit-widget-content" class="panel-collapse collapse" role="tabpanel"
+       	 aria-labelledby="time-limit-widget-heading">
+		<div>				
+			<button class="btn btn-success" id="time-limit-widget-add-5-minutes"
+					onClick="updateTimeLimit('absolute', null, 5)">
+				<fmt:message key="label.monitoring.time.limit.plus.minute.5"/>
+			</button>
+		</div>
+		
+		<div>				
+			<button class="btn btn-default"
+					onClick="scrollToTimeLimitPanel()">
+				<fmt:message key="label.monitoring.time.limit.show.controls"/>
+			</button>
+		</div>
 	</div>
 </div>
