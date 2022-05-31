@@ -387,7 +387,7 @@
 
 <%@ include file="parts/advanceoptions.jsp"%>
 
-<c:import url="/timelimit/timeLimit.jsp" context="/lams/monitoring">
+<c:import url="/timeLimit.jsp" context="/lams/monitoring">
 	<c:param name="toolContentId" value="${assessment.contentId}"/>
 	<c:param name="absoluteTimeLimit" value="${assessment.absoluteTimeLimitSeconds}"/>
 	<c:param name="relativeTimeLimit" value="${assessment.relativeTimeLimit}"/>

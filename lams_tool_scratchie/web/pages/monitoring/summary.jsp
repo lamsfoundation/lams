@@ -485,7 +485,7 @@
 	
 <%@ include file="parts/advanceOptions.jsp"%>
 
-<c:import url="/timelimit/timeLimit.jsp" context="/lams/monitoring">
+<c:import url="/timeLimit.jsp" context="/lams/monitoring">
 	<c:param name="toolContentId" value="${scratchie.contentId}"/>
 	<c:param name="absoluteTimeLimit" value="${scratchie.absoluteTimeLimitSeconds}"/>
 	<c:param name="relativeTimeLimit" value="${scratchie.relativeTimeLimit}"/>
