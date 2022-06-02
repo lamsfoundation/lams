@@ -321,29 +321,29 @@ function updateAbsoluteTimeLimitCounter(secondsLeft, start) {
 										// check for 30 seconds or less and display timer in red
 										var secondsLeft = $.countdown.periodsToSeconds(periods),
 											keepOpen = secondsLeft <= 60 && secondsLeft > 0 
-													   && $('#absolute-time-limit-start').hasClass('disabled'),
+													   && $('#absolute-time-limit-start').hasClass('hidden'),
 											widgetToggle = $('#time-limit-widget-toggle'),
-											widgetAddTimeButtonContainer = $('#time-limit-widget-add-5-minutes').closest('div');
-											
+											expiredHideContainers = $('.expired-hide-container');
+
 										counters.data('keepOpen', keepOpen);
 										
 										if (keepOpen) {
 											showTimeLimitWidget(true);
 											widgetToggle.attr('data-toggle', null);
+											
+											counters.addClass('countdown-timeout');
 										} else {
 											widgetToggle.attr('data-toggle', "collapse");
 										}
 										
-										if (secondsLeft <= 30) {
-											counters.addClass('countdown-timeout');
-										} else {
-											counters.removeClass('countdown-timeout');
-										}		
-											
 										if (secondsLeft > 0) {
-											widgetAddTimeButtonContainer.show();
+											expiredHideContainers.show();
+											
+											if (secondsLeft > 60) {
+												counters.removeClass('countdown-timeout');
+											}
 										} else {
-											widgetAddTimeButtonContainer.hide();
+											expiredHideContainers.hide();
 										}
 									},
 									expiryText : '<span class="countdown-timeout"><fmt:message key="label.monitoring.time.limit.expired" /></span>'
@@ -699,10 +699,17 @@ function scrollToTimeLimitPanel() {
 
     <div id="time-limit-widget-content" class="panel-collapse collapse" role="tabpanel"
        	 aria-labelledby="time-limit-widget-heading">
-		<div>				
-			<button class="btn btn-success" id="time-limit-widget-add-5-minutes"
-					onClick="updateTimeLimit('absolute', null, 5)">
-				<fmt:message key="label.monitoring.time.limit.plus.minute.5"/>
+		<div class="expired-hide-container">				
+			<button class="btn btn-success" id="time-limit-widget-add-1-minute"
+					onClick="updateTimeLimit('absolute', null, 1)">
+				<fmt:message key="label.monitoring.time.limit.plus.minute.1"/>
+			</button>
+		</div>
+		
+		<div class="expired-hide-container">				
+			<button class="btn btn-danger"
+					onClick="updateTimeLimit('absolute', false)">
+				<fmt:message key="label.monitoring.time.limit.cancel"/>
 			</button>
 		</div>
 		
