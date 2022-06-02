@@ -19,7 +19,7 @@
 	  top: 45px;
 	  right: 0;
 	  /* Collapsed by default */
-	  width: 100px;
+	  width: 130px;
 	  display: none;
 	}	
 	
@@ -27,6 +27,8 @@
 		/* Underlining the link in title does not look nice*/
 		text-decoration: none !important;
 		color: black;
+		font-size: 20px;
+		font-weight: normal;
 	}
 
 	#time-limit-widget #time-limit-widget-content > div {
@@ -58,7 +60,7 @@ $(document).ready(function(){
 				$('.panel-heading', timeLimitWidget).removeClass('collapsable-icon-left');
 				
 				timeLimitWidget.animate({
-					width: '100px'
+					width: '130px'
 				}, function(){
 					// if hideTimeLimitLearnerWidget() set it to true, then we are deleting the widget
 					var remove = timeLimitContent.data('remove');
