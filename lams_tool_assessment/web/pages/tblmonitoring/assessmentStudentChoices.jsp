@@ -157,4 +157,11 @@
 </div>          
 </div>
 
-<%@ include file="/pages/monitoring/parts/timeLimit.jsp"%>
+<c:import url="/timeLimit.jsp" context="/lams/monitoring">
+	<c:param name="toolContentId" value="${assessment.contentId}"/>
+	<c:param name="absoluteTimeLimit" value="${assessment.absoluteTimeLimitSeconds}"/>
+	<c:param name="relativeTimeLimit" value="${assessment.relativeTimeLimit}"/>
+	<c:param name="isTbl" value="true" />
+	<c:param name="controllerContext" value="tool/laasse10/monitoring" />
+</c:import>
+

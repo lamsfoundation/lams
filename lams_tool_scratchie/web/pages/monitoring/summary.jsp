@@ -485,7 +485,13 @@
 	
 <%@ include file="parts/advanceOptions.jsp"%>
 
-<%@ include file="parts/timeLimit.jsp"%>
+<c:import url="/timeLimit.jsp" context="/lams/monitoring">
+	<c:param name="toolContentId" value="${scratchie.contentId}"/>
+	<c:param name="absoluteTimeLimit" value="${scratchie.absoluteTimeLimitSeconds}"/>
+	<c:param name="relativeTimeLimit" value="${scratchie.relativeTimeLimit}"/>
+	<c:param name="isTbl" value="false" />
+	<c:param name="controllerContext" value="tool/lascrt11/monitoring" />
+</c:import>
 
 <%@ include file="parts/dateRestriction.jsp"%>
 

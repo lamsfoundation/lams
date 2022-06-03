@@ -45,7 +45,6 @@ import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -918,9 +917,9 @@ public class MonitoringController {
 	service.saveOrUpdateAssessment(assessment);
     }
 
-    @RequestMapping(path = "/getPossibleIndividualTimeLimitUsers", method = RequestMethod.GET)
+    @RequestMapping(path = "/getPossibleIndividualTimeLimits", method = RequestMethod.GET)
     @ResponseBody
-    public String getPossibleIndividualTimeLimitUsers(
+    public String getPossibleIndividualTimeLimits(
 	    @RequestParam(name = AssessmentConstants.PARAM_TOOL_CONTENT_ID) long toolContentId,
 	    @RequestParam(name = "term") String searchString) {
 	Assessment assessment = service.getAssessmentByContentId(toolContentId);
@@ -934,7 +933,7 @@ public class MonitoringController {
 	if (grouping != null) {
 	    Set<Group> groups = grouping.getGroups();
 	    for (Group group : groups) {
-		if (!group.getUsers().isEmpty() && group.getGroupName().contains(searchString.toLowerCase())) {
+		if (!group.getUsers().isEmpty() && group.getGroupName().toLowerCase().contains(searchString.toLowerCase())) {
 		    ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
 		    groupJSON.put("label", groupLabel + group.getGroupName() + "\"");
 		    groupJSON.put("value", "group-" + group.getGroupId());
@@ -952,7 +951,7 @@ public class MonitoringController {
 		String name = user.getFirstName() + " " + user.getLastName() + " (" + user.getLogin() + ")";
 		if (grouping != null) {
 		    Group group = grouping.getGroupBy(user);
-		    if (group != null) {
+		    if (group != null && !group.isNull()) {
 			name += " - " + group.getGroupName();
 		    }
 		}
@@ -964,9 +963,9 @@ public class MonitoringController {
 	return responseJSON.toString();
     }
 
-    @RequestMapping(path = "/getExistingIndividualTimeLimitUsers", method = RequestMethod.GET)
+    @RequestMapping(path = "/getExistingIndividualTimeLimits", method = RequestMethod.GET)
     @ResponseBody
-    public String getExistingIndividualTimeLimitUsers(
+    public String getExistingIndividualTimeLimits(
 	    @RequestParam(name = AssessmentConstants.PARAM_TOOL_CONTENT_ID) long toolContentId) {
 	Assessment assessment = service.getAssessmentByContentId(toolContentId);
 	Map<Integer, Integer> timeLimitAdjustments = assessment.getTimeLimitAdjustments();
