@@ -23,6 +23,14 @@
 	  display: none;
 	}	
 	
+	#time-limit-widget .btn-success {
+		float: none;
+	}
+	
+	#time-limit-widget .panel-heading a:after, #time-limit-widget .panel-heading a:after {
+		content: none;
+	}
+	
 	#time-limit-widget .panel-title a {
 		/* Underlining the link in title does not look nice*/
 		text-decoration: none !important;
