@@ -90,6 +90,13 @@ $(document).ready(function(){
 					timeLimitContent.css('visibility', 'visible');
 				});
 			});
+
+	$('#time-limit-widget-toggle', timeLimitWidget).click(function(){
+		if ($(this).data('prevent-toggle') === true){
+			return;
+		}
+		timeLimitContent.collapse('toggle');
+	});
 	
 	// create counter if absolute time limit is set
 	if (absoluteTimeLimit) {
@@ -334,14 +341,11 @@ function updateAbsoluteTimeLimitCounter(secondsLeft, start) {
 											expiredHideContainers = $('.expired-hide-container');
 
 										counters.data('keepOpen', keepOpen);
-										
+										widgetToggle.data('prevent-toggle', keepOpen)
+
 										if (keepOpen) {
 											showTimeLimitWidget(true);
-											widgetToggle.attr('data-toggle', null);
-											
 											counters.addClass('countdown-timeout');
-										} else {
-											widgetToggle.attr('data-toggle', "collapse");
 										}
 										
 										if (secondsLeft > 0) {
@@ -696,8 +700,7 @@ function scrollToTimeLimitPanel() {
 	<div class="panel-heading"
 		 id="time-limit-widget-heading">
        	<span class="panel-title">
-	    	<a class="collapsed" role="button" data-toggle="collapse" href="#time-limit-widget-content"
-	    	   aria-expanded="false" aria-controls="time-limit-widget-content" id="time-limit-widget-toggle">
+	    	<a class="collapsed" role="button" id="time-limit-widget-toggle">
 	    	   <i class="fa fa-clock-o"></i>
 	    	   <div id="absolute-time-limit-widget-value" class="absolute-time-limit-value"
 	    	   		 title="<fmt:message key="label.monitoring.time.limit" />"></div>
