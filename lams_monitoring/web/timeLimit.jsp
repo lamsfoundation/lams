@@ -21,7 +21,7 @@
 	  /* Collapsed by default */
 	  width: 130px;
 	  display: none;
-	}	
+	}
 	
 	#time-limit-widget .btn-success {
 		float: none;
@@ -79,6 +79,8 @@ $(document).ready(function(){
 						}, 1000);
 					}
 				});
+
+				sessionStorage.setItem('lams-time-limit-widget-open', false);				
 			})
 			.on('show.bs.collapse', function() {
 				// hide content at first as it does not look nice when widget get expanded
@@ -89,6 +91,8 @@ $(document).ready(function(){
 					$('.panel-heading', timeLimitWidget).addClass('collapsable-icon-left');
 					timeLimitContent.css('visibility', 'visible');
 				});
+
+				sessionStorage.setItem('lams-time-limit-widget-open', true);
 			});
 
 	$('#time-limit-widget-toggle', timeLimitWidget).click(function(){
@@ -100,7 +104,8 @@ $(document).ready(function(){
 	
 	// create counter if absolute time limit is set
 	if (absoluteTimeLimit) {
-		showTimeLimitWidget(false);
+		let timeLimitWidgetOpen = sessionStorage.getItem('lams-time-limit-widget-open') === "true";
+		showTimeLimitWidget(timeLimitWidgetOpen, timeLimitWidgetOpen);
 		updateAbsoluteTimeLimitCounter();
 		
 		// expand time limit panel if absolute time limit is set and not expired
@@ -472,13 +477,18 @@ function hideTimeLimitWidget(remove){
 	}
 }
 
-function showTimeLimitWidget(expand) {
+function showTimeLimitWidget(expand, immediateExpand) {
 	var timeLimitWidget = $('#time-limit-widget'),
 		timeLimitContent = $('#time-limit-widget-content', timeLimitWidget);
 	timeLimitWidget.show();
 	
 	if (expand && !timeLimitContent.hasClass('in')){
-		timeLimitContent.collapse('show');
+		if (immediateExpand) {
+			timeLimitContent.addClass('in');
+			timeLimitWidget.css('width', '200px');
+		} else {
+			timeLimitContent.collapse('show');
+		}
 	}
 }
 
