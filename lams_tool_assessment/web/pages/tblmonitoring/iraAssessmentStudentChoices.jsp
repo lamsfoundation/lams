@@ -1,6 +1,15 @@
 <%@ include file="/common/taglibs.jsp"%>
 <% pageContext.setAttribute("newLineChar", "\r\n"); %>
 
+<c:set var="timeLimitPanelUrl"><lams:LAMSURL/>monitoring/timeLimit.jsp</c:set>
+<c:url var="timeLimitPanelUrl" value="${timeLimitPanelUrl}">
+	<c:param name="toolContentId" value="${assessment.contentId}"/>
+	<c:param name="absoluteTimeLimit" value="${assessment.absoluteTimeLimitSeconds}"/>
+	<c:param name="relativeTimeLimit" value="${assessment.relativeTimeLimit}"/>
+	<c:param name="isTbl" value="true" />
+	<c:param name="controllerContext" value="tool/laasse10/monitoring" />
+</c:url>
+	
 <style>
 	#completion-charts-container > div {
 		padding: 5rem 0;
@@ -44,6 +53,8 @@
 	
 	$(document).ready(function(){
 		drawCompletionCharts(${toolContentID}, ${groupsInAnsweredQuestionsChart}, false);
+
+		$('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');
 	});
 			
 	function exportExcel(){
@@ -110,10 +121,4 @@
 <%-- Include student's choices part --%>
 <%@ include file="/pages/monitoring/parts/mcqStudentChoices.jsp" %>
 
-<c:import url="/timeLimit.jsp" context="/lams/monitoring">
-	<c:param name="toolContentId" value="${assessment.contentId}"/>
-	<c:param name="absoluteTimeLimit" value="${assessment.absoluteTimeLimitSeconds}"/>
-	<c:param name="relativeTimeLimit" value="${assessment.relativeTimeLimit}"/>
-	<c:param name="isTbl" value="true" />
-	<c:param name="controllerContext" value="tool/laasse10/monitoring" />
-</c:import>
+<div id="time-limit-panel-placeholder"></div>

@@ -1,6 +1,15 @@
 <%@ include file="/common/taglibs.jsp"%>
 <% pageContext.setAttribute("newLineChar", "\r\n"); %>
 
+<c:set var="timeLimitPanelUrl"><lams:LAMSURL/>monitoring/timeLimit.jsp</c:set>
+<c:url var="timeLimitPanelUrl" value="${timeLimitPanelUrl}">
+	<c:param name="toolContentId" value="${scratchie.contentId}"/>
+	<c:param name="absoluteTimeLimit" value="${scratchie.absoluteTimeLimitSeconds}"/>
+	<c:param name="relativeTimeLimit" value="${scratchie.relativeTimeLimit}"/>
+	<c:param name="isTbl" value="true" />
+	<c:param name="controllerContext" value="tool/lascrt11/monitoring" />
+</c:url>
+
 <style>
 	/* show horizontal scroller for iPads */
 	body {
@@ -63,6 +72,10 @@
 		    $(document.body).append(form);
 		    form.submit();
 		};
+
+		$(document).ready(function(){
+			$('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');
+		});
 	</script>
 	
 	<!-- Header -->
@@ -376,11 +389,5 @@
 <!-- End question detail modal -->
 
 <c:if test="${isTbl}">
-	<c:import url="/timeLimit.jsp" context="/lams/monitoring">
-		<c:param name="toolContentId" value="${scratchie.contentId}"/>
-		<c:param name="absoluteTimeLimit" value="${scratchie.absoluteTimeLimitSeconds}"/>
-		<c:param name="relativeTimeLimit" value="${scratchie.relativeTimeLimit}"/>
-		<c:param name="isTbl" value="true" />
-		<c:param name="controllerContext" value="tool/lascrt11/monitoring" />
-	</c:import>
+	<div id="time-limit-panel-placeholder"></div>
 </c:if>

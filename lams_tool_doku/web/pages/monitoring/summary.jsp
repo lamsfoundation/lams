@@ -3,6 +3,16 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 <c:set var="dokumaran" value="${sessionMap.dokumaran}" />
+
+<c:set var="timeLimitPanelUrl"><lams:LAMSURL/>monitoring/timeLimit.jsp</c:set>
+<c:url var="timeLimitPanelUrl" value="${timeLimitPanelUrl}">
+		<c:param name="toolContentId" value="${dokumaran.contentId}"/>
+		<c:param name="absoluteTimeLimit" value="${dokumaran.absoluteTimeLimitSeconds}"/>
+		<c:param name="relativeTimeLimit" value="${dokumaran.relativeTimeLimit}"/>
+		<c:param name="isTbl" value="${isTbl}" />
+		<c:param name="controllerContext" value="tool/ladoku11/monitoring" />
+</c:url>
+	
 <%@ page import="org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants"%>
 
 <lams:css suffix="jquery.jRating"/>
@@ -300,6 +310,8 @@
 			//insert total learners number taken from the parent tblmonitor.jsp
 			$("#doku-monitoring-summary-${sessionMap.toolContentID} .total-learners-number").text(TOTAL_LESSON_LEARNERS_NUMBER);
 		</c:if>
+
+		$('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');
 	});
 	
 	function startGalleryWalk(){
@@ -616,13 +628,7 @@
 		<%@ include file="advanceoptions.jsp"%>
 	</c:if>
 	
-	<c:import url="/timeLimit.jsp" context="/lams/monitoring">
-		<c:param name="toolContentId" value="${dokumaran.contentId}"/>
-		<c:param name="absoluteTimeLimit" value="${dokumaran.absoluteTimeLimitSeconds}"/>
-		<c:param name="relativeTimeLimit" value="${dokumaran.relativeTimeLimit}"/>
-		<c:param name="isTbl" value="${isTbl}" />
-		<c:param name="controllerContext" value="tool/ladoku11/monitoring" />
-	</c:import>
-	
+	<div id="time-limit-panel-placeholder"></div>
+
 	<div id="change-leader-modals"></div>
 </div>

@@ -3,6 +3,16 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 <c:set var="whiteboard" value="${sessionMap.whiteboard}" />
+
+<c:set var="timeLimitPanelUrl"><lams:LAMSURL/>monitoring/timeLimit.jsp</c:set>
+<c:url var="timeLimitPanelUrl" value="${timeLimitPanelUrl}">
+		<c:param name="toolContentId" value="${whiteboard.contentId}"/>
+		<c:param name="absoluteTimeLimit" value="${whiteboard.absoluteTimeLimitSeconds}"/>
+		<c:param name="relativeTimeLimit" value="${whiteboard.relativeTimeLimit}"/>
+		<c:param name="isTbl" value="${isTbl}" />
+		<c:param name="controllerContext" value="tool/lawhiteboard11/monitoring" />
+</c:url>
+
 <%@ page import="org.lamsfoundation.lams.tool.whiteboard.WhiteboardConstants"%>
 
 <lams:css suffix="jquery.jRating"/>
@@ -337,6 +347,8 @@
 		</c:if>
 
 		setupFullScreenEvents();
+
+		$('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');
 	});
 	
 	function startGalleryWalk(){
@@ -644,14 +656,8 @@
 	<c:if test="${not isTbl}">
 		<%@ include file="advanceoptions.jsp"%>
 	</c:if>
-	
-	<c:import url="/timeLimit.jsp" context="/lams/monitoring">
-		<c:param name="toolContentId" value="${whiteboard.contentId}"/>
-		<c:param name="absoluteTimeLimit" value="${whiteboard.absoluteTimeLimitSeconds}"/>
-		<c:param name="relativeTimeLimit" value="${whiteboard.relativeTimeLimit}"/>
-		<c:param name="isTbl" value="${isTbl}" />
-		<c:param name="controllerContext" value="tool/lawhiteboard11/monitoring" />
-	</c:import>
+
+	<div id="time-limit-panel-placeholder"></div>
 	
 	<div id="change-leader-modals"></div>
 </div>

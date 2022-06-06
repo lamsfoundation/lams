@@ -4,6 +4,15 @@
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 <c:set var="scratchie" value="${sessionMap.scratchie}"/>
 
+<c:set var="timeLimitPanelUrl"><lams:LAMSURL/>monitoring/timeLimit.jsp</c:set>
+<c:url var="timeLimitPanelUrl" value="${timeLimitPanelUrl}">
+	<c:param name="toolContentId" value="${scratchie.contentId}"/>
+	<c:param name="absoluteTimeLimit" value="${scratchie.absoluteTimeLimitSeconds}"/>
+	<c:param name="relativeTimeLimit" value="${scratchie.relativeTimeLimit}"/>
+	<c:param name="isTbl" value="false" />
+	<c:param name="controllerContext" value="tool/lascrt11/monitoring" />
+</c:url>
+	
 <style type="text/css">
 	/* remove jqGrid borders */
 	.ui-jqgrid {
@@ -300,6 +309,8 @@
             $.extend(grid[0].p.postData,{filters:JSON.stringify(f)});
             grid.trigger("reloadGrid",[{page:1,current:true}]);
 	    });
+
+        $('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');
 	});
 	
 	function exportExcel(){
@@ -485,13 +496,7 @@
 	
 <%@ include file="parts/advanceOptions.jsp"%>
 
-<c:import url="/timeLimit.jsp" context="/lams/monitoring">
-	<c:param name="toolContentId" value="${scratchie.contentId}"/>
-	<c:param name="absoluteTimeLimit" value="${scratchie.absoluteTimeLimitSeconds}"/>
-	<c:param name="relativeTimeLimit" value="${scratchie.relativeTimeLimit}"/>
-	<c:param name="isTbl" value="false" />
-	<c:param name="controllerContext" value="tool/lascrt11/monitoring" />
-</c:import>
+<div id="time-limit-panel-placeholder"></div>
 
 <%@ include file="parts/dateRestriction.jsp"%>
 
