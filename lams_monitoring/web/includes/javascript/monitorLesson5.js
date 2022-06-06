@@ -1348,6 +1348,7 @@ function updateSequenceTab() {
 	sequenceRefreshInProgress = true;
 	
 	drawLessonCompletionChart();
+	updateLessonTab();
 	
 	sequenceCanvas = $('#sequenceCanvas');
 	sequenceCanvas.css('visibility', 'hidden');
