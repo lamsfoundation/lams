@@ -887,7 +887,11 @@ public class QbService implements IQbService {
 	    }
 
 	    // append new answer to option
-	    name += (StringUtils.isBlank(name) ? "" : QbUtils.VSA_ANSWER_DELIMITER) + answer;
+	    if (StringUtils.isBlank(name)) {
+		name = answer;
+	    } else {
+		name += QbUtils.VSA_ANSWER_DELIMITER + answer;
+	    }
 	    targetOption.setName(name);
 	    qbDAO.update(targetOption);
 	    qbDAO.flush();
@@ -995,13 +999,28 @@ public class QbService implements IQbService {
 	}
 	// set units
 	if (type == QbQuestion.TYPE_NUMERICAL) {
-	    Set<QbQuestionUnit> unitList = getUnitsFromRequest(request, true);
-	    qbQuestion.getUnits().clear();
+	    Set<QbQuestionUnit> unitsFromRequest = getUnitsFromRequest(request, true);
+	    List<QbQuestionUnit> existingUnits = qbQuestion.getUnits();
+	    List<QbQuestionUnit> newUnits = new ArrayList<>();
 	    int displayOrder = 0;
-	    for (QbQuestionUnit unit : unitList) {
+	    for (QbQuestionUnit unit : unitsFromRequest) {
 		unit.setQbQuestion(qbQuestion);
 		unit.setDisplayOrder(displayOrder++);
-		qbQuestion.getUnits().add(unit);
+		newUnits.add(unit);
+	    }
+	    qbQuestion.setUnits(newUnits);
+
+	    for (QbQuestionUnit existingUnit : existingUnits) {
+		boolean unitFound = false;
+		for (QbQuestionUnit unit : newUnits) {
+		    if (unit.getUid() != null && unit.getUid().equals(existingUnit.getUid())) {
+			unitFound = true;
+			break;
+		    }
+		}
+		if (!unitFound) {
+		    qbDAO.delete(existingUnit);
+		}
 	    }
 	}
 

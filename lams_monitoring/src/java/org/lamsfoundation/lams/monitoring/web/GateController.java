@@ -58,6 +58,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -132,9 +133,9 @@ public class GateController {
      * Open the gate if is closed.
      */
     @RequestMapping(path = "/openGate", method = RequestMethod.POST)
-    public String openGate(@ModelAttribute GateForm gateForm, HttpServletRequest request,
-	    HttpServletResponse response) {
+    public String openGate(@ModelAttribute GateForm gateForm, HttpServletRequest request, Model model) {
 	GateActivity gate = monitoringService.openGate(gateForm.getActivityId(), getUserId());
+	model.addAttribute("gateJustToggled", true);
 	return findViewByGateType(gateForm, gate);
     }
 
@@ -142,8 +143,9 @@ public class GateController {
      * Close the gate again.
      */
     @RequestMapping(path = "/closeGate", method = RequestMethod.POST)
-    public String closeGate(@ModelAttribute GateForm gateForm) {
+    public String closeGate(@ModelAttribute GateForm gateForm, Model model) {
 	GateActivity gate = monitoringService.closeGate(gateForm.getActivityId());
+	model.addAttribute("gateJustToggled", true);
 	return findViewByGateType(gateForm, gate);
     }
 

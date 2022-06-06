@@ -23,7 +23,7 @@
 		
 		var	orgId = ${param.organisationID},
 			userId = <lams:user property="userID"/>,
-			role = '${param.role}',
+			role = '${empty param.role ? "none" : param.role}',
 			
 			LAMS_URL = '<lams:LAMSURL/>',
 			LEARNING_URL = LAMS_URL + 'learning/',

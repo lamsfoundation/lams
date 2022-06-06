@@ -9,9 +9,31 @@ Include this jsp in your jqGrid page head to get some jqGrid functionality
 <link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet">
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 
+<c:set var="language"><lams:user property="localeLanguage"/></c:set>
+<c:choose>
+	<c:when test="${language eq 'es'}">
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jqgrid-i18n/grid.locale-es.js"></script>
+		<c:set var="jqGridInternationalised" value="true" />
+ 	</c:when>
+ 	 <c:when test="${language eq 'fr'}">
+ 	 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jqgrid-i18n/grid.locale-fr.js"></script>
+ 	 	<c:set var="jqGridInternationalised" value="true" />
+ 	 </c:when>
+ 	 <c:when test="${language eq 'el'}">
+ 	 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jqgrid-i18n/grid.locale-el.js"></script>
+ 	 	<c:set var="jqGridInternationalised" value="true" />
+ 	 </c:when>
+ 	<c:when test="${language eq 'no'}">
+ 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jqgrid-i18n/grid.locale-no.js"></script>
+ 	 	<c:set var="jqGridInternationalised" value="true" />
+ 	 </c:when>
+</c:choose>
+	
 <script type="text/javascript">
 	<%-- Add jqGrid internationalisation snippet --%>
-	<c:import url="/jqGrid.i18n.jsp" context="/lams" />
+	<c:if test="${jqGridInternationalised}">
+		$.extend(true, $.jgrid,$.jgrid.regional['${language}']);
+	</c:if>
 		
 	var popupWidth = 1280,
 		popupHeight = 720;

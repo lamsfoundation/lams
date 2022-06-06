@@ -213,7 +213,7 @@ public class DisplayGroupController {
 	    boolean isMonitor = roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR);
 	    boolean disabled = !isMonitor && isKumaliveDisabledForOrganisation;
 	    links.add(new IndexLinkBean(isMonitor ? "index.kumalive.teacher" : "index.kumalive",
-		    "javascript:openKumalive(" + organisationId + ")",
+		    "javascript:openKumalive(" + organisationId + ",'" + (isMonitor ? "teacher" : "learner") + "')",
 		    "fa fa-fw fa-bolt" + (disabled ? " disabled" : ""), "index.kumalive.tooltip"));
 	}
 
@@ -227,10 +227,9 @@ public class DisplayGroupController {
     private IndexOrgBean populateContentsOrgBean(IndexOrgBean orgBean, Organisation org, List<Integer> roles,
 	    String username, boolean isSysAdmin) throws SQLException, NamingException {
 	Integer userId = getUser(username).getUserId();
-	
+
 	// set lesson beans
-	Map<Long, IndexLessonBean> map = populateLessonBeans(userId, org.getOrganisationId(),
-		roles);
+	Map<Long, IndexLessonBean> map = populateLessonBeans(userId, org.getOrganisationId(), roles);
 	List<IndexLessonBean> lessonBeans = IndexUtils.sortLessonBeans(org.getOrderedLessonIds(), map);
 	orgBean.setLessons(lessonBeans);
 
@@ -245,7 +244,8 @@ public class DisplayGroupController {
 
 	    List<IndexOrgBean> childOrgBeans = new ArrayList<>();
 	    for (Organisation childOrganisation : childOrganisations) {
-		if (OrganisationState.ACTIVE.equals(childOrganisation.getOrganisationState().getOrganisationStateId())) {
+		if (OrganisationState.ACTIVE
+			.equals(childOrganisation.getOrganisationState().getOrganisationStateId())) {
 		    List<Integer> classRoles = new ArrayList<>();
 		    List<UserOrganisationRole> userOrganisationRoles = userManagementService
 			    .getUserOrganisationRoles(childOrganisation.getOrganisationId(), username);
@@ -262,7 +262,7 @@ public class DisplayGroupController {
 			classRoles.add(Role.ROLE_GROUP_MANAGER);
 		    }
 		    IndexOrgBean childOrgBean = createOrgBean(childOrganisation, classRoles, username, isSysAdmin);
-		    
+
 		    //check whether organisation was collapsed by the user
 		    if (isCollapsingSubcoursesEnabled) {
 			for (UserOrganisationCollapsed userOrganisationCollapsed : userOrganisationsCollapsed) {
@@ -273,7 +273,7 @@ public class DisplayGroupController {
 			    }
 			}
 		    }
-		    
+
 		    childOrgBeans.add(childOrgBean);
 		}
 	    }
