@@ -616,6 +616,7 @@ function drawLessonCompletionChart(){
 							labels : labels
 						},
 						options : {
+							responsive : false,
 							tooltips : {
 								enabled : true,
 								callbacks: {

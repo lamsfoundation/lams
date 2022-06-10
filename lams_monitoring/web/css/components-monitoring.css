@@ -128,6 +128,10 @@
 	text-align: center;	
 }
 
+.monitoring-page-wrapper #sequence-tab-content .sequence-tab-layout-column {
+	margin-bottom: 2rem;
+}
+
 .monitoring-page-content .graph-grades {
 	background-color: #fff;
 	box-shadow: 0px 20px 20px #2E384D1A;
@@ -297,9 +301,12 @@
 
 .monitoring-page-wrapper .monitoring-panel {
 	display: inline-block;
+	width: 100%;
+	height: 100%;
 	box-shadow: 0px 20px 20px #2E384D1A;
 	background-color: #fff;
 	border-radius: 1.2rem;
+	margin-bottom: 3rem;
 	padding: 1.5rem 2rem;
 }
 
@@ -313,16 +320,15 @@
 }
 
 .monitoring-page-wrapper #completion-chart-panel {
-	max-width: 300px;
 	min-width: 250px;
 }
 
 .monitoring-page-wrapper #completion-chart-panel .panel-body {
-  height: 351px;
+	height: 351px;
 }
 
 .monitoring-page-wrapper #completion-chart-panel #completion-chart {
-	margin-top: -25px;
+	margin: auto;
 }
 
 .monitoring-page-wrapper #required-tasks {
@@ -347,6 +353,10 @@
 .monitoring-page-wrapper #required-tasks .badge {
 	padding: .5rem 1rem;
 	vertical-align: middle;
+}
+
+.monitoring-page-wrapper #required-tasks .btn-group {
+	min-width: 130px;
 }
 
 .monitoring-page-wrapper #required-tasks button {

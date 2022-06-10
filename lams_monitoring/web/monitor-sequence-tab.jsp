@@ -3,8 +3,8 @@
 
 <div id="sequence-tab-content" class="container-fluid">
 	<div class="row">
-		<div class="col mb-5">
-			<div id="canvas-container" class="svg-learner-draggable-area ms-5 text-start monitoring-panel">
+		<div class="col sequence-tab-layout-column">
+			<div id="canvas-container" class="svg-learner-draggable-area text-start monitoring-panel">
 				<div id="sequenceTopButtonsContainer" class="topButtonsContainer">
 					<a id="liveEditButton" class="btn btn-sm btn-light" style="display:none" title="<fmt:message key='button.live.edit.tooltip'/>"
 				       href="#" onClick="javascript:openLiveEdit()">
@@ -40,7 +40,7 @@
 		</div>
 		<div class="col">
 			<div class="row">
-				<div class="col mb-5">
+				<div class="col sequence-tab-layout-column">
 					<div id="completion-chart-panel" class="monitoring-panel">
 						<h6><fmt:message key="lesson.chart.title"/></h6>
 						<div class="panel-body">
@@ -67,7 +67,7 @@
 						-->
 					</div>
 				</div>
-				<div id="required-tasks" class="col mb-5">
+				<div id="required-tasks" class="col sequence-tab-layout-column">
 					<div class="monitoring-panel">
 						<h6><fmt:message key="lesson.required.tasks"/></h6>
 						<div id="required-tasks-content"></div>
