@@ -1,0 +1,15 @@
+/* LAMS custom palette 
+   https://coolors.co/f8f8f8-a6aabd-0175e2-f9f871-00914a-d73961
+*/
+$blue: #0175E2;
+$yellow: #F9F871;
+$green: #00914A;
+$red: #D73961;
+$gray: #A6AABD;
+
+
+@import "bootstrap/bootstrap.scss";
+
+:root {
+	--lams-background-gray: #F8F8F8;
+}
