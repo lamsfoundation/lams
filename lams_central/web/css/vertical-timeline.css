@@ -123,7 +123,7 @@ https://www.bootdey.com/snippets/view/tickets-timeline
   background-clip: padding-box;
   border-radius: 50%;
   text-align: center;
-  border: 7px solid #ffffff;
+  border: 1px solid var(--bs-gray);
   line-height: 45px;
   font-size: 15px;
   float: left;
@@ -139,6 +139,7 @@ https://www.bootdey.com/snippets/view/tickets-timeline
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
+  border: 1px solid var(--bs-gray);
 }
 .vertical-timeline .timeline-entry .timeline-entry-inner .timeline-label:after {
   content: '';
@@ -148,7 +149,7 @@ https://www.bootdey.com/snippets/view/tickets-timeline
   height: 0;
   border-style: solid;
   border-width: 9px 9px 9px 0;
-  border-color: transparent #ffffff transparent transparent;
+  border-color: transparent var(--bs-gray) transparent transparent;
   left: 0;
   top: 20px;
   margin-left: -9px;
@@ -159,6 +160,12 @@ https://www.bootdey.com/snippets/view/tickets-timeline
 .vertical-timeline .timeline-entry .timeline-entry-inner .timeline-label p .timeline-img.pull-right {
   margin: 5px 0 0 10px;
 }
+
+.vertical-timeline .timeline-entry .timeline-entry-inner .timeline-icon.activity-complete,
+.vertical-timeline .timeline-entry .timeline-entry-inner .timeline-icon.activity-current {
+	border-width: 7px;
+}
+
 
 .vertical-timeline .timeline-entry .timeline-entry-inner .timeline-icon.activity-complete ~ .timeline-label:after {
 	margin-left: -13px;
@@ -180,5 +187,10 @@ https://www.bootdey.com/snippets/view/tickets-timeline
 
 .vertical-timeline .timeline-entry .timeline-entry-inner .timeline-icon img {
 	width: 25px;
+	margin-top: 10px;
+}
+
+.vertical-timeline .timeline-entry .timeline-entry-inner .timeline-icon.activity-complete img,
+.vertical-timeline .timeline-entry .timeline-entry-inner .timeline-icon.activity-current img {
 	margin-top: -2px;
 }

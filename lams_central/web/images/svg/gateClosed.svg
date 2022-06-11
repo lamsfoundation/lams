@@ -20,7 +20,7 @@
 <style
    type="text/css"
    id="style1150">
-	svg.gateClosed .st0{fill:#FBA919;stroke:#111342;stroke-width:14.3597;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	svg.gateClosed .st0{fill:#D73961;stroke:#111342;stroke-width:14.3597;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
 	svg.gateClosed .st1{display:none;}
 	
 		svg.gateClosed .st2{display:inline;fill:#FFFFFF;stroke:#111342;stroke-width:14.3597;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
@@ -32,7 +32,7 @@
    cx="256"
    class="st0"
    r="250.54585"
-   style="fill:#ff2a2a;stroke:#ff2a2a;stroke-width:8.9083;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" /><g
+   style="fill:#D73961;stroke:#D73961;stroke-width:8.9083;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" /><g
    id="g1158"
    class="st1">
 		<circle

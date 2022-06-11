@@ -360,24 +360,11 @@
 }
 
 .monitoring-page-wrapper #required-tasks button {
-	background-color: #3C42E0;
-	border: 0;
-	color: #fff;
-	font-family: mont-regular, sans-serif;
 	font-size: .8rem;
-	box-shadow: 0px 3px 6px #3C42E040;
-}
-
-.monitoring-page-wrapper #required-tasks button.contribute-gate-opened-button {
-	background-color: #05CCD6;
 }
 
 .monitoring-page-wrapper #required-tasks button.contribute-go-button {
 	min-width: 5rem;
-}
-
-.monitoring-page-wrapper #required-tasks button:hover {
-	background-color: #878bea;
 }
 
 .monitoring-page-wrapper #required-tasks .dropdown-item {
@@ -1106,19 +1093,11 @@ body.component .leader-display h4 {
 }
 
 body.component .popover-link {
-	color: #337ab7 !important;
-}
-
-body.component .popover-link:hover {
-	color: #0E9AEF !important;
-}
-
-body.component .popover-link:focus {
-	color: #0E9AEF !important;
+	color: var(--bs-blue) !important;
 }
 
 body.component .popover-title {
-	background-color: #dddddd;
+	background-color: var(--bs-gray);
 }
 
 body.component .popover-content-with-portrait {
@@ -1127,32 +1106,30 @@ body.component .popover-content-with-portrait {
 }
 
 body.component .portrait-color-0 {
-	color: #001f3f;
+	color: black;
 }
 
 body.component .portrait-color-1 {
-	color: #FF851B;
+	color: var(--bs-red);
 }
 
 body.component .portrait-color-2 {
-	color: #85144b;
+	color: var(--bs-yellow);
+	filter: brightness(70%);
 }
 
 body.component .portrait-color-3 {
-	color: #111111;
+	color: var(--bs-gray);
 }
 
 body.component .portrait-color-4 {
-	color: #3D9970;
+	color: var(--bs-green);
 }
 
 body.component .portrait-color-5 {
-	color: #0074D9;
+	color: var(--bs-blue);
 }
 
-body.component .portrait-color-6 {
-	color: #FF4136;
-}
 
 body.component .portrait-sm-lineheight {
 	line-height: 32px;
@@ -1232,7 +1209,7 @@ body.component .portrait-round {
 
 #learners-accordion .vertical-timeline-container {
 	display: none;
-	background-color: #F6F5FA;
+	background-color: var(--lams-background-gray);
 	padding-top: 5px;
 	border-radius: 10px;
 }
@@ -1244,3 +1221,7 @@ body.component .portrait-round {
 #learners-accordion .vertical-timeline:before  {
 	bottom: 90px;
 }	
+
+.table-hover > tbody > tr:hover > * {
+	--bs-table-accent-bg: var(--bs-gray-200);
+}

@@ -10,7 +10,7 @@
 }
 
 .ui-jqgrid.ui-jqgrid-bootstrap .ui-jqgrid-caption {
-	background-color: #F6F5FA;
+	background-color: var(--bs-gray-200);
 }
 
 .ui-jqgrid .ui-jqgrid-bdiv {
@@ -81,7 +81,7 @@
 }
 
 .table-hover tbody tr:hover {
-	background-color: #F6F5FA;
+	background-color: var(--bs-gray-200);
 }
 
 .ui-jqgrid .ui-jqgrid-titlebar>.ui-jqgrid-titlebar-close {

@@ -236,11 +236,11 @@
 		
 		<div class="component-menu">
 			<div class="component-menu-btn">
-				<a href="/" title="Back to lesson list"><i class="fa fa-arrow-left fa-lg"></i></a>
-				<a id="edit-lesson-btn" href="#"><i class="fa fa-pen fa-lg"></i></a>
-				<a id="load-sequence-tab-btn" href="#" class="navigate-btn active"><i class="fa fa-sitemap fa-lg"></i></a>
-				<a id="load-learners-tab-btn" href="#" class="navigate-btn"><i class="fa fa-solid fa-user fa-lg"></i></a>
-				<a id="load-gradebook-tab-btn" href="#" class="navigate-btn"><i class="fa fa-solid fa-list-ol fa-lg"></i></a>
+				<a href="/" class="btn btn-primary" title="Back to lesson list"><i class="fa fa-arrow-left fa-lg"></i></a>
+				<a id="edit-lesson-btn" class="btn btn-primary" href="#"><i class="fa fa-pen fa-lg"></i></a>
+				<a id="load-sequence-tab-btn" href="#" class="btn btn-primary navigate-btn active"><i class="fa fa-sitemap fa-lg"></i></a>
+				<a id="load-learners-tab-btn" href="#" class="btn btn-primary navigate-btn"><i class="fa fa-solid fa-user fa-lg"></i></a>
+				<a id="load-gradebook-tab-btn" href="#" class="btn btn-primary navigate-btn"><i class="fa fa-solid fa-list-ol fa-lg"></i></a>
 			</div>
 			
 			<div class="lesson-properties">

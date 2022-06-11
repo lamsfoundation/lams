@@ -1,6 +1,6 @@
 // Functions for displaying portraits using Javascript. The logic should match PortraitTag.jsp except that this uses all divs and the tag uses an image. 
 
-var NUM_COLORS = 7,
+var NUM_COLORS = 6,
    CSS_ROUND = 'portrait-round',
    PORTRAIT_VERSION_SUFFIX = ' portrait-color-',
    CSS_GENERIC_SMALL = 'portrait-generic-sm',

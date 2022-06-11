@@ -41,6 +41,19 @@ var originalSequenceCanvas = null,
 	},
 	tempusDominusDateFormatter = function(date) {
 		return date ? date.year + '-' + date.monthFormatted + '-' + date.dateFormatted + ' ' + date.hoursFormatted + ':' + date.minutesFormatted : '';
+	},
+	
+	COLORS = {
+		blue: '#0175E2',
+		yellow: '#F9F871',
+		green: '#00914A',
+		red: '#D73961',
+		gray: '#6c757d'
+	},
+	GRAPH_COLORS = {
+		blue: 'rgba(1, 117, 226, 0.85)',
+		yellow: 'rgba(249, 248, 113, 0.85)',
+		green: 'rgba(0, 145, 74, 0.85)'
 	};
 	
 
@@ -65,6 +78,7 @@ function loadTab(tabName, button) {
 		tabContent.load(LAMS_URL + 'monitoring/monitoring/displaySequenceTab.do', function(){
 			refreshMonitor('sequence');
 			canvasFitScreen(learningDesignSvgFitScreen, true);
+			$("#load-sequence-tab-btn").addClass('active');
 		});
 	} else if (tabName == 'learners') {
 		tabContent.load(LAMS_URL + 'monitoring/monitoring/displayLearnersTab.do', function(){
@@ -466,7 +480,7 @@ function updateLessonTab(){
 					labelColour = 'danger'; 
 					break;
 			}
-			$('#lessonStateLabel').attr('class', 'badge bg-' + labelColour).html(label + ' <i class="fa-solid fa-angles-down"></i>');
+			$('#lessonStateLabel').attr('class', 'badge btn-' + labelColour).html(label + ' <i class="fa-solid fa-angles-down"></i>');
 			
 			// update available options in change state dropdown menu
 			var selectField = $('#lessonStateField');
@@ -607,11 +621,13 @@ function drawLessonCompletionChart(){
 							},
 							datasets : [ {
 								data : percent,
-								backgroundColor : [ 'rgba(255, 195, 55, 1)',
-													'rgba(253, 60, 165, 1)',
-													'rgba(5, 204, 214, 1)'
+								backgroundColor : [
+													GRAPH_COLORS.yellow,
+													GRAPH_COLORS.green,
+													GRAPH_COLORS.blue
 												  ],
-								borderWidth : 0
+								borderWidth : 1,
+								borderColor : COLORS.gray
 							} ],
 							labels : labels
 						},
@@ -652,7 +668,7 @@ function drawLessonCompletionChart(){
 													text: label + ": " + rawValue + " (" + value + "%)",
 													fillStyle: style.backgroundColor,
 													strokeStyle: style.borderColor,
-													lineWidth: style.borderWidth,
+													lineWidth: 0,
 													hidden: isNaN(value) || meta.data[i].hidden,
 				
 													// Extra data used for toggling the
@@ -866,10 +882,10 @@ function updateContributeActivities(contributeActivities) {
 						 					 + '</button></div>';
 							} else {
 								entryContent += '<div class="btn-group" role="group"><button onClick="javascript:openGateNow('
-                                    + contributeActivity.activityID + ')" type="button" class="btn" title="' 
+                                    + contributeActivity.activityID + ')" type="button" class="btn btn-primary" title="' 
 									+ LABELS.CONTRIBUTE_OPEN_GATE_NOW_TOOLTIP + '">' 
 									+ LABELS.CONTRIBUTE_OPEN_GATE_NOW_BUTTON 
-									+ '</button><button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'
+									+ '</button><button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'
 									+ '<div class="dropdown-menu"><a href="#" class="dropdown-item" onClick="javascript:openPopUp(\''
                                     + this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' 
 									+ LABELS.CONTRIBUTE_OPEN_GATE_TOOLTIP + '">' 

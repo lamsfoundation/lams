@@ -1,5 +1,5 @@
 body.component {
-	background-color: #E4E4E4;
+	background-color: var(--lams-background-gray);
 }
 
 body.component .tooltip-inner {
@@ -28,7 +28,6 @@ body.component .info_icon {
 	min-height: 100vh;
 	border-radius: 2rem;
 	overflow: hidden;
-	background-color: #F6F5FA;
 }
 
 .component-page-wrapper input::-webkit-input-placeholder {
@@ -40,7 +39,7 @@ body.component .info_icon {
 }
 
 .component-page-wrapper label {
-	color: #6c757d;
+	color: var(--bs-gray);
 }
 
 .component-page-wrapper .btn {
@@ -368,28 +367,12 @@ body.component .info_icon {
 }
 
 .component-page-wrapper .component-menu-btn a {
-	color: #fff;
-	display: inline-block;
-	background-color: #3C42E0;
 	width: 3.1rem;
 	height: 3.1rem;
-	border-radius: 1rem;
-	text-align: center;
-	line-height: 2.8rem;
-	box-shadow: 0px 3px 6px #3C42E040;
-	transition: all .3s ease;
 }
 
 .component-page-wrapper .component-menu-btn a i.fa {
-	padding-top: 1.5rem;
-}
-
-.component-page-wrapper .component-menu-btn a.active {
-	background-color: #878bea;
-}
-
-.component-page-wrapper .component-menu-btn a:hover {
-	background-color: #878bea;
+	padding-top: 1.09rem;
 }
 
 .component-page-wrapper .component-menu-btn a img {
@@ -511,7 +494,7 @@ body.component .info_icon {
 
 .switch input ~ label::before {
 	right: 0;
-	background-color: #dee2e6;
+	background-color: var(--bs-gray);
 	border-radius: calc(2.375rem * .8);
 	transition: 0.2s all;
 }
@@ -527,7 +510,7 @@ body.component .info_icon {
 }
 
 .switch input:checked ~ label::before {
-	background-color: #7fdaa1;
+	background-color: var(--bs-green);
 }
 
 .switch input:checked ~ label::after {
