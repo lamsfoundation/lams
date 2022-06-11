@@ -15,6 +15,7 @@
 
 .monitoring-page-wrapper {
 	position: relative;
+	font-family: mont-regular, sans-serif;
 }
 
 .monitoring-page-wrapper ul, .monitoring-page-wrapper ol {
@@ -30,6 +31,11 @@
 
 .monitoring-page-wrapper img {
 	max-width: 100%;
+}
+
+.monitoring-page-wrapper dt {
+	font-weight: normal;
+	font-family: mont-bold, sans-serif;
 }
 
 .monitoring-page-wrapper a:hover, .monitoring-page-wrapper a:focus {
@@ -311,7 +317,7 @@
 }
 
 .monitoring-page-wrapper .monitoring-panel h6 {
-	color: #ACB5CC;
+	color: var(--bs-gray);
 	font-family: mont-bold;
 	text-transform: uppercase;
 	font-size: .75rem;

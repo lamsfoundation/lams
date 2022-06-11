@@ -20,8 +20,7 @@
 .ui-jqgrid-htable th {
 	border: 3px !important;
 	padding: 0 !important;
-	font-family: 'Poppins', sans-serif;
-	font-weight: 700;
+	font-family: mont-bold, sans-serif;
 	font-size: 1rem;
 	margin: 0;
 	width: 100%;
@@ -53,7 +52,6 @@
 .ui-jqgrid-bdiv .ui-row-ltr.jqgrow td {
 	border-bottom: 2px solid #C3CEDC !important;
 	height: initial !important;
-	font-family: 'Poppins', sans-serif;
 }
 
 .ui-jqgrid .ui-row-ltr, .ui-jqgrid .ui-jqgrid-labels {
