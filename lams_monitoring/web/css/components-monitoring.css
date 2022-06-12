@@ -320,7 +320,6 @@
 	color: var(--bs-gray);
 	font-family: mont-bold;
 	text-transform: uppercase;
-	font-size: .75rem;
 	letter-spacing: 1.4px;
 	margin-bottom: 2rem;
 }
@@ -338,7 +337,7 @@
 }
 
 .monitoring-page-wrapper #required-tasks {
-	min-width: 350px;
+	min-width: 410px;
 }
 
 .monitoring-page-wrapper #required-tasks .row {
@@ -348,7 +347,6 @@
 .monitoring-page-wrapper #required-tasks .label {
 	color: #2E384D;
 	font-family: mont-regular, sans-serif;
-	font-size: .8rem;
 	margin: 0;
 }
 
@@ -363,10 +361,6 @@
 
 .monitoring-page-wrapper #required-tasks .btn-group {
 	min-width: 130px;
-}
-
-.monitoring-page-wrapper #required-tasks button {
-	font-size: .8rem;
 }
 
 .monitoring-page-wrapper #required-tasks button.contribute-go-button {
@@ -1196,12 +1190,6 @@ body.component .portrait-round {
 	text-align: center;
 	position: relative;
 	top: 33%;
-}
-
-
-#learners-accordion .learners-accordion-login,
-#learners-accordion .learners-accordion-email {
-	color: #BEC4D1;
 }
 
 #learners-accordion .learners-accordion-login .fa-user,
