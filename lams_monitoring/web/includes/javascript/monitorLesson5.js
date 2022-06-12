@@ -203,11 +203,11 @@ function initLessonTab(){
 	        	return response.msg; //msg will be shown in editable form
 	        }
 	    }
-    //hide and show pencil on showing and hiding editing widget
-	}).on('shown', function(e, editable) {
-		$(this).nextAll('i.fa-pencil').hide();
-	}).on('hidden', function(e, reason) {
-		$(this).nextAll('i.fa-pencil').show();
+	})
+	
+	$('#editLessonNameButton').click(function(e) {
+	    e.stopPropagation();
+	    $('#lesson-name').editable('toggle');
 	});
 	
 	new tempusDominus.TempusDominus(document.getElementById('scheduleDatetimeField'), tempusDominusDefaultOptions)

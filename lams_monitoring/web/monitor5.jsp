@@ -322,8 +322,15 @@
 					<dt><fmt:message key="lesson.manage"/>:</dt>
 					<dd>
 						<div>
+							<button id="editLessonNameButton" class="btn btn-sm btn-primary"
+									type="button"
+									title='Edit lesson name'>
+								<i class="fa fa-pencil"></i>
+								<span class="hidden-xs">Edit lesson name</span>
+							</button>
+							
 							<button id="viewLearnersButton" class="btn btn-sm btn-primary"
-									type="button"onClick="javascript:showLessonLearnersDialog()"
+									type="button" onClick="javascript:showLessonLearnersDialog()"
 									title='<fmt:message key="button.view.learners.tooltip"/>'>
 								<i class="fa fa-users"></i>
 								<span class="hidden-xs"><fmt:message key="button.view.learners"/></span>
