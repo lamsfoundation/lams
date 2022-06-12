@@ -94,13 +94,11 @@
 }
 
 .ui-jqgrid.ui-jqgrid-bootstrap .ui-pg-table .btn.ui-pg-button {
-	/*
-	color: #fff;
-	background-color: #6c757d;
-	border-color: #6c757d;
+	color: var(--bs-white);
+	background-color: var(--bs-secondary);
+	border-color: var(--bs-secondary);
 	margin-right: .4rem;
 	margin-left: .4rem;
-	*/
 	font-size: 14px;
 	border: none;
 }
@@ -108,10 +106,6 @@
 .ui-jqgrid.ui-jqgrid-bootstrap .ui-pg-table .btn.ui-pg-button.active,
 .ui-jqgrid.ui-jqgrid-bootstrap .ui-pg-table .btn.ui-pg-button:hover {
 	border: none;
-}
-
-.ui-jqgrid.ui-jqgrid-bootstrap .ui-pg-table .btn.ui-pg-button.disabled {
-	opacity: 0.65;
 }
 
 .ui-jqgrid.ui-jqgrid-bootstrap .ui-pg-table .ui-pg-selbox {
@@ -138,7 +132,7 @@
 }
 
 .ui-jqgrid.ui-jqgrid-bootstrap .ui-pg-button span {
-	margin: 5px 5px 0 0;
+	margin: 5px 7px;
 }
 
 .ui-jqgrid.ui-jqgrid-bootstrap .ui-pg-table .ui-pg-selbox {
