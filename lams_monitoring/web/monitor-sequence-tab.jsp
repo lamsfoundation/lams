@@ -44,7 +44,7 @@
 					<div id="completion-chart-panel" class="monitoring-panel">
 						<h6><fmt:message key="lesson.chart.title"/></h6>
 						<div class="panel-body">
-							<canvas id="completion-chart" height="600px" width="200px"></canvas>
+							<canvas id="completion-chart" height="600px" width="240px"></canvas>
 						</div>
 						<!--
 						<div class="graph-con">

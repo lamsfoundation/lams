@@ -654,6 +654,7 @@ function drawLessonCompletionChart(){
 								position: 'bottom',
 								align: 'start',
 								labels : {
+									fontSize : 16,
 									generateLabels : function(chart) {
 										var data = chart.data;
 										if (data.labels.length && data.datasets.length) {
@@ -690,7 +691,7 @@ function drawLessonCompletionChart(){
 						plugins: [{
 						    beforeInit: function(chart) {
 						      chart.legend.afterFit = function() {
-						        this.height = this.height + 250;
+						        this.height = this.height + 230;
 						      };
 						    }
 						}]
