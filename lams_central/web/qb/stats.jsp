@@ -154,15 +154,17 @@
 		<div class="panel-heading">
 			<fmt:message key="label.qb.stats.question" />
 			
-			<div class="btn-group-xs pull-right">
-				<a href="<c:url value='/qb/edit/editQuestion.do'/>?qbQuestionUid=${question.uid}&KeepThis=true&TB_iframe=true&modal=true" class="btn btn-default thickbox"> 
-					<i class="fa fa-pencil"	title="<fmt:message key="label.edit" />"></i>
-				</a>
-			
-				<a href="#nogo" onClick="javascript:exportQTI()" class="btn btn-default">
-					<i class="fa fa-download" title="<fmt:message key='label.export.qti'/>"></i>
-				</a>
-			</div>
+			<c:if test="${empty param.waQuestionUid}">
+				<div class="btn-group-xs pull-right">
+					<a href="<c:url value='/qb/edit/editQuestion.do'/>?qbQuestionUid=${question.uid}&KeepThis=true&TB_iframe=true&modal=true" class="btn btn-default thickbox"> 
+						<i class="fa fa-pencil"	title="<fmt:message key="label.edit" />"></i>
+					</a>
+				
+					<a href="#nogo" onClick="javascript:exportQTI()" class="btn btn-default">
+						<i class="fa fa-download" title="<fmt:message key='label.export.qti'/>"></i>
+					</a>
+				</div>
+			</c:if>
 		</div>
 		<div class="panel-body">
 			<div class="question-table">
