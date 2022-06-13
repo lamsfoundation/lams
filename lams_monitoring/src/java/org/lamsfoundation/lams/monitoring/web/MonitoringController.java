@@ -125,7 +125,7 @@ import reactor.core.publisher.Flux;
 public class MonitoringController {
     private static Logger log = Logger.getLogger(MonitoringController.class);
 
-    private static final DateFormat LESSON_SCHEDULING_DATETIME_FORMAT = new SimpleDateFormat("MM/dd/yy HH:mm");
+    private static final DateFormat LESSON_SCHEDULING_DATETIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     private static final int LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT = 53;
     private static final int LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT = 7;
