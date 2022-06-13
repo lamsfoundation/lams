@@ -2445,8 +2445,12 @@ function drawLearnerTimeline(learnerId, data) {
 		$('.timeline-title', entry).text(activity.name);
 			
 		switch(activity.status){
-			case 0: icon.addClass('border-primary activity-current');break;
-			case 1: icon.addClass('border-success activity-complete');break;
+			case 0: entry.addClass('activity-current');
+					icon.addClass('border-primary');
+					break;
+			case 1: icon.addClass('border-success');
+			 		entry.addClass('activity-complete');
+					break;
 		}
 		
 		if (activity.iconURL) {

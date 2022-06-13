@@ -154,6 +154,17 @@ https://www.bootdey.com/snippets/view/tickets-timeline
   top: 20px;
   margin-left: -9px;
 }
+
+.vertical-timeline .timeline-entry.activity-complete .timeline-entry-inner .timeline-label:before {
+  content: '\f00c';
+  font-family: 'FontAwesome';
+  position: absolute;
+  right: 6px;
+  top: 0px;
+  font-size: 20px;
+  color: var(--bs-green);
+}
+
 .vertical-timeline .timeline-entry .timeline-entry-inner .timeline-label p .timeline-img {
   margin: 5px 10px 0 0;
 }
@@ -161,27 +172,27 @@ https://www.bootdey.com/snippets/view/tickets-timeline
   margin: 5px 0 0 10px;
 }
 
-.vertical-timeline .timeline-entry .timeline-entry-inner .timeline-icon.activity-complete,
-.vertical-timeline .timeline-entry .timeline-entry-inner .timeline-icon.activity-current {
+.vertical-timeline .timeline-entry.activity-complete .timeline-entry-inner .timeline-icon,
+.vertical-timeline .timeline-entry.activity-current .timeline-entry-inner .timeline-icon {
 	border-width: 7px;
 }
 
 
-.vertical-timeline .timeline-entry .timeline-entry-inner .timeline-icon.activity-complete ~ .timeline-label:after {
+.vertical-timeline .timeline-entry.activity-complete .timeline-entry-inner .timeline-icon ~ .timeline-label:after {
 	margin-left: -13px;
 	border-color: transparent var(--bs-success) transparent transparent;
 }
 
-.vertical-timeline .timeline-entry .timeline-entry-inner .timeline-icon.activity-complete ~ .timeline-label{
+.vertical-timeline .timeline-entry.activity-complete .timeline-entry-inner .timeline-icon ~ .timeline-label{
 	border-left: thick solid var(--bs-success);
 }
 
-.vertical-timeline .timeline-entry .timeline-entry-inner .timeline-icon.activity-current ~ .timeline-label:after {
+.vertical-timeline .timeline-entry.activity-current .timeline-entry-inner .timeline-icon ~ .timeline-label:after {
 	margin-left: -13px;
 	border-color: transparent var(--bs-primary) transparent transparent;
 }
 
-.vertical-timeline .timeline-entry .timeline-entry-inner .timeline-icon.activity-current ~ .timeline-label{
+.vertical-timeline .timeline-entry.activity-current .timeline-entry-inner .timeline-icon ~ .timeline-label{
 	border-left: thick solid var(--bs-primary);
 }
 
@@ -190,7 +201,7 @@ https://www.bootdey.com/snippets/view/tickets-timeline
 	margin-top: 10px;
 }
 
-.vertical-timeline .timeline-entry .timeline-entry-inner .timeline-icon.activity-complete img,
-.vertical-timeline .timeline-entry .timeline-entry-inner .timeline-icon.activity-current img {
+.vertical-timeline .timeline-entry.activity-complete .timeline-entry-inner .timeline-icon img,
+.vertical-timeline .timeline-entry.activity-current .timeline-entry-inner .timeline-icon img {
 	margin-top: -2px;
 }
