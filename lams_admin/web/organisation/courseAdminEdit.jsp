@@ -29,8 +29,8 @@
 					<form:hidden path="stateId" />
 				</c:if>
 				<p>
-					<a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a> : 
-					<a href="orgmanage.do?org=<c:out value="${organisationForm.orgId}" />" class="btn btn-default">
+					<a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a> : 
+					<a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${organisationForm.orgId}" />" class="btn btn-default">
 						<c:out value="${organisationForm.name}"/>
 					</a>
 				</p>
