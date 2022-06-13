@@ -933,6 +933,7 @@ body.component .ui-menu-item-wrapper.autocomplete-menu-item-with-portrait {
 #canvas-container div#sequenceCanvas {
 	width: 100%;
 	display: flex;
+	overflow: auto;
 	justify-content: center;
 	align-items: center;
 	-webkit-touch-callout: none;
