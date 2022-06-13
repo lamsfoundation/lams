@@ -710,10 +710,13 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	}
     }
 
+    @Override
     public Long getActivityMaxPossibleMark(long toolActivityId) {
-	ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(toolActivityId,
-		ToolActivity.class);
-	return getActivityMaxPossibleMark(toolActivity);
+	Activity activity = activityDAO.getActivityByActivityId(toolActivityId);
+	if (!activity.isToolActivity()) {
+	    return null;
+	}
+	return getActivityMaxPossibleMark((ToolActivity) activity);
     }
 
     @Override
