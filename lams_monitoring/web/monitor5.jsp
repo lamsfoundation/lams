@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>LAMS Monitor</title>
+	<title><fmt:message key="monitor.title" /></title>
 	
 	<link rel="icon" type="image/x-icon" href="<lams:LAMSURL/>images/svg/lamsv5_logo.svg">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css">
@@ -232,15 +232,27 @@
 <body class="component">
 <div class="monitoring-page-wrapper component-page-wrapper">
 	<div class="component-sidebar active">
-		<a href="/" class="lams-logo"><img src="<lams:LAMSURL/>images/svg/lamsv5_logo.svg" alt="#" /></a>
+		<a href="/" title="<fmt:message key='label.monitoring.return.to.index' />" class="lams-logo">
+			<img src="<lams:LAMSURL/>images/svg/lamsv5_logo.svg" alt="<fmt:message key='label.monitoring.logo' />" />
+		</a>
 		
 		<div class="component-menu">
 			<div class="component-menu-btn">
-				<a href="/" class="btn btn-primary" title="Back to lesson list"><i class="fa fa-arrow-left fa-lg"></i></a>
-				<a id="edit-lesson-btn" class="btn btn-primary" href="#"><i class="fa fa-pen fa-lg"></i></a>
-				<a id="load-sequence-tab-btn" href="#" class="btn btn-primary navigate-btn active"><i class="fa fa-sitemap fa-lg"></i></a>
-				<a id="load-learners-tab-btn" href="#" class="btn btn-primary navigate-btn"><i class="fa fa-solid fa-user fa-lg"></i></a>
-				<a id="load-gradebook-tab-btn" href="#" class="btn btn-primary navigate-btn"><i class="fa fa-solid fa-list-ol fa-lg"></i></a>
+				<a href="/" class="btn btn-primary" title="<fmt:message key='label.monitoring.return.to.index' />">
+					<i class="fa fa-arrow-left fa-lg"></i>
+				</a>
+				<a id="edit-lesson-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.monitoring.edit.lesson.settings' />">
+					<i class="fa fa-pen fa-lg"></i>
+				</a>
+				<a id="load-sequence-tab-btn" href="#" class="btn btn-primary navigate-btn active" title="<fmt:message key='tab.sequence' />">
+					<i class="fa fa-sitemap fa-lg"></i>
+				</a>
+				<a id="load-learners-tab-btn" href="#" class="btn btn-primary navigate-btn" title="<fmt:message key='tab.learners' />">
+					<i class="fa fa-solid fa-user fa-lg"></i>
+				</a>
+				<a id="load-gradebook-tab-btn" href="#" class="btn btn-primary navigate-btn" title="<fmt:message key='tab.gradebook' />">
+					<i class="fa fa-solid fa-list-ol fa-lg"></i>
+				</a>
 			</div>
 			
 			<div class="lesson-properties">
