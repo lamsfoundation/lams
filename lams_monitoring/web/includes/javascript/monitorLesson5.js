@@ -10,6 +10,8 @@ var originalSequenceCanvas = null,
 	sequenceSearchedLearner = null,
 // for synchronisation purposes
 	sequenceRefreshInProgress = false,
+// currently opened EventSources
+	eventSources = [],
 
 // double tap support
 	tapTimeout = 500,
@@ -72,10 +74,18 @@ function loadTab(tabName, button) {
 		$(button).addClass('active');
 	}
 	
+	clearEventSources();
+	
 	let tabContent = $('.monitoring-page-content .tab-content');
 		
 	if (tabName == 'sequence') {
 		tabContent.load(LAMS_URL + 'monitoring/monitoring/displaySequenceTab.do', function(){
+			openEventSource(LAMS_URL + 'monitoring/monitoring/getLearnerProgressUpdateFlux.do?lessonId=' +  lessonId,
+				function (event) {
+					if ("doRefresh" == event.data && $('#sequence-tab-content').length === 1){
+						updateSequenceTab();
+				}
+			});
 			refreshMonitor('sequence');
 			canvasFitScreen(learningDesignSvgFitScreen, true);
 			$("#load-sequence-tab-btn").addClass('active');
@@ -86,6 +96,32 @@ function loadTab(tabName, button) {
 		});
 	} else if (tabName == 'gradebook') {
 		tabContent.load(LAMS_URL + 'monitoring/monitoring/displayGradebookTab.do', function(){
+			openEventSource(LAMS_URL + 'monitoring/monitoring/getGradebookUpdateFlux.do?lessonId=' +  lessonId,
+				function (event) {
+					if ("doRefresh" == event.data && $('#gradebookDiv').length === 1){
+					    let expandedGridIds = [],
+							userGrid = $('#userView'),
+							activityGrid = $('#activityView');
+						// do not update if grid is being edited by the teacher
+						if (userGrid.data('isCellEdited') === true || activityGrid.data('isCellEdited') === true) {
+							return;
+						}
+						
+					    $("tr:has(.sgexpanded)", userGrid).each(function () {
+					        let num = $(this).attr('id');
+					        expandedGridIds.push(num);
+					    });
+						userGrid.data('expandedGridIds', expandedGridIds).trigger("reloadGrid");
+						
+						expandedGridIds = [];
+					    $("tr:has(.sgexpanded)", activityGrid).each(function () {
+					        let num = $(this).attr('id');
+					        expandedGridIds.push(num);
+					    });
+						activityGrid.data('expandedGridIds', expandedGridIds).trigger("reloadGrid");
+					}
+				});
+			
 			refreshMonitor('gradebook');
 		});
 	}
@@ -1326,13 +1362,6 @@ function initSequenceTab(){
 	$('#forceBackwardsCloseButton', forceBackwardsDialogContents).click(function(){
 		$('#forceBackwardsDialog').modal('hide');
 	});
-
-	const learnerProgressUpdateSource = new EventSource(LAMS_URL + 'monitoring/monitoring/getLearnerProgressUpdateFlux.do?lessonId=' +  lessonId);
-	learnerProgressUpdateSource.onmessage = function (event) {
-		if ("doRefresh" == event.data && $('#sequence-tab-content').length === 1){
-			updateSequenceTab();
-		}
-	}
 }
 
 function showIntroductionDialog(lessonId) {
@@ -2397,23 +2426,17 @@ function updateLearnersTab(){
 				
 				$('.accordion-collapse', item).attr('id', itemCollapseId).attr('data-bs-parent', '#learners-accordion')
 					  .on('show.bs.collapse', function () {
-						if (learnerProgressSource) {
-							try {
-								learnerProgressSource.close();
-							} catch(e) {
-								console.error(e);
-							}
-						}
+						clearEventSources();
 						
 						let learnerId = $(this).closest('.accordion-item').data('user-id');
-						learnerProgressSource = new EventSource(LAMS_URL + 'learning/learner/getLearnerProgressUpdateFlux.do?lessonId='
-																		 +  lessonId + '&userId=' + learnerId);
-																	
-						learnerProgressSource.onmessage = function (event) {
-							if ($('#learners-accordion-item-' + learnerId).length === 1) {
-								drawLearnerTimeline(learnerId, event.data);
-							}
-						}
+						openEventSource(LAMS_URL + 'learning/learner/getLearnerProgressUpdateFlux.do?lessonId='
+																		 +  lessonId + '&userId=' + learnerId,
+							function (event) {
+								if ($('#learners-accordion-item-' + learnerId).length === 1) {
+									drawLearnerTimeline(learnerId, event.data);
+								}
+						});
+						
 					  });
 				});
 		}
@@ -2541,32 +2564,6 @@ function initGradebookTab() {
 			clearButton : 'btn btn-sm'
 		}
 	});
-	
-	const gradebooksUpdateSource = new EventSource(LAMS_URL + 'monitoring/monitoring/getGradebookUpdateFlux.do?lessonId=' +  lessonId);
-	gradebooksUpdateSource.onmessage = function (event) {
-		if ("doRefresh" == event.data && $('#gradebookDiv').length === 1){
-		    let expandedGridIds = [],
-				userGrid = $('#userView'),
-				activityGrid = $('#activityView');
-			// do not update if grid is being edited by the teacher
-			if (userGrid.data('isCellEdited') === true || activityGrid.data('isCellEdited') === true) {
-				return;
-			}
-			
-		    $("tr:has(.sgexpanded)", userGrid).each(function () {
-		        let num = $(this).attr('id');
-		        expandedGridIds.push(num);
-		    });
-			userGrid.data('expandedGridIds', expandedGridIds).trigger("reloadGrid");
-			
-			expandedGridIds = [];
-		    $("tr:has(.sgexpanded)", activityGrid).each(function () {
-		        let num = $(this).attr('id');
-		        expandedGridIds.push(num);
-		    });
-			activityGrid.data('expandedGridIds', expandedGridIds).trigger("reloadGrid");
-		}
-	};
 }
 
 /**
@@ -3073,4 +3070,21 @@ function dblTap(elem, dblClickFunction) {
 		
 		lastTapTarget = event.currentTarget;
 	});
+}
+
+function openEventSource(url, onMessageFunction) {
+	const eventSource = new EventSource(url);
+	eventSources.push(eventSource);
+	eventSource.onmessage = onMessageFunction;
+}
+
+function clearEventSources() {
+	eventSources.forEach(function(eventSource){
+		try {
+			eventSource.close();
+		} catch(e) {
+			console.error("Error while closing Event Source", e);
+		}
+	});
+	eventSources = [];
 }
