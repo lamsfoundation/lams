@@ -143,7 +143,7 @@ public class LearnerController {
     public static final String LEARNER_TIMELINE_FLUX_NAME = "learner timeline updated";
 
     public LearnerController() {
-	FluxRegistry.initFluxMap(LEARNER_TIMELINE_FLUX_NAME, CommonConstants.ACTIVITY_COMPLETED_SINK_NAME,
+	FluxRegistry.initFluxMap(LEARNER_TIMELINE_FLUX_NAME, CommonConstants.ACTIVITY_ENTERED_SINK_NAME,
 		(LearnerActivityCompleteFluxItem item,
 			LearnerActivityCompleteFluxItem key) -> item.getLessonId() == key.getLessonId()
 				&& item.getUserId() == key.getUserId(),

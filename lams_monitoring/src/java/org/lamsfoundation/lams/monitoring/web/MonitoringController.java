@@ -155,7 +155,7 @@ public class MonitoringController {
 
     public MonitoringController() {
 	// bind sinks so a learner finishing an activity also triggers an update in lesson progress
-	FluxRegistry.bindSink(CommonConstants.ACTIVITY_COMPLETED_SINK_NAME, CommonConstants.LESSON_PROGRESSED_SINK_NAME,
+	FluxRegistry.bindSink(CommonConstants.ACTIVITY_ENTERED_SINK_NAME, CommonConstants.LESSON_PROGRESSED_SINK_NAME,
 		learnerProgressFluxItem -> ((LearnerActivityCompleteFluxItem) learnerProgressFluxItem).getLessonId());
 	// bind sinks so a learner entering a lesson also triggers an update in lesson progress
 	FluxRegistry.bindSink(CommonConstants.LESSON_JOINED_SINK_NAME, CommonConstants.LESSON_PROGRESSED_SINK_NAME,

@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
@@ -39,8 +38,6 @@ import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.lesson.util.LearnerActivityCompleteFluxItem;
-import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,12 +118,7 @@ public class CompleteActivityController {
 		}
 	    }
 
-	    // notify all event subscribers that a learner finished an activity
-	    FluxRegistry.emit(CommonConstants.ACTIVITY_COMPLETED_SINK_NAME,
-		    new LearnerActivityCompleteFluxItem(lessonId, learnerId, activityId));
-
 	    return forward;
-
 	} catch (LearnerServiceException e) {
 	    return "error";
 	}

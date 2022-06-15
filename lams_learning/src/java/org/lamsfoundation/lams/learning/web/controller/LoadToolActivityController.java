@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.hibernate.AssertionFailure;
+import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
@@ -35,7 +36,9 @@ import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.util.LearnerActivityCompleteFluxItem;
 import org.lamsfoundation.lams.tool.exception.RequiredGroupMissingException;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,6 +136,11 @@ public class LoadToolActivityController {
 	    log.error("activity not ToolActivity");
 	    return "error";
 	}
+
+	// notify all event subscribers that a learner finished an activity
+	FluxRegistry.emit(CommonConstants.ACTIVITY_ENTERED_SINK_NAME, new LearnerActivityCompleteFluxItem(
+		learnerProgress.getLesson().getLessonId(), learnerProgress.getUser().getUserId(), activityId));
+
 	return "loadToolActivity";
     }
 }

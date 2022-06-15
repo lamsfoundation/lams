@@ -70,7 +70,7 @@ public class CommonConstants {
     // FLUX sinks
 
     // updated when a learner completes an activity by himself
-    public static final String ACTIVITY_COMPLETED_SINK_NAME = "activity completed by learner";
+    public static final String ACTIVITY_ENTERED_SINK_NAME = "activity completed by learner";
     // updated when a learner completes an activity by himself
     public static final String LESSON_JOINED_SINK_NAME = "lesson joined by learner";
     // updated when a there was a change to lesson progress
