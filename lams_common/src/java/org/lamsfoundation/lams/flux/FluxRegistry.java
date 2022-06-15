@@ -9,10 +9,14 @@ import java.util.function.Function;
 import reactor.core.publisher.Flux;
 
 public class FluxRegistry {
+    @SuppressWarnings("rawtypes")
     private static final Map<String, FluxMap> fluxRegistry = new ConcurrentHashMap<>();
+    @SuppressWarnings("rawtypes")
     private static final Map<String, SharedSink> sinkRegistry = new ConcurrentHashMap<>();
+    @SuppressWarnings("rawtypes")
     private static final Map<String, Map<String, Function>> boundSinks = new ConcurrentHashMap<>();
 
+    @SuppressWarnings("unchecked")
     private static <T> SharedSink<T> getSink(String sinkName) {
 	SharedSink<T> sink = sinkRegistry.get(sinkName);
 	if (sink != null) {
@@ -26,6 +30,7 @@ public class FluxRegistry {
     /**
      * Binds sinks so an emit for one sink is also an emit for another
      */
+    @SuppressWarnings("rawtypes")
     public static void bindSink(String sourceSinkName, String targetSinkName, Function emitTransformer) {
 	// make sure that sinks exist
 	FluxRegistry.getSink(sourceSinkName);
@@ -41,6 +46,7 @@ public class FluxRegistry {
 	}
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> void initFluxMap(String fluxName, String sinkName, BiPredicate<T, T> itemEqualsPredicate,
 	    Function<T, String> fetchFunction, Integer throttleSeconds, Integer timeoutSeconds) {
 	if (fluxRegistry.containsKey(fluxName)) {
@@ -58,7 +64,8 @@ public class FluxRegistry {
 	fluxRegistry.put(fluxName, fluxMap);
     }
 
-    public static <T, String> Flux<String> get(String fluxName, T key) {
+    @SuppressWarnings({ "unchecked" })
+    public static <T> Flux<String> get(String fluxName, T key) {
 	FluxMap<T, String> fluxMap = fluxRegistry.get(fluxName);
 	if (fluxMap == null) {
 	    throw new IllegalArgumentException("FluxMap for \"" + fluxName + "\" was not initialised");
@@ -66,6 +73,7 @@ public class FluxRegistry {
 	return fluxMap.get(key);
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public static <T> void emit(String sinkName, T item) {
 	if (item == null) {
 	    return;
