@@ -2555,14 +2555,14 @@ function initGradebookTab() {
 		});
 	});
 	*/
-		
 	$.extend(true, $.jgrid.guiStyles.bootstrap4, {
 		pager : {
 			pagerSelect : 'form-control-select'
 		},
 		searchToolbar : {
 			clearButton : 'btn btn-sm'
-		}
+		},
+		titleButton : "btn btn-xs"
 	});
 }
 
