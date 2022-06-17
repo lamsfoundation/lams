@@ -665,5 +665,5 @@ body.component .info_icon {
 
 .form-select-sm,
 .btn-sm, .btn-group-sm > .btn {
-	font-size: 1rem;
+	font-size: 15px;
 }
