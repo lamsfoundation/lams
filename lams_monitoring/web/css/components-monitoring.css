@@ -859,8 +859,6 @@ body.component .ui-menu-item-wrapper.autocomplete-menu-item-with-portrait {
 
 .dialogContainer .dialogSearchPhraseClear {
 	visibility: hidden;
-	padding-top: 11px;
-	cursor: pointer;
 }
 
 .ui-front {
@@ -871,30 +869,39 @@ body.component .ui-menu-item-wrapper.autocomplete-menu-item-with-portrait {
 	border-radius: 0 0 5px 5px;
 }
 
-.dialogContainer .navCell i {
-	cursor: pointer;
+.dialogContainer .pageCell {
+	vertical-align: middle;
 }
 
 .dialogContainer .dialogListItem {
-	padding: 3px 0 3px 5px;
+	height: 3rem;
+	border-color: var(--bs-gray-300);
     cursor: pointer;
 }
 
+.dialogContainer .dialogListItem:hover {
+	background-color: var(--bs-gray-200);
+}
+
 .dialogContainer .dialogListItem .portrait-sm {
-	margin: 3px 0 -4px 0;
+	margin: 7px 0 0 7px;
+}
+
+R.dialogContainer .dialogListItem .portrait-generic-sm {
+	margin-top: 2px;
 }
 
 .dialogContainer .dialogListItem  .portrait-sm-lineheight {
-	margin-left: 5px;	
+	display: inline-block;
+	margin-top: 2px;
 }
 
-.dialogContainer .dialogListItem .portrait-sm + .portrait-sm-lineheight {
-	display: inline-block;
-	margin-top: 3px;
-} 
+.dialogContainer .dialogListItem  .portrait-sm + .portrait-sm-lineheight {
+	margin-left: 8px;
+}
+
 .dialogContainer .dialogListItem.dialogListItemSelected {
-    background-color: #5898d0 !important;
-    color: white !important;
+    background-color: rgba(0, 145, 74, 0.1) !important;
 }
 
 .dialogContainer .dialogTitle {

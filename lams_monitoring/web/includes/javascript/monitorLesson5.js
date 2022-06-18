@@ -984,7 +984,7 @@ function editEmailProgressDate(dateCheckbox){
 function fillEmailProgress() {
 	var dialog = $('#emailProgressDialog'),
 		table = $('#emailProgressDialogTable', dialog),
-		list = $('.dialogList', table).empty(),
+		list = $('.dialogTable', table).empty(),
 		dates = null;
 		ajaxProperties = dialog.data('ajaxProperties'),
 		dates = null;
@@ -1011,8 +1011,6 @@ function fillEmailProgress() {
 	$.each(dates, function(dateIndex, date) {
 		addCheckbox(date, list, true);
 	});	
-
-	colorDialogList(table);
 }
 
 function addCheckbox(dateObj, list, checked) {
@@ -1074,7 +1072,6 @@ function sendProgressEmail() {
 }
 
 function addEmailProgressDate() {
-	debugger;
 	var table = $('#emailProgressDialogTable', '#emailProgressDialog'),
 		list = $('.dialogList', table),
 		newDateMS = new tempusDominus.TempusDominus(document.getElementById('emaildatePicker')).viewDate;
@@ -1136,7 +1133,6 @@ function addEmailProgressSeries(forceQuestion, table) {
     		}
     	}
     }
-	colorDialogList(table);
 } 
 
 function openGateNow(activityId) {
@@ -1235,16 +1231,21 @@ function initSequenceTab(){
 	$('#learnerGroupDialogCloseButton', learnerGroupDialogContents).click(function(){
 		$('#learnerGroupDialog').modal('hide');
 	});
-	
+		//check whether current window is a top level one (otherwise it's an iframe or popup)
+	var isTopLevelWindow = window.top == window.self;
+	//calculate width and height based on the dimensions of the window to which dialog is added
+	var dialogWindow = isTopLevelWindow ? $(window) : $(window.parent);
     // initialise lesson dialog
 	var learnerGroupDialog = showDialog('learnerGroupDialog',{
 			'autoOpen'  : false,
 			'width'     : 450,
-			'height'	: 450,
+			'height'	: Math.max(450, Math.min(700, dialogWindow.height() - 30)),
 			'resizable' : true,
 			'open'      : function(){
 				// until operator selects an user, buttons remain disabled
 				$('button.learnerGroupDialogSelectableButton').blur().prop('disabled', true);
+			},
+			'close'		: function(){
 			}
 		}, false);
 	
@@ -2266,8 +2267,6 @@ function fillClassList(role, disableCreator) {
 		    })
 		}
 	});	
-
-	colorDialogList(table);
 }
 
 /**
@@ -2733,7 +2732,7 @@ function closeMonitorLessonDialog(refresh) {
  */
 function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowForceComplete, allowView, allowEmail) {
 	var learnerGroupDialog = $('#learnerGroupDialog'),
-		learnerGroupList = $('.dialogList', learnerGroupDialog).empty(),
+		learnerGroupList = $('.dialogTable', learnerGroupDialog).empty(),
 		// no parameters provided? just work on what we saved
 		isRefresh = ajaxProperties == null,
 		learners = null,
@@ -2800,60 +2799,59 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 		var viewUrl = allowView ? LAMS_URL + 'monitoring/monitoring/getLearnerActivityURL.do?userID=' 
         				       	  + learner.id + '&activityID=' + ajaxProperties.data.activityID + '&lessonID=' + lessonId
         				        : null,
-				learnerDiv = $('<div />').attr({
+				learnerRow = $('<tr />').attr({
 									'userId'  : learner.id,
 									'viewUrl'    : viewUrl
 									})
 			                      .addClass('dialogListItem')
 							      .appendTo(learnerGroupList),
+				learnerCell = $('<td />').appendTo(learnerRow),
 				portraitDiv = $('<div />').attr({
 						'id': 'user-'+learner.id,
 						})
 						.addClass('roffset5')
-						.appendTo(learnerDiv);
+						.appendTo(learnerCell);
 				addPortrait( portraitDiv, learner.portraitId, learner.id, 'small', true, LAMS_URL );
 				$('<span/>').html(getLearnerDisplayName(learner))
 					.addClass('portrait-sm-lineheight')
-					.appendTo(learnerDiv);
+					.appendTo(learnerCell);
 
 		if (allowForceComplete || allowView || allowEmail) {
-			learnerDiv.click(function(event){
+			learnerRow.click(function(event){
 				// select the learner
-				var learnerDiv = $(this),
-					selectedSiblings = learnerDiv.siblings('div.dialogListItem.dialogListItemSelected');
+				var learnerRow = $(this),
+					selectedSiblings = learnerRow.siblings('tr.dialogListItem.dialogListItemSelected');
 				    	// enable buttons
 			    $('button.learnerGroupDialogSelectableButton', learnerGroupDialog).prop('disabled', false);
 			    
 				if (allowForceComplete && (event.metaKey || event.ctrlKey)) {
-					var isSelected = learnerDiv.hasClass('dialogListItemSelected');
+					var isSelected = learnerRow.hasClass('dialogListItemSelected');
 					if (isSelected) {
 						// do not un-select last learner
 						if (selectedSiblings.length > 0) {
-							learnerDiv.removeClass('dialogListItemSelected')
+							learnerRow.removeClass('dialogListItemSelected')
 						}
 					} else {
-						learnerDiv.addClass('dialogListItemSelected');
+						learnerRow.addClass('dialogListItemSelected');
 					}
 					if (selectedSiblings.length + (isSelected ? 0 : 1) > 1) {
 						// disable view button - only one learner can be viewed and multiple are selected
 						$('button#learnerGroupDialogViewButton', learnerGroupDialog).prop('disabled', true);
 					}
 				} else {
-					learnerDiv.addClass('dialogListItemSelected');
+					learnerRow.addClass('dialogListItemSelected');
 					// un-select other learners
 					selectedSiblings.removeClass('dialogListItemSelected');
 				}
 			    });
 			if (allowView){
-				dblTap(learnerDiv, function(){
+				dblTap(learnerRow, function(){
 					// same as clicking View Learner button
 					openPopUp(viewUrl, "LearnActivity", popupHeight, popupWidth, true);
 				});
 			}
 		}
 	});
-	
-	colorDialogList(learnerGroupDialog);
 	
 	if (!isRefresh) {
 		// show buttons and labels depending on parameters
@@ -2945,16 +2943,6 @@ function sortClassList(role) {
 	ajaxProperties.data.orderAscending = orderAscending;
 	// refresh the list
 	showClassDialog(role);
-}
-
-/**
- * Colours a list of users
- */
-function colorDialogList(parent) {
-	$('.dialogList div.dialogListItem', parent).each(function(userIndex, userDiv){
-		// every odd learner has different background
-		$(userDiv).css('background-color', userIndex % 2 ? '#f5f5f5' : 'inherit');
-	});
 }
 
 /**

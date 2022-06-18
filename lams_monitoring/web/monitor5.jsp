@@ -482,47 +482,61 @@
 				</div>
 			</td>
 			<td>
-				<span class="dialogSearchPhraseClear fa-solid fa-circle-xmark"
-					  onClick="javascript:learnerGroupClearSearchPhrase()"
-					  title="<fmt:message key='learners.search.phrase.clear.tooltip' />" 
-				></span>
+				<button class="btn btn-xs btn-secondary dialogSearchPhraseClear" 
+						onClick="javascript:learnerGroupClearSearchPhrase()"
+						title="<fmt:message key='learners.search.phrase.clear.tooltip' />">
+					<i class="fa-solid fa-fw fa-xmark"></i>
+				</button>
 			</td>
 		</tr>
 		<tr>
-			<td class="navCell pageMinus10Cell"
-				title="<fmt:message key='learner.group.backward.10'/>"
-				onClick="javascript:shiftLearnerGroupList(-10)">
-					<i class="fa-solid fa-step-backward"></i>
+			<td class="navCell pageMinus10Cell">
+				<button class="btn btn-xs btn-secondary" 
+						onClick="javascript:shiftLearnerGroupList(-10)"
+						title="<fmt:message key='learner.group.backward.10'/>">
+					<i class="fa-solid fa-fw fa-step-backward"></i>
+				</button>
+					
 			</td>
-			<td class="navCell pageMinus1Cell"
-				title="<fmt:message key='learner.group.backward.1'/>"
-				onClick="javascript:shiftLearnerGroupList(-1)">
-					<i class="fa-solid fa-backward"></i>
+			<td class="navCell pageMinus1Cell">
+				<button class="btn btn-xs btn-secondary" 
+						onClick="javascript:shiftLearnerGroupList(-1)"
+						title="<fmt:message key='learner.group.backward.1'/>">
+					<i class="fa-solid fa-fw fa-backward"></i>
+				</button>
 			</td>
 			<td class="pageCell"
 				title="<fmt:message key='learners.page'/>">
 			</td>
-			<td class="navCell pagePlus1Cell"
-				title="<fmt:message key='learner.group.forward.1'/>"
-				onClick="javascript:shiftLearnerGroupList(1)">
-					<i class="fa-solid fa-forward"></i>
+			<td class="navCell pagePlus1Cell">
+				<button class="btn btn-xs btn-secondary" 
+						onClick="javascript:shiftLearnerGroupList(1)"
+						title="<fmt:message key='learner.group.forward.1'/>">
+					<i class="fa-solid fa-fw fa-forward"></i>
+				</button>
 			</td>
-			<td class="navCell pagePlus10Cell" 
-				title="<fmt:message key='learner.group.forward.10'/>"
-				onClick="javascript:shiftLearnerGroupList(10)">
-					<i class="fa-solid fa-step-forward"></i>
+			<td class="navCell pagePlus10Cell">
+				<button class="btn btn-xs btn-secondary" 
+						onClick="javascript:shiftLearnerGroupList(10)"
+						title="<fmt:message key='learner.group.forward.10'/>">
+					<i class="fa-solid fa-fw fa-step-forward"></i>
+				</button>
 			</td>
-			<td class="navCell sortCell" 
-				title="<fmt:message key='learner.group.sort.button'/>" 
-				onClick="javascript:sortLearnerGroupList()">
-					<i class="fa-solid fa-caret-down"></i>
+			<td class="navCell sortCell" role="button">
+				<button class="btn btn-xs btn-secondary" 
+						onClick="javascript:sortLearnerGroupList()"
+						title="<fmt:message key='learner.group.sort.button'/>">
+					<i class="fa-solid fa-fw fa-caret-down"></i>
+				</button>
 			</td>
 		</tr>
 		<tr>
-			<td colspan="6" class="dialogList"></td>
+			<td colspan="6">
+				<table class="dialogTable table table-condensed table-hover"></table>
+			</td>
 		</tr>
 	</table>
-	<div class="bottom-buttons float-end">
+	<div class="modal-footer">
 		<button id="learnerGroupDialogForceCompleteAllButton" class="btn btn-secondary me-2">
 			<span><fmt:message key="button.force.complete.all" /></span>
 		</button>
@@ -557,7 +571,7 @@
 							  <input type="text" class="form-control dialogSearchPhrase" placeholder="<fmt:message key='search.learner.textbox' />"
 							  		 aria-label="<fmt:message key='search.learner.textbox' />">
 							  <span class="dialogSearchPhraseIcon input-group-text" title="<fmt:message key='search.learner.textbox' />">
-							  		<i class=" fa-solid fa-sm fa-search"></i>
+							  		<i class="fa-solid fa-sm fa-search"></i>
 							  </span>
 							</div>
 						</td>
@@ -572,12 +586,12 @@
 						<td class="navCell pageMinus10Cell"
 							title="<fmt:message key='learner.group.backward.10'/>"
 							onClick="javascript:sortClassList('Learner', -10)">
-								<i class="fa-solid fa-step-backward"></i>
+								<i class="fa-solid fa-fw fa-step-backward"></i>
 						</td>
 						<td class="navCell pageMinus1Cell"
 							title="<fmt:message key='learner.group.backward.1'/>"
 							onClick="javascript:sortClassList('Learner', -1)">
-								<i class="fa-solid fa-backward"></i>
+								<i class="fa-solid fa-fw fa-backward"></i>
 						</td>
 						<td class="pageCell"
 							title="<fmt:message key='learners.page'/>">
@@ -585,17 +599,17 @@
 						<td class="navCell pagePlus1Cell"
 							title="<fmt:message key='learner.group.forward.1'/>"
 							onClick="javascript:sortClassList('Learner', 1)">
-								<i class="fa-solid fa-forward"></i>
+								<i class="fa-solid fa-fw fa-forward"></i>
 						</td>
 						<td class="navCell pagePlus10Cell" 
 							title="<fmt:message key='learner.group.forward.10'/>"
 							onClick="javascript:sortClassList('Learner', 10)">
-								<i class="fa-solid fa-step-forward"></i>
+								<i class="fa-solid fa-fw fa-step-forward"></i>
 						</td>
 						<td class="navCell sortCell" 
 							title="<fmt:message key='learner.group.sort.button'/>" 
 							onClick="javascript:sortClassList('Learner')">
-								<i class="fa-solid fa-caret-down"></i>
+								<i class="fa-solid fa-fw fa-caret-down"></i>
 						</td>
 					</tr>
 					<tr>

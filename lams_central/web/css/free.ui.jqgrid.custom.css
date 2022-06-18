@@ -28,7 +28,7 @@
 }
 
 .ui-jqgrid-labels th {
-	border-bottom: 2px solid #20639B !important;
+	border-bottom: 2px solid var(--bs-secondary)!important;
 	padding-bottom: .4rem !important;
 	background-color: #fff;
 }
@@ -50,7 +50,7 @@
 }
 
 .ui-jqgrid-bdiv .ui-row-ltr.jqgrow td {
-	border-bottom: 2px solid #C3CEDC !important;
+	border-bottom: 2px solid var(--bs-gray-300) !important;
 	height: initial !important;
 }
 
@@ -156,4 +156,8 @@
 
 .ui-jqgrid.ui-jqgrid-bootstrap .ui-pg-table .btn.ui-pg-button[id^="refresh_"] {
 	padding: 0.9em 0 0.7em 0;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-jqgrid-btable .table-success {
+	background-color: rgba(0, 145, 74, 0.1);
 }
