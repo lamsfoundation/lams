@@ -43,6 +43,10 @@ var originalSequenceCanvas = null,
 	},
 	tempusDominusDateFormatter = function(date) {
 		return date ? date.year + '-' + date.monthFormatted + '-' + date.dateFormatted + ' ' + date.hoursFormatted + ':' + date.minutesFormatted : '';
+	}
+	dateFormatter = function(date) {
+		return ("0" + date.getDate()).slice(-2) + "-" + ("0"+(date.getMonth() + 1)).slice(-2) + "-" +
+    			date.getFullYear() + " " + ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
 	},
 	
 	COLORS = {
@@ -257,6 +261,7 @@ function initLessonTab(){
 	var classDialog = showDialog('classDialog',{
 		'autoOpen'  : false,
 		'width'     : 950,
+		'height'	: 700,
 		'title' 	: LABELS.LESSON_EDIT_CLASS,
 		'resizable' : true,
 		'close' : function(){
@@ -301,16 +306,20 @@ function initLessonTab(){
 
 	var emailProgressDialog = showDialog('emailProgressDialog',{
 			'autoOpen'  : false,
-			'height'    : 500,
 			'width'     : 510,
+			'height'	: 700,
 			'title' 	: LABELS.PROGRESS_EMAIL_TITLE,
-			'resizable' : false
+			'resizable' : false,
+			'close'		: function(){}
 		}, false);
 	$('.modal-body', emailProgressDialog).empty().append($('#emailProgressDialogContents').show());
 	
 	//initialize datetimepicker
-	new tempusDominus.TempusDominus(document.getElementById('emaildatePicker'), tempusDominusDefaultOptions)
-		.dates.formatInput = tempusDominusDateFormatter;
+	let datePickerElement = $('#emaildatePicker'),
+		datePicker = new tempusDominus.TempusDominus(datePickerElement[0], tempusDominusDefaultOptions);
+		
+	datePicker.dates.formatInput = tempusDominusDateFormatter;
+	datePickerElement.data('datePicker', datePicker);
 		
 	// sets gradebook on complete functionality
 	$('#gradebookOnCompleteButton').change(function(){
@@ -957,9 +966,9 @@ function configureProgressEmail(){
  * Adds/removes date to the set of progress report emailing dates
  */
 function editEmailProgressDate(dateCheckbox){
-	var dateid = dateCheckbox.parent().attr('dateid'),
-		add = dateCheckbox.is(':checked');
-	var data = {
+	var dateid = dateCheckbox.closest('.dialogListItem').attr('dateid'),
+		add = dateCheckbox.is(':checked'),
+		data = {
 		'lessonID' : lessonId,
 		'id' : dateid,
 		'add' : add
@@ -971,9 +980,9 @@ function editEmailProgressDate(dateCheckbox){
 		cache : false,
 		data : data,
 		success : function( dateObj ) {
-			dateCheckbox.parent().attr('dateid', dateObj.id);
-			dateCheckbox.parent().attr('datems', dateObj.ms);
-			dateCheckbox.parent().children().last().html(dateObj.date); 
+			dateCheckbox.closest('.dialogListItem')
+				.attr('dateid', dateObj.id)
+				.find('label').text(dateFormatter(new Date(dateObj.id))); 
 		}
 	});
 }
@@ -1009,25 +1018,25 @@ function fillEmailProgress() {
 	$.ajax(ajaxProperties);
 
 	$.each(dates, function(dateIndex, date) {
-		addCheckbox(date, list, true);
+		addCheckbox(date.id, list, true);
 	});	
 }
 
-function addCheckbox(dateObj, list, checked) {
+function addCheckbox(dateId, list, checked) {
 	// check for an existing matching date
-	var alreadyExists = false;
-	var existingDivs = $("div", list);
+	var alreadyExists = false,
+		existingDivs = $("tr", list);
 	$.each(existingDivs, function(divIndex, div) {
-		if ( div.getAttribute('dateid') == dateObj.id ) {
+		if ( div.getAttribute('dateid') == dateId) {
 			alreadyExists = true;
 			return false;
 		}
 	});	
 	if ( alreadyExists )
 		return;
-
+		
 	// does not exist so add to list
-	var checkboxId = 'email-progress-date-' + dateObj.id,
+	var checkboxId = 'email-progress-date-' + dateId,
 		checkbox = $('<input />').attr({
    	 	'type' : 'checkbox',
 		'id'   : checkboxId
@@ -1036,17 +1045,19 @@ function addCheckbox(dateObj, list, checked) {
     		editEmailProgressDate($(this));
        }),
 
-     dateString = $('<label />').addClass('form-check-label').attr('for', checkboxId).text(dateObj.date),
+
+     dateString = $('<label />').addClass('form-check-label').attr('for', checkboxId).text(dateFormatter(new Date(dateId))),
    	
-     dateDiv = $('<div />').attr({
-			'dateid'  : dateObj.id,
-			'datems'  : dateObj.ms
-			})
-         .addClass('dialogListItem')
-          .append(dateString)
-	      .prepend(checkbox)
-	      .appendTo(list);
-   	
+	 dateRow = $('<tr />').attr({
+					'dateid'  : dateId
+				})
+	          .addClass('dialogListItem')
+			  .appendTo(list);
+		
+	 $('<td />').append(checkbox).appendTo(dateRow);
+	 $('<td />').append(dateString).appendTo(dateRow);
+	    	
+
 	checkbox.prop('checked', checked);
 	return checkbox;
 }
@@ -1073,16 +1084,18 @@ function sendProgressEmail() {
 
 function addEmailProgressDate() {
 	var table = $('#emailProgressDialogTable', '#emailProgressDialog'),
-		list = $('.dialogList', table),
-		newDateMS = new tempusDominus.TempusDominus(document.getElementById('emaildatePicker')).viewDate;
-		
+		list = $('.dialogTable', table),
+		datePickerElement = $('#emaildatePicker'),
+		datePicker = datePickerElement.data('datePicker'),
+		date = datePicker.viewDate;
 
-	if ( newDateMS != null ) {
-		if ( newDateMS.getTime() < Date.now()  ) {
+	datePickerElement.val('');
+		
+	if (date != null ) {
+		if (date.getTime() < Date.now()  ) {
 			alert(LABELS.ERROR_DATE_IN_PAST);
 		} else {
-			var dateObj = { id: newDateMS.getTime(), date: getEmailDateString(newDateMS)},
-				checkbox = addCheckbox(dateObj, list, true);
+			var checkbox = addCheckbox(date.getTime(), list, true);
 			editEmailProgressDate(checkbox); // update back end
 			addEmailProgressSeries(false, table);
 		}
@@ -1091,17 +1104,11 @@ function addEmailProgressDate() {
 	}
 }
 
-
-
-function getEmailDateString(date) {
-	return date.toLocaleDateString('en', {year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: false });
-}
-
 function addEmailProgressSeries(forceQuestion, table) {
 	if ( ! table ) {
 		table = $('#emailProgressDialogTable', '#emailProgressDialog');
 	} 
-	var list = $('.dialogList', table),
+	var list = $('.dialogTable', table),
 		items = $('.dialogListItem', list);
 	
 	if ( forceQuestion && items.length < 2 ) {
@@ -1127,8 +1134,7 @@ function addEmailProgressSeries(forceQuestion, table) {
 				var genDateMS = maxDate;
     			for (var i = 0; i < numDates; i++) {
     				genDateMS = +genDateMS + +diff;
-    				var genDateObj = { id: genDateMS, date: getEmailDateString(new Date(genDateMS))};
-    			    var checkbox = addCheckbox(genDateObj, list, false);
+    			    addCheckbox(genDateMS, list, false);
     			}
     		}
     	}
@@ -1231,14 +1237,12 @@ function initSequenceTab(){
 	$('#learnerGroupDialogCloseButton', learnerGroupDialogContents).click(function(){
 		$('#learnerGroupDialog').modal('hide');
 	});
-		//check whether current window is a top level one (otherwise it's an iframe or popup)
-	var isTopLevelWindow = window.top == window.self;
-	//calculate width and height based on the dimensions of the window to which dialog is added
-	var dialogWindow = isTopLevelWindow ? $(window) : $(window.parent);
+
     // initialise lesson dialog
 	var learnerGroupDialog = showDialog('learnerGroupDialog',{
 			'autoOpen'  : false,
 			'width'     : 450,
+			'height'	: 700,
 			'resizable' : true,
 			'open'      : function(){
 				// until operator selects an user, buttons remain disabled

@@ -730,7 +730,9 @@
 					<td class="dialogTitle" colspan="6"><fmt:message key="progress.email.will.be.sent.on"/></td>
 				</tr>
 				<tr>
-					<td class="dialogList" colspan="6"></td>
+					<td colspan="6">
+						<table class="dialogTable table table-condensed table-hover"></table>
+					</td>
 				</tr>
 			</table>
 		</div>
