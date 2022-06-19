@@ -13,6 +13,11 @@
 	src: url(/lams/includes/fonts/FontsFree-Net-Mont1.ttf);
 }
 
+.toast {
+	border-color: var(--bs-yellow);
+	border-width: 3px;
+}
+
 .monitoring-page-wrapper {
 	position: relative;
 	font-family: mont-regular, sans-serif;
@@ -48,6 +53,7 @@
 	transition: all .3s ease;
 	vertical-align: top;
 }
+
 
 .component-sidebar {
 	align-items: center;
