@@ -828,6 +828,10 @@
 	width: 15rem;
 } 
 
+.monitoring-page-wrapper #sequenceSearchPhraseButton {
+	border: none;
+} 
+
 .monitoring-page-wrapper #sequenceSearchPhraseClearIcon {
 	display: none;
 }
