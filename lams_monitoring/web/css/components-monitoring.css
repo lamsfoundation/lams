@@ -18,6 +18,10 @@
 	border-width: 3px;
 }
 
+#confirmationDialog {
+	z-index: calc(var(--bs-modal-zindex) + 1);
+}
+
 .monitoring-page-wrapper {
 	position: relative;
 	font-family: mont-regular, sans-serif;
@@ -886,6 +890,7 @@ body.component .ui-menu-item-wrapper.autocomplete-menu-item-with-portrait {
 .dialogContainer .dialogListItem {
 	height: 3rem;
 	border-color: var(--bs-gray-300);
+	border-bottom-width: 2px;
     cursor: pointer;
 }
 

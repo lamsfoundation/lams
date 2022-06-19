@@ -792,7 +792,7 @@ function startLesson(){
  */
 function getSelectedClassUserList(containerId) {
 	var list = [];
-	$('#' + containerId).children('div.dialogListItem').each(function(){
+	$('#' + containerId).children('tr.dialogListItem').each(function(){
 		if ($('input:checked', this).length > 0){
 			list.push($(this).attr('userId'));
 		}
@@ -1213,7 +1213,7 @@ function initSequenceTab(){
 	
 	$('#learnerGroupDialogViewButton', learnerGroupDialogContents).click(function() {
 		var dialog = $('#learnerGroupDialog'),
-			selectedLearner = $('.dialogList div.dialogListItemSelected', dialog);
+			selectedLearner = $('.dialogList .dialogListItemSelected', dialog);
 		if (selectedLearner.length == 1) {
 			// open pop up with user progress in the given activity
 			openPopUp(selectedLearner.attr('viewUrl'), "LearnActivity", popupHeight, popupWidth, true);
@@ -1222,7 +1222,7 @@ function initSequenceTab(){
 	
 	$('#learnerGroupDialogEmailButton', learnerGroupDialogContents).click(function() {
 		var dialog = $('#learnerGroupDialog'),
-			selectedLearner = $('.dialogList div.dialogListItemSelected', dialog);
+			selectedLearner = $('.dialogList .dialogListItemSelected', dialog);
 		if (selectedLearner.length == 1) {
 			showEmailDialog(selectedLearner.attr('userId'));
 		}
@@ -1239,7 +1239,6 @@ function initSequenceTab(){
 	var learnerGroupDialog = showDialog('learnerGroupDialog',{
 			'autoOpen'  : false,
 			'width'     : 450,
-			'height'	: Math.max(450, Math.min(700, dialogWindow.height() - 30)),
 			'resizable' : true,
 			'open'      : function(){
 				// until operator selects an user, buttons remain disabled
@@ -2191,7 +2190,7 @@ function showClassDialog(role){
 function fillClassList(role, disableCreator) {
 	var dialog = $('#classDialog'),
 		table = $('#class' + role + 'Table', dialog),
-		list = $('.dialogList', table).empty(),
+		list = $('.dialogTable', table).empty(),
 		searchPhrase = role == 'Learner' ? $('.dialogSearchPhrase', table).val().trim() : null,
 		ajaxProperties = dialog.data(role + 'AjaxProperties'),
 		users = null,
@@ -2240,13 +2239,15 @@ function fillClassList(role, disableCreator) {
 	    		editClassMember($(this));
 	      }),
 	    		
-	      userDiv = $('<div />').attr({
+	      userRow = $('<tr />').attr({
 				'userId'  : user.id
 				})
 	          .addClass('dialogListItem')
-			  .prepend($('<label />').addClass('form-check-label').attr('for', checkboxId).text(getLearnerDisplayName(user)))
-		      .prepend(checkbox)
-		      .appendTo(list);
+			  .appendTo(list);
+		
+		$('<td />').append(checkbox).appendTo(userRow);
+		$('<td />').append($('<label />').addClass('form-check-label').attr('for', checkboxId).text(getLearnerDisplayName(user)))
+				   .appendTo(userRow);
 	    	
 		if (user.classMember) {
 			checkbox.prop('checked', 'checked');
@@ -2257,14 +2258,7 @@ function fillClassList(role, disableCreator) {
 		}
 		
 		if (disableCreator && user.lessonCreator) {
-			userDiv.addClass('dialogListItemDisabled');
-		} else {
-			userDiv.click(function(event){
-				if (event.target == this && !checkbox.is(':disabled')) {
-		    		checkbox.prop('checked', checkbox.is(':checked') ? null : 'checked');
-		    		checkbox.change();
-		    	}
-		    })
+			userRow.addClass('dialogListItemDisabled');
 		}
 	});	
 }
@@ -2275,8 +2269,8 @@ function fillClassList(role, disableCreator) {
 function editClassMember(userCheckbox){
 	var data={ 
 		'lessonID' : lessonId,
-		'userID'   : userCheckbox.parent().attr('userId'),
-		'role'     : userCheckbox.closest('table').is('#classMonitorTable') ? 'MONITOR' : 'LEARNER',
+		'userID'   : userCheckbox.closest('.dialogListItem').attr('userId'),
+		'role'     : userCheckbox.closest('table.dialogTable').is('#classMonitorTable') ? 'MONITOR' : 'LEARNER',
 		'add'      : userCheckbox.is(':checked')
 	};
 	data[csrfTokenName] = csrfTokenValue;

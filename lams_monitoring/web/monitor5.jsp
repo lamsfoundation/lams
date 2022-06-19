@@ -576,44 +576,58 @@
 							</div>
 						</td>
 						<td>
-							<span class="dialogSearchPhraseClear fa-solid fa-circle-xmark"
-								  onClick="javascript:classClearSearchPhrase()"
-								  title="<fmt:message key='learners.search.phrase.clear.tooltip' />" 
-							></span>
+							<button class="btn btn-xs btn-secondary dialogSearchPhraseClear" 
+									onClick="javascript:classClearSearchPhrase()"
+									title="<fmt:message key='learners.search.phrase.clear.tooltip' />">
+								<i class="fa-solid fa-fw fa-xmark"></i>
+							</button>
 						</td>
 					</tr>
 					<tr>
-						<td class="navCell pageMinus10Cell"
-							title="<fmt:message key='learner.group.backward.10'/>"
-							onClick="javascript:sortClassList('Learner', -10)">
+						<td class="navCell pageMinus10Cell">
+							<button class="btn btn-xs btn-secondary" 
+									onClick="javascript:sortClassList('Learner', -10)"
+									title="<fmt:message key='learner.group.backward.10'/>">
 								<i class="fa-solid fa-fw fa-step-backward"></i>
+							</button>
+								
 						</td>
-						<td class="navCell pageMinus1Cell"
-							title="<fmt:message key='learner.group.backward.1'/>"
-							onClick="javascript:sortClassList('Learner', -1)">
+						<td class="navCell pageMinus1Cell">
+							<button class="btn btn-xs btn-secondary" 
+									onClick="javascript:sortClassList('Learner', -1)"
+									title="<fmt:message key='learner.group.backward.1'/>">
 								<i class="fa-solid fa-fw fa-backward"></i>
+							</button>
 						</td>
 						<td class="pageCell"
 							title="<fmt:message key='learners.page'/>">
 						</td>
-						<td class="navCell pagePlus1Cell"
-							title="<fmt:message key='learner.group.forward.1'/>"
-							onClick="javascript:sortClassList('Learner', 1)">
+						<td class="navCell pagePlus1Cell">
+							<button class="btn btn-xs btn-secondary" 
+									onClick="javascript:sortClassList('Learner', 1)"
+									title="<fmt:message key='learner.group.forward.1'/>">
 								<i class="fa-solid fa-fw fa-forward"></i>
+							</button>
 						</td>
-						<td class="navCell pagePlus10Cell" 
-							title="<fmt:message key='learner.group.forward.10'/>"
-							onClick="javascript:sortClassList('Learner', 10)">
+						<td class="navCell pagePlus10Cell">
+							<button class="btn btn-xs btn-secondary" 
+									onClick="javascript:sortClassList('Learner', 10)"
+									title="<fmt:message key='learner.group.forward.10'/>">
 								<i class="fa-solid fa-fw fa-step-forward"></i>
+							</button>
 						</td>
-						<td class="navCell sortCell" 
-							title="<fmt:message key='learner.group.sort.button'/>" 
-							onClick="javascript:sortClassList('Learner')">
+						<td class="navCell sortCell" role="button">
+							<button class="btn btn-xs btn-secondary" 
+									onClick="javascript:sortClassList('Learner')"
+									title="<fmt:message key='learner.group.sort.button'/>">
 								<i class="fa-solid fa-fw fa-caret-down"></i>
+							</button>
 						</td>
 					</tr>
 					<tr>
-						<td class="dialogList" colspan="6"></td>
+						<td colspan="6">
+							<table class="dialogTable table table-condensed table-hover"></table>
+						</td>
 					</tr>
 					<tr>
 						<td colspan="6">
@@ -636,37 +650,50 @@
 						<td id="classMonitorSearchRow" colspan="6">&nbsp;</td>
 					</tr>
 					<tr>
-						<td class="navCell pageMinus10Cell"
-							title="<fmt:message key='learner.group.backward.10'/>"
-							onClick="javascript:sortClassList('Monitor', -10)">
-								<i class="fa-solid fa-step-backward"></i>
+						<td class="navCell pageMinus10Cell">
+							<button class="btn btn-xs btn-secondary" 
+									onClick="javascript:sortClassList('Monitor', -10)"
+									title="<fmt:message key='learner.group.backward.10'/>">
+								<i class="fa-solid fa-fw fa-step-backward"></i>
+							</button>
+								
 						</td>
-						<td class="navCell pageMinus1Cell"
-							title="<fmt:message key='learner.group.backward.1'/>"
-							onClick="javascript:sortClassList('Monitor', -1)">
-								<i class="fa-solid fa-backward"></i>
+						<td class="navCell pageMinus1Cell">
+							<button class="btn btn-xs btn-secondary" 
+									onClick="javascript:sortClassList('Monitor', -1)"
+									title="<fmt:message key='learner.group.backward.1'/>">
+								<i class="fa-solid fa-fw fa-backward"></i>
+							</button>
 						</td>
 						<td class="pageCell"
 							title="<fmt:message key='learners.page'/>">
 						</td>
-						<td class="navCell pagePlus1Cell"
-							title="<fmt:message key='learner.group.forward.1'/>"
-							onClick="javascript:sortClassList('Monitor', 1)">
-								<i class="fa-solid fa-forward"></i>
+						<td class="navCell pagePlus1Cell">
+							<button class="btn btn-xs btn-secondary" 
+									onClick="javascript:sortClassList('Monitor', 1)"
+									title="<fmt:message key='learner.group.forward.1'/>">
+								<i class="fa-solid fa-fw fa-forward"></i>
+							</button>
 						</td>
-						<td class="navCell pagePlus10Cell" 
-							title="<fmt:message key='learner.group.forward.10'/>"
-							onClick="javascript:sortClassList('Monitor', 10)">
-								<i class="fa-solid fa-step-forward"></i>
+						<td class="navCell pagePlus10Cell">
+							<button class="btn btn-xs btn-secondary" 
+									onClick="javascript:sortClassList('Monitor', 10)"
+									title="<fmt:message key='learner.group.forward.10'/>">
+								<i class="fa-solid fa-fw fa-step-forward"></i>
+							</button>
 						</td>
-						<td class="navCell sortCell" 
-							title="<fmt:message key='learner.group.sort.button'/>" 
-							onClick="javascript:sortClassList('Monitor')">
-								<i class="fa-solid fa-caret-down"></i>
+						<td class="navCell sortCell" role="button">
+							<button class="btn btn-xs btn-secondary" 
+									onClick="javascript:sortClassList('Monitor')"
+									title="<fmt:message key='learner.group.sort.button'/>">
+								<i class="fa-solid fa-fw fa-caret-down"></i>
+							</button>
 						</td>
 					</tr>
 					<tr>
-						<td class="dialogList" colspan="6"></td>
+						<td colspan="6">
+							<table class="dialogTable table table-condensed table-hover"></table>
+						</td>
 					</tr>
 					<tr>
 						<td colspan="6"></td>
