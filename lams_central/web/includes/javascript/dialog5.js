@@ -408,11 +408,6 @@ function showNotificationsDialog(orgID, lessonID) {
 	var isTopLevelWindow = window.top == window.self;
 	//calculate width and height based on the dimensions of the window to which dialog is added
 	var dialogWindow = isTopLevelWindow ? $(window) : $(window.parent);
-	
-	// if screen is narrow, then it is much longer
-	var width = Math.max(380, Math.min(800, dialogWindow.width() - 60)),
-		height = width < 798 ? 850 : 650;
-	height = Math.max(380, Math.min(height, dialogWindow.height() - 30));
 		
 	var id = "dialogNotifications" + (lessonID ? "Lesson" + lessonID : "Org" + orgID);
 	showDialog(id, {
@@ -420,8 +415,7 @@ function showNotificationsDialog(orgID, lessonID) {
 			'orgID' : orgID,
 			'lessonID' : lessonID
 		},
-		'height': height,
-		'width' : width,
+		'height': 700,
 		//dialog needs to be added to a top level window to avoid boundary limitations of the interim iframe
 		"isCreateInParentWindow" : !isTopLevelWindow,		
 		'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
@@ -439,7 +433,7 @@ function showNotificationsDialog(orgID, lessonID) {
 					+ orgID);
 			}
 		}
-	}, false).find('.modal-dialog').addClass('modal-lg');
+	}, false).find('.modal-dialog').addClass('modal-xl');
 }
 
 

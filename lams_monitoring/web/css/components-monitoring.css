@@ -991,8 +991,7 @@ R.dialogContainer .dialogListItem .portrait-generic-sm {
 	min-width: 35px;
 }
 
-#canvas-container div#sequenceCanvas div.more-learner-icon, #completedLearnersContainer div.more-learner-icon
-	{
+#canvas-container div#sequenceCanvas div.more-learner-icon, #completedLearnersContainer div.more-learner-icon {
 	display: inline-block;
 	width: 35px;
 	height: 35px;

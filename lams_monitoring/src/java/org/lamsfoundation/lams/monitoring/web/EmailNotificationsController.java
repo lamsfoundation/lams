@@ -156,7 +156,7 @@ public class EmailNotificationsController {
 	request.setAttribute("lesson", lesson);
 	request.setAttribute("activities", activities);
 
-	return "emailnotifications/lessonNotifications";
+	return "emailnotifications/lessonNotifications5";
     }
 
     /**

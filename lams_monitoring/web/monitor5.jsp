@@ -10,7 +10,6 @@
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/vertical-timeline.css"> 
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable5.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css">
