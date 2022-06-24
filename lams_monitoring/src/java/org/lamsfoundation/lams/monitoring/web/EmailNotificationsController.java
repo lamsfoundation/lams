@@ -262,7 +262,7 @@ public class EmailNotificationsController {
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
 	request.setAttribute(AttributeNames.PARAM_ORGANISATION_ID, organisationId);
 
-	return "emailnotifications/scheduledEmailList";
+	return "emailnotifications/scheduledEmailList5";
     }
 
     /**
@@ -298,7 +298,7 @@ public class EmailNotificationsController {
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
 	request.setAttribute(AttributeNames.PARAM_ORGANISATION_ID, organisationId);
 
-	return "emailnotifications/archivedEmailList";
+	return "emailnotifications/archivedEmailList5";
     }
 
     @RequestMapping("getArchivedRecipients")

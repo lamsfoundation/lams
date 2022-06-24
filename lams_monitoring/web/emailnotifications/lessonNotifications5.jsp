@@ -21,7 +21,6 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/popper.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/monitorToolSummaryAdvanced.js "></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/tempus-dominus.min.js"></script>
 	
@@ -111,7 +110,6 @@
     			} else {
     				//get the timestamp in milliseconds since midnight Jan 1, 1970
     				var scheduleDate = datePicker.viewDate;
-    				debugger;
     				if (scheduleDate == null) {
     					return;
     				}
@@ -128,12 +126,14 @@
     	            dataType: 'json',
     	            type: 'post',
     	            success: function (json) {
+        	            let showToast = window.parent.showToast;
+        	            
     		            if (json.isSuccessfullySent) {
-    		            	alert("<fmt:message key="email.notifications.emails.successfully.sent" />");
+    		            	showToast("<fmt:message key="email.notifications.emails.successfully.sent" />");
     					} else if (json.isSuccessfullyScheduled) {
-    		            	alert("<fmt:message key="email.notifications.emails.successfully.scheduled" />");
+    						showToast("<fmt:message key="email.notifications.emails.successfully.scheduled" />");
     					} else {
-    						alert("<fmt:message key="email.notifications.problems.sending.emails" />");
+    						showToast("<fmt:message key="email.notifications.problems.sending.emails" />");
     					}
     	            }
     	       	});
@@ -185,7 +185,7 @@
     
 <body class="p-3">
 	<div class="clearfix">
-		<div class="btn-group float-end">
+		<div class="float-end">
 			<a href="<c:url value='/emailNotifications/showScheduledEmails.do'/>?lessonID=${lesson.lessonId}"
 			   id="listEmailsHref" class="btn btn-secondary btn-sm">
 				<i class="fa fa-calendar"></i> <fmt:message key="email.notifications.scheduled.messages.button" />
