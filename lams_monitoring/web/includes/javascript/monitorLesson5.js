@@ -155,6 +155,26 @@ function initCommonElements(){
 		loadTab('gradebook', this);
 	});
 	
+	$('#load-other-nvg-btn').click(function(){
+		let switchButton = $(this),
+			tblButtons = $('#tbl-navigate-btn-group'),
+			regularButtons = $('#navigate-btn-group'),
+			tblButtonsShown = tblButtons.hasClass('shown');
+		tblButtons.toggleClass('shown');
+		
+		if (tblButtonsShown) {
+			tblButtons.slideUp(function(){
+				regularButtons.slideDown();
+			});
+		} else {
+			regularButtons.slideUp(function(){
+				tblButtons.slideDown();
+			});
+		}
+		
+		$('i', switchButton).toggleClass('fa-angles-up fa-angles-down')
+	});
+	
 	
 	initLessonTab();
 }
@@ -525,7 +545,7 @@ function updateLessonTab(){
 					labelColour = 'danger'; 
 					break;
 			}
-			$('#lessonStateLabel').attr('class', 'badge btn-' + labelColour).html(label + ' <i class="fa-solid fa-angles-down"></i>');
+			$('#lessonStateLabel').attr('class', 'btn btn-sm btn-' + labelColour).html(label + ' <i class="fa-solid fa-angles-down"></i>');
 			
 			// update available options in change state dropdown menu
 			var selectField = $('#lessonStateField');

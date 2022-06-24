@@ -16,6 +16,7 @@
 .toast {
 	border-color: var(--bs-yellow);
 	border-width: 3px;
+	font-size: 1rem;
 }
 
 #confirmationDialog {
@@ -25,6 +26,7 @@
 .monitoring-page-wrapper {
 	position: relative;
 	font-family: mont-regular, sans-serif;
+	border-radius: 0;
 }
 
 .monitoring-page-wrapper ul, .monitoring-page-wrapper ol {
@@ -62,6 +64,8 @@
 .component-sidebar {
 	align-items: center;
 	padding-top: 2rem;
+	padding-bottom: 0;
+	border-radius: 0 0 1.2rem 1.2rem;
 }
 
 .component-sidebar .lams-logo {
@@ -86,16 +90,23 @@
 .component-sidebar .component-menu-btn {
 	width: 3.6rem;
 	height: 100%;
-	padding-left: 3px;
 }
 
-.component-sidebar #edit-lesson-btn {
-	margin-bottom: 1.5rem;
+.component-sidebar .component-menu-btn .navigate-btn-container {
+	margin-bottom: 10px;
+}
+
+.component-sidebar .component-menu-btn a {
+	margin-bottom: 0;
+}
+
+.component-sidebar .component-menu-btn label {
+	display: block;
+	font-size: 15px;
 }
 
 .component-sidebar .lesson-properties {
 	visibility: hidden;
-	height: 100%;
 	padding-left: 2rem;
 	text-align: left;
 }
@@ -117,13 +128,7 @@
 .component-sidebar .lesson-properties #lessonDetails .btn,
 .component-sidebar .lesson-properties #lessonDetails select,
 .component-sidebar .lesson-properties #lessonDetails input[type="text"] {
-	width: 75%;
-}
-
-.component-sidebar .lesson-properties #lessonDetails #lessonStateLabel {
-	font-size: 1rem;
-	font-weight: normal;
-	cursor: pointer;
+	width: 90%;
 }
 
 .component-sidebar .lesson-properties #gradebookOnCompleteButton {
