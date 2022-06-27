@@ -24,7 +24,6 @@
 }
 
 .monitoring-page-wrapper {
-	position: relative;
 	font-family: mont-regular, sans-serif;
 	border-radius: 0;
 }
@@ -62,9 +61,10 @@
 
 
 .component-sidebar {
+	height: initial;
 	align-items: center;
 	padding-top: 2rem;
-	padding-bottom: 0;
+	padding-bottom: 1rem;
 	border-radius: 0 0 1.2rem 1.2rem;
 }
 
@@ -106,22 +106,19 @@
 }
 
 .component-sidebar .lesson-properties {
-	visibility: hidden;
 	padding-left: 2rem;
 	text-align: left;
 }
 
-.component-sidebar .lesson-properties.active {
-	visibility: visible;
-}
-
 .component-sidebar .lesson-properties #lessonDetails {
 	opacity: 0;
-	transition: opacity 0 linear 0;
+	height: 0;
+	transition: height 0s ease 0s;
 }
 
 .component-sidebar .lesson-properties.active #lessonDetails {
 	opacity: 1;
+	height: initial;
 	transition: opacity .3s ease .3s;
 }
 
