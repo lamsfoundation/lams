@@ -103,6 +103,7 @@
 .component-sidebar .component-menu-btn label {
 	display: block;
 	font-size: 15px;
+	white-space: nowrap;
 }
 
 .component-sidebar .lesson-properties {
@@ -113,12 +114,14 @@
 .component-sidebar .lesson-properties #lessonDetails {
 	opacity: 0;
 	height: 0;
+	visibility: hidden;
 	transition: height 0s ease 0s;
 }
 
 .component-sidebar .lesson-properties.active #lessonDetails {
 	opacity: 1;
 	height: initial;
+	visibility: visible;
 	transition: opacity .3s ease .3s;
 }
 

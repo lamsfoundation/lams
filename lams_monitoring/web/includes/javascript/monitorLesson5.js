@@ -82,52 +82,67 @@ function loadTab(tabName, button) {
 	
 	let tabContent = $('.monitoring-page-content .tab-content');
 		
-	if (tabName == 'sequence') {
-		tabContent.load(LAMS_URL + 'monitoring/monitoring/displaySequenceTab.do', function(){
-			openEventSource(LAMS_URL + 'monitoring/monitoring/getLearnerProgressUpdateFlux.do?lessonId=' +  lessonId,
-				function (event) {
-					if ("doRefresh" == event.data && $('#sequence-tab-content').length === 1){
-						updateSequenceTab();
-				}
-			});
-			refreshMonitor('sequence');
-			canvasFitScreen(learningDesignSvgFitScreen, true);
-			$("#load-sequence-tab-btn").addClass('active');
-		});
-	} else if (tabName == 'learners') {
-		tabContent.load(LAMS_URL + 'monitoring/monitoring/displayLearnersTab.do', function(){
-			refreshMonitor('learners');
-		});
-	} else if (tabName == 'gradebook') {
-		tabContent.load(LAMS_URL + 'monitoring/monitoring/displayGradebookTab.do', function(){
-			openEventSource(LAMS_URL + 'monitoring/monitoring/getGradebookUpdateFlux.do?lessonId=' +  lessonId,
-				function (event) {
-					if ("doRefresh" == event.data && $('#gradebookDiv').length === 1){
-					    let expandedGridIds = [],
-							userGrid = $('#userView'),
-							activityGrid = $('#activityView');
-						// do not update if grid is being edited by the teacher
-						if (userGrid.data('isCellEdited') === true || activityGrid.data('isCellEdited') === true) {
-							return;
-						}
-						
-					    $("tr:has(.sgexpanded)", userGrid).each(function () {
-					        let num = $(this).attr('id');
-					        expandedGridIds.push(num);
-					    });
-						userGrid.data('expandedGridIds', expandedGridIds).trigger("reloadGrid");
-						
-						expandedGridIds = [];
-					    $("tr:has(.sgexpanded)", activityGrid).each(function () {
-					        let num = $(this).attr('id');
-					        expandedGridIds.push(num);
-					    });
-						activityGrid.data('expandedGridIds', expandedGridIds).trigger("reloadGrid");
+		
+	switch(tabName) {
+		case 'sequence': {
+			tabContent.load(LAMS_URL + 'monitoring/monitoring/displaySequenceTab.do', function(){
+				openEventSource(LAMS_URL + 'monitoring/monitoring/getLearnerProgressUpdateFlux.do?lessonId=' +  lessonId,
+					function (event) {
+						if ("doRefresh" == event.data && $('#sequence-tab-content').length === 1){
+							updateSequenceTab();
 					}
 				});
-			
-			refreshMonitor('gradebook');
-		});
+				refreshMonitor('sequence');
+				canvasFitScreen(learningDesignSvgFitScreen, true);
+				$("#load-sequence-tab-btn").addClass('active');
+			});
+		}
+		break;
+		
+		case 'learners': {
+			tabContent.load(LAMS_URL + 'monitoring/monitoring/displayLearnersTab.do', function(){
+				refreshMonitor('learners');
+			});
+		}
+		break;
+		
+		case 'gradebook': {
+			tabContent.load(LAMS_URL + 'monitoring/monitoring/displayGradebookTab.do', function(){
+				openEventSource(LAMS_URL + 'monitoring/monitoring/getGradebookUpdateFlux.do?lessonId=' +  lessonId,
+					function (event) {
+						if ("doRefresh" == event.data && $('#gradebookDiv').length === 1){
+						    let expandedGridIds = [],
+								userGrid = $('#userView'),
+								activityGrid = $('#activityView');
+							// do not update if grid is being edited by the teacher
+							if (userGrid.data('isCellEdited') === true || activityGrid.data('isCellEdited') === true) {
+								return;
+							}
+							
+						    $("tr:has(.sgexpanded)", userGrid).each(function () {
+						        let num = $(this).attr('id');
+						        expandedGridIds.push(num);
+						    });
+							userGrid.data('expandedGridIds', expandedGridIds).trigger("reloadGrid");
+							
+							expandedGridIds = [];
+						    $("tr:has(.sgexpanded)", activityGrid).each(function () {
+						        let num = $(this).attr('id');
+						        expandedGridIds.push(num);
+						    });
+							activityGrid.data('expandedGridIds', expandedGridIds).trigger("reloadGrid");
+						}
+					});
+				
+				refreshMonitor('gradebook');
+			});
+		}
+		break;
+		
+		case 'teams': {
+			tabContent.load(LAMS_URL + 'monitoring/tblmonitor/teams.do?lessonID=' + lessonId);
+		}
+		break;
 	}
 }
 
@@ -153,6 +168,10 @@ function initCommonElements(){
 	
 	$('#load-gradebook-tab-btn').click(function(){
 		loadTab('gradebook', this);
+	});
+	
+	$('#load-teams-tab-btn').click(function(){
+		loadTab('teams', this);
 	});
 	
 	$('#load-other-nvg-btn').click(function(){

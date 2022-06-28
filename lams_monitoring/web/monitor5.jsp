@@ -236,22 +236,149 @@
 		</a>
 		
 		<div class="component-menu">
-			<div class="component-menu-btn">
-				<a href="/" class="btn btn-primary" title="<fmt:message key='label.monitoring.return.to.index' />">
-					<i class="fa fa-arrow-left fa-lg"></i>
-				</a>
-				<a id="edit-lesson-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.monitoring.edit.lesson.settings' />">
-					<i class="fa fa-pen fa-lg"></i>
-				</a>
-				<a id="load-sequence-tab-btn" href="#" class="btn btn-primary navigate-btn active" title="<fmt:message key='tab.sequence' />">
-					<i class="fa fa-sitemap fa-lg"></i>
-				</a>
-				<a id="load-learners-tab-btn" href="#" class="btn btn-primary navigate-btn" title="<fmt:message key='tab.learners' />">
-					<i class="fa fa-solid fa-user fa-lg"></i>
-				</a>
-				<a id="load-gradebook-tab-btn" href="#" class="btn btn-primary navigate-btn" title="<fmt:message key='tab.gradebook' />">
-					<i class="fa fa-solid fa-list-ol fa-lg"></i>
-				</a>
+			<div class="component-menu-btn d-flex flex-column align-items-center">
+				<div class="navigate-btn-container">
+					<a id="return-to-index-btn" href="/" class="btn btn-primary" title="<fmt:message key='label.monitoring.return.to.index' />">
+						<i class="fa fa-arrow-left fa-lg"></i>
+					</a>
+					<label for="return-to-index-btn">
+						Return
+					</label>
+				</div>
+								
+				<div class="navigate-btn-container">
+					<a id="load-sequence-tab-btn" href="#" class="btn btn-primary navigate-btn active" title="<fmt:message key='tab.sequence' />">
+						<i class="fa fa-cubes fa-lg"></i>
+					</a>
+					<label for="load-sequence-tab-btn">
+						<fmt:message key='tab.sequence' />
+					</label>
+				</div>
+				
+				<div id="navigate-btn-group" style="display: ${isTBLSequence ? 'none' : ''}">
+					<div class="navigate-btn-container">
+						<a id="edit-lesson-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.monitoring.edit.lesson.settings' />">
+							<i class="fa fa-pen fa-lg"></i>
+						</a>
+						<label for="edit-lesson-btn">
+							Edit
+						</label>
+					</div>
+	
+					<div class="navigate-btn-container">
+						<a id="load-learners-tab-btn" href="#" class="btn btn-primary navigate-btn" title="<fmt:message key='tab.learners' />">
+							<i class="fa fa-solid fa-users fa-lg"></i>
+						</a>
+						<label for="load-learners-tab-btn">
+							<fmt:message key='tab.learners' />
+						</label>
+					</div>
+					
+					<div class="navigate-btn-container">
+						<a id="load-gradebook-tab-btn" href="#" class="btn btn-primary navigate-btn" title="<fmt:message key='tab.gradebook' />">
+							<i class="fa fa-solid fa-list-ol fa-lg"></i>
+						</a>
+						<label for="load-gradebook-tab-btn">
+							<fmt:message key='tab.gradebook' />
+						</label>
+					</div>
+				</div>
+				
+				<c:if test="${isTBLSequence}">
+					<div id="tbl-navigate-btn-group" class="shown">
+						<div class="navigate-btn-container">
+							<a id="load-teams-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.teams' />">
+								<i class="fa fa-people-group fa-lg"></i>
+							</a>
+							<label for="load-teams-tab-btn">
+								<fmt:message key='label.teams' />
+							</label>
+						</div>
+						
+						<c:if test="${not empty isGatesAvailable}">
+							<div class="navigate-btn-container">
+								<a id="load-gates-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.gates' />">
+									<i class="fa fa-sign-in fa-lg"></i>
+								</a>
+								<label for="load-gates-tab-btn">
+									<fmt:message key='label.gates' />
+								</label>
+							</div>
+						</c:if>
+						
+						<c:if test="${not empty isIraMcqAvailable || not empty isIraAssessmentAvailable}">
+							<c:set var="iraMethodName">
+								<c:choose>
+									<c:when test="${not empty isIraMcqAvailable}">iraMcq</c:when>
+									<c:otherwise>iraAssessment</c:otherwise>
+								</c:choose>
+							</c:set>
+							
+							<div class="navigate-btn-container">
+								<a id="load-ira-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.ira' />"
+								   data-method="${iraMethodName}">
+									<i class="fa fa-user fa-lg"></i>
+								</a>
+								<label for="load-ira-tab-btn">
+									<fmt:message key='label.ira' />
+								</label>
+							</div>
+						</c:if>
+						
+						<c:if test="${not empty isScratchieAvailable}">
+							<div class="navigate-btn-container">
+								<a id="load-tra-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.tra' />">
+									<i class="fa fa-users fa-lg"></i>
+								</a>
+								<label for="load-tra-tab-btn">
+									<fmt:message key='label.tra' />
+								</label>
+							</div>
+							
+							<div class="navigate-btn-container">
+								<a id="load-burning-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.burning.questions' />">
+									<i class="fa fa-question-circle fa-lg"></i>
+								</a>
+								<label for="load-burning-tab-btn">
+									Burning Qs
+								</label>
+							</div>
+						</c:if>
+						
+						<c:if test="${not empty isAeAvailable}">
+							<div class="navigate-btn-container">
+								<a id="load-aes-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.aes' />">
+									<i class="fa fa-dashboard fa-lg"></i>
+								</a>
+								<label for="load-aes-tab-btn">
+									<fmt:message key='label.aes' />
+								</label>
+							</div>
+						</c:if>
+						
+						<c:if test="${not empty isPeerreviewAvailable}">
+							<div class="navigate-btn-container">
+								<a id="load-peer-review-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.peer.review' />">
+									<i class="fa fa-users fa-lg"></i>
+								</a>
+								<label for="load-aes-tab-btn">
+									<fmt:message key='label.peer.review' />
+								</label>
+							</div>
+						</c:if>
+					</div>
+					
+					<div class="navigate-btn-container">
+						<a id="load-other-nvg-btn" class="btn btn-primary" href="#" title="Show remaining options">
+							<i class="fa fa-angles-up fa-lg"></i>
+						</a>
+						<label for="load-teams-tab-btn">
+							Other
+						</label>
+					</div>
+				</c:if>
+				
+
 			</div>
 			
 			<div class="lesson-properties">
