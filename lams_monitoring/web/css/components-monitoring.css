@@ -52,6 +52,10 @@
 	text-decoration: none;
 }
 
+.monitoring-page-wrapper .card-header {
+	background-color: var(--bs-gray-200);
+}
+
 .monitoring-page-content {
 	min-height: 100%;
 	padding: 2rem 4.8rem 2rem 8rem;
@@ -109,19 +113,21 @@
 .component-sidebar .lesson-properties {
 	padding-left: 2rem;
 	text-align: left;
+	visibility: hidden;
+	height: 0;
+}
+
+.component-sidebar .lesson-properties.active {
+	visibility: visible;
+	height: initial;
 }
 
 .component-sidebar .lesson-properties #lessonDetails {
 	opacity: 0;
-	height: 0;
-	visibility: hidden;
-	transition: height 0s ease 0s;
 }
 
 .component-sidebar .lesson-properties.active #lessonDetails {
 	opacity: 1;
-	height: initial;
-	visibility: visible;
 	transition: opacity .3s ease .3s;
 }
 
@@ -143,7 +149,6 @@
 .monitoring-page-wrapper #lesson-name {
 	margin-left: 4rem;
 }
-
 
 .monitoring-page-wrapper #sequence-tab-content {
 	text-align: center;	
@@ -1246,3 +1251,4 @@ body.component .portrait-round {
 .table-hover > tbody > tr:hover > * {
 	--bs-table-accent-bg: var(--bs-gray-200);
 }
+

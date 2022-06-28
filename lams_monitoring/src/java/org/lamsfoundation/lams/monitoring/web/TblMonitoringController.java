@@ -282,7 +282,7 @@ public class TblMonitoringController {
 	    request.setAttribute("chartNamesDataset", chartNamesDataset.toString());
 	}
 
-	return "tblmonitor/teams";
+	return "tblmonitor/teams5";
     }
 
     /**
@@ -324,7 +324,7 @@ public class TblMonitoringController {
 	}
 
 	request.setAttribute("permissionGates", permissionGates);
-	return "tblmonitor/gates";
+	return "tblmonitor/gates5";
     }
 
     /**
