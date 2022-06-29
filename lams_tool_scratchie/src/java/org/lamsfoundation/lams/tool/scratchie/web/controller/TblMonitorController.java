@@ -212,6 +212,6 @@ public class TblMonitorController {
 		: scratchieService.getItemsWithIndicatedScratches(user.getSession().getSessionId());
 
 	request.setAttribute("scratchieItems", scratchieItems);
-	return "pages/tblmonitoring/teams";
+	return "pages/tblmonitoring/teams5";
     }
 }

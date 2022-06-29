@@ -2435,8 +2435,6 @@ function updateLearnersTab(){
 		},
 		'dataType' : 'json',
 		'success'  : function(response) {
-			let learnerProgressSource = null;
-			
 			$(response.learners).each(function(){
 				let learner = this,
 					itemHeaderId = 'learners-accordion-heading-' + learner.id,
@@ -2742,6 +2740,8 @@ function refreshMonitor(){
 		tabName = 'learners';
 	} else if ($('#gradebookDiv').length === 1){
 		tabName = 'gradebook';
+	} else if ($('#tbl-teams-tab-content').length == 1) {
+		tabName = 'teams';
 	}
 	
 	if (tabName == 'sequence'){
@@ -2750,6 +2750,8 @@ function refreshMonitor(){
 		updateLearnersTab();
 	} else if (tabName == 'gradebook'){
 		updateGradebookTab();
+	} else if (tabName == 'teams'){
+		loadTab('teams');
 	}
 }
 

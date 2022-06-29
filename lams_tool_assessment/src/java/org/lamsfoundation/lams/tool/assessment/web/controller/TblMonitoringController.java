@@ -49,9 +49,6 @@ public class TblMonitoringController {
     @Qualifier("laasseAssessmentService")
     private IAssessmentService assessmentService;
 
-    @Autowired
-    private ILearnerService learnerService;
-
     /**
      * Shows ira page in case of Assessment activity
      */
@@ -352,7 +349,7 @@ public class TblMonitoringController {
 	AssessmentResultDTO result = assessmentService.getUserMasterDetail(user.getSession().getSessionId(), userId);
 	request.setAttribute(AssessmentConstants.ATTR_ASSESSMENT_RESULT, result);
 
-	return "pages/tblmonitoring/teams";
+	return "pages/tblmonitoring/teams5";
     }
 
 }

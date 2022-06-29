@@ -1,7 +1,9 @@
 <%@ include file="/taglibs.jsp"%>
 <style>
 	
-	#tbl-teams-tab-content .card-header {
+	#tbl-teams-tab-content .card-header,
+	#tbl-teams-tab-content a.card-title,
+	#tbl-teams-tab-content a.ira-modal-link {
 	   	cursor: pointer;
 	}
 	
@@ -34,13 +36,13 @@
 						datasets : [ {
 							label: "<fmt:message key='label.ira' />",
 							data : summaryChartIraDataset,
-							backgroundColor : 'rgba(255, 195, 55, 1)'
+							backgroundColor : 'rgba(249, 248, 113, 0.85)'
 											  
 						},
 						{
 							label: "<fmt:message key='label.tra' />",
 							data : summaryChartTraDataset,
-							backgroundColor : 'rgba(5, 204, 214, 1)'
+							backgroundColor : 'rgba(1, 117, 226, 0.85)'
 											  
 						}],
 						labels : summaryChartNamesDataset
@@ -109,13 +111,13 @@
 					datasets : [ {
 						label: "iRAT",
 						data : iraScores,
-						backgroundColor : 'rgba(255, 195, 55, 1)'
+						backgroundColor : 'rgba(249, 248, 113, 0.85)'
 										  
 					},
 					{
 						label: "tRAT",
 						data : traScores,
-						backgroundColor : 'rgba(5, 204, 214, 1)'
+						backgroundColor : 'rgba(1, 117, 226, 0.85)'
 										  
 					}],
 					labels : userNames
@@ -162,7 +164,8 @@
 			$('#ira-correct-answer-count').html(userScore);
 
 			//load modal dialog content using Ajax
-			var url = "${isIraMcqAvailable}" == "true" ? "<lams:LAMSURL/>tool/lamc11/tblmonitoring/getModalDialogForTeamsTab.do" : "<lams:LAMSURL/>tool/laasse10/tblmonitoring/getModalDialogForTeamsTab.do";
+			var url = "${isIraMcqAvailable}" == "true" ? "<lams:LAMSURL/>tool/lamc11/tblmonitoring/getModalDialogForTeamsTab.do" 
+													   : "<lams:LAMSURL/>tool/laasse10/tblmonitoring/getModalDialogForTeamsTab.do";
 			$('#ira-modal .modal-body').load(
 				url, 
 				{
@@ -206,13 +209,20 @@
 		});
 
 		$('[data-toggle="tooltip"]').tooltip();
+
+		if (sequenceSearchedLearner) {
+			 $('html,body').animate({scrollTop: $('#user-name-' + sequenceSearchedLearner).offset().top},'slow');
+		}
 	});
 
 	function showChangeLeaderModal(groupID) {
-		$('#change-leader-modals').empty()
+		var modalContainer = $('#change-leader-modals');
+		modalContainer.empty()
 		.load('<lams:LAMSURL/>tool/lalead11/monitoring/displayChangeLeaderForGroupDialog.do',{
 			leaderSelectionToolContentId : '${leaderSelectionToolContentId}',
 			groupId : groupID
+		}, function(){
+			modalContainer.children('.modal').modal('show');
 		});
 	}
 
@@ -442,7 +452,7 @@
 										<h5 class="card-title"><fmt:message key="label.tra.correct.count"/>: ${groupDto.traCorrectAnswerCount}</h5>
 									</c:when>
 									<c:otherwise>
-										<a data-toggle="modal" href="#tra-modal"
+										<a data-bs-toggle="modal" data-bs-target="#tra-modal"
 										   data-user-id="${groupDto.groupLeader.userID}"
 										   data-tra-correct-answer-count="${groupDto.traCorrectAnswerCount}"
 										   class="card-title text-decoration-none">
@@ -485,13 +495,13 @@
 											<c:forEach var="userDto" items="${groupDto.userList}">
 											
 												<tr>
-													<td class="">
+													<td>
 														<c:choose>
 															<c:when test="${empty userDto.iraCorrectAnswerCount}">
 																<c:out value="${userDto.lastName}" />,&nbsp;<c:out value="${userDto.firstName}" />
 															</c:when>
 															<c:otherwise>
-																<a data-toggle="modal" href="#ira-modal"
+																<a class="text-decoration-none ira-modal-link" data-bs-toggle="modal" data-bs-target="#ira-modal"
 																   data-user-id="${userDto.userID}"
 																   data-ira-correct-answer-count="${userDto.iraCorrectAnswerCount}">
 																	<span id="user-name-${userDto.userID}" class="belong-to-group-${groupDto.groupID} new-popover <c:if test="${userDto.groupLeader}">fw-bold</c:if>" 
@@ -502,7 +512,7 @@
 															</c:otherwise>
 														</c:choose>
 														<c:if test="${userDto.groupLeader}">
-															<abbr title="Leader" class="fa fa-user-plus" style="color:darkorange"></abbr>
+															<abbr title="Leader" class="fa fa-user-plus" style="color: var(--bs-red)"></abbr>
 														</c:if>
 													</td>
 													
@@ -512,7 +522,7 @@
 																-													
 															</c:when>
 															<c:otherwise>
-																<a data-toggle="modal" href="#ira-modal"
+																<a class="text-decoration-none ira-modal-link" data-bs-toggle="modal" data-bs-target="#ira-modal"
 																		data-user-id="${userDto.userID}"
 																		data-ira-correct-answer-count="${userDto.iraCorrectAnswerCount}">
 																	${userDto.iraCorrectAnswerCount}
@@ -628,15 +638,10 @@
 <div class="modal-dialog">
 <div class="modal-content">
 	<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal">
-			<span aria-hidden="true"><i class="fa fa-close"></i></span>
-			<span class="sr-only">
-				<fmt:message key="button.close"/>
-			</span>
-		</button>
 		<h4 class="modal-title" id="exampleModalLabel">
 			<fmt:message key="label.bar.chart"/>
 		</h4>
+		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 	</div>
           
 	<div class="modal-body">
@@ -653,20 +658,20 @@
 <div class="modal-content">
 
 	<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-close"></i></button>
-		<h4 class="modal-title">
-			<fmt:message key="label.ira.responses.for"/>: <span id="ira-user-name-label"></span> 
-		</h4>
-		<fmt:message key="label.ira.correct.count"/>: <span id="ira-correct-answer-count"></span>
+		<div class="modal-title">
+			<h4>
+				<fmt:message key="label.ira.responses.for"/>: <span id="ira-user-name-label"></span> 
+			</h4>
+			<fmt:message key="label.ira.correct.count"/>: <span id="ira-correct-answer-count"></span>
+		</div>
+		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 	</div>
           
-	<!-- Begin -->
 	<div class="modal-body">
 	</div>
-	<!-- end -->  
 	
 	<div class="modal-footer">	
-		<a href="#" data-dismiss="modal" class="btn btn-default">
+		<a href="#" data-bs-dismiss="modal" class="btn btn-primary">
 			<fmt:message key="button.ok"/>
 		</a>
 	</div>
@@ -682,11 +687,13 @@
 <div class="modal-content">
 
 	<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-close"></i></button>
-		<h4 class="modal-title">
-			<fmt:message key="label.tra.responses.for"/>: <span id="tra-user-name-label"></span> 
-		</h4>
-		<fmt:message key="label.tra.correct.count"/>: <span id="tra-correct-answer-count"></span>
+		<div class="modal-title">
+			<h4>
+				<fmt:message key="label.tra.responses.for"/>: <span id="tra-user-name-label"></span> 
+			</h4>
+			<fmt:message key="label.tra.correct.count"/>: <span id="tra-correct-answer-count"></span>
+		</div>
+		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 	</div>
           
 	<!-- Begin -->
@@ -695,7 +702,7 @@
 	<!-- end -->  
 	
 	<div class="modal-footer">	
-		<a href="#" data-dismiss="modal" class="btn btn-primary">
+		<a href="#" data-bs-dismiss="modal" class="btn btn-primary">
 			<fmt:message key="button.ok"/>
 		</a>
 	</div>
