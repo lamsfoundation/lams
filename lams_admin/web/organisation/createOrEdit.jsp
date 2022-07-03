@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <%@ include file="/taglibs.jsp"%>
 
+<c:set var="webAppUrl"><lams:WebAppURL /></c:set>
+
 <lams:html>
 <lams:head>
 	<c:set var="title"><fmt:message key="admin.organisation.entry"/></c:set>
@@ -37,7 +39,7 @@
     
 <body class="stripes">
 	<lams:Page type="admin" title="${title}" formID="organisationForm">
-		<form:form action="../orgsave.do" method="post" modelAttribute="organisationForm" id="organisationForm" onsubmit="return warnIfRemoved()">
+		<form:form action="${webAppUrl}orgsave.do" method="post" modelAttribute="organisationForm" id="organisationForm" onsubmit="return warnIfRemoved()">
 			    <input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 				<form:hidden path="orgId" />
 				<form:hidden path="parentId" />
@@ -142,7 +144,6 @@
 						<div class="checkbox">
 							<label for="enable-live-edit">
 							<form:checkbox path="enableLiveEdit" id="enable-live-edit"/>
-							<input type="hidden" name="enableLiveEdit" value="false">
 								<fmt:message key="config.live.edit"/>
 							</label>
 						</div>
