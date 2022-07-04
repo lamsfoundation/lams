@@ -121,7 +121,6 @@ public class SignupManagementController {
 		signup.setBlurb(signupForm.getBlurb());
 		signup.setContext(signupForm.getContext());
 		userManagementService.save(signup);
-		SignupManagementController.log.warn("Signup page added/updated! Coursekey: " + signupForm.getCourseKey());
 
 		return "forward:/signupManagement/start.do";
 	    }
@@ -141,7 +140,6 @@ public class SignupManagementController {
 	Integer soid = WebUtil.readIntParam(request, "soid");
 
 	if (soid != null && soid > 0) {
-		SignupManagementController.log.warn("Signup page deleted! soid: " + soid);
 	    userManagementService.deleteById(SignupOrganisation.class, soid);
 	}
 

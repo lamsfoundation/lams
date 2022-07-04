@@ -23,7 +23,7 @@
 package org.lamsfoundation.lams.admin.web.controller;
 
 import java.util.ArrayList;
-import org.apache.log4j.Logger;
+
 import org.lamsfoundation.lams.timezone.Timezone;
 import org.lamsfoundation.lams.timezone.dto.TimezoneDTO;
 import org.lamsfoundation.lams.timezone.service.ITimezoneService;
@@ -41,7 +41,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @RequestMapping("/timezonemanagement")
 public class TimezoneManagementController {
-	private static Logger log = Logger.getLogger(TimezoneManagementController.class);
 
     @Autowired
     private ITimezoneService timezoneService;
@@ -70,7 +69,6 @@ public class TimezoneManagementController {
     @RequestMapping(path = "/changeServerTimezone")
     public String changeServerTimezone(@RequestParam String serverTimezone) throws Exception {
 	timezoneService.setServerTimezone(serverTimezone);
-	TimezoneManagementController.log.warn("Server timezone changed!");
 
 	return "forward:start.do?saved=true";
     }
