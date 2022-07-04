@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.web.form.ExtServerForm;
 import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
@@ -52,6 +53,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 @RequestMapping("/extserver")
 public class ExtServerManagementController {
+	private static Logger log = Logger.getLogger(ExtServerManagementController.class);
 
     @Autowired
     private IIntegrationService integrationService;
@@ -140,6 +142,7 @@ public class ExtServerManagementController {
 	    }
 	}
 
+	String extServerStatus;
 	if (errorMap.isEmpty()) {
 	    ExtServer map = null;
 	    if (sid.equals(-1)) {
@@ -147,11 +150,15 @@ public class ExtServerManagementController {
 		BeanUtils.copyProperties(map, extServerForm);
 		map.setSid(null);
 		map.setServerTypeId(ExtServer.INTEGRATION_SERVER_TYPE);
+		extServerStatus = "added";
+		// ExtServerManagementController.log.warn("Integration server added! key: " + extServerForm.getServerkey() + " name: " + extServerForm.getServername());
 	    } else {
 		map = integrationService.getExtServer(sid);
 		BeanUtils.copyProperties(map, extServerForm);
+		extServerStatus = "updated";
 	    }
 	    integrationService.saveExtServer(map);
+		ExtServerManagementController.log.warn("Integration server " + extServerStatus + "! key: " + extServerForm.getServerkey() + " name: " + extServerForm.getServername());
 	    return "forward:/extserver/serverlist.do";
 	} else {
 	    request.setAttribute("errorMap", errorMap);
@@ -165,6 +172,7 @@ public class ExtServerManagementController {
 	ExtServer map = integrationService.getExtServer(sid);
 	map.setDisabled(true);
 	integrationService.saveExtServer(map);
+	ExtServerManagementController.log.warn("Integration server disabled! key:  " + map.getServerkey());
 	return "redirect:/extserver/serverlist.do";
     }
 
@@ -174,12 +182,15 @@ public class ExtServerManagementController {
 	ExtServer map = integrationService.getExtServer(sid);
 	map.setDisabled(false);
 	integrationService.saveExtServer(map);
+	ExtServerManagementController.log.warn("Integration server enabled! key:  " + map.getServerkey());
 	return "redirect:/extserver/serverlist.do";
     }
 
     @RequestMapping(path = "/delete", method = RequestMethod.POST)
     public String delete(HttpServletRequest request) throws Exception {
 	Integer sid = WebUtil.readIntParam(request, "sid", false);
+	ExtServer map = integrationService.getExtServer(sid);
+	ExtServerManagementController.log.warn("Integration server deleted! key:  " + map.getServerkey());
 	userManagementService.deleteById(ExtServer.class, sid);
 	return "redirect:/extserver/serverlist.do";
     }

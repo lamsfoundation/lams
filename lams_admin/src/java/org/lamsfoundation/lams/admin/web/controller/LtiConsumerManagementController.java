@@ -124,6 +124,7 @@ public class LtiConsumerManagementController {
 	ExtServer ltiConsumer = integrationService.getExtServer(sid);
 	ltiConsumer.setDisabled(disable);
 	integrationService.saveExtServer(ltiConsumer);
+	LtiConsumerManagementController.log.warn("LTI integration disabled! Sid: " + sid );
 
 	return start(request);
     }
@@ -135,6 +136,7 @@ public class LtiConsumerManagementController {
     public String delete(HttpServletRequest request) throws Exception {
 	Integer sid = WebUtil.readIntParam(request, "sid", true);
 	userManagementService.deleteById(ExtServer.class, sid);
+	LtiConsumerManagementController.log.warn("LTI integration deleted! Sid: " + sid );
 
 	return start(request);
     }
@@ -198,6 +200,7 @@ public class LtiConsumerManagementController {
 	    }
 	}
 
+	String extServerStatus;
 	if (errorMap.isEmpty()) {
 	    ExtServer ltiConsumer = null;
 	    if (sid.equals(-1)) {
@@ -206,10 +209,12 @@ public class LtiConsumerManagementController {
 		ltiConsumer.setSid(null);
 		ltiConsumer.setServerTypeId(ExtServer.LTI_CONSUMER_SERVER_TYPE);
 		ltiConsumer.setUserinfoUrl("blank");
+		extServerStatus = "added";
 
 	    } else {
 		ltiConsumer = integrationService.getExtServer(sid);
 		BeanUtils.copyProperties(ltiConsumer, ltiConsumerForm);
+		extServerStatus = "updated";
 	    }
 	    ltiConsumer.setTimeToLiveLoginRequestEnabled(false);
 
@@ -218,6 +223,8 @@ public class LtiConsumerManagementController {
 	    ltiConsumer.setDefaultLocale(locale);
 
 	    integrationService.saveExtServer(ltiConsumer);
+		LtiConsumerManagementController.log.warn("LTI integration " + extServerStatus + "! ServerName: " + ltiConsumerForm.getServerkey() );
+
 	    return start(request);
 
 	} else {

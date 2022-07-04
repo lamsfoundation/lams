@@ -32,6 +32,7 @@ import java.nio.charset.Charset;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.web.form.LoginMaintainForm;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -46,6 +47,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 public class LoginSaveController {
+	private static Logger log = Logger.getLogger(LoginSaveController.class);
 
     private static final String NEWS_PAGE_PATH_SUFFIX = File.separatorChar + "lams-www.war" + File.separatorChar
 	    + "news.html";
@@ -61,6 +63,7 @@ public class LoginSaveController {
 	    bWriter = new BufferedWriter(ow);
 	    bWriter.write(loginMaintainForm.getNews());
 	    bWriter.flush();
+		LoginSaveController.log.warn("Login Page changed!");
 	} finally {
 	    if (bWriter != null) {
 		bWriter.close();

@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.web.form.ConfigForm;
 import org.lamsfoundation.lams.config.ConfigurationItem;
 import org.lamsfoundation.lams.logevent.LogEvent;
@@ -53,6 +54,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  */
 @Controller
 public class ConfigController {
+	private static Logger log = Logger.getLogger(ConfigController.class);
 
     @Autowired
     private Configuration configuration;
@@ -134,6 +136,7 @@ public class ConfigController {
 	    String changeLogString = changeLog.insert(0, "Configuration changed: ").substring(0,
 		    changeLog.length() - 2);
 	    logEventService.logEvent(LogEvent.TYPE_CONFIG_CHANGE, getUserId(), null, null, null, changeLogString);
+		ConfigController.log.warn(changeLogString + " by UserId : " +  getUserId());	
 	}
 
 	Configuration.refreshCache();
