@@ -268,7 +268,7 @@
 			<c:choose>
 				<c:when test="${isGroupedActivity}">
 					<%-- iframe is loaded on collapse panel open --%>
-					data-src=
+					data-src
 				</c:when>
 				<c:otherwise>
 					<%-- iframe is loaded on page open --%>
