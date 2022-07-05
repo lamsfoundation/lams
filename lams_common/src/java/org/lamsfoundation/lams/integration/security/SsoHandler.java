@@ -43,6 +43,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.owasp.csrfguard.CsrfValidator;
@@ -71,6 +72,7 @@ public class SsoHandler implements ServletExtension {
     private static IUserManagementService userManagementService = null;
 
     private static Logger log = Logger.getLogger(SsoHandler.class);
+    private static Logger auditLogger = Logger.getLogger(AuditLogFilter.class);
 
     private static final String REDIRECT_KEY = "io.undertow.servlet.form.auth.redirect.location";
     static final String KEEP_SESSION_ID_KEY = "lams.keepSessionId";
@@ -253,9 +255,7 @@ public class SsoHandler implements ServletExtension {
 		    user.setFailedAttempts(failedAttempts);
 
 		    if (log.isDebugEnabled()) {
-			if (log.isDebugEnabled()) {
-			    log.debug("User " + loggedInLogin + "with login \"" + login + "\" failed to authenticate.");
-			}
+			log.debug("User " + loggedInLogin + "with login \"" + login + "\" failed to authenticate.");
 		    }
 
 		    if (failedAttempts >= failedAttemptsConfig) {
@@ -264,17 +264,22 @@ public class SsoHandler implements ServletExtension {
 			Long currentTimeMillis = System.currentTimeMillis();
 			Date date = new Date(currentTimeMillis + lockOutTimeMillis);
 			user.setLockOutTime(date);
-			String message = new StringBuilder("User ").append(user.getLogin()).append(" (")
-				.append(user.getUserId()).append(") is locked out for ")
+
+			String messageSuffix = new StringBuilder().append(" (").append(user.getUserId())
+				.append(") is locked out for ")
 				.append(Configuration.getAsInt(ConfigurationKeys.LOCK_OUT_TIME)).append(" mins after ")
 				.append(failedAttempts).append(" failed attempts.").toString();
+			String message = new StringBuilder("User ").append(user.getLogin()).append(messageSuffix)
+				.toString();
 			SsoHandler.getLogEventService(session.getServletContext()).logEvent(
 				LogEvent.TYPE_ACCOUNT_LOCKED, user.getUserId(), user.getUserId(), null, null, message);
 
+			message = new StringBuilder().append("\"").append(user.getLogin()).append("\"")
+				.append(user.getUserId()).append(messageSuffix).toString();
+			auditLogger.info(message);
+
 			if (log.isDebugEnabled()) {
-			    if (log.isDebugEnabled()) {
-				log.debug(message);
-			    }
+			    log.debug(message);
 			}
 		    }
 
