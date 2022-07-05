@@ -20,16 +20,16 @@ import org.springframework.web.filter.OncePerRequestFilter;
  *
  * @author Marcin Cieslak
  */
-public class SecurityLogFilter extends OncePerRequestFilter {
+public class AuditLogFilter extends OncePerRequestFilter {
 
-    private static final Logger log = Logger.getLogger(SecurityLogFilter.class);
+    private static final Logger log = Logger.getLogger(AuditLogFilter.class);
 
     @Override
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 	    throws IOException, ServletException {
 	try {
 	    // look for user information
-	    UserDTO user = SecurityLogFilter.getUserDto();
+	    UserDTO user = AuditLogFilter.getUserDto();
 	    StringBuilder logMessageBuilder = new StringBuilder();
 	    if (user == null) {
 		logMessageBuilder.append("Unauthenticated user ");
@@ -67,7 +67,7 @@ public class SecurityLogFilter extends OncePerRequestFilter {
 
 	    log.info(logMessageBuilder);
 	} catch (Exception e) {
-	    log.error("Exception while logging to security log", e);
+	    log.error("Exception while logging to audit log", e);
 	}
 
 	chain.doFilter(request, response);

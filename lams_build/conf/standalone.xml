@@ -142,12 +142,12 @@
                 <append value="true" />
             </size-rotating-file-handler>
             
-            <periodic-rotating-file-handler name="LAMSSECURITY"
+            <periodic-rotating-file-handler name="LAMSAUDIT"
                 autoflush="true">
                 <formatter>
-                    <named-formatter name="LAMSSECURITYPATTERN" />
+                    <named-formatter name="LAMSAUDITPATTERN" />
                 </formatter>
-                <file relative-to="jboss.server.log.dir" path="security.log" />
+                <file relative-to="jboss.server.log.dir" path="auditlams.log" />
                 <suffix value="'.'yyyy-MM-dd" />
                 <append value="true" />
             </periodic-rotating-file-handler>
@@ -163,7 +163,7 @@
                 <pattern-formatter
                     pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} [%t:%x] %-5p %c - %m%n" />
             </formatter>
-            <formatter name="LAMSSECURITYPATTERN">
+            <formatter name="LAMSAUDITPATTERN">
                 <pattern-formatter
                     pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} %m%n" />
             </formatter>
@@ -277,10 +277,10 @@
                 </handlers>
             </logger>
             
-            <logger category="org.lamsfoundation.lams.web.filter.SecurityLogFilter" use-parent-handlers="false">
+            <logger category="org.lamsfoundation.lams.web.filter.AuditLogFilter" use-parent-handlers="false">
                 <level name="INFO" />
                 <handlers>
-                    <handler name="LAMSSECURITY" />
+                    <handler name="LAMSAUDIT" />
                 </handlers>
             </logger>
             
