@@ -255,7 +255,7 @@ public class GateController {
 		return "gate/passwordGateContent";
 	    }
 
-	    return "gate/permissionGateContent";
+	    return "gate/permissionGateContent5";
 	} else {
 	    throw new MonitoringServiceException("Invalid gate activity. " + "gate id [" + gate.getActivityId()
 		    + "] - the type [" + gate.getActivityTypeId() + "] is not a gate type");

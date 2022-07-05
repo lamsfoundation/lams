@@ -1252,3 +1252,10 @@ body.component .portrait-round {
 	--bs-table-accent-bg: var(--bs-gray-200);
 }
 
+.gate-card .card-body {
+	height: 80px;
+}
+
+.gate-opened-icon {
+	cursor: pointer;
+}

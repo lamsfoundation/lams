@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <%@ include file="/taglibs.jsp"%>
+
+<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
+
 <lams:html>
 <head>
 	<meta charset="utf-8" />
@@ -25,6 +28,8 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.cookie.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.timeago.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/popper.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable5.js"></script>

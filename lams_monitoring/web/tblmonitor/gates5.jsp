@@ -1,11 +1,7 @@
 <%@ include file="/taglibs.jsp"%>
 
-<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.timeago.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
-
 <script type="text/javascript">
-	$(document).ready(function() {$("time.timeago").timeago();});
+	$(document).ready(function() {$("time.timeago").timeago();}); 
 	
 
 	function openGateNow(activityId) {
@@ -18,55 +14,76 @@
 			'url'  : '<lams:LAMSURL/>monitoring/gate/openGate.do',
 			'data'  : data,
 			'success' : function(){
-				refresh();
+				loadTab('gates');
 			}
 		});
 	}
+
+	function openGateSelectively(url){
+		showDialog("dialogGate", {
+			'autoOpen'  : true,
+			'height'    : 820,
+			'modal'     : false,
+			'resizable' : false,
+			'title'     : '<fmt:message key="button.task.gate.open"/>',
+			'open'      : function(){
+				var dialog = $(this);
+				// load contents after opening the dialog
+				$('iframe', dialog).attr('src', url);
+			},
+			'close' : function(){
+				loadTab('gates');
+			}
+		}, false, true).addClass('modal-lg');
+	}
+	
 </script>
 
-<!-- Header -->
-<div class="row no-gutter">
-	<div class="col-xs-12 col-md-12 col-lg-8">
-		<h3>
-			<fmt:message key="label.gates"/>
-		</h3>
-	</div>
-</div>
-<!-- End header -->
+
 
 <!-- Tables -->
-<div class="row no-gutter">
-<div class="col-xs-12 col-md-12 col-lg-12">
-
+<div class="text-center">
+	<h3>
+		<fmt:message key="label.gates"/>
+	</h3>
+	
 	<c:forEach var="permissionGate" items="${permissionGates}">
-			
-		<div class="panel panel-default">
-			<div class="panel-heading">
-			</div>
-			
-			<div class="panel-body">
-				<c:out value="${permissionGate.title}" escapeXml="false"/>
+		<div class="card w-50 mb-3 d-inline-block text-start gate-card">
+			<div class="card-body">
+				<span class="card-title"><c:out value="${permissionGate.title}" escapeXml="false"/></span>
 				<c:choose>
 					<c:when test="${permissionGate.complete}">
+						<i class="fa fa-check-square gate-opened-icon fs-3 text-success float-end mt-2" 
+						   onClick="javascript:openGateSelectively('${permissionGate.url}')"
+						   title="<fmt:message key='button.task.gate.opened.tooltip'/>"></i>
 						<br />
 						<small>
-						<fmt:message key="label.gate.gate.open"/>
-						<c:if test="${not empty permissionGate.openTime}">
-							&nbsp;<lams:Date value="${permissionGate.openTime}" timeago="true" />
-						</c:if>
-						<c:if test="${not empty permissionGate.openUser}">
-							&nbsp;<fmt:message key="label.gate.gate.open.user">
-								<fmt:param value="${permissionGate.openUser}" />
-							</fmt:message>
-						</c:if>
+							<fmt:message key="label.gate.gate.open"/>
+							<c:if test="${not empty permissionGate.openTime}">
+								&nbsp;<lams:Date value="${permissionGate.openTime}" timeago="true" />
+							</c:if>
+							<c:if test="${not empty permissionGate.openUser}">
+								&nbsp;<fmt:message key="label.gate.gate.open.user">
+									<fmt:param value="${permissionGate.openUser}" />
+								</fmt:message>
+							</c:if>
 						</small>
-						<i class="fa fa-check-square" 
-						   onClick="javascript:openPopUp('${permissionGate.url}','ContributeActivity', 600, 800, true)"
-						   title="<fmt:message key='button.task.gate.opened.tooltip'/>"></i>
+
 					</c:when>
 					<c:otherwise>
+						<button type="button" class="btn btn-sm btn-primary float-end ms-3 mt-2"
+								title="<fmt:message key='button.task.gate.open.tooltip'/>"
+								onClick="javascript:openGateSelectively('${permissionGate.url}')">
+							<fmt:message key="button.task.gate.open"/>
+						</button>
+						<button type="button" class="btn btn-sm btn-primary float-end mt-2"
+								title="<fmt:message key='button.task.gate.open.now.tooltip'/>"
+								onClick="javascript:openGateNow(${permissionGate.activityID})">
+							<fmt:message key="button.task.gate.open.now"/>
+						</button>
+						
 						<c:if test="${permissionGate.waitingLearnersCount > 0}">
-							<br/>
+							<br />
 							<small class="m-r">
 								<i class="fa fa-users fa-users-at-gate"></i>
 													 
@@ -75,17 +92,6 @@
 								</fmt:message>
 							</small>
 						</c:if>
-
-						<button type="button" class="btn btn-sm btn-primary pull-right loffset10"
-								title="<fmt:message key='button.task.gate.open.tooltip'/>"
-								onClick="javascript:openPopUp('${permissionGate.url}','ContributeActivity', 600, 800, true)">
-							<fmt:message key="button.task.gate.open"/>
-						</button>
-						<button type="button" class="btn btn-sm btn-primary pull-right"
-								title="<fmt:message key='button.task.gate.open.now.tooltip'/>"
-								onClick="javascript:openGateNow(${permissionGate.activityID})">
-							<fmt:message key="button.task.gate.open.now"/>
-						</button>
 					</c:otherwise>
 				</c:choose>
 						
@@ -93,6 +99,4 @@
 		</div>			
 			
 	</c:forEach> 
-
-</div>
 </div>

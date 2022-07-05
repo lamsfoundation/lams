@@ -143,6 +143,11 @@ function loadTab(tabName, button) {
 			tabContent.load(LAMS_URL + 'monitoring/tblmonitor/teams.do?lessonID=' + lessonId);
 		}
 		break;
+		
+		case 'gates': {
+			tabContent.load(LAMS_URL + 'monitoring/tblmonitor/gates.do?lessonID=' + lessonId);
+		}
+		break;
 	}
 }
 
@@ -172,6 +177,10 @@ function initCommonElements(){
 	
 	$('#load-teams-tab-btn').click(function(){
 		loadTab('teams', this);
+	});
+	
+	$('#load-gates-tab-btn').click(function(){
+		loadTab('gates', this);
 	});
 	
 	$('#load-other-nvg-btn').click(function(){
@@ -2752,6 +2761,8 @@ function refreshMonitor(){
 		updateGradebookTab();
 	} else if (tabName == 'teams'){
 		loadTab('teams');
+	} else if (tabName == 'gates'){
+		loadTab('gates');
 	}
 }
 
