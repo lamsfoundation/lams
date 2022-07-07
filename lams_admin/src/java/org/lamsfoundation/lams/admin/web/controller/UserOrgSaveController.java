@@ -42,6 +42,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class UserOrgSaveController {
     private static Logger log = Logger.getLogger(UserOrgSaveController.class);
+    private static Logger auditLogger = Logger.getLogger(AuditLogFilter.class);
 
     @Autowired
     private IUserManagementService userManagementService;
@@ -68,6 +70,8 @@ public class UserOrgSaveController {
 	Integer orgId = userOrgForm.getOrgId();
 	request.setAttribute("org", orgId);
 
+	UserDTO loggedInUser = ((UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER));
+
 	boolean canEditRole = false;
 
 	// sysadmin, global course admins can add/change users and their roles.
@@ -79,8 +83,6 @@ public class UserOrgSaveController {
 	    canEditRole = true;
 	} else {
 
-	    Integer loggeduserId = ((UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER))
-		    .getUserID();
 	    Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, orgId);
 	    if (organisation == null) {
 		String message = "Adding users to organisation: No permission to access organisation " + orgId;
@@ -91,8 +93,8 @@ public class UserOrgSaveController {
 	    if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
 		organisation = organisation.getParentOrganisation();
 	    }
-	    if (userManagementService.isUserInRole(loggeduserId, organisation.getOrganisationId(), Role.GROUP_MANAGER)
-		    && !orgId.equals(rootOrgId)) {
+	    if (userManagementService.isUserInRole(loggedInUser.getUserID(), organisation.getOrganisationId(),
+		    Role.GROUP_MANAGER) && !orgId.equals(rootOrgId)) {
 		canEditRole = true;
 	    } else {
 		String message = "Adding users to organisation: No permission to access organisation " + orgId;
@@ -125,6 +127,8 @@ public class UserOrgSaveController {
 		user.setUserOrganisations(userUos);
 		iter.remove();
 		log.debug("removed userId=" + userId + " from orgId=" + orgId);
+		auditLogger.info("\"" + loggedInUser.getLogin() + "\" (" + loggedInUser.getUserID() + ") removed user "
+			+ userId + " from organisation " + orgId);
 		// remove from subgroups
 		userManagementService.deleteChildUserOrganisations(uo.getUser(), uo.getOrganisation());
 	    }
@@ -134,7 +138,7 @@ public class UserOrgSaveController {
 	for (int i = 0; i < userIdList.size(); i++) {
 	    Integer userId = new Integer(userIdList.get(i));
 	    Iterator iter2 = uos.iterator();
-	    Boolean alreadyInOrg = false;
+	    boolean alreadyInOrg = false;
 	    while (iter2.hasNext()) {
 		UserOrganisation uo = (UserOrganisation) iter2.next();
 		if (uo.getUser().getUserId().equals(userId)) {
@@ -162,6 +166,9 @@ public class UserOrgSaveController {
 	    for (UserOrganisation uo : newUserOrganisations) {
 		userManagementService.setRolesForUserOrganisation(uo.getUser(), orgId,
 			Arrays.asList(Role.ROLE_LEARNER.toString()));
+
+		auditLogger.info("\"" + loggedInUser.getLogin() + "\" (" + loggedInUser.getUserID() + ") added user "
+			+ uo.getUser().getUserId() + " as " + Role.LEARNER + " to organisation " + orgId);
 	    }
 	    return "redirect:/usermanage.do?org=" + orgId;
 	} else {

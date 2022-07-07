@@ -81,6 +81,7 @@ import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.imgscalr.ResizePictureUtil;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.InitializingBean;
@@ -100,7 +101,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class UserManagementService implements IUserManagementService, InitializingBean {
 
-    private Logger log = Logger.getLogger(UserManagementService.class);
+    private static Logger log = Logger.getLogger(UserManagementService.class);
+    private static Logger auditLogger = Logger.getLogger(AuditLogFilter.class);
 
     private static final String SEQUENCES_FOLDER_NAME_KEY = "runsequences.folder.name";
 
@@ -740,6 +742,8 @@ public class UserManagementService implements IUserManagementService, Initializi
 	    setRolesForUserOrganisation(user, org.getParentOrganisation(), rolesList, checkGroupManagerRoles);
 	}
 
+	UserDTO loggedInUser = ((UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER));
+
 	List<String> rolesCopy = new ArrayList<>();
 	rolesCopy.addAll(rolesList);
 	log.debug("rolesList.size: " + rolesList.size());
@@ -755,6 +759,11 @@ public class UserManagementService implements IUserManagementService, Initializi
 			// remove from the Copys the ones we are keeping
 			rolesCopy.remove(roleId);
 			uorsCopy.remove(uor);
+
+			auditLogger.info((loggedInUser == null ? "Unauthenticated user"
+				: "\"" + loggedInUser.getLogin() + "\" (" + loggedInUser.getUserID() + ")")
+				+ " removed user " + uo.getUser().getUserId() + " as " + uor.getRole().getName()
+				+ " from organisation " + uo.getOrganisation().getOrganisationId());
 		    }
 		}
 	    }
@@ -770,7 +779,13 @@ public class UserManagementService implements IUserManagementService, Initializi
 	    Role role = (Role) findById(Role.class, Integer.parseInt(roleId));
 	    UserOrganisationRole uor = new UserOrganisationRole(uo, role);
 	    save(uor);
+
 	    log.debug("setting role: " + role.getName() + " in organisation: " + org.getName());
+	    auditLogger.info((loggedInUser == null ? "Unauthenticated user"
+		    : "\"" + loggedInUser.getLogin() + "\" (" + loggedInUser.getUserID() + ")") + " added user "
+		    + uo.getUser().getUserId() + " as " + uor.getRole().getName() + " to organisation "
+		    + uo.getOrganisation().getOrganisationId());
+
 	    uors.add(uor);
 	    // when a user gets these roles, they need a workspace
 	    if (role.getName().equals(Role.AUTHOR) || role.getName().equals(Role.SYSADMIN)) {
@@ -853,8 +868,16 @@ public class UserManagementService implements IUserManagementService, Initializi
 	UserOrganisationRole uor = new UserOrganisationRole(uo, role);
 	save(uor);
 	uo.addUserOrganisationRole(uor);
+
+	UserDTO loggedInUser = ((UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER));
+
 	log.debug("setting role: " + uor.getRole().getName() + " in organisation: "
 		+ uor.getUserOrganisation().getOrganisation().getName());
+	auditLogger.info((loggedInUser == null ? "Unauthenticated user"
+		: "\"" + loggedInUser.getLogin() + "\" (" + loggedInUser.getUserID() + ")") + " added user "
+		+ uo.getUser().getUserId() + " as " + uor.getRole().getName() + " to organisation "
+		+ uo.getOrganisation().getOrganisationId());
+
 	return uo;
     }
 
