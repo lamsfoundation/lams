@@ -545,7 +545,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    String secureDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator
 		    + FileUtil.LAMS_WWW_DIR + File.separator + FileUtil.LAMS_WWW_SECURE_DIR;
 
-	    String contentFolder = ExportToolContentService.getContentDirPath(contentFolderID, true);
+	    String contentFolder = FileUtil.getContentDirPath(contentFolderID, true);
 	    contentFolder = FileUtil.getFullPath(secureDir, contentFolder);
 
 	    if (!FileUtil.isEmptyDirectory(contentFolder, true)) {
@@ -729,7 +729,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    // into new format of paths like secure/40/28/81/39/15/76/
 	    String oldResourcePath = FileUtil.LAMS_WWW_SECURE_DIR + '/' + ldDto.getContentFolderID() + '/';
 	    String newResourcePath = FileUtil.LAMS_WWW_SECURE_DIR + '/'
-		    + ExportToolContentService.getContentDirPath(ldDto.getContentFolderID(), false);
+		    + FileUtil.getContentDirPath(ldDto.getContentFolderID(), false);
 	    if (rewriteResourcePaths && ldDto.getDescription() != null) {
 		ldDto.setDescription(ldDto.getDescription().replaceAll(oldResourcePath, newResourcePath));
 	    }
@@ -856,7 +856,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    + ExportToolContentService.EXPORT_CONTENT_ZIP_SUFFIX;
 	    String secureDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator
 		    + FileUtil.LAMS_WWW_DIR + File.separator + FileUtil.LAMS_WWW_SECURE_DIR + File.separator
-		    + ExportToolContentService.getContentDirPath(contentFolderID, true);
+		    + FileUtil.getContentDirPath(contentFolderID, true);
 	    File contentZipFile = new File(FileUtil.getFullPath(sourceDir, contentZipFileName));
 
 	    // unzip file to target secure dir if exists
@@ -2029,19 +2029,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	act.setEndXcoord(actDto.getEndXCoord());
 	act.setStartYcoord(actDto.getStartYCoord());
 	act.setEndYcoord(actDto.getEndYCoord());
-    }
-
-    /**
-     * Convert content folder ID to real path inside secure dir or on server
-     */
-    private static String getContentDirPath(String contentFolderID, boolean isFileSystemPath) {
-	String contentFolderIDClean = contentFolderID.replaceAll("-", "");
-	String contentDir = "";
-	for (int charIndex = 0; charIndex < 6; charIndex++) {
-	    contentDir += contentFolderIDClean.substring(charIndex * 2, charIndex * 2 + 2)
-		    + (isFileSystemPath ? File.separator : "/");
-	}
-	return contentDir;
     }
 
     // ******************************************************************

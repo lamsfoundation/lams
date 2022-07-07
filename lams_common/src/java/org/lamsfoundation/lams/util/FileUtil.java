@@ -24,21 +24,23 @@
 package org.lamsfoundation.lams.util;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import javax.mail.internet.MimeUtility;
 import javax.servlet.http.HttpServletRequest;
@@ -90,6 +92,10 @@ public class FileUtil {
     public static final String LAMS_WWW_DIR = "lams-www.war";
     public static final String LAMS_RUNTIME_CONTENT_DIR = "runtime";
     private static final long numMilliSecondsInADay = 24 * 60 * 60 * 1000;
+
+    // looks for URL with non-chopped content folder ID
+    private static final Pattern LEGACY_CONTENT_FOLDER_PATH = Pattern
+	    .compile("/+lams/+www/+secure/+([0-9a-f\\-]{3,}/+).*?[\"']", Pattern.CASE_INSENSITIVE);
 
     public static final String ALLOWED_EXTENSIONS_FLASH = ".swf,.fla";
     public static final String ALLOWED_EXTENSIONS_IMAGE = ".jpg,.gif,.jpeg,.png,.bmp";
@@ -654,10 +660,32 @@ public class FileUtil {
 	IdentifierGenerator uuidGen = new UUIDGenerator();
 	((Configurable) uuidGen).configure(StringType.INSTANCE, new Properties(), null);
 
-//	Serializable generate(SharedSessionContractImplementor session, Object object)
-
 	// lowercase to resolve OS issues
 	return ((String) uuidGen.generate(null, null)).toLowerCase();
+    }
+
+    /**
+     * Convert content folder ID to real path inside secure dir or on server
+     */
+    public static String getContentDirPath(String contentFolderID, boolean isFileSystemPath) {
+	String contentFolderIDClean = contentFolderID.replaceAll("-", "");
+	String contentDir = "";
+	for (int charIndex = 0; charIndex < 6; charIndex++) {
+	    contentDir += contentFolderIDClean.substring(charIndex * 2, charIndex * 2 + 2)
+		    + (isFileSystemPath ? File.separator : "/");
+	}
+	return contentDir;
+    }
+
+    public static String structureContentDirPath(String text) {
+	// example path: /lams//www/secure/ff808181292370660129c52061536966/Image//matthew.jpg
+	// This method looks for non-chopped, legacy content folder IDs and replaces them with multi-part version
+	// Also it cleans up duplicate slashes in URL
+	return StringUtils.isBlank(text) ? text : LEGACY_CONTENT_FOLDER_PATH.matcher(text).replaceAll(matchResult -> {
+	    return matchResult.group()
+		    .replace(matchResult.group(1), FileUtil.getContentDirPath(matchResult.group(1), false))
+		    .replaceAll("/{2,}", "/");
+	});
     }
 
     /**
@@ -707,7 +735,7 @@ public class FileUtil {
      */
     public static Object getObjectFromXML(XStream xStream, String fullFilePath) throws IOException {
 
-	Reader file = null;
+	Reader reader = null;
 	XStream conversionXml = xStream != null ? xStream : new XStream(new StaxDriver());
 	// allow parsing all classes
 	conversionXml.addPermission(AnyTypePermission.ANY);
@@ -729,13 +757,16 @@ public class FileUtil {
 		}
 		numTries++;
 
-		file = new InputStreamReader(new FileInputStream(fullFilePath), FileUtil.ENCODING_UTF_8);
-		return conversionXml.fromXML(file);
+		String xmlContent = Files.readString(Paths.get(fullFilePath));
+		// look for legacy, non-chopped content folder IDs and replace them with multi-part version
+		xmlContent = FileUtil.structureContentDirPath(xmlContent);
+		reader = new StringReader(xmlContent);
+		return conversionXml.fromXML(reader);
 
 	    } catch (ConversionException ce) {
 		FileUtil.log.debug("Failed import", ce);
 		finalException = ce;
-		file.close();
+		reader.close();
 
 		if (ce.getMessage() == null) {
 		    // can't retry, so get out of here!
@@ -776,8 +807,8 @@ public class FileUtil {
 		    }
 		}
 	    } finally {
-		if (file != null) {
-		    file.close();
+		if (reader != null) {
+		    reader.close();
 		}
 	    }
 	}
