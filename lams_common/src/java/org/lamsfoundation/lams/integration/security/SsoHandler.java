@@ -72,7 +72,6 @@ public class SsoHandler implements ServletExtension {
     private static IUserManagementService userManagementService = null;
 
     private static Logger log = Logger.getLogger(SsoHandler.class);
-    private static Logger auditLogger = Logger.getLogger(AuditLogFilter.class);
 
     private static final String REDIRECT_KEY = "io.undertow.servlet.form.auth.redirect.location";
     static final String KEEP_SESSION_ID_KEY = "lams.keepSessionId";
@@ -265,21 +264,19 @@ public class SsoHandler implements ServletExtension {
 			Date date = new Date(currentTimeMillis + lockOutTimeMillis);
 			user.setLockOutTime(date);
 
-			String messageSuffix = new StringBuilder().append(" (").append(user.getUserId())
-				.append(") is locked out for ")
+			String messagePayload = new StringBuilder().append("is locked out for ")
 				.append(Configuration.getAsInt(ConfigurationKeys.LOCK_OUT_TIME)).append(" mins after ")
 				.append(failedAttempts).append(" failed attempts.").toString();
-			String message = new StringBuilder("User ").append(user.getLogin()).append(messageSuffix)
-				.toString();
+			String eventMessage = new StringBuilder("User ").append(user.getLogin()).append(" (")
+				.append(user.getUserId()).append(") ").append(messagePayload).toString();
 			SsoHandler.getLogEventService(session.getServletContext()).logEvent(
-				LogEvent.TYPE_ACCOUNT_LOCKED, user.getUserId(), user.getUserId(), null, null, message);
+				LogEvent.TYPE_ACCOUNT_LOCKED, user.getUserId(), user.getUserId(), null, null,
+				eventMessage);
 
-			message = new StringBuilder().append("\"").append(user.getLogin()).append("\"")
-				.append(user.getUserId()).append(messageSuffix).toString();
-			auditLogger.info(message);
+			AuditLogFilter.log(user.getUserId(), user.getLogin(), messagePayload);
 
 			if (log.isDebugEnabled()) {
-			    log.debug(message);
+			    log.debug(eventMessage);
 			}
 		    }
 
