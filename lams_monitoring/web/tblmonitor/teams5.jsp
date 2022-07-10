@@ -241,8 +241,7 @@
 	<!-- Tables -->
 
 	<div class="row">
-		<div class="col-4"></div>
-		<div class="col-4">
+		<div class="col-4 offset-4">
 			<h3 id="tbl-teams-tab-title" class="text-center">
 				<fmt:message key="label.students.teams"/>
 			</h3>
@@ -255,11 +254,9 @@
 				</div>
 			</c:if>
 		</div>
-		<div class="col-2"></div>
 	</div>
 	<div class="row">
-		<div class="col-2"></div>
-		<div class="col-8">
+		<div class="col-8 offset-2">
 			<c:if test="${not empty chartNamesDataset}">
 				<canvas id="summary-chart" class="mt-3"></canvas>
 			</c:if>
