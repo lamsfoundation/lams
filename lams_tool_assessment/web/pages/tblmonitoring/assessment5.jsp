@@ -19,7 +19,7 @@
 	function showStudentChoices() {
 		// these methods come from tblmonitor.jsp and aes.jsp in lams_monitoring
 		if (${not empty isIraAssessment and isIraAssessment}) {
-			loadTab('iraAssessmentStudentChoices', ${toolContentID});
+			loadTab('iraAssessmentStudentChoices');
 			return;
 		}
 		loadAePane(${toolContentID}, 'studentChoices');

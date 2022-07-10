@@ -123,7 +123,7 @@ public class TblMonitoringController {
 	request.setAttribute("assessment", assessment);
 	request.setAttribute("isTbl", true);
 
-	return "pages/tblmonitoring/iraAssessmentStudentChoices";
+	return "pages/tblmonitoring/iraAssessmentStudentChoices5";
     }
 
     private List<TblAssessmentDTO> getAssessmentDtos(String[] toolContentIds, String[] activityTitles) {

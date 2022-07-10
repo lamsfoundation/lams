@@ -153,6 +153,11 @@ function loadTab(tabName, button) {
 			tabContent.load(LAMS_URL + 'tool/laasse10/tblmonitoring/iraAssessment.do?toolContentID=' + iraToolContentId);
 		}
 		break;
+		
+		case 'iraAssessmentStudentChoices': {
+			tabContent.load(LAMS_URL + 'tool/laasse10/tblmonitoring/iraAssessmentStudentChoices.do?toolContentID=' + iraToolContentId);
+		}
+		break;
 	}
 }
 

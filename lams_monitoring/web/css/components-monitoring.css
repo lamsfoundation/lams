@@ -63,7 +63,6 @@
 	vertical-align: top;
 }
 
-
 .component-sidebar {
 	height: initial;
 	align-items: center;
@@ -1250,6 +1249,7 @@ body.component .portrait-round {
 
 .table-hover > tbody > tr:hover > * {
 	--bs-table-accent-bg: var(--bs-gray-200);
+	color: var(--bs-black) !important;
 }
 
 .gate-card .card-body {
