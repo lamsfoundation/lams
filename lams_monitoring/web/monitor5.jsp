@@ -324,11 +324,16 @@
 							</c:set>
 							
 							<div class="navigate-btn-container">
-								<a id="load-irat-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.ira' />"
-								   data-method="${iraMethodName}">
-									<i class="fa fa-user fa-lg"></i>
-								</a>
-								<label for="load-irat-tab-btn">
+								<div class="btn-group-vertical" id="load-irat-btn-group">
+									<a id="load-irat-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.ira' />">
+										<i class="fa fa-user fa-lg"></i>
+									</a>
+									<a id="load-irat-student-choices-tab-btn" class="btn btn-primary" href="#" title="iRAT student choices">
+										<i class="fa fa-user-check fa-lg"></i>
+									</a>
+								</div>
+								
+								<label for="load-irat-btn-group">
 									<fmt:message key='label.ira' />
 								</label>
 							</div>

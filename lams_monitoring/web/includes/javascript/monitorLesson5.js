@@ -154,7 +154,7 @@ function loadTab(tabName, button) {
 		}
 		break;
 		
-		case 'iraAssessmentStudentChoices': {
+		case 'iratStudentChoices': {
 			tabContent.load(LAMS_URL + 'tool/laasse10/tblmonitoring/iraAssessmentStudentChoices.do?toolContentID=' + iraToolContentId);
 		}
 		break;
@@ -195,6 +195,10 @@ function initCommonElements(){
 	
 	$('#load-irat-tab-btn').click(function(){
 		loadTab('irat', this);
+	});
+	
+	$('#load-irat-student-choices-tab-btn').click(function(){
+		loadTab('iratStudentChoices', this);
 	});
 	
 	$('#load-other-nvg-btn').click(function(){
@@ -2777,6 +2781,10 @@ function refreshMonitor(){
 		loadTab('teams');
 	} else if (tabName == 'gates'){
 		loadTab('gates');
+	} else if (tabName == 'irat'){
+		loadTab('irat');
+	} else if (tabName == 'iratStudentChoices'){
+		loadTab('iratStudentChoices');
 	}
 }
 
