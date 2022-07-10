@@ -54,6 +54,8 @@
 			lessonStartDate = '${lesson.scheduleStartDate}',
 			lessonEndDate = '${lesson.scheduleEndDate}',
 			liveEditEnabled = ${enableLiveEdit && lesson.liveEditEnabled},
+			TOTAL_LESSON_LEARNERS_NUMBER = ${lesson.numberPossibleLearners},
+			iraToolContentId='${iraToolContentId}',
 			LAMS_URL = '<lams:LAMSURL/>',
 			csrfToken = '<csrf:tokenname/> : <csrf:tokenvalue/>',
 			csrfTokenName = '<csrf:tokenname/>',
@@ -320,11 +322,11 @@
 							</c:set>
 							
 							<div class="navigate-btn-container">
-								<a id="load-ira-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.ira' />"
+								<a id="load-irat-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.ira' />"
 								   data-method="${iraMethodName}">
 									<i class="fa fa-user fa-lg"></i>
 								</a>
-								<label for="load-ira-tab-btn">
+								<label for="load-irat-tab-btn">
 									<fmt:message key='label.ira' />
 								</label>
 							</div>

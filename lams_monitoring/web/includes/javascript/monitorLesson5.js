@@ -148,6 +148,11 @@ function loadTab(tabName, button) {
 			tabContent.load(LAMS_URL + 'monitoring/tblmonitor/gates.do?lessonID=' + lessonId);
 		}
 		break;
+		
+		case 'irat': {
+			tabContent.load(LAMS_URL + 'tool/laasse10/tblmonitoring/iraAssessment.do?toolContentID=' + iraToolContentId);
+		}
+		break;
 	}
 }
 
@@ -181,6 +186,10 @@ function initCommonElements(){
 	
 	$('#load-gates-tab-btn').click(function(){
 		loadTab('gates', this);
+	});
+	
+	$('#load-irat-tab-btn').click(function(){
+		loadTab('irat', this);
 	});
 	
 	$('#load-other-nvg-btn').click(function(){

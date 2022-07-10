@@ -189,7 +189,7 @@ public class TblMonitoringController {
 	int attemptedLearnersNumber = assessmentService.getCountUsersByContentId(toolContentId);
 	model.addAttribute("attemptedLearnersNumber", attemptedLearnersNumber);
 
-	return "pages/tblmonitoring/assessment";
+	return "pages/tblmonitoring/assessment5";
     }
 
     /**
