@@ -118,7 +118,7 @@
                 <formatter>
                     <named-formatter name="LAMSAUDITPATTERN" />
                 </formatter>
-                <file relative-to="jboss.server.log.dir" path="auditlams.log" />
+                <file relative-to="jboss.server.log.dir" path="lamsaudit.log" />
                 <suffix value="'.'yyyy-MM-dd" />
                 <append value="true" />
             </periodic-rotating-file-handler>
