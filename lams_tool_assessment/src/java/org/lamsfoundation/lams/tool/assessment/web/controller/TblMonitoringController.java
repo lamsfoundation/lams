@@ -273,7 +273,7 @@ public class TblMonitoringController {
 	request.setAttribute("assessment", assessment);
 	request.setAttribute("isTbl", true);
 
-	return "pages/tblmonitoring/assessmentStudentChoices";
+	return "pages/tblmonitoring/assessmentStudentChoices5";
     }
 
     /**

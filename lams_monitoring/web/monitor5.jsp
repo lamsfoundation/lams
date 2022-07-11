@@ -57,7 +57,12 @@
 			lessonEndDate = '${lesson.scheduleEndDate}',
 			liveEditEnabled = ${enableLiveEdit && lesson.liveEditEnabled},
 			TOTAL_LESSON_LEARNERS_NUMBER = ${lesson.numberPossibleLearners},
-			iraToolContentId='${iraToolContentId}',
+			
+			iraToolContentId = '${iraToolContentId}',
+			aeToolContentIds = "${aeToolContentIds}",
+			aeToolTypes = "${aeToolTypes}",
+			aeActivityTitles = "${aeActivityTitles}",
+			
 			LAMS_URL = '<lams:LAMSURL/>',
 			csrfToken = '<csrf:tokenname/> : <csrf:tokenvalue/>',
 			csrfTokenName = '<csrf:tokenname/>',

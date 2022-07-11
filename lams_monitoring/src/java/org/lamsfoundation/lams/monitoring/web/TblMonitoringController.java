@@ -386,7 +386,7 @@ public class TblMonitoringController {
 	model.addAttribute("aeToolTypes", toolTypes);
 	model.addAttribute("aeActivityTitles", activityTitles);
 
-	return "tblmonitor/aes";
+	return "tblmonitor/aes5";
     }
 
     /**

@@ -2,7 +2,7 @@
 <% pageContext.setAttribute("newLineChar", "\r\n"); %>
 <c:set var="showQuestionMonitoringActionButtons" value="${attemptedLearnersNumber > 0}" />
 
-<%@ include file="/pages/monitoring/parts/discloseAnswers.jsp"%>
+<%@ include file="/pages/monitoring/parts/discloseAnswers5.jsp"%>
 
 <script>
 	//for allquestions.jsp to know whether to display an additional button
@@ -19,7 +19,7 @@
 	function showStudentChoices() {
 		// these methods come from tblmonitor.jsp and aes.jsp in lams_monitoring
 		if (${not empty isIraAssessment and isIraAssessment}) {
-			loadTab('iratStudentChoices');
+			loadTab('iratStudentChoices', $('#load-irat-student-choices-tab-btn'));
 			return;
 		}
 		loadAePane(${toolContentID}, 'studentChoices');
@@ -47,6 +47,13 @@
 					<fmt:message key="label.attendance"/>: <span>${attemptedLearnersNumber}</span>/<span class="total-learners-number"></span> 
 				</h4> 
 			</div>
+			<div class="col-4 text-end">
+				<div class="btn btn-secondary"
+					 onclick="javascript:showStudentChoices()">
+					<i class="fa fa-file"></i>
+					<fmt:message key="label.show.students.choices"/>
+				</div>   
+			</div>                 
 		</div>
 			
 		<c:if test="${allowDiscloseAnswers and showQuestionMonitoringActionButtons}">

@@ -70,6 +70,11 @@
 	<!-- Notifications -->  
 	<div class="row">
 		<div class="col-10 offset-1 text-end">
+			<a href="#nogo" type="button" class="btn btn-secondary buttons_column"
+					onclick="javascript:loadTab('irat', $('#load-irat-tab-btn'))">
+				<i class="fa fa-undo"></i>
+				<fmt:message key="label.hide.students.choices"/>
+			</a>
 			<a href="#nogo" onclick="javascript:printTable(); return false;" type="button" class="btn btn-secondary buttons_column">
 				<i class="fa fa-print"></i>
 				<fmt:message key="label.print"/>

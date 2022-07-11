@@ -64,6 +64,11 @@ var originalSequenceCanvas = null,
 	
 
 $(document).ready(function(){
+	$.ajaxSetup ({
+	    // Disable caching of AJAX responses
+	    cache: false
+	});
+
 	initCommonElements();
 	initSequenceTab();
 	initGradebookTab();
@@ -72,7 +77,7 @@ $(document).ready(function(){
 });
 
 function loadTab(tabName, button) {
-	$('.navigate-btn, .lesson-properties').removeClass('active');
+	$('.navigate-btn-container a.btn, .lesson-properties').removeClass('active');
 	$('.component-sidebar').removeClass('expanded');
 	if (button) {
 		$(button).addClass('active');
@@ -80,7 +85,7 @@ function loadTab(tabName, button) {
 	
 	clearEventSources();
 	
-	let tabContent = $('.monitoring-page-content .tab-content');
+	let tabContent = $('.monitoring-page-content .tab-content').empty();
 		
 		
 	switch(tabName) {
@@ -150,12 +155,20 @@ function loadTab(tabName, button) {
 		break;
 		
 		case 'irat': {
-			tabContent.load(LAMS_URL + 'tool/laasse10/tblmonitoring/iraAssessment.do?toolContentID=' + iraToolContentId);
+			tabContent.load(LAMS_URL + 'tool/laasse10/tblmonitoring/iraAssessment.do?toolContentID=' + iraToolContentId + '&_=' + (new Date()).getTime());
 		}
 		break;
 		
 		case 'iratStudentChoices': {
 			tabContent.load(LAMS_URL + 'tool/laasse10/tblmonitoring/iraAssessmentStudentChoices.do?toolContentID=' + iraToolContentId);
+		}
+		break;
+		
+		case 'aes': {
+			tabContent.load(LAMS_URL + 'monitoring/tblmonitor/aes.do?'
+			                + '&aeToolContentIds='+ aeToolContentIds 
+							+ '&aeToolTypes=' + aeToolTypes 
+							+ '&aeActivityTitles=' + encodeURIComponent(aeActivityTitles));
 		}
 		break;
 	}
@@ -199,6 +212,10 @@ function initCommonElements(){
 	
 	$('#load-irat-student-choices-tab-btn').click(function(){
 		loadTab('iratStudentChoices', this);
+	});
+	
+	$('#load-aes-tab-btn').click(function(){
+		loadTab('aes', this);
 	});
 	
 	$('#load-other-nvg-btn').click(function(){
@@ -2785,7 +2802,9 @@ function refreshMonitor(){
 		loadTab('irat');
 	} else if (tabName == 'iratStudentChoices'){
 		loadTab('iratStudentChoices');
-	}
+	} else if (tabName == 'aes'){
+		loadTab('aes');
+	} 
 }
 
 
