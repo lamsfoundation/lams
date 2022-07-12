@@ -324,7 +324,7 @@ public class MonitoringController {
 	    throws EtherpadException {
 	summary(request, response);
 	request.setAttribute("isTbl", true);
-	return "pages/monitoring/summary";
+	return "pages/monitoring/summary5";
     }
 
     @RequestMapping(path = "/updateTimeLimit", method = RequestMethod.POST)
