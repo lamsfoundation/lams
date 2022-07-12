@@ -84,7 +84,7 @@
 		function startDiscussionSentiment(toolQuestionUid, burningQuestionUid, markAsActive) {
 			// burningQuestionUid is not used in Assessment, but must be added for function signature consistency
 			
-			$('#discussion-sentiment-chart-panel-container-' + toolQuestionUid).load(
+			$('#discussion-sentiment-chart-card-container-' + toolQuestionUid).load(
 				'${lams}learning/discussionSentiment/startMonitor.do',
 				{
 					toolQuestionUid : toolQuestionUid,
@@ -149,20 +149,20 @@
 					<c:if test="${param.embedded and empty toolSessionID}">
 						<div class="monitor-question-buttons">
 							<c:if test="${assessment.allowDiscloseAnswers and showQuestionMonitoringActionButtons}">
-								<div class="btn-group-xs disclose-button-group" questionUid="${question.uid}">
+								<div class="btn-group-sm disclose-button-group ms-2" questionUid="${question.uid}">
 									<%-- Allow disclosing correct answers only for multiple choice questions --%>
 									<c:if test="${question.type == 1}">
-										<div class="btn btn-default disclose-correct-button"
+										<div class="btn btn-secondary disclose-correct-button"
 											<c:if test="${question.correctAnswersDisclosed}">
-												disabled="disabled"><i class="fa fa-check text-success">&nbsp;</i
+												disabled="disabled"><i class="fa fa-check">&nbsp;</i
 											</c:if>
 											>
 											<fmt:message key="label.disclose.correct.answers"/>
 										</div>
 									</c:if>
-									<div class="btn btn-default disclose-groups-button"
+									<div class="btn btn-secondary disclose-groups-button"
 										<c:if test="${question.groupsAnswersDisclosed}">
-											disabled="disabled"><i class="fa fa-check text-success">&nbsp;</i
+											disabled="disabled"><i class="fa fa-check">&nbsp;</i
 										</c:if>
 										>
 										<fmt:message key="label.disclose.groups.answers"/>
@@ -171,9 +171,9 @@
 							</c:if>
 							
 							<c:if test="${param.showQuestionDetailsButton or assessment.allowDiscussionSentiment}">
-								<div class="btn-group-xs voffset5">
+								<div class="btn-group-sm mt-3">
 									<c:if test="${param.showQuestionDetailsButton}">
-										<a class="thickbox btn btn-default"
+										<a class="thickbox btn btn-secondary"
 										   href='<c:url value="/monitoring/questionSummary.do?sessionMapID=${sessionMapID}"/>&questionUid=${question.uid}&KeepThis=true&TB_iframe=true&modal=true'>
 											<i class="fa fa-info-circle"></i>&nbsp;<fmt:message key="label.monitoring.summary.results.question" />
 										</a>
@@ -181,7 +181,7 @@
 									
 									<c:if test="${assessment.allowDiscussionSentiment and showQuestionMonitoringActionButtons}">
 										<div id="discussion-sentiment-start-button-${question.uid}"
-										     class="btn btn-default discussion-sentiment-start-button"
+										     class="btn btn-secondary discussion-sentiment-start-button"
 										     onClick="javascript:startDiscussionSentiment(${question.uid}, null, true)">
 											<i class="fa fa-comments"></i>&nbsp;<fmt:message key="label.monitoring.discussion.start"/>
 										</div>
@@ -323,7 +323,7 @@
 					</c:if>
 					
 					<c:if test="${param.embedded and empty toolSessionID and assessment.allowDiscussionSentiment}">
-						<div id="discussion-sentiment-chart-panel-container-${question.uid}"></div>
+						<div id="discussion-sentiment-chart-card-container-${question.uid}"></div>
 					</c:if>
 				</div>
 							

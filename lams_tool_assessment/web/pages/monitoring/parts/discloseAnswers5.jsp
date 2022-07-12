@@ -24,19 +24,18 @@
 				
 				
 				button.click(function(event) {	
-					if (!confirm(isCorrectButton ? "<fmt:message key='message.disclose.correct.answers' />"
-												: "<fmt:message key='message.disclose.groups.answers' />")) {
-						return;
-					}
-		
-					// check if correct answers are disclosed before groups' answers
-					if (isCorrectButton &&
-						!button.closest('.disclose-button-group').find('.disclose-groups-button').is('[disabled]') &&
-						!confirm("<fmt:message key='message.disclose.correct.before.groups.answers' />")) {
-						return;
-					}
-					
-					discloseAnswers(button, resultsPane, true);
+					showConfirm(isCorrectButton ? "<fmt:message key='message.disclose.correct.answers' />"
+								: "<fmt:message key='message.disclose.groups.answers' />", function(){
+						// check if correct answers are disclosed before groups' answers
+						if (isCorrectButton &&
+							!button.closest('.disclose-button-group').find('.disclose-groups-button').is('[disabled]')) {
+								showConfirm("<fmt:message key='message.disclose.correct.before.groups.answers' />", function(){
+									discloseAnswers(button, resultsPane, true);
+								});
+						} else {
+							discloseAnswers(button, resultsPane, true);
+						}
+					});
 				});
 			});
 		
@@ -47,23 +46,25 @@
 				// do not add a handler twice
 				if (!isRefresh) {
 					allCorrectButton.click(function(){
-						if (!confirm("<fmt:message key='message.disclose.all.correct.answers' />")) {
-							return;
-						}
-		
-						// check if correct answers are disclosed before groups' answers
-						if (!$('.disclose-all-groups-button', assessmentQuestionsPane).is('[disabled]') &&
-							!confirm("<fmt:message key='message.disclose.correct.before.groups.answers' />")) {
-							return;
-						}
-						
-						let nonDisclosedQuestions = $('.disclose-correct-button', assessmentQuestionsPane).not('[disabled]'),
-			    			lastQuestionUid = nonDisclosedQuestions.last().closest('.disclose-button-group').attr('questionUid');
-						nonDisclosedQuestions.each(function() {
-							let isLast = lastQuestionUid == $(this).closest('.disclose-button-group').attr('questionUid'); 
-							discloseAnswers($(this), resultsPane, isLast);
+						showConfirm("<fmt:message key='message.disclose.all.correct.answers' />", function(){
+							// check if correct answers are disclosed before groups' answers
+							let discloseFunction = function(){
+								let nonDisclosedQuestions = $('.disclose-correct-button', assessmentQuestionsPane).not('[disabled]'),
+				    				lastQuestionUid = nonDisclosedQuestions.last().closest('.disclose-button-group').attr('questionUid');
+								nonDisclosedQuestions.each(function() {
+									let isLast = lastQuestionUid == $(this).closest('.disclose-button-group').attr('questionUid'); 
+									discloseAnswers($(this), resultsPane, isLast);
+								});
+								disabledAndCheckButton(allCorrectButton);
+							};
+							
+							if (!$('.disclose-all-groups-button', assessmentQuestionsPane).is('[disabled]')) {
+								showConfirm("<fmt:message key='message.disclose.correct.before.groups.answers' />", discloseFunction);
+								return;
+							}
+							
+							discloseFunction();
 						});
-						disabledAndCheckButton(allCorrectButton);
 					});
 				}
 			} else {
@@ -75,17 +76,15 @@
 				// do not add a handler twice
 				if (!isRefresh) {
 					allGroupsButton.click(function(){
-						if (!confirm("<fmt:message key='message.disclose.all.groups.answers' />")) {
-							return;
-						}
-		
-						let nonDisclosedQuestions = $('.disclose-groups-button', assessmentQuestionsPane).not('[disabled]'),
-		    				lastQuestionUid = nonDisclosedQuestions.last().closest('.disclose-button-group').attr('questionUid');
-						nonDisclosedQuestions.each(function() {
-							let isLast = lastQuestionUid == $(this).closest('.disclose-button-group').attr('questionUid'); 
-							discloseAnswers($(this), resultsPane, isLast);
+						showConfirm("<fmt:message key='message.disclose.all.groups.answers' />", function(){
+							let nonDisclosedQuestions = $('.disclose-groups-button', assessmentQuestionsPane).not('[disabled]'),
+			    				lastQuestionUid = nonDisclosedQuestions.last().closest('.disclose-button-group').attr('questionUid');
+							nonDisclosedQuestions.each(function() {
+								let isLast = lastQuestionUid == $(this).closest('.disclose-button-group').attr('questionUid'); 
+								discloseAnswers($(this), resultsPane, isLast);
+							});
+							disabledAndCheckButton(allGroupsButton);
 						});
-						disabledAndCheckButton(allGroupsButton);
 					});
 				}
 			} else {
@@ -97,7 +96,6 @@
 	function discloseAnswers(button, resultsPane, isLast) {
 		let isCorrectButton = button.hasClass('disclose-correct-button'),
 			toolContentId = resultsPane.data('toolContentId');
-		
 		$.ajax({
 			'url'  : '<lams:WebAppURL />monitoring/' 
 					  + (isCorrectButton ? 'discloseCorrectAnswers' : 'discloseGroupsAnswers')
@@ -116,6 +114,6 @@
 	}
 
 	function disabledAndCheckButton(button){
-		button.attr('disabled', true).html('<i class="fa fa-check text-success">&nbsp;</i>' + button.text());
+		button.attr('disabled', true).html('<i class="fa fa-check">&nbsp;</i>' + button.text());
 	}
 </script>

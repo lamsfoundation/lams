@@ -1259,3 +1259,7 @@ body.component .portrait-round {
 .gate-opened-icon {
 	cursor: pointer;
 }
+
+.bg-success {
+	color: var(--bs-white) !important;
+}

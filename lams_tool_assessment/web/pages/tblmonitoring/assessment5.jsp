@@ -26,52 +26,50 @@
 	}
 </script>
 
-<div class="container-fluid">
-	<%-- For AEs tab the panes are defined in TBL monitor, for IRA we need to define it here --%>
-	<div ${isIraAssessment ? 'id="assessment-pane-' += toolContentID += '"' : '' }>
-		<c:if test="${isIraAssessment}">
-			<div class="row">
-				<div class="col-8 offset-2 text-center">
-					<h3>
-						<fmt:message key="label.ira.questions.marks"/>
-					</h3>
-				</div>
+<%-- For AEs tab the panes are defined in TBL monitor, for IRA we need to define it here --%>
+<div class="container-fluid" ${isIraAssessment ? 'id="assessment-pane-' += toolContentID += '"' : '' }>
+	<c:if test="${isIraAssessment}">
+		<div class="row">
+			<div class="col-8 offset-2 text-center">
+				<h3>
+					<fmt:message key="label.ira.questions.marks"/>
+				</h3>
 			</div>
-		</c:if>
-		
-		<!-- Notifications -->  
-		<div class="row mb-3">
-			<div class="col-4 offset-2 pt-1">
-				<h4>
-					<i class="fa fa-users" style="color:gray" ></i> 
-					<fmt:message key="label.attendance"/>: <span>${attemptedLearnersNumber}</span>/<span class="total-learners-number"></span> 
-				</h4> 
-			</div>
-			<div class="col-4 text-end">
-				<div class="btn btn-secondary"
-					 onclick="javascript:showStudentChoices()">
-					<i class="fa fa-file"></i>
-					<fmt:message key="label.show.students.choices"/>
-				</div>   
-			</div>                 
 		</div>
-			
-		<c:if test="${allowDiscloseAnswers and showQuestionMonitoringActionButtons}">
-			<%-- Release correct/groups answers for all questions in this assessment --%>
-			<div class="row">
-				<div class="col-xs-12 col-md-12 col-lg-12">
-					<div class="btn-group-sm pull-right disclose-all-button-group">
-						<div class="btn btn-default disclose-all-correct-button">
-							<fmt:message key="label.disclose.all.correct.answers"/>
-						</div>
-						<div class="btn btn-default disclose-all-groups-button">
-							<fmt:message key="label.disclose.all.groups.answers"/>
-						</div>
-					</div>
-				</div>
-			</div>
-		</c:if>		
+	</c:if>
 	
-		<div class="results" data-tool-content-id="${toolContentID}"></div>
+	<!-- Notifications -->  
+	<div class="row mb-3">
+		<div class="col-4 offset-2 pt-1">
+			<h4>
+				<i class="fa fa-users" style="color:gray" ></i> 
+				<fmt:message key="label.attendance"/>: <span>${attemptedLearnersNumber}</span>/<span class="total-learners-number"></span> 
+			</h4> 
+		</div>
+		<div class="col-4 text-end">
+			<button class="btn btn-secondary" type="button"
+				 onclick="javascript:showStudentChoices()">
+				<i class="fa fa-file"></i>
+				<fmt:message key="label.show.students.choices"/>
+			</button>   
+		</div>                 
 	</div>
+		
+	<c:if test="${allowDiscloseAnswers and showQuestionMonitoringActionButtons}">
+		<%-- Release correct/groups answers for all questions in this assessment --%>
+		<div class="row mb-3 disclose-all-button-group">
+			<div class="col-2 offset-6 pt-1 text-end">
+				<button class="btn btn-secondary disclose-all-correct-button" type="button">
+					<fmt:message key="label.disclose.all.correct.answers"/>
+				</button>
+			</div>
+			<div class="col-2 pt-1 text-end">
+				<button class="btn btn-secondary disclose-all-groups-button" type="button">
+					<fmt:message key="label.disclose.all.groups.answers"/>
+				</button>
+			</div>
+		</div>
+	</c:if>		
+
+	<div class="results" data-tool-content-id="${toolContentID}"></div>
 </div>

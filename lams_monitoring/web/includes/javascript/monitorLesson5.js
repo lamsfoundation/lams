@@ -3106,11 +3106,16 @@ function showToast(text) {
 }
 
 function showConfirm(body, callback) {
-	let dialog = $('#confirmationDialog');
-	$('.modal-body', dialog).html(body);
+	let dialog = $('#confirmationDialog').data('confirmed', null).off('hidden.bs.modal').on('hidden.bs.modal', function(){
+		if (dialog.data('confirmed')) {
+			callback(true);
+		}
+	});
+
+	$('.modal-body', dialog).html(body)
 	
 	$("#confirmationDialogConfirmButton").off('click').on("click", function(){
-    	callback(true);
+		dialog.data('confirmed', true);
     	dialog.modal('hide');
 	});
   

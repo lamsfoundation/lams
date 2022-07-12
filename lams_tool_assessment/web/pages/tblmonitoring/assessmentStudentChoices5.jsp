@@ -155,7 +155,7 @@
 						
 						<c:forEach var="tblQuestionDto" items="${questionDtos}" varStatus="j">
 							<c:set var="questionResultDto" value="${tblQuestionDto.sessionQuestionResults[i.index]}"/>
-							<td class="text-center <c:if test="${questionResultDto.correct}">bg-success text-white</c:if>" >
+							<td class="text-center <c:if test="${questionResultDto.correct}">bg-success</c:if>" >
 								${questionResultDto.answer}
 							</td>
 						</c:forEach>
