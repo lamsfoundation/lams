@@ -193,13 +193,13 @@
 					</c:if>
 					
 					<c:if test="${question.answerRequired}">
-						<span class="asterisk pull-right">
+						<span class="asterisk float-end">
 							<i class="fa fa-xs fa-asterisk text-danger" title="<fmt:message key="label.answer.required"/>" 
 									alt="<fmt:message key="label.answer.required"/>"></i>
 						</span>
 					</c:if>
 					
-					<h3 class="panel-title" style="margin-bottom: 10px;font-size: initial;">
+					<h3 class="card-title mb-3" style="font-size: initial;">
 						<c:if test="${assessment.numbered}">
 								${status.index + sessionMap.questionNumberingOffset}.
 						</c:if>
@@ -209,12 +209,6 @@
 						</c:if>
 					</h3>
 					
-			
-									
-					<c:if test="${empty question.question}">
-						<!--  must have something here otherwise the question-numbers span does not float properly -->
-						&nbsp;
-					</c:if>
 					${question.question}
 				</div>
 							

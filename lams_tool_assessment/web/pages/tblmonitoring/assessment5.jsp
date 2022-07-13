@@ -49,7 +49,7 @@
 		<div class="col-4 text-end">
 			<button class="btn btn-secondary" type="button"
 				 onclick="javascript:showStudentChoices()">
-				<i class="fa fa-file"></i>
+				<i class="fa fa-list-check"></i>
 				<fmt:message key="label.show.students.choices"/>
 			</button>   
 		</div>                 

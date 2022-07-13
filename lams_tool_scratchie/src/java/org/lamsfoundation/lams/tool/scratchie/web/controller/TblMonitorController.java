@@ -107,7 +107,7 @@ public class TblMonitorController {
 	    request.setAttribute("groupSummaries", groupSummaries);
 	}
 
-	return "pages/tblmonitoring/tra";
+	return "pages/tblmonitoring/tra5";
     }
 
     /**
@@ -125,7 +125,7 @@ public class TblMonitorController {
 	model.addAttribute("scratchie", scratchie);
 	model.addAttribute("isTbl", true);
 
-	return "pages/monitoring/studentChoices";
+	return "pages/monitoring/studentChoices5";
     }
 
     /**

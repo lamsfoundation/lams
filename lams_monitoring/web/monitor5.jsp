@@ -42,6 +42,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait5.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/tempus-dominus.min.js"></script>
+	<lams:JSImport src="includes/javascript/common.js" />
 	<lams:JSImport src="includes/javascript/dialog5.js" />
 	<lams:JSImport src="includes/javascript/monitorLesson5.js" relative="true" />
 	
@@ -59,6 +60,7 @@
 			TOTAL_LESSON_LEARNERS_NUMBER = ${lesson.numberPossibleLearners},
 			
 			iraToolContentId = '${iraToolContentId}',
+			traToolContentId = '${traToolContentId}',
 			aeToolContentIds = "${aeToolContentIds}",
 			aeToolTypes = "${aeToolTypes}",
 			aeActivityTitles = "${aeActivityTitles}",
@@ -334,7 +336,7 @@
 										<i class="fa fa-user fa-lg"></i>
 									</a>
 									<a id="load-irat-student-choices-tab-btn" class="btn btn-primary" href="#" title="iRAT student choices">
-										<i class="fa fa-user-check fa-lg"></i>
+										<i class="fa fa-list-check fa-lg"></i>
 									</a>
 								</div>
 								
@@ -346,10 +348,16 @@
 						
 						<c:if test="${not empty isScratchieAvailable}">
 							<div class="navigate-btn-container">
-								<a id="load-tra-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.tra' />">
-									<i class="fa fa-users fa-lg"></i>
-								</a>
-								<label for="load-tra-tab-btn">
+								<div class="btn-group-vertical" id="load-irat-btn-group">
+									<a id="load-trat-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.tra' />">
+										<i class="fa fa-users fa-lg"></i>
+									</a>
+									<a id="load-trat-student-choices-tab-btn" class="btn btn-primary" href="#" title="tRAT student choices">
+										<i class="fa fa-list-check fa-lg"></i>
+									</a>
+								</div>
+								
+								<label for="load-trat-btn-group">
 									<fmt:message key='label.tra' />
 								</label>
 							</div>

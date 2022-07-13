@@ -64,11 +64,6 @@ var originalSequenceCanvas = null,
 	
 
 $(document).ready(function(){
-	$.ajaxSetup ({
-	    // Disable caching of AJAX responses
-	    cache: false
-	});
-
 	initCommonElements();
 	initSequenceTab();
 	initGradebookTab();
@@ -155,12 +150,22 @@ function loadTab(tabName, button) {
 		break;
 		
 		case 'irat': {
-			tabContent.load(LAMS_URL + 'tool/laasse10/tblmonitoring/iraAssessment.do?toolContentID=' + iraToolContentId + '&_=' + (new Date()).getTime());
+			tabContent.load(LAMS_URL + 'tool/laasse10/tblmonitoring/iraAssessment.do?toolContentID=' + iraToolContentId);
 		}
 		break;
 		
 		case 'iratStudentChoices': {
 			tabContent.load(LAMS_URL + 'tool/laasse10/tblmonitoring/iraAssessmentStudentChoices.do?toolContentID=' + iraToolContentId);
+		}
+		break;
+		
+		case 'trat': {
+			tabContent.load(LAMS_URL + 'tool/lascrt11/tblmonitoring/tra.do?toolContentID=' + traToolContentId);
+		}
+		break;
+		
+		case 'tratStudentChoices': {
+			tabContent.load(LAMS_URL + 'tool/lascrt11/tblmonitoring/traStudentChoices.do?toolContentID=' + traToolContentId);
 		}
 		break;
 		
@@ -212,6 +217,14 @@ function initCommonElements(){
 	
 	$('#load-irat-student-choices-tab-btn').click(function(){
 		loadTab('iratStudentChoices', this);
+	});
+		
+	$('#load-trat-tab-btn').click(function(){
+		loadTab('trat', this);
+	});
+	
+	$('#load-trat-student-choices-tab-btn').click(function(){
+		loadTab('tratStudentChoices', this);
 	});
 	
 	$('#load-aes-tab-btn').click(function(){
@@ -2802,6 +2815,8 @@ function refreshMonitor(){
 		loadTab('irat');
 	} else if (tabName == 'iratStudentChoices'){
 		loadTab('iratStudentChoices');
+	} else if (tabName == 'trat'){
+		loadTab('trat');
 	} else if (tabName == 'aes'){
 		loadTab('aes');
 	} 
