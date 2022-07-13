@@ -196,7 +196,7 @@ public class TblMonitorController {
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, scratchie.getContentId());
 	request.setAttribute("discussionSentimentEnabled", scratchie.isDiscussionSentimentEnabled());
 
-	return "pages/monitoring/parts/burningQuestions";
+	return "pages/monitoring/parts/burningQuestions5";
     }
 
     /**

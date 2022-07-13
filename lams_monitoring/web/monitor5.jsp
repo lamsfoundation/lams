@@ -596,7 +596,7 @@
 						<span></span>
 					</div>
 				 -->
-				<p id="lesson-name">Lesson Name</p>
+				<p id="lesson-name"><c:out value="${lesson.lessonName}"/></p>
 			</div>
 			<div class="top-menu">
 				<div id="sequenceSearchPhraseContainer" class="input-group">

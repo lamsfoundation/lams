@@ -168,6 +168,11 @@ function loadTab(tabName, button) {
 			tabContent.load(LAMS_URL + 'tool/lascrt11/tblmonitoring/traStudentChoices.do?toolContentID=' + traToolContentId);
 		}
 		break;
+				
+		case 'burningQuestions': {
+			tabContent.load(LAMS_URL + 'tool/lascrt11/tblmonitoring/burningQuestions.do?toolContentID=' + traToolContentId);
+		}
+		break;
 		
 		case 'aes': {
 			tabContent.load(LAMS_URL + 'monitoring/tblmonitor/aes.do?'
@@ -225,6 +230,10 @@ function initCommonElements(){
 	
 	$('#load-trat-student-choices-tab-btn').click(function(){
 		loadTab('tratStudentChoices', this);
+	});
+	
+	$('#load-burning-tab-btn').click(function(){
+		loadTab('burningQuestions', this);
 	});
 	
 	$('#load-aes-tab-btn').click(function(){
@@ -2817,6 +2826,10 @@ function refreshMonitor(){
 		loadTab('iratStudentChoices');
 	} else if (tabName == 'trat'){
 		loadTab('trat');
+	} else if (tabName == 'tratStudentChoices'){
+		loadTab('tratStudentChoices');
+	} else if (tabName == 'burningQuestions'){
+		loadTab('burningQuestions');
 	} else if (tabName == 'aes'){
 		loadTab('aes');
 	} 
