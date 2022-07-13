@@ -22,7 +22,7 @@
 			<c:forEach var="question" items="${questions}" varStatus="i">
 				<tr>
 					<td class="text-center">
-						<a data-toggle="modal" href="#question${i.index}Modal" class="fs-5">
+						<a data-bs-toggle="modal" data-bs-target="#question${i.index}Modal" href="#"class="fs-5">
 							${i.index+1}
 						</a>
 					</td>
@@ -43,58 +43,50 @@
 </div>
 </div>
 
-<!-- End table -->
-
 <!-- Question detail modal -->
 <c:forEach var="question" items="${questions}" varStatus="i">
 	<div class="modal fade" id="question${i.index}Modal">
-	<div class="modal-dialog">
+	<div class="modal-dialog modal-dialog-centered">
 	<div class="modal-content">
-	<div class="modal-body">
-	
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h4 class="panel-title">
-					<span class="float-left space-right">Q${i.index+1})</span>
-					<c:if test="${not empty question.title}">
-						<p><c:out value="${question.title}"  escapeXml="false" /></p>
-					</c:if>
-					${question.question}
-				</h4>
+		<div class="modal-header align-items-start">
+			<div class="modal-title">
+				<span>Q${i.index+1})</span>
+				<c:if test="${not empty question.title}">
+					<p><c:out value="${question.title}"  escapeXml="false" /></p>
+				</c:if>
+				${question.question}
 			</div>
-			<div class="panel-body">
-				<div class="table-responsive">
-					<table class="table table-striped table-hover">
-						<tbody>
+			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		</div>
+		<div class="modal-body">
+			<div class="table-responsive">
+				<table class="table table-hover">
+					<tbody>
+						<c:forEach var="option" items="${question.optionDtos}" varStatus="j">
+							<c:set var="cssClass"><c:if test='${option.correct}'>bg-success</c:if></c:set>
+							<tr>
+								<td width="5px" class="${cssClass}">
+									${ALPHABET[j.index]}.
+								</td>
+								<td class="${cssClass}">
+									<c:out value="${option.name}" escapeXml="false"/>
+								</td>
+								<td class="${cssClass}">
+									<fmt:formatNumber type="number" maxFractionDigits="2" value="${option.percentage}"/>%
+								</td>
+							</tr>
+						</c:forEach>
 						
-							<c:forEach var="option" items="${question.optionDtos}" varStatus="j">
-								<c:set var="cssClass"><c:if test='${option.correct}'>bg-success</c:if></c:set>
-								<tr>
-									<td width="5px" class="${cssClass}">
-										${ALPHABET[j.index]}.
-									</td>
-									<td class="${cssClass}">
-										<c:out value="${option.name}" escapeXml="false"/>
-									</td>
-									<td class="${cssClass}">
-										<fmt:formatNumber type="number" maxFractionDigits="2" value="${option.percentage}"/>%
-									</td>
-								</tr>
-							</c:forEach>
-							
-						</tbody>
-					</table>
-				</div>
-			</div> 
+					</tbody>
+				</table>
+			</div>
 		</div>
 	            
 		<div class="modal-footer">	
-			<a href="#" data-dismiss="modal" class="btn btn-default">
+			<a href="#" data-bs-dismiss="modal" class="btn btn-secondary">
 				<fmt:message key="label.ok"/>
 			</a>
 		</div>
-	
-	</div>
 	</div>
 	</div>
 	</div>

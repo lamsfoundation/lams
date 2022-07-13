@@ -124,7 +124,7 @@
 								<th></th>
 								<c:forEach var="item" items="${items}" varStatus="i">
 									<th class="text-center">
-										<a data-toggle="modal" href="#question${i.index}Modal">
+										<a data-bs-toggle="modal" data-bs-target="#question${i.index}Modal" href="#">
 											<fmt:message key="label.authoring.basic.question.text"/> ${i.index + 1}
 										</a>
 									</th>
@@ -311,68 +311,63 @@
 	
 	<!-- Question detail modal -->
 	<c:forEach var="item" items="${items}" varStatus="i">
-		<div class="modal fade question-detail-modal" id="question${i.index}Modal">
-		<div class="modal-dialog">
+		<div class="modal fade" id="question${i.index}Modal">
+		<div class="modal-dialog modal-dialog-centered">
 		<div class="modal-content">
-		<div class="modal-body">
-		
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h4 class="panel-title"><span class="float-left space-right">Q${i.index+1})</span> ${item.qbQuestion.name}</h4>
+			<div class="modal-header align-items-start">
+				<div class="modal-title">
+					<span>Q${i.index+1})</span>
+					<c:if test="${not empty item.qbQuestion.name}">
+						<p><c:out value="${item.qbQuestion.name}"  escapeXml="false" /></p>
+					</c:if>
+					${item.qbQuestion.description}
 				</div>
-				<div class="panel-body">
-				
-					<div>
-						${item.qbQuestion.description}
-					</div>
-				
-					<div class="table-responsive voffset10">
-						<table class="table table-striped table-hover">
-							<tbody>
-							
-								<c:forEach var="qbOption" items="${item.qbQuestion.qbOptions}" varStatus="j">
-									<c:set var="cssClass"><c:if test='${qbOption.correct}'>bg-success</c:if></c:set>
-										<tr>
-											<c:choose>
-												<c:when test="${item.qbQuestion.type == 1 or item.qbQuestion.type == 8}">
-													<td width="5px" class="${cssClass}">
-														${ALPHABET[j.index]}.
-													</td>
-													<td class="${cssClass}">
-														<c:out value="${qbOption.name}" escapeXml="false"/>
-													</td>
-												</c:when>
-												<c:otherwise>
-													<td width="5px" class="${cssClass}">
-														<c:choose>
-															<c:when test="${qbOption.correct}">
-																<i class="fa fa-check"></i>
-															</c:when>
-															<c:otherwise>
-																<i class="fa fa-close"></i>
-															</c:otherwise>
-														</c:choose>
-													</td>
-													<td class="${cssClass}">
-														${fn:replace(qbOption.name, newLineChar, ', ')}
-													</td>
-												</c:otherwise>
-											</c:choose>
-										</tr>
-								</c:forEach>
-							</tbody>
-						</table>
-					</div>
-				</div> 
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
-		            
+			<div class="modal-body">
+				<div class="table-responsive voffset10">
+					<table class="table table-striped table-hover">
+						<tbody>
+						
+							<c:forEach var="qbOption" items="${item.qbQuestion.qbOptions}" varStatus="j">
+								<c:set var="cssClass"><c:if test='${qbOption.correct}'>bg-success</c:if></c:set>
+									<tr>
+										<c:choose>
+											<c:when test="${item.qbQuestion.type == 1 or item.qbQuestion.type == 8}">
+												<td width="5px" class="${cssClass}">
+													${ALPHABET[j.index]}.
+												</td>
+												<td class="${cssClass}">
+													<c:out value="${qbOption.name}" escapeXml="false"/>
+												</td>
+											</c:when>
+											<c:otherwise>
+												<td width="5px" class="${cssClass}">
+													<c:choose>
+														<c:when test="${qbOption.correct}">
+															<i class="fa fa-check"></i>
+														</c:when>
+														<c:otherwise>
+															<i class="fa fa-close"></i>
+														</c:otherwise>
+													</c:choose>
+												</td>
+												<td class="${cssClass}">
+													${fn:replace(qbOption.name, newLineChar, ', ')}
+												</td>
+											</c:otherwise>
+										</c:choose>
+									</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+				</div>
+			</div> 
 			<div class="modal-footer">	
-				<a href="#" data-dismiss="modal" class="btn btn-default">
+				<a href="#" data-bs-dismiss="modal" class="btn btn-secondary">
 					<fmt:message key="button.close"/>
 				</a>
 			</div>
-		
-		</div>
 		</div>
 		</div>
 		</div>

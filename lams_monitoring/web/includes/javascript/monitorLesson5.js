@@ -3187,3 +3187,34 @@ function clearEventSources() {
 	});
 	eventSources = [];
 }
+
+
+function printTable() {
+    var title = document.title;
+    var divElements = document.getElementById('questions-data').outerHTML;
+    var printWindow = window.open("", "_blank", "");
+    //open the window
+    printWindow.document.open();
+    //write the html to the new window, link to css file
+    printWindow.document.write('<html><head><title>' + title + '</title>\n');
+    printWindow.document.write('<style type="text/css">\n');
+    printWindow.document.write('body {font-family: "Helvetica Neue",Helvetica,Arial,sans-serif; -webkit-print-color-adjust: exact;}\n');
+    printWindow.document.write('.table > tbody > tr > td.success {background-color: #81c466;}\n');
+    printWindow.document.write('table { border: 1px solid #ddd; width: 100%; max-width: 100%; margin-bottom: 20px; background-color: transparent; border-spacing: 0; border-collapse: collapse; }\n');
+    printWindow.document.write('* { -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; font-size: 16px; }\n');
+    printWindow.document.write('.table-striped > tbody > tr:nth-of-type(2n+1) {background-color: #f9f9f9; }\n');
+    printWindow.document.write('.table-bordered > tbody > tr > td, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > td, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > thead > tr > th {  border: 1px solid #ddd;  }\n');
+    printWindow.document.write('a { color: #337ab7; text-decoration: none; }\n');
+    printWindow.document.write('.text-center { text-align: center; }\n');
+    printWindow.document.write('</style>\n');
+    printWindow.document.write('</head><body>\n');
+    printWindow.document.write(divElements);
+    printWindow.document.write('\n</body></html>');
+    printWindow.document.close();
+    printWindow.focus();
+    //The Timeout is ONLY to make Safari work, but it still works with FF, IE & Chrome.
+    setTimeout(function() {
+        printWindow.print();
+        printWindow.close();
+    }, 100);
+}
