@@ -41,6 +41,26 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/tempus-dominus.min.js"></script>
+	
+	<c:choose>
+		<c:when test="${localeLanguage eq 'es'}">
+			<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jqgrid-i18n/grid.locale-es.js"></script>
+			<c:set var="jqGridInternationalised" value="true" />
+	 	</c:when>
+	 	 <c:when test="${localeLanguage eq 'fr'}">
+	 	 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jqgrid-i18n/grid.locale-fr.js"></script>
+	 	 	<c:set var="jqGridInternationalised" value="true" />
+	 	 </c:when>
+	 	 <c:when test="${localeLanguage eq 'el'}">
+	 	 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jqgrid-i18n/grid.locale-el.js"></script>
+	 	 	<c:set var="jqGridInternationalised" value="true" />
+	 	 </c:when>
+	 	<c:when test="${localeLanguage eq 'no'}">
+	 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jqgrid-i18n/grid.locale-no.js"></script>
+	 	 	<c:set var="jqGridInternationalised" value="true" />
+	 	 </c:when>
+	</c:choose>
+	
 	<lams:JSImport src="includes/javascript/common.js" />
 	<lams:JSImport src="includes/javascript/download.js" />
 	<lams:JSImport src="includes/javascript/portrait5.js" />
@@ -240,9 +260,10 @@
 				<fmt:message key="label.person.editing.lesson" var="LIVE_EDIT_WARNING_VAR"><fmt:param value="%0"/></fmt:message>
 				LIVE_EDIT_WARNING: '<c:out value="${LIVE_EDIT_WARNING_VAR}" />'
 			};
-
-			<%-- Add jqGrid internationalisation snippet --%> 
-			<c:import url="/jqGrid.i18n.jsp" context="/lams" />
+			
+		<c:if test="${jqGridInternationalised}">
+			$.extend(true, $.jgrid,$.jgrid.regional['${language}']);
+		</c:if>
 	</script>
 	
 </head>
