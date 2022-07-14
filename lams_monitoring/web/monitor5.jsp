@@ -39,10 +39,11 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chart.bundle.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chart.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait5.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/tempus-dominus.min.js"></script>
 	<lams:JSImport src="includes/javascript/common.js" />
+	<lams:JSImport src="includes/javascript/download.js" />
+	<lams:JSImport src="includes/javascript/portrait5.js" />
 	<lams:JSImport src="includes/javascript/dialog5.js" />
 	<lams:JSImport src="includes/javascript/monitorLesson5.js" relative="true" />
 	
@@ -64,6 +65,7 @@
 			aeToolContentIds = "${aeToolContentIds}",
 			aeToolTypes = "${aeToolTypes}",
 			aeActivityTitles = "${aeActivityTitles}",
+			peerreviewToolContentId = "${peerreviewToolContentId}",
 			
 			LAMS_URL = '<lams:LAMSURL/>',
 			csrfToken = '<csrf:tokenname/> : <csrf:tokenvalue/>',
@@ -386,7 +388,7 @@
 						<c:if test="${not empty isPeerreviewAvailable}">
 							<div class="navigate-btn-container">
 								<a id="load-peer-review-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.peer.review' />">
-									<i class="fa fa-users fa-lg"></i>
+									<i class="fa fa-person-circle-question fa-lg"></i>
 								</a>
 								<label for="load-aes-tab-btn">
 									<fmt:message key='label.peer.review' />

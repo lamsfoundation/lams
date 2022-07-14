@@ -181,6 +181,11 @@ function loadTab(tabName, button) {
 							+ '&aeActivityTitles=' + encodeURIComponent(aeActivityTitles));
 		}
 		break;
+		
+		case 'peerReview': {
+			tabContent.load(LAMS_URL + 'tool/laprev11/tblmonitoring/peerreview.do?toolContentID=' + peerreviewToolContentId);
+		}
+		break;
 	}
 }
 
@@ -238,6 +243,10 @@ function initCommonElements(){
 	
 	$('#load-aes-tab-btn').click(function(){
 		loadTab('aes', this);
+	});
+	
+	$('#load-peer-review-tab-btn').click(function(){
+		loadTab('peerReview', this);
 	});
 	
 	$('#load-other-nvg-btn').click(function(){
@@ -2832,6 +2841,8 @@ function refreshMonitor(){
 		loadTab('burningQuestions');
 	} else if (tabName == 'aes'){
 		loadTab('aes');
+	} else if (tabName == 'peerReview'){
+		loadTab('peerReview');
 	} 
 }
 

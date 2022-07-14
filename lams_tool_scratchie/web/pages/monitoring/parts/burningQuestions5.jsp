@@ -132,8 +132,8 @@
 						<c:set var="generalBurningQuestionDiscussionItemUid"
 							   value="${empty generalBurningQuestionDiscussionItemUid and not empty item.uid ? item.uid : generalBurningQuestionDiscussionItemUid}" />
 						<c:set var="discussionItemUid" value="${empty item.uid ? generalBurningQuestionDiscussionItemUid : item.uid}" />
-			 			<div class="accordion-item" >
-					    	<h4 class="accordion-header" id="heading${groupSummary.sessionId}">
+			 			<div class="accordion-item">
+					    	<h4 class="accordion-header" id="heading${item.uid}">
 					    	  	<button class="accordion-button collapsed" type="button"
 						    			data-bs-toggle="collapse" data-bs-target="#collapse${item.uid}"
 						    			aria-expanded="false">
@@ -151,7 +151,7 @@
 									</c:choose>
 						    	</button>
 						    </h4>
-						    <div id="collapse${item.uid}" class="accordion-collapse collapse" aria-labelledby="heading${groupSummary.sessionId}">	
+						    <div id="collapse${item.uid}" class="accordion-collapse collapse" aria-labelledby="heading${item.uid}">	
 								<div class="accordion-body">
 								
 									<span class="burning-question-description">

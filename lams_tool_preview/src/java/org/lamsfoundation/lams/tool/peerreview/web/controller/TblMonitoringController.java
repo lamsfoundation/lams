@@ -65,7 +65,7 @@ public class TblMonitoringController {
 
 	request.setAttribute(PeerreviewConstants.ATTR_CRITERIAS, flattenedCriterias);
 
-	return "/pages/monitoring/summary";
+	return "/pages/monitoring/summary5";
     }
 
 }
