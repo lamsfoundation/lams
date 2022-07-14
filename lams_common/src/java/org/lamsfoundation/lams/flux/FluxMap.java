@@ -118,7 +118,10 @@ public class FluxMap<T, U> {
 			    log.debug("Cancelling (" + counter + ") subscription to flux for \"" + name + "\" with key "
 				    + key);
 			}
-		    });
+		    })
+
+		    // detach all subscribers when flux is complete
+		    .onTerminateDetach();
 
 	    // remove Flux when source Flux did not emit an accepted signal before given timeout
 	    if (timeoutSeconds != null) {

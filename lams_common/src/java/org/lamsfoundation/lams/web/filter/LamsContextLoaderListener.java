@@ -1,7 +1,9 @@
 package org.lamsfoundation.lams.web.filter;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
 
+import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.web.context.ContextLoaderListener;
@@ -28,5 +30,16 @@ public class LamsContextLoaderListener extends ContextLoaderListener {
 	    parentContext = (ApplicationContext) parentContext.getBean(PARENT_CONTEXT_NAME);
 	}
 	return parentContext;
+    }
+
+    /**
+     * Close the root web application context.
+     */
+    @Override
+    public void contextDestroyed(ServletContextEvent event) {
+	// close all sinks and underlying fluxes
+	FluxRegistry.shutdown();
+	
+	super.contextDestroyed(event);
     }
 }

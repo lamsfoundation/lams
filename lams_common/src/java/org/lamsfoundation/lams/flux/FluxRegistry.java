@@ -6,9 +6,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
+import org.apache.log4j.Logger;
+
 import reactor.core.publisher.Flux;
 
 public class FluxRegistry {
+    private static Logger log = Logger.getLogger(FluxMap.class.getName());
+
     @SuppressWarnings("rawtypes")
     private static final Map<String, FluxMap> fluxRegistry = new ConcurrentHashMap<>();
     @SuppressWarnings("rawtypes")
@@ -50,8 +54,10 @@ public class FluxRegistry {
     public static <T> void initFluxMap(String fluxName, String sinkName, BiPredicate<T, T> itemEqualsPredicate,
 	    Function<T, String> fetchFunction, Integer throttleSeconds, Integer timeoutSeconds) {
 	if (fluxRegistry.containsKey(fluxName)) {
-	    throw new IllegalArgumentException("FluxMap for \"" + fluxName + "\" was already initialised");
+	    log.warn("FluxMap for \"" + fluxName + "\" was already initialised");
+	    return;
 	}
+
 	SharedSink<T> sink = sinkRegistry.get(sinkName);
 	if (sink == null) {
 	    sink = FluxRegistry.getSink(sinkName);
@@ -90,6 +96,16 @@ public class FluxRegistry {
 	for (Entry<String, Function> binding : sinkBindings.entrySet()) {
 	    FluxRegistry.emit(binding.getKey(), binding.getValue().apply(item));
 	}
+    }
 
+    @SuppressWarnings("rawtypes")
+    public static void shutdown() {
+	for (SharedSink sink : sinkRegistry.values()) {
+	    try {
+		sink.shutdown();
+	    } catch (Exception e) {
+		log.warn("Exception while closing Flux sink: " + e.getMessage());
+	    }
+	}
     }
 }

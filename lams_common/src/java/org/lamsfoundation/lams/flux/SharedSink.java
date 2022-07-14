@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
+import reactor.core.publisher.Sinks.EmitFailureHandler;
 
 /**
  * This class allows both sink functionality (manually pushing elements to Flux)
@@ -36,5 +37,9 @@ public class SharedSink<T> {
 
     public Flux<T> getFlux() {
 	return flux;
+    }
+
+    public void shutdown() {
+	sink.emitComplete(EmitFailureHandler.FAIL_FAST);
     }
 }
