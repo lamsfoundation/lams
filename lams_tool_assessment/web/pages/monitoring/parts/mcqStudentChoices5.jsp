@@ -1,5 +1,9 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<script>
+	$('#allocate-vsas-button').toggle(${vsaPresent});
+</script>
+
 <!-- Table -->
 <c:if test="${not empty questions}">
 <div class="card">

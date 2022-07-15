@@ -11,7 +11,6 @@ import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
@@ -67,6 +66,18 @@ public class TblMonitoringController {
 	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
 
+	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
+	request.setAttribute("groupsInAnsweredQuestionsChart", assessment.isUseSelectLeaderToolOuput());
+	request.setAttribute("assessment", assessment);
+
+	return "pages/tblmonitoring/iraAssessmentStudentChoices5";
+    }
+
+    @RequestMapping("iraAssessmentStudentChoicesTable")
+    public String iraAssessmentStudentChoicesTable(HttpServletRequest request) {
+	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
+
 	//prepare list of the questions, filtering out questions that aren't supposed to be answered
 	Set<AssessmentQuestion> questionList = new LinkedHashSet<>();
 	//in case there is at least one random question - we need to show all questions in a drop down select
@@ -118,12 +129,7 @@ public class TblMonitoringController {
 	}
 	request.setAttribute("questions", questionDtos);
 
-	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
-	request.setAttribute("groupsInAnsweredQuestionsChart", assessment.isUseSelectLeaderToolOuput());
-	request.setAttribute("assessment", assessment);
-	request.setAttribute("isTbl", true);
-
-	return "pages/tblmonitoring/iraAssessmentStudentChoices5";
+	return "pages/monitoring/parts/mcqStudentChoices5";
     }
 
     private List<TblAssessmentDTO> getAssessmentDtos(String[] toolContentIds, String[] activityTitles) {

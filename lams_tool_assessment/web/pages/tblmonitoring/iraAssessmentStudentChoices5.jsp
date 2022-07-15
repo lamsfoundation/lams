@@ -9,6 +9,10 @@
 	<c:param name="isTbl" value="true" />
 	<c:param name="controllerContext" value="tool/laasse10/monitoring" />
 </c:url>
+
+<style>
+
+</style>
 	
 <lams:JSImport src="includes/javascript/chart5.js" relative="true" />
 
@@ -43,8 +47,17 @@
 		COMPLETION_CHART_UPDATE_INTERVAL = 0;
 	
 	$(document).ready(function(){
-		drawCompletionCharts(${toolContentID}, ${groupsInAnsweredQuestionsChart}, false);
+		openEventSource('<lams:WebAppURL />monitoring/getCompletionChartsData.do?toolContentId=${toolContentID}', function(event) {
+			if (!event.data) {
+				return;
+			}
+			var data = JSON.parse(event.data);
+			drawActivityCompletionChart(data, true);
+			drawAnsweredQuestionsChart(data, ${groupsInAnsweredQuestionsChart}, true);
 
+			$('#student-choices-table').load('<lams:WebAppURL />tblmonitoring/iraAssessmentStudentChoicesTable.do?toolContentID=${toolContentID}');
+		});
+		
 		$('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');
 	});
 			
@@ -83,12 +96,10 @@
 				<i class="fa fa-file"></i>
 				<fmt:message key="label.excel.export"/>
 			</a>
-			<c:if test="${vsaPresent}">
-				<a class="btn btn-secondary buttons_column" target="_blank"
-				   href='<lams:LAMSURL />qb/vsa/displayVsaAllocate.do?toolContentID=${toolContentID}'>
-					<fmt:message key="label.vsa.allocate.button" />
-				</a>
-			</c:if>
+			<a class="btn btn-secondary buttons_column d-none" target="_blank" id="allocate-vsas-button"
+			   href='<lams:LAMSURL />qb/vsa/displayVsaAllocate.do?toolContentID=${toolContentID}'>
+				<fmt:message key="label.vsa.allocate.button" />
+			</a>
 		</div>
 	</div>
 	<!-- End notifications -->
@@ -110,7 +121,7 @@
 	
 	<%-- Include student's choices part --%>
 	<div class="row">
-		<div class="col-10 offset-1">
+		<div class="col-10 offset-1" id="student-choices-table">
 			<%@ include file="/pages/monitoring/parts/mcqStudentChoices5.jsp" %>
 		</div>
 	</div>
