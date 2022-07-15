@@ -3,13 +3,14 @@
 	--lams-yellow: #F9F871;
 	--lams-green: #00914A;
 	--lams-red: #D73961;
+	--lams-gray: #6c757d;
 	--lams-opacity: 0.5;
 	--lams-low-opacity: 0.25;
 }
 
 .svg-tool-activity-border {
 	fill: none;
-	stroke: var(--bs-gray);
+	stroke: var(--lams-gray);
 	stroke-width: 1;
 }
 
@@ -98,7 +99,7 @@
 }
 
 .svg-annotation-container {
-	stroke: var(--bs-gray);
+	stroke: var(--lams-gray);
 }
 
 .svg-activity-optional .svg-annotation-container,
@@ -110,18 +111,18 @@
 
 .svg-transition {
 	stroke-width: 1;
-	stroke: var(--bs-gray);
+	stroke: var(--lams-gray);
 	fill: none;
 }
 
 .svg-transition-element {
-	stroke: var(--bs-gray);
-	fill: var(--bs-gray);
+	stroke: var(--lams-gray);
+	fill: var(--lams-gray);
 }
 
 .svg-transition-draw {
 	stroke-width: 2;
-	stroke: var(--bs-gray);
+	stroke: var(--lams-gray);
 	stroke-dasharray: 5, 3;
 }
 
