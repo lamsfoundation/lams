@@ -55,6 +55,8 @@ import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.flux.FluxMap;
+import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -174,6 +176,12 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     private IOutcomeService outcomeService;
 
     private ScratchieOutputFactory scratchieOutputFactory;
+
+    public ScratchieServiceImpl() {
+	FluxRegistry.initFluxMap(ScratchieConstants.ANSWERS_UPDATED_SINK_NAME,
+		ScratchieConstants.ANSWERS_UPDATED_SINK_NAME, null, toolContentId -> "doRefresh",
+		FluxMap.SHORT_THROTTLE, FluxMap.STANDARD_TIMEOUT);
+    }
 
     // *******************************************************************************
     // Service method
@@ -464,8 +472,11 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    log.setQbToolQuestion(qbToolQuestion);
 	    log.setAccessDate(new Timestamp(new Date().getTime()));
 	    scratchieAnswerVisitDao.saveObject(log);
+	    // need to flush so subscribers to sink see new answers in DB
+	    scratchieAnswerVisitDao.flush();
 
 	    recalculateMarkForSession(sessionId, false);
+	    FluxRegistry.emit(ScratchieConstants.ANSWERS_UPDATED_SINK_NAME, log.getQbToolQuestion().getToolContentId());
 	}
     }
 

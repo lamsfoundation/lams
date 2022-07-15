@@ -191,4 +191,9 @@ public class ScratchieConstants {
     public static final String ATTR_SHOW_RESULTS = "showResults";
 
     public static final String ATTR_REFERENCES_SEQUENCE_IDS = "sequenceIds";
+    
+    //flux management
+    public static final String ANSWERS_UPDATED_SINK_NAME = "scratchie learner answers updated";
+
+    public static final String STUDENT_CHOICES_UPDATE_FLUX_NAME = "scratchie student choices updated";
 }

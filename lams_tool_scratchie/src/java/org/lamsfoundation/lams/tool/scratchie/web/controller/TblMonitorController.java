@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
@@ -54,6 +55,7 @@ import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,8 +64,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import reactor.core.publisher.Flux;
 
 @Controller
 @RequestMapping("/tblmonitoring")
@@ -123,9 +128,26 @@ public class TblMonitorController {
 
 	model.addAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
 	model.addAttribute("scratchie", scratchie);
-	model.addAttribute("isTbl", true);
 
 	return "pages/monitoring/studentChoices5";
+    }
+
+    @RequestMapping("/traStudentChoicesTable")
+    public String traStudentChoicesTable(@RequestParam(name = AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentId,
+	    Model model) throws IOException, ServletException {
+	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
+
+	Map<String, Object> modelAttributes = scratchieService.prepareStudentChoicesData(scratchie);
+	model.addAllAttributes(modelAttributes);
+
+	return "pages/monitoring/studentChoicesTable";
+    }
+
+    @RequestMapping(path = "/traStudentChoicesFlux", method = RequestMethod.GET, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @ResponseBody
+    public Flux<String> getTraStudentChoicesFlux(@RequestParam long toolContentId)
+	    throws JsonProcessingException, IOException {
+	return FluxRegistry.get(ScratchieConstants.ANSWERS_UPDATED_SINK_NAME, toolContentId);
     }
 
     /**
