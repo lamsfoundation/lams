@@ -48,7 +48,16 @@
 	COMPLETION_CHART_UPDATE_INTERVAL = 10 * 1000;
 	
 	$(document).ready(function(){
-		drawCompletionCharts(${toolContentID}, ${groupsInAnsweredQuestionsChart}, true);
+		openEventSource('<lams:WebAppURL />monitoring/getCompletionChartsData.do?toolContentId=${toolContentID}', function(event) {
+			if (!event.data) {
+				return;
+			}
+			var data = JSON.parse(event.data);
+			drawActivityCompletionChart(data, true);
+			drawAnsweredQuestionsChart(data, ${groupsInAnsweredQuestionsChart}, true);
+
+			$('#student-choices-table').load('<lams:WebAppURL />tblmonitoring/aesStudentChoicesTable.do?toolContentID=${toolContentID}');
+		});
 
 		$('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');
 	});
@@ -146,22 +155,8 @@
 				<tr>
 					<td colspan="${fn:length(questionDtos) + 1}" class="fw-bold"><fmt:message key="label.teams"/></td> 
 				</tr>
-				
-				<c:forEach var="session" items="${sessions}" varStatus="i">
-					<tr>
-						<td class="text-center">
-							${session.sessionName}
-						</td>
-						
-						<c:forEach var="tblQuestionDto" items="${questionDtos}" varStatus="j">
-							<c:set var="questionResultDto" value="${tblQuestionDto.sessionQuestionResults[i.index]}"/>
-							<td class="text-center <c:if test="${questionResultDto.correct}">bg-success</c:if>" >
-								${questionResultDto.answer}
-							</td>
-						</c:forEach>
-						
-					</tr>
-				</c:forEach>                                               
+			</tbody>
+			<tbody id="student-choices-table">                                             
 			</tbody>
 		</table>
 	</div>

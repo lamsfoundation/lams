@@ -201,8 +201,8 @@ public class TblMonitoringController {
     /**
      * Shows ira StudentChoices page
      */
-    @RequestMapping("aesStudentChoices")
-    public String aesStudentChoices(HttpServletRequest request) {
+    @RequestMapping("aesStudentChoicesTable")
+    public String aesStudentChoicesTable(HttpServletRequest request) {
 	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
 	Map<Long, QuestionSummary> questionSummaries = assessmentService.getQuestionSummaryForExport(assessment, false);
@@ -211,10 +211,6 @@ public class TblMonitoringController {
 	    QuestionDTO questionDto = questionSummary.getQuestionDto();
 
 	    TblAssessmentQuestionDTO tblQuestionDto = new TblAssessmentQuestionDTO();
-	    tblQuestionDto.setTitle(questionDto.getTitle());
-	    tblQuestionDto
-		    .setQuestionTypeLabel(AssessmentServiceImpl.getQuestionTypeLanguageLabel(questionDto.getType()));
-	    tblQuestionDto.setCorrectAnswer(getAssessmentCorrectAnswer(questionDto));
 
 	    List<TblAssessmentQuestionResultDTO> sessionQuestionResults = new ArrayList<>();
 	    for (List<AssessmentQuestionResult> questionResultsPerSession : questionSummary
@@ -274,10 +270,32 @@ public class TblMonitoringController {
 
 	request.setAttribute("sessions", sessions);
 	request.setAttribute("questionDtos", tblQuestionDtos);
+
+	return "pages/tblmonitoring/assessmentStudentChoicesTable";
+    }
+
+    @RequestMapping("aesStudentChoices")
+    public String aesStudentChoices(HttpServletRequest request) {
+	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
+	Map<Long, QuestionSummary> questionSummaries = assessmentService.getQuestionSummaryForExport(assessment, false);
+	List<TblAssessmentQuestionDTO> tblQuestionDtos = new ArrayList<>();
+	for (QuestionSummary questionSummary : questionSummaries.values()) {
+	    QuestionDTO questionDto = questionSummary.getQuestionDto();
+
+	    TblAssessmentQuestionDTO tblQuestionDto = new TblAssessmentQuestionDTO();
+	    tblQuestionDto.setTitle(questionDto.getTitle());
+	    tblQuestionDto
+		    .setQuestionTypeLabel(AssessmentServiceImpl.getQuestionTypeLanguageLabel(questionDto.getType()));
+	    tblQuestionDto.setCorrectAnswer(getAssessmentCorrectAnswer(questionDto));
+
+	    tblQuestionDtos.add(tblQuestionDto);
+	}
+
+	request.setAttribute("questionDtos", tblQuestionDtos);
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
 	request.setAttribute("groupsInAnsweredQuestionsChart", assessment.isUseSelectLeaderToolOuput());
 	request.setAttribute("assessment", assessment);
-	request.setAttribute("isTbl", true);
 
 	return "pages/tblmonitoring/assessmentStudentChoices5";
     }
