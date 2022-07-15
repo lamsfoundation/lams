@@ -786,11 +786,13 @@
 		</div>
 	</c:if>
 	
+	<!-- 
 	<div>
 		<button onclick="javascript:startTour();return false;" class="btn btn-sm btn-secondary tour-button"> 
 			<i class="fa-solid fa-question-circle"></i> <span class="hidden-xs">Tour</span>
 		</button>
 	</div>
+	 -->
 </div> <!-- Closes buttons -->
 		
 <div id="releaseMarksPanel"></div>
