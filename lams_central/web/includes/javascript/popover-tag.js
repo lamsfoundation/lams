@@ -1,36 +1,7 @@
 $(document).ready(function() {
 	// has this script already run?
-	let otherPopoversProcessed = $('.lams-popover-processed').length > 0;
-	
-	// go through only non-processed LAMS popovers
-	$('.lams-popover:not(.lams-popover-processed)')
-		// mark this popover as processed and add icons
-		.addClass('lams-popover-processed fa fa-question-circle')
-		// add accessibility attributes
-		.attr({
-			"aria-expanded" : "false",
-			"aria-haspopup" : "true",
-			"tabindex"      : "0",
-			"role"          : "button"
-		})
-		.css({
-			'color' : 'black',
-			'text-decoration' : 'none'
-		})
-		.on('keypress', function(e){
-		    if (e.keyCode === 32 || e.keyCode == 13) {
-				// check for Space or Enter key and simulate a click
-		        $(this).trigger('click');
-		        return false;
-		    }
-		})
-		.popover({
-			'container' : 'body',
-			'html'      : true,
-			'trigger'   : 'click',
-			// without this option the close button in popover title does not show up
-			'sanitize'  : false,
-			'title' : function(){
+	let otherPopoversProcessed = $('.lams-popover-processed').length > 0,
+		titleFunction = function(){
 				// first try to get the title straight from element attributes
 				let popover = $(this),
 					title = popover.data('title');
@@ -62,12 +33,41 @@ $(document).ready(function() {
 					popover.attr('aria-label', title);
 					// put title text on the left and a close button on the right
 					title = '<div style="display: flex; justify-content: space-between;"><span>' + title + 
-							'</span><a role="button" class="close" aria-label="Close" tabindex="0" style="height: 100%"><span aria-hidden="true">&times;</span></a>';
+							'</span><button type="buttton" class="btn-close" aria-label="Close" tabindex="0"></button>';
 					popover.data('titlePresent', true);
 				}
 				
 				return title;
-			},
+			};
+	
+	// go through only non-processed LAMS popovers
+	$('.lams-popover:not(.lams-popover-processed)')
+		// mark this popover as processed and add icons
+		.addClass('lams-popover-processed fa fa-question-circle')
+		// add accessibility attributes
+		.attr({
+			"aria-expanded" : "false",
+			"aria-haspopup" : "true",
+			"tabindex"      : "0",
+			"role"          : "button"
+		})
+		.css({
+			'color' : 'black',
+			'text-decoration' : 'none'
+		})
+		.on('keypress', function(e){
+		    if (e.keyCode === 32 || e.keyCode == 13) {
+				// check for Space or Enter key and simulate a click
+		        $(this).trigger('click');
+		        return false;
+		    }
+		}).popover({
+			'container' : 'body',
+			'html'      : true,
+			'trigger'   : 'click',
+			// without this option the close button in popover title does not show up
+			'sanitize'  : false,
+			'title' : titleFunction,
 			'content' : function(){
 				// first try to get content straight from element attributes
 				let popover = $(this),
@@ -91,15 +91,17 @@ $(document).ready(function() {
 				
 				// if there is not title then we need to put close button directly on content
 				if (content && !popover.data('titlePresent')) {
-					content = '<a role="button" class="close pull-right" aria-label="Close" tabindex="0" style="height: 100%"><span aria-hidden="true">&times;</span></a>'
-					          + content;
+					content = '<div class="d-flex flex-column">'
+							  + '<button type="buttton" class="btn-close align-self-end" aria-label="Close" tabindex="0"></button>'
+					          + content + '</div>';
 				}
 				
 				return content;
 			}
-		}).each(function(){
+		}).data('lamsPopoverTitleFunction', titleFunction)
+		  .each(function(){
 			// trigger title() function for each popover so aria-label gets set up
-			$(this).data('bs.popover').options.title.call(this);
+			$(this).data('lamsPopoverTitleFunction').call(this);
 		});
 		
 	if (otherPopoversProcessed) {
@@ -108,7 +110,7 @@ $(document).ready(function() {
 	}
 		
 	// when a close button is clicked, close the popover
-	$(document).on('keypress click', '.popover .close', function(e){
+	$(document).on('keypress click', '.popover .btn-close', function(e){
 		if (e.type == "click" || e.keyCode === 32 || e.keyCode == 13) {
 			var popoverId = $(this).closest('.popover').attr('id');
 			$('.lams-popover-processed[data-original-title], .lams-popover-processed[aria-describedby="' + popoverId + '"]').popover('hide');

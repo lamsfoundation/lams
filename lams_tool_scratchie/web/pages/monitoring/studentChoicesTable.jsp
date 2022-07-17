@@ -79,8 +79,10 @@
 	<c:set var="totalPercentSum" value="0" />
 	<tr>
 		<th><fmt:message key="label.total"/>&nbsp;
-		<i class="fa fa-question-circle text-primary" data-toggle="tooltip" data-placement="top" data-container="body" 
-		   title="<fmt:message key="label.total.1st.attempt.by.question"/>"></i></th>
+			<lams:Popover>
+				<fmt:message key="label.total.1st.attempt.by.question"/>
+			</lams:Popover>
+		</th>
 		   
 		<c:forEach var="item" items="${items}">
 			<c:set var="highlightClass">
@@ -108,8 +110,9 @@
 		</c:set>
 		<td class="text-center ${totalAverageHighlightClass}">
 			<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${totalSum / fn:length(items)}" />&nbsp;
-			<i class="fa fa-question-circle text-primary" data-toggle="tooltip" data-placement="top" data-container="body" 
-			    title="<fmt:message key="label.total.1st.attempt.average"/>"></i>
+			<lams:Popover>
+				<fmt:message key="label.total.1st.attempt.average"/>
+			</lams:Popover>
 		</td>
 		<td class="text-center">-</td>
 	</tr>
@@ -131,8 +134,9 @@
 		<td class="text-center">-</td>
 		<td class="text-center ${totalAverageHighlightClass}">					
 			<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${totalPercentAverage}" />&nbsp;%&nbsp;
-			<i class="fa fa-question-circle text-primary" data-toggle="tooltip" data-placement="top" data-container="body" 
-			    title="<fmt:message key="label.total.1st.attempt.average"/>"></i>
+			<lams:Popover>
+				<fmt:message key="label.total.1st.attempt.average"/>
+			</lams:Popover>
 		</td>
 	</tr>                         
 </c:if>				

@@ -133,8 +133,9 @@
 								
 								<th class="text-center">
 									<fmt:message key="label.total"/>&nbsp;
-									<i class="fa fa-question-circle text-primary" data-toggle="tooltip" data-placement="top" data-container="body" 
-									   title="<fmt:message key="label.total.1st.attempt.by.team"/>"></i>
+									<lams:Popover>
+										<fmt:message key="label.total.1st.attempt.by.team"/>
+									</lams:Popover>
 								</th>
 								<th class="text-center">
 									<fmt:message key="label.total"/> %
