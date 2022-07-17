@@ -1,6 +1,8 @@
 ﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
 // copy of lesson SVG so it does no need to be fetched every time
-var originalSequenceCanvas = null,
+var currentTab = 'sequence',
+
+	originalSequenceCanvas = null,
 // DIV container for lesson SVG
 // it gets accessed so many times it's worth to cache it here
 	sequenceCanvas = null,
@@ -72,6 +74,8 @@ $(document).ready(function(){
 });
 
 function loadTab(tabName, button) {
+	currentTab = tabName;
+	
 	$('.navigate-btn-container a.btn, .lesson-properties').removeClass('active');
 	$('.component-sidebar').removeClass('expanded');
 	if (button) {
@@ -81,7 +85,6 @@ function loadTab(tabName, button) {
 	clearEventSources();
 	
 	let tabContent = $('.monitoring-page-content .tab-content').empty();
-		
 		
 	switch(tabName) {
 		case 'sequence': {
@@ -1035,25 +1038,25 @@ function updateContributeActivities(contributeActivities) {
 					case 3  : 
 					case 12 : if (this.isComplete) {
 						 		entryContent += '<div class="pull-right"><button class="contribute-gate-opened-button btn btn-success" '
-						 					 + 'onClick="javascript:openPopUp(\'' + this.url 
-						 					 + '\',\'ContributeActivity\', 800, 1280, true)" '
+						 					 + 'onClick="javascript:openGateSelectively(\'' + this.url  + '\')" '
 						 					 + 'title="' + LABELS.CONTRIBUTE_OPENED_GATE_TOOLTIP + '">'
 						 					 + LABELS.CONTRIBUTE_OPENED_GATE 
 						 					 + '</button></div>';
 							} else {
-								entryContent += '<div class="btn-group" role="group"><button onClick="javascript:openGateNow('
+								entryContent += '<div class="btn-group dropdown-center"><button onClick="javascript:openGateNow('
                                     + contributeActivity.activityID + ')" type="button" class="btn btn-primary" title="' 
 									+ LABELS.CONTRIBUTE_OPEN_GATE_NOW_TOOLTIP + '">' 
 									+ LABELS.CONTRIBUTE_OPEN_GATE_NOW_BUTTON 
-									+ '</button><button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'
-									+ '<div class="dropdown-menu"><a href="#" class="dropdown-item" onClick="javascript:openPopUp(\''
-                                    + this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' 
+									+ '</button><button  class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" ' 
+									+ 'type="button" aria-haspopup="true" aria-expanded="false"></button>'
+									+ '<ul class="dropdown-menu"><li class="bg-primary rounded">'
+									+ '<a href="#" class="dropdown-item text-white" onClick="javascript:openGateSelectively(\'' + this.url + '\')" title="' 
 									+ LABELS.CONTRIBUTE_OPEN_GATE_TOOLTIP + '">' 
-									+ LABELS.CONTRIBUTE_OPEN_GATE_BUTTON + '</a></div></div>';
+									+ LABELS.CONTRIBUTE_OPEN_GATE_BUTTON + '</a></li></ul></div>';
 									
 							}
 							break;
-					default : entryContent += '<button type="button" class="btn contribute-go-button" onClick="javascript:openPopUp(\''
+					default : entryContent += '<button type="button" class="btn btn-primary contribute-go-button" onClick="javascript:openPopUp(\''
 						 + this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' + LABELS.CONTRIBUTE_TOOLTIP
 						 + '">' + LABELS.CONTRIBUTE_BUTTON + '</button>';
 				}
@@ -1265,25 +1268,29 @@ function openGateNow(activityId) {
 		'url'  : LAMS_URL + 'monitoring/gate/openGate.do',
 		'data'  : data,
 		'success' : function(){
-			updateLessonTab();
+			refreshMonitor();
 		}
 	});
 }
 
-function closeGate(activityId) {
-	var data = {
-		'activityId' : activityId
-	};
-	data[csrfTokenName] = csrfTokenValue;
-	$.ajax({
-		'type' : 'post',
-		'url'  : LAMS_URL + 'monitoring/gate/closeGate.do',
-		'data'  : data,
-		'success' : function(){
-			updateLessonTab();
+function openGateSelectively(url){
+	showDialog("dialogGate", {
+		'autoOpen'  : true,
+		'height'    : 820,
+		'modal'     : false,
+		'resizable' : false,
+		'title'     : LABELS.CONTRIBUTE_OPEN_GATE_BUTTON,
+		'open'      : function(){
+			var dialog = $(this);
+			// load contents after opening the dialog
+			$('iframe', dialog).attr('src', url);
+		},
+		'close' : function(){
+			refreshMonitor();
 		}
-	});
+	}, false, true).addClass('modal-lg');
 }
+
 //********** SEQUENCE TAB FUNCTIONS **********
 
 /**
@@ -2810,40 +2817,15 @@ function openPopUp(url, title, h, w, status, forceNewWindow) {
  * Updates all changeable elements of monitoring screen.
  */
 function refreshMonitor(){
-	let tabName = 'sequence';
-	if ($('#learners-accordion').length === 1) {
-		tabName = 'learners';
-	} else if ($('#gradebookDiv').length === 1){
-		tabName = 'gradebook';
-	} else if ($('#tbl-teams-tab-content').length == 1) {
-		tabName = 'teams';
-	}
-	
-	if (tabName == 'sequence'){
+	if (currentTab == 'sequence'){
 		updateSequenceTab();
-	} else if (tabName == 'learners'){
+	} else if (currentTab == 'learners'){
 		updateLearnersTab();
-	} else if (tabName == 'gradebook'){
+	} else if (currentTab == 'gradebook'){
 		updateGradebookTab();
-	} else if (tabName == 'teams'){
-		loadTab('teams');
-	} else if (tabName == 'gates'){
-		loadTab('gates');
-	} else if (tabName == 'irat'){
-		loadTab('irat');
-	} else if (tabName == 'iratStudentChoices'){
-		loadTab('iratStudentChoices');
-	} else if (tabName == 'trat'){
-		loadTab('trat');
-	} else if (tabName == 'tratStudentChoices'){
-		loadTab('tratStudentChoices');
-	} else if (tabName == 'burningQuestions'){
-		loadTab('burningQuestions');
-	} else if (tabName == 'aes'){
-		loadTab('aes');
-	} else if (tabName == 'peerReview'){
-		loadTab('peerReview');
-	} 
+	} else {
+		loadTab(currentTab);	
+	}
 }
 
 

@@ -2,44 +2,7 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {$("time.timeago").timeago();}); 
-	
-
-	function openGateNow(activityId) {
-		var data = {
-			'activityId' : activityId,
-			'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
-		};
-		$.ajax({
-			'type' : 'post',
-			'url'  : '<lams:LAMSURL/>monitoring/gate/openGate.do',
-			'data'  : data,
-			'success' : function(){
-				loadTab('gates');
-			}
-		});
-	}
-
-	function openGateSelectively(url){
-		showDialog("dialogGate", {
-			'autoOpen'  : true,
-			'height'    : 820,
-			'modal'     : false,
-			'resizable' : false,
-			'title'     : '<fmt:message key="button.task.gate.open"/>',
-			'open'      : function(){
-				var dialog = $(this);
-				// load contents after opening the dialog
-				$('iframe', dialog).attr('src', url);
-			},
-			'close' : function(){
-				loadTab('gates');
-			}
-		}, false, true).addClass('modal-lg');
-	}
-	
 </script>
-
-
 
 <!-- Tables -->
 <div class="container-fluid">
