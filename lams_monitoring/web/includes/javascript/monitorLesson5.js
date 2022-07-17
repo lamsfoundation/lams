@@ -86,7 +86,8 @@ function loadTab(tabName, button) {
 	
 	clearEventSources();
 	
-	let tabContent = $('.monitoring-page-content .tab-content').empty();
+	let tabContent = $('.monitoring-page-content .tab-content').empty(),
+		searchStudentWidget = $('#sequenceSearchPhraseContainer');
 		
 	switch(tabName) {
 		case 'sequence': {
@@ -101,6 +102,7 @@ function loadTab(tabName, button) {
 				canvasFitScreen(learningDesignSvgFitScreen, true);
 				$("#load-sequence-tab-btn").addClass('active');
 			});
+			searchStudentWidget.show();
 		}
 		break;
 		
@@ -108,6 +110,7 @@ function loadTab(tabName, button) {
 			tabContent.load(LAMS_URL + 'monitoring/monitoring/displayLearnersTab.do', function(){
 				refreshMonitor('learners');
 			});
+			searchStudentWidget.show();
 		}
 		break;
 		
@@ -141,41 +144,49 @@ function loadTab(tabName, button) {
 				
 				refreshMonitor('gradebook');
 			});
+			searchStudentWidget.show();
 		}
 		break;
 		
 		case 'teams': {
 			tabContent.load(LAMS_URL + 'monitoring/tblmonitor/teams.do?lessonID=' + lessonId);
+			searchStudentWidget.show();
 		}
 		break;
 		
 		case 'gates': {
 			tabContent.load(LAMS_URL + 'monitoring/tblmonitor/gates.do?lessonID=' + lessonId);
+			searchStudentWidget.hide();
 		}
 		break;
 		
 		case 'irat': {
 			tabContent.load(LAMS_URL + 'tool/laasse10/tblmonitoring/iraAssessment.do?toolContentID=' + iraToolContentId);
+			searchStudentWidget.hide();
 		}
 		break;
 		
 		case 'iratStudentChoices': {
 			tabContent.load(LAMS_URL + 'tool/laasse10/tblmonitoring/iraAssessmentStudentChoices.do?toolContentID=' + iraToolContentId);
+			searchStudentWidget.hide();
 		}
 		break;
 		
 		case 'trat': {
 			tabContent.load(LAMS_URL + 'tool/lascrt11/tblmonitoring/tra.do?toolContentID=' + traToolContentId);
+			searchStudentWidget.hide();
 		}
 		break;
 		
 		case 'tratStudentChoices': {
 			tabContent.load(LAMS_URL + 'tool/lascrt11/tblmonitoring/traStudentChoices.do?toolContentID=' + traToolContentId);
+			searchStudentWidget.hide();
 		}
 		break;
 				
 		case 'burningQuestions': {
 			tabContent.load(LAMS_URL + 'tool/lascrt11/tblmonitoring/burningQuestions.do?toolContentID=' + traToolContentId);
+			searchStudentWidget.hide();
 		}
 		break;
 		
@@ -184,11 +195,13 @@ function loadTab(tabName, button) {
 			                + '&aeToolContentIds='+ aeToolContentIds 
 							+ '&aeToolTypes=' + aeToolTypes 
 							+ '&aeActivityTitles=' + encodeURIComponent(aeActivityTitles));
+			searchStudentWidget.hide();
 		}
 		break;
 		
 		case 'peerReview': {
 			tabContent.load(LAMS_URL + 'tool/laprev11/tblmonitoring/peerreview.do?toolContentID=' + peerreviewToolContentId);
+			searchStudentWidget.hide();
 		}
 		break;
 	}
