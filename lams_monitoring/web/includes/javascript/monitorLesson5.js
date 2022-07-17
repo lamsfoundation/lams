@@ -1,6 +1,6 @@
 ﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
 // copy of lesson SVG so it does no need to be fetched every time
-var currentTab = 'sequence',
+var currentTab = sessionStorage.getItem("lamsMonitoringCurrentTab") || 'sequence',
 
 	originalSequenceCanvas = null,
 // DIV container for lesson SVG
@@ -69,12 +69,14 @@ $(document).ready(function(){
 	initCommonElements();
 	initSequenceTab();
 	initGradebookTab();
-	loadTab('sequence');
+	loadTab(currentTab);
 	updateLessonTab();
+	loadDefaultTab = false;
 });
 
 function loadTab(tabName, button) {
 	currentTab = tabName;
+	sessionStorage.setItem("lamsMonitoringCurrentTab", currentTab);
 	
 	$('.navigate-btn-container a.btn, .lesson-properties').removeClass('active');
 	$('.component-sidebar').removeClass('expanded');

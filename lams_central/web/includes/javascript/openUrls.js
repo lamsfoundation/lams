@@ -55,6 +55,7 @@ function openMonitorLesson( lessonID, url, displayFullScreen ) {
 	url += 'lessonID='+ lessonID;
 	
 	if (displayFullScreen) {
+		sessionStorage.removeItem("lamsMonitoringCurrentTab");
 		window.location.href = url;
 		return;
 	}
