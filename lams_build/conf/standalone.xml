@@ -141,6 +141,16 @@
                 <max-backup-index value="20" />
                 <append value="true" />
             </size-rotating-file-handler>
+            
+            <periodic-rotating-file-handler name="LAMSAUDIT"
+                autoflush="true">
+                <formatter>
+                    <named-formatter name="LAMSAUDITPATTERN" />
+                </formatter>
+                <file relative-to="jboss.server.log.dir" path="lamsaudit.log" />
+                <suffix value="'.'yyyy-MM-dd" />
+                <append value="true" />
+            </periodic-rotating-file-handler>
 
             <!-- ISO8601 date format -->
             <formatter name="HIBERNATEPATTERN">
@@ -152,6 +162,10 @@
             <formatter name="LAMSPATTERN">
                 <pattern-formatter
                     pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} [%t:%x] %-5p %c - %m%n" />
+            </formatter>
+            <formatter name="LAMSAUDITPATTERN">
+                <pattern-formatter
+                    pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} %m%n" />
             </formatter>
             
             <!-- ABSOLUTE date format -->
@@ -260,6 +274,13 @@
                 <handlers>
                     <handler name="LAMSFILE" />
                     <handler name="LAMSCONSOLE" />
+                </handlers>
+            </logger>
+            
+            <logger category="org.lamsfoundation.lams.web.filter.AuditLogFilter" use-parent-handlers="false">
+                <level name="INFO" />
+                <handlers>
+                    <handler name="LAMSAUDIT" />
                 </handlers>
             </logger>
             

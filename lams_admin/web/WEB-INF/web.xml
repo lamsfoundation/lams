@@ -67,6 +67,10 @@
 		</init-param>
     </filter>
     <filter>
+        <filter-name>AuditLogFilter</filter-name>
+        <filter-class>org.lamsfoundation.lams.web.filter.AuditLogFilter</filter-class>
+    </filter>
+    <filter>
         <filter-name>CSRFGuard</filter-name>
         <filter-class>org.owasp.csrfguard.CsrfGuardFilter</filter-class>
     </filter>
@@ -83,6 +87,10 @@
 		<filter-name>HibernateFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
+    <filter-mapping>
+        <filter-name>AuditLogFilter</filter-name>
+        <url-pattern>*.do</url-pattern>
+    </filter-mapping>
     <filter-mapping>
         <filter-name>CSRFGuard</filter-name>
         <url-pattern>*.do</url-pattern>
@@ -202,8 +210,36 @@
 	
 	<security-constraint>
 		<web-resource-collection>
-			<web-resource-name>Secure Content</web-resource-name>
+			<web-resource-name>Sysadmin Content</web-resource-name>
 			<url-pattern>/*</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>SYSADMIN</role-name>
+		</auth-constraint>
+	</security-constraint>
+	
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Group Manager Content</web-resource-name>
+			<url-pattern>/usersearch.do</url-pattern>
+			<url-pattern>/orgmanage.do</url-pattern>
+			<url-pattern>/orgmanage/*</url-pattern>
+			<url-pattern>/organisation/create.do</url-pattern>
+			<url-pattern>/organisation/edit.do</url-pattern>
+			<url-pattern>/orgsave.do</url-pattern>
+			<url-pattern>/usermanage.do</url-pattern>
+			<url-pattern>/userorgsave.do</url-pattern>
+			<url-pattern>/userorg.do</url-pattern>
+			<url-pattern>/userorgrolesave.do</url-pattern>
+			<url-pattern>/userroles.do</url-pattern>
+			<url-pattern>/userrolessave.do</url-pattern>
+			<url-pattern>/user/edit.do</url-pattern>
+			<url-pattern>/user/basiclist.do</url-pattern>
+			<url-pattern>/user/searchsingle.do</url-pattern>
+			<url-pattern>/usersave/saveUserDetails.do</url-pattern>
+			<url-pattern>/css/*</url-pattern>
 			<http-method>GET</http-method>
  			<http-method>POST</http-method>
 		</web-resource-collection>

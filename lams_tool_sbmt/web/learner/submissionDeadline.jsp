@@ -11,7 +11,7 @@
 	<script type="text/javascript">
 		function finish() {
 			document.getElementById("finishButton").disabled = true;
-			var finishUrl = "<lams:WebAppURL />learner/finish.do?sessionMapID=${sessionMapID}";
+			var finishUrl = "<lams:WebAppURL />learning/finish.do?sessionMapID=${sessionMapID}";
 			location.href = finishUrl;
 		}
 		function notebook() {

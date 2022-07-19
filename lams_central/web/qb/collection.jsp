@@ -415,17 +415,26 @@
 
 
 		function removeQuestions(){
-			let questionsToRemove = $('#collection-grid').jqGrid('getGridParam','selarrrow');
+			let collectionGrid = $('#collection-grid'), 
+				questionsToRemove = collectionGrid.jqGrid('getGridParam','selarrrow');
 			if (questionsToRemove.length == 0){
 				return;
 			}
+			let questionIdsToRemove = [];
+			questionsToRemove.forEach(function(questionUid) {
+				let questionId = $('tr#' + questionUid + ' > td[aria-describedby="collection-grid_id"]', collectionGrid).text();
+				if (questionId) {
+					questionIdsToRemove.push(questionId);
+				}
+			});
+			
 			$.ajax({
 				'url'  : '<lams:LAMSURL />qb/collection/removeCollectionQuestions.do',
 				'type' : 'POST',
 				'dataType' : 'text',
 				'data' : {
 					'collectionUid' : ${collection.uid},
-	 				'qbQuestionIds' : questionsToRemove,
+	 				'qbQuestionIds' : questionIdsToRemove,
 					"<csrf:tokenname/>" : "<csrf:tokenvalue/>"
 				},
 				'cache' : false

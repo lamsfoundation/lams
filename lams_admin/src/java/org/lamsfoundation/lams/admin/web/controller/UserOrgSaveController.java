@@ -29,6 +29,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,6 +44,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,6 +115,7 @@ public class UserOrgSaveController {
 	String[] userIds = userOrgForm.getUserIds();
 	List<String> userIdList = userIds == null ? Collections.emptyList() : Arrays.asList(userIds);
 	log.debug("new user membership of orgId=" + orgId + " will be: " + userIdList);
+	Set<Integer> removedUserIds = new TreeSet<>();
 
 	// remove UserOrganisations that aren't in form data
 	Iterator iter = uos.iterator();
@@ -127,6 +131,8 @@ public class UserOrgSaveController {
 		log.debug("removed userId=" + userId + " from orgId=" + orgId);
 		// remove from subgroups
 		userManagementService.deleteChildUserOrganisations(uo.getUser(), uo.getOrganisation());
+
+		removedUserIds.add(userId);
 	    }
 	}
 	// add UserOrganisations that are in form data
@@ -134,7 +140,7 @@ public class UserOrgSaveController {
 	for (int i = 0; i < userIdList.size(); i++) {
 	    Integer userId = new Integer(userIdList.get(i));
 	    Iterator iter2 = uos.iterator();
-	    Boolean alreadyInOrg = false;
+	    boolean alreadyInOrg = false;
 	    while (iter2.hasNext()) {
 		UserOrganisation uo = (UserOrganisation) iter2.next();
 		if (uo.getUser().getUserId().equals(userId)) {
@@ -151,6 +157,11 @@ public class UserOrgSaveController {
 
 	organisation.setUserOrganisations(uos);
 	userManagementService.save(organisation);
+
+	auditLog(orgId,
+		newUserOrganisations.stream().collect(
+			Collectors.mapping(uo -> uo.getUser().getUserId(), Collectors.toCollection(TreeSet::new))),
+		removedUserIds, canEditRole);
 
 	// if no new users, then finish; otherwise forward to where roles can be assigned for new users.
 	if (newUserOrganisations.isEmpty()) {
@@ -173,4 +184,27 @@ public class UserOrgSaveController {
 	}
     }
 
+    private void auditLog(Integer organisationId, Set<Integer> addedUserIds, Set<Integer> removedUserIds,
+	    boolean canEditRole) {
+	if (addedUserIds.isEmpty() && removedUserIds.isEmpty()) {
+	    return;
+	}
+
+	StringBuilder auditLogMessage = new StringBuilder();
+	if (!addedUserIds.isEmpty()) {
+	    auditLogMessage.append("added users ").append(addedUserIds).append(" ");
+	    if (!canEditRole) {
+		auditLogMessage.append("and assigned them LEARNER role ");
+	    }
+	    if (!removedUserIds.isEmpty()) {
+		auditLogMessage.append("and ");
+	    }
+	}
+	if (!removedUserIds.isEmpty()) {
+	    auditLogMessage.append("removed users ").append(removedUserIds);
+	}
+	auditLogMessage.append(" to/from organisation ").append(organisationId);
+
+	AuditLogFilter.log(auditLogMessage);
+    }
 }

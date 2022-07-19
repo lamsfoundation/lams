@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
+
+<c:set var="webAppUrl"><lams:WebAppURL /></c:set>
 
 <lams:html>
 <lams:head>
@@ -17,7 +18,7 @@
 
 	<lams:Page type="admin" title="${title}" formID="organisationForm">
 	
-		<form:form action="../orgsave.do" modelAttribute="organisationForm" id="organisationForm" method="post">
+		<form:form action="${webAppUrl}orgsave.do" modelAttribute="organisationForm" id="organisationForm" method="post">
 				<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 				<form:hidden path="orgId" />
 				<form:hidden path="parentId" />
@@ -29,8 +30,8 @@
 					<form:hidden path="stateId" />
 				</c:if>
 				<p>
-					<a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a> : 
-					<a href="orgmanage.do?org=<c:out value="${organisationForm.orgId}" />" class="btn btn-default">
+					<a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a> : 
+					<a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${organisationForm.orgId}" />" class="btn btn-default">
 						<c:out value="${organisationForm.name}"/>
 					</a>
 				</p>
@@ -39,7 +40,8 @@
 					<fmt:message key="admin.edit"/> <c:out value="${organisationForm.name}"/>
 				</h1>
 				
-				<div align="center"><html-el:errors/></div>
+				<lams:errors path="*"/>
+				
 				<table  class="table table-no-border">
 					<tr>
 						<td><fmt:message key="admin.organisation.name"/>:</td>

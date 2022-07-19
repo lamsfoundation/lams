@@ -336,10 +336,10 @@ public class AuthoringController {
 	    QuestionReference reference = iterRef.next();
 	    iterRef.remove();
 	    if (reference.getUid() != null) {
+		AssessmentQuestion assessmentQuestion = reference.getQuestion();
 		service.deleteQuestionReference(reference.getUid());
 
-		//TODO maybe check and delete orphaned AssessmentQuestion
-		//service.deleteAssessmentQuestion(question.getUid());
+		service.deleteAssessmentQuestion(assessmentQuestion.getUid());
 	    }
 	}
 
