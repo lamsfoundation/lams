@@ -465,6 +465,7 @@ public class WebUtil {
 	userJSON.put("firstName", user.getFirstName());
 	userJSON.put("lastName", user.getLastName());
 	userJSON.put("login", user.getLogin());
+	userJSON.put("email", user.getEmail());
 	userJSON.put("portraitId", user.getPortraitUuid() == null ? null : user.getPortraitUuid().toString());
 	return userJSON;
     }

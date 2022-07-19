@@ -40,7 +40,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
-import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
 import org.lamsfoundation.lams.tool.peerreview.dto.EmailPreviewDTO;
 import org.lamsfoundation.lams.tool.peerreview.dto.GroupSummary;
@@ -84,15 +83,12 @@ public class MonitoringController {
     private static final String EMAIL_PREVIEW_PATH = "pages/monitoring/emailpreview";
     private static final String MANAGE_USERS_PATH = "/pages/monitoring/manageUsers";
 
-    // this seems to reflect width of 12.5 the best
-    private static final int SPREADSHEET_EXPORT_FIXED_COLUMN_WIDTH = Double.valueOf(13.22 * 256).intValue();
+    // in characters
+    private static final int SPREADSHEET_EXPORT_FIXED_COLUMN_WIDTH = 13;
 
     @Autowired
     @Qualifier("peerreviewService")
     private IPeerreviewService service;
-
-    @Autowired
-    private IRatingService ratingService;
 
     @RequestMapping("/summary")
     public String summary(HttpServletRequest request, HttpServletResponse response) {

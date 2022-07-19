@@ -86,8 +86,9 @@ public class CompleteActivityController {
 	    return null;
 	}
 
+	long lessonId = progress.getLesson().getLessonId();
 	if (progress.isComplete() && progress.getLesson().getAllowLearnerRestart()) {
-	    request.setAttribute("lessonID", progress.getLesson().getLessonId());
+	    request.setAttribute("lessonID", lessonId);
 	}
 
 	try {
@@ -116,8 +117,8 @@ public class CompleteActivityController {
 		    forward = WebUtil.appendParameterToURL(forward, "finishedActivityId", String.valueOf(activityId));
 		}
 	    }
-	    return forward;
 
+	    return forward;
 	} catch (LearnerServiceException e) {
 	    return "error";
 	}

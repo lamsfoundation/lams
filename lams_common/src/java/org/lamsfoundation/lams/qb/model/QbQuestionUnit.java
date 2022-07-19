@@ -2,7 +2,6 @@ package org.lamsfoundation.lams.qb.model;
 
 import java.io.Serializable;
 
-import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -32,7 +31,7 @@ public class QbQuestionUnit implements Serializable, Cloneable, Comparable<QbQue
 
     @Column
     private String name;
-    
+
     @Column
     private float multiplier = 0;
 
@@ -65,7 +64,7 @@ public class QbQuestionUnit implements Serializable, Cloneable, Comparable<QbQue
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(this.name).append(this.multiplier).toHashCode();
+	return new HashCodeBuilder().append(this.name).append(this.multiplier).append(this.displayOrder).toHashCode();
     }
 
     @Override

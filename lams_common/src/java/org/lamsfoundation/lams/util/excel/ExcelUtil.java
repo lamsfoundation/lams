@@ -110,7 +110,7 @@ public class ExcelUtil {
 
     public static void createExcel(OutputStream out, List<ExcelSheet> sheets, String dateHeader,
 	    boolean displaySheetTitle, boolean produceXlsxFile) throws IOException {
-	ExcelUtil.createExcel(out, sheets, dateHeader, displaySheetTitle, true, null);
+	ExcelUtil.createExcel(out, sheets, dateHeader, displaySheetTitle, produceXlsxFile, null);
     }
 
     /**
@@ -255,6 +255,7 @@ public class ExcelUtil {
 		sheet.setColumnWidth(columnIndex, columnWidth);
 	    }
 	} else {
+	    // this is in characters, not in 1/256 units
 	    sheet.setDefaultColumnWidth(fixedColumnWidth);
 	}
     }

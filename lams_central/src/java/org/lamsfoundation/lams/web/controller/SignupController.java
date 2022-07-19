@@ -104,7 +104,7 @@ public class SignupController {
 			request.setAttribute("error", e.getMessage());
 		    }
 		    request.setAttribute("email", user.getEmail());
-		    return "/signup/emailVerifyResult";
+		    return "/signup/emailVerify";
 		} else {
 		    user.setDisabledFlag(false);
 		    signupService.signupUser(user, signupForm.getPassword(), signupForm.getContext());
@@ -186,6 +186,7 @@ public class SignupController {
 		HttpSession hses = request.getSession();
 		hses.setAttribute("login", login);
 		hses.setAttribute("password", password);
+		hses.setAttribute("isSignup", true);
 		response.sendRedirect("/lams/login.jsp?redirectURL=/lams");
 		return null;
 	    }
@@ -306,6 +307,6 @@ public class SignupController {
 		request.setAttribute("error", e.getMessage());
 	    }
 	}
-	return "/signup/emailVerify";
+	return "/signup/emailVerifyResult";
     }
 }

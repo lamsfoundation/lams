@@ -711,6 +711,15 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
     }
 
     @Override
+    public Long getActivityMaxPossibleMark(long toolActivityId) {
+	Activity activity = activityDAO.getActivityByActivityId(toolActivityId);
+	if (!activity.isToolActivity()) {
+	    return null;
+	}
+	return getActivityMaxPossibleMark((ToolActivity) activity);
+    }
+
+    @Override
     public Long getActivityMaxPossibleMark(ToolActivity activity) {
 	// if ActivityEvaluation is not set it means activity will produce no toolOutputs and thus max possible mark is null
 	if (activity == null) {

@@ -315,6 +315,7 @@ public class ConfigurationKeys {
     // LKC-213 LKC Workflow Automation
     public static String WORKFLOW_AUTOMATION_ENABLE = "WorkflowAutomationEnable";
     public static String WORKFLOW_AUTOMATION_API_URL = "WorkflowAutomationApiURL";
+    public static String WORKFLOW_AUTOMATION_IGPS_URL = "WorkflowAutomationIgpsURL";
     public static String WORKFLOW_AUTOMATION_CLIENT_ID = "WorkflowAutomationClientID";
     public static String WORKFLOW_AUTOMATION_CLIENT_SECRET = "WorkflowAutomationClientSecret";
     public static String WORKFLOW_AUTOMATION_INTEGRATED_SERVER = "WorkflowAutomationIntServer";

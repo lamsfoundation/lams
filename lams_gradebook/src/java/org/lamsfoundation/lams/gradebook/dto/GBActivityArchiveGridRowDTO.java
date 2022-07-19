@@ -26,6 +26,7 @@ import java.util.ArrayList;
 
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
+import org.lamsfoundation.lams.util.DateUtil;
 
 public class GBActivityArchiveGridRowDTO extends GradebookGridRowDTO {
 
@@ -44,16 +45,16 @@ public class GBActivityArchiveGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(feedback);
 	    ret.add(lessonMark.toString());
 	    ret.add(status);
-	    ret.add(timeTaken != null ? convertTimeToString(timeTaken) : CELL_EMPTY);
-	    ret.add(startDate != null ? convertDateToString(startDate, null) : CELL_EMPTY);
-	    ret.add(finishDate != null ? convertDateToString(finishDate, null) : CELL_EMPTY);
+	    ret.add(timeTaken != null ? DateUtil.convertTimeToString(timeTaken) : CELL_EMPTY);
+	    ret.add(startDate != null ? DateUtil.convertToString(startDate, null) : CELL_EMPTY);
+	    ret.add(finishDate != null ? DateUtil.convertToString(finishDate, null) : CELL_EMPTY);
 	    ret.add(mark != null ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
 	} else {
 	    ret.add(id);
 	    ret.add(status);
-	    ret.add(timeTaken != null ? convertTimeToString(timeTaken) : CELL_EMPTY);
-	    ret.add(startDate != null ? convertDateToString(startDate, null) : CELL_EMPTY);
-	    ret.add(finishDate != null ? convertDateToString(finishDate, null) : CELL_EMPTY);
+	    ret.add(timeTaken != null ? DateUtil.convertTimeToString(timeTaken) : CELL_EMPTY);
+	    ret.add(startDate != null ? DateUtil.convertToString(startDate, null) : CELL_EMPTY);
+	    ret.add(finishDate != null ? DateUtil.convertToString(finishDate, null) : CELL_EMPTY);
 	    ret.add(feedback);
 	    ret.add(lessonMark != null ? GradebookUtil.niceFormatting(lessonMark) : CELL_EMPTY);
 	    ret.add(mark != null ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);

@@ -328,9 +328,9 @@ public class MonitoringController {
 	scratchieService.saveOrUpdateScratchie(scratchie);
     }
 
-    @RequestMapping(path = "/getPossibleIndividualTimeLimitUsers", method = RequestMethod.GET)
+    @RequestMapping(path = "/getPossibleIndividualTimeLimits", method = RequestMethod.GET)
     @ResponseBody
-    public String getPossibleIndividualTimeLimitUsers(
+    public String getPossibleIndividualTimeLimits(
 	    @RequestParam(name = AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentId,
 	    @RequestParam(name = "term") String searchString) {
 
@@ -347,9 +347,9 @@ public class MonitoringController {
 	return responseJSON.toString();
     }
 
-    @RequestMapping(path = "/getExistingIndividualTimeLimitUsers", method = RequestMethod.GET)
+    @RequestMapping(path = "/getExistingIndividualTimeLimits", method = RequestMethod.GET)
     @ResponseBody
-    public String getExistingIndividualTimeLimitUsers(
+    public String getExistingIndividualTimeLimits(
 	    @RequestParam(name = AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentId) {
 
 	String groupLabel = scratchieService.getMessage("monitoring.label.group") + " \"";

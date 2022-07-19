@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -132,7 +131,8 @@ public class GradebookMonitoringController {
 	    request.setAttribute("weights", weights);
 	}
 
-	return "gradebookMonitor";
+	boolean isTab = WebUtil.readBooleanParam(request, "isTab", false);
+	return "gradebookMonitor" + (isTab ? "Content5" : "");
     }
 
     @RequestMapping("/courseMonitor")
@@ -271,7 +271,8 @@ public class GradebookMonitoringController {
     }
 
     @RequestMapping("/displayReleaseMarksPanel")
-    public String displayReleaseMarksPanel(@RequestParam long lessonID, Model model) {
+    public String displayReleaseMarksPanel(@RequestParam long lessonID, @RequestParam(required = false) boolean isTab,
+	    Model model) {
 	Lesson lesson = lessonService.getLesson(lessonID);
 	if (lesson.getMarksReleased()) {
 	    model.addAttribute("marksReleased", true);
@@ -290,7 +291,7 @@ public class GradebookMonitoringController {
 	    }
 	}
 
-	return "releaseLessonMarks";
+	return "releaseLessonMarks" + (isTab ? "5" : "");
     }
 
     @RequestMapping("/getReleaseMarksEmailContent")

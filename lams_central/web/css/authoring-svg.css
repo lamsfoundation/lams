@@ -1,12 +1,22 @@
+:root{
+	--lams-blue: #0175E2;
+	--lams-yellow: #F9F871;
+	--lams-green: #00914A;
+	--lams-red: #D73961;
+	--lams-gray: #6c757d;
+	--lams-opacity: 0.5;
+	--lams-low-opacity: 0.25;
+}
+
 .svg-tool-activity-border {
 	fill: none;
-	stroke: #b6b6b6;
+	stroke: var(--lams-gray);
 	stroke-width: 1;
 }
 
 .svg-tool-activity-border-require-grouping {
 	fill: none;
-	stroke: red;
+	stroke: var(--lams-red);
 	stroke-width: 3;
 }
 
@@ -21,33 +31,35 @@
 
 .svg-tool-activity-category-1 {
 	stroke: none;
-	fill: #caddfb;
+	fill: var(--lams-blue);
+	opacity: var(--lams-low-opacity);
 }
 
 .svg-tool-activity-category-2 {
 	stroke: none;
-	fill: #ffffbb;
+	fill: var(--lams-yellow);
+	opacity: var(--lams-opacity);
 }
 
 .svg-tool-activity-category-3 {
-	fill: #2DBCE9;
-	opacity: 0.25;
+	fill: var(--lams-blue);
+	opacity: var(--lams-opacity);
 }
 
 .svg-tool-activity-category-4 {
-	fill: #FF72AC;
-	opacity: 0.25;	
-
+	fill: var(--lams-red);
+	opacity: var(--lams-opacity);	
 }
 
 .svg-tool-activity-category-5 {
 	stroke: none;
-	fill: #caddfb;
+	fill: var(--lams-blue);
+	opacity: var(--lams-low-opacity);
 }
 
 .svg-tool-activity-category-6 {
-	fill: #1AD9B2;
-	opacity: 0.25;
+	fill: var(--lams-green);
+	opacity: var(--lams-opacity);
 }
 
 .svg-activity-title-label {
@@ -75,41 +87,42 @@
 }
 
 .svg-branching-start {
-	stroke: green;
+	stroke: var(--lams-green);
 }
 
 .svg-branching-end {
-	stroke: red;
+	stroke: var(--lams-red);
 }
 
 .svg-branching-match {
-	stroke: blue;
+	stroke: var(--lams-blue);
 }
 
 .svg-annotation-container {
-	stroke: #b6b6b6;
+	stroke: var(--lams-gray);
 }
 
 .svg-activity-optional .svg-annotation-container,
 .svg-activity-parallel .svg-annotation-container,
 .svg-activity-floating .svg-annotation-container {
-	fill : #f0f8ff;
+	fill: var(--lams-blue);
+	opacity: var(--lams-low-opacity);
 }
 
 .svg-transition {
 	stroke-width: 1;
-	stroke: rgb(119, 126, 157);
+	stroke: var(--lams-gray);
 	fill: none;
 }
 
 .svg-transition-element {
-	stroke: rgb(119, 126, 157);
-	fill: rgb(119, 126, 157);
+	stroke: var(--lams-gray);
+	fill: var(--lams-gray);
 }
 
 .svg-transition-draw {
 	stroke-width: 2;
-	stroke: rgb(119, 126, 157);
+	stroke: var(--lams-gray);
 	stroke-dasharray: 5, 3;
 }
 

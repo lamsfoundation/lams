@@ -1,24 +1,92 @@
 <!DOCTYPE html>
 <%@ include file="/taglibs.jsp"%>
+
+<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
+
 <lams:html>
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>LAMS Monitor</title>
-		
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap4.min.css">
-	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome/css/font-awesome.min.css">
+	<title><fmt:message key="monitor.title" /></title>
+	
+	<link rel="icon" type="image/x-icon" href="<lams:LAMSURL/>images/svg/lamsv5_logo.svg">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/vertical-timeline.css"> 
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable5.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/free.ui.jqgrid.custom.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/tempus-dominus.min.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>gradebook/includes/css/gradebook.css" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>css/components-monitoring.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>css/components-monitoring-responsive.css">
-	
+
+	<lams:css suffix="chart"/>
+		
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap4.bundle.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.plugin.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.countdown.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.cookie.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.timeago.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/popper.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable5.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/d3.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chart.bundle.min.js"></script>
-	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/monitorLesson5.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chart.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/tempus-dominus.min.js"></script>
+	
+	<c:choose>
+		<c:when test="${localeLanguage eq 'es'}">
+			<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jqgrid-i18n/grid.locale-es.js"></script>
+			<c:set var="jqGridInternationalised" value="true" />
+	 	</c:when>
+	 	 <c:when test="${localeLanguage eq 'fr'}">
+	 	 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jqgrid-i18n/grid.locale-fr.js"></script>
+	 	 	<c:set var="jqGridInternationalised" value="true" />
+	 	 </c:when>
+	 	 <c:when test="${localeLanguage eq 'el'}">
+	 	 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jqgrid-i18n/grid.locale-el.js"></script>
+	 	 	<c:set var="jqGridInternationalised" value="true" />
+	 	 </c:when>
+	 	<c:when test="${localeLanguage eq 'no'}">
+	 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jqgrid-i18n/grid.locale-no.js"></script>
+	 	 	<c:set var="jqGridInternationalised" value="true" />
+	 	 </c:when>
+	</c:choose>
+	
+	<lams:JSImport src="includes/javascript/common.js" />
+	<lams:JSImport src="includes/javascript/download.js" />
+	<lams:JSImport src="includes/javascript/portrait5.js" />
+	<lams:JSImport src="includes/javascript/dialog5.js" />
+	<lams:JSImport src="includes/javascript/monitorLesson5.js" relative="true" />
+	
+	
 	<script type="text/javascript">
+		<!-- Some of the following settings will be used in progressBar.js -->
 		var lessonId = ${lesson.lessonID},
+			userId = '<lams:user property="userID"/>',
 			ldId = ${lesson.learningDesignID},
+			lessonStateId = ${lesson.lessonStateID},
+			createDateTimeStr = '${lesson.createDateTimeStr}',
+			lessonStartDate = '${lesson.scheduleStartDate}',
+			lessonEndDate = '${lesson.scheduleEndDate}',
+			liveEditEnabled = ${enableLiveEdit && lesson.liveEditEnabled},
+			TOTAL_LESSON_LEARNERS_NUMBER = ${lesson.numberPossibleLearners},
+			
+			iraToolContentId = '${iraToolContentId}',
+			traToolContentId = '${traToolContentId}',
+			aeToolContentIds = "${aeToolContentIds}",
+			aeToolTypes = "${aeToolTypes}",
+			aeActivityTitles = "${aeActivityTitles}",
+			peerreviewToolContentId = "${peerreviewToolContentId}",
+			
 			LAMS_URL = '<lams:LAMSURL/>',
 			csrfToken = '<csrf:tokenname/> : <csrf:tokenvalue/>',
 			csrfTokenName = '<csrf:tokenname/>',
@@ -53,8 +121,6 @@
 				SAVE_BUTTON : '<c:out value="${SAVE_BUTTON_VAR}" />',
 				<fmt:message key="button.cancel" var="CANCEL_BUTTON_VAR"/>
 				CANCEL_BUTTON : '<c:out value="${CANCEL_BUTTON_VAR}" />',
-				<fmt:message key="learner.finished.count" var="LEARNER_FINISHED_COUNT_VAR"/>
-				LEARNER_FINISHED_COUNT : '<c:out value="${LEARNER_FINISHED_COUNT_VAR}" />',
 				<fmt:message key="learner.finished.dialog.title" var="LEARNER_FINISHED_DIALOG_TITLE_VAR"/>
 				LEARNER_FINISHED_DIALOG_TITLE : '<c:out value="${LEARNER_FINISHED_DIALOG_TITLE_VAR}" />',
 				<fmt:message key="lesson.enable.presence.alert" var="LESSON_PRESENCE_ENABLE_ALERT_VAR"/>
@@ -143,8 +209,10 @@
 				CONTRIBUTE_OPEN_GATE_BUTTON : '<c:out value="${CONTRIBUTE_OPEN_GATE_BUTTON_VAR}" />',
 				<fmt:message key="button.task.gate.open.tooltip" var="CONTRIBUTE_OPEN_GATE_TOOLTIP_VAR"/>
 				CONTRIBUTE_OPEN_GATE_TOOLTIP : '<c:out value="${CONTRIBUTE_OPEN_GATE_TOOLTIP_VAR}" />',
-				<fmt:message key="label.task.gate.opened" var="CONTRIBUTE_OPENED_GATE_VAR"/>
+				<fmt:message key="button.task.gate.opened" var="CONTRIBUTE_OPENED_GATE_VAR"/>
 				CONTRIBUTE_OPENED_GATE : '<c:out value="${CONTRIBUTE_OPENED_GATE_VAR}" />',
+				<fmt:message key="button.task.gate.opened.tooltip" var="CONTRIBUTE_OPENED_GATE_TOOLTIP_VAR"/>
+				CONTRIBUTE_OPENED_GATE_TOOLTIP : '<c:out value="${CONTRIBUTE_OPENED_GATE_TOOLTIP_VAR}" />',
 				<fmt:message key="lesson.task.attention" var="CONTRIBUTE_ATTENTION_VAR"/>
 				CONTRIBUTE_ATTENTION : '<c:out value="${CONTRIBUTE_ATTENTION_VAR}" />',
 				<fmt:message key="button.help" var="BUTTON_HELP_VAR"/>
@@ -193,196 +261,704 @@
 				LIVE_EDIT_WARNING: '<c:out value="${LIVE_EDIT_WARNING_VAR}" />'
 			};
 			
-		$(document).ready(function(){
-			$('.hamburger').click(function(){
-				$(this).toggleClass('active');
-				$('.component-sidebar, .monitoring-page-content').toggleClass('active');
-			});
-			
-			var ctx = document.getElementById('myChart').getContext('2d');
-			var myChart = new Chart(ctx, {
-				type : 'doughnut',
-				borderWidth : 0,
-				data : {
-					elements : {
-						arc : {
-							borderWidth : 0,
-							fontSize : 0,
-						}
-					},
-					datasets : [ {
-						data : [ 10, 70, 20 ],
-						backgroundColor : [ 'rgba(5, 204, 214, 1)',
-								'rgba(255, 195, 55, 1)', 'rgba(253, 60, 165, 1)', ],
-						label : 'Dataset 1',
-						borderWidth : 0,
-					} ],
-					labels : [ 'Not started', 'In process', 'Completed' ]
-				},
-				options : {
-					responsive : true,
-					legend : {
-						display : false,
-					},
-					animation : {
-						animateScale : true,
-						animateRotate : true
-					}
-				}
-			});
-			
-			refreshMonitor();
-		});
+		<c:if test="${jqGridInternationalised}">
+			$.extend(true, $.jgrid,$.jgrid.regional['${language}']);
+		</c:if>
 	</script>
+	
 </head>
 <body class="component">
-<div class="monitoring-page-wrapper">
-	<div class="component-sidebar">
-		<ul>
-			<li class="logo-li">
-				<a href="#"><img src="<lams:LAMSURL/>images/components/lams_logo_white.png" alt="#" /></a>
-			</li>
-			<li class="menu-li active">
-				<a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><defs><style>.a,.b,.c,.d{fill:none;}.b,.c,.d{stroke:#3c42e0;stroke-width:2px;}.b,.c{stroke-linejoin:round;}.c,.d{stroke-linecap:round;}</style></defs><g transform="translate(-44 -351)"><rect class="a" width="24" height="24" transform="translate(44 351)"/><g transform="translate(1 13)"><rect class="b" width="5" height="5" transform="translate(53 354)"/><rect class="b" width="5" height="5" transform="translate(53 341)"/><rect class="b" width="5" height="5" transform="translate(45 354)"/><rect class="b" width="5" height="5" transform="translate(61 354)"/><path class="c" d="M47.5,353.938V350H63.594v4"/><path class="d" d="M47.5,358v-8" transform="translate(8 -4)"/></g></g></svg></a>
-			</li>
-			<li class="menu-li">
-				<a href="<lams:WebAppURL/>monitor-sequence-tab.jsp"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><defs><style>.a,.b{fill:none;}.a{stroke:#acb5cc;stroke-linecap:round;stroke-linejoin:round;stroke-width:2px;}</style></defs><g transform="translate(-45 -200)"><g transform="translate(45.5 199.5)"><path class="a" d="M16.045,27.955V26.136A3.636,3.636,0,0,0,12.409,22.5H5.136A3.636,3.636,0,0,0,1.5,26.136v1.818" transform="translate(0 -7.091)"/><path class="a" d="M14.773,8.136A3.636,3.636,0,1,1,11.136,4.5,3.636,3.636,0,0,1,14.773,8.136Z" transform="translate(-2.364)"/><path class="a" d="M32.727,28.031V26.213A3.636,3.636,0,0,0,30,22.7" transform="translate(-11.227 -7.168)"/><path class="a" d="M24,4.7a3.636,3.636,0,0,1,0,7.045" transform="translate(-8.864 -0.077)"/></g><rect class="b" width="24" height="24" transform="translate(45 200)"/></g></svg></a>
-			</li>
-			<li class="menu-li">
-				<a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><defs><style>.a{fill:none;}.b{fill:#acb5cc;}</style></defs><path class="a" d="M0,0H24V24H0Z"/><path class="b" d="M18,2H6A2.006,2.006,0,0,0,4,4V20a2.006,2.006,0,0,0,2,2H18a2.006,2.006,0,0,0,2-2V4A2.006,2.006,0,0,0,18,2ZM9,4h2V9l-1-.75L9,9Zm9,16H6V4H7v9l3-2.25L13,13V4h5Z"/></svg></a>
-			</li>
-		</ul>
-		<!-- 
-		<div class="user-col active">
-			<img src="<lams:LAMSURL/>images/components/img1.png" alt="#" />
-			<span></span>
+<div class="monitoring-page-wrapper component-page-wrapper">
+	<div class="component-sidebar active">
+		<a href="/" title="<fmt:message key='label.monitoring.return.to.index' />" class="lams-logo">
+			<img src="<lams:LAMSURL/>images/svg/lamsv5_logo.svg" alt="<fmt:message key='label.monitoring.logo' />" />
+		</a>
+		
+		<div class="component-menu">
+			<div class="component-menu-btn d-flex flex-column align-items-center">
+				<div class="navigate-btn-container">
+					<a id="return-to-index-btn" href="/" class="btn btn-primary" title="<fmt:message key='label.monitoring.return.to.index' />">
+						<i class="fa fa-arrow-left fa-lg"></i>
+					</a>
+					<label for="return-to-index-btn">
+						Return
+					</label>
+				</div>
+								
+				<div class="navigate-btn-container">
+					<a id="load-sequence-tab-btn" href="#" class="btn btn-primary navigate-btn active" title="<fmt:message key='tab.sequence' />">
+						<i class="fa fa-cubes fa-lg"></i>
+					</a>
+					<label for="load-sequence-tab-btn">
+						<fmt:message key='tab.sequence' />
+					</label>
+				</div>
+				
+				<div id="navigate-btn-group" style="display: ${isTBLSequence ? 'none' : ''}">
+					<div class="navigate-btn-container">
+						<a id="edit-lesson-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.monitoring.edit.lesson.settings' />">
+							<i class="fa fa-pen fa-lg"></i>
+						</a>
+						<label for="edit-lesson-btn">
+							Edit
+						</label>
+					</div>
+	
+					<div class="navigate-btn-container">
+						<a id="load-learners-tab-btn" href="#" class="btn btn-primary navigate-btn" title="<fmt:message key='tab.learners' />">
+							<i class="fa fa-solid fa-users fa-lg"></i>
+						</a>
+						<label for="load-learners-tab-btn">
+							<fmt:message key='tab.learners' />
+						</label>
+					</div>
+					
+					<div class="navigate-btn-container">
+						<a id="load-gradebook-tab-btn" href="#" class="btn btn-primary navigate-btn" title="<fmt:message key='tab.gradebook' />">
+							<i class="fa fa-solid fa-list-ol fa-lg"></i>
+						</a>
+						<label for="load-gradebook-tab-btn">
+							<fmt:message key='tab.gradebook' />
+						</label>
+					</div>
+				</div>
+				
+				<c:if test="${isTBLSequence}">
+					<div id="tbl-navigate-btn-group" class="shown">
+						<div class="navigate-btn-container">
+							<a id="load-teams-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.teams' />">
+								<i class="fa fa-people-group fa-lg"></i>
+							</a>
+							<label for="load-teams-tab-btn">
+								<fmt:message key='label.teams' />
+							</label>
+						</div>
+						
+						<c:if test="${not empty isGatesAvailable}">
+							<div class="navigate-btn-container">
+								<a id="load-gates-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.gates' />">
+									<i class="fa fa-sign-in fa-lg"></i>
+								</a>
+								<label for="load-gates-tab-btn">
+									<fmt:message key='label.gates' />
+								</label>
+							</div>
+						</c:if>
+						
+						<c:if test="${not empty isIraMcqAvailable || not empty isIraAssessmentAvailable}">
+							<c:set var="iraMethodName">
+								<c:choose>
+									<c:when test="${not empty isIraMcqAvailable}">iraMcq</c:when>
+									<c:otherwise>iraAssessment</c:otherwise>
+								</c:choose>
+							</c:set>
+							
+							<div class="navigate-btn-container">
+								<div class="btn-group-vertical" id="load-irat-btn-group">
+									<a id="load-irat-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.ira' />">
+										<i class="fa fa-user fa-lg"></i>
+									</a>
+									<a id="load-irat-student-choices-tab-btn" class="btn btn-primary" href="#" title="iRAT student choices">
+										<i class="fa fa-list-check fa-lg"></i>
+									</a>
+								</div>
+								
+								<label for="load-irat-btn-group">
+									<fmt:message key='label.ira' />
+								</label>
+							</div>
+						</c:if>
+						
+						<c:if test="${not empty isScratchieAvailable}">
+							<div class="navigate-btn-container">
+								<div class="btn-group-vertical" id="load-irat-btn-group">
+									<a id="load-trat-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.tra' />">
+										<i class="fa fa-users fa-lg"></i>
+									</a>
+									<a id="load-trat-student-choices-tab-btn" class="btn btn-primary" href="#" title="tRAT student choices">
+										<i class="fa fa-list-check fa-lg"></i>
+									</a>
+								</div>
+								
+								<label for="load-trat-btn-group">
+									<fmt:message key='label.tra' />
+								</label>
+							</div>
+							
+							<div class="navigate-btn-container">
+								<a id="load-burning-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.burning.questions' />">
+									<i class="fa fa-question-circle fa-lg"></i>
+								</a>
+								<label for="load-burning-tab-btn">
+									Burning Qs
+								</label>
+							</div>
+						</c:if>
+						
+						<c:if test="${not empty isAeAvailable}">
+							<div class="navigate-btn-container">
+								<a id="load-aes-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.aes' />">
+									<i class="fa fa-dashboard fa-lg"></i>
+								</a>
+								<label for="load-aes-tab-btn">
+									<fmt:message key='label.aes' />
+								</label>
+							</div>
+						</c:if>
+						
+						<c:if test="${not empty isPeerreviewAvailable}">
+							<div class="navigate-btn-container">
+								<a id="load-peer-review-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.peer.review' />">
+									<i class="fa fa-person-circle-question fa-lg"></i>
+								</a>
+								<label for="load-aes-tab-btn">
+									<fmt:message key='label.peer.review' />
+								</label>
+							</div>
+						</c:if>
+					</div>
+					
+					<div class="navigate-btn-container">
+						<a id="load-other-nvg-btn" class="btn btn-primary" href="#" title="Show remaining options">
+							<i class="fa fa-angles-up fa-lg"></i>
+						</a>
+						<label for="load-teams-tab-btn">
+							Other
+						</label>
+					</div>
+				</c:if>
+				
+
+			</div>
+			
+			<div class="lesson-properties">
+				<dl id="lessonDetails" class="dl-horizontal">
+					<dt><fmt:message key="lesson.state"/>
+					</dt>
+					<dd>
+						<span data-bs-toggle="collapse" data-bs-target="#changeState" id="lessonStateLabel" class="lessonManageField"></span>
+					  	<div style="display:inline-block;vertical-align: middle;"><span id="lessonStartDateSpan" class="lessonManageField loffset5"></span>
+					  	<span id="lessonFinishDateSpan" class="lessonManageField loffset5"></span></div>
+					  	 
+						<!--  Change lesson status or start/schedule start -->
+						<div class="collapse offset10" id="changeState">
+							<div id="lessonScheduler">
+								<form>
+									<div id="lessonStartApply">
+										<div class="form-group mt-2" >
+											<label for="scheduleDatetimeField" class="form-label"><fmt:message key="lesson.start"/></label>
+											<input class="lessonManageField form-control-sm" id="scheduleDatetimeField" type="text" autocomplete="nope" />
+										</div>
+										
+										<div class="mt-2">
+											<a id="scheduleLessonButton" class="btn btn-sm btn-default lessonManageField" href="#"
+												   onClick="javascript:scheduleLesson()"
+												   title='<fmt:message key="button.schedule.tooltip"/>'>
+											   <fmt:message key="button.schedule"/>
+											</a>
+											<a id="startLessonButton" class="btn btn-sm btn-secondary" href="#"
+													   onClick="javascript:startLesson()"
+													   title='<fmt:message key="button.start.now.tooltip"/>'>
+												   <fmt:message key="button.start.now"/>
+											</a>
+										</div>
+									</div>
+									
+									<div id="lessonDisableApply">
+										<div class="form-group mt-2">
+											<label for="disableDatetimeField" class="form-label d-block"><fmt:message key="lesson.end"/></label>
+											<input class="lessonManageField form-control-sm" id="disableDatetimeField" type="text"/>
+										</div>
+										<div class="mt-2">
+											<a id="scheduleDisableLessonButton" class="btn btn-sm btn-secondary lessonManageField" href="#"
+												   onClick="javascript:scheduleDisableLesson()"
+												   title='<fmt:message key="button.schedule.disable.tooltip"/>'>
+										   	<fmt:message key="button.schedule"/>
+											</a>
+											<a id="disableLessonButton" class="btn btn-sm btn-secondary" href="#"
+												   onClick="javascript:disableLesson()"
+												   title='<fmt:message key="button.disable.now.tooltip"/>'>
+											   <fmt:message key="button.disable.now"/>
+											</a>
+										</div>
+									</div>
+								</form>
+							</div>
+							
+							<div id="lessonStateChanger">
+								<select id="lessonStateField" class="form-select-sm mt-2" onchange="lessonStateFieldChanged()">
+									<option value="-1"><fmt:message key="lesson.select.state"/></option>
+								</select>
+								<span id="lessonStateApply">
+									<button type="button" class="lessonManageField btn btn-sm btn-primary"
+											onClick="javascript:changeLessonState()"
+											title='<fmt:message key="lesson.change.state.tooltip"/>'>
+								   		<i class="fa fa-check"></i> 
+								   		<span class="hidden-xs"><fmt:message key="button.apply"/></span>
+							    	</button>
+							    </span>
+					    	</div>					
+						</div>
+					</dd>
+					
+					<!-- 
+					<dt><fmt:message key="lesson.learners"/>:</dt>
+					<dd title='<fmt:message key="lesson.ratio.learners.tooltip"/>' id="learnersStartedPossibleCell"></dd>
+					 -->
+					 
+					<!--  lesson actions -->
+					<dt><fmt:message key="lesson.manage"/>:</dt>
+					<dd>
+						<div>
+							<button id="editLessonNameButton" class="btn btn-sm btn-primary"
+									type="button"
+									title='Edit lesson name'>
+								<i class="fa fa-pencil"></i>
+								<span class="hidden-xs">Edit lesson name</span>
+							</button>
+							
+							<button id="viewLearnersButton" class="btn btn-sm btn-primary"
+									type="button" onClick="javascript:showLessonLearnersDialog()"
+									title='<fmt:message key="button.view.learners.tooltip"/>'>
+								<i class="fa fa-users"></i>
+								<span class="hidden-xs"><fmt:message key="button.view.learners"/></span>
+							</button>
+							
+							<button id="editClassButton" class="btn btn-sm btn-primary"
+									type="button" onClick="javascript:showClassDialog()"
+									title='<fmt:message key="button.edit.class.tooltip"/>'>
+								<i class="fa fa-user-times"></i>
+								<span class="hidden-xs"><fmt:message key="button.edit.class"/></span>
+							</button>
+							
+							<c:if test="${lesson.enabledLessonNotifications}">
+								<button id="notificationButton" class="btn btn-sm btn-primary"
+										type="button" onClick="javascript:showNotificationsDialog(null,${lesson.lessonID})">
+									<i class="fa fa-bullhorn"></i>
+									<span class="hidden-xs"><fmt:message key="email.notifications"/></span>
+								</button>
+							</c:if>
+						</div>
+						
+						<div>
+							<c:if test="${lesson.enableLessonIntro}">
+								<button id="editIntroButton" class="btn btn-sm btn-primary"
+										type="button" onClick="javascript:showIntroductionDialog(${lesson.lessonID})">
+									<i class="fa fa-sm fa-info"></i>
+									<span class="hidden-xs"><fmt:message key="label.lesson.introduction"/></span>
+								</button>
+							</c:if>			
+											   
+							<lams:Switch id="gradebookOnCompleteButton" checked="${lesson.gradebookOnComplete}"
+								labelKey="label.display.activity.scores" iconClass="fa fa-sm fa-list-ol" />
+						</div>
+					</dd>
+
+					<!-- IM & Presence -->
+					<dt><fmt:message key="lesson.im"/>:</dt>
+					<dd>
+						
+						<lams:Switch id="presenceButton" checked="${lesson.learnerPresenceAvailable}"
+							labelKey="lesson.presence" iconClass="fa fa-sm fa-wifi"	/>
+						
+						<!-- <span id="presenceCounter" class="badge">0</span> -->
+	
+						<div id="imButtonWrapper"
+							<c:if test="${not lesson.learnerPresenceAvailable}">
+								style="display: none"
+							</c:if>
+							>
+							<lams:Switch id="imButton" checked="${lesson.learnerImAvailable}"
+								labelKey="lesson.im" iconClass="fa fa-sm fa-comments"	/>
+						</div>
+						
+						<button id="openImButton" class="btn btn-primary btn-sm"
+							<c:if test="${not lesson.learnerImAvailable}">
+								style="display: none"
+							</c:if>
+						><i class="fa fa-sm fa-comments"></i>
+						 <span class="hidden-xs"><fmt:message key="button.open.im"/></span> 
+						</button>
+					</dd>
+					
+					<!-- Progress Emails -->
+					<dt><fmt:message key="lesson.progress.email"/>:</dt>
+					<dd>
+						<button id="sendProgressEmail" class="btn btn-primary btn-sm"
+							onClick="javascript:sendProgressEmail()"/>
+							<i class="fa fa-sm fa-envelope"></i>
+							<span class="hidden-xs"><fmt:message key="progress.email.send"/></span> 
+						</button>
+						<button id="configureProgressEmail" class="btn btn-primary btn-sm"
+							onClick="javascript:configureProgressEmail()"/>
+							<i class="fa fa-sm fa-cog"></i>
+							<span class="hidden-xs"><fmt:message key="progress.email.configure"/></span> 
+						</button>
+					</dd>
+
+					<!--  encodedLessonID -->
+					<c:if test="${ALLOW_DIRECT_LESSON_LAUNCH}">
+                                 <dt class="text-muted"><small><fmt:message key="lesson.learner.url"/></small></dt>
+						<dd class="text-muted">
+                                 <small><c:out value="${serverURL}r/${lesson.encodedLessonID}" escapeXml="true"/></small>
+						</dd>
+					</c:if>
+					
+				</dl>	
+			</div>
 		</div>
-		 -->
 	</div>
-	<div class="component-page-wrapper monitoring-page-content">
+	
+	<div class="monitoring-page-content active">
 		<header class="d-flex justify-content-between">
 			<div class="hamburger-box">
-				<div class="hamburger">
-					<span></span>
-					<span></span>
-					<span></span>
-				</div>
-				<p>Lesson Name</p>
+				<!-- 
+					<div class="hamburger">
+						<span></span>
+						<span></span>
+						<span></span>
+					</div>
+				 -->
+				<p id="lesson-name"><c:out value="${lesson.lessonName}"/></p>
 			</div>
 			<div class="top-menu">
-				<form>
-					<input type="text" name="" placeholder="Search Student">
-					<img src="<lams:LAMSURL/>images/components/search.svg" alt="#" />
-				</form>
-				<div class="top-menu-btn">
-					<a href="#"><img src="<lams:LAMSURL/>images/components/icon1.svg" alt="#" /></a>
-					<a href="#"><img src="<lams:LAMSURL/>images/components/icon2.svg" alt="#" /></a>
-					<a href="#"><img src="<lams:LAMSURL/>images/components/icon3.svg" alt="#" /></a>
+				<div id="sequenceSearchPhraseContainer" class="input-group">
+					<input id="sequenceSearchPhrase" type="text" class="form-control" placeholder="Search Student">
+				    <button id="sequenceSearchPhraseButton" class="btn bg-white opacity-100" type="button" disabled onClick="javascript:sequenceClearSearchPhrase(true)">
+				    	<i id="sequenceSearchPhraseIcon" class="fa-solid fa-fw fa-magnifying-glass"></i>
+				    	<i id="sequenceSearchPhraseClearIcon" class="fa-solid fa-fw fa-lg fa-xmark"></i>
+				    </button>
 				</div>
+				<!-- 
+				<div class="top-menu-btn component-menu-btn">
+					<a href="#" onClick="javscript:refreshMonitor()"><img src="<lams:LAMSURL/>images/components/icon2.svg" alt="#" /></a>
+				</div>
+				 -->
 			</div>
 		</header>
-		<div class="row pt-5">
-			<div class="col-12 col-md-3 content-left">
-				<div class="graph-col">
-					<div class="graph-con">
-						<canvas id="myChart" class="chartjs-render-monitor"></canvas>
-					</div>
-					<ul>
-						<li>
-							<h6>completion</h6>
-						</li>
-						<li>
-							<span class="graph-count"></span> - Not started
-						</li>
-						<li>
-							<span class="graph-count"></span> - In process
-						</li>
-						<li>
-							<span class="graph-count"></span> - Completed
-						</li>
-					</ul>
+		
+		<div class="tab-content pt-4">
+			
+		</div>
+	</div>
+</div>
+
+
+<div id="learnerGroupDialogContents" class="dialogContainer">
+	<span id="learnerGroupMultiSelectLabel"><fmt:message key='learner.group.multi.select'/></span>
+	<table id="listLearners" class="table table-borderless">
+		<tr id="learnerGroupSearchRow">
+			<td colspan="5">
+				<div class="input-group mb-3">
+				  <input type="text" class="form-control dialogSearchPhrase" placeholder="<fmt:message key='search.learner.textbox' />"
+				  		 aria-label="<fmt:message key='search.learner.textbox' />">
+				  <span class="dialogSearchPhraseIcon input-group-text" title="<fmt:message key='search.learner.textbox' />">
+				  		<i class=" fa-solid fa-sm fa-search"></i>
+				  </span>
 				</div>
-				<div class="graph-grades">
-					<div class="graph-star-col">
-						<img src="<lams:LAMSURL/>images/components/star.png" alt="#" />
-						<p>grades</p>
-					</div>
-					<div class="grades-progress-col">
-						<div class="grades-left">
-							<div class="grades-score d-flex">
-								<p><span>High:</span> 99</p>
-								<div class="grades-progress-bar">
-									<div class="progress-div" id="progress-bar-1" style="width: 99%">
-										<span></span>
-									</div>
-								</div>
+			</td>
+			<td>
+				<button class="btn btn-xs btn-secondary dialogSearchPhraseClear" 
+						onClick="javascript:learnerGroupClearSearchPhrase()"
+						title="<fmt:message key='learners.search.phrase.clear.tooltip' />">
+					<i class="fa-solid fa-fw fa-xmark"></i>
+				</button>
+			</td>
+		</tr>
+		<tr>
+			<td class="navCell pageMinus10Cell">
+				<button class="btn btn-xs btn-secondary" 
+						onClick="javascript:shiftLearnerGroupList(-10)"
+						title="<fmt:message key='learner.group.backward.10'/>">
+					<i class="fa-solid fa-fw fa-step-backward"></i>
+				</button>
+					
+			</td>
+			<td class="navCell pageMinus1Cell">
+				<button class="btn btn-xs btn-secondary" 
+						onClick="javascript:shiftLearnerGroupList(-1)"
+						title="<fmt:message key='learner.group.backward.1'/>">
+					<i class="fa-solid fa-fw fa-backward"></i>
+				</button>
+			</td>
+			<td class="pageCell"
+				title="<fmt:message key='learners.page'/>">
+			</td>
+			<td class="navCell pagePlus1Cell">
+				<button class="btn btn-xs btn-secondary" 
+						onClick="javascript:shiftLearnerGroupList(1)"
+						title="<fmt:message key='learner.group.forward.1'/>">
+					<i class="fa-solid fa-fw fa-forward"></i>
+				</button>
+			</td>
+			<td class="navCell pagePlus10Cell">
+				<button class="btn btn-xs btn-secondary" 
+						onClick="javascript:shiftLearnerGroupList(10)"
+						title="<fmt:message key='learner.group.forward.10'/>">
+					<i class="fa-solid fa-fw fa-step-forward"></i>
+				</button>
+			</td>
+			<td class="navCell sortCell" role="button">
+				<button class="btn btn-xs btn-secondary" 
+						onClick="javascript:sortLearnerGroupList()"
+						title="<fmt:message key='learner.group.sort.button'/>">
+					<i class="fa-solid fa-fw fa-caret-down"></i>
+				</button>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="6">
+				<table class="dialogTable table table-condensed table-hover"></table>
+			</td>
+		</tr>
+	</table>
+	<div class="modal-footer">
+		<button id="learnerGroupDialogForceCompleteAllButton" class="btn btn-secondary me-2">
+			<span><fmt:message key="button.force.complete.all" /></span>
+		</button>
+		<button id="learnerGroupDialogForceCompleteButton" class="learnerGroupDialogSelectableButton btn btn-secondary me-2">
+			<span><fmt:message key="button.force.complete" /></span>
+		</button>
+
+		<button id="learnerGroupDialogViewButton" class="learnerGroupDialogSelectableButton btn btn-secondary me-2">
+			<span><fmt:message key="button.view.learner" /></span>
+		</button>
+		<button id="learnerGroupDialogEmailButton" class="learnerGroupDialogSelectableButton btn btn-secondary me-2">
+			<span><fmt:message key="button.email" /></span>
+		</button>
+		<button id="learnerGroupDialogCloseButton" class="btn btn-primary me-2">
+			<span><fmt:message key="button.close" /></span>
+		</button>
+	</div>
+</div>
+
+<div id="classDialogContents" class="dialogContainer">
+	<div id="classDialogTable">
+		<div class="row">
+			<div id="leftLearnerTable" class="col-6">
+				<table id="classLearnerTable" class="table table-borderless">
+					<tr class="table-active">
+						<td class="dialogTitle" colspan="6"><fmt:message
+								key="lesson.learners" /></td>
+					</tr>
+					<tr>
+						<td colspan="5">
+							<div class="input-group mb-3">
+							  <input type="text" class="form-control dialogSearchPhrase" placeholder="<fmt:message key='search.learner.textbox' />"
+							  		 aria-label="<fmt:message key='search.learner.textbox' />">
+							  <span class="dialogSearchPhraseIcon input-group-text" title="<fmt:message key='search.learner.textbox' />">
+							  		<i class="fa-solid fa-sm fa-search"></i>
+							  </span>
 							</div>
-							<div class="grades-score d-flex">
-								<p><span>Median:</span> 68</p>
-								<div class="grades-progress-bar">
-									<div class="progress-div" id="progress-bar-2" style="width: 68%">
-										<span></span>
-									</div>
-								</div>
-							</div>
-							<div class="grades-score d-flex">
-								<p><span>Low:</span> 28</p>
-								<div class="grades-progress-bar">
-									<div class="progress-div" id="progress-bar-3" style="width: 28%">
-										<span></span>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="score-col">
-					<div class="row">
-						<div class="col-12 col-sm-6">
-							<div class="score-col-inner" id="score-col1">
-								<h1>8<span>%</span></h1>
-								<p>Students <br>at risk</p>
-								<img src="<lams:LAMSURL/>images/components/icon1.png" alt="#" />
-							</div>
-						</div>
-						<div class="col-12 col-sm-6">
-							<div class="score-col-inner" id="score-col2">
-								<h1>98<span>%</span></h1>
-								<p>Average <br>Score</p>
-								<img src="<lams:LAMSURL/>images/components/icon2.png" alt="#" />
-							</div>
-						</div>
-					</div>
-				</div>
+						</td>
+						<td>
+							<button class="btn btn-xs btn-secondary dialogSearchPhraseClear" 
+									onClick="javascript:classClearSearchPhrase()"
+									title="<fmt:message key='learners.search.phrase.clear.tooltip' />">
+								<i class="fa-solid fa-fw fa-xmark"></i>
+							</button>
+						</td>
+					</tr>
+					<tr>
+						<td class="navCell pageMinus10Cell">
+							<button class="btn btn-xs btn-secondary" 
+									onClick="javascript:sortClassList('Learner', -10)"
+									title="<fmt:message key='learner.group.backward.10'/>">
+								<i class="fa-solid fa-fw fa-step-backward"></i>
+							</button>
+								
+						</td>
+						<td class="navCell pageMinus1Cell">
+							<button class="btn btn-xs btn-secondary" 
+									onClick="javascript:sortClassList('Learner', -1)"
+									title="<fmt:message key='learner.group.backward.1'/>">
+								<i class="fa-solid fa-fw fa-backward"></i>
+							</button>
+						</td>
+						<td class="pageCell"
+							title="<fmt:message key='learners.page'/>">
+						</td>
+						<td class="navCell pagePlus1Cell">
+							<button class="btn btn-xs btn-secondary" 
+									onClick="javascript:sortClassList('Learner', 1)"
+									title="<fmt:message key='learner.group.forward.1'/>">
+								<i class="fa-solid fa-fw fa-forward"></i>
+							</button>
+						</td>
+						<td class="navCell pagePlus10Cell">
+							<button class="btn btn-xs btn-secondary" 
+									onClick="javascript:sortClassList('Learner', 10)"
+									title="<fmt:message key='learner.group.forward.10'/>">
+								<i class="fa-solid fa-fw fa-step-forward"></i>
+							</button>
+						</td>
+						<td class="navCell sortCell" role="button">
+							<button class="btn btn-xs btn-secondary" 
+									onClick="javascript:sortClassList('Learner')"
+									title="<fmt:message key='learner.group.sort.button'/>">
+								<i class="fa-solid fa-fw fa-caret-down"></i>
+							</button>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="6">
+							<table class="dialogTable table table-condensed table-hover"></table>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="6">
+							<button id="addAllLearnersButton"
+								class="btn btn-sm btn-secondary float-end"
+								onClick="javascript:addAllLearners()">
+								<fmt:message key="button.edit.class.add.all" />
+							</button>
+						</td>
+					</tr>
+				</table>
 			</div>
-			<div class="col-12 col-md-9 content-right">
-				<div class="user-map-col h-100">
-					<img src="<lams:LAMSURL/>images/components/user-map.png" alt="#" />
-					<div class="map-pn">
-						<span><img src="<lams:LAMSURL/>images/components/plus.svg" alt="#" /></span>
-						<span><img src="<lams:LAMSURL/>images/components/minus.svg" alt="#" /></span>
-					</div>
-				</div>
+			<div id="rightMonitorTable" class="col">
+				<table id="classMonitorTable" class="table table-borderless">
+					<tr class="table-active">
+						<td class="dialogTitle" colspan="6"><fmt:message
+								key="lesson.monitors" /></td>
+					</tr>
+					<tr>
+						<td id="classMonitorSearchRow" colspan="6">&nbsp;</td>
+					</tr>
+					<tr>
+						<td class="navCell pageMinus10Cell">
+							<button class="btn btn-xs btn-secondary" 
+									onClick="javascript:sortClassList('Monitor', -10)"
+									title="<fmt:message key='learner.group.backward.10'/>">
+								<i class="fa-solid fa-fw fa-step-backward"></i>
+							</button>
+								
+						</td>
+						<td class="navCell pageMinus1Cell">
+							<button class="btn btn-xs btn-secondary" 
+									onClick="javascript:sortClassList('Monitor', -1)"
+									title="<fmt:message key='learner.group.backward.1'/>">
+								<i class="fa-solid fa-fw fa-backward"></i>
+							</button>
+						</td>
+						<td class="pageCell"
+							title="<fmt:message key='learners.page'/>">
+						</td>
+						<td class="navCell pagePlus1Cell">
+							<button class="btn btn-xs btn-secondary" 
+									onClick="javascript:sortClassList('Monitor', 1)"
+									title="<fmt:message key='learner.group.forward.1'/>">
+								<i class="fa-solid fa-fw fa-forward"></i>
+							</button>
+						</td>
+						<td class="navCell pagePlus10Cell">
+							<button class="btn btn-xs btn-secondary" 
+									onClick="javascript:sortClassList('Monitor', 10)"
+									title="<fmt:message key='learner.group.forward.10'/>">
+								<i class="fa-solid fa-fw fa-step-forward"></i>
+							</button>
+						</td>
+						<td class="navCell sortCell" role="button">
+							<button class="btn btn-xs btn-secondary" 
+									onClick="javascript:sortClassList('Monitor')"
+									title="<fmt:message key='learner.group.sort.button'/>">
+								<i class="fa-solid fa-fw fa-caret-down"></i>
+							</button>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="6">
+							<table class="dialogTable table table-condensed table-hover"></table>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="6"></td>
+					</tr>
+				</table>
 			</div>
 		</div>
-		<div class="row">
-			<div id="required-tasks" class="col-12 col-md-6 mb-4">
-				<div id="required-tasks-content" class="monitoring-panel">
-					<h6><fmt:message key="lesson.required.tasks"/></h6>
-				</div>
+	</div>
+</div>
+	
+<div id="forceBackwardsDialogContents" class="dialogContainer">
+	<div id="forceBackwardsMsg"></div>
+    <div class="pull-right mt-3">
+
+           <button id="forceBackwardsRemoveContentNoButton" class="btn btn-primary me-1">
+                   <span><fmt:message key="force.complete.remove.content.no"/></span>
+           </button>
+
+           <button id="forceBackwardsRemoveContentYesButton" class="btn btn-primary me-1">
+                   <span><fmt:message key="force.complete.remove.content.yes" /></span>
+           </button>
+
+           <button id="forceBackwardsCloseButton" class="btn btn-secondary">
+                   <span><fmt:message key="button.close" /></span>
+           </button>
+   </div>
+</div>
+
+<div id="emailProgressDialogContents" class="dialogContainer">
+	<div id="emailProgressDialogTable">
+		<div>
+			<table id="emailProgressTable" class="table">
+				<tr class="table-active">
+					<td class="dialogTitle" colspan="6"><fmt:message key="progress.email.will.be.sent.on"/></td>
+				</tr>
+				<tr>
+					<td colspan="6">
+						<table class="dialogTable table table-condensed table-hover"></table>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="row mt-2">
+			<div class="col-6 form-group">
+				<label for="emaildatePicker"><fmt:message key="progress.email.select.date"/></label>
+				<input type="text" class="form-control" name="emaildatePicker" id="emaildatePicker" value="" autocomplete="off" />
 			</div>
-			<div class="col-12 col-md-6 mb-4">
-				<div class="monitoring-panel insight-col">
-					<h6>insights</h6>
-					<div class="insight-col-content">
-						<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem</p>
-						<p><a href="#">read more...</a></p>
-					</div>
-				</div>
+		</div>
+
+		<div class="row mt-2">
+			<div class="col-6 text-end">
+				<button id="addEmailProgressDateButton"
+					class="btn btn-sm btn-primary"
+					onClick="javascript:addEmailProgressDate()">
+					<fmt:message key="progress.email.add.date"/>
+				</button>
+			</div>
+			<div class="col-6 text-end">
+				<button id="addEmailProgressSeriesButton"
+					class="btn btn-sm btn-secondary"
+					onClick="javascript:addEmailProgressSeries(true)">
+					<fmt:message key="progress.email.generate.date.list"/>
+				</button>
 			</div>
 		</div>
 	</div>
 </div>
 
+<div id="confirmationDialog" class="modal dialogContainer fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog  modal-dialog-centered">
+    <div class="modal-content">
+    	<div class="modal-body">
+    	</div>
+      	<div class="modal-footer">
+        	<button type="button" class="btn btn-secondary" id="confirmationDialogCancelButton">Cancel</button>
+        	<button type="button" class="btn btn-primary" id="confirmationDialogConfirmButton">Confirm</button>
+      	</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" id="toast-container">
+</div>
+
+<div id="toast-template" class="toast align-items-center bg-white" role="alert" aria-live="assertive" aria-atomic="true">
+	<div class="d-flex">
+		<div class="toast-body"></div>
+		<button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+  	</div>
+</div>
 </body>
 </lams:html>

@@ -135,7 +135,7 @@ public class DiscussionSentimentController {
 
 	int learnerCount = lessonService.getCountLessonLearners(lessonId, null);
 	model.addAttribute("learnerCount", learnerCount);
-	return "/discussion/monitor";
+	return "/discussion/monitor5";
     }
 
     @RequestMapping(path = "/stopMonitor", method = RequestMethod.POST)

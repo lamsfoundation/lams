@@ -148,8 +148,6 @@ public class EmailProgressController {
 	}
 	if (date != null) {
 	    dateJSON.put("id", date.getTime());
-	    dateJSON.put("ms", date.getTime());
-	    dateJSON.put("date", DateUtil.convertToStringForJSON(date, locale));
 	}
 	return dateJSON;
     }

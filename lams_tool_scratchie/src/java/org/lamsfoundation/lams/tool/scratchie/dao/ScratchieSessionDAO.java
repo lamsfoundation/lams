@@ -48,6 +48,6 @@ public interface ScratchieSessionDAO extends DAO {
     /**
      * Returns all session ids where specified qbQuestionUid is used with the given answer
      */
-    List<Long> getSessionIdsByQbQuestion(Long qbQuestionUid, String answer);
+    List<Long> getSessionIdsByQbToolQuestion(Long toolQuestionUid, String answer);
 
 }

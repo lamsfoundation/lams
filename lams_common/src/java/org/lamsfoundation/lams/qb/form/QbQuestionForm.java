@@ -56,6 +56,7 @@ public class QbQuestionForm {
     private boolean shuffle;
     private boolean prefixAnswersWithLetters;
     private boolean caseSensitive;
+    private boolean exactMatch;
     private boolean correctAnswer;
     private boolean allowRichEditor;
     private int maxWordsLimit;
@@ -214,6 +215,14 @@ public class QbQuestionForm {
 
     public void setCaseSensitive(boolean caseSensitive) {
 	this.caseSensitive = caseSensitive;
+    }
+
+    public boolean isExactMatch() {
+	return exactMatch;
+    }
+
+    public void setExactMatch(boolean exactMatch) {
+	this.exactMatch = exactMatch;
     }
 
     public boolean isCorrectAnswer() {

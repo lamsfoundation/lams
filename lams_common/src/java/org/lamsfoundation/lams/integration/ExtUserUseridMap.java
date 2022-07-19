@@ -29,6 +29,9 @@ public class ExtUserUseridMap implements Serializable {
     @Column(name = "external_username")
     private String extUsername;
 
+    @Column(name = "lti_adv_username")
+    private String ltiAdvUsername;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -58,6 +61,14 @@ public class ExtUserUseridMap implements Serializable {
 
     public void setExtUsername(String extUsername) {
 	this.extUsername = extUsername;
+    }
+
+    public String getLtiAdvUsername() {
+	return ltiAdvUsername;
+    }
+
+    public void setLtiAdvUsername(String ltiAdvUsername) {
+	this.ltiAdvUsername = ltiAdvUsername;
     }
 
     public User getUser() {

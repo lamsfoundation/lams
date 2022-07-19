@@ -92,7 +92,7 @@ public class TblMonitoringController {
 	request.setAttribute("totalLearnersNumber", lesson.getAllLearners().size());
 
 	List<Activity> lessonActivities = getLessonActivities(lesson);
-	setupAvailableActivityTypes(request, lessonActivities);
+	TblMonitoringController.setupAvailableActivityTypes(request, lessonActivities);
 	return "tblmonitor/tblmonitor";
     }
 
@@ -105,7 +105,7 @@ public class TblMonitoringController {
 	Lesson lesson = lessonService.getLesson(lessonId);
 
 	List<Activity> lessonActivities = getLessonActivities(lesson);
-	setupAvailableActivityTypes(request, lessonActivities);
+	TblMonitoringController.setupAvailableActivityTypes(request, lessonActivities);
 	boolean isTraAvailable = (request.getAttribute("isScratchieAvailable") != null)
 		&& ((Boolean) request.getAttribute("isScratchieAvailable"));
 	boolean isIraAssesmentAvailable = request.getAttribute("isIraAssessmentAvailable") != null
@@ -282,7 +282,7 @@ public class TblMonitoringController {
 	    request.setAttribute("chartNamesDataset", chartNamesDataset.toString());
 	}
 
-	return "tblmonitor/teams";
+	return "tblmonitor/teams5";
     }
 
     /**
@@ -324,7 +324,7 @@ public class TblMonitoringController {
 	}
 
 	request.setAttribute("permissionGates", permissionGates);
-	return "tblmonitor/gates";
+	return "tblmonitor/gates5";
     }
 
     /**
@@ -386,7 +386,7 @@ public class TblMonitoringController {
 	model.addAttribute("aeToolTypes", toolTypes);
 	model.addAttribute("aeActivityTitles", activityTitles);
 
-	return "tblmonitor/aes";
+	return "tblmonitor/aes5";
     }
 
     /**
@@ -484,7 +484,7 @@ public class TblMonitoringController {
 	return null;
     }
 
-    private void setupAvailableActivityTypes(HttpServletRequest request, List<Activity> activities) {
+    public static void setupAvailableActivityTypes(HttpServletRequest request, List<Activity> activities) {
 	//check if there is Scratchie activity. It's used only in case of LKC TBL monitoring, when all assessment are treated as AEs
 	boolean isScratchieAvailable = false;
 	for (Activity activity : activities) {

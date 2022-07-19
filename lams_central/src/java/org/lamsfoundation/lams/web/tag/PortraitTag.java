@@ -43,7 +43,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class PortraitTag extends BodyTagSupport {
     private static final long serialVersionUID = -3143529984657965761L;
     private static final Logger log = Logger.getLogger(PortraitTag.class);
-    private static final int NUM_COLORS = 7;
+    private static final int NUM_COLORS = 6;
     private IUserManagementService userManagementService;
 
     private static final String CSS_ROUND = " portrait-round";

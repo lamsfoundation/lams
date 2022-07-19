@@ -205,11 +205,15 @@
 			if ( svg ) {
 				var svgWidth = svg.attr('width'),
 					svgHeight = svg.attr('height');
+				
 				if ( svgWidth > 280 ) {
 					svg.attr('width', '100%');
 					svg.attr('height', '100%');
 					svg.css('max-width', svgWidth);
 					svg.css('max-height', svgHeight);
+
+					// keep max-width and max-height between automatic refresh
+					originalSequenceCanvas = svg[0].outerHTML;
 				} 
 				$('#sequenceCanvas').css('width', 'auto').css('height', 'auto');
 			}

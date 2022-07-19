@@ -135,6 +135,7 @@ public class EditQbQuestionController {
 	form.setShuffle(qbQuestion.isShuffle());
 	form.setPrefixAnswersWithLetters(qbQuestion.isPrefixAnswersWithLetters());
 	form.setCaseSensitive(qbQuestion.isCaseSensitive());
+	form.setExactMatch(qbQuestion.isExactMatch());
 	form.setCorrectAnswer(qbQuestion.getCorrectAnswer());
 	form.setAllowRichEditor(qbQuestion.isAllowRichEditor());
 	form.setMaxWordsLimit(qbQuestion.getMaxWordsLimit());
@@ -298,6 +299,27 @@ public class EditQbQuestionController {
 	unitList.add(unit);
 
 	request.setAttribute(QbConstants.ATTR_UNIT_LIST, unitList);
+	return "qb/authoring/unitlist";
+    }
+
+    /**
+     * Ajax call, will remove the given unit
+     */
+    @RequestMapping("/removeUnit")
+    public String removeUnit(HttpServletRequest request, @RequestParam int unitToRemoveIndex)
+	    throws ServletException, IOException {
+	Set<QbQuestionUnit> unitList = qbService.getUnitsFromRequest(request, false);
+	Set<QbQuestionUnit> newUnitList = new TreeSet<>();
+	int displayOrder = 0;
+	for (QbQuestionUnit unit : unitList) {
+	    if (unitToRemoveIndex != unit.getDisplayOrder()) {
+		unit.setDisplayOrder(displayOrder);
+		displayOrder++;
+		newUnitList.add(unit);
+	    }
+	}
+
+	request.setAttribute(QbConstants.ATTR_UNIT_LIST, newUnitList);
 	return "qb/authoring/unitlist";
     }
 

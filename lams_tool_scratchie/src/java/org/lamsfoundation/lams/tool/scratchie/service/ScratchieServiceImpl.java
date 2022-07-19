@@ -55,6 +55,8 @@ import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.flux.FluxMap;
+import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -174,6 +176,12 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     private IOutcomeService outcomeService;
 
     private ScratchieOutputFactory scratchieOutputFactory;
+
+    public ScratchieServiceImpl() {
+	FluxRegistry.initFluxMap(ScratchieConstants.ANSWERS_UPDATED_SINK_NAME,
+		ScratchieConstants.ANSWERS_UPDATED_SINK_NAME, null, toolContentId -> "doRefresh",
+		FluxMap.SHORT_THROTTLE, FluxMap.STANDARD_TIMEOUT);
+    }
 
     // *******************************************************************************
     // Service method
@@ -464,8 +472,11 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    log.setQbToolQuestion(qbToolQuestion);
 	    log.setAccessDate(new Timestamp(new Date().getTime()));
 	    scratchieAnswerVisitDao.saveObject(log);
+	    // need to flush so subscribers to sink see new answers in DB
+	    scratchieAnswerVisitDao.flush();
 
 	    recalculateMarkForSession(sessionId, false);
+	    FluxRegistry.emit(ScratchieConstants.ANSWERS_UPDATED_SINK_NAME, log.getQbToolQuestion().getToolContentId());
 	}
     }
 
@@ -592,8 +603,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     }
 
     @Override
-    public boolean recalculateMarksForVsaQuestion(Long qbQuestionUid, String answer) {
-	List<Long> sessionIds = scratchieSessionDao.getSessionIdsByQbQuestion(qbQuestionUid, answer);
+    public boolean recalculateMarksForVsaQuestion(Long toolQuestionUid, String answer) {
+	List<Long> sessionIds = scratchieSessionDao.getSessionIdsByQbToolQuestion(toolQuestionUid, answer);
 	// recalculate marks if it's required
 	for (Long sessionId : sessionIds) {
 	    recalculateMarkForSession(sessionId, true);
@@ -629,7 +640,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		List<ScratchieAnswerVisitLog> visitLogs = scratchieAnswerVisitDao.getVsaLogsByItem(item.getUid());
 		for (ScratchieAnswerVisitLog visitLog : visitLogs) {
 		    String answer = visitLog.getAnswer();
-		    if (QbUtils.normaliseVSAnswer(answer) == null) {
+		    if (QbUtils.normaliseVSAnswer(answer, qbQuestion.isExactMatch()) == null) {
 			continue;
 		    }
 
@@ -1100,8 +1111,9 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	String name = correctAnswersGroup.getName();
 
 	for (String userAnswer : userAnswers) {
-	    String normalisedQuestionAnswer = QbUtils.normaliseVSAnswer(userAnswer);
-	    if (QbUtils.isVSAnswerAllocated(name, normalisedQuestionAnswer, qbQuestion.isCaseSensitive())) {
+	    String normalisedQuestionAnswer = QbUtils.normaliseVSAnswer(userAnswer, qbQuestion.isExactMatch());
+	    if (QbUtils.isVSAnswerAllocated(name, normalisedQuestionAnswer, qbQuestion.isCaseSensitive(),
+		    qbQuestion.isExactMatch())) {
 		return true;
 	    }
 	}
@@ -1145,9 +1157,10 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	for (ScratchieAnswerVisitLog userLog : userLogs) {
 	    if (userLog.getQbToolQuestion().getUid().equals(item.getUid())) {
 		itemAttempts++;
-		String normalisedQuestionAnswer = QbUtils.normaliseVSAnswer(userLog.getAnswer());
+		String normalisedQuestionAnswer = QbUtils.normaliseVSAnswer(userLog.getAnswer(),
+			qbQuestion.isExactMatch());
 		if (correctVsaOption != null && QbUtils.isVSAnswerAllocated(correctVsaOption, normalisedQuestionAnswer,
-			qbQuestion.isCaseSensitive())) {
+			qbQuestion.isCaseSensitive(), qbQuestion.isExactMatch())) {
 		    break;
 		}
 	    }

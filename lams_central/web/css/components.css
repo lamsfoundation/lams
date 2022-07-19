@@ -1,5 +1,5 @@
 body.component {
-	background-color: #E4E4E4;
+	background-color: var(--lams-background-gray);
 }
 
 body.component .tooltip-inner {
@@ -25,9 +25,9 @@ body.component .info_icon {
 }
 
 .component-page-wrapper {
+	min-height: 100vh;
 	border-radius: 2rem;
 	overflow: hidden;
-	background-color: #F6F5FA;
 }
 
 .component-page-wrapper input::-webkit-input-placeholder {
@@ -36,10 +36,6 @@ body.component .info_icon {
 
 .component-page-wrapper input::-moz-placeholder {
 	color: #626262;
-}
-
-.component-page-wrapper label {
-	color: #6c757d;
 }
 
 .component-page-wrapper .btn {
@@ -93,7 +89,8 @@ body.component .info_icon {
     border-bottom: 2px solid #20639B;
 }
 
-.component-page-wrapper table.table tbody td {
+.component-page-wrapper table.table tbody td,
+.component-page-wrapper table.table tbody th {
 	border: none;
     border-bottom: 2px solid #C3CEDC;
 }
@@ -273,10 +270,16 @@ body.component .info_icon {
 	align-items: flex-start;
 	flex-direction: column;
 	transition: all .3s ease;
+	transform: translateX(-7rem);
+	z-index: 1;
 }
 
 .component-sidebar.active {
-	transform: translateX(-7rem);
+	transform: translateX(0);
+}
+
+.component-sidebar .component-menu-btn a {
+	margin-bottom: 1rem;
 }
 
 .component-sidebar > ul {
@@ -286,7 +289,8 @@ body.component .info_icon {
 	margin-bottom: auto;
 }
 
-.component-sidebar .logo-li {
+.component-sidebar .logo-li,
+.component-sidebar .lams-logo {
 	margin-bottom: 4rem;
 }
 
@@ -358,25 +362,21 @@ body.component .info_icon {
 	display: flex;
 }
 
-.component-page-wrapper .top-menu-btn a {
-	display: inline-block;
-	background-color: #3C42E0;
+.component-page-wrapper .component-menu-btn a {
 	width: 3.1rem;
 	height: 3.1rem;
-	border-radius: 1rem;
-	margin-left: .6rem;
-	text-align: center;
-	line-height: 2.8rem;
-	box-shadow: 0px 3px 6px #3C42E040;
-	transition: all .3s ease;
 }
 
-.component-page-wrapper .top-menu-btn a:hover {
-	background-color: #878bea;
+.component-page-wrapper .component-menu-btn a i.fa {
+	padding-top: 1.09rem;
 }
 
-.component-page-wrapper .top-menu-btn a img {
+.component-page-wrapper .component-menu-btn a img {
 	width: 1rem;
+}
+
+.component-page-wrapper .top-menu a {
+	margin-left: .6rem;
 }
 
 .component-page-wrapper .top-menu form {
@@ -407,23 +407,8 @@ body.component .info_icon {
 	color: #ACB5CC;
 }
 
-.component-page-wrapper .graph-con {
-	position: relative;
-	min-height: 12rem;
-	width: calc(100% - 8rem);
-}
-
-.component-page-wrapper .graph-con #myChart {
-	width: 25rem !important;
-	height: 12rem !important;
-	margin-left: -5rem;
-	margin-bottom: -5rem;
-	border: 0;
-}
-
 .component-page-wrapper .graph-col {
-	display: flex;
-	justify-content: space-between;
+		
 }
 
 .component-page-wrapper .graph-col ul {
@@ -505,7 +490,7 @@ body.component .info_icon {
 
 .switch input ~ label::before {
 	right: 0;
-	background-color: #dee2e6;
+	background-color: var(--bs-gray);
 	border-radius: calc(2.375rem * .8);
 	transition: 0.2s all;
 }
@@ -521,7 +506,7 @@ body.component .info_icon {
 }
 
 .switch input:checked ~ label::before {
-	background-color: #7fdaa1;
+	background-color: var(--bs-green);
 }
 
 .switch input:checked ~ label::after {
@@ -593,6 +578,9 @@ body.component .info_icon {
 }
 
 
+.editable-click, a.editable-click, a.editable-click:hover {
+	border-bottom: none;
+}
 
 /* Unused? */
 /* 
@@ -674,3 +662,8 @@ body.component .info_icon {
 }
 
 */
+
+.form-select-sm,
+.btn-sm, .btn-group-sm > .btn {
+	font-size: 15px;
+}

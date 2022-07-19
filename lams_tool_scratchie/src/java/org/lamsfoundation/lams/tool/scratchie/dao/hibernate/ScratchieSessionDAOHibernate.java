@@ -28,15 +28,20 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.qb.QbUtils;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieSessionDAO;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
-import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieSessionComparator;
+import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -91,17 +96,43 @@ public class ScratchieSessionDAOHibernate extends LAMSBaseDAO implements Scratch
     }
 
     @Override
-    public List<Long> getSessionIdsByQbQuestion(Long qbQuestionUid, String answer) {
+    public List<Long> getSessionIdsByQbToolQuestion(Long toolQuestionUid, String answer) {
+	if (StringUtils.isBlank(answer)) {
+	    return List.of();
+	}
+
+	QbToolQuestion qbToolQuestion = find(QbToolQuestion.class, toolQuestionUid);
+	ToolActivity toolActivity = findByProperty(ToolActivity.class, "toolContentId",
+		qbToolQuestion.getToolContentId()).get(0);
+	Organisation organisation = toolActivity.getLearningDesign().getLessons().iterator().next().getOrganisation();
+	Organisation parentOrganisation = organisation.getParentOrganisation();
+	if (parentOrganisation != null && parentOrganisation.getOrganisationType().getOrganisationTypeId()
+		.equals(OrganisationType.ROOT_TYPE)) {
+	    parentOrganisation = null;
+	}
+
 	final String FIND_BY_QBQUESTION_AND_FINISHED = "SELECT DISTINCT session.sessionId FROM "
 		+ ScratchieItem.class.getName() + " AS item, " + ScratchieSession.class.getName() + " AS session, "
-		+ ScratchieAnswerVisitLog.class.getName()
-		+ " AS visitLog WHERE session.scratchie.uid = item.scratchieUid AND item.qbQuestion.uid =:qbQuestionUid"
-		+ " AND session.sessionId = visitLog.sessionId AND REGEXP_REPLACE(visitLog.answer, '"
-		+ IScratchieService.VSA_ANSWER_NORMALISE_SQL_REG_EXP + "', '') = :answer";
+		+ ScratchieAnswerVisitLog.class.getName() + " AS visitLog, " + ToolActivity.class.getName()
+		+ " AS a JOIN a.learningDesign.lessons AS l "
+		+ "WHERE session.scratchie.uid = item.scratchieUid AND a.toolContentId = session.scratchie.contentId "
+		+ "AND (l.organisation.organisationId = :organisationId OR "
+		+ "     l.organisation.parentOrganisation.organisationId = :organisationId"
+		+ (parentOrganisation == null ? ""
+			: " OR l.organisation.organisationId = :parentOrganisationId OR "
+				+ "l.organisation.parentOrganisation.organisationId = :parentOrganisationId")
+		+ ") AND item.qbQuestion.uid =:qbQuestionUid " + "AND session.sessionId = visitLog.sessionId AND "
+		+ (qbToolQuestion.getQbQuestion().isExactMatch() ? "TRIM(visitLog.answer)"
+			: "REGEXP_REPLACE(visitLog.answer, '" + QbUtils.VSA_ANSWER_NORMALISE_SQL_REG_EXP + "', '')")
+		+ " = :answer";
 
 	Query<Long> q = getSession().createQuery(FIND_BY_QBQUESTION_AND_FINISHED, Long.class);
-	q.setParameter("qbQuestionUid", qbQuestionUid);
-	String normalisedAnswer = answer.replaceAll(IScratchieService.VSA_ANSWER_NORMALISE_JAVA_REG_EXP, "");
+	q.setParameter("qbQuestionUid", qbToolQuestion.getQbQuestion().getUid());
+	q.setParameter("organisationId", organisation.getOrganisationId());
+	if (parentOrganisation != null) {
+	    q.setParameter("parentOrganisationId", parentOrganisation.getOrganisationId());
+	}
+	String normalisedAnswer = answer.replaceAll(QbUtils.VSA_ANSWER_NORMALISE_JAVA_REG_EXP, "");
 	q.setParameter("answer", normalisedAnswer);
 	return q.list();
     }

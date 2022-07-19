@@ -815,14 +815,16 @@ public class QbService implements IQbService {
     @Override
     public Long allocateVSAnswerToOption(Long toolQuestionUid, Long targetOptionUid, Long previousOptionUid,
 	    String answer) {
-	String normalisedAnswer = QbUtils.normaliseVSAnswer(answer);
+	QbToolQuestion toolQuestion = qbDAO.find(QbToolQuestion.class, toolQuestionUid);
+	QbQuestion qbQuestion = toolQuestion.getQbQuestion();
+	boolean isExactMatch = qbQuestion.isExactMatch();
+
+	String normalisedAnswer = QbUtils.normaliseVSAnswer(answer, isExactMatch);
 	if (normalisedAnswer == null && previousOptionUid.equals(-1L)) {
 	    return null;
 	}
 	answer = answer.strip();
 
-	QbToolQuestion toolQuestion = qbDAO.find(QbToolQuestion.class, toolQuestionUid);
-	QbQuestion qbQuestion = toolQuestion.getQbQuestion();
 	Long qbQuestionUid = qbQuestion.getUid();
 	boolean isQuestionCaseSensitive = qbQuestion.isCaseSensitive();
 
@@ -834,8 +836,8 @@ public class QbService implements IQbService {
 	    if (previousOptionUid.equals(-1L)) {
 		// new allocation, check if the answer was not allocated anywhere already
 		String name = option.getName();
-		boolean isAnswerAllocated = QbUtils.isVSAnswerAllocated(name, normalisedAnswer,
-			isQuestionCaseSensitive);
+		boolean isAnswerAllocated = QbUtils.isVSAnswerAllocated(name, normalisedAnswer, isQuestionCaseSensitive,
+			isExactMatch);
 		if (isAnswerAllocated) {
 		    return option.getUid();
 		}
@@ -862,7 +864,7 @@ public class QbService implements IQbService {
 	    Set<String> nameWithoutUserAnswer = new LinkedHashSet<>(List.of(alternatives));
 	    nameWithoutUserAnswer.remove(answer);
 	    name = nameWithoutUserAnswer.isEmpty() ? ""
-		    : nameWithoutUserAnswer.stream().filter(a -> QbUtils.normaliseVSAnswer(a) != null)
+		    : nameWithoutUserAnswer.stream().filter(a -> QbUtils.normaliseVSAnswer(a, isExactMatch) != null)
 			    .collect(Collectors.joining(QbUtils.VSA_ANSWER_DELIMITER));
 	    previousOption.setName(name);
 	    qbDAO.update(previousOption);
@@ -877,14 +879,19 @@ public class QbService implements IQbService {
 	if (targetOption != null) {
 	    String name = targetOption.getName();
 
-	    boolean isAnswerAllocated = QbUtils.isVSAnswerAllocated(name, normalisedAnswer, isQuestionCaseSensitive);
+	    boolean isAnswerAllocated = QbUtils.isVSAnswerAllocated(name, normalisedAnswer, isQuestionCaseSensitive,
+		    isExactMatch);
 	    if (isAnswerAllocated) {
 		// the answer has been already allocated to the target option
 		return targetOptionUid;
 	    }
 
 	    // append new answer to option
-	    name += (StringUtils.isBlank(name) ? "" : QbUtils.VSA_ANSWER_DELIMITER) + answer;
+	    if (StringUtils.isBlank(name)) {
+		name = answer;
+	    } else {
+		name += QbUtils.VSA_ANSWER_DELIMITER + answer;
+	    }
 	    targetOption.setName(name);
 	    qbDAO.update(targetOption);
 	    qbDAO.flush();
@@ -945,6 +952,7 @@ public class QbService implements IQbService {
 	} else if ((type == QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
 	    qbQuestion.setPenaltyFactor(Float.parseFloat(form.getPenaltyFactor()));
 	    qbQuestion.setCaseSensitive(form.isCaseSensitive());
+	    qbQuestion.setExactMatch(form.isExactMatch());
 	    qbQuestion.setAutocompleteEnabled(form.isAutocompleteEnabled());
 
 	} else if ((type == QbQuestion.TYPE_NUMERICAL)) {
@@ -991,14 +999,29 @@ public class QbService implements IQbService {
 	}
 	// set units
 	if (type == QbQuestion.TYPE_NUMERICAL) {
-	    Set<QbQuestionUnit> unitList = getUnitsFromRequest(request, true);
-	    List<QbQuestionUnit> units = new ArrayList<>();
+	    Set<QbQuestionUnit> unitsFromRequest = getUnitsFromRequest(request, true);
+	    List<QbQuestionUnit> existingUnits = qbQuestion.getUnits();
+	    List<QbQuestionUnit> newUnits = new ArrayList<>();
 	    int displayOrder = 0;
-	    for (QbQuestionUnit unit : unitList) {
+	    for (QbQuestionUnit unit : unitsFromRequest) {
+		unit.setQbQuestion(qbQuestion);
 		unit.setDisplayOrder(displayOrder++);
-		units.add(unit);
+		newUnits.add(unit);
 	    }
-	    qbQuestion.setUnits(units);
+	    qbQuestion.setUnits(newUnits);
+
+	    for (QbQuestionUnit existingUnit : existingUnits) {
+		boolean unitFound = false;
+		for (QbQuestionUnit unit : newUnits) {
+		    if (unit.getUid() != null && unit.getUid().equals(existingUnit.getUid())) {
+			unitFound = true;
+			break;
+		    }
+		}
+		if (!unitFound) {
+		    qbDAO.delete(existingUnit);
+		}
+	    }
 	}
 
 	return qbQuestion.isQbQuestionModified(oldQuestion);

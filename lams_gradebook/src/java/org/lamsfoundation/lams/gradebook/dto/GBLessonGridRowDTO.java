@@ -20,13 +20,13 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.gradebook.dto;
 
 import java.util.ArrayList;
 
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.springframework.web.util.HtmlUtils;
 
 public class GBLessonGridRowDTO extends GradebookGridRowDTO {
@@ -49,7 +49,7 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
 
     @Override
     public ArrayList<String> toStringArray(GBGridView view) {
-	ArrayList<String> ret = new ArrayList<String>();
+	ArrayList<String> ret = new ArrayList<>();
 
 	ret.add(id.toString());
 
@@ -63,10 +63,11 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
 		ret.add(rowName);
 	    }
 	    ret.add(subGroup);
-	    ret.add(startDate != null ? convertDateToString(startDate, null) : CELL_EMPTY);
-	    ret.add((medianTimeTaken != null && medianTimeTaken != 0) ? convertTimeToString(medianTimeTaken)
+	    ret.add(startDate != null ? DateUtil.convertToString(startDate, null) : CELL_EMPTY);
+	    ret.add((medianTimeTaken != null && medianTimeTaken != 0) ? DateUtil.convertTimeToString(medianTimeTaken)
 		    : CELL_EMPTY);
-	    ret.add((averageMark != null) ? GradebookUtil.niceFormatting(averageMark, displayMarkAsPercent) : CELL_EMPTY);
+	    ret.add((averageMark != null) ? GradebookUtil.niceFormatting(averageMark, displayMarkAsPercent)
+		    : CELL_EMPTY);
 
 	} else if ((view == GBGridView.LRN_COURSE) || (view == GBGridView.MON_USER)) {
 	    if (gradebookLearnerURL != null && gradebookLearnerURL.length() != 0) {
@@ -77,13 +78,15 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
 	    }
 	    ret.add(subGroup);
 	    ret.add((status != null) ? status : CELL_EMPTY);
-	    ret.add(startDate != null ? convertDateToString(startDate, null) : CELL_EMPTY);
-	    ret.add(finishDate != null ? convertDateToString(finishDate, null) : CELL_EMPTY);
+	    ret.add(startDate != null ? DateUtil.convertToString(startDate, null) : CELL_EMPTY);
+	    ret.add(finishDate != null ? DateUtil.convertToString(finishDate, null) : CELL_EMPTY);
 	    ret.add(feedback);
 	    ret.add((medianTimeTaken != null && medianTimeTaken != 0)
-		    ? toItalic(convertTimeToString(medianTimeTaken)) : CELL_EMPTY);
-	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
-	    ret.add((averageMark != null) ? toItalic(GradebookUtil.niceFormatting(averageMark, displayMarkAsPercent)) : CELL_EMPTY);
+		    ? toItalic(DateUtil.convertTimeToString(medianTimeTaken))
+		    : CELL_EMPTY);
+	    ret.add((timeTaken != null) ? DateUtil.convertTimeToString(timeTaken) : CELL_EMPTY);
+	    ret.add((averageMark != null) ? toItalic(GradebookUtil.niceFormatting(averageMark, displayMarkAsPercent))
+		    : CELL_EMPTY);
 	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark, displayMarkAsPercent) : CELL_EMPTY);
 
 	    //plain lesson list case

@@ -21,16 +21,16 @@ var PropertyDefs = {
 				PropertyLib.fillGroupingDropdown(activity, activity.branchingActivity.grouping);
 				PropertyLib.fillToolInputDropdown(activity, activity.branchingActivity.input);
 				
-				$('.propertiesContentFieldOptionalSequenceMin', content).attr('value',
-																				 activity.branchingActivity.minOptions)
-																		.attr('max',
-																				 activity.branchingActivity.branches.length);
-				$('.propertiesContentFieldOptionalSequenceMax', content).attr('value',
-																				 activity.branchingActivity.maxOptions)
-																		.attr({
+				$('.propertiesContentFieldOptionalSequenceMin', content).attr('max', activity.branchingActivity.branches.length)
+																		.val(activity.branchingActivity.minOptions ?
+																			 activity.branchingActivity.minOptions : 0);
+																		
+				$('.propertiesContentFieldOptionalSequenceMax', content).attr({
 																			'min' : activity.branchingActivity.minOptions,
 																			'max' : activity.branchingActivity.branches.length
-																		});
+																		})
+																		.val(activity.branchingActivity.maxOptions ? 
+																		     activity.branchingActivity.maxOptions : 0);
 				if (activity.branchingActivity.branches.length == 0) {
 					// no branches = no buttons to define and match groups/conditions to branches
 					$('.propertiesContentRowConditions', content)
@@ -133,10 +133,13 @@ var PropertyDefs = {
 				  var value = +$(this).val();
 				  activity.branchingActivity.minOptions = Math.min(value, activity.branchingActivity.branches.length);
 				  if (value != activity.branchingActivity.minOptions) {
-					  $(this, content).attr('value', activity.branchingActivity.minOptions);
+					  value = activity.branchingActivity.minOptions;
+					  $(this, content).val(value);
 				  }
-				  if (activity.branchingActivity.minOptions > activity.branchingActivity.maxOptions) {
-					  $('.propertiesContentFieldOptionalSequenceMax', content).attr('value', value);
+				
+				  if (activity.branchingActivity.maxOptions && value > activity.branchingActivity.maxOptions) {
+					  activity.branchingActivity.maxOptions = value;
+					  $('.propertiesContentFieldOptionalSequenceMax', content).val(value);
 				  }
 				  $('.propertiesContentFieldOptionalSequenceMax', content).attr('min', value);
 			  });
@@ -297,10 +300,10 @@ var PropertyDefs = {
 			  .on('input', changeFunction);
 			
 			$('.propertiesContentFieldActivityCompletionBased', content)
-				.attr('checked', activity.gateActivityCompletionBased ? 'checked' : null);
+				.prop('checked', activity.gateActivityCompletionBased);
 			
 			$('.propertiesContentFieldStopAtPrecedingActivity', content)
-				.attr('checked', activity.gateStopAtPrecedingActivity ? 'checked' : null);
+				.prop('checked', activity.gateStopAtPrecedingActivity);
 				
 			$('.propertiesContentFieldPassword', content)
 			  .val(activity.password);
@@ -312,7 +315,6 @@ var PropertyDefs = {
 		
 		if (activity.transitions.to.length == 0){
 			$('.propertiesContentFieldActivityCompletionBased', content)
-				.attr('checked', null)
 				.prop('checked', false)
 				.attr('disabled', 'disabled');
 
@@ -406,9 +408,9 @@ var PropertyDefs = {
 			$('.propertiesContentFieldTitle', content).val(activity.title);
 			$('.propertiesContentFieldGroupingType', content).val(activity.groupingType);
 			if (activity.groupDivide == 'learners') {
-				$('.propertiesContentFieldLearnerCountEnable', content).attr('checked', 'checked');
+				$('.propertiesContentFieldLearnerCountEnable', content).prop('checked', true);
 			} else {
-				$('.propertiesContentFieldGroupCountEnable', content).attr('checked', 'checked');
+				$('.propertiesContentFieldGroupCountEnable', content).prop('checked', true);
 			}	
 			
 			// create groups/learners spinners
@@ -422,8 +424,8 @@ var PropertyDefs = {
 			}).attr('value', activity.learnerCount)
 			  .on('input', changeFunction);
 			
-			$('.propertiesContentFieldEqualSizes', content).attr('checked', activity.equalSizes ? 'checked' : null);
-			$('.propertiesContentFieldViewLearners', content).attr('checked', activity.viewLearners ? 'checked' : null);
+			$('.propertiesContentFieldEqualSizes', content).prop('checked', activity.equalSizes);
+			$('.propertiesContentFieldViewLearners', content).prop('checked', activity.viewLearners);
 			$('.propertiesContentFieldNameGroups', content).click(function(){
 				PropertyLib.openGroupNamingDialog(activity);
 			});
@@ -553,10 +555,11 @@ var PropertyDefs = {
 				  var value = +$(this).val();
 				  activity.minOptions = Math.min(value, activity.childActivities.length);
 				  if (value != activity.minOptions) {
-					  $(this, content).attr('value', activity.minOptions);
+					  value = activity.minOptions;
+					  $(this, content).val(value);
 				  }
-				  if (activity.minOptions > activity.maxOptions) {
-					  $('.propertiesContentFieldOptionalActivityMax', content).attr('value', value);
+				  if (activity.maxOptions && value > activity.maxOptions) {
+					  $('.propertiesContentFieldOptionalActivityMax', content).val(value);
 				  }
 				  $('.propertiesContentFieldOptionalActivityMax', content).attr('min', value);
 			  });
@@ -572,14 +575,18 @@ var PropertyDefs = {
 			  });
 		}
 		
-		$('.propertiesContentFieldOptionalActivityMin', content).attr('value', activity.minOptions)
-																.attr('max', activity.childActivities.length);
-		$('.propertiesContentFieldOptionalActivityMax', content).attr('value', activity.maxOptions)
-																.attr({
+		$('.propertiesContentFieldOptionalActivityMin', content).attr('max', activity.childActivities.length)
+																.val(activity.minOptions ?
+																	 activity.minOptions : 0);
+																
+		$('.propertiesContentFieldOptionalActivityMax', content).attr({
 																	'min' : activity.minOptions,
 																	'max' : activity.childActivities.length
-																});
+																})
+																.val(activity.maxOptions ?
+																	 activity.maxOptions : 0);
 	},
+	
 
 	
 	/**
@@ -832,8 +839,7 @@ var PropertyDefs = {
 			});
 		}
 
-		$('.propertiesContentFieldDefault', content).attr('checked',
-				transition.branch && transition.branch.defaultBranch ? 'checked' : null);
+		$('.propertiesContentFieldDefault', content).prop('checked', transition.branch && transition.branch.defaultBranch);
 	}
 },
 
@@ -1109,7 +1115,7 @@ PropertyLib = {
 					var dialog = layout.outputConditionsDialog,
 						activity = dialog.data('parentObject'),
 						outputSelect = $('#outputSelect', dialog),
-						emptyOption = $('option[value="none"]', outputSelect).attr('selected', 'selected'),
+						emptyOption = $('option[value="none"]', outputSelect).prop('selected', true),
 						// conditions can have names like "output.name#6", but real output names do not have a suffix
 						outputName = activity.conditionsToBranches && activity.conditionsToBranches.length > 0
 								 	 ? activity.conditionsToBranches[0].condition.name.split('#')[0] : null;
@@ -1143,8 +1149,8 @@ PropertyLib = {
 										   .appendTo(outputSelect);
 							// select the output for which mappings were already defined
 							if (this.name == outputName) {
-								option.attr('selected', 'selected');
-								emptyOption.attr('selected', null);
+								option.prop('selected', true);
+								emptyOption.prop('selected', false);
 							}
 						});
 					}
@@ -1508,7 +1514,7 @@ PropertyLib = {
 	 */
 	fillGroupingDropdown : function(activity, grouping) {
 		// find all groupings on canvas and fill dropdown menu with their titles
-		var emptyOption = $('<option />').attr('selected', 'selected'),
+		var emptyOption = $('<option />').prop('selected', true),
 			groupingDropdown = $('.propertiesContentFieldGrouping', activity.propertiesContent).empty().append(emptyOption),
 			groupings = [];
 		
@@ -1527,8 +1533,8 @@ PropertyLib = {
 						// store reference to grouping object
 						.data('grouping', this);
 			if (this == grouping) {
-				emptyOption.removeAttr('selected');
-				option.attr('selected', 'selected');
+				emptyOption.prop('selected', false);
+				option.prop('selected', true);
 			}
 		});
 	},
@@ -1589,8 +1595,8 @@ PropertyLib = {
 						// store reference to grouping object
 						.data('input', this);
 			if (this == input) {
-				emptyOption.removeAttr('selected');
-				option.attr('selected', 'selected');
+				emptyOption.prop('selected', false);
+				option.prop('selected', true);
 			}
 		});
 	},
@@ -1630,8 +1636,8 @@ PropertyLib = {
 			
 			// select the default output
 			if (activity.gradebookToolOutputDefinitionName == this.name) {
-				option.attr('selected', 'selected');
-				emptyOption.attr('selected', null);
+				option.prop('selected', true);
+				emptyOption.prop('selected', false);
 			}
 		});
 		

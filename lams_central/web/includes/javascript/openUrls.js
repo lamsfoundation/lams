@@ -47,11 +47,20 @@ function returnToMonitorLessonIntegrated( lessonID ) {
 	window.location = '/lams/home/monitorLesson.do?lessonID='+lessonID;
 }
 
-function openMonitorLesson( lessonID, url ) {
+function openMonitorLesson( lessonID, url, displayFullScreen ) {
 	if (!url) {
-		url = '/lams/home/monitorLesson.do?';
+		// change back to Home controller after upgrade!!
+		url = '/lams/monitoring/monitoring/monitorLesson.do?';
 	}
 	url += 'lessonID='+ lessonID;
+	
+	if (displayFullScreen) {
+		sessionStorage.removeItem("lamsMonitoringCurrentTab");
+		window.location.href = url;
+		return;
+	}
+	
+	url += '&newUI=false';
 	
 	if (isMac) {
 		if(belowMinRes) {

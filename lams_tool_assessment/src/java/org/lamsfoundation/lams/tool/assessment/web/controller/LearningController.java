@@ -1317,7 +1317,7 @@ public class LearningController {
 	sessionMap.put(AssessmentConstants.CONFIG_KEY_HIDE_TITLES,
 		Boolean.valueOf(service.getConfigValue(AssessmentConstants.CONFIG_KEY_HIDE_TITLES)));
 
-	return "pages/learning/results" + (embedded ? "/allquestions" : "");
+	return "pages/learning/results" + (embedded ? "/allquestions5" : "");
     }
 
     @RequestMapping(path = "/logLearnerInteractionEvent", method = RequestMethod.POST)

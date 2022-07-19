@@ -131,6 +131,7 @@
 	<filter-mapping>
 		<filter-name>CSRFGuard</filter-name> 
 		<url-pattern>*.do</url-pattern>
+		<url-pattern>/ForgotPasswordRequest</url-pattern>
 	</filter-mapping>
 
 

@@ -59,20 +59,10 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
 		return "Target user's e-mail address is invalid.";
 	    }
 
-	    if (fromUserId == null) {
-		Emailer.sendFromSupportEmail(subject, toEmail, message, isHtmlFormat, attachmentFilename);
-	    } else {
-		User fromUser = (User) DeliveryMethodMail.userManagementService.findById(User.class, fromUserId);
-		if (fromUser == null) {
-		    return "Source user with ID " + fromUserId + " was not found.";
-		}
-		String fromEmail = fromUser.getEmail();
-		if (!DeliveryMethodMail.emailValidator.isValid(fromEmail)) {
-		    return "Source user's e-mail address is invalid.";
-		}
+	    // keep fromUserId parameter for consistency with other delivery method signatures
+	    // but ignore it as all emails are sent using the system account
 
-		Emailer.send(subject, toEmail, "", fromEmail, "", message, isHtmlFormat, attachmentFilename);
-	    }
+	    Emailer.sendFromSupportEmail(subject, toEmail, message, isHtmlFormat, attachmentFilename);
 	    return null;
 	} catch (Exception e) {
 	    String error = e.toString();

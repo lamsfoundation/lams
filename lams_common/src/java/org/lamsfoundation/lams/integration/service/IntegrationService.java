@@ -478,30 +478,33 @@ public class IntegrationService implements IIntegrationService {
 		    + ", firstName:" + firstName + ", lastName:" + lastName);
 	}
 
-	User user = new User();
-	user.setLogin(login);
-	user.setPassword(password);
-	user.setSalt(salt);
-	user.setTitle(userData[0]);
-	user.setFirstName(userData[1]);
-	user.setLastName(userData[2]);
-	user.setAddressLine1(userData[3]);
-	user.setCity(userData[4]);
-	user.setState(userData[5]);
-	user.setPostcode(userData[6]);
-	user.setCountry(LanguageUtil.getSupportedCountry(userData[7]));
-	user.setDayPhone(userData[8]);
-	user.setMobilePhone(userData[9]);
-	user.setFax(userData[10]);
-	user.setEmail(userData[11]);
-	user.setAuthenticationMethod(
-		(AuthenticationMethod) service.findById(AuthenticationMethod.class, AuthenticationMethod.DB));
-	user.setCreateDate(new Date());
-	user.setDisabledFlag(false);
-	user.setLocale(LanguageUtil.getSupportedLocaleByNameOrLanguageCode(userData[12]));
-	user.setTimeZone(timezoneService.getServerTimezone().getTimezoneId());
-	user.setTheme(service.getDefaultTheme());
-	service.saveUser(user);
+	User user = service.getUserByLogin(login);
+	if (user == null) {
+	    user = new User();
+	    user.setLogin(login);
+	    user.setPassword(password);
+	    user.setSalt(salt);
+	    user.setTitle(userData[0]);
+	    user.setFirstName(userData[1]);
+	    user.setLastName(userData[2]);
+	    user.setAddressLine1(userData[3]);
+	    user.setCity(userData[4]);
+	    user.setState(userData[5]);
+	    user.setPostcode(userData[6]);
+	    user.setCountry(LanguageUtil.getSupportedCountry(userData[7]));
+	    user.setDayPhone(userData[8]);
+	    user.setMobilePhone(userData[9]);
+	    user.setFax(userData[10]);
+	    user.setEmail(userData[11]);
+	    user.setAuthenticationMethod(
+		    (AuthenticationMethod) service.findById(AuthenticationMethod.class, AuthenticationMethod.DB));
+	    user.setCreateDate(new Date());
+	    user.setDisabledFlag(false);
+	    user.setLocale(LanguageUtil.getSupportedLocaleByNameOrLanguageCode(userData[12]));
+	    user.setTimeZone(timezoneService.getServerTimezone().getTimezoneId());
+	    user.setTheme(service.getDefaultTheme());
+	    service.saveUser(user);
+	}
 	ExtUserUseridMap extUserUseridMap = new ExtUserUseridMap();
 	extUserUseridMap.setExtServer(extServer);
 	extUserUseridMap.setExtUsername(extUsername);
@@ -681,9 +684,9 @@ public class IntegrationService implements IIntegrationService {
 		: getExtUserUseridMapByUserId(server, user.getUserId());
 
 	// checks whether the lesson was created from extServer and whether it has lessonFinishCallbackUrl setting
-	if (extServerLesson != null && extUser != null
-		&& server.getServerTypeId().equals(ExtServer.INTEGRATION_SERVER_TYPE)
-		&& StringUtils.isNotBlank(lessonFinishCallbackUrl)) {
+	if (extServerLesson != null && extUser != null && StringUtils.isNotBlank(lessonFinishCallbackUrl)
+	// fill parameters if it is not regular LTI call, i.e. plain integration or LTI Advantage
+		&& (server.isIntegrationServer() || lessonFinishCallbackUrl.contains("%activityId%"))) {
 
 	    // construct real lessonFinishCallbackUrl
 	    String timestamp = Long.toString(new Date().getTime());
@@ -718,9 +721,11 @@ public class IntegrationService implements IIntegrationService {
 		: getExtUserUseridMapByUserId(server, user.getUserId());
 
 	// checks whether the lesson was created from extServer and whether it's a LTI Tool Consumer - create a new thread to report score back to LMS (in order to do this task in parallel not to slow down later work)
-	if (extServerLesson != null && extUser != null
-		&& server.getServerTypeId().equals(ExtServer.LTI_CONSUMER_SERVER_TYPE)
-		&& StringUtils.isNotBlank(extServerLesson.getExtServer().getLessonFinishUrl())) {
+	if (extServerLesson != null && extUser != null && server.isLtiConsumer()
+		&& StringUtils.isNotBlank(extServerLesson.getExtServer().getLessonFinishUrl())
+		// do not run for LTI Advantage as it does lesson score update in lessonComplete.jsp
+		// and also teachers can pull score from LAMS to platform on demand
+		&& !extServerLesson.getExtServer().getLessonFinishUrl().contains("%activityId%")) {
 
 	    // calculate lesson's MaxPossibleMark
 	    Long lessonMaxPossibleMark = toolService.getLessonMaxPossibleMark(lesson);

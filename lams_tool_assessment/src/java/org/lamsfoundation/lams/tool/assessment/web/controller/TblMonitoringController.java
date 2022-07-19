@@ -11,7 +11,6 @@ import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
@@ -49,9 +48,6 @@ public class TblMonitoringController {
     @Qualifier("laasseAssessmentService")
     private IAssessmentService assessmentService;
 
-    @Autowired
-    private ILearnerService learnerService;
-
     /**
      * Shows ira page in case of Assessment activity
      */
@@ -67,6 +63,18 @@ public class TblMonitoringController {
      */
     @RequestMapping("iraAssessmentStudentChoices")
     public String iraAssessmentStudentChoices(HttpServletRequest request) {
+	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
+
+	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
+	request.setAttribute("groupsInAnsweredQuestionsChart", assessment.isUseSelectLeaderToolOuput());
+	request.setAttribute("assessment", assessment);
+
+	return "pages/tblmonitoring/iraAssessmentStudentChoices5";
+    }
+
+    @RequestMapping("iraAssessmentStudentChoicesTable")
+    public String iraAssessmentStudentChoicesTable(HttpServletRequest request) {
 	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
 
@@ -121,12 +129,7 @@ public class TblMonitoringController {
 	}
 	request.setAttribute("questions", questionDtos);
 
-	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
-	request.setAttribute("groupsInAnsweredQuestionsChart", assessment.isUseSelectLeaderToolOuput());
-	request.setAttribute("assessment", assessment);
-	request.setAttribute("isTbl", true);
-
-	return "pages/tblmonitoring/iraAssessmentStudentChoices";
+	return "pages/monitoring/parts/mcqStudentChoices5";
     }
 
     private List<TblAssessmentDTO> getAssessmentDtos(String[] toolContentIds, String[] activityTitles) {
@@ -192,14 +195,14 @@ public class TblMonitoringController {
 	int attemptedLearnersNumber = assessmentService.getCountUsersByContentId(toolContentId);
 	model.addAttribute("attemptedLearnersNumber", attemptedLearnersNumber);
 
-	return "pages/tblmonitoring/assessment";
+	return "pages/tblmonitoring/assessment5";
     }
 
     /**
      * Shows ira StudentChoices page
      */
-    @RequestMapping("aesStudentChoices")
-    public String aesStudentChoices(HttpServletRequest request) {
+    @RequestMapping("aesStudentChoicesTable")
+    public String aesStudentChoicesTable(HttpServletRequest request) {
 	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
 	Map<Long, QuestionSummary> questionSummaries = assessmentService.getQuestionSummaryForExport(assessment, false);
@@ -208,10 +211,6 @@ public class TblMonitoringController {
 	    QuestionDTO questionDto = questionSummary.getQuestionDto();
 
 	    TblAssessmentQuestionDTO tblQuestionDto = new TblAssessmentQuestionDTO();
-	    tblQuestionDto.setTitle(questionDto.getTitle());
-	    tblQuestionDto
-		    .setQuestionTypeLabel(AssessmentServiceImpl.getQuestionTypeLanguageLabel(questionDto.getType()));
-	    tblQuestionDto.setCorrectAnswer(getAssessmentCorrectAnswer(questionDto));
 
 	    List<TblAssessmentQuestionResultDTO> sessionQuestionResults = new ArrayList<>();
 	    for (List<AssessmentQuestionResult> questionResultsPerSession : questionSummary
@@ -271,12 +270,34 @@ public class TblMonitoringController {
 
 	request.setAttribute("sessions", sessions);
 	request.setAttribute("questionDtos", tblQuestionDtos);
+
+	return "pages/tblmonitoring/assessmentStudentChoicesTable";
+    }
+
+    @RequestMapping("aesStudentChoices")
+    public String aesStudentChoices(HttpServletRequest request) {
+	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
+	Map<Long, QuestionSummary> questionSummaries = assessmentService.getQuestionSummaryForExport(assessment, false);
+	List<TblAssessmentQuestionDTO> tblQuestionDtos = new ArrayList<>();
+	for (QuestionSummary questionSummary : questionSummaries.values()) {
+	    QuestionDTO questionDto = questionSummary.getQuestionDto();
+
+	    TblAssessmentQuestionDTO tblQuestionDto = new TblAssessmentQuestionDTO();
+	    tblQuestionDto.setTitle(questionDto.getTitle());
+	    tblQuestionDto
+		    .setQuestionTypeLabel(AssessmentServiceImpl.getQuestionTypeLanguageLabel(questionDto.getType()));
+	    tblQuestionDto.setCorrectAnswer(getAssessmentCorrectAnswer(questionDto));
+
+	    tblQuestionDtos.add(tblQuestionDto);
+	}
+
+	request.setAttribute("questionDtos", tblQuestionDtos);
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
 	request.setAttribute("groupsInAnsweredQuestionsChart", assessment.isUseSelectLeaderToolOuput());
 	request.setAttribute("assessment", assessment);
-	request.setAttribute("isTbl", true);
 
-	return "pages/tblmonitoring/assessmentStudentChoices";
+	return "pages/tblmonitoring/assessmentStudentChoices5";
     }
 
     /**
@@ -352,7 +373,7 @@ public class TblMonitoringController {
 	AssessmentResultDTO result = assessmentService.getUserMasterDetail(user.getSession().getSessionId(), userId);
 	request.setAttribute(AssessmentConstants.ATTR_ASSESSMENT_RESULT, result);
 
-	return "pages/tblmonitoring/teams";
+	return "pages/tblmonitoring/teams5";
     }
 
 }

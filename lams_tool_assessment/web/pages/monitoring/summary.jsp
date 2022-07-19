@@ -5,6 +5,15 @@
 <c:set var="assessment" value="${sessionMap.assessment}"/>
 <c:set var="showQuestionMonitoringActionButtons" value="${not empty sessionDtos}" />
 
+<c:set var="timeLimitPanelUrl"><lams:LAMSURL/>monitoring/timeLimit.jsp</c:set>
+<c:url var="timeLimitPanelUrl" value="${timeLimitPanelUrl}">
+	<c:param name="toolContentId" value="${assessment.contentId}"/>
+	<c:param name="absoluteTimeLimit" value="${assessment.absoluteTimeLimitSeconds}"/>
+	<c:param name="relativeTimeLimit" value="${assessment.relativeTimeLimit}"/>
+	<c:param name="isTbl" value="false" />
+	<c:param name="controllerContext" value="tool/laasse10/monitoring" />
+</c:url>
+
 <%@ include file="parts/discloseAnswers.jsp"%>
 
 <script type="text/javascript">
@@ -177,6 +186,8 @@
 		setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 		
 		drawCompletionCharts(${assessment.contentId}, ${assessment.useSelectLeaderToolOuput}, true);
+
+		$('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');
 	});
 
 	function resizeJqgrid(jqgrids) {
@@ -366,7 +377,7 @@
 				
 				<c:if test="${vsaPresent}">
 					<a class="btn btn-sm pull-right btn-default roffset5" target="_blank"
-			   		   href='<lams:LAMSURL />qb/vsa/displayVsaAllocate.do?toolContentID=${sessionMap.assessment.contentId}'>
+			   		   href='<lams:LAMSURL />qb/vsa/displayVsaAllocate.do?toolContentID=${assessment.contentId}'>
 						<fmt:message key="label.vsa.allocate.button" />
 					</a>
 				</c:if>
@@ -387,7 +398,7 @@
 
 <%@ include file="parts/advanceoptions.jsp"%>
 
-<%@ include file="parts/timeLimit.jsp"%>
+<div id="time-limit-panel-placeholder"></div>
 
 <%@ include file="parts/dateRestriction.jsp"%>
 

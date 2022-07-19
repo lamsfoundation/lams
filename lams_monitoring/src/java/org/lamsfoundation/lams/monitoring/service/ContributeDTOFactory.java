@@ -24,9 +24,7 @@
 package org.lamsfoundation.lams.monitoring.service;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Set;
 import java.util.Vector;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -41,13 +39,11 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy;
 import org.lamsfoundation.lams.learningdesign.strategy.IContributionTypeStrategy;
 import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
-import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO.ContributeEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
 
 public class ContributeDTOFactory {
@@ -68,7 +64,6 @@ public class ContributeDTOFactory {
 	return dto;
     }
 
-    @SuppressWarnings("unchecked")
     private static ContributeActivityDTO addContributionURLS(Long lessonID, Activity activity,
 	    IContributionTypeStrategy strategy, ILamsCoreToolService toolService) {
 	ContributeActivityDTO dto = null;
@@ -96,31 +91,19 @@ public class ContributeDTOFactory {
 		    entry.setIsComplete(true);
 
 		} else if (ContributionTypes.CHOSEN_GROUPING.equals(contributionTypeEntry)) {
-		    Lesson lesson = null;
-		    // find the lesson for this activity
-		    for (Lesson candidateLesson : activity.getLearningDesign().getLessons()) {
-			if (candidateLesson.getLessonId().equals(lessonID)) {
-			    lesson = candidateLesson;
-			    break;
-			}
-		    }
-		    if (lesson != null) {
-			// all availables users
-			Set<User> learners = new HashSet<>(lesson.getLessonClass().getLearners());
-			if (!learners.isEmpty()) {
-			    // check if all users were assigned to groups and can not move anymore
-			    GroupingActivity groupingActivity = (GroupingActivity) activity;
-			    Grouping grouping = groupingActivity.getCreateGrouping();
-			    if ((grouping != null) && (grouping.getGroups() != null)) {
-				for (Group group : grouping.getGroups()) {
-				    if (!group.mayBeDeleted()) {
-					learners.removeAll(group.getUsers());
-				    }
+		    // check if there are at least 2 groups with added learners
+		    GroupingActivity groupingActivity = (GroupingActivity) activity;
+		    Grouping grouping = groupingActivity.getCreateGrouping();
+		    if ((grouping != null) && (grouping.getGroups() != null)) {
+			int groupsWithLearnersAdded = 0;
+			for (Group group : grouping.getGroups()) {
+			    if (!group.getUsers().isEmpty()) {
+				groupsWithLearnersAdded++;
+				if (groupsWithLearnersAdded >= 2) {
+				    entry.setIsComplete(true);
+				    break;
 				}
 			    }
-			}
-			if (learners.isEmpty()) {
-			    entry.setIsComplete(true);
 			}
 		    }
 		}

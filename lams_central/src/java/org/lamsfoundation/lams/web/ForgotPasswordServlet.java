@@ -3,7 +3,6 @@ package org.lamsfoundation.lams.web;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
@@ -15,18 +14,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.hibernate.HibernateException;
-import org.hibernate.id.Configurable;
-import org.hibernate.id.IdentifierGenerator;
-import org.hibernate.id.UUIDGenerator;
-import org.hibernate.type.StringType;
+import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
 import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.Emailer;
-import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
@@ -172,7 +166,7 @@ public class ForgotPasswordServlet extends HttpServlet {
 	    if (!skipSendingEmail) {
 		boolean isHtmlFormat = false;
 		// generate a key for the request
-		String key = ForgotPasswordServlet.generateUniqueKey();
+		String key = RandomPasswordGenerator.generateForgotPasswordKey();
 
 		// all good, save the request in the db
 		ForgotPasswordRequest fp = new ForgotPasswordRequest();
@@ -258,22 +252,4 @@ public class ForgotPasswordServlet extends HttpServlet {
 	request.setAttribute("showErrorMessage", showErrorMessage);
 	request.getRequestDispatcher("/forgotPasswordProc.jsp").forward(request, response);
     }
-
-    /**
-     * Generates the unique key used for the forgot password request
-     *
-     * @return a unique key
-     * @throws HibernateException
-     * @throws FileUtilException
-     * @throws IOException
-     */
-    public static String generateUniqueKey() throws HibernateException {
-	Properties props = new Properties();
-
-	IdentifierGenerator uuidGen = new UUIDGenerator();
-	((Configurable) uuidGen).configure(StringType.INSTANCE, props, null);
-
-	return ((String) uuidGen.generate(null, null)).toLowerCase();
-    }
-
 }

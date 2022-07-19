@@ -54,8 +54,12 @@ public class DateUtil {
     public static final String SCHEDULE_LESSON_FORMAT = "dd/M/yyyy h:mm a";
     public static final String ISO8601_FORMAT = "yyyy-MM-dd'T'HH:mmZ";
     public static final String PRETTY_FORMAT = "d MMMM yyyy h:mm:ss a";
-    
-    private static final FastDateFormat dateFormatterTimeAgo = FastDateFormat.getInstance(DateUtil.ISO8601_FORMAT, TimeZone.getTimeZone("GMT"), null);
+
+    private static final DateFormat shortDateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT,
+	    DateFormat.SHORT);
+
+    private static final FastDateFormat dateFormatterTimeAgo = FastDateFormat.getInstance(DateUtil.ISO8601_FORMAT,
+	    TimeZone.getTimeZone("GMT"), null);
 
     /**
      * Convert your local time to Universal Time Coordinator. TODO conversion is not working properly. The returned Date
@@ -105,7 +109,7 @@ public class DateUtil {
      */
     public static Date convertToTimeZoneFromDefault(TimeZone targetTimeZone, Date date) {
 	TimeZone defaultTz = TimeZone.getDefault();
-	Integer rawOffset = defaultTz.getOffset(date.getTime()) - targetTimeZone.getOffset(date.getTime());
+	int rawOffset = defaultTz.getOffset(date.getTime()) - targetTimeZone.getOffset(date.getTime());
 
 	return new Date(date.getTime() - rawOffset);
     }
@@ -121,7 +125,7 @@ public class DateUtil {
      */
     public static Date convertFromTimeZoneToDefault(TimeZone targetTimeZone, Date date) {
 	TimeZone defaultTz = TimeZone.getDefault();
-	Integer rawOffset = defaultTz.getOffset(date.getTime()) - targetTimeZone.getOffset(date.getTime());
+	int rawOffset = defaultTz.getOffset(date.getTime()) - targetTimeZone.getOffset(date.getTime());
 
 	return new Date(date.getTime() + rawOffset);
     }
@@ -267,7 +271,60 @@ public class DateUtil {
      */
     public static String convertToStringForTimeagoJSON(Date value) {
 	return dateFormatterTimeAgo.format(value);
-	
+
     }
 
+    /**
+     * A shared function to convert milliseconds into a readable string
+     *
+     * @param timeInMillis
+     * @return
+     */
+    public static String convertTimeToString(Long timeInMillis) {
+	StringBuilder sb = new StringBuilder();
+	if (timeInMillis != null && timeInMillis >= 1000) {
+	    long totalTimeInSeconds = timeInMillis / 1000;
+
+	    long seconds = (totalTimeInSeconds >= 60 ? totalTimeInSeconds % 60 : totalTimeInSeconds);
+	    long minutes = (totalTimeInSeconds = (totalTimeInSeconds / 60)) >= 60 ? totalTimeInSeconds % 60
+		    : totalTimeInSeconds;
+	    long hours = (totalTimeInSeconds = (totalTimeInSeconds / 60)) >= 24 ? totalTimeInSeconds % 24
+		    : totalTimeInSeconds;
+	    long days = (totalTimeInSeconds = (totalTimeInSeconds / 24));
+
+	    if (days != 0) {
+		sb.append("" + days + "d, ");
+	    }
+	    if (hours != 0) {
+		sb.append("" + hours + "h, ");
+	    }
+	    if (minutes != 0) {
+		sb.append("" + minutes + "m, ");
+	    }
+	    if (seconds != 0) {
+		sb.append("" + seconds + "s");
+	    }
+	}
+
+	if (sb.length() > 0) {
+	    return sb.toString();
+	} else {
+	    return null;
+	}
+    }
+
+    /**
+     * A shared function to convert date into a readable string
+     *
+     * @param date
+     *            to format
+     * @return formatted date
+     */
+    public static String convertToString(Date date, DateFormat format) {
+	if (date != null) {
+	    DateFormat usedFormat = format == null ? shortDateFormat : format;
+	    return usedFormat.format(date);
+	}
+	return null;
+    }
 }

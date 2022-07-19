@@ -51,8 +51,11 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.IAuthoringService;
+import org.lamsfoundation.lams.flux.FluxMap;
+import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
@@ -64,12 +67,15 @@ import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
+import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.lesson.util.LearnerActivityCompleteFluxItem;
+import org.lamsfoundation.lams.lesson.util.LearnerLessonJoinFluxItem;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
@@ -95,6 +101,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -102,9 +109,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import reactor.core.publisher.Flux;
 
 /**
  * The action servlet that provide all the monitoring functionalities. It interact with the teacher via JSP monitoring
@@ -117,7 +127,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class MonitoringController {
     private static Logger log = Logger.getLogger(MonitoringController.class);
 
-    private static final DateFormat LESSON_SCHEDULING_DATETIME_FORMAT = new SimpleDateFormat("MM/dd/yy HH:mm");
+    private static final DateFormat LESSON_SCHEDULING_DATETIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     private static final int LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT = 53;
     private static final int LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT = 7;
@@ -132,6 +142,8 @@ public class MonitoringController {
     @Autowired
     private ISecurityService securityService;
     @Autowired
+    private IActivityDAO activityDAO;
+    @Autowired
     private IMonitoringFullService monitoringService;
     @Autowired
     private IUserManagementService userManagementService;
@@ -144,6 +156,22 @@ public class MonitoringController {
     private MessageService messageService;
     @Autowired
     private IAuthoringService authoringService;
+
+    public MonitoringController() {
+	// bind sinks so a learner finishing an activity also triggers an update in lesson progress
+	FluxRegistry.bindSink(CommonConstants.ACTIVITY_ENTERED_SINK_NAME, CommonConstants.LESSON_PROGRESSED_SINK_NAME,
+		learnerProgressFluxItem -> ((LearnerActivityCompleteFluxItem) learnerProgressFluxItem).getLessonId());
+	// bind sinks so a learner entering a lesson also triggers an update in lesson progress
+	FluxRegistry.bindSink(CommonConstants.LESSON_JOINED_SINK_NAME, CommonConstants.LESSON_PROGRESSED_SINK_NAME,
+		lessonJoinedFluxItem -> ((LearnerLessonJoinFluxItem) lessonJoinedFluxItem).getLessonId());
+
+	FluxRegistry.initFluxMap(MonitoringConstants.CANVAS_REFRESH_FLUX_NAME,
+		CommonConstants.LESSON_PROGRESSED_SINK_NAME, null, lessonId -> "doRefresh", FluxMap.STANDARD_THROTTLE,
+		FluxMap.STANDARD_TIMEOUT);
+	FluxRegistry.initFluxMap(MonitoringConstants.GRADEBOOK_REFRESH_FLUX_NAME,
+		CommonConstants.LESSON_PROGRESSED_SINK_NAME, null, lessonId -> "doRefresh", FluxMap.STANDARD_THROTTLE,
+		FluxMap.STANDARD_TIMEOUT);
+    }
 
     private Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
@@ -159,6 +187,20 @@ public class MonitoringController {
 	String fullURL = WebUtil.convertToFullURL(url);
 	response.sendRedirect(response.encodeRedirectURL(fullURL));
 	return null;
+    }
+
+    @RequestMapping(path = "/getLearnerProgressUpdateFlux", method = RequestMethod.GET, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @ResponseBody
+    public Flux<String> getLearnerProgressUpdateFlux(@RequestParam long lessonId)
+	    throws JsonProcessingException, IOException {
+	return FluxRegistry.get(MonitoringConstants.CANVAS_REFRESH_FLUX_NAME, lessonId);
+    }
+
+    @RequestMapping(path = "/getGradebookUpdateFlux", method = RequestMethod.GET, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @ResponseBody
+    public Flux<String> getGradebookUpdateFlux(@RequestParam long lessonId)
+	    throws JsonProcessingException, IOException {
+	return FluxRegistry.get(MonitoringConstants.GRADEBOOK_REFRESH_FLUX_NAME, lessonId);
     }
 
     /**
@@ -970,10 +1012,30 @@ public class MonitoringController {
 		&& userManagementService.isUserInRole(user.getUserID(), organisation.getOrganisationId(), Role.AUTHOR);
 	request.setAttribute("enableLiveEdit", enableLiveEdit);
 	request.setAttribute("lesson", lessonDTO);
-	request.setAttribute("isTBLSequence", learningDesignService.isTBLSequence(lessonDTO.getLearningDesignID()));
+	boolean isTBLSequence = learningDesignService.isTBLSequence(lessonDTO.getLearningDesignID());
+	request.setAttribute("isTBLSequence", isTBLSequence);
+	boolean useNewUI = WebUtil.readBooleanParam(request, "newUI", true);
+	if (isTBLSequence && useNewUI) {
+	    List<Activity> lessonActivities = getLessonActivities(lessonService.getLesson(lessonId));
+	    TblMonitoringController.setupAvailableActivityTypes(request, lessonActivities);
+	}
 
-	boolean useNewUI = WebUtil.readBooleanParam(request, "newUI", false);
 	return "monitor" + (useNewUI ? "5" : "");
+    }
+
+    @RequestMapping("/displaySequenceTab")
+    public String displaySequenceTab() {
+	return "monitor-sequence-tab";
+    }
+
+    @RequestMapping("/displayLearnersTab")
+    public String displayLearnersTab() {
+	return "monitor-learners-tab";
+    }
+
+    @RequestMapping("/displayGradebookTab")
+    public String displayGradebookTab() {
+	return "monitor-gradebook-tab";
     }
 
     /**
@@ -1081,20 +1143,23 @@ public class MonitoringController {
 	Integer notCompletedLearnersCount = possibleLearnersCount - completedLearnersCount - startedLearnersCount;
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	ObjectNode notStartedJSON = JsonNodeFactory.instance.objectNode();
-	notStartedJSON.put("name", messageService.getMessage("lesson.chart.not.completed"));
-	notStartedJSON.put("value", Math.round(notCompletedLearnersCount.doubleValue() / possibleLearnersCount * 100));
-	responseJSON.withArray("data").add(notStartedJSON);
-
 	ObjectNode startedJSON = JsonNodeFactory.instance.objectNode();
 	startedJSON.put("name", messageService.getMessage("lesson.chart.started"));
 	startedJSON.put("value", Math.round((startedLearnersCount.doubleValue()) / possibleLearnersCount * 100));
+	startedJSON.put("raw", startedLearnersCount);
 	responseJSON.withArray("data").add(startedJSON);
 
 	ObjectNode completedJSON = JsonNodeFactory.instance.objectNode();
 	completedJSON.put("name", messageService.getMessage("lesson.chart.completed"));
 	completedJSON.put("value", Math.round(completedLearnersCount.doubleValue() / possibleLearnersCount * 100));
+	completedJSON.put("raw", completedLearnersCount);
 	responseJSON.withArray("data").add(completedJSON);
+
+	ObjectNode notStartedJSON = JsonNodeFactory.instance.objectNode();
+	notStartedJSON.put("name", messageService.getMessage("lesson.chart.not.completed"));
+	notStartedJSON.put("value", Math.round(notCompletedLearnersCount.doubleValue() / possibleLearnersCount * 100));
+	notStartedJSON.put("raw", notCompletedLearnersCount);
+	responseJSON.withArray("data").add(notStartedJSON);
 
 	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
@@ -1622,5 +1687,67 @@ public class MonitoringController {
 	    updatedLatestLearners.removeLast();
 	}
 	return updatedLatestLearners;
+    }
+
+    private List<Activity> getLessonActivities(Lesson lesson) {
+	/*
+	 * Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity for some mysterious
+	 * reason Causes a ClassCastException when you try to cast it, even if it is a ToolActivity.
+	 *
+	 * THIS IS A HACK to retrieve the first tool activity manually so it can be cast as a ToolActivity - if it is
+	 * one
+	 */
+	Activity firstActivity = activityDAO
+		.getActivityByActivityId(lesson.getLearningDesign().getFirstActivity().getActivityId());
+	List<Activity> activities = new ArrayList<>();
+	sortActivitiesByLearningDesignOrder(firstActivity, activities);
+
+	return activities;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void sortActivitiesByLearningDesignOrder(Activity activity, List<Activity> sortedActivities) {
+	sortedActivities.add(activity);
+
+	//in case of branching activity - add all activities based on their orderId
+	if (activity.isBranchingActivity()) {
+	    BranchingActivity branchingActivity = (BranchingActivity) activity;
+	    Set<SequenceActivity> sequenceActivities = new TreeSet<>(new ActivityOrderComparator());
+	    sequenceActivities.addAll((Set<SequenceActivity>) (Set<?>) branchingActivity.getActivities());
+	    for (Activity sequenceActivityNotInitialized : sequenceActivities) {
+		SequenceActivity sequenceActivity = (SequenceActivity) monitoringService
+			.getActivityById(sequenceActivityNotInitialized.getActivityId());
+		Set<Activity> childActivities = new TreeSet<>(new ActivityOrderComparator());
+		childActivities.addAll(sequenceActivity.getActivities());
+
+		//add one by one in order to initialize all activities
+		for (Activity childActivity : childActivities) {
+		    Activity activityInit = monitoringService.getActivityById(childActivity.getActivityId());
+		    sortedActivities.add(activityInit);
+		}
+	    }
+
+	    // In case of complex activity (parallel, help or optional activity) add all its children activities.
+	    // They will be sorted by orderId
+	} else if (activity.isComplexActivity()) {
+	    ComplexActivity complexActivity = (ComplexActivity) activity;
+	    Set<Activity> childActivities = new TreeSet<>(new ActivityOrderComparator());
+	    childActivities.addAll(complexActivity.getActivities());
+
+	    // add one by one in order to initialize all activities
+	    for (Activity childActivity : childActivities) {
+		Activity activityInit = monitoringService.getActivityById(childActivity.getActivityId());
+		sortedActivities.add(activityInit);
+	    }
+	}
+
+	Transition transitionFrom = activity.getTransitionFrom();
+	if (transitionFrom != null) {
+	    // query activity from DB as transition holds only proxied activity object
+	    Long nextActivityId = transitionFrom.getToActivity().getActivityId();
+	    Activity nextActivity = monitoringService.getActivityById(nextActivityId);
+
+	    sortActivitiesByLearningDesignOrder(nextActivity, sortedActivities);
+	}
     }
 }
