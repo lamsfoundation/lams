@@ -417,4 +417,12 @@
        <name>Popover</name>
        <path>/WEB-INF/tags/Popover.tag</path>
    	</tag-file>
+   	<tag-file>
+       <name>Input</name>
+       <path>/WEB-INF/tags/Input.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>Switch</name>
+       <path>/WEB-INF/tags/Switch.tag</path>
+   	</tag-file>
 </taglib>
