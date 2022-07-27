@@ -143,7 +143,7 @@
 	
 <c:forEach var="question" items="${sessionMap.pagedQuestions[pageNumber-1]}" varStatus="status">						
 	<div class="row mb-3">
-		<div class="col-8 offset-2">			
+		<div class="col-10 offset-1">			
 			<div class="card">
 				<div class="card-header">			
 					<c:if test="${param.embedded and empty toolSessionID}">

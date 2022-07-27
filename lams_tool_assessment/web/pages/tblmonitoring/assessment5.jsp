@@ -30,7 +30,7 @@
 <div class="container-fluid" ${isIraAssessment ? 'id="assessment-pane-' += toolContentID += '"' : '' }>
 	<c:if test="${isIraAssessment}">
 		<div class="row">
-			<div class="col-8 offset-2 text-center">
+			<div class="col-10 offset-1 text-center">
 				<h3>
 					<fmt:message key="label.ira.questions.marks"/>
 				</h3>
@@ -40,13 +40,13 @@
 	
 	<!-- Notifications -->  
 	<div class="row mb-3">
-		<div class="col-4 offset-2 pt-1">
+		<div class="col-5 offset-1 pt-1">
 			<h4>
 				<i class="fa fa-users" style="color:gray" ></i> 
 				<fmt:message key="label.attendance"/>: <span>${attemptedLearnersNumber}</span>/<span class="total-learners-number"></span> 
 			</h4> 
 		</div>
-		<div class="col-4 text-end">
+		<div class="col-5 text-end">
 			<button class="btn btn-secondary" type="button"
 				 onclick="javascript:showStudentChoices()">
 				<i class="fa fa-list-check"></i>

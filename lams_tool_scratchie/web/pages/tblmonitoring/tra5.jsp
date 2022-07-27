@@ -57,7 +57,7 @@
 
 <div class="container-fluid">
 	 <div class="row">
-		<div class="col-8 offset-2 text-center">
+		<div class="col-10 offset-1 text-center">
 			<h3>
 				<fmt:message key="label.tra.questions.marks"/>
 			</h3>
@@ -65,13 +65,13 @@
 	</div>
 	
 	<div class="row mb-3">
-		<div class="col-4 offset-2 pt-1">
+		<div class="col-5 offset-1 pt-1">
 			<h4>
 				<i class="fa fa-users text-secondary"></i> 
 				<fmt:message key="label.attendance"/>: <span>${attemptedLearnersNumber}</span>/<span class="total-learners-number"></span> 
 			</h4> 
 		</div>
-		<div class="col-4 text-end">
+		<div class="col-5 text-end">
 			<button class="btn btn-secondary" type="button"
 				 onclick="javascript:loadTab('tratStudentChoices', $('#load-trat-student-choices-tab-btn'))">
 				<i class="fa fa-list-check"></i>
@@ -84,7 +84,7 @@
 	<!-- Tables -->
 	<c:forEach var="item" items="${items}" varStatus="i">
 		<div class="row mb-3">
-			<div class="col-8 offset-2">			
+			<div class="col-10 offset-1">			
 				<div class="card">
 					<div class="card-header">			
 						<h3 class="card-title mb-3" style="font-size: initial">

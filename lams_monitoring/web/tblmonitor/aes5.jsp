@@ -57,7 +57,7 @@
 </script>
 <div id="aes-tab" class="container-fluid">
 	<div class="row">
-		<div class="col-8 offset-2 text-center">
+		<div class="col-10 offset-1 text-center">
 			<h3>
 				<fmt:message key="label.aes.questions.marks"/>
 			</h3>
