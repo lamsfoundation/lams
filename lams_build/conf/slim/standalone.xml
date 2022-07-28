@@ -248,6 +248,14 @@
                 </handlers>
             </logger>
             
+            <logger category="org.owasp.csrfguard" use-parent-handlers="false">
+                <level name="WARN" />
+                <handlers>
+                    <handler name="LAMSFILE" />
+                    <handler name="LAMSCONSOLE" />
+                </handlers>
+            </logger>
+            
             <logger category="org.lamsfoundation.lams.web.filter.AuditLogFilter" use-parent-handlers="false">
                 <level name="INFO" />
                 <handlers>
