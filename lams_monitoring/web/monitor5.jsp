@@ -6,7 +6,6 @@
 <lams:html>
 <head>
 	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title><fmt:message key="monitor.title" /></title>
 	
 	<link rel="icon" type="image/x-icon" href="<lams:LAMSURL/>images/svg/lamsv5_logo.svg">
@@ -69,7 +68,6 @@
 	
 	
 	<script type="text/javascript">
-		<!-- Some of the following settings will be used in progressBar.js -->
 		var lessonId = ${lesson.lessonID},
 			userId = '<lams:user property="userID"/>',
 			ldId = ${lesson.learningDesignID},
@@ -91,6 +89,7 @@
 			csrfToken = '<csrf:tokenname/> : <csrf:tokenvalue/>',
 			csrfTokenName = '<csrf:tokenname/>',
 			csrfTokenValue = '<csrf:tokenvalue/>',
+			
 			decoderDiv = $('<div />'),
 			LABELS = {
 				<fmt:message key="index.emailnotifications" var="EMAIL_NOTIFICATIONS_TITLE_VAR"/>
@@ -286,7 +285,7 @@
 				</div>
 								
 				<div class="navigate-btn-container">
-					<a id="load-sequence-tab-btn" href="#" class="btn btn-primary navigate-btn active" title="<fmt:message key='tab.sequence' />">
+					<a id="load-sequence-tab-btn" href="#" class="btn btn-primary active" title="<fmt:message key='tab.sequence' />">
 						<i class="fa fa-cubes fa-lg"></i>
 					</a>
 					<label for="load-sequence-tab-btn">
@@ -305,7 +304,8 @@
 					</div>
 	
 					<div class="navigate-btn-container">
-						<a id="load-learners-tab-btn" href="#" class="btn btn-primary navigate-btn" title="<fmt:message key='tab.learners' />">
+						<a id="load-learners-tab-btn" href="#" class="btn btn-primary" 
+						   data-tab-name="learners"	title="<fmt:message key='tab.learners' />">
 							<i class="fa fa-solid fa-users fa-lg"></i>
 						</a>
 						<label for="load-learners-tab-btn">
@@ -314,7 +314,8 @@
 					</div>
 					
 					<div class="navigate-btn-container">
-						<a id="load-gradebook-tab-btn" href="#" class="btn btn-primary navigate-btn" title="<fmt:message key='tab.gradebook' />">
+						<a id="load-gradebook-tab-btn" href="#" class="btn btn-primary"
+						   data-tab-name="gradebook" title="<fmt:message key='tab.gradebook' />">
 							<i class="fa fa-solid fa-list-ol fa-lg"></i>
 						</a>
 						<label for="load-gradebook-tab-btn">
@@ -326,7 +327,8 @@
 				<c:if test="${isTBLSequence}">
 					<div id="tbl-navigate-btn-group" class="shown">
 						<div class="navigate-btn-container">
-							<a id="load-teams-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.teams' />">
+							<a id="load-teams-tab-btn" class="btn btn-primary" href="#"
+							   data-tab-name="teams" title="<fmt:message key='label.teams' />">
 								<i class="fa fa-people-group fa-lg"></i>
 							</a>
 							<label for="load-teams-tab-btn">
@@ -336,7 +338,8 @@
 						
 						<c:if test="${not empty isGatesAvailable}">
 							<div class="navigate-btn-container">
-								<a id="load-gates-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.gates' />">
+								<a id="load-gates-tab-btn" class="btn btn-primary" href="#"
+								   data-tab-name="gates" title="<fmt:message key='label.gates' />">
 									<i class="fa fa-sign-in fa-lg"></i>
 								</a>
 								<label for="load-gates-tab-btn">
@@ -355,10 +358,12 @@
 							
 							<div class="navigate-btn-container">
 								<div class="btn-group-vertical" id="load-irat-btn-group">
-									<a id="load-irat-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.ira' />">
+									<a id="load-irat-tab-btn" class="btn btn-primary" href="#"
+									   data-tab-name="irat"	title="<fmt:message key='label.ira' />">
 										<i class="fa fa-user fa-lg"></i>
 									</a>
-									<a id="load-irat-student-choices-tab-btn" class="btn btn-primary" href="#" title="iRAT student choices">
+									<a id="load-irat-student-choices-tab-btn" class="btn btn-primary" href="#"
+									   data-tab-name="iratStudentChoices" title="iRAT student choices">
 										<i class="fa fa-list-check fa-lg"></i>
 									</a>
 								</div>
@@ -372,10 +377,12 @@
 						<c:if test="${not empty isScratchieAvailable}">
 							<div class="navigate-btn-container">
 								<div class="btn-group-vertical" id="load-irat-btn-group">
-									<a id="load-trat-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.tra' />">
+									<a id="load-trat-tab-btn" class="btn btn-primary" href="#"
+									   data-tab-name="trat" title="<fmt:message key='label.tra' />">
 										<i class="fa fa-users fa-lg"></i>
 									</a>
-									<a id="load-trat-student-choices-tab-btn" class="btn btn-primary" href="#" title="tRAT student choices">
+									<a id="load-trat-student-choices-tab-btn" class="btn btn-primary" href="#"
+									   data-tab-name="tratStudentChoices" title="tRAT student choices">
 										<i class="fa fa-list-check fa-lg"></i>
 									</a>
 								</div>
@@ -386,7 +393,8 @@
 							</div>
 							
 							<div class="navigate-btn-container">
-								<a id="load-burning-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.burning.questions' />">
+								<a id="load-burning-tab-btn" class="btn btn-primary" href="#"
+								   data-tab-name="burningQuestions" title="<fmt:message key='label.burning.questions' />">
 									<i class="fa fa-question-circle fa-lg"></i>
 								</a>
 								<label for="load-burning-tab-btn">
@@ -397,7 +405,8 @@
 						
 						<c:if test="${not empty isAeAvailable}">
 							<div class="navigate-btn-container">
-								<a id="load-aes-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.aes' />">
+								<a id="load-aes-tab-btn" class="btn btn-primary" href="#"
+								   data-tab-name="aes" title="<fmt:message key='label.aes' />">
 									<i class="fa fa-dashboard fa-lg"></i>
 								</a>
 								<label for="load-aes-tab-btn">
@@ -408,7 +417,8 @@
 						
 						<c:if test="${not empty isPeerreviewAvailable}">
 							<div class="navigate-btn-container">
-								<a id="load-peer-review-tab-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.peer.review' />">
+								<a id="load-peer-review-tab-btn" class="btn btn-primary" href="#"
+								   data-tab-name="peerReview" title="<fmt:message key='label.peer.review' />">
 									<i class="fa fa-person-circle-question fa-lg"></i>
 								</a>
 								<label for="load-aes-tab-btn">

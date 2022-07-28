@@ -1123,11 +1123,6 @@ public class MonitoringController {
 		    indfm.format(tzFinishDate) + " " + user.getTimeZone().getDisplayName(userLocale));
 	}
 
-	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, false, false);
-	if (contributeActivities != null) {
-	    responseJSON.set("contributeActivities", JsonUtil.readArray(contributeActivities));
-	}
-
 	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
     }
