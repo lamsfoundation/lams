@@ -25,15 +25,20 @@ package org.lamsfoundation.lams.admin.web.controller;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.web.dto.UserBean;
 import org.lamsfoundation.lams.admin.web.form.UserOrgRoleForm;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -47,15 +52,15 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 /**
  * @author jliew
  *
- * Saves roles for users that were just added.
- * Uses session scope because using request scope doesn't copy the form data
- * into UserOrgRoleForm's userBeans ArrayList (the list becomes empty).
+ *         Saves roles for users that were just added.
+ *         Uses session scope because using request scope doesn't copy the form data
+ *         into UserOrgRoleForm's userBeans ArrayList (the list becomes empty).
  */
 @Controller
 @SessionAttributes("userOrgRoleForm")
 public class UserOrgRoleSaveController {
     private static Logger log = Logger.getLogger(UserOrgRoleSaveController.class);
-    
+
     @Autowired
     private IUserManagementService userManagementService;
     @Autowired
@@ -89,6 +94,9 @@ public class UserOrgRoleSaveController {
 		return "forward:/userorg.do";
 	    }
 	    userManagementService.setRolesForUserOrganisation(user, orgId, Arrays.asList(roleIds));
+
+	    auditLog(orgId, user.getUserId(), roleIds);
+
 	    // FMALIKOFF 5/7/7 Commented out the following code that set the roles in the course if the current org is a class, as the logic
 	    // is done in service.setRolesForUserOrganisation()
 	    //if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
@@ -100,4 +108,11 @@ public class UserOrgRoleSaveController {
 	return "redirect:/usermanage.do?org=" + orgId;
     }
 
+    private void auditLog(Integer organisationId, Integer userId, String[] roleIds) {
+	List<String> roles = Stream.of(roleIds).collect(Collectors
+		.mapping(roleId -> Role.ROLE_MAP.get(Integer.valueOf(roleId)), Collectors.toUnmodifiableList()));
+	StringBuilder auditLogMessage = new StringBuilder("assigned to user ").append(userId).append(" roles ")
+		.append(roles).append(" in organisation ").append(organisationId);
+	AuditLogFilter.log(auditLogMessage);
+    }
 }

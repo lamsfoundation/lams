@@ -201,7 +201,7 @@ public class UniversalLoginModule implements LoginModule {
 
 	    if (!validatePassword(password)) {
 		if (UniversalLoginModule.log.isDebugEnabled()) {
-		    UniversalLoginModule.log.debug("Bad password for user: " + userName);
+		    UniversalLoginModule.log.info("Bad password for user: " + userName);
 		}
 		throw new FailedLoginException("Incorrect password");
 	    }

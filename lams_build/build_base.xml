@@ -61,6 +61,7 @@
 			<include name="javax/persistence/api/main/javax.persistence-api-*.jar" />
 			<include name="org/hibernate/main/hibernate-core-*.Final.jar" />
 			<include name="org/bouncycastle/main/bcprov-*.jar" />
+			<include name="org/codehaus/woodstox/main/*.jar" />
 		</fileset>
 		<!-- Optional project own libraries -->
 		<fileset dir="lib" erroronmissingdir="false">

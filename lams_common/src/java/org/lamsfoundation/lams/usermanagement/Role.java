@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -66,6 +67,9 @@ public class Role implements Serializable, Comparable<Role> {
     public static final Integer ROLE_LEARNER = 5;
 //    public static final Integer ROLE_GROUP_ADMIN = 6;
     /***********************************************************/
+
+    public static final Map<Integer, String> ROLE_MAP = Map.of(ROLE_SYSADMIN, SYSADMIN, ROLE_GROUP_MANAGER,
+	    GROUP_MANAGER, ROLE_AUTHOR, AUTHOR, ROLE_MONITOR, MONITOR, ROLE_LEARNER, LEARNER);
 
     @Id
     @Column(name = "role_id")
