@@ -285,7 +285,8 @@
 				</div>
 								
 				<div class="navigate-btn-container">
-					<a id="load-sequence-tab-btn" href="#" class="btn btn-primary active" title="<fmt:message key='tab.sequence' />">
+					<a id="load-sequence-tab-btn" href="#" class="btn btn-primary active"
+					   data-tab-name="sequence"	title="<fmt:message key='tab.sequence' />">
 						<i class="fa fa-cubes fa-lg"></i>
 					</a>
 					<label for="load-sequence-tab-btn">
