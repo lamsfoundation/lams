@@ -280,7 +280,7 @@
 						<i class="fa fa-arrow-left fa-lg"></i>
 					</a>
 					<label for="return-to-index-btn">
-						Return
+						<fmt:message key='label.monitoring.return' />
 					</label>
 				</div>
 								
@@ -300,7 +300,7 @@
 							<i class="fa fa-pen fa-lg"></i>
 						</a>
 						<label for="edit-lesson-btn">
-							Edit
+							<fmt:message key='label.monitoring.edit' />
 						</label>
 					</div>
 	
@@ -395,11 +395,11 @@
 							
 							<div class="navigate-btn-container">
 								<a id="load-burning-tab-btn" class="btn btn-primary" href="#"
-								   data-tab-name="burningQuestions" title="<fmt:message key='label.burning.questions' />">
+								   data-tab-name="burningQuestions" title="<fmt:message key='label.monitoring.burning.questions' />">
 									<i class="fa fa-question-circle fa-lg"></i>
 								</a>
 								<label for="load-burning-tab-btn">
-									Burning Qs
+									<fmt:message key='label.monitoring.burning.questions' />
 								</label>
 							</div>
 						</c:if>
@@ -430,11 +430,11 @@
 					</div>
 					
 					<div class="navigate-btn-container">
-						<a id="load-other-nvg-btn" class="btn btn-primary" href="#" title="Show remaining options">
+						<a id="load-other-nvg-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.monitoring.other.tooltip' />">
 							<i class="fa fa-angles-up fa-lg"></i>
 						</a>
 						<label for="load-teams-tab-btn">
-							Other
+							<fmt:message key='label.monitoring.other' />
 						</label>
 					</div>
 				</c:if>
