@@ -975,6 +975,12 @@ R.dialogContainer .dialogListItem .portrait-generic-sm {
 	user-select: none;
 }
 
+#canvas-container.svg-learner-draggable-area.force-completing,
+#canvas-container.svg-learner-draggable-area.force-completing div#sequenceCanvas svg.svg-learning-design,
+#canvas-container.svg-learner-draggable-area.force-completing div#sequenceCanvas svg.svg-learning-design * {
+	cursor: wait !important;	
+}
+
 #canvas-container div#sequenceCanvas div.learner-icon-container {
 	position: relative;
 }

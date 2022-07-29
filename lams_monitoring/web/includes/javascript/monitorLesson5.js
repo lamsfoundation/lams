@@ -157,7 +157,7 @@ function initCommonElements(){
 			$(this).val(ui.item.rawLabel);
 			// mark the learner's ID and make him highlighted after the refresh
 			sequenceSearchedLearner = ui.item.value;
-			refreshMonitor();
+			loadTab();
 			return false;
 		}
 	});
@@ -279,7 +279,9 @@ function initCommonElements(){
 		'resizable' : true,
 		'height'	: 300,
 		'width'  	: 400,
-		'title'		: LABELS.FORCE_COMPLETE_BUTTON
+		'title'		: LABELS.FORCE_COMPLETE_BUTTON,
+		'close'		: function(){
+		}
 	}, false);
 	// only need to do this once as then it updates the msg field directly.
 	$('.modal-body', '#forceBackwardsDialog').empty().append($('#forceBackwardsDialogContents').show());
@@ -405,7 +407,7 @@ function initCommonElements(){
 		'title' 	: LABELS.LESSON_EDIT_CLASS,
 		'resizable' : true,
 		'close' : function(){
-			refreshMonitor();
+			loadTab();
 		}
 	}, false);
 	
@@ -1742,7 +1744,6 @@ function forceComplete(currentActivityId, learners, x, y) {
 	}
 	
 	var targetActivityId = null,
-		executeForceComplete = false,
 		isEndLesson = !targetActivity.is('g'),
 		learnerNames = '';
 	
@@ -1811,6 +1812,8 @@ function forceComplete(currentActivityId, learners, x, y) {
  * Tell server to force complete the learner.
  */
 function forceCompleteExecute(learners, moveAllFromActivityId, activityId, removeContent) {
+	$('.svg-learner-draggable-area').addClass('force-completing');
+	
 	var learnerIds = '';
 	if (learners) {
 		$.each(learners, function() {
@@ -1841,7 +1844,7 @@ function forceCompleteExecute(learners, moveAllFromActivityId, activityId, remov
 			showToast(response);
 									
 			// progress changed, show it to monitor
-			refreshMonitor();
+			loadTab();
 		}
 	});
 }
@@ -2041,9 +2044,7 @@ function addActivityIconsHandlers(activity) {
 							    'distance'    : 20,
 							    'scroll'      : false,
 							    'cursorAt'	  : {'left' : 10, 'top' : 15},
-							    'helper' : function(){
-							    	return learnerIcon.clone();
-							    },
+							    'helper' : "clone",
 								'stop' : function(event, ui) {
 									var learners = [{
 										'id'   : learner.id,
@@ -2237,7 +2238,7 @@ function sequenceClearSearchPhrase(refresh){
 	$('#sequenceSearchedLearnerHighlighter').hide();
 	sequenceSearchedLearner = null;
 	if (refresh) {
-		refreshMonitor();
+		loadTab();
 	}
 }
 
