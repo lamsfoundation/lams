@@ -708,7 +708,7 @@
 					<i class="fa-solid fa-fw fa-step-forward"></i>
 				</button>
 			</td>
-			<td class="navCell sortCell" role="button">
+			<td class="navCell sortCell text-end" role="button">
 				<button class="btn btn-xs btn-secondary" 
 						onClick="javascript:sortLearnerGroupList()"
 						title="<fmt:message key='learner.group.sort.button'/>">
@@ -802,7 +802,7 @@
 								<i class="fa-solid fa-fw fa-step-forward"></i>
 							</button>
 						</td>
-						<td class="navCell sortCell" role="button">
+						<td class="navCell sortCell text-end" role="button">
 							<button class="btn btn-xs btn-secondary" 
 									onClick="javascript:sortClassList('Learner')"
 									title="<fmt:message key='learner.group.sort.button'/>">
@@ -868,7 +868,7 @@
 								<i class="fa-solid fa-fw fa-step-forward"></i>
 							</button>
 						</td>
-						<td class="navCell sortCell" role="button">
+						<td class="navCell sortCell text-end" role="button">
 							<button class="btn btn-xs btn-secondary" 
 									onClick="javascript:sortClassList('Monitor')"
 									title="<fmt:message key='learner.group.sort.button'/>">

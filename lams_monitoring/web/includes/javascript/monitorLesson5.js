@@ -167,7 +167,7 @@ function initCommonElements(){
 		var dialog = $('#learnerGroupDialog'),
 			// are we moving selected learners or all of learners who are currently in the activity
 			moveAll = $(this).attr('id') == 'learnerGroupDialogForceCompleteAllButton',
-			selectedLearners = moveAll ? null : $('.dialogList div.dialogListItemSelected', dialog),
+			selectedLearners = moveAll ? null : $('.dialogTable .dialogListItemSelected', dialog),
 			// go to "force complete" mode, similar to dragging user to an activity
 			activityId = dialog.data('ajaxProperties').data.activityID,
 			dropArea = sequenceCanvas.add('#completedLearnersContainer');
@@ -192,20 +192,20 @@ function initCommonElements(){
 		dialog.modal('hide');
 		
 		if (moveAll) {
-			alert(LABELS.FORCE_COMPLETE_CLICK.replace('[0]', ''));
+			showToast(LABELS.FORCE_COMPLETE_CLICK.replace('[0]', ''));
 		} else {
 			var learnerNames = '';
 			selectedLearners.each(function(){
 				learnerNames += $(this).text() + ', ';
 			});
 			learnerNames = learnerNames.slice(0, -2);
-			alert(LABELS.FORCE_COMPLETE_CLICK.replace('[0]', '"' + learnerNames + '"'));
+			showToast(LABELS.FORCE_COMPLETE_CLICK.replace('[0]', '"' + learnerNames + '"'));
 		}
 	});
 	
 	$('#learnerGroupDialogViewButton', learnerGroupDialogContents).click(function() {
 		var dialog = $('#learnerGroupDialog'),
-			selectedLearner = $('.dialogList .dialogListItemSelected', dialog);
+			selectedLearner = $('.dialogTable .dialogListItemSelected', dialog);
 		if (selectedLearner.length == 1) {
 			// open pop up with user progress in the given activity
 			openPopUp(selectedLearner.attr('viewUrl'), "LearnActivity", popupHeight, popupWidth, true);
@@ -214,7 +214,7 @@ function initCommonElements(){
 	
 	$('#learnerGroupDialogEmailButton', learnerGroupDialogContents).click(function() {
 		var dialog = $('#learnerGroupDialog'),
-			selectedLearner = $('.dialogList .dialogListItemSelected', dialog);
+			selectedLearner = $('.dialogTable .dialogListItemSelected', dialog);
 		if (selectedLearner.length == 1) {
 			showEmailDialog(selectedLearner.attr('userId'));
 		}
@@ -227,7 +227,6 @@ function initCommonElements(){
     // initialise lesson dialog
 	var learnerGroupDialog = showDialog('learnerGroupDialog',{
 			'autoOpen'  : false,
-			'width'     : 450,
 			'height'	: 700,
 			'resizable' : true,
 			'open'      : function(){
@@ -238,7 +237,7 @@ function initCommonElements(){
 			}
 		}, false);
 	
-	$('.modal-body', learnerGroupDialog).empty().append(learnerGroupDialogContents.show());
+	$('.modal-body', learnerGroupDialog).empty().append(learnerGroupDialogContents.show()).closest('.modal-dialog').addClass('modal-lg');;
 	
 	// search for users with the term the Monitor entered
 	$('.dialogSearchPhrase', learnerGroupDialog).autocomplete({
@@ -392,13 +391,6 @@ function initCommonElements(){
 	    $('#lesson-name').editable('toggle');
 	});
 	
-	new tempusDominus.TempusDominus(document.getElementById('scheduleDatetimeField'), tempusDominusDefaultOptions)
-		.dates.formatInput = tempusDominusDateFormatter;
-		
-	new tempusDominus.TempusDominus(document.getElementById('disableDatetimeField'), tempusDominusDefaultOptions)
-		.dates.formatInput = tempusDominusDateFormatter;
-
-	
 	// sets up dialog for editing class
 	var classDialog = showDialog('classDialog',{
 		'autoOpen'  : false,
@@ -457,13 +449,6 @@ function initCommonElements(){
 	$('.modal-body', emailProgressDialog).empty().append($('#emailProgressDialogContents').show());
 	
 	
-	//initialize datetimepicker
-	let datePickerElement = $('#emaildatePicker'),
-		datePicker = new tempusDominus.TempusDominus(datePickerElement[0], tempusDominusDefaultOptions);
-		
-	datePicker.dates.formatInput = tempusDominusDateFormatter;
-	datePickerElement.data('datePicker', datePicker);
-		
 	// sets gradebook on complete functionality
 	$('#gradebookOnCompleteButton').change(function(){
 		var checked = $(this).prop('checked'),
@@ -615,6 +600,19 @@ function initCommonElements(){
 			$('#lesson-instructions').html(response.lessonInstructions);
 		}
 	});
+	
+	//initialize datetimepickers
+	new tempusDominus.TempusDominus(document.getElementById('scheduleDatetimeField'), tempusDominusDefaultOptions)
+		.dates.formatInput = tempusDominusDateFormatter;
+		
+	new tempusDominus.TempusDominus(document.getElementById('disableDatetimeField'), tempusDominusDefaultOptions)
+		.dates.formatInput = tempusDominusDateFormatter;
+
+	let datePickerElement = $('#emaildatePicker'),
+		datePicker = new tempusDominus.TempusDominus(datePickerElement[0], tempusDominusDefaultOptions);
+		
+	datePicker.dates.formatInput = tempusDominusDateFormatter;
+	datePickerElement.data('datePicker', datePicker);
 }
 
 /**
@@ -2056,7 +2054,7 @@ function addActivityIconsHandlers(activity) {
 							});
 			
 			if (usersViewable) {
-				dblTap(learnerIcon, function(event){
+				learnerIcon.click(function(event){
 					 // double click on learner icon to see activity from his perspective
 					var url = LAMS_URL + 'monitoring/monitoring/getLearnerActivityURL.do?userID=' 
 						               + learner.id + '&activityID=' + activity.id + '&lessonID=' + lessonId;
@@ -2074,8 +2072,8 @@ function addActivityIconsHandlers(activity) {
 	}
 		
 	if (activity.learnerCount > 0){
-		$('#act' + activity.id + 'learnerGroup', sequenceCanvas)
-		   .click(function(event){
+		$('div#act' + activity.id + 'learnerGroup', sequenceCanvas)
+		   .click(function(){
 				 // double click on learner group icon to see list of learners
 				var ajaxProperties = {
 						url : LAMS_URL + 'monitoring/monitoring/getCurrentLearners.do',
