@@ -1,9 +1,4 @@
 @font-face {
-	font-family: mont-semibold;
-	src: url(/lams/includes/fonts/mont-semibold.ttf);
-}
-
-@font-face {
 	font-family: mont-bold;
 	src: url(/lams/includes/fonts/FontsFree-Net-Mont-Bold.ttf);
 }
@@ -124,9 +119,17 @@
 	opacity: 0;
 }
 
+.component-sidebar .lesson-properties #lessonDetails > * {
+	display: none;
+}
+
 .component-sidebar .lesson-properties.active #lessonDetails {
 	opacity: 1;
 	transition: opacity .3s ease .3s;
+}
+
+.component-sidebar .lesson-properties.active #lessonDetails > * {
+	display: initial;
 }
 
 .component-sidebar .lesson-properties #lessonDetails .btn,
@@ -154,6 +157,8 @@
 
 .monitoring-page-wrapper #sequence-tab-content .sequence-tab-layout-column {
 	margin-bottom: 2rem;
+	padding-right: 0;
+	padding-left: var(--bs-gutter-x);
 }
 
 .monitoring-page-content .graph-grades {
@@ -840,6 +845,7 @@
 
 .monitoring-page-wrapper #sequenceSearchPhraseContainer {
 	width: 20rem;
+	margin-left: 1rem;
 }
 
 .monitoring-page-wrapper #sequenceSearchPhrase {
@@ -848,6 +854,7 @@
 
 .monitoring-page-wrapper #sequenceSearchPhraseButton {
 	border: none;
+	height: 3.1rem;
 } 
 
 .monitoring-page-wrapper #sequenceSearchPhraseClearIcon {
@@ -1231,6 +1238,10 @@ body.component .portrait-round {
 #learners-accordion .learners-accordion-login .fa-user,
 #learners-accordion .learners-accordion-email .fa-envelope {
 	margin-right: 10px;
+}
+
+#learners-accordion .learners-accordion-email a {
+	text-decoration: none;
 }
 
 #learners-accordion .learners-accordion-portrait > div {

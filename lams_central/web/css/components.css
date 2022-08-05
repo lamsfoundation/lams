@@ -346,7 +346,7 @@ body.component .info_icon {
 }
 
 .component-page-wrapper .hamburger-box p {
-	font-family: mont-semibold, sans-serif;
+	font-family: mont-bold, sans-serif;
 	font-size: 2rem;
 	margin: 0;
 	line-height: 1;

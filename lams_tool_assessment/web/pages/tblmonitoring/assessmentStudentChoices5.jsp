@@ -103,8 +103,10 @@
 		</div>
 		
 		<div class="col-md-5 col-sm-12 ms-2 my-4">
-			<div class="monitoring-panel position-relative">
-				<h4 id="answered-questions-chart-none" class="position-absolute top-50 w-100 text-center">No students have answered questions yet</h4>
+			<div class="monitoring-panel">
+				<h4 id="answered-questions-chart-none" class="text-center position-relative top-50">
+					<fmt:message key="label.monitoring.student.choices.none" />
+				</h4>
 				<canvas id="answered-questions-chart"></canvas>
 			</div>
 		</div>

@@ -773,7 +773,7 @@
 					<tr>
 						<td class="navCell pageMinus10Cell">
 							<button class="btn btn-xs btn-secondary" 
-									onClick="javascript:sortClassList('Learner', -10)"
+									onClick="javascript:shiftClassList('Learner', -10)"
 									title="<fmt:message key='learner.group.backward.10'/>">
 								<i class="fa-solid fa-fw fa-step-backward"></i>
 							</button>
@@ -781,7 +781,7 @@
 						</td>
 						<td class="navCell pageMinus1Cell">
 							<button class="btn btn-xs btn-secondary" 
-									onClick="javascript:sortClassList('Learner', -1)"
+									onClick="javascript:shiftClassList('Learner', -1)"
 									title="<fmt:message key='learner.group.backward.1'/>">
 								<i class="fa-solid fa-fw fa-backward"></i>
 							</button>
@@ -791,14 +791,14 @@
 						</td>
 						<td class="navCell pagePlus1Cell">
 							<button class="btn btn-xs btn-secondary" 
-									onClick="javascript:sortClassList('Learner', 1)"
+									onClick="javascript:shiftClassList('Learner', 1)"
 									title="<fmt:message key='learner.group.forward.1'/>">
 								<i class="fa-solid fa-fw fa-forward"></i>
 							</button>
 						</td>
 						<td class="navCell pagePlus10Cell">
 							<button class="btn btn-xs btn-secondary" 
-									onClick="javascript:sortClassList('Learner', 10)"
+									onClick="javascript:shiftClassList('Learner', 10)"
 									title="<fmt:message key='learner.group.forward.10'/>">
 								<i class="fa-solid fa-fw fa-step-forward"></i>
 							</button>
@@ -839,7 +839,7 @@
 					<tr>
 						<td class="navCell pageMinus10Cell">
 							<button class="btn btn-xs btn-secondary" 
-									onClick="javascript:sortClassList('Monitor', -10)"
+									onClick="javascript:shiftClassList('Monitor', -10)"
 									title="<fmt:message key='learner.group.backward.10'/>">
 								<i class="fa-solid fa-fw fa-step-backward"></i>
 							</button>
@@ -847,7 +847,7 @@
 						</td>
 						<td class="navCell pageMinus1Cell">
 							<button class="btn btn-xs btn-secondary" 
-									onClick="javascript:sortClassList('Monitor', -1)"
+									onClick="javascript:shiftClassList('Monitor', -1)"
 									title="<fmt:message key='learner.group.backward.1'/>">
 								<i class="fa-solid fa-fw fa-backward"></i>
 							</button>
@@ -857,14 +857,14 @@
 						</td>
 						<td class="navCell pagePlus1Cell">
 							<button class="btn btn-xs btn-secondary" 
-									onClick="javascript:sortClassList('Monitor', 1)"
+									onClick="javascript:shiftClassList('Monitor', 1)"
 									title="<fmt:message key='learner.group.forward.1'/>">
 								<i class="fa-solid fa-fw fa-forward"></i>
 							</button>
 						</td>
 						<td class="navCell pagePlus10Cell">
 							<button class="btn btn-xs btn-secondary" 
-									onClick="javascript:sortClassList('Monitor', 10)"
+									onClick="javascript:shiftClassList('Monitor', 10)"
 									title="<fmt:message key='learner.group.forward.10'/>">
 								<i class="fa-solid fa-fw fa-step-forward"></i>
 							</button>

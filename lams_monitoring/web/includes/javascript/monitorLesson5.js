@@ -274,7 +274,6 @@ function initCommonElements(){
 	var forceBackwardsDialogContents = $('#forceBackwardsDialogContents');
 	showDialog('forceBackwardsDialog', {
 		'autoOpen'	: false,
-		'modal'     : true,
 		'resizable' : true,
 		'height'	: 300,
 		'width'  	: 400,
@@ -1099,7 +1098,6 @@ function showEmailDialog(userId){
 		'autoOpen'  : true,
 		'height'    : Math.max(380, Math.min(700, dialogWindow.height() - 30)),
 		'width'     : Math.max(380, Math.min(700, dialogWindow.width() - 60)),
-		'modal'     : true,
 		'resizable' : true,
 		'title'     : LABELS.EMAIL_TITLE,
 		//dialog needs to be added to a top level window to avoid boundary limitations of the interim iframe
@@ -1249,9 +1247,11 @@ function editEmailProgressDate(dateCheckbox){
 		cache : false,
 		data : data,
 		success : function( dateObj ) {
-			dateCheckbox.closest('.dialogListItem')
-				.attr('dateid', dateObj.id)
-				.find('label').text(dateFormatter(new Date(dateObj.id))); 
+			if (dateObj.id) {
+				dateCheckbox.closest('.dialogListItem')
+					.attr('dateid', dateObj.id)
+					.find('label').text(dateFormatter(new Date(dateObj.id)));
+			} 
 		}
 	});
 }
@@ -1433,7 +1433,6 @@ function openGateSelectively(url){
 	showDialog("dialogGate", {
 		'autoOpen'  : true,
 		'height'    : 820,
-		'modal'     : false,
 		'resizable' : false,
 		'title'     : LABELS.CONTRIBUTE_OPEN_GATE_BUTTON,
 		'open'      : function(){
@@ -2458,9 +2457,12 @@ function updateLearnersTab(){
 							.prepend(portraitSmall);
 				$('.learners-accordion-name', item).text(learner.firstName + ' ' + learner.lastName);
 				$('.learners-accordion-login', item).html('<i class="fa-regular fa-user"></i>' + learner.login);
-				$('.learners-accordion-email', item).html('<i class="fa-regular fa-envelope"></i>' + learner.email);
+				$('.learners-accordion-email', item).html('<i class="fa-regular fa-envelope"></i><a href="mailto:' + learner.email + '">' 
+														  + learner.email + '</a>');
 				if (portraitLarge) {
 					$('.learners-accordion-portrait', item).append(portraitLarge);
+				} else {
+					$('.learners-accordion-portrait', item).remove();
 				}
 				
 				$('.accordion-collapse', item).attr('id', itemCollapseId).attr('data-bs-parent', '#learners-accordion')
