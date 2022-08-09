@@ -2000,7 +2000,7 @@ public class GradebookService implements IGradebookFullService {
 
 		    List<ToolActivity> lessonActivities = lessonActivitiesMap.get(lesson.getLessonId());
 		    int numberActivities = lessonActivities.size();
-		    lessonsNames.addEmptyCells(9 + numberActivities + (isSubcourse ? -2 : 0));
+		    lessonsNames.addEmptyCells(8 + numberActivities * 2 + (isSubcourse ? -2 : 0));
 		}
 
 		lessonsNames.addCell(getMessage("label.overall.totals"), true, ExcelCell.BORDER_STYLE_LEFT_THICK);
