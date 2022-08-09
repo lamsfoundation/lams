@@ -280,7 +280,7 @@
 					   data-tab-name="sequence"	title="<fmt:message key='tab.sequence' />">
 						<i class="fa fa-cubes fa-lg"></i>
 					</a>
-					<label for="load-sequence-tab-btn">
+					<label for="load-sequence-tab-btn" class="d-none d-md-block">
 						<fmt:message key='tab.sequence' />
 					</label>
 				</div>
@@ -290,7 +290,7 @@
 						<a id="edit-lesson-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.monitoring.edit.lesson.settings' />">
 							<i class="fa fa-pen fa-lg"></i>
 						</a>
-						<label for="edit-lesson-btn">
+						<label for="edit-lesson-btn" class="d-none d-md-block">
 							<fmt:message key='label.monitoring.edit' />
 						</label>
 					</div>
@@ -300,7 +300,7 @@
 						   data-tab-name="learners"	title="<fmt:message key='tab.learners' />">
 							<i class="fa fa-solid fa-users fa-lg"></i>
 						</a>
-						<label for="load-learners-tab-btn">
+						<label for="load-learners-tab-btn" class="d-none d-md-block">
 							<fmt:message key='tab.learners' />
 						</label>
 					</div>
@@ -310,7 +310,7 @@
 						   data-tab-name="gradebook" title="<fmt:message key='tab.gradebook' />">
 							<i class="fa fa-solid fa-list-ol fa-lg"></i>
 						</a>
-						<label for="load-gradebook-tab-btn">
+						<label for="load-gradebook-tab-btn" class="d-none d-md-block">
 							<fmt:message key='tab.gradebook' />
 						</label>
 					</div>
@@ -323,7 +323,7 @@
 							   data-tab-name="teams" title="<fmt:message key='label.teams' />">
 								<i class="fa fa-people-group fa-lg"></i>
 							</a>
-							<label for="load-teams-tab-btn">
+							<label for="load-teams-tab-btn" class="d-none d-md-block">
 								<fmt:message key='label.teams' />
 							</label>
 						</div>
@@ -334,7 +334,7 @@
 								   data-tab-name="gates" title="<fmt:message key='label.gates' />">
 									<i class="fa fa-sign-in fa-lg"></i>
 								</a>
-								<label for="load-gates-tab-btn">
+								<label for="load-gates-tab-btn" class="d-none d-md-block">
 									<fmt:message key='label.gates' />
 								</label>
 							</div>
@@ -360,7 +360,7 @@
 									</a>
 								</div>
 								
-								<label for="load-irat-btn-group">
+								<label for="load-irat-btn-group" class="d-none d-md-block">
 									<fmt:message key='label.ira' />
 								</label>
 							</div>
@@ -379,7 +379,7 @@
 									</a>
 								</div>
 								
-								<label for="load-trat-btn-group">
+								<label for="load-trat-btn-group" class="d-none d-md-block">
 									<fmt:message key='label.tra' />
 								</label>
 							</div>
@@ -389,7 +389,7 @@
 								   data-tab-name="burningQuestions" title="<fmt:message key='label.monitoring.burning.questions' />">
 									<i class="fa fa-question-circle fa-lg"></i>
 								</a>
-								<label for="load-burning-tab-btn">
+								<label for="load-burning-tab-btn" class="d-none d-md-block">
 									<fmt:message key='label.monitoring.burning.questions' />
 								</label>
 							</div>
@@ -401,7 +401,7 @@
 								   data-tab-name="aes" title="<fmt:message key='label.aes' />">
 									<i class="fa fa-dashboard fa-lg"></i>
 								</a>
-								<label for="load-aes-tab-btn">
+								<label for="load-aes-tab-btn" class="d-none d-md-block">
 									<fmt:message key='label.aes' />
 								</label>
 							</div>
@@ -413,7 +413,7 @@
 								   data-tab-name="peerReview" title="<fmt:message key='label.peer.review' />">
 									<i class="fa fa-person-circle-question fa-lg"></i>
 								</a>
-								<label for="load-aes-tab-btn">
+								<label for="load-aes-tab-btn" class="d-none d-md-block">
 									<fmt:message key='label.peer.review' />
 								</label>
 							</div>
@@ -424,7 +424,7 @@
 						<a id="load-other-nvg-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.monitoring.other.tooltip' />">
 							<i class="fa fa-angles-up fa-lg"></i>
 						</a>
-						<label for="load-teams-tab-btn">
+						<label for="load-teams-tab-btn" class="d-none d-md-block">
 							<fmt:message key='label.monitoring.other' />
 						</label>
 					</div>
