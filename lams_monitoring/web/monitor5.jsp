@@ -276,15 +276,6 @@
 		<div class="component-menu">
 			<div class="component-menu-btn d-flex flex-column align-items-center">
 				<div class="navigate-btn-container">
-					<a id="return-to-index-btn" href="/" class="btn btn-primary" title="<fmt:message key='label.monitoring.return.to.index' />">
-						<i class="fa fa-arrow-left fa-lg"></i>
-					</a>
-					<label for="return-to-index-btn">
-						<fmt:message key='label.monitoring.return' />
-					</label>
-				</div>
-								
-				<div class="navigate-btn-container">
 					<a id="load-sequence-tab-btn" href="#" class="btn btn-primary active"
 					   data-tab-name="sequence"	title="<fmt:message key='tab.sequence' />">
 						<i class="fa fa-cubes fa-lg"></i>
