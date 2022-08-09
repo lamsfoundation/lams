@@ -40,16 +40,20 @@
 		
 							</c:when>
 							<c:otherwise>
-								<button type="button" class="btn btn-sm btn-primary float-end ms-3 mt-2"
-										title="<fmt:message key='button.task.gate.open.tooltip'/>"
-										onClick="javascript:openGateSelectively('${permissionGate.url}')">
-									<fmt:message key="button.task.gate.open"/>
-								</button>
-								<button type="button" class="btn btn-sm btn-primary float-end mt-2"
-										title="<fmt:message key='button.task.gate.open.now.tooltip'/>"
-										onClick="javascript:openGateNow(${permissionGate.activityID})">
-									<fmt:message key="button.task.gate.open.now"/>
-								</button>
+								<div class="d-inline-flex justify-content-end float-end">
+									<button type="button" class="btn btn-sm btn-primary mt-2"
+											title="<fmt:message key='button.task.gate.open.now.tooltip'/>"
+											onClick="javascript:openGateNow(${permissionGate.activityID})">
+										<fmt:message key="button.task.gate.open.now"/>
+									</button>
+									<button type="button" class="btn btn-sm btn-primary ms-3 mt-2"
+											title="<fmt:message key='button.task.gate.open.tooltip'/>"
+											onClick="javascript:openGateSelectively('${permissionGate.url}')">
+										<fmt:message key="button.task.gate.open"/>
+									</button>
+
+								</div>
+
 								
 								<c:if test="${permissionGate.waitingLearnersCount > 0}">
 									<br />

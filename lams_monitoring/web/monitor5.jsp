@@ -438,7 +438,7 @@
 					<dt><fmt:message key="lesson.state"/>
 					</dt>
 					<dd>
-						<span data-bs-toggle="collapse" data-bs-target="#changeState" id="lessonStateLabel" class="lessonManageField"></span>
+						<button data-bs-toggle="collapse" data-bs-target="#changeState" id="lessonStateLabel" class="lessonManageField"></button>
 					  	<div style="display:inline-block;vertical-align: middle;"><span id="lessonStartDateSpan" class="lessonManageField loffset5"></span>
 					  	<span id="lessonFinishDateSpan" class="lessonManageField loffset5"></span></div>
 					  	 

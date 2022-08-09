@@ -85,7 +85,7 @@
 	<c:forEach var="item" items="${items}" varStatus="i">
 		<div class="row mb-3">
 			<div class="col-10 offset-1">			
-				<div class="card">
+				<div class="card" tabindex="0">
 					<div class="card-header">			
 						<h3 class="card-title mb-3" style="font-size: initial">
 							${i.index+1}. <c:out value="${item.qbQuestion.name}" escapeXml="false"/>

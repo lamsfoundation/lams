@@ -248,10 +248,10 @@
 		</div>
 		<div class="col-2 text-end">
 			<c:if test="${not empty groupsSetupUrl}">
-				<div onClick="javascript:openPopUp('<lams:LAMSURL/>${groupsSetupUrl}','GroupsSetup', 800, 1280, true)" type="button"
+				<button onClick="javascript:openPopUp('<lams:LAMSURL/>${groupsSetupUrl}','GroupsSetup', 800, 1280, true)" type="button"
 					    class="btn btn-secondary">
 					<fmt:message key="label.teams.setup"/>
-				</div>
+				</button>
 			</c:if>
 		</div>
 	</div>
@@ -432,7 +432,7 @@
 			</div>
 		
 			<c:forEach var="groupDto" items="${groupDtos}">
-				<div class="card mb-3" id="teams-panel-${groupDto.groupID}">
+				<div class="card mb-3" id="teams-panel-${groupDto.groupID}" tabindex="0">
 					<h5 class="card-header" data-bs-toggle="collapse" data-bs-target="#collapse-${groupDto.groupID}">
 						<a class="text-decoration-none" id="group-name-${groupDto.groupID}">
 							<c:out value="${groupDto.groupName}" />
