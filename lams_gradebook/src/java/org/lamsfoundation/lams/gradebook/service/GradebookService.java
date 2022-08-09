@@ -1770,17 +1770,20 @@ public class GradebookService implements IGradebookFullService {
 	if ((lessons != null) && (lessons.size() > 0)) {
 	    // Adding the user lesson marks to the summary----------------------
 	    ExcelRow lessonsNames = sheet.initRow();
-	    lessonsNames.addCell("");
-	    lessonsNames.addCell("");
-	    lessonsNames.addCell("");
+	    lessonsNames.addEmptyCells(3);
 	    for (Lesson lesson : lessons) {
 		lessonsNames.addCell(messageService.getMessage("gradebook.exportcourse.lesson",
 			new Object[] { lesson.getLessonName() }), true);
-		lessonsNames.addCell("");
-		lessonsNames.addCell("");
-		lessonsNames.addCell("");
-		lessonsNames.addCell("");
-		lessonsNames.addCell("");
+		boolean isSubcourse = lesson.getOrganisation().getOrganisationType().getOrganisationTypeId()
+			.equals(OrganisationType.CLASS_TYPE);
+		if (isSubcourse) {
+		    lessonsNames.addEmptyCell();
+		    lessonsNames.addCell(messageService.getMessage("gradebook.exportcourse.subcourse",
+			    new Object[] { lesson.getOrganisation().getName() }));
+		    lessonsNames.addEmptyCells(3);
+		} else {
+		    lessonsNames.addEmptyCells(5);
+		}
 	    }
 
 	    // Setting up the user marks table
@@ -1979,24 +1982,29 @@ public class GradebookService implements IGradebookFullService {
 		}
 		lessonsNames.addCell("", ExcelCell.BORDER_STYLE_LEFT_THICK);
 		lessonsNames.addCell(getMessage("label.overall.totals"), true).setAlignment(ExcelCell.ALIGN_CENTER);
-		lessonsNames.addCell("", ExcelCell.BORDER_STYLE_RIGHT_THICK);
 	    } else {
-		lessonsNames.addEmptyCells(4);
 		for (Lesson lesson : selectedLessons) {
 		    String lessonName = isWeightedLessonMap.get(lesson.getLessonId())
 			    ? new StringBuilder(lesson.getLessonName()).append(" ").append(weightedMessage).toString()
 			    : lesson.getLessonName();
+		    lessonsNames.addCell(
+			    messageService.getMessage("gradebook.exportcourse.lesson", new Object[] { lessonName }),
+			    true, ExcelCell.BORDER_STYLE_LEFT_THICK);
+
+		    boolean isSubcourse = lesson.getOrganisation().getOrganisationType().getOrganisationTypeId()
+			    .equals(OrganisationType.CLASS_TYPE);
+		    if (isSubcourse) {
+			lessonsNames.addEmptyCell();
+			lessonsNames.addCell(messageService.getMessage("gradebook.exportcourse.subcourse",
+				new Object[] { lesson.getOrganisation().getName() }));
+		    }
 
 		    List<ToolActivity> lessonActivities = lessonActivitiesMap.get(lesson.getLessonId());
 		    int numberActivities = lessonActivities.size();
-		    lessonsNames.addEmptyCells(numberActivities);
-		    lessonsNames.addCell(lessonName, true);
-		    lessonsNames.addEmptyCells(9 + (numberActivities * 2));
+		    lessonsNames.addEmptyCells(8 + numberActivities * 2 + (isSubcourse ? -2 : 0));
 		}
 
-		lessonsNames.addCell("", ExcelCell.BORDER_STYLE_LEFT_THIN);
-		lessonsNames.addCell(getMessage("label.overall.totals"), true);
-		lessonsNames.addCell("", ExcelCell.BORDER_STYLE_RIGHT_THICK);
+		lessonsNames.addCell(getMessage("label.overall.totals"), true, ExcelCell.BORDER_STYLE_LEFT_THICK);
 	    }
 
 	    // Headers row----------------------
@@ -2015,7 +2023,7 @@ public class GradebookService implements IGradebookFullService {
 		headerRow.addCell(getMessage("label.actuals"), true, ExcelCell.BORDER_STYLE_LEFT_THICK)
 			.setAlignment(ExcelCell.ALIGN_CENTER);
 		headerRow.addCell(getMessage("label.max")).setAlignment(ExcelCell.ALIGN_CENTER);
-		headerRow.addCell("%", false, ExcelCell.BORDER_STYLE_RIGHT_THICK).setAlignment(ExcelCell.ALIGN_CENTER);
+		headerRow.addCell("%", false).setAlignment(ExcelCell.ALIGN_CENTER);
 	    } else {
 		//create Selected Lessons Header Full
 		for (Lesson lesson : selectedLessons) {
@@ -2046,10 +2054,9 @@ public class GradebookService implements IGradebookFullService {
 		    headerRow.addCell("%", ExcelCell.BORDER_STYLE_RIGHT_THICK);
 		}
 
-		headerRow.addEmptyCells(2);
 		headerRow.addCell(getMessage("label.actuals"), true, ExcelCell.BORDER_STYLE_LEFT_THIN);
 		headerRow.addCell(getMessage("label.max"), true);
-		headerRow.addCell("%", true, ExcelCell.BORDER_STYLE_RIGHT_THICK);
+		headerRow.addCell("%");
 	    }
 
 	    // Actual data rows----------------------
@@ -2179,8 +2186,7 @@ public class GradebookService implements IGradebookFullService {
 		    userRow.addCell(overallMaxMark);
 		    userRow.addPercentageCell(percentage, false, ExcelCell.BORDER_STYLE_RIGHT_THICK);
 		} else {
-		    userRow.addEmptyCells(2);
-		    userRow.addCell(overallTotal, ExcelCell.BORDER_STYLE_LEFT_THIN);
+		    userRow.addCell(overallTotal, ExcelCell.BORDER_STYLE_LEFT_THICK);
 		    userRow.addCell(overallMaxMark);
 		    userRow.addPercentageCell(percentage, true, ExcelCell.BORDER_STYLE_RIGHT_THICK);
 		}
@@ -2192,7 +2198,7 @@ public class GradebookService implements IGradebookFullService {
     private void addUsernameCells(User learner, ExcelRow userRow) {
 	//first, last names and login
 	String lastName = (learner.getLastName() == null) ? "" : learner.getLastName().toUpperCase();
-	userRow.addCell(lastName);
+	userRow.addCell(lastName, ExcelCell.BORDER_STYLE_LEFT_THICK);
 	String firstName = (learner.getFirstName() == null) ? "" : learner.getFirstName().toUpperCase();
 	userRow.addCell(firstName);
 	userRow.addCell(learner.getLogin());

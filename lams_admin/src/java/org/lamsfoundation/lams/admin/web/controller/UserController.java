@@ -120,7 +120,8 @@ public class UserController {
 
 	// test requestor's permission
 	Organisation org = null;
-	Boolean canEdit = userManagementService.isUserGlobalGroupManager();
+	boolean isSysAdmin = userManagementService.isUserSysAdmin();
+	Boolean canEdit = userManagementService.isUserGlobalGroupManager() || isSysAdmin;
 	if (orgId != null) {
 	    org = (Organisation) userManagementService.findById(Organisation.class, orgId);
 	    if (!canEdit) {
@@ -137,7 +138,10 @@ public class UserController {
 	    }
 	}
 
-	if (!(canEdit || request.isUserInRole(Role.SYSADMIN))) {
+	// only sysadmins can edit other sysadmins
+	canEdit &= isSysAdmin || !userManagementService.isUserSysAdmin(userId);
+
+	if (!canEdit) {
 	    request.setAttribute("errorName", "UserController");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
