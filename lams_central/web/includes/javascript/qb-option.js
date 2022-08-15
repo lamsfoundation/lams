@@ -8,6 +8,7 @@ function removeOption(idx){
 	var	deletionConfirmed = confirm(CONFIRM_DELETE_ANSWER_LABEL);
 	if (deletionConfirmed) {
 		$("#option-table-" + idx).remove();
+		checkQuestionNewVersion();
 	}
 }
 	
@@ -31,6 +32,7 @@ function addOption(){
 		}, 
 		function() {
 			initializeAnswers();
+			checkQuestionNewVersion();
 		}
 	);
 }
@@ -137,6 +139,7 @@ function initializeAnswers() {
 					    $('input[name="optionDisplayOrder' + optionIndex + '"]').val(i+1);
 					    $('span#optionDisplayOrderSpan' + optionIndex).text(alphabet[i]);
 					}
+					checkQuestionNewVersion();
 				}
 			}
 		});

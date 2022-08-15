@@ -249,6 +249,20 @@ public class EditQbQuestionController {
 	}
     }
 
+    @RequestMapping(path = "/checkQuestionNewVersion", method = RequestMethod.POST)
+    @ResponseBody
+    public String checkQuestionNewVersion(@ModelAttribute("assessmentQuestionForm") QbQuestionForm form,
+	    HttpServletRequest request) {
+	boolean isAddingQuestion = form.getUid() == -1;
+	if (isAddingQuestion) {
+	    return "true";
+	}
+
+	QbQuestion qbQuestion = qbService.getQuestionByUid(form.getUid());
+	return String.valueOf(qbService.extractFormToQbQuestion(qbQuestion, form,
+		request) >= IQbService.QUESTION_MODIFIED_VERSION_BUMP);
+    }
+
     @RequestMapping("/returnQuestionUid")
     @ResponseBody
     public String returnQuestionUid(HttpServletResponse response, @RequestParam Long qbQuestionUid) {

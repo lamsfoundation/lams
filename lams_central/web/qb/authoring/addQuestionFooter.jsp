@@ -33,18 +33,15 @@
 					<fmt:message key="label.cancel" />
 				</a>
 				
-				<div class="btn-group btn-group-sm dropup">
+				<div class="btn-group btn-group-sm">
 					<a id="saveButton" type="button" class="btn btn-sm btn-default button-add-item" onClick="javascript:saveQuestion(false)">
 						<fmt:message key="button.save" />
 					</a>
-					<button id="saveDropButton" type="button" class="btn btn-default dropdown-toggle"
-							data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						<span class="caret"></span>
-						<span class="sr-only">Toggle Dropdown</span>
-					</button>
-					<ul class="dropdown-menu">
-						<li id="saveAsButton" onClick="javascript:saveQuestion(true)"><a href="#"><fmt:message key="button.save.new.version" /></a></li>
-					</ul>
+					<c:if test="${not isNewQuestion}">
+						<a id="saveAsButton" type="button" class="btn btn-sm btn-default button-add-item loffset10" onClick="javascript:saveQuestion(true)">
+							<fmt:message key="button.save.new.version" />
+						</a>
+					</c:if>
 				</div>
 			</div>
 		</div>

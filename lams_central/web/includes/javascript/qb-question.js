@@ -14,10 +14,29 @@ $(document).ready(function(){
 	});
 });
 
+// submits whole question form in order to check if it changed enough to produce a new question version
+function checkQuestionNewVersion(){
+	if (isNewQuestion) {
+		return;
+	}
+	$('#assessmentQuestionForm').attr('action', CHECK_QUESTION_NEW_VERSION_URL).data('validator').cancelSubmit = true;
+	$('#assessmentQuestionForm').submit();
+}
+
+function isVersionCheck() {
+	return $('#assessmentQuestionForm').attr('action') == CHECK_QUESTION_NEW_VERSION_URL;	
+}
+
 // post-submit callback 
 function afterRatingSubmit(responseText, statusText)  { 
 	self.parent.refreshThickbox()
 	self.parent.tb_remove();
+}
+
+function afterVersionCheck(responseText, statusText, c, d){
+	$('#assessmentQuestionForm').attr('action', SAVE_QUESTION_URL).data('validator').cancelSubmit = false;
+	// the controller produces true/false and is interpreted as JSON
+	$('#saveButton').toggle(!responseText);
 }
 
 //form validation handler. It's called when the form contains an error.
@@ -64,12 +83,7 @@ function formValidationErrorPlacement( error, element ) {
 		$( "<span class='fa fa-remove form-control-feedback'></span>" ).insertAfter( element );
 	}
 }
-function formValidationSuccess ( label, element ) {
-	// Add the span element, if doesn't exists, and apply the icon classes to it.
-	if ( !$( element ).next( "span" )[ 0 ] ) {
-		//$( "<span class='fa fa-check form-control-feedback'></span>" ).insertAfter( $( element ) );
-	}
-}
+
 function formValidationHighlight ( element, errorClass, validClass ) {
 	$( element ).parent().addClass( "has-error" ).removeClass( "has-success" );
 	$( element ).next( "span" ).addClass( "fa-remove" ).removeClass( "fa-check" );

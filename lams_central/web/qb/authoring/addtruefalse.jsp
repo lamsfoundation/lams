@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="questionType" value="5"	scope="request" />
+<c:set var="isNewQuestion" value="${assessmentQuestionForm.uid eq -1}" />
 		
 <lams:html>
 	<lams:head>
@@ -15,8 +16,12 @@
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.tabcontroller.js"></script>
 		<script type="text/javascript">
+			const CHECK_QUESTION_NEW_VERSION_URL = "/lams/qb/edit/checkQuestionNewVersion.do";
+			const SAVE_QUESTION_URL = "/lams/qb/edit/saveOrUpdateQuestion.do";
 			const VALIDATION_ERROR_LABEL = "<fmt:message key='error.form.validation.error'/>";
 			const VALIDATION_ERRORS_LABEL = "<fmt:message key='error.form.validation.errors'><fmt:param >{errors_counter}</fmt:param></fmt:message>";
+			
+			var isNewQuestion = ${isNewQuestion};
 		</script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/qb-question.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
@@ -24,6 +29,8 @@
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap-toggle.js"></script>
   	    <script>
 			$(document).ready(function(){
+				$('#correctAnswer').change(checkQuestionNewVersion);
+				
 		    	$("#assessmentQuestionForm").validate({
 		    		ignore: 'hidden, div.cke_editable',
 		    		rules: {
@@ -55,17 +62,18 @@
 		    			$("#feedbackOnIncorrect").val(CKEDITOR.instances.feedbackOnIncorrect.getData());
 		    			$("#new-collection-uid").val($("#collection-uid-select option:selected").val());
 		    			
-		    	    	var options = { 
-		    	    		target:  parent.jQuery('#itemArea'), 
-		    		   		success: afterRatingSubmit  // post-submit callback
-		    		    }; 				
+		    	    	var isVersionBeingChecked = isVersionCheck(),
+		    	    		options = { 
+			    	    		target:  isVersionBeingChecked ? null : parent.jQuery('#itemArea'), 
+			    	    		dataType : isVersionBeingChecked? 'json' : null, 
+			    		   		success: isVersionBeingChecked? afterVersionCheck : afterRatingSubmit  // post-submit callback
+			    		    };			
 		    		    				
 		    			$('#assessmentQuestionForm').ajaxSubmit(options);
 		    		},
 		    	    invalidHandler: formValidationInvalidHandler,
 					errorElement: "em",
 					errorPlacement: formValidationErrorPlacement,
-					success: formValidationSuccess,
 					highlight: formValidationHighlight,
 					unhighlight: formValidationUnhighlight
 		  		});
