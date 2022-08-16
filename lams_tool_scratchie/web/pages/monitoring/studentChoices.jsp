@@ -194,7 +194,13 @@
 										<c:param name="toolSessionID" value="${sessionDto.sessionId}" />
 										<c:param name="mode" value="teacher" />
 									</c:url>
-									<a href="#" onClick="javascript:launchPopup('${userSummaryUrl}', 'MonitoringReview')">${sessionDto.sessionName}</a>
+									<a href="#" onClick="javascript:launchPopup('${userSummaryUrl}', 'MonitoringReview')">
+										${sessionDto.sessionName}
+										<c:if test="${sessionDto.scratchingFinished}">
+											<i class="fa fa-check text-success loffset5" title="<fmt:message key='label.finish'/>"></i>
+										</c:if>
+									</a>
+									
 								</c:otherwise>
 							</c:choose>
 							

@@ -2110,6 +2110,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    if (session != null) {
 		// for this view, we need user ID, not UID
 		summary.setLeaderUid(session.getGroupLeader().getUserId());
+		summary.setScratchingFinished(session.isScratchingFinished());
 	    }
 
 	    //prepare OptionDtos to display
