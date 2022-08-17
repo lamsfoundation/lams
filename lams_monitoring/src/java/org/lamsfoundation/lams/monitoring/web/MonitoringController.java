@@ -1191,7 +1191,7 @@ public class MonitoringController {
 	}
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, true, true);
+	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, true, false);
 	if (contributeActivities != null) {
 	    responseJSON.set("contributeActivities", JsonUtil.readArray(contributeActivities));
 	}

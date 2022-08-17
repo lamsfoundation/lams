@@ -1162,7 +1162,6 @@ function updateContributeActivities(contributeActivities) {
 		row = row.append(cell);
 	}
 	*/
-
 	if (contributeActivities) {
 		$.each(contributeActivities, function(){
 			let contributeActivity = this;
@@ -1554,8 +1553,13 @@ function updateSequenceTab() {
 				if (response.contributeActivities) {
 					$.each(response.contributeActivities, function(){
 						if (activity.id == this.activityID) {
-							 activity.requiresAttention = true;
-							 return false;
+							$.each(this.contributeEntries, function(){
+								if (!this.isComplete) {
+									activity.requiresAttention = true;
+							 		return false;
+								}
+							});
+							return false;
 						}
 					});
 				}
@@ -1971,10 +1975,10 @@ function addActivityIcons(activity) {
 		
 		if (requiresAttentionIcon) {
 			$('<foreignObject />').append(requiresAttentionIcon).appendTo(activityGroup).attr({
-				'x' : coord.x + 25,
-				'y' : coord.y -  5,
+				'x' : coord.x + 35,
+				'y' : coord.y - 10,
 				'width'  : 20,
-				'height' : 20
+				'height' : 25
 			});
 		}
 	} else if (isBranching) {
