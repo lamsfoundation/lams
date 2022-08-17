@@ -1,4 +1,6 @@
 <%@ include file="/taglibs.jsp"%>
+
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.timeago.js"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
 		$("time.timeago").timeago();
