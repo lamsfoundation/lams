@@ -328,18 +328,6 @@
 							</label>
 						</div>
 						
-						<c:if test="${not empty isGatesAvailable}">
-							<div class="navigate-btn-container">
-								<a id="load-gates-tab-btn" class="btn btn-primary" href="#"
-								   data-tab-name="gates" title="<fmt:message key='label.gates' />">
-									<i class="fa fa-sign-in fa-lg"></i>
-								</a>
-								<label for="load-gates-tab-btn" class="d-none d-md-block">
-									<fmt:message key='label.gates' />
-								</label>
-							</div>
-						</c:if>
-						
 						<c:if test="${not empty isIraMcqAvailable || not empty isIraAssessmentAvailable}">
 							<c:set var="iraMethodName">
 								<c:choose>

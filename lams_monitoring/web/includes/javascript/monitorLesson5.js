@@ -701,12 +701,6 @@ function loadTab(tabName, button) {
 		}
 		break;
 		
-		case 'gates': {
-			tabContent.load(LAMS_URL + 'monitoring/tblmonitor/gates.do?lessonID=' + lessonId);
-			searchStudentWidget.hide();
-		}
-		break;
-		
 		case 'irat': {
 			tabContent.load(LAMS_URL + 'tool/laasse10/tblmonitoring/iraAssessment.do?toolContentID=' + iraToolContentId);
 			searchStudentWidget.hide();

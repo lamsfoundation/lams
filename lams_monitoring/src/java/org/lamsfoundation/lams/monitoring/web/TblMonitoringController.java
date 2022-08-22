@@ -324,7 +324,7 @@ public class TblMonitoringController {
 	}
 
 	request.setAttribute("permissionGates", permissionGates);
-	return "tblmonitor/gates5";
+	return "tblmonitor/gates";
     }
 
     /**
