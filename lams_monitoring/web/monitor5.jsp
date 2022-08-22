@@ -277,11 +277,11 @@
 			<div class="component-menu-btn d-flex flex-column align-items-center">
 				<div class="navigate-btn-container">
 					<a id="load-sequence-tab-btn" href="#" class="btn btn-primary active"
-					   data-tab-name="sequence"	title="<fmt:message key='tab.sequence' />">
+					   data-tab-name="sequence"	title="<fmt:message key='tab.dashboard' />">
 						<i class="fa fa-cubes fa-lg"></i>
 					</a>
 					<label for="load-sequence-tab-btn" class="d-none d-md-block">
-						<fmt:message key='tab.sequence' />
+						<fmt:message key='tab.dashboard' />
 					</label>
 				</div>
 				
