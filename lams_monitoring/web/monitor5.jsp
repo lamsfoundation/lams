@@ -502,9 +502,9 @@
 						<div>
 							<button id="editLessonNameButton" class="btn btn-sm btn-primary"
 									type="button"
-									title='Edit lesson name'>
+									title='<fmt:message key="button.edit.lesson.name"/>'>
 								<i class="fa fa-pencil"></i>
-								<span class="hidden-xs">Edit lesson name</span>
+								<span class="hidden-xs"><fmt:message key="button.edit.lesson.name"/></span>
 							</button>
 							
 							<button id="liveEditButton" class="btn btn-sm btn-primary" style="display:none"
