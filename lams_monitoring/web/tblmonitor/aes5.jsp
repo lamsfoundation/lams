@@ -10,7 +10,7 @@
 	var tblSelectedAeToolContentId = tblSelectedAeToolContentId || '${empty param.toolContentID ? aeToolContentIds[0] : param.toolContentID}';
 
 	$(document).ready(function(){
-		loadAePane(tblSelectedAeToolContentId);
+		loadAePane(tblSelectedAeToolContentId, 'studentChoices');
 		
 		// change attempted and all learners numbers
 		$('#aes-tab .nav-tabs li').bind('click', function (event) {

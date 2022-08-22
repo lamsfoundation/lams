@@ -328,27 +328,14 @@
 							</label>
 						</div>
 						
-						<c:if test="${not empty isIraMcqAvailable || not empty isIraAssessmentAvailable}">
-							<c:set var="iraMethodName">
-								<c:choose>
-									<c:when test="${not empty isIraMcqAvailable}">iraMcq</c:when>
-									<c:otherwise>iraAssessment</c:otherwise>
-								</c:choose>
-							</c:set>
-							
+						<c:if test="${not empty isIraAssessmentAvailable}">
 							<div class="navigate-btn-container">
-								<div class="btn-group-vertical" id="load-irat-btn-group">
-									<a id="load-irat-tab-btn" class="btn btn-primary" href="#"
-									   data-tab-name="irat"	title="<fmt:message key='label.ira' />">
-										<i class="fa fa-user fa-lg"></i>
-									</a>
-									<a id="load-irat-student-choices-tab-btn" class="btn btn-primary" href="#"
-									   data-tab-name="iratStudentChoices" title="iRAT student choices">
-										<i class="fa fa-list-check fa-lg"></i>
-									</a>
-								</div>
+								<a id="load-irat-tab-btn" class="btn btn-primary" href="#"
+								   data-tab-name="iratStudentChoices"	title="<fmt:message key='label.ira' />">
+									<i class="fa fa-user fa-lg"></i>
+								</a>
 								
-								<label for="load-irat-btn-group" class="d-none d-md-block">
+								<label for="load-irat-tab-btn" class="d-none d-md-block">
 									<fmt:message key='label.ira' />
 								</label>
 							</div>
@@ -356,18 +343,12 @@
 						
 						<c:if test="${not empty isScratchieAvailable}">
 							<div class="navigate-btn-container">
-								<div class="btn-group-vertical" id="load-irat-btn-group">
-									<a id="load-trat-tab-btn" class="btn btn-primary" href="#"
-									   data-tab-name="trat" title="<fmt:message key='label.tra' />">
-										<i class="fa fa-users fa-lg"></i>
-									</a>
-									<a id="load-trat-student-choices-tab-btn" class="btn btn-primary" href="#"
-									   data-tab-name="tratStudentChoices" title="tRAT student choices">
-										<i class="fa fa-list-check fa-lg"></i>
-									</a>
-								</div>
+								<a id="load-trat-tab-btn" class="btn btn-primary" href="#"
+									   data-tab-name="tratStudentChoices" title="<fmt:message key='label.tra' />">
+									<i class="fa fa-users fa-lg"></i>
+								</a>
 								
-								<label for="load-trat-btn-group" class="d-none d-md-block">
+								<label for="load-trat-tab-btn" class="d-none d-md-block">
 									<fmt:message key='label.tra' />
 								</label>
 							</div>
