@@ -97,26 +97,6 @@ function initCommonElements(){
 		loadTab($(this).data('tab-name'), this);
 	});
 	
-	$('#load-other-nvg-btn').click(function(){
-		let switchButton = $(this),
-			tblButtons = $('#tbl-navigate-btn-group'),
-			regularButtons = $('#navigate-btn-group'),
-			tblButtonsShown = tblButtons.hasClass('shown');
-		tblButtons.toggleClass('shown');
-		
-		if (tblButtonsShown) {
-			tblButtons.slideUp(function(){
-				regularButtons.slideDown();
-			});
-		} else {
-			regularButtons.slideUp(function(){
-				tblButtons.slideDown();
-			});
-		}
-		
-		$('i', switchButton).toggleClass('fa-angles-up fa-angles-down')
-	});
-	
 	// initialise dialogs
 	
 	// search for users with the term the Monitor entered
