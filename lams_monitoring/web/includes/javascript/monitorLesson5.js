@@ -2180,6 +2180,7 @@ function highlightSearchedLearner(icon) {
 	
 	setTimeout(function(){
 		clearInterval(toggleInterval);
+		icon.show();
 		//if the search box was cleared during blinking, act accordingly
 		if (!sequenceSearchedLearner) {
 			icon.removeClass('learner-searched');
