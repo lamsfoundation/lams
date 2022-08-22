@@ -1882,7 +1882,7 @@ function addActivityIcons(activity) {
 			});
 			
 			$.each(activity.learners, function(learnerIndex, learner){
-				if (learnerIndex >= 5 && activity.learnerCount > 6) {
+				if (learnerIndex >= 5) {
 					return false;					
 				}
 				$(definePortrait(learner.portraitId, learner.id, STYLE_SMALL, true, LAMS_URL))
@@ -1902,16 +1902,14 @@ function addActivityIcons(activity) {
 					  .appendTo(learnersContainer);
 			});
 			
-			if (activity.learnerCount > 6) {
-				allLearnersIcon
-					  .css({
-						'left'     : '140px',
-						'z-index'  : 108,
-						'margin-top' : '1px'
-					  })
-					  .text('+' + (activity.learnerCount - 5))
-					  .appendTo(learnersContainer);
-			}
+			allLearnersIcon
+				  .css({
+					'left'     : '140px',
+					'z-index'  : 108,
+					'margin-top' : '1px'
+				  })
+				  .text(activity.learnerCount)
+				  .appendTo(learnersContainer);
 		}
 		
 		if (requiresAttentionIcon) {
