@@ -507,6 +507,13 @@
 								<span class="hidden-xs">Edit lesson name</span>
 							</button>
 							
+							<button id="liveEditButton" class="btn btn-sm btn-primary" style="display:none"
+									type="button" onClick="javascript:openLiveEdit()"
+									title='<fmt:message key='button.live.edit.tooltip'/>'>
+								<i class="fa fa-pen-to-square"></i>
+								<span class="hidden-xs"><fmt:message key='button.live.edit'/></span>
+							</button>
+							
 							<button id="viewLearnersButton" class="btn btn-sm btn-primary"
 									type="button" onClick="javascript:showLessonLearnersDialog()"
 									title='<fmt:message key="button.view.learners.tooltip"/>'>

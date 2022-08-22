@@ -1483,13 +1483,6 @@ function updateSequenceTab() {
 	// clear all learner icons
 	$('.learner-icon, .more-learner-icon', '#canvas-container').remove();
 	
-	var sequenceTopButtonsContainer = $('#sequenceTopButtonsContainer');
-	if ($('img#sequenceCanvasLoading', sequenceTopButtonsContainer).length == 0){
-		$('#sequenceCanvasLoading')
-				.clone().appendTo(sequenceTopButtonsContainer)
-				.css('display', 'block');
-	}
-	
 	$.ajax({
 		dataType : 'json',
 		url : LAMS_URL + 'monitoring/monitoring/getLessonProgress.do',
@@ -1503,9 +1496,6 @@ function updateSequenceTab() {
 			$.each(response.activities, function(){
 				$('g[uiid="' + this.uiid + '"]', sequenceCanvas).attr('id', this.id);
 			});
-
-			// remove the loading animation
-			$('img#sequenceCanvasLoading', sequenceTopButtonsContainer).remove();
 
 			var learnerCount = 0;
 			$.each(response.activities, function(index, activity){
@@ -1610,25 +1600,21 @@ function updateSequenceTab() {
 function updateLiveEdit() {
 	if ( liveEditEnabled ) {
 		if ( lockedForEdit ) {
-			if ( userId == lockedForEditUserId ) {
-				$("#liveEditButton").removeClass('btn-default');
-				$("#liveEditButton").addClass('btn-primary');
+			if ( +userId == lockedForEditUserId ) {
+				$("#liveEditButton").removeClass('btn-primary');
+				$("#liveEditButton").addClass('btn-warning');
 				$("#liveEditButton").show();
 				$("#liveEditWarning").hide();
-				$("#liveEditWarning").text("");
 			} else {
-				$("#liveEditButton").removeClass('btn-primary');
-				$("#liveEditButton").addClass('btn-default');
 				$("#liveEditButton").hide();
 				$("#liveEditWarning").text(LABELS.LIVE_EDIT_WARNING.replace("%0",lockedForEditUsername));
 				$("#liveEditWarning").show();
 			}
 		} else {
-			$("#liveEditButton").removeClass('btn-primary');
-			$("#liveEditButton").addClass('btn-default');
+			$("#liveEditButton").removeClass('btn-warning');
+			$("#liveEditButton").addClass('btn-primary');
 			$("#liveEditButton").show();
 			$("#liveEditWarning").hide();
-			$("#liveEditWarning").text("");
 		}
 	} else {
 		$("#liveEditButton").hide();

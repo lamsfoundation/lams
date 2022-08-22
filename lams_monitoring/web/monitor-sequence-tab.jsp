@@ -4,13 +4,8 @@
 <div id="sequence-tab-content" class="container-fluid">
 	<div class="row">
 		<div class="col sequence-tab-layout-column">
+			<div style="display:none" class="text-danger fw-bold" id="liveEditWarning"></div>
 			<div id="canvas-container" class="svg-learner-draggable-area text-start monitoring-panel">
-				<div id="sequenceTopButtonsContainer" class="topButtonsContainer">
-					<a id="liveEditButton" class="btn btn-sm btn-secondary float-end" style="display:none" title="<fmt:message key='button.live.edit.tooltip'/>"
-				       href="#" onClick="javascript:openLiveEdit()">
-						<i class="fa fa-pencil"></i> <span class="hidden-xs"><fmt:message key='button.live.edit'/></span>
-					</a>
-				</div>
 				<div id="sequenceCanvas"></div>
 				<div id="completedLearnersContainer" class="mt-2" title="<fmt:message key='force.complete.end.lesson.tooltip' />">
 					<img id="completedLessonLearnersIcon" src="<lams:LAMSURL/>images/completed.svg" />
