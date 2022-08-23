@@ -108,6 +108,8 @@ function initializeAnswers() {
 	       	} else {
 	       		optionDisplayOrderSpan.removeClass('correctOption').css('filter', 'brightness(1)');
 	       	}
+
+			checkQuestionNewVersion();
 	    });
 	    //update slider's label with the initial value
 	    $('.slider').trigger('slide');

@@ -34,7 +34,7 @@
 				</a>
 				
 				<div class="btn-group btn-group-sm">
-					<a id="saveButton" type="button" class="btn btn-sm btn-default button-add-item" onClick="javascript:saveQuestion(false)">
+					<a id="saveButton" type="button" class="btn btn-sm btn-primary button-add-item" onClick="javascript:saveQuestion(false)">
 						<fmt:message key="button.save" />
 					</a>
 					<c:if test="${not isNewQuestion}">

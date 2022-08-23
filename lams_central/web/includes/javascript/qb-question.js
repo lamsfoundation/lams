@@ -19,8 +19,14 @@ function checkQuestionNewVersion(){
 	if (isNewQuestion) {
 		return;
 	}
-	$('#assessmentQuestionForm').attr('action', CHECK_QUESTION_NEW_VERSION_URL).data('validator').cancelSubmit = true;
-	$('#assessmentQuestionForm').submit();
+	let form = $('#assessmentQuestionForm'),
+		validator = form.data('validator');
+	if (!validator) {
+		return;
+	}
+	form.attr('action', CHECK_QUESTION_NEW_VERSION_URL);
+	validator.cancelSubmit = true;
+	form.submit();
 }
 
 function isVersionCheck() {
@@ -36,7 +42,9 @@ function afterRatingSubmit(responseText, statusText)  {
 function afterVersionCheck(responseText, statusText, c, d){
 	$('#assessmentQuestionForm').attr('action', SAVE_QUESTION_URL).data('validator').cancelSubmit = false;
 	// the controller produces true/false and is interpreted as JSON
-	$('#saveButton').toggle(!responseText);
+	let newVersion = responseText;
+	$('#saveButton').toggle(!newVersion);
+	$('#saveAsButton').toggleClass('btn-default', !newVersion).toggleClass('btn-primary', newVersion);
 }
 
 //form validation handler. It's called when the form contains an error.

@@ -36,7 +36,7 @@
 
 	$(document).ready(function(){
 		// trigger is-new-question-version check when changing certain data in a question
-		$('.option-grade-slider, .number, input[name="optionCorrect"]').change(checkQuestionNewVersion);
+		$('.number, input[name="optionCorrect"]').change(checkQuestionNewVersion);
 	});
 </script>
 <lams:JSImport src="includes/javascript/qb-question.js" />
