@@ -16,7 +16,7 @@
 		const VALIDATION_ERROR_LABEL = "<fmt:message key='error.form.validation.error'/>";
 		const VALIDATION_ERRORS_LABEL = "<fmt:message key='error.form.validation.errors'><fmt:param >{errors_counter}</fmt:param></fmt:message>";
 	</script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/qb-question.js"></script>
+	<lams:JSImport src="includes/javascript/qb-question.js" />
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>

@@ -23,7 +23,7 @@
 			
 			var isNewQuestion = ${isNewQuestion};
 		</script>
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/qb-question.js"></script>
+		<lams:JSImport src="includes/javascript/qb-question.js" />
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap-toggle.js"></script>
