@@ -41,6 +41,14 @@
 
 					</div>
 				</div>
+				<div class="col sequence-tab-layout-column d-none" id="lesson-instructions-panel">
+					<div class="monitoring-panel">
+						<h6><fmt:message key="tab.instructions.title" /></h6>
+						<div id="lesson-instructions-content" class="text-start">
+							<c:out value="${lesson.lessonInstructions}" escapeXml="false" />
+						</div>
+					</div>
+				</div>
 			</div>
 
 		</div>

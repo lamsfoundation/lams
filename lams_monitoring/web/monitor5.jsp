@@ -606,6 +606,11 @@
 	</div>
 </div>
 
+<c:if test="${not empty lesson.lessonInstructions}">
+	<div class="d-none" id="lesson-instructions-source">
+		<c:out value="${lesson.lessonInstructions}" escapeXml="false" />
+	</div>
+</c:if>
 
 <div id="learnerGroupDialogContents" class="dialogContainer">
 	<span id="learnerGroupMultiSelectLabel"><fmt:message key='learner.group.multi.select'/></span>

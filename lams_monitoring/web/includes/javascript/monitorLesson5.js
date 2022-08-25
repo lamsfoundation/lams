@@ -1456,6 +1456,12 @@ function updateSequenceTab() {
 	// clear all learner icons
 	$('.learner-icon, .more-learner-icon', '#canvas-container').remove();
 	
+	let lessonInstructionsSource = $('#lesson-instructions-source');
+	if (lessonInstructionsSource.length === 1) {
+		$('#lesson-instructions-content').html(lessonInstructionsSource.html())
+			.closest('#lesson-instructions-panel').removeClass('d-none');
+	}
+	
 	$.ajax({
 		dataType : 'json',
 		url : LAMS_URL + 'monitoring/monitoring/getLessonProgress.do',
