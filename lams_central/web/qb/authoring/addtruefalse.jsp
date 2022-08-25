@@ -29,8 +29,6 @@
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap-toggle.js"></script>
   	    <script>
 			$(document).ready(function(){
-				$('#correctAnswer').change(checkQuestionNewVersion);
-				
 		    	$("#assessmentQuestionForm").validate({
 		    		ignore: 'hidden, div.cke_editable',
 		    		rules: {

@@ -1,5 +1,10 @@
 //in order to use this js file, define const VALIDATION_ERROR_LABEL and VALIDATION_ERRORS_LABEL
 
+// do not check for new version more often than every 2 seconds
+let newQuestionVersionCheckTime = new Date().getTime,
+	newQuestionVersionCheckThrottle = 2000;
+
+
 $(document).ready(function(){
 	$("#question-settings-link").on('click', function() {
 		$('.question-tab:visible').fadeToggle("fast", function() {
@@ -11,14 +16,31 @@ $(document).ready(function(){
 
 		//toggle Settings button class
 		$(this).toggleClass("btn-default btn-primary");
+	});	
+
+	// trigger is-new-question-version check when changing certain data in a question
+	$('#assessmentQuestionForm').on('input', 'input, select, textarea', function(){
+		checkQuestionNewVersion(false);
+	}).on('change', function(){
+		checkQuestionNewVersion(true);
+	});
+	$('body').on('input paste', '[contenteditable]', function(){
+		checkQuestionNewVersion(false);
 	});
 });
 
 // submits whole question form in order to check if it changed enough to produce a new question version
-function checkQuestionNewVersion(){
+function checkQuestionNewVersion(quick){
 	if (isNewQuestion) {
 		return;
 	}
+	
+	let currentTime = new Date().getTime();
+	if (!quick && currentTime - newQuestionVersionCheckTime < newQuestionVersionCheckThrottle) {
+		return;
+	}
+	newQuestionVersionCheckTime = currentTime;
+	
 	let form = $('#assessmentQuestionForm'),
 		validator = form.data('validator');
 	if (!validator) {
@@ -44,7 +66,7 @@ function afterVersionCheck(responseText, statusText, c, d){
 	// the controller produces true/false and is interpreted as JSON
 	let newVersion = responseText;
 	$('#saveButton').toggle(!newVersion);
-	$('#saveAsButton').toggleClass('btn-default', !newVersion).toggleClass('btn-primary', newVersion);
+	$('#saveAsButton').toggle(newVersion).toggleClass('btn-primary', newVersion).toggleClass('btn-default', !newVersion);
 }
 
 //form validation handler. It's called when the form contains an error.

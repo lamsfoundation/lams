@@ -33,11 +33,6 @@
 		}
 		form.submit();
 	}
-
-	$(document).ready(function(){
-		// trigger is-new-question-version check when changing certain data in a question
-		$('.number, input[name="optionCorrect"]').change(checkQuestionNewVersion);
-	});
 </script>
 <lams:JSImport src="includes/javascript/qb-question.js" />
 <lams:JSImport src="includes/javascript/qb-option.js" />

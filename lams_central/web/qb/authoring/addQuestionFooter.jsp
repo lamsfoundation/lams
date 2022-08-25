@@ -38,7 +38,8 @@
 						<fmt:message key="button.save" />
 					</a>
 					<c:if test="${not isNewQuestion}">
-						<a id="saveAsButton" type="button" class="btn btn-sm btn-default button-add-item loffset10" onClick="javascript:saveQuestion(true)">
+						<a id="saveAsButton" type="button" class="btn btn-sm btn-default button-add-item loffset10" onClick="javascript:saveQuestion(true)"
+						   style="display: none">
 							<fmt:message key="button.save.new.version" />
 						</a>
 					</c:if>
