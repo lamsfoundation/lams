@@ -205,7 +205,7 @@
 				    	 	if (cellname == "mark") {
 				    	 		
 				    	 		var rowData = jQuery("#"+subgrid_table_id).getRowData(rowid);
-				    	 		var string = removeHTMLTags(rowData["mark"]);
+				    	 		var string = removeHTMLTags(value);
 				    	 		
 				    	 		
 				    	 		if (string.indexOf("-") != -1)
@@ -228,7 +228,7 @@
 				    	 	}
 				    	 },
 				    	 beforeSaveCell: function(rowid, cellname,value, iRow, iCol){
-				    	 	value = trim(value);
+				    	 	value = value ? value.trim() : value;
 				    	 	
 				    	 	if (cellname == "mark") {
 				    	 		if (value == "") {
@@ -548,7 +548,7 @@
 				    	 	}
 				    	 },
 				    	 beforeSaveCell: function(rowid, cellname,value, iRow, iCol){
-				    	 	value = trim(value);
+				    		 value = value ? value.trim() : value;
 				    	 	
 				    	 	if (cellname == "mark") {
 				    	 		if (value == "") {

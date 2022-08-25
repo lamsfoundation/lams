@@ -3066,3 +3066,9 @@ function printTable() {
         printWindow.close();
     }, 100);
 }
+
+// Removes html tags from a string
+function removeHTMLTags(string) {
+ 	var strTagStrippedText = string.replace(/<\/?[^>]+(>|$)/g, "");
+ 	return strTagStrippedText;
+}
