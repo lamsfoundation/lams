@@ -657,6 +657,15 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     }
 
     /**
+     * Tells whether burning questions are enabled in the given activity
+     */
+    @Override
+    public boolean isBurningQuestionsEnabled(long toolContentId) {
+	Scratchie scratchie = getScratchieByContentId(toolContentId);
+	return scratchie != null && scratchie.isBurningQuestionsEnabled();
+    }
+
+    /**
      * Counts how many questions were answered correctly on first attempt by the given user, regardless of mark given.
      */
     @Override

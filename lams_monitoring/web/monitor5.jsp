@@ -321,15 +321,17 @@
 							</label>
 						</div>
 						
-						<div class="navigate-btn-container">
-							<a id="load-burning-tab-btn" class="btn btn-primary" href="#"
-							   data-tab-name="burningQuestions" title="<fmt:message key='label.monitoring.burning.questions' />">
-								<i class="fa fa-question-circle fa-lg"></i>
-							</a>
-							<label for="load-burning-tab-btn" class="d-none d-md-block">
-								<fmt:message key='label.monitoring.burning.questions' />
-							</label>
-						</div>
+						<c:if test="${burningQuestionsEnabled}">
+							<div class="navigate-btn-container">
+								<a id="load-burning-tab-btn" class="btn btn-primary" href="#"
+								   data-tab-name="burningQuestions" title="<fmt:message key='label.monitoring.burning.questions' />">
+									<i class="fa fa-question-circle fa-lg"></i>
+								</a>
+								<label for="load-burning-tab-btn" class="d-none d-md-block">
+									<fmt:message key='label.monitoring.burning.questions' />
+								</label>
+							</div>
+						</c:if>
 					</c:if>
 					
 					<c:if test="${not empty isAeAvailable}">

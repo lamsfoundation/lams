@@ -16,4 +16,9 @@ public interface ICommonScratchieService {
      * Returns VS answers which require allocation for the given activity
      */
     Map<QbToolQuestion, Map<String, Integer>> getUnallocatedVSAnswers(long toolContentId);
+
+    /**
+     * Tells whether burning questions are enabled in the given activity
+     */
+    boolean isBurningQuestionsEnabled(long toolContentId);
 }

@@ -84,6 +84,7 @@ import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
+import org.lamsfoundation.lams.tool.service.ICommonScratchieService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -156,6 +157,9 @@ public class MonitoringController {
     private MessageService messageService;
     @Autowired
     private IAuthoringService authoringService;
+    @Autowired
+    @Qualifier("scratchieService")
+    private ICommonScratchieService commonScratchieService;
 
     public MonitoringController() {
 	// bind sinks so a learner finishing an activity also triggers an update in lesson progress
@@ -1018,6 +1022,14 @@ public class MonitoringController {
 	if (isTBLSequence && useNewUI) {
 	    List<Activity> lessonActivities = getLessonActivities(lessonService.getLesson(lessonId));
 	    TblMonitoringController.setupAvailableActivityTypes(request, lessonActivities);
+
+	    boolean burningQuestionsEnabled = false;
+	    Long traToolActivityId = (Long) request.getAttribute("traToolActivityId");
+	    if (traToolActivityId != null) {
+		long traToolContentId = activityDAO.find(ToolActivity.class, traToolActivityId).getToolContentId();
+		burningQuestionsEnabled = commonScratchieService.isBurningQuestionsEnabled(traToolContentId);
+	    }
+	    request.setAttribute("burningQuestionsEnabled", burningQuestionsEnabled);
 	}
 
 	return "monitor" + (useNewUI ? "5" : "");
