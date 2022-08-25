@@ -82,6 +82,17 @@
 		}
 	}
 
+	/*
+		Expands all subgrids of the given jqGrid.
+	*/
+	function expandAllRows(jqGridId) {
+		let jqGrid = $('#' + jqGridId),
+			ids = jqGrid.getDataIDs();
+		$.each(ids, function(){
+			jqGrid.expandSubGridRow(this);
+		});
+	}
+
 	jQuery(document).ready(function(){
 		var jqgridWidth = $(window).width() - 100;
 		
@@ -734,7 +745,7 @@
 <div class="gbTopButtonsContainer d-flex justify-content-end" id="export-link-area">
 
 	<div>
-		<button type="button" id="export-grades-button" class="btn btn-sm btn-secondary" title="<fmt:message key='gradebook.export.excel'/>" >
+		<button type="button" id="export-grades-button" class="btn btn-secondary" title="<fmt:message key='gradebook.export.excel'/>" >
 			<i class="fa-solid fa-download"></i><span id="exportSpan" class="hidden-xs">
 			<fmt:message key="gradebook.export.excel" />
 			</span>
@@ -742,7 +753,7 @@
 	</div>
 
 	<div id="tour-release-marks">
-		<button type="button" onClick="javascript:toggleReleaseMarksPanel()" class="btn btn-sm btn-secondary" 
+		<button type="button" onClick="javascript:toggleReleaseMarksPanel()" class="btn btn-secondary" 
 			title="<fmt:message key="gradebook.monitor.releasemarks.toggle.panel.tooltip" />">
 			<i class="fa-solid fa-share-alt "></i> <span class="hidden-xs">
 				<fmt:message key="gradebook.monitor.releasemarks.toggle.panel" />
@@ -752,14 +763,14 @@
 
 	<div id="tour-mark-chart-button">
 		<div id="markChartShown" style="display:none">
-			<button type="button" onClick="javascript:toggleMarkChart()" class="btn btn-sm btn-secondary" title="<fmt:message key='label.hide.marks.chart'/>" >
+			<button type="button" onClick="javascript:toggleMarkChart()" class="btn btn-secondary" title="<fmt:message key='label.hide.marks.chart'/>" >
 				<i class="fa-solid fa-bar-chart"></i> <span class="hidden-xs">
 				<fmt:message key="label.hide.marks.chart"/>
 				</span>
 			</button> 
 		</div>
 		<div id="markChartHidden">
-			<button type="button" onClick="javascript:toggleMarkChart()" class="btn btn-sm btn-secondary" title="<fmt:message key='label.show.marks.chart'/>" >
+			<button type="button" onClick="javascript:toggleMarkChart()" class="btn btn-secondary" title="<fmt:message key='label.show.marks.chart'/>" >
 				<i class="fa-solid fa-bar-chart"></i> <span class="hidden-xs">
 				<fmt:message key="label.show.marks.chart"/>
 				</span>
@@ -770,7 +781,7 @@
 	<c:if test="${usesWeights}">
 		<div id="tour-weight-button">
 			<div id="weightShown" style="display:none">
-			<button type="button" onClick="javascript:toggleWeight()" class="btn btn-sm btn-secondary" title="<fmt:message key='label.button.hide.weights'/>" >
+			<button type="button" onClick="javascript:toggleWeight()" class="btn btn-secondary" title="<fmt:message key='label.button.hide.weights'/>" >
 				<i class="fa-solid fa-balance-scale"></i> <span class="hidden-xs">
 				<fmt:message key="label.button.hide.weights"/>
 				</span>
@@ -825,12 +836,16 @@
 	</div>	
 </c:if>
 
-<div class="grid-holder voffset20 mt-5">
+<div class="grid-holder mt-4">
+	<div class="d-flex flex-row-reverse mb-2">
+		<button class="btn btn-secondary btn-sm" onClick="javascript:expandAllRows('userView')"><fmt:message key="gradebook.grid.expand.all"/></button>
+	</div>
 	<table id="userView" class="scroll" ></table>
 	<div id="userViewPager" class="scroll" ></div>
 	
-	<br />
-	<br />
+	<div class="d-flex flex-row-reverse mt-4 mb-2">
+		<button class="btn btn-secondary btn-sm" onClick="javascript:expandAllRows('activityView')"><fmt:message key="gradebook.grid.expand.all"/></button>
+	</div>
 	
 	<table id="activityView" class="scroll" ></table>
 	<div id="activityViewPager" class="scroll" ></div>
