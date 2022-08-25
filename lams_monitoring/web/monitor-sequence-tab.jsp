@@ -28,8 +28,17 @@
 					<div id="completion-chart-panel" class="monitoring-panel">
 						<h6><fmt:message key="lesson.chart.title"/></h6>
 						<div class="panel-body">
-							<canvas id="completion-chart" height="600px" width="240px"></canvas>
+							<canvas id="completion-chart" height="300px" width="240px"></canvas>
+							<div class="mt-3 row">
+								<div class="col-6 offset-md-2 text-end"><fmt:message key="lesson.ratio.learners.started"/></div>
+								<div class="col-2 text-start" id="learner-started-count"></div>
+							</div>
+							<div class="row">
+								<div class="col col-6 offset-md-2 text-end"><fmt:message key="lesson.ratio.learners.total"/></div>
+								<div class="col-2 text-start" id="learner-total-count"></div>
+							</div>
 						</div>
+
 					</div>
 				</div>
 			</div>

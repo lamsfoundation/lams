@@ -974,14 +974,7 @@ function drawLessonCompletionChart(){
 								animateRotate : true,
 								duration : 1000
 							}
-						},
-						plugins: [{
-						    beforeInit: function(chart) {
-						      chart.legend.afterFit = function() {
-						        this.height = this.height + 230;
-						      };
-						    }
-						}]
+						}
 					});
 			
 				lessonCompletionChart.lessonCompletionChartRawData = raw;
@@ -1545,7 +1538,8 @@ function updateSequenceTab() {
 			}
 			
 			var learnerTotalCount = learnerCount + response.completedLearnerCount;
-			// $('#learnersStartedPossibleCell').html('<span id="tour-learner-count">'+learnerTotalCount + ' / ' + response.numberPossibleLearners+'</span>');
+			$('#learner-started-count').text(learnerTotalCount);
+			$('#learner-total-count').text(response.numberPossibleLearners);
 			addCompletedLearnerIcons(response.completedLearners, response.completedLearnerCount, learnerTotalCount);
 			
 			$.each(response.activities, function(activityIndex, activity){
