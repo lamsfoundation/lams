@@ -1,7 +1,8 @@
 //in order to use this js file, define const VALIDATION_ERROR_LABEL and VALIDATION_ERRORS_LABEL
 
-// do not check for new version more often than every 2 seconds
-let newQuestionVersionCheckTime = new Date().getTime,
+// skip initial check of new version
+let newQuestionVersionCheckTime = new Date().getTime() + 1000,
+	// do not check for new version more often than every 2 seconds
 	newQuestionVersionCheckThrottle = 2000;
 
 
@@ -36,7 +37,8 @@ function checkQuestionNewVersion(quick){
 	}
 	
 	let currentTime = new Date().getTime();
-	if (!quick && currentTime - newQuestionVersionCheckTime < newQuestionVersionCheckThrottle) {
+	// skip initial check of new version
+	if (currentTime < newQuestionVersionCheckTime || (!quick && currentTime - newQuestionVersionCheckTime < newQuestionVersionCheckThrottle)) {
 		return;
 	}
 	newQuestionVersionCheckTime = currentTime;
@@ -66,7 +68,7 @@ function afterVersionCheck(responseText, statusText, c, d){
 	// the controller produces true/false and is interpreted as JSON
 	let newVersion = responseText;
 	$('#saveButton').toggle(!newVersion);
-	$('#saveAsButton').toggle(newVersion).toggleClass('btn-primary', newVersion).toggleClass('btn-default', !newVersion);
+	$('#saveAsButton').show().toggleClass('btn-primary', newVersion).toggleClass('btn-default', !newVersion);
 }
 
 //form validation handler. It's called when the form contains an error.

@@ -76,7 +76,7 @@ function initializeAnswers() {
 	           	var initialValue = $(this).next("input").val();
 	           	$(this).slider('value', initialValue);
 	        }
-	    }).on('slide',function(event,ui){
+	    }).on('slide',function(event, ui){
 	        //ui is not available at the initial call 
 	        var newValueInt = ui ? eval(ui.value) : eval($(this).slider('value'));
 		        
@@ -109,7 +109,9 @@ function initializeAnswers() {
 	       		optionDisplayOrderSpan.removeClass('correctOption').css('filter', 'brightness(1)');
 	       	}
 
-			checkQuestionNewVersion();
+			if (ui) {
+				checkQuestionNewVersion();
+			}
 	    });
 	    //update slider's label with the initial value
 	    $('.slider').trigger('slide');
