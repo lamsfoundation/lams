@@ -1,5 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams"><lams:LAMSURL/></c:set>
+<c:set var="isNewQuestion" value="${assessmentQuestionForm.uid eq -1}" />
 
  <!-- ********************  CSS ********************** -->
 <lams:css />
@@ -15,10 +16,14 @@
 <script type="text/javascript">
 	const QUESTION_TYPE = ${questionType};
 	const ADD_OPTION_URL = "/lams/qb/edit/addOption.do";
+	const CHECK_QUESTION_NEW_VERSION_URL = "/lams/qb/edit/checkQuestionNewVersion.do";
+	const SAVE_QUESTION_URL = "/lams/qb/edit/saveOrUpdateQuestion.do";
 	const CONFIRM_DELETE_ANSWER_LABEL = "<fmt:message key="label.do.you.want.to.delete.answer"></fmt:message>";
 	const SLIDER_NONE_LABEL = "<fmt:message key="label.authoring.basic.none" />";
 	const VALIDATION_ERROR_LABEL = "<fmt:message key='error.form.validation.error'/>";
 	const VALIDATION_ERRORS_LABEL = "<fmt:message key='error.form.validation.errors'><fmt:param >{errors_counter}</fmt:param></fmt:message>";
+
+	var isNewQuestion = ${isNewQuestion};
 	
 	function saveQuestion(isNewVersion) {
 		let form = $('#assessmentQuestionForm');
@@ -29,8 +34,8 @@
 		form.submit();
 	}
 </script>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/qb-question.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/qb-option.js"></script>
+<lams:JSImport src="includes/javascript/qb-question.js" />
+<lams:JSImport src="includes/javascript/qb-option.js" />
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>

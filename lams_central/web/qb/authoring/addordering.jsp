@@ -47,17 +47,18 @@
 		    			$("#feedbackOnIncorrect").val(CKEDITOR.instances.feedbackOnIncorrect.getData());
 		    			$("#new-collection-uid").val($("#collection-uid-select option:selected").val());
 		    			
-		    	    	var options = { 
-		    	    		target:  parent.jQuery('#itemArea'), 
-		    		   		success: afterRatingSubmit  // post-submit callback
-		    		    }; 				
+		    	    	var isVersionBeingChecked = isVersionCheck(),
+		    	    		options = { 
+			    	    		target:  isVersionBeingChecked ? null : parent.jQuery('#itemArea'), 
+			    	    		dataType : isVersionBeingChecked? 'json' : null, 
+			    		   		success: isVersionBeingChecked? afterVersionCheck : afterRatingSubmit  // post-submit callback
+			    		    };					
 		    		    				
 		    			$('#assessmentQuestionForm').ajaxSubmit(options);
 		    		},
 		    		invalidHandler: formValidationInvalidHandler,
 					errorElement: "em",
 					errorPlacement: formValidationErrorPlacement,
-					success: formValidationSuccess,
 					highlight: formValidationHighlight,
 					unhighlight: formValidationUnhighlight
 		  		});

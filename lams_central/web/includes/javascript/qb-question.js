@@ -1,5 +1,11 @@
 //in order to use this js file, define const VALIDATION_ERROR_LABEL and VALIDATION_ERRORS_LABEL
 
+// skip initial check of new version
+let newQuestionVersionCheckTime = new Date().getTime() + 1000,
+	// do not check for new version more often than every 2 seconds
+	newQuestionVersionCheckThrottle = 2000;
+
+
 $(document).ready(function(){
 	$("#question-settings-link").on('click', function() {
 		$('.question-tab:visible').fadeToggle("fast", function() {
@@ -11,13 +17,58 @@ $(document).ready(function(){
 
 		//toggle Settings button class
 		$(this).toggleClass("btn-default btn-primary");
+	});	
+
+	// trigger is-new-question-version check when changing certain data in a question
+	$('#assessmentQuestionForm').on('input', 'input, select, textarea', function(){
+		checkQuestionNewVersion(false);
+	}).on('change', function(){
+		checkQuestionNewVersion(true);
+	});
+	$('body').on('input paste', '[contenteditable]', function(){
+		checkQuestionNewVersion(false);
 	});
 });
+
+// submits whole question form in order to check if it changed enough to produce a new question version
+function checkQuestionNewVersion(quick){
+	if (isNewQuestion) {
+		return;
+	}
+	
+	let currentTime = new Date().getTime();
+	// skip initial check of new version
+	if (currentTime < newQuestionVersionCheckTime || (!quick && currentTime - newQuestionVersionCheckTime < newQuestionVersionCheckThrottle)) {
+		return;
+	}
+	newQuestionVersionCheckTime = currentTime;
+	
+	let form = $('#assessmentQuestionForm'),
+		validator = form.data('validator');
+	if (!validator) {
+		return;
+	}
+	form.attr('action', CHECK_QUESTION_NEW_VERSION_URL);
+	validator.cancelSubmit = true;
+	form.submit();
+}
+
+function isVersionCheck() {
+	return $('#assessmentQuestionForm').attr('action') == CHECK_QUESTION_NEW_VERSION_URL;	
+}
 
 // post-submit callback 
 function afterRatingSubmit(responseText, statusText)  { 
 	self.parent.refreshThickbox()
 	self.parent.tb_remove();
+}
+
+function afterVersionCheck(responseText, statusText, c, d){
+	$('#assessmentQuestionForm').attr('action', SAVE_QUESTION_URL).data('validator').cancelSubmit = false;
+	// the controller produces true/false and is interpreted as JSON
+	let newVersion = responseText;
+	$('#saveButton').toggle(!newVersion);
+	$('#saveAsButton').show().toggleClass('btn-primary', newVersion).toggleClass('btn-default', !newVersion);
 }
 
 //form validation handler. It's called when the form contains an error.
@@ -64,12 +115,7 @@ function formValidationErrorPlacement( error, element ) {
 		$( "<span class='fa fa-remove form-control-feedback'></span>" ).insertAfter( element );
 	}
 }
-function formValidationSuccess ( label, element ) {
-	// Add the span element, if doesn't exists, and apply the icon classes to it.
-	if ( !$( element ).next( "span" )[ 0 ] ) {
-		//$( "<span class='fa fa-check form-control-feedback'></span>" ).insertAfter( $( element ) );
-	}
-}
+
 function formValidationHighlight ( element, errorClass, validClass ) {
 	$( element ).parent().addClass( "has-error" ).removeClass( "has-success" );
 	$( element ).next( "span" ).addClass( "fa-remove" ).removeClass( "fa-check" );
