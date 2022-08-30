@@ -37,6 +37,11 @@
 								<div class="col col-6 offset-md-2 text-end"><fmt:message key="lesson.ratio.learners.total"/></div>
 								<div class="col-2 text-start" id="learner-total-count"></div>
 							</div>
+							<div id="lesson-time-limits" class="d-none mt-3">
+								<div class="text-center fw-bold mb-1">
+									<fmt:message key="label.monitoring.time.limit"/>
+								</div>
+							</div>
 						</div>
 
 					</div>

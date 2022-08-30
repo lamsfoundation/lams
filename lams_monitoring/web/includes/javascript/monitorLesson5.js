@@ -614,8 +614,12 @@ function loadTab(tabName, button) {
 	
 	clearEventSources();
 	
-	let tabContent = $('.monitoring-page-content .tab-content').empty(),
+	
+	let tabContent = $('.monitoring-page-content .tab-content'),
 		searchStudentWidget = $('#sequenceSearchPhraseContainer');
+		
+	$('.is-countdown', tabContent).countdown('destroy');
+	tabContent.empty();
 		
 	switch(tabName) {
 		case 'sequence': {
@@ -1573,6 +1577,34 @@ function updateSequenceTab() {
 			updateLiveEdit();
 			
 			updateContributeActivities(response.contributeActivities);
+			
+			let timeLimitsDiv = $('#lesson-time-limits').toggleClass('d-none', !response.timeLimits);
+			if (response.timeLimits) {
+				$('.is-countdown', timeLimitsDiv).countdown('destroy').closest('.row').remove();
+				
+				$.each(response.timeLimits, function(){
+					let timeLimit = this,
+						row = $('<div class="row" />').appendTo(timeLimitsDiv)
+					$('<div class="col col-6 text-end" />').text(timeLimit.activityTitle).appendTo(row);
+					$('<div class="col-2 text-start" />')
+						.appendTo(row)
+						.countdown({
+							until: '+' + timeLimit.secondsLeft +'S',
+							format: 'hMS',
+							compact: true,
+							alwaysExpire : false,
+							onTick: function(periods) {
+								// check for 30 seconds or less and display timer in red
+								var secondsLeft = $.countdown.periodsToSeconds(periods);
+								if (secondsLeft <= 30) {
+									$(this).addClass('countdown-timeout');
+								} else {
+									$(this).removeClass('countdown-timeout');
+								}
+							}
+						});
+				});
+			}
 		}
 	});
 }

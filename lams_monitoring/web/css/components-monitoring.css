@@ -154,6 +154,11 @@
 	text-align: center;	
 }
 
+  		
+.monitoring-page-wrapper #sequence-tab-content .countdown-timeout {
+	color: var(--bs-red) !important;
+}
+
 .monitoring-page-wrapper #sequence-tab-content .sequence-tab-layout-column {
 	margin-bottom: 2rem;
 	padding-right: 0;

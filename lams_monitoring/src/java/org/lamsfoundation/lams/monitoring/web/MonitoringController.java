@@ -1033,8 +1033,6 @@ public class MonitoringController {
 	    request.setAttribute("burningQuestionsEnabled", burningQuestionsEnabled);
 	}
 
-	List<ActivityTimeLimitDTO> absoluteTimeLimits = lessonService.getRunningAbsoluteTimeLimits(lessonId);
-
 	return "monitor" + (useNewUI ? "5" : "");
     }
 
@@ -1374,6 +1372,11 @@ public class MonitoringController {
 	    } else {
 		responseJSON.put("lockedForEdit", false);
 	    }
+	}
+
+	List<ActivityTimeLimitDTO> absoluteTimeLimits = lessonService.getRunningAbsoluteTimeLimits(lessonId);
+	if (!absoluteTimeLimits.isEmpty()) {
+	    responseJSON.set("timeLimits", JsonUtil.readArray(absoluteTimeLimits));
 	}
 
 	response.setContentType("application/json;charset=utf-8");

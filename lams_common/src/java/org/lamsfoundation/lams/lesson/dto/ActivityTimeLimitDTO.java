@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.lesson.dto;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 public class ActivityTimeLimitDTO {
     private Long activityId;
@@ -21,7 +22,7 @@ public class ActivityTimeLimitDTO {
 	return activityTitle;
     }
 
-    public LocalDateTime getAbsoluteTimeLimit() {
-	return absoluteTimeLimit;
+    public long getSecondsLeft() {
+	return ChronoUnit.SECONDS.between(LocalDateTime.now(), absoluteTimeLimit);
     }
 }
