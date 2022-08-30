@@ -110,7 +110,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 	    + "<ADDITIONAL_TOOLS_PLACEHOLDER>) AS absolute_time_limit "
 	    + "FROM lams_lesson AS l JOIN lams_learning_activity AS a USING (learning_design_id) "
 	    + "WHERE l.lesson_id = :lessonId AND a.tool_content_id IS NOT NULL    "
-	    + "HAVING absolute_time_limit > NOW() ORDER BY absolute_time_limit";
+	    + "HAVING absolute_time_limit > UTC_TIMESTAMP() ORDER BY absolute_time_limit";
 
     /**
      * Retrieves the Lesson. Used in instances where it cannot be lazy loaded so it forces an initialize.
