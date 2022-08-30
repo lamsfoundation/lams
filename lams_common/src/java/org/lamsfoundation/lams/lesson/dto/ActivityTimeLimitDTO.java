@@ -4,18 +4,18 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 public class ActivityTimeLimitDTO {
-    private Long activityId;
+    private Long toolContentId;
     private String activityTitle;
     private LocalDateTime absoluteTimeLimit;
 
-    public ActivityTimeLimitDTO(Long activityId, String activityTitle, LocalDateTime absoluteTimeLimit) {
-	this.activityId = activityId;
+    public ActivityTimeLimitDTO(Long toolContentId, String activityTitle, LocalDateTime absoluteTimeLimit) {
+	this.toolContentId = toolContentId;
 	this.activityTitle = activityTitle;
 	this.absoluteTimeLimit = absoluteTimeLimit;
     }
 
-    public Long getActivityId() {
-	return activityId;
+    public Long getToolContentId() {
+	return toolContentId;
     }
 
     public String getActivityTitle() {

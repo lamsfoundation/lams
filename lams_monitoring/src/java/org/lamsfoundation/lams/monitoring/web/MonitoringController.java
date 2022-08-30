@@ -105,6 +105,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -176,6 +177,10 @@ public class MonitoringController {
 	FluxRegistry.initFluxMap(MonitoringConstants.GRADEBOOK_REFRESH_FLUX_NAME,
 		CommonConstants.LESSON_PROGRESSED_SINK_NAME, null, lessonId -> "doRefresh", FluxMap.STANDARD_THROTTLE,
 		FluxMap.STANDARD_TIMEOUT);
+	FluxRegistry.initFluxMap(MonitoringConstants.TIME_LIMIT_REFRESH_FLUX_NAME,
+		CommonConstants.ACTIVITY_TIME_LIMIT_CHANGED_SINK_NAME,
+		(Collection<Long> key, Collection<Long> item) -> key.containsAll(item), toolContentIds -> "doRefresh",
+		FluxMap.SHORT_THROTTLE, FluxMap.STANDARD_TIMEOUT);
     }
 
     private Integer getUserId() {
@@ -206,6 +211,13 @@ public class MonitoringController {
     public Flux<String> getGradebookUpdateFlux(@RequestParam long lessonId)
 	    throws JsonProcessingException, IOException {
 	return FluxRegistry.get(MonitoringConstants.GRADEBOOK_REFRESH_FLUX_NAME, lessonId);
+    }
+
+    @RequestMapping(path = "/getTimeLimitUpdateFlux", method = RequestMethod.GET, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @ResponseBody
+    public Flux<String> getTimeLimitUpdateFlux(@RequestParam Set<Long> toolContentIds)
+	    throws JsonProcessingException, IOException {
+	return FluxRegistry.get(MonitoringConstants.TIME_LIMIT_REFRESH_FLUX_NAME, toolContentIds);
     }
 
     /**
@@ -1617,6 +1629,22 @@ public class MonitoringController {
 	}
 
 	return "timer";
+    }
+
+    @GetMapping("/getTimeLimits")
+    @ResponseBody
+    public String getTimeLimits(@RequestParam long lessonID, HttpServletResponse response) throws IOException {
+	ArrayNode responseJSON = null;
+
+	List<ActivityTimeLimitDTO> absoluteTimeLimits = lessonService.getRunningAbsoluteTimeLimits(lessonID);
+	if (absoluteTimeLimits.isEmpty()) {
+	    responseJSON = JsonNodeFactory.instance.arrayNode();
+	} else {
+	    responseJSON = JsonUtil.readArray(absoluteTimeLimits);
+	}
+
+	response.setContentType("application/json;charset=utf-8");
+	return responseJSON.toString();
     }
 
     /**

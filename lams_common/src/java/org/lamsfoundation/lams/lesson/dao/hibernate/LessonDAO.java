@@ -104,7 +104,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
     private final static String FIND_LESSON_IDS_BY_ORG_ID = "SELECT lesson.lessonId FROM " + Lesson.class.getName()
 	    + " AS lesson WHERE lesson.organisation.organisationId = :organisationId";
 
-    private final static String FIND_ABSOLUTE_TIME_LIMITS = "SELECT a.activity_id AS activityId, a.title AS activityTitle, "
+    private final static String FIND_ABSOLUTE_TIME_LIMITS = "SELECT a.tool_content_id AS toolContentId, a.title AS activityTitle, "
 	    + "(SELECT absolute_time_limit FROM tl_lascrt11_scratchie WHERE content_id = tool_content_id UNION "
 	    + "	SELECT absolute_time_limit FROM tl_laasse10_assessment WHERE content_id = tool_content_id "
 	    + "<ADDITIONAL_TOOLS_PLACEHOLDER>) AS absolute_time_limit "

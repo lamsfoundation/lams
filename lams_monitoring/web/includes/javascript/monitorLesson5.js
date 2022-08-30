@@ -1578,35 +1578,66 @@ function updateSequenceTab() {
 			
 			updateContributeActivities(response.contributeActivities);
 			
-			let timeLimitsDiv = $('#lesson-time-limits').toggleClass('d-none', !response.timeLimits);
+			// set up flux for updating time limits on dashboard
 			if (response.timeLimits) {
-				$('.is-countdown', timeLimitsDiv).countdown('destroy').closest('.row').remove();
-				
+				let timeLimitFluxUrl = LAMS_URL + 'monitoring/monitoring/getTimeLimitUpdateFlux.do?';
 				$.each(response.timeLimits, function(){
-					let timeLimit = this,
-						row = $('<div class="row" />').appendTo(timeLimitsDiv)
-					$('<div class="col col-6 text-end" />').text(timeLimit.activityTitle).appendTo(row);
-					$('<div class="col-2 text-start" />')
-						.appendTo(row)
-						.countdown({
-							until: '+' + timeLimit.secondsLeft +'S',
-							format: 'hMS',
-							compact: true,
-							alwaysExpire : false,
-							onTick: function(periods) {
-								// check for 30 seconds or less and display timer in red
-								var secondsLeft = $.countdown.periodsToSeconds(periods);
-								if (secondsLeft <= 30) {
-									$(this).addClass('countdown-timeout');
-								} else {
-									$(this).removeClass('countdown-timeout');
-								}
-							}
-						});
+					// it is a list of tool content IDs to which the dashboard will react and update time limits
+					timeLimitFluxUrl += 'toolContentIds=' + this.toolContentId + '&';
+				});
+				
+				openEventSource(timeLimitFluxUrl,
+					function (event) {
+						if ("doRefresh" == event.data && $('#sequence-tab-content').length === 1){
+							updateTimeLimits();
+						}
 				});
 			}
 		}
 	});
+}
+
+/**
+	Gets running absolute time limits for the lesson and displays them as countdown timers
+ */
+function updateTimeLimits(){
+	$.ajax({
+		dataType : 'json',
+		url : LAMS_URL + 'monitoring/monitoring/getTimeLimits.do',
+		cache : false,
+		data : {
+			'lessonID'  : lessonId
+		},		
+		success : function(timeLimits) {
+			let timeLimitsDiv = $('#lesson-time-limits').toggleClass('d-none', timeLimits.length === 0);
+			$('.is-countdown', timeLimitsDiv).countdown('destroy').closest('.row').remove();
+			
+			$.each(timeLimits, function(){
+				let timeLimit = this,
+					row = $('<div class="row" />').appendTo(timeLimitsDiv)
+				$('<div class="col col-6 text-end" />').text(timeLimit.activityTitle).appendTo(row);
+				$('<div class="col-2 text-start" />')
+					.appendTo(row)
+					.countdown({
+						until: '+' + timeLimit.secondsLeft +'S',
+						format: 'hMS',
+						compact: true,
+						alwaysExpire : false,
+						onTick: function(periods) {
+							// check for 30 seconds or less and display timer in red
+							var secondsLeft = $.countdown.periodsToSeconds(periods);
+							if (secondsLeft <= 30) {
+								$(this).addClass('countdown-timeout');
+							} else {
+								$(this).removeClass('countdown-timeout');
+							}
+						}
+					});
+			});
+		}
+	});
+	
+	
 }
 
 function updateLiveEdit() {

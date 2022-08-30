@@ -76,4 +76,6 @@ public class CommonConstants {
     public static final String LESSON_JOINED_SINK_NAME = "lesson joined by learner";
     // updated when a there was a change to lesson progress
     public static final String LESSON_PROGRESSED_SINK_NAME = "lesson progress changed";
+    // updated when time limit changes in an activity
+    public static final String ACTIVITY_TIME_LIMIT_CHANGED_SINK_NAME = "activity time limit changed";
 }
