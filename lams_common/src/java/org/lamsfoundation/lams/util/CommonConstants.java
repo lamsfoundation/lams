@@ -45,6 +45,7 @@ public class CommonConstants {
 
     public static final String TOOL_SIGNATURE_ASSESSMENT = "laasse10";
     public static final String TOOL_SIGNATURE_DOKU = "ladoku11";
+    public static final String TOOL_SIGNATURE_WHITEBOARD = "lawhiteboard11";
     public static final String TOOL_SIGNATURE_FORUM = "lafrum11";
     public static final String TOOL_SIGNATURE_LEADERSELECTION = "lalead11";
     public static final String TOOL_SIGNATURE_MCQ = "lamc11";

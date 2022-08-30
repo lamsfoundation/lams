@@ -72,6 +72,7 @@ import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.dto.ActivityTimeLimitDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.lesson.util.LearnerActivityCompleteFluxItem;
@@ -1031,6 +1032,8 @@ public class MonitoringController {
 	    }
 	    request.setAttribute("burningQuestionsEnabled", burningQuestionsEnabled);
 	}
+
+	List<ActivityTimeLimitDTO> absoluteTimeLimits = lessonService.getRunningAbsoluteTimeLimits(lessonId);
 
 	return "monitor" + (useNewUI ? "5" : "");
     }

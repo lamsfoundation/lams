@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.dto.ActivityTimeLimitDTO;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
@@ -215,4 +216,9 @@ public interface ILessonDAO extends IBaseDAO {
      * or a Hibernate error occurs. So we need a way to get the ids withouth calling Organisation.getLessons()
      */
     List<Long> getOrganisationLessons(Integer organisationId);
+
+    /**
+     * Finds activities in the given lesson which have non-expired absolute time limit set up.
+     */
+    List<ActivityTimeLimitDTO> getRunningAbsoluteTimeLimits(long lessonId);
 }
