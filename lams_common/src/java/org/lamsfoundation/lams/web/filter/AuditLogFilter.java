@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -25,9 +24,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class AuditLogFilter extends OncePerRequestFilter {
 
     private static final Logger logger = Logger.getLogger(AuditLogFilter.class);
-
-    private static final String instanceName = StringUtils.isBlank(SessionManager.getJvmRoute()) ? "unknown host"
-	    : SessionManager.getJvmRoute();
 
     // paths that have more accurate logs built in business logic
     // or just need to be ignored
@@ -88,12 +84,12 @@ public class AuditLogFilter extends OncePerRequestFilter {
     }
 
     public static final void log(Integer userId, String userName, CharSequence message) {
-	StringBuilder logMessageBuilder = new StringBuilder("At \"").append(instanceName).append("\" ");
+	StringBuilder logMessageBuilder = new StringBuilder();
 
 	if (userId == null) {
-	    logMessageBuilder.append("unauthenticated user ");
+	    logMessageBuilder.append("Unauthenticated user ");
 	} else {
-	    logMessageBuilder.append("user \"").append(userName).append("\" (").append(userId).append(") ");
+	    logMessageBuilder.append("\"").append(userName).append("\" (").append(userId).append(") ");
 	}
 	logMessageBuilder.append(message);
 
