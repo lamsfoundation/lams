@@ -372,7 +372,8 @@
 	<!-- ====================================================================== -->
 	<target name="_sass.do.compile">
         <apply dest="${basedir}/build/css" executable="${sass_exec_file}" failonerror="true" verbose="true">
-        	<arg value="--no-source-map"/>
+<!--        	<arg value="&#45;&#45;no-source-map"/>-->
+					<arg value="--sourcemap=none"/>
         	<arg value="--load-path=${scss.common.variables}"/>
             <srcfile/>
             <targetfile/>
