@@ -123,7 +123,8 @@
 			}
 		
 			function confirmForceComplete() {
-				return confirm("<fmt:message key='message.confirmForceComplete'/>");
+				<%--return confirm("<fmt:message key='message.confirmForceComplete'/>");--%>
+				return confirm('fmt:message key="message.confirmForceComplete"/>');
 			}
 		</script>
 		
