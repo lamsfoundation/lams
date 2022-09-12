@@ -387,6 +387,16 @@
 						<fmt:message key='label.monitoring.edit' />
 					</label>
 				</div>
+				
+				<div class="navigate-btn-container">
+					<a id="timer-btn" class="btn btn-primary" href="<lams:LAMSURL/>monitoring/timer.jsp" target="_blank" 
+					   title="<fmt:message key='label.countdown.timer' />">
+						<i class="fa fa-hourglass-half fa-lg"></i>
+					</a>
+					<label for="timer-btn" class="d-none d-md-block">
+						<fmt:message key='label.countdown.timer' />
+					</label>
+				</div>
 			</div>
 			
 			<div class="lesson-properties">
