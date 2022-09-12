@@ -549,7 +549,7 @@
 				</a>
 			</div>
 			
-			<div class="btn-group-xs pull-right voffset10" style="display: flex;">
+			<div class="btn-group-xs pull-right" style="display: flex;">
 				<select id="question-type" class="form-control btn-xs">
 					<option selected="selected"><fmt:message key="label.question.type.multiple.choice" /></option>
 					<option><fmt:message key="label.question.type.matching.pairs" /></option>

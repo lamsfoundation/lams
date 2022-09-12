@@ -1820,6 +1820,9 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		}
 
 		for (OptionDTO optionDto : optionDtos) {
+		    if (StringUtils.isBlank(optionDto.getAnswer())) {
+			continue;
+		    }
 		    row = researchAndAnalysisSheet.initRow();
 		    String optionTitle = isMcqItem ? removeHtmlMarkup(optionDto.getAnswer())
 			    : optionDto.getAnswer().strip().replace("\r\n", ", ");

@@ -512,13 +512,15 @@
 			<c:choose>
 				<c:when test="${sessionMap.reflectOn and (not sessionMap.userFinished)}">
 					<button id="notebookButton" onclick="javascript:notebook();"
-							class="btn btn-primary btn-disable-on-submit pull-right ${sessionMap.mode eq 'author' ? '' : 'btn-hide-on-min-not-met'}">
+							class="btn btn-primary btn-disable-on-submit pull-right
+								   ${sessionMap.mode eq 'author' or empty sessionMap.minLimitUploadNumber ? '' : 'btn-hide-on-min-not-met'}">
 						<fmt:message key="label.continue" />
 					</button>
 				</c:when>
 				<c:otherwise>
 					<button type="button" 
-							class="btn btn-primary btn-disable-on-submit pull-right na ${sessionMap.mode eq 'author' ? '' : 'btn-hide-on-min-not-met'}"
+							class="btn btn-primary btn-disable-on-submit pull-right na
+								   ${sessionMap.mode eq 'author' or empty sessionMap.minLimitUploadNumber ? '' : 'btn-hide-on-min-not-met'}"
 							id="finishButton">
 						<c:choose>
 							<c:when test="${isLastActivity}">

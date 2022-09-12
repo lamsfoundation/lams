@@ -1916,6 +1916,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		((ScheduleGateActivity) act).setGateActivityLevelId(actDto.getGateActivityLevelID());
 		// always set false
 		((ScheduleGateActivity) act).setGateOpen(false);
+		((ScheduleGateActivity) act).setGateStopAtPrecedingActivity(actDto.isGateStopAtPrecedingActivity());
 
 		((ScheduleGateActivity) act).setGateStartTimeOffset(actDto.getGateStartTimeOffset());
 		((ScheduleGateActivity) act).setGateEndTimeOffset(actDto.getGateEndTimeOffset());
@@ -1925,6 +1926,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    case Activity.PERMISSION_GATE_ACTIVITY_TYPE:
 		((PermissionGateActivity) act).setGateActivityLevelId(actDto.getGateActivityLevelID());
 		((PermissionGateActivity) act).setGateOpen(false);
+		((PermissionGateActivity) act).setGateStopAtPrecedingActivity(actDto.isGateStopAtPrecedingActivity());
 		((PermissionGateActivity) act)
 			.setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.PERMISSION_GATE));
 		break;
@@ -1938,6 +1940,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    case Activity.CONDITION_GATE_ACTIVITY_TYPE:
 		((ConditionGateActivity) act).setGateActivityLevelId(actDto.getGateActivityLevelID());
 		((ConditionGateActivity) act).setGateOpen(false);
+		((ConditionGateActivity) act).setGateStopAtPrecedingActivity(actDto.isGateStopAtPrecedingActivity());
 		((ConditionGateActivity) act)
 			.setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.PERMISSION_GATE));
 		break;

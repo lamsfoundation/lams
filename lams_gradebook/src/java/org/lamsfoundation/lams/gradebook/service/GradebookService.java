@@ -2475,7 +2475,7 @@ public class GradebookService implements IGradebookFullService {
 		: 0.0;
 
 	for (GradebookUserActivity guact : userActivities) {
-	    if (markedActivity == null || guact.getUid() != markedActivity.getUid()) {
+	    if (guact.getMark() != null && (markedActivity == null || guact.getUid() != markedActivity.getUid())) {
 		if (useWeightings) {
 		    totalMark = totalMark + getWeightedMark(useWeightings, guact, guact.getMark());
 		} else {

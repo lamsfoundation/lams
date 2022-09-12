@@ -2198,6 +2198,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    summaryTableRow = new ExcelRow();
 	    List<QbOption> options = question.getQbQuestion().getQbOptions();
 	    for (QbOption option : options) {
+		if (option == null || StringUtils.isBlank(option.getName())) {
+		    continue;
+		}
 		summaryOfAnswers.put(option.getUid(), 0);
 		StringBuilder bldr = new StringBuilder(getMessage("label.authoring.basic.option.answer")).append(" ")
 			.append(i + 1).append(" - ");
