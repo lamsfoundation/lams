@@ -2131,6 +2131,7 @@ function addActivityIconsHandlers(activity) {
  */
 function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 	var iconsContainer = $('#completedLearnersContainer');
+	$('.learner-icon, .more-learner-icon', iconsContainer).remove();
 	
 	if (learners) {
 		// create learner icons, along with handlers
