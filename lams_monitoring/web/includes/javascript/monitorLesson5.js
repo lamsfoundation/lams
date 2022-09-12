@@ -1614,9 +1614,9 @@ function updateTimeLimits(){
 			
 			$.each(timeLimits, function(){
 				let timeLimit = this,
-					row = $('<div class="row" />').appendTo(timeLimitsDiv)
-				$('<div class="col col-6 text-end" />').text(timeLimit.activityTitle).appendTo(row);
-				$('<div class="col-2 text-start" />')
+					row = $('<div class="row mb-2" />').appendTo(timeLimitsDiv)
+				$('<div class="col text-end" />').text(timeLimit.activityTitle).appendTo(row);
+				$('<div class="col text-start" />')
 					.appendTo(row)
 					.countdown({
 						until: '+' + timeLimit.secondsLeft +'S',
