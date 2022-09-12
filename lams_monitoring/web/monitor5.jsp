@@ -20,7 +20,6 @@
 	<link rel="stylesheet" href="<lams:LAMSURL/>gradebook/includes/css/gradebook.css" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>css/components-monitoring.css">
-	<link rel="stylesheet" href="<lams:WebAppURL/>css/components-monitoring-responsive.css">
 
 	<lams:css suffix="chart"/>
 		
@@ -267,7 +266,7 @@
 	
 </head>
 <body class="component">
-<div class="monitoring-page-wrapper component-page-wrapper">
+<div class="component-page-wrapper monitoring-page-wrapper ">
 	<div class="component-sidebar active">
 		<a href="/" title="<fmt:message key='label.monitoring.return.to.index' />" class="lams-logo">
 			<img src="<lams:LAMSURL/>images/svg/lamsv5_logo.svg" alt="<fmt:message key='label.monitoring.logo' />" />
@@ -612,7 +611,7 @@
 			</div>
 		</header>
 		
-		<div class="tab-content pt-4">
+		<div class="tab-content pt-2">
 			
 		</div>
 	</div>
