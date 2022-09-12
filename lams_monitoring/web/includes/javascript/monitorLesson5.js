@@ -630,7 +630,6 @@ function loadTab(tabName, button) {
 							updateSequenceTab();
 					}
 				});
-				updateSequenceTab();
 				$("#load-sequence-tab-btn").addClass('active');
 			});
 			searchStudentWidget.show();
