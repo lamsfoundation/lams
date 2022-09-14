@@ -66,7 +66,6 @@
 		    		invalidHandler: formValidationInvalidHandler,
 					errorElement: "em",
 					errorPlacement: formValidationErrorPlacement,
-					success: formValidationSuccess,
 					highlight: formValidationHighlight,
 					unhighlight: formValidationUnhighlight
 		  		});
