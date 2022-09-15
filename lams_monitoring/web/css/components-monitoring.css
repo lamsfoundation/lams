@@ -197,6 +197,10 @@ body.component #sequenceInfoDialog {
 	min-width: 5rem;
 }
 
+.monitoring-page-wrapper #sequence-tab-content #required-tasks .dropdown-menu {
+	padding: 0;	
+}
+
 .monitoring-page-wrapper #sequence-tab-content #required-tasks .dropdown-item {
 	font-size: .9rem;
 }

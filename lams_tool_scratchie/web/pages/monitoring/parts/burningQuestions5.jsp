@@ -7,10 +7,6 @@
 		text-align: right;
 	}	
 	
-	.discussion-sentiment-start-button .fa-comments {
-		color: black !important;
-	}
-	
 	.discussion-sentiment-chart-row {
 		display: none;
 	}

@@ -250,9 +250,10 @@ body.component .portrait-round {
 }
 
 .component-page-wrapper table.table tbody td,
-.component-page-wrapper table.table tbody th {
+.component-page-wrapper table.table tbody th,
+.ui-jqgrid-bdiv .ui-row-ltr.jqgrow td {
 	border: none;
-	border-bottom: 2px solid var(--bs-gray-200);
+	border-bottom: 2px solid var(--bs-gray-200) !important;
 }
 
 .component-page-wrapper .card-header {
@@ -385,6 +386,13 @@ body.component .portrait-round {
 	border-bottom: none;
 }
 
+.component-page-wrapper .card.ui-jqgrid-view {
+	overflow-x: hidden;
+}
+
+.component-page-wrapper .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-table td {
+	border-bottom: none !important;
+}
 
 .component-page-wrapper .component-sidebar {
 	position: absolute;
