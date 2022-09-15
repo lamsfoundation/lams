@@ -70,7 +70,7 @@ public class TblMonitoringController {
 	request.setAttribute("groupsInAnsweredQuestionsChart", assessment.isUseSelectLeaderToolOuput());
 	request.setAttribute("assessment", assessment);
 
-	return "pages/tblmonitoring/iraAssessmentStudentChoices5";
+	return "pages/tblmonitoring/iraAssessmentStudentChoices";
     }
 
     @RequestMapping("iraAssessmentStudentChoicesTable")
@@ -129,7 +129,7 @@ public class TblMonitoringController {
 	}
 	request.setAttribute("questions", questionDtos);
 
-	return "pages/monitoring/parts/mcqStudentChoices5";
+	return "pages/monitoring/parts/mcqStudentChoices";
     }
 
     private List<TblAssessmentDTO> getAssessmentDtos(String[] toolContentIds, String[] activityTitles) {
@@ -195,7 +195,7 @@ public class TblMonitoringController {
 	int attemptedLearnersNumber = assessmentService.getCountUsersByContentId(toolContentId);
 	model.addAttribute("attemptedLearnersNumber", attemptedLearnersNumber);
 
-	return "pages/tblmonitoring/assessment5";
+	return "pages/tblmonitoring/assessment";
     }
 
     /**
@@ -297,7 +297,7 @@ public class TblMonitoringController {
 	request.setAttribute("groupsInAnsweredQuestionsChart", assessment.isUseSelectLeaderToolOuput());
 	request.setAttribute("assessment", assessment);
 
-	return "pages/tblmonitoring/assessmentStudentChoices5";
+	return "pages/tblmonitoring/assessmentStudentChoices";
     }
 
     /**
@@ -373,7 +373,7 @@ public class TblMonitoringController {
 	AssessmentResultDTO result = assessmentService.getUserMasterDetail(user.getSession().getSessionId(), userId);
 	request.setAttribute(AssessmentConstants.ATTR_ASSESSMENT_RESULT, result);
 
-	return "pages/tblmonitoring/teams5";
+	return "pages/tblmonitoring/teams";
     }
 
 }

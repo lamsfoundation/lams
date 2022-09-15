@@ -112,7 +112,7 @@ public class TblMonitorController {
 	    request.setAttribute("groupSummaries", groupSummaries);
 	}
 
-	return "pages/tblmonitoring/tra5";
+	return "pages/tblmonitoring/tra";
     }
 
     /**
@@ -234,6 +234,6 @@ public class TblMonitorController {
 		: scratchieService.getItemsWithIndicatedScratches(user.getSession().getSessionId());
 
 	request.setAttribute("scratchieItems", scratchieItems);
-	return "pages/tblmonitoring/teams5";
+	return "pages/tblmonitoring/teams";
     }
 }

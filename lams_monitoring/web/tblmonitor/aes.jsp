@@ -2,18 +2,18 @@
 <% pageContext.setAttribute("newLineChar", "\r\n"); %>
 
 <style>
-	.tab-pane {
-		padding-top: 10px;
+	#aes-tab .nav-tabs .nav-item {
+		min-width: 200px;
 	}
 </style>
 <script>
 	var tblSelectedAeToolContentId = tblSelectedAeToolContentId || '${empty param.toolContentID ? aeToolContentIds[0] : param.toolContentID}';
 
 	$(document).ready(function(){
-		loadAePane(tblSelectedAeToolContentId);
+		loadAePane(tblSelectedAeToolContentId, 'studentChoices');
 		
 		// change attempted and all learners numbers
-		$('#aes-tab .nav-tabs').bind('click', function (event) {
+		$('#aes-tab .nav-tabs li').bind('click', function (event) {
 			var link = $(event.target);
 			// store which tab was cliked last
 			tblSelectedAeToolContentId = link.data("tool-content-id");
@@ -24,10 +24,10 @@
 	
 	function loadAePane(targetToolContentId, contentType){
 		$('#aes-tab .tab-pane').each(function(){
-			var aePane = $(this),
+			var aePane = $(this).hide(),
 				toolContentId = aePane.data('toolContentId'),
 				toolType = aePane.data('toolType'),
-				nav = $('#aes-tab .nav-tabs a[data-tool-content-id="' + toolContentId + '"]').closest('li');
+				nav = $('#aes-tab .nav-tabs a[data-tool-content-id="' + toolContentId + '"]');
 	
 			if (toolContentId == targetToolContentId) {
 				var url = null;
@@ -42,7 +42,7 @@
 					aePane.data('contentType', 'default');
 				}
 				// load AE tab content for the given tool content ID
-				aePane.load(url);
+				aePane.show().load(url);
 					
 				aePane.addClass('active');
 				nav.addClass('active');
@@ -55,32 +55,30 @@
 	}
 	
 </script>
-<div id="aes-tab">
-	<!-- Header -->
+<div id="aes-tab" class="container-fluid">
 	<div class="row">
-		<div class="col-xs-12">
+		<div class="col-10 offset-1 text-center">
 			<h3>
 				<fmt:message key="label.aes.questions.marks"/>
 			</h3>
 		</div>
 	</div>
-	<!-- End header -->    
 	
 	<ul class="nav nav-tabs">
 		<c:forEach var="aeToolContentId" items="${aeToolContentIds}" varStatus="status">
-			<li>
-				<a data-toggle="tab" href="#assessment-pane-${aeToolContentId}" 
-				   data-tool-content-id="${aeToolContentId}">
+			<li class="nav-item text-center">
+				<a data-toggle="tab" href="#" 
+				   data-tool-content-id="${aeToolContentId}" class="nav-link">
 					<c:out value="${aeActivityTitles[status.index]}" escapeXml="false"/>
 				</a>
 			</li>
 		</c:forEach>
 	</ul>
 			
-	<div class="tab-content">
+	<div>
 		<c:forEach var="aeToolContentId" items="${aeToolContentIds}" varStatus="status">
 			<div id="assessment-pane-${aeToolContentId}"
-				 class="tab-pane assessment-questions-pane"
+				 class="tab-pane assessment-questions-pane pt-4"
 				 data-tool-type="${aeToolTypes[status.index]}"
 				 data-tool-content-id="${aeToolContentId}">
 			</div>

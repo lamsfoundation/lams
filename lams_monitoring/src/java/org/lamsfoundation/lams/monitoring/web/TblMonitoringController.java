@@ -282,7 +282,7 @@ public class TblMonitoringController {
 	    request.setAttribute("chartNamesDataset", chartNamesDataset.toString());
 	}
 
-	return "tblmonitor/teams5";
+	return "tblmonitor/teams";
     }
 
     /**
@@ -386,7 +386,7 @@ public class TblMonitoringController {
 	model.addAttribute("aeToolTypes", toolTypes);
 	model.addAttribute("aeActivityTitles", activityTitles);
 
-	return "tblmonitor/aes5";
+	return "tblmonitor/aes";
     }
 
     /**

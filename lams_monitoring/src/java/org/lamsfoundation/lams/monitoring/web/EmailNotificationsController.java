@@ -29,7 +29,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -66,7 +65,6 @@ import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -86,8 +84,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -156,7 +154,9 @@ public class EmailNotificationsController {
 	request.setAttribute("lesson", lesson);
 	request.setAttribute("activities", activities);
 
-	return "emailnotifications/lessonNotifications5";
+	boolean newUI = WebUtil.readBooleanParam(request, "newUI", false);
+
+	return "emailnotifications/lessonNotifications" + (newUI ? "5" : "");
     }
 
     /**
@@ -196,7 +196,9 @@ public class EmailNotificationsController {
 	request.setAttribute("lessons", lessons);
 	request.setAttribute("firstLesson", firstLesson);
 
-	return "emailnotifications/courseNotifications";
+	boolean newUI = WebUtil.readBooleanParam(request, "newUI", false);
+
+	return "emailnotifications/courseNotifications" + (newUI ? "5" : "");
     }
 
     /**
@@ -262,7 +264,9 @@ public class EmailNotificationsController {
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
 	request.setAttribute(AttributeNames.PARAM_ORGANISATION_ID, organisationId);
 
-	return "emailnotifications/scheduledEmailList5";
+	boolean newUI = WebUtil.readBooleanParam(request, "newUI", false);
+
+	return "emailnotifications/scheduledEmailList" + (newUI ? "5" : "");
     }
 
     /**
@@ -298,7 +302,9 @@ public class EmailNotificationsController {
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
 	request.setAttribute(AttributeNames.PARAM_ORGANISATION_ID, organisationId);
 
-	return "emailnotifications/archivedEmailList5";
+	boolean newUI = WebUtil.readBooleanParam(request, "newUI", false);
+
+	return "emailnotifications/archivedEmailList" + (newUI ? "5" : "");
     }
 
     @RequestMapping("getArchivedRecipients")

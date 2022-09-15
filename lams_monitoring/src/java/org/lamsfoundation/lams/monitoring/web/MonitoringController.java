@@ -1031,8 +1031,7 @@ public class MonitoringController {
 	request.setAttribute("lesson", lessonDTO);
 	boolean isTBLSequence = learningDesignService.isTBLSequence(lessonDTO.getLearningDesignID());
 	request.setAttribute("isTBLSequence", isTBLSequence);
-	boolean useNewUI = WebUtil.readBooleanParam(request, "newUI", true);
-	if (isTBLSequence && useNewUI) {
+	if (isTBLSequence) {
 	    List<Activity> lessonActivities = getLessonActivities(lessonService.getLesson(lessonId));
 	    TblMonitoringController.setupAvailableActivityTypes(request, lessonActivities);
 
@@ -1045,7 +1044,7 @@ public class MonitoringController {
 	    request.setAttribute("burningQuestionsEnabled", burningQuestionsEnabled);
 	}
 
-	return "monitor" + (useNewUI ? "5" : "");
+	return "monitor";
     }
 
     @RequestMapping("/displaySequenceTab")

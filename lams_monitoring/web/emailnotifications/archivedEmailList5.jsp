@@ -119,8 +119,8 @@
 		</c:forEach>
 	</table>
 	
-	<a href="<c:url value='/emailNotifications/'/>${lessonID == null ? 'getCourseView.do?organisationID='.concat(organisationID)
-																	   : 'getLessonView.do?lessonID='.concat(lessonID)}"
+	<a href="<c:url value='/emailNotifications/'/>${lessonID == null ? 'getCourseView.do?newUI=true&organisationID='.concat(organisationID)
+																	   : 'getLessonView.do?newUI=true&lessonID='.concat(lessonID)}"
 	   class="btn btn-primary pull-right">
 		<fmt:message key="email.notifications.scheduled.messages.list.back" />
 	</a>

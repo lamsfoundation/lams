@@ -186,11 +186,11 @@
 <body class="p-3">
 	<div class="clearfix">
 		<div class="float-end">
-			<a href="<c:url value='/emailNotifications/showScheduledEmails.do'/>?lessonID=${lesson.lessonId}"
+			<a href="<c:url value='/emailNotifications/showScheduledEmails.do'/>?newUI=true&lessonID=${lesson.lessonId}"
 			   id="listEmailsHref" class="btn btn-secondary btn-sm">
 				<i class="fa fa-calendar"></i> <fmt:message key="email.notifications.scheduled.messages.button" />
 			</a>
-			<a href="<c:url value='/emailNotifications/showArchivedEmails.do'/>?lessonID=${lesson.lessonId}"
+			<a href="<c:url value='/emailNotifications/showArchivedEmails.do'/>?newUI=true&lessonID=${lesson.lessonId}"
 			   id="archiveHref" class="btn btn-secondary btn-sm">
 				<i class="fa fa-archive"></i> <fmt:message key="email.notifications.archived.messages.button" />
 			</a>		

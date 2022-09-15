@@ -1,4 +1,4 @@
-let GRAPH_COLORS = {
+var GRAPH_COLORS = {
 		blue: 'rgba(1, 117, 226, 0.85)',
 		yellow: 'rgba(249, 248, 113, 0.85)',
 		green: 'rgba(0, 145, 74, 0.85)',

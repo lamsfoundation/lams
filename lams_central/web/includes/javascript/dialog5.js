@@ -319,9 +319,7 @@ function showAuthoringDialog(learningDesignID, relaunchMonitorLessonID){
 function showNotificationsDialog(orgID, lessonID) {
 	//check whether current window is a top level one (otherwise it's an iframe or popup)
 	var isTopLevelWindow = window.top == window.self;
-	//calculate width and height based on the dimensions of the window to which dialog is added
-	var dialogWindow = isTopLevelWindow ? $(window) : $(window.parent);
-		
+
 	var id = "dialogNotifications" + (lessonID ? "Lesson" + lessonID : "Org" + orgID);
 	showDialog(id, {
 		'data' : {
@@ -334,17 +332,10 @@ function showNotificationsDialog(orgID, lessonID) {
 		'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
 		'open' : function() {
 			var dialog = $(this);
-			// if lesson ID is given, use lesson view; otherwise use course view
-			if (lessonID) {
-				// load contents after opening the dialog
-				$('iframe', dialog).attr('src', LAMS_URL
-					+ 'monitoring/emailNotifications/getLessonView.do?lessonID='
-					+ lessonID);
-			} else {
-				$('iframe', dialog).attr('src', LAMS_URL
-					+ 'monitoring/emailNotifications/getCourseView.do?organisationID='
-					+ orgID);
-			}
+			// load contents after opening the dialog
+			$('iframe', dialog).attr('src', LAMS_URL
+				+ 'monitoring/emailNotifications/getLessonView.do?newUI=true&lessonID='
+				+ lessonID);
 		}
 	}, false).find('.modal-dialog').addClass('modal-xl');
 }

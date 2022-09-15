@@ -132,7 +132,7 @@ public class GradebookMonitoringController {
 	}
 
 	boolean isTab = WebUtil.readBooleanParam(request, "isTab", false);
-	return "gradebookMonitor" + (isTab ? "Content5" : "");
+	return "gradebookMonitor" + (isTab ? "Content" : "");
     }
 
     @RequestMapping("/courseMonitor")
@@ -291,7 +291,7 @@ public class GradebookMonitoringController {
 	    }
 	}
 
-	return "releaseLessonMarks" + (isTab ? "5" : "");
+	return "releaseLessonMarks";
     }
 
     @RequestMapping("/getReleaseMarksEmailContent")

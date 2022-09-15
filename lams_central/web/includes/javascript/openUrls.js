@@ -47,43 +47,14 @@ function returnToMonitorLessonIntegrated( lessonID ) {
 	window.location = '/lams/home/monitorLesson.do?lessonID='+lessonID;
 }
 
-function openMonitorLesson( lessonID, url, displayFullScreen ) {
+function openMonitorLesson( lessonID, url ) {
 	if (!url) {
 		// change back to Home controller after upgrade!!
 		url = '/lams/monitoring/monitoring/monitorLesson.do?';
 	}
 	url += 'lessonID='+ lessonID;
-	
-	if (displayFullScreen) {
-		sessionStorage.removeItem("lamsMonitoringCurrentTab");
-		window.location.href = url;
-		return;
-	}
-	
-	url += '&newUI=false';
-	
-	if (isMac) {
-		if(belowMinRes) {
-			monitorLessonWin = window.open(url,'mWindow','width=' + monitor_width 
-							   + ',height=' + monitor_height + ',resizable,scrollbars' + getCenterParams(monitor_width, monitor_height));
-		} else {
-			monitorLessonWin = window.open(url,'mWindow','width=' + monitor_width
-							   + ',height=' + monitor_height + ',resizable,scrollbars' + getCenterParams(monitor_width, monitor_height));
-		}
-	} else {
-		if (monitorLessonWin && !monitorLessonWin.closed) {
-			monitorLessonWin.location = url;
-			monitorLessonWin.focus();
-		} else {
-			monitorLessonWin = window.open(url,'mWindow','width=' + monitor_width
-							   + ',height=' + monitor_height + ',resizable,resizable,scrollbars'
-							   + getCenterParams(monitor_width, monitor_height));
-		}
-	}
-}
-
-function openTBLMonitorLesson( lessonID ) {
-	openMonitorLesson(lessonID, '/lams/monitoring/tblmonitor/start.do?')
+	sessionStorage.removeItem("lamsMonitoringCurrentTab");
+	window.location.href = url;
 }
 
 function openLearner( lessonId, url ) {
