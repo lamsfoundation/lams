@@ -14,9 +14,9 @@
 	<link rel="stylesheet" href="/lams/css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="/lams/css/bootstrap-tourist.min.css" type="text/css" media="screen">
 
-	<script type="text/javascript" src="${lams}includes/javascript/getSysInfo.js"></script>
-	<script type="text/javascript" src="${lams}loadVars.jsp"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/openUrls.js"></script>
+	<lams:JSImport src="includes/javascript/getSysInfo.js" />
+	<lams:JSImport src="loadVars.jsp" />
+	<lams:JSImport src="includes/javascript/openUrls.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
@@ -29,7 +29,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-tourist.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.ui.touch-punch.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.slimscroll.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/main.js"></script>
+	<lams:JSImport src="includes/javascript/main.js" />
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>',	
 			decoderDiv = $('<div />'),
