@@ -36,10 +36,6 @@
 		margin-bottom: 10px;
 	}
 	
-	#release-marks-schedule-display {
-		margin-right: 20px;
-	}
-	
 	#release-marks-schedule-labels > label {
 		vertical-align: text-top;
 	}
@@ -58,19 +54,32 @@
 		
 
 	jQuery(document).ready(function() {
-		// store this frequently used element
-		releaseMarksAlertBox = $('#release-marks-alert');
-		
-		$('#release-marks-schedule-date').datetimepicker({
-			// date must be in future
-			minDate : 0,
-			dateFormat : 'yy-mm-dd'
-		}).change(function(){
-			// if there is no date selected, disable the confirmation button
-			var date = $(this).val();
-			$('#release-marks-schedule-confirm').prop('disabled', !date || date.trim() == '');
+		$.extend(true, $.jgrid.guiStyles.bootstrap4, {
+			pager : {
+				pagerSelect : 'form-control-select'
+			},
+			searchToolbar : {
+				clearButton : 'btn btn-sm'
+			}
 		});
 		
+		// store this frequently used element
+		releaseMarksAlertBox = $('#release-marks-alert');
+
+		var marksScheduleDatePicker = $('#release-marks-schedule-date');
+		if (marksScheduleDatePicker.length === 1) {
+			
+			new tempusDominus.TempusDominus(marksScheduleDatePicker[0], tempusDominusDefaultOptions)
+				.dates.formatInput = tempusDominusDateFormatter;
+			
+			marksScheduleDatePicker.change(function(){
+				// if there is no date selected, disable the confirmation button
+				var date = $(this).val();
+				$('#release-marks-schedule-confirm').prop('disabled', !date || date.trim() == '');
+			});
+			
+		}
+
 		onReleaseMarksOpen();
 	});
 
@@ -87,7 +96,7 @@
 
 	// release/hide marks
 	function toggleMarksRelease() {
-		if (confirm(marksReleased ? "<fmt:message key="gradebook.monitor.releasemarks.check.hide"/>" : "<fmt:message key="gradebook.monitor.releasemarks.check.release"/>")) {
+		showConfirm(marksReleased ? "<fmt:message key="gradebook.monitor.releasemarks.check.hide"/>" : "<fmt:message key="gradebook.monitor.releasemarks.check.release"/>", function() {
 			releaseMarksAlertBox.hide();
 			
 			$.ajax({
@@ -107,7 +116,7 @@
 			    	}
 		    	}
 			});
-	    }
+		});
 	}
 	
 	function sendReleaseMarksEmails(){
@@ -129,26 +138,24 @@
 			return;
 		}
 		
-		if (!confirm('<fmt:message key="gradebook.monitor.releasemarks.send.emails.confirm" />'.replace('[COUNT_PLACEHOLDER]', finalList.length))){
-			return;
-		}
-	
-		$.ajax({
-			'url'      : '<lams:LAMSURL/>gradebook/gradebookMonitoring/sendReleaseMarksEmails.do',
-			'data'     : {
-				'lessonID' : releaseMarksLessonID,
-				 'includedLearners' : JSON.stringify(finalList)
-			 },
-			'dataType' : 'text',
-			'cache'    : false,
-			'success' : function(response) {
-				if (response == 'success') {
-					releaseMarksAlertBox.removeClass('alert-danger').addClass('alert-success').text('Emails were sent').show();
-					return;
-				}
+		showConfirm('<fmt:message key="gradebook.monitor.releasemarks.send.emails.confirm" />'.replace('[COUNT_PLACEHOLDER]', finalList.length), function() {
+			$.ajax({
+				'url'      : '<lams:LAMSURL/>gradebook/gradebookMonitoring/sendReleaseMarksEmails.do',
+				'data'     : {
+					'lessonID' : releaseMarksLessonID,
+					 'includedLearners' : JSON.stringify(finalList)
+				 },
+				'dataType' : 'text',
+				'cache'    : false,
+				'success' : function(response) {
+					if (response == 'success') {
+						releaseMarksAlertBox.removeClass('alert-danger').addClass('alert-success').text('Emails were sent').show();
+						return;
+					}
 
-				releaseMarksAlertBox.removeClass('alert-success').addClass('alert-danger').text('There was a problem with sending emails: ' + response).show();
-			}
+					releaseMarksAlertBox.removeClass('alert-success').addClass('alert-danger').text('There was a problem with sending emails: ' + response).show();
+				}
+			});
 		});
 	}
 
@@ -170,8 +177,8 @@
 
 		// initialize user list 
 		var grid = $('<table id="release-marks-learners-table"></table>').appendTo('#release-marks-learners-panel').jqGrid({
-			guiStyle: "bootstrap",
-			iconSet: 'fontAwesome',
+			guiStyle: "bootstrap4",
+			iconSet: 'fontAwesomeSolid',
 		   	url: "<lams:LAMSURL/>monitoring/emailNotifications/getUsers.do?searchType=4&lessonID=" + releaseMarksLessonID,
 			datatype: "json",
 		   	colNames:['<fmt:message key="gradebook.columntitle.learnerName"/>'],
@@ -323,14 +330,14 @@
 	
 	<div id="release-marks-learners">
 		<div class="release-marks-buttons">
-        	<button type="button" id="release-marks-schedule-display" class="btn btn-sm btn-default" onClick="javascript:displayReleaseMarksSchedule()">
+        	<button type="button" id="release-marks-schedule-display" class="btn btn-sm btn-secondary me-2" onClick="javascript:displayReleaseMarksSchedule()">
         	    <i class="fa fa-calendar"></i>
                 <span class="hidden-xs">
                     <fmt:message key="gradebook.monitor.releasemarks.schedule.button" />
                 </span>
         	</button>
               
-			<button type="button" class="btn btn-sm btn-default" onClick="javascript:sendReleaseMarksEmails()">
+			<button type="button" class="btn btn-sm btn-primary" onClick="javascript:sendReleaseMarksEmails()">
 			    <i class="fa fa-bullhorn"></i>
                 <span class="hidden-xs">
                     <fmt:message key="gradebook.monitor.releasemarks.send.emails" />
@@ -353,13 +360,13 @@
             </button>  
 		</div>
 		<div class="row">
-			<div class="col-sm-4 col-xs-12">
+			<div class="col-lg-6 col-md-12">
 				<!-- A dummy element so learners table starts on the same height as email preview -->
 				<span>&nbsp;</span>
 				
                 <div id="release-marks-learners-panel"> </div>
 			</div>
-			<div class="col-sm-8 col-xs-12">
+			<div class="col-lg-6 col-md-12">
                 <div id="release-marks-email-preview">
 					<p style="margin: 0 0 0 0;" class="text-muted text-center"><small><em><fmt:message key="gradebook.monitor.releasemarks.email.preview" />&nbsp;<span id="release-marks-email-preview-user"></span></em></small></p>
                     <div id="release-marks-email-preview-content"></div>
@@ -369,9 +376,9 @@
 
 	</div>
 	
-	<div id="release-marks-schedule">
+	<div id="release-marks-schedule" class="container-fluid">
 		<div class="release-marks-buttons">
-			<button type="button" id="release-marks-schedule-cancel" onClick="javascript:cancelScheduleReleaseMarks()" class="btn btn-sm btn-default">
+			<button type="button" id="release-marks-schedule-cancel" onClick="javascript:cancelScheduleReleaseMarks()" class="btn btn-sm btn-secondary">
 				<i class="fa fa-ban"></i>
                 <span class="hidden-xs">
                     <fmt:message key="gradebook.monitor.releasemarks.schedule.cancel" />
@@ -389,20 +396,28 @@
 			</c:if>
 		</div>
 		<div class="row">
-			<div class="col-xs-1"></div>
-			<c:choose>
-				<c:when test="${empty releaseMarksScheduleDate}">
-					<div id="release-marks-schedule-labels" class="col-xs-3">
-						<label for="release-marks-schedule-date"><fmt:message key="gradebook.monitor.releasemarks.schedule.date" /></label><br><br>
-						<label for="release-marks-schedule-emails"><fmt:message key="gradebook.monitor.releasemarks.schedule.send.emails" /></label>
-					</div>
-					<div class="col-xs-3">
-						<input type="text" id="release-marks-schedule-date" autocomplete="nope" /><br><br>
-						<input type="checkbox" id="release-marks-schedule-emails" />
-					</div>
-				</c:when>
-				<c:otherwise>
-					<div class="col-xs-6">
+			<div class="col-1"></div>
+			<div class="col-6">
+				<c:choose>
+					<c:when test="${empty releaseMarksScheduleDate}">
+						<div  id="release-marks-schedule-labels" class="row">
+							<div class="col-6">
+								<label for="release-marks-schedule-date" class="form-label"><fmt:message key="gradebook.monitor.releasemarks.schedule.date" /></label>
+							</div>
+							<div class="col-6">
+								<input type="text" class="form-control form-control-sm" id="release-marks-schedule-date" autocomplete="off" />
+							</div>
+						</div>
+						<div class="row mt-4">
+							<div class="col-6">
+								<label for="release-marks-schedule-emails" class="form-check-label"><fmt:message key="gradebook.monitor.releasemarks.schedule.send.emails" /></label>
+							</div>
+							<div class="col-6">
+								<input type="checkbox" class="form-check-input" id="release-marks-schedule-emails" />
+							</div>
+						</div>
+					</c:when>
+					<c:otherwise>
 						<p>
 							<fmt:message key="gradebook.monitor.releasemarks.scheduled.date">
 								<fmt:param value="${releaseMarksScheduleDate}" />
@@ -417,10 +432,10 @@
 								</c:otherwise>
 							</c:choose>
 						</p>
-					</div>
-				</c:otherwise>
-			</c:choose>
-			<div class="col-xs-5"></div>
+					</c:otherwise>
+				</c:choose>
+			</div>
+			<div class="col-5"></div>
 		</div>
 	</div>
 </div>
