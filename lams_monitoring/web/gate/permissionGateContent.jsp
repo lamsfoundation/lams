@@ -24,7 +24,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <lams:html>
     <lams:head>
+    	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
+		<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
+	
     	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 		<script type="text/javascript">
 			function allowUsers(who){
 				var allowed = '';
@@ -38,30 +42,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				return true;
 			}
 		</script>
-		<lams:css/>
     </lams:head>
     
-    <body class="stripes">
-		<c:set var="title"><fmt:message key="label.permission.gate.title"/></c:set>
-		<lams:Page title="${title}" type="monitoring" formID="gateForm">
+    <body class="px-2">
+		<h3 class="text-center"><fmt:message key="label.permission.gate.title"/></h3>
 			
-			<%@ include file="gateInfo.jsp" %>
-			
-			<c:if test="${not gateForm.gate.gateOpen}" >
-				<p><fmt:message key="label.gate.you.open.message"/></p>
-			</c:if>
-	
-			<%@ include file="gateStatus.jsp" %>
-			<c:if test="${not gateForm.gate.gateOpen}" >
-						<%@ include file="openGateSingleUser.jsp" %>
-			</c:if>
-		</lams:Page>
+		<%@ include file="gateInfo.jsp" %>
+		
+		<c:if test="${not gateForm.gate.gateOpen}" >
+			<p><fmt:message key="label.gate.you.open.message"/></p>
+		</c:if>
 
-		<div id="footer">
-		</div><!--closes footer-->
-
+		<%@ include file="gateStatus.jsp" %>
+		<c:if test="${not gateForm.gate.gateOpen}" >
+					<%@ include file="openGateSingleUser.jsp" %>
+		</c:if>
     </body>
 </lams:html>
-
-	
-	

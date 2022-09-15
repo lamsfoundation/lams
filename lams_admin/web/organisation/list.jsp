@@ -33,6 +33,10 @@
 			display: inline-block;
 			margin-top: 5px;
 		}
+		
+		.course-admin-property {
+			padding-left: 20px !important;
+		}
 	</style>
 	
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
@@ -197,15 +201,18 @@
 							<td><fmt:formatDate value="${org.createDate}" pattern="${datePattern}" /></td>
 						</tr>
 						<tr>
-							<td><fmt:message key="admin.can.add.user"/>:</td>
+							<td colspan="2"><fmt:message key="role.GROUP.MANAGER"/>:</td>
+						</tr>
+						<tr>
+							<td class="course-admin-property"><fmt:message key="admin.can.add.user"/>:</td>
 							<td><c:out value="${org.courseAdminCanAddNewUsers}" /></td>
 						</tr>
 						<tr>
-							<td><fmt:message key="admin.can.browse.user"/>:</td>
+							<td class="course-admin-property"><fmt:message key="admin.can.browse.user"/>:</td>
 							<td><c:out value="${org.courseAdminCanBrowseAllUsers}" /></td>
 						</tr>
 						<tr>
-							<td><fmt:message key="admin.can.change.status"/>:</td>
+							<td class="course-admin-property"><fmt:message key="admin.can.change.status"/>:</td>
 							<td><c:out value="${org.courseAdminCanChangeStatusOfCourse}" /></td>
 						</tr>
 						<tr>

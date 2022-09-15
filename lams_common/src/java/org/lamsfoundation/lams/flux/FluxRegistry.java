@@ -63,7 +63,7 @@ public class FluxRegistry {
 	    sink = FluxRegistry.getSink(sinkName);
 	}
 	if (itemEqualsPredicate == null) {
-	    itemEqualsPredicate = (key, item) -> item.equals(key);
+	    itemEqualsPredicate = (item, key) -> item.equals(key);
 	}
 	FluxMap<T, String> fluxMap = new FluxMap<>(fluxName, sink.getFlux(), itemEqualsPredicate, fetchFunction,
 		throttleSeconds, timeoutSeconds);

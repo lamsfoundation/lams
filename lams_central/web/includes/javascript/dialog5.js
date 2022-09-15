@@ -56,7 +56,6 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	// use the input attributes or fall back to default ones
 	initParams = $.extend({
 		'autoOpen' : true,
-		'modal'    : false,
 		'draggable' : true,
 		'resizable' : extraButtons == true,
 		'startMaximized' : false,
@@ -93,7 +92,10 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	var draggable = initParams.draggable && ! /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 	if (draggable) {
 		modalDialog.draggable({
-			'cancel' : '.modal-body, button.close'
+			'cancel' : '.modal-body, button.close',
+			'revert' : function() {
+				return modalDialog.offset().top < -5;
+			}
 		});
 	}
 	dialog.data("isDraggable", draggable);
@@ -103,96 +105,17 @@ function showDialog(id, initParams, extraButtons, recreate) {
 		dialog.data(initParams.data);
 	}
 	
-	dialog.on('show.bs.modal', initParams.modal ? initParams.open : function(event){
-		
-		// skip hiding dialog if it's already shown, as bootstrap doesn't fire 'shown.bs.modal' event second time if dialog is already open
-		if (!dialog.data('shown')) {
-			dialog.css('visibility', 'hidden');
-		}
-		
-		if (initParams.open) {
-			initParams.open.call(dialog, event);
-		}
-		
-	});
+	dialog.on('show.bs.modal', initParams.open);
 	dialog.on('hide.bs.modal', initParams.beforeClose);
 	dialog.on('hidden.bs.modal', initParams.close);
 	
 	dialog.modal({
 		'keyboard' : false,
-		'backdrop' : initParams.modal ? 'static' : false
+		'backdrop' : 'static'
 	});
 	
 	if (initParams.autoOpen) {
 		dialog.modal('show');
-	}
-	
-	if (!initParams.modal) {
-		// make the dialog non-modal
-		dialog.on('shown.bs.modal', function(){
-
-			// store 'shown.bs.modal' event was fired
-			dialog.data({
-				'shown' : true
-			});
-
-			// the main modal div is maximised, we need to shrink it
-			modalDialog.css({
-				'margin' : 0
-			});
-			dialog.width(modalDialog.outerWidth(true) + 15);
-			dialog.height(modalDialog.outerHeight(true) + 15);
-			// remove overlay
-			dialog.siblings('.modal-backdrop').remove();
-			dialog.css('visibility', 'visible');
-			
-			// center the dialog or put it into previously defined position
-			var position = dialog.data('position');
-			if (position !== false) {
-				position = position || 
-					(dialog.data('isCreateInParentWindow') ?
-						{
-							'my' : 'center center',
-							'at' : 'center center',
-							'of' : targetWindow
-						}
-						:
-						{
-							'my' : 'top',
-							'at' : 'top+15px',
-							'of' : window
-						}
-					);
-				dialog.position(position);
-			}
-
-			if (draggable) {
-				modalDialog.on('drag', function(event, ui){
-					// pass the event to the dialog, not its internal element
-					dialog.offset({
-						'top'  : Math.min(window.innerHeight - 30, Math.max(0, ui.offset.top + 5)),
-						'left' : Math.min(window.innerWidth - 200, Math.max(0, ui.offset.left + 5))
-					});
-					modalDialog.css({
-						'position' : 'static'
-					});
-				});
-			}
-			
-			if (initParams.resizable) {
-				modalContent.on('resize', function(event, ui){
-					dialog.width(ui.size.width + 15);
-					dialog.height(ui.size.height + 15);
-				}).on('resizestart', function(){
-					// disable iframe as a target
-					// so it does not consume mouse movement when shrinking the dialog
-					$('iframe', this).css('pointer-events', 'none');
-				}).on('resizestop', function(){
-					$('iframe', this).css('pointer-events', 'auto');
-					dialog.modal('handleUpdate');
-				});
-			}
-		});
 	}
 	
 	if (extraButtons) {
@@ -206,10 +129,6 @@ function showDialog(id, initParams, extraButtons, recreate) {
 				// restore dialog
 				var oldWidth = dialog.data('oldWidth'),
 					oldHeight = dialog.data('oldHeight');
-				if (!initParams.modal) {
-					dialog.width(oldWidth + 15);
-					dialog.height(oldHeight + 15);
-				}
 				internalDialog.width(oldWidth);
 				internalContent.width(oldWidth);
 				internalContent.height(oldHeight);
@@ -222,12 +141,6 @@ function showDialog(id, initParams, extraButtons, recreate) {
 					'oldWidth' : internalContent.width(),
 					'oldHeight': internalContent.height()
 				});
-				if (!initParams.modal) {
-					dialog.css({
-						'width' : '100%',
-						'height': '100%'
-					});
-				}
 				internalDialog.css({
 					'width' : '100%',
 					'height': '100%'
@@ -239,7 +152,7 @@ function showDialog(id, initParams, extraButtons, recreate) {
 				$('.ui-resizable-handle', dialog).hide();
 			}
 			// center the dialog
-			 (initParams.modal ? internalDialog : dialog).position(
+			 internalDialog.position(
 					 dialog.data('isCreateInParentWindow') ?
 								{
 									'my' : 'center center',
@@ -406,9 +319,7 @@ function showAuthoringDialog(learningDesignID, relaunchMonitorLessonID){
 function showNotificationsDialog(orgID, lessonID) {
 	//check whether current window is a top level one (otherwise it's an iframe or popup)
 	var isTopLevelWindow = window.top == window.self;
-	//calculate width and height based on the dimensions of the window to which dialog is added
-	var dialogWindow = isTopLevelWindow ? $(window) : $(window.parent);
-		
+
 	var id = "dialogNotifications" + (lessonID ? "Lesson" + lessonID : "Org" + orgID);
 	showDialog(id, {
 		'data' : {
@@ -421,17 +332,10 @@ function showNotificationsDialog(orgID, lessonID) {
 		'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
 		'open' : function() {
 			var dialog = $(this);
-			// if lesson ID is given, use lesson view; otherwise use course view
-			if (lessonID) {
-				// load contents after opening the dialog
-				$('iframe', dialog).attr('src', LAMS_URL
-					+ 'monitoring/emailNotifications/getLessonView.do?lessonID='
-					+ lessonID);
-			} else {
-				$('iframe', dialog).attr('src', LAMS_URL
-					+ 'monitoring/emailNotifications/getCourseView.do?organisationID='
-					+ orgID);
-			}
+			// load contents after opening the dialog
+			$('iframe', dialog).attr('src', LAMS_URL
+				+ 'monitoring/emailNotifications/getLessonView.do?newUI=true&lessonID='
+				+ lessonID);
 		}
 	}, false).find('.modal-dialog').addClass('modal-xl');
 }

@@ -48,7 +48,7 @@
 		});
 		
 		function resizeSVG() {
-			var svg = $('svg','#ldSVG');
+			var svg = $('#ldSVG svg.svg-learning-design');
 			if ( svg ) {
 				var panelWidth = $('.panel-learner-page').width(),
 					svgWidth = svg.attr('width'),

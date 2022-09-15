@@ -102,71 +102,72 @@
 					</tr>
 				</table>
 					
-					<c:if test="${organisationForm.typeId == 2}">
-						<div class="checkbox">
-							<label for="course-admin-can-add-new-users">
-							<form:checkbox path="courseAdminCanAddNewUsers" id="course-admin-can-add-new-users" />
-								<fmt:message key="admin.can.add.user"/>
-							</label>
-						</div>
-						<div class="checkbox">
-							<label for="course-admin-can-browse-all-users">
-							<form:checkbox path="courseAdminCanBrowseAllUsers" id="course-admin-can-browse-all-users"/>
-								<fmt:message key="admin.can.browse.user"/>
-							</label>
-						</div>
-						<div class="checkbox">
-							<label for="course-admin-can-change-status-of-course">
-							<form:checkbox path="courseAdminCanChangeStatusOfCourse" id="course-admin-can-change-status-of-course"/>
-								<fmt:message key="admin.can.change.status"/>
-							</label>
-						</div>
-						<div class="checkbox">
-							<label for="enable-course-notifications">
-							<form:checkbox path="enableCourseNotifications" id="enable-course-notifications"/>
-								<fmt:message key="admin.enable.course.notifications"/>
-							</label>
-						</div>
-						<div class="checkbox">
-							<label for="enableGradebookForLearners">
-							<form:checkbox id="enableGradebookForLearners" path="enableGradebookForLearners" />
-								<fmt:message key="admin.gradebook.learner.enable"/>
-							</label>
-						</div>
-						<div class="checkbox">
-							<label for="enable-single-activity-lessons">
-							<form:checkbox path="enableSingleActivityLessons" id="enable-single-activity-lessons"/>
-								<fmt:message key="config.authoring.single.activity"/>
-							</label>
-						</div>
-					</c:if>
-					
-						<div class="checkbox">
-							<label for="enable-live-edit">
-							<form:checkbox path="enableLiveEdit" id="enable-live-edit"/>
-								<fmt:message key="config.live.edit"/>
-							</label>
-						</div>
-						
-						<div class="checkbox">
-							<label for="enable-kumalive">
-							<form:checkbox path="enableKumalive" id="enable-kumalive"/>
-								<fmt:message key="config.kumalive.enable"/>
-							</label>
-						</div>
-					
-					<c:if test="${not empty organisationForm.orgId}">
-						<div class="voffset10">
-							<c:if test="${organisationForm.typeId == 2}"><fmt:message key="msg.group.organisation_id"/></c:if>
-							<c:if test="${organisationForm.typeId == 3}"><fmt:message key="msg.subgroup.organisation_id"/></c:if>
-							&nbsp;<c:out value="${organisationForm.orgId}" />.
-						</div>
-					</c:if>
-					
-					<div class="pull-right">
-						<a href="javascript:history.back();" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
-						<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save"/>" />
+				<c:if test="${organisationForm.typeId == 2}">
+					<span><fmt:message key="role.GROUP.MANAGER"/>:</span>
+					<div class="checkbox loffset10">
+						<label for="course-admin-can-add-new-users">
+						<form:checkbox path="courseAdminCanAddNewUsers" id="course-admin-can-add-new-users" />
+							<fmt:message key="admin.can.add.user"/>
+						</label>
 					</div>
+					<div class="checkbox loffset10">
+						<label for="course-admin-can-browse-all-users">
+						<form:checkbox path="courseAdminCanBrowseAllUsers" id="course-admin-can-browse-all-users"/>
+							<fmt:message key="admin.can.browse.user"/>
+						</label>
+					</div>
+					<div class="checkbox loffset10">
+						<label for="course-admin-can-change-status-of-course">
+						<form:checkbox path="courseAdminCanChangeStatusOfCourse" id="course-admin-can-change-status-of-course"/>
+							<fmt:message key="admin.can.change.status"/>
+						</label>
+					</div>
+					<div class="checkbox">
+						<label for="enable-course-notifications">
+						<form:checkbox path="enableCourseNotifications" id="enable-course-notifications"/>
+							<fmt:message key="admin.enable.course.notifications"/>
+						</label>
+					</div>
+					<div class="checkbox">
+						<label for="enableGradebookForLearners">
+						<form:checkbox id="enableGradebookForLearners" path="enableGradebookForLearners" />
+							<fmt:message key="admin.gradebook.learner.enable"/>
+						</label>
+					</div>
+					<div class="checkbox">
+						<label for="enable-single-activity-lessons">
+						<form:checkbox path="enableSingleActivityLessons" id="enable-single-activity-lessons"/>
+							<fmt:message key="config.authoring.single.activity"/>
+						</label>
+					</div>
+				</c:if>
+					
+				<div class="checkbox">
+					<label for="enable-live-edit">
+					<form:checkbox path="enableLiveEdit" id="enable-live-edit"/>
+						<fmt:message key="config.live.edit"/>
+					</label>
+				</div>
+				
+				<div class="checkbox">
+					<label for="enable-kumalive">
+					<form:checkbox path="enableKumalive" id="enable-kumalive"/>
+						<fmt:message key="config.kumalive.enable"/>
+					</label>
+				</div>
+					
+				<c:if test="${not empty organisationForm.orgId}">
+					<div class="voffset10">
+						<c:if test="${organisationForm.typeId == 2}"><fmt:message key="msg.group.organisation_id"/></c:if>
+						<c:if test="${organisationForm.typeId == 3}"><fmt:message key="msg.subgroup.organisation_id"/></c:if>
+						&nbsp;<c:out value="${organisationForm.orgId}" />.
+					</div>
+				</c:if>
+				
+				<div class="pull-right">
+					<a href="javascript:history.back();" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
+					<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save"/>" />
+				</div>
 				
 		</form:form>
 	</lams:Page>

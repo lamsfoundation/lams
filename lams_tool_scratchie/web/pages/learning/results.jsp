@@ -384,7 +384,7 @@
 		</c:if>
 		
 		<!-- Display burningQuestionItemDtos -->
-		<c:if test="${sessionMap.isBurningQuestionsEnabled}">
+		<c:if test="${sessionMap.isBurningQuestionsEnabled and not empty burningQuestionItemDtos}">
             
             <a class="btn btn-sm btn-default pull-right roffset10" href="#" onclick="return refreshToBurningQuestions()">
             	<i class="fa fa-refresh"></i> 

@@ -195,29 +195,34 @@ public class QbQuestion implements Serializable, Cloneable {
 	// options are different
 	List<QbOption> oldOptions = oldQuestion.getQbOptions();
 	List<QbOption> newOptions = getQbOptions();
-	for (QbOption oldOption : oldOptions) {
-	    for (QbOption newOption : newOptions) {
-		if (oldOption.getDisplayOrder() == newOption.getDisplayOrder()) {
-
-		    //ordering
-		    if (((oldQuestion.getType() == QbQuestion.TYPE_ORDERING)
-			    && (oldOption.getDisplayOrder() != newOption.getDisplayOrder()))
-			    //short answer
-			    || ((oldQuestion.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS)
-				    && !StringUtils.equals(oldOption.getName(), newOption.getName()))
-			    //numbering
-			    || (oldOption.getNumericalOption() != newOption.getNumericalOption())
-			    || (oldOption.getAcceptedError() != newOption.getAcceptedError())
-			    //changed option maxMark (Assessment tool) or correctness of the option (MCQ/Scratchie/Q&A)
-			    || (oldOption.getMaxMark() != newOption.getMaxMark())) {
-			isModificationRequiresNewVersion = true;
-			break;
+	if (oldOptions.size() != newOptions.size()) {
+	    isModificationRequiresNewVersion = true;
+	} else if (oldQuestion.getType() == QbQuestion.TYPE_ORDERING) {
+	    for (int optionIndex = 0; optionIndex < oldOptions.size(); optionIndex++) {
+		if (!oldOptions.get(optionIndex).getName().equals(newOptions.get(optionIndex).getName())) {
+		    isModificationRequiresNewVersion = true;
+		    break;
+		}
+	    }
+	} else {
+	    for (QbOption oldOption : oldOptions) {
+		for (QbOption newOption : newOptions) {
+		    if (oldOption.getDisplayOrder() == newOption.getDisplayOrder()) {
+			//ordering
+			if (//short answer
+			((oldQuestion.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS)
+				&& !StringUtils.equals(oldOption.getName(), newOption.getName()))
+				//numbering
+				|| (oldOption.getNumericalOption() != newOption.getNumericalOption())
+				|| (oldOption.getAcceptedError() != newOption.getAcceptedError())
+				//changed option maxMark (Assessment tool) or correctness of the option (MCQ/Scratchie/Q&A)
+				|| (oldOption.getMaxMark() != newOption.getMaxMark())) {
+			    isModificationRequiresNewVersion = true;
+			    break;
+			}
 		    }
 		}
 	    }
-	}
-	if (oldOptions.size() != newOptions.size()) {
-	    isModificationRequiresNewVersion = true;
 	}
 
 	return isModificationRequiresNewVersion ? IQbService.QUESTION_MODIFIED_VERSION_BUMP

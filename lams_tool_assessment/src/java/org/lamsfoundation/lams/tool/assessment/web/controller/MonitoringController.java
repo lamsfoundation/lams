@@ -51,6 +51,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.logevent.LearnerInteractionEvent;
@@ -901,6 +902,9 @@ public class MonitoringController {
 	assessment.setAbsoluteTimeLimit(absoluteTimeLimit == null ? null
 		: LocalDateTime.ofEpochSecond(absoluteTimeLimit, 0, OffsetDateTime.now().getOffset()));
 	service.saveOrUpdateAssessment(assessment);
+
+	// update monitoring UI where time limits are reflected on dashboard
+	FluxRegistry.emit(CommonConstants.ACTIVITY_TIME_LIMIT_CHANGED_SINK_NAME, Set.of(toolContentId));
     }
 
     @RequestMapping(path = "/getPossibleIndividualTimeLimits", method = RequestMethod.GET)
@@ -919,7 +923,8 @@ public class MonitoringController {
 	if (grouping != null) {
 	    Set<Group> groups = grouping.getGroups();
 	    for (Group group : groups) {
-		if (!group.getUsers().isEmpty() && group.getGroupName().toLowerCase().contains(searchString.toLowerCase())) {
+		if (!group.getUsers().isEmpty()
+			&& group.getGroupName().toLowerCase().contains(searchString.toLowerCase())) {
 		    ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
 		    groupJSON.put("label", groupLabel + group.getGroupName() + "\"");
 		    groupJSON.put("value", "group-" + group.getGroupId());

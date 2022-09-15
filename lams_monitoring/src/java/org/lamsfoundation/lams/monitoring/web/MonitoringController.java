@@ -72,6 +72,7 @@ import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.dto.ActivityTimeLimitDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.lesson.util.LearnerActivityCompleteFluxItem;
@@ -84,6 +85,7 @@ import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
+import org.lamsfoundation.lams.tool.service.ICommonScratchieService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -103,6 +105,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -156,6 +159,9 @@ public class MonitoringController {
     private MessageService messageService;
     @Autowired
     private IAuthoringService authoringService;
+    @Autowired
+    @Qualifier("scratchieService")
+    private ICommonScratchieService commonScratchieService;
 
     public MonitoringController() {
 	// bind sinks so a learner finishing an activity also triggers an update in lesson progress
@@ -171,6 +177,10 @@ public class MonitoringController {
 	FluxRegistry.initFluxMap(MonitoringConstants.GRADEBOOK_REFRESH_FLUX_NAME,
 		CommonConstants.LESSON_PROGRESSED_SINK_NAME, null, lessonId -> "doRefresh", FluxMap.STANDARD_THROTTLE,
 		FluxMap.STANDARD_TIMEOUT);
+	FluxRegistry.initFluxMap(MonitoringConstants.TIME_LIMIT_REFRESH_FLUX_NAME,
+		CommonConstants.ACTIVITY_TIME_LIMIT_CHANGED_SINK_NAME,
+		(Collection<Long> key, Collection<Long> item) -> key.containsAll(item), toolContentIds -> "doRefresh",
+		FluxMap.SHORT_THROTTLE, FluxMap.STANDARD_TIMEOUT);
     }
 
     private Integer getUserId() {
@@ -201,6 +211,13 @@ public class MonitoringController {
     public Flux<String> getGradebookUpdateFlux(@RequestParam long lessonId)
 	    throws JsonProcessingException, IOException {
 	return FluxRegistry.get(MonitoringConstants.GRADEBOOK_REFRESH_FLUX_NAME, lessonId);
+    }
+
+    @RequestMapping(path = "/getTimeLimitUpdateFlux", method = RequestMethod.GET, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @ResponseBody
+    public Flux<String> getTimeLimitUpdateFlux(@RequestParam Set<Long> toolContentIds)
+	    throws JsonProcessingException, IOException {
+	return FluxRegistry.get(MonitoringConstants.TIME_LIMIT_REFRESH_FLUX_NAME, toolContentIds);
     }
 
     /**
@@ -1014,13 +1031,20 @@ public class MonitoringController {
 	request.setAttribute("lesson", lessonDTO);
 	boolean isTBLSequence = learningDesignService.isTBLSequence(lessonDTO.getLearningDesignID());
 	request.setAttribute("isTBLSequence", isTBLSequence);
-	boolean useNewUI = WebUtil.readBooleanParam(request, "newUI", true);
-	if (isTBLSequence && useNewUI) {
+	if (isTBLSequence) {
 	    List<Activity> lessonActivities = getLessonActivities(lessonService.getLesson(lessonId));
 	    TblMonitoringController.setupAvailableActivityTypes(request, lessonActivities);
+
+	    boolean burningQuestionsEnabled = false;
+	    Long traToolActivityId = (Long) request.getAttribute("traToolActivityId");
+	    if (traToolActivityId != null) {
+		long traToolContentId = activityDAO.find(ToolActivity.class, traToolActivityId).getToolContentId();
+		burningQuestionsEnabled = commonScratchieService.isBurningQuestionsEnabled(traToolContentId);
+	    }
+	    request.setAttribute("burningQuestionsEnabled", burningQuestionsEnabled);
 	}
 
-	return "monitor" + (useNewUI ? "5" : "");
+	return "monitor";
     }
 
     @RequestMapping("/displaySequenceTab")
@@ -1123,11 +1147,6 @@ public class MonitoringController {
 		    indfm.format(tzFinishDate) + " " + user.getTimeZone().getDisplayName(userLocale));
 	}
 
-	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, false, false);
-	if (contributeActivities != null) {
-	    responseJSON.set("contributeActivities", JsonUtil.readArray(contributeActivities));
-	}
-
 	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
     }
@@ -1196,7 +1215,7 @@ public class MonitoringController {
 	}
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, true, true);
+	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, true, false);
 	if (contributeActivities != null) {
 	    responseJSON.set("contributeActivities", JsonUtil.readArray(contributeActivities));
 	}
@@ -1364,6 +1383,11 @@ public class MonitoringController {
 	    } else {
 		responseJSON.put("lockedForEdit", false);
 	    }
+	}
+
+	List<ActivityTimeLimitDTO> absoluteTimeLimits = lessonService.getRunningAbsoluteTimeLimits(lessonId);
+	if (!absoluteTimeLimits.isEmpty()) {
+	    responseJSON.set("timeLimits", JsonUtil.readArray(absoluteTimeLimits));
 	}
 
 	response.setContentType("application/json;charset=utf-8");
@@ -1604,6 +1628,22 @@ public class MonitoringController {
 	}
 
 	return "timer";
+    }
+
+    @GetMapping("/getTimeLimits")
+    @ResponseBody
+    public String getTimeLimits(@RequestParam long lessonID, HttpServletResponse response) throws IOException {
+	ArrayNode responseJSON = null;
+
+	List<ActivityTimeLimitDTO> absoluteTimeLimits = lessonService.getRunningAbsoluteTimeLimits(lessonID);
+	if (absoluteTimeLimits.isEmpty()) {
+	    responseJSON = JsonNodeFactory.instance.arrayNode();
+	} else {
+	    responseJSON = JsonUtil.readArray(absoluteTimeLimits);
+	}
+
+	response.setContentType("application/json;charset=utf-8");
+	return responseJSON.toString();
     }
 
     /**

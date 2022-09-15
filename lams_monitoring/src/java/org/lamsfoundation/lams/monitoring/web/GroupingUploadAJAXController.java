@@ -38,11 +38,11 @@ import java.util.Set;
 import java.util.Vector;
 
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -188,9 +188,9 @@ public class GroupingUploadAJAXController {
 
     private List<ExcelSheet> exportLearnersForGrouping(Collection<User> learners, Set<Group> groups,
 	    Set<OrganisationGroup> orgGroups) {
-	List<ExcelSheet> sheets = new LinkedList<ExcelSheet>();
+	List<ExcelSheet> sheets = new LinkedList<>();
 	ExcelSheet excelSheet = new ExcelSheet(messageService.getMessage("label.course.groups.prefix"));
- 	sheets.add(excelSheet);
+	sheets.add(excelSheet);
 
 	ExcelRow titleRow = excelSheet.initRow();
 	titleRow.addCell(messageService.getMessage("spreadsheet.column.login"));
@@ -478,34 +478,43 @@ public class GroupingUploadAJAXController {
 	int startRow = sheet.getFirstRowNum();
 	int endRow = sheet.getLastRowNum();
 	int skipped = 0;
+	Set<String> allUsers = new HashSet<>();
 
 	for (int i = startRow + 1; i < (endRow + 1); i++) {
 	    HSSFRow row = sheet.getRow(i);
 	    String login = parseStringCell(row.getCell(0));
-	    if (login != null) {
-		login = login.trim();
-		if (login.length() > 0) {
-		    String groupName = row.getLastCellNum() > 3 ? parseStringCell(row.getCell(3)) : null;
-		    groupName = groupName != null ? groupName.trim() : null;
-		    if (groupName == null || groupName.length() == 0) {
-			skipped++;
-			GroupingUploadAJAXController.log.warn("Unable to add learner " + login
-				+ " for group in related to grouping " + groupingID + " as group name is missing.");
-		    } else {
-			Set<String> users = groups.get(groupName);
-			if (users == null) {
-			    users = new HashSet<>();
-			    groups.put(groupName, users);
-			}
-			users.add(login);
-		    }
-		}
+
+	    if (StringUtils.isBlank(login)) {
+		skipped++;
+		GroupingUploadAJAXController.log.warn(
+			"Unable to add learner for group related to grouping " + groupingID + " as login is missing.");
+		continue;
 	    }
+	    boolean alreadyExists = !allUsers.add(login);
+	    if (alreadyExists) {
+		skipped++;
+		GroupingUploadAJAXController.log.warn(
+			"Skipping duplicate row for learner " + login + " for group related to grouping " + groupingID);
+		continue;
+	    }
+	    String groupName = row.getLastCellNum() > 3 ? parseStringCell(row.getCell(3)) : null;
+	    if (groupName == null || groupName.length() == 0) {
+		skipped++;
+		GroupingUploadAJAXController.log.warn("Unable to add learner " + login
+			+ " for group in related to grouping " + groupingID + " as group name is missing.");
+		continue;
+	    }
+	    Set<String> users = groups.get(groupName);
+	    if (users == null) {
+		users = new HashSet<>();
+		groups.put(groupName, users);
+	    }
+	    users.add(login);
 	}
 	return skipped;
     }
 
-    final Comparator<OrganisationGroup> ORG_GROUP_COMPARATOR = new Comparator<OrganisationGroup>() {
+    final Comparator<OrganisationGroup> ORG_GROUP_COMPARATOR = new Comparator<>() {
 	@Override
 	public int compare(OrganisationGroup o1, OrganisationGroup o2) {
 	    String grp1Name = o1 != null ? o1.getName() : "";

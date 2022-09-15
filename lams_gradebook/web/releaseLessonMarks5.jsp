@@ -360,13 +360,13 @@
             </button>  
 		</div>
 		<div class="row">
-			<div class="col-sm-4 col-xs-12">
+			<div class="col-lg-6 col-md-12">
 				<!-- A dummy element so learners table starts on the same height as email preview -->
 				<span>&nbsp;</span>
 				
                 <div id="release-marks-learners-panel"> </div>
 			</div>
-			<div class="col-sm-8 col-xs-12">
+			<div class="col-lg-6 col-md-12">
                 <div id="release-marks-email-preview">
 					<p style="margin: 0 0 0 0;" class="text-muted text-center"><small><em><fmt:message key="gradebook.monitor.releasemarks.email.preview" />&nbsp;<span id="release-marks-email-preview-user"></span></em></small></p>
                     <div id="release-marks-email-preview-content"></div>

@@ -402,6 +402,8 @@ public interface IUserManagementService {
      */
     boolean isUserSysAdmin();
 
+    boolean isUserSysAdmin(Integer userId);
+
     /**
      * Count then umber of users with a particular role in a given org.
      *

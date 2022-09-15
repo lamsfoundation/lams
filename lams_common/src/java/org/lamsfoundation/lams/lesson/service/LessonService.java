@@ -49,6 +49,7 @@ import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
+import org.lamsfoundation.lams.lesson.dto.ActivityTimeLimitDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.MessageService;
@@ -740,5 +741,10 @@ public class LessonService implements ILessonService {
     @Override
     public void saveLesson(Lesson lesson) {
 	lessonDAO.saveLesson(lesson);
+    }
+
+    @Override
+    public List<ActivityTimeLimitDTO> getRunningAbsoluteTimeLimits(long lessonId) {
+	return lessonDAO.getRunningAbsoluteTimeLimits(lessonId);
     }
 }

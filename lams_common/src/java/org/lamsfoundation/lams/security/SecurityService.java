@@ -34,6 +34,8 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 
 /**
  * Contains methods for checking and logging user access to LAMS content. Should be used throughout the whole project.
@@ -56,6 +58,7 @@ public class SecurityService implements ISecurityService {
 		    + "\"";
 	    SecurityService.log.error(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
+	    logAuditRoleFailure(userId, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -67,6 +70,7 @@ public class SecurityService implements ISecurityService {
 		    + "\"";
 	    SecurityService.log.error(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
+	    logAuditRoleFailure(userId, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -80,6 +84,7 @@ public class SecurityService implements ISecurityService {
 		    + " is learner and can \"" + action + "\"";
 	    SecurityService.log.error(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
+	    logAuditRoleFailure(userId, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -97,6 +102,7 @@ public class SecurityService implements ISecurityService {
 		    + "\"";
 	    SecurityService.log.debug(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
+	    logAuditRoleFailure(userId, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -115,6 +121,7 @@ public class SecurityService implements ISecurityService {
 		    + "\"";
 	    SecurityService.log.error(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
+	    logAuditRoleFailure(userId, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -126,6 +133,7 @@ public class SecurityService implements ISecurityService {
 		    + "\"";
 	    SecurityService.log.error(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
+	    logAuditRoleFailure(userId, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -139,6 +147,7 @@ public class SecurityService implements ISecurityService {
 		    + " is monitor and can \"" + action + "\"";
 	    SecurityService.log.error(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
+	    logAuditRoleFailure(userId, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -160,6 +169,7 @@ public class SecurityService implements ISecurityService {
 	    if (action != null) {
 		SecurityService.log.debug(error);
 		logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
+		logAuditRoleFailure(userId, error);
 	    }
 	    if (escalate) {
 		throw new SecurityException(error);
@@ -178,6 +188,7 @@ public class SecurityService implements ISecurityService {
 	    String error = "Missing lesson ID when checking if user " + userId + " is owner and can \"" + action + "\"";
 	    SecurityService.log.error(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
+	    logAuditRoleFailure(userId, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -189,6 +200,7 @@ public class SecurityService implements ISecurityService {
 		    + "\"";
 	    SecurityService.log.error(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
+	    logAuditRoleFailure(userId, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -202,6 +214,7 @@ public class SecurityService implements ISecurityService {
 		    + " is owner and can \"" + action + "\"";
 	    SecurityService.log.error(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
+	    logAuditRoleFailure(userId, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -213,6 +226,7 @@ public class SecurityService implements ISecurityService {
 	    String error = "User " + userId + " is not owner of lesson " + lessonId + " and can not \"" + action + "\"";
 	    SecurityService.log.debug(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
+	    logAuditRoleFailure(userId, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -231,6 +245,7 @@ public class SecurityService implements ISecurityService {
 		    + "\"";
 	    SecurityService.log.error(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
+	    logAuditRoleFailure(userId, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -242,6 +257,7 @@ public class SecurityService implements ISecurityService {
 		    + action + "\"";
 	    SecurityService.log.error(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
+	    logAuditRoleFailure(userId, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -255,6 +271,7 @@ public class SecurityService implements ISecurityService {
 		    + " is participant and can \"" + action + "\"";
 	    SecurityService.log.error(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
+	    logAuditRoleFailure(userId, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -275,6 +292,7 @@ public class SecurityService implements ISecurityService {
 		    + "\"";
 	    SecurityService.log.debug(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
+	    logAuditRoleFailure(userId, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -291,6 +309,7 @@ public class SecurityService implements ISecurityService {
 	    String error = "Missing user ID when checking if is sysadmin and can \"" + action + "\"";
 	    SecurityService.log.error(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, null, null, error);
+	    logAuditRoleFailure(userId, error);
 	    throw new SecurityException(error);
 	}
 
@@ -298,6 +317,7 @@ public class SecurityService implements ISecurityService {
 	    String error = "User " + userId + " is not sysadmin and can not \"" + action + "\"";
 	    SecurityService.log.debug(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, null, null, error);
+	    logAuditRoleFailure(userId, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -364,11 +384,17 @@ public class SecurityService implements ISecurityService {
 		+ orgId + " and can not \"" + action + "\"";
 	SecurityService.log.debug(error);
 	logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, null, null, error);
+	logAuditRoleFailure(userId, error);
 	if (escalate) {
 	    throw new SecurityException(error);
 	} else {
 	    return false;
 	}
+    }
+
+    private void logAuditRoleFailure(Integer userId, String message) {
+	User user = (User) securityDAO.find(User.class, userId);
+	AuditLogFilter.log(userId, user.getLogin(), "failed role check with message: " + message);
     }
 
     public void setSecurityDAO(ISecurityDAO securityDAO) {

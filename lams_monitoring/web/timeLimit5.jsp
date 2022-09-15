@@ -540,21 +540,21 @@ function scrollToTimeLimitPanel() {
 					<!-- Finish now button at absolute time limit row -->
 				</td>
 				<td class="text-center">
-					<button class="btn btn-secondary"
+					<button class="btn btn-secondary mb-1"
 							onClick="updateTimeLimit('relative', null, 1)">
 						<fmt:message key="label.monitoring.time.limit.plus.minute.1"/>
 					</button>
-					<button class="btn btn-secondary"
+					<button class="btn btn-secondary mb-1"
 							onClick="updateTimeLimit('relative', null, 5)">
 						<fmt:message key="label.monitoring.time.limit.plus.minute.5"/>
 					</button>
 				</td>
 				<td class="text-center">
-					<button class="btn btn-secondary"
+					<button class="btn btn-secondary mb-1"
 							onClick="updateTimeLimit('relative', null, -5)">
 						<fmt:message key="label.monitoring.time.limit.minus.minute.5"/>
 					</button>
-					<button class="btn btn-secondary"
+					<button class="btn btn-secondary mb-1"
 							onClick="updateTimeLimit('relative', null, -1)">
 						<fmt:message key="label.monitoring.time.limit.minus.minute.1"/>
 					</button>
@@ -592,21 +592,21 @@ function scrollToTimeLimitPanel() {
 					</button>
 				</td>
 				<td class="text-center">
-					<button class="btn btn-secondary"
+					<button class="btn btn-secondary mb-1"
 							onClick="updateTimeLimit('absolute', null, 1)">
 						<fmt:message key="label.monitoring.time.limit.plus.minute.1"/>
 					</button>
-					<button class="btn btn-secondary"
+					<button class="btn btn-secondary mb-1"
 							onClick="updateTimeLimit('absolute', null, 5)">
 						<fmt:message key="label.monitoring.time.limit.plus.minute.5"/>
 					</button>
 				</td>
 				<td class="text-center">
-					<button class="btn btn-secondary"
+					<button class="btn btn-secondary mb-1"
 							onClick="updateTimeLimit('absolute', null, -5)">
 						<fmt:message key="label.monitoring.time.limit.minus.minute.5"/>
 					</button>
-					<button class="btn btn-secondary"
+					<button class="btn btn-secondary mb-1"
 							onClick="updateTimeLimit('absolute', null, -1)">
 						<fmt:message key="label.monitoring.time.limit.minus.minute.1"/>
 					</button>

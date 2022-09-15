@@ -948,9 +948,13 @@ public class UserManagementService implements IUserManagementService, Initializi
 
     @Override
     public boolean isUserSysAdmin() {
+	return isUserSysAdmin(getRequestorId());
+    }
+
+    @Override
+    public boolean isUserSysAdmin(Integer userId) {
 	Integer rootOrgId = getRootOrganisation().getOrganisationId();
-	Integer requestorId = getRequestorId();
-	return requestorId != null ? isUserInRole(requestorId, rootOrgId, Role.SYSADMIN) : false;
+	return userId != null && isUserInRole(userId, rootOrgId, Role.SYSADMIN);
     }
 
     @Override

@@ -1,7 +1,14 @@
+var GRAPH_COLORS = {
+		blue: 'rgba(1, 117, 226, 0.85)',
+		yellow: 'rgba(249, 248, 113, 0.85)',
+		green: 'rgba(0, 145, 74, 0.85)',
+		gray: '#6c757d'
+	};
+
 function drawActivityCompletionChart(data, animate){
-	var newData = [ data.possibleLearners - data.startedLearners,
-		 			data.startedLearners - data.completedLearners,
-		 			data.completedLearners
+	var newData = [ data.startedLearners - data.completedLearners,
+		 			data.completedLearners,
+					data.possibleLearners - data.startedLearners
 	   			  ];
 	if (activityCompletionChart != null) {
 		// chart already exists, just update data
@@ -24,15 +31,18 @@ function drawActivityCompletionChart(data, animate){
 			},
 			datasets : [ {
 				data : newData,
-				backgroundColor : [ 'rgba(5, 204, 214, 1)',
-									'rgba(255, 195, 55, 1)',
-									'rgba(253, 60, 165, 1)',
+				backgroundColor : [
+									GRAPH_COLORS.yellow,
+									GRAPH_COLORS.green,
+									GRAPH_COLORS.blue,
 								  ],
-				borderWidth : 0,
+				borderWidth : 1,
+				borderColor : COLORS.gray
 			} ],
-			labels : [ LABELS.ACTIVITY_COMPLETION_CHART_POSSIBLE_LEARNERS,
+			labels : [ 
 					   LABELS.ACTIVITY_COMPLETION_CHART_STARTED_LEARNERS,
-					   LABELS.ACTIVITY_COMPLETION_CHART_COMPLETED_LEARNERS ]
+					   LABELS.ACTIVITY_COMPLETION_CHART_COMPLETED_LEARNERS,
+					   LABELS.ACTIVITY_COMPLETION_CHART_POSSIBLE_LEARNERS, ]
 		},
 		options : {
 			layout : {
@@ -43,6 +53,7 @@ function drawActivityCompletionChart(data, animate){
 			legend : {
 				position: 'left',
 				labels : {
+					fontSize : 16,
 					generateLabels : function(chart) {
 						var data = chart.data;
 						if (data.labels.length && data.datasets.length) {
@@ -55,7 +66,7 @@ function drawActivityCompletionChart(data, animate){
 									text: label + ": " + value,
 									fillStyle: style.backgroundColor,
 									strokeStyle: style.borderColor,
-									lineWidth: style.borderWidth,
+									lineWidth: 0,
 									hidden: isNaN(value) || meta.data[i].hidden,
 
 									// Extra data used for toggling the
@@ -70,7 +81,7 @@ function drawActivityCompletionChart(data, animate){
 			},
 			title : {
 				display: true,
-				fontSize : '15',
+				fontSize : '18',
 				text : LABELS.ACTIVITY_COMPLETION_CHART_TITLE
 			},
 			animation : {
@@ -106,7 +117,7 @@ function drawAnsweredQuestionsChart(data, useGroups, animate){
 		data : {
 			datasets : [ {
 				data :  Object.values(data.answeredQuestionsByUsersCount),
-				backgroundColor : 'rgba(255, 195, 55, 1)'
+				backgroundColor : GRAPH_COLORS.green
 								  
 			} ],
 			labels :  Object.keys(data.answeredQuestionsByUsersCount),
@@ -122,8 +133,8 @@ function drawAnsweredQuestionsChart(data, useGroups, animate){
 			},
 			title : {
 				display: true,
-				fontSize : '15',
-				lineHeight: 3,
+				fontSize : '18',
+				lineHeight: 2,
 				text : useGroups ? LABELS.ANSWERED_QUESTIONS_CHART_TITLE_GROUPS : LABELS.ANSWERED_QUESTIONS_CHART_TITLE
 			},
 			animation : {

@@ -8,11 +8,14 @@
 		display: none;
 		margin: 20px 0;
 	}
+	
+	.gbTopButtonsContainer button {
+		margin: 0 0 0 .8rem;
+	}
 </style>
 	
 <script type="text/javascript">
 
-	var marksReleased = ${marksReleased};
 	var graphLoaded = false;
 
 	function toggleMarkChart() {
@@ -67,7 +70,8 @@
 		
 		if (releaseMarksPanel.is(':empty')) {
 			releaseMarksPanel.load('<lams:LAMSURL/>gradebook/gradebookMonitoring/displayReleaseMarksPanel.do',{
-				'lessonID' : ${lessonDetails.lessonID}
+				'lessonID' : ${lessonDetails.lessonID},
+				'isTab'	   : true
 			}, function(){
 				releaseMarksPanel.slideDown();
 			});
@@ -78,13 +82,24 @@
 		}
 	}
 
+	/*
+		Expands all subgrids of the given jqGrid.
+	*/
+	function expandAllRows(jqGridId) {
+		let jqGrid = $('#' + jqGridId),
+			ids = jqGrid.getDataIDs();
+		$.each(ids, function(){
+			jqGrid.expandSubGridRow(this);
+		});
+	}
+
 	jQuery(document).ready(function(){
 		var jqgridWidth = $(window).width() - 100;
 		
 		// Create the user view grid with sub grid for activities
 		jQuery("#userView").jqGrid({
-			guiStyle: "bootstrap",
-			iconSet: 'fontAwesome',
+			guiStyle: "bootstrap4",
+			iconSet: 'fontAwesomeSolid',
 			autoencode:false,
 			caption: "<fmt:message key="gradebook.gridtitle.usergrid"/>",
 		    datatype: "xml",
@@ -134,6 +149,7 @@
 			    jQuery("#userView").clearGridData();
 			   	alert("<fmt:message key="gradebook.error.loaderror"/>");
 		    },
+
 		    subGrid: true,
 			subGridRowExpanded: function(subgrid_id, row_id) {
 				var subgrid_table_id = subgrid_id+"_t",
@@ -143,8 +159,8 @@
 		   	   
 				jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
 				jQuery("#"+subgrid_table_id).jqGrid({
-						 guiStyle: "bootstrap",
-						 iconSet: 'fontAwesome',
+						 guiStyle: "bootstrap4",
+						 iconSet: 'fontAwesomeSolid',
 						 autoencode:false,
 					     datatype: "xml",
 					     url: "<lams:LAMSURL />gradebook/gradebook/getActivityGridData.do?lessonID=${lessonDetails.lessonID}&view=monUserView&userID=" + userID,
@@ -200,7 +216,7 @@
 				    	 	if (cellname == "mark") {
 				    	 		
 				    	 		var rowData = jQuery("#"+subgrid_table_id).getRowData(rowid);
-				    	 		var string = removeHTMLTags(rowData["mark"]);
+				    	 		var string = removeHTMLTags(value);
 				    	 		
 				    	 		
 				    	 		if (string.indexOf("-") != -1)
@@ -223,7 +239,7 @@
 				    	 	}
 				    	 },
 				    	 beforeSaveCell: function(rowid, cellname,value, iRow, iCol){
-				    	 	value = trim(value);
+				    	 	value = value ? value.trim() : value;
 				    	 	
 				    	 	if (cellname == "mark") {
 				    	 		if (value == "") {
@@ -348,8 +364,8 @@
 						   	    activityID = rowData["id"].split("_")[0];
 							jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll archive'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
 							jQuery("#"+subgrid_table_id).jqGrid({
-									 guiStyle: "bootstrap",
-									 iconSet: 'fontAwesome',
+									 guiStyle: "bootstrap4",
+									 iconSet: 'fontAwesomeSolid',
 									 autoencode:false,
 									 autowidth: true,
 								     datatype: "xml",
@@ -398,13 +414,19 @@
 				gridComplete: function(){
 			   	 	initializePortraitPopover('<lams:LAMSURL/>');
 				}
-			}).navGrid("#userViewPager", {edit:false,add:false,del:false,search:false}); // applying refresh button
+			}).navGrid("#userViewPager", {edit:false,add:false,del:false,search:false})// applying refresh button
+			  .on('jqGridBeforeEditCell', function(){
+				  $(this).data('isCellEdited', true);
+			  })
+			  .on('jqGridAfterSaveCell jqGridAfterRestoreCell', function(){
+				  $(this).data('isCellEdited', false);
+			  });
 			jQuery("#userView").jqGrid('filterToolbar');
 
 			// Creating activity view with sub learner view
 			jQuery("#activityView").jqGrid({
-				guiStyle: "bootstrap",
-				iconSet: 'fontAwesome',
+				guiStyle: "bootstrap4",
+				iconSet: 'fontAwesomeSolid',
 				autoencode:false,
 				caption: "<fmt:message key="gradebook.gridtitle.activitygrid"/>",
 			    datatype: "xml",
@@ -439,6 +461,12 @@
 		    		jQuery("#activityView").clearGridData();
 		    		alert("<fmt:message key="gradebook.error.loaderror"/>");
 		    	},
+		    	beforeEditCell : function() {
+				    $(this).data('isCellEdited', true);
+				},
+				afterEditCell : function(){
+					$(this).data('isCellEdited', false);
+				},
 			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
 				   var subgrid_table_id;
@@ -448,8 +476,8 @@
 				   
 				   jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
 				   jQuery("#"+subgrid_table_id).jqGrid({
-							 guiStyle: "bootstrap",
-						 iconSet: 'fontAwesome',
+							 guiStyle: "bootstrap4",
+						 iconSet: 'fontAwesomeSolid',
 						 autoencode:false,
 					     datatype: "xml",
 					     url: "<lams:LAMSURL />gradebook/gradebook/getUserGridData.do?view=monActivityView&lessonID=${lessonDetails.lessonID}&activityID=" + activityID + "&groupId=" + groupID,
@@ -499,6 +527,12 @@
 					    		jQuery("#"+subgrid_table_id).clearGridData();
 					    		alert("<fmt:message key="gradebook.error.loaderror"/>");
 					    	 },
+				    	 beforeEditCell : function() {
+						    $("#activityView").data('isCellEdited', true);
+						 },
+						 afterEditCell : function(){
+							$("#activityView").data('isCellEdited', false);
+						 },
 				    	 formatCell: function(rowid, cellname,value, iRow, iCol) {
 				    	 	if (cellname == "mark") {
 				    	 		
@@ -525,7 +559,7 @@
 				    	 	}
 				    	 },
 				    	 beforeSaveCell: function(rowid, cellname,value, iRow, iCol){
-				    	 	value = trim(value);
+				    		 value = value ? value.trim() : value;
 				    	 	
 				    	 	if (cellname == "mark") {
 				    	 		if (value == "") {
@@ -583,8 +617,8 @@
 						   	    userID = nameParts[3];
 							jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll archive'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
 							jQuery("#"+subgrid_table_id).jqGrid({
-									 guiStyle: "bootstrap",
-									 iconSet: 'fontAwesome',
+									 guiStyle: "bootstrap4",
+									 iconSet: 'fontAwesomeSolid',
 									 autoencode:false,
 								     datatype: "xml",
 								     url: "<lams:LAMSURL />gradebook/gradebook/getActivityArchiveGridData.do?lessonID=${lessonDetails.lessonID}&activityID="
@@ -624,7 +658,13 @@
 								     loadError: function(xhr,st,err) {
 								    	jQuery("#"+subgrid_table_id).clearGridData();
 								 	 	alert("<fmt:message key="gradebook.error.loaderror"/>");
-								     }
+								     },
+							    	 beforeEditCell : function() {
+									    $("#activityView").data('isCellEdited', true);
+									 },
+									 afterEditCell : function(){
+										$("#activityView").data('isCellEdited', false);
+									 },
 							  	});
 							}
 					 }).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false}) // applying refresh button
@@ -634,14 +674,19 @@
 				 gridComplete: function(){
 				 	fixPagerInCenter('activityViewPager', 0);
 				 }	 
-			}).navGrid("#activityViewPager", {edit:false,add:false,del:false,search:false}); // enable refresh button
-			
+			}).navGrid("#activityViewPager", {edit:false,add:false,del:false,search:false}) // enable refresh button
+			  .on('jqGridBeforeEditCell', function(){
+				  $(this).data('isCellEdited', true);
+			  })
+			  .on('jqGridAfterSaveCell jqGridAfterRestoreCell', function(){
+				  $(this).data('isCellEdited', false);
+			  });
+			  
 			$("#export-grades-button").click(function() {
 				var areaToBlock = "export-link-area";
 				var exportExcelUrl = "<lams:WebAppURL/>gradebookMonitoring/exportExcelLessonGradebook.do?<csrf:token/>&lessonID=${lessonDetails.lessonID}";
-				var languageLabelWait = "<fmt:message key='gradebook.coursemonitor.wait'/>";
 				// if exportSpan is hidden then icon only mode, use small font.
-				blockExportButton(areaToBlock, exportExcelUrl, languageLabelWait, $("#exportSpan:hidden").length > 0);
+				blockExportButton(areaToBlock, exportExcelUrl);
 				
 				return false;
 			});
@@ -656,117 +701,116 @@
 	            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible", this));
 	        })
 
-	        function userNameFormatter (cellvalue, options, rowObject) {
-				return definePortraitPopover(rowObject[8].innerHTML, rowObject.id, cellvalue, cellvalue, true);
-			}
-
-	        // Combine portraits with activityURL. Both are optional so it is mix and match.
-       	 	function userNameFormatterActivity (cellvalue, options, rowObject) {
-       	 		var portProcessed = definePortraitPopover(rowObject[9].innerHTML, rowObject.id, cellvalue, cellvalue, true);
-       	 		if ( rowObject.children.length > 10 && rowObject[10].innerHTML.length > 0 ) {
-       	 			var activityURL = rowObject[10].innerHTML;
-       	 			if ( portProcessed.indexOf('<a') != -1 ) {
-       	 				return portProcessed.replace("<a ", "<a href='"+activityURL+"' ");
-       	 			} else {
-       	 				return "<a href='"+activityURL+"'>"+cellvalue+"</a>";
-       	 			}
-       	 		} 
-       	 		return portProcessed;
-			}
 
 	        setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
+	    	
+	    	$("#userView, #activityView").bind("jqGridAfterGridComplete", function () {
+		   	   let grid = $(this), 
+		   	       expandedGridIds = grid.data('expandedGridIds');
+		   	   $(this).data('expandedGridIds', null);
+		   	   if (expandedGridIds) {
+			   	   $(expandedGridIds).each(function(index, id){
+				   		grid.jqGrid('expandSubGridRow', id);
+			   	   });
+		   	   }
+	    	});
+	    	
+	    	$("#userView").bind("jqGridAfterGridComplete", function () {
+		   	   if (sequenceSearchedLearner) {
+			   	   $('tr[id="' + sequenceSearchedLearner + '"]', this).addClass('table-success');
+			   	}
+	    	});
 
 	});
+
+    function userNameFormatter (cellvalue, options, rowObject) {
+		return definePortraitPopover(rowObject[8].innerHTML, rowObject.id, cellvalue, cellvalue, true);
+	}
+
+    // Combine portraits with activityURL. Both are optional so it is mix and match.
+ 	function userNameFormatterActivity (cellvalue, options, rowObject) {
+ 		var portProcessed = definePortraitPopover(rowObject[9].innerHTML, rowObject.id, cellvalue, cellvalue, true);
+ 		if ( rowObject.children.length > 10 && rowObject[10].innerHTML.length > 0 ) {
+ 			var activityURL = rowObject[10].innerHTML;
+ 			if ( portProcessed.indexOf('<a') != -1 ) {
+ 				return portProcessed.replace("<a ", "<a href='"+activityURL+"' ");
+ 			} else {
+ 				return "<a href='"+activityURL+"'>"+cellvalue+"</a>";
+ 			}
+ 		} 
+ 		return portProcessed;
+	}
 </script>
 
-
-<div class="gbTopButtonsContainer pull-left flaot-start">
-	<div class="visible-xs-inline">
-		<div id="padlockLocked" style="display:none">
-			<span class="lockLabel">
-			<i class="fa fa-lock"></i>
-			<fmt:message key="label.marks"/>
-			</span>
-		</div>
-		<div id="padlockUnlocked" style="display:none">
-			<span class="lockLabel">
-			<i class="fa fa-unlock"></i>
-			<fmt:message key="label.marks"/>
-			</span>
-		</div>
-	</div>
-</div>
-
-<div class="gbTopButtonsContainer pull-right float-end" id="export-link-area">
+<div class="gbTopButtonsContainer d-flex justify-content-end" id="export-link-area">
 
 	<div>
-		<a href="#nogo" id="export-grades-button" class="btn btn-sm btn-default btn-secondary" title="<fmt:message key='gradebook.export.excel'/>" >
-			<i class="fa fa-download"></i><span id="exportSpan" class="hidden-xs">
+		<button type="button" id="export-grades-button" class="btn btn-secondary" title="<fmt:message key='gradebook.export.excel'/>" >
+			<i class="fa-solid fa-download"></i><span id="exportSpan" class="hidden-xs">
 			<fmt:message key="gradebook.export.excel" />
 			</span>
-		</a> 
+		</button> 
 	</div>
 
 	<div id="tour-release-marks">
-		<a href="javascript:toggleReleaseMarksPanel()" class="btn btn-sm btn-default btn-secondary" 
+		<button type="button" onClick="javascript:toggleReleaseMarksPanel()" class="btn btn-secondary" 
 			title="<fmt:message key="gradebook.monitor.releasemarks.toggle.panel.tooltip" />">
-			<i class="fa fa-share-alt "></i> <span class="hidden-xs">
+			<i class="fa-solid fa-share-alt "></i> <span class="hidden-xs">
 				<fmt:message key="gradebook.monitor.releasemarks.toggle.panel" />
 			</span>
-		</a>
+		</button>
 	</div>
 
-		<div id="tour-mark-chart-button">
+	<div id="tour-mark-chart-button">
 		<div id="markChartShown" style="display:none">
-			<a href="javascript:toggleMarkChart()" class="btn btn-sm btn-default btn-secondary" title="<fmt:message key='label.hide.marks.chart'/>" >
-				<i class="fa fa-bar-chart"></i> <span class="hidden-xs">
+			<button type="button" onClick="javascript:toggleMarkChart()" class="btn btn-secondary" title="<fmt:message key='label.hide.marks.chart'/>" >
+				<i class="fa-solid fa-bar-chart"></i> <span class="hidden-xs">
 				<fmt:message key="label.hide.marks.chart"/>
 				</span>
-			</a> 
+			</button> 
 		</div>
 		<div id="markChartHidden">
-			<a href="javascript:toggleMarkChart()" class="btn btn-sm btn-default btn-secondary" title="<fmt:message key='label.show.marks.chart'/>" >
-				<i class="fa fa-bar-chart"></i> <span class="hidden-xs">
+			<button type="button" onClick="javascript:toggleMarkChart()" class="btn btn-secondary" title="<fmt:message key='label.show.marks.chart'/>" >
+				<i class="fa-solid fa-bar-chart"></i> <span class="hidden-xs">
 				<fmt:message key="label.show.marks.chart"/>
 				</span>
-			</a> 
+			</button> 
 		</div>
 	</div>
 	
 	<c:if test="${usesWeights}">
 		<div id="tour-weight-button">
 			<div id="weightShown" style="display:none">
-			<a href="javascript:toggleWeight()" class="btn btn-sm btn-default btn-secondary" title="<fmt:message key='label.button.hide.weights'/>" >
-				<i class="fa fa-balance-scale"></i> <span class="hidden-xs">
+			<button type="button" onClick="javascript:toggleWeight()" class="btn btn-secondary" title="<fmt:message key='label.button.hide.weights'/>" >
+				<i class="fa-solid fa-balance-scale"></i> <span class="hidden-xs">
 				<fmt:message key="label.button.hide.weights"/>
 				</span>
-			</a> 
+			</button>  
 			</div>
 			<div id="weightHidden">
-				<a href="javascript:toggleWeight()" class="btn btn-sm btn-default btn-secondary" title="<fmt:message key='label.button.show.weights'/>" >
-					<i class="fa fa-balance-scale"></i> <span class="hidden-xs">
+				<button type="button" onClick="javascript:toggleWeight()" class="btn btn-sm btn-secondary" title="<fmt:message key='label.button.show.weights'/>" >
+					<i class="fa-solid fa-balance-scale"></i> <span class="hidden-xs">
 					<fmt:message key="label.button.show.weights"/>
 					</span>
-				</a> 
+				</button>  
 			</div>
 		</div>
 	</c:if>
 	
-	<button onclick="javascript:startTour();return false;" class="btn btn-sm btn-default btn-secondary float-end tour-button"> 
-	<i class="fa fa-question-circle"></i> <span class="hidden-xs">Tour</span></button>
+	<!-- 
+	<div>
+		<button onclick="javascript:startTour();return false;" class="btn btn-sm btn-secondary tour-button"> 
+			<i class="fa-solid fa-question-circle"></i> <span class="hidden-xs">Tour</span>
+		</button>
+	</div>
+	 -->
 </div> <!-- Closes buttons -->
 		
-<div class="row">
-	<div class="col-xs-12">
-		<div id="releaseMarksPanel"></div>
-	</div>
-</div>
+<div id="releaseMarksPanel"></div>
 		
-<div class="row">
-	 <div class="col-xs-12">
+<div>
 	 <lams:WaitingSpinner id="markChartBusy"/>
-		 <div id="markChartDiv" class="markChartDiv" style="display:none"></div>
-	</div>
+	 <div id="markChartDiv" class="markChartDiv" style="display:none"></div>
 </div>
 
 <c:if test="${usesWeights}">
@@ -792,12 +836,16 @@
 	</div>	
 </c:if>
 
-<div class="grid-holder voffset20 mt-5">
+<div class="grid-holder mt-4">
+	<div class="d-flex flex-row-reverse mb-2">
+		<button class="btn btn-secondary btn-sm" onClick="javascript:expandAllRows('userView')"><fmt:message key="gradebook.grid.expand.all"/></button>
+	</div>
 	<table id="userView" class="scroll" ></table>
 	<div id="userViewPager" class="scroll" ></div>
 	
-	<br />
-	<br />
+	<div class="d-flex flex-row-reverse mt-4 mb-2">
+		<button class="btn btn-secondary btn-sm" onClick="javascript:expandAllRows('activityView')"><fmt:message key="gradebook.grid.expand.all"/></button>
+	</div>
 	
 	<table id="activityView" class="scroll" ></table>
 	<div id="activityViewPager" class="scroll" ></div>

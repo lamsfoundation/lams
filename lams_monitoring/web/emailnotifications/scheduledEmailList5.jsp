@@ -13,11 +13,11 @@
 	
 	<c:choose>
 		<c:when test="${lessonID != null}">
-			<c:set var="returnUrlParams">getLessonView.do?lessonID=${lessonID}</c:set>
+			<c:set var="returnUrlParams">getLessonView.do?newUI=true&lessonID=${lessonID}</c:set>
 			<c:set var="deleteUrlParams">lessonID=${lessonID}</c:set>
 		</c:when>
 		<c:otherwise>
-			<c:set var="returnUrlParams">getCourseView.do?organisationID=${organisationID}</c:set>
+			<c:set var="returnUrlParams">getCourseView.do?newUI=true&organisationID=${organisationID}</c:set>
 			<c:set var="deleteUrlParams">organisationID=${organisationID}</c:set>
 		</c:otherwise>
 	</c:choose>

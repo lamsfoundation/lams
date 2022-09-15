@@ -565,7 +565,16 @@ public class LearningController {
 	if (isBurningQuestionsEnabled) {
 	    List<BurningQuestionItemDTO> burningQuestionItemDtos = scratchieService.getBurningQuestionDtos(scratchie,
 		    toolSessionId, true, true);
-	    request.setAttribute(ScratchieConstants.ATTR_BURNING_QUESTION_ITEM_DTOS, burningQuestionItemDtos);
+	    boolean burningQuestionsAvailable = false;
+	    for (BurningQuestionItemDTO burningQuestionItemDto : burningQuestionItemDtos) {
+		if (!burningQuestionItemDto.getBurningQuestionDtos().isEmpty()) {
+		    burningQuestionsAvailable = true;
+		    break;
+		}
+	    }
+	    if (burningQuestionsAvailable) {
+		request.setAttribute(ScratchieConstants.ATTR_BURNING_QUESTION_ITEM_DTOS, burningQuestionItemDtos);
+	    }
 	}
 
 	// display other groups' notebooks

@@ -1,7 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <% pageContext.setAttribute("newLineChar", "\r\n"); %>
 
-<c:set var="timeLimitPanelUrl"><lams:LAMSURL/>monitoring/timeLimit.jsp</c:set>
+<c:set var="timeLimitPanelUrl"><lams:LAMSURL/>monitoring/timeLimit5.jsp</c:set>
 <c:url var="timeLimitPanelUrl" value="${timeLimitPanelUrl}">
 	<c:param name="toolContentId" value="${assessment.contentId}"/>
 	<c:param name="absoluteTimeLimit" value="${assessment.absoluteTimeLimitSeconds}"/>
@@ -9,17 +9,12 @@
 	<c:param name="isTbl" value="true" />
 	<c:param name="controllerContext" value="tool/laasse10/monitoring" />
 </c:url>
-	
-<style>
-	#completion-charts-container > div {
-		padding: 5rem 0;
-	}
-</style>
 
-<script src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-<script src="<lams:LAMSURL/>includes/javascript/jquery.plugin.js"></script>
-<script src="<lams:LAMSURL/>includes/javascript/jquery.countdown.js"></script>
-<lams:JSImport src="includes/javascript/chart.js" relative="true" />
+<style>
+
+</style>
+	
+<lams:JSImport src="includes/javascript/chart5.js" relative="true" />
 
 <script>	
 	var WEB_APP_URL = '<lams:WebAppURL />',
@@ -52,8 +47,17 @@
 		COMPLETION_CHART_UPDATE_INTERVAL = 0;
 	
 	$(document).ready(function(){
-		drawCompletionCharts(${toolContentID}, ${groupsInAnsweredQuestionsChart}, false);
+		openEventSource('<lams:WebAppURL />monitoring/getCompletionChartsData.do?toolContentId=${toolContentID}', function(event) {
+			if (!event.data) {
+				return;
+			}
+			var data = JSON.parse(event.data);
+			drawActivityCompletionChart(data, true);
+			drawAnsweredQuestionsChart(data, ${groupsInAnsweredQuestionsChart}, true);
 
+			$('#student-choices-table').load('<lams:WebAppURL />tblmonitoring/iraAssessmentStudentChoicesTable.do?toolContentID=${toolContentID}');
+		});
+		
 		$('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');
 	});
 			
@@ -67,58 +71,65 @@
 	    form.submit();
 	};
 </script>
-
-<!-- Header -->
-<div class="row no-gutter">
-	<div class="col-xs-12 col-md-12 col-lg-8">
-		<h3>
-			<fmt:message key="label.ira.questions.marks"/>
-		</h3>
-	</div>
-</div>
-<!-- End header -->
-
-<!-- Notifications -->  
-<div class="row no-gutter">
-	<div class="col-md-4 col-lg-4 ">
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-10 offset-1 text-center">
+			<h3>
+				<fmt:message key="label.ira.questions.marks"/>
+			</h3>
+		</div>
 	</div>
 	
-	<div class="col-xs-12 col-md-8 col-lg-6 col-lg-offset-2">
-		<a href="#nogo" type="button" class="btn btn-sm btn-default buttons_column"
-				onclick="javascript:loadTab('iraAssessment'); return false;">
-			<i class="fa fa-undo"></i>
-			<fmt:message key="label.hide.students.choices"/>
-		</a>
-		<a href="#nogo" onclick="javascript:printTable(); return false;" type="button" class="btn btn-sm btn-default buttons_column">
-			<i class="fa fa-print"></i>
-			<fmt:message key="label.print"/>
-		</a>
-		<a href="#nogo" onclick="javascript:exportExcel(); return false;" type="button" class="btn btn-sm btn-default buttons_column">
-			<i class="fa fa-file"></i>
-			<fmt:message key="label.excel.export"/>
-		</a>
-		<c:if test="${vsaPresent}">
-			<a class="btn btn-sm btn-default buttons_column" target="_blank"
+	<!-- Notifications -->  
+	<div class="row">
+		<div class="col-10 offset-1 text-end">
+			<a href="#nogo" type="button" class="btn btn-secondary buttons_column"
+					onclick="javascript:loadTab('irat', $('#load-irat-tab-btn'))">
+				<i class="fa fa-undo"></i>
+				<fmt:message key="label.hide.students.choices"/>
+			</a>
+			<a href="#nogo" onclick="javascript:printTable(); return false;" type="button" class="btn btn-secondary buttons_column">
+				<i class="fa fa-print"></i>
+				<fmt:message key="label.print"/>
+			</a>
+			<a href="#nogo" onclick="javascript:exportExcel(); return false;" type="button" class="btn btn-secondary buttons_column">
+				<i class="fa fa-file"></i>
+				<fmt:message key="label.excel.export"/>
+			</a>
+			<a class="btn btn-secondary buttons_column d-none" target="_blank" id="allocate-vsas-button"
 			   href='<lams:LAMSURL />qb/vsa/displayVsaAllocate.do?toolContentID=${toolContentID}'>
 				<fmt:message key="label.vsa.allocate.button" />
 			</a>
-		</c:if>
+		</div>
 	</div>
-</div>
-<br>
-<!-- End notifications -->
+	<!-- End notifications -->
 
-<div id="completion-charts-container">
-	<div class="col-sm-12 col-md-6">
-		<canvas id="activity-completion-chart"></canvas>
+	<div class="row" id="completion-charts-container">
+		<div class="col-md-5 col-sm-12 offset-md-1 me-2 my-4">
+			<div class="monitoring-panel">
+				<canvas id="activity-completion-chart"></canvas>
+			</div>
+		</div>
+		
+		<div class="col-md-5 col-sm-12 ms-2 my-4">
+			<div class="monitoring-panel">
+				<h4 id="answered-questions-chart-none" class="text-center position-relative top-50">
+					<fmt:message key="label.monitoring.student.choices.none" />
+				</h4>
+				<canvas id="answered-questions-chart"></canvas>
+			</div>
+		</div>
 	</div>
 	
-	<div class="col-sm-12 col-md-6">
-		<canvas id="answered-questions-chart"></canvas>
+	<%-- Include student's choices part --%>
+	<div class="row">
+		<div class="col-10 offset-1" id="student-choices-table">
+			<%@ include file="/pages/monitoring/parts/mcqStudentChoices5.jsp" %>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col-10 offset-1" id="time-limit-panel-placeholder">
+		</div>
 	</div>
 </div>
-
-<%-- Include student's choices part --%>
-<%@ include file="/pages/monitoring/parts/mcqStudentChoices.jsp" %>
-
-<div id="time-limit-panel-placeholder"></div>

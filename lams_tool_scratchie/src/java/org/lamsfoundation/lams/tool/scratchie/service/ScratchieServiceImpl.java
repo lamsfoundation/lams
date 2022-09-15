@@ -657,6 +657,15 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     }
 
     /**
+     * Tells whether burning questions are enabled in the given activity
+     */
+    @Override
+    public boolean isBurningQuestionsEnabled(long toolContentId) {
+	Scratchie scratchie = getScratchieByContentId(toolContentId);
+	return scratchie != null && scratchie.isBurningQuestionsEnabled();
+    }
+
+    /**
      * Counts how many questions were answered correctly on first attempt by the given user, regardless of mark given.
      */
     @Override
@@ -1811,6 +1820,9 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		}
 
 		for (OptionDTO optionDto : optionDtos) {
+		    if (StringUtils.isBlank(optionDto.getAnswer())) {
+			continue;
+		    }
 		    row = researchAndAnalysisSheet.initRow();
 		    String optionTitle = isMcqItem ? removeHtmlMarkup(optionDto.getAnswer())
 			    : optionDto.getAnswer().strip().replace("\r\n", ", ");
@@ -2110,6 +2122,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    if (session != null) {
 		// for this view, we need user ID, not UID
 		summary.setLeaderUid(session.getGroupLeader().getUserId());
+		summary.setScratchingFinished(session.isScratchingFinished());
 	    }
 
 	    //prepare OptionDtos to display

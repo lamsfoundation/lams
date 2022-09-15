@@ -23,9 +23,12 @@
 
 package org.lamsfoundation.lams.lesson.dao.hibernate;
 
+import java.math.BigInteger;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -41,8 +44,11 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
+import org.lamsfoundation.lams.lesson.dto.ActivityTimeLimitDTO;
+import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -97,6 +103,14 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 
     private final static String FIND_LESSON_IDS_BY_ORG_ID = "SELECT lesson.lessonId FROM " + Lesson.class.getName()
 	    + " AS lesson WHERE lesson.organisation.organisationId = :organisationId";
+
+    private final static String FIND_ABSOLUTE_TIME_LIMITS = "SELECT a.tool_content_id AS toolContentId, a.title AS activityTitle, "
+	    + "(SELECT absolute_time_limit FROM tl_lascrt11_scratchie WHERE content_id = tool_content_id UNION "
+	    + "	SELECT absolute_time_limit FROM tl_laasse10_assessment WHERE content_id = tool_content_id "
+	    + "<ADDITIONAL_TOOLS_PLACEHOLDER>) AS absolute_time_limit "
+	    + "FROM lams_lesson AS l JOIN lams_learning_activity AS a USING (learning_design_id) "
+	    + "WHERE l.lesson_id = :lessonId AND a.tool_content_id IS NOT NULL    "
+	    + "HAVING absolute_time_limit > UTC_TIMESTAMP() ORDER BY absolute_time_limit";
 
     /**
      * Retrieves the Lesson. Used in instances where it cannot be lazy loaded so it forces an initialize.
@@ -433,4 +447,35 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 	return query.list();
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<ActivityTimeLimitDTO> getRunningAbsoluteTimeLimits(long lessonId) {
+	StringBuilder additionalToolsBuilder = new StringBuilder();
+
+	boolean toolAvailable = !findByProperty(Tool.class, "toolSignature", CommonConstants.TOOL_SIGNATURE_DOKU, true)
+		.isEmpty();
+	if (toolAvailable) {
+	    additionalToolsBuilder.append(
+		    "UNION SELECT absolute_time_limit FROM tl_ladoku11_dokumaran WHERE content_id = tool_content_id ");
+	}
+
+	toolAvailable = !findByProperty(Tool.class, "toolSignature", CommonConstants.TOOL_SIGNATURE_WHITEBOARD, true)
+		.isEmpty();
+	if (toolAvailable) {
+	    additionalToolsBuilder.append(
+		    "UNION SELECT absolute_time_limit FROM tl_lawhiteboard11_whiteboard WHERE content_id = tool_content_id");
+	}
+
+	String queryText = FIND_ABSOLUTE_TIME_LIMITS.replace("<ADDITIONAL_TOOLS_PLACEHOLDER>", additionalToolsBuilder);
+	Query<Object[]> query = getSession().createSQLQuery(queryText).setParameter("lessonId", lessonId);
+	List<Object[]> queryResult = query.getResultList();
+	List<ActivityTimeLimitDTO> result = new LinkedList<>();
+	for (Object[] entry : queryResult) {
+
+	    ActivityTimeLimitDTO dto = new ActivityTimeLimitDTO(((BigInteger) entry[0]).longValue(), (String) entry[1],
+		    ((Date) entry[2]).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+	    result.add(dto);
+	}
+	return result;
+    }
 }

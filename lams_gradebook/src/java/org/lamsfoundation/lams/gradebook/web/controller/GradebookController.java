@@ -461,6 +461,10 @@ public class GradebookController {
 
 	} else if (view == GBGridView.MON_COURSE || view == GBGridView.LIST) {
 	    isGroupManager = userManagementService.hasRoleInOrganisation(viewer, Role.ROLE_GROUP_MANAGER, organisation);
+	    if (!isGroupManager && organisation.getParentOrganisation() != null) {
+		isGroupManager = userManagementService.hasRoleInOrganisation(viewer, Role.ROLE_GROUP_MANAGER,
+			organisation.getParentOrganisation());
+	    }
 	    if (!isGroupManager && !securityService.hasOrgRole(courseID, viewer.getUserId(),
 		    new String[] { Role.MONITOR }, "get course gradebook", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN,
