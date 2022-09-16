@@ -54,6 +54,12 @@
 	
 	span.wrong-response {
 	  background-color: #d9534f; }
+	  
+	.burning-questions-badge {
+		margin-left: 5px;
+		font-size: 11px;
+		background-color: #aaa;
+	}
 </style>
 
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/common.js"></script>
@@ -135,6 +141,15 @@
 						<a data-toggle="modal" href="#question${i.index}Modal">
 							<fmt:message key="label.authoring.basic.question.text"/> ${i.index + 1}
 						</a>
+						<c:if test="${not empty burningQuestionItemDtos}">
+							<c:forEach var="burningQuestionDto" items="${burningQuestionItemDtos}">
+								<c:if test="${burningQuestionDto.scratchieItem.uid eq item.uid and not empty burningQuestionDto.burningQuestionDtos}">
+									<a href="#accordionBurning" class="badge burning-questions-badge" title='<fmt:message key="label.burning.questions" />'>
+										<c:out value="${fn:length(burningQuestionDto.burningQuestionDtos)}" />
+									</a>
+								</c:if>
+							</c:forEach>
+						</c:if>
 					</th>
 				</c:forEach>
 				

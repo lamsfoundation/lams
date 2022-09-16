@@ -128,6 +128,17 @@
 										<a data-bs-toggle="modal" data-bs-target="#question${i.index}Modal" href="#">
 											<fmt:message key="label.authoring.basic.question.text"/> ${i.index + 1}
 										</a>
+										<c:if test="${not empty burningQuestionItemDtos}">
+											<c:forEach var="burningQuestionDto" items="${burningQuestionItemDtos}">
+												<c:if test="${burningQuestionDto.scratchieItem.uid eq item.uid and not empty burningQuestionDto.burningQuestionDtos}">
+													<a href="#" class="badge rounded-pill bg-warning text-decoration-none text-dark align-middle ms-1"
+													   title='<fmt:message key="label.burning.questions"/>'
+													   onClick="javascript:loadTab('burningQuestions')" >
+														<c:out value="${fn:length(burningQuestionDto.burningQuestionDtos)}" />
+													</a>
+												</c:if>
+											</c:forEach>
+										</c:if>
 									</th>
 								</c:forEach>
 								
