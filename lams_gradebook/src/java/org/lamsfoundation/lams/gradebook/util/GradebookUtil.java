@@ -204,6 +204,8 @@ public class GradebookUtil {
 		Collections.sort(gridRows, new GBAverageMarkComparator());
 	    } else if (sortBy.equals(GradebookConstants.PARAM_START_DATE)) {
 		Collections.sort(gridRows, new GBStartDateComparator());
+	    } else if (sortBy.equals(GradebookConstants.PARAM_SEQUENCE)) {
+		// do not sort at all
 	    } else {
 		Collections.sort(gridRows, new GBRowNameComparator());
 	    }

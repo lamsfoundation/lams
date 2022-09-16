@@ -137,8 +137,8 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 		ret.add(rowName);
 	    }
 	    ret.add(status);
-	    ret.add(timeTaken != null ? DateUtil.convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add(startDate != null ? DateUtil.convertToString(startDate, null) : CELL_EMPTY);
+	    ret.add(timeTaken != null ? DateUtil.convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add(finishDate != null ? DateUtil.convertToString(finishDate, null) : CELL_EMPTY);
 	    ret.add(feedback);
 	    ret.add(outcomes != null ? outcomes : CELL_EMPTY);

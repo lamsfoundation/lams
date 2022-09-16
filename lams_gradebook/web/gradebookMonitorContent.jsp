@@ -179,8 +179,8 @@
 					     	'',
 					     	"<fmt:message key="gradebook.columntitle.activity"/>",
 					     	"<fmt:message key="gradebook.columntitle.progress"/>",
-					     	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
 					    	"<fmt:message key="gradebook.columntitle.startDate"/>", 
+					     	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
 					    	"<fmt:message key="gradebook.columntitle.completeDate"/>", 
 					     	"<fmt:message key="gradebook.columntitle.activityFeedback"/>", 
 					     	"<fmt:message key="gradebook.columntitle.outcome"/>",
@@ -189,8 +189,9 @@
 					     colModel: [
 					       	{name:'id', index:'id', sortable:false, hidden:true, hidedlg:true},
 					       	{name:'marksAvailable',index:'marksAvailable', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
-							{name:'rowName',  index:'rowName', sortable:false, editable: false, width: 140},
+							{name:'rowName',  index:'rowName', sortable:true, editable: false, width: 181},
 							{name:'status',  index:'status', sortable:false, editable:false, width:30, align:"center"},
+						    {name:'startDate',index:'startDate', width:0, hidden: false, align:"center", width:50},
 							{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:51, title : true, align:"center",
 								cellattr: function(rowID, val, rawObject, cm, rdata) {
 									if (rdata.startDate != "-") {
@@ -198,7 +199,6 @@
 									}
 						    	}
 					    	},
-						    {name:'startDate',index:'startDate', width:0, hidden: true},
 						    {name:'finishDate',index:'finishDate', width:0, hidden: true},
 							{name:'feedback',  index:'feedback', sortable:false, editable: true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}, width:200, hidden:true},
 							{name:'outcome', index:'outcome', sortable:false, editable: false,
