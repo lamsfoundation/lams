@@ -72,7 +72,7 @@ public class SysAdminStartController {
 
 	    links = new ArrayList<>();
 	    links.add(new LinkBean("logevent/start.do", "label.event.log"));
-	    links.add(new LinkBean("cleanup/start.do", "sysadmin.batch.temp.file.delete"));
+	    links.add(new LinkBean("cleanup/start.do", "sysadmin.cleanup"));
 	    links.add(new LinkBean("cleanupPreviewLessons/start.do", "sysadmin.batch.preview.lesson.delete"));
 	    links.add(new LinkBean("statistics/start.do", "admin.statistics.title"));
 	    groupedLinks.add(new Object[] { AdminConstants.START_MONITOR_LINKS, links });
