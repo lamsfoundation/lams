@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.admin.web.controller;
 
 import java.io.File;
 
+import javax.management.MalformedObjectNameException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
@@ -34,6 +35,7 @@ import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.TempDirectoryFilter;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -41,25 +43,25 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author jliew
  */
 @Controller
 @RequestMapping("/cleanup")
-public class CleanupTempFilesController {
-    private static Logger log = Logger.getLogger(CleanupTempFilesController.class);
+public class CleanupController {
+    private static Logger log = Logger.getLogger(CleanupController.class);
 
     @Autowired
     @Qualifier("adminMessageService")
     private MessageService messageService;
 
     @RequestMapping(path = "/start")
-    public String execute(@ModelAttribute CleanupForm cleanupForm, HttpServletRequest request) throws Exception {
-
+    public String start(@ModelAttribute CleanupForm cleanupForm, HttpServletRequest request) throws Exception {
 	// check user is sysadmin
 	if (!(request.isUserInRole(Role.SYSADMIN))) {
-	    request.setAttribute("errorName", "CleanupTempFilesAction");
+	    request.setAttribute("errorName", "CleanupAction");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.need.sysadmin"));
 	    return "error";
 	}
@@ -69,6 +71,17 @@ public class CleanupTempFilesController {
 	if (action != null && StringUtils.equals(action, "refresh")) {
 	    return refresh(cleanupForm, request);
 	}
+	return "cleanup";
+    }
+
+    @RequestMapping(path = "/files", method = RequestMethod.POST)
+    public String cleanUpFiles(@ModelAttribute CleanupForm cleanupForm, HttpServletRequest request) throws Exception {
+	// check user is sysadmin
+	if (!(request.isUserInRole(Role.SYSADMIN))) {
+	    request.setAttribute("errorName", "CleanupTempFilesAction");
+	    request.setAttribute("errorMessage", messageService.getMessage("error.need.sysadmin"));
+	    return "error";
+	}
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	Integer numDays = cleanupForm.getNumDays();
@@ -77,18 +90,26 @@ public class CleanupTempFilesController {
 	if (numDays != null) {
 	    if (numDays >= 0) {
 		int filesDeleted = FileUtil.cleanupOldFiles(FileUtil.getOldTempFiles(numDays));
-		String args[] = new String[1];
-		args[0] = new Integer(filesDeleted).toString();
-		request.setAttribute("filesDeleted", messageService.getMessage("msg.cleanup.files.deleted", args));
+		request.setAttribute("filesDeleted",
+			messageService.getMessage("msg.cleanup.files.deleted", new Integer[] { filesDeleted }));
 	    } else {
 		errorMap.add("numDays", messageService.getMessage("error.non.negative.number.required"));
 	    }
-	} else {
-	    // recommended number of days to leave temp files
-	    cleanupForm.setNumDays(1);
 	}
 	request.setAttribute("errorMap", errorMap);
 	return "cleanup";
+    }
+
+    @RequestMapping(path = "/cache", method = RequestMethod.POST)
+    public String cleanUpCache() throws MalformedObjectNameException {
+	boolean cacheCleared = HibernateSessionManager.clearCache();
+	return "redirect:start.do?cacheCleared=" + cacheCleared;
+    }
+
+    @RequestMapping(path = "/garbage", method = RequestMethod.POST)
+    public String cleanUpGarbage() throws MalformedObjectNameException {
+	System.gc();
+	return "redirect:start.do?garbageCollectorRun=true";
     }
 
     @RequestMapping("/refresh")
@@ -109,12 +130,6 @@ public class CleanupTempFilesController {
 	}
 	request.setAttribute("zipTotal", zipTotal / 1024);
 	request.setAttribute("tmpTotal", tmpTotal / 1024);
-
-	// set default numDays
-	Integer numDays = cleanupForm.getNumDays();
-	if (numDays == null) {
-	    cleanupForm.setNumDays(1);
-	}
 
 	return "cleanup";
     }
