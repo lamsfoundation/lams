@@ -13,7 +13,7 @@
 		<c:set var="title"><fmt:message key="admin.page.title" /></c:set>
 		<lams:Page type="admin" title="${title}">
 			
-			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="admin.return" /></a>
+			<a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-default"><fmt:message key="admin.return" /></a>
 			
 			<lams:errors/>
 		

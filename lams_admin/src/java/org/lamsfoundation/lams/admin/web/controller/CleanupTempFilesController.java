@@ -57,10 +57,10 @@ public class CleanupTempFilesController {
     @RequestMapping(path = "/start")
     public String execute(@ModelAttribute CleanupForm cleanupForm, HttpServletRequest request) throws Exception {
 
-	// check user is sysadmin
-	if (!(request.isUserInRole(Role.SYSADMIN))) {
+	// check user is appadmin
+	if (!(request.isUserInRole(Role.APPADMIN))) {
 	    request.setAttribute("errorName", "CleanupTempFilesAction");
-	    request.setAttribute("errorMessage", messageService.getMessage("error.need.sysadmin"));
+	    request.setAttribute("errorMessage", messageService.getMessage("error.need.appadmin"));
 	    return "error";
 	}
 

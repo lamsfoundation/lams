@@ -120,6 +120,10 @@
 						<td><c:out value="${SYSADMIN}"/></td>
 					</tr>
 					<tr>
+						<td width="30%"><fmt:message key="label.appadmins"/>:</td>
+						<td><c:out value="${APPADMIN}"/></td>
+					</tr>
+					<tr>
 						<td colspan="2">
 							<c:out value="${numUsers}"/>
 						</td>

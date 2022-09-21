@@ -12,7 +12,7 @@ var kumaliveWin = null;
 var monitorLessonWin = null;
 var addLessonWin = null;
 var epWin = null;
-var sysadminWin = null;
+var appadminWin = null;
 var omWin = null;
 var pWin = null;
 var copyrightWin = null;
@@ -34,7 +34,7 @@ function closeAllChildren() {
 	if (monitorLessonWin && !monitorLessonWin.closed) monitorLessonWin.closeWindow();
 	if (addLessonWin && !addLessonWin.closed) addLessonWin.close();
 	if (epWin && !epWin.closed) epWin.close();
-	if (sysadminWin && !sysadminWin.closed) sysadminWin.close();
+	if (appadminWin && !appadminWin.closed) appadminWin.close();
 	if (omWin && !omWin.closed) omWin.close();
 	if (pWin && !pWin.closed) pWin.close();
 	if (copyrightWin && !copyrightWin.closed) copyrightWin.close();
@@ -116,9 +116,9 @@ function openLearnerShortenedUrl( lessonId ) {
 	}	
 }
 
-function openSysadmin() {
-	var height = sys_admin_height;
-	var width = sys_admin_width;
+function openAppadmin() {
+	var height = app_admin_height;
+	var width = app_admin_width;
 	var left = 0;
 	var top = 0;
 	
@@ -128,16 +128,16 @@ function openSysadmin() {
 	}
 	
 	if (isMac) {
-		sysadminWin = window.open('admin/sysadminstart.do','saWindow','left='+left+',top='+top+',width='+width+',height='+height
+		appadminWin = window.open('admin/appadminstart.do','saWindow','left='+left+',top='+top+',width='+width+',height='+height
 					  +',resizable,location,menubar,scrollbars,dependent,status,toolbar');
 	} else {
-		if (sysadminWin && !sysadminWin.closed ) {
-			sysadminWin.location = 'admin/sysadminstart.do';
-			sysadminWin.focus();
+		if (appadminWin && !appadminWin.closed ) {
+			appadminWin.location = 'admin/appadminstart.do';
+			appadminWin.focus();
 		} else {
-			sysadminWin = window.open('admin/sysadminstart.do','saWindow','left='+left+',top='+top+',width='+width+',height='
+			appadminWin = window.open('admin/appadminstart.do','saWindow','left='+left+',top='+top+',width='+width+',height='
 					      +height+',resizable,location,menubar,scrollbars,dependent,status,toolbar');
-			sysadminWin.focus();
+			appadminWin.focus();
 		}
 	}
 }

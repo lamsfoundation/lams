@@ -33,7 +33,7 @@
 	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
 		
 		<p>
-			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a>
+			<a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-default"><fmt:message key="appadmin.maintain" /></a>
 		</p>
 
 		<div class="panel panel-default">
@@ -97,7 +97,7 @@
 					
 						<div class="pull-right">
 							<input type="reset" class="btn btn-default" value="<fmt:message key="admin.reset" />" />
-							<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default loffset5"><fmt:message key="admin.cancel"/></a>
+							<a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-default loffset5"><fmt:message key="admin.cancel"/></a>
 							<input type="submit" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 						</div>
 					</form:form>

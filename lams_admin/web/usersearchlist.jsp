@@ -4,7 +4,6 @@
 <c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="useInternalSMTPServer"><lams:Configuration key="InternalSMTPServer"/></c:set>
 <c:set var="smtpServer"><lams:Configuration key="SMTPServer"/></c:set>
-<c:set var="loginAsEnable"><lams:Configuration key="LoginAsEnable"/></c:set>
 
 <lams:html>
 <lams:head>
@@ -96,7 +95,7 @@
 								rows += 	'&nbsp;';
 								rows +=     '<form style="display: inline-block;" id="delete_' + orgData["userId"] +'" method="post" action="/lams/admin/user/edit.do"><input type="hidden" name="userId" value="' + orgData["userId"] + '"/><input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/><button class="btn btn-primary btn-xs" type="submit"><i class="fa fa-pencil"></i> <span class="hidden-xs hidden-sm"><fmt:message key="admin.edit"/></span></button></form>';
 								rows += 	'&nbsp;';
-								<c:if test="${loginAsEnable eq 'true'}">
+								<c:if test="${loginAsEnable}">
 								rows += 	'<a title="<fmt:message key="label.login.as"/>" href="<lams:LAMSURL/>loginas.do?login=' + orgData["login"] + '" id="loginAs' + orgData["userId"] +'">';
 								rows += 		'<button type="button" class="btn btn-primary btn-xs"><i class="fa fa-sign-in"></i><span class="hidden-xs hidden-sm"> <fmt:message key="label.login.as"/></span></button>';
 								rows += 	'</a>';
@@ -145,7 +144,7 @@
 
 	<lams:Page type="admin" title="${title}">
 		<p><a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
-		<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default loffset5"><fmt:message key="sysadmin.maintain" /></a></p>
+		<a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-default loffset5"><fmt:message key="appadmin.maintain" /></a></p>
 		
 		<p><input class="btn btn-default" type="button" value="<fmt:message key="admin.user.create"/>" onclick="javascript:document.location='user/edit.do'" />
 		

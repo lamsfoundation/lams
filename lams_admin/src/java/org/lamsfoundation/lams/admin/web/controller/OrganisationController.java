@@ -88,7 +88,7 @@ public class OrganisationController {
 	    UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
 	    if (userDto != null) {
 		Integer userId = userDto.getUserID();
-		// sysadmin, global group admin, group manager, group admin can edit group
+		// appadmin, global group admin, group manager, group admin can edit group
 		if (userManagementService.canEditGroup(userId, orgId)) {
 		    // edit existing organisation
 		    if (orgId != null) {
@@ -113,7 +113,7 @@ public class OrganisationController {
 			request.setAttribute("courseToDeleteLessons", courseToDeleteLessons);
 		    }
 		    request.getSession().setAttribute("status", status);
-		    if (userManagementService.isUserSysAdmin()
+		    if (userManagementService.isUserAppAdmin()
 			    || userManagementService.isUserGlobalGroupManager()) {
 			return "organisation/createOrEdit";
 		    } else {
@@ -131,8 +131,8 @@ public class OrganisationController {
 	    throws Exception {
 	initLocalesAndStatus();
 
-	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager())) {
-	    // only sysadmins and global group admins can create groups
+	if (!(request.isUserInRole(Role.APPADMIN) || userManagementService.isUserGlobalGroupManager())) {
+	    // only appadmins and global group admins can create groups
 	    if (((organisationForm.getTypeId() != null)
 		    && organisationForm.getTypeId().equals(OrganisationType.COURSE_TYPE))
 		    || (organisationForm.getTypeId() == null)) {
@@ -169,14 +169,14 @@ public class OrganisationController {
 
     @RequestMapping(path = "/deleteAllLessonsInit")
     public String deleteAllLessonsInit(HttpServletRequest request, HttpServletResponse response) throws IOException {
-	if (!securityService.isSysadmin(getUserID(), "display cleanup preview lessons", false)) {
-	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a sysadmin");
+	if (!securityService.isAppadmin(getUserID(), "display cleanup preview lessons", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not an appadmin");
 	    return null;
 	}
 
-	if (!(request.isUserInRole(Role.SYSADMIN))) {
+	if (!(request.isUserInRole(Role.APPADMIN))) {
 	    request.setAttribute("errorName", "OrganisationAction");
-	    request.setAttribute("errorMessage", messageService.getMessage("error.need.sysadmin"));
+	    request.setAttribute("errorMessage", messageService.getMessage("error.need.appadmin"));
 	    return "error";
 	}
 

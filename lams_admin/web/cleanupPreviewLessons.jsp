@@ -4,7 +4,7 @@
 
 <lams:html>
 <lams:head>
-	<c:set var="title"><fmt:message key="sysadmin.batch.preview.lesson.delete"/></c:set>
+	<c:set var="title"><fmt:message key="appadmin.batch.preview.lesson.delete"/></c:set>
 	<title>${title}</title>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
@@ -74,7 +74,7 @@
 
 	<lams:Page type="admin" title="${title}">
 		
-		<p><a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
+		<p><a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-default"><fmt:message key="appadmin.maintain" /></a></p>
 
 		<fmt:message key="label.cleanup.preview.lesson.count" />&nbsp;<span id="previewCount">${previewCount}</span> / <span id="allLessonCount">${allLessonCount}</span>
 		<div id="deletingBox" style="display: none">

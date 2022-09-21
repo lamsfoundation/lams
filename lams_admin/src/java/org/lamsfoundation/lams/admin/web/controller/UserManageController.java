@@ -99,7 +99,8 @@ public class UserManageController {
 	// check permission
 	Integer rootOrgId = userManagementService.getRootOrganisation().getOrganisationId();
 	if (request.isUserInRole(Role.SYSADMIN)
-		|| (userManagementService.isUserGlobalGroupManager() && !orgId.equals(rootOrgId))) {
+		|| ((request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager())
+			&& !orgId.equals(rootOrgId))) {
 	    userManageForm.setCourseAdminCanAddNewUsers(true);
 	    userManageForm.setCourseAdminCanBrowseAllUsers(true);
 	    userManageForm.setCanEditRole(true);
@@ -113,7 +114,7 @@ public class UserManageController {
 	} else {
 	    return forwardError(request, "error.authorisation");
 	}
-	userManageForm.setCanResetOrgPassword(request.isUserInRole(Role.SYSADMIN));
+	userManageForm.setCanResetOrgPassword(request.isUserInRole(Role.APPADMIN));
 
 	userManageForm.setOrgId(orgId);
 	userManageForm.setOrgName(orgName);
@@ -129,6 +130,7 @@ public class UserManageController {
 	// count roles in the org
 	HashMap<String, Integer> roleCount = new HashMap<>();
 	if (orgId.equals(rootOrgId)) {
+	    roleCount.put(Role.APPADMIN, Role.ROLE_APPADMIN);
 	    roleCount.put(Role.SYSADMIN, Role.ROLE_SYSADMIN);
 	    roleCount.put(Role.GROUP_MANAGER, Role.ROLE_GROUP_MANAGER);
 	} else {
@@ -144,8 +146,8 @@ public class UserManageController {
 
 	// count users in the org
 	// TODO use hql that does a count instead of getting whole objects
-	Integer numUsers = Integer.valueOf(userManagementService.getUsersFromOrganisation(orgId).size());
-	args[0] = numUsers.toString();
+	int numUsers = userManagementService.getUsersFromOrganisation(orgId).size();
+	args[0] = Integer.toString(numUsers);
 	request.setAttribute("numUsers", messageService.getMessage("label.users.in.group", args));
 
 	return "userlist";

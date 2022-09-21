@@ -211,7 +211,7 @@
 			<role-name>LEARNER</role-name>
 			<role-name>MONITOR</role-name>
 			<role-name>AUTHOR</role-name>
-			<role-name>SYSADMIN</role-name>
+			<role-name>APPADMIN</role-name>
 		</auth-constraint>
 	</security-constraint>
 
@@ -226,7 +226,7 @@
 		<auth-constraint>
 			<role-name>AUTHOR</role-name>
 			<role-name>MONITOR</role-name>
-			<role-name>SYSADMIN</role-name>
+			<role-name>APPADMIN</role-name>
 		</auth-constraint>
 	</security-constraint>
 	<security-constraint>
@@ -240,7 +240,7 @@
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>MONITOR</role-name>
-			<role-name>SYSADMIN</role-name>
+			<role-name>APPADMIN</role-name>
 		</auth-constraint>
 	</security-constraint>
 	<security-constraint>
@@ -254,7 +254,7 @@
 			<!-- Author can preview the lesson -->
 			<role-name>MONITOR</role-name>
 			<role-name>GROUP MANAGER</role-name>
-			<role-name>SYSADMIN</role-name>
+			<role-name>APPADMIN</role-name>
 		</auth-constraint>
 	</security-constraint>
 
@@ -267,7 +267,7 @@
  			<http-method>POST</http-method>
 		</web-resource-collection>
 		<auth-constraint>
-			<role-name>SYSADMIN</role-name>
+			<role-name>APPADMIN</role-name>
 		</auth-constraint>
 	</security-constraint>
 
@@ -303,8 +303,8 @@
 	</security-role>
 
 	<security-role>
-		<description>LAMS System Adminstrator</description>
-		<role-name>SYSADMIN</role-name>
+		<description>LAMS Application Adminstrator</description>
+		<role-name>APPADMIN</role-name>
 	</security-role>
 
 	<error-page>

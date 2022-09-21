@@ -555,7 +555,7 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	if (whiteboardServerUrlConfigItem == null
 		|| StringUtils.isBlank(whiteboardServerUrlConfigItem.getConfigValue())) {
 	    throw new WhiteboardApplicationException(
-		    "Whiteboard server URL is not configured on sysadmin tool management page");
+		    "Whiteboard server URL is not configured on appadmin tool management page");
 	}
 	String whiteboardServerUrl = whiteboardServerUrlConfigItem.getConfigValue();
 	if (whiteboardServerUrl.contains(WhiteboardConfigItem.SERVER_URL_PLACEHOLDER)) {

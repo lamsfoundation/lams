@@ -52,7 +52,9 @@ public class Role implements Serializable, Comparable<Role> {
 
 //    public static final String GROUP_ADMIN = "GROUP ADMIN";
 
-    public static final String SYSADMIN = "SYSADMIN";// for future use
+    public static final String APPADMIN = "APPADMIN";
+
+    public static final String SYSADMIN = "SYSADMIN";
 
     /**
      * Added by Manpreet Minhas
@@ -60,12 +62,13 @@ public class Role implements Serializable, Comparable<Role> {
      * for a given user ar per the database. New roles may be added/deleted in the near future
      *
      ************************************************************/
-    public static final Integer ROLE_SYSADMIN = 1;
+    public static final Integer ROLE_APPADMIN = 1;
     public static final Integer ROLE_GROUP_MANAGER = 2;
     public static final Integer ROLE_AUTHOR = 3;
     public static final Integer ROLE_MONITOR = 4;
     public static final Integer ROLE_LEARNER = 5;
 //    public static final Integer ROLE_GROUP_ADMIN = 6;
+    public static final Integer ROLE_SYSADMIN = 7;
     /***********************************************************/
 
     public static final Map<Integer, String> ROLE_MAP = Map.of(ROLE_SYSADMIN, SYSADMIN, ROLE_GROUP_MANAGER,
@@ -81,9 +84,6 @@ public class Role implements Serializable, Comparable<Role> {
 
     @Column
     private String description;
-
-    public Role() {
-    }
 
     public Integer getRoleId() {
 	return this.roleId;
@@ -145,7 +145,7 @@ public class Role implements Serializable, Comparable<Role> {
 	return this.roleId.equals(Role.ROLE_MONITOR);
     }
 
-    public boolean isSysAdmin() {
-	return this.roleId.equals(Role.ROLE_SYSADMIN);
+    public boolean isAppAdmin() {
+	return this.roleId.equals(Role.ROLE_APPADMIN);
     }
 }

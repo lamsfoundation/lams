@@ -892,7 +892,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
     @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	// do not remove learner content if it was set up so in sysadmin tool management
+	// do not remove learner content if it was set up so in appadmin tool management
 	ForumConfigItem keepLearnerContent = getConfigItem(ForumConfigItem.KEY_KEEP_LEARNER_CONTENT);
 	if (Boolean.valueOf(keepLearnerContent.getConfigValue())) {
 	    return;
@@ -1524,7 +1524,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	// *******************************Handle user*******************
 	// Code taken from AuthoringAction TODO
 	//	    String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	// check whether it is sysadmin:LDEV-906
+	// check whether it is appadmin:LDEV-906
 	//	if (!StringUtils.equals(contentFolderID, "-1")) {
 	// try to get form system session
 	//		HttpSession ss = SessionManager.getSession();

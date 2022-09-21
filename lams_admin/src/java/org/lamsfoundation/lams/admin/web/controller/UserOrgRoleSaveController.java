@@ -30,15 +30,20 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.web.dto.UserBean;
 import org.lamsfoundation.lams.admin.web.form.UserOrgRoleForm;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.filter.AuditLogFilter;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -64,6 +69,8 @@ public class UserOrgRoleSaveController {
     @Autowired
     private IUserManagementService userManagementService;
     @Autowired
+    private ISecurityService securityService;
+    @Autowired
     @Qualifier("adminMessageService")
     private MessageService messageService;
 
@@ -74,6 +81,12 @@ public class UserOrgRoleSaveController {
 	log.debug("userBeans is null? " + userBeans == null);
 	Integer orgId = userOrgRoleForm.getOrgId();
 	log.debug("orgId: " + orgId);
+
+	Integer rootOrgId = userManagementService.getRootOrganisation().getOrganisationId();
+	boolean isGlobalRolesSet = orgId.equals(rootOrgId);
+	if (isGlobalRolesSet) {
+	    securityService.isSysadmin(getUserId(), "add user with global roles", true);
+	}
 
 	request.setAttribute("org", orgId);
 	request.getSession().removeAttribute("userOrgRoleForm");
@@ -93,7 +106,22 @@ public class UserOrgRoleSaveController {
 		request.setAttribute("orgId", orgId);
 		return "forward:/userorg.do";
 	    }
-	    userManagementService.setRolesForUserOrganisation(user, orgId, Arrays.asList(roleIds));
+
+	    List<String> userRolesList = Arrays.asList(roleIds);
+	    if (userRolesList.contains(Role.ROLE_SYSADMIN.toString())
+		    && !userRolesList.contains(Role.ROLE_APPADMIN.toString())) {
+		//all sysadmins are also appadmins
+		userRolesList = new ArrayList<>(userRolesList);
+		userRolesList.add(Role.ROLE_APPADMIN.toString());
+	    }
+	    userManagementService.setRolesForUserOrganisation(user, orgId, userRolesList);
+
+	    if (userRolesList.contains(Role.ROLE_APPADMIN.toString())
+		    && !userRolesList.contains(Role.ROLE_SYSADMIN.toString())) {
+		// appadmin need to have 2FA on, unless sysadmin says otherwise in user edit panels
+		user.setTwoFactorAuthenticationEnabled(true);
+		userManagementService.save(user);
+	    }
 
 	    auditLog(orgId, user.getUserId(), roleIds);
 
@@ -106,6 +134,12 @@ public class UserOrgRoleSaveController {
 	    //}
 	}
 	return "redirect:/usermanage.do?org=" + orgId;
+    }
+
+    private Integer getUserId() {
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	return user != null ? user.getUserID() : null;
     }
 
     private void auditLog(Integer organisationId, Integer userId, String[] roleIds) {

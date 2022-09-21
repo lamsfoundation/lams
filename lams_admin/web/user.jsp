@@ -130,7 +130,7 @@
 			$("#portraitPicture").css('background-image','');
 			addPortrait( $("#portraitPicture"), portraitId, 
 					'<c:out value="${userForm.userId}" />', 'large', true, '/lams/' );
-			<c:if test="${isSysadmin}">
+			<c:if test="${isAppadmin}">
 			if ( portraitId.length > 0 )  {
 				$("#portraitButton").css('display','block');
 			} else {
@@ -139,7 +139,7 @@
 			</c:if>
 		}
 		
-		<c:if test="${isSysadmin}">
+		<c:if test="${isAppadmin}">
 			function deletePortrait() {
 				$("#portraitButton").css('display','none');
 				
@@ -257,7 +257,7 @@
 				    <div class="row">
 					<div class="col-md-3">
 			    			<div class="text-center"><div id="portraitPicture" ></div></div>
-						<c:if test="${isSysadmin}">
+						<c:if test="${isAppadmin}">
 			    			<div id="portraitButton" class="text-center voffset10" style="display:none; margin-bottom: 5px;">
 			    			<a href="#" onclick="javascript:deletePortrait();" class="btn btn-primary btn-sm"><fmt:message key="label.delete.portrait" /></a></div>
 			    			</c:if>
@@ -469,7 +469,7 @@
 								</td>
 							</tr>
 							
-							<c:if test="${isSysadmin}">
+							<c:if test="${canSetTwoFactorAuthentication}">
 								<tr>
 									<td class="align-right">
 										<fmt:message key="label.2FA.property.enable" />:
@@ -495,21 +495,22 @@
 						</table>
 					</div>
 					</div>
-					
-					<div class="row">
-					<div class="col-md-12">
-						<c:if test="${isSysadmin and not empty userForm.userId}">
-							<div class="pull-left">
-							<a href="<lams:LAMSURL/>admin/userChangePass.jsp?userId=${userForm.userId}&login=${userForm.login}" class="btn btn-primary"><fmt:message key="admin.user.changePassword" /></a>
-							</div>
-						</c:if>
+					<c:if test="${isAppadmin}">
+						<div class="row">
+						<div class="col-md-12">
+							<c:if test="${isSysadmin and not empty userForm.userId}">
+								<div class="pull-left">
+								<a href="<lams:LAMSURL/>admin/userChangePass.jsp?userId=${userForm.userId}&login=${userForm.login}" class="btn btn-primary"><fmt:message key="admin.user.changePassword" /></a>
+								</div>
+							</c:if>
 						
-						<div class="pull-right">
-							<a href="javascript:history.back();" class="btn btn-default"> <fmt:message key="admin.cancel" /> </a>
-							<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
+							<div class="pull-right">
+								<a href="javascript:history.back();" class="btn btn-default"> <fmt:message key="admin.cancel" /> </a>
+								<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
+							</div>
 						</div>
-					</div>
-					</div>
+						</div>
+					</c:if>
 					
 					</div>
 				</div> <!-- End of panel -->

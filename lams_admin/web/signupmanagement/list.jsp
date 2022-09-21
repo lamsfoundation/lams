@@ -19,7 +19,7 @@
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
 	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
 	
-		<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
+		<p><a href="<lams:LAMSURL/>/admin/appadminstart.do" class="btn btn-default"><fmt:message key="appadmin.maintain" /></a></p>
 
 		<c:if test="${not empty error}">
 			<lams:Alert type="warn" id="errorMessage" close="false">	

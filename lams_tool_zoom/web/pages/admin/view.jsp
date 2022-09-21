@@ -109,7 +109,7 @@
 		<div class="container-fluid">
 			<div class="panel panel-default panel-admin-page">
 				<div class="panel-body panel-admin-body">
-					<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-primary"><fmt:message key="sysadmin.maintain" /></a></p>
+					<p><a href="<lams:LAMSURL/>/admin/appadminstart.do" class="btn btn-primary"><fmt:message key="appadmin.maintain" /></a></p>
 					<c:if test="${saveOK}">
 						 <lams:Alert type="info" close="false">
 						 	<fmt:message key='label.api.saved'/>

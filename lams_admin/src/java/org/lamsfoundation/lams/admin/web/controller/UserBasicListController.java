@@ -80,7 +80,7 @@ public class UserBasicListController {
 			    }
 			    // get users
 			    List users = new ArrayList();
-			    if (request.isUserInRole(Role.SYSADMIN)
+			    if (request.isUserInRole(Role.APPADMIN)
 				    || userManagementService.isUserGlobalGroupManager()) {
 				users = userManagementService.getAllUsers(org.getOrganisationId());
 			    } else if (userManagementService.isUserInRole(userId, group.getOrganisationId(),

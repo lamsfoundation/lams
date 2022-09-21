@@ -59,8 +59,8 @@ public class PortraitBatchUploadController {
     @RequestMapping("/uploadPortraits")
     @ResponseBody
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException {
-	if (!securityService.isSysadmin(getUserID(), "batch upload portraits", false)) {
-	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a sysadmin");
+	if (!securityService.isAppadmin(getUserID(), "batch upload portraits", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not an appadmin");
 	    return null;
 	}
 

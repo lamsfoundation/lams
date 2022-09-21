@@ -4,7 +4,7 @@
 
 <lams:html>
 <lams:head>
-	<c:set var="title"><fmt:message key="sysadmin.maintain.external.servers"/></c:set>
+	<c:set var="title"><fmt:message key="appadmin.maintain.external.servers"/></c:set>
 	<title>${title}</title>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
@@ -21,7 +21,7 @@
 <body class="stripes">
 	<lams:Page type="admin" title="${title}">
 		<p>
-			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a>
+			<a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-default"><fmt:message key="appadmin.maintain" /></a>
 		</p>
 
 			<table class="table table-striped">

@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.admin.web.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -31,15 +32,20 @@ import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.web.form.UserRolesForm;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.filter.AuditLogFilter;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -59,6 +65,8 @@ public class UserRolesSaveController {
     @Autowired
     private IUserManagementService userManagementService;
     @Autowired
+    private ISecurityService securityService;
+    @Autowired
     @Qualifier("adminMessageService")
     private MessageService messageService;
 
@@ -67,12 +75,19 @@ public class UserRolesSaveController {
     @RequestMapping(path = "/userrolessave", method = RequestMethod.POST)
     public String execute(@ModelAttribute UserRolesForm userRolesForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
+
+	Integer orgId = userRolesForm.getOrgId();
+	Integer rootOrgId = userManagementService.getRootOrganisation().getOrganisationId();
+	boolean isGlobalRolesSet = orgId.equals(rootOrgId);
+	if (isGlobalRolesSet) {
+	    securityService.isSysadmin(getUserId(), "save global roles", true);
+	}
+
 	if (rolelist == null) {
 	    rolelist = userManagementService.findAll(Role.class);
 	    Collections.sort(rolelist);
 	}
 
-	Integer orgId = userRolesForm.getOrgId();
 	Integer userId = userRolesForm.getUserId();
 	String[] roles = userRolesForm.getRoles();
 
@@ -89,21 +104,40 @@ public class UserRolesSaveController {
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	// user must have at least 1 role
-	if (roles == null || roles.length < 1) {
+	if (!isGlobalRolesSet && (roles == null || roles.length < 1)) {
 	    errorMap.add("roles", messageService.getMessage("error.roles.empty"));
 	    request.setAttribute("errorMap", errorMap);
 	    request.setAttribute("rolelist", userManagementService.filterRoles(rolelist,
-		    request.isUserInRole(Role.SYSADMIN), org.getOrganisationType()));
+		    request.isUserInRole(Role.APPADMIN), org.getOrganisationType()));
 	    request.setAttribute("login", user.getLogin());
 	    request.setAttribute("fullName", user.getFullName());
 	    return "forward:/userroles.do";
 	}
+	List<String> userRolesList = roles == null || roles.length < 1 ? List.of() : Arrays.asList(roles);
+	if (userRolesList.contains(Role.ROLE_SYSADMIN.toString())
+		&& !userRolesList.contains(Role.ROLE_APPADMIN.toString())) {
+	    //all sysadmins are also appadmins
+	    userRolesList = new ArrayList<>(userRolesList);
+	    userRolesList.add(Role.ROLE_APPADMIN.toString());
+	}
+	userManagementService.setRolesForUserOrganisation(user, orgId, userRolesList);
 
-	userManagementService.setRolesForUserOrganisation(user, orgId, Arrays.asList(roles));
+	if (userRolesList.contains(Role.ROLE_APPADMIN.toString())
+		&& !userRolesList.contains(Role.ROLE_SYSADMIN.toString())) {
+	    // appadmin need to have 2FA on, unless sysadmin says otherwise in user edit panels
+	    user.setTwoFactorAuthenticationEnabled(true);
+	    userManagementService.save(user);
+	}
 
 	auditLog(orgId, userId, roles);
 
 	return "redirect:/usermanage.do?org=" + orgId;
+    }
+
+    private Integer getUserId() {
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	return user != null ? user.getUserID() : null;
     }
 
     private void auditLog(Integer organisationId, Integer userId, String[] roleIds) {

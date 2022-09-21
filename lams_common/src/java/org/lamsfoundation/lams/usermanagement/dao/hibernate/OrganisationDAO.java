@@ -56,7 +56,7 @@ public class OrganisationDAO extends LAMSBaseDAO implements IOrganisationDAO {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<OrganisationDTO> getActiveCoursesByUser(Integer userId, boolean isSysadmin, int page, int size,
+    public List<OrganisationDTO> getActiveCoursesByUser(Integer userId, boolean isAppadmin, int page, int size,
 	    String searchString) {
 
 	final String GET_ALL_ACTIVE_COURSE_IDS = "SELECT o.organisationId, o.name FROM Organisation o"
@@ -70,12 +70,12 @@ public class OrganisationDAO extends LAMSBaseDAO implements IOrganisationDAO {
 		+ OrganisationState.ACTIVE + " AND uo.user.userId = :userId "
 		+ " AND (uo.organisation.name LIKE CONCAT('%', :searchString, '%')) ORDER BY uo.organisation.name";
 
-	String queryStr = isSysadmin ? GET_ALL_ACTIVE_COURSE_IDS : GET_ACTIVE_COURSE_IDS_BY_USER;
+	String queryStr = isAppadmin ? GET_ALL_ACTIVE_COURSE_IDS : GET_ACTIVE_COURSE_IDS_BY_USER;
 	Query query = getSession().createQuery(queryStr);
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
 	query.setString("searchString", searchString);
-	if (!isSysadmin) {
+	if (!isAppadmin) {
 	    query.setInteger("userId", userId);
 	}
 	query.setFirstResult(page * size);
@@ -115,7 +115,7 @@ public class OrganisationDAO extends LAMSBaseDAO implements IOrganisationDAO {
     }
 
     @Override
-    public int getCountActiveCoursesByUser(Integer userId, boolean isSysadmin, String searchString) {
+    public int getCountActiveCoursesByUser(Integer userId, boolean isAppadmin, String searchString) {
 
 	final String GET_ALL_ACTIVE_COURSE_IDS = "SELECT COUNT(o) FROM Organisation o"
 		+ " WHERE o.organisationType.organisationTypeId = " + OrganisationType.COURSE_TYPE
@@ -127,12 +127,12 @@ public class OrganisationDAO extends LAMSBaseDAO implements IOrganisationDAO {
 		+ " AND uo.organisation.organisationState.organisationStateId = " + OrganisationState.ACTIVE
 		+ " AND uo.user.userId = :userId " + " AND (uo.organisation.name LIKE CONCAT('%', :searchString, '%'))";
 
-	String queryStr = isSysadmin ? GET_ALL_ACTIVE_COURSE_IDS : GET_ACTIVE_COURSE_IDS_BY_USER;
+	String queryStr = isAppadmin ? GET_ALL_ACTIVE_COURSE_IDS : GET_ACTIVE_COURSE_IDS_BY_USER;
 	Query query = getSession().createQuery(queryStr);
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
 	query.setString("searchString", searchString);
-	if (!isSysadmin) {
+	if (!isAppadmin) {
 	    query.setInteger("userId", userId);
 	}
 

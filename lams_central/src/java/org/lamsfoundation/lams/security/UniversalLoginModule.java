@@ -102,7 +102,7 @@ public class UniversalLoginModule implements LoginModule {
      */
     @Override
     public boolean commit() throws LoginException {
-	if (loginOK == false) {
+	if (!loginOK) {
 	    return false;
 	}
 
@@ -276,11 +276,11 @@ public class UniversalLoginModule implements LoginModule {
 	// there is no session if the request did not go through SsoHandler
 	// it happens on session failover
 	if (SessionManager.getSession() != null) {
-	    // allow sysadmin to login as another user; in this case, the LAMS shared session will be present,
+	    // allow appadmin to login as another user; in this case, the LAMS shared session will be present,
 	    // allowing the following check to work
-	    if (UniversalLoginModule.userManagementService.isUserSysAdmin()) {
+	    if (UniversalLoginModule.userManagementService.isUserAppAdmin()) {
 		if (UniversalLoginModule.log.isDebugEnabled()) {
-		    UniversalLoginModule.log.debug("Authenticated sysadmin");
+		    UniversalLoginModule.log.debug("Authenticated appadmin");
 		}
 		return true;
 	    }
@@ -439,7 +439,7 @@ public class UniversalLoginModule implements LoginModule {
 	    ps = conn.prepareStatement(UniversalLoginModule.ROLES_QUERY);
 	    ps.setString(1, userName);
 	    rs = ps.executeQuery();
-	    if (rs.next() == false) {
+	    if (!rs.next()) {
 		throw new FailedLoginException("No matching user name found in roles: " + userName);
 	    }
 
@@ -469,7 +469,13 @@ public class UniversalLoginModule implements LoginModule {
 			group.addMember(p);
 			groupMembers.add(name);
 		    }
-		    if (name.equals(Role.SYSADMIN)) {
+		    // sysadmin is always app admin
+		    if (name.equals(Role.SYSADMIN) && !groupMembers.contains(Role.APPADMIN)) {
+			UniversalLoginModule.log.info("Assign user: " + userName + " to role " + Role.APPADMIN);
+			group.addMember(p);
+			groupMembers.add(Role.APPADMIN);
+		    }
+		    if (name.equals(Role.APPADMIN) || name.equals(Role.SYSADMIN)) {
 			p = new SimplePrincipal(Role.AUTHOR);
 			UniversalLoginModule.log.info("Found role " + name);
 			if (!groupMembers.contains(Role.AUTHOR)) {

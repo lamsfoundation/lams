@@ -27,15 +27,20 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.admin.web.form.ExtServerForm;
 import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
+import org.lamsfoundation.lams.security.ISecurityService;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -58,11 +63,15 @@ public class ExtServerManagementController {
     @Autowired
     private IUserManagementService userManagementService;
     @Autowired
+    private ISecurityService securityService;
+    @Autowired
     @Qualifier("adminMessageService")
     private MessageService messageService;
-    
+
     @RequestMapping(path = "/serverlist")
     public String serverlist(HttpServletRequest request) throws Exception {
+	securityService.isSysadmin(getUserId(), "open integrated server list", true);
+
 	List<ExtServer> extServers = integrationService.getAllExtServers();
 	Collections.sort(extServers);
 	request.setAttribute("servers", extServers);
@@ -71,7 +80,8 @@ public class ExtServerManagementController {
 
     @RequestMapping(path = "/edit")
     public String edit(@ModelAttribute ExtServerForm extServerForm, HttpServletRequest request) throws Exception {
-	
+	securityService.isSysadmin(getUserId(), "open integrated server edit page", true);
+
 	Integer sid = WebUtil.readIntParam(request, "sid", true);
 	if (sid != null) {
 	    ExtServer map = integrationService.getExtServer(sid);
@@ -83,6 +93,7 @@ public class ExtServerManagementController {
     @RequestMapping(path = "/serversave")
     public String serversave(@ModelAttribute ExtServerForm extServerForm, BindingResult bindingResult,
 	    HttpServletRequest request, HttpServletResponse response) throws Exception {
+	securityService.isSysadmin(getUserId(), "save integrated server", true);
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
@@ -106,7 +117,7 @@ public class ExtServerManagementController {
 	    errorMap.add("userinfoUrl", messageService.getMessage("error.required",
 		    new Object[] { messageService.getMessage("sysadmin.userinfoUrl") }));
 	}
-	
+
 	Integer sid = extServerForm.getSid();
 	if (errorMap.isEmpty()) {//check duplication
 	    List listServer = userManagementService.findByProperty(ExtServer.class, "serverid",
@@ -131,7 +142,7 @@ public class ExtServerManagementController {
 		    errorMap.add("prefix", messageService.getMessage("error.not.unique",
 			    new Object[] { messageService.getMessage("sysadmin.prefix") }));
 		} else {
-		    ExtServer map = (ExtServer) listPrefix.get(0);
+		    ExtServer map = listPrefix.get(0);
 		    if (!map.getSid().equals(sid)) {
 			errorMap.add("prefix", messageService.getMessage("error.not.unique",
 				new Object[] { messageService.getMessage("sysadmin.prefix") }));
@@ -161,6 +172,8 @@ public class ExtServerManagementController {
 
     @RequestMapping(path = "/disable", method = RequestMethod.POST)
     public String disable(HttpServletRequest request) throws Exception {
+	securityService.isSysadmin(getUserId(), "disable integrated server", true);
+
 	Integer sid = WebUtil.readIntParam(request, "sid", false);
 	ExtServer map = integrationService.getExtServer(sid);
 	map.setDisabled(true);
@@ -170,6 +183,8 @@ public class ExtServerManagementController {
 
     @RequestMapping(path = "/enable", method = RequestMethod.POST)
     public String enable(HttpServletRequest request) throws Exception {
+	securityService.isSysadmin(getUserId(), "enable integrated server", true);
+
 	Integer sid = WebUtil.readIntParam(request, "sid", false);
 	ExtServer map = integrationService.getExtServer(sid);
 	map.setDisabled(false);
@@ -179,9 +194,16 @@ public class ExtServerManagementController {
 
     @RequestMapping(path = "/delete", method = RequestMethod.POST)
     public String delete(HttpServletRequest request) throws Exception {
+	securityService.isSysadmin(getUserId(), "delete integrated server", true);
+
 	Integer sid = WebUtil.readIntParam(request, "sid", false);
 	userManagementService.deleteById(ExtServer.class, sid);
 	return "redirect:/extserver/serverlist.do";
     }
 
+    private Integer getUserId() {
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	return user != null ? user.getUserID() : null;
+    }
 }

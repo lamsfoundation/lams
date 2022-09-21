@@ -94,10 +94,10 @@ public class SecurityService implements ISecurityService {
 
 	Organisation org = lesson.getOrganisation();
 	Integer orgId = org == null ? null : org.getOrganisationId();
-	boolean hasSysadminRole = securityDAO.isSysadmin(userId);
+	boolean hasAppadminRole = securityDAO.isAppadmin(userId);
 	boolean hasOrgRole = orgId == null || securityDAO.hasOrgRole(orgId, userId, Role.LEARNER);
 
-	if (!hasSysadminRole && !(hasOrgRole && securityDAO.isLessonLearner(lessonId, userId))) {
+	if (!hasAppadminRole && !(hasOrgRole && securityDAO.isLessonLearner(lessonId, userId))) {
 	    String error = "User " + userId + " is not learner in lesson " + lessonId + " and can not \"" + action
 		    + "\"";
 	    SecurityService.log.debug(error);
@@ -157,8 +157,8 @@ public class SecurityService implements ISecurityService {
 
 	Organisation org = lesson.getOrganisation();
 	Integer orgId = org == null ? null : org.getOrganisationId();
-	boolean hasSysadminRole = securityDAO.isSysadmin(userId);
-	boolean hasGroupManagerRole = hasSysadminRole || (orgId != null && securityDAO.isGroupManager(orgId, userId));
+	boolean hasAppadminRole = securityDAO.isAppadmin(userId);
+	boolean hasGroupManagerRole = hasAppadminRole || (orgId != null && securityDAO.isGroupManager(orgId, userId));
 	boolean hasMonitorRole = hasGroupManagerRole || orgId == null
 		|| securityDAO.hasOrgRole(orgId, userId, Role.MONITOR);
 
@@ -281,8 +281,8 @@ public class SecurityService implements ISecurityService {
 
 	Organisation org = lesson.getOrganisation();
 	Integer orgId = org == null ? null : org.getOrganisationId();
-	boolean hasSysadminRole = securityDAO.isSysadmin(userId);
-	boolean hasGroupManagerRole = hasSysadminRole || (orgId != null && securityDAO.isGroupManager(orgId, userId));
+	boolean hasAppadminRole = securityDAO.isAppadmin(userId);
+	boolean hasGroupManagerRole = hasAppadminRole || (orgId != null && securityDAO.isGroupManager(orgId, userId));
 	boolean hasRole = hasGroupManagerRole || orgId == null
 		|| securityDAO.hasOrgRole(orgId, userId, Role.LEARNER, Role.MONITOR);
 
@@ -293,6 +293,29 @@ public class SecurityService implements ISecurityService {
 	    SecurityService.log.debug(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
 	    logAuditRoleFailure(userId, error);
+	    if (escalate) {
+		throw new SecurityException(error);
+	    } else {
+		return false;
+	    }
+	}
+
+	return true;
+    }
+
+    @Override
+    public boolean isAppadmin(Integer userId, String action, boolean escalate) {
+	if (userId == null) {
+	    String error = "Missing user ID when checking if is appadmin and can \"" + action + "\"";
+	    SecurityService.log.error(error);
+	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, null, null, error);
+	    throw new SecurityException(error);
+	}
+
+	if (!securityDAO.isSysadmin(userId) || !securityDAO.isAppadmin(userId)) {
+	    String error = "User " + userId + " is not appadmin and can not \"" + action + "\"";
+	    SecurityService.log.debug(error);
+	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, null, null, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -359,7 +382,7 @@ public class SecurityService implements ISecurityService {
 	}
 
 	try {
-	    if (securityDAO.isSysadmin(userId) || securityDAO.hasOrgRole(orgId, userId, roles)) {
+	    if (securityDAO.isAppadmin(userId) || securityDAO.hasOrgRole(orgId, userId, roles)) {
 		return true;
 	    }
 

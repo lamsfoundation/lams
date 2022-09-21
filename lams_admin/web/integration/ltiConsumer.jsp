@@ -42,8 +42,8 @@
 <body class="stripes">
 	<lams:Page type="admin" title="${title}" formID="ltiConsumerForm">
 		<p>
-			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default">
-				<fmt:message key="sysadmin.maintain" />
+			<a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-default">
+				<fmt:message key="appadmin.maintain" />
 			</a>
 					
 			<a href="<lams:LAMSURL/>admin/ltiConsumerManagement/start.do" class="btn btn-default">

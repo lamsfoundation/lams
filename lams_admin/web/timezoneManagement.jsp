@@ -18,7 +18,7 @@
     
 <body class="stripes">
 	<lams:Page type="admin" title="${title}" formID="timezoneForm">
-		<p><a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
+		<p><a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-default"><fmt:message key="appadmin.maintain" /></a></p>
 			
 		<h4>
 			<fmt:message key="admin.servertimezone.select.server.timezone" />

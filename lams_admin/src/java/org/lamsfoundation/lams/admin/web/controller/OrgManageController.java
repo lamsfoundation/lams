@@ -95,7 +95,7 @@ public class OrgManageController {
 	}
 
 	// check if user is allowed to view and edit groups
-	if (!request.isUserInRole(Role.SYSADMIN) && !userManagementService.isUserGlobalGroupManager()
+	if (!request.isUserInRole(Role.APPADMIN) && !userManagementService.isUserGlobalGroupManager()
 		&& !(isRootOrganisation ? request.isUserInRole(Role.GROUP_MANAGER)
 			: securityService.hasOrgRole(orgId, userId, new String[] { Role.GROUP_MANAGER },
 				"manage courses", false))) {
@@ -143,7 +143,7 @@ public class OrgManageController {
 
 	// let the jsp know whether to display links
 	request.setAttribute("createGroup",
-		request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager());
+		request.isUserInRole(Role.APPADMIN) || userManagementService.isUserGlobalGroupManager());
 	request.setAttribute("editGroup", true);
 	request.setAttribute("manageGlobalRoles", request.isUserInRole(Role.SYSADMIN));
 	return "organisation/list";

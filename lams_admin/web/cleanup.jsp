@@ -6,7 +6,7 @@
 
 <lams:html>
 <lams:head>
-	<c:set var="title"><fmt:message key="sysadmin.batch.temp.file.delete"/></c:set>
+	<c:set var="title"><fmt:message key="appadmin.batch.temp.file.delete"/></c:set>
 	<title>${title}</title>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
@@ -19,7 +19,7 @@
 	
 	<lams:Page type="admin" title="${title}" formID="cleanupForm">
 	
-	<p><a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
+	<p><a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-default"><fmt:message key="appadmin.maintain" /></a></p>
 
 	<lams:errors path="numDays"/>
 	
@@ -51,7 +51,7 @@
 		<form:input path="numDays" maxlength="4" size="4" cssClass="form-control form-control-inline" /></p>
 		
 		<div class="pull-right">
-			<a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="admin.cancel" /></a>
+			<a href="<lams:LAMSURL/>/admin/appadminstart.do" class="btn btn-default"><fmt:message key="admin.cancel" /></a>
 			<input type="submit" class="btn btn-primary loffset5" value="<fmt:message key="admin.delete"/>" />
 		</div>
 		

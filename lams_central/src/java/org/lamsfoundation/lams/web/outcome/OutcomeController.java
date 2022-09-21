@@ -94,7 +94,7 @@ public class OutcomeController {
     @RequestMapping("/outcomeManage")
     public String outcomeManage(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	UserDTO user = OutcomeController.getUserDTO();
-	securityService.isSysadmin(user.getUserID(), "import outcomes", true);
+	securityService.isAppadmin(user.getUserID(), "import outcomes", true);
 
 	List<Outcome> outcomes = outcomeService.getOutcomes();
 	request.setAttribute("outcomes", outcomes);
@@ -105,7 +105,7 @@ public class OutcomeController {
     public String outcomeEdit(@ModelAttribute OutcomeForm outcomeForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	UserDTO user = OutcomeController.getUserDTO();
-	securityService.isSysadmin(user.getUserID(), "import outcomes", true);
+	securityService.isAppadmin(user.getUserID(), "import outcomes", true);
 
 	Long outcomeId = WebUtil.readLongParam(request, "outcomeId", true);
 	Outcome outcome = outcomeId == null ? null : (Outcome) userManagementService.findById(Outcome.class, outcomeId);
@@ -177,7 +177,7 @@ public class OutcomeController {
     @RequestMapping(path = "/outcomeRemove", method = RequestMethod.POST)
     public String outcomeRemove(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	UserDTO user = OutcomeController.getUserDTO();
-	securityService.isSysadmin(user.getUserID(), "import outcomes", true);
+	securityService.isAppadmin(user.getUserID(), "import outcomes", true);
 
 	Long outcomeId = WebUtil.readLongParam(request, "outcomeId", false);
 	Outcome outcome = (Outcome) userManagementService.findById(Outcome.class, outcomeId);
@@ -279,8 +279,8 @@ public class OutcomeController {
 		    "Either lesson ID or tool content ID or QB question ID must not be null when fetching outcome mappings");
 	}
 	Integer userId = OutcomeController.getUserDTO().getUserID();
-	if (!request.isUserInRole(Role.SYSADMIN) && !request.isUserInRole(Role.AUTHOR)) {
-	    String error = "User " + userId + " is not sysadmin nor an author and can not map outcome";
+	if (!request.isUserInRole(Role.APPADMIN) && !request.isUserInRole(Role.AUTHOR)) {
+	    String error = "User " + userId + " is not appadmin nor an author and can not map outcome";
 	    log.error(error);
 	    throw new SecurityException(error);
 	}
@@ -380,7 +380,7 @@ public class OutcomeController {
     @RequestMapping("/outcomeExport")
     public void outcomeExport(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	UserDTO user = OutcomeController.getUserDTO();
-	securityService.isSysadmin(user.getUserID(), "export outcomes", true);
+	securityService.isAppadmin(user.getUserID(), "export outcomes", true);
 
 	List<ExcelSheet> sheets = outcomeService.exportOutcomes();
 
@@ -402,7 +402,7 @@ public class OutcomeController {
     public String outcomeImport(@RequestParam("file") MultipartFile file, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	UserDTO user = OutcomeController.getUserDTO();
-	securityService.isSysadmin(user.getUserID(), "import outcomes", true);
+	securityService.isAppadmin(user.getUserID(), "import outcomes", true);
 
 	try {
 	    int importCount = outcomeService.importOutcomes(file);
@@ -550,7 +550,7 @@ public class OutcomeController {
     @RequestMapping("/scaleExport")
     public void scaleExport(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	UserDTO user = OutcomeController.getUserDTO();
-	securityService.isSysadmin(user.getUserID(), "export outcome scales", true);
+	securityService.isAppadmin(user.getUserID(), "export outcome scales", true);
 
 	List<ExcelSheet> sheets = outcomeService.exportScales();
 
@@ -572,7 +572,7 @@ public class OutcomeController {
     public String scaleImport(@RequestParam("file") MultipartFile file, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	UserDTO user = OutcomeController.getUserDTO();
-	securityService.isSysadmin(user.getUserID(), "import outcome scales", true);
+	securityService.isAppadmin(user.getUserID(), "import outcome scales", true);
 
 	try {
 	    int importCount = outcomeService.importScales(file);

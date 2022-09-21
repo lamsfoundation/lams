@@ -100,29 +100,29 @@ public class HomeController {
     private ILogEventService logEventService;
 
     /**
-     * request for sysadmin environment
+     * request for appadmin environment
      */
-    @RequestMapping("/sysadmin")
-    public String sysadmin(HttpServletRequest req) throws IOException, ServletException {
+    @RequestMapping("/appadmin")
+    public String appadmin(HttpServletRequest req) throws IOException, ServletException {
 
 	try {
-	    HomeController.log.debug("request sysadmin");
+	    HomeController.log.debug("request appadmin");
 	    int orgId = new Integer(req.getParameter("orgId")).intValue();
 	    UserDTO user = getUser();
 	    if (user == null) {
 		HomeController.log.error("admin: User missing from session. ");
 		return "errorContent";
-	    } else if (userManagementService.isUserInRole(user.getUserID(), orgId, Role.SYSADMIN)) {
-		HomeController.log.debug("user is sysadmin");
-		return "sysadmin";
+	    } else if (userManagementService.isUserInRole(user.getUserID(), orgId, Role.APPADMIN)) {
+		HomeController.log.debug("user is appadmin");
+		return "appadmin";
 	    } else {
 		HomeController.log.error("User " + user.getLogin()
-			+ " tried to get sysadmin screen but isn't sysadmin in organisation: " + orgId);
+			+ " tried to get appadmin screen but isn't appadmin in organisation: " + orgId);
 		return displayMessage(req, "error.authorisation");
 	    }
 
 	} catch (Exception e) {
-	    HomeController.log.error("Failed to load sysadmin", e);
+	    HomeController.log.error("Failed to load appadmin", e);
 	    return "errorContent";
 	}
     }

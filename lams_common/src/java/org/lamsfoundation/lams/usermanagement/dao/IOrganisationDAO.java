@@ -39,17 +39,17 @@ public interface IOrganisationDAO extends IBaseDAO {
      * Get list of orgIds of active groups.
      *
      * @param userId
-     * @param isSysadmin
+     * @param isAppadmin
      * @param page
      * @param size
      * @param searchString
      *            filters results by course name. It can be null and then doesn't affect results
      * @return list of orgIds
      */
-    List<OrganisationDTO> getActiveCoursesByUser(Integer userId, boolean isSysadmin, int page, int size,
+    List<OrganisationDTO> getActiveCoursesByUser(Integer userId, boolean isAppadmin, int page, int size,
 	    String searchString);
 
-    int getCountActiveCoursesByUser(Integer userId, boolean isSysadmin, String searchString);
+    int getCountActiveCoursesByUser(Integer userId, boolean isAppadmin, String searchString);
 
     /**
      * Returns courses with specified type, state and parent course.

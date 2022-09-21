@@ -6,7 +6,7 @@
 
 <lams:html>
 <lams:head>
-	<c:set var="title"><fmt:message key="sysadmin.maintain"/></c:set>
+	<c:set var="title"><fmt:message key="appadmin.maintain"/></c:set>
 	<title>${title}</title>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 

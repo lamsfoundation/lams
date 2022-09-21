@@ -4,7 +4,7 @@
 
 <lams:html>
 <lams:head>
-	<c:set var="title"><fmt:message key="sysadmin.tool.management"/></c:set>
+	<c:set var="title"><fmt:message key="appadmin.tool.management"/></c:set>
 	<title>${title}</title>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
@@ -22,9 +22,9 @@
 <body class="stripes">
 	
 	<lams:Page type="admin" title="${title}">
-				<p><a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
+				<p><a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-default"><fmt:message key="appadmin.maintain" /></a></p>
 
-				<h1><fmt:message key="sysadmin.tool.management" /></h1>
+				<h1><fmt:message key="appadmin.tool.management" /></h1>
 				
 				<div class="panel">
 					<p>
@@ -36,7 +36,7 @@
 						<fmt:message key="msg.edit.tool.content.3" />
 					</p>
 					
-					<p>${fn:length(toolLibrary)}&nbsp;<fmt:message key="sysadmin.library.totals" /></p>
+					<p>${fn:length(toolLibrary)}&nbsp;<fmt:message key="appadmin.library.totals" /></p>
 				</div>	
 				
 				<c:set var="displayToolManagement" value="false" />
@@ -81,7 +81,7 @@
 										<lams:LAMSURL /><c:out value="${dto.authoringURL}" />?toolContentID=${dto.toolContentID}&contentFolderID=-1"
 									</c:set>
 									&nbsp;
-									<a class="btn btn-xs btn-default" id="defaultContent${dto.activityTitle}" href="${editDefaultContentUrl}" target="_blank"><fmt:message key="sysadmin.edit.default.tool.content" /></a>
+									<a class="btn btn-xs btn-default" id="defaultContent${dto.activityTitle}" href="${editDefaultContentUrl}" target="_blank"><fmt:message key="appadmin.edit.default.tool.content" /></a>
 									<c:if test="${(displayToolManagement == 'true') and (dto.adminURL != null)}">
 										&nbsp;
 										<a class="btn btn-xs btn-default" id="toolManagement${dto.activityTitle}" href="<lams:LAMSURL /><c:out value="${dto.adminURL}" />" ><fmt:message key="msg.tool.management" /></a>

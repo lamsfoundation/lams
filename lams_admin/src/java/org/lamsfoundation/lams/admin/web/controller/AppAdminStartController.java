@@ -43,7 +43,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  *
  */
 @Controller
-public class SysAdminStartController {
+public class AppAdminStartController {
 
     @Autowired
     private IUserManagementService userManagementService;
@@ -51,38 +51,44 @@ public class SysAdminStartController {
     @Qualifier("adminMessageService")
     private MessageService messageService;
 
-    @RequestMapping(path = "/sysadminstart")
+    @RequestMapping(path = "/appadminstart")
     public String execute(HttpServletRequest request) throws Exception {
 	ArrayList<Object[]> groupedLinks = new ArrayList<>();
+	ArrayList<LinkBean> links = new ArrayList<>();
 
 	if (request.isUserInRole(Role.SYSADMIN)) {
-	    ArrayList<LinkBean> links = new ArrayList<>();
+	    links = new ArrayList<>();
 	    links.add(new LinkBean("config.do", "sysadmin.config.settings.edit"));
-	    links.add(new LinkBean("timezonemanagement/start.do", "admin.timezone.title"));
-	    links.add(new LinkBean("loginmaintain.do", "sysadmin.maintain.loginpage"));
-	    links.add(new LinkBean("signupManagement/start.do", "admin.signup.title"));
-	    links.add(new LinkBean("extserver/serverlist.do", "sysadmin.maintain.external.servers"));
+	    links.add(new LinkBean("extserver/serverlist.do", "appadmin.maintain.external.servers"));
 	    links.add(new LinkBean("ltiConsumerManagement/start.do", "label.manage.tool.consumers"));
+	    links.add(new LinkBean("ldap/start.do", "sysadmin.ldap.configuration"));
+	    groupedLinks.add(new Object[] { AdminConstants.START_SYSADMIN_CONFIG_LINKS, links });
+	}
+
+	if (request.isUserInRole(Role.APPADMIN)) {
+	    links = new ArrayList<>();
+	    links.add(new LinkBean("timezonemanagement/start.do", "admin.timezone.title"));
+	    links.add(new LinkBean("loginmaintain.do", "appadmin.maintain.loginpage"));
+	    links.add(new LinkBean("signupManagement/start.do", "admin.signup.title"));
 	    links.add(new LinkBean("policyManagement/list.do", "admin.policies.title"));
-	    links.add(new LinkBean("toolcontentlist/start.do", "sysadmin.tool.management"));
+	    links.add(new LinkBean("toolcontentlist/start.do", "appadmin.tool.management"));
 	    links.add(new LinkBean("../outcome/outcomeManage.do", "admin.outcome.title"));
 	    links.add(new LinkBean("themeManagement/start.do", "admin.themes.title"));
-	    links.add(new LinkBean("sessionmaintain/list.do", "sysadmin.maintain.session"));
-	    groupedLinks.add(new Object[] { AdminConstants.START_CONFIG_LINKS, links });
+	    links.add(new LinkBean("sessionmaintain/list.do", "appadmin.maintain.session"));
+	    groupedLinks.add(new Object[] { AdminConstants.START_APPADMIN_CONFIG_LINKS, links });
 
 	    links = new ArrayList<>();
 	    links.add(new LinkBean("logevent/start.do", "label.event.log"));
-	    links.add(new LinkBean("cleanup/start.do", "sysadmin.batch.temp.file.delete"));
-	    links.add(new LinkBean("cleanupPreviewLessons/start.do", "sysadmin.batch.preview.lesson.delete"));
+	    links.add(new LinkBean("cleanup/start.do", "appadmin.batch.temp.file.delete"));
+	    links.add(new LinkBean("cleanupPreviewLessons/start.do", "appadmin.batch.preview.lesson.delete"));
 	    links.add(new LinkBean("statistics/start.do", "admin.statistics.title"));
 	    groupedLinks.add(new Object[] { AdminConstants.START_MONITOR_LINKS, links });
 
 	    links = new ArrayList<>();
 	    links.add(new LinkBean("usersearch.do", "admin.user.find"));
-	    links.add(new LinkBean("importgroups.do", "sysadmin.import.groups.title"));
+	    links.add(new LinkBean("importgroups.do", "appadmin.import.groups.title"));
 	    links.add(new LinkBean("importexcel.do", "admin.user.import"));
 	    links.add(new LinkBean("disabledmanage.do", "admin.list.disabled.users"));
-	    links.add(new LinkBean("ldap/start.do", "sysadmin.ldap.configuration"));
 	    groupedLinks.add(new Object[] { AdminConstants.START_COURSE_LINKS, links });
 
 	    // LKC-213
@@ -94,21 +100,20 @@ public class SysAdminStartController {
 	    }
 
 	} else if (userManagementService.isUserGlobalGroupManager()) {
-	    ArrayList<LinkBean> links = new ArrayList<>();
 	    links.add(new LinkBean("usersearch.do", "admin.user.find"));
-	    links.add(new LinkBean("importgroups.do", "sysadmin.import.groups.title"));
+	    links.add(new LinkBean("importgroups.do", "appadmin.import.groups.title"));
 	    links.add(new LinkBean("importexcel.do", "admin.user.import"));
 	    links.add(new LinkBean("disabledmanage.do", "admin.list.disabled.users"));
 	    groupedLinks.add(new Object[] { AdminConstants.START_COURSE_LINKS, links });
 
 	} else {
-	    request.setAttribute("errorName", "SysAdminStartAction");
+	    request.setAttribute("errorName", "AppAdminStartAction");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
 	}
 
 	request.setAttribute("groupedLinks", groupedLinks);
-	return "sysadmin";
+	return "appadmin";
     }
 
 }

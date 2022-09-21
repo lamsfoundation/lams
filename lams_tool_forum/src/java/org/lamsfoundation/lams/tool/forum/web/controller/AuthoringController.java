@@ -152,7 +152,7 @@ public class AuthoringController {
 		    Iterator<Message> iter = forum.getMessages().iterator();
 		    while (iter.hasNext()) {
 			Message topic = iter.next();
-			// contentFolderID != -1 means it is sysadmin: LDEV-906
+			// contentFolderID != -1 means it is appadmin: LDEV-906
 			if (topic.getCreatedBy() == null && !StringUtils.equals(contentFolderID, "-1")) {
 			    // get login user (author)
 			    HttpSession ss = SessionManager.getSession();
@@ -170,7 +170,7 @@ public class AuthoringController {
 	    } else {
 		topics = forumService.getAuthoredTopics(forum.getUid());
 		// failure tolerance: if current contentID is defaultID, the createBy will be null.
-		// contentFolderID != -1 means it is sysadmin: LDEV-906
+		// contentFolderID != -1 means it is appadmin: LDEV-906
 		if (!StringUtils.equals(contentFolderID, "-1")) {
 		    for (MessageDTO messageDTO : topics) {
 			if (StringUtils.isBlank(messageDTO.getAuthor())) {
@@ -246,7 +246,7 @@ public class AuthoringController {
 	// *******************************Handle user*******************
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	ForumUser forumUser = null;
-	// check whether it is sysadmin:LDEV-906
+	// check whether it is appadmin:LDEV-906
 	if (!StringUtils.equals(contentFolderID, "-1")) {
 	    // try to get form system session
 	    HttpSession ss = SessionManager.getSession();
@@ -405,7 +405,7 @@ public class AuthoringController {
 	// check whether this user exist or not
 	ForumUser forumUser = forumService.getUserByID(new Long(user.getUserID().intValue()));
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	// check whether it is sysadmin:LDEV-906
+	// check whether it is appadmin:LDEV-906
 	if (forumUser == null && !StringUtils.equals(contentFolderID, "-1")) {
 	    // if user not exist, create new one in database
 	    forumUser = new ForumUser(user, null);
