@@ -627,8 +627,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.file.not.found"));
 	} catch (RepositoryCheckedException e) {
 	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.repository"));
-	} catch (IOException e) {
-	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.io.exception"));
 	}
 	return node;
     }

@@ -22,9 +22,11 @@ CREATE TABLE tl_lawhiteboard11_whiteboard (
    gallery_walk_read_only TINYINT NOT NULL DEFAULT 0,
    gallery_walk_started TINYINT NOT NULL DEFAULT 0,
    gallery_walk_finished TINYINT NOT NULL DEFAULT 0,
+   gallery_walk_edit_enabled TINYINT NOT NULL DEFAULT 0,
    gallery_walk_instructions TEXT,
    primary key (uid)
 )ENGINE=InnoDB;
+
 CREATE TABLE tl_lawhiteboard11_session (
    uid bigint not null auto_increment,
    whiteboard_uid bigint,
@@ -76,7 +78,7 @@ INSERT INTO `tl_lawhiteboard11_whiteboard` (`uid`, `create_date`, `update_date`,
   (1,NULL,NULL,NULL,'Whiteboard','0','Instructions',0,0,${default_content_id},0,0);
   
 INSERT INTO tl_lawhiteboard11_configuration (config_key, config_value) VALUES
-('ServerURL', '[LAMS_SERVER_URL]:9003');
-  
-  
+('ServerURL', '[LAMS_SERVER_URL]:9003'),
+('WhiteboardIdPrefix', NULL);
+
 SET FOREIGN_KEY_CHECKS=1;
