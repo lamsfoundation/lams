@@ -17,6 +17,7 @@ help_url,
 language_file,
 create_date_time,
 modified_date_time,
+admin_url,
 supports_outputs
 )
 VALUES
@@ -38,4 +39,5 @@ VALUES
 'org.lamsfoundation.lams.tool.mc.ApplicationResources',
 NOW(),
 NOW(),
+'tool/lamc11/admin/start.do',
 1)

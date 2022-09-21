@@ -15,13 +15,12 @@ create table tl_lasbmt11_content (
    created_by bigint, 
    updated datetime,
    submission_deadline datetime,
-   mark_release_notify TINYINT(1) DEFAULT 0,
    file_submit_notify TINYINT(1) DEFAULT 0,
    use_select_leader_tool_ouput TINYINT(1) NOT NULL DEFAULT 0,
    min_limit_upload_number bigint,
    primary key (content_id)
 );
-
+		
 create table tl_lasbmt11_session (
    session_id bigint not null,
    status TINYINT(1),

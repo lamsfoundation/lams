@@ -16,6 +16,12 @@ CREATE TABLE tl_lamind10_mindmap (
   export_content mediumtext,
   reflect_on_activity bit(1),
   reflect_instructions mediumtext,
+  gallery_walk_enabled TINYINT NOT NULL DEFAULT 0,
+  gallery_walk_read_only TINYINT NOT NULL DEFAULT 0,
+  gallery_walk_started TINYINT NOT NULL DEFAULT 0,
+  gallery_walk_finished TINYINT NOT NULL DEFAULT 0,
+  gallery_walk_edit_enabled TINYINT NOT NULL DEFAULT 0,
+  gallery_walk_instructions TEXT,
   PRIMARY KEY (uid)
 );
 
