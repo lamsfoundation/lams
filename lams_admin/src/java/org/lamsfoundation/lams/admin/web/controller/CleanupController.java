@@ -50,8 +50,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
  */
 @Controller
 @RequestMapping("/cleanup")
-public class CleanupTempFilesController {
-    private static Logger log = Logger.getLogger(CleanupTempFilesController.class);
+public class CleanupController {
+    private static Logger log = Logger.getLogger(CleanupController.class);
 
     @Autowired
     @Qualifier("adminMessageService")
@@ -104,6 +104,12 @@ public class CleanupTempFilesController {
     public String cleanUpCache() throws MalformedObjectNameException {
 	boolean cacheCleared = HibernateSessionManager.clearCache();
 	return "redirect:start.do?cacheCleared=" + cacheCleared;
+    }
+
+    @RequestMapping(path = "/garbage", method = RequestMethod.POST)
+    public String cleanUpGarbage() throws MalformedObjectNameException {
+	System.gc();
+	return "redirect:start.do?garbageCollectorRun=true";
     }
 
     @RequestMapping("/refresh")

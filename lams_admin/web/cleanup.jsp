@@ -82,6 +82,23 @@
 				</form:form>
 			</div>
 		</div>
+		
+		<div class="panel panel-default" >
+			<div class="panel-heading">
+				<span class="panel-title">
+					<fmt:message key="sysadmin.garbage.clear" />
+				</span>
+			</div>
+			
+			<div class="panel-body">
+				<form:form action="garbage.do" method="post">
+					<input type="submit" class="btn btn-primary" value="<fmt:message key="sysadmin.clear"/>" />
+					<c:if test="${param.garbageCollectorRun eq 'true'}">
+						<span class="loffset10"><fmt:message key="sysadmin.garbage.cleared" /></span>
+					</c:if>
+				</form:form>
+			</div>
+		</div>
 	
 	</lams:Page>
 
