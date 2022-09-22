@@ -71,8 +71,8 @@ public class Role implements Serializable, Comparable<Role> {
     public static final Integer ROLE_SYSADMIN = 7;
     /***********************************************************/
 
-    public static final Map<Integer, String> ROLE_MAP = Map.of(ROLE_SYSADMIN, SYSADMIN, ROLE_GROUP_MANAGER,
-	    GROUP_MANAGER, ROLE_AUTHOR, AUTHOR, ROLE_MONITOR, MONITOR, ROLE_LEARNER, LEARNER);
+    public static final Map<Integer, String> ROLE_MAP = Map.of(ROLE_APPADMIN, APPADMIN, ROLE_GROUP_MANAGER,
+	    GROUP_MANAGER, ROLE_AUTHOR, AUTHOR, ROLE_MONITOR, MONITOR, ROLE_LEARNER, LEARNER, ROLE_SYSADMIN, SYSADMIN);
 
     @Id
     @Column(name = "role_id")
