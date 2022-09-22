@@ -38,8 +38,8 @@
 			<transaction src="${basedir}/build/sql/create_lams_11_db.sql"/>
 			<transaction src="${db.scripts}/create_lams_11_tables.sql"/>
 			<!-- Create tables for LAMS and other application's integration -->
-			<transaction src="${db.scripts}/insert_lams_users.sql"/> 
 			<transaction src="${db.scripts}/insert_types_data.sql"/>
+			<transaction src="${db.scripts}/insert_lams_users.sql"/> 
 			<transaction src="${basedir}/build/sql/insert_lams_config_data.sql"/>
 			<!-- Create Quartz table --> 
 	    	<transaction src="${db.scripts}/create_quartz_table.sql"/>

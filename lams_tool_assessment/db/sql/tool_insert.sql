@@ -17,6 +17,7 @@ help_url,
 language_file,
 create_date_time,
 modified_date_time,
+admin_url,
 supports_outputs
 )
 VALUES
@@ -38,5 +39,6 @@ VALUES
 'org.lamsfoundation.lams.tool.assessment.ApplicationResources',
 NOW(),
 NOW(),
+'tool/laasse10/admin/start.do',
 1
 )

@@ -26,6 +26,11 @@ public class CleanupForm {
 
     private Integer numDays;
 
+    public CleanupForm() {
+	// recommended number of days to leave temp files
+	numDays = 1;
+    }
+
     public Integer getNumDays() {
 	return numDays;
     }

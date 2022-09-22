@@ -1,5 +1,7 @@
 package org.lamsfoundation.lams.util.hibernate;
 
+import org.apache.log4j.Logger;
+import org.hibernate.Cache;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.context.internal.ManagedSessionContext;
@@ -18,7 +20,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class HibernateSessionManager {
     private static SessionFactory sessionFactory;
 
-    //  private static Logger log = Logger.getLogger(HibernateSessionManager.class);
+    private static Logger log = Logger.getLogger(HibernateSessionManager.class);
+
     /**
      * Makes sure that an open Hibernate session is bound to current thread.
      */
@@ -56,6 +59,24 @@ public class HibernateSessionManager {
 
     public static Statistics getStatistics() {
 	return HibernateSessionManager.getSessionFactory().getStatistics();
+    }
+
+    public static boolean clearCache() {
+	try {
+	    Session session = HibernateSessionManager.getSessionFactory().getCurrentSession();
+	    if (session != null) {
+		session.clear();
+	    }
+
+	    Cache cache = HibernateSessionManager.getSessionFactory().getCache();
+	    if (cache != null) {
+		cache.evictAllRegions();
+	    }
+	} catch (Exception e) {
+	    log.error("Error while clearing cache", e);
+	    return false;
+	}
+	return true;
     }
 
     private static SessionFactory getSessionFactory() {

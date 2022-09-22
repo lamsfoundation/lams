@@ -18,7 +18,6 @@ create table tl_laprev11_peerreview (
    maximum_rates integer DEFAULT 0,
    maximum_rates_per_user integer DEFAULT 0,
    self_review tinyint(1) DEFAULT 0,
-   notify_users_of_results tinyint(1) DEFAULT 1,
    show_ratings_left_by_user tinyint(1) DEFAULT 0,
    tolerance TINYINT UNSIGNED NOT NULL DEFAULT 0,
    PRIMARY KEY (uid),

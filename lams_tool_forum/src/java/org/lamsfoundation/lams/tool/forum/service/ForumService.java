@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.forum.service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -739,8 +738,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    } catch (FileNotFoundException e) {
 		throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
 	    } catch (RepositoryCheckedException e) {
-		throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-	    } catch (IOException e) {
 		throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
 	    }
 	}
