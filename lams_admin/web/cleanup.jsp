@@ -54,7 +54,8 @@
 				</p>
 				
 				<form:form action="files.do" modelAttribute="cleanupForm" id="cleanupForm" method="post">
-				
+					<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
+					
 					<p><fmt:message key="label.cleanup.delete" />:
 					<form:input path="numDays" maxlength="4" size="4" cssClass="form-control form-control-inline" /></p>
 					
@@ -75,6 +76,8 @@
 			
 			<div class="panel-body">
 				<form:form action="cache.do" method="post">
+					<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
+					
 					<input type="submit" class="btn btn-primary pull-right" value="<fmt:message key="sysadmin.clear"/>" />
 					<c:if test="${param.cacheCleared eq 'true'}">
 						<span class="loffset10"><fmt:message key="sysadmin.cache.cleared" /></span>
@@ -92,6 +95,8 @@
 			
 			<div class="panel-body">
 				<form:form action="garbage.do" method="post">
+					<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
+			
 					<input type="submit" class="btn btn-primary pull-right" value="<fmt:message key="sysadmin.clear"/>" />
 					<c:if test="${param.garbageCollectorRun eq 'true'}">
 						<span class="loffset10"><fmt:message key="sysadmin.garbage.cleared" /></span>

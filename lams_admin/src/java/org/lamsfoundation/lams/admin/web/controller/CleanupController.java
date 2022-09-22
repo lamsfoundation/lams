@@ -101,13 +101,27 @@ public class CleanupController {
     }
 
     @RequestMapping(path = "/cache", method = RequestMethod.POST)
-    public String cleanUpCache() throws MalformedObjectNameException {
+    public String cleanUpCache(HttpServletRequest request) throws MalformedObjectNameException {
+	// check user is sysadmin
+	if (!(request.isUserInRole(Role.SYSADMIN))) {
+	    request.setAttribute("errorName", "CleanupCacheAction");
+	    request.setAttribute("errorMessage", messageService.getMessage("error.need.sysadmin"));
+	    return "error";
+	}
+
 	boolean cacheCleared = HibernateSessionManager.clearCache();
 	return "redirect:start.do?cacheCleared=" + cacheCleared;
     }
 
     @RequestMapping(path = "/garbage", method = RequestMethod.POST)
-    public String cleanUpGarbage() throws MalformedObjectNameException {
+    public String cleanUpGarbage(HttpServletRequest request) throws MalformedObjectNameException {
+	// check user is sysadmin
+	if (!(request.isUserInRole(Role.SYSADMIN))) {
+	    request.setAttribute("errorName", "CleanupGarbageAction");
+	    request.setAttribute("errorMessage", messageService.getMessage("error.need.sysadmin"));
+	    return "error";
+	}
+
 	System.gc();
 	return "redirect:start.do?garbageCollectorRun=true";
     }
