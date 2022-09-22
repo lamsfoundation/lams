@@ -1095,10 +1095,25 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     public static boolean isItemUnraveledByAnswers(ScratchieItem item, List<String> userAnswers) {
 	QbQuestion qbQuestion = item.getQbQuestion();
 
-	QbOption correctAnswersGroup = qbQuestion.getQbOptions().get(0).isCorrect() ? qbQuestion.getQbOptions().get(0)
-		: qbQuestion.getQbOptions().get(1);
+	QbOption correctAnswersGroup = null;
+	// find which option is the correct one, in VSA terms
+	for (QbOption option : qbQuestion.getQbOptions()) {
+	    if (option.isCorrect()) {
+		// if the options has 100%, it is obviously the correct one
+		correctAnswersGroup = option;
+		break;
+	    }
+	    // if the option has the highest grade, it is considered the correct one
+	    if (correctAnswersGroup == null ? option.getMaxMark() > 0 : option.getMaxMark() > correctAnswersGroup.getMaxMark()) {
+		correctAnswersGroup = option;
+	    }
+	}
+	if (correctAnswersGroup == null) {
+	    return false;
+	}
+		
+	
 	String name = correctAnswersGroup.getName();
-
 	for (String userAnswer : userAnswers) {
 	    String normalisedQuestionAnswer = QbUtils.normaliseVSAnswer(userAnswer, qbQuestion.isExactMatch());
 	    if (QbUtils.isVSAnswerAllocated(name, normalisedQuestionAnswer, qbQuestion.isCaseSensitive(),
