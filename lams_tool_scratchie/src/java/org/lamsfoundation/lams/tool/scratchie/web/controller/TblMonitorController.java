@@ -129,12 +129,6 @@ public class TblMonitorController {
 	model.addAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
 	model.addAttribute("scratchie", scratchie);
 
-	if (scratchie.isBurningQuestionsEnabled()) {
-	    List<BurningQuestionItemDTO> burningQuestionItemDtos = scratchieService.getBurningQuestionDtos(scratchie,
-		    null, true, true);
-	    model.addAttribute(ScratchieConstants.ATTR_BURNING_QUESTION_ITEM_DTOS, burningQuestionItemDtos);
-	}
-
 	return "pages/monitoring/studentChoices5";
     }
 
@@ -145,6 +139,12 @@ public class TblMonitorController {
 
 	Map<String, Object> modelAttributes = scratchieService.prepareStudentChoicesData(scratchie);
 	model.addAllAttributes(modelAttributes);
+
+	if (scratchie.isBurningQuestionsEnabled()) {
+	    List<BurningQuestionItemDTO> burningQuestionItemDtos = scratchieService.getBurningQuestionDtos(scratchie,
+		    null, true, true);
+	    model.addAttribute(ScratchieConstants.ATTR_BURNING_QUESTION_ITEM_DTOS, burningQuestionItemDtos);
+	}
 
 	return "pages/monitoring/studentChoicesTable";
     }

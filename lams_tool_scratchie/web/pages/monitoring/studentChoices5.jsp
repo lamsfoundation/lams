@@ -73,7 +73,7 @@
 
 	$(document).ready(function(){
 		openEventSource('<lams:WebAppURL />tblmonitoring/traStudentChoicesFlux.do?toolContentId=${toolContentID}', function(event) {
-			$('#student-choices-table').load('<lams:WebAppURL />tblmonitoring/traStudentChoicesTable.do?toolContentID=${toolContentID}');
+			$(tlbMonitorHorizontalScrollElement).load('<lams:WebAppURL />tblmonitoring/traStudentChoicesTable.do?toolContentID=${toolContentID}');
 		});
 		
 		$('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');
@@ -119,63 +119,6 @@
 		<div class="col-10 offset-1">
 			<div class="card">
 				<div id="questions-data-container" class="table-responsive card-body">
-					<table id="questions-data" class="table table-bordered table-hover table-condensed">
-						<thead>
-							<tr role="row" class="border-top-0">
-								<th></th>
-								<c:forEach var="item" items="${items}" varStatus="i">
-									<th class="text-center">
-										<a data-bs-toggle="modal" data-bs-target="#question${i.index}Modal" href="#">
-											<fmt:message key="label.authoring.basic.question.text"/> ${i.index + 1}
-										</a>
-										<c:if test="${not empty burningQuestionItemDtos}">
-											<c:forEach var="burningQuestionDto" items="${burningQuestionItemDtos}">
-												<c:if test="${burningQuestionDto.scratchieItem.uid eq item.uid and not empty burningQuestionDto.burningQuestionDtos}">
-													<a href="#" class="badge rounded-pill bg-warning text-decoration-none text-dark align-middle ms-1"
-													   title='<fmt:message key="label.burning.questions"/>'
-													   onClick="javascript:loadTab('burningQuestions')" >
-														<c:out value="${fn:length(burningQuestionDto.burningQuestionDtos)}" />
-													</a>
-												</c:if>
-											</c:forEach>
-										</c:if>
-									</th>
-								</c:forEach>
-								
-								<th class="text-center">
-									<fmt:message key="label.total"/>&nbsp;
-									<lams:Popover>
-										<fmt:message key="label.total.1st.attempt.by.team"/>
-									</lams:Popover>
-								</th>
-								<th class="text-center">
-									<fmt:message key="label.total"/> %
-								</th>
-							</tr>
-						</thead>
-						<tbody>
-						
-							<tr>
-								<th>
-									<b>
-										<fmt:message key="label.correct.answer"/>
-									</b>
-								</th>
-								<c:forEach var="item" items="${items}">
-									<td class="text-center">
-										<c:if test="${item.qbQuestion.type == 1 or item.qbQuestion.type == 8}">
-											${item.correctAnswerLetter}
-										</c:if>
-									</td>
-								</c:forEach>
-								
-								<td class="text-center"></td>
-								<td class="text-center"></td>
-							</tr>
-						</tbody>
-						<tbody id="student-choices-table">
-						</tbody>
-					</table>
 				</div>
 			</div>
 		</div>          
