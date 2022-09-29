@@ -31,9 +31,9 @@
 	<lams:Page5 type="admin" title="${title}" titleHelpURL="${help}"  breadcrumbItems="${breadcrumbItems}" formID="configForm" >
 	
 		<c:if test="${not empty error}">
-			<lams:Alert type="danger" id="error-messages" close="false">
+			<lams:Alert5 type="danger" id="error-messages" close="false">
 				<c:out value="${error}" />
-			</lams:Alert>
+			</lams:Alert5>
 		</c:if>
 		
 		<form:form action="config/save.do" modelAttribute="configForm" id="configForm" method="post">

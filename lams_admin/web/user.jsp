@@ -209,7 +209,7 @@
 		<c:if test="${empty userForm.userId}">
 			<div class="row">
 				<div class="col-6 offset-3">
-					<lams:Alert type="info" id="passwordConditions" close="false">
+					<lams:Alert5 type="info" id="passwordConditions" close="false">
 						<fmt:message key='label.password.must.contain' />:
 							<ul class="list-unstyled ml-2" style="line-height: 1.2">
 							<li><span class="fa fa-check" aria-hidden="true"></span> <fmt:message
@@ -242,7 +242,7 @@
 							<li><span class="fa fa-check"></span> <fmt:message
 									key='label.password.common' /></li>
 						</ul>
-					</lams:Alert>
+					</lams:Alert5>
 				</div>
 			</div>
 		</c:if>

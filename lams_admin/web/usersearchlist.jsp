@@ -11,12 +11,13 @@
 	<title>${title}</title>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
-	<lams:css/>
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css" type="text/css" media="screen">	
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery.tablesorter.theme.bootstrap5.css">
+	<link type="text/css"  href="<lams:LAMSURL/>css/jquery.tablesorter.pager5.css" rel="stylesheet">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css" type="text/css" media="screen">
-	
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css">
-	<link type="text/css" href="${lams}css/jquery.tablesorter.pager.css" rel="stylesheet">
 	<style>
 		#tablesorter thead .disabled {
 			display: none
@@ -28,7 +29,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap5.bundle.min.js"></script>
-	<script type="text/javascript" src="${lams}/includes/javascript/portrait.js" ></script>
+	<lams:JSImport src="includes/javascript/portrait5.js" />
 	<script type="text/javascript">
 	  	$(document).ready(function(){
 	  	
@@ -90,21 +91,21 @@
 								rows += 	orgData["email"];
 								rows += '</td>';
 								
-								rows += '<td class="text-center">';
-								rows +=		'<form style="display: inline-block;" id="delete_' + orgData["userId"] +'" method="post" action="/lams/admin/user/remove.do"><input type="hidden" name="userId" value="' + orgData["userId"] + '"/><input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/><button class="btn btn-outline-danger btn-sm" type="submit"><i class="fa fa-trash" title="<fmt:message key="admin.user.delete"/>"></i></button></form>';
+								rows += '<td>';
+								rows +=		'<form style="display: inline-block;" id="delete_' + orgData["userId"] +'" method="post" action="/lams/admin/user/remove.do"><input type="hidden" name="userId" value="' + orgData["userId"] + '"/><input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/><button class="btn btn-danger" type="submit"><i class="fa fa-trash" title="<fmt:message key="admin.user.delete"/>"></i></button></form>';
 								rows += 	'&nbsp;';
-								rows +=     '<form style="display: inline-block;" id="edit_' + orgData["userId"] +'" method="post" action="/lams/admin/user/edit.do"><input type="hidden" name="userId" value="' + orgData["userId"] + '"/><input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/><button class="btn btn-outline-primary btn-sm" type="submit"><i class="fa fa-pencil" title="<fmt:message key="admin.edit"/>"></i></button></form>';
+								rows +=     '<form style="display: inline-block;" id="edit_' + orgData["userId"] +'" method="post" action="/lams/admin/user/edit.do"><input type="hidden" name="userId" value="' + orgData["userId"] + '"/><input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/><button class="btn btn-primary" type="submit"><i class="fa fa-pencil" title="<fmt:message key="admin.edit"/>"></i></button></form>';
 								rows += 	'&nbsp;';
 								<c:if test="${loginAsEnable}">
 								rows += 	'<a title="<fmt:message key="label.login.as"/>" href="<lams:LAMSURL/>loginas.do?login=' + orgData["login"] + '">';
-								rows += 		'<button type="button" class="btn btn-outline-primary btn-sm" title="<fmt:message key="label.login.as"/>"><i class="fa fa-sign-in"></i></button>';
+								rows += 		'<button type="button" class="btn btn-primary" title="<fmt:message key="label.login.as"/>"><i class="fa fa-sign-in"></i></button>';
 								rows += 	'</a>';
 								rows += 	'&nbsp;';
 								</c:if>
 	
 								if (${(useInternalSMTPServer || not empty smtpServer)} && orgData["email"] != null && orgData["email"] != "") {
 								rows += 	'<a title="<fmt:message key="label.email"/>" href="<lams:LAMSURL/>emailUser/composeMail.do?returnUrl=/lams/admin/usersearch.do&userID=' + orgData["userId"] + '">';
-								rows += 		'<button type="button" class="btn btn-outline-primary btn-sm"><i class="fa fa-envelope"></i> <span class="hidden-xs hidden-sm"><fmt:message key="label.email"/></span></button>';
+								rows += 		'<button type="button" class="btn btn-primary"><i class="fa fa-envelope"></i> <span class="hidden-xs hidden-sm"><fmt:message key="label.email"/></span></button>';
 								rows += 	'</a>';
 								}
 								
@@ -140,7 +141,7 @@
 	</script>
 </lams:head>
     
-<body class="stripes">
+<body class="component pb-4">
 
 	<%-- Build the breadcrumb --%>
 	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
@@ -149,16 +150,18 @@
 
 
 	<lams:Page5 type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">
-	
-		<p><input class="btn btn-primary btn-sm" type="button" value="<fmt:message key="admin.user.create"/>" onclick="javascript:document.location='user/edit.do'" />
+		<div class="row mb-3">
+			<div class="col-2">
+				<input class="btn btn-primary" type="button" value="<fmt:message key="admin.user.create"/>" onclick="javascript:document.location='user/edit.do'" />
+			</div>
+				<label for="search" class="col offset-6 col-form-label text-end"><fmt:message key="admin.search" />:</label>
+			<div class="col-2">
+				<input class="search form-control" type="search" id="search" name="term" data-column="1">
+			</div>
+		</div>
 		
-		<span class="pull-right">
-			<label for="search"><fmt:message key="admin.search" /></label>:&nbsp;<input class="search form-control form-control-sm form-control-inline" type="search" id="search" name="term" data-column="1">
-		</span>
-		</p>
-		
-		<lams:TSTable numColumns="6"> 
-			<th width="3%">
+		<lams:TSTable5 numColumns="6"> 
+			<th width="100px">
 				<fmt:message key="admin.user.userid"/>
 			</th>
 			<th>
@@ -173,13 +176,13 @@
 			<th class="d-none d-lg-table-cell">
 				<fmt:message key="admin.user.email"/>
 			</th>
-			<th class="text-center">
+			<th>
 				<fmt:message key="admin.user.actions"/>
 			</th>
-		</lams:TSTable>			
-		<hr>
-		<div class="pull-right">
-			<a href="javascript:history.go(-1)" class="btn btn-outline-secondary btn-sm">
+		</lams:TSTable5>		
+			
+		<div class="text-end">
+			<a href="javascript:history.go(-1)" class="btn btn-secondary">
 				<fmt:message key="admin.cancel"/>
 			</a>
 		</div>		

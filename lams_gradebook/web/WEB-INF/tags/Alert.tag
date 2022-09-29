@@ -28,7 +28,7 @@
 </c:choose>
 
 <div class="row no-gutter">
-	<div class="col-xs-12 col-sm-offset-2 col-sm-8">
+	<div class="col-12 col-xs-12 col-sm-offset-2 col-sm-8">
 		<div id="${idName}" class="alert alert-${alertType}" style="margin-bottom: 10px; padding: 8px">
 			<div class="media">
 				<div class="media-left">

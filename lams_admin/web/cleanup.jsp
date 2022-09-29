@@ -32,9 +32,9 @@
 			<div class="card-body">
 				<lams:errors path="numDays"/>
 		
-				<lams:Alert type="warn" id="cleanup-warning" close="false">
+				<lams:Alert5 type="warn" id="cleanup-warning" close="false">
 					<fmt:message key="msg.cleanup.warning" /><br />
-				</lams:Alert>
+				</lams:Alert5>
 				
 				<c:set var="filesDeleted" value="${filesDeleted}"/>
 				<c:if test="${not empty filesDeleted}">

@@ -347,7 +347,7 @@
 				<div class="panel panel-default panel-body">
 					<h3><c:out value='${orgPasswordChangeForm.orgName}' /></h3>
 					
-					<lams:Alert type="info" id="passwordConditions" close="false">
+					<lams:Alert5 type="info" id="passwordConditions" close="false">
 						<fmt:message key='label.password.must.contain' />:
 						<ul class="list-unstyled" style="line-height: 1.2">
 							<li><span class="fa fa-check"></span> <fmt:message
@@ -383,7 +383,7 @@
 							</li>
 						</ul>
 						
-					</lams:Alert>
+					</lams:Alert5>
 					
 					<form:form action="changePassword.do" modelAttribute="orgPasswordChangeForm" id="orgPasswordChangeForm" method="post">
 						<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
@@ -408,9 +408,9 @@
 						</div>
 						
 						<c:if test="${success}">
-							<lams:Alert type="info" id="passwordConditions" close="false">
+							<lams:Alert5 type="info" id="passwordConditions" close="false">
 								<h4><fmt:message key="admin.org.password.change.success" /></h4>
-							</lams:Alert>
+							</lams:Alert5>
 						</c:if>
 						
 						<div id="formValidationErrors">

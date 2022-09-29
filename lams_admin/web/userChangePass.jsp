@@ -99,7 +99,7 @@
 <lams:Page5 type="admin" title="${title}" formID="userForm" breadcrumbItems="${breadcrumbItems}">	
 
 
-						<lams:Alert type="info" id="passwordConditions" close="false">
+						<lams:Alert5 type="info" id="passwordConditions" close="false">
 							<fmt:message key='label.password.must.contain' />:
 		<ul class="list-unstyled ml-2" style="line-height: 1.2">
 			<li><span class="fa fa-check"  aria-hidden="true"></span> <fmt:message
@@ -134,7 +134,7 @@
 									<fmt:message key='label.password.common' />
 								</li>
 							</ul>
-						</lams:Alert>
+						</lams:Alert5>
 						
 	<div class="row">
 		<div class="col-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">

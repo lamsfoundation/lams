@@ -36,9 +36,9 @@
 	<lams:Page5 type="admin" title="${title}" titleHelpURL="${help}" breadcrumbItems="${breadcrumbItems}">
 	
 		<c:if test="${not empty error}">
-			<lams:Alert type="warn" id="errorMessage" close="false">	
+			<lams:Alert5 type="warn" id="errorMessage" close="false">	
 				<c:out value="${error}" />
-			</lams:Alert>
+			</lams:Alert5>
 		</c:if>
 		
 		<table class="table table-striped table-bordered" >

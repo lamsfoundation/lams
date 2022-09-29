@@ -149,7 +149,7 @@
 				</ul>
 				</p>
 			<c:set var="alertTitle"><fmt:message key='label.password.must.contain' /></c:set>
-			<lams:Alert type="info" close="false" title="${alertTitle}:">
+			<lams:Alert5 type="info" close="false" title="${alertTitle}:">
 				<ul style="line-height: 1.2em; list-style: none;">
 							<li><span class="fa fa-check"></span> <fmt:message
 									key='label.password.min.length'>
@@ -178,7 +178,7 @@
 								<fmt:message key='label.password.common' />
 							</li>
 						</ul>
-					</lams:Alert>
+					</lams:Alert5>
 				</div>
 				<p>
 					<fmt:message key="msg.import.conclusion" />
