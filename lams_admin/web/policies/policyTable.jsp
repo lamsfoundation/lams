@@ -73,7 +73,7 @@
 			</td>
 
 			<td>
-				<a href="#nogo" class="change-status-link" data-policy-uid="${policy.uid}" data-policy-id="${policy.policyId}">
+				<a href="#nogo" class="change-status-link" data-policy-uid="${policy.uid}" data-policy-id="${policy.policyId}" data-policy-state="${policy.policyStateId}">
 					<c:choose>
 						<c:when test="${policy.policyStateId == 1}">
 							<fmt:message key="label.deactivate"/>
