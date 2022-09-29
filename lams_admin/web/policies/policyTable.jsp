@@ -78,7 +78,7 @@
 			</td>
 
 			<td>
-				<a href="#nogo" class="change-status-link" data-policy-uid="${policy.uid}" data-policy-id="${policy.policyId}">
+				<a href="#nogo" class="change-status-link" data-policy-uid="${policy.uid}" data-policy-id="${policy.policyId}" data-policy-state="${policy.policyStateId}">
 					<c:choose>
 						<c:when test="${policy.policyStateId == 1}">
 							<button class="btn btn-warning" title="<fmt:message key="label.deactivate"/>"><i class="fa fa-pause"></i></button>

@@ -57,13 +57,15 @@
 			$(document).on("click", ".change-status-link", function() {
 				var policyUid = $(this).data("policy-uid");
 				var policyId = $(this).data("policy-id");
+				var policyStateId = $(this).data("policy-state");
 				
 				$("#policy-table").load(
 					"togglePolicyStatus.do?<csrf:token/>", 
 					{
 						policyUid: policyUid,
 						policyId: policyId,
-						viewPreviousVersions: "${viewPreviousVersions}"
+						viewPreviousVersions: "${viewPreviousVersions}",
+					    policyStateId: policyStateId
 					},
 					function() {}
 				);			
