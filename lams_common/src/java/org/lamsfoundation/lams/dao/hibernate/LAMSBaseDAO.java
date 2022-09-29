@@ -306,6 +306,11 @@ public class LAMSBaseDAO implements IBaseDAO {
     }
 
     @Override
+    public List findNative(String nativeQueryString) {
+	return getSession().createNativeQuery(nativeQueryString).getResultList();
+    }
+
+    @Override
     public List find(String queryString) {
 	return doFind(queryString);
     }

@@ -19,15 +19,16 @@
 	<c:set var="title"><fmt:message key="appadmin.import.groups.title"/></c:set>
 	<title>${title}</title>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
+	
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 	<link href="<lams:LAMSURL/>css/uppy.min.css" rel="stylesheet" type="text/css" />
 	<link href="<lams:LAMSURL/>css/uppy.custom.css" rel="stylesheet" type="text/css" />
-
-	<lams:css/>
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
-	
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/uppy/uppy.min.js"></script>
 	<c:choose>
 		<c:when test="${language eq 'es'}">
@@ -114,14 +115,18 @@
 	 </script>
 </lams:head>
     
-<body class="stripes">
+<body class="component">
 
 	<c:set var="help"><fmt:message key="Import+Groups"/></c:set>
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
-	<lams:Page type="admin" title="${title}" titleHelpURL="${help}" formID="importForm">
-	
-	<p><a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-default"><fmt:message key="appadmin.maintain" /></a></p>
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/apadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+	<c:set var="breadcrumbActive">. | <fmt:message key="sysadmin.import.groups.title"/></c:set>
+	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>	
 
+	
+	<lams:Page5 type="admin" title="${title}" titleHelpURL="${help}" formID="importForm" breadcrumbItems="${breadcrumbItems}">
+	
 	<div id="main-page">
 	
 	<c:if test="${not empty results}">
@@ -183,15 +188,15 @@
 				
 		<div id="file-upload-area" class="voffset20"></div>
 		
-		<div class="pull-right voffset20">
-		<a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
-		<input type="submit" id="importButton" class="btn btn-primary loffset5" value="<fmt:message key="label.import"/>" /> &nbsp; 	
+		<div class="mt-3 text-end">
+		<a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-secondary"><fmt:message key="admin.cancel"/></a>
+		<input type="submit" id="importButton" class="btn btn-primary" value="<fmt:message key="label.import"/>" /> &nbsp; 	
 		</div>
 	
 	</form:form>
 	
 	</div>
-	</lams:Page>
+	</lams:Page5>
 		
 </body>
 </lams:html>

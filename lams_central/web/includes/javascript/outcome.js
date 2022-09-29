@@ -22,7 +22,6 @@ function removeScale(scaleId) {
 function openEditOutcomeDialog(outcomeId) {
 	window.parent.showDialog("dialogOutcomeEdit", {
 		'height': Math.max(380, Math.min(700, $(window.parent).height() - 30)),
-		'width' : Math.max(380, Math.min(850, $(window.parent).width() - 60)),
 		'title' : outcomeId ? LABELS.EDIT_OUTCOME_TITLE : LABELS.ADD_OUTCOME_TITLE,
 		'open'  : function() {
 			var dialog = $(this);
@@ -63,7 +62,7 @@ function openOutcomeScaleDialog() {
 					.attr('src', LAMS_URL
 						+ 'outcome/scaleManage.do');
 		}
-	});
+	}).addClass('modal-lg');
 }
 
 function submitOutcome(){

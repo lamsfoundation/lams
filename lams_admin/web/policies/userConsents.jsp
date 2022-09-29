@@ -3,9 +3,11 @@
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
-	<lams:css/>
-	<lams:css suffix="learner"/>
-	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/free.ui.jqgrid.custom.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<style>
 		th, td {
@@ -14,16 +16,26 @@
 	</style>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript">
 		
 		$(document).ready(function(){
-  
+			// customise jqGrid's Boostrap theme
+			$.extend(true, $.jgrid.guiStyles.bootstrap4, {
+				pager : {
+					pagerSelect : 'form-control-select'
+				},
+				searchToolbar : {
+					clearButton : 'btn btn-sm'
+				},
+				titleButton : "btn btn-xs"
+			});
+			
 			// for the ipad, we seem to need to force the grid to a sensible size to start
 			$("#consents-grid").jqGrid({
-				guiStyle: "bootstrap",
-				iconSet: 'fontAwesome',
+				guiStyle: "bootstrap4",
+				iconSet: 'fontAwesomeSolid',
 				autoencode:false,
 				caption: "${organisationName}",
 			    datatype: "json",
@@ -33,8 +45,8 @@
 				shrinkToFit: false,
 			    sortorder: "asc", 
 			    sortname: "fullName", 
-			    pager: 'consents-grid-pager',
-			    rowList:[10,20,30,40,50,100],
+			    pager: true,
+			    rowList:[10,50,100,500],
 			    rowNum:10,
 			    colNames:[
 			    	'',
@@ -53,8 +65,6 @@
 			    	alert('<fmt:message key="admin.org.password.change.grid.error.load"/>');
 			    },
 				gridComplete: function(){
-					//toolTip($(".jqgrow"));	// enable tooltips for grid
-					fixPagerInCenter('consents-grid-pager', 0);
 				}	
 			}).navGrid("#consents-grid-pager", {edit:false,add:false,del:false,search:false});
 
@@ -90,25 +100,14 @@
 </lams:head>
 
 <body>
-<div class="row no-gutter no-margin">
-<div class="col-xs-12">
-<div class="container" id="content">
-
-	<h5>
-		<c:out value="${policy.policyName}" />
-	</h5>
-
-	<fmt:message key="label.version" />: <c:out value="${policy.version}" />
-	<br/><br/>
+<c:set var="title"><c:out value='${policy.policyName}' escapeXml='true'/></c:set>
+<lams:Page5 type="admin" title="${title}" >
+	<p><fmt:message key="label.version" />: <c:out value="${policy.version}" /></p>
 	
 	 <div class="grid-holder">
  		<table id="consents-grid" class="scroll"></table>
-		<div id="consents-grid-pager" class="scroll"></div>
- 		<div class="tooltip-lg" id="tooltip"></div>
 	</div>
 
-</div>
-</div>
-</div>
+</lams:Page5>
 </body>
 </lams:html>

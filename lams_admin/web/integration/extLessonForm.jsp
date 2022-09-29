@@ -1,38 +1,53 @@
 <%@ include file="/taglibs.jsp"%>
 
-		<h3><fmt:message key="sysadmin.lesson.default" /></h3>
-		<div class="checkbox">
-		    <label>
-		    <form:checkbox path="gradebookOnComplete" /><fmt:message key="sysadmin.lesson.gradebook.complete" />
+		<h4><fmt:message key="sysadmin.lesson.default" /></h4>
+				<div class="form-check mb-2">
+					<form:checkbox id="gradebookOnComplete" path="gradebookOnComplete" cssClass="form-check-input"/>
+					<label class="form-check-label" for="gradebookOnComplete">
+						<fmt:message key="sysadmin.lesson.gradebook.complete" />
 		    </label>
 		</div>
-		<div class="checkbox">
-		    <label>
-		     <form:checkbox path="forceLearnerRestart" /><fmt:message key="sysadmin.lesson.force.restart" />
+					
+				<div class="form-check mb-2">
+					<form:checkbox path="forceLearnerRestart" id="forceLearnerRestart" cssClass="form-check-input"/>
+					<label class="form-check-label" for="forceLearnerRestart">
+						<fmt:message key="sysadmin.lesson.force.restart" />
 		    </label>
 		</div>
-		<div class="checkbox">
-		    <label>
-		     <form:checkbox path="allowLearnerRestart" /><fmt:message key="sysadmin.lesson.allow.restart" />
+
+				<div class="form-check mb-2">
+					<form:checkbox id="allowLearnerRestart" path="allowLearnerRestart" cssClass="form-check-input"/>
+					<label class="form-check-label" for="allowLearnerRestart">
+						<fmt:message key="sysadmin.lesson.allow.restart" />
 		    </label>
 		</div>
-		<div class="checkbox">
-		    <label>
-		     <form:checkbox path="liveEditEnabled" /><fmt:message key="sysadmin.lesson.liveedit" />
+		    
+				<div class="form-check mb-2">
+					<form:checkbox id="liveEditEnabled" path="liveEditEnabled" cssClass="form-check-input"/>
+					<label class="form-check-label" for="liveEditEnabled">
+						<fmt:message key="sysadmin.lesson.liveedit" />
 		    </label>
 		</div>
-		<div class="checkbox">
-		    <label>
-		    <form:checkbox path="enableLessonNotifications" /><fmt:message key="sysadmin.lesson.notification" />
+
+				<div class="form-check mb-2">
+					<form:checkbox id="enableLessonNotifications" path="enableLessonNotifications" cssClass="form-check-input"/>
+					<label class="form-check-label" for="enableLessonNotifications">
+						<fmt:message key="sysadmin.lesson.notification" />
 		    </label>
 		</div>
-		<div class="checkbox">
-		    <label>
-		     <form:checkbox path="learnerPresenceAvailable" styleId="learnerPresenceAvailable" /><fmt:message key="sysadmin.lesson.presence" />
+
+				<div class="form-check mb-2">
+					<form:checkbox id="learnerPresenceAvailable" path="learnerPresenceAvailable" cssClass="form-check-input" styleId="learnerPresenceAvailable" />
+					<label class="form-check-label" for="learnerPresenceAvailable">
+						<fmt:message key="sysadmin.lesson.presence" />
 		    </label>
 		</div>
-		<div class="checkbox">
-		    <label>
-		     <form:checkbox path="learnerImAvailable" styleId="learnerImAvailable" /><fmt:message key="sysadmin.lesson.im" />
+
+				<div class="form-check mb-2">
+					<form:checkbox id="learnerImAvailable" path="learnerImAvailable" cssClass="form-check-input" styleId="learnerImAvailable" />
+					<label class="form-check-label" for="learnerImAvailable">
+						<fmt:message key="sysadmin.lesson.im" />
 		    </label>
-		</div>
+		</div>			
+	</div>
+

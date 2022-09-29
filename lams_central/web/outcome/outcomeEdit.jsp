@@ -3,15 +3,19 @@
 
 <lams:html>
 <lams:head>
-	<lams:css/>
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/outcome.css" type="text/css" media="screen" />
+	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
+	
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/outcome.css" type="text/css" media="screen">
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/outcome.js"></script>
-	<lams:JSImport src="includes/javascript/dialog.js" />
+	<lams:JSImport src="includes/javascript/dialog5.js" />
 	<script type="text/javascript">
 		<c:if test="${saved}">
 			var outcomesFrame = $('#dialogOutcome iframe', window.parent.document);
@@ -37,56 +41,45 @@
 			};
 	</script>
 </lams:head>
-<body>
+<body class="component bg-white p-3">
 <form:form action="outcomeSave.do" method="post" modelAttribute="outcomeForm">
 	<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 	<form:hidden path="outcomeId" />
 	
-	<div class="container">
-		<div class="row vertical-center-row">
-			<div
-				class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
-				<div class="panel">
-					<div class="panel-body">
-					
-						<lams:errors/>
-						
-						<div class="form-group">
-							<label><fmt:message key="outcome.manage.add.name" />:
-								<form:input path="name" size="50" maxlength="255" cssClass="form-control" />
-							</label>
-						</div>
-						<div class="form-group">
-							<label><fmt:message key="outcome.manage.add.code" />:
-								<form:input path="code" size="50" maxlength="50" cssClass="form-control" />
-							</label>
-						</div>
-						<div class="form-group">
-							<label><fmt:message key="outcome.manage.add.scale" />:
-								<form:select path="scaleId"  cssClass="form-control">
-									<c:forEach items="${scales}" var="scale">
-										<form:option value="${scale.scaleId}">
-											<c:out value="${scale.name}" /> (<c:out value="${scale.code}" />)
-										</form:option>
-									</c:forEach>
-								</form:select>
-							</label>
-							<button type="button" class="btn btn-default" onClick="javascript:openOutcomeScaleDialog()">
-								<fmt:message key="scale.manage" />
-							</button>
-						</div>
-						<div class="form-group">
-							<fmt:message key="outcome.manage.add.description" />:
-							<lams:CKEditor id="description" value="${outcomeForm.description}" contentFolderID="${outcomeForm.contentFolderId}"></lams:CKEditor>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<button id="addButton" type="submit" class="btn btn-primary" onClick="javascript:submitOutcome()">
-			<fmt:message key="outcome.manage.add.save" />
+	<lams:errors/>
+	
+	<div class="mb-3">
+		<label class="form-label"><fmt:message key="outcome.manage.add.name" />:
+			<form:input path="name" size="50" maxlength="255" cssClass="form-control" />
+		</label>
+	</div>
+	<div class="mb-3">
+		<label class="form-label"><fmt:message key="outcome.manage.add.code" />:
+			<form:input path="code" size="50" maxlength="50" cssClass="form-control" />
+		</label>
+	</div>
+	<div class="mb-3">
+		<label class="form-label"><fmt:message key="outcome.manage.add.scale" />:
+			<form:select path="scaleId"  cssClass="form-control">
+				<c:forEach items="${scales}" var="scale">
+					<form:option value="${scale.scaleId}">
+						<c:out value="${scale.name}" /> (<c:out value="${scale.code}" />)
+					</form:option>
+				</c:forEach>
+			</form:select>
+		</label>
+		<button type="button" class="btn btn-secondary" onClick="javascript:openOutcomeScaleDialog()">
+			<fmt:message key="scale.manage" />
 		</button>
 	</div>
+	<div class="mb-3">
+		<fmt:message key="outcome.manage.add.description" />:
+		<lams:CKEditor id="description" value="${outcomeForm.description}" contentFolderID="${outcomeForm.contentFolderId}"></lams:CKEditor>
+	</div>
+
+	<button id="addButton" type="submit" class="btn btn-primary" onClick="javascript:submitOutcome()">
+		<fmt:message key="outcome.manage.add.save" />
+	</button>
 </form:form>
 </body>
 </lams:html>

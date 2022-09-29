@@ -7,21 +7,20 @@
 	<title>${title}</title>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
-	<lams:css/>
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
-	<style media="screen,projection" type="text/css">
-		table td {
-	  		padding-bottom: 7px;
-		}
-	</style>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
+	
 	<script type="text/javascript">
 		$(document).ready(function(){
 			// validate signup form on keyup and submit
 			var validator = $("#ltiConsumerForm").validate({
+				errorClass: 'text-danger form-text font-italic',
  				rules: {
 					serverid: "required", 
 					serverkey: "required",
@@ -39,93 +38,71 @@
 	</script>
 </lams:head>
     
-<body class="stripes">
-	<lams:Page type="admin" title="${title}" formID="ltiConsumerForm">
-		<p>
-			<a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-default">
-				<fmt:message key="appadmin.maintain" />
-			</a>
-					
-			<a href="<lams:LAMSURL/>admin/ltiConsumerManagement/start.do" class="btn btn-default">
-				<fmt:message key="label.manage.tool.consumers" />
-			</a>
-		</p>
+<body class="component pb-4">
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+	<c:set var="breadcrumbChild1"><lams:LAMSURL/>admin/ltiConsumerManagement/start.do | <fmt:message key="label.manage.tool.consumers" /></c:set>
+	<c:set var="breadcrumbActive">. | <fmt:message key="appadmin.maintain.server.edit"/></c:set>
+	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbChild1},${breadcrumbActive}"/>
 
+
+	<lams:Page5 type="admin" title="${title}" formID="ltiConsumerForm" breadcrumbItems="${breadcrumbItems}">
 		<lams:errors path="*"/>
 		<form:form action="save.do" id="ltiConsumerForm" modelAttribute="ltiConsumerForm" method="post">
 			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<form:hidden path="sid" />
-						
-			<table class="table table-no-border">
-				<tr>
-					<td><fmt:message key="sysadmin.serverkey" />&nbsp;*</td>
-					<td>
+			
+			<div class="row">
+				<div class="col-6 offset-3">				
+					<div class="mb-3">
+			   			<label for="serverid" class="form-label"><fmt:message key="sysadmin.serverkey" /></label>&nbsp;<span class="text-danger">*</span>
+			    		<input id="serverid" maxlength="20" name="serverid" value="${ltiConsumerForm.serverid}" class="form-control" required/>
 						<lams:errors path="serverid"/>
-						<form:input path="serverid" size="20" cssClass="form-control"/>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.serversecret" />&nbsp;*</td>
-					<td>
+					</div>
+					<div class="mb-3">
+						<label for="serverkey" class="form-label"><fmt:message key="sysadmin.serversecret" /></label>&nbsp;<span class="text-danger">*</span>
+						<input id="serverkey" maxlength="20" name="serverkey" value="${ltiConsumerForm.serverkey}" class="form-control" required/>
 						<lams:errors path="serverkey"/>
-						<form:input path="serverkey" size="30" cssClass="form-control"/>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.servername" />&nbsp;*</td>
-					<td>
+					</div>
+					<div class="mb-3">
+						<label for="servername" class="form-label"><fmt:message key="sysadmin.servername" /></label>&nbsp;<span class="text-danger">*</span>
+						<input id="servername" maxlength="20" name="servername" value="${ltiConsumerForm.servername}" class="form-control" required/>
 						<lams:errors path="servername"/>
-						<form:input path="servername" size="30" cssClass="form-control"/>
-					</td>
-				</tr>
-				<tr>
-					<td valign="top"><fmt:message key="sysadmin.serverdesc" />:</td>
-					<td>
-						<form:input path="serverdesc" cols="40" rows="3" cssClass="form-control"/>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.prefix" />&nbsp;*</td>
-					<td>
-						<lams:errors path="prefix"/>
-						<form:input path="prefix" size="10" cssClass="form-control"/>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.disabled" />:</td>
-					<td>
-						<form:checkbox path="disabled"  />
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.lessonFinishUrl" />:</td>
-					<td>
-						<form:input path="lessonFinishUrl" cssClass="form-control" />
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.lti.consumer.monitor.roles" />:</td>
-					<td>
-						<form:input path="ltiToolConsumerMonitorRoles" cssClass="form-control"/>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.user.id.name" />:</td>
-					<td>
-						<form:input path="userIdParameterName" cssClass="form-control"/>
-					</td>
-				</tr>
-				
-				<c:if test="${ltiAdvantageEnabled}">
-					<tr>
-						<td colspan="2">
-							<h3><fmt:message key="sysadmin.lti.advantage" /></h3>
-						</td>
-					</tr>
-					<tr>
-						<td><fmt:message key="admin.user.country" />:</td>
-						<td>
-							<form:select path="defaultCountry" cssClass="form-control">
+					</div>
+					<div class="mb-3">
+						<label for="serverdesc" class="form-label"><fmt:message key="sysadmin.serverdesc" /></label>&nbsp;<span class="text-danger">*</span>
+						<input id="serverdesc" maxlength="20" name="serverdesc" value="${ltiConsumerForm.serverdesc}" class="form-control"/>
+						<lams:errors path="servername"/>
+					</div>
+					<div class="mb-3">
+						<label for="prefix" class="form-label"><fmt:message key="sysadmin.prefix" /></label>&nbsp;<span class="text-danger">*</span>
+						<input id="prefix" maxlength="10" name="prefix" value="${ltiConsumerForm.prefix}" class="form-control"/>
+						<lams:errors path="servername"/>
+					</div>
+					<div class="mb-3">
+						<label for="ltiToolConsumerMonitorRoles" class="form-label"><fmt:message key="sysadmin.lti.consumer.monitor.roles" /></label>:
+						<form:input id="ltiToolConsumerMonitorRoles" path="ltiToolConsumerMonitorRoles" cssClass="form-control" />
+					</div>
+					<div class="mb-3 my-2">
+						<label for="lessonFinishUrl" class="form-label"><fmt:message key="sysadmin.lessonFinishUrl" /></label>:
+						<form:hidden id="lessonFinishUrl" path="lessonFinishUrl"/>
+						<c:out value="${ltiConsumerForm.lessonFinishUrl}"/>
+					</div>
+
+					<div class="mb-3 mt-3">
+						<div class="form-check mb-2">
+							<form:checkbox path="disabled" cssClass="form-check-input"/>
+				    		<label class="form-check-label" for="disabled">
+				    			<fmt:message key="sysadmin.disabled" />
+				    		</label>
+				  	  	</div>
+					</div>
+					<c:if test="${ltiAdvantageEnabled}">
+						<h4 class="mt-3"><fmt:message key="sysadmin.lti.advantage" /></h4>
+						
+						<div class="mb-3">
+							<label for="defaultCountry" class="form-label"><fmt:message key="admin.user.country" /></label>
+							<form:select path="defaultCountry" cssClass="form-select">
 								<form:option value="0"><fmt:message key="label.select.country" /></form:option>
 								<c:forEach items="${countryCodes}" var="countryCode">
 									<form:option value="${countryCode.key}">
@@ -133,139 +110,132 @@
 									</form:option>
 								</c:forEach>
 							</form:select>
-						</td>
-					</tr>
-					<tr>
-						<td><fmt:message key="admin.organisation.locale" />:</td>
-						<td>
-							<form:select path="defaultLocaleId" cssClass="form-control">
+							<lams:errors path="defaultCountry"/>
+						</div>
+						<div class="mb-3">
+							<label for="defaultLocaleId"><fmt:message key="admin.organisation.locale" /></label>
+							<form:select path="defaultLocaleId" cssClass="form-select">
 								<c:forEach items="${locales}" var="locale">
 									<form:option value="${locale.localeId}">
 										<c:out value="${locale.description}" />
 									</form:option>
 								</c:forEach>
 							</form:select>
-						</td>
-					</tr>
-					<tr>
-						<td><fmt:message key="admin.user.time.zone" />:</td>
-						<td>
-							<form:select path="defaultTimeZone" cssClass="form-control">
+							<lams:errors path="defaultLocaleId"/>
+						</div>
+						<div class="mb-3">
+							<label for="defaultTimeZone" class="form-label"><fmt:message key="admin.user.time.zone" /></label>
+							<form:select path="defaultTimeZone" cssClass="form-select">
 								<c:forEach items="${timezoneDtos}" var="timezoneDto">
 									<form:option value="${timezoneDto.timeZoneId}">
 										${timezoneDto.timeZoneId} - ${timezoneDto.displayName}
 									</form:option>
 								</c:forEach>
 							</form:select>
-						</td>
-					</tr>
-					<tr>
-						<td><fmt:message key="sysadmin.use.course.prefix" />:</td>
-						<td>
-							<form:checkbox path="useCoursePrefix"  />
-						</td>
-					</tr>
-					<tr>
-						<td><fmt:message key="sysadmin.user.registration.enabled" />:</td>
-						<td>
-							<form:checkbox path="userRegistrationEnabled"  />
-						</td>
-					</tr>
-					<tr>
-						<td><fmt:message key="sysadmin.user.name.lower.case" />:</td>
-						<td>
-							<form:checkbox path="userNameLowerCase"  />
-						</td>
-					</tr>
-					<tr>
-						<td><fmt:message key="sysadmin.lti.advantage.enforce.state.cookie" />:</td>
-						<td>
-							<form:checkbox path="enforceStateCookie"  />
-						</td>
-					</tr>
-					<tr>
-						<td><fmt:message key="sysadmin.lti.advantage.tool.reregistration.enabled" />:</td>
-						<td>
-							<form:checkbox path="toolReregistrationEnabled"  />
-						</td>
-					</tr>
-					<tr>
-						<td><fmt:message key="sysadmin.lti.advantage.platform.issuer" />:</td>
-						<td>
+							<lams:errors path="defaultTimeZone"/>
+						</div>
+						<div class="form-check mb-2">
+							<form:checkbox path="useCoursePrefix" cssClass="form-check-input"/>
+				    		<label class="form-check-label" for="useCoursePrefix">
+				    			<fmt:message key="sysadmin.use.course.prefix" />
+				    		</label>
+				  	  	</div>
+						<div class="form-check mb-2">
+							<form:checkbox path="userRegistrationEnabled" cssClass="form-check-input"/>
+				    		<label class="form-check-label" for="userRegistrationEnabled">
+				    			<fmt:message key="sysadmin.user.registration.enabled" />
+				    		</label>
+				  	  	</div>
+						<div class="form-check mb-2">
+							<form:checkbox path="userNameLowerCase" cssClass="form-check-input"/>
+				    		<label class="form-check-label" for="userNameLowerCase">
+				    			<fmt:message key="sysadmin.user.name.lower.case" />
+				    		</label>
+				  	  	</div>
+						<div class="form-check mb-2">
+							<form:checkbox path="enforceStateCookie" cssClass="form-check-input"/>
+				    		<label class="form-check-label" for="enforceStateCookie">
+				    			<fmt:message key="sysadmin.lti.advantage.enforce.state.cookie" />
+				    		</label>
+				  	  	</div>
+						<div class="form-check mb-2">
+							<form:checkbox path="toolReregistrationEnabled" cssClass="form-check-input"/>
+				    		<label class="form-check-label" for="toolReregistrationEnabled">
+				    			<fmt:message key="sysadmin.lti.advantage.tool.reregistration.enabled" />
+				    		</label>
+				  	  	</div>
+						<div class="mb-3">
+							<label for="issuer" class="form-label"><fmt:message key="sysadmin.lti.advantage.platform.issuer" /></label>
 							<form:input path="issuer" cssClass="form-control"/>
-						</td>
-					</tr>
-					<tr>
-						<td><fmt:message key="sysadmin.lti.advantage.platform.keyset.url" />:</td>
-						<td>
+							<lams:errors path="issuer"/>
+						</div>
+						<div class="mb-3">
+							<label for="platformKeySetUrl" class="form-label"><fmt:message key="sysadmin.lti.advantage.platform.keyset.url" /></label>
 							<form:input path="platformKeySetUrl" cssClass="form-control"/>
-						</td>
-					</tr>
-					<tr>
-						<td><fmt:message key="sysadmin.lti.advantage.platform.oidc.url" />:</td>
-						<td>
+							<lams:errors path="platformKeySetUrl"/>
+						</div>
+						<div class="mb-3">
+							<label for="oidcAuthUrl" class="form-label"><fmt:message key="sysadmin.lti.advantage.platform.oidc.url" /></label>
 							<form:input path="oidcAuthUrl" cssClass="form-control"/>
-						</td>
-					</tr>
-					<tr>
-						<td><fmt:message key="sysadmin.lti.advantage.platform.access.token.url" />:</td>
-						<td>
+							<lams:errors path="oidcAuthUrl"/>
+						</div>
+						<div class="mb-3">
+							<label for="accessTokenUrl" class="form-label"><fmt:message key="sysadmin.lti.advantage.platform.access.token.url" /></label>
 							<form:input path="accessTokenUrl" cssClass="form-control"/>
-						</td>
-					</tr>
-					<tr>
-						<td><fmt:message key="sysadmin.lti.advantage.tool.name" />:</td>
-						<td>
+							<lams:errors path="accessTokenUrl"/>
+						</div>
+						<div class="mb-3">
+							<label for="toolName" class="form-label"><fmt:message key="sysadmin.lti.advantage.tool.name" /></label>
 							<form:input path="toolName" cssClass="form-control"/>
-						</td>
-					</tr>
-					<tr>
-						<td><fmt:message key="sysadmin.lti.advantage.tool.description" />:</td>
-						<td>
+							<lams:errors path="toolName"/>
+						</div>
+						<div class="mb-3">
+							<label for="toolDescription" class="form-label"><fmt:message key="sysadmin.lti.advantage.tool.description" /></label>
 							<form:input path="toolDescription" cssClass="form-control"/>
-						</td>
-					</tr>
-					<tr>
-						<td><fmt:message key="sysadmin.lti.advantage.tool.client.id" />:</td>
-						<td>
+							<lams:errors path="toolDescription"/>
+						</div>
+						<div class="mb-3">
+							<label for="clientId" class="form-label"><fmt:message key="sysadmin.lti.advantage.tool.client.id" /></label>
 							<form:input path="clientId" cssClass="form-control"/>
-						</td>
-					</tr>
-					<tr>
-						<td><fmt:message key="sysadmin.lti.advantage.tool.keyset.url" />:</td>
-						<td>
+							<lams:errors path="clientId"/>
+						</div>
+						<div class="mb-3">
+							<label for="toolKeySetUrl" class="form-label"><fmt:message key="sysadmin.lti.advantage.tool.keyset.url" /></label>
 							<form:input path="toolKeySetUrl" cssClass="form-control"/>
-						</td>
-					</tr>
-					<tr>
-						<td><fmt:message key="sysadmin.lti.advantage.tool.key.id" />:</td>
-						<td>
+							<lams:errors path="toolKeySetUrl"/>
+						</div>
+						<div class="mb-3">
+							<label for="toolKeyId" class="form-label"><fmt:message key="sysadmin.lti.advantage.tool.key.id" /></label>
 							<form:input path="toolKeyId" cssClass="form-control"/>
-						</td>
-					</tr>
-					<tr>
-						<td><fmt:message key="sysadmin.lti.advantage.tool.public.key" />:</td>
-						<td>
+							<lams:errors path="toolKeyId"/>
+						</div>
+						<div class="mb-3">
+							<label for="publicKey" class="form-label"><fmt:message key="sysadmin.lti.advantage.tool.public.key" /></label>
 							<form:input path="publicKey" cssClass="form-control"/>
-						</td>
-					</tr>
-					<tr>
-						<td><fmt:message key="sysadmin.lti.advantage.tool.private.key" />:</td>
-						<td>
+							<lams:errors path="publicKey"/>
+						</div>
+						<div class="mb-3">
+							<label for="privateKey" class="form-label"><fmt:message key="sysadmin.lti.advantage.tool.private.key" /></label>
 							<form:input path="privateKey" cssClass="form-control"/>
-						</td>
-					</tr>
-				</c:if>
-			</table>
-				
-			<%@ include file="extLessonForm.jsp"%>
-					
-			<div class="pull-right">
-				<a href="<lams:LAMSURL/>admin/ltiConsumerManagement/start.do" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
-				<input type="submit" name="submitbutton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
+							<lams:errors path="privateKey"/>
+						</div>
+					</c:if>
+				</div>
 			</div>
 			
+			<div class="row mt-3">
+				<div class="col-6 offset-3">	
+					<%@ include file="extLessonForm.jsp"%>
+				</div>
+			</div>
+			
+			<div class="row mt-3">
+				<div class="col-6 offset-3 text-end">
+					<a href="<lams:LAMSURL/>admin/ltiConsumerManagement/start.do" class="btn btn-secondary"><fmt:message key="admin.cancel"/></a>
+					<input type="submit" name="submitbutton" class="btn btn-primary" value="<fmt:message key="admin.save" />" />
+				</div>
+			</div>	
 		</form:form>
-	</lams:Page>		
+	</lams:Page5>		
 </body>
 </lams:html>

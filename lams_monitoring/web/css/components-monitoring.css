@@ -131,8 +131,7 @@ body.component #sequenceInfoDialog {
 }
 
 .monitoring-page-wrapper .component-sidebar .lesson-properties #lessonDetails dt {
-	font-weight: normal;
-	font-family: mont-bold, sans-serif;
+	font-weight: bold;
 	margin-top: 1rem;
 }
 
@@ -149,7 +148,7 @@ body.component #sequenceInfoDialog {
 
 .monitoring-page-wrapper .monitoring-panel h6 {
 	color: var(--bs-gray);
-	font-family: mont-bold, sans-serif;
+	font-weight: bold;
 	text-transform: uppercase;
 	letter-spacing: 1.4px;
 	margin-bottom: 2rem;
@@ -190,7 +189,7 @@ body.component #sequenceInfoDialog {
 }
 
 .monitoring-page-wrapper #sequence-tab-content #required-tasks .label.contribute-activity-title {
-	font-family: mont-bold, sans-serif;
+	font-weight: bold;
 }
 
 .monitoring-page-wrapper #sequence-tab-content #required-tasks button.contribute-go-button {

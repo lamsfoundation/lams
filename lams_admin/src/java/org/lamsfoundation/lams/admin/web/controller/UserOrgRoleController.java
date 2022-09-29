@@ -77,9 +77,11 @@ public class UserOrgRoleController {
 
 	// display breadcrumb links
 	request.setAttribute("orgName", organisation.getName());
+	request.setAttribute("orgCode", organisation.getCode());
 	Organisation parentOrg = organisation.getParentOrganisation();
 	if (parentOrg != null && !parentOrg.equals(userManagementService.getRootOrganisation())) {
 	    request.setAttribute("pOrgId", parentOrg.getOrganisationId());
+	    request.setAttribute("pOrgCode", parentOrg.getCode());
 	    request.setAttribute("pOrgName", parentOrg.getName());
 	}
 	request.setAttribute("orgType", organisation.getOrganisationType().getOrganisationTypeId());

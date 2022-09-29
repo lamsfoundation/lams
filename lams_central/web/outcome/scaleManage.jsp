@@ -3,16 +3,20 @@
 
 <lams:html>
 <lams:head>
-	<lams:css/>
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/outcome.css" type="text/css" media="screen" />
+	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
+	
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/outcome.css" type="text/css" media="screen">
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/outcome.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.cookie.js"></script>
-	<lams:JSImport src="includes/javascript/dialog.js" />
+	<lams:JSImport src="includes/javascript/dialog5.js" />
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>',
 			
@@ -27,63 +31,59 @@
 			};
 	</script>
 </lams:head>
-<body class="stripes">
+<body class="component bg-white p-3">
 <lams:Page type="admin" >
 
 	<lams:errors/>	
 
 	<div class="outcomeContainer">
 		<div class="row">
-			<div class="col-xs-5">
+			<div class="col-7">
 				<fmt:message key='outcome.manage.add.name' />
 			</div>
-			<div class="col-xs-3">
+			<div class="col-3">
 				<fmt:message key='outcome.manage.add.code' />
-			</div>
-			<div class="col-xs-1">
-			</div>
-			<div class="col-xs-1">
 			</div>
 		</div>
 		<c:forEach var="scale" items="${scales}">
 			<div class="row">
-				<div class="col-xs-5">
+				<div class="col-7">
 					<c:out value="${scale.name}" />
 				</div>
-				<div class="col-xs-3">
+				<div class="col-3">
 					<c:out value="${scale.code}" />
 				</div>
-				<div class="col-xs-1">
+				<div class="col-2">
 					<c:choose>
 						<c:when test="${scale.scaleId != 1}">
-							<i class="manageButton fa fa-pencil" title="<fmt:message key='scale.manage.edit' />"
-						   	   onClick="javascript:openEditScaleDialog(${scale.scaleId})" >
-							</i>
+							<button class="btn btn-secondary" onClick="javascript:openEditScaleDialog(${scale.scaleId})"
+								 	title="<fmt:message key='scale.manage.edit' />">
+								<i class="fa fa-pencil"></i>
+							</button>
 						</c:when>
 						<c:otherwise>
-							<i class="manageButton fa fa-eye" title="<fmt:message key='scale.manage.view' />"
-						   	   onClick="javascript:openEditScaleDialog(${scale.scaleId})" >
-							</i>
+							<button class="btn btn-secondary" onClick="javascript:openEditScaleDialog(${scale.scaleId})"
+								 	title="<fmt:message key='scale.manage.view' />">
+								<i class="fa fa-eye"></i>
+							</button>
 						</c:otherwise>
 					</c:choose>
-				</div>
-				<div class="col-xs-1">
 					<c:if test="${scale.scaleId != 1}">
-						<i class="manageButton fa fa-remove" title="<fmt:message key='scale.manage.remove' />"
-					   	   onClick="javascript:removeScale(${scale.scaleId})" >
-						</i>
+						<button type="button" onClick="javascript:removeScale(${scale.scaleId})" class="btn btn-danger">
+							<i class="fa fa-trash" title="<fmt:message key='scale.manage.remove' />"></i>
+						</button>
 					</c:if>
 				</div>
 			</div>
 		</c:forEach>
-		<div id="exportButton" class="btn btn-default pull-left" onClick="javascript:exportOutcome(true)"
+		<div id="exportButton" class="btn btn-secondary float-start" onClick="javascript:exportOutcome(true)"
 			 data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key="outcome.export" /></span>">
 			<i class="fa fa-download"></i>
 			<span class="hidden-xs">
 				<fmt:message key="outcome.export" />
 			</span>
 		</div> 
-		<div id="importButton" class="btn btn-default pull-left" onClick="javascript:$('#importInput').click()">
+		<div id="importButton" class="btn btn-secondary float-start" onClick="javascript:$('#importInput').click()">
 			<i class="fa fa-upload"></i> <fmt:message key="outcome.import" />
 		</div>
 		<form id="importForm" action="scaleImport.do" method="post" enctype="multipart/form-data">

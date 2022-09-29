@@ -30,7 +30,7 @@
 	
 	<c:set var="help"><fmt:message key="LDAP+Configuration"/></c:set>
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
-	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
+	<lams:Page5 type="admin" title="${title}" titleHelpURL="${help}">
 		
 		<p>
 			<a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-default"><fmt:message key="appadmin.maintain" /></a>
@@ -160,7 +160,7 @@
 						
 			</div>
 		</div>				
-	</lams:Page>
+	</lams:Page5>
 
 </body>
 </lams:html>

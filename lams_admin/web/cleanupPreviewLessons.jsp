@@ -8,11 +8,14 @@
 	<title>${title}</title>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
-	<lams:css/>
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
+	
 	<script type="text/javascript">
 		$(document).ready(function(){
 			var previewCount = ${previewCount},
@@ -70,21 +73,23 @@
 	</script>
 </lams:head>
 
-<body class="stripes">
+<body class="component">
 
-	<lams:Page type="admin" title="${title}">
-		
-		<p><a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-default"><fmt:message key="appadmin.maintain" /></a></p>
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="appadmin.batch.preview.lesson.delete"/></c:set>
+
+	<lams:Page5 type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">	
 
 		<fmt:message key="label.cleanup.preview.lesson.count" />&nbsp;<span id="previewCount">${previewCount}</span> / <span id="allLessonCount">${allLessonCount}</span>
 		<div id="deletingBox" style="display: none">
-		<fmt:message key="label.cleanup.preview.lesson.progress" />
+			<fmt:message key="label.cleanup.preview.lesson.progress" />
 		</div>
 				
-		<div class="pull-right">
-			<button id="deleteButton" class="btn btn-primary loffset5"><fmt:message key="admin.delete"/></button>
+		<div class="float-end">
+			<button id="deleteButton" class="btn btn-primary"><fmt:message key="admin.delete"/></button>
 		</div>
-	</lams:Page>
+	</lams:Page5>
 
 </body>
 </lams:html>

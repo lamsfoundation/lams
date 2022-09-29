@@ -19,15 +19,16 @@
 <lams:head>
 	<c:set var="title"><fmt:message key="admin.user.management"/></c:set>
 	<title>${title}</title>
-
-	<lams:css/>
-	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
-	<link rel="shortcut icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
+	
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 	<link href="<lams:LAMSURL/>css/uppy.min.css" rel="stylesheet" type="text/css" />
 	<link href="<lams:LAMSURL/>css/uppy.custom.css" rel="stylesheet" type="text/css" />
-	
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
+
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/uppy/uppy.min.js"></script>
 	<c:choose>
 		<c:when test="${language eq 'es'}">
@@ -114,16 +115,18 @@
 	</script>
 </lams:head>
     
-<body class="stripes">
+<body class="component">
 
 	<c:set var="title"><fmt:message key="admin.user.management"/></c:set>
 	<c:set var="help"><fmt:message key="Import+Users"/></c:set>
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
-			<lams:Page type="admin" title="${title}" titleHelpURL="${help}" formID="importExcelForm">
-				<p>
-					<a href="<lams:LAMSURL/>admin/appadminstart.do"
-						class="btn btn-default"><fmt:message key="appadmin.maintain" /></a>
-				</p>
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+	<c:set var="breadcrumbActive">. | <fmt:message key="admin.user.management"/></c:set>
+	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>	
+	
+	<lams:Page5 type="admin" title="${title}" titleHelpURL="${help}" formID="importExcelForm" breadcrumbItems="${breadcrumbItems}">
+
 				
 				<p>
 					<fmt:message key="msg.import.intro" />
@@ -145,10 +148,9 @@
 						</ul></li>
 				</ul>
 				</p>
-				<div class ="pull-left">
-					<lams:Alert type="info" close="false">
-						<strong><fmt:message key='label.password.must.contain' />:</strong>
-						<ul style="line-height: 1.2">
+			<c:set var="alertTitle"><fmt:message key='label.password.must.contain' /></c:set>
+			<lams:Alert type="info" close="false" title="${alertTitle}:">
+				<ul style="line-height: 1.2em; list-style: none;">
 							<li><span class="fa fa-check"></span> <fmt:message
 									key='label.password.min.length'>
 									<fmt:param value='${minNumChars}' />
@@ -186,25 +188,23 @@
 					<form:hidden path="orgId" />
 					<form:hidden path="tmpFileUploadId" />
 					
-					<div class="checkbox">
-						<label>
-							<form:checkbox path="sendEmail" /> <fmt:message key='label.import.email' />
+					<div class="form-check">
+						
+						<form:checkbox path="sendEmail" cssClass="form-check-input"/>
+						<label class="form-check-label" for="sendEmail">
+							<fmt:message key='label.import.email' />
 						</label>
 					</div>
 				
-					<div id="file-upload-area" class="voffset20"></div>
+					<div id="file-upload-area" class="my-3"></div>
 				
-					<div class="pull-right voffset20">
-						<a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
-						<input type="submit" id="importButton" class="btn btn-primary loffset5" value="<fmt:message key="label.import" />" />
+					<div class="text-end">
+						<a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-secondary"><fmt:message key="admin.cancel"/></a>
+						<input type="submit" id="importButton" class="btn btn-primary" value="<fmt:message key="label.import" />" />
 						&nbsp;
 					</div>
 				
 				</form:form>
-			</lams:Page>
+			</lams:Page5>
 </body>
 </lams:html>
-
-
-
-

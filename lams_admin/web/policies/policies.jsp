@@ -7,9 +7,12 @@
 	<title>${title}</title>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
-	<lams:css/>
-	<link rel="stylesheet" href="<lams:LAMSURL/>/admin/css/admin.css" type="text/css" media="screen">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
+
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<style>
 		th, td {
 			text-align: center;
@@ -20,31 +23,34 @@
 	</style>
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-	<lams:JSImport src="includes/javascript/dialog.js" />
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.timeago.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
+	<lams:JSImport src="includes/javascript/dialog5.js" />
 	<script type="text/javascript">
-		$(window).on('load', function(){
+	    $(document).ready(function(){
+	        $("time.timeago").timeago();
+	    });
+    </script>
+	
+	<script type="text/javascript">
+		$(document).ready(function(){
 			//dialog displaying user consents given for the specified policy
 			$(".policy-consents-link").click(function() {
-				var policyUid = $(this).data("policy-uid");
-				
-				var id = "policy-consents-dialog",
-				dialog = $('#' + id),
-				exists = dialog.length > 0
-				url = '<c:url value="/policyManagement/displayUserConsents.do"/>?policyUid=' + policyUid;
+				var policyUid = $(this).data("policy-uid"),
+					id = "policy-consents-dialog",
+					url = '<c:url value="/policyManagement/displayUserConsents.do"/>?policyUid=' + policyUid;
 				showDialog(id, {
-					//'resizable' : false,
 					'data' : {
 						'orgID'  : "orgID"
 					},
-					'height' : 500,
-					'width'  : 600,
+					'height' : 800,
 					'title'  : "<fmt:message key='label.user.consents'/>",
 					'open'   : function() {
 						$('iframe', this).attr('src', url);
 					}
-				}, true, exists);
+				}).addClass('modal-lg');;
+				
 			});
 	
 			//handler for "change-status" links
@@ -67,29 +73,41 @@
 	</script>
 </lams:head>
 
-<body class="stripes">
+<body class="component pb-4">
 	<c:set var="help"><lams:help style="small" page="LAMS+Policies" /></c:set>
-	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
-		<p>
-			<a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-default">
-				<fmt:message key="appadmin.maintain" />
-			</a>
-			<c:if test="${viewPreviousVersions}">
-				<a class="btn btn-default" href="<lams:WebAppURL />policyManagement/list.do">
-					<fmt:message key="admin.policies.title"/>
-				</a>
-			</c:if>
-		</p>
 		
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+    <c:choose>
+    <c:when test="${viewPreviousVersions}">
+    	<c:set var="breadcrumbChild1"><lams:WebAppURL />policyManagement/list.do | <fmt:message key="admin.policies.title" /></c:set>
+    	<c:set var="breadcrumbActive">. | <fmt:message key="label.view.previous.versions"/></c:set>
+    		<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbChild1}, ${breadcrumbActive}"/>	
+    	
+	</c:when>
+	<c:otherwise>
+		<c:set var="breadcrumbActive">. | <fmt:message key="admin.policies.title"/></c:set>
+			<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>	
+	</c:otherwise>
+	</c:choose>
+
+	
+	<lams:Page5 type="admin" title="${title}" titleHelpURL="${help}" breadcrumbItems="${breadcrumbItems}">
+
 		<div id="policy-table">
 			<%@ include file="policyTable.jsp"%>
 		</div>
 		
-		<c:if test="${!viewPreviousVersions}">
-			<a class="btn btn-default pull-right" href="<lams:WebAppURL />policyManagement/edit.do">
-				<fmt:message key="label.add.new.policy"/>
+		<div class="mt-3 text-end">
+			<a href="<lams:WebAppURL />policyManagement/list.do" class="btn btn-secondary">
+				<fmt:message key="admin.cancel"/>
 			</a>
-		</c:if>
-	</lams:Page>
+			<c:if test="${!viewPreviousVersions}">
+				<a class="btn btn-primary" href="<lams:WebAppURL />policyManagement/edit.do">
+					<fmt:message key="label.add.new.policy"/>
+				</a>
+			</c:if>
+		</div>
+	</lams:Page5>
 </body>
 </lams:html>
