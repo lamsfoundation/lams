@@ -190,7 +190,7 @@
 					
 					<div class="form-check">
 						
-						<form:checkbox path="sendEmail" cssClass="form-check-input"/>
+						<form:checkbox path="sendEmail" id="sendEmail" cssClass="form-check-input"/>
 						<label class="form-check-label" for="sendEmail">
 							<fmt:message key='label.import.email' />
 						</label>

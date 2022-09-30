@@ -244,16 +244,16 @@
 				<select id="areaMenu" class="form-select form-select-sm d-inline" onchange="javascript:configureTypeDropdown(this.value)"></select>
 			</div>
 			<div class="col-12">
-				<select id="typeMenu" class="form-select form-select-sm d-inline"></select>
+				<select id="typeMenu" class="form-select form-select-sm d-inline" aria-label="Type of event"></select>
 			</div>
 			<div class="col-12">
 				<span class="d-inline px-4"><fmt:message key="label.between.dates"/></span>
 			</div>
 			<div class="col-12">
-				<input type="text" class="form-control form-control-sm" name="startDatePicker" id="startDatePicker" value=""/>
+				<input type="text" class="form-control form-control-sm" name="startDatePicker" id="startDatePicker" aria-label="Start date" value=""/>
 			</div>
 			<div class="col-12">
-				<input type="text" class="form-control form-control-sm" name="endDatePicker" id="endDatePicker" value=""/>
+				<input type="text" class="form-control form-control-sm" name="endDatePicker" id="endDatePicker" aria-label="End date" value=""/>
 			</div>
 			<div class="col-12">
 				<a href="#" class="btn btn-primary btn-sm" onclick="javascript:getEvents()"><fmt:message key="admin.search"/></a>

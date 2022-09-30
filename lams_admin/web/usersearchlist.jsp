@@ -92,9 +92,9 @@
 								rows += '</td>';
 								
 								rows += '<td>';
-								rows +=		'<form style="display: inline-block;" id="delete_' + orgData["userId"] +'" method="post" action="/lams/admin/user/remove.do"><input type="hidden" name="userId" value="' + orgData["userId"] + '"/><input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/><button class="btn btn-danger" type="submit"><i class="fa fa-trash" title="<fmt:message key="admin.user.delete"/>"></i></button></form>';
+								rows +=		'<form style="display: inline-block;" id="delete_' + orgData["userId"] +'" method="post" action="/lams/admin/user/remove.do"><input type="hidden" name="userId" value="' + orgData["userId"] + '"/><input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/><button class="btn btn-danger" type="submit" title="<fmt:message key="admin.user.delete"/>"><i class="fa fa-trash"></i></button></form>';
 								rows += 	'&nbsp;';
-								rows +=     '<form style="display: inline-block;" id="edit_' + orgData["userId"] +'" method="post" action="/lams/admin/user/edit.do"><input type="hidden" name="userId" value="' + orgData["userId"] + '"/><input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/><button class="btn btn-primary" type="submit"><i class="fa fa-pencil" title="<fmt:message key="admin.edit"/>"></i></button></form>';
+								rows +=     '<form style="display: inline-block;" id="edit_' + orgData["userId"] +'" method="post" action="/lams/admin/user/edit.do"><input type="hidden" name="userId" value="' + orgData["userId"] + '"/><input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/><button class="btn btn-primary" type="submit" title="<fmt:message key="admin.edit"/>"><i class="fa fa-pencil"></i></button></form>';
 								rows += 	'&nbsp;';
 								<c:if test="${loginAsEnable}">
 								rows += 	'<a title="<fmt:message key="label.login.as"/>" href="<lams:LAMSURL/>loginas.do?login=' + orgData["login"] + '">';

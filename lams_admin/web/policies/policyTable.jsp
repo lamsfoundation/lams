@@ -60,37 +60,35 @@
 			
 			<!-- Actions columns -->
 			<td>
-				<a href="<lams:WebAppURL />policyManagement/edit.do?policyUid=${policy.uid}">
-					<button class="btn btn-primary" title="<fmt:message key="admin.edit"/>">
-						<i class="fa fa-pencil"></i>
-					</button>
+				<a href="<lams:WebAppURL />policyManagement/edit.do?policyUid=${policy.uid}" class="btn btn-primary" title="<fmt:message key="admin.edit"/>">
+					<i class="fa fa-pencil"></i>
 				</a>
 			</td>
 						
 			<td>
 				<c:if test="${!viewPreviousVersions && policy.hasPreviousVersions()}">
-					<a href="<lams:WebAppURL />policyManagement/viewPreviousVersions.do?policyId=${policy.policyId}">
-						<button  title="<fmt:message key="label.view.previous.versions"/>" class="btn btn-primary" >
-							<i class="fa fa-code-fork fa-fw"></i>
-						</button>
+					<a href="<lams:WebAppURL />policyManagement/viewPreviousVersions.do?policyId=${policy.policyId}"
+					   title="<fmt:message key="label.view.previous.versions"/>" class="btn btn-primary">
+						<i class="fa fa-code-fork fa-fw"></i>
 					</a>
 				</c:if>	
 			</td>
 
 			<td>
-				<a href="#nogo" class="change-status-link" data-policy-uid="${policy.uid}" data-policy-id="${policy.policyId}" data-policy-state="${policy.policyStateId}">
-					<c:choose>
-						<c:when test="${policy.policyStateId == 1}">
-							<button class="btn btn-warning" title="<fmt:message key="label.deactivate"/>"><i class="fa fa-pause"></i></button>
-						</c:when>
-						<c:otherwise>
-							<button class="btn btn-success" title="<fmt:message key="label.activate"/>">
-								<i class="fa fa-power-off"></i>
-							</button>
-											
-						</c:otherwise>
-					</c:choose>
-				</a>
+				<c:choose>
+					<c:when test="${policy.policyStateId == 1}">
+						<a href="#nogo" class="change-status-link btn btn-warning" data-policy-uid="${policy.uid}" data-policy-id="${policy.policyId}"
+						   data-policy-state="${policy.policyStateId}" title="<fmt:message key="label.deactivate"/>">
+						   <i class="fa fa-pause"></i>
+						</a>
+					</c:when>
+					<c:otherwise>
+						<a href="#nogo" class="change-status-link btn btn-success" data-policy-uid="${policy.uid}" data-policy-id="${policy.policyId}"
+						  data-policy-state="${policy.policyStateId}" title="<fmt:message key="label.activate"/>">
+							<i class="fa fa-power-off"></i>
+						</a>
+					</c:otherwise>
+				</c:choose>
 			</td>
 			<!-- End of Actions columns -->
 				

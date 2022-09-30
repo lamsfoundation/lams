@@ -57,7 +57,7 @@
 					<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			
 					<p><fmt:message key="label.cleanup.delete" />:
-					<form:input path="numDays" maxlength="4" size="4" cssClass="form-control d-inline ms-2" cssStyle="width: 100px" /></p>
+					<form:input path="numDays" maxlength="4" size="4" cssClass="form-control d-inline ms-2" cssStyle="width: 100px" title="Number of days" /></p>
 					
 					<div class="text-end">
 						<input type="submit" class="btn btn-primary" value="<fmt:message key="admin.delete"/>" />
