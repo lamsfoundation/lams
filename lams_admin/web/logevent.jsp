@@ -234,7 +234,7 @@
     
 <body class="component pb-4">
 	<%-- Build breadcrumb --%>
-	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
 	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="label.event.log"/></c:set>
 
 	<lams:Page5 type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">

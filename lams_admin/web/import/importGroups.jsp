@@ -120,8 +120,8 @@
 	<c:set var="help"><fmt:message key="Import+Groups"/></c:set>
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
 	<%-- Build breadcrumb --%>
-	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/apadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
-	<c:set var="breadcrumbActive">. | <fmt:message key="sysadmin.import.groups.title"/></c:set>
+	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+	<c:set var="breadcrumbActive">. | <fmt:message key="appadmin.import.groups.title"/></c:set>
 	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>	
 
 	
@@ -200,7 +200,3 @@
 		
 </body>
 </lams:html>
-
-
-
-
