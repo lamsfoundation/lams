@@ -102,14 +102,6 @@ public class ConfigurationKeys {
 
     public static String HELP_URL = "HelpURL";
 
-    public static String XMPP_DOMAIN = "XmppDomain";
-
-    public static String XMPP_CONFERENCE = "XmppConference";
-
-    public static String XMPP_ADMIN = "XmppAdmin";
-
-    public static String XMPP_PASSWORD = "XmppPassword";
-
     public static String DEFAULT_THEME = "DefaultTheme";
 
     public static String ALLOW_DIRECT_LESSON_LAUNCH = "AllowDirectLessonLaunch";
@@ -203,23 +195,6 @@ public class ConfigurationKeys {
 
     public static String CUSTOM_TAB_TITLE = "CustomTabTitle";
 
-    /**
-     * Configurable screen sizes for authoring, monitor, learner and admin (LDEV-1598)
-     */
-    public static String AUTHORING_SCREEN_SIZE = "AuthoringScreenSize";
-
-    public static String MONITOR_SCREEN_SIZE = "MonitorScreenSize";
-
-    public static String LEARNER_SCREEN_SIZE = "LearnerScreenSize";
-
-    public static String ADMIN_SCREEN_SIZE = "AdminScreenSize";
-
-    public static String GMAP_KEY = "GmapKey";
-
-    public static String RED5_SERVER_URL = "Red5ServerUrl";
-
-    public static String RED5_RECORDINGS_URL = "Red5RecordingsUrl";
-
     public static String SMTP_AUTH_USER = "SMTPUser";
 
     public static String SMTP_AUTH_PASSWORD = "SMTPPassword";
@@ -231,18 +206,6 @@ public class ConfigurationKeys {
     public static String FORGOT_YOUR_PASSWORD_LINK_ENABLE = "EnableForgotYourPasswordLink";
 
     public static String PROFILE_PARTIAL_EDIT_ENABLE = "ProfilePartialEditEnable";
-
-    public static String KALTURA_SERVER = "KalturaServer";
-
-    public static String KALTURA_PARTNER_ID = "KalturaPartnerId";
-
-    public static String KALTURA_SUB_PARTNER_ID = "KalturaSubPartnerId";
-
-    public static String KALTURA_USER_SECRET = "KalturaUserSecret";
-
-    public static String KALTURA_KCW_UI_CONF_ID = "KalturaKCWUiConfId";
-
-    public static String KALTURA_KDP_UI_CONF_ID = "KalturaKDPUiConfId";
 
     public static String USER_VALIDATION_REQUIRED_USERNAME = "UserValidationUsername";
 

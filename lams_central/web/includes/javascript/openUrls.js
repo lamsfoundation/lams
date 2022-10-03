@@ -6,6 +6,9 @@ if (screen.width <= 800 && screen.height <= 600) {
 	belowMinRes = false;
 }
 
+var learner_width = 1280;
+var learner_height = 720;
+
 var authorWin = null;
 var learnWin = null;
 var kumaliveWin = null;
@@ -43,18 +46,9 @@ function closeAllChildren() {
 	if (gradebookMonLessonWin && !gradebookMonLessonWin.closed) gradebookMonLessonWin.close();
 }
 
-function returnToMonitorLessonIntegrated( lessonID ) {
-	window.location = '/lams/home/monitorLesson.do?lessonID='+lessonID;
-}
-
-function openMonitorLesson( lessonID, url ) {
-	if (!url) {
-		// change back to Home controller after upgrade!!
-		url = '/lams/monitoring/monitoring/monitorLesson.do?';
-	}
-	url += 'lessonID='+ lessonID;
+function openMonitorLesson(lessonID) {
 	sessionStorage.removeItem("lamsMonitoringCurrentTab");
-	window.location.href = url;
+	window.location.href = '/lams/home/monitorLesson.do?lessonID='+ lessonID;
 }
 
 function openLearner( lessonId, url ) {
@@ -117,8 +111,8 @@ function openLearnerShortenedUrl( lessonId ) {
 }
 
 function openAppadmin() {
-	var height = app_admin_height;
-	var width = app_admin_width;
+	var height = 768;
+	var width = 1024;
 	var left = 0;
 	var top = 0;
 	

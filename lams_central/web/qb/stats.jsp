@@ -63,7 +63,6 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/getSysInfo.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>loadVars.jsp"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/openUrls.js"></script>
 	<script type="text/javascript">
 		var permanentRemove = '${permanentRemove}' == 'true',

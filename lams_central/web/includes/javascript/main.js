@@ -289,39 +289,6 @@ function makeSortable(element) {
 	}).disableSelection();
 }
 
-
-function showMonitorLessonDialog(lessonID) {
-	var id = "dialogMonitorLesson" + lessonID,
-	    dialog = showDialog(id, {
-			'data' : {
-				'isMonitorDialog' : true,
-				'lessonID' : lessonID
-			},
-			'autoOpen' : false,
-			'height': Math.max(380, Math.min(monitor_height, $(window).height() - 30)),
-			'width' : Math.max(380, Math.min(monitor_width, $(window).width() - 60)),
-			'title' : LABELS.MONITORING_TITLE,
-			'open' : function() {
-				// load contents after opening the dialog
-				$('iframe', this).attr({'src': LAMS_URL
-					+ 'home/monitorLesson.do?lessonID='
-					+ $(this).data('lessonID'),
-					'id' : 'monitorModal'});
-			},
-	
-		}, true, true);
-		
-
-		
-	// if it was just created
-	if (dialog) {
-		// tell the dialog contents that it was resized
-		$('.modal-content', dialog).on('resizestop', resizeSequenceCanvas);
-		
-		dialog.modal('show');
-	}
-}
-
 /**
  * Adjust the position of LD SVG in Monitoring.
  */
@@ -669,11 +636,7 @@ function closeDialog(id, refresh) {
 	if (refresh) {
 		loadOrganisation();
 	}
-	var dialog = $("#" + id).modal('hide'),
-		relaunchMonitorLessonID = dialog.data('relaunchMonitorLessonID');
-	if (relaunchMonitorLessonID) {
-		showMonitorLessonDialog(relaunchMonitorLessonID);
-	}
+	$("#" + id).modal('hide');
 }
 
 
