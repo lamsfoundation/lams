@@ -15,7 +15,6 @@
 	<link rel="stylesheet" href="/lams/css/bootstrap-tourist.min.css" type="text/css" media="screen">
 
 	<lams:JSImport src="includes/javascript/getSysInfo.js" />
-	<lams:JSImport src="loadVars.jsp" />
 	<lams:JSImport src="includes/javascript/openUrls.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
