@@ -61,7 +61,7 @@ public class AppAdminStartController {
 	    links.add(new LinkBean("config.do", "sysadmin.config.settings.edit"));
 	    links.add(new LinkBean("extserver/serverlist.do", "appadmin.maintain.external.servers"));
 	    links.add(new LinkBean("ltiConsumerManagement/start.do", "label.manage.tool.consumers"));
-	    links.add(new LinkBean("ldap/start.do", "sysadmin.ldap.configuration"));
+	    // links.add(new LinkBean("ldap/start.do", "sysadmin.ldap.configuration"));
 	    groupedLinks.add(new Object[] { AdminConstants.START_SYSADMIN_CONFIG_LINKS, links });
 	}
 
