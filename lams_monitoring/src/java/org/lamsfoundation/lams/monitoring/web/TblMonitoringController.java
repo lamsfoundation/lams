@@ -79,21 +79,6 @@ public class TblMonitoringController {
     private ICommonScratchieService commonScratchieService;
 
     /**
-     * Displays addStudent page.
-     */
-    @RequestMapping("/start")
-    public String unspecified(HttpServletRequest request) {
-	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	Lesson lesson = lessonService.getLesson(lessonId);
-	request.setAttribute("lesson", lesson);
-	request.setAttribute("totalLearnersNumber", lesson.getAllLearners().size());
-
-	List<Activity> lessonActivities = getLessonActivities(lesson);
-	TblMonitoringController.setupAvailableActivityTypes(request, lessonActivities);
-	return "tblmonitor/tblmonitor";
-    }
-
-    /**
      * Shows Teams page
      */
     @RequestMapping("/teams")
@@ -105,8 +90,8 @@ public class TblMonitoringController {
 	TblMonitoringController.setupAvailableActivityTypes(request, lessonActivities);
 	boolean isTraAvailable = (request.getAttribute("isScratchieAvailable") != null)
 		&& ((Boolean) request.getAttribute("isScratchieAvailable"));
-	boolean isIraAvailable = request.getAttribute("isIraAssessmentAvailable") != null
-		&& ((Boolean) request.getAttribute("isIraAssessmentAvailable"));
+	boolean isIraAvailable = request.getAttribute("isIraAvailable") != null
+		&& ((Boolean) request.getAttribute("isIraAvailable"));
 	Long iraToolActivityId = request.getAttribute("iraToolActivityId") == null ? null
 		: (Long) request.getAttribute("iraToolActivityId");
 	Long traToolActivityId = request.getAttribute("traToolActivityId") == null ? null
@@ -508,7 +493,7 @@ public class TblMonitoringController {
 		if (!iraPassed && isScratchieAvailable
 			&& CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)) {
 		    iraPassed = true;
-		    request.setAttribute("isIraAssessmentAvailable", true);
+		    request.setAttribute("isIraAvailable", true);
 		    request.setAttribute("iraToolContentId", toolContentId);
 		    request.setAttribute("iraToolActivityId", toolActivityId);
 
