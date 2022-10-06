@@ -22,6 +22,7 @@ import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.tool.ToolContent;
+import org.lamsfoundation.lams.usermanagement.Role;
 
 public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
@@ -89,6 +90,10 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     private static final String FIND_QUESTION_COLLECTIONS_BY_QUESTION_ID = "SELECT c.* FROM lams_qb_collection_question AS cq "
 	    + "JOIN lams_qb_collection AS c ON cq.collection_uid = c.uid WHERE cq.qb_question_id = :qbQuestionId";
+
+    private static final String FIND_SHARED_QUESTION_COLLECTIONS_BY_USER = "SELECT c FROM QbCollection AS c "
+	    + "INNER JOIN c.organisations AS o INNER JOIN o.userOrganisations AS uo INNER JOIN uo.userOrganisationRoles AS r "
+	    + "WHERE c.userId != :userId AND uo.user.userId = :userId AND r.role.roleId = " + Role.ROLE_AUTHOR;
 
     private static final String ADD_COLLECTION_QUESTION = "INSERT INTO lams_qb_collection_question VALUES (:collectionUid, :qbQuestionId)";
 
@@ -279,8 +284,8 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 		    " JOIN lams_qb_collection_question collection ON question.question_id = collection.qb_question_id");
 	}
 	if (learningDesignId != null) {
-	    queryBuilder.append(
-		    " JOIN lams_qb_tool_question tool_question ON question.uid = tool_question.qb_question_uid")
+	    queryBuilder
+		    .append(" JOIN lams_qb_tool_question tool_question ON question.uid = tool_question.qb_question_uid")
 		    .append(" JOIN lams_learning_activity activity USING (tool_content_id)");
 	}
 
@@ -433,6 +438,12 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     public List<QbCollection> getQuestionCollectionsByQuestionId(int qbQuestionId) {
 	return getSession().createNativeQuery(FIND_QUESTION_COLLECTIONS_BY_QUESTION_ID)
 		.setParameter("qbQuestionId", qbQuestionId).addEntity(QbCollection.class).list();
+    }
+
+    @Override
+    public List<QbCollection> getSharedQuestionCollections(int userId) {
+	return getSession().createQuery(FIND_SHARED_QUESTION_COLLECTIONS_BY_USER, QbCollection.class)
+		.setParameter("userId", userId).getResultList();
     }
 
     @SuppressWarnings("unchecked")

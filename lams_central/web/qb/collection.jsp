@@ -584,7 +584,7 @@
 	</c:choose>
 
 	<%-- Do not display links for collection manipulation for public and private collections --%>
-	<c:if test="${not empty collection.userId and not collection.personal
+	<c:if test="${userId eq collection.userId and not collection.personal
 		and (not empty collection.organisations or not empty availableOrganisations)}">
 		<div class="panel panel-default voffset20">
 			<div class="panel-heading">
