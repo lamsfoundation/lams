@@ -629,7 +629,7 @@ public class QbService implements IQbService {
 
     @Override
     public List<QbCollection> getUserCollections(int userId) {
-	List<QbCollection> collections = new LinkedList<>();
+	Set<QbCollection> collections = new LinkedHashSet<>();
 
 	QbCollection privateCollection = getUserPrivateCollection(userId);
 	collections.add(privateCollection);
@@ -639,7 +639,10 @@ public class QbService implements IQbService {
 	QbCollection publicCollection = getPublicCollection();
 	collections.add(publicCollection);
 
-	return collections;
+	List<QbCollection> sharedCollections = qbDAO.getSharedQuestionCollections(userId);
+	collections.addAll(sharedCollections);
+
+	return new LinkedList<>(collections);
     }
 
     @Override

@@ -90,8 +90,9 @@ public class QbCollectionController {
     @RequestMapping("/showOne")
     public String showOneCollection(@RequestParam long collectionUid, Model model) throws Exception {
 	model.addAttribute("collection", qbService.getCollection(collectionUid));
-	model.addAttribute("availableOrganisations",
-		qbService.getShareableWithOrganisations(collectionUid, getUserId()));
+	int userId = getUserId();
+	model.addAttribute("userId", userId);
+	model.addAttribute("availableOrganisations", qbService.getShareableWithOrganisations(collectionUid, userId));
 	model.addAttribute("questionCount", qbService.getCountCollectionQuestions(collectionUid, null));
 	model.addAttribute("isQtiExportEnabled", Configuration.getAsBoolean(ConfigurationKeys.QB_QTI_ENABLE));
 	return "qb/collection";
