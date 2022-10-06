@@ -1086,9 +1086,9 @@ public class GradebookService implements IGradebookFullService {
     public String getReleaseMarksEmailContent(long lessonID, int userID) {
 	if (RELEASE_MARKS_EMAIL_TEMPLATE_CONTENT == null) {
 	    try {
-		RELEASE_MARKS_EMAIL_TEMPLATE_CONTENT = Files
-			.readString(Paths.get(Configuration.get(ConfigurationKeys.LAMS_EAR_DIR), FileUtil.LAMS_WWW_DIR,
-				"gradebookReleaseLessonMarksEmailTemplate.html"));
+		RELEASE_MARKS_EMAIL_TEMPLATE_CONTENT = Files.readString(
+			Paths.get(Configuration.get(ConfigurationKeys.LAMS_EAR_DIR), FileUtil.LAMS_CENTRAL_WAR_DIR,
+				"templates", "gradebookReleaseLessonMarksEmailTemplate.html"));
 	    } catch (Exception e) {
 		throw new RuntimeException("Can not read release marks email template", e);
 	    }
