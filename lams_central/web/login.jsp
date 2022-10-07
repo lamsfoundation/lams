@@ -188,10 +188,12 @@
 			<%
 				// invalidate session so a new user can be logged in
 				HttpSession hs = SessionManager.getSession();
+				Boolean isSignup = false;
+				
 				if (hs != null) {
 					UserDTO userDTO = (UserDTO) hs.getAttribute("user");
 					if (userDTO != null && !userDTO.getLogin().equals(request.getAttribute("login"))) {
-					    Object isSignup = hs.getAttribute("isSignup");
+					    isSignup = (Boolean) hs.getAttribute("isSignup");
 					    // remove session from mapping
 					    SessionManager.removeSessionByLogin(userDTO.getLogin(), true);
 					    
@@ -201,6 +203,9 @@
 					    hs.setAttribute("isLoginAs", request.getAttribute("isLoginAs"));
 					}
 				}
+				
+				hs = request.getSession();
+				hs.setAttribute("isIntegrationLogin", isSignup == null || !isSignup);
 			%>
 			<script type="text/javascript">
 				// submit the hidden form

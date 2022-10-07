@@ -165,6 +165,7 @@ public class SsoHandler implements ServletExtension {
 
 		boolean isUsingLoginAsFeature = isPasswordToken
 			&& Boolean.TRUE.equals(session.getAttribute("isLoginAs"));
+		boolean isIntegrationLogin = Boolean.TRUE.equals(session.getAttribute("isIntegrationLogin"));
 
 		// LoginRequestServlet (integrations) and LoginAsAction (sysadmin) set this parameter
 		String redirectURL = request.getParameter("redirectURL");
@@ -229,6 +230,7 @@ public class SsoHandler implements ServletExtension {
 
 		// session ID was changed after log in
 		SessionManager.updateSessionID(oldSessionID);
+		session.setAttribute("isIntegrationLogin", isIntegrationLogin);
 
 		if (login.equals(request.getRemoteUser())) {
 		    session.setAttribute(AttributeNames.USER, userDTO);

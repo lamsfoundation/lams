@@ -96,20 +96,26 @@ public class IndexController {
 	    userDTO.setFirstLogin(false);
 	}
 
-	if (user.getPasswordChangeDate() != null) {
-	    int expirationPeriod = Configuration.getAsInt(ConfigurationKeys.PASSWORD_EXPIRATION_MONTHS);
-	    if (expirationPeriod > 0) {
-		LocalDateTime expirationDate = user.getPasswordChangeDate().plusMonths(expirationPeriod);
-		if (LocalDateTime.now().isAfter(expirationDate)) {
-		    user.setChangePassword(true);
-		    userManagementService.save(user);
-		    return "forward:/password.do?passwordExpired=true";
+	HttpSession session = request.getSession();
+	Boolean isIntegrationLogin = (Boolean) session.getAttribute("isIntegrationLogin");
+	isIntegrationLogin = isIntegrationLogin != null && isIntegrationLogin;
+
+	if (!isIntegrationLogin) {
+	    if (user.getPasswordChangeDate() != null) {
+		int expirationPeriod = Configuration.getAsInt(ConfigurationKeys.PASSWORD_EXPIRATION_MONTHS);
+		if (expirationPeriod > 0) {
+		    LocalDateTime expirationDate = user.getPasswordChangeDate().plusMonths(expirationPeriod);
+		    if (LocalDateTime.now().isAfter(expirationDate)) {
+			user.setChangePassword(true);
+			userManagementService.save(user);
+			return "forward:/password.do?passwordExpired=true";
+		    }
 		}
 	    }
-	}
 
-	if (user.getChangePassword() != null && user.getChangePassword()) {
-	    return "forward:/password.do";
+	    if (user.getChangePassword() != null && user.getChangePassword()) {
+		return "forward:/password.do";
+	    }
 	}
 
 	// check if user needs to get his shared two-factor authorization secret
