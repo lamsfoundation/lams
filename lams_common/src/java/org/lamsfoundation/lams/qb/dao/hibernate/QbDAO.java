@@ -5,8 +5,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.persistence.Query;
@@ -18,6 +20,7 @@ import org.hibernate.type.IntegerType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.qb.dao.IQbDAO;
+import org.lamsfoundation.lams.qb.dto.QbAnswersForOptionDTO;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
@@ -51,7 +54,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    + "LEFT JOIN tl_laasse10_option_answer AS aa ON a.answer_uid = aa.question_result_uid AND aa.answer_boolean = 1 "
 	    + "WHERE tq.qb_question_uid = :qbQuestionUid GROUP BY opt HAVING opt IS NOT NULL";
 
-    private static final String FIND_ANSWERS_BY_ACTIVITY = "SELECT COALESCE(mcu.que_usr_id, su.user_id, au.user_id) AS user_id, "
+    private static final String FIND_ANSWERS_BY_ACTIVITY_AND_QUESTION = "SELECT COALESCE(mcu.que_usr_id, su.user_id, au.user_id) AS user_id, "
 	    + "IF(su.user_id IS NULL, COALESCE(a.qb_option_uid, aa.question_option_uid), IF(COUNT(a.qb_option_uid) > 1, -1, a.qb_option_uid)) AS opt "
 	    + "FROM lams_learning_activity AS act JOIN lams_qb_tool_question AS tq USING (tool_content_id) "
 	    + "JOIN lams_qb_tool_answer AS a USING (tool_question_uid) "
@@ -66,6 +69,19 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    + "LEFT JOIN tl_laasse10_user AS au ON ar.user_uid = au.uid AND au.session_finished = 1 "
 	    + "WHERE act.activity_id = :activityId AND tq.qb_question_uid = :qbQuestionUid GROUP BY user_id "
 	    + "HAVING opt IS NOT NULL AND user_id IS NOT NULL";
+
+    private static final String FIND_OPTION_ANSWER_COUNT_BY_QUESTION = "SELECT tq.qb_question_uid, o.uid AS qb_option_uid, o.max_mark = 1 AS is_correct, "
+	    + "SUM(IF(aa.uid IS NULL AND sa.uid IS NULL, 0, 1)) AS chosen_count "
+	    + "FROM lams_qb_tool_question AS tq JOIN lams_qb_option AS o USING (qb_question_uid) "
+	    + "LEFT JOIN lams_qb_tool_answer AS a ON a.tool_question_uid = tq.tool_question_uid AND (a.qb_option_uid IS NULL OR a.qb_option_uid = o.uid) "
+	    + "LEFT JOIN tl_laasse10_question_result AS aq ON a.answer_uid = aq.uid "
+	    + "LEFT JOIN tl_laasse10_option_answer AS aa ON aa.question_result_uid = aq.uid AND aa.question_option_uid = o.uid AND aa.answer_boolean = 1 "
+	    + "LEFT JOIN tl_laasse10_assessment_result AS ar ON aq.result_uid = ar.uid AND ar.latest = 1 "
+	    + "LEFT JOIN tl_lascrt11_answer_log AS sa ON a.answer_uid = sa.uid AND a.answer_uid = "
+	    + "   (SELECT sa2.uid FROM tl_lascrt11_answer_log AS sa2 JOIN lams_qb_tool_answer AS a2 "
+	    + "	   ON a2.answer_uid = sa2.uid AND a2.tool_question_uid = a.tool_question_uid AND sa2.session_id = sa.session_id "
+	    + "    ORDER BY sa2.access_date, sa2.uid LIMIT 1) "
+	    + "WHERE tq.tool_content_id = :toolContentId GROUP BY o.uid ORDER BY tq.display_order, o.display_order";
 
     private static final String FIND_BURNING_QUESTIONS = "SELECT b.question, COUNT(bl.uid) FROM ScratchieBurningQuestion b LEFT OUTER JOIN "
 	    + "BurningQuestionLike AS bl ON bl.burningQuestion = b WHERE b.scratchieItem.qbQuestion.uid = :qbQuestionUid "
@@ -399,14 +415,65 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Map<Integer, Long> getAnswersForActivity(long activityId, long qbQuestionUid) {
-	List<Object[]> result = this.getSession().createSQLQuery(FIND_ANSWERS_BY_ACTIVITY)
+    public Map<Integer, Long> getAnswersForActivityAndQuestion(long activityId, long qbQuestionUid) {
+	List<Object[]> result = this.getSession().createSQLQuery(FIND_ANSWERS_BY_ACTIVITY_AND_QUESTION)
 		.setParameter("activityId", activityId).setParameter("qbQuestionUid", qbQuestionUid).list();
 	Map<Integer, Long> map = new HashMap<>(result.size());
 	for (Object[] answerStat : result) {
 	    map.put(((BigInteger) answerStat[0]).intValue(), ((BigInteger) answerStat[1]).longValue());
 	}
 	return map;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<QbAnswersForOptionDTO> getAnswerCountForOptions(long toolContentId) {
+	List<Object[]> result = this.getSession().createSQLQuery(FIND_OPTION_ANSWER_COUNT_BY_QUESTION)
+		.setParameter("toolContentId", toolContentId).list();
+	List<QbAnswersForOptionDTO> dtos = new LinkedList<>();
+	Map<Long, Map<Long, Integer>> questionsToOptionsMap = new LinkedHashMap<>();
+	// it contains all UID of correct answers
+	Set<Long> correctOptionUids = new HashSet<>();
+	
+	// build a map of question ID -> option ID -> answer count
+	for (Object[] answerEntry : result) {
+	    Long qbQuestionUid = ((Number) answerEntry[0]).longValue();
+	    Map<Long, Integer> answersForOptions = questionsToOptionsMap.get(qbQuestionUid);
+	    if (answersForOptions == null) {
+		answersForOptions = new LinkedHashMap<>();
+		questionsToOptionsMap.put(qbQuestionUid, answersForOptions);
+	    }
+	    Long qbOptionUid = ((Number) answerEntry[1]).longValue();
+	    answersForOptions.put(qbOptionUid, ((Number) answerEntry[3]).intValue());
+
+	    boolean isCorrect = ((Number) answerEntry[2]).intValue() == 1;
+	    if (isCorrect) {
+		correctOptionUids.add(qbOptionUid);
+	    }
+	}
+
+	// calculate answer percentage for question and all options
+	int displayOrder = 1;
+	for (Entry<Long, Map<Long, Integer>> questionToOptionEntry : questionsToOptionsMap.entrySet()) {
+	    double totalAnswers = questionToOptionEntry.getValue().values().stream().mapToInt(Integer::intValue).sum();
+	    QbAnswersForOptionDTO dto = new QbAnswersForOptionDTO(questionToOptionEntry.getKey(), displayOrder++);
+	    dtos.add(dto);
+
+	    for (Entry<Long, Integer> answersForOptionEntry : questionToOptionEntry.getValue().entrySet()) {
+		Long qbOptionUid = answersForOptionEntry.getKey();
+		if (totalAnswers == 0) {
+		    dto.getOptionAnswerPercent().put(qbOptionUid, -1);
+		    continue;
+		}
+
+		Long answerPercent = Math.round(answersForOptionEntry.getValue() / totalAnswers * 100);
+		dto.getOptionAnswerPercent().put(qbOptionUid, answerPercent.intValue());
+		if (correctOptionUids.contains(qbOptionUid)) {
+		    dto.setCorrectAnswerPercent(answerPercent.intValue());
+		}
+	    }
+	}
+	return dtos;
     }
 
     @Override

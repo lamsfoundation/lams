@@ -295,7 +295,7 @@
 						</label>
 					</div>
 					
-					<c:if test="${not empty isIraAssessmentAvailable}">
+					<c:if test="${not empty isIraAvailable}">
 						<div class="navigate-btn-container">
 							<a id="load-irat-tab-btn" class="btn btn-primary" href="#"
 							   data-tab-name="iratStudentChoices"	title="<fmt:message key='label.ira' />">

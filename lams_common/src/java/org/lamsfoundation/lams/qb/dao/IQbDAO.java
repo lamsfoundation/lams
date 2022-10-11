@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.qb.dto.QbAnswersForOptionDTO;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.ToolContent;
@@ -50,7 +51,9 @@ public interface IQbDAO extends IBaseDAO {
 
     Map<Long, Long> getAnswerStatsForQuestion(long qbQuestionUid);
 
-    Map<Integer, Long> getAnswersForActivity(long activityId, long qbQuestionUid);
+    Map<Integer, Long> getAnswersForActivityAndQuestion(long activityId, long qbQuestionUid);
+
+    List<QbAnswersForOptionDTO> getAnswerCountForOptions(long toolContentId);
 
     Map<String, Long> getBurningQuestions(long qbQuestionUid);
 

@@ -1177,8 +1177,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public int countAttemptsPerOption(Long toolContentId, Long optionUid, boolean finishedAttemptsOnly) {
-	return assessmentResultDao.countAttemptsPerOption(toolContentId, optionUid, finishedAttemptsOnly);
+    public int countAttemptsPerOption(Long toolContentId, Long optionUid) {
+	return assessmentResultDao.countAttemptsPerOption(toolContentId, optionUid);
     }
 
     @Override
@@ -3445,7 +3445,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	}
 	AssessmentResult assessmentResult = getLastAssessmentResult(assessment.getUid(),
 		Integer.valueOf(userId).longValue());
-	return countCorrectAnswers(assessment.getUid(), user.getUid(), assessmentResult);
+	return countCorrectAnswers(assessment.getUid(), assessmentResult);
     }
 
     @Override
@@ -3456,16 +3456,19 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	Collection<AssessmentResult> assessmentResults = assessmentResultDao.getLastAssessmentResults(assessmentUid);
 	for (AssessmentResult assessmentResult : assessmentResults) {
 	    AssessmentUser user = assessmentResult.getUser();
-	    int count = countCorrectAnswers(assessmentUid, user.getUid(), assessmentResult);
+	    int count = countCorrectAnswers(assessmentUid, assessmentResult);
 	    counts.put(user.getUserId().intValue(), count);
 	}
 	return counts;
     }
 
-    private int countCorrectAnswers(long assessmentUid, long userUid, AssessmentResult assessmentResult) {
+    private int countCorrectAnswers(long assessmentUid, AssessmentResult assessmentResult) {
 	if (assessmentResult == null) {
 	    return 0;
 	}
+
+	AssessmentUser user = assessmentResult.getUser();
+	long userUid = user.getUid();
 	int count = 0;
 
 	for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {

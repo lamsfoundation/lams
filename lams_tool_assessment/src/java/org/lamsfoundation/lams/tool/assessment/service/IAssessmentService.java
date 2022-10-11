@@ -327,7 +327,7 @@ public interface IAssessmentService extends ICommonToolService {
     /**
      * Count how many last attempts selected specified option.
      */
-    int countAttemptsPerOption(Long toolContentId, Long optionUid, boolean finishedAttemptsOnly);
+    int countAttemptsPerOption(Long toolContentId, Long optionUid);
 
     /**
      * Return number of finished results. I.e. don't count the last not-yet-finished result (it can be autosave one).

@@ -1,7 +1,11 @@
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -10,6 +14,7 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
@@ -32,6 +37,9 @@ import org.lamsfoundation.lams.monitoring.dto.PermissionGateDTO;
 import org.lamsfoundation.lams.monitoring.dto.TblGroupDTO;
 import org.lamsfoundation.lams.monitoring.dto.TblUserDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
+import org.lamsfoundation.lams.qb.dto.QbAnswersForOptionDTO;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.service.ICommonAssessmentService;
 import org.lamsfoundation.lams.tool.service.ICommonScratchieService;
@@ -46,7 +54,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -66,6 +76,8 @@ public class TblMonitoringController {
     @Autowired
     private IMonitoringFullService monitoringService;
     @Autowired
+    private IQbService qbService;
+    @Autowired
     private ILamsToolService lamsToolService;
     @Autowired
     private ILamsCoreToolService lamsCoreToolService;
@@ -75,26 +87,8 @@ public class TblMonitoringController {
     @Qualifier("laasseAssessmentService")
     private ICommonAssessmentService commonAssessmentService;
     @Autowired
-    @Qualifier("mcService")
-    private ICommonAssessmentService commonMcqService;
-    @Autowired
     @Qualifier("scratchieService")
     private ICommonScratchieService commonScratchieService;
-
-    /**
-     * Displays addStudent page.
-     */
-    @RequestMapping("/start")
-    public String unspecified(HttpServletRequest request) {
-	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	Lesson lesson = lessonService.getLesson(lessonId);
-	request.setAttribute("lesson", lesson);
-	request.setAttribute("totalLearnersNumber", lesson.getAllLearners().size());
-
-	List<Activity> lessonActivities = getLessonActivities(lesson);
-	TblMonitoringController.setupAvailableActivityTypes(request, lessonActivities);
-	return "tblmonitor/tblmonitor";
-    }
 
     /**
      * Shows Teams page
@@ -108,17 +102,15 @@ public class TblMonitoringController {
 	TblMonitoringController.setupAvailableActivityTypes(request, lessonActivities);
 	boolean isTraAvailable = (request.getAttribute("isScratchieAvailable") != null)
 		&& ((Boolean) request.getAttribute("isScratchieAvailable"));
-	boolean isIraAssesmentAvailable = request.getAttribute("isIraAssessmentAvailable") != null
-		&& ((Boolean) request.getAttribute("isIraAssessmentAvailable"));
-	boolean isIraMcqAvailable = request.getAttribute("isIraMcqAvailable") != null
-		&& ((Boolean) request.getAttribute("isIraMcqAvailable"));
+	boolean isIraAvailable = request.getAttribute("isIraAvailable") != null
+		&& ((Boolean) request.getAttribute("isIraAvailable"));
 	Long iraToolActivityId = request.getAttribute("iraToolActivityId") == null ? null
 		: (Long) request.getAttribute("iraToolActivityId");
 	Long traToolActivityId = request.getAttribute("traToolActivityId") == null ? null
 		: (Long) request.getAttribute("traToolActivityId");
 	Long leaderselectionToolActivityId = request.getAttribute("leaderselectionToolActivityId") == null ? null
 		: (Long) request.getAttribute("leaderselectionToolActivityId");
-	Long iraToolContentId = isIraMcqAvailable || isIraAssesmentAvailable
+	Long iraToolContentId = isIraAvailable
 		? activityDAO.find(ToolActivity.class, iraToolActivityId).getToolContentId()
 		: null;
 	Long traToolContentId = isTraAvailable
@@ -143,9 +135,7 @@ public class TblMonitoringController {
 	Set<Group> groups = grouping == null ? null : grouping.getGroups();
 
 	Map<Integer, Integer> iraCorrectAnswerCountByUser = Map.of();
-	if (isIraMcqAvailable) {
-	    iraCorrectAnswerCountByUser = commonMcqService.countCorrectAnswers(iraToolContentId);
-	} else if (isIraAssesmentAvailable) {
+	if (isIraAvailable) {
 	    iraCorrectAnswerCountByUser = commonAssessmentService.countCorrectAnswers(iraToolContentId);
 	}
 
@@ -283,6 +273,140 @@ public class TblMonitoringController {
 	}
 
 	return "tblmonitor/teams";
+    }
+
+    @GetMapping("/questionResults")
+    public String getQuestionResults(@RequestParam(required = false) Long iraToolContentId,
+	    @RequestParam(required = false) Long traToolContentId, @RequestParam(required = false) String order,
+	    Model model) {
+	List<QbAnswersForOptionDTO> iraAnswers = null;
+	if (iraToolContentId != null) {
+	    // get answer percentage for each iRAT question and its options
+	    iraAnswers = qbService.getAnswerCountForOptions(iraToolContentId);
+	    model.addAttribute("iraAnswerCountForOptions", iraAnswers);
+	}
+
+	List<QbAnswersForOptionDTO> traAnswers = null;
+	List<QbAnswersForOptionDTO> averageAnswers = null;
+	if (traToolContentId != null) {
+	    traAnswers = qbService.getAnswerCountForOptions(traToolContentId);
+	    model.addAttribute("traAnswerCountForOptions", traAnswers);
+
+	    // if both iRAT and tRAT are present, count average
+	    if (iraAnswers != null) {
+		averageAnswers = new LinkedList<>();
+		model.addAttribute("averageAnswerCountForOptions", averageAnswers);
+
+		for (QbAnswersForOptionDTO iraDto : iraAnswers) {
+		    QbAnswersForOptionDTO averageDto = new QbAnswersForOptionDTO(iraDto.getQbQuestionUid(),
+			    iraDto.getDisplayOrder());
+		    averageAnswers.add(averageDto);
+
+		    // there can be no answers for iRAT yet
+		    boolean iraHasAnswers = iraDto.getCorrectAnswerPercent() >= 0;
+
+		    for (QbAnswersForOptionDTO traDto : traAnswers) {
+			if (traDto.getQbQuestionUid() == iraDto.getQbQuestionUid()) {
+			    boolean traHasAnswers = traDto.getCorrectAnswerPercent() >= 0;
+			    if (iraHasAnswers) {
+				if (traHasAnswers) {
+				    // both RATs have answers present, count average
+				    averageDto.setCorrectAnswerPercent(
+					    (iraDto.getCorrectAnswerPercent() + traDto.getCorrectAnswerPercent()) / 2);
+				} else {
+				    // just iRAT has answers
+				    averageDto.setCorrectAnswerPercent(iraDto.getCorrectAnswerPercent());
+				}
+			    } else if (traHasAnswers) {
+				// just tRAT has answers
+				averageDto.setCorrectAnswerPercent(traDto.getCorrectAnswerPercent());
+			    }
+
+			    // count average for each option
+			    for (Long qbOptionUid : iraDto.getOptionAnswerPercent().keySet()) {
+				int iraOptionAnswers = iraDto.getOptionAnswerPercent().get(qbOptionUid);
+				int traOptionAnswers = traDto.getOptionAnswerPercent().get(qbOptionUid);
+
+				if (iraHasAnswers) {
+				    if (traHasAnswers) {
+					averageDto.getOptionAnswerPercent().put(qbOptionUid,
+						(iraOptionAnswers + traOptionAnswers) / 2);
+				    } else {
+					averageDto.getOptionAnswerPercent().put(qbOptionUid, iraOptionAnswers);
+				    }
+				} else if (traHasAnswers) {
+				    averageDto.getOptionAnswerPercent().put(qbOptionUid, traOptionAnswers);
+				} else {
+				    averageDto.getOptionAnswerPercent().put(qbOptionUid, -1);
+				}
+			    }
+			}
+		    }
+		}
+	    }
+	}
+
+	List<QbAnswersForOptionDTO> sortSource = iraAnswers == null ? iraAnswers : traAnswers;
+	List<List<QbAnswersForOptionDTO>> sortTargets = new LinkedList<>();
+
+	if (StringUtils.isBlank(order)) {
+	    order = "default";
+	} else {
+	    order = order.toLowerCase();
+	}
+
+	// find out by which column to sort
+	if (iraAnswers != null && order.startsWith("ira")) {
+	    iraAnswers.sort(Comparator.comparing(QbAnswersForOptionDTO::getCorrectAnswerPercent));
+	    sortSource = iraAnswers;
+	    // other collections need to have same sorting as well
+	    if (traAnswers != null) {
+		sortTargets.add(traAnswers);
+		sortTargets.add(averageAnswers);
+	    }
+	} else if (traAnswers != null && order.startsWith("tra")) {
+	    traAnswers.sort(Comparator.comparing(QbAnswersForOptionDTO::getCorrectAnswerPercent));
+
+	    sortSource = traAnswers;
+	    if (iraAnswers != null) {
+		sortTargets.add(iraAnswers);
+		sortTargets.add(averageAnswers);
+	    }
+	} else if (averageAnswers != null && order.startsWith("average")) {
+	    averageAnswers.sort(Comparator.comparing(QbAnswersForOptionDTO::getCorrectAnswerPercent));
+	    sortSource = averageAnswers;
+	    sortTargets.add(traAnswers);
+	    sortTargets.add(iraAnswers);
+	}
+
+	if (order.endsWith("reversed")) {
+	    Collections.reverse(sortSource);
+	}
+
+	// fetch questions according to sort order
+	Map<Integer, QbQuestion> questions = new LinkedHashMap<>();
+	for (QbAnswersForOptionDTO dto : sortSource) {
+	    QbQuestion question = qbService.getQuestionByUid(dto.getQbQuestionUid());
+	    questions.put(dto.getDisplayOrder(), question);
+	}
+
+	// sort remaining collections according to sor order
+	for (List<QbAnswersForOptionDTO> dtos : sortTargets) {
+	    List<QbAnswersForOptionDTO> sortedTarget = new LinkedList<>();
+	    for (QbAnswersForOptionDTO sourceDto : sortSource) {
+		for (QbAnswersForOptionDTO targetDto : dtos) {
+		    if (sourceDto.getQbQuestionUid() == targetDto.getQbQuestionUid()) {
+			sortedTarget.add(targetDto);
+			break;
+		    }
+		}
+	    }
+	    dtos.clear();
+	    dtos.addAll(sortedTarget);
+	}
+
+	model.addAttribute("questions", questions);
+	return "tblmonitor/teamsQuestionResults";
     }
 
     /**
@@ -511,15 +635,11 @@ public class TblMonitoringController {
 		Long toolActivityId = toolActivity.getActivityId();
 		String toolTitle = toolActivity.getTitle();
 
-		//count only the first MCQ or Assessmnet as iRA
-		if (!iraPassed && (CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)
-			|| isScratchieAvailable && CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature))) {
+		//count only the first Assessmnet as iRA
+		if (!iraPassed && isScratchieAvailable
+			&& CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)) {
 		    iraPassed = true;
-		    if (CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
-			request.setAttribute("isIraMcqAvailable", true);
-		    } else {
-			request.setAttribute("isIraAssessmentAvailable", true);
-		    }
+		    request.setAttribute("isIraAvailable", true);
 		    request.setAttribute("iraToolContentId", toolContentId);
 		    request.setAttribute("iraToolActivityId", toolActivityId);
 

@@ -119,8 +119,8 @@ public class TblMonitoringController {
 
 		// build candidate dtos
 		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-		    int optionAttemptCount = assessmentService.countAttemptsPerOption(toolContentId, optionDto.getUid(),
-			    false);
+		    int optionAttemptCount = assessmentService.countAttemptsPerOption(toolContentId,
+			    optionDto.getUid());
 
 		    float percentage = (float) (optionAttemptCount * 100) / totalNumberOfUsers;
 		    optionDto.setPercentage(percentage);

@@ -1,9 +1,14 @@
 <%@ include file="/taglibs.jsp"%>
+<c:set var="ALPHABET" value="${fn:split('a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z', ',')}" scope="request"/>
+<c:set var="ALPHABET_CAPITAL_LETTERS" value="${fn:split('A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z', ',')}" scope="request"/>
+
 <style>
 	
 	#tbl-teams-tab-content .card-header,
 	#tbl-teams-tab-content a.card-title,
-	#tbl-teams-tab-content a.ira-modal-link {
+	#tbl-teams-tab-content a.ira-modal-link,
+	#question-results-panel th a,
+	#question-results-panel .question-results-question-row a {
 	   	cursor: pointer;
 	}
 	
@@ -17,6 +22,12 @@
 	
 	#tbl-teams-tab-content .fa-arrow-circle-left {
 		visibility: hidden;
+	}
+	
+	.question-results-cell {
+		width: 15%;
+		text-align: center;
+		border-left: 2px solid var(--bs-gray-200) !important;
 	}
 </style>
 
@@ -164,10 +175,8 @@
 			$('#ira-correct-answer-count').html(userScore);
 
 			//load modal dialog content using Ajax
-			var url = "${isIraMcqAvailable}" == "true" ? "<lams:LAMSURL/>tool/lamc11/tblmonitoring/getModalDialogForTeamsTab.do" 
-													   : "<lams:LAMSURL/>tool/laasse10/tblmonitoring/getModalDialogForTeamsTab.do";
 			$('#ira-modal .modal-body').load(
-				url, 
+				"<lams:LAMSURL/>tool/laasse10/tblmonitoring/getModalDialogForTeamsTab.do", 
 				{
 					toolContentID: "${iraToolContentId}",
 					userID: userId
@@ -208,11 +217,14 @@
 			);
 		});
 
+		loadTeamsQuestionResults('default');
+		
 		$('[data-toggle="tooltip"]').tooltip();
 
 		if (sequenceSearchedLearner) {
 			 $('html,body').animate({scrollTop: $('#user-name-' + sequenceSearchedLearner).offset().top},'slow');
 		}
+		
 	});
 
 	function showChangeLeaderModal(groupID) {
@@ -232,6 +244,21 @@
 			loadTab("teams");
 		} else {
 			alert("Leader was not changed.");
+		}
+	}
+
+	var teamsQuestionResultsOrder = '';
+	function loadTeamsQuestionResults(order) {
+		let iraToolContentId = '${iraToolContentId}',
+			traToolContentId = '${traToolContentId}';
+		if (iraToolContentId || traToolContentId) {
+			if (order == teamsQuestionResultsOrder) {
+				order += 'Reversed';
+			}
+			teamsQuestionResultsOrder = order;
+			
+			$('#question-results-panel').load(LAMS_URL + 'monitoring/tblmonitor/questionResults.do?iraToolContentId=' + iraToolContentId + 
+				'&traToolContentId=' + traToolContentId + '&order=' + order);
 		}
 	}
 </script>            
@@ -277,7 +304,7 @@
 										<fmt:message key="label.teams"/>
 									</th>
 									
-									<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
+									<c:if test="${isIraAvailable}">
 										<th class="text-center">
 											<fmt:message key="label.ira.correct.count.average"/>
 										</th>
@@ -288,7 +315,7 @@
 											<fmt:message key="label.tra.correct.count"/>
 										</th>
 										
-										<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
+										<c:if test="${isIraAvailable}">
 											<th class="text-center">
 												<fmt:message key="label.ira.tra.delta"/>
 											</th>
@@ -305,7 +332,7 @@
 											<a href="#teams-panel-${groupDto.groupID}"><c:out value="${groupDto.groupName}" /></a>
 										</td>
 										
-										<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
+										<c:if test="${isIraAvailable}">
 											<td class="text-center">
 												<c:choose>
 													<c:when test="${empty groupDto.iraCorrectAnswerCountAverage}">
@@ -353,7 +380,7 @@
 												</c:choose>
 											</td>
 											
-											<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
+											<c:if test="${isIraAvailable}">
 												<td class="text-center">
 													<c:choose>
 														<c:when test="${empty groupDto.correctAnswerCountPercentDelta}">
@@ -385,7 +412,7 @@
 									<tr>
 										<th><fmt:message key="label.ira.tra.average"/></th>
 										
-										<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
+										<c:if test="${isIraAvailable}">
 											<td class="text-center">
 												<c:choose>
 													<c:when test="${empty averageIraCorrectAnswerCountAverage}">
@@ -410,7 +437,7 @@
 												</c:choose>
 											</td>
 											
-											<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
+											<c:if test="${isIraAvailable}">
 												<td class="text-center">
 													<c:choose>
 														<c:when test="${empty averageCorrectAnswerCountDelta}">
@@ -430,6 +457,8 @@
 					</div>
 				</div>
 			</div>
+			
+			<div id="question-results-panel"></div>
 		
 			<c:forEach var="groupDto" items="${groupDtos}">
 				<div class="card mb-3" id="teams-panel-${groupDto.groupID}" tabindex="0">
@@ -461,7 +490,7 @@
 								</c:choose>
 							</c:if>
 							
-							<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
+							<c:if test="${isIraAvailable}">
 								<div class="table-responsive">
 									<table class="table table-hover table-condensed">
 										<thead>
@@ -594,7 +623,7 @@
 							<!-- Change leader and Compare buttons -->
 							<div class="row">
 								<div class="col-xs-12 col-md-12 col-lg-12">
-									<c:if test="${(isIraAssessmentAvailable || isIraMcqAvailable) && isScratchieAvailable && not empty groupDto.userList && not empty groupDto.traCorrectAnswerCount}">
+									<c:if test="${isIraAvailable and isScratchieAvailable and not empty groupDto.userList and not empty groupDto.traCorrectAnswerCount}">
 										<button href="#" data-bs-toggle="modal" data-bs-target="#comparison-modal" type="button" class="btn btn-sm btn-secondary float-end"
 												data-ira-scores="
 												<c:forEach var="userDto" items="${groupDto.userList}">
