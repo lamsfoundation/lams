@@ -3,11 +3,13 @@ package org.lamsfoundation.lams.qb.service;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.lamsfoundation.lams.qb.dto.QbAnswersForOptionDTO;
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
 import org.lamsfoundation.lams.qb.form.QbQuestionForm;
@@ -76,6 +78,8 @@ public interface IQbService {
     QbStatsActivityDTO getActivityStats(Long activityId, Long qbQuestionUid);
 
     QbStatsActivityDTO getActivityStats(Long activityId, Long qbQuestionUid, Collection<Long> correctOptionUids);
+
+    List<QbAnswersForOptionDTO> getAnswerCountForOptions(long toolContentId);
 
     List<QbQuestion> getPagedQuestions(String questionTypes, String collectionUids,
 	    Long onlyInSameLearningDesignAsToolContentID, int page, int size, String sortBy, String sortOrder,

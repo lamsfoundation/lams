@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.qb.QbConstants;
 import org.lamsfoundation.lams.qb.QbUtils;
 import org.lamsfoundation.lams.qb.dao.IQbDAO;
+import org.lamsfoundation.lams.qb.dto.QbAnswersForOptionDTO;
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
 import org.lamsfoundation.lams.qb.form.QbQuestionForm;
@@ -274,7 +275,8 @@ public class QbService implements IQbService {
 	// if there is only 1 participant, there is no point in calculating question indexes
 	if (participantCount >= Configuration.getAsInt(ConfigurationKeys.QB_STATS_MIN_PARTICIPANTS)) {
 	    // mapping of user ID -> option UID
-	    Map<Integer, Long> activityAnswers = qbDAO.getAnswersForActivity(activity.getActivityId(), qbQuestionUid);
+	    Map<Integer, Long> activityAnswers = qbDAO.getAnswersForActivityAndQuestion(activity.getActivityId(),
+		    qbQuestionUid);
 	    // take only learners who finished (not only submitted) this activity
 	    userLessonGrades = userLessonGrades.stream()
 		    .filter(g -> activityAnswers.containsKey(g.getLearner().getUserId())).collect(Collectors.toList());
@@ -345,6 +347,11 @@ public class QbService implements IQbService {
 	}
 
 	return activityDTO;
+    }
+
+    @Override
+    public List<QbAnswersForOptionDTO> getAnswerCountForOptions(long toolContentId) {
+	return qbDAO.getAnswerCountForOptions(toolContentId);
     }
 
     @Override
