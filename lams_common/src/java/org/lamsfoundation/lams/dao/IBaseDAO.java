@@ -234,6 +234,8 @@ public interface IBaseDAO {
 
     <T> List<T> findByProperties(Class<T> clazz, Map<String, Object> properties, boolean cache);
 
+    List findNative(String nativeQueryString);
+
     public List find(String queryString);
 
     public List find(String queryString, Object value);

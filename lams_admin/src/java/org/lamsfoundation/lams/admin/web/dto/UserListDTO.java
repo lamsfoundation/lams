@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
 public class UserListDTO {
     private List<UserManageBean> userManageBeans;
     private Integer orgId;
+    private String orgCode;
     private String orgName;
     private Boolean courseAdminCanAddNewUsers;
     private Boolean courseAdminCanBrowseAllUsers;
@@ -95,6 +96,14 @@ public class UserListDTO {
 
     public void setCanEditRole(Boolean canEditRole) {
         this.canEditRole = canEditRole;
+    }
+
+    public String getOrgCode() {
+	return orgCode;
+    }
+
+    public void setOrgCode(String orgCode) {
+	this.orgCode = orgCode;
     }
 
 }

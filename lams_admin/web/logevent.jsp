@@ -9,12 +9,14 @@
 	<title>${title}</title>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
-	<lams:css/>
-	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css">
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css"/>
 	<link rel="stylesheet" href="${lams}css/jquery-ui.timepicker.css" />
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css"/>
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css" />
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
@@ -22,7 +24,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script> 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script> 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script> 
-	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap5.bundle.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/portrait.js" ></script>
 	<script type="text/javascript">
 	
@@ -230,32 +232,49 @@
 	 </script>
 </lams:head>
     
-<body class="stripes">
-	<lams:Page type="admin" title="${title}">
-	
-		<p>
-			<a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-default"><fmt:message key="appadmin.maintain" /></a>
-		</p>
+<body class="component pb-4">
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="label.event.log"/></c:set>
 
-		<div class="form form-inline">
-				<span><select id="areaMenu" class="form-control" onchange="javascript:configureTypeDropdown(this.value)"></select>&nbsp;
-				<select id="typeMenu" class="form-control"></select></span>
-				<span class="pull-right"><fmt:message key="label.between.dates"/>&nbsp;<input type="text" class="form-control" name="startDatePicker" id="startDatePicker" value=""/>
-				&nbsp;<input type="text" class="form-control" name="endDatePicker" id="endDatePicker" value=""/>
-				<a href="#" class="btn btn-default" onclick="javascript:getEvents()"><fmt:message key="admin.search"/></a>
-				</span>
+	<lams:Page5 type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">
+	
+		<form class="row row-cols-lg-auto g-3 align-items-center">
+  			<div class="col-12">
+				<select id="areaMenu" class="form-select form-select-sm d-inline" onchange="javascript:configureTypeDropdown(this.value)"></select>
+			</div>
+			<div class="col-12">
+				<select id="typeMenu" class="form-select form-select-sm d-inline" aria-label="Type of event"></select>
+			</div>
+			<div class="col-12">
+				<span class="d-inline px-4"><fmt:message key="label.between.dates"/></span>
+			</div>
+			<div class="col-12">
+				<input type="text" class="form-control form-control-sm" name="startDatePicker" id="startDatePicker" aria-label="Start date" value=""/>
+			</div>
+			<div class="col-12">
+				<input type="text" class="form-control form-control-sm" name="endDatePicker" id="endDatePicker" aria-label="End date" value=""/>
+			</div>
+			<div class="col-12">
+				<a href="#" class="btn btn-primary btn-sm" onclick="javascript:getEvents()"><fmt:message key="admin.search"/></a>
+			</div>
 		</div>
 		
-		<div class="voffset10">	
-			<lams:TSTable numColumns="5" dataId="data-session-id='1'">
+		<div class="mt-3 bg-white">	
+			<lams:TSTable5 numColumns="5" dataId="data-session-id='1'">
 					<th style="width:20%"><fmt:message key="label.date"/></th>
 					<th class="no-spinner"><fmt:message key="label.event.type"/></th>
 					<th class="no-spinner" style="width:12%"><fmt:message key="audit.change.made.by"/></th>
 					<th class="no-spinner" style="width:12%"><fmt:message key="audit.change.made.to"/></th>
 					<th class="no-spinner"><fmt:message key="audit.remarks"/></th>
-			</lams:TSTable>
+			</lams:TSTable5>
 		</div>
-			
-	</lams:Page>
+		<div class="text-end">
+			<a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-secondary">
+				<fmt:message key="admin.cancel"/>
+			</a>
+		</div>		
+
+	</lams:Page5>
 </body>
 </lams:html>

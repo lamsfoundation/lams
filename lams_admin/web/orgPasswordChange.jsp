@@ -18,9 +18,10 @@
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
 	<lams:css/>
-	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
 	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet" />
+	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<style type="text/css">
 		.changeContainer .checkbox {
 			display: inline-block;
@@ -72,7 +73,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript">
 	     var mustHaveUppercase = ${mustHaveUppercase},
@@ -337,7 +338,7 @@
 </lams:head>
     
 <body class="stripes">
-	<lams:Page type="admin" title="${title}">
+	<lams:Page5 type="admin" title="${title}">
 				<p>
 					<a href="<lams:LAMSURL/>admin/usermanage.do?org=<c:out value='${orgPasswordChangeForm.organisationID}' />" class="btn btn-default">
 					<fmt:message key="admin.user.manage" /></a>
@@ -346,7 +347,7 @@
 				<div class="panel panel-default panel-body">
 					<h3><c:out value='${orgPasswordChangeForm.orgName}' /></h3>
 					
-					<lams:Alert type="info" id="passwordConditions" close="false">
+					<lams:Alert5 type="info" id="passwordConditions" close="false">
 						<fmt:message key='label.password.must.contain' />:
 						<ul class="list-unstyled" style="line-height: 1.2">
 							<li><span class="fa fa-check"></span> <fmt:message
@@ -382,7 +383,7 @@
 							</li>
 						</ul>
 						
-					</lams:Alert>
+					</lams:Alert5>
 					
 					<form:form action="changePassword.do" modelAttribute="orgPasswordChangeForm" id="orgPasswordChangeForm" method="post">
 						<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
@@ -407,9 +408,9 @@
 						</div>
 						
 						<c:if test="${success}">
-							<lams:Alert type="info" id="passwordConditions" close="false">
+							<lams:Alert5 type="info" id="passwordConditions" close="false">
 								<h4><fmt:message key="admin.org.password.change.success" /></h4>
-							</lams:Alert>
+							</lams:Alert5>
 						</c:if>
 						
 						<div id="formValidationErrors">
@@ -452,12 +453,12 @@
 								</tr>
 							</tbody>
 						</table>
-						<div class="pull-right voffset20">
+						<div class="pull-right mt-3">
 							<input type="submit" class="btn btn-primary" value="<fmt:message key='admin.org.password.change.submit' />" />
 						</div>
 					</form:form>
 				</div>
-	</lams:Page>
+	</lams:Page5>
 </body>
 </lams:html>
 

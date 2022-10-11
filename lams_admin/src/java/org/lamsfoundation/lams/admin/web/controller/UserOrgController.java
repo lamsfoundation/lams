@@ -64,11 +64,14 @@ public class UserOrgController {
 	    return "error";
 	}
 
+	String orgCode = organisation.getCode();
+	
 	String orgName = organisation.getName();
 	log.debug("orgName: " + orgName);
 	Organisation parentOrg = organisation.getParentOrganisation();
 	if (parentOrg != null && !parentOrg.equals(userManagementService.getRootOrganisation())) {
 	    request.setAttribute("pOrgId", parentOrg.getOrganisationId());
+	    request.setAttribute("pOrgCode", parentOrg.getCode());
 	    request.setAttribute("pOrgName", parentOrg.getName());
 	}
 	Integer orgType = organisation.getOrganisationType().getOrganisationTypeId();
@@ -76,6 +79,7 @@ public class UserOrgController {
 
 	// create form object
 	userOrgForm.setOrgId(orgId);
+	userOrgForm.setOrgCode(orgCode);
 	userOrgForm.setOrgName(orgName);
 
 	String[] args = { "0" };

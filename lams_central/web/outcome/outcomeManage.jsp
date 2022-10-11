@@ -3,16 +3,20 @@
 <lams:html>
 <lams:head>
 	<title><fmt:message key="index.outcome.manage" /></title>
-	<lams:css/>
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/outcome.css" type="text/css" media="screen" />
+	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
+
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/outcome.css" type="text/css" media="screen">
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/outcome.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.cookie.js"></script>
-	<lams:JSImport src="includes/javascript/dialog.js" />
+	<lams:JSImport src="includes/javascript/dialog5.js" />
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>',
 			
@@ -27,43 +31,43 @@
 			};
 	</script>
 </lams:head>
-<body class="stripes">
+<body class="component">
 <lams:Page type="admin" >
 	<lams:errors path="*"/>
 	
 	<div class="outcomeContainer">
 		<div class="row">
-			<div class="col-xs-5">
+			<div class="col-7">
 				<fmt:message key='outcome.manage.add.name' />
 			</div>
-			<div class="col-xs-3">
+			<div class="col-3">
 				<fmt:message key='outcome.manage.add.code' />
-			</div>
-			<div class="col-xs-1">
-			</div>
-			<div class="col-xs-1">
 			</div>
 		</div>
 		<c:forEach var="outcome" items="${outcomes}">
 			<div class="row">
-				<div class="col-xs-5">
+				<div class="col-7">
 					<c:out value="${outcome.name}" />
 				</div>
-				<div class="col-xs-3">
+				<div class="col-3">
 					<c:out value="${outcome.code}" />
 				</div>
-				<div class="col-xs-1">
-					<i class="manageButton fa fa-pencil" title="<fmt:message key='outcome.manage.edit' />"
-				   	   onClick="javascript:openEditOutcomeDialog(${outcome.outcomeId})" >
-					</i>
-				</div>
-				<div class="col-xs-1">
-					<csrf:form style="display: inline-block;" id="remove_${outcome.outcomeId}" method="post" action="outcomeRemove.do"><input type="hidden" name="outcomeId" value="${outcome.outcomeId}"/><button type="button" onClick="javascript:removeOutcome('remove_${outcome.outcomeId}')" class="btn btn-danger btn-xs"><i class="fa fa-trash" title="<fmt:message key='outcome.manage.remove' />"></i></button></csrf:form>
+				<div class="col-2">
+					<button class="btn btn-secondary" onClick="javascript:openEditOutcomeDialog(${outcome.outcomeId})"
+						 	title="<fmt:message key='outcome.manage.edit' />">
+						<i class="fa fa-pencil"></i>
+					</button>
+					<csrf:form style="display: inline-block;" id="remove_${outcome.outcomeId}" method="post" action="outcomeRemove.do">
+						<input type="hidden" name="outcomeId" value="${outcome.outcomeId}"/>
+						<button type="button" onClick="javascript:removeOutcome('remove_${outcome.outcomeId}')" class="btn btn-danger">
+							<i class="fa fa-trash" title="<fmt:message key='outcome.manage.remove' />"></i>
+						</button>
+					</csrf:form>
 				</div>
 			</div>
 		</c:forEach>
 		<c:if test="${not empty outcomes}">
-			<div id="exportButton" class="btn btn-default pull-left" onClick="javascript:exportOutcome()"
+			<div id="exportButton" class="btn btn-secondary float-start" onClick="javascript:exportOutcome()"
 				 data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key="outcome.export" /></span>">
 				<i class="fa fa-download"></i>
 				<span class="hidden-xs">
@@ -72,7 +76,7 @@
 			</div>
 		</c:if>
 		
-		<div id="importButton" class="btn btn-default pull-left" onClick="javascript:$('#importInput').click()">
+		<div id="importButton" class="btn btn-secondary float-start" onClick="javascript:$('#importInput').click()">
 			<i class="fa fa-upload"></i> <fmt:message key="outcome.import" />
 		</div>
 		<form id="importForm" action="outcomeImport.do" method="post" enctype="multipart/form-data">

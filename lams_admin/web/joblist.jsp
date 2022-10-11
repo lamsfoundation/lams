@@ -14,7 +14,7 @@
 </lams:head>
     
 <body class="stripes">
-	<lams:Page type="admin" title="${title}">
+	<lams:Page5 type="admin" title="${title}">
 		<div align="center" id="jobList">
 			<div id="datatablecontainer">
 			<table width="100%" align="CENTER" 	class="form">
@@ -47,7 +47,7 @@
 			</div>
 		</div>
 
-	</lams:Page>
+	</lams:Page5>
 </body>
 </lams:html>
 

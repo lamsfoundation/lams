@@ -6,8 +6,13 @@
 
 <lams:html>
 	<lams:head>
-		<lams:css/>
+		<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
+		<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
+		<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
+		<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
+		
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 	</lams:head>
 	
 	<script type="text/JavaScript">
@@ -39,17 +44,17 @@
 	%>
 	</c:set>	
 
-<body class="stripes">
-	<lams:Page type="admin" title="${title}">
+<body class="component">
+	<lams:Page5 type="admin" title="${title}">
 	
 		<div align="center">	
-			<h3><fmt:message key="msg.please.wait"/></h3>
+			<h4><fmt:message key="msg.please.wait"/></h4>
 			<p>${progressMessage}</p>
 		</div>
 			
 		<lams:WaitingSpinner id="fileUpload_Busy"/> 
 		
-	</lams:Page>
+	</lams:Page5>
 </body>
 
 </lams:html>
