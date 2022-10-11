@@ -90,6 +90,7 @@ public class FileUtil {
 
     public static final String LAMS_WWW_SECURE_DIR = "secure";
     public static final String LAMS_WWW_DIR = "lams-www.war";
+    public static final String LAMS_CENTRAL_WAR_DIR = "lams-central.war";
     public static final String LAMS_RUNTIME_CONTENT_DIR = "runtime";
     private static final long numMilliSecondsInADay = 24 * 60 * 60 * 1000;
 

@@ -377,9 +377,9 @@ public class ImportService implements IImportService {
     private void sendUserImportPasswordChangeEmail(User user) {
 	try {
 	    if (USER_IMPORT_PASSWORD_CHANGE_EMAIL_TEMPLATE_CONTENT == null) {
-		USER_IMPORT_PASSWORD_CHANGE_EMAIL_TEMPLATE_CONTENT = Files
-			.readString(Paths.get(Configuration.get(ConfigurationKeys.LAMS_EAR_DIR), FileUtil.LAMS_WWW_DIR,
-				"userImportPasswordChangeEmailTemplate.html"));
+		USER_IMPORT_PASSWORD_CHANGE_EMAIL_TEMPLATE_CONTENT = Files.readString(
+			Paths.get(Configuration.get(ConfigurationKeys.LAMS_EAR_DIR), FileUtil.LAMS_CENTRAL_WAR_DIR,
+				"templates", "userImportPasswordChangeEmailTemplate.html"));
 	    }
 
 	    String key = RandomPasswordGenerator.generateForgotPasswordKey();

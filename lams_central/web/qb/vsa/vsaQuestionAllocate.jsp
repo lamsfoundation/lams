@@ -85,39 +85,42 @@
            		</div>		
 			</div>
 			
-			<div class="col-sm-4 text-center">
-				<c:set var="option1" value="${optionsArray[1]}"/>
-				<h4>
-					<c:choose>
-						<c:when test="${isTbl && option1.maxMark == 1}">
-							<i class="fa fa-check fa-lg text-success"></i> <fmt:message key="label.correct" />
-						</c:when>
-						<c:when test="${isTbl && option1.maxMark == 0}">
-							<i class="fa fa-times fa-lg text-danger"></i>	<fmt:message key="label.incorrect" />
-						</c:when>
-						<c:otherwise>
-							<fmt:message key="label.authoring.basic.option.grade"/>: ${option1.maxMark}
-						</c:otherwise>
-					</c:choose>
-				</h4>
-				
-				<div class="list-group col sortable-on ${isTbl ? 'tbl-incorrect-list' : ''}"
-					 data-question-uid="${toolQuestion.uid}"
-					 data-option-uid="${option1.uid}" id="answer-group${option1.uid}"></div>
-					 	
-				<c:if test="${not empty option1.name}">
-					<fmt:message key="label.answer.alternatives" />:
-					<div class="answer-alternatives" id="answer-alternatives${option0.uid}"
+			<c:if test="${fn:length(optionsArray) > 1}">
+				<div class="col-sm-4 text-center">
+					<c:set var="option1" value="${optionsArray[1]}"/>
+					
+					<h4>
+						<c:choose>
+							<c:when test="${isTbl && option1.maxMark == 1}">
+								<i class="fa fa-check fa-lg text-success"></i> <fmt:message key="label.correct" />
+							</c:when>
+							<c:when test="${isTbl && option1.maxMark == 0}">
+								<i class="fa fa-times fa-lg text-danger"></i>	<fmt:message key="label.incorrect" />
+							</c:when>
+							<c:otherwise>
+								<fmt:message key="label.authoring.basic.option.grade"/>: ${option1.maxMark}
+							</c:otherwise>
+						</c:choose>
+					</h4>
+					
+					<div class="list-group col sortable-on ${isTbl ? 'tbl-incorrect-list' : ''}"
 						 data-question-uid="${toolQuestion.uid}"
-						 data-option-uid="${option1.uid}"
-						 data-option-correct="${option1.maxMark > 0}">
-						<c:forEach var="answer" items="${fn:split(option1.name, newLineChar)}">
-							<button type="button" class="btn btn-xs ${isTbl ? 'btn-danger' : 'btn-primary'}"
-									title='<fmt:message key="label.vsa.deallocate.button.tip" />'>${answer}</button>
-						</c:forEach>
-					</div>
-				</c:if>
-			</div>
+						 data-option-uid="${option1.uid}" id="answer-group${option1.uid}"></div>
+						 	
+					<c:if test="${not empty option1.name}">
+						<fmt:message key="label.answer.alternatives" />:
+						<div class="answer-alternatives" id="answer-alternatives${option0.uid}"
+							 data-question-uid="${toolQuestion.uid}"
+							 data-option-uid="${option1.uid}"
+							 data-option-correct="${option1.maxMark > 0}">
+							<c:forEach var="answer" items="${fn:split(option1.name, newLineChar)}">
+								<button type="button" class="btn btn-xs ${isTbl ? 'btn-danger' : 'btn-primary'}"
+										title='<fmt:message key="label.vsa.deallocate.button.tip" />'>${answer}</button>
+							</c:forEach>
+						</div>
+					</c:if>
+				</div>
+			</c:if>
 		</div>
 		
 		<c:forEach var="option" items="${optionsArray}" begin="2" varStatus="status">

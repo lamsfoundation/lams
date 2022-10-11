@@ -57,7 +57,7 @@ public class AuditLogFilter extends OncePerRequestFilter {
 			String[] values = entry.getValue();
 			if (values != null && values.length > 0) {
 			    for (String value : entry.getValue()) {
-				logMessageBuilder.append(value).append(", ");
+				logMessageBuilder.append(value.replaceAll("(?:\\n|\\r)", "")).append(", ");
 			    }
 			    logMessageBuilder.delete(logMessageBuilder.length() - 2, logMessageBuilder.length());
 			}
