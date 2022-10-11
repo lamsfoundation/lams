@@ -75,7 +75,7 @@
 		</table>
 		<hr>
 		<div class="text-end">
-			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-secondary">
+			<a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-secondary">
 				<fmt:message key="admin.cancel"/>
 			</a>
 		</div>		
