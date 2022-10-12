@@ -434,7 +434,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	Map<Long, Map<Long, Integer>> questionsToOptionsMap = new LinkedHashMap<>();
 	// it contains all UID of correct answers
 	Set<Long> correctOptionUids = new HashSet<>();
-	
+
 	// build a map of question ID -> option ID -> answer count
 	for (Object[] answerEntry : result) {
 	    Long qbQuestionUid = ((Number) answerEntry[0]).longValue();
@@ -462,12 +462,12 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    for (Entry<Long, Integer> answersForOptionEntry : questionToOptionEntry.getValue().entrySet()) {
 		Long qbOptionUid = answersForOptionEntry.getKey();
 		if (totalAnswers == 0) {
-		    dto.getOptionAnswerPercent().put(qbOptionUid, -1);
+		    dto.getOptionAnswerPercent().add(-1);
 		    continue;
 		}
 
 		Long answerPercent = Math.round(answersForOptionEntry.getValue() / totalAnswers * 100);
-		dto.getOptionAnswerPercent().put(qbOptionUid, answerPercent.intValue());
+		dto.getOptionAnswerPercent().add(answerPercent.intValue());
 		if (correctOptionUids.contains(qbOptionUid)) {
 		    dto.setCorrectAnswerPercent(answerPercent.intValue());
 		}

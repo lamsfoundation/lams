@@ -47,23 +47,25 @@
 				<c:forEach var="questionEntry" items="${questions}" varStatus="status">
 					<c:set var="question" value="${questionEntry.value}" />
 					<tbody>
-						<tr class="question-results-question-row" data-bs-toggle="collapse" data-bs-target="#collapse-question-results-options-${question.uid}">
+						<tr class="question-results-question-row" 
+							data-bs-toggle="collapse" data-bs-target="#collapse-question-results-options-${question.uid}">
 							<td>
 								<a class="text-decoration-none">${questionEntry.key}.&nbsp<c:out value="${question.name}" /></a>
 							</td>
 							
+							<c:set var="isHighlight" value="true" />
 							<c:if test="${not empty iraAnswerCountForOptions}">
-								<c:set var="answersForOptionsDtos" value="${iraAnswerCountForOptions}" />
+								<c:set var="answerPercent" value="${iraAnswerCountForOptions[status.index].correctAnswerPercent}" />
 								<%@ include file="teamsQuestionResultsCell.jsp"%>
 							</c:if>
 							
 							<c:if test="${not empty traAnswerCountForOptions}">
-								<c:set var="answersForOptionsDtos" value="${traAnswerCountForOptions}" />
+								<c:set var="answerPercent" value="${traAnswerCountForOptions[status.index].correctAnswerPercent}" />
 								<%@ include file="teamsQuestionResultsCell.jsp"%>
 							</c:if>
 							
 							<c:if test="${not empty averageAnswerCountForOptions}">
-								<c:set var="answersForOptionsDtos" value="${averageAnswerCountForOptions}" />
+								<c:set var="answerPercent" value="${averageAnswerCountForOptions[status.index].correctAnswerPercent}" />
 								<%@ include file="teamsQuestionResultsCell.jsp"%>
 							</c:if>
 						</tr>
@@ -75,19 +77,21 @@
 								<td class="ps-4">
 									${ALPHABET[optionStatus.index]}. <c:out value="${option.name}" escapeXml="false"/>
 								</td>
+															
+								<c:set var="isHighlight" value="false" />
 								<c:if test="${not empty iraAnswerCountForOptions}">
-									<c:set var="answersForOptionsDtos" value="${iraAnswerCountForOptions}" />
-									<%@ include file="teamsOptionResultsCell.jsp"%>
+									<c:set var="answerPercent" value="${iraAnswerCountForOptions[status.index].optionAnswerPercent[optionStatus.index]}" />
+									<%@ include file="teamsQuestionResultsCell.jsp"%>
 								</c:if>
 								
 								<c:if test="${not empty traAnswerCountForOptions}">
-									<c:set var="answersForOptionsDtos" value="${traAnswerCountForOptions}" />
-									<%@ include file="teamsOptionResultsCell.jsp"%>
+									<c:set var="answerPercent" value="${traAnswerCountForOptions[status.index].optionAnswerPercent[optionStatus.index]}" />
+									<%@ include file="teamsQuestionResultsCell.jsp"%>
 								</c:if>
 								
 								<c:if test="${not empty averageAnswerCountForOptions}">
-									<c:set var="answersForOptionsDtos" value="${averageAnswerCountForOptions}" />
-									<%@ include file="teamsOptionResultsCell.jsp"%>
+									<c:set var="answerPercent" value="${averageAnswerCountForOptions[status.index].optionAnswerPercent[optionStatus.index]}" />
+									<%@ include file="teamsQuestionResultsCell.jsp"%>
 								</c:if>
 							</tr>
 						</c:forEach>

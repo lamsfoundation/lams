@@ -297,7 +297,8 @@ public class TblMonitoringController {
 		averageAnswers = new LinkedList<>();
 		model.addAttribute("averageAnswerCountForOptions", averageAnswers);
 
-		for (QbAnswersForOptionDTO iraDto : iraAnswers) {
+		for (int iraDtoIndex = 0; iraDtoIndex < iraAnswers.size(); iraDtoIndex++) {
+		    QbAnswersForOptionDTO iraDto = iraAnswers.get(iraDtoIndex);
 		    QbAnswersForOptionDTO averageDto = new QbAnswersForOptionDTO(iraDto.getQbQuestionUid(),
 			    iraDto.getDisplayOrder());
 		    averageAnswers.add(averageDto);
@@ -305,41 +306,37 @@ public class TblMonitoringController {
 		    // there can be no answers for iRAT yet
 		    boolean iraHasAnswers = iraDto.getCorrectAnswerPercent() >= 0;
 
-		    for (QbAnswersForOptionDTO traDto : traAnswers) {
-			if (traDto.getQbQuestionUid() == iraDto.getQbQuestionUid()) {
-			    boolean traHasAnswers = traDto.getCorrectAnswerPercent() >= 0;
-			    if (iraHasAnswers) {
-				if (traHasAnswers) {
-				    // both RATs have answers present, count average
-				    averageDto.setCorrectAnswerPercent(
-					    (iraDto.getCorrectAnswerPercent() + traDto.getCorrectAnswerPercent()) / 2);
-				} else {
-				    // just iRAT has answers
-				    averageDto.setCorrectAnswerPercent(iraDto.getCorrectAnswerPercent());
-				}
-			    } else if (traHasAnswers) {
-				// just tRAT has answers
-				averageDto.setCorrectAnswerPercent(traDto.getCorrectAnswerPercent());
-			    }
+		    QbAnswersForOptionDTO traDto = traAnswers.get(iraDtoIndex);
+		    boolean traHasAnswers = traDto.getCorrectAnswerPercent() >= 0;
+		    if (iraHasAnswers) {
+			if (traHasAnswers) {
+			    // both RATs have answers present, count average
+			    averageDto.setCorrectAnswerPercent(
+				    (iraDto.getCorrectAnswerPercent() + traDto.getCorrectAnswerPercent()) / 2);
+			} else {
+			    // just iRAT has answers
+			    averageDto.setCorrectAnswerPercent(iraDto.getCorrectAnswerPercent());
+			}
+		    } else if (traHasAnswers) {
+			// just tRAT has answers
+			averageDto.setCorrectAnswerPercent(traDto.getCorrectAnswerPercent());
+		    }
 
-			    // count average for each option
-			    for (Long qbOptionUid : iraDto.getOptionAnswerPercent().keySet()) {
-				int iraOptionAnswers = iraDto.getOptionAnswerPercent().get(qbOptionUid);
-				int traOptionAnswers = traDto.getOptionAnswerPercent().get(qbOptionUid);
+		    // count average for each option
+		    for (int optionIndex = 0; optionIndex < iraDto.getOptionAnswerPercent().size(); optionIndex++) {
+			int iraOptionAnswers = iraDto.getOptionAnswerPercent().get(optionIndex);
+			int traOptionAnswers = traDto.getOptionAnswerPercent().get(optionIndex);
 
-				if (iraHasAnswers) {
-				    if (traHasAnswers) {
-					averageDto.getOptionAnswerPercent().put(qbOptionUid,
-						(iraOptionAnswers + traOptionAnswers) / 2);
-				    } else {
-					averageDto.getOptionAnswerPercent().put(qbOptionUid, iraOptionAnswers);
-				    }
-				} else if (traHasAnswers) {
-				    averageDto.getOptionAnswerPercent().put(qbOptionUid, traOptionAnswers);
-				} else {
-				    averageDto.getOptionAnswerPercent().put(qbOptionUid, -1);
-				}
+			if (iraHasAnswers) {
+			    if (traHasAnswers) {
+				averageDto.getOptionAnswerPercent().add((iraOptionAnswers + traOptionAnswers) / 2);
+			    } else {
+				averageDto.getOptionAnswerPercent().add(iraOptionAnswers);
 			    }
+			} else if (traHasAnswers) {
+			    averageDto.getOptionAnswerPercent().add(traOptionAnswers);
+			} else {
+			    averageDto.getOptionAnswerPercent().add(-1);
 			}
 		    }
 		}
@@ -390,12 +387,12 @@ public class TblMonitoringController {
 	    questions.put(dto.getDisplayOrder(), question);
 	}
 
-	// sort remaining collections according to sor order
+	// sort remaining collections according to sort order
 	for (List<QbAnswersForOptionDTO> dtos : sortTargets) {
 	    List<QbAnswersForOptionDTO> sortedTarget = new LinkedList<>();
 	    for (QbAnswersForOptionDTO sourceDto : sortSource) {
 		for (QbAnswersForOptionDTO targetDto : dtos) {
-		    if (sourceDto.getQbQuestionUid() == targetDto.getQbQuestionUid()) {
+		    if (sourceDto.getDisplayOrder() == targetDto.getDisplayOrder()) {
 			sortedTarget.add(targetDto);
 			break;
 		    }
