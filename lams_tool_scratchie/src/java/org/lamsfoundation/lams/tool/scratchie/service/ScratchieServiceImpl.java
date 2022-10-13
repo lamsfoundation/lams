@@ -1116,7 +1116,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	QbOption correctAnswerGroup = ScratchieServiceImpl.isItemUnraveled(item, userLog.getAnswer());
 	if (correctAnswerGroup != null) {
 	    // link visit log to QB option
-	    if (userLog.getQbOption() == null || userLog.getQbOption().getUid().equals(correctAnswerGroup.getUid())) {
+	    if (userLog.getQbOption() == null || !userLog.getQbOption().getUid().equals(correctAnswerGroup.getUid())) {
 		userLog.setQbOption(correctAnswerGroup);
 		scratchieAnswerVisitDao.update(userLog);
 	    }
