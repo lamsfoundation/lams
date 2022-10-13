@@ -70,17 +70,23 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    + "WHERE act.activity_id = :activityId AND tq.qb_question_uid = :qbQuestionUid GROUP BY user_id "
 	    + "HAVING opt IS NOT NULL AND user_id IS NOT NULL";
 
-    private static final String FIND_OPTION_ANSWER_COUNT_BY_QUESTION = "SELECT tq.qb_question_uid, o.uid AS qb_option_uid, o.max_mark = 1 AS is_correct, "
-	    + "SUM(IF(aa.uid IS NULL AND sa.uid IS NULL, 0, 1)) AS chosen_count "
-	    + "FROM lams_qb_tool_question AS tq JOIN lams_qb_option AS o USING (qb_question_uid) "
-	    + "LEFT JOIN lams_qb_tool_answer AS a ON a.tool_question_uid = tq.tool_question_uid AND (a.qb_option_uid IS NULL OR a.qb_option_uid = o.uid) "
+    private static final String FIND_OPTION_ANSWER_COUNT_BY_QUESTION = "SELECT tq.qb_question_uid, "
+	    + "IFNULL(a3.question_answer_count, 0) AS question_answer_count, o.uid AS qb_option_uid, o.max_mark = 1 AS is_correct, "
+	    + "SUM(IF(aa.uid IS NULL AND sa.uid IS NULL AND NOT (q.type = " + QbQuestion.TYPE_VERY_SHORT_ANSWERS
+	    + "    AND a.qb_option_uid IS NOT NULL AND o.max_mark = 1), 0, 1)) AS option_answer_count "
+	    + "FROM lams_qb_tool_question AS tq JOIN lams_qb_question AS q ON tq.qb_question_uid = q.uid "
+	    + "JOIN lams_qb_option AS o USING (qb_question_uid) "
+	    + "LEFT JOIN lams_qb_tool_answer AS a ON a.tool_question_uid = tq.tool_question_uid AND (a.qb_option_uid = o.uid OR q.type <> "
+	    + QbQuestion.TYPE_VERY_SHORT_ANSWERS + ") "
 	    + "LEFT JOIN tl_laasse10_question_result AS aq ON a.answer_uid = aq.uid "
 	    + "LEFT JOIN tl_laasse10_option_answer AS aa ON aa.question_result_uid = aq.uid AND aa.question_option_uid = o.uid AND aa.answer_boolean = 1 "
 	    + "LEFT JOIN tl_laasse10_assessment_result AS ar ON aq.result_uid = ar.uid AND ar.latest = 1 "
 	    + "LEFT JOIN tl_lascrt11_answer_log AS sa ON a.answer_uid = sa.uid AND a.answer_uid = "
-	    + "   (SELECT sa2.uid FROM tl_lascrt11_answer_log AS sa2 JOIN lams_qb_tool_answer AS a2 "
-	    + "	   ON a2.answer_uid = sa2.uid AND a2.tool_question_uid = a.tool_question_uid AND sa2.session_id = sa.session_id "
+	    + "(SELECT sa2.uid FROM tl_lascrt11_answer_log AS sa2 JOIN lams_qb_tool_answer AS a2 "
+	    + "    ON a2.answer_uid = sa2.uid AND a2.tool_question_uid = a.tool_question_uid AND sa2.session_id = sa.session_id "
 	    + "    ORDER BY sa2.access_date, sa2.uid LIMIT 1) "
+	    + "LEFT JOIN (SELECT tool_question_uid, COUNT(*) AS question_answer_count FROM lams_qb_tool_answer GROUP BY tool_question_uid) AS a3 "
+	    + "    ON tq.tool_question_uid = a3.tool_question_uid "
 	    + "WHERE tq.tool_content_id = :toolContentId GROUP BY o.uid ORDER BY tq.display_order, o.display_order";
 
     private static final String FIND_BURNING_QUESTIONS = "SELECT b.question, COUNT(bl.uid) FROM ScratchieBurningQuestion b LEFT OUTER JOIN "
@@ -432,21 +438,24 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 		.setParameter("toolContentId", toolContentId).list();
 	List<QbAnswersForOptionDTO> dtos = new LinkedList<>();
 	Map<Long, Map<Long, Integer>> questionsToOptionsMap = new LinkedHashMap<>();
+	Map<Long, Integer> questionsToQuestionCountMap = new HashMap<>();
 	// it contains all UID of correct answers
 	Set<Long> correctOptionUids = new HashSet<>();
 
 	// build a map of question ID -> option ID -> answer count
 	for (Object[] answerEntry : result) {
 	    Long qbQuestionUid = ((Number) answerEntry[0]).longValue();
+
 	    Map<Long, Integer> answersForOptions = questionsToOptionsMap.get(qbQuestionUid);
 	    if (answersForOptions == null) {
 		answersForOptions = new LinkedHashMap<>();
 		questionsToOptionsMap.put(qbQuestionUid, answersForOptions);
+		questionsToQuestionCountMap.put(qbQuestionUid, ((Number) answerEntry[1]).intValue());
 	    }
-	    Long qbOptionUid = ((Number) answerEntry[1]).longValue();
-	    answersForOptions.put(qbOptionUid, ((Number) answerEntry[3]).intValue());
+	    Long qbOptionUid = ((Number) answerEntry[2]).longValue();
+	    answersForOptions.put(qbOptionUid, ((Number) answerEntry[4]).intValue());
 
-	    boolean isCorrect = ((Number) answerEntry[2]).intValue() == 1;
+	    boolean isCorrect = ((Number) answerEntry[3]).intValue() == 1;
 	    if (isCorrect) {
 		correctOptionUids.add(qbOptionUid);
 	    }
@@ -455,8 +464,9 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	// calculate answer percentage for question and all options
 	int displayOrder = 1;
 	for (Entry<Long, Map<Long, Integer>> questionToOptionEntry : questionsToOptionsMap.entrySet()) {
-	    double totalAnswers = questionToOptionEntry.getValue().values().stream().mapToInt(Integer::intValue).sum();
-	    QbAnswersForOptionDTO dto = new QbAnswersForOptionDTO(questionToOptionEntry.getKey(), displayOrder++);
+	    long qbQuestionUid = questionToOptionEntry.getKey();
+	    double totalAnswers = questionsToQuestionCountMap.get(qbQuestionUid);
+	    QbAnswersForOptionDTO dto = new QbAnswersForOptionDTO(qbQuestionUid, displayOrder++);
 	    dtos.add(dto);
 
 	    for (Entry<Long, Integer> answersForOptionEntry : questionToOptionEntry.getValue().entrySet()) {

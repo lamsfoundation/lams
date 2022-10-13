@@ -449,7 +449,7 @@ public class LearningController {
 	}
 
 	// return whether option is correct or not
-	boolean isAnswerCorrect = ScratchieServiceImpl.isItemUnraveledByAnswers(item, List.of(answer));
+	boolean isAnswerCorrect = ScratchieServiceImpl.isItemUnraveled(item, answer) != null;
 
 	// return whether such answer was already logged (and also the answer hash which was logged previously)
 	int loggedAnswerHash = -1;

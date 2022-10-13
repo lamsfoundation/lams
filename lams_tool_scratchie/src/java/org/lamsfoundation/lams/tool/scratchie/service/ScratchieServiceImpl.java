@@ -693,8 +693,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    }
 
 	    int numberOfAttempts = ScratchieServiceImpl.getNumberAttemptsForItem(item, visitLogs);
-	    boolean isUnraveledOnFirstAttempt = (numberOfAttempts == 1)
-		    && ScratchieServiceImpl.isItemUnraveled(item, logs);
+	    boolean isUnraveledOnFirstAttempt = (numberOfAttempts == 1) && isItemUnraveled(item, logs);
 	    if (isUnraveledOnFirstAttempt) {
 		count++;
 	    }
@@ -958,7 +957,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		optionDto.setScratched(isScratched);
 	    }
 
-	    boolean isItemUnraveled = ScratchieServiceImpl.isItemUnraveled(item, userLogs);
+	    boolean isItemUnraveled = isItemUnraveled(item, userLogs);
 	    item.setUnraveled(isItemUnraveled);
 	}
 
@@ -1045,7 +1044,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 			String answer = userLog.getAnswer();
 			optionDto.setAnswer(answer);
 			optionDto.setDisplayOrder(-200);
-			boolean isCorrect = ScratchieServiceImpl.isItemUnraveledByAnswers(item, List.of(answer));
+			boolean isCorrect = isItemUnraveled(item, userLog);
 			optionDto.setCorrect(isCorrect);
 			optionDto.setUserId(leader.getUserId());
 			item.getOptionDtos().add(optionDto);
@@ -1075,7 +1074,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
      *            uses logs from it (The main reason to have this parameter is to reduce number of queries to DB)
      * @return
      */
-    private static boolean isItemUnraveled(ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs) {
+    private boolean isItemUnraveled(ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs) {
 	boolean isItemUnraveled = false;
 
 	if (QbQuestion.TYPE_MULTIPLE_CHOICE == item.getQbQuestion().getType()
@@ -1098,21 +1097,35 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	    //VSA question
 	} else {
-	    List<String> userAnswers = new ArrayList<>();
 	    for (ScratchieAnswerVisitLog userLog : userLogs) {
 		if (userLog.getQbToolQuestion().getUid().equals(item.getUid())
 			&& StringUtils.isNotBlank(userLog.getAnswer())) {
-		    userAnswers.add(userLog.getAnswer());
+		    isItemUnraveled = isItemUnraveled(item, userLog);
+		    if (isItemUnraveled) {
+			break;
+		    }
 		}
 	    }
 
-	    isItemUnraveled = ScratchieServiceImpl.isItemUnraveledByAnswers(item, userAnswers);
 	}
 
 	return isItemUnraveled;
     }
 
-    public static boolean isItemUnraveledByAnswers(ScratchieItem item, List<String> userAnswers) {
+    private boolean isItemUnraveled(ScratchieItem item, ScratchieAnswerVisitLog userLog) {
+	QbOption correctAnswerGroup = ScratchieServiceImpl.isItemUnraveled(item, userLog.getAnswer());
+	if (correctAnswerGroup != null) {
+	    // link visit log to QB option
+	    if (userLog.getQbOption() == null || userLog.getQbOption().getUid().equals(correctAnswerGroup.getUid())) {
+		userLog.setQbOption(correctAnswerGroup);
+		scratchieAnswerVisitDao.update(userLog);
+	    }
+	    return true;
+	}
+	return false;
+    }
+
+    public static QbOption isItemUnraveled(ScratchieItem item, String userAnswer) {
 	QbQuestion qbQuestion = item.getQbQuestion();
 
 	QbOption correctAnswersGroup = null;
@@ -1124,24 +1137,22 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		break;
 	    }
 	    // if the option has the highest grade, it is considered the correct one
-	    if (correctAnswersGroup == null ? option.getMaxMark() > 0 : option.getMaxMark() > correctAnswersGroup.getMaxMark()) {
+	    if (correctAnswersGroup == null ? option.getMaxMark() > 0
+		    : option.getMaxMark() > correctAnswersGroup.getMaxMark()) {
 		correctAnswersGroup = option;
 	    }
 	}
 	if (correctAnswersGroup == null) {
-	    return false;
+	    return null;
 	}
-		
-	
+
 	String name = correctAnswersGroup.getName();
-	for (String userAnswer : userAnswers) {
-	    String normalisedQuestionAnswer = QbUtils.normaliseVSAnswer(userAnswer, qbQuestion.isExactMatch());
-	    if (QbUtils.isVSAnswerAllocated(name, normalisedQuestionAnswer, qbQuestion.isCaseSensitive(),
-		    qbQuestion.isExactMatch())) {
-		return true;
-	    }
+	String normalisedQuestionAnswer = QbUtils.normaliseVSAnswer(userAnswer, qbQuestion.isExactMatch());
+	if (QbUtils.isVSAnswerAllocated(name, normalisedQuestionAnswer, qbQuestion.isCaseSensitive(),
+		qbQuestion.isExactMatch())) {
+	    return correctAnswersGroup;
 	}
-	return false;
+	return null;
     }
 
     @Override
@@ -1153,7 +1164,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    // get lowest mark by default
 	    int mark = Integer.parseInt(presetMarks[presetMarks.length - 1]);
 	    // add mark only if an item was unravelled
-	    if (ScratchieServiceImpl.isItemUnraveled(item, userLogs)) {
+	    if (isItemUnraveled(item, userLogs)) {
 		int itemAttempts = ScratchieServiceImpl.getNumberAttemptsForItem(item, userLogs);
 		String markStr = (itemAttempts <= presetMarks.length) ? presetMarks[itemAttempts - 1]
 			: presetMarks[presetMarks.length - 1];
@@ -1233,8 +1244,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 			optionUid = attempt.getQbOption().getUid();
 
 		    } else {
-			String answer = attempt.getAnswer();
-			boolean isCorrect = ScratchieServiceImpl.isItemUnraveledByAnswers(item, List.of(answer));
+			boolean isCorrect = isItemUnraveled(item, attempt);
 			boolean isFirstAnswersGroupCorrect = options.get(0).isCorrect();
 
 			optionUid = isCorrect && isFirstAnswersGroupCorrect || !isCorrect && !isFirstAnswersGroupCorrect
@@ -2255,8 +2265,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		    // for displaying purposes if there is no attemps we assign -1 which will be shown as "-"
 		    mark = numberOfAttempts == 0 ? -1 : item.getMark();
 
-		    isUnraveledOnFirstAttempt = numberOfAttempts == 1
-			    && ScratchieServiceImpl.isItemUnraveled(item, logs);
+		    isUnraveledOnFirstAttempt = numberOfAttempts == 1 && isItemUnraveled(item, logs);
 
 		    // find out options' sequential letters - A,B,C...
 		    for (ScratchieAnswerVisitLog visitLog : visitLogs) {
@@ -2275,8 +2284,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 			    }
 
 			} else {
-			    String answer = visitLog.getAnswer();
-			    boolean isCorrect = ScratchieServiceImpl.isItemUnraveledByAnswers(item, List.of(answer));
+			    boolean isCorrect = isItemUnraveled(item, visitLog);
 			    boolean isFirstAnswersGroupCorrect = qbQuestion.getQbOptions().get(0).isCorrect();
 
 			    sequencialLetter = isCorrect && isFirstAnswersGroupCorrect
