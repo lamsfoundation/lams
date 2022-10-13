@@ -3205,6 +3205,8 @@ GeneralLib = {
 			}
 		}
 		
+		ActivityLib.removeSelectEffect();
+		
 		$.ajax({
 			type : 'POST',
 			url : LAMS_URL + 'authoring/saveLearningDesignImage.do',
