@@ -265,6 +265,11 @@ public interface IIntegrationService {
 	    String firstName, String lastName, String email, String extCourseId, String countryIsoCode,
 	    String langIsoCode, boolean usePrefix) throws UserInfoFetchException, UserInfoValidationException;
 
+    ExtUserUseridMap addExtUserToCourseAndLesson(ExtServer extServer, String method, Long lesssonId, String username,
+	    String firstName, String lastName, String email, String extCourseId, String prettyCourseName,
+	    String countryIsoCode, String langIsoCode, boolean usePrefix)
+	    throws UserInfoFetchException, UserInfoValidationException;
+
     /**
      * Creates an external org and normal org. It does not set roles for the creator.
      */

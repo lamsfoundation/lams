@@ -921,6 +921,13 @@ public class IntegrationService implements IIntegrationService {
     public ExtUserUseridMap addExtUserToCourse(ExtServer extServer, String method, String username, String firstName,
 	    String lastName, String email, String extCourseId, String countryIsoCode, String langIsoCode,
 	    boolean usePrefix) throws UserInfoFetchException, UserInfoValidationException {
+	return addExtUserToCourse(extServer, method, username, firstName, lastName, email, extCourseId, null,
+		countryIsoCode, langIsoCode, usePrefix);
+    }
+
+    private ExtUserUseridMap addExtUserToCourse(ExtServer extServer, String method, String username, String firstName,
+	    String lastName, String email, String extCourseId, String prettyCourseName, String countryIsoCode,
+	    String langIsoCode, boolean usePrefix) throws UserInfoFetchException, UserInfoValidationException {
 
 	if (log.isDebugEnabled()) {
 	    log.debug("Adding user '" + username + "' as " + method + " to course with extCourseId '" + extCourseId
@@ -937,7 +944,7 @@ public class IntegrationService implements IIntegrationService {
 	}
 
 	// adds user to group
-	getExtCourseClassMap(extServer, userMap, extCourseId, null, method);
+	getExtCourseClassMap(extServer, userMap, extCourseId, prettyCourseName, method);
 
 	return userMap;
     }
@@ -946,13 +953,22 @@ public class IntegrationService implements IIntegrationService {
     public ExtUserUseridMap addExtUserToCourseAndLesson(ExtServer extServer, String method, Long lesssonId,
 	    String username, String firstName, String lastName, String email, String extCourseId, String countryIsoCode,
 	    String langIsoCode, boolean usePrefix) throws UserInfoFetchException, UserInfoValidationException {
+	return addExtUserToCourseAndLesson(extServer, method, lesssonId, username, firstName, lastName, email,
+		extCourseId, null, countryIsoCode, langIsoCode, usePrefix);
+    }
+
+    @Override
+    public ExtUserUseridMap addExtUserToCourseAndLesson(ExtServer extServer, String method, Long lesssonId,
+	    String username, String firstName, String lastName, String email, String extCourseId,
+	    String prettyCourseName, String countryIsoCode, String langIsoCode, boolean usePrefix)
+	    throws UserInfoFetchException, UserInfoValidationException {
 
 	if (log.isDebugEnabled()) {
 	    log.debug("Adding user '" + username + "' as " + method + " to lesson with id '" + lesssonId + "'.");
 	}
 
 	ExtUserUseridMap userMap = addExtUserToCourse(extServer, method, username, firstName, lastName, email,
-		extCourseId, countryIsoCode, langIsoCode, usePrefix);
+		extCourseId, prettyCourseName, countryIsoCode, langIsoCode, usePrefix);
 
 	User user = userMap.getUser();
 	if (user == null) {
