@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.web.dto.UserBean;
 import org.lamsfoundation.lams.admin.web.form.UserOrgRoleForm;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -78,6 +79,7 @@ public class UserOrgRoleSaveController {
 	request.setAttribute("org", orgId);
 	request.getSession().removeAttribute("userOrgRoleForm");
 
+	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, orgId);
 	// save UserOrganisation memberships, and the associated roles;
 	// for subgroups, if user is not a member of the parent group then add to that as well.
 	for (int i = 0; i < userBeans.size(); i++) {
@@ -95,7 +97,7 @@ public class UserOrgRoleSaveController {
 	    }
 	    userManagementService.setRolesForUserOrganisation(user, orgId, Arrays.asList(roleIds));
 
-	    auditLog(orgId, user.getUserId(), roleIds);
+	    auditLog(organisation, user.getUserId(), roleIds);
 
 	    // FMALIKOFF 5/7/7 Commented out the following code that set the roles in the course if the current org is a class, as the logic
 	    // is done in service.setRolesForUserOrganisation()
@@ -108,11 +110,14 @@ public class UserOrgRoleSaveController {
 	return "redirect:/usermanage.do?org=" + orgId;
     }
 
-    private void auditLog(Integer organisationId, Integer userId, String[] roleIds) {
+    private void auditLog(Organisation organisation, Integer userId, String[] roleIds) {
 	List<String> roles = Stream.of(roleIds).collect(Collectors
 		.mapping(roleId -> Role.ROLE_MAP.get(Integer.valueOf(roleId)), Collectors.toUnmodifiableList()));
-	StringBuilder auditLogMessage = new StringBuilder("assigned to user ").append(userId).append(" roles ")
-		.append(roles).append(" in organisation ").append(organisationId);
-	AuditLogFilter.log(auditLogMessage);
+	User targetUser = userManagementService.getUserById(userId);
+	StringBuilder auditLogMessage = new StringBuilder("assigned to user ").append(targetUser.getFirstName())
+		.append(" ").append(targetUser.getLastName()).append(" (").append(targetUser.getLogin())
+		.append(") roles ").append(roles).append(" in organisation \"").append(organisation.getName())
+		.append("\"");
+	AuditLogFilter.log(AuditLogFilter.ROLE_ADD_ACTION, auditLogMessage);
     }
 }

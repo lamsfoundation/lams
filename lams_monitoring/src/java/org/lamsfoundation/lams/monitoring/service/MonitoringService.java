@@ -117,6 +117,7 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.excel.ExcelRow;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.quartz.JobBuilder;
@@ -2837,6 +2838,11 @@ public class MonitoringService implements IMonitoringFullService {
 		    // start lesson; passing creatorId as this parameter is only used for security check whether user is allowed to start a lesson
 		    this.startLesson(newLesson.getLessonId(), creatorId);
 
+		    StringBuilder logMessageBuilder = new StringBuilder("cloned lesson \"")
+			    .append(lesson.getLessonName()).append("\" from organisation \"")
+			    .append(lesson.getOrganisation().getName()).append("\" to \"").append(group.getName())
+			    .append("\"");
+		    AuditLogFilter.log(AuditLogFilter.LESSON_CLONE_ACTION, logMessageBuilder);
 		} else {
 		    throw new MonitoringServiceException("No learners specified, can't create any Lessons.");
 		}

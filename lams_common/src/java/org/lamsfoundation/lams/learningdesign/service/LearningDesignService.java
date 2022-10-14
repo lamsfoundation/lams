@@ -62,6 +62,7 @@ import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.ILoadedMessageSourceService;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 
@@ -172,6 +173,9 @@ public class LearningDesignService implements ILearningDesignService {
 	LearningLibrary library = learningLibraryDAO.getLearningLibraryById(learningLibraryId);
 	library.setValidLibrary(valid);
 	learningLibraryDAO.update(library);
+
+	AuditLogFilter.log(valid ? AuditLogFilter.TOOL_ENABLED_ACTION : AuditLogFilter.TOOL_DISABLE_ACTION,
+		"tool name: " + library.getTitle());
     }
 
     @Override
