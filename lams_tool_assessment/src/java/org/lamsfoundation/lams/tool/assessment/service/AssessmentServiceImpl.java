@@ -368,13 +368,25 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
+    public List<AssessmentUserDTO> getPagedUsersByContentId(Long contentId, int page, int size, String sortBy,
+	    String sortOrder, String searchString) {
+	return assessmentUserDao.getPagedUsersByContentId(contentId, page, size, sortBy, sortOrder, searchString,
+		userManagementService);
+    }
+
+    @Override
     public int getCountUsersBySession(Long sessionId, String searchString) {
 	return assessmentUserDao.getCountUsersBySession(sessionId, searchString);
     }
 
     @Override
     public int getCountUsersByContentId(Long contentId) {
-	return assessmentUserDao.getCountUsersByContentId(contentId);
+	return getCountUsersByContentId(contentId, null);
+    }
+
+    @Override
+    public int getCountUsersByContentId(Long contentId, String searchString) {
+	return assessmentUserDao.getCountUsersByContentId(contentId, searchString);
     }
 
     /**

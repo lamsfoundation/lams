@@ -29,147 +29,12 @@
 		
 		initializePortraitPopover("<lams:LAMSURL />");
 		
-		<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
-		
-			jQuery("#list${sessionDto.sessionId}").jqGrid({
-			   	multiselect: false,
-				datatype: "json",
-				url: "<c:url value="/monitoring/getUsers.do"/>?sessionMapID=${sessionMapID}&sessionId=${sessionDto.sessionId}",
-				height: '100%',
-				autowidth: true,
-				shrinkToFit: false,
-			    pager: 'listPager${sessionDto.sessionId}',
-			    rowList:[10,20,30,40,50,100],
-			    rowNum:10,
-			    viewrecords:true,
-				guiStyle: "bootstrap",
-				iconSet: 'fontAwesome',
-			   	colNames:[
-				   	'userId',
-					'sessionId',
-					"<fmt:message key="label.monitoring.summary.user.name" />",
-					"<fmt:message key="label.monitoring.summary.total" />",
-					'portraitId'
-				],
-			   	colModel:[
-			   		{name:'userId', index:'userId', width:0, hidden: true},
-			   		{name:'sessionId', index:'sessionId', width:0, hidden: true},
-			   		{name:'userName', index:'userName', width:570, searchoptions: { clearSearch: false }, formatter:userNameFormatter},
-			   		{name:'total', index:'total', width:174, align:"right", formatter:'number', search:false},
-			   		{name:'portraitId', index:'portraitId', width:0, hidden: true},
-			   	],
-			   	ondblClickRow: function(rowid) {
-			   		var userId = jQuery("#list${sessionDto.sessionId}").getCell(rowid, 'userId');
-			   		var sessionId = jQuery("#list${sessionDto.sessionId}").getCell(rowid, 'sessionId');
-					var userSummaryUrl = '<c:url value="/monitoring/userSummary.do?sessionMapID=${sessionMapID}"/>';
-					var newUserSummaryHref = userSummaryUrl + "&userID=" + userId + "&sessionId=" + sessionId + "&KeepThis=true&TB_iframe=true&modal=true";
-					$("#userSummaryHref").attr("href", newUserSummaryHref);	
-					$("#userSummaryHref").click(); 		
-			  	},
-			  	onSelectRow: function(rowid) { 
-			  	    if(rowid == null) { 
-			  	    	rowid=0; 
-			  	    } 
-			   		var userId = jQuery("#list${sessionDto.sessionId}").getCell(rowid, 'userId');
-			   		var sessionId = jQuery("#list${sessionDto.sessionId}").getCell(rowid, 'sessionId');
-					var userMasterDetailUrl = '<c:url value="/monitoring/userMasterDetail.do"/>';
-		  	        jQuery("#userSummary${sessionDto.sessionId}").clearGridData().setGridParam({gridstate: "visible"}).trigger("reloadGrid");
-		  	        $("#masterDetailArea").load(
-		  	        	userMasterDetailUrl,
-		  	        	{
-		  	        		userID: userId,
-		  	        		sessionId: sessionId,
-		  	        		sessionMapID: '${sessionMapID}'
-		  	       		}
-		  	       	);    
-	  	  		},
-			    loadError: function(xhr,st,err) {
-			    	jQuery("#list${sessionDto.sessionId}").clearGridData();
-			    	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.loaderror"/>", "<fmt:message key="label.ok"/>");
-			    },
-			    loadComplete: function () {
-			   	 	initializePortraitPopover('<lams:LAMSURL/>');
-			    },
-
-			})
-			<c:if test="${!sessionMap.assessment.useSelectLeaderToolOuput}">
-				.jqGrid('filterToolbar', { 
-					searchOnEnter: false
-				})
-			</c:if>
-			.navGrid("#listPager${sessionDto.sessionId}", {edit:false,add:false,del:false,search:false});
-	        
-	        var oldValue = 0;
-			jQuery("#userSummary${sessionDto.sessionId}").jqGrid({
-				datatype: "local",
-				autoencode:false,
-				rowNum: 10000,
-				gridstate:"hidden",
-				height: 180,
-				autowidth: true,
-				shrinkToFit: false,
-				guiStyle: "bootstrap",
-				iconSet: 'fontAwesome',
-			   	colNames:[
-				   	'#',
-					'questionResultUid',
-  					'Question',
-  					"<fmt:message key="label.authoring.basic.list.header.mark" />",
-  					<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
-  						"<fmt:message key="label.confidence" />",
-  					</c:if>
-  					"<fmt:message key="label.monitoring.user.summary.response" />"
-  				], 
-			   	colModel:[
-	  			   	{name:'id', index:'id', width:20, sorttype:"int"},
-	  			   	{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
-	  			   	{name:'title', index:'title', width: 200},
-	  			    {name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' },
-	  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
-	  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align', formatter: gradientNumberFormatter},
-	  			  	</c:if>
-	  			  	{name:'response', index:'response', datatype:'html', width:443, sortable:false}
-			   	],
-			   	multiselect: false,
-
-				cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>&<csrf:token/>',
-  				cellEdit: true,
-  				afterEditCell: function (rowid,name,val,iRow,iCol){
-  					oldValue = eval(val);
-				},
-				beforeSaveCell : function(rowid, name, val, iRow, iCol) {
-					if (isNaN(val)) {
-  						return null;
-  					}
-					
-					// get maxGrade attribute which was set in masterDetailLoadUp.jsp
-					var maxGrade = jQuery("table#userSummary${sessionDto.sessionId} tr#" + iRow 
-							              + " td[aria-describedby$='_" + name + "']").attr("maxGrade");
-					if (+val > +maxGrade) {
-						return maxGrade;
-					}
-				},
-  				afterSaveCell : function (rowid,name,val,iRow,iCol){
-  					if (isNaN(val)) {
-  						jQuery("#userSummary${sessionDto.sessionId}").restoreCell(iRow,iCol); 
-  					} else {
-  						var parentSelectedRowId = jQuery("#list${sessionDto.sessionId}").getGridParam("selrow");
-  						var previousTotal =  eval(jQuery("#list${sessionDto.sessionId}").getCell(parentSelectedRowId, 'total'));
-  						jQuery("#list${sessionDto.sessionId}").setCell(parentSelectedRowId, 'total', previousTotal - oldValue + eval(val), {}, {});
-  					}
-				},	  		
-  				beforeSubmitCell : function (rowid,name,val,iRow,iCol){
-  					if (isNaN(val)) {
-  						return {nan:true};
-  					} else {
-  						var questionResultUid = jQuery("#userSummary${sessionDto.sessionId}").getCell(rowid, 'questionResultUid');
-  						return {questionResultUid:questionResultUid};		  				  		
-  				  	}
-  				}
-			});
-			
+		<c:forEach var="sessionDto" items="${sessionDtos}">
+			buildJqgridLearnerTable(${sessionDto.sessionId});
 		</c:forEach>
-
+		<c:if test="${sessionMap.isGroupedActivity}">
+			buildJqgridLearnerTable('-all-learners');
+		</c:if>
 
 		
 		//jqgrid autowidth (http://stackoverflow.com/a/1610197)
@@ -189,6 +54,150 @@
 
 		$('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');
 	});
+
+	function buildJqgridLearnerTable(sessionId) {
+		jQuery("#list" + sessionId).data('sessionId', sessionId).jqGrid({
+		   	multiselect: false,
+			datatype: "json",
+			url: "<c:url value="/monitoring/getUsers.do"/>?sessionMapID=${sessionMapID}"
+				 + (sessionId === '-all-learners' ? "" : "&sessionId=" + sessionId),
+			height: '100%',
+			autowidth: true,
+			shrinkToFit: false,
+		    pager: 'listPager' + sessionId,
+		    rowList:[10,20,30,40,50,100],
+		    rowNum:10,
+		    viewrecords:true,
+			guiStyle: "bootstrap",
+			iconSet: 'fontAwesome',
+		   	colNames:[
+			   	'userId',
+				'sessionId',
+				"<fmt:message key="label.monitoring.summary.user.name" />",
+				"<fmt:message key="label.monitoring.summary.total" />",
+				'portraitId'
+			],
+		   	colModel:[
+		   		{name:'userId', index:'userId', width:0, hidden: true},
+		   		{name:'sessionId', index:'sessionId', width:0, hidden: true},
+		   		{name:'userName', index:'userName', width:570, searchoptions: { clearSearch: false }, formatter:userNameFormatter},
+		   		{name:'total', index:'total', width:174, align:"right", formatter:'number', search:false},
+		   		{name:'portraitId', index:'portraitId', width:0, hidden: true},
+		   	],
+		   	ondblClickRow: function(rowid) {
+			   	var sessionId = $(this).data('sessionId');
+		   		var userId = jQuery("#list" + sessionId).getCell(rowid, 'userId');
+		   		var sessionId = jQuery("#list" + sessionId).getCell(rowid, 'sessionId');
+				var userSummaryUrl = '<c:url value="/monitoring/userSummary.do?sessionMapID=${sessionMapID}"/>';
+				var newUserSummaryHref = userSummaryUrl + "&userID=" + userId + "&sessionId=" + sessionId + "&KeepThis=true&TB_iframe=true&modal=true";
+				$("#userSummaryHref").attr("href", newUserSummaryHref);	
+				$("#userSummaryHref").click(); 		
+		  	},
+		  	onSelectRow: function(rowid) { 
+		  	    if(rowid == null) { 
+		  	    	rowid=0; 
+		  	    } 
+		  	    var tableName = $(this).data('sessionId');
+		   		var sessionId = jQuery("#list" + tableName).getCell(rowid, 'sessionId');
+		   		var userId = jQuery("#list" + tableName).getCell(rowid, 'userId');
+				var userMasterDetailUrl = '<c:url value="/monitoring/userMasterDetail.do"/>';
+	  	        jQuery("#userSummary" + tableName).clearGridData().setGridParam({gridstate: "visible"}).trigger("reloadGrid");
+	  	        $("#masterDetailArea").load(
+	  	        	userMasterDetailUrl,
+	  	        	{
+	  	        		userID: userId,
+	  	        		sessionId: sessionId,
+	  	        		tableName: tableName,
+	  	        		sessionMapID: '${sessionMapID}'
+	  	       		}
+	  	       	);    
+  	  		},
+		    loadError: function(xhr,st,err) {
+		    	var sessionId = $(this).data('sessionId');
+		    	jQuery("#list" + sessionId).clearGridData();
+		    	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.loaderror"/>", "<fmt:message key="label.ok"/>");
+		    },
+		    loadComplete: function () {
+		   	 	initializePortraitPopover('<lams:LAMSURL/>');
+		    },
+
+		})
+		<c:if test="${!sessionMap.assessment.useSelectLeaderToolOuput}">
+			.jqGrid('filterToolbar', { 
+				searchOnEnter: false
+			})
+		</c:if>
+		.navGrid("#listPager" + sessionId, {edit:false,add:false,del:false,search:false});
+        
+        var oldValue = 0;
+		jQuery("#userSummary" + sessionId).jqGrid({
+			datatype: "local",
+			autoencode:false,
+			rowNum: 10000,
+			gridstate:"hidden",
+			height: 180,
+			autowidth: true,
+			shrinkToFit: false,
+			guiStyle: "bootstrap",
+			iconSet: 'fontAwesome',
+		   	colNames:[
+			   	'#',
+				'questionResultUid',
+					'Question',
+					"<fmt:message key="label.authoring.basic.list.header.mark" />",
+					<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
+						"<fmt:message key="label.confidence" />",
+					</c:if>
+					"<fmt:message key="label.monitoring.user.summary.response" />"
+				], 
+		   	colModel:[
+  			   	{name:'id', index:'id', width:20, sorttype:"int"},
+  			   	{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
+  			   	{name:'title', index:'title', width: 200},
+  			    {name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' },
+  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
+  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align', formatter: gradientNumberFormatter},
+  			  	</c:if>
+  			  	{name:'response', index:'response', datatype:'html', width:443, sortable:false}
+		   	],
+		   	multiselect: false,
+
+			cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>&<csrf:token/>',
+				cellEdit: true,
+				afterEditCell: function (rowid,name,val,iRow,iCol){
+					oldValue = eval(val);
+			},
+			beforeSaveCell : function(rowid, name, val, iRow, iCol) {
+				if (isNaN(val)) {
+						return null;
+					}
+				
+				// get maxGrade attribute which was set in masterDetailLoadUp.jsp
+				var maxGrade = jQuery("table#userSummary" + sessionId + " tr#" + iRow 
+						              + " td[aria-describedby$='_" + name + "']").attr("maxGrade");
+				if (+val > +maxGrade) {
+					return maxGrade;
+				}
+			},
+				afterSaveCell : function (rowid,name,val,iRow,iCol){
+					if (isNaN(val)) {
+						jQuery("#userSummary" + sessionId).restoreCell(iRow,iCol); 
+					} else {
+						var parentSelectedRowId = jQuery("#list" + sessionId).getGridParam("selrow");
+						var previousTotal =  eval(jQuery("#list" + sessionId).getCell(parentSelectedRowId, 'total'));
+						jQuery("#list" + sessionId).setCell(parentSelectedRowId, 'total', previousTotal - oldValue + eval(val), {}, {});
+					}
+			},	  		
+				beforeSubmitCell : function (rowid,name,val,iRow,iCol){
+					if (isNaN(val)) {
+						return {nan:true};
+					} else {
+						var questionResultUid = jQuery("#userSummary" + sessionId).getCell(rowid, 'questionResultUid');
+						return {questionResultUid:questionResultUid};		  				  		
+				  	}
+				}
+		});
+	}
 
 	function resizeJqgrid(jqgrids) {
 		jqgrids.each(function(index) {
@@ -299,9 +308,8 @@
 		<fmt:message key="label.monitoring.summary.double.click" />
 	</div>
 
-	<div id="masterDetailArea" class="voffset10">
-		<%@ include file="parts/masterDetailLoadUp.jsp"%>
-	</div>
+	<div id="masterDetailArea" class="voffset10"></div>
+	
 	<a onclick="" href="return false;" class="thickbox initially-hidden" id="userSummaryHref"></a>
 	
 	<c:if test="${sessionMap.isGroupedActivity}">
@@ -349,12 +357,31 @@
 		<c:if test="${sessionMap.isGroupedActivity}">
 			</div> <!-- end collapse area  -->
 			</div> <!-- end collapse panel  -->
+			<div class="voffset5">&nbsp;</div>
 		</c:if>
-		${ !sessionMap.isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
 
 	</c:forEach>
 		
 	<c:if test="${sessionMap.isGroupedActivity}">
+			<div class="panel panel-default" >
+		        <div class="panel-heading" id="heading-all-learners">
+		        	<span class="panel-title collapsable-icon-left">
+		        		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse-all-learners" 
+						   aria-expanded="false" aria-controls="collapse-all-learners" >
+							<fmt:message key="monitoring.label.all.learners" />
+						</a>
+					</span>
+		        </div>
+				<div id="collapse-all-learners" class="panel-collapse collapse" 
+			         role="tabpanel" aria-labelledby="heading-all-learners">
+			         
+					<table id="list-all-learners"></table>
+					<div class="voffset10"></div>
+					<table id="userSummary-all-learners"></table>
+					<div id="listPager-all-learners"></div>
+					
+			    </div>
+		    </div>
 		</div> <!--  end panel group -->
 	</c:if>	
 </c:if>

@@ -3,7 +3,7 @@
 
 <script type="text/javascript">
 	function masterDetailLoadUp(){
-		jQuery("#userSummary${assessmentResult.sessionId}").clearGridData().setGridParam({scrollOffset: 18});
+		jQuery("#userSummary${param.tableName}").clearGridData().setGridParam({scrollOffset: 18});
 
  	    <c:forEach var="questionResult" items="${assessmentResult.questionResults}" varStatus="i">
 	       	<c:set var="question" value="${questionResult.questionDto}"/>
@@ -13,7 +13,7 @@
  	        var responseStr = "";
  	       	<%@ include file="userresponse.jsp"%>
  	       		
- 	       	var table = jQuery("#userSummary${assessmentResult.sessionId}");
+ 	       	var table = jQuery("#userSummary${param.tableName}");
  	     	table.addRowData(${i.index + 1}, {
  	   	    	id:"${i.index + 1}",
  	   	   		questionResultUid:"${questionResult.uid}",

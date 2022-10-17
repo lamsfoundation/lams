@@ -27,6 +27,7 @@ public class AssessmentUserDTO {
     private String firstName;
     private String lastName;
     private String login;
+    private Long sessionId;
     private float grade;
     private boolean resultSubmitted;
 
@@ -55,6 +56,14 @@ public class AssessmentUserDTO {
 
     public void setLogin(String login) {
 	this.login = login;
+    }
+
+    public Long getSessionId() {
+	return sessionId;
+    }
+
+    public void setSessionId(Long sessionId) {
+	this.sessionId = sessionId;
     }
 
     public float getGrade() {

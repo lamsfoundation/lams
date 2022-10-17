@@ -110,9 +110,14 @@ public interface IAssessmentService extends ICommonToolService {
     List<AssessmentUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy, String sortOrder,
 	    String searchString);
 
+    List<AssessmentUserDTO> getPagedUsersByContentId(Long contentId, int page, int size, String sortBy,
+	    String sortOrder, String searchString);
+
     int getCountUsersBySession(Long sessionId, String searchString);
 
     int getCountUsersByContentId(Long contentId);
+    
+    int getCountUsersByContentId(Long contentId, String searchString);
 
     int getCountLessonLearnersByContentId(long contentId);
 

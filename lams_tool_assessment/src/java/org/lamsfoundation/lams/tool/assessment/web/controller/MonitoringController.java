@@ -400,7 +400,7 @@ public class MonitoringController {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 
-	Long sessionId = WebUtil.readLongParam(request, "sessionId");
+	Long sessionId = WebUtil.readLongParam(request, "sessionId", true);
 
 	// Getting the params passed in from the jqGrid
 	int page = WebUtil.readIntParam(request, CommonConstants.PARAM_PAGE);
@@ -414,6 +414,11 @@ public class MonitoringController {
 
 	List<AssessmentUserDTO> userDtos = new ArrayList<>();
 	int countSessionUsers = 0;
+	if (sessionId == null) {
+	    userDtos = service.getPagedUsersByContentId(assessment.getContentId(), page - 1, rowLimit, sortBy,
+		    sortOrder, searchString);
+	    countSessionUsers = service.getCountUsersByContentId(assessment.getContentId(), searchString);
+	} else
 	//in case of UseSelectLeaderToolOuput - display only one user
 	if (assessment.isUseSelectLeaderToolOuput()) {
 
@@ -450,7 +455,7 @@ public class MonitoringController {
 
 	    ArrayNode userData = JsonNodeFactory.instance.arrayNode();
 	    userData.add(userDto.getUserId());
-	    userData.add(sessionId);
+	    userData.add(userDto.getSessionId());
 	    String fullName = HtmlUtils.htmlEscape(userDto.getFirstName() + " " + userDto.getLastName());
 	    userData.add(fullName);
 	    userData.add(userDto.getGrade());
