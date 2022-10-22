@@ -72,6 +72,9 @@ public class SignupManagementController {
 		List<Organisation> organisations = signupService.getOrganisationCandidates();
 		request.setAttribute("organisations", organisations);
 
+		AuditLogFilter.log(AuditLogFilter.SIGNUP_PAGE_EDIT_ACTION,
+			"signup for organisation: " + signup.getOrganisation().getName());
+
 		return "signupmanagement/add";
 	    }
 	}
@@ -147,7 +150,7 @@ public class SignupManagementController {
 	    SignupOrganisation signupOrganisation = (SignupOrganisation) userManagementService
 		    .findById(SignupOrganisation.class, soid);
 
-	    AuditLogFilter.log(AuditLogFilter.SIGNUP_PAGE_ADD_ACTION,
+	    AuditLogFilter.log(AuditLogFilter.SIGNUP_PAGE_DELETE_ACTION,
 		    "signup for organisation: " + signupOrganisation.getOrganisation().getName());
 
 	    userManagementService.delete(signupOrganisation);

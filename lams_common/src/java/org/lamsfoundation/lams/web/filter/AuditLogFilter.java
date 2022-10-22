@@ -33,8 +33,11 @@ public class AuditLogFilter extends OncePerRequestFilter {
 
     public static final String CALL_ACTION = "endpoint_call";
     public static final String CONFIG_CHANGE_ACTION = "configuration_change";
+    public static final String LOGIN_PAGE_CHANGE_ACTION = "login_page_change";
     public static final String TIMEZONE_CHANGE_ACTION = "timezone_change";
     public static final String ACCOUNT_LOCKED_ACTION = "account_lock";
+    public static final String LOGIN_AS_ACTION = "login_as";
+    public static final String SESSION_DELETE_ACTION = "session_delete";
 
     public static final String TOOL_ENABLED_ACTION = "tool_enable_action";
     public static final String TOOL_DISABLE_ACTION = "tool_disable_action";
@@ -56,6 +59,7 @@ public class AuditLogFilter extends OncePerRequestFilter {
     public static final String ORGANISATION_EDIT_ACTION = "org_edit";
 
     public static final String LESSON_CLONE_ACTION = "lesson_clone";
+    public static final String LESSONS_CLONE_ACTION = "lessons_clone";
     public static final String LESSON_REMOVE_PERMAMENTLY_ACTION = "lesson_remove_perm";
 
     public static final String INTEGRATED_SERVER_ADD_ACTION = "integrated_server_add";
@@ -76,6 +80,7 @@ public class AuditLogFilter extends OncePerRequestFilter {
 
     public static final String SIGNUP_PAGE_ADD_ACTION = "signup_page_add";
     public static final String SIGNUP_PAGE_DELETE_ACTION = "signup_page_delete";
+    public static final String SIGNUP_PAGE_EDIT_ACTION = "signup_page_edit";
 
     @Override
     public final void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)

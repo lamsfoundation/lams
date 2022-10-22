@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.lamsfoundation.lams.admin.web.form.LoginMaintainForm;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,6 +62,8 @@ public class LoginSaveController {
 	    bWriter = new BufferedWriter(ow);
 	    bWriter.write(loginMaintainForm.getNews());
 	    bWriter.flush();
+
+	    AuditLogFilter.log(AuditLogFilter.LOGIN_PAGE_CHANGE_ACTION, "login page changed");
 	} finally {
 	    if (bWriter != null) {
 		bWriter.close();

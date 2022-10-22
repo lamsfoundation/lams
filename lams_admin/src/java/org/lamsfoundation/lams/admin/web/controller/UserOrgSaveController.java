@@ -195,7 +195,7 @@ public class UserOrgSaveController {
 	}
 	if (!removedUserIds.isEmpty()) {
 	    StringBuilder auditLogMessage = new StringBuilder();
-	    auditLogMessage.append("Removed users ").append(getUserNamesForLog(addedUserIds))
+	    auditLogMessage.append("Removed users ").append(getUserNamesForLog(removedUserIds))
 		    .append(" from organisation \"").append(organisation.getName()).append("\"");
 	    AuditLogFilter.log(AuditLogFilter.USER_UNENROLL_ACTION, auditLogMessage);
 	}
