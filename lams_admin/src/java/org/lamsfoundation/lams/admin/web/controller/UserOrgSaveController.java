@@ -205,7 +205,7 @@ public class UserOrgSaveController {
 	StringBuilder userNames = new StringBuilder();
 	for (Integer userId : userIds) {
 	    User user = userManagementService.getUserById(userId);
-	    userNames.append(user.getFirstName()).append(user.getFirstName()).append(" ").append(user.getLastName())
+	    userNames.append(user.getFirstName()).append(" ").append(user.getLastName())
 		    .append(" (").append(user.getLogin()).append("), ");
 	}
 	return userNames.delete(userNames.length() - 2, userNames.length()).toString();
