@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,7 +119,7 @@ public class UserSaveController {
 	UserDTO sysadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	log.debug("orgId: " + orgId);
-	Boolean edit = false;
+	boolean edit = false;
 	SupportedLocale locale = (SupportedLocale) userManagementService.findById(SupportedLocale.class,
 		userForm.getLocaleId());
 	AuthenticationMethod authenticationMethod = (AuthenticationMethod) userManagementService
@@ -198,6 +199,8 @@ public class UserSaveController {
 		user.setTheme(cssTheme);
 
 		userManagementService.saveUser(user);
+
+		AuditLogFilter.log(AuditLogFilter.USER_EDIT_ACTION, "user login: " + user.getLogin());
 	    } else { // create user
 
 		//password validation
@@ -240,12 +243,15 @@ public class UserSaveController {
 		    user.setTheme(theme);
 
 		    userManagementService.saveUser(user);
+
 		    userManagementService.updatePassword(user, password);
 
 		    // make 'create user' audit log entry
 		    userManagementService.logUserCreated(user, sysadmin);
 
 		    log.debug("user: " + user.toString());
+
+		    AuditLogFilter.log(AuditLogFilter.USER_ADD_ACTION, "user login: " + user.getLogin());
 		}
 	    }
 	}

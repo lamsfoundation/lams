@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -323,6 +324,7 @@ public class UserController {
 	String message = messageService.getMessage("audit.user.disable", args);
 	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, sysadmin != null ? sysadmin.getUserID() : null, userId,
 		null, null, message);
+
 	if ((orgId == null) || (orgId == 0)) {
 	    return "forward:../usersearch.do";
 	} else {
@@ -377,6 +379,8 @@ public class UserController {
 	log.debug("enabling user: " + userId);
 	user.setDisabledFlag(false);
 	userManagementService.saveUser(user);
+
+	AuditLogFilter.log(AuditLogFilter.USER_ENABLE_ACTION, "user login: " + user.getLogin());
 
 	return "forward:/disabledmanage.do";
     }

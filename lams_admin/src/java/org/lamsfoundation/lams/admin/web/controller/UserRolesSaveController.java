@@ -101,16 +101,18 @@ public class UserRolesSaveController {
 
 	userManagementService.setRolesForUserOrganisation(user, orgId, Arrays.asList(roles));
 
-	auditLog(orgId, userId, roles);
+	auditLog(org, userId, roles);
 
 	return "redirect:/usermanage.do?org=" + orgId;
     }
 
-    private void auditLog(Integer organisationId, Integer userId, String[] roleIds) {
+    private void auditLog(Organisation organisation, Integer userId, String[] roleIds) {
 	List<String> roles = Stream.of(roleIds).collect(Collectors
 		.mapping(roleId -> Role.ROLE_MAP.get(Integer.valueOf(roleId)), Collectors.toUnmodifiableList()));
-	StringBuilder auditLogMessage = new StringBuilder("assigned to user ").append(userId).append(" roles ")
-		.append(roles).append(" in organisation ").append(organisationId);
-	AuditLogFilter.log(auditLogMessage);
+	User targetUser = userManagementService.getUserById(userId);
+	StringBuilder auditLogMessage = new StringBuilder("to user ").append(targetUser.getFirstName()).append(" ")
+		.append(targetUser.getLastName()).append(" (").append(targetUser.getLogin()).append(") assigned roles ")
+		.append(roles).append(" in organisation \"").append(organisation.getName()).append("\"");
+	AuditLogFilter.log(AuditLogFilter.ROLE_ADD_ACTION, auditLogMessage);
     }
 }

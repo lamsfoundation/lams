@@ -62,7 +62,7 @@
 								&nbsp;
 								<c:choose>
 									<c:when test="${ltiConsumer.disabled}">
-                                        <csrf:form style="display: inline-block;" id="enable_${ltiConsumer.sid}" method="post" action="/lams/admin/ltiConsumerManagement/disable.do"><input type="hidden" name="sid" value="${ltiConsumer.sid}"/><input type="hidden" name="disable" value="false"/><input type="submit" class="btn btn-primary btn-xs" value="<fmt:message key="admin.enable" />"/></csrf:form>
+                                        <csrf:form style="display: inline-block;" id="enable_${ltiConsumer.sid}" method="post" action="/lams/admin/ltiConsumerManagement/enable.do"><input type="hidden" name="sid" value="${ltiConsumer.sid}"/><input type="hidden" name="disable" value="false"/><input type="submit" class="btn btn-primary btn-xs" value="<fmt:message key="admin.enable" />"/></csrf:form>
 									</c:when>
 									<c:otherwise>
                                         <csrf:form style="display: inline-block;" id="disable_${ltiConsumer.sid}" method="post" action="/lams/admin/ltiConsumerManagement/disable.do"><input type="hidden" name="sid" value="${ltiConsumer.sid}"/><input type="hidden" name="disable" value="true"/><input type="submit" class="btn btn-primary btn-xs" value="<fmt:message key="admin.disable" />"/></csrf:form>

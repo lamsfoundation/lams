@@ -23,6 +23,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -125,7 +126,23 @@ public class LtiConsumerManagementController {
 	ltiConsumer.setDisabled(disable);
 	integrationService.saveExtServer(ltiConsumer);
 
+	AuditLogFilter.log(AuditLogFilter.LTI_INTEGRATED_SERVER_DISABLE_ACTION,
+		"integrated server name: " + ltiConsumer.getServerid());
+
 	return start(request);
+    }
+
+    @RequestMapping(path = "/enable", method = RequestMethod.POST)
+    public String enable(HttpServletRequest request) throws Exception {
+	Integer sid = WebUtil.readIntParam(request, "sid", false);
+	ExtServer ltiConsumer = integrationService.getExtServer(sid);
+	ltiConsumer.setDisabled(false);
+	integrationService.saveExtServer(ltiConsumer);
+
+	AuditLogFilter.log(AuditLogFilter.LTI_INTEGRATED_SERVER_ENABLE_ACTION,
+		"LTI integrated server name: " + ltiConsumer.getServerid());
+
+	return "redirect:/extserver/serverlist.do";
     }
 
     /**
@@ -134,7 +151,12 @@ public class LtiConsumerManagementController {
     @RequestMapping(path = "/delete", method = RequestMethod.POST)
     public String delete(HttpServletRequest request) throws Exception {
 	Integer sid = WebUtil.readIntParam(request, "sid", true);
-	userManagementService.deleteById(ExtServer.class, sid);
+	ExtServer extServer = integrationService.getExtServer(sid);
+
+	AuditLogFilter.log(AuditLogFilter.LTI_INTEGRATED_SERVER_DELETE_ACTION,
+		"LTI integrated server name: " + extServer.getServerid());
+
+	userManagementService.delete(extServer);
 
 	return start(request);
     }
@@ -207,9 +229,14 @@ public class LtiConsumerManagementController {
 		ltiConsumer.setServerTypeId(ExtServer.LTI_CONSUMER_SERVER_TYPE);
 		ltiConsumer.setUserinfoUrl("blank");
 
+		AuditLogFilter.log(AuditLogFilter.LTI_INTEGRATED_SERVER_ADD_ACTION,
+			"LTI integrated server name: " + ltiConsumer.getServerid());
 	    } else {
 		ltiConsumer = integrationService.getExtServer(sid);
 		BeanUtils.copyProperties(ltiConsumer, ltiConsumerForm);
+
+		AuditLogFilter.log(AuditLogFilter.LTI_INTEGRATED_SERVER_EDIT_ACTION,
+			"LTI integrated server name: " + ltiConsumer.getServerid());
 	    }
 	    ltiConsumer.setTimeToLiveLoginRequestEnabled(false);
 

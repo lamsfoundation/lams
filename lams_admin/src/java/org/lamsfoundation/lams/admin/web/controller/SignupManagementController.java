@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -15,6 +14,7 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -72,6 +72,9 @@ public class SignupManagementController {
 		List<Organisation> organisations = signupService.getOrganisationCandidates();
 		request.setAttribute("organisations", organisations);
 
+		AuditLogFilter.log(AuditLogFilter.SIGNUP_PAGE_EDIT_ACTION,
+			"signup for organisation: " + signup.getOrganisation().getName());
+
 		return "signupmanagement/add";
 	    }
 	}
@@ -100,6 +103,8 @@ public class SignupManagementController {
 	    } else {
 		// proceed
 		SignupOrganisation signup;
+		Organisation organisation = (Organisation) userManagementService.findById(Organisation.class,
+			signupForm.getOrganisationId());
 		if (signupForm.getSignupOrganisationId() != null && signupForm.getSignupOrganisationId() > 0) {
 		    // form was editing existing
 		    signup = (SignupOrganisation) userManagementService.findById(SignupOrganisation.class,
@@ -107,6 +112,9 @@ public class SignupManagementController {
 		} else {
 		    signup = new SignupOrganisation();
 		    signup.setCreateDate(new Date());
+
+		    AuditLogFilter.log(AuditLogFilter.SIGNUP_PAGE_ADD_ACTION,
+			    "signup for organisation: " + organisation.getName());
 		}
 		signup.setAddToLessons(signupForm.isAddToLessons());
 		signup.setAddAsStaff(signupForm.isAddAsStaff());
@@ -115,8 +123,7 @@ public class SignupManagementController {
 		signup.setEmailVerify(signupForm.getEmailVerify());
 		signup.setDisabled(signupForm.isDisabled());
 		signup.setLoginTabActive(signupForm.isLoginTabActive());
-		signup.setOrganisation((Organisation) userManagementService.findById(Organisation.class,
-			signupForm.getOrganisationId()));
+		signup.setOrganisation(organisation);
 		signup.setCourseKey(signupForm.getCourseKey());
 		signup.setBlurb(signupForm.getBlurb());
 		signup.setContext(signupForm.getContext());
@@ -140,7 +147,13 @@ public class SignupManagementController {
 	Integer soid = WebUtil.readIntParam(request, "soid");
 
 	if (soid != null && soid > 0) {
-	    userManagementService.deleteById(SignupOrganisation.class, soid);
+	    SignupOrganisation signupOrganisation = (SignupOrganisation) userManagementService
+		    .findById(SignupOrganisation.class, soid);
+
+	    AuditLogFilter.log(AuditLogFilter.SIGNUP_PAGE_DELETE_ACTION,
+		    "signup for organisation: " + signupOrganisation.getOrganisation().getName());
+
+	    userManagementService.delete(signupOrganisation);
 	}
 
 	return "redirect:/signupManagement/start.do";

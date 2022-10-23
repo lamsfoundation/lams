@@ -36,6 +36,7 @@ import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -60,7 +61,7 @@ public class ExtServerManagementController {
     @Autowired
     @Qualifier("adminMessageService")
     private MessageService messageService;
-    
+
     @RequestMapping(path = "/serverlist")
     public String serverlist(HttpServletRequest request) throws Exception {
 	List<ExtServer> extServers = integrationService.getAllExtServers();
@@ -71,7 +72,7 @@ public class ExtServerManagementController {
 
     @RequestMapping(path = "/edit")
     public String edit(@ModelAttribute ExtServerForm extServerForm, HttpServletRequest request) throws Exception {
-	
+
 	Integer sid = WebUtil.readIntParam(request, "sid", true);
 	if (sid != null) {
 	    ExtServer map = integrationService.getExtServer(sid);
@@ -106,7 +107,7 @@ public class ExtServerManagementController {
 	    errorMap.add("userinfoUrl", messageService.getMessage("error.required",
 		    new Object[] { messageService.getMessage("sysadmin.userinfoUrl") }));
 	}
-	
+
 	Integer sid = extServerForm.getSid();
 	if (errorMap.isEmpty()) {//check duplication
 	    List listServer = userManagementService.findByProperty(ExtServer.class, "serverid",
@@ -131,7 +132,7 @@ public class ExtServerManagementController {
 		    errorMap.add("prefix", messageService.getMessage("error.not.unique",
 			    new Object[] { messageService.getMessage("sysadmin.prefix") }));
 		} else {
-		    ExtServer map = (ExtServer) listPrefix.get(0);
+		    ExtServer map = listPrefix.get(0);
 		    if (!map.getSid().equals(sid)) {
 			errorMap.add("prefix", messageService.getMessage("error.not.unique",
 				new Object[] { messageService.getMessage("sysadmin.prefix") }));
@@ -147,9 +148,15 @@ public class ExtServerManagementController {
 		BeanUtils.copyProperties(map, extServerForm);
 		map.setSid(null);
 		map.setServerTypeId(ExtServer.INTEGRATION_SERVER_TYPE);
+
+		AuditLogFilter.log(AuditLogFilter.INTEGRATED_SERVER_ADD_ACTION,
+			"integrated server name: " + map.getServerid());
 	    } else {
 		map = integrationService.getExtServer(sid);
 		BeanUtils.copyProperties(map, extServerForm);
+
+		AuditLogFilter.log(AuditLogFilter.INTEGRATED_SERVER_EDIT_ACTION,
+			"integrated server name: " + map.getServerid());
 	    }
 	    integrationService.saveExtServer(map);
 	    return "forward:/extserver/serverlist.do";
@@ -165,6 +172,10 @@ public class ExtServerManagementController {
 	ExtServer map = integrationService.getExtServer(sid);
 	map.setDisabled(true);
 	integrationService.saveExtServer(map);
+
+	AuditLogFilter.log(AuditLogFilter.INTEGRATED_SERVER_DISABLE_ACTION,
+		"integrated server name: " + map.getServerid());
+
 	return "redirect:/extserver/serverlist.do";
     }
 
@@ -174,13 +185,22 @@ public class ExtServerManagementController {
 	ExtServer map = integrationService.getExtServer(sid);
 	map.setDisabled(false);
 	integrationService.saveExtServer(map);
+
+	AuditLogFilter.log(AuditLogFilter.INTEGRATED_SERVER_ENABLE_ACTION,
+		"integrated server name: " + map.getServerid());
+
 	return "redirect:/extserver/serverlist.do";
     }
 
     @RequestMapping(path = "/delete", method = RequestMethod.POST)
     public String delete(HttpServletRequest request) throws Exception {
 	Integer sid = WebUtil.readIntParam(request, "sid", false);
-	userManagementService.deleteById(ExtServer.class, sid);
+	ExtServer extServer = integrationService.getExtServer(sid);
+
+	AuditLogFilter.log(AuditLogFilter.INTEGRATED_SERVER_DELETE_ACTION,
+		"integrated server name: " + extServer.getServerid());
+
+	userManagementService.delete(extServer);
 	return "redirect:/extserver/serverlist.do";
     }
 

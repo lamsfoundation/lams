@@ -29,6 +29,7 @@ import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -63,6 +64,8 @@ public class SessionMaintainController {
 	    String message = new StringBuilder("User ").append(login).append(" (").append(user.getUserId())
 		    .append(") got logged out by sysadmin").toString();
 	    logEventService.logEvent(LogEvent.TYPE_LOGOUT, user.getUserId(), user.getUserId(), null, null, message);
+
+	    AuditLogFilter.log(AuditLogFilter.SESSION_DELETE_ACTION, message);
 	}
 	return list(request);
     }
