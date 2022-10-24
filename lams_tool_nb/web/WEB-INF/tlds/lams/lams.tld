@@ -368,6 +368,10 @@
 	    <name>Alert5</name>
 		<path>/WEB-INF/tags/Alert5.tag</path>
    	</tag-file>  
+   	<tag-file>
+       <name>FileUpload5</name>
+       <path>/WEB-INF/tags/FileUpload5.tag</path>
+   	</tag-file>
    	<tag>
     <name>textarea</name>
     <tag-class>org.lamsfoundation.lams.web.tag.LAMSMultiLinesTextareaTag</tag-class>
