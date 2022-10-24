@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,6 +93,10 @@ public class LoginAsController {
 		    String message = messageService.getMessage("audit.admin.loginas", args);
 		    logEventService.logEvent(LogEvent.TYPE_LOGIN_AS, sysadmin.getUserID(), user.getUserId(), null, null,
 			    message);
+		    StringBuilder logMessageBuilder = new StringBuilder("logged in as user ")
+			    .append(user.getFirstName()).append(" ").append(user.getLastName()).append(" (")
+			    .append(user.getLogin()).append(")");
+		    AuditLogFilter.log(AuditLogFilter.LOGIN_AS_ACTION, logMessageBuilder);
 
 		    // login.jsp knows what to do with these
 		    request.setAttribute("login", login);

@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,9 +159,15 @@ public class ExtServerManagementController {
 		BeanUtils.copyProperties(map, extServerForm);
 		map.setSid(null);
 		map.setServerTypeId(ExtServer.INTEGRATION_SERVER_TYPE);
+
+		AuditLogFilter.log(AuditLogFilter.INTEGRATED_SERVER_ADD_ACTION,
+			"integrated server name: " + map.getServerid());
 	    } else {
 		map = integrationService.getExtServer(sid);
 		BeanUtils.copyProperties(map, extServerForm);
+
+		AuditLogFilter.log(AuditLogFilter.INTEGRATED_SERVER_EDIT_ACTION,
+			"integrated server name: " + map.getServerid());
 	    }
 	    integrationService.saveExtServer(map);
 	    return "forward:/extserver/serverlist.do";
@@ -178,6 +185,10 @@ public class ExtServerManagementController {
 	ExtServer map = integrationService.getExtServer(sid);
 	map.setDisabled(true);
 	integrationService.saveExtServer(map);
+
+	AuditLogFilter.log(AuditLogFilter.INTEGRATED_SERVER_DISABLE_ACTION,
+		"integrated server name: " + map.getServerid());
+
 	return "redirect:/extserver/serverlist.do";
     }
 
@@ -189,6 +200,10 @@ public class ExtServerManagementController {
 	ExtServer map = integrationService.getExtServer(sid);
 	map.setDisabled(false);
 	integrationService.saveExtServer(map);
+
+	AuditLogFilter.log(AuditLogFilter.INTEGRATED_SERVER_ENABLE_ACTION,
+		"integrated server name: " + map.getServerid());
+
 	return "redirect:/extserver/serverlist.do";
     }
 
@@ -197,7 +212,12 @@ public class ExtServerManagementController {
 	securityService.isSysadmin(getUserId(), "delete integrated server", true);
 
 	Integer sid = WebUtil.readIntParam(request, "sid", false);
-	userManagementService.deleteById(ExtServer.class, sid);
+	ExtServer extServer = integrationService.getExtServer(sid);
+
+	AuditLogFilter.log(AuditLogFilter.INTEGRATED_SERVER_DELETE_ACTION,
+		"integrated server name: " + extServer.getServerid());
+
+	userManagementService.delete(extServer);
 	return "redirect:/extserver/serverlist.do";
     }
 

@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,12 +61,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class OrgSaveController {
 
     private static Logger log = Logger.getLogger(OrgSaveController.class);
-    
+
     @Autowired
     private ILogEventService logEventService;
     @Autowired
     private IUserManagementService userManagementService;
-    
+
     @Autowired
     @Qualifier("adminMessageService")
     private MessageService messageService;
@@ -110,10 +111,10 @@ public class OrgSaveController {
 	    } else {
 		org = new Organisation();
 		BeanUtils.copyProperties(org, organisationForm);
-		org.setParentOrganisation(
-			(Organisation) userManagementService.findById(Organisation.class, organisationForm.getParentId()));
-		org.setOrganisationType(
-			(OrganisationType) userManagementService.findById(OrganisationType.class, organisationForm.getTypeId()));
+		org.setParentOrganisation((Organisation) userManagementService.findById(Organisation.class,
+			organisationForm.getParentId()));
+		org.setOrganisationType((OrganisationType) userManagementService.findById(OrganisationType.class,
+			organisationForm.getTypeId()));
 		writeAuditLog(user, org, organisationForm, org.getOrganisationState());
 	    }
 	    org.setOrganisationState(state);
@@ -146,6 +147,9 @@ public class OrgSaveController {
 		message = messageService.getMessage(key, args);
 		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null, null,
 			null, null, message);
+
+		AuditLogFilter.log(user, AuditLogFilter.ORGANISATION_STATE_CHANGE_ACTION, message);
+
 	    }
 	    if (!StringUtils.equals(org.getName(), orgForm.getName())) {
 		args[0] = "name";
@@ -154,6 +158,8 @@ public class OrgSaveController {
 		message = messageService.getMessage(key, args);
 		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null, null,
 			null, null, message);
+
+		AuditLogFilter.log(user, AuditLogFilter.ORGANISATION_EDIT_ACTION, message);
 	    }
 	    if (!StringUtils.equals(org.getCode(), orgForm.getCode())) {
 		args[0] = "code";
@@ -162,6 +168,8 @@ public class OrgSaveController {
 		message = messageService.getMessage(key, args);
 		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null, null,
 			null, null, message);
+
+		AuditLogFilter.log(user, AuditLogFilter.ORGANISATION_EDIT_ACTION, message);
 	    }
 	    if (!StringUtils.equals(org.getDescription(), orgForm.getDescription())) {
 		args[0] = "description";
@@ -170,6 +178,8 @@ public class OrgSaveController {
 		message = messageService.getMessage(key, args);
 		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null, null,
 			null, null, message);
+
+		AuditLogFilter.log(user, AuditLogFilter.ORGANISATION_EDIT_ACTION, message);
 	    }
 	    if (!org.getCourseAdminCanAddNewUsers().equals(orgForm.isCourseAdminCanAddNewUsers())) {
 		args[0] = "courseAdminCanAddNewUsers";
@@ -178,6 +188,8 @@ public class OrgSaveController {
 		message = messageService.getMessage(key, args);
 		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null, null,
 			null, null, message);
+
+		AuditLogFilter.log(user, AuditLogFilter.ORGANISATION_EDIT_ACTION, message);
 	    }
 	    if (!org.getCourseAdminCanBrowseAllUsers().equals(orgForm.isCourseAdminCanAddNewUsers())) {
 		args[0] = "courseAdminCanBrowseAllUsers";
@@ -186,6 +198,8 @@ public class OrgSaveController {
 		message = messageService.getMessage(key, args);
 		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null, null,
 			null, null, message);
+
+		AuditLogFilter.log(user, AuditLogFilter.ORGANISATION_EDIT_ACTION, message);
 	    }
 	    if (!org.getCourseAdminCanChangeStatusOfCourse().equals(orgForm.isCourseAdminCanChangeStatusOfCourse())) {
 		args[0] = "courseAdminCanChangeStatusOfCourse";
@@ -194,6 +208,8 @@ public class OrgSaveController {
 		message = messageService.getMessage(key, args);
 		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null, null,
 			null, null, message);
+
+		AuditLogFilter.log(user, AuditLogFilter.ORGANISATION_EDIT_ACTION, message);
 	    }
 	} else {
 	    String[] args = new String[2];
@@ -202,7 +218,8 @@ public class OrgSaveController {
 	    message = messageService.getMessage("audit.organisation.create", args);
 	    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null, null, null,
 		    null, message);
+
+	    AuditLogFilter.log(user, AuditLogFilter.ORGANISATION_ADD_ACTION, message);
 	}
     }
-
 }

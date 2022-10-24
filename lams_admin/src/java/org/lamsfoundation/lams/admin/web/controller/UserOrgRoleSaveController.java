@@ -36,6 +36,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.web.dto.UserBean;
 import org.lamsfoundation.lams.admin.web.form.UserOrgRoleForm;
 import org.lamsfoundation.lams.security.ISecurityService;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -91,6 +92,8 @@ public class UserOrgRoleSaveController {
 	request.setAttribute("org", orgId);
 	request.getSession().removeAttribute("userOrgRoleForm");
 
+	StringBuilder logMessageBuilder = new StringBuilder();
+	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, orgId);
 	// save UserOrganisation memberships, and the associated roles;
 	// for subgroups, if user is not a member of the parent group then add to that as well.
 	for (int i = 0; i < userBeans.size(); i++) {
@@ -123,8 +126,13 @@ public class UserOrgRoleSaveController {
 		userManagementService.save(user);
 	    }
 
-	    auditLog(orgId, user.getUserId(), roleIds);
-
+	    List<String> roles = Stream.of(roleIds).collect(Collectors
+		    .mapping(roleId -> Role.ROLE_MAP.get(Integer.valueOf(roleId)), Collectors.toUnmodifiableList()));
+	    logMessageBuilder.append("to user ").append(user.getFirstName()).append(" ").append(user.getLastName())
+		    .append(" (").append(user.getLogin()).append(") assigned roles ").append(roles);
+	    if (i < userBeans.size() - 1) {
+		logMessageBuilder.append(", ");
+	    }
 	    // FMALIKOFF 5/7/7 Commented out the following code that set the roles in the course if the current org is a class, as the logic
 	    // is done in service.setRolesForUserOrganisation()
 	    //if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
@@ -133,6 +141,12 @@ public class UserOrgRoleSaveController {
 	    //	}
 	    //}
 	}
+
+	if (logMessageBuilder.length() > 0) {
+	    logMessageBuilder.append(" in organisation \"").append(organisation.getName()).append("\"");
+	    AuditLogFilter.log(AuditLogFilter.ROLE_ADD_ACTION, logMessageBuilder);
+	}
+
 	return "redirect:/usermanage.do?org=" + orgId;
     }
 
@@ -140,13 +154,5 @@ public class UserOrgRoleSaveController {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	return user != null ? user.getUserID() : null;
-    }
-
-    private void auditLog(Integer organisationId, Integer userId, String[] roleIds) {
-	List<String> roles = Stream.of(roleIds).collect(Collectors
-		.mapping(roleId -> Role.ROLE_MAP.get(Integer.valueOf(roleId)), Collectors.toUnmodifiableList()));
-	StringBuilder auditLogMessage = new StringBuilder("assigned to user ").append(userId).append(" roles ")
-		.append(roles).append(" in organisation ").append(organisationId);
-	AuditLogFilter.log(auditLogMessage);
     }
 }

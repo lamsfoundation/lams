@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import org.lamsfoundation.lams.timezone.Timezone;
 import org.lamsfoundation.lams.timezone.dto.TimezoneDTO;
 import org.lamsfoundation.lams.timezone.service.ITimezoneService;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -69,6 +70,8 @@ public class TimezoneManagementController {
     @RequestMapping(path = "/changeServerTimezone")
     public String changeServerTimezone(@RequestParam String serverTimezone) throws Exception {
 	timezoneService.setServerTimezone(serverTimezone);
+
+	AuditLogFilter.log(AuditLogFilter.TIMEZONE_CHANGE_ACTION, "server time zone: " + serverTimezone);
 
 	return "forward:start.do?saved=true";
     }

@@ -81,6 +81,7 @@ import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.imgscalr.ResizePictureUtil;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.InitializingBean;
@@ -644,6 +645,7 @@ public class UserManagementService implements IUserManagementService, Initializi
 	    log.debug("deleting user " + user.getLogin());
 	    delete(user);
 
+	    AuditLogFilter.log(AuditLogFilter.USER_DELETE_ACTION, "user login: " + user.getLogin());
 	} else {
 	    log.error("Requested delete of a user who does not exist. User ID " + userId);
 	}
@@ -692,6 +694,8 @@ public class UserManagementService implements IUserManagementService, Initializi
 	    delete(uo);
 	    iter.remove();
 	}
+
+	AuditLogFilter.log(AuditLogFilter.USER_DISABLE_ACTION, "user login: " + user.getLogin());
     }
 
     @Override

@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,6 +142,8 @@ public class ConfigController {
 	    String changeLogString = changeLog.insert(0, "Configuration changed: ").substring(0,
 		    changeLog.length() - 2);
 	    logEventService.logEvent(LogEvent.TYPE_CONFIG_CHANGE, getUserId(), null, null, null, changeLogString);
+
+	    AuditLogFilter.log(AuditLogFilter.CONFIG_CHANGE_ACTION, changeLogString);
 	}
 
 	Configuration.refreshCache();

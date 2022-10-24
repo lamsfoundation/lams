@@ -64,6 +64,7 @@ import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -928,6 +929,8 @@ public class ImportService implements IImportService {
 	String message = messageService.getMessage(key, args);
 	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, userDTO != null ? userDTO.getUserID() : null, null, null,
 		null, message);
+
+	AuditLogFilter.log(userDTO, AuditLogFilter.USER_BULK_ADD_ACTION, message);
     }
 
     // ---------------------------------------------------------------------

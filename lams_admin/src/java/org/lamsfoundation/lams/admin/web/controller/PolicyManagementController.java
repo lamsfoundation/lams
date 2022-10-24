@@ -22,6 +22,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -156,6 +157,10 @@ public class PolicyManagementController {
 	policy.setCreatedBy(createdBy);
 	policy.setLastModified(new Date());
 	userManagementService.save(policy);
+
+	if (oldPolicy == null) {
+	    AuditLogFilter.log(AuditLogFilter.POLICY_ADD_ACTION, "policy name: " + policy.getPolicyName());
+	}
 
 	return "redirect:list.do";
     }

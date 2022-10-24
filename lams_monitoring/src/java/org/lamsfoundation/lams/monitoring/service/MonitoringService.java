@@ -117,6 +117,7 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.excel.ExcelRow;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.quartz.JobBuilder;
@@ -2660,13 +2661,27 @@ public class MonitoringService implements IMonitoringFullService {
 	    UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    if (userDto != null) {
 		Integer creatorId = userDto.getUserID();
-
+		StringBuilder logMessageBuilder = new StringBuilder("cloned lessons ");
+		Organisation organisation = null;
 		for (String lessonIdStr : lessonIds) {
 		    Long lessonId = Long.parseLong(lessonIdStr);
-
-		    cloneLesson(lessonId, creatorId, addAllStaff, addAllLearners, staffIds, learnerIds, group);
+		    cloneLesson(lessonId, creatorId, addAllStaff, addAllLearners, staffIds, learnerIds, group, false);
 		    result++;
+
+		    Lesson lesson = lessonService.getLesson(lessonId);
+		    if (organisation == null) {
+			organisation = lesson.getOrganisation();
+		    }
+		    logMessageBuilder.append("\"").append(lesson.getLessonName()).append("\", ");
 		}
+		if (lessonIds.length > 0) {
+		    logMessageBuilder.delete(logMessageBuilder.length() - 2, logMessageBuilder.length())
+			    .append(" from organisation \"").append(organisation.getName()).append("\" to \"")
+			    .append(group.getName()).append("\"");
+
+		    AuditLogFilter.log(AuditLogFilter.LESSONS_CLONE_ACTION, logMessageBuilder);
+		}
+
 	    } else {
 		throw new MonitoringServiceException("No UserDTO in session, can't create any Lessons.");
 	    }
@@ -2801,9 +2816,8 @@ public class MonitoringService implements IMonitoringFullService {
 	return NumberUtil.formatLocalisedNumber(raw, (Locale) null, 2);
     }
 
-    @Override
-    public Long cloneLesson(Long lessonId, Integer creatorId, Boolean addAllStaff, Boolean addAllLearners,
-	    String[] staffIds, String[] learnerIds, Organisation group) throws MonitoringServiceException {
+    private Long cloneLesson(Long lessonId, Integer creatorId, Boolean addAllStaff, Boolean addAllLearners,
+	    String[] staffIds, String[] learnerIds, Organisation group, boolean log) {
 	Lesson newLesson = null;
 
 	securityService.isGroupMonitor(group.getOrganisationId(), creatorId, "cloneLesson", true);
@@ -2837,6 +2851,13 @@ public class MonitoringService implements IMonitoringFullService {
 		    // start lesson; passing creatorId as this parameter is only used for security check whether user is allowed to start a lesson
 		    this.startLesson(newLesson.getLessonId(), creatorId);
 
+		    if (log) {
+			StringBuilder logMessageBuilder = new StringBuilder("cloned lesson \"")
+				.append(lesson.getLessonName()).append("\" from organisation \"")
+				.append(lesson.getOrganisation().getName()).append("\" to \"").append(group.getName())
+				.append("\"");
+			AuditLogFilter.log(AuditLogFilter.LESSON_CLONE_ACTION, logMessageBuilder);
+		    }
 		} else {
 		    throw new MonitoringServiceException("No learners specified, can't create any Lessons.");
 		}
@@ -2848,6 +2869,12 @@ public class MonitoringService implements IMonitoringFullService {
 	}
 
 	return newLesson.getLessonId();
+    }
+
+    @Override
+    public Long cloneLesson(Long lessonId, Integer creatorId, Boolean addAllStaff, Boolean addAllLearners,
+	    String[] staffIds, String[] learnerIds, Organisation group) throws MonitoringServiceException {
+	return cloneLesson(lessonId, creatorId, addAllStaff, addAllLearners, staffIds, learnerIds, group, true);
     }
 
     /*

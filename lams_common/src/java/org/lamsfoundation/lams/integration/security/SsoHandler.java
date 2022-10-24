@@ -266,16 +266,16 @@ public class SsoHandler implements ServletExtension {
 			Date date = new Date(currentTimeMillis + lockOutTimeMillis);
 			user.setLockOutTime(date);
 
-			String messagePayload = new StringBuilder().append("is locked out for ")
+			StringBuilder messagePayload = new StringBuilder().append("locked out for ")
 				.append(Configuration.getAsInt(ConfigurationKeys.LOCK_OUT_TIME)).append(" mins after ")
-				.append(failedAttempts).append(" failed attempts.").toString();
+				.append(failedAttempts).append(" failed attempts.");
 			String eventMessage = new StringBuilder("User ").append(user.getLogin()).append(" (")
-				.append(user.getUserId()).append(") ").append(messagePayload).toString();
+				.append(user.getUserId()).append(") is ").append(messagePayload).toString();
 			SsoHandler.getLogEventService(session.getServletContext()).logEvent(
 				LogEvent.TYPE_ACCOUNT_LOCKED, user.getUserId(), user.getUserId(), null, null,
 				eventMessage);
 
-			AuditLogFilter.log(user.getUserId(), user.getLogin(), messagePayload);
+			AuditLogFilter.log(userDTO, AuditLogFilter.ACCOUNT_LOCKED_ACTION, messagePayload);
 
 			if (log.isDebugEnabled()) {
 			    log.debug(eventMessage);

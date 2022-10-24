@@ -417,7 +417,8 @@ public class SecurityService implements ISecurityService {
 
     private void logAuditRoleFailure(Integer userId, String message) {
 	User user = (User) securityDAO.find(User.class, userId);
-	AuditLogFilter.log(userId, user.getLogin(), "failed role check with message: " + message);
+	AuditLogFilter.log(user.getUserDTO(), AuditLogFilter.ROLE_CHECK_ACTION,
+		"failed role check with message: " + message);
     }
 
     public void setSecurityDAO(ISecurityDAO securityDAO) {

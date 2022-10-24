@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.admin.web.controller;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -158,7 +159,7 @@ public class UserOrgSaveController {
 	organisation.setUserOrganisations(uos);
 	userManagementService.save(organisation);
 
-	auditLog(orgId,
+	auditLog(organisation,
 		newUserOrganisations.stream().collect(
 			Collectors.mapping(uo -> uo.getUser().getUserId(), Collectors.toCollection(TreeSet::new))),
 		removedUserIds, canEditRole);
@@ -184,27 +185,29 @@ public class UserOrgSaveController {
 	}
     }
 
-    private void auditLog(Integer organisationId, Set<Integer> addedUserIds, Set<Integer> removedUserIds,
+    private void auditLog(Organisation organisation, Set<Integer> addedUserIds, Set<Integer> removedUserIds,
 	    boolean canEditRole) {
-	if (addedUserIds.isEmpty() && removedUserIds.isEmpty()) {
-	    return;
-	}
-
-	StringBuilder auditLogMessage = new StringBuilder();
 	if (!addedUserIds.isEmpty()) {
-	    auditLogMessage.append("added users ").append(addedUserIds).append(" ");
-	    if (!canEditRole) {
-		auditLogMessage.append("and assigned them LEARNER role ");
-	    }
-	    if (!removedUserIds.isEmpty()) {
-		auditLogMessage.append("and ");
-	    }
+	    StringBuilder auditLogMessage = new StringBuilder();
+	    auditLogMessage.append("Added users ").append(getUserNamesForLog(addedUserIds))
+		    .append(" to organisation \"").append(organisation.getName()).append("\"");
+	    AuditLogFilter.log(AuditLogFilter.USER_ENROLL_ACTION, auditLogMessage);
 	}
 	if (!removedUserIds.isEmpty()) {
-	    auditLogMessage.append("removed users ").append(removedUserIds);
+	    StringBuilder auditLogMessage = new StringBuilder();
+	    auditLogMessage.append("Removed users ").append(getUserNamesForLog(removedUserIds))
+		    .append(" from organisation \"").append(organisation.getName()).append("\"");
+	    AuditLogFilter.log(AuditLogFilter.USER_UNENROLL_ACTION, auditLogMessage);
 	}
-	auditLogMessage.append(" to/from organisation ").append(organisationId);
+    }
 
-	AuditLogFilter.log(auditLogMessage);
+    private String getUserNamesForLog(Collection<Integer> userIds) {
+	StringBuilder userNames = new StringBuilder();
+	for (Integer userId : userIds) {
+	    User user = userManagementService.getUserById(userId);
+	    userNames.append(user.getFirstName()).append(" ").append(user.getLastName())
+		    .append(" (").append(user.getLogin()).append("), ");
+	}
+	return userNames.delete(userNames.length() - 2, userNames.length()).toString();
     }
 }
