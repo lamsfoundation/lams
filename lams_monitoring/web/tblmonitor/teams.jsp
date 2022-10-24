@@ -275,10 +275,9 @@
 		</div>
 		<div class="col-2 text-end">
 			<c:if test="${not empty groupsSetupUrl}">
-				<button onClick="javascript:openPopUp('<lams:LAMSURL/>${groupsSetupUrl}','GroupsSetup', 800, 1280, true)" type="button"
-					    class="btn btn-secondary">
+				<a href="<lams:LAMSURL/>${groupsSetupUrl}" class="btn btn-secondary" target="_blank">
 					<fmt:message key="label.teams.setup"/>
-				</button>
+				</a>
 			</c:if>
 		</div>
 	</div>

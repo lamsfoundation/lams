@@ -24,13 +24,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <lams:html>
     <lams:head>
-		<lams:css/>
-		<lams:css webapp="monitoring" suffix="monitorLesson"/>
+		<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
+		<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
+		<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
+		
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
     </lams:head>
     
-    <body class="stripes">
-		<lams:Page type="monitor" title="${title}">
+    <body class="component">
+		<lams:Page5 type="monitor" title="${title}">
 		
 			<div class="container-fluid">
 				<c:choose>
@@ -43,16 +45,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:set var="numGroups" value="${fn:length(groups)}"/> 
 					<c:choose>
 					<c:when test="${numGroups == 1}">
-						<c:set var="colClass">col-xs-12</c:set>
+						<c:set var="colClass">col-12</c:set>
 					</c:when>
 					<c:when test="${numGroups == 2}">
-						<c:set var="colClass">col-xs-6</c:set>
+						<c:set var="colClass">col-6</c:set>
 					</c:when>
 					<c:when test="${numGroups == 3}">
-						<c:set var="colClass">col-xs-4</c:set>
+						<c:set var="colClass">col-4</c:set>
 					</c:when>
 					<c:otherwise>
-						<c:set var="colClass">col-md-3</c:set>
+						<c:set var="colClass">col-3</c:set>
 					</c:otherwise>
 					</c:choose>
 					
@@ -61,16 +63,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			 			<div class="${colClass}">
 							<h4><c:out value="${isCourseGrouping?group.name:group.groupName}" /></h4>
 							<c:choose> 
-							<c:when test="${empty group.users}">
-								<span><fmt:message key="label.no.learners"/></span>
-							</c:when>
-							<c:otherwise>
-							<table class="group-table table table-condensed table-striped">
-							<c:forEach items="${group.users}" var="user">
-								<tr><td>	<lams:Portrait userId="${user.userId}"/><span class="loffset5"><c:out value="${user.firstName} ${user.lastName}" /></span></td></tr>
-							</c:forEach>
-							</table>
-							</c:otherwise>
+								<c:when test="${empty group.users}">
+									<span><fmt:message key="label.no.learners"/></span>
+								</c:when>
+								<c:otherwise>
+									<table class="group-table table table-condensed table-striped">
+									<c:forEach items="${group.users}" var="user">
+										<tr>
+											<td>
+												<lams:Portrait userId="${user.userId}"/>
+												<span class="loffset5">
+													<c:out value="${user.firstName} ${user.lastName}" />
+												</span>
+											</td>
+										</tr>
+									</c:forEach>
+									</table>
+								</c:otherwise>
 							</c:choose>
 						</div>
 					<c:if test="${(groupCounter.last) or (((groupCounter.index+1) mod 4) == 0)}"></div></c:if>
@@ -79,10 +88,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:choose>	
 			</div>
 			<div id="footer"></div>
-		</lams:Page>
+		</lams:Page5>
 
 		<div id="footer">
 		</div><!--closes footer-->
 
-    </body>
+    </body5>
 </lams:html>

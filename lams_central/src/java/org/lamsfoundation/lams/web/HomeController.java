@@ -107,6 +107,7 @@ public class HomeController {
 
 	try {
 	    HomeController.log.debug("request appadmin");
+
 	    int orgId = new Integer(req.getParameter("orgId")).intValue();
 	    UserDTO user = getUser();
 	    if (user == null) {

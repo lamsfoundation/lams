@@ -217,7 +217,15 @@ public class OrganisationGroupController {
 	    log.debug("Displaying course groups for user " + userId + " and organisation " + organisationId);
 	}
 	Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, true);
-	request.setAttribute("canEdit", isGroupSuperuser || (activityId != null));
+
+	if (activityId == null) {
+	    request.setAttribute("canEdit", isGroupSuperuser);
+	} else {
+	    Activity activity = (Activity) userManagementService.findById(Activity.class, activityId);
+	    request.setAttribute(AttributeNames.PARAM_TITLE, activity.getTitle());
+	    request.setAttribute("description", activity.getDescription());
+	    request.setAttribute("canEdit", true);
+	}
 
 	ObjectNode orgGroupingJSON = JsonNodeFactory.instance.objectNode();
 	orgGroupingJSON.put("organisationId", organisationId);

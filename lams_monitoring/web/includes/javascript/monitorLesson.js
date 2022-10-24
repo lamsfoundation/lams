@@ -1175,6 +1175,9 @@ function updateContributeActivities(contributeActivities) {
 									
 							}
 							break;
+					case 6 : entryContent += '<a class="btn btn-primary contribute-go-button" target="_blank" href="'
+							 + this.url + '" title="' + LABELS.CONTRIBUTE_TOOLTIP + '">' + LABELS.CONTRIBUTE_BUTTON + '</a>';
+							break;
 					default : entryContent += '<button type="button" class="btn btn-primary contribute-go-button" onClick="javascript:openPopUp(\''
 						 + this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' + LABELS.CONTRIBUTE_TOOLTIP
 						 + '">' + LABELS.CONTRIBUTE_BUTTON + '</button>';
@@ -3029,27 +3032,6 @@ function showToast(text) {
 	toast.find('.toast-body', toast).text(text);
 	toast = new bootstrap.Toast(toast[0]);
     toast.show();
-}
-
-function showConfirm(body, callback) {
-	let dialog = $('#confirmationDialog').data('confirmed', null).off('hidden.bs.modal').on('hidden.bs.modal', function(){
-		if (dialog.data('confirmed')) {
-			callback(true);
-		}
-	});
-
-	$('.modal-body', dialog).html(body)
-	
-	$("#confirmationDialogConfirmButton").off('click').on("click", function(){
-		dialog.data('confirmed', true);
-    	dialog.modal('hide');
-	});
-  
-	$("#confirmationDialogCancelButton").off('click').on("click", function(){
-    	dialog.modal('hide');
-	});
-
-	dialog.modal('show');
 }
 
 /**

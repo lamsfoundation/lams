@@ -7,21 +7,28 @@
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
 <c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE))%></c:set>
 <c:set var="lessonMode" value="${not empty param.activityID}" />
+<c:if test="${empty title}">
+	<c:set var="title"><fmt:message key="label.course.groups.viewonly.title" /></c:set>
+</c:if>
 
 <lams:html>
 <lams:head>
-	<lams:css/>
-	<link rel="stylesheet" href="${lams}css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="${lams}css/orgGroup.css" type="text/css" media="screen" />
-
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-	<lams:JSImport src="includes/javascript/dialog.js" />
-	<script type="text/javascript" src="${lams}includes/javascript/orgGroup.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
+	<title>${title}</title>
+	
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/orgGroup.css">
+	
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.cookie.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
+	<lams:JSImport src="includes/javascript/dialog5.js" />
+	<lams:JSImport src="includes/javascript/orgGroup.js" />
+	<lams:JSImport src="includes/javascript/portrait5.js" />
+	<lams:JSImport src="includes/javascript/upload.js" />
 	<script type="text/javascript">;
 		var grouping = ${grouping},
 			organisationId = grouping.organisationId,
@@ -76,198 +83,214 @@
 				<fmt:message key="label.import.successful" var="LABEL_IMPORT_SUCCESSFUL_VAR"><fmt:param value="%1"/><fmt:param value="%2"/></fmt:message>
 				LABEL_IMPORT_SUCCESSFUL_LABEL : decoderDiv.html('<c:out value="${LABEL_IMPORT_SUCCESSFUL_VAR}" />').text(),
 			};
-					
+ 					
 			<!-- LDEV_NTU-7 Page jumps to the top when clicking the link in Grouping -->		
 			jQuery(document).ready(function(){
-			    jQuery('#noscrollinputid').on('click', function(event) {  
-			         jQuery('#collapseUploadGroupFile').toggle('show');
+			    $('#advanced-settings-accordion .collapse').on('shown.bs.collapse', function() {
+				    var collapseElement = $(this);
 			         $('html, body').animate({
-			        	  scrollTop: $("#collapseUploadGroupFile").offset().top
-			         }, 1000);
-			    });
-
-			    jQuery('#noscrolladvancedid').on('click', function(event) {  
-			         jQuery('#collapseAdvanced').toggle('show');
-			         $('html, body').animate({
-			        	  scrollTop: $("#collapseAdvanced").offset().top
-			         }, 1000);
+			        	  scrollTop: $('.accordion-body', collapseElement).offset().top
+			         }, 0);
 			    });
 			});
 	</script>
 </lams:head>
-<body>
 
-<c:if test="${not lessonMode and (empty usedForBranching or usedForBranching eq false)}">
-
-	<!-- It is shown when user tries to save a grouping with empty name -->
-	<span id="grouping-name-blank-error" class="errorMessage">
-		<fmt:message key="label.course.groups.name.blank" />
-	</span>
-
-	<!-- It is shown when user tries to save a grouping with a non unique name -->
-	<span id="grouping-name-non-unique-error" class="errorMessage">
-		<fmt:message key="label.course.groups.name.not.unique" />
-	</span>
+<body class="component my-2">
+	<lams:Page5 title="${title}" type="monitoring">
+		<div class="card mb-2">
+			<div class="card-body">
+				<c:if test="${not empty description}">
+					<p><c:out value="${description}"/></p>
+				</c:if>
+			
+				<h4 class="card-title"><fmt:message key="label.grouping.general.instructions.heading"/></h4>
+				
+				<c:if test="${not usedForBranching}">
+					<p class="card-text">
+						<fmt:message key="label.grouping.general.instructions.line1"/>
+					</p>
+				</c:if>
+				
+				<p class="card-text">
+					<fmt:message key="label.grouping.general.instructions.line2"/>
+				</p>
+				
+				<c:if test="${usedForBranching}">
+					<p class="card-text"><fmt:message key="label.grouping.general.instructions.branching"/></p>
+				</c:if>
+			</div>
+		</div>
 		
-	<div id="titleDiv">
-		<fmt:message key="label.course.groups.name" />
-		<input id="groupingName" type="text"
-			<c:if test="${not canEdit or lessonMode}">
-				readonly="readonly"
+		<div class="card mb-2">
+			<div class="card-body">
+				<c:if test="${not lessonMode and (empty usedForBranching or usedForBranching eq false)}">
+					<!-- It is shown when user tries to save a grouping with empty name -->
+
+					<h5 id="grouping-name-blank-error" class="text-danger text-center d-none">
+						<fmt:message key="label.course.groups.name.blank" />
+					</h5>
+				
+					<!-- It is shown when user tries to save a grouping with a non unique name -->
+					<h5 id="grouping-name-non-unique-error" class="text-danger text-center d-none">
+						<fmt:message key="label.course.groups.name.not.unique" />
+					</h5>
+					
+					<div id="titleDiv" class="clearfix text-center mb-2">
+						<fmt:message key="label.course.groups.name" />
+						<input id="groupingName" type="text" class="form-control form-control-sm d-inline w-25 ms-1"
+							<c:if test="${not canEdit or lessonMode}">
+								readonly="readonly"
+							</c:if>
+						/>
+						
+						<c:if test="${canEdit}">
+							<button class="float-end btn btn-secondary btn-disable-on-downupload" onClick="javascript:saveGroups()">
+								<i class="fa fa-save"></i> <fmt:message key="button.save" />
+							</button>
+						</c:if>
+					</div>
+				</c:if>
+				
+				<div id="titleInstructions" class="clearfix text-center pb-2 border-bottom border-secondary">
+					<span class="d-inline-block fst-italic mt-2">
+						<c:choose>
+							<c:when test="${canEdit}">
+								<fmt:message key="label.course.groups.edit.title" />
+							</c:when>
+							<c:otherwise>
+								<fmt:message key="label.course.groups.viewonly.title" />
+							</c:otherwise>
+						</c:choose>
+					</span>
+					<button type="button" onClick="javascript:showPrintPage()" class="float-end btn btn-secondary">
+						<i class="fa fa-print"></i> <fmt:message key="label.print"/>
+					</button>
+				</div>
+				
+				<div class="row" id="groupsTable">
+					<div class="col-3 border-end border-secondary p-1" id="unassignedUserCell">
+						<div class="text-center fw-bold my-2">
+							<fmt:message key="label.course.groups.unassigned" />
+							<span class="sortUsersButton"
+							      title="<fmt:message key='label.course.groups.sort.tooltip' />">&#9650;</span>
+						</div>
+						<div class="userContainer"></div>
+					</div>
+					<div class="col-9 d-flex flex-wrap" id="groupsCell">
+						<c:if test="${canEdit and not usedForBranching}">
+							<div id="newGroupPlaceholder" class="groupContainer ms-2 mt-2">
+								<div class="text-center text-primary"><fmt:message key="label.course.groups.add" /></div>
+							</div>
+						</c:if>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="accordion" id="advanced-settings-accordion"> 
+			<c:if test="${lessonMode}">
+			  	<div class="accordion-item">
+					<h2 class="accordion-header" id="headingAdvanced">
+						 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" aria-expanded="false"
+					    		data-bs-target="#course-grouping-advanced-settings" aria-controls="course-grouping-advanced-settings">
+					    	<fmt:message key="label.advanced.settings" />
+					    </button>
+					</h2>
+			        <div id="course-grouping-advanced-settings" class="accordion-collapse collapse" data-bs-parent="#advanced-settings-accordion"
+			        	  aria-labelledby="headingAdvanced">
+			        	  <div class="accordion-body">
+							<fmt:message key="label.save.as.course.grouping.hint" />
+							<button id="save-course-grouping-button" class="btn btn-primary btn-disable-on-downupload d-block mt-2"
+									onClick="javascript:saveAsCourseGrouping();">
+								<i class="fa fa-save"></i>
+								<fmt:message key="label.save.as.course.grouping" />
+							</button>
+						</div>
+			        </div>
+			    </div>
+		    </c:if>
+		    
+		    <c:if test="${canEdit}">
+			    <div class="accordion-item">
+					<h2 class="accordion-header" id="headingUploadGroupFile">
+						 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" aria-expanded="false"
+					    		data-bs-target="#upload-group-file-settings" aria-controls="upload-group-file-settings">
+					    	<fmt:message key="label.import.groups.from.template" />
+					    </button>
+					</h2>
+			        <div id="upload-group-file-settings" class="accordion-collapse collapse" data-bs-parent="#advanced-settings-accordion"
+			        	 aria-labelledby="headingUploadGroupFile">
+			        	 <div class="accordion-body">
+							<fmt:message key="label.import.groups.from.template.description" />
+							<button id="download-template" class="btn btn-primary btn-disable-on-downupload d-block mt-2 mb-4"
+									onClick="javascript:downloadTemplate();">
+								<i class="fa fa-download"></i> <fmt:message key="label.download.template" />
+							</button>
+							<form action="../monitoring/groupingUpload/importLearnersForGrouping.do" enctype="multipart/form-data" id="uploadForm">
+								<input type="hidden" name="activityID" value="${param.activityID}"/>
+								<input type="hidden" name="lessonID" value="${lessonID}"/>
+								<lams:FileUpload5 fileFieldname="groupUploadFile" fileInputMessageKey="label.upload.group.spreadsheet"
+									uploadInfoMessageKey="-" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
+								<button id="import" type="button" class="btn btn-primary btn-disable-on-downupload ms-3"
+										onClick="javascript:importGroupsFromSpreadsheet()">
+									<i class="fa fa-upload"></i> <fmt:message key="button.import" />
+								</button>
+							</form>
+						</div>
+					</div>
+				</div>
 			</c:if>
-		/>
+		</div>
 		
-		<c:if test="${canEdit}">
-			<button class="pull-right btn btn-default btn-disable-on-downupload" onClick="javascript:saveGroups()">
-				<i class="fa fa-save"></i>
-				<span><fmt:message key="button.save" /></span>
-			</button>
-		</c:if>
-		<button class="pull-right btn btn-default btn-disable-on-downupload" 
-		   onClick="javascript:window.parent.showOrgGroupingDialog(organisationId)"
-		>
-			<i class="fa fa-users"></i>
-			<fmt:message key="label.course.groups.back" />
-		</button>
-	</div>
-</c:if>
-
-<div id="titleInstructions">
-	<c:choose>
-		<c:when test="${canEdit}">
-			<fmt:message key="label.course.groups.edit.title" />
-		</c:when>
-		<c:otherwise>
-			<fmt:message key="label.course.groups.viewonly.title" />
-		</c:otherwise>
-	</c:choose>
-	<span class="pull-right"><a href="#none" onClick="javascript:showPrintPage();"><i id="print-button" class="fa fa-print roffset10" title="<fmt:message key="label.print"/>"></i></a></span>
-</div>
-
-<table id="groupsTable">
-	<tr>
-		<td id="unassignedUserCell">
-			<div class="userContainerTitle">
-				<fmt:message key="label.course.groups.unassigned" />
-				<span class="sortUsersButton"
+		<!-- A template which gets cloned when a group is added -->
+		<div id="groupTemplate" class="groupContainer d-none p-1 ms-2 mt-2">
+			<div class="userContainerTitle mb-2 d-flex justify-content-between align-middle">
+				<c:if test="${canEdit and not usedForBranching}">
+					<i class="removeGroupButton fa fa-remove fs-3 text-danger ms-1 mt-1" 
+					   title="<fmt:message key='label.course.groups.remove.tooltip' />" ></i>
+				</c:if>
+				<input type="text" class="form-control form-control-sm d-inline"
+					<c:if test="${not canEdit}">
+						readonly="readonly"
+					</c:if>
+				/>
+				<span class="sortUsersButton me-1 mt-1"
 				      title="<fmt:message key='label.course.groups.sort.tooltip' />">&#9650;</span>
 			</div>
 			<div class="userContainer"></div>
-		</td>
-		<td id="groupsCell">
-			<c:if test="${canEdit and not usedForBranching}">
-				<div id="newGroupPlaceholder" class="groupContainer">
-					<div><fmt:message key="label.course.groups.add" /></div>
-				</div>
-			</c:if>
-		</td>
-	</tr>
-</table>
-
-<!-- A template which gets cloned when a group is added -->
-<div id="groupTemplate" class="groupContainer">
-	<div class="userContainerTitle">
-		<c:if test="${canEdit and not usedForBranching}">
-			<i class="removeGroupButton fa fa-remove fa-2x" title="<fmt:message key='label.course.groups.remove.tooltip' />" ></i>
-		</c:if>
-		<input type="text" 
-			<c:if test="${not canEdit}">
-				readonly="readonly"
-			</c:if>
-		/>
-		<span class="sortUsersButton"
-		      title="<fmt:message key='label.course.groups.sort.tooltip' />">&#9650;</span>
-	</div>
-	<div class="userContainer"></div>
-</div>
-
-<c:if test="${lessonMode}">
-	<c:set var="adTitle"><fmt:message key="label.advanced.settings" /></c:set>
-	<!-- LDEV_NTU-7 Page jumps to the top when clicking the link in Grouping -->	
-	<!-- lams:AdvancedAccordian title="${adTitle}"-->
-	
-		<div class="panel-group" id="accordionAdvanced" role="tablist" aria-multiselectable="true"> 
-    <div class="panel panel-default" >
-		 <div class="panel-heading collapsable-icon-left" id="headingAdvanced">
-        	<span class="panel-title">
-	    	<a id="noscrolladvancedid" class="collapsed" role="button" data-toggle="collapse" aria-expanded="false" aria-controls="collapseAdvanced" >
-          	${adTitle}
-        	</a>
-      		</span>
-        </div>
-        
-        <div id="collapseAdvanced" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingAdvanced">
-	        <div id="course-grouping-advanced-settings">
-				<fmt:message key="label.save.as.course.grouping.hint" />
-				<button id="save-course-grouping-button" class="pull-right btn btn-sm btn-primary btn-disable-on-downupload" onClick="javascript:saveAsCourseGrouping();">
-					<i class="fa fa-save"></i>
-					<fmt:message key="label.save.as.course.grouping" />
+		</div>
+		
+		<!-- Inner dialog placeholders -->
+		<div id="save-course-grouping-dialog-contents" class="dialogContainer p-2">
+			<span id="span-tooltip">
+				<fmt:message key="label.enter.course.grouping.name"/>
+			</span>
+				
+			<input id="dialog-course-grouping-name" type="text" class="form-control my-3" />
+					
+			<div class="text-end">
+				<button id="dialog-close-button" class="btn btn-secondary btn-disable-on-downupload">
+					<fmt:message key="label.cancel" />
+				</button>
+				<button id="dialog-save-button" class="btn btn-primary btn-disable-on-downupload">
+					<fmt:message key="button.save" />
 				</button>
 			</div>
 		</div>
-	</div>
-	</div>
 		
-	<!--  /lams:AdvancedAccordian-->
-</c:if>
-
-<c:if test="${canEdit}">
-<div class="panel-group ${lessonMode?'voffset5':'voffset20'}" id="accordionUploadGroupFile" role="tablist" aria-multiselectable="true"> 
-    <div class="panel panel-default" >
-        <div class="panel-heading collapsable-icon-left" id="headingUploadGroupFile">
-	        	<span class="panel-title">
-	        		<a id="noscrollinputid" class="collapsed" role="button" data-toggle="collapse" aria-expanded="false" aria-controls="collapseUploadGroupFile" >
-		          		<fmt:message key="label.import.groups.from.template" />
-		        	</a>
-		     </span>
-        </div>
-        <div id="collapseUploadGroupFile" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingUploadGroupFile">
-        		<div id="upload-group-file-settings">
-			<fmt:message key="label.import.groups.from.template.description" />
-			<div>
-				<button id="download-template" class="btn btn-sm btn-default btn-disable-on-downupload" onClick="javascript:downloadTemplate();">
-					<i class="fa fa-save"></i>
-					<fmt:message key="label.download.template" />
-				</button>
-			</div>
-			<div class="voffset5">
-				<form action="../monitoring/groupingUpload/importLearnersForGrouping.do" enctype="multipart/form-data" id="uploadForm">
-					<input type="hidden" name="activityID" value="${param.activityID}"/>
-					<input type="hidden" name="lessonID" value="${lessonID}"/>
-					<button id="import" type="button" class="pull-right btn btn-sm btn-primary btn-disable-on-downupload" onClick="javascript:importGroupsFromSpreadsheet();return false;">
-						<fmt:message key="button.import" />
-					</button>
-					<lams:FileUpload fileFieldname="groupUploadFile" fileInputMessageKey="label.upload.group.spreadsheet"
-						uploadInfoMessageKey="-" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
-				</form>
-			</div>
-			<lams:WaitingSpinner id="attachmentArea_Busy"/>
-			</div>
+		<div id="confirmationDialog" class="modal dialogContainer fade" tabindex="-1" role="dialog">
+		  <div class="modal-dialog  modal-dialog-centered">
+		    <div class="modal-content">
+		    	<div class="modal-body">
+		    	</div>
+		      	<div class="modal-footer">
+		        	<button type="button" class="btn btn-secondary" id="confirmationDialogCancelButton">Cancel</button>
+		        	<button type="button" class="btn btn-primary" id="confirmationDialogConfirmButton">Confirm</button>
+		      	</div>
+		    </div>
+		  </div>
 		</div>
-	</div>
-</div>
-</c:if>
-	
-
-<!-- Inner dialog placeholders -->
-<div id="save-course-grouping-dialog-contents" class="dialogContainer">
-	<span id="span-tooltip">
-		<fmt:message key="label.enter.course.grouping.name"/>
-	</span>
-		
-	<div>
-		<input id="dialog-course-grouping-name" type="text" size="40"/>
-	</div>
-			
-	<div class="btn-group pull-right">
-		<button id="dialog-save-button" class="btn btn-default btn-disable-on-downupload roffset5 ">
-			<fmt:message key="button.save" />
-		</button>
-		<button id="dialog-close-button" class="btn btn-default btn-disable-on-downupload">
-			<fmt:message key="label.cancel" />
-		</button>
-	</div>
-</div>
-	
+	</lams:Page5>
 </body>
 </lams:html>

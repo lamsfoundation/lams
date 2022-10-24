@@ -192,7 +192,7 @@ body.component #sequenceInfoDialog {
 	font-weight: bold;
 }
 
-.monitoring-page-wrapper #sequence-tab-content #required-tasks button.contribute-go-button {
+.monitoring-page-wrapper #sequence-tab-content #required-tasks .contribute-go-button {
 	min-width: 5rem;
 }
 

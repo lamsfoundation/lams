@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -56,6 +55,8 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.util.FirstNameAlphabeticComparator;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -89,8 +90,6 @@ public class GroupingAJAXController {
     @Autowired
     private IUserManagementService userManagementService;
 
-    private static final String CHOSEN_GROUPING_SCREEN = "chosenGrouping";
-    private static final String VIEW_GROUPS_SCREEN = "viewGroups";
     private static final String PARAM_ACTIVITY_TITLE = "title";
     private static final String PARAM_ACTIVITY_DESCRIPTION = "description";
     public static final String PARAM_MAX_NUM_GROUPS = "maxNumberOfGroups";
@@ -126,34 +125,15 @@ public class GroupingAJAXController {
 	    grouping = ((GroupingActivity) activity).getCreateGrouping();
 	}
 
+	if (!forcePrintView && grouping.isChosenGrouping()) {
+	    return "redirect:" + Configuration.get(ConfigurationKeys.SERVER_URL)
+		    + "/organisationGroup/viewGroupings.do?lessonID=" + lessonId + "&activityID=" + activityID;
+	}
+
 	request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID, activityID);
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
 	request.setAttribute(GroupingAJAXController.PARAM_ACTIVITY_TITLE, activity.getTitle());
 	request.setAttribute(GroupingAJAXController.PARAM_ACTIVITY_DESCRIPTION, activity.getDescription());
-
-	if (!forcePrintView && grouping.isChosenGrouping()) {
-	    // can I remove groups/users - can't if tool sessions have been created
-	    Set<Group> groups = grouping.getGroups();
-	    Iterator<Group> iter = groups.iterator();
-	    boolean mayDelete = true;
-	    while (mayDelete && iter.hasNext()) {
-		Group group = iter.next();
-		mayDelete = group.mayBeDeleted();
-	    }
-
-	    // is this grouping used for branching. If it is, must honour the groups
-	    // set in authoring or some groups won't have a branch. mayDelete can still
-	    // be true or false as you can remove users from groups, you just can't remove
-	    // groups due to the branching relationship.
-	    boolean usedForBranching = grouping.isUsedForBranching();
-
-	    request.setAttribute(GroupingAJAXController.PARAM_MAY_DELETE, mayDelete);
-	    request.setAttribute(GroupingAJAXController.PARAM_USED_FOR_BRANCHING, usedForBranching);
-	    request.setAttribute(GroupingAJAXController.PARAM_MAX_NUM_GROUPS, grouping.getMaxNumberOfGroups());
-	    request.setAttribute(GroupingAJAXController.PARAM_VIEW_MODE, Boolean.FALSE);
-
-	    return "grouping/chosenGrouping";
-	}
 
 	SortedSet<Group> groups = new TreeSet<>(new GroupComparator());
 	groups.addAll(grouping.getGroups());
@@ -237,8 +217,8 @@ public class GroupingAJAXController {
 
 		if (result) {
 		    if (log.isDebugEnabled()) {
-			log.debug("Removing users " + membersParam.toString() + " from group "
-				+ group.getGroupId() + " in activity " + activityID);
+			log.debug("Removing users " + membersParam.toString() + " from group " + group.getGroupId()
+				+ " in activity " + activityID);
 		    }
 
 		    try {
@@ -263,8 +243,7 @@ public class GroupingAJAXController {
 	    if (groupID == null) {
 		String name = WebUtil.readStrParam(request, GroupingAJAXController.PARAM_NAME);
 		if (log.isDebugEnabled()) {
-		    log
-			    .debug("Creating group with name \"" + name + "\" in activity " + activityID);
+		    log.debug("Creating group with name \"" + name + "\" in activity " + activityID);
 		}
 		Group group = monitoringService.addGroup(activityID, name, true);
 		if (group == null) {
@@ -279,8 +258,8 @@ public class GroupingAJAXController {
 
 	    if (result && (members != null)) {
 		if (log.isDebugEnabled()) {
-		    log.debug("Adding users " + membersParam.toString() + " to group " + groupID
-			    + " in activity " + activityID);
+		    log.debug("Adding users " + membersParam.toString() + " to group " + groupID + " in activity "
+			    + activityID);
 		}
 
 		// add users to the given group
@@ -311,8 +290,7 @@ public class GroupingAJAXController {
 
 	// check if user is allowed to view and edit groupings
 	if (!securityService.hasOrgRole(organisationId, userId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR },
-		"view organisation groupings", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR }, "view organisation groupings", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the organisation");
 	    return null;
 	}
