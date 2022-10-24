@@ -26,7 +26,7 @@ $(document).ready(function(){
 		// ability to save a grouping on pressing the Enter key in the name input field
 		$('#groupingName').on('keyup', function (e) {
 			//remove alert class if it was applied
-			$("#grouping-name-blank-error,#grouping-name-non-unique-error").hide();
+			$("#grouping-name-blank-error,#grouping-name-non-unique-error").addClass('d-none');
 			
 		    if (e.keyCode == 13) {
 				saveGroups();
@@ -38,7 +38,7 @@ $(document).ready(function(){
 		// allow adding new groups
 		$('#newGroupPlaceholder').click(function(){
 			// the label is "Group X" where X is the top group number
-			addGroup(null, LABELS.GROUP_PREFIX_LABEL + ' ' + $('#groupsTable .groupContainer').length, null);
+			addGroup(null, LABELS.GROUP_PREFIX_LABEL + ' ' + $('#groupsCell .groupContainer').length, null);
 		});
 	}
 });
@@ -54,9 +54,9 @@ function addGroup(groupId, name, users) {
 						'id'      : null,
 						'groupId' : groupId
 					})
-					.css('display', null);
+					.removeClass('d-none');
 	
-	var groupNameFields = $('#groupsTable .groupContainer input');
+	var groupNameFields = $('#groupsCell .groupContainer input');
 	var groupTopIndex = groupNameFields.length;
 	// names can be blank in course groups,
 	// but in lesson groups they have to exist and be unique
@@ -115,11 +115,11 @@ function fillGroup(users, container) {
 			var portraitDiv = $('<div />').attr({
 				'id': 'portrait-'+userJSON.id,
 				})
-				.addClass('roffset5')
+				.addClass('mb-2')
 				.appendTo(userDiv);
 			addPortrait(portraitDiv, userJSON.portraitId, userJSON.id, 'small', true, LAMS_URL );
 			$('<span/>').text(userJSON.firstName + ' ' + userJSON.lastName + ' (' + userJSON.login + ')')
-				.addClass('portrait-sm-lineheight')
+				.addClass('portrait-sm-lineheight ms-1')
 				.appendTo(userDiv);
 
 			// for later use
@@ -133,7 +133,9 @@ function fillGroup(users, container) {
 							'containment' : '#groupsTable',
 						    'revert'      : 'invalid',
 						    'distance'    : 20,
-						    'scroll'      : false,
+						    'scroll'      : true,
+						    'scrollSensitivity' : 120,
+							'scrollSpeed' : 100,
 						    'cursor'      : 'move',
 							'helper'      : function(event){
 								// include the user from which dragging started
@@ -272,20 +274,7 @@ function transferUsers(fromContainer, toContainer) {
             $(this).draggable('disable');
 		  }
 	   });
-	   
-	   // recolour both containers
-	   colorDraggableUsers(toContainer);
-	   colorDraggableUsers(fromContainer);
 	}
-}
-
-
-function colorDraggableUsers(container) {
-	// every second line is different
-	$(container).find('div.draggableItem').each(function(index, userDiv){
-		$(this).removeClass( index % 2 ? 'draggableEven' : 'draggableOdd');
-		$(this).addClass( index % 2 ? 'draggableOdd' : 'draggableEven');
-	});
 }
 
 /**
@@ -316,8 +305,6 @@ function sortUsers(container) {
 			button.html('▲');
 			sortOrderAscending[containerId] = true;
 		}
-		
-		colorDraggableUsers(container);
 	}
 }
 
@@ -327,37 +314,40 @@ function sortUsers(container) {
 function removeGroup(container) {
 	// no groupId means this group was just added and it was not persisted in DB yet
 	var groupId = container.attr('groupId');
-	var executeDelete = true;
-	if (groupId) {
-		executeDelete = confirm(LABELS.GROUP_REMOVE_LABEL);
-	}
-	if (executeDelete) {
-		executeDelete = !lessonMode;
-		
-		if (lessonMode) {
-			var data = {
-				'activityID' : groupingActivityId,
-				'groupID'    : groupId
-			};
-			data[csrfTokenName] = csrfTokenValue;
+	var executeDelete = true,
+		deleteFunction = function(){
+			executeDelete = !lessonMode;
 			
-			$.ajax({
-				async    : false,
-				cache    : false,
-				dataType : 'json',
-				url : LAMS_URL + 'monitoring/grouping/removeGroup.do',
-				data : data,
-				type : 'POST',
-				success : function(response) {
-					executeDelete = response.result;
-				}
-			});
-		}
+			if (lessonMode) {
+				var data = {
+					'activityID' : groupingActivityId,
+					'groupID'    : groupId
+				};
+				data[csrfTokenName] = csrfTokenValue;
+				
+				$.ajax({
+					async    : false,
+					cache    : false,
+					dataType : 'json',
+					url : LAMS_URL + 'monitoring/grouping/removeGroup.do',
+					data : data,
+					type : 'POST',
+					success : function(response) {
+						executeDelete = response.result;
+					}
+				});
+			}
+			
+			if (executeDelete) {
+				$('#unassignedUserCell .userContainer').append($('.userContainer div.draggableItem', container));
+				container.remove();
+			}
+		};
 		
-		if (executeDelete) {
-			$('#unassignedUserCell .userContainer').append($('.userContainer div.draggableItem', container));
-			container.remove();
-		}
+	if (groupId) {
+		executeDelete = showConfirm(LABELS.GROUP_REMOVE_LABEL, deleteFunction);
+	} else {
+		deleteFunction();
 	}
 }
 
@@ -397,7 +387,7 @@ function saveGroups(){
 	var groupingName = $('#groupingName').val();
 	// course grouping name can not be blank
 	if (!groupingName) {
-		$('#grouping-name-blank-error').show();
+		$('#grouping-name-blank-error').removeClass('d-none');
 		$('#groupingName').focus();
 		return false;
 	}
@@ -418,7 +408,7 @@ function saveGroups(){
 		}
 	});
 	if ((grouping.name != groupingName) && !isGroupingNameUnique) {
-		$('#grouping-name-non-unique-error').show();
+		$('#grouping-name-non-unique-error').removeClass('d-none');
 		$('#groupingName').focus();
 		return false;		
 	}
@@ -474,7 +464,8 @@ function saveGroups(){
 		},
 		type : 'POST',
 		success : function() {
-			window.parent.showOrgGroupingDialog(organisationId);
+			window.opener.showOrgGroupingDialog(organisationId);
+			window.close();
 		}
 	});
 }
@@ -551,7 +542,7 @@ function showPrintPage() {
 	}
 	var height = Math.min(550, $(window).height()),
 		width = Math.max(1093, $(window).width());
-	var wd = window.open(url,LABELS.GROUP_PREFIX_LABEL,'height='+height+',width='+width+',resizable,scrollbars').focus();
+	window.open(url,LABELS.GROUP_PREFIX_LABEL,'height='+height+',width='+width+',resizable,scrollbars').focus();
 }
 /** 
  * *************** Import groups from a spreadsheet ***************
@@ -560,23 +551,11 @@ function showPrintPage() {
 		// do not disable the file button or the file will be missing on the upload.
 		$('.btn-disable-on-downupload').prop('disabled', false);
 		$('a.btn-disable-on-downupload').show(); // links must be hidden, cannot be disabled
-		
-		// show the waiting area during the upload
-		var div = document.getElementById("attachmentArea_Busy");
-		if(div != null){
-			div.style.display = 'none';
-		}
 	}
 	function disableButtons() {
 		// do not disable the file button or the file will be missing on the upload.
 		$('.btn-disable-on-downupload').prop('disabled', true);
 		$('a.btn-disable-on-downupload').hide(); // links must be hidden, cannot be disabled
-		
-		// show the waiting area during the upload
-		var div = document.getElementById("attachmentArea_Busy");
-		if(div != null){
-			div.style.display = 'inline-block';
-		}
 	}
 	
 	function importGroupsFromSpreadsheet() {
@@ -586,7 +565,7 @@ function showPrintPage() {
 
 		disableButtons();
 		var file = getValidateSpreadsheetFile();
-		if ( file != null && ( ! warnBeforeUpload || confirm(LABELS.WARNING_REPLACE_GROUPS_LABEL) ) ) {
+		if ( file != null && ( !warnBeforeUpload || confirm(LABELS.WARNING_REPLACE_GROUPS_LABEL) ) ) {
 			var form = $("#uploadForm")[0];
 			var formDataUpload = new FormData(form);
 			formDataUpload.append("organisationID", organisationId); 
@@ -605,7 +584,7 @@ function showPrintPage() {
 				var groupingName = $('#groupingName').val();
 				// course grouping name can not be blank
 				if (!groupingName) {
-					$('#grouping-name-blank-error').show();
+					$('#grouping-name-blank-error').removeClass('d-none');
 					$('#groupingName').focus();
 					enableButtons();
 					return false;
@@ -627,7 +606,7 @@ function showPrintPage() {
 							formDataUpload.append("name",  groupingName)
 							callImportURL(form, formDataUpload);
 						} else {
-							$('#grouping-name-non-unique-error').show();
+							$('#grouping-name-non-unique-error').removeClass('d-none');
 							$('#groupingName').focus();
 							enableButtons();
 							return false;		
@@ -677,10 +656,6 @@ function showPrintPage() {
 	        			else  {
 	        				// unknown failure on back end. 
 	        				alert(LABELS.GENERAL_ERROR_LABEL);
-			        		var div = document.getElementById("attachmentArea_Busy");
-			        		if(div != null){
-			        			div.style.display = 'none';
-			        		}
 	        			}
 	        		} else {
 	        			var msg = LABELS.LABEL_IMPORT_SUCCESSFUL_LABEL.replace("%1", response.added).replace("%2", response.skipped);
@@ -691,10 +666,6 @@ function showPrintPage() {
 	        error: function() {
 	        		// unknown failure on back end. 
 	        		alert(LABELS.GENERAL_ERROR_LABEL);
-	        		var div = document.getElementById("attachmentArea_Busy");
-	        		if(div != null){
-	        			div.style.display = 'none';
-	        		}
 	        }
 		});
 	}

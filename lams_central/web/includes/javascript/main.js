@@ -336,7 +336,6 @@ function showAddLessonDialog(orgID) {
 }
 
 function showOrgGroupingDialog(orgID, activityID) {
-	$('#dialogOrgGroup').modal('hide');
 	showDialog("dialogOrgGrouping", {
 		'width' : 460,
 		'height': 460,
@@ -347,21 +346,11 @@ function showOrgGroupingDialog(orgID, activityID) {
 												   + (activityID ? '&activityID=' + activityID : ''),
 													'id' : 'orgGroupingModal'});
 		}
-	}, true);
+	}, false, true);
 }
 
 function showOrgGroupDialog(url) {
-	$('#dialogOrgGrouping').modal('hide');
-	showDialog("dialogOrgGroup", {
-		'width' : Math.max(380, Math.min(960, $(window).width() - 60)),
-		'height': Math.max(380, Math.min(750, $(window).height() - 30)),
-		'title' : LABELS.COURSE_GROUPS_TITLE,
-		'open' : function() {
-			// load contents after opening the dialog
-			$('iframe', this).attr({'src': url,
-				'id' : 'orgGroupModal'});
-		}
-	}, true);
+	window.open(url, '_blank');
 }
 
 function showAddSingleActivityLessonDialog(orgID, toolID, learningLibraryID) {

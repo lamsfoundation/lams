@@ -1,4 +1,4 @@
-﻿﻿﻿var gtbDialog = null;
+﻿﻿var gtbDialog = null;
 
 function removeGrouping(groupingId) {
 	if (!lessonMode && confirm(LABELS.REMOVE_GROUPING_CONFIRM_LABEL)) {
