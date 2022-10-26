@@ -6,7 +6,7 @@
 	<c:param name="toolContentId" value="${scratchie.contentId}"/>
 	<c:param name="absoluteTimeLimit" value="${scratchie.absoluteTimeLimitSeconds}"/>
 	<c:param name="relativeTimeLimit" value="${scratchie.relativeTimeLimit}"/>
-	<c:param name="isTbl" value="true" />
+	<c:param name="isTbl" value="${isTbl}" />
 	<c:param name="controllerContext" value="tool/lascrt11/monitoring" />
 </c:url>
 
@@ -56,7 +56,15 @@
 	  background-color: #d9534f; }
 </style>
 
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery-ui.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.plugin.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.countdown.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/common.js"></script>
+<script>
+	$(document).ready(function(){
+		$('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');
+	});
+</script>
 
 <c:if test="${not showStudentChoicesTableOnly}">
 	<script>
@@ -72,10 +80,6 @@
 		    $(document.body).append(form);
 		    form.submit();
 		};
-
-		$(document).ready(function(){
-			$('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');
-		});
 	</script>
 	
 	<!-- Header -->
