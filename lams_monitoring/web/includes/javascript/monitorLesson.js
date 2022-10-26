@@ -1598,7 +1598,7 @@ function addActivityIcons(activity) {
 		isGrouping = activity.type == 2,
 		// branching and gates require extra adjustments
 		isBranching =  [10,11,12,13].indexOf(activity.type) > -1,
-		isGate = [3,4,5,14].indexOf(activity.type) > -1,
+		isGate = [3,4,5,14,16].indexOf(activity.type) > -1,
 		isContainer = [6,7].indexOf(activity.type) > -1,
 		activityGroup = $('g[id="' + activity.id + '"]', learningDesignSvg),
 		requiresAttentionIcon = activity.requiresAttention ? 
