@@ -206,18 +206,19 @@ CKEDITOR.on('instanceReady', function(e){
 });
 
 CKEDITOR.config.embed_provider = '//ckeditor.iframe.ly/api/oembed?url={url}&callback={callback}'; //default URL for 'embed' plugin
+
 /* If you want to use LAMS embedding proxy:
 Set
-CKEDITOR.config.embed_provider = '/lams/embed.do?url={url}&callback={callback}';
+//CKEDITOR.config.embed_provider = '/lams/embed.do?url={url}&callback={callback}';
 You can use absolute URL instead, for example
-CKEDITOR.config.embed_provider = 'https://demo.lamsfoundation.org/lams/embed.do?url={url}&callback={callback}';
+//CKEDITOR.config.embed_provider = 'https://demo.lamsfoundation.org/lams/embed.do?url={url}&callback={callback}';
 
 Then set the real embed provider URL into this property
-lams_embed_provider = '//ckeditor.iframe.ly/api/oembed?consent=0';
+//lams_embed_provider = '//ckeditor.iframe.ly/api/oembed?consent=0';
 For iframely remember to use "consent=0" parameter, otherwise each user will be asked whether to trust this content.
 You can also append your API key:
-lams_embed_provider = '//ckeditor.iframe.ly/api/oembed?consent=0&api_key=YOUR_API_KEY_HERE';
+//lams_embed_provider = '//ckeditor.iframe.ly/api/oembed?consent=0&api_key=YOUR_API_KEY_HERE';
 
 Then put a comma-separated list of domains for which you want to use LAMS embedding, for example
-lams_embed_custom_domains = 'video.someuni.ac.uk,media.anotheruni.sg';
+//lams_embed_custom_domains = 'video.someuni.ac.uk,media.anotheruni.sg';
 */
