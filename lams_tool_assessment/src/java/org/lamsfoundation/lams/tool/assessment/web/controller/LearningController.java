@@ -584,8 +584,9 @@ public class LearningController {
 	//get user answers from request and store them into sessionMap
 	storeUserAnswersIntoSessionMap(request, pageNumber);
 
+	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	boolean isTimelimitExpired = WebUtil.readBooleanParam(request, "isTimelimitExpired", false);
-	if (!isTimelimitExpired) {
+	if (!isTimelimitExpired && (mode == null || !mode.equals(ToolAccessMode.AUTHOR))) {
 
 	    // check all required questions got answered
 	    int pageNumberWithUnasweredQuestions = validateAnswers(sessionMap);
@@ -608,7 +609,6 @@ public class LearningController {
 	}
 
 	String redirectURL = "redirect:/learning/start.do";
-	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	if (mode != null) {
 	    redirectURL = WebUtil.appendParameterToURL(redirectURL, AttributeNames.ATTR_MODE, mode.toString());
 	}
@@ -939,7 +939,6 @@ public class LearningController {
      */
     @SuppressWarnings("unchecked")
     private int validateAnswers(SessionMap<String, Object> sessionMap) {
-
 	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 
