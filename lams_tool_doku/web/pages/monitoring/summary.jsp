@@ -294,18 +294,6 @@
 		});
 
 		
-		// create counter if absolute time limit is set
-		if (absoluteTimeLimit) {
-			updateAbsoluteTimeLimitCounter();
-			
-			// expand time limit panel if absolute time limit is set and not expired
-			if (absoluteTimeLimit > new Date().getTime() / 1000) {
-				$('#time-limit-collapse').collapse('show');
-			}
-		}
-		initInidividualTimeLimitAutocomplete();
-		
-		
 		<c:if test="${isTbl}">
 			//insert total learners number taken from the parent tblmonitor.jsp
 			$("#doku-monitoring-summary-${sessionMap.toolContentID} .total-learners-number").text(TOTAL_LESSON_LEARNERS_NUMBER);
