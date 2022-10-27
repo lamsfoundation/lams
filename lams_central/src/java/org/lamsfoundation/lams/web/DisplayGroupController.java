@@ -88,8 +88,7 @@ public class DisplayGroupController {
 	if (org != null) {
 	    User user = getUser(request.getRemoteUser());
 	    if (!securityService.hasOrgRole(orgId, user.getUserId(),
-		    new String[] { Role.GROUP_MANAGER, Role.LEARNER, Role.MONITOR, Role.AUTHOR }, "display group",
-		    false)) {
+		    new String[] { Role.GROUP_MANAGER, Role.LEARNER, Role.MONITOR, Role.AUTHOR }, "display group")) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a part of the organisation");
 		return null;
 	    }

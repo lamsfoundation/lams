@@ -681,7 +681,7 @@ public class LessonManagerServlet extends HttpServlet {
 
 	// check is user monitor
 	ExtUserUseridMap monitorMap = integrationService.getExtUserUseridMap(extServer, username);
-	securityService.isLessonMonitor(lsId, monitorMap.getUser().getUserId(), "remove user", true);
+	securityService.ensureLessonMonitor(lsId, monitorMap.getUser().getUserId(), "remove user");
 
 	// remove requested user
 	String[] extUsernames = (userIds != null) ? userIds.split(",") : new String[0];
@@ -715,7 +715,7 @@ public class LessonManagerServlet extends HttpServlet {
 
 	// check is user monitor
 	ExtUserUseridMap monitorMap = integrationService.getExtUserUseridMap(extServer, username);
-	securityService.isLessonMonitor(lsId, monitorMap.getUser().getUserId(), "remove all users", true);
+	securityService.ensureLessonMonitor(lsId, monitorMap.getUser().getUserId(), "remove all users");
 
 	// remove all users from the specified lesson
 	Lesson lesson = lessonService.getLesson(lsId);

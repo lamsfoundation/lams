@@ -71,8 +71,7 @@ public class GradebookLearningController {
 		return "error";
 	    }
 	    if (!securityService.hasOrgRole(oranisationID, user.getUserID(),
-		    new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.LEARNER }, "get course gradebook for learner",
-		    false)) {
+		    new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.LEARNER }, "get course gradebook for learner")) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the organisation");
 		return null;
 	    }

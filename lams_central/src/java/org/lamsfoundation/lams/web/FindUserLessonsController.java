@@ -48,7 +48,7 @@ public class FindUserLessonsController {
 	Integer courseID = WebUtil.readIntParam(request, "courseID");
 
 	User viewer = (User) userManagementService.findById(User.class, getUserId());
-	if (!securityService.isGroupMonitor(courseID, viewer.getUserId(), "find user lessons", false)) {
+	if (!securityService.isGroupMonitor(courseID, viewer.getUserId(), "find user lessons")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 	    return null;
 	}
@@ -98,7 +98,7 @@ public class FindUserLessonsController {
     @RequestMapping("/autocomplete")
     public String autocomplete(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Integer courseID = WebUtil.readIntParam(request, "courseID", true);
-	if (!securityService.isGroupMonitor(courseID, getUserId(), "autocomplete for find user lessons", false)) {
+	if (!securityService.isGroupMonitor(courseID, getUserId(), "autocomplete for find user lessons")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 	    return null;
 	}

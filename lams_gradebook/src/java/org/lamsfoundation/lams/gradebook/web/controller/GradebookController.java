@@ -118,8 +118,7 @@ public class GradebookController {
 	GBGridView view = GradebookUtil.readGBGridViewParam(request, GradebookConstants.PARAM_VIEW, false);
 
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!securityService.isLessonParticipant(lessonID, getUser().getUserID(), "get activity gradebook data",
-		false)) {
+	if (!securityService.isLessonParticipant(lessonID, getUser().getUserID(), "get activity gradebook data")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a learner in the lesson");
 	    return null;
 	}
@@ -166,8 +165,7 @@ public class GradebookController {
 
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-	if (!securityService.isLessonParticipant(lessonID, getUser().getUserID(), "get activity archive gradebook data",
-		false)) {
+	if (!securityService.isLessonParticipant(lessonID, getUser().getUserID(), "get activity archive gradebook data")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a learner in the lesson");
 	    return null;
 	}
@@ -207,7 +205,7 @@ public class GradebookController {
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	UserDTO currentUserDTO = getUser();
 	Integer userId = currentUserDTO.getUserID();
-	if (!securityService.isLessonParticipant(lessonId, userId, "get lesson complete gradebook data", false)) {
+	if (!securityService.isLessonParticipant(lessonId, userId, "get lesson complete gradebook data")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a learner in the lesson");
 	}
 
@@ -316,7 +314,7 @@ public class GradebookController {
 	int totalUsers = 0;
 	// if leesonID is specified show results based on lesson
 	if (lessonID != null) {
-	    if (!securityService.isLessonMonitor(lessonID, user.getUserID(), "get gradebook", false)) {
+	    if (!securityService.isLessonMonitor(lessonID, user.getUserID(), "get gradebook")) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 		return null;
 	    }
@@ -370,7 +368,7 @@ public class GradebookController {
 	    // 2nd table of gradebook course monitor
 	    // if organisationID is specified (but not lessonID) then show results for organisation
 	} else if (organisationID != null) {
-	    if (!securityService.isGroupMonitor(organisationID, user.getUserID(), "get gradebook", false)) {
+	    if (!securityService.isGroupMonitor(organisationID, user.getUserID(), "get gradebook")) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 		return null;
 	    }
@@ -454,7 +452,7 @@ public class GradebookController {
 
 	//permission check
 	if (view == GBGridView.MON_USER) {
-	    if (!securityService.isGroupMonitor(courseID, viewer.getUserId(), "get course gradebook", false)) {
+	    if (!securityService.isGroupMonitor(courseID, viewer.getUserId(), "get course gradebook")) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 		return null;
 	    }
@@ -466,7 +464,7 @@ public class GradebookController {
 			organisation.getParentOrganisation());
 	    }
 	    if (!isGroupManager && !securityService.hasOrgRole(courseID, viewer.getUserId(),
-		    new String[] { Role.MONITOR }, "get course gradebook", false)) {
+		    new String[] { Role.MONITOR }, "get course gradebook")) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN,
 			"User is not a group manager or monitor in the organisation");
 		return null;
@@ -474,7 +472,7 @@ public class GradebookController {
 
 	} else if (view == GBGridView.LRN_COURSE) {
 	    if (!securityService.hasOrgRole(courseID, viewer.getUserId(), new String[] { Role.LEARNER },
-		    "get course gradebook for learner", false)) {
+		    "get course gradebook for learner")) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a learner in the organisation");
 		return null;
 	    }
@@ -517,12 +515,12 @@ public class GradebookController {
 	Integer userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_USERID);
 
 	if (getUser().getUserID().equals(userID)) {
-	    if (!securityService.isLessonParticipant(lessonID, userID, "get lesson mark aggregate", false)) {
+	    if (!securityService.isLessonParticipant(lessonID, userID, "get lesson mark aggregate")) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the lesson");
 		return null;
 	    }
 	} else {
-	    if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "get lesson mark aggregate", false)) {
+	    if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "get lesson mark aggregate")) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 		return null;
 	    }
@@ -573,7 +571,7 @@ public class GradebookController {
 	}
 	Integer userID = getUser().getUserID();
 	for (Lesson lesson : activity.getLearningDesign().getLessons()) {
-	    if (!securityService.isLessonMonitor(lesson.getLessonId(), userID, "get activity mark average", false)) {
+	    if (!securityService.isLessonMonitor(lesson.getLessonId(), userID, "get activity mark average")) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 		return null;
 	    }
@@ -596,7 +594,7 @@ public class GradebookController {
     @ResponseBody
     public String getAverageMarkForLesson(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "get lesson mark average", false)) {
+	if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "get lesson mark average")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}

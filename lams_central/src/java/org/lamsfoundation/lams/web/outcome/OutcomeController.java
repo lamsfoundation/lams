@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -94,7 +93,7 @@ public class OutcomeController {
     @RequestMapping("/outcomeManage")
     public String outcomeManage(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	UserDTO user = OutcomeController.getUserDTO();
-	securityService.isSysadmin(user.getUserID(), "import outcomes", true);
+	securityService.ensureSysadmin(user.getUserID(), "import outcomes");
 
 	List<Outcome> outcomes = outcomeService.getOutcomes();
 	request.setAttribute("outcomes", outcomes);
@@ -105,7 +104,7 @@ public class OutcomeController {
     public String outcomeEdit(@ModelAttribute OutcomeForm outcomeForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	UserDTO user = OutcomeController.getUserDTO();
-	securityService.isSysadmin(user.getUserID(), "import outcomes", true);
+	securityService.ensureSysadmin(user.getUserID(), "import outcomes");
 
 	Long outcomeId = WebUtil.readLongParam(request, "outcomeId", true);
 	Outcome outcome = outcomeId == null ? null : (Outcome) userManagementService.findById(Outcome.class, outcomeId);
@@ -177,7 +176,7 @@ public class OutcomeController {
     @RequestMapping(path = "/outcomeRemove", method = RequestMethod.POST)
     public String outcomeRemove(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	UserDTO user = OutcomeController.getUserDTO();
-	securityService.isSysadmin(user.getUserID(), "import outcomes", true);
+	securityService.ensureSysadmin(user.getUserID(), "import outcomes");
 
 	Long outcomeId = WebUtil.readLongParam(request, "outcomeId", false);
 	Outcome outcome = (Outcome) userManagementService.findById(Outcome.class, outcomeId);
@@ -330,7 +329,7 @@ public class OutcomeController {
 	    lessonId = lessonService.getLessonByToolContentId(outcomeMapping.getToolContentId()).getLessonId();
 	}
 	Integer userId = OutcomeController.getUserDTO().getUserID();
-	securityService.isLessonMonitor(lessonId, userId, "set outcome result", true);
+	securityService.ensureLessonMonitor(lessonId, userId, "set outcome result");
 
 	OutcomeResult result = outcomeService.getOutcomeResult(userId, mappingId);
 	if (result == null) {
@@ -380,7 +379,7 @@ public class OutcomeController {
     @RequestMapping("/outcomeExport")
     public void outcomeExport(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	UserDTO user = OutcomeController.getUserDTO();
-	securityService.isSysadmin(user.getUserID(), "export outcomes", true);
+	securityService.ensureSysadmin(user.getUserID(), "export outcomes");
 
 	List<ExcelSheet> sheets = outcomeService.exportOutcomes();
 
@@ -402,7 +401,7 @@ public class OutcomeController {
     public String outcomeImport(@RequestParam("file") MultipartFile file, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	UserDTO user = OutcomeController.getUserDTO();
-	securityService.isSysadmin(user.getUserID(), "import outcomes", true);
+	securityService.ensureSysadmin(user.getUserID(), "import outcomes");
 
 	try {
 	    int importCount = outcomeService.importOutcomes(file);
@@ -550,7 +549,7 @@ public class OutcomeController {
     @RequestMapping("/scaleExport")
     public void scaleExport(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	UserDTO user = OutcomeController.getUserDTO();
-	securityService.isSysadmin(user.getUserID(), "export outcome scales", true);
+	securityService.ensureSysadmin(user.getUserID(), "export outcome scales");
 
 	List<ExcelSheet> sheets = outcomeService.exportScales();
 
@@ -572,7 +571,7 @@ public class OutcomeController {
     public String scaleImport(@RequestParam("file") MultipartFile file, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	UserDTO user = OutcomeController.getUserDTO();
-	securityService.isSysadmin(user.getUserID(), "import outcome scales", true);
+	securityService.ensureSysadmin(user.getUserID(), "import outcome scales");
 
 	try {
 	    int importCount = outcomeService.importScales(file);

@@ -238,8 +238,8 @@ public class PresenceWebsocketServer {
 	websocket.getUserProperties().put(PARAM_NICKNAME, nickname);
 	websocket.getUserProperties().put(AttributeNames.PARAM_LESSON_ID, lessonId);
 
-	PresenceWebsocketServer.getSecurityService().isLessonParticipant(lessonId, user.getUserId(), "join lesson chat",
-		true);
+	PresenceWebsocketServer.getSecurityService().ensureLessonParticipant(lessonId, user.getUserId(),
+		"join lesson chat");
 
 	Set<Session> lessonWebsockets = PresenceWebsocketServer.websockets.get(lessonId);
 	if (lessonWebsockets == null) {
@@ -301,10 +301,7 @@ public class PresenceWebsocketServer {
      */
     @OnMessage
     public void receiveRequest(String input, Session websocket) throws IOException {
-	if (StringUtils.isBlank(input)) {
-	    return;
-	}
-	if (input.equalsIgnoreCase("ping")) {
+	if (StringUtils.isBlank(input) || input.equalsIgnoreCase("ping")) {
 	    // just a ping every few minutes
 	    return;
 	}

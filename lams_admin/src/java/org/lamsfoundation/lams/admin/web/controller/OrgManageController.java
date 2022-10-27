@@ -98,7 +98,7 @@ public class OrgManageController {
 	if (!request.isUserInRole(Role.SYSADMIN) && !userManagementService.isUserGlobalGroupManager()
 		&& !(isRootOrganisation ? request.isUserInRole(Role.GROUP_MANAGER)
 			: securityService.hasOrgRole(orgId, userId, new String[] { Role.GROUP_MANAGER },
-				"manage courses", false))) {
+				"manage courses"))) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a manager or admin in the organisation");
 	    return null;
 	}

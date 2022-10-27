@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.persistence.PersistenceException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -153,7 +154,7 @@ public class CommentController {
 	Comment rootComment = commentService.createOrGetRoot(externalId, externalSecondaryId, externalType,
 		externalSignature, user);
 	sessionMap.put(CommentConstants.ATTR_ROOT_COMMENT_UID, rootComment.getUid());
-	
+
 	prepareViewTopicData(request, sessionMap, pageSize, sortBy, true);
 	return "comments/comments";
     }
@@ -182,7 +183,7 @@ public class CommentController {
 		.equals(WebUtil.getToolAccessMode((String) sessionMap.get(AttributeNames.ATTR_MODE)))) {
 	    GroupedToolSession toolSession = (GroupedToolSession) lamsCoreToolService.getToolSessionById(toolSessionId);
 	    return securityService.isLessonMonitor(toolSession.getLesson().getLessonId(), user.getUserId(),
-		    "Comment Monitoring Tasks", false);
+		    "Comment Monitoring Tasks");
 	} else {
 	    return false;
 	}
@@ -206,13 +207,13 @@ public class CommentController {
 	if (sortBy != null) {
 	    sessionMap.put(CommentConstants.ATTR_SORT_BY, sortBy);
 	}
-	
+
 	prepareViewTopicData(request, sessionMap, pageSize, sortBy, sticky);
 	return (sticky ? "comments/allviewwrapper" : "comments/topicviewwrapper");
     }
 
-    private void prepareViewTopicData(HttpServletRequest request, SessionMap<String, Object> sessionMap, Integer pageSize,
-	    Integer sortBy, boolean includeSticky) {
+    private void prepareViewTopicData(HttpServletRequest request, SessionMap<String, Object> sessionMap,
+	    Integer pageSize, Integer sortBy, boolean includeSticky) {
 
 	Long externalId = (Long) sessionMap.get(CommentConstants.ATTR_EXTERNAL_ID);
 	Long externalSecondaryId = (Long) sessionMap.get(CommentConstants.ATTR_EXTERNAL_SECONDARY_ID);
@@ -410,7 +411,7 @@ public class CommentController {
 	ObjectNode responseJSON;
 	if (!validateText(commentText)) {
 	    responseJSON = getFailedValidationJSON();
-	    
+
 	} else {
 
 	    User user = getCurrentUser(request);

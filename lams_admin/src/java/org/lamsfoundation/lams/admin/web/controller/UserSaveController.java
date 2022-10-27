@@ -296,7 +296,7 @@ public class UserSaveController {
 	Integer loggeduserId = ((UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
 
 	// check if logged in User is Sysadmin
-	if (!securityService.isSysadmin(loggeduserId, "Change Password of User " + userId, true)) {
+	if (!securityService.isSysadmin(loggeduserId, "change password for user " + userId)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Only Sysadmin has edit permisions");
 	    return null;
 	}

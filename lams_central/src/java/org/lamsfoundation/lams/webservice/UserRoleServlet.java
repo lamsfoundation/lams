@@ -69,7 +69,7 @@ public class UserRoleServlet extends HttpServlet {
 		return;
 	    }
 	    ExtUserUseridMap sysadminUserMap = integrationService.getExtUserUseridMap(extServer, username);
-	    if (!securityService.isSysadmin(sysadminUserMap.getUser().getUserId(), "set user role", false)) {
+	    if (!securityService.isSysadmin(sysadminUserMap.getUser().getUserId(), "set user role")) {
 		log.error("Sysadmin role check failed while trying to set role for user: " + targetUsername);
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed, user is not sysadmin");
 		return;

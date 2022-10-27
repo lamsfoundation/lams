@@ -96,7 +96,7 @@ public class NotebookController {
 	Long lessonID = notebookForm.getLessonID();
 	Lesson lesson = learnerService.getLesson(lessonID);
 
-	if (!securityService.isLessonMonitor(lessonID, userID, "view all journals", false)) {
+	if (!securityService.isLessonMonitor(lessonID, userID, "view all journals")) {
 	    throw new UserAccessDeniedException(
 		    "User " + userID + " may not retrieve journal entries for lesson " + lessonID);
 	}
@@ -129,7 +129,7 @@ public class NotebookController {
 
 	if (entry.getUser() != null && !entry.getUser().getUserId().equals(user.getUserId())) {
 	    // wants to look at someone else's entry - check they are a teacher
-	    if (!securityService.isLessonMonitor(currentLessonID, userID, "view notebook entry", false)) {
+	    if (!securityService.isLessonMonitor(currentLessonID, userID, "view notebook entry")) {
 		throw new UserAccessDeniedException(
 			"User " + userID + " may not retrieve journal entries for lesson " + currentLessonID);
 	    }

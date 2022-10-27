@@ -114,9 +114,8 @@ public class OrgPasswordChangeController {
 
 	UserDTO userDTO = getUserDTO();
 	Integer currentUserId = userDTO.getUserID();
-	if (!securityService.isSysadmin(currentUserId, "get grid users for org password change", false)) {
+	if (!securityService.isSysadmin(currentUserId, "get grid users for org password change")) {
 	    String warning = "User " + currentUserId + " is not a sysadmin";
-	    log.warn(warning);
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
 	    return null;
 	}
@@ -178,9 +177,8 @@ public class OrgPasswordChangeController {
 	UserDTO userDTO = getUserDTO();
 	Integer currentUserId = userDTO.getUserID();
 	// security check
-	if (!securityService.isSysadmin(currentUserId, "org password change", false)) {
+	if (!securityService.isSysadmin(currentUserId, "org password change")) {
 	    String warning = "User " + currentUserId + " is not a sysadmin";
-	    log.warn(warning);
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
 	    return null;
 	}

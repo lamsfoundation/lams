@@ -140,7 +140,7 @@ public class HomeController {
 		return "errorContent";
 	    }
 
-	    if (!securityService.isLessonLearner(lessonId, user.getUserID(), "access lesson", false)) {
+	    if (!securityService.isLessonLearner(lessonId, user.getUserID(), "access lesson")) {
 		res.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a learner in the lesson");
 		return null;
 	    }
@@ -258,7 +258,7 @@ public class HomeController {
     public String addLesson(HttpServletRequest req, HttpServletResponse res, @RequestParam Integer organisationID)
 	    throws IOException, UserAccessDeniedException, RepositoryCheckedException {
 	UserDTO userDTO = getUser();
-	if (!securityService.isGroupMonitor(organisationID, userDTO.getUserID(), "add lesson", false)) {
+	if (!securityService.isGroupMonitor(organisationID, userDTO.getUserID(), "add lesson")) {
 	    res.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 	    return null;
 	}
