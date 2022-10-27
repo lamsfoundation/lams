@@ -19,6 +19,7 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -130,7 +131,8 @@ public class EditorEmbedProxyController {
 			this.customEmbedJsonTemplate.get("html").asText().replace("[URL]", embeddedUrl));
 		StringBuilder responseString = new StringBuilder(callback).append(" && ").append(callback).append("(")
 			.append(responseJSON.toString()).append(");");
-		return ResponseEntity.ok(responseString.toString());
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType("application/javascript"))
+			.body(responseString.toString());
 	    }
 	}
 
