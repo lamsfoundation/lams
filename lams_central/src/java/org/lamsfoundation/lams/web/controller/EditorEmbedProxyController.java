@@ -40,6 +40,7 @@ public class EditorEmbedProxyController {
     private static final String CUSTOM_EMBED_PROPERTY_NAME = "lams_embed_custom_domains";
     private static final String EMBED_PROVIDER_DEFAULT_HTTP_PROTOCOL = "http:";
     private static final Pattern PROPERTY_VALUE_EXTRACTOR = Pattern.compile("'(.*?)'");
+    private static final MediaType JSONP_RETURN_MIME_TYPE = MediaType.parseMediaType("application/javascript");
 
     private final String targetEmbedUrl;
     private final Set<String> customEmbedDomains;
@@ -131,8 +132,7 @@ public class EditorEmbedProxyController {
 			this.customEmbedJsonTemplate.get("html").asText().replace("[URL]", embeddedUrl));
 		StringBuilder responseString = new StringBuilder(callback).append(" && ").append(callback).append("(")
 			.append(responseJSON.toString()).append(");");
-		return ResponseEntity.ok().contentType(MediaType.parseMediaType("application/javascript"))
-			.body(responseString.toString());
+		return ResponseEntity.ok().contentType(JSONP_RETURN_MIME_TYPE).body(responseString.toString());
 	    }
 	}
 
