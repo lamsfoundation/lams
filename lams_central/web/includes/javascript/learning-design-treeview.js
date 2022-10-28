@@ -93,7 +93,8 @@ var ldTreeview = {
 							  	         'learningDesignId' : this.learningDesignId,
 							  	         'canHaveReadOnly'	: canHaveReadOnly,
 							  	         'canModify'		: canModify,
-							  	         'readOnly'			: this.readOnly
+							  	         'readOnly'			: this.readOnly,
+										 'modifiedDate'     : this.formattedDate
 								        });
 						});
 					}
