@@ -134,7 +134,7 @@ public class KumaliveWebsocketServer {
 		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_ORGANISATION_ID).get(0));
 	Integer userId = getUser(websocket).getUserId();
 	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.LEARNER }, "register on kumalive", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.LEARNER }, "register on kumalive")) {
 	    // prevent unauthorised user from accessing Kumalive
 	    String warning = "User " + userId + " is not a monitor nor a learner of organisation " + organisationId;
 	    logger.warn(warning);
@@ -178,10 +178,7 @@ public class KumaliveWebsocketServer {
 	    logger.warn("Kumalives are disabled");
 	    return;
 	}
-	if (StringUtils.isBlank(input)) {
-	    return;
-	}
-	if (input.equalsIgnoreCase("ping")) {
+	if (StringUtils.isBlank(input) || input.equalsIgnoreCase("ping")) {
 	    // just a ping every few minutes
 	    return;
 	}
@@ -469,7 +466,7 @@ public class KumaliveWebsocketServer {
 	Integer userId = user.getUserId();
 
 	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive raise hand prompt", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive raise hand prompt")) {
 	    String warning = "User " + userId + " is not a monitor of organisation " + organisationId;
 	    logger.warn(warning);
 	    return;
@@ -494,7 +491,7 @@ public class KumaliveWebsocketServer {
 	Integer userId = user.getUserId();
 
 	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive down hand prompt", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive down hand prompt")) {
 	    String warning = "User " + userId + " is not a monitor of organisation " + organisationId;
 	    logger.warn(warning);
 	    return;
@@ -520,7 +517,7 @@ public class KumaliveWebsocketServer {
 	Integer userId = user.getUserId();
 
 	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.LEARNER }, "kumalive raise hand", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.LEARNER }, "kumalive raise hand")) {
 	    String warning = "User " + userId + " is not a monitor nor a learner of organisation " + organisationId;
 	    logger.warn(warning);
 	    return;
@@ -556,7 +553,7 @@ public class KumaliveWebsocketServer {
 	Integer userId = user.getUserId();
 
 	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.LEARNER }, "kumalive down hand", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.LEARNER }, "kumalive down hand")) {
 	    String warning = "User " + userId + " is not a monitor nor a learner of organisation " + organisationId;
 	    logger.warn(warning);
 	    return;
@@ -587,7 +584,7 @@ public class KumaliveWebsocketServer {
 	Integer userId = user.getUserId();
 
 	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive speak", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive speak")) {
 	    String warning = "User " + userId + " is not a monitor of organisation " + organisationId;
 	    logger.warn(warning);
 	    return;
@@ -609,7 +606,7 @@ public class KumaliveWebsocketServer {
 	Integer userId = user.getUserId();
 
 	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive score", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive score")) {
 	    String warning = "User " + userId + " is not a monitor of organisation " + organisationId;
 	    logger.warn(warning);
 	    return;
@@ -640,7 +637,7 @@ public class KumaliveWebsocketServer {
 	Integer userId = user.getUserId();
 
 	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive poll start", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive poll start")) {
 	    String warning = "User " + userId + " is not a monitor of organisation " + organisationId;
 	    logger.warn(warning);
 	    return;
@@ -677,7 +674,7 @@ public class KumaliveWebsocketServer {
 	Integer userId = user.getUserId();
 
 	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
-		new String[] { Role.LEARNER }, "kumalive poll vote", false)) {
+		new String[] { Role.LEARNER }, "kumalive poll vote")) {
 	    String warning = "User " + userId + " is not a learner of organisation " + organisationId;
 	    logger.warn(warning);
 	    return;
@@ -719,7 +716,7 @@ public class KumaliveWebsocketServer {
 	Integer userId = user.getUserId();
 
 	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive poll release results", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive poll release results")) {
 	    String warning = "User " + userId + " is not a monitor of organisation " + organisationId;
 	    logger.warn(warning);
 	    return;
@@ -753,7 +750,7 @@ public class KumaliveWebsocketServer {
 	Integer userId = user.getUserId();
 
 	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive poll start", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive poll start")) {
 	    String warning = "User " + userId + " is not a monitor of organisation " + organisationId;
 	    logger.warn(warning);
 	    return;
@@ -780,7 +777,7 @@ public class KumaliveWebsocketServer {
 	Integer userId = user.getUserId();
 
 	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive poll start", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive poll start")) {
 	    String warning = "User " + userId + " is not a monitor of organisation " + organisationId;
 	    logger.warn(warning);
 	    return;
@@ -806,7 +803,7 @@ public class KumaliveWebsocketServer {
 	Integer userId = user.getUserId();
 
 	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive finish", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive finish")) {
 	    String warning = "User " + userId + " is not a monitor of organisation " + organisationId;
 	    logger.warn(warning);
 	    return;

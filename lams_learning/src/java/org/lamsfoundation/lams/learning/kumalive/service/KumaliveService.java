@@ -57,7 +57,6 @@ import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelRow;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 
@@ -82,7 +81,7 @@ public class KumaliveService implements IKumaliveService {
 
     @Override
     public Kumalive getKumalive(Long id) {
-	return (Kumalive) kumaliveDAO.find(Kumalive.class, id);
+	return kumaliveDAO.find(Kumalive.class, id);
     }
 
     @Override
@@ -97,7 +96,7 @@ public class KumaliveService implements IKumaliveService {
     public Kumalive startKumalive(Integer organisationId, Integer userId, String name, ArrayNode rubricsJSON,
 	    boolean isTeacher) {
 	if (isTeacher) {
-	    securityService.isGroupMonitor(organisationId, userId, "start kumalive", true);
+	    securityService.ensureGroupMonitor(organisationId, userId, "start kumalive");
 	}
 	Kumalive kumalive = getKumaliveByOrganisation(organisationId);
 	if (kumalive == null) {
@@ -108,8 +107,8 @@ public class KumaliveService implements IKumaliveService {
 	    return kumalive;
 	}
 
-	Organisation organisation = (Organisation) kumaliveDAO.find(Organisation.class, organisationId);
-	User createdBy = (User) kumaliveDAO.find(User.class, userId);
+	Organisation organisation = kumaliveDAO.find(Organisation.class, organisationId);
+	User createdBy = kumaliveDAO.find(User.class, userId);
 	kumalive = new Kumalive(organisation, createdBy, name);
 	kumaliveDAO.insert(kumalive);
 
@@ -141,7 +140,7 @@ public class KumaliveService implements IKumaliveService {
      */
     @Override
     public void finishKumalive(Long id) {
-	Kumalive kumalive = (Kumalive) kumaliveDAO.find(Kumalive.class, id);
+	Kumalive kumalive = kumaliveDAO.find(Kumalive.class, id);
 	kumalive.setFinished(true);
 	kumaliveDAO.update(kumalive);
     }
@@ -151,8 +150,8 @@ public class KumaliveService implements IKumaliveService {
      */
     @Override
     public void scoreKumalive(Long rubricId, Integer userId, Long batch, Short score) {
-	KumaliveRubric rubric = (KumaliveRubric) kumaliveDAO.find(KumaliveRubric.class, rubricId);
-	User user = (User) kumaliveDAO.find(User.class, userId);
+	KumaliveRubric rubric = kumaliveDAO.find(KumaliveRubric.class, rubricId);
+	User user = kumaliveDAO.find(User.class, userId);
 	KumaliveScore kumaliveScore = new KumaliveScore(rubric, user, batch, score);
 	kumaliveDAO.insert(kumaliveScore);
     }
@@ -164,7 +163,7 @@ public class KumaliveService implements IKumaliveService {
 
     @Override
     public void saveRubrics(Integer organisationId, ArrayNode rubricsJSON) {
-	Organisation organisation = (Organisation) kumaliveDAO.find(Organisation.class, organisationId);
+	Organisation organisation = kumaliveDAO.find(Organisation.class, organisationId);
 	kumaliveDAO.deleteByProperty(KumaliveRubric.class, "organisation", organisation);
 	for (Short rubricIndex = 0; rubricIndex < rubricsJSON.size(); rubricIndex++) {
 	    String name = rubricsJSON.get(rubricIndex.intValue()).asText();
@@ -237,7 +236,7 @@ public class KumaliveService implements IKumaliveService {
     @Override
     public ObjectNode getReportKumaliveData(Long kumaliveId, boolean isAscending) {
 	Kumalive kumalive = getKumalive(kumaliveId);
-	List<Long> rubrics = new LinkedList<Long>();
+	List<Long> rubrics = new LinkedList<>();
 	for (KumaliveRubric rubric : kumalive.getRubrics()) {
 	    rubrics.add(rubric.getRubricId());
 	}
@@ -291,7 +290,7 @@ public class KumaliveService implements IKumaliveService {
     @Override
     public ObjectNode getReportUserData(Long kumaliveId, Integer userId) {
 	Kumalive kumalive = getKumalive(kumaliveId);
-	List<Long> rubrics = new LinkedList<Long>();
+	List<Long> rubrics = new LinkedList<>();
 	for (KumaliveRubric rubric : kumalive.getRubrics()) {
 	    rubrics.add(rubric.getRubricId());
 	}
@@ -381,8 +380,7 @@ public class KumaliveService implements IKumaliveService {
 	    // mapping user (sorted by name) -> batch (i.e. question ID) -> rubric -> score
 	    TreeMap<User, Map<Long, Map<Long, Short>>> scores = kumaliveDAO
 		    .findKumaliveScore(kumalive.getKumaliveId(), true).stream()
-		    .collect(Collectors.groupingBy(KumaliveScore::getUser,
-			    () -> new TreeMap<User, Map<Long, Map<Long, Short>>>(USER_COMPARATOR),
+		    .collect(Collectors.groupingBy(KumaliveScore::getUser, () -> new TreeMap<>(USER_COMPARATOR),
 			    Collectors.groupingBy(KumaliveScore::getBatch, TreeMap::new, Collectors
 				    .toMap(score -> score.getRubric().getRubricId(), KumaliveScore::getScore))));
 
@@ -461,12 +459,12 @@ public class KumaliveService implements IKumaliveService {
 			// populate data for learners sheet
 			Map<String, Map<Long, Double>> learnerSummary = learnerSummaries.get(learner);
 			if (learnerSummary == null) {
-			    learnerSummary = new HashMap<String, Map<Long, Double>>();
+			    learnerSummary = new HashMap<>();
 			    learnerSummaries.put(learner, learnerSummary);
 			}
 			Map<Long, Double> learnerKumaliveSummary = learnerSummary.get(kumalive.getName());
 			if (learnerKumaliveSummary == null) {
-			    learnerKumaliveSummary = new HashMap<Long, Double>();
+			    learnerKumaliveSummary = new HashMap<>();
 			    learnerSummary.put(kumalive.getName(), learnerKumaliveSummary);
 			}
 			learnerKumaliveSummary.put(rubricIds[rubricIndex], average);
@@ -493,7 +491,7 @@ public class KumaliveService implements IKumaliveService {
 	    kumaliveNameRow.addCell(kumalive.getName(), true, 1);
 	    kumaliveNameRow.addEmptyCells(kumalive.getRubrics().size() - 1);
 	}
-	
+
 	ExcelRow userHeaderRow = sheet.initRow();
 	userHeaderRow.addCell(messageService.getMessage("label.kumalive.report.last.name"), true);
 	userHeaderRow.addCell(messageService.getMessage("label.kumalive.report.first.name"), true);
@@ -513,18 +511,19 @@ public class KumaliveService implements IKumaliveService {
 	    userRow.addCell(learner.getFirstName(), false);
 	    userRow.addCell(learner.getLastName(), false);
 	    userRow.addCell(learner.getLogin(), false);
-	    
+
 	    for (Kumalive kumalive : kumalives) {
 		Map<Long, Double> learnerKumaliveSummary = learnerSummary.getValue().get(kumalive.getName());
 		boolean border = true;
 		for (KumaliveRubric rubric : kumalive.getRubrics()) {
-		    Double average = learnerKumaliveSummary == null ? null : learnerKumaliveSummary.get(rubric.getRubricId());
+		    Double average = learnerKumaliveSummary == null ? null
+			    : learnerKumaliveSummary.get(rubric.getRubricId());
 		    border = false;
 		    if (average != null) {
 			userRow.addCell(average, false, border ? 1 : 0);
 		    } else {
 			userRow.addEmptyCell();
-		    }		    
+		    }
 		}
 	    }
 	}
@@ -571,7 +570,7 @@ public class KumaliveService implements IKumaliveService {
      */
     @Override
     public void saveVote(Long answerId, Integer userId) {
-	KumalivePollAnswer answer = (KumalivePollAnswer) kumaliveDAO.find(KumalivePollAnswer.class, answerId);
+	KumalivePollAnswer answer = kumaliveDAO.find(KumalivePollAnswer.class, answerId);
 	if (answer.getVotes().containsKey(userId)) {
 	    logger.warn("Learner " + userId + " tried to vote for answer ID " + answerId + " but he already voted");
 	    return;
@@ -589,7 +588,7 @@ public class KumaliveService implements IKumaliveService {
      */
     @Override
     public void releasePollResults(Long pollId, boolean votesReleased, boolean votersReleased) {
-	KumalivePoll poll = (KumalivePoll) kumaliveDAO.find(KumalivePoll.class, pollId);
+	KumalivePoll poll = kumaliveDAO.find(KumalivePoll.class, pollId);
 	poll.setVotesReleased(votesReleased || votersReleased);
 	poll.setVotersReleased(votersReleased);
 	kumaliveDAO.update(poll);
@@ -600,7 +599,7 @@ public class KumaliveService implements IKumaliveService {
      */
     @Override
     public void finishPoll(Long pollId) {
-	KumalivePoll poll = (KumalivePoll) kumaliveDAO.find(KumalivePoll.class, pollId);
+	KumalivePoll poll = kumaliveDAO.find(KumalivePoll.class, pollId);
 	if (poll.getFinishDate() != null) {
 	    logger.warn("Trying to finish poll " + pollId + " which is already finished");
 	    return;

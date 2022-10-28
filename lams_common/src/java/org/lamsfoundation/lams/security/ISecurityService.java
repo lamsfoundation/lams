@@ -29,43 +29,64 @@ public interface ISecurityService {
      * Checks if the is a manager or monitor in the organisation. This is just a convenience method for hasOrgRole()
      * with MONITOR and GROUP_MANAGER.
      */
-    boolean isGroupMonitor(Integer orgId, Integer userId, String action, boolean escalate) throws SecurityException;
+    boolean isGroupMonitor(Integer orgId, Integer userId, String action);
+
+    boolean isGroupMonitor(Integer orgId, Integer userId, String action, boolean skipLog);
+
+    boolean ensureGroupMonitor(Integer orgId, Integer userId, String action) throws SecurityException;
 
     /**
      * Checks if the user is a learner in the given lesson.
      */
-    boolean isLessonLearner(Long lessonId, Integer userId, String action, boolean escalate) throws SecurityException;
+    boolean isLessonLearner(Long lessonId, Integer userId, String action);
+
+    boolean isLessonLearner(Long lessonId, Integer userId, String action, boolean skipLog);
+
+    boolean ensureLessonLearner(Long lessonId, Integer userId, String action) throws SecurityException;
 
     /**
      * Checks if the user is a monitor or owner of the given lesson, or a group manager of the organisation.
-     * 
-     * @param lessonId
-     * @param userId
-     * @param action describes action that was requested and is used for logging. If this value is null, no logging will be done.
-     * @param escalate
      */
-    boolean isLessonMonitor(Long lessonId, Integer userId, String action, boolean escalate) throws SecurityException;
+    boolean isLessonMonitor(Long lessonId, Integer userId, String action);
+
+    boolean isLessonMonitor(Long lessonId, Integer userId, String action, boolean skipLog);
+
+    boolean ensureLessonMonitor(Long lessonId, Integer userId, String action) throws SecurityException;
 
     /**
      * Checks if the user is the owner of the given lesson.
      */
-    boolean isLessonOwner(Long lessonId, Integer userId, String action, boolean escalate) throws SecurityException;
+    boolean isLessonOwner(Long lessonId, Integer userId, String action);
+
+    boolean isLessonOwner(Long lessonId, Integer userId, String action, boolean skipLog);
+
+    boolean ensureLessonOwner(Long lessonId, Integer userId, String action) throws SecurityException;
 
     /**
      * Checks if the user is either a learner or a staff member in the given lesson.
      */
-    boolean isLessonParticipant(Long lessonId, Integer userId, String action, boolean escalate)
-	    throws SecurityException;
+    boolean isLessonParticipant(Long lessonId, Integer userId, String action);
+
+    boolean isLessonParticipant(Long lessonId, Integer userId, String action, boolean skipLog);
+
+    boolean ensureLessonParticipant(Long lessonId, Integer userId, String action) throws SecurityException;
 
     /**
      * Checks if the user has a global role of SYSADMIN.
      */
-    boolean isSysadmin(Integer userId, String action, boolean escalate);
+    boolean isSysadmin(Integer userId, String action);
+
+    boolean isSysadmin(Integer userId, String action, boolean skipLog);
+
+    boolean ensureSysadmin(Integer userId, String action) throws SecurityException;
 
     /**
-     * Checks if the user has any of the given roles in the given organisation. If GROUP_MANAGER and/or GROUP_ADMIN are
+     * Checks if the user has any of the given roles in the given organisation. If GROUP_MANAGER is
      * given for class type organisation, their parent organisations are checked.
      */
-    boolean hasOrgRole(Integer orgId, Integer userId, String[] roles, String action, boolean escalate)
-	    throws SecurityException;
+    boolean hasOrgRole(Integer orgId, Integer userId, String[] roles, String action);
+
+    boolean hasOrgRole(Integer orgId, Integer userId, String[] roles, String action, boolean skipLog);
+
+    boolean ensureOrgRole(Integer orgId, Integer userId, String[] roles, String action) throws SecurityException;
 }

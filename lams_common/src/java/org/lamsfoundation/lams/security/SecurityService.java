@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.logevent.LogEvent;
@@ -51,45 +52,38 @@ public class SecurityService implements ISecurityService {
     private ILogEventService logEventService;
 
     @Override
-    public boolean isLessonLearner(Long lessonId, Integer userId, String action, boolean escalate)
+    public boolean isLessonLearner(Long lessonId, Integer userId, String action) {
+	return isLessonLearner(lessonId, userId, action, false);
+    }
+
+    @Override
+    public boolean isLessonLearner(Long lessonId, Integer userId, String action, boolean skipLog) {
+	return isLessonLearner(lessonId, userId, action, skipLog, false);
+    }
+
+    @Override
+    public boolean ensureLessonLearner(Long lessonId, Integer userId, String action) {
+	return isLessonLearner(lessonId, userId, action, false, true);
+    }
+
+    private boolean isLessonLearner(Long lessonId, Integer userId, String action, boolean skipLog, boolean escalate)
 	    throws SecurityException {
 	if (lessonId == null) {
 	    String error = "Missing lesson ID when checking if user " + userId + " is learner and can \"" + action
 		    + "\"";
-	    SecurityService.log.error(error);
-	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
-	    logAuditRoleFailure(userId, error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
+	    return processCheckFailure(userId, error, skipLog, escalate);
 	}
 	if (userId == null) {
 	    String error = "Missing user ID when checking if is learner in lesson " + lessonId + " and can \"" + action
 		    + "\"";
-	    SecurityService.log.error(error);
-	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
-	    logAuditRoleFailure(userId, error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
+	    return processCheckFailure(userId, error, skipLog, escalate);
 	}
 
 	Lesson lesson = (Lesson) securityDAO.find(Lesson.class, lessonId);
 	if (lesson == null) {
 	    String error = "Could not find lesson " + lessonId + " when checking if user " + userId
 		    + " is learner and can \"" + action + "\"";
-	    SecurityService.log.error(error);
-	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
-	    logAuditRoleFailure(userId, error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
+	    return processCheckFailure(userId, error, skipLog, escalate);
 	}
 
 	Organisation org = lesson.getOrganisation();
@@ -100,59 +94,45 @@ public class SecurityService implements ISecurityService {
 	if (!hasSysadminRole && !(hasOrgRole && securityDAO.isLessonLearner(lessonId, userId))) {
 	    String error = "User " + userId + " is not learner in lesson " + lessonId + " and can not \"" + action
 		    + "\"";
-	    SecurityService.log.debug(error);
-	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
-	    logAuditRoleFailure(userId, error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
+	    return processCheckFailure(userId, error, skipLog, escalate);
 	}
 
 	return true;
     }
 
     @Override
-    public boolean isLessonMonitor(Long lessonId, Integer userId, String action, boolean escalate)
+    public boolean isLessonMonitor(Long lessonId, Integer userId, String action) {
+	return isLessonMonitor(lessonId, userId, action, false);
+    }
+
+    @Override
+    public boolean isLessonMonitor(Long lessonId, Integer userId, String action, boolean skipLog) {
+	return isLessonMonitor(lessonId, userId, action, skipLog, false);
+    }
+
+    @Override
+    public boolean ensureLessonMonitor(Long lessonId, Integer userId, String action) {
+	return isLessonMonitor(lessonId, userId, action, false, true);
+    }
+
+    private boolean isLessonMonitor(Long lessonId, Integer userId, String action, boolean skipLog, boolean escalate)
 	    throws SecurityException {
 	if (lessonId == null) {
 	    String error = "Missing lesson ID when checking if user " + userId + " is monitor and can \"" + action
 		    + "\"";
-	    SecurityService.log.error(error);
-	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
-	    logAuditRoleFailure(userId, error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
+	    return processCheckFailure(userId, error, skipLog, escalate);
 	}
 	if (userId == null) {
 	    String error = "Missing user ID when checking if is monitor in lesson " + lessonId + " and can \"" + action
 		    + "\"";
-	    SecurityService.log.error(error);
-	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
-	    logAuditRoleFailure(userId, error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
+	    return processCheckFailure(userId, error, skipLog, escalate);
 	}
 
 	Lesson lesson = (Lesson) securityDAO.find(Lesson.class, lessonId);
 	if (lesson == null) {
 	    String error = "Could not find lesson " + lessonId + " when checking if user " + userId
 		    + " is monitor and can \"" + action + "\"";
-	    SecurityService.log.error(error);
-	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
-	    logAuditRoleFailure(userId, error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
+	    return processCheckFailure(userId, error, skipLog, escalate);
 	}
 
 	Organisation org = lesson.getOrganisation();
@@ -165,118 +145,87 @@ public class SecurityService implements ISecurityService {
 	if (!hasGroupManagerRole && !(hasMonitorRole && securityDAO.isLessonMonitor(lessonId, userId, true))) {
 	    String error = "User " + userId + " is not monitor in lesson " + lessonId + " and can not \"" + action
 		    + "\"";
-	    //no logging needed, if action parameter is empty
-	    if (action != null) {
-		SecurityService.log.debug(error);
-		logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
-		logAuditRoleFailure(userId, error);
-	    }
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
+	    return processCheckFailure(userId, error, skipLog, escalate);
 	}
 
 	return true;
     }
 
     @Override
-    public boolean isLessonOwner(Long lessonId, Integer userId, String action, boolean escalate)
+    public boolean isLessonOwner(Long lessonId, Integer userId, String action) {
+	return isLessonOwner(lessonId, userId, action, false);
+    }
+
+    @Override
+    public boolean isLessonOwner(Long lessonId, Integer userId, String action, boolean skipLog) {
+	return isLessonOwner(lessonId, userId, action, skipLog, false);
+    }
+
+    @Override
+    public boolean ensureLessonOwner(Long lessonId, Integer userId, String action) {
+	return isLessonOwner(lessonId, userId, action, false, true);
+    }
+
+    private boolean isLessonOwner(Long lessonId, Integer userId, String action, boolean skipLog, boolean escalate)
 	    throws SecurityException {
 	if (lessonId == null) {
 	    String error = "Missing lesson ID when checking if user " + userId + " is owner and can \"" + action + "\"";
-	    SecurityService.log.error(error);
-	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
-	    logAuditRoleFailure(userId, error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
+	    return processCheckFailure(userId, error, skipLog, escalate);
 	}
 	if (userId == null) {
 	    String error = "Missing user ID when checking if is owner of lesson " + lessonId + " and can \"" + action
 		    + "\"";
-	    SecurityService.log.error(error);
-	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
-	    logAuditRoleFailure(userId, error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
+	    return processCheckFailure(userId, error, skipLog, escalate);
 	}
 
 	Lesson lesson = (Lesson) securityDAO.find(Lesson.class, lessonId);
 	if (lesson == null) {
 	    String error = "Could not find lesson " + lessonId + " when checking if user " + userId
 		    + " is owner and can \"" + action + "\"";
-	    SecurityService.log.error(error);
-	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
-	    logAuditRoleFailure(userId, error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
+	    return processCheckFailure(userId, error, skipLog, escalate);
 	}
 
 	if (!lesson.getUser().getUserId().equals(userId)) {
 	    String error = "User " + userId + " is not owner of lesson " + lessonId + " and can not \"" + action + "\"";
-	    SecurityService.log.debug(error);
-	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
-	    logAuditRoleFailure(userId, error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
+	    return processCheckFailure(userId, error, skipLog, escalate);
 	}
 
 	return true;
     }
 
     @Override
-    public boolean isLessonParticipant(Long lessonId, Integer userId, String action, boolean escalate)
+    public boolean isLessonParticipant(Long lessonId, Integer userId, String action) {
+	return isLessonParticipant(lessonId, userId, action, false);
+    }
+
+    @Override
+    public boolean isLessonParticipant(Long lessonId, Integer userId, String action, boolean skipLog) {
+	return isLessonParticipant(lessonId, userId, action, skipLog, false);
+    }
+
+    @Override
+    public boolean ensureLessonParticipant(Long lessonId, Integer userId, String action) {
+	return isLessonParticipant(lessonId, userId, action, false, true);
+    }
+
+    private boolean isLessonParticipant(Long lessonId, Integer userId, String action, boolean skipLog, boolean escalate)
 	    throws SecurityException {
 	if (lessonId == null) {
 	    String error = "Missing lesson ID when checking if user " + userId + " is participant and can \"" + action
 		    + "\"";
-	    SecurityService.log.error(error);
-	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
-	    logAuditRoleFailure(userId, error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
+	    return processCheckFailure(userId, error, skipLog, escalate);
 	}
 	if (userId == null) {
 	    String error = "Missing user ID when checking if is participant in lesson " + lessonId + " and can \""
 		    + action + "\"";
-	    SecurityService.log.error(error);
-	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
-	    logAuditRoleFailure(userId, error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
+	    return processCheckFailure(userId, error, skipLog, escalate);
 	}
 
 	Lesson lesson = (Lesson) securityDAO.find(Lesson.class, lessonId);
 	if (lesson == null) {
 	    String error = "Could not find lesson " + lessonId + " when checking if user " + userId
 		    + " is participant and can \"" + action + "\"";
-	    SecurityService.log.error(error);
-	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
-	    logAuditRoleFailure(userId, error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
+	    return processCheckFailure(userId, error, skipLog, escalate);
 	}
 
 	Organisation org = lesson.getOrganisation();
@@ -290,72 +239,88 @@ public class SecurityService implements ISecurityService {
 		|| securityDAO.isLessonMonitor(lessonId, userId, true)))) {
 	    String error = "User " + userId + " is not participant in lesson " + lessonId + " and can not \"" + action
 		    + "\"";
-	    SecurityService.log.debug(error);
-	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
-	    logAuditRoleFailure(userId, error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
+	    return processCheckFailure(userId, error, skipLog, escalate);
 	}
 
 	return true;
     }
 
     @Override
-    public boolean isSysadmin(Integer userId, String action, boolean escalate) {
+    public boolean isSysadmin(Integer userId, String action) {
+	return isSysadmin(userId, action, false);
+    }
+
+    @Override
+    public boolean isSysadmin(Integer userId, String action, boolean skipLog) {
+	return isSysadmin(userId, action, skipLog, false);
+    }
+
+    @Override
+    public boolean ensureSysadmin(Integer userId, String action) {
+	return isSysadmin(userId, action, false, true);
+    }
+
+    private boolean isSysadmin(Integer userId, String action, boolean skipLog, boolean escalate) {
 	if (userId == null) {
 	    String error = "Missing user ID when checking if is sysadmin and can \"" + action + "\"";
-	    SecurityService.log.error(error);
-	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, null, null, error);
-	    logAuditRoleFailure(userId, error);
-	    throw new SecurityException(error);
+	    return processCheckFailure(userId, error, skipLog, escalate);
 	}
 
 	if (!securityDAO.isSysadmin(userId)) {
 	    String error = "User " + userId + " is not sysadmin and can not \"" + action + "\"";
-	    SecurityService.log.debug(error);
-	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, null, null, error);
-	    logAuditRoleFailure(userId, error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
+	    return processCheckFailure(userId, error, skipLog, escalate);
 	}
 
 	return true;
+
     }
 
     @Override
-    public boolean isGroupMonitor(Integer orgId, Integer userId, String action, boolean escalate)
-	    throws SecurityException {
-	return hasOrgRole(orgId, userId, SecurityService.GROUP_MONITOR_ROLES, action, escalate);
+    public boolean isGroupMonitor(Integer orgId, Integer userId, String action) {
+	return isGroupMonitor(orgId, userId, action, false);
     }
 
     @Override
-    public boolean hasOrgRole(Integer orgId, Integer userId, String[] roles, String action, boolean escalate)
+    public boolean isGroupMonitor(Integer orgId, Integer userId, String action, boolean skipLog) {
+	return isGroupMonitor(orgId, userId, action, skipLog, false);
+    }
+
+    @Override
+    public boolean ensureGroupMonitor(Integer orgId, Integer userId, String action) {
+	return isGroupMonitor(orgId, userId, action, false, true);
+    }
+
+    private boolean isGroupMonitor(Integer orgId, Integer userId, String action, boolean skipLog, boolean escalate)
 	    throws SecurityException {
+	return hasOrgRole(orgId, userId, SecurityService.GROUP_MONITOR_ROLES, action, skipLog, escalate);
+    }
+
+    @Override
+    public boolean hasOrgRole(Integer orgId, Integer userId, String[] roles, String action) {
+	return hasOrgRole(orgId, userId, roles, action, false);
+    }
+
+    @Override
+    public boolean hasOrgRole(Integer orgId, Integer userId, String[] roles, String action, boolean skipLog) {
+	return hasOrgRole(orgId, userId, roles, action, skipLog, false);
+    }
+
+    @Override
+    public boolean ensureOrgRole(Integer orgId, Integer userId, String[] roles, String action) {
+	return hasOrgRole(orgId, userId, roles, action, false, true);
+    }
+
+    private boolean hasOrgRole(Integer orgId, Integer userId, String[] roles, String action, boolean skipLog,
+	    boolean escalate) throws SecurityException {
 	if (orgId == null) {
 	    String error = "Missing organisation ID when checking if user " + userId + " has any of "
 		    + Arrays.toString(roles) + " roles in organisation " + orgId + " and can \"" + action + "\"";
-	    SecurityService.log.error(error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
+	    return processCheckFailure(userId, error, skipLog, escalate);
 	}
 	if (userId == null) {
 	    String error = "Missing user ID when checking if has any of " + Arrays.toString(roles)
 		    + " roles in organisation " + orgId + " and can \"" + action + "\"";
-	    SecurityService.log.error(error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
+	    return processCheckFailure(userId, error, skipLog, escalate);
 	}
 
 	try {
@@ -382,20 +347,26 @@ public class SecurityService implements ISecurityService {
 
 	String error = "User " + userId + " does not have any of " + Arrays.toString(roles) + " roles in organisation "
 		+ orgId + " and can not \"" + action + "\"";
-	SecurityService.log.debug(error);
-	logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, null, null, error);
-	logAuditRoleFailure(userId, error);
-	if (escalate) {
-	    throw new SecurityException(error);
-	} else {
-	    return false;
-	}
+	return processCheckFailure(userId, error, skipLog, escalate);
     }
 
-    private void logAuditRoleFailure(Integer userId, String message) {
-	User user = (User) securityDAO.find(User.class, userId);
-	AuditLogFilter.log(user.getUserDTO(), AuditLogFilter.ROLE_CHECK_ACTION,
-		"failed role check with message: " + message);
+    private boolean processCheckFailure(Integer userId, String error, boolean skipLog, boolean escalate) {
+	// always log if an exception is going to be thrown
+	skipLog |= escalate;
+	skipLog &= StringUtils.isNotBlank(error);
+
+	if (!skipLog) {
+	    SecurityService.log.warn(error);
+	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, null, null, error);
+
+	    User user = (User) securityDAO.find(User.class, userId);
+	    AuditLogFilter.log(user.getUserDTO(), AuditLogFilter.ROLE_CHECK_ACTION,
+		    "failed role check with message: " + error);
+	}
+	if (escalate) {
+	    throw new SecurityException(error);
+	}
+	return false;
     }
 
     public void setSecurityDAO(ISecurityDAO securityDAO) {

@@ -1254,8 +1254,8 @@ public class LearningController {
 	UserDTO user = LearningController.getCurrentUser();
 	Lesson lesson = lessonService.getLessonByToolContentId(toolContentId);
 
-	securityService.isLessonMonitor(lesson.getLessonId(), user.getUserID(), "show Assessment results for teacher",
-		true);
+	securityService.ensureLessonMonitor(lesson.getLessonId(), user.getUserID(),
+		"show Assessment results for teacher");
 
 	// initialize Session Map
 

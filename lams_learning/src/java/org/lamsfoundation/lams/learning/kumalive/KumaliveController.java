@@ -64,7 +64,7 @@ public class KumaliveController {
 	    return null;
 	}
 	if (!securityService.hasOrgRole(organisationId, currentUserId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get rubrics", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get rubrics")) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation " + organisationId;
 	    log.warn(warning);
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
@@ -93,7 +93,7 @@ public class KumaliveController {
 	    return null;
 	}
 	if (!securityService.hasOrgRole(organisationId, currentUserId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report")) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation " + organisationId;
 	    log.warn(warning);
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
@@ -117,7 +117,7 @@ public class KumaliveController {
 	    return null;
 	}
 	if (!securityService.hasOrgRole(organisationId, currentUserId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report organisation data", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report organisation data")) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation " + organisationId;
 	    log.warn(warning);
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
@@ -151,7 +151,7 @@ public class KumaliveController {
 	    return null;
 	}
 	if (!securityService.hasOrgRole(organisation.getOrganisationId(), currentUserId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report kumalive rubrics", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report kumalive rubrics")) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation "
 		    + organisation.getOrganisationId();
 	    log.warn(warning);
@@ -185,7 +185,7 @@ public class KumaliveController {
 	    return null;
 	}
 	if (!securityService.hasOrgRole(organisation.getOrganisationId(), currentUserId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report kumalive data", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report kumalive data")) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation "
 		    + organisation.getOrganisationId();
 	    log.warn(warning);
@@ -217,7 +217,7 @@ public class KumaliveController {
 	    return null;
 	}
 	if (!securityService.hasOrgRole(organisation.getOrganisationId(), currentUserId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report user data", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report user data")) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation "
 		    + organisation.getOrganisationId();
 	    log.warn(warning);
@@ -256,7 +256,7 @@ public class KumaliveController {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
 	}
 	if (!securityService.hasOrgRole(organisationId, currentUserId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive export", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive export")) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation " + organisationId;
 	    log.warn(warning);
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
@@ -291,7 +291,7 @@ public class KumaliveController {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
 	}
 	if (!securityService.hasOrgRole(organisationId, userId, new String[] { Role.GROUP_MANAGER, Role.MONITOR },
-		"kumalive get rubrics", false)) {
+		"kumalive get rubrics")) {
 	    String warning = "User " + userId + " is not a monitor of organisation " + organisationId;
 	    log.warn(warning);
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);

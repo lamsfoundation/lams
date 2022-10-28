@@ -309,7 +309,7 @@ public class AuthoringController {
 	}
 	Integer userID = getUserId();
 
-	if (!securityService.isGroupMonitor(organisationID, userID, "create single activity lesson", false)) {
+	if (!securityService.isGroupMonitor(organisationID, userID, "create single activity lesson")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 	    return null;
 	}

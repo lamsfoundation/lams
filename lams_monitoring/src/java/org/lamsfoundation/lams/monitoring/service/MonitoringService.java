@@ -368,7 +368,7 @@ public class MonitoringService implements IMonitoringFullService {
 	    Boolean allowLearnerRestart, Boolean gradebookOnComplete, Integer scheduledNumberDaysToLessonFinish,
 	    Long precedingLessonId) {
 
-	securityService.isGroupMonitor(organisationId, userID, "intializeLesson", true);
+	securityService.ensureGroupMonitor(organisationId, userID, "intializeLesson");
 
 	LearningDesign originalLearningDesign = learningDesignDAO.getLearningDesignById(new Long(learningDesignId));
 	if (originalLearningDesign == null) {
@@ -477,7 +477,7 @@ public class MonitoringService implements IMonitoringFullService {
 
 	// if lesson isn't started recreate the lesson class
 	if (newLesson.isLessonStarted()) {
-	    securityService.isLessonMonitor(lessonId, userId, "create class for lesson", true);
+	    securityService.ensureLessonMonitor(lessonId, userId, "create class for lesson");
 	    lessonService.updateLearners(newLesson, organizationUsers);
 	    lessonService.updateStaffMembers(newLesson, staffs);
 	} else {
@@ -485,7 +485,7 @@ public class MonitoringService implements IMonitoringFullService {
 		// security check needs organisation to be set
 		// it is not set for lesson preview, so it still needs improvement
 		newLesson.setOrganisation(organisation);
-		securityService.isLessonMonitor(lessonId, userId, "create class for lesson", true);
+		securityService.ensureLessonMonitor(lessonId, userId, "create class for lesson");
 	    }
 
 	    LessonClass oldLessonClass = newLesson.getLessonClass();
@@ -504,7 +504,7 @@ public class MonitoringService implements IMonitoringFullService {
 
     @Override
     public void startLessonOnSchedule(long lessonId, Date startDate, Integer userId) {
-	securityService.isLessonMonitor(lessonId, userId, "start lesson on schedule", true);
+	securityService.ensureLessonMonitor(lessonId, userId, "start lesson on schedule");
 
 	// we get the lesson just created
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
@@ -572,7 +572,7 @@ public class MonitoringService implements IMonitoringFullService {
 
     @Override
     public void finishLessonOnSchedule(long lessonId, Date userEnteredEndDate, Integer userId) {
-	securityService.isLessonMonitor(lessonId, userId, "finish lesson on schedule", true);
+	securityService.ensureLessonMonitor(lessonId, userId, "finish lesson on schedule");
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	if (requestedLesson == null) {
 	    String error = "Unable to schedule lesson end as lesson is missing. Lesson Id " + lessonId;
@@ -660,7 +660,7 @@ public class MonitoringService implements IMonitoringFullService {
 
     @Override
     public void finishLessonOnSchedule(long lessonId, int scheduledNumberDaysToLessonFinish, Integer userId) {
-	securityService.isLessonMonitor(lessonId, userId, "finish lesson on schedule", true);
+	securityService.ensureLessonMonitor(lessonId, userId, "finish lesson on schedule");
 
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	if (requestedLesson == null) {
@@ -703,7 +703,7 @@ public class MonitoringService implements IMonitoringFullService {
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	if (requestedLesson.getOrganisation() != null) {
 	    // preview does not have organisation set, so this security check still needs improvement
-	    securityService.isLessonMonitor(lessonId, userId, "start lesson", true);
+	    securityService.ensureLessonMonitor(lessonId, userId, "start lesson");
 	}
 	if (requestedLesson.isLessonStarted()) {
 	    MonitoringService.log.warn("Lesson " + lessonId
@@ -957,7 +957,7 @@ public class MonitoringService implements IMonitoringFullService {
 
     @Override
     public void archiveLesson(long lessonId, Integer userId) {
-	securityService.isLessonMonitor(lessonId, userId, "archive lesson", true);
+	securityService.ensureLessonMonitor(lessonId, userId, "archive lesson");
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	Integer lessonState = requestedLesson.getLessonStateId();
 
@@ -976,7 +976,7 @@ public class MonitoringService implements IMonitoringFullService {
 
     @Override
     public void unarchiveLesson(long lessonId, Integer userId) {
-	securityService.isLessonMonitor(lessonId, userId, "unarchive lesson", true);
+	securityService.ensureLessonMonitor(lessonId, userId, "unarchive lesson");
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	// remove any triggers waiting to suspend the lesson
 	removeScheduleDisableTrigger(requestedLesson);
@@ -985,7 +985,7 @@ public class MonitoringService implements IMonitoringFullService {
 
     @Override
     public void suspendLesson(long lessonId, Integer userId, boolean clearScheduleDetails) {
-	securityService.isLessonMonitor(lessonId, userId, "suspend lesson", true);
+	securityService.ensureLessonMonitor(lessonId, userId, "suspend lesson");
 	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
 	if (!Lesson.SUSPENDED_STATE.equals(lesson.getLessonStateId())
 		&& !Lesson.REMOVED_STATE.equals(lesson.getLessonStateId())) {
@@ -1008,7 +1008,7 @@ public class MonitoringService implements IMonitoringFullService {
 
     @Override
     public void unsuspendLesson(long lessonId, Integer userId) {
-	securityService.isLessonMonitor(lessonId, userId, "unsuspend lesson", true);
+	securityService.ensureLessonMonitor(lessonId, userId, "unsuspend lesson");
 	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
 	Integer state = lesson.getLessonStateId();
 	// only suspend started lesson
@@ -1130,7 +1130,7 @@ public class MonitoringService implements IMonitoringFullService {
 
     @Override
     public void removeLesson(long lessonId, Integer userId) {
-	securityService.isLessonMonitor(lessonId, userId, "remove lesson", true);
+	securityService.ensureLessonMonitor(lessonId, userId, "remove lesson");
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	// remove any triggers waiting to suspend the lesson
 	removeScheduleDisableTrigger(requestedLesson);
@@ -1145,7 +1145,7 @@ public class MonitoringService implements IMonitoringFullService {
     // on the Lesson object. If you only access the lesson id then it will work. You can still load the Organisation,
     // but do not load the Lesson collection in the Organisation
     public void removeLessonPermanently(long lessonId, Integer userId) {
-	securityService.isLessonMonitor(lessonId, userId, "remove lesson permanently", true);
+	securityService.ensureLessonMonitor(lessonId, userId, "remove lesson permanently");
 
 	Lesson lesson = lessonDAO.getLesson(lessonId);
 	LearningDesign learningDesign = lesson.getLearningDesign();
@@ -1227,7 +1227,7 @@ public class MonitoringService implements IMonitoringFullService {
 
     @Override
     public Boolean togglePresenceAvailable(long lessonId, Integer userId, Boolean presenceAvailable) {
-	securityService.isLessonMonitor(lessonId, userId, "set presence available", true);
+	securityService.ensureLessonMonitor(lessonId, userId, "set presence available");
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	requestedLesson.setLearnerPresenceAvailable(presenceAvailable != null ? presenceAvailable : Boolean.FALSE);
 	lessonDAO.updateLesson(requestedLesson);
@@ -1236,7 +1236,7 @@ public class MonitoringService implements IMonitoringFullService {
 
     @Override
     public Boolean togglePresenceImAvailable(long lessonId, Integer userId, Boolean presenceImAvailable) {
-	securityService.isLessonMonitor(lessonId, userId, "set presence instant messaging available", true);
+	securityService.ensureLessonMonitor(lessonId, userId, "set presence instant messaging available");
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	requestedLesson.setLearnerImAvailable(presenceImAvailable != null ? presenceImAvailable : Boolean.FALSE);
 	lessonDAO.updateLesson(requestedLesson);
@@ -1245,7 +1245,7 @@ public class MonitoringService implements IMonitoringFullService {
 
     @Override
     public Boolean toggleGradebookOnComplete(long lessonId, Integer userId, Boolean gradebookOnComplete) {
-	securityService.isLessonMonitor(lessonId, userId, "set gradebook on complete", true);
+	securityService.ensureLessonMonitor(lessonId, userId, "set gradebook on complete");
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	requestedLesson.setGradebookOnComplete(gradebookOnComplete != null ? gradebookOnComplete : Boolean.FALSE);
 	lessonDAO.updateLesson(requestedLesson);
@@ -1303,9 +1303,9 @@ public class MonitoringService implements IMonitoringFullService {
     public String forceCompleteActivitiesByUser(Integer learnerId, Integer requesterId, long lessonId, Long activityId,
 	    boolean removeLearnerContent) {
 	if (requesterId.equals(learnerId)) {
-	    securityService.isLessonLearner(lessonId, requesterId, "force complete", true);
+	    securityService.ensureLessonLearner(lessonId, requesterId, "force complete");
 	} else {
-	    securityService.isLessonMonitor(lessonId, requesterId, "force complete", true);
+	    securityService.ensureLessonMonitor(lessonId, requesterId, "force complete");
 	}
 	Lesson lesson = lessonDAO.getLesson(Long.valueOf(lessonId));
 	User learner = baseDAO.find(User.class, learnerId);
@@ -2039,7 +2039,7 @@ public class MonitoringService implements IMonitoringFullService {
     @Override
     public String getLearnerActivityURL(Long lessonID, Long activityID, Integer learnerUserID, Integer requestingUserId)
 	    throws IOException, LamsToolServiceException {
-	securityService.isLessonMonitor(lessonID, requestingUserId, "get learner activity URL", true);
+	securityService.ensureLessonMonitor(lessonID, requestingUserId, "get learner activity URL");
 	Lesson lesson = lessonDAO.getLesson(lessonID);
 
 	Activity activity = activityDAO.getActivityByActivityId(activityID);
@@ -2065,7 +2065,7 @@ public class MonitoringService implements IMonitoringFullService {
     @Override
     public String getActivityMonitorURL(Long lessonID, Long activityID, String contentFolderID, Integer userID)
 	    throws IOException, LamsToolServiceException {
-	securityService.isLessonMonitor(lessonID, userID, "get activity monitor URL", true);
+	securityService.ensureLessonMonitor(lessonID, userID, "get activity monitor URL");
 
 	Activity activity = activityDAO.getActivityByActivityId(activityID);
 
@@ -2820,7 +2820,7 @@ public class MonitoringService implements IMonitoringFullService {
 	    String[] staffIds, String[] learnerIds, Organisation group, boolean log) {
 	Lesson newLesson = null;
 
-	securityService.isGroupMonitor(group.getOrganisationId(), creatorId, "cloneLesson", true);
+	securityService.ensureGroupMonitor(group.getOrganisationId(), creatorId, "cloneLesson");
 
 	Lesson lesson = lessonService.getLesson(lessonId);
 	if (lesson != null) {
