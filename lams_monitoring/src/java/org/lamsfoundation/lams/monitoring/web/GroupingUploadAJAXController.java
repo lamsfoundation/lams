@@ -420,7 +420,7 @@ public class GroupingUploadAJAXController {
 		    iter.remove();
 
 		} else if (!securityService.isLessonLearner(lessonId, learner.getUserId(), "be added to grouping",
-			false)) {
+			true)) {
 		    totalUsersSkipped++;
 		    iter.remove();
 		}
