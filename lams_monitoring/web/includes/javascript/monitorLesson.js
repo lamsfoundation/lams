@@ -1556,14 +1556,28 @@ function updateSequenceTab() {
 			
 			$.each(response.activities, function(activityIndex, activity){
 				addActivityIconsHandlers(activity);
-				
+					
 				if (activity.url) {
-					var activityGroup = $('g[id="' + activity.id + '"]');
+					let activityGroup = $('g[id="' + activity.id + '"]'),
+						isGrouping = activity.type == 2,
+						isGate = [3,4,5,14,16].indexOf(activity.type) > -1;
+						
 					activityGroup.css('cursor', 'pointer');
-					dblTap(activityGroup, function(){  
-						// double click on activity shape to open Monitoring for this activity
-						openPopUp(LAMS_URL + activity.url, "MonitorActivity", popupHeight, popupWidth, true, true);
-					});
+					
+					// double click on activity shape to open Monitoring for this activity
+					if (isGate) {
+						dblTap(activityGroup, function(){  
+							openGateSelectively(LAMS_URL + activity.url);
+						});
+					} else if (isGrouping) {
+						dblTap(activityGroup, function(){  
+							window.open(LAMS_URL + activity.url, "_blank");
+						});
+					} else {
+						dblTap(activityGroup, function(){  
+							openPopUp(LAMS_URL + activity.url, "MonitorActivity", popupHeight, popupWidth, true, true);
+						});
+					}
 				}
 			});
 			
