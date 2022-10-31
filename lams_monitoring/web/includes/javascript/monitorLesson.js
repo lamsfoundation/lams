@@ -1982,7 +1982,7 @@ function addActivityIcons(activity) {
 				'x' : coord.x + 180,
 				'y' : coord.y - 1,
 				'width'  : 20,
-				'height' : 20
+				'height' : 21
 			});
 		}
 	} else if (isGate) {
@@ -2109,21 +2109,6 @@ function addActivityIconsHandlers(activity) {
 					};
 				showLearnerGroupDialog(ajaxProperties, activity.title, false, true, usersViewable, false);
 			});
-	}
-	
-	if (activity.requiresAttention){
-		$('#act' + activity.id + 'attention', sequenceCanvas).click(function(event){
-			event.stopPropagation();
-			// switch to first tab where attention prompts are listed
-			if ($('#tblmonitor-tab-content').length == 0) {
-				// wer are in regular monitor, so switch to first tab to perform tasks
-				doSelectTab(1);
-			} else {
-				// we are in TBL mode, so switch back to regular monitor to perform tasks
-				switchToRegularMonitor(true);
-			}
-			 
-		});
 	}
 }
 
