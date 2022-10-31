@@ -207,7 +207,7 @@ public class LtiController {
 	ExtCourseClassMap extCourse = integrationService.getExtCourseClassMap(extServer.getSid(), contextId);
 	Integer organisationId = extCourse.getOrganisation().getOrganisationId();
 	//only monitors are allowed to create lesson
-	if (!securityService.isGroupMonitor(organisationId, userId, "add lesson", false)) {
+	if (!securityService.isGroupMonitor(organisationId, userId, "add lesson")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 	    return null;
 	}
@@ -269,7 +269,7 @@ public class LtiController {
 	boolean enableLessonIntro = WebUtil.readBooleanParam(request, "enableLessonIntro", false);
 
 	//only monitors are allowed to create lesson
-	if (!securityService.isGroupMonitor(organisationId, userId, "add lesson", false)) {
+	if (!securityService.isGroupMonitor(organisationId, userId, "add lesson")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 	    return null;
 	}
@@ -488,7 +488,7 @@ public class LtiController {
 	request.setAttribute("description", lesson.getLessonDescription());
 	request.setAttribute("isDisplayDesignImage", lesson.isDisplayDesignImage());
 	// only teachers can see "Open monitor" link
-	boolean isMonitor = securityService.isLessonMonitor(lessonId, userId, null, false);
+	boolean isMonitor = securityService.isLessonMonitor(lessonId, userId, null, true);
 	request.setAttribute("isMonitor", isMonitor);
 
 	//get learnerProgressDto

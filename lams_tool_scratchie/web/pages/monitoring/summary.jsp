@@ -3,15 +3,6 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 <c:set var="scratchie" value="${sessionMap.scratchie}"/>
-
-<c:set var="timeLimitPanelUrl"><lams:LAMSURL/>monitoring/timeLimit.jsp</c:set>
-<c:url var="timeLimitPanelUrl" value="${timeLimitPanelUrl}">
-	<c:param name="toolContentId" value="${scratchie.contentId}"/>
-	<c:param name="absoluteTimeLimit" value="${scratchie.absoluteTimeLimitSeconds}"/>
-	<c:param name="relativeTimeLimit" value="${scratchie.relativeTimeLimit}"/>
-	<c:param name="isTbl" value="false" />
-	<c:param name="controllerContext" value="tool/lascrt11/monitoring" />
-</c:url>
 	
 <style type="text/css">
 	/* remove jqGrid borders */
@@ -309,8 +300,6 @@
             $.extend(grid[0].p.postData,{filters:JSON.stringify(f)});
             grid.trigger("reloadGrid",[{page:1,current:true}]);
 	    });
-
-        $('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');
 	});
 	
 	function exportExcel(){
@@ -393,6 +382,7 @@
 	</div>
 	
 	<c:set var="showStudentChoicesTableOnly" value="true" />
+	<c:set var="isTbl" value="false" />
 	<h4><fmt:message key="monitoring.tab.summary" /></h4>
 	<%@ include file="studentChoices.jsp"%>
 	

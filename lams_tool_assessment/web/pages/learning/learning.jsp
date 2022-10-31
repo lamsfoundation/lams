@@ -100,6 +100,8 @@
 	</c:forEach>
 	
 	<script type="text/javascript">
+		var skipValidation = false;
+		
 		$(document).ready(function(){
 			//if isLeadershipEnabled - enable/disable submit buttons for hedging marks type of questions
 			if (${isLeadershipEnabled}) {
@@ -550,6 +552,15 @@
 				return true;
 				
 			} else {
+				<c:if test="${mode == 'author'}">
+					if (!skipValidation) {
+						alert('<fmt:message key="label.authoring.preview.skip.validation" />');
+						skipValidation = true;
+					} else {
+						return true;
+					}
+				</c:if>
+			
 				//remove .bg-warning from all questions
 				$('[id^=question-area-]').removeClass('bg-warning');
 				$('#warning-answers-required').hide();

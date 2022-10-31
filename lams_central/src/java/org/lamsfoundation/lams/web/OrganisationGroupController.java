@@ -131,7 +131,7 @@ public class OrganisationGroupController {
 
 	// check if user is allowed to view and edit groupings
 	if (!securityService.hasOrgRole(organisationId, userId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR }, "view organisation groupings", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR }, "view organisation groupings")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the organisation");
 	    return null;
 	}
@@ -206,7 +206,7 @@ public class OrganisationGroupController {
 
 	// check if user is allowed to view and edit groups
 	if (!securityService.hasOrgRole(organisationId, userId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR }, "view organisation groups", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR }, "view organisation groups")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the organisation");
 	    return null;
 	}
@@ -370,7 +370,7 @@ public class OrganisationGroupController {
 	int organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	// check if user is allowed to save grouping
 	if (!securityService.hasOrgRole(organisationId, userId, new String[] { Role.GROUP_MANAGER },
-		"save organisation grouping", false)) {
+		"save organisation grouping")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a manager or admin in the organisation");
 	}
 
@@ -439,7 +439,7 @@ public class OrganisationGroupController {
 	Integer userId = getUserDTO().getUserID();
 	int organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	if (!securityService.hasOrgRole(organisationId, userId, new String[] { Role.GROUP_MANAGER },
-		"remove organisation grouping", false)) {
+		"remove organisation grouping")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a manager or admin in the organisation");
 	    return null;
 	}

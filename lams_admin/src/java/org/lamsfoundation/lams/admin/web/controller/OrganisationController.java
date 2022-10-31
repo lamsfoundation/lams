@@ -169,7 +169,7 @@ public class OrganisationController {
 
     @RequestMapping(path = "/deleteAllLessonsInit")
     public String deleteAllLessonsInit(HttpServletRequest request, HttpServletResponse response) throws IOException {
-	if (!securityService.isAppadmin(getUserID(), "display cleanup preview lessons", false)) {
+	if (!securityService.isAppadmin(getUserID(), "display cleanup preview lessons")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not an appadmin");
 	    return null;
 	}

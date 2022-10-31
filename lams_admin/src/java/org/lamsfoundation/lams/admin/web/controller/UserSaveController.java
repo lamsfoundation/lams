@@ -302,7 +302,7 @@ public class UserSaveController {
 	Integer loggeduserId = ((UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
 
 	// check if logged in User is Appadmin
-	if (!securityService.isAppadmin(loggeduserId, "Change Password of User " + userId, true)) {
+	if (!securityService.isAppadmin(loggeduserId, "change password for user " + userId)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Only Appadmin has edit permisions");
 	    return null;
 	}

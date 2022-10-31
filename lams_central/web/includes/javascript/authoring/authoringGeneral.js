@@ -995,6 +995,14 @@ GeneralInitLib = {
 					}
 				}
 				
+				if (isOpenDialog && node.modifiedDate) {
+					if (isSelected) {
+						$('#ldStoreDialogModifiedDateSpan').text(node.modifiedDate).show();
+ 					} else {
+						$('#ldStoreDialogModifiedDateSpan').hide();
+					}
+				}
+				
 				// if it's a folder in load sequence dialog - highlight but stop processing
 				if (isOpenDialog && !node.learningDesignId){
 					return true;

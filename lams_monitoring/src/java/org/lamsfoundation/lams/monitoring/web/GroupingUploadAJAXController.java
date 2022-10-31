@@ -143,7 +143,7 @@ public class GroupingUploadAJAXController {
 
 	// check if user is allowed to view and edit groups
 	if (!securityService.hasOrgRole(organisationId, userId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR }, "view organisation groups", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR }, "view organisation groups")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the organisation");
 	    return;
 	}
@@ -279,7 +279,7 @@ public class GroupingUploadAJAXController {
 	// check if user is allowed to save grouping
 	if (!securityService.hasOrgRole(organisationId, userId,
 		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR },
-		"save organisation grouping from spreadsheet", false)) {
+		"save organisation grouping from spreadsheet")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a manager or admin in the organisation");
 	    return null;
 	}
@@ -341,7 +341,7 @@ public class GroupingUploadAJAXController {
 		    //Check user is a part of the organisation
 		} else if (!securityService.hasOrgRole(organisation.getOrganisationId(), learner.getUserId(),
 			new String[] { Role.GROUP_MANAGER, Role.LEARNER, Role.MONITOR, Role.AUTHOR },
-			"be added to grouping", false)) {
+			"be added to grouping", true)) {
 
 		    totalUsersSkipped++;
 
@@ -420,8 +420,7 @@ public class GroupingUploadAJAXController {
 		    iter.remove();
 
 		} else if (!securityService.isLessonLearner(lessonId, learner.getUserId(), "be added to grouping",
-			false)) {
-		    //log.warn("Unable to add learner " + login + " to lesson grouping as learner doesn't belong to the lesson.");
+			true)) {
 		    totalUsersSkipped++;
 		    iter.remove();
 		}

@@ -105,7 +105,7 @@ public class LessonConditionsController {
     public String getIndexLessonConditions(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException {
 	Long lessonId = WebUtil.readLongParam(request, CentralConstants.PARAM_LESSON_ID, false);
-	if (!securityService.isLessonMonitor(lessonId, getUser().getUserID(), "show lesson conditions", false)) {
+	if (!securityService.isLessonMonitor(lessonId, getUser().getUserID(), "show lesson conditions")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
@@ -168,7 +168,7 @@ public class LessonConditionsController {
     @RequestMapping(path = "/removeLessonDependency", method = RequestMethod.POST)
     public String removeLessonDependency(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long lessonId = WebUtil.readLongParam(request, CentralConstants.PARAM_LESSON_ID, false);
-	if (!securityService.isLessonOwner(lessonId, getUser().getUserID(), "remove lesson dependency", false)) {
+	if (!securityService.isLessonOwner(lessonId, getUser().getUserID(), "remove lesson dependency")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not the owner of the lesson");
 	    return null;
 	}
@@ -199,7 +199,7 @@ public class LessonConditionsController {
     @RequestMapping(path = "/addLessonDependency", method = RequestMethod.POST)
     public String addLessonDependency(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long lessonId = WebUtil.readLongParam(request, CentralConstants.PARAM_LESSON_ID, false);
-	if (!securityService.isLessonOwner(lessonId, getUser().getUserID(), "add lesson dependency", false)) {
+	if (!securityService.isLessonOwner(lessonId, getUser().getUserID(), "add lesson dependency")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not the owner of the lesson");
 	    return null;
 	}
@@ -226,7 +226,7 @@ public class LessonConditionsController {
     @RequestMapping(path = "/setDaysToLessonFinish", method = RequestMethod.POST)
     public String setDaysToLessonFinish(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long lessonId = WebUtil.readLongParam(request, CentralConstants.PARAM_LESSON_ID, false);
-	if (!securityService.isLessonOwner(lessonId, getUser().getUserID(), "set days to lesson finish", false)) {
+	if (!securityService.isLessonOwner(lessonId, getUser().getUserID(), "set days to lesson finish")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not the owner of the lesson");
 	    return null;
 	}

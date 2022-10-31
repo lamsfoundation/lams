@@ -3523,6 +3523,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    assessmentResultDao.update(lastAssessmentResult);
 	}
 
+	assessmentUser.setSessionFinished(true);
+	assessmentUserDao.saveObject(user);
+
 	//if this is a leader finishes, complete all non-leaders as well, also copy leader results to them
 	AssessmentUser groupLeader = checkLeaderSelectToolForSessionLeader(assessmentUser, toolSessionId);
 	if (isUserGroupLeader(userId, toolSessionId)) {
@@ -3535,11 +3538,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		copyAnswersFromLeader(sessionUser, groupLeader);
 	    });
 
-	} else {
-	    assessmentUser.setSessionFinished(true);
-	    assessmentUserDao.saveObject(user);
+	} else if (groupLeader != null && groupLeader.isSessionFinished()) {
+	    //copy answers from leader to current user
+	    copyAnswersFromLeader(assessmentUser, groupLeader);
 	}
-
     }
 
     @Override

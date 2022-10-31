@@ -24,10 +24,12 @@
 package org.lamsfoundation.lams.workspace.service;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Pattern;
@@ -50,6 +52,7 @@ import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedExceptio
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.workspace.WorkspaceFolderContent;
@@ -171,7 +174,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
      * @throws IOException
      */
     private void deleteFolder(Integer folderID, Integer userID) throws IOException {
-	WorkspaceFolder workspaceFolder = (WorkspaceFolder) baseDAO.find(WorkspaceFolder.class, folderID);
+	WorkspaceFolder workspaceFolder = baseDAO.find(WorkspaceFolder.class, folderID);
 	User user = (User) userMgmtService.findById(User.class, userID);
 	deleteFolder(workspaceFolder, user, isSysAuthorAdmin(user));
     }
@@ -244,20 +247,20 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 
     @Override
     public WorkspaceFolder getWorkspaceFolder(Integer workspaceFolderID) {
-	return (WorkspaceFolder) baseDAO.find(WorkspaceFolder.class, workspaceFolderID);
+	return baseDAO.find(WorkspaceFolder.class, workspaceFolderID);
     }
 
     @Override
     public Vector<FolderContentDTO> getFolderContentsExcludeHome(Integer userID, WorkspaceFolder folder, Integer mode)
 	    throws UserAccessDeniedException, RepositoryCheckedException {
-	User user = (User) baseDAO.find(User.class, userID);
+	User user = baseDAO.find(User.class, userID);
 	return getFolderContentsInternal(user, folder, mode, "getFolderContentsExcludeHome", user.getWorkspaceFolder());
     }
 
     @Override
     public Vector<FolderContentDTO> getFolderContents(Integer userID, WorkspaceFolder folder, Integer mode)
 	    throws UserAccessDeniedException, RepositoryCheckedException {
-	User user = (User) baseDAO.find(User.class, userID);
+	User user = baseDAO.find(User.class, userID);
 	return getFolderContentsInternal(user, folder, mode, "getFolderContents", null);
     }
 
@@ -392,7 +395,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	    Collections.sort(folderContents);
 	}
 
-	User user = (User) baseDAO.find(User.class, userID);
+	User user = baseDAO.find(User.class, userID);
 
 	// fill JSON object with folders and LDs
 	for (FolderContentDTO folderContent : folderContents) {
@@ -423,6 +426,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 		    learningDesignJSON.put("learningDesignId", folderContent.getResourceID());
 		    JsonUtil.putOpt(learningDesignJSON, "type", folderContent.getDesignType());
 		    learningDesignJSON.put("date", folderContent.getLastModifiedDateTime().toString());
+		    learningDesignJSON.put("formattedDate", DateUtil.convertToStringForJSON(
+			    folderContent.getLastModifiedDateTime(), DateFormat.SHORT, Locale.getDefault()));
 		    learningDesignJSON.put("canModify",
 			    WorkspaceFolder.OWNER_ACCESS.equals(folderContent.getPermissionCode())
 				    || ((user != null) && isSysAuthorAdmin(user)));
@@ -623,7 +628,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     public void copyFolder(Integer folderID, Integer targetFolderID, Integer userID) throws IOException,
 	    WorkspaceFolderException, LearningDesignException, UserAccessDeniedException, UserException {
 	if (isUserAuthorizedToModifyFolderContents(targetFolderID, userID)) {
-	    WorkspaceFolder workspaceFolder = (WorkspaceFolder) baseDAO.find(WorkspaceFolder.class, folderID);
+	    WorkspaceFolder workspaceFolder = baseDAO.find(WorkspaceFolder.class, folderID);
 	    if (workspaceFolder != null) {
 		WorkspaceFolder newFolder = createFolder(targetFolderID, workspaceFolder.getName(), userID);
 		copyRootContent(workspaceFolder, newFolder, userID);
@@ -654,9 +659,9 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     @Override
     public boolean isUserAuthorizedToModifyFolderContents(Integer folderID, Integer userID)
 	    throws UserException, WorkspaceFolderException {
-	User user = (User) baseDAO.find(User.class, userID);
+	User user = baseDAO.find(User.class, userID);
 	if (user != null) {
-	    WorkspaceFolder targetParent = (WorkspaceFolder) baseDAO.find(WorkspaceFolder.class, folderID);
+	    WorkspaceFolder targetParent = baseDAO.find(WorkspaceFolder.class, folderID);
 	    if (targetParent != null) {
 		Integer permissions = getPermissions(targetParent, user);
 		return !permissions.equals(WorkspaceFolder.NO_ACCESS)
@@ -671,7 +676,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 
     public void copyRootContent(WorkspaceFolder workspaceFolder, WorkspaceFolder targetWorkspaceFolder, Integer userID)
 	    throws UserException, LearningDesignException, UserAccessDeniedException, WorkspaceFolderException {
-	User user = (User) baseDAO.find(User.class, userID);
+	User user = baseDAO.find(User.class, userID);
 	if (user == null) {
 	    throw new UserException(messageService.getMessage("no.such.user", new Object[] { userID }));
 	}
@@ -690,7 +695,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     @Override
     public WorkspaceFolder createFolder(Integer parentFolderID, String name, Integer userID)
 	    throws UserException, WorkspaceFolderException {
-	WorkspaceFolder parentFolder = (WorkspaceFolder) baseDAO.find(WorkspaceFolder.class, parentFolderID);
+	WorkspaceFolder parentFolder = baseDAO.find(WorkspaceFolder.class, parentFolderID);
 
 	if (parentFolder != null) {
 
@@ -708,7 +713,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	    Integer newWorkspaceFolderType = parentFolder.getWorkspaceFolderType().equals(
 		    WorkspaceFolder.PUBLIC_SEQUENCES) ? WorkspaceFolder.PUBLIC_SEQUENCES : WorkspaceFolder.NORMAL;
 
-	    User user = (User) baseDAO.find(User.class, userID);
+	    User user = baseDAO.find(User.class, userID);
 	    if (user != null) {
 		WorkspaceFolder workspaceFolder = new WorkspaceFolder(name, parentFolder, userID, new Date(),
 			new Date(), newWorkspaceFolderType);
@@ -775,7 +780,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
      * @throws IOException
      */
     private void deleteLearningDesign(Long learningDesignID, Integer userID) throws IOException {
-	User user = (User) baseDAO.find(User.class, userID);
+	User user = baseDAO.find(User.class, userID);
 	if (user == null) {
 	    throw new IOException("User could not be found, ID: " + userID);
 	}
@@ -803,8 +808,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
      * @throws Exception
      */
     private void deleteWorkspaceFolderContent(Long folderContentID) throws IOException {
-	WorkspaceFolderContent workspaceFolderContent = (WorkspaceFolderContent) baseDAO
-		.find(WorkspaceFolderContent.class, folderContentID);
+	WorkspaceFolderContent workspaceFolderContent = baseDAO.find(WorkspaceFolderContent.class, folderContentID);
 	if (workspaceFolderContent != null) {
 	    baseDAO.delete(workspaceFolderContent);
 	}
@@ -889,7 +893,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
      */
     @Override
     public FolderContentDTO getUserWorkspaceFolder(Integer userID) throws IOException {
-	User user = (User) baseDAO.find(User.class, userID);
+	User user = baseDAO.find(User.class, userID);
 
 	if (user != null) {
 	    WorkspaceFolder workspaceFolder = user.getWorkspaceFolder();
@@ -913,7 +917,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
      */
     @Override
     public FolderContentDTO getPublicWorkspaceFolder(Integer userID) throws IOException {
-	User user = (User) baseDAO.find(User.class, userID);
+	User user = baseDAO.find(User.class, userID);
 
 	if (user != null) {
 	    WorkspaceFolder publicFolder = null;
@@ -985,7 +989,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
      */
     public void renameWorkspaceFolder(Integer workspaceFolderID, String newName, Integer userID)
 	    throws IOException, UserException, WorkspaceFolderException {
-	WorkspaceFolder folder = (WorkspaceFolder) baseDAO.find(WorkspaceFolder.class, workspaceFolderID);
+	WorkspaceFolder folder = baseDAO.find(WorkspaceFolder.class, workspaceFolderID);
 	if (folder != null) {
 	    WorkspaceFolder parent = folder.getParentWorkspaceFolder();
 	    if ((parent != null) && isUserAuthorizedToModifyFolderContents(workspaceFolderID, userID)) {

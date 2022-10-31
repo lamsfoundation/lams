@@ -69,7 +69,7 @@ public class UserRoleServlet extends HttpServlet {
 		return;
 	    }
 	    ExtUserUseridMap appadminUserMap = integrationService.getExtUserUseridMap(extServer, username);
-	    if (!securityService.isAppadmin(appadminUserMap.getUser().getUserId(), "set user role", false)) {
+	    if (!securityService.isAppadmin(appadminUserMap.getUser().getUserId(), "set user role")) {
 		log.error("Appadmin role check failed while trying to set role for user: " + targetUsername);
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed, user is not appadmin");
 		return;

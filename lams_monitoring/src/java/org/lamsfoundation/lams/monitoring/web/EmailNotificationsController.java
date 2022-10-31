@@ -136,8 +136,8 @@ public class EmailNotificationsController {
     public String getLessonView(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!securityService.isLessonMonitor(lessonId, getCurrentUser().getUserID(), "show lesson email notifications",
-		false)) {
+	if (!securityService.isLessonMonitor(lessonId, getCurrentUser().getUserID(),
+		"show lesson email notifications")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
@@ -166,8 +166,7 @@ public class EmailNotificationsController {
     public String getCourseView(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
 	int orgId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
-	if (!securityService.isGroupMonitor(orgId, getCurrentUser().getUserID(), "show course email notifications",
-		false)) {
+	if (!securityService.isGroupMonitor(orgId, getCurrentUser().getUserID(), "show course email notifications")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 	    return null;
 	}
@@ -176,7 +175,7 @@ public class EmailNotificationsController {
 	Organisation org = (Organisation) userManagementService.findById(Organisation.class, orgId);
 
 	boolean isGroupMonitor = securityService.hasOrgRole(orgId, getCurrentUser().getUserID(),
-		new String[] { Role.GROUP_MANAGER }, "show course email notifications", false);
+		new String[] { Role.GROUP_MANAGER }, "show course email notifications");
 	Integer userRole = isGroupMonitor ? Role.ROLE_GROUP_MANAGER : Role.ROLE_MONITOR;
 	Map<Long, IndexLessonBean> staffMap = lessonService
 		.getLessonsByOrgAndUserWithCompletedFlag(getCurrentUser().getUserID(), orgId, userRole);
@@ -214,13 +213,13 @@ public class EmailNotificationsController {
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
 	if (isLessonNotifications) {
 	    if (!securityService.isLessonMonitor(lessonId, getCurrentUser().getUserID(),
-		    "show scheduled lesson email notifications", false)) {
+		    "show scheduled lesson email notifications")) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
 		return null;
 	    }
 	} else {
 	    if (!securityService.isGroupMonitor(organisationId, getCurrentUser().getUserID(),
-		    "show scheduled course email notifications", false)) {
+		    "show scheduled course email notifications")) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the organisation");
 		return null;
 	    }
@@ -281,7 +280,7 @@ public class EmailNotificationsController {
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
 	if (isLessonNotifications) {
 	    if (!securityService.isLessonMonitor(lessonId, getCurrentUser().getUserID(),
-		    "show archived lesson email notifications", false)) {
+		    "show archived lesson email notifications")) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
 		return null;
 	    }
@@ -290,7 +289,7 @@ public class EmailNotificationsController {
 	    request.setAttribute("notifications", notifications);
 	} else {
 	    if (!securityService.isGroupMonitor(organisationId, getCurrentUser().getUserID(),
-		    "show archived course email notifications", false)) {
+		    "show archived course email notifications")) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the organisation");
 		return null;
 	    }
@@ -321,13 +320,13 @@ public class EmailNotificationsController {
 	// check if the user is allowed to fetch this data
 	if (isLessonNotifications) {
 	    if (!securityService.isLessonMonitor(lessonId, getCurrentUser().getUserID(),
-		    "show archived lesson email notification participants", false)) {
+		    "show archived lesson email notification participants")) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
 		return null;
 	    }
 	} else {
 	    if (!securityService.isGroupMonitor(organisationId, getCurrentUser().getUserID(),
-		    "show archived course email notification participants", false)) {
+		    "show archived course email notification participants")) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the organisation");
 		return null;
 	    }
@@ -387,13 +386,12 @@ public class EmailNotificationsController {
 	try {
 	    // if this method throws an Exception, there will be no deleteNotification=true in the JSON reply
 	    if (isLessonNotifications) {
-		if (!securityService.isLessonMonitor(lessonId, userId, "show scheduled lesson email notifications",
-			false)) {
+		if (!securityService.isLessonMonitor(lessonId, userId, "show scheduled lesson email notifications")) {
 		    error = "Unable to delete notification: the user is not a monitor in the lesson";
 		}
 	    } else {
 		if (!securityService.isGroupMonitor(organisationId, userId,
-			"show scheduled course course email notifications", false)) {
+			"show scheduled course course email notifications")) {
 		    error = "Unable to delete notification: the user is not a monitor in the organisation";
 		}
 	    }
@@ -451,13 +449,13 @@ public class EmailNotificationsController {
 	// check if the user is allowed to fetch this data
 	if (isLessonNotifications) {
 	    if (!securityService.isLessonMonitor(lessonId, getCurrentUser().getUserID(),
-		    "export archived lesson email notification", false)) {
+		    "export archived lesson email notification")) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
 		return;
 	    }
 	} else {
 	    if (!securityService.isGroupMonitor(organisationId, getCurrentUser().getUserID(),
-		    "export archived course email notification", false)) {
+		    "export archived course email notification")) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the organisation");
 		return;
 	    }
@@ -584,13 +582,13 @@ public class EmailNotificationsController {
 
 	if (lessonId != null) {
 	    if (!securityService.isLessonMonitor(lessonId, getCurrentUser().getUserID(),
-		    "get users for lesson email notifications", false)) {
+		    "get users for lesson email notifications")) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
 		return null;
 	    }
 	} else if (orgId != null) {
 	    if (!securityService.isGroupMonitor(orgId, getCurrentUser().getUserID(),
-		    "get users for course email notifications", false)) {
+		    "get users for course email notifications")) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the organisation");
 		return null;
 	    }

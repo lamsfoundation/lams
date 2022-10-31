@@ -98,7 +98,7 @@ public class EmailProgressController {
     public String getEmailProgressDates(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, SchedulerException {
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!securityService.isLessonMonitor(lessonId, getCurrentUser().getUserID(), "get class members", false)) {
+	if (!securityService.isLessonMonitor(lessonId, getCurrentUser().getUserID(), "get class members")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
@@ -173,7 +173,7 @@ public class EmailProgressController {
     @ResponseBody
     public String updateEmailProgressDate(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!securityService.isLessonMonitor(lessonId, getCurrentUser().getUserID(), "get class members", false)) {
+	if (!securityService.isLessonMonitor(lessonId, getCurrentUser().getUserID(), "get class members")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
@@ -251,7 +251,7 @@ public class EmailProgressController {
 
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Integer monitorUserId = getCurrentUser().getUserID();
-	if (!securityService.isLessonMonitor(lessonId, monitorUserId, "get lesson progress", false)) {
+	if (!securityService.isLessonMonitor(lessonId, monitorUserId, "get lesson progress")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}

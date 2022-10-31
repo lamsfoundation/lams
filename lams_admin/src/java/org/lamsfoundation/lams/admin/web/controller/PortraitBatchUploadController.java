@@ -40,8 +40,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Looks for [login].png images in /tmp/portraits of user IDs within given range and starting with the given prefix
@@ -59,7 +57,7 @@ public class PortraitBatchUploadController {
     @RequestMapping("/uploadPortraits")
     @ResponseBody
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException {
-	if (!securityService.isAppadmin(getUserID(), "batch upload portraits", false)) {
+	if (!securityService.isAppadmin(getUserID(), "batch upload portraits")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not an appadmin");
 	    return null;
 	}
