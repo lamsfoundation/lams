@@ -1616,7 +1616,7 @@ function updateTimeLimits(){
 			
 			$.each(timeLimits, function(){
 				let timeLimit = this,
-					row = $('<div class="row mb-2" />').appendTo(timeLimitsDiv)
+					row = $('<div class="row mb-2" />').appendTo(timeLimitsDiv);
 				$('<div class="col text-end" />').text(timeLimit.activityTitle).appendTo(row);
 				$('<div class="col text-start" />')
 					.appendTo(row)
