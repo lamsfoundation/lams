@@ -54,8 +54,9 @@ public class DateUtil {
     public static final String SCHEDULE_LESSON_FORMAT = "dd/M/yyyy h:mm a";
     public static final String ISO8601_FORMAT = "yyyy-MM-dd'T'HH:mmZ";
     public static final String PRETTY_FORMAT = "d MMMM yyyy h:mm:ss a";
-    
-    private static final FastDateFormat dateFormatterTimeAgo = FastDateFormat.getInstance(DateUtil.ISO8601_FORMAT, TimeZone.getTimeZone("GMT"), null);
+
+    private static final FastDateFormat dateFormatterTimeAgo = FastDateFormat.getInstance(DateUtil.ISO8601_FORMAT,
+	    TimeZone.getTimeZone("GMT"), null);
 
     /**
      * Convert your local time to Universal Time Coordinator. TODO conversion is not working properly. The returned Date
@@ -105,7 +106,7 @@ public class DateUtil {
      */
     public static Date convertToTimeZoneFromDefault(TimeZone targetTimeZone, Date date) {
 	TimeZone defaultTz = TimeZone.getDefault();
-	Integer rawOffset = defaultTz.getOffset(date.getTime()) - targetTimeZone.getOffset(date.getTime());
+	int rawOffset = defaultTz.getOffset(date.getTime()) - targetTimeZone.getOffset(date.getTime());
 
 	return new Date(date.getTime() - rawOffset);
     }
@@ -121,7 +122,7 @@ public class DateUtil {
      */
     public static Date convertFromTimeZoneToDefault(TimeZone targetTimeZone, Date date) {
 	TimeZone defaultTz = TimeZone.getDefault();
-	Integer rawOffset = defaultTz.getOffset(date.getTime()) - targetTimeZone.getOffset(date.getTime());
+	int rawOffset = defaultTz.getOffset(date.getTime()) - targetTimeZone.getOffset(date.getTime());
 
 	return new Date(date.getTime() + rawOffset);
     }
@@ -223,11 +224,6 @@ public class DateUtil {
      * @return
      */
     public static String convertToStringForJSON(Date value, Integer style, Integer type, Locale locale) {
-
-	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	TimeZone tz = user.getTimeZone();
-
 	int dateStyle, timeStyle;
 	switch (style) {
 	    case DateFormat.SHORT:
@@ -255,6 +251,9 @@ public class DateUtil {
 		df = DateFormat.getDateTimeInstance(dateStyle, timeStyle, locale);
 	}
 
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = ss == null ? null : (UserDTO) ss.getAttribute(AttributeNames.USER);
+	TimeZone tz = user == null ? null : user.getTimeZone();
 	if (tz != null) {
 	    df.setTimeZone(tz);
 	}
@@ -267,7 +266,7 @@ public class DateUtil {
      */
     public static String convertToStringForTimeagoJSON(Date value) {
 	return dateFormatterTimeAgo.format(value);
-	
+
     }
 
 }
