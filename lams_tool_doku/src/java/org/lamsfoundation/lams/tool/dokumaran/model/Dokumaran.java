@@ -180,6 +180,9 @@ public class Dokumaran implements Cloneable {
 
 	dokumaran.setAbsoluteTimeLimit(null);
 	dokumaran.setTimeLimitAdjustments(new HashMap<>(this.getTimeLimitAdjustments()));
+	dokumaran.setGalleryWalkStarted(false);
+	dokumaran.setGalleryWalkFinished(false);
+	dokumaran.setGalleryWalkEditEnabled(false);
 
 	return dokumaran;
     }
