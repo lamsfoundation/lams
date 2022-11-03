@@ -227,11 +227,6 @@ public class DateUtil {
      * @return
      */
     public static String convertToStringForJSON(Date value, Integer style, Integer type, Locale locale) {
-
-	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	TimeZone tz = user.getTimeZone();
-
 	int dateStyle, timeStyle;
 	switch (style) {
 	    case DateFormat.SHORT:
@@ -259,6 +254,9 @@ public class DateUtil {
 		df = DateFormat.getDateTimeInstance(dateStyle, timeStyle, locale);
 	}
 
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = ss == null ? null : (UserDTO) ss.getAttribute(AttributeNames.USER);
+	TimeZone tz = user == null ? null : user.getTimeZone();
 	if (tz != null) {
 	    df.setTimeZone(tz);
 	}
