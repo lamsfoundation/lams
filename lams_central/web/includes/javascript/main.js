@@ -336,17 +336,8 @@ function showAddLessonDialog(orgID) {
 }
 
 function showOrgGroupingDialog(orgID, activityID) {
-	showDialog("dialogOrgGrouping", {
-		'width' : 460,
-		'height': 460,
-		'title' : LABELS.COURSE_GROUPS_TITLE,
-		'open' : function() {
-			// load contents after opening the dialog
-			$('iframe', this).attr({'src': LAMS_URL + 'organisationGroup/viewGroupings.do?organisationID=' + orgID
-												   + (activityID ? '&activityID=' + activityID : ''),
-													'id' : 'orgGroupingModal'});
-		}
-	}, false, true);
+	window.open(LAMS_URL + 'organisationGroup/viewGroupings.do?organisationID=' + orgID + (activityID ? '&activityID=' + activityID : ''),
+				'_blank');
 }
 
 function showOrgGroupDialog(url) {

@@ -1,6 +1,4 @@
-﻿﻿var gtbDialog = null;
-
-function removeGrouping(groupingId) {
+﻿function removeGrouping(groupingId) {
 	if (!lessonMode && confirm(LABELS.REMOVE_GROUPING_CONFIRM_LABEL)) {
 		//dynamically create a form and submit it
 		var form = $('<form method="post" action="' +  LAMS_URL + 'organisationGroup/removeGrouping.do"></form>');
@@ -42,8 +40,7 @@ function viewGroups(groupingId, force) {
 			document.location.href = url + '&activityID=' + groupingActivityId;
 		}
 	} else {
-		// load to dialog
-		window.parent.showOrgGroupDialog(url);
+		document.location.href = url;
 	}
 }
 /**
@@ -55,8 +52,8 @@ function openGroupMappingDialog(groupingId) {
 	 * 2) two types of groups: course and branching could easily get mixed
 	 */
 	
-	var groupMappingDialogContents = $('#groupMappingDialogContents').clone().attr('id', null);
-	$('#branchMappingOKButton', groupMappingDialogContents).click(function(){
+	let gtbDialog = $('#groupMappingDialogContents').clone().attr('id', 'groupMappingDialog');
+	$('#branchMappingOKButton', gtbDialog).click(function(){
 		var dialog = $(this).closest('.modal'),
 			groupsToBranches = [];
 	
@@ -96,74 +93,64 @@ function openGroupMappingDialog(groupingId) {
 	});
 	
 	// initialise the dialog buttons
-	$('.branchMappingAddButton', groupMappingDialogContents).click(function(){
+	$('.branchMappingAddButton', gtbDialog).click(function(){
 		addGroupMapping();
 	});
-	$('.branchMappingRemoveButton', groupMappingDialogContents).click(function(){
+	$('.branchMappingRemoveButton', gtbDialog).click(function(){
 		removeGroupMapping();
 	});
 
-	// initialise dialog for matching groups to branches in branching activities
-	gtbDialog = showDialog('gtbDialog',{
-		'autoOpen' : false,
-		'modal'  : true,
-		'width'  : 800,
-		'title'  : LABELS.COURSE_GROUPS_TO_BRANCHES_MATCH_DIALOG_TITLE,
-		'open'   : function(){
-			var dialog = $(this),
-				groupsCell = $('.branchMappingFreeItemCell', dialog),
-				branchesCell = $('.branchMappingFreeBranchCell', dialog),
-				groupCell = $('.branchMappingBoundItemCell', dialog),
-				branchCell = $('.branchMappingBoundBranchCell', dialog);
+	let groupsCell = $('.branchMappingFreeItemCell', gtbDialog),
+		branchesCell = $('.branchMappingFreeBranchCell', gtbDialog),
+		groupCell = $('.branchMappingBoundItemCell', gtbDialog),
+		branchCell = $('.branchMappingBoundBranchCell', gtbDialog);
 			
-			// clear out previous entries
-			$('.branchMappingListCell', dialog).empty();
-			
-			// fetch course and branching groups
-			$.ajax({
-				url : LAMS_URL + 'organisationGroup/getGroupsForMapping.do',
-				data : {
-					'groupingId' 		  : groupingId,
-					'activityID' 		  : groupingActivityId
-				},
-				dataType : 'json',
-				success : function(response) {
-					// fill table with course and branching groups
-					$.each(response.groups, function(){
-						var group = this,
-							groupElem = $('<div />').click(selectGroupMappingListItem)
-													.text(group.name).attr('id', group.id);
-						
-						$.each(response.branches, function() {
-							// check if a branching group alread exists with the same name as a course group
-							if (this.name == group.name) {
-								var branchElem = $('<div />').click(selectGroupMappingListItem)
-															 .appendTo(branchCell)
-															 .text(this.name)
-															 .attr('id', this.id)
-															 .data('boundItem', groupElem);
-								groupElem.appendTo(groupCell).data('boundItem', branchElem);
-								groupElem = null;
-								return false;
-							}
-						});
-						
-						if (groupElem) {
-							// no existing mapping was found, make the group available for mapping
-							groupElem.appendTo(groupsCell);
-						}
-					});
-					// fill in branch groups
-					$.each(response.branches, function(){
-						$('<div />').click(selectGroupMappingListItem).appendTo(branchesCell)
-									.text(this.name).attr('id', this.id);
-					});
+	// clear out previous entries
+	$('.branchMappingListCell', gtbDialog).empty();
+	
+	// fetch course and branching groups
+	$.ajax({
+		url : LAMS_URL + 'organisationGroup/getGroupsForMapping.do',
+		data : {
+			'groupingId' 		  : groupingId,
+			'activityID' 		  : groupingActivityId
+		},
+		dataType : 'json',
+		success : function(response) {
+			// fill table with course and branching groups
+			$.each(response.groups, function(){
+				var group = this,
+					groupElem = $('<div />').click(selectGroupMappingListItem)
+											.text(group.name).attr('id', group.id);
+				
+				$.each(response.branches, function() {
+					// check if a branching group alread exists with the same name as a course group
+					if (this.name == group.name) {
+						var branchElem = $('<div />').click(selectGroupMappingListItem)
+													 .appendTo(branchCell)
+													 .text(this.name)
+													 .attr('id', this.id)
+													 .data('boundItem', groupElem);
+						groupElem.appendTo(groupCell).data('boundItem', branchElem);
+						groupElem = null;
+						return false;
+					}
+				});
+				
+				if (groupElem) {
+					// no existing mapping was found, make the group available for mapping
+					groupElem.appendTo(groupsCell);
 				}
 			});
+			// fill in branch groups
+			$.each(response.branches, function(){
+				$('<div />').click(selectGroupMappingListItem).appendTo(branchesCell)
+							.text(this.name).attr('id', this.id);
+			});
 		}
-	}, false);
+	});
+			
 	
-	$('.modal-body', gtbDialog).empty().append(groupMappingDialogContents.show());
 	gtbDialog.modal('show');
 };
 
@@ -171,7 +158,7 @@ function openGroupMappingDialog(groupingId) {
  * Make a pair out of selected groups.
  */
 function addGroupMapping(){
-	var dialog = gtbDialog,
+	var dialog = $('#groupMappingDialog'),
 		selectedItem = $('.branchMappingFreeItemCell .selected', dialog),
 		selectedBranch =  $('.branchMappingFreeBranchCell .selected', dialog);
 	
@@ -194,7 +181,7 @@ function addGroupMapping(){
 }
 
 function removeGroupMapping() {
-	var dialog = gtbDialog,
+	var dialog = $('#groupMappingDialog'),
 		selectedItem = $('.branchMappingBoundItemCell .selected', dialog),
 		selectedBranch =  $('.branchMappingBoundBranchCell .selected', dialog);
 
