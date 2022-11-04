@@ -631,7 +631,11 @@ const pad = {
     const oldFullyConnected = !!padconnectionstatus.isFullyConnected();
     const wasConnecting = (padconnectionstatus.getStatus().what === 'connecting');
     if (newState === 'CONNECTED') {
-      padeditor.enable();
+	  if (!clientVars.readonly) {
+		// LAMS fix for Etherpad bug
+      	padeditor.enable();
+	  }
+
       padeditbar.enable();
       padimpexp.enable();
       padconnectionstatus.connected();
