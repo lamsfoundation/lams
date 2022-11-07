@@ -814,6 +814,7 @@ function sendProgressEmail() {
 	if ( confirm(LABELS.PROGRESS_EMAIL_SEND_NOW_QUESTION) ) {
 		$.ajax({
 			dataType : 'json',
+			type : 'post', 
 			url : LAMS_URL + 'monitoring/emailProgress/sendLessonProgressEmail.do',
 			cache : false,
 			data : {
