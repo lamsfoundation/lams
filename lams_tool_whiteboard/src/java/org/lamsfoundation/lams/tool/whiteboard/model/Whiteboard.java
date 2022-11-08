@@ -159,6 +159,9 @@ public class Whiteboard implements Cloneable {
 
 	whiteboard.setAbsoluteTimeLimit(null);
 	whiteboard.setTimeLimitAdjustments(new HashMap<>(this.getTimeLimitAdjustments()));
+	whiteboard.setGalleryWalkStarted(false);
+	whiteboard.setGalleryWalkFinished(false);
+	whiteboard.setGalleryWalkEditEnabled(false);
 
 	return whiteboard;
     }

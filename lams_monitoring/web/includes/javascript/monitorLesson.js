@@ -1307,6 +1307,7 @@ function sendProgressEmail() {
 	showConfirm(LABELS.PROGRESS_EMAIL_SEND_NOW_QUESTION, function() {
 		$.ajax({
 			dataType : 'json',
+			type : 'post', 
 			url : LAMS_URL + 'monitoring/emailProgress/sendLessonProgressEmail.do',
 			type: 'post',
 			cache : false,

@@ -62,6 +62,7 @@ import org.springframework.orm.hibernate5.HibernateOptimisticLockingFailureExcep
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -261,6 +262,7 @@ public class LearningController {
      * Checks Leader Progress
      */
     @RequestMapping("/checkLeaderProgress")
+    @ResponseBody
     private String checkLeaderProgress(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
