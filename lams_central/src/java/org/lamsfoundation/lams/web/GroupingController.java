@@ -83,9 +83,9 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Controller
-@RequestMapping("/organisationGroup")
-public class OrganisationGroupController {
-    private static Logger log = Logger.getLogger(OrganisationGroupController.class);
+@RequestMapping("/grouping")
+public class GroupingController {
+    private static Logger log = Logger.getLogger(GroupingController.class);
 
     private static final String PARAM_USED_FOR_BRANCHING = "usedForBranching";
 

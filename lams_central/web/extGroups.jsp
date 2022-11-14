@@ -20,7 +20,7 @@
 	<fmt:message key="index.course.groups.title" />
 </div>
 
-<form id="ext-groups-form" action="<lams:LAMSURL/>organisationGroup/viewGroups.do" method="POST">
+<form id="ext-groups-form" action="<lams:LAMSURL/>grouping/viewGroups.do" method="POST">
 	<input name="lessonID" value="${lessonID}" type="hidden"/>
 	<input name="activityID" value="${param.activityID}" type="hidden"/>
 

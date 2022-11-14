@@ -1,7 +1,7 @@
 ﻿function removeGrouping(groupingId) {
 	if (!lessonMode && confirm(LABELS.REMOVE_GROUPING_CONFIRM_LABEL)) {
 		//dynamically create a form and submit it
-		var form = $('<form method="post" action="' +  LAMS_URL + 'organisationGroup/removeGrouping.do"></form>');
+		var form = $('<form method="post" action="' +  LAMS_URL + 'grouping/removeGrouping.do"></form>');
 		
 	    var hiddenField = $('<input type="hidden" name="organisationID" value="' + organisationId + '"></input>');
 	    form.append(hiddenField);
@@ -19,7 +19,7 @@
 }
 
 function viewGroups(groupingId, force) {
-	var url = LAMS_URL + 'organisationGroup/viewGroups.do?organisationID=' + organisationId;
+	var url = LAMS_URL + 'grouping/viewGroups.do?organisationID=' + organisationId;
 	if (lessonId) {
 		url += '&lessonID=' + lessonId;
 	}
@@ -79,7 +79,7 @@ function openGroupMappingDialog(groupingId) {
 		
 		// save the mapping
 		$.ajax({
-			url : LAMS_URL + 'organisationGroup/saveGroupMappings.do',
+			url : LAMS_URL + 'grouping/saveGroupMappings.do',
 			data : data,
 			type : 'POST',
 			success : function(response) {
@@ -110,7 +110,7 @@ function openGroupMappingDialog(groupingId) {
 	
 	// fetch course and branching groups
 	$.ajax({
-		url : LAMS_URL + 'organisationGroup/getGroupsForMapping.do',
+		url : LAMS_URL + 'grouping/getGroupsForMapping.do',
 		data : {
 			'groupingId' 		  : groupingId,
 			'activityID' 		  : groupingActivityId
