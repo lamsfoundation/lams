@@ -13,7 +13,7 @@
   	  	<include name="download.js"/>
         	<include name="main.js"/>
         	<include name="openUrls.js"/>
-        	<include name="orgGroup.js"/>
+        	<include name="groups.js"/>
         	<include name="orgGrouping.js"/>
         	<include name="progressBar.js"/>
  	   	<include name="portrait.js"/>

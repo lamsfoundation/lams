@@ -80,8 +80,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Controller
 @RequestMapping("/grouping")
-public class GroupingAJAXController {
-    private static Logger log = Logger.getLogger(GroupingAJAXController.class);
+public class GroupingController {
+    private static Logger log = Logger.getLogger(GroupingController.class);
 
     @Autowired
     private IMonitoringFullService monitoringService;
@@ -125,15 +125,15 @@ public class GroupingAJAXController {
 	    grouping = ((GroupingActivity) activity).getCreateGrouping();
 	}
 
-	if (!forcePrintView && grouping.isChosenGrouping()) {
-	    return "redirect:" + Configuration.get(ConfigurationKeys.SERVER_URL)
-		    + "/organisationGroup/viewGroupings.do?lessonID=" + lessonId + "&activityID=" + activityID;
+	if (!forcePrintView) {
+	    return "redirect:" + Configuration.get(ConfigurationKeys.SERVER_URL) + "grouping/viewGroupings.do?lessonID="
+		    + lessonId + "&activityID=" + activityID;
 	}
 
 	request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID, activityID);
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
-	request.setAttribute(GroupingAJAXController.PARAM_ACTIVITY_TITLE, activity.getTitle());
-	request.setAttribute(GroupingAJAXController.PARAM_ACTIVITY_DESCRIPTION, activity.getDescription());
+	request.setAttribute(GroupingController.PARAM_ACTIVITY_TITLE, activity.getTitle());
+	request.setAttribute(GroupingController.PARAM_ACTIVITY_DESCRIPTION, activity.getDescription());
 
 	SortedSet<Group> groups = new TreeSet<>(new GroupComparator());
 	groups.addAll(grouping.getGroups());
@@ -146,7 +146,7 @@ public class GroupingAJAXController {
 	    group.setUsers(sortedUsers);
 	}
 
-	request.setAttribute(GroupingAJAXController.GROUPS, groups);
+	request.setAttribute(GroupingController.GROUPS, groups);
 	// go to a view only screen for random grouping
 	return "grouping/viewGroups";
     }
@@ -184,7 +184,7 @@ public class GroupingAJAXController {
 	    }
 	}
 
-	request.setAttribute(GroupingAJAXController.GROUPS, groups);
+	request.setAttribute(GroupingController.GROUPS, groups);
 	request.setAttribute("isCourseGrouping", true); // flag to page it is a course grouping so use the field names for OrganisationGroup
 	return "grouping/viewGroups";
     }
@@ -200,7 +200,7 @@ public class GroupingAJAXController {
 	boolean result = true;
 
 	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-	String membersParam = WebUtil.readStrParam(request, GroupingAJAXController.PARAM_MEMBERS, true);
+	String membersParam = WebUtil.readStrParam(request, GroupingController.PARAM_MEMBERS, true);
 	String[] members = StringUtils.isBlank(membersParam) ? null : membersParam.split(",");
 
 	// remove users from current group
@@ -241,7 +241,7 @@ public class GroupingAJAXController {
 	// group ID = -1 means that user is not being assigned to any new group, i.e. becomse unassigned
 	if (result && ((groupID == null) || (groupID > 0))) {
 	    if (groupID == null) {
-		String name = WebUtil.readStrParam(request, GroupingAJAXController.PARAM_NAME);
+		String name = WebUtil.readStrParam(request, GroupingController.PARAM_NAME);
 		if (log.isDebugEnabled()) {
 		    log.debug("Creating group with name \"" + name + "\" in activity " + activityID);
 		}
@@ -331,7 +331,7 @@ public class GroupingAJAXController {
     @RequestMapping(path = "/changeGroupName", method = RequestMethod.POST)
     public String changeGroupName(HttpServletRequest request) {
 	Long groupID = WebUtil.readLongParam(request, AttributeNames.PARAM_GROUP_ID);
-	String name = WebUtil.readStrParam(request, GroupingAJAXController.PARAM_NAME);
+	String name = WebUtil.readStrParam(request, GroupingController.PARAM_NAME);
 	if (name != null) {
 	    if (log.isDebugEnabled()) {
 		log.debug("Renaming group  " + groupID + " to \"" + name + "\"");

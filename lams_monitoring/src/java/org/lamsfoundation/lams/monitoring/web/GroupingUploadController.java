@@ -94,8 +94,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Controller
 @RequestMapping("/groupingUpload")
-public class GroupingUploadAJAXController {
-    private static Logger log = Logger.getLogger(GroupingUploadAJAXController.class);
+public class GroupingUploadController {
+    private static Logger log = Logger.getLogger(GroupingUploadController.class);
 
     @Autowired
     private IMonitoringFullService monitoringService;
@@ -485,21 +485,21 @@ public class GroupingUploadAJAXController {
 
 	    if (StringUtils.isBlank(login)) {
 		skipped++;
-		GroupingUploadAJAXController.log.warn(
+		GroupingUploadController.log.warn(
 			"Unable to add learner for group related to grouping " + groupingID + " as login is missing.");
 		continue;
 	    }
 	    boolean alreadyExists = !allUsers.add(login);
 	    if (alreadyExists) {
 		skipped++;
-		GroupingUploadAJAXController.log.warn(
+		GroupingUploadController.log.warn(
 			"Skipping duplicate row for learner " + login + " for group related to grouping " + groupingID);
 		continue;
 	    }
 	    String groupName = row.getLastCellNum() > 3 ? parseStringCell(row.getCell(3)) : null;
 	    if (groupName == null || groupName.length() == 0) {
 		skipped++;
-		GroupingUploadAJAXController.log.warn("Unable to add learner " + login
+		GroupingUploadController.log.warn("Unable to add learner " + login
 			+ " for group in related to grouping " + groupingID + " as group name is missing.");
 		continue;
 	    }

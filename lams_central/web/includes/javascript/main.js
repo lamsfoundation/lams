@@ -336,7 +336,7 @@ function showAddLessonDialog(orgID) {
 }
 
 function showOrgGroupingDialog(orgID, activityID) {
-	window.open(LAMS_URL + 'organisationGroup/viewGroupings.do?organisationID=' + orgID + (activityID ? '&activityID=' + activityID : ''),
+	window.open(LAMS_URL + 'grouping/viewGroupings.do?organisationID=' + orgID + (activityID ? '&activityID=' + activityID : ''),
 				'_blank');
 }
 

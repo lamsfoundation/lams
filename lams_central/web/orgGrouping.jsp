@@ -54,6 +54,19 @@
 </lams:head>
 <body class="component">
 	<lams:Page5 type="admin" title="${title}">
+		<c:if test="${lessonMode}">
+			<div class="row mb-2">
+				<div class="col-4 offset-4">
+					<div class="card">
+						<div class="card-body">
+							<fmt:message key="label.grouping.general.instructions.line1" />
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		</c:if>
+		
 		<div class="row">
 			<div class="col-4 offset-4">
 				<ul class="list-group">

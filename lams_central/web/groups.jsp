@@ -19,14 +19,14 @@
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/orgGroup.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/groups.css">
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.cookie.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 	<lams:JSImport src="includes/javascript/dialog5.js" />
-	<lams:JSImport src="includes/javascript/orgGroup.js" />
+	<lams:JSImport src="includes/javascript/groups.js" />
 	<lams:JSImport src="includes/javascript/portrait5.js" />
 	<lams:JSImport src="includes/javascript/upload.js" />
 	<script type="text/javascript">;
@@ -105,12 +105,6 @@
 				</c:if>
 			
 				<h4 class="card-title"><fmt:message key="label.grouping.general.instructions.heading"/></h4>
-				
-				<c:if test="${not usedForBranching}">
-					<p class="card-text">
-						<fmt:message key="label.grouping.general.instructions.line1"/>
-					</p>
-				</c:if>
 				
 				<p class="card-text">
 					<fmt:message key="label.grouping.general.instructions.line2"/>
