@@ -652,7 +652,7 @@
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>Organisation grouping</web-resource-name>
-			<url-pattern>/orgGroup.jsp</url-pattern>
+			<url-pattern>/groups.jsp</url-pattern>
 			<url-pattern>/orgGrouping.jsp</url-pattern>
 			<http-method>GET</http-method>
  			<http-method>POST</http-method>
