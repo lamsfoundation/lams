@@ -483,7 +483,7 @@ CKEDITOR.addSnippets( 'bootsnippets-advanced-layout', {
 		image: 'tabs.png',
 		description: '',
 		html: 
-			'<div class="bootstrap-tabs" data-tab-set-title="Tab Set Title">' +
+			'<div class="bootstrap-tabs" data-tab-set-title="Tab Set Title" style="background-color:#f8f8f8;border: 1px solid #e8e5e5;border-radius: 5px 5px 40px 10px;padding: 5px;">' +
 			'	<ul class="nav nav-tabs" role="tablist"><!-- add tabs here -->' +
 			'		<li role="presentation"><a aria-controls="title-tab-1" class="tab-link" data-toggle="tab" href="#title-tab-1" role="tab" target="_blank">Tab 1 Name</a></li>' +
 			'		<li role="presentation"><a aria-controls="title-tab-2" class="tab-link" data-toggle="tab" href="#title-tab-2" role="tab" target="_blank">Tab 2 Name</a></li>' +
@@ -493,19 +493,19 @@ CKEDITOR.addSnippets( 'bootsnippets-advanced-layout', {
 		
 			'	<div class="tab-content"><!-- add tab panels here -->' +
 			'		<div class="tab-pane" id="title-tab-1" role="tabpanel">' +
-			'			<div class="tab-pane-content">Tab 1 Content</div>' +
+			'			<div class="tab-pane-content" style="padding:1em">Tab 1 Content</div>' +
 			'		</div>' +
 			
 			'		<div class="tab-pane" id="title-tab-2" role="tabpanel">' +
-			'			<div class="tab-pane-content">Tab 2 Content</div>' +
+			'			<div class="tab-pane-content" style="padding:1em">Tab 2 Content</div>' +
 			'		</div>' +
 			
 			'		<div class="tab-pane" id="title-tab-3" role="tabpanel">' +
-			'			<div class="tab-pane-content">Tab 3 Content</div>' +
+			'			<div class="tab-pane-content" style="padding:1em">Tab 3 Content</div>' +
 			'		</div>' +
 			
 			'		<div class="tab-pane active" id="title-tab-4" role="tabpanel">' +
-			'			<div class="tab-pane-content">Tab 4 Content</div>' +
+			'			<div class="tab-pane-content" style="padding:1em">Tab 4 Content</div>' +
 			'		</div>' +
 			'	</div>' +
 			'</div>'
