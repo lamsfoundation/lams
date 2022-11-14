@@ -355,7 +355,7 @@ public class GroupingController {
 	}
 	request.setAttribute("unassignedUsers", unassignedUsersJSON);
 
-	return "orgGroup";
+	return "groups";
     }
 
     /**
