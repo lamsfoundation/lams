@@ -106,12 +106,6 @@
 			
 				<h4 class="card-title"><fmt:message key="label.grouping.general.instructions.heading"/></h4>
 				
-				<c:if test="${not usedForBranching}">
-					<p class="card-text">
-						<fmt:message key="label.grouping.general.instructions.line1"/>
-					</p>
-				</c:if>
-				
 				<p class="card-text">
 					<fmt:message key="label.grouping.general.instructions.line2"/>
 				</p>

@@ -125,9 +125,9 @@ public class GroupingController {
 	    grouping = ((GroupingActivity) activity).getCreateGrouping();
 	}
 
-	if (!forcePrintView && grouping.isChosenGrouping()) {
-	    return "redirect:" + Configuration.get(ConfigurationKeys.SERVER_URL)
-		    + "grouping/viewGroupings.do?lessonID=" + lessonId + "&activityID=" + activityID;
+	if (!forcePrintView) {
+	    return "redirect:" + Configuration.get(ConfigurationKeys.SERVER_URL) + "grouping/viewGroupings.do?lessonID="
+		    + lessonId + "&activityID=" + activityID;
 	}
 
 	request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID, activityID);
