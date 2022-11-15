@@ -729,7 +729,8 @@
 	});
 
     function userNameFormatter (cellvalue, options, rowObject) {
-		return definePortraitPopover(rowObject[8].innerHTML, rowObject.id, cellvalue, cellvalue, true);
+		return $(definePortraitPopover(rowObject[8].innerHTML, options.rowId, cellvalue, cellvalue, true))
+				.attr('onClick', 'javascript:expandUserRowSubgrid(' + options.rowId + ');')[0].outerHTML;
 	}
 
     // Combine portraits with activityURL. Both are optional so it is mix and match.
@@ -744,6 +745,10 @@
  			}
  		} 
  		return portProcessed;
+	}
+
+	function expandUserRowSubgrid(userId) {
+		$('#userView').expandSubGridRow(userId);
 	}
 </script>
 
