@@ -12,6 +12,11 @@
 	.gbTopButtonsContainer button {
 		margin: 0 0 0 .8rem;
 	}
+	
+	.markChartDiv {
+		margin: 20px 0 0 0;
+		width: 100%;
+	}
 </style>
 	
 <script type="text/javascript">
