@@ -8,16 +8,13 @@
 
 .groupContainer {
   width: 279px;
+  height: 283px;
   border: thin dotted var(--bs-secondary);
+  overflow-y: auto;
 }
 
 .sortUsersButton, .removeGroupButton {
   cursor: pointer;
-}
-
-.userContainer {
-	height: 260px;
-	overflow-y: auto;
 }
 
 #unassignedUserCell .userContainer {
@@ -48,7 +45,7 @@
 }
 
 #newGroupPlaceholder > div {
-	margin: 130px 0;
+	margin: 128px 0;
 }
 
 .userContainer .ui-state-disabled {

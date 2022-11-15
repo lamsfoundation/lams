@@ -110,17 +110,25 @@ function fillGroup(users, container) {
 			userIds = [];
 		// create user DIVs
 		$.each(users, function(index, userJSON) {
-			var userDiv = $('<div />').attr('userId', userJSON.id)
+			var userDiv = $('<div />')
+				.attr('userId', userJSON.id)
 				.addClass('draggableItem');
+			
+			new bootstrap.Tooltip(userDiv, {
+				'title'     : userJSON.login,
+				'placement' : 'left'
+			});
+			
 			var portraitDiv = $('<div />').attr({
 				'id': 'portrait-'+userJSON.id,
 				})
 				.addClass('mb-2')
 				.appendTo(userDiv);
 			addPortrait(portraitDiv, userJSON.portraitId, userJSON.id, 'small', true, LAMS_URL );
-			$('<span/>').text(userJSON.firstName + ' ' + userJSON.lastName + ' (' + userJSON.login + ')')
+			$('<span/>').text(userJSON.firstName + ' ' + userJSON.lastName)
 				.addClass('portrait-sm-lineheight ms-1')
 				.appendTo(userDiv);
+				
 
 			// for later use
 			userDivs.push(userDiv);
