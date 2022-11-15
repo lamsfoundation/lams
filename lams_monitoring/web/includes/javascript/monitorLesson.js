@@ -349,7 +349,7 @@ function initCommonElements(){
 	$('#lesson-name').editable({
 	    type: 'text',
 	    pk: lessonId,
-	    url: LAMS_URL + 'monitoring/monitoring/renameLesson.do?' + $("#csrf-form", window.parent.document).serialize(),
+	    url: LAMS_URL + 'monitoring/monitoring/renameLesson.do?' + csrfTokenName + '=' + csrfTokenValue,
 	    validate: function(value) {
 		    //close editing area on validation failure
             if (!value.trim()) {
