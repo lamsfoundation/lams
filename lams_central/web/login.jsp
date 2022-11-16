@@ -191,7 +191,17 @@
 				Boolean isSignup = false;
 				
 				if (hs != null) {
-					UserDTO userDTO = (UserDTO) hs.getAttribute("user");
+					UserDTO userDTO = null;
+					try {
+						userDTO = (UserDTO) hs.getAttribute("user");
+					} catch (Exception e) {
+					    // something is wrong, so try to invalidate the session
+					    try {
+							hs.invalidate();
+					    } catch (Exception e1){
+							// do nothing if invalidation fails
+					    }
+					}
 					if (userDTO != null && !userDTO.getLogin().equals(request.getAttribute("login"))) {
 					    isSignup = (Boolean) hs.getAttribute("isSignup");
 					    // remove session from mapping
