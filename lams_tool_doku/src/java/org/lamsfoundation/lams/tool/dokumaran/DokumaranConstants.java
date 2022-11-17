@@ -56,15 +56,15 @@ public class DokumaranConstants {
     public static final String ATTR_TOOL_SESSION_ID = "toolSessionID";
 
     public static final String ATTR_DOKUMARAN = "dokumaran";
-    
+
     public static final String ATTR_GROUP_USERS = "groupUsers";
-    
+
     public static final String ATTR_IS_LEADER_RESPONSE_FINALIZED = "isLeaderResponseFinalized";
 
     public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
 
     public static final String ATTR_SUMMARY_LIST = "summaryList";
-    
+
     public static final String ATTR_HAS_FAULTY_SESSION = "hasFaultySession";
 
     public static final String ATTR_USER_LIST = "userList";
@@ -72,7 +72,7 @@ public class DokumaranConstants {
     public static final String ATTR_FINISH_LOCK = "finishedLock";
 
     public static final String ATTR_LOCK_ON_FINISH = "lockOnFinish";
-    
+
     public static final String ATTR_HAS_EDIT_RIGHT = "hasEditRight";
 
     public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
@@ -90,17 +90,17 @@ public class DokumaranConstants {
     public static final String ATTR_USER_FINISHED = "userFinished";
 
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
-    
+
     public static final String ATTR_PAD_ID = "padId";
-    
+
     public static final String ATTR_SECONDS_LEFT = "secondsLeft";
-    
+
     public static final String KEY_ETHERPAD_SERVER_URL = "etherpadServerUrl";
-    
+
     public static final String DEFAULT_PAD_NAME = "LAMS-pad";
-    
+
     public static final String PREFIX_REGULAR_GROUP = "LAMS-group-";
-    
+
     public static final String PREFIX_SHARED_GROUP = "LAMS-sharedGroup-";
 
     // error message keys
@@ -120,4 +120,8 @@ public class DokumaranConstants {
     public static final String ATTR_USER_UID = "userUid";
 
     public static final String MANUAL_GRADING_DEFINITION_NAME = "manual.grading";
+
+    public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
+
+    public static final String ATTR_SUBMISSION_DEADLINE_DATESTRING = "submissionDateString";
 }

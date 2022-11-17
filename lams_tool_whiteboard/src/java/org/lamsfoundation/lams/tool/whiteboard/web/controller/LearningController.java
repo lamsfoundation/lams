@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,6 +51,7 @@ import org.lamsfoundation.lams.tool.whiteboard.service.WhiteboardService;
 import org.lamsfoundation.lams.tool.whiteboard.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -204,10 +206,28 @@ public class LearningController {
 	    boolean isLeaderResponseFinalized = session != null && leader != null && leader.isSessionFinished();
 	    sessionMap.put(WhiteboardConstants.ATTR_IS_LEADER_RESPONSE_FINALIZED, isLeaderResponseFinalized);
 	}
-	
+
 	// add define later support
 	if (whiteboard.isDefineLater()) {
 	    return "pages/learning/definelater";
+	}
+
+	//check if there is submission deadline
+	Date submissionDeadline = whiteboard.getSubmissionDeadline();
+	if (submissionDeadline != null) {
+	    //store submission deadline to sessionMap
+	    sessionMap.put(WhiteboardConstants.ATTR_SUBMISSION_DEADLINE, submissionDeadline);
+	    if (currentUserDto == null) {
+		currentUserDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    }
+	    TimeZone learnerTimeZone = currentUserDto.getTimeZone();
+	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
+
+	    //calculate whether submission deadline has passed, and if so forward to "submissionDeadline"
+	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
+		return "pages/learning/submissionDeadline";
+	    }
 	}
 
 	// set contentInUse flag to true!

@@ -220,7 +220,14 @@
 <body class="stripes">
 
 	<lams:Page type="learner" title="${dokumaran.title}" style="">
-	
+		<c:if test="${not empty sessionMap.submissionDeadline && (sessionMap.mode == 'author' || sessionMap.mode == 'learner')}">
+			<lams:Alert id="submission-deadline" type="info" close="true">
+				<fmt:message key="authoring.info.teacher.set.restriction" >
+					<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
+				</fmt:message>
+			</lams:Alert>
+		</c:if>
+		
 		<!--  Warnings -->
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
 			<lams:Alert type="danger" id="warn-lock" close="false">
