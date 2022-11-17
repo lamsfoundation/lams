@@ -28,7 +28,7 @@ public class UserOrgForm {
 
     private String orgName;
 
-    private String[] userIds;
+    private String userIds;
 
     public Integer getOrgId() {
 	return orgId;
@@ -46,12 +46,11 @@ public class UserOrgForm {
 	this.orgName = orgName;
     }
 
-    public String[] getUserIds() {
+    public String getUserIds() {
 	return userIds;
     }
 
-    public void setUserIds(String[] userIds) {
+    public void setUserIds(String userIds) {
 	this.userIds = userIds;
     }
-
 }

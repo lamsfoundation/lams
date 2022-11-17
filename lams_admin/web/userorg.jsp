@@ -141,9 +141,11 @@
 		}
 		
 		function populateForm() {
+			let userIds = '';
 			jQuery("li", "div#existing").each(function() {
-				jQuery("form", "div#form").append("<input type='checkbox' name='userIds' value='"+jQuery(this).attr("id")+"' checked='checked' style='display:none;'>");
+				userIds += $(this).attr("id") + ',';
 			});
+			$('#userOrgForm #userIds').val(userIds);
 			return true;
 		}
 	</script>
@@ -210,6 +212,7 @@
 					<form:form action="./userorgsave.do" modelAttribute="userOrgForm" id="userOrgForm" method="post">
 						<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 						<form:hidden path="orgId" />
+						<form:hidden path="userIds" />
 						<a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
 						<input type="submit" id="nextButton" class="btn btn-primary loffset5" onclick="return populateForm();" value="<fmt:message key="label.next"/>" />
 					</form:form>
