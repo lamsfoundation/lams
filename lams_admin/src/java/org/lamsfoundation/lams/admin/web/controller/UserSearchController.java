@@ -64,7 +64,8 @@ public class UserSearchController {
 
     @RequestMapping("/usersearch")
     public String unspecified(HttpServletRequest request) throws Exception {
-	if (!(request.isUserInRole(Role.APPADMIN) || userManagementService.isUserGlobalGroupManager())) {
+	if (!(request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)
+		|| userManagementService.isUserGlobalGroupManager())) {
 	    log.debug("user not appadmin or global group admin");
 
 	    request.setAttribute("errorName", "UserSearchAction authorisation");
@@ -73,7 +74,7 @@ public class UserSearchController {
 	}
 
 	boolean loginAsEnable = Configuration.getAsBoolean(ConfigurationKeys.LOGIN_AS_ENABLE)
-		&& request.isUserInRole(Role.SYSADMIN);
+		&& (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.SYSADMIN));
 	request.setAttribute("loginAsEnable", loginAsEnable);
 
 	return "usersearchlist";

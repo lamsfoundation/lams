@@ -171,7 +171,7 @@ public class PortraitSaveController {
 	Integer userId = WebUtil.readIntParam(request, "userId", true);
 
 	// check user is appadmin
-	if (!(request.isUserInRole(Role.APPADMIN))) {
+	if (!(request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN))) {
 	    log.error("Attempt to delete a portrait by user that is not appadmin. User is " + request.getRemoteUser()
 		    + " portrait to be deleted is for user " + userId + ".");
 	    return deleteResponse(response, "error");

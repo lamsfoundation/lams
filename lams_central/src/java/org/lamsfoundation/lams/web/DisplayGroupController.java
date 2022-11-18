@@ -101,7 +101,8 @@ public class DisplayGroupController {
 		roles.add(roleId);
 	    }
 
-	    IndexOrgBean iob = createOrgBean(org, roles, request.getRemoteUser(), request.isUserInRole(Role.APPADMIN));
+	    IndexOrgBean iob = createOrgBean(org, roles, request.getRemoteUser(),
+		    request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN));
 
 	    request.setAttribute("orgBean", iob);
 	    if (org.getEnableSingleActivityLessons()

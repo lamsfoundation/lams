@@ -78,7 +78,7 @@ public class UserOrgSaveController {
 	// course manager can add existing users in any role except appadmin
 	// course admin can add existing users but only as learner
 	Integer rootOrgId = userManagementService.getRootOrganisation().getOrganisationId();
-	if (request.isUserInRole(Role.APPADMIN)
+	if (request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)
 		|| (userManagementService.isUserGlobalGroupManager() && !orgId.equals(rootOrgId))) {
 	    canEditRole = true;
 	} else {
@@ -177,8 +177,10 @@ public class UserOrgSaveController {
 	    }
 	    return "redirect:/usermanage.do?org=" + orgId;
 	} else {
-	    request.setAttribute("roles", userManagementService.filterRoles(rolelist,
-		    request.isUserInRole(Role.APPADMIN), organisation.getOrganisationType()));
+	    request.setAttribute("roles",
+		    userManagementService.filterRoles(rolelist,
+			    request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN),
+			    organisation.getOrganisationType()));
 	    request.setAttribute("newUserOrganisations", newUserOrganisations);
 	    request.setAttribute("orgId", orgId);
 	    return "forward:/userorgrole.do";

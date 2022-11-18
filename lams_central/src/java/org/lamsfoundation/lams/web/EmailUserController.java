@@ -143,7 +143,8 @@ public class EmailUserController {
 	    currentUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 	}
 
-	boolean result = request.isUserInRole(Role.APPADMIN) || userManagementService.isUserGlobalGroupManager();
+	boolean result = request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)
+		|| userManagementService.isUserGlobalGroupManager();
 	if (!result) {
 	    String orgId = request.getParameter(AttributeNames.PARAM_ORGANISATION_ID);
 	    if (StringUtils.isBlank(orgId)) {

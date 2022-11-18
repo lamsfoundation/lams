@@ -71,7 +71,7 @@ public class ToolContentListController {
     @RequestMapping(path = "/start")
     public String execute(HttpServletRequest request) throws Exception {
 	// check permission
-	if (!(request.isUserInRole(Role.APPADMIN))) {
+	if (!(request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN))) {
 	    request.setAttribute("errorName", "ToolContentListAction");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";

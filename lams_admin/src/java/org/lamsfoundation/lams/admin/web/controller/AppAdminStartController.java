@@ -65,7 +65,7 @@ public class AppAdminStartController {
 	    groupedLinks.add(new Object[] { AdminConstants.START_SYSADMIN_CONFIG_LINKS, links });
 	}
 
-	if (request.isUserInRole(Role.APPADMIN)) {
+	if (request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)) {
 	    links = new ArrayList<>();
 	    links.add(new LinkBean("timezonemanagement/start.do", "admin.timezone.title"));
 	    links.add(new LinkBean("loginmaintain.do", "appadmin.maintain.loginpage"));

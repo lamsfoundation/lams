@@ -113,8 +113,7 @@ public class OrganisationController {
 			request.setAttribute("courseToDeleteLessons", courseToDeleteLessons);
 		    }
 		    request.getSession().setAttribute("status", status);
-		    if (userManagementService.isUserAppAdmin()
-			    || userManagementService.isUserGlobalGroupManager()) {
+		    if (userManagementService.isUserAppAdmin() || userManagementService.isUserGlobalGroupManager()) {
 			return "organisation/createOrEdit";
 		    } else {
 			return "organisation/courseAdminEdit";
@@ -131,7 +130,8 @@ public class OrganisationController {
 	    throws Exception {
 	initLocalesAndStatus();
 
-	if (!(request.isUserInRole(Role.APPADMIN) || userManagementService.isUserGlobalGroupManager())) {
+	if (!(request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)
+		|| userManagementService.isUserGlobalGroupManager())) {
 	    // only appadmins and global group admins can create groups
 	    if (((organisationForm.getTypeId() != null)
 		    && organisationForm.getTypeId().equals(OrganisationType.COURSE_TYPE))
@@ -174,7 +174,7 @@ public class OrganisationController {
 	    return null;
 	}
 
-	if (!(request.isUserInRole(Role.APPADMIN))) {
+	if (!(request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN))) {
 	    request.setAttribute("errorName", "OrganisationAction");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.need.appadmin"));
 	    return "error";

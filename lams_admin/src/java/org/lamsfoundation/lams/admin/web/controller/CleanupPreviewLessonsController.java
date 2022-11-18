@@ -33,7 +33,6 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.security.ISecurityService;
-import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -67,16 +66,10 @@ public class CleanupPreviewLessonsController {
 
     @RequestMapping(path = "/start")
     public String unspecified(HttpServletRequest request, HttpServletResponse response) throws IOException {
-	
+
 	if (!securityService.isAppadmin(getUserID(), "display cleanup preview lessons")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not an appadmin");
 	    return null;
-	}
-
-	if (!(request.isUserInRole(Role.APPADMIN))) {
-	    request.setAttribute("errorName", "CleanupPreviewLessonsController");
-	    request.setAttribute("errorMessage", messageService.getMessage("error.need.appadmin"));
-	    return "error";
 	}
 
 	long[] lessonCount = lessonService.getPreviewLessonCount();

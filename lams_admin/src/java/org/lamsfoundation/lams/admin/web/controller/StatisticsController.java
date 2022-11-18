@@ -48,7 +48,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class StatisticsController {
 
     @Autowired
-    private IStatisticsService statisticsService;    
+    private IStatisticsService statisticsService;
     @Autowired
     private IUserManagementService userManagementService;
     @Autowired
@@ -59,7 +59,7 @@ public class StatisticsController {
     public String unspecified(HttpServletRequest request) throws Exception {
 
 	// check permission
-	if (!request.isUserInRole(Role.APPADMIN)) {
+	if (!request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)) {
 	    request.setAttribute("errorName", "StatisticsAction");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
@@ -80,7 +80,7 @@ public class StatisticsController {
 	Integer orgId = WebUtil.readIntParam(request, "orgId");
 
 	// check permission
-	if (!request.isUserInRole(Role.APPADMIN)) {
+	if (!request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)) {
 	    request.setAttribute("errorName", "StatisticsAction");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";

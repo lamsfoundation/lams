@@ -278,7 +278,8 @@ public class OutcomeController {
 		    "Either lesson ID or tool content ID or QB question ID must not be null when fetching outcome mappings");
 	}
 	Integer userId = OutcomeController.getUserDTO().getUserID();
-	if (!request.isUserInRole(Role.APPADMIN) && !request.isUserInRole(Role.AUTHOR)) {
+	if (!request.isUserInRole(Role.APPADMIN) && !request.isUserInRole(Role.SYSADMIN)
+		&& !request.isUserInRole(Role.AUTHOR)) {
 	    String error = "User " + userId + " is not appadmin nor an author and can not map outcome";
 	    log.error(error);
 	    throw new SecurityException(error);

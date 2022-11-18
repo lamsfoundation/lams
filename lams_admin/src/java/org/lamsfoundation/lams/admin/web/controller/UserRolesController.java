@@ -107,10 +107,10 @@ public class UserRolesController {
 	Integer orgIdOfCourse = (orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE))
 		? org.getParentOrganisation().getOrganisationId()
 		: orgId;
-	Boolean isAppadmin = request.isUserInRole(Role.APPADMIN);
+	Boolean isAppadmin = request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN);
 	User requestor = userManagementService.getUserByLogin(request.getRemoteUser());
 	Integer rootOrgId = userManagementService.getRootOrganisation().getOrganisationId();
-	Boolean requestorHasRole = userManagementService.isUserInRole(requestor.getUserId(), orgIdOfCourse,
+	boolean requestorHasRole = userManagementService.isUserInRole(requestor.getUserId(), orgIdOfCourse,
 		Role.GROUP_MANAGER) || (userManagementService.isUserGlobalGroupManager() && !rootOrgId.equals(orgId));
 
 	if (!(requestorHasRole || isAppadmin)) {

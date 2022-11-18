@@ -114,7 +114,8 @@ public class UserManageController {
 	} else {
 	    return forwardError(request, "error.authorisation");
 	}
-	userManageForm.setCanResetOrgPassword(request.isUserInRole(Role.APPADMIN));
+	userManageForm
+		.setCanResetOrgPassword(request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN));
 
 	userManageForm.setOrgId(orgId);
 	userManageForm.setOrgName(orgName);

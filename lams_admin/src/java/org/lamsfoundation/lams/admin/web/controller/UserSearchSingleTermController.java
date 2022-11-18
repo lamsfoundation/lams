@@ -75,7 +75,7 @@ public class UserSearchSingleTermController {
 				group = org;
 			    }
 			    // get search results, filtered according to orgId
-			    if (request.isUserInRole(Role.APPADMIN)
+			    if (request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)
 				    || userManagementService.isUserGlobalGroupManager()) {
 				users = userManagementService.findUsers(term, orgId);
 			    } else if (userManagementService.isUserInRole(userId, group.getOrganisationId(),

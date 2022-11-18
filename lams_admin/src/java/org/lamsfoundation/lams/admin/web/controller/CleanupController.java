@@ -60,7 +60,7 @@ public class CleanupController {
     @RequestMapping(path = "/start")
     public String start(@ModelAttribute CleanupForm cleanupForm, HttpServletRequest request) throws Exception {
 	// check user is sysadmin
-	if (!(request.isUserInRole(Role.APPADMIN))) {
+	if (!(request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN))) {
 	    request.setAttribute("errorName", "CleanupAction");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.need.sysadmin"));
 	    return "error";
@@ -77,7 +77,7 @@ public class CleanupController {
     @RequestMapping(path = "/files", method = RequestMethod.POST)
     public String cleanUpFiles(@ModelAttribute CleanupForm cleanupForm, HttpServletRequest request) throws Exception {
 	// check user is sysadmin
-	if (!(request.isUserInRole(Role.APPADMIN))) {
+	if (!(request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN))) {
 	    request.setAttribute("errorName", "CleanupTempFilesAction");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.need.sysadmin"));
 	    return "error";
@@ -103,7 +103,7 @@ public class CleanupController {
     @RequestMapping(path = "/cache", method = RequestMethod.POST)
     public String cleanUpCache(HttpServletRequest request) throws MalformedObjectNameException {
 	// check user is sysadmin
-	if (!(request.isUserInRole(Role.APPADMIN))) {
+	if (!(request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN))) {
 	    request.setAttribute("errorName", "CleanupCacheAction");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.need.sysadmin"));
 	    return "error";
@@ -116,7 +116,7 @@ public class CleanupController {
     @RequestMapping(path = "/garbage", method = RequestMethod.POST)
     public String cleanUpGarbage(HttpServletRequest request) throws MalformedObjectNameException {
 	// check user is sysadmin
-	if (!(request.isUserInRole(Role.APPADMIN))) {
+	if (!(request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN))) {
 	    request.setAttribute("errorName", "CleanupGarbageAction");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.need.sysadmin"));
 	    return "error";

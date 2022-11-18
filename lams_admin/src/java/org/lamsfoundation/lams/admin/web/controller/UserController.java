@@ -140,7 +140,7 @@ public class UserController {
 	    }
 	}
 
-	if (!(canEdit || request.isUserInRole(Role.APPADMIN))) {
+	if (!(canEdit || request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN))) {
 	    request.setAttribute("errorName", "UserController");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
@@ -197,7 +197,7 @@ public class UserController {
 	userForm.setOrgId(org == null ? null : org.getOrganisationId());
 
 	// appadmins can mark users as required to use two-factor authentication
-	boolean isAppadmin = request.isUserInRole(Role.APPADMIN);
+	boolean isAppadmin = request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN);
 	if (isAppadmin) {
 	    request.setAttribute("isAppadmin", true);
 	}
@@ -293,7 +293,8 @@ public class UserController {
     // determine whether to disable or delete user based on their lams data
     @RequestMapping("/remove")
     public String remove(HttpServletRequest request) throws Exception {
-	if (!(request.isUserInRole(Role.APPADMIN) || userManagementService.isUserGlobalGroupManager())) {
+	if (!(request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)
+		|| userManagementService.isUserGlobalGroupManager())) {
 	    request.setAttribute("errorName", "UserAction");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
@@ -313,7 +314,8 @@ public class UserController {
 
     @RequestMapping(path = "/disable", method = RequestMethod.POST)
     public String disable(HttpServletRequest request) throws Exception {
-	if (!(request.isUserInRole(Role.APPADMIN) || userManagementService.isUserGlobalGroupManager())) {
+	if (!(request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)
+		|| userManagementService.isUserGlobalGroupManager())) {
 	    request.setAttribute("errorName", "UserController");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
@@ -339,7 +341,8 @@ public class UserController {
 
     @RequestMapping(path = "/delete", method = RequestMethod.POST)
     public String delete(HttpServletRequest request) throws Exception {
-	if (!(request.isUserInRole(Role.APPADMIN) || userManagementService.isUserGlobalGroupManager())) {
+	if (!(request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)
+		|| request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager())) {
 	    request.setAttribute("errorName", "UserAction");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
@@ -370,7 +373,8 @@ public class UserController {
     // called from disabled users screen
     @RequestMapping(path = "/enable", method = RequestMethod.POST)
     public String enable(HttpServletRequest request) throws Exception {
-	if (!(request.isUserInRole(Role.APPADMIN) || userManagementService.isUserGlobalGroupManager())) {
+	if (!(request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)
+		|| userManagementService.isUserGlobalGroupManager())) {
 	    request.setAttribute("errorName", "UserController");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";

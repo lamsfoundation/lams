@@ -156,7 +156,8 @@ public class IndexController {
 	    boolean isIntegrationUser = integrationService.isIntegrationUser(userDTO.getUserID());
 	    //prevent integration users with mere learner rights from accessing index.do
 	    if (isIntegrationUser && !request.isUserInRole(Role.AUTHOR) && !request.isUserInRole(Role.MONITOR)
-		    && !request.isUserInRole(Role.GROUP_MANAGER) && !request.isUserInRole(Role.APPADMIN)) {
+		    && !request.isUserInRole(Role.GROUP_MANAGER) && !request.isUserInRole(Role.APPADMIN)
+		    && !request.isUserInRole(Role.SYSADMIN)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN,
 			"Integration users with learner right are not allowed to access this page");
 		return null;
@@ -180,7 +181,7 @@ public class IndexController {
 	request.setAttribute("favoriteOrganisations", favoriteOrganisations);
 	request.setAttribute("activeOrgId", user.getLastVisitedOrganisationId());
 
-	boolean isAppadmin = request.isUserInRole(Role.APPADMIN);
+	boolean isAppadmin = request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN);
 	int userCoursesCount = userManagementService.getCountActiveCoursesByUser(userDTO.getUserID(), isAppadmin, null);
 	request.setAttribute("isCourseSearchOn", userCoursesCount > 10);
 
@@ -204,7 +205,8 @@ public class IndexController {
 
     private void setAdminLinks(HttpServletRequest request) {
 	List<IndexLinkBean> adminLinks = new ArrayList<>();
-	if (request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.GROUP_MANAGER)) {
+	if (request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)
+		|| request.isUserInRole(Role.GROUP_MANAGER)) {
 	    adminLinks.add(new IndexLinkBean("index.courseman", "javascript:openOrgManagement("
 		    + userManagementService.getRootOrganisation().getOrganisationId() + ')'));
 	}
@@ -225,7 +227,7 @@ public class IndexController {
 	User loggedInUser = userManagementService.getUserByLogin(request.getRemoteUser());
 
 	Integer userId = loggedInUser.getUserId();
-	boolean isAppadmin = request.isUserInRole(Role.APPADMIN);
+	boolean isAppadmin = request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN);
 	String searchString = WebUtil.readStrParam(request, "fcol[1]", true);
 
 	// paging parameters of tablesorter

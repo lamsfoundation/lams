@@ -89,7 +89,8 @@ public class UserSaveController {
 	// course manager can add/change users and their roles iff CourseAdminCanAddNewUsers
 	// course admin can add/change users but only set role to learner iff CourseAdminCanAddNewUsers
 	Integer rootOrgId = userManagementService.getRootOrganisation().getOrganisationId();
-	if (request.isUserInRole(Role.APPADMIN) || userManagementService.isUserGlobalGroupManager()) {
+	if (request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)
+		|| userManagementService.isUserGlobalGroupManager()) {
 	    canEditRole = true;
 	} else {
 

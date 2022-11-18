@@ -23,7 +23,6 @@
 package org.lamsfoundation.lams.admin.web.controller;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -96,7 +95,8 @@ public class OrgManageController {
 	}
 
 	// check if user is allowed to view and edit groups
-	if (!request.isUserInRole(Role.APPADMIN) && !userManagementService.isUserGlobalGroupManager()
+	if (!request.isUserInRole(Role.APPADMIN) && !request.isUserInRole(Role.SYSADMIN)
+		&& !userManagementService.isUserGlobalGroupManager()
 		&& !(isRootOrganisation ? request.isUserInRole(Role.GROUP_MANAGER)
 			: securityService.hasOrgRole(orgId, userId, new String[] { Role.GROUP_MANAGER },
 				"manage courses"))) {
@@ -110,7 +110,7 @@ public class OrgManageController {
 		: userManagementService.getUsersFromOrganisation(orgId).size();
 	String key = org == rootOrganisation ? "label.users.in.system" : "label.users.in.group";
 	request.setAttribute("numUsers", messageService.getMessage(key, new String[] { String.valueOf(numUsers) }));
-	request.setAttribute("totalUsers", numUsers); 
+	request.setAttribute("totalUsers", numUsers);
 
 	// Set OrgManageForm
 	if (orgManageForm == null) {
@@ -145,8 +145,8 @@ public class OrgManageController {
 	}
 
 	// let the jsp know whether to display links
-	request.setAttribute("createGroup",
-		request.isUserInRole(Role.APPADMIN) || userManagementService.isUserGlobalGroupManager());
+	request.setAttribute("createGroup", request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)
+		|| userManagementService.isUserGlobalGroupManager());
 	request.setAttribute("editGroup", true);
 	request.setAttribute("manageGlobalRoles", request.isUserInRole(Role.SYSADMIN));
 	return "organisation/list";
