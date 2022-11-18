@@ -5,6 +5,8 @@
 <lams:html>
 <lams:head>
 	<c:set var="title"><fmt:message key="sysadmin.lesson.delete.title"/></c:set>
+	<fmt:message key="msg.delete.all.lesson.confirm.1" var="DELETE_CONFIRM_VAR"><fmt:param value="${courseName}"/></fmt:message>
+	
 	<title>${title}</title>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
@@ -16,7 +18,8 @@
 	<script type="text/javascript">
 		$(document).ready(function(){
 			var lessonCount = ${lessonCount},
-				deleteButton = $('#deleteButton');
+				deleteButton = $('#deleteButton'),
+				decoderDiv = $('<div />');
 			
 			if (lessonCount == 0) {
 				deleteButton.prop('disabled', true);
@@ -25,8 +28,8 @@
 			
 			deleteButton.click(function(){
 				
-				if (!confirm('<fmt:message key="msg.delete.all.lesson.confirm.1"><fmt:param value="${courseName}"/></fmt:message>')
-						|| !confirm('<fmt:message key="msg.delete.all.lesson.confirm.2" />')) {
+				if (!confirm(decoderDiv.html('<c:out value="${DELETE_CONFIRM_VAR}" />').text())
+					|| !confirm('<fmt:message key="msg.delete.all.lesson.confirm.2" />')) {
 					return;
 				}
 				
