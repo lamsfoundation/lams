@@ -41,19 +41,19 @@ public class WhiteboardConstants {
     public static final String ATTR_TOOL_CONTENT_ID = "toolContentID";
 
     public static final String ATTR_WHITEBOARD = "whiteboard";
-    
+
     public static final String ATTR_GROUP_USERS = "groupUsers";
-    
+
     public static final String ATTR_IS_LEADER_RESPONSE_FINALIZED = "isLeaderResponseFinalized";
 
     public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
 
     public static final String ATTR_SUMMARY_LIST = "summaryList";
-    
+
     public static final String ATTR_FINISH_LOCK = "finishedLock";
 
     public static final String ATTR_LOCK_ON_FINISH = "lockOnFinish";
-    
+
     public static final String ATTR_HAS_EDIT_RIGHT = "hasEditRight";
 
     public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
@@ -79,4 +79,8 @@ public class WhiteboardConstants {
     public static final String ATTR_REFLECT_LIST = "reflectList";
 
     public static final String MANUAL_GRADING_DEFINITION_NAME = "manual.grading";
+
+    public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
+
+    public static final String ATTR_SUBMISSION_DEADLINE_DATESTRING = "submissionDateString";
 }

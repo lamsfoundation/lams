@@ -19,6 +19,7 @@
 <link href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet" type="text/css">
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css"/>
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css" />
+<link href="${lams}css/jquery-ui.timepicker.css" rel="stylesheet" type="text/css">
 	
 <style media="screen,projection" type="text/css">
 	 		
@@ -95,8 +96,23 @@
 	}
 </style>
 
+<script>
+	// pass settings to monitorToolSummaryAdvanced.js
+    let submissionDeadlineSettings = {
+		lams: '<lams:LAMSURL />',
+		submissionDeadline: '${submissionDeadline}',
+		submissionDateString: '${submissionDateString}',
+		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>?<csrf:token/>',
+		toolContentID: '${param.toolContentID}',
+		messageNotification: '<fmt:message key="monitor.summary.notification" />',
+		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
+		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
+	};
+</script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script> 
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script> 
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>  
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script> 
@@ -615,8 +631,10 @@
 	<c:if test="${not isTbl}">
 		<%@ include file="advanceoptions.jsp"%>
 	</c:if>
-	
+
 	<div id="time-limit-panel-placeholder"></div>
+			
+	<%@ include file="dateRestriction.jsp"%>
 
 	<div id="change-leader-modals"></div>
 </div>

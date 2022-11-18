@@ -83,6 +83,9 @@ public class Dokumaran implements Cloneable {
     @Column(name = "allow_multiple_leaders")
     private boolean allowMultipleLeaders;
 
+    @Column(name = "submission_deadline")
+    private Date submissionDeadline;
+
     @Column(name = "relative_time_limit")
     private int relativeTimeLimit;
 
@@ -356,6 +359,14 @@ public class Dokumaran implements Cloneable {
 
     public void setContentId(Long contentId) {
 	this.contentId = contentId;
+    }
+
+    public Date getSubmissionDeadline() {
+	return submissionDeadline;
+    }
+
+    public void setSubmissionDeadline(Date submissionDeadline) {
+	this.submissionDeadline = submissionDeadline;
     }
 
     /**

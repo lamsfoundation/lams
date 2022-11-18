@@ -8,6 +8,7 @@
 
 	<%@ include file="/common/header.jsp"%>
 
+	<title><fmt:message key="tool.display.name" /></title>
 	<script type="text/javascript">
 		function finish() {
 			document.getElementById("finishButton").disabled = true;

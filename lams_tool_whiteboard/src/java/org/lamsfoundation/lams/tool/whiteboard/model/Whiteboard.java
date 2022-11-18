@@ -71,6 +71,9 @@ public class Whiteboard implements Cloneable {
     @Column(name = "use_select_leader_tool_ouput")
     private boolean useSelectLeaderToolOuput;
 
+    @Column(name = "submission_deadline")
+    private Date submissionDeadline;
+
     @Column(name = "relative_time_limit")
     private int relativeTimeLimit;
 
@@ -302,6 +305,14 @@ public class Whiteboard implements Cloneable {
 
     public void setContentId(Long contentId) {
 	this.contentId = contentId;
+    }
+
+    public Date getSubmissionDeadline() {
+	return submissionDeadline;
+    }
+
+    public void setSubmissionDeadline(Date submissionDeadline) {
+	this.submissionDeadline = submissionDeadline;
     }
 
     /**

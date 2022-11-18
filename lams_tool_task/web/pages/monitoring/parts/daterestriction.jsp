@@ -8,7 +8,7 @@
 	<div id="datetimeDiv" <c:if test='${not empty sessionMap.submissionDeadline}'> style="display: none;" </c:if>>
 		<div class="form-group">
 		<label for="datetime"><fmt:message key="monitor.summary.after.date" />&nbsp;
-		<input type="text" name="datetime" id="datetime" value="" class="form-control form-control-inline" autocomplete="nope"/>
+		<input type="text" name="datetime" id="datetime" value="" class="form-control form-control-inline" autocomplete="off"/>
 		</label>							
 		<a	href="javascript:setSubmissionDeadline();" class="btn btn-default">
 			<fmt:message key="monitor.summary.set.restriction" />

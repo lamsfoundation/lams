@@ -30,10 +30,12 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -64,6 +66,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -72,6 +75,7 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -136,6 +140,19 @@ public class MonitoringController {
 	}
 
 	Whiteboard whiteboard = whiteboardService.getWhiteboardByContentId(contentId);
+
+	//set SubmissionDeadline, if any
+	if (whiteboard.getSubmissionDeadline() != null) {
+	    Date submissionDeadline = whiteboard.getSubmissionDeadline();
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone teacherTimeZone = teacher.getTimeZone();
+	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
+	    request.setAttribute(WhiteboardConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
+	    // use the unconverted time, as convertToStringForJSON() does the timezone conversion if needed
+	    request.setAttribute(WhiteboardConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING,
+		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
+	}
 
 	// Create reflectList if reflection is enabled.
 	if (whiteboard.isReflectOnActivity()) {
@@ -323,7 +340,8 @@ public class MonitoringController {
 	if (grouping != null) {
 	    Set<Group> groups = grouping.getGroups();
 	    for (Group group : groups) {
-		if (!group.getUsers().isEmpty() && group.getGroupName().toLowerCase().contains(searchString.toLowerCase())) {
+		if (!group.getUsers().isEmpty()
+			&& group.getGroupName().toLowerCase().contains(searchString.toLowerCase())) {
 		    ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
 		    groupJSON.put("label", groupLabel + group.getGroupName() + "\"");
 		    groupJSON.put("value", "group-" + group.getGroupId());
@@ -434,6 +452,33 @@ public class MonitoringController {
 	    }
 	}
 	whiteboardService.saveOrUpdate(whiteboard);
+    }
+
+    /**
+     * Set Submission Deadline
+     */
+    @RequestMapping(path = "/setSubmissionDeadline", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
+    @ResponseBody
+    public String setSubmissionDeadline(HttpServletRequest request) {
+	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Whiteboard whiteboard = whiteboardService.getWhiteboardByContentId(contentID);
+
+	Long dateParameter = WebUtil.readLongParam(request, WhiteboardConstants.ATTR_SUBMISSION_DEADLINE, true);
+	Date tzSubmissionDeadline = null;
+	String formattedDate = "";
+	if (dateParameter != null) {
+	    Date submissionDeadline = new Date(dateParameter);
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone teacherTimeZone = teacher.getTimeZone();
+	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
+	    formattedDate = DateUtil.convertToStringForJSON(tzSubmissionDeadline, request.getLocale());
+
+	}
+	whiteboard.setSubmissionDeadline(tzSubmissionDeadline);
+	whiteboardService.saveOrUpdate(whiteboard);
+
+	return formattedDate;
     }
 
     private Integer getUserId() {

@@ -85,7 +85,7 @@
 		</script>
 		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
- 		<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+ 		<lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
 		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
