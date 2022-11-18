@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.admin.web.controller;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -36,6 +35,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.web.form.UserOrgForm;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -113,8 +113,9 @@ public class UserOrgSaveController {
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, orgId);
 	Set uos = organisation.getUserOrganisations();
 
-	String[] userIds = userOrgForm.getUserIds();
-	List<String> userIdList = userIds == null ? Collections.emptyList() : Arrays.asList(userIds);
+	String[] userIds = StringUtils.isBlank(userOrgForm.getUserIds()) ? null : userOrgForm.getUserIds().split(",");
+	List<Integer> userIdList = Arrays.stream(userIds).filter(StringUtils::isNotBlank)
+		.collect(Collectors.mapping(userId -> Integer.valueOf(userId), Collectors.toList()));
 	log.debug("new user membership of orgId=" + orgId + " will be: " + userIdList);
 	Set<Integer> removedUserIds = new TreeSet<>();
 
@@ -123,7 +124,7 @@ public class UserOrgSaveController {
 	while (iter.hasNext()) {
 	    UserOrganisation uo = (UserOrganisation) iter.next();
 	    Integer userId = uo.getUser().getUserId();
-	    if (userIdList.indexOf(userId.toString()) < 0) {
+	    if (!userIdList.contains(userId)) {
 		User user = (User) userManagementService.findById(User.class, userId);
 		Set userUos = user.getUserOrganisations();
 		userUos.remove(uo);
@@ -138,8 +139,7 @@ public class UserOrgSaveController {
 	}
 	// add UserOrganisations that are in form data
 	List<UserOrganisation> newUserOrganisations = new ArrayList<>();
-	for (int i = 0; i < userIdList.size(); i++) {
-	    Integer userId = new Integer(userIdList.get(i));
+	for (Integer userId : userIdList) {
 	    Iterator iter2 = uos.iterator();
 	    boolean alreadyInOrg = false;
 	    while (iter2.hasNext()) {
@@ -205,8 +205,8 @@ public class UserOrgSaveController {
 	StringBuilder userNames = new StringBuilder();
 	for (Integer userId : userIds) {
 	    User user = userManagementService.getUserById(userId);
-	    userNames.append(user.getFirstName()).append(" ").append(user.getLastName())
-		    .append(" (").append(user.getLogin()).append("), ");
+	    userNames.append(user.getFirstName()).append(" ").append(user.getLastName()).append(" (")
+		    .append(user.getLogin()).append("), ");
 	}
 	return userNames.delete(userNames.length() - 2, userNames.length()).toString();
     }

@@ -5,8 +5,8 @@
 <lams:html>
 <lams:head>
 	<%@ include file="/common/header.jsp"%>
-
 	<title><fmt:message key="label.learning.title" /></title>
+
 	<script type="text/javascript">
 	
 		function finishSession(){
