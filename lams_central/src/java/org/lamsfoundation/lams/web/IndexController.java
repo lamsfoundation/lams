@@ -208,7 +208,8 @@ public class IndexController {
 	    adminLinks.add(new IndexLinkBean("index.courseman", "javascript:openOrgManagement("
 		    + userManagementService.getRootOrganisation().getOrganisationId() + ')'));
 	}
-	if (request.isUserInRole(Role.APPADMIN) || userManagementService.isUserGlobalGroupManager()) {
+	if (request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)
+		|| userManagementService.isUserGlobalGroupManager()) {
 	    adminLinks.add(new IndexLinkBean("index.appadmin", "javascript:openAppadmin()"));
 	}
 

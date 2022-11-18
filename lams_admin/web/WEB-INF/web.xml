@@ -217,6 +217,7 @@
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>SYSADMIN</role-name>
+			<role-name>APPADMIN</role-name>
 		</auth-constraint>
 	</security-constraint>
 	
