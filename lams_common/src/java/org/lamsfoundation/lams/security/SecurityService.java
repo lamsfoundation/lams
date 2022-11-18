@@ -261,6 +261,10 @@ public class SecurityService implements ISecurityService {
     }
 
     private boolean isAppadmin(Integer userId, String action, boolean skipLog, boolean escalate) {
+	if (isSysadmin(userId, action, true, false)) {
+	    return true;
+	}
+
 	if (userId == null) {
 	    String error = "Missing user ID when checking if is appadmin and can \"" + action + "\"";
 	    return processCheckFailure(userId, error, skipLog, escalate);
