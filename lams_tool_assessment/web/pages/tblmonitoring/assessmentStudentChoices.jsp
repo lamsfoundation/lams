@@ -88,7 +88,7 @@
 				<fmt:message key="label.print"/>
 			</a>
 			<a href="#nogo" onclick="javascript:exportExcel(); return false;" type="button" class="btn btn-secondary buttons_column">
-				<i class="fa fa-file"></i>
+				<i class="fa fa-file-excel"></i>
 				<fmt:message key="label.excel.export"/>
 			</a>
 		</div>
