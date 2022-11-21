@@ -190,6 +190,8 @@ public class SPEnrolmentServlet extends HttpServlet {
 		Set<User> allUsersParsed = createUsers(extServer, creatorId, allUsersMapped, userIDs, allExistingUsers,
 			allExistingExtUsers);
 
+		Set<User> allUsersinCourses = new HashSet<>();
+
 		// map lines into corresponding roles
 		Map<String, List<List<String>>> linesByMode = allLines.stream()
 			.collect(Collectors.groupingByConcurrent(row -> row.get(6)));
@@ -243,15 +245,17 @@ public class SPEnrolmentServlet extends HttpServlet {
 			for (String courseCode : courses.keySet()) {
 			    Organisation course = allExistingOrganisations.get(courseCode);
 
-			    assignManagers(course, creatorId, mappings, allUsersParsed, userIDs, allExistingRoles,
-				    allExistingUsers, mappingsProcessed);
+			    Collection<User> courseUsers = assignManagers(course, creatorId, mappings, allUsersParsed,
+				    userIDs, allExistingRoles, allExistingUsers, mappingsProcessed);
+
+			    allUsersinCourses.addAll(courseUsers);
 
 			    logger.info("Processed " + mappingsProcessed.get() + " entries");
 			}
 			logger.info("Processing \"" + role + "\" role finished");
 
 			// END OF GROUP MANAGER PROCESSING!
-			return;
+			continue;
 		    }
 
 		    // START OF LEARNER / STAFF PROCESSING
@@ -288,7 +292,6 @@ public class SPEnrolmentServlet extends HttpServlet {
 			    .parallelStream().filter(e -> e.getExtServer().getSid().equals(extServerSid))
 			    .collect(Collectors.toConcurrentMap(e -> e.getOrganisation().getOrganisationId(), e -> e));
 
-		    Set<User> allUsersinCourses = new HashSet<>();
 		    // go through each course
 		    AtomicInteger mappingsProcessed = new AtomicInteger();
 		    logger.info("Processing courses and assigments");
@@ -306,33 +309,27 @@ public class SPEnrolmentServlet extends HttpServlet {
 			logger.info("Processed " + mappingsProcessed.get() + " entries");
 		    }
 
-		    logger.info("Disabling users");
-		    // users who are part of courses but are not in the file anymore are eligible for disabling
-		    allUsersinCourses.removeAll(allUsersParsed);
-		    for (User user : allUsersinCourses) {
-			// make a flat set of roles from all subcourses
-			Set<Integer> roles = userManagementService.getRolesForUser(user.getUserId()).values().stream()
-				.collect(HashSet::new, Set::addAll, Set::addAll);
-			if (mode == Mode.STAFF) {
-			    // check if the user is learner in any course
-			    roles.remove(Role.ROLE_MONITOR);
-			    roles.remove(Role.ROLE_AUTHOR);
-			} else {
-			    // check if the user is staff in any course
-			    roles.remove(Role.ROLE_LEARNER);
-			}
-			if (roles.isEmpty()) {
-			    // he is only a learner or this is staff mode, so disable
-			    userManagementService.disableUser(user.getUserId());
-
-			    String message = "User \"" + user.getLogin() + "\" disabled";
-			    logger.info(message);
-			    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
-				    "SPEnrolment: " + message);
-			}
-		    }
 		    logger.info("Processing \"" + role + "\" role finished");
 		}
+
+		logger.info("Disabling users");
+		// users who are part of courses but are not in the file anymore are eligible for disabling
+		allUsersinCourses.removeAll(allUsersParsed);
+		for (User user : allUsersinCourses) {
+		    // make a flat set of roles from all subcourses
+		    Set<Integer> roles = userManagementService.getRolesForUser(user.getUserId()).values().stream()
+			    .collect(HashSet::new, Set::addAll, Set::addAll);
+		    if (roles.isEmpty()) {
+			// he is only a learner or this is staff mode, so disable
+			userManagementService.disableUser(user.getUserId());
+
+			String message = "User \"" + user.getLogin() + "\" disabled";
+			logger.info(message);
+			logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
+				"SPEnrolment: " + message);
+		    }
+		}
+
 		logger.info("SP enrolments provisioning completed successfully");
 	    } catch (Exception e) {
 		logger.error("Error while provisioning SP enrolments", e);
@@ -606,7 +603,7 @@ public class SPEnrolmentServlet extends HttpServlet {
     }
 
     @SuppressWarnings("unchecked")
-    private void assignManagers(Organisation course, Integer creatorId, Map<String, List<String>> mappings,
+    private Collection<User> assignManagers(Organisation course, Integer creatorId, Map<String, List<String>> mappings,
 	    Set<User> allUsersParsed, Map<String, Integer> userIDs,
 	    Map<String, Map<Integer, Set<Integer>>> allExistingRoles, Map<String, User> allExistingUsers,
 	    AtomicInteger mappingsProcessed) throws UserInfoValidationException {
@@ -616,6 +613,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 	// get existing managers for given course
 	Collection<User> courseUsers = userManagementService.getUsersFromOrganisationByRole(courseId,
 		Role.GROUP_MANAGER, true);
+	Set<User> initialCourseUsers = new HashSet<>(courseUsers);
 
 	// go through each user
 	List<String> courseMappings = mappings.get(courseCode);
@@ -680,6 +678,8 @@ public class SPEnrolmentServlet extends HttpServlet {
 	    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
 		    "SPEnrolment: " + message);
 	}
+
+	return initialCourseUsers;
     }
 
     @Override
