@@ -164,6 +164,6 @@ public class AuditLogFilter extends OncePerRequestFilter {
 
     private static final UserDTO getUserDto() {
 	HttpSession ss = SessionManager.getSession();
-	return (UserDTO) ss.getAttribute(AttributeNames.USER);
+	return ss == null ? null : (UserDTO) ss.getAttribute(AttributeNames.USER);
     }
 }
