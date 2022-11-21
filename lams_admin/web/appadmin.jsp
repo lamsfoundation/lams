@@ -22,7 +22,7 @@
 		<div class="row"> 
 			<div class="col text-center"> 
 				<a href="/" class="lams-logo" alt="LAMS logo">
-					<img src="<lams:LAMSURL/>images/svg/lamsv5_logo.svg" alt="<fmt:message key='label.monitoring.logo' />" />
+					<img src="<lams:LAMSURL/>images/svg/lamsv5_logo.svg" alt="LAMS logo" />
 				</a>
    			</div> 
   		</div>
