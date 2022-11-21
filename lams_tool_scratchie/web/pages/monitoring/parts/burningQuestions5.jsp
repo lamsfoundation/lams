@@ -98,20 +98,19 @@
 <div class="container-fluid">
 	<!-- Tables -->
 
-	<div class="row mb-2">
-		<div class="col-4 offset-4">
-			<h3 class="text-center">
+	<div class="row">
+		<div class="col-10 offset-1 pb-2">
+			<div class="float-end">
+				<button type="button" id="toggle-burning-questions-button" class="btn btn-secondary" data-expanded="false">
+					<i class="fa fa-plus-circle"></i>
+					<span class="hidden-xs">
+						<fmt:message key='label.expand.all' />
+					</span>
+				</button>
+			</div>
+			<h3>
 				<fmt:message key="label.burning.questions"/>
 			</h3>
-		</div>
-		<div class="col-3 text-end">
-	        <button type="button" id="toggle-burning-questions-button" class="btn btn-secondary" data-expanded="false">
-	           	<i class="fa fa-plus-circle"></i>
-	           	<span class="hidden-xs">
-	           		<fmt:message key='label.expand.all' />
-	           	</span>
-	        </button>
-		</div>
 	</div>
 	
 	<div class="row">

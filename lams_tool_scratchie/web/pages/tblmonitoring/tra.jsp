@@ -57,7 +57,15 @@
 
 <div class="container-fluid">
 	 <div class="row">
-		<div class="col-10 offset-1 text-center">
+		<div class="col-10 offset-1">
+			<div class="float-end">
+				<button class="btn btn-secondary" type="button"
+					 onclick="javascript:loadTab('tratStudentChoices', $('#load-trat-student-choices-tab-btn'))">
+					<i class="fa fa-list-check"></i> 
+					<fmt:message key="label.show.students.choices"/>
+				</button>   
+			</div>                 
+
 			<h3>
 				<fmt:message key="label.tra.questions.marks"/>
 			</h3>
@@ -71,13 +79,6 @@
 				<fmt:message key="label.attendance"/>: <span>${attemptedLearnersNumber}</span>/<span class="total-learners-number"></span> 
 			</h4> 
 		</div>
-		<div class="col-5 text-end">
-			<button class="btn btn-secondary" type="button"
-				 onclick="javascript:loadTab('tratStudentChoices', $('#load-trat-student-choices-tab-btn'))">
-				<i class="fa fa-list-check"></i>
-				<fmt:message key="label.show.students.choices"/>
-			</button>   
-		</div>                 
 	</div>
 	<!-- End notifications -->              
 	

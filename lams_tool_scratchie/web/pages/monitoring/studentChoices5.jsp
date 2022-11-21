@@ -81,17 +81,9 @@
 </script>
 
 <div class="container-fluid">
-	 <div class="row">
-		<div class="col-8 offset-2 text-center">
-			<h3>
-				<fmt:message key="label.tra.questions.marks"/>
-			</h3>
-		</div>
-	</div>
-	
-	<!-- Notifications -->  
-	<div class="row mb-4">
-		<div class="col-10 offset-1 text-end">
+	 <div class="col-10 offset-1 pb-2">
+		<!-- Notifications -->  
+		<div class="float-end">
 			<a href="#nogo" type="button" class="btn btn-secondary buttons_column"
 					onclick="javascript:loadTab('trat', $('#load-trat-tab-btn'))">
 				<i class="fa fa-clipboard-question"></i>
@@ -112,8 +104,12 @@
 				</a>
 			</c:if>
 		</div>
+		<!-- End notifications -->
+		<h3>
+			<fmt:message key="label.tra.questions.marks"/>
+		</h3>
 	</div>
-	<!-- End notifications -->
+	
 	
 	<div class="row">
 		<div class="col-10 offset-1">

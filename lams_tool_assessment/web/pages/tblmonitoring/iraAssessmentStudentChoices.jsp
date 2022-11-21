@@ -73,37 +73,34 @@
 </script>
 <div class="container-fluid">
 	<div class="row">
-		<div class="col-10 offset-1 text-center">
+		<div class="col-10 offset-1 text-right">
+			<!-- Notifications -->  
+			<div class="float-end">
+				<a href="#nogo" type="button" class="btn btn-secondary buttons_column"
+						onclick="javascript:loadTab('irat', $('#load-irat-tab-btn'))">
+					<i class="fa fa-clipboard-question"></i>
+					<fmt:message key="label.hide.students.choices"/>
+				</a>
+				<a href="#nogo" onclick="javascript:printTable(); return false;" type="button" class="btn btn-secondary buttons_column">
+					<i class="fa fa-print"></i>
+					<fmt:message key="label.print"/>
+				</a>
+				<a href="#nogo" onclick="javascript:exportExcel(); return false;" type="button" class="btn btn-secondary buttons_column">
+					<i class="fa fa-file-excel"></i>
+					<fmt:message key="label.excel.export"/>
+				</a>
+				<a class="btn btn-secondary buttons_column d-none" target="_blank" id="allocate-vsas-button"
+				   href='<lams:LAMSURL />qb/vsa/displayVsaAllocate.do?toolContentID=${toolContentID}'>
+					<fmt:message key="label.vsa.allocate.button" />
+				</a>
+			</div>
+			<!-- End notifications -->
 			<h3>
 				<fmt:message key="label.ira.questions.marks"/>
 			</h3>
 		</div>
 	</div>
 	
-	<!-- Notifications -->  
-	<div class="row">
-		<div class="col-10 offset-1 text-end">
-			<a href="#nogo" type="button" class="btn btn-secondary buttons_column"
-					onclick="javascript:loadTab('irat', $('#load-irat-tab-btn'))">
-				<i class="fa fa-clipboard-question"></i>
-				<fmt:message key="label.hide.students.choices"/>
-			</a>
-			<a href="#nogo" onclick="javascript:printTable(); return false;" type="button" class="btn btn-secondary buttons_column">
-				<i class="fa fa-print"></i>
-				<fmt:message key="label.print"/>
-			</a>
-			<a href="#nogo" onclick="javascript:exportExcel(); return false;" type="button" class="btn btn-secondary buttons_column">
-				<i class="fa fa-file-excel"></i>
-				<fmt:message key="label.excel.export"/>
-			</a>
-			<a class="btn btn-secondary buttons_column d-none" target="_blank" id="allocate-vsas-button"
-			   href='<lams:LAMSURL />qb/vsa/displayVsaAllocate.do?toolContentID=${toolContentID}'>
-				<fmt:message key="label.vsa.allocate.button" />
-			</a>
-		</div>
-	</div>
-	<!-- End notifications -->
-
 	<div class="row" id="completion-charts-container">
 		<div class="col-md-5 col-sm-12 offset-md-1 me-2 my-4">
 			<div class="monitoring-panel">

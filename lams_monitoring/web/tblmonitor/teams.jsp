@@ -268,21 +268,21 @@
 	<!-- Tables -->
 
 	<div class="row">
-		<div class="col-4 offset-4">
-			<h3 id="tbl-teams-tab-title" class="text-center">
+		<div class="col-10 offset-1">
+			<div class="float-end">
+				<c:if test="${not empty groupsSetupUrl}">
+					<a href="<lams:LAMSURL/>${groupsSetupUrl}" class="btn btn-secondary" target="_blank">
+						<fmt:message key="label.teams.setup"/>
+					</a>
+				</c:if>
+			</div>
+			<h3 id="tbl-teams-tab-title" class="text-right">
 				<fmt:message key="label.students.teams"/>
 			</h3>
 		</div>
-		<div class="col-2 text-end">
-			<c:if test="${not empty groupsSetupUrl}">
-				<a href="<lams:LAMSURL/>${groupsSetupUrl}" class="btn btn-secondary" target="_blank">
-					<fmt:message key="label.teams.setup"/>
-				</a>
-			</c:if>
-		</div>
 	</div>
 	<div class="row">
-		<div class="col-8 offset-2">
+		<div class="col-10 offset-1">
 			<c:if test="${not empty chartNamesDataset}">
 				<canvas id="summary-chart" class="mt-3"></canvas>
 			</c:if>
