@@ -784,6 +784,14 @@ public class UserManagementService implements IUserManagementService, Initializi
 	    }
 	}
 	if (uors.isEmpty()) {
+	    user.getUserOrganisations().remove(uo);
+	    Iterator<UserOrganisation> userOrganisationIterator = org.getUserOrganisations().iterator();
+	    while (userOrganisationIterator.hasNext()) {
+		if (uo.getUserOrganisationId().equals(userOrganisationIterator.next().getUserOrganisationId())) {
+		    userOrganisationIterator.remove();
+		    break;
+		}
+	    }
 	    delete(uo);
 	} else {
 	    uo.setUserOrganisationRoles(uors);

@@ -133,7 +133,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 		}
 
 		// split each line into list of trimmed pieces
-		Map<String, List<List<String>>> linesByMode = Files.readAllLines(fileInput).parallelStream().unordered()
+		List<List<String>> allLines = Files.readAllLines(fileInput).parallelStream().unordered()
 			.map(line -> Arrays.stream(line.split(DELIMITER)).map(elem -> elem.trim())
 				.collect(Collectors.toList()))
 			// filter out malformed rows
@@ -149,58 +149,68 @@ public class SPEnrolmentServlet extends HttpServlet {
 			    }
 			    // throw an exception when a row is malformed rather than silently discard it
 			    throw new RuntimeException("Malformed row: " + String.join(DELIMITER, row));
-			}).collect(Collectors.groupingByConcurrent(row -> row.get(6)));
+			}).collect(Collectors.toList());
 
-		if (linesByMode.isEmpty()) {
+		if (allLines.isEmpty()) {
 		    throw new ServletException("File is empty");
 		}
 
+		// map of course code (ID) -> course name
+		ConcurrentMap<String, String> courses = allLines.parallelStream().unordered().collect(
+			Collectors.toConcurrentMap(elem -> elem.get(0), elem -> elem.get(1), (elem1, elem2) -> elem1));
+
+		// map of user login -> user ID
+		Map<String, Integer> userIDs = new HashMap<>();
+
+		// find sysadmin as he/she will be the creator of organisations
+		Organisation rootOrganisation = userManagementService.getRootOrganisation();
+		Integer creatorId = rootOrganisation.getCreatedBy().getUserId();
+
+		// map of user login -> email, first name
+		// for learner email is login, for staff it is a different ID in email format
+		ConcurrentMap<String, String[]> allUsersMapped = allLines.parallelStream().unordered()
+			.collect(Collectors.toConcurrentMap(
+				elem -> elem.get(6).equals(Mode.STAFF.getRole())
+					|| elem.get(6).equals(Mode.MANAGER.getRole()) ? elem.get(3) : elem.get(5),
+				elem -> new String[] { elem.get(5), elem.get(4) }, (elem1, elem2) -> elem1));
+
+		Integer extServerSid = extServer.getSid();
+		// load all users from DB which are present in the output file
+		// map of user login -> user
+		Map<String, User> allExistingUsers = userManagementService
+			.findByPropertyValues(User.class, "login", allUsersMapped.keySet()).parallelStream()
+			.collect(Collectors.toConcurrentMap(User::getLogin, u -> u));
+		// load all ext users from DB which are present in the output file
+		// map of user login -> extUser
+		Map<String, ExtUserUseridMap> allExistingExtUsers = userManagementService
+			.findByPropertyValues(ExtUserUseridMap.class, "extUsername", allExistingUsers.keySet())
+			.parallelStream().filter(e -> e.getExtServer().getSid().equals(extServerSid))
+			.collect(Collectors.toConcurrentMap(ExtUserUseridMap::getExtUsername, e -> e));
+		// CREATE USERS and ext users
+		Set<User> allUsersParsed = createUsers(extServer, creatorId, allUsersMapped, userIDs, allExistingUsers,
+			allExistingExtUsers);
+
+		// map lines into corresponding roles
+		Map<String, List<List<String>>> linesByMode = allLines.stream()
+			.collect(Collectors.groupingByConcurrent(row -> row.get(6)));
+
 		for (String role : Mode.getAllRoles()) {
-		    List<List<String>> lines = linesByMode.get(role);
-		    if (lines == null) {
-			continue;
-		    }
-		    
 		    logger.info("Processing \"" + role + "\" role");
 
+		    List<List<String>> lines = linesByMode.get(role);
 		    // it is easier to detect whether we process managers or staff or learners just once
 		    // than for each user - they do not come together anyway
 		    final Mode mode = role.equals(Mode.STAFF.getRole()) ? Mode.STAFF
 			    : (role.equals(Mode.MANAGER.getRole()) ? Mode.MANAGER : Mode.LEARNER);
 
-		    // map of course code (ID) -> course name
-		    ConcurrentMap<String, String> courses = lines.parallelStream().unordered().collect(Collectors
-			    .toConcurrentMap(elem -> elem.get(0), elem -> elem.get(1), (elem1, elem2) -> elem1));
-
-		    // map of user login -> email, first name
-		    // for learner email is login, for staff it is a different ID in email format
-		    ConcurrentMap<String, String[]> users = lines.parallelStream().unordered()
-			    .collect(Collectors.toConcurrentMap(
-				    elem -> mode == Mode.STAFF || mode == Mode.MANAGER ? elem.get(3) : elem.get(5),
-				    elem -> new String[] { elem.get(5), elem.get(4) }, (elem1, elem2) -> elem1));
-
-		    // map of user login -> user ID
-		    Map<String, Integer> userIDs = new HashMap<>();
-
-		    // find sysadmin as he/she will be the creator of organisations
-		    Organisation rootOrganisation = userManagementService.getRootOrganisation();
-		    Integer creatorId = rootOrganisation.getCreatedBy().getUserId();
-
-		    Integer extServerSid = extServer.getSid();
-		    // load all users from DB which are present in the output file
-		    // map of user login -> user
-		    Map<String, User> allExistingUsers = userManagementService
-			    .findByPropertyValues(User.class, "login", users.keySet()).parallelStream()
-			    .collect(Collectors.toConcurrentMap(User::getLogin, u -> u));
-		    // load all ext users from DB which are present in the output file
-		    // map of user login -> extUser
-		    Map<String, ExtUserUseridMap> allExistingExtUsers = userManagementService
-			    .findByPropertyValues(ExtUserUseridMap.class, "extUsername", allExistingUsers.keySet())
-			    .parallelStream().filter(e -> e.getExtServer().getSid().equals(extServerSid))
-			    .collect(Collectors.toConcurrentMap(ExtUserUseridMap::getExtUsername, e -> e));
-		    // CREATE USERS and ext users
-		    Set<User> allUsersParsed = createUsers(extServer, creatorId, users, userIDs, allExistingUsers,
-			    allExistingExtUsers);
+		    if (lines == null) {
+			// always process manager role, even if there are no managers
+			if (mode == Mode.MANAGER) {
+			    lines = List.of();
+			} else {
+			    continue;
+			}
+		    }
 
 		    // map of user login -> course ID -> role IDs
 		    // for all users which are present in the output file
@@ -229,6 +239,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 
 			AtomicInteger mappingsProcessed = new AtomicInteger();
 			logger.info("Processing courses and assigments");
+
 			for (String courseCode : courses.keySet()) {
 			    Organisation course = allExistingOrganisations.get(courseCode);
 
@@ -607,58 +618,67 @@ public class SPEnrolmentServlet extends HttpServlet {
 		Role.GROUP_MANAGER, true);
 
 	// go through each user
-	for (String login : mappings.get(courseCode)) {
-	    mappingsProcessed.incrementAndGet();
+	List<String> courseMappings = mappings.get(courseCode);
+	if (courseMappings != null) {
+	    for (String login : courseMappings) {
+		mappingsProcessed.incrementAndGet();
 
-	    // check if the user is already a manager is the course
-	    // if so, there is nothing to do
-	    boolean userAlreadyAssigned = false;
-	    Integer userId = userIDs.get(login);
-	    Iterator<User> courseUserIterator = courseUsers.iterator();
-	    while (courseUserIterator.hasNext()) {
-		if (userId.equals(courseUserIterator.next().getUserId())) {
-		    courseUserIterator.remove();
-		    userAlreadyAssigned = true;
-		    break;
+		// check if the user is already a manager is the course
+		// if so, there is nothing to do
+		boolean userAlreadyAssigned = false;
+		Integer userId = userIDs.get(login);
+		Iterator<User> courseUserIterator = courseUsers.iterator();
+		while (courseUserIterator.hasNext()) {
+		    if (userId.equals(courseUserIterator.next().getUserId())) {
+			courseUserIterator.remove();
+			userAlreadyAssigned = true;
+			break;
+		    }
 		}
-	    }
-	    if (userAlreadyAssigned) {
-		continue;
-	    }
+		if (userAlreadyAssigned) {
+		    continue;
+		}
 
-	    // the user is not a manager yet, so assign him the role
-	    Map<Integer, Set<Integer>> existingCoursesRoles = allExistingRoles.get(login);
-	    Set<Integer> existingCourseRoles = existingCoursesRoles == null ? null
-		    : allExistingRoles.get(login).get(courseId);
-	    if (existingCourseRoles == null) {
-		existingCourseRoles = new HashSet<>();
+		// the user is not a manager yet, so assign him the role
+		Map<Integer, Set<Integer>> existingCoursesRoles = allExistingRoles.get(login);
+		Set<Integer> existingCourseRoles = existingCoursesRoles == null ? null
+			: allExistingRoles.get(login).get(courseId);
+		if (existingCourseRoles == null) {
+		    existingCourseRoles = new HashSet<>();
+		}
+		existingCourseRoles.add(Role.ROLE_GROUP_MANAGER);
+
+		User user = allExistingUsers.get(login);
+		userManagementService.setRolesForUserOrganisation(user, course,
+			existingCourseRoles.stream().map(String::valueOf).collect(Collectors.toList()), false);
+
+		String message = "Group manager \"" + login + "\" added to course";
+		logger.info(message);
+		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
+			"SPEnrolment: " + message);
 	    }
-	    existingCourseRoles.add(Role.ROLE_GROUP_MANAGER);
-
-	    User user = allExistingUsers.get(login);
-	    userManagementService.setRolesForUserOrganisation(user, course,
-		    existingCourseRoles.stream().map(String::valueOf).collect(Collectors.toList()), false);
-
-	    String message = "Group manager \"" + login + "\" added to course";
-	    logger.info(message);
-	    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
-		    "SPEnrolment: " + message);
 	}
 
 	// user is a group manager, but he should not; remove him role from course
 	for (User user : courseUsers) {
 	    Map<Integer, Set<Integer>> existingCoursesRoles = allExistingRoles.get(user.getLogin());
-	    Set<Integer> existingSubcourseRoles = existingCoursesRoles == null ? null
-		    : existingCoursesRoles.get(courseId);
-	    if (existingSubcourseRoles != null) {
-		existingSubcourseRoles.remove(Role.ROLE_GROUP_MANAGER);
-		userManagementService.setRolesForUserOrganisation(user.getUserId(), courseId, existingSubcourseRoles);
-
-		String message = "Group manager \"" + user.getLogin() + "\" removed from course " + courseId;
-		logger.info(message);
-		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
-			"SPEnrolment: " + message);
+	    Set<Integer> existingSubcourseRoles = null;
+	    if (existingCoursesRoles == null) {
+		existingSubcourseRoles = Set.of();
+	    } else {
+		existingSubcourseRoles = existingCoursesRoles.get(courseId);
+		if (existingSubcourseRoles == null) {
+		    existingSubcourseRoles = Set.of();
+		} else {
+		    existingSubcourseRoles.remove(Role.ROLE_GROUP_MANAGER);
+		}
 	    }
+	    userManagementService.setRolesForUserOrganisation(user.getUserId(), courseId, existingSubcourseRoles);
+
+	    String message = "Group manager \"" + user.getLogin() + "\" removed from course " + courseId;
+	    logger.info(message);
+	    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
+		    "SPEnrolment: " + message);
 	}
     }
 
