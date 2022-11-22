@@ -13,7 +13,7 @@
 
 <div class="component-page-wrapper d-flex">
 		<div class="component-page-content">
-            <a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
+            <a href="#content" class="visually-hidden-focusable">Skip to main content</a>
             
             <c:if test="${not empty titleKey}">
 				<header class="header d-flex justify-content-between">
