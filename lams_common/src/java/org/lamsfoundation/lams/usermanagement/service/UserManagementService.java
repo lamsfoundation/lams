@@ -799,7 +799,7 @@ public class UserManagementService implements IUserManagementService, Initializi
 	}
 
 	if (checkGroupManagerRoles) {
-	    // make sure group managers have monitor and learner in each subgroup
+	    // make sure group managers have monitor in each subgroup
 	    checkGroupManager(user, org);
 	}
     }
@@ -829,9 +829,8 @@ public class UserManagementService implements IUserManagementService, Initializi
 		uos.add(uo);
 		log.debug("added " + user.getLogin() + " to " + org.getName());
 		uo = setRoleForUserOrganisation(uo, (Role) findById(Role.class, Role.ROLE_MONITOR));
-		uo = setRoleForUserOrganisation(uo, (Role) findById(Role.class, Role.ROLE_LEARNER));
 		save(uo);
-		return;
+		continue;
 	    }
 
 	    // iterate through roles and add monitor and learner if don't
@@ -839,22 +838,14 @@ public class UserManagementService implements IUserManagementService, Initializi
 	    Set<UserOrganisationRole> uors = uo.getUserOrganisationRoles();
 	    if ((uors != null) && !uors.isEmpty()) {
 		boolean isMonitor = false;
-		boolean isLearner = false;
 		for (UserOrganisationRole uor : uors) {
 		    if (uor.getRole().getName().equals(Role.MONITOR)) {
 			isMonitor = true;
-		    } else if (uor.getRole().getName().equals(Role.LEARNER)) {
-			isLearner = true;
-		    }
-		    if (isMonitor && isLearner) {
 			break;
 		    }
 		}
 		if (!isMonitor) {
 		    uo = setRoleForUserOrganisation(uo, (Role) findById(Role.class, Role.ROLE_MONITOR));
-		}
-		if (!isLearner) {
-		    uo = setRoleForUserOrganisation(uo, (Role) findById(Role.class, Role.ROLE_LEARNER));
 		}
 		save(uo);
 	    }
