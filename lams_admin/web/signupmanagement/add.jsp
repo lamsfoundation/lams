@@ -15,7 +15,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 </lams:head>
     
-<body class="component pb-4">
+<body class="component pb-4 pt-2">
 	<c:set var="title"><fmt:message key="admin.add.edit.signup.page"/></c:set>
 	
 	<%-- Build breadcrumb --%>

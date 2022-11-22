@@ -141,7 +141,7 @@
 	</script>
 </lams:head>
     
-<body class="component pb-4">
+<body class="component pb-4 pt-2">
 
 	<%-- Build the breadcrumb --%>
 	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>

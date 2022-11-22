@@ -17,7 +17,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 </lams:head>
     
-<body class="component pb-4">
+<body class="component pb-4 pt-2">
 	<lams:Page5 type="admin" title="${title}">
 		<div class="row"> 
 			<div class="col text-center"> 
@@ -41,7 +41,7 @@
 			
 
 			<div class="row mb-3">
-				<div class="col-4 offset-4">
+				<div class="col-6 offset-3">
 					<ul class="list-group">
 			 			<c:forEach items="${links[1]}" var="linkBean">
 							<li class="list-group-item">

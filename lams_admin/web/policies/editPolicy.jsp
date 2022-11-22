@@ -61,7 +61,7 @@
 		});
 	</script>
 </lams:head>
-<body class="component pb-4">
+<body class="component pb-4 pt-2">
 	<c:set var="title"><fmt:message key="admin.add.edit.policy"/></c:set>
 	
 	<%-- Build breadcrumb --%>

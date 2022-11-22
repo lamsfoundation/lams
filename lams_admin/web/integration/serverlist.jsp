@@ -21,7 +21,7 @@
 	</script>
 </lams:head>
     
-<body class="component pb-4">
+<body class="component pb-4 pt-2">
 	<%-- Build breadcrumb --%>
 	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
 	<c:set var="breadcrumbActive">. | <fmt:message key="appadmin.maintain.external.servers"/></c:set>

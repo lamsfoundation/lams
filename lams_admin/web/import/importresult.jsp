@@ -16,7 +16,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 </lams:head>
     
-<body class="component">
+<body class="component pb-4 pt-2">
 	<lams:Page5 type="admin" title="${title}">
 		<p><a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-secondary"><fmt:message key="appadmin.maintain" /></a></p>
 

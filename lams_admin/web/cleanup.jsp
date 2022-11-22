@@ -18,7 +18,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 </lams:head>
     
-<body class="component">
+<body class="component pt-2">
 	<%-- Build breadcrumb --%>
 	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
 	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="sysadmin.cleanup"/></c:set>
