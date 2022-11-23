@@ -474,135 +474,158 @@ public class SPEnrolmentServlet extends HttpServlet {
 	    boolean isStaffMode, AtomicInteger mappingsProcessed) throws UserInfoValidationException {
 	String courseCode = course.getCode();
 	Integer courseId = course.getOrganisationId();
+	ConcurrentMap<String, Organisation> existingSubcourses = allExistingParsedCoursesAndSubcourses.get(courseId);
+	Map<String, Organisation> nonProcessedSubcourses = existingSubcourses == null ? new HashMap<>()
+		: new HashMap<>(existingSubcourses);
 	// go through each subcourse
-	for (Entry<String, List<String>> subcourseEntry : mappings.get(courseCode).entrySet()) {
-	    String subcourseCode = subcourseEntry.getKey();
-	    ConcurrentMap<String, Organisation> existingSubcourses = allExistingParsedCoursesAndSubcourses
-		    .get(courseId);
-	    Organisation subcourse = existingSubcourses == null ? null : existingSubcourses.get(subcourseCode);
+	Map<String, List<String>> subcourseMappings = mappings.get(courseCode);
+	if (subcourseMappings != null) {
+	    for (Entry<String, List<String>> subcourseEntry : subcourseMappings.entrySet()) {
+		String subcourseCode = subcourseEntry.getKey();
+		nonProcessedSubcourses.remove(subcourseCode);
 
-	    // create subcourse
-	    if (subcourse == null) {
-		ExtCourseClassMap extSubOrgMap = integrationService.createExtCourseClassMap(extServer, creatorId,
-			subcourseCode, subcourseCode, course.getOrganisationId().toString(), false);
-		subcourse = extSubOrgMap.getOrganisation();
-		subcourse.setCode(subcourseCode);
-		userManagementService.save(subcourse);
+		Organisation subcourse = existingSubcourses == null ? null : existingSubcourses.get(subcourseCode);
+		// create subcourse
+		if (subcourse == null) {
+		    ExtCourseClassMap extSubOrgMap = integrationService.createExtCourseClassMap(extServer, creatorId,
+			    subcourseCode, subcourseCode, course.getOrganisationId().toString(), false);
+		    subcourse = extSubOrgMap.getOrganisation();
+		    subcourse.setCode(subcourseCode);
+		    userManagementService.save(subcourse);
 
-		if (existingSubcourses == null) {
-		    existingSubcourses = new ConcurrentHashMap<>();
-		    allExistingParsedCoursesAndSubcourses.put(courseId, existingSubcourses);
+		    if (existingSubcourses == null) {
+			existingSubcourses = new ConcurrentHashMap<>();
+			allExistingParsedCoursesAndSubcourses.put(courseId, existingSubcourses);
+		    }
+		    existingSubcourses.put(subcourse.getCode(), subcourse);
+		    allExistingParsedExtCourses.put(extSubOrgMap.getOrganisation().getOrganisationId(), extSubOrgMap);
+
+		    String message = "Subcourse created with code and name \"" + courseCode + "\" and ID "
+			    + subcourse.getOrganisationId();
+		    logger.info(message);
+		    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
+			    "SPEnrolment: " + message);
+		} else {
+		    String name = subcourse.getName();
+
+		    ExtCourseClassMap extOrgMap = allExistingParsedExtCourses.get(subcourse.getOrganisationId());
+		    if (extOrgMap == null) {
+			extOrgMap = new ExtCourseClassMap();
+			extOrgMap.setCourseid(name);
+			extOrgMap.setExtServer(extServer);
+			extOrgMap.setOrganisation(subcourse);
+			userManagementService.save(extOrgMap);
+
+			String message = "External subcourse created for existing subcourse with code \""
+				+ subcourseCode + "\" and name \"" + name + "\" and ID "
+				+ subcourse.getOrganisationId();
+			logger.info(message);
+			logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
+				"SPEnrolment: " + message);
+		    }
 		}
-		existingSubcourses.put(subcourse.getCode(), subcourse);
-		allExistingParsedExtCourses.put(extSubOrgMap.getOrganisation().getOrganisationId(), extSubOrgMap);
 
-		String message = "Subcourse created with code and name \"" + courseCode + "\" and ID "
-			+ subcourse.getOrganisationId();
-		logger.info(message);
-		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
-			"SPEnrolment: " + message);
-	    } else {
-		String name = subcourse.getName();
+		Integer subcourseId = subcourse.getOrganisationId();
 
-		ExtCourseClassMap extOrgMap = allExistingParsedExtCourses.get(subcourse.getOrganisationId());
-		if (extOrgMap == null) {
-		    extOrgMap = new ExtCourseClassMap();
-		    extOrgMap.setCourseid(name);
-		    extOrgMap.setExtServer(extServer);
-		    extOrgMap.setOrganisation(subcourse);
-		    userManagementService.save(extOrgMap);
+		// get existing learners/staff members for given subcourse
+		Collection<User> subcourseMonitorsOrLearners = userManagementService
+			.getUsersFromOrganisationByRole(subcourseId, isStaffMode ? Role.MONITOR : Role.LEARNER, true);
+		Collection<User> subcourseUsers = new HashSet<>(subcourseMonitorsOrLearners);
+		if (isStaffMode) {
+		    // make sure that staff has both monitor and author roles in subcourse,
+		    // even if they are course managers in the parent organisations
+		    // and they already have a monitor role in subcourse
+		    Collection<User> authors = userManagementService.getUsersFromOrganisationByRole(subcourseId,
+			    Role.AUTHOR, true);
+		    subcourseUsers.retainAll(authors);
+		}
 
-		    String message = "External subcourse created for existing subcourse with code \"" + subcourseCode
-			    + "\" and name \"" + name + "\" and ID " + subcourse.getOrganisationId();
+		// go through each user
+		for (String login : subcourseEntry.getValue()) {
+
+		    logger.info("Processing \"" + login + "\"");
+
+		    mappingsProcessed.incrementAndGet();
+
+		    // check if the user is already a learner/staff member in the subcourse
+		    // if so, there is nothing to do
+		    boolean userAlreadyAssigned = false;
+		    Integer userId = userIDs.get(login);
+		    Iterator<User> subcourseUserIterator = subcourseUsers.iterator();
+		    while (subcourseUserIterator.hasNext()) {
+			User user = subcourseUserIterator.next();
+			if (userId.equals(user.getUserId())) {
+			    // IMPORTANT: if we found a matching existing learner/staff member, we get remove him from this collection
+			    // so after this loop he does not get removed from subcourses
+			    subcourseUserIterator.remove();
+			    subcourseMonitorsOrLearners.remove(user);
+			    userAlreadyAssigned = true;
+			    break;
+			}
+		    }
+		    if (userAlreadyAssigned) {
+			continue;
+		    }
+
+		    // the user is not a learner/staff member yet, so assign him the role and add him to lessons
+		    Map<Integer, Set<Integer>> existingSubcoursesRoles = allExistingRoles.get(login);
+		    Set<Integer> existingSubcourseRoles = existingSubcoursesRoles == null ? null
+			    : allExistingRoles.get(login).get(subcourseId);
+		    if (existingSubcourseRoles == null) {
+			existingSubcourseRoles = new HashSet<>();
+		    }
+		    if (isStaffMode) {
+			existingSubcourseRoles.add(Role.ROLE_AUTHOR);
+			existingSubcourseRoles.add(Role.ROLE_MONITOR);
+		    } else {
+			existingSubcourseRoles.add(Role.ROLE_LEARNER);
+		    }
+		    User user = allExistingParsedUsers.get(login);
+		    userManagementService.setRolesForUserOrganisation(user, subcourse,
+			    existingSubcourseRoles.stream().map(String::valueOf).collect(Collectors.toList()), false);
+
+		    for (Lesson lesson : lessonService.getLessonsByGroup(subcourseId)) {
+			if (isStaffMode) {
+			    lessonService.addStaffMember(lesson.getLessonId(), userId);
+			} else {
+			    lessonService.addLearner(lesson.getLessonId(), userId);
+			}
+		    }
+
+		    String message = (isStaffMode ? "Teacher" : "Learner") + " \"" + login + "\" added to subcourse "
+			    + subcourseId + " and its lessons";
 		    logger.info(message);
 		    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
 			    "SPEnrolment: " + message);
 		}
-	    }
 
-	    Integer subcourseId = subcourse.getOrganisationId();
+		// user is a learner/staff member, but he should not; remove him role from subcourse, course and lessons
+		for (User user : subcourseMonitorsOrLearners) {
 
-	    // get existing learners/staff members for given subcourse
-	    Collection<User> subcourseMonitorsOrLearners = userManagementService
-		    .getUsersFromOrganisationByRole(subcourseId, isStaffMode ? Role.MONITOR : Role.LEARNER, true);
-	    Collection<User> subcourseUsers = new HashSet<>(subcourseMonitorsOrLearners);
-	    if (isStaffMode) {
-		// make sure that staff has both monitor and author roles in subcourse,
-		// even if they are course managers in the parent organisations
-		// and they already have a monitor role in subcourse
-		Collection<User> authors = userManagementService.getUsersFromOrganisationByRole(subcourseId,
-			Role.AUTHOR, true);
-		subcourseUsers.retainAll(authors);
-	    }
-
-	    // go through each user
-	    for (String login : subcourseEntry.getValue()) {
-
-		logger.info("Processing \"" + login + "\"");
-
-		mappingsProcessed.incrementAndGet();
-
-		// check if the user is already a learner/staff member in the subcourse
-		// if so, there is nothing to do
-		boolean userAlreadyAssigned = false;
-		Integer userId = userIDs.get(login);
-		Iterator<User> subcourseUserIterator = subcourseUsers.iterator();
-		while (subcourseUserIterator.hasNext()) {
-		    User user = subcourseUserIterator.next();
-		    if (userId.equals(user.getUserId())) {
-			// IMPORTANT: if we found a matching existing learner/staff member, we get remove him from this collection
-			// so after this loop he does not get removed from subcourses
-			subcourseUserIterator.remove();
-			subcourseMonitorsOrLearners.remove(user);
-			userAlreadyAssigned = true;
-			break;
+		    boolean removedFromSubcourse = removeFromCourse(subcourse, user,
+			    isStaffMode ? Mode.STAFF : Mode.LEARNER, allExistingRoles);
+		    if (removedFromSubcourse) {
+			String message = (isStaffMode ? "Teacher" : "Learner") + " \"" + user.getLogin()
+				+ "\" removed from subcourse " + subcourseId + " and its lessons";
+			logger.info(message);
+			logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
+				"SPEnrolment: " + message);
 		    }
 		}
-		if (userAlreadyAssigned) {
-		    continue;
-		}
-
-		// the user is not a learner/staff member yet, so assign him the role and add him to lessons
-		Map<Integer, Set<Integer>> existingSubcoursesRoles = allExistingRoles.get(login);
-		Set<Integer> existingSubcourseRoles = existingSubcoursesRoles == null ? null
-			: allExistingRoles.get(login).get(subcourseId);
-		if (existingSubcourseRoles == null) {
-		    existingSubcourseRoles = new HashSet<>();
-		}
-		if (isStaffMode) {
-		    existingSubcourseRoles.add(Role.ROLE_AUTHOR);
-		    existingSubcourseRoles.add(Role.ROLE_MONITOR);
-		} else {
-		    existingSubcourseRoles.add(Role.ROLE_LEARNER);
-		}
-		User user = allExistingParsedUsers.get(login);
-		userManagementService.setRolesForUserOrganisation(user, subcourse,
-			existingSubcourseRoles.stream().map(String::valueOf).collect(Collectors.toList()), false);
-
-		for (Lesson lesson : lessonService.getLessonsByGroup(subcourseId)) {
-		    if (isStaffMode) {
-			lessonService.addStaffMember(lesson.getLessonId(), userId);
-		    } else {
-			lessonService.addLearner(lesson.getLessonId(), userId);
-		    }
-		}
-
-		String message = (isStaffMode ? "Teacher" : "Learner") + " \"" + login + "\" added to subcourse "
-			+ subcourseId + " and its lessons";
-		logger.info(message);
-		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
-			"SPEnrolment: " + message);
 	    }
+	}
 
-	    // user is a learner/staff member, but he should not; remove him role from subcourse, course and lessons
+	for (Organisation subcourse : nonProcessedSubcourses.values()) {
+	    // get all learners/staff members for given subcourse and remove them
+	    Collection<User> subcourseMonitorsOrLearners = userManagementService.getUsersFromOrganisationByRole(
+		    subcourse.getOrganisationId(), isStaffMode ? Role.MONITOR : Role.LEARNER, true);
 	    for (User user : subcourseMonitorsOrLearners) {
 
 		boolean removedFromSubcourse = removeFromCourse(subcourse, user,
-			isStaffMode ? Mode.STAFF : Mode.LEARNER, allExistingParsedCoursesAndSubcourses,
-			allExistingRoles);
+			isStaffMode ? Mode.STAFF : Mode.LEARNER, allExistingRoles);
 		if (removedFromSubcourse) {
 		    String message = (isStaffMode ? "Teacher" : "Learner") + " \"" + user.getLogin()
-			    + "\" removed from subcourse " + subcourseId + " and its lessons";
+			    + "\" removed from subcourse " + subcourse.getOrganisationId() + " and its lessons";
 		    logger.info(message);
 		    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
 			    "SPEnrolment: " + message);
@@ -612,7 +635,6 @@ public class SPEnrolmentServlet extends HttpServlet {
     }
 
     private boolean removeFromCourse(Organisation course, User user, Mode mode,
-	    Map<Integer, ConcurrentMap<String, Organisation>> allExistingParsedCoursesAndSubcourses,
 	    Map<String, Map<Integer, Set<Integer>>> allExistingRoles) {
 	// no existing roles and the user should be removed - nothing to do
 	Map<Integer, Set<Integer>> existingCoursesRoles = allExistingRoles.get(user.getLogin());
@@ -662,7 +684,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 			return true;
 		    }
 		}
-		removeFromCourse(parentCourse, user, mode, allExistingParsedCoursesAndSubcourses, allExistingRoles);
+		removeFromCourse(parentCourse, user, mode, allExistingRoles);
 	    }
 	}
 
@@ -726,7 +748,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 
 	// user is a group manager, but he should not; remove him role from course
 	for (User user : courseUsers) {
-	    boolean removedFromCourse = removeFromCourse(course, user, Mode.MANAGER, null, allExistingRoles);
+	    boolean removedFromCourse = removeFromCourse(course, user, Mode.MANAGER, allExistingRoles);
 	    if (removedFromCourse) {
 		String message = "Manager \"" + user.getLogin() + "\" removed from course " + courseId;
 		logger.info(message);
