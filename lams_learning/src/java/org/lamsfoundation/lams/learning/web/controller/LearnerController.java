@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.learning.web.controller;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -78,10 +79,13 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.util.UriUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -151,10 +155,14 @@ public class LearnerController {
 		    ObjectNode responseJSON = null;
 		    try {
 			responseJSON = getLearnerProgress(item.getLessonId(), item.getUserId(), true);
+			if (responseJSON != null) {
+			    return UriUtils.encode(responseJSON.toString(), StandardCharsets.UTF_8.toString());
+			}
 		    } catch (Exception e) {
 			log.error("Error while getting learner timeline flux", e);
 		    }
-		    return responseJSON == null ? "" : responseJSON.toString();
+		    return "";
+
 		}, FluxMap.STANDARD_THROTTLE, FluxMap.STANDARD_TIMEOUT);
     }
 
@@ -331,7 +339,7 @@ public class LearnerController {
      * Produces necessary data for learner progress bar.
      */
 
-    @RequestMapping("/getLearnerProgressUpdateFlux")
+    @RequestMapping(path = "/getLearnerProgressUpdateFlux", method = RequestMethod.GET, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @ResponseBody
     public Flux<String> getLearnerProgressUpdateFlux(@RequestParam long lessonId, @RequestParam int userId)
 	    throws JsonProcessingException, IOException {
