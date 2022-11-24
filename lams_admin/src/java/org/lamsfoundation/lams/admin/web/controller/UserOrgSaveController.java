@@ -113,7 +113,8 @@ public class UserOrgSaveController {
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, orgId);
 	Set uos = organisation.getUserOrganisations();
 
-	String[] userIds = StringUtils.isBlank(userOrgForm.getUserIds()) ? null : userOrgForm.getUserIds().split(",");
+	String[] userIds = StringUtils.isBlank(userOrgForm.getUserIds()) ? new String[0]
+		: userOrgForm.getUserIds().split(",");
 	List<Integer> userIdList = Arrays.stream(userIds).filter(StringUtils::isNotBlank)
 		.collect(Collectors.mapping(userId -> Integer.valueOf(userId), Collectors.toList()));
 	log.debug("new user membership of orgId=" + orgId + " will be: " + userIdList);
