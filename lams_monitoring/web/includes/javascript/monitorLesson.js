@@ -2503,7 +2503,7 @@ function updateLearnersTab(){
 																		 +  lessonId + '&userId=' + learnerId,
 							function (event) {
 								if ($('#learners-accordion-item-' + learnerId).length === 1) {
-									drawLearnerTimeline(learnerId, event.data);
+									drawLearnerTimeline(learnerId, decodeURIComponent(event.data));
 								}
 						});
 						
