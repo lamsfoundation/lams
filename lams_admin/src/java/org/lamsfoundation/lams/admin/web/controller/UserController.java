@@ -342,7 +342,7 @@ public class UserController {
     @RequestMapping(path = "/delete", method = RequestMethod.POST)
     public String delete(HttpServletRequest request) throws Exception {
 	if (!(request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)
-		|| request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager())) {
+		|| userManagementService.isUserGlobalGroupManager())) {
 	    request.setAttribute("errorName", "UserAction");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";

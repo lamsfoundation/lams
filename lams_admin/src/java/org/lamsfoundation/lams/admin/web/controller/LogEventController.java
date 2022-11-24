@@ -71,7 +71,7 @@ public class LogEventController {
     public String unspecified(HttpServletRequest request) throws Exception {
 
 	// check permission
-	if (!request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)) {
+	if (!request.isUserInRole(Role.APPADMIN) && !request.isUserInRole(Role.SYSADMIN)) {
 	    request.setAttribute("errorName", "EventLogAdmin");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
@@ -103,7 +103,7 @@ public class LogEventController {
 	    throws ServletException, IOException {
 
 	// check permission
-	if (!request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)) {
+	if (!request.isUserInRole(Role.APPADMIN) && !request.isUserInRole(Role.SYSADMIN)) {
 	    request.setAttribute("errorName", "EventLogAdmin");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";

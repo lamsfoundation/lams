@@ -99,7 +99,7 @@ public class UserManageController {
 	// check permission
 	Integer rootOrgId = userManagementService.getRootOrganisation().getOrganisationId();
 	if (request.isUserInRole(Role.SYSADMIN)
-		|| ((request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager())
+		|| ((request.isUserInRole(Role.APPADMIN) || userManagementService.isUserGlobalGroupManager())
 			&& !orgId.equals(rootOrgId))) {
 	    userManageForm.setCourseAdminCanAddNewUsers(true);
 	    userManageForm.setCourseAdminCanBrowseAllUsers(true);

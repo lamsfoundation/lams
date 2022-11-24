@@ -59,7 +59,7 @@ public class StatisticsController {
     public String unspecified(HttpServletRequest request) throws Exception {
 
 	// check permission
-	if (!request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)) {
+	if (!request.isUserInRole(Role.APPADMIN) && !request.isUserInRole(Role.SYSADMIN)) {
 	    request.setAttribute("errorName", "StatisticsAction");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
@@ -80,7 +80,7 @@ public class StatisticsController {
 	Integer orgId = WebUtil.readIntParam(request, "orgId");
 
 	// check permission
-	if (!request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)) {
+	if (!request.isUserInRole(Role.APPADMIN) && !request.isUserInRole(Role.SYSADMIN)) {
 	    request.setAttribute("errorName", "StatisticsAction");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
