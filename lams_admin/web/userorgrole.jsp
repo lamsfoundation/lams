@@ -26,17 +26,19 @@
 	<lams:Page type="admin" title="${title}" formID="userOrgRoleForm">
 		
 		<p><a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
+		<c:set var="cancelUrl"><lams:LAMSURL/>admin/orgmanage.do?org=1</c:set>
 	    <c:if test="${not empty pOrgId}">
 	        : <a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${pOrgId}" />" class="btn btn-default"><c:out value="${pOrgName}"/></a>
 	    </c:if>
 	    <c:if test="${userOrgRoleForm.orgId != 1}">
-			: <a href="<lams:LAMSURL/>admin/<c:if test="${orgType == 3}">user</c:if><c:if test="${orgType != 3}">org</c:if>manage.do?org=<c:out value="${userOrgRoleForm.orgId}" />" class="btn btn-default">
+	    	<c:set var="cancelUrl"><lams:LAMSURL/>admin/<c:if test="${orgType == 3}">user</c:if><c:if test="${orgType != 3}">org</c:if>manage.do?org=<c:out value="${userOrgRoleForm.orgId}" /></c:set>
+			: <a href="${cancelUrl}" class="btn btn-default">
 			<c:out value="${orgName}"/></a>
 		</c:if>
 		<c:if test="${userOrgRoleForm.orgId == 1}">
-			: <a href="<lams:LAMSURL/>admin/usermanage.do?org=<c:out value="${userOrgRoleForm.orgId}" />" class="btn btn-default"><fmt:message key="admin.global.roles.manage" /></a>
+			<c:set var="cancelUrl"><lams:LAMSURL/>admin/usermanage.do?org=<c:out value="${userOrgRoleForm.orgId}" /></c:set>
+			: <a href="${cancelUrl}" class="btn btn-default"><fmt:message key="admin.global.roles.manage" /></a>
 		</c:if>
-		</h4>
 		
 		<h3><fmt:message key="admin.user.assign.roles" /></h3>
 		
@@ -75,7 +77,7 @@
 		</c:if>
 		
 		<div class="pull-right">
-			<a href="<lams:LAMSURL/>admin/usermanage.do?org=1" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
+			<a href="${cancelUrl}" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
 			<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save"/>" />
 		</div>
 		</form:form>

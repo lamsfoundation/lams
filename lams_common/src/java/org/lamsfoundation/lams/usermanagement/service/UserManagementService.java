@@ -867,6 +867,8 @@ public class UserManagementService implements IUserManagementService, Initializi
 	allRoles.addAll(rolelist);
 	Role role = new Role();
 	if (!orgType.getOrganisationTypeId().equals(OrganisationType.ROOT_TYPE) || !isAppadmin) {
+	    role.setRoleId(Role.ROLE_SYSADMIN);
+	    allRoles.remove(role);
 	    role.setRoleId(Role.ROLE_APPADMIN);
 	    allRoles.remove(role);
 	} else {
