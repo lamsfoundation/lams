@@ -2532,8 +2532,9 @@ function drawLearnerTimeline(learnerId, data) {
 			entry = activityEntryTemplate.clone().appendTo(timeline),
 			icon = $('.timeline-icon', entry),
 			iconURL = null,
-			durationCell = $('.timeline-activity-duration', entry),
-			markCell = $('.timeline-activity-mark', entry);
+			activityBox = ('.timeline-label', entry),
+			durationCell = $('.timeline-activity-duration', activityBox),
+			markCell = $('.timeline-activity-mark', activityBox);
 			
 		$('.timeline-title', entry).text(activity.name);
 			
@@ -2570,6 +2571,14 @@ function drawLearnerTimeline(learnerId, data) {
 			durationCell.text(activity.duration);
 		} else {
 			durationCell.closest('tr').remove();
+		}
+		
+		if (activity.url) {
+			activityBox.css('cursor', 'pointer');
+			dblTap(activityBox, function(){
+				// open pop up with user progress in the given activity
+				openPopUp(activity.url, "LearnActivity", popupHeight, popupWidth, true);
+			});
 		}
 	});
 	
