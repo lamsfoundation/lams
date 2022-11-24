@@ -448,7 +448,7 @@
 		<div class="container-fluid" style="max-width: 1600px">
 
 
-		<a href="#content" class="visually-hidden-focusable">Skip to main content</a>
+		<a href="#content" class="sr-only sr-only-focusable visually-hidden visually-hidden-focusable">Skip to main content</a>
 		<c:choose>
 		<c:when test="${usePanel}">
 			<%-- The Breadcrumb
@@ -515,7 +515,7 @@
 			
 			<div id="content">
 				<main role="main">
-					<c:if test="${not empty title}"><h1><c:out value="${title}" escapeXml="true" /></h1></c:if>
+					<c:if test="${not empty title}"><h2><c:out value="${title}" escapeXml="true" /></h2></c:if>
 					<jsp:doBody />
 				</main>
 			</div>

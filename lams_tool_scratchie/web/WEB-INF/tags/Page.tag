@@ -403,7 +403,7 @@
 		<div id="navcontent" class="content">
 			<div class="row no-gutter no-margin">
 			<div class="col-xs-12">
-			<div class="container">
+			<div class="container-fluid" style="max-width: 1400px">
 				<c:choose>
 				<c:when test="${usePanel}">
 					<div class="panel panel-default panel-${type}-page">
