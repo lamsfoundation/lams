@@ -239,12 +239,20 @@ public class SessionManager {
 	Map<String, List<Object>> result = new TreeMap<>();
 	for (Entry<String, HttpSession> entry : loginMapping.entrySet()) {
 	    HttpSession session = entry.getValue();
-	    UserDTO user = (UserDTO) session.getAttribute(AttributeNames.USER);
+	    UserDTO user = null;
+	    try {
+		user = (UserDTO) session.getAttribute(AttributeNames.USER);
+	    } catch (Exception e) {
+		if (log.isDebugEnabled()) {
+		    log.debug("Session " + session.getId() + " is already invalidated");
+		}
+	    }
 	    List<Object> sessionInfo = new LinkedList<>();
-	    sessionInfo.add(user.getFirstName());
-	    sessionInfo.add(user.getLastName());
-	    sessionInfo.add(new Date(session.getLastAccessedTime()));
-	    sessionInfo.add(sessionCreatedDateFormatter.format(new Date(session.getCreationTime())));
+	    sessionInfo.add(user == null ? "Invalidated" : user.getFirstName());
+	    sessionInfo.add(user == null ? "session" : user.getLastName());
+	    sessionInfo.add(user == null ? null : new Date(session.getLastAccessedTime()));
+	    sessionInfo
+		    .add(user == null ? null : sessionCreatedDateFormatter.format(new Date(session.getCreationTime())));
 	    sessionInfo.add(session.getId());
 	    result.put(entry.getKey(), sessionInfo);
 	}
