@@ -77,7 +77,7 @@ public class SessionManager {
     /**
      * Stores session in current thread and mapping so other modules can refer to it.
      */
-    public static void startSession(HttpServletRequest request) {
+    public static HttpSession startSession(HttpServletRequest request) {
 	HttpSession session = request.getSession();
 
 	String sessionId = session.getId();
@@ -100,6 +100,8 @@ public class SessionManager {
 	    }
 	    loginMapping.put(login, session);
 	}
+
+	return session;
     }
 
     /**

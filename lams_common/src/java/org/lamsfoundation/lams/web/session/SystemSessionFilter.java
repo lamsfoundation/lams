@@ -33,6 +33,10 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.log4j.Logger;
+import org.springframework.web.util.NestedServletException;
 
 /**
  * This filter must set before <code>org.lamsfoundation.lams.web.filter.LocaleFilter</code> in web.xml
@@ -41,6 +45,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author Steve.Ni
  */
 public class SystemSessionFilter implements Filter {
+    private static Logger log = Logger.getLogger(SystemSessionFilter.class.getName());
 
     private static final String CONTEXT_ERROR_PAGE = "/error.jsp";
 
@@ -65,10 +70,23 @@ public class SystemSessionFilter implements Filter {
 	    return;
 	}
 
-	SessionManager.startSession(httpRequest);
+	HttpSession session = SessionManager.startSession(httpRequest);
 	// do following part of chain
-	chain.doFilter(request, response);
-	SessionManager.endSession();
+	try {
+	    chain.doFilter(request, response);
+	} catch (NestedServletException e) {
+	    if (e.getCause() instanceof IllegalStateException) {
+		// There seems to be a problem with Infinispan session invalidation.
+		// Until we upgrade WildFly we need to keep these safety measures.
+		String sessionId = session.getId();
+		log.warn("Session " + sessionId + " was already invalidated");
+		SessionManager.removeSessionByID(sessionId, false, true);
+	    } else {
+		throw e;
+	    }
+	} finally {
+	    SessionManager.endSession();
+	}
     }
 
     @Override
