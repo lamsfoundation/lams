@@ -120,6 +120,7 @@ public class OrganisationGroupController {
 	    // read organisation ID from lesson
 	    organisationId = organisation.getOrganisationId();
 	}
+	Integer targetOrganisationId = organisationId;
 	if (organisation == null) {
 	    organisation = (Organisation) userManagementService.findById(Organisation.class, organisationId);
 	}
@@ -145,7 +146,7 @@ public class OrganisationGroupController {
 	boolean lessonGroupsExist = (grouping != null) && (grouping.getGroups() != null)
 		&& !grouping.getGroups().isEmpty() && !isDefaultChosenGrouping(grouping);
 	if (lessonGroupsExist || (activityID != null && orgGroupings.isEmpty())) {
-	    return viewGroups(request, response, organisationId);
+	    return viewGroups(request, response, organisationId, targetOrganisationId);
 	}
 
 	// if this grouping is used for branching then it should use groups set in authoring. It will be possible to
@@ -157,6 +158,7 @@ public class OrganisationGroupController {
 	    log.debug("Displaying course groupings for user " + userId + " and organisation " + organisationId);
 	}
 	request.setAttribute(AttributeNames.PARAM_ORGANISATION_ID, organisationId);
+	request.setAttribute("targetOrganisationId", targetOrganisationId);
 
 	// if it's not a group-based branching and lesson is created using integrations - show groups received from LMS instead of actual LAMS ones
 	if (!isUsedForBranching && integrationService.isIntegratedServerGroupFetchingAvailable(lessonId)) {
@@ -192,7 +194,8 @@ public class OrganisationGroupController {
     @RequestMapping("/viewGroups")
     @SuppressWarnings("unchecked")
     public String viewGroups(HttpServletRequest request, HttpServletResponse response,
-	    @RequestParam(value = "organisationID", required = false) Integer organisationId)
+	    @RequestParam(value = "organisationID", required = false) Integer organisationId,
+	    @RequestParam(value = "targetOrganisationID", required = false) Integer targetOrganisationId)
 	    throws IOException, GroupInfoFetchException, UserInfoValidationException {
 	Integer userId = getUserDTO().getUserID();
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
@@ -213,14 +216,18 @@ public class OrganisationGroupController {
 
 	boolean isGroupSuperuser = userManagementService.isUserInRole(userId, organisationId, Role.GROUP_MANAGER);
 
+	if (targetOrganisationId == null) {
+	    targetOrganisationId = organisationId;
+	}
+
 	if (log.isDebugEnabled()) {
-	    log.debug("Displaying course groups for user " + userId + " and organisation " + organisationId);
+	    log.debug("Displaying course groups for user " + userId + " and organisation " + targetOrganisationId);
 	}
 	Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, true);
 	request.setAttribute("canEdit", isGroupSuperuser || (activityId != null));
 
 	ObjectNode orgGroupingJSON = JsonNodeFactory.instance.objectNode();
-	orgGroupingJSON.put("organisationId", organisationId);
+	orgGroupingJSON.put("organisationId", targetOrganisationId);
 
 	Long orgGroupingId = WebUtil.readLongParam(request, "groupingId", true);
 	OrganisationGrouping orgGrouping = null;
@@ -322,7 +329,7 @@ public class OrganisationGroupController {
 	    // if groups haven't been selected yet - show all available groups in organisation
 	} else if ((lessonGroups == null) || lessonGroups.isEmpty()) {
 
-	    learners = userManagementService.getUsersFromOrganisationByRole(organisationId, Role.LEARNER, true);
+	    learners = userManagementService.getUsersFromOrganisationByRole(targetOrganisationId, Role.LEARNER, true);
 	    Set<OrganisationGroup> orgGroups = orgGrouping == null ? null : orgGrouping.getGroups();
 	    orgGroupsJSON = getOrgGroupsDetails(orgGroups, learners);
 

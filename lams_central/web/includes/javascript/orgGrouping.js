@@ -21,7 +21,8 @@ function removeGrouping(groupingId) {
 }
 
 function viewGroups(groupingId, force) {
-	var url = LAMS_URL + 'organisationGroup/viewGroups.do?organisationID=' + organisationId;
+	var url = LAMS_URL + 'organisationGroup/viewGroups.do?organisationID=' + organisationId 
+			  + '&targetOrganisationID=' + targetOrganisationId;
 	if (lessonId) {
 		url += '&lessonID=' + lessonId;
 	}
