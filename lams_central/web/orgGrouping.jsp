@@ -35,6 +35,7 @@
 			lessonMode = ${lessonMode},
 			// parameter can be null and the ID available only as a JSP attribute
 			organisationId = ${empty organisationID ? param.organisationID : organisationID},
+			targetOrganisationId = '${targetOrganisationId}',
 			lessonId = '${param.lessonID}',
 			csrfTokenName = '<csrf:tokenname/>',
 			csrfTokenValue = '<csrf:tokenvalue/>',
