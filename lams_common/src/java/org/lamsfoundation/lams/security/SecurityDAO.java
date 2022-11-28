@@ -24,8 +24,7 @@ package org.lamsfoundation.lams.security;
 
 import java.io.Serializable;
 
-import org.hibernate.Query;
-import org.hibernate.SQLQuery;
+import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -75,11 +74,8 @@ public class SecurityDAO extends LAMSBaseDAO implements ISecurityDAO {
 
     @Override
     public boolean hasOrgRole(Integer orgId, Integer userId, String... roles) {
-	Query query = getSession().createQuery(SecurityDAO.CHECK_ORG_ROLE);
-	query.setParameter("orgId", orgId);
-	query.setParameter("userId", userId);
-	query.setParameterList("roles", roles);
-	return !query.setCacheable(true).list().isEmpty();
+	return !doFindByNamedParam(SecurityDAO.CHECK_ORG_ROLE, new String[] { "orgId", "userId", "roles" },
+		new Object[] { orgId, userId, roles }).isEmpty();
     }
 
     @Override
@@ -96,9 +92,9 @@ public class SecurityDAO extends LAMSBaseDAO implements ISecurityDAO {
 
     @Override
     public boolean isLessonLearner(Long lessonId, Integer userId) {
-	SQLQuery query = getSession().createSQLQuery(SecurityDAO.CHECK_LESSON_LEARNER);
-	query.setLong("lessonId", lessonId);
-	query.setInteger("user_id", userId);
+	Query query = getSession().createSQLQuery(SecurityDAO.CHECK_LESSON_LEARNER);
+	query.setParameter("lessonId", lessonId);
+	query.setParameter("user_id", userId);
 	return !query.list().isEmpty();
     }
 
