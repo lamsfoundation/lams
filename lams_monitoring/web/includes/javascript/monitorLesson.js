@@ -207,7 +207,7 @@ function initCommonElements(){
     // initialise lesson dialog
 	var learnerGroupDialog = showDialog('learnerGroupDialog',{
 			'autoOpen'  : false,
-			'height'	: 700,
+			'height'	: 860,
 			'resizable' : true,
 			'open'      : function(){
 				// until operator selects an user, buttons remain disabled
@@ -217,7 +217,7 @@ function initCommonElements(){
 			}
 		}, false);
 	
-	$('.modal-body', learnerGroupDialog).empty().append(learnerGroupDialogContents.show()).closest('.modal-dialog').addClass('modal-lg');;
+	$('.modal-body', learnerGroupDialog).empty().append(learnerGroupDialogContents.show()).closest('.modal-dialog').addClass('modal-xl');;
 	
 	// search for users with the term the Monitor entered
 	$('.dialogSearchPhrase', learnerGroupDialog).autocomplete({
@@ -374,7 +374,7 @@ function initCommonElements(){
 	var classDialog = showDialog('classDialog',{
 		'autoOpen'  : false,
 		'width'     : 950,
-		'height'	: 700,
+		'height'	: 860,
 		'title' 	: LABELS.LESSON_EDIT_CLASS,
 		'resizable' : true,
 		'close' : function(){
@@ -382,7 +382,7 @@ function initCommonElements(){
 		}
 	}, false);
 	
-	$('.modal-body', classDialog).empty().append($('#classDialogContents').show()).closest('.modal-dialog').addClass('modal-lg');
+	$('.modal-body', classDialog).empty().append($('#classDialogContents').show()).closest('.modal-dialog').addClass('modal-xl');
 	
 	// search for users in the organisation with the term the Monitor entered
 	$('.dialogSearchPhrase', classDialog).autocomplete({

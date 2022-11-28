@@ -387,15 +387,6 @@
 					</label>
 				</div>
 				
-				<div class="navigate-btn-container">
-					<a id="timer-btn" class="btn btn-primary" href="<lams:LAMSURL/>monitoring/timer.jsp" target="_blank" 
-					   title="<fmt:message key='label.countdown.timer' />">
-						<i class="fa fa-hourglass-half fa-lg"></i>
-					</a>
-					<label for="timer-btn" class="d-none d-md-block">
-						<fmt:message key='label.countdown.timer' />
-					</label>
-				</div>
 			</div>
 			
 			<div class="lesson-properties">
@@ -512,9 +503,16 @@
 									<span class="hidden-xs"><fmt:message key="email.notifications"/></span>
 								</button>
 							</c:if>
+
+                            <a id="editTimerButton" class="btn btn-sm btn-primary"
+                                    type="button" href="<lams:LAMSURL/>monitoring/timer.jsp" target="_blank"
+                                    title='<fmt:message key="label.countdown.timer" />'>
+                                <i class="fa fa-hourglass-half"></i>
+                                <span class="hidden-xs"><fmt:message key="label.countdown.timer"/></span>
+                            </a>
 						</div>
 						
-						<div>
+						<div class="mt-2">
 							<c:if test="${lesson.enableLessonIntro}">
 								<button id="editIntroButton" class="btn btn-sm btn-primary"
 										type="button" onClick="javascript:showIntroductionDialog(${lesson.lessonID})">
