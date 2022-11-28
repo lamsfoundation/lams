@@ -566,8 +566,9 @@
 		</property>
 		<property name="transactionAttributes">
 			<props>
-				<prop key="is*">PROPAGATION_REQUIRED,readOnly</prop>
-				<prop key="has*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="is*">PROPAGATION_REQUIRED</prop>
+				<prop key="has*">PROPAGATION_REQUIRED</prop>
+				<prop key="ensure*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>

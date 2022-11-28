@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.learning.presence;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -121,6 +122,10 @@ public class PresenceWebsocketServer {
 	    try {
 		ArrayNode rosterJSON = roster.getRosterJSON();
 		for (Session websocket : lessonWebsockets) {
+		    if (!websocket.isOpen()) {
+			PresenceWebsocketServer.removeWebsocket(websocket, lessonWebsockets);
+			continue;
+		    }
 		    // if this run is meant only for one learner, skip the others
 		    String websocketNickName = (String) websocket.getUserProperties().get(PARAM_NICKNAME);
 		    if ((nickName != null) && !nickName.equals(websocketNickName)) {
@@ -279,14 +284,7 @@ public class PresenceWebsocketServer {
     public void unregisterUser(Session websocket) {
 	Long lessonId = (Long) websocket.getUserProperties().get(AttributeNames.PARAM_LESSON_ID);
 	Set<Session> lessonWebsockets = PresenceWebsocketServer.websockets.get(lessonId);
-	Iterator<Session> sessionIterator = lessonWebsockets.iterator();
-	while (sessionIterator.hasNext()) {
-	    Session storedSession = sessionIterator.next();
-	    if (storedSession.equals(websocket)) {
-		sessionIterator.remove();
-		break;
-	    }
-	}
+	PresenceWebsocketServer.removeWebsocket(websocket, lessonWebsockets);
 
 	if (PresenceWebsocketServer.log.isDebugEnabled()) {
 	    PresenceWebsocketServer.log.debug("User " + websocket.getUserProperties().get(PARAM_NICKNAME)
@@ -396,6 +394,20 @@ public class PresenceWebsocketServer {
 	}
 
 	return messagesJSON;
+    }
+
+    private static void removeWebsocket(Session websocket, Collection<Session> lessonWebsockets) {
+	if (lessonWebsockets == null) {
+	    return;
+	}
+	Iterator<Session> sessionIterator = lessonWebsockets.iterator();
+	while (sessionIterator.hasNext()) {
+	    Session storedSession = sessionIterator.next();
+	    if (storedSession.equals(websocket)) {
+		sessionIterator.remove();
+		break;
+	    }
+	}
     }
 
     private static ObjectNode buildMessageJSON(PresenceChatMessage message) {
