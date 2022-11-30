@@ -194,6 +194,8 @@ public class ScratchieConstants {
     
     //flux management
     public static final String ANSWERS_UPDATED_SINK_NAME = "scratchie learner answers updated";
-
     public static final String STUDENT_CHOICES_UPDATE_FLUX_NAME = "scratchie student choices updated";
+    
+    public static final String BURNING_QUESTIONS_UPDATED_SINK_NAME = "scratchie burning questions updated";
+    public static final String BURNING_QUESTIONS_UPDATED_FLUX_NAME = "scratchie burning questions updated";
 }

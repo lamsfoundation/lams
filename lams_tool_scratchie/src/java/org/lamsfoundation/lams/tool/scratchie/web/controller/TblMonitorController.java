@@ -153,7 +153,14 @@ public class TblMonitorController {
     @ResponseBody
     public Flux<String> getTraStudentChoicesFlux(@RequestParam long toolContentId)
 	    throws JsonProcessingException, IOException {
-	return FluxRegistry.get(ScratchieConstants.ANSWERS_UPDATED_SINK_NAME, toolContentId);
+	return FluxRegistry.get(ScratchieConstants.STUDENT_CHOICES_UPDATE_FLUX_NAME, toolContentId);
+    }
+
+    @RequestMapping(path = "/burningQuestionsFlux", method = RequestMethod.GET, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @ResponseBody
+    public Flux<String> getBurningQuestionsFlux(@RequestParam long toolContentId)
+	    throws JsonProcessingException, IOException {
+	return FluxRegistry.get(ScratchieConstants.BURNING_QUESTIONS_UPDATED_FLUX_NAME, toolContentId);
     }
 
     /**
@@ -199,17 +206,29 @@ public class TblMonitorController {
     }
 
     /**
-     * Shows Teams page
+     * Shows Burning Questions container page
      */
     @RequestMapping("/burningQuestions")
     public String burningQuestions(HttpServletRequest request) throws IOException, ServletException {
+	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
+	request.setAttribute("discussionSentimentEnabled", scratchie.isDiscussionSentimentEnabled());
+
+	return "pages/monitoring/parts/burningQuestions5";
+    }
+
+    /**
+     * Shows Burning Questions content page
+     */
+    @RequestMapping("/burningQuestionsTable")
+    public String burningQuestionsTable(HttpServletRequest request) throws IOException, ServletException {
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
 
 	//find available burningQuestionDtos, if any
 	if (scratchie.isBurningQuestionsEnabled()) {
 	    List<BurningQuestionItemDTO> burningQuestionItemDtos = scratchieService.getBurningQuestionDtos(scratchie,
-		    null, true, true);
+		    null, false, true);
 
 	    MonitoringController.setUpBurningQuestions(burningQuestionItemDtos);
 
@@ -218,13 +237,10 @@ public class TblMonitorController {
 	    ScratchieConfigItem hideTitles = scratchieService.getConfigItem(ScratchieConfigItem.KEY_HIDE_TITLES);
 	    request.setAttribute(ScratchieConfigItem.KEY_HIDE_TITLES, Boolean.valueOf(hideTitles.getConfigValue()));
 
+	    request.setAttribute("discussionSentimentEnabled", scratchie.isDiscussionSentimentEnabled());
 	}
 
-	request.setAttribute("isTbl", true);
-	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, scratchie.getContentId());
-	request.setAttribute("discussionSentimentEnabled", scratchie.isDiscussionSentimentEnabled());
-
-	return "pages/monitoring/parts/burningQuestions5";
+	return "pages/monitoring/parts/burningQuestionsTable";
     }
 
     /**
