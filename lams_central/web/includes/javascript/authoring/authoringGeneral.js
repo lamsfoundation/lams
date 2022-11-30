@@ -795,10 +795,10 @@ GeneralInitLib = {
 						// in open dialog display only information
 						$('#ldStoreDialogReadOnlySpan', layout.ldStoreDialog).css('color', layout.colors.activityReadOnly);
 					} else if (canSetReadOnly) {
-							// the first highlighted folder is user's private folder
-							$('#ldStoreDialogReadOnlyCheckbox', layout.ldStoreDialog).show()
-								.prop('disabled', false).prop('checked', false);
-							$('#ldStoreDialogReadOnlySpan', layout.ldStoreDialog).show().css('color', 'initial');
+						// the first highlighted folder is user's private folder
+						$('#ldStoreDialogReadOnlyCheckbox', layout.ldStoreDialog).show()
+							.prop('disabled', false).prop('checked', false);
+						$('#ldStoreDialogReadOnlySpan', layout.ldStoreDialog).show().css('color', 'initial');
 					} else {
 						$('#ldStoreDialogReadOnlySpan', layout.ldStoreDialog).css('color', layout.colors.activityReadOnly);
 					}
@@ -995,7 +995,7 @@ GeneralInitLib = {
 					}
 				}
 				
-				if (isOpenDialog && node.modifiedDate) {
+				if (node.modifiedDate) {
 					if (isSelected) {
 						$('#ldStoreDialogModifiedDateSpan').text(node.modifiedDate).show();
  					} else {

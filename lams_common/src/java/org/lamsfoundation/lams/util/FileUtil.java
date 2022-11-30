@@ -662,14 +662,19 @@ public class FileUtil {
 	((Configurable) uuidGen).configure(StringType.INSTANCE, new Properties(), null);
 
 	// lowercase to resolve OS issues
-	return ((String) uuidGen.generate(null, null)).toLowerCase();
+	String uuid = ((String) uuidGen.generate(null, null)).toLowerCase();
+	// UUIDs are cut into folders of two characters (see getContentDirPath())
+	// and used in image paths. AdBlock can block an image if there is "ad" in its path.
+	// Just make sure this path piece never occurs.
+	uuid = uuid.replace("ad", "00").replace("a-d", "1-1");
+	return uuid;
     }
 
     /**
      * Convert content folder ID to real path inside secure dir or on server
      */
     public static String getContentDirPath(String contentFolderID, boolean isFileSystemPath) {
-	String contentFolderIDClean = contentFolderID.replaceAll("-", "");
+	String contentFolderIDClean = contentFolderID.replace("-", "");
 	String contentDir = "";
 	for (int charIndex = 0; charIndex < 6; charIndex++) {
 	    contentDir += contentFolderIDClean.substring(charIndex * 2, charIndex * 2 + 2)
