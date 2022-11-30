@@ -178,9 +178,13 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     private ScratchieOutputFactory scratchieOutputFactory;
 
     public ScratchieServiceImpl() {
-	FluxRegistry.initFluxMap(ScratchieConstants.ANSWERS_UPDATED_SINK_NAME,
+	FluxRegistry.initFluxMap(ScratchieConstants.STUDENT_CHOICES_UPDATE_FLUX_NAME,
 		ScratchieConstants.ANSWERS_UPDATED_SINK_NAME, null, toolContentId -> "doRefresh",
 		FluxMap.SHORT_THROTTLE, FluxMap.STANDARD_TIMEOUT);
+
+	FluxRegistry.initFluxMap(ScratchieConstants.BURNING_QUESTIONS_UPDATED_FLUX_NAME,
+		ScratchieConstants.BURNING_QUESTIONS_UPDATED_SINK_NAME, null, toolContentId -> "doRefresh",
+		FluxMap.STANDARD_THROTTLE, FluxMap.STANDARD_TIMEOUT);
     }
 
     // *******************************************************************************
@@ -724,6 +728,10 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    burningQuestion.setGeneralQuestion(isGeneralBurningQuestion);
 	    burningQuestion.setSessionId(sessionId);
 	    burningQuestion.setAccessDate(new Date());
+
+	    ScratchieSession session = getScratchieSessionBySessionId(sessionId);
+	    FluxRegistry.emit(ScratchieConstants.BURNING_QUESTIONS_UPDATED_SINK_NAME,
+		    session.getScratchie().getContentId());
 	}
 	burningQuestion.setQuestion(question);
 
