@@ -3090,6 +3090,12 @@ function clearEventSources() {
 	eventSources = [];
 }
 
+function copyLessonUrlToClipboard(){
+  var copyText = $('#lessonUrl').text();
+  navigator.clipboard.writeText(copyText);
+
+  $('#lessonUrlCopyToClipboardButton').removeClass('btn-primary').addClass('btn-success');
+}
 
 function printTable() {
     var title = document.title;

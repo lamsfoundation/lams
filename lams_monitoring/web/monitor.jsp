@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <%@ include file="/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 
 <c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
+<c:set var="ALLOW_DIRECT_LESSON_LAUNCH"><%=Configuration.get(ConfigurationKeys.ALLOW_DIRECT_LESSON_LAUNCH)%></c:set>
+<c:set var="serverURL"><%=Configuration.get(ConfigurationKeys.SERVER_URL)%></c:set>
+<c:if test="${fn:substring(serverURL, fn:length(serverURL)-1, fn:length(serverURL)) != '/'}">
+	<c:set var="serverURL">${serverURL}/</c:set>
+</c:if>
 
 <lams:html>
 <head>
@@ -391,6 +397,20 @@
 			
 			<div class="lesson-properties">
 				<dl id="lessonDetails" class="dl-horizontal">
+					<c:if test="${ALLOW_DIRECT_LESSON_LAUNCH}">
+                        <dt class="text-muted mt-0"><small><fmt:message key="lesson.learner.url"/></small></dt>
+						<dd class="text-muted">
+                           <small id="lessonUrl" class="text-break">
+                           	<c:out value="${serverURL}r/${lesson.encodedLessonID}" escapeXml="true"/>
+                            <button id="lessonUrlCopyToClipboardButton" class="btn btn-primary btn-sm ms-2"
+                           		   onClick="javascript:copyLessonUrlToClipboard()"
+                           		   title='<fmt:message key="button.copy.lesson.url.tooltip"/>'>
+                           		<i class="fa-regular fa-clipboard"></i>
+                            </button>
+                            </small>
+						</dd>
+					</c:if>
+					
 					<dt><fmt:message key="lesson.state"/>
 					</dt>
 					<dd>
@@ -567,15 +587,6 @@
 							<span class="hidden-xs"><fmt:message key="progress.email.configure"/></span> 
 						</button>
 					</dd>
-
-					<!--  encodedLessonID -->
-					<c:if test="${ALLOW_DIRECT_LESSON_LAUNCH}">
-                                 <dt class="text-muted"><small><fmt:message key="lesson.learner.url"/></small></dt>
-						<dd class="text-muted">
-                                 <small><c:out value="${serverURL}r/${lesson.encodedLessonID}" escapeXml="true"/></small>
-						</dd>
-					</c:if>
-					
 				</dl>	
 			</div>
 		</div>

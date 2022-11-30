@@ -111,6 +111,7 @@ body.component #sequenceInfoDialog {
 }
 
 .monitoring-page-wrapper .component-sidebar .lesson-properties.active #lessonDetails {
+	max-width: 256px;
 	opacity: 1;
 	transition: opacity .3s ease .3s;
 }
@@ -128,6 +129,11 @@ body.component #sequenceInfoDialog {
 .monitoring-page-wrapper .component-sidebar .lesson-properties #lessonDetails select,
 .monitoring-page-wrapper .component-sidebar .lesson-properties #lessonDetails input[type="text"] {
 	width: 90%;
+}
+
+.monitoring-page-wrapper .component-sidebar .lesson-properties #lessonDetails #lessonUrlCopyToClipboardButton {
+	width: initial;
+	vertical-align: baseline;
 }
 
 .monitoring-page-wrapper .component-sidebar .lesson-properties #lessonDetails dt {
