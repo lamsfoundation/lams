@@ -2573,7 +2573,7 @@ function drawLearnerTimeline(learnerId, data) {
 			durationCell.closest('tr').remove();
 		}
 		
-		if (activity.url) {
+		if (activity.url && activity.type != 'g') {
 			activityBox.css('cursor', 'pointer');
 			dblTap(activityBox, function(){
 				// open pop up with user progress in the given activity
