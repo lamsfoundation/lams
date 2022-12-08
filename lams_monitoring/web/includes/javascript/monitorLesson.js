@@ -1334,6 +1334,13 @@ function updateSequenceTab() {
 			updateLiveEdit();
 			
 			sequenceRefreshInProgress = false;
+		},
+		error : function(jqXHR, textStatus){
+			if (textStatus === 'parsererror') {
+				alert('Lesson monitoring periodic auto update failed and will be stopped.\n' +
+				      'If you have logged out, please close this window.\nOtherwise please refresh the page.')
+				autoRefreshBlocked = true;
+			}
 		}
 	});
 }
