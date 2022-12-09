@@ -906,6 +906,8 @@ public class PeerreviewServiceImpl
 	    return;
 	}
 
+	ratingService.removeUserCommitsByContent(toolContentId, userId);
+
 	List<PeerreviewSession> sessions = peerreviewSessionDao.getByContentId(toolContentId);
 	for (PeerreviewSession session : sessions) {
 	    PeerreviewUser user = peerreviewUserDao.getUserByUserIDAndSessionID(userId.longValue(),
@@ -917,6 +919,7 @@ public class PeerreviewServiceImpl
 		    peerreviewDao.deleteById(NotebookEntry.class, entry.getUid());
 		}
 
+		peerreviewUserDao.delete(user);
 	    }
 	}
     }
