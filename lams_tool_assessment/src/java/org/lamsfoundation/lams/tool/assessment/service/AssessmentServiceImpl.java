@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.assessment.service;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -139,6 +140,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelRow;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
+import org.springframework.web.util.UriUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -201,9 +203,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
     public AssessmentServiceImpl() {
 	FluxRegistry.initFluxMap(AssessmentConstants.COMPLETION_CHARTS_UPDATE_FLUX_NAME,
-		AssessmentConstants.ANSWERS_UPDATED_SINK_NAME, null,
-		(Long toolContentId) -> getCompletionChartsData(toolContentId), FluxMap.SHORT_THROTTLE,
-		FluxMap.STANDARD_TIMEOUT);
+		AssessmentConstants.ANSWERS_UPDATED_SINK_NAME, null, (Long toolContentId) -> UriUtils
+			.encode(getCompletionChartsData(toolContentId), StandardCharsets.UTF_8.toString()),
+		FluxMap.SHORT_THROTTLE, FluxMap.STANDARD_TIMEOUT);
     }
 
     // *******************************************************************************
