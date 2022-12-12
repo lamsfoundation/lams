@@ -461,7 +461,7 @@
 	  var selectedNode = node;
 	  // modified for LAMS
 	  var classList = target != 'refresh' && target.attr('class') ? target.attr('class').split(' ') : [];
-	  if (target == 'refresh' || (classList.indexOf('expand-icon') !== -1)) {    	
+	  if (target == 'refresh' || (classList.indexOf('expand-icon') !== -1) || (classList.indexOf('tree-parent') !== -1)) {    	
 		  if (this.options.lazyLoad) {
 			  var bareBonesLazyLoadFunction = function(parentNode, callback, options){callback(parentNode, [], options);};
 			  this.options.lazyLoadFunction = (typeof this.options.lazyLoadFunction === 'function') ? this.options.lazyLoadFunction : bareBonesLazyLoadFunction;
