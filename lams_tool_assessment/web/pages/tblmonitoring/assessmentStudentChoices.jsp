@@ -52,7 +52,7 @@
 			if (!event.data) {
 				return;
 			}
-			var data = JSON.parse(event.data);
+			var data = JSON.parse(decodeURIComponent(event.data));
 			drawActivityCompletionChart(data, true);
 			drawAnsweredQuestionsChart(data, ${groupsInAnsweredQuestionsChart}, true);
 
