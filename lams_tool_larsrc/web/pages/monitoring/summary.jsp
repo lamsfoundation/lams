@@ -138,6 +138,9 @@
 					<c:when test="${item.itemType == 2}">
 						<c:set var="itemTypeLabel"><fmt:message key="label.authoring.basic.resource.file" /></c:set>
 					</c:when>
+					<c:when test="${item.itemType == 3}">
+						<c:set var="itemTypeLabel"><fmt:message key="label.authoring.basic.resource.website" /></c:set>
+					</c:when>
 				</c:choose>
    	        
 				<c:set var="itemTitle">

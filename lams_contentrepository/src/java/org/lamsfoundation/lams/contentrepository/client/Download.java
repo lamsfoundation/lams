@@ -163,7 +163,7 @@ public abstract class Download extends HttpServlet {
 	    // update versionId in case it was null and we got the latest version...
 	    version = node.getVersion();
 
-	    if (node.isNodeType(NodeType.PACKAGENODE)) {
+	    if (!saveFile && node.isNodeType(NodeType.PACKAGENODE)) {
 
 		// now get the path of the initial page in the package
 		IValue value = node.getProperty(PropertyName.INITIALPATH);
@@ -182,7 +182,7 @@ public abstract class Download extends HttpServlet {
 		Download.log.debug("Attempting to redirect to initial page " + initialPage);
 		response.sendRedirect(initialPage);
 
-	    } else if (node.isNodeType(NodeType.FILENODE)) {
+	    } else if (saveFile || node.isNodeType(NodeType.FILENODE)) {
 
 		handleFileNode(response, request, node, saveFile);
 
@@ -214,7 +214,7 @@ public abstract class Download extends HttpServlet {
 
 	    // check if it is plain numeric UUID or complex portrait UUID
 	    IVersionedNode node = uuid.contains("-") ? getRepositoryService().getFileItem(ticket, uuid, version)
-		    : getRepositoryService().getFileItem(ticket, Long.valueOf(uuid), version);
+		    : getRepositoryService().getFileItem(ticket, Long.valueOf(uuid), version, relPathString);
 	    if (!node.isNodeType(NodeType.FILENODE)) {
 		throw new RepositoryCheckedException(
 			"Unexpected type of node " + node.getNodeType() + " Expected File node. Data is " + node);

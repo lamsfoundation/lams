@@ -44,6 +44,13 @@
 	 		width: 100%;
 	 		min-height: 500px;
 	 	}
+	 	
+	 	.embedded-content iframe {
+	 		border: 0;
+	 		width: 100%;
+	 		height: 100%;
+	 		min-height: 500px;
+	 	}
 	</style>
 
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
