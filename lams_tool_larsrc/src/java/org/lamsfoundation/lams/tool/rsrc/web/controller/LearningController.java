@@ -574,7 +574,8 @@ public class LearningController {
 		errorMap.add("GLOBAL", messageService.getMessage(ResourceConstants.ERROR_MSG_URL_BLANK));
 	    }
 	}
-	if (resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE) {
+	if (resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE
+		|| resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE) {
 	    File uploadDir = FileUtil.getTmpFileUploadDir(resourceItemForm.getTmpFileUploadId());
 	    if (uploadDir.canRead()) {
 		File[] files = uploadDir.listFiles();

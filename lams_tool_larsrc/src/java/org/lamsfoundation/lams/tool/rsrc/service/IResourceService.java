@@ -77,7 +77,7 @@ public interface IResourceService extends ICommonToolService {
     List<ResourceItem> getAuthoredItems(Long resourceUid);
 
     /**
-     * Upload resource item file to repository. i.e., single file
+     * Upload resource item file to repository. i.e., single file, website zip
      *
      */
     void uploadResourceItemFile(ResourceItem item, File file) throws UploadResourceFileException;

@@ -40,7 +40,18 @@
 						</i>
 					</td>
 				</c:if>
-
+				<c:if test="${resource.type == 3}">
+					<td>
+						<span class="field-name"> <fmt:message
+								key="label.authoring.basic.resource.website" /> : </span>
+						<c:out value="${resource.title}" escapeXml="true"/>
+					</td>
+					<td width="5%">
+						<i class="fa fa-eye" title="<fmt:message key="label.authoring.basic.resource.preview" />"
+							onclick="previewItem(3, ${status.index},'${sessionMapID}')">
+						</i>
+					</td>
+				</c:if>
 				
 				<td class="arrows" style="width:5%">
 					<!-- Don't display up icon if first line -->

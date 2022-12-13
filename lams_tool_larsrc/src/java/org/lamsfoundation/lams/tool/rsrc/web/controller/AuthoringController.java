@@ -157,6 +157,9 @@ public class AuthoringController {
 		    resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 		}
 		return "pages/authoring/parts/addfile";
+	    case 3:
+		resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
+		return "pages/authoring/parts/addwebsite";
 	    default:
 		throw new IllegalArgumentException("Unknown item type" + item.getType());
 	}
@@ -178,6 +181,9 @@ public class AuthoringController {
 	    case 2:
 		resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 		return "pages/authoring/parts/addfile";
+	    case 3:
+		resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
+		return "pages/authoring/parts/addwebsite";
 	    default:
 		throw new IllegalArgumentException("Unknown item type" + type);
 	}
@@ -205,6 +211,9 @@ public class AuthoringController {
 		case 2:
 		    resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 		    return "pages/authoring/parts/addfile";
+		case 3:
+		    resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
+		    return "pages/authoring/parts/addwebsite";
 		default:
 		    throw new IllegalArgumentException("Unknown item type" + resourceItemForm.getItemType());
 	    }
@@ -225,6 +234,8 @@ public class AuthoringController {
 			return "pages/authoring/parts/addurl";
 		    case 2:
 			return "pages/authoring/parts/addfile";
+		    case 3:
+			return "pages/authoring/parts/addwebsite";
 		    default:
 			throw new IllegalArgumentException("Unknown item type" + resourceItemForm.getItemType());
 		}
@@ -611,7 +622,8 @@ public class AuthoringController {
 	short type = itemForm.getItemType();
 	item.setType(itemForm.getItemType());
 
-	if (type == ResourceConstants.RESOURCE_TYPE_FILE & !itemForm.isHasFile()) {
+	if ((type == ResourceConstants.RESOURCE_TYPE_FILE || type == ResourceConstants.RESOURCE_TYPE_WEBSITE)
+		&& !itemForm.isHasFile()) {
 	    File uploadDir = FileUtil.getTmpFileUploadDir(itemForm.getTmpFileUploadId());
 	    if (uploadDir.canRead()) {
 		File[] files = uploadDir.listFiles();

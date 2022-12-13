@@ -24,9 +24,11 @@
 package org.lamsfoundation.lams.tool.rsrc.service;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -95,6 +97,8 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
+import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -641,8 +645,69 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    item.setFileUuid(nodeKey.getUuid());
 	    item.setFileVersionId(nodeKey.getVersion());
 	}
+	// need unzip upload, and check the initial item :default.htm/html or index.htm/html
+	if (item.getType() == ResourceConstants.RESOURCE_TYPE_WEBSITE) {
+	    try {
+		InputStream is = new FileInputStream(file);
+		String packageDirectory = ZipFileUtil.expandZip(is, fileName);
+		String initFile = findWebsiteInitialItem(packageDirectory);
+		if (initFile == null) {
+		    throw new UploadResourceFileException(
+			    messageService.getMessage("error.msg.website.no.initial.file"));
+		}
+		item.setInitialItem(initFile);
+		// upload package
+		NodeKey nodeKey = processPackage(packageDirectory, initFile);
+		item.setFileUuid(nodeKey.getUuid());
+		item.setFileVersionId(nodeKey.getVersion());
+	    } catch (ZipFileUtilException e) {
+		log.error(messageService.getMessage("error.msg.zip.file.exception") + " : " + e.toString());
+		throw new UploadResourceFileException(messageService.getMessage("error.msg.zip.file.exception"));
+	    } catch (FileNotFoundException e) {
+		log.error(messageService.getMessage("error.msg.file.not.found") + ":" + e.toString());
+		throw new UploadResourceFileException(messageService.getMessage("error.msg.file.not.found"));
+	    }
+	}
+
 	// create the package from the directory contents
 	item.setFileName(fileName);
+    }
+
+    private NodeKey processPackage(String packageDirectory, String initFile) throws UploadResourceFileException {
+	NodeKey node = null;
+	try {
+	    node = resourceToolContentHandler.uploadPackage(packageDirectory, initFile);
+	} catch (InvalidParameterException e) {
+	    throw new UploadResourceFileException(messageService.getMessage("error.msg.invaid.param.upload"));
+	} catch (RepositoryCheckedException e) {
+	    throw new UploadResourceFileException(messageService.getMessage("error.msg.repository"));
+	}
+	return node;
+    }
+
+    /**
+     * Find out default.htm/html or index.htm/html in the given directory folder
+     *
+     * @param packageDirectory
+     */
+    private String findWebsiteInitialItem(String packageDirectory) {
+	File file = new File(packageDirectory);
+	if (!file.isDirectory()) {
+	    return null;
+	}
+
+	File[] initFiles = file.listFiles(new FileFilter() {
+	    @Override
+	    public boolean accept(File pathname) {
+		if (pathname == null || pathname.getName() == null) {
+		    return false;
+		}
+		String name = pathname.getName();
+		return name.endsWith("default.html") || name.endsWith("default.htm") || name.endsWith("index.html")
+			|| name.endsWith("index.htm");
+	    }
+	});
+	return initFiles.length > 0 ? initFiles[0].getName() : null;
     }
 
     /**

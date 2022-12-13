@@ -56,8 +56,10 @@ public class ViewItemController {
     @Autowired
     private IResourceService resourceService;
 
-    private static final Set<String> DISPLAYABLE_IMAGE_EXTENSIONS = Set.of(".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg");
-	private static final Set<String> DISPLAYABLE_MEDIA_EXTENSIONS = Set.of(".mov", ".mp4", ".webm", ".ogg", ".mp3", ".wav");
+    private static final Set<String> DISPLAYABLE_IMAGE_EXTENSIONS = Set.of(".jpg", ".jpeg", ".png", ".gif", ".bmp",
+	    ".webp", ".svg");
+    private static final Set<String> DISPLAYABLE_MEDIA_EXTENSIONS = Set.of(".mov", ".mp4", ".webm", ".ogg", ".mp3",
+	    ".wav");
     private static final Set<String> DISPLAYABLE_EMBED_EXTENSIONS = Set.of(".pdf");
 
     /**
@@ -134,7 +136,6 @@ public class ViewItemController {
 	if (item == null) {
 	    return "error";
 	}
-
 	boolean isDownload = item.getType() == ResourceConstants.RESOURCE_TYPE_FILE;
 	request.setAttribute(ResourceConstants.ATTR_IS_DOWNLOAD, isDownload);
 	String lowercaseFileName = isDownload && StringUtils.isNotBlank(item.getFileName())
@@ -147,10 +148,13 @@ public class ViewItemController {
 	boolean isDisplayableMedia = lowercaseFileName != null
 		&& DISPLAYABLE_MEDIA_EXTENSIONS.stream().anyMatch(ext -> lowercaseFileName.endsWith(ext));
 	request.setAttribute(ResourceConstants.ATTR_IS_DISPLAYABLE_MEDIA, isDisplayableMedia);
-	
+
 	boolean isDisplayableEmbed = lowercaseFileName != null
 		&& DISPLAYABLE_EMBED_EXTENSIONS.stream().anyMatch(ext -> lowercaseFileName.endsWith(ext));
 	request.setAttribute(ResourceConstants.ATTR_IS_DISPLAYABLE_EMBED, isDisplayableEmbed);
+
+	request.setAttribute(ResourceConstants.ATTR_IS_DISPLAYABLE_PAGE,
+		item.getType() == ResourceConstants.RESOURCE_TYPE_WEBSITE);
 
 	String reviewUrl = getReviewUrl(item, sessionMapID);
 	request.setAttribute(ResourceConstants.ATTR_RESOURCE_REVIEW_URL, reviewUrl);
@@ -248,6 +252,7 @@ public class ViewItemController {
 		}
 		break;
 	    case ResourceConstants.RESOURCE_TYPE_FILE:
+	    case ResourceConstants.RESOURCE_TYPE_WEBSITE:
 		url = "/download/?uuid=" + item.getFileUuid();
 		break;
 	}
