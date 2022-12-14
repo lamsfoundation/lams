@@ -55,7 +55,7 @@ public class ResourceItem implements Cloneable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    // Resource Type:1=URL,2=File
+    // Resource Type:1=URL,2=File,3=Website
     @Column(name = "item_type")
     private short type;
 
@@ -67,6 +67,9 @@ public class ResourceItem implements Cloneable {
 
     @Column
     private String url;
+
+    @Column(name = "init_item")
+    private String initialItem;
 
     @Column(name = "file_uuid")
     private Long fileUuid;
@@ -152,6 +155,14 @@ public class ResourceItem implements Cloneable {
 
     public void setFileVersionId(Long crVersionId) {
 	this.fileVersionId = crVersionId;
+    }
+
+    public String getInitialItem() {
+	return initialItem;
+    }
+
+    public void setInitialItem(String initialItem) {
+	this.initialItem = initialItem;
     }
 
     public String getInstructions() {

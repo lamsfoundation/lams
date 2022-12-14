@@ -37,6 +37,8 @@ public class ResourceConstants {
 
     public static final short RESOURCE_TYPE_FILE = 2;
 
+    public static final short RESOURCE_TYPE_WEBSITE = 3;
+
     // for action forward name
     public static final String SUCCESS = "success";
 
@@ -79,12 +81,14 @@ public class ResourceConstants {
     public static final String ATTR_RESOURCE_REVIEW_URL = "resourceItemReviewUrl";
 
     public static final String ATTR_IS_DOWNLOAD = "isDownload";
-    
+
     public static final String ATTR_IS_DISPLAYABLE_IMAGE = "isDisplayableImage";
 
-    public static final String  ATTR_IS_DISPLAYABLE_MEDIA = "isDisplayableMedia";
-    
+    public static final String ATTR_IS_DISPLAYABLE_MEDIA = "isDisplayableMedia";
+
     public static final String ATTR_IS_DISPLAYABLE_EMBED = "isDisplayableEmbed";
+    
+    public static final String ATTR_IS_DISPLAYABLE_PAGE = "isDisplayablePage";
 
     public static final String ATTR_RESOURCE = "resource";
 

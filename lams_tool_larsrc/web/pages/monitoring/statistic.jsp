@@ -53,6 +53,9 @@
 							<c:when test="${item.itemType == 2}">
 								<fmt:message key="label.authoring.basic.resource.file" />
 							</c:when>
+							<c:when test="${item.itemType == 3}">
+								<fmt:message key="label.authoring.basic.resource.website" />
+							</c:when>
 						</c:choose>
 					</td>
 					<td>

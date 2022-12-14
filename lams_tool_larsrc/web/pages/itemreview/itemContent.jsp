@@ -35,12 +35,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:if>
 		
 		var isDownload = ${isDownload},
+			isPage = ${isDisplayablePage},
 			panel = $('#item-content-${itemUid}');
 
 		if (isDownload) {
 			$('.download-button', panel).removeClass('hidden');
 			return;
    		}
+   		if (isPage) {
+   			$('.iframe-open-button', panel).removeClass('hidden');
+   	   		return;
+   	   	}
    		
 		$.ajax({
 		    url: "https://ckeditor.iframe.ly/api/oembed?url=" + encodeURIComponent("${resourceItemReviewUrl}"),
@@ -59,7 +64,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	function iframelyCallback${itemUid}(response) {
 		iframelyCallback(${itemUid}, response);
 	}
-
 </script>
 	
 <div id="item-content-${itemUid}" class="item-content">
@@ -76,6 +80,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<fmt:message key="label.download" />
 			</a>
 			<a href="${resourceItemReviewUrl}" target="_blank" class="embedded-open-button hidden btn btn-default btn-sm pull-right">
+				<i class="fa fa-external-link" aria-hidden="true"></i>
+				<fmt:message key="open.in.new.window" />
+			</a>
+			<a href="<c:url value='${resourceItemReviewUrl}'/>" target="_blank" class="iframe-open-button hidden btn btn-default btn-sm pull-right">
+				<i class="fa fa-external-link" aria-hidden="true"></i>
 				<fmt:message key="open.in.new.window" />
 			</a>
 		</div>
@@ -100,7 +109,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<embed src="<c:url value='${resourceItemReviewUrl}' />&preferDownload=false#toolbar=0" />
 				</div>
 			</c:if>		
-
+			<c:if test="${isDisplayablePage}">
+				<iframe src="<c:url value='${resourceItemReviewUrl}'/>"></iframe>
+			</c:if>		
 		</div>
 
 	</div>
