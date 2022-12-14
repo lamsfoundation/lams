@@ -9,9 +9,11 @@ var currentTab = sessionStorage.getItem("lamsMonitoringCurrentTab") || 'sequence
 	sequenceCanvas = null,
 // which learner was selected in the search box
 	sequenceSearchedLearner = null,
+// which page of learners' progress is getting displayed
+	learnersTabPage = 1,
+	learnersTabSortedByProgress = false,
 // currently opened EventSources
 	eventSources = [],
-
 // double tap support
 	tapTimeout = 500,
 	lastTapTime = 0,
@@ -638,6 +640,9 @@ function loadTab(tabName, button) {
 		
 		case 'learners': {
 			tabContent.load(LAMS_URL + 'monitoring/monitoring/displayLearnersTab.do', function(){
+				$('#learnes-order-by-completion').change(function(){
+					learnersPageShift(0);
+				})
 				updateLearnersTab();
 			});
 			searchStudentWidget.show();
@@ -2459,15 +2464,38 @@ function resizeSequenceCanvas(width, height){
  */
 function updateLearnersTab(){
 	let learnersAccordion = $('#learners-accordion').empty(),
-		itemTemplate = $('.learners-accordion-item-template').clone().removeClass('learners-accordion-item-template d-none');
+		itemTemplate = $('.learners-accordion-item-template').clone().removeClass('learners-accordion-item-template d-none'),
+		pager = $('#learners-pager');
 		
 	$.ajax({
 		'url' : LAMS_URL + 'monitoring/monitoring/getLearnerProgressPage.do',
 		'data': {
-			lessonID: lessonId
+			lessonID: lessonId,
+			pageNumber: learnersTabPage,
+			isProgressSorted: learnersTabSortedByProgress,
+			searchedLearnerID: sequenceSearchedLearner
 		},
 		'dataType' : 'json',
 		'success'  : function(response) {
+			// hide/show pager elements depending if they are needed
+			if (sequenceSearchedLearner) {
+				pager.addClass('d-none');
+			} else {
+				let learnersCount = +response.learnerPossibleNumber;
+				if (learnersCount < 10) {
+					$('.pager-element', pager).addClass('d-none');
+				} else {
+					$('.pager-element', pager).removeClass('d-none');
+					$('#learners-previous-page', pager).toggleClass('d-none', learnersTabPage < 2);
+					let pageCount = Math.ceil(learnersCount / 10);
+					$('#learners-next-page', pager).toggleClass('d-none', learnersTabPage >= pageCount);
+					
+					$('#learnes-order-by-completion', pager).prop('checked', learnersTabSortedByProgress);
+					$('#learners-page', pager).text(learnersTabPage + '/' + pageCount);
+				}
+				pager.removeClass('d-none');
+			}
+			
 			$(response.learners).each(function(){
 				let learner = this,
 					itemHeaderId = 'learners-accordion-heading-' + learner.id,
@@ -2481,7 +2509,6 @@ function updateLearnersTab(){
 					   .find('.accordion-button')
 							.attr('data-bs-target', '#' + itemCollapseId)
 							.attr('aria-controls', itemCollapseId)
-							.addClass(sequenceSearchedLearner == learner.id ? 'bg-primary' : '')
 							.html('<span>' + learner.firstName + ' ' + learner.lastName + '</span>')
 							.prepend(portraitSmall);
 				$('.learners-accordion-name', item).text(learner.firstName + ' ' + learner.lastName);
@@ -2586,12 +2613,12 @@ function drawLearnerTimeline(learnerId, data) {
 }
 
 /**
- * Clears previous run search for phrase, in Learners tab.
+ * Handler for shift page numbers bar.
  */
-function learnersClearSearchPhrase(){
-	$('#learnersSearchPhrase').val('').autocomplete("close");
-	loadLearnerProgressPage(1, '');
-	$('#learnersSearchPhraseClear').hide();
+function learnersPageShift(increment){
+	learnersTabPage += +increment;
+	learnersTabSortedByProgress = $('#learnes-order-by-completion').prop('checked');
+	updateLearnersTab();
 }
 
 /**

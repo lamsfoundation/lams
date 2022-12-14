@@ -1,9 +1,34 @@
 <!DOCTYPE html>
 <%@ include file="/taglibs.jsp"%>
 
-<div id="learners-accordion" class="accordion">
+<div id="learners-tab-content" class="container-fluid">
+	<div class="row" id="learners-pager">
+		<div class="col offset-4 text-end" >
+			<button class="btn btn-secondary pager-element d-none" onClick="javascript:learnersPageShift(-1)"
+				    id="learners-previous-page" title="<fmt:message key='learner.group.backward.10'/>">
+				<i class="fa fa-fw fa-backward" ></i>
+			</button>
+		</div>
+		<div class="col text-center">
+			<p class="pager-element mt-1 d-none">
+				<fmt:message key='learners.page' />&nbsp;<span id="learners-page" />
+			</p>
+		</div>
+		<div class="col text-start">
+			<button class="btn btn-secondary pager-element d-none" onClick="javascript:learnersPageShift(1)"
+				    id="learners-next-page" title="<fmt:message key='learner.group.forward.10'/>">
+				<i class="fa fa-fw fa-forward" ></i>
+			</button>
+		</div>
+		<div class="col-2 offset-3">
+			<lams:Switch id="learnes-order-by-completion" labelKey="learners.order" 
+						 iconClass="fa fa-sm fa-arrow-down-wide-short" />
+		</div>
+	</div>
+	
+	<div id="learners-accordion" class="accordion">
+	</div>
 </div>
-
 
 <div class="learners-accordion-item-template accordion-item d-none">
   <h2 class="accordion-header">

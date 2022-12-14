@@ -1074,25 +1074,35 @@ public class MonitoringController {
 	    return null;
 	}
 
-	String searchPhrase = request.getParameter("searchPhrase");
-	Integer pageNumber = WebUtil.readIntParam(request, "pageNumber", true);
-	if (pageNumber == null || pageNumber < 1) {
-	    pageNumber = 1;
-	}
-	// are the learners sorted by the most completed first?
-	boolean isProgressSorted = WebUtil.readBooleanParam(request, "isProgressSorted", false);
-
-	// either sort by name or how much a learner progressed into the lesson
-	List<User> learners = isProgressSorted
-		? monitoringService.getLearnersByMostProgress(lessonId, searchPhrase, 10, (pageNumber - 1) * 10)
-		: lessonService.getLessonLearners(lessonId, searchPhrase, 10, (pageNumber - 1) * 10, true);
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	for (User learner : learners) {
-	    responseJSON.withArray("learners").add(WebUtil.userToJSON(learner));
-	}
+	Integer searchedLearnerId = WebUtil.readIntParam(request, "searchedLearnerID", true);
+	if (searchedLearnerId == null) {
+	    Integer pageNumber = WebUtil.readIntParam(request, "pageNumber", true);
+	    if (pageNumber == null || pageNumber < 1) {
+		pageNumber = 1;
+	    }
+	    // are the learners sorted by the most completed first?
+	    boolean isProgressSorted = WebUtil.readBooleanParam(request, "isProgressSorted", false);
 
-	// get all possible learners matching the given phrase, if any; used for max page number
-	responseJSON.put("learnerPossibleNumber", lessonService.getCountLessonLearners(lessonId, searchPhrase));
+	    // either sort by name or how much a learner progressed into the lesson
+	    List<User> learners = isProgressSorted
+		    ? monitoringService.getLearnersByMostProgress(lessonId, null, 10, (pageNumber - 1) * 10)
+		    : lessonService.getLessonLearners(lessonId, null, 10, (pageNumber - 1) * 10, true);
+
+	    for (int i = 0; i < 5; i++) {
+		for (User learner : learners) {
+		    responseJSON.withArray("learners").add(WebUtil.userToJSON(learner));
+		}
+	    }
+
+	    // get all possible learners matching the given phrase, if any; used for max page number
+	    responseJSON.put("learnerPossibleNumber", lessonService.getCountLessonLearners(lessonId, null) * 5);
+	} else {
+	    // only one learner is searched
+	    User learner = userManagementService.getUserById(searchedLearnerId);
+	    responseJSON.withArray("learners").add(WebUtil.userToJSON(learner));
+	    responseJSON.put("learnerPossibleNumber", 1);
+	}
 	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
     }
