@@ -1089,14 +1089,12 @@ public class MonitoringController {
 		    ? monitoringService.getLearnersByMostProgress(lessonId, null, 10, (pageNumber - 1) * 10)
 		    : lessonService.getLessonLearners(lessonId, null, 10, (pageNumber - 1) * 10, true);
 
-	    for (int i = 0; i < 5; i++) {
-		for (User learner : learners) {
-		    responseJSON.withArray("learners").add(WebUtil.userToJSON(learner));
-		}
+	    for (User learner : learners) {
+		responseJSON.withArray("learners").add(WebUtil.userToJSON(learner));
 	    }
 
 	    // get all possible learners matching the given phrase, if any; used for max page number
-	    responseJSON.put("learnerPossibleNumber", lessonService.getCountLessonLearners(lessonId, null) * 5);
+	    responseJSON.put("learnerPossibleNumber", lessonService.getCountLessonLearners(lessonId, null));
 	} else {
 	    // only one learner is searched
 	    User learner = userManagementService.getUserById(searchedLearnerId);
