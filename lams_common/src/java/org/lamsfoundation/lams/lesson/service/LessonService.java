@@ -285,6 +285,7 @@ public class LessonService implements ILessonService {
 	    if (grouper != null) {
 		try {
 		    grouper.removeAllLearnersFromGrouping(grouping);
+		    grouping.getGroups().clear();
 		} catch (GroupingException e) {
 		    throw new LessonServiceException(e);
 		}

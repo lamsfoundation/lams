@@ -175,29 +175,23 @@ public abstract class Grouper {
      */
     public void removeAllLearnersFromGrouping(Grouping grouping) throws GroupingException {
 
-	boolean canRemove = true;
-
 	for (Group group : grouping.getGroups()) {
 	    if (!group.mayBeDeleted()) {
-		canRemove = false;
-		break;
+		String error = "Tried to clear a group which cannot be removed (tool sessions probably exist). Grouping "
+			+ grouping + ". Not removing the groupings.";
+		log.error(error);
+		throw new GroupingException(error);
 	    }
 	}
 
-	if (canRemove) {
-	    for (Group group : grouping.getGroups()) {
-		if (log.isDebugEnabled()) {
-		    log.debug("Cleared all  users from group " + group.getGroupName());
-		}
-		group.getUsers().clear();
+	for (Group group : grouping.getGroups()) {
+	    if (log.isDebugEnabled()) {
+		log.debug("Cleared all users and removed group " + group.getGroupName());
 	    }
-	} else {
-	    String error = "Tried to clear a group which cannot be removed (tool sessions probably exist). Grouping "
-		    + grouping + ". Not removing the groupings.";
-	    log.error(error);
-	    throw new GroupingException(error);
+	    group.getUsers().clear();
 	}
     }
+
     /**
      * Create an empty group for the given grouping. Trims the name of the group before creating the group. If the group
      * name group name already exists then it appends a datetime string to make the name unique. Gives it 5 attempts to
