@@ -86,7 +86,7 @@
 										</span>
 									</div>
 									<div class="col-1 text-end">
-										<c:if test="${canEdit and not lessonMode}">
+										<c:if test="${not lessonMode}">
 											<i class="removeGroupingButton fa fa-remove fa-lg" title="<fmt:message key='label.course.groups.remove.tooltip' />"
 											   onClick="javascript:removeGrouping(${grouping.groupingId})" ></i>
 										</c:if>
@@ -98,15 +98,15 @@
 				</ul>
 			</div>
 		</div>
-		<c:if test="${canEdit}">
-			<div class="row mt-3">
-				<div class="col-4 offset-4 text-end">
-					<div class="btn btn-secondary" onClick="javascript:viewGroups()">
-					<i class="fa fa-plus"></i>
-					<span><fmt:message key='label.course.groups.grouping.create' /></span>
-				</div>
+		
+		<div class="row mt-3">
+			<div class="col-4 offset-4 text-end">
+				<div class="btn btn-secondary" onClick="javascript:viewGroups()">
+				<i class="fa fa-plus"></i>
+				<span><fmt:message key='label.course.groups.grouping.create' /></span>
 			</div>
-		</c:if>
+		</div>
+		
 </lams:Page5>
 
 <c:if test="${usedForBranching eq true}">

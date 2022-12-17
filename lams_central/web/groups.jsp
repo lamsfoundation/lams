@@ -33,7 +33,6 @@
 		var grouping = ${grouping},
 			organisationId = grouping.organisationId,
 			unassignedUsers = ${unassignedUsers},
-			canEdit = ${canEdit},
 			groupingActivityId = '${param.activityID}',
 			lessonId = '${lessonID}',
 			lessonMode = ${lessonMode},
@@ -133,29 +132,21 @@
 					<div id="titleDiv" class="clearfix text-center mb-2">
 						<fmt:message key="label.course.groups.name" />
 						<input id="groupingName" type="text" class="form-control form-control-sm d-inline w-25 ms-1"
-							<c:if test="${not canEdit or lessonMode}">
+							<c:if test="${lessonMode}">
 								readonly="readonly"
 							</c:if>
 						/>
 						
-						<c:if test="${canEdit}">
-							<button class="float-end btn btn-secondary btn-disable-on-downupload" onClick="javascript:saveGroups()">
-								<i class="fa fa-save"></i> <fmt:message key="button.save" />
-							</button>
-						</c:if>
+						<button class="float-end btn btn-secondary btn-disable-on-downupload" onClick="javascript:saveGroups()">
+							<i class="fa fa-save"></i> <fmt:message key="button.save" />
+						</button>
 					</div>
 				</c:if>
 				
 				<div id="titleInstructions" class="clearfix text-center pb-2 border-bottom border-secondary">
 					<span class="d-inline-block fst-italic mt-2">
-						<c:choose>
-							<c:when test="${canEdit}">
-								<fmt:message key="label.course.groups.edit.title" />
-							</c:when>
-							<c:otherwise>
-								<fmt:message key="label.course.groups.viewonly.title" />
-							</c:otherwise>
-						</c:choose>
+						
+					<fmt:message key="label.course.groups.edit.title" />
 					</span>
 					<button type="button" onClick="javascript:showPrintPage()" class="float-end btn btn-secondary">
 						<i class="fa fa-print"></i> <fmt:message key="label.print"/>
@@ -172,7 +163,7 @@
 						<div class="userContainer"></div>
 					</div>
 					<div class="col-9 d-flex flex-wrap" id="groupsCell">
-						<c:if test="${canEdit and not usedForBranching}">
+						<c:if test="${not usedForBranching}">
 							<div id="newGroupPlaceholder" class="groupContainer ms-2 mt-2">
 								<div class="text-center text-primary"><fmt:message key="label.course.groups.add" /></div>
 							</div>
@@ -205,50 +196,44 @@
 			    </div>
 		    </c:if>
 		    
-		    <c:if test="${canEdit}">
-			    <div class="accordion-item">
-					<h2 class="accordion-header" id="headingUploadGroupFile">
-						 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" aria-expanded="false"
-					    		data-bs-target="#upload-group-file-settings" aria-controls="upload-group-file-settings">
-					    	<fmt:message key="label.import.groups.from.template" />
-					    </button>
-					</h2>
-			        <div id="upload-group-file-settings" class="accordion-collapse collapse" data-bs-parent="#advanced-settings-accordion"
-			        	 aria-labelledby="headingUploadGroupFile">
-			        	 <div class="accordion-body">
-							<fmt:message key="label.import.groups.from.template.description" />
-							<button id="download-template" class="btn btn-primary btn-disable-on-downupload d-block mt-2 mb-4"
-									onClick="javascript:downloadTemplate();">
-								<i class="fa fa-download"></i> <fmt:message key="label.download.template" />
+		    <div class="accordion-item">
+				<h2 class="accordion-header" id="headingUploadGroupFile">
+					 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" aria-expanded="false"
+				    		data-bs-target="#upload-group-file-settings" aria-controls="upload-group-file-settings">
+				    	<fmt:message key="label.import.groups.from.template" />
+				    </button>
+				</h2>
+		        <div id="upload-group-file-settings" class="accordion-collapse collapse" data-bs-parent="#advanced-settings-accordion"
+		        	 aria-labelledby="headingUploadGroupFile">
+		        	 <div class="accordion-body">
+						<fmt:message key="label.import.groups.from.template.description" />
+						<button id="download-template" class="btn btn-primary btn-disable-on-downupload d-block mt-2 mb-4"
+								onClick="javascript:downloadTemplate();">
+							<i class="fa fa-download"></i> <fmt:message key="label.download.template" />
+						</button>
+						<form action="../monitoring/groupingUpload/importLearnersForGrouping.do" enctype="multipart/form-data" id="uploadForm">
+							<input type="hidden" name="activityID" value="${param.activityID}"/>
+							<input type="hidden" name="lessonID" value="${lessonID}"/>
+							<lams:FileUpload5 fileFieldname="groupUploadFile" fileInputMessageKey="label.upload.group.spreadsheet"
+								uploadInfoMessageKey="-" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
+							<button id="import" type="button" class="btn btn-primary btn-disable-on-downupload ms-3"
+									onClick="javascript:importGroupsFromSpreadsheet()">
+								<i class="fa fa-upload"></i> <fmt:message key="button.import" />
 							</button>
-							<form action="../monitoring/groupingUpload/importLearnersForGrouping.do" enctype="multipart/form-data" id="uploadForm">
-								<input type="hidden" name="activityID" value="${param.activityID}"/>
-								<input type="hidden" name="lessonID" value="${lessonID}"/>
-								<lams:FileUpload5 fileFieldname="groupUploadFile" fileInputMessageKey="label.upload.group.spreadsheet"
-									uploadInfoMessageKey="-" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
-								<button id="import" type="button" class="btn btn-primary btn-disable-on-downupload ms-3"
-										onClick="javascript:importGroupsFromSpreadsheet()">
-									<i class="fa fa-upload"></i> <fmt:message key="button.import" />
-								</button>
-							</form>
-						</div>
+						</form>
 					</div>
 				</div>
-			</c:if>
+			</div>
 		</div>
 		
 		<!-- A template which gets cloned when a group is added -->
 		<div id="groupTemplate" class="groupContainer d-none p-1 ms-2 mt-2">
 			<div class="userContainerTitle mb-2 d-flex justify-content-between align-middle">
-				<c:if test="${canEdit and not usedForBranching}">
+				<c:if test="${not usedForBranching}">
 					<i class="removeGroupButton fa fa-remove fs-3 text-danger ms-1 mt-1" 
 					   title="<fmt:message key='label.course.groups.remove.tooltip' />" ></i>
 				</c:if>
-				<input type="text" class="form-control form-control-sm d-inline"
-					<c:if test="${not canEdit}">
-						readonly="readonly"
-					</c:if>
-				/>
+				<input type="text" class="form-control form-control-sm d-inline" />
 				<span class="sortUsersButton me-1 mt-1"
 				      title="<fmt:message key='label.course.groups.sort.tooltip' />">&#9650;</span>
 			</div>
