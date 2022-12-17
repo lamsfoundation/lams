@@ -116,7 +116,9 @@ public class OrganisationGroupServlet extends HttpServlet {
 	    boolean isGroupSuperuser = userManagementService.isUserInRole(user.getUserId(),
 		    organisation.getOrganisationId(), Role.MONITOR)
 		    || userManagementService.isUserInRole(user.getUserId(), organisation.getOrganisationId(),
-			    Role.AUTHOR);
+			    Role.AUTHOR)
+		    || userManagementService.isUserInRole(user.getUserId(), organisation.getOrganisationId(),
+			    Role.GROUP_MANAGER);
 	    if (!isGroupSuperuser) {
 		log.error("User " + user.getUserId() + " may not perform group actions for course "
 			+ organisation.getOrganisationId());
@@ -235,7 +237,7 @@ public class OrganisationGroupServlet extends HttpServlet {
 	}
 
 	// check group name uniqueness
-	Set<OrganisationGroup> groups = new HashSet<OrganisationGroup>(grouping.getGroups());
+	Set<OrganisationGroup> groups = new HashSet<>(grouping.getGroups());
 	for (OrganisationGroup group : groups) {
 	    if (group.getName().equals(groupName)) {
 		throw new ServletException("Group with name \"" + groupingName + "\" exists in grouping with ID "
@@ -279,7 +281,7 @@ public class OrganisationGroupServlet extends HttpServlet {
 	    return;
 	}
 
-	Set<OrganisationGroup> groups = new HashSet<OrganisationGroup>(grouping.getGroups());
+	Set<OrganisationGroup> groups = new HashSet<>(grouping.getGroups());
 	groups.remove(group);
 	userManagementService.saveOrganisationGrouping(grouping, groups);
 
@@ -406,7 +408,7 @@ public class OrganisationGroupServlet extends HttpServlet {
 
     @SuppressWarnings("unchecked")
     private OrganisationGrouping findGrouping(Integer organisationId, String groupingName) {
-	Map<String, Object> queryProperties = new TreeMap<String, Object>();
+	Map<String, Object> queryProperties = new TreeMap<>();
 	queryProperties.put("organisationId", organisationId);
 	queryProperties.put("name", groupingName);
 	List<OrganisationGrouping> result = userManagementService.findByProperties(OrganisationGrouping.class,
@@ -416,7 +418,7 @@ public class OrganisationGroupServlet extends HttpServlet {
 
     @SuppressWarnings("unchecked")
     private OrganisationGroup findGroup(Long groupingId, String groupName) {
-	Map<String, Object> queryProperties = new TreeMap<String, Object>();
+	Map<String, Object> queryProperties = new TreeMap<>();
 	queryProperties.put("groupingId", groupingId);
 	queryProperties.put("name", groupName);
 	List<OrganisationGroup> result = userManagementService.findByProperties(OrganisationGroup.class,

@@ -280,7 +280,7 @@ public class GroupingUploadAJAXController {
 	if (!securityService.hasOrgRole(organisationId, userId,
 		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR },
 		"save organisation grouping from spreadsheet")) {
-	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a manager or admin in the organisation");
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a super user in the organisation");
 	    return null;
 	}
 

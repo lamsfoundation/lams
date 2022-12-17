@@ -26,7 +26,6 @@
 		var grouping = ${grouping},
 			organisationId = grouping.organisationId,
 			unassignedUsers = ${unassignedUsers},
-			canEdit = ${canEdit},
 			groupingActivityId = '${param.activityID}',
 			lessonId = '${lessonID}',
 			lessonMode = ${lessonMode},
@@ -112,17 +111,15 @@
 	<div id="titleDiv">
 		<fmt:message key="label.course.groups.name" />
 		<input id="groupingName" type="text"
-			<c:if test="${not canEdit or lessonMode}">
+			<c:if test="${lessonMode}">
 				readonly="readonly"
 			</c:if>
 		/>
 		
-		<c:if test="${canEdit}">
-			<button class="pull-right btn btn-default btn-disable-on-downupload" onClick="javascript:saveGroups()">
-				<i class="fa fa-save"></i>
-				<span><fmt:message key="button.save" /></span>
-			</button>
-		</c:if>
+		<button class="pull-right btn btn-default btn-disable-on-downupload" onClick="javascript:saveGroups()">
+			<i class="fa fa-save"></i>
+			<span><fmt:message key="button.save" /></span>
+		</button>
 		<button class="pull-right btn btn-default btn-disable-on-downupload" 
 		   onClick="javascript:window.parent.showOrgGroupingDialog(organisationId)"
 		>
@@ -133,14 +130,7 @@
 </c:if>
 
 <div id="titleInstructions">
-	<c:choose>
-		<c:when test="${canEdit}">
-			<fmt:message key="label.course.groups.edit.title" />
-		</c:when>
-		<c:otherwise>
-			<fmt:message key="label.course.groups.viewonly.title" />
-		</c:otherwise>
-	</c:choose>
+	<fmt:message key="label.course.groups.edit.title" />
 	<span class="pull-right"><a href="#none" onClick="javascript:showPrintPage();"><i id="print-button" class="fa fa-print roffset10" title="<fmt:message key="label.print"/>"></i></a></span>
 </div>
 
@@ -155,7 +145,7 @@
 			<div class="userContainer"></div>
 		</td>
 		<td id="groupsCell">
-			<c:if test="${canEdit and not usedForBranching}">
+			<c:if test="${not usedForBranching}">
 				<div id="newGroupPlaceholder" class="groupContainer">
 					<div><fmt:message key="label.course.groups.add" /></div>
 				</div>
@@ -167,14 +157,10 @@
 <!-- A template which gets cloned when a group is added -->
 <div id="groupTemplate" class="groupContainer">
 	<div class="userContainerTitle">
-		<c:if test="${canEdit and not usedForBranching}">
+		<c:if test="${not usedForBranching}">
 			<i class="removeGroupButton fa fa-remove fa-2x" title="<fmt:message key='label.course.groups.remove.tooltip' />" ></i>
 		</c:if>
-		<input type="text" 
-			<c:if test="${not canEdit}">
-				readonly="readonly"
-			</c:if>
-		/>
+		<input type="text" />
 		<span class="sortUsersButton"
 		      title="<fmt:message key='label.course.groups.sort.tooltip' />">&#9650;</span>
 	</div>
@@ -211,7 +197,6 @@
 	<!--  /lams:AdvancedAccordian-->
 </c:if>
 
-<c:if test="${canEdit}">
 <div class="panel-group ${lessonMode?'voffset5':'voffset20'}" id="accordionUploadGroupFile" role="tablist" aria-multiselectable="true"> 
     <div class="panel panel-default" >
         <div class="panel-heading collapsable-icon-left" id="headingUploadGroupFile">
@@ -246,7 +231,6 @@
 		</div>
 	</div>
 </div>
-</c:if>
 	
 
 <!-- Inner dialog placeholders -->

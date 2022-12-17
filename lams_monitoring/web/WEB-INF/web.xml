@@ -199,7 +199,21 @@
  			<http-method>POST</http-method>
 		</web-resource-collection>
 		<auth-constraint>
-			<!-- Author can preview the lesson -->
+			<role-name>MONITOR</role-name>
+			<role-name>GROUP MANAGER</role-name>
+			<role-name>SYSADMIN</role-name>
+		</auth-constraint>
+	</security-constraint>
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Grouping upload</web-resource-name>
+			<url-pattern>/groupingUpload/*</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<!-- Any super user can work with uploads -->
+			<role-name>AUTHOR</role-name>
 			<role-name>MONITOR</role-name>
 			<role-name>GROUP MANAGER</role-name>
 			<role-name>SYSADMIN</role-name>

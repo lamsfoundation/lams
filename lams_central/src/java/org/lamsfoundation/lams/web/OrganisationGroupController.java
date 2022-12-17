@@ -133,7 +133,7 @@ public class OrganisationGroupController {
 	// check if user is allowed to view and edit groupings
 	if (!securityService.hasOrgRole(organisationId, userId,
 		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR }, "view organisation groupings")) {
-	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the organisation");
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a super user in the organisation");
 	    return null;
 	}
 
@@ -176,9 +176,6 @@ public class OrganisationGroupController {
 	    return "extGroups";
 	}
 
-	boolean isGroupSuperuser = userManagementService.isUserInRole(userId, organisationId, Role.GROUP_MANAGER);
-	request.setAttribute("canEdit", isGroupSuperuser || (activityID != null));
-
 	Set<OrganisationGroupingDTO> orgGroupingDTOs = new TreeSet<>();
 	for (OrganisationGrouping orgGrouping : orgGroupings) {
 	    orgGroupingDTOs.add(new OrganisationGroupingDTO(orgGrouping));
@@ -214,8 +211,6 @@ public class OrganisationGroupController {
 	    return null;
 	}
 
-	boolean isGroupSuperuser = userManagementService.isUserInRole(userId, organisationId, Role.GROUP_MANAGER);
-
 	if (targetOrganisationId == null) {
 	    targetOrganisationId = organisationId;
 	}
@@ -223,8 +218,6 @@ public class OrganisationGroupController {
 	if (log.isDebugEnabled()) {
 	    log.debug("Displaying course groups for user " + userId + " and organisation " + targetOrganisationId);
 	}
-	Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, true);
-	request.setAttribute("canEdit", isGroupSuperuser || (activityId != null));
 
 	ObjectNode orgGroupingJSON = JsonNodeFactory.instance.objectNode();
 	orgGroupingJSON.put("organisationId", targetOrganisationId);
@@ -246,6 +239,7 @@ public class OrganisationGroupController {
 	boolean isExternalGroupsSelected = extGroupIds != null && extGroupIds.length > 0;
 
 	// check if any groups already exist in this grouping
+	Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, true);
 	Grouping lessonGrouping = getLessonGrouping(activityId);
 	Set<Group> lessonGroups = lessonGrouping == null ? null : lessonGrouping.getGroups();
 	if ((activityId != null) && (lessonGrouping != null) && (isExternalGroupsSelected || (orgGroupingId != null))
@@ -368,9 +362,9 @@ public class OrganisationGroupController {
 	Integer userId = getUserDTO().getUserID();
 	int organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	// check if user is allowed to save grouping
-	if (!securityService.hasOrgRole(organisationId, userId, new String[] { Role.GROUP_MANAGER },
-		"save organisation grouping")) {
-	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a manager or admin in the organisation");
+	if (!securityService.hasOrgRole(organisationId, userId,
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR }, "save organisation grouping")) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a super user in the organisation");
 	}
 
 	if (log.isDebugEnabled()) {
@@ -437,9 +431,9 @@ public class OrganisationGroupController {
 	// check if user is allowed to edit groups
 	Integer userId = getUserDTO().getUserID();
 	int organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
-	if (!securityService.hasOrgRole(organisationId, userId, new String[] { Role.GROUP_MANAGER },
-		"remove organisation grouping")) {
-	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a manager or admin in the organisation");
+	if (!securityService.hasOrgRole(organisationId, userId,
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR }, "remove organisation grouping")) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a super user in the organisation");
 	    return null;
 	}
 

@@ -59,7 +59,7 @@
 				<a href="#" class="groupingName" onClick="javascript:${groupingMethod}(${grouping.groupingId})"> <c:out value="${grouping.name}" />
 				</a> <span class="groupCount" title='<fmt:message key="label.course.groups.grouping.count.label" />'>
 					(${grouping.groupCount}) </span>
-			<c:if test="${canEdit and not lessonMode}">
+			<c:if test="${not lessonMode}">
 				<i class="removeGroupingButton fa fa-remove fa-lg" title="<fmt:message key='label.course.groups.remove.tooltip' />"
 				   onClick="javascript:removeGrouping(${grouping.groupingId})" ></i>
 			</c:if>
@@ -67,13 +67,11 @@
 	</c:if>
 </c:forEach>
 
-<c:if test="${canEdit}">
-		<div id="addGroupingButton" class="btn btn-default" onClick="javascript:viewGroups()">
-		<i class="fa fa-plus"></i>
-		<span><fmt:message key='label.course.groups.grouping.create' /></span>
-	</div>
-</c:if>
-	
+<div id="addGroupingButton" class="btn btn-default" onClick="javascript:viewGroups()">
+	<i class="fa fa-plus"></i>
+	<span><fmt:message key='label.course.groups.grouping.create' /></span>
+</div>
+
 <c:if test="${usedForBranching eq true}">
 	<div id="groupMappingDialogContents" style="display:none">
 		<table>

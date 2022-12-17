@@ -34,13 +34,11 @@ $(document).ready(function(){
 		});
 	}
 	
-	if (canEdit) {
-		// allow adding new groups
-		$('#newGroupPlaceholder').click(function(){
-			// the label is "Group X" where X is the top group number
-			addGroup(null, LABELS.GROUP_PREFIX_LABEL + ' ' + $('#groupsTable .groupContainer').length, null);
-		});
-	}
+	// allow adding new groups
+	$('#newGroupPlaceholder').click(function(){
+		// the label is "Group X" where X is the top group number
+		addGroup(null, LABELS.GROUP_PREFIX_LABEL + ' ' + $('#groupsTable .groupContainer').length, null);
+	});
 });
 
 
@@ -126,63 +124,60 @@ function fillGroup(users, container) {
 			userDivs.push(userDiv);
 			userIds.push(userJSON.id);
 			
-			// if teacher can not edit, then no drag&drop is available
-			if (canEdit) {
-	    		userDiv.draggable({ 
-							'appendTo'    : 'body',
-							'containment' : '#groupsTable',
-						    'revert'      : 'invalid',
-						    'distance'    : 20,
-						    'scroll'      : false,
-						    'cursor'      : 'move',
-							'helper'      : function(event){
-								// include the user from which dragging started
-								$(this).addClass('draggableSelected');
-								
-								// copy selected users
-								var helperContainer = $('<div />');
-								$(this).siblings('.draggableSelected').addBack().each(function(){
-									$(this).clone().appendTo(helperContainer);
-								});
-								return helperContainer;
-							}
-					})
-				
-					.click(function(event){
-						var wasSelected = $(this).hasClass('draggableSelected');
-						var parentId = $(this).parent().parent().attr('id');
-						// this is needed for shift+click
-						var lastSelectedUser = lastSelectedUsers[parentId];
-						
-						if (event.shiftKey && lastSelectedUser && lastSelectedUser != this) {
-							// clear current selection
-							$(this).siblings().addBack().removeClass('draggableSelected');
+    		userDiv.draggable({ 
+						'appendTo'    : 'body',
+						'containment' : '#groupsTable',
+					    'revert'      : 'invalid',
+					    'distance'    : 20,
+					    'scroll'      : false,
+					    'cursor'      : 'move',
+						'helper'      : function(event){
+							// include the user from which dragging started
+							$(this).addClass('draggableSelected');
 							
-							// find range of users to select
-							var lastSelectedIndex = $(lastSelectedUser).index();
-							var index = $(this).index();
-							
-							var startingElem = lastSelectedIndex > index ? this : lastSelectedUser;
-							var endingElem = lastSelectedIndex > index ? lastSelectedUser : this;
-							
-							$(startingElem).nextUntil(endingElem).addBack().add(endingElem)
-								.addClass('draggableSelected');
-						} else {
-							if (!event.ctrlKey) {
-								// clear current sleection
-								$(this).siblings().addBack().removeClass('draggableSelected');
-							}
-							
-							if (wasSelected && !event.shiftKey){
-								$(this).removeClass('draggableSelected');
-								lastSelectedUsers[parentId] = null;
-							} else {
-								$(this).addClass('draggableSelected');
-								lastSelectedUsers[parentId] = this;
-							}
+							// copy selected users
+							var helperContainer = $('<div />');
+							$(this).siblings('.draggableSelected').addBack().each(function(){
+								$(this).clone().appendTo(helperContainer);
+							});
+							return helperContainer;
 						}
-					});
-			}
+				})
+			
+				.click(function(event){
+					var wasSelected = $(this).hasClass('draggableSelected');
+					var parentId = $(this).parent().parent().attr('id');
+					// this is needed for shift+click
+					var lastSelectedUser = lastSelectedUsers[parentId];
+					
+					if (event.shiftKey && lastSelectedUser && lastSelectedUser != this) {
+						// clear current selection
+						$(this).siblings().addBack().removeClass('draggableSelected');
+						
+						// find range of users to select
+						var lastSelectedIndex = $(lastSelectedUser).index();
+						var index = $(this).index();
+						
+						var startingElem = lastSelectedIndex > index ? this : lastSelectedUser;
+						var endingElem = lastSelectedIndex > index ? lastSelectedUser : this;
+						
+						$(startingElem).nextUntil(endingElem).addBack().add(endingElem)
+							.addClass('draggableSelected');
+					} else {
+						if (!event.ctrlKey) {
+							// clear current sleection
+							$(this).siblings().addBack().removeClass('draggableSelected');
+						}
+						
+						if (wasSelected && !event.shiftKey){
+							$(this).removeClass('draggableSelected');
+							lastSelectedUsers[parentId] = null;
+						} else {
+							$(this).addClass('draggableSelected');
+							lastSelectedUsers[parentId] = this;
+						}
+					}
+				});
 			
 			if (!createOnServer) {
 				$('.userContainer', container).append(userDiv);
@@ -209,48 +204,46 @@ function fillGroup(users, container) {
 		sortUsers(container);
 	});
 	
-	if (canEdit) {
-		$(container).droppable({
-		   'activeClass' : 'droppableHighlight',
-		   'tolerance'   : 'pointer',
-		   'drop'        : function (event, ui) {
-			   var draggableUserContainer = $(ui.draggable).parent();
-			   var thisUserContainer = $('.userContainer', this);
-			   // do not do anything if it is the same container
-			   // using "accept" feature breaks the layout
-			   if (draggableUserContainer[0] !=  thisUserContainer[0]) {
-				   var executeDrop = !lessonMode;
-				   if (!executeDrop) {
-					   var transferToLocked = $(this).hasClass('locked');
-					   // make sure user wants to transfer learners to a group which is already in use
-					   executeDrop = !transferToLocked || confirm(LABELS.TRANSFER_LOCKED_LABEL);
-					   if (executeDrop) {
-						   var userIds = [];
-						   $('div.draggableSelected', draggableUserContainer).each(function(){
-							   userIds.push($(this).attr('userId'));
-						   });
-						   // execute transfer on server side
-						   executeDrop = assignUsersToGroup(userIds, $(this));
-					   }
-			       }
-				   
+	$(container).droppable({
+	   'activeClass' : 'droppableHighlight',
+	   'tolerance'   : 'pointer',
+	   'drop'        : function (event, ui) {
+		   var draggableUserContainer = $(ui.draggable).parent();
+		   var thisUserContainer = $('.userContainer', this);
+		   // do not do anything if it is the same container
+		   // using "accept" feature breaks the layout
+		   if (draggableUserContainer[0] !=  thisUserContainer[0]) {
+			   var executeDrop = !lessonMode;
+			   if (!executeDrop) {
+				   var transferToLocked = $(this).hasClass('locked');
+				   // make sure user wants to transfer learners to a group which is already in use
+				   executeDrop = !transferToLocked || confirm(LABELS.TRANSFER_LOCKED_LABEL);
 				   if (executeDrop) {
-					   transferUsers(draggableUserContainer, thisUserContainer);
+					   var userIds = [];
+					   $('div.draggableSelected', draggableUserContainer).each(function(){
+						   userIds.push($(this).attr('userId'));
+					   });
+					   // execute transfer on server side
+					   executeDrop = assignUsersToGroup(userIds, $(this));
 				   }
-			   }  
-		   }
-		});
+		       }
+			   
+			   if (executeDrop) {
+				   transferUsers(draggableUserContainer, thisUserContainer);
+			   }
+		   }  
+	   }
+	});
+
 	
-		
-		$('.removeGroupButton', container).click(function(){
-			removeGroup(container);
+	$('.removeGroupButton', container).click(function(){
+		removeGroup(container);
+	});
+	
+	if (lessonMode) {
+		$('input', container).blur(function(){
+			renameGroup(container);
 		});
-		
-		if (lessonMode) {
-			$('input', container).blur(function(){
-				renameGroup(container);
-			});
-		}
 	}
 }
 
@@ -389,7 +382,7 @@ function renameGroup(container) {
  * Save a course grouping.
  */
 function saveGroups(){
-	if (!canEdit || lessonMode) {
+	if (lessonMode) {
 		return false;
 	}
 	$('.errorMessage').hide();
@@ -580,10 +573,6 @@ function showPrintPage() {
 	}
 	
 	function importGroupsFromSpreadsheet() {
-		if (!canEdit) {
-			return false;
-		}
-
 		disableButtons();
 		var file = getValidateSpreadsheetFile();
 		if ( file != null && ( ! warnBeforeUpload || confirm(LABELS.WARNING_REPLACE_GROUPS_LABEL) ) ) {
