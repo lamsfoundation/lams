@@ -316,7 +316,7 @@ public class Group implements Serializable, Nullable, Comparable<Group> {
      * attached
      */
     public boolean mayBeDeleted() {
-	return getToolSessions().size() == 0;
+	return getToolSessions() == null || getToolSessions().size() == 0;
     }
 
     /**

@@ -64,6 +64,7 @@
 			<lams:Tab id="1" key="label.tab.lesson" />
 			<lams:Tab id="2" key="label.tab.class" />
 			<lams:Tab id="3" key="label.tab.advanced" />
+			<lams:Tab id="3" key="label.tab.grouping" />
 			<lams:Tab id="4" key="label.tab.conditions" />
 		</lams:Tabs>
 		<lams:TabBodyArea>
@@ -291,6 +292,22 @@
 				</lams:TabBody>
 				
 				<lams:TabBody id="4">
+					<div id="tabLessonTitle" class="tabTitle bg-warning"><fmt:message key="label.tab.grouping" /></div>
+					<p><fmt:message key="label.tab.grouping.desc.1" /></p>
+					<p><fmt:message key="label.tab.grouping.desc.2" /></p>
+					<div>
+						<select name="orgGroupingId">
+							<option>none</option>
+							<c:forEach var="orgGrouping" items="${orgGroupings}">
+								<option value="${orgGrouping.groupingId}">
+									<c:out value="${orgGrouping.name}" />
+								</option>
+							</c:forEach>
+						</select>
+					</div>
+				</lams:TabBody>
+				
+				<lams:TabBody id="5">
 					<!-- Conditions Panel -->
 					<div class="lead"><fmt:message key="label.tab.conditions.dependencies" /></div>
 					<div class="options">

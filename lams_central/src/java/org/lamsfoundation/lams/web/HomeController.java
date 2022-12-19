@@ -28,6 +28,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -53,6 +54,7 @@ import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationGrouping;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -304,6 +306,10 @@ public class HomeController {
 
 	// find subgroups which can be set as multiple lessons start
 	req.setAttribute("subgroups", organisation.getChildOrganisations());
+
+	List<OrganisationGrouping> orgGroupings = userManagementService.findByProperty(OrganisationGrouping.class,
+		"organisationId", organisationID);
+	req.setAttribute("orgGroupings", orgGroupings);
 
 	return "addLesson";
     }

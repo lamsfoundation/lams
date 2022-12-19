@@ -52,6 +52,7 @@ import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupComparator;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
+import org.lamsfoundation.lams.learningdesign.service.LearningDesignService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.security.ISecurityService;
@@ -144,7 +145,7 @@ public class OrganisationGroupController {
 	// show groups page if this is a lesson mode and user have already chosen a grouping or there is no organisation
 	// groupings available
 	boolean lessonGroupsExist = (grouping != null) && (grouping.getGroups() != null)
-		&& !grouping.getGroups().isEmpty() && !isDefaultChosenGrouping(grouping);
+		&& !grouping.getGroups().isEmpty() && !LearningDesignService.isDefaultChosenGrouping(grouping);
 	if (lessonGroupsExist || (activityID != null && orgGroupings.isEmpty())) {
 	    return viewGroups(request, response, organisationId, targetOrganisationId);
 	}
@@ -243,7 +244,7 @@ public class OrganisationGroupController {
 	Grouping lessonGrouping = getLessonGrouping(activityId);
 	Set<Group> lessonGroups = lessonGrouping == null ? null : lessonGrouping.getGroups();
 	if ((activityId != null) && (lessonGrouping != null) && (isExternalGroupsSelected || (orgGroupingId != null))
-		&& isDefaultChosenGrouping(lessonGrouping)) {
+		&& LearningDesignService.isDefaultChosenGrouping(lessonGrouping)) {
 	    if (log.isDebugEnabled()) {
 		log.debug("Removing default groups for grouping " + orgGroupingId);
 	    }
@@ -598,24 +599,6 @@ public class OrganisationGroupController {
 	}
 
 	return null;
-    }
-
-    /**
-     * Check if the given groups are default for chosen grouping. There is actually no good way to detect this, but even
-     * if a custom grouping is mistaken for the default one, it should bring little harm.
-     */
-    private boolean isDefaultChosenGrouping(Grouping grouping) {
-	Set<Group> groups = grouping.getGroups();
-	for (Group group : groups) {
-	    if (!group.getUsers().isEmpty()) {
-		return false;
-	    }
-	}
-	if (groups == null || (grouping.getMaxNumberOfGroups() != null
-		&& !grouping.getMaxNumberOfGroups().equals(groups.size()))) {
-	    return false;
-	}
-	return true;
     }
 
     private UserDTO getUserDTO() {

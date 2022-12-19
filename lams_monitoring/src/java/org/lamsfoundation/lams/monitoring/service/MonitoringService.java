@@ -2703,7 +2703,6 @@ public class MonitoringService implements IMonitoringFullService {
 	}
     }
 
-    @SuppressWarnings("unchecked")
     private EmailProgressActivitiesProcessor getEmailProgressActivitiesProcessor(Long lessonId) {
 
 	// TODO custom SQL to get the ids, number of users & marks in one go

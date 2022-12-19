@@ -305,6 +305,7 @@ public class MonitoringController {
 	boolean imEnable = WebUtil.readBooleanParam(request, "imEnable", false);
 	Integer splitNumberLessons = WebUtil.readIntParam(request, "splitNumberLessons", true);
 	boolean schedulingEnable = WebUtil.readBooleanParam(request, "schedulingEnable", false);
+	Long orgGroupingId = WebUtil.readLongParam(request, "orgGroupingId", true);
 	Date schedulingDatetime = null;
 	Date schedulingEndDatetime = null;
 	if (schedulingEnable) {
@@ -384,6 +385,10 @@ public class MonitoringController {
 
 		    monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
 			    learnerGroupInstanceName, lessonInstanceLearners, staffGroupInstanceName, staff, userId);
+
+		    if (orgGroupingId != null) {
+			lessonService.performGrouping(lesson.getLearningDesign().getLearningDesignId(), orgGroupingId);
+		    }
 		} catch (SecurityException e) {
 		    try {
 			response.sendError(HttpServletResponse.SC_FORBIDDEN,
