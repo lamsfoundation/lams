@@ -64,8 +64,10 @@
 			<lams:Tab id="1" key="label.tab.lesson" />
 			<lams:Tab id="2" key="label.tab.class" />
 			<lams:Tab id="3" key="label.tab.advanced" />
-			<lams:Tab id="3" key="label.tab.grouping" />
-			<lams:Tab id="4" key="label.tab.conditions" />
+			<c:if test="${not empty orgGroupings}">
+				<lams:Tab id="4" key="label.tab.grouping" />
+			</c:if>
+			<lams:Tab id="5" key="label.tab.conditions" />
 		</lams:Tabs>
 		<lams:TabBodyArea>
 			<lams:TabBodys>
@@ -292,18 +294,24 @@
 				</lams:TabBody>
 				
 				<lams:TabBody id="4">
-					<div id="tabLessonTitle" class="tabTitle bg-warning"><fmt:message key="label.tab.grouping" /></div>
-					<p><fmt:message key="label.tab.grouping.desc.1" /></p>
-					<p><fmt:message key="label.tab.grouping.desc.2" /></p>
-					<div>
-						<select name="orgGroupingId">
-							<option>none</option>
-							<c:forEach var="orgGrouping" items="${orgGroupings}">
-								<option value="${orgGrouping.groupingId}">
+					
+						<p class="voffset10"><fmt:message key="label.tab.grouping.desc.1" /></p>
+						<p><fmt:message key="label.tab.grouping.desc.2" /></p>
+						<div class="loffset20">
+						<div class="checkbox">
+							<label>
+								<input name="orgGroupingId" type="radio" value="" checked/>
+								<fmt:message key="authoring.label.none" />
+							</label>
+						</div>
+						<c:forEach var="orgGrouping" items="${orgGroupings}">
+							<div class="checkbox">
+								<label>
+									<input name="orgGroupingId" type="radio" value="${orgGrouping.groupingId}"/>
 									<c:out value="${orgGrouping.name}" />
-								</option>
-							</c:forEach>
-						</select>
+								</label>
+							</div>
+						</c:forEach>
 					</div>
 				</lams:TabBody>
 				
