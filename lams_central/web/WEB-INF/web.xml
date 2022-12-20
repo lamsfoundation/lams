@@ -627,6 +627,7 @@
 			<url-pattern>/images/*</url-pattern>
 			<url-pattern>/includes/javascript/*</url-pattern>
 			<url-pattern>/includes/font-awesome/*</url-pattern>
+			<url-pattern>/includes/font-awesome6/*</url-pattern>
 			<url-pattern>/ckeditor/*</url-pattern>
 			<url-pattern>/favicon.ico</url-pattern>
 			<http-method>GET</http-method>
