@@ -25,6 +25,10 @@
 			#bottom-buttons {
 				text-align: right;
 				margin: 10px 10px 10px 0;
+			}		
+				
+			.requires-grading {
+				background-color: rgba(255, 195, 55, .6);
 			}
 		</style>
 		
@@ -107,6 +111,7 @@
 		  			   			"<fmt:message key="label.answer.rating.title" />",
 		  			  		</c:if>
 		  			   		"<fmt:message key="label.monitoring.user.summary.response" />",
+	  						'markedBy',
 		  			   		'userId',
 	  						'portraitId'
 	  					],
@@ -117,7 +122,8 @@
 							{name:'userName',index:'userName', width:83, searchoptions: { clearSearch: false }, formatter : function(cellvalue, options, rowObject) {
 				    			return definePortraitPopover(rowObject[rowObject.length - 1], rowObject[rowObject.length - 2], rowObject[2]);
 							}},
-							{name:'grade', index:'grade', width:30, sorttype:"float", search:false, editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' },
+							{name:'grade', index:'grade', width:30, sorttype:"float", search:false, editable:true,
+								editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align', title : false},
 	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels and questionDto.type != 8}">
 			  			   		{name:'confidence', index:'confidence', width: 80, search:false, classes: 'vertical-align', formatter: gradientNumberFormatter},
 			  			  	</c:if>
@@ -125,6 +131,7 @@
 				  				{name:'rating', index:'rating', width:120, align:"center", sortable:false, search:false},
 		  			  		</c:if>
 			  			   	{name:'response', index:'response', width:400, sortable:false, search:false, formatter: responseFormatter},
+		  				   	{name:'markedBy', index:'markedBy', width:0, hidden: true},
 			  				{name:'userId', index:'userId', width:0, hidden: true},
 		  				   	{name:'portraitId', index:'portraitId', width:0, hidden: true}
 	  				   	],
@@ -170,6 +177,26 @@
 	  							CodeMirror.colorize($('.code-style'));
 	  						}
   					    },
+  					    gridComplete : function(){
+  					    	let questionType = ${questionDto.type};
+  					    	// highlight essay questions which have not been graded
+	  						if (questionType == 6) {
+	  							let table = jQuery("#session${sessionDto.sessionId}"),
+	  								rows = table.getDataIDs();
+	  							for (rowIndex = 0;rowIndex < rows.length; rowIndex++) {
+		  							 let rowData = jQuery("#session${sessionDto.sessionId}").getRowData(rows[rowIndex]),
+		  							 	 requiresMarking = rowData.markedBy == "" && rowData.grade == 0;
+	  								 table.setCell(rows[rowIndex], "grade", "", requiresMarking ? 'requires-grading' : '',
+	  		  						 requiresMarking ? {
+	  									title : "<fmt:message key='label.monitoring.user.summary.grade.required' />"
+		  		  					 } :
+			  		  			     (rowData.markedBy == "" ? null : {
+			  		  					title : "<fmt:message key='label.monitoring.user.summary.grade.by'><fmt:param> </fmt:param></fmt:message>"
+	  			         		   		   + rowData.markedBy
+			  		  				 }));
+		  						 }
+	  						}
+  	  					},
   					    subGrid: true,
   						subGridOptions: {
   							reloadOnExpand : false,

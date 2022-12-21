@@ -628,6 +628,7 @@ public class MonitoringController {
 		}
 
 		userData.add(response);
+		userData.add(questionResult.getMarkedBy() == null ? "" : questionResult.getMarkedBy().getFullName());
 	    } else {
 		userData.add("");
 		userData.add("");
@@ -640,6 +641,7 @@ public class MonitoringController {
 		    userData.add("-");
 		}
 		userData.add("-");
+		userData.add("");
 	    }
 
 	    userData.add(userDto.getUserId());
@@ -935,7 +937,8 @@ public class MonitoringController {
 	if (grouping != null) {
 	    Set<Group> groups = grouping.getGroups();
 	    for (Group group : groups) {
-		if (!group.getUsers().isEmpty() && group.getGroupName().toLowerCase().contains(searchString.toLowerCase())) {
+		if (!group.getUsers().isEmpty()
+			&& group.getGroupName().toLowerCase().contains(searchString.toLowerCase())) {
 		    ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
 		    groupJSON.put("label", groupLabel + group.getGroupName() + "\"");
 		    groupJSON.put("value", "group-" + group.getGroupId());

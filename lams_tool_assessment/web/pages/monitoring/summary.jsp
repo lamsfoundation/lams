@@ -124,7 +124,8 @@
 	  			   	{name:'id', index:'id', width:20, sorttype:"int"},
 	  			   	{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
 	  			   	{name:'title', index:'title', width: 200},
-	  			    {name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' },
+	  			    {name:'grade', index:'grade', width:80, sorttype:"float", editable:true, 
+		  			    editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align', title : false },
 	  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
 	  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align', formatter: gradientNumberFormatter},
 	  			  	</c:if>

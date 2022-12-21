@@ -25,8 +25,22 @@
  	   	   		grade:"<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>"
  	   	   	});
 
+ 	   	   	<c:set var="requiresMarking"
+ 	 	   	   	   value="${empty questionResult.markedBy and question.type eq 6 and questionResult.mark eq 0}" />
  	 	    // set maxGrade attribute to cell DOM element
- 	 	    table.setCell(${i.index + 1}, "grade", "", null, {"maxGrade" :  "${questionResult.maxMark}"});
+ 	 	    table.setCell(${i.index + 1}, "grade", "", ${requiresMarking ? "'requires-grading'" : "null"},
+ 	 	 	   {"maxGrade" :  "${questionResult.maxMark}"
+ 	 	 	    <c:choose>
+	 	 	    	<c:when test="${requiresMarking}">
+	 	 	    		,"title" : "<fmt:message key='label.monitoring.user.summary.grade.required' />"
+	 	 	    	</c:when>
+	 	 	    	<c:when test="${not empty questionResult.markedBy}">
+	 	 	  			,"title" : "<fmt:message key='label.monitoring.user.summary.grade.by'>
+		 	 	  						<fmt:param><c:out value='${questionResult.markedBy.fullName}' /></fmt:param>
+		 	 	  					</fmt:message>"
+	 	 	    	</c:when>
+	 	 	    </c:choose>
+ 	 	 	    });
 		</c:forEach>
 
 		if (typeof CodeMirror != 'undefined') {
