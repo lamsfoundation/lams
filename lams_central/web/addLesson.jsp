@@ -18,7 +18,8 @@
 	<script type="text/javascript" src="${lams}includes/javascript/learning-design-treeview.js" ></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/addLesson.js"></script>
+	<lams:JSImport src="includes/javascript/dialog.js" />
+	<lams:JSImport src="includes/javascript/addLesson.js" />
 	<script type="text/javascript">
 		var userId = '<lams:user property="userID"/>',
 			users = ${users},
@@ -39,6 +40,7 @@
 			LABEL_NAME_INVALID_CHARACTERS = '<fmt:message key="error.lessonname.invalid.characters" />',
 			LABEL_PREVIEW_LESSON_DEFAULT_TITLE = '<fmt:message key="authoring.fla.preview.lesson.default.title" />',
 			LABEL_PREVIEW_ERROR = '<fmt:message key="authoring.fla.preview.error" />';
+			LABEL_ORG_GROUPING_DIALOG_TITLE = '<fmt:message key="label.course.groups.viewonly.title" />';
 			
  		$(document).ready(function(){
 			initLessonTab();
@@ -309,7 +311,14 @@
 								<label>
 									<input name="orgGroupingId" type="radio" value="${orgGrouping.groupingId}"/>
 									<c:out value="${orgGrouping.name}" />
+									<span title='<fmt:message key="label.course.groups.grouping.count.tooltip" />'>
+										(${orgGrouping.groupCount})
+									</span>
 								</label>
+								<i class="fa fa-external-link show-grouping-link"
+								   title='<fmt:message key="label.course.groups.viewonly.title" />' 
+								   onClick="javascript:showOrgGrouping(${orgGrouping.groupingId})"></i>
+								
 							</div>
 						</c:forEach>
 					</div>

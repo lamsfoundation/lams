@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationGrouping;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.OrganisationGroupingDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -309,7 +310,11 @@ public class HomeController {
 
 	List<OrganisationGrouping> orgGroupings = userManagementService.findByProperty(OrganisationGrouping.class,
 		"organisationId", organisationID);
-	req.setAttribute("orgGroupings", orgGroupings);
+	Set<OrganisationGroupingDTO> orgGroupingDTOs = new TreeSet<>();
+	for (OrganisationGrouping orgGrouping : orgGroupings) {
+	    orgGroupingDTOs.add(new OrganisationGroupingDTO(orgGrouping));
+	}
+	req.setAttribute("orgGroupings", orgGroupingDTOs);
 
 	return "addLesson";
     }

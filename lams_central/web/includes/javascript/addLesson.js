@@ -749,3 +749,19 @@ function updateSplitLearnersFields(){
 		$('#splitLearnersDescription').html(description);
 	}
 }
+
+// ********** GROUPING TAB FUNCTIONS *******
+
+function showOrgGrouping(groupingId){
+	showDialog("dialogOrgGrouping", {
+		'title' : LABEL_ORG_GROUPING_DIALOG_TITLE,
+		'modal' : true,
+		'width' : 800,
+		'height': 550,
+		'open' : function() {
+			var dialog = $(this);
+			// load contents after opening the dialog
+			$('iframe', dialog).attr('src', LAMS_URL + 'monitoring/grouping/printGrouping.do?groupingId=' + groupingId);
+		}
+	});
+}
