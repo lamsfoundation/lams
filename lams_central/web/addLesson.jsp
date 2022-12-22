@@ -23,6 +23,7 @@
 	<script type="text/javascript">
 		var userId = '<lams:user property="userID"/>',
 			users = ${users},
+			orgGroupingsAvailable = ${not empty orgGroupings},
 			
 			LAMS_URL = '<lams:LAMSURL/>',
 			LD_THUMBNAIL_URL_BASE = LAMS_URL + 'home/getLearningDesignThumbnail.do?ldId=',
@@ -65,10 +66,10 @@
 		<lams:Tabs>
 			<lams:Tab id="1" key="label.tab.lesson" />
 			<lams:Tab id="2" key="label.tab.class" />
-			<lams:Tab id="3" key="label.tab.advanced" />
 			<c:if test="${not empty orgGroupings}">
-				<lams:Tab id="4" key="label.tab.grouping" />
+				<lams:Tab id="3" key="label.tab.grouping" />
 			</c:if>
+			<lams:Tab id="4" key="label.tab.advanced" />
 			<lams:Tab id="5" key="label.tab.conditions" />
 		</lams:Tabs>
 		<lams:TabBodyArea>
@@ -161,7 +162,46 @@
 					</table>
 				</lams:TabBody>
 				
-				<lams:TabBody id="3">
+				<c:if test="${not empty orgGroupings}">
+					<lams:TabBody id="3">
+						<!-- Course groupings panel -->
+						<div class="row voffset10">
+							<div class="col-sm-8 col-sm-offset-2" id="grouping-tab-desc">
+								<p id="grouping-tab-desc-select"><fmt:message key="label.tab.grouping.desc" /></p>
+								<div class="alert alert-info text-center" role="alert" id="grouping-tab-desc-none">
+									<fmt:message key="label.tab.grouping.none" />
+								</div>
+							</div>
+						</div>
+						
+						<div class="row loffset20" id="grouping-tab-select">
+							<div class="col-sm-8 col-sm-offset-2">
+								<div class="checkbox">
+									<label>
+										<input name="orgGroupingId" type="radio" value="" checked/>
+										<fmt:message key="authoring.label.none" />
+									</label>
+								</div>
+								<c:forEach var="orgGrouping" items="${orgGroupings}">
+									<div class="checkbox">
+										<label>
+											<input name="orgGroupingId" type="radio" value="${orgGrouping.groupingId}"/>
+											<c:out value="${orgGrouping.name}" />
+											<span title='<fmt:message key="label.course.groups.grouping.count.tooltip" />'>
+												(${orgGrouping.groupCount})
+											</span>
+										</label>
+										<i class="fa fa-external-link show-grouping-link"
+										   title='<fmt:message key="label.course.groups.viewonly.title" />' 
+										   onClick="javascript:showOrgGrouping(${orgGrouping.groupingId})"></i>
+										
+									</div>
+								</c:forEach>
+							</div>
+						</div>
+					</lams:TabBody>
+				</c:if>
+				<lams:TabBody id="4">
 					<!-- Advanced Panel -->
 					<input id="organisation-id" name="organisationID" value="${param.organisationID}" type="hidden" />
 					<input id="ldIdField" name="learningDesignID" type="hidden" />
@@ -293,35 +333,6 @@
 							</c:forEach>
 						</div>
 					</c:if>
-				</lams:TabBody>
-				
-				<lams:TabBody id="4">
-					
-						<p class="voffset10"><fmt:message key="label.tab.grouping.desc.1" /></p>
-						<p><fmt:message key="label.tab.grouping.desc.2" /></p>
-						<div class="loffset20">
-						<div class="checkbox">
-							<label>
-								<input name="orgGroupingId" type="radio" value="" checked/>
-								<fmt:message key="authoring.label.none" />
-							</label>
-						</div>
-						<c:forEach var="orgGrouping" items="${orgGroupings}">
-							<div class="checkbox">
-								<label>
-									<input name="orgGroupingId" type="radio" value="${orgGrouping.groupingId}"/>
-									<c:out value="${orgGrouping.name}" />
-									<span title='<fmt:message key="label.course.groups.grouping.count.tooltip" />'>
-										(${orgGrouping.groupCount})
-									</span>
-								</label>
-								<i class="fa fa-external-link show-grouping-link"
-								   title='<fmt:message key="label.course.groups.viewonly.title" />' 
-								   onClick="javascript:showOrgGrouping(${orgGrouping.groupingId})"></i>
-								
-							</div>
-						</c:forEach>
-					</div>
 				</lams:TabBody>
 				
 				<lams:TabBody id="5">

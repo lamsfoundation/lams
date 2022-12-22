@@ -237,5 +237,9 @@ span#splitLearnersDescription {
 }
 
 .show-grouping-link {
-	cursor: pointer;
+  cursor: pointer;
+}
+
+#grouping-tab-select, #grouping-tab-desc-select {
+  display: none;
 }

@@ -59,6 +59,7 @@ import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
@@ -1542,6 +1543,19 @@ public class MonitoringController {
 	}
 
 	return "timer";
+    }
+
+    @RequestMapping(path = "/isLearningDesignHasGroupings", method = RequestMethod.GET)
+    @ResponseBody
+    public String isLearningDesignHasGroupings(@RequestParam long learningDesignId) {
+	LearningDesign learningDesign = learningDesignService.getLearningDesign(learningDesignId);
+	for (Activity activity : learningDesign.getActivities()) {
+	    if (activity.isGroupingActivity()
+		    && !((GroupingActivity) activity).getCreateGrouping().isUsedForBranching()) {
+		return Boolean.TRUE.toString();
+	    }
+	}
+	return Boolean.FALSE.toString();
     }
 
     /**
