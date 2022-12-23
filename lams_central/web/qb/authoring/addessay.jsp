@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="isNewQuestion" value="${assessmentQuestionForm.uid eq -1}" />
 
 <lams:html>
 <lams:head>
@@ -15,6 +16,7 @@
 	<script type="text/javascript">
 		const VALIDATION_ERROR_LABEL = "<fmt:message key='error.form.validation.error'/>";
 		const VALIDATION_ERRORS_LABEL = "<fmt:message key='error.form.validation.errors'><fmt:param >{errors_counter}</fmt:param></fmt:message>";
+		var isNewQuestion = ${isNewQuestion};
 	</script>
 	<lams:JSImport src="includes/javascript/qb-question.js" />
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
@@ -120,6 +122,8 @@
 			        });
 				}
 		    }).change();
+
+	        $('#saveAsButton').show();
 		});
 		
 		
