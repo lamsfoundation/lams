@@ -8,7 +8,7 @@
 <c:if test="${not empty questions}">
 <div class="card">
 <div class="table-responsive card-body pb-0" style="margin:0">
-	<table id="questions-data" class="table table-bordered table-hover table-condensed">
+	<table id="questions-data" class="table table-bordered table-condensed">
 		<thead>
 			<tr role="row" class="border-top-0">
 				<th class="text-center">
@@ -32,8 +32,19 @@
 					</td>
 					
 					<c:forEach var="option" items="${question.optionDtos}">
-						<td class="align-middle text-center <c:if test='${option.correct}'>bg-success text-white</c:if>">
-							<fmt:formatNumber type="number" maxFractionDigits="2" value="${option.percentage}"/>%
+						<c:set var="highlightClass">
+							<c:choose>
+								<c:when test="${option.correct and (option.percentage == -1 or option.percentage > 95)}">bg-success text-white</c:when>
+								<c:when test="${option.correct and option.percentage < 40}">bg-danger text-white</c:when>
+								<c:when test="${option.correct and option.percentage < 75}">bg-warning</c:when>
+								<c:otherwise></c:otherwise>
+							</c:choose>
+						</c:set>
+						<td class="align-middle text-center ${highlightClass}">
+							<c:choose>
+								<c:when test="${option.percentage == -1}">-</c:when>
+								<c:otherwise><fmt:formatNumber type="number" maxFractionDigits="2" value="${option.percentage}"/>%</c:otherwise>
+							</c:choose>
 						</td>
 					</c:forEach>
 					

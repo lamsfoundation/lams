@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.tool.assessment.web.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -113,18 +114,24 @@ public class TblMonitoringController {
 	request.setAttribute("maxOptionsInQuestion", maxOptionsInQuestion);
 	request.setAttribute("vsaPresent", vsaPresent);
 
-	int totalNumberOfUsers = assessmentService.getCountUsersByContentId(toolContentId);
-	if (totalNumberOfUsers > 0) {
-	    for (QuestionDTO questionDto : questionDtos) {
+	for (QuestionDTO questionDto : questionDtos) {
+	    Map<Long, Integer> optionsAttempts = new HashMap<>();
+	    int questionAttempts = 0;
+	    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+		int optionAttempts = assessmentService.countAttemptsPerOption(toolContentId, optionDto.getUid());
 
-		// build candidate dtos
-		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-		    int optionAttemptCount = assessmentService.countAttemptsPerOption(toolContentId,
-			    optionDto.getUid());
+		optionsAttempts.put(optionDto.getUid(), optionAttempts);
+		questionAttempts += optionAttempts;
+	    }
 
-		    float percentage = (float) (optionAttemptCount * 100) / totalNumberOfUsers;
-		    optionDto.setPercentage(percentage);
+	    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+		if (questionAttempts == 0) {
+		    optionDto.setPercentage(-1);
+		    continue;
 		}
+
+		float percentage = (float) (optionsAttempts.get(optionDto.getUid()) * 100) / questionAttempts;
+		optionDto.setPercentage(percentage);
 	    }
 	}
 	request.setAttribute("questions", questionDtos);
