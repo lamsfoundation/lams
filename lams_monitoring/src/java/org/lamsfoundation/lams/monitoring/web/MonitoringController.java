@@ -1548,10 +1548,10 @@ public class MonitoringController {
     @RequestMapping(path = "/isLearningDesignHasGroupings", method = RequestMethod.GET)
     @ResponseBody
     public String isLearningDesignHasGroupings(@RequestParam long learningDesignId) {
-	LearningDesign learningDesign = learningDesignService.getLearningDesign(learningDesignId);
-	for (Activity activity : learningDesign.getActivities()) {
-	    if (activity.isGroupingActivity()
-		    && !((GroupingActivity) activity).getCreateGrouping().isUsedForBranching()) {
+	List<GroupingActivity> groupingActivities = monitoringService
+		.getGroupingActivitiesByLearningDesignId(learningDesignId);
+	for (GroupingActivity activity : groupingActivities) {
+	    if (!activity.getCreateGrouping().isUsedForBranching()) {
 		return Boolean.TRUE.toString();
 	    }
 	}

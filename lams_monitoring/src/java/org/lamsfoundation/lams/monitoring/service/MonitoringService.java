@@ -2007,6 +2007,11 @@ public class MonitoringService implements IMonitoringFullService {
     }
 
     @Override
+    public List<GroupingActivity> getGroupingActivitiesByLearningDesignId(Long learningDesignId) {
+	return activityDAO.getGroupingActivitiesByLearningDesignId(learningDesignId);
+    }
+
+    @Override
     public GroupingActivity getGroupingActivityById(Long activityID) {
 	Activity activity = getActivityById(activityID);
 	if (activity == null) {
