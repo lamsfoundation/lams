@@ -25,22 +25,43 @@
 		<tbody>
 			<c:forEach var="question" items="${questions}" varStatus="i">
 				<tr>
-					<td class="text-center">
-						<a data-bs-toggle="modal" data-bs-target="#question${i.index}Modal" href="#"class="fs-5">
+					<c:set var="correctOptionPercentage" value="-1" />
+					<c:forEach var="option" items="${question.optionDtos}">
+						<c:if test="${option.correct}">
+							<c:set var="correctOptionPercentage" value="${option.percentage}" />
+						</c:if>
+					</c:forEach>
+					<c:choose>
+						<c:when test="${correctOptionPercentage > 95}">
+							<c:set var="highlightClass" value="bg-success" />
+							<c:set var="textClass" value="text-white" />
+						</c:when>
+						<c:when test="${correctOptionPercentage >= 0 and correctOptionPercentage < 40}">
+							<c:set var="highlightClass" value="bg-danger" />
+							<c:set var="textClass" value="text-white" />
+						</c:when>
+						<c:when test="${correctOptionPercentage >= 0 and correctOptionPercentage < 75}">
+							<c:set var="highlightClass" value="bg-warning" />
+							<c:set var="textClass" value="" />
+						</c:when>
+						<c:otherwise>
+							<c:set var="highlightClass" value="" />
+							<c:set var="textClass" value="" />
+						</c:otherwise>
+					</c:choose>
+					
+					<td class="text-center ${highlightClass}">
+						<a data-bs-toggle="modal" data-bs-target="#question${i.index}Modal" href="#" class="fs-5 ${textClass}">
 							${i.index+1}
 						</a>
 					</td>
 					
 					<c:forEach var="option" items="${question.optionDtos}">
-						<c:set var="highlightClass">
-							<c:choose>
-								<c:when test="${option.correct and (option.percentage == -1 or option.percentage > 95)}">bg-success text-white</c:when>
-								<c:when test="${option.correct and option.percentage < 40}">bg-danger text-white</c:when>
-								<c:when test="${option.correct and option.percentage < 75}">bg-warning</c:when>
-								<c:otherwise></c:otherwise>
-							</c:choose>
-						</c:set>
-						<td class="align-middle text-center ${highlightClass}">
+						<td class="align-middle text-center
+							<c:if test="${option.correct}">
+								fw-bolder fs-5" title="<fmt:message key="label.authoring.true.false.correct.answer"/>
+							</c:if>
+							">
 							<c:choose>
 								<c:when test="${option.percentage == -1}">-</c:when>
 								<c:otherwise><fmt:formatNumber type="number" maxFractionDigits="2" value="${option.percentage}"/>%</c:otherwise>
