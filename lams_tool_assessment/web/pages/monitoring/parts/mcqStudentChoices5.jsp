@@ -1,13 +1,18 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<link href="<lams:WebAppURL/>includes/css/assessment.css" rel="stylesheet" type="text/css">
+
 <script>
 	$('#allocate-vsas-button').toggle(${vsaPresent});
+	$(function () {
+		$('[data-toggle="tooltip"]').tooltip()
+	})	
 </script>
 
 <!-- Table -->
 <c:if test="${not empty questions}">
 <div class="card">
-<div class="table-responsive card-body pb-0" style="margin:0">
+<div class="table-responsive table-hover card-body pb-0" style="margin:0">
 	<table id="questions-data" class="table table-bordered table-condensed">
 		<thead>
 			<tr role="row" class="border-top-0">
@@ -33,15 +38,15 @@
 					</c:forEach>
 					<c:choose>
 						<c:when test="${correctOptionPercentage > 95}">
-							<c:set var="highlightClass" value="bg-success" />
+							<c:set var="highlightClass" value="bg-success border-success" />
 							<c:set var="textClass" value="text-white" />
 						</c:when>
 						<c:when test="${correctOptionPercentage >= 0 and correctOptionPercentage < 40}">
-							<c:set var="highlightClass" value="bg-danger" />
+							<c:set var="highlightClass" value="bg-danger border-danger" />
 							<c:set var="textClass" value="text-white" />
 						</c:when>
 						<c:when test="${correctOptionPercentage >= 0 and correctOptionPercentage < 75}">
-							<c:set var="highlightClass" value="bg-warning" />
+							<c:set var="highlightClass" value="bg-warning border-warning" />
 							<c:set var="textClass" value="" />
 						</c:when>
 						<c:otherwise>
@@ -50,8 +55,8 @@
 						</c:otherwise>
 					</c:choose>
 					
-					<td class="text-center ${highlightClass}">
-						<a data-bs-toggle="modal" data-bs-target="#question${i.index}Modal" href="#" class="fs-5 ${textClass}">
+					<td class="text-center">
+						<a data-bs-toggle="modal" data-bs-target="#question${i.index}Modal" href="#" class="${highlightClass} fs-5 ${textClass} aQuestionLink">
 							${i.index+1}
 						</a>
 					</td>
@@ -59,9 +64,10 @@
 					<c:forEach var="option" items="${question.optionDtos}">
 						<td class="align-middle text-center
 							<c:if test="${option.correct}">
-								fw-bolder fs-5" title="<fmt:message key="label.authoring.true.false.correct.answer"/>
+								fw-bolder text-success fs-5" title="<fmt:message key="label.authoring.true.false.correct.answer"/>
 							</c:if>
-							">
+							"  data-toggle="tooltip" data-placement="top"
+							>
 							<c:choose>
 								<c:when test="${option.percentage == -1}">-</c:when>
 								<c:otherwise><fmt:formatNumber type="number" maxFractionDigits="2" value="${option.percentage}"/>%</c:otherwise>
