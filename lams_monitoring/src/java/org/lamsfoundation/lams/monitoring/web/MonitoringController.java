@@ -59,6 +59,7 @@ import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
@@ -305,6 +306,7 @@ public class MonitoringController {
 	boolean imEnable = WebUtil.readBooleanParam(request, "imEnable", false);
 	Integer splitNumberLessons = WebUtil.readIntParam(request, "splitNumberLessons", true);
 	boolean schedulingEnable = WebUtil.readBooleanParam(request, "schedulingEnable", false);
+	Long orgGroupingId = WebUtil.readLongParam(request, "orgGroupingId", true);
 	Date schedulingDatetime = null;
 	Date schedulingEndDatetime = null;
 	if (schedulingEnable) {
@@ -384,6 +386,10 @@ public class MonitoringController {
 
 		    monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
 			    learnerGroupInstanceName, lessonInstanceLearners, staffGroupInstanceName, staff, userId);
+
+		    if (orgGroupingId != null) {
+			lessonService.performGrouping(lesson.getLearningDesign().getLearningDesignId(), orgGroupingId);
+		    }
 		} catch (SecurityException e) {
 		    try {
 			response.sendError(HttpServletResponse.SC_FORBIDDEN,
@@ -1537,6 +1543,19 @@ public class MonitoringController {
 	}
 
 	return "timer";
+    }
+
+    @RequestMapping(path = "/isLearningDesignHasGroupings", method = RequestMethod.GET)
+    @ResponseBody
+    public String isLearningDesignHasGroupings(@RequestParam long learningDesignId) {
+	List<GroupingActivity> groupingActivities = monitoringService
+		.getGroupingActivitiesByLearningDesignId(learningDesignId);
+	for (GroupingActivity activity : groupingActivities) {
+	    if (!activity.getCreateGrouping().isUsedForBranching()) {
+		return Boolean.TRUE.toString();
+	    }
+	}
+	return Boolean.FALSE.toString();
     }
 
     /**

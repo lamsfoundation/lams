@@ -121,6 +121,11 @@ public interface ILessonService {
     void performGrouping(Long lessonId, GroupingActivity groupingActivity, User learner) throws LessonServiceException;
 
     /**
+     * Applies given course grouping to all non-branch, non-modified groupings in the given Learnin Design.
+     */
+    void performGrouping(long learningDesignId, long orgGroupingId);
+
+    /**
      * Perform the grouping, setting the given list of learners as one group.
      *
      * @param groupingActivity

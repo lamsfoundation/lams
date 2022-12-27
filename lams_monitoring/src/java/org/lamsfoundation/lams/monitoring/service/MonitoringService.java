@@ -2007,6 +2007,11 @@ public class MonitoringService implements IMonitoringFullService {
     }
 
     @Override
+    public List<GroupingActivity> getGroupingActivitiesByLearningDesignId(Long learningDesignId) {
+	return activityDAO.getGroupingActivitiesByLearningDesignId(learningDesignId);
+    }
+
+    @Override
     public GroupingActivity getGroupingActivityById(Long activityID) {
 	Activity activity = getActivityById(activityID);
 	if (activity == null) {
@@ -2703,7 +2708,6 @@ public class MonitoringService implements IMonitoringFullService {
 	}
     }
 
-    @SuppressWarnings("unchecked")
     private EmailProgressActivitiesProcessor getEmailProgressActivitiesProcessor(Long lessonId) {
 
 	// TODO custom SQL to get the ids, number of users & marks in one go

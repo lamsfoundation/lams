@@ -235,3 +235,11 @@ span#splitLearnersDescription {
 	border-top: $border-thin-default-light;	
 	width: 100%;
 }
+
+.show-grouping-link {
+  cursor: pointer;
+}
+
+#grouping-tab-select, #grouping-tab-desc-select {
+  display: none;
+}

@@ -40,9 +40,11 @@ import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouper;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.learningdesign.exception.GroupingException;
+import org.lamsfoundation.lams.learningdesign.service.LearningDesignService;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonClass;
@@ -50,6 +52,8 @@ import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
+import org.lamsfoundation.lams.usermanagement.OrganisationGroup;
+import org.lamsfoundation.lams.usermanagement.OrganisationGrouping;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.MessageService;
 
@@ -325,6 +329,40 @@ public class LessonService implements ILessonService {
 		} catch (GroupingException e) {
 		    throw new LessonServiceException(e);
 		}
+	    }
+	    groupingDAO.update(grouping);
+	}
+    }
+
+    @Override
+    public void performGrouping(long learningDesignId, long orgGroupingId) {
+	LearningDesign learningDesign = baseDAO.find(LearningDesign.class, learningDesignId);
+	OrganisationGrouping orgGrouping = groupingDAO.find(OrganisationGrouping.class, orgGroupingId);
+	// find all grouping activities
+	for (Activity activity : learningDesign.getActivities()) {
+	    if (!activity.isGroupingActivity()) {
+		continue;
+	    }
+	    // skip groupings used for branching
+	    // and ones that have already been initialised
+	    GroupingActivity groupingActivity = (GroupingActivity) activity;
+	    Grouping grouping = groupingActivity.getCreateGrouping();
+	    if (grouping == null || grouping.isUsedForBranching()) {
+		continue;
+	    }
+	    boolean groupingAlreadyApplied = grouping.getGroups() != null && !grouping.getGroups().isEmpty()
+		    && !LearningDesignService.isDefaultChosenGrouping(grouping);
+	    if (groupingAlreadyApplied) {
+		continue;
+	    }
+
+	    // nuke all existing groups and create new ones
+	    removeAllLearnersFromGrouping(grouping);
+	    groupingDAO.flush();
+	    for (OrganisationGroup orgGroup : orgGrouping.getGroups()) {
+		Group group = Group.createLearnerGroup(grouping, orgGroup.getName(),
+			new HashSet<>(orgGroup.getUsers()));
+		grouping.getGroups().add(group);
 	    }
 	    groupingDAO.update(grouping);
 	}

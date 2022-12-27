@@ -33,11 +33,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
@@ -653,5 +656,25 @@ public class LearningDesignService implements ILearningDesignService {
 	    default:
 		return null;
 	}
+    }
+
+    /**
+     * Check if the given groups are default for chosen grouping. There is actually no good way to detect this, but even
+     * if a custom grouping is mistaken for the default one, it should bring little harm.
+     */
+    public static boolean isDefaultChosenGrouping(Grouping grouping) {
+	Set<Group> groups = grouping.getGroups();
+	if (groups == null) {
+	    return false;
+	}
+	for (Group group : groups) {
+	    if (group.getUsers() != null && !group.getUsers().isEmpty()) {
+		return false;
+	    }
+	}
+	if (grouping.getMaxNumberOfGroups() != null && !grouping.getMaxNumberOfGroups().equals(groups.size())) {
+	    return false;
+	}
+	return true;
     }
 }
