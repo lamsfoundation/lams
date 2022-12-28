@@ -79,6 +79,10 @@ public class AssessmentQuestionResult extends QbToolAnswer {
     private String justification;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "marked_by")
+    private AssessmentUser markedBy;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "result_uid")
     private AssessmentResult assessmentResult;
 
@@ -201,6 +205,14 @@ public class AssessmentQuestionResult extends QbToolAnswer {
 
     public String getJustificationEscaped() {
 	return justification == null ? null : StringEscapeUtils.escapeJavaScript(justification.replace("\r\n", "<br>"));
+    }
+
+    public AssessmentUser getMarkedBy() {
+	return markedBy;
+    }
+
+    public void setMarkedBy(AssessmentUser markedBy) {
+	this.markedBy = markedBy;
     }
 
     public AssessmentUser getUser() {

@@ -2304,7 +2304,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public void changeQuestionResultMark(Long questionResultUid, float newMark) {
+    public void changeQuestionResultMark(Long questionResultUid, float newMark, Integer teacherId) {
 	AssessmentQuestionResult questionResult = assessmentQuestionResultDao
 		.getAssessmentQuestionResultByUid(questionResultUid);
 	float oldMark = questionResult.getMark();
@@ -2314,6 +2314,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	Long toolSessionId = assessmentResult.getSessionId();
 	Assessment assessment = assessmentResult.getAssessment();
 	Long questionUid = questionResult.getQbToolQuestion().getUid();
+
+	AssessmentUser teacher = null;
+	if (teacherId != null) {
+	    teacher = getUserByIdAndContent(teacherId.longValue(), assessment.getContentId());
+	}
 
 	// When changing a mark for user and isUseSelectLeaderToolOuput is true, the mark should be propagated to all
 	// students within the group
@@ -2342,6 +2347,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    AssessmentQuestionResult lastAssessmentQuestionResult = (AssessmentQuestionResult) lastAssessmentQuestionResultObj[0];
 
 	    lastAssessmentQuestionResult.setMark(newMark);
+	    if (teacher != null) {
+		lastAssessmentQuestionResult.setMarkedBy(teacher);
+	    }
 	    assessmentQuestionResultDao.saveObject(lastAssessmentQuestionResult);
 
 	    AssessmentResult result = lastAssessmentQuestionResult.getAssessmentResult();

@@ -33,6 +33,10 @@
 				background-color: initial;
 				border: none;
 			}
+			
+			.requires-grading {
+				background-color: rgba(255, 195, 55, .6);
+			}
  		</style>
  		
 		<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
