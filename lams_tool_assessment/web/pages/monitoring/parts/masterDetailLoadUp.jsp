@@ -33,16 +33,22 @@
  	 	 	    <c:choose>
 	 	 	    	<c:when test="${requiresMarking}">
 	 	 	    		,"title" : "<fmt:message key='label.monitoring.user.summary.grade.required' />"
+	 	 	    		,"data-toggle" : "tooltip"
+	 	 	    		,"data-container" : "body"
 	 	 	    	</c:when>
 	 	 	    	<c:when test="${not empty questionResult.markedBy}">
 	 	 	  			,"title" : "<fmt:message key='label.monitoring.user.summary.grade.by'>
 		 	 	  						<fmt:param><c:out value='${questionResult.markedBy.fullName}' /></fmt:param>
 		 	 	  					</fmt:message>"
+		 	 	  		,"data-toggle" : "tooltip"
+		 	 	    	,"data-container" : "body"
 	 	 	    	</c:when>
 	 	 	    </c:choose>
  	 	 	    });
 		</c:forEach>
 
+		$('[data-toggle="tooltip"]').bootstrapTooltip();
+		
 		if (typeof CodeMirror != 'undefined') {
 			CodeMirror.colorize($('.code-style'));
 		}

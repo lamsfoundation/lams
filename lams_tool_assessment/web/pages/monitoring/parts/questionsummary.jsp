@@ -188,13 +188,18 @@
 		  							 	 requiresMarking = rowData.markedBy == "" && rowData.grade == 0;
 	  								 table.setCell(rows[rowIndex], "grade", "", requiresMarking ? 'requires-grading' : '',
 	  		  						 requiresMarking ? {
-	  									title : "<fmt:message key='label.monitoring.user.summary.grade.required' />"
+	  									title : "<fmt:message key='label.monitoring.user.summary.grade.required' />",
+	  									"data-toggle" : "tooltip",
+	  							 	 	"data-container" : "body"
 		  		  					 } :
 			  		  			     (rowData.markedBy == "" ? null : {
 			  		  					title : "<fmt:message key='label.monitoring.user.summary.grade.by'><fmt:param> </fmt:param></fmt:message>"
-	  			         		   		   + rowData.markedBy
+	  			         		   		   + rowData.markedBy,
+	  									"data-toggle" : "tooltip",
+	  							 	 	"data-container" : "body"
 			  		  				 }));
 		  						 }
+	  							$('[data-toggle="tooltip"]').tooltip();
 	  						}
   	  					},
   					    subGrid: true,
