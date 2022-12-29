@@ -1076,6 +1076,7 @@ public class MonitoringController {
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	Integer searchedLearnerId = WebUtil.readIntParam(request, "searchedLearnerID", true);
+	List<User> learners = null;
 	if (searchedLearnerId == null) {
 	    Integer pageNumber = WebUtil.readIntParam(request, "pageNumber", true);
 	    if (pageNumber == null || pageNumber < 1) {
@@ -1085,22 +1086,28 @@ public class MonitoringController {
 	    boolean isProgressSorted = WebUtil.readBooleanParam(request, "isProgressSorted", false);
 
 	    // either sort by name or how much a learner progressed into the lesson
-	    List<User> learners = isProgressSorted
+	    learners = isProgressSorted
 		    ? monitoringService.getLearnersByMostProgress(lessonId, null, 10, (pageNumber - 1) * 10)
 		    : lessonService.getLessonLearners(lessonId, null, 10, (pageNumber - 1) * 10, true);
-
-	    for (User learner : learners) {
-		responseJSON.withArray("learners").add(WebUtil.userToJSON(learner));
-	    }
 
 	    // get all possible learners matching the given phrase, if any; used for max page number
 	    responseJSON.put("learnerPossibleNumber", lessonService.getCountLessonLearners(lessonId, null));
 	} else {
 	    // only one learner is searched
 	    User learner = userManagementService.getUserById(searchedLearnerId);
-	    responseJSON.withArray("learners").add(WebUtil.userToJSON(learner));
+	    learners = List.of(learner);
 	    responseJSON.put("learnerPossibleNumber", 1);
 	}
+
+	for (User learner : learners) {
+	    ObjectNode learnerJSON = WebUtil.userToJSON(learner);
+	    LearnerProgress learnerProgress = lessonService.getUserProgressForLesson(learner.getUserId(), lessonId);
+	    learnerJSON.put("completedActivityCount",
+		    learnerProgress == null ? 0 : learnerProgress.getCompletedActivities().size());
+	    learnerJSON.put("completedLesson", learnerProgress != null && learnerProgress.isComplete());
+	    responseJSON.withArray("learners").add(learnerJSON);
+	}
+
 	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
     }

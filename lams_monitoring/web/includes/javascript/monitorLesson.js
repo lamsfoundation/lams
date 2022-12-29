@@ -2502,15 +2502,17 @@ function updateLearnersTab(){
 					itemCollapseId = 'learners-accordion-collapse-' + learner.id,
 					item = itemTemplate.clone().data('user-id', learner.id).attr('id', 'learners-accordion-item-' + learner.id).appendTo(learnersAccordion),
 					portraitSmall = $(definePortrait(learner.portraitId, learner.id, STYLE_SMALL, true, LAMS_URL)).addClass('me-2'),
-					portraitLarge = learner.portraitId ? $(definePortrait(learner.portraitId, learner.id, STYLE_LARGE, false, LAMS_URL)) : null;
-
+					portraitLarge = learner.portraitId ? $(definePortrait(learner.portraitId, learner.id, STYLE_LARGE, false, LAMS_URL)) : null,
+					itemHeader = $('.accordion-header', item).attr('id', itemHeaderId);
 					
-				$('.accordion-header', item).attr('id', itemHeaderId)
-					   .find('.accordion-button')
-							.attr('data-bs-target', '#' + itemCollapseId)
-							.attr('aria-controls', itemCollapseId)
-							.html('<span>' + learner.firstName + ' ' + learner.lastName + '</span>')
-							.prepend(portraitSmall);
+				$('.accordion-button', itemHeader)
+						.attr('data-bs-target', '#' + itemCollapseId)
+						.attr('aria-controls', itemCollapseId)
+						.prepend('<span>' + learner.firstName + ' ' + learner.lastName + '</span>')
+						.prepend(portraitSmall);
+				$('.accordion-completed-activity-count', itemHeader).text(learner.completedActivityCount).tooltip();
+				$('.accordion-completed-lesson', itemHeader).toggle(learner.completedLesson).tooltip();
+				
 				$('.learners-accordion-name', item).text(learner.firstName + ' ' + learner.lastName);
 				$('.learners-accordion-login', item).html('<i class="fa-regular fa-user"></i>' + learner.login);
 				$('.learners-accordion-email', item).html('<i class="fa-regular fa-envelope"></i><a href="mailto:' + learner.email + '">' 

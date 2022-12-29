@@ -340,6 +340,10 @@ body.component #sequenceInfoDialog {
 	text-align: center;
 }
 
+.monitoring-page-wrapper #learners-accordion .accordion-item .accordion-button:after {
+	margin-left: 0;
+}
+
 .monitoring-page-wrapper #learners-accordion .no-progress {
 	display: none;	
 	text-align: center;

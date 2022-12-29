@@ -31,10 +31,16 @@
 </div>
 
 <div class="learners-accordion-item-template accordion-item d-none">
-  <h2 class="accordion-header">
-    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" aria-expanded="false">
-    </button>
-  </h2>
+	<div class="accordion-header">
+	    <button class="accordion-button fs-4 collapsed" type="button" data-bs-toggle="collapse" aria-expanded="false">
+	    	<div class="ms-auto me-5">
+	    		<i class="me-2 fa-solid fa-check text-success accordion-completed-lesson" 
+	    		   title="<fmt:message key='learner.completed.lesson'/>"></i>
+		 		<span class="badge bg-success accordion-completed-activity-count"
+		 			  title="<fmt:message key='learner.completed.activity.count'/>"></span> 
+	    	</div>
+    	</button>
+    </div>
   <div class="accordion-collapse collapse">
 	<div class="accordion-body container-fluid">
 		<div class="row">
