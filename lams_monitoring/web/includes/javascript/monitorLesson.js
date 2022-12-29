@@ -2476,11 +2476,6 @@ function updateLearnersTab(){
 		},
 		'dataType' : 'json',
 		'success'  : function(response) {
-			// show the "clear" button
-			$('#sequenceSearchPhraseButton').prop('disabled', sequenceSearchedLearner == null);
-			$('#sequenceSearchPhraseIcon').toggle(sequenceSearchedLearner == null);
-			$('#sequenceSearchPhraseClearIcon').toggle(sequenceSearchedLearner != null);
-			
 			// hide/show pager elements depending if they are needed
 			if (sequenceSearchedLearner) {
 				pager.addClass('d-none');
