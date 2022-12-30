@@ -528,7 +528,7 @@
 			<c:if test="${isAppadmin}">
 				<div class="row">
 					<div class="col-6 offset-3 text-end">
-						<c:if test="${isSysadmin and not empty userForm.userId}">
+						<c:if test="${not empty userForm.userId}">
 							<a	href="<lams:LAMSURL/>admin/userChangePass.jsp?userId=${userForm.userId}&login=${userForm.login}"
 								class="btn btn-primary float-start">
 									<fmt:message key="admin.user.changePassword" />
