@@ -115,7 +115,7 @@
 	</script>
 </lams:head>
     
-<body class="component pb-4 pt-2">
+<body class="component pb-4 pt-2 px-2 px-sm-4">
 
 	<c:set var="title"><fmt:message key="admin.user.management"/></c:set>
 	<c:set var="help"><fmt:message key="Import+Users"/></c:set>

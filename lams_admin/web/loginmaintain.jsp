@@ -16,7 +16,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 </lams:head>
     
-<body class="component pb-4 pt-2">
+<body class="component pb-4 pt-2 px-2 px-sm-4">
 
 	<%-- Build breadcrumb --%>
 	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>

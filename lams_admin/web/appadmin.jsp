@@ -17,7 +17,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 </lams:head>
     
-<body class="component pb-4 pt-2">
+<body class="component pb-4 pt-2 px-2 px-sm-4">
 	<lams:Page5 type="admin" title="${title}">
 		<div class="row"> 
 			<div class="col text-center"> 

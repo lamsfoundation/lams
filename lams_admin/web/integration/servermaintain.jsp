@@ -58,7 +58,7 @@
 	
 </lams:head>
     
-<body class="component pb-4 pt-2">
+<body class="component pb-4 pt-2 px-2 px-sm-4">
 	
 	<c:set var="help"><fmt:message key="Integrations"/></c:set>
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>

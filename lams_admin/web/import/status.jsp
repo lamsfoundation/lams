@@ -44,7 +44,7 @@
 	%>
 	</c:set>	
 
-<body class="component pb-4 pt-2">
+<body class="component pb-4 pt-2 px-2 px-sm-4">
 	<lams:Page5 type="admin" title="${title}">
 	
 		<div align="center">	

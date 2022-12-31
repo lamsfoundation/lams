@@ -33,7 +33,7 @@
 	</script>
 </lams:head>
     
-<body class="component pb-4 pt-2">
+<body class="component pb-4 pt-2 px-2 px-sm-4">
 	<%-- Build breadcrumb --%>
 	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
 	<c:set var="breadcrumbItems">${breadcrumbItems}, . | ${title}</c:set>
