@@ -684,4 +684,12 @@ public class TblMonitoringController {
 	request.setAttribute("aeToolTypes", aeToolTypes);
 	request.setAttribute("aeActivityTitles", aeActivityTitles);
     }
+
+    /**
+     * Redirects to monitoring page
+     */
+    @RequestMapping("/start")
+    public String start(@RequestParam(name = AttributeNames.PARAM_LESSON_ID) long lessonId) {
+	return "redirect:/monitoring/monitorLesson.do?" + AttributeNames.PARAM_LESSON_ID + "=" + lessonId;
+    }
 }
