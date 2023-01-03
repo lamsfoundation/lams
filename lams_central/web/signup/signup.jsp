@@ -27,8 +27,8 @@
 	<lams:Page type="admin" formID="SignupForm">
 		<div class="page-header">
 			<p class="text-center">
-				<img src="<lams:LAMSURL/>/images/svg/lams_logo_black.svg"
-					alt="LAMS - Learning Activity Management System" width="200px"></img>
+				<img src="<lams:LAMSURL/>/images/svg/lamsv5_logo.svg"
+					alt="LAMS - Learning Activity Management System" width="100px"></img>
 			</p>
 			<c:if test="${not empty signupOrganisation}">
 				<h1 align="center">

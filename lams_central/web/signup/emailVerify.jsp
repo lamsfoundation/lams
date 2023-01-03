@@ -7,7 +7,7 @@
 <script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
 
 <div class="panel-heading text-center">
-	<img src="<lams:LAMSURL/>/images/svg/lams_logo_black.svg" class="img-center" width="200px"></img>
+	<img src="<lams:LAMSURL/>/images/svg/lamsv5_logo.svg" class="img-center" width="100px"></img>
 </div>
 <div class="panel-body text-center">
 	<c:choose>
