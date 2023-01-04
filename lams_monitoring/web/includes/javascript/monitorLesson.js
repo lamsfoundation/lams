@@ -2374,10 +2374,11 @@ function fillClassList(role, disableCreator) {
  * Adds/removes a Learner/Monitor to/from the class.
  */
 function editClassMember(userCheckbox){
-	var data={ 
+	var data = { 
 		'lessonID' : lessonId,
 		'userID'   : userCheckbox.closest('.dialogListItem').attr('userId'),
-		'role'     : userCheckbox.closest('table.dialogTable').is('#classMonitorTable') ? 'MONITOR' : 'LEARNER',
+		'role'     : userCheckbox.parents('table.dialogTable')
+								 .parents('table.table').is('#classMonitorTable') ? 'MONITOR' : 'LEARNER',
 		'add'      : userCheckbox.is(':checked')
 	};
 	data[csrfTokenName] = csrfTokenValue;
