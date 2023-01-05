@@ -176,6 +176,9 @@ public abstract class Grouper {
     public void removeAllLearnersFromGrouping(Grouping grouping) throws GroupingException {
 
 	for (Group group : grouping.getGroups()) {
+	    if (group == null) {
+		continue;
+	    }
 	    if (!group.mayBeDeleted()) {
 		String error = "Tried to clear a group which cannot be removed (tool sessions probably exist). Grouping "
 			+ grouping + ". Not removing the groupings.";
@@ -185,8 +188,11 @@ public abstract class Grouper {
 	}
 
 	for (Group group : grouping.getGroups()) {
+	    if (group == null || group.getUsers() == null) {
+		continue;
+	    }
 	    if (log.isDebugEnabled()) {
-		log.debug("Cleared all users and removed group " + group.getGroupName());
+		log.debug("Cleared all users from group " + group.getGroupName());
 	    }
 	    group.getUsers().clear();
 	}

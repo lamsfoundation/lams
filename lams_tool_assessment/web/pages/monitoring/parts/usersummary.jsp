@@ -26,6 +26,10 @@
 	  		pre {
 				background-color: initial;
 				border: none;
+			}	
+			
+			.requires-grading {
+				background-color: rgba(255, 195, 55, .6);
 			}
 		</style>
 		
@@ -97,7 +101,8 @@
 	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels and question.type != 8}">
 			  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align', formatter: gradientNumberFormatter},
 			  			  	</c:if>
-	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' }		
+	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, 
+		  				   		editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align', title : false }		
 	  				   	],
 	  				   	multiselect: false,
 	  				  	cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>&<csrf:token/>',
@@ -138,6 +143,9 @@
 	  				
 	  	   	        <c:forEach var="questionResult" items="${userSummaryItem.questionResults}" varStatus="i">
 	  	   	        	<c:set var="learnerInteraction" value="${learnerInteractions[questionResult.qbToolQuestion.uid]}" />
+	  	   	       		<c:set var="requiresMarking"
+	 	 	   	   	   		value="${empty questionResult.markedBy and questionResult.questionDto.type eq 6 and questionResult.mark eq 0}" />
+		 	 	   	   	   
 	  	   	        	var responseStr = "";
 	  	   	       		<%@ include file="userresponse.jsp"%>
 	  	   	     		var table = jQuery("#user${question.uid}");
@@ -153,11 +161,29 @@
 	  	   	   	   	    });
 	  	   	     		
 	  	   	    		// set maxGrade attribute to cell DOM element
-	  	 	 	     	table.setCell(${i.index + 1}, "grade", "", null, {"maxGrade" :  "${questionResult.maxMark}"});
+	  	 	 	     	table.setCell(${i.index + 1}, "grade", "", ${requiresMarking ? "'requires-grading'" : "null"},
+	  		  	 	 		{"maxGrade" :  "${questionResult.maxMark}"
+	  		   	 	 	    <c:choose>
+				 	 	    	<c:when test="${requiresMarking}">
+				 	 	    		,"title" : "<fmt:message key='label.monitoring.user.summary.grade.required' />"
+					 	 	    	,"data-toggle" : "tooltip"
+						 	 	    ,"data-container" : "body"
+				 	 	    	</c:when>
+				 	 	    	<c:when test="${not empty questionResult.markedBy}">
+				 	 	  			,"title" : "<fmt:message key='label.monitoring.user.summary.grade.by'>
+					 	 	  						<fmt:param><c:out value='${questionResult.markedBy.fullName}' /></fmt:param>
+					 	 	  					</fmt:message>"
+					 		 	 	,"data-toggle" : "tooltip"
+					 			 	,"data-container" : "body"
+				 	 	    	</c:when>
+				 	 	    </c:choose>
+			 	 	 	    });
 	  		        </c:forEach>			
 	  				
 	  			</c:forEach>
-	  			
+
+				$('[data-toggle="tooltip"]').tooltip();
+				
   				//jqgrid autowidth (http://stackoverflow.com/a/1610197)
 	  			$(window).bind('resize', function() {
 	  				var grid;
@@ -180,7 +206,7 @@
 						etherpadInitMethods[groupId]();
 					}
 				});
-
+				
 				if (typeof CodeMirror != 'undefined') {
 					CodeMirror.colorize($('.code-style'));
 				}

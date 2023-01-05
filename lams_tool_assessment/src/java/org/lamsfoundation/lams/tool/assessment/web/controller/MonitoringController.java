@@ -339,7 +339,9 @@ public class MonitoringController {
 		&& !StringUtils.isEmpty(request.getParameter(AssessmentConstants.PARAM_QUESTION_RESULT_UID))) {
 	    Long questionResultUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_RESULT_UID);
 	    float newGrade = Float.valueOf(request.getParameter(AssessmentConstants.PARAM_GRADE));
-	    service.changeQuestionResultMark(questionResultUid, newGrade);
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    service.changeQuestionResultMark(questionResultUid, newGrade, teacher.getUserID());
 	}
     }
 
@@ -618,6 +620,7 @@ public class MonitoringController {
 		}
 
 		userData.add(response);
+		userData.add(questionResult.getMarkedBy() == null ? "" : questionResult.getMarkedBy().getFullName());
 	    } else {
 		userData.add("");
 		userData.add("");
@@ -630,6 +633,7 @@ public class MonitoringController {
 		    userData.add("-");
 		}
 		userData.add("-");
+		userData.add("");
 	    }
 
 	    userData.add(userDto.getUserId());

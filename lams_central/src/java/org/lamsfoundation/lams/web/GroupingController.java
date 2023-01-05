@@ -52,6 +52,7 @@ import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupComparator;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
+import org.lamsfoundation.lams.learningdesign.service.LearningDesignService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.security.ISecurityService;
@@ -144,7 +145,7 @@ public class GroupingController {
 	// show groups page if this is a lesson mode and user have already chosen a grouping or there is no organisation
 	// groupings available
 	boolean lessonGroupsExist = (grouping != null) && (grouping.getGroups() != null)
-		&& !grouping.getGroups().isEmpty() && !isDefaultChosenGrouping(grouping);
+		&& !grouping.getGroups().isEmpty() && !LearningDesignService.isDefaultChosenGrouping(grouping);
 	if (lessonGroupsExist || (activityID != null && orgGroupings.isEmpty())) {
 	    return viewGroups(request, response, organisationId, targetOrganisationId);
 	}
@@ -249,7 +250,7 @@ public class GroupingController {
 	Grouping lessonGrouping = getLessonGrouping(activityId);
 	Set<Group> lessonGroups = lessonGrouping == null ? null : lessonGrouping.getGroups();
 	if ((activityId != null) && (lessonGrouping != null) && (isExternalGroupsSelected || (orgGroupingId != null))
-		&& isDefaultChosenGrouping(lessonGrouping)) {
+		&& LearningDesignService.isDefaultChosenGrouping(lessonGrouping)) {
 	    if (log.isDebugEnabled()) {
 		log.debug("Removing default groups for grouping " + orgGroupingId);
 	    }

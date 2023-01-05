@@ -31,6 +31,11 @@ function initLessonTab(){
 			// hide existing LD image
 			$('.ldChoiceDependentCanvasElement').css('display', 'none');
 			
+			if (orgGroupingsAvailable) {
+				$('#grouping-tab-desc-select, #grouping-tab-select').hide();
+				$('#grouping-tab-desc-none').show();
+			}
+			
 			// if a LD is selected
 			if (node.state.selected && node.learningDesignId) {
 				$('#lessonNameInput').val(node.label);
@@ -40,6 +45,21 @@ function initLessonTab(){
 				}
 				// display "loading" animation and finally LD thumbnail
 				loadLearningDesignSVG(node.learningDesignId);
+				
+				if (orgGroupingsAvailable) {
+					$.ajax({
+						'url' : LAMS_URL + 'monitoring/monitoring/isLearningDesignHasGroupings.do',
+						'data' : {
+							'learningDesignId' : node.learningDesignId
+						},
+						'dataType' : 'text',
+						'success' : function(response) {
+							let hasGroupings = response == 'true';
+							$('#grouping-tab-desc-select, #grouping-tab-select').toggle(hasGroupings);
+							$('#grouping-tab-desc-none').toggle(!hasGroupings);
+						}
+					})
+				}
 			} else {
 				// a folder got selected or LD got deselected
 				$('#lessonNameInput').val(null);
@@ -750,4 +770,20 @@ function updateSplitLearnersFields(){
 		var description = SPLIT_LEARNERS_DESCRIPTION.replace('[0]', instances).replace('[1]', learnerCount);
 		$('#splitLearnersDescription').html(description);
 	}
+}
+
+// ********** GROUPING TAB FUNCTIONS *******
+
+function showOrgGrouping(groupingId){
+	showDialog("dialogOrgGrouping", {
+		'title' : LABEL_ORG_GROUPING_DIALOG_TITLE,
+		'modal' : true,
+		'width' : 800,
+		'height': 550,
+		'open' : function() {
+			var dialog = $(this);
+			// load contents after opening the dialog
+			$('iframe', dialog).attr('src', LAMS_URL + 'monitoring/grouping/printGrouping.do?groupingId=' + groupingId);
+		}
+	});
 }
