@@ -55,6 +55,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.IndexUtils;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -225,6 +226,11 @@ public class DisplayGroupController {
     @SuppressWarnings("unchecked")
     private IndexOrgBean populateContentsOrgBean(IndexOrgBean orgBean, Organisation org, List<Integer> roles,
 	    String username, boolean isSysAdmin) throws SQLException, NamingException {
+	if (Configuration.getAsBoolean(ConfigurationKeys.ALLOW_DIRECT_LESSON_LAUNCH)) {
+	    orgBean.setEncodedOrgId(
+		    WebUtil.ORG_SHORTENING_PREFIX + WebUtil.encodeIdForDirectLaunch(org.getOrganisationId()));
+	}
+
 	Integer userId = getUser(username).getUserId();
 
 	// set lesson beans

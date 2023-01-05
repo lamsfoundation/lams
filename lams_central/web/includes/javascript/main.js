@@ -696,3 +696,8 @@ function removeLesson(lessonID) {
 		}
 	}
 }
+
+function copyOrgUrlToClipboard(){
+  var copyText = $('#direct-org-launch-link').text();
+  navigator.clipboard.writeText(copyText);
+}

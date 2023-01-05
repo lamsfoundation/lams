@@ -51,7 +51,7 @@ public class LaunchLearnerUrlServlet extends HttpServlet {
 
     @Autowired
     private ILessonService lessonService;
-    
+
     /*
      * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
      * available in that applicationContext.
@@ -64,27 +64,37 @@ public class LaunchLearnerUrlServlet extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	String encodedLessonId = request.getPathInfo();
+	String encodedId = request.getPathInfo();
 
 	// redirect to login page if accessing / URL
-	if (StringUtils.isBlank(encodedLessonId) || encodedLessonId.length() < 2) {
+	if (StringUtils.isBlank(encodedId) || encodedId.length() < 2) {
 	    String lamsUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 	    response.sendRedirect(lamsUrl);
 	    return;
 	}
 
 	// cut off the first '/'
-	encodedLessonId = encodedLessonId.substring(1);
+	encodedId = encodedId.substring(1);
+	boolean isOrganisationId = encodedId.startsWith(WebUtil.ORG_SHORTENING_PREFIX);
+	if (isOrganisationId) {
+	    encodedId = encodedId.replaceFirst(WebUtil.ORG_SHORTENING_PREFIX, "");
+	    String decodedOrgId = WebUtil.decodeIdForDirectLaunch(encodedId);
+	    int orgId = Integer.parseInt(decodedOrgId);
+
+	    String lamsUrl = Configuration.get(ConfigurationKeys.SERVER_URL) + "index.do";
+	    response.sendRedirect(lamsUrl + "index.do?" + AttributeNames.PARAM_ORGANISATION_ID + "=" + orgId);
+	    return;
+	}
 
 	Long lessonId;
 	try {
-	    String decodedLessonId = WebUtil.decodeIdForDirectLaunch(encodedLessonId);
+	    String decodedLessonId = WebUtil.decodeIdForDirectLaunch(encodedId);
 	    lessonId = Long.valueOf(decodedLessonId);
 
 	} catch (IllegalArgumentException e) {
-	    log.warn("Supplied lessonId: " + encodedLessonId + " has wrong format.");
+	    log.warn("Supplied lessonId: " + encodedId + " has wrong format.");
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-		    "Supplied lessonId: " + encodedLessonId + " has wrong format.");
+		    "Supplied lessonId: " + encodedId + " has wrong format.");
 //	     return mapping.findForward("error");
 //	    displayMessage(request, response, "error.lessonid.has.wrong.format");
 	    return;

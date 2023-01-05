@@ -3,6 +3,7 @@
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 
 <c:set var="isCollapsingSubcoursesEnabled"><%=Configuration.getAsBoolean(ConfigurationKeys.ENABLE_COLLAPSING_SUBCOURSES)%></c:set>
+<c:set var="isDirectOrgLaunchEnabled"><%=Configuration.getAsBoolean(ConfigurationKeys.ALLOW_DIRECT_LESSON_LAUNCH)%></c:set>
 
 <div class="course-header">
 	<span class="lead">
@@ -18,6 +19,15 @@
 			</c:otherwise>
 		</c:choose>
 	</a>
+	<c:if test="${isDirectOrgLaunchEnabled}">
+		<small class="loffset20">
+			<fmt:message key="index.organisation.link"/>
+			<span id="direct-org-launch-link"><lams:LAMSURL/>r/<c:out value="${orgBean.encodedOrgId}" escapeXml="true"/>
+            <i id="direct-org-launch-link-copy-button" class="text-primary loffset10 fa fa-clipboard"
+             		onClick="javascript:copyOrgUrlToClipboard()"
+             		title='<fmt:message key="index.organisation.link.tooltip"/>'></i>
+        </small>
+	</c:if>
 	
 	<!-- Group header -->
 	<c:set var="org" value="${orgBean}" />

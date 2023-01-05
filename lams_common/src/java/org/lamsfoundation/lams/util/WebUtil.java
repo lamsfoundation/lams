@@ -57,6 +57,8 @@ public class WebUtil {
 
     private static final String URL_SHORTENING_CYPHER = "jbdnuteywk";
 
+    public static final String ORG_SHORTENING_PREFIX = "c-";
+
     /**
      * @exception IllegalArgumentException
      *                - if not set
@@ -496,7 +498,7 @@ public class WebUtil {
      * @param id
      * @return
      */
-    public static String encodeIdForDirectLaunch(Long id) {
+    public static String encodeIdForDirectLaunch(Number id) {
 	String encodedId = id.toString();
 	encodedId = encodedId.replace('0', URL_SHORTENING_CYPHER.charAt(0));
 	encodedId = encodedId.replace('1', URL_SHORTENING_CYPHER.charAt(1));
@@ -519,10 +521,14 @@ public class WebUtil {
      * @return
      */
     public static String decodeIdForDirectLaunch(String encodedId) throws IllegalArgumentException {
+	boolean isOrganisationId = encodedId.startsWith(ORG_SHORTENING_PREFIX);
+	if (isOrganisationId) {
+	    encodedId = encodedId.replaceFirst(ORG_SHORTENING_PREFIX, "");
+	}
 
 	// it should contain only the characters from URL_SHORTENING_CYPHER
 	if (!encodedId.matches("[" + URL_SHORTENING_CYPHER + "]*")) {
-	    throw new IllegalArgumentException("Lesson or course ID: " + encodedId + " has wrong format.");
+	    throw new IllegalArgumentException("Lesson or organisation ID: " + encodedId + " has wrong format.");
 	}
 
 	String decodedId = encodedId;
