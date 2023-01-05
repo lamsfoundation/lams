@@ -78,7 +78,7 @@ public class LaunchLearnerUrlServlet extends HttpServlet {
 
 	Long lessonId;
 	try {
-	    String decodedLessonId = WebUtil.decodeLessonId(encodedLessonId);
+	    String decodedLessonId = WebUtil.decodeIdForDirectLaunch(encodedLessonId);
 	    lessonId = Long.valueOf(decodedLessonId);
 
 	} catch (IllegalArgumentException e) {

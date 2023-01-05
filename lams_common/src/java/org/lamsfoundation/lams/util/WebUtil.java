@@ -493,23 +493,23 @@ public class WebUtil {
     /**
      * Converse lessonId into alphabetic sequence for using it in URL shortening
      *
-     * @param lessonId
+     * @param id
      * @return
      */
-    public static String encodeLessonId(Long lessonId) {
-	String encodedLessonId = lessonId.toString();
-	encodedLessonId = encodedLessonId.replace('0', URL_SHORTENING_CYPHER.charAt(0));
-	encodedLessonId = encodedLessonId.replace('1', URL_SHORTENING_CYPHER.charAt(1));
-	encodedLessonId = encodedLessonId.replace('2', URL_SHORTENING_CYPHER.charAt(2));
-	encodedLessonId = encodedLessonId.replace('3', URL_SHORTENING_CYPHER.charAt(3));
-	encodedLessonId = encodedLessonId.replace('4', URL_SHORTENING_CYPHER.charAt(4));
-	encodedLessonId = encodedLessonId.replace('5', URL_SHORTENING_CYPHER.charAt(5));
-	encodedLessonId = encodedLessonId.replace('6', URL_SHORTENING_CYPHER.charAt(6));
-	encodedLessonId = encodedLessonId.replace('7', URL_SHORTENING_CYPHER.charAt(7));
-	encodedLessonId = encodedLessonId.replace('8', URL_SHORTENING_CYPHER.charAt(8));
-	encodedLessonId = encodedLessonId.replace('9', URL_SHORTENING_CYPHER.charAt(9));
+    public static String encodeIdForDirectLaunch(Long id) {
+	String encodedId = id.toString();
+	encodedId = encodedId.replace('0', URL_SHORTENING_CYPHER.charAt(0));
+	encodedId = encodedId.replace('1', URL_SHORTENING_CYPHER.charAt(1));
+	encodedId = encodedId.replace('2', URL_SHORTENING_CYPHER.charAt(2));
+	encodedId = encodedId.replace('3', URL_SHORTENING_CYPHER.charAt(3));
+	encodedId = encodedId.replace('4', URL_SHORTENING_CYPHER.charAt(4));
+	encodedId = encodedId.replace('5', URL_SHORTENING_CYPHER.charAt(5));
+	encodedId = encodedId.replace('6', URL_SHORTENING_CYPHER.charAt(6));
+	encodedId = encodedId.replace('7', URL_SHORTENING_CYPHER.charAt(7));
+	encodedId = encodedId.replace('8', URL_SHORTENING_CYPHER.charAt(8));
+	encodedId = encodedId.replace('9', URL_SHORTENING_CYPHER.charAt(9));
 
-	return encodedLessonId;
+	return encodedId;
     }
 
     /**
@@ -518,26 +518,26 @@ public class WebUtil {
      * @param encodedlessonId
      * @return
      */
-    public static String decodeLessonId(String encodedLessonId) throws IllegalArgumentException {
+    public static String decodeIdForDirectLaunch(String encodedId) throws IllegalArgumentException {
 
 	// it should contain only the characters from URL_SHORTENING_CYPHER
-	if (!encodedLessonId.matches("[" + URL_SHORTENING_CYPHER + "]*")) {
-	    throw new IllegalArgumentException("LessonId: " + encodedLessonId + " has wrong format.");
+	if (!encodedId.matches("[" + URL_SHORTENING_CYPHER + "]*")) {
+	    throw new IllegalArgumentException("Lesson or course ID: " + encodedId + " has wrong format.");
 	}
 
-	String decodedLessonId = encodedLessonId;
-	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(0), '0');
-	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(1), '1');
-	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(2), '2');
-	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(3), '3');
-	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(4), '4');
-	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(5), '5');
-	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(6), '6');
-	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(7), '7');
-	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(8), '8');
-	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(9), '9');
+	String decodedId = encodedId;
+	decodedId = decodedId.replace(URL_SHORTENING_CYPHER.charAt(0), '0');
+	decodedId = decodedId.replace(URL_SHORTENING_CYPHER.charAt(1), '1');
+	decodedId = decodedId.replace(URL_SHORTENING_CYPHER.charAt(2), '2');
+	decodedId = decodedId.replace(URL_SHORTENING_CYPHER.charAt(3), '3');
+	decodedId = decodedId.replace(URL_SHORTENING_CYPHER.charAt(4), '4');
+	decodedId = decodedId.replace(URL_SHORTENING_CYPHER.charAt(5), '5');
+	decodedId = decodedId.replace(URL_SHORTENING_CYPHER.charAt(6), '6');
+	decodedId = decodedId.replace(URL_SHORTENING_CYPHER.charAt(7), '7');
+	decodedId = decodedId.replace(URL_SHORTENING_CYPHER.charAt(8), '8');
+	decodedId = decodedId.replace(URL_SHORTENING_CYPHER.charAt(9), '9');
 
-	return decodedLessonId;
+	return decodedId;
     }
 
     public static Document getDocument() throws ParserConfigurationException {
