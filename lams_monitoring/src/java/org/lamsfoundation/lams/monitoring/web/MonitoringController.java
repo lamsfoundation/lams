@@ -1009,7 +1009,7 @@ public class MonitoringController {
 	    lessonDTO.setCreateDateTimeStr(sfm.format(lessonDTO.getCreateDateTime()));
 	}
 	// prepare encoded lessonId for shortened learner URL
-	lessonDTO.setEncodedLessonID(WebUtil.encodeLessonId(lessonId));
+	lessonDTO.setEncodedLessonID(WebUtil.encodeIdForDirectLaunch(lessonId));
 
 	if (!securityService.isLessonMonitor(lessonId, user.getUserID(), "monitor lesson")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
