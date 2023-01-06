@@ -3,6 +3,7 @@
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 
 <c:set var="isCollapsingSubcoursesEnabled"><%=Configuration.getAsBoolean(ConfigurationKeys.ENABLE_COLLAPSING_SUBCOURSES)%></c:set>
+<c:set var="isDirectOrgLaunchEnabled"><%=Configuration.getAsBoolean(ConfigurationKeys.ALLOW_DIRECT_LESSON_LAUNCH)%></c:set>
 
 <div class="course-header">
 	<span class="lead">

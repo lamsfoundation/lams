@@ -55,6 +55,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.IndexUtils;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -148,59 +149,55 @@ public class DisplayGroupController {
 		    moreLinks.add(new IndexLinkBean("index.classman",
 			    "javascript:openOrgManagement(" + organisationId + ")", "fa fa-fw fa-ellipsis-v", null));
 		}
-		if ((roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_AUTHOR)
-			|| roles.contains(Role.ROLE_MONITOR))) {
-		    moreLinks.add(new IndexLinkBean("index.orggroup",
-			    "javascript:showOrgGroupingDialog(" + organisationId + ")", "fa fa-fw fa-users", null));
-		}
+		moreLinks.add(new IndexLinkBean("index.orggroup",
+			"javascript:showOrgGroupingDialog(" + organisationId + ")", "fa fa-fw fa-users", null));
 
-		if (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR)) {
-		    String name = org.getEnableSingleActivityLessons() ? "index.addlesson.single" : "index.addlesson";
-		    links.add(new IndexLinkBean(name, "javascript:showAddLessonDialog(" + organisationId + ")",
-			    "fa fa-fw fa-plus", null));
-		}
+		String name = org.getEnableSingleActivityLessons() ? "index.addlesson.single" : "index.addlesson";
+		links.add(new IndexLinkBean(name, "javascript:showAddLessonDialog(" + organisationId + ")",
+			"fa fa-fw fa-plus", null));
+
 		moreLinks.add(new IndexLinkBean("index.searchlesson",
 			"javascript:showSearchLessonDialog(" + organisationId + ")", "fa fa-fw fa-search",
 			"index.searchlesson.tooltip"));
 
 		// Adding course notifications links if enabled
-		if (org.getEnableCourseNotifications()
-			&& (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR))) {
+		if (org.getEnableCourseNotifications()) {
 		    moreLinks.add(new IndexLinkBean("index.emailnotifications",
 			    "javascript:showNotificationsDialog(" + organisationId + ",null)", "fa fa-fw fa-bullhorn",
 			    "index.emailnotifications.tooltip"));
 		}
 
 		// Adding lesson sorting link
-		if (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR)) {
+		// make sure the group or any of its subgroups has at least one lesson
+		boolean hasLesson = !orgBean.getLessons().isEmpty();
+		for (IndexOrgBean childOrgBean : orgBean.getChildIndexOrgBeans()) {
+		    hasLesson |= (childOrgBean.getLessons() != null) && !childOrgBean.getLessons().isEmpty();
+		}
 
-		    // make sure the group or any of its subgroups has at least one lesson
-		    boolean hasLesson = !orgBean.getLessons().isEmpty();
-		    for (IndexOrgBean childOrgBean : orgBean.getChildIndexOrgBeans()) {
-			hasLesson |= (childOrgBean.getLessons() != null) && !childOrgBean.getLessons().isEmpty();
-		    }
+		if (hasLesson) {
+		    moreLinks.add(new IndexLinkBean("label.enable.lesson.sorting", "javascript:makeOrgSortable()",
+			    "fa fa-fw fa-sort sorting tour-sorting", "label.enable.lesson.sorting"));
+		}
 
-		    if (hasLesson) {
-			moreLinks.add(new IndexLinkBean("label.enable.lesson.sorting", "javascript:makeOrgSortable()",
-				"fa fa-fw fa-sort sorting tour-sorting", "label.enable.lesson.sorting"));
-		    }
+		String link = "javascript:showGradebookCourseDialog(" + organisationId + ")";
+		moreLinks.add(new IndexLinkBean("index.coursegradebook", link, "fa fa-fw fa-list-ol",
+			"index.coursegradebook.tooltip"));
 
-		    String link = "javascript:showGradebookCourseDialog(" + organisationId + ")";
-		    moreLinks.add(new IndexLinkBean("index.coursegradebook", link, "fa fa-fw fa-list-ol",
-			    "index.coursegradebook.tooltip"));
+		if (Configuration.getAsBoolean(ConfigurationKeys.ALLOW_DIRECT_LESSON_LAUNCH)) {
+		    String orgUrl = Configuration.get(ConfigurationKeys.SERVER_URL) + "r/"
+			    + WebUtil.ORG_SHORTENING_PREFIX + WebUtil.encodeIdForDirectLaunch(organisationId);
+		    link = "javascript:copyOrgUrlToClipboard('" + orgUrl + "')";
+		    moreLinks.add(new IndexLinkBean("index.organisation.link", link, "fa fa-fw fa-clipboard",
+			    "index.organisation.link.tooltip"));
 		}
 	    } else {// CLASS_TYPE
-		if (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR)) {
-		    String name = org.getParentOrganisation().getEnableSingleActivityLessons()
-			    ? "index.addlesson.single"
-			    : "index.addlesson";
-		    links.add(new IndexLinkBean(name, "javascript:showAddLessonDialog(" + organisationId + ")",
-			    "fa fa-fw fa-plus", null));
+		String name = org.getParentOrganisation().getEnableSingleActivityLessons() ? "index.addlesson.single"
+			: "index.addlesson";
+		links.add(new IndexLinkBean(name, "javascript:showAddLessonDialog(" + organisationId + ")",
+			"fa fa-fw fa-plus", null));
 
-		    String link = "javascript:showGradebookCourseDialog(" + organisationId + ")";
-		    moreLinks.add(
-			    new IndexLinkBean("index.coursegradebook.subgroup", link, "fa fa-fw fa-list-ol", null));
-		}
+		String link = "javascript:showGradebookCourseDialog(" + organisationId + ")";
+		moreLinks.add(new IndexLinkBean("index.coursegradebook.subgroup", link, "fa fa-fw fa-list-ol", null));
 	    }
 	}
 

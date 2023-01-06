@@ -696,3 +696,23 @@ function removeLesson(lessonID) {
 		}
 	}
 }
+
+function copyOrgUrlToClipboard(url){
+	navigator.clipboard.writeText(url);
+	
+	$.blockUI({ 
+            message: '<div class="growlUI"><h2>' + LABELS.ORG_LINK_COPY_SUCCESS_MESSAGE + '</h2></div>', 
+            fadeIn: 700, 
+            fadeOut: 700, 
+            timeout: 4000, 
+            showOverlay: false, 
+            centerY: true,
+            css: { 
+                backgroundColor: '#000', 
+                '-webkit-border-radius': '10px', 
+                '-moz-border-radius': '10px', 
+                opacity: .6, 
+                color: '#fff' 
+            } 
+        }); 
+}

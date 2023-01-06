@@ -178,7 +178,8 @@ public class IndexController {
 	List<Organisation> favoriteOrganisations = userManagementService
 		.getFavoriteOrganisationsByUser(userDTO.getUserID());
 	request.setAttribute("favoriteOrganisations", favoriteOrganisations);
-	request.setAttribute("activeOrgId", user.getLastVisitedOrganisationId());
+	Integer targetOrgId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
+	request.setAttribute("activeOrgId", targetOrgId == null ? user.getLastVisitedOrganisationId() : targetOrgId);
 
 	boolean isSysadmin = request.isUserInRole(Role.SYSADMIN);
 	int userCoursesCount = userManagementService.getCountActiveCoursesByUser(userDTO.getUserID(), isSysadmin, null);

@@ -29,7 +29,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-tourist.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.ui.touch-punch.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.slimscroll.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/main.js"></script>
+	<lams:JSImport src="includes/javascript/main.js" />
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>',	
 			decoderDiv = $('<div />'),
@@ -91,7 +91,9 @@
 				<fmt:message key="index.outcome.manage" var="OUTCOME_MANAGE_TITLE_VAR"/>
 				OUTCOME_MANAGE_TITLE : '<c:out value="${OUTCOME_MANAGE_TITLE_VAR}" />',
 				<fmt:message key="outcome.manage.title" var="OUTCOME_COURSE_MANAGE_TITLE_VAR"/>
-				OUTCOME_COURSE_MANAGE_TITLE : '<c:out value="${OUTCOME_COURSE_MANAGE_TITLE_VAR}" />'
+				OUTCOME_COURSE_MANAGE_TITLE : '<c:out value="${OUTCOME_COURSE_MANAGE_TITLE_VAR}" />',
+				<fmt:message key="index.organisation.link.success" var="ORG_LINK_COPY_SUCCESS_MESSAGE_VAR"/>
+				ORG_LINK_COPY_SUCCESS_MESSAGE : '<c:out value="${ORG_LINK_COPY_SUCCESS_MESSAGE_VAR}" />'
 			},
 			activeOrgId = <c:choose><c:when test="${empty activeOrgId}">null</c:when><c:otherwise>${activeOrgId}</c:otherwise></c:choose>;
 

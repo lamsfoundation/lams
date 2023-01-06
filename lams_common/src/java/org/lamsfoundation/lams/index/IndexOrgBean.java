@@ -52,9 +52,9 @@ public class IndexOrgBean implements Comparable {
 	this.id = id;
 	this.name = name;
 	this.type = type;
-	this.links = new ArrayList<IndexLinkBean>();
-	this.lessons = new ArrayList<IndexLessonBean>();
-	this.childIndexOrgBeans = new ArrayList<IndexOrgBean>();
+	this.links = new ArrayList<>();
+	this.lessons = new ArrayList<>();
+	this.childIndexOrgBeans = new ArrayList<>();
     }
 
     /**
@@ -200,7 +200,7 @@ public class IndexOrgBean implements Comparable {
     public void addChildOrgBean(IndexOrgBean orgBean) {
 	childIndexOrgBeans.add(orgBean);
     }
-    
+
     /**
      * @return whether user marked this organisation as favorite
      */
@@ -211,7 +211,7 @@ public class IndexOrgBean implements Comparable {
     public void setFavorite(boolean favorite) {
 	this.favorite = favorite;
     }
-    
+
     public boolean getCollapsed() {
 	return this.collapsed;
     }
@@ -219,5 +219,4 @@ public class IndexOrgBean implements Comparable {
     public void setCollapsed(boolean collapsed) {
 	this.collapsed = collapsed;
     }
-
 }
