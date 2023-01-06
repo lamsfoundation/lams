@@ -19,9 +19,6 @@
 			</c:otherwise>
 		</c:choose>
 	</a>
-	<h4 id="course-url-copied" class="loffset20 text-success" style="display: none;">
-		<fmt:message key='index.organisation.link.success'/>
-	</h4>
 	
 	<!-- Group header -->
 	<c:set var="org" value="${orgBean}" />
