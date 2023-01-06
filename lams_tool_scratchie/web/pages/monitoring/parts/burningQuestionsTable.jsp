@@ -56,8 +56,7 @@
 			<c:when test="${burningQuestionsAvailable}">
 				<div class="accordion" id="burning-questions-accordion"> 	
 					<c:forEach var="burningQuestionItemDto" items="${burningQuestionItemDtos}" varStatus="i">
-						<c:set var="burningQsCount" value="${fn:length(burningQuestionItemDto.burningQuestionDtos)}"/>
-						<c:if test="${burningQsCount > 0}">
+						<c:if test="${not empty burningQuestionItemDto.burningQuestionDtos}">
 							<c:set var="item" value="${burningQuestionItemDto.scratchieItem}"/>
 							<%-- toolQuestionUid, i.e. item UID, is required for discussion token.
 								 It is missing for general burning questions as they are not bound to any question.

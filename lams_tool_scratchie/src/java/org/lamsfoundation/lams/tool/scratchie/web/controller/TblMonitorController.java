@@ -228,7 +228,7 @@ public class TblMonitorController {
 	//find available burningQuestionDtos, if any
 	if (scratchie.isBurningQuestionsEnabled()) {
 	    List<BurningQuestionItemDTO> burningQuestionItemDtos = scratchieService.getBurningQuestionDtos(scratchie,
-		    null, false, true);
+		    null, true, true);
 
 	    MonitoringController.setUpBurningQuestions(burningQuestionItemDtos);
 
