@@ -28,16 +28,15 @@
 
 <%-- For AEs tab the panes are defined in TBL monitor, for IRA we need to define it here --%>
 <div class="container-fluid" ${isIraAssessment ? 'id="assessment-pane-' += toolContentID += '"' : '' }>
+
 	<c:if test="${isIraAssessment}">
 		<div class="row">
 			<div class="col-10 offset-1">
-				<div class="float-end">
-					<button class="btn btn-secondary" type="button"
-						 onclick="javascript:showStudentChoices()">
-						<i class="fa fa-gauge"></i>
-						<fmt:message key="label.show.students.choices"/>
-					</button>   
-				</div>                 
+				<button class="btn btn-secondary float-end" type="button"
+					 onclick="javascript:showStudentChoices()">
+					<i class="fa fa-gauge"></i>
+					<fmt:message key="label.show.students.choices"/>
+				</button>   
 				<h3>
 					<fmt:message key="label.ira.questions.marks"/>
 				</h3>
@@ -47,7 +46,14 @@
 	
 	<!-- Notifications -->  
 	<div class="row mb-3">
-		<div class="col-5 offset-1 pt-1">
+		<div class="col-10 offset-1 pt-1">
+			<c:if test="${not isIraAssessment}">
+				<button class="btn btn-secondary float-end" type="button"
+					 onclick="javascript:showStudentChoices()">
+					<i class="fa fa-gauge"></i>
+					<fmt:message key="label.show.students.choices"/>
+				</button>   
+			</c:if>
 			<h4>
 				<i class="fa fa-users" style="color:gray" ></i> 
 				<fmt:message key="label.attendance"/>: <span>${attemptedLearnersNumber}</span>/<span class="total-learners-number"></span> 
@@ -58,12 +64,10 @@
 	<c:if test="${allowDiscloseAnswers and showQuestionMonitoringActionButtons}">
 		<%-- Release correct/groups answers for all questions in this assessment --%>
 		<div class="row mb-3 disclose-all-button-group">
-			<div class="col-2 offset-6 pt-1 text-end">
+			<div class="col-4 offset-7 text-end">
 				<button class="btn btn-secondary disclose-all-correct-button" type="button">
 					<fmt:message key="label.disclose.all.correct.answers"/>
 				</button>
-			</div>
-			<div class="col-2 pt-1 text-end">
 				<button class="btn btn-secondary disclose-all-groups-button" type="button">
 					<fmt:message key="label.disclose.all.groups.answers"/>
 				</button>
