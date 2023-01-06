@@ -43,7 +43,6 @@ public class IndexOrgBean implements Comparable {
     private Integer type;
     private boolean favorite = false;
     private boolean collapsed = false;
-    private String encodedOrgId;
     private List<IndexLinkBean> links;
     private List<IndexLinkBean> moreLinks;
     private List<IndexLessonBean> lessons;
@@ -219,13 +218,5 @@ public class IndexOrgBean implements Comparable {
 
     public void setCollapsed(boolean collapsed) {
 	this.collapsed = collapsed;
-    }
-
-    public String getEncodedOrgId() {
-	return encodedOrgId;
-    }
-
-    public void setEncodedOrgId(String encodedOrgId) {
-	this.encodedOrgId = encodedOrgId;
     }
 }

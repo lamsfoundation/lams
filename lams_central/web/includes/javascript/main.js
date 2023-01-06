@@ -697,7 +697,11 @@ function removeLesson(lessonID) {
 	}
 }
 
-function copyOrgUrlToClipboard(){
-  var copyText = $('#direct-org-launch-link').text();
-  navigator.clipboard.writeText(copyText);
+function copyOrgUrlToClipboard(url){
+	navigator.clipboard.writeText(url);
+	
+  	let successNotification = $('#course-url-copied').css('display', 'inline-block');
+  	setTimeout(function(){
+		successNotification.hide();
+	}, 5000);
 }

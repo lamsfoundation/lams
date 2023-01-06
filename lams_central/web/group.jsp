@@ -19,15 +19,9 @@
 			</c:otherwise>
 		</c:choose>
 	</a>
-	<c:if test="${isDirectOrgLaunchEnabled}">
-		<small class="loffset20">
-			<fmt:message key="index.organisation.link"/>
-			<span id="direct-org-launch-link"><lams:LAMSURL/>r/<c:out value="${orgBean.encodedOrgId}" escapeXml="true"/>
-            <i id="direct-org-launch-link-copy-button" class="text-primary loffset10 fa fa-clipboard"
-             		onClick="javascript:copyOrgUrlToClipboard()"
-             		title='<fmt:message key="index.organisation.link.tooltip"/>'></i>
-        </small>
-	</c:if>
+	<h4 id="course-url-copied" class="loffset20 text-success" style="display: none;">
+		<fmt:message key='index.organisation.link.success'/>
+	</h4>
 	
 	<!-- Group header -->
 	<c:set var="org" value="${orgBean}" />
