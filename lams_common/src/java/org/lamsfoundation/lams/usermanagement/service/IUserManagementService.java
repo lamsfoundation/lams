@@ -246,6 +246,11 @@ public interface IUserManagementService {
     Map<Integer, Set<Integer>> getRolesForUser(Integer userId);
 
     /**
+     * Checks if given user has got any roles in any organisation.
+     */
+    boolean hasUserAnyRoles(Integer userId);
+
+    /**
      * @param login
      * @param typeId
      * @param stateId
