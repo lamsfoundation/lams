@@ -402,6 +402,16 @@ public class UserManagementService implements IUserManagementService, Initializi
 	return baseDAO.findByProperties(UserOrganisation.class, properties);
     }
 
+    /**
+     * Checks if given user has got any roles in any organisation.
+     */
+    @Override
+    public boolean hasUserAnyRoles(Integer userId) {
+	Map<String, Object> properties = new HashMap<>();
+	properties.put("userOrganisation.user.userId", userId);
+	return baseDAO.countByProperties(UserOrganisationRole.class, properties) > 0;
+    }
+
     @Override
     public List getUserOrganisationsForUserByTypeAndStatusAndParent(String login, Integer typeId, Integer stateId,
 	    Integer parentOrgId) {

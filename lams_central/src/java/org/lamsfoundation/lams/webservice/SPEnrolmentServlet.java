@@ -332,10 +332,8 @@ public class SPEnrolmentServlet extends HttpServlet {
 		// users who are part of courses but are not in the file anymore are eligible for disabling
 		allExistingUsersFromParsedCourses.removeAll(allParsedUsers);
 		for (User user : allExistingUsersFromParsedCourses) {
-		    // make a flat set of roles from all subcourses
-		    Set<Integer> roles = userManagementService.getRolesForUser(user.getUserId()).values().stream()
-			    .collect(HashSet::new, Set::addAll, Set::addAll);
-		    if (roles.isEmpty()) {
+		    boolean hasAnyRoles = userManagementService.hasUserAnyRoles(user.getUserId());
+		    if (!hasAnyRoles) {
 			// he is only a learner or this is staff mode, so disable
 			userManagementService.disableUser(user.getUserId());
 
