@@ -47,7 +47,7 @@ public class ActivityURL {
     private boolean floating;
     private byte status;
     private boolean defaultURL;
-    private long duration;
+    private Long duration;
     private List<ActivityURL> childActivities;
 
     public ActivityURL() {
