@@ -17,6 +17,7 @@
 
 <script type="text/javascript">
 	$(document).ready(function(){
+	    let savedCellValue = "";
 
 		jQuery("#group${toolSessionId}").jqGrid({
 		   	url: "<c:url value='/monitoring/getUsers.do'/>?toolContentId=${sessionMap.toolContentID}&toolSessionId=${toolSessionId}&criteriaId=${criteria.ratingCriteriaId}",
@@ -79,13 +80,15 @@
 							'id',
 							'<fmt:message key="label.user.name" />',
 							'${heading}',
-							'criteriaId'
+							'criteriaId',
+							'userId'
 							],
 						colModel:[
 						   {name:'id', index:'id', width:0, hidden:true},
 						   {name:'userName', index:'userName', width:40 },
-						   {name:'rating', index:'rating',  title:false},
-						   {name:'criteriaId', width:0, hidden:true}
+						   {name:'rating', index:'rating',  title:false, editable: true},
+						   {name:'criteriaId', width:0, hidden:true},
+						   {name:'userId', width:0, hidden:true}
 						],
 						loadComplete: function(){
 							//remove empty subgrids
@@ -97,7 +100,22 @@
 						loadError: function(xhr,st,err) {
 					    	jQuery("#"+subgridTableId).clearGridData();
 					    	info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
-					    }
+					    },
+					    cellurl: "<c:url value='/monitoring/saveComment.do'/>?<csrf:token/>&toolSessionId=${toolSessionId}&criteriaId=${criteria.ratingCriteriaId}&itemId=" + itemId,
+	  				  	cellEdit: true,
+		  				beforeSelectRow: function(rowId) {
+			  			  // only comments are editable
+			  			  var rowData = $(this).jqGrid ('getRowData', rowId);
+			  			  $(this).setColProp('rating',{editable: rowData.criteriaId == 'Comments'});
+		  				}, 		
+	  				  	beforeSubmitCell : function (rowId,name,val){
+		  				  	// send additional information while submitting
+				  			var rowData = $(this).jqGrid ('getRowData', rowId);
+				  			return {
+					  			userId : rowData.userId,
+					  			comment : val
+					  		};
+	  					}
 					})
 			}
 		}).jqGrid('filterToolbar', { 

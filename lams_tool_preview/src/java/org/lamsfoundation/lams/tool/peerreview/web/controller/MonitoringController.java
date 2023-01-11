@@ -62,6 +62,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.HtmlUtils;
@@ -328,6 +329,7 @@ public class MonitoringController {
 		userData.add((String) ratingDetails[4]);
 		userData.add((String) ratingDetails[2]);
 		userData.add(title);
+		userData.add(ratingDetails[0].toString());
 
 		ObjectNode userRow = JsonNodeFactory.instance.objectNode();
 		userRow.put("id", i++);
@@ -352,6 +354,7 @@ public class MonitoringController {
 		    commentText = StringUtils.replace(commentText, "&lt;BR&gt;", "<BR/>").replace("\n", "<BR/>");
 		    userData.add(commentText);
 		    userData.add("Comments");
+		    userData.add(ratingDetails[0].toString());
 
 		    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
 		    userRow.put("id", i++);
@@ -682,5 +685,13 @@ public class MonitoringController {
 
 	service.setUserHidden(toolContentId, userUid, isHidden);
 	return "";
+    }
+
+    @RequestMapping("/saveComment")
+    @ResponseBody
+    public void saveComment(@RequestParam Long criteriaId, @RequestParam Long toolSessionId,
+	    @RequestParam Integer userId, @RequestParam Long itemId, @RequestParam String comment) {
+	RatingCriteria criteria = service.getCriteriaByCriteriaId(criteriaId);
+	service.commentItem(criteria, toolSessionId, userId, itemId, comment);
     }
 }
