@@ -51,11 +51,22 @@
 			if (!event.data) {
 				return;
 			}
-			var data = JSON.parse(decodeURIComponent(event.data));
+			
+			let data = JSON.parse(decodeURIComponent(event.data));
 			drawActivityCompletionChart(data, true);
 			drawAnsweredQuestionsChart(data, ${groupsInAnsweredQuestionsChart}, true);
 
-			$('#student-choices-table').load('<lams:WebAppURL />tblmonitoring/iraAssessmentStudentChoicesTable.do?toolContentID=${toolContentID}');
+			// if in student choice table a question modal is open, postpone the table update until the modal is closed
+			let openQuestionModal = $('.iraQuestionModal.show');
+			if (openQuestionModal.length == 0) {
+				$('#student-choices-table').load('<lams:WebAppURL />tblmonitoring/iraAssessmentStudentChoicesTable.do?toolContentID=${toolContentID}');
+				return;
+			}
+			
+			openQuestionModal.one('hidden.bs.modal', function() {
+				$('#student-choices-table').load('<lams:WebAppURL />tblmonitoring/iraAssessmentStudentChoicesTable.do?toolContentID=${toolContentID}');
+			});
+			
 		});
 		
 		$('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');

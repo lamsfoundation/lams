@@ -5,7 +5,7 @@
 <script>
 	$('#allocate-vsas-button').toggle(${vsaPresent});
 	$(function () {
-		$('[data-toggle="tooltip"]').tooltip()
+		$('[data-toggle="tooltip"]').tooltip();
 	})	
 </script>
 
@@ -87,7 +87,7 @@
 
 <!-- Question detail modal -->
 <c:forEach var="question" items="${questions}" varStatus="i">
-	<div class="modal fade" id="question${i.index}Modal">
+	<div class="modal fade iraQuestionModal" id="question${i.index}Modal">
 	<div class="modal-dialog modal-dialog-centered">
 	<div class="modal-content">
 		<div class="modal-header align-items-start">
@@ -114,7 +114,10 @@
 									<c:out value="${option.name}" escapeXml="false"/>
 								</td>
 								<td class="${cssClass}">
-									<fmt:formatNumber type="number" maxFractionDigits="2" value="${option.percentage}"/>%
+									<c:choose>
+										<c:when test="${option.percentage == -1}">-</c:when>
+										<c:otherwise><fmt:formatNumber type="number" maxFractionDigits="2" value="${option.percentage}"/>%</c:otherwise>
+									</c:choose>
 								</td>
 							</tr>
 						</c:forEach>
@@ -122,12 +125,6 @@
 					</tbody>
 				</table>
 			</div>
-		</div>
-	            
-		<div class="modal-footer">	
-			<a href="#" data-bs-dismiss="modal" class="btn btn-secondary">
-				<fmt:message key="label.ok"/>
-			</a>
 		</div>
 	</div>
 	</div>
