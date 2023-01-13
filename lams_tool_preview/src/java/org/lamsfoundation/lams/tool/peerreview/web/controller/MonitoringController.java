@@ -37,6 +37,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
@@ -59,7 +60,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -351,7 +351,8 @@ public class MonitoringController {
 		    userData.add(i);
 		    userData.add((String) ratingDetails[4]);
 		    String commentText = HtmlUtils.htmlEscape(comment);
-		    commentText = StringUtils.replace(commentText, "&lt;BR&gt;", "<BR/>").replace("\n", "<BR/>");
+		    commentText = commentText.replace("&lt;BR&gt;", "\n<BR>").replace("&lt;br&gt;", "\n<BR>");
+		    
 		    userData.add(commentText);
 		    userData.add("Comments");
 		    userData.add(ratingDetails[0].toString());
@@ -690,8 +691,9 @@ public class MonitoringController {
     @RequestMapping("/saveComment")
     @ResponseBody
     public void saveComment(@RequestParam Long criteriaId, @RequestParam Long toolSessionId,
-	    @RequestParam Integer userId, @RequestParam Long itemId, @RequestParam String comment) {
+	    @RequestParam Integer userId, @RequestParam Long itemId, @RequestParam(name = "rating") String comment) {
 	RatingCriteria criteria = service.getCriteriaByCriteriaId(criteriaId);
+	comment = comment.replace("\n", "<br>");
 	service.commentItem(criteria, toolSessionId, userId, itemId, comment);
     }
 }
