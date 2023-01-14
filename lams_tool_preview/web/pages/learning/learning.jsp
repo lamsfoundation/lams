@@ -20,7 +20,10 @@
 <c:choose>
 	<c:when test="${peerreview.showRatingsLeftForUser || peerreview.reflectOnActivity}">
 		<c:set var="finishButtonLabel"><fmt:message key="label.continue" /></c:set>
-	</c:when>				
+	</c:when>	
+	<c:when test="${sessionMap.isLastActivity}">
+		<c:set var="finishButtonLabel"><fmt:message key="label.finish" /></c:set>
+	</c:when>					
 	<c:otherwise>
 		<c:set var="finishButtonLabel"><fmt:message key="label.finished" /></c:set>
 	</c:otherwise>
@@ -72,7 +75,6 @@
 </lams:head>
 <body class="stripes">
 	<lams:Page type="learner" title="${peerreview.title}">
-
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
 			<lams:Alert type="danger" id="warn-lock" close="false">
 				<c:choose>
