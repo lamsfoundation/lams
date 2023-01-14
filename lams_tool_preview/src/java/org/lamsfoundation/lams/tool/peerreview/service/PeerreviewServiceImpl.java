@@ -350,9 +350,9 @@ public class PeerreviewServiceImpl
     }
 
     @Override
-    public void commentItem(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Long itemId,
+    public String commentItem(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Long itemId,
 	    String comment) {
-	ratingService.commentItem(ratingCriteria, toolSessionId, userId, itemId, comment);
+	return ratingService.commentItem(ratingCriteria, toolSessionId, userId, itemId, comment);
     }
 
     @Override

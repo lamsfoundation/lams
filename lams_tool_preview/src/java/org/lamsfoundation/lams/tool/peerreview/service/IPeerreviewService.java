@@ -236,8 +236,8 @@ public interface IPeerreviewService extends ToolRatingManager, ICommonToolServic
     /** Save the ratings for ranking and hedging. */
     int rateItems(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Map<Long, Float> newRatings);
 
-    /** Save a comment made on a comment only page. */
-    void commentItem(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Long itemId, String comment);
+    /** Save a comment made on a comment only page. Return previous comment, if overwritten. */
+    String commentItem(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Long itemId, String comment);
 
     /** Get the details for a single criteria */
     RatingCriteria getCriteriaByCriteriaId(Long ratingCriteriaId);
