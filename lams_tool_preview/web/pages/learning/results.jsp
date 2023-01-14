@@ -165,6 +165,11 @@
 						<fmt:message key="label.continue" />
 					</a>
 				</c:when>
+				<c:when test="${sessionMap.isLastActivity}">
+					<a href="#nogo" id="finishButton" class="btn btn-primary voffset5 pull-right na voffset20">
+						<fmt:message key="label.finish" />
+					</a>
+				</c:when>		
 				<c:otherwise>
 					<a href="#nogo" id="finishButton" class="btn btn-primary voffset5 pull-right na voffset20">
 						<fmt:message key="label.finished" />

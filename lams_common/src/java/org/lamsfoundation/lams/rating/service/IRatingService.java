@@ -126,7 +126,7 @@ public interface IRatingService {
     ItemRatingCriteriaDTO rateItem(RatingCriteria criteria, Long toolSessionId, Integer userId, Long itemId,
 	    float ratingFloat);
 
-    void commentItem(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Long itemId, String comment);
+    String commentItem(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Long itemId, String comment);
 
     /**
      * Returns results for all items. If result is needed for only one item provide provide it as a single element in a
