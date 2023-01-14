@@ -1,5 +1,18 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+
+<style>
+    /* when item is editable - show pencil icon on hover */
+    .editable-comment:hover +span+ i, /* when link is hovered select i */
+	.editable-comment + span:hover+ i, /* when space after link is hovered select i */
+	.editable-comment + span + i:hover { /* when icon is hovered select i */
+	  visibility: visible;
+	}
+	
+	.editable-comment +span+ i { /* in all other case hide it */
+	  visibility: hidden;
+	}
+</style>
 <c:choose>
 <c:when test="${criteria.ratingStyle eq 0 }">
 	<c:set var="heading"></c:set>
@@ -17,6 +30,7 @@
 
 <script type="text/javascript">
 	$(document).ready(function(){
+	    let savedCellValue = "";
 
 		jQuery("#group${toolSessionId}").jqGrid({
 		   	url: "<c:url value='/monitoring/getUsers.do'/>?toolContentId=${sessionMap.toolContentID}&toolSessionId=${toolSessionId}&criteriaId=${criteria.ratingCriteriaId}",
@@ -79,14 +93,55 @@
 							'id',
 							'<fmt:message key="label.user.name" />',
 							'${heading}',
-							'criteriaId'
+							'criteriaId',
+							'userId'
 							],
 						colModel:[
 						   {name:'id', index:'id', width:0, hidden:true},
 						   {name:'userName', index:'userName', width:40 },
-						   {name:'rating', index:'rating',  title:false},
-						   {name:'criteriaId', width:0, hidden:true}
+						   {name:'rating', index:'rating',  title:false, edittype: 'textarea', editoptions: {rows:"8"},
+						   		formatter:function(cellvalue, options, rowObject, event) {
+						   			if (event == "edit") {
+						   				cellvalue = cellvalue.replace(/\n/g, '\n<br>');
+						   			}
+						   			var rowData = $(this).jqGrid("getLocalRow", options.rowId);
+
+						   			// when item is editable - show pencil icon on hover
+									return rowData.criteriaId == 'Comments' ? 
+									   		"<span class='editable-comment'>" + cellvalue +
+									   		"</span><span>&nbsp;</span><i class='fa fa-pencil'></i>" 
+									   		: cellvalue;
+				   				},
+				   				unformat:function(cellvalue, options, rowObject) {
+				   					var text = $('<div>' + cellvalue + '</div>').text();
+									return text.trim();
+				   				},
+					   			editable: function (options) {
+					   				// only comments are editable
+					   	            var rowData = $(this).jqGrid("getLocalRow", options.rowid);
+						  			return rowData.criteriaId == 'Comments';
+					   	        }
+						   },
+						   {name:'criteriaId', width:0, hidden:true},
+						   {name:'userId', width:0, hidden:true}
 						],
+
+					    editurl: "<c:url value='/monitoring/saveComment.do'/>?<csrf:token/>&toolSessionId=${toolSessionId}&criteriaId=${criteria.ratingCriteriaId}&itemId=" + itemId,
+	  				  	inlineEditing: { keys: true, defaultFocusField: "rating", focusField: "rating" },
+	  					onSelectRow: function (rowid) {
+		  					var grid = $(this),
+	  							rowData = grid.jqGrid("getRowData", rowid);	  	
+  							                
+							if (rowData.criteriaId == 'Comments') {
+			  					grid.jqGrid("editRow", rowid, { focusField: "rating" });
+			  	            	// Modify event handler to save on blur
+			  	              	$("textarea[id^='" + rowid + "_rating']", grid).bind('blur', function(){
+			  	              		grid.saveRow(rowid, null, null, {
+			  	              			userId : rowData.userId
+				  	              	});
+			  	              	});
+							}
+	  	            	},
 						loadComplete: function(){
 							//remove empty subgrids
 					        var table_value = $('#'+subgridTableId).getGridParam('records');

@@ -38,15 +38,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
 import org.lamsfoundation.lams.tool.peerreview.dto.EmailPreviewDTO;
 import org.lamsfoundation.lams.tool.peerreview.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
+import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.tool.peerreview.service.IPeerreviewService;
 import org.lamsfoundation.lams.tool.peerreview.service.PeerreviewServiceImpl;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
@@ -59,9 +63,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.HtmlUtils;
@@ -89,6 +93,12 @@ public class MonitoringController {
     @Autowired
     @Qualifier("peerreviewService")
     private IPeerreviewService service;
+
+    @Autowired
+    private ILogEventService logEventService;
+
+    @Autowired
+    private IUserManagementService userManagementService;
 
     @RequestMapping("/summary")
     public String summary(HttpServletRequest request, HttpServletResponse response) {
@@ -328,6 +338,7 @@ public class MonitoringController {
 		userData.add((String) ratingDetails[4]);
 		userData.add((String) ratingDetails[2]);
 		userData.add(title);
+		userData.add(ratingDetails[0].toString());
 
 		ObjectNode userRow = JsonNodeFactory.instance.objectNode();
 		userRow.put("id", i++);
@@ -349,9 +360,11 @@ public class MonitoringController {
 		    userData.add(i);
 		    userData.add((String) ratingDetails[4]);
 		    String commentText = HtmlUtils.htmlEscape(comment);
-		    commentText = StringUtils.replace(commentText, "&lt;BR&gt;", "<BR/>").replace("\n", "<BR/>");
+		    commentText = commentText.replace("&lt;BR&gt;", "\n<BR>").replace("&lt;br&gt;", "\n<BR>");
+
 		    userData.add(commentText);
 		    userData.add("Comments");
+		    userData.add(ratingDetails[0].toString());
 
 		    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
 		    userRow.put("id", i++);
@@ -682,5 +695,20 @@ public class MonitoringController {
 
 	service.setUserHidden(toolContentId, userUid, isHidden);
 	return "";
+    }
+
+    @RequestMapping("/saveComment")
+    @ResponseBody
+    public void saveComment(@RequestParam Long criteriaId, @RequestParam Long toolSessionId,
+	    @RequestParam Integer userId, @RequestParam Long itemId, @RequestParam(name = "rating") String comment) {
+	RatingCriteria criteria = service.getCriteriaByCriteriaId(criteriaId);
+	comment = comment.replace("\n", "<br>");
+	String previousComment = service.commentItem(criteria, toolSessionId, userId, itemId, comment);
+
+	User user = userManagementService.getUserById(userId);
+	PeerreviewSession session = service.getPeerreviewSessionBySessionId(toolSessionId);
+
+	logEventService.logChangeLearnerContent(userId.longValue(), user.getLogin(),
+		session.getPeerreview().getContentId(), previousComment, comment);
     }
 }

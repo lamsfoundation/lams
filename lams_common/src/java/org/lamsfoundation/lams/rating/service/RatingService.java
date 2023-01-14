@@ -203,10 +203,10 @@ public class RatingService implements IRatingService {
     }
 
     @Override
-    public void commentItem(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Long itemId,
+    public String commentItem(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Long itemId,
 	    String comment) {
 	RatingComment ratingComment = ratingCommentDAO.getComment(ratingCriteria.getRatingCriteriaId(), userId, itemId);
-
+	String previousComment = null;
 	// persist MessageRating changes in DB
 	if (ratingComment == null) { // add
 	    ratingComment = new RatingComment();
@@ -217,10 +217,14 @@ public class RatingService implements IRatingService {
 
 	    ratingComment.setRatingCriteria(ratingCriteria);
 	    ratingComment.setToolSessionId(toolSessionId);
+	} else {
+	    previousComment = ratingComment.getComment();
 	}
 
 	ratingComment.setComment(comment);
 	ratingDAO.saveOrUpdate(ratingComment);
+
+	return previousComment;
     }
 
     @Override
