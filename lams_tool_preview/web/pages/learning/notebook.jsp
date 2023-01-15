@@ -40,10 +40,18 @@
 			<form:textarea id="focused" rows="5" path="entryText" cssClass="form-control"></form:textarea>
 
 			<div class="space-bottom-top align-right">
-				<a href="#nogo" class="btn btn-primary voffset5 pull-right na" id="finishButton">
-					<fmt:message key="label.finished" />
+				<a href="#nogo" class="btn btn-primary voffset10 pull-right na" id="finishButton">
+					<c:choose>
+						<c:when test="${sessionMap.isLastActivity}">
+							<fmt:message key="label.finish" />
+						</c:when>					
+						<c:otherwise>
+							<fmt:message key="label.finished" />
+						</c:otherwise>
+					</c:choose>
 				</a>
 			</div>
+			
 		</lams:Page>
 	</form:form>
 
@@ -59,5 +67,3 @@
 
 </body>
 </lams:html>
-
-
