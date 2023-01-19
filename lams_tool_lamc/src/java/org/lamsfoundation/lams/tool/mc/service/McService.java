@@ -2068,10 +2068,12 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
     @Override
     public Map<Integer, Integer> countCorrectAnswers(long toolContentId) {
-	return mcUsrAttemptDAO.findByProperty(McUsrAttempt.class, "qbToolQuestion.toolContentId", toolContentId)
-		.stream().filter(McUsrAttempt::isAttemptCorrect)
+	List<McUsrAttempt> attempts = mcUsrAttemptDAO.findByProperty(McUsrAttempt.class, "qbToolQuestion.toolContentId",
+		toolContentId);
+	return attempts.stream()
 		.collect(Collectors.groupingBy(a -> a.getMcQueUsr().getQueUsrId().intValue(),
-			Collectors.collectingAndThen(Collectors.toList(), List::size)));
+			Collectors.collectingAndThen(Collectors.toList(),
+				l -> (int) l.stream().filter(McUsrAttempt::isAttemptCorrect).count())));
     }
 
     // ****************** REST methods *************************
