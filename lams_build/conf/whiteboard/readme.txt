@@ -23,3 +23,5 @@ https://stackoverflow.com/questions/63610932/express-static-network-requests-stu
    
    3.5 In index.html we hide some buttons
        In index.html and index.js we hide Whiteboard contents until everything loads, otherwise the UI looks messed up at first.
+       
+   3.6 In main.css we make buttons on iPad smaller. Otherwise they obstruct pretty much whole canvas. 

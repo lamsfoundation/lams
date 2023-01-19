@@ -59,6 +59,7 @@ module.exports = {
             if (!savedUndos[wid]) {
                 savedUndos[wid] = [];
             }
+			console.log("undo wid: " + wid, savedUndos[wid]);
             let savedBoard = this.loadStoredData(wid);
             for (var i = savedUndos[wid].length - 1; i >= 0; i--) {
                 if (savedUndos[wid][i]["username"] == username) {
@@ -161,6 +162,15 @@ module.exports = {
             return;
         }
         savedBoards[targetWid] = sourceData.slice();
+
+		// LAMS: after load prefix author so his steps can not be undone
+		for (var i = 0; i < savedBoards[targetWid].length; i++) {
+			let username = savedBoards[targetWid][i]["username"];
+			if (username && !username.startsWith('authored-')) {
+				savedBoards[targetWid][i]["username"] = 'authored-' + username;
+			}
+		}         					   
+		
         this.saveToDB(targetWid);
     },
 	saveData: function(wid, data, processEmbeddedImages) {
