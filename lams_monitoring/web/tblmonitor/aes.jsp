@@ -23,6 +23,9 @@
 	});
 	
 	function loadAePane(targetToolContentId, contentType){
+		// defined in monitorLesson.js
+		clearEventSources();
+		
 		$('#aes-tab .tab-pane').each(function(){
 			var aePane = $(this).hide(),
 				toolContentId = aePane.data('toolContentId'),
