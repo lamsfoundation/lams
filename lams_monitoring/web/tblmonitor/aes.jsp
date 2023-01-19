@@ -33,13 +33,13 @@
 				var url = null;
 				if (toolType == 'd') {
 					url =  "<lams:LAMSURL/>tool/ladoku11/monitoring/ae.do?toolContentID="  + toolContentId;
-				} else if (contentType == 'studentChoices' || (!contentType && aePane.data('contentType') == 'studentChoices')){
+				} else if (contentType == 'default' || (!contentType && aePane.data('contentType') == 'default')){
 					// contentType is an extra setting saying which content from the given tool type to display
-					url =  "<lams:LAMSURL/>tool/laasse10/tblmonitoring/aesStudentChoices.do?toolContentID="  + toolContentId;
-					aePane.data('contentType', 'studentChoices');
-				} else {
 					url = "<lams:LAMSURL/>tool/laasse10/tblmonitoring/assessment.do?toolContentID="  + toolContentId;
 					aePane.data('contentType', 'default');
+				} else {
+					url =  "<lams:LAMSURL/>tool/laasse10/tblmonitoring/aesStudentChoices.do?toolContentID="  + toolContentId;
+					aePane.data('contentType', 'studentChoices');
 				}
 				// load AE tab content for the given tool content ID
 				aePane.show().load(url);
