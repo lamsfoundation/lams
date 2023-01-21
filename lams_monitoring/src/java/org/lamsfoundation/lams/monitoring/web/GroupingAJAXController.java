@@ -49,8 +49,10 @@ import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.security.ISecurityService;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationGroup;
 import org.lamsfoundation.lams.usermanagement.OrganisationGrouping;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -237,8 +239,8 @@ public class GroupingAJAXController {
 
 		if (result) {
 		    if (log.isDebugEnabled()) {
-			log.debug("Removing users " + membersParam.toString() + " from group "
-				+ group.getGroupId() + " in activity " + activityID);
+			log.debug("Removing users " + membersParam.toString() + " from group " + group.getGroupId()
+				+ " in activity " + activityID);
 		    }
 
 		    try {
@@ -263,8 +265,7 @@ public class GroupingAJAXController {
 	    if (groupID == null) {
 		String name = WebUtil.readStrParam(request, GroupingAJAXController.PARAM_NAME);
 		if (log.isDebugEnabled()) {
-		    log
-			    .debug("Creating group with name \"" + name + "\" in activity " + activityID);
+		    log.debug("Creating group with name \"" + name + "\" in activity " + activityID);
 		}
 		Group group = monitoringService.addGroup(activityID, name, true);
 		if (group == null) {
@@ -279,8 +280,8 @@ public class GroupingAJAXController {
 
 	    if (result && (members != null)) {
 		if (log.isDebugEnabled()) {
-		    log.debug("Adding users " + membersParam.toString() + " to group " + groupID
-			    + " in activity " + activityID);
+		    log.debug("Adding users " + membersParam.toString() + " to group " + groupID + " in activity "
+			    + activityID);
 		}
 
 		// add users to the given group
@@ -304,15 +305,20 @@ public class GroupingAJAXController {
     @ResponseBody
     public String saveAsCourseGrouping(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
+	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
+	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationId);
+	// get course groupings from top-leve course
+	if (OrganisationType.CLASS_TYPE.equals(organisation.getOrganisationType().getOrganisationTypeId())) {
+	    organisation = organisation.getParentOrganisation();
+	    organisationId = organisation.getOrganisationId();
+	}
 	HttpSession ss = SessionManager.getSession();
 	Integer userId = ((UserDTO) ss.getAttribute(AttributeNames.USER)).getUserID();
-	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	String newGroupingName = request.getParameter("name");
 
 	// check if user is allowed to view and edit groupings
 	if (!securityService.hasOrgRole(organisationId, userId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR },
-		"view organisation groupings")) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR }, "save as organisation grouping")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the organisation");
 	    return null;
 	}
