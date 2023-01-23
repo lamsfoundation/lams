@@ -13,6 +13,7 @@ import java.util.UUID;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
@@ -26,12 +27,14 @@ import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.tool.ToolContent;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -116,6 +119,14 @@ public class EditQbQuestionController {
 	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 	if (qbQuestion == null) {
 	    throw new RuntimeException("QbQuestion with uid:" + qbQuestionUid + " was not found!");
+	}
+	Integer userId = getUserId();
+	boolean editingAllowed = qbService.isQuestionInUserCollection(qbQuestion.getQuestionId(), userId)
+		|| qbService.isQuestionInPublicCollection(qbQuestion.getQuestionId());
+	if (!editingAllowed) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN,
+		    "The user does not have access to given QB question editing");
+	    return null;
 	}
 
 	//populate question information to its form for editing
@@ -394,4 +405,9 @@ public class EditQbQuestionController {
 	return forward;
     }
 
+    private Integer getUserId() {
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	return user != null ? user.getUserID() : null;
+    }
 }
