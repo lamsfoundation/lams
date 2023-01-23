@@ -22,6 +22,7 @@
 
 package org.lamsfoundation.lams.web.qb;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +89,12 @@ public class QbCollectionController {
     }
 
     @RequestMapping("/showOne")
-    public String showOneCollection(@RequestParam long collectionUid, Model model) throws Exception {
+    public String showOneCollection(@RequestParam long collectionUid, Model model, HttpServletResponse response)
+	    throws Exception {
+	if (!hasUserAccessToCollection(collectionUid)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user does not have access to given collection");
+	    return null;
+	}
 	model.addAttribute("collection", qbService.getCollection(collectionUid));
 	int userId = getUserId();
 	model.addAttribute("userId", userId);
@@ -101,7 +107,11 @@ public class QbCollectionController {
     @RequestMapping(path = "/getCollectionGridData")
     @ResponseBody
     public String getCollectionGridData(@RequestParam long collectionUid, @RequestParam String view,
-	    HttpServletRequest request, HttpServletResponse response) {
+	    HttpServletRequest request, HttpServletResponse response) throws IOException {
+	if (!hasUserAccessToCollection(collectionUid)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user does not have access to given collection");
+	    return null;
+	}
 	response.setContentType("application/xml;charset=UTF-8");
 
 	int page = WebUtil.readIntParam(request, CommonConstants.PARAM_PAGE);
@@ -128,6 +138,114 @@ public class QbCollectionController {
 	List<QbQuestion> questions = qbService.getQuestionsByQuestionId(qbQuestionId);
 	questions = questions.subList(1, questions.size());
 	return toGridXML(questions, 1, 1, questions.size(), view);
+    }
+
+    @RequestMapping(path = "/removeCollectionQuestion", method = RequestMethod.POST)
+    @ResponseBody
+    public void removeCollectionQuestion(@RequestParam long collectionUid, @RequestParam int qbQuestionId,
+	    HttpServletResponse response) throws IOException {
+	if (!hasUserAccessToCollection(collectionUid)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user does not have access to given collection");
+	    return;
+	}
+	qbService.removeQuestionFromCollectionByQuestionId(collectionUid, qbQuestionId, true);
+    }
+
+    @RequestMapping(path = "/removeCollectionQuestions", method = RequestMethod.POST)
+    @ResponseBody
+    public String removeCollectionQuestions(@RequestParam long collectionUid,
+	    @RequestParam("qbQuestionIds[]") int[] qbQuestionIds, HttpServletResponse response) throws IOException {
+	if (!hasUserAccessToCollection(collectionUid)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user does not have access to given collection");
+	    return null;
+	}
+	boolean allQuestionsRemoved = true;
+	for (int qbQuestionId : qbQuestionIds) {
+	    allQuestionsRemoved &= qbService.removeQuestionFromCollectionByQuestionId(collectionUid, qbQuestionId,
+		    true);
+	}
+	// if some questions could not be removed because they are in sequences, we need to let the user know
+	return allQuestionsRemoved ? "ok" : "fail";
+    }
+
+    @RequestMapping(path = "/addCollectionQuestion", method = RequestMethod.POST)
+    @ResponseBody
+    public void addCollectionQuestion(@RequestParam long targetCollectionUid, @RequestParam boolean copy,
+	    @RequestParam int qbQuestionId, HttpServletResponse response) throws IOException {
+	if (!Configuration.getAsBoolean(ConfigurationKeys.QB_COLLECTIONS_TRANSFER_ALLOW)) {
+	    throw new SecurityException("Transfering questions between collections is disabled");
+	}
+	if (!hasUserAccessToCollection(targetCollectionUid)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user does not have access to given collection");
+	    return;
+	}
+	qbService.addQuestionToCollection(targetCollectionUid, qbQuestionId, copy);
+    }
+
+    @RequestMapping(path = "/addCollection", method = RequestMethod.POST)
+    @ResponseBody
+    public void addCollection(@RequestParam String name) {
+	if (!Configuration.getAsBoolean(ConfigurationKeys.QB_COLLECTIONS_CREATE_ALLOW)) {
+	    throw new SecurityException("New collections are disabled");
+	}
+	qbService.addCollection(getUserId(), name);
+    }
+
+    @RequestMapping(path = "/changeCollectionName", method = RequestMethod.POST)
+    @ResponseBody
+    public String changeCollectionName(@RequestParam(name = "pk") long collectionUid,
+	    @RequestParam(name = "value") String name, HttpServletResponse response) throws IOException {
+	if (!hasUserAccessToCollection(collectionUid)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user does not have access to given collection");
+	    return null;
+	}
+	Collection<QbCollection> collections = qbService.getUserCollections(getUserId());
+	name = name.trim();
+	for (QbCollection collection : collections) {
+	    if (collection.getUid().equals(collectionUid)) {
+		if (collection.getUserId() == null) {
+		    // can not change public collection name
+		    return "false";
+		}
+	    } else if (name.equalsIgnoreCase(collection.getName())) {
+		// a collection with the same name already exists
+		return "false";
+	    }
+	}
+	qbService.changeCollectionName(collectionUid, name);
+	return "true";
+    }
+
+    @RequestMapping(path = "/removeCollection", method = RequestMethod.POST)
+    @ResponseBody
+    public void removeCollection(@RequestParam long collectionUid, HttpServletResponse response) throws IOException {
+	if (!hasUserAccessToCollection(collectionUid)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user does not have access to given collection");
+	    return;
+	}
+	qbService.removeCollection(collectionUid);
+    }
+
+    @RequestMapping(path = "/shareCollection", method = RequestMethod.POST)
+    @ResponseBody
+    public void shareCollection(@RequestParam long collectionUid, @RequestParam int organisationId,
+	    HttpServletResponse response) throws IOException {
+	if (!hasUserAccessToCollection(collectionUid)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user does not have access to given collection");
+	    return;
+	}
+	qbService.shareCollection(collectionUid, organisationId);
+    }
+
+    @RequestMapping(path = "/unshareCollection", method = RequestMethod.POST)
+    @ResponseBody
+    public void unshareCollection(@RequestParam long collectionUid, @RequestParam int organisationId,
+	    HttpServletResponse response) throws IOException {
+	if (!hasUserAccessToCollection(collectionUid)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user does not have access to given collection");
+	    return;
+	}
+	qbService.unshareCollection(collectionUid, organisationId);
     }
 
     private String toGridXML(List<QbQuestion> questions, int page, int maxPages, int totalCount, String view) {
@@ -192,86 +310,18 @@ public class QbCollectionController {
 	return null;
     }
 
-    @RequestMapping(path = "/removeCollectionQuestion", method = RequestMethod.POST)
-    @ResponseBody
-    public void removeCollectionQuestion(@RequestParam long collectionUid, @RequestParam int qbQuestionId) {
-	qbService.removeQuestionFromCollectionByQuestionId(collectionUid, qbQuestionId, true);
-    }
-
-    @RequestMapping(path = "/removeCollectionQuestions", method = RequestMethod.POST)
-    @ResponseBody
-    public String removeCollectionQuestionS(@RequestParam long collectionUid,
-	    @RequestParam("qbQuestionIds[]") int[] qbQuestionIds) {
-	boolean allQuestionsRemoved = true;
-	for (int qbQuestionId : qbQuestionIds) {
-	    allQuestionsRemoved &= qbService.removeQuestionFromCollectionByQuestionId(collectionUid, qbQuestionId,
-		    true);
-	}
-	// if some questions could not be removed because they are in sequences, we need to let the user know
-	return allQuestionsRemoved ? "ok" : "fail";
-    }
-
-    @RequestMapping(path = "/addCollectionQuestion", method = RequestMethod.POST)
-    @ResponseBody
-    public void addCollectionQuestion(@RequestParam long targetCollectionUid, @RequestParam boolean copy,
-	    @RequestParam int qbQuestionId) {
-	if (!Configuration.getAsBoolean(ConfigurationKeys.QB_COLLECTIONS_TRANSFER_ALLOW)) {
-	    throw new SecurityException("Transfering questions between collections is disabled");
-	}
-	qbService.addQuestionToCollection(targetCollectionUid, qbQuestionId, copy);
-    }
-
-    @RequestMapping(path = "/addCollection", method = RequestMethod.POST)
-    @ResponseBody
-    public void addCollection(@RequestParam String name) {
-	if (!Configuration.getAsBoolean(ConfigurationKeys.QB_COLLECTIONS_CREATE_ALLOW)) {
-	    throw new SecurityException("New collections are disabled");
-	}
-	qbService.addCollection(getUserId(), name);
-    }
-
-    @RequestMapping(path = "/changeCollectionName", method = RequestMethod.POST)
-    @ResponseBody
-    public String changeCollectionName(@RequestParam(name = "pk") long collectionUid,
-	    @RequestParam(name = "value") String name) {
-	Collection<QbCollection> collections = qbService.getUserCollections(getUserId());
-	name = name.trim();
-	for (QbCollection collection : collections) {
-	    if (collection.getUid().equals(collectionUid)) {
-		if (collection.getUserId() == null) {
-		    // can not change public collection name
-		    return "false";
-		}
-	    } else if (name.equalsIgnoreCase(collection.getName())) {
-		// a collection with the same name already exists
-		return "false";
-	    }
-	}
-	qbService.changeCollectionName(collectionUid, name);
-	return "true";
-    }
-
-    @RequestMapping(path = "/removeCollection", method = RequestMethod.POST)
-    @ResponseBody
-    public void removeCollection(@RequestParam long collectionUid) {
-	qbService.removeCollection(collectionUid);
-    }
-
-    @RequestMapping(path = "/shareCollection", method = RequestMethod.POST)
-    @ResponseBody
-    public void shareCollection(@RequestParam long collectionUid, @RequestParam int organisationId) {
-	qbService.shareCollection(collectionUid, organisationId);
-    }
-
-    @RequestMapping(path = "/unshareCollection", method = RequestMethod.POST)
-    @ResponseBody
-    public void unshareCollection(@RequestParam long collectionUid, @RequestParam int organisationId) {
-	qbService.unshareCollection(collectionUid, organisationId);
-    }
-
     private Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	return user != null ? user.getUserID() : null;
+    }
+
+    private boolean hasUserAccessToCollection(long collectionUid) {
+	Integer userId = getUserId();
+	if (userId == null) {
+	    return false;
+	}
+	Collection<QbCollection> collections = qbService.getUserCollections(userId);
+	return collections.stream().map(QbCollection::getUid).anyMatch(uid -> uid.equals(collectionUid));
     }
 }
