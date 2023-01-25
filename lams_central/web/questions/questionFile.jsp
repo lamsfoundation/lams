@@ -123,7 +123,7 @@
 		}
 		
 		$(document).ready(function(){
-			initFileUpload('${tmpFileUploadId}', '<lams:user property="localeLanguage"/>');
+			initFileUpload('<c:out value="${tmpFileUploadId}" />', '<lams:user property="localeLanguage"/>');
 		});	
 	</script>
 </lams:head>

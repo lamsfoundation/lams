@@ -46,7 +46,7 @@
 		UPLOAD_FILE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>';
 	
 		$(document).ready(function() {
-			initFileUpload('${importForm.tmpFileUploadId}', '${language}');
+			initFileUpload('<c:out value="${importForm.tmpFileUploadId}" />', '${language}');
 		});
 		
 		/**
