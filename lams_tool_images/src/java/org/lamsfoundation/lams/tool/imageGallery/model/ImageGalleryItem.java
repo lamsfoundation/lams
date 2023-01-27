@@ -111,6 +111,13 @@ public class ImageGalleryItem implements Cloneable {
     @Transient
     private ImageGalleryAttachment thumbnailFile;
     @Transient
+    private String originalFileDisplayUuid;
+    @Transient
+    private String mediumFileDisplayUuid;
+    @Transient
+    private String thumbnailFileDisplayUuid;
+
+    @Transient
     private String titleEscaped;
     @Transient
     private String descriptionEscaped;
@@ -330,5 +337,29 @@ public class ImageGalleryItem implements Cloneable {
 
     public void setDescriptionEscaped(String descriptionEscaped) {
 	this.descriptionEscaped = descriptionEscaped;
+    }
+
+    public String getOriginalFileDisplayUuid() {
+        return originalFileDisplayUuid;
+    }
+
+    public void setOriginalFileDisplayUuid(String originalFileDisplayUuid) {
+        this.originalFileDisplayUuid = originalFileDisplayUuid;
+    }
+
+    public String getMediumFileDisplayUuid() {
+        return mediumFileDisplayUuid;
+    }
+
+    public void setMediumFileDisplayUuid(String mediumFileDisplayUuid) {
+        this.mediumFileDisplayUuid = mediumFileDisplayUuid;
+    }
+
+    public String getThumbnailFileDisplayUuid() {
+        return thumbnailFileDisplayUuid;
+    }
+
+    public void setThumbnailFileDisplayUuid(String thumbnailFileDisplayUuid) {
+        this.thumbnailFileDisplayUuid = thumbnailFileDisplayUuid;
     }
 }

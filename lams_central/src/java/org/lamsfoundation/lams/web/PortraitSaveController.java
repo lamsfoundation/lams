@@ -127,31 +127,31 @@ public class PortraitSaveController {
 
 	    // upload to the content repository
 	    originalFileNode = centralToolContentHandler.uploadFile(is, fileNameWithoutExt + "_original.jpg",
-		    "image/jpeg", true);
+		    "image/jpeg");
 	    is.close();
-	    log.debug("saved file with uuid: " + originalFileNode.getUuid() + " and portrait uuid "
-		    + originalFileNode.getPortraitUuid() + " and version: " + originalFileNode.getVersion());
+	    log.debug("saved file with uuid: " + originalFileNode.getNodeId() + " and portrait uuid "
+		    + originalFileNode.getUuid() + " and version: " + originalFileNode.getVersion());
 
 	    //resize to the large size
 	    is = ResizePictureUtil.resize(file.getInputStream(), CommonConstants.PORTRAIT_LARGEST_DIMENSION_LARGE);
-	    NodeKey node = centralToolContentHandler.updateFile(originalFileNode.getUuid(), is,
+	    NodeKey node = centralToolContentHandler.updateFile(originalFileNode.getNodeId(), is,
 		    fileNameWithoutExt + "_large.jpg", "image/jpeg");
 	    is.close();
-	    log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
+	    log.debug("saved file with uuid: " + node.getNodeId() + " and version: " + node.getVersion());
 
 	    //resize to the medium size
 	    is = ResizePictureUtil.resize(file.getInputStream(), CommonConstants.PORTRAIT_LARGEST_DIMENSION_MEDIUM);
-	    node = centralToolContentHandler.updateFile(node.getUuid(), is, fileNameWithoutExt + "_medium.jpg",
+	    node = centralToolContentHandler.updateFile(node.getNodeId(), is, fileNameWithoutExt + "_medium.jpg",
 		    "image/jpeg");
 	    is.close();
-	    log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
+	    log.debug("saved file with uuid: " + node.getNodeId() + " and version: " + node.getVersion());
 
 	    //resize to the small size
 	    is = ResizePictureUtil.resize(file.getInputStream(), CommonConstants.PORTRAIT_LARGEST_DIMENSION_SMALL);
-	    node = centralToolContentHandler.updateFile(node.getUuid(), is, fileNameWithoutExt + "_small.jpg",
+	    node = centralToolContentHandler.updateFile(node.getNodeId(), is, fileNameWithoutExt + "_small.jpg",
 		    "image/jpeg");
 	    is.close();
-	    log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
+	    log.debug("saved file with uuid: " + node.getNodeId() + " and version: " + node.getVersion());
 
 	}
 
@@ -159,7 +159,7 @@ public class PortraitSaveController {
 	if (user.getPortraitUuid() != null) {
 	    centralToolContentHandler.deleteFile(user.getPortraitUuid());
 	}
-	user.setPortraitUuid(UUID.fromString(originalFileNode.getPortraitUuid()));
+	user.setPortraitUuid(UUID.fromString(originalFileNode.getUuid()));
 	userManagementService.saveUser(user);
 
 	return "forward:/index.do?redirect=portrait";

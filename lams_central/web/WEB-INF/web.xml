@@ -584,6 +584,7 @@
 		<web-resource-collection>
 			<web-resource-name>General secure content</web-resource-name>
 			<url-pattern>/*</url-pattern>
+			<url-pattern>/ckeditor/filemanager/*</url-pattern>
 			<http-method>GET</http-method>
  			<http-method>POST</http-method>
 		</web-resource-collection>
@@ -667,9 +668,11 @@
 	</security-constraint>
 	<security-constraint>
 		<web-resource-collection>
-			<web-resource-name>Add lesson</web-resource-name>
+			<web-resource-name>Monitor access</web-resource-name>
 			<url-pattern>/addLesson.jsp</url-pattern>
 			<url-pattern>/lti/addLesson.jsp</url-pattern>
+			<url-pattern>/qb/collection/*</url-pattern>
+			<url-pattern>/qb/stats/*</url-pattern>
 			<http-method>GET</http-method>
  			<http-method>POST</http-method>
 		</web-resource-collection>

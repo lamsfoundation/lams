@@ -210,6 +210,7 @@ public class LearningController {
 	    image.setDescriptionEscaped(descriptionEscaped);
 	}
 
+	igService.fillImageDisplayUuid(images);
 	sessionMap.put(ImageGalleryConstants.ATTR_IMAGE_LIST, images);
 	sessionMap.put(ImageGalleryConstants.ATTR_IMAGE_GALLERY, imageGallery);
 
@@ -317,6 +318,7 @@ public class LearningController {
 	ImageGalleryItem image = igService.getImageGalleryItemByUid(imageUid);
 	String escapedDescription = image.getDescription().replaceAll("[\"]", "&quot;");
 	image.setDescription(escapedDescription);
+	igService.fillImageDisplayUuid(image);
 	sessionMap.put(ImageGalleryConstants.PARAM_CURRENT_IMAGE, image);
 
 	// becuase in webpage will use this login name. Here is just

@@ -176,7 +176,9 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
     @Override
     public List<ImageGalleryItem> getAuthoredItems(Long imageGalleryUid) {
-	return imageGalleryItemDao.getAuthoringItems(imageGalleryUid);
+	List<ImageGalleryItem> items = imageGalleryItemDao.getAuthoringItems(imageGalleryUid);
+	fillImageDisplayUuid(items);
+	return items;
     }
 
     @Override
@@ -434,6 +436,12 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 		    summary.setItemRatingDto(itemRatingDto);
 		}
 
+		image.setOriginalFileDisplayUuid(
+			imageGalleryToolContentHandler.getFileUuid(image.getOriginalFileUuid()));
+		image.setMediumFileDisplayUuid(imageGalleryToolContentHandler.getFileUuid(image.getMediumFileUuid()));
+		image.setThumbnailFileDisplayUuid(
+			imageGalleryToolContentHandler.getFileUuid(image.getThumbnailFileUuid()));
+
 		group.add(summary);
 	    }
 	    // if there is no any item available, then just put session name into Summary
@@ -553,10 +561,11 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    // upload file
 	    NodeKey nodeKey = uploadMultipartFile(file);
 	    image.setFileName(file.getName());
-	    image.setOriginalFileUuid(nodeKey.getUuid());
+	    image.setOriginalFileUuid(nodeKey.getNodeId());
+	    image.setOriginalFileDisplayUuid(nodeKey.getUuid());
 	    String fileName = file.getName();
 
-	    InputStream originalIS = imageGalleryToolContentHandler.getFileInputStream(nodeKey.getUuid());
+	    InputStream originalIS = imageGalleryToolContentHandler.getFileInputStream(nodeKey.getNodeId());
 	    BufferedImage originalImage = ImageIO.read(originalIS);
 	    //throw exception if image was not successfully read
 	    if (originalImage == null) {
@@ -568,7 +577,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
 	    // prepare medium image
 	    originalIS.close();
-	    originalIS = imageGalleryToolContentHandler.getFileInputStream(nodeKey.getUuid());
+	    originalIS = imageGalleryToolContentHandler.getFileInputStream(nodeKey.getNodeId());
 	    InputStream mediumIS = ResizePictureUtil.resize(originalIS, mediumImageDimensions);
 	    if (mediumIS == null) {
 		throw new UploadImageGalleryFileException("Impossible to resize image");
@@ -576,22 +585,24 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    String mediumFileName = ImageGalleryServiceImpl.MEDIUM_FILENAME_PREFIX
 		    + fileName.substring(0, fileName.indexOf('.')) + ".jpg";
 	    NodeKey mediumNodeKey = imageGalleryToolContentHandler.uploadFile(mediumIS, mediumFileName, "image/jpeg");
-	    image.setMediumFileUuid(mediumNodeKey.getUuid());
+	    image.setMediumFileUuid(mediumNodeKey.getNodeId());
+	    image.setMediumFileDisplayUuid(mediumNodeKey.getUuid());
 	    //store MediumImageWidth and MediumImageHeight
-	    InputStream mediumIS2 = imageGalleryToolContentHandler.getFileInputStream(mediumNodeKey.getUuid());
+	    InputStream mediumIS2 = imageGalleryToolContentHandler.getFileInputStream(mediumNodeKey.getNodeId());
 	    BufferedImage mediumImage = ImageIO.read(mediumIS2);
 	    image.setMediumImageWidth(mediumImage.getWidth(null));
 	    image.setMediumImageHeight(mediumImage.getHeight(null));
 	    mediumIS2.close();
 
 	    // prepare thumbnail image
-	    InputStream originalIS2 = imageGalleryToolContentHandler.getFileInputStream(nodeKey.getUuid());
+	    InputStream originalIS2 = imageGalleryToolContentHandler.getFileInputStream(nodeKey.getNodeId());
 	    InputStream thumbnailIS = ResizePictureUtil.resize(originalIS2, thumbnailImageDimensions);
 	    String thumbnailFileName = ImageGalleryServiceImpl.THUMBNAIL_FILENAME_PREFIX
 		    + fileName.substring(0, fileName.indexOf('.')) + ".jpg";
 	    NodeKey thumbnailNodeKey = imageGalleryToolContentHandler.uploadFile(thumbnailIS, thumbnailFileName,
 		    "image/jpeg");
-	    image.setThumbnailFileUuid(thumbnailNodeKey.getUuid());
+	    image.setThumbnailFileUuid(thumbnailNodeKey.getNodeId());
+	    image.setThumbnailFileDisplayUuid(thumbnailNodeKey.getUuid());
 
 	} catch (RepositoryCheckedException e) {
 	    throw new UploadImageGalleryFileException(
@@ -1182,6 +1193,20 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	}
 
 	return images;
+    }
+
+    @Override
+    public void fillImageDisplayUuid(Collection<ImageGalleryItem> items) {
+	for (ImageGalleryItem item : items) {
+	    fillImageDisplayUuid(item);
+	}
+    }
+
+    @Override
+    public void fillImageDisplayUuid(ImageGalleryItem item) {
+	item.setOriginalFileDisplayUuid(imageGalleryToolContentHandler.getFileUuid(item.getOriginalFileUuid()));
+	item.setMediumFileDisplayUuid(imageGalleryToolContentHandler.getFileUuid(item.getMediumFileUuid()));
+	item.setThumbnailFileDisplayUuid(imageGalleryToolContentHandler.getFileUuid(item.getThumbnailFileUuid()));
     }
 
     // *****************************************************************************

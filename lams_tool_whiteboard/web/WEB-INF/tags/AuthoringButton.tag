@@ -97,7 +97,7 @@
     function closeWindow(nextAction) {
         // notifyCloseURL needs to be encoded in Java *twice*, otherwise it won't work
         // for both AuthoringButton.tag and authoringConfirm.jsp
-		var notifyCloseURL = decodeURIComponent("${notifyCloseURL}");
+		var notifyCloseURL = decodeURIComponent("<c:out value='${notifyCloseURL}' />");
 		if (notifyCloseURL == ""){
 			if (nextAction == "defineLater") {
 				refreshParentMonitoringWindow();
@@ -105,7 +105,7 @@
 			var clearSessionUrl = "<c:url value='${clearSessionActionUrl}?action=" + nextAction + "&mode=${accessMode}&defineLater=${defineLater}&customiseSessionID=${customiseSessionID}&signature=${toolSignature}&toolContentID=${toolContentID}'/>";
 			doAjaxCall(clearSessionUrl);
 		} else {
-			if ('${param.noopener}' == 'true' || notifyCloseURL.indexOf('noopener=true') >= 0) {
+			if (${param.noopener eq "true" or notifyCloseURL.indexOf("noopener=true") >= 0}) {
 				window.location.href = notifyCloseURL + '&action=' + nextAction;
 			} else if (window.parent.opener == null){
 				doAjaxCall(notifyCloseURL);

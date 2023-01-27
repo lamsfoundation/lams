@@ -322,7 +322,11 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
     @Override
     public Message getMessage(Long messageUid) throws PersistenceException {
-	return messageDao.getById(messageUid);
+	Message message = messageDao.getById(messageUid);
+	for (Attachment attachment : message.getAttachments()) {
+	    attachment.setFileDisplayUuid(forumToolContentHandler.getFileUuid(attachment.getFileUuid()));
+	}
+	return message;
     }
 
     @Override
@@ -405,9 +409,10 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
 	NodeKey nodeKey = processFile(uploadFile);
 	Attachment file = new Attachment();
-	file.setFileUuid(nodeKey.getUuid());
+	file.setFileUuid(nodeKey.getNodeId());
 	file.setFileVersionId(nodeKey.getVersion());
 	file.setFileName(uploadFile.getName());
+	file.setFileDisplayUuid(nodeKey.getUuid());
 
 	return file;
     }
@@ -564,6 +569,11 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    if (topic.getToolSession() == null) {
 		map.put(topic.getCreated(), topic);
 	    }
+
+	    for (Attachment attachment : topic.getAttachments()) {
+		attachment.setFileDisplayUuid(forumToolContentHandler.getFileUuid(attachment.getFileUuid()));
+	    }
+
 	}
 	return MessageDTO.getMessageDTO(new ArrayList<>(map.values()));
     }
@@ -581,7 +591,11 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     @Override
     public List<MessageDTO> getMessagesByUserUid(Long userId, Long sessionId) {
 	List<Message> list = messageDao.getByUserAndSession(userId, sessionId);
-
+	for (Message message : list) {
+	    for (Attachment attachment : message.getAttachments()) {
+		attachment.setFileDisplayUuid(forumToolContentHandler.getFileUuid(attachment.getFileUuid()));
+	    }
+	}
 	return MessageDTO.getMessageDTO(list);
     }
 
@@ -713,6 +727,9 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     }
 
     private MessageDTO makeDTOSetRating(MessageSeq msgSeq, Message message) {
+	for (Attachment attachment : message.getAttachments()) {
+	    attachment.setFileDisplayUuid(forumToolContentHandler.getFileUuid(attachment.getFileUuid()));
+	}
 	MessageDTO dto = MessageDTO.getMessageDTO(message);
 	dto.setLevel(msgSeq.getMessageLevel());
 	//set averageRating

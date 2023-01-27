@@ -21,8 +21,6 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.sbmt.dto;
 
 import java.io.Serializable;
@@ -60,15 +58,17 @@ public class FileDetailsDTO implements Serializable {
     private String markFileName;
     private Long markFileUUID;
     private Long markFileVersionID;
+    private String markFileDisplayUuid;
 
     //file repository info
     private Long uuID;
     private Long versionID;
+    private String displayUuid;
 
     private boolean finished;
     //if this file uploaded by current learner
     private boolean currentLearner;
-    
+
     private boolean removed;
 
     /**
@@ -101,7 +101,8 @@ public class FileDetailsDTO implements Serializable {
 	    this.reportID = report.getReportID();
 	    this.comments = report.getComments();
 	    this.marks = report.getMarks() != null
-		    ? NumberUtil.formatLocalisedNumber(report.getMarks(), numberFormat, 2) : "";
+		    ? NumberUtil.formatLocalisedNumber(report.getMarks(), numberFormat, 2)
+		    : "";
 	    this.markFileName = report.getMarkFileName();
 	    this.markFileUUID = report.getMarkFileUUID();
 	    this.markFileVersionID = report.getMarkFileVersionID();
@@ -228,6 +229,14 @@ public class FileDetailsDTO implements Serializable {
 	this.versionID = versionID;
     }
 
+    public String getDisplayUuid() {
+	return displayUuid;
+    }
+
+    public void setDisplayUuid(String displayUuid) {
+	this.displayUuid = displayUuid;
+    }
+
     /**
      * @return Returns the submissionID.
      */
@@ -296,6 +305,14 @@ public class FileDetailsDTO implements Serializable {
 
     public void setMarkFileVersionID(Long markFileVersionID) {
 	this.markFileVersionID = markFileVersionID;
+    }
+
+    public String getMarkFileDisplayUuid() {
+	return markFileDisplayUuid;
+    }
+
+    public void setMarkFileDisplayUuid(String markFileDisplayUuid) {
+	this.markFileDisplayUuid = markFileDisplayUuid;
     }
 
     public boolean isRemoved() {

@@ -50,7 +50,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * This is a specialised servlet that supports the downloading of single files and the rendering of packages.
  * <p>
- * It has a rather odd format - you can call it initially with the file/package uuid (and optional version and
+ * It has a rather odd format - you can call it initially with the file/package ID (and optional version and
  * preferDownload parameters) using <BR>
  * download?uuid=&lt;uuid&gt;&version=&lt;version&gt;&preferDownload=[true|false].
  * <p>
@@ -158,8 +158,14 @@ public abstract class Download extends HttpServlet {
 
 	    version = Download.getLong(request.getParameter(Download.VERSION_NAME));
 	    // check if it is plain numeric UUID or complex portrait UUID
-	    IVersionedNode node = uuid.contains("-") ? getRepositoryService().getFileItem(ticket, uuid, version)
-		    : getRepositoryService().getFileItem(ticket, Long.valueOf(uuid), version);
+	    boolean isSimpleUid = !uuid.contains("-");
+	    if (isSimpleUid) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN,
+			"Downloading files using simple UIDs has been discontinued for security reasons");
+		return;
+	    }
+	    IVersionedNode node = getRepositoryService().getFileItem(ticket, uuid, version);
+
 	    // update versionId in case it was null and we got the latest version...
 	    version = node.getVersion();
 
@@ -212,15 +218,12 @@ public abstract class Download extends HttpServlet {
 		throw new RepositoryCheckedException("Filename is missing. " + Download.expectedFormat);
 	    }
 
-	    // check if it is plain numeric UUID or complex portrait UUID
-	    IVersionedNode node = uuid.contains("-") ? getRepositoryService().getFileItem(ticket, uuid, version)
-		    : getRepositoryService().getFileItem(ticket, Long.valueOf(uuid), version, relPathString);
+	    IVersionedNode node = getRepositoryService().getFileItem(ticket, uuid, version);
 	    if (!node.isNodeType(NodeType.FILENODE)) {
 		throw new RepositoryCheckedException(
 			"Unexpected type of node " + node.getNodeType() + " Expected File node. Data is " + node);
 	    }
 	    handleFileNode(response, request, node, saveFile);
-
 	}
     }
 

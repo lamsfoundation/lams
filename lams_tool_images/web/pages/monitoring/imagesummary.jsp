@@ -51,7 +51,7 @@
 				<form:hidden path="sessionMapID" value="${sessionMapID}"/>
 				
 				<c:set var="mediumImagePath">
-			   		<lams:WebAppURL />download/?uuid=${image.mediumFileUuid}&preferDownload=false
+			   		<lams:WebAppURL />download/?uuid=${image.mediumFileDisplayUuid}&preferDownload=false
 				</c:set>	
 				<c:set var="title">
 					<c:out value="${image.title}" escapeXml="true"/>

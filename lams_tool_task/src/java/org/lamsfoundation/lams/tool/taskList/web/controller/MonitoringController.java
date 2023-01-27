@@ -337,29 +337,15 @@ public class MonitoringController {
 		    commentsFiles += "<li>";
 		    for (TaskListItemAttachment userAttachment : userAttachments) {
 			commentsFiles += HtmlUtils.htmlEscape(userAttachment.getFileName()) + " ";
-			commentsFiles += "<a href='" + TOOL_URL + "/download/?uuid=" + userAttachment.getFileUuid()
-				+ "&versionID=" + userAttachment.getFileVersionId() + "&preferDownload=true'>" + label
-				+ "</a>";
+			commentsFiles += "<a href='" + TOOL_URL + "/download/?uuid="
+				+ userAttachment.getFileDisplayUuid() + "&versionID="
+				+ userAttachment.getFileVersionId() + "&preferDownload=true'>" + label + "</a>";
 		    }
 		    commentsFiles += "</li>";
 		}
 
 		commentsFiles += "</ul>";
 
-//
-//		<c:forEach var="attachment" items="${visitLogSummary.attachments}">
-//			<li>
-//				<c:out value="${attachment.fileName}" />
-//
-//				<c:set var="downloadURL">
-//					<html:rewrite page="/download/?uuid=${attachment.fileUuid}&versionID=${attachment.fileVersionId}&preferDownload=true" />
-//				</c:set>
-//				<html:link href="${downloadURL}">
-//					<fmt:message key="label.download" />
-//				</html:link>
-//
-//			</li>
-//		</c:forEach>
 		userData.add(commentsFiles);
 	    }
 
@@ -421,7 +407,7 @@ public class MonitoringController {
 	}
 	taskList.setSubmissionDeadline(tzSubmissionDeadline);
 	taskListService.saveOrUpdateTaskList(taskList);
-	
+
 	return formattedDate;
     }
 

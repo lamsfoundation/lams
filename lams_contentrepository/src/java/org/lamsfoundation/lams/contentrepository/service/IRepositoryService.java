@@ -171,7 +171,7 @@ public interface IRepositoryService {
      *             if any internal errors have occured
      */
     public abstract NodeKey addFileItem(ITicket ticket, InputStream istream, String filename, String mimeType,
-	    String versionDescription, boolean generatePortraitUuid)
+	    String versionDescription)
 	    throws FileException, AccessDeniedException, InvalidParameterException;
 
     /**
@@ -322,16 +322,16 @@ public interface IRepositoryService {
      *
      * @param ticket
      *            ticket issued on login. Identifies tool and workspace - mandatory
-     * @param uuid
+     * @param nodeId
      *            id of the file/package - mandatory
      * @param version
      *            desired version - if null gets latest version
      * @return node.
      */
-    public abstract IVersionedNode getFileItem(ITicket ticket, Long uuid, Long version)
+    public abstract IVersionedNode getFileItem(ITicket ticket, Long nodeId, Long version)
 	    throws AccessDeniedException, ItemNotFoundException, FileException;
 
-    IVersionedNode getFileItem(ITicket ticket, String portraitUuid, Long version)
+    IVersionedNode getFileItem(ITicket ticket, String uuid, Long version)
 	    throws AccessDeniedException, ItemNotFoundException, FileException;
 
     /**
@@ -347,7 +347,7 @@ public interface IRepositoryService {
      *
      * @param ticket
      *            ticket issued on login. Identifies tool and workspace - mandatory
-     * @param uuid
+     * @param nodeId
      *            id of the package - mandatory
      * @param versionId
      *            desired version - if null gets latest version. This is the version
@@ -365,7 +365,7 @@ public interface IRepositoryService {
      *             if any internal errors have occured
      * @return node.
      */
-    public abstract IVersionedNode getFileItem(ITicket ticket, Long uuid, Long versionId, String relPath)
+    public abstract IVersionedNode getFileItem(ITicket ticket, Long nodeId, Long versionId, String relPath)
 	    throws AccessDeniedException, ItemNotFoundException, FileException;
 
     /**
