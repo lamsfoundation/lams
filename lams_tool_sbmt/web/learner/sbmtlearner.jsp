@@ -395,7 +395,7 @@
 								
 								<c:if test="${file.currentLearner}">
 									<c:set var="downloadURL">
-										<c:url value="/download?uuid=${file.uuID}&versionID=${file.versionID}&preferDownload=true" />
+										<c:url value="/download?uuid=${file.displayUuid}&versionID=${file.versionID}&preferDownload=true" />
 									</c:set>
 									</td>
 									

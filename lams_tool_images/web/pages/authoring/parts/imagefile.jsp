@@ -6,7 +6,7 @@
 	<p>
 		<fmt:message key="label.authoring.image" />: <c:out value="${itemAttachment.fileName}" />
 		<c:set var="viewURL">
-			<lams:WebAppURL />download/?uuid=${itemAttachment.fileUuid}&preferDownload=false
+			<lams:WebAppURL />download/?uuid=${itemAttachment.fileDisplayUuid}&preferDownload=false
 		</c:set>					
 		&nbsp;&nbsp;&nbsp;
 		<a href="#nogo" onclick="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')" class="btn btn-default btn-xs">

@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.imageGallery.service;
 
 import java.util.ArrayList;
@@ -60,7 +59,7 @@ public class ImageGalleryOutputFactory extends OutputFactory {
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
 	    int definitionType) {
 
-	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
+	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<>();
 
 	Class simpleUrlArrayClass = SimpleURL[].class;
 	switch (definitionType) {
@@ -91,9 +90,9 @@ public class ImageGalleryOutputFactory extends OutputFactory {
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IImageGalleryService imageGalleryService,
 	    Long toolSessionId, Long learnerId) {
 
-	TreeMap<String, ToolOutput> outputs = new TreeMap<String, ToolOutput>();
+	TreeMap<String, ToolOutput> outputs = new TreeMap<>();
 	// tool output cache
-	TreeMap<String, ToolOutput> baseOutputs = new TreeMap<String, ToolOutput>();
+	TreeMap<String, ToolOutput> baseOutputs = new TreeMap<>();
 	if (names == null) {
 	    outputs.put(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED,
 		    getToolOutput(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED,
@@ -141,13 +140,13 @@ public class ImageGalleryOutputFactory extends OutputFactory {
 		} else if (nameParts[0].equals(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_VOTES)) {
 		    return getNumVotes(user, session, imageGalleryService);
 		} else if (nameParts[0].equals(ImageGalleryOutputFactory.OUTPUT_NAME_UPLOADED_IMAGES_URLS)) {
-		    List<SimpleURL> uploadedImagesUrls = new ArrayList<SimpleURL>();
+		    List<SimpleURL> uploadedImagesUrls = new ArrayList<>();
 		    Set<ImageGalleryItem> sessionImages = imageGalleryService
 			    .getImagesForGroup(session.getImageGallery(), toolSessionId);
 		    for (ImageGalleryItem image : sessionImages) {
 			if (!image.isCreateByAuthor()) {
 			    String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
-			    String innerUrl = serverUrl + "download/?uuid=" + image.getOriginalFileUuid()
+			    String innerUrl = serverUrl + "download/?uuid=" + image.getOriginalFileDisplayUuid()
 				    + "&preferDownload=false&" + AttributeNames.PARAM_TOOL_CONTENT_HANDLER_NAME + "="
 				    + ImageGalleryConstants.TOOL_CONTENT_HANDLER_NAME;
 			    String fullUrl = "javascript:var dummy = window.open('" + innerUrl + "','"
@@ -199,7 +198,7 @@ public class ImageGalleryOutputFactory extends OutputFactory {
 	Long contentId = imageGallery.getContentId();
 
 	Set<ImageGalleryItem> allImages = imageGallery.getImageGalleryItems();
-	List<Long> itemIds = new LinkedList<Long>();
+	List<Long> itemIds = new LinkedList<>();
 	for (ImageGalleryItem image : allImages) {
 	    itemIds.add(image.getUid());
 	}
@@ -211,8 +210,8 @@ public class ImageGalleryOutputFactory extends OutputFactory {
 
 	    boolean isCommentsByOtherUsersRequired = user == null;
 	    Long userId = user == null ? -1L : user.getUserId();
-	    List<ItemRatingDTO> ratingCriteriaDtos = imageGalleryService.getRatingCriteriaDtos(contentId, session.getSessionId(), itemIds,
-		    isCommentsByOtherUsersRequired, userId);
+	    List<ItemRatingDTO> ratingCriteriaDtos = imageGalleryService.getRatingCriteriaDtos(contentId,
+		    session.getSessionId(), itemIds, isCommentsByOtherUsersRequired, userId);
 
 	    if (user != null) {
 		for (ItemRatingDTO ratingCriteriaDto : ratingCriteriaDtos) {

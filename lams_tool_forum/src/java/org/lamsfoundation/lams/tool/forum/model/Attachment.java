@@ -34,6 +34,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -73,6 +74,9 @@ public class Attachment implements Cloneable, Comparable<Attachment> {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "message_uid")
     private Message message;
+
+    @Transient
+    private String fileDisplayUuid;
 
     //Default contruction method
     public Attachment() {
@@ -174,6 +178,14 @@ public class Attachment implements Cloneable, Comparable<Attachment> {
 
     public void setMessage(Message message) {
 	this.message = message;
+    }
+
+    public String getFileDisplayUuid() {
+	return fileDisplayUuid;
+    }
+
+    public void setFileDisplayUuid(String fileDisplayUuid) {
+	this.fileDisplayUuid = fileDisplayUuid;
     }
 
     @Override

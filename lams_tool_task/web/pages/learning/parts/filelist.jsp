@@ -14,7 +14,7 @@
 					<li><c:out value="${file.fileName}" escapeXml="true" /> <c:if test="${file.createBy != null}">
 						[<c:out value="${file.createBy.firstName} ${file.createBy.lastName}" escapeXml="true" />]
 					</c:if> <c:set var="downloadURL">
-							<lams:WebAppURL/>download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true
+							<lams:WebAppURL/>download/?uuid=${file.fileDisplayUuid}&versionID=${file.fileVersionId}&preferDownload=true
 						</c:set> <a href="${downloadURL}"><fmt:message key="label.download" /></a></li>
 				</c:if>
 			</c:forEach>

@@ -173,18 +173,16 @@ public class ToolContentHandler implements IToolContentFullHandler {
     }
 
     @Override
-    public NodeKey uploadFile(InputStream stream, String fileName, String mimeType, boolean generatePortraitUuid)
+    public NodeKey uploadFile(InputStream stream, String fileName, String mimeType)
 	    throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException {
 	NodeKey nodeKey = null;
 	try {
 	    try {
-		nodeKey = repositoryService.addFileItem(getTicket(false), stream, fileName, mimeType, null,
-			generatePortraitUuid);
+		nodeKey = repositoryService.addFileItem(getTicket(false), stream, fileName, mimeType, null);
 	    } catch (AccessDeniedException e) {
 		log.warn("Unable to access repository to add file " + fileName + "AccessDeniedException: "
 			+ e.getMessage() + " Retrying login.");
-		nodeKey = repositoryService.addFileItem(getTicket(true), stream, fileName, mimeType, null,
-			generatePortraitUuid);
+		nodeKey = repositoryService.addFileItem(getTicket(true), stream, fileName, mimeType, null);
 	    }
 
 	} catch (RepositoryCheckedException e2) {
@@ -197,22 +195,16 @@ public class ToolContentHandler implements IToolContentFullHandler {
     }
 
     @Override
-    public NodeKey uploadFile(InputStream stream, String fileName, String mimeType)
-	    throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException {
-	return uploadFile(stream, fileName, mimeType, false);
-    }
-
-    @Override
-    public NodeKey updateFile(Long uuid, InputStream stream, String fileName, String mimeType)
+    public NodeKey updateFile(Long nodeId, InputStream stream, String fileName, String mimeType)
 	    throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException {
 	NodeKey nodeKey = null;
 	try {
 	    try {
-		nodeKey = repositoryService.updateFileItem(getTicket(false), uuid, fileName, stream, mimeType, null);
+		nodeKey = repositoryService.updateFileItem(getTicket(false), nodeId, fileName, stream, mimeType, null);
 	    } catch (AccessDeniedException e) {
 		log.warn("Unable to access repository to add file " + fileName + "AccessDeniedException: "
 			+ e.getMessage() + " Retrying login.");
-		nodeKey = repositoryService.updateFileItem(getTicket(true), uuid, fileName, stream, mimeType, null);
+		nodeKey = repositoryService.updateFileItem(getTicket(true), nodeId, fileName, stream, mimeType, null);
 	    }
 
 	} catch (RepositoryCheckedException e2) {
@@ -279,22 +271,22 @@ public class ToolContentHandler implements IToolContentFullHandler {
     }
 
     @Override
-    public void saveFile(Long uuid, String toFileName)
+    public void saveFile(Long nodeId, String toFileName)
 	    throws ItemNotFoundException, RepositoryCheckedException, IOException {
 	try {
 	    try {
-		repositoryService.saveFile(getTicket(false), uuid, null, toFileName);
+		repositoryService.saveFile(getTicket(false), nodeId, null, toFileName);
 	    } catch (AccessDeniedException e) {
-		log.warn("Unable to access repository to add copy node " + uuid + "AccessDeniedException: "
+		log.warn("Unable to access repository to add copy node " + nodeId + "AccessDeniedException: "
 			+ e.getMessage() + " Retrying login.");
-		repositoryService.saveFile(getTicket(false), uuid, null, toFileName);
+		repositoryService.saveFile(getTicket(false), nodeId, null, toFileName);
 	    }
 	} catch (ItemNotFoundException e) {
-	    log.warn("Unable to to save node " + uuid + " as the node cannot be found. Repository Exception: "
+	    log.warn("Unable to to save node " + nodeId + " as the node cannot be found. Repository Exception: "
 		    + e.getMessage() + " Retry not possible.");
 	    throw e;
 	} catch (RepositoryCheckedException e) {
-	    log.warn("Unable to to save node " + uuid + "Repository Exception: " + e.getMessage()
+	    log.warn("Unable to to save node " + nodeId + "Repository Exception: " + e.getMessage()
 		    + " Retry not possible.");
 	    throw e;
 	}
@@ -304,38 +296,38 @@ public class ToolContentHandler implements IToolContentFullHandler {
      * TODO To be removed from the system and replaced with the call with the user id.
      */
     @Override
-    public NodeKey copyFile(Long uuid) throws ItemNotFoundException, RepositoryCheckedException {
+    public NodeKey copyFile(Long nodeId) throws ItemNotFoundException, RepositoryCheckedException {
 	log.error(
 		"copyFile(Long uuid) to be removed - it sets the owner of files in the content repository to 1. Some tool needs to be updated.");
-	return copyFile(uuid, new Integer(1));
+	return copyFile(nodeId, 1);
     }
 
     /**
      * Copy an entry in the content repository.
      *
-     * @param uuid
+     * @param nodeId
      *            id of the file node. Mandatory
      * @throws ItemNotFoundException
      *             Node to copy cannot be found
      * @throws RepositoryCheckedException
      *             Some other error occured.
      */
-    private NodeKey copyFile(Long uuid, Integer userId) throws ItemNotFoundException, RepositoryCheckedException {
+    private NodeKey copyFile(Long nodeId, Integer userId) throws ItemNotFoundException, RepositoryCheckedException {
 	NodeKey nodeKey = null;
 	try {
 	    try {
-		nodeKey = repositoryService.copyNodeVersion(getTicket(false), uuid, null);
+		nodeKey = repositoryService.copyNodeVersion(getTicket(false), nodeId, null);
 	    } catch (AccessDeniedException e) {
-		log.warn("Unable to access repository to add copy node " + uuid + "AccessDeniedException: "
+		log.warn("Unable to access repository to add copy node " + nodeId + "AccessDeniedException: "
 			+ e.getMessage() + " Retrying login.");
-		nodeKey = repositoryService.copyNodeVersion(getTicket(true), uuid, null);
+		nodeKey = repositoryService.copyNodeVersion(getTicket(true), nodeId, null);
 	    }
 	} catch (ItemNotFoundException e) {
-	    log.warn("Unable to to copy node " + uuid + " as the node cannot be found. Repository Exception: "
+	    log.warn("Unable to to copy node " + nodeId + " as the node cannot be found. Repository Exception: "
 		    + e.getMessage() + " Retry not possible.");
 	    throw e;
 	} catch (RepositoryCheckedException e) {
-	    log.warn("Unable to to copy node " + uuid + "Repository Exception: " + e.getMessage()
+	    log.warn("Unable to to copy node " + nodeId + "Repository Exception: " + e.getMessage()
 		    + " Retry not possible.");
 	    throw e;
 	}
@@ -343,7 +335,26 @@ public class ToolContentHandler implements IToolContentFullHandler {
     }
 
     @Override
-    public void deleteFile(Long uuid) throws InvalidParameterException, RepositoryCheckedException {
+    public void deleteFile(Long nodeId) throws InvalidParameterException, RepositoryCheckedException {
+	try {
+	    try {
+		repositoryService.deleteNode(getTicket(false), nodeId);
+	    } catch (AccessDeniedException e) {
+		log.warn("Unable to access repository to delete file id" + nodeId + "AccessDeniedException: "
+			+ e.getMessage() + " Retrying login.");
+		repositoryService.deleteNode(getTicket(true), nodeId);
+	    }
+	} catch (ItemNotFoundException e1) {
+	    // didn't exist so don't need to delete. Ignore problem.
+	} catch (RepositoryCheckedException e2) {
+	    log.error("Unable delete file id" + nodeId + "Repository Exception: " + e2.getMessage()
+		    + " Retry not possible.");
+	    throw e2;
+	}
+    }
+
+    @Override
+    public void deleteFile(UUID uuid) throws InvalidParameterException, RepositoryCheckedException {
 	try {
 	    try {
 		repositoryService.deleteNode(getTicket(false), uuid);
@@ -362,67 +373,44 @@ public class ToolContentHandler implements IToolContentFullHandler {
     }
 
     @Override
-    public void deleteFile(UUID portraitUuid) throws InvalidParameterException, RepositoryCheckedException {
+    public InputStream getFileInputStream(Long nodeId)
+	    throws ItemNotFoundException, FileException, RepositoryCheckedException {
 	try {
 	    try {
-		repositoryService.deleteNode(getTicket(false), portraitUuid);
+		return repositoryService.getFileItem(getTicket(false), nodeId, null).getFile();
 	    } catch (AccessDeniedException e) {
-		log.warn("Unable to access repository to delete file id" + portraitUuid + "AccessDeniedException: "
+		log.warn("Unable to access repository to get file id" + nodeId + "AccessDeniedException: "
 			+ e.getMessage() + " Retrying login.");
-		repositoryService.deleteNode(getTicket(true), portraitUuid);
+		return repositoryService.getFileItem(getTicket(true), nodeId, null).getFile();
 	    }
-	} catch (ItemNotFoundException e1) {
-	    // didn't exist so don't need to delete. Ignore problem.
 	} catch (RepositoryCheckedException e2) {
-	    log.error("Unable delete file id" + portraitUuid + "Repository Exception: " + e2.getMessage()
+	    log.warn("Unable to to get file id" + nodeId + "Repository Exception: " + e2.getMessage()
 		    + " Retry not possible.");
 	    throw e2;
 	}
     }
 
     @Override
-    public InputStream getFileInputStream(Long uuid)
-	    throws ItemNotFoundException, FileException, RepositoryCheckedException {
+    public String getFileUuid(Long nodeId) {
+	if (nodeId == null) {
+	    return null;
+	}
+	NodeKey nodeKey = null;
 	try {
 	    try {
-		return repositoryService.getFileItem(getTicket(false), uuid, null).getFile();
+		nodeKey = repositoryService.getFileItem(getTicket(false), nodeId, null).getNodeKey();
 	    } catch (AccessDeniedException e) {
-		log.warn("Unable to access repository to get file id" + uuid + "AccessDeniedException: "
+		log.warn("Unable to access repository to get file id" + nodeId + "AccessDeniedException: "
 			+ e.getMessage() + " Retrying login.");
-		return repositoryService.getFileItem(getTicket(true), uuid, null).getFile();
+		nodeKey = repositoryService.getFileItem(getTicket(true), nodeId, null).getNodeKey();
 	    }
+	    return nodeKey.getUuid();
 	} catch (RepositoryCheckedException e2) {
-	    log.warn("Unable to to get file id" + uuid + "Repository Exception: " + e2.getMessage()
+	    log.warn("Unable to to get file id" + nodeId + "Repository Exception: " + e2.getMessage()
 		    + " Retry not possible.");
-	    throw e2;
+	    return null;
 	}
     }
-
-/*
- * protected File getFile(String fileName, InputStream is) throws FileNotFoundException, Exception {
- * InputStream in = new BufferedInputStream(is, 500);
- * File file = new File(fileName);
- * OutputStream out = new BufferedOutputStream(new FileOutputStream(file), 500);
- * int bytes;
- * while ((bytes = in.available()) > 0) {
- * byte[] byteArray = new byte[bytes];
- * in.read(byteArray);
- * out.write(byteArray);
- * }
- * in.close();
- * out.close();
- * out.flush();
- * return file;
- * }
- *
- * protected byte[] getBytes(File file) throws FileNotFoundException, Exception {
- * byte[] byteArray = new byte[(int) file.length()];
- * FileInputStream stream = new FileInputStream(file);
- * stream.read(byteArray);
- * stream.close();
- * return byteArray;
- * }
- */
 
     /* *** Required for Spring bean creation **************************/
 

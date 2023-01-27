@@ -108,9 +108,8 @@
 							</c:if>					
 						
 							{
-								img: "<lams:WebAppURL />download/?uuid="+${image.mediumFileUuid}+"&preferDownload="+false,
-								//thumb: ""<lams:WebAppURL />download/?uuid="+${image.thumbnailFileUuid}+"&preferDownload="+false,
-								full: "<lams:WebAppURL />download/?uuid="+${image.originalFileUuid}+"&preferDownload="+false,
+								img: "<lams:WebAppURL />download/?uuid=${image.mediumFileDisplayUuid}&preferDownload=false",
+								full: "<lams:WebAppURL />download/?uuid=${image.originalFileDisplayUuid}&preferDownload=false",
 								id: '${image.uid}', // Custom anchor is used with the hash:true option.
 								caption: '<div class="caption-heading">${image.titleEscaped}</div>'
 									+ '${description}'

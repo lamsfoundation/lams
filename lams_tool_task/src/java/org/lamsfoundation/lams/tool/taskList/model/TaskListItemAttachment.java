@@ -34,6 +34,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -73,6 +74,9 @@ public class TaskListItemAttachment implements Cloneable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by")
     private TaskListUser createBy;
+
+    @Transient
+    private String fileDisplayUuid;
 
     @Override
     public Object clone() {
@@ -178,4 +182,13 @@ public class TaskListItemAttachment implements Cloneable {
     public void setCreateBy(TaskListUser createBy) {
 	this.createBy = createBy;
     }
+
+    public String getFileDisplayUuid() {
+	return fileDisplayUuid;
+    }
+
+    public void setFileDisplayUuid(String fileDisplayUuid) {
+	this.fileDisplayUuid = fileDisplayUuid;
+    }
+
 }

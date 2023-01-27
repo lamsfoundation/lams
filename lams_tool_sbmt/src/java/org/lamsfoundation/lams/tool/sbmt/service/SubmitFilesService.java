@@ -584,7 +584,7 @@ public class SubmitFilesService
 
 	SubmitUser learner = submitUserDAO.getLearner(sessionID, userID);
 	details.setLearner(learner);
-	details.setUuid(nodeKey.getUuid());
+	details.setUuid(nodeKey.getNodeId());
 	details.setVersionID(nodeKey.getVersion());
 	SubmitFilesReport report = new SubmitFilesReport();
 	report.setDetails(details);
@@ -647,6 +647,8 @@ public class SubmitFilesService
 	for (SubmissionDetails submissionDetails : list) {
 	    if (includeRemovedFiles || !submissionDetails.isRemoved()) {
 		FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails, numberFormat);
+		detailDto.setDisplayUuid(sbmtToolContentHandler.getFileUuid(detailDto.getUuID()));
+		detailDto.setMarkFileDisplayUuid(sbmtToolContentHandler.getFileUuid(detailDto.getMarkFileUUID()));
 		details.add(detailDto);
 	    }
 	}
@@ -682,6 +684,8 @@ public class SubmitFilesService
 		SubmitUserDTO submitUserDTO = new SubmitUserDTO(learner);
 
 		FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails, numberFormat);
+		detailDto.setDisplayUuid(sbmtToolContentHandler.getFileUuid(detailDto.getUuID()));
+		detailDto.setMarkFileDisplayUuid(sbmtToolContentHandler.getFileUuid(detailDto.getMarkFileUUID()));
 		userFileList = map.get(submitUserDTO);
 		// if it is first time to this user, creating a new ArrayList for this user.
 		if (userFileList == null) {
@@ -699,7 +703,11 @@ public class SubmitFilesService
     @Override
     public FileDetailsDTO getFileDetails(Long detailID, Locale currentLocale) {
 	SubmissionDetails details = submissionDetailsDAO.getSubmissionDetailsByID(detailID);
-	return new FileDetailsDTO(details, currentLocale != null ? NumberFormat.getInstance(currentLocale) : null);
+	FileDetailsDTO detailDto = new FileDetailsDTO(details,
+		currentLocale != null ? NumberFormat.getInstance(currentLocale) : null);
+	detailDto.setDisplayUuid(sbmtToolContentHandler.getFileUuid(detailDto.getUuID()));
+	detailDto.setMarkFileDisplayUuid(sbmtToolContentHandler.getFileUuid(detailDto.getMarkFileUUID()));
+	return detailDto;
     }
 
     @Override
@@ -742,7 +750,7 @@ public class SubmitFilesService
 			}
 
 			report.setMarkFileName(markFile.getOriginalFilename());
-			report.setMarkFileUUID(nodeKey.getUuid());
+			report.setMarkFileUUID(nodeKey.getNodeId());
 			report.setMarkFileVersionID(nodeKey.getVersion());
 		    }
 
@@ -774,7 +782,7 @@ public class SubmitFilesService
 		    // IToolContentHandler.TYPE_ONLINE);
 
 		    report.setMarkFileName(markFile.getOriginalFilename());
-		    report.setMarkFileUUID(nodeKey.getUuid());
+		    report.setMarkFileUUID(nodeKey.getNodeId());
 		    report.setMarkFileVersionID(nodeKey.getVersion());
 		}
 

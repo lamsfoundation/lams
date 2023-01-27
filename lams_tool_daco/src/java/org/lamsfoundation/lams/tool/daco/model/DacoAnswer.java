@@ -33,6 +33,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.log4j.Logger;
 
@@ -81,6 +82,9 @@ public class DacoAnswer implements Cloneable {
 
     @Column(name = "create_date")
     private Date createDate;
+
+    @Transient
+    private String fileDisplayUuid;
 
     @Override
     public Object clone() {
@@ -173,5 +177,13 @@ public class DacoAnswer implements Cloneable {
 
     public void setCreateDate(Date createDate) {
 	this.createDate = createDate;
+    }
+
+    public String getFileDisplayUuid() {
+	return fileDisplayUuid;
+    }
+
+    public void setFileDisplayUuid(String fileDisplayUuid) {
+	this.fileDisplayUuid = fileDisplayUuid;
     }
 }

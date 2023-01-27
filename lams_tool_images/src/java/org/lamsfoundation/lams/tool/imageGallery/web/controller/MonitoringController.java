@@ -131,6 +131,7 @@ public class MonitoringController {
 	    request.setAttribute("itemRatingDto", itemRatingDto);
 	}
 
+	igService.fillImageDisplayUuid(image);
 	request.setAttribute(ImageGalleryConstants.ATTR_IMAGE, image);
 
 	imageGalleryItemForm.setImageUid(image.getUid().toString());

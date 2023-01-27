@@ -65,14 +65,11 @@ public interface IToolContentHandler {
     public NodeKey uploadFile(InputStream stream, String fileName, String mimeType)
 	    throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException;
 
-    public NodeKey uploadFile(InputStream stream, String fileName, String mimeType, boolean generatePortraitUuid)
-	    throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException;
-
     /**
      * Update an existing file in the repository. This will create a new version of this file (its version number will
      * be equal to the current one incremented by 1).
      *
-     * @param uuid
+     * @param nodeId
      *            unique id of the updated file. Mandatory
      *
      * @param stream
@@ -89,7 +86,7 @@ public interface IToolContentHandler {
      * @throws RepositoryCheckedException
      *             Some other error occured.
      */
-    public NodeKey updateFile(Long uuid, InputStream stream, String fileName, String mimeType)
+    public NodeKey updateFile(Long nodeId, InputStream stream, String fileName, String mimeType)
 	    throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException;
 
     /**
@@ -115,24 +112,24 @@ public interface IToolContentHandler {
     /**
      * Delete a file node. If the node does not exist, then nothing happens (ie ItemNotFoundException is NOT thrown).
      *
-     * @param uuid
+     * @param nodeId
      *            id of the file node. Mandatory
      * @throws InvalidParameterException
      *             One of the mandatory parameters is missing.
      * @throws RepositoryCheckedException
      *             Some other error occured.
      */
-    public void deleteFile(Long uuid) throws InvalidParameterException, RepositoryCheckedException;
+    public void deleteFile(Long nodeId) throws InvalidParameterException, RepositoryCheckedException;
 
     /**
-     * Delete a file node using portrait UUID
+     * Delete a file node using UUID
      */
-    public void deleteFile(UUID portraitUuid) throws InvalidParameterException, RepositoryCheckedException;
+    public void deleteFile(UUID uuid) throws InvalidParameterException, RepositoryCheckedException;
 
     /**
      * Get the file, as an inputstream.
      *
-     * @param uuid
+     * @param nodeId
      *            id of the file node. Mandatory
      * @throws FileException
      *             An error occured writing the input stream to disk.
@@ -141,7 +138,7 @@ public interface IToolContentHandler {
      * @throws RepositoryCheckedException
      *             Some other error occured.
      */
-    public InputStream getFileInputStream(Long uuid)
+    public InputStream getFileInputStream(Long nodeId)
 	    throws ItemNotFoundException, FileException, RepositoryCheckedException;
 
     /**
@@ -151,13 +148,15 @@ public interface IToolContentHandler {
      * If the <code>toFileName</code> is null, file name use original file name instead
      * and file save path will be system temporary directory.
      *
-     * @param uuid
+     * @param nodeId
      * @param toFileName
      *            file name to save. Using the original file name instead if null value given.
      * @throws ItemNotFoundException
      * @throws RepositoryCheckedException
      * @throws IOException
      */
-    public void saveFile(Long uuid, String toFileName)
+    public void saveFile(Long nodeId, String toFileName)
 	    throws ItemNotFoundException, RepositoryCheckedException, IOException;
+
+    String getFileUuid(Long nodeId);
 }

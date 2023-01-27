@@ -28,31 +28,31 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
- * Represents the two part key - UUID and version.
+ * Represents the two part key - node ID and version.
  * Version may be null;
  *
  * @author Fiona Malikoff
  */
 public class NodeKey {
 
-    private Long uuid = null;
+    private Long nodeId = null;
     private Long version = null;
-    private String portraitUuid;
+    private String uuid;
 
     /**
      *
      */
-    public NodeKey(Long uuid, Long version, String portraitUuid) {
-	this.uuid = uuid;
+    public NodeKey(Long nodeId, Long version, String uuid) {
+	this.nodeId = nodeId;
 	this.version = version;
-	this.portraitUuid = portraitUuid;
+	this.uuid = uuid;
     }
 
     /**
      * @return Returns the uuid.
      */
-    public Long getUuid() {
-	return uuid;
+    public Long getNodeId() {
+	return nodeId;
     }
 
     /**
@@ -62,14 +62,14 @@ public class NodeKey {
 	return version;
     }
 
-    public String getPortraitUuid() {
-	return portraitUuid;
+    public String getUuid() {
+	return uuid;
     }
 
     @Override
     public String toString() {
-	return new ToStringBuilder(this).append("uuid", uuid).append("version", version)
-		.append("portraitUuid", portraitUuid).toString();
+	return new ToStringBuilder(this).append("nodeId", nodeId).append("version", version).append("uuid", uuid)
+		.toString();
     }
 
     @Override
@@ -81,11 +81,12 @@ public class NodeKey {
 	    return false;
 	}
 	NodeKey castOther = (NodeKey) other;
-	return new EqualsBuilder().append(uuid, castOther.getUuid()).append(version, castOther.getVersion()).isEquals();
+	return new EqualsBuilder().append(nodeId, castOther.getNodeId()).append(version, castOther.getVersion())
+		.isEquals();
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(uuid).append(version).toHashCode();
+	return new HashCodeBuilder().append(nodeId).append(version).toHashCode();
     }
 }
