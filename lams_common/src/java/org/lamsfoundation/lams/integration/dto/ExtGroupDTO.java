@@ -20,11 +20,11 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.integration.dto;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.util.AlphanumComparator;
 
 public class ExtGroupDTO implements Comparable {
@@ -39,8 +39,10 @@ public class ExtGroupDTO implements Comparable {
     public int compareTo(Object o) {
 	ExtGroupDTO castOther = (ExtGroupDTO) o;
 
-	String grp1Name = castOther != null && castOther.getGroupName() != null ? castOther.getGroupName() : "";
-	String grp2Name = this.groupName != null ? this.groupName : "";
+	String grp1Name = castOther != null && castOther.getGroupName() != null
+		? StringUtils.lowerCase(castOther.getGroupName())
+		: "";
+	String grp2Name = this.groupName != null ? StringUtils.lowerCase(this.groupName) : "";
 
 	AlphanumComparator comparator = new AlphanumComparator();
 	return comparator.compare(grp1Name, grp2Name);
