@@ -41,6 +41,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -280,8 +281,9 @@ public class Group implements Serializable, Nullable, Comparable<Group> {
      */
     @Override
     public int compareTo(Group group) {
-	return new CompareToBuilder().append(this.getOrderId(), group.getOrderId())
-		.append(this.getGroupId(), group.getGroupId()).append(this.getGroupName(), group.getGroupName())
+	return new CompareToBuilder()
+		.append(StringUtils.lowerCase(this.getGroupName()), StringUtils.lowerCase(group.getGroupName()))
+		.append(this.getOrderId(), group.getOrderId()).append(this.getGroupId(), group.getGroupId())
 		.append(this.getGroupUIID(), group.getGroupUIID()).toComparison();
     }
 

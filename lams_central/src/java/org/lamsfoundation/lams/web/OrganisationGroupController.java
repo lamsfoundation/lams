@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,7 +48,6 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.GroupComparator;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.service.LearningDesignService;
@@ -65,7 +63,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationGroupingDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.AlphanumComparator;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -519,9 +516,8 @@ public class OrganisationGroupController {
 	ArrayNode groupsJSON = JsonNodeFactory.instance.arrayNode();
 	if (groups != null) {
 	    // sort groups by their name
-	    List<Group> groupList = new LinkedList<>(groups);
-	    Collections.sort(groupList, new GroupComparator());
-	    for (Group group : groupList) {
+	    Set<Group> groupSet = new TreeSet<>(groups);
+	    for (Group group : groupSet) {
 		ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
 		groupJSON.put("name", group.getGroupName());
 		groupJSON.put("groupId", group.getGroupId());
@@ -547,25 +543,13 @@ public class OrganisationGroupController {
      */
     private ArrayNode getOrgGroupsDetails(Set<OrganisationGroup> groups, Collection<User> learners) {
 
-	final Comparator<OrganisationGroup> ORG_GROUP_COMPARATOR = new Comparator<>() {
-	    @Override
-	    public int compare(OrganisationGroup o1, OrganisationGroup o2) {
-		String grp1Name = o1 != null ? o1.getName() : "";
-		String grp2Name = o2 != null ? o2.getName() : "";
-
-		AlphanumComparator comparator = new AlphanumComparator();
-		return comparator.compare(grp1Name, grp2Name);
-	    }
-	};
-
 	// serialize database group objects into JSON
 	ArrayNode groupsJSON = JsonNodeFactory.instance.arrayNode();
 	if (groups != null) {
 	    // sort groups by their name
-	    List<OrganisationGroup> groupList = new LinkedList<>(groups);
-	    Collections.sort(groupList, ORG_GROUP_COMPARATOR);
+	    Set<OrganisationGroup> groupSet = new TreeSet<>(groups);
 
-	    for (OrganisationGroup group : groupList) {
+	    for (OrganisationGroup group : groupSet) {
 		ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
 		groupJSON.put("name", group.getName());
 		groupJSON.put("groupId", group.getGroupId());

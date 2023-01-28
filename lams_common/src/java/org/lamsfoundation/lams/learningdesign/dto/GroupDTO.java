@@ -28,6 +28,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserBasicDTO;
@@ -36,15 +37,16 @@ import org.lamsfoundation.lams.util.AlphanumComparator;
 /** Grouping object, suitable for sending to Authoring */
 public class GroupDTO {
 
-    public static final Comparator<GroupDTO> GROUP_NAME_COMPARATOR = new Comparator<GroupDTO>() {
+    public static final Comparator<GroupDTO> GROUP_NAME_COMPARATOR = new Comparator<>() {
 	/**
 	 * Compare the group names
 	 */
 	@Override
 	public int compare(GroupDTO grp1, GroupDTO grp2) {
-	    String grp1Name = grp1 != null ? grp1.getGroupName() : "";
 
-	    String grp2Name = grp2 != null ? grp2.getGroupName() : "";
+	    String grp1Name = grp1 != null ? StringUtils.lowerCase(grp1.getGroupName()) : "";
+
+	    String grp2Name = grp2 != null ? StringUtils.lowerCase(grp2.getGroupName()) : "";
 
 	    AlphanumComparator comparator = new AlphanumComparator();
 	    return comparator.compare(grp1Name, grp2Name);
@@ -61,7 +63,7 @@ public class GroupDTO {
 
     public GroupDTO() {
     }
-    
+
     public GroupDTO(Group group, boolean setupUserList) {
 	groupID = group.getGroupId();
 	groupName = group.getGroupName();
@@ -71,7 +73,7 @@ public class GroupDTO {
 	if (setupUserList && group.getUsers() != null) {
 	    Iterator<User> iter = group.getUsers().iterator();
 	    while (iter.hasNext()) {
-		userList.add(((User) iter.next()).getUserBasicDTO());
+		userList.add(iter.next().getUserBasicDTO());
 	    }
 	}
     }
@@ -115,7 +117,7 @@ public class GroupDTO {
     public void setUserList(List<UserBasicDTO> userList) {
 	this.userList = userList;
     }
-    
+
     public boolean isUserBelongsToGroup() {
 	return userBelongsToGroup;
     }
