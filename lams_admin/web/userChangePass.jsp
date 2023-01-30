@@ -86,7 +86,7 @@
 <body class="stripes">
 	<form id="userForm" modelAttribute="userForm" action="usersave/changePass.do" method="post">
 		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
-		<input type="hidden" name="userId" value="${param.userId}" />
+		<input type="hidden" name="userId" value='<c:out value="${param.userId}" />' />
 		<div class="panel panel-default">
 			<div
 				class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
@@ -142,7 +142,7 @@
 						
 						<div>
 							<label for="login"><fmt:message key="admin.user.login" />:</label>
-							<span>${param.login}</span>
+							<span><c:out value="${param.login}" /></span>
 						</div>
 						<div class="form-group">
 							<label for="password"><fmt:message

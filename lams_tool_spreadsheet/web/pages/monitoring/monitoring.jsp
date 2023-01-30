@@ -34,7 +34,7 @@
 			function doStatistic(){
 				var url = "<c:url value="/monitoring/doStatistic.do"/>";
 			    var reqIDVar = new Date();
-				var param = "toolContentID=" + ${param.toolContentID};
+				var param = "toolContentID=" + <c:out value="${param.toolContentID}" />;
 				messageLoading();
 				$.ajaxSetup({ cache: true });
 				$("#"+statisticTargetDiv).load(

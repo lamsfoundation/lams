@@ -51,7 +51,7 @@
 	marksReleased = ${marksReleased};
 
 	
-	var releaseMarksLessonID = ${param.lessonID},
+	var releaseMarksLessonID = <c:out value="${param.lessonID}" />,
 		releaseMarksAlertBox = null,
 		// is release marks scheduled?
 		releaseMarksScheduleDate = '${releaseMarksScheduleDate}';

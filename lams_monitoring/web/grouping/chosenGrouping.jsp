@@ -60,7 +60,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<p><fmt:message key="label.grouping.general.instructions.branching"/></p>
 	</c:if>
 	
-	<iframe id="chosenGroupingIFrame" src="<lams:LAMSURL/>organisationGroup/viewGroupings.do?lessonID=${param.lessonID}&activityID=${param.activityID}"></iframe>
+	<iframe id="chosenGroupingIFrame"
+		src='<lams:LAMSURL/>organisationGroup/viewGroupings.do?lessonID=<c:out value="${param.lessonID}" />&activityID=<c:out value="${param.activityID}" />'></iframe>
 
 	</lams:Page>
 </body>

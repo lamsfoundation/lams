@@ -140,7 +140,7 @@
     		$(this).attr("disabled", "disabled");
 
 			$.ajax({
-				url: "${param.returnUrl}",
+				url: '<c:out value="${param.returnUrl}" />',
 				data: {
 					qbQuestionUid: $("#selected-question-uid").val()
 				},
@@ -328,7 +328,7 @@
 	<c:if test="${not empty param.toolContentID}">
 		<div class="checkbox-inline loffset5">
 			<label for="same-ld-checkbox" title='<fmt:message key="label.qb.advanced.search.same.ld.tip"/>'>
-				<input id="same-ld-checkbox" type="checkbox" value="${param.toolContentID}" />
+				<input id="same-ld-checkbox" type="checkbox" value='<c:out value="${param.toolContentID}" />' />
 					<fmt:message key="label.qb.advanced.search.same.ld"/>
 			</label>
 		</div>

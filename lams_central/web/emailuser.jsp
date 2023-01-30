@@ -26,7 +26,7 @@
 <script type="text/javascript" src="${lams}includes/javascript/instantedit.js"></script>
 <script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
 <script type="text/javascript">
-	var returnUrl = '${param.returnUrl}';
+	var returnUrl = '<c:out value="${param.returnUrl}" />';
 
 	function sendEmail() {
 
