@@ -43,7 +43,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.GroupComparator;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
@@ -157,7 +156,7 @@ public class GroupingAJAXController {
 	    return "grouping/chosenGrouping";
 	}
 
-	SortedSet<Group> groups = new TreeSet<>(new GroupComparator());
+	Set<Group> groups = new TreeSet<>();
 	groups.addAll(grouping.getGroups());
 
 	// sort users with first, then last name, then login
