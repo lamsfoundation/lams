@@ -31,12 +31,12 @@
 	<lams:JSImport src="includes/javascript/orgGrouping.js" />
 	
 	<script type="text/javascript">
-		var groupingActivityId = '${param.activityID}',
+		var groupingActivityId = '<c:out value="${param.activityID}" />',
 			lessonMode = ${lessonMode},
 			// parameter can be null and the ID available only as a JSP attribute
-			organisationId = ${empty organisationID ? param.organisationID : organisationID},
+			organisationId = <c:out value="${empty organisationID ? param.organisationID : organisationID}" />,
 			targetOrganisationId = '${targetOrganisationId}',
-			lessonId = '${param.lessonID}',
+			lessonId = '<c:out value="${param.lessonID}" />',
 			csrfTokenName = '<csrf:tokenname/>',
 			csrfTokenValue = '<csrf:tokenvalue/>',
 			LAMS_URL = '<lams:LAMSURL/>',

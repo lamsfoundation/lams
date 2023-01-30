@@ -25,7 +25,7 @@
 			// Create the organisation view grid with sub grid for users	
 			$("#organisationGrid").jqGrid({
 			    datatype		   : "json",
-			    url				   : "<lams:LAMSURL />learning/kumalive/getReportOrganisationData.do?organisationID=${param.organisationID}",
+			    url				   : '<lams:LAMSURL />learning/kumalive/getReportOrganisationData.do?organisationID=<c:out value="${param.organisationID}" />',
 			    height			   : "100%",
 			    // use new theme
 			    guiStyle 		   : "bootstrap",
@@ -159,7 +159,7 @@
 		});
 
 		function exportAll(){
-			 blockExportButtons('<lams:LAMSURL />learning/kumalive/exportKumalives.do?organisationID=${param.organisationID}');
+			 blockExportButtons('<lams:LAMSURL />learning/kumalive/exportKumalives.do?organisationID=<c:out value="${param.organisationID}" />');
 		}
 
 		function exportSelected(){

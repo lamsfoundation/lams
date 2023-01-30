@@ -56,9 +56,9 @@
 
 <script>
 // in minutes since learner entered the activity
-var relativeTimeLimit = ${param.relativeTimeLimit},
+var relativeTimeLimit = <c:out value="${param.relativeTimeLimit}" />,
 	// in seconds since epoch started
-	absoluteTimeLimit = ${empty param.absoluteTimeLimit ? 'null' : param.absoluteTimeLimit};
+	absoluteTimeLimit = <c:out value="${empty param.absoluteTimeLimit ? 'null' : param.absoluteTimeLimit}" />;
 
 $(document).ready(function(){
 	let timeLimitWidget = $('#time-limit-widget'),
@@ -248,11 +248,11 @@ function updateTimeLimitOnServer() {
 	}
 	
 	$.ajax({
-		'url' : '/lams/${param.controllerContext}/updateTimeLimit.do',
+		'url' : '/lams/<c:out value="${param.controllerContext}" />/updateTimeLimit.do',
 		'type': 'post',
 		'cache' : 'false',
 		'data': {
-			'toolContentID' : '${param.toolContentId}',
+			'toolContentID' : '<c:out value="${param.toolContentId}" />',
 			'relativeTimeLimit' : relativeTimeLimit,
 			'absoluteTimeLimit' : absoluteTimeLimit,
 			'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
@@ -388,7 +388,7 @@ function timeLimitFinishNow(){
 
 function initInidividualTimeLimitAutocomplete(){
 	$('#individual-time-limit-autocomplete').autocomplete({
-		'source' : '/lams/${param.controllerContext}/getPossibleIndividualTimeLimits.do?toolContentID=${param.toolContentId}',
+		'source' : '/lams/<c:out value="${param.controllerContext}" />/getPossibleIndividualTimeLimits.do?toolContentID=${param.toolContentId}',
 		'delay'  : 700,
 		'minLength' : 3,
 		'select' : function(event, ui){
@@ -412,11 +412,11 @@ function initInidividualTimeLimitAutocomplete(){
 
 function updateIndividualTimeLimitOnServer(itemId, adjustment) {
 	$.ajax({
-		'url' : '/lams/${param.controllerContext}/updateIndividualTimeLimit.do',
+		'url' : '/lams/<c:out value="${param.controllerContext}" />/updateIndividualTimeLimit.do',
 		'type': 'post',
 		'cache' : 'false',
 		'data': {
-			'toolContentID' : '${param.toolContentId}',
+			'toolContentID' : '<c:out value="${param.toolContentId}" />',
 			// itemId can user-<userId> or group-<groupId>
 			'itemId' : itemId,
 			'adjustment' : adjustment,
@@ -433,11 +433,11 @@ function refreshInidividualTimeLimits() {
 	var table = $('#time-limit-table');
 	
 	$.ajax({
-		'url' : '/lams/${param.controllerContext}/getExistingIndividualTimeLimits.do',
+		'url' : '/lams/<c:out value="${param.controllerContext}" />/getExistingIndividualTimeLimits.do',
 		'dataType' : 'json',
 		'cache' : 'false',
 		'data': {
-			'toolContentID' : '${param.toolContentId}'
+			'toolContentID' : '<c:out value="${param.toolContentId}" />'
 		},
 		success : function(users) {
 			// remove existing time limits
@@ -538,7 +538,7 @@ function scrollToTimeLimitPanel() {
 			</tr>
 			<tr>
 				<td>
-					<span id="relative-time-limit-value">${param.relativeTimeLimit}</span>&nbsp;
+					<span id="relative-time-limit-value"><c:out value="${param.relativeTimeLimit}" /></span>&nbsp;
 					<fmt:message key="label.monitoring.time.limit.minutes"/>
 				</td>
 				<td class="centered">

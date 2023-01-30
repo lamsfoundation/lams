@@ -30,7 +30,7 @@
 
 <lams:JSImport src="learning/includes/javascript/gate-check.js" />
 <script type="text/javascript">
-	checkNextGateActivity('finishButton', '${param.toolSessionID}', '', function(){
+	checkNextGateActivity('finishButton', '<c:out value="${param.toolSessionID}" />', '', function(){
 		 submitForm('finishActivity');
 	});
 	

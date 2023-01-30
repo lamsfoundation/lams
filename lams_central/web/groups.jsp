@@ -33,7 +33,7 @@
 		var grouping = ${grouping},
 			organisationId = grouping.organisationId,
 			unassignedUsers = ${unassignedUsers},
-			groupingActivityId = '${param.activityID}',
+			groupingActivityId = '<c:out value="${param.activityID}" />',
 			lessonId = '${lessonID}',
 			lessonMode = ${lessonMode},
 			// This attribute can be empty.
@@ -212,8 +212,8 @@
 							<i class="fa fa-download"></i> <fmt:message key="label.download.template" />
 						</button>
 						<form action="../monitoring/groupingUpload/importLearnersForGrouping.do" enctype="multipart/form-data" id="uploadForm">
-							<input type="hidden" name="activityID" value="${param.activityID}"/>
-							<input type="hidden" name="lessonID" value="${lessonID}"/>
+							<input type="hidden" name="activityID" value='<c:out value="${param.activityID}" />' />
+							<input type="hidden" name="lessonID" value='<c:out value="${lessonID}" />' />
 							<lams:FileUpload5 fileFieldname="groupUploadFile" fileInputMessageKey="label.upload.group.spreadsheet"
 								uploadInfoMessageKey="-" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
 							<button id="import" type="button" class="btn btn-primary btn-disable-on-downupload ms-3"

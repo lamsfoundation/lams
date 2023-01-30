@@ -209,8 +209,8 @@
 	}
 	
 	$(document).ready(function(){
-		var toolQuestionUid = ${param.toolQuestionUid},
-			burningQuestionUid = '${param.burningQuestionUid}',
+		var toolQuestionUid = <c:out value="${param.toolQuestionUid}" />,
+			burningQuestionUid = '<c:out value="${param.burningQuestionUid}" />',
 			idSuffix = toolQuestionUid + (burningQuestionUid ? '-' + burningQuestionUid : ''),
 			// how often to refresh the chart
 			dataRefreshInterval = 5 * 1000;
@@ -246,10 +246,10 @@
 	       	 </fmt:message>
 	       	)
      	</div>
-     	<div class="btn btn-default discussion-sentiment-start-button" onClick="javascript:startDiscussionSentiment(${param.toolQuestionUid}, '${param.burningQuestionUid}', true)">
+     	<div class="btn btn-default discussion-sentiment-start-button" onClick="javascript:startDiscussionSentiment(<c:out value="${param.toolQuestionUid}" />, '<c:out value="${param.burningQuestionUid}" />', true)">
 			<fmt:message key="label.discussion.restart"/>
 		</div>
-  		<div class="btn btn-default discussion-sentiment-stop-button" onClick="javascript:stopDiscussionSentiment(${param.toolQuestionUid}, '${param.burningQuestionUid}')">
+  		<div class="btn btn-default discussion-sentiment-stop-button" onClick="javascript:stopDiscussionSentiment(<c:out value="${param.toolQuestionUid}" />, '<c:out value="${param.burningQuestionUid}" />')">
 			<fmt:message key="label.discussion.stop"/>
 		</div>
     </div>

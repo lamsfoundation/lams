@@ -126,7 +126,7 @@
 			$.ajax({
 				url      : '<lams:LAMSURL />learning/discussionSentiment/vote.do',
 				data     : {
-					lessonId  : ${param.lessonId},
+					lessonId  : <c:out value="${param.lessonId}" />,
 					selectedOption : selectedOption
 				},
 				type     : 'post',

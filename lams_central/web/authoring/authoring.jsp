@@ -279,8 +279,8 @@
 			activitiesOnlySelectable = false,
 			isLtiContentSelection = ${param.ltiContentSelection eq 'true'},
 			initContentFolderID = '${contentFolderID}',
-			initLearningDesignID = '${param.learningDesignID}',
-			initRelaunchMonitorLessonID = '${param.relaunchMonitorLessonID}',
+			initLearningDesignID = '<c:out value="${param.learningDesignID}" />',
+			initRelaunchMonitorLessonID = '<c:out value="${param.relaunchMonitorLessonID}" />',
 			initAccess = ${access},
 			csrfTokenName = '<csrf:tokenname/>',
 			csrfTokenValue = '<csrf:tokenvalue/>';

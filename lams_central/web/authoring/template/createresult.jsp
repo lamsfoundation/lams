@@ -9,10 +9,6 @@
 	<lams:css />
 </lams:head>
 
-<%-- <c:set var="learningDesignID" scope="request">
-	${param.learningDesignID}
-</c:set>
- --%>
 <body class="stripes">
 	<!-- Flashless Authoring is looks for this string: plearningDesignID=${param.learningDesignID} -->
 	<!-- Flashless Authoring is looks for this string: learningDesignID=${learningDesignID} -->

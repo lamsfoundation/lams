@@ -21,7 +21,7 @@
 	<script type="text/javascript">
 		"use strict"
 		
-		var	orgId = ${param.organisationID},
+		var	orgId = <c:out value="${param.organisationID}" />,
 			userId = <lams:user property="userID"/>,
 			role = '${empty param.role ? "none" : param.role}',
 			

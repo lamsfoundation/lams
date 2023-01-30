@@ -141,7 +141,7 @@
 
 			<form id="userForm" modelAttribute="userForm" action="usersave/changePass.do" method="post">
 				<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
-				<input type="hidden" name="userId" value="${param.userId}" />
+				<input type="hidden" name="userId" value='<c:out value="${param.userId}" />' />
 							
 						<lams:errors path="password"/>
 						

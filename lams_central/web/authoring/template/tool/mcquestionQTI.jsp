@@ -14,7 +14,7 @@ which are passed on to the individual question jsps to generate the form fields.
 	<c:forEach var="learningOutcome" items="${question.learningOutcomes}">
 		<input type="hidden" name="question${questionNumber}learningOutcome" value="${learningOutcome}"/>
 	</c:forEach>
-	<input type="hidden" name="question${questionNumber}collection" value="${param.collectionUid}" />
+	<input type="hidden" name="question${questionNumber}collection" value='<c:out value="${param.collectionUid}" />' />
 </div>
 
 
