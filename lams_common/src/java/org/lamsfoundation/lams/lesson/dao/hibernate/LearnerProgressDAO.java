@@ -95,10 +95,11 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 	    + " progress.lesson.lessonId IN (:lessonIds)";
 
     private final static String LOAD_LEARNERS_LATEST_BY_ACTIVITY = "SELECT u.* FROM lams_learner_progress AS prog "
-	    + "JOIN lams_progress_attempted AS att USING (learner_progress_id) "
 	    + "JOIN lams_user AS u USING (user_id) "
-	    + "WHERE prog.current_activity_id = :activityId AND att.activity_id = :activityId "
-	    + "ORDER BY att.start_date_time DESC";
+	    + "LEFT JOIN lams_progress_attempted AS att ON prog.learner_progress_id = att.learner_progress_id AND att.activity_id = :activityId "
+	    + "LEFT JOIN lams_progress_completed AS comp ON prog.learner_progress_id = comp.learner_progress_id AND comp.activity_id = :activityId "
+	    + "WHERE prog.current_activity_id = :activityId AND (att.learner_progress_id IS NOT NULL OR comp.learner_progress_id IS NOT NULL) "
+	    + "ORDER BY att.start_date_time DESC, comp.start_date_time DESC";
 
     private final static String LOAD_LEARNERS_BY_ACTIVITIES = "SELECT prog.user FROM LearnerProgress prog WHERE "
 	    + " prog.currentActivity.id IN (:activityIds) "
