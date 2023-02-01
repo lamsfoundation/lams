@@ -2410,6 +2410,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    scratchieItem.setDisplayOrder(displayOrder++);
 	    scratchieItem.setQbQuestion(qbQuestion);
 	    scratchieItem.setToolContentId(toolContentId);
+	    scratchieItem.setMark(qbQuestion.getMaxMark());
 	    scratchieItemDao.insert(scratchieItem);
 	    scratchie.getScratchieItems().add(scratchieItem);
 	}

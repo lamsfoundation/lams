@@ -2854,6 +2854,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    QuestionReference questionReference = new QuestionReference();
 	    questionReference.setQuestion(assessmentQuestion);
 	    questionReference.setSequenceId(displayOrder);
+	    questionReference.setMaxMark(qbQuestion.getMaxMark());
 	    assessmentQuestionDao.insert(questionReference);
 	    assessment.getQuestionReferences().add(questionReference);
 
