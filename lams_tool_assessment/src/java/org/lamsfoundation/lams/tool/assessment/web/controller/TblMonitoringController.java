@@ -330,10 +330,13 @@ public class TblMonitoringController {
 		case QbQuestion.TYPE_VERY_SHORT_ANSWERS:
 		    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 			if (optionDto.getMaxMark() == 1f) {
-			    return optionDto.getName();
+			    if (sb.length() > 0) {
+				sb.append("<br>");
+			    }
+			    sb.append(optionDto.getName());
 			}
 		    }
-		    break;
+		    return sb.toString();
 
 		case QbQuestion.TYPE_NUMERICAL:
 		    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
