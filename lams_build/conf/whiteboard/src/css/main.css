@@ -50,6 +50,32 @@ so buttons are not too large on iPads
     width: 25px;
 }
 
+/* LAMS: for smartphones */
+@media (max-device-width: 480px) {
+    .btn-group button {
+        font-size: 0.8em;
+        height: 30px;
+        width: 35px;
+        padding: 6px;
+    }
+
+    .minGroup {
+        width: 20px;
+    }
+    
+    #whiteboardColorpicker {
+    	top: 2px !important;
+    }
+    
+    #whiteboardThicknessSlider {
+    	top: 7px !important;
+    }
+    
+    .btn-group button .activeToolIcon + img {
+    	top: 7px !important;
+    }
+}
+
 /*
 @media (max-device-width: 1024px) {
     .btn-group button {
