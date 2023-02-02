@@ -46,17 +46,17 @@
 			margin-bottom: 5px;
 		}
 
-		.full-screen-content-div:fullscreen {
-			padding: 20px 0 70px 0;
+		.full-screen-content-div.fullscreen {
+			padding: 20px 30px 70px 0;
 		}
 		
-		.full-screen-content-div:fullscreen .full-screen-flex-div {
+		.full-screen-content-div.fullscreen .full-screen-flex-div {
 			margin: 0 2%;
 		}
 		
-		.full-screen-content-div:fullscreen .full-screen-flex-div,
-		.full-screen-content-div:fullscreen .full-screen-main-div,
-		.full-screen-content-div:fullscreen #whiteboard-frame {
+		.full-screen-content-div.fullscreen .full-screen-flex-div,
+		.full-screen-content-div.fullscreen .full-screen-main-div,
+		.full-screen-content-div.fullscreen #whiteboard-frame {
 			height: 100%;
 			width: 100%;
 		}
@@ -78,6 +78,10 @@
 			$('.panel-learner-page').closest('.container').removeClass('container').addClass('container-fluid');
 			
 			setupFullScreenEvents();
+			document.addEventListener("fullscreenchange", whiteboardFullScreenChanged);
+			document.addEventListener("mozfullscreenchange", whiteboardFullScreenChanged);
+			document.addEventListener("webkitfullscreenchange", whiteboardFullScreenChanged);
+			document.addEventListener("msfullscreenchange", whiteboardFullScreenChanged);
 		});
 		
 		if (${!hasEditRight && mode != "teacher" && !finishedLock}) {
@@ -216,6 +220,11 @@
 				},
 				description: "<div id='countdown-label'><fmt:message key='label.time.left' /></div>"
 			});
+		}
+
+		function whiteboardFullScreenChanged() {
+			var fullscreenElement = document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement;
+			$('.full-screen-content-div').toggleClass('fullscreen', fullscreenElement && fullscreenElement != null);
 		}
 	</script>
 	
