@@ -191,6 +191,8 @@ public interface IAssessmentService extends ICommonToolService {
 
     void deleteQuestionReference(Long uid);
 
+    void deleteSection(Long uid);
+
     /**
      * Get assessment which is relative with the special toolSession.
      *

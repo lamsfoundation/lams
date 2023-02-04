@@ -112,6 +112,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentSection;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
@@ -492,6 +493,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	}
 
 	assessmentQuestionDao.removeObject(QuestionReference.class, uid);
+    }
+
+    @Override
+    public void deleteSection(Long uid) {
+	assessmentDao.removeObject(AssessmentSection.class, uid);
     }
 
     @Override

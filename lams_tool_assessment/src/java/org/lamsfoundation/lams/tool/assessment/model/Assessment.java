@@ -51,8 +51,6 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.SortComparator;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
@@ -101,6 +99,12 @@ public class Assessment implements Cloneable {
 
     @Column(name = "questions_per_page")
     private int questionsPerPage;
+
+    // Question section
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "assessment_uid")
+    @SortComparator(AssessmentSection.AssessmentSectionComparator.class)
+    private Set<AssessmentSection> sections = new TreeSet<>();
 
     @Column(name = "attempts_allowed")
     private int attemptsAllowed;
@@ -223,7 +227,7 @@ public class Assessment implements Cloneable {
 	try {
 	    assessment = (Assessment) super.clone();
 	    assessment.setUid(null);
-	    
+
 	    // clone questions
 	    if (questions != null) {
 		Iterator<AssessmentQuestion> iter = questions.iterator();
@@ -276,7 +280,7 @@ public class Assessment implements Cloneable {
 	    if (createdBy != null) {
 		assessment.setCreatedBy((AssessmentUser) createdBy.clone());
 	    }
-	    
+
 	    assessment.setAbsoluteTimeLimit(null);
 	    assessment.setTimeLimitAdjustments(new HashMap<>(this.getTimeLimitAdjustments()));
 	} catch (CloneNotSupportedException e) {
@@ -647,10 +651,16 @@ public class Assessment implements Cloneable {
 	this.questionsPerPage = questionsPerPage;
     }
 
+    public Set<AssessmentSection> getSections() {
+	return sections;
+    }
+
+    public void setSections(Set<AssessmentSection> sections) {
+	this.sections = sections;
+    }
+
     /**
      * number of allow students attempts
-     *
-     * @return
      */
     public int getAttemptsAllowed() {
 	return attemptsAllowed;
@@ -683,8 +693,6 @@ public class Assessment implements Cloneable {
 
     /**
      * If this is checked, then in learner we display the numbering for learners.
-     *
-     * @return
      */
     public boolean isNumbered() {
 	return numbered;
