@@ -276,6 +276,20 @@ public class Assessment implements Cloneable {
 		}
 		assessment.overallFeedbacks = set;
 	    }
+
+	    // clone sections
+	    if (sections != null) {
+		Iterator<AssessmentSection> iter = sections.iterator();
+		TreeSet<AssessmentSection> set = new TreeSet<>();
+		while (iter.hasNext()) {
+		    AssessmentSection section = iter.next();
+		    AssessmentSection newQuestion = section.clone();
+		    // just clone old file without duplicate it in repository
+		    set.add(newQuestion);
+		}
+		assessment.sections = set;
+	    }
+
 	    // clone ReourceUser as well
 	    if (createdBy != null) {
 		assessment.setCreatedBy((AssessmentUser) createdBy.clone());

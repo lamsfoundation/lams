@@ -161,16 +161,16 @@
 							 cssClass="form-control input-sm loffset10">
 					<form:option value="-1" cssClass="hidden">-</form:option>
 					<form:option value="0">-</form:option>
-					<form:option value="10">10</form:option>
-					<form:option value="9">9</form:option>
-					<form:option value="8">8</form:option>
-					<form:option value="7">7</form:option>
-					<form:option value="6">6</form:option>
-					<form:option value="5">5</form:option>
-					<form:option value="4">4</form:option>
-					<form:option value="3">3</form:option>
-					<form:option value="2">2</form:option>
 					<form:option value="1">1</form:option>
+					<form:option value="2">2</form:option>
+					<form:option value="3">3</form:option>
+					<form:option value="4">4</form:option>
+					<form:option value="5">5</form:option>
+					<form:option value="6">6</form:option>
+					<form:option value="7">7</form:option>
+					<form:option value="8">8</form:option>
+					<form:option value="9">9</form:option>
+					<form:option value="10">10</form:option>
 				</form:select>
 			</label>
 		</div>

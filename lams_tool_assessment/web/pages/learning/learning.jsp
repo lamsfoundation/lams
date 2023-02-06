@@ -667,6 +667,9 @@
 		<br>
 		
 		<div class="form-group">
+			<%@ include file="parts/paging.jsp"%>
+			<br>
+			
 			<%@ include file="parts/allquestions.jsp"%>
 			
 			<%@ include file="parts/paging.jsp"%>

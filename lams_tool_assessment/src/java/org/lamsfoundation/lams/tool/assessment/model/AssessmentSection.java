@@ -13,7 +13,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "tl_laasse10_section")
-public class AssessmentSection implements Serializable, Comparable<AssessmentSection> {
+public class AssessmentSection implements Serializable, Cloneable, Comparable<AssessmentSection> {
 
     private static final long serialVersionUID = -8252609064125180392L;
 
@@ -81,6 +81,13 @@ public class AssessmentSection implements Serializable, Comparable<AssessmentSec
     @Override
     public int compareTo(AssessmentSection o) {
 	return COMPARATOR.compare(this, o);
+    }
+
+    @Override
+    public AssessmentSection clone() throws CloneNotSupportedException {
+	AssessmentSection clone = (AssessmentSection) super.clone();
+	clone.setUid(null);
+	return clone;
     }
 
     @Override

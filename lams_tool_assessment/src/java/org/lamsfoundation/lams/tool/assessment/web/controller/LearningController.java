@@ -75,6 +75,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentOverallFeedback;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentSection;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
@@ -385,22 +386,41 @@ public class LearningController {
 	}
 
 	//paging
+	int questionPerPageCount = assessment.getQuestionsPerPage();
+	List<Integer> paging = null;
+	if (questionPerPageCount == -1) {
+	    paging = assessment.getSections().stream()
+		    .collect(Collectors.mapping(AssessmentSection::getQuestionCount, Collectors.toList()));
+	} else if (questionPerPageCount == 0) {
+	    paging = List.of(questionDtos.size());
+	} else {
+	    paging = new ArrayList<>();
+	    int pageCount = questionDtos.size() / questionPerPageCount;
+	    if (questionDtos.size() % questionPerPageCount > 0) {
+		pageCount++;
+	    }
+	    for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++) {
+		paging.add(questionPerPageCount);
+	    }
+	}
+
 	List<Set<QuestionDTO>> pagedQuestionDtos = new ArrayList<>();
-	int maxQuestionsPerPage = ((assessment.getQuestionsPerPage() != 0) && hasEditRight)
-		? assessment.getQuestionsPerPage()
-		: questionDtos.size();
-	LinkedHashSet<QuestionDTO> questionsForOnePage = new LinkedHashSet<>();
+	Set<QuestionDTO> questionsForOnePage = new LinkedHashSet<>();
 	pagedQuestionDtos.add(questionsForOnePage);
-	int count = 0;
+	int questionInPageCount = 0;
+	Iterator<Integer> pageIterator = paging.iterator();
+	questionPerPageCount = pageIterator.next();
 
 	// lists all code styles used in this assessment
 	Set<Integer> codeStyles = new HashSet<>();
 	for (QuestionDTO questionDto : questionDtos) {
 	    questionsForOnePage.add(questionDto);
-	    count++;
-	    if ((questionsForOnePage.size() == maxQuestionsPerPage) && (count != questionDtos.size())) {
+	    questionInPageCount++;
+	    if (questionInPageCount == questionPerPageCount && pageIterator.hasNext()) {
 		questionsForOnePage = new LinkedHashSet<>();
 		pagedQuestionDtos.add(questionsForOnePage);
+		questionPerPageCount = pageIterator.next();
+		questionInPageCount = 0;
 	    }
 
 	    if (questionDto.getCodeStyle() != null) {
