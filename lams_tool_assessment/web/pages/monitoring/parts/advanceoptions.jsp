@@ -27,7 +27,17 @@
 			</td>
 			
 			<td>
-				<c:out value="${assessment.questionsPerPage}" escapeXml="true"/>
+				<c:choose>
+					<c:when test="${assessment.questionsPerPage == -1}">
+						<fmt:message key="label.authoring.advance.sections" />
+					</c:when>
+					<c:when test="${assessment.questionsPerPage == 0}">
+						<fmt:message key="label.authoring.advance.all.in.one.page" />
+					</c:when>
+					<c:otherwise>
+						<c:out value="${assessment.questionsPerPage}" escapeXml="true"/>
+					</c:otherwise>
+				</c:choose>
 			</td>
 		</tr>
 		
