@@ -42,14 +42,15 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.GroupComparator;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.security.ISecurityService;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationGroup;
 import org.lamsfoundation.lams.usermanagement.OrganisationGrouping;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -135,7 +136,7 @@ public class GroupingController {
 	request.setAttribute(GroupingController.PARAM_ACTIVITY_TITLE, activity.getTitle());
 	request.setAttribute(GroupingController.PARAM_ACTIVITY_DESCRIPTION, activity.getDescription());
 
-	SortedSet<Group> groups = new TreeSet<>(new GroupComparator());
+	SortedSet<Group> groups = new TreeSet<>();
 	groups.addAll(grouping.getGroups());
 
 	// sort users with first, then last name, then login
@@ -283,9 +284,15 @@ public class GroupingController {
     @ResponseBody
     public String saveAsCourseGrouping(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
+	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
+	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationId);
+	// get course groupings from top-leve course
+	if (OrganisationType.CLASS_TYPE.equals(organisation.getOrganisationType().getOrganisationTypeId())) {
+	    organisation = organisation.getParentOrganisation();
+	    organisationId = organisation.getOrganisationId();
+	}
 	HttpSession ss = SessionManager.getSession();
 	Integer userId = ((UserDTO) ss.getAttribute(AttributeNames.USER)).getUserID();
-	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	String newGroupingName = request.getParameter("name");
 
 	// check if user is allowed to view and edit groupings

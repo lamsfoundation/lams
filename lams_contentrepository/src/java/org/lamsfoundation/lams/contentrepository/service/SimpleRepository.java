@@ -146,7 +146,7 @@ public class SimpleRepository implements IRepositoryAdmin {
      */
     private CrWorkspace getWorkspace(Long workspaceId) throws WorkspaceNotFoundException {
 	// call workspace dao to get the workspace
-	CrWorkspace workspace = (CrWorkspace) workspaceDAO.find(CrWorkspace.class, workspaceId);
+	CrWorkspace workspace = workspaceDAO.find(CrWorkspace.class, workspaceId);
 	if (workspace == null) {
 	    throw new WorkspaceNotFoundException("Workspace id=" + workspaceId + " does not exist.");
 	}
@@ -432,14 +432,13 @@ public class SimpleRepository implements IRepositoryAdmin {
      */
     @Override
     public NodeKey addFileItem(ITicket ticket, InputStream istream, String filename, String mimeType,
-	    String versionDescription, boolean generatePortraitUUid)
-	    throws FileException, AccessDeniedException, InvalidParameterException {
+	    String versionDescription) throws FileException, AccessDeniedException, InvalidParameterException {
 
 	try {
 	    CrWorkspace workspace = getWorkspace(ticket.getWorkspaceId());
 	    Integer userId = getCurrentUserId();
 	    SimpleVersionedNode initialNodeVersion = nodeFactory.createFileNode(workspace, null, null, istream,
-		    filename, mimeType, versionDescription, userId, generatePortraitUUid);
+		    filename, mimeType, versionDescription, userId);
 	    initialNodeVersion.save();
 	    return initialNodeVersion.getNodeKey();
 	} catch (ValidationException e) {
@@ -492,16 +491,16 @@ public class SimpleRepository implements IRepositoryAdmin {
      * ITicket, java.lang.Long, java.lang.Long)
      */
     @Override
-    public IVersionedNode getFileItem(ITicket ticket, Long uuid, Long version)
+    public IVersionedNode getFileItem(ITicket ticket, Long nodeId, Long version)
 	    throws AccessDeniedException, ItemNotFoundException, FileException {
 
-	return nodeFactory.getNode(ticket.getWorkspaceId(), uuid, version);
+	return nodeFactory.getNode(ticket.getWorkspaceId(), nodeId, version);
     }
 
     @Override
-    public IVersionedNode getFileItem(ITicket ticket, String portraitUuid, Long version)
+    public IVersionedNode getFileItem(ITicket ticket, String uuid, Long version)
 	    throws AccessDeniedException, ItemNotFoundException, FileException {
-	return nodeFactory.getNode(ticket.getWorkspaceId(), UUID.fromString(portraitUuid), version);
+	return nodeFactory.getNode(ticket.getWorkspaceId(), UUID.fromString(uuid), version);
     }
 
     /*
@@ -511,13 +510,13 @@ public class SimpleRepository implements IRepositoryAdmin {
      * ITicket, java.lang.Long, java.lang.Long, java.lang.String)
      */
     @Override
-    public IVersionedNode getFileItem(ITicket ticket, Long uuid, Long version, String relPath)
+    public IVersionedNode getFileItem(ITicket ticket, Long nodeId, Long version, String relPath)
 	    throws AccessDeniedException, ItemNotFoundException, FileException {
 
 	long start = System.currentTimeMillis();
-	String key = "getFileItem " + uuid;
+	String key = "getFileItem " + nodeId;
 
-	IVersionedNode latestNodeVersion = nodeFactory.getNode(ticket.getWorkspaceId(), uuid, version);
+	IVersionedNode latestNodeVersion = nodeFactory.getNode(ticket.getWorkspaceId(), nodeId, version);
 	log.error(key + " latestNodeVersion " + (System.currentTimeMillis() - start));
 
 	if (relPath == null) {
@@ -745,7 +744,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 	    }
 
 	    if (node.isNodeType(NodeType.FILENODE)) {
-		saveSigleFile(toFileName, node);
+		saveSingleFile(toFileName, node);
 	    } else if (node.isNodeType(NodeType.PACKAGENODE)) {
 		Set<IVersionedNode> children = node.getChildNodes();
 		String tempRoot = FileUtil.createTempDirectory("export_package");
@@ -756,7 +755,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 		    //if folder does not exist, create first.
 		    FileUtil.createDirectory(FileUtil.getFileDirectory(fullname));
 
-		    saveSigleFile(fullname, child);
+		    saveSingleFile(fullname, child);
 		}
 		if (toFileName == null) {
 		    IValue prop = node.getProperty(PropertyName.FILENAME);
@@ -788,7 +787,7 @@ public class SimpleRepository implements IRepositoryAdmin {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    private void saveSigleFile(String toFileName, IVersionedNode node)
+    private void saveSingleFile(String toFileName, IVersionedNode node)
 	    throws FileException, ValueFormatException, FileUtilException, FileNotFoundException, IOException {
 	InputStream is = node.getFile();
 	if (toFileName == null) {

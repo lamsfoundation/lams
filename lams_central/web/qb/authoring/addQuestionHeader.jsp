@@ -39,6 +39,5 @@
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.slider.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.touch-punch.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/Sortable.js"></script>

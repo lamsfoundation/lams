@@ -111,7 +111,7 @@
 		}
 		
 		$(document).ready(function(){
-			initFileUpload('${tmpFileUploadId}', '<lams:user property="localeLanguage"/>');
+			initFileUpload('<c:out value="${tmpFileUploadId}" />', '<lams:user property="localeLanguage"/>');
 		});	
 	</script>
 </lams:head>
@@ -127,9 +127,9 @@
 			
 		<div class="panel-body">
 			<c:set var="csrfToken"><csrf:token/></c:set>
-			<form action="<c:url value="/xmlQuestions/importQuestionsXml.do"/>?${csrfToken}&collectionUid=${param.collectionUid}" method="post" 
+			<form action='<c:url value="/xmlQuestions/importQuestionsXml.do"/>?${csrfToken}&collectionUid=<c:out value="${param.collectionUid}" />' method="post" 
 				id="importForm">	
-				<input type="hidden" name="tmpFileUploadId" value="${tmpFileUploadId}" /> 
+				<input type="hidden" name="tmpFileUploadId" value='<c:out value="${tmpFileUploadId}" />' /> 
 				
 			
 				<div id="image-upload-area" class="voffset20"></div>

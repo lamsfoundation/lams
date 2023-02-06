@@ -123,7 +123,7 @@
 		}
 		
 		$(document).ready(function(){
-			initFileUpload('${tmpFileUploadId}', '<lams:user property="localeLanguage"/>');
+			initFileUpload('<c:out value="${tmpFileUploadId}" />', '<lams:user property="localeLanguage"/>');
 		});	
 	</script>
 </lams:head>
@@ -138,12 +138,12 @@
 		</div>
 		</c:if>
 		<form id="questionForm" action="<lams:LAMSURL/>questions.do" enctype="multipart/form-data" method="post">
-			<input type="hidden" name="tmpFileUploadId" value="${tmpFileUploadId}" /> 
-			<input type="hidden" name="returnURL" value="${empty param.returnURL ? returnURL : param.returnURL}" /> 
-			<input type="hidden" name="importType" value="${empty param.importType ? importType : param.importType}" /> 
-			<input type="hidden" name="callerID" value="${empty param.callerID ? callerID : param.callerID}" /> 
-			<input type="hidden" name="limitType" value="${empty param.limitType ? limitType : param.limitType}" /> 
-			<input type="hidden" name="collectionChoice" value="${empty param.collectionChoice ? collectionChoice : param.collectionChoice}" /> 
+			<input type="hidden" name="tmpFileUploadId" value='<c:out value="${tmpFileUploadId}" />' /> 
+			<input type="hidden" name="returnURL" value='<c:out value="${empty param.returnURL ? returnURL : param.returnURL}" />' /> 
+			<input type="hidden" name="importType" value='<c:out value="${empty param.importType ? importType : param.importType}" />' /> 
+			<input type="hidden" name="callerID" value='<c:out value="${empty param.callerID ? callerID : param.callerID}" />' /> 
+			<input type="hidden" name="limitType" value='<c:out value="${empty param.limitType ? limitType : param.limitType}" />' /> 
+			<input type="hidden" name="collectionChoice" value='<c:out value="${empty param.collectionChoice ? collectionChoice : param.collectionChoice}" />' /> 
 			
 			<div id="image-upload-area" class="voffset20"></div>
 

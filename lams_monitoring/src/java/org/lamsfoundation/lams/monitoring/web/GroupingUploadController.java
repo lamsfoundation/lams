@@ -26,8 +26,6 @@ package org.lamsfoundation.lams.monitoring.web;
 import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -35,6 +33,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import javax.servlet.ServletOutputStream;
@@ -52,7 +51,6 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.CellType;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.GroupComparator;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -67,7 +65,6 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.AlphanumComparator;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -199,9 +196,8 @@ public class GroupingUploadController {
 	titleRow.addCell(messageService.getMessage("spreadsheet.column.groupname"));
 
 	if (groups != null) {
-	    List<Group> groupList = new LinkedList<>(groups);
-	    Collections.sort(groupList, new GroupComparator());
-	    for (Group group : groupList) {
+	    Set<Group> groupSet = new TreeSet<>(groups);
+	    for (Group group : groupSet) {
 		String groupName = group.getGroupName();
 		for (User groupUser : group.getUsers()) {
 		    generateUserRow(groupName, groupUser, excelSheet);
@@ -512,17 +508,6 @@ public class GroupingUploadController {
 	}
 	return skipped;
     }
-
-    final Comparator<OrganisationGroup> ORG_GROUP_COMPARATOR = new Comparator<>() {
-	@Override
-	public int compare(OrganisationGroup o1, OrganisationGroup o2) {
-	    String grp1Name = o1 != null ? o1.getName() : "";
-	    String grp2Name = o2 != null ? o2.getName() : "";
-
-	    AlphanumComparator comparator = new AlphanumComparator();
-	    return comparator.compare(grp1Name, grp2Name);
-	}
-    };
 
     private UserDTO getUserDTO() {
 	HttpSession ss = SessionManager.getSession();

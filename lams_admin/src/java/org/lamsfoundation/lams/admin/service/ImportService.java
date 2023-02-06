@@ -310,7 +310,9 @@ public class ImportService implements IImportService {
 	    rowResult = new ArrayList<>();
 	    StringBuilder generatedPassword = new StringBuilder();
 	    row = sheet.getRow(i);
-	    user = parseUser(row, i, generatedPassword);
+	    if (row != null) {
+		user = parseUser(row, i, generatedPassword);
+	    }
 
 	    if (emptyRow) {
 		ImportService.log.debug("Row " + i + " is empty.");

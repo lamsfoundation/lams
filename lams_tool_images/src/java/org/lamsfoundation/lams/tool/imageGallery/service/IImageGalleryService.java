@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.imageGallery.service;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -307,4 +308,8 @@ public interface IImageGalleryService extends ToolRatingManager, ICommonToolServ
     void saveOrUpdateImageGalleryConfigItem(ImageGalleryConfigItem item);
 
     void notifyTeachersOnImageSumbit(Long sessionId, ImageGalleryUser imageGalleryUser);
+
+    void fillImageDisplayUuid(ImageGalleryItem item);
+
+    void fillImageDisplayUuid(Collection<ImageGalleryItem> items);
 }

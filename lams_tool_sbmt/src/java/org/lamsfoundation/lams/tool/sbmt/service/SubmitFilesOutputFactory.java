@@ -113,7 +113,7 @@ public class SubmitFilesOutputFactory extends OutputFactory {
 			    int urlIndex = 0;
 			    for (FileDetailsDTO filesDetailsDTO : files) {
 				String fileUrl = "javascript:var dummy = window.open('" + serverUrl + "download/?uuid="
-					+ filesDetailsDTO.getUuID() + "&preferDownload=false&"
+					+ filesDetailsDTO.getDisplayUuid() + "&preferDownload=false&"
 					+ AttributeNames.PARAM_TOOL_CONTENT_HANDLER_NAME + "="
 					+ SbmtConstants.TOOL_CONTENT_HANDLER_NAME + "','"
 					+ filesDetailsDTO.getFileDescription() + "','resizable,scrollbars')";

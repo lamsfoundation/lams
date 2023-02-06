@@ -246,7 +246,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
     @Override
     public String getPortraitUuid() {
 	nodeObjectInitilised("Unable to get portrait UUID");
-	return node.getPortraitUuid() == null ? null : node.getPortraitUuid().toString();
+	return node.getUuid() == null ? null : node.getUuid().toString();
     }
 
     /**
@@ -851,13 +851,13 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 	while (iter.hasNext()) {
 	    NodeKey nk = (NodeKey) iter.next();
 	    try {
-		int delStatus = fileDAO.delete(nk.getUuid(), nk.getVersion());
+		int delStatus = fileDAO.delete(nk.getNodeId(), nk.getVersion());
 		if (delStatus == -1) {
-		    failedList.add(fileDAO.getFilePath(nk.getUuid(), nk.getVersion()));
+		    failedList.add(fileDAO.getFilePath(nk.getNodeId(), nk.getVersion()));
 		}
 	    } catch (FileException e) {
 		log.error("FileException occured while deleting files for " + nodeDescription, e);
-		failedList.add("Filename unknown uuid " + nk.getUuid() + " version " + nk.getVersion());
+		failedList.add("Filename unknown uuid " + nk.getNodeId() + " version " + nk.getVersion());
 	    }
 	}
 
@@ -1007,7 +1007,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 		    // no need to the new node as a child node, as createFileNode will do it.
 		    FileInputStream istream = new FileInputStream(file);
 		    nodeFactory.createFileNode(workspace, this, relPath, istream, filename, null, versionDescription,
-			    userId, false);
+			    userId);
 		}
 	    }
 

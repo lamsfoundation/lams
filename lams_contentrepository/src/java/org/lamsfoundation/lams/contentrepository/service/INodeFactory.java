@@ -54,7 +54,7 @@ public interface INodeFactory {
      */
     public abstract SimpleVersionedNode createFileNode(CrWorkspace workspace, SimpleVersionedNode parentNode,
 	    String relPath, InputStream istream, String filename, String mimeType, String versionDescription,
-	    Integer userId, boolean generatePortraitUuid)
+	    Integer userId)
 	    throws org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 
     /**

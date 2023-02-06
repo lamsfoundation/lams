@@ -38,6 +38,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
@@ -62,7 +63,7 @@ public class OrganisationGroup implements Serializable, Comparable<OrganisationG
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "lams_user_organisation_group", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private Set<User> users = new HashSet<User>();
+    private Set<User> users = new HashSet<>();
 
     public OrganisationGroup() {
     }
@@ -109,10 +110,7 @@ public class OrganisationGroup implements Serializable, Comparable<OrganisationG
 	if (this == obj) {
 	    return true;
 	}
-	if (obj == null) {
-	    return false;
-	}
-	if (!(obj instanceof OrganisationGroup)) {
+	if ((obj == null) || !(obj instanceof OrganisationGroup)) {
 	    return false;
 	}
 	OrganisationGroup other = (OrganisationGroup) obj;
@@ -128,7 +126,8 @@ public class OrganisationGroup implements Serializable, Comparable<OrganisationG
 
     @Override
     public int compareTo(OrganisationGroup group) {
-	return new CompareToBuilder().append(this.getGroupId(), group.getGroupId())
-		.append(this.getName(), group.getName()).toComparison();
+	return new CompareToBuilder()
+		.append(StringUtils.lowerCase(this.getName()), StringUtils.lowerCase(group.getName()))
+		.append(this.getGroupId(), group.getGroupId()).toComparison();
     }
 }

@@ -83,7 +83,7 @@ public class AuthoringController {
 
     @Autowired
     @Qualifier("laimagImageGalleryService")
-    private IImageGalleryService igService;
+    private IImageGalleryService imageGalleryService;
 
     @Autowired
     @Qualifier("laimagMessageService")
@@ -108,13 +108,13 @@ public class AuthoringController {
 	    throws ServletException {
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	ImageGallery imageGallery = igService.getImageGalleryByContentId(contentId);
+	ImageGallery imageGallery = imageGalleryService.getImageGalleryByContentId(contentId);
 
 	imageGallery.setDefineLater(true);
-	igService.saveOrUpdateImageGallery(imageGallery);
+	imageGalleryService.saveOrUpdateImageGallery(imageGallery);
 
 	//audit log the teacher has started editing activity in monitor
-	igService.auditLogStartEditingActivityInMonitor(contentId);
+	imageGalleryService.auditLogStartEditingActivityInMonitor(contentId);
 
 	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
 	return readDatabaseData(imageGalleryForm, request);
@@ -141,17 +141,18 @@ public class AuthoringController {
 	imageGalleryForm.setSessionMapID(sessionMap.getSessionID());
 
 	try {
-	    imageGallery = igService.getImageGalleryByContentId(contentId);
+	    imageGallery = imageGalleryService.getImageGalleryByContentId(contentId);
 	    // if imageGallery does not exist, try to use default content instead.
 	    if (imageGallery == null) {
-		imageGallery = igService.getDefaultContent(contentId);
+		imageGallery = imageGalleryService.getDefaultContent(contentId);
 		if (imageGallery.getImageGalleryItems() != null) {
 		    items = new ArrayList<>(imageGallery.getImageGalleryItems());
+		    imageGalleryService.fillImageDisplayUuid(items);
 		} else {
 		    items = null;
 		}
 	    } else {
-		items = igService.getAuthoredItems(imageGallery.getUid());
+		items = imageGalleryService.getAuthoredItems(imageGallery.getUid());
 	    }
 
 	    imageGalleryForm.setImageGallery(imageGallery);
@@ -185,7 +186,7 @@ public class AuthoringController {
 	imageGalleryItemList.addAll(items);
 
 	// get rating criterias from DB
-	List<RatingCriteria> ratingCriterias = igService.getRatingCriterias(contentId);
+	List<RatingCriteria> ratingCriterias = imageGalleryService.getRatingCriterias(contentId);
 	sessionMap.put(AttributeNames.ATTR_RATING_CRITERIAS, ratingCriterias);
 
 	sessionMap.put(ImageGalleryConstants.ATTR_IMAGE_GALLERY_FORM, imageGalleryForm);
@@ -238,7 +239,7 @@ public class AuthoringController {
 	Long contentId = imageGalleryForm.getImageGallery().getContentId();
 
 	// **********************************Get ImageGallery PO*********************
-	ImageGallery imageGalleryPO = igService.getImageGalleryByContentId(contentId);
+	ImageGallery imageGalleryPO = imageGalleryService.getImageGalleryByContentId(contentId);
 	if (imageGalleryPO == null) {
 	    // new ImageGallery, create it.
 	    imageGalleryPO = imageGallery;
@@ -268,7 +269,8 @@ public class AuthoringController {
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	ImageGalleryUser imageGalleryUser = igService.getUserByIDAndContent(user.getUserID().longValue(), contentId);
+	ImageGalleryUser imageGalleryUser = imageGalleryService.getUserByIDAndContent(user.getUserID().longValue(),
+		contentId);
 	if (imageGalleryUser == null) {
 	    imageGalleryUser = new ImageGalleryUser(user, imageGalleryPO);
 	}
@@ -303,7 +305,7 @@ public class AuthoringController {
 	    ImageGalleryItem item = iter.next();
 	    iter.remove();
 	    if (item.getUid() != null) {
-		igService.deleteImageGalleryItem(item.getUid());
+		imageGalleryService.deleteImageGalleryItem(item.getUid());
 	    }
 	}
 	// handle imageGallery item attachment file:
@@ -315,14 +317,14 @@ public class AuthoringController {
 	}
 	// **********************************************
 	// finally persist imageGalleryPO again
-	igService.saveOrUpdateImageGallery(imageGalleryPO);
+	imageGalleryService.saveOrUpdateImageGallery(imageGalleryPO);
 
 	// ************************* Handle rating criterias *******************
 	if (mode.isAuthor()) {
 	    List<RatingCriteria> oldCriterias = (List<RatingCriteria>) sessionMap
 		    .get(AttributeNames.ATTR_RATING_CRITERIAS);
 
-	    igService.saveRatingCriterias(request, oldCriterias, contentId);
+	    imageGalleryService.saveRatingCriterias(request, oldCriterias, contentId);
 	}
 	imageGalleryForm.setImageGallery(imageGalleryPO);
 
@@ -573,6 +575,7 @@ public class AuthoringController {
 	if (item.getOriginalFileUuid() != null) {
 	    form.setFileUuid(item.getOriginalFileUuid());
 	    form.setFileName(item.getFileName());
+	    form.setFileDisplayUuid(item.getOriginalFileDisplayUuid());
 	    form.setHasFile(true);
 	} else {
 	    form.setHasFile(false);
@@ -619,7 +622,7 @@ public class AuthoringController {
 	if (StringUtils.isBlank(title)) {
 	    Long nextImageTitleNumber = (Long) sessionMap.get(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE);
 	    sessionMap.put(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE, nextImageTitleNumber + 1);
-	    title = igService.generateNextImageTitle(nextImageTitleNumber);
+	    title = imageGalleryService.generateNextImageTitle(nextImageTitleNumber);
 	}
 	item.setTitle(title);
 
@@ -661,7 +664,7 @@ public class AuthoringController {
 		    if (StringUtils.isBlank(title)) {
 			Long nextImageTitleNumber = (Long) sessionMap.get(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE);
 			sessionMap.put(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE, nextImageTitleNumber + 1);
-			title = igService.generateNextImageTitle(nextImageTitleNumber);
+			title = imageGalleryService.generateNextImageTitle(nextImageTitleNumber);
 		    }
 		    nextItem.setTitle(title);
 		    nextItem.setDescription(item.getDescription());
@@ -670,7 +673,7 @@ public class AuthoringController {
 		    item = nextItem;
 		}
 
-		igService.uploadImageGalleryItemFile(item, file);
+		imageGalleryService.uploadImageGalleryItemFile(item, file);
 		if (!hasOld) {
 		    imageList.add(item);
 		}

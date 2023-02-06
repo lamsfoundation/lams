@@ -12,14 +12,13 @@
 				window.parent.ActivityLib.closeActivityAuthoring(window.frameElement.id);
 				return;
 			}
-
-			var notifyCloseURL = "${param.notifyCloseURL}";
+			
+			var notifyCloseURL = "<c:out value='${param.notifyCloseURL}' />";
 			if (notifyCloseURL == "") {
 				refreshParentMonitoringWindow();
 			} else {
 				if (window.parent.opener == null
-						|| '${param.noopener}' == 'true'
-						|| notifyCloseURL.indexOf('noopener=true') >= 0) {
+						|| ${param.noopener eq "true" or param.notifyCloseURL.indexOf("noopener=true") >= 0}) {
 					window.location.href = notifyCloseURL + '&action=save';
 				} else {
 					window.parent.opener.location.href = notifyCloseURL;

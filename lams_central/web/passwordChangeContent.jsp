@@ -88,7 +88,7 @@
 
 <body>
 <form:form modelAttribute="passwordChangeActionForm" id="change-password" method="post" action="/lams/passwordChanged.do">
-	<input type="hidden" name="redirectURL" value="${param.redirectURL}" />
+	<input type="hidden" name="redirectURL" value='<c:out value="${param.redirectURL}" />' />
 	<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 
 	<div style="clear: both"></div>

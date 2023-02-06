@@ -52,8 +52,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<form:form action="processNewEntry.do" modelAttribute="notebookForm" id="notebookForm" method="post">
 	
 			<form:hidden path="signature" />
-			<form:hidden path="currentLessonID" value="${param.currentLessonID}" />
-			<form:hidden path="lessonID" value="${param.lessonID}" />
+			<form:hidden path="currentLessonID" value='${param.currentLessonID}' />
+			<form:hidden path="lessonID" value='${param.lessonID}' />
 	
 			<div class="lead">
 				<fmt:message key="mynotes.add.new.button" />

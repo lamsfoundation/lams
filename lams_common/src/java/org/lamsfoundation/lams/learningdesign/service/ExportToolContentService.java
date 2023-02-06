@@ -1068,7 +1068,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    }
 
 		    // refresh file node Uuid and Version value to latest.
-		    BeanUtils.setProperty(fileNode.instance, fileNode.name.uuidFieldName, key.getUuid());
+		    BeanUtils.setProperty(fileNode.instance, fileNode.name.uuidFieldName, key.getNodeId());
 		    // version id is optional
 		    if (fileNode.name.versionFieldName != null) {
 			BeanUtils.setProperty(fileNode.instance, fileNode.name.versionFieldName, key.getVersion());

@@ -53,6 +53,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.lamsfoundation.lams.tool.forum.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.dto.SessionDTO;
+import org.lamsfoundation.lams.tool.forum.model.Attachment;
 import org.lamsfoundation.lams.tool.forum.model.Forum;
 import org.lamsfoundation.lams.tool.forum.model.ForumReport;
 import org.lamsfoundation.lams.tool.forum.model.ForumToolSession;
