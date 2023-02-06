@@ -684,9 +684,13 @@
 	<!-- Some constraints are based on DisplayGroupAction class -->
 	<security-constraint>
 		<web-resource-collection>
-			<web-resource-name>Organisation grouping</web-resource-name>
+			<web-resource-name>Any superuser content</web-resource-name>
 			<url-pattern>/orgGroup.jsp</url-pattern>
 			<url-pattern>/orgGrouping.jsp</url-pattern>
+			<url-pattern>/qb/collection/*</url-pattern>
+			<url-pattern>/qb/stats/*</url-pattern>
+			<url-pattern>/questions/*</url-pattern>
+			<url-pattern>/xmlQuestions/*</url-pattern>
 			<http-method>GET</http-method>
  			<http-method>POST</http-method>
 		</web-resource-collection>
@@ -702,8 +706,6 @@
 			<web-resource-name>Monitor access</web-resource-name>
 			<url-pattern>/addLesson.jsp</url-pattern>
 			<url-pattern>/lti/addLesson.jsp</url-pattern>
-			<url-pattern>/qb/collection/*</url-pattern>
-			<url-pattern>/qb/stats/*</url-pattern>
 			<http-method>GET</http-method>
  			<http-method>POST</http-method>
 		</web-resource-collection>

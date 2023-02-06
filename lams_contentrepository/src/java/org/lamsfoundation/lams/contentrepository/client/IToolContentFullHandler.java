@@ -56,14 +56,14 @@ public interface IToolContentFullHandler extends IToolContentHandler {
     /**
      * Copy an entry in the content repository.
      *
-     * @param uuid
+     * @param nodeId
      *            id of the file node. Mandatory
      * @throws ItemNotFoundException
      *             Node to copy cannot be found
      * @throws RepositoryCheckedException
      *             Some other error occured.
      */
-    public NodeKey copyFile(Long uuid) throws ItemNotFoundException, RepositoryCheckedException;
+    public NodeKey copyFile(Long nodeId) throws ItemNotFoundException, RepositoryCheckedException;
 
     public IRepositoryService getRepositoryService();
 }

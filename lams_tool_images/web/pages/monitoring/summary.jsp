@@ -99,7 +99,7 @@ $(document).ready(function(){
 
 					<td align="center">
 						<c:set var="thumbnailPath">
-						   	<lams:WebAppURL />download/?uuid=${image.thumbnailFileUuid}&preferDownload=false
+						   	<lams:WebAppURL />download/?uuid=${image.thumbnailFileDisplayUuid}&preferDownload=false
 						</c:set>
 						<c:set var="url" >
 							<c:url value='/monitoring/imageSummary.do'/>?sessionMapID=${sessionMapID}&imageUid=${image.uid}&toolSessionID=${sessionId}&KeepThis=true&TB_iframe=true&modal=true

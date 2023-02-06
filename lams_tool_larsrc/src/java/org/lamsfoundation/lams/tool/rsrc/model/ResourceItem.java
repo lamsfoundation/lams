@@ -108,8 +108,12 @@ public class ResourceItem implements Cloneable {
     // ******************************* DTO fields ***********
     @Transient
     private boolean complete;
+
     @Transient
     private ItemRatingDTO ratingDTO;
+
+    @Transient
+    private String fileDisplayUuid;
 
     @Override
     public Object clone() {
@@ -283,6 +287,14 @@ public class ResourceItem implements Cloneable {
 
     public void setAllowComments(boolean allowComments) {
 	this.allowComments = allowComments;
+    }
+
+    public String getFileDisplayUuid() {
+	return fileDisplayUuid;
+    }
+
+    public void setFileDisplayUuid(String fileDisplayUuid) {
+	this.fileDisplayUuid = fileDisplayUuid;
     }
 
     @Override

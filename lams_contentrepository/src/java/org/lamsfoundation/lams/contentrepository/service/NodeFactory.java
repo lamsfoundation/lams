@@ -76,11 +76,11 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
      */
     @Override
     public SimpleVersionedNode createFileNode(CrWorkspace workspace, SimpleVersionedNode parentNode, String relPath,
-	    InputStream istream, String filename, String mimeType, String versionDescription, Integer userId,
-	    boolean generatePortraitUuid) throws InvalidParameterException {
+	    InputStream istream, String filename, String mimeType, String versionDescription, Integer userId)
+	    throws InvalidParameterException {
 
 	SimpleVersionedNode initialNodeVersion = createBasicNode(NodeType.FILENODE, workspace, parentNode, relPath,
-		versionDescription, userId, generatePortraitUuid);
+		versionDescription, userId);
 	initialNodeVersion.setFile(istream, filename, mimeType);
 
 	return initialNodeVersion;
@@ -97,7 +97,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 	    Integer userId) throws org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException {
 
 	SimpleVersionedNode initialNodeVersion = createBasicNode(NodeType.PACKAGENODE, workspace, null, null,
-		versionDescription, userId, false);
+		versionDescription, userId);
 	initialNodeVersion.setProperty(PropertyName.INITIALPATH, initialPath);
 
 	return initialNodeVersion;
@@ -116,14 +116,14 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 	    throws org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException {
 
 	SimpleVersionedNode initialNodeVersion = createBasicNode(NodeType.DATANODE, workspace, parentNode, null,
-		versionDescription, userId, false);
+		versionDescription, userId);
 
 	return initialNodeVersion;
     }
 
     /** Create the core part of a node */
     private SimpleVersionedNode createBasicNode(String nodeType, CrWorkspace workspace, SimpleVersionedNode parentNode,
-	    String relPath, String versionDescription, Integer userId, boolean generatePortraitUuid) {
+	    String relPath, String versionDescription, Integer userId) {
 
 	SimpleVersionedNode initialNodeVersion = beanFactory.getBean("node", SimpleVersionedNode.class);
 
@@ -131,9 +131,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 	CrNodeVersion parentNodeVersion = parentNode != null ? parentNode.getNodeVersion() : null;
 	CrNode node = new CrNode(relPath, nodeType, createdDate, userId, workspace, parentNodeVersion,
 		versionDescription);
-	if (generatePortraitUuid) {
-	    node.setPortraitUuid(UUID.randomUUID());
-	}
+	node.setUuid(UUID.randomUUID());
 	CrNodeVersion nodeVersion = node.getNodeVersion(null);
 
 	initialNodeVersion.setNode(node);
@@ -209,7 +207,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 	}
 
 	CrNode node = null;
-	List<CrNode> result = nodeDAO.findByProperty(CrNode.class, "portraitUuid", portraitUuid);
+	List<CrNode> result = nodeDAO.findByProperty(CrNode.class, "uuid", portraitUuid);
 	node = result.isEmpty() ? null : result.get(0);
 	if (node == null) {
 

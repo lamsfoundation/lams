@@ -21,8 +21,8 @@
 </div>
 
 <form id="ext-groups-form" action="<lams:LAMSURL/>organisationGroup/viewGroups.do" method="POST">
-	<input name="lessonID" value="${lessonID}" type="hidden"/>
-	<input name="activityID" value="${param.activityID}" type="hidden"/>
+	<input name="lessonID" value='<c:out value="${lessonID}" />' type="hidden"/>
+	<input name="activityID" value='<c:out value="${param.activityID}" />' type="hidden"/>
 
 	<c:forEach var="group" items="${extGroups}">
 		<div class="groupingContainer">

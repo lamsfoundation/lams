@@ -61,7 +61,7 @@
 				$("#statisticArea").load(
 					url,
 					{
-						toolContentID: ${param.toolContentID}, 
+						toolContentID: <c:out value="${param.toolContentID}" />, 
 						reqID: (new Date()).getTime()
 					}
 				);

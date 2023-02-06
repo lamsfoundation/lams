@@ -1211,34 +1211,34 @@ public class UserManagementService implements IUserManagementService, Initializi
 		FileInputStream is = new FileInputStream(portraitFile);
 		String fileNameWithoutExt = login;
 		NodeKey originalFileNode = centralToolContentHandler.uploadFile(is,
-			fileNameWithoutExt + "_original.jpg", "image/jpeg", true);
+			fileNameWithoutExt + "_original.jpg", "image/jpeg");
 		is.close();
-		log.debug("Saved original portrait with uuid: " + originalFileNode.getUuid() + " and version: "
+		log.debug("Saved original portrait with uuid: " + originalFileNode.getNodeId() + " and version: "
 			+ originalFileNode.getVersion());
 
 		//resize to the large size
 		is = new FileInputStream(portraitFile);
 		InputStream modifiedPortraitInputStream = ResizePictureUtil.resize(is,
 			CommonConstants.PORTRAIT_LARGEST_DIMENSION_LARGE);
-		NodeKey node = centralToolContentHandler.updateFile(originalFileNode.getUuid(),
+		NodeKey node = centralToolContentHandler.updateFile(originalFileNode.getNodeId(),
 			modifiedPortraitInputStream, fileNameWithoutExt + "_large.jpg", "image/jpeg");
 		modifiedPortraitInputStream.close();
 		is.close();
 		if (log.isDebugEnabled()) {
 		    log.debug(
-			    "Saved large portrait with uuid: " + node.getUuid() + " and version: " + node.getVersion());
+			    "Saved large portrait with uuid: " + node.getNodeId() + " and version: " + node.getVersion());
 		}
 
 		//resize to the medium size
 		is = new FileInputStream(portraitFile);
 		modifiedPortraitInputStream = ResizePictureUtil.resize(is,
 			CommonConstants.PORTRAIT_LARGEST_DIMENSION_MEDIUM);
-		node = centralToolContentHandler.updateFile(node.getUuid(), modifiedPortraitInputStream,
+		node = centralToolContentHandler.updateFile(node.getNodeId(), modifiedPortraitInputStream,
 			fileNameWithoutExt + "_medium.jpg", "image/jpeg");
 		modifiedPortraitInputStream.close();
 		is.close();
 		if (log.isDebugEnabled()) {
-		    log.debug("Saved medium portrait with uuid: " + node.getUuid() + " and version: "
+		    log.debug("Saved medium portrait with uuid: " + node.getNodeId() + " and version: "
 			    + node.getVersion());
 		}
 
@@ -1246,19 +1246,19 @@ public class UserManagementService implements IUserManagementService, Initializi
 		is = new FileInputStream(portraitFile);
 		modifiedPortraitInputStream = ResizePictureUtil.resize(is,
 			CommonConstants.PORTRAIT_LARGEST_DIMENSION_SMALL);
-		node = centralToolContentHandler.updateFile(node.getUuid(), modifiedPortraitInputStream,
+		node = centralToolContentHandler.updateFile(node.getNodeId(), modifiedPortraitInputStream,
 			fileNameWithoutExt + "_small.jpg", "image/jpeg");
 		modifiedPortraitInputStream.close();
 		is.close();
 		if (log.isDebugEnabled()) {
 		    log.debug(
-			    "Saved small portrait with uuid: " + node.getUuid() + " and version: " + node.getVersion());
+			    "Saved small portrait with uuid: " + node.getNodeId() + " and version: " + node.getVersion());
 		}
 		// delete old portrait file (we only want to keep the user's current portrait)
 		if (user.getPortraitUuid() != null) {
 		    centralToolContentHandler.deleteFile(user.getPortraitUuid());
 		}
-		user.setPortraitUuid(UUID.fromString(originalFileNode.getPortraitUuid()));
+		user.setPortraitUuid(UUID.fromString(originalFileNode.getUuid()));
 		saveUser(user);
 
 		log.info("Uploaded portrait for user " + userId + " with login \"" + login + "\"");

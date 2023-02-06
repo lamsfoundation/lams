@@ -170,7 +170,7 @@ public class ViewItemController {
 
 		break;
 	    case CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE:
-		url = "/download/?uuid=" + item.getFileUuid() + "&preferDownload=false";
+		url = "/download/?uuid=" + item.getFileDisplayUuid() + "&preferDownload=false";
 		break;
 	}
 	request.setAttribute(CommonCartridgeConstants.ATTR_RESOURCE_REVIEW_URL, url);
@@ -258,35 +258,6 @@ public class ViewItemController {
 	    item = commonCartridgeService.getCommonCartridgeItemByUid(itemUid);
 	}
 	return item;
-    }
-
-    private static Pattern wikipediaPattern = Pattern.compile("wikipedia",
-	    Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
-
-    private Object getReviewUrl(CommonCartridgeItem item, String sessionMapID, String mode, int itemIdx) {
-	short type = item.getType();
-	String url = null;
-	switch (type) {
-	    case CommonCartridgeConstants.RESOURCE_TYPE_BASIC_LTI:
-		if (item.isOpenUrlNewWindow()) {
-		    if (CommonCartridgeConstants.MODE_AUTHOR_SESSION.equals(mode)) {
-			url = "/openUrlPopup.do?" + AttributeNames.ATTR_MODE + "=" + mode + "&"
-				+ CommonCartridgeConstants.PARAM_ITEM_INDEX + "=" + itemIdx + "&"
-				+ CommonCartridgeConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
-		    } else {
-			url = "/openUrlPopup.do?" + CommonCartridgeConstants.PARAM_RESOURCE_ITEM_UID + "="
-				+ item.getUid() + "&" + CommonCartridgeConstants.ATTR_SESSION_MAP_ID + "="
-				+ sessionMapID;
-		    }
-		} else {
-		    url = CommonCartridgeWebUtils.protocol(item.getUrl());
-		}
-		break;
-	    case CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE:
-		url = "/download/?uuid=" + item.getFileUuid() + "&preferDownload=false";
-		break;
-	}
-	return url;
     }
 
     /**

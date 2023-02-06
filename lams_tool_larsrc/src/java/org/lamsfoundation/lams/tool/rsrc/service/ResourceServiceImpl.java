@@ -171,7 +171,11 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
     @Override
     public List<ResourceItem> getAuthoredItems(Long resourceUid) {
-	return resourceItemDao.getAuthoringItems(resourceUid);
+	List<ResourceItem> items = resourceItemDao.getAuthoringItems(resourceUid);
+	for (ResourceItem item : items) {
+	    item.setFileDisplayUuid(resourceToolContentHandler.getFileUuid(item.getFileUuid()));
+	}
+	return items;
     }
 
     @Override
@@ -219,6 +223,9 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
 	// add resource items from ResourceSession
 	items.addAll(session.getResourceItems());
+	for (ResourceItem item : items) {
+	    item.setFileDisplayUuid(resourceToolContentHandler.getFileUuid(item.getFileUuid()));
+	}
 
 	return items;
     }
@@ -327,7 +334,9 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
     @Override
     public ResourceItem getResourceItemByUid(Long itemUid) {
-	return resourceItemDao.getByUid(itemUid);
+	ResourceItem item = resourceItemDao.getByUid(itemUid);
+	item.setFileDisplayUuid(resourceToolContentHandler.getFileUuid(item.getFileUuid()));
+	return item;
     }
 
     @Override
@@ -642,8 +651,9 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	// For file only upload one sigle file
 	if (item.getType() == ResourceConstants.RESOURCE_TYPE_FILE) {
 	    NodeKey nodeKey = processFile(file);
-	    item.setFileUuid(nodeKey.getUuid());
+	    item.setFileUuid(nodeKey.getNodeId());
 	    item.setFileVersionId(nodeKey.getVersion());
+	    item.setFileDisplayUuid(nodeKey.getUuid());
 	}
 	// need unzip upload, and check the initial item :default.htm/html or index.htm/html
 	if (item.getType() == ResourceConstants.RESOURCE_TYPE_WEBSITE) {
@@ -658,8 +668,9 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 		item.setInitialItem(initFile);
 		// upload package
 		NodeKey nodeKey = processPackage(packageDirectory, initFile);
-		item.setFileUuid(nodeKey.getUuid());
+		item.setFileUuid(nodeKey.getNodeId());
 		item.setFileVersionId(nodeKey.getVersion());
+		item.setFileDisplayUuid(nodeKey.getUuid());
 	    } catch (ZipFileUtilException e) {
 		log.error(messageService.getMessage("error.msg.zip.file.exception") + " : " + e.toString());
 		throw new UploadResourceFileException(messageService.getMessage("error.msg.zip.file.exception"));

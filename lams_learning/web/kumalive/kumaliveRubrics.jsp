@@ -30,7 +30,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript">
-		var orgId = ${param.organisationID};
+		var orgId = <c:out value="${param.organisationID}" />;
 		function removeRubric(elem) {
 			$(elem).closest('.rubric').remove();
 		}
@@ -85,11 +85,11 @@
 			}
 			
 			var data = {
-				'organisationID' : ${param.organisationID},
+				'organisationID' : <c:out value="${param.organisationID}" />,
 				'rubrics' : JSON.stringify(rubrics)
 			};
 			$.post('<lams:LAMSURL/>learning/kumalive/saveRubrics.do', data, function(){
-				window.parent.closeDialog('dialogKumaliveRubrics${param.organisationID}');
+				window.parent.closeDialog('dialogKumaliveRubrics<c:out value="${param.organisationID}" />');
 			});
 		}
 		

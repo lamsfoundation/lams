@@ -99,14 +99,14 @@
 
 								<div id="actionButtons" class="pull-right">						
 								<c:set var="viewMarkFileURL">
-									<lams:WebAppURL />download/?uuid=${fileInfo.markFileUUID}&versionID=${fileInfo.markFileVersionID}&preferDownload=false
+									<lams:WebAppURL />download/?uuid=${fileInfo.markFileDisplayUuid}&versionID=${fileInfo.markFileVersionID}&preferDownload=false
 								</c:set>
 								<a href="javascript:launchInstructionsPopup('${viewMarkFileURL}')" class="btn btn-xs btn-default">
 									<i class="fa fa-eye" title="<fmt:message key="label.view" />"></i>
 								</a>
 								
 								<c:set var="downloadMarkFileURL">
-									<lams:WebAppURL />download/?uuid=${fileInfo.markFileUUID}&versionID=${fileInfo.markFileVersionID}&preferDownload=true
+									<lams:WebAppURL />download/?uuid=${fileInfo.markFileDisplayUuid}&versionID=${fileInfo.markFileVersionID}&preferDownload=true
 								</c:set>
 								<a href="${downloadMarkFileURL}" class="btn btn-xs btn-default loffset10">
 									<i class="fa fa-download" title="<fmt:message key="label.download" />"></i>

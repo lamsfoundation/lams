@@ -279,7 +279,7 @@
 			activitiesOnlySelectable = false,
 			isLtiContentSelection = ${param.ltiContentSelection eq 'true'},
 			initContentFolderID = '${contentFolderID}',
-			initLearningDesignID = '${param.learningDesignID}',
+			initLearningDesignID = '<c:out value="${param.learningDesignID}" />',
 			initAccess = ${access},
 			csrfTokenName = '<csrf:tokenname/>',
 			csrfTokenValue = '<csrf:tokenvalue/>';

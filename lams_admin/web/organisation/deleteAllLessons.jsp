@@ -52,7 +52,7 @@
 			'url'     : '<lams:LAMSURL/>admin/organisation/deleteAllLessons.do',
 			'data'    : {
 				'limit'  : 5,
-				'orgId'  : ${param.orgId},
+				'orgId'  : <c:out value="${param.orgId}" />,
 				"<csrf:tokenname/>":"<csrf:tokenvalue/>"
 			},
 			'success' : function(response){
@@ -80,7 +80,7 @@
 	<lams:Page type="admin" title="${title}">
 				<p>
 					<a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
-					:  <a href="<lams:LAMSURL/>admin/orgmanage.do?org=${param.orgId}" class="btn btn-default"><c:out value="${courseName}" /></a>
+					:  <a href='<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${param.orgId}" />' class="btn btn-default"><c:out value="${courseName}" /></a>
 				</p>
 				
 				<lams:errors/>

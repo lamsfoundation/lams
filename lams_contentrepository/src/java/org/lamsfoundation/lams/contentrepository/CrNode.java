@@ -57,8 +57,8 @@ public class CrNode implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long nodeId;
 
-    @Column(name = "portrait_uuid")
-    private UUID portraitUuid;
+    @Column(name = "uuid")
+    private UUID uuid;
 
     @Column
     private String path;
@@ -98,7 +98,7 @@ public class CrNode implements Serializable {
 	this.createdDateTime = createdDateTime;
 
 	// start the next version id at 1, which is used straight away by incrementNextVersionId()
-	this.nextVersionId = new Long(1);
+	this.nextVersionId = 1L;
 
 	this.crWorkspace = workspace;
 	this.parentNodeVersion = parentNodeVersion;
@@ -106,25 +106,6 @@ public class CrNode implements Serializable {
 		new CrNodeVersion(this, createdDateTime, incrementNextVersionId(), versionDescription, userId));
     }
 
-    /** full constructor */
-/*
- * public CrNode(String path, String type, Date createdDateTime, Long nextVersionId,
- * org.lamsfoundation.lams.contentrepository.CrWorkspace crWorkspace,
- * org.lamsfoundation.lams.contentrepository.CrNodeVersion parentNodeVersion, Set<CrNodeVersion> crNodeVersions) {
- * }
- */
-
-    /** minimal constructor */
-/*
- * public CrNode(String type, Long nextVersionId, org.lamsfoundation.lams.contentrepository.CrWorkspace crWorkspace,
- * org.lamsfoundation.lams.contentrepository.CrNodeVersion parentNodeVersion, Set<CrNodeVersion> crNodeVersions) {
- * this.type = type;
- * this.nextVersionId = nextVersionId;
- * this.crWorkspace = crWorkspace;
- * this.parentNodeVersion = parentNodeVersion;
- * this.crNodeVersions = crNodeVersions;
- * }
- */
     public Long getNodeId() {
 	return this.nodeId;
     }
@@ -133,12 +114,12 @@ public class CrNode implements Serializable {
 	this.nodeId = nodeId;
     }
 
-    public UUID getPortraitUuid() {
-	return portraitUuid;
+    public UUID getUuid() {
+	return uuid;
     }
 
-    public void setPortraitUuid(UUID portraitUuid) {
-	this.portraitUuid = portraitUuid;
+    public void setUuid(UUID uuid) {
+	this.uuid = uuid;
     }
 
     public String getPath() {
