@@ -378,7 +378,7 @@
 		}
 		
 		function nextPage(pageNumber){
-			if (!validateAnswers()) {
+			if (${assessment.questionsPerPage != -1} && !validateAnswers()) {
 				return;
 			}
 			disableButtons();
