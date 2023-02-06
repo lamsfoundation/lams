@@ -29,8 +29,17 @@
 						<c:otherwise>
 							<a href="#nogo" onclick="return nextPage(${status.index + 1})">
 						</c:otherwise>
-					</c:choose>			
-						<c:out value="${section.name}" />
+					</c:choose>
+					<c:choose>
+						<c:when	test="${empty section.name}">
+							<fmt:message key="label.learning.section.default.name">	
+								<fmt:param value="${status.index + 1}" />
+							</fmt:message>
+						</c:when>
+						<c:otherwise>
+							<c:out value="${section.name}" />
+						</c:otherwise>
+					</c:choose>
 					</a>
 				</c:forEach>
 			</c:when>
@@ -45,7 +54,7 @@
 							<a href="#nogo" onclick="return nextPage(${status.index + 1})">
 						</c:otherwise>
 					</c:choose>			
-						${status.index + 1} 
+					${status.index + 1}
 					</a>
 				</c:forEach>	
 			</c:otherwise>
