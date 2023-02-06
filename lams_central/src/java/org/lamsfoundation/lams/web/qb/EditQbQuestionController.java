@@ -26,6 +26,7 @@ import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
 import org.lamsfoundation.lams.qb.service.IQbService;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -63,6 +64,8 @@ public class EditQbQuestionController {
     private IUserManagementService userManagementService;
     @Autowired
     WebApplicationContext applicationcontext;
+    @Autowired
+    ISecurityService securityService;
 
     /**
      * Display empty page for new question.
@@ -121,7 +124,9 @@ public class EditQbQuestionController {
 	    throw new RuntimeException("QbQuestion with uid:" + qbQuestionUid + " was not found!");
 	}
 	Integer userId = getUserId();
-	boolean editingAllowed = qbService.isQuestionInUserCollection(qbQuestion.getQuestionId(), userId)
+	boolean editingAllowed = securityService.isAppadmin(userId, null, true)
+		|| securityService.isSysadmin(userId, null, true)
+		|| qbService.isQuestionInUserCollection(qbQuestion.getQuestionId(), userId)
 		|| qbService.isQuestionInPublicCollection(qbQuestion.getQuestionId());
 	if (!editingAllowed) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN,

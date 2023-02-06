@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.outcome.service.IOutcomeService;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
@@ -70,6 +71,9 @@ public class QbCollectionController {
 
     @Autowired
     private IOutcomeService outcomeService;
+
+    @Autowired
+    ISecurityService securityService;
 
     @RequestMapping("/show")
     public String showUserCollections(Model model) throws Exception {
@@ -320,6 +324,9 @@ public class QbCollectionController {
 	Integer userId = getUserId();
 	if (userId == null) {
 	    return false;
+	}
+	if (securityService.isAppadmin(userId, null, true) || securityService.isSysadmin(userId, null, true)) {
+	    return true;
 	}
 	Collection<QbCollection> collections = qbService.getUserCollections(userId);
 	return collections.stream().map(QbCollection::getUid).anyMatch(uid -> uid.equals(collectionUid));
