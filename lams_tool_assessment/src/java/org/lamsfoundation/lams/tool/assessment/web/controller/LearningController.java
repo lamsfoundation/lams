@@ -416,7 +416,7 @@ public class LearningController {
 	for (QuestionDTO questionDto : questionDtos) {
 	    questionsForOnePage.add(questionDto);
 	    questionInPageCount++;
-	    if (questionInPageCount == questionPerPageCount && pageIterator.hasNext()) {
+	    if (questionPerPageCount > 0 && questionInPageCount == questionPerPageCount && pageIterator.hasNext()) {
 		questionsForOnePage = new LinkedHashSet<>();
 		pagedQuestionDtos.add(questionsForOnePage);
 		questionPerPageCount = pageIterator.next();

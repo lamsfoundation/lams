@@ -63,6 +63,8 @@
 			$('#confidence-levels-type-area').css('display', 'none');
 		</c:if>
 
+		$('.sectionEntry:last .sectionRemoveButton', sectionsContainer).removeClass('hidden');
+		
 		// sections add/remove functionality
 		let sectionAddButton = $('#sectionAddButton').click(function(){
 				let sectionsContainer = $('#sectionsContainer'),
@@ -71,12 +73,10 @@
 					section = $('#sectionTemplate').clone().attr('id', 'sectionEntry' + sectionSuffix).removeClass('hidden');
 			$('.sectionRemoveButton', sections).addClass('hidden');
 			section.appendTo(sectionsContainer);
+			$('.sectionRemoveButton', section).removeClass('hidden');
+			
 			$('input[type="text"]', section).attr('name', 'sectionName' + sectionSuffix);
 			$('select', section).attr('name', 'sectionQuestionCount' + sectionSuffix);
-			$('.sectionRemoveButton', section).removeClass('hidden').click(function(){
-				section.remove();
-				$('.sectionEntry:last .sectionRemoveButton', sectionsContainer).removeClass('hidden');
-			});
 		});
 		
 		$('input[name="questionDistributionType"]').change(function(){
@@ -99,6 +99,11 @@
 			}
 		}).first().change();
 	});
+
+	function removeSection(button){
+		$(button).closest('.sectionEntry').remove();
+		$('#sectionsContainer .sectionEntry:last .sectionRemoveButton').removeClass('hidden');
+	}
 </script>
 
 <!-- Advance Tab Content -->
@@ -194,6 +199,9 @@
 						   value="<c:out value='${section.name}' />" name="sectionName${sectionStatus.index + 1}" />
 					<fmt:message key="label.authoring.advance.section.questions.count" />
 					<select class="form-control input-sm loffset10" name="sectionQuestionCount${sectionStatus.index + 1}">
+						<option value="0" ${section.questionCount eq 0 ? 'selected' : ''}>
+							<fmt:message key="label.authoring.advance.section.all.remaining.questions" />
+						</option>
 						<c:forEach var="sectionQuestionCountOption" begin="1" end="15">
 							<option value="${sectionQuestionCountOption}"
 							        ${sectionQuestionCountOption eq section.questionCount ? 'selected' : ''}>
@@ -201,6 +209,10 @@
 							</option>
 						</c:forEach>
 					</select>
+					<button type="button" class="sectionRemoveButton btn btn-default btn-sm loffset20 hidden"
+							onClick="javascript:removeSection(this)">
+						<i class="fa fa-remove"></i>&nbsp;<fmt:message key="label.authoring.advance.section.remove" />
+					</button>
 				</div>
 			</c:forEach>
 		</div>
@@ -210,14 +222,17 @@
 			<input type="text" class="form-control input-sm loffset10" maxlength="100" />
 			<fmt:message key="label.authoring.advance.section.questions.count" />
 			<select class="form-control input-sm loffset10">
+				<option value="0" selected>
+					<fmt:message key="label.authoring.advance.section.all.remaining.questions" />
+				</option>
 				<c:forEach var="sectionQuestionCountOption" begin="1" end="15">
-					<option value="${sectionQuestionCountOption}"
-					        ${sectionQuestionCountOption eq 5 ? 'selected' : ''}>
+					<option value="${sectionQuestionCountOption}">
 						${sectionQuestionCountOption}
 					</option>
 				</c:forEach>
 			</select>
-			<button type="button" class="sectionRemoveButton btn btn-default btn-sm loffset20 hidden">
+			<button type="button" class="sectionRemoveButton btn btn-default btn-sm loffset20 hidden"
+					onClick="javascript:removeSection(this)">
 				<i class="fa fa-remove"></i>&nbsp;<fmt:message key="label.authoring.advance.section.remove" />
 			</button>
 		</div>
