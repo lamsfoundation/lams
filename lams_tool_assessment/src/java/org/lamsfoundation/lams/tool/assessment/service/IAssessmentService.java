@@ -449,7 +449,7 @@ public interface IAssessmentService extends ICommonToolService {
      */
     List<Float> getMarksArrayForLeaders(Long contentId);
 
-    void changeQuestionResultMark(Long questionResultUid, float newMark, Integer teacherId);
+    void changeQuestionResultMark(Long questionResultUid, Float newMark, String markerComment, Integer teacherId);
 
     void notifyTeachersOnAttemptCompletion(Long sessionId, String userName);
 

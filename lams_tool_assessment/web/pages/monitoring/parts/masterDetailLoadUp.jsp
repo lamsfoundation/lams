@@ -49,7 +49,8 @@
 		 	    	<c:otherwise>
 		 	    		""
 		 	    	</c:otherwise>
-		 	     </c:choose>
+		 	     </c:choose>,
+		 	     markerComment: "<c:out value='${questionResult.markerComment}' />"
  	   	   	});
 
  	 	    // set maxGrade attribute to cell DOM element

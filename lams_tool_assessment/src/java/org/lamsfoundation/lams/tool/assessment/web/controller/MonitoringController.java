@@ -346,16 +346,31 @@ public class MonitoringController {
     }
 
     @RequestMapping(path = "/saveUserGrade", method = RequestMethod.POST)
-    public void saveUserGrade(HttpServletRequest request, HttpServletResponse response) {
-
+    @ResponseBody
+    public String saveUserGrade(HttpServletRequest request, HttpServletResponse response) {
+	String responseText = null;
 	if ((request.getParameter(AssessmentConstants.PARAM_NOT_A_NUMBER) == null)
 		&& !StringUtils.isEmpty(request.getParameter(AssessmentConstants.PARAM_QUESTION_RESULT_UID))) {
 	    Long questionResultUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_RESULT_UID);
-	    float newGrade = Float.valueOf(request.getParameter(AssessmentConstants.PARAM_GRADE));
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    service.changeQuestionResultMark(questionResultUid, newGrade, teacher.getUserID());
+
+	    String column = request.getParameter(AssessmentConstants.PARAM_COLUMN);
+	    Float newGrade = null;
+	    String markerComment = null;
+	    if (column.equals(AssessmentConstants.PARAM_GRADE)) {
+		String gradeString = request.getParameter(AssessmentConstants.PARAM_GRADE);
+		if (StringUtils.isNotBlank(gradeString) && !gradeString.strip().equals("-")) {
+		    newGrade = Float.valueOf(gradeString);
+		    responseText = teacher.getLastName() + " " + teacher.getFirstName();
+		}
+	    } else if (column.equals(AssessmentConstants.PARAM_MARKER_COMMENT)) {
+		markerComment = request.getParameter(AssessmentConstants.PARAM_MARKER_COMMENT);
+	    }
+
+	    service.changeQuestionResultMark(questionResultUid, newGrade, markerComment, teacher.getUserID());
 	}
+	return responseText;
     }
 
     /**

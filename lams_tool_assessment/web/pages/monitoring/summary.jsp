@@ -89,8 +89,7 @@
 			    },
 			    loadComplete: function () {
 			   	 	initializePortraitPopover('<lams:LAMSURL/>');
-			    },
-
+			    }
 			})
 			<c:if test="${!sessionMap.assessment.useSelectLeaderToolOuput}">
 				.jqGrid('filterToolbar', { 
@@ -114,13 +113,14 @@
 				   	'#',
 					'questionResultUid',
 					'questionType',
-  					'Question',
+					"<fmt:message key="label.monitoring.question.summary.question" />",
   					"<fmt:message key="label.authoring.basic.list.header.mark" />",
   					<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
   						"<fmt:message key="label.confidence" />",
   					</c:if>
   					"<fmt:message key="label.monitoring.user.summary.response" />",
-  					"Marker"
+  					"<fmt:message key="label.monitoring.user.summary.marker" />",
+  					"<fmt:message key="label.monitoring.user.summary.marker.comment" />"
   				], 
 			   	colModel:[
 	  			   	{name:'id', index:'id', width:20, sorttype:"int"},
@@ -132,23 +132,34 @@
 	  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
 	  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align', formatter: gradientNumberFormatter},
 	  			  	</c:if>
-	  			  	{name:'response', index:'response', datatype:'html', width:443, sortable:false},
-		  			{name:'marker', index:'marker', width: 80, title: false}
+	  			  	{name:'response', index:'response', datatype:'html', width:400, sortable:false},
+		  			{name:'marker', index:'marker', width: 80, title: false},
+		  			{name:'markerComment', index:'markerComment', width:120, editable:true, sortable: false,
+		  			    editoptions: {maxlength: 100}, align:"left", classes: 'vertical-align', title : false },
 			   	],
 			   	multiselect: false,
 
 				cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>&<csrf:token/>',
   				cellEdit: true,
-  				formatCell: function(rowid, cellname, value, iRow, iCol){
+  				formatCell: function(rowid, name, value, iRow, iCol){
+  	  				if (name != "grade") {
+  	  	  				return value;
+  	  	  			}
   	  				if (value == "-") {
   	  	  				value = "0";
   	  	  			}
   	  	  			return value;
   	  			},
   				afterEditCell: function (rowid, name, val, iRow, iCol){
+  	  				if (name != "grade") {
+  	  	  				return;
+  	  	  			}
   					oldValue = eval(val);
 				},
 				beforeSaveCell : function(rowid, name, val, iRow, iCol) {
+					if (name != "grade") {
+  	  	  				return val;
+  	  	  			}
 					if (isNaN(val)) {
   						return null;
   					}
@@ -161,6 +172,9 @@
 					}
 				},
   				afterSaveCell : function (rowid,name,val,iRow,iCol){
+  					if (name != "grade") {
+  	  	  				return;
+  	  	  			}
   					if (isNaN(val)) {
   						jQuery("#userSummary${sessionDto.sessionId}").restoreCell(iRow,iCol); 
   					} else {
@@ -170,13 +184,25 @@
   					}
 				},	  		
   				beforeSubmitCell : function (rowid,name,val,iRow,iCol){
-  					if (isNaN(val)) {
+  					if (name == "grade" && isNaN(val)) {
   						return {nan:true};
   					} else {
   						var questionResultUid = jQuery("#userSummary${sessionDto.sessionId}").getCell(rowid, 'questionResultUid');
-  						return {questionResultUid:questionResultUid};		  				  		
+  						return {
+  	  							questionResultUid:questionResultUid,
+  	  						    column:name
+  	  						   };		  				  		
   				  	}
-  				}
+  				},
+  				afterSubmitCell : function (serverresponse, rowid, name, value, iRow, iCol) {
+  	  				if (serverresponse.statusText == "OK") {
+  	  	  				if (serverresponse.responseText != "") {
+  	  	  					$(this).setCell(rowid, 'marker', serverresponse.responseText, {}, {});
+  	  	  				}
+  	  					return [true, ""];
+  	  				}
+  	  				
+  	  			}
 			});
 			
 		</c:forEach>

@@ -59,6 +59,10 @@ public class AssessmentConstants {
     public static final String PARAM_NOT_A_NUMBER = "nan";
 
     public static final String PARAM_GRADE = "grade";
+    
+    public static final String PARAM_MARKER_COMMENT = "markerComment";
+    
+    public static final String PARAM_COLUMN = "column";
 
     public static final String PARAM_MAX_MARK = "maxMark";
 

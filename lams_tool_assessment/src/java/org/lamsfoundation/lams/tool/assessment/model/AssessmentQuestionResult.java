@@ -77,6 +77,9 @@ public class AssessmentQuestionResult extends QbToolAnswer {
 
     @Column
     private String justification;
+    
+    @Column(name = "marker_comment")
+    private String markerComment;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "marked_by")
@@ -213,6 +216,14 @@ public class AssessmentQuestionResult extends QbToolAnswer {
 
     public void setMarkedBy(AssessmentUser markedBy) {
 	this.markedBy = markedBy;
+    }
+    
+    public String getMarkerComment() {
+        return markerComment;
+    }
+
+    public void setMarkerComment(String markerComment) {
+        this.markerComment = markerComment;
     }
 
     public AssessmentUser getUser() {
