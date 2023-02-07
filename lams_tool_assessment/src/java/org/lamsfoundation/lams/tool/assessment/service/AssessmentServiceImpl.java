@@ -1804,6 +1804,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		questionTitleRow.addCell(getMessage("label.answer.justification"), true,
 			ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	    }
+	    questionTitleRow.addCell(getMessage("label.monitoring.user.summary.marker"), true,
+		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	    questionTitleRow.addCell(getMessage("label.monitoring.user.summary.marker.comment"), true,
+		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 
 	    int questionNumber = 1;
 
@@ -1928,7 +1932,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			//mark
 			//calculating markCount & markTotal
 			if (questionResult.getMark() != null && questionResult.getFinishDate() != null) {
-			    userResultRow.addCell(questionResult.getMark());
+			    userResultRow.addCell(questionResult.getMarkedBy() == null
+				    && question.getType().equals(QbQuestion.TYPE_ESSAY) ? "-"
+					    : questionResult.getMark().toString());
 
 			    markCount++;
 			    markTotal += questionResult.getMark();
@@ -1940,6 +1946,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			    userResultRow.addCell(AssessmentEscapeUtils
 				    .escapeStringForExcelExport(questionResult.getJustification()));
 			}
+			userResultRow.addCell(
+				questionResult.getMarkedBy() == null ? "" : questionResult.getMarkedBy().getFullName());
+			userResultRow.addCell(questionResult.getMarkerComment());
 
 			questionSummaryTabTemp.add(userResultRow);
 
