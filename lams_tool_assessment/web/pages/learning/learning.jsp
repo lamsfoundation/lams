@@ -643,9 +643,11 @@
 			</lams:Alert>
 		</c:if>
 		
-		<lams:Alert type="info" close="true">
-			<fmt:message key="label.learning.submit.all.tip" />
-		</lams:Alert>
+		<c:if test="${hasEditRight}">
+			<lams:Alert type="info" close="true">
+				<fmt:message key="label.learning.submit.all.tip" />
+			</lams:Alert>
+		</c:if>
 		
 		<div class="panel">
 			<c:out value="${assessment.instructions}" escapeXml="false"/>
