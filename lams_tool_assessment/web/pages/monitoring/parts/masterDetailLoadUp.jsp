@@ -5,6 +5,10 @@
 	function masterDetailLoadUp(){
 		jQuery("#userSummary${assessmentResult.sessionId}").clearGridData().setGridParam({scrollOffset: 18});
 
+		$('#userSummary${assessmentResult.sessionId}').on( "sortstop", function(event, ui) {
+			debugger;
+		});
+
  	    <c:forEach var="questionResult" items="${assessmentResult.questionResults}" varStatus="i">
 	       	<c:set var="question" value="${questionResult.questionDto}"/>
 	       	<c:set var="title">
@@ -19,6 +23,7 @@
  	     	table.addRowData(${i.index + 1}, {
  	   	    	id:"${i.index + 1}",
  	   	   		questionResultUid:"${questionResult.uid}",
+ 	   	   		questionType : "${questionResult.questionDto.type}",
  	   	   		title:"${fn:escapeXml(title)}",
  	   	   		response:responseStr,
  	   	   		<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
@@ -32,28 +37,23 @@
 	 	 	    	<c:otherwise>
 	 	 	    		"<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>"
 	 	 	    	</c:otherwise>
-	 	 	    </c:choose>
+	 	 	    </c:choose>,
+	 	 	    marker : 
+		 	 	 <c:choose>
+	 	 	    	<c:when test="${requiresMarking}">
+		 	    		("<b><fmt:message key='label.monitoring.user.summary.grade.required' /></b>")
+		 	    	</c:when>
+		 	    	<c:when test="${not empty questionResult.markedBy}">
+		 	  			"<c:out value='${questionResult.markedBy.fullName}' />"
+		 	    	</c:when>
+		 	    	<c:otherwise>
+		 	    		""
+		 	    	</c:otherwise>
+		 	     </c:choose>
  	   	   	});
 
-
  	 	    // set maxGrade attribute to cell DOM element
- 	 	    table.setCell(${i.index + 1}, "grade", "", ${requiresMarking ? "'requires-grading'" : "null"},
- 	 	 	   {"maxGrade" :  "${questionResult.maxMark}"
- 	 	 	    <c:choose>
-	 	 	    	<c:when test="${requiresMarking}">
-	 	 	    		,"title" : "<fmt:message key='label.monitoring.user.summary.grade.required' />"
-	 	 	    		,"data-toggle" : "tooltip"
-	 	 	    		,"data-container" : "body"
-	 	 	    	</c:when>
-	 	 	    	<c:when test="${not empty questionResult.markedBy}">
-	 	 	  			,"title" : "<fmt:message key='label.monitoring.user.summary.grade.by'>
-		 	 	  						<fmt:param><c:out value='${questionResult.markedBy.fullName}' /></fmt:param>
-		 	 	  					</fmt:message>"
-		 	 	  		,"data-toggle" : "tooltip"
-		 	 	    	,"data-container" : "body"
-	 	 	    	</c:when>
-	 	 	    </c:choose>
- 	 	 	    });
+ 	 	    table.setCell(${i.index + 1}, "grade", "", null, {"maxGrade" :  "${questionResult.maxMark}"});
 		</c:forEach>
 
 		$('[data-toggle="tooltip"]').bootstrapTooltip();

@@ -113,23 +113,27 @@
 			   	colNames:[
 				   	'#',
 					'questionResultUid',
+					'questionType',
   					'Question',
   					"<fmt:message key="label.authoring.basic.list.header.mark" />",
   					<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
   						"<fmt:message key="label.confidence" />",
   					</c:if>
-  					"<fmt:message key="label.monitoring.user.summary.response" />"
+  					"<fmt:message key="label.monitoring.user.summary.response" />",
+  					"Marker"
   				], 
 			   	colModel:[
 	  			   	{name:'id', index:'id', width:20, sorttype:"int"},
 	  			   	{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
+	  			   	{name:'questionType', index:'questionType', width:0, hidden: true},
 	  			   	{name:'title', index:'title', width: 200},
 	  			    {name:'grade', index:'grade', width:80, sorttype:"float", editable:true, 
 		  			    editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align', title : false },
 	  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
 	  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align', formatter: gradientNumberFormatter},
 	  			  	</c:if>
-	  			  	{name:'response', index:'response', datatype:'html', width:443, sortable:false}
+	  			  	{name:'response', index:'response', datatype:'html', width:443, sortable:false},
+		  			{name:'marker', index:'marker', width: 80, title: false}
 			   	],
 			   	multiselect: false,
 
