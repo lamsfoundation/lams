@@ -135,7 +135,13 @@
 
 				cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>&<csrf:token/>',
   				cellEdit: true,
-  				afterEditCell: function (rowid,name,val,iRow,iCol){
+  				formatCell: function(rowid, cellname, value, iRow, iCol){
+  	  				if (value == "-") {
+  	  	  				value = "0";
+  	  	  			}
+  	  	  			return value;
+  	  			},
+  				afterEditCell: function (rowid, name, val, iRow, iCol){
   					oldValue = eval(val);
 				},
 				beforeSaveCell : function(rowid, name, val, iRow, iCol) {

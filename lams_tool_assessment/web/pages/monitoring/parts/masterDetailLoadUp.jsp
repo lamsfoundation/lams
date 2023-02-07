@@ -14,6 +14,8 @@
  	       	<%@ include file="userresponse.jsp"%>
  	       		
  	       	var table = jQuery("#userSummary${assessmentResult.sessionId}");
+ 	   	   	<c:set var="requiresMarking"
+	 	   	   	   value="${empty questionResult.markedBy and question.type eq 6 and questionResult.mark eq 0}" />
  	     	table.addRowData(${i.index + 1}, {
  	   	    	id:"${i.index + 1}",
  	   	   		questionResultUid:"${questionResult.uid}",
@@ -22,11 +24,18 @@
  	   	   		<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
  	   	   			confidence:"${question.type == 8 ? -1 : questionResult.confidenceLevel}",
  	   	   		</c:if>
- 	   	   		grade:"<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>"
+ 	   	   		grade:
+	 	 	 	 <c:choose>
+	 	 	    	<c:when test="${requiresMarking}">
+	 	 	    		"-"
+	 	 	    	</c:when>
+	 	 	    	<c:otherwise>
+	 	 	    		"<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>"
+	 	 	    	</c:otherwise>
+	 	 	    </c:choose>
  	   	   	});
 
- 	   	   	<c:set var="requiresMarking"
- 	 	   	   	   value="${empty questionResult.markedBy and question.type eq 6 and questionResult.mark eq 0}" />
+
  	 	    // set maxGrade attribute to cell DOM element
  	 	    table.setCell(${i.index + 1}, "grade", "", ${requiresMarking ? "'requires-grading'" : "null"},
  	 	 	   {"maxGrade" :  "${questionResult.maxMark}"
