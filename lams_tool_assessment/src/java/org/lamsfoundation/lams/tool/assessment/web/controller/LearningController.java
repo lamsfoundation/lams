@@ -501,10 +501,11 @@ public class LearningController {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	int oldPageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
+	boolean hasEditRight = (Boolean) sessionMap.get(AssessmentConstants.ATTR_HAS_EDIT_RIGHT);
 
 	//if AnswersValidationFailed - get pageNumber as request parameter and as method parameter otherwise
 	int pageNumberToOpen;
-	if (isAnswersValidationFailed) {
+	if (isAnswersValidationFailed && hasEditRight) {
 	    pageNumberToOpen = pageNumberWithUnasweredQuestions;
 	} else {
 	    pageNumberToOpen = WebUtil.readIntParam(request, AssessmentConstants.ATTR_PAGE_NUMBER);
@@ -526,10 +527,12 @@ public class LearningController {
 	    return "pages/learning/results";
 
 	} else {
-	    //get user answers from request and store them into sessionMap
-	    storeUserAnswersIntoSessionMap(request, oldPageNumber);
-	    // store results from sessionMap into DB
-	    storeUserAnswersIntoDatabase(sessionMap, true);
+	    if (hasEditRight) {
+		//get user answers from request and store them into sessionMap
+		storeUserAnswersIntoSessionMap(request, oldPageNumber);
+		// store results from sessionMap into DB
+		storeUserAnswersIntoDatabase(sessionMap, true);
+	    }
 
 	    // use redirect to prevent form resubmission
 	    String redirectURL = "redirect:/pages/learning/learning.jsp";
