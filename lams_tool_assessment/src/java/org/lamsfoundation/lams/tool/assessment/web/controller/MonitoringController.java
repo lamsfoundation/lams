@@ -601,7 +601,8 @@ public class MonitoringController {
 		userData.add(questionResult.getMaxMark());
 		userData.add(fullName);
 		//LDEV_NTU-11 Swapping Mark and Response columns in Assessment Monitor
-		userData.add(questionResult.getMark());
+		userData.add(questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_ESSAY)
+			&& questionResult.getMarkedBy() == null ? "-" : questionResult.getMark().toString());
 		// show confidence levels if this feature is turned ON
 		if (assessment.isEnableConfidenceLevels()) {
 		    userData.add(questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_MARK_HEDGING) ? -1
@@ -643,7 +644,13 @@ public class MonitoringController {
 		}
 
 		userData.add(response);
-		userData.add(questionResult.getMarkedBy() == null ? "" : questionResult.getMarkedBy().getFullName());
+		userData.add(
+			questionResult.getMarkedBy() == null
+				? (questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_ESSAY)
+					? service.getMessage("label.monitoring.user.summary.grade.required")
+					: "")
+				: questionResult.getMarkedBy().getFullName());
+		userData.add(questionResult.getMarkerComment());
 	    } else {
 		userData.add("");
 		userData.add("");

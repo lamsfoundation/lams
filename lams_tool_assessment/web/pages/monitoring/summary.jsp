@@ -112,7 +112,6 @@
 			   	colNames:[
 				   	'#',
 					'questionResultUid',
-					'questionType',
 					"<fmt:message key="label.monitoring.question.summary.question" />",
   					"<fmt:message key="label.authoring.basic.list.header.mark" />",
   					<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
@@ -125,7 +124,6 @@
 			   	colModel:[
 	  			   	{name:'id', index:'id', width:20, sorttype:"int"},
 	  			   	{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
-	  			   	{name:'questionType', index:'questionType', width:0, hidden: true},
 	  			   	{name:'title', index:'title', width: 200},
 	  			    {name:'grade', index:'grade', width:80, sorttype:"float", editable:true, 
 		  			    editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align', title : false },
@@ -135,7 +133,7 @@
 	  			  	{name:'response', index:'response', datatype:'html', width:400, sortable:false},
 		  			{name:'marker', index:'marker', width: 80, title: false},
 		  			{name:'markerComment', index:'markerComment', width:120, editable:true, sortable: false,
-		  			    editoptions: {maxlength: 100}, align:"left", classes: 'vertical-align', title : false },
+		  			    editoptions: {maxlength: 100}, align:"left", classes: 'vertical-align', title : false }
 			   	],
 			   	multiselect: false,
 
@@ -201,7 +199,6 @@
   	  	  				}
   	  					return [true, ""];
   	  				}
-  	  				
   	  			}
 			});
 			

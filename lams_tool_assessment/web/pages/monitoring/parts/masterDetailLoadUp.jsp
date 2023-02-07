@@ -5,10 +5,6 @@
 	function masterDetailLoadUp(){
 		jQuery("#userSummary${assessmentResult.sessionId}").clearGridData().setGridParam({scrollOffset: 18});
 
-		$('#userSummary${assessmentResult.sessionId}').on( "sortstop", function(event, ui) {
-			debugger;
-		});
-
  	    <c:forEach var="questionResult" items="${assessmentResult.questionResults}" varStatus="i">
 	       	<c:set var="question" value="${questionResult.questionDto}"/>
 	       	<c:set var="title">
@@ -23,7 +19,6 @@
  	     	table.addRowData(${i.index + 1}, {
  	   	    	id:"${i.index + 1}",
  	   	   		questionResultUid:"${questionResult.uid}",
- 	   	   		questionType : "${questionResult.questionDto.type}",
  	   	   		title:"${fn:escapeXml(title)}",
  	   	   		response:responseStr,
  	   	   		<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
@@ -56,8 +51,6 @@
  	 	    // set maxGrade attribute to cell DOM element
  	 	    table.setCell(${i.index + 1}, "grade", "", null, {"maxGrade" :  "${questionResult.maxMark}"});
 		</c:forEach>
-
-		$('[data-toggle="tooltip"]').bootstrapTooltip();
 		
 		if (typeof CodeMirror != 'undefined') {
 			CodeMirror.colorize($('.code-style'));

@@ -111,7 +111,8 @@
 		  			   			"<fmt:message key="label.answer.rating.title" />",
 		  			  		</c:if>
 		  			   		"<fmt:message key="label.monitoring.user.summary.response" />",
-	  						'markedBy',
+		  					"<fmt:message key="label.monitoring.user.summary.marker" />",
+		  					"<fmt:message key="label.monitoring.user.summary.marker.comment" />",
 		  			   		'userId',
 	  						'portraitId'
 	  					],
@@ -131,7 +132,9 @@
 				  				{name:'rating', index:'rating', width:120, align:"center", sortable:false, search:false},
 		  			  		</c:if>
 			  			   	{name:'response', index:'response', width:400, sortable:false, search:false, formatter: responseFormatter},
-		  				   	{name:'markedBy', index:'markedBy', width:0, hidden: true},
+			  			  	{name:'marker', index:'marker', width: 80, search:false, title: false},
+				  			{name:'markerComment', index:'markerComment', width:120, search:false, editable:true, sortable: false,
+				  			    editoptions: {maxlength: 100}, align:"left", classes: 'vertical-align', title : false },
 			  				{name:'userId', index:'userId', width:0, hidden: true},
 		  				   	{name:'portraitId', index:'portraitId', width:0, hidden: true}
 	  				   	],
@@ -139,10 +142,25 @@
 	  				   	caption: "${sessionDto.sessionName}",
 	  				  	cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>&<csrf:token/>',
 	  				  	cellEdit: true,
+	  	  				formatCell: function(rowid, name, value, iRow, iCol){
+	  	  	  				if (name != "grade") {
+	  	  	  	  				return value;
+	  	  	  	  			}
+	  	  	  				if (value == "-") {
+	  	  	  	  				value = "0";
+	  	  	  	  			}
+	  	  	  	  			return value;
+	  	  	  			},
 	  				  	beforeEditCell: function (rowid,name,val,iRow,iCol){
+	  	  	  				if (name != "grade") {
+	  	  	  	  				return;
+	  	  	  	  			}
 	  				  		previousCellValue = val;
 	  				  	},
 	  					beforeSaveCell : function(rowid, name, val, iRow, iCol) {
+	  						if (name != "grade") {
+	  	  	  	  				return val;
+	  	  	  	  			}
 	  						if (isNaN(val)) {
 	  	  						return null;
 	  	  					}
@@ -154,6 +172,9 @@
 	  						}
 	  					},
 	  				  	afterSaveCell : function (rowid,name,val,iRow,iCol){
+	  	  					if (name != "grade") {
+	  	  	  	  				return;
+	  	  	  	  			}
 	  				  		var questionResultUid = jQuery("#session${sessionDto.sessionId}").getCell(rowid, 'questionResultUid');
 	  				  		if (isNaN(val) || (questionResultUid=="")) {
 	  				  			jQuery("#session${sessionDto.sessionId}").restoreCell(iRow,iCol); 
@@ -162,13 +183,24 @@
 	  				  		}
   						},	  		
 	  				  	beforeSubmitCell : function (rowid,name,val,iRow,iCol){
-	  				  		if (isNaN(val)) {
-	  				  			return {nan:true};
-	  				  		} else {
-	  							var questionResultUid = jQuery("#session${sessionDto.sessionId}").getCell(rowid, 'questionResultUid');
-	  							return {questionResultUid:questionResultUid};		  				  		
-	  				  		}
+	  	  					if (name == "grade" && isNaN(val)) {
+	  	  						return {nan:true};
+	  	  					} else {
+	  	  						var questionResultUid = jQuery("#session${sessionDto.sessionId}").getCell(rowid, 'questionResultUid');
+	  	  						return {
+	  	  	  							questionResultUid:questionResultUid,
+	  	  	  						    column:name
+	  	  	  						   };		  				  		
+	  	  				  	}
 	  					},
+	  	  				afterSubmitCell : function (serverresponse, rowid, name, value, iRow, iCol) {
+	  	  	  				if (serverresponse.statusText == "OK") {
+	  	  	  	  				if (serverresponse.responseText != "") {
+	  	  	  	  					$(this).setCell(rowid, 'marker', serverresponse.responseText, {}, {});
+	  	  	  	  				}
+	  	  	  					return [true, ""];
+	  	  	  				}
+	  	  	  			},
   						loadComplete: function () {
   							initializeJRating();
   					   	 	initializePortraitPopover('<lams:LAMSURL/>');
@@ -177,31 +209,6 @@
 	  							CodeMirror.colorize($('.code-style'));
 	  						}
   					    },
-  					    gridComplete : function(){
-  					    	let questionType = ${questionDto.type};
-  					    	// highlight essay questions which have not been graded
-	  						if (questionType == 6) {
-	  							let table = jQuery("#session${sessionDto.sessionId}"),
-	  								rows = table.getDataIDs();
-	  							for (rowIndex = 0;rowIndex < rows.length; rowIndex++) {
-		  							 let rowData = jQuery("#session${sessionDto.sessionId}").getRowData(rows[rowIndex]),
-		  							 	 requiresMarking = rowData.markedBy == "" && rowData.grade == 0;
-	  								 table.setCell(rows[rowIndex], "grade", "", requiresMarking ? 'requires-grading' : '',
-	  		  						 requiresMarking ? {
-	  									title : "<fmt:message key='label.monitoring.user.summary.grade.required' />",
-	  									"data-toggle" : "tooltip",
-	  							 	 	"data-container" : "body"
-		  		  					 } :
-			  		  			     (rowData.markedBy == "" ? null : {
-			  		  					title : "<fmt:message key='label.monitoring.user.summary.grade.by'><fmt:param> </fmt:param></fmt:message>"
-	  			         		   		   + rowData.markedBy,
-	  									"data-toggle" : "tooltip",
-	  							 	 	"data-container" : "body"
-			  		  				 }));
-		  						 }
-	  							$('[data-toggle="tooltip"]').tooltip();
-	  						}
-  	  					},
   					    subGrid: true,
   						subGridOptions: {
   							reloadOnExpand : false,
