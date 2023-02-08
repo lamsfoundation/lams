@@ -2336,9 +2336,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    Assessment assessment = assessmentResult.getAssessment();
 	    Long questionUid = questionResult.getQbToolQuestion().getUid();
 
-	    AssessmentUser teacher = null;
+	    User teacher = null;
 	    if (teacherId != null) {
-		teacher = getUserByIdAndContent(teacherId.longValue(), assessment.getContentId());
+		teacher = userManagementService.getUserById(teacherId);
 	    }
 
 	    // When changing a mark for user and isUseSelectLeaderToolOuput is true, the mark should be propagated to all
