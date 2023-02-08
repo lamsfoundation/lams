@@ -103,14 +103,14 @@
 		  				   	'questionResultUid',
 	  				   	    'maxMark',
 	  		  				"<fmt:message key="label.monitoring.summary.user.name" />",
-	  		  			    "<fmt:message key="label.monitoring.user.summary.grade" />",
+		  			   		"<fmt:message key="label.monitoring.user.summary.response" />",
 		  			   		<c:if test="${assessment.enableConfidenceLevels and questionDto.type != 8}">
 		  			   			"<fmt:message key="label.confidence" />",
 		  			  		</c:if>
 			  			   	<c:if test="${questionDto.groupsAnswersDisclosed}">
 		  			   			"<fmt:message key="label.answer.rating.title" />",
 		  			  		</c:if>
-		  			   		"<fmt:message key="label.monitoring.user.summary.response" />",
+		  		  			"<fmt:message key="label.monitoring.user.summary.grade" />",
 		  					"<fmt:message key="label.monitoring.user.summary.marker" />",
 		  					"<fmt:message key="label.monitoring.user.summary.marker.comment" />",
 		  			   		'userId',
@@ -123,15 +123,15 @@
 							{name:'userName',index:'userName', width:83, searchoptions: { clearSearch: false }, formatter : function(cellvalue, options, rowObject) {
 				    			return definePortraitPopover(rowObject[rowObject.length - 1], rowObject[rowObject.length - 2], rowObject[2]);
 							}},
-							{name:'grade', index:'grade', width:30, sorttype:"float", search:false, editable:true,
-								editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align', title : false},
+			  			   	{name:'response', index:'response', width:400, sortable:false, search:false, formatter: responseFormatter},
 	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels and questionDto.type != 8}">
 			  			   		{name:'confidence', index:'confidence', width: 80, search:false, classes: 'vertical-align', formatter: gradientNumberFormatter},
 			  			  	</c:if>
 				  			<c:if test="${questionDto.groupsAnswersDisclosed}">
 				  				{name:'rating', index:'rating', width:120, align:"center", sortable:false, search:false},
 		  			  		</c:if>
-			  			   	{name:'response', index:'response', width:400, sortable:false, search:false, formatter: responseFormatter},
+							{name:'grade', index:'grade', width:30, sorttype:"float", search:false, editable:true,
+								editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align', title : false},
 			  			  	{name:'marker', index:'marker', width: 80, search:false, title: false},
 				  			{name:'markerComment', index:'markerComment', width:120, search:false, editable:true, sortable: false,
 				  			    editoptions: {maxlength: 100}, align:"left", classes: 'vertical-align', title : false },

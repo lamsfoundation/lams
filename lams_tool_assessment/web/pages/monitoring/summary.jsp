@@ -113,11 +113,11 @@
 				   	'#',
 					'questionResultUid',
 					"<fmt:message key="label.monitoring.question.summary.question" />",
-  					"<fmt:message key="label.authoring.basic.list.header.mark" />",
-  					<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
-  						"<fmt:message key="label.confidence" />",
-  					</c:if>
   					"<fmt:message key="label.monitoring.user.summary.response" />",
+  					<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
+						"<fmt:message key="label.confidence" />",
+					</c:if>
+  					"<fmt:message key="label.authoring.basic.list.header.mark" />",
   					"<fmt:message key="label.monitoring.user.summary.marker" />",
   					"<fmt:message key="label.monitoring.user.summary.marker.comment" />"
   				], 
@@ -125,12 +125,12 @@
 	  			   	{name:'id', index:'id', width:20, sorttype:"int"},
 	  			   	{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
 	  			   	{name:'title', index:'title', width: 200},
-	  			    {name:'grade', index:'grade', width:80, sorttype:"float", editable:true, 
-		  			    editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align', title : false },
+	  			  	{name:'response', index:'response', datatype:'html', width:400, sortable:false},
 	  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
 	  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align', formatter: gradientNumberFormatter},
 	  			  	</c:if>
-	  			  	{name:'response', index:'response', datatype:'html', width:400, sortable:false},
+	  			    {name:'grade', index:'grade', width:80, sorttype:"float", editable:true, 
+		  			    editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align', title : false },
 		  			{name:'marker', index:'marker', width: 80, title: false},
 		  			{name:'markerComment', index:'markerComment', width:120, editable:true, sortable: false,
 		  			    editoptions: {maxlength: 100}, align:"left", classes: 'vertical-align', title : false }

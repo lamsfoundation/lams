@@ -600,9 +600,14 @@ public class MonitoringController {
 		userData.add(questionResultUid);
 		userData.add(questionResult.getMaxMark());
 		userData.add(fullName);
-		//LDEV_NTU-11 Swapping Mark and Response columns in Assessment Monitor
-		userData.add(questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_ESSAY)
-			&& questionResult.getMarkedBy() == null ? "-" : questionResult.getMark().toString());
+
+		String response = AssessmentEscapeUtils.printResponsesForJqgrid(questionResult);
+		if (StringUtils.isNotBlank(questionResult.getJustification())) {
+		    response += "<br><i>" + service.getMessage("label.answer.justification") + "</i><br>"
+			    + questionResult.getJustificationEscaped();
+		}
+		userData.add(response);
+		
 		// show confidence levels if this feature is turned ON
 		if (assessment.isEnableConfidenceLevels()) {
 		    userData.add(questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_MARK_HEDGING) ? -1
@@ -636,14 +641,10 @@ public class MonitoringController {
 		    userData.add(starString);
 		}
 
-		String response = AssessmentEscapeUtils.printResponsesForJqgrid(questionResult);
 
-		if (StringUtils.isNotBlank(questionResult.getJustification())) {
-		    response += "<br><i>" + service.getMessage("label.answer.justification") + "</i><br>"
-			    + questionResult.getJustificationEscaped();
-		}
-
-		userData.add(response);
+		//LDEV_NTU-11 Swapping Mark and Response columns in Assessment Monitor
+		userData.add(questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_ESSAY)
+			&& questionResult.getMarkedBy() == null ? "-" : questionResult.getMark().toString());
 		userData.add(
 			questionResult.getMarkedBy() == null
 				? (questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_ESSAY)
@@ -663,6 +664,7 @@ public class MonitoringController {
 		    userData.add("-");
 		}
 		userData.add("-");
+		userData.add("");
 		userData.add("");
 	    }
 

@@ -163,7 +163,15 @@
 	  	  	  						    column:name
 	  	  	  						   };		  				  		
 	  	  				  	}
-	  					}  	
+	  					},
+	  	  				afterSubmitCell : function (serverresponse, rowid, name, value, iRow, iCol) {
+	  	  	  				if (serverresponse.statusText == "OK") {
+	  	  	  	  				if (serverresponse.responseText != "") {
+	  	  	  	  					$(this).setCell(rowid, 'marker', serverresponse.responseText, {}, {});
+	  	  	  	  				}
+	  	  	  					return [true, ""];
+	  	  	  				}
+	  	  	  			}
 	  				});
 	  				
 	  	   	        <c:forEach var="questionResult" items="${userSummaryItem.questionResults}" varStatus="i">
