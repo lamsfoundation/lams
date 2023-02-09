@@ -487,7 +487,7 @@
 		</div>
 
 		<div id="select-lessons-area" class="voffset5 form-inline">
-			<input class="btn btn-xs btn-default" type="button" value="<fmt:message key="label.button.export"/>" id="export-selected-lessons-button" />
+			<input class="btn btn-xs btn-default" type="button" value="<fmt:message key="label.button.export.selected.lessons"/>" id="export-selected-lessons-button" />
 			<div class="checkbox input-sm loffset5"><label><input type="checkbox" id="export-selected-simplified">&nbsp;<fmt:message key="label.simplified.export"/></label></div>
 			<div><fmt:message key="gradebook.export.desc"/></div>
 		</div>
