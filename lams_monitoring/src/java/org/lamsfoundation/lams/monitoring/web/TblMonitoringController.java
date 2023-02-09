@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -12,19 +13,15 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
-import org.lamsfoundation.lams.learningdesign.BranchingActivity;
-import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
-import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
+import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
@@ -64,6 +61,8 @@ public class TblMonitoringController {
     @Autowired
     private ILessonService lessonService;
     @Autowired
+    private ILearningDesignService learningDesignService;
+    @Autowired
     private IMonitoringFullService monitoringService;
     @Autowired
     private ILamsToolService lamsToolService;
@@ -91,8 +90,11 @@ public class TblMonitoringController {
 	request.setAttribute("lesson", lesson);
 	request.setAttribute("totalLearnersNumber", lesson.getAllLearners().size());
 
-	List<Activity> lessonActivities = getLessonActivities(lesson);
-	setupAvailableActivityTypes(request, lessonActivities);
+	Map<String, Object> activityTypesMeta = learningDesignService
+		.getAvailableTBLActivityTypes(lesson.getLearningDesign().getLearningDesignId());
+	for (Entry<String, Object> entry : activityTypesMeta.entrySet()) {
+	    request.setAttribute(entry.getKey(), entry.getValue());
+	}
 	return "tblmonitor/tblmonitor";
     }
 
@@ -104,8 +106,12 @@ public class TblMonitoringController {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Lesson lesson = lessonService.getLesson(lessonId);
 
-	List<Activity> lessonActivities = getLessonActivities(lesson);
-	setupAvailableActivityTypes(request, lessonActivities);
+	Map<String, Object> activityTypesMeta = learningDesignService
+		.getAvailableTBLActivityTypes(lesson.getLearningDesign().getLearningDesignId());
+	for (Entry<String, Object> entry : activityTypesMeta.entrySet()) {
+	    request.setAttribute(entry.getKey(), entry.getValue());
+	}
+
 	boolean isTraAvailable = (request.getAttribute("isScratchieAvailable") != null)
 		&& ((Boolean) request.getAttribute("isScratchieAvailable"));
 	boolean isIraAssesmentAvailable = request.getAttribute("isIraAssessmentAvailable") != null
@@ -387,77 +393,6 @@ public class TblMonitoringController {
 	model.addAttribute("aeActivityTitles", activityTitles);
 
 	return "tblmonitor/aes";
-    }
-
-    /**
-     * Returns lesson activities sorted by the learning design order.
-     */
-    private List<Activity> getLessonActivities(Lesson lesson) {
-	/*
-	 * Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity for some mysterious
-	 * reason Causes a ClassCastException when you try to cast it, even if it is a ToolActivity.
-	 *
-	 * THIS IS A HACK to retrieve the first tool activity manually so it can be cast as a ToolActivity - if it is
-	 * one
-	 */
-	Activity firstActivity = activityDAO
-		.getActivityByActivityId(lesson.getLearningDesign().getFirstActivity().getActivityId());
-	List<Activity> activities = new ArrayList<>();
-	sortActivitiesByLearningDesignOrder(firstActivity, activities);
-
-	return activities;
-    }
-
-    /**
-     * Sort all activities by the learning design order.
-     *
-     * @param activity
-     * @param sortedActivities
-     */
-    @SuppressWarnings("unchecked")
-    private void sortActivitiesByLearningDesignOrder(Activity activity, List<Activity> sortedActivities) {
-	sortedActivities.add(activity);
-
-	//in case of branching activity - add all activities based on their orderId
-	if (activity.isBranchingActivity()) {
-	    BranchingActivity branchingActivity = (BranchingActivity) activity;
-	    Set<SequenceActivity> sequenceActivities = new TreeSet<>(new ActivityOrderComparator());
-	    sequenceActivities.addAll((Set<SequenceActivity>) (Set<?>) branchingActivity.getActivities());
-	    for (Activity sequenceActivityNotInitialized : sequenceActivities) {
-		SequenceActivity sequenceActivity = (SequenceActivity) monitoringService
-			.getActivityById(sequenceActivityNotInitialized.getActivityId());
-		Set<Activity> childActivities = new TreeSet<>(new ActivityOrderComparator());
-		childActivities.addAll(sequenceActivity.getActivities());
-
-		//add one by one in order to initialize all activities
-		for (Activity childActivity : childActivities) {
-		    Activity activityInit = monitoringService.getActivityById(childActivity.getActivityId());
-		    sortedActivities.add(activityInit);
-		}
-	    }
-
-	    // In case of complex activity (parallel, help or optional activity) add all its children activities.
-	    // They will be sorted by orderId
-	} else if (activity.isComplexActivity()) {
-	    ComplexActivity complexActivity = (ComplexActivity) activity;
-	    Set<Activity> childActivities = new TreeSet<>(new ActivityOrderComparator());
-	    childActivities.addAll(complexActivity.getActivities());
-
-	    // add one by one in order to initialize all activities
-	    for (Activity childActivity : childActivities) {
-		Activity activityInit = monitoringService.getActivityById(childActivity.getActivityId());
-		sortedActivities.add(activityInit);
-	    }
-	}
-
-	Transition transitionFrom = activity.getTransitionFrom();
-	if (transitionFrom != null) {
-	    // query activity from DB as transition holds only proxied activity object
-	    Long nextActivityId = transitionFrom.getToActivity().getActivityId();
-	    Activity nextActivity = monitoringService.getActivityById(nextActivityId);
-
-	    sortActivitiesByLearningDesignOrder(nextActivity, sortedActivities);
-	}
     }
 
     private GroupingActivity getGroupingActivity(Lesson lesson) {

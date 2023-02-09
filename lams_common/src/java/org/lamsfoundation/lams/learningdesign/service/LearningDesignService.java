@@ -29,22 +29,29 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
+import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
+import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
@@ -556,6 +563,99 @@ public class LearningDesignService implements ILearningDesignService {
 	return verifyNextActivityFitsTbl(firstActivity, "Grouping", iRatToolContentId, tRatToolContentId);
     }
 
+    public Map<String, Object> getAvailableTBLActivityTypes(Long learningDesignId) {
+	Map<String, Object> result = new HashMap<>();
+
+	LearningDesign learningDesign = getLearningDesign(learningDesignId);
+	Activity firstActivity = activityDAO.getActivityByActivityId(learningDesign.getFirstActivity().getActivityId());
+	List<Activity> activities = new ArrayList<>();
+	sortActivitiesByLearningDesignOrder(firstActivity, activities);
+
+	//check if there is Scratchie activity. It's used only in case of LKC TBL monitoring, when all assessment are treated as AEs
+	boolean isScratchieAvailable = false;
+	for (Activity activity : activities) {
+	    if (activity instanceof ToolActivity) {
+		ToolActivity toolActivity = (ToolActivity) activity;
+		String toolSignature = toolActivity.getTool().getToolSignature();
+		if (CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature)) {
+		    isScratchieAvailable = true;
+		    break;
+		}
+	    }
+	}
+
+	boolean scratchiePassed = false;
+	boolean iraPassed = false;
+	String aeToolContentIds = "";
+	String aeToolTypes = "";
+	String aeActivityTitles = "";
+	for (Activity activity : activities) {
+	    if (activity instanceof ToolActivity) {
+		ToolActivity toolActivity = (ToolActivity) activity;
+		String toolSignature = toolActivity.getTool().getToolSignature();
+		Long toolContentId = toolActivity.getToolContentId();
+		Long toolActivityId = toolActivity.getActivityId();
+		String toolTitle = toolActivity.getTitle();
+
+		//count only the first MCQ or Assessmnet as iRA
+		if (!iraPassed && (CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)
+			|| isScratchieAvailable && CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature))) {
+		    iraPassed = true;
+		    if (CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
+			result.put("isIraMcqAvailable", true);
+		    } else {
+			result.put("isIraAssessmentAvailable", true);
+		    }
+		    result.put("iraToolContentId", toolContentId);
+		    result.put("iraToolActivityId", toolActivityId);
+
+		    continue;
+		}
+
+		//aes are counted only after Scratchie activity, or for LKC TBL monitoring
+		if ((scratchiePassed || !isScratchieAvailable)
+			&& (CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)
+				|| CommonConstants.TOOL_SIGNATURE_DOKU.equals(toolSignature))) {
+		    result.put("isAeAvailable", true);
+		    //prepare assessment details to be passed to Assessment tool
+		    aeToolContentIds += toolContentId + ",";
+		    aeToolTypes += CommonConstants.TOOL_SIGNATURE_DOKU.equals(toolSignature) ? "d," : "a,";
+		    aeActivityTitles += toolTitle + "\\,";
+
+		} else if (CommonConstants.TOOL_SIGNATURE_FORUM.equals(toolSignature)) {
+		    result.put("isForumAvailable", true);
+		    result.put("forumActivityId", toolActivityId);
+
+		} else if (CommonConstants.TOOL_SIGNATURE_PEER_REVIEW.equals(toolSignature)) {
+		    result.put("isPeerreviewAvailable", true);
+		    result.put("peerreviewToolContentId", toolContentId);
+
+		    //tRA is the first scratchie activity
+		} else if (!scratchiePassed && CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature)) {
+		    scratchiePassed = true;
+
+		    result.put("isScratchieAvailable", true);
+		    result.put("traToolContentId", toolContentId);
+		    result.put("traToolActivityId", toolActivityId);
+		}
+
+		if (CommonConstants.TOOL_SIGNATURE_LEADERSELECTION.equals(toolSignature)) {
+		    result.put("leaderselectionToolActivityId", toolActivityId);
+		    result.put("leaderselectionToolContentId", toolContentId);
+		}
+
+	    } else if (activity instanceof GateActivity) {
+		result.put("isGatesAvailable", true);
+	    }
+	}
+
+	result.put("aeToolContentIds", aeToolContentIds);
+	result.put("aeToolTypes", aeToolTypes);
+	result.put("aeActivityTitles", aeActivityTitles);
+
+	return result;
+    }
+
     /**
      * Traverses the learning design verifying it follows typical TBL structure.
      * Also returns matching iRAT / tRAT activity to the provided iRatToolContentId or tRatToolContentId.
@@ -659,6 +759,55 @@ public class LearningDesignService implements ILearningDesignService {
     }
 
     /**
+     * Get learning design activities sorted by the sequence order.
+     */
+    @SuppressWarnings("unchecked")
+    private void sortActivitiesByLearningDesignOrder(Activity activity, List<Activity> sortedActivities) {
+	sortedActivities.add(activity);
+
+	//in case of branching activity - add all activities based on their orderId
+	if (activity.isBranchingActivity()) {
+	    BranchingActivity branchingActivity = (BranchingActivity) activity;
+	    Set<SequenceActivity> sequenceActivities = new TreeSet<>(new ActivityOrderComparator());
+	    sequenceActivities.addAll((Set<SequenceActivity>) (Set<?>) branchingActivity.getActivities());
+	    for (Activity sequenceActivityNotInitialized : sequenceActivities) {
+		SequenceActivity sequenceActivity = (SequenceActivity) activityDAO.getActivityByActivityId(
+			sequenceActivityNotInitialized.getActivityId(), SequenceActivity.class);
+		Set<Activity> childActivities = new TreeSet<>(new ActivityOrderComparator());
+		childActivities.addAll(sequenceActivity.getActivities());
+
+		//add one by one in order to initialize all activities
+		for (Activity childActivity : childActivities) {
+		    Activity activityInit = activityDAO.getActivityByActivityId(childActivity.getActivityId());
+		    sortedActivities.add(activityInit);
+		}
+	    }
+
+	    // In case of complex activity (parallel, help or optional activity) add all its children activities.
+	    // They will be sorted by orderId
+	} else if (activity.isComplexActivity()) {
+	    ComplexActivity complexActivity = (ComplexActivity) activity;
+	    Set<Activity> childActivities = new TreeSet<>(new ActivityOrderComparator());
+	    childActivities.addAll(complexActivity.getActivities());
+
+	    // add one by one in order to initialize all activities
+	    for (Activity childActivity : childActivities) {
+		Activity activityInit = activityDAO.getActivityByActivityId(childActivity.getActivityId());
+		sortedActivities.add(activityInit);
+	    }
+	}
+
+	Transition transitionFrom = activity.getTransitionFrom();
+	if (transitionFrom != null) {
+	    // query activity from DB as transition holds only proxied activity object
+	    Long nextActivityId = transitionFrom.getToActivity().getActivityId();
+	    Activity nextActivity = activityDAO.getActivityByActivityId(nextActivityId);
+
+	    sortActivitiesByLearningDesignOrder(nextActivity, sortedActivities);
+	}
+    }
+
+    /**
      * Check if the given groups are default for chosen grouping. There is actually no good way to detect this, but even
      * if a custom grouping is mistaken for the default one, it should bring little harm.
      */
@@ -677,4 +826,5 @@ public class LearningDesignService implements ILearningDesignService {
 	}
 	return true;
     }
+
 }

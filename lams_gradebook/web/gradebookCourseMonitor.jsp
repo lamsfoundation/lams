@@ -353,8 +353,15 @@
 				return false;
 			});
 			
-			$("#export-selected-lessons-button").click(function() {
+			$("#export-tbl-button").click(function() {
+				var areaToBlock = "export-link-area";
+				var exportExcelUrl = "<lams:WebAppURL/>gradebookMonitoring/exportExcelTBLGradebook.do?<csrf:token/>&organisationID=${organisationID}";
+				blockExportButton(areaToBlock, exportExcelUrl, languageLabelWait);
 				
+				return false;
+			});
+			
+			$("#export-selected-lessons-button").click(function() {
 				var ids = jQuery("#organisationGrid").getGridParam('selarrrow');
 				// if at least one lesson selceted do export
 				if(ids.length) {
@@ -461,28 +468,34 @@
 				
 
 		<div id="export-link-area" class="gbTopButtonsContainer">
-		<div>
-			<a href="#nogo" id="export-course-button" class="btn btn-xs btn-default" title="<fmt:message key="gradebook.export.excel" />">
-				<i class="fa fa-download"></i><span class="hidden-xs">
-				<fmt:message key="gradebook.export.excel" />
-				</span>
-			</a>
-		</div>
-
-		<div id="selectLessonsNotShown">
-			<a class="btn btn-xs btn-default" href="#nogo" onclick="return openSelectLessonsArea();" title="<fmt:message key="label.select.lessons.to.export" />" >
-				<i class="fa fa-square-o"></i><span class="hidden-xs">
-				<fmt:message key="label.select.lessons.to.export" />
-				</span>
-			</a>
-		</div>
-		<div id="selectLessonsShown" style="display:none">
-			<a class="btn btn-xs btn-default" href="#nogo" onclick="return openSelectLessonsArea();" title="<fmt:message key="label.hide.lessons.to.export " />" >
-				<i class="fa fa-square-o"></i><span class="hidden-xs">
-				<fmt:message key="label.hide.lessons.to.export" />
-				</span>
-			</a>
-		</div>
+			<div>
+				<a href="#nogo" id="export-course-button" class="btn btn-xs btn-default" title="<fmt:message key="gradebook.export.excel" />">
+					<i class="fa fa-download"></i><span class="hidden-xs">
+					<fmt:message key="gradebook.export.excel" />
+					</span>
+				</a>
+			</div>
+			
+			<div>
+				<a href="#nogo" id="export-tbl-button" class="btn btn-xs btn-default" title="<fmt:message key="label.button.export.tbl" />">
+					<fmt:message key="label.button.export.tbl" />
+				</a>
+			</div>
+	
+			<div id="selectLessonsNotShown">
+				<a class="btn btn-xs btn-default" href="#nogo" onclick="return openSelectLessonsArea();" title="<fmt:message key="label.select.lessons.to.export" />" >
+					<i class="fa fa-square-o"></i><span class="hidden-xs">
+					<fmt:message key="label.select.lessons.to.export" />
+					</span>
+				</a>
+			</div>
+			<div id="selectLessonsShown" style="display:none">
+				<a class="btn btn-xs btn-default" href="#nogo" onclick="return openSelectLessonsArea();" title="<fmt:message key="label.hide.lessons.to.export " />" >
+					<i class="fa fa-square-o"></i><span class="hidden-xs">
+					<fmt:message key="label.hide.lessons.to.export" />
+					</span>
+				</a>
+			</div>
 
 		</div>
 
