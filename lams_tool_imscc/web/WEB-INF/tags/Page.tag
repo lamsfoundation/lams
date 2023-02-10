@@ -100,9 +100,9 @@
 		<script type="text/javascript">
 			var allowRestart = false,
 				restartLessonConfirmation = "Are you sure you want to start the lesson from the beginning?",
-				toolSessionId = '${toolSessionId}',
-				lessonId = '${lessonID}',
-				mode = '${mode}',
+				toolSessionId = '<c:out value="${toolSessionId}" />',
+				lessonId = '<c:out value="${lessonID}" />',
+				mode = '<c:out value="${mode}" />',
 				
 				LAMS_URL = '<lams:LAMSURL/>',
 				LEARNING_URL = LAMS_URL + 'learning/',

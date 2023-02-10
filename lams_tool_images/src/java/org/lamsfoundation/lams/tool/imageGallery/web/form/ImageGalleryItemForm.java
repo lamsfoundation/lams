@@ -44,6 +44,7 @@ public class ImageGalleryItemForm {
     private boolean hasFile;
     private Long fileUuid;
     private String fileName;
+    private String fileDisplayUuid;
     private MultipartFile file;
     private String tmpFileUploadId;
 
@@ -115,6 +116,14 @@ public class ImageGalleryItemForm {
 
     public void setFileUuid(Long fileUuid) {
 	this.fileUuid = fileUuid;
+    }
+
+    public String getFileDisplayUuid() {
+	return fileDisplayUuid;
+    }
+
+    public void setFileDisplayUuid(String fileDisplayUuid) {
+	this.fileDisplayUuid = fileDisplayUuid;
     }
 
     public boolean isHasFile() {

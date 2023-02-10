@@ -235,6 +235,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 
 	    List<DacoAnswer> record = new LinkedList<>();
 	    for (DacoAnswer answer : answers) {
+		answer.setFileDisplayUuid(dacoToolContentHandler.getFileUuid(answer.getFileUuid()));
 		if (recordId != answer.getRecordId()) {
 		    recordId = answer.getRecordId();
 		    /*
@@ -325,8 +326,9 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	    if ((answer.getQuestion().getType() == DacoConstants.QUESTION_TYPE_FILE)
 		    || (answer.getQuestion().getType() == DacoConstants.QUESTION_TYPE_IMAGE)) {
 		NodeKey nodeKey = processFile(file);
-		answer.setFileUuid(nodeKey.getUuid());
+		answer.setFileUuid(nodeKey.getNodeId());
 		answer.setFileVersionId(nodeKey.getVersion());
+		answer.setFileDisplayUuid(nodeKey.getUuid());
 	    }
 
 	    // create the package from the directory contents
@@ -349,7 +351,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     public Integer getGroupRecordCount(Long sessionId) {
 	List<DacoUser> users = dacoUserDao.getBySessionId(sessionId);
 
-	Integer groupRecordCount = 0;
+	int groupRecordCount = 0;
 	for (DacoUser user : users) {
 	    groupRecordCount += dacoAnswerDao.getUserRecordCount(user.getUserId(), sessionId);
 	}
@@ -567,7 +569,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
     }
-    
+
     @Override
     public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
 	return false;

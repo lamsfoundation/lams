@@ -5,6 +5,7 @@ import InfoService from "./services/InfoService";
 import ThrottlingService from "./services/ThrottlingService";
 import ConfigService from "./services/ConfigService";
 import html2canvas from "html2canvas";
+import DOMPurify from "dompurify";
 
 const RAD_TO_DEG = 180.0 / Math.PI;
 const DEG_TO_RAD = Math.PI / 180.0;
@@ -25,6 +26,7 @@ const whiteboard = {
      * @type Point
      */
     startCoords: new Point(0, 0),
+    viewCoords: { x: 0, y: 0 },
     drawFlag: false,
     oldGCO: null,
     mouseover: false,
@@ -150,6 +152,8 @@ const whiteboard = {
                     currentPos.x,
                     currentPos.y,
                 ];
+            } else if (_this.tool === "hand") {
+                _this.startCoords = currentPos;
             } else if (_this.tool === "eraser") {
                 _this.drawEraserLine(
                     currentPos.x,
@@ -160,7 +164,12 @@ const whiteboard = {
                 );
                 _this.sendFunction({
                     t: _this.tool,
-                    d: [currentPos.x, currentPos.y, currentPos.x, currentPos.y],
+                    d: [
+                        currentPos.x - _this.viewCoords.x,
+                        currentPos.y - _this.viewCoords.y,
+                        currentPos.x - _this.viewCoords.x,
+                        currentPos.y - _this.viewCoords.y,
+                    ],
                     th: _this.thickness,
                 });
             } else if (_this.tool === "line") {
@@ -222,7 +231,29 @@ const whiteboard = {
         });
 
         _this.mouseOverlay.on("mousemove touchmove", function (e) {
+            //Move hole canvas
             e.preventDefault();
+
+            if (_this.tool == "hand" && _this.drawFlag) {
+                let currentPos = Point.fromEvent(e);
+                let xDif = _this.startCoords.x - currentPos.x;
+                let yDif = _this.startCoords.y - currentPos.y;
+
+                _this.viewCoords.x -= xDif;
+                _this.viewCoords.y -= yDif;
+
+                _this.startCoords.x = currentPos.x;
+                _this.startCoords.y = currentPos.y;
+
+                const dbCp = JSON.parse(JSON.stringify(_this.drawBuffer)); // Copy the buffer
+                _this.canvas.width = $(window).width();
+                _this.canvas.height = $(window).height(); // Set new canvas height
+                _this.drawBuffer = [];
+                _this.textContainer.empty();
+                _this.imgContainer.empty();
+                _this.loadData(dbCp); // draw old content in
+            }
+
             if (ReadOnlyService.readOnlyActive) return;
             _this.triggerMouseMove(e);
         });
@@ -237,7 +268,6 @@ const whiteboard = {
             }
             if (ReadOnlyService.readOnlyActive) return;
             _this.drawFlag = false;
-            _this.drawId++;
             _this.ctx.globalCompositeOperation = _this.oldGCO;
 
             let currentPos = Point.fromEvent(e);
@@ -264,15 +294,18 @@ const whiteboard = {
                 );
                 _this.sendFunction({
                     t: _this.tool,
-                    d: [currentPos.x, currentPos.y, _this.startCoords.x, _this.startCoords.y],
+                    d: [
+                        currentPos.x - _this.viewCoords.x,
+                        currentPos.y - _this.viewCoords.y,
+                        _this.startCoords.x - _this.viewCoords.x,
+                        _this.startCoords.y - _this.viewCoords.y,
+                    ],
                     c: _this.drawcolor,
                     th: _this.thickness,
                 });
                 _this.svgContainer.find("line").remove();
             } else if (_this.tool === "pen") {
-                _this.drawId--;
                 _this.pushPointSmoothPen(currentPos.x, currentPos.y);
-                _this.drawId++;
             } else if (_this.tool === "rect") {
                 if (_this.pressedKeys.shift) {
                     if (
@@ -301,7 +334,12 @@ const whiteboard = {
                 );
                 _this.sendFunction({
                     t: _this.tool,
-                    d: [_this.startCoords.x, _this.startCoords.y, currentPos.x, currentPos.y],
+                    d: [
+                        _this.startCoords.x - _this.viewCoords.x,
+                        _this.startCoords.y - _this.viewCoords.y,
+                        currentPos.x - _this.viewCoords.x,
+                        currentPos.y - _this.viewCoords.y,
+                    ],
                     c: _this.drawcolor,
                     th: _this.thickness,
                 });
@@ -317,7 +355,11 @@ const whiteboard = {
                 );
                 _this.sendFunction({
                     t: _this.tool,
-                    d: [_this.startCoords.x, _this.startCoords.y, r],
+                    d: [
+                        _this.startCoords.x - _this.viewCoords.x,
+                        _this.startCoords.y - _this.viewCoords.y,
+                        r,
+                    ],
                     c: _this.drawcolor,
                     th: _this.thickness,
                 });
@@ -397,8 +439,16 @@ const whiteboard = {
                         _this.drawId++;
                         _this.sendFunction({
                             t: _this.tool,
-                            d: [left, top, leftT, topT, width, height],
+                            d: [
+                                left - _this.viewCoords.x, //left from
+                                top - _this.viewCoords.y,
+                                leftT - _this.viewCoords.x, //Left too
+                                topT - _this.viewCoords.y,
+                                width,
+                                height,
+                            ],
                         });
+
                         _this.dragCanvasRectContent(left, top, leftT, topT, width, height);
                         imgDiv.remove();
                         dragOutOverlay.remove();
@@ -406,6 +456,7 @@ const whiteboard = {
                 imgDiv.draggable();
                 _this.svgContainer.find("rect").remove();
             }
+            _this.drawId++;
         };
 
         _this.mouseOverlay.on("mouseout", function (e) {
@@ -430,8 +481,8 @@ const whiteboard = {
                     _this.drawcolor,
                     _this.textboxBackgroundColor,
                     fontsize,
-                    currentPos.x,
-                    currentPos.y,
+                    currentPos.x - _this.viewCoords.x,
+                    currentPos.y - _this.viewCoords.y,
                     txId,
                     isStickyNote,
                 ],
@@ -440,8 +491,8 @@ const whiteboard = {
                 _this.drawcolor,
                 _this.textboxBackgroundColor,
                 fontsize,
-                currentPos.x,
-                currentPos.y,
+                currentPos.x - _this.viewCoords.x,
+                currentPos.y - _this.viewCoords.y,
                 txId,
                 isStickyNote,
                 true
@@ -495,7 +546,12 @@ const whiteboard = {
                     );
                     _this.sendFunction({
                         t: _this.tool,
-                        d: [currentPos.x, currentPos.y, _this.prevPos.x, _this.prevPos.y],
+                        d: [
+                            currentPos.x - _this.viewCoords.x,
+                            currentPos.y - _this.viewCoords.y,
+                            _this.prevPos.x - _this.viewCoords.x,
+                            _this.prevPos.y - _this.viewCoords.y,
+                        ],
                         th: _this.thickness,
                     });
                 }
@@ -557,6 +613,8 @@ const whiteboard = {
         });
 
         ThrottlingService.throttle(currentPos, () => {
+            currentPos.x -= _this.viewCoords.x;
+            currentPos.y -= _this.viewCoords.y;
             _this.lastPointerPosition = currentPos;
             _this.sendFunction({
                 t: "cursor",
@@ -622,7 +680,11 @@ const whiteboard = {
             var left = Math.round(p.left * 100) / 100;
             var top = Math.round(p.top * 100) / 100;
             _this.drawId++;
-            _this.sendFunction({ t: "eraseRec", d: [left, top, width, height] });
+            _this.sendFunction({
+                t: "eraseRec",
+                d: [left - _this.viewCoords.x, top - _this.viewCoords.y, width, height],
+            });
+
             _this.eraseRec(left, top, width, height);
         });
         _this.mouseOverlay.find(".xCanvasBtn").click(); //Remove all current drops
@@ -653,45 +715,71 @@ const whiteboard = {
         _this.penSmoothLastCoords.push(X, Y);
         if (_this.penSmoothLastCoords.length >= 8) {
             _this.drawPenSmoothLine(_this.penSmoothLastCoords, _this.drawcolor, _this.thickness);
+            let sendArray = [];
+            for (let i = 0; i < _this.penSmoothLastCoords.length; i++) {
+                sendArray.push(_this.penSmoothLastCoords[i]);
+                if (i % 2 == 0) {
+                    sendArray[i] -= this.viewCoords.x;
+                } else {
+                    sendArray[i] -= this.viewCoords.y;
+                }
+            }
             _this.sendFunction({
                 t: _this.tool,
-                d: _this.penSmoothLastCoords,
+                d: sendArray,
                 c: _this.drawcolor,
                 th: _this.thickness,
             });
         }
     },
-    dragCanvasRectContent: function (xf, yf, xt, yt, width, height) {
+    dragCanvasRectContent: function (xf, yf, xt, yt, width, height, remote) {
+        var _this = this;
+        let xOffset = remote ? _this.viewCoords.x : 0;
+        let yOffset = remote ? _this.viewCoords.y : 0;
         var tempCanvas = document.createElement("canvas");
         tempCanvas.width = width;
         tempCanvas.height = height;
         var tempCanvasContext = tempCanvas.getContext("2d");
-        tempCanvasContext.drawImage(this.canvas, xf, yf, width, height, 0, 0, width, height);
-        this.eraseRec(xf, yf, width, height);
-        this.ctx.drawImage(tempCanvas, xt, yt);
+        tempCanvasContext.drawImage(
+            this.canvas,
+            xf + xOffset,
+            yf + yOffset,
+            width,
+            height,
+            0,
+            0,
+            width,
+            height
+        );
+        this.eraseRec(xf + xOffset, yf + yOffset, width, height);
+        this.ctx.drawImage(tempCanvas, xt + xOffset, yt + yOffset);
     },
-    eraseRec: function (fromX, fromY, width, height) {
+    eraseRec: function (fromX, fromY, width, height, remote) {
         var _this = this;
+        let xOffset = remote ? _this.viewCoords.x : 0;
+        let yOffset = remote ? _this.viewCoords.y : 0;
         _this.ctx.beginPath();
-        _this.ctx.rect(fromX, fromY, width, height);
+        _this.ctx.rect(fromX + xOffset, fromY + yOffset, width, height);
         _this.ctx.fillStyle = "rgba(0,0,0,1)";
         _this.ctx.globalCompositeOperation = "destination-out";
         _this.ctx.fill();
         _this.ctx.closePath();
         _this.ctx.globalCompositeOperation = _this.oldGCO;
     },
-    drawPenLine: function (fromX, fromY, toX, toY, color, thickness) {
+    drawPenLine: function (fromX, fromY, toX, toY, color, thickness, remote) {
         var _this = this;
         _this.ctx.beginPath();
-        _this.ctx.moveTo(fromX, fromY);
-        _this.ctx.lineTo(toX, toY);
+        let xOffset = remote ? _this.viewCoords.x : 0;
+        let yOffset = remote ? _this.viewCoords.y : 0;
+        _this.ctx.moveTo(fromX + xOffset, fromY + yOffset);
+        _this.ctx.lineTo(toX + xOffset, toY + yOffset);
         _this.ctx.strokeStyle = color;
         _this.ctx.lineWidth = thickness;
         _this.ctx.lineCap = _this.lineCap;
         _this.ctx.stroke();
         _this.ctx.closePath();
     },
-    drawPenSmoothLine: function (coords, color, thickness) {
+    drawPenSmoothLine: function (coords, color, thickness, remote) {
         var _this = this;
         var xm1 = coords[0];
         var ym1 = coords[1];
@@ -704,13 +792,15 @@ const whiteboard = {
         var length = Math.sqrt(Math.pow(x0 - x1, 2) + Math.pow(y0 - y1, 2));
         var steps = Math.ceil(length / 5);
         _this.ctx.beginPath();
-        _this.ctx.moveTo(x0, y0);
+        let xOffset = remote ? _this.viewCoords.x : 0;
+        let yOffset = remote ? _this.viewCoords.y : 0;
+        _this.ctx.moveTo(x0 + xOffset, y0 + yOffset);
         if (steps == 0) {
-            _this.ctx.lineTo(x0, y0);
+            _this.ctx.lineTo(x0 + xOffset, y0 + yOffset);
         }
         for (var i = 0; i < steps; i++) {
             var point = lanczosInterpolate(xm1, ym1, x0, y0, x1, y1, x2, y2, (i + 1) / steps);
-            _this.ctx.lineTo(point[0], point[1]);
+            _this.ctx.lineTo(point[0] + xOffset, point[1] + yOffset);
         }
         _this.ctx.strokeStyle = color;
         _this.ctx.lineWidth = thickness;
@@ -718,11 +808,13 @@ const whiteboard = {
         _this.ctx.stroke();
         _this.ctx.closePath();
     },
-    drawEraserLine: function (fromX, fromY, toX, toY, thickness) {
+    drawEraserLine: function (fromX, fromY, toX, toY, thickness, remote) {
         var _this = this;
+        let xOffset = remote ? _this.viewCoords.x : 0;
+        let yOffset = remote ? _this.viewCoords.y : 0;
         _this.ctx.beginPath();
-        _this.ctx.moveTo(fromX, fromY);
-        _this.ctx.lineTo(toX, toY);
+        _this.ctx.moveTo(fromX + xOffset, fromY + yOffset);
+        _this.ctx.lineTo(toX + xOffset, toY + yOffset);
         _this.ctx.strokeStyle = "rgba(0,0,0,1)";
         _this.ctx.lineWidth = thickness * 2;
         _this.ctx.lineCap = _this.lineCap;
@@ -731,22 +823,26 @@ const whiteboard = {
         _this.ctx.closePath();
         _this.ctx.globalCompositeOperation = _this.oldGCO;
     },
-    drawRec: function (fromX, fromY, toX, toY, color, thickness) {
+    drawRec: function (fromX, fromY, toX, toY, color, thickness, remote) {
         var _this = this;
-        toX = toX - fromX;
-        toY = toY - fromY;
+        let xOffset = remote ? _this.viewCoords.x : 0;
+        let yOffset = remote ? _this.viewCoords.y : 0;
+        toX = toX - fromX - xOffset;
+        toY = toY - fromY - yOffset;
         _this.ctx.beginPath();
-        _this.ctx.rect(fromX, fromY, toX, toY);
+        _this.ctx.rect(fromX + xOffset, fromY + yOffset, toX + xOffset, toY + yOffset);
         _this.ctx.strokeStyle = color;
         _this.ctx.lineWidth = thickness;
         _this.ctx.lineCap = _this.lineCap;
         _this.ctx.stroke();
         _this.ctx.closePath();
     },
-    drawCircle: function (fromX, fromY, radius, color, thickness) {
+    drawCircle: function (fromX, fromY, radius, color, thickness, remote) {
         var _this = this;
+        let xOffset = remote ? _this.viewCoords.x : 0;
+        let yOffset = remote ? _this.viewCoords.y : 0;
         _this.ctx.beginPath();
-        _this.ctx.arc(fromX, fromY, radius, 0, 2 * Math.PI, false);
+        _this.ctx.arc(fromX + xOffset, fromY + yOffset, radius, 0, 2 * Math.PI, false);
         _this.ctx.lineWidth = thickness;
         _this.ctx.strokeStyle = color;
         _this.ctx.stroke();
@@ -774,6 +870,14 @@ const whiteboard = {
             _this.setTextboxFontSize(_this.latestActiveTextBoxId, thickness);
         }
     },
+    imgWithSrc(url) {
+        return $(
+            DOMPurify.sanitize('<img src="' + url + '">', {
+                ALLOWED_TAGS: ["img"],
+                ALLOWED_ATTR: ["src"], // kill any attributes malicious url introduced
+            })
+        );
+    },
     addImgToCanvasByUrl: function (url) {
         var _this = this;
         var oldTool = _this.tool;
@@ -784,14 +888,14 @@ const whiteboard = {
             finalURL = imageURL + url;
         }
 
+        var img = this.imgWithSrc(finalURL).css({ width: "100%", height: "100%" });
+        finalURL = img.attr("src");
+
         _this.setTool("mouse"); //Set to mouse tool while dropping to prevent errors
         _this.imgDragActive = true;
         _this.mouseOverlay.css({ cursor: "default" });
         var imgDiv = $(
             '<div class="dragMe" style="border: 2px dashed gray; position:absolute; left:200px; top:200px; min-width:160px; min-height:100px; cursor:move;">' +
-                '<img style="width:100%; height:100%;" src="' +
-                finalURL +
-                '">' +
                 '<div style="position:absolute; right:5px; top:3px;">' +
                 '<button draw="1" style="margin: 0px 0px; background: #03a9f4; padding: 5px; margin-top: 3px; color: white;" class="addToCanvasBtn btn btn-default">Draw to canvas</button> ' +
                 '<button draw="0" style="margin: 0px 0px; background: #03a9f4; padding: 5px; margin-top: 3px; color: white;" class="addToBackgroundBtn btn btn-default">Add to background</button> ' +
@@ -801,6 +905,7 @@ const whiteboard = {
                 '<div class="rotationHandle" style="position:absolute; bottom: -30px; left: 0px; width:100%; text-align:center; cursor:ew-resize;"><i class="fa fa-undo"></i></div>' +
                 "</div>"
         );
+        imgDiv.prepend(img);
         imgDiv
             .find(".xCanvasBtn")
             .off("click")
@@ -860,8 +965,8 @@ const whiteboard = {
                 ui.position.top += recoupTop;
             },
             stop: function (event, ui) {
-                left = ui.position.left;
-                top = ui.position.top;
+                left = ui.position.left - _this.viewCoords.x;
+                top = ui.position.top - _this.viewCoords.y;
             },
         });
         imgDiv.resizable();
@@ -884,20 +989,17 @@ const whiteboard = {
         dom.i2svg();
     },
     drawImgToBackground(url, width, height, left, top, rotationAngle) {
+        var _this = this;
+        const px = (v) => Number(v).toString() + "px";
         this.imgContainer.append(
-            '<img crossorigin="anonymous" style="width:' +
-                width +
-                "px; height:" +
-                height +
-                "px; position:absolute; top:" +
-                top +
-                "px; left:" +
-                left +
-                "px; transform: rotate(" +
-                rotationAngle +
-                'rad);" src="' +
-                url +
-                '">'
+            this.imgWithSrc(url).css({
+                width: px(width),
+                height: px(height),
+                top: px(top + _this.viewCoords.y),
+                left: px(left + _this.viewCoords.x),
+                position: "absolute",
+                transform: "rotate(" + Number(rotationAngle) + "rad)",
+            })
         );
     },
     addTextBox(
@@ -908,14 +1010,18 @@ const whiteboard = {
         top,
         txId,
         isStickyNote,
-        newLocalBox
+        newLocalBox,
+        remote
     ) {
         var _this = this;
-        console.log(isStickyNote);
         var cssclass = "textBox";
         if (isStickyNote) {
             cssclass += " stickyNote";
         }
+
+        left = left + _this.viewCoords.x;
+        top = top + _this.viewCoords.y;
+        let editable = _this.tool == "text" || _this.tool === "stickynote" ? "true" : "false";
         var textBox = $(
             '<div id="' +
                 txId +
@@ -929,12 +1035,14 @@ const whiteboard = {
                 "background-color:" +
                 textboxBackgroundColor +
                 ';">' +
-                '<div contentEditable="true" spellcheck="false" class="textContent" style="outline: none; font-size:' +
+                '<div contentEditable="' +
+                editable +
+                '" spellcheck="false" class="textContent" style="outline: none; font-size:' +
                 fontsize +
                 "em; color:" +
                 textcolor +
-                '; min-width:50px; min-height:50px"></div>' +
-                '<div title="remove textbox" class="removeIcon" style="position:absolute; cursor:pointer; top:-4px; right:2px;">x</div>' +
+                '; min-width:50px; min-height:100%;"></div>' +
+                '<div title="remove textbox" class="removeIcon" style="position:absolute; cursor:pointer; top:-3px; right:2px;"><b>🗑</b></div>' +
                 '<div title="move textbox" class="moveIcon" style="position:absolute; cursor:move; top:1px; left:2px; font-size: 0.5em;"><i class="fas fa-expand-arrows-alt"></i></div>' +
                 "</div>"
         );
@@ -975,14 +1083,22 @@ const whiteboard = {
                 var textBoxPosition = textBox.position();
                 _this.sendFunction({
                     t: "setTextboxPosition",
-                    d: [txId, textBoxPosition.top, textBoxPosition.left],
+                    d: [
+                        txId,
+                        textBoxPosition.top - _this.viewCoords.y,
+                        textBoxPosition.left - _this.viewCoords.x,
+                    ],
                 });
             },
             drag: function () {
                 var textBoxPosition = textBox.position();
                 _this.sendFunction({
                     t: "setTextboxPosition",
-                    d: [txId, textBoxPosition.top, textBoxPosition.left],
+                    d: [
+                        txId,
+                        textBoxPosition.top - _this.viewCoords.y,
+                        textBoxPosition.left - _this.viewCoords.x,
+                    ],
                 });
             },
         });
@@ -1021,7 +1137,10 @@ const whiteboard = {
         $("#" + txId).remove();
     },
     setTextboxPosition(txId, top, left) {
-        $("#" + txId).css({ top: top + "px", left: left + "px" });
+        $("#" + txId).css({
+            top: top + this.viewCoords.y + "px",
+            left: left + this.viewCoords.x + "px",
+        });
     },
     setTextboxFontSize(txId, fontSize) {
         $("#" + txId)
@@ -1039,15 +1158,30 @@ const whiteboard = {
             .css({ "background-color": textboxBackgroundColor });
     },
     drawImgToCanvas(url, width, height, left, top, rotationAngle, doneCallback) {
+        top = Number(top); // probably not as important here
+        left = Number(left); // as it is when generating html
+        width = Number(width);
+        height = Number(height);
+        rotationAngle = Number(rotationAngle);
+
         var _this = this;
         var img = document.createElement("img");
         img.onload = function () {
             rotationAngle = rotationAngle ? rotationAngle : 0;
             if (rotationAngle === 0) {
-                _this.ctx.drawImage(img, left, top, width, height);
+                _this.ctx.drawImage(
+                    img,
+                    left + _this.viewCoords.x,
+                    top + _this.viewCoords.y,
+                    width,
+                    height
+                );
             } else {
                 _this.ctx.save();
-                _this.ctx.translate(left + width / 2, top + height / 2);
+                _this.ctx.translate(
+                    left + _this.viewCoords.x + width / 2,
+                    top + _this.viewCoords.y + height / 2
+                );
                 _this.ctx.rotate(rotationAngle);
                 _this.ctx.drawImage(img, -(width / 2), -(height / 2), width, height);
                 _this.ctx.restore();
@@ -1056,10 +1190,11 @@ const whiteboard = {
                 doneCallback();
             }
         };
-        img.src = url;
+
+        img.src = this.imgWithSrc(url).attr("src"); // or here - but consistent
     },
     undoWhiteboard: function (username) {
-        //Not call this directly because you will get out of sync whit others...
+        //Not call this directly because you will get out of sync whith others...
         var _this = this;
         if (!username) {
             username = _this.settings.username;
@@ -1089,7 +1224,7 @@ const whiteboard = {
         });
     },
     redoWhiteboard: function (username) {
-        //Not call this directly because you will get out of sync whit others...
+        //Not call this directly because you will get out of sync whith others...
         var _this = this;
         if (!username) {
             username = _this.settings.username;
@@ -1130,9 +1265,11 @@ const whiteboard = {
         if (this.tool === "text" || this.tool === "stickynote") {
             $(".textBox").addClass("active");
             this.textContainer.appendTo($(whiteboardContainer)); //Bring textContainer to the front
+            $(".textContent").attr("contenteditable", "true");
         } else {
             $(".textBox").removeClass("active");
             this.mouseOverlay.appendTo($(whiteboardContainer));
+            $(".textContent").attr("contenteditable", "false");
         }
         this.refreshCursorAppearance();
         this.mouseOverlay.find(".xCanvasBtn").click();
@@ -1142,7 +1279,7 @@ const whiteboard = {
         var _this = this;
         _this.drawcolor = color;
         $("#whiteboardColorpicker").css({ background: color });
-        if ((_this.tool == "text" || this.tool === "stickynote") && _this.latestActiveTextBoxId) {
+        if ((_this.tool == "text" || _this.tool === "stickynote") && _this.latestActiveTextBoxId) {
             _this.sendFunction({
                 t: "setTextboxFontColor",
                 d: [_this.latestActiveTextBoxId, color],
@@ -1196,20 +1333,28 @@ const whiteboard = {
             if (tool === "line" || tool === "pen") {
                 if (data.length == 4) {
                     //Only used for old json imports
-                    _this.drawPenLine(data[0], data[1], data[2], data[3], color, thickness);
+                    _this.drawPenLine(data[0], data[1], data[2], data[3], color, thickness, true);
                 } else {
-                    _this.drawPenSmoothLine(data, color, thickness);
+                    _this.drawPenSmoothLine(data, color, thickness, true);
                 }
             } else if (tool === "rect") {
-                _this.drawRec(data[0], data[1], data[2], data[3], color, thickness);
+                _this.drawRec(data[0], data[1], data[2], data[3], color, thickness, true);
             } else if (tool === "circle") {
-                _this.drawCircle(data[0], data[1], data[2], color, thickness);
+                _this.drawCircle(data[0], data[1], data[2], color, thickness, true);
             } else if (tool === "eraser") {
-                _this.drawEraserLine(data[0], data[1], data[2], data[3], thickness);
+                _this.drawEraserLine(data[0], data[1], data[2], data[3], thickness, true);
             } else if (tool === "eraseRec") {
-                _this.eraseRec(data[0], data[1], data[2], data[3]);
+                _this.eraseRec(data[0], data[1], data[2], data[3], true);
             } else if (tool === "recSelect") {
-                _this.dragCanvasRectContent(data[0], data[1], data[2], data[3], data[4], data[5]);
+                _this.dragCanvasRectContent(
+                    data[0],
+                    data[1],
+                    data[2],
+                    data[3],
+                    data[4],
+                    data[5],
+                    true
+                );
             } else if (tool === "addImgBG") {
                 if (content["draw"] == "1") {
                     _this.drawImgToCanvas(
@@ -1232,7 +1377,16 @@ const whiteboard = {
                     );
                 }
             } else if (tool === "addTextBox") {
-                _this.addTextBox(data[0], data[1], data[2], data[3], data[4], data[5], data[6]);
+                _this.addTextBox(
+                    data[0],
+                    data[1],
+                    data[2],
+                    data[3],
+                    data[4],
+                    data[5],
+                    data[6],
+                    true
+                );
             } else if (tool === "setTextboxText") {
                 _this.setTextboxText(data[0], data[1]);
             } else if (tool === "removeTextbox") {
@@ -1255,15 +1409,16 @@ const whiteboard = {
             } else if (tool === "cursor" && _this.settings) {
                 if (content["event"] === "move") {
                     if (_this.cursorContainer.find("." + content["username"]).length >= 1) {
-                        _this.cursorContainer
-                            .find("." + content["username"])
-                            .css({ left: data[0] + "px", top: data[1] - 15 + "px" });
+                        _this.cursorContainer.find("." + content["username"]).css({
+                            left: data[0] + _this.viewCoords.x + "px",
+                            top: data[1] + _this.viewCoords.y - 15 + "px",
+                        });
                     } else {
                         _this.cursorContainer.append(
                             '<div style="font-size:0.8em; padding-left:2px; padding-right:2px; background:gray; color:white; border-radius:3px; position:absolute; left:' +
-                                data[0] +
+                                (data[0] + _this.viewCoords.x) +
                                 "px; top:" +
-                                (data[1] - 151) +
+                                (data[1] + _this.viewCoords.y - 151) +
                                 'px;" class="userbadge ' +
                                 content["username"] +
                                 '">' +
@@ -1432,7 +1587,6 @@ const whiteboard = {
     },
     loadJsonData(content, doneCallback) {
         var _this = this;
-
         _this.loadDataInSteps(content, false, function (stepData, index) {
             _this.sendFunction(stepData);
             if (index >= content.length - 1) {
@@ -1518,6 +1672,33 @@ function lanczosInterpolate(xm1, ym1, x0, y0, x1, y1, x2, y2, a) {
     c1 -= delta;
     c2 -= delta;
     return [cm1 * xm1 + c0 * x0 + c1 * x1 + c2 * x2, cm1 * ym1 + c0 * y0 + c1 * y1 + c2 * y2];
+}
+
+function testImage(url, callback, timeout) {
+    timeout = timeout || 5000;
+    var timedOut = false,
+        timer;
+    var img = new Image();
+    img.onerror = img.onabort = function () {
+        if (!timedOut) {
+            clearTimeout(timer);
+            callback(false);
+        }
+    };
+    img.onload = function () {
+        if (!timedOut) {
+            clearTimeout(timer);
+            callback(true);
+        }
+    };
+    img.src = url;
+    timer = setTimeout(function () {
+        timedOut = true;
+        // reset .src to invalid URL so it stops previous
+        // loading, but doesn't trigger new load
+        img.src = "//!!!!/test.jpg";
+        callback(false);
+    }, timeout);
 }
 
 export default whiteboard;

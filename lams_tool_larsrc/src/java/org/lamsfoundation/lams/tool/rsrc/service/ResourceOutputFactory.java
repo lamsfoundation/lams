@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.rsrc.service;
 
 import java.util.ArrayList;
@@ -47,7 +46,7 @@ public class ResourceOutputFactory extends OutputFactory {
     @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
 	    int definitionType) throws ToolException {
-	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
+	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<>();
 	Class simpleUrlArrayClass = SimpleURL[].class;
 	switch (definitionType) {
 	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
@@ -68,9 +67,9 @@ public class ResourceOutputFactory extends OutputFactory {
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IResourceService resourceService,
 	    Long toolSessionId, Long learnerId) {
 
-	TreeMap<String, ToolOutput> outputs = new TreeMap<String, ToolOutput>();
+	TreeMap<String, ToolOutput> outputs = new TreeMap<>();
 	// tool output cache
-	TreeMap<String, ToolOutput> baseOutputs = new TreeMap<String, ToolOutput>();
+	TreeMap<String, ToolOutput> baseOutputs = new TreeMap<>();
 	if (names == null) {
 	    outputs.put(ResourceConstants.SHARED_ITEMS_DEFINITION_NAME, getToolOutput(
 		    ResourceConstants.SHARED_ITEMS_DEFINITION_NAME, resourceService, toolSessionId, learnerId));
@@ -98,7 +97,7 @@ public class ResourceOutputFactory extends OutputFactory {
 	    String[] nameParts = splitConditionName(name);
 	    if (ResourceConstants.SHARED_ITEMS_DEFINITION_NAME.equals(nameParts[0])) {
 		List<ResourceItem> items = resourceService.getResourceItemsBySessionId(toolSessionId);
-		List<ResourceItem> uploadedItems = new ArrayList<ResourceItem>(items.size());
+		List<ResourceItem> uploadedItems = new ArrayList<>(items.size());
 		for (ResourceItem item : items) {
 		    if (!item.isCreateByAuthor()) {
 			uploadedItems.add(item);
@@ -112,8 +111,8 @@ public class ResourceOutputFactory extends OutputFactory {
 
 			String path = uploadedItem.getUrl();
 			if (path == null) {
-			    path = serverUrl + "download/?uuid=" + uploadedItem.getFileUuid() + "&preferDownload=false&"
-				    + AttributeNames.PARAM_TOOL_CONTENT_HANDLER_NAME + "="
+			    path = serverUrl + "download/?uuid=" + uploadedItem.getFileDisplayUuid()
+				    + "&preferDownload=false&" + AttributeNames.PARAM_TOOL_CONTENT_HANDLER_NAME + "="
 				    + ResourceConstants.TOOL_CONTENT_HANDLER_NAME;
 
 			}

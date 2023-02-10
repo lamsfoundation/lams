@@ -111,7 +111,7 @@
 			
 				<c:forEach var="file" items="${topic.message.attachments}">
 					<c:set var="downloadURL">
-						<lams:WebAppURL />download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true
+						<lams:WebAppURL />download/?uuid=${file.fileDisplayUuid}&versionID=${file.fileVersionId}&preferDownload=true
 					</c:set>
 					<a href="<c:out value='${downloadURL}' escapeXml='false'/>"><i class="fa fa-paperclip" title="<fmt:message key='message.label.attachment'/>"></i></a>
 				</c:forEach>

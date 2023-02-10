@@ -34,13 +34,13 @@
 	
 		<c:otherwise>
 			<c:set var="viewURL">
-				<lams:WebAppURL/>download/?uuid=${fileInfo.uuID}&versionID=${fileInfo.versionID}&preferDownload=false
+				<lams:WebAppURL/>download/?uuid=${fileInfo.displayUuid}&versionID=${fileInfo.versionID}&preferDownload=false
 			</c:set>
 			<a href="javascript:launchInstructionsPopup('${viewURL}')" class="btn btn-xs btn-default">
 				<i class="fa fa-eye" title="<fmt:message key="label.view" />"></i> <span class="hidden-xs"><fmt:message key="label.view" /></span>
 			</a>
 			<c:set var="downloadURL">
-				<lams:WebAppURL/>download/?uuid=${fileInfo.uuID}&versionID=${fileInfo.versionID}&preferDownload=true
+				<lams:WebAppURL/>download/?uuid=${fileInfo.displayUuid}&versionID=${fileInfo.versionID}&preferDownload=true
 			</c:set>
 			<a href="${downloadURL}" class="btn btn-xs btn-default loffset10">
 				<i class="fa fa-download" title="<fmt:message key="label.download" />"></i> <span class="hidden-xs"><fmt:message key="label.download" /></span>

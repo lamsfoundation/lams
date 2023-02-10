@@ -22,7 +22,7 @@
 	<script type="text/javascript">
 		var LAMS_URL = "<lams:LAMSURL/>",
 			APP_URL = "<lams:WebAppURL />",
-			lessonId = "${param.lessonID}",
+			lessonId = '<c:out value="${param.lessonID}" />',
 			<%-- Learner interface uses attribues, Monitor uses parameters --%>
 			presenceEnabled = ${param.presenceEnabledPatch eq 'true' or presenceEnabledPatch},
 			presenceShown = ${param.presenceShown eq 'true' or presenceShown},

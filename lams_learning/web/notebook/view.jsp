@@ -61,7 +61,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<form:hidden path="uid" value="${entry.uid}" />
 			<form:hidden path="signature" />
 			<form:hidden path="lessonID" value="${entry.externalID}" />
-			<form:hidden path="currentLessonID" value="${empty currentLessonID ? param.currentLessonID : currentLessonID}" />
+			<form:hidden path="currentLessonID" value='${empty currentLessonID ? param.currentLessonID : currentLessonID}" />
 			
 			<!-- title -->
 			<c:set var="title">

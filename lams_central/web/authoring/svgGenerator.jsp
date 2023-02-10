@@ -50,7 +50,7 @@
 			isReadOnlyMode = true,
 			activitiesOnlySelectable = ${param.selectable eq 'true'},
 			isLtiContentSelection = false,
-			initLearningDesignID = '${param.learningDesignID}',
+			initLearningDesignID = '<c:out value="${param.learningDesignID}" />',
 			csrfTokenName = '<csrf:tokenname/>',
 			csrfTokenValue = '<csrf:tokenvalue/>';
 	</script>

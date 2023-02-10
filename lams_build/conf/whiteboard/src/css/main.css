@@ -50,6 +50,32 @@ so buttons are not too large on iPads
     width: 25px;
 }
 
+/* LAMS: for smartphones */
+@media (max-device-width: 480px) {
+    .btn-group button {
+        font-size: 0.8em;
+        height: 30px;
+        width: 35px;
+        padding: 6px;
+    }
+
+    .minGroup {
+        width: 20px;
+    }
+    
+    #whiteboardColorpicker {
+    	top: 2px !important;
+    }
+    
+    #whiteboardThicknessSlider {
+    	top: 7px !important;
+    }
+    
+    .btn-group button .activeToolIcon + img {
+    	top: 7px !important;
+	}
+}
+
 /*
 @media (max-device-width: 1024px) {
     .btn-group button {
@@ -213,4 +239,30 @@ button {
 .shareWhiteboardDialogItem {
     padding: 5px;
     margin: 5px;
+}
+
+.picker_wrapper .picker_palette {
+    width: 100%;
+    order: 1;
+    display: flex;
+    margin-top: 0;
+    margin-bottom: 0;
+    flex-wrap: wrap;
+}
+
+.picker_wrapper .picker_splotch {
+    /*flex:1;*/
+    width: 17px;
+    height: 19px;
+    margin: 4px 4px;
+    box-shadow: 0 0 0 1px silver;
+    border: 2px solid transparent;
+}
+
+.picker_wrapper .picker_splotch:hover {
+    border: 2px solid black;
+}
+
+.picker_wrapper .picker_splotch.picker_splotch_active {
+    border: 2px dotted yellow;
 }

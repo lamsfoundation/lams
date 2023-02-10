@@ -26,7 +26,7 @@
 		var grouping = ${grouping},
 			organisationId = grouping.organisationId,
 			unassignedUsers = ${unassignedUsers},
-			groupingActivityId = '${param.activityID}',
+			groupingActivityId = '<c:out value="${param.activityID}" />',
 			lessonId = '${lessonID}',
 			lessonMode = ${lessonMode},
 			// This attribute can be empty.
@@ -217,8 +217,8 @@
 			</div>
 			<div class="voffset5">
 				<form action="../monitoring/groupingUpload/importLearnersForGrouping.do" enctype="multipart/form-data" id="uploadForm">
-					<input type="hidden" name="activityID" value="${param.activityID}"/>
-					<input type="hidden" name="lessonID" value="${lessonID}"/>
+					<input type="hidden" name="activityID" value='<c:out value="${param.activityID}" />' />
+					<input type="hidden" name="lessonID" value='<c:out value="${lessonID}" />' />
 					<button id="import" type="button" class="pull-right btn btn-sm btn-primary btn-disable-on-downupload" onClick="javascript:importGroupsFromSpreadsheet();return false;">
 						<fmt:message key="button.import" />
 					</button>

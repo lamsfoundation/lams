@@ -84,7 +84,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						// submit lesson total mark to the integrated server in case request comes from an integrated server
 						if (${not empty param.activityFinishUrl}) {
 							$.ajax({ 
-							    url: "${param.activityFinishUrl}",
+							    url: '<c:out value="${param.activityFinishUrl}" />',
 							    type: "POST",
 							    dataType: 'html',
 								cache: false,

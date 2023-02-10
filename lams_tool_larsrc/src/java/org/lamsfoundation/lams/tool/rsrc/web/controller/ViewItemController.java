@@ -253,7 +253,7 @@ public class ViewItemController {
 		break;
 	    case ResourceConstants.RESOURCE_TYPE_FILE:
 	    case ResourceConstants.RESOURCE_TYPE_WEBSITE:
-		url = "/download/?uuid=" + item.getFileUuid();
+		url = "/download/?uuid=" + item.getFileDisplayUuid();
 		break;
 	}
 	return url;

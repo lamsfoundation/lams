@@ -147,8 +147,9 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 
 	// create new attachement
 	TaskListItemAttachment file = new TaskListItemAttachment();
-	file.setFileUuid(nodeKey.getUuid());
+	file.setFileUuid(nodeKey.getNodeId());
 	file.setFileVersionId(nodeKey.getVersion());
+	file.setFileDisplayUuid(nodeKey.getUuid());
 	file.setFileName(uploadFile.getName());
 	file.setCreated(new Timestamp(new Date().getTime()));
 	file.setCreateBy(user);
@@ -202,12 +203,21 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	// to skip CGLib problem
 	Long contentId = session.getTaskList().getContentId();
 	TaskList taskList = taskListDao.getByContentId(contentId);
+	for (TaskListItem item : taskList.getTaskListItems()) {
+	    for (TaskListItemAttachment attachment : item.getAttachments()) {
+		attachment.setFileDisplayUuid(taskListToolContentHandler.getFileUuid(attachment.getFileUuid()));
+	    }
+	}
 	return taskList;
     }
 
     @Override
     public TaskListItem getTaskListItemByUid(Long itemUid) {
-	return taskListItemDao.getByUid(itemUid);
+	TaskListItem item = taskListItemDao.getByUid(itemUid);
+	for (TaskListItemAttachment attachment : item.getAttachments()) {
+	    attachment.setFileDisplayUuid(taskListToolContentHandler.getFileUuid(attachment.getFileUuid()));
+	}
+	return item;
     }
 
     @Override

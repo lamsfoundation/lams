@@ -137,7 +137,7 @@
 													</c:when>
 													<c:otherwise>
 														<fmt:message key="label.learning.file.uploaded" />
-														<a href="<c:url value='/download/?uuid=${answer.fileUuid}&preferDownload=true'/>">&nbsp;${answer.fileName}</a>
+														<a href="<c:url value='/download/?uuid=${answer.fileDisplayUuid}&preferDownload=true'/>">&nbsp;${answer.fileName}</a>
 													</c:otherwise>
 												</c:choose>
 											</c:when>

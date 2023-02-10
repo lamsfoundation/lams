@@ -178,7 +178,8 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     }
 
     @Override
-    public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws InvalidParameterException, RepositoryCheckedException {
+    public void deleteFromRepository(Long fileUuid, Long fileVersionId)
+	    throws InvalidParameterException, RepositoryCheckedException {
 	commonCartridgeToolContentHandler.deleteFile(fileUuid);
     }
 
@@ -302,7 +303,9 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 
     @Override
     public CommonCartridgeItem getCommonCartridgeItemByUid(Long itemUid) {
-	return commonCartridgeItemDao.getByUid(itemUid);
+	CommonCartridgeItem item = commonCartridgeItemDao.getByUid(itemUid);
+	item.setFileDisplayUuid(commonCartridgeToolContentHandler.getFileUuid(item.getFileUuid()));
+	return item;
     }
 
     @Override
@@ -707,7 +710,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     @Override
     public boolean isReadOnly(Long toolContentId) {
 	CommonCartridge cartridge = commonCartridgeDao.getByContentId(toolContentId);
-	for (CommonCartridgeItem item : (Set<CommonCartridgeItem>) cartridge.getCommonCartridgeItems()) {
+	for (CommonCartridgeItem item : cartridge.getCommonCartridgeItems()) {
 	    if (!item.isCreateByAuthor()) {
 		// we don't remove users in removeLearnerContent()
 		// we just remove their items
@@ -859,7 +862,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
     }
-    
+
     @Override
     public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
 	return false;
@@ -874,7 +877,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     public List<User> getMonitorsByToolSessionId(Long sessionId) {
 	return lessonService.getMonitorsByToolSessionId(sessionId);
     }
-    
+
     @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
@@ -884,7 +887,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);

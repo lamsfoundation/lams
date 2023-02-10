@@ -59,7 +59,7 @@ public class CommonCartridgeItem implements Cloneable {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     // CommonCartridge Type:1=URL,2=File,3=Website,4=Learning Object
     @Column(name = "item_type")
     private short type;
@@ -84,25 +84,25 @@ public class CommonCartridgeItem implements Cloneable {
 
     @Column(name = "launch_url")
     private String launchUrl;
-    
+
     @Column(name = "secure_launch_url")
     private String secureLaunchUrl;
-    
+
     @Column(name = "tool_key")
     private String key;
-    
+
     @Column(name = "tool_secret")
     private String secret;
-    
+
     @Column(name = "custom_str")
     private String customStr;
-    
+
     @Column(name = "frame_height")
     private int frameHeight;
-    
+
     @Column(name = "open_url_new_window")
     private boolean openUrlNewWindow;
-    
+
     @Column(name = "button_text")
     private String buttonText;
 
@@ -125,13 +125,13 @@ public class CommonCartridgeItem implements Cloneable {
 
     @Column(name = "is_hide")
     private boolean isHide;
-    
+
     @Column(name = "create_by_author")
     private boolean isCreateByAuthor;
 
     @Column(name = "create_date")
     private Date createDate;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by")
     private CommonCartridgeUser createBy;
@@ -139,6 +139,9 @@ public class CommonCartridgeItem implements Cloneable {
     // *********************************************** DTO fields
     @Transient
     private boolean complete;
+
+    @Transient
+    private String fileDisplayUuid;
 
     @Override
     public Object clone() {
@@ -168,7 +171,7 @@ public class CommonCartridgeItem implements Cloneable {
 
 	return obj;
     }
-    
+
     @Override
     public String toString() {
 	return new ToStringBuilder(this).append(" uid", uid).append(" type", type).append(" title", title).toString();
@@ -386,4 +389,11 @@ public class CommonCartridgeItem implements Cloneable {
 	return complete;
     }
 
+    public String getFileDisplayUuid() {
+	return fileDisplayUuid;
+    }
+
+    public void setFileDisplayUuid(String fileDisplayUuid) {
+	this.fileDisplayUuid = fileDisplayUuid;
+    }
 }

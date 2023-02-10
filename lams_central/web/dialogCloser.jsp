@@ -3,7 +3,7 @@
 <html>
 <head>
 	<script type="text/javascript">
-		window.parent['${param.function}']('${param.action}');
+		window.parent['<c:out value="${param.function}" />']('<c:out value="${param.action}" />');
 	</script>
 </head>
 </html>
