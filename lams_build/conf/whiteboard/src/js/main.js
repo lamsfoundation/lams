@@ -155,7 +155,7 @@ function initWhiteboard() {
         whiteboard.loadWhiteboard("#whiteboardContainer", {
             //Load the whiteboard
             whiteboardId: whiteboardId,
-            username: btoa(myUsername),
+            username: btoa(encodeURIComponent(myUsername)),
             backgroundGridUrl: "./images/" + ConfigService.backgroundGridImage,
             sendFunction: function (content) {
                 if (ReadOnlyService.readOnlyActive) return;
@@ -328,6 +328,11 @@ function initWhiteboard() {
                 } else {
                     $("#textboxBackgroundColorPickerBtn").hide();
                 }
+                let savedThickness = localStorage.getItem("item_thickness_" + activeTool);
+                if (savedThickness) {
+                    whiteboard.setStrokeThickness(savedThickness);
+                    $("#whiteboardThicknessSlider").val(savedThickness);
+                }
             });
 
         // upload image button
@@ -335,7 +340,18 @@ function initWhiteboard() {
             .off("click")
             .click(function () {
                 if (ReadOnlyService.readOnlyActive) return;
-                showBasicAlert("Please drag the image into the browser.");
+                showBasicAlert(`Please drag the image into the browser.<br>
+                Or upload here: <input type="file" id="manualFileUpload" name="myfile" />`);
+                document.getElementById("manualFileUpload").addEventListener(
+                    "change",
+                    function (e) {
+                        $(".basicalert").remove();
+                        if (ReadOnlyService.readOnlyActive) return;
+                        e.originalEvent = { dataTransfer: { files: e.target.files } };
+                        handleFileUploadEvent(e);
+                    },
+                    false
+                );
             });
 
         // save image as imgae
@@ -591,7 +607,16 @@ function initWhiteboard() {
         $("#whiteboardThicknessSlider").on("input", function () {
             if (ReadOnlyService.readOnlyActive) return;
             whiteboard.setStrokeThickness($(this).val());
+            let activeTool = $(".whiteboard-tool.active").attr("tool");
+            localStorage.setItem("item_thickness_" + activeTool, $(this).val());
         });
+
+        let activeTool = $(".whiteboard-tool.active").attr("tool");
+        let savedThickness = localStorage.getItem("item_thickness_" + activeTool);
+        if (savedThickness) {
+            whiteboard.setStrokeThickness(savedThickness);
+            $("#whiteboardThicknessSlider").val(savedThickness);
+        }
 
         // handle drag&drop
         var dragCounter = 0;
@@ -614,10 +639,8 @@ function initWhiteboard() {
             }
         });
 
-        $("#whiteboardContainer").on("drop", function (e) {
-            //Handle drop
-            if (ReadOnlyService.readOnlyActive) return;
-
+        function handleFileUploadEvent(e) {
+            console.log(e);
             if (e.originalEvent.dataTransfer) {
                 if (e.originalEvent.dataTransfer.files.length) {
                     //File from harddisc
@@ -759,26 +782,138 @@ function initWhiteboard() {
                     });
                 }
             }
+        }
+
+        $("#whiteboardContainer").on("drop", function (e) {
+            //Handle drop
+            if (ReadOnlyService.readOnlyActive) return;
+
+            handleFileUploadEvent(e);
             dragCounter = 0;
             whiteboard.dropIndicator.hide();
         });
 
-        new Picker({
-            parent: $("#whiteboardColorpicker")[0],
-            color: "#000000",
-            onChange: function (color) {
-                whiteboard.setDrawColor(color.rgbaString);
-            },
-        });
+        if (!localStorage.getItem("savedColors")) {
+            localStorage.setItem(
+                "savedColors",
+                JSON.stringify([
+                    "rgba(0, 0, 0, 1)",
+                    "rgba(255, 255, 255, 1)",
+                    "rgba(255, 0, 0, 1)",
+                    "rgba(0, 255, 0, 1)",
+                    "rgba(0, 0, 255, 1)",
+                    "rgba(255, 255, 0, 1)",
+                    "rgba(255, 0, 255, 1)",
+                ])
+            );
+        }
 
-        new Picker({
-            parent: $("#textboxBackgroundColorPicker")[0],
-            color: "#f5f587",
-            bgcolor: "#f5f587",
-            onChange: function (bgcolor) {
-                whiteboard.setTextBackgroundColor(bgcolor.rgbaString);
-            },
-        });
+        let colorPickerOnOpen = function (current_color) {
+            this._domPalette = $(".picker_palette", this.domElement);
+            const palette = JSON.parse(localStorage.getItem("savedColors"));
+            if ($(".picker_splotch", this._domPalette).length === 0) {
+                for (let i = 0; i < palette.length; i++) {
+                    let palette_Color_obj = new this.color.constructor(palette[i]);
+                    let splotch_div = $(
+                        '<div style="position:relative;"><span position="' +
+                            i +
+                            '" class="removeColor" style="position:absolute; cursor:pointer; right:-1px; top:-4px;">x</span></div>'
+                    )
+                        .addClass("picker_splotch")
+                        .attr({
+                            id: "s" + i,
+                        })
+                        .css("background-color", palette_Color_obj.hslaString)
+                        .on("click", { that: this, obj: palette_Color_obj }, function (e) {
+                            e.data.that._setColor(e.data.obj.hslaString);
+                        });
+                    splotch_div.find(".removeColor").on("click", function (e) {
+                        e.preventDefault();
+                        $(this).parent("div").remove();
+                        palette.splice(i, 1);
+                        localStorage.setItem("savedColors", JSON.stringify(palette));
+                    });
+                    this._domPalette.append(splotch_div);
+                }
+            }
+        };
+
+        const colorPickerTemplate = `
+        <div class="picker_wrapper" tabindex="-1">
+          <div class="picker_arrow"></div>
+          <div class="picker_hue picker_slider">
+            <div class="picker_selector"></div>
+          </div>
+          <div class="picker_sl">
+            <div class="picker_selector"></div>
+          </div>
+          <div class="picker_alpha picker_slider">
+            <div class="picker_selector"></div>
+          </div>
+          <div class="picker_palette"></div>
+          <div class="picker_editor">
+            <input aria-label="Type a color name or hex value"/>
+          </div>
+          <div class="picker_sample"></div>
+          <div class="picker_done">
+            <button>Ok</button>
+          </div>
+          <div class="picker_cancel">
+            <button>Cancel</button>
+          </div>
+        </div>
+      `;
+
+        let colorPicker = null;
+        function intColorPicker(initColor) {
+            if (colorPicker) {
+                colorPicker.destroy();
+            }
+            colorPicker = new Picker({
+                parent: $("#whiteboardColorpicker")[0],
+                color: initColor || "#000000",
+                onChange: function (color) {
+                    whiteboard.setDrawColor(color.rgbaString);
+                },
+                onDone: function (color) {
+                    let palette = JSON.parse(localStorage.getItem("savedColors"));
+                    if (!palette.includes(color.rgbaString)) {
+                        palette.push(color.rgbaString);
+                        localStorage.setItem("savedColors", JSON.stringify(palette));
+                    }
+                    intColorPicker(color.rgbaString);
+                },
+                onOpen: colorPickerOnOpen,
+                template: colorPickerTemplate,
+            });
+        }
+        intColorPicker();
+
+        let bgColorPicker = null;
+        function intBgColorPicker(initColor) {
+            if (bgColorPicker) {
+                bgColorPicker.destroy();
+            }
+            bgColorPicker = new Picker({
+                parent: $("#textboxBackgroundColorPicker")[0],
+                color: initColor || "#f5f587",
+                bgcolor: initColor || "#f5f587",
+                onChange: function (bgcolor) {
+                    whiteboard.setTextBackgroundColor(bgcolor.rgbaString);
+                },
+                onDone: function (bgcolor) {
+                    let palette = JSON.parse(localStorage.getItem("savedColors"));
+                    if (!palette.includes(color.rgbaString)) {
+                        palette.push(color.rgbaString);
+                        localStorage.setItem("savedColors", JSON.stringify(palette));
+                    }
+                    intBgColorPicker(color.rgbaString);
+                },
+                onOpen: colorPickerOnOpen,
+                template: colorPickerTemplate,
+            });
+        }
+        intBgColorPicker();
 
         // on startup select mouse
         shortcutFunctions.setTool_mouse();
@@ -828,15 +963,16 @@ function initWhiteboard() {
             url: document.URL.substr(0, document.URL.lastIndexOf("/")) + "/api/upload",
             data: {
                 imagedata: base64data,
-                whiteboardId: whiteboardId,
+                wid: whiteboardId,
                 date: date,
                 at: accessToken,
             },
             success: function (msg) {
                 const { correspondingReadOnlyWid } = ConfigService;
                 const filename = `${correspondingReadOnlyWid}_${date}.png`;
+                const rootUrl = document.URL.substr(0, document.URL.lastIndexOf("/"));
                 whiteboard.addImgToCanvasByUrl(
-                    `/uploads/${correspondingReadOnlyWid}/${filename}`
+                    `${rootUrl}/uploads/${correspondingReadOnlyWid}/${filename}`
                 ); //Add image to canvas
                 console.log("Image uploaded!");
             },
@@ -853,7 +989,7 @@ function initWhiteboard() {
             url: document.URL.substr(0, document.URL.lastIndexOf("/")) + "/api/upload",
             data: {
                 imagedata: base64data,
-                whiteboardId: whiteboardId,
+                wid: whiteboardId,
                 date: date,
                 at: accessToken,
                 webdavaccess: JSON.stringify(webdavaccess),
@@ -913,7 +1049,7 @@ function initWhiteboard() {
 
     // handle pasting from clipboard
     window.addEventListener("paste", function (e) {
-        if ($(".basicalert").length > 0) {
+        if ($(".basicalert").length > 0 || !!e.origin) {
             return;
         }
         if (e.clipboardData) {
