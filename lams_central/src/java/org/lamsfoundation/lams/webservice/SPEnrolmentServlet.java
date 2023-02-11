@@ -164,13 +164,18 @@ public class SPEnrolmentServlet extends HttpServlet {
 		Organisation rootOrganisation = userManagementService.getRootOrganisation();
 		Integer creatorId = rootOrganisation.getCreatedBy().getUserId();
 
-		// map of user login -> email, first name
+		// map of user login -> email, first name, user ID used as last name (only for learners)
 		// for learner email is login, for staff it is a different ID in email format
 		ConcurrentMap<String, String[]> allParsedUserMapping = allLines.parallelStream().unordered()
 			.collect(Collectors.toConcurrentMap(
 				elem -> elem.get(6).equals(Mode.STAFF.getRole())
-					|| elem.get(6).equals(Mode.MANAGER.getRole()) ? elem.get(3) : elem.get(5),
-				elem -> new String[] { elem.get(5), elem.get(4) }, (elem1, elem2) -> elem1));
+					|| elem.get(6).equals(Mode.MANAGER.getRole())
+						? elem.get(3)
+						: elem.get(5),
+				elem -> new String[] { elem.get(5), elem.get(4),
+					elem.get(6).equals(Mode.STAFF.getRole())
+						|| elem.get(6).equals(Mode.MANAGER.getRole()) ? "." : elem.get(3) },
+				(elem1, elem2) -> elem1));
 		logger.info("Found " + allParsedUserMapping.size() + " users in the file");
 
 		Integer extServerSid = extServer.getSid();
@@ -375,8 +380,9 @@ public class SPEnrolmentServlet extends HttpServlet {
 
 		String email = userEntry.getValue()[0];
 		String firstName = userEntry.getValue()[1];
+		String lastName = userEntry.getValue()[2];
 		ExtUserUseridMap userMap = integrationService.getImplicitExtUserUseridMap(extServer, login, password,
-			salt, firstName, ".", email);
+			salt, firstName, lastName, email);
 		user = userMap.getUser();
 
 		allExistingUsers.put(login, user);
