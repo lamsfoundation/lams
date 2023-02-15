@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -119,4 +120,9 @@ public interface ILearningDesignService {
      * it returns tool content ID of a matching tRAT / iRAT activity.
      */
     Long findMatchingRatActivity(long toolContentId);
+
+    /**
+     * Fills map with meta information about available activity types in the learning design.
+     */
+    Map<String, Object> getAvailableTBLActivityTypes(Long learningDesignId);
 }

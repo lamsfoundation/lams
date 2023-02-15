@@ -148,7 +148,8 @@ public class GradebookMonitoringController {
 	}
 	if (!securityService.hasOrgRole(organisationID, user.getUserID(),
 		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "get course gradebook page")) {
-	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a course manager in the organisation");
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN,
+		    "User is not a course manager or monitor in the organisation");
 	    return null;
 	}
 
@@ -368,7 +369,7 @@ public class GradebookMonitoringController {
 	    throws IOException {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "export lesson gradebook spreadsheet")) {
-	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a group manager in the lesson");
 	}
 
 	if (log.isDebugEnabled()) {
@@ -392,6 +393,40 @@ public class GradebookMonitoringController {
     }
 
     /**
+     * Exports TBL lessons in course to spreadsheet
+     */
+    @RequestMapping("/exportExcelTBLGradebook")
+    @ResponseBody
+    public void exportExcelTBLGradebook(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
+	UserDTO user = getUser();
+	if (!securityService.hasOrgRole(organisationID, user.getUserID(), new String[] { Role.GROUP_MANAGER },
+		"get course TBL gradebook spreadsheet")) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a group manager in the organisation");
+	    return;
+	}
+
+	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationID);
+	if (log.isDebugEnabled()) {
+	    log.debug("Exporting to a spreadsheet course TBL lessons: " + organisationID);
+	}
+	List<ExcelSheet> sheets = gradebookService.exportCourseTBLGradebook(user.getUserID(), organisationID);
+
+	String fileName = organisation.getName().replaceAll(" ", "_") + "_TBL.xlsx";
+	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
+
+	response.setContentType("application/x-download");
+	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+
+	// set cookie that will tell JS script that export has been finished
+	WebUtil.setFileDownloadTokenCookie(request, response);
+
+	// Code to generate file and write file contents to response
+	ServletOutputStream out = response.getOutputStream();
+	ExcelUtil.createExcel(out, sheets, gradebookService.getMessage("gradebook.export.dateheader"), true);
+    }
+
+    /**
      * Exports Course Gradebook into excel.
      */
     @RequestMapping("/exportExcelCourseGradebook")
@@ -400,9 +435,11 @@ public class GradebookMonitoringController {
 	    throws IOException {
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	UserDTO user = getUser();
+
 	if (!securityService.hasOrgRole(organisationID, user.getUserID(), new String[] { Role.GROUP_MANAGER },
 		"get course gradebook spreadsheet")) {
-	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a group manager in the organisation");
+	    return;
 	}
 
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationID);

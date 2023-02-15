@@ -232,6 +232,7 @@ public interface IGradebookFullService extends IGradebookService {
      * @param userID
      * @return
      */
+    @Override
     GradebookUserActivity getGradebookUserActivity(Long activityID, Integer userID);
 
     /**
@@ -283,19 +284,16 @@ public interface IGradebookFullService extends IGradebookService {
 
     /**
      * Get the summary data for course in order to create excel export
-     *
-     * @param userId
-     * @param organisationId
-     * @return
      */
     List<ExcelSheet> exportCourseGradebook(Integer userId, Integer organisationId);
 
     /**
+     * Get the summary data for course TBL lessons in order to create excel export
+     */
+    List<ExcelSheet> exportCourseTBLGradebook(Integer userId, Integer organisationId);
+
+    /**
      * Get the summary data for selected lessons in order to create excel export
-     *
-     * @param userId
-     * @param organisationId
-     * @return
      */
     List<ExcelSheet> exportSelectedLessonsGradebook(Integer userId, Integer organisationId, String[] lessonIds,
 	    boolean simplified);
@@ -313,4 +311,5 @@ public interface IGradebookFullService extends IGradebookService {
 
     /** Get a summary of the weightings */
     List<String[]> getWeights(LearningDesign design);
+
 }
