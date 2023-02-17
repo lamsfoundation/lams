@@ -90,27 +90,30 @@
 				<c:if test="${assessment.enableConfidenceLevels and question.type != 8}">
 					<%@ include file="confidencelevel.jsp"%>
 				</c:if>
+				
+				<%--Display jsutification for each question --%>
+				<c:if test="${(assessment.allowAnswerJustification || (question.type == 8 && question.hedgingJustificationEnabled)) 
+							&& justificationEligible && (!isLeadershipEnabled or isUserLeader)}">
+					<div class="form-group answer-justification-container voffset20">
+						<a data-toggle="collapse" data-target="#answer-justification-${question.uid}" role="button" class="collapsed">
+							<span class="if-collapsed"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i></span>
+				 				<span class="if-not-collapsed"><i class="fa fa-xs fa-minus-square-o roffset5" aria-hidden="true"></i></span>
+							<fmt:message key="label.answer.justification" />
+						</a>
+						
+						<div id="answer-justification-${question.uid}" class="collapse">
+							<textarea name="answerJustification${status.index}" class="form-control" rows="6" 
+									  placeholder='<fmt:message key="label.answer.justification.prompt"/>'
+							>${question.justification}</textarea>
+						</div>
+					</div>
+				</c:if>
+				
 			</div>
 					
 		</div>
 		
-		<%--Display jsutification for each question --%>
-		<c:if test="${(assessment.allowAnswerJustification || (question.type == 8 && question.hedgingJustificationEnabled)) 
-					&& justificationEligible && (!isLeadershipEnabled or isUserLeader)}">
-			<div class="form-group answer-justification-container">
-				<a data-toggle="collapse" data-target="#answer-justification-${question.uid}" role="button" class="collapsed">
-					<span class="if-collapsed"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i></span>
-		 				<span class="if-not-collapsed"><i class="fa fa-xs fa-minus-square-o roffset5" aria-hidden="true"></i></span>
-					<fmt:message key="label.answer.justification" />
-				</a>
-				
-				<div id="answer-justification-${question.uid}" class="collapse">
-					<textarea name="answerJustification${status.index}" class="form-control" rows="6" 
-							  placeholder='<fmt:message key="label.answer.justification.prompt"/>'
-					>${question.justification}</textarea>
-				</div>
-			</div>
-		</c:if>
+
 		
 		<%--Display Etherpad for each question --%>
 		<c:if test="${isQuestionEtherpadEnabled}">
