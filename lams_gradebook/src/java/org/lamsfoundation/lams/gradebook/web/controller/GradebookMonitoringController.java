@@ -400,8 +400,7 @@ public class GradebookMonitoringController {
     public void exportExcelTBLGradebook(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	UserDTO user = getUser();
-	if (!securityService.hasOrgRole(organisationID, user.getUserID(), new String[] { Role.GROUP_MANAGER },
-		"get course TBL gradebook spreadsheet")) {
+	if (!securityService.isGroupMonitor(organisationID, user.getUserID(), "get course TBL gradebook spreadsheet")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a group manager in the organisation");
 	    return;
 	}
@@ -436,8 +435,7 @@ public class GradebookMonitoringController {
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	UserDTO user = getUser();
 
-	if (!securityService.hasOrgRole(organisationID, user.getUserID(), new String[] { Role.GROUP_MANAGER },
-		"get course gradebook spreadsheet")) {
+	if (!securityService.isGroupMonitor(organisationID, user.getUserID(), "get course gradebook spreadsheet")) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a group manager in the organisation");
 	    return;
 	}
