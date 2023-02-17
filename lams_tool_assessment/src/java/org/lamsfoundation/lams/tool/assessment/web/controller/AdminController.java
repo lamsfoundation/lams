@@ -58,6 +58,9 @@ public class AdminController {
 	assessmentService.setConfigValue(AssessmentConstants.CONFIG_KEY_HIDE_TITLES,
 		String.valueOf(adminForm.isHideTitles()));
 
+	assessmentService.setConfigValue(AssessmentConstants.CONFIG_KEY_AUTO_EXPAND_JUSTIFICATION,
+		String.valueOf(adminForm.isAutoexpandJustification()));
+
 	request.setAttribute("savedSuccess", true);
 	return "/pages/admin/config";
 

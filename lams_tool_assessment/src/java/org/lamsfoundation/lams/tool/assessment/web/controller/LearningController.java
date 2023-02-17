@@ -418,6 +418,8 @@ public class LearningController {
 
 	sessionMap.put(AssessmentConstants.CONFIG_KEY_HIDE_TITLES,
 		Boolean.valueOf(service.getConfigValue(AssessmentConstants.CONFIG_KEY_HIDE_TITLES)));
+	sessionMap.put(AssessmentConstants.CONFIG_KEY_AUTO_EXPAND_JUSTIFICATION,
+		Boolean.valueOf(service.getConfigValue(AssessmentConstants.CONFIG_KEY_AUTO_EXPAND_JUSTIFICATION)));
 
 	if (!codeStyles.isEmpty()) {
 	    request.setAttribute(AssessmentConstants.ATTR_CODE_STYLES, codeStyles);
