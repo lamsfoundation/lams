@@ -25,11 +25,21 @@ package org.lamsfoundation.lams.tool.assessment.web.form;
 public class AdminForm {
     private boolean hideTitles;
 
+    private boolean autoexpandJustification;
+
     public boolean isHideTitles() {
 	return hideTitles;
     }
 
     public void setHideTitles(boolean hideTitles) {
 	this.hideTitles = hideTitles;
+    }
+
+    public boolean isAutoexpandJustification() {
+	return autoexpandJustification;
+    }
+
+    public void setAutoexpandJustification(boolean autoexpandJustification) {
+	this.autoexpandJustification = autoexpandJustification;
     }
 }

@@ -178,6 +178,14 @@
 					location.reload();
 				};
 			</c:if>
+
+			<c:if test="${sessionMap.autoexpandJustification and (!isLeadershipEnabled or isUserLeader)}">
+				// auto expand justification panel on first click
+				$('.question-area').find('input, select, .ordering-option').on('click change', function(){
+					$(this).closest('.question-area').children('.answer-justification-container:not(.autoopened)')
+						   .addClass('autoopened').children('.collapse').collapse('show');
+				});
+			</c:if>
 		});
 		
 		function countHedgeQuestionSelectTotal(questionIndex) {
