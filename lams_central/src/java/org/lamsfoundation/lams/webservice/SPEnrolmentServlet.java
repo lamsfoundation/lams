@@ -26,18 +26,24 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Spliterator;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -70,6 +76,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -105,6 +112,9 @@ public class SPEnrolmentServlet extends HttpServlet {
 
     private static final String FILE_INPUT_DEFAULT_NAME = "LAMS-OUTPUT.csv";
     private static final String FILE_INPUT_PARAM = "file-input";
+    private static final int THREADS_DEFAULT_VALUE = 4;
+    private static final String THREADS_PARAM = "threads";
+
     private static final String DELIMITER = "\\|";
     private static final String INTEGRATED_SERVER_NAME = "saml";
 
@@ -113,14 +123,26 @@ public class SPEnrolmentServlet extends HttpServlet {
     private static ILogEventService logEventService = null;
     private static IIntegrationService integrationService = null;
 
+    private int threadCount = THREADS_DEFAULT_VALUE;
+    private ExecutorService executor = null;
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	Integer threadCount = WebUtil.readIntParam(request, THREADS_PARAM, true);
+	if (threadCount != null && threadCount > 0) {
+	    this.threadCount = threadCount;
+	}
+	executor = Executors.newFixedThreadPool(this.threadCount);
+
 	// check if path to input file is provided as GET parameter
 	// if not, use default one of <tempDir>/LAMS-OUTPUT.csv
 	String fileInputParam = request.getParameter(FILE_INPUT_PARAM);
 	Path fileInput = StringUtils.isBlank(fileInputParam)
 		? Paths.get(Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR), FILE_INPUT_DEFAULT_NAME)
 		: Paths.get(fileInputParam);
+	if (!Files.isReadable(fileInput)) {
+	    throw new IOException("File not readable: " + fileInput.toAbsolutePath().toString());
+	}
 
 	// run processing in a separate thread as it can take a while and request would time out
 	new Thread(() -> {
@@ -154,11 +176,11 @@ public class SPEnrolmentServlet extends HttpServlet {
 			}).collect(Collectors.toList());
 
 		if (allLines.isEmpty()) {
-		    throw new ServletException("File is empty");
+		    throw new IOException("File is empty");
 		}
 
 		// map of user login -> user ID
-		Map<String, Integer> userIDs = new HashMap<>();
+		Map<String, Integer> userIDs = new ConcurrentHashMap<>();
 
 		// find sysadmin as he/she will be the creator of organisations
 		Organisation rootOrganisation = userManagementService.getRootOrganisation();
@@ -169,10 +191,9 @@ public class SPEnrolmentServlet extends HttpServlet {
 		ConcurrentMap<String, String[]> allParsedUserMapping = allLines.parallelStream().unordered()
 			.collect(Collectors.toConcurrentMap(
 				elem -> elem.get(6).equals(Mode.STAFF.getRole())
-					|| elem.get(6).equals(Mode.MANAGER.getRole())
-						? elem.get(3)
-						: elem.get(5),
-				elem -> new String[] { elem.get(5), elem.get(4),
+					|| elem.get(6).equals(Mode.MANAGER.getRole()) ? elem.get(3).toLowerCase()
+						: elem.get(5).toLowerCase(),
+				elem -> new String[] { elem.get(5).toLowerCase(), elem.get(4),
 					elem.get(6).equals(Mode.STAFF.getRole())
 						|| elem.get(6).equals(Mode.MANAGER.getRole()) ? "." : elem.get(3) },
 				(elem1, elem2) -> elem1));
@@ -181,15 +202,15 @@ public class SPEnrolmentServlet extends HttpServlet {
 		Integer extServerSid = extServer.getSid();
 		// load all users from DB which are present in the output file
 		// map of user login -> user
-		Map<String, User> allExistingParsedUsers = userManagementService
+		ConcurrentMap<String, User> allExistingParsedUsers = userManagementService
 			.findByPropertyValues(User.class, "login", allParsedUserMapping.keySet()).parallelStream()
-			.collect(Collectors.toConcurrentMap(User::getLogin, u -> u));
+			.collect(Collectors.toConcurrentMap(u -> u.getLogin().toLowerCase(), u -> u));
 
 		logger.info(allExistingParsedUsers.size() + " users already exist");
 
 		// load all ext users from DB which are present in the output file
 		// map of user login -> extUser
-		Map<String, ExtUserUseridMap> allExistingParsedExtUsers = userManagementService
+		ConcurrentMap<String, ExtUserUseridMap> allExistingParsedExtUsers = userManagementService
 			.findByPropertyValues(ExtUserUseridMap.class, "extUsername", allExistingParsedUsers.keySet())
 			.parallelStream().filter(e -> e.getExtServer().getSid().equals(extServerSid))
 			.collect(Collectors.toConcurrentMap(ExtUserUseridMap::getExtUsername, e -> e));
@@ -207,7 +228,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 
 		// load all organisations from DB which are present in the output file, by code
 		// map of code -> organisation
-		Map<String, Organisation> allExistingParsedCourses = userManagementService
+		ConcurrentMap<String, Organisation> allExistingParsedCourses = userManagementService
 			.findByPropertyValues(Organisation.class, "code", allParsedCourseMapping.keySet())
 			.parallelStream().collect(Collectors.toConcurrentMap(Organisation::getCode, o -> o));
 
@@ -226,13 +247,13 @@ public class SPEnrolmentServlet extends HttpServlet {
 		logger.info(allParsedSubcourseMapping.size() + " subcourses already exist");
 
 		// map of course ID -> subcourse code -> subcourse
-		Map<Integer, ConcurrentMap<String, Organisation>> allExistingParsedCoursesAndSubcourses = allExistingParsedSubcourses
+		ConcurrentMap<Integer, ConcurrentMap<String, Organisation>> allExistingParsedCoursesAndSubcourses = allExistingParsedSubcourses
 			.parallelStream().filter(o -> o.getParentOrganisation() != null)
 			.collect(Collectors.groupingByConcurrent(o -> o.getParentOrganisation().getOrganisationId(),
 				Collectors.toConcurrentMap(Organisation::getCode, o -> o)));
 
 		// load all ext courses and subcourses from DB which are present in the output file
-		Map<Integer, ExtCourseClassMap> allExistingParsedExtCourses = userManagementService
+		ConcurrentMap<Integer, ExtCourseClassMap> allExistingParsedExtCourses = userManagementService
 			.findByPropertyValues(ExtCourseClassMap.class, "classid", Stream
 				// merge IDs of organisations and suborganisations
 				.concat(allExistingParsedCourses.values().stream(),
@@ -247,7 +268,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 			.collect(Collectors.mapping(UserOrganisation::getUser, Collectors.toSet()));
 
 		// map lines into corresponding roles
-		Map<String, List<List<String>>> linesByMode = allLines.stream()
+		ConcurrentMap<String, List<List<String>>> linesByMode = allLines.stream()
 			.collect(Collectors.groupingByConcurrent(row -> row.get(6)));
 
 		for (String role : Mode.getAllRoles()) {
@@ -283,20 +304,54 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    if (mode == Mode.MANAGER) {
 			// map of course code -> user logins
 			Map<String, List<String>> mappings = lines.stream()
-				.collect(Collectors.groupingBy(elem -> elem.get(0), LinkedHashMap::new,
+				.collect(Collectors.groupingByConcurrent(elem -> elem.get(0), ConcurrentHashMap::new,
 					Collectors.mapping(elem -> elem.get(3), Collectors.toList())));
 
 			AtomicInteger mappingsProcessed = new AtomicInteger();
 			logger.info("Processing manager courses and assigments");
 
-			for (Entry<String, String> courseEntry : allParsedCourseMapping.entrySet()) {
-			    Organisation course = getCourse(courseEntry.getKey(), courseEntry.getValue(), extServer,
-				    creatorId, rootOrganisation, allExistingParsedCourses, allExistingParsedExtCourses);
+			Collection<Spliterator<Entry<String, String>>> spliterators = splitCollection(
+				allParsedCourseMapping.entrySet());
+			List<Future<?>> futures = new ArrayList<>(spliterators.size());
 
-			    assignManagers(course, creatorId, mappings, allParsedUsers, userIDs, allExistingRoles,
-				    allExistingParsedUsers, mappingsProcessed);
+			for (Spliterator<Entry<String, String>> spliterator : spliterators) {
+			    logger.info("Managers processing split count: " + spliterator.estimateSize());
 
-			    logger.info("Processed " + mappingsProcessed.get() + " entries");
+			    futures.add(executor.submit(new Callable<Integer>() {
+				@Override
+				public Integer call() throws Exception {
+				    try {
+					HibernateSessionManager.openSession();
+					boolean elementsRemaining = true;
+					do {
+					    elementsRemaining = spliterator.tryAdvance(courseEntry -> {
+						logger.info("Processing course: " + courseEntry.getValue());
+
+						try {
+						    Organisation course = getCourse(courseEntry.getKey(),
+							    courseEntry.getValue(), extServer, creatorId,
+							    rootOrganisation, allExistingParsedCourses,
+							    allExistingParsedExtCourses);
+						    assignManagers(course, creatorId, mappings, allParsedUsers, userIDs,
+							    allExistingRoles, allExistingParsedUsers,
+							    mappingsProcessed);
+
+						    logger.info("Processed " + mappingsProcessed.get() + " entries");
+						} catch (UserInfoValidationException | InterruptedException
+							| ExecutionException e) {
+						    logger.error("Error while processing managers", e);
+						}
+					    });
+					} while (elementsRemaining);
+				    } finally {
+					HibernateSessionManager.closeSession();
+				    }
+				    return null;
+				}
+			    }));
+			}
+			for (Future<?> future : futures) {
+			    future.get();
 			}
 			logger.info("Processing manager role finished");
 
@@ -307,9 +362,9 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    // START OF LEARNER / STAFF PROCESSING
 
 		    // map of course code -> subcourse code -> user logins
-		    Map<String, Map<String, List<String>>> mappings = lines.stream()
-			    .collect(Collectors.groupingBy(elem -> elem.get(0), LinkedHashMap::new,
-				    Collectors.groupingBy(elem -> elem.get(2), LinkedHashMap::new,
+		    ConcurrentMap<String, ConcurrentMap<String, List<String>>> mappings = lines.stream()
+			    .collect(Collectors.groupingByConcurrent(elem -> elem.get(0), ConcurrentHashMap::new,
+				    Collectors.groupingByConcurrent(elem -> elem.get(2), ConcurrentHashMap::new,
 					    Collectors.mapping(elem -> mode == Mode.STAFF ? elem.get(3) : elem.get(5),
 						    Collectors.toList()))));
 
@@ -353,11 +408,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 	    } catch (Exception e) {
 		logger.error("Error while provisioning SP enrolments", e);
 	    } finally {
-		try {
-		    HibernateSessionManager.closeSession();
-		} catch (Exception e) {
-		    logger.error("Error while closing Hibernate session", e);
-		}
+		HibernateSessionManager.closeSession();
 	    }
 	}).start();
 
@@ -367,61 +418,93 @@ public class SPEnrolmentServlet extends HttpServlet {
     private Set<User> createUsers(ExtServer extServer, Integer creatorId, Map<String, String[]> users,
 	    Map<String, Integer> userIDs, Map<String, User> allExistingUsers,
 	    Map<String, ExtUserUseridMap> allExistingExtUsers)
-	    throws UserInfoValidationException, UserInfoFetchException {
-	Set<User> allUsersParsed = new HashSet<>();
+	    throws UserInfoValidationException, UserInfoFetchException, InterruptedException, ExecutionException {
+	Set<User> allUsersParsed = ConcurrentHashMap.newKeySet();
 	logger.info("Creating users");
-	for (Entry<String, String[]> userEntry : users.entrySet()) {
-	    // email servers as login
-	    String login = userEntry.getKey();
-	    User user = allExistingUsers.get(login);
-	    if (user == null) {
-		String salt = HashUtil.salt();
-		String password = HashUtil.sha256(RandomPasswordGenerator.nextPassword(10), salt);
 
-		String email = userEntry.getValue()[0];
-		String firstName = userEntry.getValue()[1];
-		String lastName = userEntry.getValue()[2];
-		ExtUserUseridMap userMap = integrationService.getImplicitExtUserUseridMap(extServer, login, password,
-			salt, firstName, lastName, email);
-		user = userMap.getUser();
+	Collection<Spliterator<Entry<String, String[]>>> spliterators = splitCollection(users.entrySet());
+	List<Future<?>> futures = new ArrayList<>(spliterators.size());
 
-		allExistingUsers.put(login, user);
-		allExistingExtUsers.put(login, userMap);
+	for (Spliterator<Entry<String, String[]>> spliterator : spliterators) {
+	    logger.info("Users processing split count: " + spliterator.estimateSize());
 
-		String message = "User created with login \"" + login + "\" and ID " + user.getUserId();
-		logger.info(message);
-		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
-			"SPEnrolment: " + message);
-	    } else {
-		ExtUserUseridMap userMap = allExistingExtUsers.get(login);
-		if (userMap == null) {
-		    userMap = new ExtUserUseridMap();
-		    userMap.setExtServer(extServer);
-		    userMap.setUser(user);
-		    userMap.setExtUsername(login);
-		    userManagementService.save(userMap);
+	    futures.add(executor.submit(new Callable<Integer>() {
+		@Override
+		public Integer call() throws Exception {
+		    try {
+			HibernateSessionManager.openSession();
+			boolean elementsRemaining = true;
+			do {
+			    elementsRemaining = spliterator.tryAdvance(userEntry -> {
 
-		    allExistingExtUsers.put(login, userMap);
+				// email servers as login
+				String login = userEntry.getKey();
+				User user = allExistingUsers.get(login.toLowerCase());
+				if (user == null) {
+				    String salt = HashUtil.salt();
+				    String password = HashUtil.sha256(RandomPasswordGenerator.nextPassword(10), salt);
 
-		    String message = "External user created for existing user with login \"" + login + "\" and ID "
-			    + user.getUserId();
-		    logger.info(message);
-		    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
-			    "SPEnrolment: " + message);
+				    String email = userEntry.getValue()[0];
+				    String firstName = userEntry.getValue()[1];
+				    String lastName = userEntry.getValue()[2];
+				    ExtUserUseridMap userMap = null;
+				    try {
+					userMap = integrationService.getImplicitExtUserUseridMap(extServer, login,
+						password, salt, firstName, lastName, email);
+				    } catch (UserInfoValidationException e) {
+					logger.error("Error while getting/creating external user: " + login, e);
+					return;
+				    }
+				    user = userMap.getUser();
+
+				    allExistingUsers.put(login, user);
+				    allExistingExtUsers.put(login, userMap);
+
+				    String message = "User created with login \"" + login + "\" and ID "
+					    + user.getUserId();
+				    logger.info(message);
+				    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
+					    "SPEnrolment: " + message);
+				} else {
+				    ExtUserUseridMap userMap = allExistingExtUsers.get(login);
+				    if (userMap == null) {
+					userMap = new ExtUserUseridMap();
+					userMap.setExtServer(extServer);
+					userMap.setUser(user);
+					userMap.setExtUsername(login);
+					userManagementService.save(userMap);
+
+					allExistingExtUsers.put(login, userMap);
+
+					String message = "External user created for existing user with login \"" + login
+						+ "\" and ID " + user.getUserId();
+					logger.info(message);
+					logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null,
+						null, "SPEnrolment: " + message);
+				    }
+				    if (user.getDisabledFlag()) {
+					// re-enable user who was disabled before
+					user.setDisabledFlag(false);
+					userManagementService.save(user);
+				    }
+				}
+
+				// fill data for later usage
+				userIDs.put(login, user.getUserId());
+				// add user to a collection of all users in the parsed file
+				allUsersParsed.add(user);
+			    });
+			} while (elementsRemaining);
+		    } finally {
+			HibernateSessionManager.closeSession();
+		    }
+		    return null;
 		}
-		if (user.getDisabledFlag()) {
-		    // re-enable user who was disabled before
-		    user.setDisabledFlag(false);
-		    userManagementService.save(user);
-		}
-	    }
-
-	    // fill data for later usage
-	    userIDs.put(login, user.getUserId());
-	    // add user to a collection of all users in the parsed file
-	    allUsersParsed.add(user);
+	    }));
 	}
-
+	for (Future<?> future : futures) {
+	    future.get();
+	}
 	return allUsersParsed;
     }
 
@@ -447,6 +530,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 	    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
 		    "SPEnrolment: " + message);
 	} else {
+	    course = userManagementService.getOrganisationById(course.getOrganisationId());
 	    String name = course.getName();
 
 	    ExtCourseClassMap extOrgMap = allExistingParsedExtCourses.get(course.getOrganisationId());
@@ -470,169 +554,218 @@ public class SPEnrolmentServlet extends HttpServlet {
     }
 
     @SuppressWarnings("unchecked")
-    private void assignLearnersOrStaff(Organisation course, Map<String, Map<String, List<String>>> mappings,
+    private void assignLearnersOrStaff(Organisation course, Map<String, ConcurrentMap<String, List<String>>> mappings,
 	    ExtServer extServer, Integer creatorId, Set<User> allUsersParsed, Map<String, Integer> userIDs,
 	    Map<String, Map<Integer, Set<Integer>>> allExistingRoles,
 	    Map<Integer, ConcurrentMap<String, Organisation>> allExistingParsedCoursesAndSubcourses,
 	    Map<Integer, ExtCourseClassMap> allExistingParsedExtCourses, Map<String, User> allExistingParsedUsers,
-	    boolean isStaffMode, AtomicInteger mappingsProcessed) throws UserInfoValidationException {
+	    boolean isStaffMode, AtomicInteger mappingsProcessed)
+	    throws UserInfoValidationException, InterruptedException, ExecutionException {
 	String courseCode = course.getCode();
 	Integer courseId = course.getOrganisationId();
 	ConcurrentMap<String, Organisation> existingSubcourses = allExistingParsedCoursesAndSubcourses.get(courseId);
-	Map<String, Organisation> nonProcessedSubcourses = existingSubcourses == null ? new HashMap<>()
-		: new HashMap<>(existingSubcourses);
+	Map<String, Organisation> nonProcessedSubcourses = existingSubcourses == null ? new ConcurrentHashMap<>()
+		: new ConcurrentHashMap<>(existingSubcourses);
 	// go through each subcourse
 	Map<String, List<String>> subcourseMappings = mappings.get(courseCode);
 	if (subcourseMappings != null) {
-	    for (Entry<String, List<String>> subcourseEntry : subcourseMappings.entrySet()) {
-		String subcourseCode = subcourseEntry.getKey();
-		nonProcessedSubcourses.remove(subcourseCode);
+	    Collection<Spliterator<Entry<String, List<String>>>> spliterators = splitCollection(
+		    subcourseMappings.entrySet());
+	    List<Future<?>> futures = new ArrayList<>(spliterators.size());
 
-		Organisation subcourse = existingSubcourses == null ? null : existingSubcourses.get(subcourseCode);
-		// create subcourse
-		if (subcourse == null) {
-		    ExtCourseClassMap extSubOrgMap = integrationService.createExtCourseClassMap(extServer, creatorId,
-			    subcourseCode, subcourseCode, course.getOrganisationId().toString(), false);
-		    subcourse = extSubOrgMap.getOrganisation();
-		    subcourse.setCode(subcourseCode);
-		    userManagementService.save(subcourse);
+	    for (Spliterator<Entry<String, List<String>>> spliterator : spliterators) {
+		logger.info("Learners/staff processing split count: " + spliterator.estimateSize());
 
-		    if (existingSubcourses == null) {
-			existingSubcourses = new ConcurrentHashMap<>();
-			allExistingParsedCoursesAndSubcourses.put(courseId, existingSubcourses);
-		    }
-		    existingSubcourses.put(subcourse.getCode(), subcourse);
-		    allExistingParsedExtCourses.put(extSubOrgMap.getOrganisation().getOrganisationId(), extSubOrgMap);
+		futures.add(executor.submit(new Callable<Integer>() {
+		    @Override
+		    public Integer call() throws Exception {
+			try {
+			    HibernateSessionManager.openSession();
+			    boolean elementsRemaining = true;
+			    do {
+				elementsRemaining = spliterator.tryAdvance(subcourseEntry -> {
+				    try {
+					ConcurrentMap<String, Organisation> existingSubcoursesInternal = existingSubcourses;
+					String subcourseCode = subcourseEntry.getKey();
+					nonProcessedSubcourses.remove(subcourseCode);
 
-		    String message = "Subcourse created with code and name \"" + courseCode + "\" and ID "
-			    + subcourse.getOrganisationId();
-		    logger.info(message);
-		    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
-			    "SPEnrolment: " + message);
-		} else {
-		    String name = subcourse.getName();
+					logger.info("Processing subcourse with code: " + subcourseCode);
 
-		    ExtCourseClassMap extOrgMap = allExistingParsedExtCourses.get(subcourse.getOrganisationId());
-		    if (extOrgMap == null) {
-			extOrgMap = new ExtCourseClassMap();
-			extOrgMap.setCourseid(name);
-			extOrgMap.setExtServer(extServer);
-			extOrgMap.setOrganisation(subcourse);
-			userManagementService.save(extOrgMap);
+					Organisation subcourse = existingSubcoursesInternal == null ? null
+						: existingSubcoursesInternal.get(subcourseCode);
+					// create subcourse
+					if (subcourse == null) {
+					    ExtCourseClassMap extSubOrgMap;
 
-			String message = "External subcourse created for existing subcourse with code \""
-				+ subcourseCode + "\" and name \"" + name + "\" and ID "
-				+ subcourse.getOrganisationId();
-			logger.info(message);
-			logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
-				"SPEnrolment: " + message);
-		    }
-		}
+					    extSubOrgMap = integrationService.createExtCourseClassMap(extServer,
+						    creatorId, subcourseCode, subcourseCode,
+						    course.getOrganisationId().toString(), false);
 
-		Integer subcourseId = subcourse.getOrganisationId();
+					    subcourse = extSubOrgMap.getOrganisation();
+					    subcourse.setCode(subcourseCode);
+					    userManagementService.save(subcourse);
 
-		// get existing learners/staff members for given subcourse
-		Collection<User> subcourseMonitorsOrLearners = userManagementService
-			.getUsersFromOrganisationByRole(subcourseId, isStaffMode ? Role.MONITOR : Role.LEARNER, true);
-		Collection<User> subcourseUsers = new HashSet<>(subcourseMonitorsOrLearners);
-		if (isStaffMode) {
-		    // make sure that staff has both monitor and author roles in subcourse,
-		    // even if they are course managers in the parent organisations
-		    // and they already have a monitor role in subcourse
-		    Collection<User> authors = userManagementService.getUsersFromOrganisationByRole(subcourseId,
-			    Role.AUTHOR, true);
-		    subcourseUsers.retainAll(authors);
-		}
+					    if (existingSubcoursesInternal == null) {
+						existingSubcoursesInternal = new ConcurrentHashMap<>();
+						allExistingParsedCoursesAndSubcourses.put(courseId,
+							existingSubcoursesInternal);
+					    }
+					    existingSubcoursesInternal.put(subcourse.getCode(), subcourse);
+					    allExistingParsedExtCourses.put(
+						    extSubOrgMap.getOrganisation().getOrganisationId(), extSubOrgMap);
 
-		// go through each user
-		for (String login : subcourseEntry.getValue()) {
+					    String message = "Subcourse created with code and name \"" + courseCode
+						    + "\" and ID " + subcourse.getOrganisationId();
+					    logger.info(message);
+					    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null,
+						    null, null, "SPEnrolment: " + message);
+					} else {
+					    String name = subcourse.getName();
 
-		    logger.info("Processing \"" + login + "\"");
+					    ExtCourseClassMap extOrgMap = allExistingParsedExtCourses
+						    .get(subcourse.getOrganisationId());
+					    if (extOrgMap == null) {
+						extOrgMap = new ExtCourseClassMap();
+						extOrgMap.setCourseid(name);
+						extOrgMap.setExtServer(extServer);
+						extOrgMap.setOrganisation(subcourse);
+						userManagementService.save(extOrgMap);
 
-		    mappingsProcessed.incrementAndGet();
+						String message = "External subcourse created for existing subcourse with code \""
+							+ subcourseCode + "\" and name \"" + name + "\" and ID "
+							+ subcourse.getOrganisationId();
+						logger.info(message);
+						logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null,
+							null, null, "SPEnrolment: " + message);
+					    }
+					}
 
-		    // check if the user is already a learner/staff member in the subcourse
-		    // if so, there is nothing to do
-		    boolean userAlreadyAssigned = false;
-		    Integer userId = userIDs.get(login);
-		    Iterator<User> subcourseUserIterator = subcourseUsers.iterator();
-		    while (subcourseUserIterator.hasNext()) {
-			User user = subcourseUserIterator.next();
-			if (userId.equals(user.getUserId())) {
-			    // IMPORTANT: if we found a matching existing learner/staff member, we get remove him from this collection
-			    // so after this loop he does not get removed from subcourses
-			    subcourseUserIterator.remove();
-			    subcourseMonitorsOrLearners.remove(user);
-			    userAlreadyAssigned = true;
-			    break;
+					Integer subcourseId = subcourse.getOrganisationId();
+
+					// get existing learners/staff members for given subcourse
+					Collection<User> subcourseMonitorsOrLearners = userManagementService
+						.getUsersFromOrganisationByRole(subcourseId,
+							isStaffMode ? Role.MONITOR : Role.LEARNER, true);
+					Set<User> subcourseUsers = ConcurrentHashMap.newKeySet();
+					subcourseUsers.addAll(subcourseMonitorsOrLearners);
+					if (isStaffMode) {
+					    // make sure that staff has both monitor and author roles in subcourse,
+					    // even if they are course managers in the parent organisations
+					    // and they already have a monitor role in subcourse
+					    Collection<User> authors = userManagementService
+						    .getUsersFromOrganisationByRole(subcourseId, Role.AUTHOR, true);
+					    subcourseUsers.retainAll(authors);
+					}
+
+					final Organisation finalSubcourse = subcourse;
+
+					for (String login : subcourseEntry.getValue()) {
+
+					    logger.info("Processing \"" + login + "\"");
+
+					    mappingsProcessed.incrementAndGet();
+
+					    // check if the user is already a learner/staff member in the subcourse
+					    // if so, there is nothing to do
+					    boolean userAlreadyAssigned = false;
+					    Integer userId = userIDs.get(login);
+					    Iterator<User> subcourseUserIterator = subcourseUsers.iterator();
+					    while (subcourseUserIterator.hasNext()) {
+						User user = subcourseUserIterator.next();
+						if (userId.equals(user.getUserId())) {
+						    // IMPORTANT: if we found a matching existing learner/staff member, we get remove him from this collection
+						    // so after this loop he does not get removed from subcourses
+						    subcourseUserIterator.remove();
+						    subcourseMonitorsOrLearners.remove(user);
+						    userAlreadyAssigned = true;
+						    break;
+						}
+					    }
+					    if (userAlreadyAssigned) {
+						return;
+					    }
+
+					    // the user is not a learner/staff member yet, so assign him the role and add him to lessons
+					    Map<Integer, Set<Integer>> existingSubcoursesRoles = allExistingRoles
+						    .get(login);
+					    Set<Integer> existingSubcourseRoles = existingSubcoursesRoles == null ? null
+						    : allExistingRoles.get(login).get(subcourseId);
+					    if (existingSubcourseRoles == null) {
+						existingSubcourseRoles = new HashSet<>();
+					    }
+					    if (isStaffMode) {
+						existingSubcourseRoles.add(Role.ROLE_AUTHOR);
+						existingSubcourseRoles.add(Role.ROLE_MONITOR);
+					    } else {
+						existingSubcourseRoles.add(Role.ROLE_LEARNER);
+					    }
+					    User user = allExistingParsedUsers.get(login.toLowerCase());
+					    userManagementService
+						    .setRolesForUserOrganisation(
+							    user, finalSubcourse, existingSubcourseRoles.stream()
+								    .map(String::valueOf).collect(Collectors.toList()),
+							    false);
+
+					    for (Lesson lesson : lessonService.getLessonsByGroup(subcourseId)) {
+						if (isStaffMode) {
+						    lessonService.addStaffMember(lesson.getLessonId(), userId);
+						} else {
+						    lessonService.addLearner(lesson.getLessonId(), userId);
+						}
+					    }
+
+					    String message = (isStaffMode ? "Teacher" : "Learner") + " \"" + login
+						    + "\" added to subcourse " + subcourseId + " and its lessons";
+					    logger.info(message);
+					    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null,
+						    null, null, "SPEnrolment: " + message);
+					}
+
+					// user is a learner/staff member, but he should not; remove him role from subcourse, course and lessons
+					for (User user : subcourseMonitorsOrLearners) {
+
+					    boolean removedFromSubcourse = removeFromCourse(subcourse, user,
+						    isStaffMode ? Mode.STAFF : Mode.LEARNER, allExistingRoles);
+					    if (removedFromSubcourse) {
+						String message = (isStaffMode ? "Teacher" : "Learner") + " \""
+							+ user.getLogin() + "\" removed from subcourse " + subcourseId
+							+ " and its lessons";
+						logger.info(message);
+						logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null,
+							null, null, "SPEnrolment: " + message);
+					    }
+					}
+				    } catch (UserInfoValidationException e) {
+					logger.error("Error while processing learners/staff", e);
+				    }
+				});
+			    } while (elementsRemaining);
+			} finally {
+			    HibernateSessionManager.closeSession();
 			}
+			return null;
 		    }
-		    if (userAlreadyAssigned) {
-			continue;
-		    }
+		}));
+	    }
+	    for (Future<?> future : futures) {
+		future.get();
+	    }
 
-		    // the user is not a learner/staff member yet, so assign him the role and add him to lessons
-		    Map<Integer, Set<Integer>> existingSubcoursesRoles = allExistingRoles.get(login);
-		    Set<Integer> existingSubcourseRoles = existingSubcoursesRoles == null ? null
-			    : allExistingRoles.get(login).get(subcourseId);
-		    if (existingSubcourseRoles == null) {
-			existingSubcourseRoles = new HashSet<>();
-		    }
-		    if (isStaffMode) {
-			existingSubcourseRoles.add(Role.ROLE_AUTHOR);
-			existingSubcourseRoles.add(Role.ROLE_MONITOR);
-		    } else {
-			existingSubcourseRoles.add(Role.ROLE_LEARNER);
-		    }
-		    User user = allExistingParsedUsers.get(login);
-		    userManagementService.setRolesForUserOrganisation(user, subcourse,
-			    existingSubcourseRoles.stream().map(String::valueOf).collect(Collectors.toList()), false);
-
-		    for (Lesson lesson : lessonService.getLessonsByGroup(subcourseId)) {
-			if (isStaffMode) {
-			    lessonService.addStaffMember(lesson.getLessonId(), userId);
-			} else {
-			    lessonService.addLearner(lesson.getLessonId(), userId);
-			}
-		    }
-
-		    String message = (isStaffMode ? "Teacher" : "Learner") + " \"" + login + "\" added to subcourse "
-			    + subcourseId + " and its lessons";
-		    logger.info(message);
-		    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
-			    "SPEnrolment: " + message);
-		}
-
-		// user is a learner/staff member, but he should not; remove him role from subcourse, course and lessons
+	    for (Organisation subcourse : nonProcessedSubcourses.values()) {
+		// get all learners/staff members for given subcourse and remove them
+		Collection<User> subcourseMonitorsOrLearners = userManagementService.getUsersFromOrganisationByRole(
+			subcourse.getOrganisationId(), isStaffMode ? Role.MONITOR : Role.LEARNER, true);
 		for (User user : subcourseMonitorsOrLearners) {
 
 		    boolean removedFromSubcourse = removeFromCourse(subcourse, user,
 			    isStaffMode ? Mode.STAFF : Mode.LEARNER, allExistingRoles);
 		    if (removedFromSubcourse) {
 			String message = (isStaffMode ? "Teacher" : "Learner") + " \"" + user.getLogin()
-				+ "\" removed from subcourse " + subcourseId + " and its lessons";
+				+ "\" removed from subcourse " + subcourse.getOrganisationId() + " and its lessons";
 			logger.info(message);
 			logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
 				"SPEnrolment: " + message);
 		    }
-		}
-	    }
-	}
-
-	for (Organisation subcourse : nonProcessedSubcourses.values()) {
-	    // get all learners/staff members for given subcourse and remove them
-	    Collection<User> subcourseMonitorsOrLearners = userManagementService.getUsersFromOrganisationByRole(
-		    subcourse.getOrganisationId(), isStaffMode ? Role.MONITOR : Role.LEARNER, true);
-	    for (User user : subcourseMonitorsOrLearners) {
-
-		boolean removedFromSubcourse = removeFromCourse(subcourse, user,
-			isStaffMode ? Mode.STAFF : Mode.LEARNER, allExistingRoles);
-		if (removedFromSubcourse) {
-		    String message = (isStaffMode ? "Teacher" : "Learner") + " \"" + user.getLogin()
-			    + "\" removed from subcourse " + subcourse.getOrganisationId() + " and its lessons";
-		    logger.info(message);
-		    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
-			    "SPEnrolment: " + message);
 		}
 	    }
 	}
@@ -699,7 +832,8 @@ public class SPEnrolmentServlet extends HttpServlet {
     private void assignManagers(Organisation course, Integer creatorId, Map<String, List<String>> mappings,
 	    Set<User> allUsersParsed, Map<String, Integer> userIDs,
 	    Map<String, Map<Integer, Set<Integer>>> allExistingRoles, Map<String, User> allExistingParsedUsers,
-	    AtomicInteger mappingsProcessed) throws UserInfoValidationException {
+	    AtomicInteger mappingsProcessed)
+	    throws UserInfoValidationException, InterruptedException, ExecutionException {
 	String courseCode = course.getCode();
 	Integer courseId = course.getOrganisationId();
 
@@ -733,11 +867,12 @@ public class SPEnrolmentServlet extends HttpServlet {
 		Set<Integer> existingCourseRoles = existingCoursesRoles == null ? null
 			: allExistingRoles.get(login).get(courseId);
 		if (existingCourseRoles == null) {
-		    existingCourseRoles = new HashSet<>();
+		    existingCourseRoles = ConcurrentHashMap.newKeySet();
 		}
 		existingCourseRoles.add(Role.ROLE_GROUP_MANAGER);
 
-		User user = allExistingParsedUsers.get(login);
+		User user = allExistingParsedUsers.get(login.toLowerCase());
+
 		userManagementService.setRolesForUserOrganisation(user, course,
 			existingCourseRoles.stream().map(String::valueOf).collect(Collectors.toList()), true);
 
@@ -760,6 +895,26 @@ public class SPEnrolmentServlet extends HttpServlet {
 			"SPEnrolment: " + message);
 	    }
 	}
+    }
+
+    /**
+     * Splits collection into as many spliterators as there are threads
+     */
+    private <T> Collection<Spliterator<T>> splitCollection(Collection<T> collection) {
+	// if there is only 100 entries, do it in one thread
+	int threadCount = collection.size() < 100 ? 1 : this.threadCount;
+
+	LinkedList<Spliterator<T>> spliterators = new LinkedList<>();
+	spliterators.add(collection.spliterator());
+	for (int threadIndex = 1; threadIndex < threadCount; threadIndex++) {
+	    Spliterator<T> spliterator = spliterators.removeFirst();
+	    spliterators.add(spliterator);
+	    Spliterator<T> anotherSpliterator = spliterator.trySplit();
+	    if (anotherSpliterator != null) {
+		spliterators.add(anotherSpliterator);
+	    }
+	}
+	return spliterators;
     }
 
     @Override
