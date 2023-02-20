@@ -105,7 +105,17 @@
                     <form:checkbox path="scratchie.revealOnDoubleClick" id="reveal-on-double-click"/>
                     <fmt:message key="label.authoring.advanced.reveal.double.click" />
                 </label>
-                <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="right" title="" data-original-title="<fmt:message key="label.authoring.advanced.reveal.double.click.tooltip" />"></i>
+                <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="right" title=""
+                   data-original-title="<fmt:message key="label.authoring.advanced.reveal.double.click.tooltip" />"></i>
+            </div>
+            
+            <div class="checkbox">
+                <label for="require-all-answers">
+                    <form:checkbox path="scratchie.requireAllAnswers" id="require-all-answers"/>
+                    <fmt:message key="label.authoring.advanced.require.all.answers" />
+                </label>
+                <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="bottom" title=""
+                   data-original-title="<fmt:message key="label.authoring.advanced.require.all.answers.tooltip" />"></i>
             </div>
 
             <div class="checkbox">

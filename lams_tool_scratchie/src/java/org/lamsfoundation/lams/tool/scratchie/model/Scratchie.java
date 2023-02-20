@@ -112,6 +112,9 @@ public class Scratchie implements Cloneable {
     @Column(name = "double_click")
     private boolean revealOnDoubleClick;
 
+    @Column(name = "require_all_answers")
+    private boolean requireAllAnswers;
+
     @Column(name = "confidence_levels_activity_uiid")
     private Integer confidenceLevelsActivityUiid;
 
@@ -212,8 +215,6 @@ public class Scratchie implements Cloneable {
     /**
      * Returns the object's creation date
      *
-     * @return date
-     *
      */
     public Date getCreated() {
 	return created;
@@ -221,8 +222,6 @@ public class Scratchie implements Cloneable {
 
     /**
      * Sets the object's creation date
-     *
-     * @param created
      */
     public void setCreated(Date created) {
 	this.created = created;
@@ -407,6 +406,14 @@ public class Scratchie implements Cloneable {
 
     public void setRevealOnDoubleClick(boolean revealOnDoubleClick) {
 	this.revealOnDoubleClick = revealOnDoubleClick;
+    }
+
+    public boolean isRequireAllAnswers() {
+	return requireAllAnswers;
+    }
+
+    public void setRequireAllAnswers(boolean requireAllAnswers) {
+	this.requireAllAnswers = requireAllAnswers;
     }
 
     /**
