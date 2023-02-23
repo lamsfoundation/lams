@@ -16,21 +16,41 @@
 	    -webkit-overflow-scrolling: touch;
 	}
 
-	/*----  fixed first column ----*/
+	#questions-header-sticky {
+		display: none;
+		position: sticky;
+		top: 0;
+		z-index: 1;
+	    background: #FFF;
+	}
+	
+	#questions-header-sticky.stick {
+		display: table;
+	}
+	
+	/* Use strick column widths so sticky and standard header look the same. */
+	#questions-header-sticky thead th:first-child,
+	#questions-data thead th:first-child {
+		min-width: 17rem;
+		max-width: 17rem;
+		width: 17rem;
+	}
+	
+	.question-header-cell {
+		min-width: 10rem;
+		max-width: 10rem;
+		width: 10rem;
+	}
+	
+	.question-header-summary-cell {
+		min-width: 7rem;
+		max-width: 7rem;
+		width: 7rem;
+	}
+	
 	#questions-data {
 	  position: relative;
-	}
-	
-	#questions-data thead th {
-	  position: -webkit-sticky; /* for Safari */
-	  position: sticky;
-	  top: 0;
 	  background: #FFF;
-	}
-	
-	#questions-data thead th:first-child {
-	  left: 0;
-	  z-index: 1;
 	}
 	
 	#questions-data tbody th {
@@ -63,6 +83,22 @@
 <script>
 	$(document).ready(function(){
 		$('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');
+
+
+		<c:if test="${fn:length(sessionDtos) > 10}">
+			// Add sticky column headers to student choices table.
+			// Standard sticky header CSS solution does not work as it is page which is being scrolled, not the table itself
+			let studentChoicesTable = $('#questions-data'),
+				studentChoicesStickyHeader = $('#questions-header-sticky');
+	
+			window.onscroll = function() {
+				let studentChoicesTableTopOffset = studentChoicesTable.offset().top,
+					studentChoicesTableHeight = studentChoicesTable.height();
+				studentChoicesStickyHeader.toggleClass("stick",
+					window.pageYOffset > studentChoicesTableTopOffset + 20 
+						&& window.pageYOffset < studentChoicesTableTopOffset + studentChoicesTableHeight);
+			}
+		</c:if>
 	});
 </script>
 
@@ -123,19 +159,14 @@
 	<!-- End notifications -->
 </c:if>
 
-<!-- Table --> 
-<div class="row no-gutter">
-<div class="col-xs-12 col-md-12 col-lg-12">
-<div class="panel">
-<div class="panel-body">
-<div id="questions-data-container" class="table-responsive">
-	<table id="questions-data" class="table table-striped table-bordered table-hover table-condensed">
+<c:if test="${fn:length(sessionDtos) > 10}">
+	<table id="questions-header-sticky" class="table table-bordered table-condensed">
 		<thead>
 			<tr role="row">
 			
 				<th></th>
 				<c:forEach var="item" items="${items}" varStatus="i">
-					<th class="text-center">
+					<th class="text-center question-header-cell">
 						<a data-toggle="modal" href="#question${i.index}Modal">
 							<fmt:message key="label.authoring.basic.question.text"/> ${i.index + 1}
 						</a>
@@ -143,12 +174,42 @@
 				</c:forEach>
 				
 				<c:if test="${not empty sessionDtos}">
-					<th class="text-center">
+					<th class="text-center question-header-summary-cell">
 						<fmt:message key="label.total"/>&nbsp;
 						<i class="fa fa-question-circle text-primary" data-toggle="tooltip" data-placement="top" data-container="body" 
 						   title="<fmt:message key="label.total.1st.attempt.by.team"/>"></i>
 					</th>
-					<th class="text-center">
+					<th class="text-center question-header-summary-cell">
+						<fmt:message key="label.total"/> %
+					</th>
+				</c:if>
+			</tr>
+		</thead>
+	</table>
+</c:if>
+	
+<!-- Table --> 
+<div id="questions-data-container">
+	<table id="questions-data" class="table table-striped table-bordered table-hover table-condensed">
+		<thead>
+			<tr role="row">
+			
+				<th></th>
+				<c:forEach var="item" items="${items}" varStatus="i">
+					<th class="text-center question-header-cell">
+						<a data-toggle="modal" href="#question${i.index}Modal">
+							<fmt:message key="label.authoring.basic.question.text"/> ${i.index + 1}
+						</a>
+					</th>
+				</c:forEach>
+				
+				<c:if test="${not empty sessionDtos}">
+					<th class="text-center question-header-summary-cell">
+						<fmt:message key="label.total"/>&nbsp;
+						<i class="fa fa-question-circle text-primary" data-toggle="tooltip" data-placement="top" data-container="body" 
+						   title="<fmt:message key="label.total.1st.attempt.by.team"/>"></i>
+					</th>
+					<th class="text-center question-header-summary-cell">
 						<fmt:message key="label.total"/> %
 					</th>
 				</c:if>
@@ -256,7 +317,7 @@
 						</c:otherwise>
 					</c:choose>
 				</tr>
-			</c:forEach>      
+			</c:forEach>  
 			
 			<c:if test="${not empty sessionDtos}">
 				<c:set var="totalSum" value="0" />
@@ -323,10 +384,6 @@
 		</tbody>
 	</table>
 	</div>
-</div>
-</div>
-</div>          
-</div>
 
 <!-- Question detail modal -->
 <c:forEach var="item" items="${items}" varStatus="i">
