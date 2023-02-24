@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
-import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
@@ -35,7 +34,6 @@ import org.lamsfoundation.lams.tool.service.ICommonScratchieService;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -417,89 +415,5 @@ public class TblMonitoringController {
 	}
 
 	return null;
-    }
-
-    private void setupAvailableActivityTypes(HttpServletRequest request, List<Activity> activities) {
-	//check if there is Scratchie activity. It's used only in case of LKC TBL monitoring, when all assessment are treated as AEs
-	boolean isScratchieAvailable = false;
-	for (Activity activity : activities) {
-	    if (activity instanceof ToolActivity) {
-		ToolActivity toolActivity = (ToolActivity) activity;
-		String toolSignature = toolActivity.getTool().getToolSignature();
-		if (CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature)) {
-		    isScratchieAvailable = true;
-		    break;
-		}
-	    }
-	}
-
-	boolean scratchiePassed = false;
-	boolean iraPassed = false;
-	String aeToolContentIds = "";
-	String aeToolTypes = "";
-	String aeActivityTitles = "";
-	for (Activity activity : activities) {
-	    if (activity instanceof ToolActivity) {
-		ToolActivity toolActivity = (ToolActivity) activity;
-		String toolSignature = toolActivity.getTool().getToolSignature();
-		Long toolContentId = toolActivity.getToolContentId();
-		Long toolActivityId = toolActivity.getActivityId();
-		String toolTitle = toolActivity.getTitle();
-
-		//count only the first MCQ or Assessmnet as iRA
-		if (!iraPassed && (CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)
-			|| isScratchieAvailable && CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature))) {
-		    iraPassed = true;
-		    if (CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
-			request.setAttribute("isIraMcqAvailable", true);
-		    } else {
-			request.setAttribute("isIraAssessmentAvailable", true);
-		    }
-		    request.setAttribute("iraToolContentId", toolContentId);
-		    request.setAttribute("iraToolActivityId", toolActivityId);
-
-		    continue;
-		}
-
-		//aes are counted only after Scratchie activity, or for LKC TBL monitoring
-		if ((scratchiePassed || !isScratchieAvailable)
-			&& (CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)
-				|| CommonConstants.TOOL_SIGNATURE_DOKU.equals(toolSignature))) {
-		    request.setAttribute("isAeAvailable", true);
-		    //prepare assessment details to be passed to Assessment tool
-		    aeToolContentIds += toolContentId + ",";
-		    aeToolTypes += CommonConstants.TOOL_SIGNATURE_DOKU.equals(toolSignature) ? "d," : "a,";
-		    aeActivityTitles += toolTitle + "\\,";
-
-		} else if (CommonConstants.TOOL_SIGNATURE_FORUM.equals(toolSignature)) {
-		    request.setAttribute("isForumAvailable", true);
-		    request.setAttribute("forumActivityId", toolActivityId);
-
-		} else if (CommonConstants.TOOL_SIGNATURE_PEER_REVIEW.equals(toolSignature)) {
-		    request.setAttribute("isPeerreviewAvailable", true);
-		    request.setAttribute("peerreviewToolContentId", toolContentId);
-
-		    //tRA is the first scratchie activity
-		} else if (!scratchiePassed && CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature)) {
-		    scratchiePassed = true;
-
-		    request.setAttribute("isScratchieAvailable", true);
-		    request.setAttribute("traToolContentId", toolContentId);
-		    request.setAttribute("traToolActivityId", toolActivityId);
-		}
-
-		if (CommonConstants.TOOL_SIGNATURE_LEADERSELECTION.equals(toolSignature)) {
-		    request.setAttribute("leaderselectionToolActivityId", toolActivityId);
-		    request.setAttribute("leaderselectionToolContentId", toolContentId);
-		}
-
-	    } else if (activity instanceof GateActivity) {
-		request.setAttribute("isGatesAvailable", true);
-	    }
-	}
-
-	request.setAttribute("aeToolContentIds", aeToolContentIds);
-	request.setAttribute("aeToolTypes", aeToolTypes);
-	request.setAttribute("aeActivityTitles", aeActivityTitles);
     }
 }
