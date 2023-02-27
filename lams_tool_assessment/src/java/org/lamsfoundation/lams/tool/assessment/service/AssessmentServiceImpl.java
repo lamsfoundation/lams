@@ -2018,6 +2018,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		questionTitlesRow.addCell(title, true, ExcelCell.BORDER_STYLE_LEFT_THIN);
 
 		int columnShift = 1;
+		if (QbQuestion.TYPE_ESSAY == question.getType()) {
+		    columnShift += 2;
+		}
 		// currently only MCQ and True/False questions have learner interaction logged
 		// for other question types, do not include the column
 		boolean addAnsweredDateColumn = QbQuestion.TYPE_MULTIPLE_CHOICE == question.getType()
@@ -2046,8 +2049,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    for (QuestionReference questionReference : questionReferences) {
 		userSummaryUserHeadersRow.addCell(getMessage("label.export.mark"), ExcelCell.BORDER_STYLE_LEFT_THIN);
 		userSummaryUserHeadersRow.addCell(getMessage("label.authoring.basic.option.answer"));
-
 		AssessmentQuestion question = questionReference.getQuestion();
+		if (QbQuestion.TYPE_ESSAY == question.getType()) {
+		    userSummaryUserHeadersRow.addCell(getMessage("label.monitoring.user.summary.marker"));
+		    userSummaryUserHeadersRow.addCell(getMessage("label.monitoring.user.summary.marker.comment"));
+		}
+
 		boolean addAnsweredDateColumn = QbQuestion.TYPE_MULTIPLE_CHOICE == question.getType()
 			|| QbQuestion.TYPE_TRUE_FALSE == question.getType();
 		if (addAnsweredDateColumn) {
@@ -2056,6 +2063,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		if (assessment.isEnableConfidenceLevels() && QbQuestion.TYPE_MARK_HEDGING != question.getType()) {
 		    userSummaryUserHeadersRow.addCell(getMessage("label.confidence"));
 		}
+
 	    }
 
 	    // a single column at the end of previous headers
@@ -2110,6 +2118,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 			// learner interaction
 			QbQuestion question = questionResult.getQbQuestion();
+			if (QbQuestion.TYPE_ESSAY == question.getType()) {
+			    userResultRow.addCell(questionResult.getMarkedBy() == null ? ""
+				    : questionResult.getMarkedBy().getFullName());
+			    userResultRow.addCell(questionResult.getMarkerComment());
+			}
+			
 			boolean addAnsweredDateColumn = QbQuestion.TYPE_MULTIPLE_CHOICE == question.getType()
 				|| QbQuestion.TYPE_TRUE_FALSE == question.getType();
 			if (addAnsweredDateColumn) {
