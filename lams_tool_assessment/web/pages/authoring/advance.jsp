@@ -62,7 +62,48 @@
 		<c:if test="${!assessmentForm.assessment.enableConfidenceLevels}">
 			$('#confidence-levels-type-area').css('display', 'none');
 		</c:if>
+
+		$('.sectionEntry:last .sectionRemoveButton', sectionsContainer).removeClass('hidden');
+		
+		// sections add/remove functionality
+		let sectionAddButton = $('#sectionAddButton').click(function(){
+				let sectionsContainer = $('#sectionsContainer'),
+					sections = $('.sectionEntry', sectionsContainer),
+					sectionSuffix = sections.length + 1,
+					section = $('#sectionTemplate').clone().attr('id', 'sectionEntry' + sectionSuffix).removeClass('hidden');
+			$('.sectionRemoveButton', sections).addClass('hidden');
+			section.appendTo(sectionsContainer);
+			$('.sectionRemoveButton', section).removeClass('hidden');
+			
+			$('input[type="text"]', section).attr('name', 'sectionName' + sectionSuffix);
+			$('select', section).attr('name', 'sectionQuestionCount' + sectionSuffix);
+		});
+		
+		$('input[name="questionDistributionType"]').change(function(){
+			let distributionType = $('input[name="questionDistributionType"]:checked').val(),
+				questionsPerPageSelect = $('#questionsPerPage');
+			if (distributionType === 'all') {
+				questionsPerPageSelect.val(0).prop('disabled', true);
+				sectionAddButton.prop('disabled', true);
+				return;
+			}
+			if (distributionType === 'page') {
+				questionsPerPageSelect.prop('disabled', false);
+				sectionAddButton.prop('disabled', true);
+				return;
+			}
+			if (distributionType === 'section') {
+				questionsPerPageSelect.val(-1).prop('disabled', true);
+				sectionAddButton.prop('disabled', false);
+				return;
+			}
+		}).first().change();
 	});
+
+	function removeSection(button){
+		$(button).closest('.sectionEntry').remove();
+		$('#sectionsContainer .sectionEntry:last .sectionRemoveButton').removeClass('hidden');
+	}
 </script>
 
 <!-- Advance Tab Content -->
@@ -90,40 +131,113 @@
 <lams:SimplePanel titleKey="label.question.options">
 
 <lams:SimplePanel panelBodyClass="panel-body-sm">
-
-<div class="form-inline">
-	<label for="assessment.questionsPerPage">
-		<fmt:message key="label.authoring.advance.questions.per.page" />&nbsp;
-		<form:select path="assessment.questionsPerPage" cssClass="form-control input-sm">
-			<form:option value="0"><fmt:message key="label.authoring.advance.all.in.one.page" /></form:option>
-			<form:option value="10">10</form:option>
-			<form:option value="9">9</form:option>
-			<form:option value="8">8</form:option>
-			<form:option value="7">7</form:option>
-			<form:option value="6">6</form:option>
-			<form:option value="5">5</form:option>
-			<form:option value="4">4</form:option>
-			<form:option value="3">3</form:option>
-			<form:option value="2">2</form:option>
-			<form:option value="1">1</form:option>
-		</form:select>
-	</label>
-</div>
-
-<div class="checkbox">
-	<label for="shuffled">
-		<form:checkbox path="assessment.shuffled" id="shuffled"/>
-		<fmt:message key="label.authoring.advance.shuffle.questions" />
-	</label>
-</div>
-
-<div class="checkbox">
-	<label for="questions-numbering">
-		<form:checkbox path="assessment.numbered" id="questions-numbering"/>
-		<fmt:message key="label.authoring.advance.numbered.questions" />
-	</label>
-</div>
-
+	<div class="checkbox">
+		<label for="shuffled">
+			<form:checkbox path="assessment.shuffled" id="shuffled"/>
+			<fmt:message key="label.authoring.advance.shuffle.questions" />
+		</label>
+	</div>
+	
+	<div class="checkbox">
+		<label for="questions-numbering">
+			<form:checkbox path="assessment.numbered" id="questions-numbering"/>
+			<fmt:message key="label.authoring.advance.numbered.questions" />
+		</label>
+	</div>
+	
+	<fmt:message key="label.authoring.advance.question.distribution" />
+	
+	<div class="loffset20">
+		<div class="radio form-inline">
+			<label for="questionDistributionTypeAll">
+				<input type="radio" name="questionDistributionType" value="all" id="questionDistributionTypeAll" 
+					${assessmentForm.assessment.questionsPerPage eq 0 ? 'checked' : ''}
+				/>
+				<fmt:message key="label.authoring.advance.all.in.one.page" />
+			</label>
+		</div>
+		
+		<div class="radio form-inline">
+			<label for="questionDistributionTypePage">
+				<input type="radio" id="questionDistributionTypePage" name="questionDistributionType" value="page"
+						${assessmentForm.assessment.questionsPerPage > 0 ? 'checked' : ''} />
+				<fmt:message key="label.authoring.advance.questions.per.page" />
+				<form:select path="assessment.questionsPerPage" id="questionsPerPage"
+							 cssClass="form-control input-sm loffset10">
+					<form:option value="-1" cssClass="hidden">-</form:option>
+					<form:option value="0">-</form:option>
+					<form:option value="1">1</form:option>
+					<form:option value="2">2</form:option>
+					<form:option value="3">3</form:option>
+					<form:option value="4">4</form:option>
+					<form:option value="5">5</form:option>
+					<form:option value="6">6</form:option>
+					<form:option value="7">7</form:option>
+					<form:option value="8">8</form:option>
+					<form:option value="9">9</form:option>
+					<form:option value="10">10</form:option>
+				</form:select>
+			</label>
+		</div>
+		
+		<div class="radio form-inline">
+			<label for="questionDistributionTypeSection">
+				<input type="radio" id="questionDistributionTypeSection" name="questionDistributionType" value="section"
+				${assessmentForm.assessment.questionsPerPage eq -1 and not empty assessmentForm.assessment.sections ? 'checked' : ''} />
+				<fmt:message key="label.authoring.advance.sections" />	   
+			</label>
+		</div>
+		<div class="radio form-inline loffset20" id="sectionsContainer">
+			<button type="button" id="sectionAddButton" class="btn btn-default btn-sm">
+				<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.advance.section.add" />
+			</button>
+			
+			<c:forEach var="section" items="${assessmentForm.assessment.sections}" varStatus="sectionStatus">
+				<div class="sectionEntry voffset10">
+					<fmt:message key="label.authoring.advance.section.name" />	  
+					<input type="text" class="form-control input-sm loffset10" maxlength="100"
+						   value="<c:out value='${section.name}' />" name="sectionName${sectionStatus.index + 1}" />
+					<fmt:message key="label.authoring.advance.section.questions.count" />
+					<select class="form-control input-sm loffset10" name="sectionQuestionCount${sectionStatus.index + 1}">
+						<option value="0" ${section.questionCount eq 0 ? 'selected' : ''}>
+							<fmt:message key="label.authoring.advance.section.all.remaining.questions" />
+						</option>
+						<c:forEach var="sectionQuestionCountOption" begin="1" end="15">
+							<option value="${sectionQuestionCountOption}"
+							        ${sectionQuestionCountOption eq section.questionCount ? 'selected' : ''}>
+								${sectionQuestionCountOption}
+							</option>
+						</c:forEach>
+					</select>
+					<button type="button" class="sectionRemoveButton btn btn-default btn-sm loffset20 hidden"
+							onClick="javascript:removeSection(this)">
+						<i class="fa fa-remove"></i>&nbsp;<fmt:message key="label.authoring.advance.section.remove" />
+					</button>
+				</div>
+			</c:forEach>
+		</div>
+		
+		<div id="sectionTemplate" class="sectionEntry voffset10 hidden">
+			<fmt:message key="label.authoring.advance.section.name" />	  
+			<input type="text" class="form-control input-sm loffset10" maxlength="100" />
+			<fmt:message key="label.authoring.advance.section.questions.count" />
+			<select class="form-control input-sm loffset10">
+				<option value="0" selected>
+					<fmt:message key="label.authoring.advance.section.all.remaining.questions" />
+				</option>
+				<c:forEach var="sectionQuestionCountOption" begin="1" end="15">
+					<option value="${sectionQuestionCountOption}">
+						${sectionQuestionCountOption}
+					</option>
+				</c:forEach>
+			</select>
+			<button type="button" class="sectionRemoveButton btn btn-default btn-sm loffset20 hidden"
+					onClick="javascript:removeSection(this)">
+				<i class="fa fa-remove"></i>&nbsp;<fmt:message key="label.authoring.advance.section.remove" />
+			</button>
+		</div>
+	</div>
+	
 </lams:SimplePanel>
 
 <lams:SimplePanel panelBodyClass="panel-body-sm">

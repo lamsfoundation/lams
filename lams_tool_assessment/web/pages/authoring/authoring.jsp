@@ -44,8 +44,9 @@
 			//serialize overallFeedbackForm
 	        $("#overallFeedbackList").val($('#advancedInputArea').contents().find('#overallFeedbackForm').serialize(true));
 	        	
-	        //enable checkbox to allow its value been submitted
+	        // enable input to allow its value been submitted
 	        $("#display-summary").removeAttr("disabled", "disabled");
+	        $("#questionsPerPage").prop('disabled', false);
 
         	return true;
         }

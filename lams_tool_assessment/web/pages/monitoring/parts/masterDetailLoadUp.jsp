@@ -14,6 +14,8 @@
  	       	<%@ include file="userresponse.jsp"%>
  	       		
  	       	var table = jQuery("#userSummary${assessmentResult.sessionId}");
+ 	   	   	<c:set var="requiresMarking"
+	 	   	   	   value="${empty questionResult.markedBy and question.type eq 6 and questionResult.mark eq 0}" />
  	     	table.addRowData(${i.index + 1}, {
  	   	    	id:"${i.index + 1}",
  	   	   		questionResultUid:"${questionResult.uid}",
@@ -22,32 +24,33 @@
  	   	   		<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
  	   	   			confidence:"${question.type == 8 ? -1 : questionResult.confidenceLevel}",
  	   	   		</c:if>
- 	   	   		grade:"<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>"
+ 	   	   		grade:
+	 	 	 	 <c:choose>
+	 	 	    	<c:when test="${requiresMarking}">
+	 	 	    		"-"
+	 	 	    	</c:when>
+	 	 	    	<c:otherwise>
+	 	 	    		"<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>"
+	 	 	    	</c:otherwise>
+	 	 	    </c:choose>,
+	 	 	    marker : 
+		 	 	 <c:choose>
+	 	 	    	<c:when test="${requiresMarking}">
+		 	    		("<b><fmt:message key='label.monitoring.user.summary.grade.required' /></b>")
+		 	    	</c:when>
+		 	    	<c:when test="${not empty questionResult.markedBy}">
+		 	  			"<c:out value='${questionResult.markedBy.fullName}' />"
+		 	    	</c:when>
+		 	    	<c:otherwise>
+		 	    		""
+		 	    	</c:otherwise>
+		 	     </c:choose>,
+		 	     markerComment: "<c:out value='${questionResult.markerComment}' />"
  	   	   	});
 
- 	   	   	<c:set var="requiresMarking"
- 	 	   	   	   value="${empty questionResult.markedBy and question.type eq 6 and questionResult.mark eq 0}" />
  	 	    // set maxGrade attribute to cell DOM element
- 	 	    table.setCell(${i.index + 1}, "grade", "", ${requiresMarking ? "'requires-grading'" : "null"},
- 	 	 	   {"maxGrade" :  "${questionResult.maxMark}"
- 	 	 	    <c:choose>
-	 	 	    	<c:when test="${requiresMarking}">
-	 	 	    		,"title" : "<fmt:message key='label.monitoring.user.summary.grade.required' />"
-	 	 	    		,"data-toggle" : "tooltip"
-	 	 	    		,"data-container" : "body"
-	 	 	    	</c:when>
-	 	 	    	<c:when test="${not empty questionResult.markedBy}">
-	 	 	  			,"title" : "<fmt:message key='label.monitoring.user.summary.grade.by'>
-		 	 	  						<fmt:param><c:out value='${questionResult.markedBy.fullName}' /></fmt:param>
-		 	 	  					</fmt:message>"
-		 	 	  		,"data-toggle" : "tooltip"
-		 	 	    	,"data-container" : "body"
-	 	 	    	</c:when>
-	 	 	    </c:choose>
- 	 	 	    });
+ 	 	    table.setCell(${i.index + 1}, "grade", "", null, {"maxGrade" :  "${questionResult.maxMark}"});
 		</c:forEach>
-
-		$('[data-toggle="tooltip"]').bootstrapTooltip();
 		
 		if (typeof CodeMirror != 'undefined') {
 			CodeMirror.colorize($('.code-style'));

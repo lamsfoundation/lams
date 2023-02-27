@@ -346,16 +346,31 @@ public class MonitoringController {
     }
 
     @RequestMapping(path = "/saveUserGrade", method = RequestMethod.POST)
-    public void saveUserGrade(HttpServletRequest request, HttpServletResponse response) {
-
+    @ResponseBody
+    public String saveUserGrade(HttpServletRequest request, HttpServletResponse response) {
+	String responseText = null;
 	if ((request.getParameter(AssessmentConstants.PARAM_NOT_A_NUMBER) == null)
 		&& !StringUtils.isEmpty(request.getParameter(AssessmentConstants.PARAM_QUESTION_RESULT_UID))) {
 	    Long questionResultUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_RESULT_UID);
-	    float newGrade = Float.valueOf(request.getParameter(AssessmentConstants.PARAM_GRADE));
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    service.changeQuestionResultMark(questionResultUid, newGrade, teacher.getUserID());
+
+	    String column = request.getParameter(AssessmentConstants.PARAM_COLUMN);
+	    Float newGrade = null;
+	    String markerComment = null;
+	    if (column.equals(AssessmentConstants.PARAM_GRADE)) {
+		String gradeString = request.getParameter(AssessmentConstants.PARAM_GRADE);
+		if (StringUtils.isNotBlank(gradeString) && !gradeString.strip().equals("-")) {
+		    newGrade = Float.valueOf(gradeString);
+		    responseText = teacher.getLastName() + " " + teacher.getFirstName();
+		}
+	    } else if (column.equals(AssessmentConstants.PARAM_MARKER_COMMENT)) {
+		markerComment = request.getParameter(AssessmentConstants.PARAM_MARKER_COMMENT);
+	    }
+
+	    service.changeQuestionResultMark(questionResultUid, newGrade, markerComment, teacher.getUserID());
 	}
+	return responseText;
     }
 
     /**
@@ -585,8 +600,14 @@ public class MonitoringController {
 		userData.add(questionResultUid);
 		userData.add(questionResult.getMaxMark());
 		userData.add(fullName);
-		//LDEV_NTU-11 Swapping Mark and Response columns in Assessment Monitor
-		userData.add(questionResult.getMark());
+
+		String response = AssessmentEscapeUtils.printResponsesForJqgrid(questionResult);
+		if (StringUtils.isNotBlank(questionResult.getJustification())) {
+		    response += "<br><i>" + service.getMessage("label.answer.justification") + "</i><br>"
+			    + questionResult.getJustificationEscaped();
+		}
+		userData.add(response);
+		
 		// show confidence levels if this feature is turned ON
 		if (assessment.isEnableConfidenceLevels()) {
 		    userData.add(questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_MARK_HEDGING) ? -1
@@ -620,15 +641,17 @@ public class MonitoringController {
 		    userData.add(starString);
 		}
 
-		String response = AssessmentEscapeUtils.printResponsesForJqgrid(questionResult);
 
-		if (StringUtils.isNotBlank(questionResult.getJustification())) {
-		    response += "<br><i>" + service.getMessage("label.answer.justification") + "</i><br>"
-			    + questionResult.getJustificationEscaped();
-		}
-
-		userData.add(response);
-		userData.add(questionResult.getMarkedBy() == null ? "" : questionResult.getMarkedBy().getFullName());
+		//LDEV_NTU-11 Swapping Mark and Response columns in Assessment Monitor
+		userData.add(questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_ESSAY)
+			&& questionResult.getMarkedBy() == null ? "-" : questionResult.getMark().toString());
+		userData.add(
+			questionResult.getMarkedBy() == null
+				? (questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_ESSAY)
+					? service.getMessage("label.monitoring.user.summary.grade.required")
+					: "")
+				: questionResult.getMarkedBy().getFullName());
+		userData.add(questionResult.getMarkerComment());
 	    } else {
 		userData.add("");
 		userData.add("");
@@ -641,6 +664,7 @@ public class MonitoringController {
 		    userData.add("-");
 		}
 		userData.add("-");
+		userData.add("");
 		userData.add("");
 	    }
 
