@@ -1038,8 +1038,11 @@ public class MonitoringController {
 	boolean isTBLSequence = learningDesignService.isTBLSequence(lessonDTO.getLearningDesignID());
 	request.setAttribute("isTBLSequence", isTBLSequence);
 	if (isTBLSequence) {
-	    List<Activity> lessonActivities = getLessonActivities(lessonService.getLesson(lessonId));
-	    TblMonitoringController.setupAvailableActivityTypes(request, lessonActivities);
+	    Map<String, Object> activityTypesMeta = learningDesignService
+		    .getAvailableTBLActivityTypes(lessonDTO.getLearningDesignID());
+	    for (Entry<String, Object> entry : activityTypesMeta.entrySet()) {
+		request.setAttribute(entry.getKey(), entry.getValue());
+	    }
 
 	    boolean burningQuestionsEnabled = false;
 	    Long traToolActivityId = (Long) request.getAttribute("traToolActivityId");

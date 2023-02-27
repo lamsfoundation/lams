@@ -218,7 +218,7 @@ function startBackendServer(port) {
         });
 
         form.on("end", function () {
-            if (accessToken === "" || hashAccessToken(formData["fields"]["whiteboardId"]) == formData["fields"]["at"]) {
+            if (accessToken === "" || hashAccessToken(formData["fields"]["wid"]) == formData["fields"]["at"]) {
                 progressUploadFormData(formData, function (err) {
                     if (err) {
                         if (err == "403") {

@@ -74,6 +74,7 @@ import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
+import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgressArchive;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -165,6 +166,7 @@ public class GradebookService implements IGradebookFullService {
     private ILearnerProgressDAO learnerProgressDAO;
     private ILessonDAO lessonDAO;
     private ILessonService lessonService;
+    private ILearningDesignService learningDesignService;
     private IUserManagementService userService;
     private IActivityDAO activityDAO;
     private MessageService messageService;
@@ -1754,6 +1756,76 @@ public class GradebookService implements IGradebookFullService {
     }
 
     @Override
+    public List<ExcelSheet> exportCourseTBLGradebook(Integer userId, Integer organisationId) {
+	List<ExcelSheet> sheets = new LinkedList<>();
+
+	// The entire data list
+	ExcelSheet sheet = new ExcelSheet(getMessage("gradebook.exportcourse.course.summary"));
+	sheets.add(sheet);
+	ExcelRow headerRow = sheet.initRow();
+	headerRow.addCell(getMessage("gradebook.export.login"), true);
+	headerRow.addCell(getMessage("gradebook.export.last.name"), true);
+	headerRow.addCell(getMessage("gradebook.export.first.name"), true);
+
+	List<Lesson> lessons = getTBLLessons(organisationId, userId);
+	Map<Long, Long> iRatActivityIds = new HashMap<>();
+	Map<Long, Long> tRatActivityIds = new HashMap<>();
+	Set<User> allLearners = new TreeSet<>();
+	for (Lesson lesson : lessons) {
+	    headerRow.addCell(lesson.getLessonName() + " iRAT", true);
+	    headerRow.addCell(lesson.getLessonName() + " tRAT", true);
+
+	    Map<String, Object> activityTypes = learningDesignService
+		    .getAvailableTBLActivityTypes(lesson.getLearningDesign().getLearningDesignId());
+	    iRatActivityIds.put(lesson.getLessonId(), (Long) activityTypes.get("iraToolActivityId"));
+	    tRatActivityIds.put(lesson.getLessonId(), (Long) activityTypes.get("traToolActivityId"));
+
+	    Set<User> lessonLearners = lesson.getAllLearners();
+	    allLearners.addAll(lessonLearners);
+	}
+
+	for (User learner : allLearners) {
+	    ExcelRow userDataRow = sheet.initRow();
+	    userDataRow.addCell(learner.getLogin());
+	    userDataRow.addCell(learner.getLastName());
+	    userDataRow.addCell(learner.getFirstName());
+	    for (Lesson lesson : lessons) {
+		Long iRatActivityId = iRatActivityIds.get(lesson.getLessonId());
+		Double mark = null;
+		if (iRatActivityId != null) {
+		    GradebookUserActivity gradebookUserActivity = getGradebookUserActivity(iRatActivityId,
+			    learner.getUserId());
+		    if (gradebookUserActivity != null && gradebookUserActivity.getMark() != null) {
+			mark = gradebookUserActivity.getMark();
+		    }
+		}
+		if (mark == null) {
+		    userDataRow.addEmptyCell();
+		} else {
+		    userDataRow.addCell(GradebookUtil.niceFormatting(mark));
+		}
+
+		Long tRatActivityId = tRatActivityIds.get(lesson.getLessonId());
+		mark = null;
+		if (tRatActivityId != null) {
+		    GradebookUserActivity gradebookUserActivity = getGradebookUserActivity(tRatActivityId,
+			    learner.getUserId());
+		    if (gradebookUserActivity != null && gradebookUserActivity.getMark() != null) {
+			mark = gradebookUserActivity.getMark();
+		    }
+		}
+		if (mark == null) {
+		    userDataRow.addEmptyCell();
+		} else {
+		    userDataRow.addCell(GradebookUtil.niceFormatting(mark));
+		}
+	    }
+	}
+
+	return sheets;
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public List<ExcelSheet> exportCourseGradebook(Integer userId, Integer organisationId) {
 	List<ExcelSheet> sheets = new LinkedList<>();
@@ -2193,6 +2265,20 @@ public class GradebookService implements IGradebookFullService {
 	    }
 	}
 	return sheets;
+    }
+
+    private List<Lesson> getTBLLessons(Integer organisationId, Integer userId) {
+	Set<Lesson> lessons = new TreeSet<>(new LessonComparator());
+	lessons.addAll(lessonService.getLessonsByGroupAndUser(userId, organisationId));
+
+	List<Lesson> tblLessons = new LinkedList<>();
+	for (Lesson lesson : lessons) {
+	    boolean isTblLesson = learningDesignService.isTBLSequence(lesson.getLearningDesign().getLearningDesignId());
+	    if (isTblLesson) {
+		tblLessons.add(lesson);
+	    }
+	}
+	return tblLessons;
     }
 
     private void addUsernameCells(User learner, ExcelRow userRow) {
@@ -2872,6 +2958,10 @@ public class GradebookService implements IGradebookFullService {
 
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
+    }
+
+    public void setLearningDesignService(ILearningDesignService learningDesignService) {
+	this.learningDesignService = learningDesignService;
     }
 
     public void setUserService(IUserManagementService userService) {

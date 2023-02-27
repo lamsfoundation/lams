@@ -17,6 +17,7 @@
 	<bean id="gradebookServiceTarget" class="org.lamsfoundation.lams.gradebook.service.GradebookService" >
 		<property name="toolService"><ref bean="lamsCoreToolService"/></property> 	
 		<property name="lessonService"><ref bean="lessonService"/></property> 
+		<property name="learningDesignService"><ref bean="learningDesignService"/></property> 
 		<property name="userService"><ref bean="userManagementService"/></property>	
 		<property name="gradebookDAO"><ref bean="gradebookDAO"/></property> 
 		<property name="learnerProgressDAO"><ref bean="learnerProgressDAO"/></property>

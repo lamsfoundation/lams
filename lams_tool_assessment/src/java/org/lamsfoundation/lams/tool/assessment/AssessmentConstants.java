@@ -211,6 +211,8 @@ public class AssessmentConstants {
 
     // configuration keys
     public static final String CONFIG_KEY_HIDE_TITLES = "hideTitles";
+    
+    public static final String CONFIG_KEY_AUTO_EXPAND_JUSTIFICATION = "autoexpandJustification";
 
     public static final String ATTR_IS_QUESTION_ETHERPAD_ENABLED = "isQuestionEtherpadEnabled";
 

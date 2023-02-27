@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -17,19 +18,15 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
-import org.lamsfoundation.lams.learningdesign.BranchingActivity;
-import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
-import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
+import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
@@ -74,6 +71,8 @@ public class TblMonitoringController {
     @Autowired
     private ILessonService lessonService;
     @Autowired
+    private ILearningDesignService learningDesignService;
+    @Autowired
     private IMonitoringFullService monitoringService;
     @Autowired
     private IQbService qbService;
@@ -98,8 +97,11 @@ public class TblMonitoringController {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Lesson lesson = lessonService.getLesson(lessonId);
 
-	List<Activity> lessonActivities = getLessonActivities(lesson);
-	TblMonitoringController.setupAvailableActivityTypes(request, lessonActivities);
+	Map<String, Object> activityTypesMeta = learningDesignService
+		.getAvailableTBLActivityTypes(lesson.getLearningDesign().getLearningDesignId());
+	for (Entry<String, Object> entry : activityTypesMeta.entrySet()) {
+	    request.setAttribute(entry.getKey(), entry.getValue());
+	}
 	boolean isTraAvailable = (request.getAttribute("isScratchieAvailable") != null)
 		&& ((Boolean) request.getAttribute("isScratchieAvailable"));
 	boolean isIraAvailable = request.getAttribute("isIraAvailable") != null
@@ -510,77 +512,6 @@ public class TblMonitoringController {
 	return "tblmonitor/aes";
     }
 
-    /**
-     * Returns lesson activities sorted by the learning design order.
-     */
-    private List<Activity> getLessonActivities(Lesson lesson) {
-	/*
-	 * Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity for some mysterious
-	 * reason Causes a ClassCastException when you try to cast it, even if it is a ToolActivity.
-	 *
-	 * THIS IS A HACK to retrieve the first tool activity manually so it can be cast as a ToolActivity - if it is
-	 * one
-	 */
-	Activity firstActivity = activityDAO
-		.getActivityByActivityId(lesson.getLearningDesign().getFirstActivity().getActivityId());
-	List<Activity> activities = new ArrayList<>();
-	sortActivitiesByLearningDesignOrder(firstActivity, activities);
-
-	return activities;
-    }
-
-    /**
-     * Sort all activities by the learning design order.
-     *
-     * @param activity
-     * @param sortedActivities
-     */
-    @SuppressWarnings("unchecked")
-    private void sortActivitiesByLearningDesignOrder(Activity activity, List<Activity> sortedActivities) {
-	sortedActivities.add(activity);
-
-	//in case of branching activity - add all activities based on their orderId
-	if (activity.isBranchingActivity()) {
-	    BranchingActivity branchingActivity = (BranchingActivity) activity;
-	    Set<SequenceActivity> sequenceActivities = new TreeSet<>(new ActivityOrderComparator());
-	    sequenceActivities.addAll((Set<SequenceActivity>) (Set<?>) branchingActivity.getActivities());
-	    for (Activity sequenceActivityNotInitialized : sequenceActivities) {
-		SequenceActivity sequenceActivity = (SequenceActivity) monitoringService
-			.getActivityById(sequenceActivityNotInitialized.getActivityId());
-		Set<Activity> childActivities = new TreeSet<>(new ActivityOrderComparator());
-		childActivities.addAll(sequenceActivity.getActivities());
-
-		//add one by one in order to initialize all activities
-		for (Activity childActivity : childActivities) {
-		    Activity activityInit = monitoringService.getActivityById(childActivity.getActivityId());
-		    sortedActivities.add(activityInit);
-		}
-	    }
-
-	    // In case of complex activity (parallel, help or optional activity) add all its children activities.
-	    // They will be sorted by orderId
-	} else if (activity.isComplexActivity()) {
-	    ComplexActivity complexActivity = (ComplexActivity) activity;
-	    Set<Activity> childActivities = new TreeSet<>(new ActivityOrderComparator());
-	    childActivities.addAll(complexActivity.getActivities());
-
-	    // add one by one in order to initialize all activities
-	    for (Activity childActivity : childActivities) {
-		Activity activityInit = monitoringService.getActivityById(childActivity.getActivityId());
-		sortedActivities.add(activityInit);
-	    }
-	}
-
-	Transition transitionFrom = activity.getTransitionFrom();
-	if (transitionFrom != null) {
-	    // query activity from DB as transition holds only proxied activity object
-	    Long nextActivityId = transitionFrom.getToActivity().getActivityId();
-	    Activity nextActivity = monitoringService.getActivityById(nextActivityId);
-
-	    sortActivitiesByLearningDesignOrder(nextActivity, sortedActivities);
-	}
-    }
-
     private GroupingActivity getGroupingActivity(Lesson lesson) {
 	Set<Activity> activities = new TreeSet<>();
 
@@ -603,86 +534,6 @@ public class TblMonitoringController {
 	}
 
 	return null;
-    }
-
-    public static void setupAvailableActivityTypes(HttpServletRequest request, List<Activity> activities) {
-	//check if there is Scratchie activity. It's used only in case of LKC TBL monitoring, when all assessment are treated as AEs
-	boolean isScratchieAvailable = false;
-	for (Activity activity : activities) {
-	    if (activity instanceof ToolActivity) {
-		ToolActivity toolActivity = (ToolActivity) activity;
-		String toolSignature = toolActivity.getTool().getToolSignature();
-		if (CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature)) {
-		    isScratchieAvailable = true;
-		    break;
-		}
-	    }
-	}
-
-	boolean scratchiePassed = false;
-	boolean iraPassed = false;
-	String aeToolContentIds = "";
-	String aeToolTypes = "";
-	String aeActivityTitles = "";
-	for (Activity activity : activities) {
-	    if (activity instanceof ToolActivity) {
-		ToolActivity toolActivity = (ToolActivity) activity;
-		String toolSignature = toolActivity.getTool().getToolSignature();
-		Long toolContentId = toolActivity.getToolContentId();
-		Long toolActivityId = toolActivity.getActivityId();
-		String toolTitle = toolActivity.getTitle();
-
-		//count only the first Assessmnet as iRA
-		if (!iraPassed && isScratchieAvailable
-			&& CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)) {
-		    iraPassed = true;
-		    request.setAttribute("isIraAvailable", true);
-		    request.setAttribute("iraToolContentId", toolContentId);
-		    request.setAttribute("iraToolActivityId", toolActivityId);
-
-		    continue;
-		}
-
-		//aes are counted only after Scratchie activity, or for LKC TBL monitoring
-		if ((scratchiePassed || !isScratchieAvailable)
-			&& (CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)
-				|| CommonConstants.TOOL_SIGNATURE_DOKU.equals(toolSignature))) {
-		    request.setAttribute("isAeAvailable", true);
-		    //prepare assessment details to be passed to Assessment tool
-		    aeToolContentIds += toolContentId + ",";
-		    aeToolTypes += CommonConstants.TOOL_SIGNATURE_DOKU.equals(toolSignature) ? "d," : "a,";
-		    aeActivityTitles += toolTitle + "\\,";
-
-		} else if (CommonConstants.TOOL_SIGNATURE_FORUM.equals(toolSignature)) {
-		    request.setAttribute("isForumAvailable", true);
-		    request.setAttribute("forumActivityId", toolActivityId);
-
-		} else if (CommonConstants.TOOL_SIGNATURE_PEER_REVIEW.equals(toolSignature)) {
-		    request.setAttribute("isPeerreviewAvailable", true);
-		    request.setAttribute("peerreviewToolContentId", toolContentId);
-
-		    //tRA is the first scratchie activity
-		} else if (!scratchiePassed && CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature)) {
-		    scratchiePassed = true;
-
-		    request.setAttribute("isScratchieAvailable", true);
-		    request.setAttribute("traToolContentId", toolContentId);
-		    request.setAttribute("traToolActivityId", toolActivityId);
-		}
-
-		if (CommonConstants.TOOL_SIGNATURE_LEADERSELECTION.equals(toolSignature)) {
-		    request.setAttribute("leaderselectionToolActivityId", toolActivityId);
-		    request.setAttribute("leaderselectionToolContentId", toolContentId);
-		}
-
-	    } else if (activity instanceof GateActivity) {
-		request.setAttribute("isGatesAvailable", true);
-	    }
-	}
-
-	request.setAttribute("aeToolContentIds", aeToolContentIds);
-	request.setAttribute("aeToolTypes", aeToolTypes);
-	request.setAttribute("aeActivityTitles", aeActivityTitles);
     }
 
     /**

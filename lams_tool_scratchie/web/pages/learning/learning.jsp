@@ -45,12 +45,10 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jgrowl.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript">
-		var isScratching = false;
+		var isScratching = false,
+			requireAllAnswers = <c:out value="${scratchie.requireAllAnswers}" />;
 		
 		$(document).ready(function(){
-			//initialize tooltips showing user names next to confidence levels
-			$('[data-toggle="tooltip"]').tooltip();
-
 			//handler for VSA input fields
 			$('.submit-user-answer-input').keypress(function(event){
 				var keycode = (event.keyCode ? event.keyCode : event.which);
@@ -99,10 +97,14 @@
 					scratchMcq(itemUid, optionUid);
 				});
 			</c:if>
+
+
 			
 			// hide Finish button for non-leaders until leader finishes
 			if (${hideFinishButton}) {
 				$("#finishButton").hide();
+			} else if (requireAllAnswers) {
+				checkAllCorrectMcqAnswersFound();
 			}
 
 			<%-- Connect to command websocket only if it is learner UI --%>
@@ -115,6 +117,9 @@
 					location.reload();
 				};
 			</c:if>
+
+			//initialize tooltips showing user names next to confidence levels
+			$('[data-toggle="tooltip"]').tooltip();
 		});
 
 		//scratch image (used by both scratchMcq() and scratchVsa())
@@ -166,11 +171,13 @@
 		            	$("[id^=imageLink-" + itemUid + "]").css('cursor','default');
 		            	$("[id^=image-" + itemUid + "]").not("img[src*='scratchie-correct-animation.gif']").not("img[src*='scratchie-correct.gif']").fadeTo(1300, 0.3);
 
+		            	checkAllCorrectMcqAnswersFound();
 		            } else {
 		            	var id = '-' + itemUid + '-' + optionUid;
 		            	$('#imageLink' + id).removeAttr('onclick');
 		            	$('#imageLink' + id).css('cursor','default');
 		            }
+
 	            },
 	            complete : function(){
     				// enable scratching again
@@ -278,6 +285,19 @@
 					'</td>' +
 				'</tr>';
 			$("table#scratches-" + itemUid).append(trElem);
+		}
+
+		function checkAllCorrectMcqAnswersFound() {
+            var numberOfAvailableScratches = $("[id^=imageLink-][onclick]").length;
+			if (numberOfAvailableScratches > 0) {
+	            $('#finishButton').prop('disabled', true).css('pointer-events', 'none')
+	            				  .parent().attr('data-title', '<fmt:message key="label.learning.require.all.answers" />')
+				  				  		   .tooltip();
+			} else {
+				$('#finishButton').prop('disabled', false)
+								  .css('pointer-events', 'auto')
+								  .parent().tooltip('destroy');
+			}
 		}
 
 		function xmlEscape(value) {
@@ -467,10 +487,11 @@
 			var method = $("#method").val();
 			
 			var proceed = true;
-			//ask for leave confirmation only if time limit is not expired
+			// ask for leave confirmation only if time limit is not expired
 			if (!isTimelimitExpired) {
 				var numberOfAvailableScratches = $("[id^=imageLink-][onclick], [id^=type-your-answer-]:visible").length;
-				proceed = (numberOfAvailableScratches > 0) ? confirm("<fmt:message key="label.one.or.more.questions.not.completed"></fmt:message>") : true;	
+				proceed = numberOfAvailableScratches == 0 || 
+						  confirm("<fmt:message key="label.one.or.more.questions.not.completed"></fmt:message>");	
 			}
 			
 			if (proceed) {

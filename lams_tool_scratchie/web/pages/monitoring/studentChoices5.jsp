@@ -16,21 +16,13 @@
 	    -webkit-overflow-scrolling: touch;
 	}
 
-	/*----  fixed first column ----*/
 	#questions-data {
 	  position: relative;
-	}
-	
-	#questions-data thead th {
-	  position: -webkit-sticky; /* for Safari */
-	  position: sticky;
-	  top: 0;
 	  background: #FFF;
 	}
 	
-	#questions-data thead th:first-child {
-	  left: 0;
-	  z-index: 1;
+	#questions-data thead {
+		background: #FFF;
 	}
 	
 	#questions-data tbody th {
@@ -77,6 +69,25 @@
 		});
 		
 		$('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');
+
+		<c:if test="${fn:length(sessionDtos) > 10}">
+			// Add sticky column headers to student choices table.
+			// Standard sticky header CSS solution does not work as it is page which is being scrolled, not the table itself
+
+			window.onscroll = function() {
+				let studentChoicesTable = $('#questions-data'),
+					studentChoicesStickyHeader = $('thead', studentChoicesTable),
+					studentChoicesTableTopOffset = studentChoicesTable.offset().top,
+					studentChoicesTableHeight = studentChoicesTable.height();
+				if (window.pageYOffset > studentChoicesTableTopOffset + 20 
+						&& window.pageYOffset < studentChoicesTableTopOffset + studentChoicesTableHeight - 20) {
+					studentChoicesStickyHeader
+						.css('transform', 'translateY(' + (window.pageYOffset - studentChoicesTableTopOffset - 2) + 'px)');
+				} else {
+					studentChoicesStickyHeader.css('transform', 'none');
+				}
+			}
+		</c:if>
 	});
 </script>
 
@@ -109,8 +120,6 @@
 			<fmt:message key="label.tra.questions.marks"/>
 		</h3>
 	</div>
-	
-	
 	<div class="row">
 		<div class="col-10 offset-1">
 			<div class="card">

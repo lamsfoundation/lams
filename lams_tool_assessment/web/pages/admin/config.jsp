@@ -26,8 +26,15 @@
 			<form:form action="/lams/tool/laasse10/admin/saveContent.do" modelAttribute="adminForm" method="post" enctype="multipart/form-data">
 				<div class="checkbox">
 					<label>
-					<form:checkbox path="hideTitles"/>
-					<fmt:message key="admin.hide.titles" /></label>
+						<form:checkbox path="hideTitles"/>
+						<fmt:message key="admin.hide.titles" />
+					</label>
+				</div>
+				<div class="checkbox">
+					<label>
+						<form:checkbox path="autoexpandJustification"/>
+						<fmt:message key="admin.autoexpand.justification" />
+					</label>
 				</div>
 				<button class="btn btn-primary  pull-right"><fmt:message key="admin.button.save" /></button>
 			</form:form>
