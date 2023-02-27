@@ -2123,7 +2123,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 				    : questionResult.getMarkedBy().getFullName());
 			    userResultRow.addCell(questionResult.getMarkerComment());
 			}
-			
+
 			boolean addAnsweredDateColumn = QbQuestion.TYPE_MULTIPLE_CHOICE == question.getType()
 				|| QbQuestion.TYPE_TRUE_FALSE == question.getType();
 			if (addAnsweredDateColumn) {

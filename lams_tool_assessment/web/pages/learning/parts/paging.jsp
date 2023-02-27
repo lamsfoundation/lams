@@ -5,8 +5,7 @@
 <c:if test="${pageCount > 1}">
 	<div id="pager" class="voffset10">
 		<c:if test="${pageNumber > 1}">
-			<button type="button" onClick="return nextPage(${pageNumber - 1})" class="btn btn-default roffset10"
-					>
+			<button type="button" onClick="return nextPage(${pageNumber - 1})" class="btn btn-default roffset10">
 				<c:choose>
 					<c:when test="${useSections}">
 						<fmt:message key="label.learning.section.previous" />
@@ -40,6 +39,17 @@
 							<c:out value="${section.name}" />
 						</c:otherwise>
 					</c:choose>
+					
+					<c:if test="${pageNumber != status.index + 1}">
+						<c:set var="questionsPage" value="${sessionMap.pagedQuestions[status.index]}" />
+						<c:set var="answeredQuestions" value="0" />
+						<c:forEach var="question" items="${questionsPage}">
+							<c:if test="${question.questionAnswered}">
+								<c:set var="answeredQuestions" value="${answeredQuestions + 1}" />
+							</c:if>
+						</c:forEach>
+						[${answeredQuestions}/${fn:length(questionsPage)}]
+					</c:if>
 					</a>
 				</c:forEach>
 			</c:when>
@@ -61,8 +71,7 @@
 		</c:choose>
 			
 		<c:if test="${pageNumber < pageCount}">
-			<button type="button" onClick="return nextPage(${pageNumber + 1})" class="btn btn-default loffset10"
-					>
+			<button type="button" onClick="return nextPage(${pageNumber + 1})" class="btn btn-default loffset10">
 				<c:choose>
 					<c:when test="${useSections}">
 						<fmt:message key="label.learning.section.next" />
