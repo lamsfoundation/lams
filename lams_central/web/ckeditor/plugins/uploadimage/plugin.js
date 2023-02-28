@@ -87,7 +87,9 @@
 					// Set width and height to prevent blinking.
 					this.replaceWith( '<img src="' + upload.url + '" ' +
 						'width="' + width + '" ' +
-						'height="' + height + '">' );
+						'height="' + height + '" ' + 
+						// LAMS modification: always add img-responsive class to uploaded image tag
+						'class="img-responsive">' );
 				}
 			} );
 
