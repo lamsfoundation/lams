@@ -386,7 +386,7 @@
 		}
 		
 		function nextPage(pageNumber){
-			if (!validateAnswers()) {
+			if (${assessment.questionsPerPage != -1} && !validateAnswers()) {
 				return;
 			}
 			disableButtons();
@@ -651,9 +651,11 @@
 			</lams:Alert>
 		</c:if>
 		
-		<lams:Alert type="info" close="true">
-			<fmt:message key="label.learning.submit.all.tip" />
-		</lams:Alert>
+		<c:if test="${hasEditRight}">
+			<lams:Alert type="info" close="true">
+				<fmt:message key="label.learning.submit.all.tip" />
+			</lams:Alert>
+		</c:if>
 		
 		<div class="panel">
 			<c:out value="${assessment.instructions}" escapeXml="false"/>
@@ -675,6 +677,9 @@
 		<br>
 		
 		<div class="form-group">
+			<%@ include file="parts/paging.jsp"%>
+			<br>
+			
 			<%@ include file="parts/allquestions.jsp"%>
 			
 			<%@ include file="parts/paging.jsp"%>

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
@@ -506,5 +507,22 @@ public class QuestionDTO implements Comparable<QuestionDTO> {
 
     public void setTitleEscaped(String titleEscaped) {
 	this.titleEscaped = titleEscaped;
+    }
+
+    public boolean isQuestionAnswered() {
+	if (isResponseSubmitted() || (getMark() != null && getMark() != 0) || StringUtils.isNotBlank(getAnswer())) {
+	    return true;
+	}
+	boolean isMatchingPairs = getType().equals(QbQuestion.TYPE_MATCHING_PAIRS);
+	boolean isMarkHedging = getType().equals(QbQuestion.TYPE_MARK_HEDGING);
+	for (OptionDTO optionDto : optionDtos) {
+	    if (optionDto.getAnswerBoolean() || (isMarkHedging && optionDto.getAnswerInt() > 0)) {
+		return true;
+	    }
+	    if (isMatchingPairs && optionDto.getAnswerInt() <= 0) {
+		return false;
+	    }
+	}
+	return isMatchingPairs;
     }
 }

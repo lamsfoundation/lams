@@ -39,10 +39,13 @@ public class AssessmentForm {
 
     private Assessment assessment;
 
+    private String questionDistributionType;
+
     public AssessmentForm() {
 	assessment = new Assessment();
 	assessment.setTitle("Shared Assessment");
 	currentTab = 1;
+	questionDistributionType = "all";
     }
 
     public void setAssessment(Assessment assessment) {
@@ -91,4 +94,11 @@ public class AssessmentForm {
 	this.contentFolderID = contentFolderID;
     }
 
+    public String getQuestionDistributionType() {
+	return questionDistributionType;
+    }
+
+    public void setQuestionDistributionType(String questionDistributionType) {
+	this.questionDistributionType = questionDistributionType;
+    }
 }

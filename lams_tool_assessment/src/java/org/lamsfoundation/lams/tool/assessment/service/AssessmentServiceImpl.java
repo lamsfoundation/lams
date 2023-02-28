@@ -115,6 +115,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentSection;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
@@ -517,6 +518,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	}
 
 	assessmentQuestionDao.removeObject(QuestionReference.class, uid);
+    }
+
+    @Override
+    public void deleteSection(Long uid) {
+	assessmentDao.removeObject(AssessmentSection.class, uid);
     }
 
     @Override
@@ -1857,6 +1863,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		questionTitleRow.addCell(getMessage("label.answer.justification"), true,
 			ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	    }
+	    questionTitleRow.addCell(getMessage("label.monitoring.user.summary.marker"), true,
+		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	    questionTitleRow.addCell(getMessage("label.monitoring.user.summary.marker.comment"), true,
+		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 
 	    int questionNumber = 1;
 
@@ -1981,7 +1991,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			//mark
 			//calculating markCount & markTotal
 			if (questionResult.getMark() != null && questionResult.getFinishDate() != null) {
-			    userResultRow.addCell(questionResult.getMark());
+			    userResultRow.addCell(questionResult.getMarkedBy() == null
+				    && question.getType().equals(QbQuestion.TYPE_ESSAY) ? "-"
+					    : questionResult.getMark().toString());
 
 			    markCount++;
 			    markTotal += questionResult.getMark();
@@ -1993,6 +2005,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			    userResultRow.addCell(AssessmentEscapeUtils
 				    .escapeStringForExcelExport(questionResult.getJustification()));
 			}
+			userResultRow.addCell(
+				questionResult.getMarkedBy() == null ? "" : questionResult.getMarkedBy().getFullName());
+			userResultRow.addCell(questionResult.getMarkerComment());
 
 			questionSummaryTabTemp.add(userResultRow);
 
@@ -2062,6 +2077,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		questionTitlesRow.addCell(title, true, ExcelCell.BORDER_STYLE_LEFT_THIN);
 
 		int columnShift = 1;
+		if (QbQuestion.TYPE_ESSAY == question.getType()) {
+		    columnShift += 2;
+		}
 		// currently only MCQ and True/False questions have learner interaction logged
 		// for other question types, do not include the column
 		boolean addAnsweredDateColumn = QbQuestion.TYPE_MULTIPLE_CHOICE == question.getType()
@@ -2090,8 +2108,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    for (QuestionReference questionReference : questionReferences) {
 		userSummaryUserHeadersRow.addCell(getMessage("label.export.mark"), ExcelCell.BORDER_STYLE_LEFT_THIN);
 		userSummaryUserHeadersRow.addCell(getMessage("label.authoring.basic.option.answer"));
-
 		AssessmentQuestion question = questionReference.getQuestion();
+		if (QbQuestion.TYPE_ESSAY == question.getType()) {
+		    userSummaryUserHeadersRow.addCell(getMessage("label.monitoring.user.summary.marker"));
+		    userSummaryUserHeadersRow.addCell(getMessage("label.monitoring.user.summary.marker.comment"));
+		}
+
 		boolean addAnsweredDateColumn = QbQuestion.TYPE_MULTIPLE_CHOICE == question.getType()
 			|| QbQuestion.TYPE_TRUE_FALSE == question.getType();
 		if (addAnsweredDateColumn) {
@@ -2100,6 +2122,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		if (assessment.isEnableConfidenceLevels() && QbQuestion.TYPE_MARK_HEDGING != question.getType()) {
 		    userSummaryUserHeadersRow.addCell(getMessage("label.confidence"));
 		}
+
 	    }
 
 	    // a single column at the end of previous headers
@@ -2154,6 +2177,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 			// learner interaction
 			QbQuestion question = questionResult.getQbQuestion();
+			if (QbQuestion.TYPE_ESSAY == question.getType()) {
+			    userResultRow.addCell(questionResult.getMarkedBy() == null ? ""
+				    : questionResult.getMarkedBy().getFullName());
+			    userResultRow.addCell(questionResult.getMarkerComment());
+			}
+
 			boolean addAnsweredDateColumn = QbQuestion.TYPE_MULTIPLE_CHOICE == question.getType()
 				|| QbQuestion.TYPE_TRUE_FALSE == question.getType();
 			if (addAnsweredDateColumn) {
@@ -2363,65 +2392,76 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public void changeQuestionResultMark(Long questionResultUid, float newMark, Integer teacherId) {
+    public void changeQuestionResultMark(Long questionResultUid, Float newMark, String markerComment,
+	    Integer teacherId) {
+	if (newMark == null && markerComment == null) {
+	    // nothing to chagne
+	    return;
+	}
 	AssessmentQuestionResult questionResult = assessmentQuestionResultDao
 		.getAssessmentQuestionResultByUid(questionResultUid);
-	float oldMark = questionResult.getMark();
-	AssessmentResult assessmentResult = questionResult.getAssessmentResult();
-	float assessmentMark = (assessmentResult.getGrade() - oldMark) + newMark;
+	if (newMark != null) {
+	    float oldMark = questionResult.getMark();
+	    AssessmentResult assessmentResult = questionResult.getAssessmentResult();
+	    float assessmentMark = (assessmentResult.getGrade() - oldMark) + newMark;
 
-	Long toolSessionId = assessmentResult.getSessionId();
-	Assessment assessment = assessmentResult.getAssessment();
-	Long questionUid = questionResult.getQbToolQuestion().getUid();
+	    Long toolSessionId = assessmentResult.getSessionId();
+	    Assessment assessment = assessmentResult.getAssessment();
+	    Long questionUid = questionResult.getQbToolQuestion().getUid();
 
-	AssessmentUser teacher = null;
-	if (teacherId != null) {
-	    teacher = getUserByIdAndContent(teacherId.longValue(), assessment.getContentId());
-	}
-
-	// When changing a mark for user and isUseSelectLeaderToolOuput is true, the mark should be propagated to all
-	// students within the group
-	List<AssessmentUser> users = new ArrayList<>();
-	if (assessment.isUseSelectLeaderToolOuput()) {
-	    users = getUsersBySession(toolSessionId);
-	} else {
-	    users = new ArrayList<>();
-	    AssessmentUser user = assessmentResult.getUser();
-	    users.add(user);
-	}
-
-	for (AssessmentUser user : users) {
-	    Long userId = user.getUserId();
-
-	    List<Object[]> questionResults = assessmentQuestionResultDao
-		    .getAssessmentQuestionResultList(assessment.getUid(), userId, questionUid);
-
-	    if ((questionResults == null) || questionResults.isEmpty()) {
-		log.warn("User with uid: " + user.getUid()
-			+ " doesn't have any results despite the fact group leader has some.");
-		continue;
+	    User teacher = null;
+	    if (teacherId != null) {
+		teacher = userManagementService.getUserById(teacherId);
 	    }
 
-	    Object[] lastAssessmentQuestionResultObj = questionResults.get(questionResults.size() - 1);
-	    AssessmentQuestionResult lastAssessmentQuestionResult = (AssessmentQuestionResult) lastAssessmentQuestionResultObj[0];
-
-	    lastAssessmentQuestionResult.setMark(newMark);
-	    if (teacher != null) {
-		lastAssessmentQuestionResult.setMarkedBy(teacher);
+	    // When changing a mark for user and isUseSelectLeaderToolOuput is true, the mark should be propagated to all
+	    // students within the group
+	    List<AssessmentUser> users = new ArrayList<>();
+	    if (assessment.isUseSelectLeaderToolOuput()) {
+		users = getUsersBySession(toolSessionId);
+	    } else {
+		users = new ArrayList<>();
+		AssessmentUser user = assessmentResult.getUser();
+		users.add(user);
 	    }
-	    assessmentQuestionResultDao.saveObject(lastAssessmentQuestionResult);
 
-	    AssessmentResult result = lastAssessmentQuestionResult.getAssessmentResult();
-	    result.setGrade(assessmentMark);
-	    assessmentResultDao.saveObject(result);
+	    for (AssessmentUser user : users) {
+		Long userId = user.getUserId();
 
-	    // propagade changes to Gradebook
-	    toolService.updateActivityMark(Double.valueOf(assessmentMark), null, userId.intValue(), toolSessionId,
-		    false);
+		List<Object[]> questionResults = assessmentQuestionResultDao
+			.getAssessmentQuestionResultList(assessment.getUid(), userId, questionUid);
 
-	    // records mark change with audit service
-	    logEventService.logMarkChange(userId, user.getLoginName(), assessment.getContentId(), "" + oldMark,
-		    "" + assessmentMark);
+		if ((questionResults == null) || questionResults.isEmpty()) {
+		    log.warn("User with uid: " + user.getUid()
+			    + " doesn't have any results despite the fact group leader has some.");
+		    continue;
+		}
+
+		Object[] lastAssessmentQuestionResultObj = questionResults.get(questionResults.size() - 1);
+		AssessmentQuestionResult lastAssessmentQuestionResult = (AssessmentQuestionResult) lastAssessmentQuestionResultObj[0];
+
+		lastAssessmentQuestionResult.setMark(newMark);
+		if (teacher != null) {
+		    lastAssessmentQuestionResult.setMarkedBy(teacher);
+		}
+		assessmentQuestionResultDao.saveObject(lastAssessmentQuestionResult);
+
+		AssessmentResult result = lastAssessmentQuestionResult.getAssessmentResult();
+		result.setGrade(assessmentMark);
+		assessmentResultDao.saveObject(result);
+
+		// propagade changes to Gradebook
+		toolService.updateActivityMark(Double.valueOf(assessmentMark), null, userId.intValue(), toolSessionId,
+			false);
+
+		// records mark change with audit service
+		logEventService.logMarkChange(userId, user.getLoginName(), assessment.getContentId(), "" + oldMark,
+			"" + assessmentMark);
+	    }
+	}
+	if (markerComment != null) {
+	    questionResult.setMarkerComment(markerComment);
+	    assessmentResultDao.saveObject(questionResult);
 	}
 
     }

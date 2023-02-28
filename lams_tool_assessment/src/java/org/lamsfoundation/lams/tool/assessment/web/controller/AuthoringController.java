@@ -52,6 +52,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
+import org.hibernate.Hibernate;
 import org.lamsfoundation.lams.qb.QbConstants;
 import org.lamsfoundation.lams.qb.form.QbQuestionForm;
 import org.lamsfoundation.lams.qb.model.QbCollection;
@@ -62,6 +63,7 @@ import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOverallFeedback;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentSection;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
@@ -173,6 +175,7 @@ public class AuthoringController {
 	// init RandomPoolQuestions
 	List<AssessmentQuestion> randomPoolQuestions = getRandomPoolQuestions(sessionMap);
 	randomPoolQuestions.clear();
+
 	for (AssessmentQuestion question : assessment.getQuestions()) {
 	    // since we are iterating anyway, here fill version information to each question
 	    qbService.fillVersionMap(question.getQbQuestion());
@@ -201,6 +204,8 @@ public class AuthoringController {
 
 	boolean questionEtherpadEnabled = StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
 	sessionMap.put(AssessmentConstants.ATTR_IS_QUESTION_ETHERPAD_ENABLED, questionEtherpadEnabled);
+
+	Hibernate.initialize(assessment.getSections());
 
 	return "pages/authoring/start";
     }
@@ -241,6 +246,7 @@ public class AuthoringController {
 	Set<AssessmentQuestion> oldQuestions = (assessmentPO == null) ? new HashSet<>() : assessmentPO.getQuestions();
 	Set<QuestionReference> oldReferences = (assessmentPO == null) ? new HashSet<>()
 		: assessmentPO.getQuestionReferences();
+	Set<AssessmentSection> oldSections = (assessmentPO == null) ? new HashSet<>() : assessmentPO.getSections();
 
 	AssessmentUser assessmentUser = null;
 
@@ -257,6 +263,9 @@ public class AuthoringController {
 	    }
 	    for (QuestionReference reference : oldReferences) {
 		service.releaseFromCache(reference);
+	    }
+	    for (AssessmentSection section : oldSections) {
+		service.releaseFromCache(section);
 	    }
 
 	    Long uid = assessmentPO.getUid();
@@ -323,6 +332,66 @@ public class AuthoringController {
 	// ************************* Handle assessment overall feedbacks *******************
 	TreeSet<AssessmentOverallFeedback> overallFeedbackList = getOverallFeedbacksFromForm(request, true);
 	assessmentPO.setOverallFeedbacks(overallFeedbackList);
+
+	// ************************* Handle sections *******************
+	String questionDistributionType = request.getParameter("questionDistributionType");
+
+	// check which sections were added / updated
+	Set<AssessmentSection> sections = new TreeSet<>();
+	int sectionCounter = 1;
+	Integer sectionQuestionCount = null;
+	do {
+	    sectionQuestionCount = WebUtil.readIntParam(request, "sectionQuestionCount" + sectionCounter, true);
+	    if (sectionQuestionCount != null) {
+		String sectionName = request.getParameter("sectionName" + sectionCounter);
+		int existingSectionCounter = 0;
+		AssessmentSection section = null;
+		for (AssessmentSection existingSection : oldSections) {
+		    existingSectionCounter++;
+		    if (existingSectionCounter < sectionCounter) {
+			continue;
+		    }
+		    section = existingSection;
+		    break;
+		}
+		if (section == null) {
+		    section = new AssessmentSection();
+		}
+		section.setDisplayOrder(sectionCounter);
+		section.setName(StringUtils.isBlank(sectionName) ? null : sectionName);
+		section.setQuestionCount(sectionQuestionCount);
+		sections.add(section);
+		sectionCounter++;
+	    }
+	} while (sectionQuestionCount != null);
+
+	assessmentPO.setSections(sections);
+
+	switch (questionDistributionType) {
+	    case "all":
+		assessmentPO.setQuestionsPerPage(0);
+		break;
+	    case "section":
+		if (sections.isEmpty()) {
+		    assessmentPO.setQuestionsPerPage(0);
+		} else {
+		    assessmentPO.setQuestionsPerPage(-1);
+		}
+		break;
+	}
+
+	// remove unnecessary sections
+	if (sectionCounter <= oldSections.size()) {
+	    Iterator<AssessmentSection> sectionIterator = oldSections.iterator();
+	    int existingSectionCounter = 1;
+	    while (sectionIterator.hasNext()) {
+		AssessmentSection section = sectionIterator.next();
+		if (existingSectionCounter >= sectionCounter) {
+		    service.deleteSection(section.getUid());
+		}
+		existingSectionCounter++;
+	    }
+	}
 
 	// **********************************************
 	// finally persist assessmentPO again

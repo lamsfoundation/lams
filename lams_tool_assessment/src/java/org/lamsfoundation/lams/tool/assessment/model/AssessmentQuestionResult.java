@@ -42,6 +42,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbToolAnswer;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * Assessment Question Result
@@ -78,9 +79,12 @@ public class AssessmentQuestionResult extends QbToolAnswer {
     @Column
     private String justification;
 
+    @Column(name = "marker_comment")
+    private String markerComment;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "marked_by")
-    private AssessmentUser markedBy;
+    private User markedBy;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "result_uid")
@@ -207,12 +211,20 @@ public class AssessmentQuestionResult extends QbToolAnswer {
 	return justification == null ? null : StringEscapeUtils.escapeJavaScript(justification.replace("\r\n", "<br>"));
     }
 
-    public AssessmentUser getMarkedBy() {
+    public User getMarkedBy() {
 	return markedBy;
     }
 
-    public void setMarkedBy(AssessmentUser markedBy) {
+    public void setMarkedBy(User markedBy) {
 	this.markedBy = markedBy;
+    }
+
+    public String getMarkerComment() {
+	return markerComment;
+    }
+
+    public void setMarkerComment(String markerComment) {
+	this.markerComment = markerComment;
     }
 
     public AssessmentUser getUser() {

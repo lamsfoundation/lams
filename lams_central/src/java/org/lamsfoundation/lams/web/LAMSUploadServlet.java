@@ -36,6 +36,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * Servlet to upload files.<br>
  *
@@ -222,6 +225,21 @@ public class LAMSUploadServlet extends HttpServlet {
 	    out.println("</script>");
 	    out.flush();
 	    out.close();
+	} else if ("json".equalsIgnoreCase(request.getParameter("responseType"))) {
+	    // UploadImage CKEditor plugin requires this format of response
+	    ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	    if (returnMessage == null) {
+		responseJSON.put("uploaded", 1);
+		responseJSON.put("fileName", newName);
+		responseJSON.put("url", fileUrl);
+	    } else {
+		responseJSON.put("uploaded", 0);
+		ObjectNode errorJSON = JsonNodeFactory.instance.objectNode();
+		errorJSON.put("message", returnMessage);
+		responseJSON.set("error", errorJSON);
+	    }
+	    response.setContentType("application/json;charset=UTF-8");
+	    response.getWriter().write(responseJSON.toString());
 	}
     }
 

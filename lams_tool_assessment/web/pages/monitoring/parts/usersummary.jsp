@@ -91,7 +91,9 @@
 	  						<c:if test="${assessment.enableConfidenceLevels and question.type != 8}">
 	  							"<fmt:message key="label.confidence" />",
 	  						</c:if>
-	  						"<fmt:message key="label.monitoring.user.summary.grade" />"
+	  						"<fmt:message key="label.monitoring.user.summary.grade" />",
+	  	  					"<fmt:message key="label.monitoring.user.summary.marker" />",
+	  	  					"<fmt:message key="label.monitoring.user.summary.marker.comment" />"
 	  					],  
 	  				   	colModel:[
 	  				   		{name:'id', index:'id', width:52, sorttype:"int"},
@@ -102,15 +104,33 @@
 			  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align', formatter: gradientNumberFormatter},
 			  			  	</c:if>
 	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, 
-		  				   		editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align', title : false }		
+		  				   		editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align', title : false },	
+	  			  			{name:'marker', index:'marker', width: 80, title: false},
+	  			  			{name:'markerComment', index:'markerComment', width:120, editable:true, sortable: false,
+	  			  			    editoptions: {maxlength: 100}, align:"left", classes: 'vertical-align', title : false }	
 	  				   	],
 	  				   	multiselect: false,
 	  				  	cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>&<csrf:token/>',
 	  				  	cellEdit: true,
+	  	  				formatCell: function(rowid, name, value, iRow, iCol){
+	  	  	  				if (name != "grade") {
+	  	  	  	  				return value;
+	  	  	  	  			}
+	  	  	  				if (value == "-") {
+	  	  	  	  				value = "0";
+	  	  	  	  			}
+	  	  	  	  			return value;
+	  	  	  			},
 	  				  	beforeEditCell: function (rowid,name,val,iRow,iCol){
+	  	  	  				if (name != "grade") {
+	  	  	  	  				return;
+	  	  	  	  			}
   				  			previousCellValue = val;
   				  		},
 	  					beforeSaveCell : function(rowid, name, val, iRow, iCol) {
+	  						if (name != "grade") {
+	  	  	  	  				return val;
+	  	  	  	  			}
 	  						if (isNaN(val)) {
 	  	  						return null;
 	  	  					}
@@ -122,7 +142,9 @@
 	  						}
 	  					},
 	  				  	afterSaveCell : function (rowid,name,val,iRow,iCol){
-	  				  		//var questionResultUid = jQuery("#user${question.uid}").getCell(rowid, 'questionResultUid');
+	  	  					if (name != "grade") {
+	  	  	  	  				return;
+	  	  	  	  			}
 	  				  		if (isNaN(val)) { //|| (questionResultUid=="")) {
 	  				  			jQuery("#user${question.uid}").restoreCell(iRow,iCol); 
 	  				  		} else {
@@ -132,13 +154,24 @@
 	  				  		}		
   						},	  		
 	  				  	beforeSubmitCell : function (rowid,name,val,iRow,iCol){
-	  				  		if (isNaN(val)) {
-	  				  			return {nan:true};
-	  				  		} else {
-	  							var questionResultUid = jQuery("#user${question.uid}").getCell(rowid, 'questionResultUid');
-	  							return {questionResultUid:questionResultUid};		  				  		
-	  				  		}
-	  					}  				  	
+		  				  	if (name == "grade" && isNaN(val)) {
+	  	  						return {nan:true};
+	  	  					} else {
+	  	  						var questionResultUid = jQuery("#user${question.uid}").getCell(rowid, 'questionResultUid');
+	  	  						return {
+	  	  	  							questionResultUid:questionResultUid,
+	  	  	  						    column:name
+	  	  	  						   };		  				  		
+	  	  				  	}
+	  					},
+	  	  				afterSubmitCell : function (serverresponse, rowid, name, value, iRow, iCol) {
+	  	  	  				if (serverresponse.statusText == "OK") {
+	  	  	  	  				if (serverresponse.responseText != "") {
+	  	  	  	  					$(this).setCell(rowid, 'marker', serverresponse.responseText, {}, {});
+	  	  	  	  				}
+	  	  	  					return [true, ""];
+	  	  	  				}
+	  	  	  			}
 	  				});
 	  				
 	  	   	        <c:forEach var="questionResult" items="${userSummaryItem.questionResults}" varStatus="i">
@@ -157,32 +190,32 @@
 		  	   	   	   		<c:if test="${assessment.enableConfidenceLevels}">
 		  	 	   	   			confidence:"${questionResult.confidenceLevel}",
 		  	 	   	   		</c:if>
-	  	   	   	   			grade:"<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>"
+	  	 	 	   	   		grade:
+	  	 		 	 	 	 <c:choose>
+	  	 		 	 	    	<c:when test="${requiresMarking}">
+	  	 		 	 	    		"-"
+	  	 		 	 	    	</c:when>
+	  	 		 	 	    	<c:otherwise>
+	  	 		 	 	    		"<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>"
+	  	 		 	 	    	</c:otherwise>
+	  	 		 	 	    </c:choose>,
+	  	 		 	 	    marker : 
+	  	 			 	 	 <c:choose>
+	  	 		 	 	    	<c:when test="${requiresMarking}">
+	  	 			 	    		("<b><fmt:message key='label.monitoring.user.summary.grade.required' /></b>")
+	  	 			 	    	</c:when>
+	  	 			 	    	<c:when test="${not empty questionResult.markedBy}">
+	  	 			 	  			"<c:out value='${questionResult.markedBy.fullName}' />"
+	  	 			 	    	</c:when>
+	  	 			 	    	<c:otherwise>
+	  	 			 	    		""
+	  	 			 	    	</c:otherwise>
+	  	 			 	     </c:choose>,
+	  	 			 	     markerComment: "<c:out value='${questionResult.markerComment}' />"
 	  	   	   	   	    });
-	  	   	     		
-	  	   	    		// set maxGrade attribute to cell DOM element
-	  	 	 	     	table.setCell(${i.index + 1}, "grade", "", ${requiresMarking ? "'requires-grading'" : "null"},
-	  		  	 	 		{"maxGrade" :  "${questionResult.maxMark}"
-	  		   	 	 	    <c:choose>
-				 	 	    	<c:when test="${requiresMarking}">
-				 	 	    		,"title" : "<fmt:message key='label.monitoring.user.summary.grade.required' />"
-					 	 	    	,"data-toggle" : "tooltip"
-						 	 	    ,"data-container" : "body"
-				 	 	    	</c:when>
-				 	 	    	<c:when test="${not empty questionResult.markedBy}">
-				 	 	  			,"title" : "<fmt:message key='label.monitoring.user.summary.grade.by'>
-					 	 	  						<fmt:param><c:out value='${questionResult.markedBy.fullName}' /></fmt:param>
-					 	 	  					</fmt:message>"
-					 		 	 	,"data-toggle" : "tooltip"
-					 			 	,"data-container" : "body"
-				 	 	    	</c:when>
-				 	 	    </c:choose>
-			 	 	 	    });
 	  		        </c:forEach>			
 	  				
 	  			</c:forEach>
-
-				$('[data-toggle="tooltip"]').tooltip();
 				
   				//jqgrid autowidth (http://stackoverflow.com/a/1610197)
 	  			$(window).bind('resize', function() {
