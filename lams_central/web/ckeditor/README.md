@@ -22,6 +22,8 @@ Installing CKEditor is an easy task. Just follow these simple steps:
     You should have already completed this step, but be
     sure you have the very latest version.
     
+    Include the following plugins with latest version: uploadwidget, uploadimage
+    
  2. **Extract** (decompress) the downloaded file into the root of your website.
  
  3. Copy plugins developed by LAMS from the old instance of CKEditor  
@@ -31,6 +33,7 @@ Installing CKEditor is an easy task. Just follow these simple steps:
 /ckeditor/plugins/bootpanel  
 /ckeditor/plugins/confighelper  
 /ckeditor/plugins/wavepanel  
+
  4. Apply all customizations listed below in LAMS Customizations
  
 **Note:** CKEditor is by default installed in the `ckeditor` folder. You can
