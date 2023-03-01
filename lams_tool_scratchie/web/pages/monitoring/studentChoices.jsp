@@ -57,7 +57,7 @@
 		$('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');
 
 
-		<c:if test="${fn:length(sessionDtos) > 0}">
+		<c:if test="${fn:length(sessionDtos) > 10}">
 			// Add sticky column headers to student choices table.
 			// Standard sticky header CSS solution does not work as it is page which is being scrolled, not the table itself
 	
