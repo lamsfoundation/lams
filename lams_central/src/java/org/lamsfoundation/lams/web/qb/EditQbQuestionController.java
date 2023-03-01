@@ -124,7 +124,8 @@ public class EditQbQuestionController {
 	boolean editingAllowed = userManagementService.isUserSysAdmin()
 		|| qbService.isQuestionInPublicCollection(qbQuestion.getQuestionId())
 		|| qbService.isQuestionInUserOwnCollection(qbQuestion.getQuestionId(), userId)
-		|| qbService.isQuestionInUserSharedCollection(qbQuestion.getQuestionId(), userId);
+		|| qbService.isQuestionInUserSharedCollection(qbQuestion.getQuestionId(), userId)
+		|| qbService.isQuestionInUserMonitoredOrganisationFolder(qbQuestion.getQuestionId(), userId);
 	if (!editingAllowed) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN,
 		    "The user does not have access to given QB question editing");

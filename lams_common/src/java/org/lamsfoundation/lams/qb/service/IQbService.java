@@ -156,6 +156,8 @@ public interface IQbService {
 
     boolean isQuestionInPublicCollection(int qbQuestionId);
 
+    boolean isQuestionInUserMonitoredOrganisationFolder(int qbQuestionId, int userId);
+
     void insertQuestion(QbQuestion qbQuestion);
 
     void prepareQuestionForExport(QbQuestion qbQuestion);

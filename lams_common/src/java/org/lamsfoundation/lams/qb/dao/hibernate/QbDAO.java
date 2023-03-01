@@ -23,6 +23,7 @@ import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 
 public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
@@ -123,6 +124,17 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     private static final String IS_QUESTION_IN_PUBLIC_COLLECTION = "SELECT DISTINCT 1 FROM lams_qb_collection_question AS cq "
 	    + "JOIN lams_qb_collection AS c ON cq.collection_uid = c.uid AND "
 	    + "c.user_id IS NULL AND cq.qb_question_id = :qbQuestionId";
+
+    private static final String IS_QUESTION_IN_USER_MONITORED_ORGANISATION_FOLDER = "SELECT DISTINCT 1 FROM lams_qb_question AS q "
+	    + "JOIN lams_qb_tool_question AS tq ON q.uid = tq.qb_question_uid AND q.question_id = :qbQuestionId "
+	    + "JOIN lams_learning_activity AS a USING (tool_content_id) "
+	    + "JOIN lams_learning_design AS ld USING (learning_design_id) "
+	    + "JOIN lams_workspace_folder AS wf USING (workspace_folder_id)"
+	    + "LEFT JOIN lams_user_organisation AS uo USING (organisation_id) "
+	    + "LEFT JOIN lams_user_organisation_role AS uor USING (user_organisation_id) "
+	    + "WHERE ld.removed = 0 AND (wf.user_id = :userId OR wf.lams_workspace_folder_type_id = "
+	    + WorkspaceFolder.PUBLIC_SEQUENCES + " OR (uo.user_id = :userId AND uor.role_id = " + Role.ROLE_MONITOR
+	    + "))";
 
     private static final String GENERATE_QUESTION_ID = "INSERT INTO lams_sequence_generator(lams_qb_question_question_id) VALUES (:qbQuestionId)";
 
@@ -516,6 +528,12 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     public boolean isQuestionInPublicCollection(int qbQuestionId) {
 	return getSession().createNativeQuery(IS_QUESTION_IN_PUBLIC_COLLECTION)
 		.setParameter("qbQuestionId", qbQuestionId).uniqueResult() != null;
+    }
+
+    @Override
+    public boolean isQuestionInUserMonitoredOrganisationFolder(int qbQuestionId, int userId) {
+	return getSession().createNativeQuery(IS_QUESTION_IN_USER_MONITORED_ORGANISATION_FOLDER)
+		.setParameter("userId", userId).setParameter("qbQuestionId", qbQuestionId).uniqueResult() != null;
     }
 
     private boolean isQuestionInCollection(long collectionUid, int qbQuestionId) {

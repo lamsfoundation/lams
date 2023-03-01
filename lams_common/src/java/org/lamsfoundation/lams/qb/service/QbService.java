@@ -677,6 +677,15 @@ public class QbService implements IQbService {
     }
 
     /**
+     * Is the question in a learning design which is in user's private folder, public folder
+     * or a course folder where user is a monitor.
+     */
+    @Override
+    public boolean isQuestionInUserMonitoredOrganisationFolder(int qbQuestionId, int userId) {
+	return qbDAO.isQuestionInUserMonitoredOrganisationFolder(qbQuestionId, userId);
+    }
+
+    /**
      * Cascades in QbToolQuestion, QbQuestion and QbOptions do not seem to work on insert.
      * New QbQuestions need to be saved step by step.
      */

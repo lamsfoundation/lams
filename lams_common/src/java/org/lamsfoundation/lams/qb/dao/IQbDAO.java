@@ -89,6 +89,8 @@ public interface IQbDAO extends IBaseDAO {
 
     boolean isQuestionInPublicCollection(int qbQuestionId);
 
+    boolean isQuestionInUserMonitoredOrganisationFolder(int qbQuestionId, int userId);
+
     int mergeQuestions(long sourceQbQUestionUid, long targetQbQuestionUid);
 
     void removeAnswersByToolContentId(long toolContentId);
