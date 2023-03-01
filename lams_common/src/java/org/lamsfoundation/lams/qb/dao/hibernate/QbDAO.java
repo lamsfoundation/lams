@@ -109,9 +109,16 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     private static final String FIND_QUESTIONS_BY_TOOL_CONTENT_ID = "SELECT tq.qbQuestion FROM QbToolQuestion AS tq "
 	    + "WHERE tq.toolContentId = :toolContentId";
 
-    private static final String IS_QUESTION_IN_USER_COLLECTION = "SELECT DISTINCT 1 FROM lams_qb_collection_question AS cq "
+    private static final String IS_QUESTION_IN_USER_OWN_COLLECTION = "SELECT DISTINCT 1 FROM lams_qb_collection_question AS cq "
 	    + "JOIN lams_qb_collection AS c ON cq.collection_uid = c.uid AND "
 	    + "c.user_id = :userId AND cq.qb_question_id = :qbQuestionId";
+
+    private static final String IS_QUESTION_IN_USER_SHARED_COLLECTION = "SELECT DISTINCT 1 FROM lams_qb_collection_question AS cq "
+	    + "JOIN lams_qb_collection AS c ON cq.collection_uid = c.uid "
+	    + "JOIN lams_qb_collection_organisation AS co ON co.collection_uid = c.uid "
+	    + "JOIN lams_user_organisation AS uo USING (organisation_id) "
+	    + "JOIN lams_user_organisation_role AS uor USING (user_organisation_id) "
+	    + "WHERE uo.user_id = :userId AND cq.qb_question_id = :qbQuestionId AND uor.role_id = " + Role.ROLE_AUTHOR;
 
     private static final String IS_QUESTION_IN_PUBLIC_COLLECTION = "SELECT DISTINCT 1 FROM lams_qb_collection_question AS cq "
 	    + "JOIN lams_qb_collection AS c ON cq.collection_uid = c.uid AND "
@@ -494,8 +501,14 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     }
 
     @Override
-    public boolean isQuestionInUserCollection(int userId, int qbQuestionId) {
-	return getSession().createNativeQuery(IS_QUESTION_IN_USER_COLLECTION).setParameter("userId", userId)
+    public boolean isQuestionInUserOwnCollection(int userId, int qbQuestionId) {
+	return getSession().createNativeQuery(IS_QUESTION_IN_USER_OWN_COLLECTION).setParameter("userId", userId)
+		.setParameter("qbQuestionId", qbQuestionId).uniqueResult() != null;
+    }
+
+    @Override
+    public boolean isQuestionInUserSharedCollection(int userId, int qbQuestionId) {
+	return getSession().createNativeQuery(IS_QUESTION_IN_USER_SHARED_COLLECTION).setParameter("userId", userId)
 		.setParameter("qbQuestionId", qbQuestionId).uniqueResult() != null;
     }
 

@@ -73,8 +73,9 @@ public class QbStatsController {
 
 	Integer userId = getUserId();
 	int qbQuestionId = stats.getQuestion().getQuestionId();
-	boolean managementAllowed = qbService.isQuestionInUserCollection(qbQuestionId, userId)
-		|| qbService.isQuestionInPublicCollection(qbQuestionId);
+	boolean managementAllowed = qbService.isQuestionInPublicCollection(qbQuestionId)
+		|| qbService.isQuestionInUserOwnCollection(qbQuestionId, userId)
+		|| qbService.isQuestionInUserSharedCollection(qbQuestionId, userId);
 	model.addAttribute("managementAllowed", managementAllowed);
 
 	Collection<QbCollection> existingCollections = qbService.getQuestionCollectionsByUid(qbQuestionUid);
