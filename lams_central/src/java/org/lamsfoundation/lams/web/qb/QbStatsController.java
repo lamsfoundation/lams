@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -66,6 +67,9 @@ public class QbStatsController {
     @Autowired
     private IOutcomeService outcomeService;
 
+    @Autowired
+    private ISecurityService securityService;
+
     @RequestMapping("/show")
     public String showStats(@RequestParam long qbQuestionUid, Model model) throws Exception {
 	QbStatsDTO stats = qbService.getQuestionStats(qbQuestionUid);
@@ -73,7 +77,8 @@ public class QbStatsController {
 
 	Integer userId = getUserId();
 	int qbQuestionId = stats.getQuestion().getQuestionId();
-	boolean managementAllowed = qbService.isQuestionInPublicCollection(qbQuestionId)
+	boolean managementAllowed = securityService.isSysadmin(getUserId(), "allow QB question editing", true)
+		|| qbService.isQuestionInPublicCollection(qbQuestionId)
 		|| qbService.isQuestionInUserOwnCollection(qbQuestionId, userId)
 		|| qbService.isQuestionInUserSharedCollection(qbQuestionId, userId);
 	model.addAttribute("managementAllowed", managementAllowed);

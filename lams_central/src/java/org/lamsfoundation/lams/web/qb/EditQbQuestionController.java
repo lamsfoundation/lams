@@ -121,7 +121,8 @@ public class EditQbQuestionController {
 	    throw new RuntimeException("QbQuestion with uid:" + qbQuestionUid + " was not found!");
 	}
 	Integer userId = getUserId();
-	boolean editingAllowed = qbService.isQuestionInPublicCollection(qbQuestion.getQuestionId())
+	boolean editingAllowed = userManagementService.isUserSysAdmin()
+		|| qbService.isQuestionInPublicCollection(qbQuestion.getQuestionId())
 		|| qbService.isQuestionInUserOwnCollection(qbQuestion.getQuestionId(), userId)
 		|| qbService.isQuestionInUserSharedCollection(qbQuestion.getQuestionId(), userId);
 	if (!editingAllowed) {
