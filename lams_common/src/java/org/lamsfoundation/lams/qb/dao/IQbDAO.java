@@ -86,9 +86,13 @@ public interface IQbDAO extends IBaseDAO {
 
     Set<Integer> getCollectionQuestionIdsExcluded(long collectionUid, Collection<Integer> qbQuestionIds);
 
-    boolean isQuestionInUserCollection(int userId, int qbQuestionId);
+    boolean isQuestionInUserOwnCollection(int userId, int qbQuestionId);
+
+    boolean isQuestionInUserSharedCollection(int userId, int qbQuestionId);
 
     boolean isQuestionInPublicCollection(int qbQuestionId);
+
+    boolean isQuestionInUserMonitoredOrganisationFolder(int qbQuestionId, int userId);
 
     int mergeQuestions(long sourceQbQUestionUid, long targetQbQuestionUid);
 

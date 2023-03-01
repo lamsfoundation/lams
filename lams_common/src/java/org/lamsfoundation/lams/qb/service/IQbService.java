@@ -154,9 +154,13 @@ public interface IQbService {
 
     void releaseFromCache(Object object);
 
-    boolean isQuestionInUserCollection(int qbQuestionId, int userId);
+    boolean isQuestionInUserOwnCollection(int qbQuestionId, int userId);
+
+    boolean isQuestionInUserSharedCollection(int qbQuestionId, int userId);
 
     boolean isQuestionInPublicCollection(int qbQuestionId);
+
+    boolean isQuestionInUserMonitoredOrganisationFolder(int qbQuestionId, int userId);
 
     void insertQuestion(QbQuestion qbQuestion);
 

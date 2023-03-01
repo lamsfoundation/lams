@@ -325,7 +325,7 @@ public class QbCollectionController {
 	if (userId == null) {
 	    return false;
 	}
-	if (securityService.isAppadmin(userId, null, true) || securityService.isSysadmin(userId, null, true)) {
+	if (securityService.isAppadmin(userId, "acess QB collection", true)){
 	    return true;
 	}
 	Collection<QbCollection> collections = qbService.getUserCollections(userId);

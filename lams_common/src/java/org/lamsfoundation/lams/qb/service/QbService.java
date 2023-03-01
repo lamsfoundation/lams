@@ -385,10 +385,7 @@ public class QbService implements IQbService {
 
     @Override
     public List<QbCollection> getUserOwnCollections(int userId) {
-	Map<String, Object> map = new HashMap<>();
-	map.put("userId", userId);
-	map.put("personal", false);
-	List<QbCollection> result = qbDAO.findByProperties(QbCollection.class, map);
+	List<QbCollection> result = qbDAO.findByProperty(QbCollection.class, "userId", userId);
 	Collections.sort(result, COLLECTION_NAME_COMPARATOR);
 	return result;
     }
@@ -638,9 +635,6 @@ public class QbService implements IQbService {
     public List<QbCollection> getUserCollections(int userId) {
 	Set<QbCollection> collections = new LinkedHashSet<>();
 
-	QbCollection privateCollection = getUserPrivateCollection(userId);
-	collections.add(privateCollection);
-
 	collections.addAll(getUserOwnCollections(userId));
 
 	QbCollection publicCollection = getPublicCollection();
@@ -675,13 +669,27 @@ public class QbService implements IQbService {
     }
 
     @Override
-    public boolean isQuestionInUserCollection(int qbQuestionId, int userId) {
-	return qbDAO.isQuestionInUserCollection(userId, qbQuestionId);
+    public boolean isQuestionInUserOwnCollection(int qbQuestionId, int userId) {
+	return qbDAO.isQuestionInUserOwnCollection(userId, qbQuestionId);
+    }
+
+    @Override
+    public boolean isQuestionInUserSharedCollection(int qbQuestionId, int userId) {
+	return qbDAO.isQuestionInUserSharedCollection(userId, qbQuestionId);
     }
 
     @Override
     public boolean isQuestionInPublicCollection(int qbQuestionId) {
 	return qbDAO.isQuestionInPublicCollection(qbQuestionId);
+    }
+
+    /**
+     * Is the question in a learning design which is in user's private folder, public folder
+     * or a course folder where user is a monitor.
+     */
+    @Override
+    public boolean isQuestionInUserMonitoredOrganisationFolder(int qbQuestionId, int userId) {
+	return qbDAO.isQuestionInUserMonitoredOrganisationFolder(qbQuestionId, userId);
     }
 
     /**

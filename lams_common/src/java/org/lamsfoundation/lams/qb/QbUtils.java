@@ -54,7 +54,7 @@ public class QbUtils {
 
 	if (isRequestCameFromTool && !isDefaultQuestion && qbQuestionUid != null) {
 	    QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
-	    boolean isQuestionInUserCollection = qbService.isQuestionInUserCollection(qbQuestion.getQuestionId(),
+	    boolean isQuestionInUserCollection = qbService.isQuestionInUserOwnCollection(qbQuestion.getQuestionId(),
 		    userId);
 	    if (!isQuestionInUserCollection) {
 		// in a tool the user is editing a question which is not in one of his collections
