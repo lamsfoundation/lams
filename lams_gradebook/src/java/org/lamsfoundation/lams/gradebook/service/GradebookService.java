@@ -2268,9 +2268,18 @@ public class GradebookService implements IGradebookFullService {
     }
 
     private List<Lesson> getTBLLessons(Integer organisationId, Integer userId) {
-	Set<Lesson> lessons = new TreeSet<>(new LessonComparator());
-	lessons.addAll(lessonService.getLessonsByGroupAndUser(userId, organisationId));
+	boolean isGroupManager = userService.isUserInRole(userId, organisationId, Role.GROUP_MANAGER);
 
+	Set<Lesson> lessons = new TreeSet<>(new LessonComparator());
+	if (isGroupManager) {
+	    lessons.addAll(lessonService.getLessonsByGroupAndUser(userId, organisationId));
+	} else {
+	    lessons.addAll(lessonService.getLessonsByGroup(organisationId));
+	    Organisation organisation = userService.getOrganisationById(organisationId);
+	    for (Organisation childOrganisation : organisation.getChildOrganisations()) {
+		lessons.addAll(lessonService.getLessonsByGroup(childOrganisation.getOrganisationId()));
+	    }
+	}
 	List<Lesson> tblLessons = new LinkedList<>();
 	for (Lesson lesson : lessons) {
 	    boolean isTblLesson = learningDesignService.isTBLSequence(lesson.getLearningDesign().getLearningDesignId());
