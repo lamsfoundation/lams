@@ -1766,6 +1766,7 @@ public class GradebookService implements IGradebookFullService {
 	headerRow.addCell(getMessage("gradebook.export.login"), true);
 	headerRow.addCell(getMessage("gradebook.export.last.name"), true);
 	headerRow.addCell(getMessage("gradebook.export.first.name"), true);
+	headerRow.addCell(getMessage("gradebook.columntitle.subGroup"), true);
 
 	List<Lesson> lessons = getTBLLessons(organisationId, userId);
 	Map<Long, Long> iRatActivityIds = new HashMap<>();
@@ -1789,6 +1790,15 @@ public class GradebookService implements IGradebookFullService {
 	    userDataRow.addCell(learner.getLogin());
 	    userDataRow.addCell(learner.getLastName());
 	    userDataRow.addCell(learner.getFirstName());
+	    Set<String> subgroups = new TreeSet<>();
+	    for (Lesson lesson : lessons) {
+		Organisation organisation = lesson.getOrganisation();
+		if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
+		    subgroups.add(organisation.getName());
+		}
+	    }
+	    userDataRow.addCell(String.join(", ", subgroups));
+
 	    for (Lesson lesson : lessons) {
 		Long iRatActivityId = iRatActivityIds.get(lesson.getLessonId());
 		Double mark = null;
