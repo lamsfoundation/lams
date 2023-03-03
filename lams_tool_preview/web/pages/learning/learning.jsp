@@ -120,7 +120,14 @@
 			<%@ include file="hedging.jsp" %>
 		</c:when>
 		<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isRubrics}">
-			<%@ include file="rubrics.jsp" %>
+			<c:choose>
+				<c:when test="${peerreview.rubricsView eq 2}">
+					<%@ include file="rubricsPivot.jsp" %>
+				</c:when>
+				<c:otherwise>
+					<%@ include file="rubrics.jsp" %>
+				</c:otherwise>
+			</c:choose>
 		</c:when>
 		</c:choose>		
 		</div>

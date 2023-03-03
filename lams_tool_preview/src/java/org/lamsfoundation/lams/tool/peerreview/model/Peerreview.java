@@ -43,8 +43,6 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
@@ -61,6 +59,9 @@ public class Peerreview implements Serializable, Cloneable {
     private static final long serialVersionUID = 39313222633921144L;
 
     private static final Logger log = Logger.getLogger(Peerreview.class);
+
+    public static final int RUBRICS_VIEW_LEARNER = 1;
+    public static final int RUBRICS_VIEW_ROW = 2;
 
     @Id
     @Column
@@ -129,6 +130,9 @@ public class Peerreview implements Serializable, Cloneable {
 
     @Column
     private int tolerance;
+
+    @Column(name = "rubrics_view")
+    private int rubricsView;
 
     // **********************************************************
     // Function method for Peerreview
@@ -455,5 +459,13 @@ public class Peerreview implements Serializable, Cloneable {
 
     public void setTolerance(int tolerance) {
 	this.tolerance = tolerance;
+    }
+
+    public int getRubricsView() {
+	return rubricsView;
+    }
+
+    public void setRubricsView(int rubricsView) {
+	this.rubricsView = rubricsView;
     }
 }

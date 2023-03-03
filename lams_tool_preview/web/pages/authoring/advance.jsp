@@ -3,9 +3,8 @@
 <!-- Advance Tab Content -->
 
 <lams:SimplePanel titleKey="label.review.options">
-
 	<div class="form-group">
-	<label for="maximumRatesPerUser"><fmt:message key="label.max.number.marks.each.user" /></label>
+		<label for="maximumRatesPerUser"><fmt:message key="label.max.number.marks.each.user" /></label>
 		<form:select path="peerreview.maximumRatesPerUser" cssClass="form-control form-control-inline">
 			<form:option value="0">
 				<fmt:message key="label.no.maximum" />
@@ -46,6 +45,18 @@
 		<fmt:message key="label.authoring.advanced.tolearnce" />
 		<form:input type="number" min="0" max="50" path="peerreview.tolerance" id="tolerance" cssClass="form-control form-control-inline loffset5" />
 		</label>
+	</div>
+	
+	<div class="form-group">
+		<label for="rubricsView"><fmt:message key="label.rating.rubrics.view" /></label>
+		<form:select path="peerreview.rubricsView" cssClass="form-control form-control-inline">
+			<form:option value="1">
+				<fmt:message key="label.rating.rubrics.view.learner" />
+			</form:option>
+			<form:option value="2">
+				<fmt:message key="label.rating.rubrics.view.row" />
+			</form:option>
+		</form:select>
 	</div>
 </lams:SimplePanel>
 
