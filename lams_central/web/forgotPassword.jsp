@@ -105,7 +105,7 @@
 							</label>
 						</div>
 						<div class="form-group">
-							<input type="text" name="login" id="login" class="form-control" maxlength="50" tabindex="1"
+							<input type="text" name="login" id="login" class="form-control" maxlength="256" tabindex="1"
 								onKeyPress="return submitenter(this,event)" />
 						</div>
 
@@ -118,7 +118,7 @@
 							</label>
 						</div>
 						<div class="form-group">
-							<input type="text" name="email" id="email" class="form-control" maxlength="50" tabindex="1"
+							<input type="text" name="email" id="email" class="form-control" maxlength="256" tabindex="1"
 								onKeyPress="return submitenter(this,event)" />
 						</div>
 
