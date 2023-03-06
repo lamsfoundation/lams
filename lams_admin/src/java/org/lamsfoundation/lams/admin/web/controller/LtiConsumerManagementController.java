@@ -123,6 +123,8 @@ public class LtiConsumerManagementController {
 	    request.setAttribute("timezoneDtos", timezoneDtos);
 	}
 
+	integrationService.clearLessonFinishUrlCache();
+
 	return "integration/ltiConsumer";
     }
 
@@ -139,6 +141,8 @@ public class LtiConsumerManagementController {
 	ltiConsumer.setDisabled(disable);
 	integrationService.saveExtServer(ltiConsumer);
 
+	integrationService.clearLessonFinishUrlCache();
+
 	AuditLogFilter.log(AuditLogFilter.LTI_INTEGRATED_SERVER_DISABLE_ACTION,
 		"integrated server name: " + ltiConsumer.getServerid());
 
@@ -151,6 +155,8 @@ public class LtiConsumerManagementController {
 	ExtServer ltiConsumer = integrationService.getExtServer(sid);
 	ltiConsumer.setDisabled(false);
 	integrationService.saveExtServer(ltiConsumer);
+
+	integrationService.clearLessonFinishUrlCache();
 
 	AuditLogFilter.log(AuditLogFilter.LTI_INTEGRATED_SERVER_ENABLE_ACTION,
 		"LTI integrated server name: " + ltiConsumer.getServerid());
@@ -172,6 +178,8 @@ public class LtiConsumerManagementController {
 		"LTI integrated server name: " + extServer.getServerid());
 
 	userManagementService.delete(extServer);
+
+	integrationService.clearLessonFinishUrlCache();
 
 	return start(request);
     }
@@ -262,6 +270,9 @@ public class LtiConsumerManagementController {
 	    ltiConsumer.setDefaultLocale(locale);
 
 	    integrationService.saveExtServer(ltiConsumer);
+
+	    integrationService.clearLessonFinishUrlCache();
+
 	    return start(request);
 
 	} else {
