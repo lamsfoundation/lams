@@ -126,7 +126,7 @@
 										</td>
 									</c:forEach>
 								</tr>
-								<c:if test="${not columnStatus.last}">
+								<c:if test="${not columnStatus.last and peerreview.rubricsInBetweenColumns}">
 									<tr>
 										<td>
 											<i><fmt:message key="label.rating.rubrics.in.between" /></i>

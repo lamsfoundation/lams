@@ -93,7 +93,7 @@
 								<th>
 									(${columnStatus.count})&nbsp;<c:out value="${columnHeader}" escapeXml="false"/>
 								</th>
-								<c:if test="${not columnStatus.last}">
+								<c:if test="${not columnStatus.last and peerreview.rubricsInBetweenColumns}">
 									<th>
 										<i>(${columnStatus.count + 0.5})&nbsp;<fmt:message key="label.rating.rubrics.in.between" /></i>
 									</th>
@@ -115,7 +115,7 @@
 									>
 										<c:out value="${column.name}" escapeXml="false" />	
 									</td>
-									<c:if test="${not columnOrderId.last}">
+									<c:if test="${not columnOrderId.last and peerreview.rubricsInBetweenColumns}">
 										<td onClick="javascript:rateRubricsCriteria(this, ${criteria.ratingCriteriaId}, ${ratingDto.itemId}, ${columnOrderId.count + 0.5})"
 											<c:if test="${criteriaDto.ratingDtos[learnerOrderId.index].userRating == (columnOrderId.count + 0.5)}">
 												class="bg-success"

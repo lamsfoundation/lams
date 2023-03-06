@@ -663,7 +663,14 @@ public class PeerreviewServiceImpl
 		.collect(Collectors.mapping(rating -> {
 		    StyledRatingDTO ratingDto = new StyledRatingDTO(currentUserId.longValue());
 		    if (rating.getRating() != null) {
-			ratingDto.setUserRating(rating.getRating().toString());
+			if (rating.getRating() % 1 > 0) {
+			    // for 0.5 rating columns get exact value
+			    ratingDto.setUserRating(rating.getRating().toString());
+			} else {
+			    // for whole points round them up so we get "1" instead of "1.0"
+			    ratingDto.setUserRating(String.valueOf(rating.getRating().intValue()));
+			}
+
 		    }
 		    ratingDto.setItemDescription(rating.getLearner().getFullName());
 		    ratingDto.setItemDescription2(rating.getLearner().getUserId().toString());

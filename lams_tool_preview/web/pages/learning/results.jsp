@@ -116,7 +116,8 @@
 				</div>
 			</c:if>
 			<div class="panel-body">
-			<lams:StyledRating criteriaRatings="${criteriaRatings}" showJustification="true" alwaysShowAverage="false" currentUserDisplay="false" />
+			<lams:StyledRating criteriaRatings="${criteriaRatings}" showJustification="true" alwaysShowAverage="false"
+							   currentUserDisplay="false" rubricsInBetweenColumns="${peerreview.rubricsInBetweenColumns}" />
 			</div>
 			</div>
 		</c:forEach>

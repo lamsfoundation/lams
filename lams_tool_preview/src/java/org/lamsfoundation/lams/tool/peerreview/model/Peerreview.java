@@ -134,6 +134,9 @@ public class Peerreview implements Serializable, Cloneable {
     @Column(name = "rubrics_view")
     private int rubricsView;
 
+    @Column(name = "rubrics_in_between_columns")
+    private boolean rubricsInBetweenColumns;
+
     // **********************************************************
     // Function method for Peerreview
     // **********************************************************
@@ -467,5 +470,13 @@ public class Peerreview implements Serializable, Cloneable {
 
     public void setRubricsView(int rubricsView) {
 	this.rubricsView = rubricsView;
+    }
+
+    public boolean isRubricsInBetweenColumns() {
+	return rubricsInBetweenColumns;
+    }
+
+    public void setRubricsInBetweenColumns(boolean rubricsInBetweenColumns) {
+	this.rubricsInBetweenColumns = rubricsInBetweenColumns;
     }
 }

@@ -16,6 +16,11 @@
 <%@ attribute name="criteriaRatings" required="true" rtexprvalue="true" type="org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO" %>
 <%@ attribute name="showJustification" required="true" %>
 <%@ attribute name="alwaysShowAverage" required="true" %>
+<%@ attribute name="rubricsInBetweenColumns" required="false" %>
+
+<c:if test="${empty rubricsInBetweenColumns}">
+	<c:set var="rubricsInBetweenColumns" value="false" />
+</c:if>
 
 <!-- On the results page, set to true for current users summary at the bottom, set to false "other users results".
 When true, hides the names and groups the comments.  -->
@@ -258,7 +263,7 @@ When true, hides the names and groups the comments.  -->
 						<th>
 							(${columnStatus.count})&nbsp;<c:out value="${columnHeader}" escapeXml="false"/>
 						</th>
-						<c:if test="${not columnStatus.last}">
+						<c:if test="${not columnStatus.last and rubricsInBetweenColumns}">
 							<th>
 								<i>(${columnStatus.count + 0.5})&nbsp;<fmt:message key="label.rating.rubrics.in.between" /></i>
 							</th>
@@ -296,7 +301,7 @@ When true, hides the names and groups the comments.  -->
 								<c:out value="${column.name}" escapeXml="false" />
 							</td>
 							
-							<c:if test="${not columnOrderId.last}">
+							<c:if test="${not columnOrderId.last and rubricsInBetweenColumns}">
 								<%-- Check if any other learner rated this learner for this 0.5 column --%>
 								<c:set var="rateCount" value="0" />
 								<c:forEach var="ratingDto" items="${criteriaDto.ratingDtos}">
@@ -364,7 +369,7 @@ When true, hides the names and groups the comments.  -->
 								</c:if>
 							</c:if>
 							</td>
-							<c:if test="${not columnOrderId.last}">
+							<c:if test="${not columnOrderId.last and rubricsInBetweenColumns}">
 								<%-- Calculate again because we need the same cell background colour --%>
 								<c:set var="rateCount" value="0" />
 								<c:forEach var="ratingDto" items="${criteriaDto.ratingDtos}">
@@ -437,7 +442,7 @@ When true, hides the names and groups the comments.  -->
 										<th>
 											(${columnStatus.count})&nbsp;<c:out value="${columnHeader}" escapeXml="false"/>
 										</th>
-										<c:if test="${not columnStatus.last}">
+										<c:if test="${not columnStatus.last and rubricsInBetweenColumns}">
 											<th>
 												<i>(${columnStatus.count + 0.5})&nbsp;<fmt:message key="label.rating.rubrics.in.between" /></i>
 											</th>
@@ -459,7 +464,7 @@ When true, hides the names and groups the comments.  -->
 											>
 												<c:out value="${column.name}" escapeXml="false" />	
 											</td>
-											<c:if test="${not columnOrderId.last}">
+											<c:if test="${not columnOrderId.last and rubricsInBetweenColumns}">
 												<td 
 													<c:if test="${criteriaDto.ratingDtos[learnerOrderId.index].userRating == (columnOrderId.count + 0.5)}">
 														class="bg-success"
