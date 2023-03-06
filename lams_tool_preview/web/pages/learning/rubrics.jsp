@@ -93,6 +93,11 @@
 								<th>
 									(${columnStatus.count})&nbsp;<c:out value="${columnHeader}" escapeXml="false"/>
 								</th>
+								<c:if test="${not columnStatus.last}">
+									<th>
+										<i>(${columnStatus.count + 0.5})&nbsp;<fmt:message key="label.rating.rubrics.in.between" /></i>
+									</th>
+								</c:if>
 							</c:forEach>
 						</tr>
 						<c:forEach var="criteriaDto" items="${criteriaRatings.criteriaGroup}">
@@ -104,12 +109,21 @@
 								<c:forEach var="column" items="${criteria.rubricsColumns}" varStatus="columnOrderId">
 									<td onClick="javascript:rateRubricsCriteria(this, ${criteria.ratingCriteriaId}, ${ratingDto.itemId}, ${columnOrderId.count})"
 										<%-- Columns are ordered from 1 to 5, so rate value is also the order ID of the column --%>
-										<c:if test="${criteriaDto.ratingDtos[learnerOrderId.index].userRating eq columnOrderId.count}">
+										<c:if test="${criteriaDto.ratingDtos[learnerOrderId.index].userRating == columnOrderId.count}">
 											class="bg-success"
 										</c:if>
 									>
 										<c:out value="${column.name}" escapeXml="false" />	
 									</td>
+									<c:if test="${not columnOrderId.last}">
+										<td onClick="javascript:rateRubricsCriteria(this, ${criteria.ratingCriteriaId}, ${ratingDto.itemId}, ${columnOrderId.count + 0.5})"
+											<c:if test="${criteriaDto.ratingDtos[learnerOrderId.index].userRating == (columnOrderId.count + 0.5)}">
+												class="bg-success"
+											</c:if>
+										>
+											<i><fmt:message key="label.rating.rubrics.in.between" /></i>
+										</td>
+									</c:if>
 								</c:forEach>
 							</tr>
 						</c:forEach>

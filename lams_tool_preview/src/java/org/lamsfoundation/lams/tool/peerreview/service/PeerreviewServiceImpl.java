@@ -663,7 +663,7 @@ public class PeerreviewServiceImpl
 		.collect(Collectors.mapping(rating -> {
 		    StyledRatingDTO ratingDto = new StyledRatingDTO(currentUserId.longValue());
 		    if (rating.getRating() != null) {
-			ratingDto.setUserRating(String.valueOf(rating.getRating().intValue()));
+			ratingDto.setUserRating(rating.getRating().toString());
 		    }
 		    ratingDto.setItemDescription(rating.getLearner().getFullName());
 		    ratingDto.setItemDescription2(rating.getLearner().getUserId().toString());

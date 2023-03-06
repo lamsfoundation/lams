@@ -118,7 +118,7 @@
 										
 										<td onClick="javascript:rateRubricsCriteria(this, ${criteria.ratingCriteriaId}, ${ratingDto.itemId}, ${columnHeaderCount - columnStatus.index})"
 											<%-- Columns are ordered from 1 to 5, so rate value is also the order ID of the column --%>
-											<c:if test="${criteriaDto.ratingDtos[learnerOrderId.index].userRating eq (columnHeaderCount - columnStatus.index)}">
+											<c:if test="${criteriaDto.ratingDtos[learnerOrderId.index].userRating == (columnHeaderCount - columnStatus.index)}">
 												class="bg-success"
 											</c:if>
 										>
@@ -126,6 +126,22 @@
 										</td>
 									</c:forEach>
 								</tr>
+								<c:if test="${not columnStatus.last}">
+									<tr>
+										<td>
+											<i><fmt:message key="label.rating.rubrics.in.between" /></i>
+										</td>
+										<c:forEach var="ratingDto" items="${exampleRatings}" varStatus="learnerOrderId">
+											<td onClick="javascript:rateRubricsCriteria(this, ${criteria.ratingCriteriaId}, ${ratingDto.itemId}, ${columnHeaderCount - columnStatus.index - 0.5})"
+												<c:if test="${criteriaDto.ratingDtos[learnerOrderId.index].userRating == (columnHeaderCount - columnStatus.index - 0.5)}">
+													class="bg-success"
+												</c:if>
+											>
+												${columnHeaderCount - columnStatus.index - 0.5}
+											</td>
+										</c:forEach>
+									</tr>
+								</c:if>
 							</c:forEach>
 						</tbody>
 					</table>
