@@ -26,8 +26,10 @@ package org.lamsfoundation.lams.learning.web.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.AssertionFailure;
+import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
@@ -55,6 +57,8 @@ public class LoadToolActivityController {
     private ILearnerFullService learnerService;
     @Autowired
     private ActivityMapping activityMapping;
+    @Autowired
+    private IIntegrationService integrationService;
 
     public static final String PARAM_ACTIVITY_URL = "activityURL";
     public static final String PARAM_IS_BRANCHING = "isBranching";
@@ -64,9 +68,20 @@ public class LoadToolActivityController {
      */
     @RequestMapping("/LoadToolActivity")
     public String execute(@ModelAttribute ActivityForm form, HttpServletRequest request, HttpServletResponse response) {
+	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	String activityFinishUrl = WebUtil.readStrParam(request, "activityFinishUrl", true);
+	if (StringUtils.isNotBlank(activityFinishUrl)) {
+	    boolean activityFinishUrlValid = integrationService.isLessonFinishUrlValid(activityFinishUrl);
+	    if (activityFinishUrlValid) {
+		request.setAttribute("activityFinishUrl", activityFinishUrl);
+	    } else {
+		log.error("Illegal activityFinishUrl parameter: " + activityFinishUrl);
+		// do not finish processing so we do not break flow in some special cases
+	    }
+	}
+
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 
-	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	Activity activity = learnerService.getActivity(activityId);
 
 	/*

@@ -40,6 +40,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpRequest;
@@ -101,6 +103,8 @@ import oauth.signpost.exception.OAuthException;
  */
 public class IntegrationService implements IIntegrationService {
     private static Logger log = Logger.getLogger(IntegrationService.class);
+
+    private Set<String> integratedServersLessonFinishUrls = null;
 
     private IUserManagementService service;
     private ILessonService lessonService;
@@ -1152,6 +1156,38 @@ public class IntegrationService implements IIntegrationService {
 		}
 	    }
 	}
+    }
+
+    @Override
+    public void clearLessonFinishUrlCache() {
+	integratedServersLessonFinishUrls = null;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean isLessonFinishUrlValid(String lessonFinishUrl) {
+	if (StringUtils.isBlank(lessonFinishUrl)) {
+	    return true;
+	}
+	if (integratedServersLessonFinishUrls == null) {
+	    integratedServersLessonFinishUrls = ((List<ExtServer>) service.findByProperty(ExtServer.class, "disabled",
+		    false, true)).stream().filter(s -> StringUtils.isNotBlank(s.getLessonFinishUrl()))
+			    .collect(Collectors.mapping(s -> {
+				String integratedServerLssonFinishUrl = s.getLessonFinishUrl();
+				int lessonFinishUrlQuerySeparator = integratedServerLssonFinishUrl.indexOf("?");
+				return lessonFinishUrlQuerySeparator < 0 ? integratedServerLssonFinishUrl
+					: integratedServerLssonFinishUrl.substring(0, lessonFinishUrlQuerySeparator);
+			    }, Collectors.toSet()));
+	}
+	if (integratedServersLessonFinishUrls.isEmpty()) {
+	    return false;
+	}
+	lessonFinishUrl = lessonFinishUrl.strip();
+	int lessonFinishUrlQuerySeparator = lessonFinishUrl.indexOf("?");
+	lessonFinishUrl = lessonFinishUrlQuerySeparator < 0 ? lessonFinishUrl
+		: lessonFinishUrl.substring(0, lessonFinishUrlQuerySeparator);
+
+	return integratedServersLessonFinishUrls.contains(lessonFinishUrl);
     }
 
     // ---------------------------------------------------------------------
