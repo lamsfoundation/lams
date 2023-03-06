@@ -78,6 +78,9 @@ public class ExtServerManagementController {
 	    ExtServer map = integrationService.getExtServer(sid);
 	    BeanUtils.copyProperties(extServerForm, map);
 	}
+
+	integrationService.clearLessonFinishUrlCache();
+
 	return "integration/servermaintain";
     }
 
@@ -159,6 +162,9 @@ public class ExtServerManagementController {
 			"integrated server name: " + map.getServerid());
 	    }
 	    integrationService.saveExtServer(map);
+
+	    integrationService.clearLessonFinishUrlCache();
+
 	    return "forward:/extserver/serverlist.do";
 	} else {
 	    request.setAttribute("errorMap", errorMap);
@@ -173,6 +179,8 @@ public class ExtServerManagementController {
 	map.setDisabled(true);
 	integrationService.saveExtServer(map);
 
+	integrationService.clearLessonFinishUrlCache();
+
 	AuditLogFilter.log(AuditLogFilter.INTEGRATED_SERVER_DISABLE_ACTION,
 		"integrated server name: " + map.getServerid());
 
@@ -185,6 +193,8 @@ public class ExtServerManagementController {
 	ExtServer map = integrationService.getExtServer(sid);
 	map.setDisabled(false);
 	integrationService.saveExtServer(map);
+
+	integrationService.clearLessonFinishUrlCache();
 
 	AuditLogFilter.log(AuditLogFilter.INTEGRATED_SERVER_ENABLE_ACTION,
 		"integrated server name: " + map.getServerid());
@@ -201,6 +211,9 @@ public class ExtServerManagementController {
 		"integrated server name: " + extServer.getServerid());
 
 	userManagementService.delete(extServer);
+
+	integrationService.clearLessonFinishUrlCache();
+
 	return "redirect:/extserver/serverlist.do";
     }
 

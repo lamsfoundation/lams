@@ -278,4 +278,13 @@ public interface IIntegrationService {
 
     void updateUserRoles(User user, Organisation org, String method);
 
+    /**
+     * Clears cache of integrated server lesson finish urls so it can reloaded on next check
+     */
+    void clearLessonFinishUrlCache();
+
+    /**
+     * Checks whether given lesson finish URL is whitelisted.
+     */
+    boolean isLessonFinishUrlValid(String lessonFinishUrl);
 }
