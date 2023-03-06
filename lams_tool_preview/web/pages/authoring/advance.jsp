@@ -58,6 +58,12 @@
 			</form:option>
 		</form:select>
 	</div>
+	
+	<div class="checkbox">
+	<label for="rubrics-in-between-columns"><form:checkbox path="peerreview.rubricsInBetweenColumns" id="rubrics-in-between-columns"/>
+	<fmt:message key="label.rating.rubrics.in.between.enable" />
+	</label>
+	</div>
 </lams:SimplePanel>
 
 <lams:OutcomeAuthor toolContentId="${peerreviewForm.peerreview.contentId}" />

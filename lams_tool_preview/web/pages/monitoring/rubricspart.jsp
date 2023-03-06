@@ -117,7 +117,8 @@
      	<div id="rubrics-user-collapse-${learnerData.key.uid}" class="panel-collapse collapse" 
      	    role="tabpanel" aria-labelledby="rubrics-user-heading-${learnerData.key.uid}">
      	    	<%-- Display ratings given to this user --%>
-		<lams:StyledRating criteriaRatings="${learnerData.value}" showJustification="true" alwaysShowAverage="false" currentUserDisplay="true"/>
+		<lams:StyledRating criteriaRatings="${learnerData.value}" showJustification="true" alwaysShowAverage="false"
+						   currentUserDisplay="true" rubricsInBetweenColumns="${sessionMap.peerreview.rubricsInBetweenColumns}" />
 	</div>
 </div>
 </c:forEach>
