@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -71,6 +72,7 @@ import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.TblAssessmentQuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummaryItem;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
@@ -82,6 +84,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
+import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -249,6 +252,14 @@ public class MonitoringController {
 	    }
 	    request.setAttribute("questions", questionDtos);
 	}
+
+	List<TblAssessmentQuestionDTO> tblQuestionDtos = TblMonitoringController.getTblAssessmentQuestionDtos(contentId,
+		true, service);
+	request.setAttribute("questionDtos", tblQuestionDtos);
+	SortedSet<AssessmentSession> sessions = new TreeSet<>(new AssessmentSessionComparator());
+	sessions.addAll(service.getSessionsByContentId(assessment.getContentId()));
+
+	request.setAttribute("sessions", sessions);
 
 	// lists all code styles used in this assessment
 	Set<Integer> codeStyles = questionList.stream().filter(q -> q.getQbQuestion().getCodeStyle() != null)

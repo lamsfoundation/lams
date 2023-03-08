@@ -211,6 +211,22 @@ public class TblMonitoringController {
     @RequestMapping("aesStudentChoicesTable")
     public String aesStudentChoicesTable(HttpServletRequest request) {
 	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	List<TblAssessmentQuestionDTO> tblQuestionDtos = TblMonitoringController
+		.getTblAssessmentQuestionDtos(toolContentId, false, assessmentService);
+
+	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
+	SortedSet<AssessmentSession> sessions = new TreeSet<>(new AssessmentSessionComparator());
+	sessions.addAll(assessmentService.getSessionsByContentId(assessment.getContentId()));
+
+	request.setAttribute("sessions", sessions);
+	request.setAttribute("questionDtos", tblQuestionDtos);
+
+	return "pages/tblmonitoring/assessmentStudentChoicesTable";
+    }
+
+    @RequestMapping("aesStudentChoices")
+    public String aesStudentChoices(HttpServletRequest request) {
+	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
 	Map<Long, QuestionSummary> questionSummaries = assessmentService.getQuestionSummaryForExport(assessment, false);
 	List<TblAssessmentQuestionDTO> tblQuestionDtos = new ArrayList<>();
@@ -218,6 +234,37 @@ public class TblMonitoringController {
 	    QuestionDTO questionDto = questionSummary.getQuestionDto();
 
 	    TblAssessmentQuestionDTO tblQuestionDto = new TblAssessmentQuestionDTO();
+	    tblQuestionDto.setTitle(questionDto.getTitle());
+	    tblQuestionDto
+		    .setQuestionTypeLabel(AssessmentServiceImpl.getQuestionTypeLanguageLabel(questionDto.getType()));
+	    tblQuestionDto.setCorrectAnswer(TblMonitoringController.getAssessmentCorrectAnswer(questionDto));
+
+	    tblQuestionDtos.add(tblQuestionDto);
+	}
+
+	request.setAttribute("questionDtos", tblQuestionDtos);
+	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
+	request.setAttribute("groupsInAnsweredQuestionsChart", assessment.isUseSelectLeaderToolOuput());
+	request.setAttribute("assessment", assessment);
+
+	return "pages/tblmonitoring/assessmentStudentChoices";
+    }
+
+    static List<TblAssessmentQuestionDTO> getTblAssessmentQuestionDtos(Long toolContentId, boolean addHeaderData,
+	    IAssessmentService assessmentService) {
+	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
+	Map<Long, QuestionSummary> questionSummaries = assessmentService.getQuestionSummaryForExport(assessment, false);
+	List<TblAssessmentQuestionDTO> tblQuestionDtos = new ArrayList<>();
+	for (QuestionSummary questionSummary : questionSummaries.values()) {
+	    QuestionDTO questionDto = questionSummary.getQuestionDto();
+
+	    TblAssessmentQuestionDTO tblQuestionDto = new TblAssessmentQuestionDTO();
+	    if (addHeaderData) {
+		tblQuestionDto.setTitle(questionDto.getTitle());
+		tblQuestionDto.setQuestionTypeLabel(
+			AssessmentServiceImpl.getQuestionTypeLanguageLabel(questionDto.getType()));
+		tblQuestionDto.setCorrectAnswer(TblMonitoringController.getAssessmentCorrectAnswer(questionDto));
+	    }
 
 	    List<TblAssessmentQuestionResultDTO> sessionQuestionResults = new ArrayList<>();
 	    for (List<AssessmentQuestionResult> questionResultsPerSession : questionSummary
@@ -272,45 +319,13 @@ public class TblMonitoringController {
 	    tblQuestionDtos.add(tblQuestionDto);
 	}
 
-	SortedSet<AssessmentSession> sessions = new TreeSet<>(new AssessmentSessionComparator());
-	sessions.addAll(assessmentService.getSessionsByContentId(assessment.getContentId()));
-
-	request.setAttribute("sessions", sessions);
-	request.setAttribute("questionDtos", tblQuestionDtos);
-
-	return "pages/tblmonitoring/assessmentStudentChoicesTable";
-    }
-
-    @RequestMapping("aesStudentChoices")
-    public String aesStudentChoices(HttpServletRequest request) {
-	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
-	Map<Long, QuestionSummary> questionSummaries = assessmentService.getQuestionSummaryForExport(assessment, false);
-	List<TblAssessmentQuestionDTO> tblQuestionDtos = new ArrayList<>();
-	for (QuestionSummary questionSummary : questionSummaries.values()) {
-	    QuestionDTO questionDto = questionSummary.getQuestionDto();
-
-	    TblAssessmentQuestionDTO tblQuestionDto = new TblAssessmentQuestionDTO();
-	    tblQuestionDto.setTitle(questionDto.getTitle());
-	    tblQuestionDto
-		    .setQuestionTypeLabel(AssessmentServiceImpl.getQuestionTypeLanguageLabel(questionDto.getType()));
-	    tblQuestionDto.setCorrectAnswer(getAssessmentCorrectAnswer(questionDto));
-
-	    tblQuestionDtos.add(tblQuestionDto);
-	}
-
-	request.setAttribute("questionDtos", tblQuestionDtos);
-	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
-	request.setAttribute("groupsInAnsweredQuestionsChart", assessment.isUseSelectLeaderToolOuput());
-	request.setAttribute("assessment", assessment);
-
-	return "pages/tblmonitoring/assessmentStudentChoices";
+	return tblQuestionDtos;
     }
 
     /**
      * Used only for excell export (for getUserSummaryData() method).
      */
-    private String getAssessmentCorrectAnswer(QuestionDTO questionDto) {
+    private static String getAssessmentCorrectAnswer(QuestionDTO questionDto) {
 	StringBuilder sb = new StringBuilder();
 
 	if (questionDto != null) {
