@@ -14,6 +14,13 @@
 	<c:param name="controllerContext" value="tool/laasse10/monitoring" />
 </c:url>
 
+<style>
+	.question-title {
+	   	overflow: auto;
+	   	min-width: 150px;
+	} 
+</style>
+
 <%@ include file="parts/discloseAnswers.jsp"%>
 
 <script type="text/javascript">
@@ -319,16 +326,80 @@
 </div>
 
 <c:if test="${not empty sessionDtos}">
-	
+	<h5><fmt:message key="label.student.choices" /></h5>
 	<c:choose>
 		<c:when test="${displayStudentChoices and not empty questions}">
-			<h5><fmt:message key="label.student.choices" /></h5>
 			<%@ include file="/pages/monitoring/parts/mcqStudentChoices.jsp" %>
 		</c:when>
-		<c:otherwise>
-			<%-- To maintain structure as if student choices table was present --%>
-			<div class="row"></div>
-		</c:otherwise>
+		<c:when test="${not displayStudentChoices and not empty questionDtos}">
+			<div class="row no-gutter">
+			<div class="col-xs-12 col-md-12 col-lg-12">
+			<div class="panel">
+			<div class="panel-body">
+			<div class="table-responsive" style="margin:0">
+				<table id="questions-data" class="table table-responsive table-striped table-bordered table-hover table-condensed">
+					<thead>
+						<tr role="row">
+							<th></th>
+							<c:forEach var="tblQuestionDto" items="${questionDtos}" varStatus="i">
+								<th class="text-center">
+									<div class="question-title">
+										<c:if test="${assessment.numbered}">
+												${i.count}.
+										</c:if>
+										${tblQuestionDto.title}
+									</div>
+								</th>
+							</c:forEach>
+						</tr>
+					</thead>
+					<tbody>
+					
+						<tr role="row">
+							<th><b>Question type</b></th>
+							<c:forEach var="tblQuestionDto" items="${questionDtos}" varStatus="i">
+								<td class="text-center">
+									${tblQuestionDto.questionTypeLabel}
+								</td>
+							</c:forEach>
+						</tr>
+					
+						<tr>
+							<td><b>Correct answer</b></td>
+							<c:forEach var="tblQuestionDto" items="${questionDtos}" varStatus="i">
+								<td class="text-center">
+									<c:out value="${tblQuestionDto.correctAnswer}" escapeXml="false" />
+			 					</td>
+							</c:forEach>
+						</tr>
+						
+						<tr>
+							<td colspan="${fn:length(questionDtos) + 1}" style="font-weight: bold;"><fmt:message key="label.teams"/></td> 
+						</tr>
+						
+						<c:forEach var="session" items="${sessions}" varStatus="i">
+							<tr>
+								<td class="text-center">
+									${session.sessionName}
+								</td>
+								
+								<c:forEach var="tblQuestionDto" items="${questionDtos}" varStatus="j">
+									<c:set var="questionResultDto" value="${tblQuestionDto.sessionQuestionResults[i.index]}"/>
+									<td class="text-center <c:if test="${questionResultDto.correct}">success</c:if>" >
+										${questionResultDto.answer}
+									</td>
+								</c:forEach>
+								
+							</tr>
+						</c:forEach>                                               
+					</tbody>
+				</table>
+			</div>
+			</div>
+			</div>
+			</div>
+			</div>
+		</c:when>
 	</c:choose>
 	
 	<button onclick="return exportSummary();" class="btn btn-default btn-sm btn-disable-on-submit pull-right">
