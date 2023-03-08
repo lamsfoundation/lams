@@ -449,6 +449,7 @@ public class MonitoringController {
 
 		AssessmentUserDTO userDto = new AssessmentUserDTO();
 		userDto.setUserId(groupLeader.getUserId());
+		userDto.setSessionId(sessionId);
 		userDto.setFirstName(groupLeader.getFirstName());
 		userDto.setLastName(groupLeader.getLastName());
 		userDto.setGrade(assessmentResult == null ? 0 : assessmentResult);
@@ -599,7 +600,7 @@ public class MonitoringController {
 			    + questionResult.getJustificationEscaped();
 		}
 		userData.add(response);
-		
+
 		// show confidence levels if this feature is turned ON
 		if (assessment.isEnableConfidenceLevels()) {
 		    userData.add(questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_MARK_HEDGING) ? -1
@@ -632,7 +633,6 @@ public class MonitoringController {
 		    }
 		    userData.add(starString);
 		}
-
 
 		//LDEV_NTU-11 Swapping Mark and Response columns in Assessment Monitor
 		userData.add(questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_ESSAY)
