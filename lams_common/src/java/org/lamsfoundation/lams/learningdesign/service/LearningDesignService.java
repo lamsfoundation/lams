@@ -563,6 +563,7 @@ public class LearningDesignService implements ILearningDesignService {
 	return verifyNextActivityFitsTbl(firstActivity, "Grouping", iRatToolContentId, tRatToolContentId);
     }
 
+    @Override
     public Map<String, Object> getAvailableTBLActivityTypes(Long learningDesignId) {
 	Map<String, Object> result = new HashMap<>();
 
@@ -597,15 +598,11 @@ public class LearningDesignService implements ILearningDesignService {
 		Long toolActivityId = toolActivity.getActivityId();
 		String toolTitle = toolActivity.getTitle();
 
-		//count only the first MCQ or Assessmnet as iRA
-		if (!iraPassed && (CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)
-			|| isScratchieAvailable && CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature))) {
+		//count only the first Assessmnet as iRA
+		if (!iraPassed && isScratchieAvailable
+			&& CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)) {
 		    iraPassed = true;
-		    if (CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
-			result.put("isIraMcqAvailable", true);
-		    } else {
-			result.put("isIraAssessmentAvailable", true);
-		    }
+		    result.put("isIraAvailable", true);
 		    result.put("iraToolContentId", toolContentId);
 		    result.put("iraToolActivityId", toolActivityId);
 
