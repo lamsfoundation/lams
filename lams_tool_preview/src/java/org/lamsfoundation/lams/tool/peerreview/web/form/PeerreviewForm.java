@@ -34,9 +34,7 @@ import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
  *
  * User: Andrey Balan
  */
-public class PeerreviewForm  {
-    private static final long serialVersionUID = 3599879328307492312L;
-
+public class PeerreviewForm {
     private static Logger logger = Logger.getLogger(PeerreviewForm.class.getName());
 
     // Forum fields
@@ -49,6 +47,7 @@ public class PeerreviewForm  {
     public PeerreviewForm() {
 	peerreview = new Peerreview();
 	peerreview.setTitle("Peer Review");
+	peerreview.setRubricsView(Peerreview.RUBRICS_VIEW_LEARNER);
 	currentTab = 1;
     }
 
