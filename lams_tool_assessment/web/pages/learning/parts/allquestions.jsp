@@ -25,6 +25,12 @@
 						${question.title}
 					</c:if>
 				</h3>
+
+				<span class="pull-right small loffset10" style="padding-top: 3px">
+					<fmt:message key="label.learning.max.mark">
+						<fmt:param value="${question.maxMark}" />
+					</fmt:message>
+				</span>
 									
 				<c:if test="${question.answerRequired}">
 					<span class="asterisk pull-right">
