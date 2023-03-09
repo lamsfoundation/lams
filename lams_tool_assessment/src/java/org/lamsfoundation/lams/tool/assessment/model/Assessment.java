@@ -154,6 +154,9 @@ public class Assessment implements Cloneable {
     @Column(name = "display_summary")
     private boolean displaySummary;
 
+    @Column(name = "display_max_mark")
+    private boolean displayMaxMark;
+    
     @Column(name = "define_later")
     private boolean defineLater;
 
@@ -655,6 +658,14 @@ public class Assessment implements Cloneable {
 
     public void setDisplaySummary(boolean displaySummary) {
 	this.displaySummary = displaySummary;
+    }
+
+    public boolean isDisplayMaxMark() {
+	return displayMaxMark;
+    }
+
+    public void setDisplayMaxMark(boolean displayMaxMark) {
+	this.displayMaxMark = displayMaxMark;
     }
 
     public int getQuestionsPerPage() {

@@ -193,11 +193,13 @@
 				</div>
 			</c:if>
 			
-			<span class="pull-right small loffset10" style="padding-top: 3px">
-				<fmt:message key="label.learning.max.mark">
-					<fmt:param value="${question.maxMark}" />
-				</fmt:message>
-			</span>
+			<c:if test="${assessment.displayMaxMark}">
+				<span class="pull-right small loffset10" style="padding-top: 3px">
+					<fmt:message key="label.learning.max.mark">
+						<fmt:param value="${question.maxMark}" />
+					</fmt:message>
+				</span>
+			</c:if>
 				
 			<c:if test="${question.answerRequired}">
 				<span class="asterisk pull-right">
