@@ -116,7 +116,9 @@
 				</div>
 			</c:if>
 			<div class="panel-body">
-			<lams:StyledRating criteriaRatings="${criteriaRatings}" showJustification="true" alwaysShowAverage="false" currentUserDisplay="false" />
+			<lams:StyledRating criteriaRatings="${criteriaRatings}" showJustification="true" alwaysShowAverage="false"
+							   currentUserDisplay="false" rubricsInBetweenColumns="${peerreview.rubricsInBetweenColumns}"
+							   rubricsPivotView="${peerreview.rubricsView eq 2}" />
 			</div>
 			</div>
 		</c:forEach>
@@ -139,7 +141,8 @@
 				<c:if test="${not criteriaRatings.ratingCriteria.rubricsStyleRating}">
 					<h4><c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/></h4>
 				</c:if>
-		 		<lams:StyledRating criteriaRatings="${criteriaRatings}" showJustification="false" alwaysShowAverage="true" currentUserDisplay="true"/>
+		 		<lams:StyledRating criteriaRatings="${criteriaRatings}" showJustification="false" alwaysShowAverage="true"
+		 						   currentUserDisplay="true" rubricsInBetweenColumns="${peerreview.rubricsInBetweenColumns}" />
 			</c:forEach>
 		</div>
 		</div>

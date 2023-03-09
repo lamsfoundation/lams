@@ -335,6 +335,13 @@
 </div>
 
 <div class="checkbox">
+	<label for="displayMaxMark">
+		<form:checkbox path="assessment.displayMaxMark" id="displayMaxMark"/>
+		<fmt:message key="label.authoring.advance.show.max.mark" />
+	</label>
+</div>
+
+<div class="checkbox">
 	<label for="allowOverallFeedbackAfterQuestion">
 		<form:checkbox path="assessment.allowOverallFeedbackAfterQuestion" id="allowOverallFeedbackAfterQuestion"/>
 		<fmt:message key="label.authoring.advance.allow.students.overall.feedback" />
