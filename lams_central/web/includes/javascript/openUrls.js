@@ -46,9 +46,13 @@ function closeAllChildren() {
 	if (gradebookMonLessonWin && !gradebookMonLessonWin.closed) gradebookMonLessonWin.close();
 }
 
-function openMonitorLesson(lessonID) {
+function openMonitorLesson( lessonID, url ) {
+	if (!url) {
+		url = '/lams/home/monitorLesson.do';
+	}
+	url += 'lessonID=' + lessonID;
 	sessionStorage.removeItem("lamsMonitoringCurrentTab");
-	window.location.href = '/lams/home/monitorLesson.do?lessonID='+ lessonID;
+	window.location.href = url;
 }
 
 function openLearner( lessonId, url ) {
