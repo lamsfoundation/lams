@@ -48,7 +48,9 @@
 	 		UPLOAD_FILE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>',
 			// convert Java syntax to JSON
 	       EXE_FILE_TYPES = JSON.parse("[" + "${EXE_FILE_TYPES}".replace(/\.\w+/g, '"$&"') + "]"),
-	       EXE_FILE_ERROR = '<fmt:message key="error.attachment.executable"/>';
+		   decoderDiv = $('<div />'),
+	       <fmt:message key="error.attachment.executable" var="EXE_FILE_ERROR_VAR" />
+	       EXE_FILE_ERROR = decoderDiv.html('<c:out value="${EXE_FILE_ERROR_VAR}" />').text();
 
 		function disableButtons() {
 			// logic to disable all buttons depends on contained pages so to avoid future changes breaking this code and stopping the page working, wrap in a try.
