@@ -48,7 +48,7 @@ function closeAllChildren() {
 
 function openMonitorLesson( lessonID, url ) {
 	if (!url) {
-		url = '/lams/home/monitorLesson.do';
+		url = '/lams/home/monitorLesson.do?';
 	}
 	url += 'lessonID=' + lessonID;
 	sessionStorage.removeItem("lamsMonitoringCurrentTab");
