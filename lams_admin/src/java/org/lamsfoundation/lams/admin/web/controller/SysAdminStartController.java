@@ -93,6 +93,14 @@ public class SysAdminStartController {
 		groupedLinks.add(new Object[] { AdminConstants.START_WORKFLOW_AUTOMATION, links });
 	    }
 
+	    // LDEV-5375
+	    boolean isAiEnabled = Configuration.isLamsModuleAvailable(Configuration.AI_MODULE_CLASS);
+	    if (isAiEnabled) {
+		links = new ArrayList<>();
+		links.add(new LinkBean("../ai/admin/start.do", "ai.config.link"));
+		groupedLinks.add(new Object[] { AdminConstants.START_AI, links });
+	    }
+
 	} else if (userManagementService.isUserGlobalGroupManager()) {
 	    ArrayList<LinkBean> links = new ArrayList<>();
 	    links.add(new LinkBean("usersearch.do", "admin.user.find"));

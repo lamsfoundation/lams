@@ -20,6 +20,7 @@ import org.lamsfoundation.lams.timezone.service.ITimezoneService;
 import org.lamsfoundation.lams.timezone.util.TimezoneIDComparator;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -83,13 +84,7 @@ public class LtiConsumerManagementController {
 	    // do nothing in case of creating a tool consumer
 	}
 
-	boolean isLtiAdvantageEnabled = false;
-	try {
-	    Class clazz = Class.forName("org.lamsfoundation.lams.lti.advantage.util.LtiAdvantageUtil", false,
-		    this.getClass().getClassLoader());
-	    isLtiAdvantageEnabled = clazz != null;
-	} catch (Exception e) {
-	}
+	boolean isLtiAdvantageEnabled = Configuration.isLamsModuleAvailable(Configuration.LTI_ADVANTAGE_MODULE_CLASS);
 
 	if (isLtiAdvantageEnabled) {
 	    request.setAttribute("ltiAdvantageEnabled", isLtiAdvantageEnabled);
