@@ -70,7 +70,7 @@ public class Configuration implements InitializingBean {
     public static final int ITEMS_ONLY_LDAP = 3;
 
     public static final String LTI_ADVANTAGE_MODULE_CLASS = "org.lamsfoundation.lams.lti.advantage.util.LtiAdvantageUtil";
-    public static final String AI_MODULE_CLASS = "org.lamsfoundation.lams.ai.AiConstants";
+    public static final String AI_MODULE_CLASS = "org.lamsfoundation.lams.ai.util.QuestionOpenAiParser";
 
     private static Map<String, ConfigurationItem> items = null;
 

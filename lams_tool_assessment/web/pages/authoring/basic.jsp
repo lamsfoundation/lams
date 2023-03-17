@@ -2,6 +2,7 @@
 <c:set var="sessionMapID" value="${assessmentForm.sessionMapID}" />
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="isAuthoringRestricted" value="${sessionMap.isAuthoringRestricted}" />
+
 <style>
 	#question-bank-div {
 		margin-top: 75px;
@@ -201,6 +202,14 @@
     	window.open('<lams:LAMSURL/>questions/questionFile.jsp?collectionChoice=true&importType='+type,
 			'QuestionFile','width=500,height=370,scrollbars=yes');
     }
+    
+	<c:if test="${sessionMap.isAiEnabled}">
+		function importOpenAi(){
+	    	launchPopup('<lams:LAMSURL/>ai/authoring/ratMcq.do' 
+	    	    		+ (existingQbQuestionUids == '' ? '' : '?qbQuestionUids=' + existingQbQuestionUids),
+	    	    		'OpenAiForm');
+	    }
+    </c:if>
 	
  	// this method is called by QTI questionChoice.jsp 
     function saveQTI(formHTML, formName) {
@@ -296,8 +305,11 @@
             <span class="caret"></span>
           </button>
           <ul class="dropdown-menu dropdown-menu-right">
-              <li><a href="javascript:void(0)" id="divass${appexNumber}CQTI" onClick="javascript:importQTI('word')"><i class="fa fa-file-word-o text-primary"></i> <fmt:message key="label.authoring.basic.import.word"/>...</a></li>
+            <li><a href="javascript:void(0)" id="divass${appexNumber}CQTI" onClick="javascript:importQTI('word')"><i class="fa fa-file-word-o text-primary"></i> <fmt:message key="label.authoring.basic.import.word"/>...</a></li>
             <li><a href="javascript:void(0)" id="divass${appexNumber}CWord" onClick="javascript:importQTI('qti')"><i class="fa fa-file-code-o text-primary"></i> <fmt:message key="label.authoring.basic.import.qti"/>...</a></li>
+            <c:if test="${sessionMap.isAiEnabled}">
+            	<li><a href="javascript:void(0)" id="divass${appexNumber}CWord" onClick="javascript:importOpenAi()"><i class="fa fa-microchip text-primary"></i> <fmt:message key="label.authoring.basic.import.openai"/>...</a></li>
+            </c:if>
           </ul>
         </div>
                 
