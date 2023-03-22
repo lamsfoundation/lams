@@ -205,8 +205,8 @@
     
 	<c:if test="${sessionMap.isAiEnabled}">
 		function importOpenAi(){
-	    	launchPopup('<lams:LAMSURL/>ai/authoring/ratMcq.do' 
-	    	    		+ (existingQbQuestionUids == '' ? '' : '?qbQuestionUids=' + existingQbQuestionUids),
+	    	launchPopup('<lams:LAMSURL/>ai/authoring/ratMcq.do?prefillFieldMode=parent&prefillSubjectFieldId=assessment.title' 
+	    	    		+ (existingQbQuestionUids == '' ? '' : '&qbQuestionUids=' + existingQbQuestionUids),
 	    	    		'OpenAiForm');
 	    }
     </c:if>
