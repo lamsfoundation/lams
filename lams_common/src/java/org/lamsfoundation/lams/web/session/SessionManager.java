@@ -41,6 +41,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.http.MediaType;
 
 public class SessionManager {
     private static Logger log = Logger.getLogger(SessionManager.class);
@@ -90,6 +91,13 @@ public class SessionManager {
 	    HttpSession existingSession = loginMapping.get(login);
 	    // check if it's a different session and if so, which one is newer
 	    if (existingSession != null && !existingSession.getId().equals(sessionId)) {
+		String acceptHeader = request.getHeader("Accept");
+		if (MediaType.TEXT_EVENT_STREAM_VALUE.equals(acceptHeader)) {
+		    throw new IllegalArgumentException(
+			    "When fetching Event Stream data error while trying to use session ID \"" + sessionId
+				    + "\" when another one is in use \"" + existingSession.getId() + "\"");
+		}
+
 		try {
 		    // invalidate the other session
 		    existingSession.invalidate();

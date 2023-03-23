@@ -69,13 +69,14 @@ public class SystemSessionFilter implements Filter {
 	    chain.doFilter(request, response);
 	    return;
 	}
-
-	HttpSession session = SessionManager.startSession(httpRequest);
-	// do following part of chain
+	
+	HttpSession session = null;
 	try {
+	    session = SessionManager.startSession(httpRequest);
+	    // do following part of chain
 	    chain.doFilter(request, response);
 	} catch (NestedServletException e) {
-	    if (e.getCause() instanceof IllegalStateException) {
+	    if (e.getCause() instanceof IllegalStateException && session != null) {
 		// There seems to be a problem with Infinispan session invalidation.
 		// Until we upgrade WildFly we need to keep these safety measures.
 		String sessionId = session.getId();
@@ -84,6 +85,8 @@ public class SystemSessionFilter implements Filter {
 	    } else {
 		throw e;
 	    }
+	} catch (IllegalArgumentException e) {
+	    log.warn("Error while creating session: " + e.getMessage());
 	} finally {
 	    SessionManager.endSession();
 	}
