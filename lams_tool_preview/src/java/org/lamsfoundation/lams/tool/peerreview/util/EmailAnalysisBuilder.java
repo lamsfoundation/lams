@@ -127,7 +127,7 @@ public class EmailAnalysisBuilder {
 	htmlText.append("<p>&nbsp;</p>\n");
 
 	if (peerreview.isSelfReview()) {
-		htmlText.append("<div style=\"").append(divSpaSapaInfoBorderStyle).append("\">\n<p style="font-size:large;font-weight:600;>ℹ️ &nbsp;<strong>")
+		htmlText.append("<div style=\"").append(divSpaSapaInfoBorderStyle).append("\">\n<p style=\"font-size:large;font-weight:600;\">ℹ️ &nbsp;<strong>")
 				.append(getLocalisedMessage("email.label.spa.sapa.info.title")).append("</strong></p>\n")
 				.append("<p>").append(getLocalisedMessage("email.label.spa.info")).append("</p>")
 				.append("<p>").append(getLocalisedMessage("email.label.sapa.info")).append("</p></span></div>\n<p>&nbsp;</p>\n");
