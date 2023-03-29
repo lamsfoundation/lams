@@ -192,8 +192,8 @@ public class SPEnrolmentServlet extends HttpServlet {
 			.collect(Collectors.toConcurrentMap(
 				elem -> (elem.get(6).equals(Mode.STAFF.getRole())
 					|| elem.get(6).equals(Mode.MANAGER.getRole()) ? elem.get(3) : elem.get(5))
-						.toLowerCase(),
-				elem -> new String[] { elem.get(5).toLowerCase(), elem.get(4),
+						.strip().toLowerCase(),
+				elem -> new String[] { elem.get(5).strip().toLowerCase(), elem.get(4),
 					elem.get(6).equals(Mode.STAFF.getRole())
 						|| elem.get(6).equals(Mode.MANAGER.getRole()) ? "." : elem.get(3) },
 				(elem1, elem2) -> elem1));
@@ -213,7 +213,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 		ConcurrentMap<String, ExtUserUseridMap> allExistingParsedExtUsers = userManagementService
 			.findByPropertyValues(ExtUserUseridMap.class, "extUsername", allExistingParsedUsers.keySet())
 			.parallelStream().filter(e -> e.getExtServer().getSid().equals(extServerSid))
-			.collect(Collectors.toConcurrentMap(ExtUserUseridMap::getExtUsername, e -> e));
+			.collect(Collectors.toConcurrentMap(e -> e.getExtUsername().toLowerCase(), e -> e));
 
 		// create users and ext users
 		Set<User> allParsedUsers = createUsers(extServer, creatorId, allParsedUserMapping, userIDs,
@@ -222,7 +222,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 		// map of course code (ID) -> course name
 		// for all organisations present in the output file
 		ConcurrentMap<String, String> allParsedCourseMapping = allLines.parallelStream().unordered().collect(
-			Collectors.toConcurrentMap(elem -> elem.get(0), elem -> elem.get(1), (elem1, elem2) -> elem1));
+			Collectors.toConcurrentMap(elem -> elem.get(0).strip(), elem -> elem.get(1).strip(), (elem1, elem2) -> elem1));
 
 		logger.info("Found " + allParsedCourseMapping.size() + " courses in the file");
 
@@ -499,7 +499,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 				    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
 					    "SPEnrolment: " + message);
 				} else {
-				    ExtUserUseridMap userMap = allExistingExtUsers.get(login);
+				    ExtUserUseridMap userMap = allExistingExtUsers.get(login.toLowerCase());
 				    if (userMap == null) {
 					userMap = new ExtUserUseridMap();
 					userMap.setExtServer(extServer);
