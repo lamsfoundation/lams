@@ -15,9 +15,36 @@
 	}
 </style>
 <script>
+	// global variable that stores information which burning question collapse panel was expanded before reload
+	var lamsTratBurningQuestionExpanded = null;
+	
 	$(document).ready(function(){
 		openEventSource('<lams:WebAppURL />tblmonitoring/burningQuestionsFlux.do?toolContentId=' + traToolContentId, function (event) {
-			$("#burningQuestionsTable").load('<lams:WebAppURL />tblmonitoring/burningQuestionsTable.do?toolContentID=' + traToolContentId);
+			lamsTratBurningQuestionExpanded = [];
+			// store information about expanded panels
+			$('#burningQuestionsTable .collapse.show').each(function(){
+				let collapse = $(this),
+					itemUid = collapse.data('itemUid');
+				lamsTratBurningQuestionExpanded.push(
+					{ 
+						itemUid : itemUid,
+						optionsExpanded : $('#options-show-' + itemUid, collapse).length === 0
+					}						
+				);
+			});		
+			$("#burningQuestionsTable").load('<lams:WebAppURL />tblmonitoring/burningQuestionsTable.do?toolContentID=' + traToolContentId,
+					function(){
+						// expand same panels as before the reload
+						lamsTratBurningQuestionExpanded.forEach(function(entry){
+							let collapse = $('#burningQuestionsTable #collapse' + entry.itemUid).addClass('show');
+							collapse.closest('.accordion-item').find('.accordion-button')
+								.removeClass('collapsed').attr('aria-expanded', 'true');
+							if (entry.optionsExpanded) {
+								$('#options-show-' + entry.itemUid, collapse).remove();
+								$('#options-' + entry.itemUid, collapse).show();
+							}
+						});
+			});
 		});
 	});
 

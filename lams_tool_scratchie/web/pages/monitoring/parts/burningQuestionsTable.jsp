@@ -46,7 +46,7 @@
 			
 			// hide link, show answers
 			let link = $(this),
-				itemUid = link.data('itemUid');
+				itemUid = link.closest('.collapse').data('itemUid');
 			link.remove();
 			$('#options-' + itemUid).show();
 		});
@@ -120,7 +120,8 @@
 										</c:choose>
 							    	</button>
 							    </h4>
-							    <div id="collapse${item.uid}" class="accordion-collapse collapse" aria-labelledby="heading${item.uid}">	
+							    <div id="collapse${item.uid}" data-item-uid="${item.uid}"
+							    	 class="accordion-collapse collapse" aria-labelledby="heading${item.uid}">	
 									<div class="accordion-body">
 									
 										<span class="burning-question-description">
@@ -128,8 +129,7 @@
 										</span>
 										
 										<c:if test="${not empty burningQuestionItemDto.scratchieItem.uid}">
-											<a id="options-show-${item.uid}" href="#" class="options-show-link" 
-											   data-item-uid="${item.uid}">
+											<a id="options-show-${item.uid}" href="#" class="options-show-link">
 												<fmt:message key='label.options.show' />
 											</a>
 											<div  id="options-${item.uid}" class="table-responsive" style="display: none">
