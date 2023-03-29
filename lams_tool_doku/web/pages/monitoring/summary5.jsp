@@ -437,13 +437,13 @@
 				  <div class="card-body">
 				   		<button id="gallery-walk-start" type="button"
 						        class="btn btn-primary
-						        	   ${not dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'hidden'}"
+						        	   ${not dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'd-none'}"
 						        onClick="javascript:startGalleryWalk()">
 							<fmt:message key="monitoring.summary.gallery.walk.start" /> 
 						</button>
 						
 						<button id="gallery-walk-finish" type="button"
-						        class="btn btn-primary ${dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'hidden'}"
+						        class="btn btn-primary ${dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'd-none'}"
 						        onClick="javascript:finishGalleryWalk()">
 							<fmt:message key="monitoring.summary.gallery.walk.finish" /> 
 						</button>
@@ -451,7 +451,7 @@
 						<br>
 									
 						<button id="gallery-walk-learner-edit" type="button"
-						        class="btn btn-default ${not dokumaran.galleryWalkEditEnabled and (dokumaran.galleryWalkStarted or dokumaran.galleryWalkFinished) ? '' : 'hidden'}"
+						        class="btn btn-secondary ${not dokumaran.galleryWalkEditEnabled and (dokumaran.galleryWalkStarted or dokumaran.galleryWalkFinished) ? '' : 'd-none'}"
 						        onClick="javascript:enableGalleryWalkLearnerEdit()">
 							<fmt:message key="monitoring.summary.gallery.walk.learner.edit" /> 
 						</button>
