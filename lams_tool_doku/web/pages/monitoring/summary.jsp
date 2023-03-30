@@ -185,7 +185,8 @@
 		});
 		
 		// marks table for each group
-		var tablesorters = $("#doku-monitoring-summary-${sessionMap.toolContentID} .tablesorter");
+		var tablesorters = $("#doku-monitoring-summary-${sessionMap.toolContentID} .tablesorter"),
+			maxMark = ${dokumaran.maxMark};
 		// intialise tablesorter tables
 		tablesorters.tablesorter({
 			theme: 'bootstrap',
@@ -230,9 +231,8 @@
 		        toolSessionId = +$this.closest('.tablesorter').attr('toolSessionId'),
 		        userId = +$this.closest('tr').attr('userId'); 
 		        
-		        // max mark is 100
-		        if (mark > 100) {
-		        	mark = 100;
+		        if (mark > maxMark) {
+		        	mark = maxMark;
 		        	$this.text(mark);
 		        }
 
@@ -607,7 +607,11 @@
 			<lams:TSTable numColumns="2" dataId='toolSessionId="${groupSummary.sessionId}"'>
 				<th><fmt:message key="label.monitoring.learner.marks.name"/></th>
 				<th><fmt:message key="label.monitoring.learner.marks.mark"/>&nbsp;
-					<small><fmt:message key="label.monitoring.learner.marks.mark.tip"/></small>
+					<small>
+						<fmt:message key="label.monitoring.learner.marks.mark.tip">
+							<fmt:param value="${dokumaran.maxMark}" />
+						</fmt:message>
+					</small>
 				</th>
 			</lams:TSTable>
 		</div>

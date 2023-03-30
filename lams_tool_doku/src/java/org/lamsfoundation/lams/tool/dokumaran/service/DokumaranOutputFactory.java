@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.tool.OutputFactory;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
+import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 
 public class DokumaranOutputFactory extends OutputFactory {
@@ -43,8 +44,13 @@ public class DokumaranOutputFactory extends OutputFactory {
 	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<>();
 	switch (definitionType) {
 	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
+		Integer maxMark = 100;
+		if (toolContentObject != null) {
+		    Dokumaran dokumaran = (Dokumaran) toolContentObject;
+		    maxMark = dokumaran.getMaxMark();
+		}
 		ToolOutputDefinition manualGradingDefinition = buildRangeDefinition(
-			DokumaranConstants.MANUAL_GRADING_DEFINITION_NAME, 0L, 100L, true);
+			DokumaranConstants.MANUAL_GRADING_DEFINITION_NAME, 0L, maxMark.longValue(), true);
 		manualGradingDefinition.setWeightable(true);
 		manualGradingDefinition.setShowConditionNameOnly(true);
 		definitionMap.put(DokumaranConstants.MANUAL_GRADING_DEFINITION_NAME, manualGradingDefinition);

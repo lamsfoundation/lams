@@ -53,6 +53,7 @@ public class DokumaranForm {
     public DokumaranForm() {
 	dokumaran = new Dokumaran();
 	dokumaran.setTitle("Shared Dokumaran");
+	dokumaran.setMaxMark(100);
 	currentTab = 1;
     }
 
