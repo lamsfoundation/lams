@@ -316,6 +316,8 @@ public class MonitoringController {
     }
 
     @RequestMapping("/startGalleryWalk")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     private void startGalleryWalk(HttpServletRequest request) throws IOException {
 	Long toolContentId = WebUtil.readLongParam(request, DokumaranConstants.ATTR_TOOL_CONTENT_ID, false);
 
@@ -323,6 +325,8 @@ public class MonitoringController {
     }
 
     @RequestMapping("/finishGalleryWalk")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     private void finishGalleryWalk(HttpServletRequest request) throws IOException {
 	Long toolContentId = WebUtil.readLongParam(request, DokumaranConstants.ATTR_TOOL_CONTENT_ID, false);
 
@@ -330,6 +334,8 @@ public class MonitoringController {
     }
 
     @RequestMapping("/enableGalleryWalkLearnerEdit")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     private void enableGalleryWalkLearnerEdit(HttpServletRequest request) throws IOException {
 	Long toolContentId = WebUtil.readLongParam(request, DokumaranConstants.ATTR_TOOL_CONTENT_ID, false);
 
