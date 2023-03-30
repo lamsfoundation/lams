@@ -1803,8 +1803,7 @@ PropertyLib = {
 		// hide trashcan button on properties dialog if read only or the item should not be deleted
 		$('.propertyBinButton', dialog).toggle(!object.readOnly 
 			&& !(object.parentActivity && object.parentActivity.readOnly) 
-			&& !(object.branchingActivity && object.branchingActivity.readOnly)
-			&& !(object instanceof ActivityDefs.Transition));
+			&& !(object.branchingActivity && object.branchingActivity.readOnly));
 		
 		modalBody.find('input').blur();
 		dialog.on('shown.bs.modal', function(){
