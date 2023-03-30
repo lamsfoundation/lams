@@ -322,6 +322,8 @@ public class MonitoringController {
 	Long toolContentId = WebUtil.readLongParam(request, DokumaranConstants.ATTR_TOOL_CONTENT_ID, false);
 
 	dokumaranService.startGalleryWalk(toolContentId);
+
+	updateTimeLimit(toolContentId, 0, null);
     }
 
     @RequestMapping("/finishGalleryWalk")
