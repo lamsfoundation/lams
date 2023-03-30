@@ -41,6 +41,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.etherpad.EtherpadException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
 import org.lamsfoundation.lams.tool.dokumaran.dto.SessionDTO;
@@ -50,6 +51,7 @@ import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
 import org.lamsfoundation.lams.tool.dokumaran.service.DokumaranApplicationException;
 import org.lamsfoundation.lams.tool.dokumaran.service.IDokumaranService;
 import org.lamsfoundation.lams.tool.dokumaran.web.form.ReflectionForm;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
@@ -80,6 +82,9 @@ public class LearningController {
 
     @Autowired
     private IDokumaranService dokumaranService;
+
+    @Autowired
+    private ISecurityService securityService;
 
     /**
      * Read dokumaran data from database and put them into HttpSession. It will redirect to init.do directly after this
@@ -180,7 +185,7 @@ public class LearningController {
 	sessionMap.put(DokumaranConstants.ATTR_REFLECTION_INSTRUCTION, dokumaran.getReflectInstructions());
 	sessionMap.put(DokumaranConstants.ATTR_REFLECTION_ENTRY, entryText);
 
-	if (dokumaran.isGalleryWalkEnabled() && mode != null && mode.isAuthor()) {
+	if (dokumaran.isGalleryWalkEnabled() && mode != null && mode.isAuthor() && request.isUserInRole(Role.AUTHOR)) {
 	    String[] galleryWalkParameterValuesArray = request.getParameterValues("galleryWalk");
 	    if (galleryWalkParameterValuesArray != null) {
 		Collection<String> galleryWalkParameterValues = Set.of(galleryWalkParameterValuesArray);
