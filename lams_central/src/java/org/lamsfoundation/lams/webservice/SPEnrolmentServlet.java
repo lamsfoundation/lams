@@ -29,6 +29,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -37,6 +39,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Spliterator;
+import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -221,8 +224,9 @@ public class SPEnrolmentServlet extends HttpServlet {
 
 		// map of course code (ID) -> course name
 		// for all organisations present in the output file
-		ConcurrentMap<String, String> allParsedCourseMapping = allLines.parallelStream().unordered().collect(
-			Collectors.toConcurrentMap(elem -> elem.get(0).strip(), elem -> elem.get(1).strip(), (elem1, elem2) -> elem1));
+		ConcurrentMap<String, String> allParsedCourseMapping = allLines.parallelStream().unordered()
+			.collect(Collectors.toConcurrentMap(elem -> elem.get(0).strip(), elem -> elem.get(1).strip(),
+				(elem1, elem2) -> elem1));
 
 		logger.info("Found " + allParsedCourseMapping.size() + " courses in the file");
 
@@ -311,7 +315,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 			logger.info("Processing manager courses and assigments");
 
 			Collection<Spliterator<Entry<String, String>>> spliterators = splitCollection(
-				allParsedCourseMapping.entrySet());
+				allParsedCourseMapping.entrySet(), null);
 			List<Future<?>> futures = new ArrayList<>(spliterators.size());
 
 			for (Spliterator<Entry<String, String>> spliterator : spliterators) {
@@ -371,8 +375,40 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    // go through each course
 		    AtomicInteger mappingsProcessed = new AtomicInteger();
 		    logger.info("Processing courses and assigments");
+
+		    // Compare 2 courses on how many users to process each has and whether is already exists
+		    // It helps with balancing thread load.
+		    Comparator<Entry<String, String>> parsedCourseSizeComparator = (c1, c2) -> {
+			boolean courseExists1 = allExistingParsedCourses.containsKey(c1.getKey());
+			boolean courseExists2 = allExistingParsedCourses.containsKey(c2.getKey());
+			if (courseExists1) {
+			    if (!courseExists2) {
+				return -1;
+			    }
+			} else if (courseExists2) {
+			    return 1;
+			}
+
+			Map<String, List<String>> subcourseMappings1 = mappings.get(c1.getKey());
+			Map<String, List<String>> subcourseMappings2 = mappings.get(c2.getKey());
+			if (subcourseMappings1 == null) {
+			    if (subcourseMappings2 == null) {
+				return 0;
+			    } else {
+				return -1;
+			    }
+			} else if (subcourseMappings2 == null) {
+			    return 1;
+			}
+
+			int courseSize1 = subcourseMappings1.values().stream()
+				.collect(Collectors.summingInt(List::size));
+			int courseSize2 = subcourseMappings2.values().stream()
+				.collect(Collectors.summingInt(List::size));
+			return courseSize1 - courseSize2;
+		    };
 		    Collection<Spliterator<Entry<String, String>>> spliterators = splitCollection(
-			    allParsedCourseMapping.entrySet());
+			    allParsedCourseMapping.entrySet(), parsedCourseSizeComparator);
 		    List<Future<?>> futures = new ArrayList<>(spliterators.size());
 
 		    for (Spliterator<Entry<String, String>> spliterator : spliterators) {
@@ -455,7 +491,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 	Set<User> allUsersParsed = ConcurrentHashMap.newKeySet();
 	logger.info("Creating users");
 
-	Collection<Spliterator<Entry<String, String[]>>> spliterators = splitCollection(users.entrySet());
+	Collection<Spliterator<Entry<String, String[]>>> spliterators = splitCollection(users.entrySet(), null);
 	List<Future<?>> futures = new ArrayList<>(spliterators.size());
 
 	for (Spliterator<Entry<String, String[]>> spliterator : spliterators) {
@@ -604,14 +640,12 @@ public class SPEnrolmentServlet extends HttpServlet {
 	Map<String, List<String>> subcourseMappings = mappings.get(courseCode);
 	if (subcourseMappings != null) {
 	    for (Entry<String, List<String>> subcourseEntry : subcourseMappings.entrySet()) {
-		ConcurrentMap<String, Organisation> existingSubcoursesInternal = existingSubcourses;
 		String subcourseCode = subcourseEntry.getKey();
 		nonProcessedSubcourses.remove(subcourseCode);
 
 		logger.info("Processing subcourse with code: " + subcourseCode);
 
-		Organisation subcourse = existingSubcoursesInternal == null ? null
-			: existingSubcoursesInternal.get(subcourseCode);
+		Organisation subcourse = existingSubcourses == null ? null : existingSubcourses.get(subcourseCode);
 		// create subcourse
 		if (subcourse == null) {
 		    ExtCourseClassMap extSubOrgMap;
@@ -623,14 +657,14 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    subcourse.setCode(subcourseCode);
 		    userManagementService.save(subcourse);
 
-		    if (existingSubcoursesInternal == null) {
-			existingSubcoursesInternal = new ConcurrentHashMap<>();
-			allExistingParsedCoursesAndSubcourses.put(courseId, existingSubcoursesInternal);
+		    if (existingSubcourses == null) {
+			existingSubcourses = new ConcurrentHashMap<>();
+			allExistingParsedCoursesAndSubcourses.put(courseId, existingSubcourses);
 		    }
-		    existingSubcoursesInternal.put(subcourse.getCode(), subcourse);
+		    existingSubcourses.put(subcourse.getCode(), subcourse);
 		    allExistingParsedExtCourses.put(extSubOrgMap.getOrganisation().getOrganisationId(), extSubOrgMap);
 
-		    String message = "Subcourse created with code and name \"" + courseCode + "\" and ID "
+		    String message = "Subcourse created with code and name \"" + subcourseCode + "\" and ID "
 			    + subcourse.getOrganisationId();
 		    logger.info(message);
 		    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
@@ -895,9 +929,23 @@ public class SPEnrolmentServlet extends HttpServlet {
     /**
      * Splits collection into as many spliterators as there are threads
      */
-    private <T> Collection<Spliterator<T>> splitCollection(Collection<T> collection) {
-	// if there is only 100 entries, do it in one thread
-	int threadCount = collection.size() < 100 ? 1 : this.threadCount;
+    private <T> Collection<Spliterator<T>> splitCollection(Collection<T> collection, Comparator<T> comparator) {
+	// if there is only 10 entries, do it in one thread
+	int threadCount = 1;
+
+	if (collection.size() > 10) {
+	    threadCount = this.threadCount;
+
+	    if (comparator != null) {
+		Set<T> treeSet = new TreeSet<>(comparator);
+		treeSet.addAll(collection);
+		collection = treeSet;
+	    }
+
+	    List<T> shuffledCollection = new ArrayList<>(collection);
+	    Collections.shuffle(shuffledCollection);
+	    collection = shuffledCollection;
+	}
 
 	LinkedList<Spliterator<T>> spliterators = new LinkedList<>();
 	spliterators.add(collection.spliterator());
