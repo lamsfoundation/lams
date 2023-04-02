@@ -396,6 +396,23 @@
 	
 	<div class="row mb-3">
 		<div class="col-10 offset-1">
+			<div class="card">
+				<div id="description-heading" class="card-header collapsed" role="button"
+					 data-bs-toggle="collapse" href="#description-collapse" aria-expanded="false">
+			       	<span class="card-title">
+			       		<fmt:message key="label.authoring.basic.description" />
+			     	</span>
+			    </div>
+			
+			    <div id="description-collapse" class="collapse card-body" role="tabpanel" aria-labelledby="description-heading">
+					<c:out value="${dokumaran.description}" escapeXml="false"/>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row mb-3">
+		<div class="col-6 offset-4">
 			<c:if test="${empty summaryList}">
 				<lams:Alert type="info" id="no-session-summary" close="false">
 					 <fmt:message key="message.monitoring.summary.no.session" />
