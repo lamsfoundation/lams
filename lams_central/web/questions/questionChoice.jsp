@@ -9,22 +9,22 @@
 		div.answerDiv {
 			padding-left: 50px;
 			display: none;
+			margin-bottom: 10px;
 		}
 		
-		input[type="checkbox"] {
-			border: none;
-			margin: 10px 10px 0px 15px;
+		div.checkbox, div.form-group {
+			width: 100%;
+			margin-bottom: 15px !important;
 		}
 		
-		.questionText {
-			margin-left: 43px;
-			overflow: auto;
+		.editableAttribute {
+			width: 80% !important;
 		}
 		
-		div.answerDiv input {
-			margin-top: 5px;
+		#selectAllDiv {
+			display: inline;
 		}
-		
+
 		.button {
 			float: right;
 			margin-left: 10px;
@@ -40,9 +40,11 @@
 		
 		#collectionSelect {
 			float: right;
+			margin-bottom: 30px;
 		}
 	</style>
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript">
 		window.resizeTo(1152, 648);
 	
@@ -169,17 +171,15 @@
 			<lams:Alert id="errorArea" type="danger" close="false">
 				<fmt:message key="label.questions.choice.missing" />
 			</lams:Alert>
-			
-			<input id="selectAll" type="checkbox" /><fmt:message key="label.questions.choice.select.all" /><br /><br />
 					       
-			<form id="questionForm" method="POST">
+			<form id="questionForm" method="POST" class="form-inline">
 				<input type="hidden" name="questionCount" value="${fn:length(questions)}" />
 				
 				<c:if test="${not empty collections}">
 					<!-- Choose a collection where questions should be imported to -->
 					<label id="collectionSelect">
 						<fmt:message key="label.questions.choice.collection" />&nbsp;
-						<select name="collectionUid" id="collectionUid">
+						<select name="collectionUid" id="collectionUid" class="form-control">
 							<c:forEach items="${collections}" var="collection">
 								<option value="${collection.uid}" ${empty collection.personal ? "selected" : ""}>
 									<c:out value="${collection.name}"/> 
@@ -188,28 +188,39 @@
 						</select>
 					</label>
 				</c:if>
-				
+						
+				<div id="selectAllDiv" class="checkbox">	
+					<label>
+						<input id="selectAll" type="checkbox"/>&nbsp;<fmt:message key="label.questions.choice.select.all" />
+					</label>
+				</div>
+			
 				<c:forEach var="question" items="${questions}" varStatus="questionStatus">
 					<c:set var="questionEditable" value="${editingEnabled and (question.type eq 'mc' or question.type eq 'mr')}" />
 					<c:set var="questionTypeLabel">label.questions.choice.type.${question.type}</c:set>
 					
-					<input data-question-index="${questionStatus.index}" class="questionCheckbox" type="checkbox" />
-					
 					<%-- Question itself --%>
-					${questionStatus.index + 1}. (<fmt:message key="${questionTypeLabel}" />)
-		     		<c:choose>
-						<c:when test="${questionEditable}">
-							<input id="question${questionStatus.index}" name="question${questionStatus.index}"
-					           	   value="<c:out value='${question.title}' />" class="questionAttribute editableAttribute"
-					           	   type="text" disabled="disabled" />
-						</c:when>
-						<c:otherwise>
-							<c:out value='${question.title}' />
-							<input id="question${questionStatus.index}" name="question${questionStatus.index}"
-					           	   value="<c:out value='${question.title}' />" class="questionAttribute" type="hidden" />
-						</c:otherwise>
-					</c:choose>
-					
+					<div class="checkbox">
+						<label>
+							<input id="question${questionStatus.index}checkbox" 
+								   data-question-index="${questionStatus.index}" class="questionCheckbox" type="checkbox" />
+							${questionStatus.index + 1}. (<fmt:message key="${questionTypeLabel}" />)
+				     		<c:choose>
+								<c:when test="${questionEditable}">
+									</label>
+									<input id="question${questionStatus.index}" name="question${questionStatus.index}"
+							           	   value="<c:out value='${question.title}' />"
+							           	   class="questionAttribute editableAttribute form-control"
+							           	   type="text" disabled="disabled" />
+								</c:when>
+								<c:otherwise>
+									<c:out value='${question.title}' />
+									</label>
+									<input id="question${questionStatus.index}" name="question${questionStatus.index}"
+							           	   value="<c:out value='${question.title}' />" class="questionAttribute" type="hidden" />
+								</c:otherwise>
+							</c:choose>
+					</div>
 					
 					<input id="question${questionStatus.index}label" name="question${questionStatus.index}label"
 					       value="<c:out value='${question.label}' />"
@@ -218,7 +229,7 @@
 					<input id="question${questionStatus.index}text" name="question${questionStatus.index}text"
 					       value="<c:out value='${question.text}' />"
 					       class="questionAttribute" type="hidden" disabled="disabled" />
-					       <div class="questionText">${question.text}</div><br />
+					       <div class="questionText">${question.text}</div>
 					<input type="hidden" id="question${questionStatus.index}type" name="question${questionStatus.index}type"
 				           value="${question.type}"
 				           class="questionAttribute" disabled="disabled" />
@@ -246,11 +257,12 @@
 								<%-- Answer itself --%>
 								<c:choose>
 									<c:when test="${questionEditable}">
-										- <input name="question${questionStatus.index}answer${answerStatus.index}"
-										       value="<c:out value='${answer.text}' />" class="answerVisible editableAttribute"
-										       type="text" disabled="disabled" />
-										 <c:if test="${answer.score == 1}">(<fmt:message key="label.correct"/>)</c:if>
-										 <br />
+										<div class="form-group">
+											<input name="question${questionStatus.index}answer${answerStatus.index}"
+											       value="<c:out value='${answer.text}' />" class="answerVisible editableAttribute form-control"
+											       type="text" disabled="disabled" />
+											 <c:if test="${answer.score == 1}">(<fmt:message key="label.correct"/>)</c:if>
+										</div>
 									</c:when>
 									<c:when test="${question.type eq 'mc' or question.type eq 'mr' or question.type eq 'mh' or question.type eq 'fb'}">
 						       			<input name="question${questionStatus.index}answer${answerStatus.index}"
