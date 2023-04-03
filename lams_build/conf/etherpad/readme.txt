@@ -36,6 +36,17 @@ Etherpad is required for Dokumaran tool and for Etherpad tag
 					      "integrity": "sha512-zQvEJO4vPVh/GSBGg/8sus+VcF7R6nO1ZjQPkC+Ks1zPbplZU3R7vng56uCpxReJ/ABK8CKm4Zliq0fp8++uiw=="
 					    },
 					    
+	mathjax:            allow mathematical formular in Etherpad 2.0.5
+	
+					    If this plugin installs correctly but does not display in Etherpad,
+						manually add following section to package-lock.json after all other plugins (for example after ep_stats section)
+						
+						"ep_mathjax": {
+					      "version": "2.0.5",
+					      "resolved": "https://registry.npmjs.org/ep_mathjax/-/ep_mathjax-2.0.5.tgz",
+					      "integrity": "sha512-+fthTJr3v8UwbnBU2ARmoOs3iLggqHAIzzAm2Cv7TuV2M3uU7OqCGPr64AQ+mfXD43NwkpQOjW9ttQVntKqsMA=="
+					    },
+					    
 	previewimages:      Preview image when pasting a link to an image 0.0.13
 	
 						If this plugin installs correctly but does not display in Etherpad,

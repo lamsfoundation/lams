@@ -127,21 +127,6 @@ public class ExtServerManagementController {
 		    }
 		}
 	    }
-
-	    List<ExtServer> listPrefix = userManagementService.findByProperty(ExtServer.class, "prefix",
-		    extServerForm.getPrefix());
-	    if (listPrefix != null && listPrefix.size() > 0) {
-		if (sid.equals(0)) {//new map
-		    errorMap.add("prefix", messageService.getMessage("error.not.unique",
-			    new Object[] { messageService.getMessage("sysadmin.prefix") }));
-		} else {
-		    ExtServer map = listPrefix.get(0);
-		    if (!map.getSid().equals(sid)) {
-			errorMap.add("prefix", messageService.getMessage("error.not.unique",
-				new Object[] { messageService.getMessage("sysadmin.prefix") }));
-		    }
-		}
-	    }
 	}
 
 	if (errorMap.isEmpty()) {

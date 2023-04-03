@@ -1786,6 +1786,8 @@ ActivityLib = {
 				DecorationLib.removeLabel(item);
 			} else if (item instanceof DecorationDefs.Region) {
 				DecorationLib.removeRegion(item);
+			} else if (item instanceof ActivityDefs.Transition) {
+				ActivityLib.removeTransition(item);
 			} else {
 				ActivityLib.removeActivity(item);
 			}

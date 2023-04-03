@@ -68,6 +68,7 @@ public class EmailAnalysisBuilder {
     // HTML Styles
     private static final String width100pc = "width:100%;";
     private static final String tableBorderedStyle = "border-collapse:collapse;border-width:1px;border-style:solid;border-color:#777;";
+	private static final String divSpaSapaInfoBorderStyle = "margin: auto;width: 50%;border-width:1px;border-style:solid;border-color:#777;background:#ffd236;padding:10px;";
     private static final String centeredStyle = "text-align:center;";
     private static final String headerBackgroundStyle = "background:#B9CDE5;";
     private static final String highlightBackgroundStyle = "background:#D7E4BD;";
@@ -126,6 +127,10 @@ public class EmailAnalysisBuilder {
 	htmlText.append("<p>&nbsp;</p>\n");
 
 	if (peerreview.isSelfReview()) {
+		htmlText.append("<div style=\"").append(divSpaSapaInfoBorderStyle).append("\">\n<p style=\"font-size:large;font-weight:600;\">ℹ️ &nbsp;<strong>")
+				.append(getLocalisedMessage("email.label.spa.sapa.info.title")).append("</strong></p>\n")
+				.append("<p>").append(getLocalisedMessage("email.label.spa.info")).append("</p>")
+				.append("<p>").append(getLocalisedMessage("email.label.sapa.info")).append("</p></span></div>\n<p>&nbsp;</p>\n");
 	    generateSAPASPAExplanation(htmlText, learnerData.getSPAFactor(), learnerData.getSAPAFactor());
 	    htmlText.append("<p>&nbsp;</p>\n");
 	}
@@ -378,7 +383,7 @@ public class EmailAnalysisBuilder {
 	String spaFactor = roundTo2PlacesAsString(learnerData.getSPAFactor());
 	StringBuilder spaFactorCellContents = new StringBuilder().append("<td>&nbsp;</td><td style=\"width:20%;")
 		.append(zebraOddRow).append("\"><span style=\"").append(bold).append("\">")
-		.append(getLocalisedMessage("email.SPA.factor")).append("</span></td><td style=\"width:20%;")
+		.append(getLocalisedMessage("email.SPA.factor")).append("</span></td><td style=\"width:20%;text-align:center;")
 		.append(zebraOddRow).append("\"><span style=\"").append(bold).append("\">").append(spaFactor)
 		.append("</span></td>");
 	htmlText.append("<table style=\"border-collapse:collapse;").append(width100pc).append("\">");
@@ -394,7 +399,7 @@ public class EmailAnalysisBuilder {
 		    String selfRating = roundTo2PlacesAsString(criteriaData.selfRating);
 		    htmlText.append("<td style=\"width:20%;").append(evenRow ? zebraEvenRow : zebraOddRow)
 			    .append("\"><span style=\"").append(bold).append("\">").append(selfRatingString)
-			    .append("</span></td><td style=\"").append(evenRow ? zebraEvenRow : zebraOddRow)
+			    .append("</span></td><td style=\"text-align:center;").append(evenRow ? zebraEvenRow : zebraOddRow)
 			    .append("\">").append(selfRating).append("</td>");
 		    if (!spaDone) {
 			htmlText.append(spaFactorCellContents);
@@ -404,7 +409,7 @@ public class EmailAnalysisBuilder {
 
 		String peerRatingExcSelf = roundTo2PlacesAsString(criteriaData.peerRatingExcSelf);
 		htmlText.append("<td style=\"").append(evenRow ? zebraEvenRow : zebraOddRow).append("\"><span style=\"")
-			.append(bold).append("\">").append(peerRatingString).append("</span></td><td style=\"")
+			.append(bold).append("\">").append(peerRatingString).append("</span></td><td style=\"text-align:center;")
 			.append(evenRow ? zebraEvenRow : zebraOddRow).append("\">").append(peerRatingExcSelf)
 			.append("</td>");
 		if (!spaDone) {
@@ -412,8 +417,8 @@ public class EmailAnalysisBuilder {
 			String sapaFactor = roundTo2PlacesAsString(learnerData.getSAPAFactor());
 			htmlText.append("<td>&nbsp;</td><td style=\"width:20%;").append(zebraOddRow)
 				.append("\"><span style=\"").append(bold).append("\">")
-				.append(getLocalisedMessage("email.SAPA.factor")).append("</span></td><td style=\"")
-				.append(zebraOddRow).append("\"><span style=\"").append(bold).append("\">")
+				.append(getLocalisedMessage("email.SAPA.factor")).append("</span></td><td style=\"text-align:center;")
+				.append(zebraOddRow).append("\"><span style=\"text-align:center;").append(bold).append("\">")
 				.append(sapaFactor).append("</span></td>");
 		    } else {
 			htmlText.append(spaFactorCellContents);
@@ -426,7 +431,7 @@ public class EmailAnalysisBuilder {
 		if (isSelfReview) {
 		    htmlText.append("<tr><td style=\"width:20%;").append(evenRow ? zebraEvenRow : zebraOddRow)
 			    .append("\"><span style=\"").append(bold).append("\">").append("Self & Peers' Rating")
-			    .append("</span></td><td style=\"").append(evenRow ? zebraEvenRow : zebraOddRow)
+			    .append("</span></td><td style=\"text-align:center;").append(evenRow ? zebraEvenRow : zebraOddRow)
 			    .append("\">").append(roundTo2PlacesAsString(criteriaData.peerRatingIncSelf))
 			    .append("</td>");
 		    htmlText.append("</tr>\n");

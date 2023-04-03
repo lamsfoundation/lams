@@ -79,7 +79,7 @@
 		
 	    <div class="panel panel-default rubrics-row-panel">
 	       <div class="panel-heading" role="tab" id="heading${criteria.ratingCriteriaId}">
-	       	<span class="panel-title collapsable-icon-left">
+	       	<span class="panel-title collapsable-icon-left" style="font-size:larger">
 	       		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${criteria.ratingCriteriaId}" 
 						aria-expanded="false" aria-controls="collapse${criteria.ratingCriteriaId}" data-parent="#rubrics-rows-panels">
 					<%-- Criterion "row" --%>
@@ -110,7 +110,9 @@
 								<tr>
 									<td>
 										<%-- Criterion "column" --%>
+										<c:if test="${not empty columnHeader}">
 										<span class="column-header-span"><c:out value="${columnHeader}" escapeXml="false"/></span><br>
+										</c:if>
 										<%-- Criterion "cell" --%>
 										<c:out value="${criteria.rubricsColumns[columnHeaderCount - columnStatus.count].name}" escapeXml="false" />	
 									</td>
