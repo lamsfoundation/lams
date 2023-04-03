@@ -7,7 +7,7 @@
 	<lams:css/>	
 	<style type="text/css">
 		div.answerDiv {
-			padding-left: 25px;
+			padding-left: 50px;
 			display: none;
 		}
 		
@@ -51,7 +51,7 @@
 		
 		function submitForm() {
 			var anyQuestionsSelected = false;
-			$('.question').each(function(){
+			$('.questionCheckbox').each(function(){
 				if ($(this).is(':checked')) {
 					anyQuestionsSelected = true;
 					return false;
@@ -87,11 +87,11 @@
 		}
 		
 		$(document).ready(function(){
-			$('.question').change(function(){
+			$('.questionCheckbox').change(function(){
 				var checked = $(this).is(':checked'),
-					selector = '#' + $(this).attr('id'),
+					selector = '#question' + $(this).data('questionIndex'),
 					answerDiv = $(selector + 'answerDiv'),
-					answersVisible = answerDiv.find('input[type="checkbox"]').length > 0;
+					answersVisible = answerDiv.find('.answerVisible').length > 0;
 					
 				$(this).attr('checked', checked);
 				// enable/disable answers and feedback fields
@@ -101,7 +101,7 @@
 					// but annoying movement when question checkbox is clicked 
 					answerDiv.toggle('slow');
 				}
-				$('input', answerDiv).add(selector + 'feedback').add(selector + 'type').add(selector + 'text')
+				$('input', answerDiv).add(selector).add(selector + 'feedback').add(selector + 'type').add(selector + 'text')
 				                     .add(selector + 'score').add(selector + 'resourcesFolder')
 				                     .attr('disabled', checked ? null : 'disabled');
 				
@@ -117,7 +117,7 @@
 			$('#selectAll').click(function(){
 				var checked = $(this).is(':checked');
 				
-				$('.question').attr('checked', checked);
+				$('.questionCheckbox').attr('checked', checked);
 				$('.questionAttribute').attr('disabled', checked ? null : 'disabled');
 				if (checked) {
 					$('#errorArea').hide('slow');
@@ -131,10 +131,9 @@
 					   .find('input').attr('disabled', 'disabled');
 				}
 			});
-			
-			$('.answer').change(function(){
-				// FF does not seem to do it right
-				$(this).attr('checked', $(this).is(':checked'));
+
+			$('.editableAttribute').change(function(){
+				$(this).attr('value', $(this).val());
 			});
 			
 			// as the form HTML is being passed, not its real values
@@ -191,37 +190,26 @@
 				</c:if>
 				
 				<c:forEach var="question" items="${questions}" varStatus="questionStatus">
+					<c:set var="questionEditable" value="${editingEnabled and (question.type eq 'mc' or question.type eq 'mr')}" />
+					<c:set var="questionTypeLabel">label.questions.choice.type.${question.type}</c:set>
+					
+					<input data-question-index="${questionStatus.index}" class="questionCheckbox" type="checkbox" />
+					
 					<%-- Question itself --%>
-					<input id="question${questionStatus.index}" name="question${questionStatus.index}"
-					       value="<c:out value='${question.title}' />"
-					       class="question" type="checkbox" />${questionStatus.index + 1}.
+					${questionStatus.index + 1}. (<fmt:message key="${questionTypeLabel}" />)
 		     		<c:choose>
-						<c:when test="${question.type eq 'mc'}">
-							(<fmt:message key="label.questions.choice.type.mc" />)
-						</c:when>
-						<c:when test="${question.type eq 'mr'}">
-							(<fmt:message key="label.questions.choice.type.mr" />)
-						</c:when>
-						<c:when test="${question.type eq 'mt'}">
-							(<fmt:message key="label.questions.choice.type.mt" />)
-						</c:when>
-						<c:when test="${question.type eq 'fb'}">
-							(<fmt:message key="label.questions.choice.type.fb" />)
-						</c:when>
-						<c:when test="${question.type eq 'es'}">
-							(<fmt:message key="label.questions.choice.type.es" />)
-						</c:when>
-						<c:when test="${question.type eq 'tf'}">
-							(<fmt:message key="label.questions.choice.type.tf" />)
-						</c:when>
-						<c:when test="${question.type eq 'mh'}">
-							(<fmt:message key="label.questions.choice.type.mh" />)
+						<c:when test="${questionEditable}">
+							<input id="question${questionStatus.index}" name="question${questionStatus.index}"
+					           	   value="<c:out value='${question.title}' />" class="questionAttribute editableAttribute"
+					           	   type="text" disabled="disabled" />
 						</c:when>
 						<c:otherwise>
-							(<fmt:message key="label.questions.choice.type.unknown" />)
+							<c:out value='${question.title}' />
+							<input id="question${questionStatus.index}" name="question${questionStatus.index}"
+					           	   value="<c:out value='${question.title}' />" class="questionAttribute" type="hidden" />
 						</c:otherwise>
 					</c:choose>
-					<c:out value='${question.title}' />
+					
 					
 					<input id="question${questionStatus.index}label" name="question${questionStatus.index}label"
 					       value="<c:out value='${question.label}' />"
@@ -257,13 +245,21 @@
 							<c:forEach var="answer" items="${question.answers}" varStatus="answerStatus">
 								<%-- Answer itself --%>
 								<c:choose>
+									<c:when test="${questionEditable}">
+										- <input name="question${questionStatus.index}answer${answerStatus.index}"
+										       value="<c:out value='${answer.text}' />" class="answerVisible editableAttribute"
+										       type="text" disabled="disabled" />
+										 <c:if test="${answer.score == 1}">(<fmt:message key="label.correct"/>)</c:if>
+										 <br />
+									</c:when>
 									<c:when test="${question.type eq 'mc' or question.type eq 'mr' or question.type eq 'mh' or question.type eq 'fb'}">
-										<input name="question${questionStatus.index}answer${answerStatus.index}"
-							       			   value="<c:out value='${answer.text}' />" class="answer"
-							       			   type="checkbox" checked="checked" disabled="disabled" />
+						       			<input name="question${questionStatus.index}answer${answerStatus.index}"
+							       			   value="<c:out value='${answer.text}' />" class="answerVisible"
+							       			   type="hidden" disabled="disabled" />
 							       		<c:if test="${answer.score == 1}"><b></c:if>
-							       		${answer.text}<br />
-							       		<c:if test="${answer.score == 1}"></b></c:if>
+							       		- ${answer.text}
+							       		<c:if test="${answer.score == 1}">&nbsp;(<fmt:message key="label.correct"/>)</b></c:if>
+							       		<br />
 					       			</c:when>
 					       			<c:otherwise>
 					       				<%-- Do not display answers if management is too difficult or pointless --%>

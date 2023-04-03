@@ -107,6 +107,7 @@ public class QuestionsController {
 		if (clazz != null) {
 		    Method method = clazz.getMethod("parseResponse", String.class);
 		    questions = (Question[]) method.invoke(null, request.getParameter("textInput"));
+		    request.setAttribute("editingEnabled", true);
 		}
 	    } catch (Exception e) {
 		errorMap.add("GLOBAL", "Error while parsing text input: " + e.getMessage());
