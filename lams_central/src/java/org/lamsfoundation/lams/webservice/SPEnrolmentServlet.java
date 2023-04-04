@@ -33,7 +33,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -347,6 +346,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 						}
 					    });
 					} while (elementsRemaining);
+					logger.info("Processed " + mappingsProcessed.get() + " entries and finished");
 				    } finally {
 					HibernateSessionManager.closeSession();
 				    }
@@ -409,6 +409,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 			// never return 0 as course will considered a duplicate
 			return courseSizeDifference == 0 && !c1.equals(c2) ? 1 : courseSizeDifference;
 		    };
+
 		    Collection<Spliterator<Entry<String, String>>> spliterators = splitCollection(
 			    allParsedCourseMapping.entrySet(), parsedCourseSizeComparator);
 		    List<Future<?>> futures = new ArrayList<>(spliterators.size());
@@ -445,6 +446,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 					    }
 					});
 				    } while (elementsRemaining);
+				    logger.info("Processed " + mappingsProcessed.get() + " entries and finished");
 				} finally {
 				    HibernateSessionManager.closeSession();
 				}
@@ -929,37 +931,35 @@ public class SPEnrolmentServlet extends HttpServlet {
     }
 
     /**
-     * Splits collection into as many spliterators as there are threads
+     * Splits collection into as many spliterators as there are threads, with balanced threads' load
      */
-    private <T> Collection<Spliterator<T>> splitCollection(Collection<T> collection, Comparator<T> comparator) {
-	// if there is only 10 entries, do it in one thread
-	int threadCount = 1;
+    private <T> Collection<Spliterator<T>> splitCollection(Collection<T> sourceCollection, Comparator<T> comparator) {
+	if (sourceCollection.size() < 10) {
+	    return Set.of(sourceCollection.spliterator());
+	}
 
-	if (collection.size() > 10) {
-	    threadCount = this.threadCount;
-
-	    if (comparator != null) {
-		Set<T> treeSet = new TreeSet<>(comparator);
-		treeSet.addAll(collection);
-		collection = treeSet;
-	    }
-
-	    List<T> shuffledCollection = new ArrayList<>(collection);
+	if (comparator == null) {
+	    List<T> shuffledCollection = new ArrayList<>(sourceCollection);
 	    Collections.shuffle(shuffledCollection);
-	    collection = shuffledCollection;
+	    sourceCollection = shuffledCollection;
+	} else {
+	    Set<T> treeSet = new TreeSet<>(comparator);
+	    treeSet.addAll(sourceCollection);
+	    sourceCollection = treeSet;
 	}
 
-	LinkedList<Spliterator<T>> spliterators = new LinkedList<>();
-	spliterators.add(collection.spliterator());
-	for (int threadIndex = 1; threadIndex < threadCount; threadIndex++) {
-	    Spliterator<T> spliterator = spliterators.removeFirst();
-	    spliterators.add(spliterator);
-	    Spliterator<T> anotherSpliterator = spliterator.trySplit();
-	    if (anotherSpliterator != null) {
-		spliterators.add(anotherSpliterator);
-	    }
+	List<List<T>> collectionList = new ArrayList<>(threadCount);
+	for (int threadIndex = 0; threadIndex < threadCount; threadIndex++) {
+	    collectionList.add(new ArrayList<>(sourceCollection.size() / threadCount + 1));
 	}
-	return spliterators;
+
+	int listIndex = 0;
+	for (T element : sourceCollection) {
+	    collectionList.get(listIndex % threadCount).add(element);
+	    listIndex++;
+	}
+
+	return collectionList.stream().collect(Collectors.mapping(List::spliterator, Collectors.toList()));
     }
 
     @Override
