@@ -1634,14 +1634,16 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
     @Override
     public Long createTblAssessmentToolContent(UserDTO user, String title, String instructions,
 	    String reflectionInstructions, boolean selectLeaderToolOutput, boolean enableNumbering,
-	    boolean enableConfidenceLevels, boolean allowDiscloseAnswers, boolean allowAnswerJustification,
-	    boolean enableDiscussionSentiment, ArrayNode questions) throws IOException {
+	    boolean shuffleQuestions, boolean enableConfidenceLevels, boolean allowDiscloseAnswers,
+	    boolean allowAnswerJustification, boolean enableDiscussionSentiment, ArrayNode questions)
+	    throws IOException {
 
 	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, instructions,
 		reflectionInstructions, null, null, user);
 	toolContentJSON.put(RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, selectLeaderToolOutput);
 	toolContentJSON.put(RestTags.ENABLE_CONFIDENCE_LEVELS, enableConfidenceLevels);
 	toolContentJSON.put("numbered", enableNumbering);
+	toolContentJSON.put("shuffled", shuffleQuestions);
 	toolContentJSON.put("displaySummary", Boolean.TRUE);
 	toolContentJSON.put("allowDiscloseAnswers", allowDiscloseAnswers);
 	toolContentJSON.put("allowAnswerJustification", allowAnswerJustification);

@@ -147,7 +147,7 @@ public interface IAuthoringFullService extends IAuthoringService {
     void storeLearningDesignAccess(Long learningDesignId, Integer userId);
 
     Long createTblAssessmentToolContent(UserDTO user, String title, String instructions, String reflectionInstructions,
-	    boolean selectLeaderToolOutput, boolean enableNumbering, boolean enableConfidenceLevels,
-	    boolean allowDiscloseAnswers, boolean allowAnswerJustification, boolean enableDiscussionSentiment,
-	    ArrayNode questions) throws IOException;
+	    boolean selectLeaderToolOutput, boolean enableNumbering, boolean shuffleQuestions,
+	    boolean enableConfidenceLevels, boolean allowDiscloseAnswers, boolean allowAnswerJustification,
+	    boolean enableDiscussionSentiment, ArrayNode questions) throws IOException;
 }

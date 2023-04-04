@@ -393,7 +393,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 			Map<String, List<String>> subcourseMappings2 = mappings.get(c2.getKey());
 			if (subcourseMappings1 == null) {
 			    if (subcourseMappings2 == null) {
-				return 0;
+				return c1.equals(c2) ? 0 : 1;
 			    } else {
 				return -1;
 			    }
@@ -405,7 +405,9 @@ public class SPEnrolmentServlet extends HttpServlet {
 				.collect(Collectors.summingInt(List::size));
 			int courseSize2 = subcourseMappings2.values().stream()
 				.collect(Collectors.summingInt(List::size));
-			return courseSize1 - courseSize2;
+			int courseSizeDifference = courseSize1 - courseSize2;
+			// never return 0 as course will considered a duplicate
+			return courseSizeDifference == 0 && !c1.equals(c2) ? 1 : courseSizeDifference;
 		    };
 		    Collection<Spliterator<Entry<String, String>>> spliterators = splitCollection(
 			    allParsedCourseMapping.entrySet(), parsedCourseSizeComparator);

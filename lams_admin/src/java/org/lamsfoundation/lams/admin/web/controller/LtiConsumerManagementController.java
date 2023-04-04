@@ -228,21 +228,6 @@ public class LtiConsumerManagementController {
 		    }
 		}
 	    }
-
-	    List<ExtServer> listPrefix = userManagementService.findByProperty(ExtServer.class, "prefix",
-		    ltiConsumerForm.getPrefix());
-	    if (listPrefix != null && listPrefix.size() > 0) {
-		if (sid == null) {//new map
-		    errorMap.add("prefix", messageService.getMessage("error.not.unique",
-			    new Object[] { messageService.getMessage("sysadmin.prefix") }));
-		} else {
-		    ExtServer ltiConsumer = listPrefix.get(0);
-		    if (!ltiConsumer.getSid().equals(sid)) {
-			errorMap.add("prefix", messageService.getMessage("error.not.unique",
-				new Object[] { messageService.getMessage("sysadmin.prefix") }));
-		    }
-		}
-	    }
 	}
 
 	if (errorMap.isEmpty()) {

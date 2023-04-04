@@ -321,6 +321,14 @@
 						</label>
 		                <i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key='authoring.tbl.enable.confidence.tooltip'/>"></i>
 					</div>	
+					
+					<div class="form-group voffset10">
+						<input type="checkbox" name="shuffleIRAT" value="true" class="form-control-inline" id="shuffleIRAT"/>&nbsp;
+						<label for="shuffleIRAT">
+							<fmt:message key="authoring.tbl.shuffle.questions"/>
+						</label>
+		                <i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key='authoring.tbl.shuffle.questions.tooltip'/>"></i>
+					</div>	
 				</div>
 			</div>
 			
