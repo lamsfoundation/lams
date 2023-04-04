@@ -162,8 +162,8 @@ public class TBLTemplateController extends LdTemplateController {
 	    ArrayNode testQuestionsArray = JsonUtil.readArray(data.testQuestions.values());
 
 	    Long iRAToolContentId = authoringService.createTblAssessmentToolContent(userDTO, activityTitle,
-		    data.getText("boilerplate.ira.instructions"), null, false, true, data.confidenceLevelEnable, false,
-		    false, false, testQuestionsArray);
+		    data.getText("boilerplate.ira.instructions"), null, false, true, data.shuffleIRAT,
+		    data.confidenceLevelEnable, false, false, false, testQuestionsArray);
 	    ObjectNode iraActivityJSON = createAssessmentActivity(maxUIID, order++, currentActivityPosition,
 		    iRAToolContentId, data.contentFolderID, groupingUIID, null, null, activityTitle);
 	    activities.add(iraActivityJSON);
@@ -252,7 +252,7 @@ public class TBLTemplateController extends LdTemplateController {
 			    StringUtils.isBlank(applicationExercise.description)
 				    ? data.getText("boilerplate.ae.instructions")
 				    : applicationExercise.description,
-			    null, true, true, false, true, true, true, questionsJSONArray);
+			    null, true, true, false, false, true, true, true, questionsJSONArray);
 		    activities.add(createAssessmentActivity(maxUIID, order++, currentActivityPosition, aetoolContentId,
 			    data.contentFolderID, groupingUIID, null, null, applicationExerciseTitle));
 		}
@@ -393,6 +393,7 @@ public class TBLTemplateController extends LdTemplateController {
 
 	SortedMap<Integer, ObjectNode> testQuestions;
 	boolean confidenceLevelEnable;
+	boolean shuffleIRAT;
 	SortedMap<Integer, AppExData> applicationExercises;
 	SortedMap<Integer, PeerReviewCriteria> peerReviewCriteria;
 
@@ -498,6 +499,7 @@ public class TBLTemplateController extends LdTemplateController {
 	    }
 
 	    confidenceLevelEnable = WebUtil.readBooleanParam(request, "confidenceLevelEnable", false);
+	    shuffleIRAT = WebUtil.readBooleanParam(request, "shuffleIRAT", false);
 	    if (useIRATRA) {
 		if (testQuestions.size() == 0) {
 		    addValidationErrorMessage("authoring.error.rat.not.blank", null, ratErrors);
