@@ -33,7 +33,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -297,19 +296,22 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    // for all organisations which are present in the output file
 		    Map<String, Map<Integer, Set<Integer>>> allExistingRoles = Stream
 			    .concat(allExistingParsedCourses.values().stream(), allExistingParsedSubcourses.stream())
-			    .flatMap(o -> o.getUserOrganisations().stream())
-			    .collect(Collectors.groupingBy(uo -> uo.getUser().getLogin(), Collectors.toMap(
-				    userOrganisation -> userOrganisation.getOrganisation().getOrganisationId(),
-				    userOrganisation -> userOrganisation.getUserOrganisationRoles().stream()
-					    .map(userOrganisationRole -> userOrganisationRole.getRole().getRoleId())
-					    .collect(Collectors.toSet()))));
+			    .flatMap(o -> o.getUserOrganisations().stream()).collect(
+				    Collectors.groupingBy(uo -> uo.getUser().getLogin().toLowerCase(),
+					    Collectors.toMap(
+						    userOrganisation -> userOrganisation.getOrganisation()
+							    .getOrganisationId(),
+						    userOrganisation -> userOrganisation.getUserOrganisationRoles()
+							    .stream().map(userOrganisationRole -> userOrganisationRole
+								    .getRole().getRoleId())
+							    .collect(Collectors.toSet()))));
 
 		    // When setting group managers, just process courses, not subcourses and lessons
 		    if (mode == Mode.MANAGER) {
 			// map of course code -> user logins
 			Map<String, List<String>> mappings = lines.stream()
 				.collect(Collectors.groupingByConcurrent(elem -> elem.get(0), ConcurrentHashMap::new,
-					Collectors.mapping(elem -> elem.get(3), Collectors.toList())));
+					Collectors.mapping(elem -> elem.get(3).toLowerCase(), Collectors.toList())));
 
 			AtomicInteger mappingsProcessed = new AtomicInteger();
 			logger.info("Processing manager courses and assigments");
@@ -347,6 +349,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 						}
 					    });
 					} while (elementsRemaining);
+					logger.info("Processed " + mappingsProcessed.get() + " entries and finished");
 				    } finally {
 					HibernateSessionManager.closeSession();
 				    }
@@ -409,6 +412,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 			// never return 0 as course will considered a duplicate
 			return courseSizeDifference == 0 && !c1.equals(c2) ? 1 : courseSizeDifference;
 		    };
+
 		    Collection<Spliterator<Entry<String, String>>> spliterators = splitCollection(
 			    allParsedCourseMapping.entrySet(), parsedCourseSizeComparator);
 		    List<Future<?>> futures = new ArrayList<>(spliterators.size());
@@ -445,6 +449,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 					    }
 					});
 				    } while (elementsRemaining);
+				    logger.info("Processed " + mappingsProcessed.get() + " entries and finished");
 				} finally {
 				    HibernateSessionManager.closeSession();
 				}
@@ -468,7 +473,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 			// he is only a learner or this is staff mode, so disable
 			userManagementService.disableUser(user.getUserId());
 
-			String message = "User \"" + user.getLogin() + "\" disabled";
+			String message = "User \"" + user.getLogin().toLowerCase() + "\" disabled";
 			logger.info(message);
 			logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
 				"SPEnrolment: " + message);
@@ -509,8 +514,8 @@ public class SPEnrolmentServlet extends HttpServlet {
 			    elementsRemaining = spliterator.tryAdvance(userEntry -> {
 
 				// email servers as login
-				String login = userEntry.getKey();
-				User user = allExistingUsers.get(login.toLowerCase());
+				String login = userEntry.getKey().toLowerCase();
+				User user = allExistingUsers.get(login);
 				if (user == null) {
 				    String salt = HashUtil.salt();
 				    String password = HashUtil.sha256(RandomPasswordGenerator.nextPassword(10), salt);
@@ -537,7 +542,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 				    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
 					    "SPEnrolment: " + message);
 				} else {
-				    ExtUserUseridMap userMap = allExistingExtUsers.get(login.toLowerCase());
+				    ExtUserUseridMap userMap = allExistingExtUsers.get(login);
 				    if (userMap == null) {
 					userMap = new ExtUserUseridMap();
 					userMap.setExtServer(extServer);
@@ -707,9 +712,8 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    subcourseUsers.retainAll(authors);
 		}
 
-		final Organisation finalSubcourse = subcourse;
-
 		for (String login : subcourseEntry.getValue()) {
+		    login = login.toLowerCase();
 
 		    logger.info("Processing \"" + login + "\"");
 
@@ -732,7 +736,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 			}
 		    }
 		    if (userAlreadyAssigned) {
-			return;
+			continue;
 		    }
 
 		    // the user is not a learner/staff member yet, so assign him the role and add him to lessons
@@ -748,8 +752,8 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    } else {
 			existingSubcourseRoles.add(Role.ROLE_LEARNER);
 		    }
-		    User user = allExistingParsedUsers.get(login.toLowerCase());
-		    userManagementService.setRolesForUserOrganisation(user, finalSubcourse,
+		    User user = allExistingParsedUsers.get(login);
+		    userManagementService.setRolesForUserOrganisation(user, subcourse,
 			    existingSubcourseRoles.stream().map(String::valueOf).collect(Collectors.toList()), false);
 
 		    for (Lesson lesson : lessonService.getLessonsByGroup(subcourseId)) {
@@ -791,7 +795,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    boolean removedFromSubcourse = removeFromCourse(subcourse, user,
 			    isStaffMode ? Mode.STAFF : Mode.LEARNER, allExistingRoles);
 		    if (removedFromSubcourse) {
-			String message = (isStaffMode ? "Teacher" : "Learner") + " \"" + user.getLogin()
+			String message = (isStaffMode ? "Teacher" : "Learner") + " \"" + user.getLogin().toLowerCase()
 				+ "\" removed from subcourse " + subcourse.getOrganisationId() + " and its lessons";
 			logger.info(message);
 			logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
@@ -805,7 +809,7 @@ public class SPEnrolmentServlet extends HttpServlet {
     private boolean removeFromCourse(Organisation course, User user, Mode mode,
 	    Map<String, Map<Integer, Set<Integer>>> allExistingRoles) {
 	// no existing roles and the user should be removed - nothing to do
-	Map<Integer, Set<Integer>> existingCoursesRoles = allExistingRoles.get(user.getLogin());
+	Map<Integer, Set<Integer>> existingCoursesRoles = allExistingRoles.get(user.getLogin().toLowerCase());
 	Set<Integer> existingCourseRoles = existingCoursesRoles == null ? null
 		: existingCoursesRoles.get(course.getOrganisationId());
 	if (existingCourseRoles == null || existingCourseRoles.isEmpty()) {
@@ -847,7 +851,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 	    if (course.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
 		for (Organisation subcourse : parentCourse.getChildOrganisations()) {
 		    List<UserOrganisationRole> rolesInSubcourse = userManagementService
-			    .getUserOrganisationRoles(subcourse.getOrganisationId(), user.getLogin());
+			    .getUserOrganisationRoles(subcourse.getOrganisationId(), user.getLogin().toLowerCase());
 		    if (!rolesInSubcourse.isEmpty()) {
 			return true;
 		    }
@@ -876,6 +880,8 @@ public class SPEnrolmentServlet extends HttpServlet {
 	List<String> courseMappings = mappings.get(courseCode);
 	if (courseMappings != null) {
 	    for (String login : courseMappings) {
+		login = login.toLowerCase();
+
 		logger.info("Processing manager \"" + login + "\"");
 		mappingsProcessed.incrementAndGet();
 
@@ -902,7 +908,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 		}
 		existingCourseRoles.add(Role.ROLE_GROUP_MANAGER);
 
-		User user = allExistingParsedUsers.get(login.toLowerCase());
+		User user = allExistingParsedUsers.get(login);
 
 		userManagementService.setRolesForUserOrganisation(user, course,
 			existingCourseRoles.stream().map(String::valueOf).collect(Collectors.toList()), true);
@@ -920,7 +926,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 	for (User user : courseUsers) {
 	    boolean removedFromCourse = removeFromCourse(course, user, Mode.MANAGER, allExistingRoles);
 	    if (removedFromCourse) {
-		String message = "Manager \"" + user.getLogin() + "\" removed from course " + courseId;
+		String message = "Manager \"" + user.getLogin().toLowerCase() + "\" removed from course " + courseId;
 		logger.info(message);
 		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
 			"SPEnrolment: " + message);
@@ -929,37 +935,35 @@ public class SPEnrolmentServlet extends HttpServlet {
     }
 
     /**
-     * Splits collection into as many spliterators as there are threads
+     * Splits collection into as many spliterators as there are threads, with balanced threads' load
      */
-    private <T> Collection<Spliterator<T>> splitCollection(Collection<T> collection, Comparator<T> comparator) {
-	// if there is only 10 entries, do it in one thread
-	int threadCount = 1;
+    private <T> Collection<Spliterator<T>> splitCollection(Collection<T> sourceCollection, Comparator<T> comparator) {
+	if (sourceCollection.size() < 10) {
+	    return Set.of(sourceCollection.spliterator());
+	}
 
-	if (collection.size() > 10) {
-	    threadCount = this.threadCount;
-
-	    if (comparator != null) {
-		Set<T> treeSet = new TreeSet<>(comparator);
-		treeSet.addAll(collection);
-		collection = treeSet;
-	    }
-
-	    List<T> shuffledCollection = new ArrayList<>(collection);
+	if (comparator == null) {
+	    List<T> shuffledCollection = new ArrayList<>(sourceCollection);
 	    Collections.shuffle(shuffledCollection);
-	    collection = shuffledCollection;
+	    sourceCollection = shuffledCollection;
+	} else {
+	    Set<T> treeSet = new TreeSet<>(comparator);
+	    treeSet.addAll(sourceCollection);
+	    sourceCollection = treeSet;
 	}
 
-	LinkedList<Spliterator<T>> spliterators = new LinkedList<>();
-	spliterators.add(collection.spliterator());
-	for (int threadIndex = 1; threadIndex < threadCount; threadIndex++) {
-	    Spliterator<T> spliterator = spliterators.removeFirst();
-	    spliterators.add(spliterator);
-	    Spliterator<T> anotherSpliterator = spliterator.trySplit();
-	    if (anotherSpliterator != null) {
-		spliterators.add(anotherSpliterator);
-	    }
+	List<List<T>> collectionList = new ArrayList<>(threadCount);
+	for (int threadIndex = 0; threadIndex < threadCount; threadIndex++) {
+	    collectionList.add(new ArrayList<>(sourceCollection.size() / threadCount + 1));
 	}
-	return spliterators;
+
+	int listIndex = 0;
+	for (T element : sourceCollection) {
+	    collectionList.get(listIndex % threadCount).add(element);
+	    listIndex++;
+	}
+
+	return collectionList.stream().collect(Collectors.mapping(List::spliterator, Collectors.toList()));
     }
 
     @Override

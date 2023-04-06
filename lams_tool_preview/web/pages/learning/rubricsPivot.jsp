@@ -13,12 +13,17 @@
 		text-align: center;
 	}
 	
+	.rubrics-table td.bg-success {
+		font-weight: bold;
+	}
+	
 	.column-header-span {
 		font-style: italic;
 	}
 
 	.expand-all-button {
-		margin-bottom: 10px;
+		margin-bottom: 15px;
+		float: right;
 	}
 </style>
 
@@ -29,6 +34,13 @@
 	});
 
 	function submitEntry(next) {
+		if (next) {
+			let criterionTables = $('.rubrics-table'),
+				ratingMissing = $('tbody td.bg-success', criterionTables).length !== $('thead th', criterionTables).length - criterionTables.length;
+			if (ratingMissing && !confirm('<fmt:message key="message.rating.rubrics.selection.missing" />')){
+				return;
+			}
+		}
 		// answer saved when clicked so don't use next button to submit
 		nextprev(next);
 	}
@@ -68,6 +80,8 @@
 <button class="btn btn-default expand-all-button" onClick="javascript:expandAllRubricsPanels()">
 	<fmt:message key="label.rating.rubrics.expand.all" />
 </button>
+<div class="clearfix"></div>
+
 <div id="rubrics-row-panels" class="panel-group" role="tablist" aria-multiselectable="true">
 	<%-- It is sufficient to take user names and columns from the first row/criterion --%>
 	<c:set var="exampleRatings" value="${criteriaRatings.ratingDtos}" />
