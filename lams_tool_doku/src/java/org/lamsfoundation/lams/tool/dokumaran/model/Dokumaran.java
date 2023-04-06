@@ -76,12 +76,14 @@ public class Dokumaran implements Cloneable {
     private String instructions;
 
     // advance
-
     @Column(name = "use_select_leader_tool_ouput")
     private boolean useSelectLeaderToolOuput;
 
     @Column(name = "allow_multiple_leaders")
     private boolean allowMultipleLeaders;
+
+    @Column(name = "max_mark")
+    private int maxMark;
 
     @Column(name = "submission_deadline")
     private Date submissionDeadline;
@@ -462,6 +464,14 @@ public class Dokumaran implements Cloneable {
 
     public void setReflectOnActivity(boolean reflectOnActivity) {
 	this.reflectOnActivity = reflectOnActivity;
+    }
+
+    public int getMaxMark() {
+	return maxMark;
+    }
+
+    public void setMaxMark(int maxMark) {
+	this.maxMark = maxMark;
     }
 
     public boolean isGalleryWalkEnabled() {

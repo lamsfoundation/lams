@@ -38,8 +38,14 @@
 </lams:SimplePanel>
 
 <lams:SimplePanel titleKey="label.resource.options">
-
 	<div class="form-inline">
+		<label for="maxMark">
+			<fmt:message key="label.authoring.advanced.maxMark" />
+		</label>
+        <form:input path="dokumaran.maxMark" type="number" min="1" max="100" size="2" id="maxMark" cssClass="form-control input-sm"/>        
+    </div>
+    
+	<div class="form-inline voffset10">
 		<label for="relativeTimeLimit">
 			<fmt:message key="label.time.limit" />&nbsp;
             <i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="" data-original-title="<fmt:message key="label.time.limit.tooltip"/>"></i>
