@@ -29,6 +29,13 @@
 	});
 
 	function submitEntry(next) {
+		if (next) {
+			let criterionTables = $('.rubrics-table'),
+				ratingMissing = $('tbody td.bg-success', criterionTables).length !== $('thead th', criterionTables).length - criterionTables.length;
+			if (ratingMissing && !confirm('<fmt:message key="message.rating.rubrics.selection.missing" />')){
+				return;
+			}
+		}
 		// answer saved when clicked so don't use next button to submit
 		nextprev(next);
 	}
