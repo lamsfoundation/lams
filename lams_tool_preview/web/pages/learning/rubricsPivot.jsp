@@ -13,6 +13,10 @@
 		text-align: center;
 	}
 	
+	.rubrics-table td.bg-success {
+		font-weight: bold;
+	}
+	
 	.column-header-span {
 		font-style: italic;
 	}

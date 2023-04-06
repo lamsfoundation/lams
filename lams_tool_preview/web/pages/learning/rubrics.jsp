@@ -24,6 +24,10 @@
 		cursor: pointer;
 	}
 	
+	.rubrics-table td.bg-success {
+		font-weight: bold;
+	}
+	
 	.expand-all-button {
 		margin-bottom: 15px;
 		float: right;
