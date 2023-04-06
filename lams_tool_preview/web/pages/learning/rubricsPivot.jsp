@@ -18,7 +18,8 @@
 	}
 
 	.expand-all-button {
-		margin-bottom: 10px;
+		margin-bottom: 15px;
+		float: right;
 	}
 </style>
 
@@ -75,6 +76,8 @@
 <button class="btn btn-default expand-all-button" onClick="javascript:expandAllRubricsPanels()">
 	<fmt:message key="label.rating.rubrics.expand.all" />
 </button>
+<div class="clearfix"></div>
+
 <div id="rubrics-row-panels" class="panel-group" role="tablist" aria-multiselectable="true">
 	<%-- It is sufficient to take user names and columns from the first row/criterion --%>
 	<c:set var="exampleRatings" value="${criteriaRatings.ratingDtos}" />
