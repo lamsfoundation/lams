@@ -425,6 +425,17 @@ public class GroupingUploadAJAXController {
 
 	// remove all the existing users from their groups
 	lessonService.removeAllLearnersFromGrouping(grouping);
+	if (!grouping.isUsedForBranching()) {
+	    Iterator<Group> groupIterator = grouping.getGroups().iterator();
+	    while (groupIterator.hasNext()) {
+		Group group = groupIterator.next();
+		// remove empty groups
+		if (group.getUsers().isEmpty() && group.getBranchActivities().isEmpty()) {
+		    groupIterator.remove();
+		}
+	    }
+	    userManagementService.save(grouping);
+	}
 
 	// Now put in the new users groupings
 	for (Map.Entry<String, Set<String>> groupEntry : groups.entrySet()) {

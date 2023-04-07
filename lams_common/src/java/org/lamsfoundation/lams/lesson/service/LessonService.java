@@ -289,7 +289,6 @@ public class LessonService implements ILessonService {
 	    if (grouper != null) {
 		try {
 		    grouper.removeAllLearnersFromGrouping(grouping);
-		    grouping.getGroups().clear();
 		} catch (GroupingException e) {
 		    throw new LessonServiceException(e);
 		}
@@ -358,7 +357,9 @@ public class LessonService implements ILessonService {
 
 	    // nuke all existing groups and create new ones
 	    removeAllLearnersFromGrouping(grouping);
+	    grouping.getGroups().clear();
 	    groupingDAO.flush();
+
 	    for (OrganisationGroup orgGroup : orgGrouping.getGroups()) {
 		Group group = Group.createLearnerGroup(grouping, orgGroup.getName(),
 			new HashSet<>(orgGroup.getUsers()));
