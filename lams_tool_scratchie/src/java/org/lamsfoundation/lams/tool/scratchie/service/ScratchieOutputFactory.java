@@ -63,10 +63,10 @@ public class ScratchieOutputFactory extends OutputFactory {
 	    Scratchie scratchie = (Scratchie) toolContentObject;
 
 	    // calculate totalMarksPossible
-	    long maxPossibleScore = scratchieService.getMaxPossibleScore(scratchie);
+	    double maxPossibleScore = Math.ceil(scratchieService.getMaxPossibleScore(scratchie));
 
-	    ToolOutputDefinition definition = buildRangeDefinition(ScratchieConstants.LEARNER_MARK, new Long(0),
-		    maxPossibleScore, true);
+	    ToolOutputDefinition definition = buildRangeDefinition(ScratchieConstants.LEARNER_MARK, 0L,
+		    Double.valueOf(maxPossibleScore).longValue(), true);
 	    definition.setWeightable(true);
 	    definitionMap.put(ScratchieConstants.LEARNER_MARK, definition);
 
@@ -107,7 +107,7 @@ public class ScratchieOutputFactory extends OutputFactory {
      */
     private ToolOutput getUserMark(IScratchieService scratchieService, Long toolSessionId, Long learnerId) {
 	ScratchieSession session = scratchieService.getScratchieSessionBySessionId(toolSessionId);
-	int userMark = 0;
+	double userMark = 0;
 	if (scratchieService.isLearnerEligibleForMark(learnerId.intValue(), session.getScratchie().getContentId())) {
 	    userMark = session.getMark();
 	}

@@ -40,23 +40,23 @@ public class LeaderResultsDTO {
 
     private Long contentId;
     private int count;
-    private Integer min;
-    private Integer max;
-    private Float average;
-    private Float median;
-    private Collection<Integer> modes;
+    private Double min;
+    private Double max;
+    private Double average;
+    private Double median;
+    private Collection<Double> modes;
 
-    public LeaderResultsDTO(Long contentId, List<Integer> grades) {
+    public LeaderResultsDTO(Long contentId, List<Double> grades) {
 	this.contentId = contentId;
 
 	if (grades == null || grades.isEmpty()) {
 	    return;
 	}
 
-	float sum = 0;
-	min = Integer.MAX_VALUE;
-	max = Integer.MIN_VALUE;
-	for (Integer grade : grades) {
+	double sum = 0;
+	min = Double.MAX_VALUE;
+	max = Double.MIN_VALUE;
+	for (Double grade : grades) {
 	    if (grade < min) {
 		min = grade;
 	    }
@@ -70,7 +70,7 @@ public class LeaderResultsDTO {
 	average = sum / count;
 
 	Collections.sort(grades);
-	median = grades.get(count / 2).floatValue();
+	median = grades.get(count / 2).doubleValue();
 	if (count % 2 == 0) {
 	    median = (median + grades.get(count / 2 - 1)) / 2;
 	}
@@ -89,7 +89,7 @@ public class LeaderResultsDTO {
 	return count;
     }
 
-    public Integer getMin() {
+    public Double getMin() {
 	return min;
     }
 
@@ -97,7 +97,7 @@ public class LeaderResultsDTO {
 	return LeaderResultsDTO.format(min);
     }
 
-    public Integer getMax() {
+    public Double getMax() {
 	return max;
     }
 
@@ -105,7 +105,7 @@ public class LeaderResultsDTO {
 	return LeaderResultsDTO.format(max);
     }
 
-    public Float getAverage() {
+    public Double getAverage() {
 	return average;
     }
 
@@ -113,7 +113,7 @@ public class LeaderResultsDTO {
 	return LeaderResultsDTO.format(average);
     }
 
-    public Float getMedian() {
+    public Double getMedian() {
 	return median;
     }
 
@@ -121,7 +121,7 @@ public class LeaderResultsDTO {
 	return LeaderResultsDTO.format(median);
     }
 
-    public Collection<Integer> getModes() {
+    public Collection<Double> getModes() {
 	return modes;
     }
 
@@ -130,7 +130,7 @@ public class LeaderResultsDTO {
 	    return "-";
 	}
 
-	Iterator<Integer> modeIterator = modes.iterator();
+	Iterator<Double> modeIterator = modes.iterator();
 	StringBuilder result = new StringBuilder(LeaderResultsDTO.format(modeIterator.next()));
 	while (modeIterator.hasNext()) {
 	    result.append(", ").append(LeaderResultsDTO.format(modeIterator.next()));
@@ -138,7 +138,7 @@ public class LeaderResultsDTO {
 	return result.toString();
     }
 
-    private static String format(Number input) {
+    public static String format(Number input) {
 	return input == null ? "-" : NumberUtil.formatLocalisedNumber(input, (Locale) null, 2);
     }
 }
