@@ -48,7 +48,11 @@
 		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 		<form:hidden path="orgId" />
 		
-		<table class="table table-condensed table-striped table-hover">
+		<label>
+			<input type="checkbox" name="addToLessons" />&nbsp;<fmt:message key="admin.user.add.to.lessons"/>
+		</label>
+		
+		<table class="table table-condensed table-striped table-hover voffset10">
 		<tr>
 			<th style="width: 20%"><fmt:message key="admin.user.login"/></th>
 			<c:forEach var="role" items="${roles}" varStatus="roleIndex">

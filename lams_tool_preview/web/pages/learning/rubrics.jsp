@@ -26,6 +26,7 @@
 	
 	.rubrics-table td.bg-success {
 		font-weight: bold;
+		font-size: larger;
 	}
 	
 	.expand-all-button {

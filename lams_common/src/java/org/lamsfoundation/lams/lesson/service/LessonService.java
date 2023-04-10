@@ -53,8 +53,11 @@ import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dto.ActivityTimeLimitDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationGroup;
 import org.lamsfoundation.lams.usermanagement.OrganisationGrouping;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.MessageService;
 
@@ -290,7 +293,6 @@ public class LessonService implements ILessonService {
 	    if (grouper != null) {
 		try {
 		    grouper.removeAllLearnersFromGrouping(grouping);
-		    grouping.getGroups().clear();
 		} catch (GroupingException e) {
 		    throw new LessonServiceException(e);
 		}
@@ -359,7 +361,9 @@ public class LessonService implements ILessonService {
 
 	    // nuke all existing groups and create new ones
 	    removeAllLearnersFromGrouping(grouping);
+	    grouping.getGroups().clear();
 	    groupingDAO.flush();
+
 	    for (OrganisationGroup orgGroup : orgGrouping.getGroups()) {
 		Group group = Group.createLearnerGroup(grouping, orgGroup.getName(),
 			new HashSet<>(orgGroup.getUsers()));
@@ -558,7 +562,40 @@ public class LessonService implements ILessonService {
 	}
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
+    public void addParticipantToOrganisationLessons(Integer organisationId, Integer userId, Integer roleId,
+	    boolean addToSubcourses) {
+	if (roleId == null || !(roleId.equals(Role.ROLE_LEARNER) || roleId.equals(Role.ROLE_MONITOR))) {
+	    log.error("Unsupported role to assign to all lesssons in organisation " + organisationId + ": " + roleId);
+	    return;
+	}
+
+	// add to course
+	for (Lesson lesson : getLessonsByGroup(organisationId)) {
+	    if (roleId.equals(Role.ROLE_MONITOR)) {
+		addStaffMember(lesson.getLessonId(), userId);
+	    } else {
+		addLearner(lesson.getLessonId(), userId);
+	    }
+	}
+
+	if (addToSubcourses) {
+	    // add to subcourses
+	    Organisation organisation = baseDAO.find(Organisation.class, organisationId);
+	    if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)) {
+		for (Organisation subCourse : organisation.getChildOrganisations()) {
+		    for (Lesson lesson : getLessonsByGroup(subCourse.getOrganisationId())) {
+			if (roleId.equals(Role.ROLE_MONITOR)) {
+			    addStaffMember(lesson.getLessonId(), userId);
+			} else {
+			    addLearner(lesson.getLessonId(), userId);
+			}
+		    }
+		}
+	    }
+	}
+    }
+
     @Override
     public void removeProgressReferencesToActivity(Activity activity) {
 	if (activity != null) {

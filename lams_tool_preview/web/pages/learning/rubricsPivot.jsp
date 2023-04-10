@@ -15,6 +15,7 @@
 	
 	.rubrics-table td.bg-success {
 		font-weight: bold;
+		font-size: larger;
 	}
 	
 	.column-header-span {
