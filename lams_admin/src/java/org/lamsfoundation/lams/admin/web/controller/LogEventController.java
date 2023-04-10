@@ -32,7 +32,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.hibernate.ObjectNotFoundException;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.LogEventType;
 import org.lamsfoundation.lams.logevent.dto.LogEventTypeDTO;
@@ -180,34 +179,34 @@ public class LogEventController {
 		    responseRow.put("activityId", event.getActivityId());
 		}
 
-		User user = event.getUser();
-		if (user != null) {
-		    Integer userId = user.getUserId();
-		    try {
-			responseRow.put("userPortraitId",
-				user.getPortraitUuid() == null ? null : user.getPortraitUuid().toString());
-			responseRow.put("userId", user.getUserId());
-			responseRow.put("userName", user.getLogin());
-		    } catch (ObjectNotFoundException e) {
-			responseRow.put("userId", userId);
+		Integer userId = event.getUserId();
+		if (userId != null) {
+		    responseRow.put("userId", userId);
+		    User user = userManagementService.getUserById(userId);
+		    if (user == null) {
 			responseRow.put("userName",
 				messageService.getMessage("label.event.user.deleted", new Object[] { userId }));
+		    } else {
+			responseRow.put("userPortraitId",
+				user.getPortraitUuid() == null ? null : user.getPortraitUuid().toString());
+			responseRow.put("userName", user.getLogin());
 		    }
 		}
-		User targetUser = event.getTargetUser();
-		if (targetUser != null) {
-		    Integer userId = targetUser.getUserId();
-		    try {
+
+		Integer targetUserId = event.getTargetUserId();
+		if (targetUserId != null) {
+		    responseRow.put("targetUserId", targetUserId);
+		    User targetUser = userManagementService.getUserById(targetUserId);
+		    if (targetUser == null) {
+			responseRow.put("targetUserName",
+				messageService.getMessage("label.event.user.deleted", new Object[] { targetUserId }));
+		    } else {
 			responseRow.put("targetUserPortraitId",
 				targetUser.getPortraitUuid() == null ? null : targetUser.getPortraitUuid().toString());
-			responseRow.put("targetUserId", targetUser.getUserId());
 			responseRow.put("targetUserName", targetUser.getLogin());
-		    } catch (ObjectNotFoundException e) {
-			responseRow.put("targetUserId", userId);
-			responseRow.put("targetUserName",
-				messageService.getMessage("label.event.user.deleted", new Object[] { userId }));
 		    }
 		}
+
 		if (eventDetails.length > 1 && eventDetails[1] != null) {
 		    responseRow.put("lessonName", JsonUtil.toString(eventDetails[1]));
 		}

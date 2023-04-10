@@ -32,7 +32,6 @@ import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.LogEventType;
 import org.lamsfoundation.lams.logevent.dao.ILogEventDAO;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
@@ -96,13 +95,10 @@ public class LogEventService implements ILogEventService {
     @Override
     public void logEvent(Integer logEventTypeId, Integer userId, Integer targetUserId, Long lessonId, Long activityId,
 	    String description, Date eventDate) {
-	User user = (userId != null) ? (User) userManagementService.findById(User.class, userId) : null;
-	User targetUser = (targetUserId != null) ? (User) userManagementService.findById(User.class, targetUserId)
-		: null;
 	LogEvent logEvent = new LogEvent();
 	logEvent.setLogEventTypeId(logEventTypeId);
-	logEvent.setUser(user);
-	logEvent.setTargetUser(targetUser);
+	logEvent.setUserId(userId);
+	logEvent.setTargetUserId(targetUserId);
 	logEvent.setLessonId(lessonId);
 	logEvent.setActivityId(activityId);
 	logEvent.setDescription(description);

@@ -27,15 +27,10 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * Base class for all activities. If you add another subclass, you must update
@@ -90,18 +85,15 @@ public class LogEvent implements Serializable {
     @Column(name = "log_event_type_id")
     private Integer logEventTypeId;
 
-    //TODO perhaps make this field possible to be null
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "user_id")
+    private Integer userId;
 
     /** Date this activity was created */
     @Column(name = "occurred_date_time")
     private Date occurredDateTime;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "target_user_id")
-    private User targetUser;
+    @Column(name = "target_user_id")
+    private Integer targetUserId;
 
     @Column(name = "lesson_id")
     private Long lessonId;
@@ -139,14 +131,6 @@ public class LogEvent implements Serializable {
 	this.logEventTypeId = logEventTypeId;
     }
 
-    public User getUser() {
-	return this.user;
-    }
-
-    public void setUser(User user) {
-	this.user = user;
-    }
-
     public Date getOccurredDateTime() {
 	return occurredDateTime;
     }
@@ -154,14 +138,6 @@ public class LogEvent implements Serializable {
     /* If occurredDateTime is null, then it will default to the current date/time */
     public void setOccurredDateTime(Date occurredDateTime) {
 	this.occurredDateTime = occurredDateTime != null ? occurredDateTime : new Date();
-    }
-
-    public User getTargetUser() {
-	return targetUser;
-    }
-
-    public void setTargetUser(User targetUser) {
-	this.targetUser = targetUser;
     }
 
     public Long getLessonId() {
@@ -186,5 +162,21 @@ public class LogEvent implements Serializable {
 
     public void setDescription(String description) {
 	this.description = description;
+    }
+
+    public Integer getUserId() {
+	return userId;
+    }
+
+    public void setUserId(Integer userId) {
+	this.userId = userId;
+    }
+
+    public Integer getTargetUserId() {
+	return targetUserId;
+    }
+
+    public void setTargetUserId(Integer targetUserId) {
+	this.targetUserId = targetUserId;
     }
 }
