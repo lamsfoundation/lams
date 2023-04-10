@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.web.dto.UserBean;
 import org.lamsfoundation.lams.admin.web.form.UserOrgRoleForm;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -64,6 +65,10 @@ public class UserOrgRoleSaveController {
 
     @Autowired
     private IUserManagementService userManagementService;
+
+    @Autowired
+    private ILessonService lessonService;
+
     @Autowired
     @Qualifier("adminMessageService")
     private MessageService messageService;
@@ -98,6 +103,15 @@ public class UserOrgRoleSaveController {
 	    }
 	    userManagementService.setRolesForUserOrganisation(user, orgId, Arrays.asList(roleIds));
 
+	    if (userOrgRoleForm.isAddToLessons()) {
+		for (String roleIdString : roleIds) {
+		    Integer roleId = Integer.valueOf(roleIdString);
+		    if (roleId.equals(Role.ROLE_LEARNER) || roleId.equals(Role.ROLE_MONITOR)) {
+			lessonService.addParticipantToOrganisationLessons(orgId, user.getUserId(), roleId, false);
+		    }
+		}
+	    }
+
 	    List<String> roles = Stream.of(roleIds).collect(Collectors
 		    .mapping(roleId -> Role.ROLE_MAP.get(Integer.valueOf(roleId)), Collectors.toUnmodifiableList()));
 	    logMessageBuilder.append("to user ").append(user.getFirstName()).append(" ").append(user.getLastName())
@@ -105,6 +119,7 @@ public class UserOrgRoleSaveController {
 	    if (i < userBeans.size() - 1) {
 		logMessageBuilder.append(", ");
 	    }
+
 	    // FMALIKOFF 5/7/7 Commented out the following code that set the roles in the course if the current org is a class, as the logic
 	    // is done in service.setRolesForUserOrganisation()
 	    //if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
@@ -116,9 +131,12 @@ public class UserOrgRoleSaveController {
 
 	if (logMessageBuilder.length() > 0) {
 	    logMessageBuilder.append(" in organisation \"").append(organisation.getName()).append("\"");
+	    if (userOrgRoleForm.isAddToLessons()) {
+		logMessageBuilder.append(" and added to all lessons");
+	    }
 	    AuditLogFilter.log(AuditLogFilter.ROLE_ADD_ACTION, logMessageBuilder);
 	}
-	
+
 	return "redirect:/usermanage.do?org=" + orgId;
     }
 }

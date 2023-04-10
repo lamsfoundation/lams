@@ -316,6 +316,12 @@ public interface ILessonService {
     void updateStaffMembers(Lesson lesson, Collection<User> users) throws LessonServiceException;
 
     /**
+     * Adds given user as learner or monitor to all lessons in the given course and optionally its subcourses.
+     */
+    void addParticipantToOrganisationLessons(Integer organisationId, Integer userId, Integer roleId,
+	    boolean addToSubcourses);
+
+    /**
      * Remove references to an activity from all learner progress entries. Used by Live Edit, to remove any references
      * to the system gates
      *

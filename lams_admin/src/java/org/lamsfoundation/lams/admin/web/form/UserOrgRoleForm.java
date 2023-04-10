@@ -43,6 +43,7 @@ public class UserOrgRoleForm {
 
     private ArrayList userBeans = new ArrayList();
     private Integer orgId;
+    private boolean addToLessons;
 
     public ArrayList getUserBeans() {
 	return userBeans;
@@ -64,4 +65,11 @@ public class UserOrgRoleForm {
 	userBeans.add(userBean);
     }
 
+    public boolean isAddToLessons() {
+	return addToLessons;
+    }
+
+    public void setAddToLessons(boolean addToLessons) {
+	this.addToLessons = addToLessons;
+    }
 }

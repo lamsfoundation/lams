@@ -42,7 +42,7 @@
 		
 		<lams:errors/>
 		<lams:errors path="roles"/>
-		
+				
 		<div class="container-fluid">
 		<div class="row">
 		  <div class="col-xs-2"><fmt:message key="admin.user.login"/>:</div>
@@ -69,6 +69,12 @@
 		    </c:forEach>
 		  </div>
 		</div>
+		
+		<div class="row">
+		  <div class="col-xs-2"><fmt:message key="admin.user.add.to.lessons"/>:</div>
+		  <div class="col-xs-10"><input type="checkbox" name="addToLessons" /></div>
+		</div>
+		
 		</div>
 		
 		<div class="pull-right">
