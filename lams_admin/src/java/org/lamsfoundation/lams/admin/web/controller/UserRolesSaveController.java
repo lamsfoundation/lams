@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.web.form.UserRolesForm;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -58,6 +59,10 @@ public class UserRolesSaveController {
 
     @Autowired
     private IUserManagementService userManagementService;
+
+    @Autowired
+    private ILessonService lessonService;
+
     @Autowired
     @Qualifier("adminMessageService")
     private MessageService messageService;
@@ -101,18 +106,30 @@ public class UserRolesSaveController {
 
 	userManagementService.setRolesForUserOrganisation(user, orgId, Arrays.asList(roles));
 
-	auditLog(org, userId, roles);
+	if (userRolesForm.isAddToLessons()) {
+	    for (String roleIdString : roles) {
+		Integer roleId = Integer.valueOf(roleIdString);
+		if (roleId.equals(Role.ROLE_LEARNER) || roleId.equals(Role.ROLE_MONITOR)) {
+		    lessonService.addParticipantToOrganisationLessons(orgId, user.getUserId(), roleId, false);
+		}
+	    }
+	}
+
+	auditLog(org, userId, roles, userRolesForm.isAddToLessons());
 
 	return "redirect:/usermanage.do?org=" + orgId;
     }
 
-    private void auditLog(Organisation organisation, Integer userId, String[] roleIds) {
+    private void auditLog(Organisation organisation, Integer userId, String[] roleIds, boolean addToLessons) {
 	List<String> roles = Stream.of(roleIds).collect(Collectors
 		.mapping(roleId -> Role.ROLE_MAP.get(Integer.valueOf(roleId)), Collectors.toUnmodifiableList()));
 	User targetUser = userManagementService.getUserById(userId);
 	StringBuilder auditLogMessage = new StringBuilder("to user ").append(targetUser.getFirstName()).append(" ")
 		.append(targetUser.getLastName()).append(" (").append(targetUser.getLogin()).append(") assigned roles ")
 		.append(roles).append(" in organisation \"").append(organisation.getName()).append("\"");
+	if (addToLessons) {
+	    auditLogMessage.append(" and added to all lessons");
+	}
 	AuditLogFilter.log(AuditLogFilter.ROLE_ADD_ACTION, auditLogMessage);
     }
 }

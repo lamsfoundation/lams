@@ -31,6 +31,8 @@ public class UserRolesForm {
 
     private String[] roles; // String []
 
+    private boolean addToLessons;
+
     public Integer getOrgId() {
 	return orgId;
     }
@@ -55,4 +57,11 @@ public class UserRolesForm {
 	this.roles = roles;
     }
 
+    public boolean isAddToLessons() {
+	return addToLessons;
+    }
+
+    public void setAddToLessons(boolean addToLessons) {
+	this.addToLessons = addToLessons;
+    }
 }
