@@ -396,7 +396,7 @@ public interface IScratchieService extends ICommonToolService {
      */
     Set<ScratchieUser> getAllLeaders(Long contentId);
 
-    void changeUserMark(Long userId, Long userUid, Integer newMark);
+    void changeUserMark(Long userId, Long userUid, Double newMark);
 
     /**
      * Recalculate marks after editing content from monitoring.
@@ -425,14 +425,11 @@ public interface IScratchieService extends ICommonToolService {
 
     /**
      * Return a maximum possible mark that user can get on answering all questions.
-     *
-     * @param scratchie
-     * @return
      */
-    int getMaxPossibleScore(Scratchie scratchie);
+    double getMaxPossibleScore(Scratchie scratchie);
 
     /** Get the raw marks for display in a graph in monitoring */
-    List<Integer> getMarksArray(Long contentId);
+    List<Double> getMarksArray(Long contentId);
 
     /** Get the statistics such as average, max, min for the marks. Used in monitoring */
     LeaderResultsDTO getLeaderResultsDTOForLeaders(Long toolContentId);

@@ -64,7 +64,7 @@ public class ScratchieItem extends QbToolQuestion implements Serializable, Clone
     @Transient
     private List<OptionDTO> optionDtos = null;
     @Transient
-    private int mark;
+    private double mark;
     @Transient
     private String correctAnswerLetter;
     @Transient
@@ -120,11 +120,11 @@ public class ScratchieItem extends QbToolQuestion implements Serializable, Clone
 	this.burningQuestion = burningQuestion;
     }
 
-    public int getMark() {
+    public double getMark() {
 	return mark;
     }
 
-    public void setMark(int mark) {
+    public void setMark(double mark) {
 	this.mark = mark;
     }
 

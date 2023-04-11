@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.NativeQuery;
@@ -89,10 +90,10 @@ public class ScratchieSessionDAOHibernate extends LAMSBaseDAO implements Scratch
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Integer> getRawLeaderMarksByToolContentId(Long toolContentId) {
-	NativeQuery<Integer> query = getSession().createNativeQuery(LOAD_MARKS);
+    public List<Double> getRawLeaderMarksByToolContentId(Long toolContentId) {
+	NativeQuery<Float> query = getSession().createNativeQuery(LOAD_MARKS);
 	query.setParameter("toolContentId", toolContentId);
-	return query.list();
+	return query.stream().collect(Collectors.mapping(Float::doubleValue, Collectors.toList()));
     }
 
     @Override

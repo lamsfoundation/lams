@@ -222,7 +222,7 @@ public class LearningController {
 
 	sessionMap.put(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
 	// calculate max score
-	int maxScore = scratchieService.getMaxPossibleScore(scratchie);
+	double maxScore = scratchieService.getMaxPossibleScore(scratchie);
 	sessionMap.put(ScratchieConstants.ATTR_MAX_SCORE, maxScore);
 
 	boolean isScratchingFinished = toolSession.isScratchingFinished();
@@ -289,9 +289,9 @@ public class LearningController {
 	if (mode.isTeacher()) {
 	    scratchieService.populateScratchieItemsWithMarks(scratchie, items, toolSessionID);
 	    // get updated score from ScratchieSession
-	    int score = toolSession.getMark();
+	    double score = toolSession.getMark();
 	    request.setAttribute(ScratchieConstants.ATTR_SCORE, score);
-	    int percentage = (maxScore == 0) ? 0 : ((score * 100) / maxScore);
+	    int percentage = (maxScore == 0) ? 0 : Double.valueOf((score * 100) / maxScore).intValue();
 	    request.setAttribute(ScratchieConstants.ATTR_SCORE_PERCENTAGE, percentage);
 	}
 
@@ -555,10 +555,10 @@ public class LearningController {
 	}
 
 	// get updated score from ScratchieSession
-	int score = toolSession.getMark();
+	double score = toolSession.getMark();
 	request.setAttribute(ScratchieConstants.ATTR_SCORE, score);
-	int maxScore = (Integer) sessionMap.get(ScratchieConstants.ATTR_MAX_SCORE);
-	int percentage = (maxScore == 0) ? 0 : ((score * 100) / maxScore);
+	double maxScore = (Double) sessionMap.get(ScratchieConstants.ATTR_MAX_SCORE);
+	int percentage = (maxScore == 0) ? 0 : Double.valueOf((score * 100) / maxScore).intValue();
 	request.setAttribute(ScratchieConstants.ATTR_SCORE_PERCENTAGE, percentage);
 
 	// display other groups' BurningQuestions

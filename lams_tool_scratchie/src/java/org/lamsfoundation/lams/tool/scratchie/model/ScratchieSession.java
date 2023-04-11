@@ -83,7 +83,7 @@ public class ScratchieSession {
     private ScratchieUser groupLeader;
 
     @Column
-    private int mark;
+    private double mark;
 
     @Column(name = "scratching_finished")
     private boolean scratchingFinished;
@@ -187,14 +187,12 @@ public class ScratchieSession {
 
     /**
      * Mark scored by a leader and shared by all users in a group.
-     *
-     * @return
      */
-    public int getMark() {
+    public double getMark() {
 	return mark;
     }
 
-    public void setMark(int mark) {
+    public void setMark(double mark) {
 	this.mark = mark;
     }
 
