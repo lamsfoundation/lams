@@ -283,12 +283,12 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     }
 
     @Override
-    public int getMaxPossibleScore(Scratchie scratchie) {
+    public double getMaxPossibleScore(Scratchie scratchie) {
 	int itemsNumber = scratchie.getScratchieItems().size();
 
 	// calculate totalMarksPossible
 	String[] presetMarks = getPresetMarks(scratchie);
-	int maxPossibleScore = (presetMarks.length > 0) ? itemsNumber * Integer.parseInt(presetMarks[0]) : 0;
+	double maxPossibleScore = (presetMarks.length > 0) ? itemsNumber * Double.valueOf(presetMarks[0]) : 0;
 
 	return maxPossibleScore;
     }
@@ -397,13 +397,13 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     }
 
     @Override
-    public void changeUserMark(Long userId, Long sessionId, Integer newMark) {
+    public void changeUserMark(Long userId, Long sessionId, Double newMark) {
 	if (newMark == null) {
 	    return;
 	}
 
 	ScratchieSession session = this.getScratchieSessionBySessionId(sessionId);
-	int oldMark = session.getMark();
+	double oldMark = session.getMark();
 
 	session.setMark(newMark);
 	scratchieSessionDao.saveObject(session);
@@ -412,8 +412,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	List<ScratchieUser> users = this.getUsersBySession(sessionId);
 	for (ScratchieUser user : users) {
 
-	    toolService.updateActivityMark(newMark.doubleValue(), null, user.getUserId().intValue(),
-		    user.getSession().getSessionId(), false);
+	    toolService.updateActivityMark(newMark, null, user.getUserId().intValue(), user.getSession().getSessionId(),
+		    false);
 
 	    // record mark change with audit service
 	    Long toolContentId = null;
@@ -509,7 +509,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	populateScratchieItemsWithMarks(scratchie, scratchie.getScratchieItems(), sessionId);
 
 	// calculate mark
-	int mark = 0;
+	double mark = 0;
 	for (ScratchieItem item : items) {
 	    mark += item.getMark();
 	}
@@ -524,7 +524,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    for (ScratchieUser user : users) {
 		Double userMark = 0.0;
 		if (isLearnerEligibleForMark(user.getUserId(), scratchie.getContentId())) {
-		    userMark = Double.valueOf(mark);
+		    userMark = mark;
 		}
 		toolService.updateActivityMark(userMark, null, user.getUserId().intValue(),
 			user.getSession().getSessionId(), false);
@@ -1170,13 +1170,13 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	for (ScratchieItem item : items) {
 	    // get lowest mark by default
-	    int mark = Integer.parseInt(presetMarks[presetMarks.length - 1]);
+	    double mark = Double.valueOf(presetMarks[presetMarks.length - 1]);
 	    // add mark only if an item was unravelled
 	    if (isItemUnraveled(item, userLogs)) {
 		int itemAttempts = ScratchieServiceImpl.getNumberAttemptsForItem(item, userLogs);
 		String markStr = (itemAttempts <= presetMarks.length) ? presetMarks[itemAttempts - 1]
 			: presetMarks[presetMarks.length - 1];
-		mark = Integer.parseInt(markStr);
+		mark = Double.valueOf(markStr);
 	    }
 	    item.setMark(mark);
 	}
@@ -1232,7 +1232,6 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    groupSummary.setNumberColumns(numberColumns);
 
 	    Map<Long, OptionDTO> optionMap = new HashMap<>();
-	    long i = 0l;
 	    for (QbOption dbOption : options) {
 		// clone it so it doesn't interfere with values from other sessions
 		OptionDTO optionDto = new OptionDTO(dbOption);
@@ -1521,7 +1520,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	row.addCell(getMessage("label.marks") + " %", true);
 
 	List<GroupSummary> summaryByTeam = getSummaryByTeam(scratchie, items);
-	int maxPossibleScore = getMaxPossibleScore(scratchie);
+	double maxPossibleScore = getMaxPossibleScore(scratchie);
 
 	for (GroupSummary summary : summaryByTeam) {
 
@@ -1552,8 +1551,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    double percentage = (numberOfItems == 0) ? 0 : (double) numberOfFirstChoiceEvents / numberOfItems;
 	    row.addPercentageCell(percentage);
 
-	    row.addCell(summary.getMark());
-	    percentage = (numberOfItems == 0) ? 0 : (double) summary.getMark() / maxPossibleScore;
+	    row.addCell(LeaderResultsDTO.format(summary.getMark()));
+	    percentage = (numberOfItems == 0) ? 0 : summary.getMark() / maxPossibleScore;
 	    row.addPercentageCell(percentage);
 	}
 
@@ -1643,9 +1642,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	    percentages[groupCount - 1] = percentage;
 	    groupCount++;
-
-	    row.addCell(summary.getMark());
-	    percentage = (numberOfItems == 0) ? 0 : (double) summary.getMark() / maxPossibleScore;
+	    row.addCell(LeaderResultsDTO.format(summary.getMark()));
+	    percentage = (numberOfItems == 0) ? 0 : summary.getMark() / maxPossibleScore;
 	    row.addPercentageCell(percentage);
 	}
 
@@ -1734,7 +1732,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		}
 		row.addCell(isFirstChoice, color);
 		row.addCell(Integer.valueOf(attempts), color);
-		Long mark = (itemDto.getUserMark() == -1) ? null : Long.valueOf(itemDto.getUserMark());
+		String mark = itemDto.getUserMark() == -1 ? "" : LeaderResultsDTO.format(itemDto.getUserMark());
 		row.addCell(mark);
 	    }
 	}
@@ -1762,8 +1760,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		row = researchAndAnalysisSheet.initRow();
 		row.addCell(user.getFirstName() + " " + user.getLastName());
 		row.addCell(Long.valueOf(summary.getTotalAttempts()));
-		Long mark = (summary.getTotalAttempts() == 0) ? null : Long.valueOf(summary.getMark());
-		row.addCell(mark);
+		Double mark = summary.getTotalAttempts() == 0 ? null : summary.getMark();
+		row.addCell(mark == null ? "" : LeaderResultsDTO.format(mark));
 		row.addCell(summary.getSessionName());
 	    }
 	}
@@ -1892,7 +1890,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		Long attempts = (long) scratchieAnswerVisitDao.getLogCountTotal(sessionId);
 		row.addCell(attempts);
 		row.addCell(getMessage("label.mark") + ":");
-		row.addCell(Long.valueOf(session.getMark()));
+		row.addCell(LeaderResultsDTO.format(session.getMark()));
 
 		row = researchAndAnalysisSheet.initRow();
 		row.addCell(getMessage("label.team.leader") + session.getSessionName());
@@ -2029,7 +2027,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		    // attempts
 		    row.addCell(Integer.valueOf(attempts));
 		    // mark
-		    Object mark = (itemDto.getUserMark() == -1) ? "" : Long.valueOf(itemDto.getUserMark());
+		    String mark = itemDto.getUserMark() == -1 ? "" : LeaderResultsDTO.format(itemDto.getUserMark());
 		    row.addCell(mark);
 
 		    //build list of all logs left for this item and this session
@@ -2117,14 +2115,14 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     }
 
     @Override
-    public List<Integer> getMarksArray(Long toolContentId) {
+    public List<Double> getMarksArray(Long toolContentId) {
 	return scratchieSessionDao.getRawLeaderMarksByToolContentId(toolContentId);
     }
 
     @Override
     public LeaderResultsDTO getLeaderResultsDTOForLeaders(Long toolContentId) {
 
-	List<Integer> marks = scratchieSessionDao.getRawLeaderMarksByToolContentId(toolContentId);
+	List<Double> marks = scratchieSessionDao.getRawLeaderMarksByToolContentId(toolContentId);
 	LeaderResultsDTO newDto = new LeaderResultsDTO(toolContentId, marks);
 
 	return newDto;
@@ -2251,7 +2249,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    for (ScratchieItem item : sortedItems) {
 		ScratchieItemDTO itemDto = new ScratchieItemDTO();
 		int numberOfAttempts = 0;
-		int mark = -1;
+		double mark = -1;
 		boolean isUnraveledOnFirstAttempt = false;
 		String optionsSequence = "";
 		QbQuestion qbQuestion = item.getQbQuestion();

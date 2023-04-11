@@ -114,14 +114,14 @@
   					oldValue = eval(val);
 				},
   				afterSaveCell : function (rowid,name,val,iRow,iCol){
-  					var intRegex = /^\d+$/;
-  					if (!intRegex.test(val)) {
+  					var number = new Number(val);
+  					if (Number.isNaN(number)) {
   						jQuery("#list${summary.sessionId}").restoreCell(iRow,iCol); 
   					}
 				},	  		
   				beforeSubmitCell : function (rowid,name,val,iRow,iCol){
-  					var intRegex = /^\d+$/;
-  					if (!intRegex.test(val)) {
+  					var number = new Number(val);
+  					if (Number.isNaN(number)) {
   						return {nan:true};
   					} else {
   						var userId = jQuery("#list${summary.sessionId}").getCell(rowid, 'userId');

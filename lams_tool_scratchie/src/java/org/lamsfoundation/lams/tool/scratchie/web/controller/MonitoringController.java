@@ -40,7 +40,6 @@ import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -197,7 +196,7 @@ public class MonitoringController {
 
 	    Long userId = WebUtil.readLongParam(request, ScratchieConstants.ATTR_USER_ID);
 	    Long sessionId = WebUtil.readLongParam(request, ScratchieConstants.PARAM_SESSION_ID);
-	    Integer newMark = Integer.valueOf(request.getParameter(ScratchieConstants.PARAM_MARK));
+	    Double newMark = Double.valueOf(request.getParameter(ScratchieConstants.PARAM_MARK));
 	    scratchieService.changeUserMark(userId, sessionId, newMark);
 	}
 
@@ -264,7 +263,7 @@ public class MonitoringController {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 
 	Scratchie scratchie = (Scratchie) sessionMap.get(ScratchieConstants.ATTR_SCRATCHIE);
-	List<Integer> results = null;
+	List<Double> results = null;
 
 	if (scratchie != null) {
 	    results = scratchieService.getMarksArray(scratchie.getContentId());

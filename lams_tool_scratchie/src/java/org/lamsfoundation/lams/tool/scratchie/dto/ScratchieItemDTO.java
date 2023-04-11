@@ -15,7 +15,7 @@ public class ScratchieItemDTO implements Cloneable {
     private Integer type;
     private List<OptionDTO> optionDtos;
     private boolean unraveledOnFirstAttempt;
-    private int userMark;
+    private double userMark;
     private int userAttempts;
     //sequence of optionDtos selected by user in the form of "X, Y, Z"
     private String optionsSequence;
@@ -45,7 +45,7 @@ public class ScratchieItemDTO implements Cloneable {
     public void setTitle(String title) {
 	this.title = title;
     }
-    
+
     public Integer getType() {
 	return type;
     }
@@ -70,11 +70,11 @@ public class ScratchieItemDTO implements Cloneable {
 	this.unraveledOnFirstAttempt = isUnraveledOnFirstAttempt;
     }
 
-    public int getUserMark() {
+    public double getUserMark() {
 	return userMark;
     }
 
-    public void setUserMark(int userMark) {
+    public void setUserMark(double userMark) {
 	this.userMark = userMark;
     }
 

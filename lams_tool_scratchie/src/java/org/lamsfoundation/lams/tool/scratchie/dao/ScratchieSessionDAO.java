@@ -42,9 +42,9 @@ public interface ScratchieSessionDAO extends DAO {
     void delete(ScratchieSession session);
 
     void deleteBySessionId(Long toolSessionId);
-    
-    List<Integer> getRawLeaderMarksByToolContentId(Long toolContentId);
-    
+
+    List<Double> getRawLeaderMarksByToolContentId(Long toolContentId);
+
     /**
      * Returns all session ids where specified qbQuestionUid is used with the given answer
      */

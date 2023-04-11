@@ -31,7 +31,7 @@ public class GroupSummary {
 
     private Long sessionId;
     private String sessionName;
-    private int mark;
+    private double mark;
     private int totalAttempts;
     private Double totalPercentage;
     private Long leaderUid;
@@ -79,11 +79,11 @@ public class GroupSummary {
 	this.sessionName = sessionName;
     }
 
-    public int getMark() {
+    public double getMark() {
 	return mark;
     }
 
-    public void setMark(int mark) {
+    public void setMark(double mark) {
 	this.mark = mark;
     }
 
