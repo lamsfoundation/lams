@@ -1,3 +1,9 @@
+/* For Boostrap 3 & 5 compability */
+.img-responsive {
+    max-width: 100%;
+    height: auto;
+}
+
 body.component {
 	font-family: Arial, sans-serif;
 	background-color: var(--lams-background-gray);
