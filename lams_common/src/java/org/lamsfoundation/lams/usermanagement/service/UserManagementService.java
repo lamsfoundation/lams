@@ -691,9 +691,17 @@ public class UserManagementService implements IUserManagementService, Initializi
 
     @Override
     public void disableUser(Integer userId) {
+	disableUser(userId, false);
+    }
+
+    @Override
+    public void disableUser(Integer userId, boolean skipLog) {
 	User user = (User) findById(User.class, userId);
+	if (user.getDisabledFlag()) {
+	    return;
+	}
 	user.setDisabledFlag(true);
-	log.debug("disabling user " + user.getLogin());
+	log.info("disabling user " + user.getLogin());
 	saveUser(user);
 
 	Set uos = user.getUserOrganisations();
@@ -705,7 +713,9 @@ public class UserManagementService implements IUserManagementService, Initializi
 	    iter.remove();
 	}
 
-	AuditLogFilter.log(AuditLogFilter.USER_DISABLE_ACTION, "user login: " + user.getLogin());
+	if (!skipLog) {
+	    AuditLogFilter.log(AuditLogFilter.USER_DISABLE_ACTION, "user login: " + user.getLogin());
+	}
     }
 
     @Override
@@ -1225,8 +1235,8 @@ public class UserManagementService implements IUserManagementService, Initializi
 		modifiedPortraitInputStream.close();
 		is.close();
 		if (log.isDebugEnabled()) {
-		    log.debug(
-			    "Saved large portrait with uuid: " + node.getNodeId() + " and version: " + node.getVersion());
+		    log.debug("Saved large portrait with uuid: " + node.getNodeId() + " and version: "
+			    + node.getVersion());
 		}
 
 		//resize to the medium size
@@ -1251,8 +1261,8 @@ public class UserManagementService implements IUserManagementService, Initializi
 		modifiedPortraitInputStream.close();
 		is.close();
 		if (log.isDebugEnabled()) {
-		    log.debug(
-			    "Saved small portrait with uuid: " + node.getNodeId() + " and version: " + node.getVersion());
+		    log.debug("Saved small portrait with uuid: " + node.getNodeId() + " and version: "
+			    + node.getVersion());
 		}
 		// delete old portrait file (we only want to keep the user's current portrait)
 		if (user.getPortraitUuid() != null) {

@@ -330,10 +330,14 @@ public interface IUserManagementService {
 
     /**
      * Sets user's disabled flag to true, and removes their organisation memberships.
-     *
-     * @param userId
      */
     void disableUser(Integer userId);
+
+    /**
+     * Sets user's disabled flag to true, and removes their organisation memberships.
+     * Skip log for batch processing.
+     */
+    void disableUser(Integer userId, boolean skipLog);
 
     /**
      * Set the roles for the specified user and organisation using the roleIds in rolesList. If userOrganisation exists,

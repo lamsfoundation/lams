@@ -464,6 +464,13 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    logger.info("Processing " + role + " role finished");
 		}
 
+		try {
+		    HibernateSessionManager.closeSession();
+		    HibernateSessionManager.openSession();
+		} catch (Exception e) {
+		    logger.warn("Error while recreating Hibernate session", e);
+		}
+
 		logger.info("Disabling users");
 		// users who are part of courses but are not in the file anymore are eligible for disabling
 		allExistingUsersFromParsedCourses.removeAll(allParsedUsers);
@@ -471,7 +478,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    boolean hasAnyRoles = userManagementService.hasUserAnyRoles(user.getUserId());
 		    if (!hasAnyRoles) {
 			// he is only a learner or this is staff mode, so disable
-			userManagementService.disableUser(user.getUserId());
+			userManagementService.disableUser(user.getUserId(), true);
 
 			String message = "User \"" + user.getLogin().toLowerCase() + "\" disabled";
 			logger.info(message);
