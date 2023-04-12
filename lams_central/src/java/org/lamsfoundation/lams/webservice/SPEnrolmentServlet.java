@@ -116,6 +116,7 @@ public class SPEnrolmentServlet extends HttpServlet {
     private static final String FILE_INPUT_PARAM = "file-input";
     private static final int THREADS_DEFAULT_VALUE = 4;
     private static final String THREADS_PARAM = "threads";
+    private static final String PASSWORD_PARAM = "password";
 
     private static final String DELIMITER = "\\|";
     private static final String INTEGRATED_SERVER_NAME = "saml";
@@ -143,7 +144,20 @@ public class SPEnrolmentServlet extends HttpServlet {
 		? Paths.get(Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR), FILE_INPUT_DEFAULT_NAME)
 		: Paths.get(fileInputParam);
 	if (!Files.isReadable(fileInput)) {
-	    throw new IOException("File not readable: " + fileInput.toAbsolutePath().toString());
+	    throw new IllegalArgumentException("File not readable: " + fileInput.toAbsolutePath().toString());
+	}
+
+	ExtServer extServer = integrationService.getExtServer(INTEGRATED_SERVER_NAME);
+	if (extServer == null) {
+	    throw new IOException("Integrated server not found: " + INTEGRATED_SERVER_NAME);
+	}
+	String password = request.getParameter(PASSWORD_PARAM);
+	if (StringUtils.isBlank(password)) {
+	    throw new IllegalArgumentException("Missing password parameter \"password\"");
+	}
+	String existingPassword = HashUtil.sha256(extServer.getServerkey());
+	if (!password.strip().equals(existingPassword)) {
+	    throw new IllegalArgumentException("Invalid sha256 of integrated server key");
 	}
 
 	// run processing in a separate thread as it can take a while and request would time out
@@ -152,11 +166,6 @@ public class SPEnrolmentServlet extends HttpServlet {
 		logger.info("SP enrolments provisioning starting");
 		// start interacting with DB
 		HibernateSessionManager.openSession();
-
-		ExtServer extServer = integrationService.getExtServer(INTEGRATED_SERVER_NAME);
-		if (extServer == null) {
-		    throw new ServletException("Integrated server not found: " + INTEGRATED_SERVER_NAME);
-		}
 
 		// split each line into list of trimmed pieces
 		List<List<String>> allLines = Files.readAllLines(fileInput).parallelStream().unordered()
@@ -464,6 +473,13 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    logger.info("Processing " + role + " role finished");
 		}
 
+		try {
+		    HibernateSessionManager.closeSession();
+		    HibernateSessionManager.openSession();
+		} catch (Exception e) {
+		    logger.warn("Error while recreating Hibernate session", e);
+		}
+
 		logger.info("Disabling users");
 		// users who are part of courses but are not in the file anymore are eligible for disabling
 		allExistingUsersFromParsedCourses.removeAll(allParsedUsers);
@@ -471,7 +487,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    boolean hasAnyRoles = userManagementService.hasUserAnyRoles(user.getUserId());
 		    if (!hasAnyRoles) {
 			// he is only a learner or this is staff mode, so disable
-			userManagementService.disableUser(user.getUserId());
+			userManagementService.disableUser(user.getUserId(), true);
 
 			String message = "User \"" + user.getLogin().toLowerCase() + "\" disabled";
 			logger.info(message);
