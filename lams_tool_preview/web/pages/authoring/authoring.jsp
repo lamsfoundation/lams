@@ -8,8 +8,10 @@
 
 	<%@ include file="/common/tabbedheader.jsp"%>
 	<link href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet" type="text/css" >
-	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script>
+	    // avoid name clash between bootstrap and jQuery UI
+	    $.fn.bootstrapTooltip = $.fn.tooltip.noConflict();
+    
         function init(){
             var tag = document.getElementById("currentTab");
 	    	if(tag.value != "") {
@@ -26,7 +28,12 @@
 	    	// end optional tab controller stuff
 	    	selectTab(tabId);
         }
+
+        $(document).ready(function() {
+        	$('[data-toggle="tooltip"]').bootstrapTooltip();
+        });
     </script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 </lams:head>
 <body class="stripes" onLoad="init()">
 <form:form action="update.do" method="post" modelAttribute="peerreviewForm">

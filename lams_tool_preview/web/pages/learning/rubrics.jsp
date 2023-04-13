@@ -36,14 +36,18 @@
 </style>
 
 <script>
-
+	var rubricsRequireRatings = ${peerreview.rubricsRequireRatings};
+	
+	$(document).ready(function(){
+		if (rubricsRequireRatings){
+			$('#finishButton').prop('disabled', isRatingMissing());
+		}
+	});
+	
 	function submitEntry(next) {
-		if (next) {
-			let criterionTables = $('.rubrics-table'),
-				ratingMissing = $('tbody td.bg-success', criterionTables).length !== $('tbody tr', criterionTables).length - criterionTables.length;
-			if (ratingMissing && !confirm('<fmt:message key="message.rating.rubrics.selection.missing" />')){
-				return;
-			}
+		if (next && !rubricsRequireRatings && isRatingMissing() 
+				&& !confirm('<fmt:message key="message.rating.rubrics.selection.missing" />')){
+			return;
 		}
 		// answer saved when clicked so don't use next button to submit
 		nextprev(next);
@@ -65,7 +69,10 @@
     				return;
     			}
     			$(cell).addClass('bg-success').siblings('td').removeClass('bg-success');
-	  			
+    			
+        		if (rubricsRequireRatings) {
+					$('#finishButton').prop('disabled', isRatingMissing());
+            	}
     		},
 			onError : function(){
     			alert('<fmt:message key="label.rating.rubrics.error.rate" />');
@@ -75,6 +82,12 @@
 
 	function expandAllRubricsUserPanels(){
 		$('.collapse').collapse('show');
+	}
+
+	function isRatingMissing() {
+		let criterionTables = $('.rubrics-table');
+		return $('tbody td.bg-success', criterionTables).length !== $('tbody tr', criterionTables).length
+			- criterionTables.length;
 	}
 </script>
 <button class="btn btn-default expand-all-button" onClick="javascript:expandAllRubricsUserPanels()">

@@ -60,9 +60,19 @@
 	</div>
 	
 	<div class="checkbox">
-	<label for="rubrics-in-between-columns"><form:checkbox path="peerreview.rubricsInBetweenColumns" id="rubrics-in-between-columns"/>
-	<fmt:message key="label.rating.rubrics.in.between.enable" />
-	</label>
+		<label for="rubrics-in-between-columns">
+			<form:checkbox path="peerreview.rubricsInBetweenColumns" id="rubrics-in-between-columns"/>
+			<fmt:message key="label.rating.rubrics.in.between.enable" />
+		</label>
+	</div>	
+	
+	<div class="checkbox">
+		<label for="rubrics-require-ratings">
+			<form:checkbox path="peerreview.rubricsRequireRatings" id="rubrics-require-ratings"/>
+			<fmt:message key="label.rating.rubrics.require.ratings" />
+		</label>
+		<i class="fa fa-question-circle" data-toggle="tooltip" data-placement="right"
+			title="<fmt:message key="label.rating.rubrics.require.ratings.tooltip" />"></i>
 	</div>
 </lams:SimplePanel>
 

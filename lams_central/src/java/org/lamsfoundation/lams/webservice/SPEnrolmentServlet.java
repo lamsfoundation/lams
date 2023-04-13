@@ -156,7 +156,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 	    throw new IllegalArgumentException("Missing password parameter \"password\"");
 	}
 	String existingPassword = HashUtil.sha256(extServer.getServerkey());
-	if (!password.strip().equals(existingPassword)) {
+	if (!password.strip().equalsIgnoreCase(existingPassword)) {
 	    throw new IllegalArgumentException("Invalid sha256 of integrated server key");
 	}
 

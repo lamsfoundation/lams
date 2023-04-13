@@ -149,14 +149,14 @@
 		
 		<div class="pull-right" id="buttonNextPrevDiv">		
 		<c:if test="${stepNumber > 1}">
-			<span id="prevButton" class="btn btn-default" onclick="javascript:${method}(false);"><fmt:message key="label.previous"/></span>
+			<button type="button" id="prevButton" class="btn btn-default" onclick="javascript:${method}(false);"><fmt:message key="label.previous"/></button>
 		</c:if>
 		<c:choose>
 			<c:when test="${stepNumber == numCriteria}">
-				<span id="finishButton" class="btn btn-primary" onclick="javascript:${method}(true);">${finishButtonLabel}</span>
+				<button type="button" id="finishButton" class="btn btn-primary" onclick="javascript:${method}(true);">${finishButtonLabel}</button>
 			</c:when>
 			<c:otherwise>
-				<span id="finishButton" class="btn btn-default" onclick="javascript:${method}(true);"><fmt:message key="label.next"/></span>
+				<button type="button" id="finishButton" class="btn btn-default" onclick="javascript:${method}(true);"><fmt:message key="label.next"/></button>
 			</c:otherwise>
 		</c:choose>
 		</div>
