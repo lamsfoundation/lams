@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component inheritJdk="true">
+	<exclude-output/>
+	<contentEntry url="file://$MODULE_DIR$"/>
+	<lib name="jboss-servlet-api_4.0_spec-1.0.0.Final.jar" scope="COMPILE">
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/servlet-api"/>
+		<relative-module-src project-related="file://$3RDPARTY_SOURCES_PROJECT$/servlet-api"/>
+	</lib>
+	<levels>
+		<level name="3rdParty" value="project"/>
+	</levels>
+</component>

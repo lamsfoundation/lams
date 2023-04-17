@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component inheritJdk="true">
+	<contentEntry url="file://$MODULE_DIR$"/>
+	<lib name="commons-io-2.5.jar" scope="COMPILE">
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/commons-io"/>
+	</lib>
+	<lib name="commons-lang-2.6.jar" scope="COMPILE">
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/commons-lang"/>
+	</lib>
+	<lib name="undertow-servlet-2.0.13.Final.jar" scope="COMPILE">
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/undertow"/>
+	</lib>
+	<lib name="undertow-core-2.0.13.Final.jar" scope="COMPILE">
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/undertow"/>
+	</lib>
+	<lib name="jackson-core-2.9.5.jar" scope="COMPILE">
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/jackson"/>
+	</lib>
+	<lib name="jackson-databind-2.9.5.jar" scope="COMPILE">
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/jackson"/>
+	</lib>
+	<lib name="javax.persistence-api-2.2.jar" scope="COMPILE">
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/persistence-api"/>
+	</lib>
+	<lib name="hibernate-core-5.3.6.Final.jar" scope="COMPILE">
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/hibernate-core"/>
+	</lib>
+	<levels>
+		<level name="3rdParty" value="project"/>
+	</levels>
+</component>

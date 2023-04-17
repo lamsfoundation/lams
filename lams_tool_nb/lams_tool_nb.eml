@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component inheritJdk="true">
+	<contentEntry url="file://$MODULE_DIR$"/>
+	<lib name="jboss-servlet-api_4.0_spec-1.0.0.Final.jar" scope="COMPILE">
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/servlet-api"/>
+	</lib>
+	<lib name="jackson-core-2.9.5.jar" scope="COMPILE">
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/jackson"/>
+	</lib>
+	<lib name="jackson-databind-2.9.5.jar" scope="COMPILE">
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/jackson"/>
+	</lib>
+	<lib name="javax.persistence-api-2.2.jar" scope="COMPILE">
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/persistence-api"/>
+	</lib>
+	<lib name="hibernate-core-5.3.6.Final.jar" scope="COMPILE">
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/hibernate-core"/>
+	</lib>
+	<levels>
+		<level name="3rdParty" value="project"/>
+	</levels>
+</component>
