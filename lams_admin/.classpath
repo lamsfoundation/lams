@@ -6,8 +6,8 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_common"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/servlet/api/main/jboss-servlet-api_4.0_spec-1.0.0.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/servlet-api">
 		<attributes>
 			<attribute name="javadoc_location" value="http://tomcat.apache.org/tomcat-8.0-doc/servletapi/"/>

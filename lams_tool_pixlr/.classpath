@@ -2,14 +2,13 @@
 <classpath>
 	<classpathentry kind="src" path="src/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE14_CONTAINER"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/servlet/api/main/jboss-servlet-api_4.0_spec-1.0.0.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/servlet-api">
 		<attributes>
 			<attribute name="javadoc_location" value="http://tomcat.apache.org/tomcat-8.0-doc/servletapi/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_common"/>
-	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jboss/log4j/logmanager/main/log4j-jboss-logmanager-1.1.6.Final.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/apache/commons/lang/main/commons-lang-2.6.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/commons-lang">
 		<attributes>
 			<attribute name="javadoc_location" value="http://commons.apache.org/proper/commons-lang/javadocs/api-2.6/"/>
@@ -17,6 +16,6 @@
 	</classpathentry>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/persistence/api/main/javax.persistence-api-2.2.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/persistence-api"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/hibernate/main/hibernate-core-5.3.6.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/hibernate-core"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jboss/log4j/logmanager/main/log4j-jboss-logmanager-1.1.6.Final.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
