@@ -3,7 +3,9 @@ package org.lamsfoundation.lams.web;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -11,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
+import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.questions.QuestionParser;
@@ -45,25 +48,15 @@ public class QuestionsController {
     private IQbService qbService;
 
     @RequestMapping("/questions")
-    public String execute(@RequestParam String tmpFileUploadId, @RequestParam String returnURL,
-	    @RequestParam("limitType") String limitTypeParam, @RequestParam(required = false) String importType,
-	    @RequestParam String callerID, @RequestParam(required = false) Boolean collectionChoice,
-	    HttpServletRequest request) throws Exception {
+    public String execute(@RequestParam(required = false) String tmpFileUploadId,
+	    @RequestParam(required = false) String returnURL, @RequestParam("limitType") String limitTypeParam,
+	    @RequestParam(required = false) String importType, @RequestParam(required = false) String callerID,
+	    @RequestParam(required = false) Boolean collectionChoice, HttpServletRequest request) throws Exception {
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	boolean isTextBasedInput = "openAi".equals(importType);
 	String packageName = null;
-
 	File file = null;
-	File uploadDir = FileUtil.getTmpFileUploadDir(tmpFileUploadId);
-	if (uploadDir.canRead()) {
-	    File[] files = uploadDir.listFiles();
-	    if (files.length > 1) {
-		errorMap.add("GLOBAL", "Uploaded more than 1 file");
-	    } else if (files.length == 1) {
-		file = files[0];
-		packageName = file.getName().toLowerCase();
-	    }
-	}
 
 	// this parameter is not really used at the moment
 	request.setAttribute("returnURL", returnURL);
@@ -74,17 +67,30 @@ public class QuestionsController {
 	// show only chosen types of questions
 	request.setAttribute("limitType", limitTypeParam);
 
+	if (!isTextBasedInput) {
+	    File uploadDir = FileUtil.getTmpFileUploadDir(tmpFileUploadId);
+	    if (uploadDir.canRead()) {
+		File[] files = uploadDir.listFiles();
+		if (files.length > 1) {
+		    errorMap.add("GLOBAL", "Uploaded more than 1 file");
+		} else if (files.length == 1) {
+		    file = files[0];
+		    packageName = file.getName().toLowerCase();
+		}
+	    }
+	}
+
 	boolean isWordInput = "word".equals(importType);
 	request.setAttribute("importType", importType);
 
 	if (collectionChoice != null && collectionChoice) {
 	    // in the view a drop down with collections will be displayed
-	    request.setAttribute("collections", qbService.getUserCollections(QuestionsController.getUserId()));
+	    List<QbCollection> collections = qbService.getUserCollections(QuestionsController.getUserId());
+	    request.setAttribute("collections", collections);
 	}
-
 	// user did not choose a file
-	if (file == null || (isWordInput ? !packageName.endsWith(".docx")
-		: !(packageName.endsWith(".zip") || packageName.endsWith(".xml")))) {
+	if (!isTextBasedInput && (file == null || (isWordInput ? !packageName.endsWith(".docx")
+		: !(packageName.endsWith(".zip") || packageName.endsWith(".xml"))))) {
 	    errorMap.add("GLOBAL", messageService.getMessage("label.questions.file.missing"));
 	}
 
@@ -94,34 +100,48 @@ public class QuestionsController {
 	    return "questions/questionFile";
 	}
 
-	String tempDirName = Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR);
-	File tempDir = new File(tempDirName);
-	if (!tempDir.exists()) {
-	    tempDir.mkdirs();
-	}
-
-	Set<String> limitType = null;
-	if (!StringUtils.isBlank(limitTypeParam)) {
-	    limitType = new TreeSet<>();
-	    // comma delimited acceptable question types, for example "mc,fb"
-	    Collections.addAll(limitType, limitTypeParam.split(","));
-	}
-
-	InputStream uploadedFileStream = new FileInputStream(file);
-
-	Question[] questions;
-	if (packageName.endsWith(".xml")) {
-	    questions = QuestionParser.parseQTIFile(uploadedFileStream, null, limitType);
-
-	} else if (packageName.endsWith(".docx")) {
-	    questions = QuestionWordParser.parseWordFile(uploadedFileStream, packageName, limitType);
-
+	Question[] questions = null;
+	if (isTextBasedInput) {
+	    try {
+		Class clazz = Class.forName(Configuration.AI_MODULE_CLASS, false, Configuration.class.getClassLoader());
+		if (clazz != null) {
+		    Method method = clazz.getMethod("parseResponse", String.class);
+		    questions = (Question[]) method.invoke(null, request.getParameter("textInput"));
+		    request.setAttribute("editingEnabled", true);
+		}
+	    } catch (Exception e) {
+		errorMap.add("GLOBAL", "Error while parsing text input: " + e.getMessage());
+	    }
 	} else {
-	    questions = QuestionParser.parseQTIPackage(uploadedFileStream, limitType);
-	}
-	request.setAttribute("questions", questions);
+	    Set<String> limitType = null;
+	    if (!StringUtils.isBlank(limitTypeParam)) {
+		limitType = new TreeSet<>();
+		// comma delimited acceptable question types, for example "mc,fb"
+		Collections.addAll(limitType, limitTypeParam.split(","));
+	    }
 
-	FileUtil.deleteTmpFileUploadDir(tmpFileUploadId);
+	    String tempDirName = Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR);
+	    File tempDir = new File(tempDirName);
+	    if (!tempDir.exists()) {
+		tempDir.mkdirs();
+	    }
+
+	    InputStream uploadedFileStream = new FileInputStream(file);
+
+	    if (packageName.endsWith(".xml")) {
+		questions = QuestionParser.parseQTIFile(uploadedFileStream, null, limitType);
+
+	    } else if (packageName.endsWith(".docx")) {
+		questions = QuestionWordParser.parseWordFile(uploadedFileStream, packageName, limitType);
+
+	    } else {
+		questions = QuestionParser.parseQTIPackage(uploadedFileStream, limitType);
+	    }
+
+	    FileUtil.deleteTmpFileUploadDir(tmpFileUploadId);
+	}
+
+	request.setAttribute("questions", questions);
 
 	return "questions/questionChoice";
     }

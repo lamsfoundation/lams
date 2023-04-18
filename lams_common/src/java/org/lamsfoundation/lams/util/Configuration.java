@@ -69,6 +69,9 @@ public class Configuration implements InitializingBean {
     public static final int ITEMS_NON_LDAP = 2;
     public static final int ITEMS_ONLY_LDAP = 3;
 
+    public static final String LTI_ADVANTAGE_MODULE_CLASS = "org.lamsfoundation.lams.lti.advantage.util.LtiAdvantageUtil";
+    public static final String AI_MODULE_CLASS = "org.lamsfoundation.lams.ai.util.QuestionOpenAiParser";
+
     private static Map<String, ConfigurationItem> items = null;
 
     protected static IConfigurationDAO configurationDAO;
@@ -313,19 +316,25 @@ public class Configuration implements InitializingBean {
 	return null;
     }
 
-    public MessageService getMessageService() {
-	return Configuration.messageService;
-    }
-
     public void persistUpdate() {
 	updatePublicFolderName();
 	Configuration.configurationDAO.insertOrUpdateAll(Configuration.items.values());
     }
 
-    /**
-     * @param configurationDAO
-     *            The configurationDAO to set.
-     */
+    @SuppressWarnings({ "rawtypes" })
+    public static boolean isLamsModuleAvailable(String moduleClassName) {
+	try {
+	    Class clazz = Class.forName(moduleClassName, false, Configuration.class.getClassLoader());
+	    return clazz != null;
+	} catch (Exception e) {
+	}
+	return false;
+    }
+
+    public MessageService getMessageService() {
+	return Configuration.messageService;
+    }
+
     public void setConfigurationDAO(IConfigurationDAO configurationDAO) {
 	Configuration.configurationDAO = configurationDAO;
     }
@@ -343,7 +352,6 @@ public class Configuration implements InitializingBean {
 	return "Configuration items:" + (Configuration.items != null ? Configuration.items.toString() : "none");
     }
 
-    @SuppressWarnings("unchecked")
     private void updatePublicFolderName() {
 	// LDEV-2430 update public folder name according to default server locale
 	WorkspaceFolder publicFolder = null;
