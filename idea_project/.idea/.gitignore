@@ -6,3 +6,7 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+/ant.xml
+/git_toolbox_prj.xml
+/modules.xml
+/vcs.xml
