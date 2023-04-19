@@ -59,9 +59,9 @@ public class AssessmentConstants {
     public static final String PARAM_NOT_A_NUMBER = "nan";
 
     public static final String PARAM_GRADE = "grade";
-    
+
     public static final String PARAM_MARKER_COMMENT = "markerComment";
-    
+
     public static final String PARAM_COLUMN = "column";
 
     public static final String PARAM_MAX_MARK = "maxMark";
@@ -215,11 +215,13 @@ public class AssessmentConstants {
 
     // configuration keys
     public static final String CONFIG_KEY_HIDE_TITLES = "hideTitles";
-    
+
     public static final String CONFIG_KEY_AUTO_EXPAND_JUSTIFICATION = "autoexpandJustification";
 
     public static final String ATTR_IS_QUESTION_ETHERPAD_ENABLED = "isQuestionEtherpadEnabled";
-    
+
+    public static final String ATTR_IS_AI_ENABLED = "isAiEnabled";
+
     public static final String ATTR_CODE_STYLES = "codeStyles";
 
     public static final String ATTR_ALL_GROUP_USERS = "allGroupUsers";
