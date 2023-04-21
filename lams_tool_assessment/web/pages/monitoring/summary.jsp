@@ -326,13 +326,13 @@
 </div>
 
 <c:if test="${not empty sessionDtos}">
-	<h5><fmt:message key="label.student.choices" /></h5>
-	<c:choose>
-		<c:when test="${displayStudentChoices and not empty questions}">
-			<%@ include file="/pages/monitoring/parts/mcqStudentChoices.jsp" %>
-		</c:when>
-		<c:when test="${not displayStudentChoices and not empty questionDtos}">
-			<div class="row no-gutter">
+	<c:if test="${displayStudentChoices and not empty questions}">
+		<h5><fmt:message key="label.student.choices" /></h5>
+		<%@ include file="/pages/monitoring/parts/mcqStudentChoices.jsp" %>
+	</c:if>
+	<c:if test="${sessionMap.isGroupedActivity and not empty questionDtos}">
+		<h5><fmt:message key="label.groups.choices" /></h5>
+		<div class="row no-gutter">
 			<div class="col-xs-12 col-md-12 col-lg-12">
 			<div class="panel">
 			<div class="panel-body">
@@ -398,10 +398,9 @@
 			</div>
 			</div>
 			</div>
-			</div>
-		</c:when>
-	</c:choose>
-	
+		</div>
+	</c:if>
+
 	<button onclick="return exportSummary();" class="btn btn-default btn-sm btn-disable-on-submit pull-right">
 		<i class="fa fa-download" aria-hidden="true"></i> 
 		<fmt:message key="label.monitoring.summary.export.summary" />
