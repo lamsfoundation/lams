@@ -2,11 +2,20 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <%@ page import="org.lamsfoundation.lams.qb.service.IQbService" %>
 
+<c:set var="existingQbQuestionUids" value="" />
+<c:if test="${sessionMap.isAiEnabled}">
+	<c:forEach var="questionReference" items="${sessionMap.questionReferences}" varStatus="status">
+		<c:set var="existingQbQuestionUids">${existingQbQuestionUids}${status.first ? "" : ","}${questionReference.question.qbQuestion.uid}</c:set>
+	</c:forEach>
+</c:if>
+		
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/Sortable.js"></script>
 <script>
 	// Inform author whether the QB question was modified
 	var qbQuestionModified = ${empty qbQuestionModified ? 0 : qbQuestionModified},
-		qbMessage = null;
+		qbMessage = null,
+		existingQbQuestionUids = '${existingQbQuestionUids}'.trim();
+		
 	switch (qbQuestionModified) {
 		case <%= IQbService.QUESTION_MODIFIED_UPDATE %>: 
 			qbMessage = '<fmt:message key="message.qb.modified.update" />';
@@ -42,6 +51,7 @@
 		
 	    //init questions sorting
 	    <c:if test="${not empty sessionMap.questionReferences}">
+		
 	    new Sortable($('#referencesTable tbody')[0], {
 		    animation: 150,
 		    direction: 'vertical',

@@ -32,6 +32,7 @@ public class AdminConstants {
     public static final String START_MONITOR_LINKS = "server.monitor.title";
     public static final String START_COURSE_LINKS = "user.course.title";
     public static final String START_WORKFLOW_AUTOMATION = "workflow.automation.title";
+    public static final String START_AI = "ai.config.title";
 
     public static final String PARAM_PAGE = "page";
     public static final String PARAM_ROWS = "rows";

@@ -2,17 +2,17 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/bb-platform-9.1.201510.1171621.jar"/>
-	<classpathentry kind="lib" path="lib/bb-taglibs-9.1.201510.1171621.jar"/>
-	<classpathentry kind="lib" path="lib/servlet-api.jar"/>
-	<classpathentry kind="lib" path="lib/bb-cms-admin-9.1.201510.1171621.jar"/>
-	<classpathentry kind="lib" path="lib/commons-codec-1.3.jar"/>
-	<classpathentry kind="lib" path="lib/commons-discovery-0.2.jar"/>
-	<classpathentry kind="lib" path="lib/commons-logging-1.0.4.jar"/>
-	<classpathentry kind="lib" path="lib/commons-io-1.4.jar"/>
-	<classpathentry kind="lib" path="lib/gson-2.2.4.jar"/>
-	<classpathentry kind="lib" path="lib/commons-lang.jar"/>
-	<classpathentry kind="lib" path="lib/slf4j-api-1.7.5.jar"/>
-	<classpathentry kind="lib" path="lib/slf4j-simple-1.7.5.jar"/>
+	<classpathentry kind="var" path="REPO_HOME/lams_bb_integration/lib/bb-platform-9.1.201510.1171621.jar"/>
+	<classpathentry kind="var" path="REPO_HOME/lams_bb_integration/lib/bb-taglibs-9.1.201510.1171621.jar"/>
+	<classpathentry kind="var" path="REPO_HOME/lams_bb_integration/lib/servlet-api.jar"/>
+	<classpathentry kind="var" path="REPO_HOME/lams_bb_integration/lib/bb-cms-admin-9.1.201510.1171621.jar"/>
+	<classpathentry kind="var" path="REPO_HOME/lams_bb_integration/lib/commons-codec-1.3.jar"/>
+	<classpathentry kind="var" path="REPO_HOME/lams_bb_integration/lib/commons-discovery-0.2.jar"/>
+	<classpathentry kind="var" path="REPO_HOME/lams_bb_integration/lib/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="var" path="REPO_HOME/lams_bb_integration/lib/commons-io-1.4.jar"/>
+	<classpathentry kind="var" path="REPO_HOME/lams_bb_integration/lib/gson-2.2.4.jar"/>
+	<classpathentry kind="var" path="REPO_HOME/lams_bb_integration/lib/commons-lang.jar"/>
+	<classpathentry kind="var" path="REPO_HOME/lams_bb_integration/lib/slf4j-api-1.7.5.jar"/>
+	<classpathentry kind="var" path="REPO_HOME/lams_bb_integration/lib/slf4j-simple-1.7.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

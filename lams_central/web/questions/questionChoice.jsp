@@ -7,24 +7,24 @@
 	<lams:css/>	
 	<style type="text/css">
 		div.answerDiv {
-			padding-left: 25px;
+			padding-left: 50px;
 			display: none;
+			margin-bottom: 10px;
 		}
 		
-		input[type="checkbox"] {
-			border: none;
-			margin: 10px 10px 0px 15px;
+		div.checkbox, div.form-group {
+			width: 100%;
+			margin-bottom: 15px !important;
 		}
 		
-		.questionText {
-			margin-left: 43px;
-			overflow: auto;
+		.editableAttribute {
+			width: 80% !important;
 		}
 		
-		div.answerDiv input {
-			margin-top: 5px;
+		#selectAllDiv {
+			display: inline;
 		}
-		
+
 		.button {
 			float: right;
 			margin-left: 10px;
@@ -40,9 +40,11 @@
 		
 		#collectionSelect {
 			float: right;
+			margin-bottom: 30px;
 		}
 	</style>
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript">
 		window.resizeTo(1152, 648);
 	
@@ -51,7 +53,7 @@
 		
 		function submitForm() {
 			var anyQuestionsSelected = false;
-			$('.question').each(function(){
+			$('.questionCheckbox').each(function(){
 				if ($(this).is(':checked')) {
 					anyQuestionsSelected = true;
 					return false;
@@ -87,11 +89,11 @@
 		}
 		
 		$(document).ready(function(){
-			$('.question').change(function(){
+			$('.questionCheckbox').change(function(){
 				var checked = $(this).is(':checked'),
-					selector = '#' + $(this).attr('id'),
+					selector = '#question' + $(this).data('questionIndex'),
 					answerDiv = $(selector + 'answerDiv'),
-					answersVisible = answerDiv.find('input[type="checkbox"]').length > 0;
+					answersVisible = answerDiv.find('.answerVisible').length > 0;
 					
 				$(this).attr('checked', checked);
 				// enable/disable answers and feedback fields
@@ -101,7 +103,7 @@
 					// but annoying movement when question checkbox is clicked 
 					answerDiv.toggle('slow');
 				}
-				$('input', answerDiv).add(selector + 'feedback').add(selector + 'type').add(selector + 'text')
+				$('input', answerDiv).add(selector).add(selector + 'feedback').add(selector + 'type').add(selector + 'text')
 				                     .add(selector + 'score').add(selector + 'resourcesFolder')
 				                     .attr('disabled', checked ? null : 'disabled');
 				
@@ -117,7 +119,7 @@
 			$('#selectAll').click(function(){
 				var checked = $(this).is(':checked');
 				
-				$('.question').attr('checked', checked);
+				$('.questionCheckbox').attr('checked', checked);
 				$('.questionAttribute').attr('disabled', checked ? null : 'disabled');
 				if (checked) {
 					$('#errorArea').hide('slow');
@@ -131,10 +133,9 @@
 					   .find('input').attr('disabled', 'disabled');
 				}
 			});
-			
-			$('.answer').change(function(){
-				// FF does not seem to do it right
-				$(this).attr('checked', $(this).is(':checked'));
+
+			$('.editableAttribute').change(function(){
+				$(this).attr('value', $(this).val());
 			});
 			
 			// as the form HTML is being passed, not its real values
@@ -156,148 +157,170 @@
 </c:set>
 
 <lams:Page type="admin" title="${title}">
-
-	<lams:Alert id="errorArea" type="danger" close="false">
-		<fmt:message key="label.questions.choice.missing" />
-	</lams:Alert>
-	
-	<input id="selectAll" type="checkbox" /><fmt:message key="label.questions.choice.select.all" /><br /><br />
-			       
-	<form id="questionForm" method="POST">
-		<input type="hidden" name="questionCount" value="${fn:length(questions)}" />
-		
-		<c:if test="${not empty collections}">
-			<!-- Choose a collection where questions should be imported to -->
-			<label id="collectionSelect">
-				<fmt:message key="label.questions.choice.collection" />&nbsp;
-				<select name="collectionUid" id="collectionUid">
-					<c:forEach items="${collections}" var="collection">
-						<option value="${collection.uid}" ${empty collection.personal ? "selected" : ""}>
-							<c:out value="${collection.name}"/> 
-						</option>
-					</c:forEach>
-				</select>
-			</label>
-		</c:if>
-		
-		<c:forEach var="question" items="${questions}" varStatus="questionStatus">
-			<%-- Question itself --%>
-			<input id="question${questionStatus.index}" name="question${questionStatus.index}"
-			       value="<c:out value='${question.title}' />"
-			       class="question" type="checkbox" />${questionStatus.index + 1}.
-     		<c:choose>
-				<c:when test="${question.type eq 'mc'}">
-					(<fmt:message key="label.questions.choice.type.mc" />)
-				</c:when>
-				<c:when test="${question.type eq 'mr'}">
-					(<fmt:message key="label.questions.choice.type.mr" />)
-				</c:when>
-				<c:when test="${question.type eq 'mt'}">
-					(<fmt:message key="label.questions.choice.type.mt" />)
-				</c:when>
-				<c:when test="${question.type eq 'fb'}">
-					(<fmt:message key="label.questions.choice.type.fb" />)
-				</c:when>
-				<c:when test="${question.type eq 'es'}">
-					(<fmt:message key="label.questions.choice.type.es" />)
-				</c:when>
-				<c:when test="${question.type eq 'tf'}">
-					(<fmt:message key="label.questions.choice.type.tf" />)
-				</c:when>
-				<c:when test="${question.type eq 'mh'}">
-					(<fmt:message key="label.questions.choice.type.mh" />)
-				</c:when>
-				<c:otherwise>
-					(<fmt:message key="label.questions.choice.type.unknown" />)
-				</c:otherwise>
-			</c:choose>
-			<c:out value='${question.title}' />
+	<c:choose>
+		<c:when test="${empty questions}">
+			<lams:Alert type="info" close="false">
+				<fmt:message key="label.questions.choice.none.found" />
+			</lams:Alert>
 			
-			<input id="question${questionStatus.index}label" name="question${questionStatus.index}label"
-			       value="<c:out value='${question.label}' />"
-			       class="questionAttribute" type="hidden" />
-			       
-			<input id="question${questionStatus.index}text" name="question${questionStatus.index}text"
-			       value="<c:out value='${question.text}' />"
-			       class="questionAttribute" type="hidden" disabled="disabled" />
-			       <div class="questionText">${question.text}</div><br />
-			<input type="hidden" id="question${questionStatus.index}type" name="question${questionStatus.index}type"
-		           value="${question.type}"
-		           class="questionAttribute" disabled="disabled" />
-		           
-		    <c:if test="${not empty question.score}">
-		     	<input type="hidden" id="question${questionStatus.index}score" name="question${questionStatus.index}score"
-		           value="${question.score}"
-		           class="questionAttribute" disabled="disabled" />
-		    </c:if>
-			<%-- Question feedback --%>
-		    <input type="hidden" id="question${questionStatus.index}feedback" name="question${questionStatus.index}feedback"
-		           value="<c:out value='${question.feedback}' />"
-		           class="questionAttribute" disabled="disabled" />
-		    <%-- If question contains images, where to take them from --%>
-		    <input type="hidden" id="question${questionStatus.index}resourcesFolder"
-		           name="question${questionStatus.index}resourcesFolder"
-		           value="<c:out value='${question.resourcesFolderPath}' />"
-		           class="questionAttribute" disabled="disabled" />
-		    <%-- Answers, if required and exist --%>
-			<c:if test="${fn:length(question.answers) > 0}">
-				<div id="question${questionStatus.index}answerDiv" class="answerDiv">
-					<input type="hidden" name="answerCount${questionStatus.index}" 
-					       value="${fn:length(question.answers)}" />
-					<c:forEach var="answer" items="${question.answers}" varStatus="answerStatus">
-						<%-- Answer itself --%>
-						<c:choose>
-							<c:when test="${question.type eq 'mc' or question.type eq 'mr' or question.type eq 'mh' or question.type eq 'fb'}">
-								<input name="question${questionStatus.index}answer${answerStatus.index}"
-					       			   value="<c:out value='${answer.text}' />" class="answer"
-					       			   type="checkbox" checked="checked" disabled="disabled" />${answer.text}<br />
-			       			</c:when>
-			       			<c:otherwise>
-			       				<%-- Do not display answers if management is too difficult or pointless --%>
-								<input name="question${questionStatus.index}answer${answerStatus.index}"
-					       			   value="<c:out value='${answer.text}' />"
-					       			   type="hidden" disabled="disabled" />
-							</c:otherwise>
-						</c:choose>
-			       		<%-- Answers score and feedback --%>
-			       		<input type="hidden" name="question${questionStatus.index}answer${answerStatus.index}score"
-						       value="${answer.score}" disabled="disabled" />
-						<input type="hidden" name="question${questionStatus.index}answer${answerStatus.index}feedback"
-		           			   value="<c:out value='${answer.feedback}' />" disabled="disabled" />
-					</c:forEach>
-					<c:if test="${question.type eq 'mt'}">
-						<input type="hidden" name="matchAnswerCount${questionStatus.index}" 
-						       value="${fn:length(question.matchAnswers)}" />
-						<c:forEach var="matchAnswer" items="${question.matchAnswers}" varStatus="matchAnswerStatus">
-							<input name="question${questionStatus.index}matchAnswer${matchAnswerStatus.index}"
-					       		   value="<c:out value='${matchAnswer.text}' />"
-					       		   type="hidden" disabled="disabled" />
-						</c:forEach>
-						<c:forEach var="entry" items="${question.matchMap}">
-				       		<input name="question${questionStatus.index}match${entry.key}"
-				       		   	   value="${entry.value}"
-				       		   	   type="hidden" disabled="disabled" />
-					    </c:forEach>
-					</c:if>
+			<div id="buttonsDiv" class="voffset10 pull-right">
+				<input class="btn btn-default" value='<fmt:message key="button.cancel"/>' type="button" onClick="javascript:window.close()" />
+			</div>
+		</c:when>
+		<c:otherwise>
+			<lams:Alert id="errorArea" type="danger" close="false">
+				<fmt:message key="label.questions.choice.missing" />
+			</lams:Alert>
+					       
+			<form id="questionForm" method="POST" class="form-inline">
+				<input type="hidden" name="questionCount" value="${fn:length(questions)}" />
+				
+				<c:if test="${not empty collections}">
+					<!-- Choose a collection where questions should be imported to -->
+					<label id="collectionSelect">
+						<fmt:message key="label.questions.choice.collection" />&nbsp;
+						<select name="collectionUid" id="collectionUid" class="form-control">
+							<c:forEach items="${collections}" var="collection">
+								<option value="${collection.uid}" ${empty collection.personal ? "selected" : ""}>
+									<c:out value="${collection.name}"/> 
+								</option>
+							</c:forEach>
+						</select>
+					</label>
+				</c:if>
+						
+				<div id="selectAllDiv" class="checkbox">	
+					<label>
+						<input id="selectAll" type="checkbox"/>&nbsp;<fmt:message key="label.questions.choice.select.all" />
+					</label>
 				</div>
-			</c:if>
 			
-			 <%-- Learning Outcomes, if required and exist --%>
-			<c:if test="${fn:length(question.learningOutcomes) > 0}">
-				<input type="hidden" name="learningOutcomeCount${questionStatus.index}" 
-					       value="${fn:length(question.learningOutcomes)}" />
-				<c:forEach var="learningOutcome" items="${question.learningOutcomes}" varStatus="learningOutcomeStatus">
-					<input name="question${questionStatus.index}learningOutcome${learningOutcomeStatus.index}"
-					       value="<c:out value='${learningOutcome}'/>" type="hidden" />
+				<c:forEach var="question" items="${questions}" varStatus="questionStatus">
+					<c:set var="questionEditable" value="${editingEnabled and (question.type eq 'mc' or question.type eq 'mr')}" />
+					<c:set var="questionTypeLabel">label.questions.choice.type.${question.type}</c:set>
+					
+					<%-- Question itself --%>
+					<div class="checkbox">
+						<label>
+							<input id="question${questionStatus.index}checkbox" 
+								   data-question-index="${questionStatus.index}" class="questionCheckbox" type="checkbox" />
+							${questionStatus.index + 1}. (<fmt:message key="${questionTypeLabel}" />)
+				     		<c:choose>
+								<c:when test="${questionEditable}">
+									</label>
+									<input id="question${questionStatus.index}" name="question${questionStatus.index}"
+							           	   value="<c:out value='${question.title}' />"
+							           	   class="questionAttribute editableAttribute form-control"
+							           	   type="text" disabled="disabled" />
+								</c:when>
+								<c:otherwise>
+									<c:out value='${question.title}' />
+									</label>
+									<input id="question${questionStatus.index}" name="question${questionStatus.index}"
+							           	   value="<c:out value='${question.title}' />" class="questionAttribute" type="hidden" />
+								</c:otherwise>
+							</c:choose>
+					</div>
+					
+					<input id="question${questionStatus.index}label" name="question${questionStatus.index}label"
+					       value="<c:out value='${question.label}' />"
+					       class="questionAttribute" type="hidden" />
+					       
+					<input id="question${questionStatus.index}text" name="question${questionStatus.index}text"
+					       value="<c:out value='${question.text}' />"
+					       class="questionAttribute" type="hidden" disabled="disabled" />
+					       <div class="questionText">${question.text}</div>
+					<input type="hidden" id="question${questionStatus.index}type" name="question${questionStatus.index}type"
+				           value="${question.type}"
+				           class="questionAttribute" disabled="disabled" />
+				           
+				    <c:if test="${not empty question.score}">
+				     	<input type="hidden" id="question${questionStatus.index}score" name="question${questionStatus.index}score"
+				           value="${question.score}"
+				           class="questionAttribute" disabled="disabled" />
+				    </c:if>
+					<%-- Question feedback --%>
+				    <input type="hidden" id="question${questionStatus.index}feedback" name="question${questionStatus.index}feedback"
+				           value="<c:out value='${question.feedback}' />"
+				           class="questionAttribute" disabled="disabled" />
+				    <%-- If question contains images, where to take them from --%>
+				    <input type="hidden" id="question${questionStatus.index}resourcesFolder"
+				           name="question${questionStatus.index}resourcesFolder"
+				           value="<c:out value='${question.resourcesFolderPath}' />"
+				           class="questionAttribute" disabled="disabled" />
+				    <%-- Answers, if required and exist --%>
+					<c:if test="${fn:length(question.answers) > 0}">
+						<div id="question${questionStatus.index}answerDiv" class="answerDiv">
+							<input type="hidden" name="answerCount${questionStatus.index}" 
+							       value="${fn:length(question.answers)}" />
+							<c:forEach var="answer" items="${question.answers}" varStatus="answerStatus">
+								<%-- Answer itself --%>
+								<c:choose>
+									<c:when test="${questionEditable}">
+										<div class="form-group">
+											<input name="question${questionStatus.index}answer${answerStatus.index}"
+											       value="<c:out value='${answer.text}' />" class="answerVisible editableAttribute form-control"
+											       type="text" disabled="disabled" />
+											 <c:if test="${answer.score == 1}">(<fmt:message key="label.correct"/>)</c:if>
+										</div>
+									</c:when>
+									<c:when test="${question.type eq 'mc' or question.type eq 'mr' or question.type eq 'mh' or question.type eq 'fb'}">
+						       			<input name="question${questionStatus.index}answer${answerStatus.index}"
+							       			   value="<c:out value='${answer.text}' />" class="answerVisible"
+							       			   type="hidden" disabled="disabled" />
+							       		<c:if test="${answer.score == 1}"><b></c:if>
+							       		- ${answer.text}
+							       		<c:if test="${answer.score == 1}">&nbsp;(<fmt:message key="label.correct"/>)</b></c:if>
+							       		<br />
+					       			</c:when>
+					       			<c:otherwise>
+					       				<%-- Do not display answers if management is too difficult or pointless --%>
+										<input name="question${questionStatus.index}answer${answerStatus.index}"
+							       			   value="<c:out value='${answer.text}' />"
+							       			   type="hidden" disabled="disabled" />
+									</c:otherwise>
+								</c:choose>
+					       		<%-- Answers score and feedback --%>
+					       		<input type="hidden" name="question${questionStatus.index}answer${answerStatus.index}score"
+								       value="${answer.score}" disabled="disabled" />
+								<input type="hidden" name="question${questionStatus.index}answer${answerStatus.index}feedback"
+				           			   value="<c:out value='${answer.feedback}' />" disabled="disabled" />
+							</c:forEach>
+							<c:if test="${question.type eq 'mt'}">
+								<input type="hidden" name="matchAnswerCount${questionStatus.index}" 
+								       value="${fn:length(question.matchAnswers)}" />
+								<c:forEach var="matchAnswer" items="${question.matchAnswers}" varStatus="matchAnswerStatus">
+									<input name="question${questionStatus.index}matchAnswer${matchAnswerStatus.index}"
+							       		   value="<c:out value='${matchAnswer.text}' />"
+							       		   type="hidden" disabled="disabled" />
+								</c:forEach>
+								<c:forEach var="entry" items="${question.matchMap}">
+						       		<input name="question${questionStatus.index}match${entry.key}"
+						       		   	   value="${entry.value}"
+						       		   	   type="hidden" disabled="disabled" />
+							    </c:forEach>
+							</c:if>
+						</div>
+					</c:if>
+					
+					 <%-- Learning Outcomes, if required and exist --%>
+					<c:if test="${fn:length(question.learningOutcomes) > 0}">
+						<input type="hidden" name="learningOutcomeCount${questionStatus.index}" 
+							       value="${fn:length(question.learningOutcomes)}" />
+						<c:forEach var="learningOutcome" items="${question.learningOutcomes}" varStatus="learningOutcomeStatus">
+							<input name="question${questionStatus.index}learningOutcome${learningOutcomeStatus.index}"
+							       value="<c:out value='${learningOutcome}'/>" type="hidden" />
+						</c:forEach>
+					</c:if>
 				</c:forEach>
-			</c:if>
-		</c:forEach>
-		
-		<div id="buttonsDiv" class="voffset10 pull-right">
-			<input class="btn btn-default" value='<fmt:message key="button.cancel"/>' type="button" onClick="javascript:window.close()" />
-			<input id="submitButton" class="btn btn-primary" value='<fmt:message key="label.ok"/>'      type="button" onClick="javascript:submitForm()" />			
-		</div>
-	</form>
+				
+				<div id="buttonsDiv" class="voffset10 pull-right">
+					<input class="btn btn-default" value='<fmt:message key="button.cancel"/>' type="button" onClick="javascript:window.close()" />
+					<input id="submitButton" class="btn btn-primary" value='<fmt:message key="label.ok"/>'      type="button" onClick="javascript:submitForm()" />			
+				</div>
+			</form>
+		</c:otherwise>
+	</c:choose>
 
 <div id="footer"></div>
 </lams:Page>

@@ -634,7 +634,12 @@ public class QbService implements IQbService {
     @Override
     public List<QbCollection> getUserCollections(int userId) {
 	Set<QbCollection> collections = new LinkedHashSet<>();
-
+	
+	// even though it is covered by #getUserOwnCollections(),
+	// it creates user private collection when necessary
+	QbCollection privateCollection = getUserPrivateCollection(userId);
+	collections.add(privateCollection);
+	
 	collections.addAll(getUserOwnCollections(userId));
 
 	QbCollection publicCollection = getPublicCollection();

@@ -205,6 +205,9 @@ public class AuthoringController {
 	boolean questionEtherpadEnabled = StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
 	sessionMap.put(AssessmentConstants.ATTR_IS_QUESTION_ETHERPAD_ENABLED, questionEtherpadEnabled);
 
+	boolean aiEnabled = Configuration.isLamsModuleAvailable(Configuration.AI_MODULE_CLASS);
+	sessionMap.put(AssessmentConstants.ATTR_IS_AI_ENABLED, aiEnabled);
+
 	Hibernate.initialize(assessment.getSections());
 
 	return "pages/authoring/start";
