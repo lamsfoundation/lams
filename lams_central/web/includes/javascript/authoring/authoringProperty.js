@@ -1,4 +1,4 @@
-﻿﻿﻿﻿/**
+﻿/**
  * This file contains methods for Activity properties dialogs.
  */
 
