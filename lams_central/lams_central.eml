@@ -5,36 +5,36 @@
 		<excludeFolder url="file://$MODULE_DIR$/bin"/>
 	</contentEntry>
 	<lib name="commons-io-2.5.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/commons-io"/>
-		<relative-module-src project-related="file://$3RDPARTY_SOURCES_PROJECT$/commons-io"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_46$/commons-io"/>
+		<relative-module-src project-related="file://$3RDPARTY_SOURCES_PROJECT_46$/commons-io"/>
 	</lib>
 	<lib name="commons-lang-2.6.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/commons-lang"/>
-		<relative-module-src project-related="file://$3RDPARTY_SOURCES_PROJECT$/commons-lang"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_46$/commons-lang"/>
+		<relative-module-src project-related="file://$3RDPARTY_SOURCES_PROJECT_46$/commons-lang"/>
 	</lib>
 	<lib name="undertow-servlet-2.0.13.Final.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/undertow"/>
-		<relative-module-src project-related="file://$3RDPARTY_SOURCES_PROJECT$/undertow"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_46$/undertow"/>
+		<relative-module-src project-related="file://$3RDPARTY_SOURCES_PROJECT_46$/undertow"/>
 	</lib>
 	<lib name="undertow-core-2.0.13.Final.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/undertow"/>
-		<relative-module-src project-related="file://$3RDPARTY_SOURCES_PROJECT$/undertow"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_46$/undertow"/>
+		<relative-module-src project-related="file://$3RDPARTY_SOURCES_PROJECT_46$/undertow"/>
 	</lib>
 	<lib name="jackson-core-2.9.5.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/jackson"/>
-		<relative-module-src project-related="file://$3RDPARTY_SOURCES_PROJECT$/jackson"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_46$/jackson"/>
+		<relative-module-src project-related="file://$3RDPARTY_SOURCES_PROJECT_46$/jackson"/>
 	</lib>
 	<lib name="jackson-databind-2.9.5.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/jackson"/>
-		<relative-module-src project-related="file://$3RDPARTY_SOURCES_PROJECT$/jackson"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_46$/jackson"/>
+		<relative-module-src project-related="file://$3RDPARTY_SOURCES_PROJECT_46$/jackson"/>
 	</lib>
 	<lib name="javax.persistence-api-2.2.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/persistence-api"/>
-		<relative-module-src project-related="file://$3RDPARTY_SOURCES_PROJECT$/persistence-api"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_46$/persistence-api"/>
+		<relative-module-src project-related="file://$3RDPARTY_SOURCES_PROJECT_46$/persistence-api"/>
 	</lib>
 	<lib name="hibernate-core-5.3.6.Final.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/hibernate-core"/>
-		<relative-module-src project-related="file://$3RDPARTY_SOURCES_PROJECT$/hibernate-core"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_46$/hibernate-core"/>
+		<relative-module-src project-related="file://$3RDPARTY_SOURCES_PROJECT_46$/hibernate-core"/>
 	</lib>
 	<levels>
 		<level name="3rdParty" value="project"/>
