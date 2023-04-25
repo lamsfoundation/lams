@@ -24,10 +24,10 @@ import java.text.ParsePosition;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.format.SimpleFraction;
 import org.apache.poi.ss.formula.eval.NotImplementedException;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
 
 /**
  * <p>Format class that handles Excel style fractions, such as "# #/#" and "#/###"</p>
@@ -43,7 +43,7 @@ import org.apache.poi.util.POILogger;
 
 @SuppressWarnings("serial")
 public class FractionFormat extends Format {
-    private static final POILogger LOGGER = POILogFactory.getLogger(FractionFormat.class);
+    private static final Logger LOGGER = LogManager.getLogger(FractionFormat.class);
     private static final Pattern DENOM_FORMAT_PATTERN = Pattern.compile("(?:(#+)|(\\d+))");
 
     //this was chosen to match the earlier limitation of max denom power
@@ -90,7 +90,7 @@ public class FractionFormat extends Format {
                 }
             } else if (m.group(1) != null) {
                 int len = m.group(1).length();
-                len = len > MAX_DENOM_POW ? MAX_DENOM_POW : len;
+                len = Math.min(len, MAX_DENOM_POW);
                 tmpMax = (int)Math.pow(10, len);
             } else {
                 tmpExact = 100;
@@ -106,12 +106,15 @@ public class FractionFormat extends Format {
 
     @SuppressWarnings("squid:S2111")
     public String format(Number num) {
+        final double d = num.doubleValue();
+        return format(new BigDecimal(d));
+    }
 
-        final BigDecimal doubleValue = new BigDecimal(num.doubleValue());
+    @SuppressWarnings("squid:S2111")
+    private String format(final BigDecimal decimal) {
+        final boolean isNeg = decimal.compareTo(BigDecimal.ZERO) < 0;
 
-        final boolean isNeg = doubleValue.compareTo(BigDecimal.ZERO) < 0;
-
-        final BigDecimal absValue = doubleValue.abs();
+        final BigDecimal absValue = decimal.abs();
         final BigDecimal wholePart = new BigDecimal(absValue.toBigInteger());
         final BigDecimal decPart = absValue.remainder(BigDecimal.ONE);
 
@@ -132,7 +135,7 @@ public class FractionFormat extends Format {
 
             StringBuilder sb = new StringBuilder();
             if (isNeg){
-                sb.append("-");
+                sb.append('-');
             }
             sb.append(wholePart);
             return sb.toString();
@@ -147,22 +150,22 @@ public class FractionFormat extends Format {
                 fract = SimpleFraction.buildFractionMaxDenominator(decPart.doubleValue(), maxDenom);
             }
         } catch (RuntimeException e){
-            LOGGER.log(POILogger.WARN, "Can't format fraction", e);
-            return Double.toString(doubleValue.doubleValue());
+            LOGGER.atWarn().withThrowable(e).log("Can't format fraction");
+            return Double.toString(decimal.doubleValue());
         }
 
         StringBuilder sb = new StringBuilder();
 
         //now format the results
         if (isNeg){
-            sb.append("-");
+            sb.append('-');
         }
 
         //if whole part has to go into the numerator
         if (wholePartFormatString == null || wholePartFormatString.isEmpty()){
             final int fden = fract.getDenominator();
             final int fnum = fract.getNumerator();
-            BigDecimal trueNum = wholePart.multiply(new BigDecimal(fden)).add(new BigDecimal(fnum));
+            BigDecimal trueNum = wholePart.multiply(BigDecimal.valueOf(fden)).add(BigDecimal.valueOf(fnum));
             sb.append(trueNum.toBigInteger()).append("/").append(fden);
             return sb.toString();
         }
@@ -184,10 +187,12 @@ public class FractionFormat extends Format {
         return sb.toString();
     }
 
+    @Override
     public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
         return toAppendTo.append(format((Number)obj));
     }
 
+    @Override
     public Object parseObject(String source, ParsePosition pos) {
         throw new NotImplementedException("Reverse parsing not supported");
     }

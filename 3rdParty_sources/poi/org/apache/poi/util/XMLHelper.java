@@ -46,6 +46,9 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.validation.SchemaFactory;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -74,11 +77,10 @@ public final class XMLHelper {
     };
 
 
-    private static POILogger logger = POILogFactory.getLogger(XMLHelper.class);
+    private static final Logger LOG = LogManager.getLogger(XMLHelper.class);
     private static long lastLog;
 
     // DocumentBuilderFactory.newDocumentBuilder is thread-safe
-    // see https://stackoverflow.com/questions/12455602/is-documentbuilder-thread-safe
     private static final DocumentBuilderFactory documentBuilderFactory = getDocumentBuilderFactory();
 
     private static final SAXParserFactory saxFactory = getSaxParserFactory();
@@ -108,8 +110,8 @@ public final class XMLHelper {
         factory.setExpandEntityReferences(false);
         factory.setValidating(false);
         trySet(factory::setFeature, FEATURE_SECURE_PROCESSING, true);
-        trySet(factory::setAttribute, ACCESS_EXTERNAL_SCHEMA, "");
-        trySet(factory::setAttribute, ACCESS_EXTERNAL_DTD, "");
+        quietSet(factory::setAttribute, ACCESS_EXTERNAL_SCHEMA, "");
+        quietSet(factory::setAttribute, ACCESS_EXTERNAL_DTD, "");
         trySet(factory::setFeature, FEATURE_EXTERNAL_ENTITIES, false);
         trySet(factory::setFeature, FEATURE_PARAMETER_ENTITIES, false);
         trySet(factory::setFeature, FEATURE_LOAD_EXTERNAL_DTD, false);
@@ -154,6 +156,7 @@ public final class XMLHelper {
             trySet(factory::setFeature, FEATURE_LOAD_DTD_GRAMMAR, false);
             trySet(factory::setFeature, FEATURE_LOAD_EXTERNAL_DTD, false);
             trySet(factory::setFeature, FEATURE_EXTERNAL_ENTITIES, false);
+            trySet(factory::setFeature, FEATURE_DISALLOW_DOCTYPE_DECL, true);
             return factory;
         } catch (RuntimeException | Error re) { // NOSONAR
             // this also catches NoClassDefFoundError, which may be due to a local class path issue
@@ -217,9 +220,9 @@ public final class XMLHelper {
     public static TransformerFactory getTransformerFactory() {
         TransformerFactory factory = TransformerFactory.newInstance();
         trySet(factory::setFeature, FEATURE_SECURE_PROCESSING, true);
-        trySet(factory::setAttribute, ACCESS_EXTERNAL_DTD, "");
-        trySet(factory::setAttribute, ACCESS_EXTERNAL_STYLESHEET, "");
-        trySet(factory::setAttribute, ACCESS_EXTERNAL_SCHEMA, "");
+        quietSet(factory::setAttribute, ACCESS_EXTERNAL_DTD, "");
+        quietSet(factory::setAttribute, ACCESS_EXTERNAL_STYLESHEET, "");
+        quietSet(factory::setAttribute, ACCESS_EXTERNAL_SCHEMA, "");
         return factory;
     }
 
@@ -236,9 +239,9 @@ public final class XMLHelper {
     public static SchemaFactory getSchemaFactory() {
         SchemaFactory factory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
         trySet(factory::setFeature, FEATURE_SECURE_PROCESSING, true);
-        trySet(factory::setProperty, ACCESS_EXTERNAL_DTD, "");
-        trySet(factory::setProperty, ACCESS_EXTERNAL_STYLESHEET, "");
-        trySet(factory::setProperty, ACCESS_EXTERNAL_SCHEMA, "");
+        quietSet(factory::setProperty, ACCESS_EXTERNAL_DTD, "");
+        quietSet(factory::setProperty, ACCESS_EXTERNAL_STYLESHEET, "");
+        quietSet(factory::setProperty, ACCESS_EXTERNAL_SCHEMA, "");
         return factory;
     }
 
@@ -288,9 +291,19 @@ public final class XMLHelper {
         return false;
     }
 
+    private static boolean quietSet(SecurityProperty property, String name, Object value) {
+        try {
+            property.accept(name, value);
+            return true;
+        } catch (Exception|Error e) {
+            // ok to ignore
+        }
+        return false;
+    }
+
     private static void logThrowable(Throwable t, String message, String name) {
         if (System.currentTimeMillis() > lastLog + TimeUnit.MINUTES.toMillis(5)) {
-            logger.log(POILogger.WARN, message + " [log suppressed for 5 minutes]", name, t);
+            LOG.atWarn().withThrowable(t).log("{} [log suppressed for 5 minutes] {}", message, name);
             lastLog = System.currentTimeMillis();
         }
     }
@@ -298,22 +311,22 @@ public final class XMLHelper {
     private static class DocHelperErrorHandler implements ErrorHandler {
 
         public void warning(SAXParseException exception) {
-            printError(POILogger.WARN, exception);
+            printError(Level.WARN, exception);
         }
 
         public void error(SAXParseException exception) {
-            printError(POILogger.ERROR, exception);
+            printError(Level.ERROR, exception);
         }
 
         public void fatalError(SAXParseException exception) throws SAXException {
-            printError(POILogger.FATAL, exception);
+            printError(Level.FATAL, exception);
             throw exception;
         }
 
         /**
          * Prints the error message.
          */
-        private void printError(int type, SAXParseException ex) {
+        private void printError(Level type, SAXParseException ex) {
             String systemId = ex.getSystemId();
             if (systemId != null) {
                 int index = systemId.lastIndexOf('/');
@@ -326,7 +339,7 @@ public final class XMLHelper {
                     ':' + ex.getColumnNumber() +
                     ':' + ex.getMessage();
 
-            logger.log(type, message, ex);
+            LOG.atLevel(type).withThrowable(ex).log(message);
         }
     }
 

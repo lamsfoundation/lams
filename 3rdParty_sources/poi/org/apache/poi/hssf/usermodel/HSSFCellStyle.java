@@ -70,7 +70,7 @@ public final class HSSFCellStyle implements CellStyle, Duplicatable {
 
 
     /**
-     * get the index within the HSSFWorkbook (sequence within the collection of ExtnededFormat objects)
+     * get the index within the HSSFWorkbook (sequence within the collection of ExtendedFormat objects)
      * @return unique index number of the underlying record this style represents (probably you don't care
      *  unless you're comparing which one is which)
      */
@@ -637,6 +637,24 @@ public final class HSSFCellStyle implements CellStyle, Duplicatable {
         _format.setFillBackground(bg);
         checkDefaultBackgroundFills();
     }
+    
+    /**
+     * Set the background fill color represented as a {@link org.apache.poi.ss.usermodel.Color} value.
+     * <br>
+     * @param color the color to use
+     * @throws IllegalArgumentException if you provide a <code>Color</code> instance that is not a {@link HSSFColor}
+     * @since POI 5.2.3
+     */
+    @Override
+    public void setFillBackgroundColor(org.apache.poi.ss.usermodel.Color color)
+    {
+        if (color instanceof HSSFColor) {
+            short index2 = ((HSSFColor)color).getIndex2();
+            if (index2 != -1) setFillBackgroundColor(index2);
+        } else if (color != null) {
+            throw new IllegalArgumentException("HSSFCellStyle only accepts HSSFColor instances");
+        }
+    }
 
     /**
      * Get the background fill color.
@@ -677,6 +695,24 @@ public final class HSSFCellStyle implements CellStyle, Duplicatable {
     {
         _format.setFillForeground(bg);
         checkDefaultBackgroundFills();
+    }
+    
+    /**
+     * Set the foreground fill color represented as a {@link org.apache.poi.ss.usermodel.Color} value.
+     * <br>
+     * @param color the color to use
+     * @throws IllegalArgumentException if you provide a <code>Color</code> instance that is not a {@link HSSFColor}
+     * @since POI 5.2.3
+     */
+    @Override
+    public void setFillForegroundColor(org.apache.poi.ss.usermodel.Color color)
+    {
+        if (color instanceof HSSFColor) {
+            short index2 = ((HSSFColor)color).getIndex2();
+            if (index2 != -1) setFillForegroundColor(index2);
+        } else if (color != null) {
+            throw new IllegalArgumentException("HSSFCellStyle only accepts HSSFColor instances");
+        }
     }
 
     /**

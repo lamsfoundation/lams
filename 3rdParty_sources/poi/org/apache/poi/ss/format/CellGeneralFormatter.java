@@ -23,8 +23,6 @@ import org.apache.poi.util.LocaleUtil;
 
 /**
  * A formatter for the default "General" cell format.
- *
- * @author Ken Arnold, Industrious Media LLC
  */
 public class CellGeneralFormatter extends CellFormatter {
     /** Creates a new general formatter. */
@@ -43,6 +41,7 @@ public class CellGeneralFormatter extends CellFormatter {
      * @param toAppendTo The buffer to append to.
      * @param value      The value to format.
      */
+    @Override
     public void formatValue(StringBuffer toAppendTo, Object value) {
         if (value instanceof Number) {
             double val = ((Number) value).doubleValue();
@@ -88,6 +87,7 @@ public class CellGeneralFormatter extends CellFormatter {
     }
 
     /** Equivalent to {@link #formatValue(StringBuffer,Object)}. {@inheritDoc}. */
+    @Override
     public void simpleValue(StringBuffer toAppendTo, Object value) {
         formatValue(toAppendTo, value);
     }

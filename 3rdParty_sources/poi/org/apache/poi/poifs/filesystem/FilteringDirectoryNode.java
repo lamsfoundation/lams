@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
 
 import org.apache.poi.hpsf.ClassID;
 
@@ -45,13 +47,13 @@ public class FilteringDirectoryNode implements DirectoryEntry
    /**
     * The names of our entries to exclude
     */
-   private Set<String> excludes;
+   private final Set<String> excludes;
    /**
     * Excludes of our child directories
     */
-   private Map<String,List<String>> childExcludes;
+   private final Map<String,List<String>> childExcludes;
 
-   private DirectoryEntry directory;
+   private final DirectoryEntry directory;
 
    /**
     * Creates a filter round the specified directory, which
@@ -88,28 +90,42 @@ public class FilteringDirectoryNode implements DirectoryEntry
       }
    }
 
+   @Override
    public DirectoryEntry createDirectory(String name) throws IOException {
       return directory.createDirectory(name);
    }
 
+   @Override
    public DocumentEntry createDocument(String name, InputStream stream)
          throws IOException {
       return directory.createDocument(name, stream);
    }
 
+   @Override
    public DocumentEntry createDocument(String name, int size,
          POIFSWriterListener writer) throws IOException {
       return directory.createDocument(name, size, writer);
    }
 
+   @Override
    public Iterator<Entry> getEntries() {
       return new FilteringIterator();
    }
 
+   @Override
    public Iterator<Entry> iterator() {
       return getEntries();
    }
 
+   /**
+    * @since POI 5.2.0
+    */
+   @Override
+   public Spliterator<Entry> spliterator() {
+      return Spliterators.spliterator(iterator(), getEntryCount(), 0);
+   }
+
+   @Override
    public int getEntryCount() {
       int size = directory.getEntryCount();
       for (String excl : excludes) {
@@ -120,6 +136,7 @@ public class FilteringDirectoryNode implements DirectoryEntry
       return size;
    }
 
+   @Override
    public Set<String> getEntryNames() {
        Set<String> names = new HashSet<>();
        for (String name : directory.getEntryNames()) {
@@ -130,10 +147,12 @@ public class FilteringDirectoryNode implements DirectoryEntry
        return names;
    }
 
+   @Override
    public boolean isEmpty() {
       return (getEntryCount() == 0);
    }
 
+   @Override
    public boolean hasEntry(String name) {
       if (excludes.contains(name)) {
          return false;
@@ -141,6 +160,7 @@ public class FilteringDirectoryNode implements DirectoryEntry
       return directory.hasEntry(name);
    }
 
+   @Override
    public Entry getEntry(String name) throws FileNotFoundException {
       if (excludes.contains(name)) {
          throw new FileNotFoundException(name);
@@ -158,40 +178,48 @@ public class FilteringDirectoryNode implements DirectoryEntry
       return entry;
    }
 
+   @Override
    public ClassID getStorageClsid() {
       return directory.getStorageClsid();
    }
 
+   @Override
    public void setStorageClsid(ClassID clsidStorage) {
       directory.setStorageClsid(clsidStorage);
    }
 
+   @Override
    public boolean delete() {
       return directory.delete();
    }
 
+   @Override
    public boolean renameTo(String newName) {
       return directory.renameTo(newName);
    }
 
+   @Override
    public String getName() {
       return directory.getName();
    }
 
+   @Override
    public DirectoryEntry getParent() {
       return directory.getParent();
    }
 
+   @Override
    public boolean isDirectoryEntry() {
       return true;
    }
 
+   @Override
    public boolean isDocumentEntry() {
       return false;
    }
 
    private class FilteringIterator implements Iterator<Entry> {
-      private Iterator<Entry> parent;
+      private final Iterator<Entry> parent;
       private Entry next;
 
       private FilteringIterator() {
@@ -209,10 +237,12 @@ public class FilteringDirectoryNode implements DirectoryEntry
          }
       }
 
+      @Override
       public boolean hasNext() {
          return (next != null);
       }
 
+      @Override
       public Entry next() {
          if (!hasNext()) {
             throw new NoSuchElementException();
@@ -223,6 +253,7 @@ public class FilteringDirectoryNode implements DirectoryEntry
          return e;
       }
 
+      @Override
       public void remove() {
          throw new UnsupportedOperationException("Remove not supported");
       }

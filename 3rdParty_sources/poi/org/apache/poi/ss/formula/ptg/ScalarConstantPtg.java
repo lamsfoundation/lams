@@ -22,11 +22,13 @@ package org.apache.poi.ss.formula.ptg;
  * Common superclass of all {@link Ptg Ptgs} that represent simple constant values.
  */
 public abstract class ScalarConstantPtg extends Ptg {
-	public final boolean isBaseToken() {
-		return true;
-	}
+    @Override
+    public final boolean isBaseToken() {
+        return true;
+    }
 
-	public final byte getDefaultOperandClass() {
-		return Ptg.CLASS_VALUE;
-	}
+    @Override
+    public final byte getDefaultOperandClass() {
+        return Ptg.CLASS_VALUE;
+    }
 }

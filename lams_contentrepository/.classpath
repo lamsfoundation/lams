@@ -21,6 +21,6 @@
 	</classpathentry>
 	<classpathentry kind="var" path="WILDFLY_HOME_46/modules/system/layers/base/javax/persistence/api/main/javax.persistence-api-2.2.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT_46/persistence-api"/>
 	<classpathentry kind="var" path="WILDFLY_HOME_46/modules/system/layers/base/org/hibernate/main/hibernate-core-5.3.6.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT_46/hibernate-core"/>
-	<classpathentry kind="var" path="WILDFLY_HOME_46/modules/system/layers/base/org/apache/commons/io/main/commons-io-2.5.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT_46/commons-io"/>
+	<classpathentry kind="var" path="WILDFLY_HOME_46/modules/system/layers/base/org/apache/commons/io/main/commons-io-2.11.0.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT_46/commons-io"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -17,11 +17,10 @@
 
 package org.apache.poi.poifs.macros;
 
+import static org.apache.logging.log4j.util.Unbox.box;
 import static org.apache.poi.util.StringUtil.endsWithIgnoreCase;
 import static org.apache.poi.util.StringUtil.startsWithIgnoreCase;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.EOFException;
 import java.io.File;
@@ -37,6 +36,10 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.apache.commons.io.input.UnsynchronizedByteArrayInputStream;
+import org.apache.commons.io.output.UnsynchronizedByteArrayOutputStream;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.DocumentInputStream;
 import org.apache.poi.poifs.filesystem.DocumentNode;
@@ -49,8 +52,6 @@ import org.apache.poi.util.CodePageUtil;
 import org.apache.poi.util.HexDump;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.LittleEndian;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
 import org.apache.poi.util.RLEDecompressingInputStream;
 import org.apache.poi.util.StringUtil;
 
@@ -67,8 +68,9 @@ import org.apache.poi.util.StringUtil;
  *
  * @since 3.15-beta2
  */
+@SuppressWarnings("unused")
 public class VBAMacroReader implements Closeable {
-    private static final POILogger LOGGER = POILogFactory.getLogger(VBAMacroReader.class);
+    private static final Logger LOGGER = LogManager.getLogger(VBAMacroReader.class);
 
     //arbitrary limit on size of strings to read, etc.
     private static final int MAX_STRING_LENGTH = 20000;
@@ -120,6 +122,7 @@ public class VBAMacroReader implements Closeable {
         throw new IllegalArgumentException("No VBA project found");
     }
 
+    @Override
     public void close() throws IOException {
         fs.close();
         fs = null;
@@ -165,14 +168,13 @@ public class VBAMacroReader implements Closeable {
         ModuleType moduleType;
         Charset charset;
         void read(InputStream in) throws IOException {
-            final ByteArrayOutputStream out = new ByteArrayOutputStream();
-            IOUtils.copy(in, out);
-            out.close();
-            buf = out.toByteArray();
+            buf = IOUtils.toByteArray(in);
         }
+        @Override
         public String getContent() {
             return new String(buf, charset);
         }
+        @Override
         public ModuleType geModuleType() {
             return moduleType;
         }
@@ -182,9 +184,9 @@ public class VBAMacroReader implements Closeable {
     }
 
     /**
-     * Recursively traverses directory structure rooted at <tt>dir</tt>.
+     * Recursively traverses directory structure rooted at {@code dir}.
      * For each macro module that is found, the module's name and code are
-     * added to <tt>modules<tt>.
+     * added to {@code modules}.
      *
      * @param dir The directory of entries to look at
      * @param modules The resulting map of modules
@@ -231,7 +233,7 @@ public class VBAMacroReader implements Closeable {
         } else {
             // Decompress a previously found module and store the decompressed result into module.buf
             InputStream stream = new RLEDecompressingInputStream(
-                    new ByteArrayInputStream(module.buf, moduleOffset, module.buf.length - moduleOffset)
+                    new UnsynchronizedByteArrayInputStream(module.buf, moduleOffset, module.buf.length - moduleOffset)
             );
             module.read(stream);
             stream.close();
@@ -263,25 +265,24 @@ public class VBAMacroReader implements Closeable {
                     module.read(decompressed);
                 }
                 return;
-            } catch (IllegalArgumentException | IllegalStateException e) {
+            } catch (IllegalArgumentException | IllegalStateException ignored) {
             }
 
             //bad module.offset, try brute force
-            ;
             byte[] decompressedBytes;
             try (InputStream compressed = new DocumentInputStream(documentNode)) {
                 decompressedBytes = findCompressedStreamWBruteForce(compressed);
             }
 
             if (decompressedBytes != null) {
-                module.read(new ByteArrayInputStream(decompressedBytes));
+                module.read(new UnsynchronizedByteArrayInputStream(decompressedBytes));
             }
         }
 
     }
 
     /**
-      * Skips <tt>n</tt> bytes in an input stream, throwing IOException if the
+      * Skips {@code n} bytes in an input stream, throwing IOException if the
       * number of bytes skipped is different than requested.
       * @throws IOException If skipping would exceed the available data or skipping did not work.
       */
@@ -310,7 +311,7 @@ public class VBAMacroReader implements Closeable {
 
     /**
      * Reads VBA Project modules from a VBA Project directory located at
-     * <tt>macroDir</tt> into <tt>modules</tt>.
+     * {@code macroDir} into {@code modules}.
      *
      * @since 3.15-beta2
      */
@@ -411,13 +412,12 @@ public class VBAMacroReader implements Closeable {
         UNKNOWN(-2);
 
 
-        private final int VARIABLE_LENGTH = -1;
         private final int id;
         private final int constantLength;
 
         RecordType(int id) {
             this.id = id;
-            this.constantLength = VARIABLE_LENGTH;
+            this.constantLength = -1;
         }
 
         RecordType(int id, int constantLength) {
@@ -633,8 +633,8 @@ public class VBAMacroReader implements Closeable {
                                            Map<String, String> moduleNames, Charset charset) throws IOException {
         //see 2.3.3 PROJECTwm Stream: Module Name Information
         //multibytecharstring
-        String mbcs = null;
-        String unicode = null;
+        String mbcs;
+        String unicode;
         //arbitrary sanity threshold
         final int maxNameRecords = 10000;
         int records = 0;
@@ -648,61 +648,60 @@ public class VBAMacroReader implements Closeable {
                         return;
                     }
                 }
-                mbcs = readMBCS(b, is, charset, MAX_STRING_LENGTH);
+                mbcs = readMBCS(b, is, charset);
             } catch (EOFException e) {
                 return;
             }
 
             try {
-                unicode = readUnicode(is, MAX_STRING_LENGTH);
+                unicode = readUnicode(is);
             } catch (EOFException e) {
                 return;
             }
-            if (mbcs.trim().length() > 0 && unicode.trim().length() > 0) {
+            if (StringUtil.isNotBlank(mbcs) && StringUtil.isNotBlank(unicode)) {
                 moduleNames.put(mbcs, unicode);
             }
 
         }
-        if (records >= maxNameRecords) {
-            LOGGER.log(POILogger.WARN, "Hit max name records to read ("+maxNameRecords+"). Stopped early.");
-        }
+        LOGGER.atWarn().log("Hit max name records to read (" + maxNameRecords + "). Stopped early.");
     }
 
-    private static String readUnicode(InputStream is, int maxLength) throws IOException {
+    private static String readUnicode(InputStream is) throws IOException {
         //reads null-terminated unicode string
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        int b0 = IOUtils.readByte(is);
-        int b1 = IOUtils.readByte(is);
+        try (UnsynchronizedByteArrayOutputStream bos = new UnsynchronizedByteArrayOutputStream()) {
+            int b0 = IOUtils.readByte(is);
+            int b1 = IOUtils.readByte(is);
 
-        int read = 2;
-        while ((b0 + b1) != 0 && read < maxLength) {
-
-            bos.write(b0);
-            bos.write(b1);
-            b0 = IOUtils.readByte(is);
-            b1 = IOUtils.readByte(is);
-            read += 2;
+            int read = 2;
+            while ((b0 + b1) != 0 && read < MAX_STRING_LENGTH) {
+                bos.write(b0);
+                bos.write(b1);
+                b0 = IOUtils.readByte(is);
+                b1 = IOUtils.readByte(is);
+                read += 2;
+            }
+            if (read >= MAX_STRING_LENGTH) {
+                LOGGER.atWarn().log("stopped reading unicode name after {} bytes", box(read));
+            }
+            return bos.toString(StandardCharsets.UTF_16LE);
         }
-        if (read >= maxLength) {
-            LOGGER.log(POILogger.WARN, "stopped reading unicode name after "+read+" bytes");
-        }
-        return new String (bos.toByteArray(), StandardCharsets.UTF_16LE);
     }
 
-    private static String readMBCS(int firstByte, InputStream is, Charset charset, int maxLength) throws IOException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        int len = 0;
-        int b = firstByte;
-        while (b > 0 && len < maxLength) {
-            ++len;
-            bos.write(b);
-            b = IOUtils.readByte(is);
+    private static String readMBCS(int firstByte, InputStream is, Charset charset) throws IOException {
+        try (UnsynchronizedByteArrayOutputStream bos = new UnsynchronizedByteArrayOutputStream()) {
+            int len = 0;
+            int b = firstByte;
+            while (b > 0 && len < MAX_STRING_LENGTH) {
+                ++len;
+                bos.write(b);
+                b = IOUtils.readByte(is);
+            }
+            return bos.toString(charset);
         }
-        return new String(bos.toByteArray(), charset);
     }
 
     /**
-     * Read <tt>length</tt> bytes of MBCS (multi-byte character set) characters from the stream
+     * Read {@code length} bytes of MBCS (multi-byte character set) characters from the stream
      *
      * @param stream the inputstream to read from
      * @param length number of bytes to read from stream
@@ -747,21 +746,21 @@ public class VBAMacroReader implements Closeable {
                     if (module != null) {
                         module.moduleType = ModuleType.Document;
                     } else {
-                        LOGGER.log(POILogger.WARN, "couldn't find module with name: "+mn);
+                        LOGGER.atWarn().log("couldn't find module with name: {}", mn);
                     }
                 } else if ("Module".equals(tokens[0]) && tokens.length > 1) {
                     ModuleImpl module = getModule(tokens[1], moduleNameMap, modules);
                     if (module != null) {
                         module.moduleType = ModuleType.Module;
                     } else {
-                        LOGGER.log(POILogger.WARN, "couldn't find module with name: "+tokens[1]);
+                        LOGGER.atWarn().log("couldn't find module with name: {}", tokens[1]);
                     }
                 } else if ("Class".equals(tokens[0]) && tokens.length > 1) {
                     ModuleImpl module = getModule(tokens[1], moduleNameMap, modules);
                     if (module != null) {
                         module.moduleType = ModuleType.Class;
                     } else {
-                        LOGGER.log(POILogger.WARN, "couldn't find module with name: "+tokens[1]);
+                        LOGGER.atWarn().log("couldn't find module with name: {}", tokens[1]);
                     }
                 }
             }
@@ -786,18 +785,16 @@ public class VBAMacroReader implements Closeable {
 
     /**
      * Sometimes the offset record in the dirstream is incorrect, but the macro can still be found.
-     * This will try to find the the first RLEDecompressing stream that starts with "Attribute".
+     * This will try to find the first RLEDecompressing stream that starts with "Attribute".
      * This relies on some, er, heuristics, admittedly.
      *
      * @param is full module inputstream to read
-     * @return uncompressed bytes if found, <code>null</code> otherwise
+     * @return uncompressed bytes if found, {@code null} otherwise
      * @throws IOException for a true IOException copying the is to a byte array
      */
     private static byte[] findCompressedStreamWBruteForce(InputStream is) throws IOException {
         //buffer to memory for multiple tries
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        IOUtils.copy(is, bos);
-        byte[] compressed = bos.toByteArray();
+        byte[] compressed = IOUtils.toByteArray(is);
         byte[] decompressed = null;
         for (int i = 0; i < compressed.length; i++) {
             if (compressed[i] == 0x01 && i < compressed.length-1) {
@@ -805,7 +802,7 @@ public class VBAMacroReader implements Closeable {
                 if (w <= 0 || (w & 0x7000) != 0x3000) {
                     continue;
                 }
-                decompressed = tryToDecompress(new ByteArrayInputStream(compressed, i, compressed.length - i));
+                decompressed = tryToDecompress(new UnsynchronizedByteArrayInputStream(compressed, i, compressed.length - i));
                 if (decompressed != null) {
                     if (decompressed.length > 9) {
                         //this is a complete hack.  The challenge is that there
@@ -824,12 +821,10 @@ public class VBAMacroReader implements Closeable {
     }
 
     private static byte[] tryToDecompress(InputStream is) {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        try {
-            IOUtils.copy(new RLEDecompressingInputStream(is), bos);
+        try (RLEDecompressingInputStream ris = new RLEDecompressingInputStream(is)) {
+            return IOUtils.toByteArray(ris);
         } catch (IllegalArgumentException | IOException | IllegalStateException e){
             return null;
         }
-        return bos.toByteArray();
     }
 }

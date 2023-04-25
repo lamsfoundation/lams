@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,27 +21,23 @@ import static org.apache.commons.io.IOUtils.EOF;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.io.IOUtils;
+
 /**
- * Data written to this stream is forwarded to a stream that has been associated
- * with this thread.
- *
- * @version $Id: DemuxInputStream.java 1586350 2014-04-10 15:57:20Z ggregory $
+ * Data written to this stream is forwarded to a stream that has been associated with this thread.
  */
-public class DemuxInputStream
-    extends InputStream
-{
-    private final InheritableThreadLocal<InputStream> m_streams = new InheritableThreadLocal<InputStream>();
+public class DemuxInputStream extends InputStream {
+    private final InheritableThreadLocal<InputStream> inputStreamLocal = new InheritableThreadLocal<>();
 
     /**
-     * Bind the specified stream to the current thread.
+     * Binds the specified stream to the current thread.
      *
      * @param input the stream to bind
      * @return the InputStream that was previously active
      */
-    public InputStream bindStream( final InputStream input )
-    {
-        final InputStream oldValue = m_streams.get();
-        m_streams.set( input );
+    public InputStream bindStream(final InputStream input) {
+        final InputStream oldValue = inputStreamLocal.get();
+        inputStreamLocal.set(input);
         return oldValue;
     }
 
@@ -50,35 +46,25 @@ public class DemuxInputStream
      *
      * @throws IOException if an error occurs
      */
+    @SuppressWarnings("resource") // we actually close the stream here
     @Override
-    public void close()
-        throws IOException
-    {
-        final InputStream input = m_streams.get();
-        if( null != input )
-        {
-            input.close();
-        }
+    public void close() throws IOException {
+        IOUtils.close(inputStreamLocal.get());
     }
 
     /**
-     * Read byte from stream associated with current thread.
+     * Reads byte from stream associated with current thread.
      *
      * @return the byte read from stream
      * @throws IOException if an error occurs
      */
+    @SuppressWarnings("resource")
     @Override
-    public int read()
-        throws IOException
-    {
-        final InputStream input = m_streams.get();
-        if( null != input )
-        {
-            return input.read();
+    public int read() throws IOException {
+        final InputStream inputStream = inputStreamLocal.get();
+        if (null != inputStream) {
+            return inputStream.read();
         }
-        else
-        {
-            return EOF;
-        }
+        return EOF;
     }
 }

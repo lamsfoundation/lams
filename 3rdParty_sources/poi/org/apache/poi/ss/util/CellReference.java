@@ -38,12 +38,12 @@ import org.apache.poi.util.GenericRecordUtil;
  *  style references. Handles sheet-based and sheet-free references
  *  as well, eg "Sheet1!A1" and "$B$72"</p>
  *
- *  <p>Use <tt>CellReference</tt> when the concept of
+ *  <p>Use {@code CellReference} when the concept of
  * relative/absolute does apply (such as a cell reference in a formula).
  * Use {@link CellAddress} when you want to refer to the location of a cell in a sheet
  * when the concept of relative/absolute does not apply (such as the anchor location
  * of a cell comment).
- * <tt>CellReference</tt>s have a concept of "sheet", while <tt>CellAddress</tt>es do not.</p>
+ * {@code CellReference}s have a concept of "sheet", while {@code CellAddress}es do not.</p>
  */
 public class CellReference implements GenericRecord {
     /**
@@ -109,6 +109,7 @@ public class CellReference implements GenericRecord {
     /**
      * Create an cell ref from a string representation.  Sheet names containing special characters should be
      * delimited and escaped as per normal syntax rules for formulas.
+     * @throws IllegalArgumentException if cellRef is not valid
      */
     public CellReference(String cellRef) {
         if(endsWithIgnoreCase(cellRef, "#REF!")) {
@@ -177,7 +178,7 @@ public class CellReference implements GenericRecord {
     public boolean isRowAbsolute(){return _isRowAbs;}
     public boolean isColAbsolute(){return _isColAbs;}
     /**
-     * @return possibly <code>null</code> if this is a 2D reference.  Special characters are not
+     * @return possibly {@code null} if this is a 2D reference.  Special characters are not
      * escaped or delimited
      */
     public String getSheetName(){
@@ -216,7 +217,7 @@ public class CellReference implements GenericRecord {
 
     /**
      * Classifies an identifier as either a simple (2D) cell reference or a named range name
-     * @return one of the values from <tt>NameType</tt>
+     * @return one of the values from {@code NameType}
      */
     public static NameType classifyCellReference(String str, SpreadsheetVersion ssVersion) {
         int len = str.length();
@@ -290,18 +291,18 @@ public class CellReference implements GenericRecord {
      * reference is valid (in range) becomes important.
      * <p>
      * Note - that the maximum sheet size varies across Excel versions:
-     * <p>
-     * <blockquote><table border="0" cellpadding="1" cellspacing="0"
-     *                 summary="Notable cases.">
+     * <table>
+     *   <caption>Notable cases.</caption>
      *   <tr><th>Version&nbsp;&nbsp;</th><th>File Format&nbsp;&nbsp;</th>
-     *   	<th>Last Column&nbsp;&nbsp;</th><th>Last Row</th></tr>
+     *      <th>Last Column&nbsp;&nbsp;</th><th>Last Row</th></tr>
      *   <tr><td>97-2003</td><td>BIFF8</td><td>"IV" (2^8)</td><td>65536 (2^14)</td></tr>
      *   <tr><td>2007</td><td>BIFF12</td><td>"XFD" (2^14)</td><td>1048576 (2^20)</td></tr>
-     * </table></blockquote>
+     * </table>
+     *
      * POI currently targets BIFF8 (Excel 97-2003), so the following behaviour can be observed for
      * this method:
-     * <blockquote><table border="0" cellpadding="1" cellspacing="0"
-     *                 summary="Notable cases.">
+     * <table>
+     *   <caption>Notable cases</caption>
      *   <tr><th>Input&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
      *       <th>Result&nbsp;</th></tr>
      *   <tr><td>"A", "1"</td><td>true</td></tr>
@@ -313,11 +314,11 @@ public class CellReference implements GenericRecord {
      *   <tr><td>"AAA", "1"</td><td>false</td></tr>
      *   <tr><td>"a", "111"</td><td>true</td></tr>
      *   <tr><td>"Sheet", "1"</td><td>false</td></tr>
-     * </table></blockquote>
+     * </table>
      *
      * @param colStr a string of only letter characters
      * @param rowStr a string of only digit characters
-     * @return <code>true</code> if the row and col parameters are within range of a BIFF8 spreadsheet.
+     * @return {@code true} if the row and col parameters are within range of a BIFF8 spreadsheet.
      */
     public static boolean cellReferenceIsWithinRange(String colStr, String rowStr, SpreadsheetVersion ssVersion) {
         if (!isColumnWithinRange(colStr, ssVersion)) {
@@ -483,16 +484,38 @@ public class CellReference implements GenericRecord {
      * Returns a text representation of this cell reference.
      * <p>
      *  Example return values:
-     *	<table border="0" cellpadding="1" cellspacing="0" summary="Example return values">
-     *	  <tr><th align='left'>Result</th><th align='left'>Comment</th></tr>
-     *	  <tr><td>A1</td><td>Cell reference without sheet</td></tr>
-     *	  <tr><td>Sheet1!A1</td><td>Standard sheet name</td></tr>
-     *	  <tr><td>'O''Brien''s Sales'!A1'&nbsp;</td><td>Sheet name with special characters</td></tr>
-     *	</table>
+     *  <table>
+     *    <caption>Example return values</caption>
+     *    <tr><th>Result</th><th>Comment</th></tr>
+     *    <tr><td>A1</td><td>Cell reference without sheet</td></tr>
+     *    <tr><td>Sheet1!A1</td><td>Standard sheet name</td></tr>
+     *    <tr><td>'O''Brien''s Sales'!A1'&nbsp;</td><td>Sheet name with special characters</td></tr>
+     *  </table>
      * @return the text representation of this cell reference as it would appear in a formula.
+     * @see #formatAsString(boolean)
      */
     public String formatAsString() {
         return formatAsString(true);
+    }
+
+    /**
+     * Returns a text representation of this cell reference in R1C1 format.
+     * <p>
+     *  Example return values:
+     *  <table>
+     *    <caption>Example return values</caption>
+     *    <tr><th>Result</th><th>Comment</th></tr>
+     *    <tr><td>R1C1</td><td>Cell reference without sheet</td></tr>
+     *    <tr><td>Sheet1!R1C1</td><td>Standard sheet name</td></tr>
+     *    <tr><td>'O''Brien''s Sales'!R1C1'&nbsp;</td><td>Sheet name with special characters</td></tr>
+     *  </table>
+     * @return the text representation of this cell reference as it would appear in a formula.
+     * @see #formatAsString()
+     * @see #formatAsR1C1String(boolean)
+     * @since POI 5.2.1
+     */
+    public String formatAsR1C1String() {
+        return formatAsR1C1String(true);
     }
 
     /**
@@ -501,15 +524,17 @@ public class CellReference implements GenericRecord {
      *
      * <p>
      *  Example return values:
-     *	<table border="0" cellpadding="1" cellspacing="0" summary="Example return values">
-     *	  <tr><th align='left'>Result</th><th align='left'>Comment</th></tr>
-     *	  <tr><td>A1</td><td>Cell reference without sheet</td></tr>
-     *	  <tr><td>Sheet1!A1</td><td>Standard sheet name</td></tr>
-     *	  <tr><td>'O''Brien''s Sales'!A1'&nbsp;</td><td>Sheet name with special characters</td></tr>
-     *	</table>
+     *  <table>
+     *    <caption>Example return values</caption>
+     *    <tr><th>Result</th><th>Comment</th></tr>
+     *    <tr><td>A1</td><td>Cell reference without sheet</td></tr>
+     *    <tr><td>Sheet1!A1</td><td>Standard sheet name</td></tr>
+     *    <tr><td>'O''Brien''s Sales'!A1'&nbsp;</td><td>Sheet name with special characters</td></tr>
+     *  </table>
      * @param   includeSheetName If true and there is a sheet name set for this cell reference,
      *                           the reference is prefixed with the sheet name and '!'
      * @return the text representation of this cell reference as it would appear in a formula.
+     * @see #formatAsString()
      */
     public String formatAsString(boolean includeSheetName) {
         StringBuilder sb = new StringBuilder(32);
@@ -518,6 +543,36 @@ public class CellReference implements GenericRecord {
             sb.append(SHEET_NAME_DELIMITER);
         }
         appendCellReference(sb);
+        return sb.toString();
+    }
+
+    /**
+     * Returns a text representation of this cell reference in R1C1 format and allows to control
+     * if the sheetname is included in the reference.
+     *
+     * <p>
+     *  Example return values:
+     *  <table>
+     *    <caption>Example return values</caption>
+     *    <tr><th>Result</th><th>Comment</th></tr>
+     *    <tr><td>R1C1</td><td>Cell reference without sheet</td></tr>
+     *    <tr><td>Sheet1!R1C1</td><td>Standard sheet name</td></tr>
+     *    <tr><td>'O''Brien''s Sales'!R1C1'&nbsp;</td><td>Sheet name with special characters</td></tr>
+     *  </table>
+     * @param   includeSheetName If true and there is a sheet name set for this cell reference,
+     *                           the reference is prefixed with the sheet name and '!'
+     * @return the text representation of this cell reference as it would appear in a formula.
+     * @see #formatAsString(boolean)
+     * @see #formatAsR1C1String()
+     * @since POI 5.2.1
+     */
+    public String formatAsR1C1String(boolean includeSheetName) {
+        StringBuilder sb = new StringBuilder(32);
+        if(includeSheetName && _sheetName != null) {
+            SheetNameFormatter.appendFormat(sb, _sheetName);
+            sb.append(SHEET_NAME_DELIMITER);
+        }
+        appendR1C1CellReference(sb);
         return sb.toString();
     }
 
@@ -563,6 +618,19 @@ public class CellReference implements GenericRecord {
     }
 
     /**
+     * Appends R1C1 cell reference with '$' markers for absolute values as required.
+     * Sheet name is not included.
+     */
+    /* package */ void appendR1C1CellReference(StringBuilder sb) {
+        if (_rowIndex != -1) {
+            sb.append('R').append(_rowIndex+1);
+        }
+        if (_colIndex != -1) {
+            sb.append('C').append(_colIndex+1);
+        }
+    }
+
+    /**
      * Checks whether this cell reference is equal to another object.
      * <p>
      *  Two cells references are assumed to be equal if their string representations
@@ -582,9 +650,7 @@ public class CellReference implements GenericRecord {
                 && _colIndex == cr._colIndex
                 && _isRowAbs == cr._isRowAbs
                 && _isColAbs == cr._isColAbs
-                && ((_sheetName == null)
-                        ? (cr._sheetName == null)
-                        : _sheetName.equals(cr._sheetName));
+                && Objects.equals(_sheetName, cr._sheetName);
     }
 
     @Override

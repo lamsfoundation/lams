@@ -17,6 +17,8 @@
 
 package org.apache.poi.sl.draw;
 
+import static org.apache.logging.log4j.util.Unbox.box;
+
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -30,13 +32,17 @@ import java.io.InvalidObjectException;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedCharacterIterator.Attribute;
 import java.text.AttributedString;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.common.usermodel.fonts.FontGroup;
 import org.apache.poi.common.usermodel.fonts.FontGroup.FontGroupRange;
 import org.apache.poi.common.usermodel.fonts.FontInfo;
@@ -45,8 +51,8 @@ import org.apache.poi.sl.usermodel.Hyperlink;
 import org.apache.poi.sl.usermodel.Insets2D;
 import org.apache.poi.sl.usermodel.PaintStyle;
 import org.apache.poi.sl.usermodel.PlaceableShape;
-import org.apache.poi.sl.usermodel.ShapeContainer;
-import org.apache.poi.sl.usermodel.Sheet;
+import org.apache.poi.sl.usermodel.PlaceholderDetails;
+import org.apache.poi.sl.usermodel.SimpleShape;
 import org.apache.poi.sl.usermodel.Slide;
 import org.apache.poi.sl.usermodel.TextParagraph;
 import org.apache.poi.sl.usermodel.TextParagraph.BulletStyle;
@@ -57,12 +63,11 @@ import org.apache.poi.sl.usermodel.TextShape;
 import org.apache.poi.sl.usermodel.TextShape.TextDirection;
 import org.apache.poi.util.Internal;
 import org.apache.poi.util.LocaleUtil;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
+import org.apache.poi.util.StringUtil;
 import org.apache.poi.util.Units;
 
 public class DrawTextParagraph implements Drawable {
-    private static final POILogger LOG = POILogFactory.getLogger(DrawTextParagraph.class);
+    private static final Logger LOG = LogManager.getLogger(DrawTextParagraph.class);
 
     /** Keys for passing hyperlinks to the graphics context */
     public static final XlinkAttribute HYPERLINK_HREF = new XlinkAttribute("href");
@@ -238,7 +243,7 @@ public class DrawTextParagraph implements Drawable {
     }
 
     public boolean isEmptyParagraph() {
-        return (lines.isEmpty() || rawText.trim().isEmpty());
+        return (lines.isEmpty() || StringUtil.isBlank(rawText));
     }
 
     @Override
@@ -363,9 +368,9 @@ public class DrawTextParagraph implements Drawable {
             buSz = 100d;
         }
         if (buSz > 0) {
-            fontSize *= buSz* 0.01;
+            fontSize *= (float) (buSz * 0.01);
         } else {
-            fontSize = (float)-buSz;
+            fontSize = (float) -buSz;
         }
 
         String buFontStr = bulletStyle.getBulletFont();
@@ -395,11 +400,31 @@ public class DrawTextParagraph implements Drawable {
     }
 
     protected String getRenderableText(Graphics2D graphics, TextRun tr) {
-        if (tr.getFieldType() == FieldType.SLIDE_NUMBER) {
-            Slide<?,?> slide = (Slide<?,?>)graphics.getRenderingHint(Drawable.CURRENT_SLIDE);
-            return (slide == null) ? "" : Integer.toString(slide.getSlideNumber());
+        FieldType ft = tr.getFieldType();
+        if (ft == null) {
+            return getRenderableText(tr);
         }
-        return getRenderableText(tr);
+        if (tr.getRawText() != null && !tr.getRawText().isEmpty()) {
+            switch (ft) {
+                case SLIDE_NUMBER: {
+                    Slide<?, ?> slide = (Slide<?, ?>) graphics.getRenderingHint(Drawable.CURRENT_SLIDE);
+                    return (slide == null) ? "" : Integer.toString(slide.getSlideNumber());
+                }
+                case DATE_TIME: {
+                    PlaceholderDetails pd = ((SimpleShape<?, ?>) this.getParagraphShape()).getPlaceholderDetails();
+                    // refresh internal members
+                    pd.getPlaceholder();
+                    String uda = pd.getUserDate();
+                    if (uda != null) {
+                        return uda;
+                    }
+                    Calendar cal = LocaleUtil.getLocaleCalendar();
+                    LocalDateTime now = LocalDateTime.ofInstant(cal.toInstant(), cal.getTimeZone().toZoneId());
+                    return now.format(pd.getDateFormat());
+                }
+            }
+        }
+        return "";
     }
 
     @Internal
@@ -548,30 +573,8 @@ public class DrawTextParagraph implements Drawable {
     /**
      * Helper method for paint style relative to bounds, e.g. gradient paint
      */
-    @SuppressWarnings("rawtypes")
     private PlaceableShape<?,?> getParagraphShape() {
-        return new PlaceableShape(){
-            @Override
-            public ShapeContainer<?,?> getParent() { return null; }
-            @Override
-            public Rectangle2D getAnchor() { return paragraph.getParentShape().getAnchor(); }
-            @Override
-            public void setAnchor(Rectangle2D anchor) {}
-            @Override
-            public double getRotation() { return 0; }
-            @Override
-            public void setRotation(double theta) {}
-            @Override
-            public void setFlipHorizontal(boolean flip) {}
-            @Override
-            public void setFlipVertical(boolean flip) {}
-            @Override
-            public boolean getFlipHorizontal() { return false; }
-            @Override
-            public boolean getFlipVertical() { return false; }
-            @Override
-            public Sheet<?,?> getSheet() { return paragraph.getParentShape().getSheet(); }
-        };
+        return paragraph.getParentShape();
     }
 
     protected List<AttributedStringData> getAttributedString(Graphics2D graphics, StringBuilder text) {
@@ -669,9 +672,11 @@ public class DrawTextParagraph implements Drawable {
     }
 
     /**
-     * Processing the glyphs is done in two steps.
-     * <li>determine the font group - a text run can have different font groups. Depending on the chars,
-     * the correct font group needs to be used
+     * Processing the glyphs is done in two steps:
+     * <ul>
+     * <li>1. determine the font group - a text run can have different font groups.
+     * <li>2. Depending on the chars, the correct font group needs to be used
+     * </ul>
      *
      * @see <a href="https://blogs.msdn.microsoft.com/officeinteroperability/2013/04/22/office-open-xml-themes-schemes-and-fonts/">Office Open XML Themes, Schemes, and Fonts</a>
      */
@@ -713,10 +718,12 @@ public class DrawTextParagraph implements Drawable {
 
                 if (partBegin < partEnd) {
                     // handle (b) and (c)
-                    attList.add(new AttributedStringData(TextAttribute.FAMILY, fontMapped.getFontName(Locale.ROOT), beginIndex+partBegin, beginIndex+partEnd));
-                    if (LOG.check(POILogger.DEBUG)) {
-                        LOG.log(POILogger.DEBUG, "mapped: ",fontMapped.getFontName(Locale.ROOT)," ",(beginIndex+partBegin)," ",(beginIndex+partEnd)," - ",runText.substring(partBegin, partEnd));
-                    }
+
+                    final String fontName = fontMapped.getFontName(Locale.ROOT);
+                    final int startIndex = beginIndex + partBegin;
+                    final int endIndex = beginIndex + partEnd;
+                    attList.add(new AttributedStringData(TextAttribute.FAMILY, fontName, startIndex, endIndex));
+                    LOG.atDebug().log("mapped: {} {} {} - {}", fontName, box(startIndex),box(endIndex),runText.substring(partBegin, partEnd));
                 }
 
                 // fallback for unsupported glyphs
@@ -725,10 +732,11 @@ public class DrawTextParagraph implements Drawable {
 
                 if (partBegin < partEnd) {
                     // handle (a) and (b)
-                    attList.add(new AttributedStringData(TextAttribute.FAMILY, fontFallback.getFontName(Locale.ROOT), beginIndex+partBegin, beginIndex+partEnd));
-                    if (LOG.check(POILogger.DEBUG)) {
-                        LOG.log(POILogger.DEBUG, "fallback: ",fontFallback.getFontName(Locale.ROOT)," ",(beginIndex+partBegin)," ",(beginIndex+partEnd)," - ",runText.substring(partBegin, partEnd));
-                    }
+                    final String fontName = fontFallback.getFontName(Locale.ROOT);
+                    final int startIndex = beginIndex + partBegin;
+                    final int endIndex = beginIndex + partEnd;
+                    attList.add(new AttributedStringData(TextAttribute.FAMILY, fontName, startIndex, endIndex));
+                    LOG.atDebug().log("fallback: {} {} {} - {}", fontName, box(startIndex),box(endIndex),runText.substring(partBegin, partEnd));
                 }
             }
 

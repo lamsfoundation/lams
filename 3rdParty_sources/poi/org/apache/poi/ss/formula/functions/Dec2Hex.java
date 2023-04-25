@@ -23,7 +23,7 @@ import org.apache.poi.ss.formula.OperationEvaluationContext;
 import org.apache.poi.ss.formula.eval.*;
 
 /**
- * Implementation for Excel DELTA() function.<p>
+ * Implementation for Excel DELTA() function.
  * <p>
  * <b>Syntax</b>:<br> <b>DEC2HEX  </b>(<b>number</b>,<b>places</b> )<br>
  * <p>
@@ -35,11 +35,11 @@ import org.apache.poi.ss.formula.eval.*;
  * Negative numbers are represented using two's-complement notation.
  *
  * <ul>
- * <li>If number < -549,755,813,888 or if number > 549,755,813,887, this function returns the #NUM! error value.</li>
+ * <li>If number &lt; -549,755,813,888 or if number &gt; 549,755,813,887, this function returns the #NUM! error value.</li>
  * <li>If number is nonnumeric, this function returns the #VALUE! error value.</li>
  * </ul>
  *
- * <h2>places</h2>
+ * Places<P>
  *
  * The number of characters to use. The places argument is useful for padding the
  * return value with leading 0s (zeros).
@@ -56,9 +56,9 @@ public final class Dec2Hex extends Var1or2ArgFunction implements FreeRefFunction
 
     public static final FreeRefFunction instance = new Dec2Hex();
 
-    private final static long MIN_VALUE = Long.parseLong("-549755813888");
-    private final static long MAX_VALUE = Long.parseLong("549755813887");
-    private final static int DEFAULT_PLACES_VALUE = 10;
+    private static final long MIN_VALUE = Long.parseLong("-549755813888");
+    private static final long MAX_VALUE = Long.parseLong("549755813887");
+    private static final int DEFAULT_PLACES_VALUE = 10;
 
     public ValueEval evaluate(int srcRowIndex, int srcColumnIndex, ValueEval number, ValueEval places) {
         ValueEval veText1;

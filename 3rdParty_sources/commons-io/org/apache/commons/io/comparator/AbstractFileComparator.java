@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,6 @@ import java.util.List;
 /**
  * Abstract file {@link Comparator} which provides sorting for file arrays and lists.
  *
- * @version $Id: AbstractFileComparator.java 1415850 2012-11-30 20:51:39Z ggregory $
  * @since 2.0
  */
 abstract class AbstractFileComparator implements Comparator<File> {
@@ -33,8 +32,8 @@ abstract class AbstractFileComparator implements Comparator<File> {
     /**
      * Sort an array of files.
      * <p>
-     * This method uses {@link Arrays#sort(Object[], Comparator)}
-     * and returns the original array.
+     * This method uses {@link Arrays#sort(Object[], Comparator)} and returns the original array.
+     * </p>
      *
      * @param files The files to sort, may be null
      * @return The sorted array
@@ -50,8 +49,8 @@ abstract class AbstractFileComparator implements Comparator<File> {
     /**
      * Sort a List of files.
      * <p>
-     * This method uses {@link Collections#sort(List, Comparator)}
-     * and returns the original list.
+     * This method uses {@link Collections#sort(List, Comparator)} and returns the original list.
+     * </p>
      *
      * @param files The files to sort, may be null
      * @return The sorted list
@@ -59,7 +58,7 @@ abstract class AbstractFileComparator implements Comparator<File> {
      */
     public List<File> sort(final List<File> files) {
         if (files != null) {
-            Collections.sort(files, this);
+            files.sort(this);
         }
         return files;
     }

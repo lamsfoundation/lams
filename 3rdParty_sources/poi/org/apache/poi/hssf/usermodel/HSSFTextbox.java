@@ -33,30 +33,31 @@ import org.apache.poi.hssf.record.EndSubRecord;
 import org.apache.poi.hssf.record.EscherAggregate;
 import org.apache.poi.hssf.record.ObjRecord;
 import org.apache.poi.hssf.record.TextObjectRecord;
+import org.apache.poi.sl.usermodel.ShapeType;
 
 /**
  * A textbox is a shape that may hold a rich text string.
  */
 public class HSSFTextbox extends HSSFSimpleShape {
-    public final static short OBJECT_TYPE_TEXT = 6;
+    public static final short OBJECT_TYPE_TEXT = 6;
 
     /**
      * How to align text horizontally
      */
-    public final static short HORIZONTAL_ALIGNMENT_LEFT = 1;
-    public final static short HORIZONTAL_ALIGNMENT_CENTERED = 2;
-    public final static short HORIZONTAL_ALIGNMENT_RIGHT = 3;
-    public final static short HORIZONTAL_ALIGNMENT_JUSTIFIED = 4;
-    public final static short HORIZONTAL_ALIGNMENT_DISTRIBUTED = 7;
+    public static final short HORIZONTAL_ALIGNMENT_LEFT = 1;
+    public static final short HORIZONTAL_ALIGNMENT_CENTERED = 2;
+    public static final short HORIZONTAL_ALIGNMENT_RIGHT = 3;
+    public static final short HORIZONTAL_ALIGNMENT_JUSTIFIED = 4;
+    public static final short HORIZONTAL_ALIGNMENT_DISTRIBUTED = 7;
 
     /**
      * How to align text vertically
      */
-    public final static short VERTICAL_ALIGNMENT_TOP = 1;
-    public final static short VERTICAL_ALIGNMENT_CENTER = 2;
-    public final static short VERTICAL_ALIGNMENT_BOTTOM = 3;
-    public final static short VERTICAL_ALIGNMENT_JUSTIFY = 4;
-    public final static short VERTICAL_ALIGNMENT_DISTRIBUTED = 7;
+    public static final short VERTICAL_ALIGNMENT_TOP = 1;
+    public static final short VERTICAL_ALIGNMENT_CENTER = 2;
+    public static final short VERTICAL_ALIGNMENT_BOTTOM = 3;
+    public static final short VERTICAL_ALIGNMENT_JUSTIFY = 4;
+    public static final short VERTICAL_ALIGNMENT_DISTRIBUTED = 7;
 
     public HSSFTextbox(EscherContainerRecord spContainer, ObjRecord objRecord, TextObjectRecord textObjectRecord) {
         super(spContainer, objRecord, textObjectRecord);
@@ -68,7 +69,7 @@ public class HSSFTextbox extends HSSFSimpleShape {
     /**
      * Construct a new textbox with the given parent and anchor.
      *
-     * @param parent
+     * @param parent the parent shape
      * @param anchor One of HSSFClientAnchor or HSSFChildAnchor
      */
     public HSSFTextbox(HSSFShape parent, HSSFAnchor anchor) {
@@ -104,7 +105,7 @@ public class HSSFTextbox extends HSSFSimpleShape {
         spContainer.setRecordId(EscherContainerRecord.SP_CONTAINER);
         spContainer.setOptions((short) 0x000F);
         sp.setRecordId(EscherSpRecord.RECORD_ID);
-        sp.setOptions((short) ((EscherAggregate.ST_TEXTBOX << 4) | 0x2));
+        sp.setOptions((short) ((ShapeType.TEXT_BOX.nativeId << 4) | 0x2));
 
         sp.setFlags(EscherSpRecord.FLAG_HAVEANCHOR | EscherSpRecord.FLAG_HASSHAPETYPE);
         opt.setRecordId(EscherOptRecord.RECORD_ID);

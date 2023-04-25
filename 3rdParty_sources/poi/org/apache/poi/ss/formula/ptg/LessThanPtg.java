@@ -18,21 +18,21 @@
 package org.apache.poi.ss.formula.ptg;
 
 /**
- * Less than operator PTG "<". The SID is taken from the
+ * Less than operator PTG "&lt;". The SID is taken from the
  * Openoffice.orgs Documentation of the Excel File Format,
  * Table 3.5.7
  */
 public final class LessThanPtg extends ValueOperatorPtg {
     /** the sid for the less than operator as hex */
-    public final static byte sid  = 0x09;
+    public static final byte sid  = 0x09;
 
     /** identifier for LESS THAN char */
-    private final static String LESSTHAN = "<";
+    private static final String LESSTHAN = "<";
 
     public static final LessThanPtg instance = new LessThanPtg();
 
     private LessThanPtg() {
-    	// enforce singleton
+        // enforce singleton
     }
 
     @Override

@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Spliterator;
+import java.util.Spliterators;
 
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.formula.EvaluationWorkbook;
@@ -53,6 +55,12 @@ public interface Workbook extends Closeable, Iterable<Sheet> {
 
     /** Device independent bitmap */
     int PICTURE_TYPE_DIB = 7;
+
+    /**
+     * Excel silently truncates long sheet names to 31 chars.
+     * This constant is used to ensure uniqueness in the first 31 chars
+     */
+    int MAX_SENSITIVE_SHEET_NAME_LEN = 31;
 
     /**
      * Convenience method to get the active sheet.  The active sheet is is the sheet
@@ -164,12 +172,11 @@ public interface Workbook extends Closeable, Iterable<Sheet> {
      *     POI's SpreadsheetAPI silently truncates the input argument to 31 characters.
      *     Example:
      *
-     *     <pre><code>
+     *     <pre>{@code
      *     Sheet sheet = workbook.createSheet("My very long sheet name which is longer than 31 chars"); // will be truncated
      *     assert 31 == sheet.getSheetName().length();
      *     assert "My very long sheet name which i" == sheet.getSheetName();
-     *     </code></pre>
-     * </p>
+     *     }</pre>
      *
      * Except the 31-character constraint, Excel applies some other rules:
      * <p>
@@ -186,7 +193,6 @@ public interface Workbook extends Closeable, Iterable<Sheet> {
      * <li> closing square bracket (]) </li>
      * </ul>
      * The string MUST NOT begin or end with the single quote (') character.
-     * </p>
      *
      * <p>
      * See {@link org.apache.poi.ss.util.WorkbookUtil#createSafeSheetName(String nameProposal)}
@@ -217,6 +223,27 @@ public interface Workbook extends Closeable, Iterable<Sheet> {
     Iterator<Sheet> sheetIterator();
 
     /**
+     * Alias for {@link #sheetIterator()} to allow foreach loops
+     */
+    @Override
+    default Iterator<Sheet> iterator() {
+        return sheetIterator();
+    }
+
+    /**
+     *  Returns a spliterator of the sheets in the workbook
+     *  in sheet order. Includes hidden and very hidden sheets.
+     *
+     * @return a spliterator of the sheets.
+     *
+     * @since POI 5.2.0
+     */
+    @Override
+    default Spliterator<Sheet> spliterator() {
+        return Spliterators.spliterator(sheetIterator(), getNumberOfSheets(), 0);
+    }
+
+    /**
      * Get the number of spreadsheets in the workbook
      *
      * @return the number of sheets
@@ -237,7 +264,7 @@ public interface Workbook extends Closeable, Iterable<Sheet> {
      * Get sheet with the given name
      *
      * @param name of the sheet
-     * @return Sheet with the name provided or <code>null</code> if it does not exist
+     * @return Sheet with the name provided or {@code null} if it does not exist
      */
     Sheet getSheet(String name);
 
@@ -258,7 +285,7 @@ public interface Workbook extends Closeable, Iterable<Sheet> {
     /**
      * Finds a font that matches the one with the supplied attributes
      *
-     * @return the font with the matched attributes or <code>null</code>
+     * @return the font with the matched attributes or {@code null}
      */
     Font findFont(boolean bold, short color, short fontHeight, String name, boolean italic, boolean strikeout, short typeOffset, byte underline);
 
@@ -312,10 +339,10 @@ public interface Workbook extends Closeable, Iterable<Sheet> {
     CellStyle getCellStyleAt(int idx);
 
     /**
-     * Write out this workbook to an Outputstream.
+     * Write out this workbook to an OutputStream.
      *
      * @param stream - the java OutputStream you wish to write to
-     * @exception IOException if anything can't be written.
+     * @throws IOException if anything can't be written.
      */
     void write(OutputStream stream) throws IOException;
 
@@ -337,7 +364,7 @@ public interface Workbook extends Closeable, Iterable<Sheet> {
 
     /**
      * @param name the name of the defined name
-     * @return the defined name with the specified name. <code>null</code> if not found.
+     * @return the defined name with the specified name. {@code null} if not found.
      */
     Name getName(String name);
 
@@ -422,25 +449,25 @@ public interface Workbook extends Closeable, Iterable<Sheet> {
      */
     void removePrintArea(int sheetIndex);
 
-	/**
-	 * Retrieves the current policy on what to do when
-	 *  getting missing or blank cells from a row.
+    /**
+     * Retrieves the current policy on what to do when
+     *  getting missing or blank cells from a row.
      * <p>
-	 * The default is to return blank and null cells.
-	 *  {@link MissingCellPolicy}
+     * The default is to return blank and null cells.
+     *  {@link MissingCellPolicy}
      * </p>
-	 */
-	MissingCellPolicy getMissingCellPolicy();
+     */
+    MissingCellPolicy getMissingCellPolicy();
 
     /**
-	 * Sets the policy on what to do when
-	 *  getting missing or blank cells from a row.
+     * Sets the policy on what to do when
+     *  getting missing or blank cells from a row.
      *
-	 * This will then apply to all calls to
-	 *  {@link Row#getCell(int)} }. See
-	 *  {@link MissingCellPolicy}
-	 */
-	void setMissingCellPolicy(MissingCellPolicy missingCellPolicy);
+     * This will then apply to all calls to
+     *  {@link Row#getCell(int)} }. See
+     *  {@link MissingCellPolicy}
+     */
+    void setMissingCellPolicy(MissingCellPolicy missingCellPolicy);
 
     /**
      * Returns the instance of DataFormat for this workbook.
@@ -479,12 +506,12 @@ public interface Workbook extends Closeable, Iterable<Sheet> {
     CreationHelper getCreationHelper();
 
     /**
-     * @return <code>false</code> if this workbook is not visible in the GUI
+     * @return {@code false} if this workbook is not visible in the GUI
      */
     boolean isHidden();
 
     /**
-     * @param hiddenFlag pass <code>false</code> to make the workbook visible in the GUI
+     * @param hiddenFlag pass {@code false} to make the workbook visible in the GUI
      */
     void setHidden(boolean hiddenFlag);
 
@@ -495,7 +522,7 @@ public interface Workbook extends Closeable, Iterable<Sheet> {
      *  ({@link #isSheetVeryHidden(int)})
      * </p>
      * @param sheetIx Number
-     * @return <code>true</code> if sheet is hidden
+     * @return {@code true} if sheet is hidden
      * @see #getSheetVisibility(int)
      */
     boolean isSheetHidden(int sheetIx);
@@ -507,7 +534,7 @@ public interface Workbook extends Closeable, Iterable<Sheet> {
      *  ({@link #isSheetHidden(int)})
      * </p>
      * @param sheetIx sheet index to check
-     * @return <code>true</code> if sheet is very hidden
+     * @return {@code true} if sheet is very hidden
      * @see #getSheetVisibility(int)
      */
     boolean isSheetVeryHidden(int sheetIx);
@@ -548,9 +575,9 @@ public interface Workbook extends Closeable, Iterable<Sheet> {
     /**
      * Register a new toolpack in this workbook.
      *
-     * @param toopack the toolpack to register
+     * @param toolpack the toolpack to register
      */
-    void addToolPack(UDFFinder toopack);
+    void addToolPack(UDFFinder toolpack);
 
     /**
      * Whether the application shall perform a full recalculation when the workbook is opened.
@@ -604,4 +631,16 @@ public interface Workbook extends Closeable, Iterable<Sheet> {
      * @return an evaluation workbook
      */
     EvaluationWorkbook createEvaluationWorkbook();
+
+    /**
+     * @return the type of cell references used
+     * @since POI 5.2.1
+     */
+    CellReferenceType getCellReferenceType();
+
+    /**
+     * @param cellReferenceType the type of cell references used
+     * @since POI 5.2.1
+     */
+    void setCellReferenceType(CellReferenceType cellReferenceType);
 }

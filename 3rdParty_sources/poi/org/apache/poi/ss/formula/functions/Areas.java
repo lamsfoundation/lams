@@ -25,8 +25,6 @@ import org.apache.poi.ss.formula.ptg.NumberPtg;
 
 /**
  * Returns the number of areas in a reference. An area is a range of contiguous cells or a single cell.
- *
- * @author Loopbing (loopbing@gmail.com)
  */
 public final class Areas implements Function {
 
@@ -42,8 +40,7 @@ public final class Areas implements Function {
                 RefListEval refListEval = (RefListEval) valueEval;
                 result = refListEval.getList().size();
             }
-            NumberEval numberEval = new NumberEval(new NumberPtg(result));
-            return numberEval;
+            return new NumberEval(new NumberPtg(result));
         } catch (Exception e) {
             return ErrorEval.VALUE_INVALID;
         }

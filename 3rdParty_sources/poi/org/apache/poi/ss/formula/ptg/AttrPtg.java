@@ -36,8 +36,8 @@ import org.apache.poi.util.LittleEndianOutput;
  * in SUM functions (i.e. SUM(A1:A3) causes an area PTG then an ATTR with the SUM option set)
  */
 public final class AttrPtg extends ControlPtg {
-    public final static byte sid  = 0x19;
-    private final static int  SIZE = 4;
+    public static final byte sid  = 0x19;
+    private static final int  SIZE = 4;
 
     // flags 'volatile' and 'space', can be combined.
     // OOO spec says other combinations are theoretically possible but not likely to occur.
@@ -104,7 +104,7 @@ public final class AttrPtg extends ControlPtg {
     }
 
     /**
-     * @param type a constant from <tt>SpaceType</tt>
+     * @param type a constant from {@code SpaceType}
      * @param count the number of space characters
      */
     public static AttrPtg createSpace(int type, int count) {
@@ -173,6 +173,7 @@ public final class AttrPtg extends ControlPtg {
         return _chooseFuncOffset;
     }
 
+    @Override
     public void write(LittleEndianOutput out) {
         out.writeByte(sid + getPtgClass());
         out.writeByte(_options);
@@ -191,6 +192,7 @@ public final class AttrPtg extends ControlPtg {
         return sid;
     }
 
+    @Override
     public int getSize() {
         if (_jumpTable != null) {
             return SIZE + (_jumpTable.length + 1) * LittleEndianConsts.SHORT_SIZE;
@@ -219,6 +221,7 @@ public final class AttrPtg extends ControlPtg {
         return -1;
     }
 
+    @Override
     public String toFormulaString() {
         if (semiVolatile.isSet(_options)) {
             return "ATTR(semiVolatile)";

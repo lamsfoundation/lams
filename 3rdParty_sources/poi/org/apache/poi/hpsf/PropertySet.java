@@ -17,8 +17,6 @@
 
 package org.apache.poi.hpsf;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -27,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.io.input.UnsynchronizedByteArrayInputStream;
+import org.apache.commons.io.output.UnsynchronizedByteArrayOutputStream;
 import org.apache.poi.EmptyFileException;
 import org.apache.poi.hpsf.wellknown.PropertyIDMap;
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
@@ -38,7 +38,6 @@ import org.apache.poi.util.LittleEndianByteArrayInputStream;
 import org.apache.poi.util.LittleEndianConsts;
 import org.apache.poi.util.LittleEndianOutputStream;
 import org.apache.poi.util.NotImplemented;
-import org.apache.poi.util.Removal;
 
 /**
  * Represents a property set in the Horrible Property Set Format
@@ -166,7 +165,7 @@ public class PropertySet {
 
 
     /**
-     * Creates a {@link PropertySet} instance from an {@link
+     * Creates a PropertySet instance from an {@link
      * InputStream} in the Horrible Property Set Format.<p>
      *
      * The constructor reads the first few bytes from the stream
@@ -180,9 +179,9 @@ public class PropertySet {
      * stream.
      * @throws IOException
      *    if the {@link InputStream} cannot be accessed as needed.
-     * @exception NoPropertySetStreamException
+     * @throws NoPropertySetStreamException
      *    if the input stream does not contain a property set.
-     * @exception UnsupportedEncodingException
+     * @throws UnsupportedEncodingException
      *    if a character encoding is not supported.
      */
     public PropertySet(final InputStream stream)
@@ -198,7 +197,7 @@ public class PropertySet {
 
 
     /**
-     * Creates a {@link PropertySet} instance from a byte array that
+     * Creates a PropertySet instance from a byte array that
      * represents a stream in the Horrible Property Set Format.
      *
      * @param stream The byte array holding the stream data.
@@ -209,7 +208,7 @@ public class PropertySet {
      * @throws NoPropertySetStreamException if the byte array is not a
      * property set stream.
      *
-     * @exception UnsupportedEncodingException if the codepage is not supported.
+     * @throws UnsupportedEncodingException if the codepage is not supported.
      */
     public PropertySet(final byte[] stream, final int offset, final int length)
     throws NoPropertySetStreamException, UnsupportedEncodingException {
@@ -220,7 +219,7 @@ public class PropertySet {
     }
 
     /**
-     * Creates a {@link PropertySet} instance from a byte array
+     * Creates a PropertySet instance from a byte array
      * that represents a stream in the Horrible Property Set Format.
      *
      * @param stream The byte array holding the stream data. The
@@ -228,7 +227,7 @@ public class PropertySet {
      * @throws NoPropertySetStreamException if the byte array is not a
      * property set stream.
      *
-     * @exception UnsupportedEncodingException if the codepage is not supported.
+     * @throws UnsupportedEncodingException if the codepage is not supported.
      */
     public PropertySet(final byte[] stream)
     throws NoPropertySetStreamException, UnsupportedEncodingException {
@@ -377,7 +376,7 @@ public class PropertySet {
      * {@link InputStream#mark} method.
      * @return {@code true} if the stream is a property set
      * stream, else {@code false}.
-     * @exception IOException if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     public static boolean isPropertySetStream(final InputStream stream) throws IOException {
         /*
@@ -439,7 +438,7 @@ public class PropertySet {
 
 
     /**
-     * Initializes this {@link PropertySet} instance from a byte
+     * Initializes this PropertySet instance from a byte
      * array. The method assumes that it has been checked already that
      * the byte array indeed represents a property set stream. It does
      * no more checks on its own.
@@ -501,9 +500,9 @@ public class PropertySet {
      * Writes the property set to an output stream.
      *
      * @param out the output stream to write the section to
-     * @exception IOException if an error when writing to the output stream
+     * @throws IOException if an error when writing to the output stream
      * occurs
-     * @exception WritingNotSupportedException if HPSF does not yet support
+     * @throws WritingNotSupportedException if HPSF does not yet support
      * writing a property's variant type.
      */
     public void write(final OutputStream out) throws IOException, WritingNotSupportedException {
@@ -515,51 +514,52 @@ public class PropertySet {
     }
 
     private byte[] toBytes() throws WritingNotSupportedException, IOException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        LittleEndianOutputStream leos = new LittleEndianOutputStream(bos);
+        try (UnsynchronizedByteArrayOutputStream bos = new UnsynchronizedByteArrayOutputStream();
+            LittleEndianOutputStream leos = new LittleEndianOutputStream(bos)) {
 
-        /* Write the number of sections in this property set stream. */
-        final int nrSections = getSectionCount();
+            /* Write the number of sections in this property set stream. */
+            final int nrSections = getSectionCount();
 
-        /* Write the property set's header. */
-        leos.writeShort(getByteOrder());
-        leos.writeShort(getFormat());
-        leos.writeInt(getOSVersion());
-        putClassId(bos, getClassID());
-        leos.writeInt(nrSections);
+            /* Write the property set's header. */
+            leos.writeShort(getByteOrder());
+            leos.writeShort(getFormat());
+            leos.writeInt(getOSVersion());
+            putClassId(bos, getClassID());
+            leos.writeInt(nrSections);
 
-        assert(bos.size() == OFFSET_HEADER);
+            assert (bos.size() == OFFSET_HEADER);
 
-        final int[][] offsets = new int[getSectionCount()][2];
+            final int[][] offsets = new int[getSectionCount()][2];
 
-        /* Write the section list, i.e. the references to the sections. Each
-         * entry in the section list consist of the section's class ID and the
-         * section's offset relative to the beginning of the stream. */
-        int secCnt = 0;
-        for (final Section section : getSections()) {
-            final ClassID formatID = section.getFormatID();
-            if (formatID == null) {
-                throw new NoFormatIDException();
+            /* Write the section list, i.e. the references to the sections. Each
+             * entry in the section list consist of the section's class ID and the
+             * section's offset relative to the beginning of the stream. */
+            int secCnt = 0;
+            for (final Section section : getSections()) {
+                final ClassID formatID = section.getFormatID();
+                if (formatID == null) {
+                    throw new NoFormatIDException();
+                }
+                putClassId(bos, formatID);
+                offsets[secCnt++][0] = bos.size();
+                // offset dummy - filled later
+                leos.writeInt(-1);
             }
-            putClassId(bos, formatID);
-            offsets[secCnt++][0] = bos.size();
-            // offset dummy - filled later
-            leos.writeInt(-1);
-        }
 
-        /* Write the sections themselves. */
-        secCnt = 0;
-        for (final Section section : getSections()) {
-            offsets[secCnt++][1] = bos.size();
-            section.write(bos);
-        }
+            /* Write the sections themselves. */
+            secCnt = 0;
+            for (final Section section : getSections()) {
+                offsets[secCnt++][1] = bos.size();
+                section.write(bos);
+            }
 
-        byte[] result = bos.toByteArray();
-        for (int[] off : offsets) {
-            LittleEndian.putInt(result, off[0], off[1]);
-        }
+            byte[] result = bos.toByteArray();
+            for (int[] off : offsets) {
+                LittleEndian.putInt(result, off[0], off[1]);
+            }
 
-        return result;
+            return result;
+        }
     }
 
     /**
@@ -590,7 +590,7 @@ public class PropertySet {
      * document. The input stream represents a snapshot of the property set.
      * If the latter is modified while the input stream is still being
      * read, the modifications will not be reflected in the input stream but in
-     * the {@link PropertySet} only.
+     * the PropertySet only.
      *
      * @return the contents of this property set stream
      *
@@ -599,7 +599,7 @@ public class PropertySet {
      * @throws IOException if an I/O exception occurs.
      */
     public InputStream toInputStream() throws WritingNotSupportedException, IOException {
-        return new ByteArrayInputStream(toBytes());
+        return new UnsynchronizedByteArrayInputStream(toBytes());
     }
 
     /**
@@ -657,9 +657,9 @@ public class PropertySet {
     }
 
     /**
-     * Checks whether this {@link PropertySet} represents a Summary Information.
+     * Checks whether this PropertySet represents a Summary Information.
      *
-     * @return {@code true} if this {@link PropertySet}
+     * @return {@code true} if this PropertySet
      * represents a Summary Information, else {@code false}.
      */
     public boolean isSummaryInformation() {
@@ -667,9 +667,9 @@ public class PropertySet {
     }
 
     /**
-     * Checks whether this {@link PropertySet} is a Document Summary Information.
+     * Checks whether this PropertySet is a Document Summary Information.
      *
-     * @return {@code true} if this {@link PropertySet}
+     * @return {@code true} if this PropertySet
      * represents a Document Summary Information, else {@code false}.
      */
     public boolean isDocumentSummaryInformation() {
@@ -687,13 +687,13 @@ public class PropertySet {
 
     /**
      * Convenience method returning the {@link Property} array contained in this
-     * property set. It is a shortcut for getting he {@link PropertySet}'s
+     * property set. It is a shortcut for getting he PropertySets
      * {@link Section}s list and then getting the {@link Property} array from the
      * first {@link Section}.
      *
      * @return The properties of the only {@link Section} of this
-     * {@link PropertySet}.
-     * @throws NoSingleSectionException if the {@link PropertySet} has
+     * PropertySet.
+     * @throws NoSingleSectionException if the PropertySet has
      * more or less than one {@link Section}.
      */
     public Property[] getProperties() throws NoSingleSectionException {
@@ -709,7 +709,7 @@ public class PropertySet {
      *
      * @param id The property ID
      * @return The property value
-     * @throws NoSingleSectionException if the {@link PropertySet} has
+     * @throws NoSingleSectionException if the PropertySet has
      * more or less than one {@link Section}.
      */
     protected Object getProperty(final int id) throws NoSingleSectionException {
@@ -726,7 +726,7 @@ public class PropertySet {
      *
      * @param id The property ID
      * @return The property value
-     * @throws NoSingleSectionException if the {@link PropertySet} has
+     * @throws NoSingleSectionException if the PropertySet has
      * more or less than one {@link Section}.
      */
     boolean getPropertyBooleanValue(final int id) throws NoSingleSectionException {
@@ -744,7 +744,7 @@ public class PropertySet {
      *
      * @param id The property ID
      * @return The propertyIntValue value
-     * @throws NoSingleSectionException if the {@link PropertySet} has
+     * @throws NoSingleSectionException if the PropertySet has
      * more or less than one {@link Section}.
      */
     int getPropertyIntValue(final int id) throws NoSingleSectionException {
@@ -765,7 +765,7 @@ public class PropertySet {
      * @return {@code true} if the last call to {@link
      * #getPropertyIntValue} or {@link #getProperty} tried to access a
      * property that was not available, else {@code false}.
-     * @throws NoSingleSectionException if the {@link PropertySet} has
+     * @throws NoSingleSectionException if the PropertySet has
      * more than one {@link Section}.
      */
     public boolean wasNull() throws NoSingleSectionException {
@@ -775,9 +775,9 @@ public class PropertySet {
 
 
     /**
-     * Gets the {@link PropertySet}'s first section.
+     * Gets the PropertySets first section.
      *
-     * @return The {@link PropertySet}'s first section.
+     * @return The PropertySets first section.
      */
     @SuppressWarnings("WeakerAccess")
     public Section getFirstSection() {
@@ -825,22 +825,12 @@ public class PropertySet {
         return getSections().containsAll(ps.getSections());
     }
 
-
-
-    /**
-     * @see Object#hashCode()
-     */
     @NotImplemented
     @Override
     public int hashCode() {
         throw new UnsupportedOperationException("FIXME: Not yet implemented.");
     }
 
-
-
-    /**
-     * @see Object#toString()
-     */
     @Override
     public String toString() {
         final StringBuilder b = new StringBuilder();
@@ -888,7 +878,7 @@ public class PropertySet {
         getFirstSection().setProperty((int)id, value);
     }
 
-    private static void putClassId(final ByteArrayOutputStream out, final ClassID n) {
+    private static void putClassId(final UnsynchronizedByteArrayOutputStream out, final ClassID n) {
         byte[] b = new byte[16];
         n.write(b, 0);
         out.write(b, 0, b.length);

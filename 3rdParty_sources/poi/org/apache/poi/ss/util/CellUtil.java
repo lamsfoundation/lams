@@ -23,20 +23,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
-import org.apache.poi.ss.usermodel.BorderStyle;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.poi.common.Duplicatable;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.util.Beta;
 
 /**
  * Various utility functions that make working with a cells and rows easier. The various methods
@@ -44,13 +38,10 @@ import org.apache.poi.util.POILogger;
  * style change to a cell, the code will attempt to see if a style already exists that meets your
  * needs. If not, then it will create a new style. This is to prevent creating too many styles.
  * there is an upper limit in Excel on the number of styles that can be supported.
- *
- *@author Eric Pugh epugh@upstate.com
- *@author (secondary) Avinash Kewalramani akewalramani@accelrys.com
  */
 public final class CellUtil {
-    
-    private static final POILogger log = POILogFactory.getLogger(CellUtil.class);
+
+    private static final Logger LOGGER = LogManager.getLogger(CellUtil.class);
 
     // FIXME: Move these constants into an enum
     public static final String ALIGNMENT = "alignment";
@@ -65,6 +56,10 @@ public final class CellUtil {
     public static final String DATA_FORMAT = "dataFormat";
     public static final String FILL_BACKGROUND_COLOR = "fillBackgroundColor";
     public static final String FILL_FOREGROUND_COLOR = "fillForegroundColor";
+    
+    public static final String FILL_BACKGROUND_COLOR_COLOR = "fillBackgroundColorColor";
+    public static final String FILL_FOREGROUND_COLOR_COLOR = "fillForegroundColorColor";
+
     public static final String FILL_PATTERN = "fillPattern";
     public static final String FONT = "font";
     public static final String HIDDEN = "hidden";
@@ -73,7 +68,9 @@ public final class CellUtil {
     public static final String ROTATION = "rotation";
     public static final String VERTICAL_ALIGNMENT = "verticalAlignment";
     public static final String WRAP_TEXT = "wrapText";
-    
+    public static final String SHRINK_TO_FIT = "shrinkToFit";
+    public static final String QUOTE_PREFIXED = "quotePrefixed";
+
     private static final Set<String> shortValues = Collections.unmodifiableSet(
             new HashSet<>(Arrays.asList(
                     BOTTOM_BORDER_COLOR,
@@ -86,15 +83,24 @@ public final class CellUtil {
                     DATA_FORMAT,
                     ROTATION
             )));
-    private static final Set<String> intValues = Collections.unmodifiableSet(
+            
+    private static final Set<String> colorValues = Collections.unmodifiableSet(
             new HashSet<>(Arrays.asList(
-                    FONT
+                    FILL_FOREGROUND_COLOR_COLOR,
+                    FILL_BACKGROUND_COLOR_COLOR
+            )));
+
+    private static final Set<String> intValues = Collections.unmodifiableSet(
+            new HashSet<>(Collections.singletonList(
+                FONT
             )));
     private static final Set<String> booleanValues = Collections.unmodifiableSet(
             new HashSet<>(Arrays.asList(
                     LOCKED,
                     HIDDEN,
-                    WRAP_TEXT
+                    WRAP_TEXT,
+                    SHRINK_TO_FIT,
+                    QUOTE_PREFIXED
             )));
     private static final Set<String> borderTypeValues = Collections.unmodifiableSet(
             new HashSet<>(Arrays.asList(
@@ -105,7 +111,7 @@ public final class CellUtil {
             )));
 
 
-    private static UnicodeMapping[] unicodeMappings;
+    private static final UnicodeMapping[] unicodeMappings;
 
     private static final class UnicodeMapping {
 
@@ -189,8 +195,114 @@ public final class CellUtil {
     }
 
     /**
+     * Copy cell value, formula and style, from srcCell per cell copy policy
+     * If srcCell is null, clears the cell value and cell style per cell copy policy.
+     *
+     * Note that if you are copying from a source cell from a different type of then you may need to disable style copying
+     * in the {@link CellCopyPolicy} (HSSF styles are not compatible with XSSF styles, for instance).
+     *
+     * This does not shift references in formulas. The <code>copyRowFrom</code> method on <code>XSSFRow</code>
+     * and <code>HSSFRow</code> does attempt to shift references in formulas.
+     *
+     * @param srcCell The cell to take value, formula and style from
+     * @param destCell The cell to copy to
+     * @param policy The policy for copying the information, see {@link CellCopyPolicy}
+     * @param context The context for copying, see {@link CellCopyContext}
+     * @throws IllegalArgumentException if copy cell style and srcCell is from a different workbook
+     * @throws IllegalStateException if srcCell hyperlink is not an instance of {@link Duplicatable}
+     * @since POI 5.2.0
+     */
+    @Beta
+    public static void copyCell(Cell srcCell, Cell destCell, CellCopyPolicy policy, CellCopyContext context) {
+        // Copy cell value (cell type is updated implicitly)
+        if (policy.isCopyCellValue()) {
+            if (srcCell != null) {
+                CellType copyCellType = srcCell.getCellType();
+                if (copyCellType == CellType.FORMULA && !policy.isCopyCellFormula()) {
+                    // Copy formula result as value
+                    // FIXME: Cached value may be stale
+                    copyCellType = srcCell.getCachedFormulaResultType();
+                }
+                switch (copyCellType) {
+                    case NUMERIC:
+                        // DataFormat is not copied unless policy.isCopyCellStyle is true
+                        if (DateUtil.isCellDateFormatted(srcCell)) {
+                            destCell.setCellValue(srcCell.getDateCellValue());
+                        }
+                        else {
+                            destCell.setCellValue(srcCell.getNumericCellValue());
+                        }
+                        break;
+                    case STRING:
+                        destCell.setCellValue(srcCell.getRichStringCellValue());
+                        break;
+                    case FORMULA:
+                        destCell.setCellFormula(srcCell.getCellFormula());
+                        break;
+                    case BLANK:
+                        destCell.setBlank();
+                        break;
+                    case BOOLEAN:
+                        destCell.setCellValue(srcCell.getBooleanCellValue());
+                        break;
+                    case ERROR:
+                        destCell.setCellErrorValue(srcCell.getErrorCellValue());
+                        break;
+
+                    default:
+                        throw new IllegalArgumentException("Invalid cell type " + srcCell.getCellType());
+                }
+            } else { //srcCell is null
+                destCell.setBlank();
+            }
+        }
+
+        // Copy CellStyle
+        if (policy.isCopyCellStyle()) {
+            if (srcCell.getSheet() != null && destCell.getSheet() != null &&
+                    destCell.getSheet().getWorkbook() == srcCell.getSheet().getWorkbook()) {
+                destCell.setCellStyle(srcCell.getCellStyle());
+            } else {
+                CellStyle srcStyle = srcCell.getCellStyle();
+                CellStyle destStyle = context == null ? null : context.getMappedStyle(srcStyle);
+                if (destStyle == null) {
+                    destStyle = destCell.getSheet().getWorkbook().createCellStyle();
+                    destStyle.cloneStyleFrom(srcStyle);
+                    if (context != null) context.putMappedStyle(srcStyle, destStyle);
+                }
+                destCell.setCellStyle(destStyle);
+            }
+        }
+
+        final Hyperlink srcHyperlink = (srcCell == null) ? null : srcCell.getHyperlink();
+
+        if (policy.isMergeHyperlink()) {
+            // if srcCell doesn't have a hyperlink and destCell has a hyperlink, don't clear destCell's hyperlink
+            if (srcHyperlink != null) {
+                if (srcHyperlink instanceof Duplicatable) {
+                    Hyperlink newHyperlink = (Hyperlink)((Duplicatable)srcHyperlink).copy();
+                    destCell.setHyperlink(newHyperlink);
+                } else {
+                    throw new IllegalStateException("srcCell hyperlink is not an instance of Duplicatable");
+                }
+            }
+        } else if (policy.isCopyHyperlink()) {
+            // overwrite the hyperlink at dest cell with srcCell's hyperlink
+            // if srcCell doesn't have a hyperlink, clear the hyperlink (if one exists) at destCell
+            if (srcHyperlink == null) {
+                destCell.setHyperlink(null);
+            } else if (srcHyperlink instanceof Duplicatable) {
+                Hyperlink newHyperlink = (Hyperlink)((Duplicatable)srcHyperlink).copy();
+                destCell.setHyperlink(newHyperlink);
+            } else {
+                throw new IllegalStateException("srcCell hyperlink is not an instance of Duplicatable");
+            }
+        }
+    }
+
+    /**
      * Take a cell, and align it.
-     * 
+     *
      * This is superior to cell.getCellStyle().setAlignment(align) because
      * this method will not modify the CellStyle object that may be referenced
      * by multiple cells. Instead, this method will search for existing CellStyles
@@ -206,10 +318,10 @@ public final class CellUtil {
     public static void setAlignment(Cell cell, HorizontalAlignment align) {
         setCellStyleProperty(cell, ALIGNMENT, align);
     }
-    
+
     /**
      * Take a cell, and vertically align it.
-     * 
+     *
      * This is superior to cell.getCellStyle().setVerticalAlignment(align) because
      * this method will not modify the CellStyle object that may be referenced
      * by multiple cells. Instead, this method will search for existing CellStyles
@@ -225,18 +337,18 @@ public final class CellUtil {
     public static void setVerticalAlignment(Cell cell, VerticalAlignment align) {
         setCellStyleProperty(cell, VERTICAL_ALIGNMENT, align);
     }
-    
+
     /**
      * Take a cell, and apply a font to it
      *
      * @param cell the cell to set the alignment for
      * @param font The Font that you want to set.
-     * @throws IllegalArgumentException if <tt>font</tt> and <tt>cell</tt> do not belong to the same workbook
+     * @throws IllegalArgumentException if {@code font} and {@code cell} do not belong to the same workbook
      */
     public static void setFont(Cell cell, Font font) {
         // Check if font belongs to workbook
         Workbook wb = cell.getSheet().getWorkbook();
-        final int fontIndex = font.getIndexAsInt();
+        final int fontIndex = font.getIndex();
         if (!wb.getFontAt(fontIndex).equals(font)) {
             throw new IllegalArgumentException("Font does not belong to this workbook");
         }
@@ -248,19 +360,19 @@ public final class CellUtil {
     }
 
     /**
-     * <p>This method attempts to find an existing CellStyle that matches the <code>cell</code>'s 
-     * current style plus styles properties in <code>properties</code>. A new style is created if the
+     * <p>This method attempts to find an existing CellStyle that matches the {@code cell}'s
+     * current style plus styles properties in {@code properties}. A new style is created if the
      * workbook does not contain a matching style.</p>
-     * 
-     * <p>Modifies the cell style of <code>cell</code> without affecting other cells that use the
+     *
+     * <p>Modifies the cell style of {@code cell} without affecting other cells that use the
      * same style.</p>
-     * 
+     *
      * <p>This is necessary because Excel has an upper limit on the number of styles that it supports.</p>
-     * 
+     *
      * <p>This function is more efficient than multiple calls to
-     * {@link #setCellStyleProperty(org.apache.poi.ss.usermodel.Cell, String, Object)}
+     * {@link #setCellStyleProperty(Cell, String, Object)}
      * if adding multiple cell styles.</p>
-     * 
+     *
      * <p>For performance reasons, if this is the only cell in a workbook that uses a cell style,
      * this method does NOT remove the old style from the workbook.
      * <!-- NOT IMPLEMENTED: Unused styles should be
@@ -273,10 +385,22 @@ public final class CellUtil {
      * @since POI 3.14 beta 2
      */
     public static void setCellStyleProperties(Cell cell, Map<String, Object> properties) {
+        setCellStyleProperties(cell, properties, false);
+    }
+
+    private static void setCellStyleProperties(final Cell cell, final Map<String, Object> properties,
+                                               final boolean disableNullColorCheck) {
         Workbook workbook = cell.getSheet().getWorkbook();
         CellStyle originalStyle = cell.getCellStyle();
+
         CellStyle newStyle = null;
         Map<String, Object> values = getFormatProperties(originalStyle);
+        if (properties.containsKey(FILL_FOREGROUND_COLOR_COLOR) && properties.get(FILL_FOREGROUND_COLOR_COLOR) == null) {
+            values.remove(FILL_FOREGROUND_COLOR);
+        }
+        if (properties.containsKey(FILL_BACKGROUND_COLOR_COLOR) && properties.get(FILL_BACKGROUND_COLOR_COLOR) == null) {
+            values.remove(FILL_BACKGROUND_COLOR);
+        }
         putAll(properties, values);
 
         // index seems like what index the cellstyle is in the list of styles for a workbook.
@@ -288,7 +412,7 @@ public final class CellUtil {
             Map<String, Object> wbStyleMap = getFormatProperties(wbStyle);
 
             // the desired style already exists in the workbook. Use the existing style.
-            if (wbStyleMap.equals(values)) {
+            if (styleMapsMatch(wbStyleMap, values, disableNullColorCheck)) {
                 newStyle = wbStyle;
                 break;
             }
@@ -303,37 +427,69 @@ public final class CellUtil {
         cell.setCellStyle(newStyle);
     }
 
+    private static boolean styleMapsMatch(final Map<String, Object> newProps,
+                                          final Map<String, Object> storedProps, final boolean disableNullColorCheck) {
+        final Map<String, Object> map1Copy = new HashMap<>(newProps);
+        final Map<String, Object> map2Copy = new HashMap<>(storedProps);
+        final Object backColor1 = map1Copy.remove(FILL_BACKGROUND_COLOR_COLOR);
+        final Object backColor2 = map2Copy.remove(FILL_BACKGROUND_COLOR_COLOR);
+        final Object foreColor1 = map1Copy.remove(FILL_FOREGROUND_COLOR_COLOR);
+        final Object foreColor2 = map2Copy.remove(FILL_FOREGROUND_COLOR_COLOR);
+        if (map1Copy.equals(map2Copy)) {
+            final boolean backColorsMatch = (!disableNullColorCheck && backColor2 == null)
+                    || Objects.equals(backColor1, backColor2);
+            final boolean foreColorsMatch = (!disableNullColorCheck && foreColor2 == null)
+                    || Objects.equals(foreColor1, foreColor2);
+            return backColorsMatch && foreColorsMatch;
+        }
+        return false;
+    }
+
     /**
-     * <p>This method attempts to find an existing CellStyle that matches the <code>cell</code>'s
-     * current style plus a single style property <code>propertyName</code> with value
-     * <code>propertyValue</code>.
+     * <p>This method attempts to find an existing CellStyle that matches the {@code cell}'s
+     * current style plus a single style property {@code propertyName} with value
+     * {@code propertyValue}.
      * A new style is created if the workbook does not contain a matching style.</p>
-     * 
-     * <p>Modifies the cell style of <code>cell</code> without affecting other cells that use the
+     *
+     * <p>Modifies the cell style of {@code cell} without affecting other cells that use the
      * same style.</p>
-     * 
+     *
      * <p>If setting more than one cell style property on a cell, use
-     * {@link #setCellStyleProperties(org.apache.poi.ss.usermodel.Cell, Map)},
+     * {@link #setCellStyleProperties(Cell, Map)},
      * which is faster and does not add unnecessary intermediate CellStyles to the workbook.</p>
-     * 
+     *
      * @param cell The cell that is to be changed.
      * @param propertyName The name of the property that is to be changed.
      * @param propertyValue The value of the property that is to be changed.
      */
     public static void setCellStyleProperty(Cell cell, String propertyName, Object propertyValue) {
-        Map<String, Object> property = Collections.singletonMap(propertyName, propertyValue);
-        setCellStyleProperties(cell, property);
+        boolean disableNullColorCheck = false;
+        final Map<String, Object> propMap;
+        if (CellUtil.FILL_FOREGROUND_COLOR_COLOR.equals(propertyName) && propertyValue == null) {
+            disableNullColorCheck = true;
+            propMap = new HashMap<>();
+            propMap.put(CellUtil.FILL_FOREGROUND_COLOR_COLOR, null);
+            propMap.put(CellUtil.FILL_FOREGROUND_COLOR, null);
+        } else if (CellUtil.FILL_BACKGROUND_COLOR_COLOR.equals(propertyName) && propertyValue == null) {
+            disableNullColorCheck = true;
+            propMap = new HashMap<>();
+            propMap.put(CellUtil.FILL_BACKGROUND_COLOR_COLOR, null);
+            propMap.put(CellUtil.FILL_BACKGROUND_COLOR, null);
+        } else {
+            propMap = Collections.singletonMap(propertyName, propertyValue);
+        }
+        setCellStyleProperties(cell, propMap, disableNullColorCheck);
     }
 
     /**
      * Returns a map containing the format properties of the given cell style.
-     * The returned map is not tied to <code>style</code>, so subsequent changes
-     * to <code>style</code> will not modify the map, and changes to the returned
+     * The returned map is not tied to {@code style}, so subsequent changes
+     * to {@code style} will not modify the map, and changes to the returned
      * map will not modify the cell style. The returned map is mutable.
      *
      * @param style cell style
      * @return map of format properties (String -> Object)
-     * @see #setFormatProperties(org.apache.poi.ss.usermodel.CellStyle, org.apache.poi.ss.usermodel.Workbook, java.util.Map)
+     * @see #setFormatProperties(CellStyle, Workbook, Map)
      */
     private static Map<String, Object> getFormatProperties(CellStyle style) {
         Map<String, Object> properties = new HashMap<>();
@@ -346,8 +502,12 @@ public final class CellUtil {
         put(properties, BOTTOM_BORDER_COLOR, style.getBottomBorderColor());
         put(properties, DATA_FORMAT, style.getDataFormat());
         put(properties, FILL_PATTERN, style.getFillPattern());
+        
         put(properties, FILL_FOREGROUND_COLOR, style.getFillForegroundColor());
         put(properties, FILL_BACKGROUND_COLOR, style.getFillBackgroundColor());
+        put(properties, FILL_FOREGROUND_COLOR_COLOR, style.getFillForegroundColorColor());
+        put(properties, FILL_BACKGROUND_COLOR_COLOR, style.getFillBackgroundColorColor());
+
         put(properties, FONT, style.getFontIndex());
         put(properties, HIDDEN, style.getHidden());
         put(properties, INDENTION, style.getIndention());
@@ -357,9 +517,11 @@ public final class CellUtil {
         put(properties, ROTATION, style.getRotation());
         put(properties, TOP_BORDER_COLOR, style.getTopBorderColor());
         put(properties, WRAP_TEXT, style.getWrapText());
+        put(properties, SHRINK_TO_FIT, style.getShrinkToFit());
+        put(properties, QUOTE_PREFIXED, style.getQuotePrefixed());
         return properties;
     }
-    
+
     /**
      * Copies the entries in src to dest, using the preferential data type
      * so that maps can be compared for equality
@@ -371,7 +533,9 @@ public final class CellUtil {
     private static void putAll(final Map<String, Object> src, Map<String, Object> dest) {
         for (final String key : src.keySet()) {
             if (shortValues.contains(key)) {
-                dest.put(key, getShort(src, key));
+                dest.put(key, nullableShort(src, key));
+            } else if (colorValues.contains(key)) {
+                dest.put(key, getColor(src, key));
             } else if (intValues.contains(key)) {
                 dest.put(key, getInt(src, key));
             } else if (booleanValues.contains(key)) {
@@ -385,7 +549,7 @@ public final class CellUtil {
             } else if (FILL_PATTERN.equals(key)) {
                 dest.put(key, getFillPattern(src, key));
             } else {
-                log.log(POILogger.INFO, "Ignoring unrecognized CellUtil format properties key: ", key);
+                LOGGER.atInfo().log("Ignoring unrecognized CellUtil format properties key: {}", key);
             }
         }
     }
@@ -408,8 +572,34 @@ public final class CellUtil {
         style.setBottomBorderColor(getShort(properties, BOTTOM_BORDER_COLOR));
         style.setDataFormat(getShort(properties, DATA_FORMAT));
         style.setFillPattern(getFillPattern(properties, FILL_PATTERN));
-        style.setFillForegroundColor(getShort(properties, FILL_FOREGROUND_COLOR));
-        style.setFillBackgroundColor(getShort(properties, FILL_BACKGROUND_COLOR));
+
+        Short fillForeColorShort = nullableShort(properties, FILL_FOREGROUND_COLOR);
+        if (fillForeColorShort != null) {
+            style.setFillForegroundColor(fillForeColorShort);
+        }
+        Short fillBackColorShort = nullableShort(properties, FILL_BACKGROUND_COLOR);
+        if (fillBackColorShort != null) {
+            style.setFillBackgroundColor(fillBackColorShort);
+        }
+
+        Color foregroundFillColor = getColor(properties, FILL_FOREGROUND_COLOR_COLOR);
+        Color backgroundFillColor = getColor(properties, FILL_BACKGROUND_COLOR_COLOR);
+
+        if (foregroundFillColor != null) {
+            try {
+                style.setFillForegroundColor(foregroundFillColor);
+            } catch (IllegalArgumentException iae) {
+                LOGGER.atDebug().log("Mismatched FillForegroundColor instance used", iae);
+            }
+        }
+        if (backgroundFillColor != null) {
+            try {
+                style.setFillBackgroundColor(backgroundFillColor);
+            } catch (IllegalArgumentException iae) {
+                LOGGER.atDebug().log("Mismatched FillBackgroundColor instance used", iae);
+            }
+        }
+
         style.setFont(workbook.getFontAt(getInt(properties, FONT)));
         style.setHidden(getBoolean(properties, HIDDEN));
         style.setIndention(getShort(properties, INDENTION));
@@ -419,6 +609,8 @@ public final class CellUtil {
         style.setRotation(getShort(properties, ROTATION));
         style.setTopBorderColor(getShort(properties, TOP_BORDER_COLOR));
         style.setWrapText(getBoolean(properties, WRAP_TEXT));
+        style.setShrinkToFit(getBoolean(properties, SHRINK_TO_FIT));
+        style.setQuotePrefixed(getBoolean(properties, QUOTE_PREFIXED));
     }
 
     /**
@@ -437,6 +629,34 @@ public final class CellUtil {
         return 0;
     }
 
+    private static Short nullableShort(Map<String, Object> properties, String name) {
+        Object value = properties.get(name);
+        if (value instanceof Short) {
+            return (Short) value;
+        }
+        if (value instanceof Number) {
+            return ((Number) value).shortValue();
+        }
+        return null;
+    }
+    
+    /**
+     * Utility method that returns the named Color value from the given map.
+     *
+     * @param properties map of named properties (String -> Object)
+     * @param name property name
+     * @return null if the property does not exist, or is not a {@link Color}
+     *         otherwise the property value
+     */
+    private static Color getColor(Map<String, Object> properties, String name) {
+        Object value = properties.get(name);
+        if (value instanceof Color) {
+            return (Color) value;
+        }
+        return null;
+    }
+
+
     /**
      * Utility method that returns the named int value from the given map.
      *
@@ -452,7 +672,7 @@ public final class CellUtil {
         }
         return 0;
     }
-    
+
     /**
      * Utility method that returns the named BorderStyle value from the given map.
      *
@@ -468,22 +688,19 @@ public final class CellUtil {
         }
         // @deprecated 3.15 beta 2. getBorderStyle will only work on BorderStyle enums instead of codes in the future.
         else if (value instanceof Short) {
-            if (log.check(POILogger.WARN)) {
-                log.log(POILogger.WARN, "Deprecation warning: CellUtil properties map uses Short values for "
-                        + name + ". Should use BorderStyle enums instead.");
-            }
-            short code = ((Short) value).shortValue();
+            LOGGER.atWarn().log("Deprecation warning: CellUtil properties map uses Short values for {}. Should use BorderStyle enums instead.", name);
+            short code = (Short) value;
             border = BorderStyle.valueOf(code);
         }
         else if (value == null) {
             border = BorderStyle.NONE;
         }
         else {
-            throw new RuntimeException("Unexpected border style class. Must be BorderStyle or Short (deprecated).");
+            throw new IllegalStateException("Unexpected border style class. Must be BorderStyle or Short (deprecated).");
         }
         return border;
     }
-    
+
     /**
      * Utility method that returns the named FillPatternType value from the given map.
      *
@@ -500,22 +717,19 @@ public final class CellUtil {
         }
         // @deprecated 3.15 beta 2. getFillPattern will only work on FillPatternType enums instead of codes in the future.
         else if (value instanceof Short) {
-            if (log.check(POILogger.WARN)) {
-                log.log(POILogger.WARN, "Deprecation warning: CellUtil properties map uses Short values for "
-                        + name + ". Should use FillPatternType enums instead.");
-            }
-            short code = ((Short) value).shortValue();
+            LOGGER.atWarn().log("Deprecation warning: CellUtil properties map uses Short values for {}. Should use FillPatternType enums instead.", name);
+            short code = (Short) value;
             pattern = FillPatternType.forInt(code);
         }
         else if (value == null) {
             pattern = FillPatternType.NO_FILL;
         }
         else {
-            throw new RuntimeException("Unexpected fill pattern style class. Must be FillPatternType or Short (deprecated).");
+            throw new IllegalStateException("Unexpected fill pattern style class. Must be FillPatternType or Short (deprecated).");
         }
         return pattern;
     }
-    
+
     /**
      * Utility method that returns the named HorizontalAlignment value from the given map.
      *
@@ -532,22 +746,19 @@ public final class CellUtil {
         }
         // @deprecated 3.15 beta 2. getHorizontalAlignment will only work on HorizontalAlignment enums instead of codes in the future.
         else if (value instanceof Short) {
-            if (log.check(POILogger.WARN)) {
-                log.log(POILogger.WARN, "Deprecation warning: CellUtil properties map used a Short value for "
-                        + name + ". Should use HorizontalAlignment enums instead.");
-            }
-            short code = ((Short) value).shortValue();
+            LOGGER.atWarn().log("Deprecation warning: CellUtil properties map used a Short value for {}. Should use HorizontalAlignment enums instead.", name);
+            short code = (Short) value;
             align = HorizontalAlignment.forInt(code);
         }
         else if (value == null) {
             align = HorizontalAlignment.GENERAL;
         }
         else {
-            throw new RuntimeException("Unexpected horizontal alignment style class. Must be HorizontalAlignment or Short (deprecated).");
+            throw new IllegalStateException("Unexpected horizontal alignment style class. Must be HorizontalAlignment or Short (deprecated).");
         }
         return align;
     }
-    
+
     /**
      * Utility method that returns the named VerticalAlignment value from the given map.
      *
@@ -564,18 +775,15 @@ public final class CellUtil {
         }
         // @deprecated 3.15 beta 2. getVerticalAlignment will only work on VerticalAlignment enums instead of codes in the future.
         else if (value instanceof Short) {
-            if (log.check(POILogger.WARN)) {
-                log.log(POILogger.WARN, "Deprecation warning: CellUtil properties map used a Short value for "
-                        + name + ". Should use VerticalAlignment enums instead.");
-            }
-            short code = ((Short) value).shortValue();
+            LOGGER.atWarn().log("Deprecation warning: CellUtil properties map used a Short value for {}. Should use VerticalAlignment enums instead.", name);
+            short code = (Short) value;
             align = VerticalAlignment.forInt(code);
         }
         else if (value == null) {
             align = VerticalAlignment.BOTTOM;
         }
         else {
-            throw new RuntimeException("Unexpected vertical alignment style class. Must be VerticalAlignment or Short (deprecated).");
+            throw new IllegalStateException("Unexpected vertical alignment style class. Must be VerticalAlignment or Short (deprecated).");
         }
         return align;
     }
@@ -592,7 +800,7 @@ public final class CellUtil {
         Object value = properties.get(name);
         //noinspection SimplifiableIfStatement
         if (value instanceof Boolean) {
-            return ((Boolean) value).booleanValue();
+            return (Boolean) value;
         }
         return false;
     }

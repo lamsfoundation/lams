@@ -29,7 +29,7 @@ import org.apache.poi.util.LittleEndianOutput;
  * This is part of a bizarre scheme to save disk space and memory (gee look at all the other whole
  * records that are in the file just "cause".., far better to waste processor cycles on this then
  * leave on of those "valuable" records out).
- * We support this in READ-ONLY mode.  HSSF converts these to NUMBER records<p>
+ * We support this in READ-ONLY mode.  HSSF converts these to NUMBER records
  *
  * @see org.apache.poi.hssf.record.NumberRecord
  */
@@ -40,7 +40,7 @@ public final class RKRecord extends CellRecord {
     public static final short RK_INTEGER               = 2;
     public static final short RK_INTEGER_TIMES_100     = 3;
 
-    private int field_4_rk_number;
+    private final int field_4_rk_number;
 
     public RKRecord(RKRecord other) {
         super(other);
@@ -75,17 +75,17 @@ public final class RKRecord extends CellRecord {
 
     @Override
     protected String getRecordName() {
-    	return "RK";
+        return "RK";
     }
 
     @Override
     protected void serializeValue(LittleEndianOutput out) {
-    	out.writeInt(field_4_rk_number);
+        out.writeInt(field_4_rk_number);
     }
 
     @Override
     protected int getValueDataSize() {
-    	return 4;
+        return 4;
     }
 
     @Override

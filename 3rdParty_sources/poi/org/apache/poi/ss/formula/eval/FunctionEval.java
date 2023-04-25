@@ -73,9 +73,9 @@ public final class FunctionEval {
         retval[5] = AggregateFunction.AVERAGE;
         retval[6] = AggregateFunction.MIN;
         retval[7] = AggregateFunction.MAX;
-        retval[8] = new RowFunc(); // ROW
-        retval[9] = new Column();
-        retval[10] = new Na();
+        retval[8] = RowFunc::evaluate; // ROW
+        retval[9] = Column::evaluate;
+        retval[10] = Na::evaluate;
         retval[11] = new Npv();
         retval[12] = AggregateFunction.STDEV;
         retval[13] = NumericFunction.DOLLAR;
@@ -105,14 +105,14 @@ public final class FunctionEval {
         retval[37] = BooleanFunction.OR;
         retval[38] = BooleanFunction.NOT;
         retval[39] = NumericFunction.MOD;
-        // 40: DCOUNT
+        retval[40] = new DStarRunner(DStarRunner.DStarAlgorithmEnum.DCOUNT);
         retval[41] = new DStarRunner(DStarRunner.DStarAlgorithmEnum.DSUM);
-        // 42: DAVERAGE
+        retval[42] = new DStarRunner(DStarRunner.DStarAlgorithmEnum.DAVERAGE);
         retval[43] = new DStarRunner(DStarRunner.DStarAlgorithmEnum.DMIN);
         retval[44] = new DStarRunner(DStarRunner.DStarAlgorithmEnum.DMAX);
-        // 45: DSTDEV
+        retval[45] = new DStarRunner(DStarRunner.DStarAlgorithmEnum.DSTDEV);
         retval[46] = AggregateFunction.VAR;
-        // 47: DVAR
+        retval[47] = new DStarRunner(DStarRunner.DStarAlgorithmEnum.DVAR);
         retval[48] = TextFunction.TEXT;
         // 49: LINEST
         retval[50] = new Trend();
@@ -137,7 +137,7 @@ public final class FunctionEval {
         retval[71] = CalendarFieldFunction.HOUR;
         retval[72] = CalendarFieldFunction.MINUTE;
         retval[73] = CalendarFieldFunction.SECOND;
-        retval[74] = new Now();
+        retval[74] = Now::evaluate;
         retval[75] = new Areas();
         retval[76] = new Rows();
         retval[77] = new Columns();
@@ -181,7 +181,7 @@ public final class FunctionEval {
         retval[130] = new T();
         // 131: N
         retval[140] = new DateValue();
-        // 141: TIMEVALUE
+        retval[141] = new TimeValue();
         // 142: SLN
         // 143: SYD
         // 144: DDB
@@ -201,15 +201,16 @@ public final class FunctionEval {
         retval[183] = AggregateFunction.PRODUCT;
         retval[184] = NumericFunction.FACT;
 
-        // 189: DPRODUCT
+        retval[189] = new DStarRunner(DStarRunner.DStarAlgorithmEnum.DPRODUCT);
         retval[190] = LogicalFunction.ISNONTEXT;
 
+        retval[193] = AggregateFunction.STDEVP;
         retval[194] = AggregateFunction.VARP;
-        // 195: DSTDEVP
-        // 196: DVARP
+        retval[195] = new DStarRunner(DStarRunner.DStarAlgorithmEnum.DSTDEVP);
+        retval[196] = new DStarRunner(DStarRunner.DStarAlgorithmEnum.DVARP);
         retval[197] = NumericFunction.TRUNC;
         retval[198] = LogicalFunction.ISLOGICAL;
-        // 199: DCOUNTA
+        retval[199] = new DStarRunner(DStarRunner.DStarAlgorithmEnum.DCOUNTA);
 
         //204: USDOLLAR (YEN in BIFF3)
         //205: FINDB
@@ -226,7 +227,7 @@ public final class FunctionEval {
         retval[216] = new Rank();
         retval[219] = new Address();
         retval[220] = new Days360();
-        retval[221] = new Today();
+        retval[221] = Today::evaluate;
         //222: VBD
 
         retval[227] = AggregateFunction.MEDIAN;
@@ -242,7 +243,6 @@ public final class FunctionEval {
         // 244: INFO
 
         // 247: DB
-        // 252: FEQUENCY
         retval[252] = Frequency.instance;
 
         retval[FunctionID.EXTERNAL_FUNC] = null; // ExternalFunction is a FreeRefFunction, nominally 255
@@ -258,8 +258,8 @@ public final class FunctionEval {
         // 275: CHIINV
         retval[276] = NumericFunction.COMBIN;
         // 277: CONFIDENCE
-        // 278:CRITBINOM
-        retval[279] = new Even();
+        // 278: CRITBINOM
+        retval[279] = NumericFunction.EVEN;
         // 280: EXPONDIST
         // 281: FDIST
         // 282: FINV
@@ -273,26 +273,26 @@ public final class FunctionEval {
         // 290: LOGNORMDIST
         // 291: LOGINV
         // 292: NEGBINOMDIST
-        // 293: NORMDIST
-        // 294: NORMSDIST
-        // 295: NORMINV
-        // 296: NORMSINV
-        // 297: STANDARDIZE
-        retval[298] = new Odd();
+        retval[293] = NormDist.instance;
+        retval[294] = NormSDist.instance;
+        retval[295] = NormInv.instance;
+        retval[296] = NormSInv.instance;
+        retval[297] = Standardize.instance;
+        retval[298] = NumericFunction.ODD;
         // 299: PERMUT
         retval[300] = NumericFunction.POISSON;
-        // 301: TDIST
+        retval[301] = TDist.instance;
         // 302: WEIBULL
         retval[303] = new Sumxmy2();
         retval[304] = new Sumx2my2();
         retval[305] = new Sumx2py2();
         // 306: CHITEST
-        // 307: CORREL
-        // 308: COVAR
-        // 309: FORECAST
+        retval[307] = Correl.instance;
+        retval[308] = Covar.instanceP;
+        retval[309] = Forecast.instance;
         // 310: FTEST
         retval[311] = new Intercept();
-        // 312: PEARSON
+        retval[312] = Correl.instance;
         // 313: RSQ
         // 314: STEYX
         retval[315] = new Slope();
@@ -309,7 +309,7 @@ public final class FunctionEval {
         retval[326] = AggregateFunction.SMALL;
         // 327: QUARTILE
         retval[328] = AggregateFunction.PERCENTILE;
-        // 329: PERCENTRANK
+        retval[329] = PercentRank.instance;
         retval[330] = new Mode();
         // 331: TRIMMEAN
         // 332: TINV
@@ -333,13 +333,13 @@ public final class FunctionEval {
         // 358: GETPIVOTDATA
         retval[359] = new Hyperlink();
         // 360: PHONETIC
-        // 361: AVERAGEA
+        retval[361] = AggregateFunction.AVERAGEA;
         retval[362] = MinaMaxa.MAXA;
         retval[363] = MinaMaxa.MINA;
-        // 364: STDEVPA
-        // 365: VARPA
-        // 366: STDEVA
-        // 367: VARA
+        retval[364] = AggregateFunction.STDEVPA;
+        retval[365] = AggregateFunction.VARPA;
+        retval[366] = AggregateFunction.STDEVA;
+        retval[367] = AggregateFunction.VARA;
 
         for (int i = 0; i < retval.length; i++) {
             Function f = retval[i];
@@ -375,7 +375,7 @@ public final class FunctionEval {
      * Register a new function in runtime.
      *
      * @param name  the function name
-     * @param func  the functoin to register
+     * @param func  the function to register
      * @throws IllegalArgumentException if the function is unknown or already  registered.
      * @since 3.8 beta6
      */
@@ -428,7 +428,7 @@ public final class FunctionEval {
         Collection<String> lst = new TreeSet<>();
         for (int i = 0; i < functions.length; i++) {
             Function func = functions[i];
-            if (func != null && (func instanceof NotImplementedFunction)) {
+            if ((func instanceof NotImplementedFunction)) {
                 FunctionMetadata metaData = FunctionMetadataRegistry.getFunctionByIndex(i);
                 lst.add(metaData.getName());
             }

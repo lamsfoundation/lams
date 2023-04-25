@@ -24,21 +24,22 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.XmlStreamReader;
 
 /**
- * Character stream that handles all the necessary Voodo to figure out the
+ * Character stream that handles all the necessary Voodoo to figure out the
  * charset encoding of the XML document written to the stream.
  *
- * @version $Id: XmlStreamWriter.java 1415850 2012-11-30 20:51:39Z ggregory $
  * @see XmlStreamReader
  * @since 2.0
  */
 public class XmlStreamWriter extends Writer {
-    private static final int BUFFER_SIZE = 4096;
+    private static final int BUFFER_SIZE = IOUtils.DEFAULT_BUFFER_SIZE;
 
     private final OutputStream out;
 
@@ -51,7 +52,7 @@ public class XmlStreamWriter extends Writer {
     private String encoding;
 
     /**
-     * Construct an new XML stream writer for the specified output stream
+     * Constructs a new XML stream writer for the specified output stream
      * with a default encoding of UTF-8.
      *
      * @param out The output stream
@@ -61,7 +62,7 @@ public class XmlStreamWriter extends Writer {
     }
 
     /**
-     * Construct an new XML stream writer for the specified output stream
+     * Constructs a new XML stream writer for the specified output stream
      * with the specified default encoding.
      *
      * @param out The output stream
@@ -73,9 +74,9 @@ public class XmlStreamWriter extends Writer {
     }
 
     /**
-     * Construct an new XML stream writer for the specified file
+     * Constructs a new XML stream writer for the specified file
      * with a default encoding of UTF-8.
-     * 
+     *
      * @param file The file to write to
      * @throws FileNotFoundException if there is an error creating or
      * opening the file
@@ -85,20 +86,21 @@ public class XmlStreamWriter extends Writer {
     }
 
     /**
-     * Construct an new XML stream writer for the specified file
+     * Constructs a new XML stream writer for the specified file
      * with the specified default encoding.
-     * 
+     *
      * @param file The file to write to
      * @param defaultEncoding The default encoding if not encoding could be detected
      * @throws FileNotFoundException if there is an error creating or
      * opening the file
      */
+    @SuppressWarnings("resource")
     public XmlStreamWriter(final File file, final String defaultEncoding) throws FileNotFoundException {
         this(new FileOutputStream(file), defaultEncoding);
     }
 
     /**
-     * Return the detected encoding.
+     * Returns the detected encoding.
      *
      * @return the detected encoding
      */
@@ -107,7 +109,7 @@ public class XmlStreamWriter extends Writer {
     }
 
     /**
-     * Return the default encoding.
+     * Returns the default encoding.
      *
      * @return the default encoding
      */
@@ -116,7 +118,7 @@ public class XmlStreamWriter extends Writer {
     }
 
     /**
-     * Close the underlying writer.
+     * Closes the underlying writer.
      *
      * @throws IOException if an error occurs closing the underlying writer
      */
@@ -131,7 +133,7 @@ public class XmlStreamWriter extends Writer {
     }
 
     /**
-     * Flush the underlying writer.
+     * Flushes the underlying writer.
      *
      * @throws IOException if an error occurs flushing the underlying writer
      */
@@ -143,7 +145,7 @@ public class XmlStreamWriter extends Writer {
     }
 
     /**
-     * Detect the encoding.
+     * Detects the encoding.
      *
      * @param cbuf the buffer to write the characters from
      * @param off The start offset
@@ -169,19 +171,17 @@ public class XmlStreamWriter extends Writer {
                     final Matcher m = ENCODING_PATTERN.matcher(xmlProlog.substring(0,
                             xmlPrologEnd));
                     if (m.find()) {
-                        encoding = m.group(1).toUpperCase();
+                        encoding = m.group(1).toUpperCase(Locale.ROOT);
                         encoding = encoding.substring(1, encoding.length() - 1);
                     } else {
                         // no encoding found in XML prolog: using default
                         // encoding
                         encoding = defaultEncoding;
                     }
-                } else {
-                    if (xmlProlog.length() >= BUFFER_SIZE) {
-                        // no encoding found in first characters: using default
-                        // encoding
-                        encoding = defaultEncoding;
-                    }
+                } else if (xmlProlog.length() >= BUFFER_SIZE) {
+                    // no encoding found in first characters: using default
+                    // encoding
+                    encoding = defaultEncoding;
                 }
             } else {
                 // no XML prolog: using default encoding
@@ -200,8 +200,8 @@ public class XmlStreamWriter extends Writer {
     }
 
     /**
-     * Write the characters to the underlying writer, detecing encoding.
-     * 
+     * Writes the characters to the underlying writer, detecting encoding.
+     *
      * @param cbuf the buffer to write the characters from
      * @param off The start offset
      * @param len The number of characters to write

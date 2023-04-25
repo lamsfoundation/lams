@@ -17,13 +17,13 @@
 
 package org.apache.poi.poifs.filesystem;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import org.apache.commons.io.input.UnsynchronizedByteArrayInputStream;
+import org.apache.commons.io.output.UnsynchronizedByteArrayOutputStream;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.LittleEndianByteArrayInputStream;
 import org.apache.poi.util.LittleEndianConsts;
@@ -48,11 +48,13 @@ public class Ole10Native {
 
 
     public static final String OLE10_NATIVE = "\u0001Ole10Native";
-    private static final Charset ISO1 = StandardCharsets.ISO_8859_1;
+    private static final Charset UTF8 = StandardCharsets.UTF_8;
     // arbitrarily selected; may need to increase
-    private static final int MAX_RECORD_LENGTH = 100_000_000;
+    private static final int DEFAULT_MAX_RECORD_LENGTH = 100_000_000;
+    private static int MAX_RECORD_LENGTH = DEFAULT_MAX_RECORD_LENGTH;
     // arbitrarily selected; may need to increase
-    private static final int MAX_STRING_LENGTH = 1024;
+    private static final int DEFAULT_MAX_STRING_LENGTH = 1024;
+    private static int MAX_STRING_LENGTH = DEFAULT_MAX_STRING_LENGTH;
 
     /**
      * Default content of the \u0001Ole entry
@@ -136,6 +138,34 @@ public class Ole10Native {
             byte[] data = IOUtils.toByteArray(dis, nativeEntry.getSize(), MAX_RECORD_LENGTH);
             return new Ole10Native(data, 0);
         }
+    }
+
+    /**
+     * @param length the max record length allowed for Ole10Native
+     */
+    public static void setMaxRecordLength(int length) {
+        MAX_RECORD_LENGTH = length;
+    }
+
+    /**
+     * @return the max record length allowed for Ole10Native
+     */
+    public static int getMaxRecordLength() {
+        return MAX_RECORD_LENGTH;
+    }
+
+    /**
+     * @param length the max string length allowed for Ole10Native
+     */
+    public static void setMaxStringLength(int length) {
+        MAX_STRING_LENGTH = length;
+    }
+
+    /**
+     * @return the max string length allowed for Ole10Native
+     */
+    public static int getMaxStringLength() {
+        return MAX_STRING_LENGTH;
     }
 
     /**
@@ -224,7 +254,7 @@ public class Ole10Native {
      */
     public static void createOleMarkerEntry(final DirectoryEntry parent) throws IOException {
         if (!parent.hasEntry(OLE_MARKER_NAME)) {
-            parent.createDocument(OLE_MARKER_NAME, new ByteArrayInputStream(OLE_MARKER_BYTES));
+            parent.createDocument(OLE_MARKER_NAME, new UnsynchronizedByteArrayInputStream(OLE_MARKER_BYTES));
         }
     }
 
@@ -246,7 +276,7 @@ public class Ole10Native {
         byte[] buf = new byte[MAX_STRING_LENGTH];
         for (int i=0; i<buf.length; i++) {
             if ((buf[i] = is.readByte()) == 0) {
-                return StringUtil.getFromCompressedUnicode(buf, 0, i);
+                return StringUtil.getFromCompressedUTF8(buf, 0, i);
             }
         }
         throw new Ole10NativeException("AsciiZ string was not null terminated after " + MAX_STRING_LENGTH + " bytes - Exiting.");
@@ -336,7 +366,7 @@ public class Ole10Native {
     /**
      * Returns the size of the embedded file. If the size is 0 (zero), no data
      * has been embedded. To be sure, that no data has been embedded, check
-     * whether {@link #getDataBuffer()} returns <code>null</code>.
+     * whether {@link #getDataBuffer()} returns {@code null}.
      *
      * @return the dataSize
      */
@@ -346,10 +376,10 @@ public class Ole10Native {
 
     /**
      * Returns the buffer containing the embedded file's data, or
-     * <code>null</code> if no data was embedded. Note that an embedding may
+     * {@code null} if no data was embedded. Note that an embedding may
      * provide information about the data, but the actual data is not included.
      * (So label, filename etc. are available, but this method returns
-     * <code>null</code>.)
+     * {@code null}.)
      *
      * @return the dataBuffer
      */
@@ -372,19 +402,19 @@ public class Ole10Native {
 
         switch (mode) {
             case parsed: {
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                UnsynchronizedByteArrayOutputStream bos = new UnsynchronizedByteArrayOutputStream();
                 try (LittleEndianOutputStream leos = new LittleEndianOutputStream(bos)) {
                     // total size, will be determined later ..
 
                     leos.writeShort(getFlags1());
-                    leos.write(getLabel().getBytes(ISO1));
+                    leos.write(getLabel().getBytes(UTF8));
                     leos.write(0);
-                    leos.write(getFileName().getBytes(ISO1));
+                    leos.write(getFileName().getBytes(UTF8));
                     leos.write(0);
                     leos.writeShort(getFlags2());
                     leos.writeShort(getUnknown1());
                     leos.writeInt(getCommand().length() + 1);
-                    leos.write(getCommand().getBytes(ISO1));
+                    leos.write(getCommand().getBytes(UTF8));
                     leos.write(0);
                     leos.writeInt(getDataSize());
                     leos.write(getDataBuffer());

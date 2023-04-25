@@ -26,29 +26,34 @@ import org.apache.poi.util.LittleEndianOutput;
  */
 public abstract class ValueOperatorPtg extends OperationPtg {
 
-	protected ValueOperatorPtg() {}
+    protected ValueOperatorPtg() {}
 
-	/**
-	 * All Operator <tt>Ptg</tt>s are base tokens (i.e. are not RVA classified)
-	 */
-	public final boolean isBaseToken() {
-		return true;
-	}
+    /**
+     * All Operator {@code Ptg}s are base tokens (i.e. are not RVA classified)
+     */
+    @Override
+    public final boolean isBaseToken() {
+        return true;
+    }
 
-	public final byte getDefaultOperandClass() {
-		return Ptg.CLASS_VALUE;
-	}
+    @Override
+    public final byte getDefaultOperandClass() {
+        return Ptg.CLASS_VALUE;
+    }
 
-	public void write(LittleEndianOutput out) {
-		out.writeByte(getSid());
-	}
+    @Override
+    public void write(LittleEndianOutput out) {
+        out.writeByte(getSid());
+    }
 
-	public final int getSize() {
-		return 1;
-	}
+    @Override
+    public final int getSize() {
+        return 1;
+    }
 
-	public final String toFormulaString() {
-		// TODO - prune this method out of the hierarchy
-		throw new RuntimeException("toFormulaString(String[] operands) should be used for subclasses of OperationPtgs");
-	}
+    @Override
+    public final String toFormulaString() {
+        // TODO - prune this method out of the hierarchy
+        throw new RuntimeException("toFormulaString(String[] operands) should be used for subclasses of OperationPtgs");
+    }
 }

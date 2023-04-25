@@ -17,11 +17,11 @@
 
 package org.apache.poi.poifs.filesystem;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.apache.commons.io.input.UnsynchronizedByteArrayInputStream;
+import org.apache.commons.io.output.UnsynchronizedByteArrayOutputStream;
 import org.apache.poi.poifs.common.POIFSConstants;
 import org.apache.poi.poifs.property.DocumentProperty;
 
@@ -30,48 +30,48 @@ import org.apache.poi.poifs.property.DocumentProperty;
  * {@link POIFSFileSystem} instance.
  */
 public final class DocumentOutputStream extends OutputStream {
-	/** the Document's size, i.e. the size of the big block data - mini block data is cached and not counted */
-	private int _document_size = 0;
+    /** the Document's size, i.e. the size of the big block data - mini block data is cached and not counted */
+    private int _document_size = 0;
 
     /** have we been closed? */
-	private boolean _closed = false;
+    private boolean _closed = false;
 
-	/** the actual Document */
-	private POIFSDocument _document;
-	/** and its Property */
-	private DocumentProperty _property;
+    /** the actual Document */
+    private final POIFSDocument _document;
+    /** and its Property */
+    private final DocumentProperty _property;
 
-	/** our buffer, when null we're into normal blocks */
-	private ByteArrayOutputStream _buffer =
-	        new ByteArrayOutputStream(POIFSConstants.BIG_BLOCK_MINIMUM_DOCUMENT_SIZE);
+    /** our buffer, when null we're into normal blocks */
+    private UnsynchronizedByteArrayOutputStream _buffer =
+            new UnsynchronizedByteArrayOutputStream(POIFSConstants.BIG_BLOCK_MINIMUM_DOCUMENT_SIZE);
 
-	/** our main block stream, when we're into normal blocks */
-	private POIFSStream _stream;
-	private OutputStream _stream_output;
+    /** our main block stream, when we're into normal blocks */
+    private POIFSStream _stream;
+    private OutputStream _stream_output;
 
     /** a write limit or -1 if unlimited */
     private final long _limit;
 
 
-	/**
-	 * Create an OutputStream from the specified DocumentEntry.
-	 * The specified entry will be emptied.
-	 *
-	 * @param document the DocumentEntry to be written
-	 */
-	public DocumentOutputStream(DocumentEntry document) throws IOException {
-	    this(document, -1);
-	}
+    /**
+     * Create an OutputStream from the specified DocumentEntry.
+     * The specified entry will be emptied.
+     *
+     * @param document the DocumentEntry to be written
+     */
+    public DocumentOutputStream(DocumentEntry document) throws IOException {
+        this(document, -1);
+    }
 
     /**
-	 * Create an OutputStream to create the specified new Entry
-	 *
-	 * @param parent Where to create the Entry
-	 * @param name Name of the new entry
-	 */
-	public DocumentOutputStream(DirectoryEntry parent, String name) throws IOException {
-	    this(createDocument(parent, name), -1);
-	}
+     * Create an OutputStream to create the specified new Entry
+     *
+     * @param parent Where to create the Entry
+     * @param name Name of the new entry
+     */
+    public DocumentOutputStream(DirectoryEntry parent, String name) throws IOException {
+        this(createDocument(parent, name), -1);
+    }
 
     /**
      * Create a DocumentOutputStream
@@ -105,7 +105,7 @@ public final class DocumentOutputStream extends OutputStream {
         }
 
         // Have an empty one created for now
-        return parent.createDocument(name, new ByteArrayInputStream(new byte[0]));
+        return parent.createDocument(name, new UnsynchronizedByteArrayInputStream(new byte[0]));
     }
 
     private void checkBufferSize() throws IOException {
@@ -115,11 +115,11 @@ public final class DocumentOutputStream extends OutputStream {
             byte[] data = _buffer.toByteArray();
             _buffer = null;
             write(data, 0, data.length);
-        } else {
-            // So far, mini stream will work, keep going
         }
+        // otherwise mini stream will work, keep going
     }
 
+    @Override
     public void write(int b) throws IOException {
         write(new byte[] { (byte)b }, 0, 1);
     }
@@ -146,11 +146,12 @@ public final class DocumentOutputStream extends OutputStream {
         }
     }
 
+    @Override
     public void close() throws IOException {
         // Do we have a pending buffer for the mini stream?
         if (_buffer != null) {
             // It's not much data, so ask POIFSDocument to do it for us
-            _document.replaceContents(new ByteArrayInputStream(_buffer.toByteArray()));
+            _document.replaceContents(_buffer.toInputStream());
         }
         else {
             // We've been writing to the stream as we've gone along
@@ -168,6 +169,6 @@ public final class DocumentOutputStream extends OutputStream {
      * @return the amount of written bytes
      */
     public long size() {
-	    return _document_size + (_buffer == null ? 0L : _buffer.size());
+        return _document_size + (_buffer == null ? 0L : _buffer.size());
     }
 }

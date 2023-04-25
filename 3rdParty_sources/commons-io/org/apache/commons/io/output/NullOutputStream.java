@@ -20,48 +20,60 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * This OutputStream writes all data to the famous <b>/dev/null</b>.
+ * Writes all data to the famous <b>/dev/null</b>.
  * <p>
- * This output stream has no destination (file/socket etc.) and all
- * bytes written to it are ignored and lost.
- *</p>
- * @version $Id: NullOutputStream.java 1674708 2015-04-20 00:02:45Z ggregory $
+ * This output stream has no destination (file/socket etc.) and all bytes written to it are ignored and lost.
+ * </p>
  */
 public class NullOutputStream extends OutputStream {
 
     /**
-     * A singleton.
+     * Deprecated in favor of {@link #NULL_OUTPUT_STREAM}.
+     *
+     * TODO: Will be private in 3.0.
+     *
+     * @deprecated Use {@link #NULL_OUTPUT_STREAM}.
+     */
+    @Deprecated
+    public NullOutputStream() {
+    }
+
+    /**
+     * The singleton.
      */
     public static final NullOutputStream NULL_OUTPUT_STREAM = new NullOutputStream();
 
     /**
-     * Does nothing - output to <code>/dev/null</code>.
+     * Does nothing - output to {@code /dev/null}.
+     *
      * @param b The bytes to write
      * @param off The start offset
      * @param len The number of bytes to write
      */
     @Override
     public void write(final byte[] b, final int off, final int len) {
-        //to /dev/null
+        // To /dev/null
     }
 
     /**
-     * Does nothing - output to <code>/dev/null</code>.
+     * Does nothing - output to {@code /dev/null}.
+     *
      * @param b The byte to write
      */
     @Override
     public void write(final int b) {
-        //to /dev/null
+        // To /dev/null
     }
 
     /**
-     * Does nothing - output to <code>/dev/null</code>.
+     * Does nothing - output to {@code /dev/null}.
+     *
      * @param b The bytes to write
      * @throws IOException never
      */
     @Override
     public void write(final byte[] b) throws IOException {
-        //to /dev/null
+        // To /dev/null
     }
 
 }

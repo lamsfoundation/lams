@@ -19,7 +19,6 @@ package org.apache.commons.io.input;
 /**
  * Listener for events from a {@link Tailer}.
  *
- * @version $Id: TailerListener.java 1714076 2015-11-12 16:06:41Z krosenvold $
  * @since 2.0
  */
 public interface TailerListener {

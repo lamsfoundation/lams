@@ -39,6 +39,7 @@ public class CellNumberPartHandler implements PartHandler {
     private final List<Special> specials = new LinkedList<>();
     private boolean improperFraction;
 
+    @Override
     public String handlePart(Matcher m, String part, CellFormatType type, StringBuffer descBuf) {
         int pos = descBuf.length();
         char firstCh = part.charAt(0);
@@ -48,7 +49,7 @@ public class CellNumberPartHandler implements PartHandler {
             // See comment in writeScientific -- exponent handling is complex.
             // (1) When parsing the format, remove the sign from after the 'e' and
             // put it before the first digit of the exponent.
-            if (exponent == null && specials.size() > 0) {
+            if (exponent == null && !specials.isEmpty()) {
                 exponent = new Special('.', pos);
                 specials.add(exponent);
                 insertSignForExponent = part.charAt(1);
@@ -72,7 +73,7 @@ public class CellNumberPartHandler implements PartHandler {
             break;
 
         case '.':
-            if (decimalPoint == null && specials.size() > 0) {
+            if (decimalPoint == null && !specials.isEmpty()) {
                 decimalPoint = new Special('.', pos);
                 specials.add(decimalPoint);
             }
@@ -80,7 +81,7 @@ public class CellNumberPartHandler implements PartHandler {
 
         case '/':
             //!! This assumes there is a numerator and a denominator, but these are actually optional
-            if (slash == null && specials.size() > 0) {
+            if (slash == null && !specials.isEmpty()) {
                 numerator = previousNumber();
                 // If the first number in the whole format is the numerator, the
                 // entire number should be printed as an improper fraction
@@ -148,7 +149,7 @@ public class CellNumberPartHandler implements PartHandler {
         }
         return null;
     }
-    
+
     private static boolean isDigitFmt(Special s) {
         return s.ch == '0' || s.ch == '?' || s.ch == '#';
     }

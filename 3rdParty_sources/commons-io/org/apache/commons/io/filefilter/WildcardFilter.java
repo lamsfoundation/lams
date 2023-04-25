@@ -18,7 +18,12 @@ package org.apache.commons.io.filefilter;
 
 import java.io.File;
 import java.io.Serializable;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -27,34 +32,70 @@ import org.apache.commons.io.FilenameUtils;
  * <p>
  * This filter selects files, but not directories, based on one or more wildcards
  * and using case-sensitive comparison.
+ * </p>
  * <p>
  * The wildcard matcher uses the characters '?' and '*' to represent a
  * single or multiple wildcard characters.
  * This is the same as often found on Dos/Unix command lines.
  * The extension check is case-sensitive.
  * See {@link FilenameUtils#wildcardMatch(String, String)} for more information.
+ * </p>
  * <p>
  * For example:
+ * </p>
+ * <h2>Using Classic IO</h2>
  * <pre>
  * File dir = new File(".");
  * FileFilter fileFilter = new WildcardFilter("*test*.java~*~");
  * File[] files = dir.listFiles(fileFilter);
- * for (int i = 0; i &lt; files.length; i++) {
- *   System.out.println(files[i]);
+ * for (String file : files) {
+ *     System.out.println(file);
  * }
  * </pre>
  *
- * @version $Id: WildcardFilter.java 1642757 2014-12-01 21:09:30Z sebb $
+ * <h2>Using NIO</h2>
+ * <pre>
+ * final Path dir = Paths.get("");
+ * final AccumulatorPathVisitor visitor = AccumulatorPathVisitor.withLongCounters(new WildcardFilter("*test*.java~*~"));
+ * //
+ * // Walk one dir
+ * Files.<b>walkFileTree</b>(dir, Collections.emptySet(), 1, visitor);
+ * System.out.println(visitor.getPathCounters());
+ * System.out.println(visitor.getFileList());
+ * //
+ * visitor.getPathCounters().reset();
+ * //
+ * // Walk dir tree
+ * Files.<b>walkFileTree</b>(dir, visitor);
+ * System.out.println(visitor.getPathCounters());
+ * System.out.println(visitor.getDirList());
+ * System.out.println(visitor.getFileList());
+ * </pre>
+ *
  * @since 1.1
- * @deprecated Use WilcardFileFilter. Deprecated as this class performs directory
- * filtering which it shouldn't do, but that can't be removed due to compatability.
+ * @deprecated Use WildcardFileFilter. Deprecated as this class performs directory
+ * filtering which it shouldn't do, but that can't be removed due to compatibility.
  */
 @Deprecated
 public class WildcardFilter extends AbstractFileFilter implements Serializable {
 
     private static final long serialVersionUID = -5037645902506953517L;
-    /** The wildcards that will be used to match filenames. */
+    /** The wildcards that will be used to match file names. */
     private final String[] wildcards;
+
+    /**
+     * Construct a new case-sensitive wildcard filter for a list of wildcards.
+     *
+     * @param wildcards  the list of wildcards to match
+     * @throws IllegalArgumentException if the pattern list is null
+     * @throws ClassCastException if the list does not contain Strings
+     */
+    public WildcardFilter(final List<String> wildcards) {
+        if (wildcards == null) {
+            throw new IllegalArgumentException("The wildcard list must not be null");
+        }
+        this.wildcards = wildcards.toArray(EMPTY_STRING_ARRAY);
+    }
 
     /**
      * Construct a new case-sensitive wildcard filter for a single wildcard.
@@ -75,7 +116,7 @@ public class WildcardFilter extends AbstractFileFilter implements Serializable {
      * @param wildcards  the array of wildcards to match
      * @throws IllegalArgumentException if the pattern array is null
      */
-    public WildcardFilter(final String[] wildcards) {
+    public WildcardFilter(final String... wildcards) {
         if (wildcards == null) {
             throw new IllegalArgumentException("The wildcard array must not be null");
         }
@@ -84,47 +125,10 @@ public class WildcardFilter extends AbstractFileFilter implements Serializable {
     }
 
     /**
-     * Construct a new case-sensitive wildcard filter for a list of wildcards.
-     *
-     * @param wildcards  the list of wildcards to match
-     * @throws IllegalArgumentException if the pattern list is null
-     * @throws ClassCastException if the list does not contain Strings
-     */
-    public WildcardFilter(final List<String> wildcards) {
-        if (wildcards == null) {
-            throw new IllegalArgumentException("The wildcard list must not be null");
-        }
-        this.wildcards = wildcards.toArray(new String[wildcards.size()]);
-    }
-
-    //-----------------------------------------------------------------------
-    /**
-     * Checks to see if the filename matches one of the wildcards.
-     *
-     * @param dir  the file directory
-     * @param name  the filename
-     * @return true if the filename matches one of the wildcards
-     */
-    @Override
-    public boolean accept(final File dir, final String name) {
-        if (dir != null && new File(dir, name).isDirectory()) {
-            return false;
-        }
-
-        for (final String wildcard : wildcards) {
-            if (FilenameUtils.wildcardMatch(name, wildcard)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks to see if the filename matches one of the wildcards.
+     * Checks to see if the file name matches one of the wildcards.
      *
      * @param file the file to check
-     * @return true if the filename matches one of the wildcards
+     * @return true if the file name matches one of the wildcards
      */
     @Override
     public boolean accept(final File file) {
@@ -134,6 +138,50 @@ public class WildcardFilter extends AbstractFileFilter implements Serializable {
 
         for (final String wildcard : wildcards) {
             if (FilenameUtils.wildcardMatch(file.getName(), wildcard)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks to see if the file name matches one of the wildcards.
+     * @param file the file to check
+     *
+     * @return true if the file name matches one of the wildcards
+     * @since 2.9.0
+     */
+    @Override
+    public FileVisitResult accept(final Path file, final BasicFileAttributes attributes) {
+        if (Files.isDirectory(file)) {
+            return FileVisitResult.TERMINATE;
+        }
+
+        for (final String wildcard : wildcards) {
+            if (FilenameUtils.wildcardMatch(Objects.toString(file.getFileName(), null), wildcard)) {
+                return FileVisitResult.CONTINUE;
+            }
+        }
+
+        return FileVisitResult.TERMINATE;
+    }
+
+    /**
+     * Checks to see if the file name matches one of the wildcards.
+     *
+     * @param dir  the file directory
+     * @param name  the file name
+     * @return true if the file name matches one of the wildcards
+     */
+    @Override
+    public boolean accept(final File dir, final String name) {
+        if (dir != null && new File(dir, name).isDirectory()) {
+            return false;
+        }
+
+        for (final String wildcard : wildcards) {
+            if (FilenameUtils.wildcardMatch(name, wildcard)) {
                 return true;
             }
         }

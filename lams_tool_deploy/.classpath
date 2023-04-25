@@ -10,7 +10,7 @@
 	<classpathentry kind="lib" path="/lams_build/deploy-tool/lib/commons-configuration-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/ant/ant.jar"/>
 	<classpathentry kind="lib" path="/lams_build/deploy-tool/lib/mysql-connector-java-8.0.11.jar" sourcepath="/3rdParty_sources/mysql-connector"/>
-	<classpathentry kind="lib" path="/lams_build/deploy-tool/lib/commons-io-2.5.jar"/>
+	<classpathentry kind="lib" path="/lams_build/deploy-tool/lib/commons-io-2.11.0.jar"/>
 	<classpathentry kind="lib" path="/lams_build/deploy-tool/lib/commons-collections-3.2.2.jar"/>
 	<classpathentry kind="lib" path="/lams_build/deploy-tool/lib/commons-dbutils-1.7.jar"/>
 	<classpathentry kind="lib" path="/lams_build/deploy-tool/lib/commons-lang-2.6.jar"/>

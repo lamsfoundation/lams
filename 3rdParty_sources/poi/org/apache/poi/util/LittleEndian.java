@@ -32,8 +32,6 @@ public final class LittleEndian implements LittleEndianConsts {
 
     /**
      * Exception to handle buffer underruns
-     *
-     * @author Marc Johnson (mjohnson at apache dot org)
      */
     public static final class BufferUnderrunException extends IOException {
         /**
@@ -493,7 +491,7 @@ public final class LittleEndian implements LittleEndianConsts {
      * @param value
      *            the short (16-bit) value
      *
-     * @exception ArrayIndexOutOfBoundsException
+     * @throws ArrayIndexOutOfBoundsException
      *                may be thrown
      */
     public static void putUByte( byte[] data, int offset, short value ) {
@@ -510,7 +508,7 @@ public final class LittleEndian implements LittleEndianConsts {
      * @param value
      *            the int (32-bit) value
      *
-     * @exception ArrayIndexOutOfBoundsException
+     * @throws ArrayIndexOutOfBoundsException
      *                may be thrown
      */
     public static void putUInt( byte[] data, int offset, long value ) {
@@ -548,7 +546,7 @@ public final class LittleEndian implements LittleEndianConsts {
      * @param value
      *            the short (16-bit) value
      *
-     * @exception ArrayIndexOutOfBoundsException
+     * @throws ArrayIndexOutOfBoundsException
      *                may be thrown
      */
     public static void putUShort( byte[] data, int offset, int value ) {
@@ -578,9 +576,9 @@ public final class LittleEndian implements LittleEndianConsts {
      * @param stream
      *            the InputStream from which the int is to be read
      * @return the int (32-bit) value
-     * @exception IOException
+     * @throws IOException
      *                will be propagated back to the caller
-     * @exception BufferUnderrunException
+     * @throws BufferUnderrunException
      *                if the stream cannot provide enough bytes
      */
     public static int readInt( InputStream stream ) throws IOException {
@@ -601,9 +599,9 @@ public final class LittleEndian implements LittleEndianConsts {
      * @param stream
      *            the InputStream from which the int is to be read
      * @return the unsigned int (32-bit) value
-     * @exception IOException
+     * @throws IOException
      *                will be propagated back to the caller
-     * @exception BufferUnderrunException
+     * @throws BufferUnderrunException
      *                if the stream cannot provide enough bytes
      */
     public static long readUInt( InputStream stream ) throws IOException {
@@ -617,9 +615,9 @@ public final class LittleEndian implements LittleEndianConsts {
      * @param stream
      *            the InputStream from which the long is to be read
      * @return the long (64-bit) value
-     * @exception IOException
+     * @throws IOException
      *                will be propagated back to the caller
-     * @exception BufferUnderrunException
+     * @throws BufferUnderrunException
      *                if the stream cannot provide enough bytes
      */
     public static long readLong( InputStream stream ) throws IOException {
@@ -648,9 +646,9 @@ public final class LittleEndian implements LittleEndianConsts {
      * @param stream
      *            the InputStream from which the short is to be read
      * @return the short (16-bit) value
-     * @exception IOException
+     * @throws IOException
      *                will be propagated back to the caller
-     * @exception BufferUnderrunException
+     * @throws BufferUnderrunException
      *                if the stream cannot provide enough bytes
      */
     public static short readShort( InputStream stream ) throws IOException {

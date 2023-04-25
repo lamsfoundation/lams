@@ -30,12 +30,13 @@ import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.Arrays;
-import java.util.Random;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.SecretKey;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.poifs.crypt.CryptoFunctions;
 import org.apache.poi.poifs.crypt.DataSpaceMapUtils;
@@ -46,15 +47,13 @@ import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.POIFSWriterEvent;
 import org.apache.poi.poifs.filesystem.POIFSWriterListener;
 import org.apache.poi.util.IOUtils;
-import org.apache.poi.util.LittleEndianByteArrayOutputStream;
 import org.apache.poi.util.LittleEndianConsts;
 import org.apache.poi.util.LittleEndianOutputStream;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
+import org.apache.poi.util.RandomSingleton;
 import org.apache.poi.util.TempFile;
 
 public class StandardEncryptor extends Encryptor {
-    private static final POILogger logger = POILogFactory.getLogger(StandardEncryptor.class);
+    private static final Logger LOG = LogManager.getLogger(StandardEncryptor.class);
 
     protected StandardEncryptor() {}
 
@@ -65,8 +64,10 @@ public class StandardEncryptor extends Encryptor {
     @Override
     public void confirmPassword(String password) {
         // see [MS-OFFCRYPTO] - 2.3.3 EncryptionVerifier
-        Random r = new SecureRandom();
+        SecureRandom r = RandomSingleton.getInstance();
         byte[] salt = new byte[16], verifier = new byte[16];
+
+        // using a java.security.SecureRandom (and avoid allocating a new SecureRandom for each random number needed).
         r.nextBytes(salt);
         r.nextBytes(verifier);
 
@@ -129,9 +130,10 @@ public class StandardEncryptor extends Encryptor {
         protected long countBytes;
         protected final File fileOut;
         protected final DirectoryNode dir;
+        protected final boolean deleteFile;
 
         @SuppressWarnings({"resource", "squid:S2095"})
-        private StandardCipherOutputStream(DirectoryNode dir, File fileOut) throws IOException {
+        private StandardCipherOutputStream(DirectoryNode dir, File fileOut, boolean deleteFile) throws IOException {
             // although not documented, we need the same padding as with agile encryption
             // and instead of calculating the missing bytes for the block size ourselves
             // we leave it up to the CipherOutputStream, which generates/saves them on close()
@@ -145,12 +147,13 @@ public class StandardEncryptor extends Encryptor {
             super(
                 new CipherOutputStream(new FileOutputStream(fileOut), getCipher(getSecretKey(), "PKCS5Padding"))
             );
+            this.deleteFile = deleteFile;
             this.fileOut = fileOut;
             this.dir = dir;
         }
 
         protected StandardCipherOutputStream(DirectoryNode dir) throws IOException {
-            this(dir, TempFile.createTempFile("encrypted_package", "crypt"));
+            this(dir, TempFile.createTempFile("encrypted_package", "crypt"), true);
         }
 
         @Override
@@ -170,6 +173,11 @@ public class StandardEncryptor extends Encryptor {
             // the CipherOutputStream adds the padding bytes on close()
             super.close();
             writeToPOIFS();
+            if (deleteFile && fileOut != null) {
+                if (!fileOut.delete()) {
+                    //ignore
+                }
+            }
         }
 
         void writeToPOIFS() throws IOException {
@@ -193,7 +201,7 @@ public class StandardEncryptor extends Encryptor {
                     IOUtils.copy(fis, leos);
                 }
                 if (!fileOut.delete()) {
-                    logger.log(POILogger.ERROR, "Can't delete temporary encryption file: ", fileOut);
+                    LOG.atError().log("Can't delete temporary encryption file: {}", fileOut);
                 }
 
                 leos.close();
@@ -212,15 +220,12 @@ public class StandardEncryptor extends Encryptor {
         final StandardEncryptionHeader header = (StandardEncryptionHeader)info.getHeader();
         final StandardEncryptionVerifier verifier = (StandardEncryptionVerifier)info.getVerifier();
 
-        EncryptionRecord er = new EncryptionRecord(){
-            @Override
-            public void write(LittleEndianByteArrayOutputStream bos) {
-                bos.writeShort(info.getVersionMajor());
-                bos.writeShort(info.getVersionMinor());
-                bos.writeInt(info.getEncryptionFlags());
-                header.write(bos);
-                verifier.write(bos);
-            }
+        EncryptionRecord er = bos -> {
+            bos.writeShort(info.getVersionMajor());
+            bos.writeShort(info.getVersionMinor());
+            bos.writeInt(info.getEncryptionFlags());
+            header.write(bos);
+            verifier.write(bos);
         };
 
         createEncryptionEntry(dir, "EncryptionInfo", er);

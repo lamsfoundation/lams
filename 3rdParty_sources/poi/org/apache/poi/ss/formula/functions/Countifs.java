@@ -18,6 +18,9 @@
 
 package org.apache.poi.ss.formula.functions;
 
+import org.apache.poi.ss.formula.eval.NumberEval;
+import org.apache.poi.ss.formula.eval.ValueEval;
+
 /**
  * Implementation for the function COUNTIFS
  * <p>
@@ -32,13 +35,30 @@ public class Countifs extends Baseifs {
     public static final FreeRefFunction instance = new Countifs();
 
     /**
-     * https://support.office.com/en-us/article/COUNTIFS-function-dda3dc6e-f74e-4aee-88bc-aa8c2a866842?ui=en-US&rs=en-US&ad=US
      * COUNTIFS(criteria_range1, criteria1, [criteria_range2, criteria2]...)
      * need at least 2 arguments and need to have an even number of arguments (criteria_range1, criteria1 plus x*(criteria_range, criteria))
+     *
      * @see org.apache.poi.ss.formula.functions.Baseifs#hasInitialRange()
+     * @see <a href="https://support.microsoft.com/en-us/office/countifs-function-dda3dc6e-f74e-4aee-88bc-aa8c2a866842">COUNTIFS function</a>
      */
     protected boolean hasInitialRange() {
         return false;
     }
-}
 
+    @Override
+    protected Aggregator createAggregator() {
+        return new Aggregator() {
+            double accumulator = 0.0;
+
+            @Override
+            public void addValue(ValueEval value) {
+                accumulator += 1.0;
+            }
+
+            @Override
+            public ValueEval getResult() {
+                return new NumberEval(accumulator);
+            }
+        };
+    }
+}

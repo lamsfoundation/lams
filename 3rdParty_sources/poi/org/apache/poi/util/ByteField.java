@@ -15,7 +15,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-        
+
 
 package org.apache.poi.util;
 
@@ -27,8 +27,6 @@ import java.nio.BufferUnderflowException;
 /**
  * representation of a byte (8-bit) field at a fixed location within a
  * byte array
- *
- * @author Marc Johnson (mjohnson at apache dot org
  */
 
 public class ByteField
@@ -44,7 +42,7 @@ public class ByteField
      *
      * @param offset of the field within its byte array
      *
-     * @exception ArrayIndexOutOfBoundsException if offset is negative
+     * @throws ArrayIndexOutOfBoundsException if offset is negative
      */
 
     public ByteField(final int offset)
@@ -60,7 +58,7 @@ public class ByteField
      * @param offset of the field within its byte array
      * @param value the initial value
      *
-     * @exception ArrayIndexOutOfBoundsException if offset is negative
+     * @throws ArrayIndexOutOfBoundsException if offset is negative
      */
 
     public ByteField(final int offset, final byte value)
@@ -82,7 +80,7 @@ public class ByteField
      * @param offset of the field within its byte array
      * @param data the byte array to read the value from
      *
-     * @exception ArrayIndexOutOfBoundsException if the offset is not
+     * @throws ArrayIndexOutOfBoundsException if the offset is not
      *            within the range of 0..(data.length - 1)
      */
 
@@ -102,7 +100,7 @@ public class ByteField
      * @param value the initial value
      * @param data the byte array to write the value to
      *
-     * @exception ArrayIndexOutOfBoundsException if the offset is not
+     * @throws ArrayIndexOutOfBoundsException if the offset is not
      *            within the range of 0..(data.length - 1)
      */
 
@@ -141,7 +139,7 @@ public class ByteField
      * @param value to be set
      * @param data the byte array to write the value to
      *
-     * @exception ArrayIndexOutOfBoundsException if the offset is out
+     * @throws ArrayIndexOutOfBoundsException if the offset is out
      *            of the byte array's range
      */
 
@@ -159,7 +157,7 @@ public class ByteField
      *
      * @param data the byte array from which the value is to be read
      *
-     * @exception ArrayIndexOutOfBoundsException if the offset is out
+     * @throws ArrayIndexOutOfBoundsException if the offset is out
      *            of range of the bte array
      */
 
@@ -175,20 +173,20 @@ public class ByteField
      * @param stream the InputStream from which the value is to be
      *               read
      *
-     * @exception BufferUnderrunException if there is not enough data
+     * @throws BufferUnderrunException if there is not enough data
      *            available from the InputStream
-     * @exception IOException if an IOException is thrown from reading
+     * @throws IOException if an IOException is thrown from reading
      *            the InputStream
      */
 
     public void readFromStream(final InputStream stream)
         throws IOException
     {
-    	// TODO - are these ~Field used / necessary
-    	int ib = stream.read();
-    	if (ib < 0) {
-    		throw new BufferUnderflowException();
-    	}
+        // TODO - are these ~Field used / necessary
+        int ib = stream.read();
+        if (ib < 0) {
+            throw new BufferUnderflowException();
+        }
         _value = (byte) ib;
     }
 
@@ -199,7 +197,7 @@ public class ByteField
      * @param data the array of bytes to which the value is to be
      *             written
      *
-     * @exception ArrayIndexOutOfBoundsException if the offset is out
+     * @throws ArrayIndexOutOfBoundsException if the offset is out
      *            of the byte array's range
      */
 

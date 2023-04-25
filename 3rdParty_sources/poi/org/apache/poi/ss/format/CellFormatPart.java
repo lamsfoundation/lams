@@ -16,10 +16,11 @@
 ==================================================================== */
 package org.apache.poi.ss.format;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.util.CodepointsUtil;
 import org.apache.poi.util.LocaleUtil;
-import org.apache.poi.util.StringCodepointsIterable;
-import org.apache.poi.util.StringUtil;
 
 import javax.swing.*;
 
@@ -29,7 +30,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.apache.poi.ss.format.CellFormatter.logger;
 import static org.apache.poi.ss.format.CellFormatter.quote;
 
 /**
@@ -38,23 +38,24 @@ import static org.apache.poi.ss.format.CellFormatter.quote;
  * values.
  * <p>
  * Each format part can contain a color, a condition, and will always contain a
- * format specification.  For example <tt>"[Red][>=10]#"</tt> has a color
- * (<tt>[Red]</tt>), a condition (<tt>>=10</tt>) and a format specification
- * (<tt>#</tt>).
+ * format specification.  For example {@code "[Red][>=10]#"} has a color
+ * ({@code [Red]}), a condition ({@code >=10}) and a format specification
+ * ({@code #}).
  * <p>
  * This class also contains patterns for matching the subparts of format
  * specification.  These are used internally, but are made public in case other
  * code has use for them.
- *
- * @author Ken Arnold, Industrious Media LLC
  */
+@SuppressWarnings("RegExpRepeatedSpace")
 public class CellFormatPart {
-    private final Color color;
-    private CellFormatCondition condition;
-    private final CellFormatter format;
-    private final CellFormatType type;
+    private static final Logger LOG = LogManager.getLogger(CellFormatPart.class);
 
     static final Map<String, Color> NAMED_COLORS;
+
+    private final Color color;
+    private final CellFormatCondition condition;
+    private final CellFormatter format;
+    private final CellFormatType type;
 
     static {
         NAMED_COLORS = new TreeMap<>(
@@ -105,25 +106,26 @@ public class CellFormatPart {
     static {
         // A condition specification
         String condition = "([<>=]=?|!=|<>)    # The operator\n" +
-                "  \\s*([0-9]+(?:\\.[0-9]*)?)\\s*  # The constant to test against\n";
-        
+                "  \\s*(-?([0-9]+(?:\\.[0-9]*)?)|(\\.[0-9]*))\\s*  # The constant to test against\n";
+
         // A currency symbol / string, in a specific locale
-        String currency = "(\\[\\$.{0,3}-[0-9a-f]{3}\\])";
+        String currency = "(\\[\\$.{0,3}(-[0-9a-f]{3,4})?])";
 
         String color =
-                "\\[(black|blue|cyan|green|magenta|red|white|yellow|color [0-9]+)\\]";
+                "\\[(black|blue|cyan|green|magenta|red|white|yellow|color [0-9]+)]";
 
         // A number specification
         // Note: careful that in something like ##, that the trailing comma is not caught up in the integer part
 
         // A part of a specification
-        String part = "\\\\.                 # Quoted single character\n" +
+        //noinspection RegExpRedundantEscape
+        String part = "\\\\.                     # Quoted single character\n" +
                 "|\"([^\\\\\"]|\\\\.)*\"         # Quoted string of characters (handles escaped quotes like \\\") \n" +
                 "|"+currency+"                   # Currency symbol in a given locale\n" +
                 "|_.                             # Space as wide as a given character\n" +
                 "|\\*.                           # Repeating fill character\n" +
                 "|@                              # Text: cell text\n" +
-                "|([0?\\#](?:[0?\\#,]*))         # Number: digit + other digits and commas\n" +
+                "|([0?\\#][0?\\#,]*)             # Number: digit + other digits and commas\n" +
                 "|e[-+]                          # Number: Scientific: Exponent\n" +
                 "|m{1,5}                         # Date: month or minute spec\n" +
                 "|d{1,4}                         # Date: day/date spec\n" +
@@ -131,16 +133,16 @@ public class CellFormatPart {
                 "|h{1,2}                         # Date: hour spec\n" +
                 "|s{1,2}                         # Date: second spec\n" +
                 "|am?/pm?                        # Date: am/pm spec\n" +
-                "|\\[h{1,2}\\]                   # Elapsed time: hour spec\n" +
-                "|\\[m{1,2}\\]                   # Elapsed time: minute spec\n" +
-                "|\\[s{1,2}\\]                   # Elapsed time: second spec\n" +
+                "|\\[h{1,2}]                     # Elapsed time: hour spec\n" +
+                "|\\[m{1,2}]                     # Elapsed time: minute spec\n" +
+                "|\\[s{1,2}]                     # Elapsed time: second spec\n" +
                 "|[^;]                           # A character\n" + "";
 
         String format = "(?:" + color + ")?                 # Text color\n" +
-                "(?:\\[" + condition + "\\])?               # Condition\n" +
+                "(?:\\[" + condition + "])?               # Condition\n" +
                 // see https://msdn.microsoft.com/en-ca/goglobal/bb964664.aspx and https://bz.apache.org/ooo/show_bug.cgi?id=70003
                 // we ignore these for now though
-                "(?:\\[\\$-[0-9a-fA-F]+\\])?                # Optional locale id, ignored currently\n" +
+                "(?:\\[\\$-[0-9a-fA-F]+])?                # Optional locale id, ignored currently\n" +
                 "((?:" + part + ")+)                        # Format spec\n";
 
         int flags = Pattern.COMMENTS | Pattern.CASE_INSENSITIVE;
@@ -173,7 +175,7 @@ public class CellFormatPart {
     public CellFormatPart(String desc) {
         this(LocaleUtil.getUserLocale(), desc);
     }
-    
+
     /**
      * Create an object to represent a format part.
      *
@@ -193,14 +195,14 @@ public class CellFormatPart {
     }
 
     /**
-     * Returns <tt>true</tt> if this format part applies to the given value. If
+     * Returns {@code true} if this format part applies to the given value. If
      * the value is a number and this is part has a condition, returns
-     * <tt>true</tt> only if the number passes the condition.  Otherwise, this
-     * always return <tt>true</tt>.
+     * {@code true} only if the number passes the condition.  Otherwise, this
+     * always return {@code true}.
      *
      * @param valueObject The value to evaluate.
      *
-     * @return <tt>true</tt> if this format part applies to the given value.
+     * @return {@code true} if this format part applies to the given value.
      */
     public boolean applies(Object valueObject) {
         if (condition == null || !(valueObject instanceof Number)) {
@@ -241,30 +243,31 @@ public class CellFormatPart {
     }
 
     /**
-     * Returns the color specification from the matcher, or <tt>null</tt> if
+     * Returns the color specification from the matcher, or {@code null} if
      * there is none.
      *
      * @param m The matcher for the format part.
      *
-     * @return The color specification or <tt>null</tt>.
+     * @return The color specification or {@code null}.
      */
     private static Color getColor(Matcher m) {
         String cdesc = m.group(COLOR_GROUP);
         if (cdesc == null || cdesc.length() == 0)
             return null;
         Color c = NAMED_COLORS.get(cdesc);
-        if (c == null)
-            logger.warning("Unknown color: " + quote(cdesc));
+        if (c == null) {
+            LOG.warn("Unknown color: " + quote(cdesc));
+        }
         return c;
     }
 
     /**
-     * Returns the condition specification from the matcher, or <tt>null</tt> if
+     * Returns the condition specification from the matcher, or {@code null} if
      * there is none.
      *
      * @param m The matcher for the format part.
      *
-     * @return The condition specification or <tt>null</tt>.
+     * @return The condition specification or {@code null}.
      */
     private CellFormatCondition getCondition(Matcher m) {
         String mdesc = m.group(CONDITION_OPERATOR_GROUP);
@@ -297,7 +300,7 @@ public class CellFormatPart {
      */
     private CellFormatter getFormatter(Locale locale, Matcher matcher) {
         String fdesc = matcher.group(SPECIFICATION_GROUP);
-        
+
         // For now, we don't support localised currencies, so simplify if there
         Matcher currencyM = CURRENCY_PAT.matcher(fdesc);
         if (currencyM.find()) {
@@ -306,12 +309,15 @@ public class CellFormatPart {
             if (currencyPart.startsWith("[$-")) {
                 // Default $ in a different locale
                 currencyRepl = "$";
+            } else if (!currencyPart.contains("-")) {
+                // Accounting formats such as USD [$USD]
+                currencyRepl = currencyPart.substring(2, currencyPart.indexOf("]"));
             } else {
                 currencyRepl = currencyPart.substring(2, currencyPart.lastIndexOf('-'));
             }
             fdesc = fdesc.replace(currencyPart, currencyRepl);
         }
-        
+
         // Build a formatter for this simplified string
         return type.formatter(locale, fdesc);
     }
@@ -333,13 +339,13 @@ public class CellFormatPart {
         boolean seenZero = false;
         while (m.find()) {
             String repl = m.group(0);
-            Iterator<String> codePoints = new StringCodepointsIterable(repl).iterator();
+            Iterator<String> codePoints = CodepointsUtil.iteratorFor(repl);
             if (codePoints.hasNext()) {
                 String c1 = codePoints.next();
                 String c2 = null;
                 if (codePoints.hasNext())
                     c2 = codePoints.next().toLowerCase(Locale.ROOT);
-                
+
                 switch (c1) {
                 case "@":
                     return CellFormatType.TEXT;
@@ -401,20 +407,21 @@ public class CellFormatPart {
      */
     static String quoteSpecial(String repl, CellFormatType type) {
         StringBuilder sb = new StringBuilder();
-        Iterator<String> codePoints = new StringCodepointsIterable(repl).iterator();
+        Iterator<String> codePoints = CodepointsUtil.iteratorFor(repl);
+
         while (codePoints.hasNext()) {
             String ch = codePoints.next();
-            if ("\'".equals(ch) && type.isSpecial('\'')) {
+            if ("'".equals(ch) && type.isSpecial('\'')) {
                 sb.append('\u0000');
                 continue;
             }
 
             boolean special = type.isSpecial(ch.charAt(0));
             if (special)
-                sb.append("\'");
+                sb.append('\'');
             sb.append(ch);
             if (special)
-                sb.append("\'");
+                sb.append('\'');
         }
         return sb.toString();
     }
@@ -449,7 +456,7 @@ public class CellFormatPart {
      * @param label The label
      * @param value The value to apply this format part to.
      *
-     * @return <tt>true</tt> if the
+     * @return {@code true} if the
      */
     public CellFormatResult apply(JLabel label, Object value) {
         CellFormatResult result = apply(value);
@@ -471,9 +478,9 @@ public class CellFormatPart {
     }
 
     /**
-     * Returns <tt>true</tt> if this format part has a condition.
+     * Returns {@code true} if this format part has a condition.
      *
-     * @return <tt>true</tt> if this format part has a condition.
+     * @return {@code true} if this format part has a condition.
      */
     boolean hasCondition() {
         return condition != null;
@@ -533,12 +540,20 @@ public class CellFormatPart {
             int pos = 0;
             while ((pos = fmt.indexOf("''", pos)) >= 0) {
                 fmt.delete(pos, pos + 2);
+                if (partHandler instanceof CellDateFormatter.DatePartHandler) {
+                    CellDateFormatter.DatePartHandler datePartHandler = (CellDateFormatter.DatePartHandler) partHandler;
+                    datePartHandler.updatePositions(pos, -2);
+                }
             }
 
             // Now the final pass for quoted chars: Replace any \u0000 with ''
             pos = 0;
             while ((pos = fmt.indexOf("\u0000", pos)) >= 0) {
                 fmt.replace(pos, pos + 1, "''");
+                if (partHandler instanceof CellDateFormatter.DatePartHandler) {
+                    CellDateFormatter.DatePartHandler datePartHandler = (CellDateFormatter.DatePartHandler) partHandler;
+                    datePartHandler.updatePositions(pos, 1);
+                }
             }
         }
 
@@ -557,20 +572,20 @@ public class CellFormatPart {
      */
     static String expandChar(String part) {
         List<String> codePoints = new ArrayList<>();
-        new StringCodepointsIterable(part).iterator().forEachRemaining(codePoints::add);
+        CodepointsUtil.iteratorFor(part).forEachRemaining(codePoints::add);
         if (codePoints.size() < 2) throw new IllegalArgumentException("Expected part string to have at least 2 chars");
         String ch = codePoints.get(1);
         return ch + ch + ch;
     }
 
     /**
-     * Returns the string from the group, or <tt>""</tt> if the group is
-     * <tt>null</tt>.
+     * Returns the string from the group, or {@code ""} if the group is
+     * {@code null}.
      *
      * @param m The matcher.
      * @param g The group number.
      *
-     * @return The group or <tt>""</tt>.
+     * @return The group or {@code ""}.
      */
     public static String group(Matcher m, int g) {
         String str = m.group(g);

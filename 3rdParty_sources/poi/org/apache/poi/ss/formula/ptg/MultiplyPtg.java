@@ -21,12 +21,12 @@ package org.apache.poi.ss.formula.ptg;
  * Implements the standard mathematical multiplication "*"
  */
 public final class MultiplyPtg extends ValueOperatorPtg {
-    public final static byte sid  = 0x05;
+    public static final byte sid  = 0x05;
 
     public static final MultiplyPtg instance = new MultiplyPtg();
 
     private MultiplyPtg() {
-    	// enforce singleton
+        // enforce singleton
     }
 
     @Override

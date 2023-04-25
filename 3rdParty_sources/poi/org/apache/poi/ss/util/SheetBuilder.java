@@ -5,9 +5,9 @@
    The ASF licenses this file to You under the Apache License, Version 2.0
    (the "License"); you may not use this file except in compliance with
    the License.  You may obtain a copy of the License at
-   
+
    http://www.apache.org/licenses/LICENSE-2.0
-   
+
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,8 +28,6 @@ import org.apache.poi.ss.usermodel.Cell;
  * Class {@code SheetBuilder} provides an easy way of building workbook sheets
  * from 2D array of Objects. It can be used in test cases to improve code
  * readability or in Swing applications with tables.
- *
- * @author Roman Kashitsyn
  */
 public class SheetBuilder {
 
@@ -83,14 +81,13 @@ public class SheetBuilder {
      * cells), creates cells if either corresponding array value is not
      * null or createEmptyCells property is true.
      * The conversion is performed in the following way:
-     * <p>
      * <ul>
      * <li>Numbers become numeric cells.</li>
-     * <li><code>java.util.Date</code> or <code>java.util.Calendar</code>
+     * <li>{@code java.util.Date} or {@code java.util.Calendar}
      * instances become date cells.</li>
      * <li>String with leading '=' char become formulas (leading '='
      * will be truncated).</li>
-     * <li>Other objects become strings via <code>Object.toString()</code>
+     * <li>Other objects become strings via {@code Object.toString()}
      * method call.</li>
      * </ul>
      *

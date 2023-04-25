@@ -16,15 +16,17 @@
  */
 package org.apache.commons.io;
 
+import java.time.Duration;
+
 /**
  * Monitors a thread, interrupting it if it reaches the specified timeout.
  * <p>
  * This works by sleeping until the specified timeout amount and then
  * interrupting the thread being monitored. If the thread being monitored
- * completes its work before being interrupted, it should <code>interrupt()</code>
+ * completes its work before being interrupted, it should {@code interrupt()}
  * the <i>monitor</i> thread.
  * </p>
- * 
+ *
  * <pre>
  *       long timeoutInMillis = 1000;
  *       try {
@@ -36,12 +38,11 @@ package org.apache.commons.io;
  *       }
  * </pre>
  *
- * @version  $Id: ThreadMonitor.java 1718945 2015-12-09 19:51:14Z krosenvold $
  */
 class ThreadMonitor implements Runnable {
 
     private final Thread thread;
-    private final long timeout;
+    private final Duration timeout;
 
     /**
      * Start monitoring the current thread.
@@ -51,7 +52,7 @@ class ThreadMonitor implements Runnable {
      * @return The monitor thread or {@code null}
      * if the timeout amount is not greater than zero
      */
-    public static Thread start(final long timeout) {
+    static Thread start(final Duration timeout) {
         return start(Thread.currentThread(), timeout);
     }
 
@@ -64,14 +65,14 @@ class ThreadMonitor implements Runnable {
      * @return The monitor thread or {@code null}
      * if the timeout amount is not greater than zero
      */
-    public static Thread start(final Thread thread, final long timeout) {
-        Thread monitor = null;
-        if (timeout > 0) {
-            final ThreadMonitor timout = new ThreadMonitor(thread, timeout);
-            monitor = new Thread(timout, ThreadMonitor.class.getSimpleName());
-            monitor.setDaemon(true);
-            monitor.start();
+    static Thread start(final Thread thread, final Duration timeout) {
+        if (timeout.isZero() || timeout.isNegative()) {
+            return null;
         }
+        final ThreadMonitor timout = new ThreadMonitor(thread, timeout);
+        final Thread monitor = new Thread(timout, ThreadMonitor.class.getSimpleName());
+        monitor.setDaemon(true);
+        monitor.start();
         return monitor;
     }
 
@@ -80,19 +81,19 @@ class ThreadMonitor implements Runnable {
      *
      * @param thread The monitor thread, may be {@code null}
      */
-    public static void stop(final Thread thread) {
+    static void stop(final Thread thread) {
         if (thread != null) {
             thread.interrupt();
         }
     }
 
     /**
-     * Construct and new monitor.
+     * Constructs a new monitor.
      *
      * @param thread The thread to monitor
      * @param timeout The timeout amount in milliseconds
      */
-    private ThreadMonitor(final Thread thread, final long timeout) {
+    private ThreadMonitor(final Thread thread, final Duration timeout) {
         this.thread = thread;
         this.timeout = timeout;
     }
@@ -103,6 +104,7 @@ class ThreadMonitor implements Runnable {
      *
      * @see Runnable#run()
      */
+    @Override
     public void run() {
         try {
             sleep(timeout);
@@ -113,21 +115,23 @@ class ThreadMonitor implements Runnable {
     }
 
     /**
-     * Sleep for a guaranteed minimum number of milliseconds unless interrupted.
+     * Sleeps for a guaranteed minimum duration unless interrupted.
      *
      * This method exists because Thread.sleep(100) can sleep for 0, 70, 100 or 200ms or anything else
      * it deems appropriate. Read the docs on Thread.sleep for further interesting details.
-     * @
-     * @param ms the number of milliseconds to sleep for
+     *
+     * @param duration the sleep duration.
      * @throws InterruptedException if interrupted
      */
-    private static void sleep(long ms) throws InterruptedException {
-        long finishAt = System.currentTimeMillis() + ms;
-        long remaining = ms;
+    private static void sleep(final Duration duration) throws InterruptedException {
+        // Ignore nanos for now.
+        final long millis = duration.toMillis();
+        final long finishAtMillis = System.currentTimeMillis() + millis;
+        long remainingMillis = millis;
         do {
-            Thread.sleep(remaining);
-            remaining = finishAt - System.currentTimeMillis();
-        } while (remaining > 0);
+            Thread.sleep(remainingMillis);
+            remainingMillis = finishAtMillis - System.currentTimeMillis();
+        } while (remainingMillis > 0);
     }
 
 

@@ -16,28 +16,39 @@
 ==================================================================== */
 package org.apache.poi.hpsf;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.poi.util.*;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
-import org.apache.poi.util.CodePageUtil;
-import org.apache.poi.util.IOUtils;
-import org.apache.poi.util.Internal;
-import org.apache.poi.util.LittleEndian;
-import org.apache.poi.util.LittleEndianByteArrayInputStream;
-import org.apache.poi.util.LittleEndianConsts;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
+import static org.apache.logging.log4j.util.Unbox.box;
 
 @Internal
 public class CodePageString {
     //arbitrarily selected; may need to increase
-    private static final int MAX_RECORD_LENGTH = 100_000;
+    private static final int DEFAULT_MAX_RECORD_LENGTH = 100_000;
+    private static int MAX_RECORD_LENGTH = DEFAULT_MAX_RECORD_LENGTH;
 
-    private final static POILogger LOG = POILogFactory.getLogger( CodePageString.class );
+    private static final Logger LOG = LogManager.getLogger(CodePageString.class);
 
     private byte[] _value;
 
+    /**
+     * @param length the max record length allowed for CodePageString
+     */
+    public static void setMaxRecordLength(int length) {
+        MAX_RECORD_LENGTH = length;
+    }
+
+    /**
+     * @return the max record length allowed for CodePageString
+     */
+    public static int getMaxRecordLength() {
+        return MAX_RECORD_LENGTH;
+    }
 
     public void read( LittleEndianByteArrayInputStream lei ) {
         int offset = lei.getReadIndex();
@@ -61,8 +72,7 @@ public class CodePageString {
             // TODO Some files, such as TestVisioWithCodepage.vsd, are currently
             // triggering this for values that don't look like codepages
             // See Bug #52258 for details
-            String msg = "CodePageString started at offset #" + offset + " is not NULL-terminated";
-            LOG.log(POILogger.WARN, msg);
+            LOG.atWarn().log("CodePageString started at offset #{} is not NULL-terminated", box(offset));
         }
 
         TypedPropertyValue.skipPadding(lei);
@@ -75,17 +85,13 @@ public class CodePageString {
 
         final int terminator = result.indexOf( '\0' );
         if ( terminator == -1 ) {
-            String msg =
-                "String terminator (\\0) for CodePageString property value not found. " +
-                "Continue without trimming and hope for the best.";
-            LOG.log(POILogger.WARN, msg);
+            LOG.atWarn().log("String terminator (\\0) for CodePageString property value not found. " +
+                    "Continue without trimming and hope for the best.");
             return result;
         }
         if ( terminator != result.length() - 1 ) {
-            String msg =
-                "String terminator (\\0) for CodePageString property value occured before the end of string. "+
-                "Trimming and hope for the best.";
-            LOG.log(POILogger.WARN, msg );
+            LOG.atDebug().log("String terminator (\\0) for CodePageString property value occurred before the end of " +
+                    "string. Trimming and hope for the best.");
         }
         return result.substring( 0, terminator );
     }

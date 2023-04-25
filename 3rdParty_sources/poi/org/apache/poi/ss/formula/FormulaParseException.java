@@ -6,7 +6,7 @@
    (the "License"); you may not use this file except in compliance with
    the License.  You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+       http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,12 +22,10 @@ package org.apache.poi.ss.formula;
  * supported by POI).  It  is primarily used by test code to confirm specific parsing exceptions.
  * Application code should also handle this exception if it potentially supplies formula text
  * that is not guaranteed to be well-formed.
- *
- * @author Josh Micich
  */
 public final class FormulaParseException extends RuntimeException {
 
-	FormulaParseException(String msg) {
-		super(msg);
-	}
+    FormulaParseException(String msg) {
+        super(msg);
+    }
 }

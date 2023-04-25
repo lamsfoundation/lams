@@ -40,8 +40,6 @@ package org.apache.poi.util;
  *      remove(int index)
  * <li> subList is not supported
  * </ul>
- *
- * @author Marc Johnson
  */
 public class IntList
 {
@@ -84,8 +82,8 @@ public class IntList
      * @param index the index where the new value is to be added
      * @param value the new value
      *
-     * @exception IndexOutOfBoundsException if the index is out of
-     *            range (index < 0 || index > size()).
+     * @throws IndexOutOfBoundsException if the index is out of
+     *            range (index &lt; 0 || index &gt; size()).
      */
 
     public void add(final int index, final int value)
@@ -178,8 +176,8 @@ public class IntList
      *
      * @return true if this list changed as a result of the call.
      *
-     * @exception IndexOutOfBoundsException if the index is out of
-     *            range (index < 0 || index > size())
+     * @throws IndexOutOfBoundsException if the index is out of
+     *            range (index &lt; 0 || index &gt; size())
      */
 
     public boolean addAll(final int index, final IntList c)
@@ -311,8 +309,8 @@ public class IntList
      *
      * @return the element at the specified position in this list.
      *
-     * @exception IndexOutOfBoundsException if the index is out of
-     *            range (index < 0 || index >= size()).
+     * @throws IndexOutOfBoundsException if the index is out of
+     *            range (index &lt; 0 || index &gt;= size()).
      */
 
     public int get(final int index)
@@ -424,8 +422,8 @@ public class IntList
      *
      * @return the element previously at the specified position.
      *
-     * @exception IndexOutOfBoundsException if the index is out of
-     *            range (index < 0 || index >= size()).
+     * @throws IndexOutOfBoundsException if the index is out of
+     *            range (index &lt; 0 || index &gt;= size()).
      */
 
     public int remove(final int index)
@@ -533,8 +531,8 @@ public class IntList
      *
      * @return the element previously at the specified position.
      *
-     * @exception IndexOutOfBoundsException if the index is out of
-     *            range (index < 0 || index >= size()).
+     * @throws IndexOutOfBoundsException if the index is out of
+     *            range (index &lt; 0 || index &gt;= size()).
      */
 
     public int set(final int index, final int element)

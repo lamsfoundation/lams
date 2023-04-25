@@ -28,7 +28,6 @@ import java.nio.charset.Charset;
  * <p>
  * Origin of code: POI.
  *
- * @version $Id: HexDump.java 1471767 2013-04-24 23:24:19Z sebb $
  */
 public class HexDump {
 
@@ -36,7 +35,6 @@ public class HexDump {
      * Instances should NOT be constructed in standard programming.
      */
     public HexDump() {
-        super();
     }
 
     /**

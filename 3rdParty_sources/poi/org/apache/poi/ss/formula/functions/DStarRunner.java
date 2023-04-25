@@ -18,18 +18,22 @@
 package org.apache.poi.ss.formula.functions;
 
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 import org.apache.poi.ss.formula.eval.AreaEval;
 import org.apache.poi.ss.formula.eval.BlankEval;
 import org.apache.poi.ss.formula.eval.ErrorEval;
 import org.apache.poi.ss.formula.eval.EvaluationException;
 import org.apache.poi.ss.formula.eval.NotImplementedException;
+import org.apache.poi.ss.formula.eval.NumberEval;
 import org.apache.poi.ss.formula.eval.NumericValueEval;
 import org.apache.poi.ss.formula.eval.OperandResolver;
 import org.apache.poi.ss.formula.eval.StringEval;
 import org.apache.poi.ss.formula.eval.StringValueEval;
 import org.apache.poi.ss.formula.eval.ValueEval;
 import org.apache.poi.ss.util.NumberComparer;
+import org.apache.poi.util.Internal;
+import org.apache.poi.util.LocaleUtil;
 
 /**
  * This class performs a D* calculation. It takes an {@link IDStarAlgorithm} object and
@@ -37,9 +41,9 @@ import org.apache.poi.ss.util.NumberComparer;
  * entries against the set of conditions is done here.
  *
  * TODO:
- * - wildcards ? and * in string conditions
  * - functions as conditions
  */
+@Internal
 public final class DStarRunner implements Function3Arg {
     /**
      * Enum for convenience to identify and source implementations of the D* functions
@@ -53,6 +57,22 @@ public final class DStarRunner implements Function3Arg {
         DMAX(DMax::new),
         /** @see DSum */
         DSUM(DSum::new),
+        /** @see DCount */
+        DCOUNT(DCount::new),
+        /** @see DCountA */
+        DCOUNTA(DCountA::new),
+        /** @see DAverage */
+        DAVERAGE(DAverage::new),
+        /** @see DStdev */
+        DSTDEV(DStdev::new),
+        /** @see DStdevp */
+        DSTDEVP(DStdevp::new),
+        /** @see DVar */
+        DVAR(DVar::new),
+        /** @see DVarp */
+        DVARP(DVarp::new),
+        /** @see DProduct */
+        DPRODUCT(DProduct::new),
         ;
 
         private final Supplier<IDStarAlgorithm> implSupplier;
@@ -77,7 +97,7 @@ public final class DStarRunner implements Function3Arg {
         this.algoType = algorithm;
     }
 
-    public final ValueEval evaluate(ValueEval[] args, int srcRowIndex, int srcColumnIndex) {
+    public ValueEval evaluate(ValueEval[] args, int srcRowIndex, int srcColumnIndex) {
         if(args.length == 3) {
             return evaluate(srcRowIndex, srcColumnIndex, args[0], args[1], args[2]);
         }
@@ -95,39 +115,49 @@ public final class DStarRunner implements Function3Arg {
         AreaEval db = (AreaEval)database;
         AreaEval cdb = (AreaEval)conditionDatabase;
 
+        // Create an algorithm runner.
+        final IDStarAlgorithm algorithm = algoType.newInstance();
+
+        int fc = -1;
         try {
             filterColumn = OperandResolver.getSingleValue(filterColumn, srcRowIndex, srcColumnIndex);
+            if (filterColumn instanceof NumericValueEval) {
+                //fc is zero based while Excel uses 1 based column numbering
+                fc = (int) Math.round(((NumericValueEval)filterColumn).getNumberValue()) - 1;
+            } else {
+                fc = getColumnForName(filterColumn, db);
+            }
+            if(fc == -1 && !algorithm.allowEmptyMatchField()) {
+                // column not found
+                return ErrorEval.VALUE_INVALID;
+            }
         } catch (EvaluationException e) {
-            return e.getErrorEval();
+            if (!algorithm.allowEmptyMatchField()) {
+                return e.getErrorEval();
+            }
+        } catch (Exception e) {
+            if (!algorithm.allowEmptyMatchField()) {
+                return ErrorEval.VALUE_INVALID;
+            }
         }
 
-        int fc;
-        try {
-            fc = getColumnForName(filterColumn, db);
-        }
-        catch (EvaluationException e) {
-            return ErrorEval.VALUE_INVALID;
-        }
-        if(fc == -1) { // column not found
-            return ErrorEval.VALUE_INVALID;
-        }
-
-        // Create an algorithm runner.
-        IDStarAlgorithm algorithm = algoType.newInstance();
 
         // Iterate over all DB entries.
         final int height = db.getHeight();
         for(int row = 1; row < height; ++row) {
             boolean matches;
             try {
-                matches = fullfillsConditions(db, row, cdb);
+                matches = fulfillsConditions(db, row, cdb);
             }
             catch (EvaluationException e) {
                 return ErrorEval.VALUE_INVALID;
             }
             // Filter each entry.
-            if(matches) {
+            if (matches) {
                 ValueEval currentValueEval = resolveReference(db, row, fc);
+                if (fc < 0 && algorithm.allowEmptyMatchField() && !(currentValueEval instanceof NumericValueEval)) {
+                    currentValueEval = NumberEval.ZERO;
+                }
                 // Pass the match to the algorithm and conditionally abort the search.
                 boolean shouldContinue = algorithm.processMatch(currentValueEval);
                 if(! shouldContinue) {
@@ -179,7 +209,7 @@ public final class DStarRunner implements Function3Arg {
      * @param name Column heading.
      * @return Corresponding column number.
      */
-    private static int getColumnForString(AreaEval db,String name) {
+    private static int getColumnForString(AreaEval db, String name) {
         int resultColumn = -1;
         final int width = db.getWidth();
         for(int column = 0; column < width; ++column) {
@@ -209,7 +239,7 @@ public final class DStarRunner implements Function3Arg {
      * @throws EvaluationException If references could not be resolved or comparison
      * operators and operands didn't match.
      */
-    private static boolean fullfillsConditions(AreaEval db, int row, AreaEval cdb)
+    private static boolean fulfillsConditions(AreaEval db, int row, AreaEval cdb)
             throws EvaluationException {
         // Only one row must match to accept the input, so rows are ORed.
         // Each row is made up of cells where each cell is a condition,
@@ -316,15 +346,21 @@ public final class DStarRunner implements Function3Arg {
                     return testNumericCondition(value, operator.equal, stringOrNumber);
                 } else { // It's a string.
                     String valueString = value instanceof BlankEval ? "" : OperandResolver.coerceValueToString(value);
-                    return stringOrNumber.equals(valueString);
+                    return stringOrNumber.equalsIgnoreCase(valueString);
                 }
             } else { // It's a text starts-with condition.
                 if(conditionString.isEmpty()) {
                     return value instanceof StringEval;
-                }
-                else {
+                } else {
                     String valueString = value instanceof BlankEval ? "" : OperandResolver.coerceValueToString(value);
-                    return valueString.startsWith(conditionString);
+                    final String lowerValue = valueString.toLowerCase(LocaleUtil.getUserLocale());
+                    final String lowerCondition = conditionString.toLowerCase(LocaleUtil.getUserLocale());
+                    final Pattern pattern = Countif.StringMatcher.getWildCardPattern(lowerCondition);
+                    if (pattern == null) {
+                        return lowerValue.startsWith(lowerCondition);
+                    } else {
+                        return pattern.matcher(lowerValue).matches();
+                    }
                 }
             }
         } else if(condition instanceof NumericValueEval) {

@@ -18,9 +18,11 @@
 package org.apache.poi.util;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Locale;
 
 /**
@@ -29,11 +31,26 @@ import java.util.Locale;
 @Internal
 public final class StringUtil {
     //arbitrarily selected; may need to increase
-    private static final int MAX_RECORD_LENGTH = 10000000;
+    private static final int DEFAULT_MAX_RECORD_LENGTH = 10000000;
+    private static int MAX_RECORD_LENGTH = DEFAULT_MAX_RECORD_LENGTH;
 
     public static final Charset UTF16LE = StandardCharsets.UTF_16LE;
     public static final Charset UTF8 = StandardCharsets.UTF_8;
     public static final Charset WIN_1252 = Charset.forName("cp1252");
+
+    /**
+     * @param length the max record length allowed for StringUtil
+     */
+    public static void setMaxRecordLength(int length) {
+        MAX_RECORD_LENGTH = length;
+    }
+
+    /**
+     * @return the max record length allowed for StringUtil
+     */
+    public static int getMaxRecordLength() {
+        return MAX_RECORD_LENGTH;
+    }
 
     private StringUtil() {
         // no instances of this class
@@ -51,7 +68,7 @@ public final class StringUtil {
      *               byte array. it is assumed that string[ offset ] and string[ offset +
      *               1 ] contain the first 16-bit unicode character
      * @param len    the length of the final string
-     * @return the converted string, never <code>null</code>.
+     * @return the converted string, never {@code null}.
      * @throws ArrayIndexOutOfBoundsException if offset is out of bounds for
      *                                        the byte array (i.e., is negative or is greater than or equal to
      *                                        string.length)
@@ -85,7 +102,7 @@ public final class StringUtil {
      * { 0x16, 0x00 } -0x16
      *
      * @param string the byte array to be converted
-     * @return the converted string, never <code>null</code>
+     * @return the converted string, never {@code null}
      */
     public static String getFromUnicodeLE(byte[] string) {
         if (string.length == 0) {
@@ -112,7 +129,7 @@ public final class StringUtil {
      * @param string byte array to read
      * @param offset offset to read byte array
      * @param len    length to read byte array
-     * @return String generated String instance by reading byte array
+     * @return String generated String instance by reading byte array (ISO-8859-1)
      */
     public static String getFromCompressedUnicode(
             final byte[] string,
@@ -122,6 +139,29 @@ public final class StringUtil {
         return new String(string, offset, len_to_use, ISO_8859_1);
     }
 
+    /**
+     * Read 8 bit data (in UTF-8 codepage) into a (unicode) Java
+     * String and return.
+     * (In Excel terms, read compressed 8 bit unicode as a string)
+     *
+     * @param string byte array to read
+     * @param offset offset to read byte array
+     * @param len    length to read byte array
+     * @return String generated String instance by reading byte array (UTF-8)
+     */
+    public static String getFromCompressedUTF8(
+            final byte[] string,
+            final int offset,
+            final int len) {
+        int len_to_use = Math.min(len, string.length - offset);
+        return new String(string, offset, len_to_use, UTF_8);
+    }
+
+    /**
+     * @param in stream,
+     * @param nChars number pf chars
+     * @return ISO_8859_1 encoded result
+     */
     public static String readCompressedUnicode(LittleEndianInput in, int nChars) {
         byte[] buf = IOUtils.safelyAllocate(nChars, MAX_RECORD_LENGTH);
         in.readFully(buf);
@@ -129,7 +169,7 @@ public final class StringUtil {
     }
 
     /**
-     * InputStream <tt>in</tt> is expected to contain:
+     * InputStream {@code in} is expected to contain:
      * <ol>
      * <li>ushort nChars</li>
      * <li>byte is16BitFlag</li>
@@ -150,7 +190,7 @@ public final class StringUtil {
     }
 
     /**
-     * InputStream <tt>in</tt> is expected to contain:
+     * InputStream {@code in} is expected to contain:
      * <ol>
      * <li>byte is16BitFlag</li>
      * <li>byte[]/char[] characterData</li>
@@ -170,7 +210,7 @@ public final class StringUtil {
     }
 
     /**
-     * OutputStream <tt>out</tt> will get:
+     * OutputStream {@code out} will get:
      * <ol>
      * <li>ushort nChars</li>
      * <li>byte is16BitFlag</li>
@@ -191,7 +231,7 @@ public final class StringUtil {
     }
 
     /**
-     * OutputStream <tt>out</tt> will get:
+     * OutputStream {@code out} will get:
      * <ol>
      * <li>byte is16BitFlag</li>
      * <li>byte[]/char[] characterData</li>
@@ -622,7 +662,7 @@ public final class StringUtil {
      *               byte array. it is assumed that string[ offset ] and string[ offset +
      *               1 ] contain the first 16-bit unicode character
      * @param len    the max. length of the final string
-     * @return the converted string, never <code>null</code>.
+     * @return the converted string, never {@code null}.
      * @throws ArrayIndexOutOfBoundsException if offset is out of bounds for
      *                                        the byte array (i.e., is negative or is greater than or equal to
      *                                        string.length)
@@ -672,6 +712,106 @@ public final class StringUtil {
         newLen = Math.min(newLen, newMaxLen);
 
         return prefix + ((newLen == 0) ? "" : new String(string, newOffset, newLen * 2, UTF16LE));
+    }
+
+
+    /**
+     * Gets a CharSequence length or {@code 0} if the CharSequence is
+     * {@code null}.
+     *
+     * copied from commons-lang3
+     *
+     * @param cs
+     *            a CharSequence or {@code null}
+     * @return CharSequence length or {@code 0} if the CharSequence is
+     *         {@code null}.
+     */
+    public static int length(final CharSequence cs) {
+        return cs == null ? 0 : cs.length();
+    }
+
+    /**
+     * <p>Checks if a CharSequence is empty (""), null or whitespace only.</p>
+     *
+     * <p>Whitespace is defined by {@link Character#isWhitespace(char)}.</p>
+     *
+     * <pre>
+     * StringUtil.isBlank(null)      = true
+     * StringUtil.isBlank("")        = true
+     * StringUtil.isBlank(" ")       = true
+     * StringUtil.isBlank("bob")     = false
+     * StringUtil.isBlank("  bob  ") = false
+     * </pre>
+     *
+     * copied from commons-lang3
+     *
+     * @param cs  the CharSequence to check, may be null
+     * @return {@code true} if the CharSequence is null, empty or whitespace only
+     */
+    public static boolean isBlank(final CharSequence cs) {
+        final int strLen = length(cs);
+        if (strLen == 0) {
+            return true;
+        }
+        for (int i = 0; i < strLen; i++) {
+            if (!Character.isWhitespace(cs.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * <p>Checks if a CharSequence is not empty (""), not null and not whitespace only.</p>
+     *
+     * <p>Whitespace is defined by {@link Character#isWhitespace(char)}.</p>
+     *
+     * <pre>
+     * StringUtil.isNotBlank(null)      = false
+     * StringUtil.isNotBlank("")        = false
+     * StringUtil.isNotBlank(" ")       = false
+     * StringUtil.isNotBlank("bob")     = true
+     * StringUtil.isNotBlank("  bob  ") = true
+     * </pre>
+     *
+     * copied from commons-lang3
+     *
+     * @param cs  the CharSequence to check, may be null
+     * @return {@code true} if the CharSequence is
+     *  not empty and not null and not whitespace only
+     */
+    public static boolean isNotBlank(final CharSequence cs) {
+        return !isBlank(cs);
+    }
+
+    /**
+     * <p>Returns padding using the specified delimiter repeated
+     * to a given length.</p>
+     *
+     * <pre>
+     * StringUtil.repeat('e', 0)  = ""
+     * StringUtil.repeat('e', 3)  = "eee"
+     * StringUtil.repeat('e', -2) = ""
+     * </pre>
+     *
+     * <p>Note: this method does not support padding with
+     * <a href="http://www.unicode.org/glossary/#supplementary_character">Unicode Supplementary Characters</a>
+     * as they require a pair of {@code char}s to be represented.
+     * </p>
+     *
+     * copied from commons-lang3
+     *
+     * @param ch  character to repeat
+     * @param repeat  number of times to repeat char, negative treated as zero
+     * @return String with repeated character
+     */
+    public static String repeat(final char ch, final int repeat) {
+        if (repeat <= 0) {
+            return "";
+        }
+        final char[] buf = new char[repeat];
+        Arrays.fill(buf, ch);
+        return new String(buf);
     }
 
 }

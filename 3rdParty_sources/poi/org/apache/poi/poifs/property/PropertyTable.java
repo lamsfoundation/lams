@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.poifs.common.POIFSBigBlockSize;
 import org.apache.poi.poifs.common.POIFSConstants;
 import org.apache.poi.poifs.filesystem.BATManaged;
@@ -31,8 +33,8 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.poifs.filesystem.POIFSStream;
 import org.apache.poi.poifs.storage.HeaderBlock;
 import org.apache.poi.util.IOUtils;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
+
+import static org.apache.logging.log4j.util.Unbox.box;
 
 /**
  * This class embodies the Property Table for a {@link POIFSFileSystem};
@@ -41,11 +43,7 @@ import org.apache.poi.util.POILogger;
  * chain of blocks.
  */
 public final class PropertyTable implements BATManaged {
-    private static final POILogger _logger =
-       POILogFactory.getLogger(PropertyTable.class);
-
-    //arbitrarily selected; may need to increase
-    private static final int MAX_RECORD_LENGTH = 100_000;
+    private static final Logger LOG = LogManager.getLogger(PropertyTable.class);
 
     private final HeaderBlock    _header_block;
     private final List<Property> _properties = new ArrayList<>();
@@ -66,7 +64,7 @@ public final class PropertyTable implements BATManaged {
      * @param headerBlock the header block of the file
      * @param filesystem the filesystem to read from
      *
-     * @exception IOException if anything goes wrong (which should be
+     * @throws IOException if anything goes wrong (which should be
      *            a result of the input being NFG)
      */
     public PropertyTable(final HeaderBlock headerBlock, final POIFSFileSystem filesystem)
@@ -90,15 +88,14 @@ public final class PropertyTable implements BATManaged {
                     bb.array().length == _bigBigBlockSize.getBigBlockSize()) {
                 data = bb.array();
             } else {
-                data = IOUtils.safelyAllocate(_bigBigBlockSize.getBigBlockSize(), MAX_RECORD_LENGTH);
+                data = IOUtils.safelyAllocate(_bigBigBlockSize.getBigBlockSize(), POIFSFileSystem.getMaxRecordLength());
 
                 int toRead = data.length;
                 if (bb.remaining() < _bigBigBlockSize.getBigBlockSize()) {
                     // Looks to be a truncated block
                     // This isn't allowed, but some third party created files
                     //  sometimes do this, and we can normally read anyway
-                    _logger.log(POILogger.WARN, "Short Property Block, ", bb.remaining(),
-                            " bytes instead of the expected " + _bigBigBlockSize.getBigBlockSize());
+                    LOG.atWarn().log("Short Property Block, {} bytes instead of the expected {}", box(bb.remaining()),box(_bigBigBlockSize.getBigBlockSize()));
                     toRead = bb.remaining();
                 }
 
@@ -108,7 +105,9 @@ public final class PropertyTable implements BATManaged {
             PropertyFactory.convertToProperties(data, _properties);
         }
 
-        populatePropertyTree( (DirectoryProperty)_properties.get(0));
+        if (_properties.get(0) != null) {
+            populatePropertyTree((DirectoryProperty) _properties.get(0));
+        }
     }
 
 
@@ -153,7 +152,7 @@ public final class PropertyTable implements BATManaged {
      * Set the start block for this instance
      *
      * @param index index into the array of BigBlock instances making
-     *              up the the filesystem
+     *              up the filesystem
      */
     public void setStartBlock(final int index) {
         _header_block.setPropertyStart(index);
@@ -175,7 +174,7 @@ public final class PropertyTable implements BATManaged {
        }
        return numBlocks;
     }
- 
+
     /**
      * Prepare to be written
      */
@@ -184,7 +183,7 @@ public final class PropertyTable implements BATManaged {
         // give each property its index
         int i=0;
         for (Property p : _properties) {
-            // only handle non-null properties 
+            // only handle non-null properties
             if (p == null) continue;
             p.setIndex(i++);
             pList.add(p);
@@ -192,8 +191,8 @@ public final class PropertyTable implements BATManaged {
 
         // prepare each property for writing
         for (Property p : pList) p.preWrite();
-    }    
-    
+    }
+
     /**
      * Writes the properties out into the given low-level stream
      */
@@ -205,7 +204,7 @@ public final class PropertyTable implements BATManaged {
           }
        }
        os.close();
-       
+
        // Update the start position if needed
        if(getStartBlock() != stream.getStartBlock()) {
           setStartBlock(stream.getStartBlock());
@@ -248,8 +247,7 @@ public final class PropertyTable implements BATManaged {
         if (! Property.isValidIndex(index))
             return false;
         if (index < 0 || index >= _properties.size()) {
-            _logger.log(POILogger.WARN, "Property index " + index +
-                    "outside the valid range 0.."+_properties.size());
+            LOG.atWarn().log("Property index {} outside the valid range 0..{}", box(index),box(_properties.size()));
             return false;
         }
         return true;

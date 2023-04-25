@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,8 +27,7 @@ import java.io.InputStream;
  * <p>
  * A typical use case would be during debugging, to ensure that data is being
  * read as expected.
- *
- * @version $Id: CountingInputStream.java 1586350 2014-04-10 15:57:20Z ggregory $
+ * </p>
  */
 public class CountingInputStream extends ProxyInputStream {
 
@@ -44,7 +43,6 @@ public class CountingInputStream extends ProxyInputStream {
         super(in);
     }
 
-    //-----------------------------------------------------------------------
 
     /**
      * Skips the stream over the specified number of bytes, adding the skipped
@@ -52,7 +50,7 @@ public class CountingInputStream extends ProxyInputStream {
      *
      * @param length  the number of bytes to skip
      * @return the actual number of bytes skipped
-     * @throws IOException if an I/O error occurs
+     * @throws IOException if an I/O error occurs.
      * @see java.io.InputStream#skip(long)
      */
     @Override
@@ -75,13 +73,12 @@ public class CountingInputStream extends ProxyInputStream {
         }
     }
 
-    //-----------------------------------------------------------------------
     /**
      * The number of bytes that have passed through this stream.
      * <p>
      * NOTE: From v1.3 this method throws an ArithmeticException if the
-     * count is greater than can be expressed by an <code>int</code>.
-     * See {@link #getByteCount()} for a method using a <code>long</code>.
+     * count is greater than can be expressed by an {@code int}.
+     * See {@link #getByteCount()} for a method using a {@code long}.
      *
      * @return the number of bytes accumulated
      * @throws ArithmeticException if the byte count is too large
@@ -94,12 +91,12 @@ public class CountingInputStream extends ProxyInputStream {
         return (int) result;
     }
 
-    /** 
-     * Set the byte count back to 0. 
+    /**
+     * Set the byte count back to 0.
      * <p>
      * NOTE: From v1.3 this method throws an ArithmeticException if the
-     * count is greater than can be expressed by an <code>int</code>.
-     * See {@link #resetByteCount()} for a method using a <code>long</code>.
+     * count is greater than can be expressed by an {@code int}.
+     * See {@link #resetByteCount()} for a method using a {@code long}.
      *
      * @return the count previous to resetting
      * @throws ArithmeticException if the byte count is too large
@@ -115,7 +112,7 @@ public class CountingInputStream extends ProxyInputStream {
     /**
      * The number of bytes that have passed through this stream.
      * <p>
-     * NOTE: This method is an alternative for <code>getCount()</code>
+     * NOTE: This method is an alternative for {@code getCount()}
      * and was added because that method returns an integer which will
      * result in incorrect count for files over 2GB.
      *
@@ -126,10 +123,10 @@ public class CountingInputStream extends ProxyInputStream {
         return this.count;
     }
 
-    /** 
-     * Set the byte count back to 0. 
+    /**
+     * Set the byte count back to 0.
      * <p>
-     * NOTE: This method is an alternative for <code>resetCount()</code>
+     * NOTE: This method is an alternative for {@code resetCount()}
      * and was added because that method returns an integer which will
      * result in incorrect count for files over 2GB.
      *

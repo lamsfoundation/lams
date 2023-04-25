@@ -25,12 +25,12 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.LittleEndian;
 import org.apache.poi.util.LittleEndianByteArrayInputStream;
 import org.apache.poi.util.LittleEndianConsts;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
 
 /**
  * Supports reading and writing of variant data.<p>
@@ -58,9 +58,7 @@ public class VariantSupport extends Variant {
             Variant.VT_CF, Variant.VT_BOOL };
 
 
-    private static final POILogger logger = POILogFactory.getLogger(VariantSupport.class);
-    //arbitrarily selected; may need to increase
-    private static final int MAX_RECORD_LENGTH = 100_000;
+    private static final Logger LOG = LogManager.getLogger(VariantSupport.class);
 
     private static boolean logUnsupportedTypes;
 
@@ -114,7 +112,7 @@ public class VariantSupport extends Variant {
             Long vt = Long.valueOf(ex.getVariantType());
             if (!unsupportedMessage.contains(vt))
             {
-            	logger.log( POILogger.ERROR, ex.getMessage());
+                LOG.atError().withThrowable(ex).log("Unsupported type");
                 unsupportedMessage.add(vt);
             }
         }
@@ -154,9 +152,9 @@ public class VariantSupport extends Variant {
      * @return A Java object that corresponds best to the variant field. For
      *         example, a VT_I4 is returned as a {@link Long}, a VT_LPSTR as a
      *         {@link String}.
-     * @exception ReadingNotSupportedException if a property is to be written
+     * @throws ReadingNotSupportedException if a property is to be written
      *            who's variant type HPSF does not yet support
-     * @exception UnsupportedEncodingException if the specified codepage is not
+     * @throws UnsupportedEncodingException if the specified codepage is not
      *            supported.
      * @see Variant
      */
@@ -176,7 +174,7 @@ public class VariantSupport extends Variant {
             typedPropertyValue.readValue(lei);
         } catch ( UnsupportedOperationException exc ) {
             try {
-                final byte[] v = IOUtils.toByteArray(lei, length, MAX_RECORD_LENGTH);
+                final byte[] v = IOUtils.toByteArray(lei, length, CodePageString.getMaxRecordLength());
                 throw new ReadingNotSupportedException( type, v );
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -254,7 +252,7 @@ public class VariantSupport extends Variant {
             default:
                 final int unpadded = lei.getReadIndex()-offset;
                 lei.setReadIndex(offset);
-                final byte[] v = IOUtils.safelyAllocate(unpadded, MAX_RECORD_LENGTH);
+                final byte[] v = IOUtils.safelyAllocate(unpadded, CodePageString.getMaxRecordLength());
                 lei.readFully( v, 0, unpadded );
                 throw new ReadingNotSupportedException( type, v );
         }
@@ -262,7 +260,7 @@ public class VariantSupport extends Variant {
 
     /**
      * Writes a variant value to an output stream. This method ensures that
-     * always a multiple of 4 bytes is written.<p>
+     * always a multiple of 4 bytes is written.
      *
      * @param out The stream to write the value to.
      * @param type The variant's type.
@@ -270,8 +268,8 @@ public class VariantSupport extends Variant {
      * @param codepage The codepage to use to write non-wide strings
      * @return The number of entities that have been written. In many cases an
      * "entity" is a byte but this is not always the case.
-     * @exception IOException if an I/O exceptions occurs
-     * @exception WritingNotSupportedException if a property is to be written
+     * @throws IOException if an I/O exceptions occurs
+     * @throws WritingNotSupportedException if a property is to be written
      * who's variant type HPSF does not yet support
      */
     public static int write(final OutputStream out, final long type,

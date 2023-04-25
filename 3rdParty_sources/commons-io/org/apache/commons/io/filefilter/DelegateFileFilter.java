@@ -25,31 +25,16 @@ import java.io.Serializable;
  * This class turns a Java FileFilter or FilenameFilter into an IO FileFilter.
  *
  * @since 1.0
- * @version $Id: DelegateFileFilter.java 1642757 2014-12-01 21:09:30Z sebb $
- *
  * @see FileFilterUtils#asFileFilter(FileFilter)
  * @see FileFilterUtils#asFileFilter(FilenameFilter)
  */
 public class DelegateFileFilter extends AbstractFileFilter implements Serializable {
 
     private static final long serialVersionUID = -8723373124984771318L;
-    /** The Filename filter */
-    private final FilenameFilter filenameFilter;
     /** The File filter */
     private final FileFilter fileFilter;
-
-    /**
-     * Constructs a delegate file filter around an existing FilenameFilter.
-     *
-     * @param filter  the filter to decorate
-     */
-    public DelegateFileFilter(final FilenameFilter filter) {
-        if (filter == null) {
-            throw new IllegalArgumentException("The FilenameFilter must not be null");
-        }
-        this.filenameFilter = filter;
-        this.fileFilter = null;
-    }
+    /** The Filename filter */
+    private final FilenameFilter filenameFilter;
 
     /**
      * Constructs a delegate file filter around an existing FileFilter.
@@ -65,6 +50,19 @@ public class DelegateFileFilter extends AbstractFileFilter implements Serializab
     }
 
     /**
+     * Constructs a delegate file filter around an existing FilenameFilter.
+     *
+     * @param filter  the filter to decorate
+     */
+    public DelegateFileFilter(final FilenameFilter filter) {
+        if (filter == null) {
+            throw new IllegalArgumentException("The FilenameFilter must not be null");
+        }
+        this.filenameFilter = filter;
+        this.fileFilter = null;
+    }
+
+    /**
      * Checks the filter.
      *
      * @param file  the file to check
@@ -74,31 +72,29 @@ public class DelegateFileFilter extends AbstractFileFilter implements Serializab
     public boolean accept(final File file) {
         if (fileFilter != null) {
             return fileFilter.accept(file);
-        } else {
-            return super.accept(file);
         }
+        return super.accept(file);
     }
 
     /**
      * Checks the filter.
      *
      * @param dir  the directory
-     * @param name  the filename in the directory
+     * @param name  the file name in the directory
      * @return true if the filter matches
      */
     @Override
     public boolean accept(final File dir, final String name) {
         if (filenameFilter != null) {
             return filenameFilter.accept(dir, name);
-        } else {
-            return super.accept(dir, name);
         }
+        return super.accept(dir, name);
     }
 
     /**
-     * Provide a String representaion of this file filter.
+     * Provide a String representation of this file filter.
      *
-     * @return a String representaion
+     * @return a String representation
      */
     @Override
     public String toString() {

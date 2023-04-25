@@ -17,6 +17,10 @@
 
 package org.apache.poi.ss.util;
 
+import org.apache.poi.ss.usermodel.PaneType;
+
+import java.util.Objects;
+
 /**
  * Holds information regarding a split plane or freeze plane for a sheet.
  *
@@ -31,75 +35,119 @@ public class PaneInformation
     public static final byte PANE_LOWER_LEFT = (byte)2;
     /** Constant for active pane being the upper left*/
     public static final byte PANE_UPPER_LEFT = (byte)3;
-    
-	private final short x;
-	private final short y;
-	private final short topRow;
-	private final short leftColumn;
-	private final byte activePane;
-	private final boolean frozen;
-	
-	public PaneInformation(short x, short y, short top, short left, byte active, boolean frozen) {
-		this.x = x;
-		this.y = y;
-		this.topRow = top;
-		this.leftColumn = left;
-		this.activePane = active;
-		this.frozen = frozen;
-	}
 
+    private final short x;
+    private final short y;
+    private final short topRow;
+    private final short leftColumn;
+    private final byte activePane;
+    private final boolean frozen;
 
-	/**
-	 * Returns the vertical position of the split.
-	 * @return 0 if there is no vertical spilt,
-	 *         or for a freeze pane the number of columns in the TOP pane,
-	 *         or for a split plane the position of the split in 1/20th of a point.
-	 */
-	public short getVerticalSplitPosition() {
-	  return x;
-	}
-	
-	/**
-	 * Returns the horizontal position of the split.
-	 * @return 0 if there is no horizontal spilt,
-	 *         or for a freeze pane the number of rows in the LEFT pane,
-	 *         or for a split plane the position of the split in 1/20th of a point.
-	 */
-	public short getHorizontalSplitPosition() {
-	  return y;
-	}
-	
-	/**
-	 * For a horizontal split returns the top row in the BOTTOM pane.
-	 * @return 0 if there is no horizontal split, or the top row of the bottom pane.
-	 */
-	public short getHorizontalSplitTopRow() {
-	  return topRow;
-	}
-	
-	/**
-	 * For a vertical split returns the left column in the RIGHT pane.
-	 * @return 0 if there is no vertical split, or the left column in the RIGHT pane.
-	 */
-	public short getVerticalSplitLeftColumn() {
-	  return leftColumn;
-	}
-	
-	/**
-	 * Returns the active pane
-	 * @see #PANE_LOWER_RIGHT
-	 * @see #PANE_UPPER_RIGHT
-	 * @see #PANE_LOWER_LEFT
-	 * @see #PANE_UPPER_LEFT
-	 * @return the active pane.
-	 */
-	public byte getActivePane() {
-	  return activePane;
-	}
-	
-	/** Returns true if this is a Freeze pane, false if it is a split pane.
-	 */
-	public boolean isFreezePane() {
-		return frozen;
-	}
+    public PaneInformation(short x, short y, short top, short left, byte active, boolean frozen) {
+        this.x = x;
+        this.y = y;
+        this.topRow = top;
+        this.leftColumn = left;
+        this.activePane = active;
+        this.frozen = frozen;
+    }
+
+    /**
+     * Returns the vertical position of the split.
+     * @return 0 if there is no vertical spilt,
+     *         or for a freeze pane the number of columns in the TOP pane,
+     *         or for a split plane the position of the split in 1/20th of a point.
+     */
+    public short getVerticalSplitPosition() {
+        return x;
+    }
+
+    /**
+     * Returns the horizontal position of the split.
+     * @return 0 if there is no horizontal spilt,
+     *         or for a freeze pane the number of rows in the LEFT pane,
+     *         or for a split plane the position of the split in 1/20th of a point.
+     */
+    public short getHorizontalSplitPosition() {
+        return y;
+    }
+
+    /**
+     * For a horizontal split returns the top row in the BOTTOM pane.
+     * @return 0 if there is no horizontal split, or the top row of the bottom pane.
+     */
+    public short getHorizontalSplitTopRow() {
+        return topRow;
+    }
+
+    /**
+     * For a vertical split returns the left column in the RIGHT pane.
+     * @return 0 if there is no vertical split, or the left column in the RIGHT pane.
+     */
+    public short getVerticalSplitLeftColumn() {
+        return leftColumn;
+    }
+
+    /**
+     * Returns the active pane.
+     * @see #PANE_LOWER_RIGHT
+     * @see #PANE_UPPER_RIGHT
+     * @see #PANE_LOWER_LEFT
+     * @see #PANE_UPPER_LEFT
+     * @return the active pane.
+     */
+    public byte getActivePane() {
+        return activePane;
+    }
+
+    /**
+     * @return the active pane type - can return <code>null</code> if no active pane type is set
+     * @since POI 5.2.3
+     */
+    public PaneType getActivePaneType() {
+        switch (activePane) {
+            case PANE_LOWER_RIGHT:
+                return PaneType.LOWER_RIGHT;
+            case PANE_UPPER_RIGHT:
+                return PaneType.UPPER_RIGHT;
+            case PANE_LOWER_LEFT:
+                return PaneType.LOWER_LEFT;
+            case PANE_UPPER_LEFT:
+                return PaneType.UPPER_LEFT;
+            default:
+                return null;
+        }
+    }
+
+    /** Returns true if this is a Freeze pane, false if it is a split pane.
+     */
+    public boolean isFreezePane() {
+        return frozen;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PaneInformation)) return false;
+
+        PaneInformation that = (PaneInformation) o;
+
+        if (x != that.x) return false;
+        if (y != that.y) return false;
+        if (topRow != that.topRow) return false;
+        if (leftColumn != that.leftColumn) return false;
+        if (activePane != that.activePane) return false;
+        return frozen == that.frozen;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                x,
+                y,
+                topRow,
+                leftColumn,
+                activePane,
+                frozen);
+    }
 }

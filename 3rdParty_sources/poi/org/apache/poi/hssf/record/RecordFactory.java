@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.poi.util.IOUtils;
+import org.apache.poi.util.RecordFormatException;
+
 /**
  * Title:  Record Factory<p>
  * Description:  Takes a stream and outputs an array of Record objects.
@@ -30,6 +33,19 @@ import java.util.List;
  */
 public final class RecordFactory {
     private static final int NUM_RECORDS = 512;
+
+    // how many records we read at max by default (can be adjusted via IOUtils)
+    //increased to 5 million due to https://bz.apache.org/bugzilla/show_bug.cgi?id=65887
+    private static final int DEFAULT_MAX_NUMBER_OF_RECORDS = 5_000_000;
+    private static int MAX_NUMBER_OF_RECORDS = DEFAULT_MAX_NUMBER_OF_RECORDS;
+
+    public static void setMaxNumberOfRecords(int maxNumberOfRecords) {
+        MAX_NUMBER_OF_RECORDS = maxNumberOfRecords;
+    }
+
+    public static int getMaxNumberOfRecords() {
+        return MAX_NUMBER_OF_RECORDS;
+    }
 
     private RecordFactory() {}
 
@@ -103,8 +119,13 @@ public final class RecordFactory {
      * @return the equivalent array of {@link NumberRecord NumberRecords}
      */
     public static NumberRecord[] convertRKRecords(MulRKRecord mrk) {
-        NumberRecord[] mulRecs = new NumberRecord[mrk.getNumColumns()];
-        for (int k = 0; k < mrk.getNumColumns(); k++) {
+        int numColumns = mrk.getNumColumns();
+        if (numColumns < 0) {
+            throw new RecordFormatException("Cannot create RKRecords with negative number of columns: " + numColumns);
+        }
+
+        NumberRecord[] mulRecs = new NumberRecord[numColumns];
+        for (int k = 0; k < numColumns; k++) {
             NumberRecord nr = new NumberRecord();
 
             nr.setColumn((short) (k + mrk.getFirstColumn()));
@@ -154,9 +175,9 @@ public final class RecordFactory {
      *
      * @return an array of Records created from the InputStream
      *
-     * @exception org.apache.poi.util.RecordFormatException on error processing the InputStream
+     * @throws org.apache.poi.util.RecordFormatException on error processing the InputStream
      */
-    public static List<org.apache.poi.hssf.record.Record> createRecords(InputStream in) throws org.apache.poi.util.RecordFormatException {
+    public static List<org.apache.poi.hssf.record.Record> createRecords(InputStream in) throws RecordFormatException {
 
         List<org.apache.poi.hssf.record.Record> records = new ArrayList<>(NUM_RECORDS);
 
@@ -165,6 +186,8 @@ public final class RecordFactory {
         Record record;
         while ((record = recStream.nextRecord())!=null) {
             records.add(record);
+
+            IOUtils.safelyAllocateCheck(records.size(), MAX_NUMBER_OF_RECORDS);
         }
 
         return records;

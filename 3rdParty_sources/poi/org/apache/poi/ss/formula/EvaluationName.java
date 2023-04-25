@@ -19,23 +19,22 @@ package org.apache.poi.ss.formula;
 
 import org.apache.poi.ss.formula.ptg.NamePtg;
 import org.apache.poi.ss.formula.ptg.Ptg;
+import org.apache.poi.util.Internal;
+
 /**
- * Abstracts a name record for formula evaluation.<br>
- *
- * For POI internal use only
- *
- * @author Josh Micich
+ * Abstracts a name record for formula evaluation.
  */
+@Internal
 public interface EvaluationName {
 
-	String getNameText();
+    String getNameText();
 
-	boolean isFunctionName();
+    boolean isFunctionName();
 
-	boolean hasFormula();
+    boolean hasFormula();
 
-	Ptg[] getNameDefinition();
+    Ptg[] getNameDefinition();
 
-	boolean isRange();
-	NamePtg createPtg();
+    boolean isRange();
+    NamePtg createPtg();
 }

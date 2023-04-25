@@ -27,6 +27,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
+import java.util.Objects;
 
 /**
  * {@link InputStream} implementation that reads a character stream from a {@link Reader}
@@ -48,10 +49,11 @@ import java.nio.charset.CodingErrorAction;
  * sequence as reading from {@code in} (provided that the initial byte sequence is legal
  * with respect to the charset encoding):
  * <pre>
- * InputStream in = ...
+ * InputStream inputStream = ...
  * Charset cs = ...
- * InputStreamReader reader = new InputStreamReader(in, cs);
+ * InputStreamReader reader = new InputStreamReader(inputStream, cs);
  * ReaderInputStream in2 = new ReaderInputStream(reader, cs);</pre>
+ *
  * {@link ReaderInputStream} implements the same transformation as {@link java.io.OutputStreamWriter},
  * except that the control flow is reversed: both classes transform a character stream
  * into a byte stream, but {@link java.io.OutputStreamWriter} pushes data to the underlying stream,
@@ -62,15 +64,17 @@ import java.nio.charset.CodingErrorAction;
  * in the design of the code. This class is typically used in situations where an existing
  * API only accepts an {@link InputStream}, but where the most natural way to produce the data
  * is as a character stream, i.e. by providing a {@link Reader} instance. An example of a situation
- * where this problem may appear is when implementing the {@link javax.activation.DataSource}
+ * where this problem may appear is when implementing the {@code javax.activation.DataSource}
  * interface from the Java Activation Framework.
  * <p>
  * Given the fact that the {@link Reader} class doesn't provide any way to predict whether the next
  * read operation will block or not, it is not possible to provide a meaningful
  * implementation of the {@link InputStream#available()} method. A call to this method
  * will always return 0. Also, this class doesn't support {@link InputStream#mark(int)}.
+ * </p>
  * <p>
  * Instances of {@link ReaderInputStream} are not thread safe.
+ * </p>
  *
  * @see org.apache.commons.io.output.WriterOutputStream
  *
@@ -143,7 +147,7 @@ public class ReaderInputStream extends InputStream {
 
     /**
      * Construct a new {@link ReaderInputStream} with a default input buffer size of
-     * 1024 characters.
+     * {@value #DEFAULT_BUFFER_SIZE} characters.
      *
      * @param reader the target {@link Reader}
      * @param charset the charset encoding
@@ -165,7 +169,7 @@ public class ReaderInputStream extends InputStream {
 
     /**
      * Construct a new {@link ReaderInputStream} with a default input buffer size of
-     * 1024 characters.
+     * {@value #DEFAULT_BUFFER_SIZE} characters.
      *
      * @param reader the target {@link Reader}
      * @param charsetName the name of the charset encoding
@@ -176,7 +180,7 @@ public class ReaderInputStream extends InputStream {
 
     /**
      * Construct a new {@link ReaderInputStream} that uses the default character encoding
-     * with a default input buffer size of 1024 characters.
+     * with a default input buffer size of {@value #DEFAULT_BUFFER_SIZE} characters.
      *
      * @param reader the target {@link Reader}
      * @deprecated 2.5 use {@link #ReaderInputStream(Reader, Charset)} instead
@@ -215,20 +219,18 @@ public class ReaderInputStream extends InputStream {
     /**
      * Read the specified number of bytes into an array.
      *
-     * @param b the byte array to read into
+     * @param array the byte array to read into
      * @param off the offset to start reading bytes into
      * @param len the number of bytes to read
-     * @return the number of bytes read or <code>-1</code>
+     * @return the number of bytes read or {@code -1}
      *         if the end of the stream has been reached
-     * @throws IOException if an I/O error occurs
+     * @throws IOException if an I/O error occurs.
      */
     @Override
-    public int read(final byte[] b, int off, int len) throws IOException {
-        if (b == null) {
-            throw new NullPointerException("Byte array must not be null");
-        }
-        if (len < 0 || off < 0 || (off + len) > b.length) {
-            throw new IndexOutOfBoundsException("Array Size=" + b.length +
+    public int read(final byte[] array, int off, int len) throws IOException {
+        Objects.requireNonNull(array, "array");
+        if (len < 0 || off < 0 || (off + len) > array.length) {
+            throw new IndexOutOfBoundsException("Array Size=" + array.length +
                     ", offset=" + off + ", length=" + len);
         }
         int read = 0;
@@ -238,7 +240,7 @@ public class ReaderInputStream extends InputStream {
         while (len > 0) {
             if (encoderOut.hasRemaining()) {
                 final int c = Math.min(encoderOut.remaining(), len);
-                encoderOut.get(b, off, c);
+                encoderOut.get(array, off, c);
                 off += c;
                 len -= c;
                 read += c;
@@ -256,9 +258,9 @@ public class ReaderInputStream extends InputStream {
      * Read the specified number of bytes into an array.
      *
      * @param b the byte array to read into
-     * @return the number of bytes read or <code>-1</code>
+     * @return the number of bytes read or {@code -1}
      *         if the end of the stream has been reached
-     * @throws IOException if an I/O error occurs
+     * @throws IOException if an I/O error occurs.
      */
     @Override
     public int read(final byte[] b) throws IOException {
@@ -268,9 +270,9 @@ public class ReaderInputStream extends InputStream {
     /**
      * Read a single byte.
      *
-     * @return either the byte read or <code>-1</code> if the end of the stream
+     * @return either the byte read or {@code -1} if the end of the stream
      *         has been reached
-     * @throws IOException if an I/O error occurs
+     * @throws IOException if an I/O error occurs.
      */
     @Override
     public int read() throws IOException {
@@ -288,7 +290,7 @@ public class ReaderInputStream extends InputStream {
     /**
      * Close the stream. This method will cause the underlying {@link Reader}
      * to be closed.
-     * @throws IOException if an I/O error occurs
+     * @throws IOException if an I/O error occurs.
      */
     @Override
     public void close() throws IOException {

@@ -142,9 +142,9 @@ public final class HSSFChart {
         records.add( createValuesLinkedDataRecord() );
         records.add( createCategoriesLinkedDataRecord() );
         records.add( createDataFormatRecord() );
-        //		records.add(createBeginRecord());
+        //      records.add(createBeginRecord());
         // unknown
-        //		records.add(createEndRecord());
+        //      records.add(createEndRecord());
         records.add( createSeriesToChartGroupRecord() );
         records.add( createEndRecord() );
         records.add( createSheetPropsRecord() );
@@ -218,7 +218,7 @@ public final class HSSFChart {
             } else if(r instanceof SeriesTextRecord) {
                 // Applies to a series, unless we've seen a legend already
                 SeriesTextRecord str = (SeriesTextRecord)r;
-                if(lastChart.legendRecord == null && lastChart.series.size() > 0) {
+                if(lastChart.legendRecord == null && !lastChart.series.isEmpty()) {
                     HSSFSeries series = lastChart.series.get(lastChart.series.size()-1);
                     series.seriesTitleText = str;
                 } else {
@@ -590,7 +590,7 @@ public final class HSSFChart {
         r.setLogarithmicScale( false );
         r.setValuesInReverse( false );
         r.setCrossCategoryAxisAtMaximum( false );
-        r.setReserved( true );	// what's this do??
+        r.setReserved( true );  // what's this do??
         return r;
     }
 
@@ -847,9 +847,9 @@ public final class HSSFChart {
     private AreaFormatRecord createAreaFormatRecord1()
     {
         AreaFormatRecord r = new AreaFormatRecord();
-        r.setForegroundColor( 16777215 );	 // RGB Color
-        r.setBackgroundColor( 0 );			// RGB Color
-        r.setPattern( (short) 1 );			 // TODO: Add Pattern constants to record
+        r.setForegroundColor( 16777215 );    // RGB Color
+        r.setBackgroundColor( 0 );          // RGB Color
+        r.setPattern( (short) 1 );           // TODO: Add Pattern constants to record
         r.setAutomatic( true );
         r.setInvert( false );
         r.setForecolorIndex( (short) 78 );
@@ -1120,7 +1120,7 @@ public final class HSSFChart {
                 }
             }
 
-            linkedDataRecord.setFormulaOfLink(ptgList.toArray(new Ptg[0]));
+            linkedDataRecord.setFormulaOfLink(ptgList.toArray(Ptg.EMPTY_PTG_ARRAY));
 
             return rowCount * colCount;
         }

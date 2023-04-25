@@ -15,24 +15,23 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-        
+
 
 package org.apache.poi.hssf.record;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.hssf.record.common.UnicodeString;
 import org.apache.poi.util.IntMapper;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
+
+import static org.apache.logging.log4j.util.Unbox.box;
 
 /**
  * Handles the task of deserializing a SST string.  The two main entry points are
- *
- * @author Glen Stampoultzis (glens at apache.org)
- * @author Jason Height (jheight at apache.org)
  */
 class SSTDeserializer
 {
-	private static POILogger logger = POILogFactory.getLogger(SSTDeserializer.class);
+    private static final Logger LOG = LogManager.getLogger(SSTDeserializer.class);
     private IntMapper<UnicodeString> strings;
 
     public SSTDeserializer( IntMapper<UnicodeString> strings )
@@ -51,7 +50,7 @@ class SSTDeserializer
          // Extract exactly the count of strings from the SST record.
          UnicodeString str;
           if (in.available() == 0 && !in.hasNextRecord()) {
-              logger.log(POILogger.ERROR, "Ran out of data before creating all the strings! String at index ", i);
+              LOG.atError().log("Ran out of data before creating all the strings! String at index {}", box(i));
               str = new UnicodeString("");
           } else {
               str = new UnicodeString(in);

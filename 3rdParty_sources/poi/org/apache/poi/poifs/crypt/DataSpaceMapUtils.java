@@ -24,8 +24,6 @@ import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.poifs.crypt.standard.EncryptionRecord;
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
 import org.apache.poi.poifs.filesystem.DocumentEntry;
-import org.apache.poi.poifs.filesystem.POIFSWriterEvent;
-import org.apache.poi.poifs.filesystem.POIFSWriterListener;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.LittleEndianByteArrayOutputStream;
 import org.apache.poi.util.LittleEndianConsts;
@@ -34,9 +32,6 @@ import org.apache.poi.util.LittleEndianOutput;
 import org.apache.poi.util.StringUtil;
 
 public class DataSpaceMapUtils {
-
-    //arbitrarily selected; may need to increase
-    private static final int MAX_RECORD_LENGTH = 100_000;
 
     public static void addDefaultDataSpace(DirectoryEntry dir) throws IOException {
         DataSpaceMapEntry dsme = new DataSpaceMapEntry(
@@ -81,13 +76,11 @@ public class DataSpaceMapUtils {
             dir.getEntry(fileName).delete();
         }
         
-        return dir.createDocument(fileName, bos.getWriteIndex(), new POIFSWriterListener(){
-            public void processPOIFSWriterEvent(POIFSWriterEvent event) {
-                try {
-                    event.getStream().write(buf, 0, event.getLimit());
-                } catch (IOException e) {
-                    throw new EncryptedDocumentException(e);
-                }
+        return dir.createDocument(fileName, bos.getWriteIndex(), event -> {
+            try {
+                event.getStream().write(buf, 0, event.getLimit());
+            } catch (IOException e) {
+                throw new EncryptedDocumentException(e);
             }
         });
     }   
@@ -337,7 +330,7 @@ public class DataSpaceMapUtils {
             return length == 0 ? null : "";
         }
 
-        byte[] data = IOUtils.safelyAllocate(length, MAX_RECORD_LENGTH);
+        byte[] data = IOUtils.safelyAllocate(length, CryptoFunctions.MAX_RECORD_LENGTH);
         is.readFully(data);
 
         // Padding (variable): A set of bytes that MUST be of correct size such that the size of the UTF-8-LP-P4

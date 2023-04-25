@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,7 @@ import java.io.Serializable;
  *
  * @since 2.0
  */
-@SuppressWarnings("deprecation") // needs to extend deprecated IOExceptionWithCause to preserve binary compatibility 
+@SuppressWarnings("deprecation") // needs to extend deprecated IOExceptionWithCause to preserve binary compatibility
 public class TaggedIOException extends IOExceptionWithCause {
 
     /**
@@ -42,14 +42,14 @@ public class TaggedIOException extends IOExceptionWithCause {
      * the argument types are intentionally more generic to make it easier
      * to use this method without type casts.
      * <p>
-     * A typical use for this method is in a <code>catch</code> block to
+     * A typical use for this method is in a {@code catch} block to
      * determine how a caught exception should be handled:
      * <pre>
      * Serializable tag = ...;
      * try {
      *     ...;
      * } catch (Throwable t) {
-     *     if (TaggedIOExcepton.isTaggedWith(t, tag)) {
+     *     if (TaggedIOException.isTaggedWith(t, tag)) {
      *         // special processing for tagged exception
      *     } else {
      *         // handling of other kinds of exceptions
@@ -74,14 +74,14 @@ public class TaggedIOException extends IOExceptionWithCause {
      * if the given throwable is of a different type or if it is tagged
      * with some other tag.
      * <p>
-     * This method is typically used in a <code>catch</code> block to
+     * This method is typically used in a {@code catch} block to
      * selectively rethrow tagged exceptions.
      * <pre>
      * Serializable tag = ...;
      * try {
      *     ...;
      * } catch (Throwable t) {
-     *     TaggedIOExcepton.throwCauseIfTagged(t, tag);
+     *     TaggedIOException.throwCauseIfTagged(t, tag);
      *     // handle other kinds of exceptions
      * }
      * </pre>
@@ -129,7 +129,7 @@ public class TaggedIOException extends IOExceptionWithCause {
      * @return wrapped exception
      */
     @Override
-    public IOException getCause() {
+    public synchronized IOException getCause() {
         return (IOException) super.getCause();
     }
 

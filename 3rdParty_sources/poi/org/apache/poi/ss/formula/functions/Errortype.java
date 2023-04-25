@@ -30,9 +30,9 @@ import org.apache.poi.ss.usermodel.FormulaError;
  * <b>Syntax:</b><br>
  * <b>ERROR.TYPE</b>(<b>errorValue</b>)</p>
  * <p>
- * Returns a number corresponding to the error type of the supplied argument.<p>
- * <p>
- *    <table border="1" cellpadding="1" cellspacing="1" summary="Return values for ERROR.TYPE()">
+ * Returns a number corresponding to the error type of the supplied argument.
+ *    <table>
+ *      <caption>Return values for ERROR.TYPE()</caption>
  *      <tr><td>errorValue</td><td>Return Value</td></tr>
  *      <tr><td>#NULL!</td><td>1</td></tr>
  *      <tr><td>#DIV/0!</td><td>2</td></tr>
@@ -45,36 +45,34 @@ import org.apache.poi.ss.usermodel.FormulaError;
  *    </table>
  *
  * Note - the results of ERROR.TYPE() are different to the constants defined in
- * <tt>ErrorConstants</tt>.
- * </p>
- *
- * @author Josh Micich
+ * {@code ErrorConstants}.
  */
 public final class Errortype extends Fixed1ArgFunction {
 
-	public ValueEval evaluate(int srcRowIndex, int srcColumnIndex, ValueEval arg0) {
+    @Override
+    public ValueEval evaluate(int srcRowIndex, int srcColumnIndex, ValueEval arg0) {
 
-		try {
-			OperandResolver.getSingleValue(arg0, srcRowIndex, srcColumnIndex);
-			return ErrorEval.NA;
-		} catch (EvaluationException e) {
-			int result = translateErrorCodeToErrorTypeValue(e.getErrorEval().getErrorCode());
-			return new NumberEval(result);
-		}
-	}
+        try {
+            OperandResolver.getSingleValue(arg0, srcRowIndex, srcColumnIndex);
+            return ErrorEval.NA;
+        } catch (EvaluationException e) {
+            int result = translateErrorCodeToErrorTypeValue(e.getErrorEval().getErrorCode());
+            return new NumberEval(result);
+        }
+    }
 
-	private int translateErrorCodeToErrorTypeValue(int errorCode) {
-		switch (FormulaError.forInt(errorCode)) {
-			case NULL:  return 1;
-			case DIV0:  return 2;
-			case VALUE: return 3;
-			case REF:   return 4;
-			case NAME:  return 5;
-			case NUM:   return 6;
-			case NA:    return 7;
-			default:
-		        throw new IllegalArgumentException("Invalid error code (" + errorCode + ")");
-		}
-	}
+    private int translateErrorCodeToErrorTypeValue(int errorCode) {
+        switch (FormulaError.forInt(errorCode)) {
+            case NULL:  return 1;
+            case DIV0:  return 2;
+            case VALUE: return 3;
+            case REF:   return 4;
+            case NAME:  return 5;
+            case NUM:   return 6;
+            case NA:    return 7;
+            default:
+                throw new IllegalArgumentException("Invalid error code (" + errorCode + ")");
+        }
+    }
 
 }

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -63,15 +63,16 @@ import java.nio.charset.CodingErrorAction;
  * in the design of the code. This class is typically used in situations where an existing
  * API only accepts an {@link OutputStream} object, but where the stream is known to represent
  * character data that must be decoded for further use.
+ * </p>
  * <p>
  * Instances of {@link WriterOutputStream} are not thread safe.
- * 
+ * </p>
+ *
  * @see org.apache.commons.io.input.ReaderInputStream
- * 
  * @since 2.0
  */
 public class WriterOutputStream extends OutputStream {
-    private static final int DEFAULT_BUFFER_SIZE = 1024;
+    private static final int BUFFER_SIZE = 1024;
 
     private final Writer writer;
     private final CharsetDecoder decoder;
@@ -92,21 +93,21 @@ public class WriterOutputStream extends OutputStream {
     private final CharBuffer decoderOut;
 
     /**
-     * Constructs a new {@link WriterOutputStream} with a default output buffer size of
-     * 1024 characters. The output buffer will only be flushed when it overflows or when
-     * {@link #flush()} or {@link #close()} is called.
-     * 
+     * Constructs a new {@link WriterOutputStream} with a default output buffer size of {@value #BUFFER_SIZE}
+     * characters. The output buffer will only be flushed when it overflows or when {@link #flush()} or {@link #close()}
+     * is called.
+     *
      * @param writer the target {@link Writer}
      * @param decoder the charset decoder
      * @since 2.1
      */
     public WriterOutputStream(final Writer writer, final CharsetDecoder decoder) {
-        this(writer, decoder, DEFAULT_BUFFER_SIZE, false);
+        this(writer, decoder, BUFFER_SIZE, false);
     }
 
     /**
      * Constructs a new {@link WriterOutputStream}.
-     * 
+     *
      * @param writer the target {@link Writer}
      * @param decoder the charset decoder
      * @param bufferSize the size of the output buffer in number of characters
@@ -128,7 +129,7 @@ public class WriterOutputStream extends OutputStream {
 
     /**
      * Constructs a new {@link WriterOutputStream}.
-     * 
+     *
      * @param writer the target {@link Writer}
      * @param charset the charset encoding
      * @param bufferSize the size of the output buffer in number of characters
@@ -150,20 +151,20 @@ public class WriterOutputStream extends OutputStream {
     }
 
     /**
-     * Constructs a new {@link WriterOutputStream} with a default output buffer size of
-     * 1024 characters. The output buffer will only be flushed when it overflows or when
-     * {@link #flush()} or {@link #close()} is called.
-     * 
+     * Constructs a new {@link WriterOutputStream} with a default output buffer size of {@value #BUFFER_SIZE}
+     * characters. The output buffer will only be flushed when it overflows or when {@link #flush()} or {@link #close()}
+     * is called.
+     *
      * @param writer the target {@link Writer}
      * @param charset the charset encoding
      */
     public WriterOutputStream(final Writer writer, final Charset charset) {
-        this(writer, charset, DEFAULT_BUFFER_SIZE, false);
+        this(writer, charset, BUFFER_SIZE, false);
     }
 
     /**
      * Constructs a new {@link WriterOutputStream}.
-     * 
+     *
      * @param writer the target {@link Writer}
      * @param charsetName the name of the charset encoding
      * @param bufferSize the size of the output buffer in number of characters
@@ -179,37 +180,37 @@ public class WriterOutputStream extends OutputStream {
     }
 
     /**
-     * Constructs a new {@link WriterOutputStream} with a default output buffer size of
-     * 1024 characters. The output buffer will only be flushed when it overflows or when
-     * {@link #flush()} or {@link #close()} is called.
-     * 
+     * Constructs a new {@link WriterOutputStream} with a default output buffer size of {@value #BUFFER_SIZE}
+     * characters. The output buffer will only be flushed when it overflows or when {@link #flush()} or {@link #close()}
+     * is called.
+     *
      * @param writer the target {@link Writer}
      * @param charsetName the name of the charset encoding
      */
     public WriterOutputStream(final Writer writer, final String charsetName) {
-        this(writer, charsetName, DEFAULT_BUFFER_SIZE, false);
+        this(writer, charsetName, BUFFER_SIZE, false);
     }
 
     /**
-     * Constructs a new {@link WriterOutputStream} that uses the default character encoding
-     * and with a default output buffer size of 1024 characters. The output buffer will only
-     * be flushed when it overflows or when {@link #flush()} or {@link #close()} is called.
-     * 
+     * Constructs a new {@link WriterOutputStream} that uses the default character encoding and with a default output
+     * buffer size of {@value #BUFFER_SIZE} characters. The output buffer will only be flushed when it overflows or when
+     * {@link #flush()} or {@link #close()} is called.
+     *
      * @param writer the target {@link Writer}
      * @deprecated 2.5 use {@link #WriterOutputStream(Writer, Charset)} instead
      */
     @Deprecated
     public WriterOutputStream(final Writer writer) {
-        this(writer, Charset.defaultCharset(), DEFAULT_BUFFER_SIZE, false);
+        this(writer, Charset.defaultCharset(), BUFFER_SIZE, false);
     }
 
     /**
      * Write bytes from the specified byte array to the stream.
-     * 
+     *
      * @param b the byte array containing the bytes to write
      * @param off the start offset in the byte array
      * @param len the number of bytes to write
-     * @throws IOException if an I/O error occurs
+     * @throws IOException if an I/O error occurs.
      */
     @Override
     public void write(final byte[] b, int off, int len) throws IOException {
@@ -227,9 +228,9 @@ public class WriterOutputStream extends OutputStream {
 
     /**
      * Write bytes from the specified byte array to the stream.
-     * 
+     *
      * @param b the byte array containing the bytes to write
-     * @throws IOException if an I/O error occurs
+     * @throws IOException if an I/O error occurs.
      */
     @Override
     public void write(final byte[] b) throws IOException {
@@ -238,20 +239,20 @@ public class WriterOutputStream extends OutputStream {
 
     /**
      * Write a single byte to the stream.
-     * 
+     *
      * @param b the byte to write
-     * @throws IOException if an I/O error occurs
+     * @throws IOException if an I/O error occurs.
      */
     @Override
     public void write(final int b) throws IOException {
-        write(new byte[] { (byte)b }, 0, 1);
+        write(new byte[] {(byte) b}, 0, 1);
     }
 
     /**
      * Flush the stream. Any remaining content accumulated in the output buffer
      * will be written to the underlying {@link Writer}. After that
-     * {@link Writer#flush()} will be called. 
-     * @throws IOException if an I/O error occurs
+     * {@link Writer#flush()} will be called.
+     * @throws IOException if an I/O error occurs.
      */
     @Override
     public void flush() throws IOException {
@@ -262,8 +263,8 @@ public class WriterOutputStream extends OutputStream {
     /**
      * Close the stream. Any remaining content accumulated in the output buffer
      * will be written to the underlying {@link Writer}. After that
-     * {@link Writer#close()} will be called. 
-     * @throws IOException if an I/O error occurs
+     * {@link Writer#close()} will be called.
+     * @throws IOException if an I/O error occurs.
      */
     @Override
     public void close() throws IOException {
@@ -274,9 +275,9 @@ public class WriterOutputStream extends OutputStream {
 
     /**
      * Decode the contents of the input ByteBuffer into a CharBuffer.
-     * 
+     *
      * @param endOfInput indicates end of input
-     * @throws IOException if an I/O error occurs
+     * @throws IOException if an I/O error occurs.
      */
     private void processInput(final boolean endOfInput) throws IOException {
         // Prepare decoderIn for reading
@@ -300,8 +301,8 @@ public class WriterOutputStream extends OutputStream {
 
     /**
      * Flush the output.
-     * 
-     * @throws IOException if an I/O error occurs
+     *
+     * @throws IOException if an I/O error occurs.
      */
     private void flushOutput() throws IOException {
         if (decoderOut.position() > 0) {
@@ -310,31 +311,38 @@ public class WriterOutputStream extends OutputStream {
         }
     }
 
-    private static void checkIbmJdkWithBrokenUTF16(Charset charset){
-        if (!"UTF-16".equals(charset.name())) return;
+    /**
+     * Check if the JDK in use properly supports the given charset.
+     *
+     * @param charset the charset to check the support for
+     */
+    private static void checkIbmJdkWithBrokenUTF16(final Charset charset){
+        if (!"UTF-16".equals(charset.name())) {
+            return;
+        }
         final String TEST_STRING_2 = "v\u00e9s";
-        byte[] bytes = TEST_STRING_2.getBytes(charset);
+        final byte[] bytes = TEST_STRING_2.getBytes(charset);
 
         final CharsetDecoder charsetDecoder2 = charset.newDecoder();
-        ByteBuffer bb2 = ByteBuffer.allocate(16);
-        CharBuffer cb2 = CharBuffer.allocate(TEST_STRING_2.length());
+        final ByteBuffer bb2 = ByteBuffer.allocate(16);
+        final CharBuffer cb2 = CharBuffer.allocate(TEST_STRING_2.length());
         final int len = bytes.length;
         for (int i = 0; i < len; i++) {
             bb2.put(bytes[i]);
             bb2.flip();
             try {
                 charsetDecoder2.decode(bb2, cb2, i == (len - 1));
-            } catch ( IllegalArgumentException e){
-                throw new UnsupportedOperationException("UTF-16 requested when runninng on an IBM JDK with broken UTF-16 support. " +
+            } catch ( final IllegalArgumentException e){
+                throw new UnsupportedOperationException("UTF-16 requested when running on an IBM JDK with broken UTF-16 support. " +
                         "Please find a JDK that supports UTF-16 if you intend to use UF-16 with WriterOutputStream");
             }
             bb2.compact();
         }
         cb2.rewind();
         if (!TEST_STRING_2.equals(cb2.toString())){
-            throw new UnsupportedOperationException("UTF-16 requested when runninng on an IBM JDK with broken UTF-16 support. " +
+            throw new UnsupportedOperationException("UTF-16 requested when running on an IBM JDK with broken UTF-16 support. " +
                     "Please find a JDK that supports UTF-16 if you intend to use UF-16 with WriterOutputStream");
-        };
+        }
 
     }
 }
