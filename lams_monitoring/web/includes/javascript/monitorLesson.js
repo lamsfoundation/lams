@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
+﻿﻿﻿﻿﻿﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
 
 // current tab that should be displayed after a refresh, defaults to Sequence tab
 var currentTab = sessionStorage.getItem("lamsMonitoringCurrentTab") || 'sequence',

@@ -2,19 +2,19 @@
 <component inheritJdk="true">
 	<contentEntry url="file://$MODULE_DIR$"/>
 	<lib name="commons-lang-2.6.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/commons-lang"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_47$/commons-lang"/>
 	</lib>
 	<lib name="jackson-core-2.9.5.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/jackson"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_47$/jackson"/>
 	</lib>
 	<lib name="jackson-databind-2.9.5.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/jackson"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_47$/jackson"/>
 	</lib>
 	<lib name="hibernate-core-5.3.6.Final.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/hibernate-core"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_47$/hibernate-core"/>
 	</lib>
 	<lib name="jboss-servlet-api_4.0_spec-1.0.0.Final.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/servlet-api"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_47$/servlet-api"/>
 	</lib>
 	<levels>
 		<level name="3rdParty" value="project"/>

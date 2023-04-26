@@ -2,25 +2,25 @@
 <component inheritJdk="true">
 	<contentEntry url="file://$MODULE_DIR$"/>
 	<lib name="jboss-servlet-api_4.0_spec-1.0.0.Final.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/servlet-api"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_47$/servlet-api"/>
 	</lib>
 	<lib name="commons-lang-2.6.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/commons-lang"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_47$/commons-lang"/>
 	</lib>
 	<lib name="jboss-websocket-api_1.1_spec-1.1.3.Final.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/websocket"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_47$/websocket"/>
 	</lib>
 	<lib name="jackson-core-2.9.5.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/jackson"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_47$/jackson"/>
 	</lib>
 	<lib name="jackson-databind-2.9.5.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/jackson"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_47$/jackson"/>
 	</lib>
 	<lib name="javax.persistence-api-2.2.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/persistence-api"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_47$/persistence-api"/>
 	</lib>
 	<lib name="hibernate-core-5.3.6.Final.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT$/hibernate-core"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_47$/hibernate-core"/>
 	</lib>
 	<levels>
 		<level name="3rdParty" value="project"/>

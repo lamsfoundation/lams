@@ -3,39 +3,42 @@
 	<exclude-output/>
 	<contentEntry url="file://$MODULE_DIR$"/>
 	<lib name="bb-platform-9.1.201510.1171621.jar" scope="COMPILE">
-		<relative-module-cls project-related="jar://$REPO_HOME$/lams_bb_integration/lib/bb-platform-9.1.201510.1171621.jar!/"/>
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/../lams_bb_integration/lib/bb-platform-9.1.201510.1171621.jar!/"/>
 	</lib>
 	<lib name="bb-taglibs-9.1.201510.1171621.jar" scope="COMPILE">
-		<relative-module-cls project-related="jar://$REPO_HOME$/lams_bb_integration/lib/bb-taglibs-9.1.201510.1171621.jar!/"/>
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/../lams_bb_integration/lib/bb-taglibs-9.1.201510.1171621.jar!/"/>
 	</lib>
 	<lib name="servlet-api.jar" scope="COMPILE">
-		<relative-module-cls project-related="jar://$REPO_HOME$/lams_bb_integration/lib/servlet-api.jar!/"/>
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/../lams_bb_integration/lib/servlet-api.jar!/"/>
 	</lib>
 	<lib name="bb-cms-admin-9.1.201510.1171621.jar" scope="COMPILE">
-		<relative-module-cls project-related="jar://$REPO_HOME$/lams_bb_integration/lib/bb-cms-admin-9.1.201510.1171621.jar!/"/>
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/../lams_bb_integration/lib/bb-cms-admin-9.1.201510.1171621.jar!/"/>
 	</lib>
 	<lib name="commons-codec-1.3.jar" scope="COMPILE">
-		<relative-module-cls project-related="jar://$REPO_HOME$/lams_bb_integration/lib/commons-codec-1.3.jar!/"/>
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/../lams_bb_integration/lib/commons-codec-1.3.jar!/"/>
 	</lib>
 	<lib name="commons-discovery-0.2.jar" scope="COMPILE">
-		<relative-module-cls project-related="jar://$REPO_HOME$/lams_bb_integration/lib/commons-discovery-0.2.jar!/"/>
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/../lams_bb_integration/lib/commons-discovery-0.2.jar!/"/>
 	</lib>
 	<lib name="commons-logging-1.0.4.jar" scope="COMPILE">
-		<relative-module-cls project-related="jar://$REPO_HOME$/lams_bb_integration/lib/commons-logging-1.0.4.jar!/"/>
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/../lams_bb_integration/lib/commons-logging-1.0.4.jar!/"/>
 	</lib>
 	<lib name="commons-io-1.4.jar" scope="COMPILE">
-		<relative-module-cls project-related="jar://$REPO_HOME$/lams_bb_integration/lib/commons-io-1.4.jar!/"/>
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/../lams_bb_integration/lib/commons-io-1.4.jar!/"/>
 	</lib>
 	<lib name="gson-2.2.4.jar" scope="COMPILE">
-		<relative-module-cls project-related="jar://$REPO_HOME$/lams_bb_integration/lib/gson-2.2.4.jar!/"/>
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/../lams_bb_integration/lib/gson-2.2.4.jar!/"/>
 	</lib>
 	<lib name="commons-lang.jar" scope="COMPILE">
-		<relative-module-cls project-related="jar://$REPO_HOME$/lams_bb_integration/lib/commons-lang.jar!/"/>
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/../lams_bb_integration/lib/commons-lang.jar!/"/>
 	</lib>
 	<lib name="slf4j-api-1.7.5.jar" scope="COMPILE">
-		<relative-module-cls project-related="jar://$REPO_HOME$/lams_bb_integration/lib/slf4j-api-1.7.5.jar!/"/>
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/../lams_bb_integration/lib/slf4j-api-1.7.5.jar!/"/>
 	</lib>
 	<lib name="slf4j-simple-1.7.5.jar" scope="COMPILE">
-		<relative-module-cls project-related="jar://$REPO_HOME$/lams_bb_integration/lib/slf4j-simple-1.7.5.jar!/"/>
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/../lams_bb_integration/lib/slf4j-simple-1.7.5.jar!/"/>
 	</lib>
+	<levels>
+		<level name="3rdParty" value="project"/>
+	</levels>
 </component>
