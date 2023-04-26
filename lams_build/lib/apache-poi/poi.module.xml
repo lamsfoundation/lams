@@ -28,6 +28,10 @@
     <resource-root path="poi-ooxml-5.2.3.jar"/>
     <resource-root path="poi-ooxml-full-5.2.3.jar"/>
     <resource-root path="poi-scratchpad-5.2.3.jar"/>
+    <resource-root path="pdfbox-2.0.28.jar"/>
+    <resource-root path="jempbox-1.8.17.jar"/>
+    <resource-root path="fontbox-2.0.28.jar"/>
+    <resource-root path="graphics2d-0.42.jar"/>
   </resources>
   <dependencies>
     <module name="javax.api"/>
@@ -36,6 +40,7 @@
     <module name="org.apache.commons.compress"/>
     <module name="org.apache.commons.math3"/>
     <module name="org.apache.commons.io"/>
+    <module name="org.apache.commons.logging"/>
     <module name="org.apache.logging.log4j"/>
     <module name="org.dom4j"/>
     <module name="com.zaxxer.sparsebits" />

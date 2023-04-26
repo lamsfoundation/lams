@@ -22,21 +22,8 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 
-<module xmlns="urn:jboss:module:1.5" name="org.apache.tika">
+<module xmlns="urn:jboss:module:1.5" name="org.apache.commons.logging">
   <resources>
-    <resource-root path="tika-core-2.7.0.jar"/>
-    <resource-root path="tika-parsers-standard-package-2.7.0.jar"/>
-    <resource-root path="tika-parser-microsoft-module-2.7.0.jar"/>
+    <resource-root path="commons-logging-1.2.jar"/>
   </resources>
-  <dependencies>
-    <module name="javax.api"/>
-    <module name="org.apache.xmlbeans"/>
-    <module name="org.apache.commons.collections4"/>
-    <module name="org.apache.commons.compress"/>
-    <module name="org.apache.commons.io"/>
-    <module name="org.dom4j"/>
-    <module name="org.apache.poi"/>
-    <module name="org.apache.xerces"/>
-    <module name="org.slf4j"/>
-  </dependencies>
 </module>

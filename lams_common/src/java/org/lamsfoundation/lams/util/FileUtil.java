@@ -23,38 +23,20 @@
 
 package org.lamsfoundation.lams.util;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map;
-import java.util.Properties;
-import java.util.regex.Pattern;
-
-import javax.mail.internet.MimeUtility;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.ConversionException;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
+import com.thoughtworks.xstream.security.AnyTypePermission;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.pdf.PDFParser;
+import org.apache.tika.parser.txt.CharsetDetector;
+import org.apache.tika.parser.txt.CharsetMatch;
+import org.apache.tika.sax.BodyContentHandler;
 import org.hibernate.id.Configurable;
 import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.id.UUIDGenerator;
@@ -65,15 +47,32 @@ import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.w3c.dom.Document;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.ConversionException;
-import com.thoughtworks.xstream.io.xml.StaxDriver;
-import com.thoughtworks.xstream.security.AnyTypePermission;
-
+import org.xml.sax.SAXException;
 import xyz.capybara.clamav.ClamavClient;
 import xyz.capybara.clamav.ClamavException;
 import xyz.capybara.clamav.commands.scan.result.ScanResult;
+
+import javax.mail.internet.MimeUtility;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.*;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Map;
+import java.util.Properties;
+import java.util.regex.Pattern;
 
 /**
  * General File Utilities
@@ -84,8 +83,8 @@ public class FileUtil {
     public static final String ENCODING_UTF_8 = "UTF8";
     public static final SimpleDateFormat EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT = new SimpleDateFormat(
 	    "dd/MM/yyyy HH:mm:ss");
-    public static final DateTimeFormatter EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMATTER = DateTimeFormatter
-	    .ofPattern("dd/MM/yyyy HH:mm:ss");
+    public static final DateTimeFormatter EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMATTER = DateTimeFormatter.ofPattern(
+	    "dd/MM/yyyy HH:mm:ss");
     public static final SimpleDateFormat EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
     public static final String LAMS_WWW_SECURE_DIR = "secure";
@@ -95,8 +94,8 @@ public class FileUtil {
     private static final long numMilliSecondsInADay = 24 * 60 * 60 * 1000;
 
     // looks for URL with non-chopped content folder ID
-    private static final Pattern LEGACY_CONTENT_FOLDER_PATH = Pattern
-	    .compile("/+lams/+www/+secure/+([0-9a-f\\-]{3,}/+).*?[\"']", Pattern.CASE_INSENSITIVE);
+    private static final Pattern LEGACY_CONTENT_FOLDER_PATH = Pattern.compile(
+	    "/+lams/+www/+secure/+([0-9a-f\\-]{3,}/+).*?[\"']", Pattern.CASE_INSENSITIVE);
 
     public static final String ALLOWED_EXTENSIONS_FLASH = ".swf,.fla";
     public static final String ALLOWED_EXTENSIONS_IMAGE = ".jpg,.gif,.jpeg,.png,.bmp";
@@ -167,7 +166,8 @@ public class FileUtil {
     /**
      * Check if this directory is empty. If checkSubdirectories = true, then it also checks its subdirectories to make
      * sure they aren't empty. If checkSubdirectories = true and the directory contains empty subdirectories it will
-     * return true. If checkSubdirectories = false and the directory contains empty subdirectories it will return false.
+     * return true. If checkSubdirectories = false and the directory contains empty subdirectories it will return
+     * false.
      */
     public static boolean isEmptyDirectory(String directoryName, boolean checkSubdirectories) throws FileUtilException {
 
@@ -212,8 +212,8 @@ public class FileUtil {
      * @param zipFileName
      * @return name of the new directory
      * @throws ZipFileUtilException
-     *             if the java io temp directory is not defined, or we are unable to calculate a unique name for the
-     *             expanded directory, or an IOException occurs.
+     * 	if the java io temp directory is not defined, or we are unable to calculate a unique name for the expanded
+     * 	directory, or an IOException occurs.
      */
     public static String createTempDirectory(String suffix) throws FileUtilException {
 
@@ -232,16 +232,18 @@ public class FileUtil {
 	    tempSysDirName = javaTemp;
 	}
 
-	String tempDirName = tempSysDirName + File.separator + FileUtil.prefix
-		+ FileUtil.generateUniqueContentFolderID() + "_" + suffix;
+	String tempDirName =
+		tempSysDirName + File.separator + FileUtil.prefix + FileUtil.generateUniqueContentFolderID() + "_"
+			+ suffix;
 	File tempDir = new File(tempDirName);
 
 	// try 100 different variations. If I can't find a unique
 	// one in 100 tries, then give up.
 	int i = 0;
 	while (tempDir.exists() && (i < 100)) {
-	    tempDirName = tempSysDirName + File.separator + FileUtil.prefix + FileUtil.generateUniqueContentFolderID()
-		    + "_" + suffix;
+	    tempDirName =
+		    tempSysDirName + File.separator + FileUtil.prefix + FileUtil.generateUniqueContentFolderID() + "_"
+			    + suffix;
 	    tempDir = new File(tempDirName);
 	    i++;
 	}
@@ -262,10 +264,10 @@ public class FileUtil {
      * If the directoryname is null or an empty string, a FileUtilException is thrown
      *
      * @param directoryName
-     *            the name of the directory to create
+     * 	the name of the directory to create
      * @return boolean. Returns true if the directory is created and false otherwise
      * @throws FileUtilException
-     *             if the directory name is null or an empty string
+     * 	if the directory name is null or an empty string
      */
     public static boolean createDirectory(String directoryName) throws FileUtilException {
 	boolean isCreated = false;
@@ -286,21 +288,20 @@ public class FileUtil {
      *
      * If the parent directory has not been created yet, it will be created.
      *
-     *
      * @param parentDirName
-     *            The name of the parent directory in which the subdirectory should be created in
+     * 	The name of the parent directory in which the subdirectory should be created in
      * @param subDirName
-     *            The name of the subdirectory to create
+     * 	The name of the subdirectory to create
      * @return boolean. Returns true if the subdirectory was created and false otherwise
      * @throws FileUtilException
-     *             if the parent/child directory name is null or empty.
+     * 	if the parent/child directory name is null or empty.
      */
     public static boolean createDirectory(String parentDirName, String subDirName) throws FileUtilException {
 	boolean isSubDirCreated = false;
 	boolean isParentDirCreated;
 
-	if ((parentDirName == null) || (parentDirName.length() == 0) || (subDirName == null)
-		|| (subDirName.length() == 0)) {
+	if ((parentDirName == null) || (parentDirName.length() == 0) || (subDirName == null) || (subDirName.length()
+		== 0)) {
 	    throw new FileUtilException("A parent or subdirectory name must be specified");
 	}
 
@@ -340,7 +341,7 @@ public class FileUtil {
      * Checks to see if there is a slash at the end of the string.
      *
      * @param stringToCheck
-     *            the directoryName to check
+     * 	the directoryName to check
      * @return boolean. Returns true if there is a slash at the end and false if not.
      */
     public static boolean trailingForwardSlashPresent(String stringToCheck) {
@@ -360,7 +361,6 @@ public class FileUtil {
     /**
      * get file name from a string which may include directory information. For example : "c:\\dir\\ndp\\pp.txt"; will
      * return pp.txt.? If file has no path infomation, then just return input fileName.
-     *
      */
     public static String getFileName(String fileName) {
 	if (fileName == null) {
@@ -383,7 +383,7 @@ public class FileUtil {
      * Get file directory info.
      *
      * @param fileName
-     *            with path info.
+     * 	with path info.
      * @return return only path info with the given fileName
      */
     public static String getFileDirectory(String fileName) {
@@ -409,7 +409,7 @@ public class FileUtil {
      *
      * @param path
      * @param file
-     *            could be file name,or sub directory path.
+     * 	could be file name,or sub directory path.
      * @return
      */
     public static String getFullPath(String path, String file) {
@@ -484,7 +484,7 @@ public class FileUtil {
      * Verify if a file with such extension is allowed to be uploaded.
      *
      * @param fileType
-     *            file type can be of the following values:File, Image, Flash, Media
+     * 	file type can be of the following values:File, Image, Flash, Media
      * @param fileName
      */
     public static boolean isExtensionAllowed(String fileType, String fileName) {
@@ -550,10 +550,10 @@ public class FileUtil {
      * List files in temp directory older than numDays.
      *
      * @param numDays
-     *            Number of days old that the directory should be to be deleted. Must be greater than 0
+     * 	Number of days old that the directory should be to be deleted. Must be greater than 0
      * @return array of files older than input date
      * @throws FileUtilException
-     *             if numDays <= 0
+     * 	if numDays <= 0
      */
     public static File[] getOldTempFiles(int numDays) throws FileUtilException {
 	// Contract checking
@@ -677,8 +677,9 @@ public class FileUtil {
 	String contentFolderIDClean = contentFolderID.replace("-", "");
 	String contentDir = "";
 	for (int charIndex = 0; charIndex < 6; charIndex++) {
-	    contentDir += contentFolderIDClean.substring(charIndex * 2, charIndex * 2 + 2)
-		    + (isFileSystemPath ? File.separator : "/");
+	    contentDir += contentFolderIDClean.substring(charIndex * 2, charIndex * 2 + 2) + (isFileSystemPath
+		    ? File.separator
+		    : "/");
 	}
 	return contentDir;
     }
@@ -790,8 +791,8 @@ public class FileUtil {
 		     * String classname = path.substring(1, classFieldDelimiter);
 		     * String fieldname = path.substring(classFieldDelimiter + 1);
 		     */
-		    if ((fieldname == null) || fieldname.equals("")
-			    || lastFieldRemoved.equals(classname + "." + fieldname)) {
+		    if ((fieldname == null) || fieldname.equals("") || lastFieldRemoved.equals(
+			    classname + "." + fieldname)) {
 			// can't retry, so get out of here!
 			break;
 		    } else {
@@ -845,8 +846,9 @@ public class FileUtil {
 	try {
 	    return Class.forName(classname);
 	} catch (ClassNotFoundException e) {
-	    FileUtil.log.error("Trying to remove unwanted fields from import but we can't find the matching class "
-		    + classname + ". Aborting retry.", e);
+	    FileUtil.log.error(
+		    "Trying to remove unwanted fields from import but we can't find the matching class " + classname
+			    + ". Aborting retry.", e);
 	    return null;
 	}
     }
@@ -958,5 +960,39 @@ public class FileUtil {
     public static void deleteTmpFileUploadDir(String tmpFileUploadId) {
 	File uploadDir = FileUtil.getTmpFileUploadDir(tmpFileUploadId);
 	FileUtils.deleteQuietly(uploadDir);
+    }
+
+    public static String getPDFContents(File file) throws TikaException, IOException, SAXException {
+
+	CharsetDetector detector = new CharsetDetector();
+	String charset = "UTF-16LE";
+
+	try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
+	    detector.setText(inputStream);
+	    CharsetMatch match = detector.detect();
+	    if (match != null) {
+		charset = match.getName();
+	    }
+	}
+
+	BodyContentHandler handler = new BodyContentHandler(-1);
+	ParseContext pcontext = new ParseContext();
+	Metadata metadata = new Metadata();
+	PDFParser pdfparser = new PDFParser();
+	try (InputStream inputStream = new FileInputStream(file)) {
+	    pdfparser.parse(inputStream, handler, metadata, pcontext);
+	}
+	String contents = handler.toString().strip();
+	if (log.isDebugEnabled()) {
+	    log.debug("PDF contents:\n" + contents);
+	}
+	if (!StandardCharsets.UTF_8.name().equals(charset)) {
+	    if (log.isDebugEnabled()) {
+		log.debug("Converting PDF contents from " + charset + " to UTF-8");
+	    }
+	    byte[] contentsBytes = contents.getBytes(charset);
+	    contents = new String(contentsBytes, StandardCharsets.UTF_8);
+	}
+	return contents;
     }
 }
