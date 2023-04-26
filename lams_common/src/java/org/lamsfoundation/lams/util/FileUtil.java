@@ -34,8 +34,6 @@ import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.pdf.PDFParser;
-import org.apache.tika.parser.txt.CharsetDetector;
-import org.apache.tika.parser.txt.CharsetMatch;
 import org.apache.tika.sax.BodyContentHandler;
 import org.hibernate.id.Configurable;
 import org.hibernate.id.IdentifierGenerator;
@@ -63,7 +61,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -963,18 +960,6 @@ public class FileUtil {
     }
 
     public static String getPDFContents(File file) throws TikaException, IOException, SAXException {
-
-	CharsetDetector detector = new CharsetDetector();
-	String charset = "UTF-16LE";
-
-	try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
-	    detector.setText(inputStream);
-	    CharsetMatch match = detector.detect();
-	    if (match != null) {
-		charset = match.getName();
-	    }
-	}
-
 	BodyContentHandler handler = new BodyContentHandler(-1);
 	ParseContext pcontext = new ParseContext();
 	Metadata metadata = new Metadata();
@@ -986,13 +971,7 @@ public class FileUtil {
 	if (log.isDebugEnabled()) {
 	    log.debug("PDF contents:\n" + contents);
 	}
-	if (!StandardCharsets.UTF_8.name().equals(charset)) {
-	    if (log.isDebugEnabled()) {
-		log.debug("Converting PDF contents from " + charset + " to UTF-8");
-	    }
-	    byte[] contentsBytes = contents.getBytes(charset);
-	    contents = new String(contentsBytes, StandardCharsets.UTF_8);
-	}
+
 	return contents;
     }
 }
