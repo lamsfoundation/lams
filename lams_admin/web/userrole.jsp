@@ -44,37 +44,38 @@
 		<lams:errors path="roles"/>
 				
 		<div class="container-fluid">
-		<div class="row">
-		  <div class="col-xs-2"><fmt:message key="admin.user.login"/>:</div>
-		  <div class="col-xs-10"><c:out value="${login}" /></div>
-		</div>
-		
-		<div class="row">
-		  <div class="col-xs-2"><fmt:message key="admin.user.name"/>:</div>
-		  <div class="col-xs-10"><c:out value="${fullName}" /></div>
-		</div>
-		
-		<div class="row">
-		  <div class="col-xs-2"><fmt:message key="admin.user.roles"/>:</div>
-		  <div class="col-xs-10">            
-		  	<c:forEach items="${rolelist}" var="role" varStatus="index">
-		    	<input type="checkbox" name="roles" value="${role.roleId}" 
-		    	<c:forEach items="${userRolesForm.roles}" var="userRole">
-		    		<c:if test="${userRole == role.roleId}">
-		    			checked="checked"
-		    		</c:if>
-		    	</c:forEach>
-		    	/>
-		        <fmt:message>role.<lams:role role="${role.name}" /></fmt:message><br/>
-		    </c:forEach>
-		  </div>
-		</div>
-		
-		<div class="row">
-		  <div class="col-xs-2"><fmt:message key="admin.user.add.to.lessons"/>:</div>
-		  <div class="col-xs-10"><input type="checkbox" name="addToLessons" /></div>
-		</div>
-		
+			<div class="row">
+			  <div class="col-xs-2"><fmt:message key="admin.user.login"/>:</div>
+			  <div class="col-xs-10"><c:out value="${login}" /></div>
+			</div>
+
+			<div class="row">
+			  <div class="col-xs-2"><fmt:message key="admin.user.name"/>:</div>
+			  <div class="col-xs-10"><c:out value="${fullName}" /></div>
+			</div>
+
+			<div class="row">
+			  <div class="col-xs-2"><fmt:message key="admin.user.roles"/>:</div>
+			  <div class="col-xs-10">
+				<c:forEach items="${rolelist}" var="role" varStatus="index">
+					<input type="checkbox" name="roles" value="${role.roleId}"
+					<c:forEach items="${userRolesForm.roles}" var="userRole">
+						<c:if test="${userRole == role.roleId}">
+							checked="checked"
+						</c:if>
+					</c:forEach>
+					/>
+					<fmt:message>role.<lams:role role="${role.name}" /></fmt:message><br/>
+				</c:forEach>
+			  </div>
+			</div>
+
+			<c:if test="${userRolesForm.orgId != 1}">
+				<div class="row">
+				  <div class="col-xs-2"><fmt:message key="admin.user.add.to.lessons"/>:</div>
+				  <div class="col-xs-10"><input type="checkbox" name="addToLessons" /></div>
+				</div>
+			</c:if>
 		</div>
 		
 		<div class="pull-right">
