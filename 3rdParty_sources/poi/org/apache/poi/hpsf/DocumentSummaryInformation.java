@@ -53,7 +53,7 @@ public class DocumentSummaryInformation extends PropertySet {
 
     @Override
     public PropertyIDMap getPropertySetIDMap() {
-    	return PropertyIDMap.getDocumentSummaryInformationProperties();
+        return PropertyIDMap.getDocumentSummaryInformationProperties();
     }
 
 
@@ -97,7 +97,7 @@ public class DocumentSummaryInformation extends PropertySet {
      * stream.
      * @throws IOException
      *    if the {@link InputStream} cannot be accessed as needed.
-     * @exception NoPropertySetStreamException
+     * @throws NoPropertySetStreamException
      *    if the input stream does not contain a property set.
      */
     public DocumentSummaryInformation(final InputStream stream)
@@ -502,7 +502,7 @@ public class DocumentSummaryInformation extends PropertySet {
 
 
     /**
-     * Returns {@code true} if the custom links are dirty. <p>
+     * Returns {@code true} if the custom links are dirty.
      *
      * @return The links dirty value
      */

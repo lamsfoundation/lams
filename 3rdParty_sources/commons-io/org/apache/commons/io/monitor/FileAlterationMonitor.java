@@ -16,48 +16,71 @@
  */
 package org.apache.commons.io.monitor;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadFactory;
 
 /**
  * A runnable that spawns a monitoring thread triggering any
  * registered {@link FileAlterationObserver} at a specified interval.
- * 
+ *
  * @see FileAlterationObserver
- * @version $Id: FileAlterationMonitor.java 1415850 2012-11-30 20:51:39Z ggregory $
  * @since 2.0
  */
 public final class FileAlterationMonitor implements Runnable {
 
+    private static final FileAlterationObserver[] EMPTY_ARRAY = {};
+
     private final long interval;
-    private final List<FileAlterationObserver> observers = new CopyOnWriteArrayList<FileAlterationObserver>();
-    private Thread thread = null;
+    private final List<FileAlterationObserver> observers = new CopyOnWriteArrayList<>();
+    private Thread thread;
     private ThreadFactory threadFactory;
-    private volatile boolean running = false;
+    private volatile boolean running;
 
     /**
-     * Construct a monitor with a default interval of 10 seconds.
+     * Constructs a monitor with a default interval of 10 seconds.
      */
     public FileAlterationMonitor() {
         this(10000);
     }
 
     /**
-     * Construct a monitor with the specified interval.
+     * Constructs a monitor with the specified interval.
      *
-     * @param interval The amount of time in miliseconds to wait between
-     * checks of the file system
+     * @param interval The amount of time in milliseconds to wait between
+     * checks of the file system.
      */
     public FileAlterationMonitor(final long interval) {
         this.interval = interval;
     }
 
     /**
-     * Construct a monitor with the specified interval and set of observers.
+     * Constructs a monitor with the specified interval and collection of observers.
      *
-     * @param interval The amount of time in miliseconds to wait between
-     * checks of the file system
+     * @param interval The amount of time in milliseconds to wait between
+     * checks of the file system.
+     * @param observers The collection of observers to add to the monitor.
+     * @since 2.9.0
+     */
+    public FileAlterationMonitor(final long interval, final Collection<FileAlterationObserver> observers) {
+        // @formatter:off
+        this(interval,
+            Optional
+                .ofNullable(observers)
+                .orElse(Collections.emptyList())
+                .toArray(EMPTY_ARRAY)
+        );
+        // @formatter:on
+    }
+
+    /**
+     * Constructs a monitor with the specified interval and set of observers.
+     *
+     * @param interval The amount of time in milliseconds to wait between
+     * checks of the file system.
      * @param observers The set of observers to add to the monitor.
      */
     public FileAlterationMonitor(final long interval, final FileAlterationObserver... observers) {
@@ -70,7 +93,7 @@ public final class FileAlterationMonitor implements Runnable {
     }
 
     /**
-     * Return the interval.
+     * Returns the interval.
      *
      * @return the interval
      */
@@ -79,7 +102,7 @@ public final class FileAlterationMonitor implements Runnable {
     }
 
     /**
-     * Set the thread factory.
+     * Sets the thread factory.
      *
      * @param threadFactory the thread factory
      */
@@ -88,7 +111,7 @@ public final class FileAlterationMonitor implements Runnable {
     }
 
     /**
-     * Add a file system observer to this monitor.
+     * Adds a file system observer to this monitor.
      *
      * @param observer The file system observer to add
      */
@@ -99,20 +122,21 @@ public final class FileAlterationMonitor implements Runnable {
     }
 
     /**
-     * Remove a file system observer from this monitor.
+     * Removes a file system observer from this monitor.
      *
      * @param observer The file system observer to remove
      */
     public void removeObserver(final FileAlterationObserver observer) {
         if (observer != null) {
             while (observers.remove(observer)) {
+                // empty
             }
         }
     }
 
     /**
      * Returns the set of {@link FileAlterationObserver} registered with
-     * this monitor. 
+     * this monitor.
      *
      * @return The set of {@link FileAlterationObserver}
      */
@@ -121,7 +145,7 @@ public final class FileAlterationMonitor implements Runnable {
     }
 
     /**
-     * Start monitoring.
+     * Starts monitoring.
      *
      * @throws Exception if an error occurs initializing the observer
      */
@@ -142,7 +166,7 @@ public final class FileAlterationMonitor implements Runnable {
     }
 
     /**
-     * Stop monitoring.
+     * Stops monitoring.
      *
      * @throws Exception if an error occurs initializing the observer
      */
@@ -151,7 +175,7 @@ public final class FileAlterationMonitor implements Runnable {
     }
 
     /**
-     * Stop monitoring.
+     * Stops monitoring.
      *
      * @param stopInterval the amount of time in milliseconds to wait for the thread to finish.
      * A value of zero will wait until the thread is finished (see {@link Thread#join(long)}).
@@ -159,11 +183,12 @@ public final class FileAlterationMonitor implements Runnable {
      * @since 2.1
      */
     public synchronized void stop(final long stopInterval) throws Exception {
-        if (running == false) {
+        if (!running) {
             throw new IllegalStateException("Monitor is not running");
         }
         running = false;
         try {
+            thread.interrupt();
             thread.join(stopInterval);
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -174,8 +199,9 @@ public final class FileAlterationMonitor implements Runnable {
     }
 
     /**
-     * Run.
+     * Runs this monitor.
      */
+    @Override
     public void run() {
         while (running) {
             for (final FileAlterationObserver observer : observers) {
@@ -187,6 +213,7 @@ public final class FileAlterationMonitor implements Runnable {
             try {
                 Thread.sleep(interval);
             } catch (final InterruptedException ignored) {
+                // ignore
             }
         }
     }

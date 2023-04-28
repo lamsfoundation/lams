@@ -18,9 +18,6 @@
 package org.apache.poi.util;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.Set;
 
 /**
  * Utilities for working with Microsoft CodePages.
@@ -250,7 +247,7 @@ public class CodePageUtil
      * eg "windows-1251", or "cp" followed by the number, e.g. if the codepage 
      * number is 1252 the returned character encoding name will be "cp1252".
      *
-     * @exception UnsupportedEncodingException if the specified codepage is
+     * @throws UnsupportedEncodingException if the specified codepage is
      * less than zero.
      */
     public static String codepageToEncoding(final int codepage)
@@ -271,7 +268,7 @@ public class CodePageUtil
      *  
      * @see <a href="http://docs.oracle.com/javase/6/docs/technotes/guides/intl/encoding.doc.html">Supported Encodings</a>
      *
-     * @exception UnsupportedEncodingException if the specified codepage is
+     * @throws UnsupportedEncodingException if the specified codepage is
      * less than zero.
      */
     public static String codepageToEncoding(final int codepage, boolean javaLangFormat)

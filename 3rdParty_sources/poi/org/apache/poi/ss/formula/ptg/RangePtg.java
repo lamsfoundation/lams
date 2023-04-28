@@ -21,15 +21,16 @@ import org.apache.poi.util.LittleEndianOutput;
 
 
 public final class RangePtg  extends OperationPtg {
-    public final static int  SIZE = 1;
-    public final static byte sid  = 0x11;
+    public static final int  SIZE = 1;
+    public static final byte sid  = 0x11;
 
     public static final RangePtg instance = new RangePtg();
 
     private RangePtg() {
-    	// enforce singleton
+        // enforce singleton
     }
 
+    @Override
     public final boolean isBaseToken() {
         return true;
     }
@@ -39,14 +40,17 @@ public final class RangePtg  extends OperationPtg {
         return sid;
     }
 
+    @Override
     public int getSize() {
         return SIZE;
     }
 
+    @Override
     public void write(LittleEndianOutput out) {
         out.writeByte(sid + getPtgClass());
     }
 
+    @Override
     public String toFormulaString()
     {
         return ":";
@@ -54,10 +58,12 @@ public final class RangePtg  extends OperationPtg {
 
 
     /** implementation of method from OperationsPtg*/
+    @Override
     public String toFormulaString(String[] operands) {
         return operands[0] + ":" + operands[1];
      }
 
+    @Override
     public int getNumberOfOperands()
     {
         return 2;

@@ -32,17 +32,15 @@ import org.apache.poi.ss.formula.eval.ValueEval;
  * <b>friendly_name</b> (optional) the value to display<p>
  *
  *  Returns last argument.  Leaves type unchanged (does not convert to {@link org.apache.poi.ss.formula.eval.StringEval}).
- *
- * @author Wayne Clingingsmith
  */
 public final class Hyperlink extends Var1or2ArgFunction {
 
-	public ValueEval evaluate(int srcRowIndex, int srcColumnIndex, ValueEval arg0) {
-		return arg0;
-	}
-	public ValueEval evaluate(int srcRowIndex, int srcColumnIndex, ValueEval arg0, ValueEval arg1) {
-		// note - if last arg is MissingArgEval, result will be NumberEval.ZERO,
-		// but WorkbookEvaluator does that translation
-		return arg1;
-	}
+    public ValueEval evaluate(int srcRowIndex, int srcColumnIndex, ValueEval arg0) {
+        return arg0;
+    }
+    public ValueEval evaluate(int srcRowIndex, int srcColumnIndex, ValueEval arg0, ValueEval arg1) {
+        // note - if last arg is MissingArgEval, result will be NumberEval.ZERO,
+        // but WorkbookEvaluator does that translation
+        return arg1;
+    }
 }

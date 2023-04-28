@@ -38,7 +38,6 @@ import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
-import java.util.Random;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
@@ -62,39 +61,40 @@ import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.LittleEndian;
 import org.apache.poi.util.LittleEndianByteArrayOutputStream;
 import org.apache.poi.util.LittleEndianConsts;
+import org.apache.poi.util.RandomSingleton;
 import org.apache.poi.util.XMLHelper;
 import org.w3c.dom.Document;
 
 public class AgileEncryptor extends Encryptor {
 
-    //arbitrarily selected; may need to increase
-    private static final int MAX_RECORD_LENGTH = 1_000_000;
-
     private byte[] integritySalt;
     private byte[] pwHash;
 
-	protected AgileEncryptor() {}
+    protected AgileEncryptor() {}
 
     protected AgileEncryptor(AgileEncryptor other) {
-	    super(other);
-	    integritySalt = (other.integritySalt == null) ? null : other.integritySalt.clone();
-	    pwHash = (other.pwHash == null) ? null : other.pwHash.clone();
+        super(other);
+        integritySalt = (other.integritySalt == null) ? null : other.integritySalt.clone();
+        pwHash = (other.pwHash == null) ? null : other.pwHash.clone();
     }
 
     @Override
     public void confirmPassword(String password) {
         // see [MS-OFFCRYPTO] - 2.3.3 EncryptionVerifier
-        Random r = new SecureRandom();
         AgileEncryptionHeader header = (AgileEncryptionHeader)getEncryptionInfo().getHeader();
         int blockSize = header.getBlockSize();
         int keySize = header.getKeySize()/8;
         int hashSize = header.getHashAlgorithm().hashSize;
 
-        byte[] newVerifierSalt = IOUtils.safelyAllocate(blockSize, MAX_RECORD_LENGTH)
-             , newVerifier = IOUtils.safelyAllocate(blockSize, MAX_RECORD_LENGTH)
-             , newKeySalt = IOUtils.safelyAllocate(blockSize, MAX_RECORD_LENGTH)
-             , newKeySpec = IOUtils.safelyAllocate(keySize, MAX_RECORD_LENGTH)
-             , newIntegritySalt = IOUtils.safelyAllocate(hashSize, MAX_RECORD_LENGTH);
+        int maxLen = CryptoFunctions.getMaxRecordLength();
+        byte[] newVerifierSalt = IOUtils.safelyAllocate(blockSize, maxLen)
+             , newVerifier = IOUtils.safelyAllocate(blockSize, maxLen)
+             , newKeySalt = IOUtils.safelyAllocate(blockSize, maxLen)
+             , newKeySpec = IOUtils.safelyAllocate(keySize, maxLen)
+             , newIntegritySalt = IOUtils.safelyAllocate(hashSize, maxLen);
+
+        // using a java.security.SecureRandom (and avoid allocating a new SecureRandom for each random number needed).
+        SecureRandom r = RandomSingleton.getInstance();
         r.nextBytes(newVerifierSalt); // blocksize
         r.nextBytes(newVerifier); // blocksize
         r.nextBytes(newKeySalt); // blocksize
@@ -104,7 +104,7 @@ public class AgileEncryptor extends Encryptor {
         confirmPassword(password, newKeySpec, newKeySalt, newVerifierSalt, newVerifier, newIntegritySalt);
     }
 
-	@Override
+    @Override
     public void confirmPassword(String password, byte[] keySpec, byte[] keySalt, byte[] verifier, byte[] verifierSalt, byte[] integritySalt) {
         AgileEncryptionVerifier ver = (AgileEncryptionVerifier)getEncryptionInfo().getVerifier();
         AgileEncryptionHeader header = (AgileEncryptionHeader)getEncryptionInfo().getHeader();
@@ -204,7 +204,7 @@ public class AgileEncryptor extends Encryptor {
         } catch (GeneralSecurityException e) {
             throw new EncryptedDocumentException(e);
         }
-	}
+    }
 
     @Override
     public OutputStream getDataStream(DirectoryNode dir)

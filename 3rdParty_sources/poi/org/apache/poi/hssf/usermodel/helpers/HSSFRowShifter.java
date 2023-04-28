@@ -17,23 +17,23 @@
 
 package org.apache.poi.hssf.usermodel.helpers;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.ss.formula.FormulaShifter;
 import org.apache.poi.ss.formula.eval.NotImplementedException;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.helpers.RowShifter;
+import org.apache.poi.util.Internal;
 import org.apache.poi.util.NotImplemented;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
 
 /**
  * Helper for shifting rows up or down
  */
 // non-Javadoc: When possible, code should be implemented in the RowShifter abstract class to avoid duplication with
-// {@link org.apache.poi.xssf.usermodel.helpers.XSSFRowShifter}
+// {@link org.apache.poi.hssf.usermodel.helpers.HSSFRowShifter}
 public final class HSSFRowShifter extends RowShifter {
-    private static final POILogger logger = POILogFactory.getLogger(HSSFRowShifter.class);
+    private static final Logger LOG = LogManager.getLogger(HSSFRowShifter.class);
 
     public HSSFRowShifter(HSSFSheet sh) {
         super(sh);
@@ -61,6 +61,17 @@ public final class HSSFRowShifter extends RowShifter {
     @NotImplemented
     public void updateHyperlinks(FormulaShifter formulaShifter) {
         throw new NotImplementedException("updateHyperlinks");
+    }
+
+    /**
+     * Update the formulas in specified row using the formula shifting policy specified by shifter
+     *
+     * @param row the row to update the formulas on
+     * @param formulaShifter the formula shifting policy
+     */
+    @Internal(since="5.1.0")
+    public void updateRowFormulas(HSSFRow row, FormulaShifter formulaShifter) {
+        HSSFRowColShifter.updateRowFormulas(row, formulaShifter);
     }
 
 }

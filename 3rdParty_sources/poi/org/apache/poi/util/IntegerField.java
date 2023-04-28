@@ -15,7 +15,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-        
+
 
 package org.apache.poi.util;
 
@@ -26,8 +26,6 @@ import java.io.*;
 /**
  * representation of an integer (32-bit) field at a fixed location
  * within a byte array
- *
- * @author Marc Johnson (mjohnson at apache dot org
  */
 
 public class IntegerField
@@ -42,7 +40,7 @@ public class IntegerField
      *
      * @param offset of the field within its byte array
      *
-     * @exception ArrayIndexOutOfBoundsException if the offset is
+     * @throws ArrayIndexOutOfBoundsException if the offset is
      *            negative
      */
 
@@ -63,7 +61,7 @@ public class IntegerField
      * @param offset of the field within its byte array
      * @param value the initial value
      *
-     * @exception ArrayIndexOutOfBoundsException if the offset is
+     * @throws ArrayIndexOutOfBoundsException if the offset is
      *            negative
      */
 
@@ -81,7 +79,7 @@ public class IntegerField
      * @param offset of the field within its byte array
      * @param data the byte array to read the value from
      *
-     * @exception ArrayIndexOutOfBoundsException if the offset is not
+     * @throws ArrayIndexOutOfBoundsException if the offset is not
      *            within the range of 0..(data.length - 1)
      */
 
@@ -101,7 +99,7 @@ public class IntegerField
      * @param value the initial value
      * @param data the byte array to write the value to
      *
-     * @exception ArrayIndexOutOfBoundsException if the offset is
+     * @throws ArrayIndexOutOfBoundsException if the offset is
      *            negative or too large
      */
 
@@ -141,7 +139,7 @@ public class IntegerField
      * @param value to be set
      * @param data the byte array to write the value to
      *
-     * @exception ArrayIndexOutOfBoundsException if the offset is too
+     * @throws ArrayIndexOutOfBoundsException if the offset is too
      *            large
      */
 
@@ -159,7 +157,7 @@ public class IntegerField
      *
      * @param data the byte array from which the value is to be read
      *
-     * @exception ArrayIndexOutOfBoundsException if the offset is too
+     * @throws ArrayIndexOutOfBoundsException if the offset is too
      *            large
      */
 
@@ -175,9 +173,9 @@ public class IntegerField
      * @param stream the InputStream from which the value is to be
      *               read
      *
-     * @exception BufferUnderrunException if there is not enough data
+     * @throws BufferUnderrunException if there is not enough data
      *            available from the InputStream
-     * @exception IOException if an IOException is thrown from reading
+     * @throws IOException if an IOException is thrown from reading
      *            the InputStream
      */
 
@@ -194,7 +192,7 @@ public class IntegerField
      * @param data the array of bytes to which the value is to be
      *             written
      *
-     * @exception ArrayIndexOutOfBoundsException if the offset is too
+     * @throws ArrayIndexOutOfBoundsException if the offset is too
      *            large
      */
 

@@ -34,9 +34,9 @@ import org.apache.poi.util.LittleEndianOutput;
  */
 public abstract class AreaPtgBase extends OperandPtg implements AreaI {
 
-    private final static BitField rowRelative = BitFieldFactory.getInstance(0x8000);
-    private final static BitField colRelative = BitFieldFactory.getInstance(0x4000);
-    private final static BitField columnMask  = BitFieldFactory.getInstance(0x3FFF);
+    private static final BitField rowRelative = BitFieldFactory.getInstance(0x8000);
+    private static final BitField colRelative = BitFieldFactory.getInstance(0x4000);
+    private static final BitField columnMask  = BitFieldFactory.getInstance(0x3FFF);
 
     /** zero based, unsigned 16 bit */
     private int field_1_first_row;
@@ -290,6 +290,9 @@ public abstract class AreaPtgBase extends OperandPtg implements AreaI {
         if(AreaReference.isWholeColumnReference(SpreadsheetVersion.EXCEL97, topLeft, botRight)) {
             return (new AreaReference(topLeft, botRight, SpreadsheetVersion.EXCEL97)).formatAsString();
         }
+        if (AreaReference.isWholeColumnReference(SpreadsheetVersion.EXCEL2007, topLeft, botRight)){
+            return new AreaReference(topLeft, botRight,SpreadsheetVersion.EXCEL2007).formatAsString();
+        }
         return topLeft.formatAsString() + ":" + botRight.formatAsString();
     }
 
@@ -297,6 +300,7 @@ public abstract class AreaPtgBase extends OperandPtg implements AreaI {
         return formatReferenceAsString();
     }
 
+    @Override
     public byte getDefaultOperandClass() {
         return Ptg.CLASS_REF;
     }

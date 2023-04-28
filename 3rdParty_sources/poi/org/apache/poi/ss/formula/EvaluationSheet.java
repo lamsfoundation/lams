@@ -20,40 +20,35 @@ package org.apache.poi.ss.formula;
 import org.apache.poi.util.Internal;
 
 /**
- * Abstracts a sheet for the purpose of formula evaluation.<br>
- * 
- * For POI internal use only
- * 
- * @author Josh Micich
+ * Abstracts a sheet for the purpose of formula evaluation.
  */
 @Internal
 public interface EvaluationSheet {
 
     /**
-     * @return <code>null</code> if there is no cell at the specified coordinates
+     * @return {@code null} if there is no cell at the specified coordinates
      */
     EvaluationCell getCell(int rowIndex, int columnIndex);
-    
+
     /**
      * Propagated from {@link EvaluationWorkbook#clearAllCachedResultValues()} to clear locally cached data.
-     * 
+     *
      * @see WorkbookEvaluator#clearAllCachedResultValues()
      * @see EvaluationWorkbook#clearAllCachedResultValues()
      * @since POI 3.15 beta 3
      */
-    public void clearAllCachedResultValues();
-    
+    void clearAllCachedResultValues();
+
     /**
      * @return last row index referenced on this sheet, for evaluation optimization
      * @since POI 4.0.0
      */
-    public int getLastRowNum();
-    
+    int getLastRowNum();
+
     /**
      * Used by SUBTOTAL and similar functions that have options to ignore hidden rows
-     * @param rowIndex
      * @return true if the row is hidden, false if not
      * @since POI 4.1.0
      */
-    public boolean isRowHidden(int rowIndex);
+    boolean isRowHidden(int rowIndex);
 }

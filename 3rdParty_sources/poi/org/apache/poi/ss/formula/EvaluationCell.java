@@ -19,36 +19,34 @@ package org.apache.poi.ss.formula;
 
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.util.Internal;
 
 /**
  * Abstracts a cell for the purpose of formula evaluation.  This interface represents both formula
- * and non-formula cells.<br>
- * 
- * For POI internal use only
- * 
- * @author Josh Micich
+ * and non-formula cells.
  */
+@Internal
 public interface EvaluationCell {
-	/**
-	 * @return an Object that identifies the underlying cell,
-	 * suitable for use as a key in a {@link java.util.HashMap}
-	 */
-	Object getIdentityKey();
+    /**
+     * @return an Object that identifies the underlying cell,
+     * suitable for use as a key in a {@link java.util.HashMap}
+     */
+    Object getIdentityKey();
 
-	EvaluationSheet getSheet();
-	int getRowIndex();
-	int getColumnIndex();
-	CellType getCellType();
+    EvaluationSheet getSheet();
+    int getRowIndex();
+    int getColumnIndex();
+    CellType getCellType();
 
-	double getNumericCellValue();
-	String getStringCellValue();
-	boolean getBooleanCellValue();
-	int getErrorCellValue();
-	CellRangeAddress getArrayFormulaRange();
-	boolean isPartOfArrayFormulaGroup();
+    double getNumericCellValue();
+    String getStringCellValue();
+    boolean getBooleanCellValue();
+    int getErrorCellValue();
+    CellRangeAddress getArrayFormulaRange();
+    boolean isPartOfArrayFormulaGroup();
 
-	/**
-	 * @return cell type of cached formula result
-	 */
-	CellType getCachedFormulaResultType();
+    /**
+     * @return cell type of cached formula result
+     */
+    CellType getCachedFormulaResultType();
 }

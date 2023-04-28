@@ -22,6 +22,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.formula.constant.ErrorConstant;
 import org.apache.poi.ss.formula.function.FunctionMetadata;
@@ -71,29 +75,30 @@ import org.apache.poi.ss.formula.ptg.ValueOperatorPtg;
 import org.apache.poi.ss.usermodel.FormulaError;
 import org.apache.poi.ss.usermodel.Name;
 import org.apache.poi.ss.usermodel.Table;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.ss.util.CellReference.NameType;
 import org.apache.poi.util.Internal;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
+import org.apache.poi.util.StringUtil;
 
 /**
  * This class parses a formula string into a List of tokens in RPN order.
- * Inspired by
- *           Lets Build a Compiler, by Jack Crenshaw
+ * Inspired by "Lets Build a Compiler" by Jack Crenshaw
  * BNF for the formula expression is :
+ * <pre>{@code
  * <expression> ::= <term> [<addop> <term>]*
  * <term> ::= <factor>  [ <mulop> <factor> ]*
  * <factor> ::= <number> | (<expression>) | <cellRef> | <function>
  * <function> ::= <functionName> ([expression [, expression]*])
+ * }</pre>
  * <p>
  * For POI internal use only
- * <p>
  */
 @Internal
 public final class FormulaParser {
-    private final static POILogger log = POILogFactory.getLogger(FormulaParser.class);
+    private static final Logger LOGGER = LogManager.getLogger(FormulaParser.class);
+
     private final String _formulaString;
     private final int _formulaLength;
     /** points at the next character to be read (after the {@link #look} codepoint) */
@@ -101,9 +106,9 @@ public final class FormulaParser {
 
     private ParseNode _rootNode;
 
-    private final static char TAB = '\t'; // HSSF + XSSF
-    private final static char CR = '\r';  // Normally just XSSF
-    private final static char LF = '\n';  // Normally just XSSF
+    private static final char TAB = '\t'; // HSSF + XSSF
+    private static final char CR = '\r';  // Normally just XSSF
+    private static final char LF = '\n';  // Normally just XSSF
 
     /**
      * Lookahead unicode codepoint
@@ -132,9 +137,9 @@ public final class FormulaParser {
      *  parse results.
      * This class is recommended only for single threaded use.
      *
-     * If you have a {@link org.apache.poi.hssf.usermodel.HSSFWorkbook}, and not a
-     *  {@link org.apache.poi.ss.usermodel.Workbook}, then use the convenience method on
-     *  {@link org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator}
+     * If you have a {@link HSSFWorkbook}, and not a
+     *  {@link Workbook}, then use the convenience method on
+     *  {@link HSSFFormulaEvaluator}
      */
     private FormulaParser(String formula, FormulaParsingWorkbook book, int sheetIndex, int rowIndex) {
         _formulaString = formula;
@@ -148,14 +153,14 @@ public final class FormulaParser {
 
     /**
      * Parse a formula into an array of tokens
-     * Side effect: creates name ({@link org.apache.poi.ss.usermodel.Workbook#createName})
+     * Side effect: creates name ({@link Workbook#createName})
      *     if formula contains unrecognized names (names are likely UDFs)
      *
      * @param formula     the formula to parse
      * @param workbook    the parent workbook
      * @param formulaType the type of the formula
      * @param sheetIndex  the 0-based index of the sheet this formula belongs to.
-     *     The sheet index is required to resolve sheet-level names. <code>-1</code> means that
+     *     The sheet index is required to resolve sheet-level names. {@code -1} means that
      *     the scope of the name will be ignored and  the parser will match names only by name
      * @param rowIndex  - the related cell's row index in 0-based form (-1 if the formula is not cell related)
      *                     used to handle structured references that have the "#This Row" quantifier.
@@ -173,14 +178,14 @@ public final class FormulaParser {
 
     /**
      * Parse a formula into an array of tokens
-     * Side effect: creates name ({@link org.apache.poi.ss.usermodel.Workbook#createName})
+     * Side effect: creates name ({@link Workbook#createName})
      *     if formula contains unrecognized names (names are likely UDFs)
      *
      * @param formula     the formula to parse
      * @param workbook    the parent workbook
      * @param formulaType the type of the formula
      * @param sheetIndex  the 0-based index of the sheet this formula belongs to.
-     *     The sheet index is required to resolve sheet-level names. <code>-1</code> means that
+     *     The sheet index is required to resolve sheet-level names. {@code -1} means that
      *     the scope of the name will be ignored and  the parser will match names only by name
      *
      * @return array of parsed tokens
@@ -207,10 +212,10 @@ public final class FormulaParser {
         }
         return (Area3DPxg) arr[0];
     }
-    
+
     /** Read New Character From Input Stream */
     private void GetChar() {
-        // The intersection operator is a space.  We track whether the run of 
+        // The intersection operator is a space.  We track whether the run of
         // whitespace preceding "look" counts as an intersection operator.
         if (IsWhite(look)) {
             if (look == ' ') {
@@ -220,7 +225,7 @@ public final class FormulaParser {
         else {
             _inIntersection = false;
         }
-        
+
         // Check to see if we've walked off the end of the string.
         if (_pointer > _formulaLength) {
             throw new RuntimeException("Parsed past the end of the formula, pos: " + _pointer +
@@ -251,7 +256,7 @@ public final class FormulaParser {
     private RuntimeException expected(String s) {
         String msg;
 
-        if (look == '=' && _formulaString.substring(0, _pointer-1).trim().length() < 1) {
+        if (look == '=' && StringUtil.isBlank(_formulaString.substring(0, _pointer-1))) {
             msg = "The specified formula '" + _formulaString
                 + "' starts with an equals sign which is not allowed.";
         } else {
@@ -379,9 +384,6 @@ public final class FormulaParser {
             }
             return false;
         }
-        if (token instanceof OperandPtg) {
-            return false;
-        }
 
         return false;
     }
@@ -398,7 +400,7 @@ public final class FormulaParser {
     }
 
     /**
-     * @return <code>false</code> if sub-expression represented the specified ParseNode definitely
+     * @return {@code false} if sub-expression represented the specified ParseNode definitely
      * cannot appear on either side of the range (':') operator
      */
     private static boolean isValidRangeOperand(ParseNode a) {
@@ -413,7 +415,9 @@ public final class FormulaParser {
         if (tkn instanceof AbstractFunctionPtg) {
             AbstractFunctionPtg afp = (AbstractFunctionPtg) tkn;
             byte returnClass = afp.getDefaultOperandClass();
-            return Ptg.CLASS_REF == returnClass;
+            //CLASS_VALUE was added as valid to support example 6 in
+            //https://support.microsoft.com/en-us/office/xlookup-function-b7fd680e-6d10-43e6-84f9-88eae8bf5929
+            return Ptg.CLASS_REF == returnClass || Ptg.CLASS_VALUE == returnClass;
         }
         if (tkn instanceof ValueOperatorPtg) {
             return false;
@@ -429,12 +433,8 @@ public final class FormulaParser {
         }
 
         // one special case of ScalarConstantPtg
-        if (tkn == ErrPtg.REF_INVALID) {
-            return true;
-        }
-
         // All other ControlPtgs and ScalarConstantPtgs cannot be used with ':'
-        return false;
+        return tkn == ErrPtg.REF_INVALID;
     }
 
     /**
@@ -466,8 +466,8 @@ public final class FormulaParser {
     private ParseNode parseRangeable() {
         SkipWhite();
         int savePointer = _pointer;
-        SheetIdentifier sheetIden = parseSheetName();
-        
+        SheetIdentifier sheetIden = parseSheetName(false);
+
         if (sheetIden == null) {
             resetPointer(savePointer);
         } else {
@@ -479,7 +479,7 @@ public final class FormulaParser {
         if (part1 == null) {
             if (sheetIden != null) {
                 if(look == '#'){  // error ref like MySheet!#REF!
-                    return new ParseNode(ErrPtg.valueOf(parseErrorLiteral()));  
+                    return new ParseNode(ErrPtg.valueOf(parseErrorLiteral()));
                 } else {
                     // Is it a named range?
                     String name = parseAsName();
@@ -584,13 +584,13 @@ public final class FormulaParser {
     }
 
 
-    
-    private final static String specHeaders = "Headers";
-    private final static String specAll = "All";
-    private final static String specData = "Data";
-    private final static String specTotals = "Totals";
-    private final static String specThisRow = "This Row";
-    
+
+    private static final String specHeaders = "Headers";
+    private static final String specAll = "All";
+    private static final String specData = "Data";
+    private static final String specTotals = "Totals";
+    private static final String specThisRow = "This Row";
+
     /**
      * Parses a structured reference, returns it as area reference.
      * Examples:
@@ -614,11 +614,10 @@ public final class FormulaParser {
      * Table1[[#This Row], [col1]]
      * Table1[ [col1]:[col2] ]
      * </pre>
-     * @param tableName
      * @return Area Reference for the given table
      */
     private ParseNode parseStructuredReference(String tableName) {
-        
+
         if ( ! (_ssVersion.equals(SpreadsheetVersion.EXCEL2007)) ) {
             throw new FormulaParseException("Structured references work only on XSSF (Excel 2007+)!");
         }
@@ -627,17 +626,17 @@ public final class FormulaParser {
            throw new FormulaParseException("Illegal table name: '" + tableName + "'");
         }
         String sheetName = tbl.getSheetName();
-        
+
         int startCol = tbl.getStartColIndex();
         int endCol = tbl.getEndColIndex();
         int startRow = tbl.getStartRowIndex();
         int endRow = tbl.getEndRowIndex();
-        
+
         // Do NOT return before done reading all the structured reference tokens from the input stream.
         // Throwing exceptions is okay.
         int savePtr0 = _pointer;
         GetChar();
-        
+
         boolean isTotalsSpec = false;
         boolean isThisRowSpec = false;
         boolean isDataSpec = false;
@@ -684,11 +683,10 @@ public final class FormulaParser {
             GetChar();
         }
         // parse column quantifier
-        String startColumnName;
         String endColumnName = null;
         int nColQuantifiers = 0;
         int savePtr1 = _pointer;
-        startColumnName = parseAsColumnQuantifier();
+        String startColumnName = parseAsColumnQuantifier();
         if (startColumnName == null) {
             resetPointer(savePtr1);
         } else {
@@ -704,7 +702,7 @@ public final class FormulaParser {
                 }
             }
         }
-        
+
         if(nColQuantifiers == 0 && nSpecQuantifiers == 0){
             resetPointer(savePtr0);
             savePtr0 = _pointer;
@@ -754,15 +752,15 @@ public final class FormulaParser {
                 return new ParseNode(ErrPtg.VALUE_INVALID);
             } else {
                 throw new FormulaParseException(
-                        "Formula contained [#This Row] or [@] structured reference but this row < 0. " + 
+                        "Formula contained [#This Row] or [@] structured reference but this row < 0. " +
                         "Row index must be specified for row-referencing structured references.");
             }
         }
-        
+
         int actualStartRow = startRow;
         int actualEndRow = endRow;
         int actualStartCol = startCol;
-        int actualEndCol = endCol; 
+        int actualEndCol = endCol;
         if (nSpecQuantifiers > 0) {
         //Selecting rows
             if (nSpecQuantifiers == 1 && isAllSpec) {
@@ -784,14 +782,14 @@ public final class FormulaParser {
                 actualStartRow = actualEndRow;
             } else if ((nSpecQuantifiers == 1 && isThisRowSpec) || isThisRow) {
                 actualStartRow = _rowIndex; //The rowNum is 0 based
-                actualEndRow = _rowIndex; 
+                actualEndRow = _rowIndex;
             } else {
                 throw new FormulaParseException("The formula "+ _formulaString + " is illegal");
             }
         } else {
             if (isThisRow) { // there is a @
                 actualStartRow = _rowIndex; //The rowNum is 0 based
-                actualEndRow = _rowIndex; 
+                actualEndRow = _rowIndex;
             } else { // Really no special quantifiers
                 actualStartRow++;
                 if (tbl.getTotalsRowCount() > 0) actualEndRow--;
@@ -802,19 +800,19 @@ public final class FormulaParser {
 
         if (nColQuantifiers == 2) {
             if (startColumnName == null || endColumnName == null) {
-                throw new IllegalStateException("Fatal error");
+                throw new IllegalStateException("Cannot parse column: " + startColumnName + " and " + endColumnName + " with formula " + _formulaString);
             }
             int startIdx = tbl.findColumnIndex(startColumnName);
             int endIdx = tbl.findColumnIndex(endColumnName);
             if (startIdx == -1 || endIdx == -1) {
-                throw new FormulaParseException("One of the columns "+ startColumnName +", "+ endColumnName +" doesn't exist in table "+ tbl.getName()); 
-            } 
+                throw new FormulaParseException("One of the columns "+ startColumnName +", "+ endColumnName +" doesn't exist in table "+ tbl.getName());
+            }
             actualStartCol = startCol+ startIdx;
             actualEndCol = startCol + endIdx;
-                
+
         } else if (nColQuantifiers == 1 && !isThisRow) {
             if (startColumnName == null) {
-                throw new IllegalStateException("Fatal error");
+                throw new IllegalStateException("Cannot parse column: " + startColumnName + " with formula " + _formulaString);
             }
             int idx = tbl.findColumnIndex(startColumnName);
             if (idx == -1) {
@@ -829,7 +827,7 @@ public final class FormulaParser {
         Ptg ptg = _book.get3DReferencePtg(new AreaReference(topLeft, bottomRight, _ssVersion), sheetIden);
         return new ParseNode(ptg);
     }
-    
+
     /**
      * Tries to parse the next as column - can contain whitespace
      * Caller should save pointer.
@@ -852,7 +850,7 @@ public final class FormulaParser {
         }
         Match(']');
         return name.toString();
-    }    
+    }
     /**
      * Tries to parse the next as special quantifier
      * Caller should save pointer.
@@ -896,7 +894,7 @@ public final class FormulaParser {
         if (look == '"') {
             return new ParseNode(new StringPtg(parseStringLiteral()));
         }
-        
+
         // from now on we can only be dealing with non-quoted identifiers
         // which will either be named ranges or functions
         String name = parseAsName();
@@ -926,7 +924,7 @@ public final class FormulaParser {
         throw new FormulaParseException("Specified name '"
                 + name + "' is not a range as expected.");
     }
-    
+
     private String parseAsName() {
         StringBuilder sb = new StringBuilder();
 
@@ -945,7 +943,7 @@ public final class FormulaParser {
 
     /**
      * @param ch unicode codepoint
-     * @return <code>true</code> if the specified character may be used in a defined name
+     * @return {@code true} if the specified character may be used in a defined name
      */
     private static boolean isValidDefinedNameChar(int ch) {
         if (Character.isLetterOrDigit(ch)) {
@@ -966,12 +964,11 @@ public final class FormulaParser {
         // includes special non-name control characters like ! $ : , ( ) [ ] and space
         return false;
     }
-    
+
     /**
      *
-     * @param sheetIden may be <code>null</code>
-     * @param part1
-     * @param part2 may be <code>null</code>
+     * @param sheetIden may be {@code null}
+     * @param part2 may be {@code null}
      */
     private ParseNode createAreaRefParseNode(SheetIdentifier sheetIden, SimpleRangePart part1,
             SimpleRangePart part2) throws FormulaParseException {
@@ -1012,14 +1009,14 @@ public final class FormulaParser {
     /**
      * Matches a zero or one letter-runs followed by zero or one digit-runs.
      * Either or both runs man optionally be prefixed with a single '$'.
-     * (copied+modified from {@link org.apache.poi.ss.util.CellReference#CELL_REF_PATTERN})
+     * (copied+modified from CellReference.CELL_REF_PATTERN)
      */
     private static final Pattern CELL_REF_PATTERN = Pattern.compile("(\\$?[A-Za-z]+)?(\\$?[0-9]+)?");
 
     /**
      * Parses out a potential LHS or RHS of a ':' intended to produce a plain AreaRef.  Normally these are
      * proper cell references but they could also be row or column refs like "$AC" or "10"
-     * @return <code>null</code> (and leaves {@link #_pointer} unchanged if a proper range part does not parse out
+     * @return {@code null} (and leaves {@link #_pointer} unchanged if a proper range part does not parse out
      */
     private SimpleRangePart parseSimpleRangePart() {
         int ptr = _pointer-1; // TODO avoid StringIndexOutOfBounds
@@ -1111,7 +1108,7 @@ public final class FormulaParser {
 
         public CellReference getCellReference() {
             if (_type != Type.CELL) {
-                throw new IllegalStateException("Not applicable to this type");
+                throw new IllegalStateException("Not applicable to this reference-type, expected CELL, but had " + _type);
             }
             return new CellReference(_rep);
         }
@@ -1129,9 +1126,9 @@ public final class FormulaParser {
         }
 
         /**
-         * @return <code>true</code> if the two range parts can be combined in an
+         * @return {@code true} if the two range parts can be combined in an
          * {@link AreaPtg} ( Note - the explicit range operator (:) may still be valid
-         * when this method returns <code>false</code> )
+         * when this method returns {@code false} )
          */
         public boolean isCompatibleForArea(SimpleRangePart part2) {
             return _type == part2._type;
@@ -1142,7 +1139,7 @@ public final class FormulaParser {
             return getClass().getName() + " [" + _rep + "]";
         }
     }
-    
+
     private String getBookName() {
         StringBuilder sb = new StringBuilder();
         GetChar();
@@ -1155,32 +1152,42 @@ public final class FormulaParser {
     }
 
     /**
-     * Note - caller should reset {@link #_pointer} upon <code>null</code> result
-     * @return The sheet name as an identifier <code>null</code> if '!' is not found in the right place
+     * Note - caller should reset {@link #_pointer} upon {@code null} result
+     * @return The sheet name as an identifier {@code null} if '!' is not found in the right place
      */
-    private SheetIdentifier parseSheetName() {
+    private SheetIdentifier parseSheetName(boolean isSndPartOfQuotedRange) {
         String bookName;
         if (look == '[') {
-        	bookName = getBookName();
+            bookName = getBookName();
         } else {
             bookName = null;
         }
 
-        if (look == '\'') {
-            Match('\'');
-            
+        if (look == '\'' || isSndPartOfQuotedRange) {
+            if (!isSndPartOfQuotedRange) {
+                Match('\'');
+            }
+
             if (look == '[')
-            	bookName = getBookName();
-            
+                bookName = getBookName();
+
             StringBuilder sb = new StringBuilder();
             boolean done = look == '\'';
             while(!done) {
                 sb.appendCodePoint(look);
                 GetChar();
-                if(look == '\'')
-                {
-                    Match('\'');
-                    done = look != '\'';
+                switch (look){
+                    case '\'' : {
+                        GetChar();
+                        if (look == '\''){
+                            // Any single quotes which were already present in the sheet name will be converted to double single quotes ('')
+                            // so switch back to single quote
+                            GetChar();
+                            break;
+                        }
+                    }
+                    case ':':
+                        done = true;
                 }
             }
 
@@ -1193,7 +1200,7 @@ public final class FormulaParser {
             }
             // See if it's a multi-sheet range, eg Sheet1:Sheet3!A1
             if (look == ':') {
-                return parseSheetRange(bookName, iden);
+                return parseSheetRange(bookName, iden, true);
             }
             return null;
         }
@@ -1206,6 +1213,9 @@ public final class FormulaParser {
                 sb.appendCodePoint(look);
                 GetChar();
             }
+            if (look == '\'') {
+                GetChar();
+            }
             NameIdentifier iden = new NameIdentifier(sb.toString(), false);
             SkipWhite();
             if (look == '!') {
@@ -1214,7 +1224,7 @@ public final class FormulaParser {
             }
             // See if it's a multi-sheet range, eg Sheet1:Sheet3!A1
             if (look == ':') {
-                return parseSheetRange(bookName, iden);
+                return parseSheetRange(bookName, iden, false);
             }
             return null;
         }
@@ -1225,14 +1235,14 @@ public final class FormulaParser {
         }
         return null;
     }
-    
+
     /**
-     * If we have something that looks like [book]Sheet1: or 
+     * If we have something that looks like [book]Sheet1: or
      *  Sheet1, see if it's actually a range eg Sheet1:Sheet2!
      */
-    private SheetIdentifier parseSheetRange(String bookname, NameIdentifier sheet1Name) {
+    private SheetIdentifier parseSheetRange(String bookname, NameIdentifier sheet1Name, boolean isSndPartOfQuotedRange) {
         GetChar();
-        SheetIdentifier sheet2 = parseSheetName();
+        SheetIdentifier sheet2 = parseSheetName(isSndPartOfQuotedRange);
         if (sheet2 != null) {
            return new SheetRangeIdentifier(bookname, sheet1Name, sheet2.getSheetIdentifier());
         }
@@ -1255,13 +1265,14 @@ public final class FormulaParser {
         switch(ch) {
             case '.': // dot is OK
             case '_': // underscore is OK
+            case ' ': // space is OK
                 return true;
         }
         return false;
     }
 
     /**
-     * @return <code>true</code> if the specified name is a valid cell reference
+     * @return {@code true} if the specified name is a valid cell reference
      */
     private boolean isValidCellReference(String str) {
         //check range bounds against grid max
@@ -1294,7 +1305,7 @@ public final class FormulaParser {
      * Note - Excel function names are 'case aware but not case sensitive'.  This method may end
      * up creating a defined name record in the workbook if the specified name is not an internal
      * Excel function, and has not been encountered before.
-     * 
+     *
      * Side effect: creates workbook name if name is not recognized (name is probably a UDF)
      *
      * @param name case preserved function name (as it was entered/appeared in the formula).
@@ -1316,7 +1327,7 @@ public final class FormulaParser {
                     throw new FormulaParseException("Attempt to use name '" + name
                             + "' as a function, but defined name in workbook does not refer to a function");
                 }
-    
+
                 // calls to user-defined functions within the workbook
                 // get a Name token which points to a defined name record
                 nameToken = hName.createPtg();
@@ -1325,10 +1336,7 @@ public final class FormulaParser {
                 nameToken = _book.getNameXPtg(name, null);
                 if (nameToken == null) {
                     // name is not an internal or external name
-                    if (log.check(POILogger.WARN)) {
-                        log.log(POILogger.WARN,
-                                "FormulaParser.function: Name '" + name + "' is completely unknown in the current workbook.");
-                    }
+                    LOGGER.atWarn().log("FormulaParser.function: Name '{}' is completely unknown in the current workbook.", name);
                     // name is probably the name of an unregistered User-Defined Function
                     switch (_book.getSpreadsheetVersion()) {
                         case EXCEL97:
@@ -1354,7 +1362,7 @@ public final class FormulaParser {
 
         return getFunction(name, nameToken, args);
     }
-    
+
     /**
      * Adds a name (named range or user defined function) to underlying workbook's names table
      */
@@ -1369,7 +1377,7 @@ public final class FormulaParser {
      * Generates the variable function ptg for the formula.
      * <p>
      * For IF Formulas, additional PTGs are added to the tokens
-     * @param name a {@link NamePtg} or {@link NameXPtg} or <code>null</code>
+     * @param name a {@link NamePtg} or {@link NameXPtg} or {@code null}
      * @return Ptg a null is returned if we're in an IF formula, it needs extreme manipulation and is handled in this function
      */
     private ParseNode getFunction(String name, Ptg namePtg, ParseNode[] args) {
@@ -1678,7 +1686,7 @@ public final class FormulaParser {
         if (!isPositive) {
             value = -value;
         }
-        return Double.valueOf(value);
+        return value;
     }
 
     private Ptg parseNumber() {
@@ -1930,7 +1938,7 @@ public final class FormulaParser {
             return result;
         }
     }
-    
+
     private ParseNode comparisonExpression() {
         ParseNode result = concatExpression();
         while (true) {

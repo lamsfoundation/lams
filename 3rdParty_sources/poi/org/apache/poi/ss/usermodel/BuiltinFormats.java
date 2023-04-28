@@ -18,7 +18,7 @@ package org.apache.poi.ss.usermodel;
 
 /**
  * Utility to identify built-in formats.  The following is a list of the formats as
- * returned by this class.<p>
+ * returned by this class.
  *<p>
  *       0, "General"<br>
  *       1, "0"<br>
@@ -59,15 +59,14 @@ package org.apache.poi.ss.usermodel;
  *       0x30, "##0.0E+0"<br>
  *       0x31, "@" - This is text format.<br>
  *       0x31  "text" - Alias for "@"<br>
- * <p>
  */
 public final class BuiltinFormats {
-	/**
-	 * The first user-defined number format starts at 164.
-	 */
-	public static final int FIRST_USER_DEFINED_FORMAT_INDEX = 164;
+    /**
+     * The first user-defined number format starts at 164.
+     */
+    public static final int FIRST_USER_DEFINED_FORMAT_INDEX = 164;
 
-	private final static String[] _formats = {
+    private static final String[] _formats = {
         "General",
         "0",
         "0.00",
@@ -108,12 +107,12 @@ public final class BuiltinFormats {
         "reserved-0x22",
         "reserved-0x23",
         "reserved-0x24",
-        
+
         "#,##0_);(#,##0)",
         "#,##0_);[Red](#,##0)",
         "#,##0.00_);(#,##0.00)",
         "#,##0.00_);[Red](#,##0.00)",
-		"_(* #,##0_);_(* (#,##0);_(* \"-\"_);_(@_)",
+        "_(* #,##0_);_(* (#,##0);_(* \"-\"_);_(@_)",
         "_(\"$\"* #,##0_);_(\"$\"* (#,##0);_(\"$\"* \"-\"_);_(@_)",
         "_(* #,##0.00_);_(* (#,##0.00);_(* \"-\"??_);_(@_)",
         "_(\"$\"* #,##0.00_);_(\"$\"* (#,##0.00);_(\"$\"* \"-\"??_);_(@_)",
@@ -122,46 +121,46 @@ public final class BuiltinFormats {
         "mm:ss.0",
         "##0.0E+0",
         "@"
-	};
+    };
 
-	/**
-	 * @return array of built-in data formats
-	 */
-	public static String[] getAll() {
-		return _formats.clone();
-	}
+    /**
+     * @return array of built-in data formats
+     */
+    public static String[] getAll() {
+        return _formats.clone();
+    }
 
-	/**
-	 * Get the format string that matches the given format index
-	 *
-	 * @param index of a built in format
-	 * @return string represented at index of format or <code>null</code> if there is not a built-in format at that index
-	 */
-	public static String getBuiltinFormat(int index) {
-		if (index < 0 || index >=_formats.length) {
-			return null;
-		}
-		return _formats[index];
-	}
+    /**
+     * Get the format string that matches the given format index
+     *
+     * @param index of a built in format
+     * @return string represented at index of format or {@code null} if there is not a built-in format at that index
+     */
+    public static String getBuiltinFormat(int index) {
+        if (index < 0 || index >=_formats.length) {
+            return null;
+        }
+        return _formats[index];
+    }
 
-	/**
-	 * Get the format index that matches the given format string.<br>
-	 * Automatically converts "text" to excel's format string to represent text.
-	 * 
-	 * @param pFmt string matching a built-in format
-	 * @return index of format or -1 if undefined.
-	 */
-	public static int getBuiltinFormat(String pFmt) {
-		String fmt = "TEXT".equalsIgnoreCase(pFmt) ? "@" : pFmt;
+    /**
+     * Get the format index that matches the given format string.<br>
+     * Automatically converts "text" to excel's format string to represent text.
+     *
+     * @param pFmt string matching a built-in format
+     * @return index of format or -1 if undefined.
+     */
+    public static int getBuiltinFormat(String pFmt) {
+        String fmt = "TEXT".equalsIgnoreCase(pFmt) ? "@" : pFmt;
 
-		int i = -1;
-		for (String f : _formats) {
-		    i++;
-		    if (f.equals(fmt)) {
-		        return i; 
-		    }
-		}
-		
-		return -1;
-	}
+        int i = -1;
+        for (String f : _formats) {
+            i++;
+            if (f.equals(fmt)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
 }

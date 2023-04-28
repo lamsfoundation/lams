@@ -19,6 +19,8 @@ package org.apache.poi.sl.usermodel;
 
 import java.util.List;
 
+import org.apache.poi.util.Removal;
+
 @SuppressWarnings("unused")
 public interface Slide<
     S extends Shape<S,P>,
@@ -54,21 +56,42 @@ public interface Slide<
      * @param placeholder the placeholder type
      * @return {@code true} if the placeholder should be displayed/rendered
      * @since POI 3.16-beta2
+     *
+     * @deprecated in POI 5.2.0 - use {@link #getDisplayPlaceholder(SimpleShape)}
+     *
      */
-    boolean getDisplayPlaceholder(Placeholder placeholder);
+    @Deprecated
+    @Removal(version = "6.0.0")
+    default boolean getDisplayPlaceholder(Placeholder placeholder) {
+        return false;
+    }
+
 
     /**
-     * Sets the slide visibility 
+     * In XSLF, slidenumber and date shapes aren't marked as placeholders
+     * whereas in HSLF they are activated via a HeadersFooter configuration.
+     * This method is used to generalize that handling.
+     *
+     * @param placeholderRefShape the shape which references to the placeholder
+     * @return {@code true} if the placeholder should be displayed/rendered
+     * @since POI 5.2.0
+     */
+    default boolean getDisplayPlaceholder(SimpleShape<?,?> placeholderRefShape) {
+        return false;
+    }
+
+    /**
+     * Sets the slide visibility
      *
      * @param hidden slide visibility, if {@code true} the slide is hidden, {@code false} shows the slide
-     * 
+     *
      * @since POI 4.0.0
      */
     void setHidden(boolean hidden);
 
     /**
      * @return the slide visibility, the slide is hidden when {@code true} - or shown when {@code false}
-     * 
+     *
      * @since POI 4.0.0
      */
     boolean isHidden();
@@ -76,6 +99,7 @@ public interface Slide<
     /**
      * @return the comment(s) for this slide
      */
+    @SuppressWarnings("java:S1452")
     List<? extends Comment> getComments();
 
     /**

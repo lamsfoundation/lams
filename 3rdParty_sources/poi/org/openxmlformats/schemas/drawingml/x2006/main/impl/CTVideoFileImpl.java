@@ -1,0 +1,226 @@
+/*
+ * XML Type:  CT_VideoFile
+ * Namespace: http://schemas.openxmlformats.org/drawingml/2006/main
+ * Java type: org.openxmlformats.schemas.drawingml.x2006.main.CTVideoFile
+ *
+ * Automatically generated - do not modify.
+ */
+package org.openxmlformats.schemas.drawingml.x2006.main.impl;
+
+import javax.xml.namespace.QName;
+import org.apache.xmlbeans.QNameSet;
+import org.apache.xmlbeans.XmlObject;
+
+/**
+ * An XML CT_VideoFile(@http://schemas.openxmlformats.org/drawingml/2006/main).
+ *
+ * This is a complex type.
+ */
+public class CTVideoFileImpl extends org.apache.xmlbeans.impl.values.XmlComplexContentImpl implements org.openxmlformats.schemas.drawingml.x2006.main.CTVideoFile {
+    private static final long serialVersionUID = 1L;
+
+    public CTVideoFileImpl(org.apache.xmlbeans.SchemaType sType) {
+        super(sType);
+    }
+
+    private static final QName[] PROPERTY_QNAME = {
+        new QName("http://schemas.openxmlformats.org/drawingml/2006/main", "extLst"),
+        new QName("http://schemas.openxmlformats.org/officeDocument/2006/relationships", "link"),
+        new QName("", "contentType"),
+    };
+
+
+    /**
+     * Gets the "extLst" element
+     */
+    @Override
+    public org.openxmlformats.schemas.drawingml.x2006.main.CTOfficeArtExtensionList getExtLst() {
+        synchronized (monitor()) {
+            check_orphaned();
+            org.openxmlformats.schemas.drawingml.x2006.main.CTOfficeArtExtensionList target = null;
+            target = (org.openxmlformats.schemas.drawingml.x2006.main.CTOfficeArtExtensionList)get_store().find_element_user(PROPERTY_QNAME[0], 0);
+            return (target == null) ? null : target;
+        }
+    }
+
+    /**
+     * True if has "extLst" element
+     */
+    @Override
+    public boolean isSetExtLst() {
+        synchronized (monitor()) {
+            check_orphaned();
+            return get_store().count_elements(PROPERTY_QNAME[0]) != 0;
+        }
+    }
+
+    /**
+     * Sets the "extLst" element
+     */
+    @Override
+    public void setExtLst(org.openxmlformats.schemas.drawingml.x2006.main.CTOfficeArtExtensionList extLst) {
+        generatedSetterHelperImpl(extLst, PROPERTY_QNAME[0], 0, org.apache.xmlbeans.impl.values.XmlObjectBase.KIND_SETTERHELPER_SINGLETON);
+    }
+
+    /**
+     * Appends and returns a new empty "extLst" element
+     */
+    @Override
+    public org.openxmlformats.schemas.drawingml.x2006.main.CTOfficeArtExtensionList addNewExtLst() {
+        synchronized (monitor()) {
+            check_orphaned();
+            org.openxmlformats.schemas.drawingml.x2006.main.CTOfficeArtExtensionList target = null;
+            target = (org.openxmlformats.schemas.drawingml.x2006.main.CTOfficeArtExtensionList)get_store().add_element_user(PROPERTY_QNAME[0]);
+            return target;
+        }
+    }
+
+    /**
+     * Unsets the "extLst" element
+     */
+    @Override
+    public void unsetExtLst() {
+        synchronized (monitor()) {
+            check_orphaned();
+            get_store().remove_element(PROPERTY_QNAME[0], 0);
+        }
+    }
+
+    /**
+     * Gets the "link" attribute
+     */
+    @Override
+    public java.lang.String getLink() {
+        synchronized (monitor()) {
+            check_orphaned();
+            org.apache.xmlbeans.SimpleValue target = null;
+            target = (org.apache.xmlbeans.SimpleValue)get_store().find_attribute_user(PROPERTY_QNAME[1]);
+            return (target == null) ? null : target.getStringValue();
+        }
+    }
+
+    /**
+     * Gets (as xml) the "link" attribute
+     */
+    @Override
+    public org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId xgetLink() {
+        synchronized (monitor()) {
+            check_orphaned();
+            org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId target = null;
+            target = (org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId)get_store().find_attribute_user(PROPERTY_QNAME[1]);
+            return target;
+        }
+    }
+
+    /**
+     * Sets the "link" attribute
+     */
+    @Override
+    public void setLink(java.lang.String link) {
+        synchronized (monitor()) {
+            check_orphaned();
+            org.apache.xmlbeans.SimpleValue target = null;
+            target = (org.apache.xmlbeans.SimpleValue)get_store().find_attribute_user(PROPERTY_QNAME[1]);
+            if (target == null) {
+                target = (org.apache.xmlbeans.SimpleValue)get_store().add_attribute_user(PROPERTY_QNAME[1]);
+            }
+            target.setStringValue(link);
+        }
+    }
+
+    /**
+     * Sets (as xml) the "link" attribute
+     */
+    @Override
+    public void xsetLink(org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId link) {
+        synchronized (monitor()) {
+            check_orphaned();
+            org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId target = null;
+            target = (org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId)get_store().find_attribute_user(PROPERTY_QNAME[1]);
+            if (target == null) {
+                target = (org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId)get_store().add_attribute_user(PROPERTY_QNAME[1]);
+            }
+            target.set(link);
+        }
+    }
+
+    /**
+     * Gets the "contentType" attribute
+     */
+    @Override
+    public java.lang.String getContentType() {
+        synchronized (monitor()) {
+            check_orphaned();
+            org.apache.xmlbeans.SimpleValue target = null;
+            target = (org.apache.xmlbeans.SimpleValue)get_store().find_attribute_user(PROPERTY_QNAME[2]);
+            return (target == null) ? null : target.getStringValue();
+        }
+    }
+
+    /**
+     * Gets (as xml) the "contentType" attribute
+     */
+    @Override
+    public org.apache.xmlbeans.XmlString xgetContentType() {
+        synchronized (monitor()) {
+            check_orphaned();
+            org.apache.xmlbeans.XmlString target = null;
+            target = (org.apache.xmlbeans.XmlString)get_store().find_attribute_user(PROPERTY_QNAME[2]);
+            return target;
+        }
+    }
+
+    /**
+     * True if has "contentType" attribute
+     */
+    @Override
+    public boolean isSetContentType() {
+        synchronized (monitor()) {
+            check_orphaned();
+            return get_store().find_attribute_user(PROPERTY_QNAME[2]) != null;
+        }
+    }
+
+    /**
+     * Sets the "contentType" attribute
+     */
+    @Override
+    public void setContentType(java.lang.String contentType) {
+        synchronized (monitor()) {
+            check_orphaned();
+            org.apache.xmlbeans.SimpleValue target = null;
+            target = (org.apache.xmlbeans.SimpleValue)get_store().find_attribute_user(PROPERTY_QNAME[2]);
+            if (target == null) {
+                target = (org.apache.xmlbeans.SimpleValue)get_store().add_attribute_user(PROPERTY_QNAME[2]);
+            }
+            target.setStringValue(contentType);
+        }
+    }
+
+    /**
+     * Sets (as xml) the "contentType" attribute
+     */
+    @Override
+    public void xsetContentType(org.apache.xmlbeans.XmlString contentType) {
+        synchronized (monitor()) {
+            check_orphaned();
+            org.apache.xmlbeans.XmlString target = null;
+            target = (org.apache.xmlbeans.XmlString)get_store().find_attribute_user(PROPERTY_QNAME[2]);
+            if (target == null) {
+                target = (org.apache.xmlbeans.XmlString)get_store().add_attribute_user(PROPERTY_QNAME[2]);
+            }
+            target.set(contentType);
+        }
+    }
+
+    /**
+     * Unsets the "contentType" attribute
+     */
+    @Override
+    public void unsetContentType() {
+        synchronized (monitor()) {
+            check_orphaned();
+            get_store().remove_attribute(PROPERTY_QNAME[2]);
+        }
+    }
+}

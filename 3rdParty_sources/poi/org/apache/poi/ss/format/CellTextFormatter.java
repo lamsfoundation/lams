@@ -20,8 +20,6 @@ import java.util.Locale;
 
 /**
  * This class implements printing out text.
- *
- * @author Ken Arnold, Industrious Media LLC
  */
 public class CellTextFormatter extends CellFormatter {
     private final int[] textPos;
@@ -52,7 +50,7 @@ public class CellTextFormatter extends CellFormatter {
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     public void formatValue(StringBuffer toAppendTo, Object obj) {
         int start = toAppendTo.length();
         String text = obj.toString();
@@ -71,6 +69,7 @@ public class CellTextFormatter extends CellFormatter {
      * <p>
      * For text, this is just printing the text.
      */
+    @Override
     public void simpleValue(StringBuffer toAppendTo, Object value) {
         SIMPLE_TEXT.formatValue(toAppendTo, value);
     }

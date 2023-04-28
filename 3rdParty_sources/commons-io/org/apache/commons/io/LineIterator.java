@@ -17,15 +17,16 @@
 package org.apache.commons.io;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * An Iterator over the lines in a <code>Reader</code>.
+ * An Iterator over the lines in a {@code Reader}.
  * <p>
- * <code>LineIterator</code> holds a reference to an open <code>Reader</code>.
+ * {@code LineIterator} holds a reference to an open {@code Reader}.
  * When you have finished with the iterator you should close the reader
  * to free internal resources. This can be done by closing the reader directly,
  * or by calling the {@link #close()} or {@link #closeQuietly(LineIterator)}
@@ -44,10 +45,9 @@ import java.util.NoSuchElementException;
  * }
  * </pre>
  *
- * @version $Id: LineIterator.java 1471767 2013-04-24 23:24:19Z sebb $
  * @since 1.2
  */
-public class LineIterator implements Iterator<String> {
+public class LineIterator implements Iterator<String>, Closeable {
 
     // N.B. This class deliberately does not implement Iterable, see https://issues.apache.org/jira/browse/IO-181
 
@@ -56,12 +56,12 @@ public class LineIterator implements Iterator<String> {
     /** The current line. */
     private String cachedLine;
     /** A flag indicating if the iterator has been fully read. */
-    private boolean finished = false;
+    private boolean finished;
 
     /**
-     * Constructs an iterator of the lines for a <code>Reader</code>.
+     * Constructs an iterator of the lines for a {@code Reader}.
      *
-     * @param reader the <code>Reader</code> to read from, not null
+     * @param reader the {@code Reader} to read from, not null
      * @throws IllegalArgumentException if the reader is null
      */
     public LineIterator(final Reader reader) throws IllegalArgumentException {
@@ -75,36 +75,37 @@ public class LineIterator implements Iterator<String> {
         }
     }
 
-    //-----------------------------------------------------------------------
     /**
-     * Indicates whether the <code>Reader</code> has more lines.
-     * If there is an <code>IOException</code> then {@link #close()} will
+     * Indicates whether the {@code Reader} has more lines.
+     * If there is an {@code IOException} then {@link #close()} will
      * be called on this instance.
      *
      * @return {@code true} if the Reader has more lines
      * @throws IllegalStateException if an IO exception occurs
      */
+    @Override
     public boolean hasNext() {
         if (cachedLine != null) {
             return true;
-        } else if (finished) {
+        }
+        if (finished) {
             return false;
-        } else {
-            try {
-                while (true) {
-                    final String line = bufferedReader.readLine();
-                    if (line == null) {
-                        finished = true;
-                        return false;
-                    } else if (isValidLine(line)) {
-                        cachedLine = line;
-                        return true;
-                    }
+        }
+        try {
+            while (true) {
+                final String line = bufferedReader.readLine();
+                if (line == null) {
+                    finished = true;
+                    return false;
                 }
-            } catch(final IOException ioe) {
-                close();
-                throw new IllegalStateException(ioe);
+                if (isValidLine(line)) {
+                    cachedLine = line;
+                    return true;
+                }
             }
+        } catch(final IOException ioe) {
+            IOUtils.closeQuietly(this, ioe::addSuppressed);
+            throw new IllegalStateException(ioe);
         }
     }
 
@@ -119,17 +120,18 @@ public class LineIterator implements Iterator<String> {
     }
 
     /**
-     * Returns the next line in the wrapped <code>Reader</code>.
+     * Returns the next line in the wrapped {@code Reader}.
      *
      * @return the next line from the input
      * @throws NoSuchElementException if there is no line to return
      */
+    @Override
     public String next() {
         return nextLine();
     }
 
     /**
-     * Returns the next line in the wrapped <code>Reader</code>.
+     * Returns the next line in the wrapped {@code Reader}.
      *
      * @return the next line from the input
      * @throws NoSuchElementException if there is no line to return
@@ -144,16 +146,19 @@ public class LineIterator implements Iterator<String> {
     }
 
     /**
-     * Closes the underlying <code>Reader</code> quietly.
+     * Closes the underlying {@code Reader}.
      * This method is useful if you only want to process the first few
      * lines of a larger file. If you do not close the iterator
-     * then the <code>Reader</code> remains open.
+     * then the {@code Reader} remains open.
      * This method can safely be called multiple times.
+     *
+     * @throws IOException if closing the underlying {@code Reader} fails.
      */
-    public void close() {
+    @Override
+    public void close() throws IOException {
         finished = true;
-        IOUtils.closeQuietly(bufferedReader);
         cachedLine = null;
+        IOUtils.close(bufferedReader);
     }
 
     /**
@@ -161,20 +166,22 @@ public class LineIterator implements Iterator<String> {
      *
      * @throws UnsupportedOperationException always
      */
+    @Override
     public void remove() {
-        throw new UnsupportedOperationException("Remove unsupported on LineIterator");
+        throw new UnsupportedOperationException("remove not supported");
     }
 
-    //-----------------------------------------------------------------------
     /**
-     * Closes the iterator, handling null and ignoring exceptions.
+     * Closes a {@code LineIterator} quietly.
      *
-     * @param iterator  the iterator to close
+     * @param iterator The iterator to close, or {@code null}.
+     * @deprecated As of 2.6 deprecated without replacement. Please use the try-with-resources statement or handle
+     * suppressed exceptions manually.
+     * @see Throwable#addSuppressed(java.lang.Throwable)
      */
+    @Deprecated
     public static void closeQuietly(final LineIterator iterator) {
-        if (iterator != null) {
-            iterator.close();
-        }
+        IOUtils.closeQuietly(iterator);
     }
 
 }

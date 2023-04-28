@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,12 +23,12 @@ import java.io.Writer;
  * {@link Writer} implementation that outputs to a {@link StringBuilder}.
  * <p>
  * <strong>NOTE:</strong> This implementation, as an alternative to
- * <code>java.io.StringWriter</code>, provides an <i>un-synchronized</i>
+ * {@code java.io.StringWriter}, provides an <i>un-synchronized</i>
  * (i.e. for use in a single thread) implementation for better performance.
  * For safe usage with multiple {@link Thread}s then
- * <code>java.io.StringWriter</code> should be used.
+ * {@code java.io.StringWriter} should be used.
+ * </p>
  *
- * @version $Id: StringBuilderWriter.java 1722253 2015-12-30 00:36:12Z ggregory $
  * @since 2.0
  */
 public class StringBuilderWriter extends Writer implements Serializable {
@@ -54,7 +54,7 @@ public class StringBuilderWriter extends Writer implements Serializable {
 
     /**
      * Constructs a new instance with the specified {@link StringBuilder}.
-     * 
+     *
      * <p>If {@code builder} is null a new instance with default capacity will be created.</p>
      *
      * @param builder The String builder. May be null.
@@ -102,7 +102,7 @@ public class StringBuilderWriter extends Writer implements Serializable {
     }
 
     /**
-     * Closing this writer has no effect. 
+     * Closing this writer has no effect.
      */
     @Override
     public void close() {
@@ -110,7 +110,7 @@ public class StringBuilderWriter extends Writer implements Serializable {
     }
 
     /**
-     * Flushing this writer has no effect. 
+     * Flushing this writer has no effect.
      */
     @Override
     public void flush() {
@@ -120,7 +120,7 @@ public class StringBuilderWriter extends Writer implements Serializable {
 
     /**
      * Writes a String to the {@link StringBuilder}.
-     * 
+     *
      * @param value The value to write
      */
     @Override

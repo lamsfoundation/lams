@@ -39,12 +39,12 @@ import org.apache.poi.ss.util.CellAddress;
  */
 public class HSSFComment extends HSSFTextbox implements Comment {
 
-    private final static int FILL_TYPE_SOLID = 0;
-    private final static int FILL_TYPE_PICTURE = 3;
+    private static final int FILL_TYPE_SOLID = 0;
+    private static final int FILL_TYPE_PICTURE = 3;
 
-    private final static int GROUP_SHAPE_PROPERTY_DEFAULT_VALUE = 655362;
-    private final static int GROUP_SHAPE_HIDDEN_MASK = 0x1000002;
-    private final static int GROUP_SHAPE_NOT_HIDDEN_MASK = 0xFEFFFFFD;
+    private static final int GROUP_SHAPE_PROPERTY_DEFAULT_VALUE = 655362;
+    private static final int GROUP_SHAPE_HIDDEN_MASK = 0x1000002;
+    private static final int GROUP_SHAPE_NOT_HIDDEN_MASK = 0xFEFFFFFD;
 
     /*
       * TODO - make HSSFComment more consistent when created vs read from file.
@@ -66,7 +66,6 @@ public class HSSFComment extends HSSFTextbox implements Comment {
     /**
      * Construct a new comment with the given parent and anchor.
      *
-     * @param parent
      * @param anchor defines position of this anchor in the sheet
      */
     public HSSFComment(HSSFShape parent, HSSFAnchor anchor) {
@@ -100,6 +99,7 @@ public class HSSFComment extends HSSFTextbox implements Comment {
     protected EscherContainerRecord createSpContainer() {
         EscherContainerRecord spContainer = super.createSpContainer();
         EscherOptRecord opt = spContainer.getChildById(EscherOptRecord.RECORD_ID);
+        assert(opt != null);
         opt.removeEscherProperty(EscherPropertyTypes.TEXT__TEXTLEFT);
         opt.removeEscherProperty(EscherPropertyTypes.TEXT__TEXTRIGHT);
         opt.removeEscherProperty(EscherPropertyTypes.TEXT__TEXTTOP);
@@ -147,7 +147,7 @@ public class HSSFComment extends HSSFTextbox implements Comment {
     /**
      * Sets whether this comment is visible.
      *
-     * @param visible <code>true</code> if the comment is visible, <code>false</code> otherwise
+     * @param visible {@code true} if the comment is visible, {@code false} otherwise
      */
     @Override
     public void setVisible(boolean visible) {
@@ -158,7 +158,7 @@ public class HSSFComment extends HSSFTextbox implements Comment {
     /**
      * Returns whether this comment is visible.
      *
-     * @return <code>true</code> if the comment is visible, <code>false</code> otherwise
+     * @return {@code true} if the comment is visible, {@code false} otherwise
      */
     @Override
     public boolean isVisible() {
@@ -253,9 +253,7 @@ public class HSSFComment extends HSSFTextbox implements Comment {
      * Do we know which cell this comment belongs to?
      */
     public boolean hasPosition() {
-        if (_note == null) return false;
-        if (getColumn() < 0 || getRow() < 0) return false;
-        return true;
+        return _note != null && getColumn() >= 0 && getRow() >= 0;
     }
 
     @Override

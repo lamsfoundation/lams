@@ -21,10 +21,13 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Spliterator;
+import java.util.Spliterators;
 
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.PaneInformation;
+import org.apache.poi.util.Removal;
 
 /**
  * High level representation of a Excel worksheet.
@@ -50,13 +53,13 @@ public interface Sheet extends Iterable<Row> {
 
     short FooterMargin = 5;
 
-    byte PANE_LOWER_RIGHT = (byte) 0;
+    byte PANE_LOWER_RIGHT = PaneInformation.PANE_LOWER_RIGHT;
 
-    byte PANE_UPPER_RIGHT = (byte) 1;
+    byte PANE_UPPER_RIGHT = PaneInformation.PANE_UPPER_RIGHT;
 
-    byte PANE_LOWER_LEFT = (byte) 2;
+    byte PANE_LOWER_LEFT = PaneInformation.PANE_LOWER_LEFT;
 
-    byte PANE_UPPER_LEFT = (byte) 3;
+    byte PANE_UPPER_LEFT = PaneInformation.PANE_UPPER_LEFT;
 
     /**
      * Create a new row within the sheet and return the high level representation
@@ -116,7 +119,7 @@ public interface Sheet extends Iterable<Row> {
     int getLastRowNum();
 
     /**
-     * Get the visibility state for a given column
+     * Set the visibility state for a given column
      *
      * @param columnIndex - the column to get (0-based)
      * @param hidden - the visibility state of the column
@@ -127,7 +130,7 @@ public interface Sheet extends Iterable<Row> {
      * Get the hidden state for a given column
      *
      * @param columnIndex - the column to set (0-based)
-     * @return hidden - <code>false</code> if the column is visible
+     * @return hidden - {@code false} if the column is visible
      */
     boolean isColumnHidden(int columnIndex);
 
@@ -153,7 +156,7 @@ public interface Sheet extends Iterable<Row> {
      * in a cell that is formatted with the standard font (first font in the workbook).<p>
      *
      * Character width is defined as the maximum digit width
-     * of the numbers <code>0, 1, 2, ... 9</code> as rendered
+     * of the numbers {@code 0, 1, 2, ... 9} as rendered
      * using the default font (first font in the workbook).<p>
      *
      * Unless you are using a very special font, the default character is '0' (zero),
@@ -166,19 +169,19 @@ public interface Sheet extends Iterable<Row> {
      * To compute the actual number of visible characters,
      * Excel uses the following formula (Section 3.3.1.12 of the OOXML spec):<p>
      *
-     * <code>
+     * {@code
      *     width = Truncate([{Number of Visible Characters} *
      *      {Maximum Digit Width} + {5 pixel padding}]/{Maximum Digit Width}*256)/256
-     * </code>
+     * }
      *
      * Using the Calibri font as an example, the maximum digit width of 11 point font size is 7 pixels (at 96 dpi).
-     * If you set a column width to be eight characters wide, e.g. <code>setColumnWidth(columnIndex, 8*256)</code>,
+     * If you set a column width to be eight characters wide, e.g. {@code setColumnWidth(columnIndex, 8*256)},
      * then the actual value of visible characters (the value shown in Excel) is derived from the following equation:
-     *  <code>
+     *  {@code
      *      Truncate([numChars*7+5]/7*256)/256 = 8;
-     *  </code>
+     *  }
      *
-     * which gives <code>7.29</code>.
+     * which gives {@code 7.29}.
      *
      * @param columnIndex - the column to set (0-based)
      * @param width - the width in units of 1/256th of a character width
@@ -191,7 +194,7 @@ public interface Sheet extends Iterable<Row> {
      *
      * <p>
      * Character width is defined as the maximum digit width
-     * of the numbers <code>0, 1, 2, ... 9</code> as rendered
+     * of the numbers {@code 0, 1, 2, ... 9} as rendered
      * using the default font (first font in the workbook)
      * </p>
      *
@@ -376,6 +379,27 @@ public interface Sheet extends Iterable<Row> {
     Iterator<Row> rowIterator();
 
     /**
+     * Alias for {@link #rowIterator()} to allow foreach loops
+     */
+    @Override
+    default Iterator<Row> iterator() {
+        return rowIterator();
+    }
+
+    /**
+     *  Returns a spliterator of the physical rows
+     *
+     * @return a spliterator of the PHYSICAL rows.  Meaning the 3rd element may not
+     * be the third row if say for instance the second row is undefined.
+     *
+     * @since POI 5.2.0
+     */
+    @Override
+    default Spliterator<Row> spliterator() {
+        return Spliterators.spliterator(rowIterator(), getPhysicalNumberOfRows(), 0);
+    }
+
+    /**
      * Control if Excel should be asked to recalculate all formulas on this sheet
      * when the workbook is opened.
      *
@@ -409,7 +433,7 @@ public interface Sheet extends Iterable<Row> {
     /**
      * Flag indicating whether the sheet displays Automatic Page Breaks.
      *
-     * @param value <code>true</code> if the sheet displays Automatic Page Breaks.
+     * @param value {@code true} if the sheet displays Automatic Page Breaks.
      */
     void setAutobreaks(boolean value);
 
@@ -440,7 +464,7 @@ public interface Sheet extends Iterable<Row> {
     /**
      * Flag indicating whether the Fit to Page print option is enabled.
      *
-     * @param value <code>true</code> if the Fit to Page print option is enabled.
+     * @param value {@code true} if the Fit to Page print option is enabled.
      */
     void setFitToPage(boolean value);
 
@@ -455,7 +479,7 @@ public interface Sheet extends Iterable<Row> {
      * When false a summary row is inserted above the detailed data being summarized and a new outline level
      * is established on that row.
      * </p>
-     * @param value <code>true</code> if row summaries appear below detail in the outline
+     * @param value {@code true} if row summaries appear below detail in the outline
      */
     void setRowSumsBelow(boolean value);
 
@@ -470,14 +494,14 @@ public interface Sheet extends Iterable<Row> {
      * When false a summary column is inserted to the left of the detailed data being
      * summarized and a new outline level is established on that column.
      * </p>
-     * @param value <code>true</code> if col summaries appear right of the detail in the outline
+     * @param value {@code true} if col summaries appear right of the detail in the outline
      */
     void setRowSumsRight(boolean value);
 
     /**
      * Flag indicating whether the sheet displays Automatic Page Breaks.
      *
-     * @return <code>true</code> if the sheet displays Automatic Page Breaks.
+     * @return {@code true} if the sheet displays Automatic Page Breaks.
      */
     boolean getAutobreaks();
 
@@ -492,7 +516,7 @@ public interface Sheet extends Iterable<Row> {
     /**
      * Flag indicating whether the Fit to Page print option is enabled.
      *
-     * @return <code>true</code> if the Fit to Page print option is enabled.
+     * @return {@code true} if the Fit to Page print option is enabled.
      */
     boolean getFitToPage();
 
@@ -507,7 +531,7 @@ public interface Sheet extends Iterable<Row> {
      * When false a summary row is inserted above the detailed data being summarized and a new outline level
      * is established on that row.
      * </p>
-     * @return <code>true</code> if row summaries appear below detail in the outline
+     * @return {@code true} if row summaries appear below detail in the outline
      */
     boolean getRowSumsBelow();
 
@@ -522,7 +546,7 @@ public interface Sheet extends Iterable<Row> {
      * When false a summary column is inserted to the left of the detailed data being
      * summarized and a new outline level is established on that column.
      * </p>
-     * @return <code>true</code> if col summaries appear right of the detail in the outline
+     * @return {@code true} if col summaries appear right of the detail in the outline
      */
     boolean getRowSumsRight();
 
@@ -530,7 +554,7 @@ public interface Sheet extends Iterable<Row> {
      * Gets the flag indicating whether this sheet displays the lines
      * between rows and columns to make editing and reading easier.
      *
-     * @return <code>true</code> if this sheet prints gridlines.
+     * @return {@code true} if this sheet prints gridlines.
      * @see #isDisplayGridlines() to check if gridlines are displayed on screen
      */
     boolean isPrintGridlines();
@@ -539,7 +563,7 @@ public interface Sheet extends Iterable<Row> {
      * Sets the flag indicating whether this sheet should print the lines
      * between rows and columns to make editing and reading easier.
      *
-     * @param show <code>true</code> if this sheet should print gridlines.
+     * @param show {@code true} if this sheet should print gridlines.
      * @see #setDisplayGridlines(boolean) to display gridlines on screen
      */
     void setPrintGridlines(boolean show);
@@ -548,7 +572,7 @@ public interface Sheet extends Iterable<Row> {
      * Gets the flag indicating whether this sheet prints the
      * row and column headings when printing.
      *
-     * @return <code>true</code> if this sheet prints row and column headings.
+     * @return {@code true} if this sheet prints row and column headings.
      */
     boolean isPrintRowAndColumnHeadings();
 
@@ -556,7 +580,7 @@ public interface Sheet extends Iterable<Row> {
      * Sets the flag indicating whether this sheet should print
      * row and columns headings when printing.
      *
-     * @param show <code>true</code> if this sheet should print row and column headings.
+     * @param show {@code true} if this sheet should print row and column headings.
      */
     void setPrintRowAndColumnHeadings(boolean show);
 
@@ -572,7 +596,7 @@ public interface Sheet extends Iterable<Row> {
      *
      * Note that XSSF offers more kinds of document headers than HSSF does
      *
-     * @return the document header. Never <code>null</code>
+     * @return the document header. Never {@code null}
      */
     Header getHeader();
 
@@ -581,7 +605,7 @@ public interface Sheet extends Iterable<Row> {
      *
      * Note that XSSF offers more kinds of document footers than HSSF does.
      *
-     * @return the document footer. Never <code>null</code>
+     * @return the document footer. Never {@code null}
      */
     Footer getFooter();
 
@@ -590,7 +614,7 @@ public interface Sheet extends Iterable<Row> {
      *
      * Note: multiple sheets can be selected, but only one sheet can be active at one time.
      *
-     * @param value <code>true</code> if this sheet is selected
+     * @param value {@code true} if this sheet is selected
      * @see Workbook#setActiveSheet(int)
      */
     void setSelected(boolean value);
@@ -600,16 +624,40 @@ public interface Sheet extends Iterable<Row> {
      *
      * @param margin which margin to get
      * @return the size of the margin
+     * @deprecated use {@link #getMargin(PageMargin)}
      */
+    @Deprecated
+    @Removal(version = "7.0.0")
     double getMargin(short margin);
+
+    /**
+     * Gets the size of the margin in inches.
+     *
+     * @param margin which margin to get
+     * @return the size of the margin
+     * @since POI 5.2.3
+     */
+    double getMargin(PageMargin margin);
 
     /**
      * Sets the size of the margin in inches.
      *
-     * @param margin which margin to get
+     * @param margin which margin to set
      * @param size the size of the margin
+     * @deprecated use {@link #setMargin(PageMargin, double)} instead
      */
+    @Deprecated
+    @Removal(version = "7.0.0")
     void setMargin(short margin, double size);
+
+    /**
+     * Sets the size of the margin in inches.
+     *
+     * @param margin which margin to set
+     * @param size the size of the margin
+     * @since POI 5.2.3
+     */
+    void setMargin(PageMargin margin, double size);
 
     /**
      * Answer whether protection is enabled or disabled
@@ -620,7 +668,7 @@ public interface Sheet extends Iterable<Row> {
 
     /**
      * Sets the protection enabled as well as the password
-     * @param password to set for protection. Pass <code>null</code> to remove protection
+     * @param password to set for protection. Pass {@code null} to remove protection
      */
     void protectSheet(String password);
 
@@ -700,7 +748,7 @@ public interface Sheet extends Iterable<Row> {
      * Additionally shifts merged regions that are completely defined in these
      * rows (ie. merged 2 cells on a row to be shifted). All merged regions that are
      * completely overlaid by shifting will be deleted.
-     * <p>
+     *
      * @param startRow the row to start shifting
      * @param endRow the row to end shifting
      * @param n the number of rows to shift
@@ -754,8 +802,23 @@ public interface Sheet extends Iterable<Row> {
      * @see #PANE_LOWER_RIGHT
      * @see #PANE_UPPER_LEFT
      * @see #PANE_UPPER_RIGHT
+     * @deprecated use {@link #createSplitPane(int, int, int, int, PaneType)}
      */
+    @Deprecated
+    @Removal(version = "7.0.0")
     void createSplitPane(int xSplitPos, int ySplitPos, int leftmostColumn, int topRow, int activePane);
+
+    /**
+     * Creates a split pane. Any existing freezepane or split pane is overwritten.
+     * @param xSplitPos      Horizontal position of split (in 1/20th of a point).
+     * @param ySplitPos      Vertical position of split (in 1/20th of a point).
+     * @param topRow        Top row visible in bottom pane
+     * @param leftmostColumn   Left column visible in right pane.
+     * @param activePane    Active pane.
+     * @see PaneType
+     * @since POI 5.2.3
+     */
+    void createSplitPane(int xSplitPos, int ySplitPos, int leftmostColumn, int topRow, PaneType activePane);
 
     /**
      * Returns the information regarding the currently configured pane (split or freeze)
@@ -809,8 +872,8 @@ public interface Sheet extends Iterable<Row> {
      * Sets a page break at the indicated row
      * Breaks occur above the specified row and left of the specified column inclusive.
      *
-     * For example, <code>sheet.setColumnBreak(2);</code> breaks the sheet into two parts
-     * with columns A,B,C in the first and D,E,... in the second. Similar, <code>sheet.setRowBreak(2);</code>
+     * For example, {@code sheet.setColumnBreak(2);} breaks the sheet into two parts
+     * with columns A,B,C in the first and D,E,... in the second. Similar, {@code sheet.setRowBreak(2);}
      * breaks the sheet into two parts with first three rows (rownum=1...3) in the first part
      * and rows starting with rownum=4 in the second.
      *
@@ -847,8 +910,8 @@ public interface Sheet extends Iterable<Row> {
      * Sets a page break at the indicated column.
      * Breaks occur above the specified row and left of the specified column inclusive.
      *
-     * For example, <code>sheet.setColumnBreak(2);</code> breaks the sheet into two parts
-     * with columns A,B,C in the first and D,E,... in the second. Similar, <code>sheet.setRowBreak(2);</code>
+     * For example, {@code sheet.setColumnBreak(2);} breaks the sheet into two parts
+     * with columns A,B,C in the first and D,E,... in the second. Similar, {@code sheet.setRowBreak(2);}
      * breaks the sheet into two parts with first three rows (rownum=1...3) in the first part
      * and rows starting with rownum=4 in the second.
      *
@@ -958,7 +1021,7 @@ public interface Sheet extends Iterable<Row> {
     /**
      * Returns cell comment for the specified location
      *
-     * @return cell comment or <code>null</code> if not found
+     * @return cell comment or {@code null} if not found
      */
     Comment getCellComment(CellAddress ref);
 
@@ -1005,7 +1068,7 @@ public interface Sheet extends Iterable<Row> {
 
     /**
      * Note - this is not the same as whether the sheet is focused (isActive)
-     * @return <code>true</code> if this sheet is currently selected
+     * @return {@code true} if this sheet is currently selected
      */
     boolean isSelected();
 
@@ -1052,7 +1115,7 @@ public interface Sheet extends Iterable<Row> {
     AutoFilter setAutoFilter(CellRangeAddress range);
 
     /**
-     * The 'Conditional Formatting' facet for this <tt>Sheet</tt>
+     * The 'Conditional Formatting' facet for this {@code Sheet}
      *
      * @return  conditional formatting rule for this sheet
      */
@@ -1182,7 +1245,7 @@ public interface Sheet extends Iterable<Row> {
     List<? extends Hyperlink> getHyperlinkList();
 
     /**
-     * Return location of the active cell, e.g. <code>A1</code>.
+     * Return location of the active cell, e.g. {@code A1}.
      *
      * @return the location of the active cell.
      * @since 3.14beta1
@@ -1192,7 +1255,7 @@ public interface Sheet extends Iterable<Row> {
     /**
       * Sets location of the active cell
       *
-      * @param address the location of the active cell, e.g. <code>A1</code>.
+      * @param address the location of the active cell, e.g. {@code A1}.
       * @since 3.14beta1
       */
     void setActiveCell(CellAddress address);

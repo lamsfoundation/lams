@@ -20,14 +20,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Closed output stream. This stream throws an exception on all attempts to
- * write something to the stream.
+ * Throws an exception on all attempts to write to the stream.
  * <p>
- * Typically uses of this class include testing for corner cases in methods
- * that accept an output stream and acting as a sentinel value instead of
- * a {@code null} output stream.
+ * Typically uses of this class include testing for corner cases in methods that accept an output stream and acting as a
+ * sentinel value instead of a {@code null} output stream.
+ * </p>
  *
- * @version $Id: ClosedOutputStream.java 1471767 2013-04-24 23:24:19Z sebb $
  * @since 1.4
  */
 public class ClosedOutputStream extends OutputStream {
@@ -48,4 +46,13 @@ public class ClosedOutputStream extends OutputStream {
         throw new IOException("write(" + b + ") failed: stream is closed");
     }
 
+    /**
+     * Throws an {@link IOException} to indicate that the stream is closed.
+     *
+     * @throws IOException always thrown
+     */
+    @Override
+    public void flush() throws IOException {
+        throw new IOException("flush() failed: stream is closed");
+    }
 }

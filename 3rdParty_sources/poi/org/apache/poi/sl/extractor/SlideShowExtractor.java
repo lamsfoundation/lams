@@ -26,6 +26,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import com.zaxxer.sparsebits.SparseBitSet;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.extractor.POITextExtractor;
 import org.apache.poi.sl.usermodel.MasterSheet;
 import org.apache.poi.sl.usermodel.Notes;
@@ -42,9 +44,9 @@ import org.apache.poi.sl.usermodel.TableShape;
 import org.apache.poi.sl.usermodel.TextParagraph;
 import org.apache.poi.sl.usermodel.TextRun;
 import org.apache.poi.sl.usermodel.TextShape;
+import org.apache.poi.util.Internal;
 import org.apache.poi.util.LocaleUtil;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
+import org.apache.poi.util.Removal;
 
 /**
  * Common SlideShow extractor
@@ -55,7 +57,7 @@ public class SlideShowExtractor<
     S extends Shape<S,P>,
     P extends TextParagraph<S,P,? extends TextRun>
 > implements POITextExtractor {
-    private static final POILogger LOG = POILogFactory.getLogger(SlideShowExtractor.class);
+    private static final Logger LOG = LogManager.getLogger(SlideShowExtractor.class);
 
     // placeholder text for slide numbers
     private static final String SLIDE_NUMBER_PH = "‹#›";
@@ -178,7 +180,7 @@ public class SlideShowExtractor<
 
                 if (ts.isPlaceholder()) {
                     // don't bother about boiler plate text on master sheets
-                    LOG.log(POILogger.INFO, "Ignoring boiler plate (placeholder) text on slide master:", text);
+                    LOG.atInfo().log("Ignoring boiler plate (placeholder) text on slide master: {}", text);
                     continue;
                 }
 
@@ -388,6 +390,7 @@ public class SlideShowExtractor<
      * @deprecated use {@link #getCodepointsInSparseBitSet(String, Boolean, Boolean)}
      */
     @Deprecated
+    @Removal(version = "6.0.0")
     public BitSet getCodepoints(String typeface, Boolean italic, Boolean bold) {
         final BitSet glyphs = new BitSet();
 
@@ -405,7 +408,8 @@ public class SlideShowExtractor<
     }
 
     /**
-     * Extract the used codepoints for font embedding / subsetting
+     * Extract the used codepoints for font embedding / subsetting. This method is not intended for public use.
+     *
      * @param typeface the typeface/font family of the textruns to examine
      * @param italic use {@code true} for italic TextRuns, {@code false} for non-italic ones and
      *      {@code null} if it doesn't matter
@@ -413,6 +417,7 @@ public class SlideShowExtractor<
      *      {@code null} if it doesn't matter
      * @return a bitset with the marked/used codepoints
      */
+    @Internal
     public SparseBitSet getCodepointsInSparseBitSet(String typeface, Boolean italic, Boolean bold) {
         final SparseBitSet glyphs = new SparseBitSet();
 

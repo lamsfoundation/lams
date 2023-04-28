@@ -21,7 +21,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.SimpleMessage;
 import org.apache.poi.hssf.record.*;
+import org.apache.poi.hssf.record.Record;
 import org.apache.poi.hssf.record.aggregates.ChartSubstreamRecordAggregate;
 import org.apache.poi.hssf.record.aggregates.ColumnInfoRecordsAggregate;
 import org.apache.poi.hssf.record.aggregates.ConditionalFormattingTable;
@@ -34,13 +38,15 @@ import org.apache.poi.hssf.record.aggregates.RecordAggregate.PositionTrackingVis
 import org.apache.poi.hssf.record.aggregates.RecordAggregate.RecordVisitor;
 import org.apache.poi.hssf.record.aggregates.RowRecordsAggregate;
 import org.apache.poi.hssf.record.aggregates.WorksheetProtectionBlock;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.ss.formula.FormulaShifter;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.PaneInformation;
 import org.apache.poi.util.Internal;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
 import org.apache.poi.util.RecordFormatException;
+
+import static org.apache.logging.log4j.util.Unbox.box;
 
 /**
  * Low level model implementation of a Sheet (one workbook contains many sheets)
@@ -50,11 +56,11 @@ import org.apache.poi.util.RecordFormatException;
  * The structures of the highlevel API use references to this to perform most of their
  * operations.  Its probably unwise to use these low level structures directly unless you
  * really know what you're doing.  I recommend you read the Microsoft Excel 97 Developer's
- * Kit (Microsoft Press) and the documentation at http://sc.openoffice.org/excelfileformat.pdf
+ * Kit (Microsoft Press) and the documentation at https://sc.openoffice.org/excelfileformat.pdf
  * before even attempting to use this.
  *
- * @see org.apache.poi.hssf.model.InternalWorkbook
- * @see org.apache.poi.hssf.usermodel.HSSFSheet
+ * @see InternalWorkbook
+ * @see HSSFSheet
  */
 @Internal
 public final class InternalSheet {
@@ -63,9 +69,9 @@ public final class InternalSheet {
     public static final short   TopMargin = 2;
     public static final short   BottomMargin = 3;
 
-    private static POILogger            log              = POILogFactory.getLogger(InternalSheet.class);
+    private static final Logger LOGGER = LogManager.getLogger(InternalSheet.class);
 
-    private List<RecordBase>             _records;
+    private final List<RecordBase>             _records;
     protected PrintGridlinesRecord       printGridlines;
     protected PrintHeadersRecord         printHeaders;
     protected GridsetRecord              gridset;
@@ -98,10 +104,10 @@ public final class InternalSheet {
     /** Add an UncalcedRecord if not true indicating formulas have not been calculated */
     protected boolean _isUncalced;
 
-    public static final byte PANE_LOWER_RIGHT = (byte)0;
-    public static final byte PANE_UPPER_RIGHT = (byte)1;
-    public static final byte PANE_LOWER_LEFT = (byte)2;
-    public static final byte PANE_UPPER_LEFT = (byte)3;
+    public static final byte PANE_LOWER_RIGHT = Sheet.PANE_LOWER_RIGHT;
+    public static final byte PANE_UPPER_RIGHT = Sheet.PANE_UPPER_RIGHT;
+    public static final byte PANE_LOWER_LEFT = Sheet.PANE_LOWER_LEFT;
+    public static final byte PANE_UPPER_LEFT = Sheet.PANE_UPPER_LEFT;
 
     /**
      * read support  (offset used as starting point for search) for low level
@@ -115,8 +121,8 @@ public final class InternalSheet {
      *
      * @return Sheet object with all values set to those read from the file
      *
-     * @see org.apache.poi.hssf.model.InternalWorkbook
-     * @see org.apache.poi.hssf.record.Record
+     * @see InternalWorkbook
+     * @see Record
      */
     public static InternalSheet createSheet(RecordStream rs) {
         return new InternalSheet(rs);
@@ -144,7 +150,7 @@ public final class InternalSheet {
             // Not a supported type
             // Skip onto the EOF, then complain
             while (rs.hasNext()) {
-                org.apache.poi.hssf.record.Record rec = rs.getNext();
+                Record rec = rs.getNext();
                 if (rec instanceof EOFRecord) {
                     break;
                 }
@@ -229,7 +235,7 @@ public final class InternalSheet {
                 continue;
             }
 
-            org.apache.poi.hssf.record.Record rec = rs.getNext();
+            Record rec = rs.getNext();
             if ( recSid == IndexRecord.sid ) {
                 // ignore INDEX record because it is only needed by Excel,
                 // and POI always re-calculates its contents
@@ -244,7 +250,7 @@ public final class InternalSheet {
             }
 
             if (recSid == FeatRecord.sid ||
-            		recSid == FeatHdrRecord.sid) {
+                    recSid == FeatHdrRecord.sid) {
                 records.add(rec);
                 continue;
             }
@@ -313,9 +319,7 @@ public final class InternalSheet {
                 // Not clear which application wrote these files.
                 rra = new RowRecordsAggregate();
             } else {
-                if (log.check(POILogger.WARN)) {
-                    log.log(POILogger.WARN, "DIMENSION record not found even though row/cells present");
-                }
+                LOGGER.atWarn().log("DIMENSION record not found even though row/cells present");
                 // Not sure if any tools write files like this, but Excel reads them OK
             }
             dimsloc = findFirstRecordLocBySid(WindowTwoRecord.sid);
@@ -330,11 +334,10 @@ public final class InternalSheet {
         // put merged cells table in the right place (regardless of where the first MergedCellsRecord was found */
         RecordOrderer.addNewSheetRecord(records, _mergedCellsTable);
         RecordOrderer.addNewSheetRecord(records, _protectionBlock);
-        if (log.check( POILogger.DEBUG ))
-            log.log(POILogger.DEBUG, "sheet createSheet (existing file) exited");
+        LOGGER.atDebug().log("sheet createSheet (existing file) exited");
     }
     private static void spillAggregate(RecordAggregate ra, final List<RecordBase> recs) {
-        ra.visitContainedRecords(r -> recs.add(r));
+        ra.visitContainedRecords(recs::add);
     }
 
     public static class UnsupportedBOFType extends RecordFormatException {
@@ -351,12 +354,13 @@ public final class InternalSheet {
 
     private static final class RecordCloner implements RecordVisitor {
 
-        private final List<org.apache.poi.hssf.record.Record> _destList;
+        private final List<Record> _destList;
 
-        public RecordCloner(List<org.apache.poi.hssf.record.Record> destList) {
+        public RecordCloner(List<Record> destList) {
             _destList = destList;
         }
-        public void visitRecord(org.apache.poi.hssf.record.Record r) {
+        @Override
+        public void visitRecord(Record r) {
             _destList.add(r.copy());
         }
     }
@@ -371,20 +375,19 @@ public final class InternalSheet {
      * @return the cloned sheet
      */
     public InternalSheet cloneSheet() {
-        List<org.apache.poi.hssf.record.Record> clonedRecords = new ArrayList<>(_records.size());
-        for (int i = 0; i < _records.size(); i++) {
-            RecordBase rb = _records.get(i);
+        List<Record> clonedRecords = new ArrayList<>(_records.size());
+        for (RecordBase rb : _records) {
             if (rb instanceof RecordAggregate) {
                 ((RecordAggregate) rb).visitContainedRecords(new RecordCloner(clonedRecords));
                 continue;
             }
-            if (rb instanceof EscherAggregate){
-                /**
+            if (rb instanceof EscherAggregate) {
+                /*
                  * this record will be removed after reading actual data from EscherAggregate
                  */
                 rb = new DrawingRecord();
             }
-            org.apache.poi.hssf.record.Record rec = ((org.apache.poi.hssf.record.Record) rb).copy();
+            Record rec = ((Record) rb).copy();
             clonedRecords.add(rec);
         }
         return createSheet(new RecordStream(clonedRecords, 0));
@@ -405,7 +408,7 @@ public final class InternalSheet {
         _mergedCellsTable = new MergedCellsTable();
         List<RecordBase> records = new ArrayList<>(32);
 
-        log.log(POILogger.DEBUG, "Sheet createsheet from scratch called");
+        LOGGER.atDebug().log("Sheet createsheet from scratch called");
 
         records.add(createBOF());
 
@@ -452,7 +455,7 @@ public final class InternalSheet {
         records.add(EOFRecord.instance);
 
         _records = records;
-        log.log(POILogger.DEBUG, "Sheet createsheet from scratch exit");
+        LOGGER.atDebug().log("Sheet createsheet from scratch exit");
     }
 
     public RowRecordsAggregate getRowsAggregate() {
@@ -533,24 +536,22 @@ public final class InternalSheet {
      * @param lastrow the last row index
      * @param lastcol the last column index
      *
-     * @see org.apache.poi.hssf.record.DimensionsRecord
+     * @see DimensionsRecord
      */
     public void setDimensions(int firstrow, short firstcol, int lastrow, short lastcol)
     {
-        if (log.check( POILogger.DEBUG ))
-        {
-            log.log(POILogger.DEBUG, "Sheet.setDimensions");
-            log.log(POILogger.DEBUG,
-                    (new StringBuilder("firstrow")).append(firstrow)
-                        .append("firstcol").append(firstcol).append("lastrow")
-                        .append(lastrow).append("lastcol").append(lastcol)
-                        .toString());
-        }
+        LOGGER.atDebug().log("Sheet.setDimensions");
+        LOGGER.atDebug().log(() -> new SimpleMessage(
+                "firstrow" + firstrow +
+                        "firstcol" + firstcol +
+                        "lastrow" + lastrow +
+                        "lastcol" + lastcol
+        ));
         _dimensions.setFirstCol(firstcol);
         _dimensions.setFirstRow(firstrow);
         _dimensions.setLastCol(lastcol);
         _dimensions.setLastRow(lastrow);
-        log.log(POILogger.DEBUG, "Sheet.setDimensions exiting");
+        LOGGER.atDebug().log("Sheet.setDimensions exiting");
     }
 
     public void visitContainedRecords(RecordVisitor rv, int offset) {
@@ -560,17 +561,17 @@ public final class InternalSheet {
         boolean haveSerializedIndex = false;
 
         for (int k = 0; k < _records.size(); k++) {
-            RecordBase record = _records.get(k);
+            RecordBase recordBase = _records.get(k);
 
-            if (record instanceof RecordAggregate) {
-                RecordAggregate agg = (RecordAggregate) record;
+            if (recordBase instanceof RecordAggregate) {
+                RecordAggregate agg = (RecordAggregate) recordBase;
                 agg.visitContainedRecords(ptv);
-            } else {
-                ptv.visitRecord((org.apache.poi.hssf.record.Record) record);
+            } else if (recordBase instanceof Record) {
+                ptv.visitRecord((Record) recordBase);
             }
 
             // If the BOF record was just serialized then add the IndexRecord
-            if (record instanceof BOFRecord) {
+            if (recordBase instanceof BOFRecord) {
               if (!haveSerializedIndex) {
                 haveSerializedIndex = true;
                 // Add an optional UncalcedRecord. However, we should add
@@ -628,9 +629,7 @@ public final class InternalSheet {
      */
     public void addValueRecord(int row, CellValueRecordInterface col) {
 
-        if(log.check(POILogger.DEBUG)) {
-          log.log(POILogger.DEBUG, "add value record  row" + row);
-        }
+        LOGGER.atDebug().log("add value record row{}", box(row));
         DimensionsRecord d = _dimensions;
 
         if (col.getColumn() >= d.getLastCol()) {
@@ -649,11 +648,11 @@ public final class InternalSheet {
      *
      * @param row - the row of the value record you wish to remove
      * @param col - a record supporting the CellValueRecordInterface.
-     * @see org.apache.poi.hssf.record.CellValueRecordInterface
+     * @see CellValueRecordInterface
      */
     public void removeValueRecord(int row, CellValueRecordInterface col) {
 
-        log.log(POILogger.DEBUG, "remove value record row "+row);
+        LOGGER.atDebug().log("remove value record row {}", box(row));
         _rowsAggregate.removeCell(col);
     }
 
@@ -669,8 +668,7 @@ public final class InternalSheet {
 
     public void replaceValueRecord(CellValueRecordInterface newval) {
 
-        if (log.check( POILogger.DEBUG ))
-            log.log(POILogger.DEBUG, "replaceValueRecord ");
+        LOGGER.atDebug().log("replaceValueRecord ");
         //The ValueRecordsAggregate use a tree map underneath.
         //The tree Map uses the CellValueRecordInterface as both the
         //key and the value, if we dont do a remove, then
@@ -693,8 +691,7 @@ public final class InternalSheet {
      */
 
     public void addRow(RowRecord row) {
-        if (log.check( POILogger.DEBUG ))
-            log.log(POILogger.DEBUG, "addRow ");
+        LOGGER.atDebug().log("addRow ");
         DimensionsRecord d = _dimensions;
 
         if (row.getRowNumber() >= d.getLastRow()) {
@@ -712,8 +709,7 @@ public final class InternalSheet {
 
         _rowsAggregate.insertRow(row);
 
-        if (log.check( POILogger.DEBUG ))
-            log.log(POILogger.DEBUG, "exit addRow");
+        LOGGER.atDebug().log("exit addRow");
     }
 
     /**
@@ -741,7 +737,7 @@ public final class InternalSheet {
      * @return Iterator of CellValueRecordInterface representing the value records
      */
     public Iterator<CellValueRecordInterface> getCellValueIterator(){
-    	return _rowsAggregate.getCellValueIterator();
+        return _rowsAggregate.getCellValueIterator();
     }
 
     /**
@@ -1002,8 +998,8 @@ public final class InternalSheet {
     /**
      * get the width of a given column in units of 1/256th of a character width
      * @param columnIndex index
-     * @see org.apache.poi.hssf.record.DefaultColWidthRecord
-     * @see org.apache.poi.hssf.record.ColumnInfoRecord
+     * @see DefaultColWidthRecord
+     * @see ColumnInfoRecord
      * @see #setColumnWidth(int, int)
      * @return column width in units of 1/256th of a character width
      */
@@ -1051,14 +1047,14 @@ public final class InternalSheet {
     public void setColumnWidth(int column, int width) {
         if(width > 255*256) throw new IllegalArgumentException("The maximum column width for an individual cell is 255 characters.");
 
-        setColumn(column, null, Integer.valueOf(width), null, null, null);
+        setColumn(column, null, width, null, null, null);
     }
 
     /**
      * Get the hidden property for a given column.
      * @param columnIndex column index
-     * @see org.apache.poi.hssf.record.DefaultColWidthRecord
-     * @see org.apache.poi.hssf.record.ColumnInfoRecord
+     * @see DefaultColWidthRecord
+     * @see ColumnInfoRecord
      * @see #setColumnHidden(int, boolean)
      * @return whether the column is hidden or not.
      */
@@ -1071,15 +1067,16 @@ public final class InternalSheet {
     }
 
     /**
-     * Get the hidden property for a given column.
+     * Set the hidden property for a given column.
      * @param column - the column number
      * @param hidden - whether the column is hidden or not
      */
     public void setColumnHidden(int column, boolean hidden) {
-        setColumn( column, null, null, null, Boolean.valueOf(hidden), null);
+        setColumn( column, null, null, null, hidden, null);
     }
+
     public void setDefaultColumnStyle(int column, int styleIndex) {
-        setColumn(column, Short.valueOf((short)styleIndex), null, null, null, null);
+        setColumn(column, (short) styleIndex, null, null, null, null);
     }
 
     private void setColumn(int column, Short xfStyle, Integer width, Integer level, Boolean hidden, Boolean collapsed) {
@@ -1180,7 +1177,7 @@ public final class InternalSheet {
     /**
      * Returns the active row
      *
-     * @see org.apache.poi.hssf.record.SelectionRecord
+     * @see SelectionRecord
      * @return row the active row index
      */
     public int getActiveCellRow() {
@@ -1194,7 +1191,7 @@ public final class InternalSheet {
      * Sets the active row
      *
      * @param row the row index
-     * @see org.apache.poi.hssf.record.SelectionRecord
+     * @see SelectionRecord
      */
     public void setActiveCellRow(int row) {
         //shouldn't have a sheet w/o a SelectionRecord, but best to guard anyway
@@ -1204,7 +1201,7 @@ public final class InternalSheet {
     }
 
     /**
-     * @see org.apache.poi.hssf.record.SelectionRecord
+     * @see SelectionRecord
      * @return column of the active cell
      */
     public short getActiveCellCol() {
@@ -1218,7 +1215,7 @@ public final class InternalSheet {
      * Sets the active column
      *
      * @param col the column index
-     * @see org.apache.poi.hssf.record.SelectionRecord
+     * @see SelectionRecord
      */
     public void setActiveCellCol(short col) {
         //shouldn't have a sheet w/o a SelectionRecord, but best to guard anyway
@@ -1249,12 +1246,12 @@ public final class InternalSheet {
      *
      * @return the matching record or {@code null} if it wasn't found
      */
-    public org.apache.poi.hssf.record.Record findFirstRecordBySid(short sid) {
+    public Record findFirstRecordBySid(short sid) {
         int ix = findFirstRecordLocBySid(sid);
         if (ix < 0) {
             return null;
         }
-        return (org.apache.poi.hssf.record.Record) _records.get(ix);
+        return (Record) _records.get(ix);
     }
 
     /**
@@ -1285,10 +1282,10 @@ public final class InternalSheet {
         int max = _records.size();
         for (int i=0; i< max; i++) {
             Object rb = _records.get(i);
-            if (!(rb instanceof org.apache.poi.hssf.record.Record)) {
+            if (!(rb instanceof Record)) {
                 continue;
             }
-            org.apache.poi.hssf.record.Record record = (org.apache.poi.hssf.record.Record) rb;
+            Record record = (Record) rb;
             if (record.getSid() == sid) {
                 return i;
             }
@@ -1349,7 +1346,7 @@ public final class InternalSheet {
      *
      * <p>If both colSplit and rowSplit are zero then the existing freeze pane is removed</p>
      *
-     * @param colSplit      Horizonatal position of split.
+     * @param colSplit      Horizontal position of split.
      * @param rowSplit      Vertical position of split.
      * @param topRow        Top row visible in bottom pane
      * @param leftmostColumn   Left column visible in right pane.
@@ -1398,7 +1395,7 @@ public final class InternalSheet {
 
     /**
      * Creates a split pane. Any existing freezepane or split pane is overwritten.
-     * @param xSplitPos      Horizonatal position of split (in 1/20th of a point).
+     * @param xSplitPos      Horizontal position of split (in 1/20th of a point).
      * @param ySplitPos      Vertical position of split (in 1/20th of a point).
      * @param topRow        Top row visible in bottom pane
      * @param leftmostColumn   Left column visible in right pane.

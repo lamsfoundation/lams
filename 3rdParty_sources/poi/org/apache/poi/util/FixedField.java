@@ -15,7 +15,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-        
+
 
 package org.apache.poi.util;
 
@@ -25,8 +25,6 @@ import java.io.*;
 
 /**
  * behavior of a field at a fixed location within a byte array
- *
- * @author Marc Johnson (mjohnson at apache dot org
  */
 
 public interface FixedField
@@ -37,7 +35,7 @@ public interface FixedField
      *
      * @param data the byte array from which the value is to be read
      *
-     * @exception ArrayIndexOutOfBoundsException if the offset is out
+     * @throws ArrayIndexOutOfBoundsException if the offset is out
      *            of the array's valid index range
      */
 
@@ -50,9 +48,9 @@ public interface FixedField
      * @param stream the InputStream from which the value is to be
      *               read
      *
-     * @exception BufferUnderrunException if there is not enough data
+     * @throws BufferUnderrunException if there is not enough data
      *            available from the InputStream
-     * @exception IOException if an IOException is thrown from reading
+     * @throws IOException if an IOException is thrown from reading
      *            the InputStream
      */
 
@@ -66,7 +64,7 @@ public interface FixedField
      * @param data the array of bytes to which the value is to be
      *             written
      *
-     * @exception ArrayIndexOutOfBoundsException if the offset is out
+     * @throws ArrayIndexOutOfBoundsException if the offset is out
      *            of the array's valid index range
      */
 

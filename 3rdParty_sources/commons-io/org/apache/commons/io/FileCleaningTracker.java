@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Keeps track of files awaiting deletion, and deletes them when an associated
@@ -39,34 +40,32 @@ import java.util.List;
  * {@link #exitWhenFinished}, typically in
  * {@code javax.servlet.ServletContextListener.contextDestroyed(javax.servlet.ServletContextEvent)} or similar.
  *
- * @version $Id: FileCleaningTracker.java 1686747 2015-06-21 18:44:49Z krosenvold $
  */
 public class FileCleaningTracker {
 
     // Note: fields are package protected to allow use by test cases
 
     /**
-     * Queue of <code>Tracker</code> instances being watched.
+     * Queue of {@code Tracker} instances being watched.
      */
-    ReferenceQueue<Object> q = new ReferenceQueue<Object>();
+    ReferenceQueue<Object> q = new ReferenceQueue<>();
     /**
-     * Collection of <code>Tracker</code> instances in existence.
+     * Collection of {@code Tracker} instances in existence.
      */
-    final Collection<Tracker> trackers = Collections.synchronizedSet(new HashSet<Tracker>()); // synchronized
+    final Collection<Tracker> trackers = Collections.synchronizedSet(new HashSet<>()); // synchronized
     /**
      * Collection of File paths that failed to delete.
      */
-    final List<String> deleteFailures = Collections.synchronizedList(new ArrayList<String>());
+    final List<String> deleteFailures = Collections.synchronizedList(new ArrayList<>());
     /**
      * Whether to terminate the thread when the tracking is complete.
      */
-    volatile boolean exitWhenFinished = false;
+    volatile boolean exitWhenFinished;
     /**
      * The thread that will clean up registered files.
      */
     Thread reaper;
 
-    //-----------------------------------------------------------------------
     /**
      * Track the specified file, using the provided marker, deleting the file
      * when the marker instance is garbage collected.
@@ -83,7 +82,7 @@ public class FileCleaningTracker {
     /**
      * Track the specified file, using the provided marker, deleting the file
      * when the marker instance is garbage collected.
-     * The speified deletion strategy is used.
+     * The specified deletion strategy is used.
      *
      * @param file  the file to be tracked, not null
      * @param marker  the marker object used to track the file, not null
@@ -91,9 +90,7 @@ public class FileCleaningTracker {
      * @throws NullPointerException if the file is null
      */
     public void track(final File file, final Object marker, final FileDeleteStrategy deleteStrategy) {
-        if (file == null) {
-            throw new NullPointerException("The file must not be null");
-        }
+        Objects.requireNonNull(file, "file");
         addTracker(file.getPath(), marker, deleteStrategy);
     }
 
@@ -113,7 +110,7 @@ public class FileCleaningTracker {
     /**
      * Track the specified file, using the provided marker, deleting the file
      * when the marker instance is garbage collected.
-     * The speified deletion strategy is used.
+     * The specified deletion strategy is used.
      *
      * @param path  the full path to the file to be tracked, not null
      * @param marker  the marker object used to track the file, not null
@@ -121,9 +118,7 @@ public class FileCleaningTracker {
      * @throws NullPointerException if the path is null
      */
     public void track(final String path, final Object marker, final FileDeleteStrategy deleteStrategy) {
-        if (path == null) {
-            throw new NullPointerException("The path must not be null");
-        }
+        Objects.requireNonNull(path, "path");
         addTracker(path, marker, deleteStrategy);
     }
 
@@ -147,7 +142,6 @@ public class FileCleaningTracker {
         trackers.add(new Tracker(path, deleteStrategy, marker, q));
     }
 
-    //-----------------------------------------------------------------------
     /**
      * Retrieve the number of files currently being tracked, and therefore
      * awaiting deletion.
@@ -176,7 +170,7 @@ public class FileCleaningTracker {
      * thread will simply exit when the JVM exits. In a more complex environment,
      * with multiple class loaders (such as an application server), you should be
      * aware that the file cleaner thread will continue running even if the class
-     * loader it was started from terminates. This can consitute a memory leak.
+     * loader it was started from terminates. This can constitute a memory leak.
      * <p>
      * For example, suppose that you have developed a web application, which
      * contains the commons-io jar file in your WEB-INF/lib directory. In other
@@ -200,7 +194,6 @@ public class FileCleaningTracker {
         }
     }
 
-    //-----------------------------------------------------------------------
     /**
      * The reaper thread.
      */
@@ -219,7 +212,7 @@ public class FileCleaningTracker {
         @Override
         public void run() {
             // thread exits when exitWhenFinished is true and there are no more tracked objects
-            while (exitWhenFinished == false || trackers.size() > 0) {
+            while (!exitWhenFinished || !trackers.isEmpty()) {
                 try {
                     // Wait for a tracker to remove.
                     final Tracker tracker = (Tracker) q.remove(); // cannot return null
@@ -235,7 +228,6 @@ public class FileCleaningTracker {
         }
     }
 
-    //-----------------------------------------------------------------------
     /**
      * Inner class which acts as the reference for a file pending deletion.
      */

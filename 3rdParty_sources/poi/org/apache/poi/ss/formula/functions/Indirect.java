@@ -17,6 +17,8 @@
 
 package org.apache.poi.ss.formula.functions;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.formula.FormulaParseException;
 import org.apache.poi.ss.formula.FormulaParser;
 import org.apache.poi.ss.formula.FormulaParsingWorkbook;
@@ -35,24 +37,24 @@ import org.apache.poi.ss.usermodel.Table;
  *
  * INDIRECT() returns the cell or area reference denoted by the text argument.<p>
  *
- * <b>Syntax</b>:</br>
+ * <b>Syntax</b>:<br>
  * <b>INDIRECT</b>(<b>ref_text</b>,isA1Style)<p>
  *
  * <b>ref_text</b> a string representation of the desired reference as it would
  * normally be written in a cell formula.<br>
  * <b>isA1Style</b> (default TRUE) specifies whether the ref_text should be
  * interpreted as A1-style or R1C1-style.
- *
- * @author Josh Micich
  */
 public final class Indirect implements FreeRefFunction {
 
+    private static final Logger LOGGER = LogManager.getLogger(Indirect.class);
     public static final FreeRefFunction instance = new Indirect();
 
     private Indirect() {
         // enforce singleton
     }
 
+    @Override
     public ValueEval evaluate(ValueEval[] args, OperationEvaluationContext ec) {
         if (args.length < 1) {
             return ErrorEval.VALUE_INVALID;
@@ -90,12 +92,12 @@ public final class Indirect implements FreeRefFunction {
         }
         // numeric quantities follow standard boolean conversion rules
         // for strings, only "TRUE" and "FALSE" (case insensitive) are valid
-        return OperandResolver.coerceValueToBoolean(ve, false).booleanValue();
+        return OperandResolver.coerceValueToBoolean(ve, false);
     }
 
     private static ValueEval evaluateIndirect(final OperationEvaluationContext ec, String text,
-            boolean isA1style) {
-        
+                                              boolean isA1style) {
+
         // Search backwards for '!' because sheet names can contain '!'
         int plingPos = text.lastIndexOf('!');
 
@@ -116,9 +118,9 @@ public final class Indirect implements FreeRefFunction {
             refText = text.substring(plingPos + 1);
         }
 
-        if (Table.isStructuredReference.matcher(refText).matches()) {
+        if (isA1style && Table.isStructuredReference.matcher(refText).matches()) {
             // The argument is structured reference
-            Area3DPxg areaPtg = null;
+            Area3DPxg areaPtg;
             try {
                 areaPtg = FormulaParser.parseStructuredReference(refText, (FormulaParsingWorkbook) ec.getWorkbook(), ec.getRowIndex());
             } catch (FormulaParseException e) {
@@ -131,20 +133,25 @@ public final class Indirect implements FreeRefFunction {
             String refStrPart2;
             int colonPos = refText.indexOf(':');
             if (colonPos < 0) {
-                 refStrPart1 = refText.trim();
-                 refStrPart2 = null;            
+                refStrPart1 = refText.trim();
+                refStrPart2 = null;
             } else {
                 refStrPart1 = refText.substring(0, colonPos).trim();
                 refStrPart2 = refText.substring(colonPos + 1).trim();
             }
-            return ec.getDynamicReference(workbookName, sheetName, refStrPart1, refStrPart2, isA1style);
+            try {
+                return ec.getDynamicReference(workbookName, sheetName, refStrPart1, refStrPart2, isA1style);
+            } catch (Exception e) {
+                LOGGER.atWarn().log("Indirect function: failed to parse reference {}", text, e);
+                return ErrorEval.REF_INVALID;
+            }
         }
     }
 
     /**
      * @return array of length 2: {workbookName, sheetName,}.  Second element will always be
      * present.  First element may be null if sheetName is unqualified.
-     * Returns <code>null</code> if text cannot be parsed.
+     * Returns {@code null} if text cannot be parsed.
      */
     private static String[] parseWorkbookAndSheetName(CharSequence text) {
         int lastIx = text.length() - 1;
@@ -188,7 +195,7 @@ public final class Indirect implements FreeRefFunction {
             // else - just sheet name
             String sheetName = unescapeString(text.subSequence(sheetStartPos, lastIx));
             if (sheetName == null) { // note - when quoted, sheetName can
-                                     // start/end with whitespace
+                // start/end with whitespace
                 return null;
             }
             return new String[] { wbName, sheetName, };
@@ -214,7 +221,7 @@ public final class Indirect implements FreeRefFunction {
     }
 
     /**
-     * @return <code>null</code> if there is a syntax error in any escape sequence
+     * @return {@code null} if there is a syntax error in any escape sequence
      * (the typical syntax error is a single quote character not followed by another).
      */
     private static String unescapeString(CharSequence text) {
@@ -248,9 +255,6 @@ public final class Indirect implements FreeRefFunction {
         if (Character.isWhitespace(text.charAt(0))) {
             return true;
         }
-        if (Character.isWhitespace(text.charAt(lastIx))) {
-            return true;
-        }
-        return false;
+        return Character.isWhitespace(text.charAt(lastIx));
     }
 }

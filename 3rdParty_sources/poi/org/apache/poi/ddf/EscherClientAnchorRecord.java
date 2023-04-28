@@ -29,13 +29,15 @@ import org.apache.poi.util.LittleEndian;
  * The escher client anchor specifies which rows and cells the shape is bound to as well as
  * the offsets within those cells.  Each cell is 1024 units wide by 256 units long regardless
  * of the actual size of the cell.  The EscherClientAnchorRecord only applies to the top-most
- * shapes.  Shapes contained in groups are bound using the EscherChildAnchorRecords.
+ * shapes. Shapes contained in groups are bound using the EscherChildAnchorRecords. Referred to as an
+ * {@code OfficeArtClientAnchor} by {@code [MS-PPT] - v20210216}.
  *
  * @see EscherChildAnchorRecord
  */
 public class EscherClientAnchorRecord extends EscherRecord {
     //arbitrarily selected; may need to increase
-    private static final int MAX_RECORD_LENGTH = 100_000;
+    private static final int DEFAULT_MAX_RECORD_LENGTH = 100_000;
+    private static int MAX_RECORD_LENGTH = DEFAULT_MAX_RECORD_LENGTH;
 
     public static final short RECORD_ID = EscherRecordTypes.CLIENT_ANCHOR.typeID;
 
@@ -58,6 +60,20 @@ public class EscherClientAnchorRecord extends EscherRecord {
     private short field_9_dy2;
     private byte[] remainingData = new byte[0];
     private boolean shortRecord;
+
+    /**
+     * @param length the max record length allowed for EscherClientAnchorRecord
+     */
+    public static void setMaxRecordLength(int length) {
+        MAX_RECORD_LENGTH = length;
+    }
+
+    /**
+     * @return the max record length allowed for EscherClientAnchorRecord
+     */
+    public static int getMaxRecordLength() {
+        return MAX_RECORD_LENGTH;
+    }
 
     public EscherClientAnchorRecord() {}
 

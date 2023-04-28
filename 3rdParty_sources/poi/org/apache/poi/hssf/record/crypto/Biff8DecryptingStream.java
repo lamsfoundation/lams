@@ -20,14 +20,13 @@ package org.apache.poi.hssf.record.crypto;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 
-import org.apache.poi.hssf.record.BOFRecord;
-import org.apache.poi.hssf.record.BiffHeaderInput;
-import org.apache.poi.hssf.record.FilePassRecord;
-import org.apache.poi.hssf.record.InterfaceHdrRecord;
+import org.apache.poi.hssf.record.*;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.crypt.ChunkedCipherInputStream;
 import org.apache.poi.poifs.crypt.Decryptor;
 import org.apache.poi.poifs.crypt.EncryptionInfo;
 import org.apache.poi.util.IOUtils;
+import org.apache.poi.util.Internal;
 import org.apache.poi.util.LittleEndian;
 import org.apache.poi.util.LittleEndianConsts;
 import org.apache.poi.util.LittleEndianInput;
@@ -37,95 +36,94 @@ import org.apache.poi.util.SuppressForbidden;
 public final class Biff8DecryptingStream implements BiffHeaderInput, LittleEndianInput {
 
     public static final int RC4_REKEYING_INTERVAL = 1024;
-    //arbitrarily selected; may need to increase
-    private static final int MAX_RECORD_LENGTH = 100_000;
 
-    private ChunkedCipherInputStream ccis;
+
+    private final ChunkedCipherInputStream ccis;
     private final byte[] buffer = new byte[LittleEndianConsts.LONG_SIZE];
     private boolean shouldSkipEncryptionOnCurrentRecord;
 
-	public Biff8DecryptingStream(InputStream in, int initialOffset, EncryptionInfo info) throws RecordFormatException {
+    public Biff8DecryptingStream(InputStream in, int initialOffset, EncryptionInfo info) throws RecordFormatException {
         try {
-            byte[] initialBuf = IOUtils.safelyAllocate(initialOffset, MAX_RECORD_LENGTH);
-    	    InputStream stream;
-    	    if (initialOffset == 0) {
-    	        stream = in;
-    	    } else {
-    	        stream = new PushbackInputStream(in, initialOffset);
-    	        ((PushbackInputStream)stream).unread(initialBuf);
-    	    }
+            byte[] initialBuf = IOUtils.safelyAllocate(initialOffset, HSSFWorkbook.getMaxRecordLength());
+            InputStream stream;
+            if (initialOffset == 0) {
+                stream = in;
+            } else {
+                stream = new PushbackInputStream(in, initialOffset);
+                ((PushbackInputStream)stream).unread(initialBuf);
+            }
 
             Decryptor dec = info.getDecryptor();
             dec.setChunkSize(RC4_REKEYING_INTERVAL);
             ccis = (ChunkedCipherInputStream)dec.getDataStream(stream, Integer.MAX_VALUE, 0);
-            
+
             if (initialOffset > 0) {
                 ccis.readFully(initialBuf);
             }
         } catch (Exception e) {
             throw new RecordFormatException(e);
         }
-	}
+    }
 
-	@Override
+    @Override
     @SuppressForbidden("just delegating")
     public int available() {
-		return ccis.available();
-	}
+        return ccis.available();
+    }
 
-	/**
-	 * Reads an unsigned short value without decrypting
-	 */
-	@Override
+    /**
+     * Reads an unsigned short value without decrypting
+     */
+    @Override
     public int readRecordSID() {
-	    readPlain(buffer, 0, LittleEndianConsts.SHORT_SIZE);
-		int sid = LittleEndian.getUShort(buffer, 0);
-		shouldSkipEncryptionOnCurrentRecord = isNeverEncryptedRecord(sid);
-		return sid;
-	}
+        readPlain(buffer, 0, LittleEndianConsts.SHORT_SIZE);
+        int sid = LittleEndian.getUShort(buffer, 0);
+        shouldSkipEncryptionOnCurrentRecord = isNeverEncryptedRecord(sid);
+        return sid;
+    }
 
-	/**
-	 * Reads an unsigned short value without decrypting
-	 */
-	@Override
+    /**
+     * Reads an unsigned short value without decrypting
+     */
+    @Override
     public int readDataSize() {
         readPlain(buffer, 0, LittleEndianConsts.SHORT_SIZE);
         int dataSize = LittleEndian.getUShort(buffer, 0);
         ccis.setNextRecordSize(dataSize);
-		return dataSize;
-	}
+        return dataSize;
+    }
 
-	@Override
+    @Override
     public double readDouble() {
-	    long valueLongBits = readLong();
-		double result = Double.longBitsToDouble(valueLongBits);
-		if (Double.isNaN(result)) {
-		    // (Because Excel typically doesn't write NaN
-		    throw new RuntimeException("Did not expect to read NaN");
-		}
-		return result;
-	}
+        long valueLongBits = readLong();
+        double result = Double.longBitsToDouble(valueLongBits);
+        if (Double.isNaN(result)) {
+            // (Because Excel typically doesn't write NaN
+            throw new RuntimeException("Did not expect to read NaN");
+        }
+        return result;
+    }
 
-	@Override
+    @Override
     public void readFully(byte[] buf) {
-	    readFully(buf, 0, buf.length);
-	}
+        readFully(buf, 0, buf.length);
+    }
 
-	@Override
+    @Override
     public void readFully(byte[] buf, int off, int len) {
         if (shouldSkipEncryptionOnCurrentRecord) {
             readPlain(buf, off, buf.length);
         } else {
             ccis.readFully(buf, off, len);
         }
-	}
+    }
 
-	@Override
+    @Override
     public int readUByte() {
-	    return readByte() & 0xFF;
-	}
-	
-	@Override
+        return readByte() & 0xFF;
+    }
+
+    @Override
     public byte readByte() {
         if (shouldSkipEncryptionOnCurrentRecord) {
             readPlain(buffer, 0, LittleEndianConsts.BYTE_SIZE);
@@ -133,14 +131,14 @@ public final class Biff8DecryptingStream implements BiffHeaderInput, LittleEndia
         } else {
             return ccis.readByte();
         }
-	}
+    }
 
-	@Override
+    @Override
     public int readUShort() {
-	    return readShort() & 0xFFFF;
-	}
-	
-	@Override
+        return readShort() & 0xFFFF;
+    }
+
+    @Override
     public short readShort() {
         if (shouldSkipEncryptionOnCurrentRecord) {
             readPlain(buffer, 0, LittleEndianConsts.SHORT_SIZE);
@@ -148,9 +146,9 @@ public final class Biff8DecryptingStream implements BiffHeaderInput, LittleEndia
         } else {
             return ccis.readShort();
         }
-	}
+    }
 
-	@Override
+    @Override
     public int readInt() {
         if (shouldSkipEncryptionOnCurrentRecord) {
             readPlain(buffer, 0, LittleEndianConsts.INT_SIZE);
@@ -158,9 +156,9 @@ public final class Biff8DecryptingStream implements BiffHeaderInput, LittleEndia
         } else {
             return ccis.readInt();
         }
-	}
+    }
 
-	@Override
+    @Override
     public long readLong() {
         if (shouldSkipEncryptionOnCurrentRecord) {
             readPlain(buffer, 0, LittleEndianConsts.LONG_SIZE);
@@ -168,19 +166,19 @@ public final class Biff8DecryptingStream implements BiffHeaderInput, LittleEndia
         } else {
             return ccis.readLong();
         }
-	}
+    }
 
-	/**
-	 * @return the absolute position in the stream
-	 */
-	public long getPosition() {
-	    return ccis.getPos();
-	}
-	
+    /**
+     * @return the absolute position in the stream
+     */
+    public long getPosition() {
+        return ccis.getPos();
+    }
+
     /**
      * TODO: Additionally, the lbPlyPos (position_of_BOF) field of the BoundSheet8 record MUST NOT be encrypted.
      *
-     * @return <code>true</code> if record type specified by <tt>sid</tt> is never encrypted
+     * @return {@code true} if record type specified by {@code sid} is never encrypted
      */
     public static boolean isNeverEncryptedRecord(int sid) {
         switch (sid) {
@@ -211,4 +209,8 @@ public final class Biff8DecryptingStream implements BiffHeaderInput, LittleEndia
         ccis.readPlain(b, off, len);
     }
 
+    @Internal
+    public boolean isCurrentRecordEncrypted() {
+        return !shouldSkipEncryptionOnCurrentRecord;
+    }
 }

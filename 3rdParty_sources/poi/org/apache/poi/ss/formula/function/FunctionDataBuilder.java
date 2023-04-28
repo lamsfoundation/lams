@@ -23,68 +23,66 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Temporarily collects <tt>FunctionMetadata</tt> instances for creation of a
- * <tt>FunctionMetadataRegistry</tt>.
- *
- * @author Josh Micich
+ * Temporarily collects {@code FunctionMetadata} instances for creation of a
+ * {@code FunctionMetadataRegistry}.
  */
 final class FunctionDataBuilder {
-	private int _maxFunctionIndex;
-	private final Map<String,FunctionMetadata> _functionDataByName;
-	private final Map<Integer,FunctionMetadata> _functionDataByIndex;
-	/** stores indexes of all functions with footnotes (i.e. whose definitions might change) */
-	private final Set<Integer> _mutatingFunctionIndexes;
+    private int _maxFunctionIndex;
+    private final Map<String,FunctionMetadata> _functionDataByName;
+    private final Map<Integer,FunctionMetadata> _functionDataByIndex;
+    /** stores indexes of all functions with footnotes (i.e. whose definitions might change) */
+    private final Set<Integer> _mutatingFunctionIndexes;
 
-	public FunctionDataBuilder(int sizeEstimate) {
-		_maxFunctionIndex = -1;
-		_functionDataByName = new HashMap<>(sizeEstimate * 3 / 2);
-		_functionDataByIndex = new HashMap<>(sizeEstimate * 3 / 2);
-		_mutatingFunctionIndexes = new HashSet<>();
-	}
+    public FunctionDataBuilder(int sizeEstimate) {
+        _maxFunctionIndex = -1;
+        _functionDataByName = new HashMap<>(sizeEstimate * 3 / 2);
+        _functionDataByIndex = new HashMap<>(sizeEstimate * 3 / 2);
+        _mutatingFunctionIndexes = new HashSet<>();
+    }
 
-	public void add(int functionIndex, String functionName, int minParams, int maxParams,
-			byte returnClassCode, byte[] parameterClassCodes, boolean hasFootnote) {
-		FunctionMetadata fm = new FunctionMetadata(functionIndex, functionName, minParams, maxParams,
-				returnClassCode, parameterClassCodes);
+    public void add(int functionIndex, String functionName, int minParams, int maxParams,
+            byte returnClassCode, byte[] parameterClassCodes, boolean hasFootnote) {
+        FunctionMetadata fm = new FunctionMetadata(functionIndex, functionName, minParams, maxParams,
+                returnClassCode, parameterClassCodes);
 
-		Integer indexKey = Integer.valueOf(functionIndex);
+        Integer indexKey = functionIndex;
 
 
-		if(functionIndex > _maxFunctionIndex) {
-			_maxFunctionIndex = functionIndex;
-		}
-		// allow function definitions to change only if both previous and the new items have footnotes
-		FunctionMetadata prevFM;
-		prevFM = _functionDataByName.get(functionName);
-		if(prevFM != null) {
-			if(!hasFootnote || !_mutatingFunctionIndexes.contains(indexKey)) {
-				throw new RuntimeException("Multiple entries for function name '" + functionName + "'");
-			}
-			_functionDataByIndex.remove(Integer.valueOf(prevFM.getIndex()));
-		}
-		prevFM = _functionDataByIndex.get(indexKey);
-		if(prevFM != null) {
-			if(!hasFootnote || !_mutatingFunctionIndexes.contains(indexKey)) {
-				throw new RuntimeException("Multiple entries for function index (" + functionIndex + ")");
-			}
-			_functionDataByName.remove(prevFM.getName());
-		}
-		if(hasFootnote) {
-			_mutatingFunctionIndexes.add(indexKey);
-		}
-		_functionDataByIndex.put(indexKey, fm);
-		_functionDataByName.put(functionName, fm);
-	}
+        if(functionIndex > _maxFunctionIndex) {
+            _maxFunctionIndex = functionIndex;
+        }
+        // allow function definitions to change only if both previous and the new items have footnotes
+        FunctionMetadata prevFM;
+        prevFM = _functionDataByName.get(functionName);
+        if(prevFM != null) {
+            if(!hasFootnote || !_mutatingFunctionIndexes.contains(indexKey)) {
+                throw new RuntimeException("Multiple entries for function name '" + functionName + "'");
+            }
+            _functionDataByIndex.remove(prevFM.getIndex());
+        }
+        prevFM = _functionDataByIndex.get(indexKey);
+        if(prevFM != null) {
+            if(!hasFootnote || !_mutatingFunctionIndexes.contains(indexKey)) {
+                throw new RuntimeException("Multiple entries for function index (" + functionIndex + ")");
+            }
+            _functionDataByName.remove(prevFM.getName());
+        }
+        if(hasFootnote) {
+            _mutatingFunctionIndexes.add(indexKey);
+        }
+        _functionDataByIndex.put(indexKey, fm);
+        _functionDataByName.put(functionName, fm);
+    }
 
-	public FunctionMetadataRegistry build() {
+    public FunctionMetadataRegistry build() {
 
-		FunctionMetadata[] jumbledArray =  new FunctionMetadata[_functionDataByName.size()];
-		_functionDataByName.values().toArray(jumbledArray);
-		FunctionMetadata[] fdIndexArray = new FunctionMetadata[_maxFunctionIndex+1];
-		for (FunctionMetadata fd : jumbledArray) {
-			fdIndexArray[fd.getIndex()] = fd;
-		}
+        FunctionMetadata[] jumbledArray =  new FunctionMetadata[_functionDataByName.size()];
+        _functionDataByName.values().toArray(jumbledArray);
+        FunctionMetadata[] fdIndexArray = new FunctionMetadata[_maxFunctionIndex+1];
+        for (FunctionMetadata fd : jumbledArray) {
+            fdIndexArray[fd.getIndex()] = fd;
+        }
 
-		return new FunctionMetadataRegistry(fdIndexArray, _functionDataByName);
-	}
+        return new FunctionMetadataRegistry(fdIndexArray, _functionDataByName);
+    }
 }

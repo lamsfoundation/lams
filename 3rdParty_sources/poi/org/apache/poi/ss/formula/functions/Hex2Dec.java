@@ -21,7 +21,7 @@ import org.apache.poi.ss.formula.OperationEvaluationContext;
 import org.apache.poi.ss.formula.eval.*;
 
 /**
- * Implementation for Excel HEX2DEC() function.<p>
+ * Implementation for Excel HEX2DEC() function.
  * <p>
  * <b>Syntax</b>:<br> <b>HEX2DEC  </b>(<b>number</b>)<br>
  * <p>
@@ -32,8 +32,6 @@ import org.apache.poi.ss.formula.eval.*;
  * The remaining 39 bits are magnitude bits. Negative numbers are represented using two's-complement notation.
  * Remark
  * If number is not a valid hexadecimal number, HEX2DEC returns the #NUM! error value.
- *
- * @author cedric dot walter @ gmail dot com
  */
 public class Hex2Dec extends Fixed1ArgFunction implements FreeRefFunction {
 
@@ -42,6 +40,7 @@ public class Hex2Dec extends Fixed1ArgFunction implements FreeRefFunction {
     static final int HEXADECIMAL_BASE = 16;
     static final int MAX_NUMBER_OF_PLACES = 10;
 
+    @Override
     public ValueEval evaluate(int srcRowIndex, int srcColumnIndex, ValueEval numberVE) {
         final String hex;
         if (numberVE instanceof RefEval) {
@@ -57,6 +56,7 @@ public class Hex2Dec extends Fixed1ArgFunction implements FreeRefFunction {
         }
     }
 
+    @Override
     public ValueEval evaluate(ValueEval[] args, OperationEvaluationContext ec) {
         if (args.length != 1) {
             return ErrorEval.VALUE_INVALID;

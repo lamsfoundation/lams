@@ -21,14 +21,14 @@ package org.apache.poi.ss.formula.ptg;
  * Unary Plus operator - does not have any effect on the operand
  */
 public final class UnaryMinusPtg extends ValueOperatorPtg {
-    public final static byte sid  = 0x13;
+    public static final byte sid  = 0x13;
 
-    private final static String MINUS = "-";
+    private static final String MINUS = "-";
 
     public static final UnaryMinusPtg instance = new UnaryMinusPtg();
 
     private UnaryMinusPtg() {
-    	// enforce singleton
+        // enforce singleton
     }
 
     @Override

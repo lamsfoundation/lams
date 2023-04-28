@@ -22,9 +22,10 @@ import org.apache.poi.ss.formula.eval.NumberEval;
 import org.apache.poi.ss.formula.eval.OperandResolver;
 import org.apache.poi.ss.formula.eval.RefEval;
 import org.apache.poi.ss.formula.eval.ValueEval;
+import org.apache.poi.util.StringUtil;
 
 /**
- * Implementation for Excel Bin2Dec() function.<p>
+ * Implementation for Excel Bin2Dec() function.
  * <p>
  * <b>Syntax</b>:<br> <b>Bin2Dec  </b>(<b>number</b>)<br>
  * <p>
@@ -37,13 +38,12 @@ import org.apache.poi.ss.formula.eval.ValueEval;
  * Remark
  * If number is not a valid binary number, or if number contains more than 10 characters (10 bits),
  * BIN2DEC returns the #NUM! error value.
- *
- * @author cedric dot walter @ gmail dot com
  */
 public class Bin2Dec extends Fixed1ArgFunction implements FreeRefFunction {
 
     public static final FreeRefFunction instance = new Bin2Dec();
 
+    @Override
     public ValueEval evaluate(int srcRowIndex, int srcColumnIndex, ValueEval numberVE) {
         final String number;
         if (numberVE instanceof RefEval) {
@@ -80,10 +80,10 @@ public class Bin2Dec extends Fixed1ArgFunction implements FreeRefFunction {
                 String inverted = toggleBits(unsigned);
                 // Calculate decimal number
                 int sum = getDecimalValue(inverted);
-    
+
                 //Add 1 to obtained number
                 sum++;
-    
+
                 value = "-" + sum;
             }
         } catch (NumberFormatException e) {
@@ -110,11 +110,15 @@ public class Bin2Dec extends Fixed1ArgFunction implements FreeRefFunction {
     private static String toggleBits(String s) {
         long i = Long.parseLong(s, 2);
         long i2 = i ^ ((1L << s.length()) - 1);
-        String s2 = Long.toBinaryString(i2);
-        while (s2.length() < s.length()) s2 = '0' + s2;
-        return s2;
+        StringBuilder s2 = new StringBuilder(Long.toBinaryString(i2));
+        int need0count = s.length() - s2.length();
+        if (need0count > 0) {
+            s2.insert(0, StringUtil.repeat('0', need0count));
+        }
+        return s2.toString();
     }
 
+    @Override
     public ValueEval evaluate(ValueEval[] args, OperationEvaluationContext ec) {
         if (args.length != 1) {
             return ErrorEval.VALUE_INVALID;

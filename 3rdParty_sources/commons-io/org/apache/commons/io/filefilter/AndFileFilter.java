@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,9 +18,13 @@ package org.apache.commons.io.filefilter;
 
 import java.io.File;
 import java.io.Serializable;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A {@link java.io.FileFilter} providing conditional AND logic across a list of
@@ -30,8 +34,6 @@ import java.util.List;
  * {@code false}.
  *
  * @since 1.0
- * @version $Id: AndFileFilter.java 1642757 2014-12-01 21:09:30Z sebb $
- *
  * @see FileFilterUtils#and(IOFileFilter...)
  */
 public class AndFileFilter
@@ -44,72 +46,65 @@ public class AndFileFilter
     private final List<IOFileFilter> fileFilters;
 
     /**
-     * Constructs a new instance of <code>AndFileFilter</code>.
+     * Constructs a new empty instance.
      *
      * @since 1.1
      */
     public AndFileFilter() {
-        this.fileFilters = new ArrayList<IOFileFilter>();
+        this(0);
     }
 
     /**
-     * Constructs a new instance of <code>AndFileFilter</code>
-     * with the specified list of filters.
+     * Constructs a new instance with the given initial list.
      *
-     * @param fileFilters  a List of IOFileFilter instances, copied, null ignored
-     * @since 1.1
+     * @param initialList the initial list.
      */
-    public AndFileFilter(final List<IOFileFilter> fileFilters) {
-        if (fileFilters == null) {
-            this.fileFilters = new ArrayList<IOFileFilter>();
-        } else {
-            this.fileFilters = new ArrayList<IOFileFilter>(fileFilters);
-        }
+    private AndFileFilter(final ArrayList<IOFileFilter> initialList) {
+        this.fileFilters = Objects.requireNonNull(initialList, "initialList");
     }
 
     /**
-     * Constructs a new file filter that ANDs the result of two other filters.
+     * Constructs a new instance with the given initial capacity.
      *
-     * @param filter1  the first filter, must not be null
-     * @param filter2  the second filter, must not be null
+     * @param initialCapacity the initial capacity.
+     */
+    private AndFileFilter(final int initialCapacity) {
+        this(new ArrayList<>(initialCapacity));
+    }
+
+    /**
+     * Constructs a new file filter that ANDs the result of other filters.
+     *
+     * @param filter1  the first filter, must second be null
+     * @param filter2  the first filter, must not be null
      * @throws IllegalArgumentException if either filter is null
      */
     public AndFileFilter(final IOFileFilter filter1, final IOFileFilter filter2) {
-        if (filter1 == null || filter2 == null) {
-            throw new IllegalArgumentException("The filters must not be null");
-        }
-        this.fileFilters = new ArrayList<IOFileFilter>(2);
+        this(2);
         addFileFilter(filter1);
         addFileFilter(filter2);
     }
 
     /**
-     * {@inheritDoc}
+     * Constructs a new instance for the give filters.
+     * @param fileFilters filters to OR.
+     *
+     * @since 2.9.0
      */
-    public void addFileFilter(final IOFileFilter ioFileFilter) {
-        this.fileFilters.add(ioFileFilter);
+    public AndFileFilter(final IOFileFilter... fileFilters) {
+        this(Objects.requireNonNull(fileFilters, "fileFilters").length);
+        addFileFilter(fileFilters);
     }
 
     /**
-     * {@inheritDoc}
+     * Constructs a new instance of {@code AndFileFilter}
+     * with the specified list of filters.
+     *
+     * @param fileFilters  a List of IOFileFilter instances, copied.
+     * @since 1.1
      */
-    public List<IOFileFilter> getFileFilters() {
-        return Collections.unmodifiableList(this.fileFilters);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean removeFileFilter(final IOFileFilter ioFileFilter) {
-        return this.fileFilters.remove(ioFileFilter);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setFileFilters(final List<IOFileFilter> fileFilters) {
-        this.fileFilters.clear();
-        this.fileFilters.addAll(fileFilters);
+    public AndFileFilter(final List<IOFileFilter> fileFilters) {
+        this(new ArrayList<>(Objects.requireNonNull(fileFilters, "fileFilters")));
     }
 
     /**
@@ -117,7 +112,7 @@ public class AndFileFilter
      */
     @Override
     public boolean accept(final File file) {
-        if (this.fileFilters.isEmpty()) {
+        if (isEmpty()) {
             return false;
         }
         for (final IOFileFilter fileFilter : fileFilters) {
@@ -133,7 +128,7 @@ public class AndFileFilter
      */
     @Override
     public boolean accept(final File file, final String name) {
-        if (this.fileFilters.isEmpty()) {
+        if (isEmpty()) {
             return false;
         }
         for (final IOFileFilter fileFilter : fileFilters) {
@@ -145,23 +140,86 @@ public class AndFileFilter
     }
 
     /**
-     * Provide a String representaion of this file filter.
+     * {@inheritDoc}
+     * @since 2.9.0
+     */
+    @Override
+    public FileVisitResult accept(final Path file, final BasicFileAttributes attributes) {
+        if (isEmpty()) {
+            return FileVisitResult.TERMINATE;
+        }
+        for (final IOFileFilter fileFilter : fileFilters) {
+            if (fileFilter.accept(file, attributes) != FileVisitResult.CONTINUE) {
+                return FileVisitResult.TERMINATE;
+            }
+        }
+        return FileVisitResult.CONTINUE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addFileFilter(final IOFileFilter fileFilter) {
+        this.fileFilters.add(Objects.requireNonNull(fileFilter, "fileFilter"));
+    }
+
+    /**
+     * Adds the given file filters.
      *
-     * @return a String representaion
+     * @param fileFilters the filters to add.
+     * @since 2.9.0
+     */
+    public void addFileFilter(final IOFileFilter... fileFilters) {
+        for (final IOFileFilter fileFilter : Objects.requireNonNull(fileFilters, "fileFilters")) {
+            addFileFilter(fileFilter);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<IOFileFilter> getFileFilters() {
+        return Collections.unmodifiableList(this.fileFilters);
+    }
+
+    private boolean isEmpty() {
+        return this.fileFilters.isEmpty();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean removeFileFilter(final IOFileFilter ioFileFilter) {
+        return this.fileFilters.remove(ioFileFilter);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setFileFilters(final List<IOFileFilter> fileFilters) {
+        this.fileFilters.clear();
+        this.fileFilters.addAll(fileFilters);
+    }
+
+    /**
+     * Provide a String representation of this file filter.
+     *
+     * @return a String representation
      */
     @Override
     public String toString() {
         final StringBuilder buffer = new StringBuilder();
         buffer.append(super.toString());
         buffer.append("(");
-        if (fileFilters != null) {
-            for (int i = 0; i < fileFilters.size(); i++) {
-                if (i > 0) {
-                    buffer.append(",");
-                }
-                final Object filter = fileFilters.get(i);
-                buffer.append(filter == null ? "null" : filter.toString());
+        for (int i = 0; i < fileFilters.size(); i++) {
+            if (i > 0) {
+                buffer.append(",");
             }
+            buffer.append(fileFilters.get(i));
         }
         buffer.append(")");
         return buffer.toString();

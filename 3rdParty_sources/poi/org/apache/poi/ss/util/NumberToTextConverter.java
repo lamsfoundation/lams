@@ -20,18 +20,19 @@ package org.apache.poi.ss.util;
 
 /**
  * Excel converts numbers to text with different rules to those of java, so
- *  <code>Double.toString(value)</tt> won't do.
+ *  {@code Double.toString(value)} won't do.
  * <ul>
  * <li>No more than 15 significant figures are output (java does 18).</li>
  * <li>The sign char for the exponent is included even if positive</li>
- * <li>Special values (<tt>NaN</tt> and <tt>Infinity</tt>) get rendered like the ordinary
+ * <li>Special values ({@code NaN} and {@code Infinity}) get rendered like the ordinary
  * number that the bit pattern represents.</li>
  * <li>Denormalised values (between &plusmn;2<sup>-1074</sup> and &plusmn;2<sup>-1022</sup>
- *  are displayed as "0"</sup>
+ *  are displayed as "0"</li>
  * </ul>
  * IEEE 64-bit Double Rendering Comparison
  *
- * <table border="1" cellpadding="2" cellspacing="0" summary="IEEE 64-bit Double Rendering Comparison">
+ * <table>
+ * <caption>IEEE 64-bit Double Rendering Comparison</caption>
  * <tr><th>Raw bits</th><th>Java</th><th>Excel</th></tr>
  *
  * <tr><td>0x0000000000000000L</td><td>0.0</td><td>0</td></tr>
@@ -106,154 +107,152 @@ package org.apache.poi.ss.util;
  * Excel's text to number conversion is not a true <i>inverse</i> of this operation.  The
  * allowable ranges are different.  Some numbers that don't correctly convert to text actually
  * <b>do</b> get handled properly when used in arithmetic evaluations.
- *
- * @author Josh Micich
  */
 public final class NumberToTextConverter {
 
-	private static final long EXCEL_NAN_BITS = 0xFFFF0420003C0000L;
-	private static final int MAX_TEXT_LEN = 20;
+    private static final long EXCEL_NAN_BITS = 0xFFFF0420003C0000L;
+    private static final int MAX_TEXT_LEN = 20;
 
-	private NumberToTextConverter() {
-		// no instances of this class
-	}
+    private NumberToTextConverter() {
+        // no instances of this class
+    }
 
-	/**
-	 * Converts the supplied <tt>value</tt> to the text representation that Excel would give if
-	 * the value were to appear in an unformatted cell, or as a literal number in a formula.<br>
-	 * Note - the results from this method differ slightly from those of <tt>Double.toString()</tt>
-	 * In some special cases Excel behaves quite differently.  This function attempts to reproduce
-	 * those results.
-	 */
-	public static String toText(double value) {
-		return rawDoubleBitsToText(Double.doubleToLongBits(value));
-	}
-	/* package */ static String rawDoubleBitsToText(long pRawBits) {
+    /**
+     * Converts the supplied {@code value} to the text representation that Excel would give if
+     * the value were to appear in an unformatted cell, or as a literal number in a formula.<br>
+     * Note - the results from this method differ slightly from those of {@code Double.toString()}
+     * In some special cases Excel behaves quite differently.  This function attempts to reproduce
+     * those results.
+     */
+    public static String toText(double value) {
+        return rawDoubleBitsToText(Double.doubleToLongBits(value));
+    }
+    /* package */ static String rawDoubleBitsToText(long pRawBits) {
 
-		long rawBits = pRawBits;
-		boolean isNegative = rawBits < 0; // sign bit is in the same place for long and double
-		if (isNegative) {
-			rawBits &= 0x7FFFFFFFFFFFFFFFL;
-		}
-		if (rawBits == 0) {
-			return isNegative ? "-0" : "0";
-		}
-		ExpandedDouble ed = new ExpandedDouble(rawBits);
-		if (ed.getBinaryExponent() < -1022) {
-			// value is 'denormalised' which means it is less than 2^-1022
-			// excel displays all these numbers as zero, even though calculations work OK
-			return isNegative ? "-0" : "0";
-		}
-		if (ed.getBinaryExponent() == 1024) {
-			// Special number NaN /Infinity
-			// Normally one would not create HybridDecimal objects from these values
-			// except in these cases Excel really tries to render them as if they were normal numbers
-			if(rawBits == EXCEL_NAN_BITS) {
-				return "3.484840871308E+308";
-			}
-			// This is where excel really gets it wrong
-			// Special numbers like Infinity and NaN are interpreted according to
-			// the standard rules below.
-			isNegative = false; // except that the sign bit is ignored
-		}
-		NormalisedDecimal nd = ed.normaliseBaseTen();
-		StringBuilder sb = new StringBuilder(MAX_TEXT_LEN+1);
-		if (isNegative) {
-			sb.append('-');
-		}
-		convertToText(sb, nd);
-		return sb.toString();
-	}
-	private static void convertToText(StringBuilder sb, NormalisedDecimal pnd) {
-		NormalisedDecimal rnd = pnd.roundUnits();
-		int decExponent = rnd.getDecimalExponent();
-		String decimalDigits;
-		if (Math.abs(decExponent)>98) {
-			decimalDigits = rnd.getSignificantDecimalDigitsLastDigitRounded();
-			if (decimalDigits.length() == 16) {
-				// rounding caused carry
-				decExponent++;
-			}
-		} else {
-			decimalDigits = rnd.getSignificantDecimalDigits();
-		}
-		int countSigDigits = countSignifantDigits(decimalDigits);
-		if (decExponent < 0) {
-			formatLessThanOne(sb, decimalDigits, decExponent, countSigDigits);
-		} else {
-			formatGreaterThanOne(sb, decimalDigits, decExponent, countSigDigits);
-		}
-	}
+        long rawBits = pRawBits;
+        boolean isNegative = rawBits < 0; // sign bit is in the same place for long and double
+        if (isNegative) {
+            rawBits &= 0x7FFFFFFFFFFFFFFFL;
+        }
+        if (rawBits == 0) {
+            return isNegative ? "-0" : "0";
+        }
+        ExpandedDouble ed = new ExpandedDouble(rawBits);
+        if (ed.getBinaryExponent() < -1022) {
+            // value is 'denormalised' which means it is less than 2^-1022
+            // excel displays all these numbers as zero, even though calculations work OK
+            return isNegative ? "-0" : "0";
+        }
+        if (ed.getBinaryExponent() == 1024) {
+            // Special number NaN /Infinity
+            // Normally one would not create HybridDecimal objects from these values
+            // except in these cases Excel really tries to render them as if they were normal numbers
+            if(rawBits == EXCEL_NAN_BITS) {
+                return "3.484840871308E+308";
+            }
+            // This is where excel really gets it wrong
+            // Special numbers like Infinity and NaN are interpreted according to
+            // the standard rules below.
+            isNegative = false; // except that the sign bit is ignored
+        }
+        NormalisedDecimal nd = ed.normaliseBaseTen();
+        StringBuilder sb = new StringBuilder(MAX_TEXT_LEN+1);
+        if (isNegative) {
+            sb.append('-');
+        }
+        convertToText(sb, nd);
+        return sb.toString();
+    }
+    private static void convertToText(StringBuilder sb, NormalisedDecimal pnd) {
+        NormalisedDecimal rnd = pnd.roundUnits();
+        int decExponent = rnd.getDecimalExponent();
+        String decimalDigits;
+        if (Math.abs(decExponent)>98) {
+            decimalDigits = rnd.getSignificantDecimalDigitsLastDigitRounded();
+            if (decimalDigits.length() == 16) {
+                // rounding caused carry
+                decExponent++;
+            }
+        } else {
+            decimalDigits = rnd.getSignificantDecimalDigits();
+        }
+        int countSigDigits = countSignifantDigits(decimalDigits);
+        if (decExponent < 0) {
+            formatLessThanOne(sb, decimalDigits, decExponent, countSigDigits);
+        } else {
+            formatGreaterThanOne(sb, decimalDigits, decExponent, countSigDigits);
+        }
+    }
 
-	private static void formatLessThanOne(StringBuilder sb, String decimalDigits, int decExponent,
-			int countSigDigits) {
-		int nLeadingZeros = -decExponent - 1;
-		int normalLength = 2 + nLeadingZeros + countSigDigits; // 2 == "0.".length()
+    private static void formatLessThanOne(StringBuilder sb, String decimalDigits, int decExponent,
+            int countSigDigits) {
+        int nLeadingZeros = -decExponent - 1;
+        int normalLength = 2 + nLeadingZeros + countSigDigits; // 2 == "0.".length()
 
-		if (needsScientificNotation(normalLength)) {
-			sb.append(decimalDigits.charAt(0));
-			if (countSigDigits > 1) {
-    			sb.append('.');
-    			sb.append(decimalDigits.subSequence(1, countSigDigits));
-			}
-			sb.append("E-");
-			appendExp(sb, -decExponent);
-			return;
-		}
-		sb.append("0.");
-		for (int i=nLeadingZeros; i>0; i--) {
-			sb.append('0');
-		}
-		sb.append(decimalDigits.subSequence(0, countSigDigits));
-	}
+        if (needsScientificNotation(normalLength)) {
+            sb.append(decimalDigits.charAt(0));
+            if (countSigDigits > 1) {
+                sb.append('.');
+                sb.append(decimalDigits.subSequence(1, countSigDigits));
+            }
+            sb.append("E-");
+            appendExp(sb, -decExponent);
+            return;
+        }
+        sb.append("0.");
+        for (int i=nLeadingZeros; i>0; i--) {
+            sb.append('0');
+        }
+        sb.append(decimalDigits.subSequence(0, countSigDigits));
+    }
 
-	private static void formatGreaterThanOne(StringBuilder sb, String decimalDigits, int decExponent, int countSigDigits) {
+    private static void formatGreaterThanOne(StringBuilder sb, String decimalDigits, int decExponent, int countSigDigits) {
 
-		if (decExponent > 19) {
-			// scientific notation
-			sb.append(decimalDigits.charAt(0));
-			if (countSigDigits>1) {
-				sb.append('.');
-				sb.append(decimalDigits.subSequence(1, countSigDigits));
-			}
-			sb.append("E+");
-			appendExp(sb, decExponent);
-			return;
-		}
-		int nFractionalDigits = countSigDigits - decExponent - 1;
-		if (nFractionalDigits > 0) {
-			sb.append(decimalDigits.subSequence(0, decExponent+1));
-			sb.append('.');
-			sb.append(decimalDigits.subSequence(decExponent+1, countSigDigits));
-			return;
-		}
-		sb.append(decimalDigits.subSequence(0, countSigDigits));
-		for (int i=-nFractionalDigits; i>0; i--) {
-			sb.append('0');
-		}
-	}
+        if (decExponent > 19) {
+            // scientific notation
+            sb.append(decimalDigits.charAt(0));
+            if (countSigDigits>1) {
+                sb.append('.');
+                sb.append(decimalDigits.subSequence(1, countSigDigits));
+            }
+            sb.append("E+");
+            appendExp(sb, decExponent);
+            return;
+        }
+        int nFractionalDigits = countSigDigits - decExponent - 1;
+        if (nFractionalDigits > 0) {
+            sb.append(decimalDigits.subSequence(0, decExponent+1));
+            sb.append('.');
+            sb.append(decimalDigits.subSequence(decExponent+1, countSigDigits));
+            return;
+        }
+        sb.append(decimalDigits.subSequence(0, countSigDigits));
+        for (int i=-nFractionalDigits; i>0; i--) {
+            sb.append('0');
+        }
+    }
 
-	private static boolean needsScientificNotation(int nDigits) {
-		return nDigits > MAX_TEXT_LEN;
-	}
+    private static boolean needsScientificNotation(int nDigits) {
+        return nDigits > MAX_TEXT_LEN;
+    }
 
-	private static int countSignifantDigits(String sb) {
-		int result=sb.length()-1;
-		while(sb.charAt(result) == '0') {
-			result--;
-			if(result < 0) {
-				throw new RuntimeException("No non-zero digits found");
-			}
-		}
-		return result + 1;
-	}
+    private static int countSignifantDigits(String sb) {
+        int result=sb.length()-1;
+        while(sb.charAt(result) == '0') {
+            result--;
+            if(result < 0) {
+                throw new RuntimeException("No non-zero digits found");
+            }
+        }
+        return result + 1;
+    }
 
-	private static void appendExp(StringBuilder sb, int val) {
-		if(val < 10) {
-			sb.append('0');
-			sb.append((char)('0' + val));
-			return;
-		}
-		sb.append(val);
-	}
+    private static void appendExp(StringBuilder sb, int val) {
+        if(val < 10) {
+            sb.append('0');
+            sb.append((char)('0' + val));
+            return;
+        }
+        sb.append(val);
+    }
 }

@@ -19,12 +19,10 @@ package org.apache.commons.io.output;
 import java.io.Writer;
 
 /**
- * This {@link Writer} writes all data to the famous <b>/dev/null</b>.
+ * Writes all data to the famous <b>/dev/null</b>.
  * <p>
- * This <code>Writer</code> has no destination (file/socket etc.) and all
- * characters written to it are ignored and lost.
- *
- * @version $Id: NullWriter.java 1471767 2013-04-24 23:24:19Z sebb $
+ * This {@code Writer} has no destination (file/socket etc.) and all characters written to it are ignored and lost.
+ * </p>
  */
 public class NullWriter extends Writer {
 
@@ -40,7 +38,7 @@ public class NullWriter extends Writer {
     }
 
     /**
-     * Does nothing - output to <code>/dev/null</code>.
+     * Does nothing - output to {@code /dev/null}.
      * @param c The character to write
      * @return this writer
      * @since 2.0
@@ -52,7 +50,7 @@ public class NullWriter extends Writer {
     }
 
     /**
-     * Does nothing - output to <code>/dev/null</code>.
+     * Does nothing - output to {@code /dev/null}.
      * @param csq The character sequence to write
      * @param start The index of the first character to write
      * @param end  The index of the first character to write (exclusive)
@@ -66,7 +64,7 @@ public class NullWriter extends Writer {
     }
 
     /**
-     * Does nothing - output to <code>/dev/null</code>.
+     * Does nothing - output to {@code /dev/null}.
      * @param csq The character sequence to write
      * @return this writer
      * @since 2.0
@@ -78,7 +76,7 @@ public class NullWriter extends Writer {
     }
 
     /**
-     * Does nothing - output to <code>/dev/null</code>.
+     * Does nothing - output to {@code /dev/null}.
      * @param idx The character to write
      */
     @Override
@@ -87,7 +85,7 @@ public class NullWriter extends Writer {
     }
 
     /**
-     * Does nothing - output to <code>/dev/null</code>.
+     * Does nothing - output to {@code /dev/null}.
      * @param chr The characters to write
      */
     @Override
@@ -96,7 +94,7 @@ public class NullWriter extends Writer {
     }
 
     /**
-     * Does nothing - output to <code>/dev/null</code>.
+     * Does nothing - output to {@code /dev/null}.
      * @param chr The characters to write
      * @param st The start offset
      * @param end The number of characters to write
@@ -107,7 +105,7 @@ public class NullWriter extends Writer {
     }
 
     /**
-     * Does nothing - output to <code>/dev/null</code>.
+     * Does nothing - output to {@code /dev/null}.
      * @param str The string to write
      */
     @Override
@@ -116,7 +114,7 @@ public class NullWriter extends Writer {
     }
 
     /**
-     * Does nothing - output to <code>/dev/null</code>.
+     * Does nothing - output to {@code /dev/null}.
      * @param str The string to write
      * @param st The start offset
      * @param end The number of characters to write

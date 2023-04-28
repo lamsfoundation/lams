@@ -17,23 +17,24 @@
 
 package org.apache.poi.ss.formula.functions;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.poi.ss.formula.eval.*;
 import org.apache.poi.ss.util.DateParser;
-import org.apache.poi.ss.formula.eval.BlankEval;
-import org.apache.poi.ss.formula.eval.EvaluationException;
-import org.apache.poi.ss.formula.eval.NumberEval;
-import org.apache.poi.ss.formula.eval.OperandResolver;
-import org.apache.poi.ss.formula.eval.ValueEval;
 import org.apache.poi.ss.usermodel.DateUtil;
+
+import java.time.DateTimeException;
 
 /**
  * Implementation for the DATEVALUE() Excel function.<p>
  *
  * <b>Syntax:</b><br>
- * <b>DATEVALUE</b>(<b>date_text</b>)<p>
+ * <b>DATEVALUE</b>(<b>date_text</b>)
  * <p>
  * The <b>DATEVALUE</b> function converts a date that is stored as text to a serial number that Excel
  * recognizes as a date. For example, the formula <b>=DATEVALUE("1/1/2008")</b> returns 39448, the
- * serial number of the date 1/1/2008. Remember, though, that your computer's system date setting may
+ * serial number of the date 1/1/2008. Any time element is ignored (see {@link TimeValue}).
+ * Remember, though, that your computer's system date setting may
  * cause the results of a <b>DATEVALUE</b> function to vary from this example
  * <p>
  * The <b>DATEVALUE</b> function is helpful in cases where a worksheet contains dates in a text format
@@ -41,10 +42,10 @@ import org.apache.poi.ss.usermodel.DateUtil;
  * <p>
  * To view a date serial number as a date, you must apply a date format to the cell. Find links to more
  * information about displaying numbers as dates in the See Also section.
- *
- * @author Milosz Rembisz
  */
 public class DateValue extends Fixed1ArgFunction {
+
+    private static final Logger LOG = LogManager.getLogger(DateValue.class);
 
     @Override
     public ValueEval evaluate(int srcRowIndex, int srcColumnIndex, ValueEval dateTextArg) {
@@ -57,6 +58,9 @@ public class DateValue extends Fixed1ArgFunction {
             }
 
             return new NumberEval(DateUtil.getExcelDate(DateParser.parseLocalDate(dateText)));
+        } catch (DateTimeException dte) {
+            LOG.atInfo().log("Failed to parse date", dte);
+            return ErrorEval.VALUE_INVALID;
         } catch (EvaluationException e) {
             return e.getErrorEval();
         }

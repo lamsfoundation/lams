@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Spliterator;
 
 /**
  * Directory property
@@ -33,10 +34,10 @@ import java.util.Set;
 public class DirectoryProperty extends Property implements Parent, Iterable<Property> {
 
     /** List of Property instances */
-    private List<Property> _children;
+    private final List<Property> _children = new ArrayList<>();
 
     /** set of children's names */
-    private Set<String>  _children_names;
+    private final Set<String>  _children_names = new HashSet<>();
 
     /**
      * Default constructor
@@ -46,8 +47,6 @@ public class DirectoryProperty extends Property implements Parent, Iterable<Prop
     public DirectoryProperty(String name)
     {
         super();
-        _children       = new ArrayList<>();
-        _children_names = new HashSet<>();
         setName(name);
         setSize(0);
         setPropertyType(PropertyConstants.DIRECTORY_TYPE);
@@ -66,8 +65,6 @@ public class DirectoryProperty extends Property implements Parent, Iterable<Prop
                                 final int offset)
     {
         super(index, array, offset);
-        _children       = new ArrayList<>();
-        _children_names = new HashSet<>();
     }
 
     /**
@@ -121,7 +118,7 @@ public class DirectoryProperty extends Property implements Parent, Iterable<Prop
     }
 
     public static class PropertyComparator implements Comparator<Property>, Serializable {
-        
+
         /**
          * compare method. Assumes both parameters are non-null
          * instances of Property. One property is less than another if
@@ -133,9 +130,9 @@ public class DirectoryProperty extends Property implements Parent, Iterable<Prop
          * @param o1 first object to compare, better be a Property
          * @param o2 second object to compare, better be a Property
          *
-         * @return negative value if o1 <  o2,
+         * @return negative value if o1 &lt;  o2,
          *         zero           if o1 == o2,
-         *         positive value if o1 >  o2.
+         *         positive value if o1 &gt;  o2.
          */
         public int compare(Property o1, Property o2)
         {
@@ -192,7 +189,7 @@ public class DirectoryProperty extends Property implements Parent, Iterable<Prop
      */
     protected void preWrite()
     {
-        if (_children.size() > 0)
+        if (!_children.isEmpty())
         {
             Property[] children = _children.toArray(new Property[ 0 ]);
 
@@ -247,13 +244,25 @@ public class DirectoryProperty extends Property implements Parent, Iterable<Prop
     public Iterator<Property> iterator() {
         return getChildren();
     }
+    /**
+     * Get a spliterator over the children of this Parent; all elements
+     * are instances of Property.
+     *
+     * @return Spliterator of children; may refer to an empty collection
+     *
+     * @since POI 5.2.0
+     */
+    @Override
+    public Spliterator<Property> spliterator() {
+        return _children.spliterator();
+    }
 
     /**
      * Add a new child to the collection of children
      *
      * @param property the new child to be added; must not be null
      *
-     * @exception IOException if we already have a child with the same
+     * @throws IOException if we already have a child with the same
      *                        name
      */
     public void addChild(final Property property)

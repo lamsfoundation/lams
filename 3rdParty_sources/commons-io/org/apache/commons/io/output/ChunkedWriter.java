@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,7 +46,7 @@ public class ChunkedWriter extends FilterWriter {
      * @param chunkSize the chunk size to use; must be a positive number.
      * @throws IllegalArgumentException if the chunk size is &lt;= 0
      */
-    public ChunkedWriter(final Writer writer, int chunkSize) {
+    public ChunkedWriter(final Writer writer, final int chunkSize) {
        super(writer);
        if (chunkSize <= 0) {
            throw new IllegalArgumentException();
@@ -71,11 +71,11 @@ public class ChunkedWriter extends FilterWriter {
      * @throws IOException upon error
      */
     @Override
-    public void write(char[] data, int srcOffset, int length) throws IOException {
+    public void write(final char[] data, final int srcOffset, final int length) throws IOException {
         int bytes = length;
         int dstOffset = srcOffset;
         while(bytes > 0) {
-            int chunk = Math.min(bytes, chunkSize);
+            final int chunk = Math.min(bytes, chunkSize);
             out.write(data, dstOffset, chunk);
             bytes -= chunk;
             dstOffset += chunk;

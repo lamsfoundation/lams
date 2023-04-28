@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,6 +48,7 @@ import org.apache.commons.io.TaggedIOException;
  * used to let higher levels of code handle the exception caused by this
  * stream while other processing errors are being taken care of at this
  * lower level.
+ * </p>
  * <pre>
  * TaggedInputStream stream = new TaggedInputStream(...);
  * try {
@@ -104,9 +105,9 @@ public class TaggedInputStream extends ProxyInputStream {
 
     /**
      * Tags any IOExceptions thrown, wrapping and re-throwing.
-     * 
+     *
      * @param e The IOException thrown
-     * @throws IOException if an I/O error occurs
+     * @throws IOException if an I/O error occurs.
      */
     @Override
     protected void handleIOException(final IOException e) throws IOException {

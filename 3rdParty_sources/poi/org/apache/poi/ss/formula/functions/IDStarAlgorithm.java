@@ -30,10 +30,20 @@ public interface IDStarAlgorithm {
      * @return Whether we should continue iterating through the database.
      */
     boolean processMatch(ValueEval eval);
+
     /**
      * Return a result ValueEval that will be the result of the calculation.
      * This is always called at the end of a run through the database.
      * @return a ValueEval
      */
     ValueEval getResult();
+
+    /**
+     * Whether the field value (the 2nd param in DCOUNT, DGET, etc.) can evaluate to empty. It
+     * is allowed to evaluate to empty for DCOUNT.
+     * @return whether the field value can evaluate to empty
+     */
+    default boolean allowEmptyMatchField() {
+        return false;
+    }
 }

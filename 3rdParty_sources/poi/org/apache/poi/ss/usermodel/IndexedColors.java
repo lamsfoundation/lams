@@ -25,9 +25,6 @@ package org.apache.poi.ss.usermodel;
  * Each element corresponds to a color index (zero-based). When using the default indexed color palette,
  * the values are not written out, but instead are implied. When the color palette has been modified from default,
  * then the entire color palette is used.
- * </p>
- *
- * @author Yegor Kozlov
  */
 public enum IndexedColors {
 
@@ -90,13 +87,13 @@ public enum IndexedColors {
     GREY_80_PERCENT(63),
     AUTOMATIC(64);
 
-    private final static IndexedColors[] _values = new IndexedColors[65];
+    private static final IndexedColors[] _values = new IndexedColors[65];
     static {
         for (IndexedColors color : values()) {
             _values[color.index] = color;
         }
     }
-    
+
     public final short index;
 
     IndexedColors(int idx){
@@ -111,9 +108,9 @@ public enum IndexedColors {
     public short getIndex(){
         return index;
     }
-    
+
     /**
-     * 
+     *
      *
      * @param index the index of the color
      * @return the corresponding IndexedColors enum

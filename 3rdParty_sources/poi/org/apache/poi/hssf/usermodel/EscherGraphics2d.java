@@ -17,17 +17,19 @@
 
 package org.apache.poi.hssf.usermodel;
 
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Arc2D;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
+import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.ImageObserver;
@@ -57,25 +59,25 @@ import java.util.Map;
  * This the amount the font should be scaled by when
  * you issue commands such as drawString().  A good way to calculate this
  * is to use the follow formula:
- * <p>
- * <pre>
+ * <pre>{@code
  *      multipler = groupHeightInPoints / heightOfGroup
- * </pre>
+ * }</pre>
  * <p>
  * The height of the group is calculated fairly simply by calculating the
  * difference between the y coordinates of the bounding box of the shape.  The
  * height of the group can be calculated by using a convenience called
- * <code>HSSFClientAnchor.getAnchorHeightInPoints()</code>.
+ * {@code HSSFClientAnchor.getAnchorHeightInPoints()}.
  * </blockquote>
  */
 public final class EscherGraphics2d extends Graphics2D {
-    private EscherGraphics _escherGraphics;
+    private static final Logger LOG = LogManager.getLogger(EscherGraphics2d.class);
+
+    private final EscherGraphics _escherGraphics;
     private BufferedImage _img;
     private AffineTransform _trans;
     private Stroke _stroke;
     private Paint _paint;
     private Shape _deviceclip;
-    private POILogger logger = POILogFactory.getLogger(getClass());
 
     /**
      * Constructs one escher graphics object from an escher graphics object.
@@ -89,11 +91,13 @@ public final class EscherGraphics2d extends Graphics2D {
         setColor(Color.black);
     }
 
+    @Override
     public void addRenderingHints(Map<?, ?> map)
     {
         getG2D().addRenderingHints(map);
     }
 
+    @Override
     public void clearRect(int i, int j, int k, int l)
     {
         Paint paint1 = getPaint();
@@ -102,6 +106,7 @@ public final class EscherGraphics2d extends Graphics2D {
         setPaint(paint1);
     }
 
+    @Override
     public void clip(Shape shape)
     {
         if(getDeviceclip() != null)
@@ -114,22 +119,26 @@ public final class EscherGraphics2d extends Graphics2D {
         setClip(shape);
     }
 
+    @Override
     public void clipRect(int x, int y, int width, int height)
     {
         clip(new Rectangle(x,y,width,height));
     }
 
+    @Override
     public void copyArea(int x, int y, int width, int height,
-				  int dx, int dy)
+                  int dx, int dy)
     {
         getG2D().copyArea(x,y,width,height,dx,dy);
     }
 
+    @Override
     public Graphics create()
     {
         return new EscherGraphics2d(_escherGraphics);
     }
 
+    @Override
     public void dispose()
     {
         getEscherGraphics().dispose();
@@ -137,6 +146,7 @@ public final class EscherGraphics2d extends Graphics2D {
         getImg().flush();
     }
 
+    @Override
     public void draw(Shape shape)
     {
         if (shape instanceof Line2D)
@@ -152,61 +162,66 @@ public final class EscherGraphics2d extends Graphics2D {
         }
         else
         {
-            if (logger.check(POILogger.WARN))
-                logger.log(POILogger.WARN, "draw not fully supported");
+            LOG.atWarn().log("draw not fully supported");
         }
     }
 
+    @Override
     public void drawArc(int x, int y, int width, int height,
-				 int startAngle, int arcAngle)
+                 int startAngle, int arcAngle)
     {
-        draw(new java.awt.geom.Arc2D.Float(x, y, width, height, startAngle, arcAngle, 0));
+        draw(new Arc2D.Float(x, y, width, height, startAngle, arcAngle, 0));
     }
 
+    @Override
     public void drawGlyphVector(GlyphVector g, float x, float y)
     {
         fill(g.getOutline(x, y));
     }
 
+    @Override
     public boolean drawImage(Image image, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1,
             int sx2, int sy2, Color bgColor, ImageObserver imageobserver)
     {
-        if (logger.check( POILogger.WARN ))
-            logger.log(POILogger.WARN,"drawImage() not supported");
+        LOG.atWarn().log("drawImage() not supported");
         return true;
     }
 
+    @Override
     public boolean drawImage(Image image, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1,
             int sx2, int sy2, ImageObserver imageobserver)
     {
-        if (logger.check( POILogger.WARN ))
-            logger.log(POILogger.WARN,"drawImage() not supported");
+        LOG.atWarn().log("drawImage() not supported");
         return drawImage(image, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null, imageobserver);
     }
+    @Override
     public boolean drawImage(Image image, int dx1, int dy1, int dx2, int dy2, Color bgColor, ImageObserver imageobserver)
     {
-        if (logger.check( POILogger.WARN ))
-            logger.log(POILogger.WARN,"drawImage() not supported");
+        LOG.atWarn().log("drawImage() not supported");
         return true;
     }
 
+    @Override
     public boolean drawImage(Image img, int x, int y,
-				      int width, int height,
-				      ImageObserver observer)
+                      int width, int height,
+                      ImageObserver observer)
     {
         return drawImage(img, x,y,width,height, null, observer);
     }
 
+    @Override
     public boolean drawImage(Image image, int x, int y, Color bgColor, ImageObserver imageobserver)
     {
         return drawImage(image, x, y, image.getWidth(imageobserver), image.getHeight(imageobserver), bgColor, imageobserver);
     }
 
+    @Override
     public boolean drawImage(Image image, int x, int y, ImageObserver imageobserver)
     {
         return drawImage(image, x, y, image.getWidth(imageobserver), image.getHeight(imageobserver), imageobserver);
     }
 
+    @Override
     public boolean drawImage(Image image, AffineTransform affinetransform, ImageObserver imageobserver)
     {
         AffineTransform affinetransform1 = (AffineTransform)getTrans().clone();
@@ -216,6 +231,7 @@ public final class EscherGraphics2d extends Graphics2D {
         return true;
     }
 
+    @Override
     public void drawImage(BufferedImage bufferedimage, BufferedImageOp op, int x, int y)
     {
         BufferedImage img = op.filter(bufferedimage, null);
@@ -227,6 +243,7 @@ public final class EscherGraphics2d extends Graphics2D {
         getEscherGraphics().drawLine(x1,y1,x2,y2, width);
     }
 
+    @Override
     public void drawLine(int x1, int y1, int x2, int y2)
     {
         int width = 0;
@@ -237,18 +254,21 @@ public final class EscherGraphics2d extends Graphics2D {
 //        draw(new GeneralPath(new java.awt.geom.Line2D.Float(x1, y1, x2, y2)));
     }
 
+    @Override
     public void drawOval(int x, int y, int width, int height)
     {
         getEscherGraphics().drawOval(x,y,width,height);
 //        draw(new java.awt.geom.Ellipse2D.Float(x, y, width, height));
     }
 
+    @Override
     public void drawPolygon(int[] xPoints, int[] yPoints,
                             int nPoints)
     {
         getEscherGraphics().drawPolygon(xPoints, yPoints, nPoints);
     }
 
+    @Override
     public void drawPolyline(int[] xPoints, int[] yPoints, int nPoints)
     {
         if(nPoints > 0)
@@ -262,16 +282,19 @@ public final class EscherGraphics2d extends Graphics2D {
         }
     }
 
+    @Override
     public void drawRect(int x, int y, int width, int height)
     {
         _escherGraphics.drawRect(x,y,width,height);
     }
 
+    @Override
     public void drawRenderableImage(RenderableImage renderableimage, AffineTransform affinetransform)
     {
         drawRenderedImage(renderableimage.createDefaultRendering(), affinetransform);
     }
 
+    @Override
     public void drawRenderedImage(RenderedImage renderedimage, AffineTransform affinetransform)
     {
         BufferedImage bufferedimage = new BufferedImage(renderedimage.getColorModel(), renderedimage.getData().createCompatibleWritableRaster(), false, null);
@@ -279,21 +302,25 @@ public final class EscherGraphics2d extends Graphics2D {
         drawImage(bufferedimage, affinetransform, null);
     }
 
+    @Override
     public void drawRoundRect(int i, int j, int k, int l, int i1, int j1)
     {
-        draw(new java.awt.geom.RoundRectangle2D.Float(i, j, k, l, i1, j1));
+        draw(new RoundRectangle2D.Float(i, j, k, l, i1, j1));
     }
 
+    @Override
     public void drawString(String string, float x, float y)
     {
         getEscherGraphics().drawString(string, (int)x, (int)y);
     }
 
+    @Override
     public void drawString(String string, int x, int y)
     {
         getEscherGraphics().drawString(string, x, y);
     }
 
+    @Override
     public void drawString(AttributedCharacterIterator attributedcharacteriterator, float x, float y)
     {
         TextLayout textlayout = new TextLayout(attributedcharacteriterator, getFontRenderContext());
@@ -303,22 +330,25 @@ public final class EscherGraphics2d extends Graphics2D {
         setPaint(paint1);
     }
 
+    @Override
     public void drawString(AttributedCharacterIterator attributedcharacteriterator, int x, int y)
     {
         getEscherGraphics().drawString(attributedcharacteriterator, x, y);
     }
 
+    @Override
     public void fill(Shape shape)
     {
-        if (logger.check( POILogger.WARN ))
-            logger.log(POILogger.WARN,"fill(Shape) not supported");
+        LOG.atWarn().log("fill(Shape) not supported");
     }
 
+    @Override
     public void fillArc(int i, int j, int k, int l, int i1, int j1)
     {
-        fill(new java.awt.geom.Arc2D.Float(i, j, k, l, i1, j1, 2));
+        fill(new Arc2D.Float(i, j, k, l, i1, j1, 2));
     }
 
+    @Override
     public void fillOval(int x, int y, int width, int height)
     {
         _escherGraphics.fillOval(x,y,width,height);
@@ -328,42 +358,47 @@ public final class EscherGraphics2d extends Graphics2D {
      * Fills a (closed) polygon, as defined by a pair of arrays, which
      *  hold the <i>x</i> and <i>y</i> coordinates.
      * <p>
-     * This draws the polygon, with <code>nPoint</code> line segments.
-     * The first <code>nPoint&nbsp;-&nbsp;1</code> line segments are
+     * This draws the polygon, with {@code nPoint} line segments.
+     * The first {@code nPoint&nbsp;-&nbsp;1} line segments are
      *  drawn between sequential points
-     *  (<code>xPoints[i],yPoints[i],xPoints[i+1],yPoints[i+1]</code>).
+     *  ({@code xPoints[i],yPoints[i],xPoints[i+1],yPoints[i+1]}).
      * The final line segment is a closing one, from the last point to
      *  the first (assuming they are different).
      * <p>
      * The area inside of the polygon is defined by using an
      *  even-odd fill rule (also known as the alternating rule), and
      *  the area inside of it is filled.
-     * @param xPoints array of the <code>x</code> coordinates.
-     * @param yPoints array of the <code>y</code> coordinates.
+     * @param xPoints array of the {@code x} coordinates.
+     * @param yPoints array of the {@code y} coordinates.
      * @param nPoints the total number of points in the polygon.
-     * @see   java.awt.Graphics#drawPolygon(int[], int[], int)
+     * @see   Graphics#drawPolygon(int[], int[], int)
      */
+    @Override
     public void fillPolygon(int[] xPoints, int[] yPoints, int nPoints)
     {
         _escherGraphics.fillPolygon(xPoints, yPoints, nPoints);
     }
 
+    @Override
     public void fillRect(int x, int y, int width, int height)
     {
         getEscherGraphics().fillRect(x,y,width,height);
     }
 
+    @Override
     public void fillRoundRect(int x, int y, int width, int height,
-				       int arcWidth, int arcHeight)
+                       int arcWidth, int arcHeight)
     {
-        fill(new java.awt.geom.RoundRectangle2D.Float(x, y, width, height, arcWidth, arcHeight));
+        fill(new RoundRectangle2D.Float(x, y, width, height, arcWidth, arcHeight));
     }
 
+    @Override
     public Color getBackground()
     {
         return getEscherGraphics().getBackground();
     }
 
+    @Override
     public Shape getClip()
     {
         try
@@ -376,6 +411,7 @@ public final class EscherGraphics2d extends Graphics2D {
         }
     }
 
+    @Override
     public Rectangle getClipBounds()
     {
         if(getDeviceclip() != null) {
@@ -385,62 +421,74 @@ public final class EscherGraphics2d extends Graphics2D {
         return null;
     }
 
+    @Override
     public Color getColor()
     {
         return _escherGraphics.getColor();
     }
 
+    @Override
     public Composite getComposite()
     {
         return getG2D().getComposite();
     }
 
+    @Override
     public GraphicsConfiguration getDeviceConfiguration()
     {
         return getG2D().getDeviceConfiguration();
     }
 
+    @Override
     public Font getFont()
     {
         return getEscherGraphics().getFont();
     }
 
+    @Override
     public FontMetrics getFontMetrics(Font font)
     {
         return getEscherGraphics().getFontMetrics(font);
     }
 
+    @Override
     public FontRenderContext getFontRenderContext()
     {
         getG2D().setTransform(getTrans());
         return getG2D().getFontRenderContext();
     }
 
+    @Override
     public Paint getPaint()
     {
         return _paint;
     }
 
-    public Object getRenderingHint(java.awt.RenderingHints.Key key)
+    @Override
+    public Object getRenderingHint(RenderingHints.Key key)
     {
         return getG2D().getRenderingHint(key);
     }
 
+    @Override
     public RenderingHints getRenderingHints()
     {
         return getG2D().getRenderingHints();
     }
 
+    @Override
     public Stroke getStroke()
     {
         return _stroke;
     }
 
+    @Override
     public AffineTransform getTransform()
     {
         return (AffineTransform)getTrans().clone();
     }
 
+    @Override
     public boolean hit(Rectangle rectangle, Shape shape, boolean flag)
     {
         getG2D().setTransform(getTrans());
@@ -449,51 +497,61 @@ public final class EscherGraphics2d extends Graphics2D {
         return getG2D().hit(rectangle, shape, flag);
     }
 
+    @Override
     public void rotate(double d)
     {
         getTrans().rotate(d);
     }
 
+    @Override
     public void rotate(double d, double d1, double d2)
     {
         getTrans().rotate(d, d1, d2);
     }
 
+    @Override
     public void scale(double d, double d1)
     {
         getTrans().scale(d, d1);
     }
 
+    @Override
     public void setBackground(Color c)
     {
         getEscherGraphics().setBackground(c);
     }
 
+    @Override
     public void setClip(int i, int j, int k, int l)
     {
         setClip(new Rectangle(i, j, k, l));
     }
 
+    @Override
     public void setClip(Shape shape)
     {
         setDeviceclip( getTrans().createTransformedShape(shape) );
     }
 
+    @Override
     public void setColor(Color c)
     {
         _escherGraphics.setColor(c);
     }
 
+    @Override
     public void setComposite(Composite composite)
     {
         getG2D().setComposite(composite);
     }
 
+    @Override
     public void setFont(Font font)
     {
         getEscherGraphics().setFont(font);
     }
 
+    @Override
     public void setPaint(Paint paint1)
     {
         if(paint1 != null)
@@ -504,63 +562,61 @@ public final class EscherGraphics2d extends Graphics2D {
         }
     }
 
+    @Override
     public void setPaintMode()
     {
         getEscherGraphics().setPaintMode();
     }
 
-    public void setRenderingHint(java.awt.RenderingHints.Key key, Object obj)
+    @Override
+    public void setRenderingHint(RenderingHints.Key key, Object obj)
     {
         getG2D().setRenderingHint(key, obj);
     }
 
+    @Override
     public void setRenderingHints(Map<?, ?> map)
     {
         getG2D().setRenderingHints(map);
     }
 
+    @Override
     public void setStroke(Stroke s)
     {
         _stroke = s;
     }
 
+    @Override
     public void setTransform(AffineTransform affinetransform)
     {
         setTrans( (AffineTransform)affinetransform.clone() );
     }
 
+    @Override
     public void setXORMode(Color color1)
     {
         getEscherGraphics().setXORMode(color1);
     }
 
+    @Override
     public void shear(double d, double d1)
     {
         getTrans().shear(d, d1);
     }
 
+    @Override
     public void transform(AffineTransform affinetransform)
     {
         getTrans().concatenate(affinetransform);
     }
 
-//    Image transformImage(Image image, Rectangle rectangle, Rectangle rectangle1, ImageObserver imageobserver, Color color1)
-//    {
-//        logger.log(POILogger.WARN,"transformImage() not supported");
-//        return null;
-//    }
-//
-//    Image transformImage(Image image, int ai[], Rectangle rectangle, ImageObserver imageobserver, Color color1)
-//    {
-//        logger.log(POILogger.WARN,"transformImage() not supported");
-//        return null;
-//    }
-
+    @Override
     public void translate(double d, double d1)
     {
         getTrans().translate(d, d1);
     }
 
+    @Override
     public void translate(int i, int j)
     {
         getTrans().translate(i, j);

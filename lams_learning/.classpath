@@ -8,7 +8,7 @@
 	<classpathentry kind="var" path="WILDFLY_HOME_46/modules/system/layers/base/org/jboss/log4j/logmanager/main/log4j-jboss-logmanager-1.1.6.Final.jar"/>
 	<classpathentry kind="var" path="WILDFLY_HOME_46/modules/system/layers/base/org/apache/commons/beanutils/main/commons-beanutils-1.9.3.jar"/>
 	<classpathentry kind="var" path="WILDFLY_HOME_46/modules/system/layers/base/org/apache/commons/collections/main/commons-collections-3.2.2.jar"/>
-	<classpathentry kind="var" path="WILDFLY_HOME_46/modules/system/layers/base/org/apache/commons/io/main/commons-io-2.5.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT_46/commons-io"/>
+	<classpathentry kind="var" path="WILDFLY_HOME_46/modules/system/layers/base/org/apache/commons/io/main/commons-io-2.11.0.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT_46/commons-io"/>
 	<classpathentry kind="var" path="WILDFLY_HOME_46/modules/system/layers/base/org/apache/commons/lang/main/commons-lang-2.6.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT_46/commons-lang">
 		<attributes>
 			<attribute name="javadoc_location" value="http://commons.apache.org/proper/commons-lang/javadocs/api-2.6/"/>
