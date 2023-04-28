@@ -23,15 +23,6 @@
 
 package org.lamsfoundation.lams.admin.web.controller;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.web.form.UserRolesForm;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
@@ -49,6 +40,14 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author jliew
@@ -85,8 +84,9 @@ public class UserRolesSaveController {
 
 	if (log.isDebugEnabled()) {
 	    String numRoles = roles != null ? Integer.toString(roles.length) : "0";
-	    log.debug(new StringBuilder("userId: ").append(userId).append(", orgId: ").append(orgId)
-		    .append(" will have ").append(numRoles).append(" roles").toString());
+	    log.debug(
+		    new StringBuilder("userId: ").append(userId).append(", orgId: ").append(orgId).append(" will have ")
+			    .append(numRoles).append(" roles").toString());
 	}
 	Organisation org = (Organisation) userManagementService.findById(Organisation.class, orgId);
 	User user = (User) userManagementService.findById(User.class, userId);
@@ -97,8 +97,9 @@ public class UserRolesSaveController {
 	if (roles == null || roles.length < 1) {
 	    errorMap.add("roles", messageService.getMessage("error.roles.empty"));
 	    request.setAttribute("errorMap", errorMap);
-	    request.setAttribute("rolelist", userManagementService.filterRoles(rolelist,
-		    request.isUserInRole(Role.SYSADMIN), org.getOrganisationType()));
+	    request.setAttribute("rolelist",
+		    userManagementService.filterRoles(rolelist, request.isUserInRole(Role.SYSADMIN),
+			    org.getOrganisationType()));
 	    request.setAttribute("login", user.getLogin());
 	    request.setAttribute("fullName", user.getFullName());
 	    return "forward:/userroles.do";
@@ -106,7 +107,7 @@ public class UserRolesSaveController {
 
 	userManagementService.setRolesForUserOrganisation(user, orgId, Arrays.asList(roles));
 
-	if (userRolesForm.isAddToLessons()) {
+	if (userRolesForm.isAddToLessons() && !orgId.equals(1)) {
 	    for (String roleIdString : roles) {
 		Integer roleId = Integer.valueOf(roleIdString);
 		if (roleId.equals(Role.ROLE_LEARNER) || roleId.equals(Role.ROLE_MONITOR)) {
@@ -121,8 +122,9 @@ public class UserRolesSaveController {
     }
 
     private void auditLog(Organisation organisation, Integer userId, String[] roleIds, boolean addToLessons) {
-	List<String> roles = Stream.of(roleIds).collect(Collectors
-		.mapping(roleId -> Role.ROLE_MAP.get(Integer.valueOf(roleId)), Collectors.toUnmodifiableList()));
+	List<String> roles = Stream.of(roleIds).collect(
+		Collectors.mapping(roleId -> Role.ROLE_MAP.get(Integer.valueOf(roleId)),
+			Collectors.toUnmodifiableList()));
 	User targetUser = userManagementService.getUserById(userId);
 	StringBuilder auditLogMessage = new StringBuilder("to user ").append(targetUser.getFirstName()).append(" ")
 		.append(targetUser.getLastName()).append(" (").append(targetUser.getLogin()).append(") assigned roles ")
