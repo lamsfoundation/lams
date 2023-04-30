@@ -34,50 +34,48 @@ import org.apache.poi.ss.formula.eval.ValueEval;
  * <li> Numbers: 0 is false. Any other number is TRUE </li>
  * <li> Areas: *all* cells in area are evaluated according to the above rules</li>
  * </ol>
- *
- * @author Amol S. Deshmukh &lt; amolweb at ya hoo dot com &gt;
  */
 public abstract class BooleanFunction implements Function,ArrayFunction {
 
-	public final ValueEval evaluate(ValueEval[] args, int srcRow, int srcCol) {
-		if (args.length < 1) {
-			return ErrorEval.VALUE_INVALID;
-		}
-		boolean boolResult;
-		try {
-			boolResult = calculate(args);
-		} catch (EvaluationException e) {
-			return e.getErrorEval();
-		}
-		return BoolEval.valueOf(boolResult);
-	}
+    public final ValueEval evaluate(ValueEval[] args, int srcRow, int srcCol) {
+        if (args.length < 1) {
+            return ErrorEval.VALUE_INVALID;
+        }
+        boolean boolResult;
+        try {
+            boolResult = calculate(args);
+        } catch (EvaluationException e) {
+            return e.getErrorEval();
+        }
+        return BoolEval.valueOf(boolResult);
+    }
 
-	private boolean calculate(ValueEval[] args) throws EvaluationException {
+    private boolean calculate(ValueEval[] args) throws EvaluationException {
 
-		boolean result = getInitialResultValue();
-		boolean atLeastOneNonBlank = false;
+        boolean result = getInitialResultValue();
+        boolean atLeastOneNonBlank = false;
 
-		/*
-		 * Note: no short-circuit boolean loop exit because any ErrorEvals will override the result
-		 */
-		for (final ValueEval arg : args) {
+        /*
+         * Note: no short-circuit boolean loop exit because any ErrorEvals will override the result
+         */
+        for (final ValueEval arg : args) {
             Boolean tempVe;
-			if (arg instanceof TwoDEval) {
-				TwoDEval ae = (TwoDEval) arg;
-				int height = ae.getHeight();
-				int width = ae.getWidth();
-				for (int rrIx=0; rrIx<height; rrIx++) {
-					for (int rcIx=0; rcIx<width; rcIx++) {
-						ValueEval ve = ae.getValue(rrIx, rcIx);
-						tempVe = OperandResolver.coerceValueToBoolean(ve, true);
-						if (tempVe != null) {
-							result = partialEvaluate(result, tempVe);
-							atLeastOneNonBlank = true;
-						}
-					}
-				}
-				continue;
-			}
+            if (arg instanceof TwoDEval) {
+                TwoDEval ae = (TwoDEval) arg;
+                int height = ae.getHeight();
+                int width = ae.getWidth();
+                for (int rrIx=0; rrIx<height; rrIx++) {
+                    for (int rcIx=0; rcIx<width; rcIx++) {
+                        ValueEval ve = ae.getValue(rrIx, rcIx);
+                        tempVe = OperandResolver.coerceValueToBoolean(ve, true);
+                        if (tempVe != null) {
+                            result = partialEvaluate(result, tempVe);
+                            atLeastOneNonBlank = true;
+                        }
+                    }
+                }
+                continue;
+            }
             if (arg instanceof RefEval) {
                 RefEval re = (RefEval) arg;
                 final int firstSheetIndex = re.getFirstSheetIndex();
@@ -93,89 +91,80 @@ public abstract class BooleanFunction implements Function,ArrayFunction {
                 continue;
             }
 
-			if (arg == MissingArgEval.instance) {
-				tempVe = false;		// missing parameters are treated as FALSE
-			} else {
-				tempVe = OperandResolver.coerceValueToBoolean(arg, false);
-			}
+            if (arg == MissingArgEval.instance) {
+                tempVe = false;     // missing parameters are treated as FALSE
+            } else {
+                tempVe = OperandResolver.coerceValueToBoolean(arg, false);
+            }
 
-			if (tempVe != null) {
-				result = partialEvaluate(result, tempVe);
-				atLeastOneNonBlank = true;
-			}
-		}
+            if (tempVe != null) {
+                result = partialEvaluate(result, tempVe);
+                atLeastOneNonBlank = true;
+            }
+        }
 
-		if (!atLeastOneNonBlank) {
-			throw new EvaluationException(ErrorEval.VALUE_INVALID);
-		}
-		return result;
-	}
-
-
-	protected abstract boolean getInitialResultValue();
-	protected abstract boolean partialEvaluate(boolean cumulativeResult, boolean currentValue);
+        if (!atLeastOneNonBlank) {
+            throw new EvaluationException(ErrorEval.VALUE_INVALID);
+        }
+        return result;
+    }
 
 
-	public static final Function AND = new BooleanFunction() {
-		protected boolean getInitialResultValue() {
-			return true;
-		}
-		protected boolean partialEvaluate(boolean cumulativeResult, boolean currentValue) {
-			return cumulativeResult && currentValue;
-		}
-	};
-	public static final Function OR = new BooleanFunction() {
-		protected boolean getInitialResultValue() {
-			return false;
-		}
-		protected boolean partialEvaluate(boolean cumulativeResult, boolean currentValue) {
-			return cumulativeResult || currentValue;
-		}
-	};
-	public static final Function FALSE = new Fixed0ArgFunction() {
-		public ValueEval evaluate(int srcRowIndex, int srcColumnIndex) {
-			return BoolEval.FALSE;
-		}
-	};
-	public static final Function TRUE = new Fixed0ArgFunction() {
-		public ValueEval evaluate(int srcRowIndex, int srcColumnIndex) {
-			return BoolEval.TRUE;
-		}
-	};
+    protected abstract boolean getInitialResultValue();
+    protected abstract boolean partialEvaluate(boolean cumulativeResult, boolean currentValue);
 
-	abstract static class Boolean1ArgFunction extends Fixed1ArgFunction implements ArrayFunction {
-		@Override
-		public ValueEval evaluateArray(ValueEval[] args, int srcRowIndex, int srcColumnIndex) {
-			if (args.length != 1) {
-				return ErrorEval.VALUE_INVALID;
-			}
-			return evaluateOneArrayArg(args[0], srcRowIndex, srcColumnIndex,
-					vA -> evaluate(srcRowIndex, srcColumnIndex, vA));
-		}
 
-	}
+    public static final Function AND = new BooleanFunction() {
+        protected boolean getInitialResultValue() {
+            return true;
+        }
+        protected boolean partialEvaluate(boolean cumulativeResult, boolean currentValue) {
+            return cumulativeResult && currentValue;
+        }
+    };
+    public static final Function OR = new BooleanFunction() {
+        protected boolean getInitialResultValue() {
+            return false;
+        }
+        protected boolean partialEvaluate(boolean cumulativeResult, boolean currentValue) {
+            return cumulativeResult || currentValue;
+        }
+    };
 
-	public static final Function NOT = new Boolean1ArgFunction() {
-		public ValueEval evaluate(int srcRowIndex, int srcColumnIndex, ValueEval arg0) {
-			boolean boolArgVal;
-			try {
-				ValueEval ve = OperandResolver.getSingleValue(arg0, srcRowIndex, srcColumnIndex);
-				Boolean b = OperandResolver.coerceValueToBoolean(ve, false);
-				boolArgVal = b == null ? false : b;
-			} catch (EvaluationException e) {
-				return e.getErrorEval();
-			}
+    public static final Function FALSE = BooleanFunction::evaluateFalse;
 
-			return BoolEval.valueOf(!boolArgVal);
-		}
-	};
+    public static final Function TRUE = BooleanFunction::evaluateTrue;
 
-	@Override
-	public ValueEval evaluateArray(ValueEval[] args, int srcRowIndex, int srcColumnIndex) {
-		if (args.length != 1) {
-			return ErrorEval.VALUE_INVALID;
-		}
-		return evaluateOneArrayArg(args[0], srcRowIndex, srcColumnIndex,
-				vA -> evaluate(new ValueEval[]{vA}, srcRowIndex, srcColumnIndex));
-	}
+    public static final Function NOT = BooleanFunction::evaluateNot;
+
+    @Override
+    public ValueEval evaluateArray(ValueEval[] args, int srcRowIndex, int srcColumnIndex) {
+        return evaluate(args, srcRowIndex, srcColumnIndex);
+    }
+
+    private static ValueEval evaluateFalse(ValueEval[] args, int srcRowIndex, int srcColumnIndex) {
+        return args.length != 0 ? ErrorEval.VALUE_INVALID : BoolEval.FALSE;
+    }
+
+    private static ValueEval evaluateTrue(ValueEval[] args, int srcRowIndex, int srcColumnIndex) {
+        return args.length != 0 ? ErrorEval.VALUE_INVALID : BoolEval.TRUE;
+    }
+
+    private static ValueEval evaluateNot(ValueEval[] args, int srcRowIndex, int srcColumnIndex) {
+        if (args.length != 1) {
+            return ErrorEval.VALUE_INVALID;
+        }
+        java.util.function.Function<ValueEval, ValueEval> notInner = (va) -> {
+            try {
+                ValueEval ve = OperandResolver.getSingleValue(va, srcRowIndex, srcColumnIndex);
+                Boolean b = OperandResolver.coerceValueToBoolean(ve, false);
+                boolean boolArgVal = b != null && b;
+                return BoolEval.valueOf(!boolArgVal);
+            } catch (EvaluationException e) {
+                return e.getErrorEval();
+            }
+        };
+
+        return ArrayFunction._evaluateOneArrayArg(args[0], srcRowIndex, srcColumnIndex, notInner);
+    }
 }

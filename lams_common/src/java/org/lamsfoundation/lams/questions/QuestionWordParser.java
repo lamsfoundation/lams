@@ -1,30 +1,5 @@
 package org.lamsfoundation.lams.questions;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXTransformerFactory;
-import javax.xml.transform.sax.TransformerHandler;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -32,7 +7,7 @@ import org.apache.tika.exception.TikaException;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.HttpHeaders;
 import org.apache.tika.metadata.Metadata;
-import org.apache.tika.metadata.TikaMetadataKeys;
+import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.mime.MediaType;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
@@ -52,6 +27,22 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXTransformerFactory;
+import javax.xml.transform.sax.TransformerHandler;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.io.*;
+import java.util.*;
 
 /**
  * Extract questions and answers from Microsoft Word format. They can be later used in question-based tools.
@@ -274,8 +265,8 @@ public class QuestionWordParser {
 		    optionsStarted = true;
 		    feedbackStarted = false;
 
-		    String markHedging = WebUtil.removeHTMLtags(text).replaceAll("(?i)" + MARK_HEDGING_TAG + "\\s*",
-			    "");
+		    String markHedging = WebUtil.removeHTMLtags(text)
+			    .replaceAll("(?i)" + MARK_HEDGING_TAG + "\\s*", "");
 		    markHedging = QuestionWordParser.strip(markHedging);
 		    isMarkHedging = Boolean.valueOf(markHedging);
 		    continue;
@@ -449,7 +440,7 @@ public class QuestionWordParser {
 	public void parse(InputStream stream, ContentHandler handler, Metadata metadata, ParseContext context)
 		throws IOException, SAXException, TikaException {
 	    // Is it a supported image?
-	    String filename = metadata.get(TikaMetadataKeys.RESOURCE_NAME_KEY);
+	    String filename = metadata.get(TikaCoreProperties.RESOURCE_NAME_KEY);
 	    String type = metadata.get(HttpHeaders.CONTENT_TYPE);
 	    boolean accept = false;
 
@@ -486,8 +477,8 @@ public class QuestionWordParser {
     }
 
     /**
-     * A content handler that re-writes image "src" and table "class" attributes,
-     * passes everything else on to the real one.
+     * A content handler that re-writes image "src" and table "class" attributes, passes everything else on to the real
+     * one.
      */
     private static class TikaImageRewritingContentHandler extends ContentHandlerDecorator {
 	private TikaImageRewritingContentHandler(ContentHandler handler) {

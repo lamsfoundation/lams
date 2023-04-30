@@ -18,90 +18,61 @@ package org.apache.commons.io.filefilter;
 
 import java.io.File;
 import java.io.Serializable;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.io.IOCase;
 
 /**
- * Filters filenames for a certain name.
+ * Filters file names for a certain name.
  * <p>
  * For example, to print all files and directories in the
- * current directory whose name is <code>Test</code>:
- *
+ * current directory whose name is {@code Test}:
+ * </p>
+ * <h2>Using Classic IO</h2>
  * <pre>
  * File dir = new File(".");
- * String[] files = dir.list( new NameFileFilter("Test") );
- * for ( int i = 0; i &lt; files.length; i++ ) {
- *     System.out.println(files[i]);
+ * String[] files = dir.list(new NameFileFilter("Test"));
+ * for (String file : files) {
+ *     System.out.println(file);
  * }
  * </pre>
  *
+ * <h2>Using NIO</h2>
+ * <pre>
+ * final Path dir = Paths.get("");
+ * final AccumulatorPathVisitor visitor = AccumulatorPathVisitor.withLongCounters(new NameFileFilter("Test"));
+ * //
+ * // Walk one dir
+ * Files.<b>walkFileTree</b>(dir, Collections.emptySet(), 1, visitor);
+ * System.out.println(visitor.getPathCounters());
+ * System.out.println(visitor.getFileList());
+ * //
+ * visitor.getPathCounters().reset();
+ * //
+ * // Walk dir tree
+ * Files.<b>walkFileTree</b>(dir, visitor);
+ * System.out.println(visitor.getPathCounters());
+ * System.out.println(visitor.getDirList());
+ * System.out.println(visitor.getFileList());
+ * </pre>
+ *
  * @since 1.0
- * @version $Id: NameFileFilter.java 1642757 2014-12-01 21:09:30Z sebb $
  * @see FileFilterUtils#nameFileFilter(String)
  * @see FileFilterUtils#nameFileFilter(String, IOCase)
  */
 public class NameFileFilter extends AbstractFileFilter implements Serializable {
 
     private static final long serialVersionUID = 176844364689077340L;
-    /** The filenames to search for */
+
+    /** The file names to search for */
     private final String[] names;
+
     /** Whether the comparison is case sensitive. */
     private final IOCase caseSensitivity;
-
-    /**
-     * Constructs a new case-sensitive name file filter for a single name.
-     *
-     * @param name  the name to allow, must not be null
-     * @throws IllegalArgumentException if the name is null
-     */
-    public NameFileFilter(final String name) {
-        this(name, null);
-    }
-
-    /**
-     * Construct a new name file filter specifying case-sensitivity.
-     *
-     * @param name  the name to allow, must not be null
-     * @param caseSensitivity  how to handle case sensitivity, null means case-sensitive
-     * @throws IllegalArgumentException if the name is null
-     */
-    public NameFileFilter(final String name, final IOCase caseSensitivity) {
-        if (name == null) {
-            throw new IllegalArgumentException("The wildcard must not be null");
-        }
-        this.names = new String[] {name};
-        this.caseSensitivity = caseSensitivity == null ? IOCase.SENSITIVE : caseSensitivity;
-    }
-
-    /**
-     * Constructs a new case-sensitive name file filter for an array of names.
-     * <p>
-     * The array is not cloned, so could be changed after constructing the
-     * instance. This would be inadvisable however.
-     *
-     * @param names  the names to allow, must not be null
-     * @throws IllegalArgumentException if the names array is null
-     */
-    public NameFileFilter(final String[] names) {
-        this(names, null);
-    }
-
-    /**
-     * Constructs a new name file filter for an array of names specifying case-sensitivity.
-     *
-     * @param names  the names to allow, must not be null
-     * @param caseSensitivity  how to handle case sensitivity, null means case-sensitive
-     * @throws IllegalArgumentException if the names array is null
-     */
-    public NameFileFilter(final String[] names, final IOCase caseSensitivity) {
-        if (names == null) {
-            throw new IllegalArgumentException("The array of names must not be null");
-        }
-        this.names = new String[names.length];
-        System.arraycopy(names, 0, this.names, 0, names.length);
-        this.caseSensitivity = caseSensitivity == null ? IOCase.SENSITIVE : caseSensitivity;
-    }
 
     /**
      * Constructs a new case-sensitive name file filter for a list of names.
@@ -126,49 +97,117 @@ public class NameFileFilter extends AbstractFileFilter implements Serializable {
         if (names == null) {
             throw new IllegalArgumentException("The list of names must not be null");
         }
-        this.names = names.toArray(new String[names.size()]);
-        this.caseSensitivity = caseSensitivity == null ? IOCase.SENSITIVE : caseSensitivity;
+        this.names = names.toArray(EMPTY_STRING_ARRAY);
+        this.caseSensitivity = toIOCase(caseSensitivity);
     }
 
-    //-----------------------------------------------------------------------
     /**
-     * Checks to see if the filename matches.
+     * Constructs a new case-sensitive name file filter for a single name.
+     *
+     * @param name  the name to allow, must not be null
+     * @throws IllegalArgumentException if the name is null
+     */
+    public NameFileFilter(final String name) {
+        this(name, IOCase.SENSITIVE);
+    }
+
+    /**
+     * Constructs a new case-sensitive name file filter for an array of names.
+     * <p>
+     * The array is not cloned, so could be changed after constructing the
+     * instance. This would be inadvisable however.
+     * </p>
+     *
+     * @param names  the names to allow, must not be null
+     * @throws IllegalArgumentException if the names array is null
+     */
+    public NameFileFilter(final String... names) {
+        this(names, IOCase.SENSITIVE);
+    }
+
+    /**
+     * Construct a new name file filter specifying case-sensitivity.
+     *
+     * @param name  the name to allow, must not be null
+     * @param caseSensitivity  how to handle case sensitivity, null means case-sensitive
+     * @throws IllegalArgumentException if the name is null
+     */
+    public NameFileFilter(final String name, final IOCase caseSensitivity) {
+        if (name == null) {
+            throw new IllegalArgumentException("The wildcard must not be null");
+        }
+        this.names = new String[] {name};
+        this.caseSensitivity = toIOCase(caseSensitivity);
+    }
+
+    /**
+     * Constructs a new name file filter for an array of names specifying case-sensitivity.
+     *
+     * @param names  the names to allow, must not be null
+     * @param caseSensitivity  how to handle case sensitivity, null means case-sensitive
+     * @throws IllegalArgumentException if the names array is null
+     */
+    public NameFileFilter(final String[] names, final IOCase caseSensitivity) {
+        if (names == null) {
+            throw new IllegalArgumentException("The array of names must not be null");
+        }
+        this.names = new String[names.length];
+        System.arraycopy(names, 0, this.names, 0, names.length);
+        this.caseSensitivity = toIOCase(caseSensitivity);
+    }
+
+    /**
+     * Checks to see if the file name matches.
      *
      * @param file  the File to check
-     * @return true if the filename matches
+     * @return true if the file name matches
      */
     @Override
     public boolean accept(final File file) {
-        final String name = file.getName();
-        for (final String name2 : this.names) {
-            if (caseSensitivity.checkEquals(name, name2)) {
-                return true;
-            }
-        }
-        return false;
+        return acceptBaseName(file.getName());
     }
 
     /**
-     * Checks to see if the filename matches.
+     * Checks to see if the file name matches.
      *
      * @param dir  the File directory (ignored)
-     * @param name  the filename
-     * @return true if the filename matches
+     * @param name  the file name
+     * @return true if the file name matches
      */
     @Override
     public boolean accept(final File dir, final String name) {
-        for (final String name2 : names) {
-            if (caseSensitivity.checkEquals(name, name2)) {
+        return acceptBaseName(name);
+    }
+
+    /**
+     * Checks to see if the file name matches.
+     * @param file  the File to check
+     *
+     * @return true if the file name matches
+     * @since 2.9.0
+     */
+    @Override
+    public FileVisitResult accept(final Path file, final BasicFileAttributes attributes) {
+        return toFileVisitResult(acceptBaseName(Objects.toString(file.getFileName(), null)), file);
+    }
+
+    private boolean acceptBaseName(final String baseName) {
+        for (final String testName : names) {
+            if (caseSensitivity.checkEquals(baseName, testName)) {
                 return true;
             }
         }
         return false;
     }
 
+    private IOCase toIOCase(final IOCase caseSensitivity) {
+        return caseSensitivity == null ? IOCase.SENSITIVE : caseSensitivity;
+    }
+
     /**
-     * Provide a String representaion of this file filter.
+     * Provide a String representation of this file filter.
      *
-     * @return a String representaion
+     * @return a String representation
      */
     @Override
     public String toString() {

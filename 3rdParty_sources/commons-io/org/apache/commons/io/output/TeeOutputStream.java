@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,20 +20,22 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Classic splitter of OutputStream. Named after the unix 'tee' 
- * command. It allows a stream to be branched off so there 
- * are now two streams.
- *
- * @version $Id: TeeOutputStream.java 1686503 2015-06-19 21:32:13Z sebb $
+ * Classic splitter of {@link OutputStream}. Named after the Unix 'tee' command. It allows a stream to be branched off
+ * so there are now two streams.
  */
 public class TeeOutputStream extends ProxyOutputStream {
 
-    /** the second OutputStream to write to */
-    protected OutputStream branch; //TODO consider making this private
+    /**
+     * The second OutputStream to write to.
+     *
+     * TODO Make private and final in 3.0.
+     */
+    protected OutputStream branch;
 
     /**
      * Constructs a TeeOutputStream.
-     * @param out the main OutputStream
+     *
+     * @param out    the main OutputStream
      * @param branch the second OutputStream
      */
     public TeeOutputStream(final OutputStream out, final OutputStream branch) {
@@ -42,9 +44,10 @@ public class TeeOutputStream extends ProxyOutputStream {
     }
 
     /**
-     * Write the bytes to both streams.
+     * Writes the bytes to both streams.
+     *
      * @param b the bytes to write
-     * @throws IOException if an I/O error occurs
+     * @throws IOException if an I/O error occurs.
      */
     @Override
     public synchronized void write(final byte[] b) throws IOException {
@@ -53,11 +56,12 @@ public class TeeOutputStream extends ProxyOutputStream {
     }
 
     /**
-     * Write the specified bytes to both streams.
-     * @param b the bytes to write
+     * Writes the specified bytes to both streams.
+     *
+     * @param b   the bytes to write
      * @param off The start offset
      * @param len The number of bytes to write
-     * @throws IOException if an I/O error occurs
+     * @throws IOException if an I/O error occurs.
      */
     @Override
     public synchronized void write(final byte[] b, final int off, final int len) throws IOException {
@@ -66,9 +70,10 @@ public class TeeOutputStream extends ProxyOutputStream {
     }
 
     /**
-     * Write a byte to both streams.
+     * Writes a byte to both streams.
+     *
      * @param b the byte to write
-     * @throws IOException if an I/O error occurs
+     * @throws IOException if an I/O error occurs.
      */
     @Override
     public synchronized void write(final int b) throws IOException {
@@ -78,7 +83,8 @@ public class TeeOutputStream extends ProxyOutputStream {
 
     /**
      * Flushes both streams.
-     * @throws IOException if an I/O error occurs
+     *
+     * @throws IOException if an I/O error occurs.
      */
     @Override
     public void flush() throws IOException {
@@ -88,14 +94,16 @@ public class TeeOutputStream extends ProxyOutputStream {
 
     /**
      * Closes both output streams.
-     * 
+     * <p>
      * If closing the main output stream throws an exception, attempt to close the branch output stream.
-     * 
+     * </p>
+     *
+     * <p>
      * If closing the main and branch output streams both throw exceptions, which exceptions is thrown by this method is
      * currently unspecified and subject to change.
-     * 
-     * @throws IOException
-     *             if an I/O error occurs
+     * </p>
+     *
+     * @throws IOException if an I/O error occurs.
      */
     @Override
     public void close() throws IOException {

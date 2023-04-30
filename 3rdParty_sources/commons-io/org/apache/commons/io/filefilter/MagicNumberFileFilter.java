@@ -20,7 +20,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
@@ -30,9 +36,9 @@ import org.apache.commons.io.IOUtils;
  * File filter for matching files containing a "magic number". A magic number
  * is a unique series of bytes common to all files of a specific file format.
  * For instance, all Java class files begin with the bytes
- * <code>0xCAFEBABE</code>.
+ * {@code 0xCAFEBABE}.
  * </p>
- *
+ * <h2>Using Classic IO</h2>
  * <pre>
  * File dir = new File(".");
  * MagicNumberFileFilter javaClassFileFilter =
@@ -58,6 +64,24 @@ import org.apache.commons.io.IOUtils;
  * for (String tarFile : tarFiles) {
  *     System.out.println(tarFile);
  * }
+ * </pre>
+ * <h2>Using NIO</h2>
+ * <pre>
+ * final Path dir = Paths.get("");
+ * final AccumulatorPathVisitor visitor = AccumulatorPathVisitor.withLongCounters(MagicNumberFileFilter("ustar", 257));
+ * //
+ * // Walk one dir
+ * Files.<b>walkFileTree</b>(dir, Collections.emptySet(), 1, visitor);
+ * System.out.println(visitor.getPathCounters());
+ * System.out.println(visitor.getFileList());
+ * //
+ * visitor.getPathCounters().reset();
+ * //
+ * // Walk dir tree
+ * Files.<b>walkFileTree</b>(dir, visitor);
+ * System.out.println(visitor.getPathCounters());
+ * System.out.println(visitor.getDirList());
+ * System.out.println(visitor.getFileList());
  * </pre>
  *
  * @since 2.0
@@ -90,7 +114,7 @@ public class MagicNumberFileFilter extends AbstractFileFilter implements
      * <p>
      * Constructs a new MagicNumberFileFilter and associates it with the magic
      * number to test for in files. This constructor assumes a starting offset
-     * of <code>0</code>.
+     * of {@code 0}.
      * </p>
      *
      * <p>
@@ -107,72 +131,11 @@ public class MagicNumberFileFilter extends AbstractFileFilter implements
      *
      * @param magicNumber the magic number to look for in the file.
      *
-     * @throws IllegalArgumentException if <code>magicNumber</code> is
+     * @throws IllegalArgumentException if {@code magicNumber} is
      *         {@code null}, or contains no bytes.
      */
     public MagicNumberFileFilter(final byte[] magicNumber) {
         this(magicNumber, 0);
-    }
-
-    /**
-     * <p>
-     * Constructs a new MagicNumberFileFilter and associates it with the magic
-     * number to test for in files. This constructor assumes a starting offset
-     * of <code>0</code>.
-     * </p>
-     *
-     * Example usage:
-     * <pre>
-     * {@code
-     * MagicNumberFileFilter xmlFileFilter =
-     *     MagicNumberFileFilter("<?xml");
-     * }
-     * </pre>
-     *
-     * @param magicNumber the magic number to look for in the file.
-     *        The string is converted to bytes using the platform default charset.
-     *
-     * @throws IllegalArgumentException if <code>magicNumber</code> is
-     *         {@code null} or the empty String.
-     */
-    public MagicNumberFileFilter(final String magicNumber) {
-        this(magicNumber, 0);
-    }
-
-    /**
-     * <p>
-     * Constructs a new MagicNumberFileFilter and associates it with the magic
-     * number to test for in files and the byte offset location in the file to
-     * to look for that magic number.
-     * </p>
-     *
-     * <pre>
-     * MagicNumberFileFilter tarFileFilter =
-     *     MagicNumberFileFilter("ustar", 257);
-     * </pre>
-     *
-     * @param magicNumber the magic number to look for in the file.
-     *        The string is converted to bytes using the platform default charset.
-     * @param offset the byte offset in the file to start comparing bytes.
-     *
-     * @throws IllegalArgumentException if <code>magicNumber</code> is
-     *         {@code null} or the empty String, or <code>offset</code> is
-     *         a negative number.
-     */
-    public MagicNumberFileFilter(final String magicNumber, final long offset) {
-        if (magicNumber == null) {
-            throw new IllegalArgumentException("The magic number cannot be null");
-        }
-        if (magicNumber.isEmpty()) {
-            throw new IllegalArgumentException("The magic number must contain at least one byte");
-        }
-        if (offset < 0) {
-            throw new IllegalArgumentException("The offset cannot be negative");
-        }
-
-        this.magicNumbers = magicNumber.getBytes(Charset.defaultCharset()); // explicitly uses the platform default
-                                                                            // charset
-        this.byteOffset = offset;
     }
 
     /**
@@ -195,8 +158,8 @@ public class MagicNumberFileFilter extends AbstractFileFilter implements
      * @param magicNumber the magic number to look for in the file.
      * @param offset the byte offset in the file to start comparing bytes.
      *
-     * @throws IllegalArgumentException if <code>magicNumber</code> is
-     *         {@code null}, or contains no bytes, or <code>offset</code>
+     * @throws IllegalArgumentException if {@code magicNumber} is
+     *         {@code null}, or contains no bytes, or {@code offset}
      *         is a negative number.
      */
     public MagicNumberFileFilter(final byte[] magicNumber, final long offset) {
@@ -210,8 +173,69 @@ public class MagicNumberFileFilter extends AbstractFileFilter implements
             throw new IllegalArgumentException("The offset cannot be negative");
         }
 
-        this.magicNumbers = new byte[magicNumber.length];
+        this.magicNumbers = IOUtils.byteArray(magicNumber.length);
         System.arraycopy(magicNumber, 0, this.magicNumbers, 0, magicNumber.length);
+        this.byteOffset = offset;
+    }
+
+    /**
+     * <p>
+     * Constructs a new MagicNumberFileFilter and associates it with the magic
+     * number to test for in files. This constructor assumes a starting offset
+     * of {@code 0}.
+     * </p>
+     *
+     * Example usage:
+     * <pre>
+     * {@code
+     * MagicNumberFileFilter xmlFileFilter =
+     *     MagicNumberFileFilter("<?xml");
+     * }
+     * </pre>
+     *
+     * @param magicNumber the magic number to look for in the file.
+     *        The string is converted to bytes using the platform default charset.
+     *
+     * @throws IllegalArgumentException if {@code magicNumber} is
+     *         {@code null} or the empty String.
+     */
+    public MagicNumberFileFilter(final String magicNumber) {
+        this(magicNumber, 0);
+    }
+
+    /**
+     * <p>
+     * Constructs a new MagicNumberFileFilter and associates it with the magic
+     * number to test for in files and the byte offset location in the file to
+     * to look for that magic number.
+     * </p>
+     *
+     * <pre>
+     * MagicNumberFileFilter tarFileFilter =
+     *     MagicNumberFileFilter("ustar", 257);
+     * </pre>
+     *
+     * @param magicNumber the magic number to look for in the file.
+     *        The string is converted to bytes using the platform default charset.
+     * @param offset the byte offset in the file to start comparing bytes.
+     *
+     * @throws IllegalArgumentException if {@code magicNumber} is
+     *         {@code null} or the empty String, or {@code offset} is
+     *         a negative number.
+     */
+    public MagicNumberFileFilter(final String magicNumber, final long offset) {
+        if (magicNumber == null) {
+            throw new IllegalArgumentException("The magic number cannot be null");
+        }
+        if (magicNumber.isEmpty()) {
+            throw new IllegalArgumentException("The magic number must contain at least one byte");
+        }
+        if (offset < 0) {
+            throw new IllegalArgumentException("The offset cannot be negative");
+        }
+
+        this.magicNumbers = magicNumber.getBytes(Charset.defaultCharset()); // explicitly uses the platform default
+                                                                            // charset
         this.byteOffset = offset;
     }
 
@@ -234,24 +258,59 @@ public class MagicNumberFileFilter extends AbstractFileFilter implements
     @Override
     public boolean accept(final File file) {
         if (file != null && file.isFile() && file.canRead()) {
-            RandomAccessFile randomAccessFile = null;
             try {
-                final byte[] fileBytes = new byte[this.magicNumbers.length];
-                randomAccessFile = new RandomAccessFile(file, "r");
-                randomAccessFile.seek(byteOffset);
-                final int read = randomAccessFile.read(fileBytes);
-                if (read != magicNumbers.length) {
-                    return false;
+                try (RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r")) {
+                    final byte[] fileBytes = IOUtils.byteArray(this.magicNumbers.length);
+                    randomAccessFile.seek(byteOffset);
+                    final int read = randomAccessFile.read(fileBytes);
+                    if (read != magicNumbers.length) {
+                        return false;
+                    }
+                    return Arrays.equals(this.magicNumbers, fileBytes);
                 }
-                return Arrays.equals(this.magicNumbers, fileBytes);
-            } catch (final IOException ioe) {
+            }
+            catch (final IOException ioe) {
                 // Do nothing, fall through and do not accept file
-            } finally {
-                IOUtils.closeQuietly(randomAccessFile);
             }
         }
 
         return false;
+    }
+
+    /**
+     * <p>
+     * Accepts the provided file if the file contains the file filter's magic
+     * number at the specified offset.
+     * </p>
+     *
+     * <p>
+     * If any {@link IOException}s occur while reading the file, the file will
+     * be rejected.
+     * </p>
+     * @param file the file to accept or reject.
+     *
+     * @return {@code true} if the file contains the filter's magic number
+     *         at the specified offset, {@code false} otherwise.
+     * @since 2.9.0
+     */
+    @Override
+    public FileVisitResult accept(final Path file, final BasicFileAttributes attributes) {
+        if (file != null && Files.isRegularFile(file) && Files.isReadable(file)) {
+            try {
+                try (final FileChannel fileChannel = FileChannel.open(file)) {
+                    final ByteBuffer byteBuffer = ByteBuffer.allocate(this.magicNumbers.length);
+                    final int read = fileChannel.read(byteBuffer);
+                    if (read != magicNumbers.length) {
+                        return FileVisitResult.TERMINATE;
+                    }
+                    return toFileVisitResult(Arrays.equals(this.magicNumbers, byteBuffer.array()), file);
+                }
+            }
+            catch (final IOException ioe) {
+                // Do nothing, fall through and do not accept file
+            }
+        }
+        return FileVisitResult.TERMINATE;
     }
 
     /**

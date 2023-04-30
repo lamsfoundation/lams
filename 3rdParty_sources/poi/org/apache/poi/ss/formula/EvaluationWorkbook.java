@@ -25,40 +25,58 @@ import org.apache.poi.ss.formula.udf.UDFFinder;
 import org.apache.poi.util.Internal;
 
 /**
- * Abstracts a workbook for the purpose of formula evaluation.<br>
- *
- * For POI internal use only
- *
- * @author Josh Micich
+ * Abstracts a workbook for the purpose of formula evaluation.
  */
 @Internal
 public interface EvaluationWorkbook {
+
+    /**
+     * Returns the name of the sheet at the given 0-based index.
+     *
+     * @param sheetIndex The 0-based index of the sheet
+     * @return The name of the sheet
+     * @throws IllegalArgumentException If the index is outside the indices of available sheets
+     */
     String getSheetName(int sheetIndex);
+
     /**
      * @return -1 if the specified sheet is from a different book
      */
     int getSheetIndex(EvaluationSheet sheet);
+
     /**
      * Finds a sheet index by case insensitive name.
      * @return the index of the sheet matching the specified name.  -1 if not found
      */
     int getSheetIndex(String sheetName);
 
+    /**
+     * Get the sheet identified by the given 0-based index.
+     *
+     * @param sheetIndex The 0-based index of the sheet
+     * @return The sheet
+     * @throws IllegalArgumentException If the index is outside the indices of available sheets
+     */
     EvaluationSheet getSheet(int sheetIndex);
 
     /**
      * HSSF Only - fetch the external-style sheet details
      * <p>Return will have no workbook set if it's actually in our own workbook</p>
+     * @return The found sheet or null if not found
+     * @throws IllegalStateException If called with XSSF or SXSSF workbooks
      */
     ExternalSheet getExternalSheet(int externSheetIndex);
+
     /**
      * XSSF Only - fetch the external-style sheet details
      * <p>Return will have no workbook set if it's actually in our own workbook</p>
+     * @return The found sheet
+     * @throws IllegalStateException If called with HSSF workbooks
      */
     ExternalSheet getExternalSheet(String firstSheetName, String lastSheetName, int externalWorkbookNumber);
     /**
      * HSSF Only - convert an external sheet index to an internal sheet index,
-     *  for an external-style reference to one of this workbook's own sheets 
+     *  for an external-style reference to one of this workbook's own sheets
      */
     int convertFromExternSheetIndex(int externSheetIndex);
 
@@ -70,22 +88,22 @@ public interface EvaluationWorkbook {
      * XSSF Only - fetch the external-style name details
      */
     ExternalName getExternalName(String nameName, String sheetName, int externalWorkbookNumber);
-    
+
     EvaluationName getName(NamePtg namePtg);
     EvaluationName getName(String name, int sheetIndex);
     String resolveNameXText(NameXPtg ptg);
     Ptg[] getFormulaTokens(EvaluationCell cell);
     UDFFinder getUDFFinder();
     SpreadsheetVersion getSpreadsheetVersion();
-    
+
     /**
      * Propagated from {@link WorkbookEvaluator#clearAllCachedResultValues()} to clear locally cached data.
      * Implementations must call the same method on all referenced {@link EvaluationSheet} instances, as well as clearing local caches.
      * @see WorkbookEvaluator#clearAllCachedResultValues()
-     * 
+     *
      * @since POI 3.15 beta 3
      */
-    public void clearAllCachedResultValues();
+    void clearAllCachedResultValues();
 
     class ExternalSheet {
         private final String _workbookName;
@@ -108,7 +126,7 @@ public interface EvaluationWorkbook {
             super(workbookName, firstSheetName);
             this._lastSheetName = lastSheetName;
         }
-        
+
         public String getFirstSheetName() {
             return getSheetName();
         }

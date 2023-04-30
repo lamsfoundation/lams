@@ -17,17 +17,22 @@
 
 package org.apache.poi.hpsf;
 
-import java.io.ByteArrayOutputStream;
+import static org.apache.logging.log4j.util.Unbox.box;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.output.UnsynchronizedByteArrayOutputStream;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.hpsf.wellknown.PropertyIDMap;
 import org.apache.poi.util.CodePageUtil;
 import org.apache.poi.util.HexDump;
@@ -35,8 +40,6 @@ import org.apache.poi.util.LittleEndian;
 import org.apache.poi.util.LittleEndianByteArrayInputStream;
 import org.apache.poi.util.LittleEndianConsts;
 import org.apache.poi.util.LocaleUtil;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
 
 /**
  * A property in a {@link Section} of a {@link PropertySet}.<p>
@@ -70,7 +73,7 @@ public class Property {
      */
     public static final int DEFAULT_CODEPAGE = CodePageUtil.CP_WINDOWS_1252;
 
-    private static final POILogger LOG = POILogFactory.getLogger(Property.class);
+    private static final Logger LOG = LogManager.getLogger(Property.class);
 
     /** The property's ID. */
     private long id;
@@ -112,7 +115,7 @@ public class Property {
     }
 
     /**
-     * Creates a {@link Property} instance by reading its bytes
+     * Creates a Property instance by reading its bytes
      * from the property set stream.
      *
      * @param id The property's ID.
@@ -122,7 +125,7 @@ public class Property {
      * @param length The property's type/value pair's length in bytes.
      * @param codepage The section's and thus the property's
      * codepage. It is needed only when reading string values.
-     * @exception UnsupportedEncodingException if the specified codepage is not
+     * @throws UnsupportedEncodingException if the specified codepage is not
      * supported.
      */
     public Property(final long id, final byte[] src, final long offset, final int length, final int codepage)
@@ -150,7 +153,7 @@ public class Property {
     }
 
     /**
-     * Creates a {@link Property} instance by reading its bytes
+     * Creates a Property instance by reading its bytes
      * from the property set stream.
      *
      * @param id The property's ID.
@@ -158,7 +161,7 @@ public class Property {
      * @param length The property's type/value pair's length in bytes.
      * @param codepage The section's and thus the property's
      * codepage. It is needed only when reading string values.
-     * @exception UnsupportedEncodingException if the specified codepage is not
+     * @throws UnsupportedEncodingException if the specified codepage is not
      * supported.
      */
     public Property(final long id, LittleEndianByteArrayInputStream leis, final int length, final int codepage)
@@ -252,7 +255,7 @@ public class Property {
      *
      * @return the property's size in bytes
      *
-     * @exception WritingNotSupportedException if HPSF does not yet support the
+     * @throws WritingNotSupportedException if HPSF does not yet support the
      * property's variant type.
      */
     protected int getSize(int property) throws WritingNotSupportedException
@@ -269,7 +272,7 @@ public class Property {
 
         /* Variable length: */
         if (type == Variant.VT_LPSTR || type == Variant.VT_LPWSTR) {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            UnsynchronizedByteArrayOutputStream bos = new UnsynchronizedByteArrayOutputStream();
             try {
                 length = write(bos, property) - 2*LittleEndianConsts.INT_SIZE;
                 /* Pad to multiples of 4. */
@@ -292,8 +295,6 @@ public class Property {
      * ID == 0 is a special case: It does not have a type, and its value is the
      * section's dictionary. Another special case are strings: Two properties
      * may have the different types Variant.VT_LPSTR and Variant.VT_LPWSTR;
-     *
-     * @see Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(final Object o) {
@@ -363,22 +364,12 @@ public class Property {
             (t2 == Variant.VT_LPSTR && t1 == Variant.VT_LPWSTR));
     }
 
-
-
-    /**
-     * @see Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return Objects.hash(id,type,value);
 
     }
 
-
-
-    /**
-     * @see Object#toString()
-     */
     @Override
     public String toString() {
         return toString(Property.DEFAULT_CODEPAGE, null);
@@ -408,11 +399,11 @@ public class Property {
         if (value instanceof String) {
             b.append((String)value);
             b.append("\n");
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            UnsynchronizedByteArrayOutputStream bos = new UnsynchronizedByteArrayOutputStream();
             try {
                 write(bos, codepage);
             } catch (Exception e) {
-                LOG.log(POILogger.WARN, "can't serialize string", e);
+                LOG.atWarn().withThrowable(e).log("can't serialize string");
             }
 
             // skip length field
@@ -427,8 +418,8 @@ public class Property {
                 String hex = HexDump.dump(bytes, 0L, 0);
                 b.append(hex);
             }
-        } else if (value instanceof java.util.Date) {
-            java.util.Date d = (java.util.Date)value;
+        } else if (value instanceof Date) {
+            Date d = (Date)value;
             long filetime = Filetime.dateToFileTime(d);
             if (Filetime.isUndefined(d)) {
                 b.append("<undefined>");
@@ -484,7 +475,7 @@ public class Property {
                     return LocaleUtil.getLocaleFromLCID(((Number)value).intValue());
             }
         } catch (Exception e) {
-            LOG.log(POILogger.WARN, "Can't decode id "+getID());
+            LOG.atWarn().log("Can't decode id {}", box(getID()));
         }
         return null;
     }
@@ -496,8 +487,8 @@ public class Property {
      * @param codepage The codepage to use for writing non-wide strings
      * @return the number of bytes written to the stream
      *
-     * @exception IOException if an I/O error occurs
-     * @exception WritingNotSupportedException if a variant type is to be
+     * @throws IOException if an I/O error occurs
+     * @throws WritingNotSupportedException if a variant type is to be
      * written that is not yet supported
      */
     public int write(final OutputStream out, final int codepage)

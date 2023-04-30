@@ -31,10 +31,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections4.bidimap.TreeBidiMap;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.hpsf.wellknown.PropertyIDMap;
 import org.apache.poi.util.CodePageUtil;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
+
+import static org.apache.logging.log4j.util.Unbox.box;
 
 /**
  * Maintains the instances of {@link CustomProperty} that belong to a
@@ -65,13 +67,13 @@ import org.apache.poi.util.POILogger;
  * HashMap&lt;String,Object&gt; mapping between Names and Custom Property Values.
  */
 public class CustomProperties implements Map<String,Object> {
-    private static final POILogger LOG = POILogFactory.getLogger(CustomProperties.class);
-    
+    private static final Logger LOG = LogManager.getLogger(CustomProperties.class);
+
     /**
      * The custom properties
      */
     private final HashMap<Long,CustomProperty> props = new HashMap<>();
-    
+
     /**
      * Maps property IDs to property names and vice versa.
      */
@@ -88,10 +90,10 @@ public class CustomProperties implements Map<String,Object> {
      * Puts a {@link CustomProperty} into this map. It is assumed that the
      * {@link CustomProperty} already has a valid ID. Otherwise use
      * {@link #put(CustomProperty)}.
-     * 
+     *
      * @param name the property name
      * @param cp the property
-     * 
+     *
      * @return the previous property stored under this name
      */
     public CustomProperty put(final String name, final CustomProperty cp) {
@@ -100,7 +102,7 @@ public class CustomProperties implements Map<String,Object> {
             isPure = false;
             return null;
         }
-        
+
         if (!name.equals(cp.getName())) {
             throw new IllegalArgumentException("Parameter \"name\" (" + name +
                     ") and custom property's name (" + cp.getName() +
@@ -108,7 +110,7 @@ public class CustomProperties implements Map<String,Object> {
         }
 
         checkCodePage(name);
-        
+
         /* Register name and ID in the dictionary. Mapping in both directions is possible. If there is already a  */
         props.remove(dictionary.getKey(name));
         dictionary.put(cp.getID(), name);
@@ -154,7 +156,7 @@ public class CustomProperties implements Map<String,Object> {
         final Property p = new Property(-1, variantType, value);
         return put(new CustomProperty(p, key));
     }
-    
+
     /**
      * Gets a named value from the custom properties - only works for keys of type String
      *
@@ -194,7 +196,7 @@ public class CustomProperties implements Map<String,Object> {
     public void clear() {
         props.clear();
     }
-    
+
     @Override
     public int hashCode() {
         return props.hashCode();
@@ -207,7 +209,7 @@ public class CustomProperties implements Map<String,Object> {
 
     @Override
     public void putAll(Map<? extends String, ?> m) {
-        for (Map.Entry<? extends String, ?> me : m.entrySet()) {
+        for (Entry<? extends String, ?> me : m.entrySet()) {
             put(me.getKey(), me.getValue());
         }
     }
@@ -217,20 +219,18 @@ public class CustomProperties implements Map<String,Object> {
      */
     public List<CustomProperty> properties() {
         List<CustomProperty> list = new ArrayList<>(props.size());
-        for (Long l : dictionary.keySet()) {
-            list.add(props.get(l));
-        }
+        list.addAll(props.values());
         return Collections.unmodifiableList(list);
     }
-    
+
     /**
-     * @return the list of property values - use {@link #properties()} for the wrapped values 
+     * @return the list of property values - use {@link #properties()} for the wrapped values
      */
     @Override
     public Collection<Object> values() {
         List<Object> list = new ArrayList<>(props.size());
-        for (Long l : dictionary.keySet()) {
-            list.add(props.get(l).getValue());
+        for (CustomProperty property : props.values()) {
+            list.add(property.getValue());
         }
         return Collections.unmodifiableCollection(list);
     }
@@ -238,8 +238,8 @@ public class CustomProperties implements Map<String,Object> {
     @Override
     public Set<Entry<String, Object>> entrySet() {
         Map<String,Object> set = new LinkedHashMap<>(props.size());
-        for (Entry<Long,String> se : dictionary.entrySet()) {
-            set.put(se.getValue(), props.get(se.getKey()).getValue());
+        for (CustomProperty property : props.values()) {
+            set.put(property.getName(), property.getValue());
         }
         return Collections.unmodifiableSet(set.entrySet());
     }
@@ -247,18 +247,17 @@ public class CustomProperties implements Map<String,Object> {
     /**
      * Returns a set of all the names of our custom properties.
      * Equivalent to {@link #nameSet()}
-     * 
+     *
      * @return a set of all the names of our custom properties
      */
     @Override
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public Set keySet() {
+    public Set<String> keySet() {
         return Collections.unmodifiableSet(dictionary.values());
     }
 
     /**
      * Returns a set of all the names of our custom properties
-     * 
+     *
      * @return a set of all the names of our custom properties
      */
     public Set<String> nameSet() {
@@ -267,7 +266,7 @@ public class CustomProperties implements Map<String,Object> {
 
     /**
      * Returns a set of all the IDs of our custom properties
-     * 
+     *
      * @return a set of all the IDs of our custom properties
      */
     public Set<Long> idSet() {
@@ -313,14 +312,14 @@ public class CustomProperties implements Map<String,Object> {
     }
 
     /**
-     * Checks against both the property, and its values. 
+     * Checks against both the property, and its values.
      */
     @Override
     public boolean containsValue(Object value) {
         if(value instanceof CustomProperty) {
             return props.containsValue(value);
         }
-      
+
         for(CustomProperty cp : props.values()) {
             if(cp.getValue() == value) {
                 return true;
@@ -393,12 +392,12 @@ public class CustomProperties implements Map<String,Object> {
         try {
             cps = CodePageUtil.codepageToEncoding(cp, false);
         } catch (UnsupportedEncodingException e) {
-            LOG.log(POILogger.ERROR, "Codepage '", cp, "' can't be found.");
+            LOG.atError().log("Codepage '{}' can't be found.", box(cp));
         }
         if (!cps.isEmpty() && Charset.forName(cps).newEncoder().canEncode(value)) {
             return;
         }
-        LOG.log(POILogger.DEBUG, "Charset '"+cps+"' can't encode '"+value+"' - switching to unicode.");
+        LOG.atDebug().log("Charset '{}' can't encode '{}' - switching to unicode.", cps, value);
         setCodepage(CodePageUtil.CP_UNICODE);
     }
 }

@@ -17,28 +17,25 @@
 
 package org.apache.poi.ss.formula.eval;
 
-/**
- * @author Josh Micich
- */
 public final class FunctionNameEval implements ValueEval {
 
-	private final String _functionName;
+    private final String _functionName;
 
-	/**
-	 * Creates a NameEval representing a function name
-	 */
-	public FunctionNameEval(String functionName) {
-		_functionName = functionName;
-	}
+    /**
+     * Creates a NameEval representing a function name
+     */
+    public FunctionNameEval(String functionName) {
+        _functionName = functionName;
+    }
 
 
-	public String getFunctionName() {
-		return _functionName;
-	}
+    public String getFunctionName() {
+        return _functionName;
+    }
 
-	public String toString() {
-		return getClass().getName() + " [" +
-				_functionName +
-				"]";
-	}
+    public String toString() {
+        return getClass().getName() + " [" +
+                _functionName +
+                "]";
+    }
 }

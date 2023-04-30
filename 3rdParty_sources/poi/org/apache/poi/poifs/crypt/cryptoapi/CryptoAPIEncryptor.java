@@ -17,7 +17,6 @@
 
 package org.apache.poi.poifs.crypt.cryptoapi;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,7 +25,6 @@ import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -44,6 +42,7 @@ import org.apache.poi.poifs.filesystem.Entry;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.LittleEndian;
+import org.apache.poi.util.RandomSingleton;
 import org.apache.poi.util.StringUtil;
 
 public class CryptoAPIEncryptor extends Encryptor {
@@ -59,9 +58,10 @@ public class CryptoAPIEncryptor extends Encryptor {
 
     @Override
     public void confirmPassword(String password) {
-        Random r = new SecureRandom();
+        SecureRandom r = RandomSingleton.getInstance();
         byte[] salt = new byte[16];
         byte[] verifier = new byte[16];
+        // using a java.security.SecureRandom (and avoid allocating a new SecureRandom for each random number needed).
         r.nextBytes(salt);
         r.nextBytes(verifier);
         confirmPassword(password, null, null, verifier, salt, null);
@@ -143,9 +143,9 @@ public class CryptoAPIEncryptor extends Encryptor {
             descEntry.reserved2 = 0;
 
             bos.setBlock(block);
-            DocumentInputStream dis = dir.createDocumentInputStream(entry);
-            IOUtils.copy(dis, bos);
-            dis.close();
+            try (DocumentInputStream dis = dir.createDocumentInputStream(entry)) {
+                IOUtils.copy(dis, bos);
+            }
 
             descEntry.streamSize = bos.size() - descEntry.streamOffset;
             descList.add(descEntry);
@@ -188,7 +188,7 @@ public class CryptoAPIEncryptor extends Encryptor {
         bos.write(buf, 0, 8);
         bos.setSize(savedSize);
 
-        dir.createDocument(encryptedStream, new ByteArrayInputStream(bos.getBuf(), 0, savedSize));
+        dir.createDocument(encryptedStream, bos.toInputStream(savedSize));
     }
 
 //    protected int getKeySizeInBytes() {

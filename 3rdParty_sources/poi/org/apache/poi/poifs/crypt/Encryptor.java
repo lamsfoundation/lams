@@ -31,6 +31,7 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.util.GenericRecordUtil;
 
 public abstract class Encryptor implements GenericRecord {
+
     protected static final String DEFAULT_POIFS_ENTRY = Decryptor.DEFAULT_POIFS_ENTRY;
     private EncryptionInfo encryptionInfo;
     private SecretKey secretKey;
@@ -57,8 +58,8 @@ public abstract class Encryptor implements GenericRecord {
 
     public abstract void confirmPassword(String password);
 
-	public static Encryptor getInstance(EncryptionInfo info) {
-	    return info.getEncryptor();
+    public static Encryptor getInstance(EncryptionInfo info) {
+        return info.getEncryptor();
     }
 
     public OutputStream getDataStream(POIFSFileSystem fs) throws IOException, GeneralSecurityException {

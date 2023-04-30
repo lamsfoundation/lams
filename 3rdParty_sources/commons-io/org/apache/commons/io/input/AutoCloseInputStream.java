@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,8 +32,8 @@ import java.io.InputStream;
  * stream as soon as possible even if the client application (by not explicitly
  * closing the stream when no longer needed) or the underlying stream (by not
  * releasing resources once the last byte has been read) do not do that.
+ * </p>
  *
- * @version $Id: AutoCloseInputStream.java 1586350 2014-04-10 15:57:20Z ggregory $
  * @since 1.4
  */
 public class AutoCloseInputStream extends ProxyInputStream {
@@ -63,7 +63,7 @@ public class AutoCloseInputStream extends ProxyInputStream {
     @Override
     public void close() throws IOException {
         in.close();
-        in = new ClosedInputStream();
+        in = ClosedInputStream.CLOSED_INPUT_STREAM;
     }
 
     /**

@@ -47,7 +47,22 @@ import org.apache.poi.util.StringUtil;
 public final class CryptoFunctions {
 
     //arbitrarily selected; may need to increase
-    private static final int MAX_RECORD_LENGTH = 100_000;
+    private static final int DEFAULT_MAX_RECORD_LENGTH = 100_000;
+    static int MAX_RECORD_LENGTH = DEFAULT_MAX_RECORD_LENGTH;
+
+    /**
+     * @param length the max record length allowed for CryptoFunctions
+     */
+    public static void setMaxRecordLength(int length) {
+        MAX_RECORD_LENGTH = length;
+    }
+
+    /**
+     * @return the max record length allowed for CryptoFunctions
+     */
+    public static int getMaxRecordLength() {
+        return MAX_RECORD_LENGTH;
+    }
 
     private CryptoFunctions() {
     }
@@ -146,7 +161,7 @@ public final class CryptoFunctions {
      *     {@code blockKey: IV = H(KeySalt + blockKey)}</li>
      * <li>If a blockKey is not provided, let IV be equal to the following value:<br>
      *     {@code KeySalt:IV = KeySalt}</li>
-     * <li>If the number of bytes in the value of IV is less than the the value of the blockSize attribute
+     * <li>If the number of bytes in the value of IV is less than the value of the blockSize attribute
      *     corresponding to the cipherAlgorithm attribute, pad the array of bytes by appending 0x36 until
      *     the array is blockSize bytes. If the array of bytes is larger than blockSize bytes, truncate the
      *     array to blockSize bytes.</li>
@@ -370,7 +385,7 @@ public final class CryptoFunctions {
      *
      * @see <a href="http://msdn.microsoft.com/en-us/library/dd926947.aspx">2.3.7.1 Binary Document Password Verifier Derivation Method 1</a>
      * @see <a href="http://msdn.microsoft.com/en-us/library/dd905229.aspx">2.3.7.4 Binary Document Password Verifier Derivation Method 2</a>
-     * @see <a href="http://www.ecma-international.org/news/TC45_current_work/Office Open XML Part 4 - Markup Language Reference.pdf">Part 4 - Markup Language Reference - Ecma International - 3.2.12 fileSharing</a>
+     * @see <a href="https://www.ecma-international.org/publications-and-standards/standards/ecma-376/">Part 4 - Markup Language Reference - Ecma International - 3.2.12 fileSharing</a>
      *
      * @param password the password
      * @return the verifier (actually a short value)

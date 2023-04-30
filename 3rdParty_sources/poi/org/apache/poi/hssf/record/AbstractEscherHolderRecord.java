@@ -27,18 +27,21 @@ import org.apache.poi.ddf.EscherRecordFactory;
 import org.apache.poi.ddf.NullEscherSerializationListener;
 import org.apache.poi.hssf.util.LazilyConcatenatedByteArray;
 import org.apache.poi.util.LittleEndian;
+import org.apache.poi.util.Removal;
 
 /**
  * The escher container record is used to hold escher records.  It is abstract and
  * must be subclassed for maximum benefit.
+ * <p>
+ * Child records are deserialized on-demand unless the {@code poi.deserialize.escher} System Property is defined.
  */
 public abstract class AbstractEscherHolderRecord extends Record {
-    private static boolean DESERIALISE;
+    private static boolean DESERIALIZE;
     static {
-    try {
-            DESERIALISE = (System.getProperty("poi.deserialize.escher") != null);
+        try {
+            DESERIALIZE = (System.getProperty("poi.deserialize.escher") != null);
         } catch (SecurityException e) {
-            DESERIALISE = false;
+            DESERIALIZE = false;
         }
     }
 
@@ -53,7 +56,7 @@ public abstract class AbstractEscherHolderRecord extends Record {
     }
 
     public AbstractEscherHolderRecord(RecordInputStream in) {
-        if (! DESERIALISE ) {
+        if (!DESERIALIZE) {
             rawDataContainer.concatenate(in.readRemainder());
         } else {
             byte[] data = in.readAllContinuedRemainder();
@@ -61,10 +64,17 @@ public abstract class AbstractEscherHolderRecord extends Record {
         }
     }
 
+    /**
+     * @deprecated Call {@link #decode()} instead.
+     */
+    @Removal(version = "5.3")
+    @Deprecated
     protected void convertRawBytesToEscherRecords() {
-        if (! DESERIALISE ) {
-            byte[] rawData = getRawData();
-        	convertToEscherRecords(0, rawData.length, rawData);
+        // decode() does a check to see if raw bytes have already been interpreted. In the case that we did not eagerly
+        //  interpret the bytes due to DESERIALIZE being false, decode() will interpret the bytes. If we did already
+        //  interpret the bytes due to DESERIALIZE being true, decode skips doing the work again.
+        if (!DESERIALIZE) {
+            decode();
         }
     }
     private void convertToEscherRecords( int offset, int size, byte[] data )
@@ -84,24 +94,22 @@ public abstract class AbstractEscherHolderRecord extends Record {
     protected abstract String getRecordName();
 
     @Override
-    public int serialize(int offset, byte[] data)
-    {
-        LittleEndian.putShort(data,      offset, getSid() );
-        LittleEndian.putShort( data, 2 + offset, (short) ( getRecordSize() - 4 ) );
+    public int serialize(int offset, byte[] data) {
         byte[] rawData = getRawData();
-        if ( escherRecords.size() == 0 && rawData != null )
-        {
-            LittleEndian.putShort(data,     offset, getSid());
-            LittleEndian.putShort(data, 2 + offset, (short)(getRecordSize() - 4));
-            System.arraycopy( rawData, 0, data, 4 + offset, rawData.length);
+
+        LittleEndian.putShort(data, offset, getSid());
+        offset += 2;
+        LittleEndian.putShort(data, offset, (short) (getRecordSize() - 4));
+        offset += 2;
+
+        if (escherRecords.isEmpty() && rawData != null) {
+            System.arraycopy(rawData, 0, data, offset, rawData.length);
             return rawData.length + 4;
         }
-        LittleEndian.putShort(data,     offset, getSid());
-        LittleEndian.putShort(data, 2 + offset, (short)(getRecordSize() - 4));
 
-        int pos = offset + 4;
+        NullEscherSerializationListener listener = new NullEscherSerializationListener();
         for (EscherRecord r : escherRecords) {
-            pos += r.serialize( pos, data, new NullEscherSerializationListener() );
+            offset += r.serialize(offset, data, listener);
         }
         return getRecordSize();
     }
@@ -109,7 +117,7 @@ public abstract class AbstractEscherHolderRecord extends Record {
     @Override
     public int getRecordSize() {
         byte[] rawData = getRawData();
-        if (escherRecords.size() == 0 && rawData != null) {
+        if (escherRecords.isEmpty() && rawData != null) {
             // XXX: It should be possible to derive this without concatenating the array, too.
             return rawData.length;
         }
@@ -156,12 +164,12 @@ public abstract class AbstractEscherHolderRecord extends Record {
      * @return the EscherContainerRecord or {@code null} if no child is a container record
      */
     public EscherContainerRecord getEscherContainer() {
-    	for (EscherRecord er : escherRecords) {
-    		if(er instanceof EscherContainerRecord) {
-    			return (EscherContainerRecord)er;
-    		}
-    	}
-    	return null;
+        for (EscherRecord er : escherRecords) {
+            if(er instanceof EscherContainerRecord) {
+                return (EscherContainerRecord)er;
+            }
+        }
+        return null;
     }
 
     /**
@@ -174,29 +182,29 @@ public abstract class AbstractEscherHolderRecord extends Record {
      * @return the record or {@code null} if it can't be found
      */
     public EscherRecord findFirstWithId(short id) {
-    	return findFirstWithId(id, getEscherRecords());
+        return findFirstWithId(id, getEscherRecords());
     }
 
     private EscherRecord findFirstWithId(short id, List<EscherRecord> records) {
-    	// Check at our level
-    	for (EscherRecord r : records) {
-    		if(r.getRecordId() == id) {
-    			return r;
-    		}
-    	}
+        // Check at our level
+        for (EscherRecord r : records) {
+            if(r.getRecordId() == id) {
+                return r;
+            }
+        }
 
-    	// Then check our children in turn
-    	for (EscherRecord r : records) {
-    		if(r.isContainerRecord()) {
-    			EscherRecord found = findFirstWithId(id, r.getChildRecords());
-    			if(found != null) {
-    				return found;
-    			}
-    		}
-    	}
+        // Then check our children in turn
+        for (EscherRecord r : records) {
+            if(r.isContainerRecord()) {
+                EscherRecord found = findFirstWithId(id, r.getChildRecords());
+                if(found != null) {
+                    return found;
+                }
+            }
+        }
 
-    	// Not found in this lot
-    	return null;
+        // Not found in this lot
+        return null;
     }
 
 
@@ -237,9 +245,9 @@ public abstract class AbstractEscherHolderRecord extends Record {
      */
     public void decode()
     {
-        if (null == escherRecords || 0 == escherRecords.size()){
+        if (escherRecords.isEmpty()) {
             byte[] rawData = getRawData();
-            convertToEscherRecords(0, rawData.length, rawData );
+            convertToEscherRecords(0, rawData.length, rawData);
         }
     }
 

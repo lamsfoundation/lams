@@ -29,20 +29,21 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.IdentityHashMap;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.util.IOUtils;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
 
 /**
  * A POIFS {@link DataSource} backed by a File
  */
 public class FileBackedDataSource extends DataSource implements Closeable {
-    private final static POILogger logger = POILogFactory.getLogger(FileBackedDataSource.class);
+    private static final Logger LOG = LogManager.getLogger(FileBackedDataSource.class);
 
     private final FileChannel channel;
     private Long channelSize;
 
     private final boolean writable;
+    private final boolean closeChannelOnClose;
     // remember file base, which needs to be closed too
     private final RandomAccessFile srcFile;
 
@@ -50,9 +51,6 @@ public class FileBackedDataSource extends DataSource implements Closeable {
     // therefore we need to keep the list of mapped buffers and do some ugly reflection to try to
     // clean the buffer during close().
     // See https://bz.apache.org/bugzilla/show_bug.cgi?id=58480,
-    // http://stackoverflow.com/questions/3602783/file-access-synchronized-on-java-object and
-    // http://bugs.java.com/view_bug.do?bug_id=4724038 for related discussions
-    // https://stackoverflow.com/questions/36077641/java-when-does-direct-buffer-released
     private final IdentityHashMap<ByteBuffer,ByteBuffer> buffersToClean = new IdentityHashMap<>();
 
     public FileBackedDataSource(File file) throws FileNotFoundException {
@@ -64,18 +62,27 @@ public class FileBackedDataSource extends DataSource implements Closeable {
     }
 
     public FileBackedDataSource(RandomAccessFile srcFile, boolean readOnly) {
-        this(srcFile, srcFile.getChannel(), readOnly);
+        this(srcFile, srcFile.getChannel(), readOnly, false);
     }
 
     public FileBackedDataSource(FileChannel channel, boolean readOnly) {
-        this(null, channel, readOnly);
+        this(channel, readOnly, true);
     }
 
-    private FileBackedDataSource(RandomAccessFile srcFile, FileChannel channel, boolean readOnly) {
+    /**
+     * @since POI 5.1.0
+     */
+    public FileBackedDataSource(FileChannel channel, boolean readOnly, boolean closeChannelOnClose) {
+        this(null, channel, readOnly, closeChannelOnClose);
+    }
+
+    private FileBackedDataSource(RandomAccessFile srcFile, FileChannel channel, boolean readOnly, boolean closeChannelOnClose) {
         this.srcFile = srcFile;
         this.channel = channel;
         this.writable = !readOnly;
+        this.closeChannelOnClose = closeChannelOnClose;
     }
+
 
     public boolean isWriteable() {
         return this.writable;
@@ -170,7 +177,7 @@ public class FileBackedDataSource extends DataSource implements Closeable {
         if (srcFile != null) {
             // see http://bugs.java.com/bugdatabase/view_bug.do?bug_id=4796385
             srcFile.close();
-        } else {
+        } else if (closeChannelOnClose) {
             channel.close();
         }
     }
@@ -195,10 +202,10 @@ public class FileBackedDataSource extends DataSource implements Closeable {
             try {
                 CleanerUtil.getCleaner().freeBuffer(buffer);
             } catch (IOException e) {
-                logger.log(POILogger.WARN, "Failed to unmap the buffer", e);
+                LOG.atWarn().withThrowable(e).log("Failed to unmap the buffer");
             }
         } else {
-            logger.log(POILogger.DEBUG, CleanerUtil.UNMAP_NOT_SUPPORTED_REASON);
+            LOG.atDebug().log(CleanerUtil.UNMAP_NOT_SUPPORTED_REASON);
         }
     }
 }

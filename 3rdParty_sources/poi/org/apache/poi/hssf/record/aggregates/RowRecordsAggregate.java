@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Spliterator;
 import java.util.TreeMap;
 
 import org.apache.poi.hssf.model.RecordStream;
@@ -31,6 +32,7 @@ import org.apache.poi.hssf.record.DBCellRecord;
 import org.apache.poi.hssf.record.DConRefRecord;
 import org.apache.poi.hssf.record.DimensionsRecord;
 import org.apache.poi.hssf.record.FormulaRecord;
+import org.apache.poi.hssf.record.HyperlinkRecord;
 import org.apache.poi.hssf.record.IndexRecord;
 import org.apache.poi.hssf.record.MergeCellsRecord;
 import org.apache.poi.hssf.record.MulBlankRecord;
@@ -42,11 +44,6 @@ import org.apache.poi.hssf.record.UnknownRecord;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.formula.FormulaShifter;
 
-/**
- *
- * @author  andy
- * @author Jason Height (jheight at chariot dot net dot au)
- */
 public final class RowRecordsAggregate extends RecordAggregate {
     private int _firstrow = -1;
     private int _lastrow  = -1;
@@ -94,6 +91,9 @@ public final class RowRecordsAggregate extends RecordAggregate {
                     // end of 'Row Block'.  Should only occur after cell records
                     // ignore DBCELL records because POI generates them upon re-serialization
                     continue;
+                case HyperlinkRecord.sid:
+                    // some files contain a HyperlinkRecord here which we ignore for now
+                    continue;
             }
             if (rec instanceof UnknownRecord) {
                 // might need to keep track of where exactly these belong
@@ -108,11 +108,12 @@ public final class RowRecordsAggregate extends RecordAggregate {
                 continue;
             }
             if (!(rec instanceof CellValueRecordInterface)) {
-                throw new RuntimeException("Unexpected record type (" + rec.getClass().getName() + ")");
+                throw new IllegalArgumentException("Unexpected record type (" + rec.getClass().getName() + ")");
             }
             _valuesAgg.construct((CellValueRecordInterface)rec, rs, svm);
         }
     }
+
     /**
      * Handles UnknownRecords which appear within the row/cell records
      */
@@ -128,7 +129,7 @@ public final class RowRecordsAggregate extends RecordAggregate {
     }
     public void insertRow(RowRecord row) {
         // Integer integer = Integer.valueOf(row.getRowNumber());
-        _rowRecords.put(Integer.valueOf(row.getRowNumber()), row);
+        _rowRecords.put(row.getRowNumber(), row);
         // Clear the cached values
         _rowRecordValues = null;
         if ((row.getRowNumber() < _firstrow) || (_firstrow == -1)) {
@@ -142,14 +143,13 @@ public final class RowRecordsAggregate extends RecordAggregate {
     public void removeRow(RowRecord row) {
         int rowIndex = row.getRowNumber();
         _valuesAgg.removeAllCellsValuesForRow(rowIndex);
-        Integer key = Integer.valueOf(rowIndex);
-        RowRecord rr = _rowRecords.remove(key);
+        RowRecord rr = _rowRecords.remove(rowIndex);
         if (rr == null) {
-            throw new RuntimeException("Invalid row index (" + key.intValue() + ")");
+            throw new IllegalArgumentException("Invalid row index (" + rowIndex + ")");
         }
         if (row != rr) {
-            _rowRecords.put(key, rr);
-            throw new RuntimeException("Attempt to remove row that does not belong to this sheet");
+            _rowRecords.put(rowIndex, rr);
+            throw new IllegalArgumentException("Attempt to remove row that does not belong to this sheet");
         }
 
         // Clear the cached values
@@ -161,7 +161,7 @@ public final class RowRecordsAggregate extends RecordAggregate {
         if (rowIndex < 0 || rowIndex > maxrow) {
             throw new IllegalArgumentException("The row number must be between 0 and " + maxrow + ", but had: " + rowIndex);
         }
-        return _rowRecords.get(Integer.valueOf(rowIndex));
+        return _rowRecords.get(rowIndex);
     }
 
     public int getPhysicalNumberOfRows()
@@ -215,7 +215,7 @@ public final class RowRecordsAggregate extends RecordAggregate {
         try {
             return _rowRecordValues[startIndex].getRowNumber();
         } catch(ArrayIndexOutOfBoundsException e) {
-            throw new RuntimeException("Did not find start row for block " + block);
+            throw new IllegalArgumentException("Did not find start row for block " + block);
         }
     }
 
@@ -232,7 +232,7 @@ public final class RowRecordsAggregate extends RecordAggregate {
         try {
             return _rowRecordValues[endIndex].getRowNumber();
         } catch(ArrayIndexOutOfBoundsException e) {
-            throw new RuntimeException("Did not find end row for block " + block);
+            throw new IllegalArgumentException("Did not find end row for block " + block);
       }
     }
 
@@ -310,6 +310,13 @@ public final class RowRecordsAggregate extends RecordAggregate {
 
     public Iterator<RowRecord> getIterator() {
         return _rowRecords.values().iterator();
+    }
+
+    /**
+     * @since POI 5.2.0
+     */
+    public Spliterator<RowRecord> getSpliterator() {
+        return _rowRecords.values().spliterator();
     }
 
     public int findStartOfRowOutlineGroup(int row) {
@@ -464,6 +471,15 @@ public final class RowRecordsAggregate extends RecordAggregate {
      */
     public Iterator<CellValueRecordInterface> getCellValueIterator() {
         return _valuesAgg.iterator();
+    }
+
+    /**
+     * Returns a spliterator for the cell values
+     *
+     * @since POI 5.2.0
+     */
+    public Spliterator<CellValueRecordInterface> getCellValueSpliterator() {
+        return _valuesAgg.spliterator();
     }
 
     public IndexRecord createIndexRecord(int indexRecordOffset, int sizeOfInitialSheetRecords) {

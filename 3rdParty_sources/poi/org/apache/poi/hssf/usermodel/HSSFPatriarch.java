@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Spliterator;
 
 import org.apache.poi.ddf.EscherComplexProperty;
 import org.apache.poi.ddf.EscherContainerRecord;
@@ -57,7 +58,6 @@ import org.apache.poi.util.StringUtil;
  * little other than act as a container for other shapes and groups.
  */
 public final class HSSFPatriarch implements HSSFShapeContainer, Drawing<HSSFShape> {
-    // private static POILogger log = POILogFactory.getLogger(HSSFPatriarch.class);
     private final List<HSSFShape> _shapes = new ArrayList<>();
 
     private final EscherSpgrRecord _spgrRecord;
@@ -239,19 +239,19 @@ public final class HSSFPatriarch implements HSSFShapeContainer, Drawing<HSSFShap
         FtCfSubRecord ftCf = new FtCfSubRecord();
         HSSFPictureData pictData = getSheet().getWorkbook().getAllPictures().get(pictureIndex-1);
         switch (pictData.getFormat()) {
-	        case Workbook.PICTURE_TYPE_WMF:
-	        case Workbook.PICTURE_TYPE_EMF:
-	        	// this needs patch #49658 to be applied to actually work 
-	            ftCf.setFlags(FtCfSubRecord.METAFILE_BIT);
-	            break;
-	        case Workbook.PICTURE_TYPE_DIB:
-	        case Workbook.PICTURE_TYPE_PNG:
-	        case Workbook.PICTURE_TYPE_JPEG:
-	        case Workbook.PICTURE_TYPE_PICT:
-	            ftCf.setFlags(FtCfSubRecord.BITMAP_BIT);
-	            break;
-	        default:
-	            throw new IllegalStateException("Invalid picture type: " + pictData.getFormat());
+            case Workbook.PICTURE_TYPE_WMF:
+            case Workbook.PICTURE_TYPE_EMF:
+                // this needs patch #49658 to be applied to actually work 
+                ftCf.setFlags(FtCfSubRecord.METAFILE_BIT);
+                break;
+            case Workbook.PICTURE_TYPE_DIB:
+            case Workbook.PICTURE_TYPE_PNG:
+            case Workbook.PICTURE_TYPE_JPEG:
+            case Workbook.PICTURE_TYPE_PICT:
+                ftCf.setFlags(FtCfSubRecord.BITMAP_BIT);
+                break;
+            default:
+                throw new IllegalStateException("Invalid picture type: " + pictData.getFormat());
         }
         obj.addSubRecord(ftCf);
         // FtPioGrbit (pictFlags)
@@ -271,12 +271,12 @@ public final class HSSFPatriarch implements HSSFShapeContainer, Drawing<HSSFShap
         DirectoryEntry oleRoot;
         try {
             DirectoryNode dn = _sheet.getWorkbook().getDirectory();
-        	if (dn == null) {
+            if (dn == null) {
                 throw new FileNotFoundException();
             }
-        	oleRoot = (DirectoryEntry)dn.getEntry(entryName);
+            oleRoot = (DirectoryEntry)dn.getEntry(entryName);
         } catch (FileNotFoundException e) {
-        	throw new IllegalStateException("trying to add ole shape without actually adding data first - use HSSFWorkbook.addOlePackage first", e);
+            throw new IllegalStateException("trying to add ole shape without actually adding data first - use HSSFWorkbook.addOlePackage first", e);
         }
         
         // create picture shape, which need to be minimal modified for oleshapes
@@ -553,6 +553,14 @@ public final class HSSFPatriarch implements HSSFShapeContainer, Drawing<HSSFShap
     @Override
     public Iterator<HSSFShape> iterator() {
         return _shapes.iterator();
+    }
+
+    /**
+     * @since POI 5.2.0
+     */
+    @Override
+    public Spliterator<HSSFShape> spliterator() {
+        return _shapes.spliterator();
     }
 
     protected HSSFSheet getSheet() {

@@ -27,48 +27,48 @@ import org.apache.poi.ss.formula.functions.Subtotal;
  */
 public interface TwoDEval extends ValueEval {
 
-	/**
-	 * @param rowIndex relative row index (zero based)
-	 * @param columnIndex relative column index (zero based)
-	 * @return element at the specified row and column position
-	 */
-	ValueEval getValue(int rowIndex, int columnIndex);
+    /**
+     * @param rowIndex relative row index (zero based)
+     * @param columnIndex relative column index (zero based)
+     * @return element at the specified row and column position
+     */
+    ValueEval getValue(int rowIndex, int columnIndex);
 
-	int getWidth();
-	int getHeight();
+    int getWidth();
+    int getHeight();
 
-	/**
-	 * @return <code>true</code> if the area has just a single row, this also includes
-	 * the trivial case when the area has just a single cell.
-	 */
-	boolean isRow();
+    /**
+     * @return {@code true} if the area has just a single row, this also includes
+     * the trivial case when the area has just a single cell.
+     */
+    default boolean isRow() {
+        return false;
+    }
 
-	/**
-	 * @return <code>true</code> if the area has just a single column, this also includes
-	 * the trivial case when the area has just a single cell.
-	 */
-	boolean isColumn();
+    /**
+     * @return {@code true} if the area has just a single column, this also includes
+     * the trivial case when the area has just a single cell.
+     */
+    boolean isColumn();
 
-	/**
-	 * @param rowIndex relative row index (zero based)
-	 * @return a single row {@link TwoDEval}
-	 */
-	TwoDEval getRow(int rowIndex);
-	/**
-	 * @param columnIndex relative column index (zero based)
-	 * @return a single column {@link TwoDEval}
-	 */
-	TwoDEval getColumn(int columnIndex);
+    /**
+     * @param rowIndex relative row index (zero based)
+     * @return a single row TwoDEval
+     */
+    TwoDEval getRow(int rowIndex);
+    /**
+     * @param columnIndex relative column index (zero based)
+     * @return a single column TwoDEval
+     */
+    TwoDEval getColumn(int columnIndex);
 
 
     /**
      * @return true if the  cell at row and col is a subtotal
      */
     boolean isSubTotal(int rowIndex, int columnIndex);
-    
+
     /**
-     *
-     * @param rowIndex
      * @return true if the row is hidden
      * @see Subtotal
      */

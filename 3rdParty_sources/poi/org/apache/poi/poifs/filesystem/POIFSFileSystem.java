@@ -16,7 +16,6 @@
 ==================================================================== */
 package org.apache.poi.poifs.filesystem;
 
-import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,7 +32,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.math3.util.ArithmeticUtils;
+import org.apache.commons.io.output.UnsynchronizedByteArrayOutputStream;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.EmptyFileException;
 import org.apache.poi.poifs.common.POIFSBigBlockSize;
 import org.apache.poi.poifs.common.POIFSConstants;
@@ -49,8 +50,6 @@ import org.apache.poi.poifs.storage.BATBlock.BATBlockAndIndex;
 import org.apache.poi.poifs.storage.HeaderBlock;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.Internal;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
 
 /**
  * <p>This is the main class of the POIFS system; it manages the entire
@@ -61,13 +60,16 @@ import org.apache.poi.util.POILogger;
 public class POIFSFileSystem extends BlockStore
         implements POIFSViewable, Closeable {
     //arbitrarily selected; may need to increase
-    private static final int MAX_RECORD_LENGTH = 100_000;
+    private static final int DEFAULT_MAX_RECORD_LENGTH = 100_000;
+    private static int MAX_RECORD_LENGTH = DEFAULT_MAX_RECORD_LENGTH;
 
-    private static final POILogger LOG = POILogFactory.getLogger(POIFSFileSystem.class);
+    private static final int MAX_ALLOCATION_SIZE = 250_000_000;
+
+    private static final Logger LOG = LogManager.getLogger(POIFSFileSystem.class);
 
     /**
      * Maximum number size (in blocks) of the allocation table as supported by
-     * POI.<p>
+     * POI.
      * <p>
      * This constant has been chosen to help POI identify corrupted data in the
      * header block (rather than crash immediately with {@link OutOfMemoryError}
@@ -94,6 +96,20 @@ public class POIFSFileSystem extends BlockStore
     private POIFSBigBlockSize bigBlockSize =
             POIFSConstants.SMALLER_BIG_BLOCK_SIZE_DETAILS;
 
+    /**
+     * @param length the max record length allowed for POIFSFileSystem
+     */
+    public static void setMaxRecordLength(int length) {
+        MAX_RECORD_LENGTH = length;
+    }
+
+    /**
+     * @return the max record length allowed for POIFSFileSystem
+     */
+    public static int getMaxRecordLength() {
+        return MAX_RECORD_LENGTH;
+    }
+
     private POIFSFileSystem(boolean newFS) {
         _header = new HeaderBlock(bigBlockSize);
         _property_table = new PropertyTable(_header);
@@ -110,7 +126,7 @@ public class POIFSFileSystem extends BlockStore
     protected void createNewDataSource() {
         // Data needs to initially hold just the header block,
         //  a single bat block, and an empty properties section
-        long blockSize = ArithmeticUtils.mulAndCheck(bigBlockSize.getBigBlockSize(), 3L);
+        long blockSize = Math.multiplyExact(bigBlockSize.getBigBlockSize(), 3L);
         _data = new ByteArrayBackedDataSource(IOUtils.safelyAllocate(blockSize, MAX_RECORD_LENGTH));
     }
 
@@ -135,8 +151,8 @@ public class POIFSFileSystem extends BlockStore
     }
 
     /**
-     * <p>Creates a POIFSFileSystem from a <tt>File</tt>. This uses less memory than
-     * creating from an <tt>InputStream</tt>. The File will be opened read-only</p>
+     * <p>Creates a POIFSFileSystem from a {@code File}. This uses less memory than
+     * creating from an {@code InputStream}. The File will be opened read-only</p>
      *
      * <p>Note that with this constructor, you will need to call {@link #close()}
      * when you're done to have the underlying file closed, as the file is
@@ -151,8 +167,8 @@ public class POIFSFileSystem extends BlockStore
     }
 
     /**
-     * <p>Creates a POIFSFileSystem from a <tt>File</tt>. This uses less memory than
-     * creating from an <tt>InputStream</tt>.</p>
+     * <p>Creates a POIFSFileSystem from a {@code File}. This uses less memory than
+     * creating from an {@code InputStream}.</p>
      *
      * <p>Note that with this constructor, you will need to call {@link #close()}
      * when you're done to have the underlying file closed, as the file is
@@ -164,20 +180,23 @@ public class POIFSFileSystem extends BlockStore
      */
     public POIFSFileSystem(File file, boolean readOnly)
             throws IOException {
-        this(null, file, readOnly, true);
+        this(null, file, readOnly, true, true);
     }
 
     /**
-     * <p>Creates a POIFSFileSystem from an open <tt>FileChannel</tt>. This uses
-     * less memory than creating from an <tt>InputStream</tt>. The stream will
+     * <p>Creates a POIFSFileSystem from an open {@code FileChannel}. This uses
+     * less memory than creating from an {@code InputStream}. The stream will
      * be used in read-only mode.</p>
      *
      * <p>Note that with this constructor, you will need to call {@link #close()}
      * when you're done to have the underlying Channel closed, as the channel is
-     * kept open during normal operation to read the data out.</p>
+     * kept open during normal operation to read the data out. For legacy reasons,
+     * the channel is not closed if there is an error creating the POIFSFileSystem.</p>
      *
      * @param channel the FileChannel from which to read the data
      * @throws IOException on errors reading, or on invalid data
+     * @see #POIFSFileSystem(FileChannel, boolean, boolean) this constructor gives more control over whether to
+     * close the provided channel
      */
     public POIFSFileSystem(FileChannel channel)
             throws IOException {
@@ -185,25 +204,49 @@ public class POIFSFileSystem extends BlockStore
     }
 
     /**
-     * <p>Creates a POIFSFileSystem from an open <tt>FileChannel</tt>. This uses
-     * less memory than creating from an <tt>InputStream</tt>.</p>
+     * <p>Creates a POIFSFileSystem from an open {@code FileChannel}. This uses
+     * less memory than creating from an {@code InputStream}.</p>
      *
      * <p>Note that with this constructor, you will need to call {@link #close()}
      * when you're done to have the underlying Channel closed, as the channel is
-     * kept open during normal operation to read the data out.</p>
+     * kept open during normal operation to read the data out. For legacy reasons,
+     * the channel is not closed if there is an error creating the POIFSFileSystem.</p>
      *
      * @param channel  the FileChannel from which to read or read/write the data
      * @param readOnly whether the POIFileSystem will only be used in read-only mode
      * @throws IOException on errors reading, or on invalid data
+     * @see #POIFSFileSystem(FileChannel, boolean, boolean) this constructor gives more control over whether to
+     * close the provided channel
      */
     public POIFSFileSystem(FileChannel channel, boolean readOnly)
             throws IOException {
-        this(channel, null, readOnly, false);
+        this(channel, null, readOnly, false, true);
+    }
+
+    /**
+     * <p>Creates a POIFSFileSystem from an open {@code FileChannel}. This uses
+     * less memory than creating from an {@code InputStream}.</p>
+     *
+     * <p>Note that with this constructor, you will need to call {@link #close()}
+     * when you're done to have the underlying resources closed. The <code>closeChannel</code>
+     * parameter controls whether the provided channel is closed.</p>
+     *
+     * @param channel      the FileChannel from which to read or read/write the data
+     * @param readOnly     whether the POIFileSystem will only be used in read-only mode
+     * @param closeChannel whether the provided FileChannel should be closed when
+     *                     {@link #close()} is called, or when this constructor throws
+     *                     an exception
+     * @throws IOException on errors reading, or on invalid data
+     * @since POI 5.1.0
+     */
+    public POIFSFileSystem(FileChannel channel, boolean readOnly, boolean closeChannel)
+            throws IOException {
+        this(channel, null, readOnly, closeChannel, closeChannel);
     }
 
     @SuppressWarnings("java:S2095")
-    private POIFSFileSystem(FileChannel channel, File srcFile, boolean readOnly, boolean closeChannelOnError)
-            throws IOException {
+    private POIFSFileSystem(FileChannel channel, File srcFile, boolean readOnly, boolean closeChannelOnError,
+                            boolean closeChannelOnClose) throws IOException {
         this(false);
 
         try {
@@ -216,7 +259,7 @@ public class POIFSFileSystem extends BlockStore
                 channel = d.getChannel();
                 _data = d;
             } else {
-                _data = new FileBackedDataSource(channel, readOnly);
+                _data = new FileBackedDataSource(channel, readOnly, closeChannelOnClose);
             }
 
             // Get the header
@@ -240,21 +283,21 @@ public class POIFSFileSystem extends BlockStore
     }
 
     /**
-     * Create a POIFSFileSystem from an <tt>InputStream</tt>.  Normally the stream is read until
-     * EOF.  The stream is always closed.<p>
+     * Create a POIFSFileSystem from an {@code InputStream}.  Normally the stream is read until
+     * EOF.  The stream is always closed.
      * <p>
-     * Some streams are usable after reaching EOF (typically those that return <code>true</code>
-     * for <tt>markSupported()</tt>).  In the unlikely case that the caller has such a stream
+     * Some streams are usable after reaching EOF (typically those that return {@code true}
+     * for {@code markSupported()}).  In the unlikely case that the caller has such a stream
      * <i>and</i> needs to use it after this constructor completes, a work around is to wrap the
-     * stream in order to trap the <tt>close()</tt> call.  A convenience method (
-     * <tt>createNonClosingInputStream()</tt>) has been provided for this purpose:
+     * stream in order to trap the {@code close()} call.  A convenience method (
+     * {@code createNonClosingInputStream()}) has been provided for this purpose:
      * <pre>
      * InputStream wrappedStream = POIFSFileSystem.createNonClosingInputStream(is);
      * HSSFWorkbook wb = new HSSFWorkbook(wrappedStream);
      * is.reset();
      * doSomethingElse(is);
      * </pre>
-     * Note also the special case of <tt>ByteArrayInputStream</tt> for which the <tt>close()</tt>
+     * Note also the special case of {@code ByteArrayInputStream} for which the {@code close()}
      * method does nothing.
      * <pre>
      * ByteArrayInputStream bais = ...
@@ -292,6 +335,10 @@ public class POIFSFileSystem extends BlockStore
             if (maxSize > Integer.MAX_VALUE) {
                 throw new IllegalArgumentException("Unable read a >2gb file via an InputStream");
             }
+
+            // don't allow huge allocations with invalid header-values
+            IOUtils.safelyAllocateCheck(maxSize, MAX_ALLOCATION_SIZE);
+
             ByteBuffer data = ByteBuffer.allocate((int) maxSize);
 
             // Copy in the header
@@ -316,7 +363,7 @@ public class POIFSFileSystem extends BlockStore
 
     /**
      * @param stream  the stream to be closed
-     * @param success <code>false</code> if an exception is currently being thrown in the calling method
+     * @param success {@code false} if an exception is currently being thrown in the calling method
      */
     private void closeInputStream(InputStream stream, boolean success) {
         try {
@@ -327,7 +374,7 @@ public class POIFSFileSystem extends BlockStore
             }
             // else not success? Try block did not complete normally
             // just print stack trace and leave original ex to be thrown
-            LOG.log(POILogger.ERROR, "can't close input stream", e);
+            LOG.atError().withThrowable(e).log("can't close input stream");
         }
     }
 
@@ -407,7 +454,7 @@ public class POIFSFileSystem extends BlockStore
         // Ensure there's a spot in the file for it
         ByteBuffer buffer = ByteBuffer.allocate(bigBlockSize.getBigBlockSize());
         // Header isn't in BATs
-        long writeTo = ArithmeticUtils.mulAndCheck(1L + offset, bigBlockSize.getBigBlockSize());
+        long writeTo = Math.multiplyExact(1L + offset, bigBlockSize.getBigBlockSize());
         _data.write(buffer, writeTo);
         // All done
         return newBAT;
@@ -535,7 +582,7 @@ public class POIFSFileSystem extends BlockStore
                 offset++;
 
                 // Chain it
-                if (_xbat_blocks.size() == 0) {
+                if (_xbat_blocks.isEmpty()) {
                     _header.setXBATStart(offset);
                 } else {
                     _xbat_blocks.get(_xbat_blocks.size() - 1).setValueAt(
@@ -733,7 +780,7 @@ public class POIFSFileSystem extends BlockStore
         // _header.setPropertyStart has been updated on write ...
 
         // HeaderBlock
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(
+        UnsynchronizedByteArrayOutputStream baos = new UnsynchronizedByteArrayOutputStream(
                 _header.getBigBlockSize().getBigBlockSize()
         );
         _header.writeData(baos);
@@ -902,12 +949,12 @@ public class POIFSFileSystem extends BlockStore
     }
 
     /**
-     * Creates a new {@link POIFSFileSystem} in a new {@link File}.
+     * Creates a new POIFSFileSystem in a new {@link File}.
      * Use {@link #POIFSFileSystem(File)} to open an existing File,
      * this should only be used to create a new empty filesystem.
      *
      * @param file The file to create and open
-     * @return The created and opened {@link POIFSFileSystem}
+     * @return The created and opened POIFSFileSystem
      */
     public static POIFSFileSystem create(File file) throws IOException {
         // Create a new empty POIFS in the file

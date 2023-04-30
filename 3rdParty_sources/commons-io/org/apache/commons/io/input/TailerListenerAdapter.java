@@ -19,7 +19,6 @@ package org.apache.commons.io.input;
 /**
  * {@link TailerListener} Adapter.
  *
- * @version $Id: TailerListenerAdapter.java 1714076 2015-11-12 16:06:41Z krosenvold $
  * @since 2.0
  */
 public class TailerListenerAdapter implements TailerListener {
@@ -29,13 +28,17 @@ public class TailerListenerAdapter implements TailerListener {
      * giving the listener a method of stopping the tailer.
      * @param tailer the tailer.
      */
+    @Override
     public void init(final Tailer tailer) {
+        // noop
     }
 
     /**
      * This method is called if the tailed file is not found.
      */
+    @Override
     public void fileNotFound() {
+        // noop
     }
 
     /**
@@ -44,21 +47,27 @@ public class TailerListenerAdapter implements TailerListener {
      * This method is called before the file is reopened, and fileNotFound may
      * be called if the new file has not yet been created.
      */
+    @Override
     public void fileRotated() {
+        // noop
     }
 
     /**
      * Handles a line from a Tailer.
      * @param line the line.
      */
+    @Override
     public void handle(final String line) {
+        // noop
     }
 
     /**
      * Handles an Exception .
      * @param ex the exception.
      */
+    @Override
     public void handle(final Exception ex) {
+        // noop
     }
 
     /**
@@ -72,5 +81,6 @@ public class TailerListenerAdapter implements TailerListener {
      * @since 2.5
      */
     public void endOfFileReached() {
+        // noop
     }
 }

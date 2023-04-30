@@ -24,9 +24,10 @@
 
 <module xmlns="urn:jboss:module:1.5" name="org.apache.xmlbeans">
   <resources>
-    <resource-root path="xmlbeans-3.1.0.jar"/>
+    <resource-root path="xmlbeans-5.1.1.jar"/>
   </resources>
   <dependencies>
     <module name="javax.api" />
+    <module name="org.apache.logging.log4j"/>
   </dependencies>
 </module>

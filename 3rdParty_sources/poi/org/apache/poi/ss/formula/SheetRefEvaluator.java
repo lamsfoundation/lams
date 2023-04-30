@@ -26,38 +26,38 @@ import org.apache.poi.ss.usermodel.CellType;
  * Evaluator for cells within a specific Sheet
  */
 final class SheetRefEvaluator {
-	private final WorkbookEvaluator _bookEvaluator;
-	private final EvaluationTracker _tracker;
-	private final int _sheetIndex;
-	private EvaluationSheet _sheet;
+    private final WorkbookEvaluator _bookEvaluator;
+    private final EvaluationTracker _tracker;
+    private final int _sheetIndex;
+    private EvaluationSheet _sheet;
 
-	public SheetRefEvaluator(WorkbookEvaluator bookEvaluator, EvaluationTracker tracker, int sheetIndex) {
-		if (sheetIndex < 0) {
-			throw new IllegalArgumentException("Invalid sheetIndex: " + sheetIndex + ".");
-		}
-		_bookEvaluator = bookEvaluator;
-		_tracker = tracker;
-		_sheetIndex = sheetIndex;
-	}
+    public SheetRefEvaluator(WorkbookEvaluator bookEvaluator, EvaluationTracker tracker, int sheetIndex) {
+        if (sheetIndex < 0) {
+            throw new IllegalArgumentException("Invalid sheetIndex: " + sheetIndex + ".");
+        }
+        _bookEvaluator = bookEvaluator;
+        _tracker = tracker;
+        _sheetIndex = sheetIndex;
+    }
 
-	public String getSheetName() {
-		return _bookEvaluator.getSheetName(_sheetIndex);
-	}
+    public String getSheetName() {
+        return _bookEvaluator.getSheetName(_sheetIndex);
+    }
 
-	public ValueEval getEvalForCell(int rowIndex, int columnIndex) {
-		return _bookEvaluator.evaluateReference(getSheet(), _sheetIndex, rowIndex, columnIndex, _tracker);
-	}
+    public ValueEval getEvalForCell(int rowIndex, int columnIndex) {
+        return _bookEvaluator.evaluateReference(getSheet(), _sheetIndex, rowIndex, columnIndex, _tracker);
+    }
 
-	private EvaluationSheet getSheet() {
-		if (_sheet == null) {
-			_sheet = _bookEvaluator.getSheet(_sheetIndex);
-		}
-		return _sheet;
-	}
+    private EvaluationSheet getSheet() {
+        if (_sheet == null) {
+            _sheet = _bookEvaluator.getSheet(_sheetIndex);
+        }
+        return _sheet;
+    }
 
     /**
-     * @param rowIndex 
-     * @param columnIndex 
+     * @param rowIndex The 0-based row-index to check
+     * @param columnIndex The 0-based column-index to check
      * @return  whether cell at rowIndex and columnIndex is a subtotal
      * @see org.apache.poi.ss.formula.functions.Subtotal
      */
@@ -83,10 +83,25 @@ final class SheetRefEvaluator {
      * Used by functions that calculate differently depending on row visibility, like some
      * variations of SUBTOTAL()
      * @see org.apache.poi.ss.formula.functions.Subtotal
-     * @param rowIndex
+     * @param rowIndex The 0-based row-index to check
      * @return true if the row is hidden
      */
     public boolean isRowHidden(int rowIndex) {
         return getSheet().isRowHidden(rowIndex);
+    }
+
+    /**
+     * @return The last used row in this sheet
+     */
+    public int getLastRowNum() {
+        return getSheet().getLastRowNum();
+    }
+
+    /**
+     * @return The maximum row number that is possible for the current
+     *         Spreadsheet version, see {@link org.apache.poi.ss.SpreadsheetVersion#getLastRowIndex()}
+     */
+    public int getMaxRowNum() {
+        return _bookEvaluator.getWorkbook().getSpreadsheetVersion().getLastRowIndex();
     }
 }

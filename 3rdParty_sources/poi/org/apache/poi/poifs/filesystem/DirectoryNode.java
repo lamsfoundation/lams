@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Spliterator;
 
 import org.apache.poi.hpsf.ClassID;
 import org.apache.poi.poifs.dev.POIFSViewable;
@@ -126,7 +127,7 @@ public class DirectoryNode
      *
      * @return a newly opened DocumentInputStream
      *
-     * @exception IOException if the document does not exist or the
+     * @throws IOException if the document does not exist or the
      *            name is that of a DirectoryEntry
      */
     public DocumentInputStream createDocumentInputStream(
@@ -143,7 +144,7 @@ public class DirectoryNode
      *
      * @return a newly opened DocumentInputStream or DocumentInputStream
      *
-     * @exception IOException if the document does not exist or the
+     * @throws IOException if the document does not exist or the
      *            name is that of a DirectoryEntry
      */
     public DocumentInputStream createDocumentInputStream(
@@ -166,7 +167,7 @@ public class DirectoryNode
      *
      * @return the new DocumentEntry
      *
-     * @exception IOException if the document can't be created
+     * @throws IOException if the document can't be created
      */
     DocumentEntry createDocument(final POIFSDocument document)
         throws IOException
@@ -250,20 +251,22 @@ public class DirectoryNode
      *         implementations of Entry.
      */
 
+    @Override
     public Iterator<Entry> getEntries()
     {
         return _entries.iterator();
     }
-    
+
     /**
      * get the names of all the Entries contained directly in this
      * instance (in other words, names of children only; no grandchildren
      * etc).
      *
      * @return the names of all the entries that may be retrieved with
-     *         getEntry(String), which may be empty (if this 
+     *         getEntry(String), which may be empty (if this
      *         DirectoryEntry is empty)
      */
+    @Override
     public Set<String> getEntryNames()
     {
         return _byname.keySet();
@@ -275,6 +278,7 @@ public class DirectoryNode
      * @return true if this instance contains no Entry instances
      */
 
+    @Override
     public boolean isEmpty()
     {
         return _entries.isEmpty();
@@ -288,11 +292,13 @@ public class DirectoryNode
      *         Entry instances
      */
 
+    @Override
     public int getEntryCount()
     {
         return _entries.size();
     }
 
+    @Override
     public boolean hasEntry( String name )
     {
         return name != null && _byname.containsKey( name );
@@ -306,10 +312,11 @@ public class DirectoryNode
      * @return the specified Entry, if it is directly contained in
      *         this DirectoryEntry
      *
-     * @exception FileNotFoundException if no Entry with the specified
+     * @throws FileNotFoundException if no Entry with the specified
      *            name exists in this DirectoryEntry
      */
 
+    @Override
     public Entry getEntry(final String name) throws FileNotFoundException {
         Entry rval = null;
 
@@ -342,9 +349,10 @@ public class DirectoryNode
      *
      * @return the new DocumentEntry
      *
-     * @exception IOException if the document can't be created
+     * @throws IOException if the document can't be created
      */
 
+    @Override
     public DocumentEntry createDocument(final String name,
                                         final InputStream stream)
         throws IOException
@@ -361,9 +369,10 @@ public class DirectoryNode
      *
      * @return the new DocumentEntry
      *
-     * @exception IOException if the document can't be created
+     * @throws IOException if the document can't be created
      */
 
+    @Override
     public DocumentEntry createDocument(final String name, final int size,
                                         final POIFSWriterListener writer)
         throws IOException
@@ -378,9 +387,10 @@ public class DirectoryNode
      *
      * @return the new DirectoryEntry
      *
-     * @exception IOException if the directory can't be created
+     * @throws IOException if the directory can't be created
      */
 
+    @Override
     public DirectoryEntry createDirectory(final String name)
         throws IOException
     {
@@ -396,7 +406,7 @@ public class DirectoryNode
     }
 
     /**
-     * Set the contents of a document, creating if needed, 
+     * Set the contents of a document, creating if needed,
      *  otherwise updating. Returns the created / updated DocumentEntry
      *
      * @param name the name of the new or existing DocumentEntry
@@ -404,7 +414,7 @@ public class DirectoryNode
      *
      * @return the new or updated DocumentEntry
      *
-     * @exception IOException if the document can't be created or its content be replaced
+     * @throws IOException if the document can't be created or its content be replaced
      */
     @SuppressWarnings("WeakerAccess")
     public DocumentEntry createOrUpdateDocument(final String name,
@@ -420,12 +430,13 @@ public class DirectoryNode
             return existing;
         }
     }
-    
+
     /**
      * Gets the storage clsid of the directory entry
      *
      * @return storage Class ID
      */
+    @Override
     public ClassID getStorageClsid()
     {
         return getProperty().getStorageClsid();
@@ -436,6 +447,7 @@ public class DirectoryNode
      *
      * @param clsidStorage storage Class ID
      */
+    @Override
     public void setStorageClsid(ClassID clsidStorage)
     {
         getProperty().setStorageClsid(clsidStorage);
@@ -485,6 +497,7 @@ public class DirectoryNode
      * @return an array of Object; may not be null, but may be empty
      */
 
+    @Override
     public Object [] getViewableArray()
     {
         return new Object[ 0 ];
@@ -497,6 +510,7 @@ public class DirectoryNode
      * @return an Iterator; may not be null, but may have an empty
      * back end store
      */
+    @Override
     public Iterator<Object> getViewableIterator() {
         List<Object> components = new ArrayList<>();
 
@@ -513,6 +527,7 @@ public class DirectoryNode
      *         a viewer should call getViewableIterator
      */
 
+    @Override
     public boolean preferArray()
     {
         return false;
@@ -525,6 +540,7 @@ public class DirectoryNode
      * @return short description
      */
 
+    @Override
     public String getShortDescription()
     {
         return getName();
@@ -533,8 +549,19 @@ public class DirectoryNode
     /**
      * Returns an Iterator over all the entries
      */
+    @Override
     public Iterator<Entry> iterator() {
         return getEntries();
+    }
+
+    /**
+     * Returns a Spliterator over all the entries
+     *
+     * @since POI 5.2.0
+     */
+    @Override
+    public Spliterator<Entry> spliterator() {
+        return _entries.spliterator();
     }
 
     /* **********  END  begin implementation of POIFSViewable ********** */

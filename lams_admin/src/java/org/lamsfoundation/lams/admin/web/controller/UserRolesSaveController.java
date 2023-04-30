@@ -136,7 +136,7 @@ public class UserRolesSaveController {
 	    userManagementService.save(user);
 	}
 
-	if (userRolesForm.isAddToLessons()) {
+	if (userRolesForm.isAddToLessons() && !orgId.equals(1)) {
 	    for (String roleIdString : roles) {
 		Integer roleId = Integer.valueOf(roleIdString);
 		if (roleId.equals(Role.ROLE_LEARNER) || roleId.equals(Role.ROLE_MONITOR)) {

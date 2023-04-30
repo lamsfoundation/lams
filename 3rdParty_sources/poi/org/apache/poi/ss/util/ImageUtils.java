@@ -20,7 +20,6 @@ import static org.apache.poi.util.Units.EMU_PER_PIXEL;
 
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
@@ -31,6 +30,9 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
+import org.apache.commons.io.input.UnsynchronizedByteArrayInputStream;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.Picture;
@@ -38,14 +40,12 @@ import org.apache.poi.ss.usermodel.PictureData;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
 import org.apache.poi.util.Units;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public final class ImageUtils {
-    private static final POILogger logger = POILogFactory.getLogger(ImageUtils.class);
+    private static final Logger LOG = LogManager.getLogger(ImageUtils.class);
 
     private static final int WIDTH_UNITS = 1024;
     private static final int HEIGHT_UNITS = 256;
@@ -56,8 +56,8 @@ public final class ImageUtils {
      * Return the dimension of this image
      *
      * @param is the stream containing the image data
-     * @param type type of the picture: {@link org.apache.poi.ss.usermodel.Workbook#PICTURE_TYPE_JPEG},
-     * {@link org.apache.poi.ss.usermodel.Workbook#PICTURE_TYPE_PNG} or {@link org.apache.poi.ss.usermodel.Workbook#PICTURE_TYPE_DIB}
+     * @param type type of the picture: {@link Workbook#PICTURE_TYPE_JPEG},
+     * {@link Workbook#PICTURE_TYPE_PNG} or {@link Workbook#PICTURE_TYPE_DIB}
      *
      * @return image dimension in pixels
      */
@@ -93,25 +93,25 @@ public final class ImageUtils {
                                 r.dispose();
                             }
                         } else {
-                            logger.log(POILogger.WARN, "ImageIO found no images");
+                            LOG.atWarn().log("ImageIO found no images");
                         }
                     }
 
                 } catch (IOException e) {
                     //silently return if ImageIO failed to read the image
-                    logger.log(POILogger.WARN, e);
+                    LOG.atWarn().withThrowable(e).log("Failed to determine image dimensions");
                 }
 
                 break;
             default:
-                logger.log(POILogger.WARN, "Only JPEG, PNG and DIB pictures can be automatically sized");
+                LOG.atWarn().log("Only JPEG, PNG and DIB pictures can be automatically sized");
         }
         return size;
     }
 
     /**
      * The metadata of PNG and JPEG can contain the width of a pixel in millimeters.
-     * Return the the "effective" dpi calculated as <code>25.4/HorizontalPixelSize</code>
+     * Return the "effective" dpi calculated as <code>25.4/HorizontalPixelSize</code>
      * and <code>25.4/VerticalPixelSize</code>.  Where 25.4 is the number of mm in inch.
      *
      * @return array of two elements: <code>{horizontalDpi, verticalDpi}</code>.
@@ -142,8 +142,9 @@ public final class ImageUtils {
      * @param scaleX the amount by which image width is multiplied relative to the original width.
      * @param scaleY the amount by which image height is multiplied relative to the original height.
      * @return the new Dimensions of the scaled picture in EMUs
+     * @throws IllegalArgumentException if scale values lead to negative or infinite results
      */
-    public static Dimension setPreferredSize(Picture picture, double scaleX, double scaleY){
+    public static Dimension setPreferredSize(Picture picture, double scaleX, double scaleY) {
         ClientAnchor anchor = picture.getClientAnchor();
         boolean isHSSF = (anchor instanceof HSSFClientAnchor);
         PictureData data = picture.getPictureData();
@@ -151,7 +152,7 @@ public final class ImageUtils {
 
         // in pixel
         final Dimension imgSize = (scaleX == Double.MAX_VALUE || scaleY == Double.MAX_VALUE)
-            ? getImageDimension(new ByteArrayInputStream(data.getData()), data.getPictureType())
+            ? getImageDimension(new UnsynchronizedByteArrayInputStream(data.getData()), data.getPictureType())
             : new Dimension();
 
         // in emus
@@ -191,7 +192,7 @@ public final class ImageUtils {
         Dimension imgSize = null;
         if (anchor.getCol2() < anchor.getCol1() || anchor.getRow2() < anchor.getRow1()) {
             PictureData data = picture.getPictureData();
-            imgSize = getImageDimension(new ByteArrayInputStream(data.getData()), data.getPictureType());
+            imgSize = getImageDimension(new UnsynchronizedByteArrayInputStream(data.getData()), data.getPictureType());
         }
 
         int w = getDimFromCell(imgSize == null ? 0 : imgSize.getWidth(), anchor.getCol1(), anchor.getDx1(), anchor.getCol2(), anchor.getDx2(),
@@ -219,6 +220,9 @@ public final class ImageUtils {
                                   Function<Integer,Number> nextSize) {
         if (targetSize < 0) {
             throw new IllegalArgumentException("target size < 0");
+        }
+        if (Double.isInfinite(targetSize) || Double.isNaN(targetSize)) {
+            throw new IllegalArgumentException("target size " + targetSize + " is not supported");
         }
 
         int cellIdx = startCell;

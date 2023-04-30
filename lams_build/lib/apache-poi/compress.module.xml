@@ -22,6 +22,6 @@
   -->
 <module name="org.apache.commons.compress" xmlns="urn:jboss:module:1.5">
     <resources>
-        <resource-root path="commons-compress-1.21.jar"/>
+        <resource-root path="commons-compress-1.23.0.jar"/>
     </resources>
 </module>

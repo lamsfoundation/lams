@@ -17,107 +17,115 @@
 
 package org.apache.poi.ss.formula.functions;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.formula.eval.ErrorEval;
 import org.apache.poi.ss.formula.eval.EvaluationException;
 import org.apache.poi.ss.formula.eval.NumberEval;
 import org.apache.poi.ss.formula.eval.OperandResolver;
 import org.apache.poi.ss.formula.eval.ValueEval;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
 
 /**
  * Implements the Excel Rate function
  */
 public class Rate implements Function {
-    private static final POILogger LOG = POILogFactory.getLogger(Rate.class);
-    
-   public ValueEval evaluate(ValueEval[] args, int srcRowIndex, int srcColumnIndex) {
-      if (args.length < 3) { //First 3 parameters are mandatory
-         return ErrorEval.VALUE_INVALID;
-      }
+    private static final Logger LOG = LogManager.getLogger(Rate.class);
 
-      double periods, payment, present_val, future_val = 0, type = 0, estimate = 0.1, rate;
+    @Override
+    public ValueEval evaluate(ValueEval[] args, int srcRowIndex, int srcColumnIndex) {
+        if (args.length < 3) { //First 3 parameters are mandatory
+            return ErrorEval.VALUE_INVALID;
+        }
 
-      try {
-         ValueEval v1 = OperandResolver.getSingleValue(args[0], srcRowIndex, srcColumnIndex);
-         ValueEval v2 = OperandResolver.getSingleValue(args[1], srcRowIndex, srcColumnIndex);
-         ValueEval v3 = OperandResolver.getSingleValue(args[2], srcRowIndex, srcColumnIndex);
-         ValueEval v4 = null;
-         if (args.length >= 4)
-            v4 = OperandResolver.getSingleValue(args[3], srcRowIndex, srcColumnIndex);
-         ValueEval v5 = null;
-         if (args.length >= 5)
-            v5 = OperandResolver.getSingleValue(args[4], srcRowIndex, srcColumnIndex);
-         ValueEval v6 = null;
-         if (args.length >= 6)
-            v6 = OperandResolver.getSingleValue(args[5], srcRowIndex, srcColumnIndex);
+        double periods, payment, present_val, future_val = 0, type = 0, estimate = 0.1, rate;
 
-         periods = OperandResolver.coerceValueToDouble(v1); 
-         payment = OperandResolver.coerceValueToDouble(v2);
-         present_val = OperandResolver.coerceValueToDouble(v3);
-         if (args.length >= 4)
-            future_val = OperandResolver.coerceValueToDouble(v4);
-         if (args.length >= 5)
-            type = OperandResolver.coerceValueToDouble(v5);
-         if (args.length >= 6)
-            estimate = OperandResolver.coerceValueToDouble(v6);
-         rate = calculateRate(periods, payment, present_val, future_val, type, estimate) ;
+        try {
+            ValueEval v1 = OperandResolver.getSingleValue(args[0], srcRowIndex, srcColumnIndex);
+            ValueEval v2 = OperandResolver.getSingleValue(args[1], srcRowIndex, srcColumnIndex);
+            ValueEval v3 = OperandResolver.getSingleValue(args[2], srcRowIndex, srcColumnIndex);
+            ValueEval v4 = null;
+            if (args.length >= 4)
+                v4 = OperandResolver.getSingleValue(args[3], srcRowIndex, srcColumnIndex);
+            ValueEval v5 = null;
+            if (args.length >= 5)
+                v5 = OperandResolver.getSingleValue(args[4], srcRowIndex, srcColumnIndex);
+            ValueEval v6 = null;
+            if (args.length >= 6)
+                v6 = OperandResolver.getSingleValue(args[5], srcRowIndex, srcColumnIndex);
 
-         checkValue(rate);
-      } catch (EvaluationException e) {
-          LOG.log(POILogger.ERROR, "Can't evaluate rate function", e);
-         return e.getErrorEval();
-      }
+            periods = OperandResolver.coerceValueToDouble(v1);
+            payment = OperandResolver.coerceValueToDouble(v2);
+            present_val = OperandResolver.coerceValueToDouble(v3);
+            if (args.length >= 4)
+                future_val = OperandResolver.coerceValueToDouble(v4);
+            if (args.length >= 5)
+                type = OperandResolver.coerceValueToDouble(v5);
+            if (args.length >= 6)
+                estimate = OperandResolver.coerceValueToDouble(v6);
+            rate = calculateRate(periods, payment, present_val, future_val, type, estimate);
 
-      return new NumberEval( rate ) ;
-   }
+            checkValue(rate);
+        } catch (EvaluationException e) {
+            LOG.atError().withThrowable(e).log("Can't evaluate rate function");
+            return e.getErrorEval();
+        }
 
-   private double calculateRate(double nper, double pmt, double pv, double fv, double type, double guess) {
-      //FROM MS http://office.microsoft.com/en-us/excel-help/rate-HP005209232.aspx
-      int FINANCIAL_MAX_ITERATIONS = 20;//Bet accuracy with 128
-      double FINANCIAL_PRECISION = 0.0000001;//1.0e-8
+        return new NumberEval(rate);
+    }
 
-      double y, y0, y1, x0, x1 = 0, f = 0, i = 0;
-      double rate = guess;
-      if (Math.abs(rate) < FINANCIAL_PRECISION) {
-         y = pv * (1 + nper * rate) + pmt * (1 + rate * type) * nper + fv;
-      } else {
-         f = Math.exp(nper * Math.log(1 + rate));
-         y = pv * f + pmt * (1 / rate + type) * (f - 1) + fv;
-      }
-      y0 = pv + pmt * nper + fv;
-      y1 = pv * f + pmt * (1 / rate + type) * (f - 1) + fv;
+    private static double _g_div_gp(double r, double n, double p, double x, double y, double w) {
+        double t1 = Math.pow(r+1, n);
+        double t2 = Math.pow(r+1, n-1);
+        return (y + t1*x + p*(t1 - 1)*(r*w + 1)/r) /
+                (n*t2*x - p*(t1 - 1)*(r*w + 1)/(Math.pow(r, 2) + n*p*t2*(r*w + 1)/r +
+                        p*(t1 - 1)*w/r));
+    }
 
-      // find root by Newton secant method
-      i = x0 = 0.0;
-      x1 = rate;
-      while ((Math.abs(y0 - y1) > FINANCIAL_PRECISION) && (i < FINANCIAL_MAX_ITERATIONS)) {
-         rate = (y1 * x0 - y0 * x1) / (y1 - y0);
-         x0 = x1;
-         x1 = rate;
+    /**
+     * Compute the rate of interest per period.
+     *
+     * The implementation was ported from the NumPy library,
+     * see https://github.com/numpy/numpy-financial/blob/d02edfb65dcdf23bd571c2cded7fcd4a0528c6af/numpy_financial/_financial.py#L602
+     *
+     *
+     * @param nper Number of compounding periods
+     * @param pmt Payment
+     * @param pv Present Value
+     * @param fv Future value
+     * @param type When payments are due ('begin' (1) or 'end' (0))
+     * @param guess Starting guess for solving the rate of interest
+     * @return rate of interest per period or NaN if the solution didn't converge
+     */
+    static double calculateRate(double nper, double pmt, double pv, double fv, double type, double guess){
+        double tol = 1e-8;
+        double maxiter = 100;
 
-         if (Math.abs(rate) < FINANCIAL_PRECISION) {
-            y = pv * (1 + nper * rate) + pmt * (1 + rate * type) * nper + fv;
-         } else {
-            f = Math.exp(nper * Math.log(1 + rate));
-            y = pv * f + pmt * (1 / rate + type) * (f - 1) + fv;
-         }
+        double rn = guess;
+        int iter = 0;
+        boolean close = false;
+        while (iter < maxiter && !close){
+            double rnp1 = rn - _g_div_gp(rn, nper, pmt, pv, fv, type);
+            double diff = Math.abs(rnp1 - rn);
+            close = diff < tol;
+            iter += 1;
+            rn = rnp1;
 
-         y0 = y1;
-         y1 = y;
-         ++i;
-      }
-      return rate;
-   }
+        }
+        if(!close)
+            return Double.NaN;
+        else {
+            return rn;
+        }
+    }
 
-   /**
-    * Excel does not support infinities and NaNs, rather, it gives a #NUM! error in these cases
-    * 
-    * @throws EvaluationException (#NUM!) if <tt>result</tt> is <tt>NaN</> or <tt>Infinity</tt>
-    */
-   static void checkValue(double result) throws EvaluationException {
-      if (Double.isNaN(result) || Double.isInfinite(result)) {
-         throw new EvaluationException(ErrorEval.NUM_ERROR);
-      }
-   }
+    /**
+     * Excel does not support infinities and NaNs, rather, it gives a #NUM! error in these cases
+     *
+     * @throws EvaluationException (#NUM!) if {@code result} is {@code NaN} or {@code Infinity}
+     */
+    static void checkValue(double result) throws EvaluationException {
+        if (Double.isNaN(result) || Double.isInfinite(result)) {
+            throw new EvaluationException(ErrorEval.NUM_ERROR);
+        }
+    }
 }

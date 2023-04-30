@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Spliterator;
 
 import org.apache.poi.ddf.DefaultEscherRecordFactory;
 import org.apache.poi.ddf.EscherBoolProperty;
@@ -46,7 +47,7 @@ import org.apache.poi.hssf.record.ObjRecord;
  */
 public class HSSFShapeGroup extends HSSFShape implements HSSFShapeContainer {
     private final List<HSSFShape> shapes = new ArrayList<>();
-    private EscherSpgrRecord _spgrRecord;
+    private final EscherSpgrRecord _spgrRecord;
 
     public HSSFShapeGroup(EscherContainerRecord spgrContainer, ObjRecord objRecord) {
         super(spgrContainer, objRecord);
@@ -54,16 +55,15 @@ public class HSSFShapeGroup extends HSSFShape implements HSSFShapeContainer {
         // read internal and external coordinates from spgrContainer
         EscherContainerRecord spContainer = spgrContainer.getChildContainers().get(0);
         _spgrRecord = (EscherSpgrRecord) spContainer.getChild(0);
-        for (EscherRecord ch : spContainer.getChildRecords()) {
+        for (EscherRecord ch : spContainer) {
             switch (EscherRecordTypes.forTypeID(ch.getRecordId())) {
-                case SPGR:
-                    break;
                 case CLIENT_ANCHOR:
                     anchor = new HSSFClientAnchor((EscherClientAnchorRecord) ch);
                     break;
                 case CHILD_ANCHOR:
                     anchor = new HSSFChildAnchor((EscherChildAnchorRecord) ch);
                     break;
+                case SPGR:
                 default:
                     break;
             }
@@ -141,10 +141,12 @@ public class HSSFShapeGroup extends HSSFShape implements HSSFShapeContainer {
     protected void afterRemove(HSSFPatriarch patriarch) {
         patriarch.getBoundAggregate().removeShapeToObjRecord(getEscherContainer().getChildContainers().get(0)
                 .getChildById(EscherClientDataRecord.RECORD_ID));
-        for ( int i=0; i<shapes.size(); i++ ) {
-            HSSFShape shape = shapes.get(i);
-            removeShape(shape);
-            shape.afterRemove(getPatriarch());
+        EscherContainerRecord cont = getEscherContainer();
+        HSSFPatriarch pat = getPatriarch();
+        for (HSSFShape shape : shapes) {
+            if (cont.removeChildRecord(shape.getEscherContainer())){
+                shape.afterRemove(pat);
+            }
         }
         shapes.clear();
     }
@@ -181,6 +183,7 @@ public class HSSFShapeGroup extends HSSFShape implements HSSFShapeContainer {
         return group;
     }
 
+    @Override
     public void addShape(HSSFShape shape) {
         shape.setPatriarch(this.getPatriarch());
         shape.setParent(this);
@@ -267,6 +270,7 @@ public class HSSFShapeGroup extends HSSFShape implements HSSFShapeContainer {
     /**
      * Return all children contained by this shape.
      */
+    @Override
     public List<HSSFShape> getChildren() {
         return Collections.unmodifiableList(shapes);
     }
@@ -275,6 +279,7 @@ public class HSSFShapeGroup extends HSSFShape implements HSSFShapeContainer {
      * Sets the coordinate space of this group.  All children are constrained
      * to these coordinates.
      */
+    @Override
     public void setCoordinates(int x1, int y1, int x2, int y2) {
         _spgrRecord.setRectX1(x1);
         _spgrRecord.setRectX2(x2);
@@ -282,6 +287,7 @@ public class HSSFShapeGroup extends HSSFShape implements HSSFShapeContainer {
         _spgrRecord.setRectY2(y2);
     }
 
+    @Override
     public void clear() {
         ArrayList <HSSFShape> copy = new ArrayList<>(shapes);
         for (HSSFShape shape: copy){
@@ -292,6 +298,7 @@ public class HSSFShapeGroup extends HSSFShape implements HSSFShapeContainer {
     /**
      * The top left x coordinate of this group.
      */
+    @Override
     public int getX1() {
         return _spgrRecord.getRectX1();
     }
@@ -299,6 +306,7 @@ public class HSSFShapeGroup extends HSSFShape implements HSSFShapeContainer {
     /**
      * The top left y coordinate of this group.
      */
+    @Override
     public int getY1() {
         return _spgrRecord.getRectY1();
     }
@@ -306,6 +314,7 @@ public class HSSFShapeGroup extends HSSFShape implements HSSFShapeContainer {
     /**
      * The bottom right x coordinate of this group.
      */
+    @Override
     public int getX2() {
         return _spgrRecord.getRectX2();
     }
@@ -313,6 +322,7 @@ public class HSSFShapeGroup extends HSSFShape implements HSSFShapeContainer {
     /**
      * The bottom right y coordinate of this group.
      */
+    @Override
     public int getY2() {
         return _spgrRecord.getRectY2();
     }
@@ -320,6 +330,7 @@ public class HSSFShapeGroup extends HSSFShape implements HSSFShapeContainer {
     /**
      * Count of all children and their childrens children.
      */
+    @Override
     public int countOfAllChildren() {
         int count = shapes.size();
         for (HSSFShape shape : shapes) {
@@ -386,10 +397,11 @@ public class HSSFShapeGroup extends HSSFShape implements HSSFShapeContainer {
         return group;
     }
 
+    @Override
     public boolean removeShape(HSSFShape shape) {
         boolean  isRemoved = getEscherContainer().removeChildRecord(shape.getEscherContainer());
         if (isRemoved){
-            shape.afterRemove(this.getPatriarch());
+            shape.afterRemove(getPatriarch());
             shapes.remove(shape);
         }
         return isRemoved;
@@ -398,5 +410,13 @@ public class HSSFShapeGroup extends HSSFShape implements HSSFShapeContainer {
     @Override
     public Iterator<HSSFShape> iterator() {
         return shapes.iterator();
+    }
+
+    /**
+     * @since POI 5.2.0
+     */
+    @Override
+    public Spliterator<HSSFShape> spliterator() {
+        return shapes.spliterator();
     }
 }

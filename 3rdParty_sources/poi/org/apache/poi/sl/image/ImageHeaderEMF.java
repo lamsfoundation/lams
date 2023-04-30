@@ -20,15 +20,15 @@ package org.apache.poi.sl.image;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.util.Internal;
 import org.apache.poi.util.LittleEndian;
 import org.apache.poi.util.LocaleUtil;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
 
 @Internal
 public class ImageHeaderEMF {
-    private static final POILogger LOG = POILogFactory.getLogger(ImageHeaderEMF.class);
+    private static final Logger LOG = LogManager.getLogger(ImageHeaderEMF.class);
 
     private static final String EMF_SIGNATURE = " EMF"; // 0x464D4520 (LE)
 
@@ -40,7 +40,7 @@ public class ImageHeaderEMF {
         int offset = off;
         int type = (int)LittleEndian.getUInt(data, offset); offset += 4;
         if (type != 1) {
-            LOG.log(POILogger.WARN, "Invalid EMF picture - invalid type");
+            LOG.atWarn().log("Invalid EMF picture - invalid type");
             deviceBounds = new Rectangle(0,0,200,200);
             return;
         }
@@ -50,12 +50,12 @@ public class ImageHeaderEMF {
         int top = LittleEndian.getInt(data, offset); offset += 4;
         int right = LittleEndian.getInt(data, offset); offset += 4;
         int bottom = LittleEndian.getInt(data, offset); offset += 4;
-        deviceBounds = new Rectangle(left, top, right-left, bottom-top);
+        deviceBounds = new Rectangle(left, top,  right-left == -1 ? 0 : right-left, bottom-top == -1 ? 0 : bottom-top);
         // ignore frame bounds
         offset += 16;
         String signature = new String(data, offset, EMF_SIGNATURE.length(), LocaleUtil.CHARSET_1252);
         if (!EMF_SIGNATURE.equals(signature)) {
-            LOG.log(POILogger.WARN, "Invalid EMF picture - invalid signature");
+            LOG.atWarn().log("Invalid EMF picture - invalid signature");
         }
     }
 

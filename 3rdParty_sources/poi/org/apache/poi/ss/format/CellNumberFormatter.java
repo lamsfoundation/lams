@@ -16,6 +16,7 @@
 ==================================================================== */
 package org.apache.poi.ss.format;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.FieldPosition;
@@ -32,15 +33,15 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.zaxxer.sparsebits.SparseBitSet;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.util.LocaleUtil;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
 
 /**
  * This class implements printing out a value using a number format.
  */
 public class CellNumberFormatter extends CellFormatter {
-    private static final POILogger LOG = POILogFactory.getLogger(CellNumberFormatter.class);
+    private static final Logger LOG = LogManager.getLogger(CellNumberFormatter.class);
 
     private final String desc;
     private final String printfFmt;
@@ -79,6 +80,7 @@ public class CellNumberFormatter extends CellFormatter {
             super(locale, "General");
         }
 
+        @Override
         public void formatValue(StringBuffer toAppendTo, Object value) {
             if (value == null) {
                 return;
@@ -95,6 +97,7 @@ public class CellNumberFormatter extends CellFormatter {
             cf.formatValue(toAppendTo, value);
         }
 
+        @Override
         public void simpleValue(StringBuffer toAppendTo, Object value) {
             formatValue(toAppendTo, value);
         }
@@ -258,7 +261,7 @@ public class CellNumberFormatter extends CellFormatter {
                         first = false;
                     }
                 }
-            if (fractionalSpecials.size() > 0) {
+            if (!fractionalSpecials.isEmpty()) {
                 fmtBuf.append('.');
                 for (Special s : fractionalSpecials) {
                     if (isDigitFmt(s)) {
@@ -420,10 +423,10 @@ public class CellNumberFormatter extends CellFormatter {
         return (afterFractional == null) ? specials.size() : specials.indexOf(afterFractional);
     }
 
-    /** {@inheritDoc} */
+    @Override
     public void formatValue(StringBuffer toAppendTo, Object valueObject) {
-        double value = ((Number) valueObject).doubleValue();
-        value *= scale;
+        BigDecimal bd = BigDecimal.valueOf(((Number) valueObject).doubleValue()).multiply(BigDecimal.valueOf(scale));
+        double value = bd.doubleValue();
 
         // For negative numbers:
         // - If the cell format has a negative number format, this method
@@ -527,7 +530,7 @@ public class CellNumberFormatter extends CellFormatter {
                     int modEndPos = delEndPos + adjust;
 
                     if (modPos < modEndPos) {
-                        if ("".equals(nextChange.getToAdd())) {
+                        if (nextChange.getToAdd() != null && nextChange.getToAdd().length() == 0) {
                             output.delete(modPos, modEndPos);
                         }
                         else {
@@ -691,12 +694,12 @@ public class CellNumberFormatter extends CellFormatter {
                 d = frac.getDenominator();
             }
             if (improperFraction) {
-                n += Math.round(value * d);
+                n = Math.toIntExact(n + Math.round(value * d));
             }
             writeSingleInteger(numeratorFmt, n, output, numeratorSpecials, mods);
             writeSingleInteger(denominatorFmt, d, output, denominatorSpecials, mods);
-        } catch (RuntimeException ignored) {
-            LOG.log(POILogger.ERROR, "error while fraction evaluation", ignored);
+        } catch (RuntimeException e) {
+            LOG.atError().withThrowable(e).log("error while fraction evaluation");
         }
     }
 
@@ -721,15 +724,22 @@ public class CellNumberFormatter extends CellFormatter {
         return text.replaceFirst("(?s)(.*)" + regex, "$1" + replacement);
     }
 
-    private static boolean hasChar(char ch, List<Special>... numSpecials) {
-        for (List<Special> specials : numSpecials) {
-            for (Special s : specials) {
-                if (s.ch == ch) {
-                    return true;
-                }
+    private static boolean hasChar(char ch, List<Special> numSpecials) {
+        for (Special s : numSpecials) {
+            if (s.ch == ch) {
+                return true;
             }
         }
         return false;
+    }
+
+    private static boolean hasChar(char ch, List<Special> numSpecials1, List<Special> numSpecials2) {
+        return hasChar(ch, numSpecials1) || hasChar(ch, numSpecials2);
+    }
+
+    private static boolean hasChar(char ch, List<Special> numSpecials1, List<Special> numSpecials2,
+                                   List<Special> numSpecials3) {
+        return hasChar(ch, numSpecials1) || hasChar(ch, numSpecials2) || hasChar(ch, numSpecials3);
     }
 
     private void writeSingleInteger(String fmt, int num, StringBuffer output, List<Special> numSpecials, Set<CellNumberStringMod> mods) {
@@ -812,7 +822,7 @@ public class CellNumberFormatter extends CellFormatter {
     private void writeFractional(StringBuffer result, StringBuffer output) {
         int digit;
         int strip;
-        if (fractionalSpecials.size() > 0) {
+        if (!fractionalSpecials.isEmpty()) {
             String decimalSeparator = Character.toString(getDecimalFormatSymbols().getDecimalSeparator());
             digit = result.indexOf(decimalSeparator) + 1;
             if (exponent != null) {
@@ -842,9 +852,10 @@ public class CellNumberFormatter extends CellFormatter {
     /**
      * {@inheritDoc}
      * <p>
-     * For a number, this is <tt>"#"</tt> for integer values, and <tt>"#.#"</tt>
+     * For a number, this is {@code "#"} for integer values, and {@code "#.#"}
      * for floating-point values.
      */
+    @Override
     public void simpleValue(StringBuffer toAppendTo, Object value) {
         SIMPLE_NUMBER.formatValue(toAppendTo, value);
     }

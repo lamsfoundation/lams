@@ -22,6 +22,9 @@ import org.apache.poi.ss.formula.eval.*;
 import org.apache.poi.ss.formula.functions.FreeRefFunction;
 import org.apache.poi.ss.formula.functions.NumericFunction;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 /**
  * Implementation of Excel 'Analysis ToolPak' function MROUND()<br>
  *
@@ -29,20 +32,16 @@ import org.apache.poi.ss.formula.functions.NumericFunction;
  *
  * <b>Syntax</b><br>
  * <b>MROUND</b>(<b>number</b>, <b>multiple</b>)
- *
- * <p>
- *
- * @author Yegor Kozlov
  */
 final class MRound implements FreeRefFunction {
 
-	public static final FreeRefFunction instance = new MRound();
+    public static final FreeRefFunction instance = new MRound();
 
-	private MRound() {
-		// enforce singleton
-	}
+    private MRound() {
+        // enforce singleton
+    }
 
-	public ValueEval evaluate(ValueEval[] args, OperationEvaluationContext ec) {
+    public ValueEval evaluate(ValueEval[] args, OperationEvaluationContext ec) {
         double number, multiple, result;
 
         if (args.length != 2) {
@@ -60,12 +59,15 @@ final class MRound implements FreeRefFunction {
                     // Returns #NUM! because the number and the multiple have different signs
                     throw new EvaluationException(ErrorEval.NUM_ERROR);
                 }
-                result = multiple * Math.round( number / multiple );
+                BigDecimal bdMultiple = BigDecimal.valueOf(multiple);
+                result = bdMultiple.multiply(BigDecimal.valueOf(number).divide(bdMultiple, 0, RoundingMode.HALF_UP))
+                        .doubleValue();
+
             }
             NumericFunction.checkValue(result);
             return new NumberEval(result);
         } catch (EvaluationException e) {
             return e.getErrorEval();
         }
-	}
+    }
 }

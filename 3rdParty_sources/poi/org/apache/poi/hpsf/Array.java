@@ -16,12 +16,23 @@
 ==================================================================== */
 package org.apache.poi.hpsf;
 
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.Internal;
 import org.apache.poi.util.LittleEndianByteArrayInputStream;
 
 @Internal
-public class Array
-{
+public class Array {
+    private static final int DEFAULT_MAX_NUMBER_OF_ARRAY_SCALARS = 100_000;
+    private static int MAX_NUMBER_OF_ARRAY_SCALARS = DEFAULT_MAX_NUMBER_OF_ARRAY_SCALARS;
+
+    public static int getMaxNumberOfArrayScalars() {
+        return MAX_NUMBER_OF_ARRAY_SCALARS;
+    }
+
+    public static void setMaxNumberOfArrayScalars(final int maxNumberOfArrayScalars) {
+        MAX_NUMBER_OF_ARRAY_SCALARS = maxNumberOfArrayScalars;
+    }
+
     static class ArrayDimension {
         private long _size;
         @SuppressWarnings("unused")
@@ -33,8 +44,7 @@ public class Array
         }
     }
 
-    static class ArrayHeader
-    {
+    static class ArrayHeader {
         private ArrayDimension[] _dimensions;
         private int _type;
 
@@ -47,7 +57,7 @@ public class Array
                 String msg = "Array dimension number "+numDimensionsUnsigned+" is not in [1; 31] range";
                 throw new IllegalPropertySetDataException(msg);
             }
-                
+
             int numDimensions = (int) numDimensionsUnsigned;
 
             _dimensions = new ArrayDimension[numDimensions];
@@ -85,6 +95,8 @@ public class Array
             throw new UnsupportedOperationException(msg);
         }
         int numberOfScalars = (int) numberOfScalarsLong;
+
+        IOUtils.safelyAllocateCheck(numberOfScalars, getMaxNumberOfArrayScalars());
 
         _values = new TypedPropertyValue[numberOfScalars];
         int paddedType = (_header._type == Variant.VT_VARIANT) ? 0 : _header._type;

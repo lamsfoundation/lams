@@ -18,9 +18,6 @@
 package org.apache.poi.ss.formula.functions;
 
 /**
- * @author Amol S. Deshmukh &lt; amolweb at ya hoo dot com &gt;
- *
- *
  * This class is a functon library for common fiscal functions.
  * <b>Glossary of terms/abbreviations:</b>
  * <br>
@@ -33,13 +30,16 @@ package org.apache.poi.ss.formula.functions;
  * </ul>
  * For more info on the terms/abbreviations please use the references below
  * (hyperlinks are subject to change):
- * </br>Online References:
+ * <p>
+ * Online References:
  * <ol>
  * <li>GNU Emacs Calc 2.02 Manual: http://theory.uwinnipeg.ca/gnu/calc/calc_203.html</li>
  * <li>Yahoo Financial Glossary: http://biz.yahoo.com/f/g/nn.html#y</li>
  * <li>MS Excel function reference: http://office.microsoft.com/en-us/assistance/CH062528251033.aspx</li>
  * </ol>
- * <h3>Implementation Notes:</h3>
+ *
+ * Implementation Notes:<p>
+ *
  * Symbols used in the formulae that follow:<br>
  * <ul>
  * <li>p: present value</li>
@@ -66,7 +66,7 @@ public final class FinanceLib {
      * Future value of an amount given the number of payments, rate, amount
      * of individual payment, present value and boolean value indicating whether
      * payments are due at the beginning of period
-     * (false => payments are due at end of period)
+     * (false =&gt; payments are due at end of period)
      * @param r rate
      * @param n num of periods
      * @param y pmt per period
@@ -74,24 +74,21 @@ public final class FinanceLib {
      * @param t type (true=pmt at beginning of period, false=pmt at end of period)
      */
     public static double fv(double r, double n, double y, double p, boolean t) {
-        double retval = 0;
         if (r == 0) {
-            retval = -1*(p+(n*y));
-        }
-        else {
+            return -1*(p+(n*y));
+        } else {
             double r1 = r + 1;
-            retval =((1-Math.pow(r1, n)) * (t ? r1 : 1) * y ) / r
+            return ((1-Math.pow(r1, n)) * (t ? r1 : 1) * y ) / r
                       -
                    p*Math.pow(r1, n);
         }
-        return retval;
     }
 
     /**
      * Present value of an amount given the number of future payments, rate, amount
      * of individual payment, future value and boolean value indicating whether
      * payments are due at the beginning of period
-     * (false => payments are due at end of period)
+     * (false =&gt; payments are due at end of period)
      * @param r rate
      * @param n num of periods
      * @param y pmt per period
@@ -99,17 +96,14 @@ public final class FinanceLib {
      * @param t type (true=pmt at beginning of period, false=pmt at end of period)
      */
     public static double pv(double r, double n, double y, double f, boolean t) {
-        double retval = 0;
         if (r == 0) {
-            retval = -1*((n*y)+f);
-        }
-        else {
+            return -1*((n*y)+f);
+        } else {
             double r1 = r + 1;
-            retval =(( ( 1 - Math.pow(r1, n) ) / r ) * (t ? r1 : 1)  * y - f)
+            return (( ( 1 - Math.pow(r1, n) ) / r ) * (t ? r1 : 1)  * y - f)
                      /
                     Math.pow(r1, n);
         }
-        return retval;
     }
 
     /**
@@ -125,8 +119,8 @@ public final class FinanceLib {
         double npv = 0;
         double r1 = r + 1;
         double trate = r1;
-        for (int i=0, iSize=cfs.length; i<iSize; i++) {
-            npv += cfs[i] / trate;
+        for (double cf : cfs) {
+            npv += cf / trate;
             trate *= r1;
         }
         return npv;
@@ -141,17 +135,14 @@ public final class FinanceLib {
      * @param t type (true=pmt at beginning of period, false=pmt at end of period)
      */
     public static double pmt(double r, double n, double p, double f, boolean t) {
-        double retval = 0;
         if (r == 0) {
-            retval = -1*(f+p)/n;
-        }
-        else {
-        double r1 = r + 1;
-        retval = ( f + p * Math.pow(r1, n) ) * r
+            return -1*(f+p)/n;
+        } else {
+            double r1 = r + 1;
+            return ( f + p * Math.pow(r1, n) ) * r
                   /
                ((t ? r1 : 1) * (1 - Math.pow(r1, n)));
         }
-        return retval;
     }
 
     /**
@@ -163,9 +154,8 @@ public final class FinanceLib {
      * @param t type (true=pmt at beginning of period, false=pmt at end of period)
      */
     public static double nper(double r, double y, double p, double f, boolean t) {
-        double retval = 0;
         if (r == 0) {
-            retval = -1 * (f + p) / y;
+            return -1 * (f + p) / y;
         } else {
             double r1 = r + 1;
             double ryr = (t ? r1 : 1) * y / r;
@@ -176,10 +166,7 @@ public final class FinanceLib {
                     ? Math.log(-p - ryr)
                     : Math.log(p + ryr);
             double a3 = Math.log(r1);
-            retval = (a1 - a2) / a3;
+            return (a1 - a2) / a3;
         }
-        return retval;
     }
-
-
 }

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,9 +44,8 @@ import org.apache.commons.io.FileUtils;
  * </pre>
  * <p>
  * <strong>N.B.</strong> Directories are treated as <b>zero size</b> unless
- * <code>sumDirectoryContents</code> is {@code true}.
+ * {@code sumDirectoryContents} is {@code true}.
  *
- * @version $Id: SizeFileComparator.java 1642757 2014-12-01 21:09:30Z sebb $
  * @since 1.4
  */
 public class SizeFileComparator extends AbstractFileComparator implements Serializable {
@@ -57,7 +56,7 @@ public class SizeFileComparator extends AbstractFileComparator implements Serial
     public static final Comparator<File> SIZE_COMPARATOR = new SizeFileComparator();
 
     /** Reverse size comparator instance - directories are treated as zero size */
-    public static final Comparator<File> SIZE_REVERSE = new ReverseComparator(SIZE_COMPARATOR);
+    public static final Comparator<File> SIZE_REVERSE = new ReverseFileComparator(SIZE_COMPARATOR);
 
     /**
      * Size comparator instance which sums the size of a directory's contents
@@ -69,7 +68,7 @@ public class SizeFileComparator extends AbstractFileComparator implements Serial
      * Reverse size comparator instance which sums the size of a directory's contents
      * using {@link FileUtils#sizeOfDirectory(File)}
      */
-    public static final Comparator<File> SIZE_SUMDIR_REVERSE = new ReverseComparator(SIZE_SUMDIR_COMPARATOR);
+    public static final Comparator<File> SIZE_SUMDIR_REVERSE = new ReverseFileComparator(SIZE_SUMDIR_COMPARATOR);
 
     /** Whether the sum of the directory's contents should be calculated. */
     private final boolean sumDirectoryContents;
@@ -85,10 +84,10 @@ public class SizeFileComparator extends AbstractFileComparator implements Serial
      * Construct a file size comparator instance specifying whether the size of
      * the directory contents should be aggregated.
      * <p>
-     * If the <code>sumDirectoryContents</code> is {@code true} The size of
+     * If the {@code sumDirectoryContents} is {@code true} The size of
      * directories is calculated using  {@link FileUtils#sizeOfDirectory(File)}.
      *
-     * @param sumDirectoryContents {@code true} if the sum of the directoryies contents
+     * @param sumDirectoryContents {@code true} if the sum of the directories' contents
      *  should be calculated, otherwise {@code false} if directories should be treated
      *  as size zero (see {@link FileUtils#sizeOfDirectory(File)}).
      */
@@ -98,23 +97,24 @@ public class SizeFileComparator extends AbstractFileComparator implements Serial
 
     /**
      * Compare the length of two files.
-     * 
+     *
      * @param file1 The first file to compare
      * @param file2 The second file to compare
      * @return a negative value if the first file's length
      * is less than the second, zero if the lengths are the
      * same and a positive value if the first files length
      * is greater than the second file.
-     * 
+     *
      */
+    @Override
     public int compare(final File file1, final File file2) {
-        long size1 = 0;
+        final long size1;
         if (file1.isDirectory()) {
             size1 = sumDirectoryContents && file1.exists() ? FileUtils.sizeOfDirectory(file1) : 0;
         } else {
             size1 = file1.length();
         }
-        long size2 = 0;
+        final long size2;
         if (file2.isDirectory()) {
             size2 = sumDirectoryContents && file2.exists() ? FileUtils.sizeOfDirectory(file2) : 0;
         } else {
@@ -123,11 +123,11 @@ public class SizeFileComparator extends AbstractFileComparator implements Serial
         final long result = size1 - size2;
         if (result < 0) {
             return -1;
-        } else if (result > 0) {
-            return 1;
-        } else {
-            return 0;
         }
+        if (result > 0) {
+            return 1;
+        }
+        return 0;
     }
 
     /**

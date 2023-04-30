@@ -17,6 +17,8 @@
 
 package org.apache.poi.hssf.usermodel;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.ddf.EscherArrayProperty;
 import org.apache.poi.ddf.EscherBoolProperty;
 import org.apache.poi.ddf.EscherClientDataRecord;
@@ -30,19 +32,18 @@ import org.apache.poi.ddf.EscherSimpleProperty;
 import org.apache.poi.ddf.EscherSpRecord;
 import org.apache.poi.hssf.record.CommonObjectDataSubRecord;
 import org.apache.poi.hssf.record.EndSubRecord;
-import org.apache.poi.hssf.record.EscherAggregate;
 import org.apache.poi.hssf.record.ObjRecord;
 import org.apache.poi.hssf.record.TextObjectRecord;
+import org.apache.poi.sl.usermodel.ShapeType;
 import org.apache.poi.util.LittleEndian;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
 
 /**
- * 
+ *
  */
 public class HSSFPolygon  extends HSSFSimpleShape {
-	private static POILogger logger = POILogFactory.getLogger(HSSFPolygon.class);
-    public final static short OBJECT_TYPE_MICROSOFT_OFFICE_DRAWING = 0x1E;
+    public static final short OBJECT_TYPE_MICROSOFT_OFFICE_DRAWING = 0x1E;
+
+    private static final Logger LOG = LogManager.getLogger(HSSFPolygon.class);
 
     public HSSFPolygon(EscherContainerRecord spContainer, ObjRecord objRecord, TextObjectRecord _textObjectRecord) {
         super(spContainer, objRecord, _textObjectRecord);
@@ -64,6 +65,7 @@ public class HSSFPolygon  extends HSSFSimpleShape {
     /**
      * Generates the shape records for this shape.
      */
+    @Override
     protected EscherContainerRecord createSpContainer() {
         EscherContainerRecord spContainer = new EscherContainerRecord();
         EscherSpRecord sp = new EscherSpRecord();
@@ -73,7 +75,7 @@ public class HSSFPolygon  extends HSSFSimpleShape {
         spContainer.setRecordId(EscherContainerRecord.SP_CONTAINER);
         spContainer.setOptions((short) 0x000F);
         sp.setRecordId(EscherSpRecord.RECORD_ID);
-        sp.setOptions((short) ((EscherAggregate.ST_NOT_PRIMATIVE << 4) | 0x2));
+        sp.setOptions((short) ((ShapeType.NOT_PRIMITIVE.nativeId << 4) | 0x2));
         if (getParent() == null) {
             sp.setFlags(EscherSpRecord.FLAG_HAVEANCHOR | EscherSpRecord.FLAG_HASSHAPETYPE);
         } else {
@@ -114,6 +116,7 @@ public class HSSFPolygon  extends HSSFSimpleShape {
     /**
      * Creates the low level OBJ record for this shape.
      */
+    @Override
     protected ObjRecord createObjRecord() {
         ObjRecord obj = new ObjRecord();
         CommonObjectDataSubRecord c = new CommonObjectDataSubRecord();
@@ -173,11 +176,11 @@ public class HSSFPolygon  extends HSSFSimpleShape {
      */
     public void setPoints(int[] xPoints, int[] yPoints) {
         if (xPoints.length != yPoints.length){
-        	logger.log( POILogger.ERROR, "xPoint.length must be equal to yPoints.length");
+            LOG.atError().log("xPoint.length must be equal to yPoints.length");
             return;
         }
         if (xPoints.length == 0){
-        	logger.log( POILogger.ERROR, "HSSFPolygon must have at least one point");
+            LOG.atError().log("HSSFPolygon must have at least one point");
         }
         EscherArrayProperty verticesProp = new EscherArrayProperty(EscherPropertyTypes.GEOMETRY__VERTICES, false, 0);
         verticesProp.setNumberOfElementsInArray(xPoints.length+1);
@@ -215,8 +218,6 @@ public class HSSFPolygon  extends HSSFSimpleShape {
 
     /**
      * Defines the width and height of the points in the polygon
-     * @param width
-     * @param height
      */
     public void setPolygonDrawArea(int width, int height) {
         setPropertyValue(new EscherSimpleProperty(EscherPropertyTypes.GEOMETRY__RIGHT, width));

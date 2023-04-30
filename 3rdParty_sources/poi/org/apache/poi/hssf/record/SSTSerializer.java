@@ -24,13 +24,11 @@ import org.apache.poi.util.IntMapper;
 /**
  * This class handles serialization of SST records.  It utilizes the record processor
  * class write individual records. This has been refactored from the SSTRecord class.
- *
- * @author Glen Stampoultzis (glens at apache.org)
  */
 final class SSTSerializer {
 
-	private final int _numStrings;
-	private final int _numUniqueStrings;
+    private final int _numStrings;
+    private final int _numUniqueStrings;
 
     private final IntMapper<UnicodeString> strings;
 
@@ -42,8 +40,8 @@ final class SSTSerializer {
     public SSTSerializer( IntMapper<UnicodeString> strings, int numStrings, int numUniqueStrings )
     {
         this.strings = strings;
-		_numStrings = numStrings;
-		_numUniqueStrings = numUniqueStrings;
+        _numStrings = numStrings;
+        _numUniqueStrings = numUniqueStrings;
 
         int infoRecs = ExtSSTRecord.getNumberOfInfoRecsForStrings(strings.size());
         this.bucketAbsoluteOffsets = new int[infoRecs];

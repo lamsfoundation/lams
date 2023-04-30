@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,7 +32,6 @@ import java.io.File;
  * {@link #exitWhenFinished}, typically in
  * {@code javax.servlet.ServletContextListener.contextDestroyed(javax.servlet.ServletContextEvent)} or similar.
  *
- * @version $Id: FileCleaner.java 1680650 2015-05-20 18:36:40Z britter $
  * @deprecated Use {@link FileCleaningTracker}
  */
 @Deprecated
@@ -42,7 +41,6 @@ public class FileCleaner {
      */
     static final FileCleaningTracker theInstance = new FileCleaningTracker();
 
-    //-----------------------------------------------------------------------
     /**
      * Track the specified file, using the provided marker, deleting the file
      * when the marker instance is garbage collected.
@@ -61,7 +59,7 @@ public class FileCleaner {
     /**
      * Track the specified file, using the provided marker, deleting the file
      * when the marker instance is garbage collected.
-     * The speified deletion strategy is used.
+     * The specified deletion strategy is used.
      *
      * @param file  the file to be tracked, not null
      * @param marker  the marker object used to track the file, not null
@@ -92,7 +90,7 @@ public class FileCleaner {
     /**
      * Track the specified file, using the provided marker, deleting the file
      * when the marker instance is garbage collected.
-     * The speified deletion strategy is used.
+     * The specified deletion strategy is used.
      *
      * @param path  the full path to the file to be tracked, not null
      * @param marker  the marker object used to track the file, not null
@@ -105,7 +103,6 @@ public class FileCleaner {
         theInstance.track(path, marker, deleteStrategy);
     }
 
-    //-----------------------------------------------------------------------
     /**
      * Retrieve the number of files currently being tracked, and therefore
      * awaiting deletion.
@@ -126,7 +123,7 @@ public class FileCleaner {
      * thread will simply exit when the JVM exits. In a more complex environment,
      * with multiple class loaders (such as an application server), you should be
      * aware that the file cleaner thread will continue running even if the class
-     * loader it was started from terminates. This can consitute a memory leak.
+     * loader it was started from terminates. This can constitute a memory leak.
      * <p>
      * For example, suppose that you have developed a web application, which
      * contains the commons-io jar file in your WEB-INF/lib directory. In other
@@ -136,7 +133,7 @@ public class FileCleaner {
      * posing a memory leak.
      * <p>
      * This method allows the thread to be terminated. Simply call this method
-     * in the resource cleanup code, such as 
+     * in the resource cleanup code, such as
      * {@code javax.servlet.ServletContextListener.contextDestroyed(javax.servlet.ServletContextEvent)}.
      * One called, no new objects can be tracked by the file cleaner.
      * @deprecated Use {@link FileCleaningTracker#exitWhenFinished()}.
@@ -151,7 +148,7 @@ public class FileCleaner {
      * This is mainly useful for code, which wants to support the new
      * {@link FileCleaningTracker} class while maintain compatibility with the
      * deprecated {@link FileCleaner}.
-     * 
+     *
      * @return the singleton instance
      */
     public static FileCleaningTracker getInstance() {

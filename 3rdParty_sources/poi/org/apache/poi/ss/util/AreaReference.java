@@ -26,22 +26,22 @@ import org.apache.poi.util.StringUtil;
 
 public class AreaReference {
 
-    /** The character (!) that separates sheet names from cell references */ 
+    /** The character (!) that separates sheet names from cell references */
     private static final char SHEET_NAME_DELIMITER = '!';
     /** The character (:) that separates the two cell references in a multi-cell area reference */
     private static final char CELL_DELIMITER = ':';
     /** The character (') used to quote sheet names when they contain special characters */
     private static final char SPECIAL_NAME_DELIMITER = '\'';
     private static final SpreadsheetVersion DEFAULT_SPREADSHEET_VERSION = SpreadsheetVersion.EXCEL97;
-    
+
     private final CellReference _firstCell;
     private final CellReference _lastCell;
     private final boolean _isSingleCell;
     private final SpreadsheetVersion _version; // never null
-    
+
     /**
      * Create an area ref from a string representation.  Sheet names containing special characters should be
-     * delimited and escaped as per normal syntax rules for formulas.<br> 
+     * delimited and escaped as per normal syntax rules for formulas.<br>
      * The area reference must be contiguous (i.e. represent a single rectangle, not a union of rectangles)
      */
     public AreaReference(String reference, SpreadsheetVersion version) {
@@ -58,7 +58,7 @@ public class AreaReference {
             // TODO - probably shouldn't initialize area ref when text is really a cell ref
             // Need to fix some named range stuff to get rid of this
             _firstCell = new CellReference(part0);
-            
+
             _lastCell = _firstCell;
             _isSingleCell = true;
             return;
@@ -66,7 +66,7 @@ public class AreaReference {
         if (parts.length != 2) {
             throw new IllegalArgumentException("Bad area ref '" + reference + "'");
         }
-        
+
         String part1 = parts[1];
         if (isPlainColumn(part0)) {
             if (!isPlainColumn(part1)) {
@@ -78,10 +78,10 @@ public class AreaReference {
 
             boolean firstIsAbs = CellReference.isPartAbsolute(part0);
             boolean lastIsAbs = CellReference.isPartAbsolute(part1);
-            
+
             int col0 = CellReference.convertColStringToIndex(part0);
             int col1 = CellReference.convertColStringToIndex(part1);
-            
+
             _firstCell = new CellReference(0, col0, true, firstIsAbs);
             _lastCell = new CellReference(0xFFFF, col1, true, lastIsAbs);
             _isSingleCell = false;
@@ -92,7 +92,7 @@ public class AreaReference {
             _isSingleCell = part0.equals(part1);
        }
      }
-    
+
     /**
      * Creates an area ref from a pair of Cell References.
      */
@@ -145,7 +145,7 @@ public class AreaReference {
         }
         _isSingleCell = false;
     }
-    
+
     private static boolean isPlainColumn(String refPart) {
         for(int i=refPart.length()-1; i>=0; i--) {
             int ch = refPart.charAt(i);
@@ -170,6 +170,14 @@ public class AreaReference {
         return splitAreaReferences(reference).length == 1;
     }
 
+    /**
+     * Construct an AreaReference which spans one more rows
+     *
+     * @param version Is the spreadsheet in format Excel97 or newer Excel versions
+     * @param start The 1-based start-index of the rows
+     * @param end The 1-based end-index of the rows
+     * @return An AreaReference that spans the given rows
+     */
     public static AreaReference getWholeRow(SpreadsheetVersion version, String start, String end) {
         if (null == version) {
             version = DEFAULT_SPREADSHEET_VERSION;
@@ -177,6 +185,17 @@ public class AreaReference {
         return new AreaReference("$A" + start + ":$" + version.getLastColumnName() + end, version);
     }
 
+    /**
+     * Construct an AreaReference which spans one more columns.
+     *
+     * Columns are specified in the Excel format, i.e. "A" is the first column
+     * "B" the seconds, ... "AA", ..
+     *
+     * @param version Is the spreadsheet in format Excel97 or newer Excel versions
+     * @param start The ABC-based start-index of the columns
+     * @param end The ABC-based end-index of the columns
+     * @return An AreaReference that spans the given columns
+     */
     public static AreaReference getWholeColumn(SpreadsheetVersion version, String start, String end) {
         if (null == version) {
             version = DEFAULT_SPREADSHEET_VERSION;
@@ -190,9 +209,9 @@ public class AreaReference {
      */
     public static boolean isWholeColumnReference(SpreadsheetVersion version, CellReference topLeft, CellReference botRight) {
         if (null == version) {
-            version = DEFAULT_SPREADSHEET_VERSION; // how the code used to behave. 
+            version = DEFAULT_SPREADSHEET_VERSION; // how the code used to behave.
         }
-        
+
         // These are represented as something like
         //   C$1:C$65535 or D$1:F$0
         // i.e. absolute from 1st row to 0th one
@@ -222,7 +241,7 @@ public class AreaReference {
      * Separates Area refs in two parts and returns them as separate elements in a String array,
      * each qualified with the sheet name (if present)
      *
-     * @return array with one or two elements. never <code>null</code>
+     * @return array with one or two elements. never {@code null}
      */
     private static String[] separateAreaRefs(String reference) {
         // TODO - refactor cell reference parsing logic to one place.
@@ -322,13 +341,13 @@ public class AreaReference {
         }
         return results.toArray(new String[0]);
     }
-    
+
     public boolean isWholeColumnReference() {
         return isWholeColumnReference(_version, _firstCell, _lastCell);
     }
-    
+
     /**
-     * @return <code>false</code> if this area reference involves more than one cell
+     * @return {@code false} if this area reference involves more than one cell
      */
     public boolean isSingleCell() {
         return _isSingleCell;
@@ -344,7 +363,7 @@ public class AreaReference {
 
     /**
      * Note - if this area reference refers to a single cell, the return value of this method will
-     * be identical to that of <tt>getFirstCell()</tt>
+     * be identical to that of {@code getFirstCell()}
      * @return the second cell reference which defines this area.  For multi-cell areas, this is
      * cell diagonally opposite the 'first cell'.  Usually this cell is in the lower right corner
      * of the area (but this is not a requirement).
@@ -383,8 +402,9 @@ public class AreaReference {
      * Returns a text representation of this area reference.
      * <p>
      *  Example return values:
-     *    <table border="0" cellpadding="1" cellspacing="0" summary="Example return values">
-     *      <tr><th align='left'>Result</th><th align='left'>Comment</th></tr>
+     *    <table>
+     *      <caption>Example return values</caption>
+     *      <tr><th>Result</th><th>Comment</th></tr>
      *      <tr><td>A1:A1</td><td>Single cell area reference without sheet</td></tr>
      *      <tr><td>A1:$C$1</td><td>Multi-cell area reference without sheet</td></tr>
      *      <tr><td>Sheet1!A$1:B4</td><td>Standard sheet name</td></tr>

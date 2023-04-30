@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,11 +39,11 @@ import java.util.List;
  *       comparator.sort(list);
  * </pre>
  *
- * @version $Id: CompositeFileComparator.java 1642757 2014-12-01 21:09:30Z sebb $
  * @since 2.0
  */
 public class CompositeFileComparator extends AbstractFileComparator implements Serializable {
 
+    private static final Comparator<?>[] EMPTY_COMPARATOR_ARRAY = {};
     private static final long serialVersionUID = -2224170307287243428L;
     private static final Comparator<?>[] NO_COMPARATORS = {};
     private final Comparator<File>[] delegates;
@@ -73,22 +73,23 @@ public class CompositeFileComparator extends AbstractFileComparator implements S
         if (delegates == null) {
             this.delegates = (Comparator<File>[]) NO_COMPARATORS; //1
         } else {
-            final List<Comparator<File>> list = new ArrayList<Comparator<File>>();
+            final List<Comparator<File>> list = new ArrayList<>();
             for (final Comparator<File> comparator : delegates) {
                 list.add(comparator);
             }
-            this.delegates = (Comparator<File>[]) list.toArray(new Comparator<?>[list.size()]); //2
+            this.delegates = (Comparator<File>[]) list.toArray(EMPTY_COMPARATOR_ARRAY); //2
         }
     }
 
     /**
      * Compare the two files using delegate comparators.
-     * 
+     *
      * @param file1 The first file to compare
      * @param file2 The second file to compare
      * @return the first non-zero result returned from
      * the delegate comparators or zero.
      */
+    @Override
     public int compare(final File file1, final File file2) {
         int result = 0;
         for (final Comparator<File> delegate : delegates) {

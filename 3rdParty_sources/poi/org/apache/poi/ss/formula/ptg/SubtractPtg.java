@@ -18,12 +18,12 @@
 package org.apache.poi.ss.formula.ptg;
 
 public final class SubtractPtg extends ValueOperatorPtg {
-    public final static byte sid  = 0x04;
+    public static final byte sid  = 0x04;
 
     public static final SubtractPtg instance = new SubtractPtg();
 
     private SubtractPtg() {
-    	// enforce singleton
+        // enforce singleton
     }
 
     @Override

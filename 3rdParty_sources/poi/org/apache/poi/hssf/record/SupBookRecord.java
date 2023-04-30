@@ -20,10 +20,10 @@ package org.apache.poi.hssf.record;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.util.GenericRecordUtil;
 import org.apache.poi.util.LittleEndianOutput;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
 import org.apache.poi.util.StringUtil;
 
 /**
@@ -32,7 +32,7 @@ import org.apache.poi.util.StringUtil;
  */
 public final class SupBookRecord extends StandardRecord {
 
-    private static final POILogger logger = POILogFactory.getLogger(SupBookRecord.class);
+    private static final Logger LOG = LogManager.getLogger(SupBookRecord.class);
 
     public static final short sid = 0x01AE;
 
@@ -132,11 +132,11 @@ public final class SupBookRecord extends StandardRecord {
             // 5.38.3 'Add-In Functions'
             _isAddInFunctions = true;
             if(field_1_number_of_sheets != 1) {
-                throw new RuntimeException("Expected 0x0001 for number of sheets field in 'Add-In Functions' but got ("
+                throw new IllegalArgumentException("Expected 0x0001 for number of sheets field in 'Add-In Functions' but got ("
                      + field_1_number_of_sheets + ")");
             }
         } else {
-            throw new RuntimeException("invalid EXTERNALBOOK code ("
+            throw new IllegalArgumentException("invalid EXTERNALBOOK code ("
                      + Integer.toHexString(nextShort) + ")");
         }
      }
@@ -200,39 +200,39 @@ public final class SupBookRecord extends StandardRecord {
     }
     private static String decodeFileName(String encodedUrl) {
         /* see "MICROSOFT OFFICE EXCEL 97-2007  BINARY FILE FORMAT SPECIFICATION" */
-    	StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         for(int i=1; i<encodedUrl.length(); i++) {
-        	char c = encodedUrl.charAt(i);
-        	switch (c) {
-        	case CH_VOLUME:
-        		char driveLetter = encodedUrl.charAt(++i);
-        		if (driveLetter == '@') {
-        			sb.append("\\\\");
-        		} else {
-        			//Windows notation for drive letters
-        			sb.append(driveLetter).append(":");
-        		}
-        		break;
-        	case CH_SAME_VOLUME:
+            char c = encodedUrl.charAt(i);
+            switch (c) {
+            case CH_VOLUME:
+                char driveLetter = encodedUrl.charAt(++i);
+                if (driveLetter == '@') {
+                    sb.append("\\\\");
+                } else {
+                    //Windows notation for drive letters
+                    sb.append(driveLetter).append(":");
+                }
+                break;
+            case CH_SAME_VOLUME:
             case CH_DOWN_DIR:
-        		sb.append(PATH_SEPERATOR);
-        		break;
-        	case CH_UP_DIR:
-        		sb.append("..").append(PATH_SEPERATOR);
-        		break;
-        	case CH_LONG_VOLUME:
-        		//Don't known to handle...
-        		logger.log(POILogger.WARN, "Found unexpected key: ChLongVolume - IGNORING");
-        		break;
-        	case CH_STARTUP_DIR:
-        	case CH_ALT_STARTUP_DIR:
-        	case CH_LIB_DIR:
-        		logger.log(POILogger.WARN, "EXCEL.EXE path unkown - using this directoy instead: .");
-        		sb.append(".").append(PATH_SEPERATOR);
-        		break;
-        	default:
-        		sb.append(c);
-        	}
+                sb.append(PATH_SEPERATOR);
+                break;
+            case CH_UP_DIR:
+                sb.append("..").append(PATH_SEPERATOR);
+                break;
+            case CH_LONG_VOLUME:
+                //Don't known to handle...
+                LOG.atWarn().log("Found unexpected key: ChLongVolume - IGNORING");
+                break;
+            case CH_STARTUP_DIR:
+            case CH_ALT_STARTUP_DIR:
+            case CH_LIB_DIR:
+                LOG.atWarn().log("EXCEL.EXE path unknown - using this directory instead: .");
+                sb.append('.').append(PATH_SEPERATOR);
+                break;
+            default:
+                sb.append(c);
+            }
         }
         return sb.toString();
     }
@@ -241,8 +241,8 @@ public final class SupBookRecord extends StandardRecord {
     }
 
     public void setURL(String pUrl) {
-    	//Keep the first marker character!
-    	field_2_encoded_url = field_2_encoded_url.substring(0, 1) + pUrl;
+        //Keep the first marker character!
+        field_2_encoded_url = field_2_encoded_url.charAt(0) + pUrl;
     }
 
     @Override

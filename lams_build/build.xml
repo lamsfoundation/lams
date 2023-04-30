@@ -399,6 +399,10 @@
 		<copy todir="${server.home}/modules/system/layers/base/org/apache/poi/main" overwrite="true" verbose="true">
 			<fileset dir="lib/apache-poi">
 				<include name="poi-*.jar" />
+				<include name="pdfbox-*.jar" />
+				<include name="jempbox-*.jar" />
+				<include name="fontbox-*.jar" />
+				<include name="graphics2d-*.jar" />
 			</fileset>
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/apache/poi/main/module.xml"
@@ -412,6 +416,14 @@
 		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/compress/main/module.xml"
 			  file="lib/apache-poi/compress.module.xml" overwrite="true" verbose="true" />
 		
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/logging/log4j/main" overwrite="true" verbose="true">
+			<fileset dir="lib/apache-poi">
+				<include name="log4j-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/logging/log4j/main/module.xml"
+			  file="lib/apache-poi/logging.module.xml" overwrite="true" verbose="true" />
+
 		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/math3/main" overwrite="true" verbose="true">
 			<fileset dir="lib/apache-poi">
 				<include name="commons-math3-*.jar" />
@@ -581,7 +593,23 @@
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/fileupload/main/module.xml"
 			  file="lib/jakarta-commons/fileupload.module.xml" overwrite="true" verbose="true" />
-		
+
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/io/main" overwrite="true" verbose="true">
+			<fileset dir="lib/jakarta-commons">
+				<include name="commons-io-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/io/main/module.xml"
+			  file="lib/jakarta-commons/io.module.xml" overwrite="true" verbose="true" />
+
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/logging/main" overwrite="true" verbose="true">
+			<fileset dir="lib/jakarta-commons">
+				<include name="commons-logging-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/logging/main/module.xml"
+			  file="lib/jakarta-commons/logging.module.xml" overwrite="true" verbose="true" />
+
 		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/validator/main" overwrite="true" verbose="true">
 			<fileset dir="lib/jakarta-commons">
 				<include name="commons-validator-*.jar" />

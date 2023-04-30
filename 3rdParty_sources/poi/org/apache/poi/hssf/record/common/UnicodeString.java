@@ -23,9 +23,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Spliterator;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.common.Duplicatable;
 import org.apache.poi.common.usermodel.GenericRecord;
 import org.apache.poi.hssf.record.RecordInputStream;
@@ -34,16 +37,16 @@ import org.apache.poi.hssf.record.cont.ContinuableRecordOutput;
 import org.apache.poi.util.BitField;
 import org.apache.poi.util.BitFieldFactory;
 import org.apache.poi.util.GenericRecordUtil;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
+
+import static org.apache.logging.log4j.util.Unbox.box;
 
 /**
  * Unicode String - just standard fields that are in several records.
- * It is considered more desirable then repeating it in all of them.<p>
- * This is often called a XLUnicodeRichExtendedString in MS documentation.<p>
+ * It is considered more desirable than repeating it in all of them.<p>
+ * This is often called a XLUnicodeRichExtendedString in MS documentation.
  */
 public class UnicodeString implements Comparable<UnicodeString>, Duplicatable, GenericRecord {
-    private static final POILogger _logger = POILogFactory.getLogger(UnicodeString.class);
+    private static final Logger LOG = LogManager.getLogger(UnicodeString.class);
 
     private static final BitField highByte  = BitFieldFactory.getInstance(0x1);
     // 0x2 is reserved
@@ -71,7 +74,7 @@ public class UnicodeString implements Comparable<UnicodeString>, Duplicatable, G
 
     /**
      * construct a unicode string record and fill its fields, ID is ignored
-     * @param in the RecordInputstream to read the record from
+     * @param in the RecordInputStream to read the record from
      */
     public UnicodeString(RecordInputStream in) {
         field_1_charCount   = in.readShort();
@@ -102,7 +105,7 @@ public class UnicodeString implements Comparable<UnicodeString>, Duplicatable, G
         if (isExtendedText() && (extensionLength > 0)) {
           field_5_ext_rst = new ExtRst(new ContinuableRecordInput(in), extensionLength);
           if(field_5_ext_rst.getDataSize()+4 != extensionLength) {
-             _logger.log(POILogger.WARN, "ExtRst was supposed to be " + extensionLength + " bytes long, but seems to actually be " + (field_5_ext_rst.getDataSize() + 4));
+              LOG.atWarn().log("ExtRst was supposed to be {} bytes long, but seems to actually be {}", box(extensionLength),box(field_5_ext_rst.getDataSize() + 4));
           }
         }
     }
@@ -125,7 +128,7 @@ public class UnicodeString implements Comparable<UnicodeString>, Duplicatable, G
         }
         UnicodeString other = (UnicodeString) o;
 
-        //OK lets do this in stages to return a quickly, first check the actual string
+        //OK lets do this in stages to return quickly, first check the actual string
         if (field_1_charCount != other.field_1_charCount
                 || field_2_optionflags != other.field_2_optionflags
                 || !field_3_string.equals(other.field_3_string)) {
@@ -175,9 +178,9 @@ public class UnicodeString implements Comparable<UnicodeString>, Duplicatable, G
      * @return number of characters
      */
     public int getCharCount() {
-    	if(field_1_charCount < 0) {
-    		return field_1_charCount + 65536;
-    	}
+        if(field_1_charCount < 0) {
+            return field_1_charCount + 65536;
+        }
         return field_1_charCount;
     }
 
@@ -270,11 +273,11 @@ public class UnicodeString implements Comparable<UnicodeString>, Duplicatable, G
 
     public FormatRun getFormatRun(int index) {
       if (field_4_format_runs == null) {
-		return null;
-	  }
+        return null;
+      }
       if (index < 0 || index >= field_4_format_runs.size()) {
-		return null;
-	  }
+        return null;
+      }
       return field_4_format_runs.get(index);
     }
 
@@ -298,8 +301,8 @@ public class UnicodeString implements Comparable<UnicodeString>, Duplicatable, G
      */
     public void addFormatRun(FormatRun r) {
       if (field_4_format_runs == null) {
-		field_4_format_runs = new ArrayList<>();
-	  }
+        field_4_format_runs = new ArrayList<>();
+      }
 
       int index = findFormatRunAt(r._character);
       if (index != -1) {
@@ -322,9 +325,19 @@ public class UnicodeString implements Comparable<UnicodeString>, Duplicatable, G
       return null;
     }
 
+    /**
+     * @since POI 5.2.0
+     */
+    public Spliterator<FormatRun> formatSpliterator() {
+        if (field_4_format_runs != null) {
+            return field_4_format_runs.spliterator();
+        }
+        return null;
+    }
+
     public void removeFormatRun(FormatRun r) {
       field_4_format_runs.remove(r);
-      if (field_4_format_runs.size() == 0) {
+      if (field_4_format_runs.isEmpty()) {
         field_4_format_runs = null;
         field_2_optionflags = richText.clearByte(field_2_optionflags);
       }
@@ -443,6 +456,7 @@ public class UnicodeString implements Comparable<UnicodeString>, Duplicatable, G
         }
     }
 
+    @Override
     public int compareTo(UnicodeString str) {
 
         int result = getString().compareTo(str.getString());

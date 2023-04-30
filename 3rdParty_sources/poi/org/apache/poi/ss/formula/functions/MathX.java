@@ -18,9 +18,13 @@
 package org.apache.poi.ss.formula.functions;
 
 import org.apache.poi.ss.util.NumberToTextConverter;
+import org.apache.poi.util.Internal;
+
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 
 /**
- * @author Amol S. Deshmukh &lt; amolweb at ya hoo dot com &gt;
  * This class is an extension to the standard math library
  * provided by java.lang.Math class. It follows the Math class
  * in that it has a private constructor and all static methods.
@@ -51,6 +55,12 @@ final class MathX {
         return round(n, p, java.math.RoundingMode.HALF_UP);
     }
 
+    public static double round(double n, double p) {
+        return round(n, (int)p);
+    }
+
+
+
     /**
      * Returns a value rounded-up to p digits after decimal.
      * If p is negative, then the number is rounded to
@@ -70,6 +80,11 @@ final class MathX {
         return round(n, p, java.math.RoundingMode.UP);
     }
 
+    public static double roundUp(double n, double p) {
+        return roundUp(n, (int)p);
+    }
+
+
     /**
      * Returns a value rounded to p digits after decimal.
      * If p is negative, then the number is rounded to
@@ -88,7 +103,11 @@ final class MathX {
     public static double roundDown(double n, int p) {
         return round(n, p, java.math.RoundingMode.DOWN);
     }
-    
+
+    public static double roundDown(double n, double p) {
+        return roundDown(n, (int)p);
+    }
+
     private static double round(double n, int p, java.math.RoundingMode rounding) {
         if (Double.isNaN(n) || Double.isInfinite(n)) {
             return Double.NaN;
@@ -217,7 +236,15 @@ final class MathX {
         if (s==0 && n!=0) {
             return Double.NaN;
         } else {
-            return (n==0 || s==0) ? 0 : Math.floor(n/s) * s;
+            if (n == 0.0 || s == 0.0) {
+                return 0.0;
+            } else if (s == 1.0) {
+                return Math.floor(n);
+            } else if (s < 0.0 && n >= 0.0) {
+                return Double.NaN;
+            } else {
+                return scaledRoundUsingBigDecimal(n, s, RoundingMode.FLOOR);
+            }
         }
     }
 
@@ -240,8 +267,23 @@ final class MathX {
         if (n>0 && s<0) {
             return Double.NaN;
         } else {
-            return (n == 0 || s == 0) ? 0 : Math.ceil(n/s) * s;
+            if (n == 0.0 || s == 0.0) {
+                return 0.0;
+            } else if (s == 1.0) {
+                return Math.ceil(n);
+            } else {
+                return scaledRoundUsingBigDecimal(n, s, RoundingMode.CEILING);
+            }
         }
+    }
+
+    @Internal
+    public static double scaledRoundUsingBigDecimal(double xval, double multiplier, RoundingMode mode) {
+        BigDecimal multiplierDecimal = BigDecimal.valueOf(multiplier);
+        BigDecimal bd = BigDecimal.valueOf(xval).divide(multiplierDecimal, MathContext.DECIMAL128)
+                .setScale(0, mode)
+                .multiply(multiplierDecimal);
+        return bd.doubleValue();
     }
 
     /**
@@ -271,6 +313,10 @@ final class MathX {
             d = Double.NaN;
         }
         return d;
+    }
+
+    public static double factorial(double d) {
+        return factorial((int)d);
     }
 
 
@@ -368,7 +414,7 @@ final class MathX {
      */
     public static double nChooseK(int n, int k) {
         double d = 1;
-        if (n<0 || k<0 || n<k) {
+        if (k < 0 || n < k) {
             d= Double.NaN;
         }
         else {

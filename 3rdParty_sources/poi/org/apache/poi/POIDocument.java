@@ -17,18 +17,22 @@
 
 package org.apache.poi;
 
+import static org.apache.logging.log4j.util.Unbox.box;
 import static org.apache.poi.hpsf.PropertySetFactory.newDocumentSummaryInformation;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedOutputStream;
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
+import org.apache.commons.io.output.UnsynchronizedByteArrayOutputStream;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.hpsf.DocumentSummaryInformation;
 import org.apache.poi.hpsf.PropertySet;
 import org.apache.poi.hpsf.PropertySetFactory;
@@ -43,8 +47,6 @@ import org.apache.poi.poifs.filesystem.DocumentInputStream;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.Internal;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
 
 /**
  * This holds the common functionality for all POI
@@ -56,11 +58,11 @@ public abstract class POIDocument implements Closeable {
     private SummaryInformation sInf;
     /** Holds further metadata on our document */
     private DocumentSummaryInformation dsInf;
-    /**	The directory that our document lives in */
+    /** The directory that our document lives in */
     private DirectoryNode directory;
 
     /** For our own logging use */
-    private static final POILogger logger = POILogFactory.getLogger(POIDocument.class);
+    private static final Logger LOG = LogManager.getLogger(POIDocument.class);
 
     /* Have the property streams been read yet? (Only done on-demand) */
     private boolean initialized;
@@ -71,7 +73,7 @@ public abstract class POIDocument implements Closeable {
      * @param dir The {@link DirectoryNode} where information is read from.
      */
     protected POIDocument(DirectoryNode dir) {
-    	this.directory = dir;
+        this.directory = dir;
     }
 
     /**
@@ -162,12 +164,12 @@ public abstract class POIDocument implements Closeable {
             if (clazz.isInstance(ps)) {
                 return (T)ps;
             } else if (ps != null) {
-                logger.log(POILogger.WARN, localName+" property set came back with wrong class - "+ps.getClass().getName());
+                LOG.atWarn().log("{} property set came back with wrong class - {}", localName, ps.getClass().getName());
             } else {
-                logger.log(POILogger.WARN, localName+" property set came back as null");
+                LOG.atWarn().log("{} property set came back as null", localName);
             }
         } catch (IOException e) {
-            logger.log(POILogger.ERROR, "can't retrieve property set", e);
+            LOG.atError().withThrowable(e).log("can't retrieve property set");
         }
         return null;
     }
@@ -268,7 +270,8 @@ public abstract class POIDocument implements Closeable {
      */
     protected void writeProperties(POIFSFileSystem outFS, List<String> writtenEntries) throws IOException {
         final EncryptionInfo ei = getEncryptionInfo();
-        final boolean encryptProps = (ei != null && ei.isDocPropsEncrypted());
+        Encryptor encGen = (ei == null) ? null : ei.getEncryptor();
+        final boolean encryptProps = (ei != null && ei.isDocPropsEncrypted() && encGen instanceof CryptoAPIEncryptor);
         try (POIFSFileSystem tmpFS = new POIFSFileSystem()) {
             final POIFSFileSystem fs = (encryptProps) ? tmpFS : outFS;
 
@@ -279,17 +282,14 @@ public abstract class POIDocument implements Closeable {
                 return;
             }
 
+            // Only CryptoAPI encryption supports encrypted property sets
+
             // create empty document summary
             writePropertySet(DocumentSummaryInformation.DEFAULT_STREAM_NAME, newDocumentSummaryInformation(), outFS);
 
             // remove summary, if previously available
             if (outFS.getRoot().hasEntry(SummaryInformation.DEFAULT_STREAM_NAME)) {
                 outFS.getRoot().getEntry(SummaryInformation.DEFAULT_STREAM_NAME).delete();
-            }
-            Encryptor encGen = ei.getEncryptor();
-            if (!(encGen instanceof CryptoAPIEncryptor)) {
-                throw new EncryptedDocumentException(
-                    "Using " + ei.getEncryptionMode() + " encryption. Only CryptoAPI encryption supports encrypted property sets!");
             }
             CryptoAPIEncryptor enc = (CryptoAPIEncryptor) encGen;
             try {
@@ -322,20 +322,18 @@ public abstract class POIDocument implements Closeable {
      *      {@link POIFSFileSystem} occurs
      */
     private void writePropertySet(String name, PropertySet set, POIFSFileSystem outFS) throws IOException {
-        try {
+        try (UnsynchronizedByteArrayOutputStream bOut = new UnsynchronizedByteArrayOutputStream()) {
             PropertySet mSet = new PropertySet(set);
-            ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-
             mSet.write(bOut);
-            byte[] data = bOut.toByteArray();
-            ByteArrayInputStream bIn = new ByteArrayInputStream(data);
 
-            // Create or Update the Property Set stream in the POIFS
-            outFS.createOrUpdateDocument(bIn, name);
+            try (InputStream bIn = bOut.toInputStream()) {
+                // Create or Update the Property Set stream in the POIFS
+                outFS.createOrUpdateDocument(bIn, name);
+            }
 
-            logger.log(POILogger.INFO, "Wrote property set ", name, " of size ", data.length);
+            LOG.atInfo().log("Wrote property set {} of size {}", name, box(bOut.size()));
         } catch(WritingNotSupportedException ignored) {
-            logger.log( POILogger.ERROR, "Couldn't write property set with name ", name, " as not supported by HPSF yet");
+            LOG.atError().log("Couldn't write property set with name {} as not supported by HPSF yet", name);
         }
     }
 
@@ -397,9 +395,9 @@ public abstract class POIDocument implements Closeable {
      *  {@link #write()} or to a different File. Overwriting the currently
      *  open file via an OutputStream isn't possible.
      *
-     * If {@code stream} is a {@link java.io.FileOutputStream} on a networked drive
+     * If {@code stream} is a {@link FileOutputStream} on a networked drive
      * or has a high cost/latency associated with each written byte,
-     * consider wrapping the OutputStream in a {@link java.io.BufferedOutputStream}
+     * consider wrapping the OutputStream in a {@link BufferedOutputStream}
      * to improve write performance, or use {@link #write()} / {@link #write(File)}
      * if possible.
      *

@@ -17,7 +17,8 @@
 
 package org.apache.poi.hssf.record;
 
-import java.io.ByteArrayInputStream;
+import org.apache.commons.io.input.UnsynchronizedByteArrayInputStream;
+
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -41,17 +42,17 @@ public final class DrawingRecordForBiffViewer extends AbstractEscherHolderRecord
 
     public DrawingRecordForBiffViewer(DrawingRecord r)
     {
-    	super(convertToInputStream(r));
-    	convertRawBytesToEscherRecords();
+        super(convertToInputStream(r));
+        decode();
     }
     private static RecordInputStream convertToInputStream(DrawingRecord r)
     {
-    	byte[] data = r.serialize();
-    	RecordInputStream rinp = new RecordInputStream(
-    			new ByteArrayInputStream(data)
-    	);
-    	rinp.nextRecord();
-    	return rinp;
+        byte[] data = r.serialize();
+        RecordInputStream rinp = new RecordInputStream(
+                new UnsynchronizedByteArrayInputStream(data)
+        );
+        rinp.nextRecord();
+        return rinp;
     }
 
     protected String getRecordName()

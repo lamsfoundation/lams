@@ -22,9 +22,6 @@ import org.apache.poi.ss.formula.EvaluationWorkbook.ExternalSheetRange;
 import org.apache.poi.ss.formula.FormulaRenderingWorkbook;
 import org.apache.poi.ss.formula.SheetNameFormatter;
 
-/**
- * @author Josh Micich
- */
 final class ExternSheetNameResolver {
     private ExternSheetNameResolver() {
         // no instances of this class
@@ -47,7 +44,16 @@ final class ExternSheetNameResolver {
                 ExternalSheetRange r = (ExternalSheetRange)externalSheet;
                 if (! r.getFirstSheetName().equals(r.getLastSheetName())) {
                     sb.append(':');
-                    SheetNameFormatter.appendFormat(sb, r.getLastSheetName());
+                    // quote should appear at the beginning and end.
+                    StringBuilder temp = new StringBuilder();
+                    SheetNameFormatter.appendFormat(temp, r.getLastSheetName());
+                    char quote = '\'';
+                    if (temp.charAt(0) == quote){
+                        sb.insert(0 , quote);
+                        sb.append(temp.substring(1));
+                    }else {
+                        sb.append(temp);
+                    }
                 }
             }
         } else {

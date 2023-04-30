@@ -17,20 +17,25 @@ package org.apache.poi.util;
    limitations under the License.
 ==================================================================== */
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Helper for fetching int values from system properties
  */
 public class Configurator {
-    private static POILogger logger = POILogFactory.getLogger(Configurator.class);
+    private static final Logger LOG = LogManager.getLogger(Configurator.class);
 
     public static int getIntValue(String systemProperty, int defaultValue) {
-        int result = defaultValue;
         String property = System.getProperty(systemProperty);
-        try {
-            result = Integer.parseInt(property);
-        } catch (Exception e) {
-            logger.log(POILogger.ERROR, "System property -D", systemProperty, " does not contains a valid integer: ", property);
+        if (property == null || "".equals(property) || "null".equals(property)) {
+            return defaultValue;
         }
-        return result;
+        try {
+            return Integer.parseInt(property);
+        } catch (Exception e) {
+            LOG.atError().log("System property -D{} does not contains a valid integer: {}", systemProperty, property);
+            return defaultValue;
+        }
     }
 }

@@ -25,10 +25,12 @@ import java.io.OutputStream;
  * <p>
  * For example, can be used with any {@link java.io.Writer} or a {@link java.lang.StringBuilder}
  * or {@link java.lang.StringBuffer}.
+ * </p>
  *
  * @since 2.5
  * @see java.lang.Appendable
- * @version $Id: AppendableOutputStream.java 1687815 2015-06-26 17:18:56Z krosenvold $
+ *
+ * @param <T> The type of the {@link Appendable} wrapped by this AppendableOutputStream.
  */
 public class AppendableOutputStream <T extends Appendable> extends OutputStream {
 
@@ -39,7 +41,7 @@ public class AppendableOutputStream <T extends Appendable> extends OutputStream 
      *
      * @param appendable the appendable to write to
      */
-    public AppendableOutputStream(T appendable) {
+    public AppendableOutputStream(final T appendable) {
         this.appendable = appendable;
     }
 
@@ -50,7 +52,7 @@ public class AppendableOutputStream <T extends Appendable> extends OutputStream 
      * @throws IOException upon error
      */
     @Override
-    public void write(int b) throws IOException {
+    public void write(final int b) throws IOException {
         appendable.append((char)b);
     }
 

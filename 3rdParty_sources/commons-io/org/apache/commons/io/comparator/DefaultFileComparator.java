@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,7 +41,6 @@ import java.util.Comparator;
  * </pre>
  * <p>
  *
- * @version $Id: DefaultFileComparator.java 1642757 2014-12-01 21:09:30Z sebb $
  * @since 1.4
  */
 public class DefaultFileComparator extends AbstractFileComparator implements Serializable {
@@ -52,16 +51,17 @@ public class DefaultFileComparator extends AbstractFileComparator implements Ser
     public static final Comparator<File> DEFAULT_COMPARATOR = new DefaultFileComparator();
 
     /** Singleton reverse default comparator instance */
-    public static final Comparator<File> DEFAULT_REVERSE = new ReverseComparator(DEFAULT_COMPARATOR);
+    public static final Comparator<File> DEFAULT_REVERSE = new ReverseFileComparator(DEFAULT_COMPARATOR);
 
     /**
      * Compare the two files using the {@link File#compareTo(File)} method.
-     * 
+     *
      * @param file1 The first file to compare
      * @param file2 The second file to compare
      * @return the result of calling file1's
      * {@link File#compareTo(File)} with file2 as the parameter.
      */
+    @Override
     public int compare(final File file1, final File file2) {
         return file1.compareTo(file2);
     }

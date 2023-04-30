@@ -25,12 +25,12 @@ package org.apache.poi.ss.formula.ptg;
  * Ptg class to implement less than or equal
  */
 public final class LessEqualPtg extends ValueOperatorPtg {
-    public final static byte sid = 0x0a;
+    public static final byte sid = 0x0a;
 
     public static final LessEqualPtg instance = new LessEqualPtg();
 
     private LessEqualPtg() {
-    	// enforce singleton
+        // enforce singleton
     }
 
     @Override

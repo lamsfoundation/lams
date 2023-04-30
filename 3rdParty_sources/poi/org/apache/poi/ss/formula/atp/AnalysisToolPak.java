@@ -22,23 +22,7 @@ import org.apache.poi.ss.formula.eval.NotImplementedFunctionException;
 import org.apache.poi.ss.formula.eval.ValueEval;
 import org.apache.poi.ss.formula.function.FunctionMetadata;
 import org.apache.poi.ss.formula.function.FunctionMetadataRegistry;
-import org.apache.poi.ss.formula.functions.Bin2Dec;
-import org.apache.poi.ss.formula.functions.Complex;
-import org.apache.poi.ss.formula.functions.Countifs;
-import org.apache.poi.ss.formula.functions.Dec2Bin;
-import org.apache.poi.ss.formula.functions.Dec2Hex;
-import org.apache.poi.ss.formula.functions.Delta;
-import org.apache.poi.ss.formula.functions.EDate;
-import org.apache.poi.ss.formula.functions.EOMonth;
-import org.apache.poi.ss.formula.functions.FactDouble;
-import org.apache.poi.ss.formula.functions.FreeRefFunction;
-import org.apache.poi.ss.formula.functions.Hex2Dec;
-import org.apache.poi.ss.formula.functions.ImReal;
-import org.apache.poi.ss.formula.functions.Imaginary;
-import org.apache.poi.ss.formula.functions.Oct2Dec;
-import org.apache.poi.ss.formula.functions.Quotient;
-import org.apache.poi.ss.formula.functions.Sumifs;
-import org.apache.poi.ss.formula.functions.WeekNum;
+import org.apache.poi.ss.formula.functions.*;
 import org.apache.poi.ss.formula.udf.UDFFinder;
 
 /**
@@ -78,23 +62,26 @@ public final class AnalysisToolPak implements UDFFinder {
     }
 
     private Map<String, FreeRefFunction> createFunctionsMap() {
-        Map<String, FreeRefFunction> m = new HashMap<>(108);
+        Map<String, FreeRefFunction> m = new HashMap<>(127);
 
         r(m, "ACCRINT", null);
         r(m, "ACCRINTM", null);
         r(m, "AMORDEGRC", null);
         r(m, "AMORLINC", null);
-        r(m, "AVERAGEIF", null);
-        r(m, "AVERAGEIFS", null);
+        r(m, "AVERAGEIF", AverageIf.instance);
+        r(m, "AVERAGEIFS", Averageifs.instance);
         r(m, "BAHTTEXT", null);
         r(m, "BESSELI", null);
-        r(m, "BESSELJ", null);
+        r(m, "BESSELJ", BesselJ.instance);
         r(m, "BESSELK", null);
         r(m, "BESSELY", null);
         r(m, "BIN2DEC", Bin2Dec.instance);
         r(m, "BIN2HEX", null);
         r(m, "BIN2OCT", null);
         r(m, "COMPLEX", Complex.instance);
+        r(m, "CEILING.MATH", CeilingMath.instance);
+        r(m, "CEILING.PRECISE", CeilingPrecise.instance);
+        r(m, "CONCAT", TextFunction.CONCAT);
         r(m, "CONVERT", null);
         r(m, "COUNTIFS", Countifs.instance);
         r(m, "COUPDAYBS", null);
@@ -103,6 +90,8 @@ public final class AnalysisToolPak implements UDFFinder {
         r(m, "COUPNCD", null);
         r(m, "COUPNUM", null);
         r(m, "COUPPCD", null);
+        r(m, "COVARIANCE.P", Covar.instanceP);
+        r(m, "COVARIANCE.S", Covar.instanceS);
         r(m, "CUBEKPIMEMBER", null);
         r(m, "CUBEMEMBER", null);
         r(m, "CUBEMEMBERPROPERTY", null);
@@ -112,13 +101,14 @@ public final class AnalysisToolPak implements UDFFinder {
         r(m, "CUBEVALUE", null);
         r(m, "CUMIPMT", null);
         r(m, "CUMPRINC", null);
+        r(m, "DAYS", Days.instance);
         r(m, "DEC2BIN", Dec2Bin.instance);
         r(m, "DEC2HEX", Dec2Hex.instance);
         r(m, "DEC2OCT", null);
         r(m, "DELTA", Delta.instance);
         r(m, "DISC", null);
-        r(m, "DOLLARDE", null);
-        r(m, "DOLLARFR", null);
+        r(m, "DOLLARDE", DollarDe.instance);
+        r(m, "DOLLARFR", DollarFr.instance);
         r(m, "DURATION", null);
         r(m, "EDATE", EDate.instance);
         r(m, "EFFECT", null);
@@ -126,13 +116,18 @@ public final class AnalysisToolPak implements UDFFinder {
         r(m, "ERF", null);
         r(m, "ERFC", null);
         r(m, "FACTDOUBLE", FactDouble.instance);
+        r(m, "FLOOR.MATH", FloorMath.instance);
+        r(m, "FLOOR.PRECISE", FloorPrecise.instance);
+        r(m, "FORECAST.LINEAR", Forecast.instance);
         r(m, "FVSCHEDULE", null);
-        r(m, "GCD", null);
+        r(m, "GCD", Gcd.instance);
         r(m, "GESTEP", null);
         r(m, "HEX2BIN", null);
         r(m, "HEX2DEC", Hex2Dec.instance);
         r(m, "HEX2OCT", null);
         r(m, "IFERROR", IfError.instance);
+        r(m, "IFNA", IfNa.instance);
+        r(m, "IFS", Ifs.instance);
         r(m, "IMABS", null);
         r(m, "IMAGINARY", Imaginary.instance);
         r(m, "IMARGUMENT", null);
@@ -154,12 +149,19 @@ public final class AnalysisToolPak implements UDFFinder {
         r(m, "ISEVEN", ParityFunction.IS_EVEN);
         r(m, "ISODD", ParityFunction.IS_ODD);
         r(m, "JIS", null);
-        r(m, "LCM", null);
+        r(m, "LCM", Lcm.instance);
+        r(m, "MAXIFS", Maxifs.instance);
         r(m, "MDURATION", null);
+        r(m, "MINIFS", Minifs.instance);
         r(m, "MROUND", MRound.instance);
         r(m, "MULTINOMIAL", null);
         r(m, "NETWORKDAYS", NetworkdaysFunction.instance);
         r(m, "NOMINAL", null);
+        r(m, "NORM.DIST", NormDist.instance);
+        r(m, "NORM.S.DIST", NormSDist.instance);
+        r(m, "NORM.INV", NormInv.instance);
+        r(m, "NORM.S.INV", NormSInv.instance);
+        r(m, "NUMBERVALUE", NumberValueFunction.instance);
         r(m, "OCT2BIN", null);
         r(m, "OCT2DEC", Oct2Dec.instance);
         r(m, "OCT2HEX", null);
@@ -167,6 +169,9 @@ public final class AnalysisToolPak implements UDFFinder {
         r(m, "ODDFYIELD", null);
         r(m, "ODDLPRICE", null);
         r(m, "ODDLYIELD", null);
+        r(m, "PERCENTRANK.EXC", PercentRankExcFunction.instance);
+        r(m, "PERCENTRANK.INC", PercentRankIncFunction.instance);
+        r(m, "POISSON.DIST", Poisson.instance);
         r(m, "PRICE", null);
         r(m, "PRICEDISC", null);
         r(m, "PRICEMAT", null);
@@ -175,19 +180,32 @@ public final class AnalysisToolPak implements UDFFinder {
         r(m, "RECEIVED", null);
         r(m, "RTD", null);
         r(m, "SERIESSUM", null);
-        r(m, "SQRTPI", null);
+        r(m, "SINGLE", Single.instance);
+        r(m, "SQRTPI", Sqrtpi.instance);
+        r(m, "STDEV.S", Stdevs.instance);
+        r(m, "STDEV.P", Stdevp.instance);
         r(m, "SUMIFS", Sumifs.instance);
+        r(m, "SWITCH", Switch.instance);
         r(m, "TBILLEQ", null);
         r(m, "TBILLPRICE", null);
         r(m, "TBILLYIELD", null);
+        r(m, "T.DIST", TDistLt.instance);
+        r(m, "T.DIST.2T", TDist2t.instance);
+        r(m, "T.DIST.RT", TDistRt.instance);
+        r(m, "TEXTJOIN", TextJoinFunction.instance);
         r(m, "WEEKNUM", WeekNum.instance);
         r(m, "WORKDAY", WorkdayFunction.instance);
+        r(m, "WORKDAY.INTL", WorkdayIntlFunction.instance);
         r(m, "XIRR", null);
+        r(m, "XLOOKUP", XLookupFunction.instance);
+        r(m, "XMATCH", XMatchFunction.instance);
         r(m, "XNPV", null);
         r(m, "YEARFRAC", YearFrac.instance);
         r(m, "YIELD", null);
         r(m, "YIELDDISC", null);
         r(m, "YIELDMAT", null);
+        r(m, "VAR.S", Vars.instance);
+        r(m, "VAR.P", Varp.instance);
 
         return m;
     }
@@ -240,20 +258,20 @@ public final class AnalysisToolPak implements UDFFinder {
     }
 
     /**
-     * Register a ATP function in runtime.
+     * Register an ATP function in runtime.
      *
      * @param name  the function name
-     * @param func  the functoin to register
-     * @throws IllegalArgumentException if the function is unknown or already  registered.
+     * @param func  the function to register
+     * @throws IllegalArgumentException if the function is unknown or already registered.
      * @since 3.8 beta6
      */
-   public static void registerFunction(String name, FreeRefFunction func){
+    public static void registerFunction(String name, FreeRefFunction func){
         AnalysisToolPak inst = (AnalysisToolPak)instance;
         if(!isATPFunction(name)) {
             FunctionMetadata metaData = FunctionMetadataRegistry.getFunctionByName(name);
             if(metaData != null) {
                 throw new IllegalArgumentException(name + " is a built-in Excel function. " +
-                        "Use FunctoinEval.registerFunction(String name, Function func) instead.");
+                        "Use FunctionEval.registerFunction(String name, Function func) instead.");
             }
 
             throw new IllegalArgumentException(name + " is not a function from the Excel Analysis Toolpack.");

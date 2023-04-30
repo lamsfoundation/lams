@@ -45,5 +45,6 @@
     <buildFile url="file://$PROJECT_DIR$/../lams_tool_zoom/build.xml" />
     <buildFile url="file://$PROJECT_DIR$/../lams_www/build.xml" />
     <buildFile url="file://$PROJECT_DIR$/../lams_bb_integration/build.xml" />
+    <buildFile url="file://$PROJECT_DIR$/../../lams-private/lams_ai/build.xml" />
   </component>
 </project>

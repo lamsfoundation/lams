@@ -16,35 +16,39 @@
  */
 package org.apache.commons.io.input;
 
+import static org.apache.commons.io.IOUtils.CR;
+import static org.apache.commons.io.IOUtils.EOF;
+import static org.apache.commons.io.IOUtils.LF;
+
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * A filtering input stream that ensures the content will have windows line endings, CRLF.
+ * A filtering input stream that ensures the content will have Windows line endings, CRLF.
  *
  * @since 2.5
  */
 public class WindowsLineEndingInputStream  extends InputStream {
 
-    private boolean slashRSeen = false;
+    private boolean slashRSeen;
 
-    private boolean slashNSeen = false;
+    private boolean slashNSeen;
 
-    private boolean injectSlashN = false;
+    private boolean injectSlashN;
 
-    private boolean eofSeen = false;
+    private boolean eofSeen;
 
     private final InputStream target;
 
     private final boolean ensureLineFeedAtEndOfFile;
 
     /**
-     * Create an input stream that filters another stream
+     * Creates an input stream that filters another stream
      *
      * @param in                        The input stream to wrap
      * @param ensureLineFeedAtEndOfFile true to ensure that the file ends with CRLF
      */
-    public WindowsLineEndingInputStream( InputStream in, boolean ensureLineFeedAtEndOfFile ) {
+    public WindowsLineEndingInputStream(final InputStream in, final boolean ensureLineFeedAtEndOfFile) {
         this.target = in;
         this.ensureLineFeedAtEndOfFile = ensureLineFeedAtEndOfFile;
     }
@@ -56,12 +60,12 @@ public class WindowsLineEndingInputStream  extends InputStream {
      */
     private int readWithUpdate() throws IOException {
         final int target = this.target.read();
-        eofSeen = target == -1;
-        if ( eofSeen ) {
+        eofSeen = target == EOF;
+        if (eofSeen) {
             return target;
         }
-        slashRSeen = target == '\r';
-        slashNSeen = target == '\n';
+        slashRSeen = target == CR;
+        slashNSeen = target == LF;
         return target;
     }
 
@@ -70,48 +74,43 @@ public class WindowsLineEndingInputStream  extends InputStream {
      */
     @Override
     public int read() throws IOException {
-        if ( eofSeen ) {
+        if (eofSeen) {
             return eofGame();
-        } else if ( injectSlashN ) {
-            injectSlashN = false;
-            return '\n';
-        } else {
-            boolean prevWasSlashR = slashRSeen;
-            int target = readWithUpdate();
-            if ( eofSeen ) {
-                return eofGame();
-            }
-            if ( target == '\n' ) {
-                if ( !prevWasSlashR )
-                {
-                    injectSlashN = true;
-                    return '\r';
-                }
-            }
-            return target;
         }
+        if (injectSlashN) {
+            injectSlashN = false;
+            return LF;
+        }
+        final boolean prevWasSlashR = slashRSeen;
+        final int target = readWithUpdate();
+        if (eofSeen) {
+            return eofGame();
+        }
+        if ((target == LF) && !prevWasSlashR) {
+            injectSlashN = true;
+            return CR;
+        }
+        return target;
     }
 
     /**
-     * Handles the eof-handling at the end of the stream
+     * Handles the EOF-handling at the end of the stream
      * @return The next char to output to the stream
      */
-
     private int eofGame() {
-        if ( !ensureLineFeedAtEndOfFile ) {
-            return -1;
+        if (!ensureLineFeedAtEndOfFile) {
+            return EOF;
         }
-        if ( !slashNSeen && !slashRSeen ) {
+        if (!slashNSeen && !slashRSeen) {
             slashRSeen = true;
-            return '\r';
+            return CR;
         }
-        if ( !slashNSeen ) {
+        if (!slashNSeen) {
             slashRSeen = false;
             slashNSeen = true;
-            return '\n';
-        } else {
-            return -1;
+            return LF;
         }
+        return EOF;
     }
 
     /**
@@ -128,7 +127,7 @@ public class WindowsLineEndingInputStream  extends InputStream {
      * {@inheritDoc}
      */
     @Override
-    public synchronized void mark( int readlimit ) {
-        throw new UnsupportedOperationException( "Mark not supported" );
+    public synchronized void mark(final int readlimit) {
+        throw UnsupportedOperationExceptions.mark();
     }
 }

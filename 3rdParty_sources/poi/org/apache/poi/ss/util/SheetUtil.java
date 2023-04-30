@@ -43,8 +43,6 @@ import org.apache.poi.util.Internal;
 
 /**
  * Helper methods for when working with Usermodel sheets
- *
- * @author Yegor Kozlov
  */
 public class SheetUtil {
 
@@ -98,6 +96,18 @@ public class SheetUtil {
      * drawing context to measure text
      */
     private static final FontRenderContext fontRenderContext = new FontRenderContext(null, true, true);
+
+    /**
+     * A system property which can be enabled to not fail when the
+     * font-system is not available on the current machine
+     */
+    private static final boolean ignoreMissingFontSystem =
+            Boolean.parseBoolean(System.getProperty("org.apache.poi.ss.ignoreMissingFontSystem"));
+
+    /**
+     * Which default char-width to use if the font-system is unavailable.
+     */
+    public static final int DEFAULT_CHAR_WIDTH = 5;
 
     /**
      * Compute width of a single cell
@@ -160,18 +170,20 @@ public class SheetUtil {
         double width = -1;
         if (cellType == CellType.STRING) {
             RichTextString rt = cell.getRichStringCellValue();
-            String[] lines = rt.getString().split("\\n");
-            for (String line : lines) {
-                String txt = line + defaultChar;
+            if (rt != null && rt.getString() != null) {
+                String[] lines = rt.getString().split("\\n");
+                for (String line : lines) {
+                    String txt = line + defaultChar;
 
-                AttributedString str = new AttributedString(txt);
-                copyAttributes(font, str, 0, txt.length());
+                    AttributedString str = new AttributedString(txt);
+                    copyAttributes(font, str, 0, txt.length());
 
-                /*if (rt.numFormattingRuns() > 0) {
-                    // TODO: support rich text fragments
-                }*/
+                    /*if (rt.numFormattingRuns() > 0) {
+                        // TODO: support rich text fragments
+                    }*/
 
-                width = getCellWidth(defaultCharWidth, colspan, style, width, str);
+                    width = getCellWidth(defaultCharWidth, colspan, style, width, str);
+                }
             }
         } else {
             String sval = null;
@@ -221,7 +233,7 @@ public class SheetUtil {
             AffineTransform trans = new AffineTransform();
             trans.concatenate(AffineTransform.getRotateInstance(style.getRotation()*2.0*Math.PI/360.0));
             trans.concatenate(
-            AffineTransform.getScaleInstance(1, fontHeightMultiple)
+                    AffineTransform.getScaleInstance(1, fontHeightMultiple)
             );
             bounds = layout.getOutline(trans).getBounds();
         } else {
@@ -233,7 +245,8 @@ public class SheetUtil {
     }
 
     /**
-     * Compute width of a column and return the result
+     * Compute width of a column and return the result.
+     * Note that this fall can fail if you do not have the right fonts installed in your OS.
      *
      * @param sheet the sheet to calculate
      * @param column    0-based index of the column
@@ -245,7 +258,8 @@ public class SheetUtil {
     }
 
     /**
-     * Compute width of a column based on a subset of the rows and return the result
+     * Compute width of a column based on a subset of the rows and return the result.
+     * Note that this fall can fail if you do not have the right fonts installed in your OS.
      *
      * @param sheet the sheet to calculate
      * @param column    0-based index of the column
@@ -271,7 +285,8 @@ public class SheetUtil {
     }
 
     /**
-     * Get default character width using the Workbook's default font
+     * Get default character width using the Workbook's default font. Note that this can
+     * fail if your OS does not have the right fonts installed.
      *
      * @param wb the workbook to get the default character width from
      * @return default character width in pixels
@@ -282,8 +297,16 @@ public class SheetUtil {
 
         AttributedString str = new AttributedString(String.valueOf(defaultChar));
         copyAttributes(defaultFont, str, 0, 1);
-        TextLayout layout = new TextLayout(str.getIterator(), fontRenderContext);
-        return (int) layout.getAdvance();
+        try {
+            TextLayout layout = new TextLayout(str.getIterator(), fontRenderContext);
+            return (int) layout.getAdvance();
+        } catch (UnsatisfiedLinkError | NoClassDefFoundError | InternalError e) {
+            if (ignoreMissingFontSystem) {
+                return DEFAULT_CHAR_WIDTH;
+            }
+
+            throw e;
+        }
     }
 
     /**

@@ -25,7 +25,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.apache.poi.hpsf.MarkUnsupportedException;
 import org.apache.poi.hpsf.NoPropertySetStreamException;
 import org.apache.poi.hpsf.PropertySet;
 import org.apache.poi.hpsf.PropertySetFactory;
@@ -42,7 +41,7 @@ public final class EntryUtils {
     public static void copyNodeRecursively( Entry entry, DirectoryEntry target )
     throws IOException {
         if ( entry.isDirectoryEntry() ) {
-        	DirectoryEntry dirEntry = (DirectoryEntry)entry;
+            DirectoryEntry dirEntry = (DirectoryEntry)entry;
             DirectoryEntry newTarget = target.createDirectory( entry.getName() );
             newTarget.setStorageClsid( dirEntry.getStorageClsid() );
             Iterator<Entry> entries = dirEntry.getEntries();
@@ -238,7 +237,7 @@ public final class EntryUtils {
                 } else {
                     return isEqual(inpA, inpB);
                 }
-            } catch (MarkUnsupportedException | NoPropertySetStreamException | IOException ex) {
+            } catch (NoPropertySetStreamException | IOException ex) {
                 throw new RuntimeException(ex);
             }
         }

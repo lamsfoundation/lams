@@ -20,28 +20,26 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.util.CodePageUtil;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.Internal;
 import org.apache.poi.util.LittleEndian;
 import org.apache.poi.util.LittleEndianByteArrayInputStream;
 import org.apache.poi.util.LittleEndianConsts;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
 import org.apache.poi.util.StringUtil;
 
 @Internal
 public class UnicodeString {
-    private static final POILogger LOG = POILogFactory.getLogger( UnicodeString.class );
-    //arbitrarily selected; may need to increase
-    private static final int MAX_RECORD_LENGTH = 100_000;
+    private static final Logger LOG = LogManager.getLogger(UnicodeString.class);
 
     private byte[] _value;
 
     public void read(LittleEndianByteArrayInputStream lei) {
         final int length = lei.readInt();
         final int unicodeBytes = length*2;
-        _value = IOUtils.safelyAllocate(unicodeBytes, MAX_RECORD_LENGTH);
+        _value = IOUtils.safelyAllocate(unicodeBytes, CodePageString.getMaxRecordLength());
         
         // If Length is zero, this field MUST be zero bytes in length. If Length is
         // nonzero, this field MUST be a null-terminated array of 16-bit Unicode characters, followed by
@@ -77,18 +75,14 @@ public class UnicodeString {
 
         final int terminator = result.indexOf( '\0' );
         if ( terminator == -1 ) {
-            String msg =
-                "String terminator (\\0) for UnicodeString property value not found. " +
-                "Continue without trimming and hope for the best.";
-            LOG.log(POILogger.WARN, msg);
+            LOG.atWarn().log("String terminator (\\0) for UnicodeString property value not found. " +
+                    "Continue without trimming and hope for the best.");
             return result;
         }
         
         if ( terminator != result.length() - 1 ) {
-            String msg =
-                "String terminator (\\0) for UnicodeString property value occured before the end of string. " +
-                "Trimming and hope for the best.";
-            LOG.log(POILogger.WARN, msg);
+            LOG.atWarn().log("String terminator (\\0) for UnicodeString property value occured before the end of " +
+                    "string. Trimming and hope for the best.");
         }
         return result.substring( 0, terminator );
     }
