@@ -27,6 +27,7 @@
     <resource-root path="tika-core-2.7.0.jar"/>
     <resource-root path="tika-parsers-standard-package-2.7.0.jar"/>
     <resource-root path="tika-parser-microsoft-module-2.7.0.jar"/>
+    <resource-root path="juniversalchardet-2.4.0.jar"/>
   </resources>
   <dependencies>
     <module name="javax.api"/>

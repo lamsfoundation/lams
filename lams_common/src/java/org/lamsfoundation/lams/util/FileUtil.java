@@ -32,8 +32,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.EmptyParser;
 import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.pdf.PDFParser;
+import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.BodyContentHandler;
 import org.hibernate.id.Configurable;
 import org.hibernate.id.IdentifierGenerator;
@@ -959,17 +961,26 @@ public class FileUtil {
 	FileUtils.deleteQuietly(uploadDir);
     }
 
-    public static String getPDFContents(File file) throws TikaException, IOException, SAXException {
+    public static String getTextFileContents(File file) throws TikaException, IOException, SAXException {
 	BodyContentHandler handler = new BodyContentHandler(-1);
-	ParseContext pcontext = new ParseContext();
+	ParseContext parseContext = new ParseContext();
+	parseContext.set(Parser.class, new EmptyParser());
 	Metadata metadata = new Metadata();
-	PDFParser pdfparser = new PDFParser();
+	AutoDetectParser parser = new AutoDetectParser();
+	String contents = null;
 	try (InputStream inputStream = new FileInputStream(file)) {
-	    pdfparser.parse(inputStream, handler, metadata, pcontext);
+	    parser.parse(inputStream, handler, metadata, parseContext);
+	} catch (Exception e) {
+	    contents = handler.toString().strip();
+	    if (StringUtils.isBlank(contents)) {
+		throw e;
+	    }
 	}
-	String contents = handler.toString().strip();
+	if (contents == null) {
+	    contents = handler.toString().strip();
+	}
 	if (log.isDebugEnabled()) {
-	    log.debug("PDF contents:\n" + contents);
+	    log.debug("File contents:\n" + contents);
 	}
 
 	return contents;
