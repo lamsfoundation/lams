@@ -20,10 +20,9 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.peerreview.dto;
 
-public class GroupSummary {
+public class GroupSummary implements Comparable<GroupSummary> {
 
     private Long sessionId;
     private String sessionName;
@@ -42,5 +41,17 @@ public class GroupSummary {
 
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
+    }
+
+    @Override
+    public int compareTo(GroupSummary o) {
+	String name1 = this.sessionName.replaceAll("\\D+", "");
+	String name2 = o.sessionName.replaceAll("\\D+", "");
+	if (name1.length() == 0 || name2.length() == 0) {
+	    return name1.compareTo(name2);
+	}
+	Long num1 = Long.parseLong(name1);
+	Long num2 = Long.parseLong(name2);
+	return num1.compareTo(num2);
     }
 }
