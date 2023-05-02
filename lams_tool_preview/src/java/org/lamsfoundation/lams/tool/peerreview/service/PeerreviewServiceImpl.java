@@ -23,29 +23,8 @@
 
 package org.lamsfoundation.lams.tool.peerreview.service;
 
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
@@ -67,12 +46,7 @@ import org.lamsfoundation.lams.rating.model.RatingRubricsColumn;
 import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.ToolCompletionStatus;
-import org.lamsfoundation.lams.tool.ToolContentManager;
-import org.lamsfoundation.lams.tool.ToolOutput;
-import org.lamsfoundation.lams.tool.ToolOutputDefinition;
-import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
-import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.tool.*;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
@@ -97,8 +71,11 @@ import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.util.HtmlUtils;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.http.HttpServletRequest;
+import java.text.NumberFormat;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author Andrey Balan
@@ -238,7 +215,7 @@ public class PeerreviewServiceImpl
 
     @Override
     public List<GroupSummary> getGroupSummaries(Long contentId) {
-	List<GroupSummary> groupList = new ArrayList<>();
+	Set<GroupSummary> groupSet = new TreeSet<>();
 
 	// get all sessions in a peerreview and retrieve all peerreview items under this session
 	// plus initial peerreview items by author creating (resItemList)
@@ -250,10 +227,10 @@ public class PeerreviewServiceImpl
 	    group.setSessionId(session.getSessionId());
 	    group.setSessionName(session.getSessionName());
 
-	    groupList.add(group);
+	    groupSet.add(group);
 	}
 
-	return groupList;
+	return new ArrayList<>(groupSet);
     }
 
     @Override
@@ -320,8 +297,10 @@ public class PeerreviewServiceImpl
 	} catch (Throwable e) {
 	    creatingUsersForSessionIds.remove(toolSessionId);
 	    String message = e.getMessage() != null ? e.getMessage() : e.getClass().getName();
-	    log.error("Exception thrown creating Peer Review users for session " + toolSessionId + " user id: "
-		    + (currentUser != null ? currentUser.getUserId().toString() : "null") + "; " + message, e);
+	    log.error("Exception thrown creating Peer Review users for session " + toolSessionId + " user id: " + (
+		    currentUser != null
+			    ? currentUser.getUserId().toString()
+			    : "null") + "; " + message, e);
 	    e.printStackTrace();
 	    throw (e);
 	}
@@ -370,8 +349,8 @@ public class PeerreviewServiceImpl
 	}
 
 	if (criteria.isRubricsStyleRating() && !getByUser) {
-	    Collection<Rating> ratings = ratingService
-		    .getRatingsByCriteriasAndItems(Set.of(criteria.getRatingCriteriaId()), Set.of(currentUserId));
+	    Collection<Rating> ratings = ratingService.getRatingsByCriteriasAndItems(
+		    Set.of(criteria.getRatingCriteriaId()), Set.of(currentUserId));
 
 	    return PeerreviewServiceImpl.getRubricsCriteriaDTO(criteria, currentUserId.intValue(), getAllUsers,
 		    ratings);
@@ -551,8 +530,8 @@ public class PeerreviewServiceImpl
 	    return null;
 	}
 
-	return new SpreadsheetBuilder(peerreview, ratingService, peerreviewSessionDao, peerreviewUserDao, this)
-		.generateTeamReport();
+	return new SpreadsheetBuilder(peerreview, ratingService, peerreviewSessionDao, peerreviewUserDao,
+		this).generateTeamReport();
     }
 
     @Override
@@ -606,8 +585,8 @@ public class PeerreviewServiceImpl
 		learners.stream().collect(Collectors.mapping(PeerreviewUser::getUserId, Collectors.toSet())));
 
 	for (PeerreviewUser learner : learners) {
-	    Function<RatingCriteria, StyledCriteriaRatingDTO> dtoBuilder = c -> PeerreviewServiceImpl
-		    .getRubricsCriteriaDTO(c, learner.getUserId().intValue(), true, ratings);
+	    Function<RatingCriteria, StyledCriteriaRatingDTO> dtoBuilder = c -> PeerreviewServiceImpl.getRubricsCriteriaDTO(
+		    c, learner.getUserId().intValue(), true, ratings);
 	    StyledCriteriaRatingDTO dto = PeerreviewServiceImpl.fillCriteriaGroup(criteria, criterias, dtoBuilder);
 	    learnerData.put(learner, dto);
 	}
@@ -656,10 +635,10 @@ public class PeerreviewServiceImpl
 	    boolean includeCurrentUser, Collection<Rating> ratings) {
 	StyledCriteriaRatingDTO dto = new StyledCriteriaRatingDTO();
 	dto.setRatingCriteria(criteria);
-	List<StyledRatingDTO> ratingDtos = ratings.stream()
-		.filter(rating -> rating.getRatingCriteria().getRatingCriteriaId()
-			.equals(criteria.getRatingCriteriaId()) && rating.getItemId().equals(currentUserId.longValue())
-			&& (includeCurrentUser || !rating.getLearner().getUserId().equals(currentUserId)))
+	List<StyledRatingDTO> ratingDtos = ratings.stream().filter(rating ->
+			rating.getRatingCriteria().getRatingCriteriaId().equals(criteria.getRatingCriteriaId())
+				&& rating.getItemId().equals(currentUserId.longValue()) && (includeCurrentUser
+				|| !rating.getLearner().getUserId().equals(currentUserId)))
 		.collect(Collectors.mapping(rating -> {
 		    StyledRatingDTO ratingDto = new StyledRatingDTO(currentUserId.longValue());
 		    if (rating.getRating() != null) {
@@ -689,15 +668,15 @@ public class PeerreviewServiceImpl
 	Long defaultPeerreviewId = new Long(
 		toolService.getToolDefaultContentIdBySignature(PeerreviewConstants.TOOL_SIGNATURE));
 	if (defaultPeerreviewId.equals(0L)) {
-	    String error = new StringBuilder("Could not retrieve default content id for this tool ")
-		    .append(PeerreviewConstants.TOOL_SIGNATURE).toString();
+	    String error = new StringBuilder("Could not retrieve default content id for this tool ").append(
+		    PeerreviewConstants.TOOL_SIGNATURE).toString();
 	    log.error(error);
 	    throw new PeerreviewApplicationException(error);
 	}
 	Peerreview defaultPeerreview = getPeerreviewByContentId(defaultPeerreviewId);
 	if (defaultPeerreview == null) {
-	    String error = new StringBuilder("Could not retrieve default content id for this tool ")
-		    .append(PeerreviewConstants.TOOL_SIGNATURE).append(" Looking for id ").append(defaultPeerreviewId)
+	    String error = new StringBuilder("Could not retrieve default content id for this tool ").append(
+			    PeerreviewConstants.TOOL_SIGNATURE).append(" Looking for id ").append(defaultPeerreviewId)
 		    .toString();
 	    log.error(error);
 	    throw new PeerreviewApplicationException(error);
@@ -781,8 +760,8 @@ public class PeerreviewServiceImpl
 			    newGroupId = nextRatingCriteriaGroupId;
 			    groupIdMap.put(existingGroupId, newGroupId);
 
-			    for (int columnIndex = 0; columnIndex < criteria.getRubricsColumnHeaders()
-				    .size(); columnIndex++) {
+			    for (int columnIndex = 0;
+				    columnIndex < criteria.getRubricsColumnHeaders().size(); columnIndex++) {
 				RatingRubricsColumn columnHeader = new RatingRubricsColumn(columnIndex + 1,
 					criteria.getRubricsColumnHeaders().get(columnIndex));
 				columnHeader.setRatingCriteriaGroupId(newGroupId);
@@ -959,8 +938,9 @@ public class PeerreviewServiceImpl
 	} else {
 	    log.error("Fail to leave tool Session.Could not find peerreview " + "session by given session id: "
 		    + toolSessionId);
-	    throw new DataMissingException("Fail to leave tool Session."
-		    + "Could not find peerreview session by given session id: " + toolSessionId);
+	    throw new DataMissingException(
+		    "Fail to leave tool Session." + "Could not find peerreview session by given session id: "
+			    + toolSessionId);
 	}
 	return toolService.completeToolSession(toolSessionId, learnerId);
     }
@@ -1154,7 +1134,8 @@ public class PeerreviewServiceImpl
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
 	}
 
-	return new ToolCompletionStatus(learner.isSessionFinished() ? ToolCompletionStatus.ACTIVITY_COMPLETED
+	return new ToolCompletionStatus(learner.isSessionFinished()
+		? ToolCompletionStatus.ACTIVITY_COMPLETED
 		: ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
     }
 
@@ -1181,8 +1162,8 @@ public class PeerreviewServiceImpl
 	peerreview.setCreated(updateDate);
 	peerreview.setUpdated(updateDate);
 
-	peerreview
-		.setLockWhenFinished(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
+	peerreview.setLockWhenFinished(
+		JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
 	peerreview.setReflectOnActivity(
 		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	peerreview.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
@@ -1207,8 +1188,8 @@ public class PeerreviewServiceImpl
 	peerreview.setMaximumRatesPerUser(JsonUtil.optInt(toolContentJSON, "maximumRatesPerUser", 0));
 	peerreview.setShowRatingsLeftForUser(
 		JsonUtil.optBoolean(toolContentJSON, "showRatingsLeftForUser", Boolean.TRUE));
-	peerreview
-		.setShowRatingsLeftByUser(JsonUtil.optBoolean(toolContentJSON, "showRatingsLeftByUser", Boolean.FALSE));
+	peerreview.setShowRatingsLeftByUser(
+		JsonUtil.optBoolean(toolContentJSON, "showRatingsLeftByUser", Boolean.FALSE));
 	peerreview.setSelfReview(JsonUtil.optBoolean(toolContentJSON, "notifyUsersOfResults", Boolean.FALSE));
 
 	saveOrUpdatePeerreview(peerreview);
