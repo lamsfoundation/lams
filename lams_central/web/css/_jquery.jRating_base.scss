@@ -56,18 +56,22 @@ p.jRatingInfos span.maxRate {
 .rating-stars-holder {text-align: center;}
 .rating-stars-caption {padding-top: 6px; font-size: 12px}
 .rating-stars, .rating-stars-disabled {margin: 0px auto; min-height: 20px;}
+
 .add-comment {
-	background-image: url('../images/tick.png');
-	width:16px !important;
-	height:16px;
-	cursor: pointer;
-	float: right !important;
-	margin-top: 20px;
+	margin-top: 30px;
 }
-.rating-comment{
+
+.comment-textarea {
+	margin: 0 auto 15px auto;
+	width: 90%;
+}
+
+.rating-comment {
 	padding: 15px;
-	margin: 10px 0;
+	width: 80%;
+	margin: 15px auto;
 }
+
 .rating-info{
 	margin-top: 0;
 	margin-bottom: 12px;

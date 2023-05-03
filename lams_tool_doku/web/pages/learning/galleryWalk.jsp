@@ -41,7 +41,7 @@
 			}
 
 			.comment-textarea {
-				margin-bottom: 15px;
+				height: 100px !important;
 			}
 		</style>
 
