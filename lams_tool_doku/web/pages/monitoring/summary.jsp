@@ -305,7 +305,7 @@
 							rows += '</td>';
 
 							rows += '<td>';
-							rows += 	userData['mark'];
+							rows += 	(userData['mark'] == '' ? '0.0' : userData['mark']);
 							rows += '</td>';
 
 							rows += '</tr>';
