@@ -16,12 +16,8 @@
 <%@ attribute name="criteriaRatings" required="true" rtexprvalue="true" type="org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO" %>
 <%@ attribute name="showJustification" required="true" %>
 <%@ attribute name="alwaysShowAverage" required="true" %>
-<%@ attribute name="rubricsPivotView" required="false" %>
 <%@ attribute name="rubricsInBetweenColumns" required="false" %>
 
-<c:if test="${empty rubricsPivotView}">
-	<c:set var="rubricsPivotView" value="false" />
-</c:if>
 <c:if test="${empty rubricsInBetweenColumns}">
 	<c:set var="rubricsInBetweenColumns" value="false" />
 </c:if>
@@ -212,8 +208,7 @@ When true, hides the names and groups the comments.  -->
 
 	<%-- Some styles for the table and results --%>
 	<style>	
-		.rubrics-user-panel .collapsable-icon-left a,
-		.rubrics-row-panel .collapsable-icon-left a {
+		.rubrics-user-panel .collapsable-icon-left a {
 			text-decoration: none;
 		}
 		
@@ -221,30 +216,17 @@ When true, hides the names and groups the comments.  -->
 			margin-top: 6px;
 		}
 		
-		.rubrics-table.standard-view tr:first-child {
+		.rubrics-table tr:first-child {
 			background-color: initial !important;
 		}
 		
-		.rubrics-table.standard-view th {
+		.rubrics-table th {
 			font-style: normal;
 			font-weight: bold;
 		}
 
-		.rubrics-table.standard-view td:first-child {
+		.rubrics-table td:first-child {
 			font-weight: bold;
-		}
-		
-		.rubrics-table.pivot-view td:not(:first-child) {
-			text-align: center;
-		}
-	
-		.rubrics-table.pivot-view th {
-			font-style: normal;
-			text-align: center;
-		}
-		
-		.column-header-span {
-			font-style: italic;
 		}
 		
 		.rubrics-table .rubrics-rating-cell {
@@ -273,7 +255,7 @@ When true, hides the names and groups the comments.  -->
 	<c:choose>
 		<c:when test="${currentUserDisplay}">
 			
-			<table class="table table-bordered rubrics-table standard-view">
+			<table class="table table-bordered rubrics-table">
 				<tr>
 					<%-- Each answer column has the same length, all remaining space is taken by the question column --%>
 					<th></th>
@@ -343,7 +325,7 @@ When true, hides the names and groups the comments.  -->
 						<%-- Cell with average rating --%>
 						<td rowspan="2" class="text-center">
 							<c:choose>
-								<c:when test="${rowRateCount == 0}">
+								<c:when test="${rowRateCount eq 0}">
 									-
 								</c:when>
 								<c:otherwise>
@@ -357,7 +339,7 @@ When true, hides the names and groups the comments.  -->
 							<%-- Calculate again because we need the same cell background colour --%>
 							<c:set var="rateCount" value="0" />
 							<c:forEach var="ratingDto" items="${criteriaDto.ratingDtos}">
-								<c:set var="rateCount" value="${rateCount + (ratingDto.userRating == columnOrderId.count? 1 : 0)}" />
+								<c:set var="rateCount" value="${rateCount + (ratingDto.userRating eq columnOrderId.count? 1 : 0)}" />
 							</c:forEach>
 							
 							<td class="rubrics-rating-cell
@@ -377,7 +359,7 @@ When true, hides the names and groups the comments.  -->
 								<%-- teachers see also who gave the rating --%>
 								<c:if test="${showJustification}">
 									<c:forEach var="ratingDto" items="${criteriaDto.ratingDtos}">
-										<c:if test="${ratingDto.userRating == columnOrderId.count}">
+										<c:if test="${ratingDto.userRating eq columnOrderId.count}">
 											<div class="rubrics-rating-learner">
 												<lams:Portrait userId="${ratingDto.itemDescription2}" hover="false" />
 												&nbsp;<c:out value="${ratingDto.itemDescription}" escapeXml="false"/>
@@ -427,90 +409,7 @@ When true, hides the names and groups the comments.  -->
 				</c:forEach>
 			</table>
 		</c:when>
-		<c:when test="${rubricsPivotView}">
-			<div id="rubrics-row-panels" class="panel-group" role="tablist" aria-multiselectable="true">
-				<%-- It is sufficient to take user names and columns from the first row/criterion --%>
-				<c:set var="exampleRatings" value="${criteriaRatings.ratingDtos}" />
-				<c:set var="columnHeaders" value="${criteriaRatings.ratingCriteria.rubricsColumnHeaders}" />
-				<c:set var="columnHeaderCount" value="${fn:length(columnHeaders)}" />
-				
-				<c:forEach var="criteriaDto" items="${criteriaRatings.criteriaGroup}">
-					<c:set var="criteria" value="${criteriaDto.ratingCriteria}" />
-					
-				    <div class="panel panel-default rubrics-row-panel pivot-view">
-				       <div class="panel-heading" role="tab" id="heading${criteria.ratingCriteriaId}">
-				       	<span class="panel-title collapsable-icon-left">
-				       		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${criteria.ratingCriteriaId}" 
-									aria-expanded="false" aria-controls="collapse${criteria.ratingCriteriaId}" data-parent="#rubrics-rows-panels">
-								<%-- Criterion "row" --%>
-								<c:out value="${criteria.title}" escapeXml="false" />
-							</a>
-						</span>
-				       </div>
-				       
-				       <div id="collapse${criteria.ratingCriteriaId}" class="panel-collapse collapse" 
-				       	    role="tabpanel" aria-labelledby="heading${criteria.ratingCriteriaId}">
-								<table class="table table-hover table-bordered rubrics-table pivot-view">
-									<thead>
-										<tr>
-											<%-- Learner profile pictures and names --%>
-											<th></th>
-											<c:forEach var="ratingDto" items="${exampleRatings}" varStatus="learnerOrderId">
-												<th>
-													<lams:Portrait userId="${ratingDto.itemId}" hover="false" /><br>
-													<strong><c:out value="${ratingDto.itemDescription}" escapeXml="false"/></strong>
-												</th>
-											</c:forEach>
-										</tr>
-									</thead>
-									
-									<tbody>
-										<c:forEach items="${columnHeaders}" varStatus="columnStatus">
-											<c:set var="columnHeader" value="${columnHeaders[columnHeaderCount - columnStatus.count]}" />
-											<tr>
-												<td>
-													<%-- Criterion "column" --%>
-													<span class="column-header-span"><c:out value="${columnHeader}" escapeXml="false"/></span><br>
-													<%-- Criterion "cell" --%>
-													<c:out value="${criteria.rubricsColumns[columnHeaderCount - columnStatus.count].name}" escapeXml="false" />	
-												</td>
-												<c:forEach var="ratingDto" items="${exampleRatings}" varStatus="learnerOrderId">
-													
-													<td
-														<%-- Columns are ordered from 1 to 5, so rate value is also the order ID of the column --%>
-														<c:if test="${criteriaDto.ratingDtos[learnerOrderId.index].userRating == (columnHeaderCount - columnStatus.index)}">
-															class="bg-success"
-														</c:if>
-													>
-														${columnHeaderCount - columnStatus.index}
-													</td>
-												</c:forEach>
-											</tr>
-											<c:if test="${not columnStatus.last and rubricsInBetweenColumns}">
-												<tr>
-													<td>
-														<i><fmt:message key="label.rating.rubrics.in.between" /></i>
-													</td>
-													<c:forEach var="ratingDto" items="${exampleRatings}" varStatus="learnerOrderId">
-														<td
-															<c:if test="${criteriaDto.ratingDtos[learnerOrderId.index].userRating == (columnHeaderCount - columnStatus.index - 0.5)}">
-																class="bg-success"
-															</c:if>
-														>
-															${columnHeaderCount - columnStatus.index - 0.5}
-														</td>
-													</c:forEach>
-												</tr>
-											</c:if>
-										</c:forEach>
-									</tbody>
-								</table>
-						</div>
-					</div>
-					
-				</c:forEach>
-			</div>
-		</c:when>
+		
 		<c:otherwise>
 		
 			<c:set var="criteriaGroupId" value="${criteriaRatings.ratingCriteria.ratingCriteriaGroupId}" />
@@ -535,7 +434,7 @@ When true, hides the names and groups the comments.  -->
 			       
 			       <div id="rubrics-collapse-${criteriaGroupId}-${ratingDto.itemId}" class="panel-collapse collapse" 
 			       	    role="tabpanel" aria-labelledby="rubrics-heading-${criteriaGroupId}-${ratingDto.itemId}">
-							<table class="table table-bordered rubrics-table standard-view">
+							<table class="table table-bordered rubrics-table">
 								<tr>
 									<%-- Each answer column has the same length, all remaining space is take by the question column --%>
 									<th></th>
