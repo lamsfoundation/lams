@@ -1,3 +1,4 @@
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ include file="/common/taglibs.jsp"%>
 
 <!-- Advance Tab Content -->
@@ -105,6 +106,15 @@
 			</label>
 			<i class="fa fa-question-circle"
 			   data-toggle="tooltip" title="<fmt:message key='label.authoring.advance.gallery.walk.read.only.tooltip' />"></i>
+		</div>
+
+		<div class="form-group">
+			<label for="galleryWalkBatchSize">
+				<fmt:message key="label.authoring.advance.gallery.walk.batch" />&nbsp;
+				<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="top" title=""
+				   data-original-title="<fmt:message key="label.authoring.advance.gallery.walk.batch.instructions"/>"></i>
+			</label>
+			<form:input path="dokumaran.galleryWalkBatchSize" type="number" min="0" max="9" size="2" id="galleryWalkBatchSize" cssClass="form-control input-sm"/>
 		</div>
 
 		<div class="form-group">

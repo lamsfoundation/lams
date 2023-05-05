@@ -23,30 +23,18 @@
 
 package org.lamsfoundation.lams.tool.dokumaran.model;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.MapKeyColumn;
-import javax.persistence.Table;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.hibernate.annotations.Cascade;
+
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Dokumaran
@@ -129,6 +117,9 @@ public class Dokumaran implements Cloneable {
 
     @Column(name = "gallery_walk_read_only")
     private boolean galleryWalkReadOnly;
+
+    @Column(name = "gallery_walk_batch_size")
+    private int galleryWalkBatchSize;
 
     @Column(name = "gallery_walk_started")
     private boolean galleryWalkStarted;
@@ -230,11 +221,11 @@ public class Dokumaran implements Cloneable {
     // **********************************************************
     // get/set methods
     // **********************************************************
+
     /**
      * Returns the object's creation date
      *
      * @return date
-     *
      */
     public Date getCreated() {
 	return created;
@@ -276,7 +267,7 @@ public class Dokumaran implements Cloneable {
 
     /**
      * @param createdBy
-     *            The userid of the user who created this Share dokumaran.
+     * 	The userid of the user who created this Share dokumaran.
      */
     public void setCreatedBy(DokumaranUser createdBy) {
 	this.createdBy = createdBy;
@@ -299,7 +290,7 @@ public class Dokumaran implements Cloneable {
 
     /**
      * @param title
-     *            The title to set.
+     * 	The title to set.
      */
     public void setTitle(String title) {
 	this.title = title;
@@ -322,7 +313,7 @@ public class Dokumaran implements Cloneable {
 
     /**
      * @param lockWhenFinished
-     *            Set to true to lock the dokumaran for finished users.
+     * 	Set to true to lock the dokumaran for finished users.
      */
     public void setLockWhenFinished(boolean lockWhenFinished) {
 	this.lockWhenFinished = lockWhenFinished;
@@ -380,7 +371,7 @@ public class Dokumaran implements Cloneable {
 
     /**
      * @param timeLimit
-     *            the time limitation, that students have to complete an attempt.
+     * 	the time limitation, that students have to complete an attempt.
      */
     public void setRelativeTimeLimit(int timeLimit) {
 	this.relativeTimeLimit = timeLimit;
@@ -488,6 +479,14 @@ public class Dokumaran implements Cloneable {
 
     public void setGalleryWalkReadOnly(boolean galleryWalkReadOnly) {
 	this.galleryWalkReadOnly = galleryWalkReadOnly;
+    }
+
+    public int getGalleryWalkBatchSize() {
+	return galleryWalkBatchSize;
+    }
+
+    public void setGalleryWalkBatchSize(int galleryWalkBatchSize) {
+	this.galleryWalkBatchSize = galleryWalkBatchSize;
     }
 
     public boolean isGalleryWalkStarted() {

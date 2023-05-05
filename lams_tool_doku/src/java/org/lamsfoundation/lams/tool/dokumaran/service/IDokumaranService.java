@@ -23,13 +23,6 @@
 
 package org.lamsfoundation.lams.tool.dokumaran.service;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
-
 import org.lamsfoundation.lams.etherpad.EtherpadException;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -42,10 +35,15 @@ import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
+
 /**
  * @author Dapeng.Ni
  *
- *         Interface that defines the contract that all ShareDokumaran service provider must follow.
+ * 	Interface that defines the contract that all ShareDokumaran service provider must follow.
  */
 public interface IDokumaranService extends ICommonToolService {
 
@@ -58,7 +56,8 @@ public interface IDokumaranService extends ICommonToolService {
     Dokumaran getDokumaranByContentId(Long contentId);
 
     /**
-     * Get a cloned copy of tool default tool content (Dokumaran) and assign the toolContentId of that copy as the given
+     * Get a cloned copy of tool default tool content (Dokumaran) and assign the toolContentId of that copy as the
+     * given
      * <code>contentId</code>
      *
      * @param contentId
@@ -73,8 +72,8 @@ public interface IDokumaranService extends ICommonToolService {
      * @param userId
      * @param toolSessionId
      * @param isFirstTimeAccess
-     *            whether user is accessing this doKumaran tool for the first time. If it's true - it will try to update
-     *            leaders list from the Leader Selection activity
+     * 	whether user is accessing this doKumaran tool for the first time. If it's true - it will try to update leaders
+     * 	list from the Leader Selection activity
      */
     List<DokumaranUser> checkLeaderSelectToolForSessionLeader(DokumaranUser user, Long toolSessionId,
 	    boolean isFirstTimeAccess);
@@ -132,6 +131,7 @@ public interface IDokumaranService extends ICommonToolService {
     void createPad(Dokumaran dokumaran, DokumaranSession session) throws DokumaranApplicationException;
 
     // ********** for user methods *************
+
     /**
      * Get learner by given user ID and tool content ID, i.e. user who has a session assigned.
      */
@@ -237,7 +237,10 @@ public interface IDokumaranService extends ICommonToolService {
 
     void enableGalleryWalkLearnerEdit(long toolContentId) throws IOException;
 
+    // List<List<DokumaranSession>> getGalleryWalkSessionBatches(long toolContentId);
+
     void changeLeaderForGroup(long toolSessionId, long leaderUserId);
 
     Grouping getGrouping(long toolContentId);
+
 }

@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.etherpad.EtherpadException;
 import org.lamsfoundation.lams.etherpad.service.IEtherpadService;
 import org.lamsfoundation.lams.etherpad.util.EtherpadUtil;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -643,6 +644,21 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	learnerService.createCommandForLearners(dokumaran.getContentId(), userIds, jsonCommand.toString());
     }
 
+    @Override
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
+
+    @Override
+    public void auditLogStartEditingActivityInMonitor(long toolContentID) {
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+    }
+
+    @Override
+    public boolean isLastActivity(Long toolSessionId) {
+	return toolService.isLastActivity(toolSessionId);
+    }
+
     // *****************************************************************************
     // private methods
     // *****************************************************************************
@@ -668,21 +684,38 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	return contentId;
     }
 
-    @Override
-    public boolean isGroupedActivity(long toolContentID) {
-	return toolService.isGroupedActivity(toolContentID);
-    }
+    private List<List<DokumaranSession>> getSessionsForGalleryWalk(long toolContentId) {
+	List<List<DokumaranSession>> result = new ArrayList<>();
 
-    @Override
-    public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
-    }
+	Dokumaran dokumaran = getDokumaranByContentId(toolContentId);
+	List<DokumaranSession> allSessions = dokumaranSessionDao.getByContentId(toolContentId);
+	int batchSize = dokumaran.getGalleryWalkBatchSize();
+	Grouping grouping = getGrouping(toolContentId);
+	if (batchSize == 0 || grouping == null) {
+	    result.add(allSessions);
+	    return result;
+	}
+	// for authors batch size is how many *other* groups given group will rate,
+	// but here we need to calculate how many groups will be in batch
+	batchSize++;
 
-    @Override
-    public boolean isLastActivity(Long toolSessionId) {
-	return toolService.isLastActivity(toolSessionId);
-    }
+	List<String> groupNames = grouping.getGroups().stream().map(Group::getGroupName).sorted().collect(Collectors.toList());
+	List<List<String>> groupNameBatches = new ArrayList<>();
+	Random random = new Random(toolContentId);
+	// create random batches of group names, each minimum size of batchSize
+	while (!groupNames.isEmpty()) {
+	    int batchSizeForThisBatch = Math.min(batchSize, groupNames.size());
+	    List<String> groupNameBatch = new ArrayList<>();
+	    for (int i = 0; i < batchSizeForThisBatch; i++) {
+		int randomIndex = random.nextInt(groupNames.size());
+		groupNameBatch.add(groupNames.remove(randomIndex));
+	    }
+	    groupNameBatches.add(groupNameBatch);
+	}
 
+
+	return result;
+    }
     // *******************************************************************************
     // ToolContentManager, ToolSessionManager methods
     // *******************************************************************************
