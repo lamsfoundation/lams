@@ -606,8 +606,8 @@
 			</div>
 			<div class="top-menu">
 				<div id="sequenceSearchPhraseContainer" class="input-group">
-					<input id="sequenceSearchPhrase" type="text" class="form-control" placeholder="Search Student">
-				    <button id="sequenceSearchPhraseButton" class="btn bg-white opacity-100" type="button" disabled onClick="javascript:sequenceClearSearchPhrase(true)">
+					<input id="sequenceSearchPhrase" type="search" class="form-control" placeholder="<fmt:message key='label.monitoring.search.learners' />...">
+				    <button id="sequenceSearchPhraseButton" class="btn bg-white opacity-100" type="button" disabled onClick="javascript:sequenceClearSearchPhrase(true)" aria-label="<fmt:message key='label.monitoring.search.learners' />">
 				    	<i id="sequenceSearchPhraseIcon" class="fa-solid fa-fw fa-magnifying-glass"></i>
 				    	<i id="sequenceSearchPhraseClearIcon" class="fa-solid fa-fw fa-lg fa-xmark"></i>
 				    </button>
