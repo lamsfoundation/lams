@@ -26,6 +26,7 @@ public class GroupSummary implements Comparable<GroupSummary> {
 
     private Long sessionId;
     private String sessionName;
+    private boolean emailsSent;
 
     public Long getSessionId() {
 	return sessionId;
@@ -41,6 +42,14 @@ public class GroupSummary implements Comparable<GroupSummary> {
 
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
+    }
+
+    public boolean isEmailsSent() {
+	return emailsSent;
+    }
+
+    public void setEmailsSent(boolean emailsSent) {
+	this.emailsSent = emailsSent;
     }
 
     @Override

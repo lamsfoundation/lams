@@ -316,7 +316,7 @@ public interface IPeerreviewService extends ToolRatingManager, ICommonToolServic
     String generateEmailReportToUser(Long toolContentId, Long sessionId, Long userId);
 
     /** Send an email with the user's results to each user in the session */
-    int emailReportToSessionUsers(Long toolContentId, Long sessionId);
+    int emailReportToUsers(Long toolContentId, Long sessionId);
 
     /** Send an email (generated previously with generateEmailReportToUser()) to the specified user in the session */
     int emailReportToUser(Long toolContentId, Long sessionId, Long userId, String emailReportToUser);

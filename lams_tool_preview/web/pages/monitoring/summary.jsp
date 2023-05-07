@@ -20,17 +20,17 @@
 <script type="text/javascript">
 	//var for jquery.jRating.js
 	var pathToImageFolder = "${lams}images/css/";
-		
+
 	//vars for rating.js
 	var MAX_RATES = 0,
-		MIN_RATES = 0,
-		COMMENTS_MIN_WORDS_LIMIT = 0,
-		MAX_RATINGS_FOR_ITEM = 0,
-		LAMS_URL = '',
-		COUNT_RATED_ITEMS = 0,
-		COMMENT_TEXTAREA_TIP_LABEL = '',
-		WARN_COMMENTS_IS_BLANK_LABEL = '',
-		WARN_MIN_NUMBER_WORDS_LABEL = '';
+			MIN_RATES = 0,
+			COMMENTS_MIN_WORDS_LIMIT = 0,
+			MAX_RATINGS_FOR_ITEM = 0,
+			LAMS_URL = '',
+			COUNT_RATED_ITEMS = 0,
+			COMMENT_TEXTAREA_TIP_LABEL = '',
+			WARN_COMMENTS_IS_BLANK_LABEL = '',
+			WARN_MIN_NUMBER_WORDS_LABEL = '';
 </script>
 <script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 
@@ -56,31 +56,33 @@
 		}
 		return element;
 	}
-	
+
 	function sendResults(sessionId) {
 		if (!confirm('<fmt:message key="confirm.notify.user.of.results" />')) {
 			return;
 		}
-		let buttons = getResultsElement(sessionId, ".btn-disable-on-submit"),
-			messageArea = getResultsElement(sessionId, ".messageArea2"),
-			messageAreaBusy = getResultsElement(sessionId, ".messageArea2_Busy"),
-			url = "<c:url value="/monitoring/sendResultsToSessionUsers.do"/>";
-		
+		let buttons = sessionId ? getResultsElement(sessionId, ".btn-disable-on-submit") : $('.btn-disable-on-submit'),
+				messageArea = sessionId ? getResultsElement(sessionId, ".messageArea2") : $('#message-area-general'),
+				messageAreaBusy = sessionId ? getResultsElement(sessionId, ".messageArea2_Busy") : $('#message-area-busy-general'),
+				emailsSentIcons = sessionId ? $('#heading' + sessionId + ' .emails-sent-icon') : $('.emails-sent-icon'),
+				url = "<c:url value="/monitoring/sendResultsToSessionUsers.do"/>";
+
 		messageArea.html("");
 		messageAreaBusy.show();
 		buttons.prop("disabled", true);
 		messageArea.load(
-			url,
-			{
-				sessionMapID: "${sessionMapID}",
-				toolContentID: ${sessionMap.toolContentID},
-				toolSessionId: sessionId, 
-				reqID: (new Date()).getTime()
-			},
-			function() {
-				messageAreaBusy.hide();
-				buttons.prop("disabled", false);
-			}
+				url,
+				{
+					sessionMapID: "${sessionMapID}",
+					toolContentID: ${sessionMap.toolContentID},
+					toolSessionId: sessionId,
+					reqID: (new Date()).getTime()
+				},
+				function() {
+					messageAreaBusy.hide();
+					buttons.prop("disabled", false);
+					emailsSentIcons.removeClass('hidden');
+				}
 		);
 		return false;
 	}
@@ -88,43 +90,48 @@
 
 <div class="panel">
 	<h4>
-	    <c:out value="${sessionMap.peerreview.title}" escapeXml="true"/>
+		<c:out value="${sessionMap.peerreview.title}" escapeXml="true"/>
 	</h4>
 	<div class="instructions voffset5">
 		<c:out value="${sessionMap.peerreview.instructions}" escapeXml="false"/>
 	</div>
-	
+
 	<c:if test="${empty summaryList}">
 		<lams:Alert type="info" id="no-session-summary" close="false">
 			<fmt:message key="message.monitoring.summary.no.session" />
 		</lams:Alert>
 	</c:if>
-	
+
 	<!--For send results feature-->
 	<lams:WaitingSpinner id="messageArea_Busy"></lams:WaitingSpinner>
 	<div class="voffset5 help-block" id="messageArea"></div>
-	
+
 </div>
 
 <c:if test="${sessionMap.isGroupedActivity}">
-	<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
+	<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true">
 </c:if>
 
 <c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
-	
- 	<c:if test="${sessionMap.isGroupedActivity}">
-	    <div class="panel panel-default" >
-        <div class="panel-heading" id="heading${groupSummary.sessionId}">
+
+	<c:if test="${sessionMap.isGroupedActivity}">
+		<div class="panel panel-default" >
+		<div class="panel-heading" id="heading${groupSummary.sessionId}">
         	<span class="panel-title collapsable-icon-left">
-        	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${groupSummary.sessionId}" 
-					aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${groupSummary.sessionId}">
-			<fmt:message key="monitoring.label.group" />: ${groupSummary.sessionName}</a>
+        	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse"
+			   href="#collapse${groupSummary.sessionId}"
+			   aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${groupSummary.sessionId}">
+				<fmt:message key="monitoring.label.group"/>: ${groupSummary.sessionName}</a>
+
+				<i class="emails-sent-icon loffset20 fa fa-envelope text-success ${groupSummary.emailsSent ? "" : "hidden"}"
+				   title="<fmt:message key="label.notified.users.of.results" />"></i>
+
 			</span>
-        </div>
-        
-        <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
+		</div>
+
+		<div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
 	</c:if>
-	
+
 	<c:set var="rubricsCriteriaCounter" value="1" />
 	<c:choose>
 		<c:when test="${fn:length(criterias) eq 1}">
@@ -172,15 +179,16 @@
 			<button onclick="javascript:launchPopup('${url}');return false;" class="btn btn-default  btn-disable-on-submit ${offset}"><fmt:message key="title.reflection"/></button>
 			<c:set var="offset">loffset5</c:set>
 		</c:if>
-		<button onClick="return sendResults(${groupSummary.sessionId});" class="btn btn-default btn-disable-on-submit ${offset}"><fmt:message key="label.notify.user.of.results"/></button>
-		
+		<button onClick="return sendResults(${groupSummary.sessionId});"
+				class="btn btn-default btn-disable-on-submit ${offset}"><fmt:message key="label.notify.user.of.results"/></button>
+
 		<c:if test="${fn:length(criterias) > 1}">
 			<!--For send results feature-->
 			<i class="fa fa-spinner messageArea2_Busy" style="display:none"></i>
-			<div class="voffset5 messageArea2"></div>
+			<div class="voffset5 loffset5 help-block messageArea2"></div>
 		</c:if>
 	</div>
-	
+
 	<c:if test="${sessionMap.isGroupedActivity}">
 		</div> <!-- end collapse area  -->
 		</div> <!-- end collapse panel  -->
@@ -193,22 +201,35 @@
 	</div> <!--  end panel group -->
 </c:if>
 
+<div style="text-align: right">
+	<lams:WaitingSpinner id="message-area-busy-general"></lams:WaitingSpinner>
+	<div class="voffset5 help-block" id="message-area-general"></div>
+</div>
+
 <div id="common-buttons-area">
 	<button onClick="return exportResults()" class="btn btn-default loffset5 pull-right btn-disable-on-submit">
-		<i class="fa fa-download" aria-hidden="true"></i> 
+		<i class="fa fa-download" aria-hidden="true"></i>
 		<fmt:message key="label.export.team.results" />
 	</button>
-	
+
+	<button onClick="return sendResults();"
+			class="btn btn-default loffset5 pull-right btn-disable-on-submit">
+		<i class="fa fa-envelope"></i>
+		<fmt:message key="label.notify.user.of.results.all"/>
+	</button>
+
 	<c:if test="${!empty summaryList}">
 		<c:set var='url'>
 			<c:url value="/monitoring/manageUsers.do"/>?sessionMapID=${sessionMapID}
 		</c:set>
-		<button onClick="javascript:launchPopup('${url}');return false;" class="btn btn-default btn-disable-on-submit pull-right">
-			<i class="fa fa-user-circle-o" aria-hidden="true"></i> 
+		<button onClick="javascript:launchPopup('${url}');return false;"
+				class="btn btn-default btn-disable-on-submit pull-right">
+			<i class="fa fa-user-circle-o" aria-hidden="true"></i>
 			<fmt:message key="label.manage.users" />
 		</button>
 	</c:if>
 </div>
+
 
 <c:if test="${!sessionMap.tblMonitoring}">
 	<%@ include file="advanceoptions.jsp"%>
