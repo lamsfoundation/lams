@@ -43,7 +43,9 @@ public class PeerreviewOutputFactory extends OutputFactory {
 	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<>();
 	if (definitionType == ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION) {
 	    ToolOutputDefinition definition = buildRangeDefinition(
-		    PeerreviewConstants.OUTPUT_NAME_LEARNER_RATING_AVERAGE, 0L, 5L);
+		    PeerreviewConstants.OUTPUT_NAME_LEARNER_RATING_AVERAGE, 0L, null);
+	    definition.setWeightable(true);
+	    definition.setImpactsOtherLearners(true);
 	    definitionMap.put(PeerreviewConstants.OUTPUT_NAME_LEARNER_RATING_AVERAGE, definition);
 	}
 
