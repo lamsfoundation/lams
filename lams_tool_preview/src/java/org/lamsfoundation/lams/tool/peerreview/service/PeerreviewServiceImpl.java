@@ -95,6 +95,8 @@ public class PeerreviewServiceImpl
 
     private MessageService messageService;
 
+    private PeerreviewOutputFactory peerreviewOutputFactory;
+
     // system services
 
     private ILamsToolService toolService;
@@ -180,6 +182,11 @@ public class PeerreviewServiceImpl
     @Override
     public PeerreviewSession getPeerreviewSessionBySessionId(Long sessionId) {
 	return peerreviewSessionDao.getSessionBySessionId(sessionId);
+    }
+
+    @Override
+    public List<PeerreviewSession> getPeerreviewSessionsByConentId(Long toolContentId) {
+	return peerreviewSessionDao.getByContentId(toolContentId);
     }
 
     @Override
@@ -797,7 +804,7 @@ public class PeerreviewServiceImpl
     @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
-	return new TreeMap<>();
+	return peerreviewOutputFactory.getToolOutputDefinitions(toolContentId, definitionType);
     }
 
     @Override
@@ -1048,17 +1055,17 @@ public class PeerreviewServiceImpl
 
     @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
-	return new TreeMap<>();
+	return peerreviewOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
     }
 
     @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
-	return null;
+	return peerreviewOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
 
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<>();
+	return peerreviewOutputFactory.getToolOutputs(name, this, toolContentId);
     }
 
     @Override
@@ -1088,6 +1095,10 @@ public class PeerreviewServiceImpl
 
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
+    }
+
+    public void setPeerreviewOutputFactory(PeerreviewOutputFactory peerreviewOutputFactory) {
+	this.peerreviewOutputFactory = peerreviewOutputFactory;
     }
 
     public void setPeerreviewDao(PeerreviewDAO peerreviewDao) {
