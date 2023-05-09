@@ -93,7 +93,7 @@ INSERT INTO lams_configuration VALUES
 ('ServerPageDirection','LTR','config.server.page.direction','config.header.look.feel','STRING',1),
 ('ServerURL','http://localhost:8080/lams/','config.server.url','config.header.system','STRING',1),
 ('ServerURLContextPath','lams/','config.server.url.context.path','config.header.system','STRING',1),
-('ServerVersionNumber','4.6','config.server.version.number','config.header.versions','STRING',1),
+('ServerVersionNumber','4.8','config.server.version.number','config.header.versions','STRING',1),
 ('ShowAllMyLessonLink','true','config.show.all.my.lesson.link','config.header.features','BOOLEAN',1),
 ('ShowTimezoneWarning','true','config.show.timezone.warning','config.header.features','BOOLEAN',1),
 ('SiteName','LAMS','config.site.name','config.header.system','STRING',1),
@@ -111,4 +111,4 @@ INSERT INTO lams_configuration VALUES
 ('UserValidationEmail','true','config.user.validation.emails','config.header.user.validation','BOOLEAN',0),
 ('UserValidationFirstLastName','true','config.user.validation.first.last.name','config.header.user.validation','BOOLEAN',0),
 ('UserValidationUsername','true','config.user.validation.username','config.header.user.validation','BOOLEAN',0),
-('Version','4.6','config.version','config.header.system','STRING',1);
+('Version','4.8','config.version','config.header.system','STRING',1);
