@@ -2,16 +2,16 @@
 <component inheritJdk="true">
 	<contentEntry url="file://$MODULE_DIR$"/>
 	<lib name="jboss-servlet-api_4.0_spec-1.0.0.Final.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_47$/servlet-api"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_48$/servlet-api"/>
 	</lib>
 	<lib name="commons-lang-2.6.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_47$/commons-lang"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_48$/commons-lang"/>
 	</lib>
 	<lib name="jackson-core-2.9.5.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_47$/jackson"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_48$/jackson"/>
 	</lib>
 	<lib name="jackson-databind-2.9.5.jar" scope="COMPILE">
-		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_47$/jackson"/>
+		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_48$/jackson"/>
 	</lib>
 	<levels>
 		<level name="3rdParty" value="project"/>
