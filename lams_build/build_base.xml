@@ -228,7 +228,7 @@
 		</copy>
 	</target>
 	
-	
+
 	<target name="_build-jar" depends="_compile-java, _build-manifest, _copy-language">
 		<!-- Internal target: Creates JAR file. -->
 		<echo>${ant.project.name}: Building JAR</echo>
@@ -279,7 +279,26 @@
 		   </fileset>
 		</copy>
 	</target>
-	
+
+	<target name="deploy-jar-as" depends="_build-jar" description="Deploys JAR.">
+		<echo>${ant.project.name}: Deploying JAR</echo>
+		<copy file="${basedir}/build/lib/${product}.jar" todir="${base.dir}/assembly/lams.ear/lib" overwrite="true" verbose="true" />
+	</target>
+
+
+	<target name="deploy-war-as" depends="_build-war" description="Deploys WAR.">
+		<echo>${ant.project.name}: Deploying WAR</echo>
+		<copy file="${basedir}/build/lib/${product}.war" todir="${base.dir}/assembly/lams.ear" overwrite="true" verbose="true" />
+
+		<echo>Copying language files for ${ant.project.name}, if exist</echo>
+		<copy todir="${base.dir}/assembly/lams.ear/lams-dictionary.jar/${product.path.filesystem}" overwrite="true">
+		   <fileset dir="${conf.dir}/language/lams" erroronmissingdir="false">
+		    <include name="**/*.properties"/>
+		    <include name="**/*.txt"/>
+		   </fileset>
+		</copy>
+	</target>
+
 	
 	<target name="_add-conf-module">
 		<!-- Internal target: Adds subprojects' JAR/WAR to LAMS EAR application.xml -->

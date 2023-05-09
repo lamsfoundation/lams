@@ -28,7 +28,8 @@
 		<echo>
 		build-db                --> Creates database tables and entries
 		deploy-tool             --> Deploys all Tool content
-		</echo>	
+		deploy-tool-nodb        --> no db update
+		</echo>
 	</target>
 	
 	<!-- =================================================================== -->
@@ -131,10 +132,10 @@
 			toolDBVersionScriptPath="${basedir}/build/deploy/sql/db_version_insert.sql"
 			toolApplicationContextPath="/${product.path.filesystem}/${tool.application.context.file}"
 			lamsEarPath="${server.home}/standalone/deployments/lams.ear"
-			toolContext="${toolContext}" 
+			toolContext="${toolContext}"
 			toolWebUri="${product}.war"
 			languageFilesPackage="${product.path.java}">
-			
+
 			<!-- Language files go as a fileset.
 			     Not nice but can't work out how to embed them in a tag. -->
 			<fileset dir="${basedir}/build/deploy/language">
@@ -154,4 +155,23 @@
 			<arg value="True" /> <!-- forcedb -->
 		</java>
 	</target>
+
+	<!-- 不进行数据表中的数据操作 -->
+	<target name="deploy-tool-nodb" depends="_package-create, _package-run-nodb"
+			description="Build Tool archives and run deployment. Do not run on a production environment." />
+
+	<target name="_package-run-nodb">
+		<!-- Internal target: Deploys Tool package. -->
+		<echo>Deploying ${ant.project.name} package</echo>
+		<java classname="org.lamsfoundation.lams.tool.deploy.Deploy" classpathref="deploy.classpath" fork="true">
+			<arg file="${basedir}/build/deploy/deploy.xml" />
+			<arg value="False" /> <!-- no forcedb -->
+			<arg value="True" /> <!-- no db -->
+		</java>
+	</target>
+
+	<!-- 将war包jar包复制到jboss目录下-->
+	<target name="_deploy-product" depends="deploy-jar, deploy-war" />
+	<!-- 将war包jar包复制到lams_build的assembly目录下-->
+	<target name="_deploy-product-as" depends="deploy-jar-as, deploy-war-as" />
 </project>

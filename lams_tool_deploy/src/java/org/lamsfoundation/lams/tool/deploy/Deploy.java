@@ -56,11 +56,15 @@ public class Deploy {
 		    + "\nSo it should be set to false for production and true for development");
 	}
 	Boolean forceDB = Boolean.FALSE;
-	if (args.length == 2 && args[1] != null) {
+	if (args.length >= 2 && args[1] != null) {
 	    forceDB = new Boolean(args[1]);
 	}
+	Boolean noDB = Boolean.FALSE;
+	if (args.length >= 3 && args[2] != null) {
+		noDB = new Boolean(args[2]);
+	}
 
-	System.out.println("Starting Tool Deploy");
+	System.out.println("Starting Tool Deploy:forceDB=" + forceDB + ",noDB=" + noDB);
 	try {
 	    System.out.println("Reading Configuration File " + args[0]);
 	    DeployToolConfig config = new DeployToolConfig(null, args[0]);
@@ -82,7 +86,7 @@ public class Deploy {
 	    dbUpdater.setToolVersion(config.getToolVersion());
 	    dbUpdater.setToolCompatibleVersion(config.getMinServerVersionNumber());
 	    dbUpdater.checkInstalledVersion();
-	    if (dbUpdater.getToolExists() && forceDB == false) {
+	    if (dbUpdater.getToolExists() && !forceDB && !noDB) {
 		if (dbUpdater.getToolNewer()) {
 		    System.out.println("Updating tool: " + toolSignature + " with version " + toolVersionStr);
 
@@ -126,6 +130,27 @@ public class Deploy {
 			    + " is already up to date.");
 		    System.exit(0);
 		}
+	    } else if (dbUpdater.getToolExists() && noDB) {
+
+			// deploy the jar and war files
+			System.out.println("[mafeng]Deploying files to assembly, file name:" + config.getDeployFiles());
+			DeployFilesTask deployFilesTask = new DeployFilesTask();
+			deployFilesTask.setLamsEarPath(config.getLamsEarPath());
+			deployFilesTask.setDeployFiles(config.getDeployFiles());
+			deployFilesTask.execute();
+
+			// deploy the language files
+			List<String> files = config.getLanguageFiles();
+			if (files != null && files.size() > 0) {
+				DeployLanguageFilesTask deployLanguageFilesTask = new DeployLanguageFilesTask();
+				deployLanguageFilesTask.setLamsEarPath(config.getLamsEarPath());
+				deployLanguageFilesTask.setDictionaryPacket(config.getLanguageFilesPackage());
+				deployLanguageFilesTask.setDeployFiles(config.getLanguageFiles());
+				deployLanguageFilesTask.execute();
+			}
+
+			System.out.println("[mafeng]Tool update completed");
+			System.exit(0);
 	    } else {
 		System.out.println("The tool to be installed: " + toolSignature + " does not exist in database");
 		System.out.println("Continuing with full install");
