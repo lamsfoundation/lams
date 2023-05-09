@@ -122,10 +122,10 @@
 			   href="#collapse${groupSummary.sessionId}"
 			   aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${groupSummary.sessionId}">
 				<fmt:message key="monitoring.label.group"/>: ${groupSummary.sessionName}</a>
-
-				<i class="emails-sent-icon loffset20 fa fa-envelope text-success ${groupSummary.emailsSent ? "" : "hidden"}"
-				   title="<fmt:message key="label.notified.users.of.results" />"></i>
-
+				<span title="<fmt:message key="label.notified.users.of.results" />" class="${groupSummary.emailsSent ? "" : "hidden"}">
+  					<i class="emails-sent-icon loffset20 fa fa-envelope" aria-hidden="true"></i>
+  					<i class="emails-sent-icon fa fa-check-circle text-success" aria-hidden="true"></i>
+				</span>
 			</span>
 		</div>
 
