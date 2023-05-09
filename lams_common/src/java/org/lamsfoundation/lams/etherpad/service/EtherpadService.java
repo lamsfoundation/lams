@@ -95,7 +95,10 @@ public class EtherpadService implements IEtherpadService {
 	}
 	//regex to get the top level part of a domain
 	Pattern p = Pattern.compile(
-		"^(?:\\w+://)?[^:?#/\\s]*?([^.\\s]+\\.(?:[a-z]{2,}|co\\.uk|org\\.uk|ac\\.uk|edu\\.au|org\\.au|com\\.au|edu\\.sg|com\\.sg|net\\.sg|org\\.sg|gov\\.sg|per\\.sg))(?:[:?#/]|$)");
+		"^(?:\\w+://)?[^:?#/\\s]*?([^.\\s]+\\.(?:[a-z]{2,}|co\\.uk|org\\.uk|ac\\.uk|edu\\.au|org\\.au|com\\.au|edu\\.sg|com\\.sg|net\\.sg|org\\.sg|gov\\.sg|per\\.sg"
+				// add special domain in china
+				+ "|com\\.cn|org\\.cn|net\\.cn|edu\\.cn|ac\\.cn|gov\\.cn|中国|企业|网址|网站|在线|集团|中文网"
+				+ "))(?:[:?#/]|$)");
 	// eg: uri.getHost() will return "www.foo.com"
 	Matcher m = p.matcher(uri.getHost());
 	String topLevelDomain = m.matches() ? "." + m.group(1) : uri.getHost();
