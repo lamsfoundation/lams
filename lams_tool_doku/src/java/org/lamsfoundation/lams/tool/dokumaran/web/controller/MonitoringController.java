@@ -23,28 +23,9 @@
 
 package org.lamsfoundation.lams.tool.dokumaran.web.controller;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.security.InvalidParameterException;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.etherpad.EtherpadException;
@@ -65,11 +46,7 @@ import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.DateUtil;
-import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.*;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -78,15 +55,19 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.security.InvalidParameterException;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/monitoring")
@@ -208,10 +189,12 @@ public class MonitoringController {
 	// identify sorting type
 	int sorting = LEARNER_MARKS_SORTING_FIRST_NAME_ASC;
 	if (isSortFirstName != null) {
-	    sorting = isSortFirstName.equals(1) ? LEARNER_MARKS_SORTING_FIRST_NAME_DESC
+	    sorting = isSortFirstName.equals(1)
+		    ? LEARNER_MARKS_SORTING_FIRST_NAME_DESC
 		    : LEARNER_MARKS_SORTING_FIRST_NAME_ASC;
 	} else if (isSortLastName != null) {
-	    sorting = isSortLastName.equals(1) ? LEARNER_MARKS_SORTING_LAST_NAME_DESC
+	    sorting = isSortLastName.equals(1)
+		    ? LEARNER_MARKS_SORTING_LAST_NAME_DESC
 		    : LEARNER_MARKS_SORTING_LAST_NAME_ASC;
 	}
 
@@ -236,9 +219,8 @@ public class MonitoringController {
 	    responsedata.put("total_rows", users.size());
 
 	    ToolSession toolSession = toolService.getToolSessionById(toolSessionId);
-	    Map<Integer, Double> gradebookUserActivities = gradebookService
-		    .getGradebookUserActivities(toolSession.getToolActivity().getActivityId()).stream()
-		    .filter(g -> g.getMark() != null)
+	    Map<Integer, Double> gradebookUserActivities = gradebookService.getGradebookUserActivities(
+			    toolSession.getToolActivity().getActivityId()).stream().filter(g -> g.getMark() != null)
 		    .collect(Collectors.toMap(g -> g.getLearner().getUserId(), GradebookUserActivity::getMark));
 
 	    DokumaranUser leader = users.get(0).getSession().getGroupLeader();
@@ -262,6 +244,7 @@ public class MonitoringController {
     }
 
     @RequestMapping(path = "/updateLearnerMark", method = RequestMethod.POST)
+    @ResponseBody
     private void updateLearnerMark(@RequestParam long toolSessionId, @RequestParam int userId,
 	    @RequestParam Double mark) {
 	ToolSession toolSession = toolService.getToolSessionById(toolSessionId);
@@ -368,7 +351,8 @@ public class MonitoringController {
 	Dokumaran dokumaran = dokumaranService.getDokumaranByContentId(toolContentId);
 	dokumaran.setRelativeTimeLimit(relativeTimeLimit);
 	// set time limit as seconds from start of epoch, using current server time zone
-	dokumaran.setAbsoluteTimeLimit(absoluteTimeLimit == null ? null
+	dokumaran.setAbsoluteTimeLimit(absoluteTimeLimit == null
+		? null
 		: LocalDateTime.ofEpochSecond(absoluteTimeLimit, 0, OffsetDateTime.now().getOffset()));
 	dokumaranService.saveOrUpdate(dokumaran);
     }
@@ -389,8 +373,8 @@ public class MonitoringController {
 	if (grouping != null) {
 	    Set<Group> groups = grouping.getGroups();
 	    for (Group group : groups) {
-		if (!group.getUsers().isEmpty()
-			&& group.getGroupName().toLowerCase().contains(searchString.toLowerCase())) {
+		if (!group.getUsers().isEmpty() && group.getGroupName().toLowerCase()
+			.contains(searchString.toLowerCase())) {
 		    ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
 		    groupJSON.put("label", groupLabel + group.getGroupName() + "\"");
 		    groupJSON.put("value", "group-" + group.getGroupId());
