@@ -1220,4 +1220,17 @@
 			<fileset dir="${server.home}/docs/" />
 		</delete>
 	</target>
+
+	<target name="update_db_connect">
+		<copy todir="${server.home}/standalone/configuration" overwrite="true" verbose="true">
+			<fileset file="${conf.dir}/standalone.xml" />
+			<filterset>
+				<filter token="db.url.run" value="${db.url.run}"/>
+				<filter token="db.username" value="${db.username}"/>
+				<filter token="db.password" value="${db.password}"/>
+				<filter token="db.timezone" value="${db.timezone}"/>
+			</filterset>
+		</copy>
+	</target>
+
 </project>
