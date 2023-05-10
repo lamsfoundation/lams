@@ -53,23 +53,24 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Creation Date: 27-06-05
  *
- * The learner url can be of three modes learner, teacher or author. Depending on
- * what mode was set, it will trigger the corresponding action. If the mode parameter
- * is missing or a key is not found in the keymap, it will call the unspecified method
- * which defaults to the learner action.
+ * The learner url can be of three modes learner, teacher or author. Depending on what mode was set, it will trigger the
+ * corresponding action. If the mode parameter is missing or a key is not found in the keymap, it will call the
+ * unspecified method which defaults to the learner action.
  *
  * <p>
- * The difference between author mode (which is basically the preview)
- * is that if the defineLater flag is set, it will not be able to see the noticeboard screen
+ * The difference between author mode (which is basically the preview) is that if the defineLater flag is set, it will
+ * not be able to see the noticeboard screen
  * </p>
  */
 @Controller
@@ -109,12 +110,22 @@ public class LearningController {
     }
 
     public String unspecified(@ModelAttribute NbLearnerForm NbLearnerForm, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response, Model model) {
 
-	return learner(NbLearnerForm, request, response);
+	return learner5(request, model);
     }
 
     @RequestMapping("/learner")
+    public String learner5(HttpServletRequest request, Model model) {
+	String url = request.getRequestURL().toString().replace("learner.do", "learnerInner.do") + "?"
+		+ request.getQueryString();
+	model.addAttribute("contentUrl", url);
+	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+	model.addAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
+	return "learner5";
+    }
+
+    @RequestMapping("/learnerInner")
     public String learner(@ModelAttribute NbLearnerForm NbLearnerForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
@@ -203,7 +214,7 @@ public class LearningController {
 	    return "message";
 	}
 
-	return "learnerContent";
+	return "learnerContent5";
 
     }
 
@@ -224,8 +235,8 @@ public class LearningController {
 
     /**
      * <p>
-     * Performs a check on the flag indicated by <code>flag</code>
-     * In this noticeboard tool, there are 3 possible flags:
+     * Performs a check on the flag indicated by <code>flag</code> In this noticeboard tool, there are 3 possible
+     * flags:
      * <li>defineLater</li>
      * <li>contentInUse</li>
      * <br>
@@ -247,13 +258,10 @@ public class LearningController {
 
     /**
      * <p>
-     * This methods checks the defineLater and runOffline flag.
-     * If defineLater flag is set, then a message is added to an ActionMessages
-     * object saying that the contents have not been defined yet. If the runOffline
-     * flag is set, a message is added to ActionMessages saying that the contents
-     * are not being run online.
-     * This method will return true if any one of the defineLater or runOffline flag is set.
-     * Otherwise false will be returned.
+     * This methods checks the defineLater and runOffline flag. If defineLater flag is set, then a message is added to
+     * an ActionMessages object saying that the contents have not been defined yet. If the runOffline flag is set, a
+     * message is added to ActionMessages saying that the contents are not being run online. This method will return
+     * true if any one of the defineLater or runOffline flag is set. Otherwise false will be returned.
      * </p>
      */
     private boolean displayMessageToUser(NoticeboardContent content, MultiValueMap<String, String> errorMap) {
@@ -270,8 +278,8 @@ public class LearningController {
     }
 
     /**
-     * Indicates that the user has finished viewing the noticeboard.
-     * The session is set to complete and leaveToolSession is called.
+     * Indicates that the user has finished viewing the noticeboard. The session is set to complete and leaveToolSession
+     * is called.
      */
     @RequestMapping("/finish")
     public String finish(@ModelAttribute NbLearnerForm nbLearnerForm, HttpServletRequest request,
@@ -339,8 +347,8 @@ public class LearningController {
     }
 
     /**
-     * Indicates that the user has finished viewing the noticeboard, and will be
-     * passed onto the Notebook reflection screen.
+     * Indicates that the user has finished viewing the noticeboard, and will be passed onto the Notebook reflection
+     * screen.
      */
     @RequestMapping(path = "/reflect", method = RequestMethod.POST)
     public String reflect(@ModelAttribute NbLearnerForm nbLearnerForm, HttpServletRequest request) {

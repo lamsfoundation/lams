@@ -148,9 +148,8 @@ public class LearnerController {
 
     public LearnerController() {
 	FluxRegistry.initFluxMap(LEARNER_TIMELINE_FLUX_NAME, CommonConstants.ACTIVITY_ENTERED_SINK_NAME,
-		(LearnerActivityCompleteFluxItem item,
-			LearnerActivityCompleteFluxItem key) -> item.getLessonId() == key.getLessonId()
-				&& item.getUserId() == key.getUserId(),
+		(LearnerActivityCompleteFluxItem item, LearnerActivityCompleteFluxItem key) ->
+			item.getLessonId() == key.getLessonId() && item.getUserId() == key.getUserId(),
 		(LearnerActivityCompleteFluxItem item) -> {
 		    ObjectNode responseJSON = null;
 		    try {
@@ -184,18 +183,16 @@ public class LearnerController {
      * </p>
      *
      * @param mapping
-     *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
-     *            the end-user.
-     *
+     * 	An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send the
+     * 	end-user.
      * @param form
-     *            The ActionForm class that will contain any data submitted by the end-user via a form.
+     * 	The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param request
-     *            A standard Servlet HttpServletRequest class.
+     * 	A standard Servlet HttpServletRequest class.
      * @param response
-     *            A standard Servlet HttpServletResponse class.
+     * 	A standard Servlet HttpServletResponse class.
      * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
-     *         next.
-     *
+     * 	next.
      * @throws IOException
      * @throws ServletException
      */
@@ -328,7 +325,8 @@ public class LearnerController {
 	    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 	    return null;
 	}
-
+	Lesson lesson = lessonService.getLesson(lessonId);
+	responseJSON.put("lessonName", lesson.getLessonName());
 	responseJSON.set("messages", getProgressBarMessages());
 
 	response.setContentType("application/json;charset=utf-8");
@@ -490,8 +488,9 @@ public class LearnerController {
 
 	if (activity.getChildActivities() != null) {
 	    for (ActivityURL childActivity : activity.getChildActivities()) {
-		activityJSON.withArray("childActivities").add(
-			activityProgressToJSON(childActivity, currentActivityId, lessonId, learnerId, monitorMode));
+		activityJSON.withArray("childActivities")
+			.add(activityProgressToJSON(childActivity, currentActivityId, lessonId, learnerId,
+				monitorMode));
 	    }
 	}
 

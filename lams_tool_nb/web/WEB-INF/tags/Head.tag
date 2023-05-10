@@ -38,7 +38,5 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store">
     <meta http-equiv="Expires" content="0">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#337ab7">
 	<jsp:doBody/>
 </head>
-
