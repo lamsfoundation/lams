@@ -492,4 +492,9 @@
 	    </apply>
 	</target>
 
+	<!-- 将war包jar包复制到jboss目录下-->
+	<target name="_deploy-product" depends="deploy-jar, deploy-war" />
+	<!-- 将war包jar包复制到lams_build的assembly目录下-->
+	<!-- 部署到服务器上的话执行此命令，将assembly目录下的内容复制到服务器上进行覆盖 -->
+	<target name="_deploy-product-as" depends="_clean-dirs, deploy-jar-as, deploy-war-as" />
 </project>

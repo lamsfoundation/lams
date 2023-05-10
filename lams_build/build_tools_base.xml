@@ -170,8 +170,4 @@
 		</java>
 	</target>
 
-	<!-- 将war包jar包复制到jboss目录下-->
-	<target name="_deploy-product" depends="deploy-jar, deploy-war" />
-	<!-- 将war包jar包复制到lams_build的assembly目录下-->
-	<target name="_deploy-product-as" depends="deploy-jar-as, deploy-war-as" />
 </project>
