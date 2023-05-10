@@ -70,6 +70,16 @@ body.component #sequenceInfoDialog {
 	display: none;
 }
 
+.component-page-wrapper .component-sidebar {
+	width: 7rem;
+	border-radius: 0 0 1.2rem 1.2rem;
+	transform: translateX(-7rem);
+}
+
+.component-page-wrapper .component-sidebar.active {
+	transform: translateX(0);
+}
+
 .monitoring-page-wrapper .component-sidebar.active.expanded {
 	width: 25rem;
 }

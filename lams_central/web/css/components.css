@@ -434,7 +434,7 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 	margin-left: 1.8rem;
 }
 
-.component-page-wrapper #sidebar-opener-button {
+.component-page-wrapper .component-page-content > header .sidebar-toggle-button {
 	font-size: 2rem;
 	margin-top: .3rem;
 	color: var(--bs-blue);
@@ -451,22 +451,14 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 .component-page-wrapper .component-sidebar {
 	position: absolute;
 	height: initial;
-	width: 7rem;
-	padding: 0.7rem 1.7rem 2rem 1.7rem;
-	border-radius: 0 0 1.2rem 1.2rem;
 	background-color: var(--bs-white);
 	text-align: center;
 	display: flex;
 	align-items: center;
 	flex-direction: column;
 	transition: all .3s ease;
-	transform: translateX(-7rem);
 	z-index: 1;
-
-}
-
-.component-page-wrapper .component-sidebar.active {
-	transform: translateX(0);
+	padding: 0.7rem 1.7rem 2rem 1.7rem;
 }
 
 .component-page-wrapper .component-sidebar .lams-logo {

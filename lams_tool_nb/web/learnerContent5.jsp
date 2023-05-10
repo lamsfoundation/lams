@@ -67,32 +67,32 @@
 		</c:if>
 
 
-		<c:if test="${not nbLearnerForm.readOnly}">
-			<c:choose>
-				<c:when test="${reflectOnActivity}">
+			<%--		<c:if test="${not nbLearnerForm.readOnly}">--%>
+			<%--			<c:choose>--%>
+			<%--				<c:when test="${reflectOnActivity}">--%>
 
-					<button  name="continueButton" class="btn btn-sm btn-primary pull-right"
-							 onclick="submitForm('reflect')">
-						<fmt:message key="button.continue" />
-					</button>
-				</c:when>
-				<c:otherwise>
+			<%--					<button  name="continueButton" class="btn btn-sm btn-primary pull-right"--%>
+			<%--						onclick="submitForm('reflect')">--%>
+			<%--						<fmt:message key="button.continue" />--%>
+			<%--					</button>--%>
+			<%--				</c:when>--%>
+			<%--				<c:otherwise>--%>
 
 
-					<a href="#nogo" id="finishButton" name="finishButton" class="btn btn-primary pull-right voffset10 na">
-						<c:choose>
-							<c:when test="${isLastActivity}">
-								<fmt:message key="button.submit" />
-							</c:when>
-							<c:otherwise>
-								<fmt:message key="button.finish" />
-							</c:otherwise>
-						</c:choose>
+			<%--					<a href="#nogo" id="finishButton" name="finishButton" class="btn btn-primary pull-right voffset10 na">--%>
+			<%--						<c:choose>--%>
+			<%--							<c:when test="${isLastActivity}">--%>
+			<%--								<fmt:message key="button.submit" />--%>
+			<%--							</c:when>--%>
+			<%--							<c:otherwise>--%>
+			<%--								<fmt:message key="button.finish" />--%>
+			<%--							</c:otherwise>--%>
+			<%--						</c:choose>--%>
 
-					</a>
-				</c:otherwise>
-			</c:choose>
-		</c:if>
+			<%--					</a>--%>
+			<%--				</c:otherwise>--%>
+			<%--			</c:choose>--%>
+			<%--		</c:if>--%>
 	</div>
 	</form:form>
 

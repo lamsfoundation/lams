@@ -11,6 +11,7 @@
         <link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
         <link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
         <link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
+        <link rel="stylesheet" href="<lams:LAMSURL/>learning/css/components-learner.css">
 
         <script src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
         <script src="<lams:LAMSURL/>includes/javascript/popper.min.js"></script>
@@ -20,6 +21,12 @@
             var LAMS_URL = '<lams:LAMSURL/>';
             $(document).ready(function (){
                 initLearnerPage(${toolSessionID});
+
+                $('.component-page-wrapper .sidebar-toggle-button').click(function () {
+                    let topToggleButton = $('.component-page-wrapper .component-page-content > header .sidebar-toggle-button');
+                    topToggleButton.toggleClass(topToggleButton.data('closed-class')).toggleClass(topToggleButton.data('opened-class'));
+                    $('.component-page-wrapper .component-sidebar').toggleClass('active');
+                });
             });
         </script>
 
@@ -33,15 +40,31 @@
         <div class="component-page-content">
             <header class="d-flex justify-content-between">
                 <div class="d-flex">
-                    <i id="sidebar-opener-button" class="fa-solid fa-bars pt-1"></i>
+                    <i class="sidebar-toggle-button fa-solid fa-fw fa-bars pt-1"
+                       data-closed-class="fa-bars" data-opened-class="fa-bars-staggered"></i>
                     <p id="lesson-name"></p>
                 </div>
                 <div class="top-menu">
 
                 </div>
             </header>
+            <main>
+                <jsp:doBody/>
+            </main>
+            <div class="activity-bottom-buttons">
+                <button class="btn btn-primary" type="button" onclick="javascript:nextActivity()">Next activity</button>
+            </div>
+        </div>
 
-            <jsp:doBody/>
+        <!-- Progress Bar Modal Start -->
+        <div class="component-sidebar">
+            <i class="fa-solid fa-xmark sidebar-toggle-button"></i>
+            <a href="/" title="Return to index page" class="lams-logo">
+                <img src="<lams:LAMSURL/>images/svg/lamsv5_logo.svg" alt="LAMS logo"/>
+            </a>
+            <h6 class="sidebar-title"><i class="fa-solid fa-bars-progress"></i>&nbsp;Progress bar</h6>
+            <ul id="progress-bar-items">
+            </ul>
         </div>
 
 
