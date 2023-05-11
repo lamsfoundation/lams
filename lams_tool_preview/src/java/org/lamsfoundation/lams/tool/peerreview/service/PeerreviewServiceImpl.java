@@ -95,6 +95,8 @@ public class PeerreviewServiceImpl
 
     private MessageService messageService;
 
+    private PeerreviewOutputFactory peerreviewOutputFactory;
+
     // system services
 
     private ILamsToolService toolService;
@@ -183,6 +185,11 @@ public class PeerreviewServiceImpl
     }
 
     @Override
+    public List<PeerreviewSession> getPeerreviewSessionsByConentId(Long toolContentId) {
+	return peerreviewSessionDao.getByContentId(toolContentId);
+    }
+
+    @Override
     public void saveOrUpdatePeerreviewSession(PeerreviewSession resSession) {
 	peerreviewSessionDao.insertOrUpdate(resSession);
     }
@@ -226,6 +233,7 @@ public class PeerreviewServiceImpl
 	    GroupSummary group = new GroupSummary();
 	    group.setSessionId(session.getSessionId());
 	    group.setSessionName(session.getSessionName());
+	    group.setEmailsSent(session.isEmailsSent());
 
 	    groupSet.add(group);
 	}
@@ -504,21 +512,35 @@ public class PeerreviewServiceImpl
     }
 
     @Override
-    public int emailReportToSessionUsers(Long toolContentId, Long sessionId) {
-	if (log.isDebugEnabled()) {
-	    log.debug("Sending email with results to all learners for session ID " + sessionId);
+    public int emailReportToUsers(Long toolContentId, Long sessionId) {
+	List<PeerreviewSession> sessions = null;
+	if (sessionId == null) {
+	    sessions = peerreviewSessionDao.getByContentId(toolContentId);
+	} else {
+	    sessions = List.of(peerreviewSessionDao.getSessionBySessionId(sessionId));
 	}
 
-	PeerreviewSession session = peerreviewSessionDao.getSessionBySessionId(sessionId);
-	Peerreview peerreview = getPeerreviewByContentId(toolContentId);
-	Map<Long, String> emails = new EmailAnalysisBuilder(peerreview, session, ratingService, peerreviewSessionDao,
-		peerreviewUserDao, this, messageService).generateHTMLEmailsForSession();
-	for (Map.Entry<Long, String> entry : emails.entrySet()) {
-	    eventNotificationService.sendMessage(null, entry.getKey().intValue(),
-		    IEventNotificationService.DELIVERY_METHOD_MAIL, getResultsEmailSubject(peerreview),
-		    entry.getValue(), true);
+	int emailsSent = 0;
+	for (PeerreviewSession session : sessions) {
+	    if (log.isDebugEnabled()) {
+		log.debug("Sending email with results to all learners for session ID " + session.getSessionId());
+	    }
+	    Peerreview peerreview = getPeerreviewByContentId(toolContentId);
+	    Map<Long, String> emails = new EmailAnalysisBuilder(peerreview, session, ratingService,
+		    peerreviewSessionDao, peerreviewUserDao, this, messageService).generateHTMLEmailsForSession();
+	    for (Map.Entry<Long, String> entry : emails.entrySet()) {
+		eventNotificationService.sendMessage(null, entry.getKey().intValue(),
+			IEventNotificationService.DELIVERY_METHOD_MAIL, getResultsEmailSubject(peerreview),
+			entry.getValue(), true);
+	    }
+
+	    session.setEmailsSent(true);
+	    peerreviewSessionDao.update(session);
+
+	    emailsSent += emails.size();
 	}
-	return emails.size();
+
+	return emailsSent;
     }
 
     @Override
@@ -797,7 +819,7 @@ public class PeerreviewServiceImpl
     @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
-	return new TreeMap<>();
+	return peerreviewOutputFactory.getToolOutputDefinitions(toolContentId, definitionType);
     }
 
     @Override
@@ -1048,17 +1070,17 @@ public class PeerreviewServiceImpl
 
     @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
-	return new TreeMap<>();
+	return peerreviewOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
     }
 
     @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
-	return null;
+	return peerreviewOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
 
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<>();
+	return peerreviewOutputFactory.getToolOutputs(name, this, toolContentId);
     }
 
     @Override
@@ -1088,6 +1110,10 @@ public class PeerreviewServiceImpl
 
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
+    }
+
+    public void setPeerreviewOutputFactory(PeerreviewOutputFactory peerreviewOutputFactory) {
+	this.peerreviewOutputFactory = peerreviewOutputFactory;
     }
 
     public void setPeerreviewDao(PeerreviewDAO peerreviewDao) {
