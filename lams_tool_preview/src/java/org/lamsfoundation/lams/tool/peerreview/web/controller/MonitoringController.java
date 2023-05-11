@@ -145,8 +145,8 @@ public class MonitoringController {
 	    Long toolContentId = (Long) sessionMap.get(PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
 
 	    List<RatingCriteria> criterias = service.getRatingCriterias(toolContentId);
-	    Map<PeerreviewUser, StyledCriteriaRatingDTO> rubricsLearnerData = service
-		    .getRubricsLearnerData(toolSessionId, criteria, criterias);
+	    Map<PeerreviewUser, StyledCriteriaRatingDTO> rubricsLearnerData = service.getRubricsLearnerData(
+		    toolSessionId, criteria, criterias);
 	    request.setAttribute("rubricsLearnerData", rubricsLearnerData);
 	}
 
@@ -190,7 +190,7 @@ public class MonitoringController {
 	String sortOrder = WebUtil.readStrParam(request, PeerreviewConstants.PARAM_SORD);
 	String sortBy = WebUtil.readStrParam(request, PeerreviewConstants.PARAM_SIDX, true);
 
-	int sorting =  PeerreviewConstants.SORT_BY_USERNAME_ASC;
+	int sorting = PeerreviewConstants.SORT_BY_USERNAME_ASC;
 	if (criteria.isRankingStyleRating()) {
 	    sorting = PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC;
 	}
@@ -263,11 +263,12 @@ public class MonitoringController {
 		if (averageRating != null && averageRating.length() > 0) {
 		    if (criteria.isStarStyleRating()) {
 			String starString = "<div class='rating-stars-holder'>";
-			starString += "<div class='rating-stars-disabled rating-stars-new' data-average='"
-				+ averageRating + "' data-id='" + criteriaId + "'>";
+			starString +=
+				"<div class='rating-stars-disabled rating-stars-new' data-average='" + averageRating
+					+ "' data-id='" + criteriaId + "'>";
 			starString += "</div>";
-			starString += "<div class='rating-stars-caption' id='rating-stars-caption-" + criteriaId
-				+ "' >";
+			starString +=
+				"<div class='rating-stars-caption' id='rating-stars-caption-" + criteriaId + "' >";
 			String msg = service.getLocalisedMessage("label.average.rating",
 				new Object[] { averageRating, numberOfVotes });
 			starString += msg;
@@ -342,8 +343,8 @@ public class MonitoringController {
 		// Show comment if comment has been left by user. Exclude the special case where it is a hedging rating
 		//  and the rating is not null - otherwise we end up putting the justification comment against entries that were not rated.
 		String comment = (String) ratingDetails[1];
-		if (comment != null && (!criteria.isHedgeStyleRating()
-			|| (criteria.isHedgeStyleRating() && ratingDetails[2] != null))) {
+		if (comment != null && (!criteria.isHedgeStyleRating() || (criteria.isHedgeStyleRating()
+			&& ratingDetails[2] != null))) {
 		    ArrayNode userData = JsonNodeFactory.instance.arrayNode();
 		    userData.add(i);
 		    userData.add((String) ratingDetails[4]);
@@ -463,9 +464,9 @@ public class MonitoringController {
 	    if (entryTime == null) {
 		userData.add("");
 	    } else {
-		StringBuilder nameField = new StringBuilder("<time class=\"timeago\" title=\"")
-			.append(DateUtil.convertToStringForJSON(entryTime, request.getLocale()))
-			.append("\" datetime=\"").append(dateFormatterTimeAgo.format(entryTime)).append("\"></time>");
+		StringBuilder nameField = new StringBuilder("<time class=\"timeago\" title=\"").append(
+				DateUtil.convertToStringForJSON(entryTime, request.getLocale())).append("\" datetime=\"")
+			.append(dateFormatterTimeAgo.format(entryTime)).append("\"></time>");
 		userData.add(nameField.toString());
 	    }
 
@@ -525,9 +526,8 @@ public class MonitoringController {
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
 	Long userId = WebUtil.readLongParam(request, "userID");
 
-	if (previewDTO == null || !dateTimeStamp.equals(previewDTO.getDateTimeStamp())
-		|| !toolSessionId.equals(previewDTO.getToolSessionId())
-		|| !userId.equals(previewDTO.getLearnerUserId())) {
+	if (previewDTO == null || !dateTimeStamp.equals(previewDTO.getDateTimeStamp()) || !toolSessionId.equals(
+		previewDTO.getToolSessionId()) || !userId.equals(previewDTO.getLearnerUserId())) {
 	    log.error(
 		    "Unable to send preview as requested parameters to not matched the catched parameters. Email text in session does not match the requested email. Cached preview: "
 			    + previewDTO);
@@ -548,8 +548,7 @@ public class MonitoringController {
     @RequestMapping("/sendResultsToSessionUsers")
     @ResponseBody
     @SuppressWarnings("unchecked")
-    public String sendResultsToSessionUsers(HttpServletRequest request, HttpServletResponse response)
-	    throws IOException {
+    public String sendResultsToUsers(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -558,9 +557,9 @@ public class MonitoringController {
 	sessionMap.remove("emailPreviewDTO"); // clear any old cached emails
 
 	Long contentId = (Long) sessionMap.get(PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
-	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
+	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId", true);
 
-	int numEmailsSent = service.emailReportToSessionUsers(contentId, toolSessionId);
+	int numEmailsSent = service.emailReportToUsers(contentId, toolSessionId);
 
 	response.setContentType("text/html;charset=utf-8");
 	return service.getLocalisedMessage("msg.results.sent", new Object[] { numEmailsSent });

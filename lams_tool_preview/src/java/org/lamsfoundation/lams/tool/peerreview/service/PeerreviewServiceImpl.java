@@ -226,6 +226,7 @@ public class PeerreviewServiceImpl
 	    GroupSummary group = new GroupSummary();
 	    group.setSessionId(session.getSessionId());
 	    group.setSessionName(session.getSessionName());
+	    group.setEmailsSent(session.isEmailsSent());
 
 	    groupSet.add(group);
 	}
@@ -504,21 +505,35 @@ public class PeerreviewServiceImpl
     }
 
     @Override
-    public int emailReportToSessionUsers(Long toolContentId, Long sessionId) {
-	if (log.isDebugEnabled()) {
-	    log.debug("Sending email with results to all learners for session ID " + sessionId);
+    public int emailReportToUsers(Long toolContentId, Long sessionId) {
+	List<PeerreviewSession> sessions = null;
+	if (sessionId == null) {
+	    sessions = peerreviewSessionDao.getByContentId(toolContentId);
+	} else {
+	    sessions = List.of(peerreviewSessionDao.getSessionBySessionId(sessionId));
 	}
 
-	PeerreviewSession session = peerreviewSessionDao.getSessionBySessionId(sessionId);
-	Peerreview peerreview = getPeerreviewByContentId(toolContentId);
-	Map<Long, String> emails = new EmailAnalysisBuilder(peerreview, session, ratingService, peerreviewSessionDao,
-		peerreviewUserDao, this, messageService).generateHTMLEmailsForSession();
-	for (Map.Entry<Long, String> entry : emails.entrySet()) {
-	    eventNotificationService.sendMessage(null, entry.getKey().intValue(),
-		    IEventNotificationService.DELIVERY_METHOD_MAIL, getResultsEmailSubject(peerreview),
-		    entry.getValue(), true);
+	int emailsSent = 0;
+	for (PeerreviewSession session : sessions) {
+	    if (log.isDebugEnabled()) {
+		log.debug("Sending email with results to all learners for session ID " + session.getSessionId());
+	    }
+	    Peerreview peerreview = getPeerreviewByContentId(toolContentId);
+	    Map<Long, String> emails = new EmailAnalysisBuilder(peerreview, session, ratingService,
+		    peerreviewSessionDao, peerreviewUserDao, this, messageService).generateHTMLEmailsForSession();
+	    for (Map.Entry<Long, String> entry : emails.entrySet()) {
+		eventNotificationService.sendMessage(null, entry.getKey().intValue(),
+			IEventNotificationService.DELIVERY_METHOD_MAIL, getResultsEmailSubject(peerreview),
+			entry.getValue(), true);
+	    }
+
+	    session.setEmailsSent(true);
+	    peerreviewSessionDao.update(session);
+
+	    emailsSent += emails.size();
 	}
-	return emails.size();
+
+	return emailsSent;
     }
 
     @Override
