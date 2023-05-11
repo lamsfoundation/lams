@@ -23,10 +23,7 @@
 
 package org.lamsfoundation.lams.tool.peerreview.service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.rating.ToolRatingManager;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
@@ -42,7 +39,9 @@ import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Interface that defines the contract that all Peerreview service provider must follow.
@@ -70,6 +69,7 @@ public interface IPeerreviewService extends ToolRatingManager, ICommonToolServic
     Peerreview getDefaultContent(Long contentId) throws PeerreviewApplicationException;
 
     // ********** for user methods *************
+
     /**
      * Create a new user in database.
      */
@@ -117,6 +117,8 @@ public interface IPeerreviewService extends ToolRatingManager, ICommonToolServic
      */
     PeerreviewSession getPeerreviewSessionBySessionId(Long sessionId);
 
+    List<PeerreviewSession> getPeerreviewSessionsByConentId(Long toolContentId);
+
     /**
      * Save or update peerreview session.
      *
@@ -155,7 +157,7 @@ public interface IPeerreviewService extends ToolRatingManager, ICommonToolServic
      * @param qaSessionId
      * @param excludeUserId
      * @param includeHiddenUsers
-     *            whether hidden users should be counted as well or not
+     * 	whether hidden users should be counted as well or not
      * @return
      */
     int getCountUsersBySession(final Long qaSessionId, final Long excludeUserId);
@@ -205,10 +207,9 @@ public interface IPeerreviewService extends ToolRatingManager, ICommonToolServic
     PeerreviewUser getUser(Long uid);
 
     /**
-     * Trigger the user creation, based on the lesson/grouping class, if needed. This
-     * should be called by the web layer to trigger an update. Could take a while to run so
-     * should be called from a new thread in the Action classm rather than holding up the Action
-     * class.
+     * Trigger the user creation, based on the lesson/grouping class, if needed. This should be called by the web layer
+     * to trigger an update. Could take a while to run so should be called from a new thread in the Action classm rather
+     * than holding up the Action class.
      *
      * Returns true if a check/update is triggered, returns false if a check is already underway.
      *
@@ -245,22 +246,18 @@ public interface IPeerreviewService extends ToolRatingManager, ICommonToolServic
     /**
      * It's a modification of org.lamsfoundation.lams.rating.ToolRatingManager.getRatingCriteriaDtos(Long contentId,
      * Long toolSessionId, Collection<Long> itemIds, boolean isCommentsByOtherUsersRequired, Long userId) method, added
-     * additional parameter
-     * isCountUsersRatedEachItem.
-     *
+     * additional parameter isCountUsersRatedEachItem.
      */
     List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Long toolSessionId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId, boolean isCountUsersRatedEachItem);
 
     /**
      * Gets all the users in the session and any existing ratings for a given criteria. If you want to use the
-     * tablesorter
-     * set skipRatings to true and it will just get the main criteria details, then on the jsp page call a tablesorter
-     * function that call getUsersRatingsCommentsByCriteriaJSON, with the page and size are included.
-     * Self rating === getAllUsers
-     * If you want the ratings done *by* the user XYZ, set getByUser to true and currentUser id to XYZ's user id.
-     * If you want the ratings done *for* user XYZ, set getByUser to true and currentUser id to XYZ's user id.
-     * user, set getByUser to false and set currentUserId to the current user id.
+     * tablesorter set skipRatings to true and it will just get the main criteria details, then on the jsp page call a
+     * tablesorter function that call getUsersRatingsCommentsByCriteriaJSON, with the page and size are included. Self
+     * rating === getAllUsers If you want the ratings done *by* the user XYZ, set getByUser to true and currentUser id
+     * to XYZ's user id. If you want the ratings done *for* user XYZ, set getByUser to true and currentUser id to XYZ's
+     * user id. user, set getByUser to false and set currentUserId to the current user id.
      */
     StyledCriteriaRatingDTO getUsersRatingsCommentsByCriteriaIdDTO(Long toolContentId, Long toolSessionId,
 	    RatingCriteria criteria, Long currentUserId, boolean skipRatings, int sorting, String searchString,
@@ -291,9 +288,8 @@ public interface IPeerreviewService extends ToolRatingManager, ICommonToolServic
     List<PeerreviewStatisticsDTO> getStatistics(Long toolContentId);
 
     /**
-     * Get all the notebook entries for a session
-     * Will return List<[user.user_id, user.first_name, user.first_name + user.last_name, notebook entry, notebook
-     * date]>
+     * Get all the notebook entries for a session Will return List<[user.user_id, user.first_name, user.first_name +
+     * user.last_name, notebook entry, notebook date]>
      */
     List<Object[]> getUserNotebookEntriesForTablesorter(Long toolSessionId, int page, int size, int sorting,
 	    String searchString);
