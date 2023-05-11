@@ -234,52 +234,6 @@
 		</copy>
 	</target>
 
-	<!-- 核心模块打包，不生成配置文件 -->
-	<target name="_build-ear-noconf" depends="_clean-dirs, _build-core">
-		<!-- Internal target: Assembles LAMS EAR in exploded form -->
-		<echo>${ant.project.name}: Copying libraries</echo>
-		<copy todir="assembly/lams.ear" flatten="true">
-			<fileset dir="..">
-				<include name="lams_monitoring/build/lib/*.war"/>
-				<include name="lams_learning/build/lib/*.war"/>
-				<include name="lams_admin/build/lib/*.war"/>
-				<include name="lams_gradebook/build/lib/*.war"/>
-			</fileset>
-		</copy>
-		<copy todir="assembly/lams.ear/lib" flatten="true">
-			<fileset dir="..">
-				<include name="lams_common/build/lib/lams.jar" />
-				<include name="lams_contentrepository/build/lib/*.jar" />
-				<include name="lams_central/build/lib/*.jar" />
-				<include name="lams_monitoring/build/lib/*.jar"/>
-				<include name="lams_learning/build/lib/*.jar"/>
-				<include name="lams_admin/build/lib/*.jar"/>
-				<include name="lams_gradebook/build/lib/*.jar"/>
-			</fileset>
-		</copy>
-
-		<echo>Copying lams-central.war</echo>
-		<copy todir="assembly/lams.ear/lams-central.war">
-			<fileset dir="../lams_central/build/lib/lams-central.war" />
-		</copy>
-
-		<echo>Expanding lams-www.war</echo>
-		<unjar src="../lams_www/build/lib/lams-www.war"
-			   dest="assembly/lams.ear/lams-www.war"
-		/>
-
-		<echo>Copying language files</echo>
-		<copy todir="assembly/lams.ear/lams-dictionary.jar">
-			<fileset dir="../lams_common/build/lib/language" />
-			<fileset dir="../lams_central/build/lib/language" />
-			<fileset dir="../lams_monitoring/build/lib/language" />
-			<fileset dir="../lams_learning/build/lib/language" />
-			<fileset dir="../lams_admin/build/lib/language" />
-			<fileset dir="../lams_gradebook/build/lib/language" />
-		</copy>
-	</target>
-
-	
 	<target name="_deploy-ear" depends="_build-ear">
 		<echo>Deploying EAR</echo>
 		<delete dir="${server.home}/standalone/deployments/lams.ear"/>
@@ -289,43 +243,10 @@
 	</target>
 
 
-	<!-- 更新核心模块，执行后将win_installer/assembly/lams.ear中的内容复制到jboss的目录下进行覆盖 -->
+	<!-- name=deploy-ear-updater，修改为deploy-ear-updater-no-tool -->
 	<target name="deploy-ear-updater-no-tool" depends="_build-ear"
 		description="Deploys EAR file to the win_installer directory.">
 		<echo>Deploying EAR to Windows Installer dir</echo>
-		<delete dir="../win_installer/assembly"/>
-		<copy todir="../win_installer/assembly/lams.ear">
-			<fileset dir="assembly/lams.ear" />
-		</copy>
-	</target>
-
-    <!-- 本地修改了核心模块代码或者插件代码可以用这个更新，执行后将assembly/lams.ear中的内容复制到jboss的目录下进行覆盖 -->
-    <!-- 该命令会将插件模块直接更新到jboss的目录中，核心模块打包到assembly/lams.ear中，需要手动复制到jboss目录中-->
-	<target name="deploy-ear-updater" depends="_build-ear-noconf, _deploy-tools-nodb, _deploy-learning-libraries-nodb"
-		description="Deploys EAR file to the win_installer directory.">
-		<echo>Deploying EAR and tools to Windows Installer dir</echo>
-		<delete dir="../win_installer/assembly"/>
-		<copy todir="../win_installer/assembly/lams.ear">
-			<fileset dir="assembly/lams.ear" />
-		</copy>
-	</target>
-
-    <!-- 本地修改了插件的代码可以用这个更新2，执行后将assembly/lams.ear中的内容复制到jboss的目录下进行覆盖 -->
-	<!-- 该命令会将插件模块直接更新到jboss的目录中，核心模块打包到assembly/lams.ear中，需要手动复制到jboss目录中-->
-	<target name="deploy-ear-updater2" depends="_build-ear-noconf, _deploy-tools-nodb2, _deploy-learning-libraries-nodb"
-		description="Deploys EAR file to the win_installer directory.">
-		<echo>Deploying EAR and tools to Windows Installer dir</echo>
-		<delete dir="../win_installer/assembly"/>
-		<copy todir="../win_installer/assembly/lams.ear">
-			<fileset dir="assembly/lams.ear" />
-		</copy>
-	</target>
-
-    <!-- 本地修改了插件的代码可以用这个更新3，执行后将assembly/lams.ear中的内容复制到jboss的目录下进行覆盖 -->
-	<!-- 该命令会将插件模块、核心模块都打包到assembly/lams.ear中，需要手动复制到jboss目录中-->
-	<target name="deploy-ear-updater2-as" depends="_build-ear-noconf, _deploy-tools-nodb2-as, _deploy-learning-libraries-nodb-as"
-		description="Deploys EAR file to the win_installer directory.">
-		<echo>Deploying EAR and tools to Windows Installer dir</echo>
 		<delete dir="../win_installer/assembly"/>
 		<copy todir="../win_installer/assembly/lams.ear">
 			<fileset dir="assembly/lams.ear" />
@@ -372,88 +293,6 @@
 			<ant antfile="../lams_tool_zoom/build.xml"          target="deploy-tool" inheritAll="false" />
 		-->
 	</target>
-
-	<target name="_deploy-tools-nodb">
-		<echo>Deploying Tools</echo>
-		<ant antfile="../lams_tool_assessment/build.xml"    target="deploy-tool-nodb" inheritAll="false" />
-		<ant antfile="../lams_tool_chat/build.xml"          target="deploy-tool-nodb" inheritAll="false" />
-		<ant antfile="../lams_tool_daco/build.xml"          target="deploy-tool-nodb" inheritAll="false" />
-		<ant antfile="../lams_tool_forum/build.xml"         target="deploy-tool-nodb" inheritAll="false" />
-		<ant antfile="../lams_tool_images/build.xml"        target="deploy-tool-nodb" inheritAll="false" />
-		<ant antfile="../lams_tool_imscc/build.xml"         target="deploy-tool-nodb" inheritAll="false" />
-		<ant antfile="../lams_tool_lamc/build.xml"          target="deploy-tool-nodb" inheritAll="false" />
-		<ant antfile="../lams_tool_laqa/build.xml"          target="deploy-tool-nodb" inheritAll="false" />
-		<ant antfile="../lams_tool_larsrc/build.xml"        target="deploy-tool-nodb" inheritAll="false" />
-		<ant antfile="../lams_tool_leader/build.xml"        target="deploy-tool-nodb" inheritAll="false" />
-		<ant antfile="../lams_tool_mindmap/build.xml"       target="deploy-tool-nodb" inheritAll="false" />
-		<ant antfile="../lams_tool_nb/build.xml"          	target="deploy-tool-nodb" inheritAll="false" />
-		<ant antfile="../lams_tool_notebook/build.xml"      target="deploy-tool-nodb" inheritAll="false" />
-		<ant antfile="../lams_tool_pixlr/build.xml"         target="deploy-tool-nodb" inheritAll="false" />
-		<ant antfile="../lams_tool_sbmt/build.xml"          target="deploy-tool-nodb" inheritAll="false" />
-		<ant antfile="../lams_tool_scratchie/build.xml"     target="deploy-tool-nodb" inheritAll="false" />
-		<ant antfile="../lams_tool_scribe/build.xml"        target="deploy-tool-nodb" inheritAll="false" />
-		<ant antfile="../lams_tool_spreadsheet/build.xml"   target="deploy-tool-nodb" inheritAll="false" />
-		<ant antfile="../lams_tool_survey/build.xml"        target="deploy-tool-nodb" inheritAll="false" />
-		<ant antfile="../lams_tool_task/build.xml"          target="deploy-tool-nodb" inheritAll="false" />
-		<ant antfile="../lams_tool_vote/build.xml"          target="deploy-tool-nodb" inheritAll="false" />
-		<ant antfile="../lams_tool_wiki/build.xml"          target="deploy-tool-nodb" inheritAll="false" />
-		<ant antfile="../lams_tool_preview/build.xml"       target="deploy-tool-nodb" inheritAll="false" />
-	</target>
-
-	<target name="_deploy-tools-nodb2">
-		<echo>Deploying Tools</echo>
-		<ant antfile="../lams_tool_assessment/build.xml"    target="_deploy-product" inheritAll="false" />
-		<ant antfile="../lams_tool_chat/build.xml"          target="_deploy-product" inheritAll="false" />
-		<ant antfile="../lams_tool_daco/build.xml"          target="_deploy-product" inheritAll="false" />
-		<ant antfile="../lams_tool_forum/build.xml"         target="_deploy-product" inheritAll="false" />
-		<ant antfile="../lams_tool_images/build.xml"        target="_deploy-product" inheritAll="false" />
-		<ant antfile="../lams_tool_imscc/build.xml"         target="_deploy-product" inheritAll="false" />
-		<ant antfile="../lams_tool_lamc/build.xml"          target="_deploy-product" inheritAll="false" />
-		<ant antfile="../lams_tool_laqa/build.xml"          target="_deploy-product" inheritAll="false" />
-		<ant antfile="../lams_tool_larsrc/build.xml"        target="_deploy-product" inheritAll="false" />
-		<ant antfile="../lams_tool_leader/build.xml"        target="_deploy-product" inheritAll="false" />
-		<ant antfile="../lams_tool_mindmap/build.xml"       target="_deploy-product" inheritAll="false" />
-		<ant antfile="../lams_tool_nb/build.xml"          	target="_deploy-product" inheritAll="false" />
-		<ant antfile="../lams_tool_notebook/build.xml"      target="_deploy-product" inheritAll="false" />
-		<ant antfile="../lams_tool_pixlr/build.xml"         target="_deploy-product" inheritAll="false" />
-		<ant antfile="../lams_tool_sbmt/build.xml"          target="_deploy-product" inheritAll="false" />
-		<ant antfile="../lams_tool_scratchie/build.xml"     target="_deploy-product" inheritAll="false" />
-		<ant antfile="../lams_tool_scribe/build.xml"        target="_deploy-product" inheritAll="false" />
-		<ant antfile="../lams_tool_spreadsheet/build.xml"   target="_deploy-product" inheritAll="false" />
-		<ant antfile="../lams_tool_survey/build.xml"        target="_deploy-product" inheritAll="false" />
-		<ant antfile="../lams_tool_task/build.xml"          target="_deploy-product" inheritAll="false" />
-		<ant antfile="../lams_tool_vote/build.xml"          target="_deploy-product" inheritAll="false" />
-		<ant antfile="../lams_tool_wiki/build.xml"          target="_deploy-product" inheritAll="false" />
-		<ant antfile="../lams_tool_preview/build.xml"       target="_deploy-product" inheritAll="false" />
-	</target>
-
-	<target name="_deploy-tools-nodb2-as">
-		<echo>Deploying Tools</echo>
-		<ant antfile="../lams_tool_assessment/build.xml"    target="_deploy-product-as" inheritAll="false" />
-		<ant antfile="../lams_tool_chat/build.xml"          target="_deploy-product-as" inheritAll="false" />
-		<ant antfile="../lams_tool_daco/build.xml"          target="_deploy-product-as" inheritAll="false" />
-		<ant antfile="../lams_tool_forum/build.xml"         target="_deploy-product-as" inheritAll="false" />
-		<ant antfile="../lams_tool_images/build.xml"        target="_deploy-product-as" inheritAll="false" />
-		<ant antfile="../lams_tool_imscc/build.xml"         target="_deploy-product-as" inheritAll="false" />
-		<ant antfile="../lams_tool_lamc/build.xml"          target="_deploy-product-as" inheritAll="false" />
-		<ant antfile="../lams_tool_laqa/build.xml"          target="_deploy-product-as" inheritAll="false" />
-		<ant antfile="../lams_tool_larsrc/build.xml"        target="_deploy-product-as" inheritAll="false" />
-		<ant antfile="../lams_tool_leader/build.xml"        target="_deploy-product-as" inheritAll="false" />
-		<ant antfile="../lams_tool_mindmap/build.xml"       target="_deploy-product-as" inheritAll="false" />
-		<ant antfile="../lams_tool_nb/build.xml"          	target="_deploy-product-as" inheritAll="false" />
-		<ant antfile="../lams_tool_notebook/build.xml"      target="_deploy-product-as" inheritAll="false" />
-		<ant antfile="../lams_tool_pixlr/build.xml"         target="_deploy-product-as" inheritAll="false" />
-		<ant antfile="../lams_tool_sbmt/build.xml"          target="_deploy-product-as" inheritAll="false" />
-		<ant antfile="../lams_tool_scratchie/build.xml"     target="_deploy-product-as" inheritAll="false" />
-		<ant antfile="../lams_tool_scribe/build.xml"        target="_deploy-product-as" inheritAll="false" />
-		<ant antfile="../lams_tool_spreadsheet/build.xml"   target="_deploy-product-as" inheritAll="false" />
-		<ant antfile="../lams_tool_survey/build.xml"        target="_deploy-product-as" inheritAll="false" />
-		<ant antfile="../lams_tool_task/build.xml"          target="_deploy-product-as" inheritAll="false" />
-		<ant antfile="../lams_tool_vote/build.xml"          target="_deploy-product-as" inheritAll="false" />
-		<ant antfile="../lams_tool_wiki/build.xml"          target="_deploy-product-as" inheritAll="false" />
-		<ant antfile="../lams_tool_preview/build.xml"       target="_deploy-product-as" inheritAll="false" />
-	</target>
-
 
 	<target name="_deploy-learning-library">
 		<!-- Internal target: Deploys a parallel activity. -->
@@ -532,31 +371,6 @@
 		</java>
 	</target>
 
-	<target name="_deploy-learning-library-nodb">
-
-		<property name="library.basedir"      value="librarypackages/${library.name}" />
-		<property name="library.language.src" value="${library.basedir}/language/lams" />
-		<property name="library.language.dst" value="${server.home}/standalone/deployments/lams.ear/lams-dictionary.jar/org/lamsfoundation/lams/library/${library.name}" />
-
-		<echo>Deploying language files</echo>
-		<copy todir="${library.language.dst}" overwrite="true">
-			<fileset dir="${library.language.src}" />
-		</copy>
-	</target>
-
-	<target name="_deploy-learning-library-nodb-as">
-
-		<property name="library.basedir"      value="librarypackages/${library.name}" />
-		<property name="library.language.src" value="${library.basedir}/language/lams" />
-		<property name="library.language.dst" value="${basedir}/assembly/lams.ear/lams-dictionary.jar/org/lamsfoundation/lams/library/${library.name}" />
-
-		<echo>Deploying language files</echo>
-		<copy todir="${library.language.dst}" overwrite="true">
-			<fileset dir="${library.language.src}" />
-		</copy>
-	</target>
-
-	
 	<target name="_deploy-learning-libraries">
 		<echo>${ant.project.name}: Deploying Library Activities</echo>
 
@@ -574,43 +388,6 @@
 		<antcall target="_deploy-learning-library">
 			<param name="library.name" value="forumscribe"/>
 		 </antcall> 
-	</target>
-	<target name="_deploy-learning-libraries-nodb">
-		<echo>${ant.project.name}: Deploying Library Activities</echo>
-
-		<echo>Generating deployment package for share resources / forum parallel activity</echo>
-		<antcall target="_deploy-learning-library-nodb">
-			<param name="library.name" value="shareresourcesforum"/>
-		</antcall>
-
-		<echo>Generating deployment package for chat / scribe parallel activity</echo>
-		<antcall target="_deploy-learning-library-nodb">
-			<param name="library.name" value="chatscribe"/>
-		</antcall>
-
-		<echo>Generating deployment package for forum / scribe parallel activity</echo>
-		<antcall target="_deploy-learning-library-nodb">
-			<param name="library.name" value="forumscribe"/>
-		 </antcall>
-	</target>
-
-	<target name="_deploy-learning-libraries-nodb-as">
-		<echo>${ant.project.name}: Deploying Library Activities</echo>
-
-		<echo>Generating deployment package for share resources / forum parallel activity</echo>
-		<antcall target="_deploy-learning-library-nodb-as">
-			<param name="library.name" value="shareresourcesforum"/>
-		</antcall>
-
-		<echo>Generating deployment package for chat / scribe parallel activity</echo>
-		<antcall target="_deploy-learning-library-nodb-as">
-			<param name="library.name" value="chatscribe"/>
-		</antcall>
-
-		<echo>Generating deployment package for forum / scribe parallel activity</echo>
-		<antcall target="_deploy-learning-library-nodb-as">
-			<param name="library.name" value="forumscribe"/>
-		 </antcall>
 	</target>
 
 	<target name="_deploy-resources">
@@ -1221,6 +998,7 @@
 		</delete>
 	</target>
 
+<!-- ******************************** 新加ant命令 by mafeng ************************************************************ -->
 	<target name="update_db_connect">
 		<copy todir="${server.home}/standalone/configuration" overwrite="true" verbose="true">
 			<fileset file="${conf.dir}/standalone.xml" />
@@ -1232,5 +1010,228 @@
 			</filterset>
 		</copy>
 	</target>
+
+	<!-- 核心模块打包，不生成配置文件 -->
+	<target name="_build-ear-noconf" depends="_clean-dirs, _build-core">
+		<!-- Internal target: Assembles LAMS EAR in exploded form -->
+		<echo>${ant.project.name}: Copying libraries</echo>
+		<copy todir="assembly/lams.ear" flatten="true">
+			<fileset dir="..">
+				<include name="lams_monitoring/build/lib/*.war"/>
+				<include name="lams_learning/build/lib/*.war"/>
+				<include name="lams_admin/build/lib/*.war"/>
+				<include name="lams_gradebook/build/lib/*.war"/>
+			</fileset>
+		</copy>
+		<copy todir="assembly/lams.ear/lib" flatten="true">
+			<fileset dir="..">
+				<include name="lams_common/build/lib/lams.jar" />
+				<include name="lams_contentrepository/build/lib/*.jar" />
+				<include name="lams_central/build/lib/*.jar" />
+				<include name="lams_monitoring/build/lib/*.jar"/>
+				<include name="lams_learning/build/lib/*.jar"/>
+				<include name="lams_admin/build/lib/*.jar"/>
+				<include name="lams_gradebook/build/lib/*.jar"/>
+			</fileset>
+		</copy>
+
+		<echo>Copying lams-central.war</echo>
+		<copy todir="assembly/lams.ear/lams-central.war">
+			<fileset dir="../lams_central/build/lib/lams-central.war" />
+		</copy>
+
+		<echo>Expanding lams-www.war</echo>
+		<unjar src="../lams_www/build/lib/lams-www.war"
+				dest="assembly/lams.ear/lams-www.war"
+		/>
+
+		<echo>Copying language files</echo>
+		<copy todir="assembly/lams.ear/lams-dictionary.jar">
+			<fileset dir="../lams_common/build/lib/language" />
+			<fileset dir="../lams_central/build/lib/language" />
+			<fileset dir="../lams_monitoring/build/lib/language" />
+			<fileset dir="../lams_learning/build/lib/language" />
+			<fileset dir="../lams_admin/build/lib/language" />
+			<fileset dir="../lams_gradebook/build/lib/language" />
+		</copy>
+	</target>
+
+	<!-- 本地修改了核心模块代码或者插件代码可以用这个更新，执行后将assembly/lams.ear中的内容复制到jboss的目录下进行覆盖 -->
+	<!-- 该命令会将插件模块直接更新到jboss的目录中，核心模块打包到assembly/lams.ear中，需要手动复制到jboss目录中-->
+	<target name="deploy-ear-updater" depends="_build-ear-noconf, _deploy-tools-nodb, _deploy-learning-libraries-nodb"
+			description="Deploys EAR file to the win_installer directory.">
+		<echo>Deploying EAR and tools to Windows Installer dir</echo>
+		<delete dir="../win_installer/assembly"/>
+		<copy todir="../win_installer/assembly/lams.ear">
+			<fileset dir="assembly/lams.ear" />
+		</copy>
+	</target>
+
+	<!-- 本地修改了插件的代码可以用这个更新2，执行后将assembly/lams.ear中的内容复制到jboss的目录下进行覆盖 -->
+	<!-- 该命令会将插件模块直接更新到jboss的目录中，核心模块打包到assembly/lams.ear中，需要手动复制到jboss目录中-->
+	<target name="deploy-ear-updater2" depends="_build-ear-noconf, _deploy-tools-nodb2, _deploy-learning-libraries-nodb"
+			description="Deploys EAR file to the win_installer directory.">
+		<echo>Deploying EAR and tools to Windows Installer dir</echo>
+		<delete dir="../win_installer/assembly"/>
+		<copy todir="../win_installer/assembly/lams.ear">
+			<fileset dir="assembly/lams.ear" />
+		</copy>
+	</target>
+
+	<!-- 本地修改了插件的代码可以用这个更新3，执行后将assembly/lams.ear中的内容复制到jboss的目录下进行覆盖 -->
+	<!-- 该命令会将插件模块、核心模块都打包到assembly/lams.ear中，需要手动复制到jboss目录中-->
+	<target name="deploy-ear-updater2-as" depends="_build-ear-noconf, _deploy-tools-nodb2-as, _deploy-learning-libraries-nodb-as"
+			description="Deploys EAR file to the win_installer directory.">
+		<echo>Deploying EAR and tools to Windows Installer dir</echo>
+		<delete dir="../win_installer/assembly"/>
+		<copy todir="../win_installer/assembly/lams.ear">
+			<fileset dir="assembly/lams.ear" />
+		</copy>
+	</target>
+
+	<target name="_deploy-tools-nodb">
+		<echo>Deploying Tools</echo>
+		<ant antfile="../lams_tool_assessment/build.xml"    target="deploy-tool-nodb" inheritAll="false" />
+		<ant antfile="../lams_tool_chat/build.xml"          target="deploy-tool-nodb" inheritAll="false" />
+		<ant antfile="../lams_tool_daco/build.xml"          target="deploy-tool-nodb" inheritAll="false" />
+		<ant antfile="../lams_tool_forum/build.xml"         target="deploy-tool-nodb" inheritAll="false" />
+		<ant antfile="../lams_tool_images/build.xml"        target="deploy-tool-nodb" inheritAll="false" />
+		<ant antfile="../lams_tool_imscc/build.xml"         target="deploy-tool-nodb" inheritAll="false" />
+		<ant antfile="../lams_tool_lamc/build.xml"          target="deploy-tool-nodb" inheritAll="false" />
+		<ant antfile="../lams_tool_laqa/build.xml"          target="deploy-tool-nodb" inheritAll="false" />
+		<ant antfile="../lams_tool_larsrc/build.xml"        target="deploy-tool-nodb" inheritAll="false" />
+		<ant antfile="../lams_tool_leader/build.xml"        target="deploy-tool-nodb" inheritAll="false" />
+		<ant antfile="../lams_tool_mindmap/build.xml"       target="deploy-tool-nodb" inheritAll="false" />
+		<ant antfile="../lams_tool_nb/build.xml"          	target="deploy-tool-nodb" inheritAll="false" />
+		<ant antfile="../lams_tool_notebook/build.xml"      target="deploy-tool-nodb" inheritAll="false" />
+		<ant antfile="../lams_tool_pixlr/build.xml"         target="deploy-tool-nodb" inheritAll="false" />
+		<ant antfile="../lams_tool_sbmt/build.xml"          target="deploy-tool-nodb" inheritAll="false" />
+		<ant antfile="../lams_tool_scratchie/build.xml"     target="deploy-tool-nodb" inheritAll="false" />
+		<ant antfile="../lams_tool_scribe/build.xml"        target="deploy-tool-nodb" inheritAll="false" />
+		<ant antfile="../lams_tool_spreadsheet/build.xml"   target="deploy-tool-nodb" inheritAll="false" />
+		<ant antfile="../lams_tool_survey/build.xml"        target="deploy-tool-nodb" inheritAll="false" />
+		<ant antfile="../lams_tool_task/build.xml"          target="deploy-tool-nodb" inheritAll="false" />
+		<ant antfile="../lams_tool_vote/build.xml"          target="deploy-tool-nodb" inheritAll="false" />
+		<ant antfile="../lams_tool_wiki/build.xml"          target="deploy-tool-nodb" inheritAll="false" />
+		<ant antfile="../lams_tool_preview/build.xml"       target="deploy-tool-nodb" inheritAll="false" />
+	</target>
+
+	<target name="_deploy-tools-nodb2">
+		<echo>Deploying Tools</echo>
+		<ant antfile="../lams_tool_assessment/build.xml"    target="_deploy-product" inheritAll="false" />
+		<ant antfile="../lams_tool_chat/build.xml"          target="_deploy-product" inheritAll="false" />
+		<ant antfile="../lams_tool_daco/build.xml"          target="_deploy-product" inheritAll="false" />
+		<ant antfile="../lams_tool_forum/build.xml"         target="_deploy-product" inheritAll="false" />
+		<ant antfile="../lams_tool_images/build.xml"        target="_deploy-product" inheritAll="false" />
+		<ant antfile="../lams_tool_imscc/build.xml"         target="_deploy-product" inheritAll="false" />
+		<ant antfile="../lams_tool_lamc/build.xml"          target="_deploy-product" inheritAll="false" />
+		<ant antfile="../lams_tool_laqa/build.xml"          target="_deploy-product" inheritAll="false" />
+		<ant antfile="../lams_tool_larsrc/build.xml"        target="_deploy-product" inheritAll="false" />
+		<ant antfile="../lams_tool_leader/build.xml"        target="_deploy-product" inheritAll="false" />
+		<ant antfile="../lams_tool_mindmap/build.xml"       target="_deploy-product" inheritAll="false" />
+		<ant antfile="../lams_tool_nb/build.xml"          	target="_deploy-product" inheritAll="false" />
+		<ant antfile="../lams_tool_notebook/build.xml"      target="_deploy-product" inheritAll="false" />
+		<ant antfile="../lams_tool_pixlr/build.xml"         target="_deploy-product" inheritAll="false" />
+		<ant antfile="../lams_tool_sbmt/build.xml"          target="_deploy-product" inheritAll="false" />
+		<ant antfile="../lams_tool_scratchie/build.xml"     target="_deploy-product" inheritAll="false" />
+		<ant antfile="../lams_tool_scribe/build.xml"        target="_deploy-product" inheritAll="false" />
+		<ant antfile="../lams_tool_spreadsheet/build.xml"   target="_deploy-product" inheritAll="false" />
+		<ant antfile="../lams_tool_survey/build.xml"        target="_deploy-product" inheritAll="false" />
+		<ant antfile="../lams_tool_task/build.xml"          target="_deploy-product" inheritAll="false" />
+		<ant antfile="../lams_tool_vote/build.xml"          target="_deploy-product" inheritAll="false" />
+		<ant antfile="../lams_tool_wiki/build.xml"          target="_deploy-product" inheritAll="false" />
+		<ant antfile="../lams_tool_preview/build.xml"       target="_deploy-product" inheritAll="false" />
+	</target>
+
+	<target name="_deploy-tools-nodb2-as">
+		<echo>Deploying Tools</echo>
+		<ant antfile="../lams_tool_assessment/build.xml"    target="_deploy-product-as" inheritAll="false" />
+		<ant antfile="../lams_tool_chat/build.xml"          target="_deploy-product-as" inheritAll="false" />
+		<ant antfile="../lams_tool_daco/build.xml"          target="_deploy-product-as" inheritAll="false" />
+		<ant antfile="../lams_tool_forum/build.xml"         target="_deploy-product-as" inheritAll="false" />
+		<ant antfile="../lams_tool_images/build.xml"        target="_deploy-product-as" inheritAll="false" />
+		<ant antfile="../lams_tool_imscc/build.xml"         target="_deploy-product-as" inheritAll="false" />
+		<ant antfile="../lams_tool_lamc/build.xml"          target="_deploy-product-as" inheritAll="false" />
+		<ant antfile="../lams_tool_laqa/build.xml"          target="_deploy-product-as" inheritAll="false" />
+		<ant antfile="../lams_tool_larsrc/build.xml"        target="_deploy-product-as" inheritAll="false" />
+		<ant antfile="../lams_tool_leader/build.xml"        target="_deploy-product-as" inheritAll="false" />
+		<ant antfile="../lams_tool_mindmap/build.xml"       target="_deploy-product-as" inheritAll="false" />
+		<ant antfile="../lams_tool_nb/build.xml"          	target="_deploy-product-as" inheritAll="false" />
+		<ant antfile="../lams_tool_notebook/build.xml"      target="_deploy-product-as" inheritAll="false" />
+		<ant antfile="../lams_tool_pixlr/build.xml"         target="_deploy-product-as" inheritAll="false" />
+		<ant antfile="../lams_tool_sbmt/build.xml"          target="_deploy-product-as" inheritAll="false" />
+		<ant antfile="../lams_tool_scratchie/build.xml"     target="_deploy-product-as" inheritAll="false" />
+		<ant antfile="../lams_tool_scribe/build.xml"        target="_deploy-product-as" inheritAll="false" />
+		<ant antfile="../lams_tool_spreadsheet/build.xml"   target="_deploy-product-as" inheritAll="false" />
+		<ant antfile="../lams_tool_survey/build.xml"        target="_deploy-product-as" inheritAll="false" />
+		<ant antfile="../lams_tool_task/build.xml"          target="_deploy-product-as" inheritAll="false" />
+		<ant antfile="../lams_tool_vote/build.xml"          target="_deploy-product-as" inheritAll="false" />
+		<ant antfile="../lams_tool_wiki/build.xml"          target="_deploy-product-as" inheritAll="false" />
+		<ant antfile="../lams_tool_preview/build.xml"       target="_deploy-product-as" inheritAll="false" />
+	</target>
+
+
+	<target name="_deploy-learning-library-nodb">
+
+		<property name="library.basedir"      value="librarypackages/${library.name}" />
+		<property name="library.language.src" value="${library.basedir}/language/lams" />
+		<property name="library.language.dst" value="${server.home}/standalone/deployments/lams.ear/lams-dictionary.jar/org/lamsfoundation/lams/library/${library.name}" />
+
+		<echo>Deploying language files</echo>
+		<copy todir="${library.language.dst}" overwrite="true">
+			<fileset dir="${library.language.src}" />
+		</copy>
+	</target>
+
+	<target name="_deploy-learning-library-nodb-as">
+
+		<property name="library.basedir"      value="librarypackages/${library.name}" />
+		<property name="library.language.src" value="${library.basedir}/language/lams" />
+		<property name="library.language.dst" value="${basedir}/assembly/lams.ear/lams-dictionary.jar/org/lamsfoundation/lams/library/${library.name}" />
+
+		<echo>Deploying language files</echo>
+		<copy todir="${library.language.dst}" overwrite="true">
+			<fileset dir="${library.language.src}" />
+		</copy>
+	</target>
+
+	<target name="_deploy-learning-libraries-nodb">
+		<echo>${ant.project.name}: Deploying Library Activities</echo>
+
+		<echo>Generating deployment package for share resources / forum parallel activity</echo>
+		<antcall target="_deploy-learning-library-nodb">
+			<param name="library.name" value="shareresourcesforum"/>
+		</antcall>
+
+		<echo>Generating deployment package for chat / scribe parallel activity</echo>
+		<antcall target="_deploy-learning-library-nodb">
+			<param name="library.name" value="chatscribe"/>
+		</antcall>
+
+		<echo>Generating deployment package for forum / scribe parallel activity</echo>
+		<antcall target="_deploy-learning-library-nodb">
+			<param name="library.name" value="forumscribe"/>
+		</antcall>
+	</target>
+
+	<target name="_deploy-learning-libraries-nodb-as">
+		<echo>${ant.project.name}: Deploying Library Activities</echo>
+
+		<echo>Generating deployment package for share resources / forum parallel activity</echo>
+		<antcall target="_deploy-learning-library-nodb-as">
+			<param name="library.name" value="shareresourcesforum"/>
+		</antcall>
+
+		<echo>Generating deployment package for chat / scribe parallel activity</echo>
+		<antcall target="_deploy-learning-library-nodb-as">
+			<param name="library.name" value="chatscribe"/>
+		</antcall>
+
+		<echo>Generating deployment package for forum / scribe parallel activity</echo>
+		<antcall target="_deploy-learning-library-nodb-as">
+			<param name="library.name" value="forumscribe"/>
+		</antcall>
+	</target>
+
 
 </project>

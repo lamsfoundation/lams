@@ -156,6 +156,7 @@
 		</java>
 	</target>
 
+<!-- ******************************** 新加ant命令 by mafeng ************************************************************ -->
 	<!-- 不进行数据表中的数据操作 -->
 	<target name="deploy-tool-nodb" depends="_package-create, _package-run-nodb"
 			description="Build Tool archives and run deployment. Do not run on a production environment." />
