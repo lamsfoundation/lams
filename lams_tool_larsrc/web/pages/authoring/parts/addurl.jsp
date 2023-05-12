@@ -116,8 +116,8 @@
 						</div>
 						<div id="item-content-0" class="panel-body item-content">
 							<div class="content-panel">
-								<h4  class="embedded-title"></h3>
-								<h5  class="embedded-description"></h4>
+								<h3  class="embedded-title"></h3>
+								<h5  class="embedded-description"></h5>
 								<div class="embedded-content"></div>
 							</div>
 						</div>
