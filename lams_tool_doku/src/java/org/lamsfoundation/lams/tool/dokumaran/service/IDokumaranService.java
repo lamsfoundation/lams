@@ -185,7 +185,7 @@ public interface IDokumaranService extends ICommonToolService {
     /**
      * Return monitoring summary list. The return value is list of dokumaran summaries for each groups.
      */
-    List<SessionDTO> getSummary(Long contentId, Long ratingUserId);
+    List<SessionDTO> getSummary(Long contentId, Long ratingUserUid);
 
     /**
      * Create refection entry into notebook tool.
@@ -237,7 +237,7 @@ public interface IDokumaranService extends ICommonToolService {
 
     void enableGalleryWalkLearnerEdit(long toolContentId) throws IOException;
 
-    // List<List<DokumaranSession>> getGalleryWalkSessionBatches(long toolContentId);
+    void assignSessionsForGalleryWalk(long toolContentId);
 
     void changeLeaderForGroup(long toolSessionId, long leaderUserId);
 

@@ -258,8 +258,8 @@
 					type: 'post',
 					success : function (){
 						$this.closest('.marks-container').find('.copy-mark-button')
-						.data('mark', mark).show()
-						.find('.copy-mark-value').text(mark);
+								.data('mark', mark).show()
+								.find('.copy-mark-value').text(mark);
 					},
 					error: function (request, status, error) {
 						alert('<fmt:message key="messsage.monitoring.learner.marks.update.fail" />');
@@ -317,11 +317,11 @@
 					}
 				}
 			})
-			.bind('pagerInitialized pagerComplete', function(event, options){
-				if ( options.totalRows == 0 ) {
-					$.tablesorter.showError($(this), '<fmt:message key="messsage.monitoring.learner.marks.no.data"/>');
-				}
-			});
+					.bind('pagerInitialized pagerComplete', function(event, options){
+						if ( options.totalRows == 0 ) {
+							$.tablesorter.showError($(this), '<fmt:message key="messsage.monitoring.learner.marks.no.data"/>');
+						}
+					});
 		});
 
 
@@ -419,9 +419,9 @@
 
 	function showChangeLeaderModal(toolSessionId) {
 		$('#doku-monitoring-summary-${sessionMap.toolContentID} #change-leader-modals').empty()
-		.load('<c:url value="/monitoring/displayChangeLeaderForGroupDialogFromActivity.do" />',{
-			toolSessionID : toolSessionId
-		});
+				.load('<c:url value="/monitoring/displayChangeLeaderForGroupDialogFromActivity.do" />',{
+					toolSessionID : toolSessionId
+				});
 	}
 
 	function onChangeLeaderCallback(response, leaderUserId, toolSessionId){
@@ -613,6 +613,17 @@
 
 				</c:when>
 				<c:otherwise>
+					<c:if test="${not empty groupSummary.galleryWalkClusterMembers}">
+						<c:set var="clusterMemberLinks" value="" />
+						<c:forEach var="clusterMember" items="${groupSummary.galleryWalkClusterMembers}" varStatus="status">
+							<c:set var="clusterMemberLinks">${clusterMemberLinks}${status.first ? "" : ",&nbsp;"}
+								<a href="#heading${clusterMember.key}"><c:out value="${clusterMember.value}" /></a></c:set>
+						</c:forEach>
+						<span class="loffset5">
+							<fmt:message key="monitoring.summary.gallery.walk.cluster.members" />&nbsp;${clusterMemberLinks}
+						</span>
+					</c:if>
+
 					<c:if test="${dokumaran.galleryWalkStarted and not dokumaran.galleryWalkReadOnly}">
 						<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" isItemAuthoredByUser="true" />
 					</c:if>

@@ -13,7 +13,7 @@
 				$('#gallery-walk-options').slideDown();
 			} else {
 				$('#gallery-walk-options').slideUp()
-				.find('#gallery-walk-read-only').prop('checked', false);
+						.find('#gallery-walk-read-only').prop('checked', false);
 			}
 		}).change();
 
@@ -108,13 +108,15 @@
 			   data-toggle="tooltip" title="<fmt:message key='label.authoring.advance.gallery.walk.read.only.tooltip' />"></i>
 		</div>
 
-		<div class="form-group">
-			<label for="galleryWalkBatchSize">
-				<fmt:message key="label.authoring.advance.gallery.walk.batch" />&nbsp;
+		<div class="form-inline form-group">
+			<label for="galleryWalkClusterSize">
+				<fmt:message key="label.authoring.advance.gallery.walk.cluster" />&nbsp;
 				<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="top" title=""
-				   data-original-title="<fmt:message key="label.authoring.advance.gallery.walk.batch.instructions"/>"></i>
+				   data-original-title="<fmt:message key="label.authoring.advance.gallery.walk.cluster.tooltip"/>"></i>
 			</label>
-			<form:input path="dokumaran.galleryWalkBatchSize" type="number" min="0" max="9" size="2" id="galleryWalkBatchSize" cssClass="form-control input-sm"/>
+			<form:input path="dokumaran.galleryWalkClusterSize" type="number" min="0" max="9" size="2" id="galleryWalkClusterSize"
+						cssClass="form-control input-sm"/>
+			<br><small class="text-muted"><fmt:message key="label.authoring.advance.gallery.walk.cluster.0" /></small>
 		</div>
 
 		<div class="form-group">

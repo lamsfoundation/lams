@@ -118,8 +118,8 @@ public class Dokumaran implements Cloneable {
     @Column(name = "gallery_walk_read_only")
     private boolean galleryWalkReadOnly;
 
-    @Column(name = "gallery_walk_batch_size")
-    private int galleryWalkBatchSize;
+    @Column(name = "gallery_walk_cluster_size")
+    private int galleryWalkClusterSize;
 
     @Column(name = "gallery_walk_started")
     private boolean galleryWalkStarted;
@@ -481,12 +481,12 @@ public class Dokumaran implements Cloneable {
 	this.galleryWalkReadOnly = galleryWalkReadOnly;
     }
 
-    public int getGalleryWalkBatchSize() {
-	return galleryWalkBatchSize;
+    public int getGalleryWalkClusterSize() {
+	return galleryWalkClusterSize;
     }
 
-    public void setGalleryWalkBatchSize(int galleryWalkBatchSize) {
-	this.galleryWalkBatchSize = galleryWalkBatchSize;
+    public void setGalleryWalkClusterSize(int galleryWalkClusterSize) {
+	this.galleryWalkClusterSize = galleryWalkClusterSize;
     }
 
     public boolean isGalleryWalkStarted() {
