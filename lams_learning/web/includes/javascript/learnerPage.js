@@ -35,11 +35,3 @@ function initLearnerPage(toolSessionId, userId) {
         }
     });
 }
-
-function nextActivity(){
-    let contentFrame = $('#learner-page-content-frame');
-    contentFrame.on('load', function (){
-        location.href = contentFrame[0].contentDocument.URL;
-    });
-    contentFrame[0].contentWindow.submitForm('finish');
-}

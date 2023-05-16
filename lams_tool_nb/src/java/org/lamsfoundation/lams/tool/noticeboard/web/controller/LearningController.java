@@ -59,7 +59,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Creation Date: 27-06-05
@@ -109,24 +108,8 @@ public class LearningController {
 	return WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, false);
     }
 
-    public String unspecified(@ModelAttribute NbLearnerForm NbLearnerForm, HttpServletRequest request,
-	    HttpServletResponse response, Model model) {
-
-	return learner5(request, model);
-    }
-
     @RequestMapping("/learner")
-    public String learner5(HttpServletRequest request, Model model) {
-	String url = request.getRequestURL().toString().replace("learner.do", "learnerInner.do") + "?"
-		+ request.getQueryString();
-	model.addAttribute("contentUrl", url);
-	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-	model.addAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
-	return "learner5";
-    }
-
-    @RequestMapping("/learnerInner")
-    public String learner(@ModelAttribute NbLearnerForm NbLearnerForm, HttpServletRequest request,
+    public String learner(@ModelAttribute NbLearnerForm nbLearnerForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	NoticeboardContent nbContent = null;
@@ -134,7 +117,7 @@ public class LearningController {
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
-	Long toolSessionID = Long.valueOf(NbLearnerForm.getToolSessionID());
+	Long toolSessionID = Long.valueOf(nbLearnerForm.getToolSessionID());
 
 	if (toolSessionID == null) {
 	    String error = "Unable to continue. The parameters tool session id is missing";
@@ -156,10 +139,10 @@ public class LearningController {
 	}
 
 	boolean readOnly = false;
-	if (NbLearnerForm.getMode() == null) {
-	    NbLearnerForm.setMode(ToolAccessMode.LEARNER.toString());
+	if (nbLearnerForm.getMode() == null) {
+	    nbLearnerForm.setMode(ToolAccessMode.LEARNER.toString());
 	}
-	ToolAccessMode mode = WebUtil.getToolAccessMode(NbLearnerForm.getMode());
+	ToolAccessMode mode = WebUtil.getToolAccessMode(nbLearnerForm.getMode());
 	Long userID = null;
 	if (mode == ToolAccessMode.LEARNER || mode == ToolAccessMode.AUTHOR) {
 	    userID = getUserID(request);
@@ -186,7 +169,7 @@ public class LearningController {
 	    readOnly = true;
 	}
 
-	NbLearnerForm.copyValuesIntoForm(nbContent, readOnly, mode.toString());
+	nbLearnerForm.copyValuesIntoForm(nbContent, readOnly, mode.toString());
 
 	NotebookEntry notebookEntry = nbService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
 		NoticeboardConstants.TOOL_SIGNATURE, userID.intValue());
