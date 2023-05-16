@@ -1,7 +1,14 @@
 <%@ tag body-content="scriptless" %>
+<%@ attribute name="toolSessionID" required="true" rtexprvalue="true"%>
+<%@ attribute name="title" required="false" rtexprvalue="true"%>
+
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
+
+<c:set var="lams">
+    <lams:LAMSURL />
+</c:set>
 
 <lams:html>
     <lams:head>
@@ -16,7 +23,9 @@
         <script src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
         <script src="<lams:LAMSURL/>includes/javascript/popper.min.js"></script>
         <script src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
-        <script src="<lams:LAMSURL/>learning/includes/javascript/learnerPage.js"></script>
+        <lams:JSImport src="learning/includes/javascript/gate-check5.js" />
+        <lams:JSImport src="learning/includes/javascript/learnerPage.js" />
+
         <script>
             var LAMS_URL = '<lams:LAMSURL/>';
             $(document).ready(function (){
@@ -43,12 +52,22 @@
                 <div class="top-menu">
                 </div>
             </header>
-            <main>
-                <jsp:doBody/>
-            </main>
-<%--            <div class="activity-bottom-buttons">--%>
-<%--                <button class="btn btn-primary" type="button" onclick="javascript:nextActivity()">Next activity</button>--%>
-<%--            </div>--%>
+
+            <div class="card">
+                <c:if test="${not empty title}">
+                    <div class="card-header">
+                        <h5><c:out value="${title}" escapeXml="true" /></h5>
+                    </div>
+                </c:if>
+
+                <div class="card-body">
+                    <main>
+                        <jsp:doBody/>
+                    </main>
+                </div>
+            </div>
+
+
         </div>
 
         <!-- Progress Bar Modal Start -->

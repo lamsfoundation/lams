@@ -139,6 +139,10 @@ body.component #sequenceInfoDialog {
 	margin-top: 1rem;
 }
 
+.component-page-wrapper .monitoring-page-content {
+	padding: 1rem 4rem 2rem 8rem;
+}
+
 .monitoring-page-wrapper .monitoring-panel {
 	display: inline-block;
 	width: 100%;

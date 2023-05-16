@@ -443,7 +443,7 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 
 .component-page-wrapper .component-page-content {
 	min-height: 100%;
-	padding: 1rem 4rem 2rem 8rem;
+	padding: 1rem 2rem 3rem 2rem;
 	transition: all .3s ease;
 	vertical-align: top;
 }

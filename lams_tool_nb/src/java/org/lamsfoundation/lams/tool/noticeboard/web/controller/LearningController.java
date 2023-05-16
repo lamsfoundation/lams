@@ -197,7 +197,7 @@ public class LearningController {
 	    return "message";
 	}
 
-	return "learnerContent5";
+	return "learnerContent";
 
     }
 
