@@ -594,7 +594,7 @@
 
 		<div class="component-page-content monitoring-page-content active">
 			<header class="d-flex justify-content-between">
-				<p id="lesson-name"><c:out value="${lesson.lessonName}"/></p>
+				<h1 id="lesson-name"><c:out value="${lesson.lessonName}"/></h1>
 				<div class="top-menu">
 					<div id="sequenceSearchPhraseContainer" class="input-group">
 						<input id="sequenceSearchPhrase" type="search" class="form-control" placeholder="<fmt:message key='label.monitoring.search.learners' />...">

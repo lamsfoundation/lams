@@ -48,6 +48,10 @@ body.component .dialogContainer #emailProgressDialogTable {
 	width: calc(100% - 12px);
 }
 
+.component-page-wrapper #lesson-name {
+	margin-left: 1.8rem;
+}
+
 body.component #sequenceInfoDialog {
 	cursor: pointer;
 }

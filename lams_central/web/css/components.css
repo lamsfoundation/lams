@@ -429,16 +429,18 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 	overflow: hidden;
 }
 
-.component-page-wrapper #lesson-name {
-	font-size: 2rem;
-	margin-left: 1.8rem;
+.component-page-wrapper button.no-decoration {
+	background-color: inherit;
+	border: none;
+}
+
+.component-page-wrapper button.no-decoration:focus {
+	border: thin solid var(--bs-secondary);
 }
 
 .component-page-wrapper .component-page-content > header .sidebar-toggle-button {
 	font-size: 2rem;
-	margin-top: .3rem;
 	color: var(--bs-blue);
-	cursor: pointer;
 }
 
 .component-page-wrapper .component-page-content {

@@ -1,3 +1,7 @@
+.component-page-wrapper #lesson-name {
+    margin-left: 1rem;
+}
+
 .component-page-wrapper .component-sidebar {
     top: 6rem;
     left: -72rem;
@@ -15,7 +19,6 @@
     font-size: 1.5rem;
     align-self: end;
     color: var(--bs-primary);
-    cursor: pointer;
 }
 
 .component-page-wrapper .component-sidebar #progress-bar-items {

@@ -12,7 +12,16 @@
 
 <lams:html>
     <lams:head>
-        <title><fmt:message key="activity.title"/></title>
+        <title>LAMS ::
+            <c:choose>
+                <c:when test="${empty title}">
+                    <fmt:message key="activity.title"/>
+                </c:when>
+                <c:otherwise>
+                    <c:out value="${title}" />
+                </c:otherwise>
+            </c:choose>
+        </title>
 
         <link rel="icon" type="image/x-icon" href="<lams:LAMSURL/>images/svg/lamsv5_logo.svg">
         <link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
@@ -30,12 +39,6 @@
             var LAMS_URL = '<lams:LAMSURL/>';
             $(document).ready(function (){
                 initLearnerPage(${toolSessionID});
-
-                $('.component-page-wrapper .sidebar-toggle-button').click(function () {
-                    let topToggleButton = $('.component-page-wrapper .component-page-content > header .sidebar-toggle-button');
-                    topToggleButton.toggleClass(topToggleButton.data('closed-class')).toggleClass(topToggleButton.data('opened-class'));
-                    $('.component-page-wrapper .component-sidebar').toggleClass('active');
-                });
             });
         </script>
     </lams:head>
@@ -45,41 +48,39 @@
         <div class="component-page-content">
             <header class="d-flex justify-content-between">
                 <div class="d-flex">
-                    <i class="sidebar-toggle-button fa-solid fa-fw fa-bars pt-1"
-                       data-closed-class="fa-bars" data-opened-class="fa-bars-staggered"></i>
-                    <p id="lesson-name"></p>
+                    <button class="sidebar-toggle-button no-decoration"
+                            data-closed-class="fa-bars" data-opened-class="fa-bars-staggered"
+                            aria-labelledby="progress-bar-title" aria-expanded="false">
+                        <i class="fa-solid fa-fw fa-bars" aria-hidden="true"></i>
+                    </button>
+                    <h1 id="lesson-name"></h1>
                 </div>
                 <div class="top-menu">
                 </div>
             </header>
 
-            <div class="card">
+            <main class="m-3">
                 <c:if test="${not empty title}">
-                    <div class="card-header">
-                        <h5><c:out value="${title}" escapeXml="true" /></h5>
-                    </div>
+                    <h3 class="mb-3" role="banner"><c:out value="${title}" escapeXml="true" /></h3>
                 </c:if>
 
-                <div class="card-body">
-                    <main>
-                        <jsp:doBody/>
-                    </main>
-                </div>
-            </div>
+                <jsp:doBody/>
+            </main>
 
 
         </div>
 
-        <!-- Progress Bar Modal Start -->
-        <div class="component-sidebar">
-            <i class="fa-solid fa-xmark sidebar-toggle-button"></i>
-            <a href="/" title="Return to index page" class="lams-logo">
-                <img src="<lams:LAMSURL/>images/svg/lamsv5_logo.svg" alt="LAMS logo"/>
+        <nav class="component-sidebar" aria-label="Side menu" aria-expanded="false">
+            <button class="sidebar-toggle-button no-decoration" aria-labelledby="progress-bar-title">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <a href="/" title="Return to index page" class="lams-logo" role="navigation">
+                <img src="<lams:LAMSURL/>images/svg/lamsv5_logo.svg" alt="LAMS logo" aria-hidden="true"/>
             </a>
-            <h6 class="sidebar-title"><i class="fa-solid fa-bars-progress"></i>&nbsp;Progress bar</h6>
+            <h6 class="sidebar-title"><i class="fa-solid fa-bars-progress"></i>&nbsp;<span id="progress-bar-title">Progress bar</span></h6>
             <ul id="progress-bar-items">
             </ul>
-        </div>
+        </nav>
 
 
     </div>
