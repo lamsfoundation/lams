@@ -46,7 +46,9 @@
     <body class="component">
     <div class="component-page-wrapper">
         <div class="component-page-content">
-            <header class="d-flex justify-content-between">
+            <a href="#component-main-content" class="visually-hidden-focusable">Skip to main content</a>
+
+            <header class="d-flex justify-content-between" role="banner">
                 <div class="d-flex">
                     <button class="sidebar-toggle-button no-decoration"
                             data-closed-class="fa-bars" data-opened-class="fa-bars-staggered"
@@ -59,9 +61,9 @@
                 </div>
             </header>
 
-            <main class="m-3">
+            <main class="m-3" id="component-main-content">
                 <c:if test="${not empty title}">
-                    <h3 class="mb-3" role="banner"><c:out value="${title}" escapeXml="true" /></h3>
+                    <h3 class="mb-3"><c:out value="${title}" escapeXml="true" /></h3>
                 </c:if>
 
                 <jsp:doBody/>
