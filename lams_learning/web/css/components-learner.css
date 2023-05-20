@@ -3,11 +3,8 @@
     margin-top: .2rem;
 }
 
-.component-page-wrapper .top-menu  {
-    width: 10%;
-}
 .component-page-wrapper .top-menu #progress-bar-widget {
-    width: 100%;
+    min-width: 10rem;
     margin-top: .6rem;
 }
 

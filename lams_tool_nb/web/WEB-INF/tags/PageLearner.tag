@@ -6,9 +6,18 @@
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-<c:set var="lams">
-    <lams:LAMSURL />
-</c:set>
+<c:set var="lams"><lams:LAMSURL /></c:set>
+<c:set var="pageLearnerPortraitUuid"><lams:user property="portraitUuid" /></c:set>
+<c:choose>
+    <c:when test="${not empty pageLearnerPortraitUuid}">
+        <c:set var="pageLearnerPortraitSrc">${lams}download/?uuid=${pageLearnerPortraitUuid}&preferDownload=false&version=4</c:set>
+    </c:when>
+    <c:otherwise>
+        <c:set var="pageLearnerPortraitSrc">${lams}images/css/john-doe-portrait.jpg</c:set>
+    </c:otherwise>
+</c:choose>
+<c:set var="pageLearnerFirstName"><lams:user property="firstName" /></c:set>
+<c:set var="pageLearnerLastName"><lams:user property="lastName" /></c:set>
 
 <lams:html>
     <lams:head>
@@ -71,6 +80,13 @@
                                  aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                     </div>
+                    <button id="profile-picture" class="no-decoration pt-1 ps-4" type="button"
+                            onclick="javascript:showMyProfileDialog()">
+                        <img class="portrait-sm portrait-round" src="${pageLearnerPortraitSrc}" aria-label="User profile picture" alt="User profile picture">
+                        <span class="xs-hidden d-block" aria-label="User first and last name">
+						    <c:out value="${pageLearnerFirstName}" escapeXml="true"/>&nbsp;<c:out value="${pageLearnerLastName}" escapeXml="true"/>
+					    </span>
+                    </button>
                 </div>
             </header>
 
