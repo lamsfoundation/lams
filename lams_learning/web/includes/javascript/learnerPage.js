@@ -37,7 +37,8 @@ function initLearnerPage(toolSessionId, userId) {
                 });
             }
 
-            let progressBarItems = $('.component-page-wrapper .component-sidebar #progress-bar-items').empty();
+            let progressBarItems = $('.component-page-wrapper .component-sidebar #progress-bar-items').empty(),
+                completedActivityCount = 0;
             $.each(result.activities, function (activityIndex, activityData) {
                 let activityItem = $('<li>').attr('role', 'navigation menubaritem').appendTo(progressBarItems),
                     activityName = !activityData.name && activityData.type === 'g' ? 'Gate' : activityData.name,
@@ -51,6 +52,8 @@ function initLearnerPage(toolSessionId, userId) {
                         activityIcon.addClass('fa-circle');
                     }
                 } else if (activityData.status === 1) {
+                    completedActivityCount++;
+
                     activityItem.addClass('progress-bar-item-complete').prepend(activityIcon);
                     if (activityData.type === 'g') {
                         activityIcon.addClass('fa-hourglass-full');
@@ -75,6 +78,13 @@ function initLearnerPage(toolSessionId, userId) {
                     }
                 }
             });
+
+            let progressBarWidgetValue = Math.round(completedActivityCount / result.activities.length * 100),
+                progressBarWidget = $('.component-page-wrapper .component-page-content #progress-bar-widget');
+            $('.progress-bar', progressBarWidget)
+                .css('width', progressBarWidgetValue + '%')
+                .attr('aria-valuenow', progressBarWidgetValue);
+            $('#progress-bar-widget-value').text(progressBarWidgetValue + '%');
         }
     });
 }

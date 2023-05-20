@@ -58,6 +58,19 @@
                     <h1 id="lesson-name"></h1>
                 </div>
                 <div class="top-menu">
+                    <div id="progress-bar-widget" title="Your lesson completion">
+                        <div class="row">
+                            <div class="col-6">
+                                Progress
+                            </div>
+                            <div class="col-6 text-end" id="progress-bar-widget-value">
+                            </div>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" aria-label="Progress bar widget"
+                                 aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
                 </div>
             </header>
 

@@ -1,5 +1,23 @@
 .component-page-wrapper #lesson-name {
     margin-left: 1rem;
+    margin-top: .2rem;
+}
+
+.component-page-wrapper .top-menu  {
+    width: 10%;
+}
+.component-page-wrapper .top-menu #progress-bar-widget {
+    width: 100%;
+    margin-top: .6rem;
+}
+
+.component-page-wrapper .top-menu #progress-bar-widget .progress {
+    height: 1.5rem;
+    background-color: var(--bs-gray-200);
+}
+
+.component-page-wrapper .top-menu #progress-bar-widget .progress .progress-bar {
+    background-color: var(--bs-blue);
 }
 
 .component-page-wrapper .component-sidebar {
