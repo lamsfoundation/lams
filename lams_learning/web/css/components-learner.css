@@ -21,7 +21,7 @@
     color: var(--bs-primary);
 }
 
-.component-page-wrapper .component-sidebar #progress-bar-items {
+.component-page-wrapper .component-sidebar .progress-bar-items {
     background-color: var(--lams-background-gray);
     padding: .5rem;
     margin-bottom: 0;
@@ -30,31 +30,32 @@
     text-align: left;
 }
 
-.component-page-wrapper .component-sidebar #progress-bar-items > li {
+.component-page-wrapper .component-sidebar .progress-bar-items > li {
     padding: .5rem 2rem;
     border-radius: 1.2rem;
     color: var(--bs-secondary);
 }
 
-.component-page-wrapper .component-sidebar #progress-bar-items > li.progress-bar-item-openable {
-    cursor: pointer;
+.component-page-wrapper .component-sidebar .progress-bar-items > li a {
+    text-decoration: none;
 }
 
-.component-page-wrapper .component-sidebar #progress-bar-items > li > .progress-bar-icon {
+.component-page-wrapper .component-sidebar .progress-bar-items > li > .progress-bar-icon {
     margin-right: .5rem;
 }
 
-.component-page-wrapper .component-sidebar #progress-bar-items > li.progress-bar-item-complete,
-.component-page-wrapper .component-sidebar #progress-bar-items > li.progress-bar-item-complete > .progress-bar-icon {
+.component-page-wrapper .component-sidebar .progress-bar-items > li.progress-bar-item-complete,
+.component-page-wrapper .component-sidebar .progress-bar-items > li.progress-bar-item-complete > .progress-bar-icon {
     color: var(--bs-green);
 }
 
-.component-page-wrapper .component-sidebar #progress-bar-items > li.progress-bar-item-current,
-.component-page-wrapper .component-sidebar #progress-bar-items > li.progress-bar-item-current > .progress-bar-icon {
+.component-page-wrapper .component-sidebar .progress-bar-items > li.support-bar-item,
+.component-page-wrapper .component-sidebar .progress-bar-items > li.progress-bar-item-current,
+.component-page-wrapper .component-sidebar .progress-bar-items > li.progress-bar-item-current > .progress-bar-icon {
     color: var(--bs-black);
 }
 
-.component-page-wrapper .component-sidebar #progress-bar-items > li:hover {
+.component-page-wrapper .component-sidebar .progress-bar-items > li:hover {
     background-color: var(--bs-white);
 }
 

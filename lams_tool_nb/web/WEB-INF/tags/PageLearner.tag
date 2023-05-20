@@ -79,8 +79,15 @@
             <a href="/" title="Return to index page" class="lams-logo" role="navigation">
                 <img src="<lams:LAMSURL/>images/svg/lamsv5_logo.svg" alt="LAMS logo" aria-hidden="true"/>
             </a>
+
+            <div id="support-bar" class="d-none pb-4 w-100">
+                <h6 class="sidebar-title"><i class="fa-solid fa-snowplow"></i>&nbsp;<span id="support-bar-title">Support activities</span></h6>
+                <ul id="support-bar-items" class="progress-bar-items">
+                </ul>
+            </div>
+
             <h6 class="sidebar-title"><i class="fa-solid fa-bars-progress"></i>&nbsp;<span id="progress-bar-title">Progress bar</span></h6>
-            <ul id="progress-bar-items">
+            <ul id="progress-bar-items" class="progress-bar-items w-100">
             </ul>
         </nav>
 
