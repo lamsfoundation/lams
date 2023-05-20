@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="FrameworkDetectionExcludesConfiguration">
-    <file type="javaeeApplication" url="file://$REPO_HOME$/lams_build/assembly/lams.ear/META-INF/application.xml" />
-    <file type="javaeeApplication" url="file://$REPO_HOME$/lams_build/bin/j2ee/application.xml" />
+    <file type="javaeeApplication" url="file://$PROJECT_DIR$/../lams_build/assembly/lams.ear/META-INF/application.xml" />
+    <file type="javaeeApplication" url="file://$PROJECT_DIR$/../lams_build/bin/j2ee/application.xml" />
     <type id="web" />
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="11" project-jdk-type="JavaSDK">
