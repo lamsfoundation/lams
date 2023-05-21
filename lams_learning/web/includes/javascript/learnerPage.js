@@ -24,14 +24,14 @@ function initLearnerPage(toolSessionId, userId) {
                 let supportBarItems = $('.component-page-wrapper .component-sidebar #support-bar').removeClass('d-none')
                     .find('#support-bar-items').empty();
                 $.each(result.support, function (activityIndex, activityData) {
-                    let activityItem = $('<li>').attr('role', 'navigation menubaritem')
+                    let activityItem = $('<li>').attr('role', 'presentation')
                         .addClass('support-bar-item progress-bar-item-openable')
                         .prepend('<i class="fa-solid fa-fw fa-circle-plus progress-bar-icon">').appendTo(supportBarItems);
                     let activityLink = $('<a>').text(activityData.name).attr({
                         'target': '_blank',
                         'href': activityData.url,
-                        'role': 'navigation',
-                        'title': 'Open completed activty "' + activityData.url + '"'
+                        'role': 'menuitem',
+                        'title': 'Open completed activity'
                     });
                     activityItem.addClass('progress-bar-item-openable').append(activityLink);
                 });
@@ -40,7 +40,7 @@ function initLearnerPage(toolSessionId, userId) {
             let progressBarItems = $('.component-page-wrapper .component-sidebar #progress-bar-items').empty(),
                 completedActivityCount = 0;
             $.each(result.activities, function (activityIndex, activityData) {
-                let activityItem = $('<li>').attr('role', 'navigation menubaritem').appendTo(progressBarItems),
+                let activityItem = $('<li>').attr('role', 'presentation').appendTo(progressBarItems),
                     activityName = !activityData.name && activityData.type === 'g' ? 'Gate' : activityData.name,
                     activityIcon = $('<i class="fa-solid fa-fw progress-bar-icon"></i>');
 
@@ -64,8 +64,8 @@ function initLearnerPage(toolSessionId, userId) {
                         let activityLink = $('<a>').text(activityName).attr({
                             'target': '_blank',
                             'href': activityData.url,
-                            'role': 'navigation',
-                            'title': 'Open completed activty "' + activityData.url + '"'
+                            'role': 'menuitem',
+                            'title': 'Open completed activity'
                         });
                         activityItem.addClass('progress-bar-item-openable').append(activityLink);
                     }
