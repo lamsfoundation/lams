@@ -55,7 +55,7 @@
     <body class="component">
     <div class="component-page-wrapper">
         <div class="component-page-content">
-            <a href="#component-main-content" class="visually-hidden-focusable">Skip to main content</a>
+            <a href="#component-main-content" class="visually-hidden-focusable p-2">Skip to main content</a>
 
             <header class="d-flex justify-content-between" role="banner">
                 <div class="d-flex">
@@ -67,7 +67,7 @@
                     <h1 id="lesson-name"></h1>
                 </div>
                 <div class="top-menu">
-                    <div id="progress-bar-widget" title="Your lesson completion">
+                    <div id="progress-bar-widget" title="Your lesson completion" class="d-none d-sm-none d-md-block">
                         <div class="row">
                             <div class="col-6">
                                 Progress
@@ -75,12 +75,12 @@
                             <div class="col-6 text-end" id="progress-bar-widget-value">
                             </div>
                         </div>
-                        <div class="progress">
-                            <div class="progress-bar" role="progressbar" aria-label="Progress bar widget"
+                        <div class="progress mt-2 mb-2">
+                            <div class="progress-bar bg-success" role="progressbar" aria-label="Progress bar widget"
                                  aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                     </div>
-                    <button id="profile-picture" class="no-decoration pt-1 ps-4" type="button"
+                    <button id="profile-picture" class="no-decoration pt-1" type="button"
                             onclick="javascript:showMyProfileDialog()">
                         <img class="portrait-sm portrait-round" src="${pageLearnerPortraitSrc}" aria-label="User profile picture" alt="User profile picture">
                         <span class="xs-hidden d-block" aria-label="User first and last name">
