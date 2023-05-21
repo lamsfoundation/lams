@@ -22,16 +22,6 @@
 
 package org.lamsfoundation.lams.web.qb;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.outcome.service.IOutcomeService;
 import org.lamsfoundation.lams.qb.model.QbCollection;
@@ -39,15 +29,13 @@ import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.CommonConstants;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.*;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,6 +44,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/qb/collection")
@@ -186,13 +183,15 @@ public class QbCollectionController {
 	qbService.addQuestionToCollection(targetCollectionUid, qbQuestionId, copy);
     }
 
-    @RequestMapping(path = "/addCollection", method = RequestMethod.POST)
+    @RequestMapping(path = "/addCollection", method = RequestMethod.POST, produces = "text/plain")
     @ResponseBody
-    public void addCollection(@RequestParam String name) {
+    public ResponseEntity<String> addCollection(@RequestParam String name) {
 	if (!Configuration.getAsBoolean(ConfigurationKeys.QB_COLLECTIONS_CREATE_ALLOW)) {
-	    throw new SecurityException("New collections are disabled");
+	    log.error("Trying to create a new collection when it is disabled: " + name);
+	    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("-1");
 	}
-	qbService.addCollection(getUserId(), name);
+	QbCollection collection = qbService.addCollection(getUserId(), name);
+	return ResponseEntity.ok(collection.getUid().toString());
     }
 
     @RequestMapping(path = "/changeCollectionName", method = RequestMethod.POST)
@@ -277,15 +276,13 @@ public class QbCollectionController {
 		rowElement.setAttribute(CommonConstants.ELEMENT_ID, uid);
 
 		// the last cell is for creating stats button
-		String usage = !view.equalsIgnoreCase("list") ? String.valueOf(
-			view.equalsIgnoreCase("version") ? qbService.getCountQuestionActivitiesByUid(question.getUid())
-				: qbService.getCountQuestionActivitiesByQuestionId(question.getQuestionId()))
-			: null;
+		String usage = !view.equalsIgnoreCase("list") ? String.valueOf(view.equalsIgnoreCase("version")
+			? qbService.getCountQuestionActivitiesByUid(question.getUid())
+			: qbService.getCountQuestionActivitiesByQuestionId(question.getQuestionId())) : null;
 		boolean hasVersions = qbService.countQuestionVersions(question.getQuestionId()) > 1;
-		String learningOutcomes = view.equalsIgnoreCase("single")
-			? outcomeService.getOutcomeMappings(null, null, null, question.getQuestionId()).stream()
-				.map(m -> m.getOutcome().getName()).collect(Collectors.joining("<br>"))
-			: null;
+		String learningOutcomes = view.equalsIgnoreCase("single") ? outcomeService.getOutcomeMappings(null,
+				null, null, question.getQuestionId()).stream().map(m -> m.getOutcome().getName())
+			.collect(Collectors.joining("<br>")) : null;
 
 		String[] data = { question.getQuestionId().toString(),
 			WebUtil.removeHTMLtags(question.getName()).trim(),
