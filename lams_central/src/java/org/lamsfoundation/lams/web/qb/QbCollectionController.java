@@ -188,7 +188,7 @@ public class QbCollectionController {
     public ResponseEntity<String> addCollection(@RequestParam String name) {
 	if (!Configuration.getAsBoolean(ConfigurationKeys.QB_COLLECTIONS_CREATE_ALLOW)) {
 	    log.error("Trying to create a new collection when it is disabled: " + name);
-	    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("-1");
+	    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Creating QB collections is disabled");
 	}
 	QbCollection collection = qbService.addCollection(getUserId(), name);
 	return ResponseEntity.ok(collection.getUid().toString());

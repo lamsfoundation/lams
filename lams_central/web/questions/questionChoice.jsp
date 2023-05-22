@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<c:set var="allowCreatingQbCollections"><%=Configuration.get(ConfigurationKeys.QB_COLLECTIONS_CREATE_ALLOW)%></c:set>
 
 <lams:html>
 	<lams:head>
@@ -163,6 +166,9 @@
 									if (!isNaN(response)) {
 										newCollectionUid = +response;
 									}
+								},
+								error : function (xhr) {
+									alert(xhr.status);
 								}
 							});
 						}
@@ -222,7 +228,9 @@
 										<c:out value="${collection.name}"/>
 									</option>
 								</c:forEach>
-								<option value="-1"><c:out escapeXml="true" value="${newOptionLabel}" /></option>
+								<c:if test="${allowCreatingQbCollections}">
+									<option value="-1"><c:out escapeXml="true" value="${newOptionLabel}" /></option>
+								</c:if>
 							</select>
 						</label>
 					</c:if>
