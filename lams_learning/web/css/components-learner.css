@@ -48,6 +48,7 @@
     border-radius: 1.2rem;
     list-style: none;
     text-align: left;
+    max-width: 60vh;
 }
 
 .component-page-wrapper .component-sidebar .progress-bar-items > li {

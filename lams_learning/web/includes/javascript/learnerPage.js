@@ -26,7 +26,7 @@ function initLearnerPage(toolSessionId, userId) {
                 $.each(result.support, function (activityIndex, activityData) {
                     let activityItem = $('<li>').attr('role', 'presentation')
                         .addClass('support-bar-item progress-bar-item-openable')
-                        .prepend('<i class="fa-solid fa-fw fa-circle-plus progress-bar-icon">').appendTo(supportBarItems);
+                        .prepend('<i class="fa-solid fa-fw fa-up-right-from-square progress-bar-icon">').appendTo(supportBarItems);
                     let activityLink = $('<a>').text(activityData.name).attr({
                         'target': '_blank',
                         'href': activityData.url,

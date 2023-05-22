@@ -59,7 +59,7 @@
 
             <header id="header" class="d-flex justify-content-between" role="banner">
                 <div class="d-flex">
-                    <button class="sidebar-toggle-button no-decoration"
+                    <button class="sidebar-toggle-button no-decoration" accesskey="p"
                             data-closed-class="fa-bars" data-opened-class="fa-bars-staggered"
                             aria-labelledby="progress-bar-title" aria-expanded="false">
                         <i class="fa-solid fa-fw fa-bars" aria-hidden="true"></i>
@@ -102,17 +102,17 @@
             <button class="sidebar-toggle-button no-decoration" aria-labelledby="progress-bar-title">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <a href="/" title="Return to index page" class="lams-logo">
+            <a href="/" title="Return to course page" class="lams-logo">
                 <img src="<lams:LAMSURL/>images/svg/lamsv5_logo.svg" alt="LAMS logo" aria-hidden="true"/>
             </a>
 
             <div id="support-bar" class="d-none pb-4 w-100">
-                <span class="sidebar-title"><i class="fa-solid fa-snowplow"></i>&nbsp;<span id="support-bar-title">Support activities</span></span>
+                <span class="sidebar-title"><i class="fa-solid fa-toolbox sidebar-title-icon"></i>&nbsp;<span tabindex="0" id="support-bar-title">Support activities</span></span>
                 <ul id="support-bar-items" class="progress-bar-items" role="menu">
                 </ul>
             </div>
 
-            <span class="sidebar-title"><i class="fa-solid fa-fw fa-bars-progress sidebar-title-icon"></i>&nbsp;<span id="progress-bar-title">Progress bar</span></span>
+            <span class="sidebar-title"><i class="fa-solid fa-fw fa-bars-progress sidebar-title-icon"></i>&nbsp;<span tabindex="0" id="progress-bar-title">Progress bar</span></span>
             <ul id="progress-bar-items" class="progress-bar-items w-100" role="menu">
             </ul>
         </nav>
