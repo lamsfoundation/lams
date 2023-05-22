@@ -3830,7 +3830,7 @@ public class AssessmentServiceImpl
 		    qbQuestion.setQbOptions(optionList);
 		}
 
-		Long collectionUid = JsonUtil.optLong(questionJSONData, RestTags.COLLECTION_UID);
+		Long collectionUid = JsonUtil.optLong(toolContentJSON, RestTags.COLLECTION_UID);
 		if (collectionUid == null) {
 		    // if no collection UUID was specified, questions end up in user's private collection
 		    if (privateCollectionUUID == null) {
@@ -3839,9 +3839,9 @@ public class AssessmentServiceImpl
 		    collectionUid = privateCollectionUUID;
 		}
 
-		boolean addToCollection = true;
+		boolean addToCollection = !isModification;
 		// check if it is the same collection - there is a good chance it is
-		if (collection == null || collectionUid != collection.getUid()) {
+		if (addToCollection && (collection == null || collectionUid != collection.getUid())) {
 		    collection = qbService.getCollection(collectionUid);
 		    if (collection == null) {
 			addToCollection = false;
@@ -3849,14 +3849,13 @@ public class AssessmentServiceImpl
 			collectionUUIDs = qbService.getCollectionQuestions(collection.getUid()).stream()
 				.peek(q -> qbService.releaseFromCache(q)).filter(q -> q.getUuid() != null)
 				.collect(Collectors.mapping(q -> q.getUuid().toString(), Collectors.toSet()));
+			if (collectionUUIDs.contains(uuid)) {
+			    addToCollection = false;
+			}
 		    }
 		}
 
 		if (isModification) {
-		    if (collectionUUIDs != null) {
-			addToCollection &= !collectionUUIDs.contains(uuid);
-		    }
-
 		    int isModified = qbQuestion.isQbQuestionModified(oldQbQuestion);
 		    if (isModified == IQbService.QUESTION_MODIFIED_VERSION_BUMP) {
 			qbQuestion.clearID();

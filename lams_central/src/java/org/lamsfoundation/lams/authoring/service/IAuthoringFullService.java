@@ -23,11 +23,8 @@
 
 package org.lamsfoundation.lams.authoring.service;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.List;
-import java.util.Vector;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.lamsfoundation.lams.authoring.IAuthoringService;
 import org.lamsfoundation.lams.authoring.ObjectExtractorException;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -40,8 +37,10 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * @author Manpreet Minhas
@@ -149,5 +148,5 @@ public interface IAuthoringFullService extends IAuthoringService {
     Long createTblAssessmentToolContent(UserDTO user, String title, String instructions, String reflectionInstructions,
 	    boolean selectLeaderToolOutput, boolean enableNumbering, boolean shuffleQuestions,
 	    boolean enableConfidenceLevels, boolean allowDiscloseAnswers, boolean allowAnswerJustification,
-	    boolean enableDiscussionSentiment, ArrayNode questions) throws IOException;
+	    boolean enableDiscussionSentiment, Long qbCollectionUid, ArrayNode questions) throws IOException;
 }

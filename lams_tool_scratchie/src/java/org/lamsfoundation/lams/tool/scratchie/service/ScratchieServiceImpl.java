@@ -23,30 +23,10 @@
 
 package org.lamsfoundation.lams.tool.scratchie.service;
 
-import java.io.IOException;
-import java.security.InvalidParameterException;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeSet;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -75,37 +55,13 @@ import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.ToolCompletionStatus;
-import org.lamsfoundation.lams.tool.ToolContentManager;
-import org.lamsfoundation.lams.tool.ToolOutput;
-import org.lamsfoundation.lams.tool.ToolOutputDefinition;
-import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
-import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.tool.*;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
-import org.lamsfoundation.lams.tool.scratchie.dao.BurningQuestionLikeDAO;
-import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieAnswerVisitDAO;
-import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieBurningQuestionDAO;
-import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieConfigItemDAO;
-import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieDAO;
-import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieItemDAO;
-import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieSessionDAO;
-import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieUserDAO;
-import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
-import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
-import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
-import org.lamsfoundation.lams.tool.scratchie.dto.LeaderResultsDTO;
-import org.lamsfoundation.lams.tool.scratchie.dto.OptionDTO;
-import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.scratchie.dto.ScratchieItemDTO;
-import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieBurningQuestion;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
+import org.lamsfoundation.lams.tool.scratchie.dao.*;
+import org.lamsfoundation.lams.tool.scratchie.dto.*;
+import org.lamsfoundation.lams.tool.scratchie.model.*;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.tool.scratchie.web.controller.LearningWebsocketServer;
 import org.lamsfoundation.lams.tool.service.ICommonScratchieService;
@@ -120,16 +76,22 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.excel.ExcelRow;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.security.InvalidParameterException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author Andrey Balan
  */
-public class ScratchieServiceImpl implements IScratchieService, ICommonScratchieService, ToolContentManager,
-	ToolSessionManager, ToolRestManager, IQbToolService {
+public class ScratchieServiceImpl
+	implements IScratchieService, ICommonScratchieService, ToolContentManager, ToolSessionManager, ToolRestManager,
+	IQbToolService {
     private static Logger log = Logger.getLogger(ScratchieServiceImpl.class.getName());
 
     private ScratchieDAO scratchieDao;
@@ -222,7 +184,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     @Override
     public ScratchieUser getUserByLoginAndSessionId(String login, long toolSessionId) {
 	List<User> user = scratchieUserDao.findByProperty(User.class, "login", login);
-	return user.isEmpty() ? null
+	return user.isEmpty()
+		? null
 		: scratchieUserDao.getUserByUserIDAndSessionID(user.get(0).getUserId().longValue(), toolSessionId);
     }
 
@@ -289,8 +252,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     @Override
     public void populateItemsWithConfidenceLevels(Long userId, Long toolSessionId, Integer confidenceLevelsActivityUiid,
 	    Collection<ScratchieItem> items) {
-	List<ConfidenceLevelDTO> confidenceLevelDtos = toolService
-		.getConfidenceLevelsByActivity(confidenceLevelsActivityUiid, userId.intValue(), toolSessionId);
+	List<ConfidenceLevelDTO> confidenceLevelDtos = toolService.getConfidenceLevelsByActivity(
+		confidenceLevelsActivityUiid, userId.intValue(), toolSessionId);
 
 	//populate Scratchie items with confidence levels
 	for (ScratchieItem item : items) {
@@ -561,7 +524,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    Long toolSessionId = session.getSessionId();
 	    List<ScratchieAnswerVisitLog> visitLogsToDelete = new ArrayList<>();
 	    String newPresetMarks = scratchie.getPresetMarks();
-	    boolean isRecalculateMarks = oldPresetMarks == null ? newPresetMarks != null
+	    boolean isRecalculateMarks = oldPresetMarks == null
+		    ? newPresetMarks != null
 		    : newPresetMarks == null || !oldPresetMarks.equals(newPresetMarks);
 
 	    // remove all scratches for modified items
@@ -673,8 +637,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    }
 
 	    int numberOfAttempts = ScratchieServiceImpl.getNumberAttemptsForItem(item, visitLogs);
-	    boolean isUnraveledOnFirstAttempt = (numberOfAttempts == 1)
-		    && ScratchieServiceImpl.isItemUnraveled(item, logs);
+	    boolean isUnraveledOnFirstAttempt =
+		    (numberOfAttempts == 1) && ScratchieServiceImpl.isItemUnraveled(item, logs);
 	    if (isUnraveledOnFirstAttempt) {
 		count++;
 	    }
@@ -799,8 +763,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     /*
      * If isIncludeOnlyLeaders then include the portrait ids needed for monitoring. If false then it
      * is probably the export and that doesn't need portraits.
-     */
-    public List<GroupSummary> getMonitoringSummary(Long contentId) {
+     */ public List<GroupSummary> getMonitoringSummary(Long contentId) {
 	List<GroupSummary> groupSummaryList = new ArrayList<>();
 	List<ScratchieSession> sessions = scratchieSessionDao.getByContentId(contentId);
 
@@ -876,8 +839,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		    // -1 if there is no log
 		    int attemptNumber = -1;
 		    for (ScratchieAnswerVisitLog itemLog : itemLogs) {
-			if (itemLog.getQbToolQuestion().getUid().equals(item.getUid())
-				&& isAnswersEqual(item, itemLog.getAnswer(), optionDto.getAnswer())) {
+			if (itemLog.getQbToolQuestion().getUid().equals(item.getUid()) && isAnswersEqual(item,
+				itemLog.getAnswer(), optionDto.getAnswer())) {
 			    // adding 1 to start from 1
 			    attemptNumber = itemLogs.indexOf(itemLog) + 1;
 			    break;
@@ -917,8 +880,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		if (QbQuestion.TYPE_MULTIPLE_CHOICE == item.getQbQuestion().getType()
 			|| QbQuestion.TYPE_MARK_HEDGING == item.getQbQuestion().getType()) {
 		    for (ScratchieAnswerVisitLog userLog : userLogs) {
-			if (userLog.getQbToolQuestion().getUid().equals(item.getUid())
-				&& userLog.getQbOption().getUid().equals(optionDto.getQbOptionUid())) {
+			if (userLog.getQbToolQuestion().getUid().equals(item.getUid()) && userLog.getQbOption().getUid()
+				.equals(optionDto.getQbOptionUid())) {
 			    isScratched = true;
 			    break;
 			}
@@ -928,8 +891,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		} else {
 		    // find according log if it exists
 		    for (ScratchieAnswerVisitLog userLog : userLogs) {
-			if (userLog.getQbToolQuestion().getUid().equals(item.getUid())
-				&& isAnswersEqual(item, userLog.getAnswer(), optionDto.getAnswer())) {
+			if (userLog.getQbToolQuestion().getUid().equals(item.getUid()) && isAnswersEqual(item,
+				userLog.getAnswer(), optionDto.getAnswer())) {
 			    isScratched = true;
 			    break;
 			}
@@ -953,7 +916,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	ScratchieUser leader = scratchieSessionDao.getSessionBySessionId(toolSessionId).getGroupLeader();
 	Collection<VsaAnswerDTO> assessmentAnswers = scratchie.isAnswersFetchingEnabled()
 		? toolService.getVsaAnswersFromAssessment(scratchie.getActivityUiidProvidingVsaAnswers(),
-			leader.getUserId().intValue(), toolSessionId)
+		leader.getUserId().intValue(), toolSessionId)
 		: null;
 
 	for (ScratchieItem item : items) {
@@ -1006,8 +969,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		    OptionDTO optionDto = null;
 		    boolean skipAddingUserAnswerToConfidenceLevel = false;
 		    for (OptionDTO optionDtoIter : item.getOptionDtos()) {
-			if (itemQbQuestionUid.equals(optionDtoIter.getQbQuestionUid())
-				&& isAnswersEqual(item, optionDtoIter.getAnswer(), userLog.getAnswer())) {
+			if (itemQbQuestionUid.equals(optionDtoIter.getQbQuestionUid()) && isAnswersEqual(item,
+				optionDtoIter.getAnswer(), userLog.getAnswer())) {
 			    optionDto = optionDtoIter;
 			    //skip showing ConfidenceLevel, as we already show it due to this user's answer in Assessment
 			    skipAddingUserAnswerToConfidenceLevel = optionDtoIter.getUserId()
@@ -1033,8 +996,9 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 		    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
 		    confidenceLevelDto.setUserId(leader.getUserId().intValue());
-		    String userName = StringUtils.isBlank(leader.getFirstName())
-			    && StringUtils.isBlank(leader.getLastName()) ? leader.getLoginName()
+		    String userName =
+			    StringUtils.isBlank(leader.getFirstName()) && StringUtils.isBlank(leader.getLastName())
+				    ? leader.getLoginName()
 				    : leader.getFirstName() + " " + leader.getLastName();
 		    confidenceLevelDto.setUserName(userName);
 		    confidenceLevelDto.setPortraitUuid(leader.getPortraitId());
@@ -1050,9 +1014,9 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
      * Check if the specified item was unraveled by user
      *
      * @param item
-     *            specified item
+     * 	specified item
      * @param userLogs
-     *            uses logs from it (The main reason to have this parameter is to reduce number of queries to DB)
+     * 	uses logs from it (The main reason to have this parameter is to reduce number of queries to DB)
      * @return
      */
     private static boolean isItemUnraveled(ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs) {
@@ -1064,8 +1028,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 		ScratchieAnswerVisitLog log = null;
 		for (ScratchieAnswerVisitLog userLog : userLogs) {
-		    if (userLog.getQbToolQuestion().getUid().equals(item.getUid())
-			    && userLog.getQbOption().getUid().equals(option.getUid())) {
+		    if (userLog.getQbToolQuestion().getUid().equals(item.getUid()) && userLog.getQbOption().getUid()
+			    .equals(option.getUid())) {
 			log = userLog;
 			break;
 		    }
@@ -1080,8 +1044,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	} else {
 	    List<String> userAnswers = new ArrayList<>();
 	    for (ScratchieAnswerVisitLog userLog : userLogs) {
-		if (userLog.getQbToolQuestion().getUid().equals(item.getUid())
-			&& StringUtils.isNotBlank(userLog.getAnswer())) {
+		if (userLog.getQbToolQuestion().getUid().equals(item.getUid()) && StringUtils.isNotBlank(
+			userLog.getAnswer())) {
 		    userAnswers.add(userLog.getAnswer());
 		}
 	    }
@@ -1104,7 +1068,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		break;
 	    }
 	    // if the option has the highest grade, it is considered the correct one
-	    if (correctAnswersGroup == null ? option.getMaxMark() > 0
+	    if (correctAnswersGroup == null
+		    ? option.getMaxMark() > 0
 		    : option.getMaxMark() > correctAnswersGroup.getMaxMark()) {
 		correctAnswersGroup = option;
 	    }
@@ -1135,7 +1100,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    // add mark only if an item was unravelled
 	    if (ScratchieServiceImpl.isItemUnraveled(item, userLogs)) {
 		int itemAttempts = ScratchieServiceImpl.getNumberAttemptsForItem(item, userLogs);
-		String markStr = (itemAttempts <= presetMarks.length) ? presetMarks[itemAttempts - 1]
+		String markStr = (itemAttempts <= presetMarks.length)
+			? presetMarks[itemAttempts - 1]
 			: presetMarks[presetMarks.length - 1];
 		mark = Double.valueOf(markStr);
 	    }
@@ -1153,9 +1119,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	// if VS answer was marked as correct in Scratchie after leader chose another answer,
 	// then the subsequent answers do not count
 	if (qbQuestion.getType().equals(QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
-	    QbOption correctAnswersGroup = qbQuestion.getQbOptions().get(0).isCorrect()
-		    ? qbQuestion.getQbOptions().get(0)
-		    : qbQuestion.getQbOptions().get(1);
+	    QbOption correctAnswersGroup = qbQuestion.getQbOptions().get(0).isCorrect() ? qbQuestion.getQbOptions()
+		    .get(0) : qbQuestion.getQbOptions().get(1);
 	    correctVsaOption = correctAnswersGroup.getName();
 	}
 	for (ScratchieAnswerVisitLog userLog : userLogs) {
@@ -1188,8 +1153,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    GroupSummary groupSummary = new GroupSummary(session);
 	    List<ScratchieAnswerVisitLog> sessionAttempts = scratchieAnswerVisitDao.getLogsBySessionAndItem(sessionId,
 		    itemUid);
-	    int numberColumns = options.size() > sessionAttempts.size() || isMcqItem ? options.size()
-		    : sessionAttempts.size();
+	    int numberColumns =
+		    options.size() > sessionAttempts.size() || isMcqItem ? options.size() : sessionAttempts.size();
 	    groupSummary.setNumberColumns(numberColumns);
 
 	    Map<Long, OptionDTO> optionMap = new HashMap<>();
@@ -1275,8 +1240,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	Set<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
 	items.addAll(scratchie.getScratchieItems());
 
-	List<BurningQuestionDTO> burningQuestionDtos = scratchieBurningQuestionDao
-		.getBurningQuestionsByContentId(scratchie.getUid(), sessionId);
+	List<BurningQuestionDTO> burningQuestionDtos = scratchieBurningQuestionDao.getBurningQuestionsByContentId(
+		scratchie.getUid(), sessionId);
 
 	//in order to group BurningQuestions by items, organise them as a list of BurningQuestionItemDTOs
 	List<BurningQuestionItemDTO> burningQuestionItemDtos = new ArrayList<>();
@@ -1288,8 +1253,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		ScratchieBurningQuestion burningQuestion = burningQuestionDto.getBurningQuestion();
 
 		//general burning question is handled further down
-		if (!burningQuestion.isGeneralQuestion()
-			&& item.getUid().equals(burningQuestion.getScratchieItem().getUid())) {
+		if (!burningQuestion.isGeneralQuestion() && item.getUid()
+			.equals(burningQuestion.getScratchieItem().getUid())) {
 		    burningQuestionDtosOfSpecifiedItem.add(burningQuestionDto);
 		}
 	    }
@@ -1817,7 +1782,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 			continue;
 		    }
 		    row = researchAndAnalysisSheet.initRow();
-		    String optionTitle = isMcqItem ? removeHtmlMarkup(optionDto.getAnswer())
+		    String optionTitle = isMcqItem
+			    ? removeHtmlMarkup(optionDto.getAnswer())
 			    : optionDto.getAnswer().strip().replace("\r\n", ", ");
 		    if (optionDto.isCorrect()) {
 			optionTitle += "(" + getMessage("label.monitoring.item.summary.correct") + ")";
@@ -1864,8 +1830,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		    //build list of all logs left for this item and this session
 		    List<ScratchieAnswerVisitLog> logsBySessionAndItem = new ArrayList<>();
 		    for (ScratchieAnswerVisitLog log : logs) {
-			if (log.getSessionId().equals(sessionId)
-				&& log.getQbToolQuestion().getUid().equals(item.getUid())) {
+			if (log.getSessionId().equals(sessionId) && log.getQbToolQuestion().getUid()
+				.equals(item.getUid())) {
 			    logsBySessionAndItem.add(log);
 			}
 		    }
@@ -1908,8 +1874,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 		int logsBySessionAndItem = 0;
 		for (ScratchieAnswerVisitLog log : logs) {
-		    if (log.getSessionId().equals(sessionId)
-			    && log.getQbToolQuestion().getUid().equals(item.getUid())) {
+		    if (log.getSessionId().equals(sessionId) && log.getQbToolQuestion().getUid()
+			    .equals(item.getUid())) {
 			logsBySessionAndItem++;
 		    }
 		}
@@ -1969,7 +1935,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		    for (OptionDTO option : options) {
 			if (option.isCorrect()) {
 			    correctOption = option.getAnswer();
-			    correctOption = isMcqItem ? removeHtmlMarkup(correctOption)
+			    correctOption = isMcqItem
+				    ? removeHtmlMarkup(correctOption)
 				    : correctOption.strip().replace("\r\n", ", ");
 			}
 		    }
@@ -1995,8 +1962,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		    //build list of all logs left for this item and this session
 		    List<ScratchieAnswerVisitLog> logsBySessionAndItem = new ArrayList<>();
 		    for (ScratchieAnswerVisitLog log : logs) {
-			if (log.getSessionId().equals(sessionId)
-				&& log.getQbToolQuestion().getUid().equals(itemDto.getUid())) {
+			if (log.getSessionId().equals(sessionId) && log.getQbToolQuestion().getUid()
+				.equals(itemDto.getUid())) {
 			    logsBySessionAndItem.add(log);
 			}
 		    }
@@ -2152,8 +2119,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    summary.setMark(numberOfFirstChoiceEvents);
 
 	    // round the percentage cell
-	    String totalPercentage = String
-		    .valueOf((items.size() == 0) ? 0 : (double) numberOfFirstChoiceEvents * 100 / items.size());
+	    String totalPercentage = String.valueOf(
+		    (items.size() == 0) ? 0 : (double) numberOfFirstChoiceEvents * 100 / items.size());
 	    summary.setTotalPercentage(Double.valueOf(totalPercentage));
 
 	}
@@ -2161,7 +2128,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	boolean vsaPresent = false;
 	for (ScratchieItem item : itemList) {
-	    item.setCorrectOnFirstAttemptPercent(groupSummaries.isEmpty() ? 0
+	    item.setCorrectOnFirstAttemptPercent(groupSummaries.isEmpty()
+		    ? 0
 		    : (double) item.getCorrectOnFirstAttemptCount() * 100 / groupSummaries.size());
 
 	    if (!vsaPresent && item.getQbQuestion().getType().equals(QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
@@ -2233,8 +2201,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		    // for displaying purposes if there is no attemps we assign -1 which will be shown as "-"
 		    mark = numberOfAttempts == 0 ? -1 : item.getMark();
 
-		    isUnraveledOnFirstAttempt = numberOfAttempts == 1
-			    && ScratchieServiceImpl.isItemUnraveled(item, logs);
+		    isUnraveledOnFirstAttempt =
+			    numberOfAttempts == 1 && ScratchieServiceImpl.isItemUnraveled(item, logs);
 
 		    // find out options' sequential letters - A,B,C...
 		    for (ScratchieAnswerVisitLog visitLog : visitLogs) {
@@ -2257,8 +2225,10 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 			    boolean isCorrect = ScratchieServiceImpl.isItemUnraveledByAnswers(item, List.of(answer));
 			    boolean isFirstAnswersGroupCorrect = qbQuestion.getQbOptions().get(0).isCorrect();
 
-			    sequencialLetter = isCorrect && isFirstAnswersGroupCorrect
-				    || !isCorrect && !isFirstAnswersGroupCorrect ? "A" : "B";
+			    sequencialLetter =
+				    isCorrect && isFirstAnswersGroupCorrect || !isCorrect && !isFirstAnswersGroupCorrect
+					    ? "A"
+					    : "B";
 			}
 
 			optionsSequence += optionsSequence.isEmpty() ? sequencialLetter : ", " + sequencialLetter;
@@ -2395,9 +2365,9 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	for (Long newQuestionUid : newQuestionUids) {
 	    QbQuestion newQuestion = qbService.getQuestionByUid(newQuestionUid);
 
-	    if (!(newQuestion.getType().equals(QbQuestion.TYPE_MULTIPLE_CHOICE)
-		    || newQuestion.getType().equals(QbQuestion.TYPE_MARK_HEDGING)
-		    || newQuestion.getType().equals(QbQuestion.TYPE_VERY_SHORT_ANSWERS))) {
+	    if (!(newQuestion.getType().equals(QbQuestion.TYPE_MULTIPLE_CHOICE) || newQuestion.getType()
+		    .equals(QbQuestion.TYPE_MARK_HEDGING) || newQuestion.getType()
+		    .equals(QbQuestion.TYPE_VERY_SHORT_ANSWERS))) {
 		log.warn("QB question with UID " + newQuestionUid + " is not supported by TBL tRAT, skipping");
 		continue;
 	    }
@@ -2482,8 +2452,9 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     public void changeLeaderForGroup(long toolSessionId, long leaderUserId) {
 	ScratchieSession session = getScratchieSessionBySessionId(toolSessionId);
 	if (session.isScratchingFinished()) {
-	    throw new InvalidParameterException("Attempting to assing a new leader with user ID " + leaderUserId
-		    + " to a finished session wtih ID " + toolSessionId);
+	    throw new InvalidParameterException(
+		    "Attempting to assing a new leader with user ID " + leaderUserId + " to a finished session wtih ID "
+			    + toolSessionId);
 	}
 
 	ScratchieUser existingLeader = session.getGroupLeader();
@@ -2502,8 +2473,9 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 			+ toolSessionId);
 	    }
 	} else if (!newLeader.getSession().getSessionId().equals(toolSessionId)) {
-	    throw new InvalidParameterException("User with ID " + leaderUserId + " belongs to session with ID "
-		    + newLeader.getSession().getSessionId() + " and not to session with ID " + toolSessionId);
+	    throw new InvalidParameterException(
+		    "User with ID " + leaderUserId + " belongs to session with ID " + newLeader.getSession()
+			    .getSessionId() + " and not to session with ID " + toolSessionId);
 	}
 
 	session.setGroupLeader(newLeader);
@@ -2815,8 +2787,9 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	} else {
 	    log.error("Fail to leave tool Session.Could not find shared scratchie " + "session by given session id: "
 		    + toolSessionId);
-	    throw new DataMissingException("Fail to leave tool Session."
-		    + "Could not find shared scratchie session by given session id: " + toolSessionId);
+	    throw new DataMissingException(
+		    "Fail to leave tool Session." + "Could not find shared scratchie session by given session id: "
+			    + toolSessionId);
 	}
 	return toolService.completeToolSession(toolSessionId, learnerId);
     }
@@ -2962,7 +2935,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
 	}
 
-	return new ToolCompletionStatus(learner.isSessionFinished() ? ToolCompletionStatus.ACTIVITY_COMPLETED
+	return new ToolCompletionStatus(learner.isSessionFinished()
+		? ToolCompletionStatus.ACTIVITY_COMPLETED
 		: ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
     }
     // ****************** REST methods *************************
@@ -3030,25 +3004,30 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		qbQuestion = null;
 	    }
 
-	    Long collectionUid = JsonUtil.optLong(questionData, RestTags.COLLECTION_UID);
-	    if (collectionUid == null) {
-		// if no collection UUID was specified, questions end up in user's private collection
-		if (privateCollectionUUID == null) {
-		    privateCollectionUUID = qbService.getUserPrivateCollection(userID).getUid();
+	    boolean addToCollection = qbQuestion == null;
+	    if (addToCollection) {
+		Long collectionUid = JsonUtil.optLong(toolContentJSON, RestTags.COLLECTION_UID);
+		if (collectionUid == null) {
+		    // if no collection UUID was specified, questions end up in user's private collection
+		    if (privateCollectionUUID == null) {
+			privateCollectionUUID = qbService.getUserPrivateCollection(userID).getUid();
+		    }
+		    collectionUid = privateCollectionUUID;
 		}
-		collectionUid = privateCollectionUUID;
-	    }
 
-	    boolean addToCollection = true;
-	    // check if it is the same collection - there is a good chance it is
-	    if (collection == null || collectionUid != collection.getUid()) {
-		collection = qbService.getCollection(collectionUid);
-		if (collection == null) {
+		// check if it is the same collection - there is a good chance it is
+		if (collection == null || collectionUid != collection.getUid()) {
+		    collection = qbService.getCollection(collectionUid);
+		    if (collection == null) {
+			addToCollection = false;
+		    } else {
+			collectionUUIDs = qbService.getCollectionQuestions(collection.getUid()).stream()
+				.peek(q -> qbService.releaseFromCache(q)).filter(q -> q.getUuid() != null)
+				.collect(Collectors.mapping(q -> q.getUuid().toString(), Collectors.toSet()));
+		    }
+		}
+		if (collectionUUIDs.contains(uuid)) {
 		    addToCollection = false;
-		} else {
-		    collectionUUIDs = qbService.getCollectionQuestions(collection.getUid()).stream()
-			    .peek(q -> qbService.releaseFromCache(q)).filter(q -> q.getUuid() != null)
-			    .collect(Collectors.mapping(q -> q.getUuid().toString(), Collectors.toSet()));
 		}
 	    }
 
@@ -3101,8 +3080,6 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 			userManagementService.save(outcomeMapping);
 		    }
 		}
-	    } else if (addToCollection && collectionUUIDs.contains(uuid)) {
-		addToCollection = false;
 	    }
 
 	    item.setQbQuestion(qbQuestion);
