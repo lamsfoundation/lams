@@ -10,14 +10,14 @@ $(document).ready(function(){
 	$("#question-settings-link").on('click', function() {
 		$('.question-tab:visible').fadeToggle("fast", function() {
 			$( ".settings-tab" ).show();
-	    });
+		});
 		$('.settings-tab:visible').fadeToggle("fast", function() {
 			$( ".question-tab" ).show();
-	    });
+		});
 
 		//toggle Settings button class
 		$(this).toggleClass("btn-default btn-primary");
-	});	
+	});
 
 	// trigger is-new-question-version check when changing certain data in a question
 	$('#assessmentQuestionForm').on('input', 'input, select, textarea', function(){
@@ -28,6 +28,51 @@ $(document).ready(function(){
 	$('body').on('input paste', '[contenteditable]', function(){
 		checkQuestionNewVersion(false);
 	});
+
+	$('#collection-uid-select').change(function(){
+		let collectionSelect = $(this),
+			newValue = collectionSelect.val(),
+			previouslySelectedOption = $('option[selected]', collectionSelect);
+		if (newValue == -1) {
+			// create a new collection on the fly
+			let newCollectionName = prompt(ADD_COLLECTION_LABEL),
+				newCollectionUid = -1;
+			if (newCollectionName) {
+				newCollectionName = newCollectionName.trim();
+				let data = {
+					'name' : newCollectionName
+				};
+				data[csrfTokenName] = csrfTokenValue;
+
+				$.ajax({
+					'url' : LAMS_URL + 'qb/collection/addCollection.do',
+					'async' : false,
+					'type' : 'post',
+					'dataType' : 'text',
+					'data' : data,
+					success : function (response){
+						if (!isNaN(response)) {
+							newCollectionUid = +response;
+						}
+					},
+					error : function (xhr) {
+						alert(xhr.responseText);
+					}
+				});
+			}
+
+			if (newCollectionUid == -1 || newCollectionUid == 0) {
+				// revert to previous selection
+				previouslySelectedOption.prop('selected', true);
+			} else {
+				$('<option>').attr('value', newCollectionUid).attr('selected', 'selected')
+					.prop('selected', true).text(newCollectionName).insertBefore($('option[value="-1"]', collectionSelect));
+			}
+		} else {
+			previouslySelectedOption.removeAttr('selected');
+			$('option[value="' + newValue + '"]', collectionSelect).attr('selected', 'selected');
+		}
+	});
 });
 
 // submits whole question form in order to check if it changed enough to produce a new question version
@@ -35,14 +80,14 @@ function checkQuestionNewVersion(quick){
 	if (isNewQuestion) {
 		return;
 	}
-	
+
 	let currentTime = new Date().getTime();
 	// skip initial check of new version
 	if (currentTime < newQuestionVersionCheckTime || (!quick && currentTime - newQuestionVersionCheckTime < newQuestionVersionCheckThrottle)) {
 		return;
 	}
 	newQuestionVersionCheckTime = currentTime;
-	
+
 	let form = $('#assessmentQuestionForm'),
 		validator = form.data('validator');
 	if (!validator) {
@@ -54,11 +99,11 @@ function checkQuestionNewVersion(quick){
 }
 
 function isVersionCheck() {
-	return $('#assessmentQuestionForm').attr('action') == CHECK_QUESTION_NEW_VERSION_URL;	
+	return $('#assessmentQuestionForm').attr('action') == CHECK_QUESTION_NEW_VERSION_URL;
 }
 
 // post-submit callback 
-function afterRatingSubmit(responseText, statusText)  { 
+function afterRatingSubmit(responseText, statusText)  {
 	self.parent.refreshThickbox()
 	self.parent.tb_remove();
 }
@@ -73,29 +118,29 @@ function afterVersionCheck(responseText, statusText, c, d){
 
 //form validation handler. It's called when the form contains an error.
 function formValidationInvalidHandler(form, validator) {
-    var errors = validator.numberOfInvalids();
-    if (errors) {
-        var message = errors == 1
+	var errors = validator.numberOfInvalids();
+	if (errors) {
+		var message = errors == 1
 			? VALIDATION_ERROR_LABEL
-          	: VALIDATION_ERRORS_LABEL.replace("{errors_counter}", errors);
-      	  
-        $("div.error span").html(message);
-        $("div.error").show();
-          
-        //show/hide settings tab, if it contains an error
-        var showSettingsTab = true;
-        $.each(validator.errorMap, function(key, value) {
-        	showSettingsTab &= key == "maxMark" || key == "penaltyFactor";
-        });
-        if (showSettingsTab) {
-        	$("#question-settings-link.btn-default").trigger( "click" );
-        } else {
-        	$("#question-settings-link.btn-primary").trigger( "click" );
-	    }
-          
-    } else {
-        $("div.error").hide();
-    }
+			: VALIDATION_ERRORS_LABEL.replace("{errors_counter}", errors);
+
+		$("div.error span").html(message);
+		$("div.error").show();
+
+		//show/hide settings tab, if it contains an error
+		var showSettingsTab = true;
+		$.each(validator.errorMap, function(key, value) {
+			showSettingsTab &= key == "maxMark" || key == "penaltyFactor";
+		});
+		if (showSettingsTab) {
+			$("#question-settings-link.btn-default").trigger( "click" );
+		} else {
+			$("#question-settings-link.btn-primary").trigger( "click" );
+		}
+
+	} else {
+		$("div.error").hide();
+	}
 }
 function formValidationErrorPlacement( error, element ) {
 	// Add the `help-block` class to the error element

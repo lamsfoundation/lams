@@ -25,6 +25,10 @@
 								</c:if>
 						</option>
 					</c:forEach>
+					<c:if test="${allowCreatingQbCollections}">
+						<fmt:message key="label.questions.choice.collection.new.option" var="newOptionLabel"/>
+						<option value="-1"><c:out escapeXml="true" value="${newOptionLabel}" /></option>
+					</c:if>
 				</select>
 			</span>
 				
