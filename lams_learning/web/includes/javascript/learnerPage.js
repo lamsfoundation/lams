@@ -6,6 +6,7 @@ function initLearnerPage(toolSessionId, userId) {
         topToggleButton.attr('aria-expanded', !isExpanded)
             .children('i').toggleClass(topToggleButton.data('closed-class')).toggleClass(topToggleButton.data('opened-class'));
         $('.component-page-wrapper .component-sidebar').toggleClass('active').attr('aria-expanded', !isExpanded);
+		$('.component-sidebar').focus();
     });
 
     $.ajax({

@@ -98,7 +98,7 @@
 
         </div>
 
-        <nav class="component-sidebar" aria-label="Side menu" aria-expanded="false" role="navigation">
+        <nav class="component-sidebar" aria-label="Side menu" aria-expanded="false" role="navigation" tabindex="-1">
             <button class="sidebar-toggle-button no-decoration" aria-labelledby="progress-bar-title">
                 <i class="fa-solid fa-xmark"></i>
             </button>
