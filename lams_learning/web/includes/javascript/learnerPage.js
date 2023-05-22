@@ -49,7 +49,7 @@ function initLearnerPage(toolSessionId, userId) {
                     if (activityData.type === 'g') {
                         activityIcon.addClass('fa-hourglass-half');
                     } else {
-                        activityIcon.addClass('fa-circle');
+                        activityIcon.addClass('fa-pen-to-square');
                     }
                 } else if (activityData.status === 1) {
                     completedActivityCount++;
@@ -58,7 +58,7 @@ function initLearnerPage(toolSessionId, userId) {
                     if (activityData.type === 'g') {
                         activityIcon.addClass('fa-hourglass-full');
                     } else {
-                        activityIcon.addClass('fa-check');
+                        activityIcon.addClass('fa-square-check');
                     }
                     if (activityData.url) {
                         let activityLink = $('<a>').text(activityName).attr({
@@ -74,7 +74,7 @@ function initLearnerPage(toolSessionId, userId) {
                     if (activityData.type === 'g') {
                         activityIcon.addClass('fa-hourglass-start');
                     } else {
-                        activityIcon.addClass('fa-circle');
+                        activityIcon.addClass('fa-square');
                     }
                 }
             });

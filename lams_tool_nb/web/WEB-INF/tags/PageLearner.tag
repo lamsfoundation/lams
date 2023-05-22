@@ -57,7 +57,7 @@
         <div class="component-page-content">
             <a href="#component-main-content" class="visually-hidden-focusable p-2">Skip to main content</a>
 
-            <header class="d-flex justify-content-between" role="banner">
+            <header id="header" class="d-flex justify-content-between" role="banner">
                 <div class="d-flex">
                     <button class="sidebar-toggle-button no-decoration"
                             data-closed-class="fa-bars" data-opened-class="fa-bars-staggered"
@@ -75,24 +75,21 @@
                             <div class="col-6 text-end" id="progress-bar-widget-value">
                             </div>
                         </div>
-                        <div class="progress mt-2 mb-2">
+                        <div class="progress mt-1 mb-2">
                             <div class="progress-bar bg-success" role="progressbar" aria-label="Progress bar widget"
                                  aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                     </div>
-                    <button id="profile-picture" class="no-decoration pt-1" type="button"
+                    <button id="profile-picture" class="no-decoration px-3 py-1" type="button"
                             onclick="javascript:showMyProfileDialog()">
-                        <img class="portrait-sm portrait-round" src="${pageLearnerPortraitSrc}" aria-label="User profile picture" alt="User profile picture">
-                        <span class="xs-hidden d-block" aria-label="User first and last name">
-						    <c:out value="${pageLearnerFirstName}" escapeXml="true"/>&nbsp;<c:out value="${pageLearnerLastName}" escapeXml="true"/>
-					    </span>
+                        <img class="portrait-sm portrait-round" src="${pageLearnerPortraitSrc}" aria-label="<c:out value="${pageLearnerFirstName} ${pageLearnerLastName}" escapeXml="true"/> profile picture" alt="User profile picture">
                     </button>
                 </div>
             </header>
 
             <main class="m-3" id="component-main-content">
                 <c:if test="${not empty title}">
-                    <h3 class="mb-3"><c:out value="${title}" escapeXml="true" /></h3>
+                    <h2 class="mb-3"><c:out value="${title}" escapeXml="true" /></h2>
                 </c:if>
 
                 <jsp:doBody/>
@@ -110,12 +107,12 @@
             </a>
 
             <div id="support-bar" class="d-none pb-4 w-100">
-                <h6 class="sidebar-title"><i class="fa-solid fa-snowplow"></i>&nbsp;<span id="support-bar-title">Support activities</span></h6>
+                <span class="sidebar-title"><i class="fa-solid fa-snowplow"></i>&nbsp;<span id="support-bar-title">Support activities</span></span>
                 <ul id="support-bar-items" class="progress-bar-items" role="menu">
                 </ul>
             </div>
 
-            <h6 class="sidebar-title"><i class="fa-solid fa-bars-progress"></i>&nbsp;<span id="progress-bar-title">Progress bar</span></h6>
+            <span class="sidebar-title"><i class="fa-solid fa-fw fa-bars-progress sidebar-title-icon"></i>&nbsp;<span id="progress-bar-title">Progress bar</span></span>
             <ul id="progress-bar-items" class="progress-bar-items w-100" role="menu">
             </ul>
         </nav>
