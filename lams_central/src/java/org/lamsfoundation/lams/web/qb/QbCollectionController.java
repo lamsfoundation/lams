@@ -22,6 +22,7 @@
 
 package org.lamsfoundation.lams.web.qb;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.outcome.service.IOutcomeService;
 import org.lamsfoundation.lams.qb.model.QbCollection;
@@ -186,11 +187,22 @@ public class QbCollectionController {
     @RequestMapping(path = "/addCollection", method = RequestMethod.POST, produces = "text/plain")
     @ResponseBody
     public ResponseEntity<String> addCollection(@RequestParam String name) {
+	if (StringUtils.isBlank(name)) {
+	    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Name is required for creating a new collection");
+	}
 	if (!Configuration.getAsBoolean(ConfigurationKeys.QB_COLLECTIONS_CREATE_ALLOW)) {
 	    log.error("Trying to create a new collection when it is disabled: " + name);
 	    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Creating QB collections is disabled");
 	}
-	QbCollection collection = qbService.addCollection(getUserId(), name);
+	String trimmedName = name.strip();
+	boolean nameAlreadyExists = qbService.getUserCollections(getUserId()).stream().map(QbCollection::getName)
+		.anyMatch(collectionName -> collectionName.equalsIgnoreCase(trimmedName));
+	if (nameAlreadyExists) {
+	    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+		    .body(messageService.getMessage("label.qb.collection.name.duplicate.error"));
+	}
+
+	QbCollection collection = qbService.addCollection(getUserId(), trimmedName);
 	return ResponseEntity.ok(collection.getUid().toString());
     }
 
