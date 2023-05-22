@@ -184,9 +184,6 @@
 						previouslySelectedOption.removeAttr('selected');
 						$('option[value="' + newValue + '"]', collectionSelect).attr('selected', 'selected');
 					}
-
-
-
 				});
 			});
 		</script>
@@ -218,7 +215,6 @@
 					<input type="hidden" name="questionCount" value="${fn:length(questions)}" />
 
 					<c:if test="${not empty collections}">
-						<fmt:message key="label.questions.choice.collection.new.option" var="newOptionLabel"/>
 						<!-- Choose a collection where questions should be imported to -->
 						<label id="collectionSelect">
 							<fmt:message key="label.questions.choice.collection" />&nbsp;
@@ -229,6 +225,7 @@
 									</option>
 								</c:forEach>
 								<c:if test="${allowCreatingQbCollections}">
+									<fmt:message key="label.questions.choice.collection.new.option" var="newOptionLabel"/>
 									<option value="-1"><c:out escapeXml="true" value="${newOptionLabel}" /></option>
 								</c:if>
 							</select>
