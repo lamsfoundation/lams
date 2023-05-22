@@ -59,7 +59,7 @@
 
             <header id="header" class="d-flex justify-content-between" role="banner">
                 <div class="d-flex">
-                    <button class="sidebar-toggle-button no-decoration" accesskey="p"
+                    <button class="sidebar-toggle-button no-decoration" accesskey="p" id="hamb"
                             data-closed-class="fa-bars" data-opened-class="fa-bars-staggered"
                             aria-labelledby="progress-bar-title" aria-expanded="false">
                         <i class="fa-solid fa-fw fa-bars" aria-hidden="true"></i>
@@ -87,7 +87,7 @@
                 </div>
             </header>
 
-            <main class="m-3" id="component-main-content">
+            <main class="p-3" id="component-main-content" tabindex="-1">
                 <c:if test="${not empty title}">
                     <h2 class="mb-3"><c:out value="${title}" escapeXml="true" /></h2>
                 </c:if>

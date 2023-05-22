@@ -1,3 +1,35 @@
+.component-page-wrapper h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
+    color: var(--bs-gray-dark);
+}
+
+.component-page-wrapper h1, .h1 {
+    font-size: calc(1.2rem + 1vw);
+}
+
+.component-page-wrapper h2, .h2 {
+    font-size: calc(1.2rem + 0.7vw);
+}
+
+.component-page-wrapper h3, .h3 {
+    font-size: calc(1.2rem + 0.5vw);
+}
+
+.component-page-wrapper h4, .h4 {
+    font-size: calc(1.1rem + 0.3vw);
+}
+
+.component-page-wrapper h5, .h5 {
+    font-size: 1.1rem;
+}
+
+.component-page-wrapper h6, .h6 {
+    font-size: 1rem;
+}
+
+.component-page-wrapper #hamb {
+    font-size: 1.8rem;
+}
+
 .component-page-wrapper #lesson-name {
     margin-left: 1rem;
     margin-top: .6rem;

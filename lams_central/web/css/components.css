@@ -436,7 +436,7 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 }
 
 .component-page-wrapper button.no-decoration:focus {
-	border: thin solid var(--bs-secondary);
+	border: thin solid var(--bs-gray-700);
 }
 
 .component-page-wrapper .component-page-content > header .sidebar-toggle-button {
