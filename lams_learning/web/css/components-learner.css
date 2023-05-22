@@ -3,6 +3,10 @@
     margin-top: .6rem;
 }
 
+#header {
+    box-shadow: 0px 1px 0px var(--bs-gray-400);
+}
+
 .component-page-wrapper .top-menu #progress-bar-widget {
     min-width: 10rem;
     margin-top: .6rem;
@@ -11,7 +15,7 @@
 
 .component-page-wrapper .top-menu #progress-bar-widget .progress {
     height: .5rem;
-    background-color: var(--bs-gray-200);
+    background-color: var(--bs-gray-400);
 }
 
 .component-page-wrapper .top-menu #progress-bar-widget .progress .progress-bar {
@@ -23,8 +27,8 @@
     left: -72rem;
     max-width: 70rem;
     border-radius: 1.2rem;
-    border: thin solid var(--bs-gray-200);
-    box-shadow: 0 0 3px rgba(0, 0, 0, .05);
+    border: thin solid var(--bs-gray-400);
+	box-shadow: 0px 3px 6px var(--bs-gray-400);
 }
 
 .component-page-wrapper .component-sidebar.active {
@@ -38,7 +42,7 @@
 }
 
 .component-page-wrapper .component-sidebar .progress-bar-items {
-    background-color: var(--lams-background-gray);
+    background-color: var(--bs-gray-200); 
     padding: .5rem;
     margin-bottom: 0;
     border-radius: 1.2rem;
@@ -54,10 +58,16 @@
 
 .component-page-wrapper .component-sidebar .progress-bar-items > li a {
     text-decoration: none;
+	color: var(--bs-gray-dark);
 }
 
 .component-page-wrapper .component-sidebar .progress-bar-items > li > .progress-bar-icon {
     margin-right: .5rem;
+}
+
+.component-page-wrapper .component-sidebar .progress-bar-items > li.progress-bar-item-incomplete,
+.component-page-wrapper .component-sidebar .progress-bar-items > li.progress-bar-item-incomplete > .progress-bar-icon {
+    color: var(--bs-gray-700);
 }
 
 .component-page-wrapper .component-sidebar .progress-bar-items > li.progress-bar-item-complete,
@@ -80,3 +90,30 @@
     display: flex;
     flex-direction: row-reverse;
 }
+
+.component-page-wrapper #finishButton {
+    box-shadow: 0px 3px 6px var(--bs-gray-400);
+}
+
+.component-page-wrapper #finishButton:focus {
+    box-shadow: var(--bs-btn-focus-box-shadow);
+}
+
+.component-page-wrapper #progress-bar-widget {
+	font-size: 0.90rem;
+}
+
+.component-page-wrapper .sidebar-title {
+    font-size: 1.2rem;
+	margin-bottom: 0.5rem
+}
+
+.component-page-wrapper .sidebar-title {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem
+}
+
+.component-page-wrapper .sidebar-title-icon {
+    font-size: 1rem;
+}
+
