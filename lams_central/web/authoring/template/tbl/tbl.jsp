@@ -1,5 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <%@ include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<c:set var="allowCreatingQbCollections"><%=Configuration.get(ConfigurationKeys.QB_COLLECTIONS_CREATE_ALLOW)%></c:set>
 <c:set var="lams">
 	<lams:LAMSURL />
 </c:set>
@@ -75,6 +78,49 @@
 
 				jQuery.validator.addMethod("validateNoSpecialCharacters", validateNoSpecialCharacters, '<fmt:message key="authoring.section.lessondetails" />: <fmt:message key="authoring.fla.title.validation.error" />');
 				initializeWizard(validator);
+
+				$('#qb-collection-uid').change(function(){
+					let collectionSelect = $(this),
+							newValue = collectionSelect.val(),
+							previouslySelectedOption = $('option[selected]', collectionSelect);
+					if (newValue == -1) {
+						// create a new collection on the fly
+						let newCollectionName = prompt('<fmt:message key="label.questions.choice.collection.new.prompt" />'),
+								newCollectionUid = -1;
+						if (newCollectionName) {
+							newCollectionName = newCollectionName.trim();
+							$.ajax({
+								'url' : '${lams}qb/collection/addCollection.do',
+								'async' : false,
+								'type' : 'post',
+								'dataType' : 'text',
+								'data' : {
+									'name' : newCollectionName,
+									'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
+								},
+								success : function (response){
+									if (!isNaN(response)) {
+										newCollectionUid = +response;
+									}
+								},
+								error : function (xhr) {
+									alert(xhr.responseText);
+								}
+							});
+						}
+
+						if (newCollectionUid == -1 || newCollectionUid == 0) {
+							// revert to previous selection
+							previouslySelectedOption.prop('selected', true);
+						} else {
+							$('<option>').attr('value', newCollectionUid).attr('selected', 'selected')
+									.prop('selected', true).text(newCollectionName).insertBefore($('option[value="-1"]', collectionSelect));
+						}
+					} else {
+						previouslySelectedOption.removeAttr('selected');
+						$('option[value="' + newValue + '"]', collectionSelect).attr('selected', 'selected');
+					}
+				});
 			});
 
 			function createApplicationExercise(type, callingAppexNumber) {
@@ -264,11 +310,15 @@
 							<div id="qb-collection-collapse" class="panel-body panel-collapse collapse" role="tabpanel"
 								 aria-labelledby="#qb-collection-heading">
 								<label for="qb-collection"><fmt:message key="authoring.label.question.collection"/></label>
-								<select name="qbCollectionUid" id="qb-collection" title="<fmt:message key="label.qb.collection" />"
+								<select name="qbCollectionUid" id="qb-collection-uid" title="<fmt:message key="label.qb.collection" />"
 										class="form-control form-control-inline">
 									<c:forEach items="${qbCollections}" var="collection">
 										<option value="${collection.uid}"><c:out value="${collection.name}" /></option>
 									</c:forEach>
+									<c:if test="${allowCreatingQbCollections}">
+										<fmt:message key="label.questions.choice.collection.new.option" var="newOptionLabel"/>
+										<option value="-1"><c:out escapeXml="true" value="${newOptionLabel}" /></option>
+									</c:if>
 								</select>
 							</div>
 						</div>
