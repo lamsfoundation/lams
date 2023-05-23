@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿/**
+﻿/**
  * This file contains main methods for Authoring.
  */
 
