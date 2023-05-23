@@ -1343,7 +1343,7 @@ GeneralLib = {
 			var activity = null;
 			if (!onlyDetachedLeft) {
 				$.each(activitiesCopy, function(){
-					if (this.transitions.to.length > 0) {
+					if (this.transitions && this.transitions.to.length > 0) {
 						activity = this;
 						// crawl back using "to" transition all the way to the beggining of sequence
 						while (activity.transitions.to.length > 0) {

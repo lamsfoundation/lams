@@ -6,7 +6,7 @@ function initLearnerPage(toolSessionId, userId) {
         topToggleButton.attr('aria-expanded', !isExpanded)
             .children('i').toggleClass(topToggleButton.data('closed-class')).toggleClass(topToggleButton.data('opened-class'));
         $('.component-page-wrapper .component-sidebar').toggleClass('active').attr('aria-expanded', !isExpanded);
-		$('.component-sidebar').focus();
+        $('.component-sidebar').focus();
     });
 
     $.ajax({
@@ -88,31 +88,4 @@ function initLearnerPage(toolSessionId, userId) {
             $('#progress-bar-widget-value').text(progressBarWidgetValue + '%');
         }
     });
-}
-
-function showMyProfileDialog() {
-    let dialog = showDialog("dialogMyProfile", {
-        'title' : "My profile",
-        'modal' : true,
-        'width' : Math.max(380, Math.min(1000, $(window).width() - 60)),
-        'height' : 430,
-        'open' : function() {
-            var dialog = $(this);
-            // load contents after opening the dialog
-            $('iframe', dialog).attr({'src': LAMS_URL + 'index.do?redirect=profile',
-                'id' : 'myProfileModal'});
-
-            // in case of mobile devices allow iframe scrolling
-            if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-                setTimeout(function() {
-                    dialog.css({
-                        'overflow-y' : 'scroll',
-                        '-webkit-overflow-scrolling' : 'touch'
-                    });
-                },500);
-            }
-        }
-    });
-
-    dialog.children('.modal-dialog').addClass('modal-lg');
 }

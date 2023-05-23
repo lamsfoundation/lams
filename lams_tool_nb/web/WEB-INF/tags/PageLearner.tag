@@ -81,7 +81,7 @@
                         </div>
                     </div>
                     <button id="profile-picture" class="no-decoration px-3 py-1" type="button"
-                            onclick="javascript:showMyProfileDialog()">
+                            onclick="javascript:showMyPortraitDialog()">
                         <img class="portrait-sm portrait-round" src="${pageLearnerPortraitSrc}" aria-label="<c:out value="${pageLearnerFirstName} ${pageLearnerLastName}" escapeXml="true"/> profile picture" alt="User profile picture">
                     </button>
                 </div>

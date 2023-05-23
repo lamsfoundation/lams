@@ -162,6 +162,13 @@ public class PortraitSaveController {
 	user.setPortraitUuid(UUID.fromString(originalFileNode.getUuid()));
 	userManagementService.saveUser(user);
 
+	// apply also to logged in user
+	HttpSession session = request.getSession();
+	UserDTO userDTO = (UserDTO) session.getAttribute(AttributeNames.USER);
+	if (userDTO != null && userDTO.getUserID().equals(user.getUserId())) {
+	    userDTO.setPortraitUuid(originalFileNode.getUuid());
+	}
+
 	return "forward:/index.do?redirect=portrait";
     }
 
