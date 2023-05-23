@@ -1,12 +1,8 @@
 // refresh progress bar on first/next activity load
 function initLearnerPage(toolSessionId, userId) {
-    $('.component-page-wrapper .sidebar-toggle-button').click(function () {
-        let topToggleButton = $('.component-page-wrapper .component-page-content > header .sidebar-toggle-button'),
-            isExpanded = topToggleButton.attr('aria-expanded') == 'true';
-        topToggleButton.attr('aria-expanded', !isExpanded)
-            .children('i').toggleClass(topToggleButton.data('closed-class')).toggleClass(topToggleButton.data('opened-class'));
-        $('.component-page-wrapper .component-sidebar').toggleClass('active').attr('aria-expanded', !isExpanded);
-        $('.component-sidebar').focus();
+    $('.component-page-wrapper .sidebar-toggle-button').click(function (event) {
+        event.stopPropagation();
+        toggleProgressBar();
     });
 
     $.ajax({
@@ -88,4 +84,28 @@ function initLearnerPage(toolSessionId, userId) {
             $('#progress-bar-widget-value').text(progressBarWidgetValue + '%');
         }
     });
+}
+
+function toggleProgressBar(forceClose) {
+    let pageContent = $('.component-page-wrapper .component-page-content'),
+        topToggleButton = $('header .sidebar-toggle-button', pageContent),
+        isExpanded = forceClose || topToggleButton.attr('aria-expanded') == 'true';
+    topToggleButton.attr('aria-expanded', !isExpanded)
+        .children('i').toggleClass(topToggleButton.data('closed-class')).toggleClass(topToggleButton.data('opened-class'));
+    $('.component-page-wrapper .component-sidebar').toggleClass('active').attr('aria-expanded', !isExpanded);
+    $('.component-sidebar').focus();
+
+    pageContent.off('click');
+    $('body').off('keyup');
+
+    if (!isExpanded) {
+        pageContent.one('click', function (){
+            toggleProgressBar(true);
+        });
+        $('body').on('keyup', function (event){
+            if (event.key === "Escape") {
+                toggleProgressBar(true);
+            }
+        });
+    }
 }
