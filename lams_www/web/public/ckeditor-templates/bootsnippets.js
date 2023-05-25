@@ -216,7 +216,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		css: '',
 		html: 
 		'<div class="col-md-12">' +
-			'<img class="img-responsive center-block img-rounded img-soft-shadow" src="/lams/www/public/ckeditor-templates/images/centered_image.jpg">' +
+			'<img class="img-fluid mx-auto d-block shadow-sm rounded" src="/lams/www/public/ckeditor-templates/images/centered_image.jpg">' +
 		'</div>'
 	},
 	{
@@ -227,7 +227,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		html: 
 		'<div class="row">' +
 	    ' 	<div class="col-md-12" style="padding-left:0; padding-right:0;">' +
-	    '  		<img src="/lams/www/public/ckeditor-templates/images/image_full_width.jpg" class="img-responsive img-rounded img-soft-shadow" style="width: 100%;"/>' +
+	    '  		<img src="/lams/www/public/ckeditor-templates/images/image_full_width.jpg" class="img-fluid mx-auto d-block shadow-sm rounded" style="width: 100%;"/>' +
 	    '	</div>' +
 	    '</div>'
 	},
@@ -239,7 +239,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		html: 
 		'<div class="row">' +
 		'	<div class="col-md-4 col-sm-6">' +
-		'		<img class="img-responsive img-rounded img-soft-shadow" src="/lams/www/public/ckeditor-templates/images/sanfran.jpg">' +
+		'		<img class="img-fluid mx-auto d-block shadow-sm rounded" src="/lams/www/public/ckeditor-templates/images/sanfran.jpg">' +
 		'	</div>' +
 	
 		'	<div class="col-md-8 col-sm-6">' +
@@ -256,7 +256,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		html: 
 		'<div class="container">' +
 		'	<div class="col-xs-12 col-sm-9 col-sm-offset-1">' +
-		'		<img class="img-responsive" src="/lams/www/public/ckeditor-templates/images/desk.jpg">' +
+		'		<img class="img-fluid" src="/lams/www/public/ckeditor-templates/images/desk.jpg">' +
 		'		<div class="carousel-caption">' +
 		'			<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut eleifend, turpis non luctus tempor</h2>' +
 		'		</div>' +
@@ -274,7 +274,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'		<div class="panel-heading">Image header</div>' +
 			
 		'		<div class="panel-body">' +
-		'			<img class="img-responsive center-block img-rounded img-soft-shadow" src="/lams/www/public/ckeditor-templates/images/learn.jpg">' +
+		'			<img class="img-fluid mx-auto d-block shadow-sm rounded" src="/lams/www/public/ckeditor-templates/images/learn.jpg">' +
 		'			<h4>Title</h4>' +
 		'			<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed in lobortis nisl, vitae iaculis sapien. Phasellus ultrices gravida massa luctus ornare. Suspendisse blandit quam elit, eu imperdiet neque semper et.</p>' +
 		'		</div>' +
@@ -343,7 +343,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'<div class="row">' +
 		'    <div class="col-md-6">' +
 		'	    <div class="thumbnail">' +
-		'	        <img alt="" src="/lams/www/public/ckeditor-templates/images/stairs.jpg" style="width:100%" class="img-responsive img-rounded img-soft-shadow" />' +
+		'	        <img alt="" src="/lams/www/public/ckeditor-templates/images/stairs.jpg" style="width:100%" class="img-fluid mx-auto d-block shadow-sm rounded" />' +
 		'	        <div class="caption">' +
 		'	          <p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>' +
 		'	        </div>' +
@@ -351,7 +351,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'	  </div>' +
 		'	  <div class="col-md-6">' +
 		'	    <div class="thumbnail">' +
-		'	        <img alt="" src="/lams/www/public/ckeditor-templates/images/study.jpg" style="width:100%" class="img-responsive img-rounded img-soft-shadow" />' +
+		'	        <img alt="" src="/lams/www/public/ckeditor-templates/images/study.jpg" style="width:100%" class="img-fluid mx-auto d-block shadow-sm rounded" />' +
 		'	        <div class="caption">' +
 		'	          <p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>' +
 		'	        </div>' +
@@ -368,7 +368,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'<div class="row">' +
 		'    <div class="col-md-4">' +
 		'	    <div class="thumbnail">' +
-		'	        <img src="/lams/www/public/ckeditor-templates/images/math.jpg" alt="" style="width:100%" class="img-responsive img-rounded img-soft-shadow" />' +
+		'	        <img src="/lams/www/public/ckeditor-templates/images/math.jpg" alt="" style="width:100%" class="img-fluid mx-auto d-block shadow-sm rounded" />' +
 		'	        <div class="caption">' +
 		'	          <p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>' +
 		'	        </div>' +
@@ -376,7 +376,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'	  </div>' +
 		'	  <div class="col-md-4">' +
 		'	    <div class="thumbnail">' +
-		'	        <img src="/lams/www/public/ckeditor-templates/images/ideas.jpg" alt="" style="width:100%" class="img-responsive img-rounded img-soft-shadow" />' +
+		'	        <img src="/lams/www/public/ckeditor-templates/images/ideas.jpg" alt="" style="width:100%" class="img-fluid mx-auto d-block shadow-sm rounded" />' +
 		'	        <div class="caption">' +
 		'	          <p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>' +
 		'	        </div>' +
@@ -384,7 +384,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'	  </div>' +
 		'	  <div class="col-md-4">' +
 		'	    <div class="thumbnail">' +
-		'	        <img src="/lams/www/public/ckeditor-templates/images/cogs.jpg" alt="" style="width:100%" class="img-responsive img-rounded img-soft-shadow" />' +
+		'	        <img src="/lams/www/public/ckeditor-templates/images/cogs.jpg" alt="" style="width:100%" class="img-fluid mx-auto d-block shadow-sm rounded" />' +
 		'	        <div class="caption">' +
 		'	          <p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>' +
 		'	        </div>' +
