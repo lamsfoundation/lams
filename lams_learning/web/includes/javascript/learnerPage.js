@@ -88,20 +88,23 @@ function initLearnerPage(toolSessionId, userId) {
 
 function toggleProgressBar(forceClose) {
     let pageContent = $('.component-page-wrapper .component-page-content'),
+        progressBar = $('.component-page-wrapper .component-sidebar'),
         topToggleButton = $('header .sidebar-toggle-button', pageContent),
         isExpanded = forceClose || topToggleButton.attr('aria-expanded') == 'true';
     topToggleButton.attr('aria-expanded', !isExpanded)
         .children('i').toggleClass(topToggleButton.data('closed-class')).toggleClass(topToggleButton.data('opened-class'));
-    $('.component-page-wrapper .component-sidebar').toggleClass('active').attr('aria-expanded', !isExpanded);
-    $('.component-sidebar').focus();
+    progressBar.toggleClass('active').attr('aria-expanded', !isExpanded);
 
-    pageContent.off('click');
     $('body').off('keyup');
 
-    if (!isExpanded) {
-        pageContent.one('click', function (){
-            toggleProgressBar(true);
-        });
+    if (isExpanded) {
+        progressBar.attr('inert', '');
+        pageContent.removeAttr('inert');
+    } else {
+        pageContent.attr('inert', '');
+        progressBar.removeAttr('inert');
+        $('.sidebar-toggle-button', progressBar).focus();
+
         $('body').on('keyup', function (event){
             if (event.key === "Escape") {
                 toggleProgressBar(true);

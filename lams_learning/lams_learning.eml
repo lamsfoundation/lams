@@ -3,6 +3,7 @@
 	<contentEntry url="file://$MODULE_DIR$">
 		<excludeFolder url="file://$MODULE_DIR$/bin"/>
 		<excludeFolder url="file://$MODULE_DIR$/build"/>
+		<excludeFolder url="file://$MODULE_DIR$/.sass-cache"/>
 	</contentEntry>
 	<lib name="commons-io-2.11.0.jar" scope="COMPILE">
 		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_48$/commons-io"/>
